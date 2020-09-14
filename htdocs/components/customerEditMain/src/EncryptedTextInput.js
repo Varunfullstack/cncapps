@@ -93,25 +93,27 @@ class EncryptedTextInput extends React.Component {
     }
 
     render() {
+
+
         if (this.state.isEncrypted && this.state.encryptedValue) {
-            return this.el(
-                'button',
-                {onClick: this.decryptValue},
-                this.el(
-                    'i',
-                    {className: 'fa fa-pencil-alt greenPencil',}
-                )
+            return (
+                <button type="button" onClick={this.decryptValue}
+                        className='form-control'
+                >
+                    <i className="fa fa-pencil-alt greenPencil"/>
+                </button>
             );
         }
 
         // not encrypted ...we need to show the input
 
-        return this.el(ReactInputMask, {
-            value: this.state.unencryptedValue,
-            onChange: this.handleChange,
-            mask: this.props.mask,
-            alwaysShowMask: true
-        });
+        return <ReactInputMask
+            value={this.state.unencryptedValue}
+            onChange={this.handleChange}
+            mask={this.props.mask}
+            alwaysShowMask={true}
+            className='form-control'
+        />
     }
 }
 

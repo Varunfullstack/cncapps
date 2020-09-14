@@ -858,12 +858,6 @@ class CTCustomer extends CTCNC
                 return $this->updateCustomerReviewController();
             case self::GET_CUSTOMER_PORTAL_DOCUMENTS:
                 return $this->getCustomerPortalDocumentsController();
-            case 'getReviewEngineers':
-                return $this->getReviewEngineersController();
-            case 'getCustomerReviewData':
-                return $this->getCustomerReviewDataController();
-            case 'updateCustomerReview':
-                return $this->updateCustomerReviewController();
             case 'createCustomerFolder':
                 $this->createCustomerFolder();
                 break;

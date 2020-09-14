@@ -2,9 +2,11 @@
 import React from 'react';
 import Select from "./Select";
 import EncryptedTextInput from "./EncryptedTextInput";
+import CustomerNotesComponent from "./CustomerNotesComponent";
 
 class CustomerEditMain extends React.Component {
     el = React.createElement;
+
 
     constructor(props) {
         super(props);
@@ -23,6 +25,8 @@ class CustomerEditMain extends React.Component {
                 lastReviewMeetingDate: '',
                 leadStatusId: '',
                 mailshotFlag: '',
+                reviewDate: '',
+                reviewTime: '',
                 modifyDate: '',
                 name: '',
                 noOfPCs: '',
@@ -52,7 +56,8 @@ class CustomerEditMain extends React.Component {
                 slaP1PenaltiesAgreed: '',
                 slaP2PenaltiesAgreed: '',
                 slaP3PenaltiesAgreed: '',
-
+                reviewUserID: '',
+                reviewAction: ''
             }
         };
         this.handleCustomerTypeUpdate = this.handleCustomerTypeUpdate.bind(this);
@@ -92,6 +97,18 @@ class CustomerEditMain extends React.Component {
         this.handleSlaP1PenaltiesAgreed = this.handleSlaP1PenaltiesAgreed.bind(this);
         this.handleSlaP2PenaltiesAgreed = this.handleSlaP2PenaltiesAgreed.bind(this);
         this.handleSlaP3PenaltiesAgreed = this.handleSlaP3PenaltiesAgreed.bind(this);
+        this.handleReviewDateUpdate = this.handleReviewDateUpdate.bind(this);
+        this.handleReviewTimeUpdate = this.handleReviewTimeUpdate.bind(this);
+        this.handleReviewUserIDUpdate = this.handleReviewUserIDUpdate.bind(this);
+        this.handleReviewActionUpdate = this.handleReviewActionUpdate.bind(this);
+    }
+
+    handleReviewActionUpdate($event) {
+        this.updateCustomerField('reviewAction', $event.target.value);
+    }
+
+    handleReviewUserIDUpdate($event) {
+        this.updateCustomerField('reviewUserID', $event.target.value);
     }
 
     handleSlaFixHoursP1($event) {
@@ -177,6 +194,14 @@ class CustomerEditMain extends React.Component {
                 .then(response => response.json())
                 .then(response => this.setState({
                     accountManagers: response.data.map(x => ({
+                        label: x.cns_name,
+                        value: x.cns_consno,
+                    }))
+                })),
+            fetch('?action=getReviewEngineers')
+                .then(response => response.json())
+                .then(response => this.setState({
+                    reviewEngineers: response.data.map(x => ({
                         label: x.cns_name,
                         value: x.cns_consno,
                     }))
@@ -676,15 +701,7 @@ class CustomerEditMain extends React.Component {
     }
 
     getAccountManagerInput() {
-        return this.el(
-            Select,
-            {
-                options: this.state.accountManagers,
-                selectedOption: this.state.customer.accountManagerUserID,
-                onChange: this.handleAccountManagerUserIDUpdate,
-                key: 'accountManager'
-            }
-        )
+
     }
 
     handleSortCodeUpdate(value) {
@@ -706,32 +723,18 @@ class CustomerEditMain extends React.Component {
         this.updateCustomerField('accountName', event.target.value);
     }
 
-    getAccountNameInput() {
-        return this.el(
-            'input',
-            {
-                type: 'text',
-                value: this.state.customer.accountName,
-                onChange: this.handleAccountNameUpdate
-            }
-        )
-
-    }
-
     handleAccountNumberUpdate(value) {
         this.updateCustomerField('accountNumber', value);
     }
 
-    getAccountNumberInput() {
-        return this.el(
-            EncryptedTextInput,
-            {
-                encryptedValue: this.state.customer.accountNumber,
-                onChange: this.handleAccountNumberUpdate,
-                mask: '99999999'
-            }
-        )
+    handleReviewDateUpdate(value) {
+        this.updateCustomerField('reviewDate', value);
     }
+
+    handleReviewTimeUpdate(value) {
+        this.updateCustomerField('reviewTime', value);
+    }
+
 
     render() {
         const {customerId} = this.props.customerId;
@@ -1165,57 +1168,41 @@ class CustomerEditMain extends React.Component {
                                 <div className="col-lg-4">
                                     <label>Account Manager</label>
                                     <div className="form-group">
-                                        <
-                                        <select name="form[customer][{customerID}][accountManagerUserID]"
-                                                onChange="setFormChanged();"
+                                        <Select options={this.state.accountManagers}
+                                                selectedOption={this.state.customer.accountManagerUserID}
+                                                onChange={this.handleAccountManagerUserIDUpdate}
+                                                key={'accountManager'}
                                                 className="form-control"
-                                        >
-                                            <option value="{accountManagerUserID}"
-                                            >
-                                                {accountManagerUserName}
-                                            </option>
-                                        </select>
+                                        />
                                     </div>
                                 </div>
                                 <div className="col-lg-4">
                                     <label htmlFor="">Sort Code</label>
                                     <div className="form-group">
-                                        <button type="button"
-                                                className="form-control"
-                                                onClick="editEncrypted('sortCode',this)"
-                                        >
-                                            <i className="fa fa-pencil-alt {sortCodePencilColor}">
-                                            </i>
-                                        </button>
-                                        <input type="hidden"
-                                               name="form[customer][{customerID}][sortCode]"
-                                               value="{sortCode}"
-                                               className="encrypted form-control"
+                                        <EncryptedTextInput
+                                            encryptedValue={this.state.customer.sortCode}
+                                            onChange={this.handleSortCodeUpdate}
+                                            mask='99-99-99'
                                         />
                                     </div>
                                 </div>
                                 <div className="col-lg-4">
                                     <label htmlFor="">Account Name</label>
                                     <div className="form-group">
-                                        <input type="text"
-                                               className="form-control"
+                                        <input className="form-control"
+                                               type='text'
+                                               value={this.state.customer.accountName}
+                                               onChange={this.handleAccountNameUpdate}
                                         />
                                     </div>
                                 </div>
                                 <div className="col-lg-4">
                                     <label htmlFor="">Account Number</label>
                                     <div className="form-group">
-                                        <button type="button"
-                                                onClick="editEncrypted('accountNumber',this)"
-                                                className="form-control"
-                                        >
-                                            <i className="fa fa-pencil-alt {accountNumberPencilColor}">
-                                            </i>
-                                        </button>
-                                        <input type="hidden"
-                                               name="form[customer][{customerID}][accountNumber]"
-                                               value="{accountNumber}"
-                                               className="encrypted form-control"
+                                        <EncryptedTextInput
+                                            encryptedValue={this.state.customer.accountNumber}
+                                            onChange={this.handleAccountNumberUpdate}
+                                            mask='99999999'
                                         />
                                     </div>
                                 </div>
@@ -1226,49 +1213,39 @@ class CustomerEditMain extends React.Component {
                         <div className="col-md-6">
                             <h4>Notes</h4>
                             <div className="row">
-
                                 <div className="col-md-4">
                                     <div className="form-group">
-                                        <label htmlFor="reviewDate">To be received
-                                            on:</label>
-                                        <input type="text"
-                                               name="form[customer][{customerID}][reviewDate]"
-                                               id="reviewDate"
-                                               value="{reviewDate}"
-                                               maxLength="10"
-                                               autoComplete="off"
-                                               className="jQueryCalendar form-control"
+                                        <label htmlFor="reviewDate">
+                                            To be reviewed on:
+                                        </label>
+                                        <input type="date"
+                                               value={this.state.customer.reviewDate}
+                                               className="form-control"
+                                               onChange={this.handleReviewDateUpdate}
                                         />
                                     </div>
                                 </div>
                                 <div className="col-md-4">
                                     <div className="form-group">
                                         <label htmlFor="">Time:</label>
-                                        <input name="form[customer][{customerID}][reviewTime]"
-                                               value="{reviewTime}"
-                                               size="5"
-                                               maxLength="5"
+                                        <input type="time"
+                                               value={this.state.customer.reviewTime}
                                                className="form-control"
+                                               onChange={this.handleReviewTimeUpdate}
                                         />
                                     </div>
                                 </div>
                                 <div className="col-md-4">
                                     <div className="form-group">
-
                                         <label>By:</label>
-                                        <select name="form[customer][{customerID}][reviewUserID]"
-                                                onChange="setFormChanged();"
-                                                className="form-control"
-                                        >
-                                            <option value="{reviewUserID}"
-                                            >{reviewUserName}
-                                            </option>
-                                        </select>
-                                        <span
-                                            className="formErrorMessage formError"
-                                        >{reviewTimeMessage}</span>
+                                        <Select
+                                            options={this.state.reviewEngineers}
+                                            selectedOption={this.state.customer.reviewUserID}
+                                            onChange={this.handleReviewUserIDUpdate}
+                                            key='reviewUserID'
+                                            className="form-control"
+                                        />
                                     </div>
-
                                 </div>
                             </div>
 
@@ -1277,106 +1254,12 @@ class CustomerEditMain extends React.Component {
                                         <textarea title="Action to be taken"
                                                   cols="120"
                                                   rows="3"
-                                                  name="form[customer][{customerID}][reviewAction]"
+                                                  value={this.state.customer.reviewAction}
                                                   className="form-control"
-                                        >{reviewAction}</textarea>
+                                                  onChange={this.handleReviewActionUpdate}
+                                        />
                             </div>
-                            <div className="form-group customerNoteHistory">
-                                                            <textarea cols="30"
-                                                                      rows="12"
-                                                                      readOnly="readonly"
-                                                                      id="customerNoteHistory"
-                                                                      className="form-control"
-                                                            > </textarea>
-                                <div className="customerNoteNav mt-3 mb-3">
-                                    <button type="button"
-                                            name="First"
-                                            aria-hidden="true"
-                                            onClick="loadNote('first')"
-                                            className="btn btn-outline-secondary"
-                                    >
-                                        <i className="fa fa-step-backward">
-                                        </i> First
-                                    </button>
-
-                                    <button type="button"
-                                            name="Previous"
-                                            onClick="loadNote('previous')"
-                                            className="btn btn-outline-secondary"
-                                    >
-                                        <i className="fa fa-backward"
-                                           aria-hidden="true"
-                                        >
-                                        </i> Back
-                                    </button>
-                                    <button type="button"
-                                            name="Next"
-                                            onClick="loadNote('next')"
-                                            className="btn btn-outline-secondary"
-                                    >
-                                        Next <i className="fa fa-forward"
-                                                aria-hidden="true"
-                                    >
-                                    </i>
-                                    </button>
-
-                                    <button type="button"
-                                            name="Last"
-                                            onClick="loadNote('last')"
-                                            className="btn btn-outline-secondary"
-                                    >
-                                        Last <i className="fa fa-step-forward"
-                                                aria-hidden="true"
-                                    >
-                                    </i>
-                                    </button>
-                                    <button type="button"
-                                            name="Delete"
-                                            onClick="deleteNote()"
-                                            className="btn btn-outline-danger"
-                                    >
-                                        <i className="fa fa-trash"
-                                           aria-hidden="true"
-                                        >
-                                        </i>
-                                        Delete
-                                    </button>
-                                    <button type="button"
-                                            name="New"
-                                            onClick="newNote()"
-                                            className="btn btn-outline-secondary"
-                                    >
-                                        <i className="fa fa-plus-circle"
-                                           aria-hidden="true"
-                                        >
-                                        </i>
-                                        New
-                                    </button>
-                                    <button type="button"
-                                            name="Save"
-                                            onClick="saveNote()"
-                                            className="btn btn-outline-secondary"
-                                    >
-                                        <i className="fa fa-floppy-o"
-                                           aria-hidden="true"
-                                        >
-                                        </i>
-                                        Save
-                                    </button>
-
-                                </div>
-                                {customerNotePopupLink}
-                            </div>
-                            <div className="form-group customerNoteDetails">
-                                                            <textarea name="customerNoteDetails"
-                                                                      id="customerNoteDetails"
-                                                                      cols="120"
-                                                                      onChange="setCustomerNotesChanged()"
-                                                                      rows="12"
-                                                                      className="form-control"
-                                                            >{customerNoteDetails}
-                                                            </textarea>
-                            </div>
+                            <CustomerNotesComponent/>
                             <div>
                                 {lastContractSent}
                             </div>
@@ -1388,52 +1271,6 @@ class CustomerEditMain extends React.Component {
 
             </div>
         );
-
-
-        // if (!this.state.loaded) {
-        //     return this.el(
-        //         Skeleton,
-        //         null,
-        //         this.el(
-        //             'table',
-        //             {className: 'content', border: 0, cellPadding: 2, cellSpacing: 1, width: '100%'},
-        //             this.el('tbody')
-        //         )
-        //     );
-        // }
-
-        // return this.el('table', {className: 'content', border: 0, cellPadding: 2, cellSpacing: 1, width: '100%'},
-        //     this.el('tbody', null,
-        //         [
-        //             this.getInputRow('Customer ' + this.props.customerID, this.getCustomerNameInput(), 'name', '13%'),
-        //             this.getInputRow('Primary Main Contact', this.getPrimaryMainContactSelect(), 'primaryMainContact'),
-        //             this.getInputRow('Mailshot', this.getMailshotInput(), 'mailshotFlag'),
-        //             this.getInputRow('Referred', this.getReferredInput(), 'referredFlag'),
-        //             this.getInputRow('Special Attention', this.getSpecialAttentionInput(), 'specialAttention'),
-        //             this.getInputRow('Last Review Meeting', this.getLastReviewMeetingInput(), 'lastReviewMeeting'),
-        //             this.getInputRow('Lead Status', this.getLeadStatusInput(), 'leadStatus'),
-        //             this.getInputRow('24 Hour Cover', this.get24HourCoverInput(), '24HourCover'),
-        //             this.getInputRow('Type', this.getCustomerTypeSelect(), 'customerType'),
-        //             this.getInputRow('Sector', this.getSectorSelect(), 'sector'),
-        //             this.getInputRow('PCs', this.getPCsInput(), 'pcs'),
-        //             this.getInputRow('Servers', this.getServersInput(), 'servers'),
-        //             this.getInputRow('Reg', this.getRegNoInput(), 'reg'),
-        //             this.getInputRow('Sites', this.getNoOfSitesInput(), 'sites'),
-        //             this.getInputRow('Pre-pay Top Up', this.getGscTopUpAmountInput(), 'gscTopUpAmount'),
-        //             this.getInputRow('Became Customer', this.getBecameCustomerDateInput(), 'becameCustomerDate'),
-        //             this.getInputRow('SLA Response Hours', this.getSLAResponseHoursInput(), 'SLA Response Hours'),
-        //             this.getInputRow('SLA Fix Hours', this.getSLAFixHoursInputs(), 'SLA Fix Hours'),
-        //             this.getInputRow('Penalties Agreed', this.getSLAPenaltiesAgreedInputs(), 'Penalties Agreed'),
-        //             this.getInputRow('Last Modified', this.state.customer.modifyDate, 'Last Modified'),
-        //             this.getInputRow('Technical Notes', this.getTechNotesInput(), 'Technical Notes'),
-        //             this.getInputRow('Active Directory Name', this.getActiveDirectoryNameInput(), 'Active Directory Name'),
-        //             this.getInputRow('Account Manager', this.getAccountManagerInput(), 'Account Manager'),
-        //             this.getInputRow('Sort Code', this.getSortCodeInput(), 'Sort Code'),
-        //             this.getInputRow('Account Name', this.getAccountNameInput(), 'Account Name'),
-        //             this.getInputRow('Account Number', this.getAccountNumberInput(), 'Account Number'),
-        //         ]
-        //     )
-        // )
     }
 
     isProspect() {

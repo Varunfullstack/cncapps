@@ -1,6 +1,5 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import Skeleton from "react-loading-skeleton";
-import ReactDOM from 'react-dom';
 
 class CustomerNotesComponent extends React.Component {
     el = React.createElement;
@@ -41,18 +40,18 @@ class CustomerNotesComponent extends React.Component {
     }
 
     createButton(className, iconClass, clickFunction, text) {
-        return this.el(
+        return (
             'button',
-            {
-                key: className,
-                className,
-                type: 'button',
-                onClick: clickFunction
-            },
-            [
-                this.getIcon(iconClass),
-                text
-            ]
+                {
+                    key: className,
+                    className,
+                    type: 'button',
+                    onClick: clickFunction
+                },
+                [
+                    this.getIcon(iconClass),
+                    text
+                ]
         )
     }
 
@@ -75,160 +74,10 @@ class CustomerNotesComponent extends React.Component {
 
     }
 
-    getFirstButton() {
-        return this.createButton(
-            'firstButton',
-            'fa fa-step-backward',
-            () => {
-                const nextIdx = 0;
-                this.changeNote(nextIdx);
-            },
-            ' Latest');
-    }
-
-    getPreviousButton() {
-        return this.createButton(
-            'previousButton',
-            'fa fa-forward',
-            () => {
-                const nextIdx = this.state.currentNoteIdx + 1;
-                this.changeNote(nextIdx);
-            },
-            ' Previous'
-        )
-    }
-
-    getNextButton() {
-        return this.createButton(
-            'nextButton',
-            'fa fa-backward',
-            () => {
-                const nextIdx = this.state.currentNoteIdx - 1;
-                this.changeNote(nextIdx);
-            },
-            ' Next'
-        )
-    }
-
-    getLastButton() {
-        return this.createButton(
-            'lastButton',
-            'fa fa-step-forward',
-            () => {
-                const nextIdx = this.state.customerNotes.length - 1;
-                this.changeNote(nextIdx);
-            },
-            ' Oldest'
-        );
-    }
-
-    getDeleteButton() {
-        return this.createButton(
-            'deleteButton',
-            'fa fa-trash',
-            () => {
-                if (!this.state.currentNote) {
-                    return;
-                }
-                const currentNoteId = this.state.currentNote.id;
-
-                fetch(`/CustomerNote.php?action=deleteNote&noteId=${currentNoteId}`)
-                    .then(() => {
-                        this.setState({
-                            customerNotes: [...this.state.customerNotes.filter(x => x.id !== currentNoteId)]
-                        });
-                        const nextIdx = 0;
-                        this.changeNote(nextIdx);
-                    })
-            },
-            ' Delete'
-        );
-    }
-
-    getNewButton() {
-        return this.createButton(
-            'newButton',
-            'fa fa-plus-circle',
-            () => {
-                this.setState({
-                    currentNote: {
-                        id: -1,
-                        customerId: this.props.customerID,
-                        createdAt: '',
-                        modifiedAt: '',
-                        modifiedById: '',
-                        note: '',
-                        createdById: '',
-                        modifiedByName: '',
-                    },
-                    isAddingNote: true,
-                })
-            },
-            ' New'
-        )
-    }
-
-    getSaveButton() {
-        return this.createButton(
-            'saveButton',
-            'fa fa-floppy-o',
-            () => {
-                fetch('/CustomerNote.php?action=updateNote',
-                    {
-                        method: 'POST',
-                        headers: {
-                            dataType: 'application/json'
-                        },
-                        body: JSON.stringify(this.state.currentNote)
-                    }
-                )
-                    .then(response => response.json())
-                    .then(response => {
-                        if (this.state.isAddingNote) {
-                            this.setState(
-                                {
-                                    customerNotes: [response.data, ...this.state.customerNotes],
-                                    currentNote: {...response.data},
-                                    currentNoteIdx: 0,
-                                    isAddingNote: false
-                                }
-                            )
-                        } else {
-                            this.setState({
-                                    customerNotes: [...this.state.customerNotes.map(x => x.id === response.data.id ? response.data : x)],
-                                    currentNote: {...response.data}
-                                }
-                            )
-                        }
-                    })
-                    .catch(error => {
-                        alert('Failed to save note');
-                    })
-            },
-            ' Save'
-        );
-    }
-
-    renderControls() {
-        return this.el(
-            'div',
-            {
-                key: 'controlsHolder',
-                className: 'controlsHolder'
-            },
-            [
-                this.getFirstButton(),
-                this.getNextButton(),
-                this.getPreviousButton(),
-                this.getLastButton(),
-                this.getDeleteButton(),
-                this.getNewButton(),
-                this.getSaveButton()
-            ]
-        )
-    }
 
     renderNotes() {
+
+
         return this.el(
             React.Fragment,
             {
@@ -290,29 +139,10 @@ class CustomerNotesComponent extends React.Component {
     }
 
     handleNoteTextChange($event) {
-        console.log(this.state.currentNote);
         this.setState(
             {
                 currentNote: {...this.state.currentNote, note: $event.target.value}
             });
-    }
-
-    renderNoteEditor() {
-        return this.el(
-            React.Fragment,
-            {},
-            [
-                this.el(
-                    'textarea',
-                    {
-                        cols: 120,
-                        rows: 12,
-                        value: this.state.currentNote && this.state.currentNote.note || '',
-                        onChange: this.handleNoteTextChange
-                    }
-                )
-            ]
-        )
     }
 
     render() {
@@ -325,15 +155,184 @@ class CustomerNotesComponent extends React.Component {
         }
 
 
-        return this.el(
-            'div',
-            {},
-            [
-                this.renderNotes(),
-                this.renderControls(),
-                this.renderNoteEditor()
-            ]
+        return (
+            <Fragment>
+                <div className="form-group customerNoteHistory">
+                    {this.renderNotes()}
+                    <div className="customerNoteNav mt-3 mb-3">
+                        <button type="button"
+                                name="First"
+                                aria-hidden="true"
+                                onClick={() => {
+                                    const nextIdx = 0;
+                                    this.changeNote(nextIdx);
+                                }}
+                                className="btn btn-outline-secondary"
+                        >
+                            <i className="fa fa-step-backward">
+                            </i> First
+                        </button>
+                        <button type="button"
+                                name="Previous"
+                                onClick={
+                                    () => {
+                                        const nextIdx = this.state.currentNoteIdx - 1;
+                                        this.changeNote(nextIdx);
+                                    }
+                                }
+                                className="btn btn-outline-secondary"
+                        >
+                            <i className="fa fa-backward"
+                               aria-hidden="true"
+                            >
+                            </i> Back
+                        </button>
+                        <button type="button"
+                                name="Next"
+                                onClick={
+                                    () => {
+                                        const nextIdx = this.state.currentNoteIdx + 1;
+                                        this.changeNote(nextIdx);
+                                    }
+                                }
+                                className="btn btn-outline-secondary"
+                        >
+                            Next
+                            <i className="fa fa-forward"
+                               aria-hidden="true"
+                            />
+                        </button>
+
+                        <button type="button"
+                                name="Last"
+                                onClick={
+                                    () => {
+                                        const nextIdx = this.state.customerNotes.length - 1;
+                                        this.changeNote(nextIdx);
+                                    }
+                                }
+                                className="btn btn-outline-secondary"
+                        >
+                            Last
+                            <i className="fa fa-step-forward"
+                               aria-hidden="true"
+                            />
+                        </button>
+                        {
+
+                        }
+                        <button type="button"
+                                name="Delete"
+                                onClick={
+                                    () => {
+                                        if (!this.state.currentNote) {
+                                            return;
+                                        }
+                                        const currentNoteId = this.state.currentNote.id;
+
+                                        fetch(`/CustomerNote.php?action=deleteNote&noteId=${currentNoteId}`)
+                                            .then(() => {
+                                                this.setState({
+                                                    customerNotes: [...this.state.customerNotes.filter(x => x.id !== currentNoteId)]
+                                                });
+                                                const nextIdx = 0;
+                                                this.changeNote(nextIdx);
+                                            })
+                                    }
+                                }
+                                className="btn btn-outline-danger"
+                        >
+                            <i className="fa fa-trash"
+                               aria-hidden="true"
+                            />
+                            Delete
+                        </button>
+                        <button type="button"
+                                name="New"
+                                onClick={
+                                    () => {
+                                        this.setState({
+                                            currentNote: {
+                                                id: -1,
+                                                customerId: this.props.customerID,
+                                                createdAt: '',
+                                                modifiedAt: '',
+                                                modifiedById: '',
+                                                note: '',
+                                                createdById: '',
+                                                modifiedByName: '',
+                                            },
+                                            isAddingNote: true,
+                                        })
+                                    }
+                                }
+                                className="btn btn-outline-secondary"
+                        >
+                            <i className="fa fa-plus-circle"
+                               aria-hidden="true"
+                            />
+                            New
+                        </button>
+                        <button type="button"
+                                name="Save"
+                                onClick={
+                                    () => {
+                                        fetch('/CustomerNote.php?action=updateNote',
+                                            {
+                                                method: 'POST',
+                                                headers: {
+                                                    dataType: 'application/json'
+                                                },
+                                                body: JSON.stringify(this.state.currentNote)
+                                            }
+                                        )
+                                            .then(response => response.json())
+                                            .then(response => {
+                                                if (this.state.isAddingNote) {
+                                                    this.setState(
+                                                        {
+                                                            customerNotes: [response.data, ...this.state.customerNotes],
+                                                            currentNote: {...response.data},
+                                                            currentNoteIdx: 0,
+                                                            isAddingNote: false
+                                                        }
+                                                    )
+                                                } else {
+                                                    this.setState({
+                                                            customerNotes: [...this.state.customerNotes.map(x => x.id === response.data.id ? response.data : x)],
+                                                            currentNote: {...response.data}
+                                                        }
+                                                    )
+                                                }
+                                            })
+                                            .catch(error => {
+                                                alert('Failed to save note');
+                                            })
+                                    }
+                                }
+                                className="btn btn-outline-secondary"
+                        >
+                            <i className="fa fa-floppy-o"
+                               aria-hidden="true"
+                            />
+
+                            Save
+                        </button>
+                    </div>
+                </div>
+                <div className="form-group customerNoteDetails">
+                    <textarea name="customerNoteDetails"
+                              id="customerNoteDetails"
+                              cols="120"
+                              value={this.state.currentNote && this.state.currentNote.note || ''}
+                              rows="12"
+                              className="form-control"
+                              onChange={($event) => this.handleNoteTextChange($event)}
+                    />
+                </div>
+            </Fragment>
         )
+
     }
 }
 
