@@ -395,9 +395,10 @@
 
                     const orderHeadId = orderHeadIdInput.value;
                     let url = '?action=CREATE_SERVICE_REQUEST_FROM_ORDER&ordheadID=' + orderHeadId;
-                    url += selectedLines.map((lineId, idx) => {
-                        return '&selectedLines[' + idx + ']=' + lineId
-                    }).join();
+                    url = [url, ...selectedLines.map((lineId, idx) => {
+                        return 'selectedLines[' + idx + ']=' + lineId
+                    })].join('&');
+
                     open(url, '_blank');
                     break;
                 }

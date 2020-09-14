@@ -1,6 +1,12 @@
 # Changelog
 This project changes will be shown here.
 
+## [v4.5.6] - 2020-09-14
+### Fixed
+- Fixed issue when creating SR from Sales Order not picking up all the selected lines
+- Fixed issue with Invoice delete line buttons not responding
+- Fixed issue with editing Sales Orders lines, not allowing to change the supplier
+
 ## [v4.5.5] - 2020-09-07
 ### Fixed
 - Fixed issue with query failing when pulling servers for customer in Customer Review Meeting Agenda (getServersByCustomerID())
