@@ -28,23 +28,24 @@ class Select extends React.Component {
     }
 
     render() {
-        return this.el("select", {
-            value: this.state.selectedOption,
-            onChange: this.handleChange
-        }, this.getOptions(this.state.options));
+        const {className} = this.props;
+
+        return (<select className={className}
+                        value={this.state.selectedOption}
+                        onChange={this.handleChange}
+        >
+            {this.getOptions(this.state.options)}
+        </select>)
     }
 
     getOptions(options) {
-        if (!options) return [];
-        return [
-            this.el('option', {value: '', key: 'empty-option'}, 'Select one option'),
-            ...options.map(x =>
-                this.el('option', {
-                    value: x.value,
-                    key: x.value
-                }, x.label)
-            )
-        ]
+        if (!options) return;
+
+        return [{value: '', label: 'Select One Option'}, ...options].map((x, idx) =>
+            <option value={x.value}
+                    key={x.value}
+            >{x.label}</option>
+        )
     }
 }
 
