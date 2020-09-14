@@ -2,7 +2,6 @@
 import React from 'react';
 import Select from "./Select";
 import EncryptedTextInput from "./EncryptedTextInput";
-import Skeleton from "react-loading-skeleton";
 
 class CustomerEditMain extends React.Component {
     el = React.createElement;
@@ -93,11 +92,6 @@ class CustomerEditMain extends React.Component {
         this.handleSlaP1PenaltiesAgreed = this.handleSlaP1PenaltiesAgreed.bind(this);
         this.handleSlaP2PenaltiesAgreed = this.handleSlaP2PenaltiesAgreed.bind(this);
         this.handleSlaP3PenaltiesAgreed = this.handleSlaP3PenaltiesAgreed.bind(this);
-        document.customerMain = this;
-    }
-
-    testFunction() {
-        console.log('test');
     }
 
     handleSlaFixHoursP1($event) {
@@ -199,21 +193,29 @@ class CustomerEditMain extends React.Component {
     }
 
     getInputRow(label, input, key, width = null) {
-        return this.el('tr', {valign: "top", key: key + "_tr"},
-            [
-                this.el('td', {className: 'content', key: key + "_content", width}, label),
-                this.el('td', {className: 'content', key: key + "_input"}, input)
-            ]
+        return (
+            <tr valign="top"
+                key={key + "_tr"}
+            >
+
+                <td className='content'
+                    key={key + "_content"}
+                    width={width}
+                >
+                    {label}
+                </td>
+                <td className='content'
+                    key={key + "_input"}
+                    width={width}
+                >
+                    {input}
+                </td>
+            </tr>
         )
     }
 
     getCustomerTypeSelect() {
-        return this.el(Select, {
-            options: this.state.customerTypes,
-            selectedOption: this.state.customer.customerTypeID,
-            key: 'customerTypes',
-            onChange: this.handleCustomerTypeUpdate
-        })
+
     }
 
     updateCustomerField(field, value) {
@@ -732,50 +734,706 @@ class CustomerEditMain extends React.Component {
     }
 
     render() {
-        if (!this.state.loaded) {
-            return this.el(
-                Skeleton,
-                null,
-                this.el(
-                    'table',
-                    {className: 'content', border: 0, cellPadding: 2, cellSpacing: 1, width: '100%'},
-                    this.el('tbody')
-                )
-            );
-        }
+        const {customerId} = this.props.customerId;
+        return (
+            <div className="tab-pane fade show active"
+                 id="nav-home"
+                 role="tabpanel"
+                 aria-labelledby="nav-home-tab"
+            >
+                <div className="container-fluid mt-3 mb-3">
+                    <div className="row">
+                        <div className="col-md-6 mb-3">
+                            <h2>`Customer-SussexIndependentFinanceAdvisersLtd.`</h2>
+                        </div>
+                        <div className="col-md-6 mb-3">
+                            <ul className="list-style-none float-right">
+                                <li>
+                                    <button className="btn btn-outline-success">Save</button>
+                                    <button className="btn btn-outline-danger">Cancel</button>
+                                    <button className="btn btn-outline-secondary">Set all
+                                        users to no support
+                                    </button>
+                                    <button className="btn btn-outline-secondary">
+                                        <i className="fa fa-filter"/>
+                                    </button>
+                                    <button className="btn btn-outline-secondary">
+                                        <i className="fa fa-ellipsis-v"/>
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-md-6">
+                            <div className="row">
+                                <div className="col-lg-6">
+                                    <label>Customer {customerId}</label>
+                                    <div className="form-group">
+                                        <input
+                                            name="form[customer][{customerID}][name]"
+                                            type="text"
+                                            value="{customerName}"
+                                            size="50"
+                                            maxLength="50"
+                                            className="form-control"
+                                        />
+                                    </div>
+                                </div>
 
-        return this.el('table', {className: 'content', border: 0, cellPadding: 2, cellSpacing: 1, width: '100%'},
-            this.el('tbody', null,
-                [
-                    this.getInputRow('Customer ' + this.props.customerID, this.getCustomerNameInput(), 'name', '13%'),
-                    this.getInputRow('Primary Main Contact', this.getPrimaryMainContactSelect(), 'primaryMainContact'),
-                    this.getInputRow('Mailshot', this.getMailshotInput(), 'mailshotFlag'),
-                    this.getInputRow('Referred', this.getReferredInput(), 'referredFlag'),
-                    this.getInputRow('Special Attention', this.getSpecialAttentionInput(), 'specialAttention'),
-                    this.getInputRow('Last Review Meeting', this.getLastReviewMeetingInput(), 'lastReviewMeeting'),
-                    this.getInputRow('Lead Status', this.getLeadStatusInput(), 'leadStatus'),
-                    this.getInputRow('24 Hour Cover', this.get24HourCoverInput(), '24HourCover'),
-                    this.getInputRow('Type', this.getCustomerTypeSelect(), 'customerType'),
-                    this.getInputRow('Sector', this.getSectorSelect(), 'sector'),
-                    this.getInputRow('PCs', this.getPCsInput(), 'pcs'),
-                    this.getInputRow('Servers', this.getServersInput(), 'servers'),
-                    this.getInputRow('Reg', this.getRegNoInput(), 'reg'),
-                    this.getInputRow('Sites', this.getNoOfSitesInput(), 'sites'),
-                    this.getInputRow('Pre-pay Top Up', this.getGscTopUpAmountInput(), 'gscTopUpAmount'),
-                    this.getInputRow('Became Customer', this.getBecameCustomerDateInput(), 'becameCustomerDate'),
-                    this.getInputRow('SLA Response Hours', this.getSLAResponseHoursInput(), 'SLA Response Hours'),
-                    this.getInputRow('SLA Fix Hours', this.getSLAFixHoursInputs(), 'SLA Fix Hours'),
-                    this.getInputRow('Penalties Agreed', this.getSLAPenaltiesAgreedInputs(), 'Penalties Agreed'),
-                    this.getInputRow('Last Modified', this.state.customer.modifyDate, 'Last Modified'),
-                    this.getInputRow('Technical Notes', this.getTechNotesInput(), 'Technical Notes'),
-                    this.getInputRow('Active Directory Name', this.getActiveDirectoryNameInput(), 'Active Directory Name'),
-                    this.getInputRow('Account Manager', this.getAccountManagerInput(), 'Account Manager'),
-                    this.getInputRow('Sort Code', this.getSortCodeInput(), 'Sort Code'),
-                    this.getInputRow('Account Name', this.getAccountNameInput(), 'Account Name'),
-                    this.getInputRow('Account Number', this.getAccountNumberInput(), 'Account Number'),
-                ]
-            )
-        )
+                                <div className="col-lg-6">
+                                    <label htmlFor="">Primary Main Contact</label>
+                                    <div className="form-group">
+                                        <select id="primaryMainContactSelector"
+                                                name="form[customer][{customerID}][primaryMainContactID]"
+                                                className="form-control"
+                                        >
+                                            <option value="">
+                                                Select a contact to be the Primary Main
+                                            </option>
+
+                                            <option value="{primaryMainContactValue}"
+                                            >
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div className="col-lg-3">
+                                    <label>Mailshot</label>
+                                    <div className="form-group form-inline">
+                                        <input type="checkbox"
+                                               name="form[customer][{customerID}][mailshotFlag]"
+                                               value="Y"
+                                               className="form-control"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="col-lg-3">
+                                    <label>Referred</label>
+                                    <div className="form-group form-inline">
+                                        <input type="checkbox"
+                                               name="form[customer][{customerID}][referredFlag]"
+                                               value="Y"
+                                               id="referred"
+                                               className="form-control"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="col-lg-6">
+                                    <label htmlFor="">Special Attention</label>
+                                    <div className="form-group form-inline">
+                                        <input type="checkbox"
+                                               name="form[customer][{customerID}][specialAttentionFlag]"
+                                               value="Y"
+                                               className="form-control"
+                                        />
+                                        <div className="col-sm-4">until</div>
+                                        <input type="text"
+                                               name="form[customer][{customerID}][specialAttentionEndDate]"
+                                               id="specialAttentionEndDate"
+                                               value="{specialAttentionEndDate}"
+                                               size="10"
+                                               maxLength="10"
+                                               autoComplete="off"
+                                               className="jQueryCalendar form-control"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="col-lg-12">
+                                    <label htmlFor="">Last Review Meeting</label>
+                                    <div className="form-group flex form-inline align-items-center">
+                                        <input
+                                            type="text"
+                                            name="form[customer][{customerID}][lastReviewMeetingDate]"
+                                            id="lastReviewMeetingDate"
+                                            value="{lastReviewMeetingDate}"
+                                            size="10"
+                                            maxLength="10"
+                                            autoComplete="off"
+                                            className="jQueryCalendar form-control col-sm-4"
+                                        />
+
+                                        <div className="col-sm-4">Frequency</div>
+                                        <select
+                                            name="form[customer][{customerID}][reviewMeetingFrequencyMonths]"
+                                            className="form-control col-sm-4"
+                                        >
+
+                                            <option
+                                                value="{reviewMeetingFrequencyMonths}"
+                                            >
+
+                                            </option>
+
+                                        </select>
+                                        <span className="formErrorMessage"/>
+                                    </div>
+                                </div>
+
+                                <div className="col-lg-6">
+                                    <label htmlFor="">Lead Status</label>
+                                    <select
+                                        name=""
+                                        className="form-control"
+                                    >
+                                        <option
+                                            value="{customer}"
+                                        >
+
+                                        </option>
+                                    </select>
+                                </div>
+                                <div className="col-lg-6">
+                                    <label>24 Hour Cover</label>
+                                    <div className="form-group form-inline">
+                                        <input type="checkbox"
+                                               name="form[customer][{customerID}][support24HourFlag]"
+                                               value="Y"
+                                               className="form-control"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="col-lg-6">
+                                    <label htmlFor="">Type</label>
+                                    <div className="form-group">
+                                        <Select options={this.state.customerTypes}
+                                                className="form-control"
+                                                selectedOption={this.state.customer.customerTypeID}
+                                                onChange={this.handleCustomerTypeUpdate}
+                                                key="customerTypes"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/*<div className="col-lg-6">*/}
+                                {/*    <label htmlFor="">Sector</label>*/}
+                                {/*    <div className="form-group">*/}
+                                {/*        <select name="form[customer][{customerID}][sectorID]"*/}
+                                {/*                className="form-control"*/}
+                                {/*        >*/}
+                                {/*            <option value="">Please select</option>*/}
+
+                                {/*            <option value="{sectorID}"*/}
+                                {/*            >{sectorDescription}*/}
+                                {/*            </option>*/}
+                                {/*        </select>*/}
+                                {/*        <span className="formErrorMessage">{SectorMessage}</span>*/}
+                                {/*    </div>*/}
+                                {/*</div>*/}
+
+                                {/*<div className="col-lg-4">*/}
+                                {/*    <label htmlFor="">PCs</label>*/}
+                                {/*    <div className="form-group">*/}
+                                {/*        <select name="form[customer][{customerID}][noOfPCs]"*/}
+                                {/*                className="form-control"*/}
+                                {/*        >*/}
+                                {/*            <option value="{noOfPCsValue}"*/}
+                                {/*            >{noOfPCsValue}*/}
+                                {/*            </option>*/}
+                                {/*        </select>*/}
+                                {/*    </div>*/}
+                                {/*</div>*/}
+
+                                {/*<div className="col-lg-4">*/}
+                                {/*    <label>Servers</label>*/}
+                                {/*    <div className="form-group">*/}
+                                {/*        <input name="form[customer][{customerID}][noOfServers]"*/}
+                                {/*               type="text"*/}
+                                {/*               value="{noOfServers}"*/}
+                                {/*               size="10"*/}
+                                {/*               maxLength="10"*/}
+                                {/*               className="form-control"*/}
+                                {/*        />*/}
+                                {/*    </div>*/}
+                                {/*</div>*/}
+
+                                {/*<div className="col-lg-4">*/}
+                                {/*    <label>Reg</label>*/}
+                                {/*    <div className="form-group">*/}
+                                {/*        <input name="form[customer][{customerID}][regNo]"*/}
+                                {/*               type="text"*/}
+                                {/*               value="{regNo}"*/}
+                                {/*               size="10"*/}
+                                {/*               maxLength="10"*/}
+                                {/*               className="form-control"*/}
+                                {/*        />*/}
+                                {/*    </div>*/}
+                                {/*</div>*/}
+                                <div className="col-lg-4">
+                                    <label>Sites</label>
+                                    <div className="form-group">
+                                        <input name="form[customer][{customerID}][noOfSites]"
+                                               type="text"
+                                               value="{noOfSites}"
+                                               size="2"
+                                               maxLength="2"
+                                               className="form-control"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="col-lg-4">
+                                    <label>`Pre - pay Top Up`</label>
+                                    <div className="form-group">
+                                        <input name="form[customer][{customerID}][gscTopUpAmount]"
+                                               type="text"
+                                               value="{gscTopUpAmount}"
+                                               size="10"
+                                               maxLength="10"
+                                               className="form-control"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="col-lg-4">
+                                    <label>Became Customer</label>
+                                    <div className="form-group">
+                                        <input name="form[customer][{customerID}][becameCustomerDate]"
+                                               type="text"
+                                               value="{becameCustomerDate}"
+                                               size="10"
+                                               maxLength="10"
+                                               className="form-control"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="col-lg-4">
+                                    <label>Dropped Date</label>
+                                    <div className="form-group">
+                                        <input name="form[customer][{customerID}][droppedCustomerDate]"
+                                               type="text"
+                                               value="{droppedCustomerDate}"
+                                               size="10"
+                                               maxLength="10"
+                                               className="form-control"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <hr/>
+                            <div className="row">
+                                <div className="col-lg-12">
+                                    <label htmlFor="">SLA Response Hours</label>
+                                    <div className="form-group form-inline">
+                                        <label style="margin: 0 .5rem">1</label>
+                                        <input name="form[customer][{customerID}][slaP1]"
+                                               type="text"
+                                               value="{slaP1}"
+                                               size="1"
+                                               maxLength="3"
+                                               className="form-control col-sm-4"
+                                        />
+                                        <label style="margin: 0 .5rem">2</label>
+                                        <input name="form[customer][{customerID}][slaP2]"
+                                               type="text"
+                                               value="{slaP2}"
+                                               size="1"
+                                               maxLength="3"
+                                               className="form-control col-sm-4"
+                                        />
+                                    </div>
+                                    <div className="form-group form-inline">
+
+                                        <label style="margin: 0 .5rem">3</label>
+                                        <input name="form[customer][{customerID}][slaP3]"
+                                               type="text"
+                                               value="{slaP3}"
+                                               size="1"
+                                               maxLength="3"
+                                               className="form-control col-sm-4"
+                                        />
+                                        <label style="margin: 0 .5rem">4</label>
+                                        <input name="form[customer][{customerID}][slaP4]"
+                                               type="text"
+                                               value="{slaP4}"
+                                               size="1"
+                                               maxLength="3"
+                                               className="form-control col-sm-4"
+
+                                        />
+
+                                    </div>
+
+                                    <div className="form-group form-inline">
+                                        <label style="margin: 0 .5rem">5</label>
+                                        <input name="form[customer][{customerID}][slaP5]"
+                                               type="text"
+                                               value="{slaP5}"
+                                               size="1"
+                                               maxLength="3"
+                                               className="form-control col-sm-4"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="col-lg-12">
+                                    <label htmlFor="">SLA Response Fix Hours</label>
+                                    <div className="form-group form-inline">
+                                        <label style="margin: 0 .5rem">1</label>
+                                        <input name="form[customer][{customerID}][slaP1]"
+                                               type="text"
+                                               value="{slaP1}"
+                                               size="1"
+                                               maxLength="3"
+                                               className="form-control col-sm-4"
+                                        />
+                                        <label style="margin: 0 .5rem">2</label>
+                                        <input name="form[customer][{customerID}][slaP2]"
+                                               type="text"
+                                               value="{slaP2}"
+                                               size="1"
+                                               maxLength="3"
+                                               className="form-control col-sm-4"
+                                        />
+                                    </div>
+                                    <div className="form-group form-inline">
+                                        <label style="margin: 0 .5rem">3</label>
+                                        <input name="form[customer][{customerID}][slaP3]"
+                                               type="text"
+                                               value="{slaP3}"
+                                               size="1"
+                                               maxLength="3"
+                                               className="form-control col-sm-4"
+                                        />
+                                        <label style="margin: 0 .5rem">4</label>
+                                        <input name="form[customer][{customerID}][slaP4]"
+                                               type="text"
+                                               value="{slaP4}"
+                                               size="1"
+                                               maxLength="3"
+                                               className="form-control col-sm-4"
+                                        />
+
+                                    </div>
+                                </div>
+                                <div className="col-lg-4">
+                                    <label htmlFor="">SLA Penalties Agreed</label>
+                                    <div className="form-group form-inline">
+                                        <label style="margin: 0 .5rem">1</label>
+                                        <input type="checkbox"
+                                               id="slaP1"
+                                               className="form-control"
+                                        />
+                                        <label style="margin: 0 .5rem">2</label>
+                                        <input type="checkbox"
+                                               id="slaP2"
+                                               className="form-control"
+                                        />
+                                        <label style="margin: 0 .5rem">3</label>
+                                        <input type="checkbox"
+                                               id="slaP3"
+                                               className="form-control"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="col-lg-4">
+                                    <label>Last Modified:</label>
+                                    <div className="form-group">
+                                        <h6>{this.state.customer.lastModified}</h6>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <hr/>
+                            <div className="row">
+                                <div className="col-lg-6">
+                                    <label>Technical Notes</label>
+                                    <div className="form-group">
+
+                                        <textarea className="form-control"
+                                                  cols="30"
+                                                  rows="2"
+                                                  name="form[customer][{customerID}][techNotes]"
+                                                  id="techNotes"
+                                        >{this.state.customer.techNotes}</textarea>
+                                    </div>
+                                </div>
+
+                                <div className="col-lg-6">
+                                    <label>Active Directory Name</label>
+                                    <div className="form-group">
+                                        <input type="text"
+                                               name="form[customer][{customerID}][activeDirectoryName]"
+                                               value="{activeDirectoryName}"
+                                               size="54"
+                                               maxLength="255"
+                                               className="form-control"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="col-lg-4">
+                                    <label>Account Manager</label>
+                                    <div className="form-group">
+                                        <
+                                        <select name="form[customer][{customerID}][accountManagerUserID]"
+                                                onChange="setFormChanged();"
+                                                className="form-control"
+                                        >
+                                            <option value="{accountManagerUserID}"
+                                            >
+                                                {accountManagerUserName}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div className="col-lg-4">
+                                    <label htmlFor="">Sort Code</label>
+                                    <div className="form-group">
+                                        <button type="button"
+                                                className="form-control"
+                                                onClick="editEncrypted('sortCode',this)"
+                                        >
+                                            <i className="fa fa-pencil-alt {sortCodePencilColor}">
+                                            </i>
+                                        </button>
+                                        <input type="hidden"
+                                               name="form[customer][{customerID}][sortCode]"
+                                               value="{sortCode}"
+                                               className="encrypted form-control"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="col-lg-4">
+                                    <label htmlFor="">Account Name</label>
+                                    <div className="form-group">
+                                        <input type="text"
+                                               className="form-control"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="col-lg-4">
+                                    <label htmlFor="">Account Number</label>
+                                    <div className="form-group">
+                                        <button type="button"
+                                                onClick="editEncrypted('accountNumber',this)"
+                                                className="form-control"
+                                        >
+                                            <i className="fa fa-pencil-alt {accountNumberPencilColor}">
+                                            </i>
+                                        </button>
+                                        <input type="hidden"
+                                               name="form[customer][{customerID}][accountNumber]"
+                                               value="{accountNumber}"
+                                               className="encrypted form-control"
+                                        />
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div className="col-md-6">
+                            <h4>Notes</h4>
+                            <div className="row">
+
+                                <div className="col-md-4">
+                                    <div className="form-group">
+                                        <label htmlFor="reviewDate">To be received
+                                            on:</label>
+                                        <input type="text"
+                                               name="form[customer][{customerID}][reviewDate]"
+                                               id="reviewDate"
+                                               value="{reviewDate}"
+                                               maxLength="10"
+                                               autoComplete="off"
+                                               className="jQueryCalendar form-control"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="col-md-4">
+                                    <div className="form-group">
+                                        <label htmlFor="">Time:</label>
+                                        <input name="form[customer][{customerID}][reviewTime]"
+                                               value="{reviewTime}"
+                                               size="5"
+                                               maxLength="5"
+                                               className="form-control"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="col-md-4">
+                                    <div className="form-group">
+
+                                        <label>By:</label>
+                                        <select name="form[customer][{customerID}][reviewUserID]"
+                                                onChange="setFormChanged();"
+                                                className="form-control"
+                                        >
+                                            <option value="{reviewUserID}"
+                                            >{reviewUserName}
+                                            </option>
+                                        </select>
+                                        <span
+                                            className="formErrorMessage formError"
+                                        >{reviewTimeMessage}</span>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                            <div className="form-group customerReviewAction">
+                                        <textarea title="Action to be taken"
+                                                  cols="120"
+                                                  rows="3"
+                                                  name="form[customer][{customerID}][reviewAction]"
+                                                  className="form-control"
+                                        >{reviewAction}</textarea>
+                            </div>
+                            <div className="form-group customerNoteHistory">
+                                                            <textarea cols="30"
+                                                                      rows="12"
+                                                                      readOnly="readonly"
+                                                                      id="customerNoteHistory"
+                                                                      className="form-control"
+                                                            > </textarea>
+                                <div className="customerNoteNav mt-3 mb-3">
+                                    <button type="button"
+                                            name="First"
+                                            aria-hidden="true"
+                                            onClick="loadNote('first')"
+                                            className="btn btn-outline-secondary"
+                                    >
+                                        <i className="fa fa-step-backward">
+                                        </i> First
+                                    </button>
+
+                                    <button type="button"
+                                            name="Previous"
+                                            onClick="loadNote('previous')"
+                                            className="btn btn-outline-secondary"
+                                    >
+                                        <i className="fa fa-backward"
+                                           aria-hidden="true"
+                                        >
+                                        </i> Back
+                                    </button>
+                                    <button type="button"
+                                            name="Next"
+                                            onClick="loadNote('next')"
+                                            className="btn btn-outline-secondary"
+                                    >
+                                        Next <i className="fa fa-forward"
+                                                aria-hidden="true"
+                                    >
+                                    </i>
+                                    </button>
+
+                                    <button type="button"
+                                            name="Last"
+                                            onClick="loadNote('last')"
+                                            className="btn btn-outline-secondary"
+                                    >
+                                        Last <i className="fa fa-step-forward"
+                                                aria-hidden="true"
+                                    >
+                                    </i>
+                                    </button>
+                                    <button type="button"
+                                            name="Delete"
+                                            onClick="deleteNote()"
+                                            className="btn btn-outline-danger"
+                                    >
+                                        <i className="fa fa-trash"
+                                           aria-hidden="true"
+                                        >
+                                        </i>
+                                        Delete
+                                    </button>
+                                    <button type="button"
+                                            name="New"
+                                            onClick="newNote()"
+                                            className="btn btn-outline-secondary"
+                                    >
+                                        <i className="fa fa-plus-circle"
+                                           aria-hidden="true"
+                                        >
+                                        </i>
+                                        New
+                                    </button>
+                                    <button type="button"
+                                            name="Save"
+                                            onClick="saveNote()"
+                                            className="btn btn-outline-secondary"
+                                    >
+                                        <i className="fa fa-floppy-o"
+                                           aria-hidden="true"
+                                        >
+                                        </i>
+                                        Save
+                                    </button>
+
+                                </div>
+                                {customerNotePopupLink}
+                            </div>
+                            <div className="form-group customerNoteDetails">
+                                                            <textarea name="customerNoteDetails"
+                                                                      id="customerNoteDetails"
+                                                                      cols="120"
+                                                                      onChange="setCustomerNotesChanged()"
+                                                                      rows="12"
+                                                                      className="form-control"
+                                                            >{customerNoteDetails}
+                                                            </textarea>
+                            </div>
+                            <div>
+                                {lastContractSent}
+                            </div>
+                        </div>
+
+                    </div>
+                    <hr/>
+                </div>
+
+            </div>
+        );
+
+
+        // if (!this.state.loaded) {
+        //     return this.el(
+        //         Skeleton,
+        //         null,
+        //         this.el(
+        //             'table',
+        //             {className: 'content', border: 0, cellPadding: 2, cellSpacing: 1, width: '100%'},
+        //             this.el('tbody')
+        //         )
+        //     );
+        // }
+
+        // return this.el('table', {className: 'content', border: 0, cellPadding: 2, cellSpacing: 1, width: '100%'},
+        //     this.el('tbody', null,
+        //         [
+        //             this.getInputRow('Customer ' + this.props.customerID, this.getCustomerNameInput(), 'name', '13%'),
+        //             this.getInputRow('Primary Main Contact', this.getPrimaryMainContactSelect(), 'primaryMainContact'),
+        //             this.getInputRow('Mailshot', this.getMailshotInput(), 'mailshotFlag'),
+        //             this.getInputRow('Referred', this.getReferredInput(), 'referredFlag'),
+        //             this.getInputRow('Special Attention', this.getSpecialAttentionInput(), 'specialAttention'),
+        //             this.getInputRow('Last Review Meeting', this.getLastReviewMeetingInput(), 'lastReviewMeeting'),
+        //             this.getInputRow('Lead Status', this.getLeadStatusInput(), 'leadStatus'),
+        //             this.getInputRow('24 Hour Cover', this.get24HourCoverInput(), '24HourCover'),
+        //             this.getInputRow('Type', this.getCustomerTypeSelect(), 'customerType'),
+        //             this.getInputRow('Sector', this.getSectorSelect(), 'sector'),
+        //             this.getInputRow('PCs', this.getPCsInput(), 'pcs'),
+        //             this.getInputRow('Servers', this.getServersInput(), 'servers'),
+        //             this.getInputRow('Reg', this.getRegNoInput(), 'reg'),
+        //             this.getInputRow('Sites', this.getNoOfSitesInput(), 'sites'),
+        //             this.getInputRow('Pre-pay Top Up', this.getGscTopUpAmountInput(), 'gscTopUpAmount'),
+        //             this.getInputRow('Became Customer', this.getBecameCustomerDateInput(), 'becameCustomerDate'),
+        //             this.getInputRow('SLA Response Hours', this.getSLAResponseHoursInput(), 'SLA Response Hours'),
+        //             this.getInputRow('SLA Fix Hours', this.getSLAFixHoursInputs(), 'SLA Fix Hours'),
+        //             this.getInputRow('Penalties Agreed', this.getSLAPenaltiesAgreedInputs(), 'Penalties Agreed'),
+        //             this.getInputRow('Last Modified', this.state.customer.modifyDate, 'Last Modified'),
+        //             this.getInputRow('Technical Notes', this.getTechNotesInput(), 'Technical Notes'),
+        //             this.getInputRow('Active Directory Name', this.getActiveDirectoryNameInput(), 'Active Directory Name'),
+        //             this.getInputRow('Account Manager', this.getAccountManagerInput(), 'Account Manager'),
+        //             this.getInputRow('Sort Code', this.getSortCodeInput(), 'Sort Code'),
+        //             this.getInputRow('Account Name', this.getAccountNameInput(), 'Account Name'),
+        //             this.getInputRow('Account Number', this.getAccountNumberInput(), 'Account Number'),
+        //         ]
+        //     )
+        // )
     }
 
     isProspect() {
