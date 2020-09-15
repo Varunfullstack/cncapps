@@ -57,7 +57,8 @@ class CustomerEditMain extends React.Component {
                 slaP2PenaltiesAgreed: '',
                 slaP3PenaltiesAgreed: '',
                 reviewUserID: '',
-                reviewAction: ''
+                reviewAction: '',
+                lastContractSent: '',
             }
         };
         this.handleCustomerTypeUpdate = this.handleCustomerTypeUpdate.bind(this);
@@ -79,6 +80,7 @@ class CustomerEditMain extends React.Component {
         this.handleNoOfSitesUpdate = this.handleNoOfSitesUpdate.bind(this);
         this.handleGscTopUpAmountUpdate = this.handleGscTopUpAmountUpdate.bind(this);
         this.handleBecameCustomerDateUpdate = this.handleBecameCustomerDateUpdate.bind(this);
+        this.handleDroppedCustomerDateUpdate = this.handleDroppedCustomerDateUpdate.bind(this);
         this.handleSLAP1Update = this.handleSLAP1Update.bind(this);
         this.handleSLAP2Update = this.handleSLAP2Update.bind(this);
         this.handleSLAP3Update = this.handleSLAP3Update.bind(this);
@@ -153,9 +155,9 @@ class CustomerEditMain extends React.Component {
     }
 
     componentDidMount() {
-
+        const {customerId} = this.props;
         Promise.all([
-            fetch('?action=getCustomer&customerID=' + this.props.customerID)
+            fetch('?action=getCustomer&customerID=' + customerId)
                 .then(response => response.json())
                 .then(response => this.setState({customer: response.data})),
             fetch('?action=getCustomerTypes')
@@ -166,7 +168,7 @@ class CustomerEditMain extends React.Component {
                         value: x.cty_ctypeno
                     }))
                 })),
-            fetch('?action=getMainContacts&customerID=' + this.props.customerID)
+            fetch('?action=getMainContacts&customerID=' + customerId)
                 .then(response => response.json())
                 .then(response => this.setState({
                     mainContacts: response.data.map(x => ({
@@ -208,6 +210,7 @@ class CustomerEditMain extends React.Component {
                 })),
         ])
             .then(allLoaded => {
+                console.log(this.state.customer);
                 this.setState({loaded: true});
             })
 
@@ -239,10 +242,6 @@ class CustomerEditMain extends React.Component {
         )
     }
 
-    getCustomerTypeSelect() {
-
-    }
-
     updateCustomerField(field, value) {
         this.setState(prevState => {
             const customer = {...prevState.customer};
@@ -253,15 +252,6 @@ class CustomerEditMain extends React.Component {
 
     handlePrimaryMainContactUpdate(value) {
         this.updateCustomerField("primaryMainContactID", value);
-    }
-
-    getPrimaryMainContactSelect() {
-        return this.el(Select, {
-            options: this.state.mainContacts,
-            selectedOption: this.state.customer.primaryMainContactID,
-            key: 'primaryMainContacts',
-            onChange: this.handlePrimaryMainContactUpdate
-        })
     }
 
     handleMailshotFlagUpdate(event) {
@@ -280,51 +270,6 @@ class CustomerEditMain extends React.Component {
         this.updateCustomerField('specialAttentionEndDate', event.target.value);
     }
 
-    getMailshotInput() {
-        return this.el('input',
-            {
-                type: 'checkbox',
-                name: 'mailshotFlag',
-                checked: this.state.customer.mailshotFlag === 'Y',
-                onChange: this.handleMailshotFlagUpdate,
-                key: 'mailshotFlag'
-            }
-        )
-    }
-
-    getSpecialAttentionInput() {
-        return [
-            this.el('input', {
-                type: 'checkbox',
-                name: "specialAttentionFlag",
-                onChange: this.handleSpecialAttentionFlagUpdate,
-                key: 'specialAttentionFlag',
-                checked: this.state.customer.specialAttentionFlag === 'Y'
-            }),
-            'until',
-            this.el('input', {
-                type: 'date',
-                size: 10,
-                maxLength: 10,
-                value: this.state.customer.specialAttentionEndDate || '',
-                onChange: this.handleSpecialAttentionDateUpdate,
-                key: 'specialAttentionDate'
-            })
-        ];
-    }
-
-    getReferredInput() {
-        return this.el(
-            'input',
-            {
-                type: 'checkbox',
-                name: 'referredFlag',
-                checked: this.state.customer.referredFlag === 'Y',
-                onChange: this.handleReferredFlagUpdate
-            }
-        )
-    }
-
     handleLastReviewMeetingDateUpdate(event) {
         this.updateCustomerField('lastReviewMeetingDate', event.target.value);
     }
@@ -337,127 +282,31 @@ class CustomerEditMain extends React.Component {
         this.updateCustomerField('reviewMeetingFrequencyMonths', event.target.value);
     }
 
-    getLastReviewMeetingInput() {
-        return [
-            this.el('input', {
-                type: 'date',
-                onChange: this.handleLastReviewMeetingDateUpdate,
-                value: this.state.customer.lastReviewMeetingDate || '',
-                key: 'lastReviewMeetingDate'
-            }),
-            " Booked",
-            this.el('input',
-                {
-                    type: "checkbox",
-                    onChange: this.handleReviewMeetingBookedUpdate,
-                    checked: this.state.customer.reviewMeetingBooked,
-                    key: 'reviewMeetingBooked'
-                }
-            ),
-            " Frequency",
-            this.el(Select, {
-                key: 'reviewMeetingFrequencyMonths',
-                options: [
-                    {label: 'Monthly', value: 1},
-                    {label: "Two Monthly", value: 2},
-                    {label: 'Quarterly', value: 3},
-                    {label: "Six-Monthly", value: 6},
-                    {label: 'Annually', value: 12}
-                ],
-                selectedOption: this.state.customer.reviewMeetingFrequencyMonths,
-                onChange: this.handleReviewMeetingFrequencyMonthsUpdate
-            })
-        ]
-    }
-
-
     handleLeadStatusIdUpdate(value) {
         this.updateCustomerField('leadStatusId', value);
-    }
-
-    getLeadStatusInput() {
-        return this.el(Select, {
-            key: 'leadStatuses',
-            options: this.state.leadStatuses,
-            selectedOption: this.state.customer.leadStatusId,
-            onChange: this.handleLeadStatusIdUpdate
-        })
     }
 
     handleSupport24HourFlagUpdate(event) {
         this.updateCustomerField('support24HourFlag', event.target.checked);
     }
 
-    get24HourCoverInput() {
-        return this.el('input', {
-            key: '24HourCover',
-            type: 'checkbox',
-            checked: this.state.customer.support24HourFlag === 'Y',
-            onChange: this.handleSupport24HourFlagUpdate
-        })
-    }
-
     handleNameUpdate(event) {
         this.updateCustomerField('name', event.target.value);
-    }
-
-    getCustomerNameInput() {
-        return this.el(
-            'input',
-            {
-                key: 'nameInput',
-                type: 'text',
-                value: this.state.customer.name,
-                onChange: this.handleNameUpdate,
-            }
-        )
     }
 
     handleSectorIDUpdate(event) {
         this.updateCustomerField('sectorID', event.target.value);
     }
 
-    getSectorSelect() {
-        return this.el(
-            Select,
-            {
-                options: this.state.sectors,
-                selectedOption: this.state.customer.sectorID,
-                onChange: this.handleSectorIDUpdate,
-                key: 'sectorSelect'
-            }
-        )
-    }
-
     handleNoOfPCsUpdate(event) {
         this.updateCustomerField('noOfPCs', event.target.value);
     }
 
-    getPCsInput() {
-        return this.el(
-            'input',
-            {
-                type: 'text',
-                value: this.state.customer.noOfPCs,
-                onChange: this.handleNoOfPCsUpdate
-            }
-        )
-    }
 
     handleNoOfServersUpdate(event) {
         this.updateCustomerField('noOfServers', event.target.value);
     }
 
-    getServersInput() {
-        return this.el(
-            'input',
-            {
-                type: 'text',
-                value: this.state.customer.noOfServers,
-                onChange: this.handleNoOfServersUpdate
-            }
-        )
-    }
 
     handleRegNoUpdate(event) {
         this.updateCustomerField('regNo', event.target.value);
@@ -475,49 +324,10 @@ class CustomerEditMain extends React.Component {
         this.updateCustomerField('becameCustomerDate', event.target.value);
     }
 
-    getRegNoInput() {
-        return this.el(
-            'input',
-            {
-                type: 'text',
-                value: this.state.customer.regNo,
-                onChange: this.handleRegNoUpdate
-            }
-        )
+    handleDroppedCustomerDateUpdate(event) {
+        this.updateCustomerField('droppedCustomerDate', event.target.value);
     }
 
-    getNoOfSitesInput() {
-        return this.el(
-            'input',
-            {
-                type: 'text',
-                value: this.state.customer.noOfSites,
-                onChange: this.handleNoOfSitesUpdate
-            }
-        )
-    }
-
-    getGscTopUpAmountInput() {
-        return this.el(
-            'input',
-            {
-                type: 'text',
-                value: this.state.customer.gscTopUpAmount,
-                onChange: this.handleGscTopUpAmountUpdate
-            }
-        )
-    }
-
-    getBecameCustomerDateInput() {
-        return this.el(
-            'input',
-            {
-                type: 'date',
-                value: this.state.customer.becameCustomerDate,
-                onChange: this.handleBecameCustomerDateUpdate
-            }
-        )
-    }
 
     handleSLAP1Update(event) {
         this.updateCustomerField('slaP1', event.target.value);
@@ -539,184 +349,21 @@ class CustomerEditMain extends React.Component {
         this.updateCustomerField('slaP5', event.target.value);
     }
 
-    getSLAFixHoursInputs() {
-        return (
-            <React.Fragment>
-                1
-                <input name="slaFixHoursP1"
-                       value={this.state.customer.slaFixHoursP1}
-                       type="number"
-                       size="1"
-                       step="0.1"
-                       maxLength="4"
-                       max="999.9"
-                       style={{width: "50px"}}
-                       onChange={this.handleSlaFixHoursP1}
-                />
-                2
-                <input name="slaFixHoursP2"
-                       value={this.state.customer.slaFixHoursP2}
-                       type="number"
-                       size="1"
-                       step="0.1"
-                       maxLength="4"
-                       max="999.9"
-                       style={{width: "50px"}}
-                       onChange={this.handleSlaFixHoursP2}
-                />
-                3
-                <input name="slaFixHoursP3"
-                       value={this.state.customer.slaFixHoursP3}
-                       type="number"
-                       size="1"
-                       step="0.1"
-                       maxLength="4"
-                       max="999.9"
-                       style={{width: "50px"}}
-                       onChange={this.handleSlaFixHoursP3}
-                />
-                4
-                <input name="slaFixHoursP4"
-                       value={this.state.customer.slaFixHoursP4}
-                       type="number"
-                       size="1"
-                       step="0.1"
-                       maxLength="4"
-                       max="999.9"
-                       style={{width: "50px"}}
-                       onChange={this.handleSlaFixHoursP4}
-                />
-            </React.Fragment>
-        )
-    }
-
-    getSLAPenaltiesAgreedInputs() {
-        return (
-            <React.Fragment>
-                1
-                <input type="checkbox"
-                       name="slaP1PenaltiesAgreed"
-                       checked={this.state.customer.slaP1PenaltiesAgreed}
-                       onChange={this.handleSlaP1PenaltiesAgreed}
-                       value="1"
-                />
-                2
-                <input type="checkbox"
-                       name="slaP2PenaltiesAgreed"
-                       checked={this.state.customer.slaP2PenaltiesAgreed}
-                       onChange={this.handleSlaP2PenaltiesAgreed}
-                       value="1"
-                />
-                3
-                <input type="checkbox"
-                       name="slaP3PenaltiesAgreed"
-                       checked={this.state.customer.slaP3PenaltiesAgreed}
-                       onChange={this.handleSlaP3PenaltiesAgreed}
-                       value="1"
-                />
-            </React.Fragment>
-        )
-    }
-
-
-    getSLAResponseHoursInput() {
-        return (
-            <React.Fragment>
-                1
-                <input type="text"
-                       value={this.state.customer.slaP1}
-                       onChange={this.handleSLAP1Update}
-                       key="SLAP1"
-                       size="1"
-                       maxLength="3"
-                />
-                2
-                <input type="text"
-                       value={this.state.customer.slaP2}
-                       onChange={this.handleSLAP2Update}
-                       key="SLAP2"
-                       size="1"
-                       maxLength="3"
-                />
-                3
-                <input type=" text"
-                       value={this.state.customer.slaP3}
-                       onChange={this.handleSLAP3Update}
-                       key="SLAP3"
-                       size="1"
-                       maxLength="3"
-
-                />
-                4
-                <input type="text"
-                       value={this.state.customer.slaP4}
-                       onChange={this.handleSLAP4Update}
-                       key="SLAP4"
-                       size="1"
-                       maxLength="3"
-                />
-                5
-                <input type="text"
-                       value={this.state.customer.slaP5}
-                       onChange={this.handleSLAP5Update}
-                       key="SLAP5"
-                       size="1"
-                       maxLength="3"
-                />
-            </React.Fragment>
-        );
-    }
-
     handleTechNotesUpdate(event) {
         this.updateCustomerField('techNotes', event.target.value);
     }
 
-    getTechNotesInput() {
-        return (
-            <input
-                type="text"
-                value={this.state.customer.techNotes}
-                onChange={this.handleTechNotesUpdate}
-            />
-        )
-    }
 
     handleActiveDirectoryNameUpdate(event) {
         this.updateCustomerField('activeDirectoryName', event.target.value);
-    }
-
-    getActiveDirectoryNameInput() {
-        return this.el(
-            'input',
-            {
-                type: 'text',
-                value: this.state.customer.activeDirectoryName,
-                onChange: this.handleActiveDirectoryNameUpdate
-            }
-        )
     }
 
     handleAccountManagerUserIDUpdate(event) {
         this.updateCustomerField('accountManagerUserID', event.target.value);
     }
 
-    getAccountManagerInput() {
-
-    }
-
     handleSortCodeUpdate(value) {
         this.updateCustomerField('sortCode', value);
-    }
-
-    getSortCodeInput() {
-        return this.el(
-            EncryptedTextInput,
-            {
-                encryptedValue: this.state.customer.sortCode,
-                onChange: this.handleSortCodeUpdate,
-                mask: '99-99-99'
-            }
-        )
     }
 
     handleAccountNameUpdate(event) {
@@ -737,7 +384,7 @@ class CustomerEditMain extends React.Component {
 
 
     render() {
-        const {customerId} = this.props.customerId;
+        const {customerId} = this.props;
         return (
             <div className="tab-pane fade show active"
                  id="nav-home"
@@ -747,7 +394,7 @@ class CustomerEditMain extends React.Component {
                 <div className="container-fluid mt-3 mb-3">
                     <div className="row">
                         <div className="col-md-6 mb-3">
-                            <h2>`Customer-SussexIndependentFinanceAdvisersLtd.`</h2>
+                            <h2>Customer - {this.state.customer.name}</h2>
                         </div>
                         <div className="col-md-6 mb-3">
                             <ul className="list-style-none float-right">
@@ -773,40 +420,32 @@ class CustomerEditMain extends React.Component {
                                 <div className="col-lg-6">
                                     <label>Customer {customerId}</label>
                                     <div className="form-group">
-                                        <input
-                                            name="form[customer][{customerID}][name]"
-                                            type="text"
-                                            value="{customerName}"
-                                            size="50"
-                                            maxLength="50"
-                                            className="form-control"
+                                        <input type="text"
+                                               onChange={this.handleNameUpdate}
+                                               value={this.state.customer.name}
+                                               size="50"
+                                               maxLength="50"
+                                               className="form-control"
                                         />
                                     </div>
                                 </div>
-
                                 <div className="col-lg-6">
                                     <label htmlFor="">Primary Main Contact</label>
                                     <div className="form-group">
-                                        <select id="primaryMainContactSelector"
-                                                name="form[customer][{customerID}][primaryMainContactID]"
-                                                className="form-control"
-                                        >
-                                            <option value="">
-                                                Select a contact to be the Primary Main
-                                            </option>
-
-                                            <option value="{primaryMainContactValue}"
-                                            >
-                                            </option>
-                                        </select>
+                                        <Select
+                                            options={this.state.mainContacts}
+                                            selectedOption={this.state.customer.primaryMainContactID}
+                                            onChange={this.handlePrimaryMainContactUpdate}
+                                            className='form-control'
+                                        />
                                     </div>
                                 </div>
                                 <div className="col-lg-3">
                                     <label>Mailshot</label>
                                     <div className="form-group form-inline">
                                         <input type="checkbox"
-                                               name="form[customer][{customerID}][mailshotFlag]"
-                                               value="Y"
+                                               checked={this.state.customer.mailshotFlag === 'Y'}
+                                               onChange={this.handleMailshotFlagUpdate}
                                                className="form-control"
                                         />
                                     </div>
@@ -815,85 +454,78 @@ class CustomerEditMain extends React.Component {
                                     <label>Referred</label>
                                     <div className="form-group form-inline">
                                         <input type="checkbox"
-                                               name="form[customer][{customerID}][referredFlag]"
-                                               value="Y"
-                                               id="referred"
                                                className="form-control"
+                                               checked={this.state.customer.referredFlag === 'Y'}
+                                               onChange={this.handleReferredFlagUpdate}
                                         />
                                     </div>
                                 </div>
-
                                 <div className="col-lg-6">
                                     <label htmlFor="">Special Attention</label>
                                     <div className="form-group form-inline">
                                         <input type="checkbox"
-                                               name="form[customer][{customerID}][specialAttentionFlag]"
-                                               value="Y"
                                                className="form-control"
+                                               onChange={this.handleSpecialAttentionFlagUpdate}
+                                               checked={this.state.customer.specialAttentionFlag === 'Y'}
                                         />
                                         <div className="col-sm-4">until</div>
-                                        <input type="text"
-                                               name="form[customer][{customerID}][specialAttentionEndDate]"
-                                               id="specialAttentionEndDate"
-                                               value="{specialAttentionEndDate}"
+                                        <input type="date"
+                                               value={this.state.customer.specialAttentionEndDate || ''}
                                                size="10"
                                                maxLength="10"
-                                               autoComplete="off"
-                                               className="jQueryCalendar form-control"
+                                               className="form-control"
+                                               onChange={this.handleSpecialAttentionDateUpdate}
                                         />
                                     </div>
                                 </div>
-
                                 <div className="col-lg-12">
                                     <label htmlFor="">Last Review Meeting</label>
                                     <div className="form-group flex form-inline align-items-center">
-                                        <input
-                                            type="text"
-                                            name="form[customer][{customerID}][lastReviewMeetingDate]"
-                                            id="lastReviewMeetingDate"
-                                            value="{lastReviewMeetingDate}"
-                                            size="10"
-                                            maxLength="10"
-                                            autoComplete="off"
-                                            className="jQueryCalendar form-control col-sm-4"
+                                        <input type="date"
+                                               onChange={this.handleLastReviewMeetingDateUpdate}
+                                               value={this.state.customer.lastReviewMeetingDate || ''}
+                                               size="10"
+                                               maxLength="10"
+                                               className="form-control col-sm-4"
                                         />
-
+                                        <label>Booked</label>
+                                        <input type="checkbox"
+                                               onChange={this.handleReviewMeetingBookedUpdate}
+                                               checked={this.state.customer.reviewMeetingBooked}
+                                               className="form-control"
+                                        />
                                         <div className="col-sm-4">Frequency</div>
-                                        <select
-                                            name="form[customer][{customerID}][reviewMeetingFrequencyMonths]"
+                                        <Select
+                                            options={
+                                                [
+                                                    {label: 'Monthly', value: 1},
+                                                    {label: "Two Monthly", value: 2},
+                                                    {label: 'Quarterly', value: 3},
+                                                    {label: "Six-Monthly", value: 6},
+                                                    {label: 'Annually', value: 12}
+                                                ]
+                                            }
+                                            selectedOption={this.state.customer.reviewMeetingFrequencyMonths}
+                                            onChange={this.handleReviewMeetingFrequencyMonthsUpdate}
                                             className="form-control col-sm-4"
-                                        >
-
-                                            <option
-                                                value="{reviewMeetingFrequencyMonths}"
-                                            >
-
-                                            </option>
-
-                                        </select>
-                                        <span className="formErrorMessage"/>
+                                        />
                                     </div>
                                 </div>
-
                                 <div className="col-lg-6">
                                     <label htmlFor="">Lead Status</label>
-                                    <select
-                                        name=""
+                                    <Select
+                                        options={this.state.leadStatuses}
+                                        selectedOption={this.state.customer.leadStatusId}
+                                        onChange={this.handleLeadStatusIdUpdate}
                                         className="form-control"
-                                    >
-                                        <option
-                                            value="{customer}"
-                                        >
-
-                                        </option>
-                                    </select>
+                                    />
                                 </div>
                                 <div className="col-lg-6">
                                     <label>24 Hour Cover</label>
                                     <div className="form-group form-inline">
                                         <input type="checkbox"
-                                               name="form[customer][{customerID}][support24HourFlag]"
-                                               value="Y"
+                                               checked={this.state.customer.support24HourFlag === 'Y'}
+                                               onChange={this.handleSupport24HourFlagUpdate}
                                                className="form-control"
                                         />
                                     </div>
@@ -905,71 +537,57 @@ class CustomerEditMain extends React.Component {
                                                 className="form-control"
                                                 selectedOption={this.state.customer.customerTypeID}
                                                 onChange={this.handleCustomerTypeUpdate}
-                                                key="customerTypes"
                                         />
                                     </div>
                                 </div>
-
-                                {/*<div className="col-lg-6">*/}
-                                {/*    <label htmlFor="">Sector</label>*/}
-                                {/*    <div className="form-group">*/}
-                                {/*        <select name="form[customer][{customerID}][sectorID]"*/}
-                                {/*                className="form-control"*/}
-                                {/*        >*/}
-                                {/*            <option value="">Please select</option>*/}
-
-                                {/*            <option value="{sectorID}"*/}
-                                {/*            >{sectorDescription}*/}
-                                {/*            </option>*/}
-                                {/*        </select>*/}
-                                {/*        <span className="formErrorMessage">{SectorMessage}</span>*/}
-                                {/*    </div>*/}
-                                {/*</div>*/}
-
-                                {/*<div className="col-lg-4">*/}
-                                {/*    <label htmlFor="">PCs</label>*/}
-                                {/*    <div className="form-group">*/}
-                                {/*        <select name="form[customer][{customerID}][noOfPCs]"*/}
-                                {/*                className="form-control"*/}
-                                {/*        >*/}
-                                {/*            <option value="{noOfPCsValue}"*/}
-                                {/*            >{noOfPCsValue}*/}
-                                {/*            </option>*/}
-                                {/*        </select>*/}
-                                {/*    </div>*/}
-                                {/*</div>*/}
-
-                                {/*<div className="col-lg-4">*/}
-                                {/*    <label>Servers</label>*/}
-                                {/*    <div className="form-group">*/}
-                                {/*        <input name="form[customer][{customerID}][noOfServers]"*/}
-                                {/*               type="text"*/}
-                                {/*               value="{noOfServers}"*/}
-                                {/*               size="10"*/}
-                                {/*               maxLength="10"*/}
-                                {/*               className="form-control"*/}
-                                {/*        />*/}
-                                {/*    </div>*/}
-                                {/*</div>*/}
-
-                                {/*<div className="col-lg-4">*/}
-                                {/*    <label>Reg</label>*/}
-                                {/*    <div className="form-group">*/}
-                                {/*        <input name="form[customer][{customerID}][regNo]"*/}
-                                {/*               type="text"*/}
-                                {/*               value="{regNo}"*/}
-                                {/*               size="10"*/}
-                                {/*               maxLength="10"*/}
-                                {/*               className="form-control"*/}
-                                {/*        />*/}
-                                {/*    </div>*/}
-                                {/*</div>*/}
+                                <div className="col-lg-6">
+                                    <label htmlFor="">Sector</label>
+                                    <div className="form-group">
+                                        <Select options={this.state.sectors}
+                                                selectedOption={this.state.customer.sectorID}
+                                                onChange={this.handleSectorIDUpdate}
+                                                className="form-control"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="col-lg-4">
+                                    <label htmlFor="">PCs</label>
+                                    <div className="form-group">
+                                        <input type="number"
+                                               value={this.state.customer.noOfPCs}
+                                               onChange={this.handleNoOfPCsUpdate}
+                                               className="form-control"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="col-lg-4">
+                                    <label>Servers</label>
+                                    <div className="form-group">
+                                        <input type="number"
+                                               value={this.state.customer.noOfServers}
+                                               onChange={this.handleNoOfServersUpdate}
+                                               className="form-control"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="col-lg-4">
+                                    <label>Reg</label>
+                                    <div className="form-group">
+                                        <input type="text"
+                                               value={this.state.customer.regNo}
+                                               onChange={this.handleRegNoUpdate}
+                                               size="10"
+                                               maxLength="10"
+                                               className="form-control"
+                                        />
+                                    </div>
+                                </div>
                                 <div className="col-lg-4">
                                     <label>Sites</label>
                                     <div className="form-group">
-                                        <input name="form[customer][{customerID}][noOfSites]"
-                                               type="text"
-                                               value="{noOfSites}"
+                                        <input type="number"
+                                               value={this.state.customer.noOfSites}
+                                               onChange={this.handleNoOfSitesUpdate}
                                                size="2"
                                                maxLength="2"
                                                className="form-control"
@@ -977,11 +595,11 @@ class CustomerEditMain extends React.Component {
                                     </div>
                                 </div>
                                 <div className="col-lg-4">
-                                    <label>`Pre - pay Top Up`</label>
+                                    <label>Pre-pay Top Up</label>
                                     <div className="form-group">
-                                        <input name="form[customer][{customerID}][gscTopUpAmount]"
-                                               type="text"
-                                               value="{gscTopUpAmount}"
+                                        <input type="text"
+                                               value={this.state.customer.gscTopUpAmount}
+                                               onChange={this.handleGscTopUpAmountUpdate}
                                                size="10"
                                                maxLength="10"
                                                className="form-control"
@@ -991,9 +609,10 @@ class CustomerEditMain extends React.Component {
                                 <div className="col-lg-4">
                                     <label>Became Customer</label>
                                     <div className="form-group">
-                                        <input name="form[customer][{customerID}][becameCustomerDate]"
-                                               type="text"
-                                               value="{becameCustomerDate}"
+
+                                        <input type="date"
+                                               value={this.state.customer.becameCustomerDate}
+                                               onChange={this.handleBecameCustomerDateUpdate}
                                                size="10"
                                                maxLength="10"
                                                className="form-control"
@@ -1003,9 +622,9 @@ class CustomerEditMain extends React.Component {
                                 <div className="col-lg-4">
                                     <label>Dropped Date</label>
                                     <div className="form-group">
-                                        <input name="form[customer][{customerID}][droppedCustomerDate]"
-                                               type="text"
-                                               value="{droppedCustomerDate}"
+                                        <input type="date"
+                                               value={this.state.customer.droppedCustomerDate || ''}
+                                               onChange={this.handleDroppedCustomerDateUpdate}
                                                size="10"
                                                maxLength="10"
                                                className="form-control"
@@ -1018,18 +637,18 @@ class CustomerEditMain extends React.Component {
                                 <div className="col-lg-12">
                                     <label htmlFor="">SLA Response Hours</label>
                                     <div className="form-group form-inline">
-                                        <label style="margin: 0 .5rem">1</label>
-                                        <input name="form[customer][{customerID}][slaP1]"
-                                               type="text"
-                                               value="{slaP1}"
+                                        <label style={{margin: "0 .5rem"}}>1</label>
+                                        <input type="number"
+                                               value={this.state.customer.slaP1}
+                                               onChange={this.handleSLAP1Update}
                                                size="1"
                                                maxLength="3"
                                                className="form-control col-sm-4"
                                         />
-                                        <label style="margin: 0 .5rem">2</label>
-                                        <input name="form[customer][{customerID}][slaP2]"
-                                               type="text"
-                                               value="{slaP2}"
+                                        <label style={{margin: "0 .5rem"}}>2</label>
+                                        <input type="number"
+                                               value={this.state.customer.slaP2}
+                                               onChange={this.handleSLAP2Update}
                                                size="1"
                                                maxLength="3"
                                                className="form-control col-sm-4"
@@ -1037,31 +656,30 @@ class CustomerEditMain extends React.Component {
                                     </div>
                                     <div className="form-group form-inline">
 
-                                        <label style="margin: 0 .5rem">3</label>
-                                        <input name="form[customer][{customerID}][slaP3]"
-                                               type="text"
-                                               value="{slaP3}"
+                                        <label style={{margin: "0 .5rem"}}>3</label>
+                                        <input type="number"
+                                               value={this.state.customer.slaP3}
+                                               onChange={this.handleSLAP3Update}
                                                size="1"
                                                maxLength="3"
                                                className="form-control col-sm-4"
                                         />
-                                        <label style="margin: 0 .5rem">4</label>
-                                        <input name="form[customer][{customerID}][slaP4]"
-                                               type="text"
-                                               value="{slaP4}"
+                                        <label style={{margin: "0 .5rem"}}>4</label>
+                                        <input type="number"
+                                               value={this.state.customer.slaP4}
+                                               onChange={this.handleSLAP4Update}
                                                size="1"
                                                maxLength="3"
                                                className="form-control col-sm-4"
-
                                         />
 
                                     </div>
 
                                     <div className="form-group form-inline">
-                                        <label style="margin: 0 .5rem">5</label>
-                                        <input name="form[customer][{customerID}][slaP5]"
-                                               type="text"
-                                               value="{slaP5}"
+                                        <label style={{margin: "0 .5rem"}}>5</label>
+                                        <input type="number"
+                                               value={this.state.customer.slaP5}
+                                               onChange={this.handleSLAP5Update}
                                                size="1"
                                                maxLength="3"
                                                className="form-control col-sm-4"
@@ -1072,38 +690,46 @@ class CustomerEditMain extends React.Component {
                                 <div className="col-lg-12">
                                     <label htmlFor="">SLA Response Fix Hours</label>
                                     <div className="form-group form-inline">
-                                        <label style="margin: 0 .5rem">1</label>
-                                        <input name="form[customer][{customerID}][slaP1]"
-                                               type="text"
-                                               value="{slaP1}"
+                                        <label style={{margin: "0 .5rem"}}>1</label>
+                                        <input value={this.state.customer.slaFixHoursP1}
+                                               type="number"
                                                size="1"
-                                               maxLength="3"
+                                               step="0.1"
+                                               maxLength="4"
+                                               max="999.9"
+                                               onChange={this.handleSlaFixHoursP1}
                                                className="form-control col-sm-4"
                                         />
-                                        <label style="margin: 0 .5rem">2</label>
-                                        <input name="form[customer][{customerID}][slaP2]"
-                                               type="text"
-                                               value="{slaP2}"
+                                        <label style={{margin: "0 .5rem"}}>2</label>
+                                        <input value={this.state.customer.slaFixHoursP2}
+                                               type="number"
                                                size="1"
-                                               maxLength="3"
+                                               step="0.1"
+                                               maxLength="4"
+                                               max="999.9"
+                                               onChange={this.handleSlaFixHoursP2}
                                                className="form-control col-sm-4"
                                         />
                                     </div>
                                     <div className="form-group form-inline">
-                                        <label style="margin: 0 .5rem">3</label>
-                                        <input name="form[customer][{customerID}][slaP3]"
-                                               type="text"
-                                               value="{slaP3}"
+                                        <label style={{margin: "0 .5rem"}}>3</label>
+                                        <input value={this.state.customer.slaFixHoursP3}
+                                               type="number"
                                                size="1"
-                                               maxLength="3"
+                                               step="0.1"
+                                               maxLength="4"
+                                               max="999.9"
+                                               onChange={this.handleSlaFixHoursP3}
                                                className="form-control col-sm-4"
                                         />
-                                        <label style="margin: 0 .5rem">4</label>
-                                        <input name="form[customer][{customerID}][slaP4]"
-                                               type="text"
-                                               value="{slaP4}"
+                                        <label style={{margin: "0 .5rem"}}>4</label>
+                                        <input value={this.state.customer.slaFixHoursP4}
+                                               type="number"
                                                size="1"
-                                               maxLength="3"
+                                               step="0.1"
+                                               maxLength="4"
+                                               max="999.9"
+                                               onChange={this.handleSlaFixHoursP4}
                                                className="form-control col-sm-4"
                                         />
 
@@ -1112,19 +738,22 @@ class CustomerEditMain extends React.Component {
                                 <div className="col-lg-4">
                                     <label htmlFor="">SLA Penalties Agreed</label>
                                     <div className="form-group form-inline">
-                                        <label style="margin: 0 .5rem">1</label>
+                                        <label style={{margin: "0 .5rem"}}>1</label>
                                         <input type="checkbox"
-                                               id="slaP1"
+                                               checked={this.state.customer.slaP1PenaltiesAgreed}
+                                               onChange={this.handleSlaP1PenaltiesAgreed}
                                                className="form-control"
                                         />
-                                        <label style="margin: 0 .5rem">2</label>
+                                        <label style={{margin: "0 .5rem"}}>2</label>
                                         <input type="checkbox"
-                                               id="slaP2"
+                                               checked={this.state.customer.slaP2PenaltiesAgreed}
+                                               onChange={this.handleSlaP2PenaltiesAgreed}
                                                className="form-control"
                                         />
-                                        <label style="margin: 0 .5rem">3</label>
+                                        <label style={{margin: "0 .5rem"}}>3</label>
                                         <input type="checkbox"
-                                               id="slaP3"
+                                               checked={this.state.customer.slaP3PenaltiesAgreed}
+                                               onChange={this.handleSlaP3PenaltiesAgreed}
                                                className="form-control"
                                         />
                                     </div>
@@ -1136,20 +765,17 @@ class CustomerEditMain extends React.Component {
                                     </div>
                                 </div>
                             </div>
-
-
                             <hr/>
                             <div className="row">
                                 <div className="col-lg-6">
                                     <label>Technical Notes</label>
                                     <div className="form-group">
-
-                                        <textarea className="form-control"
-                                                  cols="30"
-                                                  rows="2"
-                                                  name="form[customer][{customerID}][techNotes]"
-                                                  id="techNotes"
-                                        >{this.state.customer.techNotes}</textarea>
+                                <textarea className="form-control"
+                                          cols="30"
+                                          rows="2"
+                                          value={this.state.customer.techNotes}
+                                          onChange={this.handleTechNotesUpdate}
+                                />
                                     </div>
                                 </div>
 
@@ -1157,8 +783,8 @@ class CustomerEditMain extends React.Component {
                                     <label>Active Directory Name</label>
                                     <div className="form-group">
                                         <input type="text"
-                                               name="form[customer][{customerID}][activeDirectoryName]"
-                                               value="{activeDirectoryName}"
+                                               value={this.state.customer.activeDirectoryName}
+                                               onChange={this.handleActiveDirectoryNameUpdate}
                                                size="54"
                                                maxLength="255"
                                                className="form-control"
@@ -1209,7 +835,6 @@ class CustomerEditMain extends React.Component {
 
                             </div>
                         </div>
-
                         <div className="col-md-6">
                             <h4>Notes</h4>
                             <div className="row">
@@ -1219,7 +844,7 @@ class CustomerEditMain extends React.Component {
                                             To be reviewed on:
                                         </label>
                                         <input type="date"
-                                               value={this.state.customer.reviewDate}
+                                               value={this.state.customer.reviewDate || ''}
                                                className="form-control"
                                                onChange={this.handleReviewDateUpdate}
                                         />
@@ -1229,7 +854,7 @@ class CustomerEditMain extends React.Component {
                                     <div className="form-group">
                                         <label htmlFor="">Time:</label>
                                         <input type="time"
-                                               value={this.state.customer.reviewTime}
+                                               value={this.state.customer.reviewTime || ''}
                                                className="form-control"
                                                onChange={this.handleReviewTimeUpdate}
                                         />
@@ -1259,18 +884,16 @@ class CustomerEditMain extends React.Component {
                                                   onChange={this.handleReviewActionUpdate}
                                         />
                             </div>
-                            <CustomerNotesComponent/>
+                            <CustomerNotesComponent customerId={customerId}/>
                             <div>
-                                {lastContractSent}
+                                {this.state.customer.lastContractSent}
                             </div>
                         </div>
-
                     </div>
-                    <hr/>
                 </div>
-
+                <hr/>
             </div>
-        );
+        )
     }
 
     isProspect() {

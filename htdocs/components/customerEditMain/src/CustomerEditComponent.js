@@ -82,9 +82,9 @@ class CustomerEditComponent extends React.Component {
                                          id="nav-tabContent"
                                     >
                                         <CustomerEditMain customerId={customerId}/>
-                                        <CustomerProjectsComponent customerId={customerId}/>
-                                        <CustomerPortalDocumentsComponent customerId={customerId}/>
-                                        <CustomerSitesComponent customerId={customerId}/>
+                                        {/*<CustomerProjectsComponent customerId={customerId}/>*/}
+                                        {/*<CustomerPortalDocumentsComponent customerId={customerId}/>*/}
+                                        {/*<CustomerSitesComponent customerId={customerId}/>*/}
                                         <div className="tab-pane fade show"
                                              id="nav-orders"
                                              role="tabpanel"

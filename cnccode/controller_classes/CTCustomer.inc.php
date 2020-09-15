@@ -792,6 +792,8 @@ class CTCustomer extends CTCNC
                             "support24HourFlag"            => $dbeCustomer->getValue(DBECustomer::support24HourFlag),
                             "techNotes"                    => $dbeCustomer->getValue(DBECustomer::techNotes),
                             "websiteURL"                   => $dbeCustomer->getValue(DBECustomer::websiteURL),
+                            "reviewDate"                   => $dbeCustomer->getValue(DBECustomer::reviewDate),
+                            "reviewTime"                   => $dbeCustomer->getValue(DBECustomer::reviewTime),
                         ]
                     ]
                 );
