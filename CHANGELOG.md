@@ -4,6 +4,8 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 976 - ServiceDesk Team Individual Stats
+### Fixed
+- Issue 969 - Login page needs two attempts to login initially
 
 ## [v4.5.6] - 2020-09-14
 ### Fixed
@@ -18,7 +20,6 @@ This project changes will be shown here.
 ## [v4.5.4] - 2020-09-02
 ### Added
 - Add the ability to add items to Credit Notes
-
 
 ## [v4.5.3] - 2020-09-01
 ### Fixed

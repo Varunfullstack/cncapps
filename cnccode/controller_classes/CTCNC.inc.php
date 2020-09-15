@@ -1142,6 +1142,7 @@ class CTCNC extends Controller
     function logout()
     {
         $GLOBALS ['sess']->delete();
+        $GLOBALS ['auth']->logout();
         header("Location: index.php");
         exit;
     }
