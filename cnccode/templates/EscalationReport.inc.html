@@ -2,12 +2,30 @@
 <script language='JavaScript'
         src="CommonJS.js"
 ></script>
-<script type="application/javascript">
+<script type="module">
+    import FixedServiceRequestCountComponent
+        from "/components/FixedServiceRequestCountComponent/FixedServiceRequestCountComponent.js";
+
     window.addEventListener('DOMContentLoaded', function () {
         window.fromDate = $('#fromDate').get(0);
         window.toDate = $('#toDate').get(0);
+
+
+        function renderReactElement(component, props, targetNode, callback) {
+            const reactElement = React.createElement(component, props, null);
+            ReactDOM.render(reactElement, targetNode, callback);
+            return reactElement;
+        }
+
+        renderReactElement(FixedServiceRequestCountComponent, null, document.getElementById('react-fixed-service-request-report'));
     })
+
+
 </script>
+
+<div id="react-fixed-service-request-report"></div>
+<hr/>
+<h1>Escalation Report</h1>
 <P class="formErrorMessage">{formError}</P>
 <form name="searchForm"
       method="get"

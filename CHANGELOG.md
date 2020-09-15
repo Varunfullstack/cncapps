@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 976 - ServiceDesk Team Individual Stats
+
 ## [v4.5.6] - 2020-09-14
 ### Fixed
 - Fixed issue when creating SR from Sales Order not picking up all the selected lines
