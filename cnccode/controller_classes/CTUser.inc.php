@@ -65,6 +65,7 @@ class CTUser extends CTCNC
 
     const DECRYPT = 'decrypt';
     const GetAge = 'getAge';
+    const REGISTER_HALF_HOLIDAYS = 'REGISTER_HALF_HOLIDAYS';
     /** @var DSForm */
     public $dsUser;
     /** @var DSForm */
@@ -200,6 +201,9 @@ class CTUser extends CTCNC
                 break;
             case CTUSER_ACT_UPDATE:
                 $this->update();
+                break;
+            case self::REGISTER_HALF_HOLIDAYS:
+                $this->registerHalfHolidays();
                 break;
             case CTUSER_ACT_ABSENCE_EDIT:
                 $this->absenceEdit();
@@ -630,7 +634,7 @@ class CTUser extends CTCNC
                     DBEUser::basedAtCustomerSite
                 ) ? 'checked' : null,
                 'siteCustomerString'                            => $siteCustomerString,
-                'streamOneLicenseManagementChecked'        => Controller::htmlChecked(
+                'streamOneLicenseManagementChecked'             => Controller::htmlChecked(
                     $dsUser->getValue(DBEJUser::streamOneLicenseManagement)
                 ),
             )
@@ -837,6 +841,48 @@ class CTUser extends CTCNC
         $dsUser->post();
     }
 
+    function registerHalfHolidays()
+    {
+        $this->setPageTitle('Register Half Holidays');
+
+        $this->setTemplateFiles(array('UserHalfHolidays' => 'UserHalfHoliday'));
+        $userId = $this->getParam('userID');
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $date = $this->getParam('date');
+            $this->buUser->logHalfHoliday($userId, $date);
+
+            $urlNext = Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => CTUSER_ACT_DISPLAY_LIST
+                )
+            );
+            header('Location: ' . $urlNext);
+            exit;
+
+        }
+        $dsUser = new DataSet($this);
+        $this->buUser->getUserByID(
+            $userId,
+            $dsUser
+        );
+
+        $this->template->setVar(
+            array(
+                'userID'   => $this->dsAbsence->getValue(self::absenceFormUserID),
+                'userName' => $dsUser->getValue(DBEJUser::name),
+            )
+        );
+
+        $this->template->parse(
+            'CONTENTS',
+            'UserHalfHolidays',
+            true
+        );
+
+        $this->parsePage();
+    }
+
     /**
      * @throws Exception
      */
@@ -992,9 +1038,15 @@ class CTUser extends CTCNC
                             )
                         );
 
-                    $txtEdit = '[edit]';
+                    $txtEdit = '[Edit]';
                 }
-
+                $urlHalfHolidays = Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action' => self::REGISTER_HALF_HOLIDAYS,
+                        'userID' => $userID
+                    )
+                );
                 $urlReportAbsent =
                     Controller::buildLink(
                         $_SERVER['PHP_SELF'],
@@ -1003,24 +1055,18 @@ class CTUser extends CTCNC
                             'userID' => $userID
                         )
                     );
-                $txtReportAbsent = '[record absence]';
+                $txtReportAbsent = '[Record Absence]';
 
                 $this->template->set_var(
                     array(
-                        'userID' => $userID,
-
-                        'firstName' => Controller::htmlDisplayText($dsUser->getValue(DBEJUser::firstName)),
-
-                        'lastName' => Controller::htmlDisplayText($dsUser->getValue(DBEJUser::lastName)),
-
-                        'urlReportAbsent'
-                        => $urlReportAbsent,
-
-                        'txtReportAbsent'
-                        => $txtReportAbsent,
-
-                        'urlEdit' => $urlEdit,
-                        'txtEdit' => $txtEdit
+                        'userID'          => $userID,
+                        'firstName'       => Controller::htmlDisplayText($dsUser->getValue(DBEJUser::firstName)),
+                        'lastName'        => Controller::htmlDisplayText($dsUser->getValue(DBEJUser::lastName)),
+                        'urlReportAbsent' => $urlReportAbsent,
+                        'txtReportAbsent' => $txtReportAbsent,
+                        'urlHalfHolidays' => $urlHalfHolidays,
+                        'urlEdit'         => $urlEdit,
+                        'txtEdit'         => $txtEdit
                     )
                 );
                 $this->template->parse(

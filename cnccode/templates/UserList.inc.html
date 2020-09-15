@@ -1,25 +1,53 @@
 <!-- Template: UserList.inc.html -->
-<script language='JavaScript' src="CommonJS.js"></script>
-<A href="{urlCreate}">[create new user]</A> 
-<table class="singleBorder" width="417" border="0" cellspacing="1" cellpadding="2">
-	<tr> 
-		<td width="265" class="listHeadText">User</td>
-		<td width="141" class="listHeadText">&nbsp;</td>
-    <td class="listHeadText">&nbsp;</td>
-	</tr>
-	<!-- BEGIN userBlock -->
-	<tr valign="top" onMouseOver="this.bgColor='#ffffcc';" onMouseOut="this.bgColor='';"> 
-		<td class="orderLineItem"><DIV align="left">{firstName} {lastName}</div></td>
-		<td class="orderLineItem">
-			<A href="{urlEdit}" title="Edit user details">{txtEdit}</a> 
-    </td>
-    
-    <td class="orderLineItem">
-      <A href="{urlReportAbsent}" title="Report user absent" 
-onClick="if(!confirm('Are you sure you want to record this user absent?')) return(false)">{txtReportAbsent}</a>
-    </td>
-    
-	</tr>
-	<!-- END userBlock -->
+<script language='JavaScript'
+        src="CommonJS.js"
+></script>
+<A href="{urlCreate}">[create new user]</A>
+<table class="singleBorder"
+       width="417"
+       border="0"
+       cellspacing="1"
+       cellpadding="2"
+>
+    <tr>
+        <td width="265"
+            class="listHeadText"
+        >User
+        </td>
+        <td width="141"
+            class="listHeadText"
+        >&nbsp;
+        </td>
+        <td class="listHeadText">&nbsp;</td>
+        <td class="listHeadText">&nbsp;</td>
+    </tr>
+    <!-- BEGIN userBlock -->
+    <tr valign="top"
+        onMouseOver="this.bgColor='#ffffcc';"
+        onMouseOut="this.bgColor='';"
+    >
+        <td class="orderLineItem">
+            <DIV align="left">{firstName} {lastName}</div>
+        </td>
+        <td class="orderLineItem">
+            <A href="{urlEdit}"
+               title="Edit user details"
+            >{txtEdit}</a>
+        </td>
+
+        <td class="orderLineItem">
+            <A href="{urlReportAbsent}"
+               title="Report user absent"
+               onClick="if(!confirm('Are you sure you want to record this user absent?')) return(false)"
+            >{txtReportAbsent}</a>
+        </td>
+        <td class="orderLineItem">
+            <A href="{urlHalfHolidays}"
+               title="Record Half Day Holiday"
+            >[Record Half Day Holiday]</a>
+        </td>
+
+    </tr>
+    <!-- END userBlock -->
 </table>
 <!-- End Template: UserList.inc.html -->

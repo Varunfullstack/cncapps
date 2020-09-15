@@ -297,6 +297,24 @@ class BUUser extends Business
         );
     }
 
+    function logHalfHoliday($userID, $date)
+    {
+        global $db;
+        $db->preparedQuery(
+            "insert ignore into userHalfHolidays values(?,?)",
+            [
+                [
+                    "type"  => "i",
+                    "value" => $userID,
+                ],
+                [
+                    "type"  => "s",
+                    "value" => $date,
+                ]
+            ]
+        );
+    }
+
     function userTimeHasBeenLogged($ID)
     {
         global $db;
@@ -328,6 +346,7 @@ class BUUser extends Business
                       loggedHours,
                       cncLoggedHours,
                       holiday,
+                      holidayHours,       
                       CONCAT(
                         consultant.`firstName`,
                         ' ',
@@ -410,6 +429,7 @@ class BUUser extends Business
   loggedDate,
   user_time_log.`loggedHours`,
   user_time_log.`cncLoggedHours`,
+  user_time_log.holidayHours,
   holiday,
   userID,
   CASE

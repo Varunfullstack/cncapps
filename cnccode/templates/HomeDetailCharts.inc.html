@@ -70,6 +70,7 @@
                 data.addColumn('number', 'Average over 5 days');
                 data.addColumn('number', 'Average over Month');
                 data.addColumn('number', 'CNC Hours Logged');
+                data.addColumn('number', 'Holiday Hours')
 
 
                 data.addRows(
@@ -80,7 +81,8 @@
                             row['holiday'] ? 'green' : null,
                             row['fiveDaysAvg'],
                             row['monthAvg'],
-                            row['cncLoggedHours']
+                            row['cncLoggedHours'],
+                            row['holidayHours']
                         ]
                     })
                 );
@@ -94,6 +96,7 @@
                         1: {type: 'line'},
                         2: {type: 'line'},
                         3: {color: '#c6c6c6'},
+                        4: {color: 'green'},
                     },
                     legend: {
                         position: 'bottom'

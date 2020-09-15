@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 976 - ServiceDesk Team Individual Stats
+- Issue 967 - Record half day holidays to assign logged hours
 ### Fixed
 - Issue 969 - Login page needs two attempts to login initially
 
