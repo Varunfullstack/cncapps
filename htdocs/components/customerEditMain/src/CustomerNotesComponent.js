@@ -9,7 +9,7 @@ class CustomerNotesComponent extends React.Component {
         this.state = {
             loaded: false,
             customerNotes: [],
-            customerId: props.customerID,
+            customerId: props.customerId,
             currentNote: null,
             currentNoteIdx: null,
             isAddingNote: false
@@ -19,7 +19,7 @@ class CustomerNotesComponent extends React.Component {
     }
 
     fetchCustomerNotes() {
-        return fetch('/CustomerNote.php?action=getCustomerNotes&customerId=' + this.props.customerID)
+        return fetch('/CustomerNote.php?action=getCustomerNotes&customerId=' + this.props.customerId)
             .then(response => response.json())
             .then(response => this.setState({customerNotes: response.data}));
     }
@@ -88,7 +88,7 @@ class CustomerNotesComponent extends React.Component {
                 {
                     style: {
                         display: 'flex',
-                        "flex-direction": 'column',
+                        flexDirection: 'column',
                         height: "400px",
                         overflowY: 'scroll',
                         width: '740px'
@@ -146,6 +146,7 @@ class CustomerNotesComponent extends React.Component {
     }
 
     render() {
+
         if (!this.state.loaded) {
             return this.el(
                 Skeleton,
@@ -254,7 +255,7 @@ class CustomerNotesComponent extends React.Component {
                                         this.setState({
                                             currentNote: {
                                                 id: -1,
-                                                customerId: this.props.customerID,
+                                                customerId: this.props.customerId,
                                                 createdAt: '',
                                                 modifiedAt: '',
                                                 modifiedById: '',
