@@ -1038,7 +1038,7 @@ class CTUser extends CTCNC
                             )
                         );
 
-                    $txtEdit = '[edit]';
+                    $txtEdit = '[Edit]';
                 }
                 $urlHalfHolidays = Controller::buildLink(
                     $_SERVER['PHP_SELF'],
@@ -1055,7 +1055,7 @@ class CTUser extends CTCNC
                             'userID' => $userID
                         )
                     );
-                $txtReportAbsent = '[record absence]';
+                $txtReportAbsent = '[Record Absence]';
 
                 $this->template->set_var(
                     array(
