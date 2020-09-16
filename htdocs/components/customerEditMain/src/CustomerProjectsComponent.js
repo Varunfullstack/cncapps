@@ -10,13 +10,13 @@ class CustomerProjectsComponent extends React.Component {
         this.state = {
             loaded: false,
             customerProjects: [],
-            customerId: props.customerID,
+            customerId: props.customerId,
         };
         document.customerProjectsComponent = this;
     }
 
     fetchCustomerProjects() {
-        return fetch('?action=getCustomerProjects&customerId=' + this.props.customerID)
+        return fetch('?action=getCustomerProjects&customerId=' + this.props.customerId)
             .then(response => response.json())
             .then(response => this.setState({customerProjects: response.data}));
     }
@@ -58,14 +58,11 @@ class CustomerProjectsComponent extends React.Component {
         if (!project.isDeletable) {
             return null;
         }
-        return this.el(
-            'a',
-            {
-                href: `Project.php?action=delete&projectID=${project.id}`,
-                key: `delete-${project.id}`
-            },
-            ' delete'
-        )
+        return (<a href={`Project.php?action=delete&projectID=${project.id}`}>
+            <button className="btn btn-outline-danger">
+                <i className="fa fa-trash"/>
+            </button>
+        </a>)
     }
 
     formatDate(dateString) {
@@ -131,6 +128,13 @@ class CustomerProjectsComponent extends React.Component {
     }
 
     render() {
+        if (!this.state.loaded) {
+            return '';
+        }
+
+        const {customerId} = this.props;
+        const {customerProjects} = this.state;
+
         return (
             <div className="tab-pane fade customerEditProjects"
                  id="nav-profile"
@@ -143,9 +147,9 @@ class CustomerProjectsComponent extends React.Component {
                             <h2>Projects</h2>
                         </div>
                         <div className="col-md-12">
-                            {/*<a href="{addProjectURL}">*/}
-                            {/*    <button className="btn btn-primary mt-3 mb-3">Add Project</button>*/}
-                            {/*</a>*/}
+                            <a href={`/Project.php?action=add&customerID=${customerId}`}>
+                                <button className="btn btn-primary mt-3 mb-3">Add Project</button>
+                            </a>
                         </div>
                     </div>
                     <div className="row">
@@ -166,88 +170,36 @@ class CustomerProjectsComponent extends React.Component {
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr>
-                                    <td>{projectName}</td>
-                                    <td>{notes}</td>
-                                    <td>{startDate}</td>
-                                    <td>{expiryDate}</td>
-                                    <td>
-                                        {/*<a href="{editProjectLink}">*/}
-                                        <button className="btn btn-outline-secondary">
-                                            <i className="fa fa-edit"/>
-                                        </button>
-                                        {/*</a>*/}
-                                    </td>
-                                    <td>
-                                        {/*<a href="{deleteProjectLink}">*/}
-                                        <button className="btn btn-outline-danger">
-                                            <i className="fa fa-trash"/>
-                                        </button>
-                                        {/*</a>*/}
-                                    </td>
-                                </tr>
+                                {
+                                    customerProjects.map(project => {
+                                        return (<tr key={project.id}>
+                                            <td>{project.name}</td>
+                                            <td>{project.notes && project.notes.substr(0, 50)}</td>
+                                            <td>{this.formatDate(project.startDate)}</td>
+                                            <td>{this.formatDate(project.expiryDate)}</td>
+                                            <td>
+                                                <a href={`/Project.php?action=edit&projectID=${project.id}`}>
+                                                    <button className="btn btn-outline-secondary">
+                                                        <i className="fa fa-edit"/>
+                                                    </button>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                {
+                                                    this.renderDeleteLink(project)
+                                                }
+                                            </td>
+                                        </tr>)
+                                    })
+                                }
+
                                 </tbody>
                             </table>
-                            <nav aria-label="Page navigation example">
-                                <ul className="pagination justify-content-end">
-                                    <li className="page-item">
-                                        <a className="page-link"
-                                           href="#"
-                                        >Previous</a>
-                                    </li>
-                                    <li className="page-item">
-                                        <a className="page-link"
-                                           href="#"
-                                        >1</a>
-                                    </li>
-                                    <li className="page-item">
-                                        <a className="page-link"
-                                           href="#"
-                                        >2</a>
-                                    </li>
-                                    <li className="page-item">
-                                        <a className="page-link"
-                                           href="#"
-                                        >3</a>
-                                    </li>
-                                    <li className="page-item">
-                                        <a className="page-link"
-                                           href="#"
-                                        >Next</a>
-                                    </li>
-                                </ul>
-                            </nav>
                         </div>
                     </div>
                 </div>
             </div>
         )
-
-        //
-        // if (!this.state.loaded) {
-        //     return this.el(
-        //         Skeleton,
-        //         null,
-        //         'Loading Data'
-        //     );
-        // }
-        //
-        //
-        // return this.el(
-        //     'div',
-        //     {},
-        //     [
-        //         this.el(
-        //             'a',
-        //             {
-        //                 href: `/Project.php?action=add&customerID=${this.props.customerId}`,
-        //                 key: 'addProjectLink'
-        //             },
-        //             'Add Project'
-        //         ),
-        //         this.renderProjects()
-        //     ]
-        // )
     }
 }
 

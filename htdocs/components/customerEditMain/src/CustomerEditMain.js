@@ -220,28 +220,6 @@ class CustomerEditMain extends React.Component {
         this.updateCustomerField('customerTypeID', value);
     }
 
-    getInputRow(label, input, key, width = null) {
-        return (
-            <tr valign="top"
-                key={key + "_tr"}
-            >
-
-                <td className='content'
-                    key={key + "_content"}
-                    width={width}
-                >
-                    {label}
-                </td>
-                <td className='content'
-                    key={key + "_input"}
-                    width={width}
-                >
-                    {input}
-                </td>
-            </tr>
-        )
-    }
-
     updateCustomerField(field, value) {
         this.setState(prevState => {
             const customer = {...prevState.customer};
@@ -399,15 +377,27 @@ class CustomerEditMain extends React.Component {
                         <div className="col-md-6 mb-3">
                             <ul className="list-style-none float-right">
                                 <li>
-                                    <button className="btn btn-outline-success">Save</button>
-                                    <button className="btn btn-outline-danger">Cancel</button>
-                                    <button className="btn btn-outline-secondary">Set all
+                                    <button type="button"
+                                            className="btn btn-outline-success"
+                                    >Save
+                                    </button>
+                                    <button type="button"
+                                            className="btn btn-outline-danger"
+                                    >Cancel
+                                    </button>
+                                    <button type="button"
+                                            className="btn btn-outline-secondary"
+                                    >Set all
                                         users to no support
                                     </button>
-                                    <button className="btn btn-outline-secondary">
+                                    <button type="button"
+                                            className="btn btn-outline-secondary"
+                                    >
                                         <i className="fa fa-filter"/>
                                     </button>
-                                    <button className="btn btn-outline-secondary">
+                                    <button type="button"
+                                            className="btn btn-outline-secondary"
+                                    >
                                         <i className="fa fa-ellipsis-v"/>
                                     </button>
                                 </li>
@@ -422,7 +412,7 @@ class CustomerEditMain extends React.Component {
                                     <div className="form-group">
                                         <input type="text"
                                                onChange={this.handleNameUpdate}
-                                               value={this.state.customer.name}
+                                               value={this.state.customer.name || ''}
                                                size="50"
                                                maxLength="50"
                                                className="form-control"
@@ -434,7 +424,7 @@ class CustomerEditMain extends React.Component {
                                     <div className="form-group">
                                         <Select
                                             options={this.state.mainContacts}
-                                            selectedOption={this.state.customer.primaryMainContactID}
+                                            selectedOption={this.state.customer.primaryMainContactID || ''}
                                             onChange={this.handlePrimaryMainContactUpdate}
                                             className='form-control'
                                         />
@@ -505,7 +495,7 @@ class CustomerEditMain extends React.Component {
                                                     {label: 'Annually', value: 12}
                                                 ]
                                             }
-                                            selectedOption={this.state.customer.reviewMeetingFrequencyMonths}
+                                            selectedOption={this.state.customer.reviewMeetingFrequencyMonths || ''}
                                             onChange={this.handleReviewMeetingFrequencyMonthsUpdate}
                                             className="form-control col-sm-4"
                                         />
@@ -515,7 +505,7 @@ class CustomerEditMain extends React.Component {
                                     <label htmlFor="">Lead Status</label>
                                     <Select
                                         options={this.state.leadStatuses}
-                                        selectedOption={this.state.customer.leadStatusId}
+                                        selectedOption={this.state.customer.leadStatusId || ''}
                                         onChange={this.handleLeadStatusIdUpdate}
                                         className="form-control"
                                     />
@@ -535,7 +525,7 @@ class CustomerEditMain extends React.Component {
                                     <div className="form-group">
                                         <Select options={this.state.customerTypes}
                                                 className="form-control"
-                                                selectedOption={this.state.customer.customerTypeID}
+                                                selectedOption={this.state.customer.customerTypeID || ''}
                                                 onChange={this.handleCustomerTypeUpdate}
                                         />
                                     </div>
@@ -544,7 +534,7 @@ class CustomerEditMain extends React.Component {
                                     <label htmlFor="">Sector</label>
                                     <div className="form-group">
                                         <Select options={this.state.sectors}
-                                                selectedOption={this.state.customer.sectorID}
+                                                selectedOption={this.state.customer.sectorID || ''}
                                                 onChange={this.handleSectorIDUpdate}
                                                 className="form-control"
                                         />
@@ -554,7 +544,7 @@ class CustomerEditMain extends React.Component {
                                     <label htmlFor="">PCs</label>
                                     <div className="form-group">
                                         <input type="number"
-                                               value={this.state.customer.noOfPCs}
+                                               value={this.state.customer.noOfPCs || ''}
                                                onChange={this.handleNoOfPCsUpdate}
                                                className="form-control"
                                         />
@@ -564,7 +554,7 @@ class CustomerEditMain extends React.Component {
                                     <label>Servers</label>
                                     <div className="form-group">
                                         <input type="number"
-                                               value={this.state.customer.noOfServers}
+                                               value={this.state.customer.noOfServers || ''}
                                                onChange={this.handleNoOfServersUpdate}
                                                className="form-control"
                                         />
@@ -574,7 +564,7 @@ class CustomerEditMain extends React.Component {
                                     <label>Reg</label>
                                     <div className="form-group">
                                         <input type="text"
-                                               value={this.state.customer.regNo}
+                                               value={this.state.customer.regNo || ''}
                                                onChange={this.handleRegNoUpdate}
                                                size="10"
                                                maxLength="10"
@@ -586,7 +576,7 @@ class CustomerEditMain extends React.Component {
                                     <label>Sites</label>
                                     <div className="form-group">
                                         <input type="number"
-                                               value={this.state.customer.noOfSites}
+                                               value={this.state.customer.noOfSites || ''}
                                                onChange={this.handleNoOfSitesUpdate}
                                                size="2"
                                                maxLength="2"
@@ -598,7 +588,7 @@ class CustomerEditMain extends React.Component {
                                     <label>Pre-pay Top Up</label>
                                     <div className="form-group">
                                         <input type="text"
-                                               value={this.state.customer.gscTopUpAmount}
+                                               value={this.state.customer.gscTopUpAmount || ''}
                                                onChange={this.handleGscTopUpAmountUpdate}
                                                size="10"
                                                maxLength="10"
@@ -611,7 +601,7 @@ class CustomerEditMain extends React.Component {
                                     <div className="form-group">
 
                                         <input type="date"
-                                               value={this.state.customer.becameCustomerDate}
+                                               value={this.state.customer.becameCustomerDate || ''}
                                                onChange={this.handleBecameCustomerDateUpdate}
                                                size="10"
                                                maxLength="10"
@@ -639,7 +629,7 @@ class CustomerEditMain extends React.Component {
                                     <div className="form-group form-inline">
                                         <label style={{margin: "0 .5rem"}}>1</label>
                                         <input type="number"
-                                               value={this.state.customer.slaP1}
+                                               value={this.state.customer.slaP1 || ''}
                                                onChange={this.handleSLAP1Update}
                                                size="1"
                                                maxLength="3"
@@ -647,7 +637,7 @@ class CustomerEditMain extends React.Component {
                                         />
                                         <label style={{margin: "0 .5rem"}}>2</label>
                                         <input type="number"
-                                               value={this.state.customer.slaP2}
+                                               value={this.state.customer.slaP2 || ''}
                                                onChange={this.handleSLAP2Update}
                                                size="1"
                                                maxLength="3"
@@ -658,7 +648,7 @@ class CustomerEditMain extends React.Component {
 
                                         <label style={{margin: "0 .5rem"}}>3</label>
                                         <input type="number"
-                                               value={this.state.customer.slaP3}
+                                               value={this.state.customer.slaP3 || ''}
                                                onChange={this.handleSLAP3Update}
                                                size="1"
                                                maxLength="3"
@@ -666,7 +656,7 @@ class CustomerEditMain extends React.Component {
                                         />
                                         <label style={{margin: "0 .5rem"}}>4</label>
                                         <input type="number"
-                                               value={this.state.customer.slaP4}
+                                               value={this.state.customer.slaP4 || ''}
                                                onChange={this.handleSLAP4Update}
                                                size="1"
                                                maxLength="3"
@@ -678,7 +668,7 @@ class CustomerEditMain extends React.Component {
                                     <div className="form-group form-inline">
                                         <label style={{margin: "0 .5rem"}}>5</label>
                                         <input type="number"
-                                               value={this.state.customer.slaP5}
+                                               value={this.state.customer.slaP5 || ''}
                                                onChange={this.handleSLAP5Update}
                                                size="1"
                                                maxLength="3"
@@ -691,7 +681,7 @@ class CustomerEditMain extends React.Component {
                                     <label htmlFor="">SLA Response Fix Hours</label>
                                     <div className="form-group form-inline">
                                         <label style={{margin: "0 .5rem"}}>1</label>
-                                        <input value={this.state.customer.slaFixHoursP1}
+                                        <input value={this.state.customer.slaFixHoursP1 || ''}
                                                type="number"
                                                size="1"
                                                step="0.1"
@@ -701,7 +691,7 @@ class CustomerEditMain extends React.Component {
                                                className="form-control col-sm-4"
                                         />
                                         <label style={{margin: "0 .5rem"}}>2</label>
-                                        <input value={this.state.customer.slaFixHoursP2}
+                                        <input value={this.state.customer.slaFixHoursP2 || ''}
                                                type="number"
                                                size="1"
                                                step="0.1"
@@ -713,7 +703,7 @@ class CustomerEditMain extends React.Component {
                                     </div>
                                     <div className="form-group form-inline">
                                         <label style={{margin: "0 .5rem"}}>3</label>
-                                        <input value={this.state.customer.slaFixHoursP3}
+                                        <input value={this.state.customer.slaFixHoursP3 || ''}
                                                type="number"
                                                size="1"
                                                step="0.1"
@@ -723,7 +713,7 @@ class CustomerEditMain extends React.Component {
                                                className="form-control col-sm-4"
                                         />
                                         <label style={{margin: "0 .5rem"}}>4</label>
-                                        <input value={this.state.customer.slaFixHoursP4}
+                                        <input value={this.state.customer.slaFixHoursP4 || ''}
                                                type="number"
                                                size="1"
                                                step="0.1"
@@ -740,19 +730,19 @@ class CustomerEditMain extends React.Component {
                                     <div className="form-group form-inline">
                                         <label style={{margin: "0 .5rem"}}>1</label>
                                         <input type="checkbox"
-                                               checked={this.state.customer.slaP1PenaltiesAgreed}
+                                               checked={this.state.customer.slaP1PenaltiesAgreed || ''}
                                                onChange={this.handleSlaP1PenaltiesAgreed}
                                                className="form-control"
                                         />
                                         <label style={{margin: "0 .5rem"}}>2</label>
                                         <input type="checkbox"
-                                               checked={this.state.customer.slaP2PenaltiesAgreed}
+                                               checked={this.state.customer.slaP2PenaltiesAgreed || ''}
                                                onChange={this.handleSlaP2PenaltiesAgreed}
                                                className="form-control"
                                         />
                                         <label style={{margin: "0 .5rem"}}>3</label>
                                         <input type="checkbox"
-                                               checked={this.state.customer.slaP3PenaltiesAgreed}
+                                               checked={this.state.customer.slaP3PenaltiesAgreed || ''}
                                                onChange={this.handleSlaP3PenaltiesAgreed}
                                                className="form-control"
                                         />
@@ -773,7 +763,7 @@ class CustomerEditMain extends React.Component {
                                 <textarea className="form-control"
                                           cols="30"
                                           rows="2"
-                                          value={this.state.customer.techNotes}
+                                          value={this.state.customer.techNotes || ''}
                                           onChange={this.handleTechNotesUpdate}
                                 />
                                     </div>
@@ -783,7 +773,7 @@ class CustomerEditMain extends React.Component {
                                     <label>Active Directory Name</label>
                                     <div className="form-group">
                                         <input type="text"
-                                               value={this.state.customer.activeDirectoryName}
+                                               value={this.state.customer.activeDirectoryName || ''}
                                                onChange={this.handleActiveDirectoryNameUpdate}
                                                size="54"
                                                maxLength="255"
@@ -795,7 +785,7 @@ class CustomerEditMain extends React.Component {
                                     <label>Account Manager</label>
                                     <div className="form-group">
                                         <Select options={this.state.accountManagers}
-                                                selectedOption={this.state.customer.accountManagerUserID}
+                                                selectedOption={this.state.customer.accountManagerUserID || ''}
                                                 onChange={this.handleAccountManagerUserIDUpdate}
                                                 key={'accountManager'}
                                                 className="form-control"
@@ -817,7 +807,7 @@ class CustomerEditMain extends React.Component {
                                     <div className="form-group">
                                         <input className="form-control"
                                                type='text'
-                                               value={this.state.customer.accountName}
+                                               value={this.state.customer.accountName || ''}
                                                onChange={this.handleAccountNameUpdate}
                                         />
                                     </div>
@@ -865,7 +855,7 @@ class CustomerEditMain extends React.Component {
                                         <label>By:</label>
                                         <Select
                                             options={this.state.reviewEngineers}
-                                            selectedOption={this.state.customer.reviewUserID}
+                                            selectedOption={this.state.customer.reviewUserID || ''}
                                             onChange={this.handleReviewUserIDUpdate}
                                             key='reviewUserID'
                                             className="form-control"
@@ -879,7 +869,7 @@ class CustomerEditMain extends React.Component {
                                         <textarea title="Action to be taken"
                                                   cols="120"
                                                   rows="3"
-                                                  value={this.state.customer.reviewAction}
+                                                  value={this.state.customer.reviewAction || ''}
                                                   className="form-control"
                                                   onChange={this.handleReviewActionUpdate}
                                         />

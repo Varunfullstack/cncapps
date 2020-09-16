@@ -1,5 +1,4 @@
 import React from 'react';
-import * as HTMLReactParser from 'html-react-parser'
 
 class CustomerPortalDocumentsComponent extends React.Component {
     el = React.createElement;
@@ -9,13 +8,12 @@ class CustomerPortalDocumentsComponent extends React.Component {
         this.state = {
             loaded: false,
             customerPortalDocuments: [],
-            customerId: props.customerID,
+            customerId: props.customerId,
         };
-        document.customerPortalDocumentsComponent = this;
     }
 
     fetchCustomerPortalDocuments() {
-        return fetch('?action=getCustomerPortalDocuments&customerId=' + this.props.customerID)
+        return fetch('?action=getCustomerPortalDocuments&customerId=' + this.props.customerId)
             .then(response => response.json())
             .then(response => this.setState({customerPortalDocuments: response.data}));
     }
@@ -29,110 +27,45 @@ class CustomerPortalDocumentsComponent extends React.Component {
             });
     }
 
-    renderHeadingRow() {
-        return this.el(
-            'tr',
-            {
-                key: 'headerRow'
-            },
-            [
-                this.renderTd('listHeadText', 'Description', 'headerName'),
-                this.renderTd('listHeadText', 'File', 'headerNotes'),
-                this.renderTd('listHeadText', 'Customer Contract', 'headerStarts'),
-                this.renderTd('listHeadText', 'Main Contact Only', 'headerExpires'),
-                this.renderTd('listHeadText', ' ', 'headerActions', false, {colSpan: 2}),
-            ],
-        )
-    }
-
-    renderTd(className, value, key, isComplex = false, attributes = {}) {
-        return this.el(
-            'td',
-            {className, key, ...attributes},
-            (value && !isComplex && HTMLReactParser.default(value)) || value
-        )
-    }
-
-
     renderPortalDocumentsRows() {
         return this.state.customerPortalDocuments.map(
             portalDocument => {
-                return this.el(
-                    'tr',
-                    {
-                        key: `portalDocumentRow-${portalDocument.id}`
-                    },
-                    [
-                        this.renderTd('content',
-                            this.el(
-                                'a',
-                                {
-                                    href: `/PortalCustomerDocument.php?action=viewFile&portalCustomerDocumentID=${portalDocument.id}`,
-                                },
-                                portalDocument.description
-                            ),
-                            `description-${portalDocument.id}`,
-                            true
-                        ),
-                        this.renderTd('content',
-                            this.el(
-                                'a',
-                                {
-                                    href: `/PortalCustomerDocument.php?action=viewFile&portalCustomerDocumentID=${portalDocument.id}`,
-                                },
-                                portalDocument.description
-                            ),
-                            `file-${portalDocument.id}`,
-                            true
-                        ),
-                        this.renderTd('content', portalDocument.customerContract ? 'Y' : 'N', `customerContract-${portalDocument.id}`),
-                        this.renderTd('content', portalDocument.mainContactOnly ? 'Y' : 'N', `notes-${portalDocument.id}`),
-                        this.renderTd('content',
-                            this.el(
-                                'a',
-                                {
-                                    href: `/PortalCustomerDocument.php?action=edit&portalCustomerDocumentID=${portalDocument.id}`,
-                                },
-                                portalDocument.description
-                            ),
-                            `edit-${portalDocument.id}`,
-                            true
-                        ),
-                        this.renderTd('content',
-                            this.el(
-                                'a',
-                                {
-                                    href: `/PortalCustomerDocument.php?action=delete&portalCustomerDocumentID=${portalDocument.id}`,
-                                },
-                                portalDocument.description
-                            ),
-                            `delete-${portalDocument.id}`,
-                            true
-                        ),
-                    ]
-                )
+                return (<tr key={`portalDocumentRow-${portalDocument.id}`}>
+                    <td>
+                        <a href={`/PortalCustomerDocument.php?action=viewFile&portalCustomerDocumentID=${portalDocument.id}`}
+                           title="View attached document"
+                        >{portalDocument.description}</a>
+                    </td>
+                    <td>
+                        <a href={`/PortalCustomerDocument.php?action=viewFile&portalCustomerDocumentID=${portalDocument.id}`}
+                           title="View attached document"
+                        >{portalDocument.description}</a>
+                    </td>
+                    <td>
+                        {portalDocument.customerContract ? 'Y' : 'N'}
+                    </td>
+                    <td>
+                        {portalDocument.mainContactOnly ? 'Y' : 'N'}
+                    </td>
+                    <td>
+                        <a href={`/PortalCustomerDocument.php?action=edit&portalCustomerDocumentID=${portalDocument.id}`}>
+                            <button className="btn btn-outline-secondary">
+                                <i className="fa fa-edit"/>
+                            </button>
+                        </a>
+                    </td>
+                    <td>
+                        <a href={`/PortalCustomerDocument.php?action=delete&portalCustomerDocumentID=${portalDocument.id}`}
+                           title="Delete attached document"
+                           onClick={() => !confirm('Are you sure you want to remove this document?')}
+                        >
+                            <button className="btn btn-outline-danger">
+                                <i className="fa fa-trash"/>
+                            </button>
+                        </a>
+                    </td>
+                </tr>);
             }
-        )
-    }
-
-    renderPortalDocuments() {
-        return this.el(
-            'table',
-            {
-                className: 'singleBorder',
-                border: 0,
-                cellPadding: 2,
-                cellSpacing: 1,
-                key: 'portalDocumentsTable'
-            },
-            this.el(
-                'tbody',
-                {},
-                [
-                    this.renderHeadingRow(),
-                    ...this.renderPortalDocumentsRows()
-                ]
-            )
         )
     }
 
@@ -149,8 +82,11 @@ class CustomerPortalDocumentsComponent extends React.Component {
                             <h2>Portal Documents</h2>
                         </div>
                         <div className="col-md-12">
-                            <button className="btn btn-primary mt-3 mb-3">Add Document
-                            </button>
+                            <a href={`/PortalCustomerDocument.php?action=add&customerID=${this.props.customerId}`}>
+                                <button className="btn btn-primary mt-3 mb-3">
+                                    Add Document
+                                </button>
+                            </a>
                         </div>
                     </div>
                     <div className="row">
@@ -163,80 +99,17 @@ class CustomerPortalDocumentsComponent extends React.Component {
                                 <tr>
                                     <td>Description</td>
                                     <td>Files</td>
-                                    <td>Starters Form</td>
-                                    <td>Leavers Form</td>
+                                    <td>Customer Contract</td>
                                     <td>Main Contact Only</td>
                                     <td/>
                                     <td/>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr>
-                                    <td>
-                                        {/*<a href="{urlViewFile}"                                                                       title="View attached document"*/}
-                                        {/*>{description}</a>*/}
-                                    </td>
-                                    <td>
-                                        {/*<a href="{urlViewFile}"*/}
-                                        {/*   title="View attached document"*/}
-                                        {/*>{filename}</a>*/}
-                                    </td>
-                                    <td>{startersFormFlag}
-                                    </td>
-                                    <td>{leaversFormFlag}
-                                    </td>
-                                    <td>{mainContactOnlyFlag}
-                                    </td>
-
-                                    <td>
-                                        {/*<a href="{urlEditDocument}">*/}
-                                        <button className="btn btn-outline-secondary">
-                                            <i className="fa fa-edit"/>
-                                        </button>
-                                        {/*</a>*/}
-                                    </td>
-                                    <td>
-                                        {/*<a href="{urlDeleteDocument}"*/}
-                                        {/*   title="Delete attached document"*/}
-                                        {/*   onClick="if(!confirm('Are you sure you want to remove this document?')) return(false)"*/}
-                                        {/*>*/}
-                                        <button className="btn btn-outline-danger">
-                                            <i className="fa fa-trash"/>
-                                        </button>
-                                        {/*</a>*/}
-                                    </td>
-                                </tr>
+                                {this.renderPortalDocumentsRows()}
                                 </tbody>
                             </table>
-                            <nav aria-label="Page navigation example">
-                                <ul className="pagination justify-content-end">
-                                    <li className="page-item">
-                                        <a className="page-link"
-                                           href="#"
-                                        >Previous</a>
-                                    </li>
-                                    <li className="page-item">
-                                        <a className="page-link"
-                                           href="#"
-                                        >1</a>
-                                    </li>
-                                    <li className="page-item">
-                                        <a className="page-link"
-                                           href="#"
-                                        >2</a>
-                                    </li>
-                                    <li className="page-item">
-                                        <a className="page-link"
-                                           href="#"
-                                        >3</a>
-                                    </li>
-                                    <li className="page-item">
-                                        <a className="page-link"
-                                           href="#"
-                                        >Next</a>
-                                    </li>
-                                </ul>
-                            </nav>
+
                         </div>
                     </div>
 
@@ -244,30 +117,6 @@ class CustomerPortalDocumentsComponent extends React.Component {
 
             </div>
         )
-        // if (!this.state.loaded) {
-        //     return this.el(
-        //         Skeleton,
-        //         null,
-        //         'Loading Data'
-        //     );
-        // }
-        //
-        //
-        // return this.el(
-        //     'div',
-        //     {},
-        //     [
-        //         this.el(
-        //             'a',
-        //             {
-        //                 href: `/PortalCustomerDocument.php?action=add&customerID=${this.props.customerId}`,
-        //                 key: 'addDocumentLink'
-        //             },
-        //             'Add document'
-        //         ),
-        //         this.renderPortalDocuments()
-        //     ]
-        // )
     }
 }
 

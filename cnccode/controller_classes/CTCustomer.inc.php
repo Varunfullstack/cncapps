@@ -140,6 +140,7 @@ class CTCustomer extends CTCNC
     const GET_CUSTOMER_SITES = "getSites";
     const GET_CUSTOMER_CONTACTS = "getContacts";
     const UPDATE_SITE = "updateSite";
+    const GET_CUSTOMER_ORDERS = 'getCustomerOrders';
     public $customerID;
     public $customerString;
     public $contactString;
@@ -704,11 +705,6 @@ class CTCustomer extends CTCNC
         }
     }
 
-    function updateSite()
-    {
-
-    }
-
     /**
      * Route to function based upon action passed
      * @throws Exception
@@ -725,6 +721,11 @@ class CTCustomer extends CTCNC
                     $value
                 );
                 echo json_encode(["status" => "ok", "data" => $encrypted]);
+                exit;
+            }
+            case self::GET_CUSTOMER_ORDERS:
+            {
+                $this->getCustomerOrdersController();
                 exit;
             }
             case 'getCustomer':
@@ -1018,6 +1019,56 @@ class CTCustomer extends CTCNC
         }
     }
 
+    function getCustomerOrdersController()
+    {
+        $customerId = $this->getParam('customerId');
+        $dbeCustomer = new DBECustomer($this);
+        $orders = [];
+        if ($dbeCustomer->getRow($customerId) && $dbeCustomer->getValue(DBECustomer::referredFlag) == 'Y') {
+            $dbeJOrdhead = new DBEJOrdhead($this);
+            $dbeJOrdhead->getRowsBySearchCriteria(
+                $customerId,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false
+            );
+            while ($dbeJOrdhead->fetchNext()) {
+
+                $ordheadID = $dbeJOrdhead->getPKValue();
+
+                $orderURL =
+                    Controller::buildLink(
+                        'SalesOrder.php',
+                        array(
+                            'action'    => CTCNC_ACT_DISP_SALESORDER,
+                            'ordheadID' => $ordheadID
+                        )
+                    );
+
+                $orders[] = [
+                    'url'       => $orderURL,
+                    'id'        => $ordheadID,
+                    'type'      => $this->getOrderTypeDescription($dbeJOrdhead->getValue(DBEJOrdhead::type)),
+                    'date'      => strftime(
+                        "%d/%m/%Y",
+                        strtotime($dbeJOrdhead->getValue(DBEJOrdhead::date))
+                    ),
+                    'custPORef' => $dbeJOrdhead->getValue(DBEJOrdhead::custPORef)
+                ];
+
+            }
+        }
+        echo json_encode(["status" => "ok", "data" => $orders]);
+    }
+
+    function getOrderTypeDescription($type)
+    {
+        return $this->orderTypeArray[$type];
+    }
+
     private function getMainContacts($customerID)
     {
         $dbeContact = new DBEContact($this);
@@ -1125,12 +1176,11 @@ class CTCustomer extends CTCNC
                     ),
                     'mainContactOnlyFlag' => $portalDocuments->getValue(
                             DBEPortalCustomerDocument::mainContactOnlyFlag
-                        ) === 'Y'
+                        ) === 'Y',
                 ];
         }
         return $documents;
     }
-
 
     /**
      * when customer folder link is clicked we call this routine which first checks
@@ -1400,6 +1450,8 @@ class CTCustomer extends CTCNC
         $dbeSite->setValue(DBESite::customerID, $data['customerID']);
         $dbeSite->setValue(DBESite::siteNo, $data['siteNo']);
         $dbeSite->getRow();
+        $dbeCustomer = new DBECustomer($this);
+        $dbeCustomer->getRow($data['customerID'])
         $dbeSite->setValue(DBESite::add1, $data["address1"]);
         $dbeSite->setValue(DBESite::add2, $data["address2"]);
         $dbeSite->setValue(DBESite::add3, $data["address3"]);
@@ -2750,11 +2802,6 @@ class CTCustomer extends CTCNC
             );
         }
 
-    }
-
-    function getOrderTypeDescription($type)
-    {
-        return $this->orderTypeArray[$type];
     }
 
     /**
