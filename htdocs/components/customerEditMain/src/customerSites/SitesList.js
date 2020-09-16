@@ -6,23 +6,44 @@ import Site from './Site.js';
 
 const SitesList = ({sites, customerId, contacts, invoiceSiteNo, deliverSiteNo, changeInvoiceSiteNo, changeDeliverSiteNo, addContactToSite, updateSite}) => {
     return (
-        <div className="sites-list">
-            {
-                sites.length ?
-                    sites.map(site => (
-                        <Site key={site.siteNo}
-                              site={site}
-                              contacts={contacts}
-                              customerId={customerId}
-                              invoiceSiteNo={invoiceSiteNo}
-                              deliverSiteNo={deliverSiteNo}
-                              changeInvoiceSiteNo={changeInvoiceSiteNo}
-                              changedDeliverSiteNo={changeDeliverSiteNo}
-                              addContactToSite={addContactToSite}
-                              updateSite={updateSite}
-                        />
-                    )) : ''
-            }
+
+        <div className="container-fluid">
+            <div className="row">
+                <div className="col-md-12">
+                    <h2>Sites</h2>
+                </div>
+                <div className="col-md-12">
+                    <a href={`/Customer.php?action=addSite&customerID=${customerId}`}>
+                        <button className="btn btn-primary mt-3 mb-3">Add Site</button>
+                    </a>
+                </div>
+            </div>
+            <div className="row">
+                <div className="col-md-12">
+                    <div className="customerEditSites">
+                        <div className="accordion"
+                             id="accordionExample1"
+                        >
+                            {
+                                sites.length ?
+                                    sites.map(site => (
+                                        <Site key={site.siteNo}
+                                              site={site}
+                                              contacts={contacts}
+                                              customerId={customerId}
+                                              invoiceSiteNo={invoiceSiteNo}
+                                              deliverSiteNo={deliverSiteNo}
+                                              changeInvoiceSiteNo={changeInvoiceSiteNo}
+                                              changedDeliverSiteNo={changeDeliverSiteNo}
+                                              addContactToSite={addContactToSite}
+                                              updateSite={updateSite}
+                                        />
+                                    )) : ''
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     )
 }

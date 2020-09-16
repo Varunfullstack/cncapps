@@ -1,13 +1,9 @@
 import React from 'react'
-import What3WordsInput from "./dumbComponents/What3WordsInput";
-import SiteSelect from "./dumbComponents/SiteSelect";
-import SiteInput from "./dumbComponents/SiteInput";
 
 export default class Site extends React.Component {
 
     constructor(props) {
         super(props);
-        this.handleDeliverContact = this.handleDeliverContact.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
     }
 
@@ -25,205 +21,242 @@ export default class Site extends React.Component {
         return confirm('Are you sure you want to delete this site?');
     }
 
-    handleDeliverContact() {
-
-    }
-
-    renderFields() {
-        const formStructure = [
-            {
-                name: "address1",
-                size: 35,
-                maxLength: 35,
-                handleChange: ($event) => this.handleInputChange($event),
-                required: true,
-                labelWidth: "13%",
-                inputWidth: "87%",
-                labelText: "Site Address",
-                value: this.props.site.address1,
-            },
-            {
-                name: "address2",
-                size: 35,
-                maxLength: 35,
-                handleChange: this.handleInputChange,
-                labelText: " ",
-                value: this.props.site.address2,
-            },
-            {
-                name: "address3",
-                size: 35,
-                maxLength: 35,
-                handleChange: this.handleInputChange,
-                labelText: " ",
-                value: this.props.site.address3
-            },
-            {
-                name: "town",
-                size: 25,
-                maxLength: 25,
-                handleChange: this.handleInputChange,
-                labelText: "Town",
-                value: this.props.site.town,
-                required: true
-            },
-            {
-                name: "county",
-                size: 25,
-                maxLength: 25,
-                handleChange: this.handleInputChange,
-                labelText: "County",
-                value: this.props.site.county,
-                required: true
-            },
-            {
-                name: "what3Words",
-                handleChange: this.handleInputChange,
-                value: this.props.site.what3Words,
-                component: What3WordsInput
-            },
-            {
-                name: "postcode",
-                size: 15,
-                maxLength: 15,
-                handleChange: this.handleInputChange,
-                labelText: "Postcode",
-                value: this.props.site.postcode,
-                required: true
-            },
-            {
-                name: "phone",
-                size: 20,
-                maxLength: 20,
-                handleChange: this.handleInputChange,
-                labelText: "Phone",
-                value: this.props.site.phone,
-                className: "telephoneValidator"
-            },
-            {
-                name: "maxTravelHours",
-                size: 5,
-                maxLength: 5,
-                type: 'number',
-                handleChange: this.handleInputChange,
-                labelText: "Max Travel Hours",
-                value: this.props.site.maxTravelHours
-            },
-            {
-                name: "invoiceSiteNo",
-                type: 'radio',
-                handleChange: (e) => this.props.changeInvoiceSiteNo(e.target.value),
-                labelText: "Default Invoice",
-                value: `${this.props.site.siteNo}`,
-                checked: +this.props.invoiceSiteNo === +this.props.site.siteNo
-            },
-            {
-                name: "deliverSiteNo",
-                type: 'radio',
-                handleChange: (e) => this.props.changedDeliverSiteNo(e.target.value),
-                labelText: "Default Delivery",
-                value: `${this.props.site.siteNo}`,
-                checked: +this.props.deliverSiteNo === +this.props.site.siteNo
-            },
-            {
-                name: "invoiceContact",
-                handleChange: this.handleInputChange,
-                labelText: "Invoice Contact",
-                value: this.props.site.invoiceContact,
-                options: this.props.contacts,
-                optionLabelFn: x => `${x.firstName} ${x.lastName}`,
-                component: SiteSelect,
-            },
-            {
-                name: "deliveryContact",
-                handleChange: this.handleInputChange,
-                labelText: "Delivery Contact",
-                value: this.props.site.deliveryContact,
-                options: this.props.contacts,
-                optionLabelFn: x => `${x.firstName} ${x.lastName}`,
-                component: SiteSelect,
-            },
-            {
-                name: "nonUKFlag",
-                type: 'checkbox',
-                handleChange: this.handleInputChange,
-                labelText: "Non UK",
-                value: '1',
-                checked: this.props.site.nonUKFlag
-            },
-            {
-                name: "active",
-                type: 'checkbox',
-                handleChange: this.handleInputChange,
-                labelText: "Active",
-                value: '1',
-                checked: this.props.site.active
-            },
-        ]
-
-        return formStructure.map(x => {
-            const TagName = x.component || SiteInput;
-            return (
-                <TagName
-                    name={x.name}
-                    size={x.size}
-                    type={x.type}
-                    maxLength={x.maxLength}
-                    handleChange={x.handleChange}
-                    required={x.required}
-                    labelWidth={x.labelWidth}
-                    inputWidth={x.inputWidth}
-                    labelText={x.labelText}
-                    value={x.value}
-                    options={x.options}
-                    optionLabelFn={x.optionLabelFn}
-                    checked={x.checked}
-                    key={`${x.name}-${this.props.site.siteNo}`}
-                />
-            )
-        })
-    }
-
     render() {
-        let {site, customerId} = this.props;
-        return (
-            <table className="content"
-                   border="0"
-                   cellPadding="2"
-                   cellSpacing="1"
-                   width="10%"
-            >
-                <tbody>
-                <tr>
-                    <td className="headerDarkgrey"
-                        colSpan="2"
-                    >
-                        <span style={{color: 'black'}}>{site.siteNo}</span>&nbsp;
-                        {
-                            site.canDelete
-                                ?
-                                <a href={`/Customer.php?action=deleteSite&customerID=${customerId}&siteNo=${site.siteNo}`}
-                                   onClick={this.checkDelete}
-                                >Delete Site</a>
-                                :
-                                ''
-                        }
-
-                    </td>
-                </tr>
-                {this.renderFields()}
-                <tr>
-                    <td colSpan="2"
-                        className="content"
-                    >
-                        <button type="button"
+        return <div className="site"
+                    style={{width: "100%"}}
+        >
+            <div className="card">
+                <div className="card-header"
+                     id="heading{siteNo}"
+                     style={{width: "100%"}}
+                >
+                    <h5 className="mb-0">
+                        <button className="btn btn-link"
+                                type="button"
+                                data-toggle="collapse"
+                                data-target={`#collapse${this.props.site.siteNo}`}
+                                aria-expanded="false"
+                                aria-controls={`collapse${this.props.site.siteNo}`}
                         >
-                            Add Contact
+                            {this.props.site.address1 || ''}
                         </button>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        );
+                    </h5>
+                </div>
+                <div id={`collapse${this.props.site.siteNo}`}
+                     className="collapse"
+                     aria-labelledby={this.props.site.siteNo}
+                     data-parent="#accordionExample1"
+                >
+                    <div className="card-body">
+                        <div className="row">
+                            <div className="col-lg-4">
+                                <div className="form-group">
+
+                                    <label>Site Address</label>
+                                    <input value={this.props.site.address1 || ''}
+                                           onChange={($event) => this.handleInputChange($event)}
+                                           name="address1"
+                                           size="35"
+                                           maxLength="35"
+                                           className="form-control mb-3"
+                                    />
+                                    <input name="address2"
+                                           value={this.props.site.address2 || ''}
+                                           onChange={($event) => this.handleInputChange($event)}
+                                           size="35"
+                                           maxLength="35"
+                                           className="form-control mb-3"
+                                    />
+                                    <input name="address3"
+                                           value={this.props.site.address3 || ''}
+                                           onChange={($event) => this.handleInputChange($event)}
+                                           size="35"
+                                           maxLength="35"
+                                           className="form-control"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="col-lg-4">
+                                <label htmlFor="town">Town</label>
+                                <div className="form-group">
+                                    <input name="town"
+                                           value={this.props.site.town || ''}
+                                           onChange={($event) => this.handleInputChange($event)}
+                                           size="25"
+                                           maxLength="25"
+                                           className="form-control"
+                                    />
+                                </div>
+                            </div>
+                            <div className="col-lg-4">
+                                <label htmlFor="country">County</label>
+                                <div className="form-group">
+                                    <input name="county"
+                                           value={this.props.site.county || ''}
+                                           onChange={($event) => this.handleInputChange($event)}
+                                           size="25"
+                                           maxLength="25"
+                                           className="form-control"
+                                    />
+                                </div>
+                            </div>
+                            <div className="col-lg-4">
+                                <label htmlFor="postcode">Postcode</label>
+                                <div className="form-group">
+                                    <input name="postcode"
+                                           value={this.props.site.postcode || ''}
+                                           onChange={($event) => this.handleInputChange($event)}
+                                           size="15"
+                                           maxLength="15"
+                                           className="form-control"
+                                    />
+                                </div>
+                            </div>
+                            <div className="col-lg-4">
+                                <label htmlFor="phone">Phone</label>
+                                <div className="form-group">
+                                    <input name="phone"
+                                           value={this.props.site.phone || ''}
+                                           onChange={($event) => this.handleInputChange($event)}
+                                           size="20"
+                                           maxLength="20"
+                                           className="form-control telephoneValidator"
+                                    />
+                                </div>
+                            </div>
+                            <div className="col-lg-4">
+                                <label htmlFor="maxTravelHours">
+                                    Max Travel Hours
+                                </label>
+                                <div className="form-group">
+                                    <input name="maxTravelHours"
+                                           value={this.props.site.maxTravelHours || ''}
+                                           onChange={($event) => this.handleInputChange($event)}
+                                           type="number"
+                                           size="5"
+                                           maxLength="5"
+                                           className="form-control"
+                                    />
+                                </div>
+                            </div>
+                            <div className="col-lg-2">
+                                <label htmlFor="invoiceSiteNo">
+                                    Default Invoice
+                                </label>
+                                <div className="form-group form-inline">
+                                    <input type="radio"
+                                           name="invoiceSiteNo"
+                                           value={this.props.site.siteNo}
+                                           checked={+this.props.invoiceSiteNo === +this.props.site.siteNo}
+                                           onChange={($event) => this.props.changeInvoiceSiteNo($event.target.value)}
+                                           className="form-control"
+                                    />
+                                </div>
+                            </div>
+                            <div className="col-lg-2">
+                                <label htmlFor="deliverSiteNo">
+                                    Default Delivery
+                                </label>
+                                <div className="form-group form-inline">
+                                    <input type="radio"
+                                           name="deliverSiteNo"
+                                           value={this.props.site.siteNo}
+                                           checked={+this.props.deliverSiteNo === +this.props.site.siteNo}
+                                           onChange={($event) => this.props.changedDeliverSiteNo($event.target.value)}
+                                           className="form-control"
+                                    />
+                                </div>
+                            </div>
+                            <div className="col-lg-4">
+                                <label htmlFor="invoiceContact">
+                                    Invoice Contact
+                                </label>
+                                <div className="form-group">
+                                    <select name="invoiceContact"
+                                            className="form-control"
+                                            value={this.props.site.invoiceContact || ''}
+                                            onChange={($event) => this.handleInputChange($event)}
+                                    >
+                                        {
+                                            this.props.contacts.map(c => {
+                                                return (<option key={c.id}
+                                                                value={c.id}
+                                                >
+                                                    {`${c.firstName} ${c.lastName}`}
+                                                </option>)
+                                            })
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="col-lg-4">
+                                <label htmlFor="default-contact">
+                                    Delivery Contact
+                                </label>
+                                <div className="form-group">
+                                    <select name="deliveryContact"
+                                            className="form-control"
+                                            value={this.props.site.deliveryContact || ''}
+                                            onChange={($event) => this.handleInputChange($event)}
+                                    >
+                                        {
+                                            this.props.contacts.map(c => {
+                                                return (<option key={c.id}
+                                                                value={c.id}
+                                                >
+                                                    {`${c.firstName} ${c.lastName}`}
+                                                </option>)
+                                            })
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="col-lg-2">
+                                <label htmlFor="non-uk">
+                                    Non UK
+                                </label>
+                                <div className="form-group form-inline">
+                                    <input type="checkbox"
+                                           name="nonUKFlag"
+                                           onChange={($event) => this.handleInputChange($event)}
+                                           title="Check to show this site is overseas and not in the UK"
+                                           value="1"
+                                           checked={this.props.site.nonUKFlag}
+                                           className="form-control"
+                                    />
+                                </div>
+                            </div>
+                            <div className="col-lg-2">
+                                <label>Active</label>
+                                <div className="form-group form-inline">
+                                    <input type="checkbox"
+                                           name="active"
+                                           onChange={($event) => this.handleInputChange($event)}
+                                           checked={this.props.site.active}
+                                           value="1"
+                                           className="form-control"
+                                    />
+                                </div>
+                            </div>
+                            <div className="col-lg-12">
+                                <button type="button"
+                                        className="btn btn-primary"
+                                    // onClick="addContact({siteNo})"
+                                >
+                                    Add Contact
+                                </button>
+                                <button type="button"
+                                        className="btn btn-primary"
+                                    // onClick="addContact({siteNo})"
+                                >
+                                    Save Changes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     }
 }

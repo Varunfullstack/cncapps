@@ -5,6 +5,7 @@ import CustomerEditMain from "./CustomerEditMain";
 import CustomerProjectsComponent from "./CustomerProjectsComponent";
 import CustomerPortalDocumentsComponent from "./CustomerPortalDocumentsComponent";
 import CustomerSitesComponent from "./customerSites/CustomerSitesComponent";
+import CustomerOrders from "./CustomerOrders";
 
 class CustomerEditComponent extends React.Component {
 
@@ -82,79 +83,10 @@ class CustomerEditComponent extends React.Component {
                                          id="nav-tabContent"
                                     >
                                         <CustomerEditMain customerId={customerId}/>
-                                        {/*<CustomerProjectsComponent customerId={customerId}/>*/}
-                                        {/*<CustomerPortalDocumentsComponent customerId={customerId}/>*/}
-                                        {/*<CustomerSitesComponent customerId={customerId}/>*/}
-                                        <div className="tab-pane fade show"
-                                             id="nav-orders"
-                                             role="tabpanel"
-                                             aria-labelledby="nav-orders-tab"
-                                        >
-                                            <div className="container-fluid mt-3 mb-3">
-                                                <div className="row">
-                                                    <div className="col-md-12">
-                                                        <h2>Orders</h2>
-                                                    </div>
-                                                </div>
-                                                <div className="row">
-                                                    <div className="col-md-12">
-                                                        <table className="table table-striped table-bordered">
-                                                            <thead>
-                                                            <tr>
-                                                                {/*<td className="fitwidth">Order No.</td>*/}
-                                                                {/*<td className="fitwidth">Type</td>*/}
-                                                                {/*<td className="fitwidth">Date</td>*/}
-                                                                {/*<td className="fitwidth">Cast PO Ref</td>*/}
-                                                                {/*<td className="fitwidth">Contract</td>*/}
-
-                                                            </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                            <tr>
-                                                                {/*<td><h6>687980</h6></td>*/}
-                                                                {/*<td><h6>687980</h6></td>*/}
-                                                                {/*<td><h6>31 / 03 / 2019</h6></td>*/}
-                                                                {/*<td><h6>Lorem ipsum.</h6></td>*/}
-                                                                {/*<td><h6>Lorem ipsum.</h6></td>*/}
-
-                                                            </tr>
-                                                            </tbody>
-                                                        </table>
-                                                        <nav aria-label="Page navigation example">
-                                                            <ul className="pagination justify-content-end">
-                                                                <li className="page-item">
-                                                                    <a className="page-link"
-                                                                       href="#"
-                                                                    >Previous</a>
-                                                                </li>
-                                                                <li className="page-item">
-                                                                    <a className="page-link"
-                                                                       href="#"
-                                                                    >1</a>
-                                                                </li>
-                                                                <li className="page-item">
-                                                                    <a className="page-link"
-                                                                       href="#"
-                                                                    >2</a>
-                                                                </li>
-                                                                <li className="page-item">
-                                                                    <a className="page-link"
-                                                                       href="#"
-                                                                    >3</a>
-                                                                </li>
-                                                                <li className="page-item">
-                                                                    <a className="page-link"
-                                                                       href="#"
-                                                                    >Next</a>
-                                                                </li>
-                                                            </ul>
-                                                        </nav>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                        </div>
-
+                                        <CustomerProjectsComponent customerId={customerId}/>
+                                        <CustomerPortalDocumentsComponent customerId={customerId}/>
+                                        <CustomerSitesComponent customerId={customerId}/>
+                                        <CustomerOrders customerId={customerId}/>
                                     </div>
                                 </div>
                             </div>
