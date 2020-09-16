@@ -91,7 +91,6 @@ class CustomerNotesComponent extends React.Component {
                         flexDirection: 'column',
                         height: "400px",
                         overflowY: 'scroll',
-                        width: '740px'
                     }
                 },
                 [

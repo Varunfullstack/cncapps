@@ -720,832 +720,6 @@
     </tr>
 </script>
 <script src="/components/customerEditMain/dist/CustomerEditComponent.js"></script>
-<script>
-    // function updateWhat3WordsLink(event) {
-    //     generateWhat3WordsLinks(event.target);
-    // }
-    //
-    //
-    // function checkLink() {
-    //     const iconElement = event.target;
-    //     const input = iconElement.nextElementSibling;
-    //     let URL = input.value;
-    //     if (!URL) {
-    //         URL = prompt("Please provide a LinkedIn URL for the contact");
-    //         if (URL && !URL.match(/^https?:\/\/.*/)) {
-    //             URL = "http://" + URL;
-    //         }
-    //         if (!URL) {
-    //             return;
-    //         }
-    //         input.value = URL;
-    //         iconElement.style.color = 'green';
-    //         return;
-    //     }
-    //
-    //     window.open(URL, '_blank');
-    // }
-    //
-    // function checkWebsite() {
-    //     let URL = $('#websiteURL').val();
-    //     if (!URL) {
-    //         URL = prompt("Please provide a Website URL for the customer");
-    //         if (URL && !URL.match(/^https?:\/\/.*/)) {
-    //             URL = "http://" + URL;
-    //         }
-    //         if (!URL) {
-    //             return;
-    //         }
-    //         $('#websiteURL').val(URL);
-    //
-    //         $('.fas.fa-globe')[0].style.color = 'green';
-    //         return;
-    //     }
-    //
-    //     window.open(URL, '_blank');
-    // }
-    //
-    // function clearReviewMeetingBooked() {
-    //     document.getElementById('reviewMeetingBooked').checked = false;
-    // }
-    //
-    // function setContactsToNoneAndReferCustomer() {
-    //     if (!confirm('This is will change all contacts to the support level of None & refer the customer. Please confirm that you want to continue.')) {
-    //         return;
-    //     }
-    //     const currentURL = new URL(location.href);
-    //     const customerID = currentURL.searchParams.get('customerID');
-    //     $.ajax({
-    //         method: 'POST',
-    //         dataType: 'JSON',
-    //         data: {
-    //             action: 'removeSupportAndRefer',
-    //             customerID: customerID
-    //         }
-    //     }).then(result => {
-    //         window.location.reload();
-    //     });
-    // }
-    //
-    // let contactsTableErrors;
-    //
-    //
-    // function checkIsProspect() {
-    //     if (isProspect()) {
-    //         $('#primaryMainContactSelector').attr('required', false);
-    //     } else if ('{primaryMainMandatory}') {
-    //         $('#primaryMainContactSelector').attr('required', true);
-    //     }
-    // }
-    //
-    // function isProspect() {
-    //     return document.customerMain.isProspect()
-    // }
-    //
-    // const isShowingInactive = {isShowingInactive};
-    //
-    //
-    // function clearRow(contactID) {
-    //
-    //     if (!confirm('Are you sure you want to delete this contact?')) {
-    //         return;
-    //     }
-    //
-    //     const row = $(event.target).closest('tr');
-    //
-    //     const object = {
-    //         contactID: contactID
-    //     };
-    //     $.ajax({
-    //         url: '?action=archiveContact',
-    //         method: 'POST',
-    //         type: 'post',
-    //         dataType: 'json',
-    //         data: object
-    //     }).then(function (result) {
-    //         if (result.status == 'error') {
-    //             throw 'Failed to clear contact';
-    //         } else {
-    //             if (isShowingInactive) {
-    //                 row.find('input[type="email"]').val(null);
-    //             } else {
-    //                 row.remove();
-    //             }
-    //
-    //         }
-    //     }).catch(function (error) {
-    //         alert('Failed to save password');
-    //     });
-    //
-    // }
-    //
-    // function addContact(siteNo) {
-    //     this.source = document.getElementById("contact-row").innerHTML;
-    //     const context = {
-    //         name: "a",
-    //         id: 1,
-    //         userID: 2
-    //     };
-    //     const html = Mustache.to_html(this.source, context);
-    //     $(html)
-    //         .find('select[name="form[contact][0][siteNo]"] option[value=' + siteNo + ']')
-    //         .attr('selected', true)
-    //         .end()
-    //         .prependTo('#contactsTable tbody');
-    // }
-    //
-    // let currentContactId = null;
-    // let currentPasswordButton = null;
-    //
-    // function resetPasswordFields() {
-    //     $('#password').val(null);
-    //     $('#repeatPassword').val(null);
-    // }
-    //
-    // function cancelNewPassword() {
-    //     $('#newPasswordDialog').dialog('close');
-    // }
-    //
-    // function saveNewPassword() {
-    //     const object = {
-    //         password: $('#password').val(),
-    //         contactID: currentContactId
-    //     };
-    //
-    //     $.ajax({
-    //         url: '?action=saveContactPassword',
-    //         method: 'POST',
-    //         type: 'post',
-    //         dataType: 'json',
-    //         data: object
-    //     }).then(function (result) {
-    //         if (result.status == 'error') {
-    //             throw 'Failed to save password';
-    //         } else {
-    //             alert('Submitted OK');
-    //             if ($(currentPasswordButton).hasClass('unlockedIcon')) {
-    //                 $(currentPasswordButton).removeClass('unlockedIcon').addClass('lockedIcon');
-    //             }
-    //         }
-    //     }).catch(function (error) {
-    //         alert('Failed to save password');
-    //         resetPasswordFields();
-    //     }).then(function () {
-    //         $('#newPasswordDialog').dialog('close');
-    //     });
-    // }
-    //
-    //
-    // function askNewPassword() {
-    //     const data = $(event.target).data();
-    //     currentContactId = data.siteNo;
-    //     currentPasswordButton = event.target;
-    //     $('#newPasswordDialog').dialog('open');
-    // }
-    //
-    // function focusOn(elementName) {
-    //     $('[name="' + elementName + '"]').focus();
-    // }
-    //
-    // let validPassword = false;
-    // let validRepeatPassword = false;
-    //
-    // let validatingContactsModal;
-    //
-    // const what3WordsBlackImg = document.createElement('img');
-    // what3WordsBlackImg.src = '/images/w3w_SymbolTransparentBackground_RGB_Black.png'
-    // what3WordsBlackImg.height = 30;
-    // const what3WordsRedImg = document.createElement('img');
-    // what3WordsRedImg.src = '/images/w3w_SymbolTransparentBackground_RGB_Red.png'
-    // what3WordsRedImg.height = 30;
-    //
-    //
-    // function generateWhat3WordsLinks(what3WordsInput) {
-    //     const holder = what3WordsInput.nextElementSibling;
-    //     holder.innerHTML = ''
-    //     const value = what3WordsInput.value;
-    //     const link = document.createElement('a');
-    //     const redImg = what3WordsRedImg.cloneNode();
-    //     link.appendChild(redImg);
-    //     if (value && what3WordsInput.checkValidity()) {
-    //         link.replaceChild(what3WordsBlackImg.cloneNode(), redImg);
-    //         link.href = "https://what3words.com/" + value;
-    //         link.target = '_blank';
-    //     }
-    //     holder.appendChild(link);
-    // }
-
-    window.addEventListener('DOMContentLoaded', function () {
-
-//         loadNote('first');
-//         checkIsProspect();
-//         document.querySelector('form[name="form"]').addEventListener('submit', checkMailShotOptions)
-//
-//         // document.querySelectorAll('.what3WordsInput').forEach(node => {
-//         //     console.log('test');
-//         //     node.addEventListener('change', updateWhat3WordsLink);
-//         //     generateWhat3WordsLinks(node);
-//         // })
-//
-//         $('#newPasswordDialog').dialog({
-//             autoOpen: false, width: 500, close: function () {
-//                 resetPasswordFields();
-//             }
-//         });
-//
-//         validatingContactsModal = $('#validatingContactsModal').dialog({
-//             autoOpen: false, width: 500, modal: true, dialogClass: 'no-close', position: {my: 'top', at: 'top'}
-//         });
-//
-//         $(".contactSupportLevel select").change(function () {
-//
-//             $('.contactSupportLevel select');
-//             $('#primaryMainContactSelector')
-//         });
-//
-//         $("#contactsTable tbody tr").click(function () {
-//             const selected = $(this).hasClass("highlight");
-//             $("#contactsTable tbody tr").removeClass("highlight");
-//             if (!selected)
-//                 $(this).addClass("highlight");
-//         });
-//
-//         $('#password').keyup(function () {
-//             $('#passwordComment').html(checkStrength($('#password').val()));
-//             checkSavePassword();
-//         });
-//
-//         $('#repeatPassword').keyup(function () {
-//             $('#repeatPasswordComment').html(checkPasswordEqual($('#password').val(), $('#repeatPassword').val()));
-//             checkSavePassword();
-//         });
-//
-//         function checkSavePassword() {
-//             if (validPassword && validRepeatPassword) {
-//                 $('#savePasswordButton').prop("disabled", false);
-//             } else {
-//                 $('#savePasswordButton').prop("disabled", true);
-//             }
-//         }
-//
-//         function checkPasswordEqual(password, repeatPassword) {
-//             validRepeatPassword = false;
-//             if (!password || !repeatPassword) {
-//                 return null;
-//             }
-//
-//             if (password != repeatPassword) {
-//                 return 'Not Equal';
-//             }
-//             validRepeatPassword = true;
-//             return null;
-//         }
-//
-//         function checkStrength(password) {
-//             validPassword = false;
-//             if (!password) {
-//                 return false;
-//             }
-//
-//             let strength = 0;
-//             if (password.length < 6) {
-//                 return 'Too short'
-//             }
-//
-//             if (password.match(/([a-z])/)) strength += 1;
-//             if (password.match(/([A-Z])/)) strength += 1;
-//             if (password.match(/([0-9])/)) strength += 1;
-//             if (password.match(/([!,%,&,@,#,$,^,*,?,_,~])/)) strength += 1;
-// // Calculated strength value, we can return messages
-// // If value is less than 2
-//             if (strength < 3) {
-//                 $('#result').removeClass();
-//                 $('#result').addClass('weak');
-//                 return 'Weak'
-//             } else if (strength >= 3) {
-//                 $('#result').removeClass();
-//                 $('#result').addClass('good');
-//                 validPassword = true;
-//                 return null
-//             }
-//         }
-//
-//         const erroredElements = {};
-//         let errorsShowing = {};
-//
-//         contactsTableErrors = $('#contactsTableErrors');
-//
-//         function showErrors(data) {
-//             contactsTableErrors.find('.errors').html(data.html);
-//             contactsTableErrors.show();
-//         }
-//
-//         function hideErrors() {
-//             errorsShowing = {};
-//             contactsTableErrors.hide();
-//         }
-//
-//         const contactsTable = $('#contactsTable');
-//         contactsTable.on('validation', 'input', onValidation);
-//         $('#contactsTable').on('beforeValidation', 'input', onBeforeValidation);
-//
-//         function onBeforeValidation(value, lang, config) {
-//
-//             if (window.isSubmitting) {
-//                 // do stuff
-//                 $(this).data('validation-skipped', 1);
-//             }
-//         }
-//
-//
-//         function onValidation(evt, valid) {
-//             //we have to generate the list of errored elements
-//             const erroredElements = $('input.error').toArray()
-//
-//             if (!erroredElements.length) {
-//                 hideErrors();
-//                 return;
-//             }
-//
-//             // we have to generate the error messages
-//
-//             const data = erroredElements.reduce((acc, elm) => {
-//
-//                 const elmData = $(elm).data();
-//
-//                 if (elmData.type) {
-//                     if (!acc.types[elmData.type]) {
-//                         // this is the first errored element of this type
-//                         acc.types[elmData.type] = true;
-//
-//                         acc.html += "<div>Validation for " + elmData.validation + " on " + elmData.type + ' Failed. <button type="button" onclick="focusOn(\'' + elm.name + '\')">click here to see it </div>';
-//                     }
-//                 } else {
-//                     // we don't have a type ..so we are going to use the validation as key
-//                     if (!acc.types[elmData.validation]) {
-//                         // this is the first errored element of this type
-//                         acc.types[elmData.validation] = true;
-//
-//                         acc.html += "<div>Validation for " + elmData.validation + ' Failed. <button type="button" onclick="focusOn(\'' + elm.name + '\')">click here to see it </div>';
-//                     }
-//                 }
-//
-//                 // console.log(acc.html);
-//                 return acc;
-//             }, {types: {}, html: ""});
-//             showErrors(data);
-//
-//         }
-//
-//         const config = {
-//             modules: 'security',
-//             showHelpOnFocus: false,
-//             addSuggestions: false,
-//             ignoreSubmit: true,
-//             submitErrorMessageCallback: function ($form, errorMessages, config) {
-//                 console.log(errorMessages);
-//                 return;
-//             },
-//             inlineErrorMessageCallback: function ($input, errorMessage, config) {
-//             },
-//             scrollToTopOnError: true,
-//             showErrorDialogs: true,
-//         };
-//         $.validate(config);
-//
-//         $.formUtils.addValidator({
-//             name: 'emailOrEmpty',
-//             validatorFunction: function (email, $el) {
-//
-//                 if (email === '') {
-//                     return true;
-//                 }
-//
-//                 const emailParts = email.toLowerCase().split('@');
-//                 let localPart = emailParts[0];
-//                 const domain = emailParts[1];
-//
-//                 if (localPart && domain) {
-//
-//                     if (localPart.indexOf('"') === 0) {
-//                         const len = localPart.length;
-//                         localPart = localPart.replace(/\"/g, '');
-//                         if (localPart.length !== (len - 2)) {
-//                             return false; // It was not allowed to have more than two apostrophes
-//                         }
-//                     }
-//
-//                     if (!$.formUtils.validators.validate_domain.validatorFunction(emailParts[1]) &&
-//                         localPart.indexOf('.') !== 0 &&
-//                         localPart.substring(localPart.length - 1, localPart.length) !== '.' &&
-//                         localPart.indexOf('..') === -1 &&
-//                         !(/[^\w\+\.\-\#\-\_\~\!\$\&\'\(\)\*\+\,\;\=\:]/.test(localPart))
-//                     ) {
-//                         return false;
-//                     }
-//
-//
-//                     ///we need to check that no other email is set to the same
-//                     const test = $('input[data-validation*="emailOrEmpty"]');
-//
-//                     let isDuplicate = false;
-//
-//                     test.each(function () {
-//                         const elm = $(this);
-//                         const isMe = elm.get(0) === $el.get(0);
-//
-//                         if (!isMe && elm.val().toLowerCase() === email.toLowerCase()) {
-//                             isDuplicate = true;
-//                             elm.addClass('error');
-//                             elm.parent().addClass('has-error');
-//                         }
-//                     });
-//
-//                     return !isDuplicate;
-//                 }
-//
-//                 return false;
-//             },
-//             errorMessage: '',
-//             errorMessageKey: 'badEmail'
-//         });
-//
-//         const validatorData = {};
-//
-//         $.formUtils.addValidator({
-//             name: 'atLeastOne',
-//             validatorFunction: function (value, $el, config, language, $form) {
-//                 const elementData = $el.data();
-//                 const dataType = elementData.type;
-//                 let isValid = false;
-//                 const except = elementData.except;
-//                 let exceptCondition = false;
-//                 if (except) {
-//                     exceptCondition = eval(except);
-//                 }
-//
-//                 if (exceptCondition) {
-//                     return true;
-//                 }
-//
-//                 if (validatorData.hasOwnProperty(dataType)) {
-//                     // there's an initiator...we should return whatever the initiator says
-//                     return validatorData[dataType];
-//                 }
-//
-//                 const test = $('[data-type="' + dataType + '"]');
-//
-//                 const allElements = test.toArray();
-//
-//                 let counter = 0;
-//
-//                 do {
-//                     var elm = $(allElements[counter]);
-//                     isValid = !!elm.prop('checked');
-//                     counter++;
-//                 } while (!isValid && counter < allElements.length);
-//
-//                 validatorData[dataType] = isValid;
-//                 test.each(function () {
-//                     const elm = $(this);
-//                     const isMe = elm.get(0) === $el.get(0);
-//                     if (!isMe) {
-//                         elm.validate(null);
-//                     }
-//                 });
-//
-//                 delete validatorData[dataType];
-//                 return isValid;
-//             },
-//             errorMessage: 'at least one failed',
-//             errorMessageKey: 'atLeastOne'
-//         });
-//
-//         $.formUtils.addValidator({
-//             name: 'atLeastOneAtMostOne',
-//             validatorFunction: function (value, $el, config, language, $form) {
-//                 const elementData = $el.data();
-//                 const dataType = elementData.type;
-//                 const test = $('[data-type="' + dataType + '"]');
-//                 let isValid = false;
-//                 const except = elementData.except;
-//                 let exceptCondition = false;
-//                 if (except) {
-//                     exceptCondition = eval(except);
-//                 }
-//
-//                 if (exceptCondition) {
-//                     return true;
-//                 }
-//
-//                 if (validatorData.hasOwnProperty(dataType)) {
-//                     // there's an initiator...we should return whatever the initiator says
-//                     return validatorData[dataType];
-//                 }
-//                 const t0 = performance.now();
-//                 const allElements = test.toArray();
-//
-//                 let counter = 0;
-//                 let checkedCount = 0;
-//                 do {
-//                     var elm = $(allElements[counter]);
-//                     checkedCount += !!elm.prop('checked');
-//                     counter++;
-//                 } while (checkedCount < 2 && counter < allElements.length);
-//
-//                 isValid = checkedCount > 0 && checkedCount < 2;
-//
-//                 validatorData[dataType] = isValid;
-//
-//                 test.each(function () {
-//                     const elm = $(this);
-//                     const isMe = elm.get(0) === $el.get(0);
-//                     if (!isMe) {
-//                         elm.validate(null);
-//                     }
-//                 });
-//
-//                 delete validatorData[dataType];
-//                 const t1 = performance.now();
-//                 // console.log('validating ' + dataType + " atLeastOneAtMostOne took " + (t1 - t0) + " milliseconds ");
-//                 return isValid;
-//             },
-//             errorMessage: '',
-//             errorMessageKey: 'atLeastOneAtMostOne'
-//         });
-//
-//         $.formUtils.addValidator({
-//             name: 'atLeastOneMain',
-//             validatorFunction: function (value, $el, config, language, $form) {
-//                 const test = $('[data-type="' + $el.data().type + '"]');
-//
-//                 let checkedCount = 0;
-//                 const except = test.data().except;
-//                 debugger;
-//                 const exceptCondition = eval(except);
-//
-//                 if (exceptCondition) {
-//                     return true;
-//                 }
-//
-//                 test.each(function () {
-//                     const elm = $(this);
-//                     const isMe = elm.get(0) === $el.get(0);
-//
-//                     if (elm.val() === 'main') {
-//                         checkedCount++;
-//                     }
-//
-//                     if (!$el.data().toBeValidated && !isMe) {
-//                         elm.data("toBeValidated", true);
-//                         elm.validate();
-//                     }
-//                 });
-//                 $el.data("toBeValidated", false);
-//
-//
-//                 return checkedCount > 0;
-//             }
-//         });
-//
-//         window.specialAttentionEndDate = $('#specialAttentionEndDate').get(0);
-//         window.lastReviewMeetingDate = $('#lastReviewMeetingDate').get(0);
-//         window.reviewDate = $('#reviewDate').get(0);
-//
-//         const assignClass = function () {
-//             const elem = $(this);
-//             const tr = elem.closest('tr');
-//
-//
-//             if (elem[0].value === 'main' || elem[0].value === 'supervisor') {
-//                 // we want to show the
-//                 tr.find('.onlyMain').prop('disabled', false);
-//                 if (elem[0].value === 'main') {
-//                     tr.addClass('redText');
-//                 }
-//             } else {
-//                 tr.find('.onlyMain').prop('disabled', true);
-//                 tr.removeClass('redText');
-//             }
-//         };
-//
-//         $('body').on('change', '[data-type="mainSelector"]', assignClass);
-//
-//         $(window).bind('validatorsLoaded', () => {
-//             $('[data-validation-url]').each(function (index) {
-//                 const $this = $(this);
-//
-//                 $this.validate(null, config);
-//             });
-//         });
-//
-//         $('[data-type="mainSelector"]').each(assignClass);
-//
-//         const types = {};
-//
-//         $('[data-validation="atLeastOne"], [data-validation="atLeastOneAtMostOne"]').each(function (index) {
-//             const $this = $(this);
-//
-//             if (typeof types[$this.data().type] === 'undefined') {
-//                 $this.validate();
-//                 types[$this.data().type] = true;
-//             }
-//         });
-
-
-    });
-    // window.onbeforeunload = bunload;
-
-    // function bunload() {
-    //     if (customerNotesChanged) {
-    //         return 'You haven\'t saved your notes';
-    //     }
-    // }
-
-
-    // function setCaretPosition(elemId, caretPos) {
-    //     const elem = document.getElementById(elemId);
-    //
-    //     if (elem != null) {
-    //         if (elem.createTextRange) {
-    //             const range = elem.createTextRange();
-    //             range.move('character', caretPos);
-    //             range.select();
-    //         } else {
-    //             if (elem.selectionStart) {
-    //                 elem.focus();
-    //                 elem.setSelectionRange(caretPos, caretPos);
-    //             } else
-    //                 elem.focus();
-    //         }
-    //     }
-    // }
-    //
-    // let customerNotesChanged = false;
-    //
-    // function setCustomerNotesChanged() {
-    //     customerNotesChanged = true;
-    // }
-    //
-    // function MM_jumpMenu(targ, selObj, restore) { //v3.0
-    //     if (selObj.options[selObj.selectedIndex].value) {
-    //         window.open(selObj.options[selObj.selectedIndex].value, targ);
-    //     }
-    //     if (restore) selObj.selectedIndex = 0;
-    // }
-    //
-    // function contactPopup(contactID, action, customerID, siteNo) {
-    //     window.open(
-    //         '{urlContactPopup}' +
-    //         '&action=' + action +
-    //         '&contactID=' + contactID +
-    //         '&customerID=' + customerID +
-    //         '&siteNo=' + siteNo +
-    //         '&parentIDField=none' +
-    //         '&parentDescField=none',
-    //         'contact',
-    //         'scrollbars=yes,resizable=yes,height=700,width=500,copyhistory=no, menubar=0'
-    //     );
-    // }
-    //
-    // const sortCode = '{sortCode}';
-    // const accountNumber = '{accountNumber}';
-    // const accountName = '{accountName}';
-    // const forceDirectDebit = {forceDirectDebit};
-    //
-    //
-    // function runValidations() {
-    //     window.isSubmitting = true;
-    //
-    //     const emails = {};
-    //
-    //     const inputs = $(".contacts input[type='email']");
-    //     for (let i = 0; i < inputs.length; i++) {
-    //         if (inputs[i].value) {
-    //             const email = inputs[i].value;
-    //
-    //             if (emails[email]) {
-    //                 alert('Please review form errors, fix them before submitting');
-    //                 return false;
-    //             }
-    //
-    //             emails[email] = true;
-    //         }
-    //
-    //     }
-    //
-    //
-    //     if ({customerID} && !isProspect()) {
-    //         const primaryMainContactSelector = $('#primaryMainContactSelector');
-    //         const value = +$('#primaryMainContactSelector').val();
-    //
-    //         const mainContactsSelect = $('.contactSupportLevel select option:selected[value="main"]').parent('select');
-    //         if (!value) {
-    //             if (!mainContactsSelect.length) {
-    //                 alert('Please set at least one Main contact, and it will be set as the Primary Main');
-    //                 return false;
-    //             }
-    //             const matches = $(mainContactsSelect[0]).attr('name').match(/\d+/);
-    //             if (!matches || !matches.length) {
-    //                 alert('Please set at least one Main contact, and it will be set as the Primary Main');
-    //                 return false;
-    //             }
-    //
-    //             //we need to make sure there's an option for this
-    //             if (!primaryMainContactSelector.find('option[value="' + matches[0] + '"]').length) {
-    //                 primaryMainContactSelector.html('<option value="' + matches[0] + '"></option>');
-    //             }
-    //
-    //             $('#primaryMainContactSelector').val(matches[0]);
-    //
-    //
-    //         } else {
-    //             let foundMain = false;
-    //
-    //             mainContactsSelect.each(function () {
-    //                 const foundMatch = $(this).attr('name').match(/\d+/);
-    //                 if (foundMatch && foundMatch[0] == value) {
-    //                     foundMain = true;
-    //                 }
-    //             });
-    //
-    //             if (!foundMain) {
-    //                 alert("The Primary Main contact is no longer flagged as Main, please flag it back or pick another Main Contact as Primary");
-    //                 return false;
-    //             }
-    //         }
-    //     }
-    //
-    //
-    //     if (forceDirectDebit) {
-    //
-    //         let existSortCode = false;
-    //         let newSortCode = null;
-    //         const sortCodeElm = $('#sortCode');
-    //         if (sortCodeElm.length) {
-    //             existSortCode = true;
-    //             newSortCode = sortCodeElm.val();
-    //         }
-    //
-    //         if (
-    //             existSortCode && !newSortCode ||
-    //             !sortCode && !newSortCode
-    //         ) {
-    //             alert('This customer needs to have a sort code, as it has direct debit renewals');
-    //             return false;
-    //         }
-    //
-    //         let existAccountNumber = false;
-    //         let newAccountNumber = null;
-    //         const accountNumberElm = $('#accountNumber');
-    //         if (accountNumberElm.length) {
-    //             existAccountNumber = true;
-    //             newAccountNumber = accountNumberElm.val();
-    //         }
-    //
-    //         if (existAccountNumber && !newAccountNumber ||
-    //             !accountNumber && !newAccountNumber) {
-    //             alert("This customer needs to have an account number, as it has direct debit renewals");
-    //             return false;
-    //         }
-    //
-    //         const accountNameElm = $('#accountName');
-    //         const newAccountName = accountNameElm.val();
-    //
-    //         if (!newAccountName) {
-    //             alert("This customer needs to have an account name, as it has direct debit renewals");
-    //             return false;
-    //         }
-    //     }
-    //
-    //     return true;
-    // }
-    //
-    // function checkMailShotOptions($event) {
-    //     $event.preventDefault();
-    //     return Promise.all(
-    //         [
-    //             document.customerReviewComponent.save(),
-    //             document.customerMain.save(),
-    //             document.customerSitesComponent.saveSites(),
-    //         ])
-    //         .then(successes => {
-    //             return successes.every(x => x);
-    //         })
-    //         .then(() => {
-    //             validatingContactsModal.dialog('open');
-    //             const toReturn = runValidations();
-    //             validatingContactsModal.dialog('close');
-    //             return toReturn;
-    //         })
-    //         .then(shouldSubmit => {
-    //             if (shouldSubmit) {
-    //                 $event.target.submit();
-    //             }
-    //         })
-    // }
-</script>
-
 <style>
     .redText td.content > input, .redText td.content > textarea, .redText td.content > select, .redText td.content > button {
         color: red !important;
@@ -1556,68 +730,28 @@
         float: right
     }
 </style>
-<link rel="stylesheet"
-      href="/font-awesome/css/font-awesome.css"
-/>
 <span class="formError">{errorMessage}</span>
 <a href="{deleteCustomerURL}"
    onClick="if(!confirm('Are you sure you want to delete this customer?')) return(false)"
 >{deleteCustomerText}</a>
-<form name="form"
-      method="post"
-      action="{submitURL}"
-      AUTOCOMPLETE="off"
+
+
+<BR>
+{customerFolderLink}
+<br>
+{renewalLink}
+<BR>
+{passwordLink}
+<BR>
+{customerFolderLink}
+<br>
+{thirdPartyContactsLink}
+<br>
+<div id="reactCustomerEditMain"
+     data-customer-id="{customerID}"
 >
 
-    <input {disabled}
-           type="submit"
-           name="Go"
-           value="Save"
-    >
-    <input {disabled}
-           name="Button"
-           type="button"
-           value="Cancel"
-           onClick="document.location='{cancelURL}';"
-    >
-    <button type="button"
-            {disabled}
-            onclick="setContactsToNoneAndReferCustomer()"
-    >
-        Set all users to no support
-    </button>
-    <input {disabled}
-           name="displayInactiveSites"
-           type="button"
-           value="Show Inactive Sites"
-           onClick="document.location='{showInactiveSitesURL}';"
-
-    >
-    <input {disabled}
-           name="displayInactiveContacts"
-           type="button"
-           value="Show Inactive Contacts"
-           onClick="document.location='{showInactiveContactsURL}';"
-    >
-    <BR>
-    {customerFolderLink}
-    <br>
-    {renewalLink}
-    <BR>
-    {passwordLink}
-    <BR>
-    {customerFolderLink}
-    <br>
-    {thirdPartyContactsLink}
-    <br>
-    <div id="reactCustomerEditMain" data-customer-id="{customerID}">
-
-    </div>
-</form>
-<div id="validatingContactsModal">
-    <p>Validating contacts</p>
 </div>
-{orders}
 
 <!--Bootstrap CDN-->
 <link rel="stylesheet"
@@ -1635,47 +769,60 @@
                 <div class="card">
                     <div class="card-body">
                         <nav>
-                            <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                            <div class="nav nav-tabs"
+                                 id="nav-tab"
+                                 role="tablist"
+                            >
                                 <a class="nav-item nav-link active"
                                    id="nav-home-tab"
                                    data-toggle="tab"
                                    href="#nav-home"
                                    role="tab"
                                    aria-controls="nav-home"
-                                   aria-selected="true">Customer</a>
+                                   aria-selected="true"
+                                >Customer</a>
                                 <a class="nav-item nav-link"
                                    id="nav-profile-tab"
                                    data-toggle="tab"
                                    href="#nav-profile"
                                    role="tab"
                                    aria-controls="nav-profile"
-                                   aria-selected="false">Projects</a>
+                                   aria-selected="false"
+                                >Projects</a>
                                 <a class="nav-item nav-link"
                                    id="nav-contact-tab"
                                    data-toggle="tab"
                                    href="#nav-portal-documents-tab"
                                    role="tab"
                                    aria-controls="nav-portal-documents-tab"
-                                   aria-selected="false">Portal Documents</a>
+                                   aria-selected="false"
+                                >Portal Documents</a>
                                 <a class="nav-item nav-link"
                                    id="nav-sites-tab"
                                    data-toggle="tab"
                                    href="#nav-sites"
                                    role="tab"
                                    aria-controls="nav-sites"
-                                   aria-selected="false">Sites</a>
+                                   aria-selected="false"
+                                >Sites</a>
                                 <a class="nav-item nav-link"
                                    id="nav-orders-tab"
                                    data-toggle="tab"
                                    href="#nav-orders"
                                    role="tab"
                                    aria-controls="nav-orders"
-                                   aria-selected="false">Orders</a>
+                                   aria-selected="false"
+                                >Orders</a>
                             </div>
                         </nav>
-                        <div class="tab-content" id="nav-tabContent">
-                            <div class="tab-pane fade show active" id="nav-home" role="tabpanel"
-                                 aria-labelledby="nav-home-tab">
+                        <div class="tab-content"
+                             id="nav-tabContent"
+                        >
+                            <div class="tab-pane fade show active"
+                                 id="nav-home"
+                                 role="tabpanel"
+                                 aria-labelledby="nav-home-tab"
+                            >
                                 <div class="container-fluid mt-3 mb-3">
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
@@ -1686,9 +833,13 @@
                                                 <li>
                                                     <button class="btn btn-outline-success">Save</button>
                                                     <button class="btn btn-outline-danger">Cancel</button>
-                                                    <button class="btn btn-outline-secondary">Set all users to no support</button>
-                                                    <button class="btn btn-outline-secondary"><i class="fa fa-filter"></i></button>
-                                                    <button class="btn btn-outline-secondary"><i class="fa fa-ellipsis-v"></i></button>
+                                                    <button class="btn btn-outline-secondary">Set all users to no
+                                                        support
+                                                    </button>
+                                                    <button class="btn btn-outline-secondary">
+                                                        <i class="fa fa-filter"></i></button>
+                                                    <button class="btn btn-outline-secondary">
+                                                        <i class="fa fa-ellipsis-v"></i></button>
                                                 </li>
                                             </ul>
                                         </div>
@@ -2110,7 +1261,8 @@
                                                     <div class="form-group">
 
                                         <textarea class="form-control"
-                                                  cols="30" rows="2"
+                                                  cols="30"
+                                                  rows="2"
                                                   name="form[customer][{customerID}][techNotes]"
                                                   id="techNotes"
                                         >{techNotes}</textarea>
@@ -2244,7 +1396,9 @@
                                                 <div class="col-lg-4">
                                                     <label for="">Account Name</label>
                                                     <div class="form-group">
-                                                        <input type="text" class="form-control">
+                                                        <input type="text"
+                                                               class="form-control"
+                                                        >
                                                     </div>
                                                 </div>
                                                 <div class="col-lg-4">
@@ -2316,7 +1470,8 @@
                                                             <!-- END reviewUserBlock -->
                                                         </select>
                                                         <span
-                                                                class="formErrorMessage formError">{reviewTimeMessage}</span>
+                                                                class="formErrorMessage formError"
+                                                        >{reviewTimeMessage}</span>
                                                     </div>
 
                                                 </div>
@@ -2333,7 +1488,8 @@
                                         >{reviewAction}</textarea>
                                             </div>
                                             <div class="form-group customerNoteHistory">
-                                        <textarea cols="30" rows="12"
+                                        <textarea cols="30"
+                                                  rows="12"
                                                   readonly="readonly"
                                                   {disabled}
                                                   id="customerNoteHistory"
@@ -2455,8 +1611,11 @@
                                 </div>
 
                             </div>
-                            <div class="tab-pane fade customerEditProjects" id="nav-profile" role="tabpanel"
-                                 aria-labelledby="nav-profile-tab">
+                            <div class="tab-pane fade customerEditProjects"
+                                 id="nav-profile"
+                                 role="tabpanel"
+                                 aria-labelledby="nav-profile-tab"
+                            >
                                 <div class="customerEditProjects container-fluid mt-3 mb-3">
                                     <div class="row">
                                         <div class="col-md-12">
@@ -2497,13 +1656,15 @@
                                                     <td>
                                                         <a href="{editProjectLink}">
                                                             <button class="btn btn-outline-secondary"><i
-                                                                    class="fa fa-edit"></i></button>
+                                                                    class="fa fa-edit"
+                                                            ></i></button>
                                                         </a>
                                                     </td>
                                                     <td>
                                                         <a href="{deleteProjectLink}">
                                                             <button class="btn btn-outline-danger"><i
-                                                                    class="fa fa-trash"></i></button>
+                                                                    class="fa fa-trash"
+                                                            ></i></button>
                                                         </a>
                                                     </td>
                                                 </tr>
@@ -2513,12 +1674,22 @@
                                             </table>
                                             <nav aria-label="Page navigation example">
                                                 <ul class="pagination justify-content-end">
-                                                    <li class="page-item"><a class="page-link" href="#">Previous</a>
+                                                    <li class="page-item"><a class="page-link"
+                                                                             href="#"
+                                                    >Previous</a>
                                                     </li>
-                                                    <li class="page-item"><a class="page-link" href="#">1</a></li>
-                                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                                    <li class="page-item"><a class="page-link" href="#">Next</a>
+                                                    <li class="page-item"><a class="page-link"
+                                                                             href="#"
+                                                    >1</a></li>
+                                                    <li class="page-item"><a class="page-link"
+                                                                             href="#"
+                                                    >2</a></li>
+                                                    <li class="page-item"><a class="page-link"
+                                                                             href="#"
+                                                    >3</a></li>
+                                                    <li class="page-item"><a class="page-link"
+                                                                             href="#"
+                                                    >Next</a>
                                                     </li>
                                                 </ul>
                                             </nav>
@@ -2531,7 +1702,8 @@
                             <div class="tab-pane fade"
                                  id="nav-portal-documents-tab"
                                  role="tabpanel"
-                                 aria-labelledby="nav-portal-documents-tab">
+                                 aria-labelledby="nav-portal-documents-tab"
+                            >
                                 <div class="container-fluid mt-3 mb-3">
                                     <div class="row">
                                         <div class="col-md-12">
@@ -2581,15 +1753,18 @@
                                                     <td>
                                                         <a href="{urlEditDocument}">
                                                             <button class="btn btn-outline-secondary"><i
-                                                                    class="fa fa-edit"></i></button>
+                                                                    class="fa fa-edit"
+                                                            ></i></button>
                                                         </a>
                                                     </td>
                                                     <td>
                                                         <a href="{urlDeleteDocument}"
                                                            title="Delete attached document"
-                                                           onClick="if(!confirm('Are you sure you want to remove this document?')) return(false)">
+                                                           onClick="if(!confirm('Are you sure you want to remove this document?')) return(false)"
+                                                        >
                                                             <button class="btn btn-outline-danger"><i
-                                                                    class="fa fa-trash"></i></button>
+                                                                    class="fa fa-trash"
+                                                            ></i></button>
                                                         </a>
                                                     </td>
                                                 </tr>
@@ -2600,12 +1775,22 @@
 
                                             <nav aria-label="Page navigation example">
                                                 <ul class="pagination justify-content-end">
-                                                    <li class="page-item"><a class="page-link" href="#">Previous</a>
+                                                    <li class="page-item"><a class="page-link"
+                                                                             href="#"
+                                                    >Previous</a>
                                                     </li>
-                                                    <li class="page-item"><a class="page-link" href="#">1</a></li>
-                                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                                    <li class="page-item"><a class="page-link" href="#">Next</a>
+                                                    <li class="page-item"><a class="page-link"
+                                                                             href="#"
+                                                    >1</a></li>
+                                                    <li class="page-item"><a class="page-link"
+                                                                             href="#"
+                                                    >2</a></li>
+                                                    <li class="page-item"><a class="page-link"
+                                                                             href="#"
+                                                    >3</a></li>
+                                                    <li class="page-item"><a class="page-link"
+                                                                             href="#"
+                                                    >Next</a>
                                                     </li>
                                                 </ul>
                                             </nav>
@@ -2615,8 +1800,11 @@
                                 </div>
 
                             </div>
-                            <div class="tab-pane fade show" id="nav-sites" role="tabpanel"
-                                 aria-labelledby="nav-sites-tab">
+                            <div class="tab-pane fade show"
+                                 id="nav-sites"
+                                 role="tabpanel"
+                                 aria-labelledby="nav-sites-tab"
+                            >
 
                                 <div class="container-fluid">
                                     <div class="row">
@@ -2636,18 +1824,26 @@
                                                     <a href="{addSiteURL}">{addSiteText}</a>
                                                 </div>
                                                 <!-- BEGIN siteBlock -->
-                                                <div class="accordion" id="accordionExample1">
+                                                <div class="accordion"
+                                                     id="accordionExample1"
+                                                >
 
-                                                    <div class="site" style="width: 100%">
+                                                    <div class="site"
+                                                         style="width: 100%"
+                                                    >
                                                         <div class="card">
-                                                            <div class="card-header" id="heading{siteNo}" style="width: 100%;">
+                                                            <div class="card-header"
+                                                                 id="heading{siteNo}"
+                                                                 style="width: 100%;"
+                                                            >
                                                                 <h5 class="mb-0">
                                                                     <button class="btn btn-link"
                                                                             type="button"
                                                                             data-toggle="collapse"
                                                                             data-target="#collapse{siteNo}"
                                                                             aria-expanded="false"
-                                                                            aria-controls="collapse{siteNo}">
+                                                                            aria-controls="collapse{siteNo}"
+                                                                    >
                                                                         {add1}
                                                                     </button>
                                                                 </h5>
@@ -2673,7 +1869,8 @@
                                                             <div id="collapse{siteNo}"
                                                                  class="collapse"
                                                                  aria-labelledby="{siteNo}"
-                                                                 data-parent="#accordionExample1">
+                                                                 data-parent="#accordionExample1"
+                                                            >
                                                                 <div class="card-body">
                                                                     <div class="row">
                                                                         <div class="col-lg-4">
@@ -2758,7 +1955,8 @@
                                                                             </div>
                                                                         </div>
                                                                         <div class="col-lg-4">
-                                                                            <label for="form[site][{customerID}{siteNo}][maxTravelHours]">Max Travel Hours</label>
+                                                                            <label for="form[site][{customerID}{siteNo}][maxTravelHours]">Max
+                                                                                Travel Hours</label>
                                                                             <div class="form-group">
                                                                                 <input name="form[site][{customerID}{siteNo}][maxTravelHours]"
                                                                                        id="form[site][{customerID}{siteNo}][maxTravelHours]"
@@ -2771,7 +1969,8 @@
                                                                             </div>
                                                                         </div>
                                                                         <div class="col-lg-2">
-                                                                            <label for="default-voices">Default Invoice</label>
+                                                                            <label for="default-voices">Default
+                                                                                Invoice</label>
                                                                             <div class="form-group form-inline">
                                                                                 <input {disabled}
                                                                                        id="default-voices"
@@ -2784,7 +1983,8 @@
                                                                             </div>
                                                                         </div>
                                                                         <div class="col-lg-2">
-                                                                            <label for="default-delivery">Default Delivery</label>
+                                                                            <label for="default-delivery">Default
+                                                                                Delivery</label>
                                                                             <div class="form-group form-inline">
                                                                                 <input {disabled}
                                                                                        id="default-delivery"
@@ -2797,7 +1997,8 @@
                                                                             </div>
                                                                         </div>
                                                                         <div class="col-lg-4">
-                                                                            <label for="invoice-contact">Invoice Contact</label>
+                                                                            <label for="invoice-contact">Invoice
+                                                                                Contact</label>
                                                                             <div class="form-group">
                                                                                 <select
                                                                                         name="form[site][{customerID}{siteNo}][invoiceContactID]"
@@ -2815,7 +2016,8 @@
                                                                             </div>
                                                                         </div>
                                                                         <div class="col-lg-4">
-                                                                            <label for="default-contact">Delivery Contact</label>
+                                                                            <label for="default-contact">Delivery
+                                                                                Contact</label>
                                                                             <div class="form-group">
                                                                                 <select
                                                                                         id="default-contact"
@@ -2859,7 +2061,10 @@
                                                                             </div>
                                                                         </div>
                                                                         <div class="col-lg-12">
-                                                                            <button type="button" class="btn btn-primary" onclick="addContact({siteNo})">Add
+                                                                            <button type="button"
+                                                                                    class="btn btn-primary"
+                                                                                    onclick="addContact({siteNo})"
+                                                                            >Add
                                                                                 Contact
                                                                             </button>
                                                                         </div>
@@ -2880,8 +2085,11 @@
                                 </div>
 
                             </div>
-                            <div class="tab-pane fade show" id="nav-orders" role="tabpanel"
-                                 aria-labelledby="nav-orders-tab">
+                            <div class="tab-pane fade show"
+                                 id="nav-orders"
+                                 role="tabpanel"
+                                 aria-labelledby="nav-orders-tab"
+                            >
                                 <div class="container-fluid mt-3 mb-3">
                                     <div class="row">
                                         <div class="col-md-12">
@@ -2917,12 +2125,22 @@
                                             </table>
                                             <nav aria-label="Page navigation example">
                                                 <ul class="pagination justify-content-end">
-                                                    <li class="page-item"><a class="page-link" href="#">Previous</a>
+                                                    <li class="page-item"><a class="page-link"
+                                                                             href="#"
+                                                    >Previous</a>
                                                     </li>
-                                                    <li class="page-item"><a class="page-link" href="#">1</a></li>
-                                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                                    <li class="page-item"><a class="page-link" href="#">Next</a>
+                                                    <li class="page-item"><a class="page-link"
+                                                                             href="#"
+                                                    >1</a></li>
+                                                    <li class="page-item"><a class="page-link"
+                                                                             href="#"
+                                                    >2</a></li>
+                                                    <li class="page-item"><a class="page-link"
+                                                                             href="#"
+                                                    >3</a></li>
+                                                    <li class="page-item"><a class="page-link"
+                                                                             href="#"
+                                                    >Next</a>
                                                     </li>
                                                 </ul>
                                             </nav>
@@ -2943,16 +2161,6 @@
 </div>
 
 <!--Required Scripts-->
-<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>-->
-<!--<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>-->
-<!--<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"-->
-<!--        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"-->
-<!--        crossorigin="anonymous"-->
-<!--&gt;</script>-->
-<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"-->
-<!--        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"-->
-<!--        crossorigin="anonymous"-->
-<!--&gt;</script>-->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
         integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"

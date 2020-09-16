@@ -3,6 +3,8 @@ import {
     ADD_SITE,
     CHANGE_DELIVER_SITE_NO,
     CHANGE_INVOICE_SITE_NO,
+    DELETE_SITE_REQUEST,
+    DELETE_SITE_SUCCESS,
     FETCH_CONTACTS_FAILURE,
     FETCH_CONTACTS_REQUEST,
     FETCH_CONTACTS_SUCCESS,
@@ -10,8 +12,9 @@ import {
     FETCH_SITES_REQUEST,
     FETCH_SITES_SUCCESS,
     INITIALIZE_CUSTOMER,
+    REQUEST_SAVE_SITE,
     SAVE_CUSTOMER_DATA_SUCCESS,
-    SITE_DATA_SAVED,
+    SAVE_SITE_SUCCESS,
     TOGGLE_VISIBILITY,
     UPDATE_SITE
 } from "./actionTypes";
@@ -27,6 +30,15 @@ export function addSite(customerId) {
 
 export function updateSite(siteNo, data) {
     return {type: UPDATE_SITE, siteNo, data}
+}
+
+
+export function deleteSiteRequest(siteNo) {
+    return {type: DELETE_SITE_REQUEST, siteNo}
+}
+
+export function deleteSiteSuccess(siteNo) {
+    return {type: DELETE_SITE_SUCCESS, siteNo}
 }
 
 export function requestContacts(customerId) {
@@ -70,11 +82,19 @@ export function toggleVisibility() {
 }
 
 export function savedSiteData(siteNo) {
-    return {type: SITE_DATA_SAVED, siteNo}
+    return {type: SAVE_SITE_SUCCESS, siteNo}
 }
 
 export function savedCustomerData() {
     return {type: SAVE_CUSTOMER_DATA_SUCCESS}
+}
+
+export function requestSaveSite(siteNo) {
+    return {type: REQUEST_SAVE_SITE, siteNo}
+}
+
+export function saveSiteSuccess(siteNo) {
+    return {type: SAVE_SITE_SUCCESS, siteNo}
 }
 
 export function fetchSites(customerId) {
@@ -95,6 +115,43 @@ export function fetchContacts(customerId) {
     }
 }
 
+export function deleteSite(customerId, siteNo) {
+    return dispatch => {
+        dispatch(deleteSiteRequest(siteNo))
+        return fetch(`?action=deleteSite&customerId=${customerId}&siteNo=${siteNo}`)
+            .then(res => res.json())
+            .then(res => {
+                if (res.status !== 'ok') {
+                    throw new Error(res.message);
+                }
+                dispatch(deleteSiteSuccess(siteNo));
+            })
+    }
+}
+
+export function saveSite(site, deliverSiteNo, invoiceSiteNo) {
+    return dispatch => {
+        dispatch(requestSaveSite(site.siteNo));
+        return fetch('?action=updateSite', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                ...site,
+                deliverSiteNo,
+                invoiceSiteNo,
+            })
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.status !== 'ok') {
+                    throw new Error(res.message);
+                }
+                dispatch(saveSiteSuccess(site.siteNo));
+            })
+    }
+}
 
 export function initializeCustomer(customerId, invoiceSiteNo, deliverSiteNo) {
     return {type: INITIALIZE_CUSTOMER, customerId, invoiceSiteNo, deliverSiteNo}

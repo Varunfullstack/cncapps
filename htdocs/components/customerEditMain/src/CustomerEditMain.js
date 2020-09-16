@@ -379,6 +379,7 @@ class CustomerEditMain extends React.Component {
                                 <li>
                                     <button type="button"
                                             className="btn btn-outline-success"
+                                            onClick={() => this.save()}
                                     >Save
                                     </button>
                                     <button type="button"
