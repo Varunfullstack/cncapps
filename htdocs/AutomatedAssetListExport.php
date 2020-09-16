@@ -175,7 +175,7 @@ IF(
   computers.version AS "Version",
        (select endOfSupportDate from (' . $fakeTable . ') f where computers.os = f.osName and computers.version like concat(\'%\', f.version, \'%\') limit 1) as `OS End of Support Date`,
   computers.domain AS \'Domain\',
-       SUBSTRING_INDEX(REPLACE(REPLACE(software.`Name`, \'Microsoft Office \',\'\'),\'Microsoft 365\',\'365\')," - ",1) AS "Office Version",
+       SUBSTRING_INDEX(REPLACE(REPLACE(sf.`Name`, \'Microsoft Office \',\'\'),\'Microsoft 365\',\'365\')," - ",1) AS "Office Version",
   virusscanners.name AS AV,
   DATE_FORMAT(
     STR_TO_DATE(computers.VirusDefs, \'%Y%m%d\'),
@@ -200,41 +200,43 @@ inv_processor
 WHERE inv_processor.Enabled = 1
 GROUP BY inv_processor.computerid) processor
 ON computers.computerid = processor.computerid
-  LEFT JOIN (software) 
-    ON (
-      computers.computerid = software.computerid 
-      AND 
-      (software.name LIKE "%microsoft office%"
-          or software.name like "%microsoft 365%"
-          ) 
-      AND software.name NOT LIKE "%visio%" 
-      AND software.name NOT LIKE "%Activation%" 
-      AND software.name NOT LIKE "%Access%" 
-      AND software.name NOT LIKE "%Communicator%" 
-      AND software.name NOT LIKE "%Converter%" 
-      AND software.name NOT LIKE "%Excel%" 
-      AND software.name NOT LIKE "%Frontpage%" 
-      AND software.name NOT LIKE "%Infopage%" 
-      AND software.name NOT LIKE "%demand%" 
-      AND software.name NOT LIKE "%outlook%" 
-      AND software.name NOT LIKE "%onenote%" 
-      AND software.name NOT LIKE "%powerpoint%" 
-      AND software.name NOT LIKE "%project%" 
-      AND software.name NOT LIKE "%sharepoint%" 
-      AND software.name NOT LIKE "%web%" 
-      AND software.name NOT LIKE "%word%" 
-      AND software.name NOT LIKE "%Live%" 
-      AND software.name NOT LIKE "%Assemblies%" 
-      AND software.name NOT LIKE "%Validation%" 
-      AND software.name NOT LIKE "%Click-to-run%" 
-      AND software.name NOT LIKE "%Sounds%" 
-      AND software.name NOT LIKE "%Language%" 
-      AND software.name NOT LIKE "%Resource%" 
-      AND software.name NOT LIKE "%communications%" 
-      AND software.name NOT LIKE "%media%" 
-      AND software.name NOT LIKE "%ODF%" 
+  LEFT JOIN (SELECT
+      *
+    FROM
+      software
+    WHERE (
+        software.name LIKE "%microsoft office%"
+        OR software.name LIKE "%microsoft 365%"
+      )
+      AND software.name NOT LIKE "%visio%"
+      AND software.name NOT LIKE "%Activation%"
+      AND software.name NOT LIKE "%Access%"
+      AND software.name NOT LIKE "%Communicator%"
+      AND software.name NOT LIKE "%Converter%"
+      AND software.name NOT LIKE "%Excel%"
+      AND software.name NOT LIKE "%Frontpage%"
+      AND software.name NOT LIKE "%Infopage%"
+      AND software.name NOT LIKE "%demand%"
+      AND software.name NOT LIKE "%outlook%"
+      AND software.name NOT LIKE "%onenote%"
+      AND software.name NOT LIKE "%powerpoint%"
+      AND software.name NOT LIKE "%project%"
+      AND software.name NOT LIKE "%sharepoint%"
+      AND software.name NOT LIKE "%web%"
+      AND software.name NOT LIKE "%word%"
+      AND software.name NOT LIKE "%Live%"
+      AND software.name NOT LIKE "%Assemblies%"
+      AND software.name NOT LIKE "%Validation%"
+      AND software.name NOT LIKE "%Click-to-run%"
+      AND software.name NOT LIKE "%Sounds%"
+      AND software.name NOT LIKE "%Language%"
+      AND software.name NOT LIKE "%Resource%"
+      AND software.name NOT LIKE "%communications%"
+      AND software.name NOT LIKE "%media%"
+      AND software.name NOT LIKE "%ODF%"
       AND software.name NOT LIKE "%SDK%"
-    ) 
+    GROUP BY computerid) sf
+    ON computers.computerid = sf.computerid
   LEFT JOIN (inv_chassis) 
     ON (
       computers.computerid = inv_chassis.computerid
@@ -255,7 +257,7 @@ ON computers.computerid = processor.computerid
     where clients.externalID = ? and  ServiceVersion
 GROUP BY computers.computerid 
 ORDER BY Location, `Computer Name`';
-
+    var_dump($query);
     $customerID = $dbeCustomer->getValue(DBECustomer::customerID);
     $customerName = $dbeCustomer->getValue(DBECustomer::name);
 
@@ -273,7 +275,6 @@ ORDER BY Location, `Computer Name`';
             );
         var_dump($query);
         echo ' </div>';
-        exit;
         continue;
     }
     $data = $statement->fetchAll(PDO::FETCH_ASSOC);

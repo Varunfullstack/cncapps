@@ -16,9 +16,8 @@ This project changes will be shown here.
 - Fixed issue with query failing when pulling servers for customer in Customer Review Meeting Agenda (getServersByCustomerID())
 
 ## [v4.5.4] - 2020-09-02
-### Added
+### Added 
 - Add the ability to add items to Credit Notes
-
 
 ## [v4.5.3] - 2020-09-01
 ### Fixed
