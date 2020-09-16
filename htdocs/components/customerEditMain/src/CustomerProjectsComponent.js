@@ -58,7 +58,9 @@ class CustomerProjectsComponent extends React.Component {
         if (!project.isDeletable) {
             return null;
         }
-        return (<a href={`Project.php?action=delete&projectID=${project.id}`}>
+        return (<a href={`Project.php?action=delete&projectID=${project.id}`}
+                   onClick={($event) => !confirm('Are you sure you want to delete this project?') ? $event.preventDefault() : null}
+        >
             <button className="btn btn-outline-danger">
                 <i className="fa fa-trash"/>
             </button>
@@ -179,7 +181,9 @@ class CustomerProjectsComponent extends React.Component {
                                             <td>{this.formatDate(project.expiryDate)}</td>
                                             <td>
                                                 <a href={`/Project.php?action=edit&projectID=${project.id}`}>
-                                                    <button className="btn btn-outline-secondary">
+                                                    <button type="button"
+                                                            className="btn btn-outline-secondary"
+                                                    >
                                                         <i className="fa fa-edit"/>
                                                     </button>
                                                 </a>

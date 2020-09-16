@@ -48,7 +48,7 @@ class CustomerPortalDocumentsComponent extends React.Component {
                         {portalDocument.mainContactOnly ? 'Y' : 'N'}
                     </td>
                     <td>
-                        <a href={`/PortalCustomerDocument.php?action=edit&portalCustomerDocumentID=${portalDocument.id}`}>
+                        <a href={`/PortalCustomerDocument.php?action=edit&portalCustomerDocumentID=${portalDocument.id}`} >
                             <button className="btn btn-outline-secondary">
                                 <i className="fa fa-edit"/>
                             </button>
@@ -57,7 +57,7 @@ class CustomerPortalDocumentsComponent extends React.Component {
                     <td>
                         <a href={`/PortalCustomerDocument.php?action=delete&portalCustomerDocumentID=${portalDocument.id}`}
                            title="Delete attached document"
-                           onClick={() => !confirm('Are you sure you want to remove this document?')}
+                           onClick={($event) => !confirm('Are you sure you want to delete this document?') ? $event.preventDefault() : null}
                         >
                             <button className="btn btn-outline-danger">
                                 <i className="fa fa-trash"/>

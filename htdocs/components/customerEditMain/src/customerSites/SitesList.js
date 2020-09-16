@@ -1,10 +1,10 @@
 import React from 'react';
 import {connect} from "react-redux";
 import {SHOW_ACTIVE} from "./visibilityFilterTypes";
-import {addContactToSite, changeDeliverSiteNo, changeInvoiceSiteNo, updateSite} from "./actions";
+import {addContactToSite, changeDeliverSiteNo, changeInvoiceSiteNo, deleteSite, saveSite, updateSite} from "./actions";
 import Site from './Site.js';
 
-const SitesList = ({sites, customerId, contacts, invoiceSiteNo, deliverSiteNo, changeInvoiceSiteNo, changeDeliverSiteNo, addContactToSite, updateSite}) => {
+const SitesList = ({sites, customerId, contacts, invoiceSiteNo, deliverSiteNo, changeInvoiceSiteNo, changeDeliverSiteNo, addContactToSite, updateSite, deleteSite}) => {
     return (
 
         <div className="container-fluid">
@@ -37,6 +37,7 @@ const SitesList = ({sites, customerId, contacts, invoiceSiteNo, deliverSiteNo, c
                                               changedDeliverSiteNo={changeDeliverSiteNo}
                                               addContactToSite={addContactToSite}
                                               updateSite={updateSite}
+                                              deleteSite={deleteSite}
                                         />
                                     )) : ''
                             }
@@ -89,6 +90,12 @@ function mapDispatchToProps(dispatch) {
         },
         updateSite: (siteNo, data) => {
             dispatch(updateSite(siteNo, data))
+        },
+        saveSite: (site, deliverSiteNo, invoiceSiteNo) => {
+            dispatch(saveSite(site, deliverSiteNo, invoiceSiteNo))
+        },
+        deleteSite: (customerId, siteNo) => {
+            dispatch(deleteSite(customerId, siteNo))
         }
     }
 }
