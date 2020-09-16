@@ -5,9 +5,8 @@
  * Date: 28/09/2018
  * Time: 14:47
  */
-
+global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
-
 require_once($cfg["path_dbe"] . "/DBEDirectDebitContracts.php");
 require_once($cfg['path_bu'] . '/BUMail.inc.php');
 require_once($cfg['path_bu'] . '/BUSalesOrder.inc.php');
@@ -210,6 +209,10 @@ class BUDirectDebitContracts extends Business
 
 
                 $dbeOrdline->setValue(
+                    DBEOrdline::isRecurring,
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::reoccurring)
+                );
+                $dbeOrdline->setValue(
                     DBEOrdline::renewalCustomerItemID,
                     null
                 );
@@ -309,6 +312,10 @@ class BUDirectDebitContracts extends Business
                     DBEOrdline::stockcat,
                     $dsItem->getValue(DBEItem::stockcat)
                 );
+                $dbeOrdline->setValue(
+                    DBEOrdline::isRecurring,
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::reoccurring)
+                );
 
                 $dbeOrdline->setValue(
                     DBEOrdline::renewalCustomerItemID,
@@ -407,6 +414,10 @@ class BUDirectDebitContracts extends Business
                     'C'
                 );
                 $dbeOrdline->setValue(
+                    DBEOrdline::isRecurring,
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::reoccurring)
+                );
+                $dbeOrdline->setValue(
                     DBEOrdline::renewalCustomerItemID,
                     ''
                 );
@@ -486,6 +497,7 @@ class BUDirectDebitContracts extends Business
                             DBEOrdline::description,
                             $description
                         );
+                        $dbeOrdline->setValue(                    DBEOrdline::isRecurring,                    $dbeJCustomerItem->getValue(DBEJCustomerItem::reoccurring)                );
                         $dbeOrdline->setValue(
                             DBEOrdline::lineType,
                             'C'

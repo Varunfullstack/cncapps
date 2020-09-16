@@ -1,5 +1,5 @@
 <?php
-
+global $cfg;
 require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEQuotationLine extends DBEntity
@@ -23,6 +23,7 @@ class DBEQuotationLine extends DBEntity
     const curUnitSale = "curUnitSale";
     const curTotalSale = "curTotalSale";
     const renewalCustomerItemID = "renewalCustomerItemID";
+    const isRecurring = "isRecurring";
 
     /**
      * calls constructor()
@@ -124,6 +125,13 @@ class DBEQuotationLine extends DBEntity
             self::renewalCustomerItemID,
             DA_ID,
             DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::isRecurring,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            false
         );
         $this->setAddColumnsOff();
         $this->setPK(0);

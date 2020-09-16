@@ -195,10 +195,73 @@
         }
     }
 
+    function updateSequenceNumbers(items, fromSequenceNo, toSequenceNo) {
+        if (!items.length) {
+            return;
+        }
+        let lowerBound = fromSequenceNo;
+        let upperBound = toSequenceNo;
+        if (lowerBound > upperBound) {
+            upperBound = fromSequenceNo;
+            lowerBound = toSequenceNo;
+        }
+
+
+        for (let i = lowerBound - 1; i < upperBound; i++) {
+            items[i].dataset.seqNo = (i + 1).toString();
+        }
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
         checkValidity();
+
+        document.getElementById('addNewRowButton').addEventListener('click', $event => {
+            open('/PurchaseOrder.php?action=addOrdline&porheadID=' + getPurchaseOrderId(), '_blank');
+        })
+
+        const deleteLineButtons = document.querySelectorAll('button.deleteLineButton');
+
+
+        deleteLineButtons.forEach(el => el.addEventListener('click', ($event) => {
+
+                if (!confirm('Are you sure you want to delete this row?')) {
+                    return;
+                }
+
+                const target = $event.target;
+                const row = target.closest('tr');
+
+                const currentSequenceNo = row.dataset.seqNo;
+
+                fetch('?action=delOrdline', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        purchaseOrderHeadId: getPurchaseOrderId(),
+                        sequenceNumber: row.dataset.seqNo
+                    })
+                })
+                    .then(x => x.json())
+                    .then(res => {
+                        if (res.status !== 'ok') {
+                            throw new Error('Failed to delete row: ' + res.message);
+                        }
+                        const tbody = row.closest('tbody');
+                        row.remove();
+                        updateSequenceNumbers(tbody.children, currentSequenceNo, tbody.childElementCount);
+
+                    })
+                    .catch(error => {
+                        alert(error);
+                        console.error(error)
+                    })
+
+
+            })
+        );
+
     });
 </SCRIPT>
+
 <TABLE width="400px"
        border="0"
        cellpadding="2"
@@ -228,8 +291,13 @@
     </TR>
 </table>
 <p>{purchaseOrderHeadDisplay}</p>
-<p>{purchaseOrderDisplayNewLine} <font class="formErrorMessage">{linesMessage}</font>
-</p>
+<button type="button"
+        title="Add New Row"
+        id="addNewRowButton"
+        class="salesOrderButton"
+>
+    <i class="fal fa-plus fa-2x"></i>
+</button>
 <table class="singleBorder"
        width="760px"
        border="0"

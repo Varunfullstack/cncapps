@@ -115,8 +115,9 @@
 
                     var dataTable = new google.visualization.DataTable();
                     dataTable.addColumn('date', 'Dates');
-                    dataTable.addColumn('number', 'Hours Logged');
+                    dataTable.addColumn('number', 'Hours Logged All Clients(except CNC)');
                     dataTable.addColumn({type: 'string', role: 'style'});
+                    dataTable.addColumn('number', 'Hours Logged Against CNC')
 
                     dataTable.addRows(
                         item.dataPoints.map(function (row) {
@@ -124,27 +125,21 @@
                                 new Date(row['date']),
                                 row['loggedHours'],
                                 row['isHolidays'] ? 'green' : null,
+                                row['cncLoggedHours']
                             ]
                         })
                     );
 
-                    var options = {
-                        'title': 'Hours Logged Over Time',
-                        seriesType: 'bars',
-                        series: {
-                            1: {type: 'line'},
-                            2: {type: 'line'}
-                        },
-                        legend: {
-                            position: 'bottom'
-                        },
-                        vAxis: {title: 'Hours Logged'}
-                    };
 
-                    var storedOptions = {
+                    const storedOptions = {
                         title: item.userName,
                         trendlines: {0: {}},
-                        legend: 'none'
+                        legend: 'none',
+                        isStacked: true,
+                        series: {
+                            0: {color: '#0082b9'},
+                            1: {color: '#c6c6c6'},
+                        }
                     };
 
                     var chart = new google.visualization.ColumnChart(test[0]);

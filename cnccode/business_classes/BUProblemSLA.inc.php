@@ -1250,5 +1250,17 @@ class BUProblemSLA extends Business
 
     }
 
+    public function clearBreachedSpecialAttentionCustomers()
+    {
+        $dbeCustomer = new DBECustomer($this);
+        $dbeCustomer->getBreachedSpecialAttentionCustomers();
+        while ($dbeCustomer->fetchNext()) {
+            $updateCustomer = new DBECustomer($this);
+            $updateCustomer->getRow($dbeCustomer->getPKValue());
+            $updateCustomer->setValue(DBECustomer::specialAttentionFlag, 'N');
+            $updateCustomer->updateRow();
+        }
+    }
+
 } // End of class
 ?>

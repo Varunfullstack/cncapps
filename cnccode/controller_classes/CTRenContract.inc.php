@@ -333,7 +333,7 @@ class CTRenContract extends CTCNC
                     'htmlFmt' => CT_HTML_FMT_POPUP
                 )
             );
-        $dbeItem=new DBEItem($this);        
+        $dbeItem = new DBEItem($this);
         $dbeItem->getRow($dsRenContract->getValue(DBECustomerItem::itemID));
         $dsCustomer = new DBECustomer($this);
         $dsCustomer->getRow($dsRenContract->getValue(DBECustomerItem::customerID));
@@ -353,6 +353,16 @@ class CTRenContract extends CTCNC
             )->format('d/m/Y');
         }
 
+        $officeItems = new DBEItem($this);
+        $officeItems->getRowsByDescriptionMatch("+CNC +Office +365 +Backup");
+        $isOfficeItem = false;
+        while (!$isOfficeItem && $officeItems->fetchNext()) {
+            $isOfficeItem = $officeItems->getValue(DBEItem::itemID) == $dbeItem->getValue(DBEItem::itemID);
+        }
+
+        $isWebroot = $dbeItem->getValue(DBEItem::itemID) == CONFIG_WEBROOT_ITEMTYPEID;
+        $isDUO = $dbeItem->getValue(DBEItem::itemID) == CONFIG_DUO_ITEMID;
+
         $this->template->set_var(
             array(
                 'customerItemID'                     => $dsRenContract->getValue(DBEJRenContract::customerItemID),
@@ -365,9 +375,9 @@ class CTRenContract extends CTCNC
                 'users'                              => Controller::htmlDisplayText(
                     $dsRenContract->getValue(DBEJRenContract::users)
                 ),
-                'usersDisable'                              => Controller::htmlDisplayText(
-                    $dbeItem->getValue(DBEItem::isStreamOne)==1?'readonly':''
-                ),                
+                'usersDisable'                       => Controller::htmlDisplayText(
+                    $dbeItem->getValue(DBEItem::isStreamOne) || $isOfficeItem || $isWebroot || $isDUO ? 'readonly' : ''
+                ),
                 'salePricePerMonth'                  => $dsRenContract->getValue(DBECustomerItem::salePricePerMonth),
                 'costPricePerMonth'                  => $dsRenContract->getValue(DBECustomerItem::costPricePerMonth),
                 'siteDesc'                           => Controller::htmlDisplayText(

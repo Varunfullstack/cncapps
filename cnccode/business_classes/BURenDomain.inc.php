@@ -267,6 +267,10 @@ class BURenDomain extends Business
                     null
                 );
                 $dbeOrdline->setValue(
+                    DBEOrdline::isRecurring,
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::reoccurring)
+                );
+                $dbeOrdline->setValue(
                     DBEOrdline::ordheadID,
                     $dsOrdhead->getValue(DBEOrdhead::ordheadID)
                 );
@@ -334,6 +338,10 @@ class BURenDomain extends Business
                 );
 
                 $dbeOrdline->setValue(
+                    DBEOrdline::isRecurring,
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::reoccurring)
+                );
+                $dbeOrdline->setValue(
                     DBEOrdline::renewalCustomerItemID,
                     $this->dbeJRenDomain->getValue(DBEJRenDomain::customerItemID)
                 );
@@ -400,6 +408,10 @@ class BURenDomain extends Business
                 $dbeOrdline->setValue(
                     DBEOrdline::lineType,
                     'C'
+                );
+                $dbeOrdline->setValue(
+                    DBEOrdline::isRecurring,
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::reoccurring)
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::renewalCustomerItemID,

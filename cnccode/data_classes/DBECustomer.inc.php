@@ -473,7 +473,8 @@ class DBECustomer extends DBCNCEntity
         $this->addColumn(
             self::streamOneEmail,
             DA_TEXT,
-            DA_ALLOW_NULL,"streamOneEmail"
+            DA_ALLOW_NULL,
+            "streamOneEmail"
         );
         $this->setPK(0);
         $this->setAddColumnsOff();
@@ -644,6 +645,27 @@ class DBECustomer extends DBCNCEntity
 
         $queryString .= ' LIMIT 0,1';
 
+        $this->setQueryString($queryString);
+        $ret = (parent::getRows());
+        return $ret;
+    }
+
+
+    function getCustomerByName($name)
+    {
+        if (!$name) {
+            return $this;
+        }
+        $this->setMethodName("getCustomerByName");
+        $name = mysqli_real_escape_string($this->db->link_id(), $name);
+        $queryString =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " where 
+				cus_name = '{$name}'
+				and {$this->getDBColumnName(DBECustomer::referredFlag)} <> 'Y' 
+				and {$this->getDBColumnName(DBECustomer::becameCustomerDate)} is not null and {$this->getDBColumnName(DBECustomer::droppedCustomerDate)} is null
+				LIMIT 1";
         $this->setQueryString($queryString);
         $ret = (parent::getRows());
         return $ret;
@@ -824,6 +846,42 @@ class DBECustomer extends DBCNCEntity
         return $ret;
 
 
+    }
+
+    /**
+     * @param $email
+     * @return $this|null
+     */
+    public function getCustomerByStreamOneEmail($email)
+    {
+        $this->setMethodName('getCustomerByStreamOneEmail');
+        if(!$email){
+            throw new Exception('Email is mandatory');
+        }
+
+        $escapedEmail = mysqli_real_escape_string($this->db->link_id(), trim($email));
+        $queryString =
+            "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} WHERE {$this->getDBColumnName(self::streamOneEmail)} like '%{$escapedEmail}%' ";
+
+        $this->setQueryString($queryString);
+        self::getRows();
+
+        if (!self::rowCount()) {
+            return null;
+        }
+        $this->fetchNext();
+        return $this;
+    }
+
+    public function getBreachedSpecialAttentionCustomers()
+    {
+        $this->setMethodName('getBreachedSpecialAttentionCustomers');
+        $queryString =
+            "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} WHERE {$this->getDBColumnName(self::specialAttentionFlag)} = 'Y' and {$this->getDBColumnName(self::specialAttentionEndDate)}  <= current_date() ";
+
+        $this->setQueryString($queryString);
+        $ret = (self::getRows());
+        return $ret;
     }
 }
 

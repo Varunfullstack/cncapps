@@ -66,18 +66,21 @@
                 var data = new google.visualization.DataTable();
                 data.addColumn('date', 'Dates');
                 data.addColumn('number', 'Hours Logged');
-                data.addColumn({type:'string', role:'style'});
+                data.addColumn({type: 'string', role: 'style'});
                 data.addColumn('number', 'Average over 5 days');
                 data.addColumn('number', 'Average over Month');
+                data.addColumn('number', 'CNC Hours Logged');
+
 
                 data.addRows(
                     result.map(function (row) {
                         return [
                             new Date(row['loggedDate']),
                             row['loggedHours'],
-                            row['holiday'] ? 'green': null,
+                            row['holiday'] ? 'green' : null,
                             row['fiveDaysAvg'],
                             row['monthAvg'],
+                            row['cncLoggedHours']
                         ]
                     })
                 );
@@ -87,13 +90,16 @@
                     'title': 'Hours Logged Over Time',
                     seriesType: 'bars',
                     series: {
+                        0: {color: '#0082b9'},
                         1: {type: 'line'},
-                        2: {type: 'line'}
+                        2: {type: 'line'},
+                        3: {color: '#c6c6c6'},
                     },
                     legend: {
                         position: 'bottom'
                     },
-                    vAxis: {title: 'Hours Logged'}
+                    vAxis: {title: 'Hours Logged'},
+                    isStacked: true
                 };
 
 // Instantiate and draw our chart, passing in some options.
@@ -106,14 +112,19 @@
                 data2.addColumn('number', '% Last 5 days');
                 data2.addColumn('number', '% Last Month');
                 data2.addColumn('number', 'Target %');
-
                 data2.addRows(
                     result.map(function (row) {
+                        console.log([
+                            new Date(row['loggedDate']),
+                            row['fiveDaysTotal'] / row['fiveDaysToLog'] * 100,
+                            row['monthTotal'] / row['monthToLog'] * 100,
+                            row['target'],
+                        ]);
                         return [
                             new Date(row['loggedDate']),
                             row['fiveDaysTotal'] / row['fiveDaysToLog'] * 100,
                             row['monthTotal'] / row['monthToLog'] * 100,
-                            row['target']
+                            row['target'],
                         ]
                     })
                 );
@@ -123,7 +134,7 @@
                     'title': 'Logged Percentage Over Time',
                     seriesType: 'line',
                     series: {
-                        1: {type: 'line'},
+                        0: {type: 'line'},
                         2: {type: 'line'}
                     },
                     legend: {

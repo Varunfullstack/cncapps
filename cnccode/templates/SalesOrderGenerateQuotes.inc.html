@@ -40,7 +40,7 @@
                         class="field"
                     >
                         <input type="text"
-                               name="form[salutation]"
+                               id="salutation"
                                value="{salutation}"
                                maxlength="40"
                                size="40"
@@ -53,7 +53,6 @@
                     </td>
                     <td>
                         <input type="text"
-                               name="form[emailSubject]"
                                value="{emailSubject}"
                                maxlength="60"
                                size="70"
@@ -70,7 +69,8 @@
                                   id="introduction"
                                   cols="80"
                                   rows="3"
-                        >{introduction}</textarea><font class="formErrorMessage">{introductionMessage}</font>
+                        >{introduction}</textarea>
+                        <font class="formErrorMessage">{introductionMessage}</font>
                     </td>
                 </tr>
                 <tr>

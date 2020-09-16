@@ -41,7 +41,7 @@ class NewOrder extends React.Component {
       state.selectedDomain='';
     } 
     
-    //console.log(endCustomer.BodyText.endCustomerDetails);
+    ////console.log(endCustomer.BodyText.endCustomerDetails);
     const currentUser = await this.apiCustomerLicenses.getCurrentUser();
     let productList = await this.apiCustomerLicenses.getLocalProducts();
    
@@ -49,20 +49,31 @@ class NewOrder extends React.Component {
       p.quantity=0;
       return p;
     });
-    let streamOneProducts = await this.apiCustomerLicenses.getProductBySKU({
-      skus: productList.map(p=>p.sku),
-    });
-    productList=productList.map(p=>{
-      const streamProduct=streamOneProducts.BodyText.productDetails.filter(s=>s.sku===p.sku);
-      if(streamProduct.length>0)
-      {
-        p={...p,...streamProduct[0]};
-      }
-      p.quantity=0;
-      return p;
-    });
-    console.log('streamOneProduct',streamOneProducts)
-    console.log(productList);
+    let pages=productList.length/20;
+    //console.log(productList);
+    //console.log(Math.ceil( pages));
+    
+    for (let i = 0; i < productList.length; i += 20) {
+      const chunck = productList.slice(i, i + 20);
+      //console.log("chunck", chunck);
+      let streamOneProducts = await this.apiCustomerLicenses.getProductBySKU({
+        skus: chunck.map((p) => p.sku),
+      });
+      //console.log("streamOneProduct", streamOneProducts);
+      productList = productList.map((p) => {
+        const streamProduct = streamOneProducts.BodyText.productDetails.filter(
+          (s) => s.sku === p.sku
+        );
+        if (streamProduct.length > 0) {
+          p = { ...p, ...streamProduct[0] };
+        }
+        p.quantity = 0;
+        return p;
+      });
+    }
+  
+
+    //console.log(productList);
     if (state.endCustomer.email)
       state = {
         ...state,
@@ -73,7 +84,7 @@ class NewOrder extends React.Component {
         },
       };
     else this.setState({ error: "Please select customer" });
-    console.log("state",state);
+    //console.log("state",state);
     this.setState({ ...state });
     this.hideSpinner();
   }
@@ -85,12 +96,12 @@ class NewOrder extends React.Component {
     this.setState({ _showSpinner: false });
   };
   // handleProductListChange = (event) => {
-  //   //console.log(event.target.value);
+  //   ////console.log(event.target.value);
   //   const { productList } = this.state;
   //   const selectedCategory = productList.filter(
   //     (p) => p.listingName == event.target.value
   //   )[0];
-  //   //console.log(selectedCategory);
+  //   ////console.log(selectedCategory);
   //   this.setState({
   //     selectedCategoryName: event.target.value,
   //     selectedCategory,
@@ -123,7 +134,7 @@ class NewOrder extends React.Component {
     else return el('input',{key:'domain',value:selectedDomain,onChange:handleDomainChange});
   }
   handleProductQuantity = (event, product) => {
-    //console.log(event.target.value,product);
+    ////console.log(event.target.value,product);
     const { filteredProductList } = this.state;
     let index = filteredProductList.map((s) => s.sku).indexOf(product.sku);
     filteredProductList[index].quantity = event.target.value;
@@ -199,7 +210,7 @@ class NewOrder extends React.Component {
   };
   getOrderFinalItemsElement = () => {
     let items = this.getFinalOrderItems();
-    console.log(items);
+    //console.log(items);
     const columns = [
       {
         path: "sku",
@@ -222,7 +233,7 @@ class NewOrder extends React.Component {
       },
     ];
     if (items) {
-      //////console.log('selectedOrderLine',selectedOrderLine)
+      ////////console.log('selectedOrderLine',selectedOrderLine)
       let total = 0;
       if (items.length > 0)
         total = items
@@ -281,7 +292,7 @@ class NewOrder extends React.Component {
     // place order
     else {
       this.showSpinner();
-      console.log(endCustomer, selectedDomain);
+      //console.log(endCustomer, selectedDomain);
       const lines = items.map((item) => {
         if (selectedDomain)
           return {
@@ -321,11 +332,11 @@ class NewOrder extends React.Component {
       {
         order.placeOrders[0].endCustomer={...endCustomer }
       }
-      // console.log(order);   
+      // //console.log(order);   
       // this.hideSpinner();
       // return;
       this.apiCustomerLicenses.addOrder(order).then((res) => {
-        console.log(res);
+        //console.log(res);
         if (
           res.Result === "Success" &&
           res.BodyText.placeOrdersDetails[0].result === "success"
@@ -338,7 +349,7 @@ class NewOrder extends React.Component {
   };
   handleCustomerOnSumbit=(customer)=>
   {
-    console.log(customer);
+    //console.log(customer);
     this.setState({_showCustomerModal:false,endCustomer:customer});
     setTimeout(()=>this.handleSubmit(),100)
     
@@ -347,7 +358,7 @@ class NewOrder extends React.Component {
     this.setState({_showCustomerModal:false});
   }
   handleSearch=(event)=>{
-    console.log(event.target.value);
+    //console.log(event.target.value);
     const value=event.target.value;
     const {productList}=this.state;
     const filteredProductList=productList.filter(p=>
@@ -357,7 +368,7 @@ class NewOrder extends React.Component {
       p.skuType.toLowerCase().indexOf(value)>=0||
       p.listingName.toLowerCase().indexOf(value)>=0||
       p.quantity.toString().toLowerCase().indexOf(value)>=0);
-      console.log(filteredProductList);
+      //console.log(filteredProductList);
       this.setState({filteredProductList});
   }
   render() {

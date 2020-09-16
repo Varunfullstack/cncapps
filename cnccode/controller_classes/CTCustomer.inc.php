@@ -2050,7 +2050,9 @@ class CTCustomer extends CTCNC
                 'accountNumberPencilColor'       => $this->dsCustomer->getValue(
                     DBECustomer::accountNumber
                 ) ? "greenPencil" : "redPencil",
-                'forceDirectDebit'               => $forceDirectDebit ? 'true' : 'false'
+                'forceDirectDebit'               => $forceDirectDebit ? 'true' : 'false',
+                'streamOneEmail'               => $this->dsCustomer->getValue(DBECustomer::streamOneEmail)
+
 
             )
         );

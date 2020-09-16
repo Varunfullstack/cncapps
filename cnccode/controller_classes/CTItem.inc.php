@@ -6,6 +6,10 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use CNCLTD\Exceptions\JsonHttpException;
+
+global $cfg;
 require_once($cfg['path_bu'] . '/BUItem.inc.php');
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
@@ -51,6 +55,15 @@ define(
 
 class CTItem extends CTCNC
 {
+    public const ADD_CHILD_ITEM = "ADD_CHILD_ITEM";
+    public const REMOVE_CHILD_ITEM = "REMOVE_CHILD_ITEM";
+    const GET_CHILD_ITEMS = "GET_CHILD_ITEMS";
+    const GET_PARENT_ITEMS = "GET_PARENT_ITEMS";
+    const SEARCH_ITEMS = "SEARCH_ITEMS";
+    const CHECK_ITEM_RECURRING = "CHECK_ITEM_RECURRING";
+    const DATA_TABLE_GET_DATA = "DATA_TABLE_GET_DATA";
+    const SEARCH_ITEMS_JSON = "SEARCH_ITEMS_JSON";
+    const GET_ITEM = 'GET_ITEM';
     /** @var DSForm */
     public $dsItem;
     /**
@@ -107,10 +120,268 @@ class CTItem extends CTCNC
                 $this->checkPermissions(SALES_PERMISSION);
                 $this->discontinue();
                 break;
+            case self::ADD_CHILD_ITEM:
+                $data = json_decode(file_get_contents('php://input'), true);
+                if (!key_exists('itemId', $data) || !isset($data['itemId'])) {
+                    throw new JsonHttpException(400, 'Item Id is mandatory');
+                }
+                if (!key_exists('childItemId', $data) || !isset($data['childItemId'])) {
+                    throw new JsonHttpException(400, 'child item id is mandatory');
+                }
+
+                $this->addChildItem($data['itemId'], $data['childItemId']);
+                $dbeItem = new DBEItem($this);
+                $dbeItem->getRow($data['childItemId']);
+                echo json_encode(["status" => "ok", "childItem" => $dbeItem->getRowAsAssocArray()]);
+                break;
+            case self::REMOVE_CHILD_ITEM:
+                $data = json_decode(file_get_contents('php://input'), true);
+                if (!key_exists('itemId', $data) || !isset($data['itemId'])) {
+                    throw new JsonHttpException(400, 'Item Id is mandatory');
+                }
+                if (!key_exists('childItemId', $data) || !isset($data['childItemId'])) {
+                    throw new JsonHttpException(400, 'child item id is mandatory');
+                }
+                $this->removeChildItem($data['itemId'], $data['childItemId']);
+                echo json_encode(["status" => "ok"]);
+                break;
+            case self::GET_CHILD_ITEMS:
+                if (!$this->getParam('itemId')) {
+                    throw new JsonHttpException(400, 'Item Id is mandatory');
+                }
+                $dbeItem = new DBEItem($this);
+                $dbeItem->getChildItems($this->getParam('itemId'));
+                $rows = [];
+                while ($dbeItem->fetchNext()) {
+                    $rows[] = $dbeItem->getRowAsAssocArray();
+                }
+                echo json_encode(["status" => "ok", "data" => $rows]);
+
+                break;
+            case self::GET_PARENT_ITEMS:
+                if (!$this->getParam('itemId')) {
+                    throw new JsonHttpException(400, 'Item Id is mandatory');
+                }
+                $dbeItem = new DBEItem($this);
+                $dbeItem->getParentItems($this->getParam('itemId'));
+                $rows = [];
+                while ($dbeItem->fetchNext()) {
+                    $rows[] = $dbeItem->getRowAsAssocArray();
+                }
+                echo json_encode(["status" => "ok", "data" => $rows]);
+
+                break;
+            case self::GET_ITEM:
+                if (!$this->getParam('itemId')) {
+                    throw new JsonHttpException(400, 'Item Id is mandatory');
+                }
+                $dbeItem = new DBEItem($this);
+                if (!$dbeItem->getRow($this->getParam('itemId'))) {
+                    throw new JsonHttpException(404, 'Item Not Found');
+                }
+                echo json_encode(
+                    [
+                        "status" => "ok",
+                        "data"   => $dbeItem->getRowAsAssocArray(),
+                    ]
+                );
+                break;
+            case self::SEARCH_ITEMS_JSON:
+                $data = self::getJSONData();
+                $term = '';
+                $limit = null;
+
+                if (!empty($data['term'])) {
+                    $term = $data['term'];
+                }
+                if (!empty($data['limit'])) {
+                    $limit = $data['limit'];
+                }
+                $this->setParam('term', $term);
+                $this->setParam('limit', $limit);
+
+            case self::SEARCH_ITEMS:
+                $dbeItem = new DBEItem($this);
+                $dbeItem->getRowsByDescriptionOrPartNoSearch($this->getParam('term'), null, $this->getParam('limit'));
+                $rows = [];
+                while ($dbeItem->fetchNext()) {
+                    $rows[] = $dbeItem->getRowAsAssocArray();
+                }
+                echo json_encode(["status" => "ok", "data" => $rows]);
+                break;
+            case self::DATA_TABLE_GET_DATA:
+            case 'getData':
+
+                $dbeItem = new DBEItem($this);
+                $dbeItemType = new DBEItemType($this);
+                $dbeManufacturer = new DBEManufacturer($this);
+                $draw = $_REQUEST['draw'];
+                $columns = $_REQUEST['columns'];
+                $search = $_REQUEST['search'];
+                $order = $_REQUEST['order'];
+                $offset = $_REQUEST['start'];
+                $limit = $_REQUEST['length'];
+
+                $columnsNames = [
+                    "description",
+                    "costPrice",
+                    "salePrice",
+                    "partNumber",
+                    "itemCategory",
+                    "renewalType",
+                    "manufacturer",
+                    "discontinued",
+                    'renewalTypeID'
+                ];
+                $columnsDefinition = [
+                    "description"   => 'item.itm_desc',
+                    "costPrice"     => 'item.itm_sstk_cost',
+                    "salePrice"     => 'item.itm_sstk_price',
+                    "partNumber"    => 'item.itm_unit_of_sale',
+                    "itemCategory"  => 'itemtype.ity_desc',
+                    "renewalType"   => 'renewalTypeID',
+                    "manufacturer"  => 'man_name',
+                    "discontinued"  => 'item.itm_discontinued',
+                    "renewalTypeId" => 'renewalTypeID'
+                ];
+
+                $columnsTypes = [
+                    "description"   => 'like',
+                    "costPrice"     => 'like',
+                    "salePrice"     => 'like',
+                    "partNumber"    => 'like',
+                    "itemCategory"  => 'like',
+                    "renewalType"   => 'like',
+                    "renewalTypeId" => 'explicitInt',
+                    "manufacturer"  => 'like',
+                    "discontinued"  => 'explicitString'
+                ];
+
+                /** @var dbSweetcode $db */
+                global $db;
+                $countQuery = "select count(*) FROM {$dbeItem->getTableName()}
+         left join {$dbeItemType->getTableName()} on {$dbeItem->getDBColumnName(DBEItem::itemTypeID)} = {$dbeItemType->getDBColumnName(DBEItemType::itemTypeID)}
+         left join {$dbeManufacturer->getTableName()} on {$dbeItem->getDBColumnName(DBEItem::manufacturerID)} = {$dbeManufacturer->getDBColumnName(DBEManufacturer::manufacturerID)}";
+                $totalCountResult = $db->query($countQuery);
+                $totalCount = $totalCountResult->fetch_row()[0];
+                $defaultQuery = "select 
+                    {$dbeItem->getDBColumnName(DBEItem::itemID)} as 'id',
+                    {$dbeItem->getDBColumnName(DBEItem::description)} as 'description',
+                    {$dbeItem->getDBColumnName(DBEItem::curUnitCost)} as 'costPrice',
+                    {$dbeItem->getDBColumnName(DBEItem::curUnitSale)} as 'salePrice',
+                    {$dbeItem->getDBColumnName(DBEItem::partNo)} as 'partNumber',
+                    {$dbeItemType->getDBColumnName(DBEItemType::description)} as 'itemCategory',
+                    case {$dbeItem->getDBColumnName(DBEItem::renewalTypeID)}
+                        when 1 then 'Broadband'
+    when 2 then 'Renewals'
+    when 3 then 'Quotation'
+    when 4 then 'Domain'
+    when 5 then 'Hosting'
+    end as 'renewalType',
+       {$dbeItem->getDBColumnName(DBEItem::renewalTypeID)} as renewalTypeId,
+                    {$dbeManufacturer->getDBColumnName(DBEManufacturer::name)} as 'manufacturer',
+                    {$dbeItem->getDBColumnName(DBEItem::discontinuedFlag)} as 'discontinued'
+                FROM {$dbeItem->getTableName()}
+         left join {$dbeItemType->getTableName()} on {$dbeItem->getDBColumnName(DBEItem::itemTypeID)} = {$dbeItemType->getDBColumnName(DBEItemType::itemTypeID)}
+         left join {$dbeManufacturer->getTableName()} on {$dbeItem->getDBColumnName(DBEItem::manufacturerID)} = {$dbeManufacturer->getDBColumnName(DBEManufacturer::manufacturerID)} where 1 ";
+                $columnSearch = [];
+                $parameters = [];
+                foreach ($columns as $column) {
+                    if (!isset($columnsDefinition[$column['data']])) {
+                        continue;
+                    }
+
+                    if ($column['search']['value']) {
+                        switch ($columnsTypes[$column['data']]) {
+                            case 'explicitInt':
+                                $columnSearch[] = $columnsDefinition[$column['data']] . " = ?";
+                                $parameters[] = [
+                                    "type"  => "i",
+                                    "value" => $column['search']['value']
+                                ];
+                                break;
+                            case 'explicitString':
+                                $columnSearch[] = $columnsDefinition[$column['data']] . " = ?";
+                                $parameters[] = [
+                                    "type"  => "s",
+                                    "value" => $column['search']['value']
+                                ];
+                                break;
+                            case 'like':
+                                $columnSearch[] = $columnsDefinition[$column['data']] . " like ?";
+                                $parameters[] = [
+                                    "type"  => "s",
+                                    "value" => "%" . $column['search']['value'] . "%"
+                                ];
+                                break;
+                        }
+                    }
+                }
+
+                if (count($columnSearch)) {
+                    $wherePart = " and " . implode(" and ", $columnSearch);
+                    $defaultQuery .= $wherePart;
+                    $countQuery .= $wherePart;
+                }
+                $orderBy = [];
+                if (count($order)) {
+                    foreach ($order as $orderItem) {
+                        if (!isset($columnsNames[(int)$orderItem['column']])) {
+                            continue;
+                        }
+                        $orderBy[] = $columnsDefinition[$columnsNames[(int)$orderItem['column']]] . " " . mysqli_real_escape_string(
+                                $db->link_id(),
+                                $orderItem['dir']
+                            );
+                    }
+                    if (count($orderBy)) {
+                        $defaultQuery .= (" order by " . implode(' , ', $orderBy));
+                    }
+                }
+                $countResult = $db->preparedQuery(
+                    $countQuery,
+                    $parameters
+                );
+                $filteredCount = $countResult->fetch_row()[0];
+
+                $defaultQuery .= " limit ?,?";
+                $parameters[] = ["type" => "i", "value" => $offset];
+                $parameters[] = ["type" => "i", "value" => $limit];
+                $result = $db->preparedQuery(
+                    $defaultQuery,
+                    $parameters
+                );
+                $data = $result->fetch_all(MYSQLI_ASSOC);
+
+                echo json_encode(
+                    [
+                        "draw"            => +$draw,
+                        "recordsTotal"    => +$totalCount,
+                        "recordsFiltered" => $filteredCount,
+                        "data"            => $data
+                    ]
+                );
+
+                break;
+            case self::CHECK_ITEM_RECURRING:
+            {
+                $data = json_decode(file_get_contents('php://input'), true);
+                if (array_key_exists('itemId', $data) || !isset($data['itemId'])) {
+                    throw new JsonHttpException(400, 'Item Id is mandatory');
+                }
+                $dbeItem = new DBEItem($this);
+                $dbeItem->getRow($data['itemId']);
+                $itemTypeId = $dbeItem->getValue(DBEItem::itemTypeID);
+                $dbeItemType = new DBEItemType($this);
+                $dbeItemType->getRow($itemTypeId);
+                echo json_encode(["status" => "ok", "data" => $dbeItemType->getValue(DBEItemType::reoccurring)]);
+
+            }
             case CTCNC_ACT_DISP_ITEM_POPUP:
-            default:
                 $this->displayItemSelectPopup();
                 break;
+            default:
+                $this->showItemList();
         }
     }
 
@@ -214,7 +485,9 @@ class CTItem extends CTCNC
                     $this->dsItem->getValue(DBEItem::serialNoFlag)
                 ),
                 'partNo'                         => Controller::htmlInputText($this->dsItem->getValue(DBEItem::partNo)),
-                'partNoOld'                      => Controller::htmlInputText($this->dsItem->getValue(DBEItem::partNoOld)),
+                'partNoOld'                      => Controller::htmlInputText(
+                    $this->dsItem->getValue(DBEItem::partNoOld)
+                ),
                 'notes'                          => Controller::htmlTextArea($this->dsItem->getValue(DBEItem::notes)),
                 'contractResponseTime'           => Controller::htmlInputText(
                     $this->dsItem->getValue(DBEItem::contractResponseTime)
@@ -231,7 +504,10 @@ class CTItem extends CTCNC
                     $this->dsItem->getValue(DBEItem::excludeFromPOCompletion)
                 ),
                 'allowSRLog'                     => $this->dsItem->getValue(DBEItem::allowSRLog) ? "checked" : null,
-                'isStreamOne'                     => $this->dsItem->getValue(DBEItem::isStreamOne) ? "checked" : null
+                'isStreamOne'                    => $this->dsItem->getValue(DBEItem::isStreamOne) ? "checked" : null,
+                'javaScript'                     => '<script src="js/react.development.js" crossorigin></script>
+                    <script src="js/react-dom.development.js" crossorigin></script>
+                    <script type="module" src=\'components/ChildItemComponent/ChildAndParentItems.js\'></script>'
             )
         );
         $this->parseItemTypeSelector($this->dsItem->getValue(DBEItem::itemTypeID));
@@ -298,15 +574,19 @@ class CTItem extends CTCNC
                 $this->displayFatalError(CTITEM_MSG_ITEM_NOT_FND);
             }
         }
+
+        $params = [
+            'action' => CTITEM_ACT_ITEM_UPDATE,
+        ];
+
+        if ($this->getParam('htmlFmt')) {
+            $params['htmlFmt'] = CT_HTML_FMT_POPUP;
+        }
         return (
         Controller::buildLink(
             $_SERVER['PHP_SELF'],
-            array(
-                'action'  => CTITEM_ACT_ITEM_UPDATE,
-                'htmlFmt' => CT_HTML_FMT_POPUP
-            )
-        )
-        );
+            $params
+        ));
     }
 
     function parseItemTypeSelector($itemTypeID)
@@ -456,15 +736,26 @@ class CTItem extends CTCNC
         $this->buItem->updateItem($this->dsItem);
         $itemID = $this->dsItem->getPKValue();
 
-        // this forces update of itemID back through Javascript to parent HTML window
         $urlNext = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
-                'action'          => CTCNC_ACT_DISP_ITEM_POPUP,
-                'itemDescription' => $itemID,
-                'htmlFmt'         => CT_HTML_FMT_POPUP
+                'action' => CTCNC_ACT_ITEM_EDIT,
+                'itemID' => $itemID,
             )
         );
+
+        if ($this->getParam('htmlFmt')) {
+            // this forces update of itemID back through Javascript to parent HTML window
+            $urlNext = Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'          => CTCNC_ACT_DISP_ITEM_POPUP,
+                    'itemDescription' => $itemID,
+                    'htmlFmt'         => CT_HTML_FMT_POPUP
+                )
+            );
+        }
+
         header('Location: ' . $urlNext);
     }
 
@@ -479,6 +770,46 @@ class CTItem extends CTCNC
 
         }
         header('Location: ' . $this->getParam('returnTo'));
+    }
+
+    function addChildItem($parentItemId, $childItemId)
+    {
+        global $db;
+
+        $query = "insert ignore into childItem values(?,?) ";
+        $db->preparedQuery(
+            $query,
+            [
+                [
+                    "type"  => "i",
+                    "value" => $parentItemId,
+                ],
+                [
+                    "type"  => "i",
+                    "value" => $childItemId,
+                ],
+            ]
+        );
+    }
+
+    function removeChildItem($parentItemId, $childItemId)
+    {
+        global $db;
+
+        $query = "delete from childItem where parentItemId = ? and childItemId = ?";
+        $db->preparedQuery(
+            $query,
+            [
+                [
+                    "type"  => "i",
+                    "value" => $parentItemId,
+                ],
+                [
+                    "type"  => "i",
+                    "value" => $childItemId,
+                ],
+            ]
+        );
     }
 
     /**
@@ -662,6 +993,25 @@ class CTItem extends CTCNC
             'ItemSelect',
             true
         );
+        $this->parsePage();
+    }
+
+    function showItemList()
+    {
+        $this->setTemplateFiles(
+            'ItemList',
+            'ItemList'
+        );
+
+        $this->template->setVar(
+            [
+                'javaScript' => '<script src="js/react.development.js" crossorigin></script>
+                    <script src="js/react-dom.development.js" crossorigin></script>
+                    <script type="module" src=\'components/utils/TypeAheadSearch.js\'></script>'
+            ]
+        );
+
+        $this->template->parse('CONTENTS', 'ItemList');
         $this->parsePage();
     }
 

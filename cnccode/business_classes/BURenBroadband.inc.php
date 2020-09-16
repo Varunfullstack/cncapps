@@ -330,6 +330,17 @@ class BURenBroadband extends Business
 
                 $line++;
 
+                /*
+                 * Get stock category from item table
+                 */
+                $buItem = new BUItem($this);
+                $dsItem = new DataSet($this);
+                $buItem->getItemByID(
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::itemID),
+                    $dsItem
+                );
+
+
                 $dbeOrdline->setValue(
                     DBEOrdline::renewalCustomerItemID,
                     null
@@ -341,6 +352,10 @@ class BURenBroadband extends Business
                 $dbeOrdline->setValue(
                     DBEOrdline::customerID,
                     $dsOrdhead->getValue(DBEOrdhead::customerID)
+                );
+                $dbeOrdline->setValue(
+                    DBEOrdline::isRecurring,
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::reoccurring)
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::itemID,
@@ -400,15 +415,7 @@ class BURenBroadband extends Business
                 // item line
                 $line++;
 
-                /*
-                 * Get stock category from item table
-                 */
-                $buItem = new BUItem($this);
-                $dsItem = new DataSet($this);
-                $buItem->getItemByID(
-                    $dbeJCustomerItem->getValue(DBEJCustomerItem::itemID),
-                    $dsItem
-                );
+
                 $dbeOrdline->setValue(
                     DBEOrdline::stockcat,
                     $dsItem->getValue(DBEItem::stockcat)
@@ -441,6 +448,10 @@ class BURenBroadband extends Business
                 $dbeOrdline->setValue(
                     DBEOrdline::sequenceNo,
                     $line
+                );
+                $dbeOrdline->setValue(
+                    DBEOrdline::isRecurring,
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::reoccurring)
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::lineType,
@@ -489,6 +500,10 @@ class BURenBroadband extends Business
                 $dbeOrdline->setValue(
                     DBEOrdline::renewalCustomerItemID,
                     null
+                );
+                $dbeOrdline->setValue(
+                    DBEOrdline::isRecurring,
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::reoccurring)
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::ordheadID,
@@ -718,14 +733,14 @@ class BURenBroadband extends Business
         );
 
     }
-    
+
     function resetContractExpireNotified()
     {
         global $db;
-        $sql ="UPDATE custitem
+        $sql = "UPDATE custitem
                 SET contractExpireNotified = 0 
                 where  DATEDIFF(DATE_ADD(installationDate, INTERVAL initialContractLength MONTH), CURDATE()) >=90";
-         $db->query($sql);
+        $db->query($sql);
     }
 } // End of class
 ?>

@@ -1,0 +1,51 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue899-0">
+        <tagDatabase tag="issue899"/>
+    </changeSet>
+    <changeSet id="issue899-1" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="childItem"/>
+            </not>
+        </preConditions>
+        <createTable tableName="childItem">
+            <column name="parentItemId" type="int(11)">
+                <constraints nullable="false" primaryKeyName="PRIMARY" primaryKey="true"/>
+            </column>
+            <column name="childItemId" type="int(11)">
+                <constraints nullable="false" primaryKeyName="PRIMARY" primaryKey="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="issue899-2" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyTableName="childItem" foreignKeyName="FK-childItem-parentItemId"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseTableName="childItem" baseColumnNames="parentItemId"
+                                 constraintName="FK-childItem-parentItemId"
+                                 referencedTableName="item"
+                                 referencedColumnNames="itm_itemno"
+                                 onUpdate="CASCADE"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+    <changeSet id="issue899-3" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyTableName="childItem" foreignKeyName="FK-childItem-childItemId"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseTableName="childItem" baseColumnNames="childItemId"
+                                 constraintName="FK-childItem-childItemId"
+                                 referencedTableName="item"
+                                 referencedColumnNames="itm_itemno"
+                                 onUpdate="CASCADE"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+
+</databaseChangeLog>

@@ -945,3 +945,112 @@ input:checked + .slider:before {
 .slider.round:before {
     border-radius: 50%;
 }
+
+.child-item-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.c-item-list__item {
+    margin-top: 5px;
+    display: flex;
+    flex-direction: row;
+}
+
+.c-item-list__link {
+    width: 350px;
+    padding-left: 10px;
+}
+
+.wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.wrapper span {
+    position: absolute;
+    right: 7px;
+    height: 22px;
+}
+
+.wrapper span i {
+    height: 100%;
+    font-size: 14px;
+    padding-top: 4px;
+}
+
+.newLine input[type="number"] {
+    width: 60px;
+}
+
+.salesOrderButton {
+    background-color: transparent;
+}
+
+.salesOrderButton[disabled] {
+    background-color: transparent;
+}
+
+.salesOrderButton i {
+    color: #C6C6C6;
+}
+
+.salesOrderButton.not-so-faint i {
+    color: #3C3C3C
+}
+
+.toggleColumn div {
+    width: 16px
+}
+
+.renewalsColumn div {
+    width: 10px;
+}
+
+.descriptionColumn div {
+    width: 250px
+}
+
+.partNumberColumn div {
+    width: 80px;
+}
+
+.supplierColumn div {
+    width: 250px;
+}
+
+.financialColumn div {
+    width: 70px;
+    text-align: right;
+}
+
+.createPOColumn div {
+    width: 30px;
+}
+
+.sortableTable input[type="number"] {
+    width: 47px;
+}
+
+#itemListTable th {
+    padding-left: 2px;
+}
+
+#itemListTable .typeahead-input {
+    width: 180px;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+#autocompleteItem .ui-autocomplete-input {
+    width: 300px;
+}

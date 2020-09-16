@@ -74,18 +74,6 @@ class DataSet extends DataAccess
     }
 
     /**
-     * Initialise internal row counter to first row in the dataset
-     * @access public
-     * @return boolean
-     */
-    function initialise()
-    {
-        parent::initialise();
-        $this->ixCurrentRow = DA_NOT_SET;
-        return TRUE;
-    }
-
-    /**
      * Increment internal row counter
      * @access private
      * @return boolean
@@ -95,74 +83,6 @@ class DataSet extends DataAccess
         $this->setMethodName("incrementRowCounter");
         $this->ixCurrentRow++;
         return true;
-    }
-
-    /**
-     * Commit update to the dataset based upon current update_mode
-     * @access public
-     * @return boolean
-     */
-    function post()
-    {
-        parent::post();
-        switch ($this->getUpdateMode()) {
-            case DA_MODE_INSERT:
-                $this->ixCurrentRow = $this->rowCount(); // One past the end
-                $this->rows[$this->ixCurrentRow] = $this->row;
-                $ret = TRUE;
-                break;
-            case DA_MODE_UPDATE:
-                if ($this->debug) {
-                    var_dump($this->ixCurrentRow);
-                }
-                $this->rows[$this->ixCurrentRow] = $this->row;
-                $ret = TRUE;
-                break;
-            default:
-                $ret = FALSE;
-                break;
-        }
-        $this->resetUpdateMode();
-        return $ret;
-    }
-
-    /**
-     * Advance one row in the dataset
-     * @access public
-     * @return boolean Success
-     */
-    function fetchNext()
-    {
-        parent::fetchNext();
-
-        if ($this->debug) {
-            try {
-                throw new Exception();
-            } catch (Exception $exception) {
-                var_dump($exception->getTraceAsString());
-            }
-            var_dump($this->ixCurrentRow, $this->rowCount());
-            var_dump(array_keys($this->rows));
-        }
-        if (($this->ixCurrentRow + 1) >= $this->rowCount()) {
-            $this->eof = TRUE;
-            return FALSE;
-        } else {
-            $this->ixCurrentRow++;
-            // Move new current row in data set to row array
-            $this->row = $this->rows[$this->ixCurrentRow];
-            return TRUE;
-        }
-    }
-
-    /**
-     * Get number of rows in dataset
-     * @access public
-     * @return integer Number of rows
-     */
-    function rowCount()
-    {
-        return count($this->rows);
     }
 
     /**
@@ -187,6 +107,18 @@ class DataSet extends DataAccess
         $this->setMethodName("reverse");
         $this->rows = array_reverse($this->rows);
         $this->initialise();
+        return TRUE;
+    }
+
+    /**
+     * Initialise internal row counter to first row in the dataset
+     * @access public
+     * @return boolean
+     */
+    function initialise()
+    {
+        parent::initialise();
+        $this->ixCurrentRow = DA_NOT_SET;
         return TRUE;
     }
 
@@ -220,6 +152,16 @@ class DataSet extends DataAccess
             }
         }
         return $ret;
+    }
+
+    /**
+     * Get number of rows in dataset
+     * @access public
+     * @return integer Number of rows
+     */
+    function rowCount()
+    {
+        return count($this->rows);
     }
 
     /**
@@ -318,6 +260,35 @@ class DataSet extends DataAccess
     }
 
     /**
+     * Commit update to the dataset based upon current update_mode
+     * @access public
+     * @return boolean
+     */
+    function post()
+    {
+        parent::post();
+        switch ($this->getUpdateMode()) {
+            case DA_MODE_INSERT:
+                $this->ixCurrentRow = $this->rowCount(); // One past the end
+                $this->rows[$this->ixCurrentRow] = $this->row;
+                $ret = TRUE;
+                break;
+            case DA_MODE_UPDATE:
+                if ($this->debug) {
+                    var_dump($this->ixCurrentRow);
+                }
+                $this->rows[$this->ixCurrentRow] = $this->row;
+                $ret = TRUE;
+                break;
+            default:
+                $ret = FALSE;
+                break;
+        }
+        $this->resetUpdateMode();
+        return $ret;
+    }
+
+    /**
      * Dump data to a CSV file with column names in first row
      * @access public
      * @parameter String $fileName The local filesystem path to which data will be dumped
@@ -355,6 +326,35 @@ class DataSet extends DataAccess
         fclose($pointer);
         $ret = TRUE;
         return $ret;
+    }
+
+    /**
+     * Advance one row in the dataset
+     * @access public
+     * @return boolean Success
+     */
+    function fetchNext()
+    {
+        parent::fetchNext();
+
+        if ($this->debug) {
+            try {
+                throw new Exception();
+            } catch (Exception $exception) {
+                var_dump($exception->getTraceAsString());
+            }
+            var_dump($this->ixCurrentRow, $this->rowCount());
+            var_dump(array_keys($this->rows));
+        }
+        if (($this->ixCurrentRow + 1) >= $this->rowCount()) {
+            $this->eof = TRUE;
+            return FALSE;
+        } else {
+            $this->ixCurrentRow++;
+            // Move new current row in data set to row array
+            $this->row = $this->rows[$this->ixCurrentRow];
+            return TRUE;
+        }
     }
 
     /**

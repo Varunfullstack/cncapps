@@ -283,6 +283,11 @@ class BURenHosting extends Business
                     );
 
                     $dbeOrdline->setValue(
+                        DBEOrdline::isRecurring,
+                        $dbeJCustomerItem->getValue(DBEJCustomerItem::reoccurring)
+                    );
+
+                    $dbeOrdline->setValue(
                         DBEOrdline::renewalCustomerItemID,
                         null
                     );
@@ -345,6 +350,10 @@ class BURenHosting extends Business
                 $buItem->getItemByID(
                     $dbeJCustomerItem->getValue(DBEJCustomerItem::itemID),
                     $dsItem
+                );
+                $dbeOrdline->setValue(
+                    DBEOrdline::isRecurring,
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::reoccurring)
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::stockcat,
@@ -418,6 +427,10 @@ class BURenHosting extends Business
                 $dbeOrdline->setValue(
                     DBEOrdline::lineType,
                     'C'
+                );
+                $dbeOrdline->setValue(
+                    DBEOrdline::isRecurring,
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::reoccurring)
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::renewalCustomerItemID,

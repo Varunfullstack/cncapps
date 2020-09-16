@@ -5,7 +5,32 @@
 {salesOrderLineEditJS}
 {salesOrderHeadDisplay}
 <!-- NOTE: This is also in salesOrderDisplay.inc.html -->
-<script language='JavaScript'>
+<script>
+    let partNumberRow;
+    let itemIdInput;
+    document.addEventListener('DOMContentLoaded', () => {
+        itemIdInput = document.getElementById('itemID');
+        itemIdInput.addEventListener('change', ($event) => {
+            updatePartNumber();
+        })
+        partNumberRow = document.getElementById('partNumberRow');
+        updatePartNumber();
+    })
+
+    async function updatePartNumber() {
+        const itemId = itemIdInput.value;
+        let display = 'none';
+        let text = '';
+        if (itemId) {
+            const response = await fetch('/Item.php?action=GET_ITEM&itemId=' + itemId);
+            const r = await response.json();
+            display = 'table-row';
+            text = r.data.partNo;
+        }
+        partNumberRow.style.display = display;
+        partNumberRow.querySelector('.field').textContent = text;
+    }
+
     function checkFunctionKey(field) {
         if (event.keyCode == 120) {			// F9 - edit
             switch (field.id) {
@@ -33,6 +58,10 @@
         }
         return;
     }
+
+    function itemIdChanged($event) {
+        console.log($event.target.value);
+    }
 </SCRIPT>
 <table width="910px"
        border="0"
@@ -52,7 +81,6 @@
       AUTOCOMPLETE="off"
 >
     <INPUT type="hidden"
-           id="updatedTime"
            name="updatedTime"
            value="{updatedTime}"
     >
@@ -60,33 +88,32 @@
            name="ordline[1][id]"
            value="{lineId}"
     >
-    <input
-            type="hidden"
-            name="ordline[1][ordheadID]"
-            value="{ordheadID}"
+    <input type="hidden"
+           name="ordline[1][ordheadID]"
+           value="{ordheadID}"
     >
-    <input
-            type="hidden"
-            name="ordline[1][itemID]"
-            id="itemID"
-            value="{itemID}"
+    <input type="hidden"
+           name="ordline[1][itemID]"
+           id="itemID"
+           value="{itemID}"
     >
-    <input
-            type="hidden"
-            name="ordline[1][sequenceNo]"
-            value="{sequenceNo}"
+    <input type="hidden"
+           name="ordline[1][sequenceNo]"
+           value="{sequenceNo}"
     >
-    <input
-            type="hidden"
-            name="ordline[1][supplierID]"
-            id="supplierID"
-            value="{supplierID}"
+    <input type="hidden"
+           name="ordline[1][supplierID]"
+           value="{supplierID}"
+           id="supplierID"
     >
-    <input
-            type="hidden"
-            name="ordline[1][renewalCustomerItemID]"
-            value="{renewalCustomerItemID}"
+    <input type="hidden"
+           name="ordline[1][renewalCustomerItemID]"
+           value="{renewalCustomerItemID}"
     >
+    <input type="hidden"
+           name="ordline[1][isRecurring]"
+           value="{isRecurring}"
+    />
     <table width="500px"
            border="0"
            cellspacing="0"
@@ -95,35 +122,41 @@
         <tr>
             <td class="promptText">Line Type</td>
             <td class="field">
-                <select
-                        {lineTypeReadOnly}"
-                type="text"
-                id="lineType"
-                name="ordline[1][lineType]"
+                <select {lineTypeReadOnly}
+                        type="text"
+                        id="lineType"
+                        name="ordline[1][lineType]"
                 >
-                <!-- BEGIN lineTypeBlock -->
-                <option {lineTypeSelected}
-                        value="{lineType}"
-                >{lineTypeDesc}
-                </option>
-                <!-- END lineTypeBlock -->
+                    <!-- BEGIN lineTypeBlock -->
+                    <option {lineTypeSelected}
+                            value="{lineType}"
+                    >{lineTypeDesc}
+                    </option>
+                    <!-- END lineTypeBlock -->
                 </select>
             </td>
         </tr>
         <tr>
             <td class="promptText">Item</td>
             <td class="field">
-                <input
-                        type="text"
-                        name="ordline[1][description]"
-                        id="itemDescription"
-                        value="{description}"
-                        onChange="javascript:validateItemDescription()"
-                        onKeydown="javascript:checkFunctionKey(itemDescription)"
-                        size="70"
-                        maxlength="70"
+                <input type="text"
+                       name="ordline[1][description]"
+                       id="itemDescription"
+                       value="{description}"
+                       onChange="javascript:validateItemDescription()"
+                       onKeydown="javascript:checkFunctionKey(itemDescription)"
+                       size="70"
+                       maxlength="70"
                 >
                 <font class="formErrorMessage">{descriptionMessage}</font>
+            </td>
+        </tr>
+        <tr id="partNumberRow"
+            style="display: none"
+        >
+            <td class="promptText">Part Number</td>
+            <td class="field">
+
             </td>
         </tr>
         <tr>
@@ -180,7 +213,6 @@
                 <input
                         type="text"
                         name="ordline[1][curUnitSale]"
-                        id="curUnitSale"
                         value="{curUnitSale}"
                         align="right"
                         onKeypress="javascript:submitOnReturn()"

@@ -8,6 +8,7 @@ require_once($cfg["path_dbe"] . "/DBEExternalItem.inc.php");
 class DBEJExternalItem extends DBEExternalItem
 {
     const itemTypeDescription = 'itemTypeDescription';
+    const itemTypeId = 'itemTypeId';
 
     /**
      * calls constructor()
@@ -20,6 +21,12 @@ class DBEJExternalItem extends DBEExternalItem
         parent::__construct($owner);
         $this->setAddColumnsOn();
         $this->addColumn(self::itemTypeDescription, DA_STRING, DA_ALLOW_NULL, 'itemtype.ity_desc');
+        $this->addColumn(
+            self::itemTypeId,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            'externalitem.itemTypeID'
+        );
         $this->setAddColumnsOff();
     }
 

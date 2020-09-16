@@ -406,7 +406,7 @@ class CTCNC extends Controller
 
 
         if ($this->hasPermissions(SALES_PERMISSION)) {
-            $menu->addSection("Sales", 'fa-tag', $this->getDefaultSalesMenu());            
+            $menu->addSection("Sales", 'fa-tag', $this->getDefaultSalesMenu());
             $this->addConditionalMenu(
                 $menu,
                 'fa-tag',
@@ -416,7 +416,7 @@ class CTCNC extends Controller
                 "StreamOne Licenses",
                 "CustomerLicenses.php?action=searchCustomers"
             );
-            
+
             // [
             //     "id"    => 312,
             //     "label" => "StreamOne Licenses",
@@ -540,7 +540,7 @@ class CTCNC extends Controller
             ],
             [
                 "id"    => 103,
-                "href"  => "CurrentActivityReport.php?action=setFilter&selectedCustomerID=",
+                "href"  => "CurrentActivityReport.php",
                 "label" => "Current Service Requests",
             ],
             [
@@ -579,7 +579,7 @@ class CTCNC extends Controller
             [
                 "id"    => 110,
                 "href"  => "DailyReport.php?action=outstandingIncidents&onScreen=true&dashboard=true&daysAgo=7",
-                "label" => "7 Dayers",
+                "label" => "Aged Service Requests",
             ],
             [
                 "id"    => 111,
@@ -813,7 +813,7 @@ class CTCNC extends Controller
                 "label" => "Quote Templates",
                 "href"  => "QuoteTemplates.php",
             ],
-            
+
             // [
             //     "id"    => 313,
             //     "label" => "TechData Orders",
@@ -1047,6 +1047,11 @@ class CTCNC extends Controller
                 "href"  => "ItemType.php",
             ],
             [
+                "id"    => 812,
+                "label" => "Items",
+                "href"  => "Item.php"
+            ],
+            [
                 "id"    => 806,
                 "label" => "Standard Text",
                 "href"  => "StandardText.php",
@@ -1222,5 +1227,5 @@ class CTCNC extends Controller
         }
         echo $js_code;
     }
-    
+
 }

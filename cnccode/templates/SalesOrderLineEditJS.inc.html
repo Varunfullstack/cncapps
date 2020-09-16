@@ -47,27 +47,7 @@
         }
     }
 
-    function bulkUpdateClick() {
-        var ret = false;
-        var seletedOptionText = document.getElementById('action').options[document.getElementById('action').selectedIndex].text;
 
-        if (seletedOptionText == 'change supplier') {
-            /*
-            We use the value in SupplierID field of ""add line"
-            */
-            if (document.getElementById("updateSupplierID").value == 0) {
-                alert('Please select a Supplier');
-                return false;
-            }
-        }
-
-        if (
-            confirm('Are you sure you want to ' + seletedOptionText)
-        ) {
-            ret = true;
-        }
-        return ret;
-    }
 
     function submitOnReturn() {
         if (event.keyCode == 13) {

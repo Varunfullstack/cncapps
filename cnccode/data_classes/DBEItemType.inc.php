@@ -100,6 +100,17 @@ class DBEItemType extends DBCNCEntity
         $ret = (parent::getRows());
     }
 
+    function getRowsByDescription($description)
+    {
+        global $db;
+        $escapedDescription = mysqli_real_escape_string($db->link_id(), $description);
+        $statement =
+            "SELECT {$this->getDBColumnNamesAsString()} as distinctDescription  FROM {$this->getTableName()} where  {$this->getDBColumnName(self::description)} like '%{$escapedDescription}%' order by {$this->getDBColumnName(self::description)}";
+
+        $this->setQueryString($statement);
+        $ret = (parent::getRows());
+    }
+
     protected function getSortOrderForItem($id)
     {
         $this->getRow($id);

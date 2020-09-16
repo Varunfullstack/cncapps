@@ -1,0 +1,60 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue974-0">
+        <tagDatabase tag="issue974"/>
+    </changeSet>
+    <changeSet id="issue974-1" author="pavwebdev">
+        <sql splitStatements="true">
+            UPDATE
+                item
+            SET item.`itm_itemtypeno` =
+                    CASE
+                        WHEN item.`itm_itemtypeno` = 10
+                            THEN 9
+                        WHEN item.`itm_itemtypeno` = 14 OR item.`itm_itemtypeno` = 15
+                            THEN 13
+                        WHEN item.`itm_itemtypeno` = 17
+                            THEN 16
+                        WHEN item.`itm_itemtypeno` = 59
+                            THEN 58
+                        WHEN item.`itm_itemtypeno` = 36
+                            THEN 35
+                        WHEN item.`itm_itemtypeno` = 6
+                            THEN 2
+                        WHEN item.`itm_itemtypeno` = 49 OR item.`itm_itemtypeno` = 50 OR item.`itm_itemtypeno` = 51 OR
+                             item.`itm_itemtypeno` = 52
+                            THEN 12
+                        WHEN item.`itm_itemtypeno` = 22
+                            THEN 21
+                        WHEN item.`itm_itemtypeno` = 48 OR item.`itm_itemtypeno` = 19 OR item.`itm_itemtypeno` = 40 OR
+                             item.`itm_itemtypeno` = 20
+                            THEN 18
+                        WHEN item.`itm_itemtypeno` = 44 OR item.`itm_itemtypeno` = 45 OR item.`itm_itemtypeno` = 47 OR
+                             item.`itm_itemtypeno` = 32 OR item.`itm_itemtypeno` = 33 OR item.`itm_itemtypeno` = 31 OR
+                             item.`itm_itemtypeno` = 46
+                            THEN 30
+                        WHEN item.`itm_itemtypeno` = 28
+                            THEN 23
+                        ELSE item.`itm_itemtypeno`
+                        END;
+            DELETE
+            FROM itemtype
+            WHERE ity_itemtypeno IN
+                  (10, 14, 15, 17, 59, 36, 6, 49, 50, 51, 52, 22, 48, 19, 40, 20, 44, 45, 47, 32, 33, 31, 46, 28);
+
+            update item set itm_itemtypeno = 2 where itm_itemtypeno = 0;
+        </sql>
+    </changeSet>
+    <changeSet id="issue974-2" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyTableName="item" foreignKeyName="fk_itemtypeId"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseTableName="item" baseColumnNames="itm_itemtypeno" constraintName="fk_itemtypeId"
+                                 referencedTableName="itemtype"
+                                 referencedColumnNames="ity_itemtypeno" onDelete="RESTRICT" onUpdate="CASCADE"/>
+    </changeSet>
+</databaseChangeLog>

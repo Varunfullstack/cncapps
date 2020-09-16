@@ -1,28 +1,35 @@
 <!-- Template: SalesOrderItemLine.inc.html -->
 <tr onMouseOver="this.bgColor='#FFFFCC';"
     onMouseOut="this.bgColor='';"
+    data-line-id="{lineId}"
+    data-sequence-no="{sequenceNo}"
 >
-    <INPUT type="hidden"
-           id="partNo"
-           name="ordline[{lineId}][partNo]"
-           value="{partNo}"
-    >
-    <INPUT type="hidden"
-           id="sequenceNo"
-           name="ordline[{lineId}][sequenceNo]"
-           value="{sequenceNo}"
-    >
-    <INPUT type="hidden"
-           name="ordline[{lineId}][id]"
-           value="{lineId}"
-    >
+    <td class="orderLineItem handle salesOrderButton">
+        <i class="fal fa-sort fa-2x"></i>
+    </td>
     <td class="orderLineItem">
         <input type="checkbox"
-               id="orderLine"
                name="selectedOrderLine[]"
                value="{lineId}"
                {orderLineChecked}
-        ></td>
+        >
+        <INPUT type="hidden"
+               name="ordline[{lineId}][lineType]"
+               value="{lineType}"
+        >
+        <INPUT type="hidden"
+               name="ordline[{lineId}][description]"
+               value="{description}"
+        >
+        <INPUT type="hidden"
+               name="ordline[{lineId}][sequenceNo]"
+               value="{sequenceNo}"
+        >
+        <INPUT type="hidden"
+               name="ordline[{lineId}][id]"
+               value="{lineId}"
+        >
+    </td>
     <td class="orderLineItem">{renewalIcon}</td>
     <td class="orderLineItem">
         <DIV align="left"> {salesOrderLineDesc}</DIV>
@@ -35,37 +42,37 @@
     </td>
     <td class="orderLineItem">
         <INPUT {readOnly}
-               type="text"
-               id="qtyOrdered"
+               type="number"
                name="ordline[{lineId}][qtyOrdered]"
                value="{qtyOrdered}"
                size="3"
+               class="lineItemQuantityOrdered"
         >
     </td>
     <td class="orderLineItem">
         <INPUT {readOnly}
-               type="text"
-               id="curUnitCost"
+               type="number"
                name="ordline[{lineId}][curUnitCost]"
                value="{curUnitCost}"
                size="3"
+               class="lineItemUnitCost"
         >
     </td>
-    <td class="orderLineItem">{curCostTotal}</td>
+    <td class="orderLineItem lineItemCostTotal">{curCostTotal}</td>
     <td class="orderLineItem">
         <INPUT {readOnly}
-               type="text"
-               id="curUnitSale"
+               type="number"
                name="ordline[{lineId}][curUnitSale]"
                value="{curUnitSale}"
                size="3"
+               class="lineItemUnitSale"
         >
     </td>
-    <td class="orderLineItem">{curSaleTotal}</td>
-    <td class="{orderLineProfitClass}">{curProfit}</td>
-    <td class="{orderLineProfitClass}">{percProfit}</td>
+    <td class="orderLineItem lineItemSaleTotal">{curSaleTotal}</td>
+    <td class="{orderLineProfitClass} lineItemProfitAmount">{curProfit}</td>
+    <td class="{orderLineProfitClass} lineItemProfitPercentage">{percProfit}</td>
     <td class="orderLineItem">
-        <DIV align="left"> {salesOrderLineIcons}{salesOrderLineUpdateItemPriceIcon}</DIV>
+        <DIV align="left"> {salesOrderLineIcons}</DIV>
     </td>
 </tr>
 <!-- End Template: SalesOrderItemLine.inc.html -->

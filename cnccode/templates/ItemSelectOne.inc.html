@@ -1,35 +1,39 @@
 <html>
 <head>
-<script type="text/javascript">
-function submitItem(itemID, itemDescription, curUnitSale, curUnitCost, qtyOrdered, slaResponseHours) {
-	if ((opener) && (!opener.closed)) {
-		if(opener.document.getElementById("{parentIDField}")){
-			opener.document.getElementById("{parentIDField}").value=itemID;
-		}
-		if(opener.document.getElementById("{parentDescField}")){
-			opener.document.getElementById("{parentDescField}").value=itemDescription;
-		}
-    if(opener.document.getElementById("{parentSlaResponseHoursField}")){
-      opener.document.getElementById("{parentSlaResponseHoursField}").value=slaResponseHours;
-    }
-		if(opener.document.getElementById("curUnitCost")){
-			opener.document.getElementById("curUnitCost").value=curUnitCost;
-		}
-		if(opener.document.getElementById("curUnitSale")){
-			opener.document.getElementById("curUnitSale").value=curUnitSale;
-		}
-		if(opener.document.getElementById("qtyOrdered")){
-			opener.document.getElementById("qtyOrdered").value=qtyOrdered;
-		}
-		window.close();
-	}
-}
-</script>
+    <script type="text/javascript">
+        function submitItem(itemID, itemDescription, curUnitSale, curUnitCost, qtyOrdered, slaResponseHours) {
+            if ((opener) && (!opener.closed)) {
+                const parentIDField = opener.document.getElementById("{parentIDField}");
+                if (parentIDField) {
+                    parentIDField.value = itemID;
+                    const evt = document.createEvent('HTMLEvents');
+                    evt.initEvent('change', false, true);
+                    parentIDField.dispatchEvent(evt);
+                }
+                if (opener.document.getElementById("{parentDescField}")) {
+                    opener.document.getElementById("{parentDescField}").value = itemDescription;
+                }
+                if (opener.document.getElementById("{parentSlaResponseHoursField}")) {
+                    opener.document.getElementById("{parentSlaResponseHoursField}").value = slaResponseHours;
+                }
+                if (opener.document.getElementById("curUnitCost")) {
+                    opener.document.getElementById("curUnitCost").value = curUnitCost;
+                }
+                if (opener.document.getElementById("curUnitSale")) {
+                    opener.document.getElementById("curUnitSale").value = curUnitSale;
+                }
+                if (opener.document.getElementById("qtyOrdered")) {
+                    opener.document.getElementById("qtyOrdered").value = qtyOrdered;
+                }
+                window.close();
+            }
+        }
+    </script>
 </head>
 <body>
 <!-- BEGIN itemBlock -->
 <script type="text/javascript">
-submitItem({itemID}, "{submitDescription}", "{curUnitSale}", "{curUnitCost}", "{qtyOrdered}", "{slaResponseHours}");
+    submitItem({itemID}, "{submitDescription}", "{curUnitSale}", "{curUnitCost}", "{qtyOrdered}", "{slaResponseHours}");
 </script>
 <!-- END itemBlock -->
 </body>

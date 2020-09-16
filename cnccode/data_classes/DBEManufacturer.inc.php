@@ -3,6 +3,7 @@
 * @authors Karim Ahmed
 * @access public
 */
+global $cfg;
 require_once($cfg["path_dbe"] . "/DBCNCEntity.inc.php");
 
 class DBEManufacturer extends DBCNCEntity
@@ -27,24 +28,19 @@ class DBEManufacturer extends DBCNCEntity
         $this->setAddColumnsOff();
     }
 
-    function getRowsByNameMatch()
+    function getRowsByNameMatch($name, $limit = true)
     {
         $this->setMethodName("getRowsByNameMatch");
-        if ($this->getValue(self::name) == '') {
-            $this->raiseError('name not set');
+        if (!$name) {
+            $this->getRows(self::name);
         }
-
+        global $db;
+        $escapedName = mysqli_real_escape_string($db->link_id(), $name);
         $queryString =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " WHERE 1=1";
-        $queryString .=
-            " AND man_name LIKE '%" . $this->getValue(self::name) . "%'";
-
-
-        $queryString .=
-            " ORDER BY " . $this->getDBColumnName(self::name) .
-            " LIMIT 0,200";
+            "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} WHERE  man_name LIKE '%{$escapedName}%' ORDER BY {$this->getDBColumnName(self::name)}";
+        if ($limit) {
+            $queryString .= " LIMIT 0,200";
+        }
 
         $this->setQueryString($queryString);
 

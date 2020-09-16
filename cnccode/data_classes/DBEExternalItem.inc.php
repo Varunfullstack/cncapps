@@ -14,6 +14,7 @@ class DBEExternalItem extends DBEntity
     const notes = 'notes';
     const licenceRenewalDate = 'licenceRenewalDate';
 
+
     /**
      * calls constructor()
      * @access public

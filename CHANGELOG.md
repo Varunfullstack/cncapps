@@ -8,6 +8,93 @@ This project changes will be shown here.
 - Issue 914 - Customer Page Customer Notes, Projects, Portal Documents Rewrite
 - Issue 915 - Customer Page Sites Rewrite
 
+## [v4.5.6] - 2020-09-14
+### Fixed
+- Fixed issue when creating SR from Sales Order not picking up all the selected lines
+- Fixed issue with Invoice delete line buttons not responding
+- Fixed issue with editing Sales Orders lines, not allowing to change the supplier
+
+## [v4.5.5] - 2020-09-07
+### Fixed
+- Fixed issue with query failing when pulling servers for customer in Customer Review Meeting Agenda (getServersByCustomerID())
+
+## [v4.5.4] - 2020-09-02
+### Added
+- Add the ability to add items to Credit Notes
+
+
+## [v4.5.3] - 2020-09-01
+### Fixed
+- Fixed issue with totals for recurring table showing wrong values in Sales order page
+
+## [v4.5.2] - 2020-08-28
+### Fixed
+- Fixed issue with updating lines
+- Fix issue with O365 Mailbox report not showing correctly in Renewal Report
+
+## [v4.5.1] - 2020-08-28
+### Fixed
+- Fixed issue with user performance data not considering cncLoggedHours
+
+## [v4.5.0] - 2020-08-28
+### Added
+- Issue 999 - Sales Order insert in place feature
+### Changed
+- Issue 997 - Improve Edit GUI to make it more intuitive
+- Issue 990 - Current Service Request menu link
+- Issue 1000 - Link manual O365 Mailbox Report to Software Subscription
+- Issue 987 - Show CNC logged time in the user graphs
+
+## [v4.4.2] - 2020-08-27
+### Fixed
+- Fix issue with inserting after reordering the lines
+
+## [v4.4.1] - 2020-08-26
+### Added
+- Show the Part Number in the edit item page
+### Changed
+- Changed the way lines are dragged in sales orders to allow for copy/select line text
+- Changed the size of the trash icon in sales order lines
+### Fixed
+- Fixed issue with Renewals Sales orders not assigning the recurring flag correctly
+- Fixed issue with deleting lines in Sales Orders
+- Fixed issue when adding an itemtype
+
+## [v4.4.0] - 2020-08-25
+### Added
+- Issue 961 - Team Performance at the start of the month
+- Issue 971 - Ability to allocate Sales Requests to people
+- Issue 901 - Webroot API for Billing and Reporting
+- Issue 521 - Split up renewal items from quotes
+- Issue 965 - StreamOne missing license email notification addition
+### Changed
+- Issue 964 - Make Office 365 Backup unit numbers field read only because it's linked to an API
+- Issue 899 - Link dependant Sales Items
+- Issue 979 - Purchase Order Date Formatting
+- Issue 974 - New Method to edit Items
+- Issue 988 - Rename 7 Dayers
+- Issue 994 - "Please reply above the line" text in SR emails to customers
+### Fixed
+- Issue 968 - Clear Special Attention Status Once Expired
+- Issue 970 - StreamOne Page Permissions
+
+## [v4.3.5] - 2020-08-18
+### Fixed
+- When Despatching, it can change the order of items.
+
+## [v4.3.4] - 2020-08-10
+### Fixed
+- Fixed sale price calculation from UpdatePriceItemFromStreamOne
+
+## [v4.3.3] - 2020-08-04
+### Fixed
+- Fixed Issues with StreamOne addOns New licenses
+- Fixed Issues with Customer Page not saving StreamOne email
+
+## [v4.3.2] - 2020-08-04
+### Fixed
+- Fixed Issues with StreamOne New licenses
+
 ## [v4.3.1] - 2020-08-03
 ### Fixed
 - Fixed Issues with StreamOne licenses

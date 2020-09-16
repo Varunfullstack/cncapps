@@ -22,7 +22,10 @@ trait SortableWithQueryDBE
     {
         /** @var $db \dbSweetcode */
         global $db;
-        $query = "select max({$this->getSortOrderColumnName()}) as maxSortOrder from {$this->getTableName()} where {$this->getDiscriminatorColumnName()} = {$this->getDiscriminatorColumnValue()}";
+        $query = "select max({$this->getSortOrderColumnName()}) as maxSortOrder from {$this->getTableName()} where 
+                                                   {$this->getDiscriminatorCondition()}
+                                                   
+                                                   ";
         $result = $db->query($query);
         if (!$result) {
             throw new \Exception("Failed to execute query: $query");
@@ -37,9 +40,7 @@ trait SortableWithQueryDBE
 
     abstract protected function getTableName();
 
-    abstract protected function getDiscriminatorColumnName();
-
-    abstract protected function getDiscriminatorColumnValue();
+    abstract protected function getDiscriminatorCondition();
 
     public function swapPlaces($oldOrderId, $newOrderId)
     {
@@ -61,7 +62,7 @@ SET
     ELSE {$this->getSortOrderColumnName()}
   END
 WHERE {$this->getSortOrderColumnName()} BETWEEN LEAST($newOrderId, $oldOrderId)
-    AND GREATEST($newOrderId, $oldOrderId) and {$this->getDiscriminatorColumnName()} = {$this->getDiscriminatorColumnValue()} ";
+    AND GREATEST($newOrderId, $oldOrderId) and {$this->getDiscriminatorCondition()} ";
 
         $db->query($query);
         $db->next_record();

@@ -27,6 +27,7 @@ class DBEOrdline extends DBEntity
     const curUnitSale = "curUnitSale";
     const curTotalSale = "curTotalSale";
     const renewalCustomerItemID = "renewalCustomerItemID";
+    const isRecurring = "isRecurring";
 
     /**
      * calls constructor()
@@ -140,6 +141,13 @@ class DBEOrdline extends DBEntity
             DA_ID,
             DA_ALLOW_NULL,
             "odl_renewal_cuino"
+        );
+        $this->addColumn(
+            self::isRecurring,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            false
         );
         $this->setPK(0);
         $this->setAddColumnsOff();
@@ -308,18 +316,16 @@ class DBEOrdline extends DBEntity
         return parent::deleteRow($pkValue);
     }
 
-    protected function getDiscriminatorColumnValue()
-    {
-        return $this->getValue(self::ordheadID);
-    }
-
     protected function getSortOrderColumnName()
     {
         return $this->getDBColumnName(self::sequenceNo);
     }
 
-    protected function getDiscriminatorColumnName()
+
+    protected function getDiscriminatorCondition()
     {
-        return $this->getDBColumnName(self::ordheadID);
+        global $db;
+        $isRecurringString = $this->getValue(self::isRecurring) ? '1' : '0';
+        return "{$this->getDBColumnName(self::ordheadID)} = '{$this->getValue(self::ordheadID)}' and {$this->getDBColumnName(self::isRecurring)} = {$isRecurringString}";
     }
 }
