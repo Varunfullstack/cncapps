@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 1009 - Asset list drive space incorrect in some cases
+
 ## [v4.5.6] - 2020-09-14
 ### Fixed
 - Fixed issue when creating SR from Sales Order not picking up all the selected lines
