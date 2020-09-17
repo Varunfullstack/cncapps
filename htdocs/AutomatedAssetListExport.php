@@ -166,7 +166,22 @@ IF(
   processor.name AS "CPU",
   computers.totalmemory AS "Memory",
   SUM(drives.Size) AS "Total Disk",
-  if(exd.`Bitlocker Enabled` and exd.`Bitlocker Password/Key` regexp \'[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}\',\'Encrypted\',null) as \'Drive Encryption\',
+  CASE
+    WHEN (exd.`Bitlocker Enabled`
+    AND exd.`Bitlocker Password/Key` REGEXP \'[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}\')
+        or exd.`Bitlocker Failure Reson` like "Bitlocker Enabled%"
+        or exd.`Bitlocker Failure Reson` like "Bitlocker has Completed Sucessfully%"
+    THEN \'Encrypted\'
+    WHEN exd.`Bitlocker Failure Reson` LIKE \'TPM is not enabled%\'
+    THEN "Hardware not enabled / capable"
+    WHEN exd.`Bitlocker Failure Reson` LIKE \'TPM is not ready%\'
+    THEN "Hardware capable but not enabled"
+    WHEN exd.`Bitlocker Failure Reson` LIKE \'TPM is present and activated but Windows cannot encrypt the drive%\'
+    THEN "Capable but failed"
+    WHEN exd.`Bitlocker Failure Reson` LIKE \'Bitlocker Key is not Present Check the Key field for any additional Errors%\' THEN NULL
+    
+    ELSE exd.`Bitlocker Failure Reson`
+  END AS \'Drive Encryption\',
   SUBSTRING_INDEX(
     computers.os,
     \'Microsoft Windows \',
@@ -257,7 +272,6 @@ ON computers.computerid = processor.computerid
     where clients.externalID = ? and  ServiceVersion
 GROUP BY computers.computerid 
 ORDER BY Location, `Computer Name`';
-    var_dump($query);
     $customerID = $dbeCustomer->getValue(DBECustomer::customerID);
     $customerName = $dbeCustomer->getValue(DBECustomer::name);
 
