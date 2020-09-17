@@ -27,7 +27,7 @@ export default class Site extends React.Component {
         >
             <div className="card">
                 <div className="card-header"
-                     id="heading{siteNo}"
+                     id={`heading${this.props.site.siteNo}`}
                      style={{width: "100%"}}
                 >
                     <h5 className="mb-0">
@@ -72,7 +72,7 @@ export default class Site extends React.Component {
                                            onChange={($event) => this.handleInputChange($event)}
                                            size="35"
                                            maxLength="35"
-                                           className="form-control"
+                                           className="form-control input-sm"
                                     />
                                 </div>
                             </div>
@@ -85,7 +85,7 @@ export default class Site extends React.Component {
                                            onChange={($event) => this.handleInputChange($event)}
                                            size="25"
                                            maxLength="25"
-                                           className="form-control"
+                                           className="form-control input-sm"
                                     />
                                 </div>
                             </div>
@@ -97,7 +97,7 @@ export default class Site extends React.Component {
                                            onChange={($event) => this.handleInputChange($event)}
                                            size="25"
                                            maxLength="25"
-                                           className="form-control"
+                                           className="form-control input-sm"
                                     />
                                 </div>
                             </div>
@@ -109,7 +109,7 @@ export default class Site extends React.Component {
                                            onChange={($event) => this.handleInputChange($event)}
                                            size="15"
                                            maxLength="15"
-                                           className="form-control"
+                                           className="form-control input-sm"
                                     />
                                 </div>
                             </div>
@@ -121,7 +121,7 @@ export default class Site extends React.Component {
                                            onChange={($event) => this.handleInputChange($event)}
                                            size="20"
                                            maxLength="20"
-                                           className="form-control telephoneValidator"
+                                           className="form-control input-sm telephoneValidator"
                                     />
                                 </div>
                             </div>
@@ -136,7 +136,19 @@ export default class Site extends React.Component {
                                            type="number"
                                            size="5"
                                            maxLength="5"
-                                           className="form-control"
+                                           className="form-control input-sm"
+                                    />
+                                </div>
+                            </div>
+                            <div className="col-lg-4">
+                                <label htmlFor="what3Words">What3Words</label>
+                                <div className="form-group">
+                                    <input name="what3Words"
+                                           id="What3Words"
+                                           value={this.props.site.what3Words || ''}
+                                           size="5"
+                                           maxLength="5"
+                                           className="form-control input-sm"
                                     />
                                 </div>
                             </div>
@@ -147,7 +159,7 @@ export default class Site extends React.Component {
                                 <div className="form-group form-inline">
                                     <input type="radio"
                                            name="invoiceSiteNo"
-                                           value={this.props.site.siteNo}
+                                           value={this.props.site.siteNo || ''}
                                            checked={+this.props.invoiceSiteNo === +this.props.site.siteNo}
                                            onChange={($event) => this.props.changeInvoiceSiteNo($event.target.value)}
                                            className="form-control"
@@ -161,7 +173,7 @@ export default class Site extends React.Component {
                                 <div className="form-group form-inline">
                                     <input type="radio"
                                            name="deliverSiteNo"
-                                           value={this.props.site.siteNo}
+                                           value={this.props.site.siteNo || ''}
                                            checked={+this.props.deliverSiteNo === +this.props.site.siteNo}
                                            onChange={($event) => this.props.changedDeliverSiteNo($event.target.value)}
                                            className="form-control"
@@ -174,7 +186,7 @@ export default class Site extends React.Component {
                                 </label>
                                 <div className="form-group">
                                     <select name="invoiceContact"
-                                            className="form-control"
+                                            className="form-control input-sm"
                                             value={this.props.site.invoiceContact || ''}
                                             onChange={($event) => this.handleInputChange($event)}
                                     >
@@ -196,7 +208,7 @@ export default class Site extends React.Component {
                                 </label>
                                 <div className="form-group">
                                     <select name="deliveryContact"
-                                            className="form-control"
+                                            className="form-control input-sm"
                                             value={this.props.site.deliveryContact || ''}
                                             onChange={($event) => this.handleInputChange($event)}
                                     >
@@ -213,30 +225,34 @@ export default class Site extends React.Component {
                                 </div>
                             </div>
                             <div className="col-lg-2">
-                                <label htmlFor="non-uk">
-                                    Non UK
-                                </label>
+                                <label>Non UK</label>
                                 <div className="form-group form-inline">
-                                    <input type="checkbox"
-                                           name="nonUKFlag"
-                                           onChange={($event) => this.handleInputChange($event)}
-                                           title="Check to show this site is overseas and not in the UK"
-                                           value="1"
-                                           checked={this.props.site.nonUKFlag}
-                                           className="form-control"
-                                    />
+                                    <label className="switch">
+                                        <input type="checkbox"
+                                               name="nonUKFlag"
+                                               onChange={($event) => this.handleInputChange($event)}
+                                               title="Check to show this site is overseas and not in the UK"
+                                               value="1"
+                                               checked={this.props.site.nonUKFlag}
+                                               className="form-control"
+                                        />
+                                        <span className="slider round"/>
+                                    </label>
                                 </div>
                             </div>
                             <div className="col-lg-2">
                                 <label>Active</label>
                                 <div className="form-group form-inline">
-                                    <input type="checkbox"
-                                           name="active"
-                                           onChange={($event) => this.handleInputChange($event)}
-                                           checked={this.props.site.active}
-                                           value="1"
-                                           className="form-control"
-                                    />
+                                    <label className="switch">
+                                        <input type="checkbox"
+                                               name="active"
+                                               onChange={($event) => this.handleInputChange($event)}
+                                               checked={this.props.site.active}
+                                               value="1"
+                                               className="tick_field"
+                                        />
+                                        <span className="slider round"/>
+                                    </label>
                                 </div>
                             </div>
                             <div className="col-lg-12">

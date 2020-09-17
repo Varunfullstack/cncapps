@@ -62,7 +62,7 @@ class CustomerProjectsComponent extends React.Component {
                    onClick={($event) => !confirm('Are you sure you want to delete this project?') ? $event.preventDefault() : null}
         >
             <button className="btn btn-outline-danger">
-                <i className="fa fa-trash"/>
+                <i className="fal fa-trash-alt fa-lg"/>
             </button>
         </a>)
     }
@@ -138,20 +138,22 @@ class CustomerProjectsComponent extends React.Component {
         const {customerProjects} = this.state;
 
         return (
-            <div className="tab-pane fade customerEditProjects"
+            <div className="tab-pane fade customerAddProjects"
                  id="nav-profile"
                  role="tabpanel"
                  aria-labelledby="nav-profile-tab"
             >
-                <div className="customerEditProjects container-fluid mt-3 mb-3">
+                <div className="customerAddProjects mt-3">
                     <div className="row">
                         <div className="col-md-12">
                             <h2>Projects</h2>
                         </div>
                         <div className="col-md-12">
-                            <a href={`/Project.php?action=add&customerID=${customerId}`}>
-                                <button className="btn btn-primary mt-3 mb-3">Add Project</button>
-                            </a>
+                            <button className="btn btn-sm btn-new mt-3 mb-3"
+                                    data-toggle="modal"
+                                    data-target="#exampleModalCenter"
+                            >Add Project
+                            </button>
                         </div>
                     </div>
                     <div className="row">
@@ -174,26 +176,28 @@ class CustomerProjectsComponent extends React.Component {
                                 <tbody>
                                 {
                                     customerProjects.map(project => {
-                                        return (<tr key={project.id}>
-                                            <td>{project.name}</td>
-                                            <td>{project.notes && project.notes.substr(0, 50)}</td>
-                                            <td>{this.formatDate(project.startDate)}</td>
-                                            <td>{this.formatDate(project.expiryDate)}</td>
-                                            <td>
-                                                <a href={`/Project.php?action=edit&projectID=${project.id}`}>
-                                                    <button type="button"
-                                                            className="btn btn-outline-secondary"
-                                                    >
-                                                        <i className="fa fa-edit"/>
-                                                    </button>
-                                                </a>
-                                            </td>
-                                            <td>
-                                                {
-                                                    this.renderDeleteLink(project)
-                                                }
-                                            </td>
-                                        </tr>)
+                                        return (
+                                            <tr key={project.id}>
+                                                <td>{project.name}</td>
+                                                <td>{project.notes && project.notes.substr(0, 50)}</td>
+                                                <td>{this.formatDate(project.startDate)}</td>
+                                                <td>{this.formatDate(project.expiryDate)}</td>
+                                                <td>
+                                                    <a href={`/Project.php?action=edit&projectID=${project.id}`}>
+                                                        <button type="button"
+                                                                className="btn btn-outline-secondary"
+                                                        >
+                                                            <i className="fal fa-edit fa-lg"/>
+                                                        </button>
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    {
+                                                        this.renderDeleteLink(project)
+                                                    }
+                                                </td>
+                                            </tr>
+                                        )
                                     })
                                 }
 

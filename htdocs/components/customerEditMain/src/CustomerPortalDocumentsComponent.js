@@ -30,41 +30,43 @@ class CustomerPortalDocumentsComponent extends React.Component {
     renderPortalDocumentsRows() {
         return this.state.customerPortalDocuments.map(
             portalDocument => {
-                return (<tr key={`portalDocumentRow-${portalDocument.id}`}>
-                    <td>
-                        <a href={`/PortalCustomerDocument.php?action=viewFile&portalCustomerDocumentID=${portalDocument.id}`}
-                           title="View attached document"
-                        >{portalDocument.description}</a>
-                    </td>
-                    <td>
-                        <a href={`/PortalCustomerDocument.php?action=viewFile&portalCustomerDocumentID=${portalDocument.id}`}
-                           title="View attached document"
-                        >{portalDocument.description}</a>
-                    </td>
-                    <td>
-                        {portalDocument.customerContract ? 'Y' : 'N'}
-                    </td>
-                    <td>
-                        {portalDocument.mainContactOnly ? 'Y' : 'N'}
-                    </td>
-                    <td>
-                        <a href={`/PortalCustomerDocument.php?action=edit&portalCustomerDocumentID=${portalDocument.id}`} >
-                            <button className="btn btn-outline-secondary">
-                                <i className="fa fa-edit"/>
-                            </button>
-                        </a>
-                    </td>
-                    <td>
-                        <a href={`/PortalCustomerDocument.php?action=delete&portalCustomerDocumentID=${portalDocument.id}`}
-                           title="Delete attached document"
-                           onClick={($event) => !confirm('Are you sure you want to delete this document?') ? $event.preventDefault() : null}
-                        >
-                            <button className="btn btn-outline-danger">
-                                <i className="fa fa-trash"/>
-                            </button>
-                        </a>
-                    </td>
-                </tr>);
+                return (
+                    <tr key={`portalDocumentRow-${portalDocument.id}`}>
+                        <td>
+                            <a href={`/PortalCustomerDocument.php?action=viewFile&portalCustomerDocumentID=${portalDocument.id}`}
+                               title="View attached document"
+                            >{portalDocument.description}</a>
+                        </td>
+                        <td>
+                            <a href={`/PortalCustomerDocument.php?action=viewFile&portalCustomerDocumentID=${portalDocument.id}`}
+                               title="View attached document"
+                            >{portalDocument.description}</a>
+                        </td>
+                        <td>
+                            {portalDocument.customerContract ? 'Y' : 'N'}
+                        </td>
+                        <td>
+                            {portalDocument.mainContactOnly ? 'Y' : 'N'}
+                        </td>
+                        <td>
+                            <a href={`/PortalCustomerDocument.php?action=edit&portalCustomerDocumentID=${portalDocument.id}`}>
+                                <button className="btn btn-outline-secondary">
+                                    <i className="fal fa-edit fa-lg"/>
+                                </button>
+                            </a>
+                        </td>
+                        <td>
+                            <a href={`/PortalCustomerDocument.php?action=delete&portalCustomerDocumentID=${portalDocument.id}`}
+                               title="Delete attached document"
+                               onClick={($event) => !confirm('Are you sure you want to delete this document?') ? $event.preventDefault() : null}
+                            >
+                                <button className="btn btn-outline-danger">
+                                    <i className="fal fa-trash-alt fa-lg"/>
+                                </button>
+                            </a>
+                        </td>
+                    </tr>
+                );
             }
         )
     }
@@ -76,15 +78,17 @@ class CustomerPortalDocumentsComponent extends React.Component {
                  role="tabpanel"
                  aria-labelledby="nav-portal-documents-tab"
             >
-                <div className="container-fluid mt-3 mb-3">
+                <div className="mt-3">
                     <div className="row">
                         <div className="col-md-12">
                             <h2>Portal Documents</h2>
                         </div>
                         <div className="col-md-12">
-                            <a href={`/PortalCustomerDocument.php?action=add&customerID=${this.props.customerId}`}>
-                                <button className="btn btn-primary mt-3 mb-3">
-                                    Add Document
+                            <a>
+                                <button className="btn btn-sm btn-new mt-3 mb-3"
+                                        data-toggle="modal"
+                                        data-target="#portalDocumentsModal"
+                                >Add Document
                                 </button>
                             </a>
                         </div>
@@ -112,9 +116,7 @@ class CustomerPortalDocumentsComponent extends React.Component {
 
                         </div>
                     </div>
-
                 </div>
-
             </div>
         )
     }

@@ -97,10 +97,11 @@ class EncryptedTextInput extends React.Component {
 
         if (this.state.isEncrypted && this.state.encryptedValue) {
             return (
-                <button type="button" onClick={this.decryptValue}
-                        className='form-control'
+                <button type="button"
+                        onClick={this.decryptValue}
+                        className='form-control input-sm'
                 >
-                    <i className="fa fa-pencil-alt greenPencil"/>
+                    <i className="fal fa-pencil-alt greenPencil"/>
                 </button>
             );
         }
