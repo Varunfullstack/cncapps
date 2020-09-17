@@ -361,6 +361,59 @@ class CustomerEditMain extends React.Component {
     }
 
 
+// <h4>Notes</h4>
+// <div className="row">
+// <div className="col-md-4">
+// <div className="form-group">
+// <label htmlFor="reviewDate">
+// To be reviewed on:
+// </label>
+// <input type="date"
+// value={this.state.customer.reviewDate || ''}
+// className="form-control"
+// onChange={this.handleReviewDateUpdate}
+// />
+// </div>
+// </div>
+// <div className="col-md-4">
+// <div className="form-group">
+// <label htmlFor="">Time:</label>
+// <input type="time"
+// value={this.state.customer.reviewTime || ''}
+// className="form-control"
+// onChange={this.handleReviewTimeUpdate}
+// />
+// </div>
+// </div>
+// <div className="col-md-4">
+// <div className="form-group">
+// <label>By:</label>
+// <Select
+// options={this.state.reviewEngineers}
+// selectedOption={this.state.customer.reviewUserID || ''}
+// onChange={this.handleReviewUserIDUpdate}
+// key='reviewUserID'
+// className="form-control"
+// />
+// </div>
+// </div>
+// </div>
+//
+//
+// <div className="form-group customerReviewAction">
+// <textarea title="Action to be taken"
+// cols="120"
+// rows="3"
+// value={this.state.customer.reviewAction || ''}
+// className="form-control"
+// onChange={this.handleReviewActionUpdate}
+// />
+// </div>
+// <CustomerNotesComponent customerId={customerId}/>
+// <div>
+// {this.state.customer.lastContractSent}
+// </div>
+
     render() {
         const {customerId} = this.props;
         return (
@@ -369,37 +422,34 @@ class CustomerEditMain extends React.Component {
                  role="tabpanel"
                  aria-labelledby="nav-home-tab"
             >
-                <div className="container-fluid mt-3 mb-3">
+                <div className="mt-3">
                     <div className="row">
                         <div className="col-md-6 mb-3">
-                            <h2>Customer - {this.state.customer.name}</h2>
+                            <h2>Customer - {this.state.customer.name} <a href="#"><i className="fal fa-globe"></i></a>
+                            </h2>
                         </div>
                         <div className="col-md-6 mb-3">
                             <ul className="list-style-none float-right">
                                 <li>
                                     <button type="button"
-                                            className="btn btn-outline-success"
+                                            className="btn btn-sm btn-new"
                                             onClick={() => this.save()}
                                     >Save
                                     </button>
                                     <button type="button"
-                                            className="btn btn-outline-danger"
-                                    >Cancel
-                                    </button>
-                                    <button type="button"
-                                            className="btn btn-outline-secondary"
+                                            className="btn btn-sm btn-outline-secondary"
                                     >Set all
                                         users to no support
                                     </button>
                                     <button type="button"
-                                            className="btn btn-outline-secondary"
+                                            className="btn btn-sm btn-outline-secondary"
                                     >
-                                        <i className="fa fa-filter"/>
+                                        <i className="fal fa-filter"/>
                                     </button>
                                     <button type="button"
-                                            className="btn btn-outline-secondary"
+                                            className="btn btn-sm btn-outline-secondary"
                                     >
-                                        <i className="fa fa-ellipsis-v"/>
+                                        <i className="fal fa-ellipsis-v"/>
                                     </button>
                                 </li>
                             </ul>
@@ -407,482 +457,492 @@ class CustomerEditMain extends React.Component {
                     </div>
                     <div className="row">
                         <div className="col-md-6">
-                            <div className="row">
-                                <div className="col-lg-6">
-                                    <label>Customer {customerId}</label>
-                                    <div className="form-group">
-                                        <input type="text"
-                                               onChange={this.handleNameUpdate}
-                                               value={this.state.customer.name || ''}
-                                               size="50"
-                                               maxLength="50"
-                                               className="form-control"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="col-lg-6">
-                                    <label htmlFor="">Primary Main Contact</label>
-                                    <div className="form-group">
-                                        <Select
-                                            options={this.state.mainContacts}
-                                            selectedOption={this.state.customer.primaryMainContactID || ''}
-                                            onChange={this.handlePrimaryMainContactUpdate}
-                                            className='form-control'
-                                        />
-                                    </div>
-                                </div>
-                                <div className="col-lg-3">
-                                    <label>Mailshot</label>
-                                    <div className="form-group form-inline">
-                                        <input type="checkbox"
-                                               checked={this.state.customer.mailshotFlag === 'Y'}
-                                               onChange={this.handleMailshotFlagUpdate}
-                                               className="form-control"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="col-lg-3">
-                                    <label>Referred</label>
-                                    <div className="form-group form-inline">
-                                        <input type="checkbox"
-                                               className="form-control"
-                                               checked={this.state.customer.referredFlag === 'Y'}
-                                               onChange={this.handleReferredFlagUpdate}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="col-lg-6">
-                                    <label htmlFor="">Special Attention</label>
-                                    <div className="form-group form-inline">
-                                        <input type="checkbox"
-                                               className="form-control"
-                                               onChange={this.handleSpecialAttentionFlagUpdate}
-                                               checked={this.state.customer.specialAttentionFlag === 'Y'}
-                                        />
-                                        <div className="col-sm-4">until</div>
-                                        <input type="date"
-                                               value={this.state.customer.specialAttentionEndDate || ''}
-                                               size="10"
-                                               maxLength="10"
-                                               className="form-control"
-                                               onChange={this.handleSpecialAttentionDateUpdate}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="col-lg-12">
-                                    <label htmlFor="">Last Review Meeting</label>
-                                    <div className="form-group flex form-inline align-items-center">
-                                        <input type="date"
-                                               onChange={this.handleLastReviewMeetingDateUpdate}
-                                               value={this.state.customer.lastReviewMeetingDate || ''}
-                                               size="10"
-                                               maxLength="10"
-                                               className="form-control col-sm-4"
-                                        />
-                                        <label>Booked</label>
-                                        <input type="checkbox"
-                                               onChange={this.handleReviewMeetingBookedUpdate}
-                                               checked={this.state.customer.reviewMeetingBooked}
-                                               className="form-control"
-                                        />
-                                        <div className="col-sm-4">Frequency</div>
-                                        <Select
-                                            options={
-                                                [
-                                                    {label: 'Monthly', value: 1},
-                                                    {label: "Two Monthly", value: 2},
-                                                    {label: 'Quarterly', value: 3},
-                                                    {label: "Six-Monthly", value: 6},
-                                                    {label: 'Annually', value: 12}
-                                                ]
-                                            }
-                                            selectedOption={this.state.customer.reviewMeetingFrequencyMonths || ''}
-                                            onChange={this.handleReviewMeetingFrequencyMonthsUpdate}
-                                            className="form-control col-sm-4"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="col-lg-6">
-                                    <label htmlFor="">Lead Status</label>
-                                    <Select
-                                        options={this.state.leadStatuses}
-                                        selectedOption={this.state.customer.leadStatusId || ''}
-                                        onChange={this.handleLeadStatusIdUpdate}
-                                        className="form-control"
-                                    />
-                                </div>
-                                <div className="col-lg-6">
-                                    <label>24 Hour Cover</label>
-                                    <div className="form-group form-inline">
-                                        <input type="checkbox"
-                                               checked={this.state.customer.support24HourFlag === 'Y'}
-                                               onChange={this.handleSupport24HourFlagUpdate}
-                                               className="form-control"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="col-lg-6">
-                                    <label htmlFor="">Type</label>
-                                    <div className="form-group">
-                                        <Select options={this.state.customerTypes}
-                                                className="form-control"
-                                                selectedOption={this.state.customer.customerTypeID || ''}
-                                                onChange={this.handleCustomerTypeUpdate}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="col-lg-6">
-                                    <label htmlFor="">Sector</label>
-                                    <div className="form-group">
-                                        <Select options={this.state.sectors}
-                                                selectedOption={this.state.customer.sectorID || ''}
-                                                onChange={this.handleSectorIDUpdate}
-                                                className="form-control"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="col-lg-4">
-                                    <label htmlFor="">PCs</label>
-                                    <div className="form-group">
-                                        <input type="number"
-                                               value={this.state.customer.noOfPCs || ''}
-                                               onChange={this.handleNoOfPCsUpdate}
-                                               className="form-control"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="col-lg-4">
-                                    <label>Servers</label>
-                                    <div className="form-group">
-                                        <input type="number"
-                                               value={this.state.customer.noOfServers || ''}
-                                               onChange={this.handleNoOfServersUpdate}
-                                               className="form-control"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="col-lg-4">
-                                    <label>Reg</label>
-                                    <div className="form-group">
-                                        <input type="text"
-                                               value={this.state.customer.regNo || ''}
-                                               onChange={this.handleRegNoUpdate}
-                                               size="10"
-                                               maxLength="10"
-                                               className="form-control"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="col-lg-4">
-                                    <label>Sites</label>
-                                    <div className="form-group">
-                                        <input type="number"
-                                               value={this.state.customer.noOfSites || ''}
-                                               onChange={this.handleNoOfSitesUpdate}
-                                               size="2"
-                                               maxLength="2"
-                                               className="form-control"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="col-lg-4">
-                                    <label>Pre-pay Top Up</label>
-                                    <div className="form-group">
-                                        <input type="text"
-                                               value={this.state.customer.gscTopUpAmount || ''}
-                                               onChange={this.handleGscTopUpAmountUpdate}
-                                               size="10"
-                                               maxLength="10"
-                                               className="form-control"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="col-lg-4">
-                                    <label>Became Customer</label>
-                                    <div className="form-group">
+                            <div className="card mb-3">
+                                <div className="card-body">
+                                    <div className="row">
+                                        <div className="col-md-12">
+                                            <h5>Key Details</h5>
+                                        </div>
+                                        <div className="col-lg-6">
+                                            <label>Customer {customerId}</label>
+                                            <div className="form-group">
+                                                <input type="text"
+                                                       onChange={this.handleNameUpdate}
+                                                       value={this.state.customer.name || ''}
+                                                       size="50"
+                                                       maxLength="50"
+                                                       className="form-control input-sm"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="col-lg-6">
+                                            <label htmlFor="">Primary Main Contact</label>
+                                            <div className="form-group">
+                                                <Select
+                                                    options={this.state.mainContacts}
+                                                    selectedOption={this.state.customer.primaryMainContactID || ''}
+                                                    onChange={this.handlePrimaryMainContactUpdate}
+                                                    className='form-control input-sm'
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="col-lg-3">
+                                            <label>Referred</label>
+                                            <div className="form-group form-inline pt-1">
+                                                <label className="switch">
+                                                    <input type="checkbox"
+                                                           checked={this.state.customer.referredFlag === 'Y'}
+                                                           onChange={this.handleReferredFlagUpdate}
+                                                    />
+                                                    <span className="slider round"/>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div className="col-lg-3">
+                                            <label>24 Hour Cover</label>
+                                            <div className="form-group form-inline pt-1">
+                                                <label className="switch"
+                                                >
+                                                    <input type="checkbox"
+                                                           checked={this.state.customer.support24HourFlag === 'Y'}
+                                                           onChange={this.handleSupport24HourFlagUpdate}
+                                                    />
+                                                    <span className="slider round"/>
+                                                </label>
 
-                                        <input type="date"
-                                               value={this.state.customer.becameCustomerDate || ''}
-                                               onChange={this.handleBecameCustomerDateUpdate}
-                                               size="10"
-                                               maxLength="10"
-                                               className="form-control"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="col-lg-4">
-                                    <label>Dropped Date</label>
-                                    <div className="form-group">
-                                        <input type="date"
-                                               value={this.state.customer.droppedCustomerDate || ''}
-                                               onChange={this.handleDroppedCustomerDateUpdate}
-                                               size="10"
-                                               maxLength="10"
-                                               className="form-control"
-                                        />
+                                            </div>
+                                        </div>
+                                        <div className="col-lg-6">
+                                            <label htmlFor="">Special Attention</label>
+                                            <div className="form-group form-inline">
+                                                <label htmlFor=""
+                                                       className="switch mr-3"
+                                                >
+                                                    <input type="checkbox"
+                                                           onChange={this.handleSpecialAttentionFlagUpdate}
+                                                           checked={this.state.customer.specialAttentionFlag === 'Y'}
+                                                    />
+                                                    <span className="slider round"/>
+                                                </label>
+                                                <div className="form-group mr-3">
+                                                    <label className="pr-3"
+                                                    >
+                                                        Until
+                                                    </label>
+                                                    <input type="date"
+                                                           value={this.state.customer.specialAttentionEndDate || ''}
+                                                           size="10"
+                                                           maxLength="10"
+                                                           className="form-control input-sm"
+                                                           onChange={this.handleSpecialAttentionDateUpdate}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <hr/>
-                            <div className="row">
-                                <div className="col-lg-12">
-                                    <label htmlFor="">SLA Response Hours</label>
-                                    <div className="form-group form-inline">
-                                        <label style={{margin: "0 .5rem"}}>1</label>
-                                        <input type="number"
-                                               value={this.state.customer.slaP1 || ''}
-                                               onChange={this.handleSLAP1Update}
-                                               size="1"
-                                               maxLength="3"
-                                               className="form-control col-sm-4"
-                                        />
-                                        <label style={{margin: "0 .5rem"}}>2</label>
-                                        <input type="number"
-                                               value={this.state.customer.slaP2 || ''}
-                                               onChange={this.handleSLAP2Update}
-                                               size="1"
-                                               maxLength="3"
-                                               className="form-control col-sm-4"
-                                        />
-                                    </div>
-                                    <div className="form-group form-inline">
+                            <div className="card mb-3">
+                                <div className="card-body">
+                                    <div className="row">
+                                        <div className="col-md-12"><h5>Review Meetings</h5></div>
+                                        <div className="col-lg-12">
+                                            <div className="form-inline">
+                                                <div className="form-group mr-3">
+                                                    <label htmlFor="ex3"
+                                                           className="col-form-label pr-3"
+                                                    >Last Review Meeting
+                                                    </label>
+                                                    <input type="date"
+                                                           onChange={this.handleLastReviewMeetingDateUpdate}
+                                                           value={this.state.customer.lastReviewMeetingDate || ''}
+                                                           size="10"
+                                                           maxLength="10"
+                                                           className="form-control input-sm"
+                                                    />
+                                                </div>
+                                                <div className="checkbox mr-3 d-flex p-2 justify-content-between align-items-center">
+                                                    <label className="pr-3">Booked</label>
+                                                    <label className="switch inline"
+                                                    >
+                                                        <input type="checkbox"
+                                                               onChange={this.handleReviewMeetingBookedUpdate}
+                                                               checked={this.state.customer.reviewMeetingBooked}
+                                                        />
+                                                        <span className="slider round"/>
+                                                    </label>
 
-                                        <label style={{margin: "0 .5rem"}}>3</label>
-                                        <input type="number"
-                                               value={this.state.customer.slaP3 || ''}
-                                               onChange={this.handleSLAP3Update}
-                                               size="1"
-                                               maxLength="3"
-                                               className="form-control col-sm-4"
-                                        />
-                                        <label style={{margin: "0 .5rem"}}>4</label>
-                                        <input type="number"
-                                               value={this.state.customer.slaP4 || ''}
-                                               onChange={this.handleSLAP4Update}
-                                               size="1"
-                                               maxLength="3"
-                                               className="form-control col-sm-4"
-                                        />
-
-                                    </div>
-
-                                    <div className="form-group form-inline">
-                                        <label style={{margin: "0 .5rem"}}>5</label>
-                                        <input type="number"
-                                               value={this.state.customer.slaP5 || ''}
-                                               onChange={this.handleSLAP5Update}
-                                               size="1"
-                                               maxLength="3"
-                                               className="form-control col-sm-4"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="col-lg-12">
-                                    <label htmlFor="">SLA Response Fix Hours</label>
-                                    <div className="form-group form-inline">
-                                        <label style={{margin: "0 .5rem"}}>1</label>
-                                        <input value={this.state.customer.slaFixHoursP1 || ''}
-                                               type="number"
-                                               size="1"
-                                               step="0.1"
-                                               maxLength="4"
-                                               max="999.9"
-                                               onChange={this.handleSlaFixHoursP1}
-                                               className="form-control col-sm-4"
-                                        />
-                                        <label style={{margin: "0 .5rem"}}>2</label>
-                                        <input value={this.state.customer.slaFixHoursP2 || ''}
-                                               type="number"
-                                               size="1"
-                                               step="0.1"
-                                               maxLength="4"
-                                               max="999.9"
-                                               onChange={this.handleSlaFixHoursP2}
-                                               className="form-control col-sm-4"
-                                        />
-                                    </div>
-                                    <div className="form-group form-inline">
-                                        <label style={{margin: "0 .5rem"}}>3</label>
-                                        <input value={this.state.customer.slaFixHoursP3 || ''}
-                                               type="number"
-                                               size="1"
-                                               step="0.1"
-                                               maxLength="4"
-                                               max="999.9"
-                                               onChange={this.handleSlaFixHoursP3}
-                                               className="form-control col-sm-4"
-                                        />
-                                        <label style={{margin: "0 .5rem"}}>4</label>
-                                        <input value={this.state.customer.slaFixHoursP4 || ''}
-                                               type="number"
-                                               size="1"
-                                               step="0.1"
-                                               maxLength="4"
-                                               max="999.9"
-                                               onChange={this.handleSlaFixHoursP4}
-                                               className="form-control col-sm-4"
-                                        />
-
-                                    </div>
-                                </div>
-                                <div className="col-lg-4">
-                                    <label htmlFor="">SLA Penalties Agreed</label>
-                                    <div className="form-group form-inline">
-                                        <label style={{margin: "0 .5rem"}}>1</label>
-                                        <input type="checkbox"
-                                               checked={this.state.customer.slaP1PenaltiesAgreed || ''}
-                                               onChange={this.handleSlaP1PenaltiesAgreed}
-                                               className="form-control"
-                                        />
-                                        <label style={{margin: "0 .5rem"}}>2</label>
-                                        <input type="checkbox"
-                                               checked={this.state.customer.slaP2PenaltiesAgreed || ''}
-                                               onChange={this.handleSlaP2PenaltiesAgreed}
-                                               className="form-control"
-                                        />
-                                        <label style={{margin: "0 .5rem"}}>3</label>
-                                        <input type="checkbox"
-                                               checked={this.state.customer.slaP3PenaltiesAgreed || ''}
-                                               onChange={this.handleSlaP3PenaltiesAgreed}
-                                               className="form-control"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="col-lg-4">
-                                    <label>Last Modified:</label>
-                                    <div className="form-group">
-                                        <h6>{this.state.customer.lastModified}</h6>
+                                                </div>
+                                                <div className="form-group">
+                                                    <label htmlFor="ex4"
+                                                           className="col-form-label pr-3"
+                                                    >Frequency</label>
+                                                    <Select
+                                                        options={
+                                                            [
+                                                                {label: 'Monthly', value: 1},
+                                                                {label: "Two Monthly", value: 2},
+                                                                {label: 'Quarterly', value: 3},
+                                                                {label: "Six-Monthly", value: 6},
+                                                                {label: 'Annually', value: 12}
+                                                            ]
+                                                        }
+                                                        selectedOption={this.state.customer.reviewMeetingFrequencyMonths || ''}
+                                                        onChange={this.handleReviewMeetingFrequencyMonthsUpdate}
+                                                        className="form-control input-sm"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <hr/>
-                            <div className="row">
-                                <div className="col-lg-6">
-                                    <label>Technical Notes</label>
-                                    <div className="form-group">
-                                <textarea className="form-control"
-                                          cols="30"
-                                          rows="2"
-                                          value={this.state.customer.techNotes || ''}
-                                          onChange={this.handleTechNotesUpdate}
-                                />
-                                    </div>
-                                </div>
+                            <div className="card mb-3">
+                                <div className="card-body">
+                                    <div className="row">
+                                        <div className="col-md-12"><h5>Accounts</h5></div>
+                                        <div className="col-lg-4">
+                                            <label>Became Customer</label>
+                                            <div className="form-group">
 
-                                <div className="col-lg-6">
-                                    <label>Active Directory Name</label>
-                                    <div className="form-group">
-                                        <input type="text"
-                                               value={this.state.customer.activeDirectoryName || ''}
-                                               onChange={this.handleActiveDirectoryNameUpdate}
-                                               size="54"
-                                               maxLength="255"
-                                               className="form-control"
-                                        />
+                                                <input type="date"
+                                                       value={this.state.customer.becameCustomerDate || ''}
+                                                       onChange={this.handleBecameCustomerDateUpdate}
+                                                       size="10"
+                                                       maxLength="10"
+                                                       className="form-control input-sm"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="col-lg-4">
+                                            <label>Dropped Date</label>
+                                            <div className="form-group">
+                                                <input type="date"
+                                                       value={this.state.customer.droppedCustomerDate || ''}
+                                                       onChange={this.handleDroppedCustomerDateUpdate}
+                                                       size="10"
+                                                       maxLength="10"
+                                                       className="form-control input-sm"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="col-lg-4">
+                                            <label>Account Manager</label>
+                                            <div className="form-group">
+                                                <Select options={this.state.accountManagers}
+                                                        selectedOption={this.state.customer.accountManagerUserID || ''}
+                                                        onChange={this.handleAccountManagerUserIDUpdate}
+                                                        key={'accountManager'}
+                                                        className="form-control input-sm"
+                                                />
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="col-lg-4">
-                                    <label>Account Manager</label>
-                                    <div className="form-group">
-                                        <Select options={this.state.accountManagers}
-                                                selectedOption={this.state.customer.accountManagerUserID || ''}
-                                                onChange={this.handleAccountManagerUserIDUpdate}
-                                                key={'accountManager'}
-                                                className="form-control"
-                                        />
+                            </div>
+                            <div className="card">
+                                <div className="card-body">
+                                    <div className="row">
+                                        <div className="col-md-12"><h5>Sector and Size</h5></div>
+                                        <div className="col-lg-6">
+                                            <label htmlFor="">Type</label>
+                                            <div className="form-group">
+                                                <Select options={this.state.customerTypes}
+                                                        className="form-control input-sm"
+                                                        selectedOption={this.state.customer.customerTypeID || ''}
+                                                        onChange={this.handleCustomerTypeUpdate}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="col-lg-6">
+                                            <label htmlFor="">Sector</label>
+                                            <div className="form-group">
+                                                <Select options={this.state.sectors}
+                                                        selectedOption={this.state.customer.sectorID || ''}
+                                                        onChange={this.handleSectorIDUpdate}
+                                                        className="form-control input-sm"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="col-lg-4">
+                                            <label htmlFor="">PCs</label>
+                                            <div className="form-group">
+                                                <input type="number"
+                                                       value={this.state.customer.noOfPCs || ''}
+                                                       onChange={this.handleNoOfPCsUpdate}
+                                                       className="form-control input-sm"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="col-lg-4">
+                                            <label>Servers</label>
+                                            <div className="form-group">
+                                                <input type="number"
+                                                       value={this.state.customer.noOfServers || ''}
+                                                       onChange={this.handleNoOfServersUpdate}
+                                                       className="form-control input-sm"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="col-lg-4">
+                                            <label>Sites</label>
+                                            <div className="form-group">
+                                                <input type="number"
+                                                       value={this.state.customer.noOfSites || ''}
+                                                       onChange={this.handleNoOfSitesUpdate}
+                                                       size="2"
+                                                       maxLength="2"
+                                                       className="form-control input-sm"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="col-lg-4">
+                                            <label htmlFor="">Sort Code</label>
+                                            <div className="form-group">
+                                                <EncryptedTextInput encryptedValue={this.state.customer.sortCode}
+                                                                    onChange={this.handleSortCodeUpdate}
+                                                                    mask='99-99-99'
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="col-lg-4">
+                                            <label htmlFor="">Account Name</label>
+                                            <div className="form-group">
+                                                <EncryptedTextInput className="form-control input-sm"
+                                                                    encryptedValue={this.state.customer.accountName || ''}
+                                                                    onChange={this.handleAccountNameUpdate}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="col-lg-4">
+                                            <label htmlFor="">Account Number</label>
+                                            <div className="form-group">
+                                                <EncryptedTextInput
+                                                    encryptedValue={this.state.customer.accountNumber}
+                                                    onChange={this.handleAccountNumberUpdate}
+                                                    mask='99999999'
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="col-lg-4">
+                                            <label>Reg</label>
+                                            <div className="form-group">
+                                                <input type="text"
+                                                       value={this.state.customer.regNo || ''}
+                                                       onChange={this.handleRegNoUpdate}
+                                                       size="10"
+                                                       maxLength="10"
+                                                       className="form-control input-sm"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="col-lg-4">
+                                            <label>Pre-pay Top Up</label>
+                                            <div className="form-group">
+                                                <input type="text"
+                                                       value={this.state.customer.gscTopUpAmount || ''}
+                                                       onChange={this.handleGscTopUpAmountUpdate}
+                                                       size="10"
+                                                       maxLength="10"
+                                                       className="form-control input-sm"
+                                                />
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="col-lg-4">
-                                    <label htmlFor="">Sort Code</label>
-                                    <div className="form-group">
-                                        <EncryptedTextInput
-                                            encryptedValue={this.state.customer.sortCode}
-                                            onChange={this.handleSortCodeUpdate}
-                                            mask='99-99-99'
-                                        />
-                                    </div>
-                                </div>
-                                <div className="col-lg-4">
-                                    <label htmlFor="">Account Name</label>
-                                    <div className="form-group">
-                                        <input className="form-control"
-                                               type='text'
-                                               value={this.state.customer.accountName || ''}
-                                               onChange={this.handleAccountNameUpdate}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="col-lg-4">
-                                    <label htmlFor="">Account Number</label>
-                                    <div className="form-group">
-                                        <EncryptedTextInput
-                                            encryptedValue={this.state.customer.accountNumber}
-                                            onChange={this.handleAccountNumberUpdate}
-                                            mask='99999999'
-                                        />
-                                    </div>
-                                </div>
-
                             </div>
                         </div>
                         <div className="col-md-6">
-                            <h4>Notes</h4>
-                            <div className="row">
-                                <div className="col-md-4">
-                                    <div className="form-group">
-                                        <label htmlFor="reviewDate">
-                                            To be reviewed on:
-                                        </label>
-                                        <input type="date"
-                                               value={this.state.customer.reviewDate || ''}
-                                               className="form-control"
-                                               onChange={this.handleReviewDateUpdate}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="col-md-4">
-                                    <div className="form-group">
-                                        <label htmlFor="">Time:</label>
-                                        <input type="time"
-                                               value={this.state.customer.reviewTime || ''}
-                                               className="form-control"
-                                               onChange={this.handleReviewTimeUpdate}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="col-md-4">
-                                    <div className="form-group">
-                                        <label>By:</label>
-                                        <Select
-                                            options={this.state.reviewEngineers}
-                                            selectedOption={this.state.customer.reviewUserID || ''}
-                                            onChange={this.handleReviewUserIDUpdate}
-                                            key='reviewUserID'
-                                            className="form-control"
-                                        />
+                            <div className="card mb-3">
+                                <div className="card-body">
+                                    <div className="row">
+                                        <div className="col-md-12"><h5>Service Level Agreements</h5></div>
+
+                                        <div className="col-lg-12">
+                                            <label htmlFor="">SLA Response Hours</label>
+                                            <div className="form-group form-inline">
+                                                <label style={{margin: "0 .5rem"}}>1</label>
+                                                <input type="number"
+                                                       value={this.state.customer.slaP1 || ''}
+                                                       onChange={this.handleSLAP1Update}
+                                                       size="1"
+                                                       maxLength="3"
+                                                       className="form-control col-sm-4"
+                                                />
+                                                <label style={{margin: "0 .5rem"}}>2</label>
+                                                <input type="number"
+                                                       value={this.state.customer.slaP2 || ''}
+                                                       onChange={this.handleSLAP2Update}
+                                                       size="1"
+                                                       maxLength="3"
+                                                       className="form-control col-sm-4"
+                                                />
+                                            </div>
+                                            <div className="form-group form-inline">
+
+                                                <label style={{margin: "0 .5rem"}}>3</label>
+                                                <input type="number"
+                                                       value={this.state.customer.slaP3 || ''}
+                                                       onChange={this.handleSLAP3Update}
+                                                       size="1"
+                                                       maxLength="3"
+                                                       className="form-control col-sm-4"
+                                                />
+                                                <label style={{margin: "0 .5rem"}}>4</label>
+                                                <input type="number"
+                                                       value={this.state.customer.slaP4 || ''}
+                                                       onChange={this.handleSLAP4Update}
+                                                       size="1"
+                                                       maxLength="3"
+                                                       className="form-control col-sm-4"
+                                                />
+
+                                            </div>
+
+                                            <div className="form-group form-inline">
+                                                <label style={{margin: "0 .5rem"}}>5</label>
+                                                <input type="number"
+                                                       value={this.state.customer.slaP5 || ''}
+                                                       onChange={this.handleSLAP5Update}
+                                                       size="1"
+                                                       maxLength="3"
+                                                       className="form-control col-sm-4"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="col-lg-12">
+                                            <label htmlFor="">SLA Response Fix Hours</label>
+                                            <div className="form-group form-inline">
+                                                <label style={{margin: "0 .5rem"}}>1</label>
+                                                <input value={this.state.customer.slaFixHoursP1 || ''}
+                                                       type="number"
+                                                       size="1"
+                                                       step="0.1"
+                                                       maxLength="4"
+                                                       max="999.9"
+                                                       onChange={this.handleSlaFixHoursP1}
+                                                       className="form-control col-sm-4"
+                                                />
+                                                <label style={{margin: "0 .5rem"}}>2</label>
+                                                <input value={this.state.customer.slaFixHoursP2 || ''}
+                                                       type="number"
+                                                       size="1"
+                                                       step="0.1"
+                                                       maxLength="4"
+                                                       max="999.9"
+                                                       onChange={this.handleSlaFixHoursP2}
+                                                       className="form-control col-sm-4"
+                                                />
+                                            </div>
+                                            <div className="form-group form-inline">
+                                                <label style={{margin: "0 .5rem"}}>3</label>
+                                                <input value={this.state.customer.slaFixHoursP3 || ''}
+                                                       type="number"
+                                                       size="1"
+                                                       step="0.1"
+                                                       maxLength="4"
+                                                       max="999.9"
+                                                       onChange={this.handleSlaFixHoursP3}
+                                                       className="form-control col-sm-4"
+                                                />
+                                                <label style={{margin: "0 .5rem"}}>4</label>
+                                                <input value={this.state.customer.slaFixHoursP4 || ''}
+                                                       type="number"
+                                                       size="1"
+                                                       step="0.1"
+                                                       maxLength="4"
+                                                       max="999.9"
+                                                       onChange={this.handleSlaFixHoursP4}
+                                                       className="form-control col-sm-4"
+                                                />
+
+                                            </div>
+                                        </div>
+                                        <div className="col-lg-4">
+                                            <label htmlFor="">SLA Penalties Agreed</label>
+                                            <div className="form-group form-inline pt-1 d-flex">
+                                                <div className="toggle-inline">
+                                                    <label>1</label>
+                                                    <label className="switch"
+                                                    >
+                                                        <input type="checkbox"
+                                                               checked={this.state.customer.slaP1PenaltiesAgreed || ''}
+                                                               onChange={this.handleSlaP1PenaltiesAgreed}
+                                                        />
+                                                        <span className="slider round"/>
+                                                    </label>
+                                                </div>
+
+                                                <div className="toggle-inline">
+                                                    <label>2</label>
+                                                    <label className="switch"
+                                                    >
+                                                        <input type="checkbox"
+                                                               checked={this.state.customer.slaP2PenaltiesAgreed || ''}
+                                                               onChange={this.handleSlaP2PenaltiesAgreed}
+                                                        />
+                                                        <span className="slider round"/>
+                                                    </label>
+                                                </div>
+                                                <div className="toggle-inline">
+                                                    <label>3</label>
+                                                    <label className="switch"
+                                                    >
+                                                        <input type="checkbox"
+                                                               checked={this.state.customer.slaP3PenaltiesAgreed || ''}
+                                                               onChange={this.handleSlaP3PenaltiesAgreed}
+                                                        />
+                                                        <span className="slider round"/>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="col-lg-4">
+                                            <label>Last Modified:</label>
+                                            <div className="form-group">
+                                                <h6>{this.state.customer.lastModified}</h6>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+                            <div className="card">
+                                <div className="card-body">
+                                    <div className="row">
+                                        <div className="col-md-12"><h5>Technical Notes</h5></div>
+                                        <div className="col-lg-6">
+                                            <label>Technical Notes</label>
+                                            <div className="form-group">
+                                                <textarea className="form-control input-sm"
+                                                          cols="30"
+                                                          rows="2"
+                                                          value={this.state.customer.techNotes || ''}
+                                                          onChange={this.handleTechNotesUpdate}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="col-lg-6">
+                                            <label>Active Directory Name</label>
+                                            <div className="form-group">
+                                                <input type="text"
+                                                       value={this.state.customer.activeDirectoryName || ''}
+                                                       onChange={this.handleActiveDirectoryNameUpdate}
+                                                       size="54"
+                                                       maxLength="255"
+                                                       className="form-control input-sm"
+                                                />
+                                            </div>
+                                        </div>
 
 
-                            <div className="form-group customerReviewAction">
-                                        <textarea title="Action to be taken"
-                                                  cols="120"
-                                                  rows="3"
-                                                  value={this.state.customer.reviewAction || ''}
-                                                  className="form-control"
-                                                  onChange={this.handleReviewActionUpdate}
-                                        />
-                            </div>
-                            <CustomerNotesComponent customerId={customerId}/>
-                            <div>
-                                {this.state.customer.lastContractSent}
+
+
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <hr/>
             </div>
         )
     }

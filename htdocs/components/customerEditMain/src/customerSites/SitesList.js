@@ -7,15 +7,25 @@ import Site from './Site.js';
 const SitesList = ({sites, customerId, contacts, invoiceSiteNo, deliverSiteNo, changeInvoiceSiteNo, changeDeliverSiteNo, addContactToSite, updateSite, deleteSite}) => {
     return (
 
-        <div className="container-fluid">
+        <div className="mt-3">
             <div className="row">
                 <div className="col-md-12">
                     <h2>Sites</h2>
                 </div>
-                <div className="col-md-12">
-                    <a href={`/Customer.php?action=addSite&customerID=${customerId}`}>
-                        <button className="btn btn-primary mt-3 mb-3">Add Site</button>
-                    </a>
+                <div className="col-md-12 custom-fa">
+                    <div className="form-inline">
+                        <div className="form-group">
+
+                            <button className="btn btn-sm btn-new mt-3 mb-3"
+                                    data-toggle="modal"
+                                    data-target="#newSiteModal"
+                            >Add Site
+                            </button>
+                        </div>
+                        <div className="form-group">
+
+                        </div>
+                    </div>
                 </div>
             </div>
             <div className="row">

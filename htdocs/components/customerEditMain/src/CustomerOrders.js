@@ -31,7 +31,7 @@ class CustomerOrders extends React.Component {
                  role="tabpanel"
                  aria-labelledby="nav-orders-tab"
             >
-                <div className="container-fluid mt-3 mb-3">
+                <div className="mt-3">
                     <div className="row">
                         <div className="col-md-12">
                             <h2>Orders</h2>
@@ -54,12 +54,12 @@ class CustomerOrders extends React.Component {
                                         <tr key={c.id}>
                                             <td>
                                                 <a href={c.url}>
-                                                    <h6>{c.id}</h6>
+                                                    {c.id}
                                                 </a>
                                             </td>
-                                            <td><h6>{c.type}</h6></td>
-                                            <td><h6>{c.date}</h6></td>
-                                            <td><h6>{c.custPORef}</h6></td>
+                                            <td>{c.type}</td>
+                                            <td>{c.date}</td>
+                                            <td>{c.custPORef}</td>
                                         </tr>
                                     ))
                                 }

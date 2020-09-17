@@ -141,6 +141,7 @@ class CTCustomer extends CTCNC
     const GET_CUSTOMER_CONTACTS = "getContacts";
     const UPDATE_SITE = "updateSite";
     const GET_CUSTOMER_ORDERS = 'getCustomerOrders';
+    const GET_CUSTOMER_DATA = 'getCustomer';
     public $customerID;
     public $customerString;
     public $contactString;
@@ -728,7 +729,7 @@ class CTCustomer extends CTCNC
                 $this->getCustomerOrdersController();
                 exit;
             }
-            case 'getCustomer':
+            case self::GET_CUSTOMER_DATA:
             {
                 $customerID = @$_REQUEST['customerID'];
                 if (!$customerID) {
@@ -795,6 +796,7 @@ class CTCustomer extends CTCNC
                             "websiteURL"                   => $dbeCustomer->getValue(DBECustomer::websiteURL),
                             "reviewDate"                   => $dbeCustomer->getValue(DBECustomer::reviewDate),
                             "reviewTime"                   => $dbeCustomer->getValue(DBECustomer::reviewTime),
+                            "dateMeetingConfirmed"         => $dbeCustomer->getValue(DBECustomer::dateMeetingConfirmed),
                         ]
                     ]
                 );
@@ -2051,7 +2053,7 @@ class CTCustomer extends CTCNC
                     DBECustomer::accountNumber
                 ) ? "greenPencil" : "redPencil",
                 'forceDirectDebit'               => $forceDirectDebit ? 'true' : 'false',
-                'streamOneEmail'               => $this->dsCustomer->getValue(DBECustomer::streamOneEmail)
+                'streamOneEmail'                 => $this->dsCustomer->getValue(DBECustomer::streamOneEmail)
 
 
             )
