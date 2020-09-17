@@ -8,6 +8,7 @@ This project changes will be shown here.
 ### Fixed
 - Issue 969 - Login page needs two attempts to login initially
 - Issue 1009 - Asset list drive space incorrect in some cases
+- Issue 987 - Show CNC logged time in the user graphs
 
 ## [v4.5.6] - 2020-09-14
 ### Fixed
