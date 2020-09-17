@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v4.6.0] - 2020-09-17
 ### Added
 - Issue 976 - ServiceDesk Team Individual Stats
 - Issue 967 - Record half day holidays to assign logged hours
