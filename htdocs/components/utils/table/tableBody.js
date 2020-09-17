@@ -30,7 +30,7 @@ class TableBody extends React.Component {
       className:selected&&pk&&selected[pk]==item[pk]&&selected[selectedKey]===item[selectedKey]?'selected':null
     }, columns.map(c => el("td", {
       key: c.path || c.key||c.label.replace(' ','')+makeid().toString(),      
-      className:c.className?c.className:' '+c.classNameColumn?this.get(item, c.classNameColumn):''
+      className:(c.className?c.className:' ')+" "+(c.classNameColumn?this.get(item, c.classNameColumn):'')
       ,style:{backgroundColor:c.backgroundColorColumn?this.get(item, c.backgroundColorColumn):''}
  
     }, this.addToolTip(

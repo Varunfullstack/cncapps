@@ -1,0 +1,103 @@
+.stepperContainer{
+
+}
+.wrapper-progressBar {
+    width: 100%;
+     height: 50px;
+    text-align: center;
+    align-content: center;
+}
+
+.progressBar {
+    width: "100%";
+    display: flex;
+    flex-direction: row;  
+    justify-content: space-around;
+
+}
+
+.progressBar li {
+    z-index: 1;
+    list-style-type: none;
+    float: left;
+    width: 100%;
+    position: relative;
+    text-align: center;
+    color:#404041 ;
+    font-weight: bold;
+    font-size: 14px;
+}
+.progressBar span.number{
+
+}
+.progressBar span.number{
+    position: relative;
+    margin-top: -50px;    
+    color: #58585a !important;
+    font-size: 16px;
+    z-index: 2;
+    cursor: pointer;
+}
+.progressBar li.active span.number{   
+    color: white !important;
+     
+}
+ 
+.progressBar li:before {
+    
+    content: " ";
+    line-height: 30px;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    border: 1px solid #ddd;
+    display: block;
+    text-align: center;
+    margin: 0 auto 10px;
+    background-color: white
+}
+
+.progressBar li:after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background-color: #ddd;
+    top: 15px;
+    left: calc(-50% + 15px);
+    z-index: -1;
+}
+
+.progressBar li:first-child:after {
+    content: none;
+}
+
+.progressBar li.active {
+    color: #58585a;
+}
+
+.progressBar li.active:before {
+    border-color: #58585a;
+    background-color: #58585a
+}
+
+.progressBar li.active + li:after {
+    background-color: #58585a;
+}
+.progressBar .title-container{
+    display: flex;
+    flex-direction: column;
+}
+.redRow {
+    background: red;
+}
+.site-select{
+    width: 200px;
+    margin: 2px;
+}
+.site-label{
+    width: 50px;
+    display: inline-block;
+    margin: 2px;
+
+}

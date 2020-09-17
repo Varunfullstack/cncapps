@@ -111,6 +111,9 @@ class CTStandardText extends CTCNC
                 );
 
                 break;
+            case "getList":
+                echo json_encode($this->getList());
+                exit;
             case CTSTANDARDTEXT_ACT_DISPLAY_LIST:
             default:
                 $this->checkPermissions(MAINTENANCE_PERMISSION);
@@ -436,5 +439,32 @@ class CTStandardText extends CTCNC
             true
         );
         $this->parsePage();
+    }
+      /**
+     * Display list of types
+     * @access private
+     * @throws Exception
+     */
+    function getList()
+    {
+        $this->setMethodName('getList');        
+        $dsStandardText = new DataSet($this);
+        $this->buStandardText->getAllTypes($dsStandardText);        
+        
+        $list=array();
+        if ($dsStandardText->rowCount() > 0) {            
+            while ($dsStandardText->fetchNext()) {
+                $stt_standardtextno = $dsStandardText->getValue(DBEStandardText::stt_standardtextno);
+                array_push(  $list,
+                            array(
+                                'id' => $stt_standardtextno,
+                                'title'           => $dsStandardText->getValue(DBEStandardText::stt_desc),
+                                'content'           => $dsStandardText->getValue(DBEStandardText::stt_text),
+                            )
+                        );
+  
+            }
+        }  
+        return   $list;     
     }
 }
