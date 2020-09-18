@@ -2895,35 +2895,29 @@ class CTCustomer extends CTCNC
      */
     function deleteSite()
     {
+        $data = $this->getJSONData();
+
         $this->setMethodName('deleteSite');
 
-        if (!$this->getCustomerID()) {
-            $this->displayFatalError('CustomerID not passed');
+        if (empty($data['customerId'])) {
+            throw new \CNCLTD\Exceptions\JsonHttpException(400, 'Customer Id Required');
         }
-        if (!$this->getSiteNo()) {
-            $this->displayFatalError('SiteNo not passed');
+        if (empty($data['siteNo'])) {
+            throw new \CNCLTD\Exceptions\JsonHttpException(400, 'Site Number Required');
         }
-        if ($this->buCustomer->canDeleteSite(
-            $this->getCustomerID(),
-            $this->getSiteNo()
+        if (!$this->buCustomer->canDeleteSite(
+            $data['customerId'],
+            $data['siteNo']
         )) {
-            $this->buCustomer->deleteSite(
-                $this->getCustomerID(),
-                $this->getSiteNo()
-            );
-        } else {
-            throw new Exception('Cannot delete this site - dependencies exist');
+            throw new \CNCLTD\Exceptions\JsonHttpException(403, 'Site Number Required');
         }
-        $nextURL =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'     => CTCNC_ACT_DISP_EDIT,
-                    'customerID' => $this->getCustomerID()
-                )
-            );
-        header('Location: ' . $nextURL);
-        exit;
+
+        $this->buCustomer->deleteSite(
+            $data['customerId'],
+            $data['siteNo']
+        );
+
+        echo json_encode(["status" => "ok"]);
     }
 
     /**

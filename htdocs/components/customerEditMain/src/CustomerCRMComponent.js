@@ -6,9 +6,8 @@ export class CustomerCRMComponent extends React.Component {
     constructor(props, context) {
         super(props, context);
         this.state = {
-            customer: {
-
-        }
+            customer: {},
+            site: {}
         };
 
 
@@ -151,7 +150,7 @@ export class CustomerCRMComponent extends React.Component {
                                                                value="Y"
                                                                {mailshotFlagChecked}
                                                         />
-                                                            <span className="slider round"></span>
+                                                        <span className="slider round"/>
                                                     </label>
                                                 </div>
                                             </td>
@@ -166,7 +165,7 @@ export class CustomerCRMComponent extends React.Component {
                             <div className="card">
                                 <div className="card-body p-1">
                                     <div className="pw-wisywig">
-                                        <div id="alerts"></div>
+                                        <div id="alerts"/>
                                         <div className="btn-toolbar editor"
                                              data-role="editor-toolbar"
                                              data-target="#editor-one"
@@ -175,7 +174,7 @@ export class CustomerCRMComponent extends React.Component {
                                                 <a className="btn dropdown-toggle"
                                                    data-toggle="dropdown"
                                                    title="Font"
-                                                ><i className="fal fa-font"></i><b className="caret"></b></a>
+                                                ><i className="fal fa-font"/><b className="caret"/></a>
                                                 <ul className="dropdown-menu">
                                                 </ul>
                                             </div>
@@ -183,9 +182,7 @@ export class CustomerCRMComponent extends React.Component {
                                                 <a className="btn dropdown-toggle"
                                                    data-toggle="dropdown"
                                                    title="Font Size"
-                                                ><i className="fal fa-text-height"></i>&nbsp;<b
-                                                    className="caret"
-                                                ></b></a>
+                                                ><i className="fal fa-text-height"/>&nbsp;<b className="caret"/></a>
                                                 <ul className="dropdown-menu">
                                                     <li>
                                                         <a data-edit="fontSize 5">
@@ -208,117 +205,141 @@ export class CustomerCRMComponent extends React.Component {
                                                 <a className="btn"
                                                    data-edit="bold"
                                                    title="Bold (Ctrl/Cmd+B)"
-                                                ><i
-                                                    className="fal fa-bold"
-                                                ></i></a>
+                                                >
+                                                    <i className="fal fa-bold"/>
+                                                </a>
                                                 <a className="btn"
                                                    data-edit="italic"
                                                    title="Italic (Ctrl/Cmd+I)"
-                                                ><i
-                                                    className="fal fa-italic"
-                                                ></i></a>
+                                                >
+                                                    <i className="fal fa-italic"/>
+                                                </a>
                                                 <a className="btn"
                                                    data-edit="strikethrough"
                                                    title="Strikethrough"
-                                                ><i className="fal fa-strikethrough"></i></a>
+                                                >
+                                                    <i className="fal fa-strikethrough"/>
+                                                </a>
                                                 <a className="btn"
                                                    data-edit="underline"
                                                    title="Underline (Ctrl/Cmd+U)"
-                                                ><i className="fal fa-underline"></i></a>
+                                                >
+                                                    <i className="fal fa-underline"/>
+                                                </a>
                                             </div>
                                             <div className="btn-group">
                                                 <a className="btn"
                                                    data-edit="insertunorderedlist"
                                                    title="Bullet list"
-                                                ><i className="fal fa-list-ul"></i></a>
+                                                >
+                                                    <i className="fal fa-list-ul"/>
+                                                </a>
                                                 <a className="btn"
                                                    data-edit="insertorderedlist"
                                                    title="Number list"
-                                                ><i className="fal fa-list-ol"></i></a>
+                                                >
+                                                    <i className="fal fa-list-ol"/>
+                                                </a>
                                                 <a className="btn"
                                                    data-edit="outdent"
                                                    title="Reduce indent (Shift+Tab)"
-                                                ><i className="fal fa-dedent"></i></a>
+                                                >
+                                                    <i className="fal fa-dedent"/>
+                                                </a>
                                                 <a className="btn"
                                                    data-edit="indent"
                                                    title="Indent (Tab)"
-                                                ><i className="fal fa-indent"></i></a>
+                                                >
+                                                    <i className="fal fa-indent"/>
+                                                </a>
                                             </div>
                                             <div className="btn-group">
                                                 <a className="btn btn-primary"
                                                    data-edit="justifyleft"
                                                    title="Align Left (Ctrl/Cmd+L)"
-                                                ><i className="fal fa-align-left"></i></a>
+                                                >
+                                                    <i className="fal fa-align-left"/>
+                                                </a>
                                                 <a className="btn"
                                                    data-edit="justifycenter"
                                                    title="Center (Ctrl/Cmd+E)"
-                                                ><i className="fal fa-align-center"></i></a>
+                                                >
+                                                    <i className="fal fa-align-center"/>
+                                                </a>
                                                 <a className="btn"
                                                    data-edit="justifyright"
                                                    title="Align Right (Ctrl/Cmd+R)"
-                                                ><i className="fal fa-align-right"></i></a>
+                                                >
+                                                    <i className="fal fa-align-right"/>
+                                                </a>
                                                 <a className="btn"
                                                    data-edit="justifyfull"
                                                    title="Justify (Ctrl/Cmd+J)"
-                                                ><i className="fal fa-align-justify"></i></a>
+                                                >
+                                                    <i className="fal fa-align-justify"/>
+                                                </a>
                                             </div>
                                             <div className="btn-group">
                                                 <a className="btn dropdown-toggle"
                                                    data-toggle="dropdown"
                                                    title="Hyperlink"
-                                                ><i className="fal fa-link"></i></a>
+                                                >
+                                                    <i className="fal fa-link"/>
+                                                </a>
                                                 <div className="dropdown-menu input-append">
                                                     <input className="span2"
                                                            placeholder="URL"
                                                            type="text"
                                                            data-edit="createLink"
-                                                    >
-                                                        <button className="btn"
-                                                                type="button"
-                                                        >Add
-                                                        </button>
+                                                    />
+                                                    <button className="btn"
+                                                            type="button"
+                                                    >Add
+                                                    </button>
                                                 </div>
                                                 <a className="btn"
                                                    data-edit="unlink"
                                                    title="Remove Hyperlink"
-                                                ><i
-                                                    className="fal fa-cut"
-                                                ></i></a>
+                                                >
+                                                    <i className="fal fa-cut"/>
+                                                </a>
                                             </div>
                                             <div className="btn-group">
                                                 <a className="btn"
                                                    title="Insert picture (or just drag &amp; drop)"
                                                    id="pictureBtn"
-                                                ><i className="fal fa-picture-o"></i></a>
+                                                >
+                                                    <i className="fal fa-picture-o"/>
+                                                </a>
                                                 <input type="file"
                                                        data-role="magic-overlay"
                                                        data-target="#pictureBtn"
                                                        data-edit="insertImage"
-                                                >
+                                                />
                                             </div>
                                             <div className="btn-group">
                                                 <a className="btn"
                                                    data-edit="undo"
                                                    title="Undo (Ctrl/Cmd+Z)"
-                                                ><i
-                                                    className="fal fa-undo"
-                                                ></i></a>
+                                                >
+                                                    <i className="fal fa-undo"/>
+                                                </a>
                                                 <a className="btn"
                                                    data-edit="redo"
                                                    title="Redo (Ctrl/Cmd+Y)"
-                                                ><i
-                                                    className="fal fa-repeat"
-                                                ></i></a>
+                                                >
+                                                    <i className="fal fa-repeat"/>
+                                                </a>
                                             </div>
                                         </div>
                                         <div id="editor-one"
                                              className="editor-wrapper placeholderText"
                                              contentEditable="true"
-                                        ></div>
+                                        />
                                         <textarea name="descr"
                                                   id="descr"
                                                   style="display:none;"
-                                        ></textarea>
+                                        />
                                     </div>
                                 </div>
 
@@ -399,7 +420,7 @@ export class CustomerCRMComponent extends React.Component {
                                                                data-validation="required"
                                                                data-type="title"
                                                                className="form-control input-sm"
-                                                        >
+                                                        />
                                                     </div>
                                                 </div>
                                                 <div className="col-lg-4">
@@ -415,7 +436,7 @@ export class CustomerCRMComponent extends React.Component {
                                                                data-validation="required"
                                                                data-type="firstName"
                                                                className="form-control input-sm"
-                                                        >
+                                                        />
                                                     </div>
                                                 </div>
                                                 <div className="col-lg-4">
@@ -431,7 +452,7 @@ export class CustomerCRMComponent extends React.Component {
                                                                data-validation="required"
                                                                data-type="lastName"
                                                                className="form-control input-sm"
-                                                        >
+                                                        />
                                                     </div>
                                                 </div>
                                                 <div className="col-lg-4">
@@ -447,7 +468,7 @@ export class CustomerCRMComponent extends React.Component {
                                                                data-validation-url="/validateUniqueEmail.php"
                                                                data-type="email"
                                                                className="form-control input-sm"
-                                                        >
+                                                        />
                                                     </div>
                                                 </div>
                                                 <div className="col-lg-4">
@@ -460,7 +481,7 @@ export class CustomerCRMComponent extends React.Component {
                                                                size="10"
                                                                maxLength="30"
                                                                className="form-control input-sm"
-                                                        >
+                                                        />
                                                     </div>
                                                 </div>
                                                 <div className="col-lg-4">
@@ -472,7 +493,7 @@ export class CustomerCRMComponent extends React.Component {
                                                                size="10"
                                                                maxLength="30"
                                                                className="form-control input-sm"
-                                                        >
+                                                        />
                                                     </div>
                                                 </div>
                                                 <div className="col-lg-4">
@@ -512,14 +533,14 @@ export class CustomerCRMComponent extends React.Component {
                                                 </div>
                                                 <div className="col-lg-4">
                                                     <div className="form-group">
-                                                        <label htmlFor="">Notes<span></span></label>
+                                                        <label htmlFor="">Notes<span/></label>
                                                         <input {disabled}
                                                                name="form[contact][{contactID}][notes]"
                                                                size="5"
                                                                maxLength="200"
                                                                value="{notes}"
                                                                className="form-control input-sm"
-                                                        >
+                                                        />
                                                     </div>
                                                 </div>
                                                 <div className="col-lg-2">
@@ -538,21 +559,22 @@ export class CustomerCRMComponent extends React.Component {
                                                                data-contact-id="{contactID}"
                                                                name="form[customer][{customerID}][sortCode]"
                                                                className="encrypted input-sm form-control {portalPasswordButtonClass} btn btn-outline-secondary btn-block fullwidth"
-                                                        >
+                                                        />
                                                     </div>
 
                                                 </div>
                                                 <div className="col-lg-2">
                                                     <div className="form-group">
-                                                        <label htmlFor="">Failed
-                                                            Login<span></span></label>
+                                                        <label htmlFor="">
+                                                            Failed Login<span/>
+                                                        </label>
                                                         <input {disabled}
                                                                name="form[contact][{contactID}][failedLoginCount]"
                                                                value="{failedLoginCount}"
                                                                size="2"
                                                                maxLength="5"
                                                                className="form-control input-sm"
-                                                        >
+                                                        />
                                                     </div>
                                                 </div>
 
@@ -567,8 +589,8 @@ export class CustomerCRMComponent extends React.Component {
                                                                    value="Y"
                                                                    {initialLoggingEmailFlagChecked}
                                                                    className="tick_field"
-                                                            >
-                                                                <span className="slider round"></span>
+                                                            />
+                                                            <span className="slider round"/>
                                                         </label>
                                                     </div>
                                                 </div>
@@ -584,8 +606,8 @@ export class CustomerCRMComponent extends React.Component {
                                                                    value="Y"
                                                                    {workUpdatesEmailFlagChecked}
                                                                    className="tick_field"
-                                                            >
-                                                                <span className="slider round"></span>
+                                                            />
+                                                            <span className="slider round"/>
                                                         </label>
                                                     </div>
                                                 </div>
@@ -601,8 +623,8 @@ export class CustomerCRMComponent extends React.Component {
                                                                    title="Check to show this site is overseas and not in the UK"
                                                                    value="Y"
                                                                    {nonukflagchecked}=""
-                                                            >
-                                                                <span className="slider round"></span>
+                                                            />
+                                                            <span className="slider round"/>
                                                         </label>
                                                     </div>
                                                 </div>
@@ -619,8 +641,8 @@ export class CustomerCRMComponent extends React.Component {
                                                                    data-validation="atLeastOne"
                                                                    data-type="accounts"
                                                                    data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
-                                                            >
-                                                                <span className="slider round"></span>
+                                                            />
+                                                            <span className="slider round"/>
                                                         </label>
                                                     </div>
                                                 </div>
@@ -636,8 +658,8 @@ export class CustomerCRMComponent extends React.Component {
                                                                    data-type="accounts"
                                                                    data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
                                                                    className="tick_field"
-                                                            >
-                                                                <span className="slider round"></span>
+                                                            />
+                                                            <span className="slider round"/>
                                                         </label>
                                                     </div>
                                                 </div>
@@ -653,8 +675,8 @@ export class CustomerCRMComponent extends React.Component {
                                                                    data-type="invoice"
                                                                    data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
                                                                    className="tick_field"
-                                                            >
-                                                                <span className="slider round"></span>
+                                                            />
+                                                            <span className="slider round"/>
                                                         </label>
                                                     </div>
                                                 </div>
@@ -667,13 +689,13 @@ export class CustomerCRMComponent extends React.Component {
                                                                    name="form[contact][0][mailshot3Flag]"
                                                                    value="Y"
                                                                    className="form-control input-sm"
-                                                            >
-                                                                <span className="slider round"></span>
+                                                            />
+                                                            <span className="slider round"/>
                                                         </label>
                                                     </div>
                                                 </div>
                                                 <div className="col-lg-2">
-                                                    <label htmlFor="stm">Stm<span></span></label>
+                                                    <label htmlFor="stm">Stm<span/></label>
                                                     <div className="form-group form-inline">
                                                         <label className="switch">
                                                             <input id="stm"
@@ -684,13 +706,13 @@ export class CustomerCRMComponent extends React.Component {
                                                                    data-validation="atLeastOneAtMostOne"
                                                                    data-type="statement"
                                                                    data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
-                                                            >
-                                                                <span className="slider round"></span>
+                                                            />
+                                                            <span className="slider round"/>
                                                         </label>
                                                     </div>
                                                 </div>
                                                 <div className="col-lg-2">
-                                                    <label htmlFor="hr">HR<span></span></label>
+                                                    <label htmlFor="hr">HR<span/></label>
                                                     <div className="form-group form-inline">
                                                         <label className="switch">
                                                             <input id="hr"
@@ -698,13 +720,13 @@ export class CustomerCRMComponent extends React.Component {
                                                                    name="form[contact][0][hrUser]"
                                                                    value="Y"
                                                                    className="form-control input-sm"
-                                                            >
-                                                                <span className="slider round"></span>
+                                                            />
+                                                            <span className="slider round"/>
                                                         </label>
                                                     </div>
                                                 </div>
                                                 <div className="col-lg-2">
-                                                    <label htmlFor="review">Review<span></span></label>
+                                                    <label htmlFor="review">Review<span/></label>
                                                     <div className="form-group form-inline">
                                                         <label className="switch">
                                                             <input id="review"
@@ -715,13 +737,13 @@ export class CustomerCRMComponent extends React.Component {
                                                                    data-type="review"
                                                                    data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
                                                                    className="form-control input-sm"
-                                                            >
-                                                                <span className="slider round"></span>
+                                                            />
+                                                            <span className="slider round"/>
                                                         </label>
                                                     </div>
                                                 </div>
                                                 <div className="col-lg-2">
-                                                    <label htmlFor="top">Top<span></span></label>
+                                                    <label htmlFor="top">Top<span/></label>
                                                     <div className="form-group form-inline">
                                                         <label className="switch">
                                                             <input id="top"
@@ -732,13 +754,13 @@ export class CustomerCRMComponent extends React.Component {
                                                                    {topUpValidation}
                                                                    data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
                                                                    className="form-control input-sm"
-                                                            >
-                                                                <span className="slider round"></span>
+                                                            />
+                                                            <span className="slider round"/>
                                                         </label>
                                                     </div>
                                                 </div>
                                                 <div className="col-lg-2">
-                                                    <label htmlFor="sr-rep">SR Rep<span></span></label>
+                                                    <label htmlFor="sr-rep">SR Rep<span/></label>
                                                     <div className="form-group form-inline">
                                                         <label className="switch">
                                                             <input id="sr-rep"
@@ -746,13 +768,13 @@ export class CustomerCRMComponent extends React.Component {
                                                                    name="form[contact][0][mailshot11Flag]"
                                                                    value="Y"
                                                                    className="form-control input-sm"
-                                                            >
-                                                                <span className="slider round"></span>
+                                                            />
+                                                            <span className="slider round"/>
                                                         </label>
                                                     </div>
                                                 </div>
                                                 <div className="col-lg-2">
-                                                    <label htmlFor="mailshot">Mailshot<span></span></label>
+                                                    <label htmlFor="mailshot">Mailshot<span/></label>
                                                     <div className="form-group form-inline">
                                                         <label className="switch">
                                                             <input id="mailshot"
@@ -760,8 +782,8 @@ export class CustomerCRMComponent extends React.Component {
                                                                    name="form[contact][0][sendMailshotFlag]"
                                                                    value="Y"
                                                                    className="form-control input-sm"
-                                                            >
-                                                                <span className="slider round"></span>
+                                                            />
+                                                            <span className="slider round"/>
                                                         </label>
                                                     </div>
                                                 </div>
@@ -774,8 +796,8 @@ export class CustomerCRMComponent extends React.Component {
                                                                    name="form[contact][0][pendingLeaverFlag]"
                                                                    value="Y"
                                                                    className="form-control input-sm"
-                                                            >
-                                                                <span className="slider round"></span>
+                                                            />
+                                                            <span className="slider round"/>
                                                         </label>
                                                     </div>
                                                 </div>
@@ -844,7 +866,7 @@ export class CustomerCRMComponent extends React.Component {
                                            maxLength="10"
                                            autoComplete="off"
                                            className="jQueryCalendar form-control input-sm"
-                                    >
+                                    />
                                 </div>
                             </div>
                             <div className="col-md-4">
@@ -856,7 +878,7 @@ export class CustomerCRMComponent extends React.Component {
                                            size="5"
                                            maxLength="5"
                                            className="form-control input-sm"
-                                    >
+                                    />
                                 </div>
                             </div>
                             <div className="col-md-4">
@@ -865,7 +887,6 @@ export class CustomerCRMComponent extends React.Component {
                                     <label>By:</label>
                                     <select
                                         {disabled}
-                                        type="text"
                                         name="form[customer][{customerID}][reviewUserID]"
                                         onChange="setFormChanged();"
                                         className="form-control input-sm"
@@ -902,7 +923,7 @@ export class CustomerCRMComponent extends React.Component {
                                                   {disabled}
                                                   id="customerNoteHistory"
                                                   className="form-control input-sm"
-                                        ></textarea>
+                                        />
 
                             <div className="customerNoteNav mt-3 mb-3">
                                 <button {disabled}
@@ -1019,6 +1040,6 @@ export class CustomerCRMComponent extends React.Component {
                 </div>
 
             </div>
-    );
+        );
     }
-    }
+}
