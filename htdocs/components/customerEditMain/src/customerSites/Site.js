@@ -146,6 +146,7 @@ export default class Site extends React.Component {
                                     <input name="what3Words"
                                            id="What3Words"
                                            value={this.props.site.what3Words || ''}
+                                           onChange={($event) => this.handleInputChange($event)}
                                            size="5"
                                            maxLength="5"
                                            className="form-control input-sm"
@@ -268,12 +269,19 @@ export default class Site extends React.Component {
                                 >
                                     Save Changes
                                 </button>
-                                <button type="button"
-                                        className="btn btn-danger"
-                                        onClick={() => this.props.deleteSite(this.props.customerId, this.props.site.siteNo)}
-                                >
-                                    Delete Site
-                                </button>
+                                {
+                                    this.props.site.canDelete ?
+                                        (
+                                            <button type="button"
+                                                    className="btn btn-danger"
+                                                    onClick={() => this.props.deleteSite(this.props.customerId, this.props.site.siteNo)}
+                                            >
+                                                Delete Site
+                                            </button>
+                                        ) : null
+
+                                }
+
                             </div>
                         </div>
                     </div>
