@@ -1,6 +1,9 @@
 import React from 'react'
+import {createGetSiteContacts, getCustomerId, getDeliverSiteNo, getInvoiceSiteNo} from "../selectors";
+import {connect} from "react-redux";
+import {addContactToSite, changeDeliverSiteNo, changeInvoiceSiteNo, deleteSite, saveSite, updateSite} from "../actions";
 
-export default class Site extends React.Component {
+class Site extends React.Component {
 
     constructor(props) {
         super(props);
@@ -14,7 +17,7 @@ export default class Site extends React.Component {
         if (target.type === 'checkbox') {
             value = target.checked;
         }
-        this.props.updateSite(this.props.site.siteNo, {[name]: value});
+        this.props.updateSite(site.siteNo, {[name]: value});
     }
 
     checkDelete() {
@@ -22,29 +25,31 @@ export default class Site extends React.Component {
     }
 
     render() {
+        const {site, contacts} = this.props;
+
         return <div className="site"
                     style={{width: "100%"}}
         >
             <div className="card">
                 <div className="card-header"
-                     id={`heading${this.props.site.siteNo}`}
+                     id={`heading${site.siteNo}`}
                      style={{width: "100%"}}
                 >
                     <h5 className="mb-0">
                         <button className="btn btn-link"
                                 type="button"
                                 data-toggle="collapse"
-                                data-target={`#collapse${this.props.site.siteNo}`}
+                                data-target={`#collapse${site.siteNo}`}
                                 aria-expanded="false"
-                                aria-controls={`collapse${this.props.site.siteNo}`}
+                                aria-controls={`collapse${site.siteNo}`}
                         >
-                            {this.props.site.address1 || ''}
+                            {site.address1 || ''}
                         </button>
                     </h5>
                 </div>
-                <div id={`collapse${this.props.site.siteNo}`}
+                <div id={`collapse${site.siteNo}`}
                      className="collapse"
-                     aria-labelledby={this.props.site.siteNo}
+                     aria-labelledby={site.siteNo}
                      data-parent="#accordionExample1"
                 >
                     <div className="card-body">
@@ -53,7 +58,7 @@ export default class Site extends React.Component {
                                 <div className="form-group">
 
                                     <label>Site Address</label>
-                                    <input value={this.props.site.address1 || ''}
+                                    <input value={site.address1 || ''}
                                            onChange={($event) => this.handleInputChange($event)}
                                            name="address1"
                                            size="35"
@@ -61,14 +66,14 @@ export default class Site extends React.Component {
                                            className="form-control mb-3"
                                     />
                                     <input name="address2"
-                                           value={this.props.site.address2 || ''}
+                                           value={site.address2 || ''}
                                            onChange={($event) => this.handleInputChange($event)}
                                            size="35"
                                            maxLength="35"
                                            className="form-control mb-3"
                                     />
                                     <input name="address3"
-                                           value={this.props.site.address3 || ''}
+                                           value={site.address3 || ''}
                                            onChange={($event) => this.handleInputChange($event)}
                                            size="35"
                                            maxLength="35"
@@ -81,7 +86,7 @@ export default class Site extends React.Component {
                                 <label htmlFor="town">Town</label>
                                 <div className="form-group">
                                     <input name="town"
-                                           value={this.props.site.town || ''}
+                                           value={site.town || ''}
                                            onChange={($event) => this.handleInputChange($event)}
                                            size="25"
                                            maxLength="25"
@@ -93,7 +98,7 @@ export default class Site extends React.Component {
                                 <label htmlFor="country">County</label>
                                 <div className="form-group">
                                     <input name="county"
-                                           value={this.props.site.county || ''}
+                                           value={site.county || ''}
                                            onChange={($event) => this.handleInputChange($event)}
                                            size="25"
                                            maxLength="25"
@@ -105,7 +110,7 @@ export default class Site extends React.Component {
                                 <label htmlFor="postcode">Postcode</label>
                                 <div className="form-group">
                                     <input name="postcode"
-                                           value={this.props.site.postcode || ''}
+                                           value={site.postcode || ''}
                                            onChange={($event) => this.handleInputChange($event)}
                                            size="15"
                                            maxLength="15"
@@ -117,7 +122,7 @@ export default class Site extends React.Component {
                                 <label htmlFor="phone">Phone</label>
                                 <div className="form-group">
                                     <input name="phone"
-                                           value={this.props.site.phone || ''}
+                                           value={site.phone || ''}
                                            onChange={($event) => this.handleInputChange($event)}
                                            size="20"
                                            maxLength="20"
@@ -131,7 +136,7 @@ export default class Site extends React.Component {
                                 </label>
                                 <div className="form-group">
                                     <input name="maxTravelHours"
-                                           value={this.props.site.maxTravelHours || ''}
+                                           value={site.maxTravelHours || ''}
                                            onChange={($event) => this.handleInputChange($event)}
                                            type="number"
                                            size="5"
@@ -145,7 +150,7 @@ export default class Site extends React.Component {
                                 <div className="form-group">
                                     <input name="what3Words"
                                            id="What3Words"
-                                           value={this.props.site.what3Words || ''}
+                                           value={site.what3Words || ''}
                                            onChange={($event) => this.handleInputChange($event)}
                                            size="5"
                                            maxLength="5"
@@ -158,13 +163,7 @@ export default class Site extends React.Component {
                                     Default Invoice
                                 </label>
                                 <div className="form-group form-inline">
-                                    <input type="radio"
-                                           name="invoiceSiteNo"
-                                           value={this.props.site.siteNo || ''}
-                                           checked={+this.props.invoiceSiteNo === +this.props.site.siteNo}
-                                           onChange={($event) => this.props.changeInvoiceSiteNo($event.target.value)}
-                                           className="form-control"
-                                    />
+
                                 </div>
                             </div>
                             <div className="col-lg-2">
@@ -174,8 +173,8 @@ export default class Site extends React.Component {
                                 <div className="form-group form-inline">
                                     <input type="radio"
                                            name="deliverSiteNo"
-                                           value={this.props.site.siteNo || ''}
-                                           checked={+this.props.deliverSiteNo === +this.props.site.siteNo}
+                                           value={site.siteNo || ''}
+                                           checked={+this.props.deliverSiteNo === +site.siteNo}
                                            onChange={($event) => this.props.changedDeliverSiteNo($event.target.value)}
                                            className="form-control"
                                     />
@@ -188,11 +187,11 @@ export default class Site extends React.Component {
                                 <div className="form-group">
                                     <select name="invoiceContact"
                                             className="form-control input-sm"
-                                            value={this.props.site.invoiceContact || ''}
+                                            value={site.invoiceContact || ''}
                                             onChange={($event) => this.handleInputChange($event)}
                                     >
                                         {
-                                            this.props.contacts.map(c => {
+                                            contacts.map(c => {
                                                 return (<option key={c.id}
                                                                 value={c.id}
                                                 >
@@ -210,11 +209,11 @@ export default class Site extends React.Component {
                                 <div className="form-group">
                                     <select name="deliveryContact"
                                             className="form-control input-sm"
-                                            value={this.props.site.deliveryContact || ''}
+                                            value={site.deliveryContact || ''}
                                             onChange={($event) => this.handleInputChange($event)}
                                     >
                                         {
-                                            this.props.contacts.map(c => {
+                                            contacts.map(c => {
                                                 return (<option key={c.id}
                                                                 value={c.id}
                                                 >
@@ -234,7 +233,7 @@ export default class Site extends React.Component {
                                                onChange={($event) => this.handleInputChange($event)}
                                                title="Check to show this site is overseas and not in the UK"
                                                value="1"
-                                               checked={this.props.site.nonUKFlag}
+                                               checked={site.nonUKFlag}
                                                className="form-control"
                                         />
                                         <span className="slider round"/>
@@ -248,7 +247,7 @@ export default class Site extends React.Component {
                                         <input type="checkbox"
                                                name="active"
                                                onChange={($event) => this.handleInputChange($event)}
-                                               checked={this.props.site.active}
+                                               checked={site.active}
                                                value="1"
                                                className="tick_field"
                                         />
@@ -265,16 +264,16 @@ export default class Site extends React.Component {
                                 </button>
                                 <button type="button"
                                         className="btn btn-primary"
-                                        onClick={() => this.props.saveSite(this.props.site, this.props.deliverSiteNo, this.props.invoiceSiteNo)}
+                                        onClick={() => this.props.saveSite(site, this.props.deliverSiteNo, this.props.invoiceSiteNo)}
                                 >
                                     Save Changes
                                 </button>
                                 {
-                                    this.props.site.canDelete ?
+                                    site.canDelete ?
                                         (
                                             <button type="button"
                                                     className="btn btn-danger"
-                                                    onClick={() => this.props.deleteSite(this.props.customerId, this.props.site.siteNo)}
+                                                    onClick={() => this.checkDelete() && this.props.deleteSite(this.props.customerId, site.siteNo)}
                                             >
                                                 Delete Site
                                             </button>
@@ -290,3 +289,44 @@ export default class Site extends React.Component {
         </div>
     }
 }
+
+const makeMapStateToProps = () => {
+    const getSiteContacts = createGetSiteContacts()
+    return (state, props) => {
+        return {
+            contacts: getSiteContacts(state, props),
+            customerId: getCustomerId(state),
+            invoiceSiteNo: getInvoiceSiteNo(state),
+            deliverSiteNo: getDeliverSiteNo(state)
+        }
+    }
+}
+
+
+const mapDispatchToProps = dispatch => {
+    return {
+        changeDeliverSiteNo: siteNo => {
+            dispatch(changeDeliverSiteNo(siteNo))
+        },
+        changeInvoiceSiteNo: siteNo => {
+            dispatch(changeInvoiceSiteNo(siteNo))
+        },
+        addContactToSite: siteNo => {
+            dispatch(addContactToSite(siteNo))
+        },
+        updateSite: (siteNo, data) => {
+            dispatch(updateSite(siteNo, data))
+        },
+        saveSite: (site) => {
+            dispatch(saveSite(site))
+        },
+        deleteSite: (customerId, siteNo) => {
+            dispatch(deleteSite(customerId, siteNo))
+        },
+    }
+}
+
+export default connect(
+    makeMapStateToProps,
+    mapDispatchToProps
+)(Site)

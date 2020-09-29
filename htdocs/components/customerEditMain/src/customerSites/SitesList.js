@@ -1,10 +1,24 @@
 import React from 'react';
 import {connect} from "react-redux";
-import {SHOW_ACTIVE} from "./visibilityFilterTypes";
-import {addContactToSite, changeDeliverSiteNo, changeInvoiceSiteNo, deleteSite, saveSite, updateSite} from "./actions";
+import {toggleVisibility} from "../actions";
 import Site from './Site.js';
+import {SHOW_ACTIVE} from "../visibilityFilterTypes";
 
 const SitesList = ({sites, customerId, contacts, invoiceSiteNo, deliverSiteNo, changeInvoiceSiteNo, changeDeliverSiteNo, addContactToSite, updateSite, deleteSite}) => {
+    const getSiteOptions = (sites) => {
+        return sites.filter(x => x.active).map(site => {
+            return (
+                <option value={site.siteNo}
+                        key={site.siteNo}
+                >
+                    {`${site.address1} - ${site.town}`}
+                </option>
+            )
+        })
+    }
+
+    console.log(invoiceSiteNo);
+
     return (
 
         <div className="mt-3">
@@ -23,7 +37,27 @@ const SitesList = ({sites, customerId, contacts, invoiceSiteNo, deliverSiteNo, c
                             </button>
                         </div>
                         <div className="form-group">
+                            <select name="invoiceSiteNo"
+                                    value={invoiceSiteNo || ''}
+                                    onChange={($event) => changeInvoiceSiteNo($event.target.value)}
+                                    className="form-control input-sm mr-1"
+                            >
+                                <option value="">
+                                    Select a Default Invoice
+                                </option>
+                                {getSiteOptions(sites)}
+                            </select>
 
+                            <select name="deliverSiteNo"
+                                    value={deliverSiteNo || ''}
+                                    onChange={($event) => changeDeliverSiteNo($event.target.value)}
+                                    className="form-control input-sm"
+                            >
+                                <option value="">
+                                    Select a Default Delivery Site
+                                </option>
+                                {getSiteOptions(sites)}
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -38,16 +72,7 @@ const SitesList = ({sites, customerId, contacts, invoiceSiteNo, deliverSiteNo, c
                                 sites.length ?
                                     sites.map(site => (
                                         <Site key={site.siteNo}
-                                              site={site}
-                                              contacts={contacts}
-                                              customerId={customerId}
-                                              invoiceSiteNo={invoiceSiteNo}
-                                              deliverSiteNo={deliverSiteNo}
-                                              changeInvoiceSiteNo={changeInvoiceSiteNo}
-                                              changedDeliverSiteNo={changeDeliverSiteNo}
-                                              addContactToSite={addContactToSite}
-                                              updateSite={updateSite}
-                                              deleteSite={deleteSite}
+                                              siteNo={site.siteNo}
                                         />
                                     )) : ''
                             }
@@ -77,36 +102,17 @@ function debug(key, result) {
 }
 
 function mapStateToProps(state) {
-    const {customer, sites, contacts, visibilityFilter} = state;
+    debugger;
     return {
-        sites: getVisibleSites(sites, visibilityFilter),
-        customerId: customer.customerId,
-        contacts: getMappedContacts(contacts),
-        invoiceSiteNo: customer.invoiceSiteNo,
-        deliverSiteNo: customer.deliverSiteNo
+        sites: getVisibleSites(state.sites, state.visibilityFilter),
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        changeDeliverSiteNo: siteNo => {
-            dispatch(changeDeliverSiteNo(siteNo))
+        toggleVisibility: () => {
+            dispatch(toggleVisibility())
         },
-        changeInvoiceSiteNo: siteNo => {
-            dispatch(changeInvoiceSiteNo(siteNo))
-        },
-        addContactToSite: siteNo => {
-            dispatch(addContactToSite(siteNo))
-        },
-        updateSite: (siteNo, data) => {
-            dispatch(updateSite(siteNo, data))
-        },
-        saveSite: (site, deliverSiteNo, invoiceSiteNo) => {
-            dispatch(saveSite(site, deliverSiteNo, invoiceSiteNo))
-        },
-        deleteSite: (customerId, siteNo) => {
-            dispatch(deleteSite(customerId, siteNo))
-        }
     }
 }
 

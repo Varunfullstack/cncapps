@@ -50,6 +50,7 @@ export default function (state = initialState, action) {
                             {}
                         )
                 },
+                allIds: [...state.allIds.filter(x => x !== action.siteNo)]
             }
         case UPDATE_SITE:
             //we are receiving changes from a component and we need to update the site with the changes

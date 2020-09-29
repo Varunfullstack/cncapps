@@ -1,5 +1,7 @@
-import {VisibilityFilterOptions} from "../actions";
+
 import {TOGGLE_VISIBILITY} from "../actionTypes";
+import {VisibilityFilterOptions} from "../actions";
+
 
 export default function (state = VisibilityFilterOptions.SHOW_ACTIVE, action) {
     if (action.type === TOGGLE_VISIBILITY) {

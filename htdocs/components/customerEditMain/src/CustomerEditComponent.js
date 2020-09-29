@@ -6,14 +6,38 @@ import CustomerProjectsComponent from "./CustomerProjectsComponent";
 import CustomerPortalDocumentsComponent from "./CustomerPortalDocumentsComponent";
 import CustomerSitesComponent from "./customerSites/CustomerSitesComponent";
 import CustomerOrders from "./CustomerOrders";
+import {Provider} from "react-redux";
+import configureStore from "./configureStore";
+import {
+    fetchAccountManagers,
+    fetchContacts,
+    fetchCustomer,
+    fetchCustomerTypes,
+    fetchLeadStatuses,
+    fetchReviewEngineers,
+    fetchSectors,
+    fetchSites
+} from "./actions";
+
+const store = configureStore();
 
 class CustomerEditComponent extends React.Component {
 
     constructor(props) {
         super(props);
+        const {customerId} = props;
         this.state = {
             loaded: true
         }
+        store.dispatch(fetchSites(customerId));
+        store.dispatch(fetchContacts(customerId));
+        store.dispatch(fetchCustomer(customerId));
+        store.dispatch(fetchCustomerTypes());
+        store.dispatch(fetchLeadStatuses());
+        store.dispatch(fetchSectors());
+        store.dispatch(fetchAccountManagers());
+        store.dispatch(fetchReviewEngineers());
+
     }
 
     render() {
@@ -95,12 +119,14 @@ class CustomerEditComponent extends React.Component {
                         <div className="tab-content"
                              id="nav-tabContent"
                         >
-                            <CustomerEditMain customerId={customerId}/>
-                            <CustomerProjectsComponent customerId={customerId}/>
-                            <CustomerPortalDocumentsComponent customerId={customerId}/>
-                            <CustomerSitesComponent customerId={customerId}/>
-                            <CustomerOrders customerId={customerId}/>
-                            {/*<CustomerCRM customerId={customerId}/>*/}
+                            <Provider store={store}>
+                                <CustomerEditMain customerId={customerId}/>
+                                <CustomerProjectsComponent customerId={customerId}/>
+                                <CustomerPortalDocumentsComponent customerId={customerId}/>
+                                <CustomerSitesComponent customerId={customerId}/>
+                                <CustomerOrders customerId={customerId}/>
+                                {/*<CustomerCRM customerId={customerId}/>*/}
+                            </Provider>
                         </div>
                     </div>
                 </div>
