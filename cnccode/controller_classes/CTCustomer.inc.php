@@ -797,6 +797,8 @@ class CTCustomer extends CTCNC
                             "reviewDate"                   => $dbeCustomer->getValue(DBECustomer::reviewDate),
                             "reviewTime"                   => $dbeCustomer->getValue(DBECustomer::reviewTime),
                             "dateMeetingConfirmed"         => $dbeCustomer->getValue(DBECustomer::dateMeetingConfirmed),
+                            "invoiceSiteNo"                => $dbeCustomer->getValue(DBECustomer::invoiceSiteNo),
+                            "deliverSiteNo"                => $dbeCustomer->getValue(DBECustomer::deliverSiteNo),
                         ]
                     ]
                 );

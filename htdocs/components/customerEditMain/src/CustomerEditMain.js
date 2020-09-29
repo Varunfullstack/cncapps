@@ -2,7 +2,7 @@
 import React from 'react';
 import Select from "./Select";
 import EncryptedTextInput from "./EncryptedTextInput";
-import CustomerNotesComponent from "./CustomerNotesComponent";
+import {connect} from "react-redux";
 
 class CustomerEditMain extends React.Component {
     el = React.createElement;
@@ -12,97 +12,8 @@ class CustomerEditMain extends React.Component {
         super(props);
         this.state = {
             loaded: false,
-            customer: {
-                accountManagerUserID: '',
-                accountName: '',
-                accountNumber: '',
-                activeDirectoryName: '',
-                becameCustomerDate: '',
-                customerID: '',
-                customerTypeID: '',
-                droppedCustomerDate: '',
-                gscTopUpAmount: '',
-                lastReviewMeetingDate: '',
-                leadStatusId: '',
-                mailshotFlag: '',
-                reviewDate: '',
-                reviewTime: '',
-                modifyDate: '',
-                name: '',
-                noOfPCs: '',
-                noOfServers: '',
-                noOfSites: '',
-                primaryMainContactID: '',
-                referredFlag: '',
-                regNo: '',
-                reviewMeetingBooked: '',
-                reviewMeetingFrequencyMonths: '',
-                sectorID: '',
-                slaP1: '',
-                slaP2: '',
-                slaP3: '',
-                slaP4: '',
-                slaP5: '',
-                sortCode: '',
-                specialAttentionEndDate: '',
-                specialAttentionFlag: '',
-                support24HourFlag: '',
-                techNotes: '',
-                websiteURL: '',
-                slaFixHoursP1: '',
-                slaFixHoursP2: '',
-                slaFixHoursP3: '',
-                slaFixHoursP4: '',
-                slaP1PenaltiesAgreed: '',
-                slaP2PenaltiesAgreed: '',
-                slaP3PenaltiesAgreed: '',
-                reviewUserID: '',
-                reviewAction: '',
-                lastContractSent: '',
-            }
+
         };
-        this.handleCustomerTypeUpdate = this.handleCustomerTypeUpdate.bind(this);
-        this.handlePrimaryMainContactUpdate = this.handlePrimaryMainContactUpdate.bind(this);
-        this.handleMailshotFlagUpdate = this.handleMailshotFlagUpdate.bind(this);
-        this.handleReferredFlagUpdate = this.handleReferredFlagUpdate.bind(this);
-        this.handleSpecialAttentionFlagUpdate = this.handleSpecialAttentionFlagUpdate.bind(this);
-        this.handleSpecialAttentionDateUpdate = this.handleSpecialAttentionDateUpdate.bind(this);
-        this.handleLastReviewMeetingDateUpdate = this.handleLastReviewMeetingDateUpdate.bind(this);
-        this.handleReviewMeetingBookedUpdate = this.handleReviewMeetingBookedUpdate.bind(this);
-        this.handleReviewMeetingFrequencyMonthsUpdate = this.handleReviewMeetingFrequencyMonthsUpdate.bind(this);
-        this.handleLeadStatusIdUpdate = this.handleLeadStatusIdUpdate.bind(this);
-        this.handleSupport24HourFlagUpdate = this.handleSupport24HourFlagUpdate.bind(this);
-        this.handleNameUpdate = this.handleNameUpdate.bind(this);
-        this.handleSectorIDUpdate = this.handleSectorIDUpdate.bind(this);
-        this.handleNoOfPCsUpdate = this.handleNoOfPCsUpdate.bind(this);
-        this.handleNoOfServersUpdate = this.handleNoOfServersUpdate.bind(this);
-        this.handleRegNoUpdate = this.handleRegNoUpdate.bind(this);
-        this.handleNoOfSitesUpdate = this.handleNoOfSitesUpdate.bind(this);
-        this.handleGscTopUpAmountUpdate = this.handleGscTopUpAmountUpdate.bind(this);
-        this.handleBecameCustomerDateUpdate = this.handleBecameCustomerDateUpdate.bind(this);
-        this.handleDroppedCustomerDateUpdate = this.handleDroppedCustomerDateUpdate.bind(this);
-        this.handleSLAP1Update = this.handleSLAP1Update.bind(this);
-        this.handleSLAP2Update = this.handleSLAP2Update.bind(this);
-        this.handleSLAP3Update = this.handleSLAP3Update.bind(this);
-        this.handleSLAP4Update = this.handleSLAP4Update.bind(this);
-        this.handleSLAP5Update = this.handleSLAP5Update.bind(this);
-        this.handleTechNotesUpdate = this.handleTechNotesUpdate.bind(this);
-        this.handleActiveDirectoryNameUpdate = this.handleActiveDirectoryNameUpdate.bind(this);
-        this.handleAccountManagerUserIDUpdate = this.handleAccountManagerUserIDUpdate.bind(this);
-        this.handleSortCodeUpdate = this.handleSortCodeUpdate.bind(this);
-        this.handleAccountNameUpdate = this.handleAccountNameUpdate.bind(this);
-        this.handleAccountNumberUpdate = this.handleAccountNumberUpdate.bind(this);
-        this.handleSlaFixHoursP1 = this.handleSlaFixHoursP1.bind(this);
-        this.handleSlaFixHoursP2 = this.handleSlaFixHoursP2.bind(this);
-        this.handleSlaFixHoursP3 = this.handleSlaFixHoursP3.bind(this);
-        this.handleSlaFixHoursP4 = this.handleSlaFixHoursP4.bind(this);
-        this.handleSlaP1PenaltiesAgreed = this.handleSlaP1PenaltiesAgreed.bind(this);
-        this.handleSlaP2PenaltiesAgreed = this.handleSlaP2PenaltiesAgreed.bind(this);
-        this.handleSlaP3PenaltiesAgreed = this.handleSlaP3PenaltiesAgreed.bind(this);
-        this.handleReviewDateUpdate = this.handleReviewDateUpdate.bind(this);
-        this.handleReviewTimeUpdate = this.handleReviewTimeUpdate.bind(this);
-        this.handleReviewUserIDUpdate = this.handleReviewUserIDUpdate.bind(this);
-        this.handleReviewActionUpdate = this.handleReviewActionUpdate.bind(this);
     }
 
     handleReviewActionUpdate($event) {
@@ -142,12 +53,13 @@ class CustomerEditMain extends React.Component {
     }
 
     save() {
+        const {customer} = this.props;
         return fetch('?action=updateCustomer', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(this.state.customer)
+            body: JSON.stringify(customer)
         })
             .then(response => response.json())
             .then(response => {
@@ -155,65 +67,6 @@ class CustomerEditMain extends React.Component {
     }
 
     componentDidMount() {
-        const {customerId} = this.props;
-        Promise.all([
-            fetch('?action=getCustomer&customerID=' + customerId)
-                .then(response => response.json())
-                .then(response => this.setState({customer: response.data})),
-            fetch('?action=getCustomerTypes')
-                .then(response => response.json())
-                .then(response => this.setState({
-                    customerTypes: response.data.map(x => ({
-                        label: x.cty_desc,
-                        value: x.cty_ctypeno
-                    }))
-                })),
-            fetch('?action=getMainContacts&customerID=' + customerId)
-                .then(response => response.json())
-                .then(response => this.setState({
-                    mainContacts: response.data.map(x => ({
-                        label: x.con_first_name + " " + x.con_last_name,
-                        value: x.con_contno
-                    }))
-                })),
-            fetch('?action=getLeadStatuses')
-                .then(response => response.json())
-                .then(response => this.setState({
-                    leadStatuses: response.data.map(x => ({
-                        label: x.name,
-                        value: x.id
-                    }))
-                })),
-            fetch('?action=getSectors')
-                .then(response => response.json())
-                .then(response => this.setState({
-                    sectors: response.data.map(x => ({
-                        label: x.sec_desc,
-                        value: x.sec_sectorno
-                    }))
-                })),
-            fetch('?action=getAccountManagers')
-                .then(response => response.json())
-                .then(response => this.setState({
-                    accountManagers: response.data.map(x => ({
-                        label: x.cns_name,
-                        value: x.cns_consno,
-                    }))
-                })),
-            fetch('?action=getReviewEngineers')
-                .then(response => response.json())
-                .then(response => this.setState({
-                    reviewEngineers: response.data.map(x => ({
-                        label: x.cns_name,
-                        value: x.cns_consno,
-                    }))
-                })),
-        ])
-            .then(allLoaded => {
-                console.log(this.state.customer);
-                this.setState({loaded: true});
-            })
-
     }
 
     handleCustomerTypeUpdate(value) {
@@ -361,61 +214,14 @@ class CustomerEditMain extends React.Component {
     }
 
 
-// <h4>Notes</h4>
-// <div className="row">
-// <div className="col-md-4">
-// <div className="form-group">
-// <label htmlFor="reviewDate">
-// To be reviewed on:
-// </label>
-// <input type="date"
-// value={this.state.customer.reviewDate || ''}
-// className="form-control"
-// onChange={this.handleReviewDateUpdate}
-// />
-// </div>
-// </div>
-// <div className="col-md-4">
-// <div className="form-group">
-// <label htmlFor="">Time:</label>
-// <input type="time"
-// value={this.state.customer.reviewTime || ''}
-// className="form-control"
-// onChange={this.handleReviewTimeUpdate}
-// />
-// </div>
-// </div>
-// <div className="col-md-4">
-// <div className="form-group">
-// <label>By:</label>
-// <Select
-// options={this.state.reviewEngineers}
-// selectedOption={this.state.customer.reviewUserID || ''}
-// onChange={this.handleReviewUserIDUpdate}
-// key='reviewUserID'
-// className="form-control"
-// />
-// </div>
-// </div>
-// </div>
-//
-//
-// <div className="form-group customerReviewAction">
-// <textarea title="Action to be taken"
-// cols="120"
-// rows="3"
-// value={this.state.customer.reviewAction || ''}
-// className="form-control"
-// onChange={this.handleReviewActionUpdate}
-// />
-// </div>
-// <CustomerNotesComponent customerId={customerId}/>
-// <div>
-// {this.state.customer.lastContractSent}
-// </div>
-
     render() {
-        const {customerId} = this.props;
+        const {customer} = this.props;
+
+        if (!customer) {
+            return null;
+        }
+
+        const {customerId} = customer;
         return (
             <div className="tab-pane fade show active"
                  id="nav-home"
@@ -425,7 +231,10 @@ class CustomerEditMain extends React.Component {
                 <div className="mt-3">
                     <div className="row">
                         <div className="col-md-6 mb-3">
-                            <h2>Customer - {this.state.customer.name} <a href="#"><i className="fal fa-globe"></i></a>
+                            <h2>Customer - {customer.name}
+                                <a href="#">
+                                    <i className="fal fa-globe"/>
+                                </a>
                             </h2>
                         </div>
                         <div className="col-md-6 mb-3">
@@ -650,7 +459,7 @@ class CustomerEditMain extends React.Component {
                                                 <Select options={this.state.customerTypes}
                                                         className="form-control input-sm"
                                                         selectedOption={this.state.customer.customerTypeID || ''}
-                                                        onChange={this.handleCustomerTypeUpdate}
+                                                        onChange={(value) => this.handleCustomerTypeUpdate(value)}
                                                 />
                                             </div>
                                         </div>
@@ -659,7 +468,7 @@ class CustomerEditMain extends React.Component {
                                             <div className="form-group">
                                                 <Select options={this.state.sectors}
                                                         selectedOption={this.state.customer.sectorID || ''}
-                                                        onChange={this.handleSectorIDUpdate}
+                                                        onChange={(value) => this.handleSectorIDUpdate(value)}
                                                         className="form-control input-sm"
                                                 />
                                             </div>
@@ -669,7 +478,7 @@ class CustomerEditMain extends React.Component {
                                             <div className="form-group">
                                                 <input type="number"
                                                        value={this.state.customer.noOfPCs || ''}
-                                                       onChange={this.handleNoOfPCsUpdate}
+                                                       onChange={($event) => this.handleNoOfPCsUpdate($event)}
                                                        className="form-control input-sm"
                                                 />
                                             </div>
@@ -679,7 +488,7 @@ class CustomerEditMain extends React.Component {
                                             <div className="form-group">
                                                 <input type="number"
                                                        value={this.state.customer.noOfServers || ''}
-                                                       onChange={this.handleNoOfServersUpdate}
+                                                       onChange={($event) => this.handleNoOfServersUpdate($event)}
                                                        className="form-control input-sm"
                                                 />
                                             </div>
@@ -689,7 +498,7 @@ class CustomerEditMain extends React.Component {
                                             <div className="form-group">
                                                 <input type="number"
                                                        value={this.state.customer.noOfSites || ''}
-                                                       onChange={this.handleNoOfSitesUpdate}
+                                                       onChange={($event) => this.handleNoOfSitesUpdate($event)}
                                                        size="2"
                                                        maxLength="2"
                                                        className="form-control input-sm"
@@ -700,7 +509,7 @@ class CustomerEditMain extends React.Component {
                                             <label htmlFor="">Sort Code</label>
                                             <div className="form-group">
                                                 <EncryptedTextInput encryptedValue={this.state.customer.sortCode}
-                                                                    onChange={this.handleSortCodeUpdate}
+                                                                    onChange={(value) => this.handleSortCodeUpdate(value)}
                                                                     mask='99-99-99'
                                                 />
                                             </div>
@@ -710,7 +519,7 @@ class CustomerEditMain extends React.Component {
                                             <div className="form-group">
                                                 <EncryptedTextInput className="form-control input-sm"
                                                                     encryptedValue={this.state.customer.accountName || ''}
-                                                                    onChange={this.handleAccountNameUpdate}
+                                                                    onChange={(value) => this.handleAccountNameUpdate(value)}
                                                 />
                                             </div>
                                         </div>
@@ -719,7 +528,7 @@ class CustomerEditMain extends React.Component {
                                             <div className="form-group">
                                                 <EncryptedTextInput
                                                     encryptedValue={this.state.customer.accountNumber}
-                                                    onChange={this.handleAccountNumberUpdate}
+                                                    onChange={(value) => this.handleAccountNumberUpdate(value)}
                                                     mask='99999999'
                                                 />
                                             </div>
@@ -729,7 +538,7 @@ class CustomerEditMain extends React.Component {
                                             <div className="form-group">
                                                 <input type="text"
                                                        value={this.state.customer.regNo || ''}
-                                                       onChange={this.handleRegNoUpdate}
+                                                       onChange={($event) => this.handleRegNoUpdate($event)}
                                                        size="10"
                                                        maxLength="10"
                                                        className="form-control input-sm"
@@ -741,7 +550,7 @@ class CustomerEditMain extends React.Component {
                                             <div className="form-group">
                                                 <input type="text"
                                                        value={this.state.customer.gscTopUpAmount || ''}
-                                                       onChange={this.handleGscTopUpAmountUpdate}
+                                                       onChange={($event) => this.handleGscTopUpAmountUpdate($event)}
                                                        size="10"
                                                        maxLength="10"
                                                        className="form-control input-sm"
@@ -764,7 +573,7 @@ class CustomerEditMain extends React.Component {
                                                 <label style={{margin: "0 .5rem"}}>1</label>
                                                 <input type="number"
                                                        value={this.state.customer.slaP1 || ''}
-                                                       onChange={this.handleSLAP1Update}
+                                                       onChange={($event) => this.handleSLAP1Update($event)}
                                                        size="1"
                                                        maxLength="3"
                                                        className="form-control col-sm-4"
@@ -772,7 +581,7 @@ class CustomerEditMain extends React.Component {
                                                 <label style={{margin: "0 .5rem"}}>2</label>
                                                 <input type="number"
                                                        value={this.state.customer.slaP2 || ''}
-                                                       onChange={this.handleSLAP2Update}
+                                                       onChange={($event) => this.handleSLAP2Update($event)}
                                                        size="1"
                                                        maxLength="3"
                                                        className="form-control col-sm-4"
@@ -783,7 +592,7 @@ class CustomerEditMain extends React.Component {
                                                 <label style={{margin: "0 .5rem"}}>3</label>
                                                 <input type="number"
                                                        value={this.state.customer.slaP3 || ''}
-                                                       onChange={this.handleSLAP3Update}
+                                                       onChange={($event) => this.handleSLAP3Update($event)}
                                                        size="1"
                                                        maxLength="3"
                                                        className="form-control col-sm-4"
@@ -791,7 +600,7 @@ class CustomerEditMain extends React.Component {
                                                 <label style={{margin: "0 .5rem"}}>4</label>
                                                 <input type="number"
                                                        value={this.state.customer.slaP4 || ''}
-                                                       onChange={this.handleSLAP4Update}
+                                                       onChange={($event) => this.handleSLAP4Update($event)}
                                                        size="1"
                                                        maxLength="3"
                                                        className="form-control col-sm-4"
@@ -803,7 +612,7 @@ class CustomerEditMain extends React.Component {
                                                 <label style={{margin: "0 .5rem"}}>5</label>
                                                 <input type="number"
                                                        value={this.state.customer.slaP5 || ''}
-                                                       onChange={this.handleSLAP5Update}
+                                                       onChange={($event) => this.handleSLAP5Update($event)}
                                                        size="1"
                                                        maxLength="3"
                                                        className="form-control col-sm-4"
@@ -820,7 +629,7 @@ class CustomerEditMain extends React.Component {
                                                        step="0.1"
                                                        maxLength="4"
                                                        max="999.9"
-                                                       onChange={this.handleSlaFixHoursP1}
+                                                       onChange={($event) => this.handleSlaFixHoursP1($event)}
                                                        className="form-control col-sm-4"
                                                 />
                                                 <label style={{margin: "0 .5rem"}}>2</label>
@@ -830,7 +639,7 @@ class CustomerEditMain extends React.Component {
                                                        step="0.1"
                                                        maxLength="4"
                                                        max="999.9"
-                                                       onChange={this.handleSlaFixHoursP2}
+                                                       onChange={($event) => this.handleSlaFixHoursP2($event)}
                                                        className="form-control col-sm-4"
                                                 />
                                             </div>
@@ -842,7 +651,7 @@ class CustomerEditMain extends React.Component {
                                                        step="0.1"
                                                        maxLength="4"
                                                        max="999.9"
-                                                       onChange={this.handleSlaFixHoursP3}
+                                                       onChange={($event) => this.handleSlaFixHoursP3($event)}
                                                        className="form-control col-sm-4"
                                                 />
                                                 <label style={{margin: "0 .5rem"}}>4</label>
@@ -852,7 +661,7 @@ class CustomerEditMain extends React.Component {
                                                        step="0.1"
                                                        maxLength="4"
                                                        max="999.9"
-                                                       onChange={this.handleSlaFixHoursP4}
+                                                       onChange={($event) => this.handleSlaFixHoursP4($event)}
                                                        className="form-control col-sm-4"
                                                 />
 
@@ -867,7 +676,7 @@ class CustomerEditMain extends React.Component {
                                                     >
                                                         <input type="checkbox"
                                                                checked={this.state.customer.slaP1PenaltiesAgreed || ''}
-                                                               onChange={this.handleSlaP1PenaltiesAgreed}
+                                                               onChange={($event) => this.handleSlaP1PenaltiesAgreed($event)}
                                                         />
                                                         <span className="slider round"/>
                                                     </label>
@@ -879,7 +688,7 @@ class CustomerEditMain extends React.Component {
                                                     >
                                                         <input type="checkbox"
                                                                checked={this.state.customer.slaP2PenaltiesAgreed || ''}
-                                                               onChange={this.handleSlaP2PenaltiesAgreed}
+                                                               onChange={($event) => this.handleSlaP2PenaltiesAgreed($event)}
                                                         />
                                                         <span className="slider round"/>
                                                     </label>
@@ -890,7 +699,7 @@ class CustomerEditMain extends React.Component {
                                                     >
                                                         <input type="checkbox"
                                                                checked={this.state.customer.slaP3PenaltiesAgreed || ''}
-                                                               onChange={this.handleSlaP3PenaltiesAgreed}
+                                                               onChange={($event) => this.handleSlaP3PenaltiesAgreed($event)}
                                                         />
                                                         <span className="slider round"/>
                                                     </label>
@@ -917,7 +726,7 @@ class CustomerEditMain extends React.Component {
                                                           cols="30"
                                                           rows="2"
                                                           value={this.state.customer.techNotes || ''}
-                                                          onChange={this.handleTechNotesUpdate}
+                                                          onChange={($event) => this.handleTechNotesUpdate($event)}
                                                 />
                                             </div>
                                         </div>
@@ -926,15 +735,13 @@ class CustomerEditMain extends React.Component {
                                             <div className="form-group">
                                                 <input type="text"
                                                        value={this.state.customer.activeDirectoryName || ''}
-                                                       onChange={this.handleActiveDirectoryNameUpdate}
+                                                       onChange={($event) => this.handleActiveDirectoryNameUpdate($event)}
                                                        size="54"
                                                        maxLength="255"
                                                        className="form-control input-sm"
                                                 />
                                             </div>
                                         </div>
-
-
 
 
                                     </div>
@@ -948,8 +755,25 @@ class CustomerEditMain extends React.Component {
     }
 
     isProspect() {
-        return !(this.state.customer.becameCustomerDate && !this.state.customer.droppedCustomerDate);
+        return !(this.props.customer.becameCustomerDate && !this.props.customer.droppedCustomerDate);
     }
 }
 
-export default CustomerEditMain;
+function mapStateToProps(state) {
+    const {customerEdit} = state;
+    debugger;
+    return {
+        customer: customerEdit.customer,
+        customerTypes: customerEdit.customerTypes,
+        leadStatuses: customerEdit.leadStatuses,
+        sectors: customerEdit.sectors,
+        accountManagers: customerEdit.accountManagers,
+        reviewEngineers: customerEdit.reviewEngineers,
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {}
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CustomerEditMain)

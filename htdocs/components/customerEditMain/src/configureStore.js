@@ -5,8 +5,8 @@ import {composeWithDevTools} from 'redux-devtools-extension'
 
 
 const composeEnhancers = composeWithDevTools({
-    trace: true,
-    traceLimit: 25
+        trace: true,
+        traceLimit: 25
 })
 
 export default function configureStore(preloadedState) {
