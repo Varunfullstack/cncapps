@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 1012 - Automatic Webroot Deactivation
+
 ## [v4.6.0] - 2020-09-17
 ### Added
 - Issue 976 - ServiceDesk Team Individual Stats
