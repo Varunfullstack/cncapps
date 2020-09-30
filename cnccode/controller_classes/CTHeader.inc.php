@@ -502,6 +502,9 @@ class CTHeader extends CTCNC
                 'customerReviewMeetingText'                                          => Controller::htmlInputText(
                     $dsHeader->getValue(DBEHeader::customerReviewMeetingText)
                 ),
+                DBEHeader::computerLastSeenThresholdDays                             => $dsHeader->getValue(
+                    DBEHeader::computerLastSeenThresholdDays
+                ),
                 DBEHeader::RemoteSupportMinWarnHours                                 => Controller::htmlInputText(
                     $dsHeader->getValue(DBEHeader::RemoteSupportMinWarnHours)
                 ),
