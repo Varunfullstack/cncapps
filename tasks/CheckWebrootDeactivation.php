@@ -292,7 +292,7 @@ $hdrs = array(
 );
 
 global $twig;
-$body = $twig->render('@internal/streamOneMissingLicensesEmail.html.twig', ["items" => $errors]);
+$body = $twig->render('@internal/computersNotSeenRecentlyEmail.html.twig', ["items" => $errors]);
 $buMail->mime->setHTMLBody($body);
 $buMail->mime->addAttachment('data.csv', 'text/csv');
 
