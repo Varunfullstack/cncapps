@@ -7,6 +7,14 @@ const getMappedContacts = createSelector(
         return contacts.allIds.map(id => contacts.byIds[id])
     }
 )
+const getSitesMap = (state) => state.sites;
+const getMappedSites = createSelector(
+    [getSitesMap],
+    (sitesMap) => {
+        return sitesMap.allIds.map(id => sitesMap.byIds[id]);
+    }
+)
+
 export const createGetSiteContacts = () => {
     return createSelector(
         [getMappedContacts, (state, props) => props.siteNo],
@@ -16,21 +24,34 @@ export const createGetSiteContacts = () => {
     )
 }
 
-export const getCustomer = (state) => state.customer;
+export const createGetSite = () => {
+    return createSelector(
+        [getSitesMap, (state, props) => props.siteNo],
+        (sitesMap, siteNo) => {
+            return sitesMap.byIds[siteNo];
+        }
+    )
+}
+
+export const getCustomer = (state) => state.customerEdit.customer;
 
 export const getCustomerId = createSelector(
     [getCustomer],
-    (customer) => customer.id
+    (customer) => customer?.id
 )
 
 
 export const getInvoiceSiteNo = createSelector(
     [getCustomer],
-    (customer) => customer.invoiceSiteNo
+    (customer) => customer?.invoiceSiteNo
 )
 
 export const getDeliverSiteNo = createSelector(
     [getCustomer],
-    (customer) => customer.deliverSiteNo
+    (customer) => customer?.deliverSiteNo
 )
 
+export const getMainContacts = createSelector(
+    [getMappedContacts],
+    (contacts) => contacts.filter(contact => contact.supportLevel === 'main')
+)

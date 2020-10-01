@@ -1,7 +1,7 @@
 import React from 'react'
-import {createGetSiteContacts, getCustomerId, getDeliverSiteNo, getInvoiceSiteNo} from "../selectors";
+import {createGetSite, createGetSiteContacts, getCustomerId} from "../selectors";
 import {connect} from "react-redux";
-import {addContactToSite, changeDeliverSiteNo, changeInvoiceSiteNo, deleteSite, saveSite, updateSite} from "../actions";
+import {addContactToSite, deleteSite, saveSite, updateSite} from "../actions";
 
 class Site extends React.Component {
 
@@ -11,6 +11,7 @@ class Site extends React.Component {
     }
 
     handleInputChange($event) {
+        const {site} = this.props;
         const target = $event.target;
         let value = target.value;
         const name = target.name;
@@ -158,28 +159,6 @@ class Site extends React.Component {
                                     />
                                 </div>
                             </div>
-                            <div className="col-lg-2">
-                                <label htmlFor="invoiceSiteNo">
-                                    Default Invoice
-                                </label>
-                                <div className="form-group form-inline">
-
-                                </div>
-                            </div>
-                            <div className="col-lg-2">
-                                <label htmlFor="deliverSiteNo">
-                                    Default Delivery
-                                </label>
-                                <div className="form-group form-inline">
-                                    <input type="radio"
-                                           name="deliverSiteNo"
-                                           value={site.siteNo || ''}
-                                           checked={+this.props.deliverSiteNo === +site.siteNo}
-                                           onChange={($event) => this.props.changedDeliverSiteNo($event.target.value)}
-                                           className="form-control"
-                                    />
-                                </div>
-                            </div>
                             <div className="col-lg-4">
                                 <label htmlFor="invoiceContact">
                                     Invoice Contact
@@ -292,12 +271,12 @@ class Site extends React.Component {
 
 const makeMapStateToProps = () => {
     const getSiteContacts = createGetSiteContacts()
+    const getSite = createGetSite();
     return (state, props) => {
         return {
+            site: getSite(state, props),
             contacts: getSiteContacts(state, props),
             customerId: getCustomerId(state),
-            invoiceSiteNo: getInvoiceSiteNo(state),
-            deliverSiteNo: getDeliverSiteNo(state)
         }
     }
 }
@@ -305,12 +284,6 @@ const makeMapStateToProps = () => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        changeDeliverSiteNo: siteNo => {
-            dispatch(changeDeliverSiteNo(siteNo))
-        },
-        changeInvoiceSiteNo: siteNo => {
-            dispatch(changeInvoiceSiteNo(siteNo))
-        },
         addContactToSite: siteNo => {
             dispatch(addContactToSite(siteNo))
         },
