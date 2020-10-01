@@ -7,7 +7,8 @@ import {
     FETCH_LEAD_STATUSES_SUCCESS,
     FETCH_REVIEW_ENGINEERS_SUCCESS,
     FETCH_SECTORS_SUCCESS,
-    SAVE_CUSTOMER_DATA_SUCCESS
+    SAVE_CUSTOMER_DATA_SUCCESS,
+    UPDATE_CUSTOMER_VALUE
 } from "../actionTypes";
 
 const initialState = {
@@ -125,6 +126,12 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 reviewEngineers: action.reviewEngineers
+            }
+        }
+        case UPDATE_CUSTOMER_VALUE: {
+            return {
+                ...state,
+                customer: {...state.customer, [action.field]: action.value}
             }
         }
         default:

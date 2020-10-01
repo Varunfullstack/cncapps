@@ -27,6 +27,7 @@ import {
     SAVE_CUSTOMER_DATA_SUCCESS,
     SAVE_SITE_SUCCESS,
     TOGGLE_VISIBILITY,
+    UPDATE_CUSTOMER_VALUE,
     UPDATE_SITE
 } from "./actionTypes";
 
@@ -155,6 +156,10 @@ export function requestSaveSite(siteNo) {
 
 export function saveSiteSuccess(siteNo) {
     return {type: SAVE_SITE_SUCCESS, siteNo}
+}
+
+export function updateCustomerValue(field, value) {
+    return {type: UPDATE_CUSTOMER_VALUE, field, value}
 }
 
 export function fetchSites(customerId) {

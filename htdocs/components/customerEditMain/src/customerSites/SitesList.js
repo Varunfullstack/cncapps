@@ -3,8 +3,9 @@ import {connect} from "react-redux";
 import {toggleVisibility} from "../actions";
 import Site from './Site.js';
 import {SHOW_ACTIVE} from "../visibilityFilterTypes";
+import {getDeliverSiteNo, getInvoiceSiteNo} from "../selectors";
 
-const SitesList = ({sites, customerId, contacts, invoiceSiteNo, deliverSiteNo, changeInvoiceSiteNo, changeDeliverSiteNo, addContactToSite, updateSite, deleteSite}) => {
+const SitesList = ({sites, visibilityFilter, toggleVisibility, invoiceSiteNo, deliverSiteNo}) => {
     const getSiteOptions = (sites) => {
         return sites.filter(x => x.active).map(site => {
             return (
@@ -54,10 +55,24 @@ const SitesList = ({sites, customerId, contacts, invoiceSiteNo, deliverSiteNo, c
                                     className="form-control input-sm"
                             >
                                 <option value="">
-                                    Select a Default Delivery Site
+                                    Select a Default deliver Site
                                 </option>
                                 {getSiteOptions(sites)}
                             </select>
+                        </div>
+                        <div className="form-group form-inline">
+                            <label className="switch">
+                                <input type="checkbox"
+                                       name="showOnlyActiveSites"
+                                       onChange={($event) => toggleVisibility()}
+                                       title="Show only active sites"
+                                       value="1"
+                                       checked={visibilityFilter === SHOW_ACTIVE}
+                                       className="form-control"
+                                />
+                                <span className="slider round"/>
+                            </label>
+                            Show Active Only
                         </div>
                     </div>
                 </div>
@@ -85,6 +100,7 @@ const SitesList = ({sites, customerId, contacts, invoiceSiteNo, deliverSiteNo, c
 }
 
 function getVisibleSites(sites, filter) {
+    console.log(sites, filter);
     const mappedSites = sites.allIds.map(id => sites.byIds[id]);
     if (filter === SHOW_ACTIVE) {
         return mappedSites.filter(x => x.active);
@@ -92,19 +108,12 @@ function getVisibleSites(sites, filter) {
     return mappedSites;
 }
 
-function getMappedContacts(contacts) {
-    return contacts.allIds.map(id => contacts.byIds[id])
-}
-
-function debug(key, result) {
-    console.log(key, result);
-    return result;
-}
-
 function mapStateToProps(state) {
-    debugger;
     return {
         sites: getVisibleSites(state.sites, state.visibilityFilter),
+        visibilityFilter: state.visibilityFilter,
+        invoiceSiteNo: getInvoiceSiteNo(state),
+        deliverSiteNo: getDeliverSiteNo(state)
     }
 }
 
