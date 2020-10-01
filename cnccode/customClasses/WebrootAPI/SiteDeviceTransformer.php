@@ -13,6 +13,7 @@ class SiteDeviceTransformer implements \Karriere\JsonDecoder\Transformer
     {
         $classBindings->register(new AliasBinding("hostName", "HostName", false));
         $classBindings->register(new AliasBinding("lastSeen", "LastSeen", false));
+        $classBindings->register(new AliasBinding("deactivated", "Deactivated", false));
     }
 
     public function transforms()

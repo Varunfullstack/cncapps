@@ -1,0 +1,17 @@
+{% extends "@internal/wrapper.html.twig" %}
+{% block content %}
+    <p>
+        Attached is the report of computers not seen recently please review it.
+    </p>
+    <p>
+        Below is a list of issues found while checking the computers
+    </p>
+
+    <ul>
+        {% for item in items %}
+            <li>
+                {{ item }}
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

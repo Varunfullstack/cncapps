@@ -8,4 +8,5 @@ class SiteDevice
 {
     public $hostName;
     public $lastSeen;
+    public $deactivated;
 }
