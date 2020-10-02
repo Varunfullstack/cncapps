@@ -75,7 +75,39 @@ class BUProject extends Business
         return $link;
 
     }
-
+/**
+     * @param $customerID
+     * @return array
+     * @throws Exception
+     */
+    public static function getCustomerProjects($customerID)
+    {
+        $thing = null;
+        $buProject = new BUProject($thing);
+        $dsProject = new DataSet($thing);
+        $buProject->getProjectsByCustomerID(
+            $customerID,
+            $dsProject,
+            date(DATE_MYSQL_DATE)
+        );        
+        $projects=array();
+        while ($dsProject->fetchNext()) {
+            $url = Controller::buildLink(
+                'Project.php',
+                array(
+                    'action'    => 'edit',
+                    'projectID' => $dsProject->getValue(DBEProject::projectID),
+                )
+            );
+            array_push($projects,
+            [
+                "projectID"=> $dsProject->getValue(DBEProject::projectID),
+                "description"=>$dsProject->getValue(DBEProject::description),
+                "editUrl"=> $url 
+            ]);
+        }
+        return $projects;
+    }
     function getProjectByID($ID,
                             &$dsResults
     )

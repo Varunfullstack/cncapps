@@ -85,3 +85,11 @@ export const Colors={
   PURPLE : '#dcbdff',
   ORANGE : '#FFE6AB',
 }
+export const params= new URLSearchParams(window.location.search);
+export function pick(obj,values){
+  const temp={...obj};
+  let newObj={};
+  for(let i=0;i<values.length;i++)  
+    newObj[values[i]]=temp[values[i]];  
+  return newObj;
+}

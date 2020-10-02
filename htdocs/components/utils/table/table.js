@@ -1,5 +1,21 @@
 import TableHeader from "./tableHeader.js?v=1";
 import TableBody from "./tableBody.js?v=1";
+import TableFooter from "./tableFooter.js?v=1";
+/**
+ * -- main properties
+ * key: "documents",
+ * data: data?.documents || [],
+ * columns: columns,
+ * pk: "id",
+ * search: false,
+ * hasFooter:false
+ * -- columns properties
+ * path:''
+ * label:''
+ * sortable:false
+ * footerContent :(c)=>
+ * footerColSpan :1
+ */
 class Table extends React.Component {
   delayTimer;
   constructor(props) {
@@ -84,6 +100,7 @@ class Table extends React.Component {
       selectedKey,
       search,
       searchLabelStyle,
+      hasFooter
     } = props;
     const { sortColumn } = this.state;
     const { handleSearch } = this;
@@ -124,10 +141,10 @@ class Table extends React.Component {
               selectedKey,
             })
           : null,
+          hasFooter?el(TableFooter,{ key: "tableFooter",columns}):null
       ]),
     ];
   }
 }
-
 export default Table;
-1;
+

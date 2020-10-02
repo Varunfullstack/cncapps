@@ -6485,7 +6485,27 @@ is currently a balance of ';
         return 'ALL_GOOD';
 
     }
+/**
+     * @param DataSet $dsCallActivity
+     * @param CTCNC $ctActivity
+     * @return bool
+     */
+    function checkActivityEditionByProblem($dsCallActivity,$ctActivity,$dbeProblem)
+    {
+        if ($dsCallActivity->getValue(DBECallActivity::overtimeExportedFlag) == 'Y' && !$ctActivity->getDbeUser(
+            )->isApprover()) {
+            return "This activity has overtime which has been processed so it can't be edited.";
+        }
 
+        // status is NOT Authorised AND NOT Checked        
+        if ($dbeProblem->getValue(DBEProblem::status) == 'C' && !$ctActivity->isUserSDManager()
+        ) {
+            return "This request has been completed and can't be edited.";
+        }
+
+        return 'ALL_GOOD';
+
+    }
     function finaliseActivity(
         $callActivityID,
         $onSite = false

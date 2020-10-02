@@ -367,12 +367,14 @@
 
 .table-responsive > .table-bordered {
     border: 0;
-}
-
-.table .selected {
-    background-color: #c2d8ee !important;
-}
-
-.table .selected td {
-    border-color: #c2d8ee !important;
-}
+    }
+    .table .selected{
+        background-color: #c2d8ee !important;
+    }
+    .table .selected td{
+        border-color: #c2d8ee !important;
+    }
+    .table .footer{
+        font-size: 20px;
+        font-weight: bold;
+    }

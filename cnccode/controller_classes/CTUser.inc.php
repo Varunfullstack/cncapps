@@ -267,6 +267,9 @@ class CTUser extends CTCNC
                     ]
                 );
                 break;
+                case "getCurrentUser":
+                    echo $this->getCurrentUser();
+                    exit;
             case CTUSER_ACT_DISPLAY_LIST:
             default:
                 $this->displayList();
@@ -1082,5 +1085,18 @@ class CTUser extends CTCNC
             true
         );
         $this->parsePage();
+    }
+    function getCurrentUser()
+    {
+        return json_encode( [
+            'firstName' => $this->dbeUser->getValue(DBEJUser::firstName),
+            'lastName' => $this->dbeUser->getValue(DBEJUser::lastName),
+            'id' => $this->dbeUser->getValue(DBEJUser::userID),
+            'email' => $this->dbeUser->getEmail(),
+            'isSdManager'=>$this->isSdManager(),
+            'isExpenseApprover' => $this->dbeUser->getValue(DBEJUser::isExpenseApprover),
+            'globalExpenseApprover' => $this->dbeUser->getValue(DBEJUser::globalExpenseApprover),
+
+        ]);
     }
 }

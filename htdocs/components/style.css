@@ -148,19 +148,23 @@ dd {
     flex: 0 0 100%;
     max-width: 100%;
 }
- .check-box{
-     padding-top: 5px;
-     padding-bottom: 5px;
-     cursor: pointer;
-     display: flex;
-     flex-direction: row;
- }
- .check-box label{
+
+.check-box {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+}
+
+.check-box label {
     margin-left: 10px;
 }
-.row-reverse{
+
+.row-reverse {
     flex-direction: row-reverse !important;
 }
+
 .row {
     display: -webkit-box;
     display: -ms-flexbox;
@@ -180,7 +184,6 @@ dd {
     flex-grow: 1;
     max-width: 100%;
     padding-left: 15px;
-
 }
 
 .col-1, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-10, .col-11, .col-12 {
@@ -214,11 +217,9 @@ dd {
     background-color: white;
     border-left: 1px solid #999;
     border-right: 1px solid #999;
-
 }
 
-.suggestion-active,
-.suggestions li:hover {
+.suggestion-active, .suggestions li:hover {
     background-color: rgb(0, 127, 255) !important;
     color: white;
     cursor: pointer;
@@ -244,7 +245,6 @@ dd {
     display: block;
     width: 100%;
     /* padding: .375rem .75rem; */
-
     /* line-height: 1.5; */
     color: #495057;
     background-color: #fff;
@@ -306,32 +306,224 @@ dd {
     margin-left: 5pt;
 }
 
+.mr-1 {
+    margin-right: 1pt;
+}
+
+.mr-2 {
+    margin-right: 2pt;
+}
+
+.mr-3 {
+    margin-right: 3pt;
+}
+
+.mr-4 {
+    margin-right: 4pt;
+}
+
+.mr-5 {
+    margin-right: 5pt;
+}
+/*margin top*/
+.mt-1 {
+    margin-top: 1pt;
+}
+
+.mt-2 {
+    margin-top: 2pt;
+}
+
+.mt-3 {
+    margin-top: 3pt;
+}
+
+.mt-4 {
+    margin-top: 4pt;
+}
+
+.mt-5 {
+    margin-top: 5pt;
+}
+/*margin bottom*/
+.mb-1 {
+    margin-bottom: 1pt;
+}
+
+.mb-2 {
+    margin-bottom: 2pt;
+}
+
+.mb-3 {
+    margin-bottom: 3pt;
+}
+
+.mb-4 {
+    margin-bottom: 4pt;
+}
+
+.mb-5 {
+    margin: 5pt;
+}
+/*margin*/
+.m-1 {
+    margin: 1pt;
+}
+
+.m-2 {
+    margin: 2pt;
+}
+
+.m-3 {
+    margin: 3pt;
+}
+
+.m-4 {
+    margin: 4pt;
+}
+
+.m-5 {
+    margin: 5pt;
+}
+/*padding */
+
+.pl-1 {
+    padding-left: 1pt;
+}
+
+.pl-2 {
+    padding-left: 2pt;
+}
+
+.pl-3 {
+    padding-left: 3pt;
+}
+
+.pl-4 {
+    padding-left: 4pt;
+}
+
+.pl-5 {
+    padding-right: 5pt;
+}
+
+.pr-1 {
+    padding-right: 1pt;
+}
+
+.pr-2 {
+    padding-right: 2pt;
+}
+
+.pr-3 {
+    padding-right: 3pt;
+}
+
+.pr-4 {
+    padding-right: 4pt;
+}
+
+.pr-5 {
+    padding-right: 5pt;
+}
+/*padding top*/
+.pt-1 {
+    padding-top: 1pt;
+}
+
+.pt-2 {
+    padding-top: 2pt;
+}
+
+.pt-3 {
+    padding-top: 3pt;
+}
+
+.pt-4 {
+    padding-top: 4pt;
+}
+
+.pt-5 {
+    padding-top: 5pt;
+}
+/*padding bottom*/
+.pb-1 {
+    padding-bottom: 1pt;
+}
+
+.pb-2 {
+    padding-bottom: 2pt;
+}
+
+.pb-3 {
+    padding-bottom: 3pt;
+}
+
+.pb-4 {
+    padding-bottom: 4pt;
+}
+
+.pb-5 {
+    padding: 5pt;
+}
+/*padding*/
+.p-1 {
+    padding: 1pt;
+}
+
+.p-2 {
+    padding: 2pt;
+}
+
+.p-3 {
+    padding: 3pt;
+}
+
+.p-4 {
+    padding: 4pt;
+}
+
+.p-5 {
+    padding: 5pt;
+}
+/*end padding*/
 .text-center {
     text-align: center;
 }
-.content-center{
+
+.content-center {
     justify-content: center;
 }
+
 /*--------------------- start of Modal*/
 
 /* The Modal (background) */
+
 .modal {
-
-
-    display: block; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 100; /* Sit on top */
-    padding-top: 100px; /* Location of the box */
+    display: block;
+    /* Hidden by default */
+    position: fixed;
+    /* Stay in place */
+    z-index: 100;
+    /* Sit on top */
+    padding-top: 100px;
+    /* Location of the box */
     left: 0;
     top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgb(0, 0, 0); /* Fallback color */
-    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+    width: 100%;
+    /* Full width */
+    height: 100%;
+    /* Full height */
+    overflow: auto;
+    /* Enable scroll if needed */
+    background-color: rgb(0, 0, 0);
+    /* Fallback color */
+    background-color: rgba(0, 0, 0, 0.4);
+    /* Black w/ opacity */
 }
 
 /* Modal Content */
+
 .modal-content {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !important;
     font-size: 1rem !important;
@@ -339,7 +531,6 @@ dd {
     line-height: 1.5 !important;
     color: #212529 !important;
     text-align: left !important;
-
     position: relative;
     background-color: #fefefe;
     margin: auto;
@@ -352,7 +543,6 @@ dd {
     -webkit-animation-duration: 0.4s;
     animation-name: animatetop;
     animation-duration: 0.4s;
-
 }
 
 .modal-content h4 {
@@ -360,10 +550,10 @@ dd {
     font-weight: 600 !important;
     color: #212529 !important;
     line-height: 1.8 !important;
-
 }
 
 /* Add Animation */
+
 @-webkit-keyframes animatetop {
     from {
         top: -300px;
@@ -394,8 +584,7 @@ dd {
     font-weight: bold;
 }
 
-.close:hover,
-.close:focus {
+.close:hover, .close:focus {
     color: #000;
     text-decoration: none;
     cursor: pointer;
@@ -407,7 +596,6 @@ dd {
     border-bottom: 1px solid #e9ecef;
     border-top-left-radius: .3rem;
     border-top-right-radius: .3rem;
-
 }
 
 .modal-title {
@@ -445,136 +633,167 @@ hr {
 }
 
 /*------------------End Modal*/
+
 /*------------------Spinner*/
+
 .loader {
+    display: block;
+    /* Hidden by default */
+    position: fixed;
+    /* Stay in place */
+    z-index: 1000000;
+    /* Sit on top */
+    padding-top: 40vh;
+    /* Location of the box */
+    width: 100%;
+    /* Full width */
+    height: 100%;
+    /* Full height */
+    overflow: auto;
+    /* Enable scroll if needed */
+    background-color: rgb(0, 0, 0);
+    /* Fallback color */
+    background-color: rgba(0, 0, 0, 0.4);
+    /* Black w/ opacity */
+    margin-top: -70px;
+}
 
-    display: block; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1000000; /* Sit on top */
-    padding-top: 40vh; /* Location of the box */
-
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgb(0,0,0); /* Fallback color */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-    margin-top:-70px;
-  }
-  .loader-content {
-    border: 16px solid #C6C6C6; /* Light grey */
-    border-top: 16px solid #0082B9; /* Blue */
+.loader-content {
+    border: 16px solid #C6C6C6;
+    /* Light grey */
+    border-top: 16px solid #0082B9;
+    /* Blue */
     border-radius: 50%;
     width: 100px;
     height: 100px;
     animation: spin 2s linear infinite;
     position: relative;
     margin: auto;
-
 }
 
 .loader-content-sm {
-    border: 5px solid #f3f3f3; /* Light grey */
-    border-top: 5px solid #3498db; /* Blue */
+    border: 5px solid #f3f3f3;
+    /* Light grey */
+    border-top: 5px solid #3498db;
+    /* Blue */
     border-radius: 50%;
     width: 20px;
     height: 20px;
     animation: spin 2s linear infinite;
     position: absolute;
-
     margin: auto;
-
 }
 
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-  .pointer{
-      cursor: pointer;
-  }
-.tab-container{
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.tab-container {
     display: flex;
     flex-direction: row;
     margin-bottom: 5px;
 }
-.tab-container i{
+
+.tab-container i {
     margin: 2px !important;
     font-style: normal !important;
     font-weight: 400 !important;
-    background-color: #E6E6E6  !important;
+    background-color: #E6E6E6 !important;
     padding: 5px;
     border-radius: 5px 5px 0px 1px;
     line-height: 1rem;
     font-size: 16px;
     cursor: pointer;
 }
-.tab-container i:hover{
-    background-color: #C6C6C6  !important;
 
+.tab-container i:hover {
+    background-color: #C6C6C6 !important;
 }
-.tab-container i.active{
-    background-color: #0082B9  !important;
+
+.tab-container i.active {
+    background-color: #0082B9 !important;
     color: white;
     font-weight: 500 !important;
+}
 
+.color-gray {
+    color: #C6C6C6 !important;
+    /* color:#F8A5B6 */
 }
-.color-gray{
-    color:#C6C6C6 !important;
-     /* color:#F8A5B6 */
+
+.color-gray2 {
+    color: #3C3C3C
 }
-.color-gray2{
-   color: #3C3C3C
-}
+
 /*current activity style*/
-.desscription{
+
+.desscription {
     line-height: 0.5em;
-    height: 1em;       /* height is 2x line-height, so two lines will display */
-    overflow: hidden; 
-    text-overflow: ellipsis;    
+    height: 1em;
+    /* height is 2x line-height, so two lines will display */
+    overflow: hidden;
+    text-overflow: ellipsis;
     word-wrap: break-word;
-     
 }
-.inbox-icon{
+
+.inbox-icon {
     font-size: 18px !important;
-    
 }
-.in-team{
+
+.in-team {
     background-color: #C6C6C6;
 }
-.align-left{
-    text-align: left; 
+
+.align-left {
+    text-align: left;
 }
-.horizontal{
+
+.horizontal {
     display: flex;
     flex-direction: row;
 }
-.vertical{
+
+.vertical {
     display: flex;
     flex-direction: column;
 }
-.strong{
+
+.strong {
     font-weight: bold;
     font-size: 16px;
-    padding:5px;
+    padding: 5px;
 }
+
 /*------------------- toggle
 /* The switch - the box around the slider */
+
 .switch {
     position: relative;
     display: inline-block;
     width: 30px;
     height: 19px;
-  }
-  
-  /* Hide default HTML checkbox */
-  .switch input {
+}
+
+/* Hide default HTML checkbox */
+
+.switch input {
     opacity: 0;
     width: 0;
     height: 0;
-  }
-  
-  /* The slider */
-  .slider {
+}
+
+/* The slider */
+
+.slider {
     position: absolute;
     cursor: pointer;
     top: 0;
@@ -584,9 +803,9 @@ hr {
     background-color: #ccc;
     -webkit-transition: .4s;
     transition: .4s;
-  }
-  
-  .slider:before {
+}
+
+.slider:before {
     position: absolute;
     content: "";
     height: 10px;
@@ -596,28 +815,48 @@ hr {
     background-color: white;
     -webkit-transition: .4s;
     transition: .4s;
-  }
-  
-  input:checked + .slider {
+}
+
+input:checked+.slider {
     background-color: #00b9f1;
-  }
-  
-  input:focus + .slider {
+}
+
+input:focus+.slider {
     box-shadow: 0 0 1px #00b9f1;
-  }
-  
-  input:checked + .slider:before {
+}
+
+input:checked+.slider:before {
     -webkit-transform: translateX(13px);
     -ms-transform: translateX(13px);
     transform: translateX(13px);
-  }
-  
-  /* Rounded sliders */
-  .slider.round {
+}
+
+/* Rounded sliders */
+
+.slider.round {
     border-radius: 15px;
-  }
-  
-  .slider.round:before {
+}
+
+.slider.round:before {
     border-radius: 50%;
-  }
-  /*-------------------end toggle
+}
+.icon{
+    color: #404041;
+}
+.icon-disable{
+    color: #bdbec1;
+}
+.icon:hover{
+    text-decoration: unset;
+}
+/*-------------------end toggle*/
+.icon-size-1{
+    font-size: 14pt;
+}
+.link-round{
+    background-color: #bdbec1;
+    border-radius: 15px;
+    height: 15px;
+    padding: 5px;
+
+}
