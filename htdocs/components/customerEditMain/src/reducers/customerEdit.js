@@ -7,6 +7,9 @@ import {
     FETCH_LEAD_STATUSES_SUCCESS,
     FETCH_REVIEW_ENGINEERS_SUCCESS,
     FETCH_SECTORS_SUCCESS,
+    REQUEST_UPDATE_CUSTOMER_FAILED,
+    REQUEST_UPDATE_CUSTOMER_FAILED_OUT_OF_DATE,
+    REQUEST_UPDATE_CUSTOMER_SUCCESS,
     SAVE_CUSTOMER_DATA_SUCCESS,
     UPDATE_CUSTOMER_VALUE
 } from "../actionTypes";
@@ -60,6 +63,7 @@ const initialState = {
         reviewAction: '',
         lastContractSent: '',
     },
+    originalCustomer: {},
     hasPendingChanges: false,
     customerTypes: [],
     leadStatuses: [],
@@ -95,7 +99,8 @@ export default function (state = initialState, action) {
         case FETCH_CUSTOMER_SUCCESS: {
             return {
                 ...state,
-                customer: action.customer
+                customer: action.customer,
+                originalCustomer: action.customer
             }
         }
         case FETCH_CUSTOMER_TYPES_SUCCESS: {
@@ -132,6 +137,43 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 customer: {...state.customer, [action.field]: action.value}
+            }
+        }
+        case REQUEST_UPDATE_CUSTOMER_FAILED_OUT_OF_DATE: {
+            return {
+                ...state,
+                originalCustomer: {
+                    ...state.originalCustomer,
+                    lastUpdatedDateTime: action.lastUpdatedDateTime
+                },
+                customer: {
+                    ...state.originalCustomer,
+                    lastUpdatedDateTime: action.lastUpdatedDateTime
+                }
+            }
+        }
+        case REQUEST_UPDATE_CUSTOMER_SUCCESS: {
+            return {
+                ...state,
+                originalCustomer: {
+                    ...state.customer,
+                    lastUpdatedDateTime: action.lastUpdatedDateTime
+                },
+                customer: {
+                    ...state.customer,
+                    lastUpdatedDateTime: action.lastUpdatedDateTime
+                }
+            }
+        }
+        case REQUEST_UPDATE_CUSTOMER_FAILED: {
+            return {
+                ...state,
+                originalCustomer: {
+                    ...state.originalCustomer,
+                },
+                customer: {
+                    ...state.originalCustomer,
+                }
             }
         }
         default:

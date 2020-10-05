@@ -1,10 +1,12 @@
 import {
     ADD_CONTACT_TO_SITE,
+    ADD_ERROR,
     ADD_SITE,
     CHANGE_DELIVER_SITE_NO,
     CHANGE_INVOICE_SITE_NO,
     DELETE_SITE_REQUEST,
     DELETE_SITE_SUCCESS,
+    DISMISS_ERROR,
     FETCH_ACCOUNT_MANAGERS,
     FETCH_ACCOUNT_MANAGERS_SUCCESS,
     FETCH_CONTACTS_FAILURE,
@@ -24,12 +26,18 @@ import {
     FETCH_SITES_REQUEST,
     FETCH_SITES_SUCCESS,
     REQUEST_SAVE_SITE,
+    REQUEST_UPDATE_CUSTOMER,
+    REQUEST_UPDATE_CUSTOMER_FAILED,
+    REQUEST_UPDATE_CUSTOMER_FAILED_OUT_OF_DATE,
+    REQUEST_UPDATE_CUSTOMER_SUCCESS,
     SAVE_CUSTOMER_DATA_SUCCESS,
     SAVE_SITE_SUCCESS,
     TOGGLE_VISIBILITY,
     UPDATE_CUSTOMER_VALUE,
     UPDATE_SITE
 } from "./actionTypes";
+import {updateCustomer} from "./helpers";
+import {OutOfDateError} from "./helpers/OutOfDateError";
 
 export const VisibilityFilterOptions = {
     SHOW_ALL: 'SHOW_ALL',
@@ -162,6 +170,30 @@ export function updateCustomerValue(field, value) {
     return {type: UPDATE_CUSTOMER_VALUE, field, value}
 }
 
+export function requestUpdateCustomer(field, value) {
+    return {type: REQUEST_UPDATE_CUSTOMER, field, value};
+}
+
+export function requestUpdateCustomerFailedOutOfDate(lastUpdatedDateTime) {
+    return {type: REQUEST_UPDATE_CUSTOMER_FAILED_OUT_OF_DATE, lastUpdatedDateTime};
+}
+
+export function requestUpdateCustomerSuccess(lastUpdatedDateTime) {
+    return {type: REQUEST_UPDATE_CUSTOMER_SUCCESS, lastUpdatedDateTime};
+}
+
+export function dismissError(errorIndex) {
+    return {type: DISMISS_ERROR, errorIndex};
+}
+
+export function addError(message, variant = 'danger') {
+    return {type: ADD_ERROR, message, variant};
+}
+
+export function requestUpdateCustomerFailed() {
+    return {type: REQUEST_UPDATE_CUSTOMER_FAILED}
+}
+
 export function fetchSites(customerId) {
     return dispatch => {
         dispatch(requestSites(customerId))
@@ -282,6 +314,51 @@ export function deleteSite(customerId, siteNo) {
                 dispatch(deleteSiteSuccess(siteNo));
             })
     }
+}
+
+export function fetchAllData(customerId) {
+    return dispatch => {
+        dispatch(fetchSites(customerId));
+        dispatch(fetchContacts(customerId));
+        dispatch(fetchCustomer(customerId));
+        dispatch(fetchCustomerTypes());
+        dispatch(fetchLeadStatuses());
+        dispatch(fetchSectors());
+        dispatch(fetchAccountManagers());
+        dispatch(fetchReviewEngineers());
+    }
+}
+
+export function updateCustomerField(field, value) {
+    return (dispatch, getState) => {
+        dispatch(updateCustomerValue(field, value));
+        const {customerID, lastUpdatedDateTime} = getState().customerEdit.customer;
+        return updateCustomer(customerID, {[field]: value}, lastUpdatedDateTime)
+            .then(newLastUpdated => {
+                // we have to apply the change to the original customer
+                dispatch(requestUpdateCustomerSuccess(newLastUpdated))
+            })
+            .catch((error) => {
+                if (error instanceof OutOfDateError) {
+                    //we should refetch everything ..just in case
+                    dispatch(requestUpdateCustomerFailedOutOfDate(error.lastUpdatedDateTime));
+                    dispatch(addError('Unable to save change due to another edit by someone else'));
+                    dispatch(fetchAllData(customerID));
+                    return;
+                }
+
+                dispatch(requestUpdateCustomerFailed());
+                dispatch(addError(`Unable to save change due to an error in the server: ${error.message}`))
+            })
+    }
+}
+
+export function updateInvoiceSiteNo(value) {
+    return updateCustomerField('invoiceSiteNo', value);
+}
+
+export function updateDeliverSiteNo(value) {
+    return updateCustomerField('deliverSiteNo', value);
 }
 
 export function saveSite(site) {

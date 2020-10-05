@@ -1,11 +1,11 @@
 import React from 'react';
 import {connect} from "react-redux";
-import {toggleVisibility} from "../actions";
+import {changeDeliverSiteNo, changeInvoiceSiteNo, toggleVisibility} from "../actions";
 import Site from './Site.js';
 import {SHOW_ACTIVE} from "../visibilityFilterTypes";
 import {getDeliverSiteNo, getInvoiceSiteNo} from "../selectors";
 
-const SitesList = ({sites, visibilityFilter, toggleVisibility, invoiceSiteNo, deliverSiteNo}) => {
+const SitesList = ({sites, visibilityFilter, onToggleVisibility, invoiceSiteNo, deliverSiteNo, onChangeInvoiceSiteNo, onChangeDeliverSiteNo}) => {
     const getSiteOptions = (sites) => {
         return sites.filter(x => x.active).map(site => {
             return (
@@ -39,8 +39,8 @@ const SitesList = ({sites, visibilityFilter, toggleVisibility, invoiceSiteNo, de
                         </div>
                         <div className="form-group">
                             <select name="invoiceSiteNo"
-                                    value={invoiceSiteNo || ''}
-                                    onChange={($event) => changeInvoiceSiteNo($event.target.value)}
+                                    value={'' + invoiceSiteNo || ''}
+                                    onChange={($event) => onChangeInvoiceSiteNo($event.target.value)}
                                     className="form-control input-sm mr-1"
                             >
                                 <option value="">
@@ -50,8 +50,8 @@ const SitesList = ({sites, visibilityFilter, toggleVisibility, invoiceSiteNo, de
                             </select>
 
                             <select name="deliverSiteNo"
-                                    value={deliverSiteNo || ''}
-                                    onChange={($event) => changeDeliverSiteNo($event.target.value)}
+                                    value={'' + deliverSiteNo || ''}
+                                    onChange={($event) => onChangeDeliverSiteNo($event.target.value)}
                                     className="form-control input-sm"
                             >
                                 <option value="">
@@ -64,7 +64,7 @@ const SitesList = ({sites, visibilityFilter, toggleVisibility, invoiceSiteNo, de
                             <label className="switch">
                                 <input type="checkbox"
                                        name="showOnlyActiveSites"
-                                       onChange={($event) => toggleVisibility()}
+                                       onChange={($event) => onToggleVisibility()}
                                        title="Show only active sites"
                                        value="1"
                                        checked={visibilityFilter === SHOW_ACTIVE}
@@ -119,9 +119,15 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        toggleVisibility: () => {
+        onToggleVisibility: () => {
             dispatch(toggleVisibility())
         },
+        onChangeInvoiceSiteNo: (value) => {
+            dispatch(changeInvoiceSiteNo(value));
+        },
+        onChangeDeliverSiteNo: (value) => {
+            dispatch(changeDeliverSiteNo(value));
+        }
     }
 }
 
