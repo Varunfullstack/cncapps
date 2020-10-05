@@ -75,7 +75,7 @@ class DBECustomer extends DBCNCEntity
     const slaP2PenaltiesAgreed = "slaP2PenaltiesAgreed";
     const slaP3PenaltiesAgreed = "slaP3PenaltiesAgreed";
     const streamOneEmail = "streamOneEmail";
-
+    const lastUpdatedDateTime = "lastUpdatedDateTime";
 
     /**
      * calls constructor()
@@ -476,8 +476,19 @@ class DBECustomer extends DBCNCEntity
             DA_ALLOW_NULL,
             "streamOneEmail"
         );
+        $this->addColumn(
+            self::lastUpdatedDateTime,
+            DATE_MYSQL_DATETIME,
+            DA_NOT_NULL
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
+    }
+
+    public function updateRow()
+    {
+        $this->setValue(DBECustomer::lastUpdatedDateTime, (new DateTime())->format(DATE_MYSQL_DATETIME));
+        return parent::updateRow();
     }
 
     /**
@@ -855,7 +866,7 @@ class DBECustomer extends DBCNCEntity
     public function getCustomerByStreamOneEmail($email)
     {
         $this->setMethodName('getCustomerByStreamOneEmail');
-        if(!$email){
+        if (!$email) {
             throw new Exception('Email is mandatory');
         }
 

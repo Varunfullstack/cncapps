@@ -39,11 +39,12 @@ class Select extends React.Component {
     }
 
     getOptions(options) {
+        const {name} = this.props;
         if (!options) return;
 
         return [{value: '', label: 'Select One Option'}, ...options].map((x, idx) =>
             <option value={x.value}
-                    key={x.value}
+                    key={`${name}-${x.value}`}
             >{x.label}</option>
         )
     }

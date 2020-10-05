@@ -94,7 +94,6 @@ class EncryptedTextInput extends React.Component {
 
     render() {
 
-
         if (this.state.isEncrypted && this.state.encryptedValue) {
             return (
                 <button type="button"

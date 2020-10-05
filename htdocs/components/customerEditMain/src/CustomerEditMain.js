@@ -4,7 +4,7 @@ import Select from "./Select";
 import EncryptedTextInput from "./EncryptedTextInput";
 import {connect} from "react-redux";
 import {getMainContacts} from "./selectors";
-import {updateCustomerValue} from "./actions";
+import {updateCustomerField} from "./actions";
 
 class CustomerEditMain extends React.Component {
     el = React.createElement;
@@ -18,61 +18,7 @@ class CustomerEditMain extends React.Component {
         };
     }
 
-    handleReviewActionUpdate($event) {
-        this.updateCustomerField('reviewAction', $event.target.value);
-    }
-
-    handleReviewUserIDUpdate($event) {
-        this.updateCustomerField('reviewUserID', $event.target.value);
-    }
-
-    handleSlaFixHoursP1($event) {
-        this.updateCustomerField('slaFixHoursP1', $event.target.value);
-    }
-
-    handleSlaFixHoursP2($event) {
-        this.updateCustomerField('slaFixHoursP2', $event.target.value);
-    }
-
-    handleSlaFixHoursP3($event) {
-        this.updateCustomerField('slaFixHoursP3', $event.target.value);
-    }
-
-    handleSlaFixHoursP4($event) {
-        this.updateCustomerField('slaFixHoursP4', $event.target.value);
-    }
-
-    handleSlaP1PenaltiesAgreed($event) {
-        this.updateCustomerField('slaP1PenaltiesAgreed', $event.target.value);
-    }
-
-    handleSlaP2PenaltiesAgreed($event) {
-        this.updateCustomerField('slaP2PenaltiesAgreed', $event.target.value);
-    }
-
-    handleSlaP3PenaltiesAgreed($event) {
-        this.updateCustomerField('slaP3PenaltiesAgreed', $event.target.value);
-    }
-
-    save() {
-        const {customer} = this.props;
-        return fetch('?action=updateCustomer', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(customer)
-        })
-            .then(response => response.json())
-            .then(response => {
-            })
-    }
-
     componentDidMount() {
-    }
-
-    handleCustomerTypeUpdate(value) {
-        this.updateCustomerField('customerTypeID', value);
     }
 
     updateCustomerField(field, value) {
@@ -80,149 +26,27 @@ class CustomerEditMain extends React.Component {
         customerValueUpdate(field, value);
     }
 
-    handlePrimaryMainContactUpdate(value) {
-        this.updateCustomerField("primaryMainContactID", value);
+    handleFlagUpdate($event) {
+        this.updateCustomerField($event.target.name, $event.target.checked ? "Y" : "N");
     }
 
-    handleMailshotFlagUpdate(event) {
-        this.updateCustomerField('mailshotFlag', event.target.checked ? "Y" : "N");
+    handleCheckboxFieldUpdate(event) {
+        this.updateCustomerField(event.target.name, event.target.checked);
     }
 
-    handleReferredFlagUpdate(event) {
-        this.updateCustomerField('referredFlag', event.target.checked ? "Y" : "N");
+    handleUpdateGenericField($event) {
+        this.updateCustomerField($event.target.name, $event.target.value);
     }
-
-    handleSpecialAttentionFlagUpdate(event) {
-        this.updateCustomerField('specialAttentionFlag', event.target.checked ? "Y" : "N");
-    }
-
-    handleSpecialAttentionDateUpdate(event) {
-        this.updateCustomerField('specialAttentionEndDate', event.target.value);
-    }
-
-    handleLastReviewMeetingDateUpdate(event) {
-        this.updateCustomerField('lastReviewMeetingDate', event.target.value);
-    }
-
-    handleReviewMeetingBookedUpdate(event) {
-        this.updateCustomerField('reviewMeetingBooked', event.target.checked);
-    }
-
-    handleReviewMeetingFrequencyMonthsUpdate(event) {
-        this.updateCustomerField('reviewMeetingFrequencyMonths', event.target.value);
-    }
-
-    handleLeadStatusIdUpdate(value) {
-        this.updateCustomerField('leadStatusId', value);
-    }
-
-    handleSupport24HourFlagUpdate(event) {
-        this.updateCustomerField('support24HourFlag', event.target.checked);
-    }
-
-    handleNameUpdate(event) {
-        this.updateCustomerField('name', event.target.value);
-    }
-
-    handleSectorIDUpdate(event) {
-        this.updateCustomerField('sectorID', event.target.value);
-    }
-
-    handleNoOfPCsUpdate(event) {
-        this.updateCustomerField('noOfPCs', event.target.value);
-    }
-
-
-    handleNoOfServersUpdate(event) {
-        this.updateCustomerField('noOfServers', event.target.value);
-    }
-
-
-    handleRegNoUpdate(event) {
-        this.updateCustomerField('regNo', event.target.value);
-    }
-
-    handleNoOfSitesUpdate(event) {
-        this.updateCustomerField('noOfSites', event.target.value);
-    }
-
-    handleGscTopUpAmountUpdate(event) {
-        this.updateCustomerField('gscTopUpAmount', event.target.value);
-    }
-
-    handleBecameCustomerDateUpdate(event) {
-        this.updateCustomerField('becameCustomerDate', event.target.value);
-    }
-
-    handleDroppedCustomerDateUpdate(event) {
-        this.updateCustomerField('droppedCustomerDate', event.target.value);
-    }
-
-
-    handleSLAP1Update(event) {
-        this.updateCustomerField('slaP1', event.target.value);
-    }
-
-    handleSLAP2Update(event) {
-        this.updateCustomerField('slaP2', event.target.value);
-    }
-
-    handleSLAP3Update(event) {
-        this.updateCustomerField('slaP3', event.target.value);
-    }
-
-    handleSLAP4Update(event) {
-        this.updateCustomerField('slaP4', event.target.value);
-    }
-
-    handleSLAP5Update(event) {
-        this.updateCustomerField('slaP5', event.target.value);
-    }
-
-    handleTechNotesUpdate(event) {
-        this.updateCustomerField('techNotes', event.target.value);
-    }
-
-
-    handleActiveDirectoryNameUpdate(event) {
-        this.updateCustomerField('activeDirectoryName', event.target.value);
-    }
-
-    handleAccountManagerUserIDUpdate(event) {
-        this.updateCustomerField('accountManagerUserID', event.target.value);
-    }
-
-    handleSortCodeUpdate(value) {
-        this.updateCustomerField('sortCode', value);
-    }
-
-    handleAccountNameUpdate(event) {
-        this.updateCustomerField('accountName', event.target.value);
-    }
-
-    handleAccountNumberUpdate(value) {
-        this.updateCustomerField('accountNumber', value);
-    }
-
-    handleReviewDateUpdate(value) {
-        this.updateCustomerField('reviewDate', value);
-    }
-
-    handleReviewTimeUpdate(value) {
-        this.updateCustomerField('reviewTime', value);
-    }
-
 
     render() {
         const {
             customer,
             customerTypes,
-            leadStatuses,
             sectors,
             accountManagers,
-            reviewEngineers,
             mainContacts
         } = this.props;
+
 
         if (!customer) {
             return null;
@@ -283,10 +107,11 @@ class CustomerEditMain extends React.Component {
                                             <label>Customer {customerId}</label>
                                             <div className="form-group">
                                                 <input type="text"
-                                                       onChange={($event) => this.updateCustomerField('name', $event.target.value)}
+                                                       onChange={($event) => this.handleUpdateGenericField($event)}
                                                        value={customer.name || ''}
                                                        size="50"
                                                        maxLength="50"
+                                                       name="name"
                                                        className="form-control input-sm"
                                                 />
                                             </div>
@@ -300,8 +125,9 @@ class CustomerEditMain extends React.Component {
                                                         label: `${x.firstName} ${x.lastName}`
                                                     }))}
                                                     selectedOption={customer.primaryMainContactID || ''}
-                                                    onChange={this.handlePrimaryMainContactUpdate}
+                                                    onChange={($event) => this.handleUpdateGenericField($event)}
                                                     className='form-control input-sm'
+                                                    name="primaryMainContactID"
                                                 />
                                             </div>
                                         </div>
@@ -311,7 +137,8 @@ class CustomerEditMain extends React.Component {
                                                 <label className="switch">
                                                     <input type="checkbox"
                                                            checked={customer.referredFlag === 'Y'}
-                                                           onChange={this.handleReferredFlagUpdate}
+                                                           onChange={$event => this.handleFlagUpdate($event)}
+                                                           name="referredFlag"
                                                     />
                                                     <span className="slider round"/>
                                                 </label>
@@ -324,7 +151,8 @@ class CustomerEditMain extends React.Component {
                                                 >
                                                     <input type="checkbox"
                                                            checked={customer.support24HourFlag === 'Y'}
-                                                           onChange={this.handleSupport24HourFlagUpdate}
+                                                           onChange={$event => this.handleFlagUpdate($event)}
+                                                           name="support24HourFlag"
                                                     />
                                                     <span className="slider round"/>
                                                 </label>
@@ -334,12 +162,11 @@ class CustomerEditMain extends React.Component {
                                         <div className="col-lg-6">
                                             <label htmlFor="">Special Attention</label>
                                             <div className="form-group form-inline">
-                                                <label htmlFor=""
-                                                       className="switch mr-3"
-                                                >
+                                                <label className="switch mr-3">
                                                     <input type="checkbox"
-                                                           onChange={this.handleSpecialAttentionFlagUpdate}
+                                                           onChange={$event => this.handleFlagUpdate($event)}
                                                            checked={customer.specialAttentionFlag === 'Y'}
+                                                           name="specialAttentionFlag"
                                                     />
                                                     <span className="slider round"/>
                                                 </label>
@@ -353,7 +180,8 @@ class CustomerEditMain extends React.Component {
                                                            size="10"
                                                            maxLength="10"
                                                            className="form-control input-sm"
-                                                           onChange={this.handleSpecialAttentionDateUpdate}
+                                                           onChange={($event) => this.handleUpdateGenericField($event)}
+                                                           name="specialAttentionEndDate"
                                                     />
                                                 </div>
                                             </div>
@@ -373,11 +201,12 @@ class CustomerEditMain extends React.Component {
                                                     >Last Review Meeting
                                                     </label>
                                                     <input type="date"
-                                                           onChange={this.handleLastReviewMeetingDateUpdate}
+                                                           onChange={($event) => this.handleUpdateGenericField($event)}
                                                            value={customer.lastReviewMeetingDate || ''}
                                                            size="10"
                                                            maxLength="10"
                                                            className="form-control input-sm"
+                                                           name="lastReviewMeetingDate"
                                                     />
                                                 </div>
                                                 <div className="checkbox mr-3 d-flex p-2 justify-content-between align-items-center">
@@ -385,8 +214,9 @@ class CustomerEditMain extends React.Component {
                                                     <label className="switch inline"
                                                     >
                                                         <input type="checkbox"
-                                                               onChange={this.handleReviewMeetingBookedUpdate}
+                                                               onChange={this.handleCheckboxFieldUpdate}
                                                                checked={customer.reviewMeetingBooked}
+                                                               name="reviewMeetingBooked"
                                                         />
                                                         <span className="slider round"/>
                                                     </label>
@@ -407,7 +237,8 @@ class CustomerEditMain extends React.Component {
                                                             ]
                                                         }
                                                         selectedOption={customer.reviewMeetingFrequencyMonths || ''}
-                                                        onChange={this.handleReviewMeetingFrequencyMonthsUpdate}
+                                                        onChange={($event) => this.handleUpdateGenericField($event)}
+                                                        name="reviewMeetingFrequencyMonths"
                                                         className="form-control input-sm"
                                                     />
                                                 </div>
@@ -426,10 +257,11 @@ class CustomerEditMain extends React.Component {
 
                                                 <input type="date"
                                                        value={customer.becameCustomerDate || ''}
-                                                       onChange={this.handleBecameCustomerDateUpdate}
+                                                       onChange={($event) => this.handleUpdateGenericField($event)}
                                                        size="10"
                                                        maxLength="10"
                                                        className="form-control input-sm"
+                                                       name="becameCustomerDate"
                                                 />
                                             </div>
                                         </div>
@@ -438,21 +270,23 @@ class CustomerEditMain extends React.Component {
                                             <div className="form-group">
                                                 <input type="date"
                                                        value={customer.droppedCustomerDate || ''}
-                                                       onChange={this.handleDroppedCustomerDateUpdate}
+                                                       onChange={($event) => this.handleUpdateGenericField($event)}
                                                        size="10"
                                                        maxLength="10"
                                                        className="form-control input-sm"
+                                                       name="droppedCustomerDate"
                                                 />
                                             </div>
                                         </div>
                                         <div className="col-lg-4">
                                             <label>Account Manager</label>
                                             <div className="form-group">
-                                                <Select options={this.state.accountManagers}
+                                                <Select options={accountManagers}
                                                         selectedOption={customer.accountManagerUserID || ''}
-                                                        onChange={this.handleAccountManagerUserIDUpdate}
+                                                        onChange={($event) => this.handleUpdateGenericField($event)}
                                                         key={'accountManager'}
                                                         className="form-control input-sm"
+                                                        name="accountManagerUserID"
                                                 />
                                             </div>
                                         </div>
@@ -469,17 +303,19 @@ class CustomerEditMain extends React.Component {
                                                 <Select options={customerTypes}
                                                         className="form-control input-sm"
                                                         selectedOption={customer.customerTypeID || ''}
-                                                        onChange={(value) => this.handleCustomerTypeUpdate(value)}
+                                                        onChange={($event) => this.handleUpdateGenericField($event)}
+                                                        name="customerTypeID"
                                                 />
                                             </div>
                                         </div>
                                         <div className="col-lg-6">
                                             <label htmlFor="">Sector</label>
                                             <div className="form-group">
-                                                <Select options={this.state.sectors}
+                                                <Select options={sectors}
                                                         selectedOption={customer.sectorID || ''}
-                                                        onChange={(value) => this.handleSectorIDUpdate(value)}
+                                                        onChange={($event) => this.handleUpdateGenericField($event)}
                                                         className="form-control input-sm"
+                                                        name="sectorID"
                                                 />
                                             </div>
                                         </div>
@@ -488,8 +324,9 @@ class CustomerEditMain extends React.Component {
                                             <div className="form-group">
                                                 <input type="number"
                                                        value={customer.noOfPCs || ''}
-                                                       onChange={($event) => this.handleNoOfPCsUpdate($event)}
+                                                       onChange={($event) => this.handleUpdateGenericField($event)}
                                                        className="form-control input-sm"
+                                                       name="noOfPCs"
                                                 />
                                             </div>
                                         </div>
@@ -498,8 +335,9 @@ class CustomerEditMain extends React.Component {
                                             <div className="form-group">
                                                 <input type="number"
                                                        value={customer.noOfServers || ''}
-                                                       onChange={($event) => this.handleNoOfServersUpdate($event)}
+                                                       onChange={($event) => this.handleUpdateGenericField($event)}
                                                        className="form-control input-sm"
+                                                       name="noOfServers"
                                                 />
                                             </div>
                                         </div>
@@ -508,10 +346,11 @@ class CustomerEditMain extends React.Component {
                                             <div className="form-group">
                                                 <input type="number"
                                                        value={customer.noOfSites || ''}
-                                                       onChange={($event) => this.handleNoOfSitesUpdate($event)}
+                                                       onChange={($event) => this.handleUpdateGenericField($event)}
                                                        size="2"
                                                        maxLength="2"
                                                        className="form-control input-sm"
+                                                       name="noOfSites"
                                                 />
                                             </div>
                                         </div>
@@ -519,8 +358,9 @@ class CustomerEditMain extends React.Component {
                                             <label htmlFor="">Sort Code</label>
                                             <div className="form-group">
                                                 <EncryptedTextInput encryptedValue={customer.sortCode}
-                                                                    onChange={(value) => this.handleSortCodeUpdate(value)}
+                                                                    onChange={($event) => this.updateCustomerField('sortCode', $event)}
                                                                     mask='99-99-99'
+                                                                    name="sortCode"
                                                 />
                                             </div>
                                         </div>
@@ -529,7 +369,7 @@ class CustomerEditMain extends React.Component {
                                             <div className="form-group">
                                                 <EncryptedTextInput className="form-control input-sm"
                                                                     encryptedValue={customer.accountName || ''}
-                                                                    onChange={(value) => this.handleAccountNameUpdate(value)}
+                                                                    onChange={($event) => this.updateCustomerField('accountName', $event)}
                                                 />
                                             </div>
                                         </div>
@@ -538,7 +378,7 @@ class CustomerEditMain extends React.Component {
                                             <div className="form-group">
                                                 <EncryptedTextInput
                                                     encryptedValue={customer.accountNumber}
-                                                    onChange={(value) => this.handleAccountNumberUpdate(value)}
+                                                    onChange={($event) => this.updateCustomerField('accountNumber', $event)}
                                                     mask='99999999'
                                                 />
                                             </div>
@@ -548,10 +388,11 @@ class CustomerEditMain extends React.Component {
                                             <div className="form-group">
                                                 <input type="text"
                                                        value={customer.regNo || ''}
-                                                       onChange={($event) => this.handleRegNoUpdate($event)}
+                                                       onChange={($event) => this.handleUpdateGenericField($event)}
                                                        size="10"
                                                        maxLength="10"
                                                        className="form-control input-sm"
+                                                       name="regNo"
                                                 />
                                             </div>
                                         </div>
@@ -560,10 +401,11 @@ class CustomerEditMain extends React.Component {
                                             <div className="form-group">
                                                 <input type="text"
                                                        value={customer.gscTopUpAmount || ''}
-                                                       onChange={($event) => this.handleGscTopUpAmountUpdate($event)}
+                                                       onChange={($event) => this.handleUpdateGenericField($event)}
                                                        size="10"
                                                        maxLength="10"
                                                        className="form-control input-sm"
+                                                       name="gscTopUpAmount"
                                                 />
                                             </div>
                                         </div>
@@ -583,18 +425,20 @@ class CustomerEditMain extends React.Component {
                                                 <label style={{margin: "0 .5rem"}}>1</label>
                                                 <input type="number"
                                                        value={customer.slaP1 || ''}
-                                                       onChange={($event) => this.handleSLAP1Update($event)}
+                                                       onChange={($event) => this.handleUpdateGenericField($event)}
                                                        size="1"
                                                        maxLength="3"
                                                        className="form-control col-sm-4"
+                                                       name="slaP1"
                                                 />
                                                 <label style={{margin: "0 .5rem"}}>2</label>
                                                 <input type="number"
                                                        value={customer.slaP2 || ''}
-                                                       onChange={($event) => this.handleSLAP2Update($event)}
+                                                       onChange={($event) => this.handleUpdateGenericField($event)}
                                                        size="1"
                                                        maxLength="3"
                                                        className="form-control col-sm-4"
+                                                       name="slaP2"
                                                 />
                                             </div>
                                             <div className="form-group form-inline">
@@ -602,18 +446,20 @@ class CustomerEditMain extends React.Component {
                                                 <label style={{margin: "0 .5rem"}}>3</label>
                                                 <input type="number"
                                                        value={customer.slaP3 || ''}
-                                                       onChange={($event) => this.handleSLAP3Update($event)}
+                                                       onChange={($event) => this.handleUpdateGenericField($event)}
                                                        size="1"
                                                        maxLength="3"
                                                        className="form-control col-sm-4"
+                                                       name="slaP3"
                                                 />
                                                 <label style={{margin: "0 .5rem"}}>4</label>
                                                 <input type="number"
                                                        value={customer.slaP4 || ''}
-                                                       onChange={($event) => this.handleSLAP4Update($event)}
+                                                       onChange={($event) => this.handleUpdateGenericField($event)}
                                                        size="1"
                                                        maxLength="3"
                                                        className="form-control col-sm-4"
+                                                       name="slaP3"
                                                 />
 
                                             </div>
@@ -622,10 +468,11 @@ class CustomerEditMain extends React.Component {
                                                 <label style={{margin: "0 .5rem"}}>5</label>
                                                 <input type="number"
                                                        value={customer.slaP5 || ''}
-                                                       onChange={($event) => this.handleSLAP5Update($event)}
+                                                       onChange={($event) => this.handleUpdateGenericField($event)}
                                                        size="1"
                                                        maxLength="3"
                                                        className="form-control col-sm-4"
+                                                       name="slaP5"
                                                 />
                                             </div>
                                         </div>
@@ -639,8 +486,9 @@ class CustomerEditMain extends React.Component {
                                                        step="0.1"
                                                        maxLength="4"
                                                        max="999.9"
-                                                       onChange={($event) => this.handleSlaFixHoursP1($event)}
+                                                       onChange={($event) => this.handleUpdateGenericField($event)}
                                                        className="form-control col-sm-4"
+                                                       name="slaFixHoursP1"
                                                 />
                                                 <label style={{margin: "0 .5rem"}}>2</label>
                                                 <input value={customer.slaFixHoursP2 || ''}
@@ -649,8 +497,9 @@ class CustomerEditMain extends React.Component {
                                                        step="0.1"
                                                        maxLength="4"
                                                        max="999.9"
-                                                       onChange={($event) => this.handleSlaFixHoursP2($event)}
+                                                       onChange={($event) => this.handleUpdateGenericField($event)}
                                                        className="form-control col-sm-4"
+                                                       name="slaFixHoursP2"
                                                 />
                                             </div>
                                             <div className="form-group form-inline">
@@ -661,8 +510,9 @@ class CustomerEditMain extends React.Component {
                                                        step="0.1"
                                                        maxLength="4"
                                                        max="999.9"
-                                                       onChange={($event) => this.handleSlaFixHoursP3($event)}
+                                                       onChange={($event) => this.handleUpdateGenericField($event)}
                                                        className="form-control col-sm-4"
+                                                       name="slaFixHoursP3"
                                                 />
                                                 <label style={{margin: "0 .5rem"}}>4</label>
                                                 <input value={customer.slaFixHoursP4 || ''}
@@ -671,8 +521,9 @@ class CustomerEditMain extends React.Component {
                                                        step="0.1"
                                                        maxLength="4"
                                                        max="999.9"
-                                                       onChange={($event) => this.handleSlaFixHoursP4($event)}
+                                                       onChange={($event) => this.handleUpdateGenericField($event)}
                                                        className="form-control col-sm-4"
+                                                       name="slaFixHoursP4"
                                                 />
 
                                             </div>
@@ -686,7 +537,8 @@ class CustomerEditMain extends React.Component {
                                                     >
                                                         <input type="checkbox"
                                                                checked={customer.slaP1PenaltiesAgreed || ''}
-                                                               onChange={($event) => this.handleSlaP1PenaltiesAgreed($event)}
+                                                               onChange={($event) => this.handleCheckboxFieldUpdate($event)}
+                                                               name="slaP1PenaltiesAgreed"
                                                         />
                                                         <span className="slider round"/>
                                                     </label>
@@ -698,7 +550,8 @@ class CustomerEditMain extends React.Component {
                                                     >
                                                         <input type="checkbox"
                                                                checked={customer.slaP2PenaltiesAgreed || ''}
-                                                               onChange={($event) => this.handleSlaP2PenaltiesAgreed($event)}
+                                                               onChange={($event) => this.handleCheckboxFieldUpdate($event)}
+                                                               name="slaP2PenaltiesAgreed"
                                                         />
                                                         <span className="slider round"/>
                                                     </label>
@@ -709,7 +562,8 @@ class CustomerEditMain extends React.Component {
                                                     >
                                                         <input type="checkbox"
                                                                checked={customer.slaP3PenaltiesAgreed || ''}
-                                                               onChange={($event) => this.handleSlaP3PenaltiesAgreed($event)}
+                                                               onChange={($event) => this.handleCheckboxFieldUpdate($event)}
+                                                               name="slaP3PenaltiesAgreed"
                                                         />
                                                         <span className="slider round"/>
                                                     </label>
@@ -736,7 +590,8 @@ class CustomerEditMain extends React.Component {
                                                           cols="30"
                                                           rows="2"
                                                           value={customer.techNotes || ''}
-                                                          onChange={($event) => this.handleTechNotesUpdate($event)}
+                                                          onChange={($event) => this.handleUpdateGenericField($event)}
+                                                          name="techNotes"
                                                 />
                                             </div>
                                         </div>
@@ -745,10 +600,11 @@ class CustomerEditMain extends React.Component {
                                             <div className="form-group">
                                                 <input type="text"
                                                        value={customer.activeDirectoryName || ''}
-                                                       onChange={($event) => this.handleActiveDirectoryNameUpdate($event)}
+                                                       onChange={($event) => this.handleUpdateGenericField($event)}
                                                        size="54"
                                                        maxLength="255"
                                                        className="form-control input-sm"
+                                                       name="activeDirectoryName"
                                                 />
                                             </div>
                                         </div>
@@ -785,7 +641,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return {
         customerValueUpdate: (field, value) => {
-            dispatch(updateCustomerValue(field, value))
+            dispatch(updateCustomerField(field, value))
         }
     }
 }

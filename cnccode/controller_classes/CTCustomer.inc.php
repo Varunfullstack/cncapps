@@ -799,6 +799,7 @@ class CTCustomer extends CTCNC
                             "dateMeetingConfirmed"         => $dbeCustomer->getValue(DBECustomer::dateMeetingConfirmed),
                             "invoiceSiteNo"                => $dbeCustomer->getValue(DBECustomer::invoiceSiteNo),
                             "deliverSiteNo"                => $dbeCustomer->getValue(DBECustomer::deliverSiteNo),
+                            "lastUpdatedDateTime"          => $dbeCustomer->getValue(DBECustomer::lastUpdatedDateTime)
                         ]
                     ]
                 );
@@ -828,12 +829,31 @@ class CTCustomer extends CTCNC
                 $data = json_decode($json, true);
                 $dbeCustomer = new DBECustomer($this);
                 $dbeCustomer->getRow($data['customerID']);
+
+                if (empty($data['lastUpdatedDateTime']) || $data['lastUpdatedDateTime'] < $dbeCustomer->getValue(
+                        DBECustomer::lastUpdatedDateTime
+                    )) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(
+                        400,
+                        "Updated by another user",
+                        [
+                            "errorCode"           => 1002,
+                            "lastUpdatedDateTime" => $dbeCustomer->getValue(DBECustomer::lastUpdatedDateTime)
+                        ]
+                    );
+                }
+
                 foreach ($data as $key => $value) {
                     $dbeCustomer->setValue($key, $value);
                 }
 
                 $dbeCustomer->updateRow();
-                echo json_encode(["status" => "ok"]);
+                echo json_encode(
+                    [
+                        "status"              => "ok",
+                        "lastUpdatedDateTime" => $dbeCustomer->getValue(DBECustomer::lastUpdatedDateTime)
+                    ]
+                );
                 break;
             }
             case 'getSectors':
