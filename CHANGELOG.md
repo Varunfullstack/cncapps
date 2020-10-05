@@ -1,9 +1,13 @@
 # Changelog
 This project changes will be shown here.
 
+## [v4.6.1] - 2020-10-05
+### Fixed
+- Expenses & Overtime Reporting
+
 ## [v4.6.0] - 2020-09-17
 ### Added
-- Issue 976 - ServiceDesk Team Individual Stats
+- Issue 976 - ServiceDesk Team Individual Stats 
 - Issue 967 - Record half day holidays to assign logged hours
 ### Fixed
 - Issue 969 - Login page needs two attempts to login initially
