@@ -159,7 +159,14 @@ WHERE
   AND (caa_endtime <> caa_starttime)
   AND (
     callactivity.`caa_consno` = ?
-    OR consultant.`expenseApproverID` = ?
+    OR (consultant.`expenseApproverID` = ? AND
+      (SELECT
+        1
+      FROM
+        consultant approvers
+      WHERE approvers.isExpenseApprover
+        AND approvers.cns_consno = ?)
+        )
     OR (
       (SELECT
         1
@@ -175,6 +182,7 @@ WHERE
                 $limit = $_REQUEST['length'];
 
                 $parameters = [
+                    ["type" => "i", "value" => $this->userID],
                     ["type" => "i", "value" => $this->userID],
                     ["type" => "i", "value" => $this->userID],
                     ["type" => "i", "value" => $this->userID],
@@ -383,7 +391,13 @@ FROM
     GROUP BY staffId) b
     ON b.staffId = consultant.`cns_consno`
 WHERE (
-    consultant.`expenseApproverID` = ?
+    (consultant.`expenseApproverID` = ? AND
+      (SELECT
+        1
+      FROM
+        consultant approvers
+      WHERE approvers.isExpenseApprover
+        AND approvers.cns_consno = ?))
     OR
     (SELECT
       1
@@ -396,7 +410,11 @@ WHERE (
 
                 $result = $db->preparedQuery(
                     $expenseQuery,
-                    [["type" => "i", "value" => $this->userID], ["type" => "i", "value" => $this->userID]]
+                    [
+                        ["type" => "i", "value" => $this->userID],
+                        ["type" => "i", "value" => $this->userID],
+                        ["type" => "i", "value" => $this->userID],
+                    ]
                 );
                 $expenses = $result->fetch_all(MYSQLI_ASSOC);
                 echo json_encode($expenses, JSON_NUMERIC_CHECK);
@@ -464,7 +482,15 @@ FROM
       GROUP BY staffId) b
       ON b.staffId = consultant.`cns_consno`
   WHERE (
-      consultant.`expenseApproverID` = ?
+      (consultant.`expenseApproverID` = ?
+      AND
+      (SELECT
+        1
+      FROM
+        consultant approvers
+      WHERE approvers.isExpenseApprover
+        AND approvers.cns_consno = ?)
+          )
       OR
       (SELECT
         1
@@ -480,7 +506,11 @@ WHERE YTD IS NOT NULL
 ORDER BY staffName";
                 $result = $db->preparedQuery(
                     $overtimeQuery,
-                    [["type" => "i", "value" => $this->userID], ["type" => "i", "value" => $this->userID]]
+                    [
+                        ["type" => "i", "value" => $this->userID],
+                        ["type" => "i", "value" => $this->userID],
+                        ["type" => "i", "value" => $this->userID],
+                    ]
                 );
                 $overtimes = $result->fetch_all(MYSQLI_ASSOC);
                 echo json_encode($overtimes, JSON_NUMERIC_CHECK);
@@ -578,12 +608,14 @@ ORDER BY staffName";
        callactivity.caa_consno = ? as isSelf,
        receipt.id as receiptId,
        expensetype.receiptRequired,
-         ((SELECT
+         (
+             (SELECT
         1
       FROM
         consultant globalApprovers
       WHERE globalApprovers.globalExpenseApprover
-        AND globalApprovers.cns_consno = ?) = 1 or consultant.`expenseApproverID` = ?) as isApprover
+        AND globalApprovers.cns_consno = ?) = 1 or consultant.`expenseApproverID` = ?
+             ) as isApprover
 FROM
   expense
   LEFT JOIN `callactivity`
@@ -604,7 +636,13 @@ WHERE
       caa_endtime and caa_endtime is not null and
       (
     callactivity.`caa_consno` = ?
-    OR consultant.`expenseApproverID` = ?
+    OR (consultant.`expenseApproverID` = ? AND
+      (SELECT
+        1
+      FROM
+        consultant approvers
+      WHERE approvers.isExpenseApprover
+        AND approvers.cns_consno = ?))
     OR ((SELECT 1 FROM consultant globalApprovers WHERE globalApprovers.globalExpenseApprover AND globalApprovers.cns_consno = ?) = 1 AND consultant.`activeFlag` = "Y")
   ) and (? is not null and callactivity.caa_consno = ? or ? is null ) 
    ';
@@ -615,6 +653,7 @@ WHERE
         }
 
         $parameters = [
+            ["type" => "i", "value" => $this->userID],
             ["type" => "i", "value" => $this->userID],
             ["type" => "i", "value" => $this->userID],
             ["type" => "i", "value" => $this->userID],
@@ -637,6 +676,7 @@ WHERE
 
         /** @var dbSweetcode $db */
         global $db;
+
         $countResult = $db->preparedQuery(
             $queryString,
             $parameters
@@ -679,6 +719,7 @@ WHERE
             $parameters[] = ["type" => "i", "value" => $offset];
             $parameters[] = ["type" => "i", "value" => $limit];
         }
+
         $result = $db->preparedQuery(
             $queryString,
             $parameters
