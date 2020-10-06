@@ -591,6 +591,7 @@ ORDER BY staffName";
   project.`projectID` AS projectId,
   expense.approvedDate,
    customer.cus_name as customerName,
+  add_town as siteTown,
   CONCAT(
     approver.`firstName`,
     " ",
@@ -631,6 +632,7 @@ FROM
       left join project on project.ordHeadID = ordhead.odh_ordno
   LEFT JOIN consultant approver
     ON approver.`cns_consno` = expense.`approvedBy`
+      left join address on add_custno = problem.pro_custno and add_siteno = caa_siteno
    left join customer on pro_custno = customer.cus_custno
 WHERE 
       caa_endtime and caa_endtime is not null and

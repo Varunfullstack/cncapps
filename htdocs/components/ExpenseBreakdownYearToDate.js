@@ -8,7 +8,9 @@ class ExpenseBreakdownYearToDate extends React.Component {
         this.state = {
             approvalSubordinates: [],
             expenses: [],
-            selectedEngineer: null
+            selectedEngineer: null,
+            selectedDetail: null,
+            financialYearExpenses: null,
         };
     }
 
@@ -60,6 +62,7 @@ class ExpenseBreakdownYearToDate extends React.Component {
         // if not we won't have the selector as it's the guy's data
         const totalRow = new Array(currentDate.getMonth() + 2).fill(0);
         const mileage = new Array(currentDate.getMonth() + 2).fill(0);
+        const mileageDetail = new Array(currentDate.getMonth() + 2).fill(0).map(x => []);
         const tableData = this.state.expenses.reduce((acc, expense) => {
             if (!(expense.expenseTypeDescription in acc)) {
                 acc[expense.expenseTypeDescription] = new Array(currentDate.getMonth() + 2).fill(0);
@@ -70,11 +73,14 @@ class ExpenseBreakdownYearToDate extends React.Component {
             totalRow[expenseMonth] += expense.value;
             totalRow[totalRow.length - 1] += expense.value;
             if (expense.expenseTypeDescription === 'Mileage') {
+
                 mileage[expenseMonth] += expense.mileage;
                 mileage[mileage.length - 1] += expense.mileage;
+                mileageDetail[expenseMonth].push(expense);
             }
             return acc;
         }, {});
+
         const monthNames = [
             "Jan",
             "Feb",
@@ -191,8 +197,16 @@ class ExpenseBreakdownYearToDate extends React.Component {
                                             return this.el(
                                                 'td',
                                                 {
-                                                    style: {textAlign: "right"},
-                                                    key: expenseType + idx
+                                                    style: {
+                                                        textAlign: "right",
+                                                        cursor: expenseType === 'Mileage' ? 'pointer' : null
+                                                    },
+                                                    key: expenseType + idx,
+                                                    onClick: $even => {
+                                                        if (expenseType === 'Mileage') {
+                                                            this.setState({selectedDetail: idx});
+                                                        }
+                                                    },
                                                 },
                                                 value.toFixed(2) + (expenseType == "Mileage" ? ` (${mileage[idx]})` : '')
                                             )
@@ -203,6 +217,100 @@ class ExpenseBreakdownYearToDate extends React.Component {
                         )
                     ]
                 ),
+                this.state.financialYearExpenses ?
+                    null :
+                    null,
+                this.state.selectedDetail !== null ?
+                    this.el(
+                        "div",
+                        {className: 'detail-table', key: 'detail-table'},
+                        [
+                            this.el('h3', {key: 'month-name'},
+                                monthNames[this.state.selectedDetail]
+                            ),
+                            this.el(
+                                'table',
+                                {
+                                    className: 'table table-stripped',
+                                    key: 'detail-table'
+                                },
+                                [
+                                    this.el(
+                                        'thead',
+                                        {key: 'detail-header'},
+                                        this.el(
+                                            'tr',
+                                            {},
+                                            [
+                                                this.el(
+                                                    'th',
+                                                    {key: 'date-column'},
+                                                    'Date'
+                                                ),
+                                                this.el(
+                                                    'th',
+                                                    {key: 'customer-column'},
+                                                    'Customer'
+                                                ),
+                                                this.el(
+                                                    'th',
+                                                    {key: 'site-column'},
+                                                    'Site'
+                                                ),
+                                                this.el(
+                                                    'th',
+                                                    {key: 'miles-column'},
+                                                    'Miles'
+                                                ),
+                                                this.el(
+                                                    'th',
+                                                    {key: 'value-column'},
+                                                    'Value'
+                                                ),
+                                            ]
+                                        )
+                                    ),
+                                    this.el(
+                                        'tbody',
+                                        {key: 'detail-body'},
+                                        mileageDetail[this.state.selectedDetail].map(expense => {
+                                            return this.el(
+                                                'tr',
+                                                {key: expense.id},
+                                                [
+                                                    this.el(
+                                                        'td',
+                                                        {key: 'date-column'},
+                                                        expense.dateSubmitted
+                                                    ),
+                                                    this.el(
+                                                        'td',
+                                                        {key: 'customer-column'},
+                                                        expense.customerName
+                                                    ),
+                                                    this.el(
+                                                        'td',
+                                                        {key: 'site-column'},
+                                                        expense.siteTown
+                                                    ),
+                                                    this.el(
+                                                        'td',
+                                                        {key: 'miles-column'},
+                                                        expense.mileage
+                                                    ),
+                                                    this.el(
+                                                        'td',
+                                                        {key: 'value-column'},
+                                                        expense.value
+                                                    ),
+                                                ]
+                                            )
+                                        })
+                                    ),
+                                ]
+                            )
+                        ],
+                    ) : null
             ]
         )
     }
