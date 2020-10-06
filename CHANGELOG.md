@@ -1,9 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
-## [v4.6.1] - 2020-10-05
-### Fixed
-- Expenses & Overtime Reporting
+## [unreleased]
+### Changed
+- Issue 1027 - Expenses & Overtime Reporting
 
 ## [v4.6.0] - 2020-09-17
 ### Added
