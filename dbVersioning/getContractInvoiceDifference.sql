@@ -1,6 +1,6 @@
 DROP FUNCTION IF EXISTS `getContractInvoiceDifference`#
 CREATE
-    DEFINER = `root`@`::1` FUNCTION `getContractInvoiceDifference`(contractId INT, givenDate DATE) RETURNS DATE
+    DEFINER = `root`@`::1` FUNCTION `getContractInvoiceDifference`(contractId INT, givenDate DATE) RETURNS int
     READS SQL DATA
     NOT DETERMINISTIC
 BEGIN
@@ -13,9 +13,9 @@ BEGIN
     FROM
         custitem
     WHERE custitem.`cui_cuino` = contractId;
-    RETURN PERIOD_DIFF(
+    RETURN cast(PERIOD_DIFF(
             formattedExpiryDate,
             DATE_FORMAT(givenDate, "%Y%m")
-        );
+         as integer));
 END #
 GRANT EXECUTE ON FUNCTION getContractInvoiceDifference TO 'webuser'@'%'
