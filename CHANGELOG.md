@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v4.6.1] - 2020-10-06
+### Added
+- Add SQL Function for Contract difference Calculation
+
 ## [v4.6.0] - 2020-09-17
 ### Added
 - Issue 976 - ServiceDesk Team Individual Stats
