@@ -17,5 +17,5 @@ BEGIN
             formattedExpiryDate,
             DATE_FORMAT(givenDate, "%Y%m")
         );
-END;
-GRANT EXECUTE ON FUNCTION getContractInvoiceDifference TO 'webuser'@'%'#
+END #
+GRANT EXECUTE ON FUNCTION getContractInvoiceDifference TO 'webuser'@'%'
