@@ -41,7 +41,41 @@ class CTExpenseDashboard extends CTCNC
     {
 
         switch ($this->getAction()) {
-            case "getExpensesData" :
+
+            case "getExpensesData":
+
+                $offset = @$_REQUEST['offset'];
+                $limit = @$_REQUEST['limit'];
+                $search = @$_REQUEST['search'];
+                $orderItems = @$_REQUEST['orderItems'];
+                $engineerId = @$_REQUEST['engineerId'];
+                $exported = @$_REQUEST['exported'];
+                $startDate = @$_REQUEST['startDate'];
+                $endDate = @$_REQUEST['endDate'];
+                $expenseTypeId = @$_REQUEST['expenseTypeId'];
+                $startDateTime = null;
+                $endDateTime = null;
+                if ($startDate) {
+                    $startDateTime = DateTime::createFromFormat(DATE_MYSQL_DATE, $startDate);
+                }
+                if ($endDate) {
+                    $endDateTime = DateTime::createFromFormat(DATE_MYSQL_DATE, $endDate);
+                }
+
+                $result = $this->getExpenses(
+                    $offset,
+                    $limit,
+                    $search,
+                    $orderItems,
+                    $engineerId,
+                    $exported,
+                    $startDateTime,
+                    $endDateTime,
+                    $expenseTypeId
+                );
+                echo json_encode($result);
+                break;
+            case "getExpensesDataTableData" :
 
                 $offset = $_REQUEST['start'];
                 $limit = $_REQUEST['length'];
@@ -562,6 +596,21 @@ ORDER BY staffName";
         }
     }
 
+    /**
+     * Returns the expenses from the DB
+     *
+     * @param int $offset
+     * @param null $limit
+     * @param null $searchValue
+     * @param array $order
+     * @param null $engineerId
+     * @param false $exported
+     * @param DateTimeInterface|null $startDate
+     * @param DateTimeInterface|null $endDate
+     * @param null $expenseTypeId
+     * @return array
+     * @throws Exception
+     */
     function getExpenses($offset = 0,
                          $limit = null,
                          $searchValue = null,
@@ -569,7 +618,8 @@ ORDER BY staffName";
                          $engineerId = null,
                          $exported = false,
                          DateTimeInterface $startDate = null,
-                         DateTimeInterface $endDate = null
+                         DateTimeInterface $endDate = null,
+                         $expenseTypeId = null
     )
     {
         $queryString = 'SELECT
@@ -653,7 +703,6 @@ WHERE
         } else {
             $queryString .= " AND exp_exported_flag <> 'Y' ";
         }
-
         $parameters = [
             ["type" => "i", "value" => $this->userID],
             ["type" => "i", "value" => $this->userID],
@@ -666,6 +715,15 @@ WHERE
             ["type" => "i", "value" => $engineerId],
             ["type" => "i", "value" => $engineerId],
         ];
+
+        if ($expenseTypeId) {
+            $queryString .= " and exp_expensetypeno = ?";
+            $parameters[] = [
+                "type"  => "i",
+                "value" => $expenseTypeId
+            ];
+        }
+
         if ($startDate) {
             $queryString .= " and caa_date >= ? ";
             $parameters[] = ["type" => "s", "value" => $startDate->format(DATE_MYSQL_DATE)];
@@ -715,13 +773,14 @@ WHERE
         }
         if (count($orderItems)) {
             $queryString .= " order by " . implode(', ', $orderItems);
+        } else {
+            $queryString .= " order by dateSubmitted";
         }
         if ($limit) {
             $queryString .= " limit ?, ?";
             $parameters[] = ["type" => "i", "value" => $offset];
             $parameters[] = ["type" => "i", "value" => $limit];
         }
-
         $result = $db->preparedQuery(
             $queryString,
             $parameters

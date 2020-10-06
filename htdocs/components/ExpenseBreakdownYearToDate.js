@@ -10,7 +10,8 @@ class ExpenseBreakdownYearToDate extends React.Component {
             expenses: [],
             selectedEngineer: null,
             selectedDetail: null,
-            financialYearExpenses: null,
+            financialYearTotalMileage: 0,
+            financialYearTotalValue: 0
         };
     }
 
@@ -26,7 +27,54 @@ class ExpenseBreakdownYearToDate extends React.Component {
             })
     }
 
-    fetchExpenses(engineerId = null) {
+    getFinancialStartAndEndDates() {
+        const today = moment().hours(0).minutes(0).seconds(0);
+        const sixthOfAprilThisYear = (moment()).month(3).date(6).hours(0).minutes(0).seconds(0);
+        if (today.isSameOrAfter(sixthOfAprilThisYear)) {
+            return {
+                startDate: sixthOfAprilThisYear,
+                endDate: today
+            }
+        }
+        return {
+            startDate: sixthOfAprilThisYear.subtract(1, 'year'),
+            endDate: today
+        }
+    }
+
+
+    fetchFinancialYearExpenses(engineerId) {
+        const financialStartAndEndDates = this.getFinancialStartAndEndDates();
+
+        let urlString = `?action=getExpensesData&exported=1&expenseTypeId=2&startDate=${financialStartAndEndDates.startDate.format('YYYY-MM-DD')}&endDate=${financialStartAndEndDates.endDate.format('YYYY-MM-DD')}`;
+        if (engineerId) {
+            urlString += `&engineerId=${engineerId}`;
+        }
+
+        return fetch(urlString)
+            .then(res => res.json())
+            .then(response => {
+                this.updateFinancialYearTotalsStateFromResponse(response)
+            });
+    }
+
+    updateFinancialYearTotalsStateFromResponse(response) {
+        this.setState(
+            response.data.reduce(
+                (acc, expense) => {
+                    acc.financialYearTotalMileage += +expense.mileage;
+                    acc.financialYearTotalValue += +expense.value;
+                    return acc;
+                },
+                {
+                    financialYearTotalMileage: 0,
+                    financialYearTotalValue: 0
+                }
+            )
+        );
+    }
+
+    fetchYearToDateExpenses(engineerId = null) {
         let url = '?action=getYearToDateExpenses';
         if (engineerId) {
             url += '&engineerId=' + engineerId
@@ -43,15 +91,16 @@ class ExpenseBreakdownYearToDate extends React.Component {
             this.fetchApprovalSubordinates();
         }
         if (this.state.selectedEngineer !== prevState.selectedEngineer) {
-            console.log(this.state.selectedEngineer, prevState.selectedEngineer);
-            this.fetchExpenses(this.state.selectedEngineer);
+            this.fetchYearToDateExpenses(this.state.selectedEngineer);
+            this.fetchFinancialYearExpenses(this.state.selectedEngineer);
         }
     }
 
     componentDidMount() {
         const {userId} = this.props;
         this.fetchApprovalSubordinates(userId);
-        this.fetchExpenses()
+        this.fetchYearToDateExpenses()
+        this.fetchFinancialYearExpenses();
     }
 
 
@@ -67,16 +116,16 @@ class ExpenseBreakdownYearToDate extends React.Component {
             if (!(expense.expenseTypeDescription in acc)) {
                 acc[expense.expenseTypeDescription] = new Array(currentDate.getMonth() + 2).fill(0);
             }
-            const expenseMonth = expense.dateSubmitted.match(/\d{4}-0(\d)-\d{2}/)[1]
-            acc[expense.expenseTypeDescription][expenseMonth] += expense.value;
+            const expenseMonth = expense.dateSubmitted.match(/\d{4}-0(\d)-\d{2}/)[1];
+
+            acc[expense.expenseTypeDescription][expenseMonth - 1] += expense.value;
             acc[expense.expenseTypeDescription][acc[expense.expenseTypeDescription].length - 1] += expense.value;
-            totalRow[expenseMonth] += expense.value;
+            totalRow[expenseMonth - 1] += expense.value;
             totalRow[totalRow.length - 1] += expense.value;
             if (expense.expenseTypeDescription === 'Mileage') {
-
-                mileage[expenseMonth] += expense.mileage;
+                mileage[expenseMonth - 1] += expense.mileage;
                 mileage[mileage.length - 1] += expense.mileage;
-                mileageDetail[expenseMonth].push(expense);
+                mileageDetail[expenseMonth - 1].push(expense);
             }
             return acc;
         }, {});
@@ -217,9 +266,22 @@ class ExpenseBreakdownYearToDate extends React.Component {
                         )
                     ]
                 ),
-                this.state.financialYearExpenses ?
-                    null :
-                    null,
+                this.el(
+                    'div',
+                    {className: 'financialYearMileage', key: 'financial-year-mileage'},
+                    [
+                        this.el(
+                            'div',
+                            {className: 'financialYearMileage-totalMileage', key: 'totalMileage'},
+                            `Financial Year Mileage: ${this.state.financialYearTotalMileage}`
+                        ),
+                        this.el(
+                            'div',
+                            {className: 'financialYearValue-totalValue', key: 'totalValue'},
+                            `Financial Year Mileage Value: £${this.state.financialYearTotalValue.toFixed(2)}`
+                        )
+                    ]
+                ),
                 this.state.selectedDetail !== null ?
                     this.el(
                         "div",

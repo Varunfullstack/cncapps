@@ -71,7 +71,7 @@
         }
         const totalInput = document.getElementById('totalInput');
         const mileageInput = document.getElementById('mileageInput');
-        totalInput.value = mileageInput.value * userMileageRate;
+        totalInput.value = (mileageInput.value * userMileageRate).toFixed(2);
 
     }
 
@@ -209,7 +209,7 @@
         <tr id="mileageRow">
             <td class="promptText">Mileage</td>
             <td class="fieldText">
-                <input type="text"
+                <input type="number"
                        name="expense[1][mileage]"
                        value="{mileage}"
                        size="10"
@@ -222,7 +222,7 @@
             <td class="promptText">Value</td>
             <td class="fieldText">
                 <input id="totalInput"
-                       type="text"
+                       type="number"
                        name="expense[1][value]"
                        value="{value}"
                        size="10"
