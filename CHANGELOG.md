@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1010 - Team & User Statistics visual improvements. 
+
 ## [v4.6.1] - 2020-10-06
 ### Added
 - Add SQL Function for Contract difference Calculation
