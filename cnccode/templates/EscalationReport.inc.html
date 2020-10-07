@@ -2,9 +2,15 @@
 <script language='JavaScript'
         src="CommonJS.js"
 ></script>
+<link rel="stylesheet"
+      href="./css/table.css"
+>
+<script type="module" src="components/FixedServiceRequestCountComponent/dist/FixedServiceRequestCountComponent.js"></script>
+
 <script type="module">
+
     import FixedServiceRequestCountComponent
-        from "/components/FixedServiceRequestCountComponent/FixedServiceRequestCountComponent.js";
+        from "/components/FixedServiceRequestCountComponent/src/FixedServiceRequestCountComponent.js";
 
     window.addEventListener('DOMContentLoaded', function () {
         window.fromDate = $('#fromDate').get(0);
