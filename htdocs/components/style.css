@@ -1,15 +1,17 @@
-.label-bold{
+.label-bold {
     font-size: 12px;
     font-weight: bold !important;
     padding: 5px;
 }
-.my-account{
+
+.my-account {
     display: flex;
     flex-direction: column;
     max-width: 500px;
 }
-.form-group{
-    width:100%;
+
+.form-group {
+    width: 100%;
     padding-top: 5px;
     padding-bottom: 5px;
 }
@@ -20,12 +22,14 @@
     padding: .75rem 1.25rem;
     margin-bottom: -1px;
     background-color: #fff;
-    border: 1px solid rgba(0,0,0,.125);
+    border: 1px solid rgba(0, 0, 0, .125);
 }
+
 .list-group-item:first-child {
     border-top-left-radius: .25rem;
     border-top-right-radius: .25rem;
 }
+
 .list-group {
     display: -webkit-box;
     display: -ms-flexbox;
@@ -38,7 +42,8 @@
     margin-bottom: 10px;
     margin-top: 10px;
 }
-.user-log{
+
+.user-log {
     max-width: 200px;
 }
 
@@ -49,22 +54,24 @@
     -ms-flex-wrap: wrap;
     flex-wrap: wrap;
     margin-right: -15px;
-    margin-left: -15px; 
+    margin-left: -15px;
     margin-top: 5px;
 }
+
 dl, ol, ul {
     margin-top: 0;
     margin-bottom: 0 !important;
 }
- 
+
 dt {
     font-weight: 700;
 }
+
 dd {
     margin-bottom: .5rem;
     margin-left: 0;
 }
- 
+
 .col-1 {
     -webkit-box-flex: 0;
     -ms-flex: 0 0 8.3333%;
@@ -127,27 +134,32 @@ dd {
     flex: 0 0 83.333333%;
     max-width: 83.333333%;
 }
+
 .col-11 {
     -webkit-box-flex: 0;
     -ms-flex: 0 0 91.666667%;
     flex: 0 0 91.666667%;
     max-width: 91.666667%;
 }
+
 .col-12 {
     -webkit-box-flex: 0;
     -ms-flex: 0 0 100%;
     flex: 0 0 100%;
     max-width: 100%;
 }
- .check-box{
-     padding-top: 5px;
-     padding-bottom: 5px;
-     cursor: pointer;
-     
- }
- .check-box label{
+
+.check-box {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    cursor: pointer;
+
+}
+
+.check-box label {
     margin-left: 10px;
 }
+
 .row {
     display: -webkit-box;
     display: -ms-flexbox;
@@ -155,9 +167,10 @@ dd {
     -ms-flex-wrap: wrap;
     flex-wrap: wrap;
     margin-right: 15px;
-    margin-left: 15px; 
+    margin-left: 15px;
     margin-top: 5px;
 }
+
 .col {
     -ms-flex-preferred-size: 0;
     flex-basis: 0;
@@ -168,121 +181,139 @@ dd {
     padding-left: 15px;
 
 }
-.col-1 , .col-2 , .col-3 , .col-4 , .col-5 , .col-6 , .col-7 , .col-8 , .col-9 , .col-10 , .col-11 , .col-12{
-    padding: 5px 0px 5px 0px; 
+
+.col-1, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-10, .col-11, .col-12 {
+    padding: 5px 0px 5px 0px;
     position: relative;
     width: 100%;
-    min-height: 1px;    
- }
+    min-height: 1px;
+}
+
 /*Auto complete list*/
 
 .no-suggestions {
     color: #999;
     padding: 0.5rem;
-  }
+}
 
-  .suggestions {
-     border-top-width: 0;
+.suggestions {
+    border-top-width: 0;
     list-style: none;
     margin-top: 0;
     max-height: 143px;
     /* overflow-y: auto; */
     padding-left: 0;
-    width: calc(300px  );
+    width: calc(300px);
     position: absolute;
     background-color: white;
-  }
+}
 
-  .suggestions li {
+.suggestions li {
     padding: 2px 0 2px 0.5rem;
     background-color: white;
     border-left: 1px solid #999;
     border-right: 1px solid #999;
 
-  }
+}
 
-  .suggestion-active,
-  .suggestions li:hover {
+.suggestion-active,
+.suggestions li:hover {
     background-color: rgb(0, 127, 255) !important;
     color: white;
     cursor: pointer;
-   }
+}
 
-  .suggestions li:last-of-type {
+.suggestions li:last-of-type {
     border-bottom: 1px solid #999;
-  }
-  .suggestions input{
-      margin-right: 5px;
-  }
-  .error
-  {
-      color: red;
-      margin-left: 15px;
-      margin-top: 5px;
-  }
-  .form-control {
+}
+
+.suggestions input {
+    margin-right: 5px;
+}
+
+.error {
+    color: red;
+    margin-left: 15px;
+    margin-top: 5px;
+}
+
+.form-control {
     font-family: Arial, Tahoma, Helvetica, sans-serif;
     font-size: 12px;
     display: block;
     width: 100%;
     /* padding: .375rem .75rem; */
-    
+
     /* line-height: 1.5; */
     color: #495057;
     background-color: #fff;
     background-clip: padding-box;
     border: 1px solid #ced4da;
     border-radius: .25rem;
-    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
-.float-right{
+
+.float-right {
     float: right;
 }
-.float-left{
+
+.float-left {
     float: left;
 }
-.text-right{
+
+.text-right {
     text-align: right;
 }
-.btn-search{
-width:70px;
+
+.btn-search {
+    width: 70px;
 }
-.nowrap{
+
+.nowrap {
     white-space: nowrap;
 }
-.required[value=""]{
+
+.required[value=""] {
     border: red !important;
     border-width: 1px !important;
     border-style: outset !important;
 }
-.error-message{
+
+.error-message {
     color: rgb(138, 14, 14);
     /* white-space: nowrap; */
     margin-left: 10px;
 }
-.ml-1{
-margin-left: 1pt;
+
+.ml-1 {
+    margin-left: 1pt;
 }
-.ml-2{
+
+.ml-2 {
     margin-left: 2pt;
-    }
-.ml-3{
+}
+
+.ml-3 {
     margin-left: 3pt;
-    }
-.ml-4{
+}
+
+.ml-4 {
     margin-left: 4pt;
-    }
-.ml-5{
+}
+
+.ml-5 {
     margin-left: 5pt;
-    }
-.text-center{
+}
+
+.text-center {
     text-align: center;
 }
+
 /*--------------------- start of Modal*/
 
 /* The Modal (background) */
 .modal {
-    
+
 
     display: block; /* Hidden by default */
     position: fixed; /* Stay in place */
@@ -293,13 +324,13 @@ margin-left: 1pt;
     width: 100%; /* Full width */
     height: 100%; /* Full height */
     overflow: auto; /* Enable scroll if needed */
-    background-color: rgb(0,0,0); /* Fallback color */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-  }
-  
-  /* Modal Content */
-  .modal-content {
-    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol" !important;
+    background-color: rgb(0, 0, 0); /* Fallback color */
+    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !important;
     font-size: 1rem !important;
     font-weight: 400 !important;
     line-height: 1.5 !important;
@@ -310,103 +341,124 @@ margin-left: 1pt;
     background-color: #fefefe;
     margin: auto;
     padding: 0;
-    border: 1px solid rgba(0,0,0,.2);
+    border: 1px solid rgba(0, 0, 0, .2);
     border-radius: .3rem;
     max-width: 70%;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     -webkit-animation-name: animatetop;
     -webkit-animation-duration: 0.4s;
     animation-name: animatetop;
     animation-duration: 0.4s;
-   
-  }
-  .modal-content h4{
+
+}
+
+.modal-content h4 {
     font-size: 1.2rem !important;
     font-weight: 600 !important;
     color: #212529 !important;
     line-height: 1.8 !important;
 
-  }
-  /* Add Animation */
-  @-webkit-keyframes animatetop {
-    from {top:-300px; opacity:0} 
-    to {top:0; opacity:1}
-  }
-  
-  @keyframes animatetop {
-    from {top:-300px; opacity:0}
-    to {top:0; opacity:1}
-  }
-  
-  /* The Close Button */
-  .close {
+}
+
+/* Add Animation */
+@-webkit-keyframes animatetop {
+    from {
+        top: -300px;
+        opacity: 0
+    }
+    to {
+        top: 0;
+        opacity: 1
+    }
+}
+
+@keyframes animatetop {
+    from {
+        top: -300px;
+        opacity: 0
+    }
+    to {
+        top: 0;
+        opacity: 1
+    }
+}
+
+/* The Close Button */
+.close {
     color: #000;
     float: right;
     font-size: 28px;
     font-weight: bold;
-  }
-  
-  .close:hover,
-  .close:focus {
+}
+
+.close:hover,
+.close:focus {
     color: #000;
     text-decoration: none;
     cursor: pointer;
-  }
-  
-  .modal-header {
+}
+
+.modal-header {
     padding: 10px 16px;
-    /* background-color: #5cb85c; */   
+    /* background-color: #5cb85c; */
     border-bottom: 1px solid #e9ecef;
     border-top-left-radius: .3rem;
     border-top-right-radius: .3rem;
-    
-  }
-  .modal-title{
+
+}
+
+.modal-title {
     margin-bottom: 0 !important;
     line-height: 1.5 !important;
-    color:rgb(33, 37, 41) !important;
+    color: rgb(33, 37, 41) !important;
     font-weight: 500;
     font-size: 1.25rem;
-  }
-  .modal-body {
-      padding: 2px 16px;
-      max-height: 600px;
-      overflow-y: auto;
-    }
-  
-  .modal-footer {
+}
+
+.modal-body {
+    padding: 2px 16px;
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.modal-footer {
     padding: 2px 16px;
     /* background-color: #5cb85c; */
     color: #000;
     border-top: 1px solid #e9ecef;
     text-align: right;
-  }
-  .green-text{
-      color: green !important;
-  }
-  .red-text{
+}
+
+.green-text {
+    color: green !important;
+}
+
+.red-text {
     color: red !important;
 }
-hr{
+
+hr {
     border: 1px solid #e9ecef;
 }
-  /*------------------End Modal*/
-  /*------------------Spinner*/
-  .loader{
-    
+
+/*------------------End Modal*/
+/*------------------Spinner*/
+.loader {
+
     display: block; /* Hidden by default */
     position: fixed; /* Stay in place */
     z-index: 1000000; /* Sit on top */
     padding-top: 40vh; /* Location of the box */
-    
+
     width: 100%; /* Full width */
     height: 100%; /* Full height */
     overflow: auto; /* Enable scroll if needed */
-    background-color: rgb(0,0,0); /* Fallback color */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-    margin-top:-70px;
-  }
-  .loader-content {
+    background-color: rgb(0, 0, 0); /* Fallback color */
+    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+    margin-top: -70px;
+}
+
+.loader-content {
     border: 16px solid #f3f3f3; /* Light grey */
     border-top: 16px solid #3498db; /* Blue */
     border-radius: 50%;
@@ -415,9 +467,10 @@ hr{
     animation: spin 2s linear infinite;
     position: relative;
     margin: auto;
-    
-  }
-  .loader-content-sm {
+
+}
+
+.loader-content-sm {
     border: 5px solid #f3f3f3; /* Light grey */
     border-top: 5px solid #3498db; /* Blue */
     border-radius: 50%;
@@ -425,14 +478,20 @@ hr{
     height: 20px;
     animation: spin 2s linear infinite;
     position: absolute;
-    
+
     margin: auto;
-    
-  }
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-  .pointer{
-      cursor: pointer;
-  }
+
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.pointer {
+    cursor: pointer;
+}
