@@ -989,3 +989,13 @@ input[type=number] {
 #autocompleteItem .ui-autocomplete-input {
     width: 300px;
 }
+
+table.sticky-header {
+    position: relative;
+}
+
+table.sticky-header thead th {
+    position: sticky;
+    top: 0;
+    background: white;
+}

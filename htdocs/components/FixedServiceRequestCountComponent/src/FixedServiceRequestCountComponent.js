@@ -1,3 +1,7 @@
+import Spinner from "../../utils/spinner";
+import React from "react";
+
+
 export const SelectionState = {
     YEAR_TO_DATE: 'YEAR_TO_DATE',
     SPECIFIC_YEAR_MONTH: 'SPECIFIC_YEAR_MONTH'
@@ -144,22 +148,23 @@ class FixedServiceRequestCountComponent extends React.Component {
     footerRow(rowList, teamPerformanceData, previousTeam) {
         const teamPerformanceValues = this.getTeamData(teamPerformanceData, previousTeam.teamId);
         rowList.push(
-            this.el('tr', {key: `footer-${previousTeam.teamId}`, className: 'teamFooter'},
-                [
-                    this.el('td', {key: `footer-0-${previousTeam.teamId}`}, 'Team Total'),
-                    this.el('td', {key: `footer-1-${previousTeam.teamId}`}, previousTeam.totalFixed),
-                    this.el('td', {key: `footer-2-${previousTeam.teamId}`}, previousTeam.totalRaised),
-                    this.el('td', {key: `footer-3-${previousTeam.teamId}`}, previousTeam.firstTimeFixRaised),
-                    this.el('td', {key: `footer-4-${previousTeam.teamId}`}, previousTeam.firstTimeFixPercentAttempted),
-                    this.el('td', {key: `footer-5-${previousTeam.teamId}`}, previousTeam.firstTimeFixPercentAchieved),
-                    this.el('td', {key: `footer-6-${previousTeam.teamId}`}, previousTeam.timeRequests),
-                    this.el('td', {key: `footer-7-${previousTeam.teamId}`}, previousTeam.changeRequests),
-                    this.el('td', {key: `footer-8-${previousTeam.teamId}`}, previousTeam.operationalTasks),
-                    this.el('td', {key: `footer-9-${previousTeam.teamId}`}, (+teamPerformanceValues.avgFixHours).toFixed(2)),
-                    this.el('td', {key: `footer-10-${previousTeam.teamId}`}, (+teamPerformanceValues.avgSLAPercentage).toFixed(2)),
-                ]
-            )
-        )
+            (<tr key={`footer-${previousTeam.teamId}`}
+                 className='teamFooter'
+            >
+                <td key={`footer-0-${previousTeam.teamId}`}> Team Total</td>
+                <td key={`footer-1-${previousTeam.teamId}`}> {previousTeam.totalFixed}</td>
+                <td key={`footer-2-${previousTeam.teamId}`}> {previousTeam.totalRaised}</td>
+                <td key={`footer-3-${previousTeam.teamId}`}> {previousTeam.firstTimeFixRaised}</td>
+                <td key={`footer-4-${previousTeam.teamId}`}> {previousTeam.firstTimeFixPercentAttempted}</td>
+                <td key={`footer-5-${previousTeam.teamId}`}> {previousTeam.firstTimeFixPercentAchieved}</td>
+                <td key={`footer-6-${previousTeam.teamId}`}> {previousTeam.timeRequests}</td>
+                <td key={`footer-7-${previousTeam.teamId}`}> {previousTeam.changeRequests}</td>
+                <td key={`footer-8-${previousTeam.teamId}`}> {previousTeam.operationalTasks}</td>
+                <td key={`footer-9-${previousTeam.teamId}`}> {(+teamPerformanceValues.avgFixHours).toFixed(2)}</td>
+                <td key={`footer-10-${previousTeam.teamId}`}> {(+teamPerformanceValues.avgSLAPercentage).toFixed(2)}</td>
+
+            </tr>)
+        );
         return rowList;
     }
 
@@ -170,12 +175,21 @@ class FixedServiceRequestCountComponent extends React.Component {
             teamPerformanceData
         } = this.state
         if (!fixedServiceRequestData) {
-            return;
+            return (
+                <React.Fragment>
+                    <Spinner key="spinner"
+                             show={true}
+                    />
+                    <h1 key={"loading"}>
+                        Please wait while loading data...
+                    </h1>
+                </React.Fragment>
+            )
         }
         const teams = {};
         let previousTeam = null;
 
-        return this.el('table', {className: 'table table-striped'},
+        return this.el('table', {className: 'table table-striped sticky-header'},
             [
                 this.el('thead', {key: 'head'},
                     this.el('tr', null, [
