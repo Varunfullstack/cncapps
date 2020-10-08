@@ -7,6 +7,7 @@ This project changes will be shown here.
 ### Fixed
 - Issue 1013 - Questionnaire export to CSV incorrect data & formatting improvements
 - Issue 1026 - OS Support Dates not sorting on Is Server
+- Issue 1022 - SSL Renewals Installation Charge Sales Order Location
 
 ## [v4.6.1] - 2020-10-06
 ### Added
