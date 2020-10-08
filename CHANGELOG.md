@@ -4,6 +4,8 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 1012 - Automatic Webroot Deactivation
+### Fixed
+- Issue 1013 - Questionnaire export to CSV incorrect data & formatting improvements
 
 ## [v4.6.1] - 2020-10-06
 ### Added

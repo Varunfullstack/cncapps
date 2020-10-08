@@ -1768,7 +1768,7 @@ class CTSalesOrder extends CTCNC
 
 
             do {
-                $this->renderLine(
+                $doesLineHaveRenewalCustomerItemID =  $this->renderLine(
                     $dsOrdline,
                     $curSaleGrandTotal,
                     $curProfitGrandTotal,
@@ -1783,6 +1783,7 @@ class CTSalesOrder extends CTCNC
                     $restrictedView,
                     $dsOrdhead
                 );
+                $hasGreenArrow = $hasGreenArrow || $doesLineHaveRenewalCustomerItemID;
             } while ($dsOrdline->fetchNext());
         }
         // END OF ORDER LINES SECTION
@@ -1938,6 +1939,7 @@ class CTSalesOrder extends CTCNC
                     $sendQuoteDocURL = null;
                     $flagAsSentQuoteDocURL = null;
                     $txtFlagAsSent = null;
+
                     if (!$fileExists) {
                         $deleteQuoteDocURL =
                             Controller::buildLink(
@@ -1987,11 +1989,14 @@ class CTSalesOrder extends CTCNC
 
                             $quoteSentDateTime = 'Not sent';
                         } else {
-                            if ($this->dsQuotation->getValue(
+                            $shouldShowSendReminder = $this->dsQuotation->getValue(
                                     DBEQuotation::fileExtension
                                 ) == 'pdf' && $this->dsQuotation->getValue(
                                     DBEQuotation::documentType
-                                ) == 'quotation' && $hasGreenArrow) {
+                                ) == 'quotation' && $hasGreenArrow && $this->dsOrdhead->getValue(
+                                    DBEOrdhead::type
+                                ) !== 'C';
+                            if ($shouldShowSendReminder) {
                                 $txtReminder = "Send Reminder";
                             }
 
@@ -2001,7 +2006,6 @@ class CTSalesOrder extends CTCNC
                                     $sentDateTime
                                 );
                             }
-
                         }
                     }
                     $documentType = $this->dsQuotation->getValue(DBEQuotation::documentType);
@@ -2023,7 +2027,6 @@ class CTSalesOrder extends CTCNC
                         }
 
                     }
-
                     $separator = $txtFlagAsSent && $txtSendQuote ? ' - ' : null;
 
                     $this->template->set_var(
@@ -2335,6 +2338,7 @@ class CTSalesOrder extends CTCNC
                         $dsOrdhead
     )
     {
+        $hasGreenArrow = false;
         $urlEditLine = null;
         $urlDeleteLine = null;
         $urlAddLine = null;
@@ -2589,6 +2593,7 @@ class CTSalesOrder extends CTCNC
             'salesOrderLineUpdateItemPriceIcon',
             null
         ); // clears for next time
+        return $hasGreenArrow;
     }
 
     function getSalutation()
@@ -4736,7 +4741,6 @@ class CTSalesOrder extends CTCNC
             );
         }
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            var_dump($this->getParam('selectedLines'));
 
             $formError = !$dsInput->populateFromArray($this->getParam('inputForm'));
 
