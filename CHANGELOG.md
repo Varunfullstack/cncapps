@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v4.7.1] - 2020-10-08
+### Fixed
+- Fixed issue with sales orders
+
 ## [v4.7.0] - 2020-10-08
 ### Added
 - Issue 1012 - Automatic Webroot Deactivation

@@ -1993,7 +1993,7 @@ class CTSalesOrder extends CTCNC
                                     DBEQuotation::fileExtension
                                 ) == 'pdf' && $this->dsQuotation->getValue(
                                     DBEQuotation::documentType
-                                ) == 'quotation' && $hasGreenArrow && $this->dsOrdhead->getValue(
+                                ) == 'quotation' && $hasGreenArrow && $dsOrdhead->getValue(
                                     DBEOrdhead::type
                                 ) !== 'C';
                             if ($shouldShowSendReminder) {
