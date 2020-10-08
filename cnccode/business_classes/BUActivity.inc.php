@@ -5611,8 +5611,7 @@ is currently a balance of ';
         $dbeCallActivity = new DBECallActivity($this);
         $dsCallActivity = new DataSet($this);
         $dsCallActivity->copyColumnsFrom($dbeCallActivity);
-        $dsCallActivity->setNull(DBECallActivity::callActivityID, DA_ALLOW_NULL);
-
+        $dsCallActivity->setNull(DBECallActivity::callActivityID, DA_ALLOW_NULL);         
         $dateTimeRaised = $_SESSION [$sessionKey] ['dateRaised'] . ' ' . $_SESSION [$sessionKey] ['timeRaised'] . ':00';
 
         $slaResponseHours = $this->getSlaResponseHours(
@@ -5844,6 +5843,260 @@ is currently a balance of ';
 
         unset($_SESSION[$sessionKey]);
 
+        return $dsCallActivity;
+    }
+    /**
+     * @param $body json data
+     * @return DataSet
+     * @throws Exception
+     */
+    function createActivityFromJson($body)
+    {
+        $dbeCallActivity = new DBECallActivity($this);
+        $dsCallActivity = new DataSet($this);
+        $dsCallActivity->copyColumnsFrom($dbeCallActivity);
+        $dsCallActivity->setNull(DBECallActivity::callActivityID, DA_ALLOW_NULL);
+
+        $dateTimeRaised = $body->dateRaised. ' ' . $body->timeRaised . ':00';
+
+        $slaResponseHours = $this->getSlaResponseHours(
+            $body->priority,
+            $body->customerID,
+            $body->contactID
+        );
+
+        /*
+    * Create a new problem
+    */
+
+        $dbeProblem = new DBEProblem($this);
+        $dbeProblem->setValue(
+            DBEProblem::hdLimitMinutes,
+            $this->dsHeader->getValue(DBEHeader::hdTeamLimitMinutes)
+        );
+        $dbeProblem->setValue(
+            DBEProblem::esLimitMinutes,
+            $this->dsHeader->getValue(DBEHeader::esTeamLimitMinutes)
+        );
+        $dbeProblem->setValue(
+            DBEProblem::smallProjectsTeamLimitMinutes,
+            $this->dsHeader->getValue(DBEHeader::smallProjectsTeamLimitMinutes)
+        );
+        $dbeProblem->setValue(
+            DBEProblem::projectTeamLimitMinutes,
+            $this->dsHeader->getValue(DBEHeader::projectTeamLimitMinutes)
+        );
+        $dbeProblem->setValue(
+            DBEProblem::customerID,
+            $body->customerID
+        );
+        $dbeProblem->setValue(
+            DBEProblem::dateRaised,
+            $dateTimeRaised
+        );
+
+        $userID = null;
+        if ($body->userID) {
+            $userID = $body->userID;
+        }
+        $dbeProblem->setValue(
+            DBEProblem::userID,
+            $userID
+        );
+
+        $dbeProblem->setValue(
+            DBEProblem::rootCauseID,
+            $body->rootCauseID??null
+        );
+
+        $dbeProblem->setValue(
+            DBEProblem::authorisedBy,
+            $body->authorisedBy??null
+        );
+
+        $dbeProblem->setValue(
+            DBEProblem::status,
+            'I'
+        );
+
+        $dbeProblem->setValue(
+            DBEProblem::slaResponseHours,
+            $slaResponseHours
+        );
+ 
+        $dbeProblem->setValue(
+            DBEProblem::queueNo,
+            $body->queueNo??1
+        ); // initial queue number
+
+        $dbeProblem->setValue(
+            DBEProblem::priority,
+            $body->priority
+        );
+        $dbeProblem->setValue(
+            DBEProblem::hideFromCustomerFlag,
+            $body->hideFromCustomerFlag?'Y':'N'
+        );
+
+        $dbeProblem->setValue(
+            DBEProblem::criticalFlag,
+            $body->criticalSRFlag?'Y':'N' 
+        );
+
+        $dbeProblem->setValue(
+            DBEProblem::internalNotes,
+            $body->internalNotes
+        );
+        $dbeProblem->setValue(
+            DBEProblem::contactID,
+            $body->contactID
+        );
+        $dbeProblem->setValue(
+            DBEProblem::contractCustomerItemID,
+            $body->contractCustomerItemID??null
+        );
+        $dbeProblem->setValue(
+            DBEProblem::projectID,
+            $body->projectID??null
+        );
+        $dbeProblem->setValue(
+            DBEProblem::emailSubjectSummary,
+            $body->emailSubjectSummary??null
+        );
+        $dbeProblem->setValue(
+            DBEProblem::assetName,
+            $body->assetName??null
+        );
+        $dbeProblem->setValue(
+            DBEProblem::assetTitle,
+            $body->assetTitle??null
+        );
+        $dbeProblem->setValue(
+            DBEProblem::repeatProblem,
+            $body->repeatProblem?1:0
+        );
+
+
+        $dbeProblem->insertRow();
+
+        if ($body->monitorSRFlag ) {
+            $this->toggleMonitoringFlag($dbeProblem->getPKValue());
+        }
+
+        $endTime = $this->getEndtime(
+            $body->callActTypeID,
+            $body->timeRaised
+        );
+
+        $dsCallActivity->setUpdateModeInsert();
+        $dsCallActivity->setValue(
+            DBEJCallActivity::callActivityID,
+            0
+        );
+        $dsCallActivity->setValue(
+            DBEJCallActivity::siteNo,
+            $body->siteNo
+        );
+        $dsCallActivity->setValue(
+            DBEJCallActivity::contactID,
+            $body->contactID
+        );
+        $dsCallActivity->setValue(
+            DBEJCallActivity::callActTypeID,
+            $body->callActTypeID??null
+        );
+        $dsCallActivity->setValue(
+            DBEJCallActivity::problemID,
+            $dbeProblem->getPKValue()
+        );
+        $dsCallActivity->setValue(
+            DBEJCallActivity::date,
+            $body->dateRaised
+        );
+        $dsCallActivity->setValue(
+            DBEJCallActivity::startTime,
+            $body->timeRaised
+        );
+        $dsCallActivity->setValue(
+            DBEJCallActivity::endTime,
+            $endTime
+        );
+        $dsCallActivity->setValue(
+            DBEJCallActivity::status,
+            'C'
+        ); // Checked
+        $dsCallActivity->setValue(
+            DBEJCallActivity::expenseExportFlag,
+            'N'
+        );
+        $dsCallActivity->setValue(
+            DBEJCallActivity::reason,
+            $body->reason
+        );
+        $dsCallActivity->setValue(
+            DBEJCallActivity::serverGuard,
+            $body->serverGuard??null
+        );
+
+        $dsCallActivity->setValue(
+            DBEJCallActivity::curValue,
+            $body->curValue??null
+        );
+        $dsCallActivity->setValue(
+            DBEJCallActivity::statementYearMonth,
+            null
+        );
+        $dsCallActivity->setValue(
+            DBEJCallActivity::customerItemID,
+            null
+        );
+        $dsCallActivity->setValue(
+            DBEJCallActivity::authorisedFlag,
+            'Y'
+        );
+        $dsCallActivity->setValue(
+            DBEJCallActivity::userID,
+            $GLOBALS['auth']->is_authenticated()
+        ); // user that created activity
+        $dsCallActivity->post();
+        $this->setProblemRaise($dbeProblem, $dsCallActivity); //createActivityFromSession
+
+        $dbeContact = null;
+        if ($body->contactID) {
+            $dbeContact = new DBEContact($this);
+            $dbeContact->getRow($body->contactID);
+        }
+
+        $this->updateDataAccessObject(
+            $dsCallActivity,
+            $dbeCallActivity
+        ); // Update the DB
+        if ($dbeProblem->getValue(DBEJProblem::hideFromCustomerFlag) == 'N') {       // skip work commenced
+
+            if ($dbeProblem->getValue(DBEJProblem::priority) == 5) {
+                $fields['submittedTo'] = 'Project Team';
+            } else {
+                $fields['submittedTo'] = 'Service Desk';
+            }
+            $this->sendEmailToCustomer(
+                $dbeProblem->getPKValue(),
+                self::InitialCustomerEmailCategory
+            );
+        }
+
+        $buCustomer = new BUCustomer($this);
+        $dsCustomer = new DataSet($this);
+        $buCustomer->getCustomerByID(
+            $body->customerID,
+            $dsCustomer
+        );
+
+        if (($dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' &&
+                $dsCustomer->getValue(DBECustomer::specialAttentionEndDate) >= date(
+                    'Y-m-d'
+                )) || ($dbeContact && $dbeContact->getValue(DBEContact::specialAttentionContactFlag) == 'Y')) {
+            $this->sendSpecialAttentionEmail($dbeCallActivity->getPKValue());
+        }
         return $dsCallActivity;
     }
 

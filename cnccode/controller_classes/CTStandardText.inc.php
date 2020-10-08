@@ -109,8 +109,22 @@ class CTStandardText extends CTCNC
                     $data,
                     JSON_NUMERIC_CHECK
                 );
-
                 break;
+                case "getByType" :
+                    //UnableToOfferFirstTimeFixReasonOptions
+                    try {
+                        $data = $this->getStandardTextOptionsForType($_REQUEST["type"]);
+                    } catch (Exception $exception) {
+                        $data = [
+                            "error" => $exception->getMessage()
+                        ];
+                    }
+    
+                    echo json_encode(
+                        $data,
+                        JSON_NUMERIC_CHECK
+                    );
+                    break;
             case "getList":
                 echo json_encode($this->getList());
                 exit;

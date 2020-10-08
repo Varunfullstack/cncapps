@@ -1096,6 +1096,7 @@ class CTUser extends CTCNC
             'isSdManager'=>$this->isSdManager(),
             'isExpenseApprover' => $this->dbeUser->getValue(DBEJUser::isExpenseApprover),
             'globalExpenseApprover' => $this->dbeUser->getValue(DBEJUser::globalExpenseApprover),
+            'teamID' => $this->dbeUser->getValue(DBEJUser::teamID),
 
         ]);
     }

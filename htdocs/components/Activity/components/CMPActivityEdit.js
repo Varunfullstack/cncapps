@@ -1,14 +1,17 @@
-import SVGActivity from "../SVGActivity.js";
-import {params, pick} from "../../utils/utils.js";
+import APIActivity from "../../services/APIActivity.js";
+import {groupBy, params, pick} from "../../utils/utils.js";
 import Toggle from "../../utils/toggle.js";
 import Table from "../../utils/table/table.js"
 import Modal from "../../utils/modal.js";
 import CKEditor from "../../utils/CKEditor.js";
 import Timer from "../../utils/timer.js";
 import ToolTip from "../../utils/ToolTip.js";
+import APICustomers from "../../services/APICutsomer.js";
 class CMPActivityEdit extends React.Component {
   el = React.createElement;
-  api = new SVGActivity();
+  api = new APIActivity();
+  apiCustomer=new APICustomers();
+
   activityStatus = {
     Fixed: "Fixed",
     CustomerAction: "CustomerAction",
@@ -94,8 +97,8 @@ class CMPActivityEdit extends React.Component {
       res.internalNotesTemplate=res.internalNotes;
       res.callActTypeIDOld=res.callActTypeID;
       Promise.all([
-        this.api.getCustomerContacts(res.customerId, res.contactID),
-        this.api.getCustomerSites(res.customerId),
+        this.apiCustomer.getCustomerContacts(res.customerId, res.contactID),
+        this.apiCustomer.getCustomerSites(res.customerId),
         this.api
           .getCustomerContracts(
             res.customerId,
@@ -677,15 +680,16 @@ class CMPActivityEdit extends React.Component {
     const { el } = this;
     const { data, callActTypes } = this.state;
     const found = callActTypes.filter((t) => t.id == data.callActTypeIDOld);
+    
     return this.getElementControl(
       "Type",
       "Type",
       el(
         "select",
         {
-          disabled: data?.isInitalDisabled || found.length == 0,
+          disabled: data?.isInitalDisabled || (found.length == 0&&data?.callActTypeIDOld!=null),
           required: true,
-          value: data?.callActTypeID,
+          value: data?.callActTypeID||"",
           onChange: (event) =>
             this.setValue("callActTypeID", event.target.value),
         },
@@ -699,25 +703,26 @@ class CMPActivityEdit extends React.Component {
   getContactsElement = () => {
     const { el } = this;
     const { data, contacts } = this.state;
+    const contactsGroup=groupBy(contacts,"siteTitle");
     return el(
       "select",
-      {
-        key: "contacts",
-        required: true,
-        value: data?.contactID,
-        onChange: (event) => this.setValue("contactID", event.target.value),
+      {         
+        key:"contacts" ,
+        value: data.contactID,
+        onChange: (event) =>this.setValue("contactID", event.target.value) ,
+        style:{width:200}
       },
-      el("option", { key: "empty", value: '' }, "Please select"),
-      contacts?.map((t) =>
-        el(
-          "option",
-          { key: t.id, value: t.id },
-          (t.startMainContactStyle || "") +
-            t.contactName +
-            (t.endMainContactStyle || "")
-        )
-      )
-    );
+      el("option", {key:'empty', value: '' }, "Please Select "),
+      contactsGroup.map((group,index)=>
+        {
+          return el(
+            "optgroup",
+            { key: group.groupName+index, label: group.groupName },
+            contactsGroup[index].items.map(item=>el("option", {key:'i'+ item.id, value: item.id }, item.name+" "+(item.startMainContactStyle||""))));
+        }
+      ),        
+    )
+ 
   };
   getContactPhone = () => {
     const { data } = this.state;
@@ -783,6 +788,7 @@ class CMPActivityEdit extends React.Component {
   getSites = () => {
     const { el } = this;
     const { data, sites } = this.state;
+    
     return el(
       "select",
       {
@@ -792,7 +798,7 @@ class CMPActivityEdit extends React.Component {
         onChange: (event) => this.setValue("siteNo", event.target.value),
       },
       el("option", { key: "empty", value: '-1' }, "Please select"),
-      sites?.map((t) => el("option", { key: t.id, value: t.id }, t.name))
+      sites?.map((t) => el("option", { key: t.id, value: t.id }, t.title))
     );
   };
   getTimeElement = () => {
@@ -825,7 +831,7 @@ class CMPActivityEdit extends React.Component {
   };
   getPriority = () => {
     const { el } = this;
-    const { data, priorities } = this.state;
+    const { data, priorities } = this.state;    
     return el(
       "select",
       {
@@ -842,6 +848,7 @@ class CMPActivityEdit extends React.Component {
   getUsersElement = () => {
     const { el } = this;
     const { data, users } = this.state;
+    
     return el(
       "select",
       {
@@ -857,7 +864,7 @@ class CMPActivityEdit extends React.Component {
   getContracts = () => {
     const { el } = this;
     const { data, contracts } = this.state;
-
+    
     return el(
       "select",
       {
@@ -891,6 +898,7 @@ class CMPActivityEdit extends React.Component {
   getRootCause = () => {
     const { el } = this;
     const { data, rootCauses } = this.state;
+    
     return el(
       "select",
       {
@@ -898,10 +906,10 @@ class CMPActivityEdit extends React.Component {
         disabled: !data.canChangePriorityFlag,
         style: { maxWidth: 200 },
         required: true,
-        value: data?.rootCauseId,
+        value: data?.rootCauseId||"",
         onChange: (event) => this.setValue("rootCauseId", event.target.value),
       },
-      el("option", { key: "empty", value: null }, "Not known"),
+      el("option", { key: "empty", value: "" }, "Not known"),
       rootCauses?.map((t) =>
         el("option", { key: t.id, value: t.id }, t.description)
       )
@@ -1015,8 +1023,7 @@ class CMPActivityEdit extends React.Component {
               disabled: data?.problemStatus != "F",
               title: "Date when this request should be set to completed",
               type: "date",
-
-              value: data?.completeDate,
+              value: data?.completeDate||"",
               onChange: (event) =>
                 this.setValue("completeDate", event.target.value),
             })

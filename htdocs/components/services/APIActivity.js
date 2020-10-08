@@ -1,17 +1,16 @@
-import APIMain from "../services/APIMain.js";
+import APIMain from "./APIMain.js";
+import ApiUrls from "./ApiUrls.js";
 
-class SVGActivity extends APIMain{
-    baseURL = "ActivityNew.php?action=";
+class APIActivity extends APIMain{
     getCallActivityDetails(callActivityID,filters) {
-        return fetch(`${this.baseURL}getCallActivity&callActivityID=${callActivityID}&includeTravel=${filters.showTravel}&includeOperationalTasks=${filters.showOperationalTasks}&includeServerGuardUpdates=${filters.showServerGaurdUpdates}`).then(res => res.json());
+        return fetch(`${ApiUrls.ActivityNew}getCallActivity&callActivityID=${callActivityID}&includeTravel=${filters.showTravel}&includeOperationalTasks=${filters.showOperationalTasks}&includeServerGuardUpdates=${filters.showServerGaurdUpdates}`).then(res => res.json());
     } 
     unlinkSalesOrder(linkedOrdheadId)
     {
         return fetch(`Activity.php?action=unlinkSalesOrder&activityId=${linkedOrdheadId}`);
     }
     setActivityCritical(callActivityID)
-    {
-        
+    {        
         return fetch(`Activity.php?action=toggleCriticalFlag&callActivityID=${callActivityID}`);
     }
     setActivityMonitoring(callActivityID)
@@ -34,7 +33,7 @@ class SVGActivity extends APIMain{
     }
     sendPartsUsed(data)
     {
-        return this.post(`ActivityNew.php?action=messageToSales`,data).then(res => res.json());
+        return this.post(`${ApiUrls.ActivityNew}messageToSales`,data).then(res => res.json());
 
     }
     getSalesRequestOptions=()=>{
@@ -57,23 +56,15 @@ class SVGActivity extends APIMain{
     }
     updateActivity(activity)
     {
-        let url='ActivityNew.php?action=updateActivity';        
+        let url=`${ApiUrls.ActivityNew}updateActivity`;        
         return this.post(url,activity).then(res => res.json());
     }
     getCallActTypes(){
-        return fetch(`ActivityNew.php?action=getCallActTypes`).then(res => res.json());
-    }
-    getCustomerContacts(customerId,contactID)
-    {
-        return fetch(`ActivityNew.php?action=getCustomerContacts&customerId=${customerId}&contactID=${contactID}`).then(res => res.json());
-    }
-    getCustomerSites(customerId)
-    {
-        return fetch(`ActivityNew.php?action=getCustomerSites&customerId=${customerId}`).then(res => res.json());
-    }
+        return fetch(`${ApiUrls.ActivityNew}getCallActTypes`).then(res => res.json());
+    }      
     getPriorities()
     {
-        return fetch(`ActivityNew.php?action=getPriorities`).then(res => res.json());
+        return fetch(`${ApiUrls.ActivityNew}getPriorities`).then(res => res.json());
     }
     activityRequestAdditionalTime(callActivityID,reason)
     {
@@ -82,16 +73,19 @@ class SVGActivity extends APIMain{
     }
     getAllUsers()
     {
-        return fetch(`ActivityNew.php?action=getAllUsers`).then(res => res.json());
+        return fetch(`${ApiUrls.ActivityNew}getAllUsers`).then(res => res.json());
     }
     getCustomerContracts(customerId,contractCustomerItemId,linkedToSalesOrder)
     {
-        return fetch(`ActivityNew.php?action=getCustomerContracts&customerId=${customerId}&contractCustomerItemId=${contractCustomerItemId}&linkedToSalesOrder=${linkedToSalesOrder}`).then(res => res.json());
+        return fetch(`${ApiUrls.ActivityNew}getCustomerContracts&customerId=${customerId}&contractCustomerItemId=${contractCustomerItemId}&linkedToSalesOrder=${linkedToSalesOrder}`).then(res => res.json());
     }
     getRootCauses()
     {
-        return fetch(`ActivityNew.php?action=getRootCauses`).then(res => res.json());
-
+        return fetch(`${ApiUrls.ActivityNew}getRootCauses`).then(res => res.json());
+    }
+    createProblem(data)
+    {
+        return this.post(`${ApiUrls.ActivityNew}createProblem`,data).then(res => res.json());
     }
 }
-export default SVGActivity;
+export default APIActivity;

@@ -5527,7 +5527,8 @@ class CTActivity extends CTCNC
 
         $urlNext =
             Controller::buildLink(
-                $_SERVER['PHP_SELF'],
+                //$_SERVER['PHP_SELF'],
+                "ActivityNew.php",
                 array(
                     'action'         => CTACTIVITY_ACT_EDIT_ACTIVITY,
                     'callActivityID' => $newActivityID

@@ -1,10 +1,10 @@
 import Table from "./../../utils/table/table.js?v=1";
-import SVCLogService from "../SVCLogService.js?v=1";
-import Spinner from "../../utils/spinner.js?v=1";
-
+ import Spinner from "../../utils/spinner.js?v=1";
+import APICustomers from "../../services/APICutsomer.js?v=1";
+ 
 class CMPCustomerSearch extends React.Component {
   el = React.createElement;
-  api=new SVCLogService();
+   apiCutsomer=new APICustomers();
   delayTimer;
   constructor(props) {
     super(props);
@@ -14,7 +14,7 @@ class CMPCustomerSearch extends React.Component {
       value=customer.cus_name;
     this.state = {
         _showSpinner:false,
-        searchValue:value,
+        searchValue:value||'Sussex Port Forwarding',
         customers:[],
 
     };
@@ -31,27 +31,30 @@ class CMPCustomerSearch extends React.Component {
     event.persist();
     this.delayTimer = setTimeout(()=> {      
       this.showSpinner();
-      this.api.searchCustomers(event.target.value).then(result=>{
-          console.log(result);
+      this.apiCutsomer.searchCustomers(event.target.value).then(result=>{          
           this.setState({customers:result,_showSpinner:false});
-
       });
     }, 1000); // Will do the ajax stuff after 1000 ms, or 1 s
   }
   getSearchElement = () => {
     const { el,handleCustomerSearch } = this;
     const {searchValue}=this.state;
-    return el("input", { placeholder: "Search Customers",
-    width: 200,
+    return el("input", { placeholder: "Search Customers",    
     value:searchValue,
-    style:{marginBottom:10},
+    style:{width: 300,marginBottom:10},
     onChange:handleCustomerSearch
     });
   };
   handleCustomerSelect =(customer)=>{
     //
+    //const projects= await ;
     if(this.props.updateSRData)
-        this.props.updateSRData({customer,nextStep:2});
+    this.props.updateSRData({customer,customerID:customer.cus_custno,nextStep:2});
+    this.apiCutsomer.getCustomerProjects(customer.cus_custno).then(projects=>{
+       if(this.props.updateSRData)
+        this.props.updateSRData({projects});
+    })
+     
   }
   getCustomersElement = () => {
     const { el ,handleCustomerSelect}    = this;

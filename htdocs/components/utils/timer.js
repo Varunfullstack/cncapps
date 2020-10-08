@@ -16,8 +16,7 @@ class Timer extends React.Component {
     {
         const {data}=this.state;
         data.hours=hours;
-        data.minutes=minutes;
-        console.log(data);
+        data.minutes=minutes;       
         this.setState({data});
         if(this.props.onChange)
         {

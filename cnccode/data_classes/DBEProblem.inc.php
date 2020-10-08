@@ -62,7 +62,10 @@ class DBEProblem extends DBEntity
     const projectTeamTimeAlertFlag = "projectTeamTimeAlertFlag";
     const raiseTypeId = "raiseTypeId";
     const salesRequestAssignedUserId = "salesRequestAssignedUserId";
-
+    const emailSubjectSummary="emailSubjectSummary";
+    const assetName="assetName";
+    const assetTitle="assetTitle";
+    const repeatProblem="repeatProblem";
     /**
      * calls constructor()
      * @access public
@@ -395,7 +398,27 @@ class DBEProblem extends DBEntity
             DA_ID,
             DA_ALLOW_NULL
         );
-
+        $this->addColumn(
+            self::emailSubjectSummary,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::assetName,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::assetTitle,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::repeatProblem,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        
         $this->setAddColumnsOff();
         $this->setPK(0);
         if ($pkID) {

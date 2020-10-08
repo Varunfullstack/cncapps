@@ -1,14 +1,14 @@
 import RadioButtons, { RadioButtonsType } from "../../utils/radioButtons.js";
 import Table from "./../../utils/table/table.js?v=1";
-import SVCLogService from "../SVCLogService.js?v=1";
-import Spinner from "../../utils/spinner.js?v=1";
+ import Spinner from "../../utils/spinner.js?v=1";
 import CMPContactSR from "./CMPContactSR.js?v=1";
 import CMPCustomerSR from "./CMPCustomerSR.js";
+import SVCCustomers from "../../services/APICutsomer.js";
 
 class CMPSelectSR extends React.Component {
     el=React.createElement;
-    
-    api=new SVCLogService();
+    apiCutsomer=new SVCCustomers();
+
     tabs=[];
     constructor(props)
     {
@@ -25,6 +25,7 @@ class CMPSelectSR extends React.Component {
     }
     componentDidMount() {
         //if(this.props.customerId&&this.props.contactId)
+        console.log(this.props);
         this.getExistingSR(this.props.customerId,this.props.contactId);
     }
     showSpinner=()=>{      
@@ -87,7 +88,7 @@ class CMPSelectSR extends React.Component {
     }
     getExistingSR=(customerId,contactId)=>{
         this.showSpinner();
-        this.api.getCustomerSR(customerId,contactId).then(res=>{
+        this.apiCutsomer.getCustomerSR(customerId,contactId).then(res=>{
             
             const customerSR=res.customerSR;
             const contactSR=res.contactSR.filter(s=>s.status!=="F");
@@ -105,7 +106,11 @@ class CMPSelectSR extends React.Component {
     }
     newSrActivity=(problemId,activityId)=>{
         console.log(problemId,activityId);
-      window.location=`Activity.php?action=editActivity&callActivityID=${activityId}`;
+      //window.location=`Activity.php?action=editActivity&callActivityID=${activityId}`;      
+      const url="Activity.php?action=createFollowOnActivity&callActivityID="+activityId;                
+      //console.log(url);
+      window.location=url;
+
     }
     render() { 
         const {el,getSRTypeElement,getTabsElement,openProblemHistory,newSrActivity}=this;

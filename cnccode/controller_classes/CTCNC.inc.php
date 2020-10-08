@@ -1229,5 +1229,18 @@ class CTCNC extends Controller
         }
         echo $js_code;
     }
-
+    function getLabtechDB()
+    {
+        $dsn = 'mysql:host=' . LABTECH_DB_HOST . ';dbname=' . LABTECH_DB_NAME;
+        $options = [
+            PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
+        ];
+        $labtechDB = new PDO(
+            $dsn,
+            LABTECH_DB_USERNAME,
+            LABTECH_DB_PASSWORD,
+            $options
+        );
+        return  $labtechDB;
+    }
 }

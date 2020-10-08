@@ -93,3 +93,44 @@ export function pick(obj,values){
     newObj[values[i]]=temp[values[i]];  
   return newObj;
 }
+export const SRQueues=[
+  {id:1,name:"HD Q",teamID:1},
+  {id:2,name:"ESC Q",teamID:2},
+  {id:3,name:"SP Q",teamID:4},
+  {id:4,name:"Sales Q",teamID:7},
+  {id:5,name:"Projects Q",teamID:5},
+  
+]
+export const TeamType={
+  Helpdesk:1,
+  Escalations:2,
+  Small_Projects:4,
+  Projects:5,
+  Directors:6,
+  Sales:7
+}
+/**
+ * 
+ * @param {array} items 
+ * @param {string} propertyName 
+ */
+export function groupBy(items,propertyName)
+{
+  const groupItems = items.reduce(function (prev, current) {
+    // get group index and group by renewalType
+    const index = prev
+      ? prev.findIndex((g) => g.groupName === current[propertyName])
+      : -1;
+    if ((prev && prev.length == 0) || index === -1) {
+      const obj = {
+        groupName: current[propertyName],
+        items: [current],
+      };
+      prev.push(obj);
+    } else if (index >= 0) {
+      prev[index].items.push(current);
+    }
+    return prev;
+  }, []);
+  return groupItems;
+}

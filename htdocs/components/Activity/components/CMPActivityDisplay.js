@@ -1,4 +1,4 @@
-import SVGActivity from "../SVGActivity.js";
+import APIActivity from "../../services/APIActivity.js";
 import {params} from "../../utils/utils.js";
 import Toggle from "../../utils/toggle.js";
 import Table from "../../utils/table/table.js"
@@ -7,7 +7,7 @@ import CKEditor from "../../utils/CKEditor.js";
 import ToolTip from "../../utils/ToolTip.js";
 class CMPActivityDisplay extends React.Component {    
     el=React.createElement;
-    api = new SVGActivity();
+    api = new APIActivity();
     constructor(props) {
         super(props);
         this.state = {  

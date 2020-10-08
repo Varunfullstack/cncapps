@@ -1,44 +1,68 @@
-import SVCLogService from "../SVCLogService.js";
-import CKEditor from "../../utils/CKEditor.js";
+ import CKEditor from "../../utils/CKEditor.js";
+import APICustomers from "../../services/APICutsomer.js";
+import Spinner from "../../utils/spinner.js?v=1";
 
 //import   CKEditor from "ckeditor5-react";
 //import * as ClassicEditor from '../../npm/node_modules/@ckeditor/ckeditor5-build-classic/build/ckeditor.js';
 
 class CMPCustomerSite extends React.Component {
   el = React.createElement;
-  api = new SVCLogService();
+  apiCutsomer = new APICustomers();
+
   constructor(props) {
     super(props);
-    const {data}=this.props;
+    const { data } = this.props;
     this.state = {
+      _showSpinner: false,
       sites: [],
       assets: [],
       data: {
-        reason: data.reason||'',
-        internalNotes: data.internalNotes||'',
-        asset:data.asset||'',
-        site:data.site||'',
+        reason: data.reason || "",
+        reasonTemplate: data.reason || "",
+        internalNotes: data.internalNotes || "",
+        internalNotesTemplate: data.internalNotes || "",
+        assetName: data.assetName || "",
+        assetTitle: data.assetTitle || "",
+        siteNo: data.siteNo || "",
+        emailSubjectSummary: data.emailSubjectSummary || "",
+        emptyAssetReason: data.emptyAssetReason || "",
       },
     };
   }
-  componentDidMount() {
-    const { el, api } = this;
-    // load customer Sites
-    api.getCustomerSites(this.props.customerId).then((res) => {
-      //console.log(res);
-      let selectedSiteId = "";
-      if (res.length == 1) selectedSiteId = res[0].id;
-      this.setState({ sites: res, selectedSiteId });
+  componentDidMount = async () => {
+    const { el, apiCutsomer } = this;
+    // load customer Sites and assets
+    this.showSpinner();
+    const result = await Promise.all([
+      apiCutsomer.getCustomerSites(this.props.customerId),
+      apiCutsomer.getCustomerAssets(this.props.customerId),
+    ]);
+    
+    const sites = result[0];
+    let assets = result[1];
+    let selectedSiteId = "";
+    if (sites.length == 1) selectedSiteId = sites[0].id;
+    assets = assets.map((asset) => {
+      if (
+        asset.BiosName.indexOf("VMware") >= 0 ||
+        asset.BiosName.indexOf("Virtual Machine") >= 0
+      ) {
+        asset.BiosVer = "";
+      }
+      return asset;
     });
-    // load customer assets
-    api.getCustomerAssets(this.props.customerId).then((res) => {
-      //console.log("assets", res);
-      this.setState({ assets: res });
-    });
-  }
+    // console.log(assets);
+    this.setState({ sites, selectedSiteId, assets,_showSpinner:false });
+  };
+  showSpinner = () => {
+    this.setState({ _showSpinner: true });
+  };
+  hideSpinner = () => {
+    this.setState({ _showSpinner: false });
+  };
   getSitesElement = () => {
     const { sites, data } = this.state;
-    const { el, handleSiteChange } = this;
+    const { el } = this;
     //console.log("selectedSiteId", selectedSiteId);
     return el(
       "div",
@@ -47,8 +71,8 @@ class CMPCustomerSite extends React.Component {
       el(
         "select",
         {
-          value: data.site,
-          onChange: handleSiteChange,
+          value: data.siteNo,
+          onChange: (event) => this.setValue("siteNo", event.target.value),
           className: "site-select",
         },
         el("option", { key: "default", value: "" }),
@@ -59,42 +83,64 @@ class CMPCustomerSite extends React.Component {
     );
   };
 
-  handleSiteChange = (event) => {
-    const {data}=this.state;
-    data.site=event.target.value;
-    console.log(event.target.value);
+  setValue = (label, value) => {
+    const { data } = this.state;
+    data[label] = value;
+    this.setState({ data });
+  };
+  handleAssetSelect = (value) => {
+    const { data, assets } = this.state;
+    const index = assets.findIndex((a) => a.name == value);
+    //  console.log(value,index,assets[index]);
+    const asset = assets[index];
+    data.assetName = value;
+    data.assetTitle =
+      asset.name + " " + asset.LastUsername + " " + asset.BiosVer;
     this.setState({ data });
   };
   getAssetElement = () => {
     const { assets } = this.state;
-    const { el, handleAssetChange } = this;
+    const { el } = this;
     return el(
       "div",
       null,
       el("label", { className: "site-label" }, "Asset"),
       el(
         "select",
-        { onChange: handleAssetChange, className: "site-select",value:this.state.data.asset },
+        {
+          onChange: (event) => this.handleAssetSelect(event.target.value),
+          className: "site-select",
+          value: this.state.data.assetName,
+        },
         el("option", { key: "default", value: "" }),
         assets.map((s) =>
-          el("option", { value: s.name, key: `asset${s.name}` }, s.name)
+          el(
+            "option",
+            { value: s.name, key: `asset${s.name}` },
+            s.name + " " + s.LastUsername + " " + s.BiosVer
+          )
         )
       )
     );
   };
-  handleAssetChange = (event) => {
-    const {data}=this.state;
-    data.asset=event.target.value
-    console.log("assets", event.target.value);
-    this.setState({ data});
+  getEmailSubjectSummary = () => {
+    const { el } = this;
+    return el(
+      "div",
+      null,
+      el("label", { className: "site-label" }, "Email Subject Summary"),
+      el("input", {
+        maxLength: 50,
+        style: { width: 292, margin: 2 },
+        onChange: (event) =>
+          this.setValue("emailSubjectSummary", event.target.value),
+        value: this.state.data.emailSubjectSummary,
+      })
+    );
   };
-  handleReasonChange = (text, field) => {    
-    const {data}=this.state;
-    data[field]=text;
-    this.setState({ data});
-  };
+
   getNotesElement = () => {
-    const { el, handleReasonChange } = this;
+    const { el } = this;
     return el(
       "div",
       null,
@@ -102,7 +148,7 @@ class CMPCustomerSite extends React.Component {
       el(CKEditor, {
         id: "reason",
         value: this.state.data.reason,
-        onChange: (data) => handleReasonChange(data, "reason"),
+        onChange: (data) => this.setValue("reasonTemplate", data),
       }),
       el(
         "div",
@@ -111,28 +157,67 @@ class CMPCustomerSite extends React.Component {
         el(CKEditor, {
           id: "internalNotes",
           value: this.state.data.internalNotes,
-          onChange: (data) => handleReasonChange(data, "internalNotes"),
+          onChange: (data) => this.setValue("internalNotesTemplate", data),
         })
       )
     );
   };
-  handleNext=()=>{
-    let {data}=this.state;    
-    data.nextStep=4;
+  handleNext = () => {
+    let { data } = this.state;
+    data.nextStep = 4;
+    data.reason = data.reasonTemplate;
+    data.internalNotes = data.internalNotesTemplate;
+
+    if (data.siteNo == "") {
+      alert("Please select customer site");
+      return;
+    }
+    if (data.assetName == "") {
+      const emptyAssetReason = prompt(
+        "Please provide the reason of no Asset",
+        this.state.data.emptyAssetReason
+      );
+      if (!emptyAssetReason) return;
+      else {
+        data.emptyAssetReason = emptyAssetReason;
+        this.setValue("emptyAssetReason", emptyAssetReason);
+      }
+    }
+    if (data.emailSubjectSummary == "") {
+      alert("You must enter Email Subject Summary");
+      return;
+    }
+    if (data.reason == "") {
+      alert("Please enter details");
+      return;
+    }
+
     this.props.updateSRData(data);
-  }
-  getNextButton=()=>{
-      const {el,handleNext}=this;
-      return el('div',null,
-      el('button',{onClick:handleNext,className:"float-right"},"Next >"))
-  }
-  render() {
-    const { el, getSitesElement, getAssetElement, getNotesElement ,getNextButton} = this;
+  };
+  getNextButton = () => {
+    const { el, handleNext } = this;
     return el(
       "div",
       null,
+      el("button", { onClick: handleNext, className: "float-right" }, "Next >")
+    );
+  };
+  render() {
+    const {_showSpinner}=this.state;
+    const {
+      el,
+      getSitesElement,
+      getAssetElement,
+      getNotesElement,
+      getNextButton,
+    } = this;
+    return el(
+      "div",
+      null,
+      el(Spinner,{show:_showSpinner}),
       getSitesElement(),
       getAssetElement(),
+      this.getEmailSubjectSummary(),
       getNotesElement(),
       getNextButton()
     );

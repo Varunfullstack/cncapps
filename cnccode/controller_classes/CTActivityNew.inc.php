@@ -9,6 +9,7 @@ require_once($cfg['path_dbe'] . '/DBECustomer.inc.php');
 require_once($cfg['path_dbe'] . '/DBEContact.inc.php');
 require_once($cfg['path_dbe'] . '/DBESite.inc.php');
 require_once($cfg['path_dbe'] . '/DBEHeader.inc.php');
+require_once($cfg['path_dbe'] . '/DBEProblemNotStartReason.inc.php');
 require_once($cfg['path_bu'] . '/BUProject.inc.php');
 require_once($cfg['path_bu'] . '/BUExpenseType.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomerItem.inc.php');
@@ -98,7 +99,11 @@ class CTActivityNew extends CTCNC
             case "getRootCauses":
                 echo json_encode($this->getRootCauses());
                 exit;
+            case "createProblem":
+                echo json_encode($this->addNewSR());
+                exit;
             default:
+           
             $this->setTemplate();
             break;
         }
@@ -1019,6 +1024,70 @@ class CTActivityNew extends CTCNC
             );           
         }
         return $rootCauses;
+    }
+    /**
+     * Log new Service Request using json Data
+     */
+    function addNewSR()
+    {
+   
+        try{
+        
+        $body                   = file_get_contents('php://input');
+        $body                   = json_decode($body);
+        $buActivity             = new BUActivity($this);
+        $body->date             = date(DATE_MYSQL_DATE);
+        $body->startTime        = date('H:i');
+        $body->dateRaised       = date(DATE_MYSQL_DATE);
+        $body->timeRaised       = date('H:i');
+        $body->callActTypeID    = CONFIG_INITIAL_ACTIVITY_TYPE_ID;       
+        //return ["team"=>$body->notStartWorkReason];
+        $dsCallActivity = $buActivity->createActivityFromJson($body);        
+        if (isset($dsCallActivity)) {
+            if (isset($body->pendingReopenedID) && isset($body->deletePending) && $body->deletePending == 'true') {
+                //delete pending
+                $dbePendingReopened = new DBEPendingReopened($this);
+                $dbePendingReopened->deleteRow($body->pendingReopenedID);
+            }
+            if($body->startWork)
+            {
+                $newActivityID = $buActivity->createFollowOnActivity(
+                    $dsCallActivity->getValue(DBEJCallActivity::callActivityID),
+                    $this->getParam('callActivityTypeID'),
+                    false,
+                    $this->getParam('reason'),
+                    true,
+                    false,
+                    $GLOBALS['auth']->is_authenticated(),
+                    $this->getParam('moveToUsersQueue')
+                );
+                //$nextURL ="Activity.php?action=createFollowOnActivity&callActivityID=".$newActivityID ."&moveToUsersQueue=1";                
+                $nextURL ="ActivityNew.php?action=editActivity&callActivityID=".$newActivityID;                
+
+            }
+            else
+            {
+                $nextURL ="CurrentActivityReport.php";
+            }
+            $currentUser=$this->getDbeUser();
+            if(!$body->startWork&&$currentUser->getValue(DBEUser::teamID)==1)
+            {
+                //$body->notStartWorkReason
+                $dbeProblemNotStartReason =new DBEProblemNotStartReason($this);
+                $dbeProblemNotStartReason->setValue(DBEProblemNotStartReason::problemID, $dsCallActivity->getValue(DBEJCallActivity::problemID));
+                $dbeProblemNotStartReason->setValue(DBEProblemNotStartReason::reason, $body->notStartWorkReason);
+                $dbeProblemNotStartReason->setValue(DBEProblemNotStartReason::userID, $currentUser->getValue(DBEUser::userID));
+                $dbeProblemNotStartReason->setValue(DBEProblemNotStartReason::createAt,$body->dateRaised. ' ' . $body->timeRaised . ':00');
+                $dbeProblemNotStartReason->insertRow();
+            }
+            return ["status"=>1,"nextURL"=>$nextURL,"problemID"=>$dsCallActivity->getValue(DBEJCallActivity::problemID),"callActivityID"=>$dsCallActivity->getValue(DBEJCallActivity::callActivityID)];
+        }
+        else return ["status"=>0];        
+    }
+    catch(Exception $exception)
+    {
+        return ["status"=>3,"error"=>$exception->getMessage()];   
+    }
     }
 }
 ?>
