@@ -131,7 +131,13 @@
             fixedHeader: true,
             pageLength: 100,
             columns: columnsData,
-            lengthMenu: [50, 100, 150, 200]
+            lengthMenu: [50, 100, 150, 200],
+            footerCallback: (row, data, start, end, display) => {
+                const total = table.column(9, {page: 'current'}).data().reduce((acc, value) => acc += (+value), 0);
+                $(table.column(9).footer()).html(
+                    "Total Balance: &pound;" + total
+                )
+            }
         });
 
         table.columns(5).search('R');

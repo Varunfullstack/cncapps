@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 1012 - Automatic Webroot Deactivation
+- Issue 1031 - Add total Balance onto ContractReport
 ### Changed
 - Issue 1010 - Team & User Statistics visual improvements.
 - Issue 1027 - Expenses & Overtime Reporting.
