@@ -5,6 +5,7 @@ class ExpenseBreakdownYearToDate extends React.Component {
 
     constructor(props) {
         super(props);
+
         this.state = {
             approvalSubordinates: [],
             expenses: [],
@@ -105,7 +106,7 @@ class ExpenseBreakdownYearToDate extends React.Component {
 
 
     render() {
-        const isApprover = this.state.approvalSubordinates.length > 1;
+        const isApprover = this.state.approvalSubordinates.length;
         const currentDate = new Date();
         // if is approver we render a dropdown, that we are going to populate from the active users
         // if not we won't have the selector as it's the guy's data
