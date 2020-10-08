@@ -266,7 +266,7 @@ class BUProblemSLA extends Business
         $engineerName = $DBEProblem->getValue(DBEJProblem::engineerName) ? $DBEProblem->getValue(
             DBEJProblem::engineerName
         ) : "NOBODY";
-        $subject = "Fix SLA FAILED - SR for {$DBEProblem->getValue(DBEJProblem::customerName)} assigned to {$engineerName} has failed the agreed fix SLA";
+        $subject = "Fix SLA WARNING - SR for {$DBEProblem->getValue(DBEJProblem::customerName) } assigned to {$engineerName} is close to breaching the agreed fix SLA";
         $this->sendSLAEmail($DBEProblem, $subject, '@internal/fixSLAWarningEmail.html.twig');
     }
 
