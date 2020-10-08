@@ -330,7 +330,7 @@ export function fetchAllData(customerId) {
 }
 
 export function updateCustomerField(field, value) {
-    return (dispatch, getState) => {
+    const thunk = (dispatch, getState) => {
         dispatch(updateCustomerValue(field, value));
         const {customerID, lastUpdatedDateTime} = getState().customerEdit.customer;
         return updateCustomer(customerID, {[field]: value}, lastUpdatedDateTime)
@@ -351,6 +351,13 @@ export function updateCustomerField(field, value) {
                 dispatch(addError(`Unable to save change due to an error in the server: ${error.message}`))
             })
     }
+    thunk.meta = {
+        debounce: {
+            time: 2500,
+            key: 'UPDATE_CUSTOMER_FIELD'
+        }
+    }
+    return thunk;
 }
 
 export function updateInvoiceSiteNo(value) {
