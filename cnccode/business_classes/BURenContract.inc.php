@@ -550,7 +550,7 @@ class BURenContract extends Business
                     );
                     $dbeOrdline->setValue(
                         DBEOrdline::isRecurring,
-                        $dbeJCustomerItem->getValue(DBEJCustomerItem::reoccurring)
+                        0
                     );
                     $dbeOrdline->setValue(
                         DBEOrdline::ordheadID,
