@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v4.7.0] - 2020-10-08
 ### Added
 - Issue 1012 - Automatic Webroot Deactivation
 - Issue 1031 - Add total Balance onto ContractReport
