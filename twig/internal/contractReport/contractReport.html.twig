@@ -135,7 +135,7 @@
             footerCallback: (row, data, start, end, display) => {
                 const total = table.column(9, {page: 'current'}).data().reduce((acc, value) => acc += (+value), 0);
                 $(table.column(9).footer()).html(
-                    "Total Balance: &pound;" + total
+                    "Total Balance: &pound;" + total.toFixed(2)
                 )
             }
         });
