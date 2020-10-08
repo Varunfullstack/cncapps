@@ -125,7 +125,7 @@ class CustomerEditMain extends React.Component {
                                                         label: `${x.firstName} ${x.lastName}`
                                                     }))}
                                                     selectedOption={customer.primaryMainContactID || ''}
-                                                    onChange={($event) => this.handleUpdateGenericField($event)}
+                                                    onChange={($value) => this.updateCustomerField('primaryMainContactID', $value)}
                                                     className='form-control input-sm'
                                                     name="primaryMainContactID"
                                                 />
