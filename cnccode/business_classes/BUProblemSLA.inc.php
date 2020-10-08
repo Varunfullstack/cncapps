@@ -184,6 +184,7 @@ class BUProblemSLA extends Business
             $timeLeftForSLA = $fixSLAValue - $dbejProblem->getValue(DBEJProblem::workingHours);
             if ($timeLeftForSLA <= 0) {
                 $this->sendFixSlaBreachedEmail($dbejProblem);
+                return true;
             } elseif ($timeLeftForSLA <= $dsHeader->getValue(DBEHeader::fixSLABreachWarningHours)) {
                 $this->sendFixSlaAlertEmail($dbejProblem);
                 return true;
