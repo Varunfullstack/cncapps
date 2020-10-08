@@ -41,7 +41,41 @@ class CTExpenseDashboard extends CTCNC
     {
 
         switch ($this->getAction()) {
-            case "getExpensesData" :
+
+            case "getExpensesData":
+
+                $offset = @$_REQUEST['offset'];
+                $limit = @$_REQUEST['limit'];
+                $search = @$_REQUEST['search'];
+                $orderItems = @$_REQUEST['orderItems'];
+                $engineerId = @$_REQUEST['engineerId'];
+                $exported = @$_REQUEST['exported'];
+                $startDate = @$_REQUEST['startDate'];
+                $endDate = @$_REQUEST['endDate'];
+                $expenseTypeId = @$_REQUEST['expenseTypeId'];
+                $startDateTime = null;
+                $endDateTime = null;
+                if ($startDate) {
+                    $startDateTime = DateTime::createFromFormat(DATE_MYSQL_DATE, $startDate);
+                }
+                if ($endDate) {
+                    $endDateTime = DateTime::createFromFormat(DATE_MYSQL_DATE, $endDate);
+                }
+
+                $result = $this->getExpenses(
+                    $offset,
+                    $limit,
+                    $search,
+                    $orderItems,
+                    $engineerId,
+                    $exported,
+                    $startDateTime,
+                    $endDateTime,
+                    $expenseTypeId
+                );
+                echo json_encode($result);
+                break;
+            case "getExpensesDataTableData" :
 
                 $offset = $_REQUEST['start'];
                 $limit = $_REQUEST['length'];
@@ -159,7 +193,14 @@ WHERE
   AND (caa_endtime <> caa_starttime)
   AND (
     callactivity.`caa_consno` = ?
-    OR consultant.`expenseApproverID` = ?
+    OR (consultant.`expenseApproverID` = ? AND
+      (SELECT
+        1
+      FROM
+        consultant approvers
+      WHERE approvers.isExpenseApprover
+        AND approvers.cns_consno = ?)
+        )
     OR (
       (SELECT
         1
@@ -175,6 +216,7 @@ WHERE
                 $limit = $_REQUEST['length'];
 
                 $parameters = [
+                    ["type" => "i", "value" => $this->userID],
                     ["type" => "i", "value" => $this->userID],
                     ["type" => "i", "value" => $this->userID],
                     ["type" => "i", "value" => $this->userID],
@@ -383,7 +425,13 @@ FROM
     GROUP BY staffId) b
     ON b.staffId = consultant.`cns_consno`
 WHERE (
-    consultant.`expenseApproverID` = ?
+    (consultant.`expenseApproverID` = ? AND
+      (SELECT
+        1
+      FROM
+        consultant approvers
+      WHERE approvers.isExpenseApprover
+        AND approvers.cns_consno = ?))
     OR
     (SELECT
       1
@@ -396,7 +444,11 @@ WHERE (
 
                 $result = $db->preparedQuery(
                     $expenseQuery,
-                    [["type" => "i", "value" => $this->userID], ["type" => "i", "value" => $this->userID]]
+                    [
+                        ["type" => "i", "value" => $this->userID],
+                        ["type" => "i", "value" => $this->userID],
+                        ["type" => "i", "value" => $this->userID],
+                    ]
                 );
                 $expenses = $result->fetch_all(MYSQLI_ASSOC);
                 echo json_encode($expenses, JSON_NUMERIC_CHECK);
@@ -464,7 +516,15 @@ FROM
       GROUP BY staffId) b
       ON b.staffId = consultant.`cns_consno`
   WHERE (
-      consultant.`expenseApproverID` = ?
+      (consultant.`expenseApproverID` = ?
+      AND
+      (SELECT
+        1
+      FROM
+        consultant approvers
+      WHERE approvers.isExpenseApprover
+        AND approvers.cns_consno = ?)
+          )
       OR
       (SELECT
         1
@@ -480,7 +540,11 @@ WHERE YTD IS NOT NULL
 ORDER BY staffName";
                 $result = $db->preparedQuery(
                     $overtimeQuery,
-                    [["type" => "i", "value" => $this->userID], ["type" => "i", "value" => $this->userID]]
+                    [
+                        ["type" => "i", "value" => $this->userID],
+                        ["type" => "i", "value" => $this->userID],
+                        ["type" => "i", "value" => $this->userID],
+                    ]
                 );
                 $overtimes = $result->fetch_all(MYSQLI_ASSOC);
                 echo json_encode($overtimes, JSON_NUMERIC_CHECK);
@@ -532,6 +596,21 @@ ORDER BY staffName";
         }
     }
 
+    /**
+     * Returns the expenses from the DB
+     *
+     * @param int $offset
+     * @param null $limit
+     * @param null $searchValue
+     * @param array $order
+     * @param null $engineerId
+     * @param false $exported
+     * @param DateTimeInterface|null $startDate
+     * @param DateTimeInterface|null $endDate
+     * @param null $expenseTypeId
+     * @return array
+     * @throws Exception
+     */
     function getExpenses($offset = 0,
                          $limit = null,
                          $searchValue = null,
@@ -539,7 +618,8 @@ ORDER BY staffName";
                          $engineerId = null,
                          $exported = false,
                          DateTimeInterface $startDate = null,
-                         DateTimeInterface $endDate = null
+                         DateTimeInterface $endDate = null,
+                         $expenseTypeId = null
     )
     {
         $queryString = 'SELECT
@@ -561,6 +641,7 @@ ORDER BY staffName";
   project.`projectID` AS projectId,
   expense.approvedDate,
    customer.cus_name as customerName,
+  add_town as siteTown,
   CONCAT(
     approver.`firstName`,
     " ",
@@ -578,12 +659,14 @@ ORDER BY staffName";
        callactivity.caa_consno = ? as isSelf,
        receipt.id as receiptId,
        expensetype.receiptRequired,
-         ((SELECT
+         (
+             (SELECT
         1
       FROM
         consultant globalApprovers
       WHERE globalApprovers.globalExpenseApprover
-        AND globalApprovers.cns_consno = ?) = 1 or consultant.`expenseApproverID` = ?) as isApprover
+        AND globalApprovers.cns_consno = ?) = 1 or consultant.`expenseApproverID` = ?
+             ) as isApprover
 FROM
   expense
   LEFT JOIN `callactivity`
@@ -599,12 +682,19 @@ FROM
       left join project on project.ordHeadID = ordhead.odh_ordno
   LEFT JOIN consultant approver
     ON approver.`cns_consno` = expense.`approvedBy`
+      left join address on add_custno = problem.pro_custno and add_siteno = caa_siteno
    left join customer on pro_custno = customer.cus_custno
 WHERE 
       caa_endtime and caa_endtime is not null and
       (
     callactivity.`caa_consno` = ?
-    OR consultant.`expenseApproverID` = ?
+    OR (consultant.`expenseApproverID` = ? AND
+      (SELECT
+        1
+      FROM
+        consultant approvers
+      WHERE approvers.isExpenseApprover
+        AND approvers.cns_consno = ?))
     OR ((SELECT 1 FROM consultant globalApprovers WHERE globalApprovers.globalExpenseApprover AND globalApprovers.cns_consno = ?) = 1 AND consultant.`activeFlag` = "Y")
   ) and (? is not null and callactivity.caa_consno = ? or ? is null ) 
    ';
@@ -613,8 +703,8 @@ WHERE
         } else {
             $queryString .= " AND exp_exported_flag <> 'Y' ";
         }
-
         $parameters = [
+            ["type" => "i", "value" => $this->userID],
             ["type" => "i", "value" => $this->userID],
             ["type" => "i", "value" => $this->userID],
             ["type" => "i", "value" => $this->userID],
@@ -625,6 +715,15 @@ WHERE
             ["type" => "i", "value" => $engineerId],
             ["type" => "i", "value" => $engineerId],
         ];
+
+        if ($expenseTypeId) {
+            $queryString .= " and exp_expensetypeno = ?";
+            $parameters[] = [
+                "type"  => "i",
+                "value" => $expenseTypeId
+            ];
+        }
+
         if ($startDate) {
             $queryString .= " and caa_date >= ? ";
             $parameters[] = ["type" => "s", "value" => $startDate->format(DATE_MYSQL_DATE)];
@@ -637,6 +736,7 @@ WHERE
 
         /** @var dbSweetcode $db */
         global $db;
+
         $countResult = $db->preparedQuery(
             $queryString,
             $parameters
@@ -673,6 +773,8 @@ WHERE
         }
         if (count($orderItems)) {
             $queryString .= " order by " . implode(', ', $orderItems);
+        } else {
+            $queryString .= " order by dateSubmitted";
         }
         if ($limit) {
             $queryString .= " limit ?, ?";

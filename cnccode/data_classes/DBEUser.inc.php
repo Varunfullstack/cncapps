@@ -371,7 +371,7 @@ class DBEUser extends DBEntity
             self::streamOneLicenseManagement,
             DA_BOOLEAN,
             DA_NOT_NULL
-        );        
+        );
         $this->addColumn(
             self::expenseApproverID,
             DA_ID,
@@ -540,9 +540,12 @@ class DBEUser extends DBEntity
         $query = "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} WHERE {$this->getDBColumnName(self::activeFlag)} = 'Y' 
             and  
             (select 1 from {$this->getTableName()} where {$this->getDBColumnName(self::globalExpenseApprover)} 
-                                 and {$this->getDBColumnName(self::userID)} = {$superiorId}
-                ) = 1 or {$this->getDBColumnName(self::expenseApproverID)} = {$superiorId} order by cns_name";
+                                 and {$this->getDBColumnName(self::userID)} = {$superiorId} 
+                ) = 1 or (({$this->getDBColumnName(self::expenseApproverID)} = {$superiorId} or {$this->getDBColumnName(self::userID)} = {$superiorId}) and 
+                          (select 1 from {$this->getTableName()} test where {$this->getDBColumnName(self::isExpenseApprover)} and {$this->getDBColumnName(self::userID)} = {$superiorId})
+                    )  order by cns_name";
         $this->setQueryString($query);
+
         return parent::getRows();
     }
 }

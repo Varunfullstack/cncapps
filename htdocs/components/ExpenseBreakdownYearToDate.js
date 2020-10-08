@@ -5,10 +5,14 @@ class ExpenseBreakdownYearToDate extends React.Component {
 
     constructor(props) {
         super(props);
+
         this.state = {
             approvalSubordinates: [],
             expenses: [],
-            selectedEngineer: null
+            selectedEngineer: null,
+            selectedDetail: null,
+            financialYearTotalMileage: 0,
+            financialYearTotalValue: 0
         };
     }
 
@@ -24,7 +28,54 @@ class ExpenseBreakdownYearToDate extends React.Component {
             })
     }
 
-    fetchExpenses(engineerId = null) {
+    getFinancialStartAndEndDates() {
+        const today = moment().hours(0).minutes(0).seconds(0);
+        const sixthOfAprilThisYear = (moment()).month(3).date(6).hours(0).minutes(0).seconds(0);
+        if (today.isSameOrAfter(sixthOfAprilThisYear)) {
+            return {
+                startDate: sixthOfAprilThisYear,
+                endDate: today
+            }
+        }
+        return {
+            startDate: sixthOfAprilThisYear.subtract(1, 'year'),
+            endDate: today
+        }
+    }
+
+
+    fetchFinancialYearExpenses(engineerId) {
+        const financialStartAndEndDates = this.getFinancialStartAndEndDates();
+
+        let urlString = `?action=getExpensesData&exported=1&expenseTypeId=2&startDate=${financialStartAndEndDates.startDate.format('YYYY-MM-DD')}&endDate=${financialStartAndEndDates.endDate.format('YYYY-MM-DD')}`;
+        if (engineerId) {
+            urlString += `&engineerId=${engineerId}`;
+        }
+
+        return fetch(urlString)
+            .then(res => res.json())
+            .then(response => {
+                this.updateFinancialYearTotalsStateFromResponse(response)
+            });
+    }
+
+    updateFinancialYearTotalsStateFromResponse(response) {
+        this.setState(
+            response.data.reduce(
+                (acc, expense) => {
+                    acc.financialYearTotalMileage += +expense.mileage;
+                    acc.financialYearTotalValue += +expense.value;
+                    return acc;
+                },
+                {
+                    financialYearTotalMileage: 0,
+                    financialYearTotalValue: 0
+                }
+            )
+        );
+    }
+
+    fetchYearToDateExpenses(engineerId = null) {
         let url = '?action=getYearToDateExpenses';
         if (engineerId) {
             url += '&engineerId=' + engineerId
@@ -41,40 +92,45 @@ class ExpenseBreakdownYearToDate extends React.Component {
             this.fetchApprovalSubordinates();
         }
         if (this.state.selectedEngineer !== prevState.selectedEngineer) {
-            console.log(this.state.selectedEngineer, prevState.selectedEngineer);
-            this.fetchExpenses(this.state.selectedEngineer);
+            this.fetchYearToDateExpenses(this.state.selectedEngineer);
+            this.fetchFinancialYearExpenses(this.state.selectedEngineer);
         }
     }
 
     componentDidMount() {
         const {userId} = this.props;
         this.fetchApprovalSubordinates(userId);
-        this.fetchExpenses()
+        this.fetchYearToDateExpenses()
+        this.fetchFinancialYearExpenses();
     }
 
 
     render() {
-        const isApprover = this.state.approvalSubordinates.length > 1;
+        const isApprover = this.state.approvalSubordinates.length;
         const currentDate = new Date();
         // if is approver we render a dropdown, that we are going to populate from the active users
         // if not we won't have the selector as it's the guy's data
         const totalRow = new Array(currentDate.getMonth() + 2).fill(0);
         const mileage = new Array(currentDate.getMonth() + 2).fill(0);
+        const mileageDetail = new Array(currentDate.getMonth() + 2).fill(0).map(x => []);
         const tableData = this.state.expenses.reduce((acc, expense) => {
             if (!(expense.expenseTypeDescription in acc)) {
                 acc[expense.expenseTypeDescription] = new Array(currentDate.getMonth() + 2).fill(0);
             }
-            const expenseMonth = expense.dateSubmitted.match(/\d{4}-0(\d)-\d{2}/)[1]
-            acc[expense.expenseTypeDescription][expenseMonth] += expense.value;
+            const expenseMonth = expense.dateSubmitted.match(/\d{4}-0(\d)-\d{2}/)[1];
+
+            acc[expense.expenseTypeDescription][expenseMonth - 1] += expense.value;
             acc[expense.expenseTypeDescription][acc[expense.expenseTypeDescription].length - 1] += expense.value;
-            totalRow[expenseMonth] += expense.value;
+            totalRow[expenseMonth - 1] += expense.value;
             totalRow[totalRow.length - 1] += expense.value;
             if (expense.expenseTypeDescription === 'Mileage') {
-                mileage[expenseMonth] += expense.mileage;
+                mileage[expenseMonth - 1] += expense.mileage;
                 mileage[mileage.length - 1] += expense.mileage;
+                mileageDetail[expenseMonth - 1].push(expense);
             }
             return acc;
         }, {});
+
         const monthNames = [
             "Jan",
             "Feb",
@@ -191,8 +247,16 @@ class ExpenseBreakdownYearToDate extends React.Component {
                                             return this.el(
                                                 'td',
                                                 {
-                                                    style: {textAlign: "right"},
-                                                    key: expenseType + idx
+                                                    style: {
+                                                        textAlign: "right",
+                                                        cursor: expenseType === 'Mileage' ? 'pointer' : null
+                                                    },
+                                                    key: expenseType + idx,
+                                                    onClick: $even => {
+                                                        if (expenseType === 'Mileage') {
+                                                            this.setState({selectedDetail: idx});
+                                                        }
+                                                    },
                                                 },
                                                 value.toFixed(2) + (expenseType == "Mileage" ? ` (${mileage[idx]})` : '')
                                             )
@@ -203,6 +267,113 @@ class ExpenseBreakdownYearToDate extends React.Component {
                         )
                     ]
                 ),
+                this.el(
+                    'div',
+                    {className: 'financialYearMileage', key: 'financial-year-mileage'},
+                    [
+                        this.el(
+                            'div',
+                            {className: 'financialYearMileage-totalMileage', key: 'totalMileage'},
+                            `Financial Year Mileage: ${this.state.financialYearTotalMileage}`
+                        ),
+                        this.el(
+                            'div',
+                            {className: 'financialYearValue-totalValue', key: 'totalValue'},
+                            `Financial Year Mileage Value: £${this.state.financialYearTotalValue.toFixed(2)}`
+                        )
+                    ]
+                ),
+                this.state.selectedDetail !== null ?
+                    this.el(
+                        "div",
+                        {className: 'detail-table', key: 'detail-table'},
+                        [
+                            this.el('h3', {key: 'month-name'},
+                                monthNames[this.state.selectedDetail]
+                            ),
+                            this.el(
+                                'table',
+                                {
+                                    className: 'table table-stripped',
+                                    key: 'detail-table'
+                                },
+                                [
+                                    this.el(
+                                        'thead',
+                                        {key: 'detail-header'},
+                                        this.el(
+                                            'tr',
+                                            {},
+                                            [
+                                                this.el(
+                                                    'th',
+                                                    {key: 'date-column'},
+                                                    'Date'
+                                                ),
+                                                this.el(
+                                                    'th',
+                                                    {key: 'customer-column'},
+                                                    'Customer'
+                                                ),
+                                                this.el(
+                                                    'th',
+                                                    {key: 'site-column'},
+                                                    'Site'
+                                                ),
+                                                this.el(
+                                                    'th',
+                                                    {key: 'miles-column'},
+                                                    'Miles'
+                                                ),
+                                                this.el(
+                                                    'th',
+                                                    {key: 'value-column'},
+                                                    'Value'
+                                                ),
+                                            ]
+                                        )
+                                    ),
+                                    this.el(
+                                        'tbody',
+                                        {key: 'detail-body'},
+                                        mileageDetail[this.state.selectedDetail].map(expense => {
+                                            return this.el(
+                                                'tr',
+                                                {key: expense.id},
+                                                [
+                                                    this.el(
+                                                        'td',
+                                                        {key: 'date-column'},
+                                                        expense.dateSubmitted
+                                                    ),
+                                                    this.el(
+                                                        'td',
+                                                        {key: 'customer-column'},
+                                                        expense.customerName
+                                                    ),
+                                                    this.el(
+                                                        'td',
+                                                        {key: 'site-column'},
+                                                        expense.siteTown
+                                                    ),
+                                                    this.el(
+                                                        'td',
+                                                        {key: 'miles-column'},
+                                                        expense.mileage
+                                                    ),
+                                                    this.el(
+                                                        'td',
+                                                        {key: 'value-column'},
+                                                        expense.value
+                                                    ),
+                                                ]
+                                            )
+                                        })
+                                    ),
+                                ]
+                            )
+                        ],
+                    ) : null
             ]
         )
     }
