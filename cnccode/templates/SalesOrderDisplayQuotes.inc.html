@@ -7,6 +7,9 @@
         }
 
         const emailSubjectElm = document.getElementById('emailSubject');
+        if (!emailSubjectElm) {
+            alert('This order is complete, cannot send a reminder');
+        }
         const emailSubject = emailSubjectElm.value;
 
         if (!emailSubject.trim()) {
