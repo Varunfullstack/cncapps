@@ -4,6 +4,8 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 1012 - Automatic Webroot Deactivation
+### Changed
+- Issue 1010 - Team & User Statistics visual improvements.
 ### Fixed
 - Issue 1013 - Questionnaire export to CSV incorrect data & formatting improvements
 - Issue 1026 - OS Support Dates not sorting on Is Server

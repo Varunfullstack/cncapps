@@ -284,16 +284,6 @@ ORDER BY teamId,
                 'technicianReport' => $technicianReport
             )
         );
-
-        $this->template->setVar(
-            'javaScript',
-            '
-                    <link rel="stylesheet" href="./css/table.css">
-                    <script src="js/react.development.js" crossorigin></script>
-                    <script src="js/react-dom.development.js" crossorigin></script>
-                    <script type="module" src=\'components/FixedServiceRequestCountComponent/FixedServiceRequestCountComponent.js\'></script>
-                '
-        );
         $this->template->parse(
             'CONTENTS',
             'EscalationReport',

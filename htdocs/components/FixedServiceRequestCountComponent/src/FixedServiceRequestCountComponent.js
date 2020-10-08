@@ -1,7 +1,15 @@
+import React, {Fragment} from "react";
+import Spinner from "./spinner";
+import moment from "moment";
+import ReactDOM from 'react-dom';
+
 export const SelectionState = {
     YEAR_TO_DATE: 'YEAR_TO_DATE',
-    SPECIFIC_YEAR_MONTH: 'SPECIFIC_YEAR_MONTH'
+    SPECIFIC_YEAR_MONTH: 'SPECIFIC_YEAR_MONTH',
+    CUSTOM_DATES: 'CUSTOM_DATES',
 }
+
+const MYSQL_DATE_FORMAT = 'YYYY-MM-DD'
 
 Number.prototype.pad = function (size) {
     let s = String(this);
@@ -21,16 +29,25 @@ class FixedServiceRequestCountComponent extends React.Component {
 
     constructor(props) {
         super(props);
-        const currentDateTime = new Date();
-        const currentFormattedDate = currentDateTime.getFullYear() + "-" + (currentDateTime.getMonth() + 1).pad();
         this.state = {
-            yearMonth: currentFormattedDate,
+            yearMonth: moment().format('YYYY-MM'),
             selectedState: SelectionState.YEAR_TO_DATE,
             firstTimeFixData: null,
             fixedServiceRequestData: null,
-            teamPerformanceData: null
+            teamPerformanceData: null,
+            fetchingData: true,
+            startDate: moment().subtract(1, 'month'),
+            endDate: moment()
         }
-        this.fetchData();
+    }
+
+    componentDidMount() {
+        this.refetchData();
+    }
+
+    refetchData() {
+        const startAndEndDates = this.getStartAndEndDates();
+        this.fetchData(startAndEndDates.startDate, startAndEndDates.endDate);
     }
 
     fetchFirstTimeFixedData(startDate, endDate) {
@@ -77,27 +94,19 @@ class FixedServiceRequestCountComponent extends React.Component {
             })
     }
 
-    fetchData() {
-        const {selectedState, yearMonth} = this.state;
-        const currentDateTime = new Date();
-        let startDate = currentDateTime.getFullYear() + "-01-01";
-        let endDate = currentDateTime.getMYSQLDate();
-        if (selectedState === SelectionState.SPECIFIC_YEAR_MONTH) {
-            const [year, month] = yearMonth.split('-');
-            startDate = (new Date(+year, +month, 1)).getMYSQLDate();
-            endDate = (new Date(+year, 1 + (+month), 0)).getMYSQLDate();
-        }
-
+    fetchData(startDate, endDate) {
+        this.setState({fetchingData: true});
         Promise.all([
-                this.fetchFirstTimeFixedData(startDate, endDate),
-                this.fetchFixedServiceRequestData(startDate, endDate),
-                this.fetchTeamPerformanceData(startDate, endDate)
+                this.fetchFirstTimeFixedData(startDate.format(MYSQL_DATE_FORMAT), endDate.format(MYSQL_DATE_FORMAT)),
+                this.fetchFixedServiceRequestData(startDate.format(MYSQL_DATE_FORMAT), endDate.format(MYSQL_DATE_FORMAT)),
+                this.fetchTeamPerformanceData(startDate.format(MYSQL_DATE_FORMAT), endDate.format(MYSQL_DATE_FORMAT))
             ]
         ).then(([firstTimeFixData, fixedServiceRequestData, teamPerformanceData]) => {
             this.setState({
                 firstTimeFixData,
                 fixedServiceRequestData,
-                teamPerformanceData
+                teamPerformanceData,
+                fetchingData: false
             })
         })
     }
@@ -144,22 +153,23 @@ class FixedServiceRequestCountComponent extends React.Component {
     footerRow(rowList, teamPerformanceData, previousTeam) {
         const teamPerformanceValues = this.getTeamData(teamPerformanceData, previousTeam.teamId);
         rowList.push(
-            this.el('tr', {key: `footer-${previousTeam.teamId}`, className: 'teamFooter'},
-                [
-                    this.el('td', {key: `footer-0-${previousTeam.teamId}`}, 'Team Total'),
-                    this.el('td', {key: `footer-1-${previousTeam.teamId}`}, previousTeam.totalFixed),
-                    this.el('td', {key: `footer-2-${previousTeam.teamId}`}, previousTeam.totalRaised),
-                    this.el('td', {key: `footer-3-${previousTeam.teamId}`}, previousTeam.firstTimeFixRaised),
-                    this.el('td', {key: `footer-4-${previousTeam.teamId}`}, previousTeam.firstTimeFixPercentAttempted),
-                    this.el('td', {key: `footer-5-${previousTeam.teamId}`}, previousTeam.firstTimeFixPercentAchieved),
-                    this.el('td', {key: `footer-6-${previousTeam.teamId}`}, previousTeam.timeRequests),
-                    this.el('td', {key: `footer-7-${previousTeam.teamId}`}, previousTeam.changeRequests),
-                    this.el('td', {key: `footer-8-${previousTeam.teamId}`}, previousTeam.operationalTasks),
-                    this.el('td', {key: `footer-9-${previousTeam.teamId}`}, (+teamPerformanceValues.avgFixHours).toFixed(2)),
-                    this.el('td', {key: `footer-10-${previousTeam.teamId}`}, (+teamPerformanceValues.avgSLAPercentage).toFixed(2)),
-                ]
-            )
-        )
+            (<tr key={`footer-${previousTeam.teamId}`}
+                 className='teamFooter'
+            >
+                <td key={`footer-0-${previousTeam.teamId}`}> Team Total</td>
+                <td key={`footer-1-${previousTeam.teamId}`}> {previousTeam.totalFixed}</td>
+                <td key={`footer-2-${previousTeam.teamId}`}> {previousTeam.totalRaised}</td>
+                <td key={`footer-3-${previousTeam.teamId}`}> {previousTeam.firstTimeFixRaised}</td>
+                <td key={`footer-4-${previousTeam.teamId}`}> {previousTeam.firstTimeFixPercentAttempted}</td>
+                <td key={`footer-5-${previousTeam.teamId}`}> {previousTeam.firstTimeFixPercentAchieved}</td>
+                <td key={`footer-6-${previousTeam.teamId}`}> {previousTeam.timeRequests}</td>
+                <td key={`footer-7-${previousTeam.teamId}`}> {previousTeam.changeRequests}</td>
+                <td key={`footer-8-${previousTeam.teamId}`}> {previousTeam.operationalTasks}</td>
+                <td key={`footer-9-${previousTeam.teamId}`}> {(+teamPerformanceValues.avgFixHours).toFixed(2)}</td>
+                <td key={`footer-10-${previousTeam.teamId}`}> {(+teamPerformanceValues.avgSLAPercentage).toFixed(2)}</td>
+
+            </tr>)
+        );
         return rowList;
     }
 
@@ -167,15 +177,25 @@ class FixedServiceRequestCountComponent extends React.Component {
         const {
             firstTimeFixData,
             fixedServiceRequestData,
-            teamPerformanceData
+            teamPerformanceData,
+            fetchingData
         } = this.state
-        if (!fixedServiceRequestData) {
-            return;
+        if (fetchingData) {
+            return (
+                <React.Fragment>
+                    <Spinner key="spinner"
+                             show={true}
+                    />
+                    <h1 key={"loading"}>
+                        Please wait while loading data...
+                    </h1>
+                </React.Fragment>
+            )
         }
         const teams = {};
         let previousTeam = null;
 
-        return this.el('table', {className: 'table table-striped'},
+        return this.el('table', {className: 'table table-striped sticky-header'},
             [
                 this.el('thead', {key: 'head'},
                     this.el('tr', null, [
@@ -324,16 +344,44 @@ class FixedServiceRequestCountComponent extends React.Component {
 
     }
 
-    componentDidUpdate(prevProps, prevState) {
+    getStartAndEndDates() {
+        const {selectedState, yearMonth, startDate, endDate} = this.state;
+        switch (selectedState) {
+            case "YEAR_TO_DATE":
+                return {
+                    startDate: moment().startOf("year"),
+                    endDate: moment()
+                }
+            case "SPECIFIC_YEAR_MONTH":
+                const startingDate = moment(yearMonth, 'YYYY-MM').startOf("month");
+                return {
+                    startDate: startingDate,
+                    endDate: startingDate.clone().endOf('month')
+                }
 
-        if (prevState.yearMonth !== this.state.yearMonth ||
-            prevState.selectedState !== this.state.selectedState) {
-            this.fetchData();
+            case "CUSTOM_DATES":
+                return {
+                    startDate: moment(startDate, MYSQL_DATE_FORMAT),
+                    endDate: moment(endDate, MYSQL_DATE_FORMAT)
+                }
         }
     }
 
+    componentDidUpdate(prevProps, prevState) {
+        if (this.hasStateChanged(prevState)) {
+            this.refetchData()
+        }
+    }
+
+    hasStateChanged(prevState) {
+        const {yearMonth, selectedState, startDate, endDate} = this.state;
+        return prevState.yearMonth !== yearMonth ||
+            prevState.selectedState !== selectedState
+            || prevState.startDate !== startDate || prevState.endDate !== endDate;
+    }
+
     render() {
-        const {selectedState, yearMonth} = this.state;
+        const {selectedState, yearMonth, startDate, endDate} = this.state;
         return this.el(
             'div',
             {
@@ -364,7 +412,6 @@ class FixedServiceRequestCountComponent extends React.Component {
                                         key: 'yearToDateInput',
                                         onChange: () => {
                                             this.setState({selectedState: SelectionState.YEAR_TO_DATE});
-
                                         }
                                     }
                                 ),
@@ -405,6 +452,34 @@ class FixedServiceRequestCountComponent extends React.Component {
                                 )
                             ]
                         ),
+                        this.el(
+                            'label',
+                            {
+                                className: `${this.prefix}-customDatesLabel`,
+                                key: 'customDatesLabel',
+                            },
+                            [
+                                this.el(
+                                    'input',
+                                    {
+                                        type: 'radio',
+                                        name: 'selection',
+                                        checked: selectedState === SelectionState.CUSTOM_DATES,
+                                        key: 'customDatesInput',
+                                        onChange: () => {
+                                            this.setState({selectedState: SelectionState.CUSTOM_DATES});
+                                        }
+                                    }
+                                ),
+                                this.el(
+                                    'span',
+                                    {
+                                        key: 'customDatesLabelSpan'
+                                    },
+                                    'Custom Dates'
+                                )
+                            ]
+                        ),
                         selectedState === SelectionState.SPECIFIC_YEAR_MONTH ?
                             this.el('input', {
                                 type: 'month',
@@ -414,7 +489,27 @@ class FixedServiceRequestCountComponent extends React.Component {
                                     this.setState({yearMonth: value});
                                 },
                                 key: 'yearMonthInput'
-                            }) : null
+                            }) :
+                            selectedState === SelectionState.CUSTOM_DATES ?
+                                (
+                                    <Fragment key="datesContainer">
+                                        <input type="date"
+                                               value={startDate.format(MYSQL_DATE_FORMAT)}
+                                               key="startDate"
+                                               onChange={($event) => {
+                                                   this.setState({startDate: moment($event.currentTarget.value, MYSQL_DATE_FORMAT)})
+                                               }}
+                                        />
+                                        <input type="date"
+                                               value={endDate.format(MYSQL_DATE_FORMAT)}
+                                               key="endDate"
+                                               onChange={($event) => {
+                                                   this.setState({endDate: moment($event.currentTarget.value, MYSQL_DATE_FORMAT)})
+                                               }}
+                                        />
+                                    </Fragment>
+                                )
+                                : null
                     ]
                 ),
                 this.el(
@@ -431,3 +526,8 @@ class FixedServiceRequestCountComponent extends React.Component {
 }
 
 export default FixedServiceRequestCountComponent;
+
+document.addEventListener('DOMContentLoaded', () => {
+    const domContainer = document.querySelector('#react-fixed-service-request-report');
+    ReactDOM.render(React.createElement(FixedServiceRequestCountComponent), domContainer);
+})
