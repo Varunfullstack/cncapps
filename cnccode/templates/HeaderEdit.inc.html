@@ -899,7 +899,7 @@
             <td class="promptText">Days In Advance Expenses Next Month Alert</td>
             <td class="inputText">
                 <input style="width: 56px"
-                        {DISABLED}
+                       {DISABLED}
                        type="number"
                        name="header[1][daysInAdvanceExpensesNextMonthAlert]"
                        value="{daysInAdvanceExpensesNextMonthAlert}"
@@ -1291,6 +1291,22 @@
                 >{customerReviewMeetingText}</textarea>
             </td>
         </tr>
+        <tr>
+            <td class="promptText">Computers seen online within XX Days</td>
+            <td class="inputText">
+                <input {DISABLED}
+                       name="header[1][computerLastSeenThresholdDays]"
+                       value="{computerLastSeenThresholdDays}"
+                       type="number"
+                       max="100"
+                       min="0"
+                       step="1"
+                       title="Threshold to ignore computers from the report if they have been seen within CWA, CWC & Webroot console within these days"
+                       required
+                >
+                <span class="formErrorMessage">{computerLastSeenThresholdDaysMessage}</span>
+            </td>
+        </tr>
 
     </table>
     <BR>
@@ -1509,6 +1525,7 @@
                 > <span class="formErrorMessage">{priority5DescMessage}</span>
             </td>
         </tr>
+
 
     </table>
 

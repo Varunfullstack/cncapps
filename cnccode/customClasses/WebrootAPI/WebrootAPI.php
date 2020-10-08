@@ -4,11 +4,15 @@
 namespace CNCLTD\WebrootAPI;
 
 
+use DateInterval;
+use DateTime;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
 use Karriere\JsonDecoder\JsonDecoder;
+use Psr\Http\Message\ResponseInterface;
 
 class WebrootAPI
 {
@@ -21,7 +25,7 @@ class WebrootAPI
     private $gsmKey;
     private $accessToken;
     /**
-     * @var \DateTime
+     * @var DateTime
      */
     private $expiresAt;
     private $refreshToken;
@@ -45,26 +49,30 @@ class WebrootAPI
     }
 
     /**
-     * @return GetSitesResponse
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @param $siteKeyCode
+     * @return SiteDevice[]
+     * @throws GuzzleException
      */
-    public function getSites()
+    public function getDevices($siteKeyCode)
     {
-        $response = $this->getAuthenticatedFromURL("api/console/gsm/{$this->gsmKey}/sites");
+        $response = $this->getAuthenticatedFromURL(
+            "api/status/site/{$siteKeyCode}?returnedInfo=SystemAnalyzer&batchSize=1000"
+        );
         $jsonDecoder = new JsonDecoder(true);
-        $jsonDecoder->register(new SiteTransformer());
-        $jsonDecoder->register(new GetSitesResponseTransformer());
-        $data = $jsonDecoder->decode((string)$response->getBody(), GetSitesResponse::class);
+        $jsonDecoder->register(new SiteDeviceTransformer());
+        $jsonDecoder->register(new GetSiteDevicesResponseTransformer());
+        /** @var GetSiteDevicesResponse $data */
+        $data = $jsonDecoder->decode((string)$response->getBody(), GetSiteDevicesResponse::class);
         if (!$data) {
             throw new Exception('Failed to parse body');
         }
-        return $data;
+        return $data->devices;
     }
 
     /**
      * @param $url
-     * @return \Psr\Http\Message\ResponseInterface
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @return ResponseInterface
+     * @throws GuzzleException
      * @throws Exception
      */
     private function getAuthenticatedFromURL($url)
@@ -122,12 +130,12 @@ class WebrootAPI
                 throw new Exception('Failed to parse response body');
             }
             $this->accessToken = $parsedBody->access_token;
-            $this->expiresAt = (new \DateTime())->add(new \DateInterval("PT{$parsedBody->expires_in}S"));
+            $this->expiresAt = (new DateTime())->add(new DateInterval("PT{$parsedBody->expires_in}S"));
             $this->refreshToken = $parsedBody->refresh_token;
             return $this->accessToken;
         }
         // we assume that if we have an access token ..we do have a refresh token
-        if ((new \DateTime()) >= $this->expiresAt) {
+        if ((new DateTime()) >= $this->expiresAt) {
             // our token is expired..lets get a new one
             $this->accessToken = null;
             $this->expiresAt = null;
@@ -156,7 +164,7 @@ class WebrootAPI
                     throw new Exception('Failed to parse response body');
                 }
                 $this->accessToken = $parsedBody->access_token;
-                $this->expiresAt = (new \DateTime())->add(new \DateInterval("PT{$parsedBody->expires_in}S"));
+                $this->expiresAt = (new DateTime())->add(new DateInterval("PT{$parsedBody->expires_in}S"));
                 $this->refreshToken = $parsedBody->refresh_token;
                 return $this->accessToken;
             } catch (ClientException $exception) {
@@ -175,6 +183,23 @@ class WebrootAPI
     {
         $this->accessToken = null;
         $this->expiresAt = null;
+    }
+
+    /**
+     * @return GetSitesResponse
+     * @throws GuzzleException
+     */
+    public function getSites()
+    {
+        $response = $this->getAuthenticatedFromURL("api/console/gsm/{$this->gsmKey}/sites");
+        $jsonDecoder = new JsonDecoder(true);
+        $jsonDecoder->register(new SiteTransformer());
+        $jsonDecoder->register(new GetSitesResponseTransformer());
+        $data = $jsonDecoder->decode((string)$response->getBody(), GetSitesResponse::class);
+        if (!$data) {
+            throw new Exception('Failed to parse body');
+        }
+        return $data;
     }
 
 }
