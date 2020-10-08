@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 1026 - OS Support Dates not sorting on Is Server
+
 ## [v4.6.1] - 2020-10-06
 ### Added
 - Add SQL Function for Contract difference Calculation

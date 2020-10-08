@@ -127,7 +127,6 @@
     let form = null;
 
     function showEdit(data = null) {
-        debugger;
         if (data) {
             form.elements['id'].value = data.id;
             form.elements['name'].value = data.name;
@@ -299,7 +298,10 @@
                     }
                 },
                 {
-                    data: 'isServer', render: (data) => {
+                    data: 'isServer', render: (data, type) => {
+                        if (type === 'sort') {
+                            return data;
+                        }
                         if (data) {
                             return "<i class='fa fa-check'></i>"
                         }
@@ -379,13 +381,19 @@
         });
 
         addButton.click(function () {
-            debugger;
+
             if (!form.checkValidity()) {
                 return;
             }
 
             const data = Array.from(form.elements).reduce((acc, element) => {
-                if (element.name) acc[element.name] = element.value;
+                if (element.name) {
+                    if (element.type === 'checkbox') {
+                        acc[element.name] = element.checked;
+                    } else {
+                        acc[element.name] = element.value;
+                    }
+                }
                 return acc
             }, {});
 
