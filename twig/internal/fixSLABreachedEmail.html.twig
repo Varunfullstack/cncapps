@@ -1,0 +1,14 @@
+{% extends "@internal/wrapper.html.twig" %}
+{% block content %}
+    <p>
+        Service Penalties will be incurred as a result of Service Request
+        <a href="{{ activityURL }}"
+           target="_blank"
+        >{{ serviceRequestId }}</a>
+        will breaching its FIX SLA.
+    </p>
+    <p>
+        Details
+        {{ details | raw }}
+    </p>
+{% endblock %}

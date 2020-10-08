@@ -181,9 +181,10 @@ class BUProblemSLA extends Business
             $dsHeader = new DataSet($this);
             $buHeader->getHeader($dsHeader);
             // we have a value..so now we need to evaluate if we have to send the email or not
-            if (($fixSLAValue - $dbejProblem->getValue(DBEJProblem::workingHours)) <= $dsHeader->getValue(
-                    DBEHeader::fixSLABreachWarningHours
-                )) {
+            $timeLeftForSLA = $fixSLAValue - $dbejProblem->getValue(DBEJProblem::workingHours);
+            if ($timeLeftForSLA <= 0) {
+                $this->sendFixSlaBreachedEmail($dbejProblem);
+            } elseif ($timeLeftForSLA <= $dsHeader->getValue(DBEHeader::fixSLABreachWarningHours)) {
                 $this->sendFixSlaAlertEmail($dbejProblem);
                 return true;
             }
@@ -191,15 +192,18 @@ class BUProblemSLA extends Business
         return false;
     }
 
-    /**
-     * Sends Fix SLA Alert
-     *
-     * @param DBEJProblem $DBEProblem
-     */
-    function sendFixSlaAlertEmail(DBEJProblem $DBEProblem)
+    function sendFixSlaBreachedEmail(DBEJProblem $DBEProblem)
+    {
+        $engineerName = $DBEProblem->getValue(DBEJProblem::engineerName) ? $DBEProblem->getValue(
+            DBEJProblem::engineerName
+        ) : "NOBODY";
+        $subject = "Fix SLA FAILED - SR for {$DBEProblem->getValue(DBEJProblem::customerName)} assigned to {$engineerName} has failed the agreed fix SLA";
+        $this->sendSLAEmail($DBEProblem, $subject, '@internal/fixSLABreachedEmail.html.twig');
+    }
+
+    function sendSLAEmail(DBEJProblem $DBEProblem, $subject, $twigTemplate)
     {
         $buMail = new BUMail($this);
-
 
         if ($dbeJCallActivity = $this->buActivity->getFirstActivityInProblem(
             $DBEProblem->getValue(DBEProblem::problemID),
@@ -214,7 +218,7 @@ class BUProblemSLA extends Business
 
             $urlActivity = SITE_URL . "/Activity.php?action=displayActivity&callActivityID={$dbeJCallActivity->getPKValue()}";
             $body = $twig->render(
-                '@internal/fixSLAWarningEmail.html.twig',
+                $twigTemplate,
                 [
                     "serviceRequestId" => $activityRef,
                     "activityURL"      => $urlActivity,
@@ -225,13 +229,7 @@ class BUProblemSLA extends Business
             $hdrs = array(
                 'To'           => $toEmail,
                 'From'         => $senderEmail,
-                'Subject'      => 'Fix SLA WARNING - SR for ' . $DBEProblem->getValue(
-                        DBEJProblem::customerName
-                    ) . ' assigned to ' . ($DBEProblem->getValue(
-                        DBEJProblem::engineerName
-                    ) ? $DBEProblem->getValue(
-                        DBEJProblem::engineerName
-                    ) : 'NOBODY') . ' is close to breaching the agreed fix SLA',
+                'Subject'      => $subject,
                 'Date'         => date("r"),
                 'Content-Type' => 'text/html; charset=UTF-8'
             );
@@ -256,8 +254,21 @@ class BUProblemSLA extends Business
             );
 
         }
+    }
 
-    } // end function monitor
+    /**
+     * Sends Fix SLA Alert
+     *
+     * @param DBEJProblem $DBEProblem
+     */
+    function sendFixSlaAlertEmail(DBEJProblem $DBEProblem)
+    {
+        $engineerName = $DBEProblem->getValue(DBEJProblem::engineerName) ? $DBEProblem->getValue(
+            DBEJProblem::engineerName
+        ) : "NOBODY";
+        $subject = "Fix SLA FAILED - SR for {$DBEProblem->getValue(DBEJProblem::customerName)} assigned to {$engineerName} has failed the agreed fix SLA";
+        $this->sendSLAEmail($DBEProblem, $subject, '@internal/fixSLAWarningEmail.html.twig');
+    }
 
     function monitor($dryRun = false, $problemID = null, $debug = false, $fixSLAOnly = false)
     {
