@@ -288,8 +288,9 @@ WHERE
                     exit;
                 }
                 $expenseId = @$_REQUEST['id'];
+                $notChargeableCallOutReason = @$_REQUEST['notChargeableCallOutReason'];
                 try {
-                    $this->processExpense($expenseId);
+                    $this->processExpense($expenseId, false, null, $notChargeableCallOutReason);
                     $response = ["status" => 'ok'];
                 } catch (Exception $exception) {
                     http_response_code(400);
@@ -305,7 +306,7 @@ WHERE
                 $expenseId = @$_REQUEST['id'];
                 $denyReason = @$_REQUEST['denyReason'];
                 try {
-                    $this->processExpense($expenseId, true, $denyReason);
+                    $this->processExpense($expenseId, true, $denyReason, null);
                     $response = ["status" => 'ok'];
                 } catch (Exception $exception) {
                     http_response_code(400);
@@ -802,9 +803,10 @@ WHERE
      * @param $id
      * @param bool $deny
      * @param null $denyReason
+     * @param null $notChargeableCallOutReason
      * @throws Exception
      */
-    function processExpense($id, $deny = false, $denyReason = null)
+    function processExpense($id, $deny = false, $denyReason = null, $notChargeableCallOutReason = null)
     {
         $dbeExpense = $this->checkProcessExpense($id);
         if ($deny) {
@@ -817,7 +819,7 @@ WHERE
             $dbeExpense->setValue(DBEExpense::approvedBy, $this->userID);
             $dbeExpense->setValue(DBEExpense::approvedDate, (new DateTime())->format(DATE_MYSQL_DATETIME));
             if ($dbeExpense->getValue(DBEExpense::expenseTypeID) === self::CALL_OUT_EXPENSE_TYPE_ID) {
-                $this->createCallOutSalesOrder($dbeExpense);
+                $this->processCallOutExpense($dbeExpense, $notChargeableCallOutReason);
 
             }
         }
@@ -926,52 +928,49 @@ WHERE
 
     }
 
-    function createCallOutSalesOrder(DBEExpense $dbeExpense)
+    function processCallOutExpense(DBEExpense $dbeExpense, $notChargeableCallOutReason = null)
     {
         $activityId = $dbeExpense->getValue(DBEExpense::callActivityID);
         $buActivity = new BUActivity($this);
         $dsActivity = new DataSet($this);
         $buActivity->getActivityByID($activityId, $dsActivity);
-        $serviceRequestId = $dsActivity->getValue(DBECallActivity::problemID);
-        $dbeProblem = new DBEProblem($this);
+        $serviceRequestId = $dsActivity->getValue(DBEJCallActivity::problemID);
+        $dbeProblem = new DBEJProblem($this);
         $dbeProblem->getRow($serviceRequestId);
         $dbeCustomer = new DBECustomer($this);
         $customerId = $dbeProblem->getValue(DBEProblem::customerID);
         $dbeCustomer->getRow($customerId);
-        $thisMonthOOHCallOuts = \CNCLTD\CustomerOOHCallOutsDB::getCustomerOOHCallOutsForCurrentMonth($customerId);
 
-        $value = 0;
-        if ($this->isOutOfHoursCallOutChargeable(
-            $thisMonthOOHCallOuts,
-            $dbeCustomer,
-            $dsActivity
-        )) {
-            $value = 150;
+
+        $chargeable = false;
+        if (!$notChargeableCallOutReason) {
+            $currentMonthOutOfHoursUsedCallOuts = \CNCLTD\CustomerCallOutsDB::getCustomerOutOfHoursUsedCallOutsForCurrentMonth(
+                $customerId
+            );
+            $BUCustomerItem = new BUCustomerItem($this);
+            $customerHasServiceDeskContract = $BUCustomerItem->customerHasServiceDeskContract($customerId);
+            $includedMonthlyOOHCallOuts = $dbeCustomer->getValue(DBECustomer::inclusiveOOHCallOuts);
+            $totalCallOutsIncludingThisOne = $currentMonthOutOfHoursUsedCallOuts + 1;
+            $isThereEnoughMonthlyOutOfHoursCallOutAllowance = $totalCallOutsIncludingThisOne > $includedMonthlyOOHCallOuts;
+            if (!$customerHasServiceDeskContract) {
+                if (!$isThereEnoughMonthlyOutOfHoursCallOutAllowance) {
+                    $chargeable = true;
+                }
+            } else {
+                $isActivityWithinWorkingHours = $this->isActivityWithinWorkingHours($dsActivity);
+                $chargeable = !$isActivityWithinWorkingHours && !$isThereEnoughMonthlyOutOfHoursCallOutAllowance;
+            }
+
+            if (!$chargeable && $isThereEnoughMonthlyOutOfHoursCallOutAllowance) {
+                $notChargeableCallOutReason = "Included within monthly allowance {$totalCallOutsIncludingThisOne} of {$includedMonthlyOOHCallOuts}";
+            }
         }
 
+        $this->createCallOutSalesOrder($dbeCustomer);
 
+        $salesOrderId = 1;
         // item 1503
-        \CNCLTD\CustomerOOHCallOutsDB::incrementCustomerOOHCallOut($customerId);
-    }
-
-    /**
-     * @param int $thisMonthOOHCallOuts
-     * @param DBECustomer $dbeCustomer
-     * @param DataSet $dsActivity
-     * @return bool
-     */
-    public function isOutOfHoursCallOutChargeable(int $thisMonthOOHCallOuts,
-                                                  DBECustomer $dbeCustomer,
-                                                  DataSet $dsActivity
-    ): bool
-    {
-
-        $BUCustomerItem = new BUCustomerItem($this);
-        $includedMonthlyOOHCallOuts = $dbeCustomer->getValue(DBECustomer::inclusiveOOHCallOuts);
-        $customerID = $dbeCustomer->getValue(DBECustomer::customerID);
-        $customerHasServiceDeskContract = $BUCustomerItem->customerHasServiceDeskContract($customerID);
-        $isActivityWithinWorkingHours = $this->isActivityWithinWorkingHours($dsActivity);
-        return $thisMonthOOHCallOuts + 1 > $includedMonthlyOOHCallOuts && (!$customerHasServiceDeskContract || $isActivityWithinWorkingHours);
+        \CNCLTD\CustomerCallOutsDB::recordCallOut($customerId, $chargeable, $salesOrderId);
     }
 
     /**
@@ -994,6 +993,118 @@ WHERE
             return false;
         }
         return true;
+    }
+
+    private function createCallOutSalesOrder(DBECustomer $dsCustomer)
+    {
+        $dsOrdhead = new DataSet($this);
+        $dbeOrdline = new DataSet($this);
+        // create sales order header with correct field values
+        $buSalesOrder = new BUSalesOrder($this);
+
+        $buSalesOrder->initialiseOrder(
+            $dsOrdhead,
+            $dbeOrdline,
+            $dsCustomer
+        );
+        $dsOrdhead->setUpdateModeUpdate();
+        $dsOrdhead->setValue(
+            DBEOrdhead::custPORef,
+            ''
+        );
+        $dsOrdhead->setValue(
+            DBEOrdhead::addItem,
+            'N'
+        );
+        $dsOrdhead->setValue(
+            DBEOrdhead::partInvoice,
+            'N'
+        );
+        $dsOrdhead->setValue(
+            DBEOrdhead::paymentTermsID,
+            CONFIG_PAYMENT_TERMS_30_DAYS
+        );
+        $dsOrdhead->post();
+        $buSalesOrder->updateHeader(
+            $dsOrdhead->getValue(DBEOrdhead::ordheadID),
+            $dsOrdhead->getValue(DBEOrdhead::custPORef),
+            $dsOrdhead->getValue(DBEOrdhead::paymentTermsID),
+            $dsOrdhead->getValue(DBEOrdhead::partInvoice),
+            $dsOrdhead->getValue(DBEOrdhead::addItem)
+        );
+
+        $ordheadID = $dsOrdhead->getValue(DBEOrdhead::ordheadID);
+        $sequenceNo = 1;
+
+        // get topUp item details
+        $dbeItem = new DBEItem($this);
+        $dbeItem->getRow(CONFIG_DEF_PREPAY_TOPUP_ITEMID);
+
+        // create order line
+        $dbeOrdline = new DBEOrdline($this);
+        $dbeOrdline->setValue(
+            DBEJOrdline::ordheadID,
+            $ordheadID
+        );
+        $dbeOrdline->setValue(
+            DBEJOrdline::sequenceNo,
+            $sequenceNo
+        );
+        $dbeOrdline->setValue(
+            DBEJOrdline::customerID,
+            $dsCustomer->getValue(DBECustomer::customerID)
+        );
+        $dbeOrdline->setValue(
+            DBEJOrdline::qtyDespatched,
+            0
+        );
+        $dbeOrdline->setValue(
+            DBEJOrdline::qtyLastDespatched,
+            0
+        );
+        $dbeOrdline->setValue(
+            DBEJOrdline::supplierID,
+            CONFIG_SALES_STOCK_SUPPLIERID
+        );
+        $dbeOrdline->setValue(
+            DBEJOrdline::lineType,
+            DBEJOrdline::LINE_TYPE_COMMENT
+        );
+
+        $dbeOrdline->setValue(
+            DBEJOrdline::stockcat,
+            'R'
+        );
+        $dbeOrdline->setValue(
+            DBEJOrdline::itemID,
+            CONFIG_DEF_PREPAY_TOPUP_ITEMID
+        );
+        $dbeOrdline->setValue(
+            DBEJOrdline::qtyOrdered,
+            1
+        );
+        $dbeOrdline->setValue(
+            DBEJOrdline::curUnitCost,
+            0
+        );
+        $dbeOrdline->setValue(
+            DBEJOrdline::curTotalCost,
+            0
+        );
+        $dbeOrdline->setValue(
+            DBEJOrdline::curUnitSale,
+            $topUpValue
+        );
+        $dbeOrdline->setValue(
+            DBEJOrdline::curTotalSale,
+            $topUpValue
+        );
+        $dbeOrdline->setValue(
+            DBEJOrdline::description,
+            $dbeItem->getValue(DBEItem::description)
+        );
+        $dbeOrdline->insertRow();
+        return $dsOrdhead->getValue(DBEOrdhead::ordheadID);
     }
 
     /**
@@ -1261,5 +1372,25 @@ WHERE caa_endtime
             true
         );
         $this->parsePage();
+    }
+
+    /**
+     * @param int $thisMonthOOHCallOuts
+     * @param DBECustomer $dbeCustomer
+     * @param DataSet $dsActivity
+     * @return bool
+     */
+    public function isOutOfHoursCallOutChargeable(int $thisMonthOOHCallOuts,
+                                                  DBECustomer $dbeCustomer,
+                                                  DataSet $dsActivity
+    ): bool
+    {
+
+        $BUCustomerItem = new BUCustomerItem($this);
+        $includedMonthlyOOHCallOuts = $dbeCustomer->getValue(DBECustomer::inclusiveOOHCallOuts);
+        $customerID = $dbeCustomer->getValue(DBECustomer::customerID);
+        $customerHasServiceDeskContract = $BUCustomerItem->customerHasServiceDeskContract($customerID);
+        $isActivityWithinWorkingHours = $this->isActivityWithinWorkingHours($dsActivity);
+        return $thisMonthOOHCallOuts + 1 > $includedMonthlyOOHCallOuts && (!$customerHasServiceDeskContract || $isActivityWithinWorkingHours);
     }
 }

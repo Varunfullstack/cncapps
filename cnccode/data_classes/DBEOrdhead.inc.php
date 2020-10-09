@@ -7,6 +7,7 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEOrdhead extends DBEntity
 {
+    const INITIAL_TYPE = 'I';
     const ordheadID = "ordheadID";
     const customerID = "customerID";
     const type = "type";

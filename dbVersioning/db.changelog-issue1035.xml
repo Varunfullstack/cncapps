@@ -20,17 +20,23 @@
     <changeSet id="issue1035-2" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="customerOOHCallOuts"/>
+                <tableExists tableName="customerCallOuts"/>
             </not>
         </preConditions>
-        <createTable tableName="customerOOHCallOuts">
+        <createTable tableName="customerCallOuts">
+            <column name="id" autoIncrement="true">
+                <constraints primaryKeyName="PRIMARY" primaryKey="true" nullable="false"/>
+            </column>
             <column name="customerId" type="int(11)">
-                <constraints nullable="false" primaryKeyName="PRIMARY" primaryKey="true"/>
+                <constraints nullable="false"/>
             </column>
-            <column name="date" type="date">
-                <constraints nullable="false" primaryKeyName="PRIMARY" primaryKey="true"/>
+            <column name="createdAt" type="datetime" defaultValueComputed="NOW()">
+                <constraints nullable="false"/>
             </column>
-            <column name="OOHCallOuts" type="int(11)" defaultValue="0">
+            <column name="chargeable" type="int(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="salesOrderHeaderId" type="int(11)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -38,15 +44,30 @@
     <changeSet id="issue1035-3" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
             <not>
-                <foreignKeyConstraintExists foreignKeyTableName="customerOOHCallOuts"
-                                            foreignKeyName="fk_customerOOHCallOuts_customerId"/>
+                <foreignKeyConstraintExists foreignKeyTableName="customerCallOuts"
+                                            foreignKeyName="fk_customerCallOuts_customerId"/>
             </not>
         </preConditions>
-        <addForeignKeyConstraint baseTableName="customerOOHCallOuts" baseColumnNames="customerId"
-                                 constraintName="fk_customerOOHCallOuts_customerId"
+        <addForeignKeyConstraint baseTableName="customerCallOuts" baseColumnNames="customerId"
+                                 constraintName="fk_customerCallOuts_customerId"
                                  referencedTableName="customer"
                                  referencedColumnNames="cus_custno"
                                  onDelete="CASCADE"
+                                 onUpdate="CASCADE"
+        />
+    </changeSet>
+    <changeSet id="issue1035-3" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyTableName="customerCallOuts"
+                                            foreignKeyName="fk_customerCallOuts_salesOrderHeaderId"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseTableName="customerCallOuts" baseColumnNames="salesOrderHeaderId"
+                                 constraintName="fk_customerCallOuts_salesOrderHeaderId"
+                                 referencedTableName="ordhead"
+                                 referencedColumnNames="odh_ordno"
+                                 onDelete="RESTRICT"
                                  onUpdate="CASCADE"
         />
     </changeSet>
