@@ -214,6 +214,7 @@
                        value="{mileage}"
                        size="10"
                        maxlength="10"
+                       step="1"
                        onchange="updateTotal()"
                        id="mileageInput"
                 > <span class="formErrorMessage">{mileageMessage}</span></td>
@@ -225,6 +226,7 @@
                        type="number"
                        name="expense[1][value]"
                        value="{value}"
+                       step="0.01"
                        size="10"
                        maxlength="10"
                 >
