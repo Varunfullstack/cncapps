@@ -1,6 +1,7 @@
  import CKEditor from "../../utils/CKEditor.js";
 import APICustomers from "../../services/APICutsomer.js";
 import Spinner from "../../utils/spinner.js?v=1";
+import { padEnd, sort } from "../../utils/utils.js";
 
 //import   CKEditor from "ckeditor5-react";
 //import * as ClassicEditor from '../../npm/node_modules/@ckeditor/ckeditor5-build-classic/build/ckeditor.js';
@@ -31,6 +32,7 @@ class CMPCustomerSite extends React.Component {
   }
   componentDidMount = async () => {
     const { el, apiCutsomer } = this;
+    const {data}=this.state;
     // load customer Sites and assets
     this.showSpinner();
     const result = await Promise.all([
@@ -39,9 +41,8 @@ class CMPCustomerSite extends React.Component {
     ]);
     
     const sites = result[0];
-    let assets = result[1];
-    let selectedSiteId = "";
-    if (sites.length == 1) selectedSiteId = sites[0].id;
+    let assets =sort(result[1],"name");    
+    if (sites.length == 1) data.siteNo = sites[0].id;
     assets = assets.map((asset) => {
       if (
         asset.BiosName.indexOf("VMware") >= 0 ||
@@ -49,10 +50,11 @@ class CMPCustomerSite extends React.Component {
       ) {
         asset.BiosVer = "";
       }
-      return asset;
+     // asset.name=padEnd(asset.name,150);
+       return asset;
     });
     // console.log(assets);
-    this.setState({ sites, selectedSiteId, assets,_showSpinner:false });
+    this.setState({ sites, data, assets,_showSpinner:false });
   };
   showSpinner = () => {
     this.setState({ _showSpinner: true });
@@ -89,13 +91,21 @@ class CMPCustomerSite extends React.Component {
     this.setState({ data });
   };
   handleAssetSelect = (value) => {
-    const { data, assets } = this.state;
+    const { data, assets } = this.state; 
+    if(value!="")
+    {
     const index = assets.findIndex((a) => a.name == value);
     //  console.log(value,index,assets[index]);
     const asset = assets[index];
     data.assetName = value;
     data.assetTitle =
       asset.name + " " + asset.LastUsername + " " + asset.BiosVer;
+    }
+    else 
+    {
+      data.assetName = "";
+      data.assetTitle ="";
+    }
     this.setState({ data });
   };
   getAssetElement = () => {
@@ -116,8 +126,7 @@ class CMPCustomerSite extends React.Component {
         assets.map((s) =>
           el(
             "option",
-            { value: s.name, key: `asset${s.name}` },
-            s.name + " " + s.LastUsername + " " + s.BiosVer
+            { value: s.name, key: `asset${s.name}`,dangerouslySetInnerHTML:{ __html: padEnd(s.name,110,"&nbsp;") + padEnd(s.LastUsername,170,"&nbsp;") + " " + s.BiosVer} }            
           )
         )
       )

@@ -73,10 +73,10 @@ class CMPActivityDisplay extends React.Component {
         el('a',{ className:data?.customerNameDisplayClass,href:`Customer.php?action=dispEdit&customerId=${data?.customerId}`,target:"_blank"},
         data?.contactName+" ") ,
             el('a', {href:`tel:${data?.sitePhone}`},data?.sitePhone),
-            el('label', null," DDI: "),
-            el('a', {href:`tel:${data?.contactPhone}`},data?.contactPhone),
-            el('label', null," Mobile: "),
-            el('a', {href:`tel:${data?.contactMobilePhone}`},data?.contactMobilePhone),
+            data?.contactPhone?el('label', null," DDI: "):null,
+            data?.contactPhone?el('a', {href:`tel:${data?.contactPhone}`},data?.contactPhone):null,
+            data?.contactMobilePhone?el('label', null," Mobile: "):null,
+            data?.contactMobilePhone?el('a', {href:`tel:${data?.contactMobilePhone}`},data?.contactMobilePhone):null,
             el('a', {href:`mailto:${data?.contactEmail}?subject=Service Request ${data?.problemID}`},el("i",{className:"fal fa-envelope ml-5"})),
         ),
         
@@ -114,7 +114,7 @@ class CMPActivityDisplay extends React.Component {
         el(ToolTip,{title:"Contracts",content: el('a',{className:"fal fa-file-contract fa-2x m-5 pointer icon",href:`Activity.php?action=contractListPopup&customerID=${data?.customerId}`,target:"_blank"})}),
 
         this. getGab(),
-        el(ToolTip,{title:"Contact SR History",content: el('a',{className:"fal fa-id-card fa-2x m-5 pointer icon",onClick:()=>this.handleContactSRHistory(data?.contactId)})}),    
+        el(ToolTip,{title:"Contact SR History",content: el('a',{className:"fal fa-id-card fa-2x m-5 pointer icon",onClick:()=>this.handleContactSRHistory(data?.contactID)})}),    
         el(ToolTip,{title:"Third Party Contacts",content: el('a',{className:"fal fa-users fa-2x m-5 pointer icon",href:`ThirdPartyContact.php?action=list&customerID=${data?.customerId}`,target:"_blank"})}),
         this.getGab(),
         data?.hasExpenses&&(currentUser.isExpenseApprover||currentUser.globalExpenseApprover)? el(ToolTip,{title:"Expenses",content: el('a',{className:"fal fa-receipt fa-2x m-5 pointer icon",href:`Expense.php?action=view&callActivityID=${data?.callActivityID}`})}):this.getGab(),  
@@ -183,8 +183,8 @@ class CMPActivityDisplay extends React.Component {
             this.loadCallActivity();
         }        
     }
-    handleContactSRHistory(contactId){
-        const w=window.open(`Activity.php?action=displayServiceRequestForContactPopup&contactID=${contactId}&htmlFmt=popup`, 'reason', 'scrollbars=yes,resizable=yes,height=400,width=1225,copyhistory=no, menubar=0');
+    handleContactSRHistory(contactID){
+        const w=window.open(`Activity.php?action=displayServiceRequestForContactPopup&contactID=${contactID}&htmlFmt=popup`, 'reason', 'scrollbars=yes,resizable=yes,height=400,width=1225,copyhistory=no, menubar=0');
         //w.onbeforeunload =()=>this.loadCallActivity();
     }
     saveFilterSession=()=>{
@@ -342,10 +342,10 @@ class CMPActivityDisplay extends React.Component {
     }
     getDetialsElement=(data)=>{
         const {el}=this;
-        return el('div',null,
+        return data?.reason?el('div',null,
         el('label',{style:{display:"block",color: "#992211",marginTop:10,marginBottom:5}},'Details'),
-        el('div',{dangerouslySetInnerHTML:{ __html: data?.reason }})
-        );
+        el('div',{dangerouslySetInnerHTML:{ __html: data?.reason }}),        
+        ):null;
     }
     getNotesElement=(data)=>{
         const {el}=this;
@@ -373,8 +373,9 @@ class CMPActivityDisplay extends React.Component {
         // this.getElement("ID",data?.problemID+'_'+data?.callActivityID),
         this.getElement(" ",data?.priority),        
         this.getElement(" ",data?.problemStatusDetials+this.getAwaitingTitle(data)),
-        this.getElement("Type",data?.activityType),        
-        this.getElement(" ","Authorised by "+data?.authorisedBy),        
+        this.getElement("Type",data?.activityType),   
+        !data?.authorisedBy?this.getElement("",""):null,       
+        data?.authorisedBy?this.getElement(" ","Authorised by "+data?.authorisedBy):null,        
         this.getElement("User",data?.engineerName),        
         this.getElement("Contract",data?.contractType),     
         // this.getElement("",""),    
@@ -395,18 +396,19 @@ class CMPActivityDisplay extends React.Component {
         this.getElement("",data?.currentUser,data?.currentUserBgColor), 
         this.getElement("",""),  
         this.getElement("",""),    
+        
+        ),
         this.getDetialsElement(data),
         this.getNotesElement(data),
-        )
         )
     }
     getAwaitingTitle=(data)=>{
         //if(data?.awaitingCustomerResponseFlag==='Y')
         //{
             if(data?.problemStatus==='I'||data?.problemStatus==='P')
-            return " - \"Awaiting CNC\" or \"On Hold\"";
+            return " - Awaiting CNC";
             else if(data?.problemStatus==='F'||data?.problemStatus==='C')
-            return "";
+            return " - On Hold";
             else 
             return "";
         //}

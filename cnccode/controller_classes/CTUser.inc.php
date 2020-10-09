@@ -270,6 +270,12 @@ class CTUser extends CTCNC
                 case "getCurrentUser":
                     echo $this->getCurrentUser();
                     exit;
+                case "all":
+                    echo json_encode($this->getAllUsers());
+                    exit;
+                case "active":                
+                    echo json_encode($this->getActiveUsers());
+                    exit;
             case CTUSER_ACT_DISPLAY_LIST:
             default:
                 $this->displayList();
@@ -1099,5 +1105,35 @@ class CTUser extends CTCNC
             'teamID' => $this->dbeUser->getValue(DBEJUser::teamID),
 
         ]);
+    }
+    function getAllUsers()
+    {
+        $dbeUser = new DBEUser($this);
+        $dbeUser->getRows(false);  // include inActive users
+        $users=array();
+        while ($dbeUser->fetchNext()) {
+            array_push($users,
+                array(                     
+                    'id'       => $dbeUser->getValue(DBEUser::userID),
+                    'name'     => $dbeUser->getValue(DBEUser::name)
+                )
+            );            
+        }
+        return $users;
+    }
+    function getActiveUsers()
+    {
+        $dbeUser = new DBEUser($this);
+        $dbeUser->getRows(true);  // include inActive users
+        $users=array();
+        while ($dbeUser->fetchNext()) {
+            array_push($users,
+                array(                     
+                    'id'       => $dbeUser->getValue(DBEUser::userID),
+                    'name'     => $dbeUser->getValue(DBEUser::name)
+                )
+            );            
+        }
+        return $users;
     }
 }

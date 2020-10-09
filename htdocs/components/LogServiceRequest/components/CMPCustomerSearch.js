@@ -14,7 +14,7 @@ class CMPCustomerSearch extends React.Component {
       value=customer.cus_name;
     this.state = {
         _showSpinner:false,
-        searchValue:value||'Sussex Port Forwarding',
+        searchValue:value ,
         customers:[],
 
     };
@@ -39,7 +39,7 @@ class CMPCustomerSearch extends React.Component {
   getSearchElement = () => {
     const { el,handleCustomerSearch } = this;
     const {searchValue}=this.state;
-    return el("input", { placeholder: "Search Customers",    
+    return el("input", { placeholder: "Search Customers or Contacts",    
     value:searchValue,
     style:{width: 300,marginBottom:10},
     onChange:handleCustomerSearch

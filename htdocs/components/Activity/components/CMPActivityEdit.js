@@ -7,11 +7,12 @@ import CKEditor from "../../utils/CKEditor.js";
 import Timer from "../../utils/timer.js";
 import ToolTip from "../../utils/ToolTip.js";
 import APICustomers from "../../services/APICutsomer.js";
+import APIUser from "../../services/APIUser.js";
 class CMPActivityEdit extends React.Component {
   el = React.createElement;
   api = new APIActivity();
   apiCustomer=new APICustomers();
-
+  apiUser=new APIUser();
   activityStatus = {
     Fixed: "Fixed",
     CustomerAction: "CustomerAction",
@@ -68,7 +69,7 @@ class CMPActivityEdit extends React.Component {
     // lodaing lookups
     Promise.all([
       this.api.getCallActTypes(),
-      this.api.getAllUsers(),
+      this.apiUser.getActiveUsers(),
       this.api.getPriorities(),
       this.api.getRootCauses(),
     ]).then((result) => {
@@ -203,9 +204,14 @@ class CMPActivityEdit extends React.Component {
      
     const callActType=this.state.callActTypes.filter(c=>c.id==data.callActTypeID)[0];    
     data.callActType=callActType;
-    if(callActType.description.indexOf("FOC")==-1&& data.siteMaxTravelHours==-1)
+    if(callActType&&callActType.description.indexOf("FOC")==-1&& data.siteMaxTravelHours==-1)
     {
       alert('Travel hours need entering for this site');
+      return false;
+    }
+    if(!callActType)
+    {
+      alert('Please select activity type');
       return false;
     }
     if(!data.contactSupportLevel)
@@ -219,7 +225,7 @@ class CMPActivityEdit extends React.Component {
       return false;
     }
     else{
-      if(callActType.reqReasonFlag=='Y'&&!data.reason.trim()){
+      if(callActType && callActType.reqReasonFlag=='Y'&&!data.reason.trim()){
         alert("Please Enter Reason");
         return false;
       }
@@ -335,14 +341,14 @@ class CMPActivityEdit extends React.Component {
           "  "
       ),
       el("a", { href: `tel:${data?.sitePhone}` }, data?.sitePhone),
-      el("label", null, " DDI: "),
-      el("a", { href: `tel:${data?.contactPhone}` }, data?.contactPhone),
-      el("label", null, " Mobile: "),
-      el(
+      data?.contactPhone?el("label", null, " DDI: "):null,
+      data?.contactPhone?el("a", { href: `tel:${data?.contactPhone}` }, data?.contactPhone):null,
+      data?.contactMobilePhon?el("label", null, " Mobile: "):null,
+      data?.contactMobilePhon?el(
         "a",
         { href: `tel:${data?.contactMobilePhone}` },
         data?.contactMobilePhone
-      ),
+      ):null,
       el(
         "a",
         {
@@ -398,7 +404,7 @@ class CMPActivityEdit extends React.Component {
         data?.linkedSalesOrderID
         ? el(ToolTip,{title:"Unlink Sales Order",content: el("a", {
             className: "fal fa-unlink fa-2x m-5 pointer icon",
-            onClick: () => this.handleUnlink(data?.linkedSalesOrderID),
+            onClick: () => this.handleUnlink(data?.callActivityID,data?.linkedSalesOrderID),
           })})
         : null,
       !data?.linkedSalesOrderID
@@ -469,7 +475,7 @@ class CMPActivityEdit extends React.Component {
               onClick: () =>
                 this.setNextStatus(this.activityStatus.CustomerAction),
             },
-            "Customer Action"
+            "On Hold"
           )
         : null,
       data?.callActTypeID != 59
@@ -488,13 +494,13 @@ class CMPActivityEdit extends React.Component {
         onChange: (event) => this.setValue("alarmDate", event.target.value),
       }),      
       el(Timer, {value:data?.alarmTime, onChange: (value) => this.setValue("alarmTime", value) }),      
-      data?.callActTypeID != 59
-        ? el(
-            "button",
-            { onClick: () => this.setNextStatus(this.activityStatus.Escalate) },
-            "Escalate"
-          )
-        : null,
+      // data?.callActTypeID != 59
+      //   ? el(
+      //       "button",
+      //       { onClick: () => this.setNextStatus(this.activityStatus.Escalate) },
+      //       "Escalate"
+      //     )
+      //   : null,
       data?.callActTypeID != 59
         ? el(
             "button",
@@ -562,21 +568,21 @@ class CMPActivityEdit extends React.Component {
     );
   };
   handleSalesOrder = (callActivityID) => {
-    console.log("opened");
+      
     const w = window.open(
       `Activity.php?action=editLinkedSalesOrder&htmlFmt=popup&callActivityID=${callActivityID}`,
       "reason",
       "scrollbars=yes,resizable=yes,height=150,width=250,copyhistory=no, menubar=0"
     );
-    w.onbeforeunload = () => this.loadCallActivity();
+    w.onbeforeunload = () => this.loadCallActivity(callActivityID);
   };
-  handleUnlink = async (linkedSalesOrderID) => {
-    const res = confirm(
+  handleUnlink = async (callActivityID,linkedSalesOrderID) => {
+     const res = confirm(
       `Are you sure you want to unlink this request to Sales Order ${linkedSalesOrderID}`
     );
     if (res) {
-      await this.api.unlinkSalesOrder(linkedSalesOrderID);
-      this.loadCallActivity();
+      await this.api.unlinkSalesOrder(callActivityID);
+      this.loadCallActivity(callActivityID);
     }
   };
   handleContactSRHistory(contactID) {
@@ -820,7 +826,7 @@ class CMPActivityEdit extends React.Component {
         value: data?.startTime,
         onChange: (value) => this.setValue("startTime", value),
       }),
-      el("label", { className: "m-2" }, "to"),
+      el("label", { className: "m-2",style: {  color: "#992211", whiteSpace: "nowrap" } }, "To"),
       el(Timer, {
         key: "endTime",
         disabled: data?.isInitalDisabled,
@@ -928,19 +934,18 @@ class CMPActivityEdit extends React.Component {
         el(
           "tr",
           null,
-          this.getElement(
-            "ID",
-            "ID",
-            data?.problemID + "_" + data?.callActivityID
-          ),
-          this.getElement("Authorisedby", "Authorised by ", data?.authorisedBy),
-          this.getTypeElement()
+          // this.getElement(
+          //   "ID",
+          //   "ID",
+          //   data?.problemID + "_" + data?.callActivityID
+          // ),
+          this.getTypeElement(),
+          data?.authorisedBy?this.getElement("Authorisedby", "Authorised by ", data?.authorisedBy):null,
+          
         ),
         el(
           "tr",
           null,
-          this.getElement("Customer", "Customer", data?.customerName),
-          this.getElement("emp1"),
           this.getElementControl(
             "Value",
             "Value",
@@ -952,7 +957,11 @@ class CMPActivityEdit extends React.Component {
               onChange: (event) =>
                 this.setValue("curValue", event.target.value),
             })
-          )
+          ),
+          this.getElement("emp1"),
+          this.getElement("Customer", "Customer", data?.customerName),
+         
+          
         ),
         el(
           "tr",

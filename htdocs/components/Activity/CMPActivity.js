@@ -1,9 +1,9 @@
 
 
 "use strict";
-import { params } from "../utils/utils.js";
-import CMPActivityDisplay from "./components/CMPActivityDisplay.js"
-import CMPActivityEdit from "./components/CMPActivityEdit.js";
+import { params } from "../utils/utils.js?v=10";
+import CMPActivityDisplay from "./components/CMPActivityDisplay.js?v=10";
+import CMPActivityEdit from "./components/CMPActivityEdit.js?v=10";
 class CMPActivity extends React.Component {
     el = React.createElement;
 

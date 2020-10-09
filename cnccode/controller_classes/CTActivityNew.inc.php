@@ -90,8 +90,7 @@ class CTActivityNew extends CTCNC
             case "getPriorities":
                 echo json_encode($this->getPriorities());
                 exit;
-            case "getAllUsers":
-                echo json_encode($this->getAllUsers());
+            
                 exit;
             case "getCustomerContracts":
                 echo json_encode($this->getCustomerContracts());
@@ -695,7 +694,7 @@ class CTActivityNew extends CTCNC
         $formError = (!$dsCallActivity->populateFromArray(["1" => $body]));
         if ($formError) {
             http_response_code(400);
-            return ["error" => $formError];
+            return ["error" => $formError,"type"=>"populateFromArray"];
         }
         $dsCallActivity->setUpdateModeUpdate();
         $dsCallActivity->post();
@@ -932,21 +931,7 @@ class CTActivityNew extends CTCNC
         }
         return $priorities;
     }
-    function getAllUsers()
-    {
-        $dbeUser = new DBEUser($this);
-        $dbeUser->getRows(false);  // include inActive users
-        $users=array();
-        while ($dbeUser->fetchNext()) {
-            array_push($users,
-                array(                     
-                    'id'       => $dbeUser->getValue(DBEUser::userID),
-                    'name'     => $dbeUser->getValue(DBEUser::name)
-                )
-            );            
-        }
-        return $users;
-    }
+    
     function getCustomerContracts()
     {
         $customerID = $_REQUEST["customerId"];

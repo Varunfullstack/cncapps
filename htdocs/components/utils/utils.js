@@ -94,12 +94,11 @@ export function pick(obj,values){
   return newObj;
 }
 export const SRQueues=[
-  {id:1,name:"HD Q",teamID:1},
-  {id:2,name:"ESC Q",teamID:2},
-  {id:3,name:"SP Q",teamID:4},
-  {id:4,name:"Sales Q",teamID:7},
-  {id:5,name:"Projects Q",teamID:5},
-  
+  {id:1,name:"Helpdesk",teamID:1},
+  {id:2,name:"Escalations",teamID:2},
+  {id:3,name:"Small Projects",teamID:4},
+  {id:5,name:"Projects",teamID:5},
+  {id:4,name:"Sales",teamID:7},
 ]
 export const TeamType={
   Helpdesk:1,
@@ -133,4 +132,25 @@ export function groupBy(items,propertyName)
     return prev;
   }, []);
   return groupItems;
+}
+/**
+ * 
+ * @param {string} length 
+ * @param {int of pixels} length 
+ */
+export function padEnd(value,length,char)
+{
+  // space length 3.05615234375
+  var canvas = document.createElement('canvas');
+  canvas.style.display="none";
+  var ctx = canvas.getContext("2d");
+  ctx.font = "11px Arial";        
+  var width = ctx.measureText(value).width;
+  console.log(width);
+  const spaceCount= (length-width)/3.05615234375;
+  for(let i=0;i<spaceCount;i++)
+  value +=char;
+  canvas.remove();
+  console.log(value,value.length);
+  return value;
 }

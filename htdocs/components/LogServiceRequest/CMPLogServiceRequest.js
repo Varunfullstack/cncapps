@@ -1,12 +1,12 @@
 
 "use strict";
-import Spinner from './../utils/spinner.js?v=1';
-import Stepper from '../utils/stepper.js?v=1';
-import CMPCustomerSearch from './components/CMPCustomerSearch.js?v=1';
-import CMPSelectSR from './components/CMPSelectSR.js?v=1';
-import CMPCustomerSite from './components/CMPCustomerSite.js?v=1';
-import CMPLastStep from './components/CMPLastStep.js?v=1';
-import APIActivity from '../services/APIActivity.js';
+import Spinner from './../utils/spinner.js?v=10';
+import Stepper from '../utils/stepper.js?v=10';
+import CMPCustomerSearch from './components/CMPCustomerSearch.js?v=10';
+import CMPSelectSR from './components/CMPSelectSR.js?v=10';
+import CMPCustomerSite from './components/CMPCustomerSite.js?v=10';
+import CMPLastStep from './components/CMPLastStep.js?v=10';
+import APIActivity from '../services/APIActivity.js?v=10';
  
 export default class CMPLogServiceRequest extends React.Component {
   el = React.createElement;
