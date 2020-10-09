@@ -1,0 +1,53 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue1035-0">
+        <tagDatabase tag="issue1035"/>
+    </changeSet>
+    <changeSet id="issue1035-1" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="inclusiveOOHCallOuts"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="inclusiveOOHCallOuts" type="int(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue1035-2" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="customerOOHCallOuts"/>
+            </not>
+        </preConditions>
+        <createTable tableName="customerOOHCallOuts">
+            <column name="customerId" type="int(11)">
+                <constraints nullable="false" primaryKeyName="PRIMARY" primaryKey="true"/>
+            </column>
+            <column name="date" type="date">
+                <constraints nullable="false" primaryKeyName="PRIMARY" primaryKey="true"/>
+            </column>
+            <column name="OOHCallOuts" type="int(11)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="issue1035-3" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyTableName="customerOOHCallOuts"
+                                            foreignKeyName="fk_customerOOHCallOuts_customerId"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseTableName="customerOOHCallOuts" baseColumnNames="customerId"
+                                 constraintName="fk_customerOOHCallOuts_customerId"
+                                 referencedTableName="customer"
+                                 referencedColumnNames="cus_custno"
+                                 onDelete="CASCADE"
+                                 onUpdate="CASCADE"
+        />
+    </changeSet>
+</databaseChangeLog>

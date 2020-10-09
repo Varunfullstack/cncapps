@@ -730,6 +730,11 @@ class CTCustomer extends CTCNC
                 !!@$value['reviewMeetingBooked']
             );
             $this->dsCustomer->setValue(
+                DBECustomer::inclusiveOOHCallOuts,
+                !!@$value['inclusiveOOHCallOuts']
+            );
+
+            $this->dsCustomer->setValue(
                 DBECustomer::regNo,
                 @$value['regNo']
             );
@@ -957,7 +962,7 @@ class CTCustomer extends CTCNC
                 DBECustomer::streamOneEmail,
                 @$value['streamOneEmail']
             );
-            
+
             $this->dsCustomer->setValue(
                 DBECustomer::accountNumber,
                 @$value['accountNumber']
@@ -1111,8 +1116,8 @@ class CTCustomer extends CTCNC
                 $buCustomer->getCustomersByNameMatch($dsResult, null, null, $term);
                 while ($dsResult->fetchNext()) {
                     $customers[] = [
-                        "id"   => $dsResult->getValue(DBECustomer::customerID),
-                        "name" => $dsResult->getValue(DBECustomer::name),
+                        "id"             => $dsResult->getValue(DBECustomer::customerID),
+                        "name"           => $dsResult->getValue(DBECustomer::name),
                         "streamOneEmail" => $dsResult->getValue(DBECustomer::streamOneEmail),
                     ];
                 }
@@ -1798,6 +1803,9 @@ class CTCustomer extends CTCNC
                 'reviewMeetingBookedChecked'     => $this->dsCustomer->getValue(
                     DBECustomer::reviewMeetingBooked
                 ) ? 'checked' : null,
+                'inclusiveOOHCallOutsChecked'    => $this->dsCustomer->getValue(
+                    DBECustomer::inclusiveOOHCallOuts
+                ) ? 'checked' : null,
                 'support24HourFlagChecked'       => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::support24HourFlag)
                 ),
@@ -1876,7 +1884,7 @@ class CTCustomer extends CTCNC
                     DBECustomer::accountNumber
                 ) ? "greenPencil" : "redPencil",
                 'forceDirectDebit'               => $forceDirectDebit ? 'true' : 'false',
-                'streamOneEmail'               => $this->dsCustomer->getValue(DBECustomer::streamOneEmail)
+                'streamOneEmail'                 => $this->dsCustomer->getValue(DBECustomer::streamOneEmail)
 
 
             )
@@ -3330,6 +3338,18 @@ class CTCustomer extends CTCNC
         return $this->buCustomer->removeSupportForAllUsersAndReferCustomer($customerID);
     }
 
+    function getCurrentUser()
+    {
+        return json_encode(
+            [
+                'firstName' => $this->dbeUser->getValue(DBEJUser::firstName),
+                'lastName'  => $this->dbeUser->getValue(DBEJUser::lastName),
+                'id'        => $this->dbeUser->getValue(DBEJUser::userID),
+                'email'     => $this->dbeUser->getEmail()
+            ]
+        );
+    }
+
     /**
      * Update details
      * @access private
@@ -3377,14 +3397,5 @@ class CTCustomer extends CTCNC
         } else {
             $this->displayEditForm();
         }
-    }
-    function getCurrentUser()
-    {
-        return json_encode( [
-            'firstName' => $this->dbeUser->getValue(DBEJUser::firstName),
-            'lastName' => $this->dbeUser->getValue(DBEJUser::lastName),
-            'id' => $this->dbeUser->getValue(DBEJUser::userID),
-            'email' => $this->dbeUser->getEmail()
-        ]);
     }
 }

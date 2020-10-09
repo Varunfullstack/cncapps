@@ -16,6 +16,8 @@ require_once($cfg ["path_dbe"] . "/DBEJCallActivity.php");
 
 class CTExpenseDashboard extends CTCNC
 {
+    const CALL_OUT_EXPENSE_TYPE_ID = 11;
+
     function __construct($requestMethod,
                          $postVars,
                          $getVars,
@@ -814,6 +816,10 @@ WHERE
         } else {
             $dbeExpense->setValue(DBEExpense::approvedBy, $this->userID);
             $dbeExpense->setValue(DBEExpense::approvedDate, (new DateTime())->format(DATE_MYSQL_DATETIME));
+            if ($dbeExpense->getValue(DBEExpense::expenseTypeID) === self::CALL_OUT_EXPENSE_TYPE_ID) {
+                $this->createCallOutSalesOrder($dbeExpense);
+
+            }
         }
         $dbeExpense->updateRow();
     }
@@ -918,6 +924,76 @@ WHERE
             $body
         );
 
+    }
+
+    function createCallOutSalesOrder(DBEExpense $dbeExpense)
+    {
+        $activityId = $dbeExpense->getValue(DBEExpense::callActivityID);
+        $buActivity = new BUActivity($this);
+        $dsActivity = new DataSet($this);
+        $buActivity->getActivityByID($activityId, $dsActivity);
+        $serviceRequestId = $dsActivity->getValue(DBECallActivity::problemID);
+        $dbeProblem = new DBEProblem($this);
+        $dbeProblem->getRow($serviceRequestId);
+        $dbeCustomer = new DBECustomer($this);
+        $customerId = $dbeProblem->getValue(DBEProblem::customerID);
+        $dbeCustomer->getRow($customerId);
+        $thisMonthOOHCallOuts = \CNCLTD\CustomerOOHCallOutsDB::getCustomerOOHCallOutsForCurrentMonth($customerId);
+
+        $value = 0;
+        if ($this->isOutOfHoursCallOutChargeable(
+            $thisMonthOOHCallOuts,
+            $dbeCustomer,
+            $dsActivity
+        )) {
+            $value = 150;
+        }
+
+
+        // item 1503
+        \CNCLTD\CustomerOOHCallOutsDB::incrementCustomerOOHCallOut($customerId);
+    }
+
+    /**
+     * @param int $thisMonthOOHCallOuts
+     * @param DBECustomer $dbeCustomer
+     * @param DataSet $dsActivity
+     * @return bool
+     */
+    public function isOutOfHoursCallOutChargeable(int $thisMonthOOHCallOuts,
+                                                  DBECustomer $dbeCustomer,
+                                                  DataSet $dsActivity
+    ): bool
+    {
+
+        $BUCustomerItem = new BUCustomerItem($this);
+        $includedMonthlyOOHCallOuts = $dbeCustomer->getValue(DBECustomer::inclusiveOOHCallOuts);
+        $customerID = $dbeCustomer->getValue(DBECustomer::customerID);
+        $customerHasServiceDeskContract = $BUCustomerItem->customerHasServiceDeskContract($customerID);
+        $isActivityWithinWorkingHours = $this->isActivityWithinWorkingHours($dsActivity);
+        return $thisMonthOOHCallOuts + 1 > $includedMonthlyOOHCallOuts && (!$customerHasServiceDeskContract || $isActivityWithinWorkingHours);
+    }
+
+    /**
+     * @param DataSet $dsActivity
+     * @return bool
+     */
+    private function isActivityWithinWorkingHours(DataSet $dsActivity)
+    {
+        $startTime = $dsActivity->getValue(DBECallActivity::startTime);
+        $starDate = $dsActivity->getValue(DBECallActivity::date);
+        $startDateTime = DateTime::createFromFormat(
+            DATE_MYSQL_DATE,
+            "{$starDate}"
+        );
+        $dayOfTheWeek = $startDateTime->format('N');
+        if ($dayOfTheWeek > 5) {
+            return false;
+        }
+        if ($startTime < '07:30' || $startTime >= '20:00') {
+            return false;
+        }
+        return true;
     }
 
     /**

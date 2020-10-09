@@ -75,6 +75,7 @@ class DBECustomer extends DBCNCEntity
     const slaP2PenaltiesAgreed = "slaP2PenaltiesAgreed";
     const slaP3PenaltiesAgreed = "slaP3PenaltiesAgreed";
     const streamOneEmail = "streamOneEmail";
+    const inclusiveOOHCallOuts = "inclusiveOOHCallOuts";
 
 
     /**
@@ -476,6 +477,15 @@ class DBECustomer extends DBCNCEntity
             DA_ALLOW_NULL,
             "streamOneEmail"
         );
+        $this->addColumn(
+            self::inclusiveOOHCallOuts,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            0
+        );
+
+
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -855,7 +865,7 @@ class DBECustomer extends DBCNCEntity
     public function getCustomerByStreamOneEmail($email)
     {
         $this->setMethodName('getCustomerByStreamOneEmail');
-        if(!$email){
+        if (!$email) {
             throw new Exception('Email is mandatory');
         }
 
