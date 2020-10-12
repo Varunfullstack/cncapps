@@ -24,7 +24,7 @@
             </not>
         </preConditions>
         <createTable tableName="customerCallOuts">
-            <column name="id" autoIncrement="true">
+            <column name="id" autoIncrement="true" type="int(11)">
                 <constraints primaryKeyName="PRIMARY" primaryKey="true" nullable="false"/>
             </column>
             <column name="customerId" type="int(11)">
@@ -56,7 +56,7 @@
                                  onUpdate="CASCADE"
         />
     </changeSet>
-    <changeSet id="issue1035-3" author="pavwebdev">
+    <changeSet id="issue1035-4" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
             <not>
                 <foreignKeyConstraintExists foreignKeyTableName="customerCallOuts"

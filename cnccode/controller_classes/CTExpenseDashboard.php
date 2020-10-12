@@ -1020,8 +1020,8 @@ WHERE
     {
         $this->createCommentLineInSalesOrder(
             $salesOrderId,
-            $customerId,
-            "Out of Hours Call $activityDate"
+            "Out of Hours Call $activityDate",
+            $customerId
         );
     }
 
@@ -1046,7 +1046,7 @@ WHERE
         );
 
         $dbeOrdline->setValue(
-            DBEJOrdline::description,
+            DBEOrdline::description,
             $comment
         );
         $dbeOrdline->insertRow();
@@ -1070,7 +1070,7 @@ WHERE
         $customerHasServiceDeskContract = $BUCustomerItem->customerHasServiceDeskContract($customerId);
         $includedMonthlyOOHCallOuts = $dbeCustomer->getValue(DBECustomer::inclusiveOOHCallOuts);
         $totalCallOutsIncludingThisOne = $currentMonthOutOfHoursUsedCallOuts + 1;
-        $isThereEnoughMonthlyOutOfHoursCallOutAllowance = $totalCallOutsIncludingThisOne > $includedMonthlyOOHCallOuts;
+        $isThereEnoughMonthlyOutOfHoursCallOutAllowance = $totalCallOutsIncludingThisOne <= $includedMonthlyOOHCallOuts;
         $isActivityWithinWorkingHours = $this->isActivityWithinWorkingHours($dsActivity);
         if (($customerHasServiceDeskContract && $isActivityWithinWorkingHours) || $isThereEnoughMonthlyOutOfHoursCallOutAllowance) {
             return "Included within monthly allowance {$totalCallOutsIncludingThisOne} of {$includedMonthlyOOHCallOuts}";
