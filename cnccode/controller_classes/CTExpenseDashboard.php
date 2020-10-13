@@ -943,11 +943,15 @@ WHERE
 
         $salesOrderId = $this->createCallOutSalesOrderHeader($dbeCustomer);
 
+        $dbeProblem->setValue(DBEProblem::linkedSalesOrderID, $salesOrderId);
+        $dbeProblem->updateRow();
+
         $this->createCallOutOutOfHoursCommentInSalesOrder(
             $salesOrderId,
             $customerId,
             $dsActivity->getValue(DBEJCallActivity::date)
         );
+        $freebie = (bool)$notChargeableCallOutReason;
 
         if (!$notChargeableCallOutReason) {
             $notChargeableCallOutReason = $this->getNotChargeableCallOutReason($customerId, $dbeCustomer, $dsActivity);
@@ -970,7 +974,7 @@ WHERE
             $amount,
             $customerId
         );
-        \CNCLTD\CustomerCallOutsDB::recordCallOut($customerId, !$notChargeableCallOutReason, $salesOrderId);
+        \CNCLTD\CustomerCallOutsDB::recordCallOut($customerId, !$notChargeableCallOutReason, $salesOrderId, $freebie);
     }
 
     private function createCallOutSalesOrderHeader(DBECustomer $dsCustomer)
@@ -1018,9 +1022,10 @@ WHERE
                                                                 $activityDate
     )
     {
+        $date = DateTime::createFromFormat(DATE_MYSQL_DATE, $activityDate);
         $this->createCommentLineInSalesOrder(
             $salesOrderId,
-            "Out of Hours Call $activityDate",
+            "Out of Hours Call {$date->format('d/m/Y')}",
             $customerId
         );
     }

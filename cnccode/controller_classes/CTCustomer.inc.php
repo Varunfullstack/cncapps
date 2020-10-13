@@ -731,9 +731,8 @@ class CTCustomer extends CTCNC
             );
             $this->dsCustomer->setValue(
                 DBECustomer::inclusiveOOHCallOuts,
-                !!@$value['inclusiveOOHCallOuts']
+                @$value['inclusiveOOHCallOuts']
             );
-
             $this->dsCustomer->setValue(
                 DBECustomer::regNo,
                 @$value['regNo']
@@ -1803,9 +1802,7 @@ class CTCustomer extends CTCNC
                 'reviewMeetingBookedChecked'     => $this->dsCustomer->getValue(
                     DBECustomer::reviewMeetingBooked
                 ) ? 'checked' : null,
-                'inclusiveOOHCallOutsChecked'    => $this->dsCustomer->getValue(
-                    DBECustomer::inclusiveOOHCallOuts
-                ) ? 'checked' : null,
+                'inclusiveOOHCallOuts'           => $this->dsCustomer->getValue(                    DBECustomer::inclusiveOOHCallOuts                ),
                 'support24HourFlagChecked'       => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::support24HourFlag)
                 ),

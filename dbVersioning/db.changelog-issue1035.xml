@@ -12,7 +12,7 @@
             </not>
         </preConditions>
         <addColumn tableName="customer">
-            <column name="inclusiveOOHCallOuts" type="int(1)" defaultValue="0">
+            <column name="inclusiveOOHCallOuts" type="int(2)" defaultValue="0">
                 <constraints nullable="false"/>
             </column>
         </addColumn>
@@ -37,6 +37,9 @@
                 <constraints nullable="false"/>
             </column>
             <column name="salesOrderHeaderId" type="int(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="freebie" type="int(1)" defaultValue="0">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -70,5 +73,13 @@
                                  onDelete="RESTRICT"
                                  onUpdate="CASCADE"
         />
+    </changeSet>
+    <changeSet id="issue1035-5" author="pavwebdev">
+        <sql>
+            update customer
+            set inclusiveOOHCallOuts = 2
+            where cus_custno in (520, 2065, 6585);
+        </sql>
+        <rollback/>
     </changeSet>
 </databaseChangeLog>

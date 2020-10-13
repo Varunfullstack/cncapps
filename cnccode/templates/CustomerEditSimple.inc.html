@@ -1681,10 +1681,10 @@
            value="{websiteURL}"
     >
     <input name="form[customer][{customerID}][streamOneEmail]"
-    id="streamOneEmail"
-    type="hidden"
-    value="{streamOneEmail}"
->
+           id="streamOneEmail"
+           type="hidden"
+           value="{streamOneEmail}"
+    >
     <input {disabled}
            type="submit"
            name="Go"
@@ -1883,11 +1883,14 @@
                     <td class="content">Inclusive OOH Call Outs</td>
                     <td class="content">
                         <input {disabled}
-                               type="checkbox"
+                               type="number"
                                name="form[customer][{customerID}][inclusiveOOHCallOuts]"
-                               value="1"
-                               {inclusiveOOHCallOutsChecked}
+                               value="{inclusiveOOHCallOuts}"
+                               step="1"
+                               max="99"
+                               min="0"
                         >
+                        Per Month
                     </td>
                 </tr>
                 <tr>

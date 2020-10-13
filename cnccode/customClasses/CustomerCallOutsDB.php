@@ -11,7 +11,7 @@ class CustomerCallOutsDB
     {
         global $db;
         $statement = $db->preparedQuery(
-            "select count(*) as result from CustomerCallOuts where customerId = ? and createdAt between DATE_FORMAT(NOW(),'%Y-%m-01') and LAST_DAY(NOW()) and chargeable group by customerId",
+            "select count(*) as result from CustomerCallOuts where customerId = ? and createdAt between DATE_FORMAT(NOW(),'%Y-%m-01') and LAST_DAY(NOW()) and not chargeable and not freebie group by customerId",
             [
                 [
                     "type"  => "i",
@@ -26,11 +26,11 @@ class CustomerCallOutsDB
         return $row['result'];
     }
 
-    static function recordCallOut($customerId, $chargeable, $salesOrderId)
+    static function recordCallOut($customerId, $chargeable, $salesOrderId, $freebie)
     {
         global $db;
         $statement = $db->preparedQuery(
-            'insert into CustomerCallOuts(customerId,chargeable, salesOrderHeaderId) values (?,?,?)',
+            'insert into CustomerCallOuts(customerId,chargeable, salesOrderHeaderId, freebie) values (?,?,?,?)',
             [
                 [
                     "type"  => "i",
@@ -43,6 +43,10 @@ class CustomerCallOutsDB
                 [
                     "type"  => "i",
                     "value" => $salesOrderId
+                ],
+                [
+                    "type"  => "i",
+                    "value" => $freebie
                 ],
             ]
         );

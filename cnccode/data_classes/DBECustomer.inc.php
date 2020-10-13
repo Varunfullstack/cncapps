@@ -479,7 +479,7 @@ class DBECustomer extends DBCNCEntity
         );
         $this->addColumn(
             self::inclusiveOOHCallOuts,
-            DA_BOOLEAN,
+            DA_INTEGER,
             DA_NOT_NULL,
             null,
             0
