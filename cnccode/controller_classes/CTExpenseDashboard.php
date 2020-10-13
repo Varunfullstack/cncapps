@@ -942,9 +942,10 @@ WHERE
         $dbeCustomer->getRow($customerId);
 
         $salesOrderId = $this->createCallOutSalesOrderHeader($dbeCustomer);
-
-        $dbeProblem->setValue(DBEProblem::linkedSalesOrderID, $salesOrderId);
-        $dbeProblem->updateRow();
+        $toUpdateProblem = new DBEProblem($this);
+        $toUpdateProblem->getRow($serviceRequestId);
+        $toUpdateProblem->setValue(DBEProblem::linkedSalesOrderID, $salesOrderId);
+        $toUpdateProblem->updateRow();
 
         $this->createCallOutOutOfHoursCommentInSalesOrder(
             $salesOrderId,
