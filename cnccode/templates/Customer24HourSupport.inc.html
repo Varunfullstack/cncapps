@@ -1,14 +1,29 @@
 <!-- Template: Customer24HourSupport.inc.html -->
+<script src="components/OutOfHoursReportComponent/dist/OutOfHoursReportComponent.js"></script>
 <div class="reportDescription">
     Shows the list of customers with out of hours support. A PIN number will display in the portal allowing them access
     to this support service.
 </div>
-<table width="878" border="0" cellspacing="1" cellpadding="1">
+<table width="878"
+       border="0"
+       cellspacing="1"
+       cellpadding="1"
+>
     <!-- BEGIN customerBlock -->
-    <tr valign="top" onMouseOver="this.bgColor='#FFFFCC';" onMouseOut="this.bgColor='';">
-        <td nowrap="nowrap" class="listItemText"><a href="{linkURL}" target="_blank">{customerName}</a>
+    <tr valign="top"
+        onMouseOver="this.bgColor='#FFFFCC';"
+        onMouseOut="this.bgColor='';"
+    >
+        <td nowrap="nowrap"
+            class="listItemText"
+        ><a href="{linkURL}"
+            target="_blank"
+        >{customerName}</a>
         </td>
     </tr>
     <!-- END customerBlock -->
 </table>
+<div id="react-out-of-hours-report"></div>
+
+
 <!-- End Template: Customer24HourSupport.inc.html -->
