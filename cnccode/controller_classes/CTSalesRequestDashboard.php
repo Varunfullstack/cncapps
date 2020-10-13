@@ -161,7 +161,7 @@ WHERE callactivity.salesRequestStatus = 'O'
                 $dbejCallActivity->getValue(DBEJCallActivity::problemID)
             );
             $srLink = Controller::buildLink(
-                'Activity.php',
+                'SRActivity.php',
                 [
                     "callActivityID" => $lastActivity->getValue(DBEJCallActivity::callActivityID),
                     "action"         => "displayActivity"

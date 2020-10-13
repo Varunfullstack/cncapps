@@ -1,5 +1,5 @@
 import APIActivity from "../../services/APIActivity.js";
-import {params} from "../../utils/utils.js";
+import {Chars, padEnd, params} from "../../utils/utils.js";
 import Toggle from "../../utils/toggle.js";
 import Table from "../../utils/table/table.js"
 import Modal from "../../utils/modal.js";
@@ -38,7 +38,7 @@ class CMPActivityDisplay extends React.Component {
         this.fileUploader=new React.createRef();
     }
     componentDidMount() {
-        this.loadFilterSession();
+        this.loadFilterSession();        
         setTimeout(()=>this.loadCallActivity(params.get('callActivityID')),10);
         
        
@@ -60,7 +60,7 @@ class CMPActivityDisplay extends React.Component {
         {
             return el('div',{style:{display:"flex",flexDirection:"row",alignItems:"center",marginTop:-20} },
             el('h3',{className:"mr-5"},"Projects "),
-            data.projects.map(p=>el("a",{key:p.projectID,href:p.editUrl,className:"link-round"},p.description))
+            data.projects.map(p=>el("a",{key:p.projectID,href:p.editUrl,className:"link-round mr-4"},p.description))
             )
         }
         else return null;
@@ -69,7 +69,15 @@ class CMPActivityDisplay extends React.Component {
         const {el}=this;
         const {data}=this.state;
         return el('div',{style:{display:"flex",flexDirection:"column"}},
-        el('div',null,
+        el('a',{ className:data?.customerNameDisplayClass,href:`Customer.php?action=dispEdit&customerId=${data?.customerId}`,target:"_blank"},
+        data?.customerName+", "+
+        data?.siteAdd1+", "+
+        data?.siteAdd2+", "+
+        data?.siteAdd3+", "+
+        data?.siteTown+", "+
+        data?.sitePostcode,
+        ), 
+        el('div',null,          
         el('a',{ className:data?.customerNameDisplayClass,href:`Customer.php?action=dispEdit&customerId=${data?.customerId}`,target:"_blank"},
         data?.contactName+" ") ,
             el('a', {href:`tel:${data?.sitePhone}`},data?.sitePhone),
@@ -80,14 +88,7 @@ class CMPActivityDisplay extends React.Component {
             el('a', {href:`mailto:${data?.contactEmail}?subject=Service Request ${data?.problemID}`},el("i",{className:"fal fa-envelope ml-5"})),
         ),
         
-        el('a',{ className:data?.customerNameDisplayClass,href:`Customer.php?action=dispEdit&customerId=${data?.customerId}`,target:"_blank"},
-        data?.customerName+", "+
-        data?.siteAdd1+", "+
-        data?.siteAdd2+", "+
-        data?.siteAdd3+", "+
-        data?.siteTown+", "+
-        data?.sitePostcode,
-        ),        
+             
         el('p',{className:'formErrorMessage mt-2'},data?.contactNotes),
         el('p',{className:'formErrorMessage mt-2'},data?.techNotes)
         )
@@ -101,7 +102,7 @@ class CMPActivityDisplay extends React.Component {
         el(ToolTip,{title:"History",content: el('a',{className:"fal fa-history fa-2x m-5 pointer icon",href:`Activity.php?action=problemHistoryPopup&problemID=${data?.problemID}&htmlFmt=popup`,target:"_blank"})}),
         el(ToolTip,{title:"Passwords",content:el('a',{className:"fal fa-unlock-alt fa-2x m-5 pointer icon",href:`Password.php?action=list&customerID=${data?.customerId}`,target:"_blank"})}),
         this. getGab(),
-        data?.canEdit=='ALL_GOOD'?el(ToolTip,{title:"Edit",content: el('a',{className:"fal fa-edit fa-2x m-5 pointer icon",href:`ActivityNew.php?action=editActivity&callActivityID=${data?.callActivityID}`})}):null,  
+        data?.canEdit=='ALL_GOOD'?el(ToolTip,{title:"Edit",content: el('a',{className:"fal fa-edit fa-2x m-5 pointer icon",href:`SRActivity.php?action=editActivity&callActivityID=${data?.callActivityID}`})}):null,  
         data?.canEdit!='ALL_GOOD'?el(ToolTip,{title:data?.canEdit,content: el('i',{className:"fal fa-edit fa-2x m-5 pointer icon-disable"})}):null,  
         data?.canDelete?el(ToolTip,{title:data?.activities.length===1?"Delete Request":"Delete Activity",content: el('i',{className:"fal fa-trash-alt fa-2x m-5 pointer icon",onClick:()=>this.handleDelete(data)})}):null,          
         !data?.canDelete?el(ToolTip,{title:"Delete Activity",content: el('i',{className:"fal fa-trash-alt fa-2x m-5 pointer  icon-disable",})}):null,  
@@ -193,11 +194,31 @@ class CMPActivityDisplay extends React.Component {
     }
     loadFilterSession=()=>{
         const item=sessionStorage.getItem('displayActivityFilter');
+        let {filters}=this.state;
+        //console.log(params.get("toggleIncludeTravel"));
+        let showTravel=false;        
+        if(params.get("toggleIncludeTravel")==1)
+            showTravel=true;
+
+        let showOperationalTasks=false;
+        if(params.get("toggleIncludeOperationalTasks")==1)
+            showOperationalTasks=true;
+        
+        let showServerGaurdUpdates=false;
+        if(params.get("toggleIncludeServerGuardUpdates")==1)
+         showServerGaurdUpdates=true;
         if(item)
-        {
-            const filters=JSON.parse(item);
-            this.setState({filters})
+        {   
+            filters=JSON.parse(item);  
+            if(showTravel) 
+            filters.showTravel=showTravel;      
+            if(showOperationalTasks) 
+            filters.showOperationalTasks=showOperationalTasks;     
+            if(showServerGaurdUpdates) 
+            filters.showServerGaurdUpdates=showServerGaurdUpdates;      
+            
         }
+        this.setState({filters})
     }
     handleTogaleChange=async (filter)=>{
         const {filters,currentActivity}=this.state;
@@ -284,7 +305,7 @@ class CMPActivityDisplay extends React.Component {
                     path: "title",
                     label: "On-site Activities Within 10 Days",
                     sortable: false,  
-                    content:(activity)=>el('a',{href:`ActivityNew.php?action=displayActivity&callActivityID=${activity.callActivityID}`,target:"_blank"},activity.title)  
+                    content:(activity)=>el('a',{href:`SRActivity.php?action=displayActivity&callActivityID=${activity.callActivityID}`,target:"_blank"},activity.title)  
                 },
             ]
             return el('div',{style:{width:300}},el(Table, {
@@ -302,15 +323,21 @@ class CMPActivityDisplay extends React.Component {
         const {el}=this;
         return el('div',{className:"activities-contianer"},
         el('div',{style:{width:"100%",display:"flex",alignItems: "center", justifyContent: "center"}},
-        el(ToolTip,{title:"Next Activity",content: el('i',{className:"fal  fa-step-backward icon icon-size-1 pointer",     onClick:this.goPrevActivity})}),
-        el(ToolTip,{title:"First Activity",content:  el('i',{className:"fal  fa-backward icon icon-size-1 mr-4 ml-4 pointer",style:{fontSize:21},onClick:this.goFirstActivity})}),
-        el('select',{value:currentActivity,onChange:this.handleActivityChange},data?.activities.map(a=>
+        el(ToolTip,{title:"First ",content: el('i',{ className:"fal  fa-step-backward icon icon-size-1 mr-4 ml-4 pointer",   onClick:this.goFirstActivity})}),
+        el(ToolTip,{title:"Previous",content:  el('i',{className:"fal  fa-backward icon icon-size-1 pointer",style:{fontSize:21}, onClick:this.goPrevActivity})}),
+        el('select',{value:currentActivity,onChange:this.handleActivityChange},
+        data?.activities.map(a=>
             el('option',{key:"cl"+a.callActivityID,value:a.callActivityID,
-            style:{fontSize:10}
-        },a.callActivityID+' - '+a.dateEngineer+' - '+a.contactName+(a.activityType?(' - '+a.activityType):'')))
+            style:{fontSize:10},
+            dangerouslySetInnerHTML:{ __html:padEnd(a.callActivityID,50,Chars.WhiteSpace)
+                +padEnd(a.dateEngineer.split('-')[0],50,Chars.WhiteSpace)
+                +padEnd(a.dateEngineer.split('-')[1],110,Chars.WhiteSpace)
+                +padEnd(a.contactName,80,Chars.WhiteSpace)                
+                +(a.activityType||'')}
+        }))
         ),        
-        el(ToolTip,{title:"Last Activity",content: el('i',{className:"fal  fa-forward icon icon-size-1 mr-4 ml-4 pointer",style:{fontSize:21}, onClick:this.goLastActivity})}),        
-        el(ToolTip,{title:"Prev Activity",content: el('i',{className:"fal  fa-step-forward icon icon-size-1 pointer",      onClick:this.goNextActivity})}),
+        el(ToolTip,{title:"Next",content: el('i',{ className:"fal  fa-forward icon icon-size-1 mr-4 ml-4 pointer",style:{fontSize:21}, onClick:this.goNextActivity})}),
+        el(ToolTip,{title:"Last",content: el('i',{className:"fal  fa-step-forward icon icon-size-1 pointer", onClick:this.goLastActivity})}),        
         this.getCurrentActivityIndxElement(data,currentActivity)
         ),        
         el('div',{style:{display:"flex",flexDirection:"row",alignItems: "center", justifyContent: "center"}},  
@@ -323,7 +350,7 @@ class CMPActivityDisplay extends React.Component {
         el('label',null,data?.totalActivityDurationHours),
         el('label',{className:"ml-5"},'Chargeable hours: '),
         el('label',null,data?.chargeableActivityDurationHours)),
-        this.getOnsiteActivities(data?.onSiteActivities)
+        // this.getOnsiteActivities(data?.onSiteActivities)
         );
     }
     getHiddenSRElement=(data)=>{
@@ -368,39 +395,96 @@ class CMPActivityDisplay extends React.Component {
         const {data}=this.state;
         const {el}=this;
         return el('div',{className:"activities-contianer"},
+        el('table',{style:{width:"100%"}},
+        el('tbody',null,
+        el('tr',null,
+        el('td',{className:"display-label"},"Status"),
+        el('td',{className:"display-content"},data?.problemStatusDetials+this.getAwaitingTitle(data)),
+        el('td',{className:"display-label"},data?.authorisedBy?"Authorised by":''),
+        el('td',{className:"display-content"},data?.authorisedBy),
+        el('td',{className:"display-label"},"Type"),
+        el('td',{colSpan:3},data?.activityType),
+        ),
+
+        el('tr',null,
+        el('td',{className:"display-label"},"Priority"),
+        el('td',{className:"display-content"},data?.priority),
+        el('td',{className:"display-label"},"Completed On"),
+        el('td',{className:"display-content"},data?.completeDate),
+        el('td',{className:"display-label"},"Date"),
+        el('td',{colSpan:3,className:"display-content"},data?.date),
+        ),
+
+        el('tr',null,
+        el('td',{className:"display-label"},"Contract"),
+        el('td',{className:"display-content"},data?.contractType),
+        el('td',{className:"display-label"},"Top-Up Value"),
+        el('td',null,data?.curValue),
+        el('td',{className:"display-label"},"Time From"),
+        el('td',{style:{width:10}},data?.startTime),
+        el('td',{className:"display-label",style:{width:10}},data?.endTime?"To":""),
+        el('td',null,data?.endTime), 
+        ),
+
+        el('tr',null,
+        el('td',{className:"display-label"},"Root Cause"),
+        el('td',{className:"display-content"},data?.rootCauseDescription),
+        el('td',null,),
+        el('td',null,),
+        el('td',{className:"display-label"},"User"),
+        el('td',{colSpan:3,className:"display-content"},data?.engineerName),
+        ),
+        el('tr',null,        
+        el('td',{colSpan:8,style:{backgroundColor:data?.currentUserBgColor,textAlign:"center"}},data?.currentUser),
+        ),
+        el('tr',null,        
+        el('td',{className:"display-label",style:{textAlign:"left"}},"Details"),
+        ),
+        el('tr',null,        
+        el('td',{colSpan:8,dangerouslySetInnerHTML:{ __html: data?.reason }}),
+        ),
+        el('tr',null,        
+        el('td',{className:"display-label",style:{textAlign:"left"}},'Internal Notes'),
+        ),
+        el('tr',null,        
+        el('td',{colSpan:8,dangerouslySetInnerHTML:{ __html: data?.internalNotes }}),
+        ),
+        )));
+        /*dangerouslySetInnerHTML:{ __html: data?.internalNotes }
         this.getHiddenSRElement(data),
         el('div',{className:"activity-detials-flex"},
         // this.getElement("ID",data?.problemID+'_'+data?.callActivityID),
-        this.getElement(" ",data?.priority),        
-        this.getElement(" ",data?.problemStatusDetials+this.getAwaitingTitle(data)),
-        this.getElement("Type",data?.activityType),   
-        !data?.authorisedBy?this.getElement("",""):null,       
-        data?.authorisedBy?this.getElement(" ","Authorised by "+data?.authorisedBy):null,        
-        this.getElement("User",data?.engineerName),        
-        this.getElement("Contract",data?.contractType),     
+        ///this.getElement(" ",data?.priority),        
+        ///this.getElement(" ",data?.problemStatusDetials+this.getAwaitingTitle(data)),
+        ///this.getElement("Type",data?.activityType),   
+        ///!data?.authorisedBy?this.getElement("",""):null,       
+        ///data?.authorisedBy?this.getElement(" ","Authorised by "+data?.authorisedBy):null,        
+        ///this.getElement("User",data?.engineerName),        
+        ///this.getElement("Contract",data?.contractType),     
         // this.getElement("",""),    
                 
         // this.getElement(" ",data?.serverGuardDetials),        
         // this.getElement("",""),    
-        this.getElement("Date",data?.date),        
+        ///this.getElement("Date",data?.date),        
         // this.getElement("Project",data?.projectDescription),        
         // this.getElement("",""),    
-        this.getElement("Start Time",data?.startTime),        
+        ///this.getElement("Start Time",data?.startTime),        
         // this.getElement("",""),
         // this.getElement("",""),
-        this.getElement("End Time",data?.endTime), 
-        this.getElement("Value",data?.curValue),       
-        this.getElement("Root Cause",data?.rootCauseDescription),      
+        ///this.getElement("End Time",data?.endTime), 
+        ///this.getElement("Top-Up Value",data?.curValue),       
+        ///this.getElement("Root Cause",data?.rootCauseDescription),      
         // this.getElement("",""),  
-        this.getElement("Complete Date",data?.completeDate),    
-        this.getElement("",data?.currentUser,data?.currentUserBgColor), 
+        ///this.getElement("Complete Date",data?.completeDate),    
+        // this.getElement("",data?.currentUser,data?.currentUserBgColor), 
+        ///el('div',{style:{width:"100%",backgroundColor:data?.currentUserBgColor,display:"flex",justifyContent:"center"}},data?.currentUser),
         this.getElement("",""),  
         this.getElement("",""),    
         
         ),
         this.getDetialsElement(data),
         this.getNotesElement(data),
-        )
+        )*/
     }
     getAwaitingTitle=(data)=>{
         //if(data?.awaitingCustomerResponseFlag==='Y')
@@ -452,12 +536,10 @@ class CMPActivityDisplay extends React.Component {
             pk: "id",
             search: false,
           }):null,
-          el(ToolTip,{title:"Add document",content: el('i',{className:"fal fa-plus pointer icon icon-size-1",onClick:this.handleSelectFiles})}),                    
+          el('div',{style:{width:20}},el(ToolTip,{title:"Add document",content: el('i',{className:"fal fa-plus pointer icon icon-size-1",onClick:this.handleSelectFiles})}),),          
           el('input',{ref:this.fileUploader,name:'usefile', type:"file",style:{display:"none"},multiple:"multiple",onChange:this.handleFileSelected}),          
           this.getSelectedFilesElement(),
           uploadFiles.length>0?el('i',{className:"fal fa-upload pointer icon icon-size-1",onClick:this.handleUpload}):null,
-
-
         );
     }
     getSelectedFilesElement=()=>{
@@ -589,11 +671,13 @@ class CMPActivityDisplay extends React.Component {
     }
     getTemplateModal=()=>{
         const {templateDefault,templateOptions,_showModal,templateTitle,templateType}=this.state;
-        const {el}=this;
+        const {el}=this;        
         return el(Modal,{width:900,key:templateType,onClose:()=>this.setState({_showModal:false}),
             title:templateTitle,show:_showModal,
             content:el('div',{key:'conatiner'},
-            templateOptions.length>0?el('select',{onChange:this.handleTemplateChanged},el('option',{key:'empty',value:-1},"-- Pick an option --"),templateOptions.map(s=>el('option',{key:s.id,value:s.id},s.name))):null,
+            templateOptions.length>0?el('select',{onChange:this.handleTemplateChanged},
+            el('option',{key:'empty',value:-1},"-- Pick an option --"),
+            templateOptions.map(s=>el('option',{key:s.id,value:s.id},s.name))):null,
                 el(CKEditor,{key:'salesRequestEditor',id:'salesRequest',value:templateDefault
                 ,onChange:this.handleTemplateValueChange})
             ),
@@ -619,12 +703,13 @@ class CMPActivityDisplay extends React.Component {
             templateTitle = "Parts Used";
             break;
         }        
-        this.setState({templateOptions:options,_showModal:true,templateType:type,templateTitle})        
+        const templateDefault='';
+        this.setState({templateOptions:options,_showModal:true,templateType:type,templateTitle,templateDefault})        
     }
     //-------------end template
     getFooter=()=>{
         const {el}=this;
-        return el('div',null,
+        return el('div',{className:"activities-contianer"},
         el('button',{className:"m-5",onClick:()=>this.handleTemplateDisplay("partsUsed")},"Parts Used"),
         el('button',{className:"m-5",onClick:()=>this.handleTemplateDisplay("salesRequest")},"Sales Request"),
         el('button',{className:"m-5",onClick:()=>this.handleTemplateDisplay("changeRequest")},"Change Request"),

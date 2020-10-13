@@ -24,7 +24,7 @@ class CMPCustomerSite extends React.Component {
         internalNotesTemplate: data.internalNotes || "",
         assetName: data.assetName || "",
         assetTitle: data.assetTitle || "",
-        siteNo: data.siteNo || "",
+        siteNo: data.siteNo || -1,
         emailSubjectSummary: data.emailSubjectSummary || "",
         emptyAssetReason: data.emptyAssetReason || "",
       },
@@ -77,7 +77,7 @@ class CMPCustomerSite extends React.Component {
           onChange: (event) => this.setValue("siteNo", event.target.value),
           className: "site-select",
         },
-        el("option", { key: "default", value: "" }),
+        el("option", { key: "default", value: -1 }),
         sites.map((s) =>
           el("option", { value: s.id, key: `site${s.id}` }, s.title)
         )
@@ -176,8 +176,8 @@ class CMPCustomerSite extends React.Component {
     data.nextStep = 4;
     data.reason = data.reasonTemplate;
     data.internalNotes = data.internalNotesTemplate;
-
-    if (data.siteNo == "") {
+    console.log(data);
+    if (data.siteNo == -1) {
       alert("Please select customer site");
       return;
     }

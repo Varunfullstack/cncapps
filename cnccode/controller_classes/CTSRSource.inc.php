@@ -107,7 +107,7 @@ class CTSRSource extends CTCNC
         $results = $this->buServiceRequestReport->search($dsSearchForm, true)->fetch_all(MYSQLI_ASSOC);
         foreach ($results as &$sr) {
             $sr['srLink'] = Controller::buildLink(
-                'Activity.php',
+                'SRActivity.php',
                 [
                     "callActivityID" => $sr['inialActivity'],
                     "action"         => "displayActivity"

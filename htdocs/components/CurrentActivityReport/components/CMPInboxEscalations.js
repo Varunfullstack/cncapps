@@ -318,9 +318,10 @@ class CMPInboxEscalations extends React.Component {
             {
               className: "pointer",
               onClick: () => srDescription(problem),
+              dangerouslySetInnerHTML:{ __html:problem.reason}
+
             },
-            problem.reason
-          ),
+           ),
       },
       {
         hide: false,

@@ -32,7 +32,7 @@ class CMPLastStep extends React.Component {
         contactID: data.contactID || -1,
         startTime: data.startTime || "",
         date: data.date || "",
-        queueNo: data.queueNo || "",
+        queueNo: data.queueNo || -1,
         notStartWorkReason: data.notStartWorkReason || "",
         notStartWorkReasonTemplate: data.notStartWorkReasonTemplate || "",
         startWork: false,
@@ -54,8 +54,8 @@ class CMPLastStep extends React.Component {
     const userQueue = SRQueues.filter(
       (q) => q.teamID == this.props.data.currentUser.teamID
     );
-    if (userQueue.length > 0 && data.queueNo == "")
-      data.queueNo = userQueue[0].id;
+    // if (userQueue.length > 0 && data.queueNo == "")
+    //   data.queueNo = userQueue[0].id;
     data.contactID = this.props.data.customer.con_contno;
     let requireAuthorize = this.checkContactNeedAuthorize(
       data.contactID,
@@ -160,7 +160,7 @@ class CMPLastStep extends React.Component {
   };
   getNextButton = () => {
     const { el } = this;
-
+    const {customer}=this.props.data;
     return el(
       "div",
       {
@@ -177,9 +177,9 @@ class CMPLastStep extends React.Component {
       el(
         "button",
         { onClick: this.handleNext, className: "float-right" },
-        "Save"
+        "Add to queue"
       ),
-      !this.state.data.startWork
+      !this.state.data.startWork&&customer.hasServiceDesk
         ? el(
             "button",
             { onClick: this.handleStartWork, className: "ml-5 float-right" },

@@ -44,13 +44,13 @@ class CMPCurrentActivityReport extends MainComponent {
     };
     this.apiCurrentActivityService = new SVCCurrentActivityService();
     this.teams=[
-      {id:1,title:'Helpdesk',code:'H',queueNumber:1,order:1,display:true,icon:null},
-      {id:2,title:'Escalations',code:'E',queueNumber:2,order:2,display:true,icon:null},
-      {id:4,title:'Small Projects',code:'SP',queueNumber:3,order:3,display:true,icon:null},
-      {id:5,title:'Projects',code:'P',queueNumber:5,order:4,display:true,icon:null},
-      {id:7,title:'Sales',code:'S',queueNumber:4,order:5,display:true,icon:null},
-      {id:10,title:'To Be Logged',code:'TBL',queueNumber:10,order:6,display:true,icon:null},
-      {id:11,title:'Pending Reopen',code:'PR',queueNumber:11,order:7,display:false,icon:null},      
+      {id:1,title:'Helpdesk',code:'H',queueNumber:1,order:1,display:true,icon:null,canMove:true},
+      {id:2,title:'Escalations',code:'E',queueNumber:2,order:2,display:true,icon:null,canMove:true},
+      {id:4,title:'Small Projects',code:'SP',queueNumber:3,order:3,display:true,icon:null,canMove:true},
+      {id:5,title:'Projects',code:'P',queueNumber:5,order:4,display:true,icon:null,canMove:true},
+      {id:7,title:'Sales',code:'S',queueNumber:4,order:5,display:true,icon:null,canMove:true},
+      {id:10,title:'To Be Logged',code:'TBL',queueNumber:10,order:6,display:true,icon:null,canMove:false},
+      {id:11,title:'Pending Reopen',code:'PR',queueNumber:11,order:7,display:true,icon:null,canMove:false},      
     ]
   }
   componentDidMount() {
@@ -266,8 +266,8 @@ class CMPCurrentActivityReport extends MainComponent {
    */
   getMoveElement = (code, problem) => {    
     const { el, moveToAnotherTeam,teams } = this;
-    let options = teams.map(t=>{return { id: t.queueNumber, title: t.code }})
-                        .filter((e) => e.title != code);    
+    let options = teams.map(t=>{return { id: t.queueNumber, title: t.code ,canMove:t.canMove}})
+                        .filter((e) => e.title != code&&e.canMove==true);    
     return el(
       "select",
       {

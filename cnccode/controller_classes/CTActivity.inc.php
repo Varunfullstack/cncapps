@@ -920,7 +920,7 @@ class CTActivity extends CTCNC
 
                 $displayActivityURL =
                     Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
+                        'SRActivity.php',
                         array(
                             'action'         => CTACTIVITY_ACT_DISPLAY_ACTIVITY,
                             'callActivityID' => $dsSearchResults->getValue($callActivityIDCol)
@@ -1449,7 +1449,7 @@ class CTActivity extends CTCNC
         $dbeProblem->updateRow();
         $urlNext =
             Controller::buildLink(
-                'Activity.php',
+                'SRActivity.php',
                 array(
                     'action'         => 'displayActivity',
                     'callActivityID' => $activityId
@@ -1555,7 +1555,11 @@ class CTActivity extends CTCNC
      * @throws Exception
      */
     function displayActivity()
-    {
+    {        
+        $newUrl=str_replace("Activity.php","SRActivity.php",$this->getFullPath());
+        header('Location: ' . $newUrl);
+        return; 
+       // 
         $this->setMethodName('displayActivity');
         $this->setPageTitle('Activity');
         $dsCallActivity = new DataSet($this);
@@ -1858,7 +1862,7 @@ class CTActivity extends CTCNC
 
             $urlJumpToActivity =
                 Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
+                    'SRActivity.php',
                     array(
                         'action'         => CTACTIVITY_ACT_DISPLAY_ACTIVITY,
                         'callActivityID' => $dbeCallActivity->getValue(DBEJCallActivity::callActivityID)
@@ -1893,7 +1897,7 @@ class CTActivity extends CTCNC
 
             $urlPreviousActivity =
                 Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
+                    'SRActivity.php',
                     array(
                         'action'         => CTACTIVITY_ACT_DISPLAY_ACTIVITY,
                         'callActivityID' => $linksArray['previous']
@@ -1909,7 +1913,7 @@ class CTActivity extends CTCNC
 
             $urlFirstActivity =
                 Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
+                    'SRActivity.php',
                     array(
                         'action'         => CTACTIVITY_ACT_DISPLAY_ACTIVITY,
                         'callActivityID' => $linksArray['first']
@@ -1924,7 +1928,7 @@ class CTActivity extends CTCNC
 
             $urlNextActivity =
                 Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
+                    'SRActivity.php',
                     array(
                         'action'         => CTACTIVITY_ACT_DISPLAY_ACTIVITY,
                         'callActivityID' => $linksArray['next']
@@ -1939,7 +1943,7 @@ class CTActivity extends CTCNC
 
             $urlLastActivity =
                 Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
+                    'SRActivity.php',
                     array(
                         'action'         => CTACTIVITY_ACT_DISPLAY_ACTIVITY,
                         'callActivityID' => $linksArray['last']
@@ -1970,7 +1974,7 @@ class CTActivity extends CTCNC
 
         $urlToggleIncludeTravel =
             Controller::buildLink(
-                $_SERVER['PHP_SELF'],
+                'SRActivity.php',
                 array(
                     'action'              => CTACTIVITY_ACT_DISPLAY_ACTIVITY,
                     'callActivityID'      => $callActivityID,
@@ -1980,7 +1984,7 @@ class CTActivity extends CTCNC
 
         $urlToggleIncludeOperationalTasks =
             Controller::buildLink(
-                $_SERVER['PHP_SELF'],
+                'SRActivity.php',
                 array(
                     'action'                        => CTACTIVITY_ACT_DISPLAY_ACTIVITY,
                     'callActivityID'                => $callActivityID,
@@ -1990,7 +1994,7 @@ class CTActivity extends CTCNC
 
         $urlToggleIncludeServerGuardUpdates =
             Controller::buildLink(
-                $_SERVER['PHP_SELF'],
+                'SRActivity.php',
                 array(
                     'action'                          => CTACTIVITY_ACT_DISPLAY_ACTIVITY,
                     'callActivityID'                  => $callActivityID,
@@ -2000,7 +2004,7 @@ class CTActivity extends CTCNC
 
         $urlToggleContext =
             Controller::buildLink(
-                $_SERVER['PHP_SELF'],
+                'SRActivity.php',
                 array(
                     'action'         => CTACTIVITY_ACT_DISPLAY_ACTIVITY,
                     'callActivityID' => $callActivityID,
@@ -2366,7 +2370,7 @@ class CTActivity extends CTCNC
 
                 $urlOnSiteActivity =
                     Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
+                        'SRActivity.php',
                         array(
                             'action'         => CTACTIVITY_ACT_DISPLAY_ACTIVITY,
                             'callActivityID' => $db->Record['caa_callactivityno']
@@ -2699,7 +2703,7 @@ class CTActivity extends CTCNC
     }
 
     private function getProblemRaiseIcon($dbeJProblem)
-    {
+    {        
         if (isset($dbeJProblem)) {
             $raiseTypeId = $dbeJProblem->getValue(DBEProblem::raiseTypeId);
             if (isset($raiseTypeId) && $raiseTypeId != null) {
@@ -2842,7 +2846,7 @@ class CTActivity extends CTCNC
     {
         $urlNext =
             Controller::buildLink(
-                $_SERVER['PHP_SELF'],
+                "SRActivity.php",
                 array(
                     'callActivityID' => $callActivityID,
                     'action'         => CTACTIVITY_ACT_DISPLAY_ACTIVITY
@@ -3140,7 +3144,7 @@ class CTActivity extends CTCNC
                 unset ($_SESSION[$this->sessionKey]); // clear the session variable
                 $nextURL =
                     Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
+                        'SRActivity.php',
                         array(
                             'action'         => 'displayActivity',
                             'callActivityID' => $callActivityID
@@ -4110,7 +4114,7 @@ class CTActivity extends CTCNC
             );
         }
         $url = Controller::buildLink(
-            'Activity.php',
+            'SRActivity.php',
             array(
                 'action'         => 'displayActivity',
                 'callActivityID' => $lastActivityID,
@@ -4326,7 +4330,7 @@ class CTActivity extends CTCNC
         $this->loadReactCSS('SpinnerHolderComponent.css');
         $urlDisplayActivity =
             Controller::buildLink(
-                $_SERVER['PHP_SELF'],
+                'SRActivity.php',
                 array(
                     'action'         => CTACTIVITY_ACT_DISPLAY_ACTIVITY,
                     'callActivityID' => $callActivityID
@@ -5490,7 +5494,7 @@ class CTActivity extends CTCNC
 
         $urlNext =
             Controller::buildLink(
-                $_SERVER['PHP_SELF'],
+                'SRActivity.php',
                 array(
                     'action'         => CTACTIVITY_ACT_DISPLAY_ACTIVITY,
                     'callActivityID' => $dsCallActivity->getValue(DBEJCallActivity::callActivityID)
@@ -5528,7 +5532,7 @@ class CTActivity extends CTCNC
         $urlNext =
             Controller::buildLink(
                 //$_SERVER['PHP_SELF'],
-                "ActivityNew.php",
+                "SRActivity.php",
                 array(
                     'action'         => CTACTIVITY_ACT_EDIT_ACTIVITY,
                     'callActivityID' => $newActivityID
@@ -5737,7 +5741,7 @@ class CTActivity extends CTCNC
         $urlActivity =
             SITE_URL .
             Controller::buildLink(
-                $_SERVER['PHP_SELF'],
+                'SRActivity.php',
                 array(
                     'callActivityID' => $dsCallActivity->getValue(DBEJCallActivity::callActivityID),
                     'action'         => CTACTIVITY_ACT_DISPLAY_ACTIVITY

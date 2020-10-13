@@ -96,6 +96,7 @@ export default class CMPLogServiceRequest extends React.Component {
             newData.uploadFiles,
             "userfile[]"
           );
+          alert(`Please advise customer their service request number is: ${result.problemID}`)
         if(result.nextURL)          
             window.location=result.nextURL;
       }

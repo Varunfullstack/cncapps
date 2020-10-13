@@ -1099,7 +1099,7 @@ class CTUser extends CTCNC
             'lastName' => $this->dbeUser->getValue(DBEJUser::lastName),
             'id' => $this->dbeUser->getValue(DBEJUser::userID),
             'email' => $this->dbeUser->getEmail(),
-            'isSdManager'=>$this->isSdManager(),
+            'isSDManger'=>$this->isSdManager(),
             'isExpenseApprover' => $this->dbeUser->getValue(DBEJUser::isExpenseApprover),
             'globalExpenseApprover' => $this->dbeUser->getValue(DBEJUser::globalExpenseApprover),
             'teamID' => $this->dbeUser->getValue(DBEJUser::teamID),

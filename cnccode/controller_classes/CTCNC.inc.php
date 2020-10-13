@@ -530,7 +530,8 @@ class CTCNC extends Controller
         return [
             [
                 "id"    => 101,
-                "href"  => "Activity.php?action=activityCreate1",
+                //"href"  => "Activity.php?action=activityCreate1",
+                "href"  => "LogServiceRequest.php",
                 "label" => "Log Service Request",
             ],
             [
@@ -1242,5 +1243,18 @@ class CTCNC extends Controller
             $options
         );
         return  $labtechDB;
+    }
+    function getFullPath()
+    {
+        // redirect to new page
+        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
+            $url = "https://";
+        else
+            $url = "http://";
+        // Append the host(domain name, ip) to the URL.   
+        $url .= $_SERVER['HTTP_HOST'];
+        // Append the requested resource location to the URL   
+        $url .= $_SERVER['REQUEST_URI'];
+        return $url;
     }
 }

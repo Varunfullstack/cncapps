@@ -536,7 +536,7 @@ class BUActivity extends Business
 
 
         $activityURL = SITE_URL . Controller::formatForHTML(
-                '/Activity.php?action=displayActivity&callActivityID=' . $callActivityID,
+                '/SRActivity.php?action=displayActivity&callActivityID=' . $callActivityID,
                 1
             );
 
@@ -726,7 +726,7 @@ class BUActivity extends Business
 
         $dbeJCallActivity = $this->getFirstActivityInProblem($problemID);
 
-        $urlActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+        $urlActivity = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
 
         $template->setVar(
@@ -1571,7 +1571,7 @@ class BUActivity extends Business
 
         $dbeJCallActivity = $this->getFirstActivityInProblem($problemID);
 
-        $urlActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+        $urlActivity = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
 
         $template->setVar(

@@ -10,11 +10,16 @@ import TableFooter from "./tableFooter.js?v=1";
  * search: false,
  * hasFooter:false
  * -- columns properties
+ * classNameColumn
+ * className
+ * backgroundColorColumn
  * path:''
  * label:''
  * sortable:false
  * footerContent :(c)=>
  * footerColSpan :1
+ * toolTip
+ * textColorColumn -> td text color
  */
 class Table extends React.Component {
   delayTimer;

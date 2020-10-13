@@ -31,7 +31,9 @@ class TableBody extends React.Component {
     }, columns.map(c => el("td", {
       key: c.path || c.key||c.label.replace(' ','')+makeid().toString(),      
       className:(c.className?c.className:' ')+" "+(c.classNameColumn?this.get(item, c.classNameColumn):'')
-      ,style:{backgroundColor:c.backgroundColorColumn?this.get(item, c.backgroundColorColumn):''}
+      ,style:{backgroundColor:c.backgroundColorColumn?this.get(item, c.backgroundColorColumn):'',
+              color:c.textColorColumn?this.get(item, c.textColorColumn):''
+             }
  
     }, this.addToolTip(
     c.content ? c.content(item) : this.get(item, c.path),c?.toolTip||null)

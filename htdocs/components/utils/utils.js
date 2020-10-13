@@ -146,11 +146,14 @@ export function padEnd(value,length,char)
   var ctx = canvas.getContext("2d");
   ctx.font = "11px Arial";        
   var width = ctx.measureText(value).width;
-  console.log(width);
+  //console.log(width);
   const spaceCount= (length-width)/3.05615234375;
   for(let i=0;i<spaceCount;i++)
   value +=char;
   canvas.remove();
-  console.log(value,value.length);
+  //console.log(value,value.length);
   return value;
+}
+export const Chars={
+  WhiteSpace:"&nbsp;"
 }

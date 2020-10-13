@@ -64,7 +64,7 @@ class CTLogServiceRequest extends CTCNC
     function setTemplate()
     {
         $this->setMethodName('setTemplate');
-        $this->setMenuId(102);
+        $this->setMenuId(101);
         $action = $this->getAction();
         $this->setPageTitle('Log Service Request');
          

@@ -32,9 +32,11 @@ componentDidUpdate=(prevProps, prevState)=> {
         console.log('destroyed',this.elementName,CKEDITOR.instances);
         CKEDITOR.instances[this.elementName].destroy(true);   
       }
+      CKEDITOR.config.width = 'auto';
       CKEDITOR.replace(this.elementName, {
-        customConfig: "../../ckeditor_config.js",
+        customConfig: "../../ckeditor_config_auto.js",
       });
+     
       if (CKEDITOR.instances[this.elementName])
         CKEDITOR.instances[this.elementName].on(
           "change",

@@ -319,8 +319,9 @@ class CMPInboxHelpDesk extends React.Component {
             {
               className: "pointer",
               onClick: () => srDescription(problem),
+              dangerouslySetInnerHTML:{ __html:problem.reason}
             },
-            problem.reason
+            
           ),
       },
       {
@@ -346,6 +347,7 @@ class CMPInboxHelpDesk extends React.Component {
       //     moment(problem.updated).format("DD/MM/YYYY HH:mm"),
       // },
     ];
+   
     if (this.props?.currentUser?.isSDManger)
       columns.push({
         hide: false,

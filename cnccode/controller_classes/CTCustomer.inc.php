@@ -3464,8 +3464,8 @@ class CTCustomer extends CTCNC
                     AND pro_status IN( 'I', 'P')
                 ) AS openSrCount,
                 (SELECT cui_itemno IS NOT NULL FROM custitem WHERE custitem.`cui_itemno` = 4111 AND custitem.`declinedFlag` <> 'Y' AND custitem.`cui_custno` = customer.`cus_custno` and renewalStatus  <> 'D' limit 1) AS hasPrepay,
-                (SELECT item.`itm_desc` FROM custitem LEFT JOIN item ON cui_itemno = item.`itm_itemno` WHERE itm_desc LIKE '%servicedesk%' AND custitem.`declinedFlag` <> 'Y' AND custitem.`cui_custno` = customer.`cus_custno` limit 1 ) AS hasServiceDesk
-            
+                (SELECT item.`itm_desc` FROM custitem LEFT JOIN item ON cui_itemno = item.`itm_itemno` WHERE itm_desc LIKE '%servicedesk%' AND custitem.`declinedFlag` <> 'Y' AND custitem.`cui_custno` = customer.`cus_custno` limit 1 ) AS hasServiceDesk,
+                cus_special_attention_flag specialAttentionCustomer
                 FROM customer
     
                 JOIN contact ON con_custno = cus_custno
@@ -3495,8 +3495,7 @@ class CTCustomer extends CTCNC
             $query
         );
         return mysqli_fetch_all( $result,MYSQLI_ASSOC);
-        
-        
+         
     }
     function getCustomerSR()
     {
@@ -3683,13 +3682,20 @@ class CTCustomer extends CTCNC
                 array(
                     'id'                    => $dbeContact->getValue(DBEContact::contactID),
                     'name'                  => $name,
+                    'firstName'              =>$dbeContact->getValue(DBEContact::firstName) ,
+                    'lastName'              => $dbeContact->getValue(DBEContact::lastName),
                     'startMainContactStyle' => $startMainContactStyle,
                     'endMainContactStyle'   => $endMainContactStyle,
                     'siteNo'   => $endMainContactStyle,
                     'siteTitle'=>$dbeSite->getValue(DBESite::add1) . ' ' . $dbeSite->getValue(
                         DBESite::town
-                    ) . ' ' . $dbeSite->getValue(DBESite::postcode)
-                    
+                    ) . ' ' . $dbeSite->getValue(DBESite::postcode),
+                    "sitePhone"=>$dbeSite->getValue(DBESite::phone),
+                    "contactPhone"=>$dbeContact->getValue(DBEContact::phone),   
+                    "contactMobilePhone"=>$dbeContact->getValue(DBEContact::mobilePhone),
+                    "contactEmail"=>$dbeContact->getValue(DBEContact::email),
+                    'contactSupportLevel'=> $dbeContact->getValue(DBEContact::supportLevel),
+
                 )
             );
         }

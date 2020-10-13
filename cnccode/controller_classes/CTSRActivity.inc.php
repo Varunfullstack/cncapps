@@ -19,7 +19,7 @@ require_once($cfg['path_bu'] . '/BURootCause.inc.php');
 require_once($cfg['path_dbe'] . '/DBEJCallActType.php');
 require_once($cfg['path_dbe'] . '/DBEJCallActivity.php');
 
-class CTActivityNew extends CTCNC
+class CTSRActivity extends CTCNC
 {
     const GREEN = '#BDF8BA';
     const CONTENT = '#F4f4f2';
@@ -112,7 +112,9 @@ class CTActivityNew extends CTCNC
     {
         $this->setMethodName('setTemplate');
         $this->setMenuId(102);        
-        $this->setPageTitle($this->getPageTitle());
+        $title=$this->getTitle();
+        //echo explode('<',$title)[1]; exit;
+        $this->setPageTitle($title);
         $this->setTemplateFiles(
             'Activity',
             'Activity.inc'
@@ -125,7 +127,7 @@ class CTActivityNew extends CTCNC
         );
         $this->parsePage();
     } 
-    function getPageTitle()
+    function getTitle()
     {
         $action = $this->getAction();
         switch($action)
@@ -167,6 +169,7 @@ class CTActivityNew extends CTCNC
     }
     private function getProblemRaiseIcon($dbeJProblem)
     {
+        
         if (isset($dbeJProblem)) {
             $raiseTypeId = $dbeJProblem->getValue(DBEProblem::raiseTypeId);
             if (isset($raiseTypeId) && $raiseTypeId != null) {
@@ -175,25 +178,25 @@ class CTActivityNew extends CTCNC
                 $dbeProblemRaiseType->getRow();
                 switch ($dbeProblemRaiseType->getValue(DBEProblemRaiseType::description)) {
                     case 'Email':
-                        return "<i class='fal fa-envelope ml-2' title='This Service Request was raised by email'></i>";
+                        return "<i class='fal fa-envelope ml-5' title='This Service Request was raised by email'></i>";
                         break;
                     case 'Portal':
-                        return "<i class='fa fa-edge ml-2' title='This Service Request was raised by the portal'></i>";
+                        return "<i class='fa fa-edge ml-5' title='This Service Request was raised by the portal'></i>";
                         break;
                     case 'Phone':
-                        return "<i class='fal fa-phone ml-2' title='This Service Request was raised by phone'></i>";
+                        return "<i class='fal fa-phone ml-5' title='This Service Request was raised by phone'></i>";
                         break;
                     case 'On site':
-                        return "<i class='fal fa-building ml-2' title='This Service Request was raised by an on site engineer'></i>";
+                        return "<i class='fal fa-building ml-5' title='This Service Request was raised by an on site engineer'></i>";
                         break;
                     case 'Alert':
-                        return "<i class='fal fa-bell ml-2' title='This Service Request was raised by an alert'></i>";
+                        return "<i class='fal fa-bell ml-5' title='This Service Request was raised by an alert'></i>";
                         break;
                     case 'Sales':
-                        return "<i class='fal fa-shopping-cart ml-2' title='This Service Request was raised via Sales'></i>";
+                        return "<i class='fal fa-shopping-cart ml-5' title='This Service Request was raised via Sales'></i>";
                         break;
                     case 'Manual':
-                        return "<i class='fal fa-user-edit ml-2' title='This Service Request was raised manually'></i>";
+                        return "<i class='fal fa-user-edit ml-5' title='This Service Request was raised manually'></i>";
                         break;
                 }
             }
@@ -406,7 +409,7 @@ class CTActivityNew extends CTCNC
         {
             array_push($activities,[
                 "callActivityID"    =>$dbejCallActivity->getValue(DBEJCallActivity::callActivityID),
-                "dateEngineer"      =>$dbejCallActivity->getValue(DBEJCallActivity::dateEngineer),
+                "dateEngineer"      =>$dbejCallActivity->getValue(DBEJCallActivity::dateEngineer),                
                 "contactName"       =>$dbejCallActivity->getValue(DBEJCallActivity::contactName),
                 "activityType"      =>$dbejCallActivity->getValue(DBEJCallActivity::activityType),  
                 "date"              =>$dbejCallActivity->getValue(DBEJCallActivity::date),  
@@ -1047,7 +1050,7 @@ class CTActivityNew extends CTCNC
                     $this->getParam('moveToUsersQueue')
                 );
                 //$nextURL ="Activity.php?action=createFollowOnActivity&callActivityID=".$newActivityID ."&moveToUsersQueue=1";                
-                $nextURL ="ActivityNew.php?action=editActivity&callActivityID=".$newActivityID;                
+                $nextURL ="SRActivity.php?action=editActivity&callActivityID=".$newActivityID;                
 
             }
             else

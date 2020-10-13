@@ -31,7 +31,15 @@ class CMPCustomerSearch extends React.Component {
     event.persist();
     this.delayTimer = setTimeout(()=> {      
       this.showSpinner();
-      this.apiCutsomer.searchCustomers(event.target.value).then(result=>{          
+      this.apiCutsomer.searchCustomers(event.target.value)
+      .then(customers=>{
+        return customers.map(c=>{
+          if(c.supportLevel=='main')
+          c.color='red';
+          return c;
+        });
+      })
+      .then(result=>{          
           this.setState({customers:result,_showSpinner:false});
       });
     }, 1000); // Will do the ajax stuff after 1000 ms, or 1 s
@@ -67,12 +75,13 @@ class CMPCustomerSearch extends React.Component {
             label: "",
             sortable: false,                        
             //classNameColumn: "customerNameDisplayClass",
+            textColorColumn:"color",
             content: (customer) =>
-            customer.specialAttentionContact=='1'?
+            customer.specialAttentionContact=='1'||customer.specialAttentionCustomer=='Y'?
             el(
                 "i",
                 {
-                    className:"fal fa-2x fa-alarm-plus color-gray2",                 
+                    className:"fal fa-2x fa-star color-gray2",                 
                 }                    
             ):null,
         },
@@ -86,7 +95,7 @@ class CMPCustomerSearch extends React.Component {
         sortable: false,
         width: "220",
         hdClassName: "text-center",
-        
+        textColorColumn:"color",
         //classNameColumn: "customerNameDisplayClass",
         content: (customer) =>
           el(
@@ -107,6 +116,7 @@ class CMPCustomerSearch extends React.Component {
         icon: "fal fa-2x  fa-location color-gray2 ",
         sortable: false,
         hdClassName: "text-center",
+        textColorColumn:"color",
         //classNameColumn: "customerNameDisplayClass",
         content: (customer) =>
           el(
@@ -147,6 +157,7 @@ class CMPCustomerSearch extends React.Component {
         icon: "fal fa-2x  fa-user color-gray2 ",
         sortable: false,
         hdClassName: "text-center",
+        textColorColumn:"color",
         //classNameColumn: "customerNameDisplayClass",
         content: (customer) =>
           el(
@@ -167,6 +178,7 @@ class CMPCustomerSearch extends React.Component {
         icon: "fal fa-2x  fa-id-card-alt color-gray2 ",
         sortable: false,
         hdClassName: "text-center",
+        textColorColumn:"color",
         //classNameColumn: "customerNameDisplayClass",
         content: (customer) =>
           el(
@@ -187,6 +199,7 @@ class CMPCustomerSearch extends React.Component {
         icon: "fal fa-2x fa-layer-group color-gray2 ",
         sortable: false,
         hdClassName: "text-center",
+        textColorColumn:"color",
         //classNameColumn: "customerNameDisplayClass",
         content: (customer) =>
           el(
@@ -207,6 +220,7 @@ class CMPCustomerSearch extends React.Component {
         icon: "fal fa-2x fa-phone color-gray2 ",
         sortable: false,
         hdClassName: "text-center",
+        textColorColumn:"color",
         //classNameColumn: "customerNameDisplayClass",
         content: (customer) =>
           el(
@@ -247,6 +261,7 @@ class CMPCustomerSearch extends React.Component {
         icon: "fal fa-2x fa-file-alt color-gray2 ",
         sortable: false,
         hdClassName: "text-center",
+        textColorColumn:"color",
         //classNameColumn: "customerNameDisplayClass",
         content: (customer) =>
           el(

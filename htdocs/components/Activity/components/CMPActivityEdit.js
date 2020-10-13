@@ -1,5 +1,5 @@
 import APIActivity from "../../services/APIActivity.js";
-import {groupBy, params, pick} from "../../utils/utils.js";
+import {groupBy, params, pick,TeamType} from "../../utils/utils.js";
 import Toggle from "../../utils/toggle.js";
 import Table from "../../utils/table/table.js"
 import Modal from "../../utils/modal.js";
@@ -8,39 +8,44 @@ import Timer from "../../utils/timer.js";
 import ToolTip from "../../utils/ToolTip.js";
 import APICustomers from "../../services/APICutsomer.js";
 import APIUser from "../../services/APIUser.js";
+import CountDownTimer from "../../utils/CountDownTimer.js";
 class CMPActivityEdit extends React.Component {
   el = React.createElement;
   api = new APIActivity();
-  apiCustomer=new APICustomers();
-  apiUser=new APIUser();
+  apiCustomer = new APICustomers();
+  apiUser = new APIUser();
   activityStatus = {
     Fixed: "Fixed",
     CustomerAction: "CustomerAction",
     CncAction: "CncAction",
     Escalate: "Escalate",
   };
+  autoSavehandler=null;
   constructor(props) {
     super(props);
-    this.state = {
-        _activityLoaded:false,
-       uploadFiles: [],
+    this.state = {      
+      _activityLoaded: false,
+      uploadFiles: [],
       contacts: [],
       sites: [],
       priorities: [],
+      currentContact: null,
+      currentUser:null,
       data: {
         curValue: "",
         documents: [],
-        reasonTemplate:'',
-        reason:'',
-        internalNotes:'',
-        internalNotesTemplate:'',
+        reasonTemplate: "",
+        reason: "",
+        internalNotes: "",
+        internalNotesTemplate: "",
         date: "",
-        alarmDate:'',
-        alarmTime:'',
-        contactNotes:'',
-        completeDate:'',
-        techNotes:'',
-        projects:[]
+        alarmDate: "",
+        alarmTime: "",
+        contactNotes: "",
+        completeDate: "",
+        techNotes: "",
+        projects: [],
+        submitAsOvertime:0
       },
       currentActivity: "",
       _showModal: false,
@@ -62,24 +67,31 @@ class CMPActivityEdit extends React.Component {
         monitorSR: false,
       },
     };
-    this.fileUploader = new React.createRef();
+    this.fileUploader = new React.createRef();  
   }
   componentDidMount() {
     this.loadCallActivity(params.get("callActivityID"));
     // lodaing lookups
     Promise.all([
       this.api.getCallActTypes(),
-      this.apiUser.getActiveUsers(),
+      this.apiUser.getActiveUsers(),      
       this.api.getPriorities(),
       this.api.getRootCauses(),
+      this.apiUser.getCurrentUser(),
     ]).then((result) => {
       this.setState({
         callActTypes: result[0],
         users: result[1],
         priorities: result[2],
         rootCauses: result[3],
+        currentUser:result[4],
       });
+      setTimeout(()=>this.autoSave(),2000);
     });
+  }
+  componentWillUnmount() {
+    clearInterval(this.autoSavehandler);
+
   }
   //------------API
   loadCallActivity(callActivityID) {
@@ -90,13 +102,13 @@ class CMPActivityEdit extends React.Component {
       filters.monitorSR = res.monitoringFlag == "1" ? true : false;
       filters.criticalSR = res.criticalFlag == "1" ? true : false;
       //res.date=moment(res.date).format("YYYY-MM-DD");
-      res.documents=res.documents.map(d=>{
-        d.createDate=moment(d.createDate).format("DD/MM/YYYY");
+      res.documents = res.documents.map((d) => {
+        d.createDate = moment(d.createDate).format("DD/MM/YYYY");
         return d;
       });
-      res.reasonTemplate=res.reason;
-      res.internalNotesTemplate=res.internalNotes;
-      res.callActTypeIDOld=res.callActTypeID;
+      res.reasonTemplate = res.reason;
+      res.internalNotesTemplate = res.internalNotes;
+      res.callActTypeIDOld = res.callActTypeID;
       Promise.all([
         this.apiCustomer.getCustomerContacts(res.customerId, res.contactID),
         this.apiCustomer.getCustomerSites(res.customerId),
@@ -107,50 +119,41 @@ class CMPActivityEdit extends React.Component {
             res.linkedSalesOrderID > 0
           )
           .then((res) => {
-            const contracts = res.reduce(function (prev, current) {
-              // get group index and group by renewalType
-              const index = prev
-                ? prev.findIndex((g) => g.groupName === current.renewalType)
-                : -1;
-              if ((prev && prev.length == 0) || index === -1) {
-                const obj = {
-                  groupName: current.renewalType,
-                  items: [current],
-                };
-                prev.push(obj);
-              } else if (index >= 0) {
-                prev[index].items.push(current);
-              }
-              return prev;
-            }, []);
+            const contracts = groupBy(res, "renewalType");             
             return contracts;
           }),
       ]).then((result) => {
         // console.log('res',result);
-        this.setState({
+        const currentContact = result[0].find((c) => c.id == res.contactID);
+        console.log(currentContact);
+        
+        this.setState({          
           filters,
           data: res,
           currentActivity: res.callActivityID,
           contacts: result[0],
           sites: result[1],
           contracts: result[2],
-          _activityLoaded:true
-        });
+          _activityLoaded: true,
+          currentContact,
+        },()=>setTimeout(()=>this.checkContactNotesAlert(),2000));
       });
     });
   }
-  updateActivity = async () => {
-    const data = {...this.state.data};
-    
-    data.reason=data.reasonTemplate;
-    data.internalNotes=data.internalNotesTemplate;
-    data.priority=this.state.priorities.filter(p=>p.name===data.priority)[0].id;
-    if(this.isValid(data))
-    {
+  updateActivity = async (autoSave=false) => {
+    const data = { ...this.state.data };
+
+    data.reason = data.reasonTemplate;
+    data.internalNotes = data.internalNotesTemplate;
+    data.priority = this.state.priorities.filter(
+      (p) => p.name === data.priority
+    )[0].id;
+    if (this.isValid(data)) {
       delete data.activities;
       delete data.onSiteActivities;
       delete data.documents;
-      const finalData=pick(data,["callActivityID",
+      const finalData = pick(data, [
+        "callActivityID",
         "alarmDate",
         "alarmTime",
         "callActTypeID",
@@ -169,155 +172,174 @@ class CMPActivityEdit extends React.Component {
         "escalationReason",
       ]);
       console.log(finalData);
-      this.api.updateActivity(finalData).then(response=>{
-        if (response.error) alert(response.error);
-        else if (response.redirectTo) document.location = response.redirectTo;
-        else
-          document.location = `ActivityNew.php?action=displayActivity&callActivityID=${data.callActivityID}`;
-          
+      this.api
+        .updateActivity(finalData)
+        .then((response) => {
 
-      }).catch(ex=>{
-        alert(ex.error);
-
-      });
-      
-      
+          if (response.error) alert(response.error);
+          if(!autoSave)
+          {
+          if (response.redirectTo) document.location = response.redirectTo;
+          else
+            document.location = `SRActivity.php?action=displayActivity&callActivityID=${data.callActivityID}`;
+          }
+        })
+        .catch((ex) => {
+          alert(ex.error);
+        });
     }
   };
-  isValid=(data)=>{
+  isValid = (data) => {
     console.log(data);
-    if(data.callActTypeID=='')
-    {
+    if (data.callActTypeID == "") {
       alert("Please select Activity Type");
       return false;
     }
-    if(data.siteNo=='-1')
-    {
+    if (data.siteNo == "-1") {
       alert("Please select Customer Site");
       return false;
     }
-    if(data.contactID=='')
-    {
+    if (data.contactID == "") {
       alert("Please select Contact");
       return false;
     }
-     
-    const callActType=this.state.callActTypes.filter(c=>c.id==data.callActTypeID)[0];    
-    data.callActType=callActType;
-    if(callActType&&callActType.description.indexOf("FOC")==-1&& data.siteMaxTravelHours==-1)
-    {
-      alert('Travel hours need entering for this site');
+
+    const callActType = this.state.callActTypes.filter(
+      (c) => c.id == data.callActTypeID
+    )[0];
+    data.callActType = callActType;
+    if (
+      callActType &&
+      callActType.description.indexOf("FOC") == -1 &&
+      data.siteMaxTravelHours == -1
+    ) {
+      alert("Travel hours need entering for this site");
       return false;
     }
-    if(!callActType)
-    {
-      alert('Please select activity type');
+    if (!callActType) {
+      alert("Please select activity type");
       return false;
     }
-    if(!data.contactSupportLevel)
-    {
-      alert('Not a nominated support contact');
+    if (!data.contactSupportLevel) {
+      alert("Not a nominated support contact");
       return false;
     }
-    if(data.curValueFlag=='Y'&&data.curValue==0)
-    {
-      alert('Please enter value');
+    if (data.curValueFlag == "Y" && data.curValue == 0) {
+      alert("Please enter value");
       return false;
-    }
-    else{
-      if(callActType && callActType.reqReasonFlag=='Y'&&!data.reason.trim()){
+    } else {
+      if (
+        callActType &&
+        callActType.reqReasonFlag == "Y" &&
+        !data.reason.trim()
+      ) {
         alert("Please Enter Reason");
         return false;
       }
-      if(data.contractCustomerItemId&&data.projectId)
-      {
+      if (data.contractCustomerItemId && data.projectId) {
         alert("Project work must be logged under T&M");
         return false;
       }
-      if(data.callActTypeID!=51) //CONFIG_INITIAL_ACTIVITY_TYPE_ID
-      {
-        const firstActivity=data.activities[0];
-        const startDate =moment(data.date).format("YYYY-MM-DD")+" "+data.startTime;
-        const firstActivityDate=moment(firstActivity.date).format("YYYY-MM-DD")+" "+firstActivity.startTime;
-        if(moment(startDate)<moment(firstActivityDate))
-        {
+      if (data.callActTypeID != 51) {
+        //CONFIG_INITIAL_ACTIVITY_TYPE_ID
+        const firstActivity = data.activities[0];
+        const startDate =
+          moment(data.date).format("YYYY-MM-DD") + " " + data.startTime;
+        const firstActivityDate =
+          moment(firstActivity.date).format("YYYY-MM-DD") +
+          " " +
+          firstActivity.startTime;
+        if (moment(startDate) < moment(firstActivityDate)) {
           alert("Date/time must be after Initial activity");
           return false;
         }
       }
-      if(data.endTime)
-      {        
-        const duration = moment.duration(moment(data.date+" "+data.endTime).diff(moment(data.date+" "+data.startTime)));        
-        const durationHours=duration.asHours();
-        const durationMinutes=duration.asMinutes();
+      if (data.endTime) {
+        const duration = moment.duration(
+          moment(data.date + " " + data.endTime).diff(
+            moment(data.date + " " + data.startTime)
+          )
+        );
+        const durationHours = duration.asHours();
+        const durationMinutes = duration.asMinutes();
 
-        if(data.endTime<data.startTime)
-        {
-          alert('End time must be after start time!');
+        if (data.endTime < data.startTime) {
+          alert("End time must be after start time!");
           return false;
         }
-        if([4, 8, 11, 18].indexOf(data.callActTypeID)>-1)
-        {
-          if(data.actUserTeamId<=4)
-          {
+        if ([4, 8, 11, 18].indexOf(data.callActTypeID) > -1) {
+          if (data.actUserTeamId <= 4) {
             let usedTime = 0;
             let allocatedTime = 0;
-            if(data.actUserTeamId==1)
-            {
-
+            if (data.actUserTeamId == 1) {
             }
           }
         }
-
       }
     }
-    
-    switch(data.nextStatus)
-    {
+
+    switch (data.nextStatus) {
       case this.activityStatus.CustomerAction:
-        const dateMoment =moment(data.alarmDate);
-        if (!dateMoment.isValid() || dateMoment.isSameOrBefore(moment(), 'minute')
+        const dateMoment = moment(data.alarmDate);
+        if (
+          !dateMoment.isValid() ||
+          dateMoment.isSameOrBefore(moment(), "minute")
         ) {
-            alert('Please provide a future date and time, or just a future date');
-            return false;
+          alert("Please provide a future date and time, or just a future date");
+          return false;
         }
         break;
     }
-    if(data.nextStatus===this.activityStatus.Escalate)
-    {
-      if(["I", "F", "C"].indexOf(data.problemStatus)===-1 && !data.escalationReason)
-      {
+    if (data.nextStatus === this.activityStatus.Escalate) {
+      if (
+        ["I", "F", "C"].indexOf(data.problemStatus) === -1 &&
+        !data.escalationReason
+      ) {
         alert("Please provide an escalate reason");
         return false;
       }
     }
     return true;
-  }
+  };
   setValue = (label, value) => {
     const { data } = this.state;
     data[label] = value;
     this.setState({ data });
   };
   //-----------------Template
-  getProjectsElement=()=>{
-    const {data}=this.state;
-    const {el}=this;
-    if(data&&data.projects.length>0)
-    {
-        return el('div',{style:{display:"flex",flexDirection:"row",alignItems:"center",marginTop:-20} },
-        el('h3',{className:"mr-5"},"Projects "),
-        data.projects.map(p=>el("a",{key:p.projectID,href:p.editUrl,className:"link-round"},p.description))
+  getProjectsElement = () => {
+    const { data } = this.state;
+    const { el } = this;
+    if (data && data.projects.length > 0) {
+      return el(
+        "div",
+        {
+          style: {
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            marginTop: -20,
+          },
+          key:"projects"
+        },
+        el("h3", { className: "mr-5" }, "Projects "),
+        data.projects.map((p) =>
+          el(
+            "a",
+            { key: p.projectID, href: p.editUrl, className: "link-round mr-4" },
+            p.description
+          )
         )
-    }
-    else return null;
-     
-}
+      );
+    } else return null;
+  };
   getHeader = () => {
     const { el } = this;
-    const { data } = this.state;
+    const { data, currentContact } = this.state;
     return el(
       "div",
-      null,
+      {style:{display:"flex",flexDirection:"column"}},
+      
       el(
         "a",
         {
@@ -335,30 +357,51 @@ class CMPActivityEdit extends React.Component {
           ", " +
           data?.siteTown +
           ", " +
-          data?.sitePostcode +
-          ", " +
-          data?.contactName +
-          "  "
+          data?.sitePostcode  
+         
       ),
-      el("a", { href: `tel:${data?.sitePhone}` }, data?.sitePhone),
-      data?.contactPhone?el("label", null, " DDI: "):null,
-      data?.contactPhone?el("a", { href: `tel:${data?.contactPhone}` }, data?.contactPhone):null,
-      data?.contactMobilePhon?el("label", null, " Mobile: "):null,
-      data?.contactMobilePhon?el(
+      el('div',null,
+      el('a',{href:`Customer.php?action=dispEdit&customerId=${data?.customerId}`}, currentContact?.firstName+' '+currentContact?.lastName +"  "),
+      el(
         "a",
-        { href: `tel:${data?.contactMobilePhone}` },
-        data?.contactMobilePhone
-      ):null,
+        { href: `tel:${currentContact?.sitePhone}` },
+        currentContact?.sitePhone
+      ),
+      currentContact?.contactPhone ? el("label", null, " DDI: ") : null,
+      currentContact?.contactPhone
+        ? el(
+            "a",
+            { href: `tel:${currentContact?.contactPhone}` },
+            currentContact?.contactPhone
+          )
+        : null,
+      currentContact?.contactMobilePhone
+        ? el("label", null, " Mobile: ")
+        : null,
+      currentContact?.contactMobilePhone
+        ? el(
+            "a",
+            { href: `tel:${currentContact?.contactMobilePhone}` },
+            currentContact?.contactMobilePhone
+          )
+        : null,
       el(
         "a",
         {
-          href: `mailto:${data?.contactEmail}?subject=Service Request ${data?.problemID}`,
+          href: `mailto:${currentContact?.contactEmail}?subject=Service Request ${data?.problemID}`,
         },
         el("i", { className: "fal fa-envelope ml-5" })
       ),
+      !currentContact?.contactSupportLevel
+        ? el(
+            "span",
+            { key: "contactSupportLevel", className: "ml-2" },
+            "Not a nominated support contact"
+          )
+        : null,
       el("p", { className: "formErrorMessage mt-2" }, data?.contactNotes),
-      el("p", { className: "formErrorMessage mt-2" }, data?.techNotes)
-    );
+      el("p", { className: "  mt-2",style:{color: "red",fontWeight:"bold", whiteSpace: "nowrap" } }, data?.techNotes)
+    ));
   };
 
   getActions = () => {
@@ -375,64 +418,101 @@ class CMPActivityEdit extends React.Component {
           width: 930,
         },
       },
-      el(ToolTip,{title:"Renewal Information",content:  el("a", {
-        className: "fal fa-tasks fa-2x m-5 pointer icon",        
-        href: `RenewalReport.php?action=produceReport&customerID=${data?.customerId}`,
-        target: "_blank",
-      })}),
-      el(ToolTip,{title:"Passwords",content: el("a", {
-        className: "fal fa-unlock-alt fa-2x m-5 pointer icon",
-        href: `Password.php?action=list&customerID=${data?.customerId}`,
-        target: "_blank",
-      })}),
-      // el(ToolTip,{title:"Generate Password",content:  el("a", {
-      //   className: "fal fa-magic fa-2x m-5 pointer icon",
-      //   onClick: this.handleGeneratPassword,
-      // })}),
-      el(ToolTip,{title:"History",content: el("a", {
-        className: "fal fa-history fa-2x m-5 pointer icon",
-        href: `Activity.php?action=problemHistoryPopup&problemID=${data?.problemID}&htmlFmt=popup`,
-        target: "_blank",
-      })}),
-     
+      el(ToolTip, {
+        title: "History",
+        content: el("a", {
+          className: "fal fa-history fa-2x m-5 pointer icon",
+          href: `Activity.php?action=problemHistoryPopup&problemID=${data?.problemID}&htmlFmt=popup`,
+          target: "_blank",
+        }),
+      }),
+      el(ToolTip, {
+        title: "Passwords",
+        content: el("a", {
+          className: "fal fa-unlock-alt fa-2x m-5 pointer icon",
+          href: `Password.php?action=list&customerID=${data?.customerId}`,
+          target: "_blank",
+        }),
+      }),
+      this.getEmptyAction(),
       data?.linkedSalesOrderID
-        ? el(ToolTip,{title:"Sales Order",content: el("a", {
-            className: "fal fa-tag fa-2x m-5 pointer icon",
-            href: `SalesOrder.php?action=displaySalesOrder&ordheadID=${data?.linkedSalesOrderID}`,
-          })})
+        ? el(ToolTip, {
+            title: "Sales Order",
+            content: el("a", {
+              className: "fal fa-tag fa-2x m-5 pointer icon",
+              href: `SalesOrder.php?action=displaySalesOrder&ordheadID=${data?.linkedSalesOrderID}`,
+            }),
+          })
         : null,
-        data?.linkedSalesOrderID
-        ? el(ToolTip,{title:"Unlink Sales Order",content: el("a", {
-            className: "fal fa-unlink fa-2x m-5 pointer icon",
-            onClick: () => this.handleUnlink(data?.callActivityID,data?.linkedSalesOrderID),
-          })})
+      data?.linkedSalesOrderID
+        ? el(ToolTip, {
+            title: "Unlink Sales Order",
+            content: el("a", {
+              className: "fal fa-unlink fa-2x m-5 pointer icon",
+              onClick: () =>
+                this.handleUnlink(
+                  data?.callActivityID,
+                  data?.linkedSalesOrderID
+                ),
+            }),
+          })
         : null,
       !data?.linkedSalesOrderID
-        ? el(ToolTip,{title:"Sales Order",content: el("a", {
-            className: "fal fa-tag fa-2x m-5 pointer icon",
-            onClick: () => this.handleSalesOrder(data?.callActivityID),
-          })})
+        ? el(ToolTip, {
+            title: "Sales Order",
+            content: el("a", {
+              className: "fal fa-tag fa-2x m-5 pointer icon",
+              onClick: () => this.handleSalesOrder(data?.callActivityID),
+            }),
+          })
         : null,
-        el(ToolTip,{title:"Contracts",content: el("a", {
-        className: "fal fa-file-contract fa-2x m-5 pointer icon",
-        href: `Activity.php?action=contractListPopup&customerID=${data?.customerId}`,
-        target: "_blank",
-      })}),
-      el(ToolTip,{title:"Third Party Contacts",content: el("a", {
-        className: "fal fa-users fa-2x m-5 pointer icon",
-        href: `ThirdPartyContact.php?action=list&customerID=${data?.customerId}`,
-        target: "_blank",
-      })}),
-      el(ToolTip,{title:"Contact SR History",content: el("a", {
-        className: "fal fa-id-card fa-2x m-5 pointer icon",
-        onClick: () => this.handleContactSRHistory(data?.contactID),
-      })}),
-      el(ToolTip,{title:"Request more time",content: el("a", {
-        className: "fal fa-hourglass-start fa-2x m-5 pointer icon",        
-        onClick: () => this.handleExtraTime(data),
-      })})
+      el(ToolTip, {
+        title: "Renewal Information",
+        content: el("a", {
+          className: "fal fa-tasks fa-2x m-5 pointer icon",
+          href: `RenewalReport.php?action=produceReport&customerID=${data?.customerId}`,
+          target: "_blank",
+        }),
+      }),
+      el(ToolTip, {
+        title: "Contracts",
+        content: el("a", {
+          className: "fal fa-file-contract fa-2x m-5 pointer icon",
+          href: `Activity.php?action=contractListPopup&customerID=${data?.customerId}`,
+          target: "_blank",
+        }),
+      }),
+      this.getEmptyAction(),
+      el(ToolTip, {
+        title: "Contact SR History",
+        content: el("a", {
+          className: "fal fa-id-card fa-2x m-5 pointer icon",
+          onClick: () => this.handleContactSRHistory(data?.contactID),
+        }),
+      }),
+      el(ToolTip, {
+        title: "Third Party Contacts",
+        content: el("a", {
+          className: "fal fa-users fa-2x m-5 pointer icon",
+          href: `ThirdPartyContact.php?action=list&customerID=${data?.customerId}`,
+          target: "_blank",
+        }),
+      }),
+
+      this.getEmptyAction(),
+      el(ToolTip, {
+        title: "Request more time",
+        content: el("a", {
+          className: "fal fa-hourglass-start fa-2x m-5 pointer icon",
+          onClick: () => this.handleExtraTime(data),
+        }),
+      }),this.getTimeBudgetElement(),
+      data.hdRemainMinutes?el(CountDownTimer,{seconds:(this.getTimeBudget()*60+60),hideSeconds:true,hideMinutesTitle:true}):null
     );
   };
+  getEmptyAction() {
+    return this.el("div", { style: { width: 20 } });
+  }
   handleExtraTime = async (data) => {
     var reason = prompt(
       "Please provide your reason to request additional time"
@@ -464,6 +544,15 @@ class CMPActivityEdit extends React.Component {
       data?.callActTypeID != 59
         ? el(
             "button",
+            {
+              onClick: () => this.setNextStatus(this.activityStatus.CncAction),
+            },
+            "CNC Action"
+          )
+        : null,
+      data?.callActTypeID != 59
+        ? el(
+            "button",
             { onClick: () => this.setNextStatus(this.activityStatus.Fixed) },
             "Fixed"
           )
@@ -478,22 +567,18 @@ class CMPActivityEdit extends React.Component {
             "On Hold"
           )
         : null,
-      data?.callActTypeID != 59
-        ? el(
-            "button",
-            {
-              onClick: () => this.setNextStatus(this.activityStatus.CncAction),
-            },
-            "CNC Action"
-          )
-        : null,
+
       el("label", { className: "m-2" }, "Future Action"),
       el("input", {
         type: "date",
-        value:(data?.alarmDate||""),
+        value: data?.alarmDate || "",
         onChange: (event) => this.setValue("alarmDate", event.target.value),
-      }),      
-      el(Timer, {value:data?.alarmTime, onChange: (value) => this.setValue("alarmTime", value) }),      
+      }),
+      data.callActivityID?el(Timer, {
+        key:"alarmTime",
+        value: data?.alarmTime,
+        onChange: (value) => this.setValue("alarmTime", value),
+      }):null,
       // data?.callActTypeID != 59
       //   ? el(
       //       "button",
@@ -501,6 +586,21 @@ class CMPActivityEdit extends React.Component {
       //       "Escalate"
       //     )
       //   : null,
+      el(
+        "button",
+        { onClick: () => this.handleTemplateDisplay("changeRequest") },
+        "Change Request"
+      ),
+      el(
+        "button",
+        { onClick: () => this.handleTemplateDisplay("salesRequest") },
+        "Sales Request"
+      ),
+      el(
+        "button",
+        { onClick: () => this.handleTemplateDisplay("partsUsed") },
+        "Parts Used"
+      ),
       data?.callActTypeID != 59
         ? el(
             "button",
@@ -510,22 +610,7 @@ class CMPActivityEdit extends React.Component {
         : null,
       data?.callActTypeID != 59
         ? el("button", { onClick: () => this.handleCancel(data) }, "Cancel")
-        : null,
-      el(
-        "button",
-        { onClick: () => this.handleTemplateDisplay("partsUsed") },
-        "Parts Used"
-      ),
-      el(
-        "button",
-        { onClick: () => this.handleTemplateDisplay("salesRequest") },
-        "Sales Request"
-      ),
-      el(
-        "button",
-        { onClick: () => this.handleTemplateDisplay("changeRequest") },
-        "Change Request"
-      )
+        : null
     );
   };
   handleCancel = (data) => {
@@ -535,10 +620,17 @@ class CMPActivityEdit extends React.Component {
     }
 
     if (confirm(text)) {
-      document.location = `ActivityNew.php?action=displayActivity&callActivityID=${data.callActivityID}`;
+      document.location = `SRActivity.php?action=displayActivity&callActivityID=${data.callActivityID}`;
     }
   };
-  setNextStatus = (status) => {
+  autoSave=()=>{
+    this.autoSavehandler=setInterval(() => {
+      this.setNextStatus("Update",true);
+      //console.log("auto save");
+    }, 10000);
+    
+  }
+  setNextStatus = (status,autoSave=false) => {
     const { data } = this.state;
     data.nextStatus = status;
     switch (status) {
@@ -557,7 +649,7 @@ class CMPActivityEdit extends React.Component {
         }
         break;
     }
-    this.setState({ data }, () => this.updateActivity());
+    this.setState({ data }, () => this.updateActivity(autoSave));
   };
 
   handleGeneratPassword = () => {
@@ -568,7 +660,6 @@ class CMPActivityEdit extends React.Component {
     );
   };
   handleSalesOrder = (callActivityID) => {
-      
     const w = window.open(
       `Activity.php?action=editLinkedSalesOrder&htmlFmt=popup&callActivityID=${callActivityID}`,
       "reason",
@@ -576,8 +667,8 @@ class CMPActivityEdit extends React.Component {
     );
     w.onbeforeunload = () => this.loadCallActivity(callActivityID);
   };
-  handleUnlink = async (callActivityID,linkedSalesOrderID) => {
-     const res = confirm(
+  handleUnlink = async (callActivityID, linkedSalesOrderID) => {
+    const res = confirm(
       `Are you sure you want to unlink this request to Sales Order ${linkedSalesOrderID}`
     );
     if (res) {
@@ -619,7 +710,7 @@ class CMPActivityEdit extends React.Component {
         },
         el(
           "label",
-          { style: { textAlign: "left", whiteSpace: "nowrap", marginLeft: 5 } },
+          { style: { textAlign: "left", whiteSpace: "nowrap", marginLeft: 15 } },
           text
         )
       ),
@@ -646,7 +737,7 @@ class CMPActivityEdit extends React.Component {
         "td",
         {
           key: key + 2,
-          style: { marginTop: 3, backgroundcolor: bgcolor, textAlign: "left" },
+          style: { marginTop: 3, backgroundcolor: bgcolor, textAlign: "left",paddingRight:15 },
         },
         content
       ),
@@ -672,7 +763,7 @@ class CMPActivityEdit extends React.Component {
       el("div", { dangerouslySetInnerHTML: { __html: data?.reason } })
     );
   };
-   
+
   deleteDocument = async (id) => {
     console.log(id);
     if (confirm("Are you sure you want to remove this document?")) {
@@ -686,20 +777,23 @@ class CMPActivityEdit extends React.Component {
     const { el } = this;
     const { data, callActTypes } = this.state;
     const found = callActTypes.filter((t) => t.id == data.callActTypeIDOld);
-    
+
     return this.getElementControl(
       "Type",
       "Type",
       el(
         "select",
         {
-          disabled: data?.isInitalDisabled || (found.length == 0&&data?.callActTypeIDOld!=null),
+          disabled:
+            data?.isInitalDisabled ||
+            (found.length == 0 && data?.callActTypeIDOld != null),
           required: true,
-          value: data?.callActTypeID||"",
+          value: data?.callActTypeID || "",
           onChange: (event) =>
             this.setValue("callActTypeID", event.target.value),
+          style:{width:"100%"}
         },
-        el("option", { key: "empty", value: '' }, "Please select"),
+        el("option", { key: "empty", value: "" }, "Please select"),
         callActTypes?.map((t) =>
           el("option", { key: t.id, value: t.id }, t.description)
         )
@@ -709,26 +803,38 @@ class CMPActivityEdit extends React.Component {
   getContactsElement = () => {
     const { el } = this;
     const { data, contacts } = this.state;
-    const contactsGroup=groupBy(contacts,"siteTitle");
-    return el(
+    const contactsGroup = groupBy(contacts, "siteTitle");
+    return el('div',{style:{display:"flex",flexDirection:"row",border:0,marginRight:-6,padding:0}}, el(
       "select",
-      {         
-        key:"contacts" ,
+      {
+        key: "contacts",
         value: data.contactID,
-        onChange: (event) =>this.setValue("contactID", event.target.value) ,
-        style:{width:200}
+        onChange: (event) => this.handleContactChange(event.target.value),
+        style: { width: "100%" },
       },
-      el("option", {key:'empty', value: '' }, "Please Select "),
-      contactsGroup.map((group,index)=>
-        {
-          return el(
-            "optgroup",
-            { key: group.groupName+index, label: group.groupName },
-            contactsGroup[index].items.map(item=>el("option", {key:'i'+ item.id, value: item.id }, item.name+" "+(item.startMainContactStyle||""))));
-        }
-      ),        
-    )
- 
+      el("option", { key: "empty", value: "" }, "Please Select "),
+      contactsGroup.map((group, index) => {
+        return el(
+          "optgroup",
+          { key: group.groupName + index, label: group.groupName },
+          contactsGroup[index].items.map((item) =>
+            el(
+              "option",
+              { key: "i" + item.id, value: item.id },
+              item.name + " " + (item.startMainContactStyle || "")
+            )
+          )
+        );
+      })
+    ),
+    data.contactNotes?el(ToolTip,{title:"",content:el('i',{className:"fal fa-2x fa-file-alt color-gray2 "})} ):null
+    );
+  };
+  handleContactChange = (id) => {
+    const { data, contacts } = this.state;
+    const currentContact = contacts.find((c) => c.id == id);
+    data.contactID = id;
+    this.setState({ data, currentContact });
   };
   getContactPhone = () => {
     const { data } = this.state;
@@ -743,11 +849,11 @@ class CMPActivityEdit extends React.Component {
         )
       );
     if (data?.contactPhone) {
-      elements.push(el("label", { key: "contactMobilePhonelabel" }, " DDI: "));
+      elements.push(el("label", { key: "contactPhonelabel" }, " DDI: "));
       elements.push(
         el(
           "a",
-          { key: "contactMobilePhone", href: `tel:${data.contactPhone}` },
+          { key: "contactPhone", href: `tel:${data.contactPhone}` },
           data.contactPhone
         )
       );
@@ -794,7 +900,7 @@ class CMPActivityEdit extends React.Component {
   getSites = () => {
     const { el } = this;
     const { data, sites } = this.state;
-    
+
     return el(
       "select",
       {
@@ -802,8 +908,9 @@ class CMPActivityEdit extends React.Component {
         required: true,
         value: data?.siteNo,
         onChange: (event) => this.setValue("siteNo", event.target.value),
+        style: { width: "100%" },
       },
-      el("option", { key: "empty", value: '-1' }, "Please select"),
+      el("option", { key: "empty", value: "-1" }, "Please select"),
       sites?.map((t) => el("option", { key: t.id, value: t.id }, t.title))
     );
   };
@@ -820,24 +927,28 @@ class CMPActivityEdit extends React.Component {
           alignItems: "center",
         },
       },
-      el(Timer, {
+      data.callActivityID?el(Timer, {
         key: "startTime",
         disabled: data?.isInitalDisabled,
         value: data?.startTime,
         onChange: (value) => this.setValue("startTime", value),
-      }),
-      el("label", { className: "m-2",style: {  color: "#992211", whiteSpace: "nowrap" } }, "To"),
-      el(Timer, {
+      }):null,
+      el(
+        "label",
+        { className: "m-2", style: { color: "#992211", whiteSpace: "nowrap" } },
+        "To"
+      ),
+      data.callActivityID?el(Timer, {
         key: "endTime",
         disabled: data?.isInitalDisabled,
         value: data?.endTime,
         onChange: (value) => this.setValue("endTime", value),
-      })
+      }):null
     );
   };
   getPriority = () => {
     const { el } = this;
-    const { data, priorities } = this.state;    
+    const { data, priorities } = this.state;
     return el(
       "select",
       {
@@ -846,6 +957,7 @@ class CMPActivityEdit extends React.Component {
         required: true,
         value: data?.priority,
         onChange: (event) => this.setValue("priority", event.target.value),
+        style:{width:"100%"}
       },
       el("option", { key: "empty", value: null }, "Please select"),
       priorities?.map((t) => el("option", { key: t.id, value: t.name }, t.name))
@@ -854,7 +966,7 @@ class CMPActivityEdit extends React.Component {
   getUsersElement = () => {
     const { el } = this;
     const { data, users } = this.state;
-    
+
     return el(
       "select",
       {
@@ -862,6 +974,7 @@ class CMPActivityEdit extends React.Component {
         required: true,
         value: data?.userID,
         onChange: (event) => this.setValue("userID", event.target.value),
+        style:{width:"100%"}
       },
       el("option", { key: "empty", value: null }, "Please select"),
       users?.map((t) => el("option", { key: t.id, value: t.id }, t.name))
@@ -870,7 +983,7 @@ class CMPActivityEdit extends React.Component {
   getContracts = () => {
     const { el } = this;
     const { data, contracts } = this.state;
-    
+
     return el(
       "select",
       {
@@ -879,6 +992,7 @@ class CMPActivityEdit extends React.Component {
         disabled: !data?.changeSRContractsFlag,
         value: data?.contractCustomerItemId || "",
         onChange: (event) => this.setValue("userID", event.target.value),
+        style:{width:"100%"}
       },
       el("option", { key: "empty", value: 99 }, "Please select"),
       el("option", { key: "tandm", value: "" }, "T&M"),
@@ -904,7 +1018,7 @@ class CMPActivityEdit extends React.Component {
   getRootCause = () => {
     const { el } = this;
     const { data, rootCauses } = this.state;
-    
+
     return el(
       "select",
       {
@@ -912,8 +1026,9 @@ class CMPActivityEdit extends React.Component {
         disabled: !data.canChangePriorityFlag,
         style: { maxWidth: 200 },
         required: true,
-        value: data?.rootCauseId||"",
+        value: data?.rootCauseId || "",
         onChange: (event) => this.setValue("rootCauseId", event.target.value),
+        style:{width:"100%"}
       },
       el("option", { key: "empty", value: "" }, "Not known"),
       rootCauses?.map((t) =>
@@ -934,50 +1049,41 @@ class CMPActivityEdit extends React.Component {
         el(
           "tr",
           null,
-          // this.getElement(
-          //   "ID",
-          //   "ID",
-          //   data?.problemID + "_" + data?.callActivityID
-          // ),
-          this.getTypeElement(),
-          data?.authorisedBy?this.getElement("Authorisedby", "Authorised by ", data?.authorisedBy):null,
-          
+          this.getElementControl("Site", "Site", this.getSites()),
+          data?.authorisedBy
+            ? this.getElement(
+                "Authorisedby",
+                "Authorised by ",
+                data?.authorisedBy
+              )
+            :  this.getElement("emp1"),
+            this.getTypeElement(),
         ),
         el(
           "tr",
           null,
-          this.getElementControl(
-            "Value",
-            "Value",
-            el("input", {
-              required: true,
-              min: 0,
-              type: "number",
-              value: data?.curValue,
-              onChange: (event) =>
-                this.setValue("curValue", event.target.value),
-            })
+          this.getElementControl("Contact", "Contact", 
+          this.getContactsElement(),
+            // ...this.getContactPhone(),
           ),
-          this.getElement("emp1"),
-          this.getElement("Customer", "Customer", data?.customerName),
-         
-          
-        ),
-        el(
-          "tr",
-          null,
-          this.getElementControl("Contact", "Contact", [
-            this.getContactsElement(),
-            ...this.getContactPhone(),
-          ]),
-          this.getElementControl(
-            "remaining",
-            "",
-            el(
-              "h2",
-              { style: { color: "red" } },
-              `HD:${data?.hdRemainMinutes} ES:${data?.esRemainMinutes} SP:${data?.imRemainMinutes} P:${data?.projectRemainMinutes}`
-            )
+          el(
+            "td",
+            { style:{textAlign:"right"}  },
+            el("label", { className: "label" }, "Hide From Customer"),            
+          ),
+          el(
+            "td",
+            { key:"td2"  },
+      
+            el(Toggle, {
+              disabled:(data?.hideFromCustomerFlag == "Y" ||data?.problemHideFromCustomerFlag == "Y"),
+              checked: data?.hideFromCustomerFlag == "Y" ? true : false,
+              onChange: (value) =>
+                this.setValue(
+                  "hideFromCustomerFlag",
+                  data?.hideFromCustomerFlag == "Y" ? "N" : "Y"
+                ),
+            }),
           ),
           this.getElementControl(
             "Date",
@@ -987,44 +1093,33 @@ class CMPActivityEdit extends React.Component {
               disabled: data?.isInitalDisabled,
               value: data?.date,
               onChange: (event) => this.setValue("date", event.target.value),
+              style:{width:"95%"}
             })
-          )
-        ),
-        el(
-          "tr",
-          null,
-          this.getElementControl("Site", "Site", this.getSites()),
-          this.getElement("emp2"),
-          this.getElementControl("Timefrom", "Time from", this.getTimeElement())
+          ),          
         ),
         el(
           "tr",
           null,
           this.getElementControl("Priority", "Priority", this.getPriority()),
-          this.getElement("emp3"),
-          this.getElementControl("User", "User", this.getUsersElement())
+          el(
+            "td",{style:{textAlign:"right"}},
+            el("label", { className: "label" }, "Submit as Overtime"),             
+          ),
+          el(
+            "td",null,
+             el(Toggle, {
+              checked: data?.submitAsOvertime==0?false:true,
+              onChange: (value) =>
+                this.setValue("submitAsOvertime", !data?.submitAsOvertime),
+            })
+          ),
+          this.getElementControl("Timefrom", "Time from", this.getTimeElement()),
+         
         ),
         el(
           "tr",
           null,
           this.getElementControl("Contract", "Contract", this.getContracts()),
-          this.getElement("emp3"),
-          this.getElementControl("RootCause", "Root Cause", this.getRootCause())
-        ),
-        el(
-          "tr",
-          null,
-          this.getElementControl(
-            "ContactNotes",
-            "Contact Notes",
-            el("input", {
-              style: { width: "98%" },
-              value: data?.contactNotes ,
-              onChange: (event) =>
-                this.setValue("contactNotes", event.target.value),
-            })
-          ),
-          this.getElement("emp3"),
           this.getElementControl(
             "CompletedOn",
             "Completed On",
@@ -1032,50 +1127,35 @@ class CMPActivityEdit extends React.Component {
               disabled: data?.problemStatus != "F",
               title: "Date when this request should be set to completed",
               type: "date",
-              value: data?.completeDate||"",
+              value: data?.completeDate || "",
+              style:{width:"100%"},
               onChange: (event) =>
                 this.setValue("completeDate", event.target.value),
+
             })
-          )
+          ),
+          this.getElementControl("User", "User", this.getUsersElement()),          
         ),
         el(
           "tr",
           null,
+          this.getElementControl("RootCause", "Root Cause", this.getRootCause()),          
           this.getElementControl(
-            "CustomerNotes",
-            "Customer Notes",
+            "Top-UpValue",
+            "Top-Up Value",
             el("input", {
-              style: { width: "98%" },
-              value: data?.techNotes || "",
+              required: true,
+              min: 0,
+              type: "number",
+              value: data?.curValue,
+              style:{width:"100%"},
               onChange: (event) =>
-                this.setValue("techNotes", event.target.value),
+                this.setValue("curValue", event.target.value),
             })
-          ),
-          this.getElement("emp3"),
-          el(
-            "td",
-            { colSpan: 2 },
-            el("label", { className: "label" }, "Hide From Customer"),
-            el(Toggle, {
-              disabled:
-                data?.hideFromCustomerFlag == "Y" ||
-                data?.problemHideFromCustomerFlag == "Y",
-              value: data?.hideFromCustomerFlag == "Y" ? true : false,
-              onChange: (value) =>
-                this.setValue(
-                  "hideFromCustomerFlag",
-                  data?.hideFromCustomerFlag == "Y" ? "N" : "Y"
-                ),
-            }),
-
-            el("label", { className: "label" }, "Submit as Overtime"),
-            el(Toggle, {
-              value: data?.submitAsOvertime,
-              onChange: (value) =>
-                this.setValue("submitAsOvertime", !data?.submitAsOvertime),
-            })
-          )
-        )
+          ),       
+         
+         
+        ),        
       )
     );
   };
@@ -1205,8 +1285,10 @@ class CMPActivityEdit extends React.Component {
     } else {
       templateDefault = "";
     }
-    setTimeout(()=> this.setState({ templateDefault, templateOptionId, templateValue }),200)  
-    
+    setTimeout(
+      () => this.setState({ templateDefault, templateOptionId, templateValue }),
+      200
+    );
   };
   handleTemplateValueChange = (value) => {
     this.setState({ templateValue: value });
@@ -1256,7 +1338,7 @@ class CMPActivityEdit extends React.Component {
       templateType,
     } = this.state;
     const { el } = this;
-    
+
     return el(Modal, {
       width: 900,
       key: templateType,
@@ -1276,12 +1358,14 @@ class CMPActivityEdit extends React.Component {
               )
             )
           : null,
-          this.state._activityLoaded? el(CKEditor, {
-          key: "salesRequestEditor",
-          id: "salesRequest",
-          value: templateDefault,
-          onChange: this.handleTemplateValueChange,
-        }):null
+        this.state._activityLoaded
+          ? el(CKEditor, {
+              key: "salesRequestEditor",
+              id: "salesRequest",
+              value: templateDefault,
+              onChange: this.handleTemplateValueChange,
+            })
+          : null
       ),
       footer: el(
         "div",
@@ -1320,42 +1404,152 @@ class CMPActivityEdit extends React.Component {
       _showModal: true,
       templateType: type,
       templateTitle,
-      templateDefault:''
+      templateDefault: "",
     });
   };
-  getActivityNotes()
-  {
-       const {el}=this;
-      const {data}=this.state;
-      return  el(
-                "div",{ className: "activities-edit-contianer" },
-                el("label",{className:"label m-5",style:{display:"block"}},"Activity Notes"),
-                this.state._activityLoaded?el(CKEditor,{id:"reason",value:data?.reason,onChange:(value)=>this.setValue("reasonTemplate",value)}):null
-                )
+  getActivityNotes() {
+    const { el } = this;
+    const { data } = this.state;
+    return el(
+      "div",
+      { className: "activities-edit-contianer" },
+      el(
+        "label",
+        { className: "label m-5", style: { display: "block" } },
+        "Activity Notes"
+      ),
+      this.state._activityLoaded
+        ? el(CKEditor, {
+            id: "reason",
+            value: data?.reason,
+            onChange: (value) => this.setValue("reasonTemplate", value),
+          })
+        : null
+    );
   }
-  getActivityInternalNotes()
-  {
-       const {el}=this;
-      const {data}=this.state;
-      return  el(
-                "div",{ className: "activities-edit-contianer" },
-                el("label",{className:"label m-5",style:{display:"block"}},"Internal Notes"),
-                this.state._activityLoaded?el(CKEditor,{id:"internal",value:data?.internalNotes,onChange:(value)=>this.setValue("internalNotesTemplate",value)}):null
-                )   
+  getActivityInternalNotes() {
+    const { el } = this;
+    const { data } = this.state;
+    return el(
+      "div",
+      { className: "activities-edit-contianer" },
+      el(
+        "label",
+        { className: "label m-5", style: { display: "block" } },
+        "Internal Notes"
+      ),
+      this.state._activityLoaded
+        ? el(CKEditor, {
+            id: "internal",
+            value: data?.internalNotes,
+            onChange: (value) => this.setValue("internalNotesTemplate", value),
+          })
+        : null
+    );
+  }
+  getTimeBudgetElement=()=>{
+    const {data,currentUser}=this.state;
+    //console.log(currentUser);
+    
+    switch(currentUser?.teamID)
+    {
+      case TeamType.Helpdesk:
+        return this.el("h2",{style: { color: "red" }},`HD:${data?.hdRemainMinutes}`);
+        break;
+        case TeamType.Escalations:
+        return this.el("h2",{style: { color: "red" }},`ES:${data?.esRemainMinutes}`);
+        break;
+        case TeamType.Small_Projects:
+        return this.el("h2",{style: { color: "red" }},`SP:${data?.imRemainMinutes}`);
+        break;
+        case TeamType.Projects:
+        return this.el("h2",{style: { color: "red" }},`P:${data?.projectRemainMinutes}`);
+        break;
+        default:
+          return null;
+    }
+   
+  }
+  getTimeBudget=()=>{
+    const {data,currentUser}=this.state;
+    //console.log(currentUser);    
+    switch(currentUser?.teamID)
+    {
+      case TeamType.Helpdesk:
+        return data?.hdRemainMinutes;
+        break;
+        case TeamType.Escalations:
+        return data?.esRemainMinutes;
+        break;
+        case TeamType.Small_Projects:
+        return data?.imRemainMinutes;
+        break;
+        case TeamType.Projects:
+        return data?.projectRemainMinutes;
+        break;
+        default:
+          return 0;
+    }   
+  }
+  checkContactNotesAlert=()=>{
+    const {data,currentUser}=this.state;
+    const key="contactNotesAlert";
+    // get from local storage
+    let obj=localStorage.getItem(key);
+    let userObj={userID:currentUser.id,contactID:data.contactID,notes:data.contactNotes};
+    //console.log(userObj,obj);
+    let alertObject;
+    const today=moment().format("YYYY-MM-DD");
+    if(!obj)
+    {
+      alert(data.contactNotes);
+        alertObject={
+        date:today,
+        items:[
+          userObj
+        ]
+      }
+    }
+    else
+    {
+      alertObject=JSON.parse(obj);
+      if(alertObject.date!=today)// clear if not today
+      {
+        alertObject={
+          date:today,
+          items:[
+            userObj
+          ]
+        }
+      }
+      else{
+        //check if he seen this notes today;
+       const found= alertObject.items.find(i=>i.userID==currentUser.id
+          &&i.contactID==data.contactID
+          &&i.notes==data.contactNotes);
+        if(!found)
+        {
+          alertObject.items.push(userObj);          
+          alert(userObj.notes);
+        }
+      }
+    }
+    localStorage.setItem(key,JSON.stringify(alertObject));  
   }
   render() {
     const { el } = this;
     return el(
-      "div",null,
+      "div",
+      null,
       this.getProjectsElement(),
       this.getHeader(),
-      this.getActions(),
-      this.getActionsButtons(),
-      this.getContentElement(),
-      this.getActivityNotes(),
-      this.getActivityInternalNotes(),
-      this.getDocumentsElement(),      
-      this.getTemplateModal()
+       el("div", { className: "activities-edit-contianer" }, this.getActions()),
+       el("div",{ className: "activities-edit-contianer" },this.getActionsButtons()),
+       this.getContentElement(),
+       this.getActivityNotes(),
+       this.getActivityInternalNotes(),
+       this.getDocumentsElement(),
+       this.getTemplateModal()
     );
   }
 }

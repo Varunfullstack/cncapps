@@ -1,6 +1,6 @@
 <?php
 require_once("config.inc.php");
-require_once($cfg["path_ct"]."/CTActivityNew.inc.php");
+require_once($cfg["path_ct"]."/CTSRActivity.inc.php");
 session_start();
 page_open(
 	array(
@@ -12,7 +12,7 @@ page_open(
 );
 GLOBAL $cfg;
 header("Cache-control: private");
-$ctActivity= new CTActivityNew(
+$ctActivity= new CTSRActivity(
 	$_SERVER['REQUEST_METHOD'],
 	$_POST,
 	$_GET,

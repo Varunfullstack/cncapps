@@ -670,8 +670,8 @@ class Controller extends BaseObject
 
     function setPageTitle($pageTitle, string $pageHeader = null)
     {
-        $this->pageTitle = $pageTitle;
-        $this->pageHeader = $pageTitle;
+        $this->pageTitle    = explode('<',$pageTitle)[0];
+        $this->pageHeader   = $pageTitle;
         if ($pageHeader) {
             $this->pageHeader = $pageHeader;
         }
@@ -961,7 +961,7 @@ class Controller extends BaseObject
     {
         // Truncate if it will become longer than max allowed
         $totalNewLength = strlen($this->pageTitle) + strlen($newString) + 2;
-
+         
         if ($totalNewLength > MAX_PAGE_TITLE) {
             $this->pageTitle =
                 substr(

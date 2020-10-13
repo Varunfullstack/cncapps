@@ -18,7 +18,7 @@
     cursor: pointer;
 }
 .activities-contianer{
-    width:960px;
+    width:1000px;
     margin-top:5px;
     border:1px solid #bdbec1;
     border-radius: 5px;
@@ -40,3 +40,17 @@
     color: #992211;
     white-space: nowrap;
 }
+.display-label{
+   text-align:right;
+   color: #992211;
+   white-space: nowrap;
+}
+.display-content{
+    text-align:left;        
+    white-space: nowrap;
+ }
+ .formErrorMessage{
+     font-size: 12px !important;
+     font-weight: bold !important;
+
+ }

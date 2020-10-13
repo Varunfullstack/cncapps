@@ -1,6 +1,8 @@
+//import ToolTip from "../ToolTip.js?v=1";
+
 class TableHeader extends React.Component {
   el = React.createElement;
-  raiseSort = (path) => {    
+  raiseSort = (path) => {
     const sortColumn = { ...this.props.sortColumn };
     if (this.props.sortColumn != null && sortColumn.path === path)
       sortColumn.order = sortColumn.order === "asc" ? "desc" : "asc";
@@ -13,7 +15,7 @@ class TableHeader extends React.Component {
   renderSortIcon = (column) => {
     let key = "fa-sort";
     let className = "fa fa-sort";
-    let style={color:'gray'};
+    let style = { color: "gray" };
 
     if (this.props.sortColumn != null) {
       if (
@@ -22,7 +24,7 @@ class TableHeader extends React.Component {
       )
         return null;
       if (column.path === this.props.sortColumn.path) {
-        style=null;
+        style = null;
         if (this.props.sortColumn.order === "asc") {
           key = "fa-sort-asc";
           className = "fa fa-sort-asc";
@@ -32,7 +34,8 @@ class TableHeader extends React.Component {
         }
       }
     }
-    if (column.sortable === true) return this.el("i", { key, className ,style});
+    if (column.sortable === true)
+      return this.el("i", { key, className, style });
     return null;
   };
   render() {
@@ -48,20 +51,30 @@ class TableHeader extends React.Component {
           el(
             "th",
             {
-              className: (c?.hdClassName||' ')+" clickable ",
-              key: c.key||c.path||c.label.replace(' ',''),
+              className: (c?.hdClassName || " ") + " clickable ",
+              key: c.key || c.path || c.label.replace(" ", ""),
               onClick: () => raiseSort(c.path),
-              width:c.width?c.width:'',
+              width: c.width ? c.width : "",
               //title:c.toolTip?c.toolTip:""
             },
             el('div',{className:"tooltip"},
-                c?.label||" ",            
+                c?.label||" ",
                 c.icon?el('i',{className:  c.icon}):null,
                 renderSortIcon(c),
                 c.hdToolTip?el('div',{className:"tooltiptext tooltip-bottom"},
                 c.hdToolTip?c.hdToolTip:""
                 ):null
             )
+            // el(ToolTip, {
+            //   title: c.hdToolTip,
+            //   content: el(
+            //     "div",
+            //     null,
+            //     c?.label || " ",
+            //     c.icon ? el("i", { className: c.icon }) : null,
+            //     renderSortIcon(c)
+            //   ),
+            // })
           )
         )
       )

@@ -3,7 +3,7 @@ import ApiUrls from "./ApiUrls.js";
 
 class APIActivity extends APIMain{
     getCallActivityDetails(callActivityID,filters) {
-        return fetch(`${ApiUrls.ActivityNew}getCallActivity&callActivityID=${callActivityID}&includeTravel=${filters.showTravel}&includeOperationalTasks=${filters.showOperationalTasks}&includeServerGuardUpdates=${filters.showServerGaurdUpdates}`).then(res => res.json());
+        return fetch(`${ApiUrls.SRActivity}getCallActivity&callActivityID=${callActivityID}&includeTravel=${filters.showTravel}&includeOperationalTasks=${filters.showOperationalTasks}&includeServerGuardUpdates=${filters.showServerGaurdUpdates}`).then(res => res.json());
     } 
     unlinkSalesOrder(linkedOrdheadId)
     {
@@ -33,7 +33,7 @@ class APIActivity extends APIMain{
     }
     sendPartsUsed(data)
     {
-        return this.post(`${ApiUrls.ActivityNew}messageToSales`,data).then(res => res.json());
+        return this.post(`${ApiUrls.SRActivity}messageToSales`,data).then(res => res.json());
 
     }
     getSalesRequestOptions=()=>{
@@ -56,15 +56,15 @@ class APIActivity extends APIMain{
     }
     updateActivity(activity)
     {
-        let url=`${ApiUrls.ActivityNew}updateActivity`;        
+        let url=`${ApiUrls.SRActivity}updateActivity`;        
         return this.post(url,activity).then(res => res.json());
     }
     getCallActTypes(){
-        return fetch(`${ApiUrls.ActivityNew}getCallActTypes`).then(res => res.json());
+        return fetch(`${ApiUrls.SRActivity}getCallActTypes`).then(res => res.json());
     }      
     getPriorities()
     {
-        return fetch(`${ApiUrls.ActivityNew}getPriorities`).then(res => res.json());
+        return fetch(`${ApiUrls.SRActivity}getPriorities`).then(res => res.json());
     }
     activityRequestAdditionalTime(callActivityID,reason)
     {
@@ -73,19 +73,19 @@ class APIActivity extends APIMain{
     }
     getAllUsers()
     {
-        return fetch(`${ApiUrls.ActivityNew}getAllUsers`).then(res => res.json());
+        return fetch(`${ApiUrls.SRActivity}getAllUsers`).then(res => res.json());
     }
     getCustomerContracts(customerId,contractCustomerItemId,linkedToSalesOrder)
     {
-        return fetch(`${ApiUrls.ActivityNew}getCustomerContracts&customerId=${customerId}&contractCustomerItemId=${contractCustomerItemId}&linkedToSalesOrder=${linkedToSalesOrder}`).then(res => res.json());
+        return fetch(`${ApiUrls.SRActivity}getCustomerContracts&customerId=${customerId}&contractCustomerItemId=${contractCustomerItemId}&linkedToSalesOrder=${linkedToSalesOrder}`).then(res => res.json());
     }
     getRootCauses()
     {
-        return fetch(`${ApiUrls.ActivityNew}getRootCauses`).then(res => res.json());
+        return fetch(`${ApiUrls.SRActivity}getRootCauses`).then(res => res.json());
     }
     createProblem(data)
     {
-        return this.post(`${ApiUrls.ActivityNew}createProblem`,data).then(res => res.json());
+        return this.post(`${ApiUrls.SRActivity}createProblem`,data).then(res => res.json());
     }
 }
 export default APIActivity;

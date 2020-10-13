@@ -1,6 +1,7 @@
 .tooltip {
     position: relative;
-    display: inline-block;
+    display: flex;
+    justify-content: center;
     /* border-bottom: 1px dotted #ccc; */
     width: 100%;
      
@@ -19,6 +20,7 @@
     z-index: 10000000;
     opacity: 0;
     transition: opacity 0.3s;
+    margin-top: 5px;
 }
 
 .tooltip:hover .tooltiptext {
@@ -45,7 +47,7 @@
 .tooltip-bottom {
   top: 100%;
   /* left: 50%;   */
-  margin-left: -150%;
+  /* margin-left: -150%; */  
 }
 
 .tooltip-bottom::after {
