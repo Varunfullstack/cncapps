@@ -2,6 +2,8 @@
 This project changes will be shown here.
 
 ## [unreleased]
+### Added
+- Issue 1035 - Customer Call Out Process Improvements
 ### Fixed
 - Quote PDF Signature Placement
 

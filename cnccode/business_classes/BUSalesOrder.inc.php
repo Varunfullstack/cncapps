@@ -364,7 +364,7 @@ class BUSalesOrder extends Business
             $dsOrdhead,
             $dsOrdline,
             $dsCustomer,
-            'I',
+            DBEOrdhead::INITIAL_TYPE,
             $directDebit,
             $transactionType
         );

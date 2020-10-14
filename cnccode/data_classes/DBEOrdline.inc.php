@@ -10,6 +10,9 @@ class DBEOrdline extends DBEntity
 {
     use \CNCLTD\SortableWithQueryDBE;
 
+    const LINE_TYPE_ITEM = 'I';
+    const LINE_TYPE_COMMENT = 'C';
+
     const id = "id";
     const lineType = "lineType";
     const ordheadID = "ordheadID";

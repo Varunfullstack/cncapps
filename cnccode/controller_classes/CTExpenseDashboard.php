@@ -16,6 +16,8 @@ require_once($cfg ["path_dbe"] . "/DBEJCallActivity.php");
 
 class CTExpenseDashboard extends CTCNC
 {
+    const CALL_OUT_EXPENSE_TYPE_ID = 11;
+
     function __construct($requestMethod,
                          $postVars,
                          $getVars,
@@ -286,8 +288,9 @@ WHERE
                     exit;
                 }
                 $expenseId = @$_REQUEST['id'];
+                $notChargeableCallOutReason = @$_REQUEST['notChargeableCallOutReason'];
                 try {
-                    $this->processExpense($expenseId);
+                    $this->processExpense($expenseId, false, null, $notChargeableCallOutReason);
                     $response = ["status" => 'ok'];
                 } catch (Exception $exception) {
                     http_response_code(400);
@@ -303,7 +306,7 @@ WHERE
                 $expenseId = @$_REQUEST['id'];
                 $denyReason = @$_REQUEST['denyReason'];
                 try {
-                    $this->processExpense($expenseId, true, $denyReason);
+                    $this->processExpense($expenseId, true, $denyReason, null);
                     $response = ["status" => 'ok'];
                 } catch (Exception $exception) {
                     http_response_code(400);
@@ -800,9 +803,10 @@ WHERE
      * @param $id
      * @param bool $deny
      * @param null $denyReason
+     * @param null $notChargeableCallOutReason
      * @throws Exception
      */
-    function processExpense($id, $deny = false, $denyReason = null)
+    function processExpense($id, $deny = false, $denyReason = null, $notChargeableCallOutReason = null)
     {
         $dbeExpense = $this->checkProcessExpense($id);
         if ($deny) {
@@ -814,6 +818,10 @@ WHERE
         } else {
             $dbeExpense->setValue(DBEExpense::approvedBy, $this->userID);
             $dbeExpense->setValue(DBEExpense::approvedDate, (new DateTime())->format(DATE_MYSQL_DATETIME));
+            if ($dbeExpense->getValue(DBEExpense::expenseTypeID) === self::CALL_OUT_EXPENSE_TYPE_ID) {
+                $this->processCallOutExpense($dbeExpense, $notChargeableCallOutReason);
+
+            }
         }
         $dbeExpense->updateRow();
     }
@@ -918,6 +926,268 @@ WHERE
             $body
         );
 
+    }
+
+    function processCallOutExpense(DBEExpense $dbeExpense, $notChargeableCallOutReason = null)
+    {
+        $activityId = $dbeExpense->getValue(DBEExpense::callActivityID);
+        $buActivity = new BUActivity($this);
+        $dsActivity = new DataSet($this);
+        $buActivity->getActivityByID($activityId, $dsActivity);
+        $serviceRequestId = $dsActivity->getValue(DBEJCallActivity::problemID);
+        $dbeProblem = new DBEJProblem($this);
+        $dbeProblem->getRow($serviceRequestId);
+        $dbeCustomer = new DBECustomer($this);
+        $customerId = $dbeProblem->getValue(DBEProblem::customerID);
+        $dbeCustomer->getRow($customerId);
+
+        $salesOrderId = $this->createCallOutSalesOrderHeader($dbeCustomer);
+        $toUpdateProblem = new DBEProblem($this);
+        $toUpdateProblem->getRow($serviceRequestId);
+        $toUpdateProblem->setValue(DBEProblem::linkedSalesOrderID, $salesOrderId);
+        $toUpdateProblem->updateRow();
+
+        $this->createCallOutOutOfHoursCommentInSalesOrder(
+            $salesOrderId,
+            $customerId,
+            $dsActivity->getValue(DBEJCallActivity::date)
+        );
+        $freebie = (bool)$notChargeableCallOutReason;
+
+        if (!$notChargeableCallOutReason) {
+            $notChargeableCallOutReason = $this->getNotChargeableCallOutReason($customerId, $dbeCustomer, $dsActivity);
+        }
+
+        if ($notChargeableCallOutReason) {
+            $this->createNotChargeableCallOutReasonCommentInSalesOrder(
+                $salesOrderId,
+                $notChargeableCallOutReason,
+                $customerId
+            );
+        }
+
+        $this->createCallOutServiceRequestCommentInSalesOrder($salesOrderId, $serviceRequestId, $customerId);
+
+        $amount = $notChargeableCallOutReason ? 0 : 150;
+        $this->createCallOutItemInSalesOrder(
+            $salesOrderId,
+            $dsActivity->getValue(DBEJCallActivity::userName),
+            $amount,
+            $customerId
+        );
+        \CNCLTD\CustomerCallOutsDB::recordCallOut($customerId, !$notChargeableCallOutReason, $salesOrderId, $freebie);
+    }
+
+    private function createCallOutSalesOrderHeader(DBECustomer $dsCustomer)
+    {
+        $dsOrdhead = new DataSet($this);
+        $dbeOrdline = new DataSet($this);
+        // create sales order header with correct field values
+        $buSalesOrder = new BUSalesOrder($this);
+
+        $buSalesOrder->initialiseOrder(
+            $dsOrdhead,
+            $dbeOrdline,
+            $dsCustomer
+        );
+        $dsOrdhead->setUpdateModeUpdate();
+        $dsOrdhead->setValue(
+            DBEOrdhead::custPORef,
+            null
+        );
+        $dsOrdhead->setValue(
+            DBEOrdhead::addItem,
+            'N'
+        );
+        $dsOrdhead->setValue(
+            DBEOrdhead::partInvoice,
+            'N'
+        );
+        $dsOrdhead->setValue(
+            DBEOrdhead::paymentTermsID,
+            CONFIG_PAYMENT_TERMS_30_DAYS
+        );
+        $dsOrdhead->post();
+        $buSalesOrder->updateHeader(
+            $dsOrdhead->getValue(DBEOrdhead::ordheadID),
+            $dsOrdhead->getValue(DBEOrdhead::custPORef),
+            $dsOrdhead->getValue(DBEOrdhead::paymentTermsID),
+            $dsOrdhead->getValue(DBEOrdhead::partInvoice),
+            $dsOrdhead->getValue(DBEOrdhead::addItem)
+        );
+        return $dsOrdhead->getValue(DBEOrdhead::ordheadID);
+    }
+
+    private function createCallOutOutOfHoursCommentInSalesOrder(int $salesOrderId,
+                                                                int $customerId,
+                                                                $activityDate
+    )
+    {
+        $date = DateTime::createFromFormat(DATE_MYSQL_DATE, $activityDate);
+        $this->createCommentLineInSalesOrder(
+            $salesOrderId,
+            "Out of Hours Call {$date->format('d/m/Y')}",
+            $customerId
+        );
+    }
+
+    private function createCommentLineInSalesOrder(int $salesOrderId, $comment, $customerId)
+    {
+        $dbeOrdline = new DBEOrdline($this);
+        $dbeOrdline->setValue(
+            DBEJOrdline::ordheadID,
+            $salesOrderId
+        );
+        $dbeOrdline->setValue(
+            DBEJOrdline::sequenceNo,
+            null
+        );
+        $dbeOrdline->setValue(
+            DBEJOrdline::customerID,
+            $customerId
+        );
+        $dbeOrdline->setValue(
+            DBEJOrdline::lineType,
+            DBEOrdline::LINE_TYPE_COMMENT
+        );
+
+        $dbeOrdline->setValue(
+            DBEOrdline::description,
+            $comment
+        );
+        $dbeOrdline->insertRow();
+    }
+
+    /**
+     * @param int|null $customerId
+     * @param DBECustomer $dbeCustomer
+     * @param DataSet $dsActivity
+     */
+    public function getNotChargeableCallOutReason(?int $customerId,
+                                                  DBECustomer $dbeCustomer,
+                                                  DataSet $dsActivity
+    ): ?string
+    {
+        $currentMonthOutOfHoursUsedCallOuts = \CNCLTD\CustomerCallOutsDB::getCustomerOutOfHoursUsedCallOutsForCurrentMonth(
+            $customerId
+        );
+
+        $BUCustomerItem = new BUCustomerItem($this);
+        $customerHasServiceDeskContract = $BUCustomerItem->customerHasServiceDeskContract($customerId);
+        $includedMonthlyOOHCallOuts = $dbeCustomer->getValue(DBECustomer::inclusiveOOHCallOuts);
+        $totalCallOutsIncludingThisOne = $currentMonthOutOfHoursUsedCallOuts + 1;
+        $isThereEnoughMonthlyOutOfHoursCallOutAllowance = $totalCallOutsIncludingThisOne <= $includedMonthlyOOHCallOuts;
+        $isActivityWithinWorkingHours = $this->isActivityWithinWorkingHours($dsActivity);
+        if (($customerHasServiceDeskContract && $isActivityWithinWorkingHours) || $isThereEnoughMonthlyOutOfHoursCallOutAllowance) {
+            return "Included within monthly allowance {$totalCallOutsIncludingThisOne} of {$includedMonthlyOOHCallOuts}";
+        }
+
+        return null;
+    }
+
+    /**
+     * @param DataSet $dsActivity
+     * @return bool
+     */
+    private function isActivityWithinWorkingHours(DataSet $dsActivity)
+    {
+        $startTime = $dsActivity->getValue(DBECallActivity::startTime);
+        $starDate = $dsActivity->getValue(DBECallActivity::date);
+        $startDateTime = DateTime::createFromFormat(
+            DATE_MYSQL_DATE,
+            "{$starDate}"
+        );
+        $dayOfTheWeek = $startDateTime->format('N');
+        if ($dayOfTheWeek > 5) {
+            return false;
+        }
+        if ($startTime < '07:30' || $startTime >= '20:00') {
+            return false;
+        }
+        return true;
+    }
+
+    private function createNotChargeableCallOutReasonCommentInSalesOrder(?int $salesOrderId,
+                                                                         string $notChargeableCallOutReason,
+                                                                         int $customerId
+    )
+    {
+        $this->createCommentLineInSalesOrder($salesOrderId, $notChargeableCallOutReason, $customerId);
+    }
+
+    private function createCallOutServiceRequestCommentInSalesOrder(int $salesOrderId,
+                                                                    int $serviceRequestId,
+                                                                    int $customerId
+    )
+    {
+        $this->createCommentLineInSalesOrder($salesOrderId, "Service Request $serviceRequestId", $customerId);
+    }
+
+    private function createCallOutItemInSalesOrder(int $salesOrderId, ?string $userName, int $amount, int $customerId)
+    {
+        // create order line
+        $dbeOrdline = new DBEOrdline($this);
+        $dbeOrdline->setValue(
+            DBEJOrdline::ordheadID,
+            $salesOrderId
+        );
+        $dbeOrdline->setValue(
+            DBEJOrdline::sequenceNo,
+            null
+        );
+        $dbeOrdline->setValue(
+            DBEJOrdline::customerID,
+            $customerId
+        );
+        $dbeOrdline->setValue(
+            DBEJOrdline::qtyDespatched,
+            0
+        );
+        $dbeOrdline->setValue(
+            DBEJOrdline::qtyLastDespatched,
+            0
+        );
+        $dbeOrdline->setValue(
+            DBEJOrdline::supplierID,
+            CONFIG_SALES_STOCK_SUPPLIERID
+        );
+        $dbeOrdline->setValue(
+            DBEJOrdline::lineType,
+            DBEOrdline::LINE_TYPE_ITEM
+        );
+        $dbeOrdline->setValue(
+            DBEJOrdline::stockcat,
+            'G'
+        );
+        $dbeOrdline->setValue(
+            DBEJOrdline::itemID,
+            CONFIG_CONSULTANCY_OUT_OF_HOURS_LABOUR_ITEMID
+        );
+        $dbeOrdline->setValue(
+            DBEJOrdline::qtyOrdered,
+            1
+        );
+        $dbeOrdline->setValue(
+            DBEJOrdline::curUnitCost,
+            0
+        );
+        $dbeOrdline->setValue(
+            DBEJOrdline::curTotalCost,
+            0
+        );
+        $dbeOrdline->setValue(
+            DBEJOrdline::curUnitSale,
+            $amount
+        );
+        $dbeOrdline->setValue(
+            DBEJOrdline::curTotalSale,
+            $amount
+        );
+        $dbeOrdline->setValue(
+            DBEJOrdline::description,
+            "$userName - Consultancy"
+        );
+        $dbeOrdline->insertRow();
     }
 
     /**

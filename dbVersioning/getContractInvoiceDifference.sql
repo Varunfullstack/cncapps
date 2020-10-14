@@ -13,9 +13,9 @@ BEGIN
     FROM
         custitem
     WHERE custitem.`cui_cuino` = contractId;
-    RETURN cast(PERIOD_DIFF(
+    RETURN PERIOD_DIFF(
             formattedExpiryDate,
             DATE_FORMAT(givenDate, "%Y%m")
-         as integer));
+         );
 END #
 GRANT EXECUTE ON FUNCTION getContractInvoiceDifference TO 'webuser'@'%'
