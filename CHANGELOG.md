@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1018 - Sales requests with attachments to include attachment notification
+
 ## [v4.7.2] - 2020-10-09
 ### Fixed
 - Fixed issue with not allowing decimal places in expense values

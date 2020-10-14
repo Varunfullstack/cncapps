@@ -2885,7 +2885,17 @@ class BUActivity extends Business
             null
         );
 
+
         $problem->updateRow();
+
+
+        $dbeJCallDocument = new DBECallDocumentWithoutFile($this);
+        $dbeJCallDocument->setValue(
+            DBECallDocumentWithoutFile::callActivityID,
+            $callActivityID
+        );
+        $dbeJCallDocument->getRowsByColumn(DBECallDocumentWithoutFile::callActivityID);
+        $hasAttachments = $dbeJCallDocument->rowCount();
         /*
     Append any comments
     */
@@ -2915,7 +2925,8 @@ class BUActivity extends Business
             $newCallActivity,
             $subject,
             $requestingUserID,
-            $approval
+            $approval,
+            $hasAttachments
         );
 
         $dbeCallActivity = new DBECallActivity($this);
@@ -3039,11 +3050,13 @@ class BUActivity extends Business
      * @param string $subject
      * @param string|int $requestingUserID
      * @param bool $approval
+     * @param bool $hasAttachments
      */
     private function sendSalesRequestReplyEmail($dbeCallActivity,
                                                 $subject,
                                                 $requestingUserID,
-                                                $approval = false
+                                                $approval = false,
+                                                $hasAttachments = false
     )
     {
         $buMail = new BUMail($this);
@@ -3077,7 +3090,8 @@ class BUActivity extends Business
                 'subject'          => $subject,
                 'urlLastActivity'  => $urlLastActivity,
                 'requestReason'    => $dbeCallActivity->getValue(DBEJCallActivity::reason),
-                'urlFirstActivity' => $urlFirstActivity
+                'urlFirstActivity' => $urlFirstActivity,
+                'attachmentsLine'  => $hasAttachments ? "<p>This request has attachments associated with it, please make sure you review them</p>" : null
             )
         );
 
