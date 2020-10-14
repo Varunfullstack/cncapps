@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v4.8.0] - 2020-10-14
 ### Added
 - Issue 1035 - Customer Call Out Process Improvements
 - Issue 1037 - SD Dashboard to include SRs about to breach Fix SLA
