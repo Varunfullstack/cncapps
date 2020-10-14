@@ -148,6 +148,24 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             $problems,
             'Current_Open_SRs'
         );
+        $shortestSLAFixRemaining = null;
+        if (!$isP5) {
+            $buProblem->getSDDashBoardData(
+                $problems,
+                $limit,
+                'shortestSLAFixRemaining',
+                false,
+                $showHelpDesk,
+                $showEscalation,
+                $showSmallProjects,
+                $showProjects
+            );
+            $shortestSLAFixRemaining = $this->renderQueue(
+                $problems,
+                'Shortest_SLA_Fix_Remaining'
+            );
+        }
+
 
         $buProblem->getSDDashBoardData(
             $problems,
@@ -276,7 +294,8 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
                 "longestOpenSR"                    => $longestOpenSR,
                 "mostHoursLogged"                  => $mostHoursLogged,
                 "activitiesByXXEngineersInXXHours" => $activitiesByXXEngineersInXXHours,
-                "criticalServiceRequests"          => $criticalSR
+                "criticalServiceRequests"          => $criticalSR,
+                'shortestSLAFixRemaining'          => $shortestSLAFixRemaining
             ]
         );
 

@@ -1,6 +1,15 @@
 # Changelog
 This project changes will be shown here.
 
+## [v4.8.0] - 2020-10-14
+### Added
+- Issue 1035 - Customer Call Out Process Improvements
+- Issue 1037 - SD Dashboard to include SRs about to breach Fix SLA
+### Changed
+- Issue 1018 - Sales requests with attachments to include attachment notification
+### Fixed
+- Quote PDF Signature Placement
+
 ## [v4.7.2] - 2020-10-09
 ### Fixed
 - Fixed issue with not allowing decimal places in expense values
