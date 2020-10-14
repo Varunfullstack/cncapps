@@ -733,6 +733,35 @@ class DBEJProblem extends DBEProblem
         }
 
         switch ($orderBy) {
+
+            case 'shortestSLAFixRemaining':
+            {
+                $sql .= ' AND
+  CASE 
+  WHEN `pro_priority` = 1 THEN customer.`slaP1PenaltiesAgreed`
+  WHEN `pro_priority` = 2 THEN customer.`slaP2PenaltiesAgreed`
+  WHEN `pro_priority` = 3 THEN customer.`slaP3PenaltiesAgreed`
+  END
+  AND 
+  CASE 
+	WHEN `pro_priority` = 1 THEN customer.`slaFixHoursP1`
+	WHEN `pro_priority` = 2 THEN customer.`slaFixHoursP2`
+	WHEN `pro_priority` = 3 THEN customer.`slaFixHoursP3`
+	END - problem.pro_working_hours > 0
+	AND 
+  CASE
+	WHEN `pro_priority` = 1 THEN customer.`slaFixHoursP1`
+	WHEN `pro_priority` = 2 THEN customer.`slaFixHoursP2`
+	WHEN `pro_priority` = 3 THEN customer.`slaFixHoursP3`
+	END - problem.pro_working_hours <= (SELECT headert.`fixSLABreachWarningHours` FROM headert LIMIT 1)
+  ORDER BY CASE 
+	WHEN `pro_priority` = 1 THEN customer.`slaFixHoursP1`
+	WHEN `pro_priority` = 2 THEN customer.`slaFixHoursP2`
+	WHEN `pro_priority` = 3 THEN customer.`slaFixHoursP3`
+	END - problem.pro_working_hours ASC';
+
+                break;
+            }
             case 'shortestSLARemaining':
             {
 

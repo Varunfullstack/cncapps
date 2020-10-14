@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 1035 - Customer Call Out Process Improvements
+- Issue 1037 - SD Dashboard to include SRs about to breach Fix SLA
 ### Fixed
 - Quote PDF Signature Placement
 
