@@ -309,8 +309,6 @@ class BUPDFSalesQuote extends Business
             );
         }
         $buPDF->CR();
-        $buPDF->CR();
-        $buPDF->CR();
         $buPDF->printString($dsUser->getValue(DBEUser::firstName) . ' ' . $dsUser->getValue(DBEUser::lastName));
         $buPDF->CR();
         $buPDF->setBoldOn();
