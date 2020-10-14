@@ -3092,7 +3092,7 @@ class BUActivity extends Business
                 'urlLastActivity'  => $urlLastActivity,
                 'requestReason'    => $dbeCallActivity->getValue(DBEJCallActivity::reason),
                 'urlFirstActivity' => $urlFirstActivity,
-                'attachmentsLine'  => $hasAttachments ? "<p>This request has attachments associated with it, please make sure you review them</p>" : null
+                'attachmentsLine'  => $hasAttachments ? "<p style='color: red'>This request has attachments associated with it, please make sure you review them.</p>" : null
             )
         );
 
