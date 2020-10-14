@@ -42,6 +42,7 @@ require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 require_once($cfg ["path_bu"] . "/BUStandardText.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJPorhead.inc.php");
 require_once($cfg["path_dbe"] . "/DBEPendingReopened.php");
+require_once($cfg['path_dbe'] . '/DBECallDocumentWithoutFile.php');
 require_once($cfg["path_ct"] . "/CTProject.inc.php");
 require_once($cfg ["path_bu"] . "/BUProblemRaiseType.inc.php");
 
