@@ -293,16 +293,19 @@ class BUPDFSalesQuote extends Business
         $buPDF->printString('COMPUTER & NETWORK CONSULTANTS LTD');
         $buPDF->CR();
         $buPDF->CR();
+
         if ($dsUser->getValue(DBEUser::signatureFilename)) {
+            $signatureHeight = 20;
             $filePath = IMAGES_DIR . '/' . $dsUser->getValue(DBEUser::signatureFilename);
             if (!file_exists($filePath)) {
                 throw new Exception('Could not find the signature file for the user in: ' . $filePath);
             }
-            $buPDF->placeImageAt(
+            $buPDF->pdf->Image(
                 $filePath,
-                'PNG',
-                10,
-                35
+                null,
+                null,
+                0,
+                $signatureHeight
             );
         }
         $buPDF->CR();
