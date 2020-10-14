@@ -7,9 +7,9 @@
  */
 global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
-require_once($cfg ["path_dbe"] . "/DBEJCallActivity.php");
 require_once($cfg['path_dbe'] . '/DBECallDocumentWithoutFile.php');
+require_once($cfg ["path_dbe"] . "/DBEJCallActivity.php");
+require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 
 class CTSalesRequestDashboard extends CTCNC
 {

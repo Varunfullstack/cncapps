@@ -5,6 +5,8 @@ This project changes will be shown here.
 ### Added
 - Issue 1035 - Customer Call Out Process Improvements
 - Issue 1037 - SD Dashboard to include SRs about to breach Fix SLA
+### Changed
+- Issue 1018 - Sales requests with attachments to include attachment notification
 ### Fixed
 - Quote PDF Signature Placement
 
