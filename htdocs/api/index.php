@@ -614,7 +614,7 @@ WHERE
             function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
                 $data = $request->getParsedBody();
 
-                if ($data) {
+                if (!$data) {
                     $response->getBody()->write(json_encode(["error" => "Data is missing"]));
                     return $response->withStatus(400);
                 }
@@ -626,8 +626,8 @@ WHERE
 
                 global $db;
                 $feedbackTokenGenerator = new \CNCLTD\FeedbackTokenGenerator($db);
-                $data = $feedbackTokenGenerator->getTokenData($data['token']);
-                if (!$data) {
+                $tokenData = $feedbackTokenGenerator->getTokenData($data['token']);
+                if (!$tokenData) {
                     $response->getBody()->write(json_encode(["error" => "Token not found!"]));
                     return $response->withStatus(400);
                 }
@@ -636,12 +636,12 @@ WHERE
                     return $response->withStatus(400);
                 }
                 $dbeProblem = new DBEProblem($this);
-                $dbeProblem->getRow($data->serviceRequestId);
+                $dbeProblem->getRow($tokenData->serviceRequestId);
                 $contactId = $dbeProblem->getValue(DBEProblem::contactID);
 
                 $customerFeedbackRepo = new \CNCLTD\CustomerFeedbackRepository($db);
                 $customerFeedback = new \CNCLTD\CustomerFeedback();
-                $customerFeedback->serviceRequestId = $data->serviceRequestId;
+                $customerFeedback->serviceRequestId = $tokenData->serviceRequestId;
                 $customerFeedback->contactId = $contactId;
                 $customerFeedback->value = $data['value'];
                 $customerFeedback->comments = @$data['comments'];

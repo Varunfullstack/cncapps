@@ -23,4 +23,31 @@
             </column>
         </createTable>
     </changeSet>
+    <changeSet id="issue973-2" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="customerFeedback"/>
+            </not>
+        </preConditions>
+        <createTable tableName="customerFeedback">
+            <column name="id" type="int(11)" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PRIMARY"/>
+            </column>
+            <column name="serviceRequestId" type="int(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="contactId" type="int(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value" type="int(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="comments" type="text">
+                <constraints nullable="true"/>
+            </column>
+            <column name="createdAt" type="datetime" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
 </databaseChangeLog>

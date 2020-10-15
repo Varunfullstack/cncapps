@@ -35,7 +35,7 @@ class CustomerFeedbackRepository
                     "value" => $customerFeedback->value
                 ],
                 [
-                    "type"  => "i",
+                    "type"  => "s",
                     "value" => $customerFeedback->comments
                 ],
             ]
