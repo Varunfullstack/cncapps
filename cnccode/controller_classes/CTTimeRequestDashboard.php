@@ -6,12 +6,16 @@
  * Time: 10:39
  */
 
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg ["path_dbe"] . "/DBEJCallActivity.php");
 
 class CTTimeRequestDashboard extends CTCNC
 {
+    const GET_DATA = 'getData';
+    const GET_DATATABLES_DATA = 'getDatatablesData';
+
     function __construct($requestMethod,
                          $postVars,
                          $getVars,
@@ -41,10 +45,143 @@ class CTTimeRequestDashboard extends CTCNC
 
         switch ($this->getAction()) {
 
+            case self::GET_DATA:
+            {
+                $result = $this->getPendingTimeRequests();
+                echo json_encode(
+                    $result,
+                    JSON_NUMERIC_CHECK
+                );
+                exit;
+            }
             default:
                 $this->displayReport();
                 break;
         }
+    }
+
+    private function getPendingTimeRequests()
+    {
+
+        $queryString = "SELECT
+  customer.`cus_name` AS customerName,
+  problem.`pro_problemno` AS serviceRequestId,
+  callactivity.`caa_callactivityno` AS activityId,
+  requester.cns_consno as requesterId,
+  requester.teamID as requesterTeamId,
+  CASE
+    requester.teamID
+    WHEN 1
+    THEN 'Helpdesk'
+    WHEN 2
+    THEN 'Escalation'
+    WHEN 4
+    THEN 'Small Projects'
+    WHEN 5
+    THEN 'Projects'
+  END AS requesterTeam,
+  requester.cns_name AS requesterName,
+  CONCAT(
+    callactivity.`caa_date`,
+    ' ',
+    callactivity.`caa_starttime`,
+    ':00'
+  ) AS requestedAt,
+  callactivity.`reason` AS notes,
+  problem.pro_chargeable_activity_duration_hours AS chargeableHours,
+  CASE
+    requester.teamID
+    WHEN 1
+    THEN problem.pro_hd_limit_minutes
+    WHEN 2
+    THEN problem.pro_es_limit_minutes
+    WHEN 4
+    THEN problem.pro_im_limit_minutes
+    WHEN 5
+    THEN problem.`projectTeamLimitMinutes`
+  END as teamLimitMinutes,
+   CASE
+    requester.teamID
+    WHEN 1
+    THEN headert.`hdTeamManagementTimeApprovalMinutes`
+    WHEN 2
+    THEN headert.`esTeamManagementTimeApprovalMinutes`
+    WHEN 4
+    THEN headert.`smallProjectsTeamManagementTimeApprovalMinutes`
+  END AS teamManagementApprovalMinutes
+FROM
+  callactivity
+  LEFT JOIN problem
+    ON problem.`pro_problemno` = callactivity.`caa_problemno`
+  LEFT JOIN customer
+    ON problem.`pro_custno` = customer.`cus_custno`
+  LEFT JOIN consultant requester
+    ON requester.`cns_consno` = callactivity.`caa_consno`
+  LEFT JOIN headert ON 1
+WHERE callactivity.caa_status = 'O'
+  AND callactivity.caa_callacttypeno = 61";
+
+        /** @var dbSweetcode $db */
+        global $db;
+
+        $queryString .= " order by requestedAt asc";
+        $result = $db->preparedQuery(
+            $queryString,
+            []
+        );
+        $data = $result->fetch_all(MYSQLI_ASSOC);
+        $buActivity = new BUActivity($this);
+
+        $data = array_map(
+            function ($datum) use ($buActivity) {
+                $problemID = $datum['serviceRequestId'];
+                $teamID = $datum['requesterTeamId'];
+
+                $leftOnBudget = null;
+                $usedMinutes = 0;
+                $dbeProblem = new DBEJProblem($this);
+                $dbeProblem->getRow($problemID);
+                $assignedMinutes = $datum['teamLimitMinutes'];
+                $isOverLimit = $assignedMinutes >= $datum['teamManagementApprovalMinutes'];
+
+                switch ($teamID) {
+                    case 1:
+                        $usedMinutes = $buActivity->getHDTeamUsedTime($problemID);
+                        break;
+                    case 2:
+                        $usedMinutes = $buActivity->getESTeamUsedTime($problemID);
+                        break;
+                    case 4:
+                        $usedMinutes = $buActivity->getSPTeamUsedTime($problemID);
+                        break;
+                    case 5:
+                        $usedMinutes = $buActivity->getUsedTimeForProblemAndTeam($problemID, 5);
+                        $isOverLimit = false;
+                }
+
+                $leftOnBudget = $assignedMinutes - $usedMinutes;
+
+                return array_merge(
+                    $datum,
+                    [
+                        "timeSpentSoFar"   => round($usedMinutes),
+                        "timeLeftOnBudget" => round($leftOnBudget),
+                        "approvalLevel"    => $isOverLimit ? 'Mgmt' : 'Team Lead',
+                        "isOverLimit"      => $isOverLimit
+                    ]
+                );
+            },
+            $data
+        );
+
+        return [
+            "data" => $data,
+            "meta" => [
+                "total"    => $result->num_rows,
+                "filtered" => $result->num_rows,
+            ]
+
+        ];
     }
 
     function displayReport()
@@ -56,131 +193,16 @@ class CTTimeRequestDashboard extends CTCNC
             'TimeRequestDashboard',
             'TimeRequestDashboard'
         );
-
         $this->setPageTitle('Time Request Dashboard');
-
-        $dbejCallActivity = new DBEJCallActivity($this);
-        $dbejCallActivity->getPendingTimeRequestRows();
-
-        $this->template->set_block(
-            'TimeRequestDashboard',
-            'TimeRequestsBlock',
-            'timeRequests'
-        );
-
-        $buActivity = new BUActivity($this);
-
         $buHeader = new BUHeader($this);
         $dsHeader = new DataSet($this);
         $buHeader->getHeader($dsHeader);
         $isAdditionalTimeApprover = $this->dbeUser->getValue(DBEUser::additionalTimeLevelApprover);
-
-
-        while ($dbejCallActivity->fetchNext()) {
-            $problemID = $dbejCallActivity->getValue(DBEJCallActivity::problemID);
-            $lastActivity = $buActivity->getLastActivityInProblem($problemID);
-            $srLink = Controller::buildLink(
-                'Activity.php',
-                [
-                    "callActivityID" => $lastActivity->getValue(DBEJCallActivity::callActivityID),
-                    "action"         => "displayActivity"
-                ]
-            );
-
-            $srLink = "<a href='$srLink' target='_blank'>" . $problemID . "</a>";
-
-            $processCRLink = Controller::buildLink(
-                'Activity.php',
-                [
-                    "callActivityID" => $dbejCallActivity->getValue(DBEJCallActivity::callActivityID),
-                    "action"         => "timeRequestReview"
-                ]
-            );
-
-
-            $requestingUserID = $dbejCallActivity->getValue(DBEJCallActivity::userID);
-            $requestingUser = new DBEUser($this);
-            $requestingUser->getRow($requestingUserID);
-
-            $teamID = $requestingUser->getValue(DBEUser::teamID);
-
-            $leftOnBudget = null;
-            $usedMinutes = 0;
-            $assignedMinutes = 0;
-
-            $dbeProblem = new DBEJProblem($this);
-            $dbeProblem->getRow($problemID);
-            $teamName = '';
-            $processCRLink = "<a href='$processCRLink'>Process Time Request</a>";
-            $isOverLimit = false;
-            switch ($teamID) {
-                case 1:
-                    $usedMinutes = $buActivity->getHDTeamUsedTime($problemID);
-                    $assignedMinutes = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
-                    $isOverLimit = $assignedMinutes >= $dsHeader->getValue(
-                            DBEHeader::hdTeamManagementTimeApprovalMinutes
-                        );
-                    $teamName = 'Helpdesk';
-                    break;
-                case 2:
-                    $usedMinutes = $buActivity->getESTeamUsedTime($problemID);
-                    $assignedMinutes = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
-                    $isOverLimit = $assignedMinutes >= $dsHeader->getValue(
-                            DBEHeader::esTeamManagementTimeApprovalMinutes
-                        );
-                    $teamName = 'Escalation';
-                    break;
-                case 4:
-                    $usedMinutes = $buActivity->getSPTeamUsedTime($problemID);
-                    $assignedMinutes = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
-                    $isOverLimit = $assignedMinutes >= $dsHeader->getValue(
-                            DBEHeader::smallProjectsTeamManagementTimeApprovalMinutes
-                        );
-                    $teamName = 'Small Projects';
-                    break;
-                case 5:
-                    $usedMinutes = $buActivity->getUsedTimeForProblemAndTeam($problemID, 5);
-                    $assignedMinutes = $dbeProblem->getValue(DBEProblem::projectTeamLimitMinutes);
-                    $teamName = 'Projects';
-            }
-
-            if ($isOverLimit && !$isAdditionalTimeApprover) {
-                $processCRLink = '';
-            }
-
-            $leftOnBudget = $assignedMinutes - $usedMinutes;
-            $requestedDateTimeString = $dbejCallActivity->getValue(
-                    DBEJCallActivity::date
-                ) . ' ' . $dbejCallActivity->getValue(DBEJCallActivity::startTime) . ":00";
-            $requestedDateTime = DateTime::createFromFormat(DATE_MYSQL_DATETIME, $requestedDateTimeString);
-            $alertTime = (new DateTime(''))->sub(
-                new DateInterval('PT' . $dsHeader->getValue(DBEHeader::pendingTimeLimitActionThresholdMinutes) . "M")
-            );
-
-            $this->template->set_var(
-                [
-                    'customerName'      => $dbejCallActivity->getValue(DBEJCallActivity::customerName),
-                    'srLink'            => $srLink,
-                    'notes'             => $dbejCallActivity->getValue(DBEJCallActivity::reason),
-                    'requestedBy'       => $dbejCallActivity->getValue(DBEJCallActivity::userName),
-                    'requestedDateTime' => $requestedDateTimeString,
-                    'processCRLink'     => $processCRLink,
-                    'chargeableHours'   => $dbeProblem->getValue(DBEJProblem::chargeableActivityDurationHours),
-                    'timeSpentSoFar'    => round($usedMinutes),
-                    'timeLeftOnBudget'  => $leftOnBudget,
-                    'requesterTeam'     => $teamName,
-                    'alertRow'          => $requestedDateTime < $alertTime ? 'warning' : null,
-                    'approvalLevel'     => $isOverLimit ? 'Mgmt' : 'Team Lead'
-                ]
-            );
-
-            $this->template->parse(
-                'timeRequests',
-                'TimeRequestsBlock',
-                true
-            );
-        }
-
+        $this->template->setVar('additionalTimeApprover', $isAdditionalTimeApprover ? 'true' : 'false');
+        $this->template->setVar(
+            'pendingTimeLimitActionThresholdMinutes',
+            $dsHeader->getValue(DBEHeader::pendingTimeLimitActionThresholdMinutes)
+        );
 
         $this->template->parse(
             'CONTENTS',
