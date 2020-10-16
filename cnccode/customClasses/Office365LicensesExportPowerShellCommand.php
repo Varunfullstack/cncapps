@@ -708,6 +708,13 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $highestRow = count($mailboxes) + 2;
         $updateCustomer = new DBECustomer($thing);
         $updateCustomer->getRow($dbeCustomer->getValue(DBECustomer::customerID));
+        if ($licensedUsers == 0) {
+            $file = $dbeCustomer->getValue(DBECustomer::customerID) . '-' . uniqid() . '.json';
+            $this->logger->warning(
+                'We have counted 0 licensed users!!!, storing data to check in ' . $file
+            );
+            file_put_contents($file, json_encode($mailboxes));
+        }
         if ($licensedUsers != $updateCustomer->getValue(DBECustomer::licensedOffice365Users)) {
             $updateCustomer->setValue(DBECustomer::licensedOffice365Users, $licensedUsers);
             $updateCustomer->updateRow();
