@@ -13,8 +13,9 @@ require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 
 class CTSalesRequestDashboard extends CTCNC
 {
+    const GET_ALLOCATION_USERS = "getAllocationUsers";
+    const GET_DATA = 'getData';
     private $allocatedUser;
-    private $filterUser;
 
     function __construct($requestMethod,
                          $postVars,
@@ -60,6 +61,68 @@ class CTSalesRequestDashboard extends CTCNC
                 $dbeProblem->updateRow();
                 echo json_encode(["status" => "ok"]);
                 break;
+            case self::GET_ALLOCATION_USERS:
+            {
+                $dbeUser = new DBEUser($this);
+                $dbeUser->getRows('firstName');
+                $result = [];
+                while ($dbeUser->fetchNext()) {
+                    $result[] =
+                        [
+                            'id'       => $dbeUser->getValue(DBEUser::userID),
+                            'userName' => $dbeUser->getValue(DBEUser::name),
+                            'fullName' => $dbeUser->getValue(DBEUser::firstName) . ' ' . $dbeUser->getValue(
+                                    DBEUser::lastName
+                                )
+                        ];
+                }
+                echo json_encode(["status" => "ok", "data" => $result]);
+                exit;
+            }
+            case self::GET_DATA:
+            {
+                global $db;
+                $query = "
+SELECT
+  callactivity.`caa_callactivityno` AS activityId,
+  callactivity.`caa_problemno` AS serviceRequestId,
+  standardtext.`stt_desc` AS `type`,
+  customer.cus_name AS customerName,
+  callactivity.`reason` AS requestBody,
+  CONCAT(callactivity.`caa_date`,' ',callactivity.`caa_starttime`,':00') AS requestedAt,
+   consultant.cns_name AS requesterName,
+   problem.`salesRequestAssignedUserId`
+FROM
+  callactivity 
+  LEFT JOIN standardtext ON callactivity.`requestType` = standardtext.`stt_standardtextno`
+  LEFT JOIN problem ON callactivity.`caa_problemno` = problem.`pro_problemno`
+  LEFT JOIN customer ON problem.`pro_custno` = customer.`cus_custno`
+  LEFT JOIN consultant ON callactivity.`caa_consno` = consultant.cns_consno
+WHERE callactivity.salesRequestStatus = 'O'
+  AND caa_callacttypeno = 43";
+                $statement = $db->preparedQuery($query, []);
+                $requests = $statement->fetch_all(MYSQLI_ASSOC);
+                $requests = array_map(
+                    function ($request) {
+                        $dbeJCallDocument = new DBECallDocumentWithoutFile($this);
+                        $dbeJCallDocument->setValue(
+                            DBECallDocumentWithoutFile::callActivityID,
+                            $request['activityId']
+                        );
+                        $dbeJCallDocument->getRowsByColumn(DBECallDocumentWithoutFile::callActivityID);
+                        $request['attachments'] = [];
+                        while ($dbeJCallDocument->fetchNext()) {
+                            $request['attachments'][] = [
+                                "documentId" => $dbeJCallDocument->getValue(DBECallDocumentWithoutFile::callDocumentID)
+                            ];
+                        }
+                        return $request;
+                    },
+                    $requests
+                );
+                echo json_encode(["status" => "ok", "data" => $requests]);
+                exit;
+            }
             default:
                 $this->displayReport();
                 break;
@@ -153,10 +216,6 @@ class CTSalesRequestDashboard extends CTCNC
 
                 $this->allocatedUser[$dbeUser->getValue(DBEUser::userID)] = $userRow;
 
-                if ($dbeUser->getValue(DBEUser::appearInQueueFlag) == 'Y') {
-
-                    $this->filterUser[$dbeUser->getValue(DBEUser::userID)] = $userRow;
-                }
             }
 
             $this->template->set_var(

@@ -12,7 +12,7 @@
     const pendingTimeLimitActionThresholdMinutes = {pendingTimeLimitActionThresholdMinutes};
 
     document.addEventListener('DOMContentLoaded', () => {
-        expensesTable = $('#timeRequestTable').DataTable({
+        $('#timeRequestTable').DataTable({
             dom: 'rt',
             columns: [
                 {data: "customerName", name: "customerName"},
