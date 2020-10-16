@@ -25,8 +25,8 @@
                         return '<a href="Activity.php?action=displayLastActivity&problemID=' + data + '" target="_blank">' + data + '</a>';
                     }
                 },
-                {data: 'requesterName', name: 'requesterName'},
                 {data: "requesterTeam", name: 'requesterTeam'},
+                {data: 'requesterName', name: 'requesterName'},
                 {
                     data: 'requestedAt', name: 'requestedAt', render: (data, type, row, meta) => {
                         if (type === 'sort') {
