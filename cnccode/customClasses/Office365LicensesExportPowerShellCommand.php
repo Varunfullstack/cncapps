@@ -621,6 +621,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                     $this->logger->warning('Raising a Customer Leaver with License SR while processing Mailboxes');
                     $this->raiseCustomerLeaverWithLicenseSR($dbeCustomer, $datum['DisplayName']);
                 }
+                $licensesWithATP = 0;
 
                 foreach ($datum['Licenses'] as $license) {
                     $dbeOffice365Licenses->getRowForLicense($license);
@@ -630,6 +631,11 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                             $dbeOffice365Licenses->getValue(DBEOffice365License::replacement),
                             $licenseValue
                         );
+
+                        if ($dbeOffice365Licenses->getValue(DBEOffice365License::includesATP)) {
+                            $licensesWithATP++;
+                        }
+
                         if (!$mailboxLimit && $dbeOffice365Licenses->getValue(DBEOffice365License::mailboxLimit)) {
                             $mailboxLimit = $dbeOffice365Licenses->getValue(DBEOffice365License::mailboxLimit);
                         }
@@ -637,6 +643,10 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                         $this->logger->warning('Raising a License not found SR while processing Mailboxes:' . $license);
                         $this->raiseCNCRequest($license, $dbeCustomer, $datum['DisplayName']);
                     }
+                }
+
+                if ($licensesWithATP > 1) {
+                    $this->raiseCustomerLeaverWithLicenseSR($dbeCustomer, $datum['DisplayName']);
                 }
             }
             $licensesArray = explode(", ", $licenseValue);
@@ -804,6 +814,13 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
      */
     function raiseCustomerLeaverWithLicenseSR(DBECustomer $dbeCustomer, $userName)
     {
+        $details = "<p>User $userName is marked as leaver but still has an Office 365 license assigned to it, please review and correct.</p>";
+        $this->raiseCustomerServiceRequest($dbeCustomer, $details);
+
+    }
+
+    function raiseCustomerServiceRequest(DBECustomer $dbeCustomer, $details)
+    {
         $customerID = $dbeCustomer->getValue(DBECustomer::customerID);
         $buActivity = new BUActivity($thing);
         $buCustomer = new BUCustomer($thing);
@@ -925,8 +942,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             DBEJCallActivity::serverGuard,
             'N'
         );
-
-        $details = "<p>User $userName is marked as leaver but still has an Office 365 license assigned to it, please review and correct.</p>";
 
         $dbeCallActivity->setValue(
             DBEJCallActivity::reason,
@@ -1359,6 +1374,12 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             null,
             'A' . $legendRowStart
         );
+    }
+
+    function raiseMultipleATPLicenses(DBECustomer $dbeCustomer, $userName)
+    {
+        $details = "<p>The username $userName has multiple M365 licenses that include ATP, please review and correct.</p>";
+        $this->raiseCustomerServiceRequest($dbeCustomer, $details);
     }
 
     protected function getParams(): PowerShellParamCollection
