@@ -6726,6 +6726,7 @@ class CTActivity extends CTCNC
         $usedMinutes = 0;
         $assignedMinutes = 0;
         $remainingTimeLimit = null;
+        $isOverLimit = false;
         switch ($teamID) {
             case 1:
                 $usedMinutes = $this->buActivity->getHDTeamUsedTime($problemID);
@@ -6734,6 +6735,9 @@ class CTActivity extends CTCNC
                 $remainingTimeLimit = $dsHeader->getValue(
                         DBEHeader::hdTeamManagementTimeApprovalMinutes
                     ) - $assignedMinutes;
+                $isOverLimit = $assignedMinutes >= $dsHeader->getValue(
+                        DBEHeader::hdTeamManagementTimeApprovalMinutes
+                    );
                 break;
             case 2:
                 $usedMinutes = $this->buActivity->getESTeamUsedTime($problemID);
@@ -6742,6 +6746,9 @@ class CTActivity extends CTCNC
                 $remainingTimeLimit = $dsHeader->getValue(
                         DBEHeader::esTeamManagementTimeApprovalMinutes
                     ) - $assignedMinutes;
+                $isOverLimit = $assignedMinutes >= $dsHeader->getValue(
+                        DBEHeader::esTeamManagementTimeApprovalMinutes
+                    );
                 break;
             case 4:
                 $usedMinutes = $this->buActivity->getSPTeamUsedTime($problemID);
@@ -6750,6 +6757,9 @@ class CTActivity extends CTCNC
                 $remainingTimeLimit = $dsHeader->getValue(
                         DBEHeader::smallProjectsTeamManagementTimeApprovalMinutes
                     ) - $assignedMinutes;
+                $isOverLimit = $assignedMinutes >= $dsHeader->getValue(
+                        DBEHeader::smallProjectsTeamManagementTimeApprovalMinutes
+                    );
                 break;
             case 5:
                 $usedMinutes = $this->buActivity->getUsedTimeForProblemAndTeam($problemID, 5);
@@ -6765,6 +6775,10 @@ class CTActivity extends CTCNC
             switch ($this->getParam('Submit')) {
 
                 case 'Approve':
+
+                    if ($isOverLimit && !$this->dbeUser->getValue(DBEUser::additionalTimeLevelApprover)) {
+                        throw new Exception('You do not have enough permissions to proceed');
+                    }
                     $option = 'A';
                     break;
 
@@ -6774,6 +6788,9 @@ class CTActivity extends CTCNC
 
                 case 'Delete':
                 default:
+                    if ($isOverLimit && !$this->dbeUser->getValue(DBEUser::additionalTimeLevelApprover)) {
+                        throw new Exception('You do not have enough permissions to proceed');
+                    }
                     $option = 'DEL';
                     break;
             }
