@@ -1470,6 +1470,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             "support"    => 0,
             "delegate"   => 0,
             "furlough"   => 0,
+            "none"       => 0,
             "total"      => 0
         ];
 
@@ -1507,7 +1508,11 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
                 var_dump($dsSupportContact->getValue(DBEContact::contactID));
             }
 
-            $supportContactsCounts[$dsSupportContact->getValue(DBEContact::supportLevel)]++;
+            if (!$dsSupportContact->getValue(DBEContact::supportLevel)) {
+                $supportContactsCounts['none']++;
+            } else {
+                $supportContactsCounts[$dsSupportContact->getValue(DBEContact::supportLevel)]++;
+            }
             $supportContactsCounts['total']++;
         }
 
@@ -1600,6 +1605,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
         $supportContactInfo .= "<tr><td>Support</td><td>$supportContactsCounts[support]</td></tr>";
         $supportContactInfo .= "<tr><td>Delegate</td><td>$supportContactsCounts[delegate]</td></tr>";
         $supportContactInfo .= "<tr><td>Furlough</td><td>$supportContactsCounts[furlough]</td></tr>";
+        $supportContactInfo .= "<tr><td>No Level</td><td>$supportContactsCounts[none]</td></tr>";
         $supportContactInfo .= "<tr><td>Total</td><td>$supportContactsCounts[total]</td></tr>";
         $supportContactInfo .= "</tbody></table>";
 

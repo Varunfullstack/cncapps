@@ -94,7 +94,7 @@ class CTContractAndNumbersReport extends CTCNC
   COALESCE(virtualServers,0) AS virtualServers,
   COALESCE(physicalServers,0) AS physicalServers,
   COALESCE(serverCareContract,0) AS serverCareContract,
-  concat('M ',coalesce(mainCount, 0),', SV ',coalesce(supervisorCount,0),', S ', coalesce(supportCount, 0),', D ', coalesce(delegateCount, 0),', T ', coalesce(totalCount, 0)) as supportedUsers,
+  concat('M ',coalesce(mainCount, 0),', SV ',coalesce(supervisorCount,0),', S ', coalesce(supportCount, 0),', D ', coalesce(delegateCount, 0),', T ', coalesce(totalCount, 0), ', N ', coalesce(noLevelCount, 0)) as supportedUsers,
   totalCount > serviceDeskUsers as moreUsersThanExpected 
 FROM
   customer
@@ -166,6 +166,9 @@ left join (
   SUM(
     contact.`supportLevel` = 'delegate'
   ) AS delegateCount,
+  SUM(
+    contact.`supportLevel` = 'delegate'
+  ) AS noLevelCount,
   sum(1) as totalCount 
 from
   contact 
