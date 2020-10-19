@@ -65,6 +65,7 @@
                     name: "salesRequestAssignedUserId",
                     render: (data, type, row, meta) => {
 
+
                         const selectElm = document.createElement('select');
                         selectElm.dataset.problemId = row.serviceRequestId;
                         selectElm.classList.add('userAllocation');
@@ -73,10 +74,17 @@
                         emptyOption.text = '';
                         emptyOption.value = '';
                         selectElm.options.add(emptyOption);
+                        let selectedUserName = '';
                         allocationUsers.forEach((allocationUser, index) => {
                             const option = new Option(allocationUser.fullName, allocationUser.id, allocationUser.id === data, allocationUser.id === data)
+                            if (allocationUser.id === data) {
+                                selectedUserName = allocationUser.fullName;
+                            }
                             selectElm.options.add(option);
                         })
+                        if (type === 'sort') {
+                            return selectedUserName;
+                        }
                         return selectElm.outerHTML;
                     }
                 },
