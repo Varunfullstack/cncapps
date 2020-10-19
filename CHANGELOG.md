@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v4.8.1] - 2020-10-19
+### Added
+- Include Sales Order number in SR Creation
+
 ## [v4.8.0] - 2020-10-14
 ### Added
 - Issue 1035 - Customer Call Out Process Improvements

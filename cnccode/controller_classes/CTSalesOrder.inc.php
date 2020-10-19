@@ -4815,7 +4815,8 @@ class CTSalesOrder extends CTCNC
                 'serviceRequestPriorityMessage'       => $dsInput->getMessage(DBEOrdhead::serviceRequestPriority),
                 'serviceRequestCustomerItemIDMessage' => $dsInput->getMessage(DBEOrdhead::serviceRequestCustomerItemID),
 
-                'urlSubmit' => $urlSubmit
+                'urlSubmit' => $urlSubmit,
+                'salesOrderHeaderId' => $this->getOrdheadID()
             )
         );
 
@@ -4839,7 +4840,6 @@ class CTSalesOrder extends CTCNC
             'SalesOrderServiceRequest',
             true
         );
-        //$this->setHTMLFmt( CT_HTML_FMT_POPUP );
 
         $this->parsePage();
 

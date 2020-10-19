@@ -6893,11 +6893,10 @@ is currently a balance of ';
         $dateRaised = date(DATE_MYSQL_DATE . ' ' . DATE_MYSQL_TIME);
         $timeRaised = date(CONFIG_MYSQL_TIME_HOURS_MINUTES);
 
-        $internalNotes = '<P>' . str_replace(
-                "\r\n",
-                "",
-                $dsInput->getValue(BURenContract::serviceRequestText)
-            ) . '</P>';
+        $cleanServiceRequestText = str_replace("\r\n", "", $dsInput->getValue(BURenContract::serviceRequestText));
+        $internalNotes = "
+<p>Sales Order Number: {$ordheadID}</p>
+<p>{$cleanServiceRequestText}</p>";
 
         if ($dsInput->getValue(BURenContract::etaDate)) {
             $internalNotes .=
