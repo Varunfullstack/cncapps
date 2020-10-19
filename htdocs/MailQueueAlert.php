@@ -11,12 +11,9 @@ require_once("config.inc.php");
 require_once($cfg["path_bu"] . "/BUMail.inc.php");
 
 global $server_type;
-define(
-    'EMAIL_SUBJECT',
-    'Email Queue Problem'
-);
 
 $error = false;
+$thing = null;
 
 
 if ($server_type == MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT) {
@@ -25,7 +22,10 @@ if ($server_type == MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT) {
     $send_to_email = 'MailQueueAlert@cnc-ltd.co.uk';
 }
 
-$sql = "
+function getCountOfMessagesInQueueForMoreThan30Minutes()
+{
+    global $db;
+    $sql = "
   SELECT 
     COUNT(*)
   FROM
@@ -34,13 +34,29 @@ $sql = "
     TIMEDIFF( NOW(), time_to_send ) > '00:30:00'
     AND sent_time IS NULL";
 
-$db->query($sql);
-$db->next_record();
-$count = $db->Record[0];
-$thing = null;
-if ($count > 0) {
+    $db->query($sql);
+    $db->next_record();
+    return $db->Record[0];
+}
 
-    $body = "$count emails have been in the mail queue for longer than 30 minutes.\n";
+function getRowCountInAutomatedRequest()
+{
+    global $db;
+    $sql = "
+  SELECT 
+    COUNT(*)
+  FROM
+    automated_request
+  ";
+
+    $db->query($sql);
+    $db->next_record();
+    return $db->Record[0];
+}
+
+
+function sendAlertEmail($body, $toEmail, $subject)
+{
     $buMail = new BUMail($thing);
 
     $buMail->mime->setHTMLBody($body);
@@ -55,25 +71,26 @@ if ($count > 0) {
 
     $hdrs = array(
         'From'         => CONFIG_SALES_MANAGER_EMAIL,
-        'Subject'      => EMAIL_SUBJECT,
+        'Subject'      => $subject,
         'Content-Type' => 'text/html; charset=UTF-8',
-        'To'           => $send_to_email
+        'To'           => $toEmail
     );
 
     $hdrs = $buMail->mime->headers($hdrs);
 
-    $sent = $buMail->send(
-        $send_to_email,
+    return $buMail->send(
+        $toEmail,
         $hdrs,
         $body
     );
-
-    if ($sent) {
-        echo "message sent";
-    } else {
-        echo "not sent";
-
-    }
-
 }
-?>
+
+if ($count = getCountOfMessagesInQueueForMoreThan30Minutes()) {
+    $body = "$count emails have been in the mail queue for longer than 30 minutes.\n";
+    sendAlertEmail($body, $send_to_email, 'Email Queue Problem');
+}
+$countOfMessagesInQueue = getRowCountInAutomatedRequest();
+if ($countOfMessagesInQueue > 30) {
+    $body = "There are $countOfMessagesInQueue rows in the automated_request table, please check the import process to confirm it is still working.\n";
+    sendAlertEmail($body, $send_to_email, 'Automated Request Import Problem');
+}

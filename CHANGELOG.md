@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 1016 - Automated Request Monitor
+
 ## [v4.8.0] - 2020-10-14
 ### Added
 - Issue 1035 - Customer Call Out Process Improvements
