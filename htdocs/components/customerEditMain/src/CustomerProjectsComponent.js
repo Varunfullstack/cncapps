@@ -4,6 +4,7 @@ import moment from "moment";
 import {connect} from "react-redux";
 import {entityMapToArray} from "../../utils/utils";
 import {deleteProject} from "./actions";
+import AddProjectModalComponent from "./modals/AddProjectModalComponent";
 
 class CustomerProjectsComponent extends React.Component {
     el = React.createElement;
@@ -154,6 +155,7 @@ class CustomerProjectsComponent extends React.Component {
                  role="tabpanel"
                  aria-labelledby="nav-profile-tab"
             >
+                <AddProjectModalComponent/>
                 <div className="customerAddProjects mt-3">
                     <div className="row">
                         <div className="col-md-12">
@@ -161,8 +163,8 @@ class CustomerProjectsComponent extends React.Component {
                         </div>
                         <div className="col-md-12">
                             <button className="btn btn-sm btn-new mt-3 mb-3"
-                                    data-toggle="modal"
-                                    data-target="#exampleModalCenter"
+                                // data-toggle="modal"
+                                // data-target="#exampleModalCenter"
                             >Add Project
                             </button>
                         </div>
