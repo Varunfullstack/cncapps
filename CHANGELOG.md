@@ -2,6 +2,8 @@
 This project changes will be shown here.
 
 ## [unreleased]
+### Added
+- Issue 1016 - Automated Request Monitor
 ### Changed
 - Issue 1014 - Allow sorting data by columns in the Various Dashboards
 
