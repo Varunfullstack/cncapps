@@ -25,6 +25,8 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "@ckeditor/ckeditor5-build-classic": "^23.0.0",
+        "@ckeditor/ckeditor5-react": "^2.1.0",
         "html-react-parser": "^0.13.0",
         "moment": "^2.27.0",
         "react": "^16.13.1",
@@ -33,18 +35,14 @@
         "react-input-mask": "^2.0.4",
         "react-loading-skeleton": "^2.1.1",
         "redux-debounced": "^0.5.0",
+        "redux": "^4.0.5",
+        "react-redux": "^7.2.0",
+        "redux-thunk": "^2.3.0",
         "reselect": "^4.0.0"
     },
     "devDependencies": {
         "parcel-bundler": "^1.12.4",
         "normalizr": "^3.6.0",
-        "react": "^16.13.1",
-        "react-dom": "^16.13.1",
-        "react-input-mask": "^2.0.4",
-        "react-loading-skeleton": "^2.1.1",
-        "react-redux": "^7.2.0",
-        "redux": "^4.0.5",
-        "redux-thunk": "^2.3.0",
         "redux-devtools-extension": "^2.13.8"
     }
 }
