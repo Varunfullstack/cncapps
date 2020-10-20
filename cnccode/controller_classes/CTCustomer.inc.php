@@ -2476,29 +2476,27 @@ class CTCustomer extends CTCNC
 
             if ($this->dsContact->getValue(DBEContact::contactID)) {
 
-                if ($this->dsContact->getValue(DBEContact::supportLevel)) {
 
-                    switch ($this->dsContact->getValue(DBEContact::supportLevel)) {
-                        case 'main':
-                            $mainCount++;
-                            break;
-                        case 'supervisor':
-                            $supervisorCount++;
-                            break;
-                        case 'support':
-                            $supportCount++;
-                            break;
-                        case 'delegate':
-                            $delegateCount++;
-                            break;
-                        case 'furlough':
-                            $furloughCount++;
-                            break;
-                        default:
-                            $noLevelCount++;
-                    }
-                    $totalCount++;
+                switch ($this->dsContact->getValue(DBEContact::supportLevel)) {
+                    case 'main':
+                        $mainCount++;
+                        break;
+                    case 'supervisor':
+                        $supervisorCount++;
+                        break;
+                    case 'support':
+                        $supportCount++;
+                        break;
+                    case 'delegate':
+                        $delegateCount++;
+                        break;
+                    case 'furlough':
+                        $furloughCount++;
+                        break;
+                    default:
+                        $noLevelCount++;
                 }
+                $totalCount++;
 
                 $deleteContactURL =
                     Controller::buildLink(

@@ -288,7 +288,6 @@ class CTCustomerReviewMeeting extends CTCNC
                 );
 
                 $supportedUsersData = $this->getSupportedUsersData(
-                    $buContact,
                     $customerId,
                     $dsCustomer->getValue(DBECustomer::name)
                 );
@@ -830,23 +829,20 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
         return $frequency;
     }
 
-    private function getSupportedUsersData(BUContact $buContact,
-                                           $customerId,
+    private function getSupportedUsersData($customerId,
                                            $customerName
     )
     {
-        /** @var DataSet $dsSupportContact */
-        $dsSupportContact = null;
-        $buContact->getSupportContacts(
-            $dsSupportContact,
-            $customerId
-        );
+        /** @var DBEContact $dsSupportContact */
+        $dsSupportContact = new DBEContact($this);
+        $dsSupportContact->getRowsByCustomerID($customerId);
 
         $supportContacts = [
             "main"       => [],
             "supervisor" => [],
             "support"    => [],
-            "delegate"   => []
+            "delegate"   => [],
+            "no level"   => []
         ];
 
         $duplicates = [];
@@ -879,11 +875,18 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
                 ];
             }
 
+            if ($dsSupportContact->getValue(DBEContact::supportLevel)) {
+                $supportContacts[$dsSupportContact->getValue(DBEContact::supportLevel)][] = [
+                    "firstName" => $firstName,
+                    "lastName"  => $lastName
+                ];
+            } else {
+                $supportContacts['no level'][] = [
+                    "firstName" => $firstName,
+                    "lastName"  => $lastName
+                ];
+            }
 
-            $supportContacts[$dsSupportContact->getValue(DBEContact::supportLevel)][] = [
-                "firstName" => $firstName,
-                "lastName"  => $lastName
-            ];
             $count++;
         }
 

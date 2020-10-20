@@ -94,8 +94,8 @@ class CTContractAndNumbersReport extends CTCNC
   COALESCE(virtualServers,0) AS virtualServers,
   COALESCE(physicalServers,0) AS physicalServers,
   COALESCE(serverCareContract,0) AS serverCareContract,
-  concat('M ',coalesce(mainCount, 0),', SV ',coalesce(supervisorCount,0),', S ', coalesce(supportCount, 0),', D ', coalesce(delegateCount, 0),', T ', coalesce(totalCount, 0), ', N ', coalesce(noLevelCount, 0)) as supportedUsers,
-  totalCount > serviceDeskUsers as moreUsersThanExpected 
+  concat('M ',coalesce(mainCount, 0),', SV ',coalesce(supervisorCount,0),', S ', coalesce(supportCount, 0),', D ', coalesce(delegateCount, 0),', N ', coalesce(noLevelCount, 0),', T ', coalesce(totalCount, 0) ) as supportedUsers,
+  actualSupportedUsersCount > serviceDeskUsers as moreUsersThanExpected 
 FROM
   customer
   LEFT JOIN
@@ -167,12 +167,13 @@ left join (
     contact.`supportLevel` = 'delegate'
   ) AS delegateCount,
   SUM(
-    contact.`supportLevel` = 'delegate'
+    contact.`supportLevel` is null
   ) AS noLevelCount,
-  sum(1) as totalCount 
+  sum(1) as totalCount,
+  sum(contact.supportLevel is not null) as actualSupportedUsersCount
 from
   contact 
-where supportLevel is not null 
+where contact.active 
 GROUP BY con_custno 
 ) supportUsers on supportUsers.con_custno = customer.cus_custno
 WHERE serviceDeskProduct IS NOT NULL OR serverCareProduct IS NOT NULL
