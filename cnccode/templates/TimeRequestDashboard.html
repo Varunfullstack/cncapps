@@ -45,11 +45,8 @@
                 {data: "timeLeftOnBudget", name: "timeLeftOnBudget"},
                 {
                     data: "activityId", name: "activityId", sortable: false, render: (data, type, row, meta) => {
-                        if (!row.isOverLimit || additionalTimeApprover) {
-                            return "<button><a target='_blank' href='Activity.php?action=timeRequestReview&callActivityID=" + row.activityId + "'>Process Time Request</a>" +
-                                "</button>";
-                        }
-                        return '';
+                        return "<button><a target='_blank' href='Activity.php?action=timeRequestReview&callActivityID=" + row.activityId + "'>Process Time Request</a>" +
+                            "</button>";
                     }
                 },
             ],
