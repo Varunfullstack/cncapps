@@ -4,6 +4,9 @@ import {
     ADD_SITE,
     CHANGE_DELIVER_SITE_NO,
     CHANGE_INVOICE_SITE_NO,
+    DELETE_PROJECT_FAILURE,
+    DELETE_PROJECT_REQUEST,
+    DELETE_PROJECT_SUCCESS,
     DELETE_SITE_REQUEST,
     DELETE_SITE_SUCCESS,
     DISMISS_ERROR,
@@ -38,6 +41,7 @@ import {
 } from "./actionTypes";
 import {updateCustomer} from "./helpers";
 import {OutOfDateError} from "./helpers/OutOfDateError";
+import debounce from "../../utils/debounce";
 
 export const VisibilityFilterOptions = {
     SHOW_ALL: 'SHOW_ALL',
@@ -194,6 +198,18 @@ export function requestUpdateCustomerFailed() {
     return {type: REQUEST_UPDATE_CUSTOMER_FAILED}
 }
 
+export function deleteProjectRequest(id) {
+    return {type: DELETE_PROJECT_REQUEST, id}
+}
+
+export function deleteProjectSuccess(id) {
+    return {type: DELETE_PROJECT_SUCCESS, id};
+}
+
+export function deleteProjectFailure(id) {
+    return {type: DELETE_PROJECT_FAILURE, id};
+}
+
 export function fetchSites(customerId) {
     return dispatch => {
         dispatch(requestSites(customerId))
@@ -295,6 +311,25 @@ export function fetchContacts(customerId) {
     }
 }
 
+
+export function deleteProject(projectId) {
+    return dispatch => {
+        dispatch(deleteProjectRequest(projectId));
+        return fetch('Project.php?action=delete&projectId=' + projectId)
+            .then(res => res.json())
+            .then(res => {
+                if (res.status !== 'ok') {
+                    throw new Error(res.message);
+                }
+                dispatch(deleteProjectSuccess(projectId));
+            })
+            .catch(error => {
+                dispatch(deleteProjectFailure(projectId));
+                dispatch(addError(`Failed to delete project! - ${error}`));
+            })
+    }
+}
+
 export function deleteSite(customerId, siteNo) {
     return dispatch => {
         dispatch(deleteSiteRequest(siteNo))
@@ -329,36 +364,39 @@ export function fetchAllData(customerId) {
     }
 }
 
-export function updateCustomerField(field, value) {
-    const thunk = (dispatch, getState) => {
-        dispatch(updateCustomerValue(field, value));
-        const {customerID, lastUpdatedDateTime} = getState().customerEdit.customer;
-        return updateCustomer(customerID, {[field]: value}, lastUpdatedDateTime)
-            .then(newLastUpdated => {
-                // we have to apply the change to the original customer
-                dispatch(requestUpdateCustomerSuccess(newLastUpdated))
-            })
-            .catch((error) => {
-                if (error instanceof OutOfDateError) {
-                    //we should refetch everything ..just in case
-                    dispatch(requestUpdateCustomerFailedOutOfDate(error.lastUpdatedDateTime));
-                    dispatch(addError('Unable to save change due to another edit by someone else'));
-                    dispatch(fetchAllData(customerID));
-                    return;
-                }
+const debounceTime = 350;
 
-                dispatch(requestUpdateCustomerFailed());
-                dispatch(addError(`Unable to save change due to an error in the server: ${error.message}`))
-            })
+
+const debouncedUpdateCustomer = debounce((dispatch, field, value, getState) => {
+
+    const {customerID, lastUpdatedDateTime} = getState().customerEdit.customer;
+    dispatch(requestUpdateCustomer(field, value));
+    updateCustomer(customerID, {[field]: value}, lastUpdatedDateTime)
+        .then(newLastUpdated => {
+            // we have to apply the change to the original customer
+            dispatch(requestUpdateCustomerSuccess(newLastUpdated))
+        })
+        .catch((error) => {
+            if (error instanceof OutOfDateError) {
+                //we should refetch everything ..just in case
+                dispatch(requestUpdateCustomerFailedOutOfDate(error.lastUpdatedDateTime));
+                dispatch(addError('Unable to save change due to another edit by someone else'));
+                dispatch(fetchAllData(customerID));
+                return;
+            }
+
+            dispatch(requestUpdateCustomerFailed());
+            dispatch(addError(`Unable to save change due to an error in the server: ${error.message}`))
+        })
+}, debounceTime);
+
+export function updateCustomerField(field, value) {
+    return (dispatch, getState) => {
+        dispatch(updateCustomerValue(field, value));
+        debouncedUpdateCustomer(dispatch, field, value, getState);
     }
-    thunk.meta = {
-        debounce: {
-            time: 2500,
-            key: 'UPDATE_CUSTOMER_FIELD'
-        }
-    }
-    return thunk;
 }
+
 
 export function updateInvoiceSiteNo(value) {
     return updateCustomerField('invoiceSiteNo', value);

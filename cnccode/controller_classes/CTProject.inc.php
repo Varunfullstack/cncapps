@@ -547,21 +547,12 @@ class CTProject extends CTCNC
             $this->getParam('projectID'),
             $dsProject
         );
-
-        if (!$this->buProject->deleteProject($this->getParam('projectID'))) {
-            $this->displayFatalError('Cannot delete this project');
+        try {
+            $this->buProject->deleteProject($this->getParam('projectID'));
+            echo json_encode(["status" => "ok"]);
             exit;
-        } else {
-            $urlNext =
-                Controller::buildLink(
-                    'Customer.php',
-                    array(
-                        'customerID' => $dsProject->getValue(DBEProject::customerID),
-                        'action'     => CTCNC_ACT_DISP_EDIT
-                    )
-                );
-            header('Location: ' . $urlNext);
-            exit;
+        } catch (\CNCLTD\Exceptions\ProjectCannotBeDeletedException $exception) {
+            throw new \CNCLTD\Exceptions\JsonHttpException(400, 'Failed to delete project');
         }
     }
 
