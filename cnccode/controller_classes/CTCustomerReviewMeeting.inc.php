@@ -842,7 +842,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             "supervisor" => [],
             "support"    => [],
             "delegate"   => [],
-            "no level"   => []
+            "no support level"   => []
         ];
 
         $duplicates = [];
@@ -881,7 +881,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
                     "lastName"  => $lastName
                 ];
             } else {
-                $supportContacts['no level'][] = [
+                $supportContacts['no support level'][] = [
                     "firstName" => $firstName,
                     "lastName"  => $lastName
                 ];
@@ -987,7 +987,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
                 $contactsInfo .= "<li>" . $contact['firstName'] . ' ' . $contact['lastName'] . "</li>";
             }
             $currentSection = "" . $sectionTemplate;
-            $currentSection = str_replace('{type}', ucfirst($type), $currentSection);
+            $currentSection = str_replace('{type}', ucwords($type), $currentSection);
             $currentSection = str_replace('{count}', count($supportContacts[$type]), $currentSection);
             $currentSection = str_replace('{contactData}', $contactsInfo, $currentSection);
             $toReturn .= $currentSection;
