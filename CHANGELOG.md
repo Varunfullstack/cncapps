@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v4.9.0] - 2020-10-20
 ### Added
 - Issue 1016 - Automated Request Monitor
 - Issue 1042 - Include Sales Order number in SR Creation
