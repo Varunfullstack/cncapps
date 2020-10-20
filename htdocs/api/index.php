@@ -605,7 +605,7 @@ WHERE
                     $response->getBody()->write(json_encode(["error" => "Token not found!"]));
                     return $response->withStatus(400);
                 }
-                $response->getBody()->write(json_encode($data));
+                $response->getBody()->write(json_encode(["status" => "ok", "data" => $data]));
                 return $response;
             }
         );
@@ -628,15 +628,23 @@ WHERE
                 $feedbackTokenGenerator = new \CNCLTD\FeedbackTokenGenerator($db);
                 $tokenData = $feedbackTokenGenerator->getTokenData($data['token']);
                 if (!$tokenData) {
-                    $response->getBody()->write(json_encode(["error" => "Token not found!"]));
+                    $response->getBody()->write(json_encode(["status" => "error", "message" => "Token not found!"]));
                     return $response->withStatus(400);
                 }
                 if (empty($data['value'])) {
-                    $response->getBody()->write(json_encode(["error" => "Feedback Value not provided"]));
+                    $response->getBody()->write(
+                        json_encode(["status" => "error", "message" => "Feedback Value not provided"])
+                    );
                     return $response->withStatus(400);
                 }
                 $dbeProblem = new DBEProblem($this);
                 $dbeProblem->getRow($tokenData->serviceRequestId);
+                if (!$dbeProblem->rowCount()) {
+                    $response->getBody()->write(
+                        json_encode(["status" => "error", "message" => "Service Request not found"])
+                    );
+                    return $response->withStatus(400);
+                }
                 $contactId = $dbeProblem->getValue(DBEProblem::contactID);
 
                 $customerFeedbackRepo = new \CNCLTD\CustomerFeedbackRepository($db);
