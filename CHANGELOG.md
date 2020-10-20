@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 1016 - Automated Request Monitor
+- Issue 1042 - Include Sales Order number in SR Creation
 ### Changed
 - Issue 1014 - Allow sorting data by columns in the Various Dashboards
 
