@@ -7,6 +7,7 @@ This project changes will be shown here.
 - Issue 1042 - Include Sales Order number in SR Creation
 ### Changed
 - Issue 1014 - Allow sorting data by columns in the Various Dashboards
+- Issue 1023 - Notify on duplicate MS ATP licenses assigned to a user
 
 ## [v4.8.0] - 2020-10-14
 ### Added

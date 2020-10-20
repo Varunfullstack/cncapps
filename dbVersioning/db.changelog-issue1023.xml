@@ -1,0 +1,28 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue1023-0">
+        <tagDatabase tag="issue1023"/>
+    </changeSet>
+    <changeSet id="issue1023-1" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="office365License" columnName="includesATP"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="office365License">
+            <column name="includesATP" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue1023-2" author="pavwebdev">
+        <sql>
+            update office365License
+            set includesATP = 1
+            where license in ('ATP_ENTERPRISE', 'SPB', 'ENTERPRISEPREMIUM')
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
