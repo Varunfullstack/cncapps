@@ -646,7 +646,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                 }
 
                 if ($licensesWithATP > 1) {
-                    $this->raiseCustomerLeaverWithLicenseSR($dbeCustomer, $datum['DisplayName']);
+                    $this->raiseMultipleATPLicensesSR($dbeCustomer, $datum['DisplayName']);
                 }
             }
             $licensesArray = explode(", ", $licenseValue);
@@ -1376,7 +1376,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         );
     }
 
-    function raiseMultipleATPLicenses(DBECustomer $dbeCustomer, $userName)
+    function raiseMultipleATPLicensesSR(DBECustomer $dbeCustomer, $userName)
     {
         $details = "<p>The username $userName has multiple M365 licenses that include ATP, please review and correct.</p>";
         $this->raiseCustomerServiceRequest($dbeCustomer, $details);
