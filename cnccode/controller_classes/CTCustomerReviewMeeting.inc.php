@@ -288,7 +288,6 @@ class CTCustomerReviewMeeting extends CTCNC
                 );
 
                 $supportedUsersData = $this->getSupportedUsersData(
-                    $buContact,
                     $customerId,
                     $dsCustomer->getValue(DBECustomer::name)
                 );
@@ -830,23 +829,20 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
         return $frequency;
     }
 
-    private function getSupportedUsersData(BUContact $buContact,
-                                           $customerId,
+    private function getSupportedUsersData($customerId,
                                            $customerName
     )
     {
-        /** @var DataSet $dsSupportContact */
-        $dsSupportContact = null;
-        $buContact->getSupportContacts(
-            $dsSupportContact,
-            $customerId
-        );
+        /** @var DBEContact $dsSupportContact */
+        $dsSupportContact = new DBEContact($this);
+        $dsSupportContact->getRowsByCustomerID($customerId);
 
         $supportContacts = [
             "main"       => [],
             "supervisor" => [],
             "support"    => [],
-            "delegate"   => []
+            "delegate"   => [],
+            "no support level"   => []
         ];
 
         $duplicates = [];
@@ -879,11 +875,18 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
                 ];
             }
 
+            if ($dsSupportContact->getValue(DBEContact::supportLevel)) {
+                $supportContacts[$dsSupportContact->getValue(DBEContact::supportLevel)][] = [
+                    "firstName" => $firstName,
+                    "lastName"  => $lastName
+                ];
+            } else {
+                $supportContacts['no support level'][] = [
+                    "firstName" => $firstName,
+                    "lastName"  => $lastName
+                ];
+            }
 
-            $supportContacts[$dsSupportContact->getValue(DBEContact::supportLevel)][] = [
-                "firstName" => $firstName,
-                "lastName"  => $lastName
-            ];
             $count++;
         }
 
@@ -984,7 +987,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
                 $contactsInfo .= "<li>" . $contact['firstName'] . ' ' . $contact['lastName'] . "</li>";
             }
             $currentSection = "" . $sectionTemplate;
-            $currentSection = str_replace('{type}', ucfirst($type), $currentSection);
+            $currentSection = str_replace('{type}', ucwords($type), $currentSection);
             $currentSection = str_replace('{count}', count($supportContacts[$type]), $currentSection);
             $currentSection = str_replace('{contactData}', $contactsInfo, $currentSection);
             $toReturn .= $currentSection;
@@ -1470,6 +1473,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             "support"    => 0,
             "delegate"   => 0,
             "furlough"   => 0,
+            "none"       => 0,
             "total"      => 0
         ];
 
@@ -1507,7 +1511,11 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
                 var_dump($dsSupportContact->getValue(DBEContact::contactID));
             }
 
-            $supportContactsCounts[$dsSupportContact->getValue(DBEContact::supportLevel)]++;
+            if (!$dsSupportContact->getValue(DBEContact::supportLevel)) {
+                $supportContactsCounts['none']++;
+            } else {
+                $supportContactsCounts[$dsSupportContact->getValue(DBEContact::supportLevel)]++;
+            }
             $supportContactsCounts['total']++;
         }
 
@@ -1600,6 +1608,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
         $supportContactInfo .= "<tr><td>Support</td><td>$supportContactsCounts[support]</td></tr>";
         $supportContactInfo .= "<tr><td>Delegate</td><td>$supportContactsCounts[delegate]</td></tr>";
         $supportContactInfo .= "<tr><td>Furlough</td><td>$supportContactsCounts[furlough]</td></tr>";
+        $supportContactInfo .= "<tr><td>No Level</td><td>$supportContactsCounts[none]</td></tr>";
         $supportContactInfo .= "<tr><td>Total</td><td>$supportContactsCounts[total]</td></tr>";
         $supportContactInfo .= "</tbody></table>";
 

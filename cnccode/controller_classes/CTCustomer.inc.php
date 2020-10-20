@@ -1802,7 +1802,7 @@ class CTCustomer extends CTCNC
                 'reviewMeetingBookedChecked'     => $this->dsCustomer->getValue(
                     DBECustomer::reviewMeetingBooked
                 ) ? 'checked' : null,
-                'inclusiveOOHCallOuts'           => $this->dsCustomer->getValue(                    DBECustomer::inclusiveOOHCallOuts                ),
+                'inclusiveOOHCallOuts'           => $this->dsCustomer->getValue(DBECustomer::inclusiveOOHCallOuts),
                 'support24HourFlagChecked'       => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::support24HourFlag)
                 ),
@@ -2448,6 +2448,7 @@ class CTCustomer extends CTCNC
         $supportCount = 0;
         $delegateCount = 0;
         $furloughCount = 0;
+        $noLevelCount = 0;
         $totalCount = 0;
 
         while ($this->dsContact->fetchNext()) {
@@ -2475,27 +2476,27 @@ class CTCustomer extends CTCNC
 
             if ($this->dsContact->getValue(DBEContact::contactID)) {
 
-                if ($this->dsContact->getValue(DBEContact::supportLevel)) {
 
-                    switch ($this->dsContact->getValue(DBEContact::supportLevel)) {
-                        case 'main':
-                            $mainCount++;
-                            break;
-                        case 'supervisor':
-                            $supervisorCount++;
-                            break;
-                        case 'support':
-                            $supportCount++;
-                            break;
-                        case 'delegate':
-                            $delegateCount++;
-                            break;
-                        case 'furlough':
-                            $furloughCount++;
-                            break;
-                    }
-                    $totalCount++;
+                switch ($this->dsContact->getValue(DBEContact::supportLevel)) {
+                    case 'main':
+                        $mainCount++;
+                        break;
+                    case 'supervisor':
+                        $supervisorCount++;
+                        break;
+                    case 'support':
+                        $supportCount++;
+                        break;
+                    case 'delegate':
+                        $delegateCount++;
+                        break;
+                    case 'furlough':
+                        $furloughCount++;
+                        break;
+                    default:
+                        $noLevelCount++;
                 }
+                $totalCount++;
 
                 $deleteContactURL =
                     Controller::buildLink(
@@ -2658,6 +2659,7 @@ class CTCustomer extends CTCNC
                     "supportCount"    => $supportCount,
                     "delegateCount"   => $delegateCount,
                     "furloughCount"   => $furloughCount,
+                    "noLevelCount"    => $noLevelCount,
                     "totalCount"      => $totalCount,
                 ]
             );
