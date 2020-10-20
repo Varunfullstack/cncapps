@@ -4,13 +4,15 @@ import sites from './reducers/sites';
 import visibilityFilter from './reducers/visibilityFilter'
 import customerEdit from './reducers/customerEdit'
 import error from './reducers/error'
+import projects from "./reducers/projects";
 
 const rootReducer = combineReducers({
     contacts,
     sites,
     visibilityFilter,
     customerEdit,
-    error
+    error,
+    projects
 })
 
 export default rootReducer

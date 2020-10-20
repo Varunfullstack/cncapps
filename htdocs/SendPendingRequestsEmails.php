@@ -56,6 +56,7 @@ function processChangeRequestsEmails()
         $dbeProblem = new DBEJProblem($thing);
         $dbeProblem->getRow($problemID);
         $changeRequested = $dbejCallActivity->getValue(DBEJCallActivity::reason);
+
         switch ($teamID) {
             case 1:
                 $storeArray = &$pendingHDRequests;

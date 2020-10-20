@@ -1,6 +1,9 @@
 import React from 'react';
 import * as HTMLReactParser from 'html-react-parser'
 import moment from "moment";
+import {connect} from "react-redux";
+import {entityMapToArray} from "../../utils/utils";
+import {deleteProject} from "./actions";
 
 class CustomerProjectsComponent extends React.Component {
     el = React.createElement;
@@ -54,17 +57,25 @@ class CustomerProjectsComponent extends React.Component {
         )
     }
 
+    handleProjectDelete(project) {
+
+        if (!confirm('Are you sure you want to delete this project?')) {
+            return;
+        }
+        this.props.onDeleteProject(project.id);
+    }
+
     renderDeleteLink(project) {
         if (!project.isDeletable) {
             return null;
         }
-        return (<a href={`Project.php?action=delete&projectID=${project.id}`}
-                   onClick={($event) => !confirm('Are you sure you want to delete this project?') ? $event.preventDefault() : null}
-        >
-            <button className="btn btn-outline-danger">
+        return (
+            <button className="btn btn-outline-danger"
+                    onClick={() => this.handleProjectDelete(project)}
+            >
                 <i className="fal fa-trash-alt fa-lg"/>
             </button>
-        </a>)
+        )
     }
 
     formatDate(dateString) {
@@ -211,4 +222,20 @@ class CustomerProjectsComponent extends React.Component {
     }
 }
 
-export default CustomerProjectsComponent;
+function mapStateToProps(state) {
+    const {projects} = state;
+    return {
+        projects: entityMapToArray(projects.allIds, projects.byIds),
+        isFetching: projects.isFetching
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        onDeleteProject: (projectId) => {
+            dispatch(deleteProject(projectId))
+        }
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CustomerProjectsComponent)

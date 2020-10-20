@@ -23,16 +23,6 @@ class BUProject extends Business
         $this->dbeProject = new DBEProject($this);
     }
 
-    function updateProject(&$dsData)
-    {
-        $this->setMethodName('updateProject');
-        $this->updateDataAccessObject(
-            $dsData,
-            $this->dbeProject
-        );
-        return TRUE;
-    }
-
     /**
      * @param $customerID
      * @return string
@@ -76,18 +66,6 @@ class BUProject extends Business
 
     }
 
-    function getProjectByID($ID,
-                            &$dsResults
-    )
-    {
-        $this->dbeProject->setPKValue($ID);
-        $this->dbeProject->getRow();
-        return ($this->getData(
-            $this->dbeProject,
-            $dsResults
-        ));
-    }
-
     function getProjectsByCustomerID($customerID,
                                      &$dsResults,
                                      $activityDate = false
@@ -103,19 +81,44 @@ class BUProject extends Business
         ));
     }
 
+    function updateProject(&$dsData)
+    {
+        $this->setMethodName('updateProject');
+        $this->updateDataAccessObject(
+            $dsData,
+            $this->dbeProject
+        );
+        return TRUE;
+    }
+
+    function getProjectByID($ID,
+                            &$dsResults
+    )
+    {
+        $this->dbeProject->setPKValue($ID);
+        $this->dbeProject->getRow();
+        return ($this->getData(
+            $this->dbeProject,
+            $dsResults
+        ));
+    }
+
     function getCurrentProjects()
     {
         return $this->dbeProject->getCurrentProjects();
     }
 
+    /**
+     * @param $ID
+     * @return bool
+     */
     function deleteProject($ID)
     {
         $this->setMethodName('deleteProject');
-        if ($this->canDelete($ID)) {
-            return $this->dbeProject->deleteRow($ID);
-        } else {
-            return FALSE;
+        if (!$this->canDelete($ID)) {
+            throw new \CNCLTD\Exceptions\ProjectCannotBeDeletedException();
         }
+        return $this->dbeProject->deleteRow($ID);
     }
 
     /**
@@ -128,15 +131,8 @@ class BUProject extends Business
     {
         $dbeProblem = new DBEProblem($this);
         // validate no activities of this type
-        $dbeProblem->setValue(
-            DBEProblem::projectID,
-            $ID
-        );
-        if ($dbeProblem->countRowsByColumn(DBEProblem::projectID) < 1) {
-            return TRUE;
-        } else {
-            return FALSE;
-        }
+        $dbeProblem->setValue(DBEProblem::projectID, $ID);
+        return $dbeProblem->countRowsByColumn(DBEProblem::projectID) < 1;
     }
 
     /**
