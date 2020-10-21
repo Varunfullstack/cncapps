@@ -17,7 +17,6 @@ class PendingTimeRequestTwigDTO
     private $timeLeftOnBudget;
     private $requesterTeam;
     private $approvalLevel;
-    private $serviceRequestId;
 
     public function __construct($customerName,
                                 $srURL,
@@ -29,8 +28,7 @@ class PendingTimeRequestTwigDTO
                                 $timeSpentSoFar,
                                 $timeLeftOnBudget,
                                 $requesterTeam,
-                                $approvalLevel,
-                                $serviceRequestId
+                                $approvalLevel
     )
     {
         $this->customerName = $customerName;
@@ -44,7 +42,6 @@ class PendingTimeRequestTwigDTO
         $this->timeLeftOnBudget = $timeLeftOnBudget;
         $this->requesterTeam = $requesterTeam;
         $this->approvalLevel = $approvalLevel;
-        $this->serviceRequestId = $serviceRequestId;
     }
 
     /**
@@ -133,14 +130,6 @@ class PendingTimeRequestTwigDTO
     public function getApprovalLevel()
     {
         return $this->approvalLevel;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getServiceRequestId()
-    {
-        return $this->serviceRequestId;
     }
 
 }

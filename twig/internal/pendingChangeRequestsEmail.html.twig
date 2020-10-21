@@ -1,0 +1,47 @@
+{% extends "@internal/wrapper.html.twig" %}
+{# @var items \CNCLTD\PendingChangeRequestTwigDTO[] #}
+{% block styles %}
+
+    .content table td, .content table th {
+    padding: 0 15px 0 15px;
+    }
+{% endblock %}
+{% block content %}
+    <p>These are the pending Change Requests</p>
+    <table>
+        <thead>
+        <tr>
+            <th>
+                Customer Name
+            </th>
+            <th>
+                SR Link
+            </th>
+            <th>
+                Change Requested
+            </th>
+            <th>
+                Requested By
+            </th>
+            <th>
+                Requested Date&Time
+            </th>
+            <th>
+                Process Change Request
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in items %}
+            <tr>
+                <td>{{ item.customerName }}</td>
+                <td><a href="{{ item.srURL }}">SR</a></td>
+                <td>{{ item.changeRequested | raw }}</td>
+                <td>{{ item.requestedBy }}</td>
+                <td>{{ item.requestedDateTime }}</td>
+                <td><a href="{{ item.processURL }}">Process Change Request</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

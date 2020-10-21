@@ -29,24 +29,12 @@ function processChangeRequestsEmails()
     $pendingHDRequests = [];
     $pendingESRequests = [];
     $pendingIMRequests = [];
-    $buActivity = new BUActivity($thing);
 
     while ($dbejCallActivity->fetchNext()) {
         $problemID = $dbejCallActivity->getValue(DBEJCallActivity::problemID);
-        $lastActivity = $buActivity->getLastActivityInProblem($problemID);
-        $srLink = SITE_URL . '/Activity.php?callActivityID=' . $lastActivity->getValue(
-                DBEJCallActivity::callActivityID
-            ) . '&action=displayActivity';
+        $srURL = SITE_URL . "/Activity.php?problemID={$problemID}&action=displayLastActivity";
+        $processURL = SITE_URL . "/Activity.php?callActivityID={$dbejCallActivity->getValue(DBEJCallActivity::callActivityID)}&action=changeRequestReview";
 
-
-        $srLink = "<a href='$srLink'>SR</a>";
-
-        $processCRLink =
-            SITE_URL . '/Activity.php?callActivityID=' . $dbejCallActivity->getValue(
-                DBEJCallActivity::callActivityID
-            ) . '&action=changeRequestReview';
-
-        $processCRLink = "<a href='$processCRLink'>Process Change Request</a>";
 
         $requestingUserID = $dbejCallActivity->getValue(DBEJCallActivity::userID);
         $requestingUser = new DBEUser($thing);
@@ -67,17 +55,14 @@ function processChangeRequestsEmails()
                 $storeArray = &$pendingIMRequests;
         }
 
-
-        $storeArray[] = [
-            'changeRequested'   => $changeRequested,
-            'customerName'      => $dbejCallActivity->getValue(DBEJCallActivity::customerName),
-            'srLink'            => $srLink,
-            'requestedBy'       => $dbejCallActivity->getValue(DBEJCallActivity::userName),
-            'requestedDateTime' => $dbejCallActivity->getValue(
-                    DBEJCallActivity::date
-                ) . ' ' . $dbejCallActivity->getValue(DBEJCallActivity::startTime),
-            'processCRLink'     => $processCRLink,
-        ];
+        $storeArray[] = new \CNCLTD\PendingChangeRequestTwigDTO(
+            $dbejCallActivity->getValue(DBEJCallActivity::customerName),
+            $srURL,
+            $dbejCallActivity->getValue(DBEJCallActivity::userName),
+            "{$dbejCallActivity->getValue(DBEJCallActivity::date)} {$dbejCallActivity->getValue(DBEJCallActivity::startTime)}",
+            $processURL,
+            $changeRequested
+        );
 
     }
     sendChangeRequestsEmail(
@@ -114,22 +99,22 @@ function addPendingTimeRequestToArray(&$array,
             DBEJCallActivity::callActivityID
         ) . '&action=timeRequestReview';
 
-    $processURL = "<a href='$processURL'>Process Time Request</a>";
     $leftOnBudget = $assignedMinutes - $usedMinutes;
 
-    $array[] = [
-        'customerName'      => $DBEJCallActivity->getValue(DBEJCallActivity::customerName),
-        'srLink'            => $srURL,
-        'notes'             => $DBEJCallActivity->getValue(DBEJCallActivity::reason),
-        'requestedBy'       => $DBEJCallActivity->getValue(DBEJCallActivity::userName),
-        'requestedDateTime' => "{$DBEJCallActivity->getValue(                DBEJCallActivity::date            )} {$DBEJCallActivity->getValue(DBEJCallActivity::startTime)}:00",
-        'processCRLink'     => $processURL,
-        'chargeableHours'   => $DBEProblem->getValue(DBEJProblem::chargeableActivityDurationHours),
-        'timeSpentSoFar'    => round($usedMinutes, 2),
-        'timeLeftOnBudget'  => round($leftOnBudget, 2),
-        'requesterTeam'     => $teamName,
-        'approvalLevel'     => $isOverLimit ? 'Mgmt' : 'Team Lead',
-    ];
+
+    $array[] = new \CNCLTD\PendingTimeRequestTwigDTO(
+        $DBEJCallActivity->getValue(DBEJCallActivity::customerName),
+        $srURL,
+        $DBEJCallActivity->getValue(DBEJCallActivity::reason),
+        $DBEJCallActivity->getValue(DBEJCallActivity::userName),
+        "{$DBEJCallActivity->getValue(                DBEJCallActivity::date            )} {$DBEJCallActivity->getValue(DBEJCallActivity::startTime)}:00",
+        $processURL,
+        $DBEProblem->getValue(DBEJProblem::chargeableActivityDurationHours),
+        round($usedMinutes, 2),
+        round($leftOnBudget, 2),
+        $teamName,
+        $isOverLimit ? 'Mgmt' : 'Team Lead'
+    );
 }
 
 function processTimeRequestsEmails()
@@ -294,67 +279,14 @@ function sendChangeRequestsEmail($teamEmail,
     if (!count($requests)) {
         return;
     }
-    global $cfg;
+    global $twig;
     $thing = null;
     $buMail = new BUMail($thing);
 
     $senderEmail = CONFIG_SUPPORT_EMAIL;
 
-    $template = new Template(
-        EMAIL_TEMPLATE_DIR,
-        "remove"
-    );
-
-    $template->set_file(
-        'page',
-        'PendingChangeRequestsEmail.inc.html'
-    );
-
-    $requestsTemplate = new Template(
-        $cfg["path_templates"],
-        "remove"
-    );
-
-
-    $requestsTemplate->setFile(
-        'ChangeRequestDashboard',
-        'ChangeRequestDashboard.html'
-    );
-
-
-    $requestsTemplate->set_block(
-        'ChangeRequestDashboard',
-        'ChangeRequestsBlock',
-        'changeRequests'
-    );
-
-
-    foreach ($requests as $request) {
-        $requestsTemplate->set_var($request);
-        $requestsTemplate->parse(
-            'changeRequests',
-            'ChangeRequestsBlock',
-            true
-        );
-    }
-
-    $requestsTemplate->parse(
-        'output',
-        'ChangeRequestDashboard',
-        true
-    );
-
-    $requestsTable = $requestsTemplate->get_var('output');
-    $template->setVar(['requestsTable' => $requestsTable]);
-
-    $template->parse(
-        'output',
-        'page',
-        true
-    );
-
-    $body = $template->getVar('output');
-
+    $body = $twig->render('@internal/pendingChangeRequestsEmail.html.twig', ["items" => $requests]);
+    echo $body;
     $toEmail = $teamEmail;
 
     $hdrs = array(
