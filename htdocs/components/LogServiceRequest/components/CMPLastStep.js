@@ -5,8 +5,9 @@ import Timer from "../../utils/timer.js";
 import { groupBy, SRQueues, TeamType } from "../../utils/utils.js";
 import APIStandardText from "../../services/APIStandardText.js";
 import StandardTextModal from "../../Modals/StandardTextModal.js";
+import MainComponent from "../../CMPMainComponent.js";
 
-class CMPLastStep extends React.Component {
+class CMPLastStep extends MainComponent {
   el = React.createElement;
 
   apiCustomer = new APICustomers();
@@ -15,7 +16,7 @@ class CMPLastStep extends React.Component {
     super(props);
     const { data } = this.props;
     this.state = {
-     
+     ...this.state,
       checkList: [],
       noWorkOptions: [],
       contacts: [],
@@ -152,7 +153,8 @@ class CMPLastStep extends React.Component {
   handleNext = () => {
     const { data } = this.state;
     this.checkStartWorkNow();
-    data.userID = this.props.data.currentUser.id;
+    //data.userID = this.props.data.currentUser.id;
+    data.userID=null;
     //data.callActTypeID=51;
     data.completeDate = null;
     if (this.isValid()) this.props.updateSRData(data, true);
@@ -192,9 +194,12 @@ class CMPLastStep extends React.Component {
     const { data } = this.state;
     data.startWork = true;
     data.notStartWorkReason = "";
-    data.notStartWorkReasonTemplate = "";
-    this.state({ data });
-    this.handleNext();
+    data.notStartWorkReasonTemplate = "";    
+    data.completeDate = null;
+    data.userID=null;    
+    this.setState({ data });
+    if (this.isValid()) 
+     this.props.updateSRData(data, true);    
   };
   getProblemPriority = () => {
     const { el, setValue } = this;
@@ -308,7 +313,7 @@ class CMPLastStep extends React.Component {
     //contactID
     const contact = contacts.find((item) => item.id == contactID);
     console.log(contactID, contact);
-    if (contact.startMainContactStyle == "- Delegate") requireAuthorize = true;
+    if (contact?.startMainContactStyle == "- Delegate") requireAuthorize = true;
     else {
       requireAuthorize = false;
       data.authorisedBy = "";
@@ -405,14 +410,15 @@ class CMPLastStep extends React.Component {
       title: "Why you don't want to start working now?",
       okTitle: "Ok",
       onChange: this.handleNoWorkReason,
+      onCancel:()=>this.setState({_showModal:false})
     });
   };
   handleNoWorkReason = (value) => {
     const { data } = this.state;
     data.notStartWorkReason = value;
-    this.setState({ data });
+    this.setState({ data,_showModal:false });
   };
-  checkStartWorkNow = () => {
+  checkStartWorkNow = async() => {
     const { currentUser } = this.props.data;
     const { customer } = this.props.data;
     const { data } = this.state;
@@ -424,7 +430,7 @@ class CMPLastStep extends React.Component {
       data.notStartWorkReason == "" &&
       !data.startWork
     ) {
-      if (!confirm("Do you want to start working on this now?")) {
+      if (!await this.confirm("Do you want to start working on this now?")) {
         _showModal = true;
       } else data.startWork = true;
     }
@@ -434,24 +440,24 @@ class CMPLastStep extends React.Component {
   isValid = () => {
     const { data, requireAuthorize } = this.state;
     if (data.contactID == -1) {
-      alert("Please select contact");
+      this.alert("Please select contact");
       return false;
     }
     if (requireAuthorize && data.authorisedBy == "") {
-      alert("Please Select Authorize By");
+      this.alert("Please Select Authorize By");
       return false;
     }
 
     if (data.priority == -1) {
-      alert("Please select priority");
+      this.alert("Please select priority");
       return false;
     }
     if (data.queueNo == -1) {
-      alert("Please select queue");
+      this.alert("Please select queue");
       return false;
     }
     if (data.reason == "") {
-      alert("Please select queue");
+      this.alert("Please select queue");
       return false;
     }
     return true;
@@ -548,6 +554,8 @@ class CMPLastStep extends React.Component {
       "div",
       null,
       getElements(),
+      this.getConfirm(),
+      this.getAlert(),
       this.getDocumentsElement(),
       this.getSelectedFilesElement(),
       this.getNextButton(),

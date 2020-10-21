@@ -2,11 +2,12 @@
 import APICustomers from "../../services/APICutsomer.js";
 import Spinner from "../../utils/spinner.js?v=1";
 import { padEnd, sort } from "../../utils/utils.js";
+import MainComponent from "../../CMPMainComponent.js";
 
 //import   CKEditor from "ckeditor5-react";
 //import * as ClassicEditor from '../../npm/node_modules/@ckeditor/ckeditor5-build-classic/build/ckeditor.js';
 
-class CMPCustomerSite extends React.Component {
+class CMPCustomerSite extends MainComponent {
   el = React.createElement;
   apiCutsomer = new APICustomers();
 
@@ -14,6 +15,7 @@ class CMPCustomerSite extends React.Component {
     super(props);
     const { data } = this.props;
     this.state = {
+      ... this.state,
       _showSpinner: false,
       sites: [],
       assets: [],
@@ -152,11 +154,13 @@ class CMPCustomerSite extends React.Component {
     const { el } = this;
     return el(
       "div",
-      null,
+      {style:{maxWidth:800 }},
       el("label", { className: "site-label" }, "Details"),
       el(CKEditor, {
         id: "reason",
         value: this.state.data.reason,
+        //inline:true,
+        height:300,
         onChange: (data) => this.setValue("reasonTemplate", data),
       }),
       el(
@@ -166,25 +170,26 @@ class CMPCustomerSite extends React.Component {
         el(CKEditor, {
           id: "internalNotes",
           value: this.state.data.internalNotes,
+          //inline:true,
+          height:300,
           onChange: (data) => this.setValue("internalNotesTemplate", data),
         })
       )
     );
   };
-  handleNext = () => {
+  handleNext = async() => {
     let { data } = this.state;
     data.nextStep = 4;
     data.reason = data.reasonTemplate;
     data.internalNotes = data.internalNotesTemplate;
     console.log(data);
     if (data.siteNo == -1) {
-      alert("Please select customer site");
+      this.alert("Please select customer site");
       return;
     }
-    if (data.assetName == "") {
-      const emptyAssetReason = prompt(
-        "Please provide the reason of no Asset",
-        this.state.data.emptyAssetReason
+    if (data.assetName == ""&& data.emptyAssetReason!="") {
+      const emptyAssetReason = await this.prompt(
+        "Please provide the reason of no Asset" ,600
       );
       if (!emptyAssetReason) return;
       else {
@@ -193,11 +198,11 @@ class CMPCustomerSite extends React.Component {
       }
     }
     if (data.emailSubjectSummary == "") {
-      alert("You must enter Email Subject Summary");
+      this.alert("You must enter Email Subject Summary");
       return;
     }
     if (data.reason == "") {
-      alert("Please enter details");
+      this.alert("Please enter details");
       return;
     }
 
@@ -224,6 +229,8 @@ class CMPCustomerSite extends React.Component {
       "div",
       null,
       el(Spinner,{show:_showSpinner}),
+      this.getPrompt(),
+      this.getAlert(),
       getSitesElement(),
       getAssetElement(),
       this.getEmailSubjectSummary(),

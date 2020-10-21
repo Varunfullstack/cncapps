@@ -12,8 +12,17 @@
             document.searchForm.submit();
         }
     }
+    function makeSumbit(value)
+    {     
+        $('#searchForm').remove('#CSV');
+        $('#searchForm').remove('#Search');
+        $('#searchForm').append('<input type="hidden" value="'+value+'" name="'+value+'"  />');
+        $('#searchForm').submit();   
+        console.log('post');
+    }
+     
 </script>
-<form name="searchForm"
+<form name="searchForm" id="searchForm" 
       method="post"
       action="{urlSubmit}"
 >
@@ -141,23 +150,11 @@
         <tr>
             <td>&nbsp;</td>
             <td>
-                <input type="submit"
-                       name="Search"
-                       value="Search"
-                >
-                <input type="submit"
-                       name="CSV"
-                       value="CSV"
-                >
-                <input name="CreateItem"
-                       type="button"
-                       onClick="document.location='CustomerItem.php?action=addCI'"
-                       value="New Item"
-                >
-                <button type="button"
-                        onclick="document.location = 'CustomerItem.php' "
-                >Clear
-                </button>
+                <i name="SearchIcon" class="fal fa-search fa-2x icon m-5 pointer" onclick="makeSumbit('Search')" ></i>
+                <i name="CSVIcon" class="fal fa-file-csv fa-2x icon m-5 pointer" onclick="makeSumbit('CSV')" ></i>
+                <i name="plusIcon" class="fal fa-plus fa-2x icon m-5 pointer" onclick="document.location='CustomerItem.php?action=addCI'" ></i>
+                <i name="clearIcon" class="fal fa-sync fa-2x icon m-5 pointer" onclick="document.location = 'CustomerItem.php'" ></i>
+                   
         </tr>
     </table>
     <table class="singleBorder"

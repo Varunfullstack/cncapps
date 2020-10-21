@@ -94,14 +94,23 @@
             elm.closest('tr').find('[type="checkbox"]').prop('checked', false);
         }
     }
+    
+    function sumbit(value)
+    {
+        $('#searchForm').remove('#CSV');
+        $('#searchForm').remove('#Search');
+        $('#searchForm').append('<input type="hidden" value="'+value+'" name="'+value+'"  />');
+        $('#searchForm').submit();
+   
+    }
 </script>
 <style type="text/css">
-    <!--
-    .style2 {
+    
+    /* .style2 {
         font-size: x-small
-    }
+    } */
 
-    -->
+   
 </style>
 
 <!--<P class="formErrorMessage">{formError} test</P>-->
@@ -360,12 +369,20 @@
                        size="100"
                        maxlength="100"
                 >
-                <button type="button"
+                <!-- <button type="button"
                         onclick="alert('+Office and +essentials – will search for any text that’s Office AND Essentials\n'+
 '“Office 365” and +premium – will search for any text that’s “Office 365” AND there’s also Premium\n'+
 'Office 365 premium – will search for any of those key words (i.e. its Office OR 365 OR Premium)')"
-                >Help
-                </button>
+                >   
+
+                </button> -->
+                <i name="Help" class="fal fa-question-square fa-2x icon m-5" 
+                onclick="alert('+Office and +essentials – will search for any text that’s Office AND Essentials\n'+
+                '“Office 365” and +premium – will search for any text that’s “Office 365” AND there’s also Premium\n'+
+                'Office 365 premium – will search for any of those key words (i.e. its Office OR 365 OR Premium)')"
+                ></i>
+
+
             </td>
         </tr>
         <tr>
@@ -406,10 +423,14 @@
         <tr>
             <td>&nbsp;</td>
             <td>
-                <input type="submit"
+                <i name="SearchIcon" class="fal fa-search fa-2x icon m-5 pointer" onclick="sumbit('Search')" ></i>
+                <i name="CSVIcon" class="fal fa-file-csv fa-2x icon m-5 pointer" onclick="sumbit('CSV')" ></i>
+                <i name="clearIcon" class="fal fa-sync fa-2x icon m-5 pointer" onclick="document.location='Activity.php'" ></i>
+
+                 <!-- <input type="submit"
                        name="Search"
                        value="Search"
-                >
+                > 
                 <input type="submit"
                        name="CSV"
                        value="CSV"
@@ -418,7 +439,7 @@
                        name="Clear"
                        value="Clear"
                        onClick="document.location='Activity.php'"
-                /></td>
+                /></td> -->
         </tr>
     </table>
     {rowsFound} activities found

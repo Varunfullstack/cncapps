@@ -370,12 +370,12 @@ class CTCNC extends Controller
         );
 
         if ($this->hasPermissions(TECHNICAL_PERMISSION)) {
-            $menu->addSection("Technical", 'fa-laptop', $this->getDefaultTechnicalMenu(), null);
+            $menu->addSection("Technical", 'fal fa-laptop', $this->getDefaultTechnicalMenu(), null);
         }
 
         $this->addConditionalMenu(
             $menu,
-            'fa-laptop',
+            'fal fa-laptop',
             "Technical",
             $this->isStarterLeaverManger(),
             114,
@@ -387,7 +387,7 @@ class CTCNC extends Controller
         if ($this->isUserSDManager()) {
             $menu->addSection(
                 "SDManagement",
-                'fa-chalkboard-teacher',
+                'fal fa-chalkboard-teacher',
                 $this->getDefaultSDManagerMenu(),
                 "SD Management"
             );
@@ -406,10 +406,10 @@ class CTCNC extends Controller
 
 
         if ($this->hasPermissions(SALES_PERMISSION)) {
-            $menu->addSection("Sales", 'fa-tag', $this->getDefaultSalesMenu());
+            $menu->addSection("Sales", 'fal fa-tag', $this->getDefaultSalesMenu());
             $this->addConditionalMenu(
                 $menu,
-                'fa-tag',
+                'fal fa-tag',
                 "Sales",
                 $this->dbeUser->getValue(DBEUser::streamOneLicenseManagement) == 1,
                 313,
@@ -437,40 +437,40 @@ class CTCNC extends Controller
         if ($this->hasPermissions(ACCOUNT_MANAGEMENT_PERMISSION)) {
             $menu->addSection(
                 'AccountManagement',
-                'fa-user-cog',
+                'fal fa-user-cog',
                 $this->getDefaultAccountManagementMenu(),
                 "Account Management"
             );
         }
 
         if ($this->hasPermissions(REPORTS_PERMISSION)) {
-            $menu->addSection('Reports', "fa-file", $this->getDefaultReportsMenu());
+            $menu->addSection('Reports', "fal fa-file", $this->getDefaultReportsMenu());
         }
 
         if ($this->hasPermissions(RENEWALS_PERMISSION)) {
             $menu->addSection(
                 'ServiceRenewals',
-                'fa-tasks',
+                'fal fa-tasks',
                 $this->getDefaultServiceRenewalsMenu(),
                 "Service Renewals"
             );
         }
 
         if ($this->hasPermissions(ACCOUNTS_PERMISSION)) {
-            $menu->addSection('Accounts', 'fa-calculator', $this->getDefaultAccountsMenu());
+            $menu->addSection('Accounts', 'fal fa-calculator', $this->getDefaultAccountsMenu());
         }
 
         if ($this->hasPermissions(MAINTENANCE_PERMISSION)) {
-            $menu->addSection("Maintenance", 'fa-wrench', $this->getDefaultMaintenanceMenu());
+            $menu->addSection("Maintenance", 'fal fa-wrench', $this->getDefaultMaintenanceMenu());
         }
 
         if ($this->hasPermissions(SENIOR_MANAGEMENT_PERMISSION)) {
-            $menu->addSection("Management", 'fa-project-diagram', $this->getDefaultManagementMenu());
+            $menu->addSection("Management", 'fal fa-project-diagram', $this->getDefaultManagementMenu());
         }
 
         $this->addConditionalMenu(
             $menu,
-            'fa-user-circle',
+            'fal fa-user',
             $this->getDbeUser()->getValue(DBEUser::name),
             true,
             1001,
@@ -480,7 +480,7 @@ class CTCNC extends Controller
 
         $this->addConditionalMenu(
             $menu,
-            'fa-user-circle',
+            'fal fa-user',
             $this->getDbeUser()->getValue(DBEUser::name),
             true,
             1002,

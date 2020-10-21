@@ -86,10 +86,13 @@ export default class CMPLogServiceRequest extends React.Component {
       if(newData.internalNotes.indexOf(newData.internalNotesAppend)==-1)
         newData.internalNotes +=newData.internalNotesAppend;
       newData.callActTypeID=null;
+      console.log(newData);
+      //return;
       const result=await this.api.createProblem(customData);     
       console.log(result);
       if(result.status)
       { 
+         
         if(newData.uploadFiles.length>0)
           await this.api.uploadFiles(
             `Activity.php?action=uploadFile&problemID=${result.problemID}&callActivityID=${result.callActivityID}`,

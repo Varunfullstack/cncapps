@@ -59,9 +59,7 @@ class APIActivity extends APIMain{
         let url=`${ApiUrls.SRActivity}updateActivity`;        
         return this.post(url,activity).then(res => res.json());
     }
-    getCallActTypes(){
-        return fetch(`${ApiUrls.SRActivity}getCallActTypes`).then(res => res.json());
-    }      
+         
     getPriorities()
     {
         return fetch(`${ApiUrls.SRActivity}getPriorities`).then(res => res.json());

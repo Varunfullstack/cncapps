@@ -8,7 +8,7 @@ require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/DBECallActType.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJCallActType.php");
 require_once($cfg["path_dbe"] . "/DBECallActivity.inc.php");
-
+require_once($cfg["path_dbe"] . "/DBConnect.php");
 class BUActivityType extends Business
 {
     /** @var DBECallActType|DataSet */
@@ -89,5 +89,18 @@ class BUActivityType extends Business
         // validate no activities of this type
         $dbeCallActivity->setValue(DBECallactivity::callActTypeID, $ID);
         return $dbeCallActivity->countRowsByColumn(DBECallactivity::callActTypeID) < 1;
+    }
+    /**
+     * @param $Id int
+     * @return boolean
+     * check if activity type in expenses or not
+     */
+    public static function hasExpenses($Id)
+    {        
+       $query="SELECT   COUNT(*) total FROM expensetypeactivityavailability WHERE activityTypeID=$Id";
+       $result=DBConnect::fetchOne($query);
+       if($result["total"]>0)
+       return true;
+       else return false;       
     }
 }

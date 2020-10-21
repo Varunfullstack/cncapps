@@ -3,7 +3,7 @@
 {% for section in sideMenu.sections %}
     <li class="sub-menu">
         <a href="javascript:">
-            <i class="fa {{ section.icon }}"
+            <i class="{{ section.icon }}"
                data-placement="right"
                title="{{ section.name }}"
             >
@@ -26,7 +26,7 @@
                     <a href="#"
                        class="float-right {{ item.favourite ? 'favourited' : '' }}"
                        onclick="return toggleFavourite({{ item.id }}, {{ item.favourite ? 'true' : 'false' }})"
-                    ><i class="{{ item.favourite ? 'fa' : '' }} far fa-star"></i>
+                    ><i class="{{ item.favourite ? 'fal' : '' }} fal fa-star"></i>
                     </a>
                 </li>
             {% endfor %}

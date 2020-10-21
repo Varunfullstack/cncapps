@@ -3695,6 +3695,7 @@ class CTCustomer extends CTCNC
                     "contactMobilePhone"=>$dbeContact->getValue(DBEContact::mobilePhone),
                     "contactEmail"=>$dbeContact->getValue(DBEContact::email),
                     'contactSupportLevel'=> $dbeContact->getValue(DBEContact::supportLevel),
+                    "notes"=>$dbeContact->getValue(DBEContact::notes)
 
                 )
             );

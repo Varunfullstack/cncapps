@@ -18,18 +18,17 @@
     cursor: pointer;
 }
 .activities-contianer{
-    width:1000px;
+   
     margin-top:5px;
     border:1px solid #bdbec1;
     border-radius: 5px;
-    padding:5px
+    
 }
 .activities-edit-contianer{
     width:1080px;
     margin-top:5px;
     border:1px solid #bdbec1;
     border-radius: 5px;
-   
 }
 .activity-detials-flex{    
     display: flex;

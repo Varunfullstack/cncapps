@@ -154,6 +154,32 @@ export function padEnd(value,length,char)
   //console.log(value,value.length);
   return value;
 }
+/**
+ * 
+ * @param {array} items 
+ * @param {string} propertyName 
+ */
+export function maxLength(items,propertyName){
+  const newItems=items.map(item=>item[propertyName]);
+  var maxLength=0;
+  if(newItems.length>0)
+  {
+    var canvas = document.createElement('canvas');
+    canvas.style.display="none";
+    var ctx = canvas.getContext("2d");
+    ctx.font = "11px Arial";    
+    for(let i=0;i<newItems.length;i++)    
+    {
+    var width = ctx.measureText(newItems[i]).width;
+    if(width>maxLength)
+      maxLength=width;
+       
+    }
+  
+    canvas.remove();
+  }
+  return maxLength;
+}
 export const Chars={
   WhiteSpace:"&nbsp;"
 }

@@ -458,8 +458,8 @@ class CTPassword extends CTCNC
                     'passwordID' => $dsPassword->getValue(DBEPassword::passwordID)
                 )
             );
-            $weirdFields = "<td class=\"contentLeftAlign\"><A href=\"$urlEdit\">edit</a></td>
-        <td class=\"contentLeftAlign\"><A href=\"$urlArchive\" onClick=\"if(!confirm('Are you sure you want to archive this password?')) return(false)\">archive</a></td>";
+            $weirdFields = "<td class=\"contentLeftAlign\"><A href=\"$urlEdit\"><i class='fal fa-edit fa-2x icon'></i></a></td>
+        <td class=\"contentLeftAlign\"><A href=\"$urlArchive\" onClick=\"if(!confirm('Are you sure you want to archive this password?')) return(false)\"><i class='fal fa-archive fa-2x icon'></i></a></td>";
 
             if ($showArchived) {
                 $weirdFields = "<td class=\"contentLeftAlign\">" . $dsPassword->getValue(DBEPassword::archivedBy) . "</td>

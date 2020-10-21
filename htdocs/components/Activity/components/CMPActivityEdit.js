@@ -1,4 +1,5 @@
 import APIActivity from "../../services/APIActivity.js";
+import APICallactType from "../../services/APICallactType.js";
 import {groupBy, params, pick,TeamType} from "../../utils/utils.js";
 import Toggle from "../../utils/toggle.js";
 import Table from "../../utils/table/table.js"
@@ -9,21 +10,27 @@ import ToolTip from "../../utils/ToolTip.js";
 import APICustomers from "../../services/APICutsomer.js";
 import APIUser from "../../services/APIUser.js";
 import CountDownTimer from "../../utils/CountDownTimer.js";
-class CMPActivityEdit extends React.Component {
+import StandardTextModal from "../../Modals/StandardTextModal.js";
+import Alert from "../../utils/Alert.js";
+import MainComponent from "../../CMPMainComponent.js";
+class CMPActivityEdit extends MainComponent {
   el = React.createElement;
   api = new APIActivity();
   apiCustomer = new APICustomers();
   apiUser = new APIUser();
+  apiCallactType=new APICallactType();
   activityStatus = {
     Fixed: "Fixed",
     CustomerAction: "CustomerAction",
     CncAction: "CncAction",
     Escalate: "Escalate",
+    Update:"Update"
   };
   autoSavehandler=null;
   constructor(props) {
     super(props);
-    this.state = {      
+    this.state = {
+      ...this.state,
       _activityLoaded: false,
       uploadFiles: [],
       contacts: [],
@@ -45,7 +52,12 @@ class CMPActivityEdit extends React.Component {
         completeDate: "",
         techNotes: "",
         projects: [],
-        submitAsOvertime:0
+        submitAsOvertime:0,
+        cncNextAction:"",
+        cncNextActionTemplate:"",
+        customerNotes:"",
+        customerNotesTemplate:"",
+        priorityChangeReason:""
       },
       currentActivity: "",
       _showModal: false,
@@ -73,18 +85,25 @@ class CMPActivityEdit extends React.Component {
     this.loadCallActivity(params.get("callActivityID"));
     // lodaing lookups
     Promise.all([
-      this.api.getCallActTypes(),
+      this.apiCallactType.getAll(),
       this.apiUser.getActiveUsers(),      
       this.api.getPriorities(),
       this.api.getRootCauses(),
       this.apiUser.getCurrentUser(),
     ]).then((result) => {
+      const currentUser=result[4];    
+      let callActTypes=result[0];
+      console.log(currentUser,callActTypes);
+      if(!currentUser.isSDManger)
+      {
+        callActTypes=callActTypes.filter(c=>c.visibleInSRFlag=='Y')
+      }
       this.setState({
-        callActTypes: result[0],
+        callActTypes,
         users: result[1],
         priorities: result[2],
         rootCauses: result[3],
-        currentUser:result[4],
+        currentUser,
       });
       setTimeout(()=>this.autoSave(),2000);
     });
@@ -93,6 +112,7 @@ class CMPActivityEdit extends React.Component {
     clearInterval(this.autoSavehandler);
 
   }
+  
   //------------API
   loadCallActivity(callActivityID) {
     const { filters } = this.state;
@@ -107,8 +127,25 @@ class CMPActivityEdit extends React.Component {
         return d;
       });
       res.reasonTemplate = res.reason;
+      res.cncNextActionTemplate=res.cncNextAction;
       res.internalNotesTemplate = res.internalNotes;
+      res.customerNotesTemplate = res.customerNotes;
       res.callActTypeIDOld = res.callActTypeID;
+      res.orignalPriority=res.priority;
+      const session=this.getSessionActivity(res.callActivityID);
+      console.log('session',session);
+      if(session)
+      {
+      res.customerNotes= session.customerNotesTemplate||res.customerNotes;
+      res.internalNotes= session.internalNotesTemplate||res.internalNotes;
+      res.cncNextAction= session.cncNextActionTemplate||res.cncNextAction;
+      res.reason= session.reasonTemplate|| res.reason;
+
+      res.customerNotesTemplate= session.customerNotesTemplate||res.customerNotesTemplate;
+      res.internalNotesTemplate= session.internalNotesTemplate||res.internalNotesTemplate;
+      res.cncNextActionTemplate= session.cncNextActionTemplate||res.cncNextActionTemplate;
+      res.reasonTemplate= session.reasonTemplate||res.reasonTemplate;
+      }
       Promise.all([
         this.apiCustomer.getCustomerContacts(res.customerId, res.contactID),
         this.apiCustomer.getCustomerSites(res.customerId),
@@ -126,7 +163,6 @@ class CMPActivityEdit extends React.Component {
         // console.log('res',result);
         const currentContact = result[0].find((c) => c.id == res.contactID);
         console.log(currentContact);
-        
         this.setState({          
           filters,
           data: res,
@@ -144,6 +180,8 @@ class CMPActivityEdit extends React.Component {
     const data = { ...this.state.data };
 
     data.reason = data.reasonTemplate;
+    data.cncNextAction=data.cncNextActionTemplate;
+    data.customerNotes= data.customerNotesTemplate;
     data.internalNotes = data.internalNotesTemplate;
     data.priority = this.state.priorities.filter(
       (p) => p.name === data.priority
@@ -170,37 +208,44 @@ class CMPActivityEdit extends React.Component {
         "internalNotes",
         "nextStatus",
         "escalationReason",
+        "customerNotes",
+        "cncNextAction",
+        "priority",
+        "priorityChangeReason"
       ]);
       console.log(finalData);
+
       this.api
         .updateActivity(finalData)
         .then((response) => {
-
-          if (response.error) alert(response.error);
-          if(!autoSave)
-          {
-          if (response.redirectTo) document.location = response.redirectTo;
-          else
-            document.location = `SRActivity.php?action=displayActivity&callActivityID=${data.callActivityID}`;
+          // return;
+          if (response.error) this.alert(response.error);
+          else {
+            if (!autoSave) {
+              if (response.redirectTo) document.location = response.redirectTo;
+              else
+                document.location = `SRActivity.php?action=displayActivity&callActivityID=${data.callActivityID}`;
+            }
           }
         })
         .catch((ex) => {
-          alert(ex.error);
+          this.alert(ex.error);
         });
     }
   };
   isValid = (data) => {
     console.log(data);
     if (data.callActTypeID == "") {
-      alert("Please select Activity Type");
+      //this.alert("Please select Activity Type");
+      this.alert("Please select Activity Type");
       return false;
     }
     if (data.siteNo == "-1") {
-      alert("Please select Customer Site");
+      this.alert("Please select Customer Site");
       return false;
     }
     if (data.contactID == "") {
-      alert("Please select Contact");
+       this.alert("Please select Contact");
       return false;
     }
 
@@ -213,19 +258,19 @@ class CMPActivityEdit extends React.Component {
       callActType.description.indexOf("FOC") == -1 &&
       data.siteMaxTravelHours == -1
     ) {
-      alert("Travel hours need entering for this site");
+      this.alert("Travel hours need entering for this site");
       return false;
     }
     if (!callActType) {
-      alert("Please select activity type");
+      this.alert("Please select activity type");
       return false;
     }
     if (!data.contactSupportLevel) {
-      alert("Not a nominated support contact");
+      this.alert("Not a nominated support contact");
       return false;
     }
     if (data.curValueFlag == "Y" && data.curValue == 0) {
-      alert("Please enter value");
+      this.alert("Please enter value");
       return false;
     } else {
       if (
@@ -233,11 +278,11 @@ class CMPActivityEdit extends React.Component {
         callActType.reqReasonFlag == "Y" &&
         !data.reason.trim()
       ) {
-        alert("Please Enter Reason");
+        this.alert("Please Enter Activity Notes");
         return false;
       }
       if (data.contractCustomerItemId && data.projectId) {
-        alert("Project work must be logged under T&M");
+        this.alert("Project work must be logged under T&M");
         return false;
       }
       if (data.callActTypeID != 51) {
@@ -250,7 +295,7 @@ class CMPActivityEdit extends React.Component {
           " " +
           firstActivity.startTime;
         if (moment(startDate) < moment(firstActivityDate)) {
-          alert("Date/time must be after Initial activity");
+          this.alert("Date/time must be after Initial activity");
           return false;
         }
       }
@@ -264,7 +309,7 @@ class CMPActivityEdit extends React.Component {
         const durationMinutes = duration.asMinutes();
 
         if (data.endTime < data.startTime) {
-          alert("End time must be after start time!");
+          this.alert("End time must be after start time!");
           return false;
         }
         if ([4, 8, 11, 18].indexOf(data.callActTypeID) > -1) {
@@ -285,7 +330,7 @@ class CMPActivityEdit extends React.Component {
           !dateMoment.isValid() ||
           dateMoment.isSameOrBefore(moment(), "minute")
         ) {
-          alert("Please provide a future date and time, or just a future date");
+          this.alert("Please provide a future date and time, or just a future date");
           return false;
         }
         break;
@@ -295,7 +340,7 @@ class CMPActivityEdit extends React.Component {
         ["I", "F", "C"].indexOf(data.problemStatus) === -1 &&
         !data.escalationReason
       ) {
-        alert("Please provide an escalate reason");
+        this.alert("Please provide an escalate reason");
         return false;
       }
     }
@@ -507,16 +552,20 @@ class CMPActivityEdit extends React.Component {
           onClick: () => this.handleExtraTime(data),
         }),
       }),this.getTimeBudgetElement(),
-      data.hdRemainMinutes?el(CountDownTimer,{seconds:(this.getTimeBudget()*60+60),hideSeconds:true,hideMinutesTitle:true}):null
+      data.hdRemainMinutes?
+      el(ToolTip, {
+        title: "Countdown Timer",
+        content: el(CountDownTimer,{seconds:(this.getTimeBudget()*60+60),hideSeconds:true,hideMinutesTitle:true})}):null
     );
   };
   getEmptyAction() {
     return this.el("div", { style: { width: 20 } });
   }
   handleExtraTime = async (data) => {
-    var reason = prompt(
-      "Please provide your reason to request additional time"
+    var reason = await this.prompt(
+      "Please provide your reason to request additional time",600
     );
+    console.log(reason);  
     if (!reason) {
       return;
     }
@@ -525,7 +574,7 @@ class CMPActivityEdit extends React.Component {
       reason
     );
     console.log(result);
-    alert("Additional time has been requested");
+    this.alert("Additional time has been requested");
   };
   getActionsButtons = () => {
     const { el } = this;
@@ -613,33 +662,68 @@ class CMPActivityEdit extends React.Component {
         : null
     );
   };
-  handleCancel = (data) => {
+  handleCancel = async(data) => {
     let text = "Are you sure you want to cancel?";
     if (data?.callActTypeID == 59) {
       text = "This will delete the Change Request activity, please confirm.";
     }
 
-    if (confirm(text)) {
+    if (await this.confirm(text)) {
       document.location = `SRActivity.php?action=displayActivity&callActivityID=${data.callActivityID}`;
     }
   };
   autoSave=()=>{
     this.autoSavehandler=setInterval(() => {
-      this.setNextStatus("Update",true);
+      const {data}=this.state;
+      const activityEdit={
+        id:data.callActivityID,
+        internalNotesTemplate:data.internalNotesTemplate,
+        cncNextActionTemplate:data.cncNextActionTemplate,
+        reasonTemplate:data.reasonTemplate,
+        customerNotesTemplate:data.customerNotesTemplate,
+      }
+      let activities=this.getSessionNotes().filter(a=>a.id!=data.callActivityID);      
+      activities.push(activityEdit);
+      sessionStorage.setItem("activityEdit",JSON.stringify(activities));
       //console.log("auto save");
-    }, 10000);
-    
+    }, 10000);    
   }
-  setNextStatus = (status,autoSave=false) => {
-    const { data } = this.state;
+  getSessionNotes=()=>{
+    sessionStorage.getItem("activityEdit");
+    return JSON.parse(sessionStorage.getItem("activityEdit"))||[];
+  }
+  getSessionActivity=(id)=>{
+    return this.getSessionNotes().find(a=>a.id==id);
+  }
+  setNextStatus =async (status,autoSave=false) => {
+    const { data,callActTypes } = this.state;
     data.nextStatus = status;
+    const type= callActTypes.find(c=>c.id==data.callActTypeID) ;
     switch (status) {
+      case this.activityStatus.CncAction:
+        //Field Name] is required for [Activity Type] when the next action is [Update type]
+        
+        let cncValid=await this.checkCncAction(data,type);
+         if(!cncValid)
+        return;
+        break;
+      case this.activityStatus.CustomerAction://holding
+          //Field Name] is required for [Activity Type] when the next action is [Update type]
+          let holdValid=await this.checkOnHold(data,type);
+           if(!holdValid)
+          return;
+          //if (!await this.confirm("Are you sure this SR is On Hold?")) return;
+
+          break;
       case this.activityStatus.Fixed:
-        if (!confirm("Are you sure this SR is fixed?")) return;
+       // let result=await this.await this.confirm("Are you sure this SR is fixed?");        
+         if (!await this.confirm("Are you sure this SR is fixed?")) return;
+        // console.log("continue.....");
+        //return;
         break;
       case this.activityStatus.Escalate:
         if (data.problemStatus == "P") {
-          const escalationReason = prompt(
+          const escalationReason =  await this.prompt(
             "Please provide your reason for escalating this SR(Required)"
           );
           if (!escalationReason) {
@@ -648,10 +732,70 @@ class CMPActivityEdit extends React.Component {
           data.escalationReason = escalationReason;
         }
         break;
+      case this.activityStatus.Update:
+          //Field Name] is required for [Activity Type] when the next action is [Update type]
+          if(!this.checkCncAction(data,type)&&!this.checkOnHold(data,type))
+            return;
+            break;
     }
     this.setState({ data }, () => this.updateActivity(autoSave));
   };
+  checkCncAction=async (data,type)=>{
+    
+      if(type && type.catRequireCNCNextActionCNCAction==1 && (data.cncNextActionTemplate==''||data.cncNextActionTemplate==null))
+      {
+        this.alert(`CNC Next Action is required for ${type.description} when the next action is CNC Action`)
+        return false;
+      }
+      if(type && type.catRequireCNCNextActionCNCAction==2 && (data.cncNextActionTemplate==''||data.cncNextActionTemplate==null))
+      {
+        if(!await this.confirm(`Are you sure you don't want to put an entry for CNC Next Action?`))
+        return false;        
+      }
+    if(data.hideFromCustomerFlag!='Y'&&data.problemHideFromCustomerFlag!='Y')
+    {
+      if(type && type.catRequireCustomerNoteCNCAction==1 && (data.customerNotesTemplate=='' || data.customerNotesTemplate==null))
+      {
+        this.alert(`Customer Notes is required for ${type.description} when the next action is CNC Action`)
+        return false;
+      }
+      if(type && type.catRequireCustomerNoteCNCAction==2 && (data.customerNotesTemplate=='' || data.customerNotesTemplate==null))
+      {
+        if(!await this.confirm(`Are you sure you don't want to put an entry for Customer Notes?`))
+        return false;
+      }
+    }
+    return true;
+  }
+  checkOnHold=async (data,type)=>{
+    if(type && type.catRequireCNCNextActionOnHold==1 && (data.cncNextActionTemplate==''||data.cncNextActionTemplate==null))
+    {
+      console.log('error');
+      this.alert(`CNC Next Action is required for ${type.description} when the next action is On Hold`)
+      return false;
+    }
+    if(type && type.catRequireCNCNextActionOnHold==2 && (data.cncNextActionTemplate==''||data.cncNextActionTemplate==null))
+    {
+      if(!await this.confirm(`Are you sure you don't want to put an entry for CNC Next Action?`))
+       return false;
 
+    }
+    if(data.hideFromCustomerFlag!='Y'&&data.problemHideFromCustomerFlag!='Y')
+    {
+       if(type && type.catRequireCustomerNoteOnHold==1 && (data.customerNotesTemplate=='' || data.customerNotesTemplate==null))
+      {
+        this.alert(`Customer Notes is required for ${type.description} when the next action is On Hold`)
+        return false;
+      }
+      if(type && type.catRequireCustomerNoteOnHold==2 && (data.customerNotesTemplate=='' || data.customerNotesTemplate==null))
+      {
+        
+        if(!await this.confirm(`Are you sure you don't want to put an entry for Customer Notes?`))
+        return false;
+      }
+    }
+    return true;
+  }
   handleGeneratPassword = () => {
     window.open(
       "Password.php?action=generate&htmlFmt=popup",
@@ -668,7 +812,7 @@ class CMPActivityEdit extends React.Component {
     w.onbeforeunload = () => this.loadCallActivity(callActivityID);
   };
   handleUnlink = async (callActivityID, linkedSalesOrderID) => {
-    const res = confirm(
+    const res = await this.confirm(
       `Are you sure you want to unlink this request to Sales Order ${linkedSalesOrderID}`
     );
     if (res) {
@@ -766,7 +910,7 @@ class CMPActivityEdit extends React.Component {
 
   deleteDocument = async (id) => {
     console.log(id);
-    if (confirm("Are you sure you want to remove this document?")) {
+    if (await this.confirm("Are you sure you want to remove this document?")) {
       await this.api.deleteDocument(this.state.currentActivity, id);
       const { data } = this.state;
       data.documents = data.documents.filter((d) => d.id != id);
@@ -802,7 +946,8 @@ class CMPActivityEdit extends React.Component {
   };
   getContactsElement = () => {
     const { el } = this;
-    const { data, contacts } = this.state;
+    const { data, contacts,currentContact } = this.state;
+    console.log(contacts);
     const contactsGroup = groupBy(contacts, "siteTitle");
     return el('div',{style:{display:"flex",flexDirection:"row",border:0,marginRight:-6,padding:0}}, el(
       "select",
@@ -827,7 +972,8 @@ class CMPActivityEdit extends React.Component {
         );
       })
     ),
-    data.contactNotes?el(ToolTip,{title:"",content:el('i',{className:"fal fa-2x fa-file-alt color-gray2 "})} ):null
+    currentContact?.notes?el(ToolTip,{title:currentContact.notes,
+    content:el('i',{className:"fal fa-2x fa-file-alt color-gray2 pointer"})} ):null
     );
   };
   handleContactChange = (id) => {
@@ -1066,12 +1212,17 @@ class CMPActivityEdit extends React.Component {
           this.getContactsElement(),
             // ...this.getContactPhone(),
           ),
-          el(
+          data?.problemHideFromCustomerFlag == "N"?el(
             "td",
             { style:{textAlign:"right"}  },
             el("label", { className: "label" }, "Hide From Customer"),            
-          ),
-          el(
+          ):null,
+          data?.problemHideFromCustomerFlag == "Y"?el(
+            "td",
+            { style:{textAlign:"right"} ,colSpan:2 },
+            el("h3", {  style:{color:"red"} }, "Entire SR hidden from customer"),            
+          ):null,
+          data?.problemHideFromCustomerFlag == "N"? el(
             "td",
             { key:"td2"  },
       
@@ -1084,7 +1235,7 @@ class CMPActivityEdit extends React.Component {
                   data?.hideFromCustomerFlag == "Y" ? "N" : "Y"
                 ),
             }),
-          ),
+          ):null,
           this.getElementControl(
             "Date",
             "Date",
@@ -1208,7 +1359,7 @@ class CMPActivityEdit extends React.Component {
     return el(
       "div",
       { className: "activities-edit-contianer" },
-      el("label", { style: { display: "block" } }, "Documents"),
+      el("label", { className:"label m-5", style: { display: "block" } }, "Documents"),
       data?.documents.length > 0
         ? el(Table, {
             key: "documents",
@@ -1301,7 +1452,7 @@ class CMPActivityEdit extends React.Component {
       currentActivity,
     } = this.state;
     if (templateValue == "") {
-      alert("Please enter detials");
+      this.alert("Please enter detials");
       return;
     }
     const payload = new FormData();
@@ -1363,6 +1514,7 @@ class CMPActivityEdit extends React.Component {
               key: "salesRequestEditor",
               id: "salesRequest",
               value: templateDefault,
+              inline:true,
               onChange: this.handleTemplateValueChange,
             })
           : null
@@ -1397,7 +1549,7 @@ class CMPActivityEdit extends React.Component {
         break;
       case "partsUsed":
         templateTitle = "Parts Used";
-        break;
+        break;     
     }
     this.setState({
       templateOptions: options,
@@ -1412,7 +1564,9 @@ class CMPActivityEdit extends React.Component {
     const { data } = this.state;
     return el(
       "div",
-      { className: "activities-edit-contianer" },
+      { style:{display:"flex",flexDirection:"row"} },
+      el('div',{className:"round-container flex-2 mr-5"},
+      
       el(
         "label",
         { className: "label m-5", style: { display: "block" } },
@@ -1422,7 +1576,47 @@ class CMPActivityEdit extends React.Component {
         ? el(CKEditor, {
             id: "reason",
             value: data?.reason,
+            inline:true,
             onChange: (value) => this.setValue("reasonTemplate", value),
+          })
+        : null
+      ),
+      el('div',{className:"round-container flex-1"},      
+      el(
+        "label",
+        { className: "label m-5", style: { display: "block" } },
+        "CNC Next Action"
+      ),
+      this.state._activityLoaded
+        ? el(CKEditor, {
+            id: "cncNextAction",
+            value: data?.cncNextAction,
+            inline:true,
+
+            onChange: (value) => this.setValue("cncNextActionTemplate", value),
+          })
+        : null
+      )
+    );
+  }
+  getCustomerNotes() {
+    const { el } = this;
+    const { data } = this.state;
+    return el(
+      "div",
+      { className: "round-container flex-column flex-1",style:{padding:5}},
+      el(
+        "label",
+        { className: "label m-5", style: { display: "block" } },
+        "Customer Notes"
+      ),
+      this.state._activityLoaded
+        ? el(CKEditor, {
+            id: "customerNotes",
+            value: data?.customerNotes,
+            height:100,
+            inline:true,
+            onChange: (value) => this.setValue("customerNotesTemplate", value),
           })
         : null
     );
@@ -1432,7 +1626,7 @@ class CMPActivityEdit extends React.Component {
     const { data } = this.state;
     return el(
       "div",
-      { className: "activities-edit-contianer" },
+      { className: "round-container flex-column flex-1",style:{padding:5} },
       el(
         "label",
         { className: "label m-5", style: { display: "block" } },
@@ -1442,6 +1636,7 @@ class CMPActivityEdit extends React.Component {
         ? el(CKEditor, {
             id: "internal",
             value: data?.internalNotes,
+            inline:true,
             onChange: (value) => this.setValue("internalNotesTemplate", value),
           })
         : null
@@ -1500,9 +1695,11 @@ class CMPActivityEdit extends React.Component {
     //console.log(userObj,obj);
     let alertObject;
     const today=moment().format("YYYY-MM-DD");
+    if(data.contactNotes&&data.contactNotes!="")
+    {
     if(!obj)
     {
-      alert(data.contactNotes);
+      this.alert(data.contactNotes);
         alertObject={
         date:today,
         items:[
@@ -1530,23 +1727,51 @@ class CMPActivityEdit extends React.Component {
         if(!found)
         {
           alertObject.items.push(userObj);          
-          alert(userObj.notes);
+          this.alert(userObj.notes);
         }
       }
     }
     localStorage.setItem(key,JSON.stringify(alertObject));  
   }
+  }
+  getPriorityChangeReason=()=>{
+    const {data}=this.state;
+    const {el}=this;   
+    console.log(data.orignalPriority!=data.priority);
+    return el(StandardTextModal,
+      {
+        value: data.priorityChangeReason,
+        show:data.orignalPriority!=data.priority,
+        title:"Priority change reason",   
+        okTitle:"Ok",
+        onChange:this.handlePriorityTemplateChange,
+        onCancel:()=>this.handlePriorityTemplateChange('')
+    });
+  }
+  handlePriorityTemplateChange=(value)=>{
+
+    const {data}=this.state;
+    data.priorityChangeReason=value;    
+    data.orignalPriority=data.priority;
+    this.setState({data});
+  }
+  
   render() {
     const { el } = this;
     return el(
       "div",
-      null,
+      {style:{width:1080}},
+      this.getAlert(),
+      this.getConfirm(),
+      this.getPrompt(),
+      this.getPriorityChangeReason(),
       this.getProjectsElement(),
       this.getHeader(),
        el("div", { className: "activities-edit-contianer" }, this.getActions()),
        el("div",{ className: "activities-edit-contianer" },this.getActionsButtons()),
        this.getContentElement(),
        this.getActivityNotes(),
+       this.getCustomerNotes(),
        this.getActivityInternalNotes(),
        this.getDocumentsElement(),
        this.getTemplateModal()

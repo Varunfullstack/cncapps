@@ -31,6 +31,10 @@ class DBECallActType extends DBEntity
     const portalDisplayFlag = "portalDisplayFlag";
     const visibleInSRFlag = "visibleInSRFlag";
 
+    const catRequireCNCNextActionCNCAction = "catRequireCNCNextActionCNCAction";
+    const catRequireCustomerNoteCNCAction = "catRequireCustomerNoteCNCAction";
+    const catRequireCNCNextActionOnHold = "catRequireCNCNextActionOnHold";
+    const catRequireCustomerNoteOnHold = "catRequireCustomerNoteOnHold";
     /**
      * calls constructor()
      * @access public
@@ -78,6 +82,12 @@ class DBECallActType extends DBEntity
         $this->addColumn(self::onSiteFlag, DA_YN, DA_NOT_NULL, "cat_on_site_flag");
         $this->addColumn(self::portalDisplayFlag, DA_YN, DA_NOT_NULL, "cat_portal_display_flag");
         $this->addColumn(self::visibleInSRFlag, DA_YN, DA_NOT_NULL, 'cat_visible_in_sr_flag');
+
+        $this->addColumn(self::catRequireCNCNextActionCNCAction, DA_INTEGER, DA_ALLOW_NULL, 'catRequireCNCNextActionCNCAction');
+        $this->addColumn(self::catRequireCustomerNoteCNCAction, DA_INTEGER, DA_ALLOW_NULL, 'catRequireCustomerNoteCNCAction');
+        $this->addColumn(self::catRequireCNCNextActionOnHold, DA_INTEGER, DA_ALLOW_NULL, 'catRequireCNCNextActionOnHold');
+        $this->addColumn(self::catRequireCustomerNoteOnHold, DA_INTEGER, DA_ALLOW_NULL, 'catRequireCustomerNoteOnHold');
+
         $this->setAddColumnsOff();
         $this->setPK(0);
     }

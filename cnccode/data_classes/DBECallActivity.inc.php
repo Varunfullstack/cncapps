@@ -46,6 +46,8 @@ class DBECallActivity extends DBEntity
     const requestType = 'requestType';
     const submitAsOvertime = "submitAsOvertime";
     const overtimeDurationApproved = "overtimeDurationApproved";
+    const customerNotes = "customerNotes";
+    const cncNextAction = "cncNextAction";
 
     /**
      * calls constructor()
@@ -263,6 +265,18 @@ class DBECallActivity extends DBEntity
         $this->addColumn(
             self::overtimeDurationApproved,
             DA_FLOAT,
+            DA_ALLOW_NULL
+        );
+
+        $this->addColumn(
+            self::customerNotes,
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+
+        $this->addColumn(
+            self::cncNextAction,
+            DA_TEXT,
             DA_ALLOW_NULL
         );
 

@@ -16,6 +16,7 @@ require_once($cfg['path_bu'] . '/BUCustomerItem.inc.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUUser.inc.php');
 require_once($cfg['path_bu'] . '/BURootCause.inc.php');
+require_once($cfg['path_bu'] . '/BUActivityType.inc.php');
 require_once($cfg['path_dbe'] . '/DBEJCallActType.php');
 require_once($cfg['path_dbe'] . '/DBEJCallActivity.php');
 
@@ -77,10 +78,7 @@ class CTSRActivity extends CTCNC
             case "updateActivity":
                 echo json_encode($this->updateCallActivity());
                 exit;
-            break;
-            case "getCallActTypes":
-                echo json_encode($this->getCallActTypes());
-                exit;
+            break;            
             case "getCustomerContacts":
                 echo json_encode($this->getCustomerContacts());
                 exit;
@@ -292,14 +290,14 @@ class CTSRActivity extends CTCNC
             "onSiteActivities"                  =>$this->getOnSiteActivity($callActivityID),
             "problemStatus"                     => $dbejCallActivity->getValue(DBEJCallActivity::problemStatus),
             "serverGuard"                       =>  $dbejCallActivity->getValue(DBEJCallActivity::serverGuard),
-            "hideFromCustomerFlag"              =>$dbeProblem->getValue(DBEProblem::hideFromCustomerFlag),
+            "problemHideFromCustomerFlag"       =>$dbeProblem->getValue(DBEProblem::hideFromCustomerFlag),
             "canEdit"                           =>$buActivity->checkActivityEditionByProblem($dbejCallActivity,$this,$dbeProblem),
             "canDelete"                         =>!$dbejCallActivity->getValue(DBEJCallActivity::endTime) || 
                                                     ($dbejCallActivity->getValue(DBEJCallActivity::status) != 'A' && 
                                                     $this->hasPermissions(MAINTENANCE_PERMISSION)),
             "hasExpenses"                       =>count($expenses)?true:false,
             "isSDManger"                        =>$buUser->isSdManager($this->userID),
-            "problemHideFromCustomerFlag"       =>$dbejCallActivity->getValue(DBEJCallActivity::problemHideFromCustomerFlag),
+            "hideFromCustomerFlag"              =>$dbejCallActivity->getValue(DBEJCallActivity::hideFromCustomerFlag),
             "allowSCRFlag"                      =>$dbejCallActivity->getValue(DBEJCallActivity::allowSCRFlag),
             "priority"                          => $buActivity->priorityArray[$dbejCallActivity->getValue(DBEJCallActivity::priority)],
             "problemStatusDetials"              =>$buActivity->problemStatusArray[$dbeProblem->getValue(DBEProblem::status)],
@@ -347,7 +345,10 @@ class CTSRActivity extends CTCNC
             'submitAsOvertime'                  => $dbejCallActivity->getValue(DBECallActivity::submitAsOvertime),
             "siteMaxTravelHours"                =>$dbeSite->getValue(DBESite::maxTravelHours),
             "projectId"                         =>$dbejCallActivity->getValue(DBEJCallActivity::projectID),
-            "projects"                          =>BUProject::getCustomerProjects($customerId)
+            "projects"                          =>BUProject::getCustomerProjects($customerId),
+            "cncNextAction"                     =>$dbejCallActivity->getValue(DBEJCallActivity::cncNextAction),
+            "customerNotes"                     =>$dbejCallActivity->getValue(DBEJCallActivity::customerNotes),
+            'activityTypeHasExpenses'           =>BUActivityType::hasExpenses($dbejCallActivity->getValue(DBEJCallActivity::callActTypeID))
 
         ];
     }
@@ -551,33 +552,7 @@ class CTSRActivity extends CTCNC
             return ['error' => true, 'errorDescription' => $ex->message];
         }
     }
-    function getCallActTypes()
-    {
-        $dbeCallActType = new DBECallActType($this);
-        $dbeCallActType->setValue(
-            DBEJCallActType::activeFlag,
-            'Y'
-        );
-        $dbeCallActType->getRowsByColumn(
-            DBEJCallActType::activeFlag,
-            'description'
-        );
-        $types=array();        
-        while ($dbeCallActType->fetchNext()) {
-            array_push($types,[
-                    'id'           => $dbeCallActType->getValue(DBECallActType::callActTypeID),
-                    'description' => $dbeCallActType->getValue(DBECallActType::description),
-                    'allowOvertime'           => $dbeCallActType->getValue(
-                        DBECallActType::engineerOvertimeFlag
-                    ) == 'Y' ? 1 : 0,
-                    "curValueFlag"=>$dbeCallActType->getValue(DBECallActType::curValueFlag),
-                    "requireCheckFlag"=>$dbeCallActType->getValue(DBECallActType::requireCheckFlag),
-                    'onSiteFlag'=>$dbeCallActType->getValue(DBECallActType::onSiteFlag),
-                    'reqReasonFlag'=>$dbeCallActType->getValue(DBECallActType::reqReasonFlag),
-             ]);
-        }
-        return  $types;
-    }
+   
     function validTime($body, $dbeProblem,$buActivity,$dbeCallActivity)
     {
         $problemID=$dbeCallActivity->getValue(DBECallActivity::problemID);
@@ -679,10 +654,9 @@ class CTSRActivity extends CTCNC
         $body            = file_get_contents('php://input');
         $body            = json_decode($body);
         $callActivityID  = $body->callActivityID;
-        
+        //echo $body->priority; exit;
         if ($callActivityID)
             $dbejCallActType->getRow($body->callActTypeID);
-
         $buActivity->getActivityByID(
             $callActivityID,
             $dsCallActivity
@@ -691,22 +665,27 @@ class CTSRActivity extends CTCNC
         //$dbeCallActivity->getRow($callActivityID);        
         //$dbeContact->getRow($body->contactID);
 
-
+        
         $previousStartTime = $dsCallActivity->getValue(DBECallActivity::startTime);
         $previousEndTime = $dsCallActivity->getValue(DBECallActivity::endTime);
         $formError = (!$dsCallActivity->populateFromArray(["1" => $body]));
+
+        
         if ($formError) {
             http_response_code(400);
             return ["error" => $formError,"type"=>"populateFromArray"];
         }
         $dsCallActivity->setUpdateModeUpdate();
         $dsCallActivity->post();
+        $dsCallActivity->addColumn('priorityChangeReason',DA_TEXT,true,$body->priorityChangeReason??null);
+        $dsCallActivity->setValue('priorityChangeReason',$body->priorityChangeReason??null);         
         $problemID=$dsCallActivity->getValue(DBECallActivity::problemID);
         $dbeProblem->getRow($problemID);
 
         if (($previousStartTime != $body->startTime) || ($previousEndTime != $body->endTime)
             && $dsCallActivity->getValue(DBECallActivity::overtimeExportedFlag) == 'N'
         ) {
+            
             $dsCallActivity->setValue(DBECallActivity::overtimeDurationApproved, null);
             $dsCallActivity->setValue(DBECallActivity::overtimeApprovedDate, null);
             $dsCallActivity->setValue(DBECallActivity::overtimeApprovedBy, null);
@@ -781,6 +760,7 @@ class CTSRActivity extends CTCNC
             }
             $dsCallActivity->post();
         }
+        
         $enteredEndTime = $buActivity->updateCallActivity(
             $dsCallActivity
         );

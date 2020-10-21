@@ -519,6 +519,7 @@ dd {
     background-color: rgb(0, 0, 0);
     /* Fallback color */
     background-color: rgba(0, 0, 0, 0.4);
+    
     /* Black w/ opacity */
 }
 
@@ -529,10 +530,12 @@ dd {
     font-size: 1rem !important;
     font-weight: 400 !important;
     line-height: 1.5 !important;
-    color: #212529 !important;
+       /* color: #212529 !important; */
+    color: #FFFFFF !important;  
     text-align: left !important;
     position: relative;
-    background-color: #fefefe;
+    /* background-color: #fefefe; */
+    background-color: #575757;
     margin: auto;
     padding: 0;
     border: 1px solid rgba(0, 0, 0, .2);
@@ -542,9 +545,12 @@ dd {
     -webkit-animation-name: animatetop;
     -webkit-animation-duration: 0.4s;
     animation-name: animatetop;
-    animation-duration: 0.4s;
+    animation-duration: 0.2s;
 }
-
+.modal button{
+    background-color: #C6C6C6 !important;
+    color: #000000 !important;
+}
 .modal-content h4 {
     font-size: 1.2rem !important;
     font-weight: 600 !important;
@@ -556,22 +562,22 @@ dd {
 
 @-webkit-keyframes animatetop {
     from {
-        top: -300px;
+        scale: 0.5;
         opacity: 0
     }
     to {
-        top: 0;
+        scale: 1;
         opacity: 1
     }
 }
 
 @keyframes animatetop {
     from {
-        top: -300px;
+        width: 0px;
         opacity: 0
     }
     to {
-        top: 0;
+        width: 100%;
         opacity: 1
     }
 }
@@ -601,7 +607,8 @@ dd {
 .modal-title {
     margin-bottom: 0 !important;
     line-height: 1.5 !important;
-    color: rgb(33, 37, 41) !important;
+    /* color: rgb(33, 37, 41) !important; */
+    color: #FFFFFF !important;
     font-weight: 500;
     font-size: 1.25rem;
 }
@@ -856,7 +863,67 @@ input:checked+.slider:before {
 .link-round{
     background-color: #bdbec1;
     border-radius: 15px;
-    height: 15px;
+    min-height: 15px;
     padding: 5px;
 
+}
+.round-container{
+    
+    margin-top:5px;
+    border:1px solid #bdbec1;
+    border-radius: 5px;
+    padding:5px
+}
+.flex-row{
+    display: flex;
+    flex-direction: row;
+}
+.flex-column{
+    display: flex;
+    flex-direction: column;
+}
+.stretch{
+    align-items: stretch;
+}
+.flex-1{
+    flex: 1;
+}
+.flex-2{
+    flex: 2;
+}
+.flex-3{
+    flex: 3;
+}
+.flex-4{
+    flex: 4;
+}
+.flex-5{
+    flex: 5;
+}
+.flex-6{
+    flex: 6;
+}
+.flex-7{
+    flex: 7;
+}
+.flex-8{
+    flex: 8;
+}
+.flex-9{
+    flex: 9;
+}
+.flex-10{
+    flex: 10;
+}
+.flex-11{
+    flex: 11;
+}
+.flex-12{
+    flex: 12;
+}
+
+.cke_textarea_inline{
+    /* min-height: 100px;      */
+    border:1px solid #dedfe0;
+    padding: 5px;
 }

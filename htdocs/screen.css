@@ -999,3 +999,17 @@ table.sticky-header thead th {
     top: 0;
     background: white;
 }
+.icon{
+    color: #404041;     
+}
+.icon-size1{
+    color: #404041;
+    font-size: 18px;
+}
+.m-5
+{
+    margin: 5pt;
+}
+.pointer{
+    cursor: pointer;
+}

@@ -196,7 +196,7 @@ class SRSourceComponent extends React.Component {
             let tableWidth = 100 * resultSummary.length;
             return el('table', {key: 'summaryTable', className: 'table table-striped', style: {width: tableWidth}}, [
                 el('thead', {key: 'summaryHead'},
-                    el('tr', {key: makeid()}, resultSummary.map(s => el('th', {key: makeid()}, s[0])))
+                    el('tr', {key: makeid()}, resultSummary.map(s => el('th', {key: makeid()},this.getIconElement(s[0]))))
                 ),
                 el('tbody', {key: 'summaryBody'},
                     el('tr', {key: makeid()}, resultSummary.map(s => el('td', {key: makeid()}, s[1])))
@@ -204,6 +204,28 @@ class SRSourceComponent extends React.Component {
             ])
         } else return null;
 
+    }
+    getIconElement=(name)=>{
+        const {el}=this;
+        switch (name) {
+          case "Email":
+            return el("i", { className: "fal fa-envelope fa-2x icon" });
+          case "Portal":
+            return el("i", { className: "fa fa-edge fa-2x icon" });
+          case "Phone":
+            return el("i", { className: "fal fa-phone fa-2x icon" });
+          case "On site":
+            return el("i", { className: "fal fa-building fa-2x icon" });
+          case "Alert":
+            return el("i", { className: "fal fa-bell fa-2x icon" });
+          case "Sales":
+            return el("i", { className: "fal fa-shopping-cart fa-2x icon" });            
+        case "Manual":
+            return el("i", { className: "fal fa-user-edit fa-2x icon" });
+        case "Total":
+            return el("i", { className: "fal fa-sigma fa-2x icon" });
+           
+        }
     }
 
     getSearchResultElement() {

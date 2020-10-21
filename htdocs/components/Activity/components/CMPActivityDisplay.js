@@ -1,20 +1,23 @@
 import APIActivity from "../../services/APIActivity.js";
-import {Chars, padEnd, params} from "../../utils/utils.js";
+import {Chars, maxLength, padEnd, params} from "../../utils/utils.js";
 import Toggle from "../../utils/toggle.js";
 import Table from "../../utils/table/table.js"
 import Modal from "../../utils/modal.js";
 import CKEditor from "../../utils/CKEditor.js";
 import ToolTip from "../../utils/ToolTip.js";
-class CMPActivityDisplay extends React.Component {    
+import ActivityFollowOn from "../../Modals/ActivityFollowOn.js";
+import MainComponent from "../../CMPMainComponent.js";
+class CMPActivityDisplay extends MainComponent {    
     el=React.createElement;
     api = new APIActivity();
     constructor(props) {
         super(props);
         this.state = {  
+            ...this.state,
             currentUser:{ 
                         globalExpenseApprover: 0,           
                         isExpenseApprover: 0,
-                        isSdManager: false
+                        isSDManger: false
                         },
             uploadFiles:[],
             data:null,
@@ -48,6 +51,11 @@ class CMPActivityDisplay extends React.Component {
         const currentUser=await this.api.getCurrentUser();
         const res=await this.api.getCallActivityDetails(callActivityID,filters);        
         console.log(res);        
+        res.activities=res.activities.map(a=>{
+            a.date=a.dateEngineer.split('-')[0];
+            a.enginner=a.dateEngineer.split('-')[1];
+            return a;
+        })
         filters.monitorSR=res.monitoringFlag=="1"?true:false;
         filters.criticalSR=res.criticalFlag=="1"?true:false;             
         this.setState({filters,data:res,currentActivity:res.callActivityID,currentUser});
@@ -97,6 +105,7 @@ class CMPActivityDisplay extends React.Component {
     getActions=()=>{
         const {el}=this;
         const {data,currentUser}=this.state;
+        console.log(currentUser);
         return el('div',{className:"activities-contianer", style:{display:"flex",flexDirection:"row",justifyContent:"center",alignItems:"center"}},
         el(ToolTip,{title:"Follow On",content: el('i',{className:"fal fa-play fa-2x m-5 pointer icon",onClick:this.handleFollowOn})}),  
         el(ToolTip,{title:"History",content: el('a',{className:"fal fa-history fa-2x m-5 pointer icon",href:`Activity.php?action=problemHistoryPopup&problemID=${data?.problemID}&htmlFmt=popup`,target:"_blank"})}),
@@ -118,9 +127,10 @@ class CMPActivityDisplay extends React.Component {
         el(ToolTip,{title:"Contact SR History",content: el('a',{className:"fal fa-id-card fa-2x m-5 pointer icon",onClick:()=>this.handleContactSRHistory(data?.contactID)})}),    
         el(ToolTip,{title:"Third Party Contacts",content: el('a',{className:"fal fa-users fa-2x m-5 pointer icon",href:`ThirdPartyContact.php?action=list&customerID=${data?.customerId}`,target:"_blank"})}),
         this.getGab(),
-        data?.hasExpenses&&(currentUser.isExpenseApprover||currentUser.globalExpenseApprover)? el(ToolTip,{title:"Expenses",content: el('a',{className:"fal fa-receipt fa-2x m-5 pointer icon",href:`Expense.php?action=view&callActivityID=${data?.callActivityID}`})}):this.getGab(),  
+        (data?.activityTypeHasExpenses)? el(ToolTip,{title:"Expenses",content: el('a',{className:"fal fa-coins fa-2x m-5 pointer icon",href:`Expense.php?action=view&callActivityID=${data?.callActivityID}`})}):this.getGab(),  
+        //(currentUser.isExpenseApprover||currentUser.globalExpenseApprover)? el(ToolTip,{title:"Expenses",content: el('a',{className:"fal fa-coins fa-2x m-5 pointer icon",href:`Expense.php?action=view&callActivityID=${data?.callActivityID}`})}):this.getGab(),  
         el(ToolTip,{title:"Add Travel",content: el('a',{className:"fal fa-car fa-2x m-5 pointer icon",href:`Activity.php?action=createFollowOnActivity&callActivityID=${data?.callActivityID}&callActivityTypeID=22`})}),  
-        currentUser.isSdManager&&data?.problemHideFromCustomerFlag=='Y'?el(ToolTip,{title:"Unhide SR",content: el('i',{className:"fal fa-eye-slash fa-2x m-5 pointer icon",onClick:()=>this.handleUnhideSR(data)})}):this.getGab(),  
+        currentUser.isSDManger&&data?.problemHideFromCustomerFlag=='Y'?el(ToolTip,{title:"Unhide SR",content: el('i',{className:"fal fa-eye-slash fa-2x m-5 pointer icon",onClick:()=>this.handleUnhideSR(data)})}):this.getGab(),  
         el(ToolTip,{title:"Calendar",content: el('a',{className:"fal fa-calendar-alt fa-2x m-5 pointer icon",href:`Activity.php?action=addToCalendar&callActivityID=${data?.callActivityID}`})}),      
         data?.allowSCRFlag=='Y'?el(ToolTip,{title:"Send client a visit confirmation email",content: el('i',{className:"fal fa-envelope fa-2x m-5 pointer icon",onClick:()=>this.handleConfirmEmail(data)})}):this.getGab(),      
 
@@ -130,7 +140,7 @@ class CMPActivityDisplay extends React.Component {
         return this.el('span',{style:{width:35}})
     }
     handleConfirmEmail=async (data)=>{
-        if(confirm('Are you sure you want to send the client a confirmation email?')) 
+        if(await this.confirm('Are you sure you want to send the client a confirmation email?')) 
         {
             await this.api.sendActivityVisitEmail(data.callActivityID);
         }
@@ -138,34 +148,37 @@ class CMPActivityDisplay extends React.Component {
     handleUnhideSR=async (data)=>{
         if(data?.isSDManger&&data?.problemHideFromCustomerFlag=='Y')
         {
-            if(confirm('This will unhide the SR from the customer and can\'t be undone, are you sure?'))
+            if(await this.confirm('This will unhide the SR from the customer and can\'t be undone, are you sure?'))
+            {
             await this.api.unHideSrActivity(data.callActivityID);
             data.problemHideFromCustomerFlag='N';
             this.setState({data});
+            }
         }
     }
-    handleDelete=(data)=>{
+    handleDelete=async (data)=>{
         let deleteActivity=false;
         if(data.activities.length===1){            
-            if(confirm('Deleting this activity will remove all traces of this Service Request from the system. Are you sure?'))
+            if(await this.confirm('Deleting this activity will remove all traces of this Service Request from the system. Are you sure?'))
             deleteActivity=true;
         }
-        else if(confirm('Delete this activity?'))
+        else if(await this.confirm('Delete this activity?'))
             deleteActivity=true;
         if(deleteActivity)
         this.api.deleteActivity(data.callActivityID).then(res=>this.goPrevActivity())
 
     }
-    handleFollowOn=()=>{
-        const {data}=this.state;
-        const followOn=data?.problemStatus=='I'&&data?.serverGuard=='N'&&data?.hideFromCustomerFlag=='N';
-        if(followOn)
-        {
-            if(confirm('You are about to commence work and an email will be sent to the customer?')) 
-                window.location=`Activity.php?action=createFollowOnActivity&callActivityID=${data?.callActivityID}`
-        }
-        else 
-            window.location=`Activity.php?action=createFollowOnActivity&callActivityID=${data?.callActivityID}`
+    handleFollowOn=async ()=>{
+        this.setState({showFollowOn:true});
+        // const {data}=this.state;
+        // const followOn=data?.problemStatus=='I'&&data?.serverGuard=='N'&&data?.hideFromCustomerFlag=='N';
+        // if(followOn)
+        // {
+        //     if(confirm('You are about to commence work and an email will be sent to the customer?')) 
+        //         window.location=`Activity.php?action=createFollowOnActivity&callActivityID=${data?.callActivityID}`
+        // }
+        // else 
+        //     window.location=`Activity.php?action=createFollowOnActivity&callActivityID=${data?.callActivityID}`
     }
 
     handleGeneratPassword=()=>{
@@ -177,7 +190,7 @@ class CMPActivityDisplay extends React.Component {
         w.onbeforeunload =()=>this.loadCallActivity();
     }
     handleUnlink=async(linkedSalesOrderID)=>{
-        const res= confirm(`Are you sure you want to unlink this request to Sales Order ${linkedSalesOrderID}`);
+        const res= await this.confirm(`Are you sure you want to unlink this request to Sales Order ${linkedSalesOrderID}`);
         if(res)
         {
             await this.api.unlinkSalesOrder(linkedSalesOrderID);
@@ -321,6 +334,11 @@ class CMPActivityDisplay extends React.Component {
     getActivitiesElement=()=>{
         const {data,currentActivity}=this.state;
         const {el}=this;
+        //console.log(maxLength( data?.activities||[],'contactName'));
+        const dateLen=maxLength( data?.activities||[],'date')+10;
+        const engineerLen=maxLength( data?.activities||[],'enginner')+10;
+        const contactName=maxLength( data?.activities||[],'contactName')+10;
+
         return el('div',{className:"activities-contianer"},
         el('div',{style:{width:"100%",display:"flex",alignItems: "center", justifyContent: "center"}},
         el(ToolTip,{title:"First ",content: el('i',{ className:"fal  fa-step-backward icon icon-size-1 mr-4 ml-4 pointer",   onClick:this.goFirstActivity})}),
@@ -328,11 +346,11 @@ class CMPActivityDisplay extends React.Component {
         el('select',{value:currentActivity,onChange:this.handleActivityChange},
         data?.activities.map(a=>
             el('option',{key:"cl"+a.callActivityID,value:a.callActivityID,
-            style:{fontSize:10},
+           
             dangerouslySetInnerHTML:{ __html:padEnd(a.callActivityID,50,Chars.WhiteSpace)
-                +padEnd(a.dateEngineer.split('-')[0],50,Chars.WhiteSpace)
-                +padEnd(a.dateEngineer.split('-')[1],110,Chars.WhiteSpace)
-                +padEnd(a.contactName,80,Chars.WhiteSpace)                
+                +padEnd(a.date,dateLen,Chars.WhiteSpace)
+                +padEnd(a.enginner,engineerLen,Chars.WhiteSpace)
+                +padEnd(a.contactName,contactName,Chars.WhiteSpace)                
                 +(a.activityType||'')}
         }))
         ),        
@@ -367,23 +385,40 @@ class CMPActivityDisplay extends React.Component {
         el('label',{style:{textAlign: "left",whiteSpace: "nowrap",marginLeft:5}},text),
         )
     }
-    getDetialsElement=(data)=>{
+    getDetialsElement=( )=>{
         const {el}=this;
-        return data?.reason?el('div',null,
+        const {data}=this.state;
+        return el("div",{className:"flex-row"},
+        data?.reason?el('div',{className:"round-container flex-2 mr-5"},
         el('label',{style:{display:"block",color: "#992211",marginTop:10,marginBottom:5}},'Details'),
         el('div',{dangerouslySetInnerHTML:{ __html: data?.reason }}),        
-        ):null;
+        ):null,
+        data?.reason?el('div',{className:"round-container flex-1"},
+        el('label',{style:{display:"block",color: "#992211",marginTop:10,marginBottom:5}},'CNC Next Action'),
+        el('div',{dangerouslySetInnerHTML:{ __html: data?.cncNextAction }}),        
+        ):null
+        );
+        
     }
-    getNotesElement=(data)=>{
+    getNotesElement=()=>{
         const {el}=this;
-        return el('div',null,
+        const {data}=this.state;
+        return el('div',{className:"round-container"},
         el('label',{style:{display:"block",color: "#992211",marginTop:10,marginBottom:5}},'Internal Notes'),
         el('div',{dangerouslySetInnerHTML:{ __html: data?.internalNotes }})
         );
     }
+    getCustomerNotesElement=()=>{
+        const {el}=this;
+        const {data}=this.state;
+        return el('div',{className:"round-container"},
+        el('label',{style:{display:"block",color: "#992211",marginTop:10,marginBottom:5}},'Customer Notes'),
+        el('div',{dangerouslySetInnerHTML:{ __html: data?.customerNotes }})
+        );
+    }
     deleteDocument=async(id)=>{
         console.log(id);
-        if(confirm('Are you sure you want to remove this document?'))
+        if(await this.confirm('Are you sure you want to remove this document?'))
         {
             await this.api.deleteDocument(this.state.currentActivity,id);
             const {data}=this.state;
@@ -409,8 +444,11 @@ class CMPActivityDisplay extends React.Component {
         el('tr',null,
         el('td',{className:"display-label"},"Priority"),
         el('td',{className:"display-content"},data?.priority),
-        el('td',{className:"display-label"},"Completed On"),
-        el('td',{className:"display-content"},data?.completeDate),
+        el('td',{ style:{textAlign:"center"} ,colSpan:1 },data?.problemHideFromCustomerFlag == "Y"?
+            el("label", {  style:{color:"red",fontWeight:"bold",fontSize:18} }, "Entire SR hidden from customer"):null
+            ), 
+        el('td',null),
+
         el('td',{className:"display-label"},"Date"),
         el('td',{colSpan:3,className:"display-content"},data?.date),
         ),
@@ -418,8 +456,9 @@ class CMPActivityDisplay extends React.Component {
         el('tr',null,
         el('td',{className:"display-label"},"Contract"),
         el('td',{className:"display-content"},data?.contractType),
-        el('td',{className:"display-label"},"Top-Up Value"),
-        el('td',null,data?.curValue),
+        el('td',{className:"display-label"},"Completed On"),
+        el('td',{className:"display-content"},data?.completeDate),
+        
         el('td',{className:"display-label"},"Time From"),
         el('td',{style:{width:10}},data?.startTime),
         el('td',{className:"display-label",style:{width:10}},data?.endTime?"To":""),
@@ -429,26 +468,23 @@ class CMPActivityDisplay extends React.Component {
         el('tr',null,
         el('td',{className:"display-label"},"Root Cause"),
         el('td',{className:"display-content"},data?.rootCauseDescription),
-        el('td',null,),
-        el('td',null,),
+        el('td',{className:"display-label"},"Top-Up Value"),
+        el('td',null,data?.curValue),      
         el('td',{className:"display-label"},"User"),
         el('td',{colSpan:3,className:"display-content"},data?.engineerName),
         ),
-        el('tr',null,        
+        data?.currentUser?el('tr',null,        
         el('td',{colSpan:8,style:{backgroundColor:data?.currentUserBgColor,textAlign:"center"}},data?.currentUser),
-        ),
-        el('tr',null,        
-        el('td',{className:"display-label",style:{textAlign:"left"}},"Details"),
-        ),
-        el('tr',null,        
-        el('td',{colSpan:8,dangerouslySetInnerHTML:{ __html: data?.reason }}),
-        ),
-        el('tr',null,        
-        el('td',{className:"display-label",style:{textAlign:"left"}},'Internal Notes'),
-        ),
-        el('tr',null,        
-        el('td',{colSpan:8,dangerouslySetInnerHTML:{ __html: data?.internalNotes }}),
-        ),
+        ):null,         
+        // el('tr',null,        
+        // el('td',{colSpan:8, },this.getDetialsElement(data)),
+        // ),
+        // el('tr',null,        
+        // el('td',{className:"display-label",style:{textAlign:"left"}},'Internal Notes'),
+        // ),
+        // el('tr',null,        
+        // el('td',{colSpan:8,dangerouslySetInnerHTML:{ __html: data?.internalNotes }}),
+        // ),
         )));
         /*dangerouslySetInnerHTML:{ __html: data?.internalNotes }
         this.getHiddenSRElement(data),
@@ -641,7 +677,7 @@ class CMPActivityDisplay extends React.Component {
         const {templateValue,templateOptionId,data,currentActivity}=this.state;
         if(templateValue=='')
         {
-            alert('Please enter detials');
+            this.alert('Please enter detials');
             return ;
         }
         const payload=new FormData();
@@ -716,14 +752,26 @@ class CMPActivityDisplay extends React.Component {
 
         )
     }
+    getFollowOnElement=()=>{
+        const {data,showFollowOn}=this.state;
+        const startWork=data?.problemStatus=='I'&&data?.serverGuard=='N'&&data?.hideFromCustomerFlag=='N';
+        return   showFollowOn?this.el(ActivityFollowOn,{startWork,key:"followOnModal",callActivityID:data.callActivityID,onCancel:()=>this.setState({showFollowOn:false})}):null;
+    }
     render() { 
         const {el}=this;
-        return el('div',{},
+        return el('div',{style:{width:1000}},
+        this.getAlert(),
+        this.getConfirm(),
+        this.getPrompt(),
+        this.getFollowOnElement(),
         this.getProjectsElement(),
         this.getHeader(),
         this.getActions(),
         this.getActivitiesElement(),
         this.getContentElement(),
+        this.getDetialsElement(),
+        this.getCustomerNotesElement(),
+        this.getNotesElement(),
         this.getDocumentsElement(),
         this.getExpensesElement(),
         this.getTemplateModal(),

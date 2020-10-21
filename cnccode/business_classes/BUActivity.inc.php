@@ -1635,7 +1635,9 @@ class BUActivity extends Business
     function updateCallActivity($dsCallActivity
     )
     {
-
+        $priorityChangeReason=$dsCallActivity->getValue("priorityChangeReason");
+        if(isset($priorityChangeReason)&&$priorityChangeReason!='')
+        $priorityChangeReason='<br/>Reason: '.$priorityChangeReason;
         $this->setMethodName('updateCallActivity');
         $dbeCallActivity = new DBECallActivity($this);
         $oldEndTime = null; // new activity
@@ -1870,10 +1872,11 @@ class BUActivity extends Business
                 self::WorkUpdatesCustomerEmailCategory,
                 self::WorkUpdatesPriorityChanged
             );
-
+           
             $this->logOperationalActivity(
                 $dsCallActivity->getValue(DBEJCallActivity::problemID),
-                'Priority Changed from ' . $oldPriority . ' to ' . $problem->getValue(DBEJProblem::priority)
+                'Priority Changed from ' . $oldPriority . ' to ' . $problem->getValue(DBEJProblem::priority).
+                $priorityChangeReason
             );
         } else {
             if ((!isset($oldReason) || (isset($oldReason) && $oldReason != $newReason)) && $dsCallActivity->getValue(

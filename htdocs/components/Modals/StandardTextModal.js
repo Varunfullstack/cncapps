@@ -52,7 +52,7 @@ class StandardTextModal  extends React.Component{
     getTemplateModal=()=>{
         const {templateOptions,_showModal,templateTitle,key,okTitle,templateDefault }=this.state;
         const {el}=this;
-        return el(Modal,{width:900,key,onClose:()=>this.setState({_showModal:false}),
+        return el(Modal,{width:900,key,onClose:()=>this.props.onCancel?this.props.onCancel():this.setState({_showModal:false}),
             title:templateTitle,show:_showModal,
             content:el('div',{key:'conatiner'},
             templateOptions.length>0?el('select',{onChange:this.handleTemplateChanged},el('option',{key:'empty',value:-1},"-- Pick an option --"),templateOptions.map(s=>el('option',{key:s.id,value:s.id},s.name))):null,
@@ -60,11 +60,22 @@ class StandardTextModal  extends React.Component{
                 ,onChange:this.handleTemplateValueChange})
             :null),
             footer:el('div',{key:"footer"},
-            el('button',{onClick:()=>this.setState({_showModal:false})},"Cancel"),
+            el('button',{onClick:()=>this.props.onCancel?this.props.onCancel():this.setState({_showModal:false})},"Cancel"),
             el('button',{onClick:this.handleTemplateOk},okTitle))
             }
         )
     }
+    static getDerivedStateFromProps(props, current_state) {   
+
+        if (current_state && current_state._showModal !== props.show) {
+          console.log("====================>",current_state , props);
+          current_state._showModal=props.show ;          
+          current_state.templateValue=props.value;
+          current_state.templateDefault=props.value; 
+          return current_state;
+        }         
+        return current_state;
+      }
     render() { 
         return ( this.getTemplateModal() );
     }

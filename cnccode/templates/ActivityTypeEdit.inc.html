@@ -30,6 +30,13 @@
                 'items', 'scrollbars=yes,resizable=no,width=610,height=560,copyhistory=no, menubar=0')
         }
     }
+    setTimeout(()=>{
+        $("select").each(
+            (index,element)=>{                
+                $(element).val( $(element).attr('value'));
+            }
+        );        
+    },1)
 </SCRIPT>
 <TABLE width="200px" border="0" cellpadding="2" cellspacing="1">
     <TR>
@@ -237,6 +244,49 @@
                 <input name="callActType[1][engineerOvertimeFlag]" type="checkbox"
                        title="Do not pay engineer overtime" value="Y" {DISABLED}
                        {engineerOvertimeFlagChecked}/>
+            </td>
+        </tr>
+
+
+        <tr>
+            <td class="promptText">Require CNC Next Action, CNC Action</td>
+            <td class="fieldText">          
+                <select name="callActType[1][catRequireCNCNextActionCNCAction]" {DISABLED} value="{catRequireCNCNextActionCNCAction}">
+                    <option value="0">Off</option>
+                    <option value="1">On</option>
+                    <option value="2">Optional</option>
+                </select> 
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Require CNC Next Action, On Hold</td>
+            <td class="fieldText">
+               
+                <select name="callActType[1][catRequireCNCNextActionOnHold]" {DISABLED} value="{catRequireCNCNextActionOnHold}">
+                    <option value="0">Off</option>
+                    <option value="1">On</option>
+                    <option value="2">Optional</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Require Customer Note, CNC Action</td>
+            <td class="fieldText">              
+                <select name="callActType[1][catRequireCustomerNoteCNCAction]" {DISABLED} value="{catRequireCustomerNoteCNCAction}">
+                    <option value="0">Off</option>
+                    <option value="1">On</option>
+                    <option value="2">Optional</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Require Customer Note, On Hold</td>
+            <td class="fieldText">               
+                <select name="callActType[1][catRequireCustomerNoteOnHold]" {DISABLED} value="{catRequireCustomerNoteOnHold}">
+                    <option value="0">Off</option>
+                    <option value="1">On</option>
+                    <option value="2">Optional</option>
+                </select>
             </td>
         </tr>
         <tr>
