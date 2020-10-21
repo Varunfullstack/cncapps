@@ -94,6 +94,44 @@ function processChangeRequestsEmails()
     );
 }
 
+function addPendingTimeRequestToArray(&$array,
+                                      DBEJCallActivity $DBEJCallActivity,
+                                      DBEProblem $DBEProblem,
+                                      $assignedMinutes,
+                                      $usedMinutes,
+                                      $teamName,
+                                      $isOverLimit
+)
+{
+
+    $srURL = SITE_URL . "/Activity.php?problemID=" . $DBEJCallActivity->getValue(
+            DBEJCallActivity::problemID
+        ) . "&action=displayLastActivity";
+
+
+    $processURL =
+        SITE_URL . '/Activity.php?callActivityID=' . $DBEJCallActivity->getValue(
+            DBEJCallActivity::callActivityID
+        ) . '&action=timeRequestReview';
+
+    $processURL = "<a href='$processURL'>Process Time Request</a>";
+    $leftOnBudget = $assignedMinutes - $usedMinutes;
+
+    $array[] = [
+        'customerName'      => $DBEJCallActivity->getValue(DBEJCallActivity::customerName),
+        'srLink'            => $srURL,
+        'notes'             => $DBEJCallActivity->getValue(DBEJCallActivity::reason),
+        'requestedBy'       => $DBEJCallActivity->getValue(DBEJCallActivity::userName),
+        'requestedDateTime' => "{$DBEJCallActivity->getValue(                DBEJCallActivity::date            )} {$DBEJCallActivity->getValue(DBEJCallActivity::startTime)}:00",
+        'processCRLink'     => $processURL,
+        'chargeableHours'   => $DBEProblem->getValue(DBEJProblem::chargeableActivityDurationHours),
+        'timeSpentSoFar'    => round($usedMinutes, 2),
+        'timeLeftOnBudget'  => round($leftOnBudget, 2),
+        'requesterTeam'     => $teamName,
+        'approvalLevel'     => $isOverLimit ? 'Mgmt' : 'Team Lead',
+    ];
+}
+
 function processTimeRequestsEmails()
 {
     $dbejCallActivity = new DBEJCallActivity($thing);
@@ -108,91 +146,80 @@ function processTimeRequestsEmails()
     $dsHeader = new DataSet($thing);
     $buHeader->getHeader($dsHeader);
     while ($dbejCallActivity->fetchNext()) {
-
-        $row = [];
         $problemID = $dbejCallActivity->getValue(DBEJCallActivity::problemID);
-        $lastActivity = $buActivity->getLastActivityInProblem($problemID);
-        $srLink = SITE_URL . '/Activity.php?callActivityID=' . $lastActivity->getValue(
-                DBEJCallActivity::callActivityID
-            ) . '&action=displayActivity';
-
-
-        $srLink = "<a href='$srLink'>SR</a>";
-
-        $processCRLink =
-            SITE_URL . '/Activity.php?callActivityID=' . $dbejCallActivity->getValue(
-                DBEJCallActivity::callActivityID
-            ) . '&action=timeRequestReview';
-
-        $processCRLink = "<a href='$processCRLink'>Process Time Request</a>";
-
         $requestingUserID = $dbejCallActivity->getValue(DBEJCallActivity::userID);
         $requestingUser = new DBEUser($thing);
         $requestingUser->getRow($requestingUserID);
-
         $teamID = $requestingUser->getValue(DBEUser::teamID);
-
-        $leftOnBudget = null;
-        $usedMinutes = 0;
-        $assignedMinutes = 0;
-
         $dbeProblem = new DBEJProblem($thing);
         $dbeProblem->getRow($problemID);
-        $teamName = '';
         $isOverLimit = false;
         switch ($teamID) {
             case 1:
                 $usedMinutes = $buActivity->getHDTeamUsedTime($problemID);
                 $assignedMinutes = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
                 $teamName = 'Help Desk';
-                $storeArray = &$pendingHDRequests;
                 $isOverLimit = $assignedMinutes >= $dsHeader->getValue(
                         DBEHeader::hdTeamManagementTimeApprovalMinutes
                     );
+                addPendingTimeRequestToArray(
+                    $pendingProjectRequests,
+                    $dbejCallActivity,
+                    $dbeProblem,
+                    $assignedMinutes,
+                    $usedMinutes,
+                    $teamName,
+                    $isOverLimit
+                );
                 break;
             case 2:
                 $usedMinutes = $buActivity->getESTeamUsedTime($problemID);
                 $assignedMinutes = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
                 $teamName = 'Escalation';
-                $storeArray = &$pendingESRequests;
                 $isOverLimit = $assignedMinutes >= $dsHeader->getValue(
                         DBEHeader::esTeamManagementTimeApprovalMinutes
                     );
+                addPendingTimeRequestToArray(
+                    $pendingProjectRequests,
+                    $dbejCallActivity,
+                    $dbeProblem,
+                    $assignedMinutes,
+                    $usedMinutes,
+                    $teamName,
+                    $isOverLimit
+                );
                 break;
             case 4:
                 $usedMinutes = $buActivity->getSPTeamUsedTime($problemID);
                 $assignedMinutes = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
                 $teamName = 'Small Projects';
-                $storeArray = &$pendingIMRequests;
                 $isOverLimit = $assignedMinutes >= $dsHeader->getValue(
                         DBEHeader::smallProjectsTeamManagementTimeApprovalMinutes
                     );
+                addPendingTimeRequestToArray(
+                    $pendingProjectRequests,
+                    $dbejCallActivity,
+                    $dbeProblem,
+                    $assignedMinutes,
+                    $usedMinutes,
+                    $teamName,
+                    $isOverLimit
+                );
                 break;
             case 5:
                 $usedMinutes = $buActivity->getUsedTimeForProblemAndTeam($problemID, 5);
                 $assignedMinutes = $dbeProblem->getValue(DBEProblem::projectTeamLimitMinutes);
                 $teamName = 'Projects';
-                $storeArray = &$pendingProjectRequests;
+                addPendingTimeRequestToArray(
+                    $pendingProjectRequests,
+                    $dbejCallActivity,
+                    $dbeProblem,
+                    $assignedMinutes,
+                    $usedMinutes,
+                    $teamName,
+                    $isOverLimit
+                );
         }
-
-        $leftOnBudget = $assignedMinutes - $usedMinutes;
-
-        $storeArray[] = [
-            'customerName'      => $dbejCallActivity->getValue(DBEJCallActivity::customerName),
-            'srLink'            => $srLink,
-            'notes'             => $dbejCallActivity->getValue(DBEJCallActivity::reason),
-            'requestedBy'       => $dbejCallActivity->getValue(DBEJCallActivity::userName),
-            'requestedDateTime' => $dbejCallActivity->getValue(
-                    DBEJCallActivity::date
-                ) . ' ' . $dbejCallActivity->getValue(DBEJCallActivity::startTime),
-            'processCRLink'     => $processCRLink,
-            'chargeableHours'   => $dbeProblem->getValue(DBEJProblem::chargeableActivityDurationHours),
-            'timeSpentSoFar'    => round($usedMinutes, 2),
-            'timeLeftOnBudget'  => round($leftOnBudget, 2),
-            'requesterTeam'     => $teamName,
-            'approvalLevel'     => $isOverLimit ? 'Mgmt' : 'Team Lead',
-        ];
-
     }
     sendTimeRequestsEmail(
         'hdtimerequest@cnc-ltd.co.uk',
@@ -220,66 +247,12 @@ function sendTimeRequestsEmail($teamEmail,
     if (!count($requests)) {
         return;
     }
-    global $cfg;
     $thing = null;
     $buMail = new BUMail($thing);
 
     $senderEmail = CONFIG_SUPPORT_EMAIL;
-
-    $template = new Template(
-        EMAIL_TEMPLATE_DIR,
-        "remove"
-    );
-
-    $template->set_file(
-        'page',
-        'PendingTimeRequestsEmail.inc.html'
-    );
-
-    $requestsTemplate = new Template(
-        $cfg["path_templates"],
-        "remove"
-    );
-
-
-    $requestsTemplate->setFile(
-        'TimeRequestDashboard',
-        'TimeRequestDashboard.html'
-    );
-
-
-    $requestsTemplate->set_block(
-        'TimeRequestDashboard',
-        'TimeRequestsBlock',
-        'timeRequests'
-    );
-
-
-    foreach ($requests as $request) {
-        $requestsTemplate->set_var($request);
-        $requestsTemplate->parse(
-            'timeRequests',
-            'TimeRequestsBlock',
-            true
-        );
-    }
-
-    $requestsTemplate->parse(
-        'output',
-        'TimeRequestDashboard',
-        true
-    );
-
-    $requestsTable = $requestsTemplate->get_var('output');
-    $template->setVar(['requestsTable' => $requestsTable]);
-
-    $template->parse(
-        'output',
-        'page',
-        true
-    );
-
-    $body = $template->getVar('output');
+    global $twig;
+    $body = $twig->render('@internal/pendingTimeRequestsEmail.html.twig', ["items" => $requests]);
 
     $toEmail = $teamEmail;
 

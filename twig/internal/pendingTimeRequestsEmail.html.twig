@@ -1,0 +1,63 @@
+{% extends "@internal/wrapper.html.twig" %}
+{# @var items \CNCLTD\PendingTimeRequestTwigDTO[] #}
+{% block styles %}
+
+    .content table td, .content table th {
+    padding: 0 15px 0 15px;
+    }
+{% endblock %}
+{% block content %}
+    <p>These are the pending Time Requests</p>
+    <table>
+        <thead>
+        <tr>
+            <th>
+                Customer Name
+            </th>
+            <th>
+                SR Link
+            </th>
+            <th>
+                Team of Requester
+            </th>
+            <th>
+                Requested Date&Time
+            </th>
+            <th>
+                Notes
+            </th>
+            <th>
+                Approval Level
+            </th>
+            <th>
+                Chargeable Hours
+            </th>
+            <th>
+                Time Spent So Far
+            </th>
+            <th>
+                Time Left On Budget
+            </th>
+            <th>
+                Process Time Request
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in items %}
+            <tr>
+                <td>{{ item.customerName }}</td>
+                <td><a href="{{ item.srURL }}">{{ item.serviceRequestId }}</a></td>
+                <td>{{ item.requesterTeam }}</td>
+                <td>{{ item.requestedDateTime }}</td>
+                <td>{{ item.notes }}</td>
+                <td>{{ item.approvalLevel }}</td>
+                <td>{{ item.chargeableHours }}</td>
+                <td>{{ item.timeSpentSoFar }}</td>
+                <td>{{ item.timeLeftOnBudget }}</td>
+                <td><a href="{{ item.processURL }}">Process Time Request</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
