@@ -5,6 +5,7 @@ import visibilityFilter from './reducers/visibilityFilter'
 import customerEdit from './reducers/customerEdit'
 import error from './reducers/error'
 import projects from "./reducers/projects";
+import portalCustomerDocuments from "./reducers/portalCustomerDocuments";
 
 const rootReducer = combineReducers({
     contacts,
@@ -12,7 +13,8 @@ const rootReducer = combineReducers({
     visibilityFilter,
     customerEdit,
     error,
-    projects
+    projects,
+    portalCustomerDocuments
 })
 
 export default rootReducer

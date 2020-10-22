@@ -667,7 +667,7 @@ class CTCurrentActivityReport extends CTCNC
         }
 
         $this->template->set_var(
-            'customerPortalCount',
+            'portalCustomerCount',
             $count
         );
 

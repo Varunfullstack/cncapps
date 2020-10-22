@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import CustomerEditMain from "./CustomerEditMain";
 import CustomerProjectsComponent from "./CustomerProjectsComponent";
-import CustomerPortalDocumentsComponent from "./CustomerPortalDocumentsComponent";
+import PortalCustomerDocumentsComponent from "./PortalCustomerDocumentsComponent";
 import CustomerSitesComponent from "./customerSites/CustomerSitesComponent";
 import CustomerOrders from "./CustomerOrders";
 import {Provider} from "react-redux";
@@ -105,7 +105,7 @@ class CustomerEditComponent extends React.Component {
 
                                 <CustomerEditMain customerId={customerId}/>
                                 <CustomerProjectsComponent customerId={customerId}/>
-                                <CustomerPortalDocumentsComponent customerId={customerId}/>
+                                <PortalCustomerDocumentsComponent customerId={customerId}/>
                                 <CustomerSitesComponent customerId={customerId}/>
                                 <CustomerOrders customerId={customerId}/>
                                 {/*<CustomerCRM customerId={customerId}/>*/}

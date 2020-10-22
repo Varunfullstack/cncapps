@@ -136,7 +136,7 @@ class CTCustomer extends CTCNC
     const customerFormSectorMessage = 'SectorMessage';
     const customerFormSpecialAttentionEndDateMessage = 'specialAttentionEndDateMessage';
     const customerFormLastReviewMeetingDateMessage = 'lastReviewMeetingDateMessage';
-    const GET_CUSTOMER_PORTAL_DOCUMENTS = 'getCustomerPortalDocuments';
+    const GET_PORTAL_CUSTOMER_DOCUMENTS = 'getPortalCustomerDocuments';
     const GET_CUSTOMER_SITES = "getSites";
     const GET_CUSTOMER_CONTACTS = "getContacts";
     const UPDATE_SITE = "updateSite";
@@ -883,8 +883,8 @@ class CTCustomer extends CTCNC
                 return $this->getCustomerReviewDataController();
             case 'updateCustomerReview':
                 return $this->updateCustomerReviewController();
-            case self::GET_CUSTOMER_PORTAL_DOCUMENTS:
-                return $this->getCustomerPortalDocumentsController();
+            case self::GET_PORTAL_CUSTOMER_DOCUMENTS:
+                return $this->getPortalCustomerDocumentsController();
             case 'createCustomerFolder':
                 $this->createCustomerFolder();
                 break;
@@ -1159,7 +1159,7 @@ class CTCustomer extends CTCNC
         );
     }
 
-    function getCustomerPortalDocumentsController()
+    function getPortalCustomerDocumentsController()
     {
         if (!isset($_REQUEST['customerId'])) {
             http_response_code(400);

@@ -83,3 +83,12 @@ export function distinct(array, propertyName) {
 export function entityMapToArray(allIds, idEntityMap) {
     return allIds.map(id => idEntityMap[id]);
 }
+
+export function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    })
+}

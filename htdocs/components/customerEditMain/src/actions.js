@@ -21,6 +21,9 @@ import {
     FETCH_CUSTOMER_TYPES_SUCCESS,
     FETCH_LEAD_STATUSES,
     FETCH_LEAD_STATUSES_SUCCESS,
+    FETCH_Portal_Customer_DOCUMENTS_FAILURE,
+    FETCH_Portal_Customer_DOCUMENTS_REQUEST,
+    FETCH_Portal_Customer_DOCUMENTS_SUCCESS,
     FETCH_PROJECTS_FAILURE,
     FETCH_PROJECTS_REQUEST,
     FETCH_PROJECTS_SUCCESS,
@@ -31,8 +34,13 @@ import {
     FETCH_SITES_FAILURE,
     FETCH_SITES_REQUEST,
     FETCH_SITES_SUCCESS,
+    HIDE_NEW_Portal_Customer_DOCUMENT_MODAL,
     HIDE_NEW_PROJECT_MODAL,
+    NEW_Portal_Customer_DOCUMENT_FIELD_UPDATE,
     NEW_PROJECT_FIELD_UPDATE,
+    REQUEST_ADD_Portal_Customer_DOCUMENT,
+    REQUEST_ADD_Portal_Customer_DOCUMENT_FAILURE,
+    REQUEST_ADD_Portal_Customer_DOCUMENT_SUCCESS,
     REQUEST_ADD_PROJECT,
     REQUEST_ADD_PROJECT_FAILURE,
     REQUEST_ADD_PROJECT_SUCCESS,
@@ -43,6 +51,7 @@ import {
     REQUEST_UPDATE_CUSTOMER_SUCCESS,
     SAVE_CUSTOMER_DATA_SUCCESS,
     SAVE_SITE_SUCCESS,
+    SHOW_NEW_Portal_Customer_DOCUMENT_MODAL,
     SHOW_NEW_PROJECT_MODAL,
     TOGGLE_VISIBILITY,
     UPDATE_CUSTOMER_VALUE,
@@ -51,6 +60,7 @@ import {
 import {updateCustomer} from "./helpers";
 import {OutOfDateError} from "./helpers/OutOfDateError";
 import debounce from "../../utils/debounce";
+import {fileToBase64} from "../../utils/utils";
 
 export const VisibilityFilterOptions = {
     SHOW_ALL: 'SHOW_ALL',
@@ -360,6 +370,31 @@ export function deleteSite(customerId, siteNo) {
     }
 }
 
+export function showNewPortalCustomerDocumentModal() {
+    return {type: SHOW_NEW_Portal_Customer_DOCUMENT_MODAL};
+}
+
+export function hideNewPortalCustomerDocumentModal() {
+    return {type: HIDE_NEW_Portal_Customer_DOCUMENT_MODAL};
+}
+
+export function newPortalCustomerDocumentFieldUpdate(field, value) {
+    return {type: NEW_Portal_Customer_DOCUMENT_FIELD_UPDATE, field, value};
+}
+
+export function requestAddPortalCustomerDocument() {
+    return {type: REQUEST_ADD_Portal_Customer_DOCUMENT};
+}
+
+export function requestAddPortalCustomerDocumentSuccess(portalCustomerDocument) {
+    return {type: REQUEST_ADD_Portal_Customer_DOCUMENT_SUCCESS, portalCustomerDocument};
+}
+
+export function requestAddPortalCustomerDocumentFailure() {
+    return {type: REQUEST_ADD_Portal_Customer_DOCUMENT_FAILURE};
+}
+
+
 export function fetchAllData(customerId) {
     return dispatch => {
         dispatch(fetchSites(customerId));
@@ -371,6 +406,38 @@ export function fetchAllData(customerId) {
         dispatch(fetchAccountManagers());
         dispatch(fetchReviewEngineers());
         dispatch(fetchProjects(customerId));
+        dispatch(fetchPortalCustomerDocuments(customerId));
+    }
+}
+
+export function fetchPortalCustomerDocumentsRequest() {
+    return {type: FETCH_Portal_Customer_DOCUMENTS_REQUEST};
+}
+
+export function fetchPortalCustomerDocumentsSuccess(portalCustomerDocuments) {
+    return {type: FETCH_Portal_Customer_DOCUMENTS_SUCCESS, portalCustomerDocuments};
+}
+
+export function fetchPortalCustomerDocumentsFailure() {
+    return {type: FETCH_Portal_Customer_DOCUMENTS_FAILURE};
+}
+
+
+export function fetchPortalCustomerDocuments(customerId) {
+    return dispatch => {
+        dispatch(fetchPortalCustomerDocumentsRequest());
+        return fetch(`?action=getPortalCustomerDocuments&customerId=${customerId}`)
+            .then(res => res.json())
+            .then(response => {
+                if (response.status !== 'ok') {
+                    throw new Error(response.message);
+                }
+                dispatch(fetchPortalCustomerDocumentsSuccess(response.data));
+            })
+            .catch(error => {
+                dispatch(fetchPortalCustomerDocumentsFailure());
+                dispatch(addError(error));
+            })
     }
 }
 
@@ -491,6 +558,40 @@ export function requestAddProjectSuccess(project) {
 
 export function requestAddProjectFailure() {
     return {type: REQUEST_ADD_PROJECT_FAILURE}
+}
+
+
+export function addNewPortalCustomerDocument(customerId, description, customerContract, mainContractOnly, file) {
+    return async dispatch => {
+        dispatch(requestAddPortalCustomerDocument());
+        const encodedFile = await fileToBase64(file);
+        return fetch('?action=addPortalCustomerDocument',
+            {
+                method: 'POST',
+                body: JSON.stringify({
+                    description,
+                    customerContract,
+                    mainContractOnly,
+                    fileName: file.name,
+                    fileType: file.type,
+                    fileSize: file.size,
+                    encodedFile
+                })
+            }
+        )
+            .then(res => res.json())
+            .then(response => {
+                if (response.status !== 'ok') {
+                    throw new Error(response.message);
+                }
+                requestAddPortalCustomerDocumentSuccess(response.data);
+
+            })
+            .catch(error => {
+                requestAddPortalCustomerDocumentFailure();
+                addError(error);
+            })
+    }
 }
 
 export function addNewProject(customerId, description, summary, openedDate) {
