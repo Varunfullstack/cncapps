@@ -96,7 +96,9 @@ class BUActivityType extends Business
      * check if activity type in expenses or not
      */
     public static function hasExpenses($Id)
-    {        
+    {  
+        if(!isset($Id))
+        return false;
        $query="SELECT   COUNT(*) total FROM expensetypeactivityavailability WHERE activityTypeID=$Id";
        $result=DBConnect::fetchOne($query);
        if($result["total"]>0)

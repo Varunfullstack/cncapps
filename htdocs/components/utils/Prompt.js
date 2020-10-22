@@ -30,7 +30,7 @@ class Prompt extends React.Component {
                 onClose:()=>this.close(),
                 footer:[
                     el('button',{key:"btncancel",onClick:()=>this.close()},"Cancel"),
-                    el('button',{key:"btnOk",onClick:()=>this.close()},"Ok"),
+                    el('button',{key:"btnOk",onClick:()=>this.close()},"OK"),
                 ],
                 content:el('textarea',{
                     key:"input",

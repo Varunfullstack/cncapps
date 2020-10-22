@@ -48,6 +48,20 @@ class CMPActivityDisplay extends MainComponent {
     }
     loadCallActivity=async (callActivityID)=>{        
         const {filters}=this.state;
+        const typeId=await this.api.getCallActivityTypeId(callActivityID);
+        console.log(typeId);
+        switch(typeId)
+        {
+            case 60: //Operational Task
+                filters.showOperationalTasks=true;
+                break;
+            case 55: //server update
+                filters.showServerGaurdUpdates=true;
+                break;
+            case 22: // enginner travel
+                filters.showTravel=true;
+                break;
+        }
         const currentUser=await this.api.getCurrentUser();
         const res=await this.api.getCallActivityDetails(callActivityID,filters);        
         console.log(res);        
@@ -263,7 +277,7 @@ class CMPActivityDisplay extends MainComponent {
         const {el}=this;
         if(!data)        
         return null;
-        const indx=data.activities.findIndex(a=>a.callActivityID==currentActivity);
+        const indx=data.activities.findIndex(a=>a.callActivityID==currentActivity);        
         return el('div',{className:"ml-5"},el('strong',null,(indx+1)),el('label',null,` of ${data.activities.length}`))
     }
     goNextActivity=()=>{
@@ -338,12 +352,13 @@ class CMPActivityDisplay extends MainComponent {
         const dateLen=maxLength( data?.activities||[],'date')+10;
         const engineerLen=maxLength( data?.activities||[],'enginner')+10;
         const contactName=maxLength( data?.activities||[],'contactName')+10;
-
+        const indx=data?.activities.findIndex(a=>a.callActivityID==currentActivity);   
         return el('div',{className:"activities-contianer"},
         el('div',{style:{width:"100%",display:"flex",alignItems: "center", justifyContent: "center"}},
         el(ToolTip,{title:"First ",content: el('i',{ className:"fal  fa-step-backward icon icon-size-1 mr-4 ml-4 pointer",   onClick:this.goFirstActivity})}),
         el(ToolTip,{title:"Previous",content:  el('i',{className:"fal  fa-backward icon icon-size-1 pointer",style:{fontSize:21}, onClick:this.goPrevActivity})}),
         el('select',{value:currentActivity,onChange:this.handleActivityChange},
+        indx==-1?el('option',{value:null},""):null,
         data?.activities.map(a=>
             el('option',{key:"cl"+a.callActivityID,value:a.callActivityID,
            
@@ -609,7 +624,8 @@ class CMPActivityDisplay extends MainComponent {
         const {data,currentUser}=this.state;
         const {el}=this;        
         const totalExpenses=data?.expenses.map(e=>e.value).reduce((p,c)=>p+c,0);
-        if(currentUser.isExpenseApprover||currentUser.globalExpenseApprover)
+         //if(currentUser.isExpenseApprover||currentUser.globalExpenseApprover)
+        if(data?.activityTypeHasExpenses)
         {
         let columns = [
             {

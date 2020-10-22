@@ -63,7 +63,7 @@ export default class MainComponent extends React.Component {
   }
   getAlert=()=>{
     const {alert}=this.state;
-    return this.el(Alert,{...alert,onClose:this.handleAlertClose});
+    return this.el(Alert,{...alert,onClose:this.handleAlertClose,key:"alert"});
   }
   handleAlertClose=()=>{
     const {alert}=this.state;
@@ -94,7 +94,7 @@ export default class MainComponent extends React.Component {
   }
   getConfirm=()=>{
     const {confirm}=this.state;
-    return this.el(Confirm,{...confirm,onClose:this.handleConfirmClose});
+    return this.el(Confirm,{...confirm,onClose:this.handleConfirmClose,key:'confirm'});
   }
   handleConfirmClose=(value)=>{
     //  console.log(value);
@@ -125,7 +125,7 @@ export default class MainComponent extends React.Component {
   }
   getPrompt=()=>{
     const {prompt}=this.state; 
-    return this.el(Prompt,{...prompt,onClose:this.handlePromptClose});
+    return this.el(Prompt,{...prompt,onClose:this.handlePromptClose,key:"prompt"});
   }
   handlePromptClose=(value)=>{
       console.log(value);

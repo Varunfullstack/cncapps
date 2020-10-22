@@ -99,6 +99,9 @@ class CTSRActivity extends CTCNC
             case "createProblem":
                 echo json_encode($this->addNewSR());
                 exit;
+            case "getCallActivityType":
+                echo json_encode($this->getCallActivityType());
+                exit;
             default:
            
             $this->setTemplate();
@@ -998,64 +1001,63 @@ class CTSRActivity extends CTCNC
      */
     function addNewSR()
     {
-   
-        try{
-        
-        $body                   = file_get_contents('php://input');
-        $body                   = json_decode($body);
-        $buActivity             = new BUActivity($this);
-        $body->date             = date(DATE_MYSQL_DATE);
-        $body->startTime        = date('H:i');
-        $body->dateRaised       = date(DATE_MYSQL_DATE);
-        $body->timeRaised       = date('H:i');
-        $body->callActTypeID    = CONFIG_INITIAL_ACTIVITY_TYPE_ID;       
-        //return ["team"=>$body->notStartWorkReason];
-        $dsCallActivity = $buActivity->createActivityFromJson($body);        
-        if (isset($dsCallActivity)) {
-            if (isset($body->pendingReopenedID) && isset($body->deletePending) && $body->deletePending == 'true') {
-                //delete pending
-                $dbePendingReopened = new DBEPendingReopened($this);
-                $dbePendingReopened->deleteRow($body->pendingReopenedID);
-            }
-            if($body->startWork)
-            {
-                $newActivityID = $buActivity->createFollowOnActivity(
-                    $dsCallActivity->getValue(DBEJCallActivity::callActivityID),
-                    $this->getParam('callActivityTypeID'),
-                    false,
-                    $this->getParam('reason'),
-                    true,
-                    false,
-                    $GLOBALS['auth']->is_authenticated(),
-                    $this->getParam('moveToUsersQueue')
-                );
-                //$nextURL ="Activity.php?action=createFollowOnActivity&callActivityID=".$newActivityID ."&moveToUsersQueue=1";                
-                $nextURL ="SRActivity.php?action=editActivity&callActivityID=".$newActivityID;                
 
-            }
-            else
-            {
-                $nextURL ="CurrentActivityReport.php";
-            }
-            $currentUser=$this->getDbeUser();
-            if(!$body->startWork&&$currentUser->getValue(DBEUser::teamID)==1)
-            {
-                //$body->notStartWorkReason
-                $dbeProblemNotStartReason =new DBEProblemNotStartReason($this);
-                $dbeProblemNotStartReason->setValue(DBEProblemNotStartReason::problemID, $dsCallActivity->getValue(DBEJCallActivity::problemID));
-                $dbeProblemNotStartReason->setValue(DBEProblemNotStartReason::reason, $body->notStartWorkReason);
-                $dbeProblemNotStartReason->setValue(DBEProblemNotStartReason::userID, $currentUser->getValue(DBEUser::userID));
-                $dbeProblemNotStartReason->setValue(DBEProblemNotStartReason::createAt,$body->dateRaised. ' ' . $body->timeRaised . ':00');
-                $dbeProblemNotStartReason->insertRow();
-            }
-            return ["status"=>1,"nextURL"=>$nextURL,"problemID"=>$dsCallActivity->getValue(DBEJCallActivity::problemID),"callActivityID"=>$dsCallActivity->getValue(DBEJCallActivity::callActivityID)];
+        try {
+
+            $body                   = file_get_contents('php://input');
+            $body                   = json_decode($body);
+            $buActivity             = new BUActivity($this);
+            $body->date             = date(DATE_MYSQL_DATE);
+            $body->startTime        = date('H:i');
+            $body->dateRaised       = date(DATE_MYSQL_DATE);
+            $body->timeRaised       = date('H:i');
+            $body->callActTypeID    = CONFIG_INITIAL_ACTIVITY_TYPE_ID;
+            //return ["team"=>$body->notStartWorkReason];
+            $dsCallActivity = $buActivity->createActivityFromJson($body);
+            if (isset($dsCallActivity)) {
+                if (isset($body->pendingReopenedID) && isset($body->deletePending) && $body->deletePending == 'true') {
+                    //delete pending
+                    $dbePendingReopened = new DBEPendingReopened($this);
+                    $dbePendingReopened->deleteRow($body->pendingReopenedID);
+                }
+                if ($body->startWork) {
+                    $newActivityID = $buActivity->createFollowOnActivity(
+                        $dsCallActivity->getValue(DBEJCallActivity::callActivityID),
+                        $this->getParam('callActivityTypeID'),
+                        false,
+                        $this->getParam('reason'),
+                        true,
+                        false,
+                        $GLOBALS['auth']->is_authenticated(),
+                        $this->getParam('moveToUsersQueue')
+                    );
+                    //$nextURL ="Activity.php?action=createFollowOnActivity&callActivityID=".$newActivityID ."&moveToUsersQueue=1";                
+                    $nextURL = "SRActivity.php?action=editActivity&callActivityID=" . $newActivityID;
+                } else {
+                    $nextURL = "CurrentActivityReport.php";
+                }
+                $currentUser = $this->getDbeUser();
+                if (!$body->startWork && $currentUser->getValue(DBEUser::teamID) == 1) {
+                    //$body->notStartWorkReason
+                    $dbeProblemNotStartReason = new DBEProblemNotStartReason($this);
+                    $dbeProblemNotStartReason->setValue(DBEProblemNotStartReason::problemID, $dsCallActivity->getValue(DBEJCallActivity::problemID));
+                    $dbeProblemNotStartReason->setValue(DBEProblemNotStartReason::reason, $body->notStartWorkReason);
+                    $dbeProblemNotStartReason->setValue(DBEProblemNotStartReason::userID, $currentUser->getValue(DBEUser::userID));
+                    $dbeProblemNotStartReason->setValue(DBEProblemNotStartReason::createAt, $body->dateRaised . ' ' . $body->timeRaised . ':00');
+                    $dbeProblemNotStartReason->insertRow();
+                }
+                return ["status" => 1, "nextURL" => $nextURL, "problemID" => $dsCallActivity->getValue(DBEJCallActivity::problemID), "callActivityID" => $dsCallActivity->getValue(DBEJCallActivity::callActivityID)];
+            } else return ["status" => 0];
+        } catch (Exception $exception) {
+            return ["status" => 3, "error" => $exception->getMessage()];
         }
-        else return ["status"=>0];        
     }
-    catch(Exception $exception)
+    function getCallActivityType()
     {
-        return ["status"=>3,"error"=>$exception->getMessage()];   
-    }
+        $callActivityID=$this->getParam("callActivityID");
+        $callActivity=new DBECallActivity($this);
+        $callActivity->getRow($callActivityID);
+        return $callActivity->getValue(DBECallActivity::callActTypeID);
     }
 }
 ?>

@@ -4,6 +4,7 @@ import Table from './../utils/table/table.js?v=1';
 import APICustomerLicenses from './APICustomerLicenses.js?v=1';
 import Spinner from './../utils/spinner.js?v=1';
 import {distinct} from '../utils/utils.js?v=1';
+import ToolTip from "../utils/ToolTip.js?v=1";
 /**import 
  * searching in TechData customers and link them with CNC customers
  */
@@ -92,14 +93,14 @@ class CMPTDCustomerSearch extends React.Component {
           el(
             "td",
             { key: "tdNew", className: "col" },
-            el(
-              "i",
-              {
-                key: "NewCustomer",                
+            el(ToolTip, {
+              title: "Add New Customer",
+              content: el("i", {
+                key: "NewCustomer",
                 onClick: handleAddNew,
-                className:"fal fa-plus fa-2x pointer"
-              },              
-            )
+                className: "fal fa-plus fa-2x pointer",
+              }),
+            })
           ),
         ])
       )
@@ -187,13 +188,18 @@ class CMPTDCustomerSearch extends React.Component {
         path: null,
         label: "Edit Company",
         sortable: false,
-        content: (c) =>c.endCustomerId !=null? el("i", { onClick: () => handleEdit(c),className:'pointer fal fa-edit',title:"Edit customer details" }):null
+        content: (c) =>c.endCustomerId !=null? 
+        el(ToolTip,{title:"Edit customer details",content:el("i", { onClick: () => handleEdit(c),className:'pointer fal fa-edit' })})
+        :null
       },
       {
         path: null,
         label: "Edit Licenses",
         sortable: false,
-        content: (c) => el("i", { onClick: () => handleSaas(c),className:'pointer fal fa-edit',title:"Edit customer licences" }),
+        content: (c) => 
+        el(ToolTip,{title:"Edit customer licences",content:
+        el("i", { onClick: () => handleSaas(c),className:'pointer fal fa-edit' })})
+        ,
       },
     ];
     //if(search&& search.result&&search.result.endCustomersDetails!=null)

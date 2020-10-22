@@ -10,7 +10,6 @@ import CMPInboxPendingReopened from './components/CMPInboxPendingReopened.js?v=1
 
 import SVCCurrentActivityService from './services/SVCCurrentActivityService.js?v=1';
 import Spinner from './../utils/spinner.js?v=9';
-import AutoComplete from "./../utils/autoComplete.js?v=1";
 import MainComponent from './../CMPMainComponent.js?v=1';
 class CMPCurrentActivityReport extends MainComponent {
   el = React.createElement;
@@ -20,6 +19,7 @@ class CMPCurrentActivityReport extends MainComponent {
     super(props);
     const filter= this.getLocalStorageFilter();
     this.state = {
+      ...this.state,
       helpDeskInbox: [],
       helpDeskInboxFiltered: [],
       escalationInbox: [],
@@ -240,11 +240,11 @@ class CMPCurrentActivityReport extends MainComponent {
     }
   };
   // Shared methods
-  moveToAnotherTeam = ({ target }, problem, code) => {
+  moveToAnotherTeam = async({ target }, problem, code) => {
     //console.log(target.value, problem, problem.problemStatus);
     let answer = null;
     if (problem.problemStatus === "P") {
-      answer = prompt(
+      answer =await this.prompt(
         "Please provide a reason for moving this SR into a different queue"
       );
       if (!answer) {
@@ -298,8 +298,8 @@ class CMPCurrentActivityReport extends MainComponent {
     //console.log("aalocate");
     window.location = `Activity.php?action=allocateAdditionalTime&problemID=${problem.problemID}`;
   };
-  requestAdditionalTime = (problem) => {
-    var reason = prompt(
+  requestAdditionalTime = async(problem) => {
+    var reason = await this.prompt(
       "Please provide your reason for requesting additional time.(Required)"
     );
     if (!reason) {
@@ -308,14 +308,14 @@ class CMPCurrentActivityReport extends MainComponent {
     this.apiCurrentActivityService
       .requestAdditionalTime(problem.problemID, reason)
       .then((res) => {
-        if (res.ok) alert("Additional time has been requested");
+        if (res.ok) this.alert("Additional time has been requested");
       });
   };
-  startWork = (problem, code) => {
+  startWork = async(problem, code) => {
     if (problem.lastCallActTypeID != null) {
       const message =
         "Are you sure you want to start work on this SR? It will be automatically allocated to you UNLESS it is already allocated";
-      if (confirm(message)) {
+      if (await this.confirm(message)) {
         this.apiCurrentActivityService
           .startActivityWork(problem.callActivityID)
           .then((res) => {
@@ -326,7 +326,7 @@ class CMPCurrentActivityReport extends MainComponent {
         ////console.log(problem);
       }
     } else {
-      alert("Another user is currently working on this SR");
+      this.alert("Another user is currently working on this SR");
     }
   };
   handleUserOnSelect = (event, problem, code) => {
@@ -533,7 +533,7 @@ class CMPCurrentActivityReport extends MainComponent {
       console.log(res);
     },error=>{
       console.log(error);
-      alert("You don't have permission to delete this SR or somthing wrong")})
+      this.alert("You don't have permission to delete this SR or somthing wrong")})
   }
   createNewSR=(problem,code)=>{
     //console.log('create new ',problem);
@@ -574,6 +574,9 @@ class CMPCurrentActivityReport extends MainComponent {
     } = this.state;
     //console.log(currentUser);
     return el("div", { style: { backgroundColor: "white" } }, [
+      this.getConfirm(),
+      this.getAlert(),
+      this.getPrompt(),
       el(Spinner, { key: "spinner", show: _showSpinner }),
       getTabsElement(),
       filter.activeTab!=='TBL'&&filter.activeTab!=="PR"?getEngineersFilterElement():null,

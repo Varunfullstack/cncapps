@@ -423,23 +423,40 @@
         <tr>
             <td>&nbsp;</td>
             <td>
-                <i name="SearchIcon" class="fal fa-search fa-2x icon m-5 pointer" onclick="sumbit('Search')" ></i>
-                <i name="CSVIcon" class="fal fa-file-csv fa-2x icon m-5 pointer" onclick="sumbit('CSV')" ></i>
-                <i name="clearIcon" class="fal fa-sync fa-2x icon m-5 pointer" onclick="document.location='Activity.php'" ></i>
-
-                 <!-- <input type="submit"
-                       name="Search"
-                       value="Search"
-                > 
-                <input type="submit"
-                       name="CSV"
-                       value="CSV"
-                >
-                <input type="button"
-                       name="Clear"
-                       value="Clear"
-                       onClick="document.location='Activity.php'"
-                /></td> -->
+                <div style="display: flex;flex-direction: row;width:100px">
+                <div class="tooltip">
+                    <i name="SearchIcon" class="fal fa-search fa-2x icon m-5 pointer" onclick="sumbit('Search')"></i>
+                    <div class="tooltiptext tooltip-bottom">
+                        Search
+                    </div>
+                </div>
+                <div class="tooltip">
+                    <i name="CSVIcon" class="fal fa-file-csv fa-2x icon m-5 pointer" onclick="sumbit('CSV')"></i>
+                    <div class="tooltiptext tooltip-bottom">
+                        Export Results to CSV file
+                    </div>
+                </div>
+                <div class="tooltip">
+                    <i name="clearIcon" class="fal fa-sync fa-2x icon m-5 pointer" onclick="document.location='Activity.php'"></i>
+                    <div class="tooltiptext tooltip-bottom">
+                        Clear Inputes
+                    </div>
+                </div>
+            </div>
+                <!-- <input type="submit"
+                                   name="Search"
+                                   value="Search"
+                            > 
+                            <input type="submit"
+                                   name="CSV"
+                                   value="CSV"
+                            >
+                            <input type="button"
+                                   name="Clear"
+                                   value="Clear"
+                                   onClick="document.location='Activity.php'"
+                            /></td> -->
+            </td>
         </tr>
     </table>
     {rowsFound} activities found

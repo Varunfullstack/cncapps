@@ -3,6 +3,7 @@ import AutoComplete from "./../utils/autoComplete.js?v=1";
 import APICustomerLicenses from './APICustomerLicenses.js?v=1';
 import {Cities} from './../utils/ukCities.js';
 import Spinner from './../utils/spinner.js?v=1';
+import ToolTip from "../utils/ToolTip.js?v=1";
 
 /**
  *  Edit TechData customers and link them with CNC customers
@@ -153,7 +154,7 @@ class CMPTDCustomerDetails extends React.Component {
           "Title",
           "title",
           null,
-          data.title,
+          data.title||"",
           false,
           errors["title"]
         ),
@@ -170,7 +171,7 @@ class CMPTDCustomerDetails extends React.Component {
           "Phone 1",
           "phone1",
           null,
-          data.phone1,
+          data.phone1||"",
           true,
           errors["phone1"]
         ),
@@ -178,7 +179,7 @@ class CMPTDCustomerDetails extends React.Component {
           "Phone 2",
           "phone2",
           null,
-          data.phone2,
+          data.phone2||"",
           false,
           errors["phone2"]
         ),
@@ -186,7 +187,7 @@ class CMPTDCustomerDetails extends React.Component {
           "Address Line 1",
           "addressLine1",
           null,
-          data.addressLine1,
+          data.addressLine1||"",
           true,
           errors["addressLine1"]
         ),
@@ -194,7 +195,7 @@ class CMPTDCustomerDetails extends React.Component {
           "Address Line 2",
           "addressLine2",
           null,
-          data.addressLine2,
+          data.addressLine2||"",
           false,
           errors["addressLine2"]
         ),
@@ -208,7 +209,7 @@ class CMPTDCustomerDetails extends React.Component {
             displayLength: "40",
             displayColumn: "name",
             pk: "id",
-            value:data.city,
+            value:data.city||"",
             onSelect: handleCityOnSelect,
           }),
           null,
@@ -219,7 +220,7 @@ class CMPTDCustomerDetails extends React.Component {
           "State",
           "state",
           null,
-          data.state,
+          data.state||"",
           false,
           errors["state"]
         ),
@@ -227,7 +228,7 @@ class CMPTDCustomerDetails extends React.Component {
           "Country",
           "country",
           null,
-          data.country,
+          data.country||"GB",
           true,
           errors["country"]
         ),
@@ -235,7 +236,7 @@ class CMPTDCustomerDetails extends React.Component {
           "Postal Code",
           "postalCode",
           null,
-          data.postalCode,
+          data.postalCode||"",
           true,
           errors["postalCode"]
         ),
@@ -272,8 +273,10 @@ class CMPTDCustomerDetails extends React.Component {
           el(
             "td",
             { key: "tdSave", colSpan: 2 },
-            [el("i", { key: "btnSave", onClick: handleOnSave,className:"fal fa-save fa-2x m-5 icon pointer" }),
-            el("i", { key: "btnCancel", onClick: handleOnCancel,className:"fal fa-window-close fa-2x m-5 icon pointer" })]
+              el('div',{style:{display:"flex",flexDirection:"row",width:70}},
+              el(ToolTip,{title:"Save",content:el("i", { key: "btnSave", onClick: handleOnSave,className:"fal fa-save fa-2x m-5 icon pointer" })}),
+              el(ToolTip,{title:"Cancel",content:el("i", { key: "btnCancel", onClick: handleOnCancel,className:"fal fa-window-close fa-2x m-5 icon pointer" })})
+              )
           )
         ),
       ])

@@ -116,6 +116,7 @@ class CMPActivityEdit extends MainComponent {
   //------------API
   loadCallActivity(callActivityID) {
     const { filters } = this.state;
+    
     this.api.getCallActivityDetails(callActivityID, filters).then((res) => {
       console.log(res);
       const { filters } = this.state;
@@ -578,7 +579,7 @@ class CMPActivityEdit extends MainComponent {
   };
   getActionsButtons = () => {
     const { el } = this;
-    const { data } = this.state;
+    const { data,currentUser } = this.state;
     return el(
       "div",
       {
@@ -653,7 +654,9 @@ class CMPActivityEdit extends MainComponent {
       data?.callActTypeID != 59
         ? el(
             "button",
-            { onClick: () => this.setNextStatus("Update") },
+            { onClick: () => this.setNextStatus("Update"),
+              disabled:!currentUser?.isSDManger
+            },
             "Update"
           )
         : null,
@@ -756,7 +759,7 @@ class CMPActivityEdit extends MainComponent {
     {
       if(type && type.catRequireCustomerNoteCNCAction==1 && (data.customerNotesTemplate=='' || data.customerNotesTemplate==null))
       {
-        this.alert(`Customer Notes is required for ${type.description} when the next action is CNC Action`)
+        this.alert(`Customer Notes are required for ${type.description} when the next action is CNC Action`)
         return false;
       }
       if(type && type.catRequireCustomerNoteCNCAction==2 && (data.customerNotesTemplate=='' || data.customerNotesTemplate==null))
@@ -784,7 +787,7 @@ class CMPActivityEdit extends MainComponent {
     {
        if(type && type.catRequireCustomerNoteOnHold==1 && (data.customerNotesTemplate=='' || data.customerNotesTemplate==null))
       {
-        this.alert(`Customer Notes is required for ${type.description} when the next action is On Hold`)
+        this.alert(`Customer Notes are required for ${type.description} when the next action is On Hold`)
         return false;
       }
       if(type && type.catRequireCustomerNoteOnHold==2 && (data.customerNotesTemplate=='' || data.customerNotesTemplate==null))

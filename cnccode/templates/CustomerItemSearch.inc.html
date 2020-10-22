@@ -150,11 +150,35 @@
         <tr>
             <td>&nbsp;</td>
             <td>
-                <i name="SearchIcon" class="fal fa-search fa-2x icon m-5 pointer" onclick="makeSumbit('Search')" ></i>
-                <i name="CSVIcon" class="fal fa-file-csv fa-2x icon m-5 pointer" onclick="makeSumbit('CSV')" ></i>
-                <i name="plusIcon" class="fal fa-plus fa-2x icon m-5 pointer" onclick="document.location='CustomerItem.php?action=addCI'" ></i>
-                <i name="clearIcon" class="fal fa-sync fa-2x icon m-5 pointer" onclick="document.location = 'CustomerItem.php'" ></i>
-                   
+                <div style="display: flex; flex-direction: row; width: 120px;">
+                    <div class="tooltip">
+                        <i name="SearchIcon" class="fal fa-search fa-2x icon m-5 pointer" onclick="makeSumbit('Search')"></i>
+                        <div class="tooltiptext tooltip-bottom">
+                            Search
+                        </div>
+                    </div>
+                    <div class="tooltip">
+                        <i name="CSVIcon" class="fal fa-file-csv fa-2x icon m-5 pointer" onclick="makeSumbit('CSV')"></i>
+                        <div class="tooltiptext tooltip-bottom">
+                            Export Results to CSV file
+                        </div>
+                    </div>
+                    <div class="tooltip">
+                        <i name="plusIcon" class="fal fa-plus fa-2x icon m-5 pointer"
+                            onclick="document.location='CustomerItem.php?action=addCI'"></i>
+                        <div class="tooltiptext tooltip-bottom">
+                            Add New Item
+                        </div>
+                    </div>
+                    <div class="tooltip">
+                        <i name="clearIcon" class="fal fa-sync fa-2x icon m-5 pointer"
+                            onclick="document.location = 'CustomerItem.php'"></i>
+                        <div class="tooltiptext tooltip-bottom">
+                            Clear Inputes
+                        </div>
+                    </div>
+                </div>
+            </td>
         </tr>
     </table>
     <table class="singleBorder"

@@ -85,5 +85,9 @@ class APIActivity extends APIMain{
     {
         return this.post(`${ApiUrls.SRActivity}createProblem`,data).then(res => res.json());
     }
+    getCallActivityTypeId(callActivityId)
+    {
+        return fetch(`${ApiUrls.SRActivity}getCallActivityType&callActivityID=${callActivityId}`).then(res => res.json());
+    }
 }
 export default APIActivity;
