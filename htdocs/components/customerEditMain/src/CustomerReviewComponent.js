@@ -47,7 +47,6 @@ class CustomerReviewComponent extends React.Component {
     }
 
     handleToBeReviewedOnDateChange($event) {
-        console.log($event);
         this.updateCustomerField('toBeReviewedOnDate', $event.target.value);
     }
 
@@ -81,8 +80,7 @@ class CustomerReviewComponent extends React.Component {
         })
             .then(response => response.json())
             .then(response => {
-                console.log('customer data saved');
-            })
+                            })
     }
 
     render() {

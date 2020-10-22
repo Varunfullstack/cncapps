@@ -4,6 +4,9 @@ import {
     ADD_SITE,
     CHANGE_DELIVER_SITE_NO,
     CHANGE_INVOICE_SITE_NO,
+    DELETE_PORTAL_CUSTOMER_DOCUMENT_FAILURE,
+    DELETE_PORTAL_CUSTOMER_DOCUMENT_REQUEST,
+    DELETE_PORTAL_CUSTOMER_DOCUMENT_SUCCESS,
     DELETE_PROJECT_FAILURE,
     DELETE_PROJECT_REQUEST,
     DELETE_PROJECT_SUCCESS,
@@ -21,9 +24,9 @@ import {
     FETCH_CUSTOMER_TYPES_SUCCESS,
     FETCH_LEAD_STATUSES,
     FETCH_LEAD_STATUSES_SUCCESS,
-    FETCH_Portal_Customer_DOCUMENTS_FAILURE,
-    FETCH_Portal_Customer_DOCUMENTS_REQUEST,
-    FETCH_Portal_Customer_DOCUMENTS_SUCCESS,
+    FETCH_PORTAL_CUSTOMER_DOCUMENTS_FAILURE,
+    FETCH_PORTAL_CUSTOMER_DOCUMENTS_REQUEST,
+    FETCH_PORTAL_CUSTOMER_DOCUMENTS_SUCCESS,
     FETCH_PROJECTS_FAILURE,
     FETCH_PROJECTS_REQUEST,
     FETCH_PROJECTS_SUCCESS,
@@ -34,13 +37,13 @@ import {
     FETCH_SITES_FAILURE,
     FETCH_SITES_REQUEST,
     FETCH_SITES_SUCCESS,
-    HIDE_NEW_Portal_Customer_DOCUMENT_MODAL,
+    HIDE_NEW_PORTAL_CUSTOMER_DOCUMENT_MODAL,
     HIDE_NEW_PROJECT_MODAL,
-    NEW_Portal_Customer_DOCUMENT_FIELD_UPDATE,
+    NEW_PORTAL_CUSTOMER_DOCUMENT_FIELD_UPDATE,
     NEW_PROJECT_FIELD_UPDATE,
-    REQUEST_ADD_Portal_Customer_DOCUMENT,
-    REQUEST_ADD_Portal_Customer_DOCUMENT_FAILURE,
-    REQUEST_ADD_Portal_Customer_DOCUMENT_SUCCESS,
+    REQUEST_ADD_PORTAL_CUSTOMER_DOCUMENT,
+    REQUEST_ADD_PORTAL_CUSTOMER_DOCUMENT_FAILURE,
+    REQUEST_ADD_PORTAL_CUSTOMER_DOCUMENT_SUCCESS,
     REQUEST_ADD_PROJECT,
     REQUEST_ADD_PROJECT_FAILURE,
     REQUEST_ADD_PROJECT_SUCCESS,
@@ -51,7 +54,7 @@ import {
     REQUEST_UPDATE_CUSTOMER_SUCCESS,
     SAVE_CUSTOMER_DATA_SUCCESS,
     SAVE_SITE_SUCCESS,
-    SHOW_NEW_Portal_Customer_DOCUMENT_MODAL,
+    SHOW_NEW_PORTAL_CUSTOMER_DOCUMENT_MODAL,
     SHOW_NEW_PROJECT_MODAL,
     TOGGLE_VISIBILITY,
     UPDATE_CUSTOMER_VALUE,
@@ -371,27 +374,27 @@ export function deleteSite(customerId, siteNo) {
 }
 
 export function showNewPortalCustomerDocumentModal() {
-    return {type: SHOW_NEW_Portal_Customer_DOCUMENT_MODAL};
+    return {type: SHOW_NEW_PORTAL_CUSTOMER_DOCUMENT_MODAL};
 }
 
 export function hideNewPortalCustomerDocumentModal() {
-    return {type: HIDE_NEW_Portal_Customer_DOCUMENT_MODAL};
+    return {type: HIDE_NEW_PORTAL_CUSTOMER_DOCUMENT_MODAL};
 }
 
 export function newPortalCustomerDocumentFieldUpdate(field, value) {
-    return {type: NEW_Portal_Customer_DOCUMENT_FIELD_UPDATE, field, value};
+    return {type: NEW_PORTAL_CUSTOMER_DOCUMENT_FIELD_UPDATE, field, value};
 }
 
 export function requestAddPortalCustomerDocument() {
-    return {type: REQUEST_ADD_Portal_Customer_DOCUMENT};
+    return {type: REQUEST_ADD_PORTAL_CUSTOMER_DOCUMENT};
 }
 
 export function requestAddPortalCustomerDocumentSuccess(portalCustomerDocument) {
-    return {type: REQUEST_ADD_Portal_Customer_DOCUMENT_SUCCESS, portalCustomerDocument};
+    return {type: REQUEST_ADD_PORTAL_CUSTOMER_DOCUMENT_SUCCESS, portalCustomerDocument};
 }
 
 export function requestAddPortalCustomerDocumentFailure() {
-    return {type: REQUEST_ADD_Portal_Customer_DOCUMENT_FAILURE};
+    return {type: REQUEST_ADD_PORTAL_CUSTOMER_DOCUMENT_FAILURE};
 }
 
 
@@ -411,15 +414,15 @@ export function fetchAllData(customerId) {
 }
 
 export function fetchPortalCustomerDocumentsRequest() {
-    return {type: FETCH_Portal_Customer_DOCUMENTS_REQUEST};
+    return {type: FETCH_PORTAL_CUSTOMER_DOCUMENTS_REQUEST};
 }
 
 export function fetchPortalCustomerDocumentsSuccess(portalCustomerDocuments) {
-    return {type: FETCH_Portal_Customer_DOCUMENTS_SUCCESS, portalCustomerDocuments};
+    return {type: FETCH_PORTAL_CUSTOMER_DOCUMENTS_SUCCESS, portalCustomerDocuments};
 }
 
 export function fetchPortalCustomerDocumentsFailure() {
-    return {type: FETCH_Portal_Customer_DOCUMENTS_FAILURE};
+    return {type: FETCH_PORTAL_CUSTOMER_DOCUMENTS_FAILURE};
 }
 
 
@@ -488,7 +491,7 @@ const debouncedUpdateCustomer = debounce((dispatch, field, value, getState) => {
                 //we should refetch everything ..just in case
                 dispatch(requestUpdateCustomerFailedOutOfDate(error.lastUpdatedDateTime));
                 dispatch(addError('Unable to save change due to another edit by someone else'));
-                dispatch(fetchAllData(customerID));
+                dispatch(fetchCustomer(customerID));
                 return;
             }
 
@@ -561,7 +564,8 @@ export function requestAddProjectFailure() {
 }
 
 
-export function addNewPortalCustomerDocument(customerId, description, customerContract, mainContractOnly, file) {
+export function addNewPortalCustomerDocument(customerId, portalDocument) {
+    const {description, customerContract, mainContractOnly, file} = portalDocument;
     return async dispatch => {
         dispatch(requestAddPortalCustomerDocument());
         const encodedFile = await fileToBase64(file);
@@ -622,5 +626,44 @@ export function addNewProject(customerId, description, summary, openedDate) {
                 addError(error);
             })
 
+    }
+}
+
+export function deletePortalDocumentRequest(id) {
+    return {type: DELETE_PORTAL_CUSTOMER_DOCUMENT_REQUEST, id}
+}
+
+export function deletePortalDocumentSuccess(id) {
+    return {type: DELETE_PORTAL_CUSTOMER_DOCUMENT_SUCCESS, id};
+}
+
+export function deletePortalDocumentFailure(id) {
+    return {type: DELETE_PORTAL_CUSTOMER_DOCUMENT_FAILURE, id};
+}
+
+export function deletePortalCustomerDocument(portalDocumentId) {
+    return dispatch => {
+        dispatch(deletePortalDocumentRequest(portalDocumentId));
+        return fetch('?action=deletePortalDocument', {
+            method: 'POST',
+            body: JSON.stringify({portalDocumentId})
+        })
+            .then(res => res.json())
+            .then(response => {
+                if (response.status !== 'ok') {
+                    throw new Error(response.message);
+                }
+                dispatch(deletePortalDocumentSuccess(portalDocumentId));
+            })
+            .catch(error => {
+                dispatch(deletePortalDocumentFailure(portalDocumentId));
+                addError(error);
+            })
+    }
+}
+
+export function newPortalDocumentFieldUpdate(field, value) {
+    return dispatch => {
+        dispatch(newPortalCustomerDocumentFieldUpdate(field, value));
     }
 }

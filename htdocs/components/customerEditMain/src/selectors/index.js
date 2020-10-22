@@ -1,4 +1,5 @@
 import {createSelector} from "reselect";
+import portalCustomerDocuments from "../reducers/portalCustomerDocuments";
 
 const getContacts = (state) => state.contacts;
 const getMappedContacts = createSelector(
@@ -55,3 +56,28 @@ export const getMainContacts = createSelector(
     [getMappedContacts],
     (contacts) => contacts.filter(contact => contact.supportLevel === 'main')
 )
+
+const getPortalCustomerDocumentsById = (state) => state.portalCustomerDocuments.byIds;
+export const getMappedPortalCustomerDocuments = createSelector(
+    [getPortalCustomerDocumentsById],
+    (portalCustomerDocumentsById) => Object.keys(portalCustomerDocumentsById).map(key => portalCustomerDocumentsById[key])
+)
+
+const getPortalCustomerDocumentsState = (state) => state.portalCustomerDocuments;
+
+export const getPortalCustomerDocumentsIsFetching = createSelector(
+    [getPortalCustomerDocumentsState],
+    (portalCustomerDocumentsState) => portalCustomerDocumentsState.isFetching
+)
+
+export const getPortalCustomerDocumentsNewPortalDocument = createSelector(
+    [getPortalCustomerDocumentsState],
+    (portalCustomerDocumentsState) => portalCustomerDocumentsState.newPortalDocument
+)
+
+export const getPortalCustomerDocumentsModalShown = createSelector(
+    [getPortalCustomerDocumentsState],
+    (state) =>state.newPortalDocumentModalShown
+)
+
+
