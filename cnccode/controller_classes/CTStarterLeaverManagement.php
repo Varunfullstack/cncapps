@@ -132,6 +132,9 @@ class CTStarterLeaverManagement extends CTCNC
 
         $questionData = $this->getParam('question');
 
+        if ($this->getParam('type')) {
+            $questionData[DBEStarterLeaverQuestion::formType] = $this->getParam('type');
+        }
 
         $dbeStarterLeaverQuestion = new DBEStarterLeaverQuestion($this);
 
@@ -144,12 +147,12 @@ class CTStarterLeaverManagement extends CTCNC
             DBEStarterLeaverQuestion::customerID,
             $questionData[DBEStarterLeaverQuestion::customerID]
         );
-        if ($this->getParam('type')) {
-            $dbeStarterLeaverQuestion->setValue(
-                DBEStarterLeaverQuestion::formType,
-                $this->getParam('type')
-            );
-        }
+
+
+        $dbeStarterLeaverQuestion->setValue(
+            DBEStarterLeaverQuestion::formType,
+            $questionData[DBEStarterLeaverQuestion::formType]
+        );
 
         $dbeStarterLeaverQuestion->setValue(
             DBEStarterLeaverQuestion::name,
