@@ -21,6 +21,9 @@ import {
     FETCH_CUSTOMER_TYPES_SUCCESS,
     FETCH_LEAD_STATUSES,
     FETCH_LEAD_STATUSES_SUCCESS,
+    FETCH_PROJECTS_FAILURE,
+    FETCH_PROJECTS_REQUEST,
+    FETCH_PROJECTS_SUCCESS,
     FETCH_REVIEW_ENGINEERS,
     FETCH_REVIEW_ENGINEERS_SUCCESS,
     FETCH_SECTORS,
@@ -28,6 +31,11 @@ import {
     FETCH_SITES_FAILURE,
     FETCH_SITES_REQUEST,
     FETCH_SITES_SUCCESS,
+    HIDE_NEW_PROJECT_MODAL,
+    NEW_PROJECT_FIELD_UPDATE,
+    REQUEST_ADD_PROJECT,
+    REQUEST_ADD_PROJECT_FAILURE,
+    REQUEST_ADD_PROJECT_SUCCESS,
     REQUEST_SAVE_SITE,
     REQUEST_UPDATE_CUSTOMER,
     REQUEST_UPDATE_CUSTOMER_FAILED,
@@ -35,6 +43,7 @@ import {
     REQUEST_UPDATE_CUSTOMER_SUCCESS,
     SAVE_CUSTOMER_DATA_SUCCESS,
     SAVE_SITE_SUCCESS,
+    SHOW_NEW_PROJECT_MODAL,
     TOGGLE_VISIBILITY,
     UPDATE_CUSTOMER_VALUE,
     UPDATE_SITE
@@ -361,6 +370,37 @@ export function fetchAllData(customerId) {
         dispatch(fetchSectors());
         dispatch(fetchAccountManagers());
         dispatch(fetchReviewEngineers());
+        dispatch(fetchProjects(customerId));
+    }
+}
+
+export function fetchProjectsRequest() {
+    return {type: FETCH_PROJECTS_REQUEST};
+}
+
+export function fetchProjectsSuccess(projects) {
+    return {type: FETCH_PROJECTS_SUCCESS, projects};
+}
+
+export function fetchProjectsFailure() {
+    return {type: FETCH_PROJECTS_FAILURE};
+}
+
+export function fetchProjects(customerId) {
+    return dispatch => {
+        dispatch(fetchProjectsRequest());
+        return fetch(`?action=getCustomerProjects&customerId=${customerId}`)
+            .then(res => res.json())
+            .then(response => {
+                if (response.status !== 'ok') {
+                    throw new Error(response.message);
+                }
+                dispatch(fetchProjectsSuccess(response.data));
+            })
+            .catch(error => {
+                dispatch(fetchProjectsFailure());
+                dispatch(addError(error));
+            })
     }
 }
 
@@ -425,5 +465,61 @@ export function saveSite(site) {
                 }
                 dispatch(saveSiteSuccess(site.siteNo));
             })
+    }
+}
+
+
+export function newProjectFieldUpdate(field, value) {
+    return {type: NEW_PROJECT_FIELD_UPDATE, field, value}
+}
+
+export function hideNewProjectModal() {
+    return {type: HIDE_NEW_PROJECT_MODAL}
+}
+
+export function showNewProjectModal() {
+    return {type: SHOW_NEW_PROJECT_MODAL}
+}
+
+export function requestAddProject(customerId, description, summary, openedDate) {
+    return {type: REQUEST_ADD_PROJECT, customerId, description, summary, openedDate}
+}
+
+export function requestAddProjectSuccess(project) {
+    return {type: REQUEST_ADD_PROJECT_SUCCESS, project}
+}
+
+export function requestAddProjectFailure() {
+    return {type: REQUEST_ADD_PROJECT_FAILURE}
+}
+
+export function addNewProject(customerId, description, summary, openedDate) {
+    return (dispatch) => {
+        dispatch(requestAddProject(customerId, description, summary, openedDate));
+        return fetch('Project.php?action=addProject',
+            {
+                method: 'POST',
+                body: JSON.stringify(
+                    {
+                        customerId,
+                        description,
+                        summary,
+                        openedDate
+                    }
+                )
+            }
+        )
+            .then(res => res.json())
+            .then(response => {
+                if (response.status !== 'ok') {
+                    throw new Error(response.message);
+                }
+                dispatch(requestAddProjectSuccess(response.data));
+            })
+            .catch(error => {
+                dispatch(requestAddProjectFailure());
+                addError(error);
+            })
+
     }
 }
