@@ -1,25 +1,23 @@
 import React from 'react';
 
-class CustomerPortalDocumentsComponent extends React.Component {
+class PortalCustomerDocumentsComponent extends React.Component {
     el = React.createElement;
 
     constructor(props) {
         super(props);
         this.state = {
             loaded: false,
-            customerPortalDocuments: [],
+            portalCustomerDocuments: [],
             customerId: props.customerId,
         };
     }
 
-    fetchCustomerPortalDocuments() {
-        return fetch('?action=getCustomerPortalDocuments&customerId=' + this.props.customerId)
-            .then(response => response.json())
-            .then(response => this.setState({customerPortalDocuments: response.data}));
+    fetchPortalCustomerDocuments() {
+
     }
 
     componentDidMount() {
-        this.fetchCustomerPortalDocuments()
+        this.fetchPortalCustomerDocuments()
             .then(() => {
                 this.setState({
                     loaded: true,
@@ -28,7 +26,7 @@ class CustomerPortalDocumentsComponent extends React.Component {
     }
 
     renderPortalDocumentsRows() {
-        return this.state.customerPortalDocuments.map(
+        return this.state.portalCustomerDocuments.map(
             portalDocument => {
                 return (
                     <tr key={`portalDocumentRow-${portalDocument.id}`}>
@@ -122,4 +120,4 @@ class CustomerPortalDocumentsComponent extends React.Component {
     }
 }
 
-export default CustomerPortalDocumentsComponent;
+export default PortalCustomerDocumentsComponent;
