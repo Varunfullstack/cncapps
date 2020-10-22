@@ -186,7 +186,6 @@ WHERE callactivity.caa_status = 'O'
 
     function displayReport()
     {
-
         $this->setMethodName('displayReport');
 
         $this->setTemplateFiles(
@@ -196,11 +195,22 @@ WHERE callactivity.caa_status = 'O'
         $this->loadReactScript('SpinnerHolderComponent.js');
         $this->loadReactCSS('SpinnerHolderComponent.css');
         $this->setPageTitle('Time Request Dashboard');
+
+        $dbejCallActivity = new DBEJCallActivity($this);
+        $dbejCallActivity->getPendingTimeRequestRows();
+
+        $this->template->set_block(
+            'TimeRequestDashboard',
+            'TimeRequestsBlock',
+            'timeRequests'
+        );
+
+        $buActivity = new BUActivity($this);
+
         $buHeader = new BUHeader($this);
         $dsHeader = new DataSet($this);
         $buHeader->getHeader($dsHeader);
         $isAdditionalTimeApprover = $this->dbeUser->getValue(DBEUser::additionalTimeLevelApprover);
-
 
         while ($dbejCallActivity->fetchNext()) {
             $problemID = $dbejCallActivity->getValue(DBEJCallActivity::problemID);
