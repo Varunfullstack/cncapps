@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [v4.9.1] - 2020-10-22
+### Fixed
+- Pending Time Requests Email not showing the data
+- Failed creation of leaver questions
+
 ## [v4.9.0] - 2020-10-20
 ### Added
 - Issue 1016 - Automated Request Monitor
