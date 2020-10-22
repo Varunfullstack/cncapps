@@ -1,4 +1,3 @@
-import Skeleton from "react-loading-skeleton";
 import React from 'react';
 import ReactDOM from 'react-dom';
 import CustomerEditMain from "./CustomerEditMain";
@@ -27,10 +26,8 @@ class CustomerEditComponent extends React.Component {
     render() {
         const {customerId} = this.props;
         if (!this.state.loaded) {
-            return (
-                <Skeleton>
-                </Skeleton>
-            )
+            return '';
+
         }
 
         return (
