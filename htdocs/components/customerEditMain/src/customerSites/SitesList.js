@@ -17,9 +17,7 @@ const SitesList = ({sites, visibilityFilter, onToggleVisibility, invoiceSiteNo, 
             )
         })
     }
-
-    console.log(invoiceSiteNo);
-
+    console.log('sitesList rerendered');
     return (
 
         <div className="mt-3">
@@ -100,7 +98,6 @@ const SitesList = ({sites, visibilityFilter, onToggleVisibility, invoiceSiteNo, 
 }
 
 function getVisibleSites(sites, filter) {
-    console.log(sites, filter);
     const mappedSites = sites.allIds.map(id => sites.byIds[id]);
     if (filter === SHOW_ACTIVE) {
         return mappedSites.filter(x => x.active);

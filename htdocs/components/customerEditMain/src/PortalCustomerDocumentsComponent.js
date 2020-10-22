@@ -1,43 +1,46 @@
 import React from 'react';
+import {
+    addNewPortalCustomerDocument,
+    deletePortalCustomerDocument,
+    hideNewPortalCustomerDocumentModal,
+    newPortalDocumentFieldUpdate,
+    showNewPortalCustomerDocumentModal
+} from "./actions";
+import {connect} from "react-redux";
+import {
+    getMappedPortalCustomerDocuments,
+    getPortalCustomerDocumentsIsFetching,
+    getPortalCustomerDocumentsModalShown,
+    getPortalCustomerDocumentsNewPortalDocument
+} from "./selectors";
+import AddPortalCustomerDocumentComponent from "./modals/AddPortalCustomerDocumentComponent";
 
 class PortalCustomerDocumentsComponent extends React.Component {
     el = React.createElement;
 
     constructor(props) {
         super(props);
-        this.state = {
-            loaded: false,
-            portalCustomerDocuments: [],
-            customerId: props.customerId,
-        };
-    }
-
-    fetchPortalCustomerDocuments() {
-
-    }
-
-    componentDidMount() {
-        this.fetchPortalCustomerDocuments()
-            .then(() => {
-                this.setState({
-                    loaded: true,
-                });
-            });
     }
 
     renderPortalDocumentsRows() {
-        return this.state.portalCustomerDocuments.map(
+        const {
+            portalCustomerDocuments,
+            onDeletePortalDocument,
+        } = this.props;
+        return portalCustomerDocuments.map(
             portalDocument => {
                 return (
                     <tr key={`portalDocumentRow-${portalDocument.id}`}>
                         <td>
                             <a href={`/PortalCustomerDocument.php?action=viewFile&portalCustomerDocumentID=${portalDocument.id}`}
                                title="View attached document"
+                               target="_blank"
                             >{portalDocument.description}</a>
                         </td>
                         <td>
                             <a href={`/PortalCustomerDocument.php?action=viewFile&portalCustomerDocumentID=${portalDocument.id}`}
                                title="View attached document"
+                               target="_blank"
                             >{portalDocument.description}</a>
                         </td>
                         <td>
@@ -47,16 +50,17 @@ class PortalCustomerDocumentsComponent extends React.Component {
                             {portalDocument.mainContactOnly ? 'Y' : 'N'}
                         </td>
                         <td>
-                            <a href={`/PortalCustomerDocument.php?action=edit&portalCustomerDocumentID=${portalDocument.id}`}>
+                            <a href={`/PortalCustomerDocument.php?action=edit&portalCustomerDocumentID=${portalDocument.id}`}
+                               target="_blank"
+                            >
                                 <button className="btn btn-outline-secondary">
                                     <i className="fal fa-edit fa-lg"/>
                                 </button>
                             </a>
                         </td>
                         <td>
-                            <a href={`/PortalCustomerDocument.php?action=delete&portalCustomerDocumentID=${portalDocument.id}`}
-                               title="Delete attached document"
-                               onClick={($event) => !confirm('Are you sure you want to delete this document?') ? $event.preventDefault() : null}
+                            <a title="Delete attached document"
+                               onClick={($event) => !confirm('Are you sure you want to delete this document?') ? $event.preventDefault() : onDeletePortalDocument(portalDocument.id)}
                             >
                                 <button className="btn btn-outline-danger">
                                     <i className="fal fa-trash-alt fa-lg"/>
@@ -70,22 +74,42 @@ class PortalCustomerDocumentsComponent extends React.Component {
     }
 
     render() {
+        console.warn('portal customer rendered');
+        const {
+            newPortalDocument,
+            newPortalDocumentModalShown,
+            onNewPortalDocumentFieldUpdate,
+            onAddNewPortalDocument,
+            onHideNewPortalDocumentModal,
+            onShowNewPortalDocumentModal,
+            customerId
+        } = this.props;
+        console.log(onShowNewPortalDocumentModal);
         return (
             <div className="tab-pane fade"
                  id="nav-portal-documents-tab"
                  role="tabpanel"
                  aria-labelledby="nav-portal-documents-tab"
             >
+                <AddPortalCustomerDocumentComponent
+                    description={newPortalDocument.description}
+                    customerContract={newPortalDocument.customerContract}
+                    mainContractOnly={newPortalDocument.mainContractOnly}
+                    file={newPortalDocument.file}
+                    show={newPortalDocumentModalShown}
+                    onFieldUpdate={onNewPortalDocumentFieldUpdate}
+                    onClose={onHideNewPortalDocumentModal}
+                    onAdd={() => onAddNewPortalDocument(customerId, newPortalDocument)}
+                />
                 <div className="mt-3">
                     <div className="row">
                         <div className="col-md-12">
                             <h2>Portal Documents</h2>
                         </div>
                         <div className="col-md-12">
-                            <a>
+                            <a onClick={() => onShowNewPortalDocumentModal}>
                                 <button className="btn btn-sm btn-new mt-3 mb-3"
-                                        data-toggle="modal"
-                                        data-target="#portalDocumentsModal"
+
                                 >Add Document
                                 </button>
                             </a>
@@ -120,4 +144,36 @@ class PortalCustomerDocumentsComponent extends React.Component {
     }
 }
 
-export default PortalCustomerDocumentsComponent;
+
+function mapStateToProps(state) {
+    console.log(state.portalCustomerDocuments);
+    return {
+        portalCustomerDocuments: getMappedPortalCustomerDocuments(state),
+        isFetching: getPortalCustomerDocumentsIsFetching(state),
+        newPortalDocument: getPortalCustomerDocumentsNewPortalDocument(state),
+        newPortalDocumentModalShown: getPortalCustomerDocumentsModalShown(state)
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        onDeletePortalDocument: (documentId) => {
+            dispatch(deletePortalCustomerDocument(documentId))
+        },
+        onNewPortalDocumentFieldUpdate: (field, value) => {
+            dispatch(newPortalDocumentFieldUpdate(field, value))
+        },
+        onAddNewPortalDocument: (customerId, portalDocument) => {
+            dispatch(addNewPortalCustomerDocument(customerId, portalDocument));
+        },
+        onHideNewPortalDocumentModal: () => {
+            dispatch(hideNewPortalCustomerDocumentModal())
+        },
+        onShowNewPortalDocumentModal: () => {
+            console.log('here');
+            dispatch(showNewPortalCustomerDocumentModal())
+        }
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(PortalCustomerDocumentsComponent)

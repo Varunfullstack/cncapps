@@ -10,8 +10,6 @@ const AddProjectModalComponent = (props) => {
     const {description, summary, openedDate, show, onNewProjectFieldUpdate, onClose, onAddProject} = props;
     CKEditor.editorUrl = '/ckeditor/ckeditor.js'
 
-    console.log(description, summary, openedDate);
-
     const ckeditorConfig = {
         contentsCss: '/screen.css',
         toolbarStartupExpanded: false,
