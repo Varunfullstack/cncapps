@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v4.9.2] 
+### Fixed
+
+ 
 ## [v4.9.1] - 2020-10-22
 ### Fixed
 - Pending Time Requests Email not showing the data

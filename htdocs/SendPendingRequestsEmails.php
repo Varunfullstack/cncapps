@@ -148,7 +148,7 @@ function processTimeRequestsEmails()
                         DBEHeader::hdTeamManagementTimeApprovalMinutes
                     );
                 addPendingTimeRequestToArray(
-                    $pendingProjectRequests,
+                    $pendingHDRequests,
                     $dbejCallActivity,
                     $dbeProblem,
                     $assignedMinutes,
@@ -165,7 +165,7 @@ function processTimeRequestsEmails()
                         DBEHeader::esTeamManagementTimeApprovalMinutes
                     );
                 addPendingTimeRequestToArray(
-                    $pendingProjectRequests,
+                    $pendingESRequests,
                     $dbejCallActivity,
                     $dbeProblem,
                     $assignedMinutes,
@@ -182,7 +182,7 @@ function processTimeRequestsEmails()
                         DBEHeader::smallProjectsTeamManagementTimeApprovalMinutes
                     );
                 addPendingTimeRequestToArray(
-                    $pendingProjectRequests,
+                    $pendingIMRequests,
                     $dbejCallActivity,
                     $dbeProblem,
                     $assignedMinutes,
@@ -286,7 +286,6 @@ function sendChangeRequestsEmail($teamEmail,
     $senderEmail = CONFIG_SUPPORT_EMAIL;
 
     $body = $twig->render('@internal/pendingChangeRequestsEmail.html.twig', ["items" => $requests]);
-    echo $body;
     $toEmail = $teamEmail;
 
     $hdrs = array(
