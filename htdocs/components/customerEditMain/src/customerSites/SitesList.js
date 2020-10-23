@@ -1,11 +1,35 @@
 import React from 'react';
 import {connect} from "react-redux";
-import {changeDeliverSiteNo, changeInvoiceSiteNo, toggleVisibility} from "../actions";
+import {
+    addNewSite,
+    changeDeliverSiteNo,
+    changeInvoiceSiteNo,
+    hideNewSiteModal,
+    newSiteFieldUpdate,
+    showNewSiteModal,
+    toggleVisibility
+} from "../actions";
 import Site from './Site.js';
 import {SHOW_ACTIVE} from "../visibilityFilterTypes";
-import {getDeliverSiteNo, getInvoiceSiteNo} from "../selectors";
+import {getDeliverSiteNo, getInvoiceSiteNo, getVisibleSites} from "../selectors";
+import AddSiteComponent from "../modals/AddSiteComponent";
 
-const SitesList = ({sites, visibilityFilter, onToggleVisibility, invoiceSiteNo, deliverSiteNo, onChangeInvoiceSiteNo, onChangeDeliverSiteNo}) => {
+const SitesList = ({
+                       customerId,
+                       sites,
+                       visibilityFilter,
+                       onToggleVisibility,
+                       invoiceSiteNo,
+                       deliverSiteNo,
+                       newSite,
+                       newSiteModalShow,
+                       onChangeInvoiceSiteNo,
+                       onChangeDeliverSiteNo,
+                       onNewSiteFieldUpdate,
+                       onNewSiteModalHide,
+                       onNewSiteModalShow,
+                       onAddSite,
+                   }) => {
     const getSiteOptions = (sites) => {
         return sites.filter(x => x.active).map(site => {
             return (
@@ -17,10 +41,22 @@ const SitesList = ({sites, visibilityFilter, onToggleVisibility, invoiceSiteNo, 
             )
         })
     }
-    console.log('sitesList rerendered');
+    console.log('sitesList rerendered', newSite);
     return (
-
         <div className="mt-3">
+            <AddSiteComponent
+                addressLine={newSite.addressLine}
+                town={newSite.town}
+                postcode={newSite.postcode}
+                phone={newSite.phone}
+                maxTravelHours={newSite.maxTravelHours}
+                show={newSiteModalShow}
+                onFieldUpdate={onNewSiteFieldUpdate}
+                onClose={onNewSiteModalHide}
+                onAdd={() => {
+                    onAddSite(customerId, newSite)
+                }}
+            />
             <div className="row">
                 <div className="col-md-12">
                     <h2>Sites</h2>
@@ -30,8 +66,7 @@ const SitesList = ({sites, visibilityFilter, onToggleVisibility, invoiceSiteNo, 
                         <div className="form-group">
 
                             <button className="btn btn-sm btn-new mt-3 mb-3"
-                                    data-toggle="modal"
-                                    data-target="#newSiteModal"
+                                    onClick={() => onNewSiteModalShow()}
                             >Add Site
                             </button>
                         </div>
@@ -97,20 +132,15 @@ const SitesList = ({sites, visibilityFilter, onToggleVisibility, invoiceSiteNo, 
     )
 }
 
-function getVisibleSites(sites, filter) {
-    const mappedSites = sites.allIds.map(id => sites.byIds[id]);
-    if (filter === SHOW_ACTIVE) {
-        return mappedSites.filter(x => x.active);
-    }
-    return mappedSites;
-}
-
 function mapStateToProps(state) {
+
     return {
-        sites: getVisibleSites(state.sites, state.visibilityFilter),
+        sites: getVisibleSites(state),
         visibilityFilter: state.visibilityFilter,
         invoiceSiteNo: getInvoiceSiteNo(state),
-        deliverSiteNo: getDeliverSiteNo(state)
+        deliverSiteNo: getDeliverSiteNo(state),
+        newSite: state.sites.newSite,
+        newSiteModalShow: state.sites.newSiteModalShow
     }
 }
 
@@ -124,6 +154,18 @@ function mapDispatchToProps(dispatch) {
         },
         onChangeDeliverSiteNo: (value) => {
             dispatch(changeDeliverSiteNo(value));
+        },
+        onNewSiteModalShow: () => {
+            dispatch(showNewSiteModal());
+        },
+        onNewSiteModalHide: () => {
+            dispatch(hideNewSiteModal());
+        },
+        onAddSite: (customerId, newSite) => {
+            dispatch(addNewSite(customerId, newSite));
+        },
+        onNewSiteFieldUpdate: (field, value) => {
+            dispatch(newSiteFieldUpdate(field, value));
         }
     }
 }

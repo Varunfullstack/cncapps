@@ -1,5 +1,5 @@
 import {createSelector} from "reselect";
-import portalCustomerDocuments from "../reducers/portalCustomerDocuments";
+import {SHOW_ACTIVE} from "../visibilityFilterTypes";
 
 const getContacts = (state) => state.contacts;
 const getMappedContacts = createSelector(
@@ -77,7 +77,17 @@ export const getPortalCustomerDocumentsNewPortalDocument = createSelector(
 
 export const getPortalCustomerDocumentsModalShown = createSelector(
     [getPortalCustomerDocumentsState],
-    (state) =>state.newPortalDocumentModalShown
+    (state) => state.newPortalDocumentModalShown
 )
 
+const getVisibilityFilter = (state) => state.visibilityFilter;
 
+export const getVisibleSites = createSelector(
+    [getMappedSites, getVisibilityFilter],
+    (mappedSites, visibilityFilter) => {
+        if (visibilityFilter === SHOW_ACTIVE) {
+            return mappedSites.filter(x => x.active);
+        }
+        return mappedSites;
+    }
+);
