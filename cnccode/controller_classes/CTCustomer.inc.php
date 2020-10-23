@@ -1624,16 +1624,6 @@ class CTCustomer extends CTCNC
         $dbeSite->setValue(DBESite::customerID, $data['customerID']);
         $dbeSite->setValue(DBESite::siteNo, $data['siteNo']);
         $dbeSite->getRow();
-        $dbeCustomer = new DBECustomer($this);
-        $dbeCustomer->getRow($data['customerID']);
-        if ($dbeCustomer->getValue(DBECustomer::invoiceSiteNo) != $data['invoiceSiteNo']
-            ||
-            $dbeCustomer->getValue(DBECustomer::deliverSiteNo) != $data['deliverSiteNo']
-        ) {
-            $dbeCustomer->setValue(DBECustomer::deliverSiteNo, $data['deliverSiteNo']);
-            $dbeCustomer->setValue(DBECustomer::invoiceSiteNo, $data['invoiceSiteNo']);
-            $dbeCustomer->updateRow();
-        }
         $dbeSite->setValue(DBESite::add1, $data["address1"]);
         $dbeSite->setValue(DBESite::add2, $data["address2"]);
         $dbeSite->setValue(DBESite::add3, $data["address3"]);
