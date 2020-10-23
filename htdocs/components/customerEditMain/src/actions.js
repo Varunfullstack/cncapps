@@ -564,37 +564,44 @@ export function requestAddProjectFailure() {
 }
 
 
+function removeDataURLMetadata(base64DataURL) {
+    return base64DataURL.split(",")[1];
+}
+
 export function addNewPortalCustomerDocument(customerId, portalDocument) {
     const {description, customerContract, mainContractOnly, file} = portalDocument;
-    return async dispatch => {
+    return dispatch => {
         dispatch(requestAddPortalCustomerDocument());
-        const encodedFile = await fileToBase64(file);
-        return fetch('?action=addPortalCustomerDocument',
-            {
-                method: 'POST',
-                body: JSON.stringify({
-                    description,
-                    customerContract,
-                    mainContractOnly,
-                    fileName: file.name,
-                    fileType: file.type,
-                    fileSize: file.size,
-                    encodedFile
-                })
-            }
-        )
-            .then(res => res.json())
-            .then(response => {
-                if (response.status !== 'ok') {
-                    throw new Error(response.message);
-                }
-                requestAddPortalCustomerDocumentSuccess(response.data);
+        return fileToBase64(file).then(encodedFile => {
 
-            })
-            .catch(error => {
-                requestAddPortalCustomerDocumentFailure();
-                addError(error);
-            })
+            return fetch('?action=addPortalCustomerDocument',
+                {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        customerId,
+                        description,
+                        customerContract,
+                        mainContractOnly,
+                        fileName: file.name,
+                        fileSize: file.size,
+                        encodedFile: removeDataURLMetadata(encodedFile),
+                    })
+                }
+            )
+                .then(res => res.json())
+                .then(response => {
+                    if (response.status !== 'ok') {
+                        throw new Error(response.message);
+                    }
+                    dispatch(requestAddPortalCustomerDocumentSuccess(response.data));
+
+                })
+                .catch(error => {
+                    dispatch(requestAddPortalCustomerDocumentFailure());
+                    addError(error);
+                })
+        })
+
     }
 }
 
