@@ -107,7 +107,7 @@ class PortalCustomerDocumentsComponent extends React.Component {
                             <h2>Portal Documents</h2>
                         </div>
                         <div className="col-md-12">
-                            <a onClick={() => onShowNewPortalDocumentModal}>
+                            <a onClick={() => onShowNewPortalDocumentModal()}>
                                 <button className="btn btn-sm btn-new mt-3 mb-3"
 
                                 >Add Document
@@ -170,7 +170,6 @@ function mapDispatchToProps(dispatch) {
             dispatch(hideNewPortalCustomerDocumentModal())
         },
         onShowNewPortalDocumentModal: () => {
-            console.log('here');
             dispatch(showNewPortalCustomerDocumentModal())
         }
     }

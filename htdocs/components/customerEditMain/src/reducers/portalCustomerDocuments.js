@@ -50,7 +50,7 @@ export default function (state = initialState, action) {
                     ...Object
                         .keys(state.byIds)
                         .reduce((acc, key) => {
-                                if (key !== action.id) {
+                                if (+key !== action.id) {
                                     acc[key] = state.byIds[key];
                                 }
                                 return acc;

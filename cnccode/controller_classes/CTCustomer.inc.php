@@ -142,6 +142,8 @@ class CTCustomer extends CTCNC
     const UPDATE_SITE = "updateSite";
     const GET_CUSTOMER_ORDERS = 'getCustomerOrders';
     const GET_CUSTOMER_DATA = 'getCustomer';
+    const ADD_PORTAL_CUSTOMER_DOCUMENT = 'addPortalCustomerDocument';
+    const DELETE_PORTAL_DOCUMENT = "deletePortalDocument";
     public $customerID;
     public $customerString;
     public $contactString;
@@ -856,7 +858,86 @@ class CTCustomer extends CTCNC
                 );
                 break;
             }
-            case 'getSectors':
+            case self::DELETE_PORTAL_DOCUMENT:
+            {
+                $data = $this->getJSONData();
+                if (!isset($data['portalDocumentId'])) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, "portal document Id is required");
+                }
+                $dbePortalCustomerDocumentWithoutFile = new DBEPortalCustomerDocumentWithoutFile($this);
+                $dbePortalCustomerDocumentWithoutFile->deleteRow($data['portalDocumentId']);
+                echo json_encode(["status" => "ok"]);
+                exit;
+            }
+            case self::ADD_PORTAL_CUSTOMER_DOCUMENT:
+            {
+                $data = $this->getJSONData();
+
+                if (!isset($data['customerId'])) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, "customerId is required");
+                }
+                if (!isset($data['description'])) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, "description is required");
+                }
+                if (!isset($data['fileName'])) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, "fileName is required");
+                }
+                if (!isset($data['encodedFile'])) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, "encodedFile is required");
+                }
+
+                if (!isset($data['customerContract'])) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, "customerContract is required");
+                }
+                if (!isset($data['mainContractOnly'])) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, "mainContractOnly is required");
+                }
+
+                $fileAndMimeType = $this->getFileDecodedAndMimeTypeFromBase64EncodedFile($data['encodedFile']);
+
+                $dbePortalCustomerDocument = new DBEPortalCustomerDocument($this);
+                $dbePortalCustomerDocument->setValue(DBEPortalCustomerDocument::customerID, $data['customerId']);
+                $dbePortalCustomerDocument->setValue(DBEPortalCustomerDocument::description, $data['description']);
+                $dbePortalCustomerDocument->setValue(DBEPortalCustomerDocument::file, $fileAndMimeType->file);
+                $dbePortalCustomerDocument->setValue(
+                    DBEPortalCustomerDocument::fileMimeType,
+                    $fileAndMimeType->mimeType
+                );
+                $dbePortalCustomerDocument->setValue(DBEPortalCustomerDocument::filename, $data['fileName']);
+                $dbePortalCustomerDocument->setValue(
+                    DBEPortalCustomerDocument::customerContract,
+                    $data['customerContract']
+                );
+                $dbePortalCustomerDocument->setValue(
+                    DBEPortalCustomerDocument::mainContactOnlyFlag,
+                    $data['mainContractOnly'] ? 'Y' : 'N'
+                );
+
+                $dbePortalCustomerDocument->insertRow();
+
+                $document =
+                    [
+                        'id'                  => $dbePortalCustomerDocument->getValue(
+                            DBEPortalCustomerDocument::portalCustomerDocumentID
+                        ),
+                        'description'         => $dbePortalCustomerDocument->getValue(
+                            DBEPortalCustomerDocumentWithoutFile::description
+                        ),
+                        'filename'            => $dbePortalCustomerDocument->getValue(
+                            DBEPortalCustomerDocumentWithoutFile::filename
+                        ),
+                        'customerContract'    => $dbePortalCustomerDocument->getValue(
+                            DBEPortalCustomerDocumentWithoutFile::customerContract
+                        ),
+                        'mainContactOnlyFlag' => $dbePortalCustomerDocument->getValue(
+                                DBEPortalCustomerDocument::mainContactOnlyFlag
+                            ) === 'Y',
+                    ];
+                echo json_encode(["status" => "ok", "data" => $document]);
+                exit;
+            }
+            case
+            'getSectors':
             {
                 $dbeSector = new DBESector($this);
                 $dbeSector->getRows(DBESector::description);
@@ -1093,11 +1174,21 @@ class CTCustomer extends CTCNC
         return $this->orderTypeArray[$type];
     }
 
-    private function getMainContacts($customerID)
+    private
+    function getMainContacts($customerID
+    )
     {
         $dbeContact = new DBEContact($this);
         $dbeContact->getMainContacts($customerID);
         return $dbeContact->fetchArray();
+    }
+
+    private function getFileDecodedAndMimeTypeFromBase64EncodedFile($encodedFile)
+    {
+        $data = base64_decode($encodedFile);
+        $f = finfo_open();
+        $mimeType = finfo_buffer($f, $data, FILEINFO_MIME_TYPE);
+        return (object)["file" => $data, "mimeType" => $mimeType];
     }
 
     function getReviewEngineersController()
@@ -1194,7 +1285,9 @@ class CTCustomer extends CTCNC
                     'description'         => $portalDocuments->getValue(
                         DBEPortalCustomerDocumentWithoutFile::description
                     ),
-                    'filename'            => $portalDocuments->getValue(DBEPortalCustomerDocumentWithoutFile::filename),
+                    'filename'            => $portalDocuments->getValue(
+                        DBEPortalCustomerDocumentWithoutFile::filename
+                    ),
                     'customerContract'    => $portalDocuments->getValue(
                         DBEPortalCustomerDocumentWithoutFile::customerContract
                     ),
@@ -1394,7 +1487,10 @@ class CTCustomer extends CTCNC
                 "active"         => $dbeSite->getValue(DBESite::activeFlag) == 'Y',
                 "nonUKFlag"      => $dbeSite->getValue(DBESite::nonUKFlag) == 'Y',
                 "what3Words"     => $dbeSite->getValue(DBESite::what3Words),
-                "canDelete"      => $this->buCustomer->canDeleteSite($customerId, $dbeSite->getValue(DBESite::siteNo))
+                "canDelete"      => $this->buCustomer->canDeleteSite(
+                    $customerId,
+                    $dbeSite->getValue(DBESite::siteNo)
+                )
             ];
         }
         echo json_encode(["status" => "ok", "data" => $sites]);
@@ -1999,7 +2095,9 @@ class CTCustomer extends CTCNC
                 'specialAttentionFlagChecked'    => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::specialAttentionFlag)
                 ),
-                'specialAttentionEndDate'        => $this->dsCustomer->getValue(DBECustomer::specialAttentionEndDate),
+                'specialAttentionEndDate'        => $this->dsCustomer->getValue(
+                    DBECustomer::specialAttentionEndDate
+                ),
                 'specialAttentionEndDateMessage' => $this->dsCustomer->getValue(
                     self::customerFormSpecialAttentionEndDateMessage
                 ),
@@ -2237,7 +2335,9 @@ class CTCustomer extends CTCNC
                 array(
                     'accountManagerUserID'       => $dsUser->getValue(DBEUser::userID),
                     'accountManagerUserName'     => $dsUser->getValue(DBEUser::name),
-                    'accountManagerUserSelected' => ($dsUser->getValue(DBEUser::userID) == $this->dsCustomer->getValue(
+                    'accountManagerUserSelected' => ($dsUser->getValue(
+                            DBEUser::userID
+                        ) == $this->dsCustomer->getValue(
                             DBECustomer::accountManagerUserID
                         )) ? CT_SELECTED : null
                 )
@@ -2521,7 +2621,9 @@ class CTCustomer extends CTCNC
                     'customerID'                           => $this->dsContact->getValue(DBEContact::customerID),
                     'supplierID'                           => $this->dsContact->getValue(DBEContact::supplierID),
                     'title'                                => $this->dsContact->getValue(DBEContact::title),
-                    'titleClass'                           => $this->dsContact->getValue(self::contactFormTitleClass),
+                    'titleClass'                           => $this->dsContact->getValue(
+                        self::contactFormTitleClass
+                    ),
                     'firstName'                            => $this->dsContact->getValue(DBEContact::firstName),
                     'lastName'                             => $this->dsContact->getValue(DBEContact::lastName),
                     'firstNameClass'                       => $this->dsContact->getValue(
@@ -2540,12 +2642,20 @@ class CTCustomer extends CTCNC
                     'pendingLeaverFlagChecked'             => ($this->dsContact->getValue(
                             DBEContact::pendingLeaverFlag
                         ) == 'Y') ? CT_CHECKED : null,
-                    'pendingLeaverDate'                    => $this->dsContact->getValue(DBEContact::pendingLeaverDate),
-                    'failedLoginCount'                     => $this->dsContact->getValue(DBEContact::failedLoginCount),
+                    'pendingLeaverDate'                    => $this->dsContact->getValue(
+                        DBEContact::pendingLeaverDate
+                    ),
+                    'failedLoginCount'                     => $this->dsContact->getValue(
+                        DBEContact::failedLoginCount
+                    ),
                     'email'                                => $this->dsContact->getValue(DBEContact::email),
-                    'emailClass'                           => $this->dsContact->getValue(self::contactFormEmailClass),
+                    'emailClass'                           => $this->dsContact->getValue(
+                        self::contactFormEmailClass
+                    ),
                     'notes'                                => $this->dsContact->getValue(DBEContact::notes),
-                    'discontinuedFlag'                     => $this->dsContact->getValue(DBEContact::discontinuedFlag),
+                    'discontinuedFlag'                     => $this->dsContact->getValue(
+                        DBEContact::discontinuedFlag
+                    ),
                     'specialAttentionContactFlagChecked'   => $this->getChecked(
                         $this->dsContact->getValue(
                             DBEContact::specialAttentionContactFlag
@@ -3064,7 +3174,8 @@ class CTCustomer extends CTCNC
      * @return bool
      * @throws Exception
      */
-    protected function saveContactPassword()
+    protected
+    function saveContactPassword()
     {
         $contactID = $this->getParam('contactID');
         $password = $this->getParam('password');
@@ -3097,7 +3208,8 @@ class CTCustomer extends CTCNC
      * @return bool
      * @throws Exception
      */
-    protected function clearContact()
+    protected
+    function clearContact()
     {
         $contactID = $this->getParam('contactID');
         if (!$contactID) {
@@ -3117,7 +3229,8 @@ class CTCustomer extends CTCNC
      * @return array
      * @throws Exception
      */
-    private function getCustomerReviewContacts()
+    private
+    function getCustomerReviewContacts()
     {
         if (!$this->getParam('customerID')) {
             throw new Exception('Customer ID is missing');

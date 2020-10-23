@@ -20,7 +20,7 @@ const AddPortalCustomerDocumentComponent = (props) => {
             </ModalHeader>
             <ModalBody>
                 <div className="row">
-                    <div className="col-6">
+                    <div className="col-12">
                         <div className="form-group">
                             <label htmlFor="portalDocumentsDescription">Description</label>
                             <input type="text"
@@ -32,7 +32,7 @@ const AddPortalCustomerDocumentComponent = (props) => {
                     </div>
                 </div>
                 <div className="row">
-                    <div className="col-3">
+                    <div className="col-6">
                         <div className="form-group">
                             <label>Customer Contract</label>
                             <div className="form-group form-inline pt-1">
@@ -47,7 +47,7 @@ const AddPortalCustomerDocumentComponent = (props) => {
 
                         </div>
                     </div>
-                    <div className="col-3">
+                    <div className="col-6">
                         <div className="form-group">
                             <label>Main Contract Only</label>
                             <div className="form-group form-inline pt-1">
@@ -62,15 +62,17 @@ const AddPortalCustomerDocumentComponent = (props) => {
 
                         </div>
                     </div>
-                    <div className="col-3">
+                </div>
+                <div className="row">
+                    <div className="col-12">
                         <div className="form-group">
                             <a className="btn"
                                title="Select a file or drag and drop"
 
                             >
                                 <i className="fal fa-picture-o"/>
-                                <FileInput onChange={$event => onFieldUpdate('file', $event.target.value)}
-                                           value={file}
+                                <FileInput onChange={$event => onFieldUpdate('file', $event[0])}
+                                           value={file ? [file] : []}
                                 >
 
                                 </FileInput>
