@@ -1,14 +1,14 @@
 # Changelog
 This project changes will be shown here.
 
-## [v4.9.2] 
+## [v4.9.2] - 2020-10-23
 ### Change
 - Change the maximum size of the position field in the customer page
 ### Fixed
 - Time Request email issues
 - Remove limits on Time Request, Change Request and Sales Request dashboards
 - Change the query to make sure we get all the open activities in OpenCallEmail
- 
+
 ## [v4.9.1] - 2020-10-22
 ### Fixed
 - Pending Time Requests Email not showing the data
