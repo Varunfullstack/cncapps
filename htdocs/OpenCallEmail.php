@@ -72,7 +72,7 @@ FROM
   callactivity 
   JOIN problem
     ON pro_problemno = caa_problemno
-  JOIN callacttype
+  left JOIN callacttype
     ON cat_callacttypeno = caa_callacttypeno
   JOIN consultant
     ON caa_consno = cns_consno
