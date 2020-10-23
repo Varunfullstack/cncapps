@@ -8,13 +8,14 @@ class CustomerSitesComponent extends Component {
     }
 
     render() {
+        const {customerId} = this.props;
         return (
             <div className="tab-pane fade show"
                  id="nav-sites"
                  role="tabpanel"
                  aria-labelledby="nav-sites-tab"
             >
-                <SitesList/>
+                <SitesList customerId={customerId}/>
             </div>
         );
     }

@@ -39,14 +39,19 @@ import {
     FETCH_SITES_SUCCESS,
     HIDE_NEW_PORTAL_CUSTOMER_DOCUMENT_MODAL,
     HIDE_NEW_PROJECT_MODAL,
+    HIDE_NEW_SITE_MODAL,
     NEW_PORTAL_CUSTOMER_DOCUMENT_FIELD_UPDATE,
     NEW_PROJECT_FIELD_UPDATE,
+    NEW_SITE_FIELD_UPDATE,
     REQUEST_ADD_PORTAL_CUSTOMER_DOCUMENT,
     REQUEST_ADD_PORTAL_CUSTOMER_DOCUMENT_FAILURE,
     REQUEST_ADD_PORTAL_CUSTOMER_DOCUMENT_SUCCESS,
     REQUEST_ADD_PROJECT,
     REQUEST_ADD_PROJECT_FAILURE,
     REQUEST_ADD_PROJECT_SUCCESS,
+    REQUEST_ADD_SITE,
+    REQUEST_ADD_SITE_FAILURE,
+    REQUEST_ADD_SITE_SUCCESS,
     REQUEST_SAVE_SITE,
     REQUEST_UPDATE_CUSTOMER,
     REQUEST_UPDATE_CUSTOMER_FAILED,
@@ -56,6 +61,7 @@ import {
     SAVE_SITE_SUCCESS,
     SHOW_NEW_PORTAL_CUSTOMER_DOCUMENT_MODAL,
     SHOW_NEW_PROJECT_MODAL,
+    SHOW_NEW_SITE_MODAL,
     TOGGLE_VISIBILITY,
     UPDATE_CUSTOMER_VALUE,
     UPDATE_SITE
@@ -672,5 +678,80 @@ export function deletePortalCustomerDocument(portalDocumentId) {
 export function newPortalDocumentFieldUpdate(field, value) {
     return dispatch => {
         dispatch(newPortalCustomerDocumentFieldUpdate(field, value));
+    }
+}
+
+function createShowNewSiteModalAction() {
+    return {type: SHOW_NEW_SITE_MODAL}
+}
+
+export function showNewSiteModal() {
+    return dispatch => {
+        dispatch(createShowNewSiteModalAction());
+    }
+}
+
+function createHideNewSiteModalAction() {
+    return {type: HIDE_NEW_SITE_MODAL}
+}
+
+export function hideNewSiteModal() {
+    return dispatch => {
+        dispatch(createHideNewSiteModalAction());
+    }
+}
+
+function createNewSiteFieldUpdateAction(field, value) {
+    return {type: NEW_SITE_FIELD_UPDATE, field, value};
+}
+
+export function newSiteFieldUpdate(field, value) {
+    return dispatch => {
+        dispatch(createNewSiteFieldUpdateAction(field, value));
+    }
+}
+
+function createAddSiteRequestAction(customerId, newSite) {
+    return {type: REQUEST_ADD_SITE, customerId, newSite}
+}
+
+function createAddSiteRequestSuccessAction(newSite) {
+    return {type: REQUEST_ADD_SITE_SUCCESS, newSite};
+}
+
+function createAddSiteRequestFailureAction() {
+    return {type: REQUEST_ADD_SITE_FAILURE};
+}
+
+export function addNewSite(customerId, newSite) {
+    return (dispatch) => {
+        dispatch(createAddSiteRequestAction(customerId, newSite));
+        return fetch('?action=addSite',
+            {
+                method: 'POST',
+                body: JSON.stringify(
+                    {
+                        customerId,
+                        addressLine: newSite.addressLine,
+                        town: newSite.town,
+                        postcode: newSite.postcode,
+                        phone: newSite.phone,
+                        maxTravelHours: newSite.maxTravelHours,
+                    }
+                )
+            }
+        )
+            .then(res => res.json())
+            .then(response => {
+                if (response.status !== 'ok') {
+                    throw new Error(response.message);
+                }
+                dispatch(createAddSiteRequestSuccessAction(response.data));
+            })
+            .catch(error => {
+                dispatch(createAddSiteRequestFailureAction());
+                addError(error);
+            })
+
     }
 }

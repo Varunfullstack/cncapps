@@ -144,6 +144,7 @@ class CTCustomer extends CTCNC
     const GET_CUSTOMER_DATA = 'getCustomer';
     const ADD_PORTAL_CUSTOMER_DOCUMENT = 'addPortalCustomerDocument';
     const DELETE_PORTAL_DOCUMENT = "deletePortalDocument";
+    const ADD_SITE = "addSite";
     public $customerID;
     public $customerString;
     public $contactString;
@@ -981,11 +982,64 @@ class CTCustomer extends CTCNC
                 return $this->getCustomerContactsController();
             case self::UPDATE_SITE:
                 return $this->updateSiteController();
+            case self::ADD_SITE:
+                $data = $this->getJSONData();
+                if (!isset($data['customerId'])) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'customerId is required');
+                }
+                if (!isset($data['addressLine'])) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'addressLine is required');
+                }
+                if (!isset($data['town'])) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'town is required');
+                }
+                if (!isset($data['postcode'])) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'postcode is required');
+                }
+                if (!isset($data['phone'])) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'phone is required');
+                }
+                if (!isset($data['maxTravelHours'])) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'maxTravelHours is required');
+                }
+
+                $dbeSite = new DBESite($this);
+                $dbeSite->setValue(DBESite::customerID, $data['customerId']);
+                $dbeSite->setValue(DBESite::add1, $data['addressLine']);
+                $dbeSite->setValue(DBESite::town, $data['town']);
+                $dbeSite->setValue(DBESite::postcode, $data['postcode']);
+                $dbeSite->setValue(DBESite::phone, $data['phone']);
+                $dbeSite->setValue(DBESite::maxTravelHours, $data['maxTravelHours']);
+                $dbeSite->setValue(DBESite::activeFlag, 'Y');
+                $dbeSite->insertRow();
+
+                $site = [
+                    "customerID"     => $dbeSite->getValue(DBESite::customerID),
+                    "siteNo"         => $dbeSite->getValue(DBESite::siteNo),
+                    "address1"       => $dbeSite->getValue(DBESite::add1),
+                    "address2"       => $dbeSite->getValue(DBESite::add2),
+                    "address3"       => $dbeSite->getValue(DBESite::add3),
+                    "town"           => $dbeSite->getValue(DBESite::town),
+                    "county"         => $dbeSite->getValue(DBESite::county),
+                    "postcode"       => $dbeSite->getValue(DBESite::postcode),
+                    "invoiceContact" => $dbeSite->getValue(DBESite::invoiceContactID),
+                    "deliverContact" => $dbeSite->getValue(DBESite::deliverContactID),
+                    "debtorCode"     => $dbeSite->getValue(DBESite::debtorCode),
+                    "sageRef"        => $dbeSite->getValue(DBESite::sageRef),
+                    "phone"          => $dbeSite->getValue(DBESite::phone),
+                    "maxTravelHours" => $dbeSite->getValue(DBESite::maxTravelHours),
+                    "active"         => $dbeSite->getValue(DBESite::activeFlag) == 'Y',
+                    "nonUKFlag"      => $dbeSite->getValue(DBESite::nonUKFlag) == 'Y',
+                    "what3Words"     => $dbeSite->getValue(DBESite::what3Words),
+                    "canDelete"      => true
+                ];
+
+                echo json_encode(["status" => "ok", "data" => $site]);
+                exit;
             case CTCUSTOMER_ACT_SEARCH:
                 $this->search();
                 break;
             case CTCUSTOMER_ACT_ADDCUSTOMER:
-            case CTCUSTOMER_ACT_ADDSITE:
             case CTCUSTOMER_ACT_ADDCONTACT:
             case CTCUSTOMER_ACT_DISP_SUCCESS:
             case CTCNC_ACT_DISP_EDIT:

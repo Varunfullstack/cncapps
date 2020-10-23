@@ -2,16 +2,31 @@ import {
     DELETE_SITE_SUCCESS,
     FETCH_SITES_REQUEST,
     FETCH_SITES_SUCCESS,
+    HIDE_NEW_SITE_MODAL,
+    NEW_SITE_FIELD_UPDATE,
+    REQUEST_ADD_SITE_FAILURE,
+    REQUEST_ADD_SITE_SUCCESS,
     SAVE_SITE_SUCCESS,
+    SHOW_NEW_SITE_MODAL,
     UPDATE_SITE
 } from "../actionTypes";
+
+const newSiteInitialState = {
+    addressLine: '',
+    town: '',
+    postcode: '',
+    phone: '',
+    maxTravelHours: '',
+}
 
 const initialState = {
     allIds: [],
     byIds: {},
     isFetching: false,
     lastUpdated: null,
-    sitesPendingChanges: {}
+    sitesPendingChanges: {},
+    newSiteModalShow: false,
+    newSite: newSiteInitialState
 }
 
 export default function (state = initialState, action) {
@@ -25,6 +40,7 @@ export default function (state = initialState, action) {
         case FETCH_SITES_SUCCESS:
             // we have received the list of sites
             return {
+                ...state,
                 ...action.sites.reduce(
                     (acc, site) => {
                         acc.allIds.push(site.siteNo);
@@ -83,6 +99,42 @@ export default function (state = initialState, action) {
                         {}
                     )
             }
+        case SHOW_NEW_SITE_MODAL: {
+            return {
+                ...state,
+                newSiteModalShow: true
+            }
+        }
+        case REQUEST_ADD_SITE_FAILURE:
+        case HIDE_NEW_SITE_MODAL: {
+            return {
+                ...state,
+                newSiteModalShow: false,
+                newSite: newSiteInitialState
+            }
+        }
+        case NEW_SITE_FIELD_UPDATE: {
+            return {
+                ...state,
+                newSite: {
+                    ...state.newSite,
+                    [action.field]: action.value
+                }
+            }
+        }
+
+        case REQUEST_ADD_SITE_SUCCESS: {
+            return {
+                ...state,
+                byIds: {
+                    ...state.byIds,
+                    [action.newSite.siteNo]: action.newSite,
+                },
+                newSiteModalShow: false,
+                allIds: [...state.allIds, action.newSite.siteNo],
+                newSite: newSiteInitialState
+            }
+        }
         default:
             return state
     }
