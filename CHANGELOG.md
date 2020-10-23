@@ -3,7 +3,7 @@ This project changes will be shown here.
 
 ## [v4.9.2] 
 ### Fixed
-
+- Time Request email issues
  
 ## [v4.9.1] - 2020-10-22
 ### Fixed
