@@ -121,13 +121,13 @@ class CMPActivityDisplay extends MainComponent {
         const {data,currentUser}=this.state;
         console.log(currentUser);
         return el('div',{className:"activities-contianer", style:{display:"flex",flexDirection:"row",justifyContent:"center",alignItems:"center"}},
-        el(ToolTip,{title:"Follow On",content: el('i',{className:"fal fa-play fa-2x m-5 pointer icon",onClick:this.handleFollowOn})}),  
+        data?.problemStatus !== "C"?el(ToolTip,{title:"Follow On",content: el('i',{className:"fal fa-play fa-2x m-5 pointer icon",onClick:this.handleFollowOn})}):null,  
         el(ToolTip,{title:"History",content: el('a',{className:"fal fa-history fa-2x m-5 pointer icon",href:`Activity.php?action=problemHistoryPopup&problemID=${data?.problemID}&htmlFmt=popup`,target:"_blank"})}),
         el(ToolTip,{title:"Passwords",content:el('a',{className:"fal fa-unlock-alt fa-2x m-5 pointer icon",href:`Password.php?action=list&customerID=${data?.customerId}`,target:"_blank"})}),
         this. getGab(),
         data?.canEdit=='ALL_GOOD'?el(ToolTip,{title:"Edit",content: el('a',{className:"fal fa-edit fa-2x m-5 pointer icon",href:`SRActivity.php?action=editActivity&callActivityID=${data?.callActivityID}`})}):null,  
         data?.canEdit!='ALL_GOOD'?el(ToolTip,{title:data?.canEdit,content: el('i',{className:"fal fa-edit fa-2x m-5 pointer icon-disable"})}):null,  
-        data?.canDelete?el(ToolTip,{title:data?.activities.length===1?"Delete Request":"Delete Activity",content: el('i',{className:"fal fa-trash-alt fa-2x m-5 pointer icon",onClick:()=>this.handleDelete(data)})}):null,          
+        (data?.canDelete&&data?.problemStatus !== "C")?el(ToolTip,{title:data?.activities.length===1?"Delete Request":"Delete Activity",content: el('i',{className:"fal fa-trash-alt fa-2x m-5 pointer icon",onClick:()=>this.handleDelete(data)})}):null,          
         !data?.canDelete?el(ToolTip,{title:"Delete Activity",content: el('i',{className:"fal fa-trash-alt fa-2x m-5 pointer  icon-disable",})}):null,  
         this. getGab(),
         data?.linkedSalesOrderID?el(ToolTip,{title:"Sales Order",content:el('a',{className:"fal fa-tag fa-2x m-5 pointer icon" ,href:`SalesOrder.php?action=displaySalesOrder&ordheadID=${data?.linkedSalesOrderID}`,target:"_blank"})}):null,
@@ -143,7 +143,7 @@ class CMPActivityDisplay extends MainComponent {
         this.getGab(),
         (data?.activityTypeHasExpenses)? el(ToolTip,{title:"Expenses",content: el('a',{className:"fal fa-coins fa-2x m-5 pointer icon",href:`Expense.php?action=view&callActivityID=${data?.callActivityID}`})}):this.getGab(),  
         //(currentUser.isExpenseApprover||currentUser.globalExpenseApprover)? el(ToolTip,{title:"Expenses",content: el('a',{className:"fal fa-coins fa-2x m-5 pointer icon",href:`Expense.php?action=view&callActivityID=${data?.callActivityID}`})}):this.getGab(),  
-        el(ToolTip,{title:"Add Travel",content: el('a',{className:"fal fa-car fa-2x m-5 pointer icon",href:`Activity.php?action=createFollowOnActivity&callActivityID=${data?.callActivityID}&callActivityTypeID=22`})}),  
+        data?.problemStatus !== "C"?el(ToolTip,{title:"Add Travel",content: el('a',{className:"fal fa-car fa-2x m-5 pointer icon",href:`Activity.php?action=createFollowOnActivity&callActivityID=${data?.callActivityID}&callActivityTypeID=22`})}):null,  
         currentUser.isSDManger&&data?.problemHideFromCustomerFlag=='Y'?el(ToolTip,{title:"Unhide SR",content: el('i',{className:"fal fa-eye-slash fa-2x m-5 pointer icon",onClick:()=>this.handleUnhideSR(data)})}):this.getGab(),  
         el(ToolTip,{title:"Calendar",content: el('a',{className:"fal fa-calendar-alt fa-2x m-5 pointer icon",href:`Activity.php?action=addToCalendar&callActivityID=${data?.callActivityID}`})}),      
         data?.allowSCRFlag=='Y'?el(ToolTip,{title:"Send client a visit confirmation email",content: el('i',{className:"fal fa-envelope fa-2x m-5 pointer icon",onClick:()=>this.handleConfirmEmail(data)})}):this.getGab(),      
@@ -465,14 +465,14 @@ class CMPActivityDisplay extends MainComponent {
         el('td',null),
 
         el('td',{className:"display-label"},"Date"),
-        el('td',{colSpan:3,className:"display-content"},data?.date),
+        el('td',{colSpan:3,className:"display-content"},moment(data?.date).format("DD/MM/YYYY")),
         ),
 
         el('tr',null,
         el('td',{className:"display-label"},"Contract"),
         el('td',{className:"display-content"},data?.contractType),
         el('td',{className:"display-label"},"Completed On"),
-        el('td',{className:"display-content"},data?.completeDate),
+        el('td',{className:"display-content"},data?.completeDate?moment(data?.completeDate).format("DD/MM/YYYY"):null),
         
         el('td',{className:"display-label"},"Time From"),
         el('td',{style:{width:10}},data?.startTime),
@@ -538,16 +538,16 @@ class CMPActivityDisplay extends MainComponent {
         )*/
     }
     getAwaitingTitle=(data)=>{
-        //if(data?.awaitingCustomerResponseFlag==='Y')
-        //{
-            if(data?.problemStatus==='I'||data?.problemStatus==='P')
+        if(data?.problemStatus!="F"&&data?.problemStatus!="C")
+        {
+            if(data?.awaitingCustomerResponseFlag==='N')
             return " - Awaiting CNC";
-            else if(data?.problemStatus==='F'||data?.problemStatus==='C')
+            else if(data?.awaitingCustomerResponseFlag==='Y')
             return " - On Hold";
             else 
             return "";
-        //}
-        //else return "";
+        }
+        else return "";
         
     }
     getDocumentsElement=()=>{
@@ -590,7 +590,7 @@ class CMPActivityDisplay extends MainComponent {
           el('div',{style:{width:20}},el(ToolTip,{title:"Add document",content: el('i',{className:"fal fa-plus pointer icon icon-size-1",onClick:this.handleSelectFiles})}),),          
           el('input',{ref:this.fileUploader,name:'usefile', type:"file",style:{display:"none"},multiple:"multiple",onChange:this.handleFileSelected}),          
           this.getSelectedFilesElement(),
-          uploadFiles.length>0?el('i',{className:"fal fa-upload pointer icon icon-size-1",onClick:this.handleUpload}):null,
+          uploadFiles.length>0?el(ToolTip,{width:30,title:"Upload documents",content:el('i',{className:"fal fa-upload pointer icon icon-size-1",onClick:this.handleUpload})}):null,
         );
     }
     getSelectedFilesElement=()=>{
@@ -612,6 +612,7 @@ class CMPActivityDisplay extends MainComponent {
         await this.api.uploadFiles(`Activity.php?action=uploadFile&problemID=${data.problemID}&callActivityID=${data.callActivityID}`
         ,uploadFiles,"userfile[]");
         this.loadCallActivity(currentActivity);
+        this.setState({uploadFiles:[]})
     }
     handleFileSelected=(e)=>{
         const uploadFiles=[...e.target.files];

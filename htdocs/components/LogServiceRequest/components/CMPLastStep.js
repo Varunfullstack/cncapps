@@ -169,8 +169,8 @@ class CMPLastStep extends MainComponent {
         style: {
           display: "flex",
           flexDirection: "row",
-          justifyContent: "center",
-          alignItems: "center",
+          justifyContent: "flex-start",
+          alignItems: "flex-start",
           width: "100%",
           marginTop: 20,
         },
@@ -552,14 +552,15 @@ class CMPLastStep extends MainComponent {
     const { el, getElements } = this;
     return el(
       "div",
-      null,
-      getElements(),
+      {style:{width:800}},
+      
+      getElements(),      
       this.getConfirm(),
       this.getAlert(),
       this.getDocumentsElement(),
-      this.getSelectedFilesElement(),
+      this.getSelectedFilesElement(),      
+      this.getNotStartReasonElement(),
       this.getNextButton(),
-      this.getNotStartReasonElement()
     );
   }
 }

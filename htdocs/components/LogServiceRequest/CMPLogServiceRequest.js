@@ -7,14 +7,16 @@ import CMPSelectSR from './components/CMPSelectSR.js?v=10';
 import CMPCustomerSite from './components/CMPCustomerSite.js?v=10';
 import CMPLastStep from './components/CMPLastStep.js?v=10';
 import APIActivity from '../services/APIActivity.js?v=10';
+import MainComponent from '../CMPMainComponent.js?v=10'
  
-export default class CMPLogServiceRequest extends React.Component {
+export default class CMPLogServiceRequest extends MainComponent{
   el = React.createElement;
   steps = [{ id:0, title:"", display:false ,active:false }];
   api =new APIActivity();
   constructor(props) {
     super(props);  
     this.state={
+      ...this.state,
         projects:[],
         _showSpinner:false,
         steps:  this.initSteps(),
@@ -63,7 +65,7 @@ export default class CMPLogServiceRequest extends React.Component {
       this.setState({data});
       console.log(user);
     });
-  }
+   }
    
   setActiveStep=(step)=>{
     const {steps}=this.state;
@@ -99,7 +101,8 @@ export default class CMPLogServiceRequest extends React.Component {
             newData.uploadFiles,
             "userfile[]"
           );
-          alert(`Please advise customer their service request number is: ${result.problemID}`)
+          this.setState({_showSpinner:false});
+          await  this.alert(`Please advise customer their service request number is: ${result.problemID}`)
         if(result.nextURL)          
             window.location=result.nextURL;
       }
@@ -124,11 +127,12 @@ export default class CMPLogServiceRequest extends React.Component {
     let {activeStep,data,_showSpinner}=this.state;
     const customer=data.customer;
     //console.log(customer);
-    return el("div",null,
+    return el("div",null,    
     el(Spinner,{show:_showSpinner}),
+    this.getAlert(),
     el("div", {style:{minHeight:"90vh"}}, 
     this.getProjectsElement(),
-    getStepper(),
+    getStepper(),    
     el('div',{style:{marginTop:30}},
       activeStep===1?el(CMPCustomerSearch,{data,updateSRData}):null ,
       activeStep===2?el(CMPSelectSR    ,{data,customerId:customer?.cus_custno,contactId:customer?.con_contno,updateSRData}):null,

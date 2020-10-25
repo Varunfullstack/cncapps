@@ -177,29 +177,41 @@ class CTSRActivity extends CTCNC
                 $dbeProblemRaiseType = new  DBEProblemRaiseType($this);
                 $dbeProblemRaiseType->setPKValue($raiseTypeId);
                 $dbeProblemRaiseType->getRow();
+                $return = "<div style='font-size: 14px;font-weight: 100; display:inline-block'>
+                  <div class='tooltip' > ";
+                $title="";
                 switch ($dbeProblemRaiseType->getValue(DBEProblemRaiseType::description)) {
                     case 'Email':
-                        return "<i class='fal fa-envelope ml-5' title='This Service Request was raised by email'></i>";
+                        $return .= "<i class='fal fa-envelope ml-5 pointer' style='font-size: 18px;' ></i>";
+                        $title="This Service Request was raised by email";
                         break;
                     case 'Portal':
-                        return "<i class='fa fa-edge ml-5' title='This Service Request was raised by the portal'></i>";
+                        $return .=  "<i class='fa fa-edge ml-5 pointer' style='font-size: 18px;' ></i>";
+                        $title="This Service Request was raised by the portal";
                         break;
                     case 'Phone':
-                        return "<i class='fal fa-phone ml-5' title='This Service Request was raised by phone'></i>";
+                        $return .=  "<i class='fal fa-phone ml-5 pointer' style='font-size: 18px;' ></i>";
+                        $title="This Service Request was raised by phone";
                         break;
                     case 'On site':
-                        return "<i class='fal fa-building ml-5' title='This Service Request was raised by an on site engineer'></i>";
+                        $return .=  "<i class='fal fa-building ml-5 pointer' style='font-size: 18px;' ></i>";
+                        $title="This Service Request was raised by an on site engineer";
                         break;
                     case 'Alert':
-                        return "<i class='fal fa-bell ml-5' title='This Service Request was raised by an alert'></i>";
+                        $return .=  "<i class='fal fa-bell ml-5 pointer' style='font-size: 18px;' ></i>";
+                        $title="This Service Request was raised by an alert";
                         break;
                     case 'Sales':
-                        return "<i class='fal fa-shopping-cart ml-5' title='This Service Request was raised via Sales'></i>";
+                        $return .=  "<i class='fal fa-shopping-cart ml-5 pointer' style='font-size: 18px;' ></i>";
+                        $title="This Service Request was raised via Sales";
                         break;
                     case 'Manual':
-                        return "<i class='fal fa-user-edit ml-5' title='This Service Request was raised manually'></i>";
+                        $return .=  "<i class='fal fa-user-edit ml-5 pointer' style='font-size: 18px;' ></i>";
+                        $title="This Service Request was raised manually";
                         break;
                 }
+                $return =$return."<div class='tooltiptext tooltip-bottom' style='width:300px' >$title</div> </div> ";
+                return $return;
             }
         } else return null;
     }

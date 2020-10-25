@@ -51,13 +51,19 @@ class StandardTextModal  extends React.Component{
     }
     getTemplateModal=()=>{
         const {templateOptions,_showModal,templateTitle,key,okTitle,templateDefault }=this.state;
-        const {el}=this;
+        const {el}=this;        
         return el(Modal,{width:900,key,onClose:()=>this.props.onCancel?this.props.onCancel():this.setState({_showModal:false}),
             title:templateTitle,show:_showModal,
-            content:el('div',{key:'conatiner'},
+            content:el('div',{key:'conatiner',style:{height:150}},
             templateOptions.length>0?el('select',{onChange:this.handleTemplateChanged},el('option',{key:'empty',value:-1},"-- Pick an option --"),templateOptions.map(s=>el('option',{key:s.id,value:s.id},s.name))):null,
-            _showModal?el(CKEditor,{key:'salesRequestEditor',id:'salesRequest',value:templateDefault
-                ,onChange:this.handleTemplateValueChange})
+            _showModal?el(CKEditor,{
+                key:'salesRequestEditor',
+                id:'salesRequest',
+                value:templateDefault,
+                onChange:this.handleTemplateValueChange,
+                inline:true,
+                height:100
+            })
             :null),
             footer:el('div',{key:"footer"},
             el('button',{onClick:()=>this.props.onCancel?this.props.onCancel():this.setState({_showModal:false})},"Cancel"),
@@ -72,6 +78,7 @@ class StandardTextModal  extends React.Component{
           current_state._showModal=props.show ;          
           current_state.templateValue=props.value;
           current_state.templateDefault=props.value; 
+          current_state.templateOptions=props.options; 
           return current_state;
         }         
         return current_state;

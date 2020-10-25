@@ -26,7 +26,7 @@ CKEDITOR.editorConfig = function (config) {
         showCharCount: true,
     };
     //CKEDITOR.config.width = '1000';
-    //CKEDITOR.config.height = 'auto';
+    CKEDITOR.config.height = 'auto';
     //CKEDITOR.config.resize_minWidth = '760';
     //CKEDITOR.config.resize_minHeight = '220';
     CKEDITOR.config.disableNativeSpellChecker = false;

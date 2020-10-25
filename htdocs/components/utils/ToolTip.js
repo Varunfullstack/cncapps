@@ -6,8 +6,8 @@ class ToolTip extends React.Component {
   }
   render() {
       const {el}=this;
-      const {title,content}=this.props;
-    return el('div',null,el(
+      const {title,content,width}=this.props;
+    return el('div',{style:{width:width}},el(
       "div",
       { className: "tooltip" },
       content,

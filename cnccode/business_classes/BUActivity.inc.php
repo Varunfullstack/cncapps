@@ -8797,10 +8797,10 @@ FROM
                     $dbeProblem->getValue(DBEJProblem::hideFromCustomerFlag) == 'N' and
                     !$dbeProblem->getValue(DBEJProblem::linkedSalesOrderID)
                 ) {
-                    $this->sendEmailToCustomer(
-                        $problemID,
-                        self::WorkStartedCustomerEmailCategory
-                    );
+                    // $this->sendEmailToCustomer(
+                    //     $problemID,
+                    //     self::WorkStartedCustomerEmailCategory
+                    // );
                 }
             } elseif ($dbeProblem->getValue(DBEJProblem::status) == 'F') {
                 //Reopen

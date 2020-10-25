@@ -1,3 +1,4 @@
+import MainComponent from "../CMPMainComponent.js";
 import APICallactType from "../services/APICallacttype.js";
 import APIUser from "../services/APIUser.js";
 import Modal from "../utils/modal.js";
@@ -5,14 +6,14 @@ import Modal from "../utils/modal.js";
  * onCancel -> call when cancel button click
  *
  */
-class ActivityFollowOn extends React.Component {
+class ActivityFollowOn extends MainComponent {
   el = React.createElement;
   apiCallactType = new APICallactType();
   apiUser = new APIUser();
 
   constructor(props) {
     super(props);
-    this.state = { types: [], callActTypeID: "" };
+    this.state = { ...this.state, types: [], callActTypeID: "" };
   }
   componentDidMount() {
     Promise.all([
@@ -67,19 +68,19 @@ class ActivityFollowOn extends React.Component {
       ),
     });
   };
-  handleCreate = () => {
+  handleCreate = async () => {
     const { startWork,callActivityID} = this.props;
     const { callActTypeID } = this.state;
     if (callActTypeID == "") {
-      alert("Please select Activity Type");
+     await this.alert("Please select Activity Type");
       return;
     }
     if (startWork) {
-      if (
-        confirm(
-          "You are about to commence work and an email will be sent to the customer?"
-        )
-      )
+      // if (
+      //   confirm(
+      //     "You are about to commence work and an email will be sent to the customer?"
+      //   )
+      // )
         window.location = `Activity.php?action=createFollowOnActivity&callActivityID=${callActivityID}&callActivityTypeID=${callActTypeID}`;
     } else
       window.location = `Activity.php?action=createFollowOnActivity&callActivityID=${callActivityID}&callActivityTypeID=${callActTypeID}`;
@@ -89,7 +90,11 @@ class ActivityFollowOn extends React.Component {
   };
  
   render() {
-    return this.getModal();
+    return this.el('div',null,
+    this.getAlert(),
+    this.getConfirm(),
+    this.getModal()
+    );
   }
 }
 

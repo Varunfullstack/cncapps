@@ -60,6 +60,12 @@ export default class MainComponent extends React.Component {
     alert.title=title;
     alert.message=message;
     this.setState({alert});
+    return new Promise((resolve,reject)=>{
+      setInterval(() => {
+          if(!this.state.alert.show)
+              resolve(true);
+      }, 100);
+  });
   }
   getAlert=()=>{
     const {alert}=this.state;

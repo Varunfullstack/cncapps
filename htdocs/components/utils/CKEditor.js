@@ -20,11 +20,12 @@ componentDidUpdate=(prevProps, prevState)=> {
     {
       setTimeout(()=>this. initEditor(),200);
     }
-    return this.el("textarea", {
+    return this.el('div',{style:{display: "inline-table", height:this.props.height ,width:this.props.width||"100%"}},
+    this.el("textarea", {
       id: this.elementName,
       name: this.elementName,    
       defaultValue: this.props.value,  
-     });
+     }));
   }
   initEditor = ( ) => {    
 
@@ -48,6 +49,8 @@ componentDidUpdate=(prevProps, prevState)=> {
       {
         CKEDITOR.instances[this.elementName].config.width  = this.props.width||'auto';
         CKEDITOR.instances[this.elementName].config.height = this.props.height||220;
+        CKEDITOR.instances[this.elementName].config.resize_minHeight = this.props.height||220;
+
         //CKEDITOR.instances[this.elementName].config.allowedContent = '*{*}';
         //CKEDITOR.instances[this.elementName].config.extraAllowedContent = '*{*}';
 

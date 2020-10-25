@@ -13,12 +13,14 @@ import CountDownTimer from "../../utils/CountDownTimer.js";
 import StandardTextModal from "../../Modals/StandardTextModal.js";
 import Alert from "../../utils/Alert.js";
 import MainComponent from "../../CMPMainComponent.js";
+import APIStandardText from "../../services/APIStandardText.js";
 class CMPActivityEdit extends MainComponent {
   el = React.createElement;
   api = new APIActivity();
   apiCustomer = new APICustomers();
   apiUser = new APIUser();
   apiCallactType=new APICallactType();
+  apiStandardText= new APIStandardText();
   activityStatus = {
     Fixed: "Fixed",
     CustomerAction: "CustomerAction",
@@ -71,6 +73,7 @@ class CMPActivityEdit extends MainComponent {
       callActTypes: [],
       users: [],
       contracts: [],
+      priorityReasons:[],
       filters: {
         showTravel: false,
         showOperationalTasks: false,
@@ -90,6 +93,8 @@ class CMPActivityEdit extends MainComponent {
       this.api.getPriorities(),
       this.api.getRootCauses(),
       this.apiUser.getCurrentUser(),
+      this.apiStandardText.getOptionsByType("Priority Change Reason")
+
     ]).then((result) => {
       const currentUser=result[4];    
       let callActTypes=result[0];
@@ -104,6 +109,7 @@ class CMPActivityEdit extends MainComponent {
         priorities: result[2],
         rootCauses: result[3],
         currentUser,
+        priorityReasons:result[5],
       });
       setTimeout(()=>this.autoSave(),2000);
     });
@@ -737,7 +743,7 @@ class CMPActivityEdit extends MainComponent {
         break;
       case this.activityStatus.Update:
           //Field Name] is required for [Activity Type] when the next action is [Update type]
-          if(!this.checkCncAction(data,type)&&!this.checkOnHold(data,type))
+          if(!await this.checkCncAction(data,type)&&!await this.checkOnHold(data,type))
             return;
             break;
     }
@@ -1186,7 +1192,7 @@ class CMPActivityEdit extends MainComponent {
     );
   };
   getContentElement = () => {
-    const { data, callActTypes } = this.state;
+    const { data, callActTypes ,currentUser} = this.state;
     const { el } = this;
 
     return el(
@@ -1361,7 +1367,7 @@ class CMPActivityEdit extends MainComponent {
     ];
     return el(
       "div",
-      { className: "activities-edit-contianer" },
+      { className: "activities-edit-contianer",style:{marginBottom:30} },
       el("label", { className:"label m-5", style: { display: "block" } }, "Documents"),
       data?.documents.length > 0
         ? el(Table, {
@@ -1702,7 +1708,7 @@ class CMPActivityEdit extends MainComponent {
     {
     if(!obj)
     {
-      this.alert(data.contactNotes);
+      this.alert(data.contactNotes,500,"Contact Note");
         alertObject={
         date:today,
         items:[
@@ -1737,16 +1743,17 @@ class CMPActivityEdit extends MainComponent {
     localStorage.setItem(key,JSON.stringify(alertObject));  
   }
   }
-  getPriorityChangeReason=()=>{
-    const {data}=this.state;
+  getPriorityChangeReason= ()=>{
+    const {data,priorityReasons}=this.state;
     const {el}=this;   
-    console.log(data.orignalPriority!=data.priority);
+    console.log(priorityReasons);
     return el(StandardTextModal,
       {
+        options:priorityReasons,
         value: data.priorityChangeReason,
         show:data.orignalPriority!=data.priority,
         title:"Priority change reason",   
-        okTitle:"Ok",
+        okTitle:"OK",
         onChange:this.handlePriorityTemplateChange,
         onCancel:()=>this.handlePriorityTemplateChange('')
     });

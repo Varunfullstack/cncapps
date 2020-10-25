@@ -141,6 +141,9 @@ class CTCurrentActivityReport extends CTCNC
             case 'processPendingReopened':
                 echo $this->processPendingReopened();
                 exit;                
+            case 'pendingReopenedPopup':
+                $this->pendingReopenedDescriptionPopUp();
+                break;
             default:
                 $this->setTemplate();
                 break;
@@ -342,7 +345,7 @@ class CTCurrentActivityReport extends CTCNC
                     'priority'                   => Controller::htmlDisplayText(
                         $serviceRequests->getValue(DBEJProblem::priority)
                     ),
-                    //'alarmDateTime'              => $alarmDateTimeDisplay,
+                    'alarmDateTime'              => $serviceRequests->getValue(DBEJProblem::alarmDate).' '.$serviceRequests->getValue(DBEJProblem::alarmTime),
                     'bgColour'                   => $bgColour,
                     'workBgColor'                => $workBgColor,
                     'workHidden'                 => $hideWork ? 'hidden' : null,
@@ -717,4 +720,43 @@ class CTCurrentActivityReport extends CTCNC
         }
         return 0;
     }
+    
+    /**
+     * @throws Exception
+     */
+    function pendingReopenedDescriptionPopUp()
+    {
+        $this->setTemplateFiles(
+            'ActivityCustomerProblemPopup',
+            'ActivityCustomerProblemPopup.inc'
+        );
+
+        $this->setPageTitle('Pending Reopened Description');
+        $pendingReopenedID = $this->getParam('pendingReopenedID');
+        if (!$pendingReopenedID) {
+            throw new Exception('Pending reopened ID is missing');
+        }
+
+        $dbePendingReopened = new DBEPendingReopened($this);
+        $dbePendingReopened->getRow($pendingReopenedID);
+
+        $this->template->set_var(
+            array(
+                'details' => str_replace(
+                    "\n",
+                    "<br/>",
+                    $dbePendingReopened->getValue(DBEPendingReopened::reason)
+                )
+            )
+        );
+
+        $this->template->parse(
+            'CONTENTS',
+            'ActivityCustomerProblemPopup',
+            true
+        );
+
+        $this->parsePage();
+        exit;
+    }  // end finaliseProblem
 }

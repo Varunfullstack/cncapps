@@ -154,24 +154,25 @@ class CMPCustomerSite extends MainComponent {
     const { el } = this;
     return el(
       "div",
-      {style:{maxWidth:800 }},
+       null,
       el("label", { className: "site-label" }, "Details"),
+      
       el(CKEditor, {
         id: "reason",
         value: this.state.data.reason,
-        //inline:true,
-        height:300,
+        inline:true,
+        height:200,
         onChange: (data) => this.setValue("reasonTemplate", data),
       }),
       el(
         "div",
-        { style: { marginTop: 10 } },
-        el("label", {}, "Internal Notes"),
+        { style: { marginTop: 30 } },
+        el("label", {className:"mt-5"}, "Internal Notes"),
         el(CKEditor, {
           id: "internalNotes",
           value: this.state.data.internalNotes,
-          //inline:true,
-          height:300,
+          inline:true,
+          height:150,
           onChange: (data) => this.setValue("internalNotesTemplate", data),
         })
       )
@@ -213,29 +214,31 @@ class CMPCustomerSite extends MainComponent {
     return el(
       "div",
       null,
-      el("button", { onClick: handleNext, className: "float-right" }, "Next >")
+      el("button", { onClick: handleNext, className: "float-left" }, "Next >")
     );
   };
   render() {
     const {_showSpinner}=this.state;
     const {
       el,
+      getNextButton,
       getSitesElement,
       getAssetElement,
       getNotesElement,
-      getNextButton,
+    
     } = this;
     return el(
       "div",
-      null,
+      {style:{width:850}},
       el(Spinner,{show:_showSpinner}),
       this.getPrompt(),
       this.getAlert(),
+     
       getSitesElement(),
       getAssetElement(),
       this.getEmailSubjectSummary(),
       getNotesElement(),
-      getNextButton()
+      getNextButton(),
     );
   }
 }
