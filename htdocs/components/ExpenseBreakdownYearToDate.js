@@ -280,6 +280,11 @@ class ExpenseBreakdownYearToDate extends React.Component {
                             'div',
                             {className: 'financialYearValue-totalValue', key: 'totalValue'},
                             `Financial Year Mileage Value: £${this.state.financialYearTotalValue.toFixed(2)}`
+                        ),
+                        this.el(
+                            'div',
+                            {key: 'disclaimer'},
+                            "Values for the current month may include unapproved expenses"
                         )
                     ]
                 ),
