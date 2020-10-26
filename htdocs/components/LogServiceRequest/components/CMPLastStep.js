@@ -179,7 +179,7 @@ class CMPLastStep extends MainComponent {
       el(
         "button",
         { onClick: this.handleNext, className: "float-right" },
-        "Add to queue"
+        "Add To Queue"
       ),
       !this.state.data.startWork&&customer.hasServiceDesk
         ? el(

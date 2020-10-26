@@ -149,7 +149,7 @@ class CMPCurrentActivityReport extends MainComponent {
           this.apiCurrentActivityService.getHelpDeskInbox().then((res) => {
             const helpDeskInbox = this.prepareResult(res);
             const helpDeskInboxFiltered = [...helpDeskInbox];
-            console.log("helpDeskInbox", helpDeskInbox);
+            //console.log("helpDeskInbox", helpDeskInbox.length,res.length);
             this.setState({
               _showSpinner: false,
               helpDeskInbox,              
@@ -183,10 +183,10 @@ class CMPCurrentActivityReport extends MainComponent {
           this.apiCurrentActivityService.getSmallProjectsInbox().then((res) => {
             const smallProjectsInbox = this.prepareResult(res);
             const smallProjectsInboxFiltered = [...smallProjectsInbox];
-            console.log(
-              "smallProjectsInboxFiltered",
-              smallProjectsInboxFiltered
-            );
+            // console.log(
+            //   "smallProjectsInboxFiltered",
+            //   smallProjectsInboxFiltered
+            // );
             this.setState({
               _showSpinner: false,
               smallProjectsInbox,          
@@ -197,7 +197,7 @@ class CMPCurrentActivityReport extends MainComponent {
           this.apiCurrentActivityService.getProjectsInbox().then((res) => {
             const projectsInbox = this.prepareResult(res);
             const projectsInboxFiltered = [...projectsInbox];
-            console.log("projectsInboxFiltered", projectsInboxFiltered);
+            //console.log("projectsInboxFiltered", projectsInboxFiltered);
             this.setState({
               _showSpinner: false,
               projectsInbox,            
@@ -208,7 +208,7 @@ class CMPCurrentActivityReport extends MainComponent {
             this.apiCurrentActivityService.getToBeLoggedInbox().then((res) => {
               const toBeLoggedInbox = this.prepareResult(res);
               const toBeLoggedInboxFiltered = [...toBeLoggedInbox];
-              console.log("toBeLoggedInboxFiltered", toBeLoggedInboxFiltered);
+              //console.log("toBeLoggedInboxFiltered", toBeLoggedInboxFiltered);
               console.log(toBeLoggedInboxFiltered.length);
               if(toBeLoggedInboxFiltered.length>0)
                 this.teams.filter(t=>t.code==='TBL')[0].icon="fal fa-asterisk";
@@ -225,7 +225,7 @@ class CMPCurrentActivityReport extends MainComponent {
             this.apiCurrentActivityService.getPendingReopenedInbox().then((res) => {
               const pendingReopenedInbox = this.prepareResult(res);
               const pendingReopenedInboxFiltered = [...pendingReopenedInbox];
-              console.log("pendingReopenedInboxFiltered", pendingReopenedInboxFiltered);
+              //console.log("pendingReopenedInboxFiltered", pendingReopenedInboxFiltered);
               if(pendingReopenedInboxFiltered.length>0)
                 this.teams.filter(t=>t.code==='PR')[0].icon="fal fa-asterisk";
               else
@@ -426,17 +426,18 @@ class CMPCurrentActivityReport extends MainComponent {
       delete problem.urlCustomer;
       delete problem.workOnClick;
     });
+    const emptyAlarm = result.filter((p) =>p.alarmDateTime ==null||p.alarmDateTime =='');
     const old = result.filter((p) => moment(p.alarmDateTime) <= moment());
     const feature = result
       .filter((p) => moment(p.alarmDateTime) > moment())
       .sort((a, b) =>
         moment(a.alarmDateTime) > moment(b.alarmDateTime) ? 1 : -1
       );
-
-    return [...old, ...feature];
+    //console.log(result.length,old.length,emptyAlarm.length,feature.length);
+    return [...old, ...emptyAlarm, ...feature];
   };
   handleUserFilterOnSelect = (userId) => {
-    console.log("save User",userId);
+    //console.log("save User",userId);
     const userFilter = userId;
     let {
       helpDeskInbox,
