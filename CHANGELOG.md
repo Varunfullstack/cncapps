@@ -8,6 +8,7 @@ This project changes will be shown here.
 - Add number of units/users to RenContract.php report
 - Add became customer to SalesByCustomer management report
 - Add 10 minutes to helpdesk when creating SR from Sales Order
+- Issue 973 - SR Feedback API
 
 ## [v4.9.2] - 2020-10-23
 ### Change
