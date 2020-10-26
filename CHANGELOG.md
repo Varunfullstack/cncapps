@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v4.9.3]
+## [v4.10.0]
 ### Added
 - Include non exported expenses in expensesBreakdownYearToDate
 - Add disclaimer showing non exported expenses added to expensesBreakdownYearToDate
