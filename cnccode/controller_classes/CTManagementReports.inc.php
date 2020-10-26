@@ -480,39 +480,53 @@ class CTManagementReports extends CTCNC
         while ($row = $results->fetch_object()) {
 
             $data[] = [
-                'customer'      => Controller::htmlDisplayText($row->customer),
-                'sector'        => Controller::htmlDisplayText($row->sector),
-                'noOfPCs'       => Controller::htmlDisplayText($row->noOfPCs),
-                'noOfServers'   => $row->noOfServers,
-                'salesMonth1'   => number_format($row->salesMonth1, 2),
-                'profitMonth1'  => round($row->profitMonth1, 2),
-                'salesMonth2'   => round($row->salesMonth2, 2),
-                'profitMonth2'  => round($row->profitMonth2, 2),
-                'salesMonth3'   => round($row->salesMonth3, 2),
-                'profitMonth3'  => round($row->profitMonth3, 2),
-                'salesMonth4'   => round($row->salesMonth4, 2),
-                'profitMonth4'  => round($row->profitMonth4, 2),
-                'salesMonth5'   => round($row->salesMonth5, 2),
-                'profitMonth5'  => round($row->profitMonth5, 2),
-                'salesMonth6'   => round($row->salesMonth6, 2),
-                'profitMonth6'  => round($row->profitMonth6, 2),
-                'salesMonth7'   => round($row->salesMonth7, 2),
-                'profitMonth7'  => round($row->profitMonth7, 2),
-                'salesMonth8'   => round($row->salesMonth8, 2),
-                'profitMonth8'  => round($row->profitMonth8, 2),
-                'salesMonth9'   => round($row->salesMonth9, 2),
-                'profitMonth9'  => round($row->profitMonth9, 2),
-                'salesMonth10'  => round($row->salesMonth10, 2),
-                'profitMonth10' => round($row->profitMonth10, 2),
-                'salesMonth11'  => round($row->salesMonth11, 2),
-                'profitMonth11' => round($row->profitMonth11, 2),
-                'salesMonth12'  => round($row->salesMonth12, 2),
-                'profitMonth12' => round($row->profitMonth12, 2),
-                'totalSales'    => round($row->salesTotal, 2),
-                'totalProfit'   => round($row->profitTotal, 2),
+                'customer'           => Controller::htmlDisplayText($row->customer),
+                'sector'             => Controller::htmlDisplayText($row->sector),
+                'noOfPCs'            => Controller::htmlDisplayText($row->noOfPCs),
+                'noOfServers'        => $row->noOfServers,
+                'salesMonth1'        => number_format($row->salesMonth1, 2),
+                'profitMonth1'       => round($row->profitMonth1, 2),
+                'salesMonth2'        => round($row->salesMonth2, 2),
+                'profitMonth2'       => round($row->profitMonth2, 2),
+                'salesMonth3'        => round($row->salesMonth3, 2),
+                'profitMonth3'       => round($row->profitMonth3, 2),
+                'salesMonth4'        => round($row->salesMonth4, 2),
+                'profitMonth4'       => round($row->profitMonth4, 2),
+                'salesMonth5'        => round($row->salesMonth5, 2),
+                'profitMonth5'       => round($row->profitMonth5, 2),
+                'salesMonth6'        => round($row->salesMonth6, 2),
+                'profitMonth6'       => round($row->profitMonth6, 2),
+                'salesMonth7'        => round($row->salesMonth7, 2),
+                'profitMonth7'       => round($row->profitMonth7, 2),
+                'salesMonth8'        => round($row->salesMonth8, 2),
+                'profitMonth8'       => round($row->profitMonth8, 2),
+                'salesMonth9'        => round($row->salesMonth9, 2),
+                'profitMonth9'       => round($row->profitMonth9, 2),
+                'salesMonth10'       => round($row->salesMonth10, 2),
+                'profitMonth10'      => round($row->profitMonth10, 2),
+                'salesMonth11'       => round($row->salesMonth11, 2),
+                'profitMonth11'      => round($row->profitMonth11, 2),
+                'salesMonth12'       => round($row->salesMonth12, 2),
+                'profitMonth12'      => round($row->profitMonth12, 2),
+                'totalSales'         => round($row->salesTotal, 2),
+                'totalProfit'        => round($row->profitTotal, 2),
+                'becameCustomerDate' => $this->formatDateIfCorrect($row->becameCustomerDate, 'd/m/Y')
             ];
         }
         return $data;
+    }
+
+    private function formatDateIfCorrect($dateString, $format)
+    {
+        if (!$dateString) {
+            return null;
+        }
+        $date = DateTime::createFromFormat(DATE_MYSQL_DATE, $dateString);
+
+        if (!$date) {
+            return null;
+        }
+        return $date->format($format);
     }
 
     /**
