@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v4.9.3]
+### Added
+- Include unpaid mileage in expense history
+
 ## [v4.9.2] - 2020-10-23
 ### Change
 - Change the maximum size of the position field in the customer page
