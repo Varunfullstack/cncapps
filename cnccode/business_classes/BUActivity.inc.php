@@ -7051,7 +7051,7 @@ is currently a balance of ';
                 $dbeProblem->setValue($queueProblemColumn, $normalMinutes);
             }
         }
-
+        $dbeProblem->setValue(DBEProblem::hdLimitMinutes,10);
 
         $dbeProblem->insertRow();
 
