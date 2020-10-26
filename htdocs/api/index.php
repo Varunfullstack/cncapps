@@ -589,6 +589,76 @@ WHERE
                 }
             }
         );
+        $group->get(
+            '/tokenData',
+            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
+                $queryParams = $request->getQueryParams();
+                if (empty($queryParams['token'])) {
+
+                    $response->getBody()->write(json_encode(["error" => "Token not provided"]));
+                    return $response->withStatus(400);
+                }
+                global $db;
+                $feedbackTokenGenerator = new \CNCLTD\FeedbackTokenGenerator($db);
+                $data = $feedbackTokenGenerator->getTokenData($queryParams['token']);
+                if (!$data) {
+                    $response->getBody()->write(json_encode(["error" => "Token not found!"]));
+                    return $response->withStatus(400);
+                }
+                $response->getBody()->write(json_encode(["status" => "ok", "data" => $data]));
+                return $response;
+            }
+        );
+        $group->post(
+            '/feedback',
+            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
+                $data = $request->getParsedBody();
+
+                if (!$data) {
+                    $response->getBody()->write(json_encode(["error" => "Data is missing"]));
+                    return $response->withStatus(400);
+                }
+
+                if (empty($data['token'])) {
+                    $response->getBody()->write(json_encode(["error" => "Token not provided"]));
+                    return $response->withStatus(400);
+                }
+
+                global $db;
+                $feedbackTokenGenerator = new \CNCLTD\FeedbackTokenGenerator($db);
+                $tokenData = $feedbackTokenGenerator->getTokenData($data['token']);
+                if (!$tokenData) {
+                    $response->getBody()->write(json_encode(["status" => "error", "message" => "Token not found!"]));
+                    return $response->withStatus(400);
+                }
+                if (empty($data['value'])) {
+                    $response->getBody()->write(
+                        json_encode(["status" => "error", "message" => "Feedback Value not provided"])
+                    );
+                    return $response->withStatus(400);
+                }
+                $dbeProblem = new DBEProblem($this);
+                $dbeProblem->getRow($tokenData->serviceRequestId);
+                if (!$dbeProblem->rowCount()) {
+                    $response->getBody()->write(
+                        json_encode(["status" => "error", "message" => "Service Request not found"])
+                    );
+                    return $response->withStatus(400);
+                }
+                $contactId = $dbeProblem->getValue(DBEProblem::contactID);
+
+                $customerFeedbackRepo = new \CNCLTD\CustomerFeedbackRepository($db);
+                $customerFeedback = new \CNCLTD\CustomerFeedback();
+                $customerFeedback->serviceRequestId = $tokenData->serviceRequestId;
+                $customerFeedback->contactId = $contactId;
+                $customerFeedback->value = $data['value'];
+                $customerFeedback->comments = @$data['comments'];
+                $customerFeedbackRepo->persistCustomerFeedback($customerFeedback);
+                $feedbackTokenGenerator->invalidateToken($data['token']);
+                $response->getBody()->write(json_encode(["status" => "ok"]));
+                return $response;
+            }
+        );
     }
 );
 $app->group(
@@ -774,7 +844,7 @@ $app->group(
                         $signableRequest = $request->getParsedBody();
                         $logger->info(
                             'Signable webHook has been called',
-                            ["signableEnvelope" => $request->getParsedBody()]
+                            ["signableEnvelope" => $signableRequest]
                         );
 
                         // for now we are going to ignore add user/add client/contact and add template actions

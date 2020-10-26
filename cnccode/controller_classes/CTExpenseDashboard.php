@@ -119,9 +119,11 @@ class CTExpenseDashboard extends CTCNC
                     null,
                     $orderItems,
                     $engineerId,
-                    true,
+                    false,
                     $startDate,
-                    $endDate
+                    $endDate,
+                    null,
+                    true
                 );
                 echo json_encode(
                     [
@@ -611,6 +613,7 @@ ORDER BY staffName";
      * @param DateTimeInterface|null $startDate
      * @param DateTimeInterface|null $endDate
      * @param null $expenseTypeId
+     * @param bool $doNotCheckExported
      * @return array
      * @throws Exception
      */
@@ -622,7 +625,8 @@ ORDER BY staffName";
                          $exported = false,
                          DateTimeInterface $startDate = null,
                          DateTimeInterface $endDate = null,
-                         $expenseTypeId = null
+                         $expenseTypeId = null,
+                         $doNotCheckExported = false
     )
     {
         $queryString = 'SELECT
@@ -701,10 +705,12 @@ WHERE
     OR ((SELECT 1 FROM consultant globalApprovers WHERE globalApprovers.globalExpenseApprover AND globalApprovers.cns_consno = ?) = 1 AND consultant.`activeFlag` = "Y")
   ) and (? is not null and callactivity.caa_consno = ? or ? is null ) 
    ';
-        if ($exported) {
-            $queryString .= " AND exp_exported_flag = 'Y' ";
-        } else {
-            $queryString .= " AND exp_exported_flag <> 'Y' ";
+        if (!$doNotCheckExported) {
+            if ($exported) {
+                $queryString .= " AND exp_exported_flag = 'Y' ";
+            } else {
+                $queryString .= " AND exp_exported_flag <> 'Y' ";
+            }
         }
         $parameters = [
             ["type" => "i", "value" => $this->userID],
@@ -784,10 +790,12 @@ WHERE
             $parameters[] = ["type" => "i", "value" => $offset];
             $parameters[] = ["type" => "i", "value" => $limit];
         }
+
         $result = $db->preparedQuery(
             $queryString,
             $parameters
         );
+
         $data = $result->fetch_all(MYSQLI_ASSOC);
         return [
             "data" => $data,

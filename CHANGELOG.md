@@ -1,6 +1,15 @@
 # Changelog
 This project changes will be shown here.
 
+## [v4.10.0] - 2020-10-26
+### Added
+- Include non exported expenses in expensesBreakdownYearToDate
+- Add disclaimer showing non exported expenses added to expensesBreakdownYearToDate
+- Add number of units/users to RenContract.php report
+- Add became customer to SalesByCustomer management report
+- Add 10 minutes to helpdesk when creating SR from Sales Order
+- Issue 973 - SR Feedback API
+
 ## [v4.9.2] - 2020-10-23
 ### Change
 - Change the maximum size of the position field in the customer page
@@ -8,7 +17,7 @@ This project changes will be shown here.
 - Time Request email issues
 - Remove limits on Time Request, Change Request and Sales Request dashboards
 - Change the query to make sure we get all the open activities in OpenCallEmail
- 
+
 ## [v4.9.1] - 2020-10-22
 ### Fixed
 - Pending Time Requests Email not showing the data

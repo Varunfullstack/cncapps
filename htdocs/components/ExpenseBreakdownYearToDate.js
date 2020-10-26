@@ -117,7 +117,7 @@ class ExpenseBreakdownYearToDate extends React.Component {
             if (!(expense.expenseTypeDescription in acc)) {
                 acc[expense.expenseTypeDescription] = new Array(currentDate.getMonth() + 2).fill(0);
             }
-            const expenseMonth = expense.dateSubmitted.match(/\d{4}-0(\d)-\d{2}/)[1];
+            const expenseMonth = expense.dateSubmitted.match(/\d{4}-(\d{2})-\d{2}/)[1];
 
             acc[expense.expenseTypeDescription][expenseMonth - 1] += expense.value;
             acc[expense.expenseTypeDescription][acc[expense.expenseTypeDescription].length - 1] += expense.value;
@@ -280,6 +280,11 @@ class ExpenseBreakdownYearToDate extends React.Component {
                             'div',
                             {className: 'financialYearValue-totalValue', key: 'totalValue'},
                             `Financial Year Mileage Value: £${this.state.financialYearTotalValue.toFixed(2)}`
+                        ),
+                        this.el(
+                            'div',
+                            {key: 'disclaimer'},
+                            "Values for the current month may include unapproved expenses"
                         )
                     ]
                 ),

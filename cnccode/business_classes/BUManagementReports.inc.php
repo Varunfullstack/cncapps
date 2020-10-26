@@ -187,6 +187,7 @@ class BUManagementReports extends Business
 		(			
 			SELECT
 				cus_name AS customer,
+			    cus_became_customer_date as becameCustomerDate,
         noOfPCs,
         noOfServers,
         noOfSites,
