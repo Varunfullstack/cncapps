@@ -1,14 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {Provider} from "react-redux";
+import configureStore from "./configureStore";
+import {clearEditingSiteAction, fetchAllData, setEditSiteAction} from "./actions";
+import ErrorHandler from "./helpers/ErrorHandlerComponent";
+import {Tab, Tabs} from "react-bootstrap";
 import CustomerEditMain from "./CustomerEditMain";
 import CustomerProjectsComponent from "./CustomerProjectsComponent";
 import PortalCustomerDocumentsComponent from "./PortalCustomerDocumentsComponent";
-import CustomerSitesComponent from "./customerSites/CustomerSitesComponent";
+import SitesList from "./customerSites/SitesList";
 import CustomerOrders from "./CustomerOrders";
-import {Provider} from "react-redux";
-import configureStore from "./configureStore";
-import {fetchAllData} from "./actions";
-import ErrorHandler from "./helpers/ErrorHandlerComponent";
+import CustomerCRMComponent from "./CustomerCRMComponent";
 
 const store = configureStore();
 
@@ -36,80 +38,100 @@ class CustomerEditComponent extends React.Component {
                 <div className="container-fluid py-3">
                     <div className="row">
                         <div className="col-md-12">
+
                             <nav>
-                                <div className="nav nav-tabs"
-                                     id="nav-tab"
-                                     role="tablist"
+                                <Tabs defaultActiveKey="customer"
+                                      onSelect={(eventKey, $event) => {
+                                          if (eventKey === 'crm') {
+                                              store.dispatch(setEditSiteAction(0));
+                                          }
+                                          if (eventKey === 'sites') {
+                                              store.dispatch(clearEditingSiteAction());
+                                          }
+                                      }}
                                 >
-                                    <a className="nav-item nav-link active"
-                                       id="nav-home-tab"
-                                       data-toggle="tab"
-                                       href="#nav-home"
-                                       role="tab"
-                                       aria-controls="nav-home"
-                                       aria-selected="true"
-                                    >Customer</a>
-                                    <a className="nav-item nav-link"
-                                       id="nav-profile-tab"
-                                       data-toggle="tab"
-                                       href="#nav-profile"
-                                       role="tab"
-                                       aria-controls="nav-profile"
-                                       aria-selected="false"
-                                    >Projects</a>
-                                    <a className="nav-item nav-link"
-                                       id="nav-contact-tab"
-                                       data-toggle="tab"
-                                       href="#nav-portal-documents-tab"
-                                       role="tab"
-                                       aria-controls="nav-portal-documents-tab"
-                                       aria-selected="false"
-                                    >Portal Documents</a>
-                                    <a className="nav-item nav-link"
-                                       id="nav-sites-tab"
-                                       data-toggle="tab"
-                                       href="#nav-sites"
-                                       role="tab"
-                                       aria-controls="nav-sites"
-                                       aria-selected="false"
-                                    >Sites</a>
-                                    <a className="nav-item nav-link"
-                                       id="nav-orders-tab"
-                                       data-toggle="tab"
-                                       href="#nav-orders"
-                                       role="tab"
-                                       aria-controls="nav-orders"
-                                       aria-selected="false"
-                                    >Orders</a>
-                                    <a className="nav-item nav-link"
-                                       id="nav-contacts-tab"
-                                       data-toggle="tab"
-                                       href="#nav-contacts"
-                                       role="tab"
-                                       aria-controls="nav-contacts"
-                                       aria-selected="false"
-                                    >Contacts</a>
-                                    <a className="nav-item nav-link"
-                                       id="nav-crm-tab"
-                                       data-toggle="tab"
-                                       href="#nav-crm"
-                                       role="tab"
-                                       aria-controls="nav-crm"
-                                       aria-selected="false"
-                                    >CRM</a>
-                                </div>
+                                    <Tab eventKey="customer"
+                                         title="Customer"
+                                    >
+                                        <CustomerEditMain customerId={customerId}/>
+                                    </Tab>
+                                    <Tab eventKey="projects"
+                                         title="Projects"
+                                    >
+                                        <CustomerProjectsComponent customerId={customerId}/>
+                                    </Tab>
+                                    <Tab eventKey="portalDocuments"
+                                         title="Portal Documents"
+                                    >
+                                        <PortalCustomerDocumentsComponent customerId={customerId}/>
+                                    </Tab>
+                                    <Tab eventKey="sites"
+                                         title="Sites"
+                                    >
+                                        <SitesList customerId={customerId}/>
+                                    </Tab>
+                                    <Tab eventKey="orders"
+                                         title="Orders"
+                                    >
+                                        <CustomerOrders customerId={customerId}/>
+                                    </Tab>
+                                    <Tab eventKey="contacts"
+                                         title="Contacts"
+                                    >
+
+                                    </Tab>
+                                    <Tab eventKey="crm"
+                                         title="CRM"
+                                    >
+                                        <CustomerCRMComponent/>
+                                    </Tab>
+                                </Tabs>
                             </nav>
                             <div className="tab-content"
                                  id="nav-tabContent"
                             >
+                                <div className="tab-pane fade show active"
+                                     id="nav-home"
+                                     role="tabpanel"
+                                     aria-labelledby="nav-home-tab"
+                                >
 
-                                <CustomerEditMain customerId={customerId}/>
-                                <CustomerProjectsComponent customerId={customerId}/>
-                                <PortalCustomerDocumentsComponent customerId={customerId}/>
-                                <CustomerSitesComponent customerId={customerId}/>
-                                <CustomerOrders customerId={customerId}/>
-                                {/*<CustomerCRM customerId={customerId}/>*/}
+                                </div>
+                                <div className="tab-pane fade customerAddProjects"
+                                     id="nav-profile"
+                                     role="tabpanel"
+                                     aria-labelledby="nav-profile-tab"
+                                >
 
+                                </div>
+                                <div className="tab-pane fade"
+                                     id="nav-portal-documents-tab"
+                                     role="tabpanel"
+                                     aria-labelledby="nav-portal-documents-tab"
+                                >
+
+                                </div>
+                                <div className="tab-pane fade"
+                                     id="nav-sites"
+                                     role="tabpanel"
+                                     aria-labelledby="nav-sites-tab"
+                                >
+
+                                </div>
+                                <div className="tab-pane fade"
+                                     id="nav-orders"
+                                     role="tabpanel"
+                                     aria-labelledby="nav-orders-tab"
+                                >
+
+                                </div>
+                                <div className="tab-pane fade"
+                                     id="nav-crm"
+                                     role="tabpanel"
+                                     aria-labelledby="nav-crm-tab"
+                                >
+
+                                </div>
                             </div>
                         </div>
                     </div>

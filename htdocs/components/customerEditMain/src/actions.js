@@ -4,6 +4,8 @@ import {
     ADD_SITE,
     CHANGE_DELIVER_SITE_NO,
     CHANGE_INVOICE_SITE_NO,
+    CLEAR_EDIT_NOTE,
+    CLEAR_EDIT_SITE,
     DELETE_PORTAL_CUSTOMER_DOCUMENT_FAILURE,
     DELETE_PORTAL_CUSTOMER_DOCUMENT_REQUEST,
     DELETE_PORTAL_CUSTOMER_DOCUMENT_SUCCESS,
@@ -18,12 +20,16 @@ import {
     FETCH_CONTACTS_FAILURE,
     FETCH_CONTACTS_REQUEST,
     FETCH_CONTACTS_SUCCESS,
+    FETCH_CUSTOMER_NOTES_REQUEST,
+    FETCH_CUSTOMER_NOTES_SUCCESS,
     FETCH_CUSTOMER_REQUEST,
     FETCH_CUSTOMER_SUCCESS,
     FETCH_CUSTOMER_TYPES,
     FETCH_CUSTOMER_TYPES_SUCCESS,
     FETCH_LEAD_STATUSES,
     FETCH_LEAD_STATUSES_SUCCESS,
+    FETCH_ORDERS_REQUEST,
+    FETCH_ORDERS_SUCCESS,
     FETCH_PORTAL_CUSTOMER_DOCUMENTS_FAILURE,
     FETCH_PORTAL_CUSTOMER_DOCUMENTS_REQUEST,
     FETCH_PORTAL_CUSTOMER_DOCUMENTS_SUCCESS,
@@ -43,6 +49,9 @@ import {
     NEW_PORTAL_CUSTOMER_DOCUMENT_FIELD_UPDATE,
     NEW_PROJECT_FIELD_UPDATE,
     NEW_SITE_FIELD_UPDATE,
+    REQUEST_ADD_NOTE,
+    REQUEST_ADD_NOTE_FAILURE,
+    REQUEST_ADD_NOTE_SUCCESS,
     REQUEST_ADD_PORTAL_CUSTOMER_DOCUMENT,
     REQUEST_ADD_PORTAL_CUSTOMER_DOCUMENT_FAILURE,
     REQUEST_ADD_PORTAL_CUSTOMER_DOCUMENT_SUCCESS,
@@ -57,19 +66,30 @@ import {
     REQUEST_UPDATE_CUSTOMER_FAILED,
     REQUEST_UPDATE_CUSTOMER_FAILED_OUT_OF_DATE,
     REQUEST_UPDATE_CUSTOMER_SUCCESS,
-    SAVE_CUSTOMER_DATA_SUCCESS,
+    REQUEST_UPDATE_NOTE,
+    REQUEST_UPDATE_NOTE_FAILED,
+    REQUEST_UPDATE_NOTE_FAILED_OUT_OF_DATE,
+    REQUEST_UPDATE_NOTE_SUCCESS,
+    REQUEST_UPDATE_SITE,
+    REQUEST_UPDATE_SITE_FAILED,
+    REQUEST_UPDATE_SITE_FAILED_OUT_OF_DATE,
+    REQUEST_UPDATE_SITE_SUCCESS,
     SAVE_SITE_SUCCESS,
+    SET_EDIT_NOTE,
+    SET_EDIT_SITE,
     SHOW_NEW_PORTAL_CUSTOMER_DOCUMENT_MODAL,
     SHOW_NEW_PROJECT_MODAL,
     SHOW_NEW_SITE_MODAL,
     TOGGLE_VISIBILITY,
     UPDATE_CUSTOMER_VALUE,
-    UPDATE_SITE
+    UPDATE_EDITING_NOTE_VALUE,
+    UPDATE_EDITING_SITE_VALUE
 } from "./actionTypes";
-import {updateCustomer} from "./helpers";
+import {updateCustomer, updateNote, updateSite} from "./helpers";
 import {OutOfDateError} from "./helpers/OutOfDateError";
 import debounce from "../../utils/debounce";
 import {fileToBase64} from "../../utils/utils";
+import {getEditingNote, getEditingSite} from "./selectors";
 
 export const VisibilityFilterOptions = {
     SHOW_ALL: 'SHOW_ALL',
@@ -78,10 +98,6 @@ export const VisibilityFilterOptions = {
 
 export function addSite(customerId) {
     return {type: ADD_SITE, customerId};
-}
-
-export function updateSite(siteNo, data) {
-    return {type: UPDATE_SITE, siteNo, data}
 }
 
 
@@ -109,8 +125,16 @@ export function requestSites(customerId) {
     return {type: FETCH_SITES_REQUEST, customerId}
 }
 
+function requestOrders(customerId) {
+    return {type: FETCH_ORDERS_REQUEST, customerId};
+}
+
 export function receiveSites(customerId, sites) {
     return {type: FETCH_SITES_SUCCESS, customerId, sites}
+}
+
+function receiveOrders(customerId, orders) {
+    return {type: FETCH_ORDERS_SUCCESS, customerId, orders}
 }
 
 export function requestCustomer(customerId) {
@@ -186,10 +210,6 @@ export function savedSiteData(siteNo) {
     return {type: SAVE_SITE_SUCCESS, siteNo}
 }
 
-export function savedCustomerData() {
-    return {type: SAVE_CUSTOMER_DATA_SUCCESS}
-}
-
 export function requestSaveSite(siteNo) {
     return {type: REQUEST_SAVE_SITE, siteNo}
 }
@@ -244,6 +264,15 @@ export function fetchSites(customerId) {
         return fetch(`?action=getSites&customerId=${customerId}`)
             .then(res => res.json())
             .then(json => dispatch(receiveSites(customerId, json.data)))
+    }
+}
+
+export function fetchOrders(customerId) {
+    return dispatch => {
+        dispatch(requestOrders(customerId))
+        return fetch(`?action=getCustomerOrders&customerId=${customerId}`)
+            .then(res => res.json())
+            .then(json => dispatch(receiveOrders(customerId, json.data)))
     }
 }
 
@@ -329,6 +358,24 @@ export function fetchReviewEngineers() {
     }
 }
 
+function fetchCustomerNotesRequestAction() {
+    return {type: FETCH_CUSTOMER_NOTES_REQUEST}
+}
+
+function fetchCustomerNotesSuccessAction(customerNotes) {
+    return {type: FETCH_CUSTOMER_NOTES_SUCCESS, customerNotes}
+}
+
+export function fetchCustomerNotes(customerId) {
+    return dispatch => {
+        dispatch(fetchCustomerNotesRequestAction());
+        fetch(`/CustomerNote.php?action=getCustomerNotes&customerId=${customerId}`)
+            .then(response => response.json())
+            .then(response => {
+                dispatch(fetchCustomerNotesSuccessAction(response.data));
+            });
+    }
+}
 
 export function fetchContacts(customerId) {
     return dispatch => {
@@ -416,6 +463,8 @@ export function fetchAllData(customerId) {
         dispatch(fetchReviewEngineers());
         dispatch(fetchProjects(customerId));
         dispatch(fetchPortalCustomerDocuments(customerId));
+        dispatch(fetchOrders(customerId));
+        dispatch(fetchCustomerNotes(customerId));
     }
 }
 
@@ -513,6 +562,153 @@ export function updateCustomerField(field, value) {
     }
 }
 
+
+export function setEditSiteAction(siteNo) {
+    return {type: SET_EDIT_SITE, siteNo}
+}
+
+export function clearEditingSiteAction() {
+    return {type: CLEAR_EDIT_SITE}
+}
+
+
+export function toggleEditingSite(siteNo) {
+    return (dispatch, getState) => {
+        const editingSite = getEditingSite(getState());
+        if (editingSite) {
+            if (editingSite.siteNo === siteNo) {
+                return dispatch(clearEditingSiteAction());
+            }
+        }
+        return dispatch(setEditSiteAction(siteNo))
+    }
+}
+
+export function requestUpdateSiteFailedOutOfDate(lastUpdatedDateTime) {
+    return {type: REQUEST_UPDATE_SITE_FAILED_OUT_OF_DATE, lastUpdatedDateTime};
+}
+
+function requestUpdateSiteAction(customerId, siteNo, field, value) {
+    return {type: REQUEST_UPDATE_SITE, customerId, siteNo, field, value};
+}
+
+function requestUpdateSiteSuccessAction(newLastUpdatedDateTime) {
+    return {type: REQUEST_UPDATE_SITE_SUCCESS, newLastUpdatedDateTime};
+}
+
+function requestUpdateSiteFailed() {
+    return {type: REQUEST_UPDATE_SITE_FAILED}
+}
+
+const debounceUpdateSite = debounce((dispatch, field, value, state) => {
+    const currentEditingSite = getEditingSite(state);
+    const customerId = currentEditingSite.customerID;
+    const siteNo = currentEditingSite.siteNo;
+    const lastUpdatedDateTime = currentEditingSite.lastUpdatedDateTime;
+    dispatch(requestUpdateSiteAction(customerId, siteNo, field, value));
+    updateSite(customerId, siteNo, {[field]: value}, lastUpdatedDateTime)
+        .then(newLastUpdated => {
+            // we have to apply the change to the original customer
+            dispatch(requestUpdateSiteSuccessAction(newLastUpdated))
+        })
+        .catch((error) => {
+            if (error instanceof OutOfDateError) {
+                //we should refetch everything ..just in case
+                dispatch(requestUpdateSiteFailedOutOfDate(error.lastUpdatedDateTime));
+                dispatch(addError('Unable to save change due to another edit by someone else'));
+                dispatch(fetchSites(customerId));
+                return;
+            }
+
+            dispatch(requestUpdateSiteFailed());
+            dispatch(addError(`Unable to save change due to an error in the server: ${error.message}`))
+        })
+}, debounceTime);
+
+const updateEditingSiteValueAction = (field, value) => {
+    return {type: UPDATE_EDITING_SITE_VALUE, field, value}
+}
+
+export function updateSiteField(field, value) {
+    return (dispatch, getState) => {
+        dispatch(updateEditingSiteValueAction(field, value));
+        debounceUpdateSite(dispatch, field, value, getState());
+    }
+}
+
+
+export function setEditNoteAction(noteNo) {
+    return {type: SET_EDIT_NOTE, noteNo}
+}
+
+export function clearEditingNoteAction() {
+    return {type: CLEAR_EDIT_NOTE}
+}
+
+
+export function toggleEditingNote(noteNo) {
+    return (dispatch, getState) => {
+        const editingNote = getEditingNote(getState());
+        if (editingNote) {
+            if (editingNote.noteNo === noteNo) {
+                return dispatch(clearEditingNoteAction());
+            }
+        }
+        return dispatch(setEditNoteAction(noteNo))
+    }
+}
+
+export function requestUpdateNoteFailedOutOfDate(lastUpdatedDateTime) {
+    return {type: REQUEST_UPDATE_NOTE_FAILED_OUT_OF_DATE, lastUpdatedDateTime};
+}
+
+function requestUpdateNoteAction(customerId, noteNo, field, value) {
+    return {type: REQUEST_UPDATE_NOTE, customerId, noteNo, field, value};
+}
+
+function requestUpdateNoteSuccessAction(newLastUpdatedDateTime) {
+    return {type: REQUEST_UPDATE_NOTE_SUCCESS, newLastUpdatedDateTime};
+}
+
+function requestUpdateNoteFailed() {
+    return {type: REQUEST_UPDATE_NOTE_FAILED}
+}
+
+const debounceUpdateNote = debounce((dispatch, field, value, state) => {
+    const currentEditingNote = getEditingNote(state);
+    const customerId = currentEditingNote.customerID;
+    const noteNo = currentEditingNote.id;
+    const lastUpdatedDateTime = currentEditingNote.lastUpdatedDateTime;
+    dispatch(requestUpdateNoteAction(customerId, noteNo, field, value));
+    updateNote(customerId, noteNo, {[field]: value}, lastUpdatedDateTime)
+        .then(newLastUpdated => {
+            // we have to apply the change to the original customer
+            dispatch(requestUpdateNoteSuccessAction(newLastUpdated))
+        })
+        .catch((error) => {
+            if (error instanceof OutOfDateError) {
+                //we should refetch everything ..just in case
+                dispatch(requestUpdateNoteFailedOutOfDate(error.lastUpdatedDateTime));
+                dispatch(addError('Unable to save change due to another edit by someone else'));
+                dispatch(fetchCustomerNotes(customerId));
+                return;
+            }
+
+            dispatch(requestUpdateNoteFailed());
+            dispatch(addError(`Unable to save change due to an error in the server: ${error.message}`))
+        })
+}, debounceTime);
+
+const updateEditingNoteValueAction = (field, value) => {
+    return {type: UPDATE_EDITING_NOTE_VALUE, field, value}
+}
+
+export function updateNoteField(field, value) {
+    return (dispatch, getState) => {
+        dispatch(updateEditingNoteValueAction(field, value));
+        debounceUpdateNote(dispatch, field, value, getState());
+    }
+}
 
 export function updateInvoiceSiteNo(value) {
     return updateCustomerField('invoiceSiteNo', value);
@@ -754,4 +950,62 @@ export function addNewSite(customerId, newSite) {
             })
 
     }
+}
+
+function createAddNoteRequestAction(customerId, newNote) {
+    return {type: REQUEST_ADD_NOTE, customerId, newNote}
+}
+
+function createAddNoteRequestSuccessAction(newNote) {
+    return {type: REQUEST_ADD_NOTE_SUCCESS, newNote};
+}
+
+function createAddNoteRequestFailureAction() {
+    return {type: REQUEST_ADD_NOTE_FAILURE};
+}
+
+export function addNewNote(customerId, note) {
+    return (dispatch) => {
+        dispatch(createAddNoteRequestAction(customerId, note));
+        return fetch('?action=addNote',
+            {
+                method: 'POST',
+                body: JSON.stringify(
+                    {
+                        customerId,
+                        note,
+                    }
+                )
+            }
+        )
+            .then(res => res.json())
+            .then(response => {
+                if (response.status !== 'ok') {
+                    throw new Error(response.message);
+                }
+                dispatch(createAddNoteRequestSuccessAction(response.data));
+            })
+            .catch(error => {
+                dispatch(createAddNoteRequestFailureAction());
+                addError(error);
+            })
+
+    }
+}
+
+
+export function goToFirstNote() {
+    return {type: GO_TO_FIRST_NOTE};
+}
+
+export function goToPreviousNote() {
+    return {type: GO_TO_PREVIOUS_NOTE};
+}
+
+export function goToNextNote() {
+    return {type: GO_TO_NEXT_NOTE};
+}
+
+export function goToLastNote() {
+    return {type: GO_TO_LAST_NOTE};
 }

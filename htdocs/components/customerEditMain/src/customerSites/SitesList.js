@@ -13,6 +13,7 @@ import Site from './Site.js';
 import {SHOW_ACTIVE} from "../visibilityFilterTypes";
 import {getDeliverSiteNo, getInvoiceSiteNo, getVisibleSites} from "../selectors";
 import AddSiteComponent from "../modals/AddSiteComponent";
+import {Accordion} from "react-bootstrap";
 
 const SitesList = ({
                        customerId,
@@ -41,7 +42,7 @@ const SitesList = ({
             )
         })
     }
-    console.log('sitesList rerendered', newSite);
+    // console.warn('sitesList rerendered', newSite);
     return (
         <div className="mt-3">
             <AddSiteComponent
@@ -113,9 +114,7 @@ const SitesList = ({
             <div className="row">
                 <div className="col-md-12">
                     <div className="customerEditSites">
-                        <div className="accordion"
-                             id="accordionExample1"
-                        >
+                        <Accordion>
                             {
                                 sites.length ?
                                     sites.map(site => (
@@ -124,7 +123,7 @@ const SitesList = ({
                                         />
                                     )) : ''
                             }
-                        </div>
+                        </Accordion>
                     </div>
                 </div>
             </div>

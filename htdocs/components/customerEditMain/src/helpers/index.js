@@ -1,10 +1,22 @@
 import {OutOfDateError} from "./OutOfDateError";
 
+export function updateSite(customerId, siteNo, fieldValueMap, lastUpdatedDateTime) {
+    return updateInServer('?action=updateSite', {customerId, siteNo, fieldValueMap, lastUpdatedDateTime});
+}
+
 export function updateCustomer(customerID, fieldValueMap, lastUpdatedDateTime) {
-    return fetch('?action=updateCustomer',
+    return updateInServer('?action=updateCustomer', {customerID, ...fieldValueMap, lastUpdatedDateTime});
+}
+
+export function updateNote(noteId, fieldValueMap, lastUpdatedDateTime) {
+    return updateInServer('?action=updateCustomerNote', {noteId, ...fieldValueMap, lastUpdatedDateTime});
+}
+
+function updateInServer(url, values) {
+    return fetch(url,
         {
             method: 'POST',
-            body: JSON.stringify({customerID, ...fieldValueMap, lastUpdatedDateTime})
+            body: JSON.stringify(values)
         }
     )
         .then(res => res.json())
