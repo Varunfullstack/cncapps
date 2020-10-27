@@ -1,6 +1,4 @@
 import {
-    CHANGE_DELIVER_SITE_NO,
-    CHANGE_INVOICE_SITE_NO,
     FETCH_ACCOUNT_MANAGERS_SUCCESS,
     FETCH_CUSTOMER_SUCCESS,
     FETCH_CUSTOMER_TYPES_SUCCESS,
@@ -10,7 +8,6 @@ import {
     REQUEST_UPDATE_CUSTOMER_FAILED,
     REQUEST_UPDATE_CUSTOMER_FAILED_OUT_OF_DATE,
     REQUEST_UPDATE_CUSTOMER_SUCCESS,
-    SAVE_CUSTOMER_DATA_SUCCESS,
     UPDATE_CUSTOMER_VALUE
 } from "../actionTypes";
 
@@ -62,6 +59,8 @@ const initialState = {
         reviewUserID: '',
         reviewAction: '',
         lastContractSent: '',
+        opportunityDeal: '',
+        dateMeetingConfirmed: '',
     },
     originalCustomer: {},
     hasPendingChanges: false,
@@ -70,32 +69,11 @@ const initialState = {
     sectors: [],
     accountManagers: [],
     reviewEngineers: [],
+    customerNotes: [],
 }
 
 export default function (state = initialState, action) {
     switch (action.type) {
-        case CHANGE_DELIVER_SITE_NO: {
-            const {siteNo} = action
-            return {
-                ...state,
-                deliverSiteNo: siteNo,
-                hasPendingChanges: true
-            }
-        }
-        case CHANGE_INVOICE_SITE_NO: {
-            const {siteNo} = action
-            return {
-                ...state,
-                invoiceSiteNo: siteNo,
-                hasPendingChanges: true
-            }
-        }
-        case SAVE_CUSTOMER_DATA_SUCCESS: {
-            return {
-                ...state,
-                hasPendingChanges: false
-            }
-        }
         case FETCH_CUSTOMER_SUCCESS: {
             return {
                 ...state,

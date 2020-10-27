@@ -4,7 +4,6 @@ const noop = () => {
 };
 
 export const FileInput = ({value, onChange = noop, ...rest}) => {
-    console.log(value);
     return (
         <div>
             {value && Boolean(value.length) && (

@@ -1,4 +1,5 @@
 import {
+    CLEAR_EDIT_SITE,
     DELETE_SITE_SUCCESS,
     FETCH_SITES_REQUEST,
     FETCH_SITES_SUCCESS,
@@ -6,8 +7,13 @@ import {
     NEW_SITE_FIELD_UPDATE,
     REQUEST_ADD_SITE_FAILURE,
     REQUEST_ADD_SITE_SUCCESS,
+    REQUEST_UPDATE_SITE_FAILED,
+    REQUEST_UPDATE_SITE_FAILED_OUT_OF_DATE,
+    REQUEST_UPDATE_SITE_SUCCESS,
     SAVE_SITE_SUCCESS,
+    SET_EDIT_SITE,
     SHOW_NEW_SITE_MODAL,
+    UPDATE_EDITING_SITE_VALUE,
     UPDATE_SITE
 } from "../actionTypes";
 
@@ -23,10 +29,22 @@ const initialState = {
     allIds: [],
     byIds: {},
     isFetching: false,
-    lastUpdated: null,
-    sitesPendingChanges: {},
     newSiteModalShow: false,
-    newSite: newSiteInitialState
+    newSite: newSiteInitialState,
+    editingSite: null,
+}
+
+
+function getUpdatedEditingSite(state, updatedSites) {
+    if (!state.editingSite) {
+        return null;
+    }
+
+    const foundUpdatedEditingSite = updatedSites.find(x => x.siteNo === state.editingSite.siteNo && x.lastUpdatedDateTime > state.editingSite.lastUpdatedDateTime);
+    if (!foundUpdatedEditingSite) {
+        return state.editingSite;
+    }
+    return foundUpdatedEditingSite;
 }
 
 export default function (state = initialState, action) {
@@ -35,7 +53,6 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 isFetching: true,
-                lastUpdated: null
             }
         case FETCH_SITES_SUCCESS:
             // we have received the list of sites
@@ -49,7 +66,7 @@ export default function (state = initialState, action) {
                     }, {allIds: [], byIds: {}}
                 ),
                 isFetching: false,
-                lastUpdated: new Date()
+                editingSite: getUpdatedEditingSite(state, action.sites)
             }
         case DELETE_SITE_SUCCESS:
             return {
@@ -78,26 +95,11 @@ export default function (state = initialState, action) {
                         ...state.byIds[action.siteNo],
                         ...action.data
                     }
-                },
-                sitesPendingChanges: {
-                    ...state.sitesPendingChanges,
-                    [action.siteNo]: null
                 }
             }
         case SAVE_SITE_SUCCESS:
             return {
-                ...state,
-                sitesPendingChanges: Object
-                    .keys(state.sitesPendingChanges)
-                    .reduce(
-                        (acc, key) => {
-                            if (key !== action.siteNo) {
-                                acc[key] = null;
-                            }
-                            return acc;
-                        },
-                        {}
-                    )
+                ...state
             }
         case SHOW_NEW_SITE_MODAL: {
             return {
@@ -122,7 +124,6 @@ export default function (state = initialState, action) {
                 }
             }
         }
-
         case REQUEST_ADD_SITE_SUCCESS: {
             return {
                 ...state,
@@ -133,6 +134,39 @@ export default function (state = initialState, action) {
                 newSiteModalShow: false,
                 allIds: [...state.allIds, action.newSite.siteNo],
                 newSite: newSiteInitialState
+            }
+        }
+        case SET_EDIT_SITE: {
+            return {
+                ...state,
+                editingSite: {...state.byIds[action.siteNo]}
+            }
+        }
+        case CLEAR_EDIT_SITE: {
+            return {
+                ...state,
+                editingSite: null
+            }
+        }
+        case REQUEST_UPDATE_SITE_FAILED:
+        case REQUEST_UPDATE_SITE_FAILED_OUT_OF_DATE: {
+            return {
+                ...state,
+                editingSite: {...state.byIds[state.editingSite.siteNo]},
+            }
+        }
+        case REQUEST_UPDATE_SITE_SUCCESS: {
+            const updatedSite = {...state.editingSite, lastUpdatedDateTime: action.newLastUpdatedDateTime};
+            return {
+                ...state,
+                editingSite: updatedSite,
+                byIds: {...state.byIds, [state.editingSite.siteNo]: updatedSite}
+            }
+        }
+        case UPDATE_EDITING_SITE_VALUE: {
+            return {
+                ...state,
+                editingSite: {...state.editingSite, [action.field]: action.value}
             }
         }
         default:

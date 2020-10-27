@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import {
     addNewPortalCustomerDocument,
     deletePortalCustomerDocument,
@@ -74,7 +74,7 @@ class PortalCustomerDocumentsComponent extends React.Component {
     }
 
     render() {
-        console.warn('portal customer rendered');
+        // console.warn('portal customer rendered');
         const {
             newPortalDocument,
             newPortalDocumentModalShown,
@@ -84,13 +84,8 @@ class PortalCustomerDocumentsComponent extends React.Component {
             onShowNewPortalDocumentModal,
             customerId
         } = this.props;
-        console.log(onShowNewPortalDocumentModal);
         return (
-            <div className="tab-pane fade"
-                 id="nav-portal-documents-tab"
-                 role="tabpanel"
-                 aria-labelledby="nav-portal-documents-tab"
-            >
+            <Fragment>
                 <AddPortalCustomerDocumentComponent
                     description={newPortalDocument.description}
                     customerContract={newPortalDocument.customerContract}
@@ -139,14 +134,14 @@ class PortalCustomerDocumentsComponent extends React.Component {
                         </div>
                     </div>
                 </div>
-            </div>
+            </Fragment>
+
         )
     }
 }
 
 
 function mapStateToProps(state) {
-    console.log(state.portalCustomerDocuments);
     return {
         portalCustomerDocuments: getMappedPortalCustomerDocuments(state),
         isFetching: getPortalCustomerDocumentsIsFetching(state),

@@ -54,11 +54,7 @@ class CustomerEditMain extends React.Component {
 
         const {customerId} = customer;
         return (
-            <div className="tab-pane fade show active"
-                 id="nav-home"
-                 role="tabpanel"
-                 aria-labelledby="nav-home-tab"
-            >
+
                 <div className="mt-3">
                     <div className="row">
                         <div className="col-md-6 mb-3">
@@ -616,7 +612,7 @@ class CustomerEditMain extends React.Component {
                         </div>
                     </div>
                 </div>
-            </div>
+
         )
     }
 

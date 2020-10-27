@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import * as HTMLReactParser from 'html-react-parser'
 import moment from "moment";
 import {connect} from "react-redux";
@@ -128,11 +128,7 @@ class CustomerProjectsComponent extends React.Component {
             return '';
         }
         return (
-            <div className="tab-pane fade customerAddProjects"
-                 id="nav-profile"
-                 role="tabpanel"
-                 aria-labelledby="nav-profile-tab"
-            >
+            <Fragment>
                 <AddProjectModalComponent description={newProject.description}
                                           summary={newProject.summary}
                                           show={newProjectModalShown}
@@ -209,7 +205,7 @@ class CustomerProjectsComponent extends React.Component {
                         </div>
                     </div>
                 </div>
-            </div>
+            </Fragment>
         )
     }
 }

@@ -802,7 +802,10 @@ class CTCustomer extends CTCNC
                             "dateMeetingConfirmed"         => $dbeCustomer->getValue(DBECustomer::dateMeetingConfirmed),
                             "invoiceSiteNo"                => $dbeCustomer->getValue(DBECustomer::invoiceSiteNo),
                             "deliverSiteNo"                => $dbeCustomer->getValue(DBECustomer::deliverSiteNo),
-                            "lastUpdatedDateTime"          => $dbeCustomer->getValue(DBECustomer::lastUpdatedDateTime)
+                            "lastUpdatedDateTime"          => $dbeCustomer->getValue(DBECustomer::lastUpdatedDateTime),
+                            "opportunityDeal"              => $dbeCustomer->getValue(DBECustomer::opportunityDeal),
+                            "reviewAction"                 => $dbeCustomer->getValue(DBECustomer::reviewAction),
+                            "lastContractSent"             => $dbeCustomer->getValue(DBECustomer::lastContractSent),
                         ]
                     ]
                 );
@@ -859,6 +862,49 @@ class CTCustomer extends CTCNC
                 );
                 break;
             }
+            case self::UPDATE_SITE:
+            {
+                $data = $this->getJSONData();
+                $dbeSite = new DBESite($this);
+                if (!isset($data['customerId'])) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, "Customer ID is mandatory");
+                }
+                if (!isset($data['siteNo'])) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, "siteNo is mandatory");
+                }
+                $dbeSite->setValue(DBESite::customerID, $data['customerId']);
+                $dbeSite->setValue(DBESite::siteNo, $data['siteNo']);
+                $dbeSite->getRowByCustomerIDSiteNo();
+
+                if (empty($data['lastUpdatedDateTime']) || $data['lastUpdatedDateTime'] < $dbeSite->getValue(
+                        DBESite::lastUpdatedDateTime
+                    )) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(
+                        400,
+                        "Updated by another user",
+                        [
+                            "errorCode"           => 1002,
+                            "lastUpdatedDateTime" => $dbeSite->getValue(DBESite::lastUpdatedDateTime)
+                        ]
+                    );
+                }
+
+                if (isset($data['fieldValueMap']['active']) && $data['siteNo'] == 0) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, "Cannot deactivate Site 0");
+                }
+
+                $dbeSite = \CNCLTD\Data\SiteMapper::fromDTOToDB($data['fieldValueMap'], $dbeSite);
+
+                $dbeSite->updateRow();
+                echo json_encode(
+                    [
+                        "status"              => "ok",
+                        "lastUpdatedDateTime" => $dbeSite->getValue(DBECustomer::lastUpdatedDateTime)
+                    ]
+                );
+                exit;
+            }
+
             case self::DELETE_PORTAL_DOCUMENT:
             {
                 $data = $this->getJSONData();
@@ -980,8 +1026,7 @@ class CTCustomer extends CTCNC
                 return $this->getCustomerSitesController();
             case self::GET_CUSTOMER_CONTACTS:
                 return $this->getCustomerContactsController();
-            case self::UPDATE_SITE:
-                return $this->updateSiteController();
+
             case self::ADD_SITE:
                 $data = $this->getJSONData();
                 if (!isset($data['customerId'])) {
@@ -1183,7 +1228,7 @@ class CTCustomer extends CTCNC
         $customerId = $this->getParam('customerId');
         $dbeCustomer = new DBECustomer($this);
         $orders = [];
-        if ($dbeCustomer->getRow($customerId) && $dbeCustomer->getValue(DBECustomer::referredFlag) == 'Y') {
+        if ($dbeCustomer->getRow($customerId) && $dbeCustomer->getValue(DBECustomer::referredFlag) != 'Y') {
             $dbeJOrdhead = new DBEJOrdhead($this);
             $dbeJOrdhead->getRowsBySearchCriteria(
                 $customerId,
@@ -1524,24 +1569,25 @@ class CTCustomer extends CTCNC
         $sites = [];
         while ($dbeSite->fetchNext()) {
             $sites[] = [
-                "customerID"     => $dbeSite->getValue(DBESite::customerID),
-                "siteNo"         => $dbeSite->getValue(DBESite::siteNo),
-                "address1"       => $dbeSite->getValue(DBESite::add1),
-                "address2"       => $dbeSite->getValue(DBESite::add2),
-                "address3"       => $dbeSite->getValue(DBESite::add3),
-                "town"           => $dbeSite->getValue(DBESite::town),
-                "county"         => $dbeSite->getValue(DBESite::county),
-                "postcode"       => $dbeSite->getValue(DBESite::postcode),
-                "invoiceContact" => $dbeSite->getValue(DBESite::invoiceContactID),
-                "deliverContact" => $dbeSite->getValue(DBESite::deliverContactID),
-                "debtorCode"     => $dbeSite->getValue(DBESite::debtorCode),
-                "sageRef"        => $dbeSite->getValue(DBESite::sageRef),
-                "phone"          => $dbeSite->getValue(DBESite::phone),
-                "maxTravelHours" => $dbeSite->getValue(DBESite::maxTravelHours),
-                "active"         => $dbeSite->getValue(DBESite::activeFlag) == 'Y',
-                "nonUKFlag"      => $dbeSite->getValue(DBESite::nonUKFlag) == 'Y',
-                "what3Words"     => $dbeSite->getValue(DBESite::what3Words),
-                "canDelete"      => $this->buCustomer->canDeleteSite(
+                "customerID"          => $dbeSite->getValue(DBESite::customerID),
+                "siteNo"              => $dbeSite->getValue(DBESite::siteNo),
+                "address1"            => $dbeSite->getValue(DBESite::add1),
+                "address2"            => $dbeSite->getValue(DBESite::add2),
+                "address3"            => $dbeSite->getValue(DBESite::add3),
+                "town"                => $dbeSite->getValue(DBESite::town),
+                "county"              => $dbeSite->getValue(DBESite::county),
+                "postcode"            => $dbeSite->getValue(DBESite::postcode),
+                "invoiceContact"      => $dbeSite->getValue(DBESite::invoiceContactID),
+                "deliverContact"      => $dbeSite->getValue(DBESite::deliverContactID),
+                "debtorCode"          => $dbeSite->getValue(DBESite::debtorCode),
+                "sageRef"             => $dbeSite->getValue(DBESite::sageRef),
+                "phone"               => $dbeSite->getValue(DBESite::phone),
+                "maxTravelHours"      => $dbeSite->getValue(DBESite::maxTravelHours),
+                "active"              => $dbeSite->getValue(DBESite::activeFlag) == 'Y',
+                "nonUKFlag"           => $dbeSite->getValue(DBESite::nonUKFlag) == 'Y',
+                "what3Words"          => $dbeSite->getValue(DBESite::what3Words),
+                "lastUpdatedDateTime" => $dbeSite->getValue(DBESite::lastUpdatedDateTime),
+                "canDelete"           => $this->buCustomer->canDeleteSite(
                     $customerId,
                     $dbeSite->getValue(DBESite::siteNo)
                 )
@@ -1610,40 +1656,6 @@ class CTCustomer extends CTCNC
             ];
         }
         echo json_encode(["status" => "ok", "data" => $contacts]);
-    }
-
-    function updateSiteController()
-    {
-        $data = json_decode(file_get_contents('php://input'), true);
-        if (!isset($data['siteNo']) || !isset($data['customerID'])) {
-            http_response_code(400);
-            echo json_encode(["status" => "error", "message" => "CustomerId and siteNo are required"]);
-            exit;
-        }
-        $dbeSite = new DBESite($this);
-        $dbeSite->setValue(DBESite::customerID, $data['customerID']);
-        $dbeSite->setValue(DBESite::siteNo, $data['siteNo']);
-        $dbeSite->getRow();
-        $dbeSite->setValue(DBESite::add1, $data["address1"]);
-        $dbeSite->setValue(DBESite::add2, $data["address2"]);
-        $dbeSite->setValue(DBESite::add3, $data["address3"]);
-        $dbeSite->setValue(DBESite::town, $data["town"]);
-        $dbeSite->setValue(DBESite::county, $data["county"]);
-        $dbeSite->setValue(DBESite::postcode, $data["postcode"]);
-        $dbeSite->setValue(DBESite::invoiceContactID, $data["invoiceContact"]);
-        $dbeSite->setValue(DBESite::deliverContactID, $data["deliverContact"]);
-        $dbeSite->setValue(DBESite::debtorCode, $data["debtorCode"]);
-        $dbeSite->setValue(DBESite::sageRef, $data["sageRef"]);
-        $dbeSite->setValue(DBESite::phone, $data["phone"]);
-        $dbeSite->setValue(DBESite::maxTravelHours, $data["maxTravelHours"]);
-        $dbeSite->setValue(DBESite::activeFlag, $data["active"] ? 'Y' : 'N');
-        $dbeSite->setValue(DBESite::nonUKFlag, $data["nonUKFlag"] ? 'Y' : 'N');
-        $dbeSite->setValue(DBESite::what3Words, $data["what3Words"]);
-        $dbeSite->updateRow();
-
-        echo json_encode(
-            ["status" => "ok",]
-        );
     }
 
     /**
@@ -3413,7 +3425,6 @@ class CTCustomer extends CTCNC
                 $dbeCustomer->setValue(DBECustomer::reviewUserID, $customerData['reviewUserID']);
                 $dbeCustomer->setValue(DBECustomer::reviewAction, $customerData['reviewAction']);
                 $dbeCustomer->updateRow();
-//                $this->buCustomer->updateSite($this->dsSite);
                 if (isset($this->postVars["form"]["contact"])) {
                     $this->buCustomer->updateContact($this->dsContact);
                 }

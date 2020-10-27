@@ -77,6 +77,9 @@ class CustomerNotesComponent extends React.Component {
 
     renderNotes() {
 
+        <Fragment>
+
+        </Fragment>
 
         return this.el(
             React.Fragment,

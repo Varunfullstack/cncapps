@@ -8,33 +8,59 @@ const getMappedContacts = createSelector(
         return contacts.allIds.map(id => contacts.byIds[id])
     }
 )
-const getSitesMap = (state) => state.sites;
+
+const getSitesState = (state) => state.sites;
+const getSitesByIds = createSelector(
+    [getSitesState],
+    sitesState => sitesState.byIds
+)
+
+const getSitesAllIds = createSelector(
+    [getSitesState],
+    sitesState => sitesState.allIds
+)
 const getMappedSites = createSelector(
-    [getSitesMap],
-    (sitesMap) => {
-        return sitesMap.allIds.map(id => sitesMap.byIds[id]);
+    [getSitesByIds, getSitesAllIds],
+    (byIds, allIds) => {
+        return allIds.map(id => byIds[id]);
     }
 )
 
 export const createGetSiteContacts = () => {
     return createSelector(
-        [getMappedContacts, (state, props) => props.siteNo],
+        [getMappedContacts, (state, siteNo) => siteNo],
         (contacts, siteNo) => {
             return contacts.filter(contact => contact.siteNo === siteNo);
         }
     )
 }
 
+export const createGetEditingSiteForSite = () => {
+    return createSelector(
+        [getEditingSite, (state, observedSiteNo) => observedSiteNo],
+        (editingSite, observedSiteNo) => {
+            if (!editingSite || editingSite.siteNo !== observedSiteNo) {
+                return null;
+            }
+            return editingSite;
+        }
+    )
+}
+
 export const createGetSite = () => {
     return createSelector(
-        [getSitesMap, (state, props) => props.siteNo],
+        [getSitesState, (state, siteNo) => siteNo],
         (sitesMap, siteNo) => {
             return sitesMap.byIds[siteNo];
         }
     )
 }
+const getCustomerState = (state) => state.customerEdit;
 
-export const getCustomer = (state) => state.customerEdit.customer;
+export const getCustomer = createSelector(
+    [getCustomerState],
+    (customerState) => customerState.customer
+)
 
 export const getCustomerId = createSelector(
     [getCustomer],
@@ -91,3 +117,65 @@ export const getVisibleSites = createSelector(
         return mappedSites;
     }
 );
+
+
+export const getEditingSite = createSelector(
+    [getSitesState],
+    siteState => siteState.editingSite
+)
+
+
+export const getLeadStatuses = createSelector(
+    [getCustomerState],
+    customerState => customerState.leadStatuses
+)
+
+export const getReviewEngineers = createSelector(
+    [getCustomerState],
+    customerState => customerState.reviewEngineers
+)
+
+const getCustomerNotesState = (state) => state.customerNotesState
+
+export const getEditingNote = createSelector(
+    [getCustomerNotesState],
+    customerNotesState => customerNotesState.editingNote
+)
+
+
+const getNotesByIds = createSelector(
+    [getCustomerNotesState],
+    state => state.byIds
+)
+
+const getNotesAllIds = createSelector(
+    [getCustomerNotesState],
+    state => state.allIds
+)
+const getMappedNotes = createSelector(
+    [getNotesByIds, getNotesAllIds],
+    (byIds, allIds) => {
+        return allIds.map(id => byIds[id]);
+    }
+)
+
+
+export const getCustomerNotes = getMappedNotes;
+
+const getOrderState = (state) => state.ordersState;
+const getOrderStateByIds = createSelector(
+    [getOrderState],
+    orderState => orderState.byIds
+)
+const getOrderStateAllIds = createSelector(
+    [getOrderState],
+    orderState => orderState.allIds
+)
+
+const mappedOrders = createSelector(
+    [getOrderStateByIds, getOrderStateAllIds],
+    (byIds, allIds) => {
+        return allIds.map(x => byIds[x]);
+    }
+)
+export const getOrders = mappedOrders;
