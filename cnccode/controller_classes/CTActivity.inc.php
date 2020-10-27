@@ -2715,7 +2715,8 @@ class CTActivity extends CTCNC
                         return "<i class='fa fa-envelope' title='This Service Request was raised by email'></i>";
                         break;
                     case 'Portal':
-                        return "<i class='fa fa-edge' title='This Service Request was raised by the portal'></i>";
+                        //return "<i class='fab fa-edge' title='This Service Request was raised by the portal'></i>";
+                        return "<img src='../images/chrome_icon.png' style='width: 25px;' ></i>";
                         break;
                     case 'Phone':
                         return "<i class='fa fa-phone' title='This Service Request was raised by phone'></i>";
@@ -4098,7 +4099,7 @@ class CTActivity extends CTCNC
                     'activityHiddenText'    => $activityHiddenText,
                     'siteAddress'           => $siteAddress,
                     'originalRequestHeader' => $originalRequestHeader,
-                    'colorClass'            => $colorClass
+                    'colorClass'            => $colorClass,
                 )
             );
             if (!in_array($activitiesByProblemID->getValue(DBECallActivity::callActTypeID), [60, 61])) {
@@ -4106,6 +4107,7 @@ class CTActivity extends CTCNC
                 $lastActivityText = "$date $startTime - $endTime ($duration) $activityType - $contactName - $siteAddress - $userName";
 
                 $lastActivityReason = $reason;
+                $lastCncNextAction=$activitiesByProblemID->getValue(DBEJCallActivity::cncNextAction);
             }
             $this->template->parse(
                 'rows',
@@ -4148,6 +4150,7 @@ class CTActivity extends CTCNC
                 'problemHiddenText'   => $problemHiddenText,
                 'lastActivityText'    => $lastActivityText,
                 'lastActivityReason'  => $lastActivityReason,
+                'lastCncNextAction'   => $lastCncNextAction,
             )
         );
 

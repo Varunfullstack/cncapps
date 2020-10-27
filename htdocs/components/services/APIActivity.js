@@ -73,9 +73,9 @@ class APIActivity extends APIMain{
     {
         return fetch(`${ApiUrls.SRActivity}getAllUsers`).then(res => res.json());
     }
-    getCustomerContracts(customerId,contractCustomerItemId,linkedToSalesOrder)
+    getCustomerContracts(customerId,contractCustomerItemID,linkedToSalesOrder)
     {
-        return fetch(`${ApiUrls.SRActivity}getCustomerContracts&customerId=${customerId}&contractCustomerItemId=${contractCustomerItemId}&linkedToSalesOrder=${linkedToSalesOrder}`).then(res => res.json());
+        return fetch(`${ApiUrls.SRActivity}getCustomerContracts&customerId=${customerId}&contractCustomerItemID=${contractCustomerItemID}&linkedToSalesOrder=${linkedToSalesOrder}`).then(res => res.json());
     }
     getRootCauses()
     {
@@ -88,6 +88,11 @@ class APIActivity extends APIMain{
     getCallActivityTypeId(callActivityId)
     {
         return fetch(`${ApiUrls.SRActivity}getCallActivityType&callActivityID=${callActivityId}`).then(res => res.json());
+    }
+    getCustomerRaisedRequest(Id)
+    {
+        return fetch(`${ApiUrls.SRActivity}getCustomerRaisedRequest&customerproblemno=${Id}`).then(res => res.json());
+
     }
 }
 export default APIActivity;

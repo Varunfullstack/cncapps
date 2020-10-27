@@ -235,8 +235,9 @@ class SRSourceComponent extends React.Component {
           case "Email":
             return el(ToolTip,{title:"Email",content:el("i", { className: "fal fa-envelope fa-2x icon pointer" })});
           case "Portal":
-            return el(ToolTip,{title:"Portal",content:el("i", { className: "fa fa-edge fa-2x icon pointer"  })});
-          case "Phone":
+            //return el(ToolTip,{title:"Portal",content:el("i", { className: "fab fa-edge fa-2x icon pointer"  })});
+            return el(ToolTip,{title:"Portal",content:el("img", { src: "../images/chrome_icon.png",style:{width:25}  })});
+          case "Phone":            
             return el(ToolTip,{title:"Phone",content:el("i", { className: "fal fa-phone fa-2x icon pointer"  })});
           case "On site":
             return el(ToolTip,{title:"On site",content:el("i", { className: "fal fa-building fa-2x icon pointer"  })});

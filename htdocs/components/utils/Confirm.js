@@ -28,8 +28,8 @@ class Confirm extends React.Component {
                 width:width||300,
                 onClose:()=>this.close(),
                 footer:[        
-                    el('button',{key:"btnOk",onClick:()=>this.close(true)},"OK"),            
-                    el('button',{key:"btncancel",onClick:()=>this.close(false)},"Cancel"),
+                    el('button',{key:"btnOk",onClick:()=>this.close(true)},"Yes"),            
+                    el('button',{key:"btncancel",onClick:()=>this.close(false)},"No"),
                    
                 ],
                 content:el('label',{key:"label"},message)

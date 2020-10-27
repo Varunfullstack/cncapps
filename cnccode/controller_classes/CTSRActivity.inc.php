@@ -102,6 +102,9 @@ class CTSRActivity extends CTCNC
             case "getCallActivityType":
                 echo json_encode($this->getCallActivityType());
                 exit;
+            case "getCustomerRaisedRequest":
+                echo json_encode($this->getCustomerRaisedRequest());
+                exit;
             default:
            
             $this->setTemplate();
@@ -186,7 +189,8 @@ class CTSRActivity extends CTCNC
                         $title="This Service Request was raised by email";
                         break;
                     case 'Portal':
-                        $return .=  "<i class='fa fa-edge ml-5 pointer' style='font-size: 18px;' ></i>";
+                        //$return .=  "<i class='fab fa-edge ml-5 pointer' style='font-size: 18px;' ></i>";
+                        $return .=  "<img src='../images/chrome_icon.png' style='width: 25px;' ></i>";
                         $title="This Service Request was raised by the portal";
                         break;
                     case 'Phone':
@@ -354,17 +358,18 @@ class CTSRActivity extends CTCNC
             "canChangePriorityFlag"          =>$dbeUser->getValue(DBEUser::changePriorityFlag) == 'Y'?true:false,
             "userID"                            => $dbejCallActivity->getValue(DBEJCallActivity::userID),
             "actUserTeamId"                       => $dbeUserActivity->getValue(DBEUser::teamID),
-            "contractCustomerItemId"            => $dbejCallActivity->getValue(DBEJCallActivity::contractCustomerItemID),
+            "contractCustomerItemID"            => $dbejCallActivity->getValue(DBEJCallActivity::contractCustomerItemID),
             "changeSRContractsFlag"             => $dbeUser->getValue(DBEUser::changeSRContractsFlag) == 'Y'?true:false,
-            "rootCauseId"                       => $dbejCallActivity->getValue(DBEJCallActivity::rootCauseID),
+            "rootCauseID"                       => $dbejCallActivity->getValue(DBEJCallActivity::rootCauseID),
             'submitAsOvertime'                  => $dbejCallActivity->getValue(DBECallActivity::submitAsOvertime),
             "siteMaxTravelHours"                =>$dbeSite->getValue(DBESite::maxTravelHours),
             "projectId"                         =>$dbejCallActivity->getValue(DBEJCallActivity::projectID),
             "projects"                          =>BUProject::getCustomerProjects($customerId),
             "cncNextAction"                     =>$dbejCallActivity->getValue(DBEJCallActivity::cncNextAction),
             "customerNotes"                     =>$dbejCallActivity->getValue(DBEJCallActivity::customerNotes),
-            'activityTypeHasExpenses'           =>BUActivityType::hasExpenses($dbejCallActivity->getValue(DBEJCallActivity::callActTypeID))
-
+            'activityTypeHasExpenses'           =>BUActivityType::hasExpenses($dbejCallActivity->getValue(DBEJCallActivity::callActTypeID)),
+            'assetName'                         =>$dbeProblem->getValue(DBEProblem::assetName),
+            'assetTitle'                         =>$dbeProblem->getValue(DBEProblem::assetTitle),
         ];
     }
     /**
@@ -933,7 +938,7 @@ class CTSRActivity extends CTCNC
     function getCustomerContracts()
     {
         $customerID = $_REQUEST["customerId"];
-        $contractCustomerItemID = $_REQUEST["contractCustomerItemId"];
+        $contractCustomerItemID = $_REQUEST["contractCustomerItemID"];
         $linkedToSalesOrder = $_REQUEST["linkedToSalesOrder"];
         $contracts = array();
         $buCustomerItem = new BUCustomerItem($this);
@@ -1058,6 +1063,10 @@ class CTSRActivity extends CTCNC
                     $dbeProblemNotStartReason->setValue(DBEProblemNotStartReason::createAt, $body->dateRaised . ' ' . $body->timeRaised . ':00');
                     $dbeProblemNotStartReason->insertRow();
                 }
+                if(isset($body->customerproblemno)&&$body->customerproblemno!=null)
+                {
+                    $buActivity->deleteCustomerRaisedRequest($body->customerproblemno);
+                }
                 return ["status" => 1, "nextURL" => $nextURL, "problemID" => $dsCallActivity->getValue(DBEJCallActivity::problemID), "callActivityID" => $dsCallActivity->getValue(DBEJCallActivity::callActivityID)];
             } else return ["status" => 0];
         } catch (Exception $exception) {
@@ -1070,6 +1079,16 @@ class CTSRActivity extends CTCNC
         $callActivity=new DBECallActivity($this);
         $callActivity->getRow($callActivityID);
         return $callActivity->getValue(DBECallActivity::callActTypeID);
+    }
+    function getCustomerRaisedRequest()
+    {
+        $Id= $this->getParam("customerproblemno");
+        if($Id)
+        {            
+            $buActivity=new BUActivity($this);
+            return $buActivity->getCustomerRaisedRequest($Id);
+        }
+        else return null;
     }
 }
 ?>

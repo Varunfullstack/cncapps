@@ -7,7 +7,6 @@ import CMPInboxSales from './components/CMPInboxSales.js?v=1';
 import CMPInboxProjects from './components/CMPInboxProjects.js?v=1';
 import CMPInboxToBeLogged from './components/CMPInboxToBeLogged.js?v=1';
 import CMPInboxPendingReopened from './components/CMPInboxPendingReopened.js?v=1';
-
 import SVCCurrentActivityService from './services/SVCCurrentActivityService.js?v=1';
 import Spinner from './../utils/spinner.js?v=9';
 import MainComponent from './../CMPMainComponent.js?v=1';
@@ -118,13 +117,10 @@ class CMPCurrentActivityReport extends MainComponent {
     this.loadQueue('PR');
     setInterval(()=> {
       this.loadQueue('PR');
-    }, 4*60*1000);
-    //this.loadQueue('S');
-    //this.loadQueue('SP');
-    //this.loadQueue('P');
-    //this.apiCurrentActivityService.getFixedInbox().then(res=>this.setState({fixedInbox:res}));
-    //this.apiCurrentActivityService.getFutureInbox().then(res=>this.setState({futureInbox:res}));
+    }, 4*60*1000);    
+  
   };
+  
   getLocalStorageFilter=()=>{
     let filter=localStorage.getItem("inboxFilter");
     if(filter)
@@ -538,7 +534,9 @@ class CMPCurrentActivityReport extends MainComponent {
   }
   createNewSR=(problem,code)=>{
     //console.log('create new ',problem);
-    window.location=`Activity.php?action=createRequestFromCustomerRequest&cpr_customerproblemno=${problem.cpCustomerProblemID}`    
+    window.location=`LogServiceRequest.php?customerproblemno=${problem.cpCustomerProblemID}`    
+    //window.location=`Activity.php?action=createRequestFromCustomerRequest&cpr_customerproblemno=${problem.cpCustomerProblemID}`    
+
   }
   render() {
     const {

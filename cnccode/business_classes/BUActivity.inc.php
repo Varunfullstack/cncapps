@@ -1789,6 +1789,16 @@ class BUActivity extends Business
             DBEJProblem::workingHoursCalculatedToTime,
             null
         );
+         $problem->setValue(
+            DBEJProblem::assetName,
+            $dsCallActivity->getValue(DBEJCallActivity::assetName)
+
+        );
+         $problem->setValue(
+            DBEJProblem::assetTitle,
+            $dsCallActivity->getValue(DBEJCallActivity::assetTitle)
+
+        );
 
         // if amended initial call activity date/time then set the problem date raised field to match
         if ($dsCallActivity->getValue(DBEJCallActivity::callActTypeID) == CONFIG_INITIAL_ACTIVITY_TYPE_ID) {

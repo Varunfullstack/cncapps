@@ -35,7 +35,7 @@
     flex-flow: row wrap;    
 }
 .label{
-    width: 80px;
+    /* width: 80px; */
     color: #992211;
     white-space: nowrap;
 }

@@ -188,7 +188,9 @@ class CMPCustomerSite extends MainComponent {
       this.alert("Please select customer site");
       return;
     }
-    if (data.assetName == ""&& data.emptyAssetReason!="") {
+    //console.log(data.assetName == ""&& data.emptyAssetReason!="",data.assetName,data.emptyAssetReason);
+    if (data.assetName == ""&& data.emptyAssetReason=="") {
+      console.log("no asset");
       const emptyAssetReason = await this.prompt(
         "Please provide the reason of no Asset" ,600
       );

@@ -65,6 +65,8 @@ class DBEJCallActivity extends DBECallActivity
     const allocatedUserID = "allocatedUserID";
     const queueNo = "queueNo";
     const caaConsno="caa_consno";
+    const assetName="assetName";
+    const assetTitle="assetTitle";
 
     var $fromString;
 
@@ -370,7 +372,19 @@ class DBEJCallActivity extends DBECallActivity
             DA_ALLOW_NULL,
             "caa_consno"
         );
- 
+        $this->addColumn(
+            self::assetName,
+            DA_TEXT,
+            DA_ALLOW_NULL,
+            "problem.assetName"
+        );
+        $this->addColumn(
+            self::assetTitle,
+            DA_TEXT,
+            DA_ALLOW_NULL,
+            "problem.assetTitle"
+        );
+
         $this->setAddColumnsOff();
 
         $this->fromString =

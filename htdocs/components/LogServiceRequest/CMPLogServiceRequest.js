@@ -8,6 +8,7 @@ import CMPCustomerSite from './components/CMPCustomerSite.js?v=10';
 import CMPLastStep from './components/CMPLastStep.js?v=10';
 import APIActivity from '../services/APIActivity.js?v=10';
 import MainComponent from '../CMPMainComponent.js?v=10'
+import { params } from '../utils/utils.js?v=10'
  
 export default class CMPLogServiceRequest extends MainComponent{
   el = React.createElement;
@@ -65,8 +66,27 @@ export default class CMPLogServiceRequest extends MainComponent{
       this.setState({data});
       console.log(user);
     });
+    this.loadCustomerProblem();
    }
-   
+   //check if it come from "To be logged or pendding"
+  loadCustomerProblem=()=>{
+    // load customerproblemno if found
+    const Id=params.get("customerproblemno");
+    if(Id)
+    {
+      this.api.getCustomerRaisedRequest(Id).then(result=>{
+        console.log(result);
+        const {data}=this.state;
+        data.customerproblemno=result.cpr_customerproblemno;
+        data.reason=result.cpr_reason;
+        data.priority=result.cpr_priority;
+        data.siteNo=result.con_siteno;
+        data.customer={cus_custno:result.con_custno,con_contno:result.cpr_contno};
+        this.setState({data});
+      })
+    }
+    console.log('Id',Id);
+  }
   setActiveStep=(step)=>{
     const {steps}=this.state;
     const index=steps.map(s=>s.id).findIndex(s=>s===step);

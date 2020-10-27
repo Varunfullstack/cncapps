@@ -1,6 +1,6 @@
 import APIActivity from "../../services/APIActivity.js";
 import APICallactType from "../../services/APICallactType.js";
-import {groupBy, params, pick,TeamType} from "../../utils/utils.js";
+import {groupBy, padEnd, params, pick,sort,TeamType} from "../../utils/utils.js";
 import Toggle from "../../utils/toggle.js";
 import Table from "../../utils/table/table.js"
 import Modal from "../../utils/modal.js";
@@ -38,6 +38,7 @@ class CMPActivityEdit extends MainComponent {
       contacts: [],
       sites: [],
       priorities: [],
+      assets:[],
       currentContact: null,
       currentUser:null,
       data: {
@@ -93,12 +94,14 @@ class CMPActivityEdit extends MainComponent {
       this.api.getPriorities(),
       this.api.getRootCauses(),
       this.apiUser.getCurrentUser(),
-      this.apiStandardText.getOptionsByType("Priority Change Reason")
-
-    ]).then((result) => {
+      this.apiStandardText.getOptionsByType("Priority Change Reason"),
+      
+    ]).then(async (result) => {
       const currentUser=result[4];    
       let callActTypes=result[0];
       console.log(currentUser,callActTypes);
+      
+
       if(!currentUser.isSDManger)
       {
         callActTypes=callActTypes.filter(c=>c.visibleInSRFlag=='Y')
@@ -159,17 +162,30 @@ class CMPActivityEdit extends MainComponent {
         this.api
           .getCustomerContracts(
             res.customerId,
-            res.contractCustomerItemId,
+            res.contractCustomerItemID,
             res.linkedSalesOrderID > 0
           )
           .then((res) => {
             const contracts = groupBy(res, "renewalType");             
             return contracts;
-          }),
+          }),          
+       this.apiCustomer.getCustomerAssets(res.customerId)
       ]).then((result) => {
         // console.log('res',result);
         const currentContact = result[0].find((c) => c.id == res.contactID);
-        console.log(currentContact);
+        //console.log(currentContact);
+        let assets =sort(result[3],"name");    
+        assets = assets.map((asset) => {
+          if (
+            asset.BiosName.indexOf("VMware") >= 0 ||
+            asset.BiosName.indexOf("Virtual Machine") >= 0
+          ) {
+            asset.BiosVer = "";
+          }
+         // asset.name=padEnd(asset.name,150);
+           return asset;
+        });
+        
         this.setState({          
           filters,
           data: res,
@@ -179,6 +195,7 @@ class CMPActivityEdit extends MainComponent {
           contracts: result[2],
           _activityLoaded: true,
           currentContact,
+          assets
         },()=>setTimeout(()=>this.checkContactNotesAlert(),2000));
       });
     });
@@ -218,14 +235,18 @@ class CMPActivityEdit extends MainComponent {
         "customerNotes",
         "cncNextAction",
         "priority",
-        "priorityChangeReason"
+        "priorityChangeReason",
+        "assetName",
+        "assetTitle",
+        "rootCauseID",
+        "contractCustomerItemID",
       ]);
       console.log(finalData);
 
       this.api
         .updateActivity(finalData)
         .then((response) => {
-          // return;
+          // update: return;
           if (response.error) this.alert(response.error);
           else {
             if (!autoSave) {
@@ -288,7 +309,7 @@ class CMPActivityEdit extends MainComponent {
         this.alert("Please Enter Activity Notes");
         return false;
       }
-      if (data.contractCustomerItemId && data.projectId) {
+      if (data.contractCustomerItemID && data.projectId) {
         this.alert("Project work must be logged under T&M");
         return false;
       }
@@ -337,7 +358,7 @@ class CMPActivityEdit extends MainComponent {
           !dateMoment.isValid() ||
           dateMoment.isSameOrBefore(moment(), "minute")
         ) {
-          this.alert("Please provide a future date and time, or just a future date");
+          this.alert("Please provide a future date and time");
           return false;
         }
         break;
@@ -1145,8 +1166,8 @@ class CMPActivityEdit extends MainComponent {
         key: "contracts",
         required: true,
         disabled: !data?.changeSRContractsFlag,
-        value: data?.contractCustomerItemId || "",
-        onChange: (event) => this.setValue("userID", event.target.value),
+        value: data?.contractCustomerItemID || "",
+        onChange: (event) => this.setValue("contractCustomerItemID", event.target.value),
         style:{width:"100%"}
       },
       el("option", { key: "empty", value: 99 }, "Please select"),
@@ -1181,8 +1202,8 @@ class CMPActivityEdit extends MainComponent {
         disabled: !data.canChangePriorityFlag,
         style: { maxWidth: 200 },
         required: true,
-        value: data?.rootCauseId || "",
-        onChange: (event) => this.setValue("rootCauseId", event.target.value),
+        value: data?.rootCauseID || "",
+        onChange: (event) => this.setValue("rootCauseID", event.target.value),
         style:{width:"100%"}
       },
       el("option", { key: "empty", value: "" }, "Not known"),
@@ -1229,7 +1250,7 @@ class CMPActivityEdit extends MainComponent {
           data?.problemHideFromCustomerFlag == "Y"?el(
             "td",
             { style:{textAlign:"right"} ,colSpan:2 },
-            el("h3", {  style:{color:"red"} }, "Entire SR hidden from customer"),            
+            el("h3", {  style:{color:"red",fontSize:14} }, "Entire SR hidden from customer"),            
           ):null,
           data?.problemHideFromCustomerFlag == "N"? el(
             "td",
@@ -1313,6 +1334,7 @@ class CMPActivityEdit extends MainComponent {
                 this.setValue("curValue", event.target.value),
             })
           ),       
+          this.getElementControl("Asset","Asset",this.getAssetsElement())
          
          
         ),        
@@ -1575,11 +1597,14 @@ class CMPActivityEdit extends MainComponent {
       "div",
       { style:{display:"flex",flexDirection:"row"} },
       el('div',{className:"round-container flex-2 mr-5"},
-      
-      el(
-        "label",
-        { className: "label m-5", style: { display: "block" } },
-        "Activity Notes"
+      el('div',{className:"flex-row"},
+        el(
+          "label",
+          { className: "label m-5 mr-2", style: { display: "block" } },
+          "Activity Notes"
+        ),
+        el(ToolTip,{width:5,title:"These notes will be available for the customer to see in the portal but will not be sent in an email.",
+        content:el("i",{className:"fal fa-info-circle mt-5 pointer icon"})})
       ),
       this.state._activityLoaded
         ? el(CKEditor, {
@@ -1591,10 +1616,14 @@ class CMPActivityEdit extends MainComponent {
         : null
       ),
       el('div',{className:"round-container flex-1"},      
-      el(
-        "label",
-        { className: "label m-5", style: { display: "block" } },
-        "CNC Next Action"
+      el('div',{className:"flex-row"},
+        el(
+          "label",
+          { className: "label m-5 mr-2", style: { display: "block" } },
+          "CNC Next Action"
+        ),
+        el(ToolTip,{width:5,title:"These are internal notes only and not visible to the customer. These are per activity.",
+        content:el("i",{className:"fal fa-info-circle mt-5 pointer icon"})})
       ),
       this.state._activityLoaded
         ? el(CKEditor, {
@@ -1614,10 +1643,14 @@ class CMPActivityEdit extends MainComponent {
     return el(
       "div",
       { className: "round-container flex-column flex-1",style:{padding:5}},
-      el(
-        "label",
-        { className: "label m-5", style: { display: "block" } },
-        "Customer Notes"
+      el('div',{className:"flex-row"},
+        el(
+          "label",
+          { className: "label m-5 mr-2", style: { display: "block" } },
+          "Customer Notes"
+        ),
+        el(ToolTip,{width:5,title:"This information will be sent to the customer in an email unless the entire Service Request is hidden.",
+        content:el("i",{className:"fal fa-info-circle mt-5 pointer icon"})})
       ),
       this.state._activityLoaded
         ? el(CKEditor, {
@@ -1636,10 +1669,14 @@ class CMPActivityEdit extends MainComponent {
     return el(
       "div",
       { className: "round-container flex-column flex-1",style:{padding:5} },
-      el(
-        "label",
-        { className: "label m-5", style: { display: "block" } },
-        "Internal Notes"
+      el('div',{className:"flex-row"},
+        el(
+          "label",
+          { className: "label m-5 mr-2", style: { display: "block" } },
+          "Internal Notes"
+        ),
+        el(ToolTip,{width:5,title:"These are internal notes only and not visible to the customer. These are per Service Request.",
+        content:el("i",{className:"fal fa-info-circle mt-5 pointer icon"})})
       ),
       this.state._activityLoaded
         ? el(CKEditor, {
@@ -1765,7 +1802,43 @@ class CMPActivityEdit extends MainComponent {
     data.orignalPriority=data.priority;
     this.setState({data});
   }
-  
+  getAssetsElement=()=>{
+    const {assets}=this.state;
+    const {el}=this;
+    return   el(
+      "select",
+      {
+        onChange: (event) => this.handleAssetSelect(event.target.value),
+        style:{width:"100%"},
+        value: this.state.data.assetName||"",
+      },
+      el("option", { key: "default", value: "" }),
+      assets.map((s) =>
+        el(
+          "option",
+          { value: s.name, key: `asset${s.name}`,dangerouslySetInnerHTML:{ __html: padEnd(s.name,110,"&nbsp;") + padEnd(s.LastUsername,170,"&nbsp;") + " " + s.BiosVer} }            
+        )
+      )
+    );
+  }
+  handleAssetSelect = (value) => {
+    const { data, assets } = this.state; 
+    if(value!="")
+    {
+    const index = assets.findIndex((a) => a.name == value);
+    //  console.log(value,index,assets[index]);
+    const asset = assets[index];
+    data.assetName = value;
+    data.assetTitle =
+      asset.name + " " + asset.LastUsername + " " + asset.BiosVer;
+    }
+    else 
+    {
+      data.assetName = "";
+      data.assetTitle ="";
+    }
+    this.setState({ data });
+  };
   render() {
     const { el } = this;
     return el(

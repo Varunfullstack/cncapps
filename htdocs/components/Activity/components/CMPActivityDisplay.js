@@ -405,30 +405,74 @@ class CMPActivityDisplay extends MainComponent {
         const {data}=this.state;
         return el("div",{className:"flex-row"},
         data?.reason?el('div',{className:"round-container flex-2 mr-5"},
-        el('label',{style:{display:"block",color: "#992211",marginTop:10,marginBottom:5}},'Details'),
+
+        el('div',{className:"flex-row"},
+        el(
+          "label",
+          { className: "label  mt-5 mr-3 ml-1 mb-5", style: { display: "block" } },
+          "Activity Notes"
+        ),
+        el(ToolTip,{width:15,title:"These notes will be available for the customer to see in the portal but will not be sent in an email.",
+        content:el("i",{className:"fal fa-info-circle mt-5 pointer icon"})})
+      ),
+
         el('div',{dangerouslySetInnerHTML:{ __html: data?.reason }}),        
         ):null,
         data?.reason?el('div',{className:"round-container flex-1"},
-        el('label',{style:{display:"block",color: "#992211",marginTop:10,marginBottom:5}},'CNC Next Action'),
-        el('div',{dangerouslySetInnerHTML:{ __html: data?.cncNextAction }}),        
+        el('div',{className:"flex-row"},
+        el(
+          "label",
+          { className: "label  mt-5 mr-3 ml-1  mb-5", style: { display: "block" } },
+          "CNC Next Action"
+        ),
+        el(ToolTip,{width:15,title:"These are internal notes only and not visible to the customer. These are per activity.",
+        content:el("i",{className:"fal fa-info-circle mt-5 pointer icon"})})
+      ),        el('div',{dangerouslySetInnerHTML:{ __html: data?.cncNextAction }}),        
         ):null
         );
         
     }
     getNotesElement=()=>{
-        const {el}=this;
-        const {data}=this.state;
-        return el('div',{className:"round-container"},
-        el('label',{style:{display:"block",color: "#992211",marginTop:10,marginBottom:5}},'Internal Notes'),
-        el('div',{dangerouslySetInnerHTML:{ __html: data?.internalNotes }})
+        const { el } = this;
+        const { data } = this.state;
+        return el(
+          "div",
+          { className: "round-container" },
+          el(
+            "div",
+            { className: "flex-row" },
+            el(
+              "label",
+              { className: "label mt-5 mr-3 ml-1 mb-5", style: { display: "block" } },
+              "Internal Notes"
+            ),
+            el(ToolTip, {
+              width: 15,
+              title:
+                "These are internal notes only and not visible to the customer. These are per Service Request.",
+              content: el("i", {
+                className: "fal fa-info-circle mt-5 pointer icon",
+              }),
+            })
+          ),
+          el("div", {
+            dangerouslySetInnerHTML: { __html: data?.internalNotes },
+          })
         );
     }
     getCustomerNotesElement=()=>{
         const {el}=this;
         const {data}=this.state;
         return el('div',{className:"round-container"},
-        el('label',{style:{display:"block",color: "#992211",marginTop:10,marginBottom:5}},'Customer Notes'),
-        el('div',{dangerouslySetInnerHTML:{ __html: data?.customerNotes }})
+        el('div',{className:"flex-row"},
+        el(
+          "label",
+          { className: "label  mt-5 mr-3 ml-1 mb-5", style: { display: "block" } },
+          "Customer Notes"
+        ),
+        el(ToolTip,{width:15,title:"This information will be sent to the customer in an email unless the entire Service Request is hidden.",
+        content:el("i",{className:"fal fa-info-circle mt-5 pointer icon"})})
+      ),        el('div',{dangerouslySetInnerHTML:{ __html: data?.customerNotes }})
         );
     }
     deleteDocument=async(id)=>{
@@ -460,7 +504,7 @@ class CMPActivityDisplay extends MainComponent {
         el('td',{className:"display-label"},"Priority"),
         el('td',{className:"display-content"},data?.priority),
         el('td',{ style:{textAlign:"center"} ,colSpan:1 },data?.problemHideFromCustomerFlag == "Y"?
-            el("label", {  style:{color:"red",fontWeight:"bold",fontSize:18} }, "Entire SR hidden from customer"):null
+            el("label", {  style:{color:"red",fontWeight:"bold",fontSize:14} }, "Entire SR hidden from customer"):null
             ), 
         el('td',null),
 
@@ -488,54 +532,19 @@ class CMPActivityDisplay extends MainComponent {
         el('td',{className:"display-label"},"User"),
         el('td',{colSpan:3,className:"display-content"},data?.engineerName),
         ),
+
+        el('tr',null,
+        el('td',{colSpan:4}),
+        el('td',{className:"display-label" },"Asset"),
+        el('td',{colSpan:3},data?.assetTitle), 
+        ),
+
         data?.currentUser?el('tr',null,        
         el('td',{colSpan:8,style:{backgroundColor:data?.currentUserBgColor,textAlign:"center"}},data?.currentUser),
         ):null,         
-        // el('tr',null,        
-        // el('td',{colSpan:8, },this.getDetialsElement(data)),
-        // ),
-        // el('tr',null,        
-        // el('td',{className:"display-label",style:{textAlign:"left"}},'Internal Notes'),
-        // ),
-        // el('tr',null,        
-        // el('td',{colSpan:8,dangerouslySetInnerHTML:{ __html: data?.internalNotes }}),
-        // ),
-        )));
-        /*dangerouslySetInnerHTML:{ __html: data?.internalNotes }
-        this.getHiddenSRElement(data),
-        el('div',{className:"activity-detials-flex"},
-        // this.getElement("ID",data?.problemID+'_'+data?.callActivityID),
-        ///this.getElement(" ",data?.priority),        
-        ///this.getElement(" ",data?.problemStatusDetials+this.getAwaitingTitle(data)),
-        ///this.getElement("Type",data?.activityType),   
-        ///!data?.authorisedBy?this.getElement("",""):null,       
-        ///data?.authorisedBy?this.getElement(" ","Authorised by "+data?.authorisedBy):null,        
-        ///this.getElement("User",data?.engineerName),        
-        ///this.getElement("Contract",data?.contractType),     
-        // this.getElement("",""),    
-                
-        // this.getElement(" ",data?.serverGuardDetials),        
-        // this.getElement("",""),    
-        ///this.getElement("Date",data?.date),        
-        // this.getElement("Project",data?.projectDescription),        
-        // this.getElement("",""),    
-        ///this.getElement("Start Time",data?.startTime),        
-        // this.getElement("",""),
-        // this.getElement("",""),
-        ///this.getElement("End Time",data?.endTime), 
-        ///this.getElement("Top-Up Value",data?.curValue),       
-        ///this.getElement("Root Cause",data?.rootCauseDescription),      
-        // this.getElement("",""),  
-        ///this.getElement("Complete Date",data?.completeDate),    
-        // this.getElement("",data?.currentUser,data?.currentUserBgColor), 
-        ///el('div',{style:{width:"100%",backgroundColor:data?.currentUserBgColor,display:"flex",justifyContent:"center"}},data?.currentUser),
-        this.getElement("",""),  
-        this.getElement("",""),    
         
-        ),
-        this.getDetialsElement(data),
-        this.getNotesElement(data),
-        )*/
+        )));
+         
     }
     getAwaitingTitle=(data)=>{
         if(data?.problemStatus!="F"&&data?.problemStatus!="C")
