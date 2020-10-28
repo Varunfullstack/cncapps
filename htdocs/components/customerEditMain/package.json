@@ -6,21 +6,9 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "buildCustomerEditComponent": "parcel build src/CustomerEditComponent.js --public-url /components/customerEditMain/dist",
-        "buildCustomerEditMainComponent": "parcel build src/CustomerEditMain.js --public-url /components/customerEditMain/dist",
-        "buildCustomerNotesComponent": "parcel build src/CustomerNotesComponent.js --public-url /components/customerEditMain/dist",
-        "buildCustomerReviewComponent": "parcel build src/CustomerReviewComponent.js --public-url /components/customerEditMain/dist",
-        "buildCustomerProjectsComponent": "parcel build src/CustomerProjectsComponent.js --public-url /components/customerEditMain/dist",
-        "buildPortalCustomerDocumentsComponent": "parcel build src/PortalCustomerDocumentsComponent.js --public-url /components/customerEditMain/dist",
-        "buildCustomerSites": "parcel build src/customerSites/CustomerSitesComponent.js --public-url /components/customerEditMain/dist",
         "startCustomerEditComponent": "parcel src/CustomerEditComponent.js --public-url /components/customerEditMain/dist",
-        "startCustomerEditMainComponent": "parcel src/CustomerEditMain.js --public-url /components/customerEditMain/dist",
-        "startCustomerNotesComponent": "parcel src/CustomerReviewComponent.js --public-url /components/customerEditMain/dist",
-        "startCustomerReviewComponent": "parcel src/CustomerNotesComponent.js --public-url /components/customerEditMain/dist",
-        "startCustomerProjectsComponent": "parcel src/CustomerProjectsComponent.js --public-url /components/customerEditMain/dist",
-        "startPortalCustomerDocumentsComponent": "parcel src/PortalCustomerDocumentsComponent.js --public-url /components/customerEditMain/dist",
-        "startCustomerSites": "parcel src/customerSites/CustomerSitesComponent.js --public-url /components/customerEditMain/dist",
-        "start": "npm run startCustomerEditMainComponent && npm run startCustomerEditComponent && npm run startCustomerReviewComponent && npm run startCustomerNotesComponent && npm run startCustomerProjectsComponent && npm run startPortalCustomerDocumentsComponent && npm run startCustomerSites",
-        "build": "npm run buildCustomerEditMainComponent && npm run buildCustomerEditComponent && npm run buildCustomerReviewComponent && npm run buildCustomerNotesComponent && npm run buildCustomerProjectsComponent && npm run buildPortalCustomerDocumentsComponent && npm run buildCustomerSites"
+        "start": "npm run startCustomerEditComponent",
+        "build": "npm run buildCustomerEditComponent"
     },
     "author": "",
     "license": "ISC",
