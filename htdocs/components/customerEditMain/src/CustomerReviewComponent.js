@@ -3,7 +3,7 @@ import Skeleton from "react-loading-skeleton";
 import ReactDOM from 'react-dom';
 import Select from "./Select";
 
-class CustomerReviewComponent extends React.Component {
+class CustomerReviewComponent extends React.PureComponent {
     el = React.createElement;
 
     constructor(props) {

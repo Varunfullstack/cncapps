@@ -79,15 +79,15 @@ class CTCustomerNote extends CTCNC
 
     function updateNote()
     {
-
-        $data = json_decode(file_get_contents('php://input'), true);
+        $data = $this->getJSONData();
 
         $buCustomerNote = new BUCustomerNote($this);
 
         $customerNoteArray = $buCustomerNote->updateNote(
-            $data['customerId'],
-            $data['id'],
-            $data['note'],
+            @$data['note'],
+            @$data['id'],
+            @$data['customerId'],
+            @$data['lastUpdatedDateTime']
         );
 
         if (!$customerNoteArray) {
@@ -126,10 +126,9 @@ class CTCustomerNote extends CTCNC
             $buCustomerNote = new BUCustomerNote($this);
 
             $buCustomerNote->updateNote(
-                $this->getParam('customerID'),
-                $this->getParam('customerNoteID'),
                 $this->getParam('details'),
-                $this->getParam('ordheadID')
+                $this->getParam('customerNoteID'),
+                $this->getParam('customerID')
             );
 
             echo '<script language="javascript">window.close()</script>;';

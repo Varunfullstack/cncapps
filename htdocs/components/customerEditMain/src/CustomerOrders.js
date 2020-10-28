@@ -1,9 +1,10 @@
 "use strict";
 import React from 'react';
-import {getOrders} from "./actions";
-import {connect} from "react-redux";
 
-class CustomerOrders extends React.Component {
+import {connect} from "react-redux";
+import {getOrders} from "./selectors";
+
+class CustomerOrders extends React.PureComponent {
     el = React.createElement;
 
 

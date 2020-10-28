@@ -6,6 +6,8 @@ import {
     CHANGE_INVOICE_SITE_NO,
     CLEAR_EDIT_NOTE,
     CLEAR_EDIT_SITE,
+    DELETE_NOTE_REQUEST,
+    DELETE_NOTE_SUCCESS,
     DELETE_PORTAL_CUSTOMER_DOCUMENT_FAILURE,
     DELETE_PORTAL_CUSTOMER_DOCUMENT_REQUEST,
     DELETE_PORTAL_CUSTOMER_DOCUMENT_SUCCESS,
@@ -43,6 +45,11 @@ import {
     FETCH_SITES_FAILURE,
     FETCH_SITES_REQUEST,
     FETCH_SITES_SUCCESS,
+    GO_TO_FIRST_NOTE,
+    GO_TO_LAST_NOTE,
+    GO_TO_NEXT_NOTE,
+    GO_TO_PREVIOUS_NOTE,
+    HIDE_NEW_NOTE_MODAL,
     HIDE_NEW_PORTAL_CUSTOMER_DOCUMENT_MODAL,
     HIDE_NEW_PROJECT_MODAL,
     HIDE_NEW_SITE_MODAL,
@@ -77,13 +84,15 @@ import {
     SAVE_SITE_SUCCESS,
     SET_EDIT_NOTE,
     SET_EDIT_SITE,
+    SHOW_NEW_NOTE_MODAL,
     SHOW_NEW_PORTAL_CUSTOMER_DOCUMENT_MODAL,
     SHOW_NEW_PROJECT_MODAL,
     SHOW_NEW_SITE_MODAL,
     TOGGLE_VISIBILITY,
     UPDATE_CUSTOMER_VALUE,
     UPDATE_EDITING_NOTE_VALUE,
-    UPDATE_EDITING_SITE_VALUE
+    UPDATE_EDITING_SITE_VALUE,
+    UPDATE_NEW_NOTE_VALUE
 } from "./actionTypes";
 import {updateCustomer, updateNote, updateSite} from "./helpers";
 import {OutOfDateError} from "./helpers/OutOfDateError";
@@ -529,7 +538,7 @@ export function fetchProjects(customerId) {
     }
 }
 
-const debounceTime = 350;
+const debounceTime = 500;
 
 
 const debouncedUpdateCustomer = debounce((dispatch, field, value, getState) => {
@@ -666,24 +675,24 @@ function requestUpdateNoteAction(customerId, noteNo, field, value) {
     return {type: REQUEST_UPDATE_NOTE, customerId, noteNo, field, value};
 }
 
-function requestUpdateNoteSuccessAction(newLastUpdatedDateTime) {
-    return {type: REQUEST_UPDATE_NOTE_SUCCESS, newLastUpdatedDateTime};
+function requestUpdateNoteSuccessAction(modifiedNote) {
+    return {type: REQUEST_UPDATE_NOTE_SUCCESS, modifiedNote};
 }
 
 function requestUpdateNoteFailed() {
     return {type: REQUEST_UPDATE_NOTE_FAILED}
 }
 
-const debounceUpdateNote = debounce((dispatch, field, value, state) => {
+const debounceUpdateNote = debounce((dispatch, value, state) => {
     const currentEditingNote = getEditingNote(state);
-    const customerId = currentEditingNote.customerID;
-    const noteNo = currentEditingNote.id;
-    const lastUpdatedDateTime = currentEditingNote.lastUpdatedDateTime;
-    dispatch(requestUpdateNoteAction(customerId, noteNo, field, value));
-    updateNote(customerId, noteNo, {[field]: value}, lastUpdatedDateTime)
-        .then(newLastUpdated => {
+    const customerId = currentEditingNote.customerId;
+    const noteId = currentEditingNote.id;
+    const lastUpdatedDateTime = currentEditingNote.modifiedAt;
+    dispatch(requestUpdateNoteAction(customerId, noteId, 'note', value));
+    updateNote(noteId, value, lastUpdatedDateTime)
+        .then(updatedNote => {
             // we have to apply the change to the original customer
-            dispatch(requestUpdateNoteSuccessAction(newLastUpdated))
+            dispatch(requestUpdateNoteSuccessAction(updatedNote))
         })
         .catch((error) => {
             if (error instanceof OutOfDateError) {
@@ -699,15 +708,8 @@ const debounceUpdateNote = debounce((dispatch, field, value, state) => {
         })
 }, debounceTime);
 
-const updateEditingNoteValueAction = (field, value) => {
-    return {type: UPDATE_EDITING_NOTE_VALUE, field, value}
-}
-
-export function updateNoteField(field, value) {
-    return (dispatch, getState) => {
-        dispatch(updateEditingNoteValueAction(field, value));
-        debounceUpdateNote(dispatch, field, value, getState());
-    }
+const updateEditingNoteValueAction = (value) => {
+    return {type: UPDATE_EDITING_NOTE_VALUE, value}
 }
 
 export function updateInvoiceSiteNo(value) {
@@ -965,9 +967,9 @@ function createAddNoteRequestFailureAction() {
 }
 
 export function addNewNote(customerId, note) {
-    return (dispatch) => {
+    return (dispatch, getState) => {
         dispatch(createAddNoteRequestAction(customerId, note));
-        return fetch('?action=addNote',
+        return fetch('CustomerNote.php?action=updateNote',
             {
                 method: 'POST',
                 body: JSON.stringify(
@@ -1008,4 +1010,48 @@ export function goToNextNote() {
 
 export function goToLastNote() {
     return {type: GO_TO_LAST_NOTE};
+}
+
+
+export function showNewNoteModal() {
+    return {type: SHOW_NEW_NOTE_MODAL}
+}
+
+export function hideNewNoteModal() {
+    return {type: HIDE_NEW_NOTE_MODAL}
+}
+
+export function newNoteUpdate(value) {
+    return {type: UPDATE_NEW_NOTE_VALUE, value}
+}
+
+export function updateEditingNote(value) {
+    return (dispatch, getState) => {
+        dispatch(updateEditingNoteValueAction(value));
+        debounceUpdateNote(dispatch, value, getState());
+    }
+}
+
+function deleteNoteRequest(noteId) {
+    return {type: DELETE_NOTE_REQUEST, noteId}
+}
+
+function deleteNoteSuccess(id) {
+    return {type: DELETE_NOTE_SUCCESS, id}
+}
+
+export function deleteNote() {
+    return (dispatch, getState) => {
+        const editingNote = getEditingNote(getState());
+        dispatch(deleteNoteRequest(editingNote.id))
+        return fetch(`CustomerNote.php?action=deleteNote&noteId=${editingNote.id}`,
+            {method: 'GET',})
+            .then(res => res.json())
+            .then(res => {
+                if (res.status !== 'ok') {
+                    throw new Error(res.message);
+                }
+                dispatch(deleteNoteSuccess(editingNote.id));
+            })
+    }
 }

@@ -15,7 +15,7 @@ import {
 } from "./selectors";
 import AddPortalCustomerDocumentComponent from "./modals/AddPortalCustomerDocumentComponent";
 
-class PortalCustomerDocumentsComponent extends React.Component {
+class PortalCustomerDocumentsComponent extends React.PureComponent {
     el = React.createElement;
 
     constructor(props) {

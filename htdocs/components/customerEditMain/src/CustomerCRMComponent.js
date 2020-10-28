@@ -1,18 +1,34 @@
 import React, {Fragment} from "react";
-import {getCustomer, getCustomerNotes, getEditingSite, getLeadStatuses, getReviewEngineers} from "./selectors";
 import {
+    getCustomer,
+    getCustomerNotes,
+    getEditingNote,
+    getEditingSite,
+    getLeadStatuses,
+    getNewNote,
+    getNewNoteModalShow,
+    getReviewEngineers
+} from "./selectors";
+import {
+    addNewNote,
+    deleteNote,
     goToFirstNote,
     goToLastNote,
     goToNextNote,
     goToPreviousNote,
+    hideNewNoteModal,
+    newNoteUpdate,
+    showNewNoteModal,
     updateCustomerField,
+    updateEditingNote,
     updateSiteField
 } from "./actions";
 import {connect} from "react-redux";
 import CKEditor from "ckeditor4-react";
 import Select from "./Select";
+import AddCustomerNoteComponent from "./modals/AddCustomerNoteComponent";
 
-class CustomerCRMComponent extends React.Component {
+class CustomerCRMComponent extends React.PureComponent {
 
     constructor(props, context) {
         super(props, context);
@@ -25,12 +41,21 @@ class CustomerCRMComponent extends React.Component {
             leadStatuses,
             reviewEngineers,
             customerNotes,
+            newNote,
+            newNoteModalShow,
+            editingNote,
             onUpdateSiteField,
             onUpdateCustomerField,
             onGoToFirstNote,
             onGoToPreviousNote,
             onGoToNextNote,
-            onGoToLastNote
+            onGoToLastNote,
+            onNewNoteUpdate,
+            onNewNoteModalClose,
+            onNewNoteAdd,
+            onNewNoteModalShow,
+            onEditingNoteUpdate,
+            onDeleteEditingNote,
         } = this.props;
 
         CKEditor.editorUrl = '/ckeditor/ckeditor.js'
@@ -60,6 +85,12 @@ class CustomerCRMComponent extends React.Component {
 
         return (
             <Fragment>
+                <AddCustomerNoteComponent note={newNote}
+                                          show={newNoteModalShow}
+                                          onNoteUpdate={onNewNoteUpdate}
+                                          onClose={onNewNoteModalClose}
+                                          onAdd={() => onNewNoteAdd(customer.customerID, newNote)}
+                />
                 <div className="mt-3">
                     <div className="row mb-3">
                         <div className="col-md-12">
@@ -747,6 +778,9 @@ class CustomerCRMComponent extends React.Component {
                                             type="date"
                                             name="reviewDate"
                                             value={customer.reviewDate}
+                                            onChange={$event => {
+                                                onUpdateCustomerField('reviewDate', $event.target.value)
+                                            }}
                                             className="form-control input-sm"
                                         />
                                         Time:
@@ -754,6 +788,9 @@ class CustomerCRMComponent extends React.Component {
                                             type="time"
                                             name="reviewTime"
                                             value={customer.reviewTime}
+                                            onChange={$event => {
+                                                onUpdateCustomerField('reviewTime', $event.target.value)
+                                            }}
                                             className="form-control input-sm"
                                         />
                                     </div>
@@ -765,7 +802,7 @@ class CustomerCRMComponent extends React.Component {
                                         <Select
                                             name="reviewUserID"
                                             onChange={$event => {
-                                                updateCustomerField('reviewUserID', $event);
+                                                onUpdateCustomerField('reviewUserID', $event);
                                             }}
                                             className="form-control input-sm"
                                             options={reviewEngineers}
@@ -873,7 +910,11 @@ class CustomerCRMComponent extends React.Component {
                                     <button
                                         type="button"
                                         name="Delete"
-                                        onClick="deleteNote()"
+                                        onClick={() => {
+                                            if (confirm('Are you sure you want to delete this note?')) {
+                                                onDeleteEditingNote()
+                                            }
+                                        }}
                                         className="btn secondary"
                                     >
                                         <i className="fal fa-trash-alt fa-lg"
@@ -884,7 +925,7 @@ class CustomerCRMComponent extends React.Component {
                                     <button
                                         type="button"
                                         name="New"
-                                        onClick="newNote()"
+                                        onClick={() => onNewNoteModalShow()}
                                         className="btn secondary"
                                     >
                                         <i className="fal fa-plus fa-lg"
@@ -892,19 +933,6 @@ class CustomerCRMComponent extends React.Component {
                                         >
                                         </i>
                                     </button>
-                                    <button
-                                        type="button"
-                                        name="Save"
-                                        onClick="saveNote()"
-                                        className="btn secondary"
-                                    >
-                                        <i className="fal fa-floppy-o fa-lg"
-                                           aria-hidden="true"
-                                        >
-                                        </i>
-
-                                    </button>
-
                                 </div>
                             </div>
 
@@ -912,18 +940,17 @@ class CustomerCRMComponent extends React.Component {
                         <div className="col-md-6">
                             <div className="form-group customerNoteDetails">
                                 <textarea
-
                                     name="customerNoteDetails"
-                                    id="customerNoteDetails"
                                     cols="120"
-                                    onChange="setCustomerNotesChanged()"
+                                    onChange={($event) => onEditingNoteUpdate($event.target.value)}
                                     rows="12"
+                                    value={editingNote?.note || ''}
                                     className="form-control input-sm"
                                 >
                                 </textarea>
                             </div>
                             <div>
-                                {customer.lastContractSent}
+                                Last Contract Sent: {customer.lastContractSent}
                             </div>
                         </div>
                     </div>
@@ -935,13 +962,16 @@ class CustomerCRMComponent extends React.Component {
 }
 
 
-function mapStateToProps(state, props) {
+function mapStateToProps(state) {
     return {
         site: getEditingSite(state),
         customer: getCustomer(state),
         leadStatuses: getLeadStatuses(state),
         reviewEngineers: getReviewEngineers(state),
         customerNotes: getCustomerNotes(state),
+        editingNote: getEditingNote(state),
+        newNote: getNewNote(state),
+        newNoteModalShow: getNewNoteModalShow(state)
     }
 }
 
@@ -966,6 +996,24 @@ function mapDispatchToProps(dispatch) {
         onGoToLastNote: () => {
             dispatch(goToLastNote())
         },
+        onNewNoteUpdate: (value) => {
+            dispatch(newNoteUpdate(value))
+        },
+        onNewNoteModalShow: () => {
+            dispatch(showNewNoteModal())
+        },
+        onNewNoteModalClose: () => {
+            dispatch(hideNewNoteModal())
+        },
+        onNewNoteAdd: (customerId, note) => {
+            dispatch(addNewNote(customerId, note))
+        },
+        onEditingNoteUpdate: (note) => {
+            dispatch(updateEditingNote(note));
+        },
+        onDeleteEditingNote: () => {
+            dispatch(deleteNote())
+        }
     }
 }
 

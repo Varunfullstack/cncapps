@@ -14,7 +14,8 @@ import {
     REQUEST_UPDATE_NOTE_SUCCESS,
     SET_EDIT_NOTE,
     SHOW_NEW_NOTE_MODAL,
-    UPDATE_EDITING_NOTE_VALUE
+    UPDATE_EDITING_NOTE_VALUE,
+    UPDATE_NEW_NOTE_VALUE
 } from "../actionTypes";
 
 const initialState = {
@@ -43,25 +44,41 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 ...mappedNotes,
+                editingNote: action.customerNotes.length ? action.customerNotes[0] : null,
                 isFetching: false
             }
         }
         case DELETE_NOTE_SUCCESS: {
+            const newAllIds = [...state.allIds.filter(id => id !== action.id)];
+            const newByIds = {
+                ...Object
+                    .keys(state.byIds)
+                    .reduce((acc, key) => {
+                            if (+key !== action.id) {
+                                acc[key] = state.byIds[key];
+                            }
+                            return acc;
+                        },
+                        {}
+                    )
+            };
+            let nextIndex = state.currentNoteIdx;
+            let newEditingNote = null;
+            if (nextIndex > newAllIds.length - 1) {
+                nextIndex--;
+            }
+            if (nextIndex < 0) {
+                nextIndex = 0;
+            } else {
+                newEditingNote = newByIds[newAllIds[nextIndex]];
+            }
+            console.log(action.id, state.byIds, newByIds);
             return {
                 ...state,
-                allIds: [...state.allIds.filter(x => x.id !== action.id)],
-                byIds: {
-                    ...Object
-                        .keys(state.byIds)
-                        .reduce((acc, key) => {
-                                if (key !== action.id) {
-                                    acc[key] = state.byIds[key];
-                                }
-                                return acc;
-                            },
-                            {}
-                        )
-                }
+                allIds: newAllIds,
+                byIds: newByIds,
+                editingNote: {...newEditingNote},
+                currentNoteIdx: nextIndex
             }
         }
         case REQUEST_ADD_NOTE_SUCCESS: {
@@ -72,14 +89,16 @@ export default function (state = initialState, action) {
                     [action.newNote.id]: action.newNote,
                 },
                 newNoteModalShow: false,
-                allIds: [...state.allIds, action.newNote.id],
-                newNote: ''
+                allIds: [action.newNote.id, ...state.allIds],
+                newNote: '',
+                editingNote: {...action.newNote},
+                currentNoteIdx: 0
             }
         }
         case UPDATE_EDITING_NOTE_VALUE: {
             return {
                 ...state,
-                editingNote: {...state.editingNote, [action.field]: action.value}
+                editingNote: {...state.editingNote, note: action.value}
             }
         }
         case REQUEST_UPDATE_NOTE_FAILED:
@@ -90,7 +109,7 @@ export default function (state = initialState, action) {
             }
         }
         case REQUEST_UPDATE_NOTE_SUCCESS: {
-            const updateNote = {...state.editingNote, lastUpdatedDateTime: action.newLastUpdatedDateTime};
+            const updateNote = {...action.modifiedNote};
             return {
                 ...state,
                 editingNote: updateNote,
@@ -121,6 +140,12 @@ export default function (state = initialState, action) {
                 ...state,
                 newNoteModalShow: false,
                 newNote: ''
+            }
+        }
+        case UPDATE_NEW_NOTE_VALUE: {
+            return {
+                ...state,
+                newNote: action.value
             }
         }
         case GO_TO_FIRST_NOTE: {

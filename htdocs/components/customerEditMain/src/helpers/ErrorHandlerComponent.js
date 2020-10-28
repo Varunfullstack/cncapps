@@ -3,7 +3,7 @@ import {Alert} from "react-bootstrap";
 import {dismissError} from "../actions";
 import React from "react";
 
-class ErrorHandler extends React.Component {
+class ErrorHandler extends React.PureComponent {
 
     render() {
         const {errors, onDismissError} = this.props;

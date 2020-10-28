@@ -1,3 +1,4 @@
+import './wdyr';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Provider} from "react-redux";
@@ -14,7 +15,7 @@ import CustomerCRMComponent from "./CustomerCRMComponent";
 
 const store = configureStore();
 
-class CustomerEditComponent extends React.Component {
+class CustomerEditComponent extends React.PureComponent {
 
     constructor(props) {
         super(props);
