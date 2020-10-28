@@ -24,26 +24,40 @@ class BUCustomerNote extends Business
     }
 
     function updateNote(
-        $customerID,
-        $customerNoteID,
-        $details
+        $details,
+        $customerNoteID = null,
+        $customerID = null,
+        $lastUpdatedDateTimeString = null
     )
     {
         $this->setMethodName('updateNote');
 
         $dbeCustomerNote = new DBECustomerNote($this);
-        if ($customerNoteID != -1) {
+        $isNewNote = !$customerNoteID || $customerNoteID == -1;
+        $nowDateTimeString = (new DateTime())->format(DATE_MYSQL_DATETIME);
+        if (!$isNewNote) {
             $dbeCustomerNote->getRow($customerNoteID);
+            // if it's an update we have to check the last updated date time and if it's lower throw an error
+            if (!$lastUpdatedDateTimeString || $dbeCustomerNote->getValue(
+                    DBECustomerNote::modifiedAt
+                ) > $lastUpdatedDateTimeString) {
+                throw new \CNCLTD\Exceptions\JsonHttpException(
+                    400, "The note has been modified by someone else", [
+                           "errorCode"           => 1002,
+                           "lastUpdatedDateTime" => $dbeCustomerNote->getValue(DBECustomerNote::modifiedAt)
+                       ]
+                );
+            }
         } else {
             $dbeCustomerNote->setValue(DBECustomerNote::customerID, $customerID);
             $dbeCustomerNote->setValue(DBECustomerNote::createdUserID, $GLOBALS['auth']->is_authenticated());
-            $dbeCustomerNote->setValue(DBECustomerNote::created, (new DateTime())->format(DATE_MYSQL_DATETIME));
+            $dbeCustomerNote->setValue(DBECustomerNote::created, $nowDateTimeString);
         }
         $dbeCustomerNote->setValue(DBECustomerNote::details, $details);
         $dbeCustomerNote->setValue(DBECustomerNote::modifiedUserID, $GLOBALS['auth']->is_authenticated());
-        $dbeCustomerNote->setValue(DBECustomerNote::modifiedAt, (new DateTime())->format(DATE_MYSQL_DATETIME));
+        $dbeCustomerNote->setValue(DBECustomerNote::modifiedAt, $nowDateTimeString);
 
-        if ($customerNoteID != -1) {
+        if (!$isNewNote) {
             $dbeCustomerNote->updateRow();
         } else {
             $dbeCustomerNote->insertRow();

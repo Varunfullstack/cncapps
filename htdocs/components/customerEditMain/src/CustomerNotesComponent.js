@@ -1,7 +1,7 @@
 import React, {Fragment} from 'react';
 import Skeleton from "react-loading-skeleton";
 
-class CustomerNotesComponent extends React.Component {
+class CustomerNotesComponent extends React.PureComponent {
     el = React.createElement;
 
     constructor(props) {

@@ -5,8 +5,9 @@ import {connect} from "react-redux";
 import {entityMapToArray} from "../../utils/utils";
 import {addNewProject, deleteProject, hideNewProjectModal, newProjectFieldUpdate, showNewProjectModal} from "./actions";
 import AddProjectModalComponent from "./modals/AddProjectModalComponent";
+import {getProjects} from "./selectors";
 
-class CustomerProjectsComponent extends React.Component {
+class CustomerProjectsComponent extends React.PureComponent {
     el = React.createElement;
 
     constructor(props) {
@@ -213,7 +214,7 @@ class CustomerProjectsComponent extends React.Component {
 function mapStateToProps(state) {
     const {projects} = state;
     return {
-        projects: entityMapToArray(projects.allIds, projects.byIds),
+        projects: getProjects(state),
         isFetching: projects.isFetching,
         newProject: projects.newProject,
         newProjectModalShown: projects.newProjectModalShown

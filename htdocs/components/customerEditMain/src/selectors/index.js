@@ -179,3 +179,34 @@ const mappedOrders = createSelector(
     }
 )
 export const getOrders = mappedOrders;
+
+const getProjectsState = (state) => state.projects;
+
+const getProjectsStateByIds = createSelector(
+    [getProjectsState],
+    projectState => projectState.byIds
+)
+
+const getProjectsStateAllIds = createSelector(
+    [getProjectsState],
+    projectState => projectState.allIds
+)
+
+const mappedProjects = createSelector(
+    [getProjectsStateByIds, getProjectsStateAllIds],
+    (byIds, allIds) => {
+        return allIds.map(x => byIds[x]);
+    }
+)
+
+export const getProjects = mappedProjects;
+
+
+export const getNewNote = createSelector(
+    [getCustomerNotesState],
+    s => s.newNote
+)
+export const getNewNoteModalShow = createSelector(
+    [getCustomerNotesState],
+    s => s.newNoteModalShow
+)

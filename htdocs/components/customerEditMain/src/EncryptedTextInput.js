@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactInputMask from 'react-input-mask';
 
-class EncryptedTextInput extends React.Component {
+class EncryptedTextInput extends React.PureComponent {
     el = React.createElement;
 
     constructor(props) {

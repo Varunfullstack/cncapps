@@ -14,6 +14,18 @@ class Select extends React.Component {
         this.handleChange = this.handleChange.bind(this);
     }
 
+    shouldComponentUpdate(nextProps, nextState, nextContext) {
+        if (JSON.stringify(this.props.options) !== JSON.stringify(nextProps.options)) {
+            return true;
+        }
+
+        if (JSON.stringify(this.props.selectedOption !== JSON.stringify(nextProps.selectedOption))) {
+            return true;
+        }
+
+        return false;
+    }
+
     handleChange(e) {
         this.setState({selectedOption: e.target.value});
         if (this.props.onChange) {
@@ -30,12 +42,14 @@ class Select extends React.Component {
     render() {
         const {className} = this.props;
 
-        return (<select className={className}
-                        value={this.state.selectedOption}
-                        onChange={this.handleChange}
-        >
-            {this.getOptions(this.state.options)}
-        </select>)
+        return (
+            <select className={className}
+                    value={this.state.selectedOption}
+                    onChange={this.handleChange}
+            >
+                {this.getOptions(this.state.options)}
+            </select>
+        )
     }
 
     getOptions(options) {

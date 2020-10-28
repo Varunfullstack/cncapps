@@ -5,7 +5,7 @@ import {addContactToSite, deleteSite, saveSite, updateSiteField} from "../action
 import {AccordionCollapse, Card} from "react-bootstrap";
 import SiteAccordionCustomToggle from "./SiteAccordionCustomToggle";
 
-class Site extends React.Component {
+class Site extends React.PureComponent {
 
     constructor(props) {
         super(props);
