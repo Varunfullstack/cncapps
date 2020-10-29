@@ -382,6 +382,7 @@ class CTActivity extends CTCNC
 
             case 'requestAdditionalTime':
                 $this->requestAdditionalTime();
+                echo json_encode(["status" => "ok"]);
                 break;
 
             case CTACTIVITY_ACT_CHANGE_REQUEST_REVIEW:

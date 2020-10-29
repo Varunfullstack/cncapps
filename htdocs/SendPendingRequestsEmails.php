@@ -7,6 +7,8 @@
  */
 
 
+use CNCLTD\PendingTimeRequestsWithoutServiceRequestCollection;
+
 require_once("config.inc.php");
 global $cfg;
 require_once($cfg['path_dbe'] . '/DBECallActivity.inc.php');
@@ -130,12 +132,22 @@ function processTimeRequestsEmails()
     $buHeader = new BUHeader($thing);
     $dsHeader = new DataSet($thing);
     $buHeader->getHeader($dsHeader);
+    $activitiesWithoutProblemIdPerTeamLeaderMap = new PendingTimeRequestsWithoutServiceRequestCollection();
     while ($dbejCallActivity->fetchNext()) {
+
         $problemID = $dbejCallActivity->getValue(DBEJCallActivity::problemID);
         $requestingUserID = $dbejCallActivity->getValue(DBEJCallActivity::userID);
         $requestingUser = new DBEUser($thing);
         $requestingUser->getRow($requestingUserID);
         $teamID = $requestingUser->getValue(DBEUser::teamID);
+        if (!$problemID) {
+            $dbeTeam = new DBETeam($thing);
+            $dbeTeam->getRow($teamID);
+            $leaderId = $dbeTeam->getValue(DBETeam::leaderId);
+            $leaderUser = new DBEUser($thing);
+            $leaderUser->getRow($leaderId);
+            $activitiesWithoutProblemIdPerTeamLeaderMap->add($leaderUser, $dbejCallActivity, $requestingUser);
+        }
         $dbeProblem = new DBEJProblem($thing);
         $dbeProblem->getRow($problemID);
         $isOverLimit = false;
@@ -222,6 +234,53 @@ function processTimeRequestsEmails()
         'projectstimerequest@cnc-ltd.co.uk',
         $pendingProjectRequests
     );
+    sendNoSRIDInTimeRequestEmails($activitiesWithoutProblemIdPerTeamLeaderMap);
+
+}
+
+function sendNoSRIDInTimeRequestEmails(PendingTimeRequestsWithoutServiceRequestCollection $activitiesWithoutProblemIdPerTeamLeaderMap
+)
+{
+    $thing = null;
+    $buMail = new BUMail($thing);
+
+    $senderEmail = CONFIG_SUPPORT_EMAIL;
+    global $twig;
+
+    foreach ($activitiesWithoutProblemIdPerTeamLeaderMap as $activitiesLeaderMap) {
+        $body = $twig->render('@internal/pendingTimeRequestsWithoutProblemID.twig', ["items" => $activitiesLeaderMap]);
+
+        $toEmail = $activitiesLeaderMap->getLeaderEmail();
+
+        $hdrs = array(
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => "Pending Time Requests Without Service Request Assigned",
+            'Date'         => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
+        );
+
+        $buMail->mime->setHTMLBody($body);
+
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
+        );
+
+        $body = $buMail->mime->get($mime_params);
+
+        $hdrs = $buMail->mime->headers($hdrs);
+
+
+        $buMail->putInQueue(
+            $senderEmail,
+            $toEmail,
+            $hdrs,
+            $body
+        );
+    }
 }
 
 function sendTimeRequestsEmail($teamEmail,
