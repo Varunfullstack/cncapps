@@ -428,6 +428,14 @@ foreach ($allSubscriptions as $item) {
     }
 }
 
+
+foreach ($cncItems as $key => $cncItem) {
+    // check if this item is in the subscriptions array
+    if (!isSubscriptionOrAddon($cncItem, $allSubscriptions, $orderDetails)) {
+        sendMissingStreamOneLicenseForContractEmail($cncItem);
+    }
+}
+
 if (!empty($missingLicensesErrors)) {
     $buMail = new BUMail($thing);
     $senderEmail = CONFIG_SUPPORT_EMAIL;
@@ -528,6 +536,11 @@ function syncAddons($orderDetails, $cncItems, $forcedMode, LoggerCLI $logger)
     }
 }
 
+function isSubscriptionOrAddon($cncItem, $allSubscriptions, $orderDetails)
+{
+    return true;
+}
+
 /**
  * @param $email
  * @return array|mixed|null
@@ -563,6 +576,38 @@ function getItemId($cncItems, $sku)
             return $item['itm_itemno'];
     }
     return null;
+}
+
+function sendMissingStreamOneLicenseForContractEmail($contract)
+{
+
+    $buMail = new BUMail($thing);
+    $toEmail = "sales@cnc-ltd.co.uk";
+    $buMail->mime->setHTMLBody("Missing Stream One License for contract ");
+
+    $mime_params = array(
+        'text_encoding' => '7bit',
+        'text_charset'  => 'UTF-8',
+        'html_charset'  => 'UTF-8',
+        'head_charset'  => 'UTF-8'
+    );
+    $body = $buMail->mime->get($mime_params);
+
+    $hdrs = array(
+        'From'         => CONFIG_SALES_MANAGER_EMAIL,
+        'Subject'      => "Missing Stream One License for contract",
+        'Content-Type' => 'text/html; charset=UTF-8',
+        'To'           => $toEmail
+    );
+
+    $hdrs = $buMail->mime->headers($hdrs);
+
+    return $buMail->send(
+        $toEmail,
+        $hdrs,
+        $body
+    );
+
 }
 
 // *************************** get all subscriptions addons and update customer items
