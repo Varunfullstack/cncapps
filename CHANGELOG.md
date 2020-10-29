@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [v4.10.1] - 2020-10-29
+### Fixed
+- Fixed issue with Time Request Dashboard breaking when there's a time request activity without SR assigned, also added means of 
+informing about this odd issue.
+
 ## [v4.10.0] - 2020-10-26
 ### Added
 - Include non exported expenses in expensesBreakdownYearToDate

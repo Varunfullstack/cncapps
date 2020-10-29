@@ -1,0 +1,41 @@
+{% extends "@internal/wrapper.html.twig" %}
+{# @var items \CNCLTD\TeamLeaderWithPendingTimeRequestsWithoutServiceRequest #}
+{% block styles %}
+
+    .content table td, .content table th {
+    padding: 0 15px 0 15px;
+    }
+{% endblock %}
+{% block content %}
+    <p>The following time requests have been submitted but are not linked to a Service Request so they will not appear
+        in the dashboard.</p>
+    <p>Please review these with CNC Management to get these addressed.</p>
+    <table>
+        <thead>
+        <tr>
+            <th>
+                Activity Id
+            </th>
+            <th>
+                Requested Date&Time
+            </th>
+            <th>
+                Description
+            </th>
+            <th>
+                Requested by
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in items %}
+            <tr>
+                <td>{{ item.activityId }}</td>
+                <td>{{ item.submittedDateTime }}</td>
+                <td>{{ item.reason }}</td>
+                <td>{{ item.requestingUserName }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

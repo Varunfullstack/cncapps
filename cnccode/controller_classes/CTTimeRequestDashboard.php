@@ -111,11 +111,11 @@ class CTTimeRequestDashboard extends CTCNC
   END AS teamManagementApprovalMinutes
 FROM
   callactivity
-  LEFT JOIN problem
+  JOIN problem
     ON problem.`pro_problemno` = callactivity.`caa_problemno`
-  LEFT JOIN customer
+  JOIN customer
     ON problem.`pro_custno` = customer.`cus_custno`
-  LEFT JOIN consultant requester
+  JOIN consultant requester
     ON requester.`cns_consno` = callactivity.`caa_consno`
   LEFT JOIN headert ON 1
 WHERE callactivity.caa_status = 'O'
