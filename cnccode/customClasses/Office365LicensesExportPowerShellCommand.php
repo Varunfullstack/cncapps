@@ -181,17 +181,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                                 return $b['TotalItemSize'] - $a['TotalItemSize'];
                             }
                         );
-                        $twig->addFilter(
-                            new TwigFilter(
-                                'MBtoGB',
-                                function ($string) {
-                                    if (!is_numeric($string)) {
-                                        return '';
-                                    }
-                                    return number_format($string / 1024) . 'GB';
-                                }
-                            )
-                        );
+
                         $body = $twig->render(
                             "@internal/emailAlmostFullAlertEmail.html.twig",
                             [
@@ -780,6 +770,9 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                 if ($usage >= $this->dbeHeader->getValue(DBEHeader::office365MailboxRedWarningThreshold)) {
                     $color = "FFFFC7CE";
                     $mailboxes[$i]['Limit'] = $mailboxLimits[$i];
+                    if ($this->alertMode) {
+                        $this->logger->warning('Registering mailbox over the limit! :' . json_encode($mailboxes[$i]));
+                    }
                     $this->warningMailboxes[] = $mailboxes[$i];
                 }
 
@@ -1101,6 +1094,12 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $dbeCallActivity->insertRow();
     }
 
+    function raiseMultipleATPLicensesSR(DBECustomer $dbeCustomer, $userName)
+    {
+        $details = "<p>The username $userName has multiple M365 licenses that include ATP, please review and correct.</p>";
+        $this->raiseCustomerServiceRequest($dbeCustomer, $details);
+    }
+
     /**
      * @param Spreadsheet $spreadSheet
      * @param $licenses
@@ -1374,12 +1373,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             null,
             'A' . $legendRowStart
         );
-    }
-
-    function raiseMultipleATPLicensesSR(DBECustomer $dbeCustomer, $userName)
-    {
-        $details = "<p>The username $userName has multiple M365 licenses that include ATP, please review and correct.</p>";
-        $this->raiseCustomerServiceRequest($dbeCustomer, $details);
     }
 
     protected function getParams(): PowerShellParamCollection

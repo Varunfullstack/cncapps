@@ -1,6 +1,7 @@
 <?php
 
 use Twig\Environment;
+use Twig\TwigFilter;
 
 function is_cli()
 {
@@ -1167,6 +1168,17 @@ $twig = new Environment(
         "cache" => __DIR__ . '/../cache',
         "debug" => $server_type !== MAIN_CONFIG_SERVER_TYPE_LIVE,
     ]
+);
+$twig->addFilter(
+    new TwigFilter(
+        'MBtoGB',
+        function ($string) {
+            if (!is_numeric($string)) {
+                return '';
+            }
+            return number_format($string / 1024) . 'GB';
+        }
+    )
 );
 $twig->addExtension(new \Twig\Extra\Intl\IntlExtension());
 $twig->addExtension(new \Twig\Extension\DebugExtension());
