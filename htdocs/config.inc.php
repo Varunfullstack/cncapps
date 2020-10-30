@@ -1162,6 +1162,7 @@ require BASE_DRIVE . '/vendor/autoload.php';
 
 $loader = new \Twig\Loader\FilesystemLoader('', __DIR__ . '/../twig');
 $loader->addPath('internal', 'internal');
+$loader->addPath('customerFacing', 'customerFacing');
 $twig = new Environment(
     $loader,
     [
