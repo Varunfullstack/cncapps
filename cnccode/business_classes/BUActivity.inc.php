@@ -7779,6 +7779,16 @@ FROM
 
             $dbeContact = $buCustomer->getPrimaryContact($customerID);
 
+            if(!$dbeContact->rowCount()){
+                $this->addCustomerRaisedRequest(
+                    $automatedRequest,
+                    null,
+                    null,
+                    "There is no primary contact associated with the customer: {$customerID}"
+                );
+                return;
+            }
+
             if (!$serverGuard) {
                 $prependMessage = '<div style="color: red">Utility alert sent from email ' . $record->getSenderEmailAddress(
                     ) . ' on ' . date(
