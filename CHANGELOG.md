@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [v4.10.2] - 2020-10-30
+### Fixed
+- Office365LicenseExport not sending alert emails for mailboxes over the limit
+- Create Customer folder shows twice in customer page
+
 ## [v4.10.1] - 2020-10-29
 ### Fixed
 - Fixed issue with Time Request Dashboard breaking when there's a time request activity without SR assigned, also added means of 
