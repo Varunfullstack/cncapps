@@ -1,5 +1,11 @@
 <!-- Template: Customer.inc.html -->
+<script src="components/dist/SpinnerHolder.js"></script>
+<div id="reactSpinnerHolder"></div>
+<link rel="stylesheet"
+      href="components/dist/SpinnerHolder.css"
+>
 <script type="application/javascript">
+
     function submitOnReturn() {
         if (event.keyCode == 13) {
             document.searchForm.submit();
@@ -78,8 +84,7 @@
         endDate ? data.endDate = endDate : null;
         firstName ? data.firstName = firstName : null;
         lastName ? data.lastName = lastName : null;
-
-        $.LoadingOverlay("show", {text: 'Running your search, please wait'});
+        spinnerComponent.showSpinner();
         $.ajax({
             url: '?action=doSearch',
             method: 'POST',
@@ -99,12 +104,11 @@
         }).catch(function () {
 
         }).then(function () {
-            $.LoadingOverlay('hide');
+            spinnerComponent.hideSpinner();
         });
         return false;
     }
 </script>
-
 <form name="form"
       method="post"
       onsubmit="return searchContactAudit();"

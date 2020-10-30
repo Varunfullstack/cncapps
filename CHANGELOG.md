@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1041 - Page Loading Spinner
+
 ## [v4.10.2] - 2020-10-30
 ### Fixed
 - Office365LicenseExport not sending alert emails for mailboxes over the limit

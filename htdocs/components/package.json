@@ -1,0 +1,22 @@
+{
+    "name": "spinnerholder",
+    "version": "1.0.0",
+    "description": "",
+    "main": "SpinnerHolder.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build:spinnerHolder": "parcel build SpinnerHolder/src/SpinnerHolder.js",
+        "start:spinnerHolder": "parcel SpinnerHolder/src/SpinnerHolder.js",
+        "build:CMPSRSource": "parcel build ./CMPSRSource/src/CMPSRSource.js",
+        "start:CMPSRSource": "parcel ./CMPSRSource/src/CMPSRSource.js"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "react": "^17.0.1",
+        "react-dom": "^17.0.1"
+    },
+    "devDependencies": {
+        "parcel-bundler": "^1.12.4"
+    }
+}

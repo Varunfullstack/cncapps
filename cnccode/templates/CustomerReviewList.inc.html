@@ -1,4 +1,9 @@
 <H2>Daily Call List</H2>
+<script src="components/dist/SpinnerHolder.js"></script>
+<div id="reactSpinnerHolder"></div>
+<link rel="stylesheet"
+      href="components/dist/SpinnerHolder.css"
+>
 <style>
     .details-pane {
         display: none;
@@ -97,11 +102,11 @@
                 url: "?action=getData",
                 type: "GET",
                 dataSrc: (response) => {
-                    $.LoadingOverlay('hide');
+                    spinnerComponent.hideSpinner();
                     return response.data;
                 },
                 data: (data) => {
-                    $.LoadingOverlay("show", {text: 'Running your search, please wait'});
+                    spinnerComponent.showSpinner();
                     return data;
                 }
             },

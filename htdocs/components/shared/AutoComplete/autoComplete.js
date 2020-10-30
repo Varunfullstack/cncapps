@@ -1,4 +1,5 @@
 "use strict";
+import React from 'react';
 
 class AutoComplete extends React.Component {
     constructor(props) {

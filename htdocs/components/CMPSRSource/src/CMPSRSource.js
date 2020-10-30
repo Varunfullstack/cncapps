@@ -1,7 +1,10 @@
 "use strict";
-import AutoComplete from "./utils/autoComplete.js?v=1";
-import Table from './utils/table/table.js?v=1';
-import * as Utils from './utils/utils.js?v=1';
+import AutoComplete from "../../shared/AutoComplete/autoComplete";
+import Table from '../../shared/table/table';
+import * as Utils from '../../utils/utils';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import Spinner from "../../shared/Spinner/Spinner";
 
 class CMPSRSource extends React.Component {
     el = React.createElement;
@@ -22,6 +25,7 @@ class CMPSRSource extends React.Component {
                 resultSummary: [],
             },
             customers: [],
+            showSpinner: false
         };
     }
 
@@ -69,7 +73,7 @@ class CMPSRSource extends React.Component {
     };
     searchAPI = (exportData = false) => {
         if (this.valid()) {
-            $.LoadingOverlay("show", {text: 'Running your search, please wait'});
+            this.setState({showSpinner: true});
 
             const {search} = this.state;
             fetch("?action=searchSR&&export=" + exportData, {
@@ -82,12 +86,11 @@ class CMPSRSource extends React.Component {
             })
                 .then((response) => response.json())
                 .then((result) => {
-                    $.LoadingOverlay('hide');
-                    const search = {...this.state.search};
-                    search.result = result;
-                    search.resultSummary = this.getSummary(result);
+                    const updatedSearch = {...this.state.search};
+                    updatedSearch.result = result;
+                    updatedSearch.resultSummary = this.getSummary(result);
                     //console.log(result);
-                    this.setState({search});
+                    this.setState({search: updatedSearch, showSpinner: false});
                 });
         }
     }
@@ -240,12 +243,15 @@ class CMPSRSource extends React.Component {
     }
 
     render() {
-        const {el} = this;
-        return el("div", {className: "sr-source"}, [
-            this.getSearchElements(),
-            this.getSummaryElements(),
-            this.getSearchResultElement(),
-        ]);
+        const {showSpinner} = this.state;
+        return (
+            <div className="sr-source">
+                <Spinner show={showSpinner}/>
+                {this.getSearchElements()}
+                {this.getSummaryElements()}
+                {this.getSearchResultElement()}
+            </div>
+        )
     }
 }
 

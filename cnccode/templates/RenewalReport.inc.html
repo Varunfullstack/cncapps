@@ -1,7 +1,11 @@
 <!-- Template: RenewalReport.inc.html -->
+<script src="components/dist/SpinnerHolder.js"></script>
+<div id="reactSpinnerHolder"></div>
+<link rel="stylesheet"
+      href="components/dist/SpinnerHolder.css"
+>
 <style>
-    .wrong
-    {
+    .wrong {
         color: red;
         font-weight: bold;
     }
@@ -137,7 +141,7 @@
             customerID: {customerID},
             contractsIDs: contractsIds
         };
-        $.LoadingOverlay("show", {text: 'Generating preview, please wait'});
+        spinnerComponent.showSpinner();
 
         $.ajax({
             url: '?action=previewPDF',
@@ -150,7 +154,7 @@
             window.open(result.PDFPath);
             var signableContact = $('#signableContact').val();
             checkSendSignable(signableContact);
-            $.LoadingOverlay('hide');
+            spinnerComponent.hideSpinner();
         });
     }
 

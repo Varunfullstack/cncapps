@@ -1,4 +1,9 @@
 <!-- Template: ActivityCreate6.inc.html -->
+<script src="components/dist/SpinnerHolder.js"></script>
+<div id="reactSpinnerHolder"></div>
+<link rel="stylesheet"
+      href="components/dist/SpinnerHolder.css"
+>
 {activityWizardHeader} {contractListPopupLink} {thirdPartyContactLink} {contactHistoryLink}
 <BR>
 <script src="CommonJS.js"></script>
@@ -18,7 +23,7 @@
             return;
         }
         const object = {contactID: contactID};
-        $.LoadingOverlay("show", {text: 'Fetching contact details'});
+        spinnerComponent.showSpinner();
         $.ajax({
             url: '?action=contactNotes',
             method: 'POST',
@@ -29,7 +34,7 @@
             $('.contactPhone').html(result.phone);
         }).catch(function () {
         }).then(function () {
-            $.LoadingOverlay('hide');
+               spinnerComponent.hideSpinner();
         });
 
     }

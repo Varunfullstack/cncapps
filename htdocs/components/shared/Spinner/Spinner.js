@@ -1,3 +1,6 @@
+import React from 'react';
+import './spinner.css';
+
 class Spinner extends React.Component {
     el = React.createElement;
 
