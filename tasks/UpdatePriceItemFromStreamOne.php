@@ -9,6 +9,7 @@ use CNCLTD\Exceptions\MissingLicenseException;
 use CNCLTD\LoggerCLI;
 use CNCLTD\StreamOneProcessing\ContractDataFactory;
 use CNCLTD\StreamOneProcessing\ContractsByStreamOneEmailAndSKUCollection;
+use CNCLTD\StreamOneProcessing\StreamOneLicenseData;
 
 require_once(__DIR__ . "/../htdocs/config.inc.php");
 global $cfg;
@@ -283,8 +284,8 @@ foreach ($allSubscriptions as $item) {
 $logger->info("Loading all subscriptions and related addOns from streamOne.....");
 $orderDetails = $buStreamOneApi->getProductsDetails($orderIds, 40);
 
-
-syncAddons($orderDetails, $cncItems, $forcedMode, $logger);
+$allAddonLicenses = getAddonLicensesFromOrders($orderDetails);
+syncAddons($allAddonLicenses, $cncItems, $forcedMode, $logger);
 $updatedItems = 0;
 $updatedItemsAddOns = 0;
 
@@ -294,10 +295,27 @@ $logger->info("All subscriptions number :" . count($allSubscriptions));
 $missingLicensesErrors = [];
 
 //get all customer subscriptions
+$streamOneLicensesToCheck = [];
+
+foreach ($allAddonLicenses as $addonLicense) {
+    $streamOneLicensesToCheck[] = new StreamOneLicenseData(
+        $addonLicense->sku,
+        $addonLicense->email
+    );
+}
+
 foreach ($allSubscriptions as $item) {
-    foreach ($item as $key => $subscription) {
+    foreach ($item as $subscription) {
         $subscription = (object)$subscription;
         try {
+
+            if ($subscription->lineStatus == 'active') {
+                $streamOneLicensesToCheck[] = new StreamOneLicenseData(
+                    $subscription->sku,
+                    $subscription->endCustomerEmail
+                );
+            }
+
             updateContracts(
                 $cncItems,
                 $subscription->sku,
@@ -317,7 +335,8 @@ foreach ($allSubscriptions as $item) {
     }
 }
 
-checkAllContractsHaveAMatchingStreamOneLicense($allSubscriptions, $orderDetails);
+
+checkAllContractsHaveAMatchingStreamOneLicense($streamOneLicensesToCheck);
 
 
 if (!empty($missingLicensesErrors)) {
@@ -368,13 +387,10 @@ if (!empty($missingLicensesErrors)) {
 $logger->info('updated customers items  ' . $updatedItems);
 $logger->info('updated customers items addOns  ' . $updatedItemsAddOns);
 
-
-function syncAddons($orderDetails, $cncItems, $forcedMode, LoggerCLI $logger)
+function getAddonLicensesFromOrders($orderDetails)
 {
-    global $db;
-    $updatedItemsAddOns = 0;
-    $allAddons = array();
-    $orderUnique = array();
+    $allAddons = [];
+    $orderUnique = [];
     foreach ($orderDetails as $order) {
         $order = $order["BodyText"]["orderInfo"];
         if (!in_array($order['orderNumber'], $orderUnique)) {
@@ -401,6 +417,12 @@ function syncAddons($orderDetails, $cncItems, $forcedMode, LoggerCLI $logger)
             }
         }
     }
+    return $allAddons;
+}
+
+
+function syncAddons($allAddons, $cncItems, $forcedMode, LoggerCLI $logger)
+{
     foreach ($allAddons as $addOn) {
         try {
             updateContracts(
@@ -452,16 +474,13 @@ WHERE item.`isStreamOne`
     return $contractsByStreamOneEmailAndSKUCollection;
 }
 
-function checkAllContractsHaveAMatchingStreamOneLicense($allSubscriptions, $orderDetails)
+/**
+ * @param StreamOneLicenseData[] $licensesToCheck
+ */
+function checkAllContractsHaveAMatchingStreamOneLicense(array $licensesToCheck)
 {
     $contractsCollection = getContractsToCheck();
-
-    var_dump($allSubscriptions);
-    var_dump($orderDetails);
-    exit;
-
-    $contractsCollection->checkSubscriptions($allSubscriptions);
-    $contractsCollection->checkAddons($orderDetails);
+    $contractsCollection->checkLicenses($licensesToCheck);
 
     $elementsNotChecked = $contractsCollection->getNotFlaggedContracts();
 
@@ -507,12 +526,14 @@ function getItemId($cncItems, $sku)
     return null;
 }
 
-function sendMissingStreamOneLicenseForContractEmail($contract)
+function sendMissingStreamOneLicenseForContractEmail(\CNCLTD\StreamOneProcessing\ContractData $contract)
 {
 
     $buMail = new BUMail($thing);
     $toEmail = "sales@cnc-ltd.co.uk";
-    $buMail->mime->setHTMLBody("Missing Stream One License for contract ");
+    $buMail->mime->setHTMLBody(
+        "Missing Stream One License for contract {$contract->getContractId()}: {$contract->getItemDescription()}"
+    );
 
     $mime_params = array(
         'text_encoding' => '7bit',

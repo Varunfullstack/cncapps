@@ -24,17 +24,16 @@ class ContractsByStreamOneEmailAndSKUCollection
         $this->mappedContracts->add($contractData);
     }
 
-    public function checkSubscriptions($allSubscriptions)
+    /**
+     * @param StreamOneLicenseData[] $licenses
+     */
+    public function checkLicenses(array $licenses)
     {
-        foreach ($allSubscriptions as $subscription) {
-            $this->mappedContracts->flagContractAsFoundByEmailAndSKU($subscription['email'], $subscription['sku']);
-        }
-    }
-
-    public function checkAddons($orderDetails)
-    {
-        foreach ($orderDetails as $detail) {
-            $this->mappedContracts->flagContractAsFoundByEmailAndSKU($detail['email'], $detail['sku']);
+        foreach ($licenses as $license) {
+            $this->mappedContracts->flagContractAsFoundByEmailAndSKU(
+                $license->getEndCustomerEmail(),
+                $license->getSku()
+            );
         }
     }
 
