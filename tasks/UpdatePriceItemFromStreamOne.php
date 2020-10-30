@@ -7,6 +7,8 @@
 
 use CNCLTD\Exceptions\MissingLicenseException;
 use CNCLTD\LoggerCLI;
+use CNCLTD\StreamOneProcessing\ContractDataFactory;
+use CNCLTD\StreamOneProcessing\ContractsByStreamOneEmailAndSKUCollection;
 
 require_once(__DIR__ . "/../htdocs/config.inc.php");
 global $cfg;
@@ -281,6 +283,262 @@ foreach ($allSubscriptions as $item) {
 $logger->info("Loading all subscriptions and related addOns from streamOne.....");
 $orderDetails = $buStreamOneApi->getProductsDetails($orderIds, 40);
 
+
+syncAddons($orderDetails, $cncItems, $forcedMode, $logger);
+$updatedItems = 0;
+$updatedItemsAddOns = 0;
+
+$subscription = null;
+$logger->info("All subscriptions number :" . count($allSubscriptions));
+
+$missingLicensesErrors = [];
+
+//get all customer subscriptions
+foreach ($allSubscriptions as $item) {
+    foreach ($item as $key => $subscription) {
+        $subscription = (object)$subscription;
+        try {
+            updateContracts(
+                $cncItems,
+                $subscription->sku,
+                $subscription->quantity,
+                $subscription->unitPrice,
+                $subscription->lineStatus,
+                $forcedMode,
+                $subscription->endCustomerEmail,
+                $logger
+            );
+        } catch (Exception $exception) {
+            if ($exception instanceof MissingLicenseException) {
+                $missingLicensesErrors[] = $exception;
+            }
+            $logger->error($exception->getMessage());
+        }
+    }
+}
+
+checkAllContractsHaveAMatchingStreamOneLicense($allSubscriptions, $orderDetails);
+
+
+if (!empty($missingLicensesErrors)) {
+    $buMail = new BUMail($thing);
+    $senderEmail = CONFIG_SUPPORT_EMAIL;
+    $toEmail = CONFIG_SALES_EMAIL;
+    $hdrs = array(
+        'From'         => $senderEmail,
+        'To'           => $toEmail,
+        'Subject'      => 'StreamOne licenses not listed for customers',
+        'Date'         => date("r"),
+        'Content-Type' => 'text/html; charset=UTF-8'
+    );
+
+    global $twig;
+    $html = $twig->render(
+        '@internal/streamOneMissingLicensesEmail.html.twig',
+        [
+            "items" => array_map(
+                function (MissingLicenseException $licenseError) {
+                    return $licenseError->getMessage();
+                },
+                $missingLicensesErrors
+            )
+        ]
+    );
+    $buMail->mime->setHTMLBody($html);
+
+    $mime_params = array(
+        'text_encoding' => '7bit',
+        'text_charset'  => 'UTF-8',
+        'html_charset'  => 'UTF-8',
+        'head_charset'  => 'UTF-8'
+    );
+
+    $body = $buMail->mime->get($mime_params);
+
+    $hdrs = $buMail->mime->headers($hdrs);
+
+    $buMail->putInQueue(
+        $senderEmail,
+        $toEmail,
+        $hdrs,
+        $body
+    );
+}
+
+$logger->info('updated customers items  ' . $updatedItems);
+$logger->info('updated customers items addOns  ' . $updatedItemsAddOns);
+
+
+function syncAddons($orderDetails, $cncItems, $forcedMode, LoggerCLI $logger)
+{
+    global $db;
+    $updatedItemsAddOns = 0;
+    $allAddons = array();
+    $orderUnique = array();
+    foreach ($orderDetails as $order) {
+        $order = $order["BodyText"]["orderInfo"];
+        if (!in_array($order['orderNumber'], $orderUnique)) {
+            array_push($orderUnique, $order["orderNumber"]);
+            foreach ($order["lines"] as $line) {
+                if (isset($line["addOns"]) && $line["lineStatus"] == 'active') {
+                    foreach ($line["addOns"] as $addon) {
+                        if ($addon["addOnStatus"] == "active") {
+                            $compositeKey = "{$order['endUserEmail']}-{$addon["sku"]}";
+                            if (!isset($allAddons[$compositeKey])) {
+                                $allAddons[$compositeKey] = (object)[
+                                    "orderNumber" => $order["orderNumber"],
+                                    "email"       => $order["endUserEmail"],
+                                    "sku"         => $addon["sku"],
+                                    "quantity"    => 0,
+                                    "addOnStatus" => $addon["addOnStatus"],
+                                    "unitPrice"   => $addon['unitPrice']
+                                ];
+                            }
+                            $allAddons[$compositeKey]->quantity += $addon['quantity'];
+                        }
+                    }
+                }
+            }
+        }
+    }
+    foreach ($allAddons as $addOn) {
+        try {
+            updateContracts(
+                $cncItems,
+                $addOn->sku,
+                $addOn->quantity,
+                $addOn->unitPrice,
+                $addOn->addOnStatus,
+                $forcedMode,
+                $addOn->email,
+                $logger
+            );
+        } catch (Exception $exception) {
+            if ($exception instanceof MissingLicenseException) {
+                $missingLicensesErrors[] = $exception;
+            }
+            $logger->error($exception->getMessage());
+        }
+    }
+}
+
+function getContractsToCheck(): ContractsByStreamOneEmailAndSKUCollection
+{
+    global $db;
+    $query = "
+    SELECT
+  item.`itm_unit_of_sale` as sku,
+  item.`partNoOld` as oldSku,
+  customer.`cus_name` as customerName,
+  customer.`streamOneEmail`,
+custitem.cui_cuino as contractId,
+           item.itm_desc as itemDescription
+FROM
+  custitem
+  JOIN item
+    ON item.`itm_itemno` = custitem.`cui_itemno`
+    JOIN customer
+    ON custitem.`cui_custno` = customer.`cus_custno`
+WHERE item.`isStreamOne`
+  AND renewalStatus = 'R'
+  AND declinedFlag = 'N'
+    ";
+    $db->query($query);
+    $contractsByStreamOneEmailAndSKUCollection = new ContractsByStreamOneEmailAndSKUCollection();
+    while ($db->next_record(MYSQLI_ASSOC)) {
+        $contractDataFactory = new ContractDataFactory();
+        $contractsByStreamOneEmailAndSKUCollection->add($contractDataFactory->fromDB($db->Record));
+    }
+    return $contractsByStreamOneEmailAndSKUCollection;
+}
+
+function checkAllContractsHaveAMatchingStreamOneLicense($allSubscriptions, $orderDetails)
+{
+    $contractsCollection = getContractsToCheck();
+
+    var_dump($allSubscriptions);
+    var_dump($orderDetails);
+    exit;
+
+    $contractsCollection->checkSubscriptions($allSubscriptions);
+    $contractsCollection->checkAddons($orderDetails);
+
+    $elementsNotChecked = $contractsCollection->getNotFlaggedContracts();
+
+    foreach ($elementsNotChecked as $item) {
+        sendMissingStreamOneLicenseForContractEmail($item);
+    }
+}
+
+/**
+ * @param $email
+ * @return array|mixed|null
+ * @throws Exception
+ */
+function getCustomerFromLicenseEmail($email)
+{
+
+    if (!$email) {
+        throw new Exception('Email is mandatory');
+    }
+    $that = null;
+    global $customerCache;
+    if (!$customerCache) {
+        $customerCache = [];
+    }
+
+    if (!array_key_exists($email, $customerCache)) {
+        $dbeCustomer = new DBECustomer($that);
+        $customerCache[$email] = null;
+        if ($dbeCustomer->getCustomerByStreamOneEmail($email)) {
+            $customerCache[$email] = $dbeCustomer->getRowAsAssocArray();
+        }
+    }
+
+    return $customerCache[$email];
+}
+
+function getItemId($cncItems, $sku)
+{
+    foreach ($cncItems as $item) {
+        if ($item['itm_unit_of_sale'] == $sku || $item['partNoOld'] == $sku)
+            return $item['itm_itemno'];
+    }
+    return null;
+}
+
+function sendMissingStreamOneLicenseForContractEmail($contract)
+{
+
+    $buMail = new BUMail($thing);
+    $toEmail = "sales@cnc-ltd.co.uk";
+    $buMail->mime->setHTMLBody("Missing Stream One License for contract ");
+
+    $mime_params = array(
+        'text_encoding' => '7bit',
+        'text_charset'  => 'UTF-8',
+        'html_charset'  => 'UTF-8',
+        'head_charset'  => 'UTF-8'
+    );
+    $body = $buMail->mime->get($mime_params);
+
+    $hdrs = array(
+        'From'         => CONFIG_SALES_MANAGER_EMAIL,
+        'Subject'      => "Missing Stream One License for contract",
+        'Content-Type' => 'text/html; charset=UTF-8',
+        'To'           => $toEmail
+    );
+
+    $hdrs = $buMail->mime->headers($hdrs);
+
+    return $buMail->send(
+        $toEmail,
+        $hdrs,
+        $body
+    );
+
+}
+
 /**
  * @param $cncItems
  * @param $sku
@@ -394,222 +652,5 @@ function updateContracts($cncItems,
         $loggerCLI->notice("Customer {$customerName} licenses for {$sku} have been changed to inactive");
     }
 }
-
-syncAddons($orderDetails, $cncItems, $forcedMode, $logger);
-$updatedItems = 0;
-$updatedItemsAddOns = 0;
-
-$subscription = null;
-$logger->info("All subscriptions number :" . count($allSubscriptions));
-
-$missingLicensesErrors = [];
-
-//get all customer subscriptions
-foreach ($allSubscriptions as $item) {
-    foreach ($item as $key => $subscription) {
-        $subscription = (object)$subscription;
-        try {
-            updateContracts(
-                $cncItems,
-                $subscription->sku,
-                $subscription->quantity,
-                $subscription->unitPrice,
-                $subscription->lineStatus,
-                $forcedMode,
-                $subscription->endCustomerEmail,
-                $logger
-            );
-        } catch (Exception $exception) {
-            if ($exception instanceof MissingLicenseException) {
-                $missingLicensesErrors[] = $exception;
-            }
-            $logger->error($exception->getMessage());
-        }
-    }
-}
-
-
-foreach ($cncItems as $key => $cncItem) {
-    // check if this item is in the subscriptions array
-    if (!isSubscriptionOrAddon($cncItem, $allSubscriptions, $orderDetails)) {
-        sendMissingStreamOneLicenseForContractEmail($cncItem);
-    }
-}
-
-if (!empty($missingLicensesErrors)) {
-    $buMail = new BUMail($thing);
-    $senderEmail = CONFIG_SUPPORT_EMAIL;
-    $toEmail = CONFIG_SALES_EMAIL;
-    $hdrs = array(
-        'From'         => $senderEmail,
-        'To'           => $toEmail,
-        'Subject'      => 'StreamOne licenses not listed for customers',
-        'Date'         => date("r"),
-        'Content-Type' => 'text/html; charset=UTF-8'
-    );
-
-    global $twig;
-    $html = $twig->render(
-        '@internal/streamOneMissingLicensesEmail.html.twig',
-        [
-            "items" => array_map(
-                function (MissingLicenseException $licenseError) {
-                    return $licenseError->getMessage();
-                },
-                $missingLicensesErrors
-            )
-        ]
-    );
-    $buMail->mime->setHTMLBody($html);
-
-    $mime_params = array(
-        'text_encoding' => '7bit',
-        'text_charset'  => 'UTF-8',
-        'html_charset'  => 'UTF-8',
-        'head_charset'  => 'UTF-8'
-    );
-
-    $body = $buMail->mime->get($mime_params);
-
-    $hdrs = $buMail->mime->headers($hdrs);
-
-    $buMail->putInQueue(
-        $senderEmail,
-        $toEmail,
-        $hdrs,
-        $body
-    );
-}
-
-$logger->info('updated customers items  ' . $updatedItems);
-$logger->info('updated customers items addOns  ' . $updatedItemsAddOns);
-function syncAddons($orderDetails, $cncItems, $forcedMode, LoggerCLI $logger)
-{
-    global $db;
-    $updatedItemsAddOns = 0;
-    $allAddons = array();
-    $orderUnique = array();
-    foreach ($orderDetails as $order) {
-        $order = $order["BodyText"]["orderInfo"];
-        if (!in_array($order['orderNumber'], $orderUnique)) {
-            array_push($orderUnique, $order["orderNumber"]);
-            foreach ($order["lines"] as $line) {
-                if (isset($line["addOns"]) && $line["lineStatus"] == 'active') {
-                    foreach ($line["addOns"] as $addon) {
-                        if ($addon["addOnStatus"] == "active") {
-                            $compositeKey = "{$order['endUserEmail']}-{$addon["sku"]}";
-                            if (!isset($allAddons[$compositeKey])) {
-                                $allAddons[$compositeKey] = (object)[
-                                    "orderNumber" => $order["orderNumber"],
-                                    "email"       => $order["endUserEmail"],
-                                    "sku"         => $addon["sku"],
-                                    "quantity"    => 0,
-                                    "addOnStatus" => $addon["addOnStatus"],
-                                    "unitPrice"   => $addon['unitPrice']
-                                ];
-                            }
-                            $allAddons[$compositeKey]->quantity += $addon['quantity'];
-                        }
-                    }
-                }
-            }
-        }
-    }
-    foreach ($allAddons as $addOn) {
-        try {
-            updateContracts(
-                $cncItems,
-                $addOn->sku,
-                $addOn->quantity,
-                $addOn->unitPrice,
-                $addOn->addOnStatus,
-                $forcedMode,
-                $addOn->email,
-                $logger
-            );
-        } catch (\Exception $exception) {
-            if ($exception instanceof MissingLicenseException) {
-                $missingLicensesErrors[] = $exception;
-            }
-            $logger->error($exception->getMessage());
-        }
-    }
-}
-
-function isSubscriptionOrAddon($cncItem, $allSubscriptions, $orderDetails)
-{
-    return true;
-}
-
-/**
- * @param $email
- * @return array|mixed|null
- * @throws Exception
- */
-function getCustomerFromLicenseEmail($email)
-{
-
-    if (!$email) {
-        throw new Exception('Email is mandatory');
-    }
-    $that = null;
-    global $customerCache;
-    if (!$customerCache) {
-        $customerCache = [];
-    }
-
-    if (!array_key_exists($email, $customerCache)) {
-        $dbeCustomer = new DBECustomer($that);
-        $customerCache[$email] = null;
-        if ($dbeCustomer->getCustomerByStreamOneEmail($email)) {
-            $customerCache[$email] = $dbeCustomer->getRowAsAssocArray();
-        }
-    }
-
-    return $customerCache[$email];
-}
-
-function getItemId($cncItems, $sku)
-{
-    foreach ($cncItems as $item) {
-        if ($item['itm_unit_of_sale'] == $sku || $item['partNoOld'] == $sku)
-            return $item['itm_itemno'];
-    }
-    return null;
-}
-
-function sendMissingStreamOneLicenseForContractEmail($contract)
-{
-
-    $buMail = new BUMail($thing);
-    $toEmail = "sales@cnc-ltd.co.uk";
-    $buMail->mime->setHTMLBody("Missing Stream One License for contract ");
-
-    $mime_params = array(
-        'text_encoding' => '7bit',
-        'text_charset'  => 'UTF-8',
-        'html_charset'  => 'UTF-8',
-        'head_charset'  => 'UTF-8'
-    );
-    $body = $buMail->mime->get($mime_params);
-
-    $hdrs = array(
-        'From'         => CONFIG_SALES_MANAGER_EMAIL,
-        'Subject'      => "Missing Stream One License for contract",
-        'Content-Type' => 'text/html; charset=UTF-8',
-        'To'           => $toEmail
-    );
-
-    $hdrs = $buMail->mime->headers($hdrs);
-
-    return $buMail->send(
-        $toEmail,
-        $hdrs,
-        $body
-    );
-
-}
-
-// *************************** get all subscriptions addons and update customer items
 
 exit;
