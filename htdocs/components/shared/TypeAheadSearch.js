@@ -1,3 +1,5 @@
+import React from 'react';
+
 class TypeAheadSearch extends React.Component {
     el = React.createElement;
     static defaultProps = {

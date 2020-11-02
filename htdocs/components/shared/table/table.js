@@ -1,6 +1,7 @@
 import React from 'react';
 import TableHeader from "./tableHeader";
 import TableBody from "./tableBody";
+import './table.css';
 
 class Table extends React.Component {
     constructor(props) {

@@ -485,7 +485,7 @@ class CTCNC extends Controller
             true,
             1002,
             "My Account",
-            "MySettings.php"
+            "MySettingsComponent.php"
         );
 
         global $twig;
@@ -680,7 +680,7 @@ class CTCNC extends Controller
             [
                 "id"    => 224,
                 "label" => "SR Source",
-                "href"  => "SRSource.php"
+                "href"  => "SRSourceComponent.php"
             ],
             [
                 "id"    => 209,

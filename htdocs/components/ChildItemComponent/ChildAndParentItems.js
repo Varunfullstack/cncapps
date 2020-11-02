@@ -1,5 +1,7 @@
-import ChildItemComponent from "./ChildItemComponent.js";
-import ItemList from "./ItemList.js";
+import ChildItemComponent from "./subComponents/ChildItemComponent";
+import ItemList from "./subComponents/ItemList";
+import React from 'react';
+import ReactDOM from 'react-dom';
 
 class ChildAndParentItems extends React.Component {
     el = React.createElement;

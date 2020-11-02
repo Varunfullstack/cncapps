@@ -122,13 +122,13 @@ class CTSRSource extends CTCNC
         $this->setMethodName('search');   
         $this->setPageTitle('Service Request Source');
         $this->setTemplateFiles(
-            'SRSource',
-            'SRSource.inc'
+            'SRSourceComponent',
+            'SRSourceComponent.inc'
         );
       
         $this->template->parse(
             'CONTENTS',
-            'SRSource',
+            'SRSourceComponent',
             true
         );
         $this->parsePage();

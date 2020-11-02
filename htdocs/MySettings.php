@@ -29,6 +29,6 @@ page_close();
 
 <script src="js/react.development.js" crossorigin></script>
 <script src="js/react-dom.development.js" crossorigin></script>
- <script type="module" src='components/CMPMySettings.js?version=<?= time() ?>'></script>
+ <script type="module" src='components/MySettingsComponent/MySettingsComponent.js?version=<?= time() ?>'></script>
 
  

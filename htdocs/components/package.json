@@ -5,18 +5,36 @@
     "main": "SpinnerHolder.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "build:spinnerHolder": "parcel build SpinnerHolder/src/SpinnerHolder.js",
-        "start:spinnerHolder": "parcel SpinnerHolder/src/SpinnerHolder.js",
-        "build:CMPSRSource": "parcel build ./CMPSRSource/src/CMPSRSource.js",
-        "start:CMPSRSource": "parcel ./CMPSRSource/src/CMPSRSource.js"
+        "build:ChildItemComponent": "parcel build ChildItemComponent/ChildAndParentItems.js",
+        "start:ChildItemComponent": "parcel ChildItemComponent/ChildAndParentItems.js",
+        "build:CustomerLicenseComponent": "parcel build CustomerLicencesComponent/CustomerLicensesComponent.js",
+        "start:CustomerLicenseComponent": "parcel CustomerLicencesComponent/CustomerLicensesComponent.js",
+        "build:ExpenseBreakdownYearToDateComponent": "parcel build ExpenseBreakdownYearToDateComponent/ExpenseBreakdownYearToDateComponent.js",
+        "start:ExpenseBreakdownYearToDateComponent": "parcel ExpenseBreakdownYearToDateComponent/ExpenseBreakdownYearToDateComponent.js",
+        "build:FixedServiceReuqestCountComponent": "parcel build FixedServiceRequestCountComponent/FixedServiceRequestCountComponent.js",
+        "start:FixedServiceReuqestCountComponent": "parcel FixedServiceRequestCountComponent/FixedServiceRequestCountComponent.js",
+        "build:MySettingsComponent": "parcel build MySettingsComponent/MySettingsComponent.js",
+        "start:MySettingsComponent": "parcel MySettingsComponent/MySettingsComponent.js",
+        "build:OutOfHoursReportComponent": "parcel build OutOfHoursReportComponent/OutOfHoursReportComponent.js",
+        "start:OutOfHoursReportComponent": "parcel OutOfHoursReportComponent/OutOfHoursReportComponent.js",
+        "build:SpinnerHolder": "parcel build SpinnerHolderComponent/SpinnerHolderComponent.js",
+        "start:SpinnerHolder": "parcel SpinnerHolderComponent/SpinnerHolderComponent.js",
+        "build:SRSourceComponent": "parcel build SRSourceComponent/SRSourceComponent.js",
+        "start:SRSourceComponent": "parcel SRSourceComponent/SRSourceComponent.js",
+        "build": "@build:ChildItemComponent && @build:CustomerLicense && @build:ExpenseBreakdownYearToDateComponent && @build:FixedServiceReuqestCountComponent && @build:MySettingsComponent && @build:OutOfHoursReportComponent && @build:SpinnerHolder && @build:SRSourceComponent",
+
     },
     "author": "",
     "license": "ISC",
     "dependencies": {
         "react": "^17.0.1",
-        "react-dom": "^17.0.1"
+        "react-dom": "^17.0.1",
+        "moment": "^2.29.1"
     },
     "devDependencies": {
-        "parcel-bundler": "^1.12.4"
+        "parcel-bundler": "^1.12.4",
+        "html-react-parser": "^0.14.0",
+        "normalizr": "^3.6.1",
+        "babel-preset-react": "^6.24.1"
     }
 }
