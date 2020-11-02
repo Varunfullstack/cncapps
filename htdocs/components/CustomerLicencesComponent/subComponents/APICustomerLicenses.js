@@ -1,5 +1,5 @@
 "use strict";
-import APIMain from '../services/APIMain';
+import APIMain from '../../services/APIMain';
 
 class APICustomerLicenses extends APIMain {
     baseURL = "CustomerLicenses.php?action=";

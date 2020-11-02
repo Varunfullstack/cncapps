@@ -1,5 +1,5 @@
 import React from 'react';
-import 'modal.css';
+import './modal.css';
 
 export class Modal extends React.Component {
     el = React.createElement;
