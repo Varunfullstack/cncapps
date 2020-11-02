@@ -7051,7 +7051,7 @@ is currently a balance of ';
                 $dbeProblem->setValue($queueProblemColumn, $normalMinutes);
             }
         }
-        $dbeProblem->setValue(DBEProblem::hdLimitMinutes,10);
+        $dbeProblem->setValue(DBEProblem::hdLimitMinutes, 10);
 
         $dbeProblem->insertRow();
 
@@ -7779,12 +7779,12 @@ FROM
 
             $dbeContact = $buCustomer->getPrimaryContact($customerID);
 
-            if(!$dbeContact->rowCount()){
+            if (!$dbeContact->rowCount()) {
                 $this->addCustomerRaisedRequest(
-                    $automatedRequest,
+                    $record,
                     null,
                     null,
-                    "There is no primary contact associated with the customer: {$customerID}"
+                    "There is no primary contact associated with the customer: {$customerID} "
                 );
                 return;
             }
@@ -8122,6 +8122,15 @@ FROM
         $buCustomer = new BUCustomer($this);
         $primaryMainContactDS = $buCustomer->getPrimaryContact($record->getCustomerID());
 
+        if (!$primaryMainContactDS || !$primaryMainContactDS->rowCount()) {
+            $this->addCustomerRaisedRequest(
+                $record,
+                null,
+                null,
+                "There is no primary contact associated with the customer: {$record->getCustomerID()} "
+            );
+            return;
+        }
 
         $senderEmail = CONFIG_SUPPORT_EMAIL;
         $toEmail = $primaryMainContactDS->getValue(DBEContact::email);
@@ -8130,73 +8139,74 @@ FROM
                 DBEContact::firstName
             ) . " " . $dbeContact->getValue(DBEContact::lastName);
 
-        if ($primaryMainContactDS->rowCount) {
-            $buMail = new BUMail($this);
-            $template = new Template(
-                EMAIL_TEMPLATE_DIR,
-                "remove"
-            );
-            $template->set_file(
-                'page',
-                'NotAuthorisedPrimaryMainContactEmail.html'
-            );
 
 
-            $template->setVar(
-                [
-                    "primaryMainContactName" => $primaryMainContactDS->getValue(DBEContact::firstName),
-                    "contactName"            => $contactName,
-                    "contactSupportLevel"    => $dbeContact->getValue(DBEContact::supportLevel)
-                ]
-            );
+        $buMail = new BUMail($this);
+        $template = new Template(
+            EMAIL_TEMPLATE_DIR,
+            "remove"
+        );
+        $template->set_file(
+            'page',
+            'NotAuthorisedPrimaryMainContactEmail.html'
+        );
 
-            $template->parse(
-                'output',
-                'page',
-                true
-            );
 
-            $body = $template->get_var('output');
+        $template->setVar(
+            [
+                "primaryMainContactName" => $primaryMainContactDS->getValue(DBEContact::firstName),
+                "contactName"            => $contactName,
+                "contactSupportLevel"    => $dbeContact->getValue(DBEContact::supportLevel)
+            ]
+        );
 
-            $hdrs = array(
-                'From'         => $senderEmail,
-                'To'           => $toEmail,
-                'Subject'      => $contactName . " is not authorised to initiate support calls",
-                'Date'         => date("r"),
-                'Content-Type' => 'text/html; charset=UTF-8'
-            );
+        $template->parse(
+            'output',
+            'page',
+            true
+        );
 
-            $buMail->mime->setHTMLBody($body);
+        $body = $template->get_var('output');
 
-            $fileName = $dbeContact->getValue(DBEContact::firstName) . " " . $dbeContact->getValue(
-                    DBEContact::lastName
-                ) . " Request At " . (new DateTime())->format('d-m-Y H:i') . '.html';
-            $buMail->mime->addAttachment(
-                $record->getHtmlBody(),
-                'application/octet-stream',
-                $fileName,
-                false
-            );
+        $hdrs = array(
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => $contactName . " is not authorised to initiate support calls",
+            'Date'         => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
+        );
 
-            $mime_params = array(
-                'text_encoding' => '7bit',
-                'text_charset'  => 'UTF-8',
-                'html_charset'  => 'UTF-8',
-                'head_charset'  => 'UTF-8'
-            );
+        $buMail->mime->setHTMLBody($body);
 
-            $body = $buMail->mime->get($mime_params);
+        $fileName = $dbeContact->getValue(DBEContact::firstName) . " " . $dbeContact->getValue(
+                DBEContact::lastName
+            ) . " Request At " . (new DateTime())->format('d-m-Y H:i') . '.html';
+        $buMail->mime->addAttachment(
+            $record->getHtmlBody(),
+            'application/octet-stream',
+            $fileName,
+            false
+        );
 
-            $hdrs = $buMail->mime->headers($hdrs);
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
+        );
 
-            $buMail->putInQueue(
-                $senderEmail,
-                $toEmail,
-                $hdrs,
-                $body
-            );
+        $body = $buMail->mime->get($mime_params);
 
-        }
+        $hdrs = $buMail->mime->headers($hdrs);
+
+        $buMail->putInQueue(
+            $senderEmail,
+            $toEmail,
+            $hdrs,
+            $body
+        );
+
+
         $buMail = new BUMail($this);
         $template = new Template(
             EMAIL_TEMPLATE_DIR,
