@@ -6100,9 +6100,9 @@ class CTActivity extends CTCNC
     function gatherFixedInformation()
     {
         // go to new react page
-        // $newUrl=str_replace("Activity.php","SRActivity.php",$this->getFullPath());
-        // header('Location: ' . $newUrl);
-        // return; 
+        $newUrl=str_replace("Activity.php","SRActivity.php",$this->getFullPath());
+        header('Location: ' . $newUrl);
+        return; 
         $this->setMethodName('gatherFixedInformation');
 
         $this->setTemplateFiles(
