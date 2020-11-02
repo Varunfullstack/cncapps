@@ -7,9 +7,13 @@
 
 use CNCLTD\Exceptions\MissingLicenseException;
 use CNCLTD\LoggerCLI;
+use CNCLTD\StreamOneProcessing\ContractData;
 use CNCLTD\StreamOneProcessing\ContractDataFactory;
 use CNCLTD\StreamOneProcessing\ContractsByStreamOneEmailAndSKUCollection;
 use CNCLTD\StreamOneProcessing\StreamOneLicenseData;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 require_once(__DIR__ . "/../htdocs/config.inc.php");
 global $cfg;
@@ -476,17 +480,16 @@ WHERE item.`isStreamOne`
 
 /**
  * @param StreamOneLicenseData[] $licensesToCheck
+ * @throws LoaderError
+ * @throws RuntimeError
+ * @throws SyntaxError
  */
 function checkAllContractsHaveAMatchingStreamOneLicense(array $licensesToCheck)
 {
     $contractsCollection = getContractsToCheck();
     $contractsCollection->checkLicenses($licensesToCheck);
-
     $elementsNotChecked = $contractsCollection->getNotFlaggedContracts();
-
-    foreach ($elementsNotChecked as $item) {
-        sendMissingStreamOneLicenseForContractEmail($item);
-    }
+    sendMissingStreamOneLicenseForContractEmail($elementsNotChecked);
 }
 
 /**
@@ -526,15 +529,22 @@ function getItemId($cncItems, $sku)
     return null;
 }
 
-function sendMissingStreamOneLicenseForContractEmail(\CNCLTD\StreamOneProcessing\ContractData $contract)
+/**
+ * @param ContractData[] $contracts
+ * @throws LoaderError
+ * @throws RuntimeError
+ * @throws SyntaxError
+ */
+function sendMissingStreamOneLicenseForContractEmail(array $contracts)
 {
-
+    if (!count($contracts)) {
+        return;
+    }
+    global $twig;
     $buMail = new BUMail($thing);
     $toEmail = "sales@cnc-ltd.co.uk";
-    $buMail->mime->setHTMLBody(
-        "Missing Stream One License for contract {$contract->getContractId()}: {$contract->getItemDescription()}"
-    );
-
+    $body = $twig->render('@internal/missingStreamOneLicenseForContractEmail.html.twig', ["items" => $contracts]);
+    $buMail->mime->setHTMLBody($body);
     $mime_params = array(
         'text_encoding' => '7bit',
         'text_charset'  => 'UTF-8',
@@ -552,7 +562,7 @@ function sendMissingStreamOneLicenseForContractEmail(\CNCLTD\StreamOneProcessing
 
     $hdrs = $buMail->mime->headers($hdrs);
 
-    return $buMail->send(
+    $buMail->send(
         $toEmail,
         $hdrs,
         $body
