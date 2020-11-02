@@ -21,8 +21,7 @@
         "start:SpinnerHolder": "parcel SpinnerHolderComponent/SpinnerHolderComponent.js",
         "build:SRSourceComponent": "parcel build SRSourceComponent/SRSourceComponent.js",
         "start:SRSourceComponent": "parcel SRSourceComponent/SRSourceComponent.js",
-        "build": "@build:ChildItemComponent && @build:CustomerLicense && @build:ExpenseBreakdownYearToDateComponent && @build:FixedServiceReuqestCountComponent && @build:MySettingsComponent && @build:OutOfHoursReportComponent && @build:SpinnerHolder && @build:SRSourceComponent",
-
+        "build": "@build:ChildItemComponent && @build:CustomerLicense && @build:ExpenseBreakdownYearToDateComponent && @build:FixedServiceReuqestCountComponent && @build:MySettingsComponent && @build:OutOfHoursReportComponent && @build:SpinnerHolder && @build:SRSourceComponent"
     },
     "author": "",
     "license": "ISC",
