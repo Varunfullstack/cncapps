@@ -471,8 +471,8 @@ WHERE item.`isStreamOne`
     ";
     $db->query($query);
     $contractsByStreamOneEmailAndSKUCollection = new ContractsByStreamOneEmailAndSKUCollection();
+    $contractDataFactory = new ContractDataFactory();
     while ($db->next_record(MYSQLI_ASSOC)) {
-        $contractDataFactory = new ContractDataFactory();
         $contractsByStreamOneEmailAndSKUCollection->add($contractDataFactory->fromDB($db->Record));
     }
     return $contractsByStreamOneEmailAndSKUCollection;
@@ -486,9 +486,12 @@ WHERE item.`isStreamOne`
  */
 function checkAllContractsHaveAMatchingStreamOneLicense(array $licensesToCheck)
 {
+
     $contractsCollection = getContractsToCheck();
+
     $contractsCollection->checkLicenses($licensesToCheck);
     $elementsNotChecked = $contractsCollection->getNotFlaggedContracts();
+    var_dump($elementsNotChecked);
     sendMissingStreamOneLicenseForContractEmail($elementsNotChecked);
 }
 
@@ -537,10 +540,12 @@ function getItemId($cncItems, $sku)
  */
 function sendMissingStreamOneLicenseForContractEmail(array $contracts)
 {
+    var_dump($contracts, count($contracts));
     if (!count($contracts)) {
         return;
     }
     global $twig;
+    $fromEmail = CONFIG_SUPPORT_EMAIL;
     $buMail = new BUMail($thing);
     $toEmail = "sales@cnc-ltd.co.uk";
     $body = $twig->render('@internal/missingStreamOneLicenseForContractEmail.html.twig', ["items" => $contracts]);
@@ -554,7 +559,7 @@ function sendMissingStreamOneLicenseForContractEmail(array $contracts)
     $body = $buMail->mime->get($mime_params);
 
     $hdrs = array(
-        'From'         => CONFIG_SALES_MANAGER_EMAIL,
+        'From'         => $fromEmail,
         'Subject'      => "Missing Stream One License for contract",
         'Content-Type' => 'text/html; charset=UTF-8',
         'To'           => $toEmail
@@ -562,7 +567,8 @@ function sendMissingStreamOneLicenseForContractEmail(array $contracts)
 
     $hdrs = $buMail->mime->headers($hdrs);
 
-    $buMail->send(
+    $buMail->putInQueue(
+        $fromEmail,
         $toEmail,
         $hdrs,
         $body

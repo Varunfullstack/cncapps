@@ -20,6 +20,7 @@ class ContractsStreamOneEmail
 
     public function add(ContractData $contractData)
     {
+
         if (!isset($this->map[$contractData->getStreamOneEmail()])) {
             $this->map[$contractData->getStreamOneEmail()] = new ContractsByEmail(
                 $contractData->getStreamOneEmail(),

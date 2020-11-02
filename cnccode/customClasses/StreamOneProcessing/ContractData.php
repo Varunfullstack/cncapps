@@ -63,7 +63,7 @@ class ContractData
      */
     public function getSku()
     {
-        return $this->sku;
+        return strtolower($this->sku);
     }
 
     /**
@@ -71,7 +71,7 @@ class ContractData
      */
     public function getOldSku()
     {
-        return $this->oldSku;
+        return strtolower($this->oldSku);
     }
 
     /**
@@ -87,7 +87,7 @@ class ContractData
      */
     public function getStreamOneEmail()
     {
-        return $this->streamOneEmail;
+        return strtolower($this->streamOneEmail);
     }
 
     /**

@@ -25,7 +25,7 @@ class StreamOneLicenseData
      */
     public function getSku()
     {
-        return $this->sku;
+        return strtolower($this->sku);
     }
 
     /**
@@ -33,7 +33,7 @@ class StreamOneLicenseData
      */
     public function getEndCustomerEmail()
     {
-        return $this->endCustomerEmail;
+        return strtolower($this->endCustomerEmail);
     }
 
 

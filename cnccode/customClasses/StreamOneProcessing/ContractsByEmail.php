@@ -29,7 +29,6 @@ class ContractsByEmail
     public function addContract(ContractData $contractData)
     {
         $this->contractsToConfirm[$contractData->getContractId()] = new ContractDataNotConfirmed($contractData);
-
         $this->contractsBySKU[$contractData->getSku()] = $contractData->getContractId();
         if ($contractData->getOldSku()) {
             $this->contractsBySKU[$contractData->getOldSku()] = $contractData->getContractId();
