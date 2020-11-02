@@ -24,7 +24,8 @@ export default class MainComponent extends React.Component {
         title: "",
         width: 500,
         message: "",
-        value:null
+        value:null,
+        defaultValue:null
       },
     };
   }
@@ -114,16 +115,22 @@ export default class MainComponent extends React.Component {
   }
   //-----------------end alert
   //----------------prompt
-  prompt=  (title="Prompt",width=500)=>{
+  prompt=  (title="Prompt",width=500,defaultValue=null)=>{
     const {prompt}=this.state;
     prompt.show=true;
     prompt.width=width;
     prompt.title=title;      
+    prompt.value=null;
+    prompt.defaultValue=defaultValue;
     this.setState({prompt});
+    let handleInterval=null;
     return new Promise((resolve,reject)=>{
-        setInterval(() => {
+      handleInterval=setInterval(() => {
             if(this.state.prompt.value!=null)
-                resolve(this.state.prompt.value);
+            {
+              resolve(this.state.prompt.value);
+              clearInterval(handleInterval);
+            }
         }, 100);
     });
     
@@ -134,7 +141,7 @@ export default class MainComponent extends React.Component {
     return this.el(Prompt,{...prompt,onClose:this.handlePromptClose,key:"prompt"});
   }
   handlePromptClose=(value)=>{
-      console.log(value);
+      //console.log(value);
     const {prompt}=this.state;
     prompt.show=false;
     prompt.title="";
@@ -143,4 +150,9 @@ export default class MainComponent extends React.Component {
     this.setState({prompt})
   }
   //-----------------end alert
+  setValue=(property,value)=>{
+    const {data}=this.state;
+    data[property]=value;
+    this.setState({data});
+  }
 }

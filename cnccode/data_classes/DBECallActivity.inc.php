@@ -48,7 +48,6 @@ class DBECallActivity extends DBEntity
     const overtimeDurationApproved = "overtimeDurationApproved";
     const customerNotes = "customerNotes";
     const cncNextAction = "cncNextAction";
-
     /**
      * calls constructor()
      * @access public
@@ -234,7 +233,8 @@ class DBECallActivity extends DBEntity
             DA_TEXT,
             DA_ALLOW_NULL
         );
-
+        
+        
         $this->addColumn(self::overtimeApprovedDate, DA_DATETIME, DA_ALLOW_NULL);
         $this->addColumn(self::overtimeApprovedBy, DA_ID, DA_ALLOW_NULL);
         $this->addColumn(self::overtimeDeniedReason, DA_STRING, DA_ALLOW_NULL);

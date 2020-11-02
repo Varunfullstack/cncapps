@@ -468,7 +468,7 @@ class CMPActivityDisplay extends MainComponent {
         el(
           "label",
           { className: "label  mt-5 mr-3 ml-1 mb-5", style: { display: "block" } },
-          "Customer Notes"
+          "Customer Summary"
         ),
         el(ToolTip,{width:15,title:"This information will be sent to the customer in an email unless the entire Service Request is hidden.",
         content:el("i",{className:"fal fa-info-circle mt-5 pointer icon"})})
@@ -497,7 +497,7 @@ class CMPActivityDisplay extends MainComponent {
         el('td',{className:"display-label"},data?.authorisedBy?"Authorised by":''),
         el('td',{className:"display-content"},data?.authorisedBy),
         el('td',{className:"display-label"},"Type"),
-        el('td',{colSpan:3},data?.activityType),
+        el('td',{colSpan:3,className:"nowrap"},data?.activityType),
         ),
 
         el('tr',null,
@@ -536,7 +536,7 @@ class CMPActivityDisplay extends MainComponent {
         el('tr',null,
         el('td',{colSpan:4}),
         el('td',{className:"display-label" },"Asset"),
-        el('td',{colSpan:3},data?.assetTitle), 
+        el('td',{colSpan:3},data?.assetName), 
         ),
 
         data?.currentUser?el('tr',null,        

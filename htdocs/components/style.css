@@ -859,7 +859,7 @@ input:checked+.slider:before {
 }
 /*-------------------end toggle*/
 .icon-size-1{
-    font-size: 14pt;
+    font-size: 14pt !important;
 }
 .link-round{
     background-color: #bdbec1;
@@ -878,6 +878,10 @@ input:checked+.slider:before {
 .flex-row{
     display: flex;
     flex-direction: row;
+}
+.flex-center{
+    align-items: center;
+    justify-content: center;
 }
 .flex-column{
     display: flex;
@@ -928,4 +932,21 @@ input:checked+.slider:before {
     border:1px solid #dedfe0;
     padding: 5px;
     height: 100%;
+}
+
+.contianer-round{
+   
+    margin-top:5px;
+    border:1px solid #bdbec1;
+    border-radius: 5px;
+    
+}
+.text-align-left{
+ text-align: left !important;   
+}
+.text-align-right{
+    text-align: right !important;   
+}
+.text-align-center{
+    text-align: center !important;   
 }

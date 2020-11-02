@@ -1766,6 +1766,11 @@ class BUActivity extends Business
             $totalTravelHours
         );
 
+        $problem->setValue(
+            DBEJProblem::emptyAssetReason,            
+            $dsCallActivity->getValue(DBEProblem::emptyAssetReason)
+        );
+
         if (in_array($problem->getValue(DBEProblem::status), ["F", "C"])) {
             /** @var $db dbSweetcode */
             global $db;
@@ -5988,7 +5993,10 @@ is currently a balance of ';
             DBEProblem::repeatProblem,
             $body->repeatProblem?1:0
         );
-
+        $dbeProblem->setValue(
+            DBEProblem::notFirstTimeFixReason,
+            $body->notFirstTimeFixReason
+        );
 
         $dbeProblem->insertRow();
 
@@ -6046,6 +6054,7 @@ is currently a balance of ';
             DBEJCallActivity::reason,
             $body->reason
         );
+        
         $dsCallActivity->setValue(
             DBEJCallActivity::serverGuard,
             $body->serverGuard??null
@@ -8956,7 +8965,8 @@ FROM
         $dbeCallActivity->setValue(DBEJCallActivity::overtimeDeniedReason, null);
         $dbeCallActivity->setValue(DBEJCallActivity::overtimeDurationApproved, null);
         $dbeCallActivity->setValue(DBEJCallActivity::expenseExportFlag, 'N');
-
+        $dbeCallActivity->setValue(DBEJCallActivity::cncNextAction, null);
+        $dbeCallActivity->setValue(DBEJCallActivity::customerNotes, null);
         $dbeCallActivity->setValue(
             DBEJCallActivity::serverGuard,
             $dbeCallActivity->getValue(DBEJCallActivity::serverGuard)

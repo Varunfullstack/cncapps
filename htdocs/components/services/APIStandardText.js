@@ -13,7 +13,10 @@ class APIStandardText extends APIMain{
     getOptionsByType=(type)=>{
         return fetch(`${ApiUrls.StandardText}getByType&type=${type}`).then(res => res.json());
     }
-     
+
+    getSalesRequestOptions=()=>{
+        return fetch(`${ApiUrls.StandardText}getSalesRequestOptions`).then(res => res.json());
+    }
      
 }
 export default APIStandardText;

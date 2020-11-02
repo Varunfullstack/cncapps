@@ -2716,7 +2716,7 @@ class CTActivity extends CTCNC
                         break;
                     case 'Portal':
                         //return "<i class='fab fa-edge' title='This Service Request was raised by the portal'></i>";
-                        return "<img src='../images/chrome_icon.png' style='width: 25px;' ></i>";
+                        return "<i class='icon-chrome_icon' style='font-size: 18px; margin:5px; color:#000080 ' ></i>";
                         break;
                     case 'Phone':
                         return "<i class='fa fa-phone' title='This Service Request was raised by phone'></i>";
@@ -6099,6 +6099,10 @@ class CTActivity extends CTCNC
      */
     function gatherFixedInformation()
     {
+        // go to new react page
+        // $newUrl=str_replace("Activity.php","SRActivity.php",$this->getFullPath());
+        // header('Location: ' . $newUrl);
+        // return; 
         $this->setMethodName('gatherFixedInformation');
 
         $this->setTemplateFiles(

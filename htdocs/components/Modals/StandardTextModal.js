@@ -42,6 +42,8 @@ class StandardTextModal  extends React.Component{
             templateDefault=op.template;
             templateValue=op.template;
             templateOptionId=op.id;
+            if(this.props.onTypeChange)
+                this.props.onTypeChange(id);
         }
         else 
         {

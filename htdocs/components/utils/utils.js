@@ -183,3 +183,8 @@ export function maxLength(items,propertyName){
 export const Chars={
   WhiteSpace:"&nbsp;"
 }
+export const isEmptyTime=(time)=>{
+  if(time==""||time==null||time=="00:00"||time=="")
+  return true;
+  else return false;
+}

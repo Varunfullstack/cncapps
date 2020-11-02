@@ -527,7 +527,7 @@ class DBEJProblem extends DBEProblem
           initial.caa_contno = " . $contactID . " and pro_date_raised >= date(now() - interval 3 month) 
          ";
 
-        $sql .= " ORDER BY pro_date_raised DESC";              // in progress
+        $sql .= " ORDER BY pro_date_raised DESC";              // in progress        
         $this->setQueryString($sql);
 
         return (parent::getRows());

@@ -1094,16 +1094,22 @@ class CTUser extends CTCNC
     }
     function getCurrentUser()
     {
+        $dbeJUser=new DBEJUser($this);
+        $dbeJUser->setValue(
+            DBEJUser::userID,
+            $this->dbeUser->getValue(DBEUser::userID)
+        );
+        $dbeJUser->getRow();
         return json_encode( [
-            'firstName' => $this->dbeUser->getValue(DBEJUser::firstName),
-            'lastName' => $this->dbeUser->getValue(DBEJUser::lastName),
-            'id' => $this->dbeUser->getValue(DBEJUser::userID),
-            'email' => $this->dbeUser->getEmail(),
+            'firstName' =>  $dbeJUser->getValue(DBEJUser::firstName),
+            'lastName' =>  $dbeJUser->getValue(DBEJUser::lastName),
+            'id' =>  $dbeJUser->getValue(DBEJUser::userID),
+            'email' =>  $dbeJUser->getEmail(),
             'isSDManger'=>$this->isSdManager(),
-            'isExpenseApprover' => $this->dbeUser->getValue(DBEJUser::isExpenseApprover),
-            'globalExpenseApprover' => $this->dbeUser->getValue(DBEJUser::globalExpenseApprover),
-            'teamID' => $this->dbeUser->getValue(DBEJUser::teamID),
-
+            'isExpenseApprover' =>  $dbeJUser->getValue(DBEJUser::isExpenseApprover),
+            'globalExpenseApprover' =>  $dbeJUser->getValue(DBEJUser::globalExpenseApprover),
+            'teamID' =>  $dbeJUser->getValue(DBEJUser::teamID),
+            'teamLevel'=> $dbeJUser->getValue(DBEJUser::teamLevel),
         ]);
     }
     function getAllUsers()

@@ -86,4 +86,6 @@
     <include file="db.changelog-4.12.0.xml"/>
     <include file="db.changelog-issue948.xml"/>
     <include file="db.changelog-issue977_.xml"/>
+    <include file="db.changelog-issue1049.xml"/>
+    
 </databaseChangeLog>

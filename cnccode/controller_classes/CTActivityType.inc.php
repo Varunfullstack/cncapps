@@ -229,6 +229,8 @@ class CTActivityType extends CTCNC
                 'catRequireCNCNextActionOnHold'            => $dsCallActType->getValue(DBECallActType::catRequireCNCNextActionOnHold),
                 'catRequireCustomerNoteCNCAction'            => $dsCallActType->getValue(DBECallActType::catRequireCustomerNoteCNCAction),
                 'catRequireCustomerNoteOnHold'            => $dsCallActType->getValue(DBECallActType::catRequireCustomerNoteOnHold),
+                'minMinutesAllowed'            => $dsCallActType->getValue(DBECallActType::minMinutesAllowed),
+
             )
         );
         $this->template->parse('CONTENTS', 'ActivityTypeEdit', true);
@@ -369,7 +371,7 @@ class CTActivityType extends CTCNC
                         'catRequireCustomerNoteCNCAction'            => $this->getCatRequireTitle($dsCallActType->getValue(DBECallActType::catRequireCustomerNoteCNCAction)),
                         'catRequireCNCNextActionOnHold'            => $this->getCatRequireTitle($dsCallActType->getValue(DBECallActType::catRequireCNCNextActionOnHold)),
                         'catRequireCustomerNoteOnHold'            => $this->getCatRequireTitle($dsCallActType->getValue(DBECallActType::catRequireCustomerNoteOnHold)),
-
+                        "minMinutesAllowed"                         =>$dsCallActType->getValue(DBECallActType::minMinutesAllowed),
                     )
                 );
                 $this->template->parse('types', 'typeBlock', true);
@@ -415,6 +417,7 @@ class CTActivityType extends CTCNC
                     'catRequireCNCNextActionOnHold'=>$dbeCallActType->getValue(DBECallActType::catRequireCNCNextActionOnHold),
                     'catRequireCustomerNoteOnHold'=>$dbeCallActType->getValue(DBECallActType::catRequireCustomerNoteOnHold),
                     'visibleInSRFlag'=>$dbeCallActType->getValue(DBECallActType::visibleInSRFlag),
+                    'minMinutesAllowed'=>$dbeCallActType->getValue(DBECallActType::minMinutesAllowed),
              ]);
         }
         return  $types;

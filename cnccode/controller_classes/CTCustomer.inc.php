@@ -1149,7 +1149,9 @@ class CTCustomer extends CTCNC
                 echo json_encode($this->getCustomerProjects());
                 exit;                
                 break; 
-
+                case "contracts":
+                    echo json_encode($this->getCustomerContracts());
+                    exit;
             default:
                 $this->displaySearchForm();
                 break;
@@ -3707,4 +3709,55 @@ class CTCustomer extends CTCNC
         $customerID = $_REQUEST["customerID"];
         return BUProject::getCustomerProjects($customerID);
     }
+    function getCustomerContracts()
+    {
+        $customerID = $_REQUEST["customerId"];
+        $contractCustomerItemID = $_REQUEST["contractCustomerItemID"];
+        $linkedToSalesOrder = $_REQUEST["linkedToSalesOrder"];
+        $contracts = array();
+        $buCustomerItem = new BUCustomerItem($this);
+        $dsContract = new DataSet($this);
+        if ($customerID) {
+            $buCustomerItem->getContractsByCustomerID(
+                $customerID,
+                $dsContract,
+                null
+            );
+        }
+
+        if (!$contractCustomerItemID) {
+            array_push($contracts,["id" => "", "name" => "tandMSelected", "renewalType" =>null]);
+        }
+
+        // if ($linkedToSalesOrder) {
+        //     $this->template->set_var(
+        //         [
+
+        //             'salesOrderReason' => "- Must be selected because this is linked to a Sales Order"
+        //         ]
+
+        //     );
+        // } 
+        while ($dsContract->fetchNext()) {
+
+            $description = $dsContract->getValue(DBEJContract::itemDescription) . ' ' . $dsContract->getValue(
+                DBEJContract::adslPhone
+            ) . ' ' . $dsContract->getValue(DBEJContract::notes) . ' ' . $dsContract->getValue(
+                DBEJContract::postcode
+            );
+            array_push($contracts,
+                array(
+                    'contractCustomerItemID' => $dsContract->getValue(DBEJContract::customerItemID),
+                    'contractDescription'    => $description,
+                    'prepayContract'         => $dsContract->getValue(DBEJContract::itemTypeID) == 57,
+                    'isDisabled'             => !$dsContract->getValue(
+                        DBEJContract::allowSRLog
+                    ) || $linkedToSalesOrder=='true' ? true : false,
+                    'renewalType'           => $dsContract->getValue(DBEJContract::renewalType)
+                )
+            );            
+         }
+         return $contracts;
+    } 
+    
 }

@@ -82,6 +82,8 @@ class BUProject extends Business
      */
     public static function getCustomerProjects($customerID)
     {
+        if(!isset($customerID))
+        return [];
         $thing = null;
         $buProject = new BUProject($thing);
         $dsProject = new DataSet($thing);
@@ -125,6 +127,8 @@ class BUProject extends Business
                                      $activityDate = false
     )
     {
+        if(!isset($customerID))
+        return [];
         $this->dbeProject->getRowsByCustomerID(
             $customerID,
             $activityDate

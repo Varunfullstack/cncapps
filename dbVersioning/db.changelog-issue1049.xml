@@ -1,0 +1,62 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdevMt" id="issue1049-0">
+        <tagDatabase tag="issue1049"/>
+    </changeSet>
+    <changeSet id="issue1049-1" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="callacttype" columnName="minMinutesAllowed"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="callacttype">
+            <column name="minMinutesAllowed" type="int(4)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue1049-2" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">            
+                <columnExists tableName="callacttype" columnName="minMinutesAllowed"/>             
+        </preConditions>
+        <sql>
+         update callacttype set minMinutesAllowed=0 ;
+         update callacttype set minMinutesAllowed=5 where cat_callacttypeno=8;
+         update callacttype set minMinutesAllowed=15 where cat_callacttypeno=4;
+        </sql>
+    </changeSet>
+    <changeSet id="issue1049-3" author="pavwebdev">
+        <sql>
+                INSERT INTO  standardtexttype (sty_desc) VALUES  ('Not First Time Fix Reason');
+        </sql>
+    </changeSet>
+    <changeSet id="issue1049-4" author="pavwebdev">
+        <sql>
+            INSERT INTO standardtext(`stt_desc`,`stt_text`,`stt_standardtexttypeno`) VALUES('Not First Time Fix Reason','Customer wanted call back later
+            Too busy',(select sty_standardtexttypeno from standardtexttype where sty_desc="Not First Time Fix Reason"))
+        </sql>
+    </changeSet>
+     
+    <changeSet id="issue1049-6" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="problem" columnName="notFirstTimeFixReason"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="problem">
+            <column name="notFirstTimeFixReason" type="text" >
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    
+    <changeSet id="issue1049-8" author="pavwebdev">
+        <sql>
+                INSERT INTO standardtexttype (sty_desc) VALUES  ('Missing Asset Reason');
+                INSERT INTO standardtext(`stt_desc`,`stt_text`,`stt_standardtexttypeno`) VALUES("Contact's privately owned computer","Contact's privately owned computer",(select sty_standardtexttypeno from standardtexttype where sty_desc="Missing Asset Reason"));
+                INSERT INTO standardtext(`stt_desc`,`stt_text`,`stt_standardtexttypeno`) VALUES("Major project installation","Major project installation",(select sty_standardtexttypeno from standardtexttype where sty_desc="Missing Asset Reason"));
+        </sql>
+    </changeSet>
+</databaseChangeLog>

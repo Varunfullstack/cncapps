@@ -31,5 +31,9 @@ class APICustomers extends APIMain{
         .then(res => res.json())         
         ;
     }
+    getCustomerContracts(customerId,contractCustomerItemID,linkedToSalesOrder)
+    {
+        return fetch(`${ApiUrls.Customer}contracts&customerId=${customerId}&contractCustomerItemID=${contractCustomerItemID}&linkedToSalesOrder=${linkedToSalesOrder}`).then(res => res.json());
+    }
 }
 export default APICustomers;

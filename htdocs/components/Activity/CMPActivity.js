@@ -4,6 +4,7 @@
 import { params } from "../utils/utils.js?v=10";
 import CMPActivityDisplay from "./components/CMPActivityDisplay.js?v=10";
 import CMPActivityEdit from "./components/CMPActivityEdit.js?v=10";
+import CMPGatherFixedInformation from "./components/CMPGatherFixedInformation.js?v=10";
 class CMPActivity extends React.Component {
     el = React.createElement;
 
@@ -19,8 +20,8 @@ class CMPActivity extends React.Component {
         return ( 
             el('div',null,
             action==='displayActivity'?el(CMPActivityDisplay,null):null ,
-            action==='editActivity'?el(CMPActivityEdit,null):null 
-
+            action==='editActivity'?el(CMPActivityEdit,null):null,
+            action==='gatherFixedInformation'?el(CMPGatherFixedInformation):null,
             )
             );
     }

@@ -66,6 +66,8 @@ class DBEProblem extends DBEntity
     const assetName="assetName";
     const assetTitle="assetTitle";
     const repeatProblem="repeatProblem";
+    const notFirstTimeFixReason="notFirstTimeFixReason";
+    const emptyAssetReason="emptyAssetReason";
     /**
      * calls constructor()
      * @access public
@@ -416,6 +418,16 @@ class DBEProblem extends DBEntity
         $this->addColumn(
             self::repeatProblem,
             DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::notFirstTimeFixReason,
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::emptyAssetReason,
+            DA_TEXT,
             DA_ALLOW_NULL
         );
         

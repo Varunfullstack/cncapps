@@ -12,6 +12,10 @@ class CMPLastStep extends MainComponent {
 
   apiCustomer = new APICustomers();
   apiStandardText = new APIStandardText();
+  modalType={
+    notStartWorkReason:"notStartWorkReason",
+    notFirstTimeFixReason:"notFirstTimeFixReason"
+  }
   constructor(props) {
     super(props);
     const { data } = this.props;
@@ -19,9 +23,11 @@ class CMPLastStep extends MainComponent {
      ...this.state,
       checkList: [],
       noWorkOptions: [],
+      notFirstTimeFixOptions:[],
       contacts: [],
       _showModal: false,
       requireAuthorize: false,
+      modalType:null,
       data: {
         uploadFiles: [],
         repeatProblem: data.repeatProblem || false,
@@ -49,6 +55,9 @@ class CMPLastStep extends MainComponent {
       this.apiStandardText.getOptionsByType(
         "Unable to offer First Time Fix reason"
       ),
+      this.apiStandardText.getOptionsByType(
+        "Not First Time Fix Reason"
+      ),
     ]);
     console.log("result", result);
     const { data } = this.state;
@@ -68,6 +77,7 @@ class CMPLastStep extends MainComponent {
       contacts: result[1],
       standardTextList: result[0],
       noWorkOptions: result[2],
+      notFirstTimeFixOptions: result[3],
       data,
     });
     this.checkStartWorkNow();
@@ -401,10 +411,10 @@ class CMPLastStep extends MainComponent {
   };
   getNotStartReasonElement = () => {
     const { el } = this;
-    const { _showModal, noWorkOptions, data } = this.state;
+    const { _showModal,modalType, noWorkOptions, data } = this.state;
     if (!_showModal) return null;
     return el(StandardTextModal, {
-      show: _showModal,
+      show: _showModal&&modalType==this.modalType.notStartWorkReason,
       options: noWorkOptions,
       value: data.notStartWorkReason,
       title: "Why you don't want to start working now?",
@@ -418,12 +428,38 @@ class CMPLastStep extends MainComponent {
     data.notStartWorkReason = value;
     this.setState({ data,_showModal:false });
   };
+  getNotFirstTimeFixReasonElement = () => {
+    const { el } = this;
+    const { _showModal,modalType, notFirstTimeFixOptions, data } = this.state;
+    if (!_showModal) return null;
+    return el(StandardTextModal, {
+      show: _showModal&&modalType==this.modalType.notFirstTimeFixReason&&data.notFirstTimeFixReason==null,
+      options: notFirstTimeFixOptions,
+      value: data.notFirstTimeFixReason,
+      title: "Reason for not attempting a First Time Fix",
+      okTitle: "OK",
+      onChange: this.handleNotFirstTimeFixReason,
+      onCancel:()=>this.setState({_showModal:false,modalType:null})
+    });
+  };
+  handleNotFirstTimeFixReason = (value) => {
+    if(value!="")
+    {
+    const { data } = this.state;
+    data.notFirstTimeFixReason = value;
+    this.setState({ data,_showModal:false,modalType:null });
+    this.handleNext();
+    }
+
+  };
+
   checkStartWorkNow = async() => {
     const { currentUser } = this.props.data;
     const { customer } = this.props.data;
     const { data } = this.state;
     const result = true;
     let _showModal = false;
+    let modalType=null;
     if (
       customer.hasServiceDesk != null &&
       currentUser.teamID == TeamType.Helpdesk &&
@@ -432,13 +468,15 @@ class CMPLastStep extends MainComponent {
     ) {
       if (!await this.confirm("Do you want to start working on this now?")) {
         _showModal = true;
+        modalType=this.modalType.notStartWorkReason;
       } else data.startWork = true;
     }
-    if (result) this.setState({ data, _showModal });
+    if (result) this.setState({ data, _showModal ,modalType});
     return true;
   };
   isValid = () => {
     const { data, requireAuthorize } = this.state;
+    const {currentUser}=this.props.data;
     if (data.contactID == -1) {
       this.alert("Please select contact");
       return false;
@@ -456,10 +494,20 @@ class CMPLastStep extends MainComponent {
       this.alert("Please select queue");
       return false;
     }
+
     if (data.reason == "") {
       this.alert("Please select queue");
       return false;
     }
+    if(currentUser.teamLevel==1&&data.queueNo==TeamType.Helpdesk&&(data.notFirstTimeFixReason==null||data.notFirstTimeFixReason==""))
+    {
+      console.log("not first");
+      const _showModal=true;
+      const modalType=this.modalType.notFirstTimeFixReason;
+      this.setState({modalType,_showModal});
+      return false;
+    }
+
     return true;
   };
   getDocumentsElement = () => {
@@ -560,6 +608,7 @@ class CMPLastStep extends MainComponent {
       this.getDocumentsElement(),
       this.getSelectedFilesElement(),      
       this.getNotStartReasonElement(),
+      this.getNotFirstTimeFixReasonElement(),
       this.getNextButton(),
     );
   }

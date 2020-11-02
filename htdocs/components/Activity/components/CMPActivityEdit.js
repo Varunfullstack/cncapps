@@ -1,6 +1,6 @@
 import APIActivity from "../../services/APIActivity.js";
 import APICallactType from "../../services/APICallactType.js";
-import {groupBy, padEnd, params, pick,sort,TeamType} from "../../utils/utils.js";
+import {groupBy, isEmptyTime, padEnd, params, pick,sort,TeamType} from "../../utils/utils.js";
 import Toggle from "../../utils/toggle.js";
 import Table from "../../utils/table/table.js"
 import Modal from "../../utils/modal.js";
@@ -60,7 +60,9 @@ class CMPActivityEdit extends MainComponent {
         cncNextActionTemplate:"",
         customerNotes:"",
         customerNotesTemplate:"",
-        priorityChangeReason:""
+        priorityChangeReason:"",
+        emptyAssetReason:"",
+        emptyAssetReasonNotify:false
       },
       currentActivity: "",
       _showModal: false,
@@ -200,6 +202,7 @@ class CMPActivityEdit extends MainComponent {
       });
     });
   }
+  // update>
   updateActivity = async (autoSave=false) => {
     const data = { ...this.state.data };
 
@@ -210,7 +213,7 @@ class CMPActivityEdit extends MainComponent {
     data.priority = this.state.priorities.filter(
       (p) => p.name === data.priority
     )[0].id;
-    if (this.isValid(data)) {
+    if (await this.isValid(data)) {
       delete data.activities;
       delete data.onSiteActivities;
       delete data.documents;
@@ -240,13 +243,16 @@ class CMPActivityEdit extends MainComponent {
         "assetTitle",
         "rootCauseID",
         "contractCustomerItemID",
+        "hideFromCustomerFlag",
+        "submitAsOvertime",
+        "emptyAssetReason"
       ]);
       console.log(finalData);
 
       this.api
         .updateActivity(finalData)
         .then((response) => {
-          // update: return;
+           //return; // update>
           if (response.error) this.alert(response.error);
           else {
             if (!autoSave) {
@@ -261,7 +267,7 @@ class CMPActivityEdit extends MainComponent {
         });
     }
   };
-  isValid = (data) => {
+  isValid = async(data) => {
     console.log(data);
     if (data.callActTypeID == "") {
       //this.alert("Please select Activity Type");
@@ -354,14 +360,19 @@ class CMPActivityEdit extends MainComponent {
     switch (data.nextStatus) {
       case this.activityStatus.CustomerAction:
         const dateMoment = moment(data.alarmDate);
+
+        //console.log('alarmTime',data.alarmTime,data.alarmDate,dateMoment.isValid(), dateMoment.isSameOrBefore(moment(), "minute"));
         if (
           !dateMoment.isValid() ||
-          dateMoment.isSameOrBefore(moment(), "minute")
+          dateMoment.isSameOrBefore(moment(), "minute")||
+          data.alarmDate==""||
+          data.alarmTime=="00:00"||
+          data.alarmTime==""
         ) {
           this.alert("Please provide a future date and time");
           return false;
         }
-        break;
+         break;
     }
     if (data.nextStatus === this.activityStatus.Escalate) {
       if (
@@ -372,8 +383,36 @@ class CMPActivityEdit extends MainComponent {
         return false;
       }
     }
+    if(callActType&&!isEmptyTime(data.startTime)&&!isEmptyTime(data.endTime))
+    {
+      const startDt=moment(data.date+" "+data.startTime);
+      const endDt=moment(data.date+" "+data.endTime);
+      const actTypeMinTime=callActType.minMinutesAllowed;
+      const timeDiff=endDt.diff(startDt,'m');
+      if(timeDiff<actTypeMinTime)
+      {
+          this.alert(`The minimum number of minutes for ${callActType.description} is ${actTypeMinTime}, you must either log more time or choose a different activity type`)
+        return false;
+
+      }  
+    }
+    console.log(data.assetName==""&&(this.state.data.emptyAssetReason==""||this.state.data.emptyAssetReason==null||!this.state.data.emptyAssetReasonNotify));
+    if(data.assetName==""&&(this.state.data.emptyAssetReason==""||this.state.data.emptyAssetReason==null||!this.state.data.emptyAssetReasonNotify))
+    {
+      const reson=await this.prompt("Please provide the reason of not listing an asset",500,this.state.data.emptyAssetReason);      
+      console.log(reson);
+      if(reson!=false)
+      {
+        this.state.data.emptyAssetReason=reson;    
+        this.state.data.emptyAssetReasonNotify=true;  
+        this.setState({data: this.state.data},()=>this.updateActivity(false));
+        console.log("reason", this.state.data);
+      }
+      return false;
+    }
     return true;
   };
+  
   setValue = (label, value) => {
     const { data } = this.state;
     data[label] = value;
@@ -794,6 +833,11 @@ class CMPActivityEdit extends MainComponent {
         if(!await this.confirm(`Are you sure you don't want to put an entry for Customer Notes?`))
         return false;
       }
+    }    
+    if(data.hideFromCustomerFlag=='Y'&&data.problemHideFromCustomerFlag!='Y'&&data.customerNotesTemplate!='')
+    {
+      this.alert(`Hide from customer can't be set because there is a customer note`);
+      return false;
     }
     return true;
   }
@@ -823,6 +867,11 @@ class CMPActivityEdit extends MainComponent {
         if(!await this.confirm(`Are you sure you don't want to put an entry for Customer Notes?`))
         return false;
       }
+    }
+    if(data.hideFromCustomerFlag=='Y'&&data.problemHideFromCustomerFlag!='Y'&&data.customerNotesTemplate!='')
+    {
+      this.alert(`Hide from customer can't be set because there is a customer note`);
+      return false;
     }
     return true;
   }
@@ -977,7 +1026,7 @@ class CMPActivityEdit extends MainComponent {
   getContactsElement = () => {
     const { el } = this;
     const { data, contacts,currentContact } = this.state;
-    console.log(contacts);
+    //console.log(contacts);
     const contactsGroup = groupBy(contacts, "siteTitle");
     return el('div',{style:{display:"flex",flexDirection:"row",border:0,marginRight:-6,padding:0}}, el(
       "select",
@@ -1647,7 +1696,7 @@ class CMPActivityEdit extends MainComponent {
         el(
           "label",
           { className: "label m-5 mr-2", style: { display: "block" } },
-          "Customer Notes"
+          "Customer Summary"
         ),
         el(ToolTip,{width:5,title:"This information will be sent to the customer in an email unless the entire Service Request is hidden.",
         content:el("i",{className:"fal fa-info-circle mt-5 pointer icon"})})
@@ -1783,7 +1832,7 @@ class CMPActivityEdit extends MainComponent {
   getPriorityChangeReason= ()=>{
     const {data,priorityReasons}=this.state;
     const {el}=this;   
-    console.log(priorityReasons);
+    //console.log(priorityReasons);
     return el(StandardTextModal,
       {
         options:priorityReasons,

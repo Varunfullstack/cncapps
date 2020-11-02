@@ -1,3 +1,8 @@
+/**
+ * paramters
+ * onChange > function
+ * inline bool default =false
+ */
 export default class CKEditor extends React.Component {
   el = React.createElement;
   constructor(props) {
@@ -50,7 +55,10 @@ componentDidUpdate=(prevProps, prevState)=> {
         CKEDITOR.instances[this.elementName].config.width  = this.props.width||'auto';
         CKEDITOR.instances[this.elementName].config.height = this.props.height||220;
         CKEDITOR.instances[this.elementName].config.resize_minHeight = this.props.height||220;
-
+        if(this.props.disableClipboard)
+        CKEDITOR.instances[this.elementName].on('paste', function (evt) {
+          evt.cancel();
+      });
         //CKEDITOR.instances[this.elementName].config.allowedContent = '*{*}';
         //CKEDITOR.instances[this.elementName].config.extraAllowedContent = '*{*}';
 
