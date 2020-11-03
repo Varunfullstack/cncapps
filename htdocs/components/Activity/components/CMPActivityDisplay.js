@@ -355,8 +355,8 @@ class CMPActivityDisplay extends MainComponent {
         const indx=data?.activities.findIndex(a=>a.callActivityID==currentActivity);   
         return el('div',{className:"activities-contianer"},
         el('div',{style:{width:"100%",display:"flex",alignItems: "center", justifyContent: "center"}},
-        el(ToolTip,{title:"First ",content: el('i',{ className:"fal  fa-step-backward icon icon-size-1 mr-4 ml-4 pointer",   onClick:this.goFirstActivity})}),
-        el(ToolTip,{title:"Previous",content:  el('i',{className:"fal  fa-backward icon icon-size-1 pointer",style:{fontSize:21}, onClick:this.goPrevActivity})}),
+        el(ToolTip,{title:"First ",content: el('i',{ className:"fal  fa-step-backward icon font-size-4 mr-4 ml-4 pointer",   onClick:this.goFirstActivity})}),
+        el(ToolTip,{title:"Previous",content:  el('i',{className:"fal  fa-backward icon font-size-4 pointer",style:{fontSize:21}, onClick:this.goPrevActivity})}),
         el('select',{value:currentActivity,onChange:this.handleActivityChange},
         indx==-1?el('option',{value:null},""):null,
         data?.activities.map(a=>
@@ -369,8 +369,8 @@ class CMPActivityDisplay extends MainComponent {
                 +(a.activityType||'')}
         }))
         ),        
-        el(ToolTip,{title:"Next",content: el('i',{ className:"fal  fa-forward icon icon-size-1 mr-4 ml-4 pointer",style:{fontSize:21}, onClick:this.goNextActivity})}),
-        el(ToolTip,{title:"Last",content: el('i',{className:"fal  fa-step-forward icon icon-size-1 pointer", onClick:this.goLastActivity})}),        
+        el(ToolTip,{title:"Next",content: el('i',{ className:"fal  fa-forward icon font-size-4 mr-4 ml-4 pointer",style:{fontSize:21}, onClick:this.goNextActivity})}),
+        el(ToolTip,{title:"Last",content: el('i',{className:"fal  fa-step-forward icon font-size-4 pointer", onClick:this.goLastActivity})}),        
         this.getCurrentActivityIndxElement(data,currentActivity)
         ),        
         el('div',{style:{display:"flex",flexDirection:"row",alignItems: "center", justifyContent: "center"}},  
@@ -584,7 +584,7 @@ class CMPActivityDisplay extends MainComponent {
                 path: "delete",
                 label: "",
                 sortable: false,                  
-                content:(document)=>el('i',{className:"fal fa-trash-alt pointer icon icon-size-1",onClick:()=>this.deleteDocument(document.id)})  
+                content:(document)=>el('i',{className:"fal fa-trash-alt pointer icon font-size-4",onClick:()=>this.deleteDocument(document.id)})  
             },
         ]       
         return el('div',{className:"activities-contianer"},
@@ -596,10 +596,10 @@ class CMPActivityDisplay extends MainComponent {
             pk: "id",
             search: false,
           }):null,
-          el('div',{style:{width:20}},el(ToolTip,{title:"Add document",content: el('i',{className:"fal fa-plus pointer icon icon-size-1",onClick:this.handleSelectFiles})}),),          
+          el('div',{style:{width:20}},el(ToolTip,{title:"Add document",content: el('i',{className:"fal fa-plus pointer icon font-size-4",onClick:this.handleSelectFiles})}),),          
           el('input',{ref:this.fileUploader,name:'usefile', type:"file",style:{display:"none"},multiple:"multiple",onChange:this.handleFileSelected}),          
           this.getSelectedFilesElement(),
-          uploadFiles.length>0?el(ToolTip,{width:30,title:"Upload documents",content:el('i',{className:"fal fa-upload pointer icon icon-size-1",onClick:this.handleUpload})}):null,
+          uploadFiles.length>0?el(ToolTip,{width:30,title:"Upload documents",content:el('i',{className:"fal fa-upload pointer icon font-size-4",onClick:this.handleUpload})}):null,
         );
     }
     getSelectedFilesElement=()=>{
@@ -772,9 +772,9 @@ class CMPActivityDisplay extends MainComponent {
     getFooter=()=>{
         const {el}=this;
         return el('div',{className:"activities-contianer"},
-        el('button',{className:"m-5",onClick:()=>this.handleTemplateDisplay("partsUsed")},"Parts Used"),
-        el('button',{className:"m-5",onClick:()=>this.handleTemplateDisplay("salesRequest")},"Sales Request"),
-        el('button',{className:"m-5",onClick:()=>this.handleTemplateDisplay("changeRequest")},"Change Request"),
+        el('button',{className:"m-5",onClick:()=>this.handleTemplateDisplay("partsUsed"),className:"btn-info"},"Parts Used"),
+        el('button',{className:"m-5",onClick:()=>this.handleTemplateDisplay("salesRequest"),className:"btn-info"},"Sales Request"),
+        el('button',{className:"m-5",onClick:()=>this.handleTemplateDisplay("changeRequest"),className:"btn-info"},"Change Request"),
 
         )
     }

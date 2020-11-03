@@ -5993,6 +5993,7 @@ is currently a balance of ';
             DBEProblem::repeatProblem,
             $body->repeatProblem?1:0
         );
+        if(isset($body->notFirstTimeFixReason))
         $dbeProblem->setValue(
             DBEProblem::notFirstTimeFixReason,
             $body->notFirstTimeFixReason

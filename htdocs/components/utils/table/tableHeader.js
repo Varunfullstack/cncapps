@@ -26,11 +26,11 @@ class TableHeader extends React.Component {
       if (column.path === this.props.sortColumn.path) {
         style = null;
         if (this.props.sortColumn.order === "asc") {
-          key = "fa-sort-asc";
-          className = "fa fa-sort-asc";
+          key = "fa-sort-up";
+          className = "fa fa-sort-up";
         } else {
           key = "fa-sort-desc";
-          className = "fa fa-sort-desc";
+          className = "fa fa-sort-down";
         }
       }
     }

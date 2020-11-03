@@ -36,6 +36,7 @@ class DBECallActType extends DBEntity
     const catRequireCNCNextActionOnHold = "catRequireCNCNextActionOnHold";
     const catRequireCustomerNoteOnHold = "catRequireCustomerNoteOnHold";
     const minMinutesAllowed="minMinutesAllowed";
+    const orderNum="orderNum";
     /**
      * calls constructor()
      * @access public
@@ -89,6 +90,7 @@ class DBECallActType extends DBEntity
         $this->addColumn(self::catRequireCNCNextActionOnHold, DA_INTEGER, DA_ALLOW_NULL, 'catRequireCNCNextActionOnHold');
         $this->addColumn(self::catRequireCustomerNoteOnHold, DA_INTEGER, DA_ALLOW_NULL, 'catRequireCustomerNoteOnHold');
         $this->addColumn(self::minMinutesAllowed, DA_INTEGER, DA_NOT_NULL, 'minMinutesAllowed');
+        $this->addColumn(self::orderNum, DA_FLOAT, DA_NOT_NULL, 'orderNum');
         $this->setAddColumnsOff();
         $this->setPK(0);
     }

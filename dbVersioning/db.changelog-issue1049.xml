@@ -59,4 +59,20 @@
                 INSERT INTO standardtext(`stt_desc`,`stt_text`,`stt_standardtexttypeno`) VALUES("Major project installation","Major project installation",(select sty_standardtexttypeno from standardtexttype where sty_desc="Missing Asset Reason"));
         </sql>
     </changeSet>
+
+      <changeSet id="issue1049-9" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="callacttype" columnName="orderNum"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="callacttype">
+            <column name="orderNum" type="FLOAT" defaultValue="1">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <sql>
+                update callacttype set orderNum=cat_callacttypeno;
+        </sql>
+    </changeSet>
 </databaseChangeLog>

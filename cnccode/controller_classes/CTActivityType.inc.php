@@ -59,7 +59,13 @@ class CTActivityType extends CTCNC
             case "getCallActTypes":
                 echo json_encode($this->getCallActTypes());
                 exit;
+            case "getAllDetails":
+                echo json_encode($this->getActTypeList());
+                exit;
             case CTACTIVITYTYPE_ACT_DISPLAY_LIST:
+            case "updateActivityTypeOrder":
+                echo json_encode($this->updateActivityTypeOrder());
+                exit;
             default:
                 $this->displayList();
                 break;
@@ -304,36 +310,86 @@ class CTActivityType extends CTCNC
         $this->setMethodName('displayList');
         $this->setPageTitle('Activity Types');
         $this->setTemplateFiles(
-            array('ActivityTypeList' => 'ActivityTypeList.inc')
+            array('ActivityTypeList' => 'ActivityTypeList.rct')
+        );         
+        $this->template->parse('CONTENTS', 'ActivityTypeList', true);
+        $this->parsePage();
+    }
+    function getCatRequireTitle($value)
+    {
+        if($value==0)
+        return "Off";
+        if($value==1)
+        return "On";
+        if($value==2)
+        return "Optional";
+    }
+    function getCallActTypes()
+    {
+        $dbeCallActType = new DBECallActType($this);
+        $dbeCallActType->setValue(
+            DBEJCallActType::activeFlag,
+            'Y'
         );
+        $dbeCallActType->getRowsByColumn(
+            DBEJCallActType::activeFlag,
+            'description'
+        );        
+        $types=array();        
+        while ($dbeCallActType->fetchNext()) {
+            array_push($types,[
+                    'id'           => $dbeCallActType->getValue(DBECallActType::callActTypeID),
+                    'description' => $dbeCallActType->getValue(DBECallActType::description),
+                    'allowOvertime'           => $dbeCallActType->getValue(
+                        DBECallActType::engineerOvertimeFlag
+                    ) == 'Y' ? 1 : 0,
+                    "curValueFlag"=>$dbeCallActType->getValue(DBECallActType::curValueFlag),
+                    "requireCheckFlag"=>$dbeCallActType->getValue(DBECallActType::requireCheckFlag),
+                    'onSiteFlag'=>$dbeCallActType->getValue(DBECallActType::onSiteFlag),
+                    'reqReasonFlag'=>$dbeCallActType->getValue(DBECallActType::reqReasonFlag),
+                    'catRequireCNCNextActionCNCAction'=>$dbeCallActType->getValue(DBECallActType::catRequireCNCNextActionCNCAction),
+                    'catRequireCustomerNoteCNCAction'=>$dbeCallActType->getValue(DBECallActType::catRequireCustomerNoteCNCAction),
+                    'catRequireCNCNextActionOnHold'=>$dbeCallActType->getValue(DBECallActType::catRequireCNCNextActionOnHold),
+                    'catRequireCustomerNoteOnHold'=>$dbeCallActType->getValue(DBECallActType::catRequireCustomerNoteOnHold),
+                    'visibleInSRFlag'=>$dbeCallActType->getValue(DBECallActType::visibleInSRFlag),
+                    'minMinutesAllowed'=>$dbeCallActType->getValue(DBECallActType::minMinutesAllowed),
+                    'order'=>$dbeCallActType->getValue(DBECallActType::orderNum),
+             ]);
+        }
+        return  $types;
+    }
+    /**
+     * @return json array
+     */
+    function getActTypeList()
+    {
         $dsCallActType = new DataSet($this);
         $this->buActivityType->getAllTypes($dsCallActType);
+        $types=array();
+        // $urlCreate = Controller::buildLink(
+        //     $_SERVER['PHP_SELF'],
+        //     array(
+        //         'action' => CTACTIVITYTYPE_ACT_CREATE
+        //     )
+        // );
 
-        $urlCreate = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'action' => CTACTIVITYTYPE_ACT_CREATE
-            )
-        );
+        // $this->template->set_var(
+        //     array('urlCreate' => $urlCreate)
+        // );
 
-        $this->template->set_var(
-            array('urlCreate' => $urlCreate)
-        );
-
-        if ($dsCallActType->rowCount()) {
-            $this->template->set_block('ActivityTypeList', 'typeBlock', 'types');
+        if ($dsCallActType->rowCount()) {            
             while ($dsCallActType->fetchNext()) {
                 $callActTypeID = $dsCallActType->getValue(DBECallActType::callActTypeID);
-                $urlEdit =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'        => CTACTIVITYTYPE_ACT_EDIT,
-                            'callActTypeID' => $callActTypeID
-                        )
-                    );
-                $txtEdit = '[edit]';
-                $this->template->set_var(
+                // $urlEdit =
+                //     Controller::buildLink(
+                //         $_SERVER['PHP_SELF'],
+                //         array(
+                //             'action'        => CTACTIVITYTYPE_ACT_EDIT,
+                //             'callActTypeID' => $callActTypeID
+                //         )
+                //     );
+                // $txtEdit = '[edit]';
+               array_push($types,
                     array(
                         'callActTypeID'         => $callActTypeID,
                         'description'           => Controller::htmlDisplayText(
@@ -364,62 +420,31 @@ class CTActivityType extends CTCNC
                         'travelFlag'            => $dsCallActType->getValue(DBECallActType::travelFlag),
                         'onSiteFlag'            => $dsCallActType->getValue(DBECallActType::onSiteFlag),
                         'portalDisplayFlag'     => $dsCallActType->getValue(DBECallActType::portalDisplayFlag),
-                        'visibleInSRFlag'       => $dsCallActType->getValue(DBECallActType::visibleInSRFlag),
-                        'urlEdit'               => $urlEdit,
-                        'txtEdit'               => $txtEdit,
+                        'visibleInSRFlag'       => $dsCallActType->getValue(DBECallActType::visibleInSRFlag),                        
                         'catRequireCNCNextActionCNCAction'            =>$this->getCatRequireTitle($dsCallActType->getValue(DBECallActType::catRequireCNCNextActionCNCAction)),
                         'catRequireCustomerNoteCNCAction'            => $this->getCatRequireTitle($dsCallActType->getValue(DBECallActType::catRequireCustomerNoteCNCAction)),
                         'catRequireCNCNextActionOnHold'            => $this->getCatRequireTitle($dsCallActType->getValue(DBECallActType::catRequireCNCNextActionOnHold)),
                         'catRequireCustomerNoteOnHold'            => $this->getCatRequireTitle($dsCallActType->getValue(DBECallActType::catRequireCustomerNoteOnHold)),
                         "minMinutesAllowed"                         =>$dsCallActType->getValue(DBECallActType::minMinutesAllowed),
+                        "order"                         =>$dsCallActType->getValue(DBECallActType::orderNum),
                     )
                 );
-                $this->template->parse('types', 'typeBlock', true);
-            }//while $dsCallActType->fetchNext()
+             }//while $dsCallActType->fetchNext()
         }
-        $this->template->parse('CONTENTS', 'ActivityTypeList', true);
-        $this->parsePage();
+        return $types;
     }
-    function getCatRequireTitle($value)
-    {
-        if($value==0)
-        return "Off";
-        if($value==1)
-        return "On";
-        if($value==2)
-        return "Optional";
-    }
-    function getCallActTypes()
-    {
-        $dbeCallActType = new DBECallActType($this);
-        $dbeCallActType->setValue(
-            DBEJCallActType::activeFlag,
-            'Y'
-        );
-        $dbeCallActType->getRowsByColumn(
-            DBEJCallActType::activeFlag,
-            'description'
-        );
-        $types=array();        
-        while ($dbeCallActType->fetchNext()) {
-            array_push($types,[
-                    'id'           => $dbeCallActType->getValue(DBECallActType::callActTypeID),
-                    'description' => $dbeCallActType->getValue(DBECallActType::description),
-                    'allowOvertime'           => $dbeCallActType->getValue(
-                        DBECallActType::engineerOvertimeFlag
-                    ) == 'Y' ? 1 : 0,
-                    "curValueFlag"=>$dbeCallActType->getValue(DBECallActType::curValueFlag),
-                    "requireCheckFlag"=>$dbeCallActType->getValue(DBECallActType::requireCheckFlag),
-                    'onSiteFlag'=>$dbeCallActType->getValue(DBECallActType::onSiteFlag),
-                    'reqReasonFlag'=>$dbeCallActType->getValue(DBECallActType::reqReasonFlag),
-                    'catRequireCNCNextActionCNCAction'=>$dbeCallActType->getValue(DBECallActType::catRequireCNCNextActionCNCAction),
-                    'catRequireCustomerNoteCNCAction'=>$dbeCallActType->getValue(DBECallActType::catRequireCustomerNoteCNCAction),
-                    'catRequireCNCNextActionOnHold'=>$dbeCallActType->getValue(DBECallActType::catRequireCNCNextActionOnHold),
-                    'catRequireCustomerNoteOnHold'=>$dbeCallActType->getValue(DBECallActType::catRequireCustomerNoteOnHold),
-                    'visibleInSRFlag'=>$dbeCallActType->getValue(DBECallActType::visibleInSRFlag),
-                    'minMinutesAllowed'=>$dbeCallActType->getValue(DBECallActType::minMinutesAllowed),
-             ]);
+    function updateActivityTypeOrder(){
+        $callActTypeID=$_REQUEST["callActTypeID"];
+        $order=$_REQUEST["order"];
+        if(!isset($callActTypeID)||!isset($order))
+        {
+            http_response_code(400);
+            return ["status"=>0];
         }
-        return  $types;
+        $dbeCallActType=new DBECallActType($this);
+        $dbeCallActType->getRow($callActTypeID);
+        $dbeCallActType->setValue(DBECallActType::orderNum,$order);
+        $dbeCallActType->updateRow();
+        return ["status"=>1];
     }
 }

@@ -704,17 +704,17 @@ class CMPActivityEdit extends MainComponent {
       //   : null,
       el(
         "button",
-        { onClick: () => this.handleTemplateDisplay("changeRequest") },
+        { onClick: () => this.handleTemplateDisplay("changeRequest"),className:"btn-info" },
         "Change Request"
       ),
       el(
         "button",
-        { onClick: () => this.handleTemplateDisplay("salesRequest") },
+        { onClick: () => this.handleTemplateDisplay("salesRequest"),className:"btn-info" },
         "Sales Request"
       ),
       el(
         "button",
-        { onClick: () => this.handleTemplateDisplay("partsUsed") },
+        { onClick: () => this.handleTemplateDisplay("partsUsed") ,className:"btn-info"},
         "Parts Used"
       ),
       data?.callActTypeID != 59
@@ -1431,7 +1431,7 @@ class CMPActivityEdit extends MainComponent {
         sortable: false,
         content: (document) =>
           el("i", {
-            className: "fal fa-trash-alt pointer icon icon-size-1",
+            className: "fal fa-trash-alt pointer icon font-size-4",
             onClick: () => this.deleteDocument(document.id),
           }),
       },
@@ -1450,7 +1450,7 @@ class CMPActivityEdit extends MainComponent {
           })
         : null,
       el("i", {
-        className: "fal fa-plus pointer icon icon-size-1",
+        className: "fal fa-plus pointer icon font-size-4",
         onClick: this.handleSelectFiles,
       }),
       el("input", {
@@ -1464,7 +1464,7 @@ class CMPActivityEdit extends MainComponent {
       this.getSelectedFilesElement(),
       uploadFiles.length > 0
         ? el("i", {
-            className: "fal fa-upload pointer icon icon-size-1",
+            className: "fal fa-upload pointer icon font-size-4",
             onClick: this.handleUpload,
           })
         : null

@@ -525,7 +525,7 @@ class CMPLastStep extends MainComponent {
         onChange: this.handleFileSelected,
       }),
       el("i", {
-        className: "fal fa-plus pointer icon icon-size-1",
+        className: "fal fa-plus pointer icon font-size-4",
         onClick: this.handleSelectFiles,
       })
     );

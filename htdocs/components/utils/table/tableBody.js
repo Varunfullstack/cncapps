@@ -27,6 +27,7 @@ class TableBody extends React.Component {
     return el("tbody", {key:'tbody'},
     data.map((item,index) => el("tr", {
       key: (pk?item[pk]:item[0]).toString()+makeid().toString(),
+      id:(pk?item[pk]:null).toString(),
       className:selected&&pk&&selected[pk]==item[pk]&&selected[selectedKey]===item[selectedKey]?'selected':null
     }, columns.map(c => el("td", {
       key: c.path || c.key||c.label.replace(' ','')+makeid().toString(),      

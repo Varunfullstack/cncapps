@@ -10,6 +10,7 @@ import CMPInboxPendingReopened from './components/CMPInboxPendingReopened.js?v=1
 import SVCCurrentActivityService from './services/SVCCurrentActivityService.js?v=1';
 import Spinner from './../utils/spinner.js?v=9';
 import MainComponent from './../CMPMainComponent.js?v=1';
+import ActivityFollowOn from '../Modals/ActivityFollowOn.js?v=1';
 class CMPCurrentActivityReport extends MainComponent {
   el = React.createElement;
   apiCurrentActivityService;
@@ -19,6 +20,8 @@ class CMPCurrentActivityReport extends MainComponent {
     const filter= this.getLocalStorageFilter();
     this.state = {
       ...this.state,
+      showFollowOn:false,
+      followOnActivity:null,
       helpDeskInbox: [],
       helpDeskInboxFiltered: [],
       escalationInbox: [],
@@ -203,13 +206,13 @@ class CMPCurrentActivityReport extends MainComponent {
           case "TBL":
             this.apiCurrentActivityService.getToBeLoggedInbox().then((res) => {
               const toBeLoggedInbox = this.prepareResult(res);
-              const toBeLoggedInboxFiltered = [...toBeLoggedInbox];
+              // const toBeLoggedInboxFiltered = [...toBeLoggedInbox];
               //console.log("toBeLoggedInboxFiltered", toBeLoggedInboxFiltered);
-              console.log(toBeLoggedInboxFiltered.length);
-              if(toBeLoggedInboxFiltered.length>0)
-                this.teams.filter(t=>t.code==='TBL')[0].icon="fal fa-asterisk";
-              else
-                this.teams.filter(t=>t.code==='TBL')[0].icon=null;
+              // console.log(toBeLoggedInboxFiltered.length);
+              // if(toBeLoggedInboxFiltered.length>0)
+              //   this.teams.filter(t=>t.code==='TBL')[0].icon="fal fa-asterisk";
+              // else
+              //   this.teams.filter(t=>t.code==='TBL')[0].icon=null;
 
               this.setState({
                 _showSpinner: false,
@@ -220,12 +223,12 @@ class CMPCurrentActivityReport extends MainComponent {
           case "PR":
             this.apiCurrentActivityService.getPendingReopenedInbox().then((res) => {
               const pendingReopenedInbox = this.prepareResult(res);
-              const pendingReopenedInboxFiltered = [...pendingReopenedInbox];
-              //console.log("pendingReopenedInboxFiltered", pendingReopenedInboxFiltered);
-              if(pendingReopenedInboxFiltered.length>0)
-                this.teams.filter(t=>t.code==='PR')[0].icon="fal fa-asterisk";
-              else
-                this.teams.filter(t=>t.code==='PR')[0].icon=null;
+              // const pendingReopenedInboxFiltered = [...pendingReopenedInbox];
+              // //console.log("pendingReopenedInboxFiltered", pendingReopenedInboxFiltered);
+              // if(pendingReopenedInboxFiltered.length>0)
+              //   this.teams.filter(t=>t.code==='PR')[0].icon="fal fa-asterisk";
+              // else
+              //   this.teams.filter(t=>t.code==='PR')[0].icon=null;
               this.setState({
                 _showSpinner: false,
                 pendingReopenedInbox,            
@@ -309,18 +312,20 @@ class CMPCurrentActivityReport extends MainComponent {
   };
   startWork = async(problem, code) => {
     if (problem.lastCallActTypeID != null) {
-      const message =
-        "Are you sure you want to start work on this SR? It will be automatically allocated to you UNLESS it is already allocated";
-      if (await this.confirm(message)) {
-        this.apiCurrentActivityService
-          .startActivityWork(problem.callActivityID)
-          .then((res) => {
-            ////console.log(res);
-            //reload
-            this.loadQueue(code);
-          });
-        ////console.log(problem);
-      }
+      console.log(problem);
+      this.setState({showFollowOn:true,followOnActivity:problem})
+      // const message =
+      //   "Are you sure you want to start work on this SR? It will be automatically allocated to you UNLESS it is already allocated";
+      // if (await this.confirm(message)) {
+      //   this.apiCurrentActivityService
+      //     .startActivityWork(problem.callActivityID)
+      //     .then((res) => {
+      //       ////console.log(res);
+      //       //reload
+      //       this.loadQueue(code);
+      //     });
+      //   ////console.log(problem);
+      // }
     } else {
       this.alert("Another user is currently working on this SR");
     }
@@ -457,14 +462,8 @@ class CMPCurrentActivityReport extends MainComponent {
       userFilter,
       escalationInbox
     );
-    const toBeLoggedInboxFiltered= this.filterData(
-      userFilter,
-      toBeLoggedInbox
-    );
-    const pendingReopenedInboxFiltered=this.filterData(
-      userFilter,
-      pendingReopenedInbox
-    );
+    const toBeLoggedInboxFiltered= toBeLoggedInbox;
+    const pendingReopenedInboxFiltered=pendingReopenedInbox;
     this.saveFilterToLocalStorage(filter);
     this.setState({
       filter,
@@ -538,6 +537,11 @@ class CMPCurrentActivityReport extends MainComponent {
     //window.location=`Activity.php?action=createRequestFromCustomerRequest&cpr_customerproblemno=${problem.cpCustomerProblemID}`    
 
   }
+  getFollowOnElement=()=>{
+    const {showFollowOn,followOnActivity}=this.state;
+    const startWork=true;//callActivity?.problemStatus=='I'&&callActivity?.serverGuard=='N'&&callActivity?.hideFromCustomerFlag=='N';
+    return   showFollowOn?this.el(ActivityFollowOn,{startWork,key:"followOnModal",callActivityID:followOnActivity.callActivityID,onCancel:()=>this.setState({showFollowOn:false})}):null;
+  }
   render() {
     const {
       el,
@@ -555,6 +559,7 @@ class CMPCurrentActivityReport extends MainComponent {
       deleteSR,
       createNewSR,
       srCustomerDescription,
+      getFollowOnElement,
       
     } = this;
     const {
@@ -576,6 +581,7 @@ class CMPCurrentActivityReport extends MainComponent {
       this.getConfirm(),
       this.getAlert(),
       this.getPrompt(),
+      this.getFollowOnElement(),
       el(Spinner, { key: "spinner", show: _showSpinner }),
       getTabsElement(),
       filter.activeTab!=='TBL'&&filter.activeTab!=="PR"?getEngineersFilterElement():null,
@@ -592,6 +598,7 @@ class CMPCurrentActivityReport extends MainComponent {
             allocateAdditionalTime,
             requestAdditionalTime,
             getAllocatedElement,
+            getFollowOnElement
           })
         : null,
 

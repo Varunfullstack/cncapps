@@ -20,6 +20,8 @@ import TableFooter from "./tableFooter.js?v=1";
  * footerColSpan :1
  * toolTip
  * textColorColumn -> td text color
+ * allowRowOrder Boolean allo rows drag and drops using jqueryUI
+ * onOrderChange Event fire on row order changed and return current and next element
  */
 class Table extends React.Component {
   delayTimer;
@@ -35,6 +37,39 @@ class Table extends React.Component {
       },
     };
   }
+  componentDidMount() {
+   if(this.props.allowRowOrder)
+   {
+    setTimeout(()=>{
+    $("#table"+this.props.key+" tbody").sortable({
+      helper: this.fixHelperModified,
+      stop: this.updateIndex
+    }).disableSelection()
+    },2000);
+  }
+  }
+  fixHelperModified = (e, tr)=> {
+    var $originals = tr.children();
+    var $helper = tr.clone();
+    $helper.children().each(function(index) {
+        $(this).width($originals.eq(index).width())
+    });
+    return $helper;
+  }
+  /**
+   * 
+   * @param {place element} e 
+   * @param {drag element} ui 
+   */
+  updateIndex = (e, ui)=> {    
+    const currentItemId= $(ui.item[0]).attr('id');
+    const nextItemId=$(ui.item[0]).next().attr('id');
+    const currentItem=this.props.data.filter(i=>i[this.props.pk]==currentItemId)[0];
+    const nextItem=this.props.data.filter(i=>i[this.props.pk]==nextItemId)[0];    
+    if(this.props.onOrderChange)
+     this.props.onOrderChange(currentItem,nextItem);    
+  };
+
   handleSort = (sortColumn) => {
     for (let i = 0; i < this.props.columns.length; i++) {
       if (this.props.columns[i].path === sortColumn.path) {
@@ -129,7 +164,7 @@ class Table extends React.Component {
             el("input", { key: "inpSearch", onChange: handleSearch }),
           ])
         : null,
-      el("table", { key: "table", className: "table table-striped" }, [
+      el("table", { key: "table"+this.props.key,id: "table"+this.props.key, className: "table table-striped" }, [
         el(TableHeader, {
           key: "tableHeader",
           columns: columns,

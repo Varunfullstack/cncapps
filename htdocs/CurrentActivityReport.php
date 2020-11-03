@@ -26,6 +26,6 @@ page_close();
 <link rel="stylesheet" href="components/style.css?version=<?= time() ?>">
 <link rel="stylesheet" href="css/table.css?version=<?= time() ?>">
 
- <script src="js/react.development.js" crossorigin></script>
-<script src="js/react-dom.development.js" crossorigin></script>
+<script src="js/react.production.min.js" crossorigin></script>
+<script src="js/react-dom.production.min.js" crossorigin></script>
 <script type="module" src='components/CurrentActivityReport/CMPCurrentActivityReport.js?version=<?= time() ?>'></script> 
