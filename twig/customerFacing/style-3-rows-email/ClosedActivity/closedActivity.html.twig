@@ -5,13 +5,12 @@
 {# @var string extra #}
 {# @var string contactFirstName #}
 {% block headerTitle %}
-    Service Request Information
+    Service Request Closed
 {% endblock %}
 {% block headerContet %}
-    Pellentesque habitant morbi tristique senectus et netus et malesuada fames
-    ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante.
+    Look at us! we have closed your request cause it's been fixed and all looks good no.
+    Nothing to see here! move along!
 {% endblock %}
-
 {% block firstRow %}
     <p>
     <span style="color: #a6a6a6">
@@ -33,9 +32,11 @@
     Best Regards
 {% endblock %}
 {% block leftFooter %}
-    Click <a>here</a> to see your request in the portal
+    {% include '@customerFacing/MoreDetailFooterContent.html.twig' %}
+{% endblock %}
+{% block test %}
+This comes from the child!!!!
 {% endblock %}
 {% block rightFooter %}
-    <h2>Current Status</h2>
-    <div>Active and Open</div>
+    This is the information in the right footer
 {% endblock %}
