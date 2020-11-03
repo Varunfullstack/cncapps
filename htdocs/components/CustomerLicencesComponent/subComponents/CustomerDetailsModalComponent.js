@@ -319,4 +319,4 @@ class CustomerDetailsModalComponent extends React.Component {
     }
 }
 
-export default CustomerDetailsModal;
+export default CustomerDetailsModalComponent;

@@ -391,6 +391,12 @@ class CTSCustomerLicenses extends CTCNC
             'CustomerLicenses',
             'CustomerLicenses.inc'
         );
+        $this->template->setVar(
+            'javaScript',
+            '<script src="components/dist/CustomerLicensesComponent.js"></script>'
+        );
+//        $this->loadReactScript('CustomerLicensesComponent.js');
+//        $this->loadReactCSS('CustomerLicensesComponent.css');
 
         $this->template->parse(
             'CONTENTS',
@@ -399,4 +405,6 @@ class CTSCustomerLicenses extends CTCNC
         );
         $this->parsePage();
     }
+
+
 }

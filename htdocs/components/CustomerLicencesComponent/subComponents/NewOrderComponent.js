@@ -423,4 +423,4 @@ class NewOrderComponent extends React.Component {
     }
 }
 
-export default NewOrder;
+export default NewOrderComponent;

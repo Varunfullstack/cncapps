@@ -892,11 +892,6 @@ class TDCustomerOrdersComponent extends React.Component {
     handleAddonHistoryClose = () => {
         this.setState({showAddonHistory: false});
     };
-    handleNewOrder = () => {
-        const {endCustomer} = this.state;
-        window.location =
-            "/CustomerLicenses.php?action=newOrder&email=" + endCustomer.email;
-    }
 
     render() {
         const {el, handleOrderHistoryHide, handleAddonHistoryClose, handleNewOrder} = this;

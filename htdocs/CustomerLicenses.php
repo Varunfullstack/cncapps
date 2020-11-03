@@ -22,8 +22,3 @@ $ctSCustomerLicenses = new CTSCustomerLicenses(
 $ctSCustomerLicenses->execute();
 page_close();
 ?>
-
-<script src='components/dist/CustomerLicensesComponent.js'></script>
-<link rel="stylesheet"
-      href='components/dist/CustomerLicensesComponent.css'
-/>

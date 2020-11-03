@@ -137,6 +137,7 @@ class Controller extends BaseObject
     var $htmlFmt = CT_HTML_FMT_SCREEN;
     var $formErrorMessage = "";        // HTML formatting
     var $action = "";
+    protected $cachedVersion;
     private $pageTitle = "";
     private $pageHeader = "";
 
@@ -1114,6 +1115,45 @@ class Controller extends BaseObject
     protected function setParam(string $string, $value)
     {
         $_REQUEST[$string] = $value;
+    }
+
+    protected function loadReactCSS(string $string)
+    {
+        $version = $this->getVersion();
+        if (!$this->template) {
+            throw new Exception('Please define a template first');
+        }
+        $this->template->setVar(
+            'javaScript',
+            "<link rel='stylesheet'  href='components/dist/$string?$version'>",
+            true
+        );
+    }
+
+    protected function getVersion()
+    {
+        if (!$this->cachedVersion) {
+            $changelog = file_get_contents(BASE_DRIVE . '/CHANGELOG.md');
+            $re = '/\[(v\d+\.\d+\.\d+)\]/m';
+            preg_match($re, $changelog, $matches);
+            $this->cachedVersion = $matches[1];
+        }
+        return $this->cachedVersion;
+    }
+
+    protected function loadReactScript(string $string)
+    {
+        $version = $this->getVersion();
+        if (!$this->template) {
+            throw new Exception('Please define a template first');
+        }
+
+        $this->template->setVar(
+            'javaScript',
+            "<script src='components/dist/$string'></script>",
+            true
+        );
+
     }
 }// End of class
 ?>
