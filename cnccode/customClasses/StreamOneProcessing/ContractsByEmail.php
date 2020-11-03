@@ -26,11 +26,31 @@ class ContractsByEmail
         $this->contractsBySKU = [];
     }
 
+    /**
+     * @param ContractData $contractData
+     * @throws ContractWithDuplicatedSKU
+     */
     public function addContract(ContractData $contractData)
     {
         $this->contractsToConfirm[$contractData->getContractId()] = new ContractDataNotConfirmed($contractData);
+
+        if (isset($this->contractsBySKU[$contractData->getSku()])) {
+            throw new ContractWithDuplicatedSKU(
+                $contractData->getSku(),
+                $this->contractsToConfirm[$this->contractsBySKU[$contractData->getSku()]]->getContractData(),
+                $contractData
+            );
+        }
+
         $this->contractsBySKU[$contractData->getSku()] = $contractData->getContractId();
         if ($contractData->getOldSku()) {
+            if (isset($this->contractsBySKU[$contractData->getOldSku()])) {
+                throw new ContractWithDuplicatedSKU(
+                    $contractData->getOldSku(),
+                    $contractData,
+                    $this->contractsBySKU[$contractData->getOldSku()]
+                );
+            }
             $this->contractsBySKU[$contractData->getOldSku()] = $contractData->getContractId();
         }
     }

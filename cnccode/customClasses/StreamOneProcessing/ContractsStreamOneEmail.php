@@ -18,6 +18,10 @@ class ContractsStreamOneEmail
         $this->map = [];
     }
 
+    /**
+     * @param ContractData $contractData
+     * @throws ContractWithDuplicatedSKU
+     */
     public function add(ContractData $contractData)
     {
 

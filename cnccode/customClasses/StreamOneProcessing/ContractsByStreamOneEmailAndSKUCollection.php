@@ -19,6 +19,10 @@ class ContractsByStreamOneEmailAndSKUCollection
         $this->mappedContracts = new ContractsStreamOneEmail();
     }
 
+    /**
+     * @param ContractData $contractData
+     * @throws ContractWithDuplicatedSKU
+     */
     public function add(ContractData $contractData)
     {
         $this->mappedContracts->add($contractData);

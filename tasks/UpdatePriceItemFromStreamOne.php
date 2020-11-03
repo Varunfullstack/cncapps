@@ -340,7 +340,7 @@ foreach ($allSubscriptions as $item) {
 }
 
 
-checkAllContractsHaveAMatchingStreamOneLicense($streamOneLicensesToCheck);
+checkAllContractsHaveAMatchingStreamOneLicense($streamOneLicensesToCheck, $logger);
 
 
 if (!empty($missingLicensesErrors)) {
@@ -448,7 +448,7 @@ function syncAddons($allAddons, $cncItems, $forcedMode, LoggerCLI $logger)
     }
 }
 
-function getContractsToCheck(): ContractsByStreamOneEmailAndSKUCollection
+function getContractsToCheck(LoggerCLI $loggerCLI): ContractsByStreamOneEmailAndSKUCollection
 {
     global $db;
     $query = "
@@ -468,30 +468,35 @@ FROM
 WHERE item.`isStreamOne`
   AND renewalStatus = 'R'
   AND declinedFlag = 'N'
+   AND customer.streamOneEmail IS NOT NULL AND customer.streamOneEmail <> ''
     ";
     $db->query($query);
     $contractsByStreamOneEmailAndSKUCollection = new ContractsByStreamOneEmailAndSKUCollection();
     $contractDataFactory = new ContractDataFactory();
     while ($db->next_record(MYSQLI_ASSOC)) {
-        $contractsByStreamOneEmailAndSKUCollection->add($contractDataFactory->fromDB($db->Record));
+        try {
+            $contractsByStreamOneEmailAndSKUCollection->add($contractDataFactory->fromDB($db->Record));
+        } catch (\CNCLTD\StreamOneProcessing\ContractWithDuplicatedSKU $contractWithDuplicatedSKU) {
+            sendContractsWithDuplicatedSKUAlert($contractWithDuplicatedSKU);
+        }
     }
     return $contractsByStreamOneEmailAndSKUCollection;
 }
 
 /**
  * @param StreamOneLicenseData[] $licensesToCheck
+ * @param LoggerCLI $loggerCLI
  * @throws LoaderError
  * @throws RuntimeError
  * @throws SyntaxError
  */
-function checkAllContractsHaveAMatchingStreamOneLicense(array $licensesToCheck)
+function checkAllContractsHaveAMatchingStreamOneLicense(array $licensesToCheck, LoggerCLI $loggerCLI)
 {
 
-    $contractsCollection = getContractsToCheck();
+    $contractsCollection = getContractsToCheck($loggerCLI);
 
     $contractsCollection->checkLicenses($licensesToCheck);
     $elementsNotChecked = $contractsCollection->getNotFlaggedContracts();
-    var_dump($elementsNotChecked);
     sendMissingStreamOneLicenseForContractEmail($elementsNotChecked);
 }
 
@@ -540,7 +545,6 @@ function getItemId($cncItems, $sku)
  */
 function sendMissingStreamOneLicenseForContractEmail(array $contracts)
 {
-    var_dump($contracts, count($contracts));
     if (!count($contracts)) {
         return;
     }
@@ -574,6 +578,39 @@ function sendMissingStreamOneLicenseForContractEmail(array $contracts)
         $body
     );
 
+}
+
+function sendContractsWithDuplicatedSKUAlert(\CNCLTD\StreamOneProcessing\ContractWithDuplicatedSKU $contractWithDuplicatedSKU
+)
+{
+    $fromEmail = CONFIG_SUPPORT_EMAIL;
+    $buMail = new BUMail($thing);
+    $toEmail = "sales@cnc-ltd.co.uk";
+    $body = $buMail->mime->setHTMLBody($contractWithDuplicatedSKU->getMessage());
+    $subject = $body;
+    $mime_params = array(
+        'text_encoding' => '7bit',
+        'text_charset'  => 'UTF-8',
+        'html_charset'  => 'UTF-8',
+        'head_charset'  => 'UTF-8'
+    );
+    $body = $buMail->mime->get($mime_params);
+
+    $hdrs = array(
+        'From'         => $fromEmail,
+        'Subject'      => $subject,
+        'Content-Type' => 'text/html; charset=UTF-8',
+        'To'           => $toEmail
+    );
+
+    $hdrs = $buMail->mime->headers($hdrs);
+
+    $buMail->putInQueue(
+        $fromEmail,
+        $toEmail,
+        $hdrs,
+        $body
+    );
 }
 
 /**
