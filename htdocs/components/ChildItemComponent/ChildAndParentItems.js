@@ -77,5 +77,7 @@ class ChildAndParentItems extends React.Component {
 }
 
 export default ChildAndParentItems;
-const domContainer = document.querySelector('#reactChildAndParentItemsComponent');
-ReactDOM.render(React.createElement(ChildAndParentItems, {itemId: domContainer.dataset.itemId}), domContainer);
+document.addEventListener('DOMContentLoaded', () => {
+    const domContainer = document.querySelector('#reactChildAndParentItemsComponent');
+    ReactDOM.render(React.createElement(ChildAndParentItems, {itemId: domContainer.dataset.itemId}), domContainer);
+})

@@ -131,5 +131,8 @@ class CustomerLicensesComponent extends React.Component {
 
 export default CustomerLicensesComponent;
 
-const domContainer = document.querySelector("#reactMainCustomerLicenses");
-ReactDOM.render(React.createElement(CustomerLicensesComponent), domContainer);
+document.addEventListener('DOMContentLoaded', () => {
+    const domContainer = document.getElementById("reactMainCustomerLicenses");
+    ReactDOM.render(React.createElement(CustomerLicensesComponent), domContainer);
+})
+

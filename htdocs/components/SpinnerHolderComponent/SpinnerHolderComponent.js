@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom';
-import Spinner from "../../shared/Spinner/Spinner";
+import Spinner from "../shared/Spinner/Spinner";
 
 class SpinnerHolderComponent extends React.Component {
     constructor(props) {

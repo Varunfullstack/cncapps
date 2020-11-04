@@ -1245,12 +1245,7 @@ class CTSalesOrder extends CTCNC
             )
         );
 
-        $this->template->setVar(
-            'javaScript',
-            '<script src="js/react.development.js" crossorigin></script>
-                    <script src="js/react-dom.development.js" crossorigin></script>
-                    <script type="module" src=\'components/utils/TypeAheadSearch.js\'></script>'
-        );
+        $this->loadReactScript('ItemListTypeAheadRenderer.js');
 
         $purchaseOrderCount = $this->buSalesOrder->countPurchaseOrders($dsOrdhead->getValue(DBEOrdhead::ordheadID));
 

@@ -82,5 +82,6 @@ class TypeAheadSearch extends React.Component {
         )
     }
 }
+document.ReactTypeAhead = TypeAheadSearch;
 
 export default TypeAheadSearch;

@@ -114,7 +114,7 @@ define(
     "POUND_CHAR",
     chr(163)
 );
-
+global $cfg;
 require_once($cfg["path_gc"] . "/BaseObject.inc.php");
 
 class Controller extends BaseObject
@@ -1150,7 +1150,7 @@ class Controller extends BaseObject
 
         $this->template->setVar(
             'javaScript',
-            "<script src='components/dist/$string'></script>",
+            "<script src='components/dist/$string?$version'></script>",
             true
         );
 

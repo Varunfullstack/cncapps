@@ -485,7 +485,7 @@ class CTCNC extends Controller
             true,
             1002,
             "My Account",
-            "MySettingsComponent.php"
+            "MySettings.php"
         );
 
         global $twig;

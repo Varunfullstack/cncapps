@@ -505,16 +505,14 @@ class CTItem extends CTCNC
                 ),
                 'allowSRLog'                     => $this->dsItem->getValue(DBEItem::allowSRLog) ? "checked" : null,
                 'isStreamOne'                    => $this->dsItem->getValue(DBEItem::isStreamOne) ? "checked" : null,
-                'javaScript'                     => "
-                    <script src='components/dist/ChildAndParentItems.js?'></script>
-                    <link href='components/dist/ChildAndParentItems.css' rel='stylesheet'>
-                    "
             )
         );
         $this->parseItemTypeSelector($this->dsItem->getValue(DBEItem::itemTypeID));
         $this->parseRenewalTypeSelector($this->dsItem->getValue(DBEItem::renewalTypeID));
         $this->parseWarrantySelector($this->dsItem->getValue(DBEItem::warrantyID));
         $this->parseItemBillingCategorySelector($this->dsItem->getValue(DBEItem::itemBillingCategoryID));
+        $this->loadReactScript('ChildAndParentItems.js');
+        $this->loadReactCSS('ChildAndParentItems.css');
         $this->template->parse(
             'CONTENTS',
             'ItemEdit',
@@ -1004,14 +1002,7 @@ class CTItem extends CTCNC
             'ItemList'
         );
 
-        $this->template->setVar(
-            [
-                'javaScript' => '<script src="js/react.development.js" crossorigin></script>
-                    <script src="js/react-dom.development.js" crossorigin></script>
-                    <script type="module" src=\'components/utils/TypeAheadSearch.js\'></script>'
-            ]
-        );
-
+        $this->loadReactScript('ItemListTypeAheadRenderer.js');
         $this->template->parse('CONTENTS', 'ItemList');
         $this->parsePage();
     }

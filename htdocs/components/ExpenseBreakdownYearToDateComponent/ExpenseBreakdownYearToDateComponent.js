@@ -389,8 +389,11 @@ class ExpenseBreakdownYearToDateComponent extends React.Component {
 
 export default ExpenseBreakdownYearToDateComponent;
 
-const domContainer = document.querySelector('#react-expense-breakdown');
-ReactDOM.render(React.createElement(ExpenseBreakdownYearToDateComponent, {
-    isApprover: domContainer.dataset.isApprover,
-    userId: domContainer.dataset.userId
-}), domContainer);
+document.addEventListener('DOMContentLoaded', () => {
+
+    const domContainer = document.getElementById('react-expense-breakdown');
+    ReactDOM.render(React.createElement(ExpenseBreakdownYearToDateComponent, {
+        isApprover: domContainer.dataset.isApprover,
+        userId: domContainer.dataset.userId
+    }), domContainer);
+})

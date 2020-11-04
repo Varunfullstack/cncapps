@@ -584,15 +584,7 @@ ORDER BY staffName";
                     "<div id='react-expense-breakdown' data-user-id='{$this->getDbeUser()->getValue(DBEUser::userID)}'></div>"
                 );
                 $this->template->parse('CONTENTS', 'ChangeLog', true);
-                $this->template->setVar(
-                    'javaScript',
-                    '
-                    <link rel="stylesheet" href="./css/table.css">
-                    <script src="js/react.development.js" crossorigin></script>
-                    <script src="js/react-dom.development.js" crossorigin></script>
-                    <script type="module" src=\'components/expenseBreakdownYearToDate.js\'></script>
-                '
-                );
+                $this->loadReactScript('expenseBreakdownYearToDateComponent.js');
                 $this->parsePage();
                 break;
             default:
