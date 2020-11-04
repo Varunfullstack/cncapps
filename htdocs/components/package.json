@@ -13,6 +13,8 @@
         "start:ExpenseBreakdownYearToDateComponent": "parcel ExpenseBreakdownYearToDateComponent/ExpenseBreakdownYearToDateComponent.js --public-url /components/dist",
         "build:FixedServiceRequestCountComponent": "parcel build FixedServiceRequestCountComponent/FixedServiceRequestCountComponent.js --public-url /components/dist",
         "start:FixedServiceRequestCountComponent": "parcel FixedServiceRequestCountComponent/FixedServiceRequestCountComponent.js --public-url /components/dist",
+        "build:ItemListTypeAheadRenderer": "parcel build ItemListTypeAheadRenderer/ItemListTypeAheadRenderer.js --public-url /components/dist",
+        "start:ItemListTypeAheadRenderer": "parcel ItemListTypeAheadRenderer/ItemListTypeAheadRenderer.js --public-url /components/dist",
         "build:MySettingsComponent": "parcel build MySettingsComponent/MySettingsComponent.js --public-url /components/dist",
         "start:MySettingsComponent": "parcel MySettingsComponent/MySettingsComponent.js --public-url /components/dist",
         "build:OutOfHoursReportComponent": "parcel build OutOfHoursReportComponent/OutOfHoursReportComponent.js --public-url /components/dist",
@@ -21,9 +23,7 @@
         "start:SpinnerHolder": "parcel SpinnerHolderComponent/SpinnerHolderComponent.js --public-url /components/dist",
         "build:SRSourceComponent": "parcel build SRSourceComponent/SRSourceComponent.js --public-url /components/dist",
         "start:SRSourceComponent": "parcel SRSourceComponent/SRSourceComponent.js --public-url /components/dist",
-        "build:ItemListTypeAheadRenderer": "parcel build ItemListTypeAheadRenderer/ItemListTypeAheadRenderer.js --public-url /components/dist",
-        "start:ItemListTypeAheadRenderer": "parcel ItemListTypeAheadRenderer/ItemListTypeAheadRenderer.js --public-url /components/dist",
-        "build": "parcel build ChildItemComponent/ChildAndParentItems.js CustomerLicencesComponent/CustomerLicensesComponent.js ExpenseBreakdownYearToDateComponent/ExpenseBreakdownYearToDateComponent.js FixedServiceRequestCountComponent/FixedServiceRequestCountComponent.js MySettingsComponent/MySettingsComponent.js OutOfHoursReportComponent/OutOfHoursReportComponent.js SpinnerHolderComponent/SpinnerHolderComponent.js SRSourceComponent/SRSourceComponent.js ItemListTypeAheadRenderer/ItemListTypeAheadRenderer.js --public-url /components/dist"
+        "build": "npm run build:ChildItemComponent && npm run build:CustomerLicenseComponent && npm run build:ExpenseBreakdownYearToDateComponent && npm run build:FixedServiceRequestCountComponent && npm run build:ItemListTypeAheadRenderer && npm run build:MySettingsComponent && npm run build:OutOfHoursReportComponent && npm run build:SpinnerHolder && npm run build:SRSourceComponent"
     },
     "author": "",
     "license": "ISC",

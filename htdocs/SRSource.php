@@ -23,12 +23,3 @@ $ctSRSource = new CTSRSource(
 $ctSRSource->execute();
 page_close();
 ?>
-<link rel="stylesheet"
-      href="components/style.css?version=<?= time() ?>"
->
-<link rel="stylesheet"
-      href="css/table.css?version=<?= time() ?>"
->
-<script type="module"
-        src='components/dist/CMPSRSource.js?version=<?= time() ?>'
-></script>

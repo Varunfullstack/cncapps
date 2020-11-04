@@ -3,6 +3,8 @@ import CheckBox from '../shared/checkBox';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import '../style.css'
+
 class MySettingsComponent extends React.Component {
     el = React.createElement;
 
@@ -105,5 +107,7 @@ class MySettingsComponent extends React.Component {
 
 export default MySettingsComponent;
 
-const domContainer = document.querySelector('#react_main_mysettings');
-ReactDOM.render(React.createElement(MySettingsComponent), domContainer);
+document.addEventListener('DOMContentLoaded', () => {
+    const domContainer = document.getElementById('react_main_mysettings');
+    ReactDOM.render(React.createElement(MySettingsComponent), domContainer);
+})

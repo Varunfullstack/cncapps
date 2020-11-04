@@ -66,7 +66,7 @@ class CTMySettings extends CTCNC
         $this->setMethodName('displayMySettings');
         $this->setTemplateFiles(
             array(
-                'MySettingsComponent' => 'MySettingsComponent.inc'
+                'MySettings' => 'MySettings.inc'
             )
         );
         $this->setPageTitle('My Account');
@@ -75,7 +75,7 @@ class CTMySettings extends CTCNC
 
         $this->template->parse(
             'CONTENTS',
-            'MySettingsComponent',
+            'MySettings',
             true
         );
 

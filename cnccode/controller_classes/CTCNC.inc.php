@@ -680,7 +680,7 @@ class CTCNC extends Controller
             [
                 "id"    => 224,
                 "label" => "SR Source",
-                "href"  => "SRSourceComponent.php"
+                "href"  => "SRSource.php"
             ],
             [
                 "id"    => 209,

@@ -6,6 +6,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Spinner from "../shared/Spinner/Spinner";
 
+import '../style.css'
+
 class SRSourceComponent extends React.Component {
     el = React.createElement;
 
@@ -258,5 +260,8 @@ class SRSourceComponent extends React.Component {
 
 export default SRSourceComponent;
 
-const domContainer = document.querySelector("#react_main_srsource");
-ReactDOM.render(React.createElement(SRSourceComponent), domContainer);
+document.addEventListener('DOMContentLoaded', () => {
+    const domContainer = document.getElementById("react_main_srsource");
+    ReactDOM.render(React.createElement(SRSourceComponent), domContainer);
+})
+
