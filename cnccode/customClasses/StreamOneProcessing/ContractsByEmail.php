@@ -48,7 +48,7 @@ class ContractsByEmail
                 throw new ContractWithDuplicatedSKU(
                     $contractData->getOldSku(),
                     $contractData,
-                    $this->contractsBySKU[$contractData->getOldSku()]
+                    $this->contractsToConfirm[$this->contractsBySKU[$contractData->getOldSku()]]->getContractData()
                 );
             }
             $this->contractsBySKU[$contractData->getOldSku()] = $contractData->getContractId();
