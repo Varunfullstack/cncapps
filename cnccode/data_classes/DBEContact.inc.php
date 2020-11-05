@@ -354,7 +354,7 @@ class DBEContact extends DBCNCEntity
             DA_ALLOW_NULL,
         );
         $this->addColumn(
-            self::pendingFurloughAction,
+            self::pendingFurloughActionDate,
             DA_DATE,
             DA_ALLOW_NULL,
         );
