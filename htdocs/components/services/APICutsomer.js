@@ -1,4 +1,4 @@
-import { groupBy } from "../utils/utils.js";
+import { groupBy, sort } from "../utils/utils.js";
 import APIMain from "./APIMain.js";
 import ApiUrls from "./ApiUrls.js";
 
@@ -34,6 +34,10 @@ class APICustomers extends APIMain{
     getCustomerContracts(customerId,contractCustomerItemID,linkedToSalesOrder)
     {
         return fetch(`${ApiUrls.Customer}contracts&customerId=${customerId}&contractCustomerItemID=${contractCustomerItemID}&linkedToSalesOrder=${linkedToSalesOrder}`).then(res => res.json());
+    }
+    getCustomerHaveOpenSR()
+    {
+        return fetch(`${ApiUrls.Customer}getCustomersHaveOpenSR`).then(res => res.json()).then(customers=>sort(customers,"name"));
     }
 }
 export default APICustomers;

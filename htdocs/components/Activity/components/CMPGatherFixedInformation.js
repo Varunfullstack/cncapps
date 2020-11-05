@@ -133,9 +133,13 @@ class CMPGatherFixedInformation extends MainComponent {
             null,
             el("td", { className: "display-label " }, "Summary of Resolution"),
             el("td", null,el(CKEditor,{
+              minCharCount:activity.problemHideFromCustomerFlag=='N'?160:-1,
               disableClipboard:true,
               value:initialActivity?.reason,
-              onChange:(value)=>this.setValue("resolutionSummary",value),inline:true}))
+              onChange:(value)=>this.setValue("resolutionSummary",value),
+              inline:true,
+
+            }))
           ),
 
         )
@@ -302,7 +306,7 @@ class CMPGatherFixedInformation extends MainComponent {
     }
     if(!data.resolutionSummary)
     {
-      this.alert("Please enter summary of resolution");
+      this.alert("You must enter more text in the summary information");
       return;
     }
     if(activity.problemHideFromCustomerFlag=='N'&&data.resolutionSummary.length<160)

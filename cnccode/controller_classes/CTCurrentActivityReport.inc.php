@@ -144,6 +144,9 @@ class CTCurrentActivityReport extends CTCNC
             case 'pendingReopenedPopup':
                 $this->pendingReopenedDescriptionPopUp();
                 break;
+            case 'getCustomerOpenSR':
+                echo json_encode($this->renderQueue(13));
+                exit;     
             default:
                 $this->setTemplate();
                 break;
@@ -199,7 +202,15 @@ class CTCurrentActivityReport extends CTCNC
                 false
             );
 
-         }   
+         }  
+         else if ($queueNo == 13) {
+            /* fixed awaiting closure */
+            $this->buActivity->getCustomerOpenSR(    
+                $_REQUEST["customerID"],
+                $serviceRequests                
+            );
+
+         }    
          else {
             $this->buActivity->getProblemsByQueueNoWithFuture(
                 $queueNo,
@@ -293,7 +304,7 @@ class CTCurrentActivityReport extends CTCNC
              array_push($result,
 
                 array(
-                    'queueOptions'               => implode($queueOptions),
+                    //'queueOptions'               => implode($queueOptions),
                     //'workOnClick'                => $workOnClick,
                     'hoursRemaining'             => $hoursRemaining,
                     //'updatedBgColor'             => $updatedBgColor,
@@ -352,6 +363,8 @@ class CTCurrentActivityReport extends CTCNC
                     "callActivityID"             =>$serviceRequests->getValue(DBEJProblem::callActivityID),
                     "lastCallActTypeID"         =>$serviceRequests->getValue(DBEJProblem::lastCallActTypeID),
                     'customerID'               => $serviceRequests->getValue(DBEJProblem::customerID),
+                    'queueNo'               => $serviceRequests->getValue(DBEJProblem::queueNo),
+
                  )
             );
         } // end while
@@ -759,4 +772,5 @@ class CTCurrentActivityReport extends CTCNC
         $this->parsePage();
         exit;
     }  // end finaliseProblem
+    
 }

@@ -12402,5 +12402,21 @@ FROM
 
         $dbeCallActivity->insertRow();
     }
+ /**
+     * Get problems by status
+     *
+     * @param mixed $status
+     * @param mixed $dsResults
+     * @param bool $includeAutomaticallyFixed
+     */
+    function getCustomerOpenSR($customerID,&$dsResults)
+    {
+        $dbeJProblem = new DBEJProblem($this);
+        $dbeJProblem->getCustomerOpenRows($customerID);
+        $this->getData(
+            $dbeJProblem,
+            $dsResults
+        );
 
+    }
 }

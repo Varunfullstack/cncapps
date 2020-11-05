@@ -22,6 +22,7 @@ import TableFooter from "./tableFooter.js?v=1";
  * textColorColumn -> td text color
  * allowRowOrder Boolean allo rows drag and drops using jqueryUI
  * onOrderChange Event fire on row order changed and return current and next element
+ * searchControls add other search control after search element
  */
 class Table extends React.Component {
   delayTimer;
@@ -154,16 +155,20 @@ class Table extends React.Component {
       );
     }
     return [
+      el("div",{className:"flex-row" },
       search
-        ? el("div", { key: "tableSearch", style: { marginBottom: 5 } }, [
-            el(
-              "label",
-              { key: "lbLabel", style: searchLabelStyle || null },
-              "Search"
-            ),
-            el("input", { key: "inpSearch", onChange: handleSearch }),
-          ])
-        : null,
+      ? el("div", { key: "tableSearch", style: { marginBottom: 5 },className:"flex-row"}, [
+          el(
+            "label",
+            { key: "lbLabel", style: searchLabelStyle || null },
+            "Search"
+          ),
+          el("input", { key: "inpSearch", onChange: handleSearch,className:"form-control",style:{width:250} })          
+        ])
+      : null,
+      this.props.searchControls||null
+      )
+     ,
       el("table", { key: "table"+this.props.key,id: "table"+this.props.key, className: "table table-striped" }, [
         el(TableHeader, {
           key: "tableHeader",

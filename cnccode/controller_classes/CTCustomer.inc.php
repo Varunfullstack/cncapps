@@ -24,6 +24,8 @@ require_once($cfg["path_bu"] . "/BURenHosting.inc.php");
 require_once($cfg["path_bu"] . "/BUExternalItem.inc.php");
 require_once($cfg["path_bu"] . "/BUCustomerItem.inc.php");
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
+require_once($cfg["path_dbe"] . "/DBConnect.php");
+
 // Parameters
 define(
     'CTCUSTOMER_VAL_NONE_SELECTED',
@@ -1149,9 +1151,12 @@ class CTCustomer extends CTCNC
                 echo json_encode($this->getCustomerProjects());
                 exit;                
                 break; 
-                case "contracts":
+            case "contracts":
                     echo json_encode($this->getCustomerContracts());
                     exit;
+            case "getCustomersHaveOpenSR":
+                echo json_encode($this->getCustomersHaveOpenSR());
+                exit;
             default:
                 $this->displaySearchForm();
                 break;
@@ -3759,5 +3764,12 @@ class CTCustomer extends CTCNC
          }
          return $contracts;
     } 
-    
+    function getCustomersHaveOpenSR()
+    {
+        $customers=DBConnect::fetchAll("SELECT `cus_custno` id,`cus_name` name FROM`customer` WHERE `cus_custno` IN(
+            SELECT  `pro_custno` FROM `problem` WHERE `pro_status` <> 'C' AND `pro_status` <> 'F'
+            )
+            ",[]);
+        return $customers;
+    }
 }

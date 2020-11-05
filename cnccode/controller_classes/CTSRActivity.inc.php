@@ -1082,7 +1082,10 @@ class CTSRActivity extends CTCNC
                 {
                     $buActivity->deleteCustomerRaisedRequest($body->customerproblemno);
                 }
-                return ["status" => 1, "nextURL" => $nextURL, "problemID" => $dsCallActivity->getValue(DBEJCallActivity::problemID), "callActivityID" => $dsCallActivity->getValue(DBEJCallActivity::callActivityID)];
+                $problemID=$dsCallActivity->getValue(DBEJCallActivity::problemID);
+                $dbeProblem=new DBEProblem($this);
+                $dbeProblem->getRow($problemID);
+                return ["status" => 1, "nextURL" => $nextURL, "problemID" => $problemID, "callActivityID" => $dsCallActivity->getValue(DBEJCallActivity::callActivityID),"raiseTypeId"=>$dbeProblem->getValue(DBEProblem::raiseTypeId)];
             } else return ["status" => 0];
         } catch (Exception $exception) {
             return ["status" => 3, "error" => $exception->getMessage()];

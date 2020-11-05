@@ -1601,17 +1601,18 @@ class CMPActivityEdit extends MainComponent {
       ),
       footer: el(
         "div",
-        { key: "footer" },
+        { key: "footer",style:{display:"flex",justifyContent: "space-between"} },
         el(
           "button",
-          { onClick: () => this.setState({ _showModal: false }) },
-          "Cancel"
+          {className:"float-left", onClick: () => this.handleTemplateSend(templateType) },
+          "Send"
         ),
         el(
           "button",
-          { onClick: () => this.handleTemplateSend(templateType) },
-          "Send"
-        )
+          {className:"float-right", onClick: () => this.setState({ _showModal: false }) },
+          "Cancel"
+        ),
+        
       ),
     });
   };

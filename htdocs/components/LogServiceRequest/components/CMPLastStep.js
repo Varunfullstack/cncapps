@@ -417,8 +417,8 @@ class CMPLastStep extends MainComponent {
       show: _showModal&&modalType==this.modalType.notStartWorkReason,
       options: noWorkOptions,
       value: data.notStartWorkReason,
-      title: "Why you don't want to start working now?",
-      okTitle: "Ok",
+      title: "Please provide a reason why you aren't offering a first time fix",
+      okTitle: "OK",
       onChange: this.handleNoWorkReason,
       onCancel:()=>this.setState({_showModal:false})
     });

@@ -11,6 +11,8 @@ import SVCCurrentActivityService from './services/SVCCurrentActivityService.js?v
 import Spinner from './../utils/spinner.js?v=9';
 import MainComponent from './../CMPMainComponent.js?v=1';
 import ActivityFollowOn from '../Modals/ActivityFollowOn.js?v=1';
+import CMPInboxOpenSR from './components/CMPInboxOpenSR.js?v=1';
+import { sort } from '../utils/utils.js?v=1';
 class CMPCurrentActivityReport extends MainComponent {
   el = React.createElement;
   apiCurrentActivityService;
@@ -36,6 +38,8 @@ class CMPCurrentActivityReport extends MainComponent {
       toBeLoggedInboxFiltered:[],
       pendingReopenedInbox:[],
       pendingReopenedInboxFiltered:[],
+      openSRInboxFiltered:[],
+      openSRInbox:[],
       fixedInbox: [],
       futureInbox: [],
       allocatedUsers: [],
@@ -53,7 +57,10 @@ class CMPCurrentActivityReport extends MainComponent {
       {id:7,title:'Sales',code:'S',queueNumber:4,order:5,display:true,icon:null,canMove:true},
       {id:10,title:'To Be Logged',code:'TBL',queueNumber:10,order:6,display:true,icon:null,canMove:false},
       {id:11,title:'Pending Reopen',code:'PR',queueNumber:11,order:7,display:true,icon:null,canMove:false},      
+      {id:12,title:'All Teams',code:'OSR',queueNumber:13,order:8,display:true,icon:null,canMove:false},      
+
     ]
+
   }
   componentDidMount() {
     this.loadData();
@@ -142,6 +149,7 @@ class CMPCurrentActivityReport extends MainComponent {
     const {handleUserFilterOnSelect}=this;
     const {filter}=this.state;
     if (code) {
+      if(code!="OSR")
       this.showSpinner();
       switch (code) {
         case "H":
@@ -209,8 +217,8 @@ class CMPCurrentActivityReport extends MainComponent {
               // const toBeLoggedInboxFiltered = [...toBeLoggedInbox];
               //console.log("toBeLoggedInboxFiltered", toBeLoggedInboxFiltered);
               // console.log(toBeLoggedInboxFiltered.length);
-              // if(toBeLoggedInboxFiltered.length>0)
-              //   this.teams.filter(t=>t.code==='TBL')[0].icon="fal fa-asterisk";
+              if(toBeLoggedInbox.length>0)
+                this.teams.filter(t=>t.code==='TBL')[0].icon="fal fa-asterisk";
               // else
               //   this.teams.filter(t=>t.code==='TBL')[0].icon=null;
 
@@ -225,8 +233,8 @@ class CMPCurrentActivityReport extends MainComponent {
               const pendingReopenedInbox = this.prepareResult(res);
               // const pendingReopenedInboxFiltered = [...pendingReopenedInbox];
               // //console.log("pendingReopenedInboxFiltered", pendingReopenedInboxFiltered);
-              // if(pendingReopenedInboxFiltered.length>0)
-              //   this.teams.filter(t=>t.code==='PR')[0].icon="fal fa-asterisk";
+              if(pendingReopenedInbox.length>0)
+                this.teams.filter(t=>t.code==='PR')[0].icon="fal fa-asterisk";
               // else
               //   this.teams.filter(t=>t.code==='PR')[0].icon=null;
               this.setState({
@@ -235,9 +243,35 @@ class CMPCurrentActivityReport extends MainComponent {
               },()=>handleUserFilterOnSelect(filter.userFilter));
             });
             break;
+            case "OSR":              
+            if(this.state.openSrCustomerID) 
+              this.getCustomerOpenSR(this.state.openSrCustomerID);
+            break;
       }
     }
   };
+  getCustomerOpenSR=(customerID)=>{
+    const {filter}=this.state;
+
+    if (customerID != null) {
+      this.showSpinner();
+      this.setState({openSrCustomerID:customerID})
+      this.apiCurrentActivityService
+        .getCustomerOpenSR(customerID)
+        .then((res) => {
+          const openSRInbox = this.prepareResult(res);
+          sort(openSRInbox,"queueNo");
+         console.log("openSRInbox",openSRInbox, openSRInbox.length);
+          this.setState(
+            {
+              _showSpinner: false,
+              openSRInbox,
+            },
+            () => this.handleUserFilterOnSelect(filter.userFilter)
+          );
+        });
+    }
+  }
   // Shared methods
   moveToAnotherTeam = async({ target }, problem, code) => {
     //console.log(target.value, problem, problem.problemStatus);
@@ -263,7 +297,7 @@ class CMPCurrentActivityReport extends MainComponent {
   /**
    * Move to another queue
    */
-  getMoveElement = (code, problem) => {    
+  getMoveElement = (code, problem,defaultValue=null) => {    
     const { el, moveToAnotherTeam,teams } = this;
     let options = teams.map(t=>{return { id: t.queueNumber, title: t.code ,canMove:t.canMove}})
                         .filter((e) => e.title != code&&e.canMove==true);    
@@ -272,6 +306,7 @@ class CMPCurrentActivityReport extends MainComponent {
       {
         key: "movItem" + problem.callActivityID,
         onChange: (event) => moveToAnotherTeam(event, problem, code),
+        defaultValue
       },
       [
         el("option", { value: "", key: "null" }),
@@ -448,6 +483,7 @@ class CMPCurrentActivityReport extends MainComponent {
       escalationInbox,
       toBeLoggedInbox,
       pendingReopenedInbox,
+      openSRInbox,
       filter,
     } = this.state;
     filter.userFilter = userFilter;
@@ -462,6 +498,7 @@ class CMPCurrentActivityReport extends MainComponent {
       userFilter,
       escalationInbox
     );
+    const openSRInboxFiltered = this.filterData(userFilter, openSRInbox);
     const toBeLoggedInboxFiltered= toBeLoggedInbox;
     const pendingReopenedInboxFiltered=pendingReopenedInbox;
     this.saveFilterToLocalStorage(filter);
@@ -473,7 +510,8 @@ class CMPCurrentActivityReport extends MainComponent {
       salesInboxFiltered,
       escalationInboxFiltered,
       toBeLoggedInboxFiltered,
-      pendingReopenedInboxFiltered
+      pendingReopenedInboxFiltered,
+      openSRInboxFiltered
     });
   };
   filterData = (engineerId, data) => {
@@ -560,6 +598,7 @@ class CMPCurrentActivityReport extends MainComponent {
       createNewSR,
       srCustomerDescription,
       getFollowOnElement,
+      getCustomerOpenSR,
       
     } = this;
     const {
@@ -570,6 +609,7 @@ class CMPCurrentActivityReport extends MainComponent {
       projectsInboxFiltered,
       toBeLoggedInboxFiltered,
       pendingReopenedInboxFiltered,
+      openSRInboxFiltered,
       allocatedUsers,
       currentUser,
       _showSpinner,
@@ -684,6 +724,23 @@ class CMPCurrentActivityReport extends MainComponent {
             createNewSR,
             srCustomerDescription,
             loadQueue
+          })
+        : null,
+        isActive("OSR")
+        ? el(CMPInboxOpenSR, {
+            key: "openSR",
+            data: openSRInboxFiltered,
+            allocatedUsers,
+            currentUser,
+            loadQueue: loadQueue,
+            getMoveElement,
+            srDescription,
+            startWork,
+            allocateAdditionalTime,
+            requestAdditionalTime,
+            getAllocatedElement,
+            getFollowOnElement,
+            getCustomerOpenSR
           })
         : null,
     ]);

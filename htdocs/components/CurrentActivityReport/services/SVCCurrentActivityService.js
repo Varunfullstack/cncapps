@@ -1,4 +1,5 @@
 "use strict";
+import { sort } from '../../utils/utils.js?v=1';
 import APIMain from './../../services/APIMain.js?v=1';
 
 class SVCCurrentActivityService extends APIMain {
@@ -77,6 +78,9 @@ class SVCCurrentActivityService extends APIMain {
             body: JSON.stringify(data)
         }).then(res => res.json());
     }
+    getCustomerOpenSR(customerID) {
+        return fetch(`${this.baseURL}getCustomerOpenSR&customerID=${customerID}`).then(res => res.json()) ;
+    } 
 }
 
 export default SVCCurrentActivityService;

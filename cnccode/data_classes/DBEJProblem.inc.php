@@ -978,6 +978,44 @@ class DBEJProblem extends DBEProblem
 
         return (parent::getRows());
     }
+    /**
+     * put your comment there...
+     *
+     * @param mixed $status
+     * @param bool $includeAutomaticallyFixed
+     * @return bool
+     * @internal param mixed $future TRUE= ONLY return future alarmed requests
+     */
+    function getCustomerOpenRows($customerID)
+    {
+        $sql =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " LEFT JOIN customer ON cus_custno = pro_custno
+           LEFT JOIN consultant ON cns_consno = pro_consno
+
+          JOIN callactivity `initial`
+            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
+
+            " 
+          
+            JOIN callactivity `last`
+            ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
+              (
+              SELECT
+                MAX( ca.caa_callactivityno )
+              FROM callactivity ca
+              WHERE ca.caa_problemno = pro_problemno
+              AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
+            )
+        WHERE 1=1";        
+        $sql .=" AND pro_custno=$customerID";
+        $sql .=" AND pro_status <> 'C' and pro_status <> 'F' ";
+        $sql .= " ORDER BY pro_alarm_date, pro_alarm_time";
+        $this->setQueryString($sql);
+        return (parent::getRows());
+    }
+
 }
 
 ?>

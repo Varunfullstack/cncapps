@@ -122,6 +122,7 @@ export default class CMPLogServiceRequest extends MainComponent{
             "userfile[]"
           );
           this.setState({_showSpinner:false});
+          if(result.raiseTypeId===3)
           await  this.alert(`Please advise customer their Service Request number is: ${result.problemID}`)
         if(result.nextURL)          
             window.location=result.nextURL;

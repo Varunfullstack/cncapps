@@ -24,13 +24,21 @@ class AutoComplete extends React.Component {
     const userInput = e.currentTarget.value;
 
     // Filter our suggestions that don't contain the user's input
-    const filteredSuggestions = items
+    let filteredSuggestions = items
       .filter(
         (suggestion) =>
           (displayColumn?suggestion[displayColumn]:suggestion).toLowerCase().indexOf(userInput.toLowerCase()) > -1
-      )
-      .slice(0, displayLength);
-
+      );
+     if (filteredSuggestions.length > displayLength) {
+      filteredSuggestions = [
+        {
+          name: "Keep typing to filter, there are more results not shown here",
+          id: null,
+        },
+        ...filteredSuggestions,
+      ];
+    }
+    filteredSuggestions=filteredSuggestions.slice(0, displayLength);
     // Update the user input and filtered suggestions, reset the active
     // suggestion and make sure the suggestions are shown
     this.setState({
@@ -43,6 +51,8 @@ class AutoComplete extends React.Component {
   };
   // Event fired when the user clicks on a suggestion
   onClick = (item) => {
+    if(item.id!=null)
+    {
     const {displayColumn,onSelect}=this.props;
     // Update the user input and reset the rest of the state
     //console.log('click',item);
@@ -53,6 +63,7 @@ class AutoComplete extends React.Component {
     });
     if(onSelect)
       onSelect(item);
+  }
   };
   // Event fired when the user presses a key down
   onKeyDown = (e) => {
@@ -116,6 +127,15 @@ class AutoComplete extends React.Component {
      if(filteredSuggestions.length===0&&userInput==='') // display first n of items
      {
         filteredSuggestions=items.slice(0,displayLength);
+        if (items.length > displayLength) {
+          filteredSuggestions = [
+            {
+              name: "Keep typing to filter, there are more results not shown here",
+              id: null,
+            },
+            ...filteredSuggestions,
+          ];
+        }
         this.setState({filteredSuggestions,
             showSuggestions:true
         })
