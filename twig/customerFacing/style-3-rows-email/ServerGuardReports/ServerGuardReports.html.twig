@@ -5,44 +5,31 @@
 {# @var string extra #}
 {# @var string contactFirstName #}
 {% block headerTitle %}
-    Service Request Information
+    Daily Report
 {% endblock %}
 
 {% block headerContet %}
-    There's been an update to your service request
+
 {% endblock %}
 
 {% block firstRow %}
-    <p>
-    <span style="color: #a6a6a6">
 
-    </span>
-    </p>
-    <p>{{ contactFirstName }},</p>
-    <p>We have carried out work on your service request reference
-        <a href="https://www.cnc-ltd.co.uk/view/?serviceid={{ activityRef }}">{{ activityRef }}</a>
-        as detailed below.
-    </p>
+    <p>Dear Customer</p>
+
+    <p>Please find attached your daily serverguard report.</p>
 {% endblock %}
 
 {% block secondRow %}
-    <h2>Details</h2>
-    <p class="singleBorder">{{ lastActivityReason }}</p>
-    <P>The technician responsible for this was {{ technicianResponsible }}. {{ extra }}</P>
 {% endblock %}
 
 {% block thirdRow %}
     Best Regards
 {% endblock %}
 
-{% block serviceRequestURL %}
-    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{activityRef}}
+{% block leftFooter %}
+
 {% endblock %}
 
-{% block footerStatus %}
-    Fixed
-{% endblock %}
+{% block rightFooter %}
 
-{% block feedbackURL %}
-    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{activityRef}}
 {% endblock %}
