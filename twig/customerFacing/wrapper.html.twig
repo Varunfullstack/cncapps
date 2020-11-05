@@ -664,8 +664,9 @@ Sizes: [
         }
     </style>
     <![endif]-->
+
 </head>
-<body bgcolor="#E1E1E1"
+<body
       leftmargin="0"
       marginwidth="0"
       topmargin="0"
@@ -700,14 +701,14 @@ Sizes: [
                 valign="top"
                 id="bodyCell"
             >
-
+                <div style="text-align:left; color:#E1E1E1">##- Please type your reply above this line -##</div>
                 <!-- EMAIL HEADER // -->
                 <!--
                     The table "emailBody" is the email's container.
                     Its width can be set to 100% for a color band
                     that spans the width of the page.
                 -->
-                <table bgcolor="#E1E1E1"
+                <table
                        border="0"
                        cellpadding="0"
                        cellspacing="0"
@@ -970,6 +971,15 @@ Sizes: [
                                                                 <div style="padding: 20px;"
                                                                 >
                                                                     {% block leftFooter %}
+																		Click
+																		<a
+																		href="
+																		{% block serviceRequestURL %}
+																		{% endblock %}
+																		"
+																		>here</a>
+																		to see more details on our portal
+
                                                                     {% endblock %}
                                                                 </div>
                                                             </td>
@@ -980,7 +990,24 @@ Sizes: [
                                                             >
                                                                 <div style="padding: 20px">
                                                                     {% block rightFooter %}
-                                                                    {% endblock %}
+	<p>
+
+	{% block footerStatusTitle %}
+		Service Request Status:
+	{% endblock %}
+
+	{% block footerStatus %}
+
+	{% endblock %}
+	</p>
+	{% block feedback %}
+		Please click <a href="
+			{% block feedbackURL %}
+			{% endblock %}
+">here</a> to give us feedback on your experience
+	{% endblock %}
+
+{% endblock %}
                                                                 </div>
                                                             </td>
                                                         </tr>

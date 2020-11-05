@@ -8,14 +8,13 @@
     Service Request Information
 {% endblock %}
 {% block headerContet %}
-    Pellentesque habitant morbi tristique senectus et netus et malesuada fames
-    ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante.
+    There's been an update to your service request
 {% endblock %}
 
 {% block firstRow %}
     <p>
     <span style="color: #a6a6a6">
-        ##======== Please type your reply above this line. ========##
+
     </span>
     </p>
     <p>{{ contactFirstName }},</p>
@@ -32,10 +31,12 @@
 {% block thirdRow %}
     Best Regards
 {% endblock %}
-{% block leftFooter %}
-    Click <a>here</a> to see your request in the portal
+{% block serviceRequestURL %}
+    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{activityRef}}
 {% endblock %}
-{% block rightFooter %}
-    <h2>Current Status</h2>
-    <div>Active and Open</div>
+{% block footerStatus %}
+    Fixed
+{% endblock %}
+{% block feedbackURL %}
+    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{activityRef}}
 {% endblock %}

@@ -16,37 +16,40 @@ if (isset($_REQUEST['context'])) {
 $body = $twig->render($templateName, $context);
 echo $body;
 
-$that = null;
-$buMail = new BUMail($that);
+if (isset($_REQUEST['send'])) {
+    $that = null;
+    $buMail = new BUMail($that);
 
-$emailTo = CONFIG_SALES_EMAIL;
+    $emailTo = CONFIG_SALES_EMAIL;
 
-$hdrs = array(
-    'From'         => CONFIG_SUPPORT_EMAIL,
-    'To'           => $emailTo,
-    'Subject'      => "Nice Twig Test",
-    'Date'         => date("r"),
-    'Content-Type' => 'text/html; charset=UTF-8'
-);
+    $hdrs = array(
+        'From'         => CONFIG_SUPPORT_EMAIL,
+        'To'           => $emailTo,
+        'Subject'      => "Nice Twig Test",
+        'Date'         => date("r"),
+        'Content-Type' => 'text/html; charset=UTF-8'
+    );
 
-$mime = new Mail_mime();
+    $mime = new Mail_mime();
 
-$mime->setHTMLBody($body);
+    $mime->setHTMLBody($body, null, false);
 
-$mime_params = array(
-    'text_encoding' => '7bit',
-    'text_charset'  => 'UTF-8',
-    'html_charset'  => 'UTF-8',
-    'head_charset'  => 'UTF-8'
-);
+    $mime_params = array(
+        'text_encoding' => '7bit',
+        'text_charset'  => 'UTF-8',
+        'html_charset'  => 'UTF-8',
+        'head_charset'  => 'UTF-8'
+    );
 
-$body = $mime->get($mime_params);
+    $body = $mime->get($mime_params);
 
-$hdrs = $mime->headers($hdrs);
+    $hdrs = $mime->headers($hdrs);
 
 
-$buMail->send(
-    $emailTo,
-    $hdrs,
-    $body
-);
+    $buMail->send(
+        $emailTo,
+        $hdrs,
+        $body
+    );
+}
+
