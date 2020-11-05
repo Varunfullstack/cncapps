@@ -1,15 +1,16 @@
 {% extends '@customerFacing/style-3-rows-email/style-3-rows.twig' %}
-{# @var integer activityRef #}
-{# @var string lastActivityReason #}
-{# @var string technicianResponsible #}
 {# @var string extra #}
 {# @var string contactFirstName #}
+{# @var string MaincontactFirstName #}
+{# @var string MaincontactLastName #}
+{# @var string SupervisorcontactFirstName #}
+{# @var string SupervisorcontactLastName #}
 {% block headerTitle %}
-    Service Request Information
+    Information Notice
 {% endblock %}
 
 {% block headerContet %}
-    There's been an update to your service request
+    Sorry, something didn't quite work out
 {% endblock %}
 
 {% block firstRow %}
@@ -19,30 +20,35 @@
     </span>
     </p>
     <p>{{ contactFirstName }},</p>
-    <p>We have carried out work on your service request reference
-        <a href="https://www.cnc-ltd.co.uk/view/?serviceid={{ activityRef }}">{{ activityRef }}</a>
-        as detailed below.
-    </p>
+
+We're sorry but you are not authorised to raise support directly with CNC and this request has not been logged.
+
+Please ask one of the following people in your organsation to phone in on your behalf to progress your request.
+
+XAVI THIS NEEEDS TO BE A LIST OF THE MAIN CONTACTS THEN SUPERVISOR CONTACTS
+{{MaincontactFirstName}} {{MaincontactLastName}} 
+{{MaincontactFirstName}} {{MaincontactLastName}} 
+{{MaincontactFirstName}} {{MaincontactLastName}} 
+{{MaincontactFirstName}} {{MaincontactLastName}} 
+{{SupervisorcontactFirstName}} {{SupervisorcontactFirstName}}
 {% endblock %}
 
 {% block secondRow %}
-    <h2>Details</h2>
-    <p class="singleBorder">{{ lastActivityReason }}</p>
-    <P>The technician responsible for this was {{ technicianResponsible }}. {{ extra }}</P>
+
 {% endblock %}
 
 {% block thirdRow %}
-    Best Regards
+ 
 {% endblock %}
 
 {% block serviceRequestURL %}
-    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{activityRef}}
+
 {% endblock %}
 
 {% block footerStatus %}
-    Fixed
+   
 {% endblock %}
 
 {% block feedbackURL %}
-    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{activityRef}}
+
 {% endblock %}

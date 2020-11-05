@@ -1,15 +1,12 @@
 {% extends '@customerFacing/style-3-rows-email/style-3-rows.twig' %}
-{# @var integer activityRef #}
-{# @var string lastActivityReason #}
-{# @var string technicianResponsible #}
-{# @var string extra #}
+{# @var integer date #}  {##NEXT BANK HOLIDAY DATE#}
 {# @var string contactFirstName #}
 {% block headerTitle %}
-    Service Request Information
+    Information Notice
 {% endblock %}
 
 {% block headerContet %}
-    There's been an update to your service request
+    UK Bank Holiday approaching
 {% endblock %}
 
 {% block firstRow %}
@@ -19,30 +16,27 @@
     </span>
     </p>
     <p>{{ contactFirstName }},</p>
-    <p>We have carried out work on your service request reference
-        <a href="https://www.cnc-ltd.co.uk/view/?serviceid={{ activityRef }}">{{ activityRef }}</a>
-        as detailed below.
+Please be aware that {date} is a national holiday in UK so the CNC ServiceDesk will be closed.  If you are a customer with 24x7 support, you may contact us by calling +441273384111 and using the security access code displayed on your customer portal at https://www.cnc-ltd.co.uk.
+<br><br>
+If your query is not of an urgent nature please e-mail us at support@cnc-ltd.co.uk and we will respond on the next working day.
     </p>
 {% endblock %}
 
 {% block secondRow %}
-    <h2>Details</h2>
-    <p class="singleBorder">{{ lastActivityReason }}</p>
-    <P>The technician responsible for this was {{ technicianResponsible }}. {{ extra }}</P>
+    <br><br>
 {% endblock %}
 
 {% block thirdRow %}
-    Best Regards
 {% endblock %}
 
 {% block serviceRequestURL %}
-    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{activityRef}}
+
 {% endblock %}
 
 {% block footerStatus %}
-    Fixed
+<br><br>    
 {% endblock %}
 
 {% block feedbackURL %}
-    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{activityRef}}
+
 {% endblock %}

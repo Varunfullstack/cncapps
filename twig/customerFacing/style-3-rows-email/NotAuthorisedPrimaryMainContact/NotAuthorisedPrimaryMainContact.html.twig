@@ -3,13 +3,16 @@
 {# @var string lastActivityReason #}
 {# @var string technicianResponsible #}
 {# @var string extra #}
-{# @var string contactFirstName #}
+{# @var string {primaryMainContactFirstName} #}
+{# @var string {{contactFirstName}}  {# XAVI THIS IS THE FIRSTNAME OF THE PERSON THAT TRIED TO GET SUPPORT BUT IS NOT AUTHORISED#}
+{# @var string {{contactLastName}}  {# XAVI THIS IS THE FIRSTNAME OF THE PERSON THAT TRIED TO GET SUPPORT BUT IS NOT AUTHORISED#}
+{# @var string {{contactSupportLevel}}  {# XAVI THIS IS THE Support LEvel OF THE PERSON THAT TRIED TO GET SUPPORT BUT IS NOT AUTHORISED#}
 {% block headerTitle %}
-    Service Request Information
+    Information Notice
 {% endblock %}
 
 {% block headerContet %}
-    There's been an update to your service request
+    Sorry, something didn't quite work for one of your staff
 {% endblock %}
 
 {% block firstRow %}
@@ -18,31 +21,29 @@
 
     </span>
     </p>
-    <p>{{ contactFirstName }},</p>
-    <p>We have carried out work on your service request reference
-        <a href="https://www.cnc-ltd.co.uk/view/?serviceid={{ activityRef }}">{{ activityRef }}</a>
-        as detailed below.
+    <p>{{primaryMainContactFirstName}},</p>
+    <p>{{contactFirstName}} {{contactLastName}} has tried to raise a support request with us but they currently have the support level {contactSupportLevel} and as such are unable to do so.
+
+You will need to contact us on their behalf to progress this request and in future, if you would like them to be able to raise requests themselves, then please log onto our portal and change their support level.
     </p>
 {% endblock %}
 
 {% block secondRow %}
-    <h2>Details</h2>
-    <p class="singleBorder">{{ lastActivityReason }}</p>
-    <P>The technician responsible for this was {{ technicianResponsible }}. {{ extra }}</P>
+
 {% endblock %}
 
 {% block thirdRow %}
-    Best Regards
+
 {% endblock %}
 
 {% block serviceRequestURL %}
-    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{activityRef}}
+    Click here  https://www.cnc-ltd.co.uk/portal/contacts/ to see more details on our portal
 {% endblock %}
 
 {% block footerStatus %}
-    Fixed
+   Fixed
 {% endblock %}
 
 {% block feedbackURL %}
-    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{activityRef}}
+    rviceid={{activityRef}}
 {% endblock %}
