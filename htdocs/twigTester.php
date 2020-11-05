@@ -32,7 +32,7 @@ if (isset($_REQUEST['send'])) {
 
     $mime = new Mail_mime();
 
-    $mime->setHTMLBody($body, null, false);
+    $mime->setHTMLBody($body);
 
     $mime_params = array(
         'text_encoding' => '7bit',

@@ -39,26 +39,38 @@ Sizes: [
             background-color: #E1E1E1;
             margin: 0;
             padding: 0;
+            font-size: 10pt;
         }
 
-        body, #bodyTable, #bodyCell, #bodyCell {
+        html, body, p, div, td {
+            font-family: Arial, sans-serif;
+            font-size: 10pt;
+        }
+
+        body, .bodyTable, #bodyCell, #bodyCell {
             height: 100% !important;
             margin: 0;
             padding: 0;
             width: 100% !important;
-            font-family: Helvetica, Arial, "Lucida Grande", sans-serif;
+            font-family: Arial, "Lucida Grande", sans-serif;
         }
 
         table {
             border-collapse: collapse;
         }
 
-        table[id=bodyTable] {
-            width: 100% !important;
+        table.bodyTable {
             margin: auto;
-            max-width: 600px !important;
             color: #7A7A7A;
             font-weight: normal;
+            table-layout: fixed;
+            max-width: 100% !important;
+            width: 100% !important;
+            min-width: 100% !important;
+        }
+
+        .headerTitle {
+            color: #FFFFFF;
         }
 
         img, a img {
@@ -67,29 +79,6 @@ Sizes: [
             text-decoration: none;
             height: auto;
             line-height: 100%;
-        }
-
-        a {
-            text-decoration: none !important;
-            border-bottom: 1px solid;
-        }
-
-        h1, h2, h3, h4, h5, h6 {
-            color: #5F5F5F;
-            font-weight: normal;
-            font-family: Helvetica;
-            font-size: 20px;
-            line-height: 125%;
-            text-align: Left;
-            letter-spacing: normal;
-            margin-top: 0;
-            margin-right: 0;
-            margin-bottom: 10px;
-            margin-left: 0;
-            padding-top: 0;
-            padding-bottom: 0;
-            padding-left: 0;
-            padding-right: 0;
         }
 
         /* CLIENT-SPECIFIC STYLES */
@@ -143,36 +132,40 @@ Sizes: [
 
         /* ========== Page Styles ========== */
         h1 {
-            display: block;
-            font-size: 26px;
-            font-style: normal;
-            font-weight: normal;
-            line-height: 100%;
+            /*display: block;*/
+            font-size: 20pt;
+            /*font-style: normal;*/
+            /*font-weight: normal;*/
+            /*line-height: 100%;*/
         }
 
         h2 {
-            display: block;
-            font-size: 20px;
-            font-style: normal;
-            font-weight: normal;
-            line-height: 120%;
+            font-size: 12pt;
+            /*display: block;*/
+            /*font-style: normal;*/
+            /*font-weight: normal;*/
+            /*line-height: 120%;*/
         }
 
-        h3 {
-            display: block;
-            font-size: 17px;
-            font-style: normal;
-            font-weight: normal;
-            line-height: 110%;
+        h2.headerContent{
+            color: #7A7A7A;
         }
 
-        h4 {
-            display: block;
-            font-size: 18px;
-            font-style: italic;
-            font-weight: normal;
-            line-height: 100%;
-        }
+        /*h3 {*/
+        /*    display: block;*/
+        /*    font-size: 17px;*/
+        /*    font-style: normal;*/
+        /*    font-weight: normal;*/
+        /*    line-height: 110%;*/
+        /*}*/
+
+        /*h4 {*/
+        /*    display: block;*/
+        /*    font-size: 18px;*/
+        /*    font-style: italic;*/
+        /*    font-weight: normal;*/
+        /*    line-height: 100%;*/
+        /*}*/
 
         .flexibleImage {
             height: auto;
@@ -187,7 +180,7 @@ Sizes: [
             padding-top: 0 !important;
         }
 
-        body, #bodyTable {
+        body, .bodyTable {
             background-color: #E1E1E1;
         }
 
@@ -213,49 +206,49 @@ Sizes: [
             border-collapse: separate;
         }
 
-        .buttonContent {
-            color: #FFFFFF;
-            font-family: Helvetica;
-            font-size: 18px;
-            font-weight: bold;
-            line-height: 100%;
-            padding: 15px;
-            text-align: center;
-        }
+        /*.buttonContent {*/
+        /*    color: #FFFFFF;*/
+        /*    font-family: Arial;*/
+        /*    font-size: 18px;*/
+        /*    font-weight: bold;*/
+        /*    line-height: 100%;*/
+        /*    padding: 15px;*/
+        /*    text-align: center;*/
+        /*}*/
 
-        .buttonContent a {
-            color: #FFFFFF;
-            display: block;
-            text-decoration: none !important;
-            border: 0 !important;
-        }
+        /*.buttonContent a {*/
+        /*    color: #FFFFFF;*/
+        /*    display: block;*/
+        /*    text-decoration: none !important;*/
+        /*    border: 0 !important;*/
+        /*}*/
 
         .emailCalendar {
             background-color: #FFFFFF;
             border: 1px solid #CCCCCC;
         }
 
-        .emailCalendarMonth {
-            background-color: #205478;
-            color: #FFFFFF;
-            font-family: Helvetica, Arial, sans-serif;
-            font-size: 16px;
-            font-weight: bold;
-            padding-top: 10px;
-            padding-bottom: 10px;
-            text-align: center;
-        }
+        /*.emailCalendarMonth {*/
+        /*    background-color: #205478;*/
+        /*    color: #FFFFFF;*/
+        /*    font-family: Arial, sans-serif;*/
+        /*    font-size: 16px;*/
+        /*    font-weight: bold;*/
+        /*    padding-top: 10px;*/
+        /*    padding-bottom: 10px;*/
+        /*    text-align: center;*/
+        /*}*/
 
-        .emailCalendarDay {
-            color: #205478;
-            font-family: Helvetica, Arial, sans-serif;
-            font-size: 60px;
-            font-weight: bold;
-            line-height: 100%;
-            padding-top: 20px;
-            padding-bottom: 20px;
-            text-align: center;
-        }
+        /*.emailCalendarDay {*/
+        /*    color: #205478;*/
+        /*    font-family: Arial, sans-serif;*/
+        /*    font-size: 60px;*/
+        /*    font-weight: bold;*/
+        /*    line-height: 100%;*/
+        /*    padding-top: 20px;*/
+        /*    padding-bottom: 20px;*/
+        /*    text-align: center;*/
+        /*}*/
 
         .imageContentText {
             margin-top: 10px;
@@ -325,10 +318,24 @@ Sizes: [
             padding: 5px;
         }
 
+        .leftFooter {
+            width: 50%;
+            background-color: #575757;
+        }
+
+        .leftFooter td {
+            color: #F8F8F8;
+        }
+
+        .leftFooter a {
+            color: #F8F8F8;
+        }
+
         .report-table thead {
             color: #000;
             background: #ccc;
         }
+
 
         .report-table thead tr th {
             padding: 5px 0;
@@ -350,36 +357,36 @@ Sizes: [
             text-align: center;
         }
 
-        .text h1 {
-            font-weight: bold;
-            font-size: 1rem;
-            text-align: center;
-            margin-bottom: 1rem;
-        }
+        /*.text h1 {*/
+        /*    font-weight: bold;*/
+        /*    font-size: 1rem;*/
+        /*    text-align: center;*/
+        /*    margin-bottom: 1rem;*/
+        /*}*/
 
         .social-icons {
             display: flex;
             justify-content: center;
         }
 
-        .hexagon-icon {
-            position: relative;
-            margin: 10px 15px;
-            width: 55px;
-            height: 32px;
-            background-color: #e6e6e6;
-            z-index: 1;
-            /* Text styling */
-            line-height: 1.25rem;
-            text-align: center;
-            font-family: sans-serif;
-            font-size: .75rem;
-            font-weight: bold;
-            letter-spacing: 1px;
-            color: #000;
-            cursor: pointer;
-            transition: color 500ms ease, text-shadow 500ms ease;
-        }
+        /*.hexagon-icon {*/
+        /*    position: relative;*/
+        /*    margin: 10px 15px;*/
+        /*    width: 55px;*/
+        /*    height: 32px;*/
+        /*    background-color: #e6e6e6;*/
+        /*    z-index: 1;*/
+        /*    !* Text styling *!*/
+        /*    line-height: 1.25rem;*/
+        /*    text-align: center;*/
+        /*    font-family: sans-serif;*/
+        /*    font-size: .75rem;*/
+        /*    font-weight: bold;*/
+        /*    letter-spacing: 1px;*/
+        /*    color: #000;*/
+        /*    cursor: pointer;*/
+        /*    transition: color 500ms ease, text-shadow 500ms ease;*/
+        /*}*/
 
         .hexagon-icon .fa {
             line-height: 35px;
@@ -443,24 +450,24 @@ Sizes: [
             transform: rotate(60deg) translate(110px, 0);
         }
 
-        .hexagon {
-            position: relative;
-            margin: 100px auto;
-            width: 190px;
-            height: 110px;
-            background-color: #e6e6e6;
-            z-index: 1;
-            /* Text styling */
-            line-height: 1.25rem;
-            text-align: center;
-            font-family: sans-serif;
-            font-size: .75rem;
-            font-weight: bold;
-            letter-spacing: 1px;
-            color: #000;
-            cursor: pointer;
-            transition: color 500ms ease, text-shadow 500ms ease;
-        }
+        /*.hexagon {*/
+        /*    position: relative;*/
+        /*    margin: 100px auto;*/
+        /*    width: 190px;*/
+        /*    height: 110px;*/
+        /*    background-color: #e6e6e6;*/
+        /*    z-index: 1;*/
+        /*    !* Text styling *!*/
+        /*    line-height: 1.25rem;*/
+        /*    text-align: center;*/
+        /*    font-family: sans-serif;*/
+        /*    font-size: .75rem;*/
+        /*    font-weight: bold;*/
+        /*    letter-spacing: 1px;*/
+        /*    color: #000;*/
+        /*    cursor: pointer;*/
+        /*    transition: color 500ms ease, text-shadow 500ms ease;*/
+        /*}*/
 
         .hexagon:hover {
             color: #fff;
@@ -637,6 +644,40 @@ Sizes: [
         }
 
         /* end IOS targeting */
+        .rightFooter {
+            width: 50%;
+            background-color: #00b1eb;
+
+        }
+
+        .rightFooter td {
+            color: #7A7A7A;
+        }
+
+        .rightFooter a {
+            color: #7A7A7A;
+        }
+
+        .rightFooter .statusValue {
+            font-weight: bold;
+        }
+
+        .extraText {
+            color: #7A7A7A;
+            text-align: center;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        .extraText a {
+            color: #7A7A7A;
+        }
+
+        .centeringTable {
+            background-color: #F8F8F8;
+        }
+
+
     </style>
     <!--
         Outlook Conditional CSS
@@ -665,13 +706,14 @@ Sizes: [
     </style>
     <![endif]-->
 
+
 </head>
 <body
-      leftmargin="0"
-      marginwidth="0"
-      topmargin="0"
-      marginheight="0"
-      offset="0"
+        leftmargin="0"
+        marginwidth="0"
+        topmargin="0"
+        marginheight="0"
+        offset="0"
 >
 
 <!-- CENTER THE EMAIL // -->
@@ -693,83 +735,27 @@ Sizes: [
            cellspacing="0"
            height="100%"
            width="100%"
-           id="bodyTable"
-           style="table-layout: fixed;max-width:100% !important;width: 100% !important;min-width: 100% !important;"
+           class="bodyTable"
+
     >
+        <tr>
+            <td class="extraText">
+                ##- Please type your reply above this line -##
+            </td>
+        </tr>
         <tr>
             <td align="center"
                 valign="top"
                 id="bodyCell"
             >
-                <div style="text-align:left; color:#E1E1E1">##- Please type your reply above this line -##</div>
+
                 <!-- EMAIL HEADER // -->
                 <!--
                     The table "emailBody" is the email's container.
                     Its width can be set to 100% for a color band
                     that spans the width of the page.
                 -->
-                <table
-                       border="0"
-                       cellpadding="0"
-                       cellspacing="0"
-                       width="600"
-                       id="emailHeader"
-                >
 
-                    <!-- HEADER ROW // -->
-                    <tr>
-                        <td align="center"
-                            valign="top"
-                        >
-                            <!-- CENTERING TABLE // -->
-                            <table border="0"
-                                   cellpadding="0"
-                                   cellspacing="0"
-                                   width="100%"
-                            >
-                                <tr>
-                                    <td align="center"
-                                        valign="top"
-                                    >
-                                        <!-- FLEXIBLE CONTAINER // -->
-                                        <table border="0"
-                                               cellpadding="10"
-                                               cellspacing="0"
-                                               width="600"
-                                               class="flexibleContainer"
-                                        >
-                                            <tr>
-                                                <td valign="top"
-                                                    width="600"
-                                                    class="flexibleContainerCell"
-                                                >
-
-                                                    <!-- CONTENT TABLE // -->
-                                                    <table border="0"
-                                                           cellpadding="0"
-                                                           cellspacing="0"
-                                                           width="100%"
-                                                    >
-                                                        <tbody>
-                                                        <tr>
-
-                                                        </tr>
-
-                                                        </tbody>
-                                                    </table>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                        <!-- // FLEXIBLE CONTAINER -->
-                                    </td>
-                                </tr>
-                            </table>
-                            <!-- // CENTERING TABLE -->
-                        </td>
-                    </tr>
-                    <!-- // END -->
-
-                </table>
                 <!-- // END -->
 
                 <!-- EMAIL BODY // -->
@@ -839,7 +825,7 @@ Sizes: [
                                                        framework of the email.
                                                    -->
                                                     <table border="0"
-                                                           cellpadding="30"
+                                                           cellpadding="20"
                                                            cellspacing="0"
                                                            width="100%"
                                                     >
@@ -850,16 +836,14 @@ Sizes: [
                                                                 style="background-color: #00b1eb;"
                                                             >
 
-                                                                <h1 style="color:#FFFFFF;line-height:100%;font-family:Helvetica,Arial,sans-serif;font-size:35px;font-weight:normal;margin-bottom:5px;text-align:center;">
+                                                                <h1 class="headerTitle">
                                                                     {% block headerTitle %}
                                                                     {% endblock %}
                                                                 </h1>
-                                                                <h3 style="text-align:center;font-weight:normal;font-family:Helvetica,Arial,sans-serif;font-size:23px;margin-bottom:10px;color:#205478;line-height:135%;">
+                                                                <h2 class="headerContent">
                                                                     {% block headerContet %}
                                                                     {% endblock %}
-                                                                </h3>
-
-
+                                                                </h2>
                                                             </td>
                                                         </tr>
                                                     </table>
@@ -894,7 +878,7 @@ Sizes: [
                                    cellpadding="0"
                                    cellspacing="0"
                                    width="100%"
-                                   bgcolor="#F8F8F8"
+                                   class="centeringTable"
                             >
                                 <tr>
                                     <td align="center"
@@ -965,50 +949,62 @@ Sizes: [
                                                         <tr>
                                                             <td align="left"
                                                                 valign="top"
-                                                                class="flexibleContainerBox"
-                                                                style="width: 50%;background-color: #575757;"
+                                                                class="leftFooter"
                                                             >
-                                                                <div style="padding: 20px;"
-                                                                >
-                                                                    {% block leftFooter %}
-																		Click
-																		<a
-																		href="
+                                                                <table>
+                                                                    <tr>
+                                                                        <td style="padding: 20px">
+                                                                            {% block leftFooter %}
+                                                                                Click
+                                                                                <a
+                                                                                        href="
 																		{% block serviceRequestURL %}
 																		{% endblock %}
 																		"
-																		>here</a>
-																		to see more details on our portal
+                                                                                >here</a>
+                                                                                to see more details on our portal
 
-                                                                    {% endblock %}
-                                                                </div>
+                                                                            {% endblock %}
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
                                                             </td>
                                                             <td align="right"
+                                                                class="rightFooter"
                                                                 valign="top"
-                                                                class="flexibleContainerBox"
-                                                                style="    width: 50%;    background-color: #00b1eb;"
                                                             >
-                                                                <div style="padding: 20px">
+                                                                <table>
                                                                     {% block rightFooter %}
-	<p>
+                                                                        <tr>
+                                                                            <td style="padding: 20px">
 
-	{% block footerStatusTitle %}
-		Service Request Status:
-	{% endblock %}
 
-	{% block footerStatus %}
+                                                                                {% block footerStatusTitle %}
+                                                                                    Service Request Status:
+                                                                                {% endblock %}
+                                                                                <span class="statusValue">
 
-	{% endblock %}
-	</p>
-	{% block feedback %}
-		Please click <a href="
-			{% block feedbackURL %}
-			{% endblock %}
-">here</a> to give us feedback on your experience
-	{% endblock %}
+                                                                                {% block footerStatus %}
 
-{% endblock %}
-                                                                </div>
+                                                                                {% endblock %}
+                                                                                </span>
+
+                                                                            </td>
+                                                                        </tr>
+                                                                        {% block feedback %}
+                                                                            <tr>
+                                                                                <td style="padding-left: 20px;padding-right: 20px;padding-bottom: 20px">
+                                                                                    Please click <a href="
+			                                                                        {% block feedbackURL %}
+			                                                                        {% endblock %}"
+                                                                                    >here</a> to give us feedback on
+                                                                                    your experience
+                                                                                </td>
+                                                                            </tr>
+                                                                        {% endblock %}
+
+                                                                    {% endblock %}
+                                                                </table>
                                                             </td>
                                                         </tr>
                                                         </tbody>
@@ -1038,69 +1034,18 @@ Sizes: [
                     Its width can be set to 100% for a color band
                     that spans the width of the page.
                 -->
-                <table bgcolor="#E1E1E1"
-                       border="0"
-                       cellpadding="0"
-                       cellspacing="0"
-                       width="600"
-                       id="emailFooter"
-                >
-
-                    <!-- FOOTER ROW // -->
-                    <!--
-                        To move or duplicate any of the design patterns
-                        in this email, simply move or copy the entire
-                        MODULE ROW section for each content block.
-                    -->
-                    <tr>
-                        <td align="center"
-                            valign="top"
-                        >
-                            <!-- CENTERING TABLE // -->
-                            <table border="0"
-                                   cellpadding="0"
-                                   cellspacing="0"
-                                   width="100%"
-                            >
-                                <tr>
-                                    <td align="center"
-                                        valign="top"
-                                    >
-                                        <!-- FLEXIBLE CONTAINER // -->
-                                        <table border="0"
-                                               cellpadding="0"
-                                               cellspacing="0"
-                                               width="600"
-                                               class="flexibleContainer"
-                                        >
-                                            <tr>
-                                                <td align="center"
-                                                    valign="top"
-                                                    width="600"
-                                                    class="flexibleContainerCell"
-                                                >
-                                                    <table border="0"
-                                                           cellpadding="30"
-                                                           cellspacing="0"
-                                                           width="100%"
-                                                    >
-                                                    </table>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                        <!-- // FLEXIBLE CONTAINER -->
-                                    </td>
-                                </tr>
-                            </table>
-                            <!-- // CENTERING TABLE -->
-                        </td>
-                    </tr>
-
-                </table>
                 <!-- // END -->
-
             </td>
         </tr>
+        <tr>
+            <td class="extraText"
+                style="padding-top: 10px"
+            >
+                Sent from Computer & Network Consultants Ltd. Please click
+                <a href=" http://www.cnc-ltd.co.uk/email-disclaimer">here</a> for our email disclaimer.
+            </td>
+        </tr>
+
     </table>
 </center>
 </body>
