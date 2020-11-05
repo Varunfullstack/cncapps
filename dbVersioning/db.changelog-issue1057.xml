@@ -30,7 +30,7 @@
             </column>
         </addColumn>
     </changeSet>
-    <changeSet id="issue1057-2" author="pavwebdev">
+    <changeSet id="issue1057-3" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="contact" columnName="pendingFurloughActionLevel"/>
