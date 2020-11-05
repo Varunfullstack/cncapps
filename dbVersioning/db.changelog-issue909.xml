@@ -17,4 +17,16 @@
             </column>
         </addColumn>
     </changeSet>
+    <changeSet id="issue909-2" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="lastUpdatedDateTime"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="lastUpdatedDateTime" type="datetime" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
