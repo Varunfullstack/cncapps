@@ -246,6 +246,8 @@ ORDER BY engineer.firstName";
             )
         );
 
+        $this->loadReactScript('SpinnerHolderComponent.js');
+        $this->loadReactCSS('SpinnerHolderComponent.css');
 
         $hdUsers = (new BUUser($this))->getUsersByTeamLevel(1);
 

@@ -92,7 +92,8 @@ class CTChangeRequestDashboard extends CTCNC
             'ChangeRequestDashboard',
             'ChangeRequestDashboard'
         );
-
+        $this->loadReactScript('SpinnerHolderComponent.js');
+        $this->loadReactCSS('SpinnerHolderComponent.css');
         $this->setPageTitle('Change Request Dashboard');
 
         $this->template->parse(

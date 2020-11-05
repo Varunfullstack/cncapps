@@ -78,6 +78,8 @@ class CTManagementReports extends CTCNC
         $this->setMethodName('SalesByCustomer');
 
         $this->setTemplateFiles('ManagementReportsSalesCustomer', 'ManagementReportsSalesCustomer.inc');
+        $this->loadReactScript('SpinnerHolderComponent.js');
+        $this->loadReactCSS('SpinnerHolderComponent.css');
 
         $this->setPageTitle("Sales By Customer Profile");
 

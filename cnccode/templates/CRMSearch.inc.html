@@ -1,12 +1,5 @@
 <!-- Template: PasswordSearch.inc.html -->
-<link rel="stylesheet"
-      href="/font-awesome/css/font-awesome.css"
-/>
-<script src="components/dist/SpinnerHolder.js"></script>
 <div id="reactSpinnerHolder"></div>
-<link rel="stylesheet"
-      href="components/dist/SpinnerHolder.css"
->
 <script type="text/javascript">
     const autocompleteURL = "/Customer.php?action=searchName";
     window.addEventListener('DOMContentLoaded', function () {
@@ -16,7 +9,6 @@
     });
 
     function checkCustomerId() {
-        debugger;
         if (!$('#customerID').val()) {
             alert('Please select a specific customer');
             return false;

@@ -1371,6 +1371,7 @@ WHERE
     function displayReport()
     {
 
+
         $this->setMethodName('displayReport');
 
         $this->setTemplateFiles(
@@ -1431,7 +1432,6 @@ WHERE caa_endtime
   AND getOvertime(caa_callactivityno) * 60 >= `minimumOvertimeMinutesRequired`
   AND caa_endtime <> caa_starttime
   AND callactivity.`caa_consno` = ?';
-
         $statement = $db->preparedQuery($useOvertimeQuery, [["type" => "i", "value" => $this->userID]]);
         $overtimeSummary = $statement->fetch_assoc();
 
