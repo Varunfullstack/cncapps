@@ -1894,10 +1894,6 @@ class CTCustomer extends CTCNC
                 }
             }
             $this->dsCustomer->fetchNext();
-//            var_dump($this->dsCustomer->getValue(DBECustomer::reviewDate));
-//            exit;
-
-
             // If we can delete this customer set the link
             if ($this->buCustomer->canDeleteCustomer(
                 $this->getCustomerID(),
