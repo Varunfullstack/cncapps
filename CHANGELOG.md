@@ -3,6 +3,7 @@ This project changes will be shown here.
 
 ## [unreleased]
 - Issue 1017 - Import Requests stuck when there's no main contact
+- Issue 1057 - Enhance Furlough Status Processing
 
 ## [v4.10.2] - 2020-10-30
 ### Fixed
