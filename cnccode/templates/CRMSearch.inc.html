@@ -1,7 +1,5 @@
 <!-- Template: PasswordSearch.inc.html -->
-<link rel="stylesheet"
-      href="/font-awesome/css/font-awesome.css"
-/>
+<div id="reactSpinnerHolder"></div>
 <script type="text/javascript">
     const autocompleteURL = "/Customer.php?action=searchName";
     window.addEventListener('DOMContentLoaded', function () {
@@ -11,7 +9,6 @@
     });
 
     function checkCustomerId() {
-        debugger;
         if (!$('#customerID').val()) {
             alert('Please select a specific customer');
             return false;
@@ -154,7 +151,7 @@
     var dataTable = null;
 
     function searchCustomers() {
-        $.LoadingOverlay("show", {text: 'Running your search, please wait'});
+        spinnerComponent.showSpinner();
         $.ajax({
             url: '{ajaxURL}',
             data: {customerLeadID: $('#customerLeadSelector').val()},
@@ -174,7 +171,7 @@
         }, error => {
 
         }).then(() => {
-            $.LoadingOverlay("hide");
+            spinnerComponent.hideSpinner();
         })
     }
 </script>

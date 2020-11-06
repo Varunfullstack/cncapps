@@ -391,6 +391,8 @@ class CTSCustomerLicenses extends CTCNC
             'CustomerLicenses',
             'CustomerLicenses.inc'
         );
+        $this->loadReactScript('CustomerLicensesComponent.js');
+        $this->loadReactCSS('CustomerLicensesComponent.css');
 
         $this->template->parse(
             'CONTENTS',
@@ -399,4 +401,6 @@ class CTSCustomerLicenses extends CTCNC
         );
         $this->parsePage();
     }
+
+
 }

@@ -264,6 +264,8 @@ ORDER BY teamId,
                 'EscalationReport' => 'EscalationReport.inc'
             )
         );
+        $this->loadReactCSS('FixedServiceRequestCountComponent.css');
+        $this->loadReactScript('FixedServiceRequestCountComponent.js');
 
         $urlSubmit = Controller::buildLink(
             $_SERVER ['PHP_SELF'],

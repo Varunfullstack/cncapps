@@ -1,3 +1,4 @@
+<div id="reactSpinnerHolder"></div>
 <script>
 
     let allocationUsers = [];
@@ -105,11 +106,11 @@
                 url: "?action=getData",
                 type: "GET",
                 dataSrc: (response) => {
-                    $.LoadingOverlay('hide');
+                    spinnerComponent.hideSpinner();
                     return response.data;
                 },
                 data: (data) => {
-                    $.LoadingOverlay("show", {text: 'Fetching data, please wait'});
+                    spinnerComponent.showSpinner();
                     return data;
                 }
             },

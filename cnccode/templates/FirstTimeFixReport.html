@@ -1,3 +1,4 @@
+<div id="reactSpinnerHolder"></div>
 <style>
     label {
         float: left;
@@ -40,7 +41,7 @@
         }
 
         var json = JSON.stringify(object);
-        $.LoadingOverlay("show", {text: 'Running your search, please wait'});
+        spinnerComponent.showSpinner();
         $.ajax({
             url: '{fetchDataURL}',
             method: 'POST',
@@ -80,7 +81,7 @@
         }).catch(function () {
 
         }).then(function () {
-            $.LoadingOverlay('hide');
+            spinnerComponent.hideSpinner();
         });
         return false;
     }

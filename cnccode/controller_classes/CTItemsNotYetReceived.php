@@ -84,6 +84,9 @@ class CTItemsNotYetReceived extends CTCNC
             'ItemsNotYetReceived',
             'ItemsNotYetReceived'
         );
+        $this->loadReactScript('SpinnerHolderComponent.js');
+        $this->loadReactCSS('SpinnerHolderComponent.css');
+
         $this->template->parse(
             'CONTENTS',
             'ItemsNotYetReceived',

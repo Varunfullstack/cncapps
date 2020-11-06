@@ -23,19 +23,3 @@ $ctSRSource = new CTSRSource(
 $ctSRSource->execute();
 page_close();
 ?>
-<link rel="stylesheet"
-      href="components/style.css?version=<?= time() ?>"
->
-<link rel="stylesheet"
-      href="css/table.css?version=<?= time() ?>"
->
-
-<script src="js/react.development.js"
-        crossorigin
-></script>
-<script src="js/react-dom.development.js"
-        crossorigin
-></script>
-<script type="module"
-        src='components/CMPSRSource.js?version=<?= time() ?>'
-></script>

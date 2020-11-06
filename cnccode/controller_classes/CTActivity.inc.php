@@ -3572,6 +3572,9 @@ class CTActivity extends CTCNC
             )
         );
 
+        $this->loadReactScript('SpinnerHolderComponent.js');
+        $this->loadReactCSS('SpinnerHolderComponent.css');
+
 // Parameters
         $this->setPageTitle("Record " . CONFIG_SERVICE_REQUEST_DESC . " Details");
 
@@ -4319,6 +4322,8 @@ class CTActivity extends CTCNC
             )
         );
 
+        $this->loadReactScript('SpinnerHolderComponent.js');
+        $this->loadReactCSS('SpinnerHolderComponent.css');
         $urlDisplayActivity =
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],

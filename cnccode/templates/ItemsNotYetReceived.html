@@ -1,3 +1,4 @@
+<div id="reactSpinnerHolder"></div>
 <script>
     let dataTable = null;
     let redSelect = null;
@@ -57,12 +58,12 @@
                 url: "?action=getData",
                 type: "GET",
                 dataSrc: (response) => {
-                    $.LoadingOverlay('hide');
+                    spinnerComponent.hideSpinner();
                     return response;
                 },
                 data: (data) => {
+                    spinnerComponent.showSpinner();
                     data.daysAgo = daysAgoSelector.selectedOptions[0].value;
-                    $.LoadingOverlay("show", {text: 'Running your search, please wait'});
                     return data;
                 }
             },

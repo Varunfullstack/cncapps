@@ -1,4 +1,5 @@
 <script src=".javascript/accounting.min.js"></script>
+<div id="reactSpinnerHolder"></div>
 <script>
     function submitOnReturn() {
         if (event.keyCode == 13) {
@@ -191,7 +192,7 @@
             object[key] = value;
         });
         var json = JSON.stringify(object);
-        $.LoadingOverlay("show", {text: 'Running your search, please wait'});
+        spinnerComponent.showSpinner();
         $.ajax({
             url: '{fetchDataUrl}',
             method: 'POST',
@@ -211,7 +212,7 @@
         }).catch(function () {
 
         }).then(function () {
-            $.LoadingOverlay('hide');
+            spinnerComponent.hideSpinner();
         });
         return false;
     }

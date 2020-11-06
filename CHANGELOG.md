@@ -2,6 +2,9 @@
 This project changes will be shown here.
 
 ## [unreleased]
+### Changed
+- Issue 1041 - Page Loading Spinner
+### Fixed
 - Issue 1017 - Import Requests stuck when there's no main contact
 
 ## [v4.10.2] - 2020-10-30

@@ -1,8 +1,9 @@
 <!-- Template: Customer.inc.html -->
+<div id="reactSpinnerHolder"></div>
 <script type="application/javascript">
 
     window.addEventListener('DOMContentLoaded', function () {
-        $.LoadingOverlay("show", {text: 'Please wait while the data is loading...'});
+        spinnerComponent.showSpinner();
 
         $.ajax('?action=getData', {
             dataType: 'json',
@@ -44,7 +45,7 @@
 
                 dataTableConfig.data = data;
                 $('#myTable').dataTable(dataTableConfig);
-                $.LoadingOverlay('hide');
+                spinnerComponent.hideSpinner();
             })
 
     })

@@ -584,15 +584,7 @@ ORDER BY staffName";
                     "<div id='react-expense-breakdown' data-user-id='{$this->getDbeUser()->getValue(DBEUser::userID)}'></div>"
                 );
                 $this->template->parse('CONTENTS', 'ChangeLog', true);
-                $this->template->setVar(
-                    'javaScript',
-                    '
-                    <link rel="stylesheet" href="./css/table.css">
-                    <script src="js/react.development.js" crossorigin></script>
-                    <script src="js/react-dom.development.js" crossorigin></script>
-                    <script type="module" src=\'components/expenseBreakdownYearToDate.js\'></script>
-                '
-                );
+                $this->loadReactScript('expenseBreakdownYearToDateComponent.js');
                 $this->parsePage();
                 break;
             default:
@@ -1379,6 +1371,7 @@ WHERE
     function displayReport()
     {
 
+
         $this->setMethodName('displayReport');
 
         $this->setTemplateFiles(
@@ -1439,7 +1432,6 @@ WHERE caa_endtime
   AND getOvertime(caa_callactivityno) * 60 >= `minimumOvertimeMinutesRequired`
   AND caa_endtime <> caa_starttime
   AND callactivity.`caa_consno` = ?';
-
         $statement = $db->preparedQuery($useOvertimeQuery, [["type" => "i", "value" => $this->userID]]);
         $overtimeSummary = $statement->fetch_assoc();
 

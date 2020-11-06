@@ -1,4 +1,5 @@
 <!-- Template: ActivityEdit.inc.html -->
+<div id="reactSpinnerHolder"></div>
 <script src="CommonJS.js"></script>
 <script>
     window.callActivityID = "{callActivityID}";
@@ -214,7 +215,7 @@
 
     function changeContactNotes() {
         const object = {contactID: event.target.value, problemID};
-        $.LoadingOverlay("show", {text: 'Fetching contact notes'});
+        spinnerComponent.showSpinner();
         $.ajax({
             url: '?action=contactNotes',
             method: 'POST',
@@ -230,7 +231,7 @@
         }).catch(function () {
 
         }).then(function () {
-            $.LoadingOverlay('hide');
+            spinnerComponent.hideSpinner();
         });
 
     }

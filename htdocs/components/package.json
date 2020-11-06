@@ -1,0 +1,44 @@
+{
+    "name": "spinnerholder",
+    "version": "1.0.0",
+    "description": "",
+    "main": "SpinnerHolder.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build:ChildItemComponent": "parcel build ChildItemComponent/ChildAndParentItems.js",
+        "start:ChildItemComponent": "parcel ChildItemComponent/ChildAndParentItems.js",
+        "build:CustomerLicenseComponent": "parcel build CustomerLicencesComponent/CustomerLicensesComponent.js --public-url /components/dist ",
+        "start:CustomerLicenseComponent": "parcel CustomerLicencesComponent/CustomerLicensesComponent.js --public-url /components/dist",
+        "build:ExpenseBreakdownYearToDateComponent": "parcel build ExpenseBreakdownYearToDateComponent/ExpenseBreakdownYearToDateComponent.js --public-url /components/dist",
+        "start:ExpenseBreakdownYearToDateComponent": "parcel ExpenseBreakdownYearToDateComponent/ExpenseBreakdownYearToDateComponent.js --public-url /components/dist",
+        "build:FixedServiceRequestCountComponent": "parcel build FixedServiceRequestCountComponent/FixedServiceRequestCountComponent.js --public-url /components/dist",
+        "start:FixedServiceRequestCountComponent": "parcel FixedServiceRequestCountComponent/FixedServiceRequestCountComponent.js --public-url /components/dist",
+        "build:ItemListTypeAheadRenderer": "parcel build ItemListTypeAheadRenderer/ItemListTypeAheadRenderer.js --public-url /components/dist",
+        "start:ItemListTypeAheadRenderer": "parcel ItemListTypeAheadRenderer/ItemListTypeAheadRenderer.js --public-url /components/dist",
+        "build:MySettingsComponent": "parcel build MySettingsComponent/MySettingsComponent.js --public-url /components/dist",
+        "start:MySettingsComponent": "parcel MySettingsComponent/MySettingsComponent.js --public-url /components/dist",
+        "build:OutOfHoursReportComponent": "parcel build OutOfHoursReportComponent/OutOfHoursReportComponent.js --public-url /components/dist",
+        "start:OutOfHoursReportComponent": "parcel OutOfHoursReportComponent/OutOfHoursReportComponent.js --public-url /components/dist",
+        "build:SpinnerHolder": "parcel build SpinnerHolderComponent/SpinnerHolderComponent.js --public-url /components/dist",
+        "start:SpinnerHolder": "parcel SpinnerHolderComponent/SpinnerHolderComponent.js --public-url /components/dist",
+        "build:SRSourceComponent": "parcel build SRSourceComponent/SRSourceComponent.js --public-url /components/dist",
+        "start:SRSourceComponent": "parcel SRSourceComponent/SRSourceComponent.js --public-url /components/dist",
+        "build": "npm run build:ChildItemComponent && npm run build:CustomerLicenseComponent && npm run build:ExpenseBreakdownYearToDateComponent && npm run build:FixedServiceRequestCountComponent && npm run build:ItemListTypeAheadRenderer && npm run build:MySettingsComponent && npm run build:OutOfHoursReportComponent && npm run build:SpinnerHolder && npm run build:SRSourceComponent"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "react": "^17.0.1",
+        "react-dom": "^17.0.1",
+        "moment": "^2.29.1"
+    },
+    "devDependencies": {
+        "parcel-bundler": "^1.12.4",
+        "html-react-parser": "^0.14.0",
+        "normalizr": "^3.6.1",
+        "babel-preset-react": "^6.24.1"
+    },
+    "browserslist": [
+        "since 2017-06"
+    ]
+}

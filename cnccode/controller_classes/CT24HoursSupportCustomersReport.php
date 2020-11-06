@@ -121,6 +121,8 @@ class CT24HoursSupportCustomersReport extends CTCNC
                 'customers'
             );
 
+            $this->loadReactScript('OutOfHoursReportComponent.js');
+
             while ($dsCustomer->fetchNext()) {
 
                 $linkURL =
