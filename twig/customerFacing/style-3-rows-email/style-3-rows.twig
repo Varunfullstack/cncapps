@@ -1,43 +1,17 @@
 {% extends "@customerFacing/wrapper.html.twig" %}
 {% block content %}
-    <table border="0"
-           cellpadding="30"
-           cellspacing="0"
-           width="100%"
+    <h3 style="color:#5F5F5F;line-height:125%;font-family:Helvetica,Arial,sans-serif;font-size:20px;font-weight:normal;margin-top:0;margin-bottom:1rem;text-align:left;">
+        {% block firstRow %}
+        {% endblock %}
+    </h3>
+    <div style="text-align:left;font-family:Helvetica,Arial,sans-serif;font-size:15px;margin-bottom:1rem;color:#5F5F5F;line-height:135%;"
     >
-        <tr>
-            <td align="center"
-                valign="top"
-            >
-                <!-- CONTENT TABLE // -->
-                <table border="0"
-                       cellpadding="0"
-                       cellspacing="0"
-                       width="100%"
-                >
-                    <tr>
-                        <td valign="top"
-                            class="textContent"
-                        >
-                            <h3 style="color:#5F5F5F;line-height:125%;font-family:Helvetica,Arial,sans-serif;font-size:20px;font-weight:normal;margin-top:0;margin-bottom:1rem;text-align:left;">
-                                {% block firstRow %}
-                                {% endblock %}
-                            </h3>
-                            <div style="text-align:left;font-family:Helvetica,Arial,sans-serif;font-size:15px;margin-bottom:1rem;color:#5F5F5F;line-height:135%;"
-                            >
-                                {% block secondRow %}
-                                {% endblock %}
-                            </div>
-                            <div style="text-align:left;font-family:Helvetica,Arial,sans-serif;font-size:15px;margin-bottom:0;color:#5F5F5F;line-height:135%;"
-                            >
-                                {% block thirdRow %}
-                                {% endblock %}
-                            </div>
-                        </td>
-                    </tr>
-                </table>
-                <!-- // CONTENT TABLE -->
-            </td>
-        </tr>
-    </table>
+        {% block secondRow %}
+        {% endblock %}
+    </div>
+    <div style="text-align:left;font-family:Helvetica,Arial,sans-serif;font-size:15px;margin-bottom:0;color:#5F5F5F;line-height:135%;"
+    >
+        {% block thirdRow %}
+        {% endblock %}
+    </div>
 {% endblock %}
