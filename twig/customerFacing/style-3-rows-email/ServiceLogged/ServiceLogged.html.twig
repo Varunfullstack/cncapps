@@ -5,6 +5,9 @@
 {# @var integer priority #}
 {# @var string serviceRequestStatus the status of the request "Initial"|"In Progress"|"On Hold" #}
 {# @var float SLA #}
+{# @var boolean isLoggedOutOfHours is this request logged out of hours? #}
+{# @var boolean outOfHoursSupport does the customer have outOfHours support? #}
+{# @var boolean support24  does the customer have 24 hour support? #}
 {% block headerTitle %}
     Service Request Information
 {% endblock %}
@@ -36,8 +39,17 @@
 
 {% block thirdRow %}
     {% if serviceRequestStatus == 'Initial' %}
-        <p>This request has been submitted to the relevant team who will contact you to arrange any and all appropriate
-            action.</p>
+        <p>
+            {% if not isLoggedOutOfHours or not outOfHoursSupport %}
+                This request has been submitted to the relevant team who will contact you to arrange any and all appropriate
+                action.
+            {% elseif support24 %}
+                This request will be responded to when the office is next open, but if you have an out of hours PIN
+                code listed on our customer portal, you may call our offices to speak to one of our on-call technicians.  Please note that there are extra charges for this service as detailed in the guide on our portal for service outside our core opening hours of Monday - Friday 07:30 - 20:00.
+            {% else %}
+                This request will be responded to when the office is next open.
+            {% endif %}
+        </p>
     {% endif %}
 {% endblock %}
 
