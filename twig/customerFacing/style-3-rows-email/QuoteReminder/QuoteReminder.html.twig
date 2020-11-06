@@ -1,48 +1,37 @@
 {% extends '@customerFacing/style-3-rows-email/style-3-rows.twig' %}
-{# @var integer activityRef #}
-{# @var string lastActivityReason #}
-{# @var string technicianResponsible #}
-{# @var string extra #}
 {# @var string contactFirstName #}
+{# @var string renewalType #}
 {% block headerTitle %}
-    Service Request Information
+    Quote Reminder
 {% endblock %}
 
 {% block headerContet %}
-    There's been an update to your service request
+    We know you're busy, so here's a gentle reminder
 {% endblock %}
 
 {% block firstRow %}
-    <p>
-    <span style="color: #a6a6a6">
-
-    </span>
-    </p>
     <p>{{ contactFirstName }},</p>
-    <p>We have carried out work on your service request reference
-        <a href="https://www.cnc-ltd.co.uk/view/?serviceid={{ activityRef }}">{{ activityRef }}</a>
-        as detailed below.
+    <p>
+        We recently sent you a renewal quotation for {{ renewalType }} as this will soon expire, a copy of which is
+        attached.
     </p>
 {% endblock %}
 
 {% block secondRow %}
-    <h2>Details</h2>
-    <p class="singleBorder">{{ lastActivityReason }}</p>
-    <P>The technician responsible for this was {{ technicianResponsible }}. {{ extra }}</P>
+    <p>If you would like to proceed, follow the instructions on the quotation to electronically sign the order but if
+        you have any questions, please contact us in advance of the renewal date.
+    </p>
 {% endblock %}
 
 {% block thirdRow %}
-    Best Regards
+
 {% endblock %}
 
-{% block serviceRequestURL %}
-    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ activityRef }}
+{% block leftFooter %}
+    <br>
+    <br>
 {% endblock %}
 
-{% block footerStatus %}
-    Fixed
-{% endblock %}
+{% block rightFooter %}
 
-{% block feedbackURL %}
-    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ activityRef }}
 {% endblock %}
