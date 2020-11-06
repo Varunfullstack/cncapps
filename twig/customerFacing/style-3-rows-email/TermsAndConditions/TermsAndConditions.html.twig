@@ -1,0 +1,42 @@
+{% extends '@customerFacing/style-3-rows-email/style-3-rows.twig' %}
+{# @var integer serviceRequestId #}
+{# @var string lastActivityReason #}
+{# @var string contactFirstName #}
+{# @var integer oldPriority #}
+{# @var integer newPriority #}
+{# @var float SLA #}
+{# @var string serviceRequestStatus  the status of the request "Initial"|"In Progress"|"On Hold" #}
+{% block headerTitle %}
+    Terms and Conditions
+{% endblock %}
+
+{% block headerContet %}
+    It's official and here's the proof
+{% endblock %}
+
+{% block firstRow %}
+    <p>{{ contactFirstName }},</p>
+    <p>
+        Please find attached a copy of the Terms & Conditions that you have recently accepted, which will also be
+        available via your portal.
+    </p>
+
+{% endblock %}
+
+{% block secondRow %}
+
+{% endblock %}
+
+{% block thirdRow %}
+
+{% endblock %}
+
+{% block serviceRequestURL %}
+    https://www.cnc-ltd.co.uk/portal/documents/
+{% endblock %}
+
+{% block rightFooter %}
+    <br>
+    &nbsp;
+    <br>
+{% endblock %}
