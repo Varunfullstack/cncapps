@@ -1,8 +1,7 @@
 {% extends '@customerFacing/style-3-rows-email/style-3-rows.twig' %}
-{# @var integer activityRef #}
+{# @var integer serviceRequestId #}
+{# @var string firstActivityReason #}
 {# @var string lastActivityReason #}
-{# @var string technicianResponsible #}
-{# @var string extra #}
 {# @var string contactFirstName #}
 {% block headerTitle %}
     Service Request Information
@@ -13,30 +12,32 @@
 {% endblock %}
 
 {% block firstRow %}
-    <p>
-    <span style="color: #a6a6a6">
-
-    </span>
-    </p>
     <p>{{ contactFirstName }},</p>
-    <p>We have carried out work on your service request reference
-        <a href="https://www.cnc-ltd.co.uk/view/?serviceid={{ activityRef }}">{{ activityRef }}</a>
-        as detailed below.
+    <p>This has now been marked as fixed on our system and a summary of the original request and resolution are detailed
+        below:
     </p>
 {% endblock %}
 
 {% block secondRow %}
-    <h2>Details</h2>
-    <p class="singleBorder">{{ lastActivityReason }}</p>
-    <P>The technician responsible for this was {{ technicianResponsible }}. {{ extra }}</P>
+    <p>Original Request:</p>
+    <p>
+        {{ firstActivityReason | raw }}
+    </p>
+    <p>
+        Resolution Summary:
+    </p>
+    <p>
+        {{ lastActivityReason | raw }}
+    </p>
+
 {% endblock %}
 
 {% block thirdRow %}
-    Best Regards
+    If you believe that this is not resolved, simply reply to this email with your explanation and we will investigate further before re-opening.   Best Regards
 {% endblock %}
 
 {% block serviceRequestURL %}
-    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ activityRef }}
+    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ serviceRequestId }}
 {% endblock %}
 
 {% block footerStatus %}
@@ -44,5 +45,5 @@
 {% endblock %}
 
 {% block feedbackURL %}
-    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ activityRef }}
+    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ serviceRequestId }}
 {% endblock %}
