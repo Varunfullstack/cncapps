@@ -1,48 +1,57 @@
 {% extends '@customerFacing/style-3-rows-email/style-3-rows.twig' %}
-{# @var integer activityRef #}
-{# @var string lastActivityReason #}
-{# @var string technicianResponsible #}
-{# @var string extra #}
 {# @var string contactFirstName #}
+{# @var InvoiceItem[] invoices
+invoice.id integer   The invoice ID
+invoice.amount    float     The amount of the invoice
+#}
+{# @var float totalAmount #}
+
+
+{% block styles %}
+
+    table.salesInvoice td {
+    padding: 5px;
+    }
+
+{% endblock %}
 {% block headerTitle %}
-    Service Request Information
+    Invoice
 {% endblock %}
 
 {% block headerContet %}
-    There's been an update to your service request
+    You've got bills to pay
 {% endblock %}
 
 {% block firstRow %}
-    <p>
-    <span style="color: #a6a6a6">
-
-    </span>
-    </p>
     <p>{{ contactFirstName }},</p>
-    <p>We have carried out work on your service request reference
-        <a href="https://www.cnc-ltd.co.uk/view/?serviceid={{ activityRef }}">{{ activityRef }}</a>
-        as detailed below.
-    </p>
+    <p>Please find attached the following invoice(s) for your attention: </p>
 {% endblock %}
 
 {% block secondRow %}
-    <h2>Details</h2>
-    <p class="singleBorder">{{ lastActivityReason }}</p>
-    <P>The technician responsible for this was {{ technicianResponsible }}. {{ extra }}</P>
+    <table class="salesInvoice">
+        <tbody>
+        <tr>
+            <td>Invoice </td>
+            <td>Amount £(ex VAT)</td>
+        </tr>
+        {% for invoice in invoices %}
+            <tr>
+                <td>{{ invoice.id }}</td>
+                <td>{{ invoice.amount | format_currency('GBP',{fraction_digit:2}) }}</td>
+            </tr>
+        {% endfor %}
+        <tr>
+            <td>Total</td>
+            <td>{{ totalAmount | format_currency('GBP',{fraction_digit:2}) }}</td>
+        </tr>
+        </tbody>
+    </table>
 {% endblock %}
-
-{% block thirdRow %}
-    Best Regards
-{% endblock %}
-
 {% block serviceRequestURL %}
-    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ activityRef }}
+    https://www.cnc-ltd.co.uk/portal/invoices/
 {% endblock %}
 
-{% block footerStatus %}
-    Fixed
+{% block rightFooter %}
+
 {% endblock %}
 
-{% block feedbackURL %}
-    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ activityRef }}
-{% endblock %}
