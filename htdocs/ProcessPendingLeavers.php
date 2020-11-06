@@ -45,3 +45,32 @@ while ($dsResults->fetchNext()) {
     );
     $dbeContact->updateRow();
 }
+
+
+$buContact->getContactsWithPendingFurloughActionForToday($dsResults);
+
+while ($dsResults->fetchNext()) {
+    ?>
+    <div>
+        <?= $dsResults->getValue(DBEContact::firstName) ?> <?= $dsResults->getValue(DBEContact::lastName) ?> has a
+        pending furlough action
+        of type <?= $dsResults->getValue(
+            DBEContact::pendingFurloughAction
+        ) === DBEContact::FURLOUGH_ACTION_TO_FURLOUGH ? "To Furlough" : 'To Unfurlough' ?>
+    </div>
+    <?php
+    $dbeContact = new DBEContact($something);
+    $dbeContact->getRow($dsResults->getValue(DBEContact::contactID));
+    if ($dsResults->getValue(
+            DBEContact::pendingFurloughAction
+        ) === DBEContact::FURLOUGH_ACTION_TO_FURLOUGH) {
+        $dbeContact->setValue(DBEContact::pendingFurloughActionLevel, $dsResults->getValue(DBEContact::supportLevel));
+        $dbeContact->setValue(DBEContact::supportLevel, DBEContact::supportLevelFurlough);
+    } else {
+        $dbeContact->setValue(DBEContact::supportLevel, $dsResults->getValue(DBEContact::pendingFurloughActionLevel));
+    }
+
+    $dbeContact->setValue(DBEContact::pendingFurloughAction, null);
+    $dbeContact->setValue(DBEContact::pendingFurloughActionDate, null);
+    $dbeContact->updateRow();
+}

@@ -7,6 +7,7 @@ This project changes will be shown here.
 - Issue 1019 - StreamOne Alert if a CNCAPPS license existing but not in StreamOne
 ### Fixed
 - Issue 1017 - Import Requests stuck when there's no main contact
+- Issue 1057 - Enhance Furlough Status Processing
 
 ## [v4.10.2] - 2020-10-30
 ### Fixed
