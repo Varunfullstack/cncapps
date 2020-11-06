@@ -20,6 +20,8 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
     const DELETE_DOCUMENT = "deleteDocument";
     const SEND_DOCUMENTS = "sendDocuments";
     const DOWNLOAD_DOCUMENT = "downloadDocument";
+    const IT_REVIEW_MEETING_AGENDA = 'IT_REVIEW_MEETING_AGENDA';
+    const REVIEW_MEETING_RESPONSE = 'REVIEW_MEETING_RESPONSE';
     private $buCustomerReviewMeetingDocuments;
 
     /**
@@ -250,43 +252,32 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
         if (!$this->getParam('meetingDate')) {
             throw new Exception('Meeting date is missing');
         }
-        if (!$this->getParam('standardTextID')) {
-            throw new Exception('Standard text ID is missing');
+        if (!$this->getParam('templateType')) {
+            throw new Exception('Template Type is missing');
         }
         if (!$this->getParam('customerID')) {
             throw new Exception('Customer ID is missing');
         }
 
         $meetingDate = $this->getParam('meetingDate');
-        $standardTextID = $this->getParam('standardTextID');
+        $templateType = $this->getParam('templateType');
         $customerID = $this->getParam('customerID');
 
-        $buStandardText = new BUStandardText($this);
-        $dsResults = new DataSet($this);
-        $buStandardText->getStandardTextByID(
-            $standardTextID,
-            $dsResults
-        );
+        $template = '@customerFacing/ITReviewMeetingAgenda/ITReviewMeetingAgenda.html.twig';
+
+        if ($templateType !== self::IT_REVIEW_MEETING_AGENDA) {
+            $template = '@customerFacing/ReviewMeetingResponse/ReviewMeetingResponse.html.twig';
+        }
+
+        global $twig;
 
         $dbeContact = new DBEContact($this);
         $dbeContact->getReviewContactsByCustomerID($customerID);
 
         $buMail = new BUMail($this);
 
-        $message = $dsResults->getValue(DBEStandardText::stt_text);
         $fromEmail = 'support@cnc-ltd.co.uk';
         while ($dbeContact->fetchNext()) {
-
-            $body = str_replace(
-                "[%contactFirstName%]",
-                $dbeContact->getValue(DBEContact::firstName),
-                $message
-            );
-            $body = str_replace(
-                "[%reviewMeetingDate%]",
-                $meetingDate,
-                $body
-            );
 
             $toEmail = $dbeContact->getValue(DBEContact::email);
 
@@ -297,7 +288,9 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
                 'Date'         => date("r"),
                 'Content-Type' => 'text/html; charset=UTF-8'
             );
-            $buMail->mime->setHTMLBody($body);
+            $buMail->mime->setHTMLBody(
+                $twig->render($template)
+            );
 
             $mime_params = array(
                 'text_encoding' => '7bit',
@@ -396,39 +389,50 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
 
         $this->template->setBlock(
             'customerReviewMeetingDocument',
-            'standardTextBlock',
-            'standardText'
+            'templateTypeBlock',
+            'templateTypes'
         );
 
         $this->template->setVar(
             [
-                "standardTextID"          => null,
-                "standardTextDescription" => 'Please Select a Standard Text'
+                "templateType"            => null,
+                "templateTypeDescription" => 'Please Select a Standard Text'
             ]
         );
 
         $this->template->parse(
-            'standardText',
-            'standardTextBlock',
+            'templateTypes',
+            'templateTypeBlock',
             true
         );
 
-        while ($dsStandardText->fetchNext()) {
 
+        $this->template->setVar(
+            [
+                "templateType"            => self::IT_REVIEW_MEETING_AGENDA,
+                "templateTypeDescription" => 'IT Review Meeting Agenda'
+            ]
+        );
 
-            $this->template->setVar(
-                [
-                    "standardTextID"          => $dsStandardText->getValue(DBEStandardText::stt_standardtextno),
-                    "standardTextDescription" => $dsStandardText->getValue(DBEStandardText::stt_desc)
-                ]
-            );
+        $this->template->parse(
+            'templateTypes',
+            'templateTypeBlock',
+            true
+        );
 
-            $this->template->parse(
-                'standardText',
-                'standardTextBlock',
-                true
-            );
-        }
+        $this->template->setVar(
+            [
+                "templateType"            => self::REVIEW_MEETING_RESPONSE,
+                "templateTypeDescription" => 'Review Meeting Response'
+            ]
+        );
+
+        $this->template->parse(
+            'templateTypes',
+            'templateTypeBlock',
+            true
+        );
+
 
         $this->template->parse(
             'CONTENTS',

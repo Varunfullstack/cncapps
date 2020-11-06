@@ -1,0 +1,31 @@
+{% extends '@customerFacing/wrapper.html.twig' %}
+{# @var string contactFirstName #}
+{% block headerTitle %}
+    Billing Notice
+{% endblock %}
+
+{% block headerContet %}
+    Advance Notification of a Direct Debit Collection
+{% endblock %}
+
+{% block content %}
+    <p>
+        Dear {{ contactFirstName }}
+    </p>
+    <p>
+        You will shortly receive an email with details of our contracts and Terms & Conditions from our online
+        signing portal Signable. Please follow the instructions in the email to complete the signing process and
+        feel free to contact our Sales department if you have any questions.
+    </p>
+    <p>
+        Regards
+    </p>
+{% endblock %}
+
+{% block leftFooter %}
+    <br><br>
+{% endblock %}
+
+{% block rightFooter %}
+
+{% endblock %}

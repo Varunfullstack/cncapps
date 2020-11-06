@@ -734,51 +734,10 @@ class BUPDFSalesQuote extends Business
 
         $senderEmail = $dsUser->getValue(DBEUser::username) . '@cnc-ltd.co.uk';
         $senderName = $dsUser->getValue(DBEUser::firstName) . ' ' . $dsUser->getValue(DBEUser::lastName);
+        global $twig;
 
-        $message =
-            '<html lang="en">
-        <head >
-        <title>Quote</title>
-        <style type="text/css">
-        <!--
-        BODY, P, TD, TH {
-          font-family: Arial, Helvetica, sans-serif;
-          font-size: 10pt;
-        }
-        .singleBorder {
-          border: #e1e1f0 2px solid;
-        }
-        TABLE {
-          border-spacing: 1px;
-        }
-        -->
-        </style>
-        </head>
-        <body>
-      ';
-        // Send email with attachment
-        $message .= '<P>' . $dbeQuotation->getValue(DBEQuotation::salutation) . '</P>';
-        if ($dbeQuotation->getValue(DBEQuotation::documentType) == 'order form') {
-            $message .= '<P>Please find attached a quotation for your attention.</P>';
-            $message .= '<P>If you have any questions please do not hesitate to contact us.</P>';
-            $message .= ' To allow us to process your order please complete, sign and return at your earliest convenience';
-        } else {
-            $apiURL = API_URL . "/acceptQuotation?code={$dbeQuotation->getValue(DBEQuotation::confirmCode)}";
-            $message .= "
-            <p>With reference to your recent enquiry, I have great pleasure in providing you with the following prices.
-             Full details are attached or click on <a href='{$apiURL}'>this link</a> to receive the electronic quote to sign.</p>";
-        }
+        $apiURL = API_URL . "/acceptQuotation?code={$dbeQuotation->getValue(DBEQuotation::confirmCode)}";
 
-        $message .= '<P>Regards,</P>';
-
-        $message .=
-            '</body>
-        </html>';
-
-        ini_set(
-            "sendmail_from",
-            $senderEmail
-        );    // the envelope from address
 
         $toEmail = $dsOrdhead->getValue(DBEJOrdhead::delContactEmail);
 
@@ -790,7 +749,16 @@ class BUPDFSalesQuote extends Business
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
-        $buMail->mime->setHTMLBody($message);
+        $buMail->mime->setHTMLBody(
+            $twig->render(
+                '@customerFacing/Quote/Quote.html.twig',
+                [
+                    "isOrderForm" => $dbeQuotation->getValue(DBEQuotation::documentType) == 'order form',
+                    "apiURL"      => $apiURL,
+                    "salutation"  => $dbeQuotation->getValue(DBEQuotation::salutation)
+                ]
+            )
+        );
 
         $buMail->mime->addAttachment(
             $quoteFile,

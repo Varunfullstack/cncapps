@@ -1,0 +1,37 @@
+{% extends '@customerFacing/wrapper.html.twig' %}
+{# @var string salutation #}
+{# @var boolean isOrderForm #}
+{# @var string apiURL #}
+{% block headerTitle %}
+    Billing Notice
+{% endblock %}
+
+{% block headerContet %}
+    Advance Notification of a Direct Debit Collection
+{% endblock %}
+
+{% block content %}
+    <p>{{ salutation }}</p>
+    {% if isOrderForm %}
+        <p>Please find attached a quotation for your attention.</p>
+        <p>If you have any questions please do not hesitate to contact us.</p>
+        <p>To allow us to process your order please complete, sign and return at your earliest convenience.</p>
+    {% else %}
+        <p>
+            With reference to your recent enquiry, I have great pleasure in providing you with the following prices.
+            Full details are attached or click on <a href="{{ apiURL }}">this link</a> to receive the electronic quote
+            to sign.
+        </p>
+    {% endif %}
+    <p>
+        Regards,
+    </p>
+{% endblock %}
+
+{% block leftFooter %}
+    <br><br>
+{% endblock %}
+
+{% block rightFooter %}
+
+{% endblock %}

@@ -700,24 +700,11 @@ class CTRenewalReport extends CTCNC
                 'Content-Type' => 'text/html; charset=UTF-8'
             );
 
-            $buStandardText = new BUStandardText($this);
-            $standardTexts = new DataSet($this);
-            $buStandardText->getStandardTextByID(
-                $templateID,
-                $standardTexts
-            );
+            global $twig;
 
-            $body = $standardTexts->getValue(DBEStandardText::stt_text);
-
-            $body = str_replace(
-                "[%contactFirstName%]",
-                $firstName,
-                $body
-            );
-            $body = str_replace(
-                "[%contactLastName%]",
-                $lastName,
-                $body
+            $body = $twig->render(
+                '@customerFacing/RenewalContractsToBeSigned/RenewalContractsToBeSigned.html.twig',
+                ["contactFirstName" => $firstName]
             );
 
             $buMail->mime->setHTMLBody($body);

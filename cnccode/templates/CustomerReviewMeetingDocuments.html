@@ -23,9 +23,9 @@
         if (!formData.get('meetingDate')) {
             return;
         }
-        const standardTextId = $('#standardText').val();
+        const templateType = $('#templateType').val();
         const customerID = $('#customerID').val();
-        formData.append("standardTextID", standardTextId);
+        formData.append("templateType", templateType);
         formData.append("customerID", customerID);
 
 
@@ -53,7 +53,7 @@
     }
 
     function checkSendReviewMeetingEmails() {
-        if ($('#standardText').val()) {
+        if ($('#templateType').val()) {
             $('#sendReviewMeetingEmailsBtn').attr('disabled', false);
         } else {
             $('#sendReviewMeetingEmailsBtn').attr('disabled', true);
@@ -306,12 +306,12 @@
     </table>
     <h1>Current Meeting</h1>
     <div>
-        <select id="standardText"
+        <select id="templateType"
                 onchange="checkSendReviewMeetingEmails()"
         >
-            <!-- BEGIN standardTextBlock -->
-            <option value="{standardTextID}">{standardTextDescription}</option>
-            <!-- END standardTextBlock -->
+            <!-- BEGIN templateTypeBlock -->
+            <option value="{templateType}">{templateTypeDescription}</option>
+            <!-- END templateTypeBlock -->
         </select>
         <button disabled
                 onclick="sendReviewMeetingEmails()"
