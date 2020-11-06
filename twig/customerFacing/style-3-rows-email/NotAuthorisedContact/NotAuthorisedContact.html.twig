@@ -1,7 +1,7 @@
 {% extends '@customerFacing/style-3-rows-email/style-3-rows.twig' %}
-{# @var string extra #}
+{# @var string contacts #}
 {# @var string contactFirstName #}
-{# @var string MaincontactFirstName #}
+{# @var ContactInfo MaincontactFirstName   contactInfo.firstName contactInfo.lastName This is a list of contacts with supportlevel ['main', 'supervisor'], in this same order #}
 {# @var string MaincontactLastName #}
 {# @var string SupervisorcontactFirstName #}
 {# @var string SupervisorcontactLastName #}
@@ -14,23 +14,21 @@
 {% endblock %}
 
 {% block firstRow %}
-    <p>
-    <span style="color: #a6a6a6">
-
-    </span>
-    </p>
     <p>{{ contactFirstName }},</p>
+    <p>
+        We're sorry but you are not authorised to raise support directly with CNC and this request has not been logged.
+    </p>
+    <p>
+        Please ask one of the following people in your organisation to phone in on your behalf to progress your request.
+    </p>
+    <ul>
+        {% for contact in contacts %}
+            <li>
+                {{ contact.firstName }} {{ contact.lastName }}
+            </li>
+        {% endfor %}
+    </ul>
 
-We're sorry but you are not authorised to raise support directly with CNC and this request has not been logged.
-
-Please ask one of the following people in your organsation to phone in on your behalf to progress your request.
-
-XAVI THIS NEEEDS TO BE A LIST OF THE MAIN CONTACTS THEN SUPERVISOR CONTACTS
-{{MaincontactFirstName}} {{MaincontactLastName}} 
-{{MaincontactFirstName}} {{MaincontactLastName}} 
-{{MaincontactFirstName}} {{MaincontactLastName}} 
-{{MaincontactFirstName}} {{MaincontactLastName}} 
-{{SupervisorcontactFirstName}} {{SupervisorcontactFirstName}}
 {% endblock %}
 
 {% block secondRow %}
@@ -38,17 +36,12 @@ XAVI THIS NEEEDS TO BE A LIST OF THE MAIN CONTACTS THEN SUPERVISOR CONTACTS
 {% endblock %}
 
 {% block thirdRow %}
- 
-{% endblock %}
-
-{% block serviceRequestURL %}
 
 {% endblock %}
 
-{% block footerStatus %}
-   
+{% block leftFooter %}
+<br><br>
 {% endblock %}
 
-{% block feedbackURL %}
-
+{% block rightFooter %}
 {% endblock %}
