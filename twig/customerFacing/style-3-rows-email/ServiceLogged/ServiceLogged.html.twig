@@ -1,48 +1,54 @@
 {% extends '@customerFacing/style-3-rows-email/style-3-rows.twig' %}
-{# @var integer activityRef #}
-{# @var string lastActivityReason #}
-{# @var string technicianResponsible #}
-{# @var string extra #}
+{# @var integer serviceRequestId #}
 {# @var string contactFirstName #}
+{# @var string reason #}
+{# @var integer priority #}
+{# @var string serviceRequestStatus the status of the request "Initial"|"In Progress"|"On Hold" #}
+{# @var float SLA #}
 {% block headerTitle %}
     Service Request Information
 {% endblock %}
 
 {% block headerContet %}
-    There's been an update to your service request
+    A new Service Request has been raised
 {% endblock %}
 
 {% block firstRow %}
-    <p>
-    <span style="color: #a6a6a6">
-
-    </span>
-    </p>
     <p>{{ contactFirstName }},</p>
-    <p>We have carried out work on your service request reference
-        <a href="https://www.cnc-ltd.co.uk/view/?serviceid={{ activityRef }}">{{ activityRef }}</a>
-        as detailed below.
+    <p> A new service request has been logged with our ServiceDesk under reference {{ serviceRequestId }} and it will
+        help
+        if you could please refer to it in all related communications with us.
     </p>
+    <p>Details: {{ reason }}</p>
 {% endblock %}
 
 {% block secondRow %}
-    <h2>Details</h2>
-    <p class="singleBorder">{{ lastActivityReason }}</p>
-    <P>The technician responsible for this was {{ technicianResponsible }}. {{ extra }}</P>
+    <p>
+        Priority: {{ priority }} -
+        {% if serviceRequestStatus == 'Initial' %}
+            We will aim to respond to this request within {{ SLA }} working hours.
+            However, we may adjust the priority of this request if necessary and will inform you if we do.
+        {% else %}
+            We have started working on this immediately.
+        {% endif %}
+    </p>
 {% endblock %}
 
 {% block thirdRow %}
-    Best Regards
+    {% if serviceRequestStatus == 'Initial' %}
+        <p>This request has been submitted to the relevant team who will contact you to arrange any and all appropriate
+            action.</p>
+    {% endif %}
 {% endblock %}
 
 {% block serviceRequestURL %}
-    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{activityRef}}
+    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ serviceRequestId }}
 {% endblock %}
 
 {% block footerStatus %}
-    Fixed
+    {{ serviceRequestStatus }}
 {% endblock %}
 
-{% block feedbackURL %}
-    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{activityRef}}
+{% block feedback %}
+    <br>
 {% endblock %}
