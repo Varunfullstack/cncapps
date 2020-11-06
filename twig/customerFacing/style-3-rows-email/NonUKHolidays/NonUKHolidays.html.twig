@@ -1,5 +1,5 @@
 {% extends '@customerFacing/style-3-rows-email/style-3-rows.twig' %}
-{# @var integer date #}  {##NEXT BANK HOLIDAY DATE#}
+{# @var integer date #}  {# #NEXT BANK HOLIDAY DATE #}
 {# @var string contactFirstName #}
 {% block headerTitle %}
     Information Notice
@@ -10,33 +10,29 @@
 {% endblock %}
 
 {% block firstRow %}
-    <p>
-    <span style="color: #a6a6a6">
-
-    </span>
-    </p>
     <p>{{ contactFirstName }},</p>
-Please be aware that {date} is a national holiday in UK so the CNC ServiceDesk will be closed.  If you are a customer with 24x7 support, you may contact us by calling +441273384111 and using the security access code displayed on your customer portal at https://www.cnc-ltd.co.uk.
-<br><br>
-If your query is not of an urgent nature please e-mail us at support@cnc-ltd.co.uk and we will respond on the next working day.
+    <p>
+        Please be aware that {date} is a national holiday in UK so the CNC ServiceDesk will be closed. If you are a
+        customer with 24x7 support, you may contact us by calling +441273384111 and using the security access code
+        displayed on your customer portal at https://www.cnc-ltd.co.uk.
+    </p>
+    <p>
+        If your query is not of an urgent nature please e-mail us at support@cnc-ltd.co.uk and we will respond on the
+        next working day.
     </p>
 {% endblock %}
 
 {% block secondRow %}
-    <br><br>
+
 {% endblock %}
 
 {% block thirdRow %}
 {% endblock %}
 
-{% block serviceRequestURL %}
-
+{% block leftFooter %}
+    <br><br>
 {% endblock %}
 
-{% block footerStatus %}
-<br><br>    
-{% endblock %}
-
-{% block feedbackURL %}
+{% block rightFooter %}
 
 {% endblock %}
