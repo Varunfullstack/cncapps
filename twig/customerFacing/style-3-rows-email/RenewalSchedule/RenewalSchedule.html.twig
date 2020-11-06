@@ -5,11 +5,11 @@
 {# @var string extra #}
 {# @var string contactFirstName #}
 {% block headerTitle %}
-    Service Request Information
+    Contracts
 {% endblock %}
 
 {% block headerContet %}
-    There's been an update to your service request
+    It's official and here's the proof
 {% endblock %}
 
 {% block firstRow %}
@@ -19,30 +19,24 @@
     </span>
     </p>
     <p>{{ contactFirstName }},</p>
-    <p>We have carried out work on your service request reference
-        <a href="https://www.cnc-ltd.co.uk/view/?serviceid={{ activityRef }}">{{ activityRef }}</a>
-        as detailed below.
+    <p>Please find attached all your contract schedules as requested. If you have any questions please do not hesitate
+        to contact us.
     </p>
 {% endblock %}
 
 {% block secondRow %}
-    <h2>Details</h2>
-    <p class="singleBorder">{{ lastActivityReason }}</p>
-    <P>The technician responsible for this was {{ technicianResponsible }}. {{ extra }}</P>
+
 {% endblock %}
 
 {% block thirdRow %}
-    Best Regards
+
 {% endblock %}
 
 {% block serviceRequestURL %}
-    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ activityRef }}
+    https://www.cnc-ltd.co.uk/portal/renewals/
 {% endblock %}
 
-{% block footerStatus %}
-    Fixed
-{% endblock %}
 
-{% block feedbackURL %}
-    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ activityRef }}
+{% block rightFooter %}
+
 {% endblock %}
