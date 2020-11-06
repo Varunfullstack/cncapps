@@ -1,0 +1,44 @@
+{% extends '@customerFacing/style-3-rows-email/style-3-rows.twig' %}
+{# @var string contactFirstName #}
+{# @var string lastActivityCustomerNotes #}
+{# @var string engineerFullName #}
+{# @var integer serviceRequestId #}
+{# @var string activityStatus #}
+{% block headerTitle %}
+    Service Request Information
+{% endblock %}
+
+{% block headerContet %}
+    We've got something to tell you
+{% endblock %}
+
+{% block firstRow %}
+    <p>{{ contactFirstName }},</p>
+    <p>
+        We have worked on your service request reference {{ serviceRequestId }} and have an update for you. A more
+        detailed update is available in our portal but here's the short version.
+    </p>
+{% endblock %}
+
+{% block secondRow %}
+    <p>
+        {{ lastActivityCustomerNotes | raw }}
+    </p>
+
+{% endblock %}
+
+{% block thirdRow %}
+    This update was added by {{ engineerFullName }}
+{% endblock %}
+
+{% block serviceRequestURL %}
+    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ serviceRequestId }}
+{% endblock %}
+
+{% block footerStatus %}
+    {{ activityStatus }}
+{% endblock %}
+
+{% block feedbackURL %}
+    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ serviceRequestId }}
+{% endblock %}
