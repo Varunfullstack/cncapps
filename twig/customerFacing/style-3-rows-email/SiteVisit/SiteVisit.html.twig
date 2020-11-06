@@ -1,48 +1,59 @@
 {% extends '@customerFacing/style-3-rows-email/style-3-rows.twig' %}
-{# @var integer activityRef #}
-{# @var string lastActivityReason #}
-{# @var string technicianResponsible #}
-{# @var string extra #}
+{# @var integer serviceRequestId #}
 {# @var string contactFirstName #}
+{# @var string engineerFullName This is the full name of the engineer that will visit #}
+{# @var Site site
+    site.add1 address of the site
+    site.add2 address of the site
+    site.add3 address of the site
+    site.town address of the site
+    site.postcode address of the site
+#}
+{# @var VisitActivity visitActivity
+    visitActivity.date          activity date with DD/MM/YYYY
+    visitActivity.timeOfTheDay  am or pm
+    visitActivity.reason        as the details of the visit
+#}
 {% block headerTitle %}
-    Service Request Information
+    Site Visit Information
 {% endblock %}
 
 {% block headerContet %}
-    There's been an update to your service request
+    We're coming to site!
 {% endblock %}
 
 {% block firstRow %}
-    <p>
-    <span style="color: #a6a6a6">
-
-    </span>
-    </p>
     <p>{{ contactFirstName }},</p>
-    <p>We have carried out work on your service request reference
-        <a href="https://www.cnc-ltd.co.uk/view/?serviceid={{ activityRef }}">{{ activityRef }}</a>
-        as detailed below.
+    <p>
+        We are pleased to confirm that {{ engineerFullName }} will visit your site
+        at {{ site.add1 }} {{ site.add2 }} {{ site.add3 }} {{ site.town }}
+        {{ site.postcode }} on
+        {{ visitActivity.date }} in the {{ visitActivity.timeOfTheDay }}.
+    </p>
+    <p>
+        {{ visitActivity.reason }}
+    </p>
+    <p>
+        If there are any problems keeping this appointment then please contact our ServiceDesk to rearrange.
     </p>
 {% endblock %}
 
 {% block secondRow %}
-    <h2>Details</h2>
-    <p class="singleBorder">{{ lastActivityReason }}</p>
-    <P>The technician responsible for this was {{ technicianResponsible }}. {{ extra }}</P>
+
 {% endblock %}
 
 {% block thirdRow %}
-    Best Regards
+
 {% endblock %}
 
 {% block serviceRequestURL %}
-    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ activityRef }}
+    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ serviceRequestId }}
 {% endblock %}
 
 {% block footerStatus %}
-    Fixed
+    In Progress
 {% endblock %}
 
-{% block feedbackURL %}
-    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ activityRef }}
+{% block feedback %}
+    <br>
 {% endblock %}

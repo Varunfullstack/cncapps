@@ -147,7 +147,7 @@ Sizes: [
             /*line-height: 120%;*/
         }
 
-        h2.headerContent{
+        h2.headerContent {
             color: #7A7A7A;
         }
 
@@ -298,9 +298,11 @@ Sizes: [
             pointer-events: auto !important;
             cursor: default !important;
         }
+
         ul li {
             font-size: 10pt;
         }
+
         .report-table {
             color: #000;
             margin: 1rem 0;
@@ -971,8 +973,7 @@ Sizes: [
                                                                     </tr>
                                                                 </table>
                                                             </td>
-                                                            <td align="right"
-                                                                class="rightFooter"
+                                                            <td class="rightFooter"
                                                                 valign="top"
                                                             >
                                                                 <table>
@@ -993,17 +994,17 @@ Sizes: [
 
                                                                             </td>
                                                                         </tr>
-                                                                        {% block feedback %}
-                                                                            <tr>
-                                                                                <td style="padding-left: 20px;padding-right: 20px;padding-bottom: 20px">
+                                                                        <tr>
+                                                                            <td style="padding-left: 20px;padding-right: 20px;padding-bottom: 20px">
+                                                                                {% block feedback %}
                                                                                     Please click <a href="
 			                                                                        {% block feedbackURL %}
 			                                                                        {% endblock %}"
-                                                                                    >here</a> to give us feedback on
+                                                                                >here</a> to give us feedback on
                                                                                     your experience
-                                                                                </td>
-                                                                            </tr>
-                                                                        {% endblock %}
+                                                                                {% endblock %}
+                                                                            </td>
+                                                                        </tr>
 
                                                                     {% endblock %}
                                                                 </table>
