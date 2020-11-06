@@ -1,4 +1,4 @@
-import React, {Fragment} from "react";
+import React from "react";
 import Spinner from "../shared/Spinner/Spinner";
 import moment from 'moment';
 import ReactDOM from 'react-dom';
@@ -493,7 +493,7 @@ class FixedServiceRequestCountComponent extends React.Component {
                             }) :
                             selectedState === SelectionState.CUSTOM_DATES ?
                                 (
-                                    <Fragment key="datesContainer">
+                                    <React.Fragment key="datesContainer">
                                         <input type="date"
                                                value={startDate.format(MYSQL_DATE_FORMAT)}
                                                key="startDate"
@@ -508,7 +508,7 @@ class FixedServiceRequestCountComponent extends React.Component {
                                                    this.setState({endDate: moment($event.currentTarget.value, MYSQL_DATE_FORMAT)})
                                                }}
                                         />
-                                    </Fragment>
+                                    </React.Fragment>
                                 )
                                 : null
                     ]

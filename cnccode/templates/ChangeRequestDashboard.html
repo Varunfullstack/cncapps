@@ -1,5 +1,5 @@
 
-<div id="reactSpinnerHolder"></div>
+
 
 <script>
     const filters = {
@@ -19,6 +19,12 @@
             return acc;
         }, {});
     }
+
+   const spinnerReady = new Promise((resolve, reject) => {
+       window.addEventListener('SpinnerReady', () => {
+           resolve();
+       })
+   })
 
     document.addEventListener('DOMContentLoaded', () => {
         const allFilterElements = document.querySelectorAll('input[type="checkbox"]');
@@ -84,11 +90,18 @@
                 url: "?action=getData",
                 type: "GET",
                 dataSrc: (response) => {
-                    spinnerComponent.hideSpinner();
+
+                    spinnerReady.then(() => {
+                        spinnerComponent.hideSpinner();
+                    })
+
                     return response.data;
                 },
                 data: (data) => {
-                    spinnerComponent.showSpinner();
+                    spinnerReady.then(() => {
+                        spinnerComponent.showSpinner();
+                    })
+
                     return getQueueFiltersObject();
                 }
             },
