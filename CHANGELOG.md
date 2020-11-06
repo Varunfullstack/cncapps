@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v4.11.0] - 2020-11-06
 ### Changed
 - Issue 1041 - Page Loading Spinner
 - Issue 1019 - StreamOne Alert if a CNCAPPS license existing but not in StreamOne
