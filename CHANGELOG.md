@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1025 - Option to not notify Sales on Sales Request Approvals
+
 ## [v4.11.1] - 2020-11-06
 ### Fixed
 - Fixed issue with time request dashboard spinner
