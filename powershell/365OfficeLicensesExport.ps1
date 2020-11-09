@@ -56,7 +56,7 @@ try
         {
             foreach ($device in $devices)
             {
-                $DeviceInfo = $device | Select-Object @{ Name = 'DisplayName'; Expression = { $DisplayName } }, @{ Name = 'Email'; Expression = { $UserPrincipalName } }, DeviceType, DeviceModel, DeviceFriendlyName, DeviceOS, @{ Name = 'FirstSyncTime'; Expression = { "{0:dd-MM-yyyy HH.mm}" -f $_.FirstSyncTime } }, @{ Name = 'LastSuccessSync'; Expression = { "{0:dd-MM-yyyy HH.mm}" -f $_.LastSuccessSync } }
+                $DeviceInfo = $device | Select-Object @{ Name = 'DisplayName'; Expression = { $DisplayName+"("+$UserPrincipalName+")" } }, @{ Name = 'Email'; Expression = { $UserPrincipalName } }, DeviceType, DeviceModel, DeviceFriendlyName, DeviceOS, @{ Name = 'FirstSyncTime'; Expression = { "{0:dd-MM-yyyy HH.mm}" -f $_.FirstSyncTime } }, @{ Name = 'LastSuccessSync'; Expression = { "{0:dd-MM-yyyy HH.mm}" -f $_.LastSuccessSync } }
 
                 if ($DeviceInfo.DeviceOs -Notlike '*Windows*')
                 {
@@ -108,7 +108,7 @@ try
             {
                 $licenses += $license.AccountSkuId
             }
-            $Information = $MSOLUSER | Select-Object @{ Name = 'DisplayName'; Expression = { $DisplayName } }, @{ Name = 'TotalItemSize'; Expression = { $TotalItemSize } }, @{ Name = 'RecipientTypeDetails'; Expression = { [String]::join(";", $RecipientTypeDetails) } }, islicensed, @{ Name = "Licenses"; Expression = { $licenses.SyncRoot } }, @{ Name = 'OWAEnabled'; Expression = { $OWA } }, @{ Name = '2FA'; Expression = { $2FA } }, @{ Name = 'OneDriveStorageUsed'; Expression = { $oneDriveStorageUsage } }
+            $Information = $MSOLUSER | Select-Object @{ Name = 'DisplayName'; Expression = { $DisplayName+"("+$UserPrincipalName+")" }  }, @{ Name = 'TotalItemSize'; Expression = { $TotalItemSize } }, @{ Name = 'RecipientTypeDetails'; Expression = { [String]::join(";", $RecipientTypeDetails) } }, islicensed, @{ Name = "Licenses"; Expression = { $licenses.SyncRoot } }, @{ Name = 'OWAEnabled'; Expression = { $OWA } }, @{ Name = '2FA'; Expression = { $2FA } }, @{ Name = 'OneDriveStorageUsed'; Expression = { $oneDriveStorageUsage } }
             $MailboxesReport += $Information
         }
         catch
