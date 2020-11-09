@@ -129,6 +129,9 @@
         <thead>
         <tr>
             <th colspan="2">&nbsp;</th>
+            <th>
+                Quantity
+            </th>
             <th>Annual Fee(&pound;)</th>
         </tr>
 
@@ -143,7 +146,11 @@
                 {description}
             </td>
             <td class="content">{notes}{coveredItemsString}</td>
-            <td class="contentRightAlign" align="right">{salePrice}</td>
+            <td class="content">{quantity}</td>
+            <td class="contentRightAlign"
+                align="right"
+            >{salePrice}
+            </td>
         </tr>
         <!-- END itemBlock -->
         </tbody>
@@ -249,8 +256,11 @@
         <!-- END userBlock -->
         </tbody>
     </table>
+    <p>
+        * Indicates no longer at the company.
+    </p>
 </div>
 
-<div class="reportSection diskSpaceReportSection" >
+<div class="reportSection diskSpaceReportSection">
     {diskSpaceSection}
 </div>
