@@ -42,7 +42,7 @@
             </column>
         </addColumn>
     </changeSet>
-    <changeSet id="hotfix-v4.11.2-3" author="pavwebdev">
+    <changeSet id="hotfix-v4.11.2-4" author="pavwebdev">
         <sql>
             UPDATE problem
             SET raiseTypeId = 7
