@@ -1,6 +1,14 @@
 # Changelog
 This project changes will be shown here.
 
+## [v4.11.2] - 2020-11-09
+### Changed
+- Change SR created through Book Sales Visit to have raiseTypeId 7
+### Fixed
+- Fixed issue with creating new Stream One orders
+- Fixed issue with Contact Audit search
+- Fixed issue with Office 365 Licenses Includes ATP field not saving correctly
+
 ## [v4.11.1] - 2020-11-06
 ### Fixed
 - Fixed issue with time request dashboard spinner
