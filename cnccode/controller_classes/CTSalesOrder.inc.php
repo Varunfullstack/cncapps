@@ -402,13 +402,7 @@ class CTSalesOrder extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "sales",
-        ];
-        if (!self::hasPermissions($roles)) {
-            Header("Location: /NotAllowed.php");
-            exit;
-        }
+
         $this->setMenuId(301);
         $this->buCustomer = new BUCustomer($this);
         $this->buSalesOrder = new BUSalesOrder($this);
@@ -482,6 +476,7 @@ class CTSalesOrder extends CTCNC
         parent::defaultAction();
         switch ($this->getAction()) {
             case CTSALESORDER_ACT_SEARCH:
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->search();
                 break;
             case CTCNC_ACT_DISP_SALESORDER:
@@ -498,6 +493,7 @@ class CTSalesOrder extends CTCNC
                 $this->deleteQuoteDoc();
                 break;
             case self::UPDATE_LINE_VALUES:
+                $this->checkPermissions(SALES_PERMISSION);
                 $data = json_decode(file_get_contents('php://input'), true);
 
                 if (!array_key_exists('lineId', $data)) {
@@ -529,6 +525,7 @@ class CTSalesOrder extends CTCNC
                 break;
             case self::COPY_TO_ORDER:
             case self::CONVERT_TO_ORDER:
+            $this->checkPermissions(SALES_PERMISSION);
                 $this->convertToOrder(self::getAction() === self::CONVERT_TO_ORDER);
                 break;
             case CTSALESORDER_ACT_INSERT_FROM_ORDER:
@@ -536,15 +533,19 @@ class CTSalesOrder extends CTCNC
                 $this->insertFromOrder();
                 break;
             case self::DELETE_LINES:
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->deleteLines();                        // bulk delete of selected lines
                 break;
             case self::CHANGE_SUPPLIER_FOR_LINES:
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->changeSupplier();
                 break;
             case self::CREATE_MANUAL_ORDER_FORM:
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->generateOrderForm();
                 break;
             case self::CREATE_SIGNABLE_QUOTE:
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->generateQuoteDoc();
                 break;
             case CTSALESORDER_ACT_UPLOAD_QUOTE_DOC:
@@ -588,6 +589,7 @@ class CTSalesOrder extends CTCNC
                 $this->moveOrderLineDown();
                 break;
             case self::DELETE_LINE:
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->deleteOrderLine();
                 break;
             case CTSALESORDER_ACT_UPDATE_HEADER:
@@ -595,6 +597,7 @@ class CTSalesOrder extends CTCNC
                 $this->updateHeader();
                 break;
             case 'toggleSOMonitor':
+                $this->checkPermissions(SALES_PERMISSION);
                 $salesOrderId = @$_REQUEST['salesOrderId'];
                 if (!$salesOrderId) {
                     echo json_encode(["status" => "error", "message" => "Sales Order ID not given"]);
@@ -617,13 +620,7 @@ class CTSalesOrder extends CTCNC
                 echo json_encode(["status" => "ok"]);
                 break;
             case self::UPDATE_ITEM_PRICE:
-                if (!$this->hasPermissions(SALES_PERMISSION)) {
-                    throw new JsonHttpException(
-                        403,
-                        'You do not sufficient permissions to perform this task'
-                    );
-                }
-
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->updateItemPrice();
                 break;
             case self::CREATE_SERVICE_REQUEST_FROM_ORDER:
@@ -631,15 +628,19 @@ class CTSalesOrder extends CTCNC
                 $this->serviceRequest();
                 break;
             case self::CREATE_SR_FROM_LINES:
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->serviceRequestFromLines();
                 break;
             case 'sendReminder':
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->sendReminderQuote();
                 break;
             case CTSALESORDER_ACT_CREATE_TEMPLATED_QUOTE:
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->createTemplatedQuote();
                 break;
             case self::MOVE_LINE_TO_POSITION:
+                $this->checkPermissions(SALES_PERMISSION);
                 $data = json_decode(file_get_contents('php://input'), true);
                 if (empty($data['lineId'])) {
                     throw new JsonHttpException(400, 'Line id is required');
@@ -684,6 +685,7 @@ class CTSalesOrder extends CTCNC
                 echo json_encode(["status" => 'ok', "updatedTime" => $updatedTime]);
                 break;
             default:
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->displaySearchForm();
                 break;
         }
