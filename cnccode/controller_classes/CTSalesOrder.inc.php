@@ -525,7 +525,7 @@ class CTSalesOrder extends CTCNC
                 break;
             case self::COPY_TO_ORDER:
             case self::CONVERT_TO_ORDER:
-            $this->checkPermissions(SALES_PERMISSION);
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->convertToOrder(self::getAction() === self::CONVERT_TO_ORDER);
                 break;
             case CTSALESORDER_ACT_INSERT_FROM_ORDER:
@@ -1765,7 +1765,7 @@ class CTSalesOrder extends CTCNC
 
 
             do {
-                $doesLineHaveRenewalCustomerItemID =  $this->renderLine(
+                $doesLineHaveRenewalCustomerItemID = $this->renderLine(
                     $dsOrdline,
                     $curSaleGrandTotal,
                     $curProfitGrandTotal,
@@ -2149,7 +2149,8 @@ class CTSalesOrder extends CTCNC
         if ($this->getOrdheadID()) {
             $this->documents(
                 $this->getOrdheadID(),
-                'SalesOrderDisplayDocuments'
+                'SalesOrderDisplayDocuments',
+                (bool)$restrictedView
             );
         }
 
@@ -2849,10 +2850,12 @@ class CTSalesOrder extends CTCNC
     /**
      * @param $ordheadID
      * @param $templateName
+     * @param bool $restrictedView
      * @throws Exception
      */
     function documents($ordheadID,
-                       $templateName
+                       $templateName,
+                       $restrictedView = false
     )
     {
         $this->template->set_block(
@@ -2880,8 +2883,8 @@ class CTSalesOrder extends CTCNC
 
         $this->template->set_var(
             array(
-                'txtAddDocument' => 'Add document',
-                'urlAddDocument' => $urlAddDocument
+                'txtAddDocument' => $restrictedView ? '' : 'Add document',
+                'urlAddDocument' => $restrictedView ? '' : $urlAddDocument
             )
         );
 
@@ -2934,8 +2937,8 @@ class CTSalesOrder extends CTCNC
                     'filename'          => $dsSalesOrderDocument->getValue(DBESalesOrderDocument::filename),
                     'createdDate'       => $createdDate,
                     'urlViewFile'       => $urlViewFile,
-                    'urlEditDocument'   => $urlEditDocument,
-                    'urlDeleteDocument' => $urlDeleteDocument,
+                    'urlEditDocument'   => $restrictedView ? '#' : $urlEditDocument,
+                    'urlDeleteDocument' => $restrictedView ? '#' : $urlDeleteDocument,
                 )
             );
             $this->template->parse(
@@ -4812,7 +4815,7 @@ class CTSalesOrder extends CTCNC
                 'serviceRequestPriorityMessage'       => $dsInput->getMessage(DBEOrdhead::serviceRequestPriority),
                 'serviceRequestCustomerItemIDMessage' => $dsInput->getMessage(DBEOrdhead::serviceRequestCustomerItemID),
 
-                'urlSubmit' => $urlSubmit,
+                'urlSubmit'          => $urlSubmit,
                 'salesOrderHeaderId' => $this->getOrdheadID()
             )
         );
