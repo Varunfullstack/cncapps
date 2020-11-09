@@ -1,6 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+- Issue 1063 - Review Meeting Enhancements - Leavers & Contract Numbers
+
 ## [v4.11.1] - 2020-11-06
 ### Fixed
 - Fixed issue with time request dashboard spinner
