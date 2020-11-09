@@ -84,15 +84,11 @@ class TDCustomerOrdersComponent extends React.Component {
         this.setState({_showSpinner: false});
     };
     handleNewOrder = () => {
-        if (this.state.search.streamOneEmail == null) {
+        if (this.state.endCustomerEmail == null) {
             const error = "Please Select a valid customer whose had TechData account";
             this.setState({error});
         } else {
-            window.location =
-                "/CustomerLicenses.php?action=newOrder&endCustomerId=" +
-                this.state.search.streamOneEmail +
-                "&customerName=" +
-                this.state.search.customerName;
+            window.location = `/CustomerLicenses.php?action=newOrder&email=${this.state.endCustomerEmail}`;
         }
     };
 
