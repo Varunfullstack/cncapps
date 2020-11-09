@@ -840,8 +840,16 @@ class CTRenContract extends CTCNC
                         'invoiceToDate'   => Controller::dateYMDtoDMY(
                             $dsRenContract->getValue(DBEJRenContract::invoiceToDate)
                         ),
-                        'quantity'                           => $dsRenContract->getValue(DBEJRenContract::users),
+                        'quantity'        => $dsRenContract->getValue(DBEJRenContract::users),
                         'notes'           => Controller::dateYMDtoDMY($dsRenContract->getValue(DBEJRenContract::notes)),
+                        'costAnnum'       => utf8MoneyFormat(
+                            UK_MONEY_FORMAT,
+                            $dsRenContract->getValue(DBEJContract::curUnitCost)
+                        ),
+                        'saleAnnum'       => utf8MoneyFormat(
+                            UK_MONEY_FORMAT,
+                            $dsRenContract->getValue(DBEJContract::curUnitSale)
+                        ),
                         'urlEdit'         => $urlEdit,
                         'urlList'         => $urlList,
                         'txtEdit'         => $txtEdit

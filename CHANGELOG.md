@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 1065 - Include Costs in Contract Renewals Page
+
 ## [v4.11.2] - 2020-11-09
 ### Changed
 - Change SR created through Book Sales Visit to have raiseTypeId 7
