@@ -197,6 +197,7 @@ class CTBookSalesVisit extends CTCNC
             DBEProblem::projectTeamLimitMinutes,
             $buActivity->dsHeader->getValue(DBEHeader::projectTeamLimitMinutes)
         );
+        $dbeProblem->setValue(DBEProblem::raiseTypeId, 7);
         $dbeProblem->setValue(
             DBEProblem::slaResponseHours,
             $buActivity->getSlaResponseHours(

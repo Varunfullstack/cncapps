@@ -7,6 +7,7 @@
  */
 
 require_once("config.inc.php");
+global $cfg;
 require_once($cfg["path_ct"] . "/CTBookSalesVisit.php");
 session_start();
 page_open(
@@ -17,7 +18,7 @@ page_open(
         ''
     )
 );
-GLOBAL $cfg;
+global $cfg;
 //header("Cache-control: private");
 $ctAwaitingCompletion = new CTBookSalesVisit(
     $_SERVER['REQUEST_METHOD'],
