@@ -71,7 +71,7 @@ class DBEUser extends DBEntity
     const basedAtCustomerSite = "basedAtCustomerSite";
     const siteCustId = "siteCustId";
     const streamOneLicenseManagement = "streamOneLicenseManagement";
-
+    const execludeFromSDManagerDashboard ="execludeFromSDManagerDashboard";
     /**
      * calls constructor()
      * @access public
@@ -372,6 +372,13 @@ class DBEUser extends DBEntity
             DA_BOOLEAN,
             DA_NOT_NULL
         );
+        $this->addColumn(
+            self::execludeFromSDManagerDashboard,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            'execludeFromSDManagerDashboard',
+            '0'
+        );        
         $this->addColumn(
             self::expenseApproverID,
             DA_ID,

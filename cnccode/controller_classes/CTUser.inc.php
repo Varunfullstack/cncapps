@@ -378,7 +378,7 @@ class CTUser extends CTCNC
             $dbeCustomer->getRow();
             $siteCustomerString = $dbeCustomer->getValue(DBECustomer::name);
         }
-
+         
         $this->template->setVar(
             array(
                 'userID'                                     => $dsUser->getValue(DBEJUser::userID),
@@ -646,6 +646,9 @@ class CTUser extends CTCNC
                 'streamOneLicenseManagementChecked'             => Controller::htmlChecked(
                     $dsUser->getValue(DBEJUser::streamOneLicenseManagement)
                 ),
+                'execludeFromSDManagerDashboardChecked'           =>  
+                    $dsUser->getValue(DBEUser::execludeFromSDManagerDashboard)? 'checked' : null
+                 ,
             )
         );
         // manager selection

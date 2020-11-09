@@ -94,11 +94,11 @@ export function pick(obj,values){
   return newObj;
 }
 export const SRQueues=[
-  {id:1,name:"Helpdesk",teamID:1},
-  {id:2,name:"Escalations",teamID:2},
-  {id:3,name:"Small Projects",teamID:4},
-  {id:5,name:"Projects",teamID:5},
-  {id:4,name:"Sales",teamID:7},
+  {id:1,name:"Helpdesk",teamID:1,code:"HD"},
+  {id:2,name:"Escalations",teamID:2,code:"ES"},
+  {id:3,name:"Small Projects",teamID:4,code:"SP"},
+  {id:5,name:"Projects",teamID:5,code:"P"},
+  {id:4,name:"Sales",teamID:7,code:"S"},
 ]
 export const TeamType={
   Helpdesk:1,

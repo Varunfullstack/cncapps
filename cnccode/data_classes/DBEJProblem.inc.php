@@ -741,8 +741,8 @@ class DBEJProblem extends DBEProblem
             
         WHERE " . $this->getDBColumnName(self::customerID) . ' <> 282  and ' . $this->getDBColumnName(
                 self::status
-            ) . ' in ("I","P") ';
-
+            ) . ' in ("I","P")  ';
+            $sql .= ' and (consultant.execludeFromSDManagerDashboard=0 or consultant.cns_consno is null) ';
         if (!$showHelpDesk) {
             $sql .= ' and pro_queue_no <> 1 ';
         }

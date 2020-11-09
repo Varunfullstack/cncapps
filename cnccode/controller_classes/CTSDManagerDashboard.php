@@ -25,11 +25,9 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             Header("Location: /NotAllowed.php");
             exit;
         }
-        if ($this->getParam('showP5')) {
+        
             $this->setMenuId(201);
-        } else {
-            $this->setMenuId(222);
-        }
+        
     }
 
     /**
@@ -61,12 +59,32 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
 
                 $this->allocateUser($options);
                 break;
+            case "react":
+                $this->setTemplate();
+            break;
+            case "getQueue":
+                echo json_encode($this->getQueue());
+                exit;
             default:
                 $this->display();
                 break;
         }
     }
-
+    //react
+    function setTemplate()
+    {
+        $isP5 = isset($_REQUEST['showP5']);
+        $this->setPageTitle('SD Manager Dashboard');
+        $this->setTemplateFiles(
+            array('SDManagerDashboard' => 'SDManagerDashboard.rct')
+        );
+        $this->template->parse(
+            'CONTENTS',
+            'SDManagerDashboard',
+            true
+        );
+        $this->parsePage();
+    }
     /**
      * @throws Exception
      */
@@ -637,5 +655,302 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
                 true
             );
         }
+    }
+    function getQueue()
+    {
+        $queue = $_REQUEST["queue"];
+        if (!isset($queue))
+            return [];
+        $buProblem = new BUActivity($this);
+        $problems = new DataSet($this);
+        $isP5=$_REQUEST["p5"]=="true"?true:false;
+        $showHelpDesk=$_REQUEST["hd"]=="true"?true:false;
+        $showEscalation=$_REQUEST["es"]=="true"?true:false;
+        $showSmallProjects=$_REQUEST["sp"]=="true"?true:false;
+        $showProjects=$_REQUEST["p"]=="true"?true:false;
+        $result=[];
+        $limit=$_REQUEST["limit"]??10;
+        $code='shortestSLARemaining';
+        if($queue==9)
+            return $this->renderOpenSRByCustomerJson($showHelpDesk,$showEscalation,$showSmallProjects,$showProjects, $limit);
+        switch ($queue) {
+            case 1: //Shortest SLA Remaining
+                $code='shortestSLARemaining';
+                break;
+            case 2: //Current Open P1 Requests                
+                $code='currentOpenP1Requests';
+                break;
+            case 3: //Current Open P1 Requests 
+                $code='shortestSLAFixRemaining';               
+                break;
+            case 4: //Critical Service Requests
+                $code='critical';    
+            break;
+            case 5: //Current Open SRs
+                $code='currentOpenSRs';  
+            break;
+            case 6: //Oldest Updated SRs
+                $code='oldestUpdatedSR'; 
+            break;
+            case 7: //Longest Open SR
+                $code='longestOpenSR';  
+            break;
+            case 8: //Most Hours Logged
+                $code='mostHoursLogged'; 
+            break;
+        }
+        $buProblem->getSDDashBoardData(
+            $problems,
+            $limit,
+            $code,
+            $isP5,
+            $showHelpDesk,
+            $showEscalation,
+            $showSmallProjects,
+            $showProjects
+        );
+        $result= $this->renderQueueJson($problems);
+
+        return $result;
+    }
+    /**
+     * @param DataSet $problems
+     * @param $name
+     * @param null $title
+     * @return mixed|void|null
+     * @throws Exception
+     */
+    private function renderQueueJson(DataSet $problems)
+    { 
+        $rowCount = 0; 
+        $result=[];
+        if (!$problems->rowCount()) {
+            return [];
+        }
+
+        while ($problems->fetchNext()) {
+            $rowCount++;
+            // $urlViewActivity = Controller::buildLink(
+            //     'Activity.php',
+            //     array(
+            //         'action'    => 'displayLastActivity',
+            //         'problemID' => $problems->getValue(DBEJProblem::problemID)
+            //     )
+            // );
+
+            $buActivity = new BUActivity($this);
+
+            // $urlAllocateAdditionalTime =
+            //     Controller::buildLink(
+            //         'Activity.php',
+            //         array(
+            //             'action'    => 'allocateAdditionalTime',
+            //             'problemID' => $problems->getValue(DBEJProblem::problemID)
+            //         )
+            //     );
+
+            //$linkAllocateAdditionalTime = '<a href="' . $urlAllocateAdditionalTime . ' " target="_blank" title="Allocate additional time"><img src="/images/clock.png" width="20px" alt="time">';
+
+            $activityCount = $buActivity->getActivityCount($problems->getValue(DBEJProblem::problemID));
+
+            $bgColour = $this->getResponseColour(
+                $problems->getValue(DBEJProblem::status),
+                $problems->getValue(DBEJProblem::priority),
+                $problems->getValue(DBEJProblem::slaResponseHours),
+                $problems->getValue(DBEJProblem::workingHours),
+                $problems->getValue(DBEJProblem::respondedHours)
+            );
+            /*
+            Updated by another user?
+            */
+            if (
+                $problems->getValue(DBEJProblem::userID) &&
+                $problems->getValue(DBEJProblem::userID) != $problems->getValue(DBEJProblem::lastUserID)
+            ) {
+                $updatedBgColor = self::PURPLE;
+            } else {
+                $updatedBgColor = self::CONTENT;
+            }
+
+            if ($problems->getValue(DBEJProblem::respondedHours) == 0 && $problems->getValue(
+                    DBEJProblem::status
+                ) == 'I') {
+                /*
+                Initial SRs that have not yet been responded to
+                */
+                $hoursRemainingBgColor = self::AMBER;
+            } elseif ($problems->getValue(DBEJProblem::awaitingCustomerResponseFlag) == 'Y') {
+                $hoursRemainingBgColor = self::GREEN;
+            } else {
+                $hoursRemainingBgColor = self::BLUE;
+            }
+            /* ------------------------------ */
+
+            // $urlCustomer =
+            //     Controller::buildLink(
+            //         'SalesOrder.php',
+            //         array(
+            //             'action'     => 'search',
+            //             'customerID' => $problems->getValue(DBEJProblem::customerID)
+            //         )
+            //     );
+
+            $alarmDateTimeDisplay = null;
+            if ($problems->getValue(DBEProblem::alarmDate)) {
+
+                $alarmDateTimeDisplay = Controller::dateYMDtoDMY(
+                        $problems->getValue(DBEJProblem::alarmDate)
+                    ) . ' ' . $problems->getValue(DBEJProblem::alarmTime);
+
+                /*
+                Has an alarm date that is in the past, set updated BG Colour (indicates moved back into work queue from future queue)
+                */
+                if ($problems->getValue(DBEJProblem::alarmDate) <= date(DATE_MYSQL_DATE)) {
+                    $updatedBgColor = self::PURPLE;
+                }
+
+            }
+            /*
+            If the dashboard is filtered by customer then the Work button opens
+            Activity edit
+            */
+            if (
+                $problems->getValue(DBEJProblem::lastCallActTypeID) == 0
+            ) {
+                $workBgColor = self::GREEN; // green = in progress
+            } else {
+                $workBgColor = self::CONTENT;
+            }
+
+            if ($problems->getValue(DBEJProblem::priority) == 1) {
+                $priorityBgColor = self::ORANGE;
+            } else {
+                $priorityBgColor = self::CONTENT;
+            }
+
+
+            $problemID = $problems->getValue(DBEJProblem::problemID);
+            $dbeProblem = new DBEProblem($this);
+            $dbeProblem->setValue(
+                DBEProblem::problemID,
+                $problemID
+            );
+            $dbeProblem->getRow();
+
+            $totalActivityDurationHours = $problems->getValue(DBEJProblem::totalActivityDurationHours);
+            array_push($result,            
+                array(
+                    'hoursRemaining'             => number_format(
+                        $problems->getValue(DBEJProblem::hoursRemaining),
+                        1
+                    ),
+                    'updatedBgColor'             => $updatedBgColor,
+                    'priorityBgColor'            => $priorityBgColor,
+                    'hoursRemainingBgColor'      => $hoursRemainingBgColor,
+                    'totalActivityDurationHours' => $totalActivityDurationHours,
+                    'time'                       => $problems->getValue(DBEJProblem::lastStartTime),
+                    'date'                       => Controller::dateYMDtoDMY(
+                        $problems->getValue(DBEJProblem::lastDate)
+                    ),
+                    'dateTime'                   =>Controller::dateYMDtoDMY($problems->getValue(DBEJProblem::lastDate)).' '. $problems->getValue(DBEJProblem::lastStartTime),
+                     
+                    'problemID'                  => $problems->getValue(DBEJProblem::problemID),
+                    'reason'                     => self::truncate(
+                        $problems->getValue(DBEJProblem::reason),
+                        150
+                    ),
+                    'urlProblemHistoryPopup'     => $this->getProblemHistoryLink(
+                        $problems->getValue(DBEJProblem::problemID)
+                    ),
+                    'engineerDropDown'           => $this->getAllocatedUserDropdown(
+                        $problems->getValue(DBEJProblem::problemID),
+                        $problems->getValue(DBEJProblem::userID)
+                    ),
+                    'engineerName'               => $problems->getValue(DBEJProblem::engineerName),
+                    'customerID'                 => $problems->getValue(DBEJProblem::customerID),
+                    'customerName'               => $problems->getValue(DBEJProblem::customerName),
+                    'customerNameDisplayClass'
+                                                 => $this->getCustomerNameDisplayClass(
+                        $problems->getValue(DBEJProblem::specialAttentionFlag),
+                        $problems->getValue(DBEJProblem::specialAttentionEndDate),
+                        $problems->getValue(DBEJProblem::specialAttentionContactFlag)
+                    ),
+                     'slaResponseHours'           => number_format(
+                        $problems->getValue(DBEJProblem::slaResponseHours),
+                        1
+                    ),
+                    'priority'                   => Controller::htmlDisplayText(
+                        $problems->getValue(DBEJProblem::priority)
+                    ),
+                    'alarmDateTime'              => $alarmDateTimeDisplay,
+                    'bgColour'                   => $bgColour,
+                    'workBgColor'                => $workBgColor,
+                    'activityCount'              => $activityCount,
+                    'teamID'                     => $problems->getValue(DBEJProblem::teamID),
+                    "engineerId"                 => $problems->getValue(DBEJProblem::userID),
+                )
+            );
+
+
+        } // end while
+        return $result;
+    } // end render queue
+    /**
+     * @param bool $showHelpDesk
+     * @param bool $showEscalation
+     * @param bool $showSmallProjects
+     * @param bool $showProjects
+     * @throws Exception
+     */
+    private function renderOpenSRByCustomerJson($showHelpDesk = true,
+                                            $showEscalation = true,
+                                            $showSmallProjects = true,
+                                            $showProjects = true,
+                                            $limit=10
+    )
+    {
+         global $db;
+        $query = 'SELECT 
+              cus_custno,
+              cus_name,
+              (SELECT 
+                COUNT(pro_problemno) 
+              FROM
+                problem 
+              WHERE problem.`pro_custno` = customer.`cus_custno` 
+                AND problem.`pro_status` IN ("I", "P") ';
+        if (!$showHelpDesk) {
+            $query .= ' and pro_queue_no <> 1 ';
+        }
+
+        if (!$showEscalation) {
+            $query .= ' and pro_queue_no <> 2 ';
+        }
+
+        if (!$showSmallProjects) {
+            $query .= ' and pro_queue_no <> 3 ';
+        }
+
+        if (!$showProjects) {
+            $query .= ' and pro_queue_no <> 5 ';
+        }
+
+        $query .= " ) openSRCount 
+            FROM
+              customer WHERE cus_custno <> 282 ORDER BY openSRCount DESC LIMIT $limit";
+
+        /** @var mysqli_result $result */
+        $result = $db->query($query);
+        $problems=[];
+        while ($row = $result->fetch_assoc()) {   
+            array_push($problems,
+                array(
+                    'customerName' => $row['cus_name'],
+                    //'srCount'      => "<A href='CurrentActivityReport.php?action=setFilter&selectedCustomerID=" . $row['cus_custno'] . "'>" . $row["openSRCount"] . "</A>"
+                    'srCount'      => $row["openSRCount"],
+                    "customerID"    =>$row["cus_custno"],
+                ));
+        }
+        return $problems;
     }
 }

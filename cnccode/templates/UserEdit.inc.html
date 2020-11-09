@@ -943,13 +943,14 @@
         </tr>
         <tr>
             <td class="promptText">
-                <div class="tooltip">SR Queue Manager
+                <div class="tooltip" style="justify-content: flex-end;">SR Queue Manager
                     <div class="tooltiptext tooltip-bottom">
                         Change Initial Activity Date And Time, allocate time, change queues and re-open SRs
                     </div>
                 </div>
                 
             </td>
+            
             <td class="fieldText">
                 <input name="user[1][changeInitialDateAndTimeFlag]"
                        type="checkbox"
@@ -958,6 +959,26 @@
                        {DISABLED}
                        {changeInitialDateAndTimeFlagChecked}
                 />
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div class="tooltip" style="justify-content: flex-end;">Execlude from SDManger Dashboard
+                    <div class="tooltiptext tooltip-bottom">
+                        Execlude from SDManger Dashboard
+                    </div>
+                </div>
+                
+            </td>
+            
+            <td class="fieldText">
+                <input name="user[1][execludeFromSDManagerDashboard]"
+                       type="checkbox"
+                       id="user[1][execludeFromSDManagerDashboard]"                        
+                       {DISABLED}
+                       {execludeFromSDManagerDashboardChecked}
+                />
+                
             </td>
         </tr>
         <tr>

@@ -383,7 +383,7 @@ class CTCNC extends Controller
             "StarterLeaverManagement.php"
         );
 
-
+        
         if ($this->isUserSDManager()) {
             $menu->addSection(
                 "SDManagement",
@@ -392,6 +392,16 @@ class CTCNC extends Controller
                 "SD Management"
             );
         }
+        $this->addConditionalMenu(
+            $menu,
+            'fa-chalkboard-teacher',
+            "SDManagement",
+            $this->dbeUser->getValue(DBEUser::changeInitialDateAndTimeFlag)=='Y',
+            201,
+            "Manager Dashboard",
+            "SDManagerDashboard.php?action=react",
+            "SD Management"
+        );
 
         $this->addConditionalMenu(
             $menu,
@@ -631,16 +641,16 @@ class CTCNC extends Controller
     private function getDefaultSDManagerMenu()
     {
         return [
-            [
-                "id"    => 222,
-                "label" => "Manager Dashboard",
-                "href"  => "SDManagerDashboard.php?HD&ES"
-            ],
-            [
-                "id"    => 201,
-                "label" => "Manager Dashboard P5",
-                "href"  => "SDManagerDashboard.php?showP5=true&SP"
-            ],
+            // [
+            //     "id"    => 222,
+            //     "label" => "Manager Dashboard",
+            //     "href"  => "SDManagerDashboard.php?action=react"
+            // ],
+            // [
+            //     "id"    => 201,
+            //     "label" => "Manager Dashboard P5",
+            //     "href"  => "SDManagerDashboard.php?showP5=true&SP"
+            // ],
             [
                 "id"    => 202,
                 "label" => "Time Requests",
