@@ -101,10 +101,10 @@ class CTOffice365Licenses extends CTCNC
 
                 $dbeOffice365License->setValue(
                     DBEOffice365License::includesATP,
-                    json_encode($this->getParam('includesATP'))
+                    json_decode($this->getParam('includesATP'))
                 );
-
                 $dbeOffice365License->updateRow();
+
                 echo json_encode(["status" => "ok"]);
                 break;
             case 'create':
