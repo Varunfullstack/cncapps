@@ -42,4 +42,14 @@
             </column>
         </addColumn>
     </changeSet>
+    <changeSet id="hotfix-v4.11.2-3" author="pavwebdev">
+        <sql>
+            UPDATE problem
+            SET raiseTypeId = 7
+            WHERE raiseTypeId IS NULL
+              AND problem.`pro_rootcauseno` = 59
+              AND YEAR(pro_date_raised) = 2020;
+        </sql>
+        <rollback/>
+    </changeSet>
 </databaseChangeLog>
