@@ -69,10 +69,12 @@
             $('#salesRequestEmailRow').show();
             $('#salesRequestUnassignFlagRow').show();
             $('#salesRequestEmailRow input').attr('required', true);
+            $('#salesRequestDoNotNotifySalesOption').show();
         } else {
             $('#salesRequestEmailRow').hide();
             $('#salesRequestUnassignFlagRow').hide();
             $('#salesRequestEmailRow input').attr('required', false);
+            $('#salesRequestDoNotNotifySalesOption').hide();
         }
         return true;
     }
@@ -164,6 +166,20 @@
                 <input name="standardText[1][salesRequestUnassignFlag]"
                        type="checkbox"
                        {salesRequestUnassignFlagChecked}
+                       value="Y"
+                >
+            </td>
+        </tr>
+        <tr hidden
+            id="salesRequestDoNotNotifySalesOption"
+        >
+            <td class="promptText">
+                Do Not Notify Sales Option
+            </td>
+            <td>
+                <input name="standardText[1][salesRequestDoNotNotifySalesOption]"
+                       type="checkbox"
+                       {salesRequestDoNotNotifySalesOptionChecked}
                        value="Y"
                 >
             </td>

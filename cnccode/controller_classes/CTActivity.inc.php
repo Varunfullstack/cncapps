@@ -7287,14 +7287,14 @@ class CTActivity extends CTCNC
         $this->setPageTitle("Review Sales Request");
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
+            $notify = true;
             switch ($this->getParam('Submit')) {
 
+                case 'Approve Without Notifying Sales':
+                    $notify = false;
                 case 'Approve':
                     $option = 'A';
-
                     break;
-
                 case 'Deny':
                     $option = 'D';
                     break;
@@ -7306,7 +7306,8 @@ class CTActivity extends CTCNC
                 $callActivityID,
                 $this->userID,
                 $option,
-                $this->getParam('comments')
+                $this->getParam('comments'),
+                $notify
             );
 
             $nextURL =
@@ -7337,19 +7338,21 @@ class CTActivity extends CTCNC
                 )
             );
 
+        $standardText = new DBEStandardText($this);
+        $standardText->getRow($dsCallActivity->getValue(DBECallActivity::requestType));
+        $showDoNotNotifyOption = $standardText->getValue(DBEStandardText::salesRequestDoNotNotifySalesOption);
+
         $this->template->set_var(
             array(
-                'callActivityID' => $callActivityID,
-
-                'problemID' => $problemID,
-
-                'customerID' => $dbeFirstActivity->getValue(DBEJCallActivity::customerID),
-
+                'callActivityID'         => $callActivityID,
+                'problemID'              => $problemID,
+                'customerID'             => $dbeFirstActivity->getValue(DBEJCallActivity::customerID),
                 'customerName'           => $dbeFirstActivity->getValue(DBEJCallActivity::customerName),
                 'requestDetails'         => $dsCallActivity->getValue(DBEJCallActivity::reason),
                 'userName'               => $dsCallActivity->getValue(DBEJCallActivity::userName),
                 'submitUrl'              => $submitURL,
-                'urlProblemHistoryPopup' => $urlProblemHistoryPopup
+                'urlProblemHistoryPopup' => $urlProblemHistoryPopup,
+                'showDoNotNotifySales'   => $showDoNotNotifyOption ? "1" : "0"
             )
         );
 

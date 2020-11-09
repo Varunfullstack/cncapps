@@ -8,37 +8,12 @@
     <changeSet id="issue1025-1" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
             <not>
-                <columnExists tableName="contact" columnName="pendingFurloughAction"/>
+                <columnExists tableName="standardtext" columnName="salesRequestDoNotNotifySalesOption"/>
             </not>
         </preConditions>
-        <addColumn tableName="contact">
-            <column name="pendingFurloughAction" type="tinyint">
-                <constraints nullable="true"/>
-            </column>
-        </addColumn>
-    </changeSet>
-
-    <changeSet id="issue1025-2" author="pavwebdev">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <columnExists tableName="contact" columnName="pendingFurloughActionDate"/>
-            </not>
-        </preConditions>
-        <addColumn tableName="contact">
-            <column name="pendingFurloughActionDate" type="date">
-                <constraints nullable="true"/>
-            </column>
-        </addColumn>
-    </changeSet>
-    <changeSet id="issue1025-3" author="pavwebdev">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <columnExists tableName="contact" columnName="pendingFurloughActionLevel"/>
-            </not>
-        </preConditions>
-        <addColumn tableName="contact">
-            <column name="pendingFurloughActionLevel" type="char(20)">
-                <constraints nullable="true"/>
+        <addColumn tableName="standardtext">
+            <column name="salesRequestDoNotNotifySalesOption" type="tinyint" defaultValue="0">
+                <constraints nullable="false"/>
             </column>
         </addColumn>
     </changeSet>

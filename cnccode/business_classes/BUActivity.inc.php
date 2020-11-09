@@ -2826,12 +2826,14 @@ class BUActivity extends Business
      * @param $userID
      * @param $response
      * @param $comments
+     * @param bool $notifySales
      * @throws Exception
      */
     public function salesRequestProcess($callActivityID,
                                         $userID,
                                         $response,
-                                        $comments
+                                        $comments,
+                                        $notifySales = true
     )
     {
         $dsCallActivity = new DataSet($this);
@@ -2921,14 +2923,15 @@ class BUActivity extends Business
             $dsCallActivity->getValue(DBECallActivity::requestType)
         );
 
-
-        $this->sendSalesRequestReplyEmail(
-            $newCallActivity,
-            $subject,
-            $requestingUserID,
-            $approval,
-            $hasAttachments
-        );
+        if ($notifySales) {
+            $this->sendSalesRequestReplyEmail(
+                $newCallActivity,
+                $subject,
+                $requestingUserID,
+                $approval,
+                $hasAttachments
+            );
+        }
 
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($callActivityID);
@@ -8138,7 +8141,6 @@ FROM
         $contactName = $dbeContact->getValue(
                 DBEContact::firstName
             ) . " " . $dbeContact->getValue(DBEContact::lastName);
-
 
 
         $buMail = new BUMail($this);
