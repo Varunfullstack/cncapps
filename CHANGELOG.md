@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 1068 - Unable to unhide an activity
+
 ## [v4.11.2] - 2020-11-09
 ### Changed
 - Change SR created through Book Sales Visit to have raiseTypeId 7
