@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1053 - New email templates
+
 ## [v4.12.0] - 2020-11-10
 ### Added
 - Issue 906 - Sales Order Permissions for Non Sales People
