@@ -11,6 +11,7 @@ This project changes will be shown here.
 - Issue 1063 - Review Meeting Enhancements - Leavers & Contract Numbers
 ### Fixed
 - Issue 1068 - Unable to unhide an activity
+- Issue 1070 - ReviewList.php not loading any details
 
 ## [v4.11.2] - 2020-11-09
 ### Changed

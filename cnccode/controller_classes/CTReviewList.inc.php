@@ -129,16 +129,8 @@ where reviewDate IS NOT NULL
 
         $this->setTemplateFiles('CustomerReviewList', 'CustomerReviewList.inc');
 
-
-//                        'reviewAction' => substr($dsCustomer->getValue(DBECustomer::reviewAction), 0, 50),
-//                        'reviewUser'   => $user,
-//                        'linkURL'      => $linkURL,
-//                        'reportURL'    => $reportUrl
-//                    )
-//
-//                );
-//                $this->template->parse('reviews', 'reviewBlock', true);
-//            }
+        $this->loadReactScript('SpinnerHolderComponent.js');
+        $this->loadReactCSS('SpinnerHolderComponent.css');
         $this->template->parse('CONTENTS', 'CustomerReviewList', true);
 
         $this->parsePage();
