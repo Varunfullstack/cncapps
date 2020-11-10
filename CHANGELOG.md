@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 906 - Sales Order Permissions for Non Sales People
+- Issue 1065 - Include Costs in Contract Renewals Page
 ### Changed
 - Issue 1025 - Option to not notify Sales on Sales Request Approvals
 ### Fixed
