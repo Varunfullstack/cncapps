@@ -2923,15 +2923,16 @@ class BUActivity extends Business
             $dsCallActivity->getValue(DBECallActivity::requestType)
         );
 
-        if ($notifySales) {
+
             $this->sendSalesRequestReplyEmail(
                 $newCallActivity,
                 $subject,
                 $requestingUserID,
                 $approval,
-                $hasAttachments
+                $hasAttachments,
+                $notifySales
             );
-        }
+
 
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($callActivityID);
@@ -3055,12 +3056,14 @@ class BUActivity extends Business
      * @param string|int $requestingUserID
      * @param bool $approval
      * @param bool $hasAttachments
+     * @param bool $notifySales
      */
     private function sendSalesRequestReplyEmail($dbeCallActivity,
                                                 $subject,
                                                 $requestingUserID,
                                                 $approval = false,
-                                                $hasAttachments = false
+                                                $hasAttachments = false,
+                                                $notifySales = true
     )
     {
         $buMail = new BUMail($this);
@@ -3119,7 +3122,7 @@ class BUActivity extends Business
                 DBEUser::username
             ) . '@' . CONFIG_PUBLIC_DOMAIN;
 
-        if ($approval) {
+        if ($approval && $notifySales) {
             $toEmail .= ',sales@' . CONFIG_PUBLIC_DOMAIN;
         }
 
