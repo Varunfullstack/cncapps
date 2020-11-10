@@ -23,6 +23,7 @@ class CTNotAllowed extends CTCNC
         );
 
         $this->template->parse('CONTENTS', 'NotAllowed', true);
+        http_response_code(401);
         $this->parsePage();
     }
 }

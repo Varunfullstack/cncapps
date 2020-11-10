@@ -1150,7 +1150,8 @@ class CTCNC extends Controller
     function checkPermissions($levels)
     {
         if (!$this->hasPermissions($levels)) {
-            $this->displayFatalError('You do not have the permissions required for the requested operation');
+            Header("Location: /NotAllowed.php");
+            exit;
         }
     }
 

@@ -2884,7 +2884,9 @@ class CTSalesOrder extends CTCNC
         $this->template->set_var(
             array(
                 'txtAddDocument' => $restrictedView ? '' : 'Add document',
-                'urlAddDocument' => $restrictedView ? '' : $urlAddDocument
+                'urlAddDocument' => $restrictedView ? '' : $urlAddDocument,
+                'deleteLinkText' => $restrictedView ? '' : 'Delete',
+                'editLinkText'   => $restrictedView ? '' : 'Edit'
             )
         );
 
