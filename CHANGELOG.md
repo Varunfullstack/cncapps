@@ -4,6 +4,8 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 906 - Sales Order Permissions for Non Sales People
+### Changed
+- Issue 1025 - Option to not notify Sales on Sales Request Approvals
 ### Fixed
 - Issue 1068 - Unable to unhide an activity
 

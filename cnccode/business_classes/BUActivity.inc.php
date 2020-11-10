@@ -2826,12 +2826,14 @@ class BUActivity extends Business
      * @param $userID
      * @param $response
      * @param $comments
+     * @param bool $notifySales
      * @throws Exception
      */
     public function salesRequestProcess($callActivityID,
                                         $userID,
                                         $response,
-                                        $comments
+                                        $comments,
+                                        $notifySales = true
     )
     {
         $dsCallActivity = new DataSet($this);
@@ -2922,13 +2924,15 @@ class BUActivity extends Business
         );
 
 
-        $this->sendSalesRequestReplyEmail(
-            $newCallActivity,
-            $subject,
-            $requestingUserID,
-            $approval,
-            $hasAttachments
-        );
+            $this->sendSalesRequestReplyEmail(
+                $newCallActivity,
+                $subject,
+                $requestingUserID,
+                $approval,
+                $hasAttachments,
+                $notifySales
+            );
+
 
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($callActivityID);
@@ -3052,12 +3056,14 @@ class BUActivity extends Business
      * @param string|int $requestingUserID
      * @param bool $approval
      * @param bool $hasAttachments
+     * @param bool $notifySales
      */
     private function sendSalesRequestReplyEmail($dbeCallActivity,
                                                 $subject,
                                                 $requestingUserID,
                                                 $approval = false,
-                                                $hasAttachments = false
+                                                $hasAttachments = false,
+                                                $notifySales = true
     )
     {
         $buMail = new BUMail($this);
@@ -3116,7 +3122,7 @@ class BUActivity extends Business
                 DBEUser::username
             ) . '@' . CONFIG_PUBLIC_DOMAIN;
 
-        if ($approval) {
+        if ($approval && $notifySales) {
             $toEmail .= ',sales@' . CONFIG_PUBLIC_DOMAIN;
         }
 
@@ -8138,7 +8144,6 @@ FROM
         $contactName = $dbeContact->getValue(
                 DBEContact::firstName
             ) . " " . $dbeContact->getValue(DBEContact::lastName);
-
 
 
         $buMail = new BUMail($this);

@@ -216,27 +216,32 @@ class CTStandardText extends CTCNC
 
         $this->template->set_var(
             array(
-                'stt_standardtextno'              => $stt_standardtextno,
-                'stt_desc'                        => Controller::htmlInputText(
+                'stt_standardtextno'                        => $stt_standardtextno,
+                'stt_desc'                                  => Controller::htmlInputText(
                     $dsStandardText->getValue(DBEStandardText::stt_desc)
                 ),
-                'stt_descMessage'                 => Controller::htmlDisplayText(
+                'stt_descMessage'                           => Controller::htmlDisplayText(
                     $dsStandardText->getMessage(DBEStandardText::stt_desc)
                 ),
-                'stt_text'                        => Controller::htmlInputText(
+                'stt_text'                                  => Controller::htmlInputText(
                     $dsStandardText->getValue(DBEStandardText::stt_text)
                 ),
-                'stt_textMessage'                 => Controller::htmlDisplayText(
+                'stt_textMessage'                           => Controller::htmlDisplayText(
                     $dsStandardText->getMessage(DBEStandardText::stt_text)
                 ),
-                'urlUpdate'                       => $urlUpdate,
-                'urlDelete'                       => $urlDelete,
-                'txtDelete'                       => $txtDelete,
-                'urlDisplayList'                  => $urlDisplayList,
-                'salesRequestEmail'               => $dsStandardText->getValue(DBEStandardText::salesRequestEmail),
-                'salesRequestUnassignFlagChecked' => $this->getChecked(
+                'urlUpdate'                                 => $urlUpdate,
+                'urlDelete'                                 => $urlDelete,
+                'txtDelete'                                 => $txtDelete,
+                'urlDisplayList'                            => $urlDisplayList,
+                'salesRequestEmail'                         => $dsStandardText->getValue(
+                    DBEStandardText::salesRequestEmail
+                ),
+                'salesRequestUnassignFlagChecked'           => $this->getChecked(
                     $dsStandardText->getValue(DBEStandardText::salesRequestUnassignFlag)
-                )
+                ),
+                'salesRequestDoNotNotifySalesOptionChecked' => $this->dsStandardText->getValue(
+                    DBEStandardText::salesRequestDoNotNotifySalesOption
+                ) ? 'checked' : null
             )
         );
 

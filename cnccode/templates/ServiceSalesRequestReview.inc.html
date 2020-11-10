@@ -1,6 +1,19 @@
 <!-- Template: ServiceSalesRequestReview.inc.html -->
 <script>
+    const showDoNotNotifySales = {showDoNotNotifySales};
+
     document.addEventListener('DOMContentLoaded', () => {
+        if (showDoNotNotifySales) {
+            const container = document.getElementById('approveWithoutNotifyContainer');
+
+            const approveWithoutNotifyInput = document.createElement('input');
+            approveWithoutNotifyInput.type = "submit";
+            approveWithoutNotifyInput.name = "Submit";
+            approveWithoutNotifyInput.value = "Approve Without Notifying Sales";
+
+            container.append(approveWithoutNotifyInput);
+        }
+
         CKEDITOR.replace('comments', {customConfig: '/ckeditor_config.js'});
     })
 </script>
@@ -53,6 +66,7 @@
             <td class="mainHeadText">{requestDetails}</td>
         </tr>
 
+
         <tr>
             <td class="promptText"
                 style="vertical-align: top;"
@@ -70,6 +84,9 @@
                        name="Submit"
                        value="Approve"
                 >
+                <span id="approveWithoutNotifyContainer">
+
+                </span>
                 <input type="submit"
                        name="Submit"
                        value="Deny"
