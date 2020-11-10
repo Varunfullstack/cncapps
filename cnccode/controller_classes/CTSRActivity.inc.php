@@ -1142,7 +1142,7 @@ class CTSRActivity extends CTCNC
         return null;
         
         $buActivity=new BUActivity($this);
-        $dbeJCallActivity=$buActivity->getFirstActivityInProblem($problemID,57);//initial activity
+        $dbeJCallActivity=$buActivity->getFirstActivityInServiceRequest($problemID, 57);//initial activity
          if($dbeJCallActivity)
         return [
             "callActivityID"=>$dbeJCallActivity->getValue(DBEJCallActivity::callActivityID),

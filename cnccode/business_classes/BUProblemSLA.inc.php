@@ -206,7 +206,7 @@ class BUProblemSLA extends Business
     {
         $buMail = new BUMail($this);
 
-        if ($dbeJCallActivity = $this->buActivity->getFirstActivityInProblem(
+        if ($dbeJCallActivity = $this->buActivity->getFirstActivityInServiceRequest(
             $DBEProblem->getValue(DBEProblem::problemID),
             CONFIG_INITIAL_ACTIVITY_TYPE_ID
         )) {
@@ -717,7 +717,7 @@ class BUProblemSLA extends Business
         $dbeJProblem = new DBEJProblem($this);
         $dbeJProblem->getRow($problemID);
 
-        if ($dbeJCallActivity = $this->buActivity->getFirstActivityInProblem(
+        if ($dbeJCallActivity = $this->buActivity->getFirstActivityInServiceRequest(
             $problemID,
             CONFIG_INITIAL_ACTIVITY_TYPE_ID
         )) {
@@ -831,7 +831,7 @@ class BUProblemSLA extends Business
                 Problem: <?= $problemID ?>
                 <?php
                 $buActivity = new BUActivity($this);
-                $fixedActivity = $buActivity->getFixedActivityInProblem($problemID);
+                $fixedActivity = $buActivity->getFixedActivityInServiceRequest($problemID);
                 if (!$fixedActivity) {
                     ?>
                     <h2>This SR doesn't have a fixed activity!!</h2>
@@ -945,12 +945,6 @@ class BUProblemSLA extends Business
                             $this->dbeProblem->getValue(DBEProblem::completionAlertCount) + 1
                         );
                         $this->dbeProblem->updateRow();
-
-                        $this->buActivity->sendEmailToCustomer(
-                            $problemID,
-                            BUActivity::PendingClosureCustomerEmailCategory
-                        );
-
                     }// end if last activity = true
 
                 }

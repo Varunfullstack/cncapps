@@ -1,31 +1,30 @@
 {% extends '@customerFacing/style-3-rows-email/style-3-rows.twig' %}
-{# @var data \CNCLTD\TwigDTOs\ActivityLoggedDTO #}
+{# @var data \CNCLTD\TwigDTOs\SalesOrderServiceRequestCreatedDTO #}
 {% block headerTitle %}
     Service Request Information
 {% endblock %}
 
 {% block headerContet %}
-    We've got something to tell you
+    A new Service Request has been raised
 {% endblock %}
 
 {% block firstRow %}
     <p>{{ data.contactFirstName }},</p>
-    <p>
-        We have worked on your service request reference {{ data.serviceRequestId }} and have an update for you. A more
-        detailed update is available in our portal but here's the short version.
+    <p> A new service request has been logged with our ServiceDesk under reference {{ data.serviceRequestId }} and it
+        will help if you could please refer to it in all related communications with us.
     </p>
+    <p>Details: {{ data.reason }}</p>
 {% endblock %}
 
 {% block secondRow %}
     <p>
-        {{ data.lastActivityCustomerNotes | raw }}
+        Priority: 5 - Project Work
     </p>
-
 {% endblock %}
 
 {% block thirdRow %}
     <p>
-        This update was added by {{ data.engineerFullName }}
+        This request has been submitted to our {{ data.teamName }} team who will contact you to arrange any further action.
     </p>
 {% endblock %}
 
@@ -38,5 +37,5 @@
 {% endblock %}
 
 {% block feedback %}
-
+    <br>
 {% endblock %}

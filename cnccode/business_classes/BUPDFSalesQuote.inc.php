@@ -598,21 +598,9 @@ class BUPDFSalesQuote extends Business
             $userID,
             $dsUser
         );
-
-        $quoteFile = 'quotes/' . $dbeQuotation->getValue(DBEOrdhead::ordheadID) . '_' . $dbeQuotation->getValue(
-                DBEQuotation::versionNo
-            ) . '.pdf';
-
-        $subject = $emailSubject;
-
-        $template = new Template (
-            EMAIL_TEMPLATE_DIR,
-            "remove"
-        );
-        $template->set_file(
-            'page',
-            'QuoteReminderEmail.html'
-        );
+        $quoteFileName = "{$dbeQuotation->getValue(DBEOrdhead::ordheadID)}_{$dbeQuotation->getValue(DBEQuotation::versionNo)}.pdf";
+        $quoteFile = "quotes/{$quoteFileName}";
+        global $twig;
 
         $DBEJRenQuotation = new DBEJRenQuotation($this);
         $DBEJRenQuotation->getRowsBySalesOrderID($dsOrdhead->getValue(DBEOrdhead::ordheadID));
@@ -623,64 +611,35 @@ class BUPDFSalesQuote extends Business
 
         $DBEJRenQuotation->fetchNext();
 
-        $sentDateValue = $dbeQuotation->getValue(DBEQuotation::sentDateTime);
-        $sentDate = DateTime::createFromFormat(
-            'Y-m-d H:i:s',
-            $sentDateValue
-        );
+        $contactFirstName = $dsDeliveryContact->getValue(DBEContact::firstName);
+        $renewalType = $DBEJRenQuotation->getValue(DBEJRenQuotation::type);
 
-        $template->set_var(
+        $body = $twig->render(
+            '@customerFacing/style-3-rows-email/QuoteReminder/QuoteReminder.html.twig',
             [
-                'contactFirstName' => $dsDeliveryContact->getValue(DBEContact::firstName),
-                'renewalType'      => $DBEJRenQuotation->getValue(DBEJRenQuotation::type),
-                'sentDate'         => $sentDate->format('d/m/Y')
+                "contactFirstName" => $contactFirstName,
+                "renewalType"      => $renewalType
             ]
         );
+        $recipientsArray = [
+            $dsOrdhead->getValue(DBEOrdhead::delContactEmail),
+            CONFIG_SALES_EMAIL
+        ];
 
-        $template->parse(
-            'output',
-            'page',
+        $attachments = new \CNCLTD\Email\AttachmentCollection();
+        $attachments->add(
+            $quoteFile,
+            'application/pdf',
+            $quoteFileName,
             true
         );
-
-        $body = $template->get_var('output');
-        $toEmail = $dsOrdhead->getValue(DBEOrdhead::delContactEmail);
-        $senderEmail = "sales@cnc-ltd.co.uk";
-
-        $hdrs = array(
-            'From'         => $senderEmail,
-            'To'           => $toEmail,
-            'Subject'      => $subject,
-            'Date'         => date("r"),
-            'Content-Type' => 'text/html; charset=UTF-8'
+        $buMail->sendEmailWithAttachments(
+            $body,
+            $emailSubject,
+            implode(',', $recipientsArray),
+            $attachments,
+            CONFIG_SALES_EMAIL
         );
-
-        $buMail->mime->setHTMLBody($body);
-
-        $buMail->mime->addAttachment(
-            $quoteFile,
-            'application/pdf'
-        );
-
-        $mime_params = array(
-            'text_encoding' => '7bit',
-            'text_charset'  => 'UTF-8',
-            'html_charset'  => 'UTF-8',
-            'head_charset'  => 'UTF-8'
-        );
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
-        $toEmail .= ',' . CONFIG_SALES_EMAIL;
-
-        return $buMail->putInQueue(
-            $senderEmail,
-            $toEmail,
-            $hdrs,
-            $body
-        );
-
     }
 
     /**

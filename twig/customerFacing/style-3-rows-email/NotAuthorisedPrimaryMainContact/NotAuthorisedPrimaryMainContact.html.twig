@@ -1,8 +1,5 @@
 {% extends '@customerFacing/style-3-rows-email/style-3-rows.twig' %}
-{# @var string primaryMainContactFirstName #}
-{# @var string contactFirstName  XAVI THIS IS THE FIRSTNAME OF THE PERSON THAT TRIED TO GET SUPPORT BUT IS NOT AUTHORISED #}
-{# @var string contactLastName   XAVI THIS IS THE FIRSTNAME OF THE PERSON THAT TRIED TO GET SUPPORT BUT IS NOT AUTHORISED #}
-{# @var string contactSupportLevel  XAVI THIS IS THE Support LEvel OF THE PERSON THAT TRIED TO GET SUPPORT BUT IS NOT AUTHORISED #}
+{# @var data CNCLTD\TwigDTOs\PrimaryMainContactNotAuthorisedNotification #}
 {% block headerTitle %}
     Information Notice
 {% endblock %}
@@ -13,9 +10,9 @@
 
 {% block firstRow %}
 
-    <p>{{ primaryMainContactFirstName }},</p>
-    <p>{{ contactFirstName }} {{ contactLastName }} has tried to raise a support request with us but they currently have
-        the support level {{ contactSupportLevel }} and as such are unable to do so.
+    <p>{{ data.primaryMainContactFirstName }}</p>
+    <p>{{ data.contactFirstName }} {{ data.contactLastName }} has tried to raise a support request with us but they
+        currently have the support level {{ data.contactSupportLevel }} and as such are unable to do so.
     </p>
     <p>
         You will need to contact us on their behalf to progress this request and in future, if you would like them to be

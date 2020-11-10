@@ -4,6 +4,9 @@
  *
  * Uses the PEAR Mail Queue to send and store email messages
  */
+
+use CNCLTD\Email\AttachmentCollection;
+
 require_once($cfg["path_bu"] . "/BUUser.inc.php");
 require_once($cfg["path_gc"] . "/Business.inc.php");
 /*
@@ -22,9 +25,8 @@ class BUMail extends Business
     const DELETE_AFTER_SEND = 1;
     const MAIL_QUEUE_SEND_LIMIT = 20;
     const MAIL_QUEUE_TRY_LIMIT = 5;
-
-    private $mailQueue;
     public $mime;
+    private $mailQueue;
     private $buUser;
 
     /**
@@ -42,35 +44,44 @@ class BUMail extends Business
         $this->buUser = new BUUser($this);
     }
 
-    /**
-     * Send mail message directly, bypassing the queue. Useful for "queue problem" email
-     *
-     * @param mixed $toEmail
-     * @param mixed $headers
-     * @param mixed $body
-     * @return mixed
-     */
-    public function send(
-        $toEmail,
-        $headers,
-        $body
+    function sendEmailWithAttachments($body,
+                                      $subject,
+                                      $recipients,
+                                      AttachmentCollection $attachmentCollection,
+                                      $fromEmail = CONFIG_SUPPORT_EMAIL
     )
     {
-        $parameters = $this->prepareMessage(
-            $toEmail,
-            $headers
+
+        $hdrs = array(
+            'From'         => $fromEmail,
+            'To'           => $recipients,
+            'Subject'      => $subject,
+            'Date'         => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
-        $mail = new Mail_smtp(
-            $GLOBALS ['mail_options']
+        $mime = new Mail_mime();
+        foreach ($attachmentCollection as $attachment) {
+            $mime->addAttachment(
+                $attachment->getContent(),
+                $attachment->getContentType(),
+                $attachment->getName(),
+                $attachment->getIsFile()
+            );
+        }
+
+        $mime->setHTMLBody($body);
+
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
 
-        $sent = $mail->send(
-            $parameters['toEmail'],
-            $parameters['headers'],
-            $body
-        );
-        return $sent;
+        $body = $mime->get($mime_params);
+        $hdrs = $mime->headers($hdrs);
+        $this->putInQueue($fromEmail, $recipients, $hdrs, $body);
     }
 
     public function putInQueue(
@@ -121,6 +132,64 @@ class BUMail extends Business
                 'headers' => $headers
             );
 
+    }
+
+    function sendSimpleEmail($body, $subject, $recipients, $fromEmail = CONFIG_SUPPORT_EMAIL)
+    {
+        $hdrs = array(
+            'From'         => $fromEmail,
+            'To'           => $recipients,
+            'Subject'      => $subject,
+            'Date'         => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
+        );
+
+        $mime = new Mail_mime();
+
+        $mime->setHTMLBody($body);
+
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
+        );
+
+        $body = $mime->get($mime_params);
+
+        $hdrs = $mime->headers($hdrs);
+        $this->putInQueue($fromEmail, $recipients, $hdrs, $body);
+    }
+
+    /**
+     * Send mail message directly, bypassing the queue. Useful for "queue problem" email
+     *
+     * @param mixed $toEmail
+     * @param mixed $headers
+     * @param mixed $body
+     * @return mixed
+     */
+    public function send(
+        $toEmail,
+        $headers,
+        $body
+    )
+    {
+        $parameters = $this->prepareMessage(
+            $toEmail,
+            $headers
+        );
+
+        $mail = new Mail_smtp(
+            $GLOBALS ['mail_options']
+        );
+
+        $sent = $mail->send(
+            $parameters['toEmail'],
+            $parameters['headers'],
+            $body
+        );
+        return $sent;
     }
 
     public function sendQueue()

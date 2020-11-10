@@ -1,5 +1,5 @@
 {% extends '@customerFacing/style-3-rows-email/style-3-rows.twig' %}
-{# @var integer date #}  {# #NEXT BANK HOLIDAY DATE #}
+{# @var  #}
 {# @var string contactFirstName #}
 {% block headerTitle %}
     Information Notice
@@ -10,9 +10,9 @@
 {% endblock %}
 
 {% block firstRow %}
-    <p>{{ contactFirstName }},</p>
+    <p>{{ contactFirstName }}</p>
     <p>
-        Please be aware that {date} is a national holiday in UK so the CNC ServiceDesk will be closed. If you are a
+        Please be aware that {{ date }} is a national holiday in UK so the CNC ServiceDesk will be closed. If you are a
         customer with 24x7 support, you may contact us by calling +441273384111 and using the security access code
         displayed on your customer portal at https://www.cnc-ltd.co.uk.
     </p>

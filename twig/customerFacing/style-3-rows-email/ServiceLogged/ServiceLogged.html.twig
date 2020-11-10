@@ -1,13 +1,5 @@
 {% extends '@customerFacing/style-3-rows-email/style-3-rows.twig' %}
-{# @var integer serviceRequestId #}
-{# @var string contactFirstName #}
-{# @var string reason #}
-{# @var integer priority #}
-{# @var string serviceRequestStatus the status of the request "Initial"|"In Progress"|"On Hold" #}
-{# @var float SLA #}
-{# @var boolean isLoggedOutOfHours is this request logged out of hours? #}
-{# @var boolean outOfHoursSupport does the customer have outOfHours support? #}
-{# @var boolean support24  does the customer have 24 hour support? #}
+{# @var data \CNCLTD\TwigDTOs\ServiceRequestLoggedDTO #}
 {% block headerTitle %}
     Service Request Information
 {% endblock %}
@@ -17,19 +9,20 @@
 {% endblock %}
 
 {% block firstRow %}
-    <p>{{ contactFirstName }},</p>
-    <p> A new service request has been logged with our ServiceDesk under reference {{ serviceRequestId }} and it will
+    <p>{{ data.contactFirstName }},</p>
+    <p> A new service request has been logged with our ServiceDesk under reference {{ data.serviceRequestId }} and it
+        will
         help
         if you could please refer to it in all related communications with us.
     </p>
-    <p>Details: {{ reason }}</p>
+    <p>Details: {{ data.reason }}</p>
 {% endblock %}
 
 {% block secondRow %}
     <p>
-        Priority: {{ priority }} -
-        {% if serviceRequestStatus == 'Initial' %}
-            We will aim to respond to this request within {{ SLA }} working hours.
+        Priority: {{ data.priority }} -
+        {% if data.serviceRequestStatus == 'Initial' %}
+            We will aim to respond to this request within {{ data.SLA }} working hours.
             However, we may adjust the priority of this request if necessary and will inform you if we do.
         {% else %}
             We have started working on this immediately.
@@ -38,14 +31,17 @@
 {% endblock %}
 
 {% block thirdRow %}
-    {% if serviceRequestStatus == 'Initial' %}
+    {% if data.serviceRequestStatus == 'Initial' %}
         <p>
-            {% if not isLoggedOutOfHours or not outOfHoursSupport %}
+            {% if not data.isLoggedOutOfHours %}
                 This request has been submitted to the relevant team who will contact you to arrange any and all appropriate
                 action.
-            {% elseif support24 %}
+            {% elseif data.support24 %}
                 This request will be responded to when the office is next open, but if you have an out of hours PIN
                 code listed on our customer portal, you may call our offices to speak to one of our on-call technicians.  Please note that there are extra charges for this service as detailed in the guide on our portal for service outside our core opening hours of Monday - Friday 07:30 - 20:00.
+            {% elseif data.hasServiceDesk %}
+                This request will be responded to when the office is next open, but if you have an out of hours PIN
+                code listed on our customer portal, you may call our offices to speak to one of our on-call technicians.
             {% else %}
                 This request will be responded to when the office is next open.
             {% endif %}
@@ -54,11 +50,11 @@
 {% endblock %}
 
 {% block serviceRequestURL %}
-    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ serviceRequestId }}
+    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ data.serviceRequestId }}
 {% endblock %}
 
 {% block footerStatus %}
-    {{ serviceRequestStatus }}
+    {{ data.serviceRequestStatus }}
 {% endblock %}
 
 {% block feedback %}

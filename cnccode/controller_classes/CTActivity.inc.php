@@ -2831,7 +2831,7 @@ class CTActivity extends CTCNC
      */
     function displayFirstActivity()
     {
-        $dbeCallActivity = $this->buActivity->getFirstActivityInProblem($this->getParam('problemID'));
+        $dbeCallActivity = $this->buActivity->getFirstActivityInServiceRequest($this->getParam('problemID'));
 
         $this->redirectToDisplay($dbeCallActivity->getValue(DBEJCallActivity::callActivityID));
 
@@ -4712,7 +4712,7 @@ class CTActivity extends CTCNC
         /*
       Use initial activity date to determine list of projects
       */
-        $dbeInitialActivity = $this->buActivity->getFirstActivityInProblem(
+        $dbeInitialActivity = $this->buActivity->getFirstActivityInServiceRequest(
             $dsCallActivity->
             getValue('problemID')
         );
@@ -5118,7 +5118,7 @@ class CTActivity extends CTCNC
                         DBEJCallActivity::callActTypeID
                     ) != CONFIG_INITIAL_ACTIVITY_TYPE_ID) {
 
-                    $dbeFirstActivity = $this->buActivity->getFirstActivityInProblem(
+                    $dbeFirstActivity = $this->buActivity->getFirstActivityInServiceRequest(
                         $this->dsCallActivity->getValue(DBEJCallActivity::problemID)
                     );
 
@@ -6402,7 +6402,7 @@ class CTActivity extends CTCNC
     function allocateAdditionalTime()
     {
         $this->setMethodName('allocateAdditionalTime');
-        $dbeFirstActivity = $this->buActivity->getFirstActivityInProblem($this->getParam('problemID'));
+        $dbeFirstActivity = $this->buActivity->getFirstActivityInServiceRequest($this->getParam('problemID'));
         $this->setTemplateFiles(
             array(
                 'ServiceRequestAllocateAdditionalTime' => 'ServiceRequestAllocateAdditionalTime.inc'
@@ -6613,7 +6613,7 @@ class CTActivity extends CTCNC
 
         $problemID = $dsCallActivity->getValue(DBEJCallActivity::problemID);
 
-        $dbeFirstActivity = $this->buActivity->getFirstActivityInProblem($problemID);
+        $dbeFirstActivity = $this->buActivity->getFirstActivityInServiceRequest($problemID);
 
         $this->setTemplateFiles(
             array(
@@ -6734,7 +6734,7 @@ class CTActivity extends CTCNC
 
         $problemID = $dsCallActivity->getValue(DBEJCallActivity::problemID);
 
-        $dbeFirstActivity = $this->buActivity->getFirstActivityInProblem($problemID);
+        $dbeFirstActivity = $this->buActivity->getFirstActivityInServiceRequest($problemID);
         $dbeProblem = new DBEProblem($this);
         $dbeProblem->getRow($problemID);
         $this->setTemplateFiles(
@@ -7296,7 +7296,7 @@ class CTActivity extends CTCNC
 
         $problemID = $dsCallActivity->getValue(DBEJCallActivity::problemID);
 
-        $dbeFirstActivity = $this->buActivity->getFirstActivityInProblem($problemID);
+        $dbeFirstActivity = $this->buActivity->getFirstActivityInServiceRequest($problemID);
 
         $this->setTemplateFiles(
             array(

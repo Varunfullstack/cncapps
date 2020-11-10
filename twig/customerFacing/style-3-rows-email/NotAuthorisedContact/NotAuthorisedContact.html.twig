@@ -1,10 +1,5 @@
 {% extends '@customerFacing/style-3-rows-email/style-3-rows.twig' %}
-{# @var string contacts #}
-{# @var string contactFirstName #}
-{# @var ContactInfo MaincontactFirstName   contactInfo.firstName contactInfo.lastName This is a list of contacts with supportlevel ['main', 'supervisor'], in this same order #}
-{# @var string MaincontactLastName #}
-{# @var string SupervisorcontactFirstName #}
-{# @var string SupervisorcontactLastName #}
+{# @var data \CNCLTD\TwigDTOs\NotAuthorisedContactDTO #}
 {% block headerTitle %}
     Information Notice
 {% endblock %}
@@ -14,7 +9,7 @@
 {% endblock %}
 
 {% block firstRow %}
-    <p>{{ contactFirstName }},</p>
+    <p>{{ data.contactFirstName }},</p>
     <p>
         We're sorry but you are not authorised to raise support directly with CNC and this request has not been logged.
     </p>
@@ -22,7 +17,7 @@
         Please ask one of the following people in your organisation to phone in on your behalf to progress your request.
     </p>
     <ul>
-        {% for contact in contacts %}
+        {% for contact in data.supportContacts %}
             <li>
                 {{ contact.firstName }} {{ contact.lastName }}
             </li>
@@ -40,7 +35,7 @@
 {% endblock %}
 
 {% block leftFooter %}
-<br><br>
+    <br><br>
 {% endblock %}
 
 {% block rightFooter %}

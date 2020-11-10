@@ -62,12 +62,13 @@ class DBEProblem extends DBEntity
     const projectTeamTimeAlertFlag = "projectTeamTimeAlertFlag";
     const raiseTypeId = "raiseTypeId";
     const salesRequestAssignedUserId = "salesRequestAssignedUserId";
-    const emailSubjectSummary="emailSubjectSummary";
-    const assetName="assetName";
-    const assetTitle="assetTitle";
-    const repeatProblem="repeatProblem";
-    const notFirstTimeFixReason="notFirstTimeFixReason";
-    const emptyAssetReason="emptyAssetReason";
+    const emailSubjectSummary = "emailSubjectSummary";
+    const assetName = "assetName";
+    const assetTitle = "assetTitle";
+    const repeatProblem = "repeatProblem";
+    const notFirstTimeFixReason = "notFirstTimeFixReason";
+    const emptyAssetReason = "emptyAssetReason";
+
     /**
      * calls constructor()
      * @access public
@@ -430,12 +431,23 @@ class DBEProblem extends DBEntity
             DA_TEXT,
             DA_ALLOW_NULL
         );
-        
+
         $this->setAddColumnsOff();
         $this->setPK(0);
         if ($pkID) {
             $this->getRow($pkID);
         }
+    }
+
+    public static function statusFromDB($dbValue)
+    {
+        $matches = [
+            "I" => "Logged",
+            "P" => "In Progress",
+            "F" => "Fixed",
+            "C" => "Closed"
+        ];
+        return $matches[$dbValue];
     }
 
     public function getManagementReviews($customerID,

@@ -64,9 +64,10 @@ class DBEJCallActivity extends DBECallActivity
     const hdPauseCount = "hdPauseCount";
     const allocatedUserID = "allocatedUserID";
     const queueNo = "queueNo";
-    const caaConsno="caa_consno";
-    const assetName="assetName";
-    const assetTitle="assetTitle";
+    const caaConsno = "caa_consno";
+    const assetName = "assetName";
+    const assetTitle = "assetTitle";
+    const emailSubjectSummary = "emailSubjectSummary";
 
     var $fromString;
 
@@ -270,6 +271,13 @@ class DBEJCallActivity extends DBECallActivity
             DA_ALLOW_NULL,
             "problem.pro_status"
         );
+        $this->addColumn(
+            self::emailSubjectSummary,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "problem.emailSubjectSummary"
+        );
+
         $this->addColumn(
             self::requestAwaitingCustomerResponseFlag,
             DA_STRING,

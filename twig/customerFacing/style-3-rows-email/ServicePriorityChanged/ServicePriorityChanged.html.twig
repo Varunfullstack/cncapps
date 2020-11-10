@@ -17,7 +17,8 @@
 {% block firstRow %}
     <p>{{ contactFirstName }},</p>
     <p>
-        Service request reference {{ serviceRequestId }} has been changed on our system from a priority {{ oldPriority }} to
+        Service request reference {{ serviceRequestId }} has been changed on our system from a
+        priority {{ oldPriority }} to
         a priority {{ newPriority }} request.
     </p>
     {% if (serviceRequestStatus == 'Initial') %}
@@ -28,7 +29,7 @@
 {% endblock %}
 
 {% block secondRow %}
-    {{lastActivityReason}}
+    {{ lastActivityReason }}
 {% endblock %}
 
 {% block thirdRow %}
