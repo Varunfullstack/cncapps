@@ -8,6 +8,7 @@ This project changes will be shown here.
 - Issue 1062 - Include email address in Microsoft 365 export
 ### Changed
 - Issue 1025 - Option to not notify Sales on Sales Request Approvals
+- Issue 1063 - Review Meeting Enhancements - Leavers & Contract Numbers
 ### Fixed
 - Issue 1068 - Unable to unhide an activity
 

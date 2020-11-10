@@ -271,6 +271,7 @@ class BUServiceDeskReport extends Business
         $sql =
             "SELECT
           CONCAT(con_first_name, ' ' , con_last_name) AS name,
+           contact.active,
              SUM(
     problem.pro_hide_from_customer_flag <> 'Y'
   ) AS count,

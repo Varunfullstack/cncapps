@@ -335,7 +335,7 @@ class CTCustomerReviewMeeting extends CTCNC
 
                 foreach ($itemTypes as $typeName => $itemTypeContainer) {
 
-                    $itemTypeHeader = '<tr><td colspan="3"><h3>' . $typeName . '</h3></td></tr>';
+                    $itemTypeHeader = '<tr><td colspan="4"><h3>' . $typeName . '</h3></td></tr>';
 
                     $nonEditableTemplate->set_var(
                         array(
@@ -349,6 +349,7 @@ class CTCustomerReviewMeeting extends CTCNC
                                 'description'        => "No Services provided",
                                 'notes'              => null,
                                 'salePrice'          => null,
+                                'quantity'           => null,
                                 'coveredItemsString' => null,
                                 'itemClass'          => null,
                                 'customerID'         => null,
@@ -387,6 +388,7 @@ class CTCustomerReviewMeeting extends CTCNC
                             }
                             $itemClass = 'externalItem';
                             $salePrice = null;
+
                             if (!is_null($item['customerItemID'])) {
                                 $formatter = new NumberFormatter('en_GB', NumberFormatter::CURRENCY);
                                 $itemClass = null;
@@ -399,6 +401,7 @@ class CTCustomerReviewMeeting extends CTCNC
                                     'notes'              => $item['notes'],
                                     'description'        => Controller::htmlDisplayText($item['description']),
                                     'salePrice'          => $salePrice,
+                                    'quantity'           => $item['units'] ? $item['units'] : "",
                                     'coveredItemsString' => $coveredItemsString,
                                     'itemClass'          => $itemClass,
                                     'customerID'         => $customerId,
@@ -547,10 +550,10 @@ class CTCustomerReviewMeeting extends CTCNC
                 );
 
                 while ($row = $srCountByUser->fetch_object()) {
-
+                    $inactiveMark = $row->active ? null : ' *';
                     $nonEditableTemplate->set_var(
                         array(
-                            'srUserName'    => $row->name,
+                            'srUserName'    => "{$row->name}{$inactiveMark}",
                             'srCount'       => $row->count,
                             'srHiddenCount' => $row->hiddenCount
                         )
@@ -838,11 +841,11 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
         $dsSupportContact->getRowsByCustomerID($customerId);
 
         $supportContacts = [
-            "main"       => [],
-            "supervisor" => [],
-            "support"    => [],
-            "delegate"   => [],
-            "no support level"   => []
+            "main"             => [],
+            "supervisor"       => [],
+            "support"          => [],
+            "delegate"         => [],
+            "no support level" => []
         ];
 
         $duplicates = [];
