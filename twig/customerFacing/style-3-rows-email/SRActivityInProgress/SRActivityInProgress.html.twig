@@ -19,24 +19,24 @@
     </p>
     <p>{{ contactFirstName }},</p>
     <p>We have carried out work on your service request reference
-        <a href="https://www.cnc-ltd.co.uk/view/?serviceid={{ activityRef }}">{{ activityRef }}</a>
+        <a href="https://www.cnc-ltd.co.uk/view/?serviceid={{ serviceRequestId }}">{{ serviceRequestId }}</a>
         as detailed below.
     </p>
 {% endblock %}
 {% block secondRow %}
     <h2>Details</h2>
-    <p class="singleBorder">{{ lastActivityReason }}</p>
+    <p class="singleBorder">{{ lastActivityCustomerSummary }}</p>
     <P>The technician responsible for this was {{ technicianResponsible }}. {{ extra }}</P>
 {% endblock %}
 {% block thirdRow %}
     Best Regards
 {% endblock %}
 {% block serviceRequestURL %}
-    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{activityRef}}
+    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ serviceRequestId }}
 {% endblock %}
 {% block footerStatus %}
-    Fixed
+    {{ status }}
 {% endblock %}
 {% block feedbackURL %}
-    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{activityRef}}
+    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ serviceRequestId }}
 {% endblock %}

@@ -1315,7 +1315,8 @@ class BUActivity extends Business
                 $subjectSuffix = 'Priority Changed';
                 break;
             case self::WorkUpdatesActivityLogged:
-                $templateName = 'ActivityLoggedCustomerEmail';
+//                $dbeJProblem->getValue(DBEProblem::sta)
+                $templateName = '@customerFacing/style-3-rows-email/SRActivityInProgress/SRActivityInProgress.html.twig';
                 if ($dbeCallActType->getValue(DBEJCallActType::customerEmailFlag) != 'Y') {
                     return;
                 }
@@ -1359,15 +1360,8 @@ class BUActivity extends Business
         if (empty($emails)) {
             return;                     // no email recipients so abort
         }
+        global $twig;
 
-        $template = new Template(
-            EMAIL_TEMPLATE_DIR,
-            "remove"
-        );
-        $template->set_file(
-            'page',
-            $templateName . '.inc.html'
-        );
 
         $technicianResponsibleName = $dbeJProblem->getValue(DBEJProblem::engineerName);
         $activityReason = $dbeLastActivity->getValue(DBEJCallActivity::reason);
@@ -1379,42 +1373,29 @@ class BUActivity extends Business
             $activityReason = $dbeCallActivity->getValue(DBECallActivity::reason);
         }
 
-        $template->setVar(
-            array(
-                'contactFirstName'      => $contact->getValue(DBEContact::firstName),
-                'activityRef'           => $problemID,
-                'CONFIG_SERVICE_REQUEST_DESC'
-                                        => CONFIG_SERVICE_REQUEST_DESC,
-                'priority'              => $this->priorityArray[$dbeJProblem->getValue(DBEJProblem::priority)],
-                'reason'                => $dbeFirstActivity->getValue(DBEJCallActivity::reason),
-                'lastActivityReason'    => $activityReason,
-                'responseDetails'       => $responseDetails,
-                'technicianResponsible' => $technicianResponsibleName
-            )
-        );
+        $context = [
 
-        foreach ($fields as $key => $value) {
+            'contactFirstName'      => $contact->getValue(DBEContact::firstName),
+            'activityRef'           => $problemID,
+            'CONFIG_SERVICE_REQUEST_DESC'
+                                    => CONFIG_SERVICE_REQUEST_DESC,
+            'priority'              => $this->priorityArray[$dbeJProblem->getValue(DBEJProblem::priority)],
+            'reason'                => $dbeFirstActivity->getValue(DBEJCallActivity::reason),
+            'lastActivityReason'    => $activityReason,
+            'responseDetails'       => $responseDetails,
+            'technicianResponsible' => $technicianResponsibleName
+        ];
 
-            $template->setVar(
-                $key,
-                $value
-            );
-
-        }
-
-        $template->parse(
-            'output',
-            'page',
-            true
-        );
-
-        $body = $template->get_var('output');
+        $context = array_merge($context, $fields);
+        $body = $twig->render($templateName, $context);
 
         $subject = CONFIG_SERVICE_REQUEST_DESC . ' ' . $problemID;
 
         if ($subjectSuffix) {
             $subject .= ' - ' . $subjectSuffix;
         }
+
+        $subject .= $dbeJProblem->getValue(DBEProblem::emailSubjectSummary);
 
         $hdrs = array(
             'From'         => $senderEmail,
@@ -1635,9 +1616,9 @@ class BUActivity extends Business
     function updateCallActivity($dsCallActivity
     )
     {
-        $priorityChangeReason=$dsCallActivity->getValue("priorityChangeReason");
-        if(isset($priorityChangeReason)&&$priorityChangeReason!='')
-        $priorityChangeReason='<br/>Reason: '.$priorityChangeReason;
+        $priorityChangeReason = $dsCallActivity->getValue("priorityChangeReason");
+        if (isset($priorityChangeReason) && $priorityChangeReason != '')
+            $priorityChangeReason = '<br/>Reason: ' . $priorityChangeReason;
         $this->setMethodName('updateCallActivity');
         $dbeCallActivity = new DBECallActivity($this);
         $oldEndTime = null; // new activity
@@ -1767,7 +1748,7 @@ class BUActivity extends Business
         );
 
         $problem->setValue(
-            DBEJProblem::emptyAssetReason,            
+            DBEJProblem::emptyAssetReason,
             $dsCallActivity->getValue(DBEProblem::emptyAssetReason)
         );
 
@@ -1794,12 +1775,12 @@ class BUActivity extends Business
             DBEJProblem::workingHoursCalculatedToTime,
             null
         );
-         $problem->setValue(
+        $problem->setValue(
             DBEJProblem::assetName,
             $dsCallActivity->getValue(DBEJCallActivity::assetName)
 
         );
-         $problem->setValue(
+        $problem->setValue(
             DBEJProblem::assetTitle,
             $dsCallActivity->getValue(DBEJCallActivity::assetTitle)
 
@@ -1887,13 +1868,13 @@ class BUActivity extends Business
         //         self::WorkUpdatesCustomerEmailCategory,
         //         self::WorkUpdatesPriorityChanged
         //     );
-           
+
         //     $this->logOperationalActivity(
         //         $dsCallActivity->getValue(DBEJCallActivity::problemID),
-        //         'Priority Changed from ' . $oldPriority . ' to ' . $problem->getValue(DBEJProblem::priority).
+        //         'Priority Changed from ' . $oldPriority . ' to ' . $problem->getValue(DBEJProblem::priority) .
         //         $priorityChangeReason
         //     );
-        // } else 
+        // } else
         {
             if ((!isset($oldReason) || (isset($oldReason) && $oldReason != $newReason)) && $dsCallActivity->getValue(
                     DBEJCallActivity::endTime
@@ -2000,21 +1981,21 @@ class BUActivity extends Business
             );
             $problem->setValue(DBEProblem::priority,$priority);
             $problem->updateRow();
-            
+
             $this->sendEmailToCustomer(
                 $problemID,
                 self::WorkUpdatesCustomerEmailCategory,
                 self::WorkUpdatesPriorityChanged
             );
-           
+
             $this->logOperationalActivity(
                 $problemID,
                 'Priority Changed from ' . $oldPriority . ' to ' . $problem->getValue(DBEJProblem::priority).
                 $reason
             );
-            return true;    
+            return true;
         }
-        return false;        
+        return false;
     }
     private function sendMonitoringEmails($callActivityID)
     {
@@ -5667,7 +5648,7 @@ is currently a balance of ';
         $dbeCallActivity = new DBECallActivity($this);
         $dsCallActivity = new DataSet($this);
         $dsCallActivity->copyColumnsFrom($dbeCallActivity);
-        $dsCallActivity->setNull(DBECallActivity::callActivityID, DA_ALLOW_NULL);         
+        $dsCallActivity->setNull(DBECallActivity::callActivityID, DA_ALLOW_NULL);
         $dateTimeRaised = $_SESSION [$sessionKey] ['dateRaised'] . ' ' . $_SESSION [$sessionKey] ['timeRaised'] . ':00';
 
         $slaResponseHours = $this->getSlaResponseHours(
@@ -5901,6 +5882,34 @@ is currently a balance of ';
 
         return $dsCallActivity;
     }
+
+    public function toggleMonitoringFlag($problemID)
+    {
+        global $db;
+        $userID = $this->loggedInUserID;
+        if (!self::checkMonitoringFlag($problemID)) {
+            //we need to enable it
+            $db->query("insert into problem_monitoring(problemId, cons_no) values ($problemID, $userID)");
+            return;
+        }
+
+        //we need to disable it
+        $db->query("delete from problem_monitoring where problemId = $problemID and cons_no = $userID");
+    }
+
+    public function checkMonitoringFlag($problemID)
+    {
+        global $db;
+
+        $userID = $this->loggedInUserID;
+
+        $sql = "SELECT * FROM problem_monitoring WHERE problemId = $problemID and cons_no = $userID";
+
+
+        $db->query($sql);
+        return !!$db->num_rows();
+    }
+
     /**
      * @param $body json data
      * @return DataSet
@@ -5913,7 +5922,7 @@ is currently a balance of ';
         $dsCallActivity->copyColumnsFrom($dbeCallActivity);
         $dsCallActivity->setNull(DBECallActivity::callActivityID, DA_ALLOW_NULL);
 
-        $dateTimeRaised = $body->dateRaised. ' ' . $body->timeRaised . ':00';
+        $dateTimeRaised = $body->dateRaised . ' ' . $body->timeRaised . ':00';
 
         $slaResponseHours = $this->getSlaResponseHours(
             $body->priority,
@@ -5962,12 +5971,12 @@ is currently a balance of ';
 
         $dbeProblem->setValue(
             DBEProblem::rootCauseID,
-            $body->rootCauseID??null
+            $body->rootCauseID ?? null
         );
 
         $dbeProblem->setValue(
             DBEProblem::authorisedBy,
-            $body->authorisedBy??null
+            $body->authorisedBy ?? null
         );
 
         $dbeProblem->setValue(
@@ -5979,10 +5988,10 @@ is currently a balance of ';
             DBEProblem::slaResponseHours,
             $slaResponseHours
         );
- 
+
         $dbeProblem->setValue(
             DBEProblem::queueNo,
-            $body->queueNo??1
+            $body->queueNo ?? 1
         ); // initial queue number
 
         $dbeProblem->setValue(
@@ -5991,12 +6000,12 @@ is currently a balance of ';
         );
         $dbeProblem->setValue(
             DBEProblem::hideFromCustomerFlag,
-            $body->hideFromCustomerFlag?'Y':'N'
+            $body->hideFromCustomerFlag ? 'Y' : 'N'
         );
 
         $dbeProblem->setValue(
             DBEProblem::criticalFlag,
-            $body->criticalSRFlag?'Y':'N' 
+            $body->criticalSRFlag ? 'Y' : 'N'
         );
 
         $dbeProblem->setValue(
@@ -6009,37 +6018,37 @@ is currently a balance of ';
         );
         $dbeProblem->setValue(
             DBEProblem::contractCustomerItemID,
-            $body->contractCustomerItemID??null
+            $body->contractCustomerItemID ?? null
         );
         $dbeProblem->setValue(
             DBEProblem::projectID,
-            $body->projectID??null
+            $body->projectID ?? null
         );
         $dbeProblem->setValue(
             DBEProblem::emailSubjectSummary,
-            $body->emailSubjectSummary??null
+            $body->emailSubjectSummary ?? null
         );
         $dbeProblem->setValue(
             DBEProblem::assetName,
-            $body->assetName??null
+            $body->assetName ?? null
         );
         $dbeProblem->setValue(
             DBEProblem::assetTitle,
-            $body->assetTitle??null
+            $body->assetTitle ?? null
         );
         $dbeProblem->setValue(
             DBEProblem::repeatProblem,
-            $body->repeatProblem?1:0
+            $body->repeatProblem ? 1 : 0
         );
-        if(isset($body->notFirstTimeFixReason))
-        $dbeProblem->setValue(
-            DBEProblem::notFirstTimeFixReason,
-            $body->notFirstTimeFixReason
-        );
+        if (isset($body->notFirstTimeFixReason))
+            $dbeProblem->setValue(
+                DBEProblem::notFirstTimeFixReason,
+                $body->notFirstTimeFixReason
+            );
 
         $dbeProblem->insertRow();
 
-        if ($body->monitorSRFlag ) {
+        if ($body->monitorSRFlag) {
             $this->toggleMonitoringFlag($dbeProblem->getPKValue());
         }
 
@@ -6063,7 +6072,7 @@ is currently a balance of ';
         );
         $dsCallActivity->setValue(
             DBEJCallActivity::callActTypeID,
-            $body->callActTypeID??null
+            $body->callActTypeID ?? null
         );
         $dsCallActivity->setValue(
             DBEJCallActivity::problemID,
@@ -6093,15 +6102,15 @@ is currently a balance of ';
             DBEJCallActivity::reason,
             $body->reason
         );
-        
+
         $dsCallActivity->setValue(
             DBEJCallActivity::serverGuard,
-            $body->serverGuard??null
+            $body->serverGuard ?? null
         );
 
         $dsCallActivity->setValue(
             DBEJCallActivity::curValue,
-            $body->curValue??null
+            $body->curValue ?? null
         );
         $dsCallActivity->setValue(
             DBEJCallActivity::statementYearMonth,
@@ -6159,33 +6168,6 @@ is currently a balance of ';
             $this->sendSpecialAttentionEmail($dbeCallActivity->getPKValue());
         }
         return $dsCallActivity;
-    }
-
-    public function toggleMonitoringFlag($problemID)
-    {
-        global $db;
-        $userID = $this->loggedInUserID;
-        if (!self::checkMonitoringFlag($problemID)) {
-            //we need to enable it
-            $db->query("insert into problem_monitoring(problemId, cons_no) values ($problemID, $userID)");
-            return;
-        }
-
-        //we need to disable it
-        $db->query("delete from problem_monitoring where problemId = $problemID and cons_no = $userID");
-    }
-
-    public function checkMonitoringFlag($problemID)
-    {
-        global $db;
-
-        $userID = $this->loggedInUserID;
-
-        $sql = "SELECT * FROM problem_monitoring WHERE problemId = $problemID and cons_no = $userID";
-
-
-        $db->query($sql);
-        return !!$db->num_rows();
     }
 
     function sendServiceReAddedEmail($newProblemID,
@@ -6799,12 +6781,13 @@ is currently a balance of ';
         return 'ALL_GOOD';
 
     }
-/**
+
+    /**
      * @param DataSet $dsCallActivity
      * @param CTCNC $ctActivity
      * @return bool
      */
-    function checkActivityEditionByProblem($dsCallActivity,$ctActivity,$dbeProblem)
+    function checkActivityEditionByProblem($dsCallActivity, $ctActivity, $dbeProblem)
     {
         if ($dsCallActivity->getValue(DBECallActivity::overtimeExportedFlag) == 'Y' && !$ctActivity->getDbeUser(
             )->isApprover()) {
@@ -6820,6 +6803,7 @@ is currently a balance of ';
         return 'ALL_GOOD';
 
     }
+
     function finaliseActivity(
         $callActivityID,
         $onSite = false
@@ -7158,12 +7142,13 @@ is currently a balance of ';
 
         $dsResults->replicate($dsAssignedResults);
     }
-/**
+
+    /**
      * @param $queueNo
      * @param DataSet $dsResults
      */
     function getProblemsByQueueNoWithFuture($queueNo,
-                                  &$dsResults
+                                            &$dsResults
     )
     {
         $dbeJProblem = new DBEJProblem($this);
@@ -12440,14 +12425,15 @@ FROM
 
         $dbeCallActivity->insertRow();
     }
- /**
+
+    /**
      * Get problems by status
      *
      * @param mixed $status
      * @param mixed $dsResults
      * @param bool $includeAutomaticallyFixed
      */
-    function getCustomerOpenSR($customerID,&$dsResults)
+    function getCustomerOpenSR($customerID, &$dsResults)
     {
         $dbeJProblem = new DBEJProblem($this);
         $dbeJProblem->getCustomerOpenRows($customerID);
