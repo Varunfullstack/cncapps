@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v4.12.0] - 2020-11-10
 ### Added
 - Issue 906 - Sales Order Permissions for Non Sales People
 - Issue 1065 - Include Costs in Contract Renewals Page
