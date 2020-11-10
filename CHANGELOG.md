@@ -4,6 +4,8 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 906 - Sales Order Permissions for Non Sales People
+### Fixed
+- Issue 1068 - Unable to unhide an activity
 
 ## [v4.11.2] - 2020-11-09
 ### Changed

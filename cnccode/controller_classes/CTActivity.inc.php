@@ -4969,6 +4969,14 @@ class CTActivity extends CTCNC
         $previousEndTime = $this->dsCallActivity->getValue(DBECallActivity::endTime);
         $this->formError = (!$this->dsCallActivity->populateFromArray($this->getParam('callActivity')));
 
+        if (!isset($this->getParam('callActivity')[1][DBECallActivity::hideFromCustomerFlag])) {
+            $this->dsCallActivity->setValue(DBECallActivity::hideFromCustomerFlag, 'N');
+        }
+
+        if (!isset($this->getParam('callActivity')[1][DBECallActivity::submitAsOvertime])) {
+            $this->dsCallActivity->setValue(DBECallActivity::submitAsOvertime, false);
+        }
+
         $this->dsCallActivity->setUpdateModeUpdate();
         // these names must not be part of an html array as the fckeditor does not work
         $this->dsCallActivity->setValue(
