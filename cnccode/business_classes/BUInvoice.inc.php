@@ -1311,11 +1311,8 @@ class BUInvoice extends Business
             $buHeader->getHeader($dsHeader);
 
             while ($dsContact->fetchNext()) {
-                $contactFullName = $dsContact->getValue(DBEContact::firstName) . ' ' . $dsContact->getValue(
-                        DBEContact::lastName
-                    );
                 $directDebitInvoiceEmailDTO = new DirectDebitInvoiceDTO(
-                    $contactFullName,
+                    $dsContact->getValue(DBEContact::firstName),
                     $dsCustomer->getValue(DBECustomer::name),
                     $dsSite->getValue(DBESite::add1),
                     $dsSite->getValue(DBESite::town),
