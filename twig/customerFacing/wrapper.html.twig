@@ -47,6 +47,22 @@ Sizes: [
             font-size: 10pt;
         }
 
+        .textContent {
+            color: #7A7A7A;
+        }
+
+        .details {
+            background-color: #FFFFFF;
+            border-radius: 10px;
+            padding: 10px;
+            color: #3C3C3C;
+        }
+
+        .details p {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+
         body, .bodyTable, #bodyCell, #bodyCell {
             height: 100% !important;
             margin: 0;
@@ -132,19 +148,11 @@ Sizes: [
 
         /* ========== Page Styles ========== */
         h1 {
-            /*display: block;*/
             font-size: 20pt;
-            /*font-style: normal;*/
-            /*font-weight: normal;*/
-            /*line-height: 100%;*/
         }
 
         h2 {
             font-size: 12pt;
-            /*display: block;*/
-            /*font-style: normal;*/
-            /*font-weight: normal;*/
-            /*line-height: 120%;*/
         }
 
         h2.headerContent {
@@ -993,13 +1001,9 @@ Sizes: [
                                                                             {% block leftFooter %}
                                                                                 Click
                                                                                 <a
-                                                                                        href="
-																		{% block serviceRequestURL %}
-																		{% endblock %}
-																		"
+                                                                                        href="{%- block serviceRequestURL %}{% endblock %}"
                                                                                 >here</a>
                                                                                 to see more details on our portal
-
                                                                             {% endblock %}
                                                                         </td>
                                                                     </tr>
@@ -1077,7 +1081,7 @@ Sizes: [
                 style="padding-top: 10px"
             >
                 Sent from Computer & Network Consultants Ltd. Please click
-                <a href=" http://www.cnc-ltd.co.uk/email-disclaimer">here</a> for our email disclaimer.
+                <a href="https://www.cnc-ltd.co.uk/email-disclaimer">here</a> for our email disclaimer.
             </td>
         </tr>
 

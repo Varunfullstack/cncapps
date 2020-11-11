@@ -1,8 +1,5 @@
 {% extends '@customerFacing/wrapper.html.twig' %}
-{# @var integer serviceRequestId #}
-{# @var string firstActivityReason #}
-{# @var string lastActivityReason #}
-{# @var string contactFirstName #}
+{# @var data \CNCLTD\TwigDTOs\ServiceRequestFixedDTO #}
 {% block headerTitle %}
     Service Request Information
 {% endblock %}
@@ -12,28 +9,37 @@
 {% endblock %}
 
 {% block content %}
-    <p>{{ contactFirstName }},</p>
+    <p>{{ data.contactFirstName }}</p>
     <p>This has now been marked as fixed on our system and a summary of the original request and resolution are detailed
         below:
     </p>
 
     <p>Original Request:</p>
+    <table style="width: 100%">
+        <tr>
+            <td class="details">
+                {{ data.firstActivityReason | raw }}
+            </td>
+        </tr>
+    </table>
     <p>
-        {{ firstActivityReason | raw }}
+        Resolution Summary:f
     </p>
+    <table style="width: 100%">
+        <tr>
+            <td class="details">
+                {{ data.lastActivityReason | raw }}
+            </td>
+        </tr>
+    </table>
     <p>
-        Resolution Summary:
+        If you believe that this is not resolved, simply reply to this email with your explanation and we will
+        investigate further before re-opening. Best Regards
     </p>
-    <p>
-        {{ lastActivityReason | raw }}
-    </p>
-
-
-    If you believe that this is not resolved, simply reply to this email with your explanation and we will investigate further before re-opening.   Best Regards
 {% endblock %}
 
 {% block serviceRequestURL %}
-    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ serviceRequestId }}
+    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ data.serviceRequestId }}
 {% endblock %}
 
 {% block footerStatus %}

@@ -1794,6 +1794,7 @@ class BUActivity extends Business
         $othersFlag = DBEContact::othersWorkUpdatesEmailFlag;
         $this->sendCustomerEmail($template, $data, $dbejCallactivity, $selfFlag, $othersFlag, $subject);
     }
+
     private function sendMonitoringEmails($callActivityID)
     {
         $buMail = new BUMail($this);
@@ -5749,6 +5750,7 @@ is currently a balance of ';
             $isLoggedOutsideServiceDeskTimeLimits,
             $hasServiceDesk,
             $has24HourSupport,
+            $raisedAutomatically
         );
 
 
@@ -5831,7 +5833,7 @@ is currently a balance of ';
 
         $dbeProblem->setValue(
             DBEProblem::status,
-            'I'
+            $body->startWork ? 'P' : 'I'
         );
 
         $dbeProblem->setValue(
@@ -8398,7 +8400,7 @@ FROM
             false
         );
         $buMail->sendEmailWithAttachments(
-        $body,
+            $body,
             $subject,
             $primaryMainContactDS->getValue(DBEContact::email),
             $attachments
@@ -9917,7 +9919,7 @@ FROM
         $buCustomer = new BUCustomer($this);
         $cc = $buCustomer->getMainSupportEmailAddresses(
             $dsCallActivity->getValue(DBEJCallActivity::customerID),
-            $toEmail
+            $contactEmail
         );
         $recipientsArray = array_merge($recipientsArray, $cc);
         $recipients = implode(",", $recipientsArray);

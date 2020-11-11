@@ -1,5 +1,6 @@
 {% extends '@customerFacing/wrapper.html.twig' %}
 {# @var data \CNCLTD\TwigDTOs\ServiceRequestLoggedDTO #}
+
 {% block headerTitle %}
     Service Request Information
 {% endblock %}
@@ -9,17 +10,23 @@
 {% endblock %}
 
 {% block content %}
-    <p>{{ data.contactFirstName }},</p>
+    <p>{{ data.contactFirstName }}</p>
     <p> A new service request has been logged with our ServiceDesk under reference {{ data.serviceRequestId }} and it
         will
         help
         if you could please refer to it in all related communications with us.
     </p>
-    <p>Details: {{ data.reason |raw }}</p>
-
+    <p>Details: </p>
+    <table style="width: 100%">
+        <tr>
+            <td class="details">
+                {{ data.reason |raw }}
+            </td>
+        </tr>
+    </table>
     <p>
         Priority: {{ data.priority }} -
-        {% if data.serviceRequestStatus == 'Initial' %}
+        {% if data.serviceRequestStatus == 'Logged' %}
             We will aim to respond to this request within {{ data.SLA }} working hours.
             However, we may adjust the priority of this request if necessary and will inform you if we do.
         {% else %}
@@ -27,7 +34,7 @@
         {% endif %}
     </p>
 
-    {% if data.serviceRequestStatus == 'Initial' %}
+    {% if data.raisedAutomatically %}
         <p>
             {% if not data.isLoggedOutOfHours %}
                 This request has been submitted to the relevant team who will contact you to arrange any and all appropriate
@@ -45,9 +52,7 @@
     {% endif %}
 {% endblock %}
 
-{% block serviceRequestURL %}
-    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ data.serviceRequestId }}
-{% endblock %}
+{% block serviceRequestURL %}https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ data.serviceRequestId }}{% endblock %}
 
 {% block footerStatus %}
     {{ data.serviceRequestStatus }}

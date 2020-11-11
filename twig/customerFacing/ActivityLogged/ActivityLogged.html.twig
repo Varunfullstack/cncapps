@@ -9,14 +9,18 @@
 {% endblock %}
 
 {% block content %}
-    <p>{{ data.contactFirstName }},</p>
+    <p>{{ data.contactFirstName }}</p>
     <p>
         We have worked on your service request reference {{ data.serviceRequestId }} and have an update for you. A more
         detailed update is available in our portal but here's the short version.
     </p>
-    <p>
-        {{ data.lastActivityCustomerNotes | raw }}
-    </p>
+    <table style="width: 100%">
+        <tr>
+            <td class="details">
+                {{ data.lastActivityCustomerNotes | raw }}
+            </td>
+        </tr>
+    </table>
     <p>
         This update was added by {{ data.engineerFullName }}
     </p>

@@ -16,6 +16,8 @@ class ServiceRequestLoggedDTO
     public $isLoggedOutOfHours;
     public $hasServiceDesk;
     public $support24;
+    public $raisedAutomatically;
+
 
     /**
      * ServiceRequestLogged constructor.
@@ -28,6 +30,7 @@ class ServiceRequestLoggedDTO
      * @param $isLoggedOutOfHours
      * @param $hasServiceDesk
      * @param $support24
+     * @param $raisedAutomatically
      */
     public function __construct($serviceRequestId,
                                 $contactFirstName,
@@ -37,7 +40,8 @@ class ServiceRequestLoggedDTO
                                 $SLA,
                                 $isLoggedOutOfHours,
                                 $hasServiceDesk,
-                                $support24
+                                $support24,
+                                $raisedAutomatically
     )
     {
         $this->serviceRequestId = $serviceRequestId;
@@ -49,6 +53,7 @@ class ServiceRequestLoggedDTO
         $this->isLoggedOutOfHours = $isLoggedOutOfHours;
         $this->hasServiceDesk = $hasServiceDesk;
         $this->support24 = $support24;
+        $this->raisedAutomatically = $raisedAutomatically;
     }
 
 

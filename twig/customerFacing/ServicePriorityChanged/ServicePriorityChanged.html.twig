@@ -1,11 +1,5 @@
 {% extends '@customerFacing/wrapper.html.twig' %}
-{# @var integer serviceRequestId #}
-{# @var string lastActivityReason #}
-{# @var string contactFirstName #}
-{# @var integer oldPriority #}
-{# @var integer newPriority #}
-{# @var float SLA #}
-{# @var string serviceRequestStatus  the status of the request "Initial"|"In Progress"|"On Hold" #}
+{# @var data \CNCLTD\TwigDTOs\PriorityChangedDTO #}
 {% block headerTitle %}
     Service Request Information
 {% endblock %}
@@ -15,29 +9,32 @@
 {% endblock %}
 
 {% block content %}
-    <p>{{ contactFirstName }},</p>
+    <p>{{ data.contactFirstName }},</p>
     <p>
-        Service request reference {{ serviceRequestId }} has been changed on our system from a
-        priority {{ oldPriority }} to
-        a priority {{ newPriority }} request.
+        Service request reference {{ data.serviceRequestId }} has been changed on our system from a
+        priority {{ data.oldPriority }} to
+        a priority {{ data.newPriority }} request.
     </p>
-    {% if (serviceRequestStatus == 'Initial') %}
+    {% if (data.serviceRequestStatus == 'Logged') %}
         <p>
-            We will aim to respond to this request within {{ SLA }} working hours.
+            We will aim to respond to this request within {{ data.SLA }} working hours.
         </p>
     {% endif %}
-
-    {{ lastActivityReason }}
-
-
+    <table style="width: 100%">
+        <tr>
+            <td class="details">
+                {{ data.lastActivityReason|raw }}
+            </td>
+        </tr>
+    </table>
 {% endblock %}
 
 {% block serviceRequestURL %}
-    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ serviceRequestId }}
+    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ data.serviceRequestId }}
 {% endblock %}
 
 {% block footerStatus %}
-    {{ serviceRequestStatus }}
+    {{ data.serviceRequestStatus }}
 {% endblock %}
 
 {% block feedback %}

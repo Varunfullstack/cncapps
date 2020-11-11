@@ -690,41 +690,16 @@ class CTRenewalReport extends CTCNC
 
 
         if ($response && $response->http == 202) {
-            $buMail = new BUMail($this);
-
-            $hdrs = array(
-                'From'         => 'support@cnc-ltd.co.uk',
-                'To'           => $email,
-                'Subject'      => "CNC Contracts and Terms & Conditions to be signed",
-                'Date'         => date("r"),
-                'Content-Type' => 'text/html; charset=UTF-8'
-            );
 
             global $twig;
-
+            $subject = "CNC Contracts and Terms & Conditions to be signed";
             $body = $twig->render(
                 '@customerFacing/RenewalContractsToBeSigned/RenewalContractsToBeSigned.html.twig',
                 ["contactFirstName" => $firstName]
             );
 
-            $buMail->mime->setHTMLBody($body);
-
-            $mime_params = array(
-                'text_encoding' => '7bit',
-                'text_charset'  => 'UTF-8',
-                'html_charset'  => 'UTF-8',
-                'head_charset'  => 'UTF-8'
-            );
-
-            $body = $buMail->mime->get($mime_params);
-
-            $hdrs = $buMail->mime->headers($hdrs);
-
-            $buMail->send(
-                $email,
-                $hdrs,
-                $body
-            );
+            $buMail = new BUMail($this);
+            $buMail->sendSimpleEmail($body, $subject, $email);
 
             $dbeCustomer = new DBECustomer($this);
             $dbeCustomer->getRow($customerID);
