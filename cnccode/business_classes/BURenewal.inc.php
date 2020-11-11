@@ -4,7 +4,11 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
-global $cfg;
+global
+
+use CNCLTD\Exceptions\ContactNotFoundException;
+
+$cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BURenBroadband.inc.php");
 require_once($cfg["path_bu"] . "/BURenContract.inc.php");
@@ -123,27 +127,18 @@ class BURenewal extends Business
         $buMail = new BUMail($this);
 
         $toEmail = $dsCustomer->getValue(DBECustomer::sendContractEmail);
+        $dbeContact = new DBEContact($this);
+        $dbeContact->setValue(DBEContact::email, $toEmail);
+        $dbeContact->getRowByColumn(DBEContact::email);
 
-        $senderEmail = CONFIG_SALES_EMAIL;
-        $senderName = 'CNC Sales';
-        $subject = 'Renewal Contracts';
+        if (!$dbeContact->fetchNext()) {
+            return;
+        }
+        $contactFirstName = $dbeContact->getValue(DBEContact::firstName);
 
+        $subject = 'CNC Renewal Contracts';
 
-        $hdrs = array(
-            'From'         => $senderName . " <" . $senderEmail . ">",
-            'To'           => $toEmail,
-            'Subject'      => $subject,
-            'Content-Type' => 'text/html; charset=UTF-8'
-        );
-
-        $template = new Template (
-            EMAIL_TEMPLATE_DIR,
-            "remove"
-        );
-        $template->set_file(
-            'page',
-            'RenewalScheduleEmail.inc.html'
-        );
+        global $twig;
 
         $this->dbeJContract->getRowsByCustomerID($dsCustomer->getValue(DBECustomer::customerID), null);
         $dsRenewal = new DataSet($this);
@@ -153,42 +148,26 @@ class BURenewal extends Business
         );
 
         $renewalCount = 0;
-
+        $attachments = new \CNCLTD\Email\AttachmentCollection();
         while ($dsRenewal->fetchNext()) {
             if ($dsRenewal->getValue(DBEJContract::renewalTypeID) != CONFIG_QUOTATION_RENEWAL_TYPE_ID) {
                 $pdfFile = $this->getRenewalAsPdfString($dsRenewal->getValue(DBEJContract::customerItemID));
-                $buMail->mime->addAttachment(
+                $attachments->add(
                     $pdfFile,
                     'Application/pdf',
-                    $dsRenewal->getValue(DBEJContract::itemDescription) . '.pdf'
+                    $dsRenewal->getValue(DBEJContract::itemDescription) . '.pdf',
+                    false
                 );
                 $renewalCount++;
             }
         }
 
         if ($renewalCount > 0) {
-
-            $template->parse(
-                'output',
-                'page',
-                true
+            $body = $twig->render(
+                '@customerFacing/style-3-rows-email/RenewalSchedule/RenewalSchedule.html.twig',
+                ["contactFirstName" => $contactFirstName]
             );
-            $buMail->mime->setHTMLBody($template->get_var('output'));
-            $mime_params = array(
-                'text_encoding' => '7bit',
-                'text_charset'  => 'UTF-8',
-                'html_charset'  => 'UTF-8',
-                'head_charset'  => 'UTF-8'
-            );
-            $body = $buMail->mime->get($mime_params);
-            $hdrs = $buMail->mime->headers($hdrs);
-
-            $buMail->putInQueue(
-                $senderEmail,
-                $toEmail,
-                $hdrs,
-                $body
-            );
+            $buMail->sendEmailWithAttachments($body, $subject, $toEmail, $attachments, CONFIG_SALES_EMAIL);
         }
 
     }
@@ -244,8 +223,7 @@ class BURenewal extends Business
         );
 
         while ($dsCustomer->fetchNext()) {
-
-            $this->sendTandcEmailToCustomer($dsCustomer);
+            $this->sendTermsAndConditionsEmailToContact($dsCustomer);
 
             $this->dbeCustomer->getRow($dsCustomer->getValue(DBECustomer::customerID));
             $this->dbeCustomer->setValue(
@@ -253,66 +231,42 @@ class BURenewal extends Business
                 null
             );
             $this->dbeCustomer->updateRow();
-
         }
     }
 
     /**
-     * @param DataSet|DBECustomer $dsCustomer
+     * @param $contactId
+     * @throws ContactNotFoundException
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
      */
-    function sendTandcEmailToCustomer($dsCustomer)
+    function sendTermsAndConditionsEmailToContact($contactId)
     {
-        /*
-        Start new email
-        */
-        $buMail = new BUMail($this);
 
-        $toEmail = $dsCustomer->getValue(DBECustomer::sendTandcEmail);
+        $dbeContact = new DBEContact($this);
+        if (!$dbeContact->getRow($contactId)) {
+            throw new ContactNotFoundException();
+        }
+        $recipient = $dbeContact->getValue(DBEContact::email);
+        $dbeCustomer = new DBECustomer($this);
+        $dbeCustomer->getRow($dbeContact->getValue(DBEContact::customerID));
 
-        $senderEmail = CONFIG_SALES_EMAIL;
-        $senderName = 'CNC Sales';
-        $subject = 'Accepted Terms & Conditions - ' . $dsCustomer->getValue(DBECustomer::name);
-
-
-        $hdrs = array(
-            'From'         => $senderName . " <" . $senderEmail . ">",
-            'To'           => $toEmail,
-            'Subject'      => $subject,
-            'Content-Type' => 'text/html; charset=UTF-8'
-        );
-
-        $template = new Template (
-            EMAIL_TEMPLATE_DIR,
-            "remove"
-        );
-        $template->set_file(
-            'page',
-            'TermsAndConditionsEmail.inc.html'
-        );
-
-        $template->parse(
-            'output',
-            'page',
+        $subject = "Accepted Terms & Conditions - {$dbeCustomer->getValue(DBECustomer::name)}";
+        $attachments = new \CNCLTD\Email\AttachmentCollection();
+        $attachments->add(
+            PDF_RESOURCE_DIR . '/Terms & Conditions.pdf',
+            'Application/pdf',
+            'Terms & Conditions.pdf',
             true
         );
-        $buMail->mime->setHTMLBody($template->get_var('output'));
-        $mime_params = array(
-            'text_encoding' => '7bit',
-            'text_charset'  => 'UTF-8',
-            'html_charset'  => 'UTF-8',
-            'head_charset'  => 'UTF-8'
+        global $twig;
+        $body = $twig->render(
+            '@customerFacing/style-3-rows-email/TermsAndConditions/TermsAndConditions.html.twig',
+            ["contactFirstName" => $dbeContact->getValue(DBEContact::firstName)]
         );
-        $body = $buMail->mime->get($mime_params);
-        $hdrs = $buMail->mime->headers($hdrs);
-
-        $buMail->putInQueue(
-            $senderEmail,
-            $toEmail,
-            $hdrs,
-            $body
-        );
-
-
+        $buMail = new BUMail($this);
+        $buMail->sendEmailWithAttachments($body, $subject, $recipient, $attachments, CONFIG_SALES_EMAIL);
     }
 
     function addCustomerAcceptedDocumentsToEmail($customerID,

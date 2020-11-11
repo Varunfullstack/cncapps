@@ -134,7 +134,7 @@ class BUMail extends Business
 
     }
 
-    function sendSimpleEmail($body, $subject, $recipients, $fromEmail = CONFIG_SUPPORT_EMAIL)
+    function sendSimpleEmail($body, $subject, $recipients, $fromEmail = CONFIG_SUPPORT_EMAIL, $cc = null)
     {
         $hdrs = array(
             'From'         => $fromEmail,
@@ -143,6 +143,9 @@ class BUMail extends Business
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
+        if ($cc) {
+            $hdrs['Cc'] = $cc;
+        }
 
         $mime = new Mail_mime();
 

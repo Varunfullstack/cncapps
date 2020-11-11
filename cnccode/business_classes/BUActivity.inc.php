@@ -10,6 +10,7 @@
 
 use CNCLTD\AutomatedRequest;
 use CNCLTD\SolarwindsAccountItem;
+use CNCLTD\TwigDTOs\SiteVisitDTO;
 
 global $cfg;
 require_once($cfg ["path_gc"] . "/Business.inc.php");
@@ -9861,14 +9862,7 @@ FROM
     {
         $buMail = new BUMail($this);
 
-        $template = new Template(
-            EMAIL_TEMPLATE_DIR,
-            "remove"
-        );
-        $template->set_file(
-            'page',
-            'SiteVisitEmail.inc.html'
-        );
+        global $twig;
         $dsCallActivity = new DataSet($this);
         $this->getActivityByID(
             $callActivityID,
@@ -9883,107 +9877,55 @@ FROM
             $dsCallActivity->getValue(DBEJCallActivity::siteNo),
             $dsSite
         );
-        $buCustomer = new BUCustomer($this);
+        $dbeProblem = new DBEProblem($this);
+        $serviceRequestId = $dsCallActivity->getValue(DBEJCallActivity::problemID);
+        $dbeProblem->getRow($serviceRequestId);
+        $emailSubjectToAppend = $dbeProblem->getValue(DBEProblem::emailSubjectSummary);
+        $contactEmail = $dsCallActivity->getValue(DBEJCallActivity::contactEmail);
+        $recipientsArray = [
+            $contactEmail
+        ];
 
-        $callRef = $dsCallActivity->getValue(DBEJCallActivity::problemID);
-
-        $senderEmail = CONFIG_SUPPORT_EMAIL;
-        $senderName = 'CNC Support Department';
-
-        $toEmail = $dsCallActivity->getValue(DBEJCallActivity::contactEmail);
+        $visitActivityTimeOfTheDay = 'afternoon';
 
         if ($dsCallActivity->getValue(DBEJCallActivity::startTime) < '12:00') {
-            $amOrPM = 'morning';
-//            $startHHMM = '0900';
-//            $endHHMM = '1200';
-        } else {
-            $amOrPM = 'afternoon';
-//            $startHHMM = '1200';
-//            $endHHMM = '1700';
+            $visitActivityTimeOfTheDay = 'morning';
         }
-
-        $template->set_var(
-            array(
-                'scrRef'           => $callRef,
-                'userName'         => $dsCallActivity->getValue(DBEJCallActivity::userName),
-                'contactEmail'     => $toEmail,
-                'senderEmail'      => $senderEmail,
-                'senderName'       => $senderName,
-                'contactFirstName' => $dsCallActivity->getValue(DBEJCallActivity::contactFirstName),
-                'contactPhone'     => $buCustomer->getContactPhone(
-                    $dsCallActivity->getValue(DBEJCallActivity::contactID)
-                ),
-                'date'             => Controller::dateYMDtoDMY($dsCallActivity->getValue(DBEJCallActivity::date)),
-                'amOrPM'           => $amOrPM,
-                'startTime'        => $dsCallActivity->getValue(DBEJCallActivity::startTime),
-                'reason'           => trim($dsCallActivity->getValue(DBEJCallActivity::reason)),
-                'add1'             => $dsSite->getValue(DBESite::add1),
-                'add2'             => $dsSite->getValue(DBESite::add2),
-                'add3'             => $dsSite->getValue(DBESite::add3),
-                'town'             => $dsSite->getValue(DBESite::town),
-                'county'           => $dsSite->getValue(DBESite::county),
-                'postcode'         => $dsSite->getValue(DBESite::postcode)
-            )
+        $data = new SiteVisitDTO(
+            $dsCallActivity->getValue(DBEJCallActivity::contactFirstName),
+            $dsCallActivity->getValue(DBEJCallActivity::userName),
+            $dsSite->getValue(DBESite::add1),
+            $dsSite->getValue(DBESite::add2),
+            $dsSite->getValue(DBESite::add3),
+            $dsSite->getValue(DBESite::town),
+            $dsSite->getValue(DBESite::postcode),
+            Controller::dateYMDtoDMY($dsCallActivity->getValue(DBEJCallActivity::date)),
+            $visitActivityTimeOfTheDay,
+            trim($dsCallActivity->getValue(DBEJCallActivity::reason)),
+            $serviceRequestId,
         );
-        $template->parse(
-            'output',
-            'page',
-            true
-        );
-        $body = $template->get_var('output');
 
 
-        // cc to main customer support contact
+        $bcc = [
+            $dsCallActivity->getValue(DBEJCallActivity::userAccount) . '@cnc-ltd.co.uk',
+            CONFIG_SALES_EMAIL,
+            "VisitConfirmation@cnc-ltd.co.uk"
+        ];
+
+        $recipientsArray = array_merge($recipientsArray, $bcc);
+
         $buCustomer = new BUCustomer($this);
-
-        $cc = false;
-
-        if (
-        $mainSupportEmailAddresses =
-            $buCustomer->getMainSupportEmailAddresses(
-                $dsCallActivity->getValue(DBEJCallActivity::customerID),
-                $toEmail
-            )
-        ) {
-            $cc = $mainSupportEmailAddresses;
-        }
-
-        $buMail->mime->setHTMLBody($body);
-
-        $mime_params = array(
-            'text_encoding' => '7bit',
-            'text_charset'  => 'UTF-8',
-            'html_charset'  => 'UTF-8',
-            'head_charset'  => 'UTF-8'
+        $cc = $buCustomer->getMainSupportEmailAddresses(
+            $dsCallActivity->getValue(DBEJCallActivity::customerID),
+            $toEmail
         );
-        $body = $buMail->mime->get($mime_params);
+        $recipientsArray = array_merge($recipientsArray, $cc);
+        $recipients = implode(",", $recipientsArray);
 
-        $bcc = $dsCallActivity->getValue(DBEJCallActivity::userAccount) . '@cnc-ltd.co.uk' . ',' .
-            CONFIG_SALES_EMAIL . ',' . "VisitConfirmation@cnc-ltd.co.uk";
+        $subject = "On-Site Visit Confirmation for Service Request {$serviceRequestId} {$emailSubjectToAppend}";
+        $body = $twig->render('@customerFacing/style-3-rows-email/SiteVisit/SiteVisit.html.twig', ["data" => $data]);
 
-        $recipients = $toEmail . ',' . $bcc . ',' . $cc;
-
-        $hdrs = array(
-            'From'         => $senderEmail,
-            'To'           => $toEmail,
-            'Subject'      => 'On-Site Visit Confirmation for Service Request ' . $callRef,
-            'Date'         => date("r"),
-            'Content-Type' => 'text/html; charset=UTF-8'
-        );
-
-        if ($cc) {
-            $hdrs['Cc'] = $cc;
-        }
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
-        $buMail->putInQueue(
-            $senderEmail,
-            $recipients,
-            $hdrs,
-            $body
-        );
-
+        $buMail->sendSimpleEmail($body, $subject, $recipients, CONFIG_SUPPORT_EMAIL, $cc);
     }
 
     /**

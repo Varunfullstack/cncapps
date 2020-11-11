@@ -14,6 +14,7 @@ global $cfg;
 require_once($cfg["path_dbe"] . "/DBEQuotation.inc.php");
 require_once($cfg["path_dbe"] . "/DBESignableEnvelope.inc.php");
 require_once($cfg["path_bu"] . "/BUSalesOrder.inc.php");
+require_once($cfg["path_bu"] . "/BURenewal.inc.php");
 
 $container = new \DI\Container();
 \Slim\Factory\AppFactory::setContainer($container);
@@ -587,6 +588,22 @@ WHERE
                 } catch (\Exception $exception) {
                     throw new Exception('Failed operation');
                 }
+            }
+        );
+        $group->post(
+            '/termsAndConditionsRequest',
+            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response, $args) {
+                $requestBody = $request->getParsedBody();
+
+                if(!isset($requestBody['contactId'])){
+                    $response->getBody()->write(
+                        json_encode(["error" => "ContactId missing"])
+                    );
+                    return $response->withStatus(400);
+                }
+
+                $buRenewal = new BURenewal($thing);
+                $buRenewal->sendTermsAndConditionsEmailToContact($contactId);
             }
         );
         $group->get(

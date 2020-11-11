@@ -5,6 +5,9 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 global $cfg;
+
+use CNCLTD\TwigDTOs\SalesInvoiceEmailDTO;
+
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/DBEInvhead.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJInvhead.inc.php");
@@ -194,27 +197,6 @@ class BUInvoice extends Business
 
         return ($this->getData(
             $this->dbeJInvhead,
-            $dsResults
-        ));
-    }
-
-    function getInvoiceLines($invheadID,
-                             &$dsResults
-    )
-    {
-        $this->setMethodName('getInvoiceLines');
-        if (!$invheadID) {
-            $this->raiseError('invheadID not passed');
-        }
-        $this->dbeJInvline->setValue(
-            DBEJInvline::invheadID,
-            $invheadID
-        );
-        $this->dbeJInvline->getRowsByColumn(
-            DBEJInvline::invheadID
-        );
-        return ($this->getData(
-            $this->dbeJInvline,
             $dsResults
         ));
     }
@@ -759,27 +741,6 @@ class BUInvoice extends Business
             $dbeJInvhead,
             $dsInvhead
         ));
-    }
-
-    function getLinesByID($invheadID,
-                          &$dsInvline
-    )
-    {
-        $this->setMethodName('getLinesByID');
-        if (!$invheadID) {
-            $this->raiseError('invheadID not passed');
-        }
-        $dbeJInvline = new DBEJInvline($this);
-        $dbeJInvline->setValue(
-            DBEJInvline::invheadID,
-            $invheadID
-        );
-        $dbeJInvline->getRowsByColumn(DBEJInvline::invheadID);
-        $this->getData(
-            $dbeJInvline,
-            $dsInvline
-        );
-        return TRUE;
     }
 
     /**
@@ -1591,10 +1552,10 @@ class BUInvoice extends Business
      *
      * One email per customer. Email body contains summary.
      *
-     * @param string $dateToUse
+     * @param string|null $dateToUse
      * @return int
      */
-    function printUnprintedInvoices($dateToUse)
+    function printUnprintedInvoices(?string $dateToUse)
     {
 
         if (!$dateToUse) {
@@ -1608,116 +1569,37 @@ class BUInvoice extends Business
         $this->getUnprintedInvoices($dsInvhead);
 
         $invoiceCount = 0;
-
-        $lastCustomerID = -1;
-
-        $senderEmail = CONFIG_SALES_EMAIL;
-        $senderName = 'CNC Sales';
-        $subject = 'Sales Invoice(s)';
-
+        $subject = 'CNC Sales Invoice(s)';
         $invoiceNumbers = array();
-        /** @var Template $template */
-        $template = null;
-        $totalValue = 0;
+
         /** @var BUMail $buMail */
         $buMail = null;
-        $hdrs = [];
-        $toEmail = null;
-        while ($dsInvhead->fetchNext()) {
 
+        /** @var SalesInvoiceEmailDTO[] $invoiceEmails */
+        $invoiceEmails = [];
+        while ($dsInvhead->fetchNext()) {
             $invoiceCount++;
 
-            if ($dsInvhead->getValue(DBEInvhead::customerID) != $lastCustomerID) {
+            $customerId = $dsInvhead->getValue(DBEInvhead::customerID);
+            if (!key_exists($customerId, $invoiceEmails)) {
+                $invoiceEmails[$customerId] = new SalesInvoiceEmailDTO();
 
-                if ($lastCustomerID != -1) {
-
-                    // send email when customer changes
-                    $template->setVar(
-                        array(
-                            'totalValue' => common_numberFormat($totalValue)
-                        )
-                    );
-
-                    $template->parse(
-                        'output',
-                        'page',
-                        true
-                    );
-
-                    $buMail->mime->setHTMLBody($template->get_var('output'));
-                    $mime_params = array(
-                        'text_encoding' => '7bit',
-                        'text_charset'  => 'UTF-8',
-                        'html_charset'  => 'UTF-8',
-                        'head_charset'  => 'UTF-8'
-                    );
-                    $body = $buMail->mime->get($mime_params);
-                    $hdrs = $buMail->mime->headers($hdrs);
-
-                    $buMail->putInQueue(
-                        $senderEmail,
-                        $toEmail,
-                        $hdrs,
-                        $body
-                    );
-
-                }
-                /*
-                * Start new customer email
-                */
-                $buMail = new BUMail($this);
-
-                $totalValue = 0;
                 $dsContact = new DataSet($this);
                 $buCustomer->getInvoiceContactsByCustomerID(
-                    $dsInvhead->getValue(DBEInvhead::customerID),
+                    $customerId,
                     $dsContact
                 );
 
-                $invoiceContactEmailList = '';
-
                 while ($dsContact->fetchNext()) {
-
-                    if ($invoiceContactEmailList) {
-                        $invoiceContactEmailList .= ',';
-                    }
-
-                    $invoiceContactEmailList .= $dsContact->getValue(DBEContact::email);
-
+                    $invoiceEmails[$customerId]->addEmail($dsContact->getValue(DBEContact::email));
                 }
-
-                $toEmail = $invoiceContactEmailList;
-
-                $hdrs = array(
-                    'From'    => $senderName . " <" . $senderEmail . ">",
-                    'To'      => $toEmail,
-                    'Subject' => $subject
-                );
-
-                $template = new Template (
-                    EMAIL_TEMPLATE_DIR,
-                    "remove"
-                );
-
-
-                $template->set_file(
-                    'page',
-                    'SalesInvoiceEmail.inc.html'
-                );
-
-                $template->set_block(
-                    'page',
-                    'invoiceBlock',
-                    'invoices'
-                );
-
-
             }
-            $lastCustomerID = $dsInvhead->getValue(DBEInvhead::customerID);
 
-            $dbeInvhead->getRow($dsInvhead->getValue(DBEInvhead::invheadID));
-
-            $invoiceNumbers[] = $dsInvhead->getValue(DBEInvhead::invheadID);
+            $invoiceId = $dsInvhead->getValue(DBEInvhead::invheadID);
+            $dbeInvhead->getRow($invoiceId);
+            $invoiceNumbers[] = $invoiceId;
+            $invoiceTotal = $this->getInvoiceTotal($invoiceId);
+            $invoiceEmails[$customerId]->addInvoice($invoiceId, $invoiceTotal);
 
             /*
             * generate PDF Invoice
@@ -1742,127 +1624,106 @@ class BUInvoice extends Business
                     $fileSize
                 )
             );
-
             $dbeInvhead->setValue(
                 DBEInvhead::datePrinted,
                 $dateToUse
             );
 
             $dbeInvhead->updateRow();
-
             unset($buPdfInvoice);
-            /*
-            Attach invoice to email
-            */
-            $fileName = $dsInvhead->getValue(DBEInvhead::invheadID) . '.pdf';
-
-            $buMail->mime->addAttachment(
-                $pdfFileName,
-                'Application/pdf',
-                $fileName
-            );
-
-            unlink($pdfFileName); // delete temp file
-            /*
-            Add line to email body
-            */
-            $invoiceValue = $this->getInvoiceValue($dsInvhead->getValue(DBEInvhead::invheadID));
-
-            $totalValue += $invoiceValue;
-
-            $template->setVar(
-                array(
-                    'invheadID'    => $dsInvhead->getValue(DBEInvhead::invheadID),
-                    'paymentTerms' => $dsInvhead->getValue(DBEInvhead::paymentTermsID),
-                    'value'        => common_numberFormat($invoiceValue)
-                )
-            );
-
-            $template->parse(
-                'invoices',
-                'invoiceBlock',
-                true
-            );
-
+            $fileName = $invoiceId . '.pdf';
+            $invoiceEmails[$customerId]->addPDFInvoiceAttachment($pdfFileName, $fileName);
         }
-        /**
-         * finish last one
-         *
-         */
+
         if ($invoiceCount) {
-            $template->setVar(
-                array(
-                    'totalValue' => common_numberFormat($totalValue)
-                )
-            );
+            global $twig;
 
-            $template->parse(
-                'output',
-                'page',
-                true
-            );
-            $buMail->mime->setHTMLBody($template->get_var('output'));
-            $mime_params = array(
-                'text_encoding' => '7bit',
-                'text_charset'  => 'UTF-8',
-                'html_charset'  => 'UTF-8',
-                'head_charset'  => 'UTF-8'
-            );
-            $body = $buMail->mime->get($mime_params);
-            $hdrs = $buMail->mime->headers($hdrs);
+            foreach ($invoiceEmails as $invoiceEmail) {
+                $body = $twig->render(
+                    '@customerFacing/style-3-rows-email/SalesInvoice/SalesInvoice.html.twig',
+                    ["data" => $invoiceEmail]
+                );
 
-            $buMail->putInQueue(
-                $senderEmail,
-                $toEmail,
-                $hdrs,
-                $body
-            );
+                $buMail->sendEmailWithAttachments(
+                    $body,
+                    $subject,
+                    $invoiceEmail->getEmails(),
+                    $invoiceEmail->getAttachments(),
+                    CONFIG_SALES_EMAIL
+                );
+            }
         }
-
-        $this->buSageExport->generateSageSalesDataByInvoiceNumbers($invoiceNumbers);
-
-        $toEmail = CONFIG_SALES_MANAGER_EMAIL;
-
-        $senderEmail = CONFIG_SALES_EMAIL;
-        $senderName = 'CNC Sales';
-        $subject = 'Sage Import Files';
-
-        $buMail = new BUMail($this);
-        $hdrs = array(
-            'From'    => $senderName . " <" . $senderEmail . ">",
-            'To'      => $toEmail,
-            'Subject' => $subject
-        );
-        $buMail->mime->setTXTBody('Sage import files from invoice run attached.');
-        $fileName = SAGE_EXPORT_DIR . '/sales.csv';
-        $buMail->mime->addAttachment(
-            $fileName,
-            'Text/csv',
-            'sales.csv'
-        );
-        $fileName = SAGE_EXPORT_DIR . '/trans.csv';
-        $buMail->mime->addAttachment(
-            $fileName,
-            'Text/csv',
-            'trans.csv'
-        );
-        $mime_params = array(
-            'text_encoding' => '7bit',
-            'text_charset'  => 'UTF-8',
-            'html_charset'  => 'UTF-8',
-            'head_charset'  => 'UTF-8'
-        );
-        $body = $buMail->mime->get($mime_params);
-        $hdrs = $buMail->mime->headers($hdrs);
-
-        $buMail->putInQueue(
-            $senderEmail,
-            $toEmail,
-            $hdrs,
-            $body
-        );
+        $this->sendSageSalesEmail($invoiceNumbers);
         return $invoiceCount;
 
+    }
+
+    private function getInvoiceTotal(?int $invoiceId)
+    {
+        /** @var DBEInvline $linesDataSet */
+        $linesDataSet = new DataSet($this);
+        $this->getInvoiceLines($invoiceId, $linesDataSet);
+        $total = 0;
+        while ($linesDataSet->fetchNext()) {
+            $total += $linesDataSet->getValue(DBEInvline::curUnitSale) * $linesDataSet->getValue(DBEInvline::qty);
+        }
+        return $total;
+    }
+
+    function getInvoiceLines($invheadID,
+                             &$dsResults
+    )
+    {
+        $this->setMethodName('getInvoiceLines');
+        if (!$invheadID) {
+            $this->raiseError('invheadID not passed');
+        }
+        $this->dbeJInvline->setValue(
+            DBEJInvline::invheadID,
+            $invheadID
+        );
+        $this->dbeJInvline->getRowsByColumn(
+            DBEJInvline::invheadID
+        );
+        return ($this->getData(
+            $this->dbeJInvline,
+            $dsResults
+        ));
+    }
+
+    /**
+     * @param array $invoiceNumbers
+     */
+    private function sendSageSalesEmail(array $invoiceNumbers): void
+    {
+        $buMail = new BUMail($this);
+        $this->buSageExport->generateSageSalesDataByInvoiceNumbers($invoiceNumbers);
+        $subject = 'Sage Import Files';
+        $attachments = new \CNCLTD\Email\AttachmentCollection();
+
+        $fileName = SAGE_EXPORT_DIR . '/sales.csv';
+        $attachments->add(
+            $fileName,
+            'Text/csv',
+            'sales.csv',
+            true
+        );
+
+        $fileName = SAGE_EXPORT_DIR . '/trans.csv';
+        $attachments->add(
+            $fileName,
+            'Text/csv',
+            'trans.csv',
+            true
+        );
+
+        $buMail->sendEmailWithAttachments(
+            'Sage import files from invoice run attached.',
+            $subject,
+            CONFIG_SALES_MANAGER_EMAIL,
+            $attachments,
+            CONFIG_SALES_EMAIL
+        );
     }
 
     function trialPrintUnprintedInvoices($dateToUse,

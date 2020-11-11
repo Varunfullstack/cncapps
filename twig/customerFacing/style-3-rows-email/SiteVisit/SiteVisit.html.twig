@@ -1,19 +1,5 @@
 {% extends '@customerFacing/style-3-rows-email/style-3-rows.twig' %}
-{# @var integer serviceRequestId #}
-{# @var string contactFirstName #}
-{# @var string engineerFullName This is the full name of the engineer that will visit #}
-{# @var Site site
-    site.add1 address of the site
-    site.add2 address of the site
-    site.add3 address of the site
-    site.town address of the site
-    site.postcode address of the site
-#}
-{# @var VisitActivity visitActivity
-    visitActivity.date          activity date with DD/MM/YYYY
-    visitActivity.timeOfTheDay  am or pm
-    visitActivity.reason        as the details of the visit
-#}
+{# @var data CNCLTD\TwigDTOs\SiteVisitDTO #}
 {% block headerTitle %}
     Site Visit Information
 {% endblock %}
@@ -23,15 +9,15 @@
 {% endblock %}
 
 {% block firstRow %}
-    <p>{{ contactFirstName }},</p>
+    <p>{{ data.contactFirstName }}</p>
     <p>
-        We are pleased to confirm that {{ engineerFullName }} will visit your site
-        at {{ site.add1 }} {{ site.add2 }} {{ site.add3 }} {{ site.town }}
-        {{ site.postcode }} on
-        {{ visitActivity.date }} in the {{ visitActivity.timeOfTheDay }}.
+        We are pleased to confirm that {{ data.engineerFullName }} will visit your site
+        at {{ data.siteAdd1 }} {{ data.siteAdd2 }} {{ data.siteAdd3 }} {{ data.siteTown }}
+        {{ data.sitePostcode }} on
+        {{ data.visitActivityDate }} in the {{ data.visitActivityTimeOfTheDay }}.
     </p>
     <p>
-        {{ visitActivity.reason }}
+        {{ data.visitActivityReason }}
     </p>
     <p>
         If there are any problems keeping this appointment then please contact our ServiceDesk to rearrange.
@@ -47,7 +33,7 @@
 {% endblock %}
 
 {% block serviceRequestURL %}
-    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ serviceRequestId }}
+    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ data.serviceRequestId }}
 {% endblock %}
 
 {% block footerStatus %}

@@ -1,12 +1,5 @@
 {% extends '@customerFacing/style-3-rows-email/style-3-rows.twig' %}
-{# @var string contactFirstName #}
-{# @var InvoiceItem[] invoices
-invoice.id integer   The invoice ID
-invoice.amount    float     The amount of the invoice
-#}
-{# @var float totalAmount #}
-
-
+{# @var data \CNCLTD\TwigDTOs\SalesInvoiceEmailDTO #}
 {% block styles %}
 
     table.salesInvoice td {
@@ -23,7 +16,6 @@ invoice.amount    float     The amount of the invoice
 {% endblock %}
 
 {% block firstRow %}
-    <p>{{ contactFirstName }},</p>
     <p>Please find attached the following invoice(s) for your attention: </p>
 {% endblock %}
 
@@ -31,10 +23,10 @@ invoice.amount    float     The amount of the invoice
     <table class="salesInvoice">
         <tbody>
         <tr>
-            <td>Invoice </td>
+            <td>Invoice</td>
             <td>Amount £(ex VAT)</td>
         </tr>
-        {% for invoice in invoices %}
+        {% for invoice in data.invoices %}
             <tr>
                 <td>{{ invoice.id }}</td>
                 <td>{{ invoice.amount | format_currency('GBP',{fraction_digit:2}) }}</td>
@@ -42,7 +34,7 @@ invoice.amount    float     The amount of the invoice
         {% endfor %}
         <tr>
             <td>Total</td>
-            <td>{{ totalAmount | format_currency('GBP',{fraction_digit:2}) }}</td>
+            <td>{{ data.totalAmount | format_currency('GBP',{fraction_digit:2}) }}</td>
         </tr>
         </tbody>
     </table>

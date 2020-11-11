@@ -1036,7 +1036,7 @@ class BUCustomer extends Business
      * @parameter DataSet &$dsResults results
      * @param $customerID
      * @param $excludeEmail
-     * @return bool : Success
+     * @return array : Success
      * @access public
      */
     function getMainSupportEmailAddresses($customerID,
@@ -1051,34 +1051,20 @@ class BUCustomer extends Business
 
         $this->dbeContact->getMainSupportRowsByCustomerID($customerID);
 
-        $emailList = false;
+        $emailList = [];
 
         while ($this->dbeContact->fetchNext()) {
-
-            // exclude excluded or duplicated emails
-            if (
-                ($this->dbeContact->getValue(DBEContact::email) != $excludeEmail)
-                and
-                (strpos(
-                        $this->dbeContact->getValue(DBEContact::email),
-                        $emailList
-                    ) == FALSE)
-            ) {
-                $emailList .= $this->dbeContact->getValue(DBEContact::email) . ',';
+            $currentContactEmail = strtolower($this->dbeContact->getValue(DBEContact::email));
+            if ($currentContactEmail === strtolower($excludeEmail)) {
+                continue;
             }
 
+            if (array_key_exists($currentContactEmail, $emailList)) {
+                continue;
+            }
+            $emailList[$currentContactEmail] = $currentContactEmail;
         }
-
-        if ($emailList) {
-            return substr(
-                $emailList,
-                0,
-                -1
-            );            // remove trailing comma
-        } else {
-            return false;
-        }
-
+        return $emailList;
     }
 
     /**

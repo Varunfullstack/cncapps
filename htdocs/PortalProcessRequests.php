@@ -6,6 +6,7 @@
  */
 
 require_once("config.inc.php");
+global $cfg;
 require_once($cfg["path_bu"] . "/BURenewal.inc.php");
 $thing = null;
 $buRenewal = new BURenewal($thing);
