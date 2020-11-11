@@ -275,42 +275,18 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
         $dbeContact->getReviewContactsByCustomerID($customerID);
 
         $buMail = new BUMail($this);
-
-        $fromEmail = 'support@cnc-ltd.co.uk';
+        $body = $twig->render($template);
+        $subject = "CNC Review Meeting Documents";
+        $recipientsArray = [];
         while ($dbeContact->fetchNext()) {
-
-            $toEmail = $dbeContact->getValue(DBEContact::email);
-
-            $hdrs = array(
-                'From'         => $this->dbeUser->getValue(DBEUser::username) . '@cnc-ltd.co.uk',
-                'To'           => $toEmail,
-                'Subject'      => "CNC Review Meeting Documents",
-                'Date'         => date("r"),
-                'Content-Type' => 'text/html; charset=UTF-8'
-            );
-            $buMail->mime->setHTMLBody(
-                $twig->render($template)
-            );
-
-            $mime_params = array(
-                'text_encoding' => '7bit',
-                'text_charset'  => 'UTF-8',
-                'html_charset'  => 'UTF-8',
-                'head_charset'  => 'UTF-8'
-            );
-
-            $body = $buMail->mime->get($mime_params);
-
-            $hdrs = $buMail->mime->headers($hdrs);
-
-            $buMail->putInQueue(
-                $fromEmail,
-                $toEmail,
-                $hdrs,
-                $body
-            );
-
+            $recipientsArray[] = $dbeContact->getValue(DBEContact::email);
         }
+        $buMail->sendSimpleEmail(
+            $body,
+            $subject,
+            implode(",", $recipientsArray),
+            "{$this->dbeUser->getValue(DBEUser::username)}@cnc-ltd.co.uk"
+        );
     }
 
     /**

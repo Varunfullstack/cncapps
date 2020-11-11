@@ -4,11 +4,11 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
-global
+global $cfg;
 
 use CNCLTD\Exceptions\ContactNotFoundException;
 
-$cfg;
+
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BURenBroadband.inc.php");
 require_once($cfg["path_bu"] . "/BURenContract.inc.php");
@@ -106,7 +106,7 @@ class BURenewal extends Business
             $dsCustomer
         );
         while ($dsCustomer->fetchNext()) {
-            $this->sendRenewalEmailToCustomer($dsCustomer);
+            $this->sendRenewalEmailToContact($dsCustomer);
             $this->dbeCustomer->getRow($dsCustomer->getValue(DBECustomer::customerID));
             $this->dbeCustomer->setValue(
                 DBECustomer::sendContractEmail,
@@ -117,30 +117,24 @@ class BURenewal extends Business
     }
 
     /**
-     * @param DataSet|DBECustomer $dsCustomer
+     * @param $contactId
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
      */
-    function sendRenewalEmailToCustomer($dsCustomer)
+    function sendRenewalEmailToContact($contactId)
     {
-        /*
-        Start new email
-        */
-        $buMail = new BUMail($this);
-
-        $toEmail = $dsCustomer->getValue(DBECustomer::sendContractEmail);
         $dbeContact = new DBEContact($this);
-        $dbeContact->setValue(DBEContact::email, $toEmail);
-        $dbeContact->getRowByColumn(DBEContact::email);
-
-        if (!$dbeContact->fetchNext()) {
-            return;
+        if (!$dbeContact->getRow($contactId)) {
+            throw new ContactNotFoundException();
         }
+        $toEmail = $dbeContact->getValue(DBEContact::email);
         $contactFirstName = $dbeContact->getValue(DBEContact::firstName);
-
         $subject = 'CNC Renewal Contracts';
 
         global $twig;
 
-        $this->dbeJContract->getRowsByCustomerID($dsCustomer->getValue(DBECustomer::customerID), null);
+        $this->dbeJContract->getRowsByCustomerID($dbeContact->getValue(DBEContact::customerID), null);
         $dsRenewal = new DataSet($this);
         $this->getData(
             $this->dbeJContract,
@@ -162,14 +156,12 @@ class BURenewal extends Business
             }
         }
 
-        if ($renewalCount > 0) {
-            $body = $twig->render(
-                '@customerFacing/style-3-rows-email/RenewalSchedule/RenewalSchedule.html.twig',
-                ["contactFirstName" => $contactFirstName]
-            );
-            $buMail->sendEmailWithAttachments($body, $subject, $toEmail, $attachments, CONFIG_SALES_EMAIL);
-        }
-
+        $body = $twig->render(
+            '@customerFacing/style-3-rows-email/RenewalSchedule/RenewalSchedule.html.twig',
+            ["contactFirstName" => $contactFirstName, "hasRenewals" => $renewalCount > 0]
+        );
+        $buMail = new BUMail($this);
+        $buMail->sendEmailWithAttachments($body, $subject, $toEmail, $attachments, CONFIG_SALES_EMAIL);
     }
 
     function getRenewalAsPdfString($customerItemID)

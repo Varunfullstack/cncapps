@@ -592,10 +592,10 @@ WHERE
         );
         $group->post(
             '/termsAndConditionsRequest',
-            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response, $args) {
+            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
                 $requestBody = $request->getParsedBody();
 
-                if(!isset($requestBody['contactId'])){
+                if (!isset($requestBody['contactId'])) {
                     $response->getBody()->write(
                         json_encode(["error" => "ContactId missing"])
                     );
@@ -603,7 +603,41 @@ WHERE
                 }
 
                 $buRenewal = new BURenewal($thing);
-                $buRenewal->sendTermsAndConditionsEmailToContact($contactId);
+                try {
+                    $buRenewal->sendTermsAndConditionsEmailToContact($requestBody['contactId']);
+                    $response->getBody()->write(json_encode(["status" => "ok"]));
+                    return $response;
+                } catch (\CNCLTD\Exceptions\ContactNotFoundException $exception) {
+                    $response->getBody()->write(
+                        json_encode(["status" => "error", "error" => "Contact not found!"])
+                    );
+                    return $response->withStatus(400);
+                }
+            }
+        );
+        $group->post(
+            '/renewalsRequest',
+            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
+                $requestBody = $request->getParsedBody();
+
+                if (!isset($requestBody['contactId'])) {
+                    $response->getBody()->write(
+                        json_encode(["error" => "ContactId missing"])
+                    );
+                    return $response->withStatus(400);
+                }
+
+                $buRenewal = new BURenewal($thing);
+                try {
+                    $buRenewal->sendRenewalEmailToContact($requestBody['contactId']);
+                    $response->getBody()->write(json_encode(["status" => "ok"]));
+                    return $response;
+                } catch (\CNCLTD\Exceptions\ContactNotFoundException $exception) {
+                    $response->getBody()->write(
+                        json_encode(["status" => "error", "error" => "Contact not found!"])
+                    );
+                    return $response->withStatus(400);
+                }
             }
         );
         $group->get(

@@ -1,15 +1,5 @@
 {% extends '@customerFacing/wrapper.html.twig' %}
-{# @var string contactName #}
-{# @var string companyName #}
-{# @var string addressLine1 #}
-{# @var string town #}
-{# @var string county #}
-{# @var string postCode #}
-{# @var string date #}
-{# @var string contactName #}
-{# @var string invoiceNo #}
-{# @var string paymentDate #}
-{# @var string totalAmount #}
+{# @var data CNCLTD\TwigDTOs\DirectDebitInvoiceDTO #}
 
 {% block headerTitle %}
     Billing Notice
@@ -24,7 +14,7 @@
         <tbody>
         <tr>
             <td>
-                {{contactName}}
+                {{ data.contactName }}
             </td>
             <td style="text-align: right">
                 Computer & Network Consultants Ltd
@@ -32,7 +22,7 @@
         </tr>
         <tr>
             <td>
-                {{companyName}}
+                {{ data.companyName }}
             </td>
             <td style="text-align: right">
                 CNC Ltd
@@ -40,7 +30,7 @@
         </tr>
         <tr>
             <td>
-                {{addressLine1}}
+                {{ data.addressLine1 }}
             </td>
             <td style="text-align: right">
                 Lady Bee Enterprise Centre
@@ -48,7 +38,7 @@
         </tr>
         <tr>
             <td>
-                {{town}}
+                {{ data.town }}
             </td>
             <td style="text-align: right">
                 Albion Street
@@ -56,7 +46,7 @@
         </tr>
         <tr>
             <td>
-                {{county}}
+                {{ data.county }}
             </td>
             <td style="text-align: right">
                 Southwick
@@ -64,7 +54,7 @@
         </tr>
         <tr>
             <td>
-                {{postCode}}
+                {{ data.postCode }}
             </td>
             <td style="text-align: right">
                 Brighton
@@ -72,16 +62,15 @@
         </tr>
         <tr>
             <td>
-                Date: {{date}}
+                Date:{{ data.date }}
             </td>
             <td style="text-align: right"
-            >BN42 4BW</td>
+            >BN42 4BW
+            </td>
         </tr>
         </tbody>
     </table>
-
-
-    <p> Dear {{contactName}}</p>
+    <p> Dear{{ data.contactName }}</p>
     <p>
         We are writing to advise you that we will be collecting the following payment by Direct Debit on or just after
         the advised date.
@@ -100,15 +89,15 @@
         </tr>
         <tr>
             <td> Reference:</td>
-            <td> {{invoiceNo}}</td>
+            <td>{{ data.invoiceNo }}</td>
         </tr>
         <tr>
             <td> Payment Date:</td>
-            <td> {{paymentDate}}</td>
+            <td>{{ data.paymentDate }}</td>
         </tr>
         <tr>
             <td> Amount:</td>
-            <td> £{{totalAmount}}</td>
+            <td> {{ data.totalAmount | format_currency('GBP',{fraction_digit:2}) }}</td>
         </tr>
         </tbody>
     </table>

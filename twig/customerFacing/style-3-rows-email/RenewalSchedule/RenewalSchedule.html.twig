@@ -13,15 +13,19 @@
 {% endblock %}
 
 {% block firstRow %}
-    <p>
-    <span style="color: #a6a6a6">
 
-    </span>
-    </p>
-    <p>{{ contactFirstName }},</p>
-    <p>Please find attached all your contract schedules as requested. If you have any questions please do not hesitate
-        to contact us.
-    </p>
+    <p>{{ contactFirstName }}</p>
+    {% if hasRenewals %}
+        <p>
+            Please find attached all your contract schedules as requested. If you have any questions please do not
+            hesitate to contact us.
+        </p>
+    {% else %}
+        <p>
+            You've requested renewal information from our portal but you don't have any at this time. If you believe
+            this is incorrect please contact sales@cnc-ltd.co.uk.
+        </p>
+    {% endif %}
 {% endblock %}
 
 {% block secondRow %}
