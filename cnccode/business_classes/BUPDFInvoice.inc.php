@@ -149,7 +149,7 @@ class BUPDFInvoice extends BaseObject
 
         $this->_dsInvhead = $dsInvhead;
 
-        $tempFile = tempnam(
+        $tempFile = @tempnam(
             '/tmp',
             'INV'
         );            // temporary disk file
@@ -182,7 +182,7 @@ class BUPDFInvoice extends BaseObject
 
         if ($this->_dsInvhead->fetchNext()) {
             // initialisation
-            $tempFile = tempnam(
+            $tempFile = @tempnam(
                 '/tmp',
                 'INV'
             );      // temporary disk file

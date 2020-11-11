@@ -76,7 +76,7 @@ function print_checker_results() {
 	global $input_separator;
 	$aspell_err = "";
 	# create temp file
-	$tempfile = tempnam( $tempfiledir, 'aspell_data_' );
+	$tempfile = @tempnam( $tempfiledir, 'aspell_data_' );
 
 	# open temp file, add the submitted text.
 	if( $fh = fopen( $tempfile, 'w' )) {
