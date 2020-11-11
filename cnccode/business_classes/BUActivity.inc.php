@@ -1667,6 +1667,7 @@ class BUActivity extends Business
         }
         return $status;
     }
+
     /**
      * @param string $template
      * @param $data

@@ -126,9 +126,6 @@ class CTSRActivity extends CTCNC
                 echo json_encode($this->changeProblemPriority());
                 exit;
             default:
-
-                $this->setTemplate();
-
             $this->setTemplate();
             break;
         }
@@ -583,96 +580,6 @@ class CTSRActivity extends CTCNC
             http_response_code(400);
             return ['error' => true, 'errorDescription' => $ex->getMessage()];
         }
-    }
-    function validTime($body, $dbeProblem,$buActivity,$dbeCallActivity)
-    {
-        $problemID=$dbeCallActivity->getValue(DBECallActivity::problemID);
-        $callActivityID=$dbeCallActivity->getValue(DBECallActivity::callActivityID);
-        $durationHours = common_convertHHMMToDecimal(
-                $body->endTime
-            ) - common_convertHHMMToDecimal($body->startTime);
-
-        $durationMinutes = convertHHMMToMinutes(
-                $body->endTime
-            ) - convertHHMMToMinutes($body->startTime);
-        if (in_array(
-            $body->callActTypeID,
-            [4, 8, 11, 18]
-        )) {            
-            $userID    = $body->userID;
-            $dbeUser = new DBEUser($this);
-            $dbeUser->getRow($userID);
-            $teamID = $dbeUser->getValue(DBEUser::teamID);
-            if ($teamID <= 4) {
-                $usedTime = 0;
-                $allocatedTime = 0;
-                if ($teamID == 1) {
-                    $usedTime = $buActivity->getHDTeamUsedTime(
-                        $problemID,
-                        $callActivityID
-                    );
-                    $allocatedTime = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
-                }
-                if ($teamID == 2) {
-                    $usedTime = $buActivity->getESTeamUsedTime(
-                        $problemID,
-                        $callActivityID
-                    );
-                    $allocatedTime = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
-                }
-                if ($teamID == 4) {
-                    $usedTime = $buActivity->getSPTeamUsedTime(
-                        $problemID,
-                        $callActivityID
-                    );
-                    $allocatedTime = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
-                }
-                if ($teamID == 5) {
-                    $usedTime = $buActivity->getUsedTimeForProblemAndTeam(
-                        $problemID,
-                        5,
-                        $callActivityID
-                    );
-                    $allocatedTime = $dbeProblem->getValue(DBEProblem::projectTeamLimitMinutes);
-                }
-                if ($usedTime + $durationMinutes > $allocatedTime) {
-                    return 'You cannot assign more time than left over';
-                }
-            }
-            // check time exceed 
-            $buHeader = new BUHeader($this);
-            $dsHeader = new DataSet($this);
-            $buHeader->getHeader($dsHeader);
-
-            if (
-                $dbeCallActivity->getValue(
-                    DBEJCallActivity::callActTypeID
-                ) == CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID &&
-                $durationHours > $dsHeader->getValue(DBEHeader::customerContactWarnHours)
-            ) {
-                return
-                    'Warning: Duration exceeds ' . $dsHeader->getValue(
-                        DBEHeader::customerContactWarnHours
-                    ) . ' hours';
-            }
-            if ($dbeCallActivity->getValue(
-                DBEJCallActivity::callActTypeID
-            ) == CONFIG_REMOTE_TELEPHONE_ACTIVITY_TYPE_ID) {
-                if ($durationHours > $dsHeader->getValue(DBEHeader::remoteSupportWarnHours)) {
-                    return 'Warning: Activity duration exceeds ' . $dsHeader->getValue(
-                        DBEHeader::remoteSupportWarnHours
-                    ) . ' hours';
-                }
-                $minHours = $dsHeader->getValue(DBEHeader::RemoteSupportMinWarnHours);
-                if ($durationHours < $minHours) {
-                    return
-                        'Remote support under ' . (floor(
-                            $minHours * 60
-                        )) . ' minutes, should this be Customer Contact instead?”.';
-                }
-            }
-        }
-        return '';
     }
     function updateCallActivity()
     {
@@ -1285,7 +1192,6 @@ class CTSRActivity extends CTCNC
             $body->description
         );
         return ["status"=>true];
-
     }
     function changeProblemPriority()
     {
