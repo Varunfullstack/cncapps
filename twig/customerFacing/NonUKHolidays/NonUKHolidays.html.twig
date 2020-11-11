@@ -1,5 +1,5 @@
 {% extends '@customerFacing/style-3-rows-email/style-3-rows.twig' %}
-{# @var  #}
+{# @var #}
 {# @var string contactFirstName #}
 {% block headerTitle %}
     Information Notice
@@ -9,7 +9,7 @@
     UK Bank Holiday approaching
 {% endblock %}
 
-{% block firstRow %}
+{% block content %}
     <p>{{ contactFirstName }}</p>
     <p>
         Please be aware that {{ date }} is a national holiday in UK so the CNC ServiceDesk will be closed. If you are a
@@ -20,13 +20,6 @@
         If your query is not of an urgent nature please e-mail us at support@cnc-ltd.co.uk and we will respond on the
         next working day.
     </p>
-{% endblock %}
-
-{% block secondRow %}
-
-{% endblock %}
-
-{% block thirdRow %}
 {% endblock %}
 
 {% block leftFooter %}

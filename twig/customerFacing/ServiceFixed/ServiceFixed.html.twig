@@ -11,14 +11,12 @@
     There's been an update to your service request
 {% endblock %}
 
-{% block firstRow %}
+{% block content %}
     <p>{{ contactFirstName }},</p>
     <p>This has now been marked as fixed on our system and a summary of the original request and resolution are detailed
         below:
     </p>
-{% endblock %}
 
-{% block secondRow %}
     <p>Original Request:</p>
     <p>
         {{ firstActivityReason | raw }}
@@ -30,9 +28,7 @@
         {{ lastActivityReason | raw }}
     </p>
 
-{% endblock %}
 
-{% block thirdRow %}
     If you believe that this is not resolved, simply reply to this email with your explanation and we will investigate further before re-opening.   Best Regards
 {% endblock %}
 

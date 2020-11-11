@@ -8,17 +8,15 @@
     A new Service Request has been raised
 {% endblock %}
 
-{% block firstRow %}
+{% block content %}
     <p>{{ data.contactFirstName }},</p>
     <p> A new service request has been logged with our ServiceDesk under reference {{ data.serviceRequestId }} and it
         will
         help
         if you could please refer to it in all related communications with us.
     </p>
-    <p>Details: {{ data.reason }}</p>
-{% endblock %}
+    <p>Details: {{ data.reason |raw }}</p>
 
-{% block secondRow %}
     <p>
         Priority: {{ data.priority }} -
         {% if data.serviceRequestStatus == 'Initial' %}
@@ -28,9 +26,7 @@
             We have started working on this immediately.
         {% endif %}
     </p>
-{% endblock %}
 
-{% block thirdRow %}
     {% if data.serviceRequestStatus == 'Initial' %}
         <p>
             {% if not data.isLoggedOutOfHours %}

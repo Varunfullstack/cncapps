@@ -14,7 +14,7 @@
     We've modified your request
 {% endblock %}
 
-{% block firstRow %}
+{% block content %}
     <p>{{ contactFirstName }},</p>
     <p>
         Service request reference {{ serviceRequestId }} has been changed on our system from a
@@ -26,13 +26,9 @@
             We will aim to respond to this request within {{ SLA }} working hours.
         </p>
     {% endif %}
-{% endblock %}
 
-{% block secondRow %}
     {{ lastActivityReason }}
-{% endblock %}
 
-{% block thirdRow %}
 
 {% endblock %}
 

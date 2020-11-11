@@ -1,4 +1,4 @@
-{% extends '@customerFacing/style-3-rows-email/style-3-rows.twig' %}
+{% extends '@customerFacing/@customerFacing/wrapper.html.twig' %}
 {# @var data \CNCLTD\TwigDTOs\ActivityLoggedDTO #}
 {% block headerTitle %}
     Service Request Information
@@ -8,22 +8,15 @@
     We've got something to tell you
 {% endblock %}
 
-{% block firstRow %}
+{% block content %}
     <p>{{ data.contactFirstName }},</p>
     <p>
         We have worked on your service request reference {{ data.serviceRequestId }} and have an update for you. A more
         detailed update is available in our portal but here's the short version.
     </p>
-{% endblock %}
-
-{% block secondRow %}
     <p>
         {{ data.lastActivityCustomerNotes | raw }}
     </p>
-
-{% endblock %}
-
-{% block thirdRow %}
     <p>
         This update was added by {{ data.engineerFullName }}
     </p>
