@@ -1613,7 +1613,7 @@ class BUInvoice extends Business
 
             foreach ($invoiceEmails as $invoiceEmail) {
                 $body = $twig->render(
-                    '@customerFacing/style-3-rows-email/SalesInvoice/SalesInvoice.html.twig',
+                    '@customerFacing/SalesInvoice/SalesInvoice.html.twig',
                     ["data" => $invoiceEmail]
                 );
 

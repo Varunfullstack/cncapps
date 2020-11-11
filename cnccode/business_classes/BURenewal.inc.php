@@ -157,7 +157,7 @@ class BURenewal extends Business
         }
 
         $body = $twig->render(
-            '@customerFacing/style-3-rows-email/RenewalSchedule/RenewalSchedule.html.twig',
+            '@customerFacing/RenewalSchedule/RenewalSchedule.html.twig',
             ["contactFirstName" => $contactFirstName, "hasRenewals" => $renewalCount > 0]
         );
         $buMail = new BUMail($this);
@@ -254,7 +254,7 @@ class BURenewal extends Business
         );
         global $twig;
         $body = $twig->render(
-            '@customerFacing/style-3-rows-email/TermsAndConditions/TermsAndConditions.html.twig',
+            '@customerFacing/TermsAndConditions/TermsAndConditions.html.twig',
             ["contactFirstName" => $dbeContact->getValue(DBEContact::firstName)]
         );
         $buMail = new BUMail($this);

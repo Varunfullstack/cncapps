@@ -70,7 +70,7 @@ foreach ($result->fetch_all(MYSQLI_ASSOC) as $row) {
     global $twig;
 
     $body = $twig->render(
-        '@customerFacing/style-3-rows-email/NonUKHolidays/NonUKHolidays.html.twig',
+        '@customerFacing/NonUKHolidays/NonUKHolidays.html.twig',
         [
             "contactFirstName" => $row['con_first_name'],
             "date"             => Date('l jS F', strtotime($dateToTest))

@@ -615,7 +615,7 @@ class BUPDFSalesQuote extends Business
         $renewalType = $DBEJRenQuotation->getValue(DBEJRenQuotation::type);
 
         $body = $twig->render(
-            '@customerFacing/style-3-rows-email/QuoteReminder/QuoteReminder.html.twig',
+            '@customerFacing/QuoteReminder/QuoteReminder.html.twig',
             [
                 "contactFirstName" => $contactFirstName,
                 "renewalType"      => $renewalType

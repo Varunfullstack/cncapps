@@ -1611,7 +1611,7 @@ class BUActivity extends Business
 
         $subject = "Service Request {$serviceRequestId} - {$dbejCallactivity->getValue(DBEJCallActivity::emailSubjectSummary)} - Updated";
 
-        $template = '@customerFacing/style-3-rows-email/ServicePriorityChanged/ServicePriorityChanged.html.twig';
+        $template = '@customerFacing/ServicePriorityChanged/ServicePriorityChanged.html.twig';
 
         $this->sendCustomerEmail($template, $data, $dbejCallactivity, $selfFlag, $othersFlag, $subject);
     } // end sendUpdatedByAnotherUserEmail
@@ -1787,7 +1787,7 @@ class BUActivity extends Business
             $status
         );
 
-        $template = '@customerFacing/style-3-rows-email/ActivityLogged/ActivityLogged.html.twig';
+        $template = '@customerFacing/ActivityLogged/ActivityLogged.html.twig';
         $subject = "Service Request {$dbejCallactivity->getValue(DBEJCallActivity::problemID)} - {$dbejCallactivity->getValue(DBEJCallActivity::emailSubjectSummary)} - Updated";
 
         $selfFlag = DBEContact::workUpdatesEmailFlag;
@@ -5752,7 +5752,7 @@ is currently a balance of ';
         );
 
 
-        $template = '@customerFacing/style-3-rows-email/ServiceLogged/ServiceLogged.html.twig';
+        $template = '@customerFacing/ServiceLogged/ServiceLogged.html.twig';
         $subject = "Service Request {$serviceRequestId} - {$dbejCallactivity->getValue(DBEJCallActivity::emailSubjectSummary)} - Logged";
 
         $selfFlag = DBEContact::initialLoggingEmailFlag;
@@ -7522,7 +7522,7 @@ is currently a balance of ';
             $status
         );
 
-        $template = '@customerFacing/style-3-rows-email/SalesOrderServiceRequestCreated/SalesOrderServiceRequestCreated.html.twig';
+        $template = '@customerFacing/SalesOrderServiceRequestCreated/SalesOrderServiceRequestCreated.html.twig';
         $subject = "Service Request {$dbejCallactivity->getValue(DBEJCallActivity::problemID)} - {$dbejCallactivity->getValue(DBEJCallActivity::emailSubjectSummary)} - Logged";
 
         $selfFlag = DBEContact::initialLoggingEmailFlag;
@@ -8380,7 +8380,7 @@ FROM
         );
 
         $body = $twig->render(
-            '@customerFacing/style-3-rows-email/NotAuthorisedPrimaryMainContact/NotAuthorisedPrimaryMainContact.html.twig',
+            '@customerFacing/NotAuthorisedPrimaryMainContact/NotAuthorisedPrimaryMainContact.html.twig',
             ["data" => $data]
         );
         $contactName = "{$notAuthorisedContactFirstName} {$notAuthorisedContactLastName}";
@@ -8414,7 +8414,7 @@ FROM
         $contacts = $buCustomer->getMainSupportContacts($dbeContact->getValue(DBEContact::customerID), true);
 
         $body = $twig->render(
-            '@customerFacing/style-3-rows-email/NotAuthorisedContact/NotAuthorisedContact.html.twig',
+            '@customerFacing/NotAuthorisedContact/NotAuthorisedContact.html.twig',
             [
                 "data" => [
                     "contactFirstName" => $dbeContact->getValue(DBEContact::firstName),
@@ -9570,7 +9570,7 @@ FROM
 
         $subject = "Service Request {$serviceRequestId} - {$serviceRequest->getValue(DBEProblem::emailSubjectSummary)} - Fixed";
 
-        $template = '@customerFacing/style-3-rows-email/ServiceFixed/ServiceFixed.html.twig';
+        $template = '@customerFacing/ServiceFixed/ServiceFixed.html.twig';
 
         $this->sendCustomerEmail($template, $data, $fixedActivityInServiceRequest, $selfFlag, $othersFlag, $subject);
     }
@@ -9923,7 +9923,7 @@ FROM
         $recipients = implode(",", $recipientsArray);
 
         $subject = "On-Site Visit Confirmation for Service Request {$serviceRequestId} {$emailSubjectToAppend}";
-        $body = $twig->render('@customerFacing/style-3-rows-email/SiteVisit/SiteVisit.html.twig', ["data" => $data]);
+        $body = $twig->render('@customerFacing/SiteVisit/SiteVisit.html.twig', ["data" => $data]);
 
         $buMail->sendSimpleEmail($body, $subject, $recipients, CONFIG_SUPPORT_EMAIL, $cc);
     }
