@@ -16,16 +16,16 @@
         {{ data.sitePostcode }} on
         {{ data.visitActivityDate }} in the {{ data.visitActivityTimeOfTheDay }}.
     </p>
-    <p>
-        {{ data.visitActivityReason }}
-    </p>
+    <table style="width: 100%">
+        <tr>
+            <td class="details">
+                {{ data.visitActivityReason|raw }}
+            </td>
+        </tr>
+    </table>
     <p>
         If there are any problems keeping this appointment then please contact our ServiceDesk to rearrange.
     </p>
-
-
-
-
 {% endblock %}
 
 {% block serviceRequestURL %}
