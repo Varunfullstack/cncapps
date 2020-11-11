@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block content %}
-    <p>{{ data.contactFirstName }},</p>
+    <p>{{ data.contactFirstName }}</p>
     <p>
         Service request reference {{ data.serviceRequestId }} has been changed on our system from a
         priority {{ data.oldPriority }} to
@@ -17,7 +17,7 @@
     </p>
     {% if (data.serviceRequestStatus == 'Logged') %}
         <p>
-            We will aim to respond to this request within {{ data.SLA }} working hours.
+            We'll aim to respond to this request within {{ data.SLA }} working hours.
         </p>
     {% endif %}
     <table style="width: 100%">

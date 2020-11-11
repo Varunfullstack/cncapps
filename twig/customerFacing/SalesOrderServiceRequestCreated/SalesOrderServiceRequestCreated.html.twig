@@ -9,11 +9,10 @@
 {% endblock %}
 
 {% block content %}
-    <p>{{ data.contactFirstName }},</p>
-    <p> A new service request has been logged with our ServiceDesk under reference {{ data.serviceRequestId }} and it
-        will help if you could please refer to it in all related communications with us.
+    <p>{{ data.contactFirstName }}</p>
+    <p> Service Request {{ data.serviceRequestId }} has been created with our Service Desk.  We'll work on this in the background and update you when we've got something important to share or ask you.
     </p>
-    <p>Details: {{ data.reason }}</p>
+    <p>{{ data.reason }}</p>
     <p>
         Priority: 5 - Project Work
     </p>
