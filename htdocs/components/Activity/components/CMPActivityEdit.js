@@ -1839,18 +1839,49 @@ class CMPActivityEdit extends MainComponent {
         options:priorityReasons,
         value: data.priorityChangeReason,
         show:data.orignalPriority!=data.priority,
-        title:"Priority change reason",   
+        title:"Priority change reason - Customer will be notified",   
         okTitle:"OK",
         onChange:this.handlePriorityTemplateChange,
         onCancel:()=>this.handlePriorityTemplateChange('')
     });
   }
-  handlePriorityTemplateChange=(value)=>{
-
+  handlePriorityTemplateChange=(value)=>{   
+    console.log("priority changed",value);
     const {data}=this.state;
-    data.priorityChangeReason=value;    
-    data.orignalPriority=data.priority;
-    this.setState({data});
+    if(value!=""&&value!=undefined)
+    {
+      //data.priorityChangeReason=value;    
+      //data.orignalPriority=data.priority;
+      //this.setState({data});    
+      const payload={
+        callActivityID:data.callActivityID,
+        priorityChangeReason:value,
+        priority: this.state.priorities.filter(
+          (p) => p.name === data.priority
+        )[0].id
+      }
+      this.api.changeProblemPriority(payload).then(result=>{
+        console.log(result);
+        if(result)
+        {
+          data.priorityChangeReason=null;    
+          data.orignalPriority=data.priority;          
+          this.setState({data}); 
+        }
+        else
+        {
+          data.priority=data.orignalPriority;
+          this.setState({data});   
+          this.alert("Priority didn't changed ")
+        }
+      })
+    }
+    else
+    {
+      data.priority=data.orignalPriority; 
+      this.setState({data});   
+      this.alert("You must provide the reason of priority change");
+    }
   }
   getAssetsElement=()=>{
     const {assets}=this.state;

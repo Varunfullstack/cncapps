@@ -117,6 +117,12 @@ class CTSRActivity extends CTCNC
             case "getInitialActivity":
                 echo json_encode($this->getInitialActivity());
                 exit;
+            case "saveManagementReviewDetails":
+                echo json_encode($this->saveManagementReviewDetails());
+                exit;
+            case "changeProblemPriority":
+                echo json_encode($this->changeProblemPriority());
+                exit;
             default:
            
             $this->setTemplate();
@@ -173,6 +179,8 @@ class CTSRActivity extends CTCNC
             case "gatherFixedInformation":
                 return "Service Request Fix Summary " . $problemID . $this->getProblemRaiseIcon($dbeProblem);
                 break;
+            case "gatherManagementReviewDetails":
+                return "Management Review Reason";
             default:
                 return 'Activity';
                 break;
@@ -662,13 +670,13 @@ class CTSRActivity extends CTCNC
                         DBEHeader::remoteSupportWarnHours
                     ) . ' hours';
                 }
-                $minHours = $dsHeader->getValue(DBEHeader::RemoteSupportMinWarnHours);
-                if ($durationHours < $minHours) {
-                    return
-                        'Remote support under ' . (floor(
-                            $minHours * 60
-                        )) . ' minutes, should this be Customer Contact instead?”.';
-                }
+                // $minHours = $dsHeader->getValue(DBEHeader::RemoteSupportMinWarnHours);
+                // if ($durationHours < $minHours) {
+                //     return
+                //         'Remote support under ' . (floor(
+                //             $minHours * 60
+                //         )) . ' minutes, should this be Customer Contact instead?”.';
+                // }
             }
         }
         return '';
@@ -1167,6 +1175,44 @@ class CTSRActivity extends CTCNC
         );
         return ["status"=>true];
         
+    }
+    function saveManagementReviewDetails()
+    {
+        $body                   = file_get_contents('php://input');
+        $body                   = json_decode($body);
+        if(!isset($body->problemID)||
+        !isset($body->description)
+        )
+        {
+            http_response_code(400);
+            return ["error"=>$body];
+        }
+        $buActivity=new BUActivity($this);
+        $buActivity->updateManagementReviewReason(
+            $body->problemID,
+            $body->description
+        );
+        return ["status"=>true];
+        
+    }
+    function changeProblemPriority()
+    {
+        $body                   = file_get_contents('php://input');
+        $body                   = json_decode($body);
+        if(!isset($body->callActivityID)||
+        !isset($body->priorityChangeReason)||
+        !isset($body->priority)
+        )
+        {
+            http_response_code(400);
+            return ["error"=>$body];
+        }
+        $buActivity=new BUActivity($this);
+       return $buActivity->updateCallActivityPriority(
+            $body->callActivityID,
+            $body->priority,
+            $body->priorityChangeReason
+        );
     }
 }
 ?>

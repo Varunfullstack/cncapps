@@ -61,9 +61,9 @@ class CMPLastStep extends MainComponent {
     ]);
     console.log("result", result);
     const { data } = this.state;
-    const userQueue = SRQueues.filter(
-      (q) => q.teamID == this.props.data.currentUser.teamID
-    );
+    // const userQueue = SRQueues.filter(
+    //   (q) => q.teamID == this.props.data.currentUser.teamID
+    // );
     // if (userQueue.length > 0 && data.queueNo == "")
     //   data.queueNo = userQueue[0].id;
     data.contactID = this.props.data.customer.con_contno;
@@ -71,6 +71,7 @@ class CMPLastStep extends MainComponent {
       data.contactID,
       result[1]
     );
+    //console.log(result[1],requireAuthorize);
     this.setState({
       requireAuthorize,
       checkList: result[0],

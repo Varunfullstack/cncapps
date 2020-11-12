@@ -87,7 +87,10 @@ class CTUser extends CTCNC
             $cookieVars,
             $cfg
         );
+        $noPermissionList=["all","active","getCurrentUser"];
         $roles = SENIOR_MANAGEMENT_PERMISSION;
+        $key=array_search( $_REQUEST["action"],$noPermissionList);        
+        if(false === $key)
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
@@ -1096,7 +1099,7 @@ class CTUser extends CTCNC
         $this->parsePage();
     }
     function getCurrentUser()
-    {
+    {        
         $dbeJUser=new DBEJUser($this);
         $dbeJUser->setValue(
             DBEJUser::userID,

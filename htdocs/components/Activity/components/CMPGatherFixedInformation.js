@@ -221,7 +221,7 @@ class CMPGatherFixedInformation extends MainComponent {
   getActions = () => {
     const { el } = this;
     return el('div',{className:"flex-row"},
-      el('button',{onClick:()=>this.handleSave()},"Save"),
+      el('button',{onClick:()=>this.handleSave()},"Fixed"),
       el('button',{onClick:()=>this.setState({showModal:true,modalType:this.modalTypes.partsUsed}),className:"btn-info"},"Parts Used"),
       el('button',{onClick:()=>this.setState({showModal:true,modalType:this.modalTypes.sales}),className:"btn-info"},"Sales Request")
     )

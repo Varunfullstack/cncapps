@@ -1,0 +1,27 @@
+.sd-card {
+    display: flex;
+    flex-direction: column;
+    min-width: 195px;
+    min-height: 150px;
+    justify-content:  flex-star;
+    padding: 10px;
+    margin: 5px;
+    background: gray;
+    align-items: center;
+
+}
+.sd-card td{
+    font-family: Arial, Tahoma, Helvetica, sans-serif;
+    font-size: 20px;
+    padding: 0px;
+    padding-right: 5px;
+    white-space: nowrap;
+}
+.sd-card table{
+    border-spacing:0px
+}
+.sd-card-title{
+    margin-top: 5px;
+    font-size: 22px;
+    font-weight: bold;
+}

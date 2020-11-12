@@ -1,5 +1,10 @@
 
 class APIMain {
+    get(url)
+    {
+      return  fetch(url)
+        .then((res) => res.json());
+    }
     getCustomers()
     {
       return  fetch("/Customer.php?action=searchName")

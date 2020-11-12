@@ -383,7 +383,7 @@ class CTCNC extends Controller
             "StarterLeaverManagement.php"
         );
 
-        
+       
         if ($this->isUserSDManager()) {
             $menu->addSection(
                 "SDManagement",
@@ -392,16 +392,8 @@ class CTCNC extends Controller
                 "SD Management"
             );
         }
-        $this->addConditionalMenu(
-            $menu,
-            'fa-chalkboard-teacher',
-            "SDManagement",
-            $this->dbeUser->getValue(DBEUser::changeInitialDateAndTimeFlag)=='Y',
-            201,
-            "Manager Dashboard",
-            "SDManagerDashboard.php?action=react",
-            "SD Management"
-        );
+       
+        
 
         $this->addConditionalMenu(
             $menu,
@@ -640,7 +632,8 @@ class CTCNC extends Controller
 
     private function getDefaultSDManagerMenu()
     {
-        return [
+        
+        $items=[
             // [
             //     "id"    => 222,
             //     "label" => "Manager Dashboard",
@@ -754,6 +747,15 @@ class CTCNC extends Controller
                 "href"  => "PasswordServices.php"
             ],
         ];
+        if( $this->dbeUser->getValue(DBEUser::changeInitialDateAndTimeFlag)=='Y')
+        $items= array_merge(
+            [[
+                "id"    => 201,
+                "label" => "SD Management",
+                "href"  => "SDManagerDashboard.php?action=react"
+            ]],$items);        
+        return $items;
+        
     }
 
     protected function isAppraiser()

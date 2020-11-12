@@ -3,6 +3,7 @@ global $cfg;
 require_once($cfg['path_ct'] . '/CTCurrentActivityReport.inc.php');
 require_once($cfg['path_bu'] . '/BUSecondSite.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
+require_once($cfg["path_dbe"] . "/DBConnect.php");
 
 class CTSDManagerDashboard extends CTCurrentActivityReport
 {
@@ -64,6 +65,9 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             break;
             case "getQueue":
                 echo json_encode($this->getQueue());
+                exit;
+            case "dailyStatsSummary":
+                echo json_encode($this->getDailyStatsSummary());
                 exit;
             default:
                 $this->display();
@@ -952,5 +956,124 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
                 ));
         }
         return $problems;
+    }
+    function getDailyStatsSummary()
+    {
+        $today= date("Y-m-d");
+        //$today= "2020-06-04";
+
+        //1-  -- get priority summary
+        $query="SELECT pro_priority priority, COUNT(pro_priority) total FROM problem 
+                WHERE 
+                `pro_status`<>'C'  
+                AND `pro_status`<>'F'
+                AND pro_priority <> 5
+                AND pro_custno <> 282
+                GROUP BY pro_priority";
+        $prioritySummary =DBConnect::fetchAll( $query,[]);
+
+        //2-  -- number of open sr foreach team exclude sales 
+        $query="SELECT c.`teamID`, COUNT(*) total
+                FROM problem p JOIN consultant c ON p.`pro_consno`=c.`cns_consno` 
+                WHERE 
+                pro_status<>'C' 
+                AND pro_status<>'F'
+                AND c.teamID<>7 
+                AND pro_custno <> 282
+                GROUP BY c.`teamID`";                
+        $openSrTeamSummary =DBConnect::fetchAll( $query,[]);
+
+        //3-  -- daily source 
+        $query="SELECT r.`description`,COUNT(*)  total
+                FROM problem p LEFT JOIN `problemraisetype` r ON p.`raiseTypeId`=r.`id`
+                WHERE    
+                pro_custno <> 282
+                AND DATE_FORMAT(`pro_date_raised`,'%Y-%m-%d') = '$today'  
+                GROUP BY raiseTypeId";
+        $dailySourceSummary =DBConnect::fetchAll( $query,[]);
+
+        //4- raised today 
+        $query="SELECT COUNT(DISTINCT  p.pro_problemno) total FROM `callactivity` c JOIN   problem p ON c.`caa_problemno`=p.`pro_problemno`
+                WHERE 
+                pro_custno <> 282   
+                AND  caa_consno <> 67
+                AND caa_callacttypeno NOT IN (60, 35)
+                AND pro_status IN ('F')
+                AND DATE_FORMAT(`pro_date_raised`,'%Y-%m-%d') = '$today'";
+        $raisedTodaySummary =DBConnect::fetchOne( $query,[]);
+
+        //5 Fixed Today
+        $query="SELECT COUNT(DISTINCT  p.pro_problemno)  total
+                FROM `callactivity` c JOIN   problem p ON c.`caa_problemno`=p.`pro_problemno`
+                WHERE    
+                pro_custno <> 282
+                AND pro_consno <> 67
+                AND pro_status <> 'I'
+                AND c.`caa_callacttypeno`=57
+                AND DATE_FORMAT(`pro_date_raised`,'%Y-%m-%d') = '$today'";
+        $fixedTodaySummary =DBConnect::fetchOne( $query,[]);
+
+        //6 Near SLA    
+        $query="SELECT COUNT(*) total FROM problem 
+                WHERE    
+                pro_custno <> 282
+                AND  pro_status IN ( 'I', 'P' )
+                AND CONCAT( pro_alarm_date, ' ', COALESCE(pro_alarm_time, '00:00:00') )  < NOW()";
+        $nearSLASummary =DBConnect::fetchOne( $query,[]);
+
+        //7  reopen today 
+        $query="SELECT COUNT(*) total FROM problem 
+                WHERE 
+                pro_custno <> 282   
+                AND DATE_FORMAT(`pro_reopened_date`,'%Y-%m-%d') = '$today'";
+        $reopenTodaySummary =DBConnect::fetchOne( $query,[]);
+
+         //8- Raised & started Today
+         $query="SELECT COUNT(DISTINCT  p.pro_problemno) total FROM `callactivity` c JOIN   problem p ON c.`caa_problemno`=p.`pro_problemno`
+         WHERE 
+         pro_custno <> 282   
+         AND  caa_consno <> 67
+         AND caa_callacttypeno NOT IN (60, 35)
+         AND pro_status IN ('P')
+         AND DATE_FORMAT(`pro_date_raised`,'%Y-%m-%d') = '$today'";
+         $raisedStartTodaySummary =DBConnect::fetchOne( $query,[]);
+
+         //9- unique Customer
+        $query="SELECT COUNT(DISTINCT  p.pro_custno) total FROM `callactivity` c JOIN   problem p ON c.`caa_problemno`=p.`pro_problemno`
+        WHERE 
+        pro_custno <> 282   
+        AND  caa_consno <> 67
+        AND caa_callacttypeno NOT IN (60, 35)
+        AND pro_status IN ('F')
+        AND DATE_FORMAT(`pro_date_raised`,'%Y-%m-%d') = '$today'";
+        $uniqueCustomerTodaySummary =DBConnect::fetchOne( $query,[]);
+
+         //9- Breached SLA
+         $query="SELECT COUNT(  DISTINCT  p.pro_problemno) total FROM `callactivity` c JOIN   problem p ON c.`caa_problemno`=p.`pro_problemno` 
+         JOIN customer cu ON p.`pro_custno`=cu.`cus_custno`
+         WHERE
+          pro_custno <> 282   
+            AND pro_priority <> 5
+            AND pro_working_hours > CASE pro_priority
+                                   WHEN 1 THEN slaFixHoursP1
+                                   WHEN 2 THEN slaFixHoursP2
+                                   WHEN 3 THEN slaFixHoursP3
+                                   WHEN 4 THEN slaFixHoursP4
+                                   ELSE 0 END
+         AND DATE_FORMAT(`pro_date_raised`,'%Y-%m-%d') = '$today'";
+         $breachedSLATodaySummary =DBConnect::fetchOne( $query,[]);
+
+        return [
+            "prioritySummary"=>$prioritySummary,
+            "openSrTeamSummary"=>$openSrTeamSummary,
+            "dailySourceSummary"=>$dailySourceSummary,
+            "raisedTodaySummary"=>$raisedTodaySummary,
+            "fixedTodaySummary"=>$fixedTodaySummary,
+            "nearSLASummary"=>$nearSLASummary,
+            "reopenTodaySummary"=> $reopenTodaySummary ,
+            "raisedStartTodaySummary"=>$raisedStartTodaySummary,
+            'breachedSLATodaySummary'=>$breachedSLATodaySummary,
+            'uniqueCustomerTodaySummary'=>$uniqueCustomerTodaySummary
+        ];
     }
 }

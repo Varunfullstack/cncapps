@@ -105,10 +105,21 @@ class APIActivity extends APIMain{
     {
         return this.post(`${ApiUrls.SRActivity}saveFixedInformation`,body).then(res => res.json());
     }
+    
     getInitialActivity(problemID)
     {
         return fetch(`${ApiUrls.SRActivity}getInitialActivity&problemID=${problemID}`)
         .then(res => res.json());
+    }
+
+    saveManagementReviewDetails(body)
+    {
+        return this.post(`${ApiUrls.SRActivity}saveManagementReviewDetails`,body).then(res => res.json());
+    }
+
+    changeProblemPriority(body)
+    {
+        return this.post(`${ApiUrls.SRActivity}changeProblemPriority`,body).then(res => res.json());
     }
 }
 export default APIActivity;

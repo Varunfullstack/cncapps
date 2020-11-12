@@ -958,4 +958,6 @@ input:checked+.slider:before {
 }
 .text-align-center{
     text-align: center !important;   
+    flex-wrap: wrap;
+        
 }

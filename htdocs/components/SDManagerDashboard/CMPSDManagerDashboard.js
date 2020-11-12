@@ -3,8 +3,8 @@ import SVCCurrentActivityService from "../CurrentActivityReport/services/SVCCurr
 import Table from "../utils/table/table.js?v=1";
 import Toggle from "../utils/toggle.js?v=1";
 import ToolTip from "../utils/ToolTip.js?v=1";
-
 import { SRQueues,sort } from "../utils/utils.js?v=1";
+import CMPDailyStats from "./components/CMPDailyStats.js?v=1";
 import APISDManagerDashboard from "./services/APISDManagerDashboard.js?v=1";
  
 class CMPSDManagerDashboard extends MainComponent {
@@ -37,15 +37,22 @@ class CMPSDManagerDashboard extends MainComponent {
       { id: 7, title: "Longest Open SR", showP5: true, icon: null },
       { id: 8, title: "Most Hours Logged", showP5: true, icon: null },
       { id: 9, title: "Customer", showP5: false, icon: null },
+      { id: 10, title: "Daily Stats", showP5: false, icon: null },
+
     ];
   }
   componentDidMount() {
     this.loadFilterFromStorage();
-    this.apiCurrentActivityService
-      .getAllocatedUsers()
-      .then((res) => {
-        console.log(res);
-        this.setState({ allocatedUsers: res })
+    setTimeout(() => {
+      this.loadAllocatedUsers()
+    }, 500);
+  }
+  loadAllocatedUsers=()=>{
+    const { filter,allocatedUsers } = this.state;
+    if (filter.activeTab <9&&allocatedUsers.length==0)
+      this.apiCurrentActivityService.getAllocatedUsers().then((res) => {
+        //console.log(res);
+        this.setState({ allocatedUsers: res });
       });
   }
   isActive = (code) => {
@@ -167,11 +174,17 @@ class CMPSDManagerDashboard extends MainComponent {
     );
   };
   loadTab = (id) => {
+    if(id<10)
+    {
+      this.loadAllocatedUsers();
     const { filter } = this.state;
     this.api.getQueue(id,filter).then((queueData) => {
-      console.log(queueData);
+      //console.log(queueData);
       this.setState({queueData})
     });
+  }
+  else return [];
+
   };
   getQueueElement=()=>{
       const {filter,queueData}=this.state;
@@ -319,7 +332,7 @@ class CMPSDManagerDashboard extends MainComponent {
         search: true,
       });
     }
-    else{
+    else if(filter.activeTab==9){
         const columns=[            
             {
               path: "customerName",
@@ -356,6 +369,9 @@ class CMPSDManagerDashboard extends MainComponent {
             
             })
         );
+    }
+    else  if(filter.activeTab==10){
+      return el(CMPDailyStats);
     }
   }
   srDescription = (problem) => {
@@ -413,12 +429,14 @@ class CMPSDManagerDashboard extends MainComponent {
     return queues[0].code;
     else return ""
   }
+
   render() {
     const { el } = this;
     return el("div", null, 
     this.getFilterElement(), 
     this.getTabsElement(),
-    this.getQueueElement()
+    this.getQueueElement(),
+  
     );
   }
 }

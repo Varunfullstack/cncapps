@@ -1866,34 +1866,35 @@ class BUActivity extends Business
                 $this->db->query($sql);
             }
         }
-        if (
-            $oldPriority != $problem->getValue(DBEJProblem::priority)
-        ) {
-            $slaResponseHours =
-                $this->getSlaResponseHours(
-                    $problem->getValue(DBEJProblem::priority),
-                    $problem->getValue(DBEJProblem::customerID),
-                    $dbeCallActivity->getValue(DBECallActivity::contactID)
-                );
+        // if (
+        //     $oldPriority != $problem->getValue(DBEJProblem::priority)
+        // ) {
+        //     $slaResponseHours =
+        //         $this->getSlaResponseHours(
+        //             $problem->getValue(DBEJProblem::priority),
+        //             $problem->getValue(DBEJProblem::customerID),
+        //             $dbeCallActivity->getValue(DBECallActivity::contactID)
+        //         );
 
-            $problem->setValue(
-                DBEJProblem::slaResponseHours,
-                $slaResponseHours
-            );
-            $problem->updateRow();
+        //     $problem->setValue(
+        //         DBEJProblem::slaResponseHours,
+        //         $slaResponseHours
+        //     );
+        //     $problem->updateRow();
 
-            $this->sendEmailToCustomer(
-                $dsCallActivity->getValue(DBEJProblem::problemID),
-                self::WorkUpdatesCustomerEmailCategory,
-                self::WorkUpdatesPriorityChanged
-            );
+        //     $this->sendEmailToCustomer(
+        //         $dsCallActivity->getValue(DBEJProblem::problemID),
+        //         self::WorkUpdatesCustomerEmailCategory,
+        //         self::WorkUpdatesPriorityChanged
+        //     );
            
-            $this->logOperationalActivity(
-                $dsCallActivity->getValue(DBEJCallActivity::problemID),
-                'Priority Changed from ' . $oldPriority . ' to ' . $problem->getValue(DBEJProblem::priority).
-                $priorityChangeReason
-            );
-        } else {
+        //     $this->logOperationalActivity(
+        //         $dsCallActivity->getValue(DBEJCallActivity::problemID),
+        //         'Priority Changed from ' . $oldPriority . ' to ' . $problem->getValue(DBEJProblem::priority).
+        //         $priorityChangeReason
+        //     );
+        // } else 
+        {
             if ((!isset($oldReason) || (isset($oldReason) && $oldReason != $newReason)) && $dsCallActivity->getValue(
                     DBEJCallActivity::endTime
                 )) {
@@ -1977,7 +1978,44 @@ class BUActivity extends Business
 
         return $enteredEndTime;
     } // end sendUpdatedByAnotherUserEmail
+    function updateCallActivityPriority($callActivityID,$priority,$reason)
+    {
+        $dbeCallActivity=new DBECallActivity($this);
+        $dbeCallActivity->getRow($callActivityID);
+        $problem=new DBEProblem($this);
+        $problemID=$dbeCallActivity->getValue(DBECallActivity::problemID);
+        $problem->getRow($problemID);
+        $oldPriority= $problem->getValue(DBEJProblem::priority);
+        if ($oldPriority != $priority) {
+            $slaResponseHours =
+                $this->getSlaResponseHours(
+                    $problem->getValue(DBEJProblem::priority),
+                    $problem->getValue(DBEJProblem::customerID),
+                    $dbeCallActivity->getValue(DBECallActivity::contactID)
+                );
 
+            $problem->setValue(
+                DBEJProblem::slaResponseHours,
+                $slaResponseHours
+            );
+            $problem->setValue(DBEProblem::priority,$priority);
+            $problem->updateRow();
+            
+            $this->sendEmailToCustomer(
+                $problemID,
+                self::WorkUpdatesCustomerEmailCategory,
+                self::WorkUpdatesPriorityChanged
+            );
+           
+            $this->logOperationalActivity(
+                $problemID,
+                'Priority Changed from ' . $oldPriority . ' to ' . $problem->getValue(DBEJProblem::priority).
+                $reason
+            );
+            return true;    
+        }
+        return false;        
+    }
     private function sendMonitoringEmails($callActivityID)
     {
         $buMail = new BUMail($this);

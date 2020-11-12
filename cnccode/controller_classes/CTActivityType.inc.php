@@ -27,10 +27,13 @@ class CTActivityType extends CTCNC
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
         $roles = MAINTENANCE_PERMISSION;
-        if (!self::hasPermissions($roles)) {
+        $noPermissionList=["getCallActTypes","getAllDetails","updateActivityTypeOrder"];
+        $key=array_search( $_REQUEST["action"],$noPermissionList);        
+        if ($key===false&&!self::hasPermissions($roles)) {          
             Header("Location: /NotAllowed.php");
             exit;
         }
+        
         $this->setMenuId(801);
         $this->buActivityType = new BUActivityType($this);
         $this->dsCallActType = new DSForm($this);
@@ -44,7 +47,7 @@ class CTActivityType extends CTCNC
      */
     function defaultAction()
     {
-        $this->checkPermissions(MAINTENANCE_PERMISSION);
+        //$this->checkPermissions(MAINTENANCE_PERMISSION);
         switch ($this->getAction()) {
             case CTACTIVITYTYPE_ACT_EDIT:
             case CTACTIVITYTYPE_ACT_CREATE:
