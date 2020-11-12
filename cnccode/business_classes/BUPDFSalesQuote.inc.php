@@ -269,8 +269,8 @@ class BUPDFSalesQuote extends Business
         $buPDF->CR();
         $buPDF->printString('If you need to vary the quote in any way, please email the changes to ');
         $buPDF->printString(
-            'sales@cnc-ltd.co.uk',
-            'mailto:sales@cnc-ltd.co.uk?Subject=Quote%20' . $ordheadID . '/' . $versionNo
+            'sales@' . CONFIG_PUBLIC_DOMAIN,
+            'mailto:sales@' . CONFIG_PUBLIC_DOMAIN . '?Subject=Quote%20' . $ordheadID . '/' . $versionNo
         );
         $buPDF->printString(
             ', quoting ' . $ordheadID . '/' . $versionNo . ' and we will send a revised order form to you.'
@@ -691,7 +691,7 @@ class BUPDFSalesQuote extends Business
 
         $subject = ucwords($body);
 
-        $senderEmail = $dsUser->getValue(DBEUser::username) . '@cnc-ltd.co.uk';
+        $senderEmail = $dsUser->getValue(DBEUser::username) . '@' . CONFIG_PUBLIC_DOMAIN;
         $senderName = $dsUser->getValue(DBEUser::firstName) . ' ' . $dsUser->getValue(DBEUser::lastName);
         global $twig;
 
@@ -712,9 +712,11 @@ class BUPDFSalesQuote extends Business
             $twig->render(
                 '@customerFacing/Quote/Quote.html.twig',
                 [
-                    "isOrderForm" => $dbeQuotation->getValue(DBEQuotation::documentType) == 'order form',
-                    "apiURL"      => $apiURL,
-                    "salutation"  => $dbeQuotation->getValue(DBEQuotation::salutation)
+                    "isOrderForm"     => $dbeQuotation->getValue(DBEQuotation::documentType) == 'order form',
+                    "apiURL"          => $apiURL,
+                    "salutation"      => $dbeQuotation->getValue(DBEQuotation::salutation),
+                    "senderFirstName" => $dsUser->getValue(DBEUser::firstName),
+                    "senderLastName"  => $dsUser->getValue(DBEUser::lastName)
                 ]
             )
         );

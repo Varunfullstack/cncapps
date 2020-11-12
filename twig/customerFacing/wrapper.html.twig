@@ -14,7 +14,10 @@ Sizes: [
 	-->
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      lang="EN"
+
+>
 <head>
     <meta http-equiv="Content-Type"
           content="text/html; charset=UTF-8"
@@ -725,12 +728,11 @@ Sizes: [
 
 
 </head>
-<body
-        leftmargin="0"
-        marginwidth="0"
-        topmargin="0"
-        marginheight="0"
-        offset="0"
+<body leftmargin="0"
+      marginwidth="0"
+      topmargin="0"
+      marginheight="0"
+      offset="0"
 >
 
 <!-- CENTER THE EMAIL // -->
@@ -744,7 +746,9 @@ Sizes: [
     the email starts from this center, so we try to
     apply necessary styling e.g. background-color.
 -->
-
+<p style="display: none">
+    nocncautosignature
+</p>
 <center style="background-color:#E1E1E1;">
 
     <table border="0"
@@ -757,7 +761,9 @@ Sizes: [
     >
         <tr>
             <td class="extraText">
-                ##- Please type your reply above this line -##
+                {% block replyText %}
+                    ##- Please type your reply above this line -##
+                {% endblock %}
             </td>
         </tr>
         <tr>

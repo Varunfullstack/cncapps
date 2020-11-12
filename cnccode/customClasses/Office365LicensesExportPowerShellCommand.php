@@ -1212,7 +1212,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
 
             $buMail->putInQueue(
                 CONFIG_SUPPORT_EMAIL,
-                "O365sparelicenses@cnc-ltd.co.uk",
+                "O365sparelicenses@" . CONFIG_PUBLIC_DOMAIN,
                 $hdrs,
                 $body
             );

@@ -1,7 +1,11 @@
 {% extends '@customerFacing/wrapper.html.twig' %}
-{# @var string salutation #}
-{# @var boolean isOrderForm #}
-{# @var string apiURL #}
+{# @var salutation string #}
+{# @var isOrderForm boolean #}
+{# @var apiURL string #}
+{# @var senderFirstName string #}
+{# @var senderLastName string #}
+{% block replyText %}
+{% endblock %}
 {% block headerTitle %}
     Billing Notice
 {% endblock %}
@@ -24,7 +28,10 @@
         </p>
     {% endif %}
     <p>
-        Regards,
+        Thanks
+    </p>
+    <p>
+        {{ senderFirstName }} {{ senderLastName }}
     </p>
 {% endblock %}
 

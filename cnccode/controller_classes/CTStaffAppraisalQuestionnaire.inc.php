@@ -1019,7 +1019,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
 
             $body = $template->getVar('OUTPUT');
 
-            $emailTo = $dbeUser->getValue(DBEUser::username) . "@cnc-ltd.co.uk";
+            $emailTo = $dbeUser->getValue(DBEUser::username) . "@" . CONFIG_PUBLIC_DOMAIN;
 
             $hdrs = array(
                 'From'         => CONFIG_SUPPORT_EMAIL,
@@ -1876,7 +1876,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
 
         $body = $template->getVar('OUTPUT');
 
-        $emailTo = $manager->getValue(DBEUser::username) . "@cnc-ltd.co.uk";
+        $emailTo = $manager->getValue(DBEUser::username) . "@" . CONFIG_PUBLIC_DOMAIN;
 
         $hdrs = array(
             'From'         => CONFIG_SUPPORT_EMAIL,
@@ -1935,8 +1935,8 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
         $managerFirstName = $manager->getValue(DBEUser::firstName);
         $lastName = $staffMember->getValue(DBEUser::lastName);
         $managerLastName = $manager->getValue(DBEUser::lastName);
-        $email = $staffMember->getValue(DBEUser::username) . '@cnc-ltd.co.uk';
-        $managerEmail = $manager->getValue(DBEUser::username) . '@cnc-ltd.co.uk';
+        $email = $staffMember->getValue(DBEUser::username) . '@' . CONFIG_PUBLIC_DOMAIN;
+        $managerEmail = $manager->getValue(DBEUser::username) . '@' . CONFIG_PUBLIC_DOMAIN;
 
         $envelopeDocument = new DocumentWithoutTemplate(
             'Staff Appraisal',

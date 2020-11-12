@@ -23,7 +23,7 @@ if (isset($_REQUEST['send'])) {
     $emailTo = CONFIG_SALES_EMAIL;
 
     $hdrs = array(
-        'From'         => CONFIG_SUPPORT_EMAIL,
+        'From'         => "test@" . CONFIG_PUBLIC_DOMAIN,
         'To'           => $emailTo,
         'Subject'      => "Nice Twig Test",
         'Date'         => date("r"),

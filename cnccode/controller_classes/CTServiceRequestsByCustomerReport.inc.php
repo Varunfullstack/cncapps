@@ -80,7 +80,7 @@ class CTServiceRequestsByCustomerReport extends CTCNC
         if ($results) {
             $buMail = new BUMail($this);
             $senderEmail = CONFIG_SUPPORT_EMAIL;
-            $toEmail = 'monthlysdreport@cnc-ltd.co.uk';
+            $toEmail = 'monthlysdreport@' . CONFIG_PUBLIC_DOMAIN;
 
             $this->template = new Template(
                 EMAIL_TEMPLATE_DIR,

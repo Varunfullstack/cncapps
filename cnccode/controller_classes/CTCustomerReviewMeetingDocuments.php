@@ -275,7 +275,13 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
         $dbeContact->getReviewContactsByCustomerID($customerID);
 
         $buMail = new BUMail($this);
-        $body = $twig->render($template);
+        $body = $twig->render(
+            $template,
+            [
+                "senderFirstName" => $this->dbeUser->getValue(DBEUser::firstName),
+                "senderLastName"  => $this->dbeUser->getValue(DBEUser::lastName),
+            ]
+        );
         $subject = "CNC Review Meeting Documents";
         $recipientsArray = [];
         while ($dbeContact->fetchNext()) {
@@ -285,7 +291,7 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
             $body,
             $subject,
             implode(",", $recipientsArray),
-            "{$this->dbeUser->getValue(DBEUser::username)}@cnc-ltd.co.uk"
+            "{$this->dbeUser->getValue(DBEUser::username)}@" . CONFIG_PUBLIC_DOMAIN
         );
     }
 

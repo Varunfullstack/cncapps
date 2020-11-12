@@ -9,7 +9,7 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 require_once("config.inc.php");
-GLOBAL $cfg;
+global $cfg;
 require_once($cfg['path_bu'] . '/BURenBroadband.inc.php');
 require_once($cfg['path_bu'] . '/BURenContract.inc.php');
 require_once($cfg['path_bu'] . '/BURenQuotation.inc.php');
@@ -24,7 +24,7 @@ $itemBillingCategory = null;
 if (isset($_REQUEST['itemBillingCategory'])) {
     $itemBillingCategory = $_REQUEST['itemBillingCategory'];
 }
-$toEmail = "CreateRenewalSalesOrders@cnc-ltd.co.uk";
+$toEmail = "CreateRenewalSalesOrders@" . CONFIG_PUBLIC_DOMAIN;
 
 if (!$itemBillingCategory) {
     $buRenBroadband->emailRenewalsSalesOrdersDue($toEmail);

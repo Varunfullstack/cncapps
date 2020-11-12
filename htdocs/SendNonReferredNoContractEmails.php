@@ -54,7 +54,7 @@ if ($db->num_rows()) {
     while ($db->next_record(MYSQLI_ASSOC)) {
 
 
-        $customerURL = SITE_URL  . Controller::formatForHTML(
+        $customerURL = SITE_URL . Controller::formatForHTML(
                 '/Customer.php?action=dispEdit&customerID=' . $db->Record['id'],
                 1
             );
@@ -90,7 +90,7 @@ if ($db->num_rows()) {
 
     echo $body;
 
-    $emailTo = "customersnocontracts@cnc-ltd.co.uk";
+    $emailTo = "customersnocontracts@" . CONFIG_PUBLIC_DOMAIN;
 
     $hdrs = array(
         'From'         => CONFIG_SUPPORT_EMAIL,

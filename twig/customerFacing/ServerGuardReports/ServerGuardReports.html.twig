@@ -4,6 +4,8 @@
 {# @var string technicianResponsible #}
 {# @var string extra #}
 {# @var string contactFirstName #}
+{% block replyText %}
+{% endblock %}
 {% block headerTitle %}
     Daily Report
 {% endblock %}
@@ -13,13 +15,9 @@
 {% endblock %}
 
 {% block content %}
-
     <p>Dear Customer</p>
-
     <p>Please find attached your daily serverguard report.</p>
-
-
-    Best Regards
+    <p> Best Regards </p>
 {% endblock %}
 
 {% block leftFooter %}

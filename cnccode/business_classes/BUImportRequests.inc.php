@@ -122,7 +122,7 @@ class BUImportRequests extends Business
         $buMail = new BUMail($this);
 
         $senderEmail = CONFIG_SUPPORT_EMAIL;
-        $toEmail = "CNCServiceDesk@cnc-ltd.co.uk";
+        $toEmail = "CNCServiceDesk@" . CONFIG_PUBLIC_DOMAIN;
 
         $template = new Template(
             $cfg["path_templates"],

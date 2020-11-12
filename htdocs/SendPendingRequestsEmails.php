@@ -68,15 +68,15 @@ function processChangeRequestsEmails()
 
     }
     sendChangeRequestsEmail(
-        'hdtimerequest@cnc-ltd.co.uk',
+        'hdtimerequest@' . CONFIG_PUBLIC_DOMAIN,
         $pendingHDRequests
     );
     sendChangeRequestsEmail(
-        'eqtimerequest@cnc-ltd.co.uk',
+        'eqtimerequest@' . CONFIG_PUBLIC_DOMAIN,
         $pendingESRequests
     );
     sendChangeRequestsEmail(
-        'imptimerequest@cnc-ltd.co.uk',
+        'imptimerequest@' . CONFIG_PUBLIC_DOMAIN,
         $pendingIMRequests
     );
 }
@@ -219,19 +219,19 @@ function processTimeRequestsEmails()
         }
     }
     sendTimeRequestsEmail(
-        'hdtimerequest@cnc-ltd.co.uk',
+        'hdtimerequest@' . CONFIG_PUBLIC_DOMAIN,
         $pendingHDRequests
     );
     sendTimeRequestsEmail(
-        'eqtimerequest@cnc-ltd.co.uk',
+        'eqtimerequest@' . CONFIG_PUBLIC_DOMAIN,
         $pendingESRequests
     );
     sendTimeRequestsEmail(
-        'sptimerequest@cnc-ltd.co.uk',
+        'sptimerequest@' . CONFIG_PUBLIC_DOMAIN,
         $pendingIMRequests
     );
     sendTimeRequestsEmail(
-        'projectstimerequest@cnc-ltd.co.uk',
+        'projectstimerequest@' . CONFIG_PUBLIC_DOMAIN,
         $pendingProjectRequests
     );
     sendNoSRIDInTimeRequestEmails($activitiesWithoutProblemIdPerTeamLeaderMap);

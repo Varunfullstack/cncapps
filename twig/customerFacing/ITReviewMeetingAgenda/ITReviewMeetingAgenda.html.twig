@@ -1,5 +1,8 @@
 {% extends '@customerFacing/wrapper.html.twig' %}
-{# @var string contactFirstName #}
+{# @var senderFirstName string #}
+{# @var senderLastName string #}
+{% block replyText %}
+{% endblock %}
 {% block headerTitle %}
     Billing Notice
 {% endblock %}
@@ -13,7 +16,12 @@
         The documents for our forthcoming review meeting are now uploaded to the customer portal, please take a few
         moments to review ready for our discussion.
     </p>
-    <p>Regards</p>
+    <p>
+        Thanks
+    </p>
+    <p>
+        {{ senderFirstName }} {{ senderLastName }}
+    </p>
 {% endblock %}
 
 {% block leftFooter %}

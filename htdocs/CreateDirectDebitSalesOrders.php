@@ -7,10 +7,10 @@
  */
 
 require_once("config.inc.php");
-GLOBAL $cfg;
+global $cfg;
 require_once($cfg['path_bu'] . '/BUDirectDebitContracts.php');
 
-$toEmail = "CreateRenewalSalesOrders@cnc-ltd.co.uk";
+$toEmail = "CreateRenewalSalesOrders@" . CONFIG_PUBLIC_DOMAIN;
 $thing = null;
 $buDirectDebitContracts = new BUDirectDebitContracts($thing);
 

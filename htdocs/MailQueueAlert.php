@@ -19,7 +19,7 @@ $thing = null;
 if ($server_type == MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT) {
     $send_to_email = CONFIG_CATCHALL_EMAIL;
 } else {
-    $send_to_email = 'MailQueueAlert@cnc-ltd.co.uk';
+    $send_to_email = 'MailQueueAlert@' . CONFIG_PUBLIC_DOMAIN;
 }
 
 function getCountOfMessagesInQueueForMoreThan30Minutes()

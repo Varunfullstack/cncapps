@@ -66,7 +66,7 @@ class CTContractAnalysisReport extends CTCNC
         }
     }
 
-/**
+    /**
      * @throws Exception
      */
     function email()
@@ -132,7 +132,7 @@ class CTContractAnalysisReport extends CTCNC
             $subject = 'Monthly Customer Profitability Report';
 
             /* Sent to the directors only */
-            $toEmail = "MonthlyCustomerProfitabilityReport@cnc-ltd.co.uk";
+            $toEmail = "MonthlyCustomerProfitabilityReport@" . CONFIG_PUBLIC_DOMAIN;
 
             $hdrs = array(
                 'From'         => $senderEmail,
@@ -168,7 +168,7 @@ class CTContractAnalysisReport extends CTCNC
     Render results section
     */
 
-/**
+    /**
      * @param $templateName
      * @param $results
      * @param DSForm $dsSearchForm

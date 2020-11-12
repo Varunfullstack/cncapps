@@ -2,11 +2,12 @@
 
 
 require_once("config.inc.php");
+global $cfg;
 require_once($cfg["path_bu"] . "/BUMail.inc.php");
 $buMail = new BUMail($thing);
-$toEmail = 'adrianc@cnc-ltd.co.uk';
+$toEmail = 'adrianc@' . CONFIG_PUBLIC_DOMAIN;
 $hdrs = array(
-    'From'         => 'support@cnc-ltd.co.uk',
+    'From'         => 'support@' . CONFIG_PUBLIC_DOMAIN,
     'To'           => $toEmail,
     'Subject'      => "Test Email",
     'Date'         => date("r"),

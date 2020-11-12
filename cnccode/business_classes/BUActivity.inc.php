@@ -1896,7 +1896,7 @@ class BUActivity extends Business
 
         $body = $buMail->mime->get($mime_params);
         foreach ($monitoringPeople as $monitoringPerson) {
-            $toEmail = $monitoringPerson['cns_logname'] . '@cnc-ltd.co.uk';
+            $toEmail = $monitoringPerson['cns_logname'] . '@' . CONFIG_PUBLIC_DOMAIN;
 
             $hdrs = array(
                 'From'         => $senderEmail,
@@ -3683,10 +3683,10 @@ class BUActivity extends Business
         $toEmail = 'changerequestreply@' . CONFIG_PUBLIC_DOMAIN;
 
         $emailsByTeam = [
-            1 => "changerequestshelpdesk@cnc-ltd.co.uk",
-            2 => "changerequestsEscalations@cnc-ltd.co.uk",
-            4 => "changerequestssmallprojects@cnc-ltd.co.uk",
-            5 => "changerequestsprojects@cnc-ltd.co.uk",
+            1 => "changerequestshelpdesk@" . CONFIG_PUBLIC_DOMAIN,
+            2 => "changerequestsEscalations@" . CONFIG_PUBLIC_DOMAIN,
+            4 => "changerequestssmallprojects@" . CONFIG_PUBLIC_DOMAIN,
+            5 => "changerequestsprojects@" . CONFIG_PUBLIC_DOMAIN,
         ];
 
         if (isset($emailsByTeam[$this->dbeUser->getValue(DBEUser::teamID)])) {
@@ -3820,10 +3820,10 @@ class BUActivity extends Business
         $toEmail = 'changerequest@' . CONFIG_PUBLIC_DOMAIN;
 
         $emailsByTeam = [
-            1 => "changerequestshelpdesk@cnc-ltd.co.uk",
-            2 => "changerequestsEscalations@cnc-ltd.co.uk",
-            4 => "changerequestssmallprojects@cnc-ltd.co.uk",
-            5 => "changerequestsprojects@cnc-ltd.co.uk",
+            1 => "changerequestshelpdesk@" . CONFIG_PUBLIC_DOMAIN,
+            2 => "changerequestsEscalations@" . CONFIG_PUBLIC_DOMAIN,
+            4 => "changerequestssmallprojects@" . CONFIG_PUBLIC_DOMAIN,
+            5 => "changerequestsprojects@" . CONFIG_PUBLIC_DOMAIN,
         ];
 
         if (isset($emailsByTeam[$this->dbeUser->getValue(DBEUser::teamID)])) {
@@ -9909,9 +9909,9 @@ FROM
 
 
         $bcc = [
-            $dsCallActivity->getValue(DBEJCallActivity::userAccount) . '@cnc-ltd.co.uk',
+            $dsCallActivity->getValue(DBEJCallActivity::userAccount) . '@' . CONFIG_PUBLIC_DOMAIN,
             CONFIG_SALES_EMAIL,
-            "VisitConfirmation@cnc-ltd.co.uk"
+            "VisitConfirmation@" . CONFIG_PUBLIC_DOMAIN
         ];
 
         $recipientsArray = array_merge($recipientsArray, $bcc);
@@ -11653,7 +11653,6 @@ FROM
         );
 
         $dbeCallActivity->insertRow();
-        // send email to grahaml@cnc-ltd.co.uk
         $buMail = new BUMail($this);
         $senderEmail = CONFIG_SUPPORT_EMAIL;
         $activityRef = $dbeProblem->getPKValue() . ' ' . $dsCustomer->getValue(DBECustomer::name);

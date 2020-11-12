@@ -33,9 +33,9 @@ $buHeader = new BUHeader($thing);
 $dsHeader = new DataSet($thing);
 $buHeader->getHeader($dsHeader);
 
-$user = "cncappsapi@cnc-ltd.co.uk";
+$user = "cncappsapi@" . CONFIG_PUBLIC_DOMAIN;
 $password = '3uGhNEBW6dsAHd6q';
-$client_Id = 'client_e2maZ8d5@cnc-ltd.co.uk';
+$client_Id = 'client_e2maZ8d5@' . CONFIG_PUBLIC_DOMAIN;
 $client_secret = '{1!XM^QJcqvM8qj';
 $gsmKey = "2FB2-LTSW-E06B-3F49-43DC";
 
@@ -282,9 +282,9 @@ fclose($csv);
 
 $buMail = new BUMail($thing);
 
-$toEmail = 'unseencomputers@cnc-ltd.co.uk';
+$toEmail = 'unseencomputers@' . CONFIG_PUBLIC_DOMAIN;
 $hdrs = array(
-    'From'         => 'support@cnc-ltd.co.uk',
+    'From'         => 'support@' . CONFIG_PUBLIC_DOMAIN,
     'To'           => $toEmail,
     'Subject'      => "Computers not seen recently",
     'Date'         => date("r"),

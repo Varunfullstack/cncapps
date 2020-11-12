@@ -1,11 +1,8 @@
 {% extends '@customerFacing/wrapper.html.twig' %}
-{# @var integer serviceRequestId #}
-{# @var string lastActivityReason #}
-{# @var string contactFirstName #}
-{# @var integer oldPriority #}
-{# @var integer newPriority #}
-{# @var float SLA #}
-{# @var string serviceRequestStatus  the status of the request "Initial"|"In Progress"|"On Hold" #}
+{# @var contactFirstName string #}
+{% block replyText %}
+{% endblock %}
+
 {% block headerTitle %}
     Terms and Conditions
 {% endblock %}
@@ -20,11 +17,6 @@
         Please find attached a copy of the Terms & Conditions that you have recently accepted, which will also be
         available via your portal.
     </p>
-
-
-
-
-
 {% endblock %}
 
 {% block serviceRequestURL %}

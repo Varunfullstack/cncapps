@@ -1329,7 +1329,7 @@ WHERE pro_priority = 5
                     $subject,
                     $body,
                     null,
-                    'customerReports@cnc-ltd.co.uk'
+                    'customerReports@' . CONFIG_PUBLIC_DOMAIN
                 );
             }
 

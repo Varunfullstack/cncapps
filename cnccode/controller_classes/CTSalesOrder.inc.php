@@ -3567,7 +3567,7 @@ class CTSalesOrder extends CTCNC
         $buPDF->CR();
         $buPDF->CR();
         $buPDF->printString(
-            'Please return a signed copy to sales@cnc-ltd.co.uk'
+            'Please return a signed copy to sales@'.CONFIG_PUBLIC_DOMAIN
         );
         $buPDF->endPage();
         // End of second page

@@ -174,7 +174,7 @@ $body = $twig->render(
     ]
 );
 $fromEmail = CONFIG_SUPPORT_EMAIL;
-$toEmail = "payroll@cnc-ltd.co.uk";
+$toEmail = "payroll@" . CONFIG_PUBLIC_DOMAIN;
 $subject = "Staff Sickness Report For Payroll";
 $hdrs = array(
     'From'    => $fromEmail,

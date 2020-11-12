@@ -645,7 +645,7 @@ ORDER BY cns_name, caa_date";
     function sendResultToEmail($fromUser, $summaryCSVString, $journalCSVString = null)
     {
         $buMail = new BUMail($this);
-        $toEmail = "payroll@cnc-ltd.co.uk";
+        $toEmail = "payroll@".CONFIG_PUBLIC_DOMAIN;
         $fromEmail = $fromUser->getValue(DBEUser::username) . "@" . CONFIG_PUBLIC_DOMAIN;
         $hdrs = array(
             'From'    => $fromEmail,

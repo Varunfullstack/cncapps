@@ -225,7 +225,7 @@ class BUUser extends Business
             ]
         );
 
-        $emailTo = "sicknessalert@cnc-ltd.co.uk";
+        $emailTo = "sicknessalert@" . CONFIG_PUBLIC_DOMAIN;
 
         $hdrs = array(
             'From'         => CONFIG_SUPPORT_EMAIL,

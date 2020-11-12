@@ -1,5 +1,7 @@
 {% extends '@customerFacing/wrapper.html.twig' %}
 {# @var data CNCLTD\TwigDTOs\PrimaryMainContactNotAuthorisedNotification #}
+{% block replyText %}
+{% endblock %}
 {% block headerTitle %}
     Information Notice
 {% endblock %}
@@ -18,10 +20,6 @@
         You will need to contact us on their behalf to progress this request and in future, if you would like them to be
         able to raise requests themselves, then please log onto our portal and change their support level.
     </p>
-
-
-
-
 {% endblock %}
 
 {% block serviceRequestURL %}

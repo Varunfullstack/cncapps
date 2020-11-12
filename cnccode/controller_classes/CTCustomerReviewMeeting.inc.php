@@ -894,10 +894,10 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
         }
 
         if (count($duplicates)) {
-            // send email to sales@cnc-ltd.co.uk with the list of duplicates
+
             $buMail = new BUMail($this);
             $senderEmail = CONFIG_SUPPORT_EMAIL;
-            $toEmail = 'sales@cnc-ltd.co.uk';
+            $toEmail = 'sales@' . CONFIG_PUBLIC_DOMAIN;
 
             $template = new Template(
                 $GLOBALS ["cfg"]["path_templates"],
@@ -1523,11 +1523,11 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
         }
 
         if (count($duplicates)) {
-            // send email to sales@cnc-ltd.co.uk with the list of duplicates
+
             $buMail = new BUMail($this);
 
             $senderEmail = CONFIG_SUPPORT_EMAIL;
-            $toEmail = 'sales@cnc-ltd.co.uk';
+            $toEmail = 'sales@' . CONFIG_PUBLIC_DOMAIN;
 
             $template = new Template(
                 $GLOBALS ["cfg"]["path_templates"],

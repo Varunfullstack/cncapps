@@ -15,7 +15,7 @@ require_once("../cnccode/business_classes/BUMail.inc.php");
 
 define(
     'OS_CALL_EMAIL_FROM_USER',
-    'sales@cnc-ltd.co.uk'
+    'sales@' . CONFIG_PUBLIC_DOMAIN
 );
 define(
     'OS_CALL_EMAIL_SUBJECT',
@@ -26,7 +26,7 @@ define(
     '%e/%c/%Y'
 );
 
-$domain = 'cnc-ltd.co.uk';
+$domain = CONFIG_PUBLIC_DOMAIN;
 
 
 //we are going to use this to add to the monitoring db

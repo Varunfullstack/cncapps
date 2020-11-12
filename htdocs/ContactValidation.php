@@ -39,8 +39,8 @@ if (!count($customersFailingValidation)) {
 $buMail = new BUMail($thing);
 $body = $twig->render('@internal/contactValidationFailedEmail.html.twig', ["customers" => $customersFailingValidation]);
 echo $body;
-$senderEmail = "sales@cnc-ltd.co.uk";
-$toEmail = "contactvalidation@cnc-ltd.co.uk";
+$senderEmail = "sales@" . CONFIG_PUBLIC_DOMAIN;
+$toEmail = "contactvalidation@" . CONFIG_PUBLIC_DOMAIN;
 $subject = "Customers with invalid contact configurations";
 $hdrs = array(
     'From'         => $senderEmail,

@@ -791,7 +791,7 @@ $app->group(
                     $email = $dsDeliveryContact->getValue(DBEContact::email);
                     global $server_type;
                     if ($server_type !== MAIN_CONFIG_SERVER_TYPE_LIVE) {
-                        $email = "sales@cnc-ltd.co.uk";
+                        $email = "sales@" . CONFIG_PUBLIC_DOMAIN;
                     }
                     $ordHeadID = $dbeQuotation->getValue(DBEQuotation::ordheadID);
                     $versionNo = $dbeQuotation->getValue(DBEQuotation::versionNo);

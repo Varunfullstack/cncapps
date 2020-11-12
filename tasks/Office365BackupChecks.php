@@ -7,7 +7,6 @@
  */
 
 use CNCLTD\LoggerCLI;
-use Twig\Environment;
 
 require_once(__DIR__ . "/../htdocs/config.inc.php");
 global $cfg;
@@ -122,7 +121,7 @@ function sendNoContractIdWarningEmail(array $accountItems)
 {
     $buMail = new BUMail($thing);
     $senderEmail = CONFIG_SUPPORT_EMAIL;
-    $toEmail = "office365backup@cnc-ltd.co.uk";
+    $toEmail = "office365backup@" . CONFIG_PUBLIC_DOMAIN;
     $hdrs = array(
         'From'         => $senderEmail,
         'To'           => $toEmail,

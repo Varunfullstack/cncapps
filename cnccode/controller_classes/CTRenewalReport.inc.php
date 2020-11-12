@@ -652,7 +652,7 @@ class CTRenewalReport extends CTCNC
         $email = $dbeContact->getValue(DBEContact::email);
         global $server_type;
         if ($server_type !== MAIN_CONFIG_SERVER_TYPE_LIVE) {
-            $email = "sales@cnc-ltd.co.uk";
+            $email = "sales@" . CONFIG_PUBLIC_DOMAIN;
         }
 
         $envelopeDocument = new DocumentWithoutTemplate(

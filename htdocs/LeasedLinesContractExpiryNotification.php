@@ -105,42 +105,5 @@ if ($dsRenBroadband->rowCount()) {
     $result = $template->getVar('OUTPUT');
     if ($onScreen) {
         echo $result;
-    } else {
-        // $buMail = new BUMail($thing);
-
-        // $senderEmail = CONFIG_SUPPORT_EMAIL;
-        // $senderName = 'CNC Support Department';
-
-        // $toEmail = "leasedlinecontractexpirations@cnc-ltd.co.uk";
-
-        // $body = $result;
-
-        // $hdrs = array(
-        //     'From'         => $senderEmail,
-        //     'To'           => $toEmail,
-        //     'Subject'      => 'Leased line contract expiry notification',
-        //     'Date'         => date("r"),
-        //     'Content-Type' => 'text/html; charset=UTF-8'
-        // );
-
-
-        // $buMail->mime->setHTMLBody($body);
-
-        // $mime_params = array(
-        //     'text_encoding' => '7bit',
-        //     'text_charset'  => 'UTF-8',
-        //     'html_charset'  => 'UTF-8',
-        //     'head_charset'  => 'UTF-8'
-        // );
-        // $body = $buMail->mime->get($mime_params);
-
-        // $hdrs = $buMail->mime->headers($hdrs);
-
-        // $buMail->putInQueue(
-        //     $senderEmail,
-        //     $toEmail,
-        //     $hdrs,
-        //     $body
-        // );
     }
 }
