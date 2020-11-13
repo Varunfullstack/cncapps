@@ -1,4 +1,4 @@
-import CKEditor from "../shared/CKEditor.js?v=1";
+import CKEditor from "../shared/CKEditor";
 import Modal from "../shared/Modal/modal";
 
 /**

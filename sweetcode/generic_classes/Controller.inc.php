@@ -670,8 +670,8 @@ class Controller extends BaseObject
 
     function setPageTitle($pageTitle, string $pageHeader = null)
     {
-        $this->pageTitle    = explode('<',$pageTitle)[0];
-        $this->pageHeader   = $pageTitle;
+        $this->pageTitle = explode('<', $pageTitle)[0];
+        $this->pageHeader = $pageTitle;
         if ($pageHeader) {
             $this->pageHeader = $pageHeader;
         }
@@ -961,7 +961,7 @@ class Controller extends BaseObject
     {
         // Truncate if it will become longer than max allowed
         $totalNewLength = strlen($this->pageTitle) + strlen($newString) + 2;
-         
+
         if ($totalNewLength > MAX_PAGE_TITLE) {
             $this->pageTitle =
                 substr(
@@ -1125,7 +1125,7 @@ class Controller extends BaseObject
         }
         $this->template->setVar(
             'javaScript',
-            "<link rel='stylesheet'  href='subComponents/dist/$string?$version'>",
+            "<link rel='stylesheet'  href='components/dist/$string?$version'>",
             true
         );
     }
@@ -1150,7 +1150,7 @@ class Controller extends BaseObject
 
         $this->template->setVar(
             'javaScript',
-            "<script src='subComponents/dist/$string?$version'></script>",
+            "<script src='components/dist/$string?$version'></script>",
             true
         );
 

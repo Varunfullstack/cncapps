@@ -1171,13 +1171,13 @@ class CTSRActivity extends CTCNC
         $this->setMethodName('setTemplate');
         $this->setMenuId(102);
         $title = $this->getTitle();
-        //echo explode('<',$title)[1]; exit;
         $this->setPageTitle($title);
         $this->setTemplateFiles(
             'Activity',
             'Activity.inc'
         );
-
+        $this->loadReactScript('ActivityComponent.js');
+        $this->loadReactCSS('ActivityComponent.css');
         $this->template->parse(
             'CONTENTS',
             'Activity',

@@ -7,7 +7,7 @@ import ActivityEditComponent from "./subComponents/ActivityEditComponent";
 import GatherFixedInformationComponent from "./subComponents/GatherFixedInformationComponent";
 import GatherManagementReviewDetailsComponent from "./subComponents/GatherManagementReviewDetailsComponent";
 
-import 'ActivityComponent.css';
+import './ActivityComponent.css';
 
 class ActivityComponent extends React.Component {
     constructor(props) {

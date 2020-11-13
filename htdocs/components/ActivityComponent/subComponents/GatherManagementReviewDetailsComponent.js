@@ -1,7 +1,7 @@
-import MainComponent from "../../shared/MainComponent.js?v=1";
-import APIActivity from "../../services/APIActivity.js?v=1";
-import CKEditor from "../../shared/CKEditor.js?v=1";
-import ToolTip from "../../shared/ToolTip.js?v=1";
+import MainComponent from "../../shared/MainComponent";
+import APIActivity from "../../services/APIActivity";
+import CKEditor from "../../shared/CKEditor";
+import ToolTip from "../../shared/ToolTip";
 import {params} from "../../utils/utils";
 
 class GatherManagementReviewDetailsComponent extends MainComponent {

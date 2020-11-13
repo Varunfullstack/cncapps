@@ -23,6 +23,8 @@
         "start:SpinnerHolder": "parcel SpinnerHolderComponent/SpinnerHolderComponent.js --public-url /components/dist",
         "build:SRSourceComponent": "parcel build SRSourceComponent/SRSourceComponent.js --public-url /components/dist",
         "start:SRSourceComponent": "parcel SRSourceComponent/SRSourceComponent.js --public-url /components/dist",
+        "start:ActivityComponent": "parcel ActivityComponent/ActivityComponent.js --public-url /components/dist",
+        "build:ActivityComponent": "parcel build ActivityComponent/ActivityComponent.js --public-url /components/dist",
         "build": "npm run build:ChildItemComponent && npm run build:CustomerLicenseComponent && npm run build:ExpenseBreakdownYearToDateComponent && npm run build:FixedServiceRequestCountComponent && npm run build:ItemListTypeAheadRenderer && npm run build:MySettingsComponent && npm run build:OutOfHoursReportComponent && npm run build:SpinnerHolder && npm run build:SRSourceComponent"
     },
     "author": "",
