@@ -13,6 +13,7 @@ import StandardTextModal from "../../Modals/StandardTextModal.js";
 import MainComponent from "../../shared/MainComponent.js";
 import APIStandardText from "../../services/APIStandardText.js";
 import Modal from "../../shared/Modal/modal";
+import React from 'react';
 
 class ActivityEditComponent extends MainComponent {
     el = React.createElement;
@@ -1265,7 +1266,7 @@ class ActivityEditComponent extends MainComponent {
 
         return el(
             "table",
-            {className: "activities-edit-contianer"},
+            {className: "activities-edit-container"},
             el(
                 "tbody",
                 {},
@@ -1433,7 +1434,7 @@ class ActivityEditComponent extends MainComponent {
         ];
         return el(
             "div",
-            {className: "activities-edit-contianer", style: {marginBottom: 30}},
+            {className: "activities-edit-container", style: {marginBottom: 30}},
             el("label", {className: "label m-5", style: {display: "block"}}, "Documents"),
             data?.documents.length > 0
                 ? el(Table, {
@@ -1929,8 +1930,8 @@ class ActivityEditComponent extends MainComponent {
             this.getPriorityChangeReason(),
             this.getProjectsElement(),
             this.getHeader(),
-            el("div", {className: "activities-edit-contianer"}, this.getActions()),
-            el("div", {className: "activities-edit-contianer"}, this.getActionsButtons()),
+            el("div", {className: "activities-edit-container"}, this.getActions()),
+            el("div", {className: "activities-edit-container"}, this.getActionsButtons()),
             this.getContentElement(),
             this.getActivityNotes(),
             this.getCustomerNotes(),

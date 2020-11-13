@@ -1,13 +1,16 @@
 import MainComponent from "../shared/MainComponent";
-import CurrentActivityService from "../CurrentActivityReport/services/CurrentActivityService";
+import CurrentActivityService from "../CurrentActivityReportComponent/services/CurrentActivityService";
 import Table from "../shared/table/table";
 import Toggle from "../shared/Toggle";
 import ToolTip from "../shared/ToolTip";
 import {SRQueues} from "../utils/utils";
 import DailyStatsComponent from "./subComponents/DailyStatsComponent";
 import APISDManagerDashboard from "./services/APISDManagerDashboard";
+import React from 'react';
+import ReactDOM from 'react-dom';
 
-import 'SDManagerDashboardComponent.css';
+import './../style.css';
+import './SDManagerDashboardComponent.css';
 
 class SDManagerDashboardComponent extends MainComponent {
     el = React.createElement;

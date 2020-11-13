@@ -1,8 +1,10 @@
 import Table from "./../../shared/table/table";
-import CurrentActivityService from "../services/CurrentActivityService.js?v=1";
+import CurrentActivityService from "../services/CurrentActivityService";
 
-class InboxHelpDeskComponent extends React.Component {
-    code = "H";
+import React from 'react';
+
+class InboxProjectsComponent extends React.Component {
+    code = "P";
     el = React.createElement;
     apiCurrentActivityService;
 
@@ -37,8 +39,8 @@ class InboxHelpDeskComponent extends React.Component {
                 label: "",
                 key: "work",
                 sortable: false,
-                hdClassName: "text-center",
                 className: "text-center",
+                hdClassName: "text-center",
                 content: (problem) =>
                     addToolTip(
                         el(
@@ -137,7 +139,7 @@ class InboxHelpDeskComponent extends React.Component {
                                 className: "float-right",
                                 style: {},
                             },
-                            `${problem.hdRemaining}`
+                            `${problem.projectTeamRemaining}`
                         )
                     ),
                 ],
@@ -266,7 +268,6 @@ class InboxHelpDeskComponent extends React.Component {
                 hdClassName: "text-center",
                 className: "text-center",
                 backgroundColorColumn: "priorityBgColor"
-
             },
             {
                 hide: false,
@@ -297,11 +298,9 @@ class InboxHelpDeskComponent extends React.Component {
                 icon: "fal fa-2x fa-user-hard-hat color-gray2 ",
                 sortable: false,
                 hdClassName: "text-center",
-
                 content: (problem) => getAllocatedElement(problem, this.code),
             },
         ];
-
         if (this.props?.currentUser?.isSDManger)
             columns.push({
                 hide: false,
@@ -402,6 +401,7 @@ class InboxHelpDeskComponent extends React.Component {
 
     render() {
         const {el, getTableElement, getSrByUsersSummaryElement} = this;
+        const {data} = this.props;
         return [
             el(
                 "div",
@@ -413,4 +413,4 @@ class InboxHelpDeskComponent extends React.Component {
     }
 }
 
-export default InboxHelpDeskComponent;
+export default InboxProjectsComponent;

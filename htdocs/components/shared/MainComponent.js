@@ -2,9 +2,13 @@ import Alert from "./Alert.js";
 import Confirm from "./Confirm.js";
 import Prompt from "./Prompt.js";
 
+import React from 'react';
+
 export default class MainComponent extends React.Component {
+
     constructor(props) {
         super(props);
+        this.el = React.createElement;
         this.state = {
             alert: {
                 show: false,
@@ -74,7 +78,13 @@ export default class MainComponent extends React.Component {
     }
     getAlert = () => {
         const {alert} = this.state;
-        return this.el(Alert, {...alert, onClose: this.handleAlertClose, key: "alert"});
+        return <Alert
+            show={alert.show}
+            width={alert.width}
+            title={alert.title}
+            message={alert.message}
+            onClose={() => this.handleAlertClose()}
+        />;
     }
     handleAlertClose = () => {
         const {alert} = this.state;

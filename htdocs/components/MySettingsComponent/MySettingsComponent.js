@@ -28,7 +28,6 @@ class MySettingsComponent extends React.Component {
                     });
 
                 this.setState({...data});
-                //console.log(data);
             })
     }
 
@@ -40,13 +39,6 @@ class MySettingsComponent extends React.Component {
     }
 
     getUserLog() {
-        // if(this.state.userLog)
-        // return this.el("ul", { className: "list-group user-log",key:"user_log" }, [
-        //   this.state.userLog.map((log) => {
-        //     return this.el('li',{className:'list-group-item',key:log.userTimeLogID},log.loggedDate+' '+log.startedTime)
-        //   }),
-        // ]);
-
         if (this.state.userLog)
             return this.el("dl", {key: "user_log"}, [
                 this.state.userLog.map((log) => {
@@ -57,15 +49,12 @@ class MySettingsComponent extends React.Component {
     }
 
     handleOnChange = () => {
-        //console.log(this.state.sendEmailAssignedService);
         const sendEmailAssignedService = !this.state.sendEmailAssignedService;
         this.setState({sendEmailAssignedService});
     }
 
     handleOnClick = () => {
-        // save it to database
         fetch('?action=sendEmailAssignedService&&sendEmailAssignedService=' + (this.state.sendEmailAssignedService ? 1 : 0), {method: 'POST'}).then(response => {
-            //console.log(response);
         })
     }
 

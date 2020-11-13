@@ -10,25 +10,6 @@ class TDOrderDetailsComponent extends React.Component {
     el = React.createElement;
     apiCustomerLicenses;
 
-    /*
-    data: {
-          poNumber: "",
-          endCustomer: {
-            id:'',
-            customerPoNumber:'',
-          },
-          lines: [
-
-          ],
-          paymentMethod:{
-            type:'Terms'
-          },
-          metaData:{
-            firstName:'',
-            lastName:'',
-            isEndCustomer:true,
-          }
-        },*/
     /**
      * init state
      * @param {*} props
@@ -50,18 +31,10 @@ class TDOrderDetailsComponent extends React.Component {
         const queryParams = new URLSearchParams(window.location.search);
         const orderId = queryParams.get("orderId");
         if (orderId && orderId != "") {
-            // get order detials
             this.apiCustomerLicenses.getOrderDetials(orderId).then(res => {
                 console.log(res);
             })
         }
-        // const endCustomerId = queryParams.get("endCustomerId");
-        // if (endCustomerId && endCustomerId != "")
-        //   this.getCustomerDetails(endCustomerId);
-        // this.apiCustomerLicenses.getProductList(2).then(result=>console.log('Product List',result))
-        // //get vendors
-        // this.fetchAllVendors(1);
-
     }
 
     fetchAllVendors = (page) => {

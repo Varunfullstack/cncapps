@@ -1,7 +1,8 @@
-import MainComponent from "../../shared/MainComponent.js?v=1";
+import MainComponent from "../../shared/MainComponent";
 import {SRQueues} from "../../utils/utils";
-import APISDManagerDashboard from "../services/APISDManagerDashboard.js?v=1";
+import APISDManagerDashboard from "../services/APISDManagerDashboard";
 import Spinner from './../../shared/Spinner/Spinner';
+import React from 'react';
 
 class DailyStatsComponent extends MainComponent {
     el = React.createElement;

@@ -1,19 +1,21 @@
 // tabs subComponents
-import InboxHelpDeskComponent from './subComponents/InboxHelpDeskComponent.js?v=1';
-import InboxEscalationsComponent from './subComponents/InboxEscalationsComponent.js?v=1';
-import InboxSmallProjectsComponent from './subComponents/InboxSmallProjectsComponent.js?v=1';
-import InboxSalesComponent from './subComponents/InboxSalesComponent.js?v=1';
-import InboxProjectsComponent from './subComponents/InboxProjectsComponent.js?v=1';
-import InboxToBeLoggedComponent from './subComponents/InboxToBeLoggedComponent.js?v=1';
-import InboxPendingReopenedComponent from './subComponents/InboxPendingReopenedComponent.js?v=1';
-import CurrentActivityService from './services/CurrentActivityService.js?v=1';
+import InboxHelpDeskComponent from './subComponents/InboxHelpDeskComponent';
+import InboxEscalationsComponent from './subComponents/InboxEscalationsComponent';
+import InboxSmallProjectsComponent from './subComponents/InboxSmallProjectsComponent';
+import InboxSalesComponent from './subComponents/InboxSalesComponent';
+import InboxProjectsComponent from './subComponents/InboxProjectsComponent';
+import InboxToBeLoggedComponent from './subComponents/InboxToBeLoggedComponent';
+import InboxPendingReopenedComponent from './subComponents/InboxPendingReopenedComponent';
+import CurrentActivityService from './services/CurrentActivityService';
 import Spinner from './../shared/Spinner/Spinner';
-import MainComponent from '../shared/MainComponent.js?v=1';
-import ActivityFollowOn from '../Modals/ActivityFollowOn.js?v=1';
-import InboxOpenSRComponent from './subComponents/InboxOpenSRComponent.js?v=1';
+import MainComponent from '../shared/MainComponent';
+import ActivityFollowOn from '../Modals/ActivityFollowOn';
+import InboxOpenSRComponent from './subComponents/InboxOpenSRComponent';
 import {sort} from '../utils/utils';
 import React from 'react';
 import ReactDOM from 'react-dom';
+
+import '../style.css';
 
 class CurrentActivityReportComponent extends MainComponent {
     el = React.createElement;
@@ -756,5 +758,8 @@ class CurrentActivityReportComponent extends MainComponent {
 }
 
 export default CurrentActivityReportComponent;
-const domContainer = document.querySelector("#reactMainCurrentActivity");
-ReactDOM.render(React.createElement(CurrentActivityReportComponent), domContainer);
+document.addEventListener('DOMContentLoaded', () => {
+    const domContainer = document.querySelector("#reactMainCurrentActivity");
+    ReactDOM.render(React.createElement(CurrentActivityReportComponent), domContainer);
+})
+

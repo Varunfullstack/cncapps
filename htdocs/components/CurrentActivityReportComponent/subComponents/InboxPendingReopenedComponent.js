@@ -1,6 +1,8 @@
 import Table from "./../../shared/table/table";
-import CurrentActivityService from "../services/CurrentActivityService.js?v=1";
+import CurrentActivityService from "../services/CurrentActivityService";
 import MainComponent from '../../shared/MainComponent.js';
+
+import React from 'react';
 
 class InboxPendingReopenedComponent extends MainComponent {
     code = "PR";

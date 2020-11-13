@@ -6,7 +6,7 @@ import RadioButtons from '../../shared/radioButtons';
 import Spinner from '../../shared/Spinner/Spinner';
 import OrderHistoryModalComponent from './OrderHistoryModalComponent';
 import React from 'react';
-import ToolTip from '../utils/ToolTip.js?v=1';
+import ToolTip from '../../shared/ToolTip';
 
 /**
  * searching in TechData customers and link them with CNC customers
@@ -175,31 +175,33 @@ class TDCustomerOrdersComponent extends React.Component {
                 label: "AddOns",
                 sortable: true,
                 content: (c) =>
-                el(ToolTip,{key:"AddOns",title: "AddOns",content:
-                    el(
-                        "i",
-                        {
-                            key: "btnManageTenant",
-                            onClick: () => handleAddOns(c),
-                            className: 'fa  fa-cart-plus pointer',
+                    el(ToolTip, {
+                        key: "AddOns", title: "AddOns", content:
+                            el(
+                                "i",
+                                {
+                                    key: "btnManageTenant",
+                                    onClick: () => handleAddOns(c),
+                                    className: 'fa  fa-cart-plus pointer',
 
-                        },
-                    )
-                })
+                                },
+                            )
+                    })
             },
             {
                 path: null,
                 label: "Manage Licenses",
                 sortable: true,
                 content: (c) =>
-                el(ToolTip,{key:"Edit",title: "Edit",content:
-                    el("i", {
-                        key: "btnManageTenant",
-                        onClick: () => handleManageTenant(c),
-                        className: 'pointer fa fa-pencil',
+                    el(ToolTip, {
+                        key: "Edit", title: "Edit", content:
+                            el("i", {
+                                key: "btnManageTenant",
+                                onClick: () => handleManageTenant(c),
+                                className: 'pointer fa fa-pencil',
 
+                            })
                     })
-                })
 
             },
             {
@@ -207,16 +209,17 @@ class TDCustomerOrdersComponent extends React.Component {
                 label: "History",
                 sortable: true,
                 content: (c) =>
-                el(ToolTip,{key:"History",title: "History",content:
-                    el(
-                        "i",
-                        {
-                            key: "btnHistory",
-                            onClick: () => handleOrderHistory(c),
-                            className: 'fa fa-history pointer'
-                        }
-                    ),
-                })
+                    el(ToolTip, {
+                        key: "History", title: "History", content:
+                            el(
+                                "i",
+                                {
+                                    key: "btnHistory",
+                                    onClick: () => handleOrderHistory(c),
+                                    className: 'fa fa-history pointer'
+                                }
+                            ),
+                    })
             },
         ];
         if (results) {
@@ -927,13 +930,15 @@ class TDCustomerOrdersComponent extends React.Component {
             }),
             modalElement,
             // this.getHeader(),
-            el('div',{key:"placeorder",style:{width:50}},
-            el(ToolTip,{title: "Place New Order",content:el('i', {
-                key: 'btnNewOrder',
-                onClick: handleNewOrder,
-                className: 'fa fa-shopping-cart fa-2x pointer',
+            el('div', {key: "placeorder", style: {width: 50}},
+                el(ToolTip, {
+                    title: "Place New Order", content: el('i', {
+                        key: 'btnNewOrder',
+                        onClick: handleNewOrder,
+                        className: 'fa fa-shopping-cart fa-2x pointer',
 
-            })})) ,
+                    })
+                })),
             this.getSearchResult(),
             el("h2", {key: "h2Addons", ref: this.addonsRef}, "AddOns"),
             this.getAddonsElement(),

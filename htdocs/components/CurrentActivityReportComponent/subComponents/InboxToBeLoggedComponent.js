@@ -1,5 +1,7 @@
 import Table from "./../../shared/table/table";
-import CurrentActivityService from "../services/CurrentActivityService.js?v=1";
+import CurrentActivityService from "../services/CurrentActivityService";
+
+import React from 'react';
 
 class InboxToBeLoggedComponent extends React.Component {
     code = "TBL";

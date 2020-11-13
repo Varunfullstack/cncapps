@@ -8,6 +8,7 @@ import ToolTip from "../../shared/ToolTip.js";
 import ActivityFollowOn from "../../Modals/ActivityFollowOn.js";
 import MainComponent from "../../shared/MainComponent.js";
 import * as React from 'react';
+import Modal from "../../shared/Modal/modal";
 
 class ActivityDisplayComponent extends MainComponent {
     api = new APIActivity();
@@ -149,7 +150,7 @@ class ActivityDisplayComponent extends MainComponent {
         const {data, currentUser} = this.state;
         console.log(currentUser);
         return el('div', {
-                className: "activities-contianer",
+                className: "activities-container",
                 style: {display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center"}
             },
             data?.problemStatus !== "C" ? el(ToolTip, {
@@ -467,7 +468,7 @@ class ActivityDisplayComponent extends MainComponent {
         const engineerLen = maxLength(data?.activities || [], 'enginner') + 10;
         const contactName = maxLength(data?.activities || [], 'contactName') + 10;
         const indx = data?.activities.findIndex(a => a.callActivityID == currentActivity);
-        return el('div', {className: "activities-contianer"},
+        return el('div', {className: "activities-container"},
             el('div', {style: {width: "100%", display: "flex", alignItems: "center", justifyContent: "center"}},
                 el(ToolTip, {
                     title: "First ",
@@ -647,7 +648,7 @@ class ActivityDisplayComponent extends MainComponent {
     getContentElement = () => {
         const {data} = this.state;
         const {el} = this;
-        return el('div', {className: "activities-contianer"},
+        return el('div', {className: "activities-container"},
             el('table', {style: {width: "100%"}},
                 el('tbody', null,
                     el('tr', null,
@@ -755,7 +756,7 @@ class ActivityDisplayComponent extends MainComponent {
                 })
             },
         ]
-        return el('div', {className: "activities-contianer"},
+        return el('div', {className: "activities-container"},
             el('label', {style: {display: "block"}}, "Documents"),
             data?.documents.length > 0 ? el(Table, {
                 key: "documents",
@@ -841,7 +842,7 @@ class ActivityDisplayComponent extends MainComponent {
                     sortable: false,
                 },
             ]
-            return el('div', {className: "activities-contianer"},
+            return el('div', {className: "activities-container"},
                 el('label', {style: {display: "block"}}, "Expenses"),
                 el(Table, {
                     key: "expenses",
@@ -909,7 +910,8 @@ class ActivityDisplayComponent extends MainComponent {
     getTemplateModal = () => {
         const {templateDefault, templateOptions, _showModal, templateTitle, templateType} = this.state;
         const {el} = this;
-        return el(Modal, {
+        return el(
+            Modal, {
                 width: 900, key: templateType, onClose: () => this.setState({_showModal: false}),
                 title: templateTitle, show: _showModal,
                 content: el('div', {key: 'conatiner'},
@@ -949,7 +951,7 @@ class ActivityDisplayComponent extends MainComponent {
     //-------------end template
     getFooter = () => {
         return (
-            <div className="activities-contianer">
+            <div className="activities-container">
                 <button className="m-5 btn-info"
                         onClick={() => this.handleTemplateDisplay("partsUsed")}
                 >

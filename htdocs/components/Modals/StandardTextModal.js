@@ -1,5 +1,6 @@
 import CKEditor from "../shared/CKEditor";
 import Modal from "../shared/Modal/modal";
+import React from 'react';
 
 /**
  * options : show,options,value,title,okTitle

@@ -1,5 +1,5 @@
-import APIMain from "../../services/APIMain.js?v=1";
-import ApiUrls from "../../services/ApiUrls.js?v=1";
+import APIMain from "../../services/APIMain";
+import ApiUrls from "../../services/ApiUrls";
 
 export default class APISDManagerDashboard extends APIMain {
   getQueue(id,filter) {

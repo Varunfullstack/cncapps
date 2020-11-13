@@ -1,55 +1,66 @@
-.test{
-    flex-direction:column;
+
+.test {
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     align-content: center;
     text-align: center;
     border-radius: 5px;
 }
-.display-active-menu{
+
+.display-active-menu {
     line-height: 30px;
 }
-.display-active-menu div{
+
+.display-active-menu div {
     background-color: #dbdbdb;
     border-top: white solid 1px;
 }
-.display-active-menu div:hover{
+
+.display-active-menu div:hover {
     background-color: #bdbec1;
     cursor: pointer;
 }
-.activities-contianer{
-   
-    margin-top:5px;
-    border:1px solid #bdbec1;
+
+.activities-container {
+
+    margin-top: 5px;
+    border: 1px solid #bdbec1;
     border-radius: 5px;
-    
+
 }
-.activities-edit-contianer{
-    width:1080px;
-    margin-top:5px;
-    border:1px solid #bdbec1;
+
+.activities-edit-container {
+    width: 1080px;
+    margin-top: 5px;
+    border: 1px solid #bdbec1;
     border-radius: 5px;
 }
-.activity-detials-flex{    
+
+.activity-details-flex {
     display: flex;
-    flex-flow: row wrap;    
+    flex-flow: row wrap;
 }
-.label{
+
+.label {
     /* width: 80px; */
     color: #992211;
     white-space: nowrap;
 }
-.display-label{
-   text-align:right;
-   color: #992211;
-   white-space: nowrap;
-}
-.display-content{
-    text-align:left;        
-    white-space: nowrap;
- }
- .formErrorMessage{
-     font-size: 12px !important;
-     font-weight: bold !important;
 
- }
+.display-label {
+    text-align: right;
+    color: #992211;
+    white-space: nowrap;
+}
+
+.display-content {
+    text-align: left;
+    white-space: nowrap;
+}
+
+.formErrorMessage {
+    font-size: 12px !important;
+    font-weight: bold !important;
+
+}

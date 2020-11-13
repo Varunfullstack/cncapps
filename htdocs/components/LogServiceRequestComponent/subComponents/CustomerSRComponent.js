@@ -1,6 +1,6 @@
 import Table from "./../../shared/table/table";
-
-class ContactSRComponent extends React.Component {
+import React from 'react';
+class CustomerSRComponent extends React.Component {
     el = React.createElement;
 
     constructor(props) {
@@ -25,7 +25,7 @@ class ContactSRComponent extends React.Component {
                         className:
                             "fal fa-2x fa-play color-gray pointer float-right inbox-icon",
                         key: "starIcon",
-                        onClick: () => newSrActivity(problem.contactProblemID, problem.contactActivityID)
+                        onClick: () => newSrActivity(problem.problemID, problem.activityID)
                     })
             },
             {
@@ -35,9 +35,9 @@ class ContactSRComponent extends React.Component {
                 key: "custsomerIcon",
                 label: "",
                 sortable: false,
-                toolTip: "Special Attention contact",
+                toolTip: "Special Attention customer",
                 content: (problem) =>
-                    problem.contactPriority === 1
+                    problem.priority === 1
                         ? el("i", {
                             className:
                                 "fal fa-2x fa-exclamation-triangle color-gray pointer float-right inbox-icon",
@@ -48,7 +48,7 @@ class ContactSRComponent extends React.Component {
             {
                 hide: false,
                 order: 1.2,
-                path: "contactProblemID",
+                path: "problemID",
                 label: "",
                 key: "problemId",
                 hdToolTip: "Problem Id",
@@ -60,9 +60,9 @@ class ContactSRComponent extends React.Component {
             {
                 hide: false,
                 order: 2,
-                path: "contactDateRaised",
+                path: "dateRaised",
                 label: "",
-                key: "contactDateRaised",
+                key: "dateRaised",
                 hdToolTip: "Raised Date",
                 icon: "fal fa-2x fa-calendar-alt color-gray2 ",
                 sortable: false,
@@ -72,9 +72,9 @@ class ContactSRComponent extends React.Component {
             {
                 hide: false,
                 order: 3,
-                path: "contactReason",
+                path: "reason",
                 label: "",
-                key: "activityId",
+                key: "reason",
                 hdToolTip: "Reason",
                 icon: "fal fa-2x fa-file-alt color-gray2 ",
                 sortable: false,
@@ -82,14 +82,15 @@ class ContactSRComponent extends React.Component {
                 content: (problem) => el('div', {
                     className: "pointer",
                     style: {color: 'blue'},
-                    onClick: () => openProblemHistory(problem.contactProblemID),
-                    dangerouslySetInnerHTML: {__html: problem.contactReason}
+                    onClick: () => openProblemHistory(problem.problemID),
+                    dangerouslySetInnerHTML: {__html: problem.reason}
                 }),
+
             },
             {
                 hide: false,
                 order: 4,
-                path: "contactPriority",
+                path: "priority",
                 label: "",
                 hdToolTip: "Service Request Priority",
                 icon: "fal fa-2x fa-signal color-gray2 ",
@@ -100,7 +101,7 @@ class ContactSRComponent extends React.Component {
             {
                 hide: false,
                 order: 5,
-                path: "contactEngineerName",
+                path: "engineerName",
                 label: "",
                 hdToolTip: "Allocated To",
                 icon: "fal fa-2x fa-user-hard-hat color-gray2 ",
@@ -117,7 +118,7 @@ class ContactSRComponent extends React.Component {
             key: "Sr",
             data: items || [],
             columns: columns,
-            pk: "contactActivityID",
+            pk: "activityID",
             search: true,
         });
     }
@@ -125,10 +126,11 @@ class ContactSRComponent extends React.Component {
     render() {
         const {items} = this.props;
         const {getTableElement, el} = this;
+        console.log(items.length);
         return (
             el('div', null, getTableElement(items))
         );
     }
 }
 
-export default ContactSRComponent;
+export default CustomerSRComponent;

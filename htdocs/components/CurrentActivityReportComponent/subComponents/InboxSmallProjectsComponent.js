@@ -1,24 +1,16 @@
-import APICustomers from "../../services/APICutsomer.js?v=1";
-import AutoComplete from "../../utils/autoComplete.js?v=1";
 import Table from "./../../shared/table/table";
-import CurrentActivityService from "../services/CurrentActivityService.js?v=1";
+import CurrentActivityService from "../services/CurrentActivityService";
 
-class InboxOpenSRComponent extends React.Component {
-    code = "OSR";
+import React from 'react';
+
+class InboxSmallProjectsComponent extends React.Component {
+    code = "SP";
     el = React.createElement;
     apiCurrentActivityService;
-    apiCustomer = new APICustomers();
 
     constructor(props) {
         super(props);
         this.apiCurrentActivityService = new CurrentActivityService();
-        this.state = {customers: [], data: this.props.data, customer: null}
-    }
-
-    componentDidMount() {
-        this.apiCustomer.getCustomerHaveOpenSR().then(customers => {
-            this.setState({customers})
-        })
     }
 
     addToolTip = (element, title) => {
@@ -29,7 +21,6 @@ class InboxOpenSRComponent extends React.Component {
             this.el("div", {className: "tooltiptext tooltip-bottom"}, title)
         );
     };
-
     getTableElement = () => {
         const {el, addToolTip} = this;
         const {
@@ -148,10 +139,9 @@ class InboxOpenSRComponent extends React.Component {
                                 className: "float-right",
                                 style: {},
                             },
-                            `${problem.hdRemaining}`
+                            `${problem.smallProjectsTeamRemaining}`
                         )
                     ),
-
                 ],
             },
             {
@@ -224,7 +214,7 @@ class InboxOpenSRComponent extends React.Component {
                 sortable: false,
                 hdClassName: "text-center",
                 className: "text-center",
-                content: (problem) => getMoveElement(this.code, problem, problem.queueNo),
+                content: (problem) => getMoveElement(this.code, problem),
             },
             {
                 hide: false,
@@ -310,10 +300,10 @@ class InboxOpenSRComponent extends React.Component {
                 icon: "fal fa-2x fa-user-hard-hat color-gray2 ",
                 sortable: false,
                 hdClassName: "text-center",
+
                 content: (problem) => getAllocatedElement(problem, this.code),
             },
         ];
-
         if (this.props?.currentUser?.isSDManger)
             columns.push({
                 hide: false,
@@ -340,48 +330,89 @@ class InboxOpenSRComponent extends React.Component {
         columns = columns
             .filter((c) => c.hide == false)
             .sort((a, b) => (a.order > b.order ? 1 : -1));
-        const {data} = this.state;
+        const {data} = this.props;
+
         return el(Table, {
             key: "helpDesk",
             data: data || [],
             columns: columns,
             pk: "problemID",
-            search: false,
-            searchControls: this.getOtherSearchElement()
+            search: true,
         });
     };
-    getOtherSearchElement = () => {
-        const {el} = this;
-        const {customers} = this.state;
-        return el('div', {className: "flex-row"}, "Customer",
-            el(AutoComplete, {
-                errorMessage: "No Customer found",
-                items: customers,
-                displayLength: "40",
-                displayColumn: "name",
-                pk: "id",
-                width: 300,
-                onSelect: this.handleOnCustomerSelect,
-            })
-        )
-    }
-    handleOnCustomerSelect = (customer) => {
-        console.log(customer);
-        if (customer != null) {
-            this.props.getCustomerOpenSR(customer.id);
-        }
-    }
 
-    static getDerivedStateFromProps(props, current_state) {
-        return {...current_state, ...props};
-    }
+    getSrByUsersSummaryElement = () => {
+        const {el} = this;
+        const {data} = this.props;
+        if (data) {
+            const future = data.filter((p) => moment(p.alarmDateTime) > moment())
+                .length;
+            if (data.length > 0) {
+                const items = data
+                    .reduce((prev, current) => {
+                        const index = prev.findIndex(
+                            (p) => p.name === current.engineerName
+                        );
+                        if (index == -1)
+                            prev.push({name: current.engineerName, total: 1});
+                        else prev[index].total += 1;
+                        return prev;
+                    }, [])
+                    .map((p) => {
+                        if (p.name != null && p.name != "") {
+                            p.name = p.name.replace("  ", " ");
+                            const arr = p.name.split(" ");
+                            p.name = arr[0][0] + arr[1][0];
+                        }
+                        return p;
+                    })
+                    .sort((a, b) => (a.name > b.name ? 1 : -1))
+                    .map((item) => {
+                        return [
+                            el(
+                                "dt",
+                                {key: "name", style: {paddingLeft: 10}},
+                                (item.name || "Unassigned") + ":"
+                            ),
+                            el("dd", {key: "total"}, item.total),
+                        ];
+                    })
+                    .concat([
+                        el(
+                            "dt",
+                            {key: "name", style: {paddingLeft: 10}},
+                            "Future" + ":"
+                        ),
+                        el("dd", {key: "total"}, future),
+                    ]);
+                return [
+                    ...[
+                        el(
+                            "dt",
+                            {key: "nameFuture", style: {paddingLeft: 10}},
+                            "Total" + ":"
+                        ),
+                        el("dt", {key: "totalFuture"}, data.length),
+                    ],
+                    ...items,
+                ];
+            }
+        }
+        return null;
+    };
 
     render() {
-        const {getTableElement,} = this;
+        const {el, getTableElement, getSrByUsersSummaryElement} = this;
+        const {data} = this.props;
         return [
+            el(
+                "div",
+                {key: "summary", style: {display: "flex", flexDirection: "row"}},
+                getSrByUsersSummaryElement()
+            ),
             getTableElement(),
         ];
     }
 }
 
-export default InboxOpenSRComponent;
+export default InboxSmallProjectsComponent;

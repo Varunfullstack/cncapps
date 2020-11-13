@@ -1,4 +1,5 @@
 import Modal from "./Modal/modal";
+import React from 'react';
 
 class Prompt extends React.Component {
     el = React.createElement;

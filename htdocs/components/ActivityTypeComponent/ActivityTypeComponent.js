@@ -3,6 +3,7 @@ import ActivityListComponent from "./subComponents/ActivityListComponent.js";
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+import '../style.css';
 
 class ActivityTypeComponent extends MainComponent {
     el = React.createElement;

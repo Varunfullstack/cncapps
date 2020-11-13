@@ -1,8 +1,9 @@
 "use strict";
-import AutoComplete from "../../shared/AutoComplete/autoComplete";
-import APICustomerLicenses from './APICustomerLicenses';
 import {Cities} from '../../utils/ukCities';
 import Spinner from '../../shared/Spinner/Spinner';
+import ToolTip from "../../shared/ToolTip";
+import APICustomerLicenses from "./APICustomerLicenses";
+import AutoComplete from "../../shared/AutoComplete/autoComplete";
 import React from 'react';
 
 /**
@@ -157,7 +158,7 @@ class TDCustomerDetailsComponent extends React.Component {
                     "Title",
                     "title",
                     null,
-                    data.title,
+                    data.title || "",
                     false,
                     errors["title"]
                 ),
@@ -174,7 +175,7 @@ class TDCustomerDetailsComponent extends React.Component {
                     "Phone 1",
                     "phone1",
                     null,
-                    data.phone1,
+                    data.phone1 || "",
                     true,
                     errors["phone1"]
                 ),
@@ -182,7 +183,7 @@ class TDCustomerDetailsComponent extends React.Component {
                     "Phone 2",
                     "phone2",
                     null,
-                    data.phone2,
+                    data.phone2 || "",
                     false,
                     errors["phone2"]
                 ),
@@ -190,7 +191,7 @@ class TDCustomerDetailsComponent extends React.Component {
                     "Address Line 1",
                     "addressLine1",
                     null,
-                    data.addressLine1,
+                    data.addressLine1 || "",
                     true,
                     errors["addressLine1"]
                 ),
@@ -198,7 +199,7 @@ class TDCustomerDetailsComponent extends React.Component {
                     "Address Line 2",
                     "addressLine2",
                     null,
-                    data.addressLine2,
+                    data.addressLine2 || "",
                     false,
                     errors["addressLine2"]
                 ),
@@ -212,7 +213,7 @@ class TDCustomerDetailsComponent extends React.Component {
                         displayLength: "40",
                         displayColumn: "name",
                         pk: "id",
-                        value: data.city,
+                        value: data.city || "",
                         onSelect: handleCityOnSelect,
                     }),
                     null,
@@ -223,7 +224,7 @@ class TDCustomerDetailsComponent extends React.Component {
                     "State",
                     "state",
                     null,
-                    data.state,
+                    data.state || "",
                     false,
                     errors["state"]
                 ),
@@ -231,7 +232,7 @@ class TDCustomerDetailsComponent extends React.Component {
                     "Country",
                     "country",
                     null,
-                    data.country,
+                    data.country || "GB",
                     true,
                     errors["country"]
                 ),
@@ -239,7 +240,7 @@ class TDCustomerDetailsComponent extends React.Component {
                     "Postal Code",
                     "postalCode",
                     null,
-                    data.postalCode,
+                    data.postalCode || "",
                     true,
                     errors["postalCode"]
                 ),
@@ -276,8 +277,24 @@ class TDCustomerDetailsComponent extends React.Component {
                     el(
                         "td",
                         {key: "tdSave", colSpan: 2},
-                        [el("button", {key: "btnSave", onClick: handleOnSave}, "Save"),
-                            el("button", {key: "btnCancel", onClick: handleOnCancel}, "Cancel")]
+                        el('div', {style: {display: "flex", flexDirection: "row", width: 70}},
+                            el(ToolTip, {
+                                title: "Save",
+                                content: el("i", {
+                                    key: "btnSave",
+                                    onClick: handleOnSave,
+                                    className: "fal fa-save fa-2x m-5 icon pointer"
+                                })
+                            }),
+                            el(ToolTip, {
+                                title: "Cancel",
+                                content: el("i", {
+                                    key: "btnCancel",
+                                    onClick: handleOnCancel,
+                                    className: "fal fa-window-close fa-2x m-5 icon pointer"
+                                })
+                            })
+                        )
                     )
                 ),
             ])

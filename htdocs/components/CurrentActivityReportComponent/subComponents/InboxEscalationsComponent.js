@@ -1,8 +1,10 @@
 import Table from "./../../shared/table/table";
-import CurrentActivityService from "../services/CurrentActivityService.js?v=1";
+import CurrentActivityService from "../services/CurrentActivityService";
 
-class InboxProjectsComponent extends React.Component {
-    code = "P";
+import React from 'react';
+
+class InboxEscalationsComponent extends React.Component {
+    code = "E";
     el = React.createElement;
     apiCurrentActivityService;
 
@@ -51,6 +53,8 @@ class InboxProjectsComponent extends React.Component {
                                         : "fad fa-play ") +
                                     " fa-2x  pointer inbox-icon" +
                                     problem.workHidden || "",
+                                //onClick: () => startWork(problem, this.code),
+                                //title: problem.workBtnTitle,
                                 style: {
                                     color: problem.workBtnColor,
                                     "--fa-primary-color":
@@ -74,8 +78,7 @@ class InboxProjectsComponent extends React.Component {
                 content: (problem) =>
                     problem.customerNameDisplayClass != null
                         ? el("i", {
-                            className:
-                                "fal fa-2x fa-star color-gray pointer float-right inbox-icon",
+                            className: "fal fa-2x fa-star color-gray pointer float-right inbox-icon",
                             key: "starIcon",
                         })
                         : null,
@@ -93,6 +96,7 @@ class InboxProjectsComponent extends React.Component {
                         el("i", {
                             className:
                                 "fal fa-2x fa-alarm-snooze color-gray pointer float-right inbox-icon",
+                            //title: "Special Attention customer / contact",
                             key: "starIcon",
                         }),
                         `This Service Request is scheduled for the future date of ${moment(
@@ -137,7 +141,7 @@ class InboxProjectsComponent extends React.Component {
                                 className: "float-right",
                                 style: {},
                             },
-                            `${problem.projectTeamRemaining}`
+                            `${problem.esRemaining}`
                         )
                     ),
                 ],
@@ -155,6 +159,7 @@ class InboxProjectsComponent extends React.Component {
                     problem.hoursRemainingBgColor === "#BDF8BA"
                         ? el("i", {
                             className: "fal  fa-user-clock color-gray pointer inbox-icon",
+                            //title: "On Hold",
                             key: "icon",
                             style: {float: "right"},
                         })
@@ -283,6 +288,7 @@ class InboxProjectsComponent extends React.Component {
                             className: "pointer",
                             onClick: () => srDescription(problem),
                             dangerouslySetInnerHTML: {__html: problem.reason}
+
                         },
                     ),
             },
@@ -296,6 +302,7 @@ class InboxProjectsComponent extends React.Component {
                 icon: "fal fa-2x fa-user-hard-hat color-gray2 ",
                 sortable: false,
                 hdClassName: "text-center",
+
                 content: (problem) => getAllocatedElement(problem, this.code),
             },
         ];
@@ -411,4 +418,4 @@ class InboxProjectsComponent extends React.Component {
     }
 }
 
-export default InboxProjectsComponent;
+export default InboxEscalationsComponent;

@@ -1,7 +1,7 @@
 <?php
 
 /**
-         * Customer Activity Report controller class
+ * Customer Activity Report controller class
  * CNC Ltd
  *
  * @access public
@@ -49,7 +49,8 @@ class CTCurrentActivityReport extends CTCNC
         $cookieVars,
         $cfg,
         $checkPermissions = true
-    ) {
+    )
+    {
         parent::__construct(
             $requestMethod,
             $postVars,
@@ -79,117 +80,67 @@ class CTCurrentActivityReport extends CTCNC
     function defaultAction()
     {
         //$this->renderQueue(1);  // Helpdesk
-    //$this->renderQueue(2);  // Escalations
-    //$this->renderQueue(4);  // Sales wrong
-    //$this->renderQueue(3);  // Small Projects
-    //$this->renderQueue(5);  // Projects
-    //$this->renderQueue(6);  //Fixed
+        //$this->renderQueue(2);  // Escalations
+        //$this->renderQueue(4);  // Sales wrong
+        //$this->renderQueue(3);  // Small Projects
+        //$this->renderQueue(5);  // Projects
+        //$this->renderQueue(6);  //Fixed
         switch ($this->getAction()) {
             case "getHelpDeskInbox":
                 echo json_encode($this->renderQueue(1));
-                exit;                
-             break;
-             case "getEscalationsInbox":
+                exit;
+            case "getEscalationsInbox":
                 echo json_encode($this->renderQueue(2));
-                exit;                
-             break;
-             case "getSalesInbox":
+                exit;
+            case "getSalesInbox":
                 echo json_encode($this->renderQueue(4));
-                exit;                
-             break;
-             case "getSmallProjectsInbox":
+                exit;
+            case "getSmallProjectsInbox":
                 echo json_encode($this->renderQueue(3));
-                exit;                
-             break;
-             case "getProjectsInbox":
+                exit;
+            case "getProjectsInbox":
                 echo json_encode($this->renderQueue(5));
-                exit;                
-             break;
-             case "getFixedInbox":
+                exit;
+            case "getFixedInbox":
                 echo json_encode($this->renderQueue(6));
-                exit;                
-             break;
-             case "getFutureInbox":
+                exit;
+            case "getFutureInbox":
                 echo json_encode($this->renderQueue(7));
-                exit;                
-             break;
-             case 'changeQueue':
+                exit;
+            case 'changeQueue':
                 echo $this->changeQueue();
-                exit;  
-                break;
+                exit;
             case 'allocatedUsers':
                 echo $this->getAllocatedUsers();
-                exit;  
-                break;
+                exit;
             case 'allocateUser':
-               echo $this->allocateUser();
-                exit; 
-                break;
+                echo $this->allocateUser();
+                exit;
             case "getToBeLoggedInbox":
                 echo $this->getToBeLogged();
                 exit;
-            break;
             case "getPendingReopenedInbox":
                 echo $this->getPendingReopenedRequests();
                 exit;
-            break;
-            case 'deleteCustomerRequest':                 
-                $this->checkPermissions(TECHNICAL_PERMISSION);                
+            case 'deleteCustomerRequest':
+                $this->checkPermissions(TECHNICAL_PERMISSION);
                 echo $this->deleteCustomerRequest();
                 exit;
-                break;
             case 'processPendingReopened':
                 echo $this->processPendingReopened();
-                exit;                
+                exit;
             case 'pendingReopenedPopup':
                 $this->pendingReopenedDescriptionPopUp();
                 break;
             case 'getCustomerOpenSR':
                 echo json_encode($this->renderQueue(13));
-                exit;     
+                exit;
             default:
                 $this->setTemplate();
                 break;
         }
     }
 
-    function setTemplate()
-    {
-        $this->setMethodName('setTemplate');
-        $this->template->setVar("menuId", 103);
-        $action = $this->getAction();
-        $this->setPageTitle('Service Requests');
-        switch ($action) {
-            case 'inbox':
-                $this->setPageTitle('Service Requests');
-                break;
-        }
-
-        $this->setTemplateFiles(
-            'CurrentActivityReportNew',
-            'CurrentActivityReportNew.inc'
-        );
-
-        $this->template->parse(
-            'CONTENTS',
-            'CurrentActivityReportNew',
-            true
-        );
-        $this->parsePage();
-    }
-
-    function getHelpDeskInbox()
-    {
-        $this->setMethodName('getHelpDeskInbox');
-
-        return json_encode($this->renderQueue(1));
-    }
-    //$this->renderQueue(1);  // Helpdesk
-    //$this->renderQueue(2);  // Escalations
-    //$this->renderQueue(3);  // Sales
-    //$this->renderQueue(4);  // Small Projects
-    //$this->renderQueue(5);  // Projects
-    //$this->renderQueue(6);  //Fixed
     private function renderQueue($queueNo)
     {
         /** @var DBEProblem|DataSet $serviceRequests */
@@ -202,16 +153,14 @@ class CTCurrentActivityReport extends CTCNC
                 false
             );
 
-         }  
-         else if ($queueNo == 13) {
+        } else if ($queueNo == 13) {
             /* fixed awaiting closure */
-            $this->buActivity->getCustomerOpenSR(    
+            $this->buActivity->getCustomerOpenSR(
                 $_REQUEST["customerID"],
-                $serviceRequests                
+                $serviceRequests
             );
 
-         }    
-         else {
+        } else {
             $this->buActivity->getProblemsByQueueNoWithFuture(
                 $queueNo,
                 $serviceRequests
@@ -222,11 +171,11 @@ class CTCurrentActivityReport extends CTCNC
             '<option>-</option>',
         ];
 
-        $result=array();
+        $result = array();
         $rowCount = 0;
         $buHeader = new BUHeader($this);
         $buHeader->getHeader($dsHeader);
-        while ($serviceRequests->fetchNext()) {            
+        while ($serviceRequests->fetchNext()) {
             $rowCount++;
             $bgColour = $this->getResponseColour(
                 $serviceRequests->getValue(DBEJProblem::status),
@@ -235,7 +184,7 @@ class CTCurrentActivityReport extends CTCNC
                 $serviceRequests->getValue(DBEJProblem::workingHours),
                 $serviceRequests->getValue(DBEJProblem::respondedHours)
             );
-         
+
             if ($serviceRequests->getValue(DBEJProblem::respondedHours) == 0 && $serviceRequests->getValue(
                     DBEJProblem::status
                 ) == 'I') {
@@ -248,12 +197,12 @@ class CTCurrentActivityReport extends CTCNC
             } else {
                 $hoursRemainingBgColor = self::BLUE;
             }
-    
-             
+
+
             if ($serviceRequests->getValue(DBEJProblem::lastCallActTypeID) == null) {
                 $workBgColor = self::GREEN; // green = in progress
             } else {
-                $workBgColor = self::CONTENT;                
+                $workBgColor = self::CONTENT;
             }
 
             if ($serviceRequests->getValue(DBEJProblem::priority) == 1) {
@@ -301,7 +250,8 @@ class CTCurrentActivityReport extends CTCNC
             $dbeCustomer->getRow($serviceRequests->getValue(DBEJProblem::customerID));
             $hideWork = $dbeCustomer->getValue(DBECustomer::referredFlag) == 'Y';
 
-             array_push($result,
+            array_push(
+                $result,
 
                 array(
                     //'queueOptions'               => implode($queueOptions),
@@ -325,7 +275,9 @@ class CTCurrentActivityReport extends CTCNC
                     'date'                       => Controller::dateYMDtoDMY(
                         $serviceRequests->getValue(DBEJProblem::lastDate)
                     ),
-                    'updated'=>   $serviceRequests->getValue(DBEJProblem::lastDate)." ".$serviceRequests->getValue(DBEJProblem::lastStartTime),
+                    'updated'                    => $serviceRequests->getValue(
+                            DBEJProblem::lastDate
+                        ) . " " . $serviceRequests->getValue(DBEJProblem::lastStartTime),
                     'problemID'                  => $serviceRequests->getValue(DBEJProblem::problemID),
                     'problemStatus'              => $serviceRequests->getValue(DBEJProblem::status),
                     'reason'                     => CTCurrentActivityReport::truncate(
@@ -340,7 +292,7 @@ class CTCurrentActivityReport extends CTCNC
                         $serviceRequests->getValue(DBEJProblem::userID)
                     ),
                     'engineerName'               => $serviceRequests->getValue(DBEJProblem::engineerName),
-                    'engineerId'               => $serviceRequests->getValue(DBEJProblem::userID),                    
+                    'engineerId'                 => $serviceRequests->getValue(DBEJProblem::userID),
                     'customerName'               => $serviceRequests->getValue(DBEJProblem::customerName),
                     'customerNameDisplayClass'   => $this->getCustomerNameDisplayClass(
                         $serviceRequests->getValue(DBEJProblem::specialAttentionFlag),
@@ -356,16 +308,18 @@ class CTCurrentActivityReport extends CTCNC
                     'priority'                   => Controller::htmlDisplayText(
                         $serviceRequests->getValue(DBEJProblem::priority)
                     ),
-                    'alarmDateTime'              => $serviceRequests->getValue(DBEJProblem::alarmDate).' '.$serviceRequests->getValue(DBEJProblem::alarmTime),
+                    'alarmDateTime'              => $serviceRequests->getValue(
+                            DBEJProblem::alarmDate
+                        ) . ' ' . $serviceRequests->getValue(DBEJProblem::alarmTime),
                     'bgColour'                   => $bgColour,
                     'workBgColor'                => $workBgColor,
                     'workHidden'                 => $hideWork ? 'hidden' : null,
-                    "callActivityID"             =>$serviceRequests->getValue(DBEJProblem::callActivityID),
-                    "lastCallActTypeID"         =>$serviceRequests->getValue(DBEJProblem::lastCallActTypeID),
-                    'customerID'               => $serviceRequests->getValue(DBEJProblem::customerID),
-                    'queueNo'               => $serviceRequests->getValue(DBEJProblem::queueNo),
+                    "callActivityID"             => $serviceRequests->getValue(DBEJProblem::callActivityID),
+                    "lastCallActTypeID"          => $serviceRequests->getValue(DBEJProblem::lastCallActTypeID),
+                    'customerID'                 => $serviceRequests->getValue(DBEJProblem::customerID),
+                    'queueNo'                    => $serviceRequests->getValue(DBEJProblem::queueNo),
 
-                 )
+                )
             );
         } // end while
         return $result;
@@ -377,6 +331,7 @@ class CTCurrentActivityReport extends CTCNC
             )
         );
     }
+
     function getResponseColour(
         $status,
         $priority,
@@ -428,6 +383,13 @@ class CTCurrentActivityReport extends CTCNC
 
         return $bgColour;
     }
+    //$this->renderQueue(1);  // Helpdesk
+    //$this->renderQueue(2);  // Escalations
+    //$this->renderQueue(3);  // Sales
+    //$this->renderQueue(4);  // Small Projects
+    //$this->renderQueue(5);  // Projects
+    //$this->renderQueue(6);  //Fixed
+
     protected function pickColor($value)
     {
         if ($value <= 5) {
@@ -437,8 +399,9 @@ class CTCurrentActivityReport extends CTCNC
         } else {
             return 'green';
         }
-    } // end function displayReport
- /**
+    }
+
+    /**
      * @param $problemID
      * @return mixed|string
      * @throws Exception
@@ -455,6 +418,7 @@ class CTCurrentActivityReport extends CTCNC
         );
 
     }
+
     /**
      * return list of user options for dropdown
      *
@@ -502,12 +466,14 @@ class CTCurrentActivityReport extends CTCNC
 
         return $string;
 
-    }
+    } // end function displayReport
+
     function getCustomerNameDisplayClass(
         $specialAttentionFlag,
         $specialAttentionEndDate,
         $specialAttentionContactFlag
-    ) {
+    )
+    {
         if (
             $specialAttentionFlag == 'Y' &&
             $specialAttentionEndDate >= date('Y-m-d')
@@ -521,40 +487,42 @@ class CTCurrentActivityReport extends CTCNC
 
         return null;
     }
-     /**
+
+    /**
      * @throws Exception
      */
     function changeQueue()
     {
         $problemID = $this->getParam('problemID');
         $newQueue = $this->getParam('queue');
-        $reason = $this->getParam('reason'); 
+        $reason = $this->getParam('reason');
         $this->buActivity->escalateProblemByProblemID(
             $problemID,
             $reason,
             $newQueue
         );
-        return json_encode(["status"=>true]);
+        return json_encode(["status" => true]);
     }
+
     function getAllocatedUsers()
     {
         $dbeUser = new DBEUser($this);
 
         $dbeUser->getRows('firstName');
-        $allocatedUser=array();
+        $allocatedUser = array();
         while ($dbeUser->fetchNext()) {
 
             $userRow =
                 array(
-                    'userID'   => $dbeUser->getValue(DBEUser::userID),
-                    'userName' => $dbeUser->getValue(DBEUser::name),
-                    'fullName' => $dbeUser->getValue(DBEUser::firstName) . ' ' . $dbeUser->getValue(
+                    'userID'            => $dbeUser->getValue(DBEUser::userID),
+                    'userName'          => $dbeUser->getValue(DBEUser::name),
+                    'fullName'          => $dbeUser->getValue(DBEUser::firstName) . ' ' . $dbeUser->getValue(
                             DBEUser::lastName
-                    ),
-                    'appearInQueueFlag'=>$dbeUser->getValue(DBEUser::appearInQueueFlag),
-                    "teamID"=>$dbeUser->getValue(DBEUser::teamID),
+                        ),
+                    'appearInQueueFlag' => $dbeUser->getValue(DBEUser::appearInQueueFlag),
+                    "teamID"            => $dbeUser->getValue(DBEUser::teamID),
                 );
-                array_push($allocatedUser,$userRow);
+            array_push($allocatedUser, $userRow);
             // if ($dbeUser->getValue(DBEUser::appearInQueueFlag) == 'Y') {
 
             //     $this->filterUser[$dbeUser->getValue(DBEUser::userID)] = $userRow;
@@ -562,7 +530,8 @@ class CTCurrentActivityReport extends CTCNC
         }
         return json_encode($allocatedUser);
     }
-     /**
+
+    /**
      * @param array $options
      * @throws Exception
      */
@@ -579,21 +548,22 @@ class CTCurrentActivityReport extends CTCNC
             $this->getParam('userID') == 0 ? null : $this->getParam('userID'),
             $dbeUser
         );
-        return json_encode(["status"=>true]);
+        return json_encode(["status" => true]);
     }
+
     function getToBeLogged()
     {
-        $this->setMethodName('getToBeLogged');                
+        $this->setMethodName('getToBeLogged');
         $customerRaisedRequests = $this->buActivity->getCustomerRaisedRequests();
         /*
         Requests raised via the customer portal
         */
         $customerRaisedRequests->next_record();
         $count = 0;
-        $result=Array();
+        $result = array();
         if ($customerRaisedRequests->Record) {
             do {
-                
+
 
                 $urlCustomer =
                     Controller::buildLink(
@@ -602,7 +572,7 @@ class CTCurrentActivityReport extends CTCNC
                             'action'     => 'search',
                             'customerID' => $customerRaisedRequests->Record['con_custno']
                         )
-                    );                
+                    );
                 $urlServiceRequest = null;
                 if ($customerRaisedRequests->Record['cpr_problemno'] > 0) {
                     $urlServiceRequest =
@@ -612,7 +582,7 @@ class CTCurrentActivityReport extends CTCNC
                                 'action'    => 'displayServiceRequest',
                                 'problemID' => $customerRaisedRequests->Record['cpr_problemno']
                             )
-                        );                    
+                        );
                 }
 
                 $truncatedReason = CTCurrentActivityReport::truncate(
@@ -625,32 +595,34 @@ class CTCurrentActivityReport extends CTCNC
                     $bgColour = self::CONTENT;
                 }
                 $count++;
-                    array_push($result,
+                array_push(
+                    $result,
                     array(
-                        'cpCustomerProblemID'      => $customerRaisedRequests->Record['cpr_customerproblemno'],
-                        'cpCustomerName'           => $customerRaisedRequests->Record['cus_name'],
-                        'cpContactName'            => $customerRaisedRequests->Record['con_first_name'] . ' ' . $customerRaisedRequests->Record['con_last_name'],
-                        'cpDate'                   => $customerRaisedRequests->Record['cpr_date'],
-                        'cpUrlServiceRequest'      => $urlServiceRequest,
-                        'cpServiceRequestID'      =>  $customerRaisedRequests->Record['cpr_problemno'],
-                        'cpPriority'               => $customerRaisedRequests->Record['cpr_priority'],
-                        'cpTruncatedReason'        => $truncatedReason,
-                        'cpFullReason'             => $customerRaisedRequests->Record['cpr_reason'],
-                        'cpUrlCustomer'            => $urlCustomer,
-                        'cpBgColor'                => $bgColour,
-                        'cpCount'                  => $count,                        
+                        'cpCustomerProblemID' => $customerRaisedRequests->Record['cpr_customerproblemno'],
+                        'cpCustomerName'      => $customerRaisedRequests->Record['cus_name'],
+                        'cpContactName'       => $customerRaisedRequests->Record['con_first_name'] . ' ' . $customerRaisedRequests->Record['con_last_name'],
+                        'cpDate'              => $customerRaisedRequests->Record['cpr_date'],
+                        'cpUrlServiceRequest' => $urlServiceRequest,
+                        'cpServiceRequestID'  => $customerRaisedRequests->Record['cpr_problemno'],
+                        'cpPriority'          => $customerRaisedRequests->Record['cpr_priority'],
+                        'cpTruncatedReason'   => $truncatedReason,
+                        'cpFullReason'        => $customerRaisedRequests->Record['cpr_reason'],
+                        'cpUrlCustomer'       => $urlCustomer,
+                        'cpBgColor'           => $bgColour,
+                        'cpCount'             => $count,
                     )
                 );
             } while ($customerRaisedRequests->next_record());
         }
-        return  json_encode($result);
-       
+        return json_encode($result);
+
     }
+
     function getPendingReopenedRequests()
     {
         $pendingReopenedRequests = $this->buActivity->getPendingReopenedRequests();
-        $result=array();
-        if ($pendingReopenedRequests && count($pendingReopenedRequests)) {        
+        $result = array();
+        if ($pendingReopenedRequests && count($pendingReopenedRequests)) {
 
             foreach ($pendingReopenedRequests as $pendingReopenedRequest) {
                 $pendingReopenSRURL = Controller::buildLink(
@@ -677,7 +649,8 @@ class CTCurrentActivityReport extends CTCNC
                             'htmlFmt'           => CT_HTML_FMT_POPUP
                         )
                     );
-                    array_push($result,                 
+                array_push(
+                    $result,
                     [
                         "pendingReopenSRURL"              => $pendingReopenSRURL,
                         "pendingReopenSR"                 => $pendingReopenSR,
@@ -692,12 +665,13 @@ class CTCurrentActivityReport extends CTCNC
                         "base64Reason"                    => base64_encode($pendingReopenedRequest['reason']),
 
                     ]
-                ); 
+                );
             }
         }
         return json_encode($result);
     }
-     /**
+
+    /**
      * @throws Exception
      */
     function deleteCustomerRequest()
@@ -706,7 +680,8 @@ class CTCurrentActivityReport extends CTCNC
         $this->buActivity->deleteCustomerRaisedRequest($customerproblemno);
         return 1;
     }
- /**
+
+    /**
      * @param $pendingReopenedID
      * @param $result
      * @throws Exception
@@ -715,25 +690,27 @@ class CTCurrentActivityReport extends CTCNC
     {
         $body = json_decode(file_get_contents('php://input'));
         $pendingReopenedID = $body->pendingReopenedID;
-        $result = $body->result;        
+        $result = $body->result;
         if (isset($pendingReopenedID) && isset($result)) {
             $dbePendingReopened = new DBEPendingReopened($this);
             switch ($result) {
-                case 'R': {
-                        $dbePendingReopened->getRow($pendingReopenedID);
-                        $this->buActivity->approvePendingReopened($dbePendingReopened);
-                        break;
-                    }
-                case 'D': {
-                        $dbePendingReopened->deleteRow($pendingReopenedID);
-                        break;
-                    }
+                case 'R':
+                {
+                    $dbePendingReopened->getRow($pendingReopenedID);
+                    $this->buActivity->approvePendingReopened($dbePendingReopened);
+                    break;
+                }
+                case 'D':
+                {
+                    $dbePendingReopened->deleteRow($pendingReopenedID);
+                    break;
+                }
             }
             return 1;
         }
         return 0;
     }
-    
+
     /**
      * @throws Exception
      */
@@ -771,6 +748,41 @@ class CTCurrentActivityReport extends CTCNC
 
         $this->parsePage();
         exit;
+    }
+
+    function setTemplate()
+    {
+        $this->setMethodName('setTemplate');
+        $this->template->setVar("menuId", 103);
+        $action = $this->getAction();
+        $this->setPageTitle('Service Requests');
+        switch ($action) {
+            case 'inbox':
+                $this->setPageTitle('Service Requests');
+                break;
+        }
+
+        $this->setTemplateFiles(
+            'CurrentActivityReportNew',
+            'CurrentActivityReportNew.inc'
+        );
+
+        $this->loadReactScript('CurrentActivityReportComponent.js');
+        $this->loadReactCSS('CurrentActivityReportComponent.css');
+
+        $this->template->parse(
+            'CONTENTS',
+            'CurrentActivityReportNew',
+            true
+        );
+        $this->parsePage();
+    }
+
+    function getHelpDeskInbox()
+    {
+        $this->setMethodName('getHelpDeskInbox');
+
+        return json_encode($this->renderQueue(1));
     }  // end finaliseProblem
-    
+
 }

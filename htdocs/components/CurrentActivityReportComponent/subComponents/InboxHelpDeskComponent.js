@@ -1,8 +1,9 @@
 import Table from "./../../shared/table/table";
-import CurrentActivityService from "../services/CurrentActivityService.js?v=1";
+import CurrentActivityService from "../services/CurrentActivityService";
+import React from 'react';
 
-class InboxEscalationsComponent extends React.Component {
-    code = "E";
+class InboxHelpDeskComponent extends React.Component {
+    code = "H";
     el = React.createElement;
     apiCurrentActivityService;
 
@@ -37,8 +38,8 @@ class InboxEscalationsComponent extends React.Component {
                 label: "",
                 key: "work",
                 sortable: false,
-                className: "text-center",
                 hdClassName: "text-center",
+                className: "text-center",
                 content: (problem) =>
                     addToolTip(
                         el(
@@ -51,8 +52,6 @@ class InboxEscalationsComponent extends React.Component {
                                         : "fad fa-play ") +
                                     " fa-2x  pointer inbox-icon" +
                                     problem.workHidden || "",
-                                //onClick: () => startWork(problem, this.code),
-                                //title: problem.workBtnTitle,
                                 style: {
                                     color: problem.workBtnColor,
                                     "--fa-primary-color":
@@ -76,7 +75,8 @@ class InboxEscalationsComponent extends React.Component {
                 content: (problem) =>
                     problem.customerNameDisplayClass != null
                         ? el("i", {
-                            className: "fal fa-2x fa-star color-gray pointer float-right inbox-icon",
+                            className:
+                                "fal fa-2x fa-star color-gray pointer float-right inbox-icon",
                             key: "starIcon",
                         })
                         : null,
@@ -94,7 +94,6 @@ class InboxEscalationsComponent extends React.Component {
                         el("i", {
                             className:
                                 "fal fa-2x fa-alarm-snooze color-gray pointer float-right inbox-icon",
-                            //title: "Special Attention customer / contact",
                             key: "starIcon",
                         }),
                         `This Service Request is scheduled for the future date of ${moment(
@@ -139,7 +138,7 @@ class InboxEscalationsComponent extends React.Component {
                                 className: "float-right",
                                 style: {},
                             },
-                            `${problem.esRemaining}`
+                            `${problem.hdRemaining}`
                         )
                     ),
                 ],
@@ -157,7 +156,6 @@ class InboxEscalationsComponent extends React.Component {
                     problem.hoursRemainingBgColor === "#BDF8BA"
                         ? el("i", {
                             className: "fal  fa-user-clock color-gray pointer inbox-icon",
-                            //title: "On Hold",
                             key: "icon",
                             style: {float: "right"},
                         })
@@ -269,6 +267,7 @@ class InboxEscalationsComponent extends React.Component {
                 hdClassName: "text-center",
                 className: "text-center",
                 backgroundColorColumn: "priorityBgColor"
+
             },
             {
                 hide: false,
@@ -286,7 +285,6 @@ class InboxEscalationsComponent extends React.Component {
                             className: "pointer",
                             onClick: () => srDescription(problem),
                             dangerouslySetInnerHTML: {__html: problem.reason}
-
                         },
                     ),
             },
@@ -304,6 +302,7 @@ class InboxEscalationsComponent extends React.Component {
                 content: (problem) => getAllocatedElement(problem, this.code),
             },
         ];
+
         if (this.props?.currentUser?.isSDManger)
             columns.push({
                 hide: false,
@@ -404,7 +403,6 @@ class InboxEscalationsComponent extends React.Component {
 
     render() {
         const {el, getTableElement, getSrByUsersSummaryElement} = this;
-        const {data} = this.props;
         return [
             el(
                 "div",
@@ -416,4 +414,4 @@ class InboxEscalationsComponent extends React.Component {
     }
 }
 
-export default InboxEscalationsComponent;
+export default InboxHelpDeskComponent;

@@ -4,7 +4,7 @@ import {groupBy, SRQueues, TeamType} from "../../utils/utils.js";
 import APIStandardText from "../../services/APIStandardText.js";
 import StandardTextModal from "../../Modals/StandardTextModal.js";
 import MainComponent from "../../shared/MainComponent.js";
-
+import React from 'react';
 class LastStepComponent extends MainComponent {
     el = React.createElement;
 

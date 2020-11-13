@@ -1,7 +1,7 @@
 import Table from "./../../shared/table/table";
 import Spinner from "../../shared/Spinner/Spinner";
-import APICustomers from "../../services/APICutsomer.js?v=1";
-
+import APICustomers from "../../services/APICutsomer";
+import React from 'react';
 class CustomerSearchComponent extends React.Component {
     el = React.createElement;
     apiCutsomer = new APICustomers();

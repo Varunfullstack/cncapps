@@ -1,5 +1,6 @@
 <?php
 require_once("config.inc.php");
+global $cfg;
 require_once($cfg["path_ct"] . "/CTSDManagerDashboard.php");
 session_start();
 page_open(
@@ -8,9 +9,9 @@ page_open(
         'auth' => PHPLIB_CLASSNAME_AUTH,
         'perm' => PHPLIB_CLASSNAME_PERM,
         ''
-        )
+    )
 );
-GLOBAL $cfg;
+global $cfg;
 header("Cache-control: private");
 $ctSecondsite = new CTSDManagerDashboard(
     $_SERVER['REQUEST_METHOD'],
@@ -23,12 +24,3 @@ $ctSecondsite->execute();
 page_close();
 
 ?>
-
-<!-- For React -->
-<link rel="stylesheet" href="components/style.css?version=<?= time() ?>">
-<link rel="stylesheet" href="css/table.css?version=<?= time() ?>">
-<link rel="stylesheet" href="components/SDManagerDashboard/style.css?version=<?= time() ?>">
-
-<script src="js/react.production.min.js" crossorigin></script>
-<script src="js/react-dom.production.min.js" crossorigin></script>
-<script type="module" src='components/SDManagerDashboard/SDManagerDashboardComponent.js?version=<?= time() ?>'></script>

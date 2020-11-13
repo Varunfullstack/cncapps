@@ -1,5 +1,5 @@
 "use strict";
-import APIMain from './../../services/APIMain.js?v=1';
+import APIMain from './../../services/APIMain';
 
 class CurrentActivityService extends APIMain {
     baseURL = "CurrentActivityReport.php?action=";

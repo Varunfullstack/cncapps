@@ -3,7 +3,7 @@ import APICustomers from "../../services/APICutsomer.js";
 import Spinner from "../../shared/Spinner/Spinner";
 import {padEnd, sort} from "../../utils/utils.js";
 import MainComponent from "../../shared/MainComponent.js";
-
+import React from 'react';
 class CustomerSiteComponent extends MainComponent {
     el = React.createElement;
     apiCutsomer = new APICustomers();

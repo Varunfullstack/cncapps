@@ -8,24 +8,39 @@ import GatherFixedInformationComponent from "./subComponents/GatherFixedInformat
 import GatherManagementReviewDetailsComponent from "./subComponents/GatherManagementReviewDetailsComponent";
 
 import './ActivityComponent.css';
+import '../style.css';
 
 class ActivityComponent extends React.Component {
     constructor(props) {
         super(props);
     }
 
+    getAppropriateElement(action) {
+        switch (action) {
+            case 'displayActivity':
+                return <ActivityDisplayComponent/>
+            case 'editActivity' :
+                return <ActivityEditComponent/>
+            case 'gatherFixedInformation' :
+                return <GatherFixedInformationComponent/>
+            case 'gatherManagementReviewDetails' :
+                return <GatherManagementReviewDetailsComponent/>
+            default:
+                return null
+        }
+    }
+
     render() {
         const action = params.get('action');
         return (
             <div>
-                {action === 'displayActivity' ? ActivityDisplayComponent : null}
-                {action === 'editActivity' ? ActivityEditComponent : null}
-                {action === 'gatherFixedInformation' ? GatherFixedInformationComponent : null}
-                {action === 'gatherManagementReviewDetails' ? GatherManagementReviewDetailsComponent : null}
+                {this.getAppropriateElement(action)}
             </div>
         );
     }
 }
 
-const domContainer = document.querySelector("#reactMainActivity");
-ReactDOM.render(React.createElement(ActivityComponent), domContainer);
+document.addEventListener('DOMContentLoaded', () => {
+    const domContainer = document.querySelector("#reactMainActivity");
+    ReactDOM.render(React.createElement(ActivityComponent), domContainer);
+});

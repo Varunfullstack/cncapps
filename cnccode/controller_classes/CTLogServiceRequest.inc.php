@@ -1,7 +1,7 @@
 <?php
 
 /**
-         * Customer Activity Report controller class
+ * Customer Activity Report controller class
  * CNC Ltd
  *
  * @access public
@@ -25,7 +25,8 @@ class CTLogServiceRequest extends CTCNC
         $cookieVars,
         $cfg,
         $checkPermissions = true
-    ) {
+    )
+    {
         parent::__construct(
             $requestMethod,
             $postVars,
@@ -33,7 +34,7 @@ class CTLogServiceRequest extends CTCNC
             $cookieVars,
             $cfg
         );
-      
+
         if ($checkPermissions) {
 
             $roles = [
@@ -52,27 +53,22 @@ class CTLogServiceRequest extends CTCNC
      */
     function defaultAction()
     {
-        switch ($this->getAction()) {           
-             
-                                           
-            default:
-                $this->setTemplate();
-                break;
-        }
+        $this->setTemplate();
     }
 
     function setTemplate()
     {
         $this->setMethodName('setTemplate');
         $this->setMenuId(101);
-        $action = $this->getAction();
         $this->setPageTitle('Log Service Request');
-         
 
         $this->setTemplateFiles(
             'LogServiceRequest',
             'LogServiceRequest.inc'
         );
+
+        $this->loadReactScript('LogServiceRequestComponent.js');
+        $this->loadReactCSS('LogServiceRequestComponent.css');
 
         $this->template->parse(
             'CONTENTS',
@@ -80,10 +76,7 @@ class CTLogServiceRequest extends CTCNC
             true
         );
         $this->parsePage();
-    }   
-    
-    
-   
-    
-    
+    }
+
+
 }

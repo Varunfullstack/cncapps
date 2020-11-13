@@ -1,6 +1,11 @@
-import MainComponent from "../MainComponent.js?v=1";
-import DailyStatsComponent from "../../SDManagerDashboard/subComponents/DailyStatsComponent.js?v=1"
-import {params} from "../../utils/utils"
+import MainComponent from "../shared/MainComponent";
+import DailyStatsComponent from "../SDManagerDashboardComponent/subComponents/DailyStatsComponent"
+import {params} from "../utils/utils"
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+import './../style.css';
+import './../SDManagerDashboardComponent/SDManagerDashboardComponent.css';
 
 class PopUpComponent extends MainComponent {
     el = React.createElement
@@ -13,12 +18,11 @@ class PopUpComponent extends MainComponent {
     render() {
         const {el} = this;
         const action = params.get("action");
-        switch (action) {
-            case "dailyStats":
-                return el(DailyStatsComponent);
-            default:
-                return el('label', null, "Not Found")
+        if (action === "dailyStats") {
+            return el(DailyStatsComponent);
         }
+
+        return el('label', null, "Not Found")
     }
 }
 

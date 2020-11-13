@@ -50,4 +50,12 @@ class Utils
             return array_rand($array);
         }
     }
+
+    public static function getCurrentChangelogVersion()
+    {
+        $changelog = file_get_contents(BASE_DRIVE . '/CHANGELOG.md');
+        $re = '/\[(v\d+\.\d+\.\d+)\]/m';
+        preg_match($re, $changelog, $matches);
+        return $matches[1];
+    }
 }

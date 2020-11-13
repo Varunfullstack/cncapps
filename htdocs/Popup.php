@@ -1,5 +1,5 @@
 <?php
-require_once("config.inc.php"); 
+require_once("config.inc.php");
 session_start();
 page_open(
     array(
@@ -7,31 +7,28 @@ page_open(
         'auth' => PHPLIB_CLASSNAME_AUTH,
         'perm' => PHPLIB_CLASSNAME_PERM,
         ''
-        )
+    )
 );
-GLOBAL $cfg;
+global $cfg;
 header("Cache-control: private");
 page_close();
 
+$currentVersion = \CNCLTD\Utils::getCurrentChangelogVersion();
 ?>
 
 
 <html>
 <head>
-<link href="/screen.css?cache=7" rel="stylesheet" type="text/css">
-<link rel="stylesheet" href="fonts/style.css">
-<!-- For React -->
-<link rel="stylesheet" href="components/style.css?version=<?= time() ?>">
-<link rel="stylesheet" href="css/table.css?version=<?= time() ?>">
-<link rel="stylesheet" href="components/SDManagerDashboard/style.css?version=<?= time() ?>">
-
-<script src="js/react.production.min.js" crossorigin></script>
-<script src="js/react-dom.production.min.js" crossorigin></script>
-<script type="module" src='components/shared/PopUp/CMPPopup.js?version=<?= time() ?>'></script>
+    <link rel='stylesheet'
+          href='components/dist/PopUpComponent.css?<?= $currentVersion ?>'
+    >
+    <script src='components/dist/PopUpComponent.js?<?= $currentVersion ?>'></script>
 </head>
-<body >
-<div >
-    <div id="reactMainPopup" name="reactMainPopup"></div>
+<body>
+<div>
+    <div id="reactMainPopup"
+         name="reactMainPopup"
+    ></div>
 </div>
 </body>
 </html>

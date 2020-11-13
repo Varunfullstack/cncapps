@@ -3,6 +3,7 @@ import APICallactType from "../../services/APICallacttype.js";
 import Icon from "../../shared/Icon.js";
 import Table from "../../shared/table/table";
 import {sort} from "../../utils/utils.js";
+import React from 'react';
 
 class ActivityListComponent extends MainComponent {
     el = React.createElement;

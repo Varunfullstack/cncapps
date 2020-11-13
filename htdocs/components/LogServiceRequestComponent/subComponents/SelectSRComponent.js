@@ -1,9 +1,9 @@
 import RadioButtons, {RadioButtonsType} from "../../shared/radioButtons";
 import Spinner from "../../shared/Spinner/Spinner";
-import ContactSRComponent from "./ContactSRComponent.js?v=1";
+import ContactSRComponent from "./ContactSRComponent";
 import CustomerSRComponent from "./CustomerSRComponent.js";
 import SVCCustomers from "../../services/APICutsomer.js";
-
+import React from 'react';
 class SelectSRComponent extends React.Component {
     el = React.createElement;
     apiCutsomer = new SVCCustomers();

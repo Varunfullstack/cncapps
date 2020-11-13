@@ -1,8 +1,8 @@
 "use strict";
-
 import Table from '../../shared/table/table';
-import APICustomerLicenses from './APICustomerLicenses';
 import Spinner from '../../shared/Spinner/Spinner';
+import ToolTip from "../../shared/ToolTip";
+import APICustomerLicenses from "./APICustomerLicenses.js";
 import React from 'react';
 
 /**import
@@ -34,17 +34,6 @@ class TDCustomerSearchComponent extends React.Component {
         this.setState({_showSpinner: false});
     };
 
-    componentDidMount() {
-        // this.showSpinner();
-        // this.apiCustomerLicenses.getCustomers().then((cncCustomers) => {
-        //   this.setState({ cncCustomers });
-        //   setTimeout(() => this.handleSearch(), 100);
-        //   this.hideSpinner();
-        // });
-
-
-    }
-
     handleChange = ({currentTarget: input}) => {
         const {customers} = this.state;
         if (customers.length > 0 && input.value.length > 0) {
@@ -63,9 +52,6 @@ class TDCustomerSearchComponent extends React.Component {
             });
             this.setState({filteredResult});
         } else this.setState({filteredResult: [...customers]});
-        // const search = { ...this.state.search };
-        // search[input.name] = input.value;
-        // this.setState({ search });
     };
 
     getSearchElement(label, name) {
@@ -99,67 +85,19 @@ class TDCustomerSearchComponent extends React.Component {
                     el(
                         "td",
                         {key: "tdNew", className: "col"},
-                        el(
-                            "button",
-                            {
+                        el(ToolTip, {
+                            title: "Add New Customer",
+                            content: el("i", {
                                 key: "NewCustomer",
                                 onClick: handleAddNew,
-                            },
-                            "Add new"
-                        )
+                                className: "fal fa-plus fa-2x pointer",
+                            }),
+                        })
                     ),
                 ])
             )
         );
     }
-
-    // handleSearch = () => {
-    //   console.log("Search", this.state.search);
-    //   const {cncCustomers}=this.state;
-    //   this.apiCustomerLicenses
-    //     .searchTechDataCustomers(this.state.search)
-    //     .then((res) => {
-    //       //set cnc customers
-    //       if (res.Result === "Success") {
-    //         // set result
-    //         res.BodyText.endCustomersDetails.map((endCust) => {
-    //           const cncCustomers = this.state.cncCustomers.filter(
-    //             (cnc) => cnc.streamOneEmail == endCust.endCustomerId
-    //           );
-    //           //console.log(endCust.endCustomerId);
-    //           if (cncCustomers.length > 0) {
-    //             endCust.cncCustomerName = cncCustomers[0].name;
-    //           }
-    //           return endCust;
-    //         });
-    //       }
-    //       return res;
-    //     })
-    //     .then((res) => {
-    //       console.log("result", res);
-    //       if (res.Result === "Success") {
-    //         // set result
-    //         const orders= this.props.orders;
-    //        const orderContacts= orders.map(o=>{
-    //           return {name:o.endCustomerName,email:o.endCustomerEmail,company:o.company,po:o.endCustomerPO
-    //             ,cncCustomer:cncCustomers.filter(cnc=>cnc.streamOneEmail===o.endCustomerEmail)[0]||null};
-    //         })
-    //         let streamOneCustomers=res.BodyText.endCustomersDetails.map(c=>{
-    //           return {name:c.firstName+' '+c.lastName,email:c.email,company:c.companyName,po:c.companyName,id:c.endCustomerId
-    //           ,cncCustomer:cncCustomers.filter(cnc=>cnc.streamOneEmail===c.email)[0]||null}
-    //         });
-    //         console.log(streamOneCustomers)
-    //         let allContact=distinct([...streamOneCustomers,...orderContacts],'email');
-    //         console.log('All Contact',allContact);
-    //         this.setState({
-    //           result: allContact,
-    //           filteredResult: allContact,
-    //         });
-    //       } else {
-    //         this.setState({ result: [], filteredResult: [] });
-    //       }
-    //     });
-    // };
 
     handleAddNew = () => {
         if (this.props.onAddNew) this.props.onAddNew();
@@ -171,16 +109,11 @@ class TDCustomerSearchComponent extends React.Component {
             customer.endCustomerId;
     };
     handleSaas = (customer) => {
-        console.log(customer);
-        // get customer orders;
         window.location = `/CustomerLicenses.php?action=searchOrders&email=${customer.email}&tap=saas`;
-        //    this.apiCustomerLicenses.getSubscriptionsByEndCustomerId(customner.endCustomerId).then(result=>console.log(result))
-        //this.apiCustomerLicenses.getSubscriptionsByEmail('mark.perres@ajmhealthcare.ord').then(result=>console.log(result))
     };
     getSearchResult = () => {
-        const {search, filteredResult} = this.state;
+        const {filteredResult} = this.state;
         const {el, handleEdit, handleSaas} = this;
-        //            return {name:o.endCustomerName,email:o.endCustomerEmail,company:o.company,po:o.endCustomerPO};
 
         const columns = [
             {path: "companyName", label: "StreamOne Company Name", sortable: true},
@@ -188,30 +121,29 @@ class TDCustomerSearchComponent extends React.Component {
             {path: "cncCustName", label: "CNC Customer", sortable: true},
             {path: "name", label: "Contact Name", sortable: true,},
             {path: "email", label: "Email", sortable: true},
-
-            // { path: "createdOn", label: "Created On", sortable: true },
             {
                 path: null,
                 label: "Edit Company",
                 sortable: false,
-                content: (c) => c.endCustomerId != null ? el("i", {
-                    onClick: () => handleEdit(c),
-                    className: 'pointer fa fa-pencil',
-                    title: "Edit customer details"
-                }) : null
+                content: (c) => c.endCustomerId != null ?
+                    el(ToolTip, {
+                        title: "Edit customer details",
+                        content: el("i", {onClick: () => handleEdit(c), className: 'pointer fal fa-edit'})
+                    })
+                    : null
             },
             {
                 path: null,
                 label: "Edit Licenses",
                 sortable: false,
-                content: (c) => el("i", {
-                    onClick: () => handleSaas(c),
-                    className: 'pointer fa fa-pencil',
-                    title: "Edit customer licences"
-                }),
+                content: (c) =>
+                    el(ToolTip, {
+                        title: "Edit customer licences", content:
+                            el("i", {onClick: () => handleSaas(c), className: 'pointer fal fa-edit'})
+                    })
+                ,
             },
         ];
-        //if(search&& search.result&&search.result.endCustomersDetails!=null)
         {
             return this.el(Table, {
                 key: "reaulttable",

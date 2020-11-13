@@ -1,15 +1,18 @@
 "use strict";
 import Spinner from './../shared/Spinner/Spinner';
-import Stepper from '../shared/stepper.js?v=10';
-import CustomerSearchComponent from './subComponents/CustomerSearchComponent.js?v=10';
-import SelectSRComponent from './subComponents/SelectSRComponent.js?v=10';
-import CustomerSiteComponent from './subComponents/CustomerSiteComponent.js?v=10';
-import LastStepComponent from './subComponents/LastStepComponent.js?v=10';
-import APIActivity from '../services/APIActivity.js?v=10';
-import MainComponent from '../shared/MainComponent.js?v=10'
+import Stepper from '../shared/stepper';
+import CustomerSearchComponent from './subComponents/CustomerSearchComponent';
+import SelectSRComponent from './subComponents/SelectSRComponent';
+import CustomerSiteComponent from './subComponents/CustomerSiteComponent';
+import LastStepComponent from './subComponents/LastStepComponent';
+import APIActivity from '../services/APIActivity';
+import MainComponent from '../shared/MainComponent'
 import {params} from '../utils/utils'
-
+import React from 'react';
+import ReactDOM from 'react-dom';
 import './LogServiceRequestComponent.css'
+import './../style.css';
+
 
 export default class LogServiceRequestComponent extends MainComponent {
     el = React.createElement;

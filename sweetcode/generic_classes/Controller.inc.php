@@ -1133,10 +1133,7 @@ class Controller extends BaseObject
     protected function getVersion()
     {
         if (!$this->cachedVersion) {
-            $changelog = file_get_contents(BASE_DRIVE . '/CHANGELOG.md');
-            $re = '/\[(v\d+\.\d+\.\d+)\]/m';
-            preg_match($re, $changelog, $matches);
-            $this->cachedVersion = $matches[1];
+            $this->cachedVersion = \CNCLTD\Utils::getCurrentChangelogVersion();
         }
         return $this->cachedVersion;
     }
