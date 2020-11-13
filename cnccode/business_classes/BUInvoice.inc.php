@@ -1543,7 +1543,7 @@ class BUInvoice extends Business
         $invoiceNumbers = array();
 
         /** @var BUMail $buMail */
-        $buMail = null;
+        $buMail = new BUMail($this);
 
         /** @var SalesInvoiceEmailDTO[] $invoiceEmails */
         $invoiceEmails = [];
