@@ -31,6 +31,7 @@ class CTSRActivity extends CTCNC
             "Y" => "ServerGuard Related",
             "N" => "Not ServerGuard Related"
         );
+    private $buActivity;
 
     function __construct($requestMethod,
                          $postVars,
@@ -56,6 +57,8 @@ class CTSRActivity extends CTCNC
             RENEWALS_PERMISSION,
         ];
 
+        $this->buActivity = new BUActivity($this);
+
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
@@ -72,15 +75,13 @@ class CTSRActivity extends CTCNC
             case "getCallActivity":
                 echo json_encode($this->getActivityDetails());
                 exit;
-                break;
             case "messageToSales":
                 echo json_encode($this->messageToSales());
                 exit;
-                break;
+
             case "updateActivity":
                 echo json_encode($this->updateCallActivity());
                 exit;
-                break;
             case "getCustomerContacts":
                 echo json_encode($this->getCustomerContacts());
                 exit;
@@ -89,8 +90,6 @@ class CTSRActivity extends CTCNC
                 exit;
             case "getPriorities":
                 echo json_encode($this->getPriorities());
-                exit;
-
                 exit;
             case "getCustomerContracts":
                 echo json_encode($this->getCustomerContracts());
@@ -173,20 +172,63 @@ class CTSRActivity extends CTCNC
         {
             case "displayActivity":
                 return "Service Request " . $problemID . $this->getProblemRaiseIcon($dbeProblem);
-                break;
             case "editActivity":
                 return "Edit Service Request " . $problemID . $this->getProblemRaiseIcon($dbeProblem);
-                break;
             case "gatherFixedInformation":
                 return "Service Request Fix Summary " . $problemID . $this->getProblemRaiseIcon($dbeProblem);
-                break;
             case "gatherManagementReviewDetails":
                 return "Management Review Reason";
             default:
                 return 'Activity';
-                break;
         }
-
+    }
+    private function getProblemRaiseIcon($dbeJProblem)
+    {
+        
+        if (isset($dbeJProblem)) {
+            $raiseTypeId = $dbeJProblem->getValue(DBEProblem::raiseTypeId);
+            if (isset($raiseTypeId) && $raiseTypeId != null) {
+                $dbeProblemRaiseType = new  DBEProblemRaiseType($this);
+                $dbeProblemRaiseType->setPKValue($raiseTypeId);
+                $dbeProblemRaiseType->getRow();
+                $return = "<div style='font-size: 14px;font-weight: 100; display:inline-block'>
+                  <div class='tooltip' > ";
+                $title="";
+                switch ($dbeProblemRaiseType->getValue(DBEProblemRaiseType::description)) {
+                    case 'Email':
+                        $return .= "<i class='fal fa-envelope ml-5 pointer' style='font-size: 18px;' ></i>";
+                        $title="This Service Request was raised by email";
+                        break;
+                    case 'Portal':
+                        //$return .=  "<i class='fab fa-edge ml-5 pointer' style='font-size: 18px;' ></i>";
+                        $return .=  "<i class='icon-chrome_icon' style='font-size: 18px; margin:5px; color:#000080 ' ></i>";
+                        $title="This Service Request was raised by the portal";
+                        break;
+                    case 'Phone':
+                        $return .=  "<i class='fal fa-phone ml-5 pointer' style='font-size: 18px;' ></i>";
+                        $title="This Service Request was raised by phone";
+                        break;
+                    case 'On site':
+                        $return .=  "<i class='fal fa-building ml-5 pointer' style='font-size: 18px;' ></i>";
+                        $title="This Service Request was raised by an on site engineer";
+                        break;
+                    case 'Alert':
+                        $return .=  "<i class='fal fa-bell ml-5 pointer' style='font-size: 18px;' ></i>";
+                        $title="This Service Request was raised by an alert";
+                        break;
+                    case 'Sales':
+                        $return .=  "<i class='fal fa-shopping-cart ml-5 pointer' style='font-size: 18px;' ></i>";
+                        $title="This Service Request was raised via Sales";
+                        break;
+                    case 'Manual':
+                        $return .=  "<i class='fal fa-user-edit ml-5 pointer' style='font-size: 18px;' ></i>";
+                        $title="This Service Request was raised manually";
+                        break;
+                }
+                $return =$return."<div class='tooltiptext tooltip-bottom' style='width:300px' >$title</div> </div> ";
+                return $return;
+            }
+        } else return null;
     }
 
     private function getActivityDetails()
@@ -581,6 +623,90 @@ class CTSRActivity extends CTCNC
             return ['error' => true, 'errorDescription' => $ex->getMessage()];
         }
     }
+    function validTime($body, $dbeProblem,$buActivity,$dbeCallActivity)
+    {
+        $problemID=$dbeCallActivity->getValue(DBECallActivity::problemID);
+        $callActivityID=$dbeCallActivity->getValue(DBECallActivity::callActivityID);
+        $durationHours = common_convertHHMMToDecimal(
+                $body->endTime
+            ) - common_convertHHMMToDecimal($body->startTime);
+
+        $durationMinutes = convertHHMMToMinutes(
+                $body->endTime
+            ) - convertHHMMToMinutes($body->startTime);
+
+        if (in_array(
+            $body->callActTypeID,
+            [4, 8, 11, 18]
+        )) {
+            $userID    = $body->userID;
+            $dbeUser = new DBEUser($this);
+            $dbeUser->getRow($userID);
+            $teamID = $dbeUser->getValue(DBEUser::teamID);
+            if ($teamID <= 4) {
+                $usedTime = 0;
+                $allocatedTime = 0;
+                if ($teamID == 1) {
+                    $usedTime = $buActivity->getHDTeamUsedTime(
+                        $problemID,
+                        $callActivityID
+                    );
+                    $allocatedTime = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
+                }
+                if ($teamID == 2) {
+                    $usedTime = $buActivity->getESTeamUsedTime(
+                        $problemID,
+                        $callActivityID
+                    );
+                    $allocatedTime = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
+                }
+                if ($teamID == 4) {
+                    $usedTime = $buActivity->getSPTeamUsedTime(
+                        $problemID,
+                        $callActivityID
+                    );
+                    $allocatedTime = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
+                }
+                if ($teamID == 5) {
+                    $usedTime = $buActivity->getUsedTimeForProblemAndTeam(
+                        $problemID,
+                        5,
+                        $callActivityID
+                    );
+                    $allocatedTime = $dbeProblem->getValue(DBEProblem::projectTeamLimitMinutes);
+                }
+                if ($usedTime + $durationMinutes > $allocatedTime) {
+                    return 'You cannot assign more time than left over';
+                }
+            }
+            // check time exceed
+            $buHeader = new BUHeader($this);
+            $dsHeader = new DataSet($this);
+            $buHeader->getHeader($dsHeader);
+
+            if (
+                $dbeCallActivity->getValue(
+                    DBEJCallActivity::callActTypeID
+                ) == CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID &&
+                $durationHours > $dsHeader->getValue(DBEHeader::customerContactWarnHours)
+            ) {
+                return
+                    'Warning: Duration exceeds ' . $dsHeader->getValue(
+                        DBEHeader::customerContactWarnHours
+                    ) . ' hours';
+            }
+            if ($dbeCallActivity->getValue(
+                    DBEJCallActivity::callActTypeID
+                ) == CONFIG_REMOTE_TELEPHONE_ACTIVITY_TYPE_ID) {
+                if ($durationHours > $dsHeader->getValue(DBEHeader::remoteSupportWarnHours)) {
+                    return 'Warning: Activity duration exceeds ' . $dsHeader->getValue(
+                            DBEHeader::remoteSupportWarnHours
+                        ) . ' hours';
+                }
+            }
+        }
+        return '';
+    }
     function updateCallActivity()
     {
         $this->setMethodName('updateCallActivity');
@@ -689,7 +815,6 @@ class CTSRActivity extends CTCNC
             ) {
                 http_response_code(400);
                 return ["error" => 'Please provide an escalate reason'];
-                $buActivity->escalateProblemBycallActivityID($body->callActivityID, $body->escalationReason);
             }
             if ($updateAwaitingCustomer) {
                 $dbeProblem->setValue(
@@ -736,98 +861,6 @@ class CTSRActivity extends CTCNC
             return ["redirectTo" => "Activity.php?action=gatherFixedInformation&callActivityID=$body->callActivityID"];
         }
         return ["status" => "1"];
-    }
-
-    function validTime($body, $dbeProblem, $buActivity, $dbeCallActivity)
-    {
-        $problemID = $dbeCallActivity->getValue(DBECallActivity::problemID);
-        $callActivityID = $dbeCallActivity->getValue(DBECallActivity::callActivityID);
-        $durationHours = common_convertHHMMToDecimal(
-                $body->endTime
-            ) - common_convertHHMMToDecimal($body->startTime);
-
-        $durationMinutes = convertHHMMToMinutes(
-                $body->endTime
-            ) - convertHHMMToMinutes($body->startTime);
-
-        if (in_array(
-            $body->callActTypeID,
-            [4, 8, 11, 18]
-        )) {
-            $userID = $body->userID;
-            $dbeUser = new DBEUser($this);
-            $dbeUser->getRow($userID);
-            $teamID = $dbeUser->getValue(DBEUser::teamID);
-            if ($teamID <= 4) {
-                $usedTime = 0;
-                $allocatedTime = 0;
-                if ($teamID == 1) {
-                    $usedTime = $buActivity->getHDTeamUsedTime(
-                        $problemID,
-                        $callActivityID
-                    );
-                    $allocatedTime = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
-                }
-                if ($teamID == 2) {
-                    $usedTime = $buActivity->getESTeamUsedTime(
-                        $problemID,
-                        $callActivityID
-                    );
-                    $allocatedTime = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
-                }
-                if ($teamID == 4) {
-                    $usedTime = $buActivity->getSPTeamUsedTime(
-                        $problemID,
-                        $callActivityID
-                    );
-                    $allocatedTime = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
-                }
-                if ($teamID == 5) {
-                    $usedTime = $buActivity->getUsedTimeForProblemAndTeam(
-                        $problemID,
-                        5,
-                        $callActivityID
-                    );
-                    $allocatedTime = $dbeProblem->getValue(DBEProblem::projectTeamLimitMinutes);
-                }
-                if ($usedTime + $durationMinutes > $allocatedTime) {
-                    return 'You cannot assign more time than left over';
-                }
-            }
-            // check time exceed
-            $buHeader = new BUHeader($this);
-            $dsHeader = new DataSet($this);
-            $buHeader->getHeader($dsHeader);
-
-            if (
-                $dbeCallActivity->getValue(
-                    DBEJCallActivity::callActTypeID
-                ) == CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID &&
-                $durationHours > $dsHeader->getValue(DBEHeader::customerContactWarnHours)
-            ) {
-                return
-                    'Warning: Duration exceeds ' . $dsHeader->getValue(
-                        DBEHeader::customerContactWarnHours
-                    ) . ' hours';
-            }
-            if ($dbeCallActivity->getValue(
-                    DBEJCallActivity::callActTypeID
-                ) == CONFIG_REMOTE_TELEPHONE_ACTIVITY_TYPE_ID) {
-                if ($durationHours > $dsHeader->getValue(DBEHeader::remoteSupportWarnHours)) {
-                    return 'Warning: Activity duration exceeds ' . $dsHeader->getValue(
-                            DBEHeader::remoteSupportWarnHours
-                        ) . ' hours';
-                }
-                $minHours = $dsHeader->getValue(DBEHeader::RemoteSupportMinWarnHours);
-                if ($durationHours < $minHours) {
-                    return
-                        'Remote support under ' . (floor(
-                            $minHours * 60
-                        )) . ' minutes, should this be Customer Contact instead?”.';
-                }
-            }
-        }
-        return '';
     }
 
     /**
@@ -1271,18 +1304,13 @@ class CTSRActivity extends CTCNC
         switch ($action) {
             case "displayActivity":
                 return "Service Request " . $problemID . $this->getProblemRaiseIcon($dbeProblem);
-                break;
             case "editActivity":
                 return "Edit Service Request " . $problemID . $this->getProblemRaiseIcon($dbeProblem);
-                break;
             case "gatherFixedInformation":
                 return "Service Request Fix Summary " . $problemID . $this->getProblemRaiseIcon($dbeProblem);
-                break;
             default:
                 return 'Activity';
-                break;
         }
-        return 'Activity';
     }
 
     private function getProblemRaiseIcon($dbeJProblem)
