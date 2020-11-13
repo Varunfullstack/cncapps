@@ -1979,7 +1979,7 @@ class CTSalesOrder extends CTCNC
                             $txtFlagAsSent = "Flag as sent";
                             if ($this->dsQuotation->getValue(DBEQuotation::documentType) == 'manualUpload') {
                                 $txtSendQuote = null;
-                            } elseif ($this->dsQuotation->getValue(DBEQuotation::documentType) != 'quotation') {
+                            } elseif ($this->dsQuotation->getValue(DBEQuotation::documentType) != 'quote') {
                                 $txtFlagAsSent = null;
                             }
 
@@ -1990,7 +1990,7 @@ class CTSalesOrder extends CTCNC
                                     DBEQuotation::fileExtension
                                 ) == 'pdf' && $this->dsQuotation->getValue(
                                     DBEQuotation::documentType
-                                ) == 'quotation' && $hasGreenArrow && $dsOrdhead->getValue(
+                                ) == 'quote' && $hasGreenArrow && $dsOrdhead->getValue(
                                     DBEOrdhead::type
                                 ) !== 'C';
                             if ($shouldShowSendReminder) {
@@ -2980,8 +2980,8 @@ class CTSalesOrder extends CTCNC
         $flagAsSent = $this->getParam('flagAsSent');
         $this->dsQuotation->fetchNext();
         $updateDB = TRUE;
-        // if this is a PDF file then send an email to the customer else simply st the sent date.
-        if ($this->dsQuotation->getValue(DBEQuotation::documentType) == 'quotation' && !$flagAsSent) {
+        // if this is a PDF file then send an email to the customer else simply set the sent date.
+        if ($this->dsQuotation->getValue(DBEQuotation::documentType) == 'quote' && !$flagAsSent) {
             $buPDFSalesQuote = new BUPDFSalesQuote($this);
             $updateDB = $buPDFSalesQuote->sendPDFEmailQuote($this->getQuotationID());
         }

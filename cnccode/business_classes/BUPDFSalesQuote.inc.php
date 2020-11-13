@@ -202,7 +202,7 @@ class BUPDFSalesQuote extends Business
         $dbeQuotation->setValue(DBEQuotation::salutation, $salutation);
         $dbeQuotation->setValue(DBEQuotation::emailSubject, $emailSubject);
         $dbeQuotation->setValue(DBEQuotation::fileExtension, 'pdf');
-        $dbeQuotation->setValue(DBEQuotation::documentType, 'quotation');
+        $dbeQuotation->setValue(DBEQuotation::documentType, 'quote');
         $dbeQuotation->setValue(DBEQuotation::deliveryContactID, $dsOrdhead->getValue(DBEOrdhead::delContactID));
         $dbeQuotation->setValue(DBEQuotation::deliverySiteAdd1, $dsOrdhead->getValue(DBEOrdhead::delAdd1));
         $dbeQuotation->setValue(DBEQuotation::deliverySiteAdd2, $dsOrdhead->getValue(DBEOrdhead::delAdd2));
@@ -716,7 +716,8 @@ class BUPDFSalesQuote extends Business
                     "apiURL"          => $apiURL,
                     "salutation"      => $dbeQuotation->getValue(DBEQuotation::salutation),
                     "senderFirstName" => $dsUser->getValue(DBEUser::firstName),
-                    "senderLastName"  => $dsUser->getValue(DBEUser::lastName)
+                    "senderLastName"  => $dsUser->getValue(DBEUser::lastName),
+                    "introduction"    => $dbeQuotation->getValue(DBEQuotation::salutation)
                 ]
             )
         );

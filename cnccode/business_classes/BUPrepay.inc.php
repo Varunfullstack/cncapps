@@ -677,94 +677,35 @@ class BUPrepay extends Business
      */
     function sendStatement($statementFilepath, $custno, &$dsContact, $balance, $date, $topUpValue)
     {
-
         $buMail = new BUMail($this);
-
-        $buMail->mime->addAttachment($statementFilepath, 'text/html');
-
-        $id_user = $GLOBALS ['auth']->is_authenticated();
-        $this->dbeUser->getRow($id_user);
         $senderEmail = CONFIG_SALES_EMAIL;
-        $senderName = 'CNC Sales';
 
+        $subject = 'Pre-Pay Contract Statement: ' . Controller::dateYMDtoDMY($date);
+        $attachments = new \CNCLTD\Email\AttachmentCollection();
+        $attachments->add($statementFilepath, 'text/html', null, true);
         while ($dsContact->fetchNext()) {
-            // Send email with attachment
-            $message = '<body><p class=MsoNormal><span style=\'font-size:10.0pt;color:black\'>';
-            $message .= 'Dear ' . $dsContact->getValue(DBEContact::firstName) . ',';
-            $message .= '</span></p>';
-            $message .= '<p class=MsoNormal><span style=\'font-size:10.0pt;color:black\'>';
-            // Temporary:
-            $message .= 'Please find attached your latest Pre-Pay Contract statement, on which there
-is currently a balance of ';
-            $message .= '&pound;' . common_numberFormat($balance) . ' + VAT.';
-            $message .= '</p>';
-
-            $message .= '<p class=MsoNormal><span style=\'font-size:10.0pt;color:black\'>';
-            $message .= 'If you have any queries relating to any of the items detailed on this statement, then please notify us within 7 days so that we can make any adjustments if applicable.';
-            $message .= '</p>';
-
-            if ($balance <= 100) {
-                $message .= '<p class=MsoNormal><span style=\'font-size:10.0pt;color:black\'>';
-                $message .= 'If no response to the contrary is received within 7 days of this statement, then we will automatically raise an invoice for &pound;' . common_numberFormat(
-                        $topUpValue * (1 + ($this->standardVatRate / 100))
-                    ) . ' Inc VAT.';
-                $message .= '</p>';
-            }
-
-            $message .= '<p class=MsoNormal><span style=\'font-size:10.0pt;color:black\'>';
-            $message .= 'Are you aware that you can receive up to &pound;500 for the referral of any company made to CNC that results in the purchase of a support contract?  Please call us for further information.';
-            $message .= '</p>';
-
-            $message .= common_getHTMLEmailFooter($senderName, $senderEmail);
-
-            $subject = 'Pre-Pay Contract Statement: ' . Controller::dateYMDtoDMY($date);
-
-            $toEmail = $dsContact->getValue(DBEContact::firstName) . ' ' . $dsContact->getValue(
-                    DBEContact::lastName
-                ) . '<' . $dsContact->getValue(DBEContact::email) . '>';
-
-            // create mime
-            $html = '<html lang="en">' . $message . '</html>';
-
-            $hdrs = array(
-                'From'         => $senderName . " <" . $senderEmail . ">",
-                'To'           => $toEmail,
-                'Subject'      => $subject,
-                'Content-Type' => 'text/html; charset=UTF-8'
+            global $twig;
+            $body = $twig->render(
+                '@customerFacing/PrePayInformation/PrePayInformation.html.twig',
+                [
+                    "contactFirstName" => $dsContact->getValue(DBEContact::firstName),
+                    "balance"          => $balance,
+                    "topUpAmount"      => $topUpValue * (1 + ($this->standardVatRate / 100))
+                ]
             );
+            $toEmail = "{$dsContact->getValue(DBEContact::firstName)} {$dsContact->getValue(DBEContact::lastName)}<{$dsContact->getValue(DBEContact::email)}>";
+            $buMail->sendEmailWithAttachments($body, $subject, $toEmail, $attachments, $senderEmail);
+        }
 
-            $buMail->mime->setHTMLBody($html);
-            $mime_params = array(
-                'text_encoding' => '7bit',
-                'text_charset'  => 'UTF-8',
-                'html_charset'  => 'UTF-8',
-                'head_charset'  => 'UTF-8'
-            );
-            $body = $buMail->mime->get($mime_params);
-            $hdrs = $buMail->mime->headers($hdrs);
-
-            $buMail->putInQueue(
-                $senderEmail,
-                $toEmail,
-                $hdrs,
-                $body
-            );
-
-        } // end while
-        /*
-        Update DB
-        */
-        $this->save($statementFilepath, $custno, $balance);
+        $this->persistPrePayStatement($statementFilepath, $custno, $balance);
     }
 
-    function save($filename, $custno, $balance)
+    function persistPrePayStatement($filename, $custno, $balance)
     {
         $db = $GLOBALS['db'];
 
         $fileString = mysqli_real_escape_string($db->link_id(), file_get_contents($filename));
-
         $sql =
-
             "INSERT INTO
         prepaystatement(
           pre_custno,
