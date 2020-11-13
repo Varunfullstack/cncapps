@@ -4,7 +4,7 @@
     "description": "",
     "main": "SpinnerHolder.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
+        "test": "echo \"Error: no test specified\" || exit 1",
         "build:ChildItemComponent": "parcel build ChildItemComponent/ChildAndParentItems.js",
         "start:ChildItemComponent": "parcel ChildItemComponent/ChildAndParentItems.js",
         "build:CustomerLicensesComponent": "parcel build CustomerLicencesComponent/CustomerLicensesComponent.js --public-url /components/dist ",
@@ -27,15 +27,16 @@
         "build:ActivityComponent": "parcel build ActivityComponent/ActivityComponent.js --public-url /components/dist",
         "start:ActivityTypeComponent": "parcel ActivityTypeComponent/ActivityTypeComponent.js --public-url /components/dist",
         "build:ActivityTypeComponent": "parcel build ActivityTypeComponent/ActivityTypeComponent.js --public-url /components/dist",
-        "build:CurrentActivityReportComponent": "parcel build CurrentActivityReportComponent/CurrentActivityReportComponent.js --public-url /components/dist",
         "start:CurrentActivityReportComponent": "parcel CurrentActivityReportComponent/CurrentActivityReportComponent.js --public-url /components/dist",
-        "build:LogServiceRequestComponent": "parcel build LogServiceRequestComponent/LogServiceRequestComponent.js --public-url /components/dist",
+        "build:CurrentActivityReportComponent": "parcel build CurrentActivityReportComponent/CurrentActivityReportComponent.js --public-url /components/dist",
         "start:LogServiceRequestComponent": "parcel LogServiceRequestComponent/LogServiceRequestComponent.js --public-url /components/dist",
-        "build:SDManagerDashboardComponent": "parcel build SDManagerDashboardComponent/SDManagerDashboardComponent.js --public-url /components/dist",
+        "build:LogServiceRequestComponent": "parcel build LogServiceRequestComponent/LogServiceRequestComponent.js --public-url /components/dist",
         "start:SDManagerDashboardComponent": "parcel SDManagerDashboardComponent/SDManagerDashboardComponent.js --public-url /components/dist",
-        "build:PopUpComponent": "parcel build PopUpComponent/PopUpComponent.js --public-url /components/dist",
+        "build:SDManagerDashboardComponent": "parcel build SDManagerDashboardComponent/SDManagerDashboardComponent.js --public-url /components/dist",
         "start:PopUpComponent": "parcel PopUpComponent/PopUpComponent.js --public-url /components/dist",
-        "build": "npm run build:ChildItemComponent && npm run build:CustomerLicensesComponent && npm run build:ExpenseBreakdownYearToDateComponent && npm run build:FixedServiceRequestCountComponent && npm run build:ItemListTypeAheadRenderer && npm run build:MySettingsComponent && npm run build:OutOfHoursReportComponent && npm run build:SpinnerHolder && npm run build:SRSourceComponent"
+        "build:PopUpComponent": "parcel build PopUpComponent/PopUpComponent.js --public-url /components/dist",
+        "build": "npm run build:ChildItemComponent && npm run build:CustomerLicensesComponent && npm run build:ExpenseBreakdownYearToDateComponent && npm run build:FixedServiceRequestCountComponent && npm run build:ItemListTypeAheadRenderer && npm run build:MySettingsComponent && npm run build:OutOfHoursReportComponent && npm run build:SpinnerHolder && npm run build:SRSourceComponent && npm run build:ActivityComponent      && npm run build:ActivityTypeComponent      && npm run build:CurrentActivityReportComponent      && npm run build:LogServiceRequestComponent      && npm run build:SDManagerDashboardComponent      && npm run build:PopUpComponent ",
+        "testConcurrency": "concurrently --kill-others \"npm run build:ChildItemComponent\" \"npm run build:CustomerLicensesComponent\" \"npm run build:ExpenseBreakdownYearToDateComponent\" \"npm run build:FixedServiceRequestCountComponent\" \"npm run build:ItemListTypeAheadRenderer\" \"npm run build:MySettingsComponent\" \"npm run build:OutOfHoursReportComponent\" \"npm run build:SpinnerHolder\" \"npm run build:SRSourceComponent\" \"npm run build:ActivityComponent\" \"npm run build:ActivityTypeComponent\" \"npm run build:CurrentActivityReportComponent\" \"npm run build:LogServiceRequestComponent\" \"npm run build:SDManagerDashboardComponent\" \"npm run build:PopUpComponent\""
     },
     "author": "",
     "license": "ISC",
@@ -45,10 +46,11 @@
         "moment": "^2.29.1"
     },
     "devDependencies": {
-        "parcel-bundler": "^1.12.4",
+        "babel-preset-react": "^6.24.1",
+        "concurrently": "^5.3.0",
         "html-react-parser": "^0.14.0",
         "normalizr": "^3.6.1",
-        "babel-preset-react": "^6.24.1"
+        "parcel-bundler": "^1.12.4"
     },
     "browserslist": [
         "since 2017-06"
