@@ -15,7 +15,7 @@ class TableHeader extends React.Component {
     renderSortIcon = (column) => {
         let key = "fa-sort";
         let className = "fa fa-sort";
-        let style = {color: 'gray'};
+        let style = {color: "gray"};
 
         if (this.props.sortColumn != null) {
             if (
@@ -26,11 +26,11 @@ class TableHeader extends React.Component {
             if (column.path === this.props.sortColumn.path) {
                 style = null;
                 if (this.props.sortColumn.order === "asc") {
-                    key = "fa-sort-asc";
-                    className = "fa fa-sort-asc";
+                    key = "fa-sort-up";
+                    className = "fa fa-sort-up";
                 } else {
                     key = "fa-sort-desc";
-                    className = "fa fa-sort-desc";
+                    className = "fa fa-sort-down";
                 }
             }
         }
@@ -51,13 +51,20 @@ class TableHeader extends React.Component {
                     el(
                         "th",
                         {
-                            className: "clickable",
-                            key: c.path || c.key || c.label.replace(' ', ''),
+                            className: (c?.hdClassName || " ") + " clickable ",
+                            key: c.key || c.path || c.label.replace(" ", ""),
                             onClick: () => raiseSort(c.path),
+                            width: c.width ? c.width : "",
+                            //title:c.toolTip?c.toolTip:""
                         },
-                        c.label,
-                        " ",
-                        renderSortIcon(c)
+                        el('div', {className: "tooltip"},
+                            c?.label || " ",
+                            c.icon ? el('i', {className: c.icon}) : null,
+                            renderSortIcon(c),
+                            c.hdToolTip ? el('div', {className: "tooltiptext tooltip-bottom"},
+                                c.hdToolTip ? c.hdToolTip : ""
+                            ) : null
+                        )
                     )
                 )
             )

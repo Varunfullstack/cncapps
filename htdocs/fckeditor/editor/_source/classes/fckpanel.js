@@ -19,7 +19,7 @@
  * == END LICENSE ==
  *
  * Component that creates floating panels. It is used by many
- * other components, like the toolbar items, context menu, etc...
+ * other subComponents, like the toolbar items, context menu, etc...
  */
 
 var FCKPanel = function( parentWindow )

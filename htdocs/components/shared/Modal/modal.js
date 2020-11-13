@@ -31,7 +31,7 @@ export class Modal extends React.Component {
                     },
                     [
                         el("div", {key: "modalHeader", className: "modal-header"}, [
-                            el("span", {key: "spanClose", className: "close fa fa-times", onClick: handleClose}),
+              el("span", { key: "spanClose", className: "close fa fa-times",onClick:handleClose,style:{color:"#FFFFFF"} }),
                             el("label", {key: "header", className: "modal-title"}, title),
                         ]),
                         el("div", {key: "modalbody", className: "modal-body"}, [

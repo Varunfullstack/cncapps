@@ -89,7 +89,7 @@ $GLOBALS['XML_RPC_twoslash'] = $GLOBALS['XML_RPC_backslash'] . $GLOBALS['XML_RPC
 $GLOBALS['XML_RPC_twoslash'] = "2SLS";
 
 // used to store state during parsing
-// quick explanation of components:
+// quick explanation of subComponents:
 //   st - used to build up a string for evaluation
 //   ac - used to accumulate values
 //   qt - used to decide if quotes are needed for evaluation

@@ -1,7 +1,8 @@
-import MainComponent from "../CMPMainComponent.js";
+import MainComponent from "../shared/MainComponent.js";
 import APICallactType from "../services/APICallacttype.js";
 import APIUser from "../services/APIUser.js";
-import Modal from "../utils/modal.js";
+import Modal from "../shared/Modal/modal";
+
 /**
  * onCancel -> call when cancel button click
  *

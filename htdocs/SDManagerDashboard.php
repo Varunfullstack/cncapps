@@ -31,4 +31,4 @@ page_close();
 
 <script src="js/react.production.min.js" crossorigin></script>
 <script src="js/react-dom.production.min.js" crossorigin></script>
-<script type="module" src='components/SDManagerDashboard/CMPSDManagerDashboard.js?version=<?= time() ?>'></script> 
+<script type="module" src='components/SDManagerDashboard/SDManagerDashboardComponent.js?version=<?= time() ?>'></script>

@@ -18,7 +18,7 @@
  *
  * == END LICENSE ==
  *
- * This is a utility object which can be used to load specific components of
+ * This is a utility object which can be used to load specific subComponents of
  * FCKeditor, including all dependencies.
  */
 

@@ -17,7 +17,7 @@
 
         render(userData) {
             //   // Fill the respective areas of the card using DOM manipulation APIs
-            //   // All of our components elements reside under shadow dom. So we created a this.shadowRoot property
+            //   // All of our subComponents elements reside under shadow dom. So we created a this.shadowRoot property
             //   // We use this property to call selectors so that the DOM is searched only under this subtree
             //   this.shadowRoot.querySelector('.card__full-name').innerHTML = userData.name;
             //   this.shadowRoot.querySelector('.card__user-name').innerHTML = userData.username;

@@ -1235,7 +1235,6 @@ class CTSRActivity extends CTCNC
                         $title = "This Service Request was raised by email";
                         break;
                     case 'Portal':
-                        //$return .=  "<i class='fab fa-edge ml-5 pointer' style='font-size: 18px;' ></i>";
                         $return .= "<i class='icon-chrome_icon' style='font-size: 18px; margin:5px; color:#000080 ' ></i>";
                         $title = "This Service Request was raised by the portal";
                         break;
@@ -1260,7 +1259,7 @@ class CTSRActivity extends CTCNC
                         $title = "This Service Request was raised manually";
                         break;
                 }
-                $return = $return . "<div class='tooltiptext tooltip-bottom' style='width:300px' >$title</div> </div> ";
+                $return .= "<div class='tooltiptext tooltip-bottom' style='width:300px' >$title</div> </div> ";
                 return $return;
             }
         }

@@ -32,7 +32,7 @@ class Menu {
   # Set true if you do not want to see the main menu
   var $nomain  = false;
 
-  # Delimiter to separate components of the page title
+  # Delimiter to separate subComponents of the page title
   var $title_delim = " : ";
 
   /***************************************************************************
@@ -221,7 +221,7 @@ class Menu {
   }
   
   /*
-   * private: split a path /2/2 into components "", /2, /2/2
+   * private: split a path /2/2 into subComponents "", /2, /2/2
    */
   function split_path($p) {
     $path = "";

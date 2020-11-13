@@ -1,5 +1,5 @@
 import React from 'react';
-
+export const RadioButtonsType={vertical:"vertical",horizontal:"horizontal"};
 export default class RadioButtons extends React.Component {
     el = React.createElement;
 
@@ -18,10 +18,14 @@ export default class RadioButtons extends React.Component {
 
     render() {
         const {el, handleOnChange} = this;
-        const {items, disabled} = this.props;
+        let {items,disabled,mode,center}=this.props;
         const {selectedOption} = this.state;
+        if(!mode){
+            mode=RadioButtonsType.vertical;
+        }
+
         if (items && items.length > 0) {
-            return el('div', {key: 'divRadioList', className: 'radio-list'}, [
+            return el('div', {key: 'divRadioList', className: 'radio-list'+(mode===RadioButtonsType.horizontal?" horizontal":"")+(center?" content-center ":"")}, [
                 items.map(item => el('div', {key: 'div' + item.id, className: 'radio'}, [
                     el('label', {key: 'lb' + item.id}, [
                         el('input', {

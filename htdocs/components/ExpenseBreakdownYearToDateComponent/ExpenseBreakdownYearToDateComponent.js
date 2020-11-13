@@ -111,8 +111,6 @@ class ExpenseBreakdownYearToDateComponent extends React.Component {
     render() {
         const isApprover = this.state.approvalSubordinates.length;
         const currentDate = new Date();
-        // if is approver we render a dropdown, that we are going to populate from the active users
-        // if not we won't have the selector as it's the guy's data
         const totalRow = new Array(currentDate.getMonth() + 2).fill(0);
         const mileage = new Array(currentDate.getMonth() + 2).fill(0);
         const mileageDetail = new Array(currentDate.getMonth() + 2).fill(0).map(x => []);
@@ -121,7 +119,6 @@ class ExpenseBreakdownYearToDateComponent extends React.Component {
                 acc[expense.expenseTypeDescription] = new Array(currentDate.getMonth() + 2).fill(0);
             }
             const expenseMonth = expense.dateSubmitted.match(/\d{4}-(\d{2})-\d{2}/)[1];
-
             acc[expense.expenseTypeDescription][expenseMonth - 1] += expense.value;
             acc[expense.expenseTypeDescription][acc[expense.expenseTypeDescription].length - 1] += expense.value;
             totalRow[expenseMonth - 1] += expense.value;
@@ -390,7 +387,6 @@ class ExpenseBreakdownYearToDateComponent extends React.Component {
 export default ExpenseBreakdownYearToDateComponent;
 
 document.addEventListener('DOMContentLoaded', () => {
-
     const domContainer = document.getElementById('react-expense-breakdown');
     ReactDOM.render(React.createElement(ExpenseBreakdownYearToDateComponent, {
         isApprover: domContainer.dataset.isApprover,

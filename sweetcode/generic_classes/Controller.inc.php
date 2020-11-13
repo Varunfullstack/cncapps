@@ -1125,7 +1125,7 @@ class Controller extends BaseObject
         }
         $this->template->setVar(
             'javaScript',
-            "<link rel='stylesheet'  href='components/dist/$string?$version'>",
+            "<link rel='stylesheet'  href='subComponents/dist/$string?$version'>",
             true
         );
     }
@@ -1150,7 +1150,7 @@ class Controller extends BaseObject
 
         $this->template->setVar(
             'javaScript',
-            "<script src='components/dist/$string?$version'></script>",
+            "<script src='subComponents/dist/$string?$version'></script>",
             true
         );
 

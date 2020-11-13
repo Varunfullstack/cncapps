@@ -10,7 +10,7 @@
  * 
  * File Name: class_upload.asp
  * 	These are the classes used to handle ASP upload without using third
- * 	part components (OCX/DLL).
+ * 	part subComponents (OCX/DLL).
  * 
  * Version:  2.0 RC3
  * Modified: 2005-03-01 12:13:29

@@ -28,4 +28,4 @@ page_close();
 <link rel="stylesheet" href="components/Activity/style.css?version=<?= time() ?>">
 <script src="js/react.production.min.js" crossorigin></script>
 <script src="js/react-dom.production.min.js" crossorigin></script>
-<script type="module" src='components/Activity/CMPActivity.js?version=<?= time() ?>'></script> 
+<script type="module" src='components/Activity/ActivityComponent.js?version=<?= time() ?>'></script>

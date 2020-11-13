@@ -33,4 +33,4 @@ page_close();
 <!-- <script src="components/npm/node_modules/@ckeditor/ckeditor5-react/dist/ckeditor.js"></script> -->
 <!-- <script src="ckeditor/ckeditor.js"></script> --> 
 
-<script type="module" src='components/LogServiceRequest/CMPLogServiceRequest.js?version=<?= time() ?>'></script> 
+<script type="module" src='components/LogServiceRequest/LogServiceRequestComponent.js?version=<?= time() ?>'></script>

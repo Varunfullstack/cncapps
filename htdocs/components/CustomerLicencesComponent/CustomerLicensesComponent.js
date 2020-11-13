@@ -35,28 +35,6 @@ class CustomerLicensesComponent extends React.Component {
     };
 
     async componentDidMount() {
-        // this.apiCustomerLicenses.getProductsPrices({
-        //   "vendorIds" : [397],
-        //   "lines":
-        //     [
-        //       {
-        //       "sku":"SK4665",
-        //       "quantity":1
-        //       },
-        //       {
-        //       "sku":"SK4663",
-        //       "quantity":1
-        //       }
-        //     ],
-        //   "page": 1
-        //   }).then(result=>{
-        //   console.log(result);
-        // })
-        //  this.apiCustomerLicenses.getProductList(3).then(res=>{
-        //    console.log(res);
-        //  })
-        // load all subscriptions
-        // get first page to know total pages
         this.showSpinner();
         let customers = await this.apiCustomerLicenses.getStreamOneCustomersLocal();
         console.log(customers);
@@ -67,18 +45,10 @@ class CustomerLicensesComponent extends React.Component {
             return c;
         })
         this.setState({customers});
-        // const orders = await this.streamOneService.fetchAllOrders();
-        // console.log("all subscriptions", orders);
-        // this.setState({ orders });
         this.hideSpinner();
-        // console.log(
-        //   "email orders",
-        //   this.streamOneService.getOrdersByEmail("mark.perress@ajmhealthcare.org")
-        // );
     }
 
     handleAddCustomer = () => {
-        console.log("add customer");
         window.location = "/CustomerLicenses.php?action=addNewCustomer";
     };
     showSpinner = () => {
