@@ -1,6 +1,8 @@
 {% extends '@customerFacing/wrapper.html.twig' %}
 {# @var string contactFirstName #}
 {# @var string renewalType #}
+{# @var senderFirstName string #}
+{# @var senderLastName string #}
 {% block replyText %}
 {% endblock %}
 {% block headerTitle %}
@@ -12,7 +14,7 @@
 {% endblock %}
 
 {% block content %}
-    <p>{{ contactFirstName }},</p>
+    <p>{{ contactFirstName }}</p>
     <p>
         We recently sent you a renewal quotation for {{ renewalType }} as this will soon expire, a copy of which is
         attached.
@@ -23,11 +25,17 @@
         you have any questions, please contact us in advance of the renewal date.
     </p>
 
-
+    <p>
+        Many thanks
+    </p>
+    <p>
+        {{ senderFirstName }} {{ senderLastName }}
+    </p>
 {% endblock %}
 
 {% block leftFooter %}
     <br>
+    &nbsp;
     <br>
 {% endblock %}
 
