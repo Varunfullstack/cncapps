@@ -24,8 +24,6 @@ class StandardTextModal extends React.Component {
 
     handleTemplateValueChange = (templateValue) => {
         this.setState({templateValue});
-        // if(this.props.onChange)
-        //     this.props.onChange(templateValue);
     }
     handleTemplateOk = () => {
         this.setState({_showModal: false})
