@@ -1,3 +1,5 @@
+import React from 'react';
+
 class TableFooter extends React.Component {
     el = React.createElement;
 
