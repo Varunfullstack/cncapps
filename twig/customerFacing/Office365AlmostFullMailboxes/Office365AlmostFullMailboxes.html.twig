@@ -1,8 +1,18 @@
-{% extends "@internal/wrapper.html.twig" %}
+{% extends '@customerFacing/wrapper.html.twig' %}
+{# @var data CNCLTD\TwigDTOs\PrimaryMainContactNotAuthorisedNotification #}
+{% block replyText %}
+{% endblock %}
+{% block headerTitle %}
+    Mailbox Information
+{% endblock %}
+
+{% block headerContet %}
+    You need to tidy up before problems appear
+{% endblock %}
+
 {% block content %}
-    <p>
-        Dear {{ contactFirstName }}
-    </p>
+
+    <p>{{ contactFirstName }}</p>
     <p>
         The following mailboxes are at or over 95% of their mail storage plan, please ask them to archive / delete
         emails otherwise they risk not being able to receive emails. If you have a plan with 50GB mailbox limit then you
@@ -12,7 +22,6 @@
     <p>
         A full report of the company mailbox sizes is available in our customer portal on our website.
     </p>
-
     <table class="alertTable">
         <thead>
         <tr>
@@ -43,8 +52,11 @@
         {% endfor %}
         </tbody>
     </table>
+{% endblock %}
 
-    <p>
-        Regards
-    </p>
+{% block leftFooter %}
+{% endblock %}
+
+{% block rightFooter %}
+
 {% endblock %}

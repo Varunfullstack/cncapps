@@ -183,7 +183,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                         );
 
                         $body = $twig->render(
-                            "@internal/emailAlmostFullAlertEmail.html.twig",
+                            "@customerFacing/Office365AlmostFullMailboxes/Office365AlmostFullMailboxes.html.twig",
                             [
                                 "contactFirstName" => $dbeContact->getValue(DBEContact::firstName),
                                 "mailboxes"        => $this->warningMailboxes
