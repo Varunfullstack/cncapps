@@ -12,12 +12,11 @@ CKEDITOR.editorConfig = function (config) {
 
     config.toolbar_CNCToolbar =
         [
-            ['Source', '-', '-', 'Bold', 'Italic', 'Underline', 'Strike', 'TextColor', 'BGColor'],
+            ['Source', '-', '-', 'Bold', 'Italic', 'Underline',  'TextColor'],
             ['NumberedList', 'BulletedList'],
             ['Table'],
-            ['Format', 'Font', 'FontSize'],
-            ['Anchor', 'Link'],
-            ['Undo', 'Redo']
+            ['Font', 'FontSize'],
+            [ 'Link'],
         ];
     config.extraPlugins = 'font,wordcount,scayt';
     config.fontSize_sizes = '8/8pt;9/9pt;10/10pt;11/11pt;12/12pt;14/14pt;16/16pt;18/18pt;20/20pt;22/22pt;24/24pt;26/26pt;28/28pt;36/36pt;48/48pt;72/72pt';

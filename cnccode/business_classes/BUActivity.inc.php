@@ -1293,7 +1293,6 @@ class BUActivity extends Business
         $dbeCallActType = new DBECallActType($this);
         $dbeCallActType->getRow($dsCallActivity->getValue(DBEJCallActivity::callActTypeID));
 
-
         // if this activity will now have an end time and the type specifies that we do not need to check it, set status to checked
         if (!$oldEndTime && $dsCallActivity->getValue(DBEJCallActivity::endTime)) {
             if ($dbeCallActType->getValue(DBECallActType::requireCheckFlag) == 'N') {
@@ -1312,6 +1311,7 @@ class BUActivity extends Business
             $dsCallActivity,
             $dbeCallActivity
         );
+
         /**Get total hours spent*/
         $sql =
             "SELECT

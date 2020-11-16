@@ -131,7 +131,7 @@ class ActivityDisplayComponent extends MainComponent {
                     <a href={`tel:${data?.sitePhone}`}> {data?.sitePhone} </a>
                     {data?.contactPhone ? <label>DDI:</label> : null}
                     {data?.contactPhone ? (<a href={`tel:${data?.contactPhone}`}>{data?.contactPhone}</a>) : null}
-                    {data?.contactMobilePhone ? <label>Mobile:</label> : null}
+                    {data?.contactMobilePhone ? <label> Mobile:</label> : null}
                     {data?.contactMobilePhone ?
                         <a href={`tel:${data?.contactMobilePhone}`}>{data?.contactMobilePhone}</a> : null
                     }

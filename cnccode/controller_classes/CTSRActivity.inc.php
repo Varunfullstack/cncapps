@@ -607,7 +607,7 @@ class CTSRActivity extends CTCNC
         if (isset($body->submitAsOvertime)) {
             $dsCallActivity->setValue(
                 DBECallActivity::submitAsOvertime,
-                isset($body->submitAsOvertime)
+                $body->submitAsOvertime
             );
             $dsCallActivity->post();
         }

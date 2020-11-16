@@ -82,9 +82,8 @@ export default class CKEditor extends React.Component {
                 ],
                 ["NumberedList", "BulletedList"],
                 ["Table"],
-                ["Format", "Font", "FontSize"],
-                ["Anchor", "Link"],
-                ["Undo", "Redo"],
+                [ "Font", "FontSize"],
+                ["Link"],
             ],
             extraPlugins: "font,wordcount,scayt",
             fontSize_sizes:
