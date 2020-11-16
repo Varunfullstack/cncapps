@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v5.0.0]
 ### Changed
 - Issue 1053 - New email templates
 
