@@ -11,7 +11,8 @@
 
 {% block content %}
     <p>{{ data.contactFirstName }}</p>
-    <p>Service Request {{ data.serviceRequestId }} has been logged with our Service Desk so we'll work on this in the background and only update you when we've got something important to share or ask you.
+    <p>Service Request {{ data.serviceRequestId }} has been logged with our Service Desk so we'll work on this in the
+        background and only update you when we've got something important to share or ask you.
     </p>
     <p>Details: </p>
     <table style="width: 100%">
@@ -24,7 +25,7 @@
     <p>
         Priority: {{ data.priority }} -
         {% if data.serviceRequestStatus == 'Logged' %}
-            We'll aim to respond to this request within {{ data.SLA }} working hours but an initial review we may adjust the priority but we'll inform you if we do.
+            We'll aim to respond to this request within {{ data.SLA }} working hour{{ data.SLA > 1 ? 's' :'' }} but an initial review we may adjust the priority but we'll inform you if we do.
         {% else %}
             We've started working on this immediately.
         {% endif %}

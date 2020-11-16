@@ -14,14 +14,14 @@ body {
   }
 
   .unlockedIcon::before {
-    font-family: 'Font Awesome 5 Free' !important;
+    font-family: 'Font Awesome 5 Pro' !important;
     content: '\f13e';
     color: red;
     font-weight: 900 !important;
   }
 
   .lockedIcon::before {
-    font-family: 'Font Awesome 5 Free' !important;
+    font-family: 'Font Awesome 5 Pro' !important;
     content: '\f023';
     color: green;
     font-weight: 900 !important;
