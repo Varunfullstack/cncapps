@@ -248,7 +248,8 @@ class ActivityEditComponent extends MainComponent {
                 "contractCustomerItemID",
                 "hideFromCustomerFlag",
                 "submitAsOvertime",
-                "emptyAssetReason"
+                "emptyAssetReason",
+                "completeDate"
             ]);
             console.log(finalData);
 
@@ -397,11 +398,12 @@ class ActivityEditComponent extends MainComponent {
 
             }
         }
-        // console.log(!data.assetName && !this.state.data.emptyAssetReason, data.emptyAssetReason, this.state.data.emptyAssetReason);
         if (!data.assetName && !this.state.data.emptyAssetReason) {
             const reason = await this.prompt("Please provide the reason of not listing an asset", 500, this.state.data.emptyAssetReason);
             this.state.data.emptyAssetReason = reason;
-            return !!reason;
+            const updatedData =  {...this.state.data, emptyAssetReason: reason};
+            this.setState({updatedData});
+            return false;
         }
         return true;
     };
@@ -409,6 +411,7 @@ class ActivityEditComponent extends MainComponent {
     setValue = (label, value) => {
         const {data} = this.state;
         data[label] = value;
+        console.log(`label: ${label}, value: ${value}, data: ${JSON.stringify(data)}`);
         this.setState({data});
     };
     //-----------------Template
@@ -1355,8 +1358,7 @@ class ActivityEditComponent extends MainComponent {
                             type: "date",
                             value: data?.completeDate || "",
                             style: {width: "100%"},
-                            onChange: (event) =>
-                                this.setValue("completeDate", event.target.value),
+                            onChange: (event) => this.setValue("completeDate", event.target.value),
 
                         })
                     ),
