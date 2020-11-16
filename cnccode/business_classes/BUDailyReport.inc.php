@@ -8,6 +8,9 @@
  * NOTE: calls to BUMail::putInQueue with 5th parameter true sends email to users flagged SDManager
  */
 
+use CNCLTD\DailyReport\ContactsWithOpenServiceRequests;
+use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
+
 global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BUMail.inc.php");
@@ -264,7 +267,7 @@ GROUP BY t.month;
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
-        $cssToInlineStyles = new \TijsVerkoyen\CssToInlineStyles\CssToInlineStyles();
+        $cssToInlineStyles = new CssToInlineStyles();
         $body = $cssToInlineStyles->convert($body);
 
         $buMail->mime->setHTMLBody($body);
@@ -1250,82 +1253,22 @@ WHERE pro_priority = 5
         $this->setMethodName('contactOpenSRReport');
 
         $contactOpenSRReportData = $this->getContactOpenSRReportData();
-        $contactsData = [];
+        global $twig;
+        foreach ($contactOpenSRReportData as $contactWithOpenServiceRequests) {
 
-        while ($row = $contactOpenSRReportData->fetch_assoc()) {
-            if (!isset($contactsData[$row['contactID']])) {
-                $contactsData[$row['contactID']] = [
-                    "name"            => $row['contactName'],
-                    "email"           => $row['contactEmail'],
-                    "customerName"    => $row['customerName'],
-                    "serviceRequests" => []
-                ];
-            }
-            $contactsData[$row['contactID']]['serviceRequests'][] = $row;
-        }
-
-        foreach ($contactsData as $contactID => $contactsDatum) {
-
-            $template = new Template (
-                EMAIL_TEMPLATE_DIR,
-                "remove"
+            $body = $twig->render(
+                '@customerFacing/OpenServiceRequestReport/OpenServiceRequestReport.html.twig',
+                [
+                    "data"     => $contactWithOpenServiceRequests,
+                    "onScreen" => $onScreen
+                ]
             );
-
-            $template->set_file(
-                'page',
-                'DailySROpenReportEmail.html'
-            );
-
-            $template->set_var(
-                'contactName',
-                $contactsDatum['name']
-            );
-
-            $template->set_block(
-                'page',
-                'openSRBlock',
-                'openSR'
-            );
-
-
-            foreach ($contactsDatum['serviceRequests'] as $SR) {
-                $urlRequest = "https://www.cnc-ltd.co.uk/view/?serviceid=" . $SR['id'];
-
-                $template->setVar(
-                    array(
-                        "srLinkToPortal" => $urlRequest,
-                        "srNumber"       => $SR['id'],
-                        "srRaisedByName" => $SR['raisedBy'] . ($onScreen ? ('( ' . $contactsDatum['customerName'] . ' )') : ''),
-                        "srRaisedOnDate" => (new \DateTime($SR['raisedOn']))->format('d-m-Y h:i'),
-                        "srStatus"       => $SR['status'],
-                        "srDetails"      => $this->getFirstLinesDetails(
-                            $SR['details'],
-                            150
-                        ),
-                    )
-                );
-
-
-                $template->parse(
-                    'openSR',
-                    'openSRBlock',
-                    true
-                );
-
-            }
-
-            $template->parse(
-                'output',
-                'page',
-                true
-            );
-            $body = $template->get_var('output');
 
             $subject = "Open Service Request Report - " . (new DateTime())->format('Y-m-d');
 
             if (!$onScreen) {
                 $this->sendByEmailTo(
-                    $contactsDatum['email'],
+                    $contactWithOpenServiceRequests->getContactEmail(),
                     $subject,
                     $body,
                     null,
@@ -1333,13 +1276,15 @@ WHERE pro_priority = 5
                 );
             }
 
-            echo '<br><div>Sent to Email ' . $contactsDatum['email'] . '</div><br>';
+            echo '<br><div>Sent to Email ' . $contactWithOpenServiceRequests->getContactEmail() . '</div><br>';
             echo $body;
-
         }
-
     }
 
+    /**
+     * @return ContactsWithOpenServiceRequests
+     * @throws Exception
+     */
     private function getContactOpenSRReportData()
     {
         $sql = "SELECT
@@ -1384,35 +1329,22 @@ ORDER BY pro_date_raised";
             throw  new Exception($this->db->error);
         }
 
-        return $result;
+        $contactOpenSRReportData = new ContactsWithOpenServiceRequests();
 
-    }
+        while ($row = $result->fetch_assoc()) {
+            $contactOpenSRReportData->add(
+                $row['contactID'],
+                $row['contactName'],
+                $row['contactEmail'],
+                $row['customerName'],
+                $row['id'],
+                $row['raisedBy'],
+                $row['raisedOn'],
+                $row['status'],
+                $row['details']
+            );
+        }
+        return $contactOpenSRReportData;
 
-    private function getFirstLinesDetails($details,
-                                          $maxCharacters
-    )
-    {
-        $details = strip_tags($details);
-        $details = preg_replace(
-            "!\s+!",
-            ' ',
-            $details
-        );
-
-        $lines = preg_split(
-            "/\./",
-            $details
-        );
-        $result = "";
-        $counter = 0;
-
-        do {
-            if ($counter) {
-                $result .= '.';
-            }
-            $result .= $lines[$counter];
-            $counter++;
-        } while ($counter < count($lines) && strlen($result) < $maxCharacters);
-        return $result;
     }
 }

@@ -1,0 +1,68 @@
+{% extends '@customerFacing/wrapper.html.twig' %}
+{# @var data CNCLTD\DailyReport\ContactWithOpenServiceRequests #}
+{% block replyText %}
+{% endblock %}
+{% block headerTitle %}
+    Service Request Information
+{% endblock %}
+
+{% block headerContet %}
+    We are keeping you in the picture......
+{% endblock %}
+
+{% block content %}
+    <p>{{ data.primaryMainContactFirstName }}</p>
+    <p>
+        The list below shows the status of all the requests that are open with our Service Desk team.
+        Please don’t reply to this email as it won’t be processed by our system, but if you wish to add an update please
+        use
+        the link for the service request that will take you to our portal.
+    </p>
+    <table>
+        <thead>
+        <tr>
+            <th>Service Request</th>
+            <th>Raised By</th>
+            <th>Raised On</th>
+            <th>Status</th>
+            <th align="left">Details</th>
+        </tr>
+        </thead>
+        <tbody>
+        {# @var sr CNCLTD\DailyReport\OpenServiceRequestDTO #}
+
+        {% for sr in data %}
+            <tr>
+                <td align="center">
+                    <a href="https://www.cnc-ltd.co.uk/view/?serviceid={{ sr.id }}">{{ sr.id }}</a>
+                </td>
+                <td align="center"
+                    style="white-space: nowrap"
+                >
+                    {{ sr.raisedBy }}
+                    {% if onScreen %}
+                        ({{ data.customerName }})
+                    {% endif %}
+                </td>
+                <td align="center"
+                    style="white-space: nowrap"
+                >{{ sr.raisedOn }}
+                </td>
+                <td align="center"
+                    style="white-space: nowrap"
+                >{{ sr.status }}
+                </td>
+                <td align="left">{{ sr.details|raw }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block serviceRequestURL %}
+    https://www.cnc-ltd.co.uk/portal/service-requests
+{% endblock %}
+
+{% block rightFooter %}
+
+{% endblock %}
