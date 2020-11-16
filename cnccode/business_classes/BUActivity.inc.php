@@ -3900,7 +3900,7 @@ class BUActivity extends Business
         }
     }
 
-        function travelActivityForCustomerEngineerTodayExists(
+    function travelActivityForCustomerEngineerTodayExists(
         $customerID,
         $siteNo,
         $userID,
@@ -3920,7 +3920,7 @@ class BUActivity extends Business
 
     } // end check default site contacts exists
 
-/**
+    /**
      * Create travel activities using site maxTravelHours field from address
      *
      * 1: startTime - maxTravelTime
@@ -6332,7 +6332,7 @@ class BUActivity extends Business
         );
     }
 
-        /**
+    /**
      * @param $callActivityID
      * @param DataSet $dsCallActivity
      * @param bool $includeTravel
@@ -6437,7 +6437,7 @@ class BUActivity extends Business
 
     } // end email to customer
 
-function linkActivities($fromCallActivityID,
+    function linkActivities($fromCallActivityID,
                             $toCallActivityID,
                             $wholeProblem = TRUE
     )
@@ -6520,7 +6520,7 @@ function linkActivities($fromCallActivityID,
 
     }
 
-        /**
+    /**
      * @param DataSet $dsCallActivity
      * @param CTCNC $ctActivity
      * @return bool
@@ -6546,7 +6546,7 @@ function linkActivities($fromCallActivityID,
 
     } // end email to customer
 
-/**
+    /**
      * @param DataSet $dsCallActivity
      * @param CTCNC $ctActivity
      * @return bool
@@ -8066,6 +8066,8 @@ FROM
             DBEProblem::slaResponseHours,
             $slaResponseHours
         );
+
+        $dbeProblem->setValue(DBEProblem::emailSubjectSummary, substr($record->getSubjectLine(), 0, 100));
         $dbeProblem->setValue(
             DBEProblem::customerID,
             $customerID
@@ -8859,7 +8861,7 @@ FROM
         );
     }
 
-        /**
+    /**
      * @param $problemID
      * @throws Exception
      */
@@ -8897,7 +8899,7 @@ FROM
         $dbePendingReopenedDelete->deleteRow($dbePendingReopened->getValue(DBEPendingReopened::id));
     } // end sendServiceReallocatedEmail
 
-/**
+    /**
      * @param AutomatedRequest $automatedRequest
      * @return bool
      * @throws Exception
