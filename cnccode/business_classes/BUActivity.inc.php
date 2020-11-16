@@ -1407,10 +1407,6 @@ class BUActivity extends Business
             $totalTravelHours
         );
 
-        $problem->setValue(
-            DBEJProblem::emptyAssetReason,
-            $dsCallActivity->getValue(DBEProblem::emptyAssetReason)
-        );
 
         if (in_array($problem->getValue(DBEProblem::status), ["F", "C"])) {
             /** @var $db dbSweetcode */
@@ -1435,16 +1431,32 @@ class BUActivity extends Business
             DBEJProblem::workingHoursCalculatedToTime,
             null
         );
-        $problem->setValue(
-            DBEJProblem::assetName,
-            $dsCallActivity->getValue(DBEJCallActivity::assetName)
 
-        );
-        $problem->setValue(
-            DBEJProblem::assetTitle,
-            $dsCallActivity->getValue(DBEJCallActivity::assetTitle)
 
-        );
+        if ($dsCallActivity->getValue(DBEJCallActivity::assetName)) {
+            $problem->setValue(
+                DBEProblem::assetName,
+                $dsCallActivity->getValue(DBEJCallActivity::assetName)
+            );
+            $problem->setValue(
+                DBEJProblem::assetTitle,
+                $dsCallActivity->getValue(DBEJCallActivity::assetTitle)
+            );
+            $problem->setValue(DBEProblem::emptyAssetReason, null);
+        } else {
+            $problem->setValue(
+                DBEJProblem::emptyAssetReason,
+                $dsCallActivity->getValue(DBEProblem::emptyAssetReason)
+            );
+            $problem->setValue(
+                DBEJProblem::assetName,
+                null
+            );
+            $problem->setValue(
+                DBEJProblem::assetTitle,
+                null
+            );
+        }
 
         // if amended initial call activity date/time then set the problem date raised field to match
         if ($dsCallActivity->getValue(DBEJCallActivity::callActTypeID) == CONFIG_INITIAL_ACTIVITY_TYPE_ID) {
@@ -1508,12 +1520,12 @@ class BUActivity extends Business
             }
         }
 
-            $hasNewReasonAndItsFinished = (!isset($oldReason) || $oldReason != $newReason) && $dsCallActivity->getValue(
-                    DBEJCallActivity::endTime
-                );
-            if ($hasNewReasonAndItsFinished) {
-                $this->sendActivityLoggedEmail($dbeCallActivity->getValue(DBEJCallActivity::callActivityID));
-            }
+        $hasNewReasonAndItsFinished = (!isset($oldReason) || $oldReason != $newReason) && $dsCallActivity->getValue(
+                DBEJCallActivity::endTime
+            );
+        if ($hasNewReasonAndItsFinished) {
+            $this->sendActivityLoggedEmail($dbeCallActivity->getValue(DBEJCallActivity::callActivityID));
+        }
 
 
         $this->sendMonitoringEmails($dbeCallActivity->getValue(DBEJCallActivity::callActivityID));
@@ -1588,71 +1600,35 @@ class BUActivity extends Business
         return $enteredEndTime;
     }
 
-    private function sendPriorityChangedEmail($oldPriority, $newPriority, $sla, ?int $activityId)
+    /**
+     * @param $activityId
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     */
+    private function sendActivityLoggedEmail($activityId)
     {
         $dbejCallactivity = new DBEJCallActivity($this);
         $dbejCallactivity->getRow($activityId);
 
-        $serviceRequestId = $dbejCallactivity->getValue(DBEJCallActivity::problemID);
-        $buActivity = new BUActivity($this);
-        $lastActivity = $buActivity->getLastActivityInProblem($serviceRequestId);
         $status = $this->getServiceRequestStatusText($dbejCallactivity);
-        $data = new \CNCLTD\TwigDTOs\PriorityChangedDTO(
-            $serviceRequestId,
-            $lastActivity->getValue(DBEJCallActivity::reason),
+
+        $data = new \CNCLTD\TwigDTOs\ActivityLoggedDTO(
             $dbejCallactivity->getValue(DBEJCallActivity::contactFirstName),
-            $oldPriority,
-            $newPriority,
-            $sla,
+            $dbejCallactivity->getValue(DBEJCallActivity::customerNotes),
+            $dbejCallactivity->getValue(DBEJCallActivity::userName),
+            $dbejCallactivity->getValue(DBEJCallActivity::problemID),
             $status
         );
+
+        $template = '@customerFacing/ActivityLogged/ActivityLogged.html.twig';
+        $subject = "Service Request {$dbejCallactivity->getValue(DBEJCallActivity::problemID)} - {$dbejCallactivity->getValue(DBEJCallActivity::emailSubjectSummary)} - Updated";
+
         $selfFlag = DBEContact::workUpdatesEmailFlag;
         $othersFlag = DBEContact::othersWorkUpdatesEmailFlag;
-
-        $subject = "Service Request {$serviceRequestId} - {$dbejCallactivity->getValue(DBEJCallActivity::emailSubjectSummary)} - Updated";
-
-        $template = '@customerFacing/ServicePriorityChanged/ServicePriorityChanged.html.twig';
-
         $this->sendCustomerEmail($template, $data, $dbejCallactivity, $selfFlag, $othersFlag, $subject);
     } // end sendUpdatedByAnotherUserEmail
-    function updateCallActivityPriority($callActivityID,$priority,$reason)
-    {
-        $dbeCallActivity=new DBECallActivity($this);
-        $dbeCallActivity->getRow($callActivityID);
-        $problem=new DBEProblem($this);
-        $problemID=$dbeCallActivity->getValue(DBECallActivity::problemID);
-        $problem->getRow($problemID);
-        $oldPriority= $problem->getValue(DBEJProblem::priority);
-        if ($oldPriority != $priority) {
-            $slaResponseHours =
-                $this->getSlaResponseHours(
-                    $problem->getValue(DBEJProblem::priority),
-                    $problem->getValue(DBEJProblem::customerID),
-                    $dbeCallActivity->getValue(DBECallActivity::contactID)
-                );
 
-            $problem->setValue(
-                DBEJProblem::slaResponseHours,
-                $slaResponseHours
-            );
-            $problem->setValue(DBEProblem::priority,$priority);
-            $problem->updateRow();
-
-            $this->sendEmailToCustomer(
-                $problemID,
-                self::WorkUpdatesCustomerEmailCategory,
-                self::WorkUpdatesPriorityChanged
-            );
-
-            $this->logOperationalActivity(
-                $problemID,
-                'Priority Changed from ' . $oldPriority . ' to ' . $problem->getValue(DBEJProblem::priority).
-                $reason
-            );
-            return true;
-        }
-        return false;
-    }
     /**
      * @param DBEJCallActivity $dbejCallactivity
      * @return string
@@ -1759,42 +1735,13 @@ class BUActivity extends Business
             $emails[] = $supportContact[DBEContact::email];
         }
         return implode(',', $emails);
-    } // end sendRequestCompletedEarlyEmail
+    }
 
     private function sendEmail(string $body, string $subject, string $emailRecipients)
     {
         $buMail = new BUMail($this);
         $buMail->sendSimpleEmail($body, $subject, $emailRecipients);
-    }
-
-    /**
-     * @param $activityId
-     * @throws \Twig\Error\LoaderError
-     * @throws \Twig\Error\RuntimeError
-     * @throws \Twig\Error\SyntaxError
-     */
-    private function sendActivityLoggedEmail($activityId)
-    {
-        $dbejCallactivity = new DBEJCallActivity($this);
-        $dbejCallactivity->getRow($activityId);
-
-        $status = $this->getServiceRequestStatusText($dbejCallactivity);
-
-        $data = new \CNCLTD\TwigDTOs\ActivityLoggedDTO(
-            $dbejCallactivity->getValue(DBEJCallActivity::contactFirstName),
-            $dbejCallactivity->getValue(DBEJCallActivity::customerNotes),
-            $dbejCallactivity->getValue(DBEJCallActivity::userName),
-            $dbejCallactivity->getValue(DBEJCallActivity::problemID),
-            $status
-        );
-
-        $template = '@customerFacing/ActivityLogged/ActivityLogged.html.twig';
-        $subject = "Service Request {$dbejCallactivity->getValue(DBEJCallActivity::problemID)} - {$dbejCallactivity->getValue(DBEJCallActivity::emailSubjectSummary)} - Updated";
-
-        $selfFlag = DBEContact::workUpdatesEmailFlag;
-        $othersFlag = DBEContact::othersWorkUpdatesEmailFlag;
-        $this->sendCustomerEmail($template, $data, $dbejCallactivity, $selfFlag, $othersFlag, $subject);
-    }
+    } // end sendRequestCompletedEarlyEmail
 
     private function sendMonitoringEmails($callActivityID)
     {
@@ -2044,10 +1991,6 @@ class BUActivity extends Business
         );
     }
 
-    /*
-  Send an alert email if number of activities per SR per day exceeds system max
-  */
-
     /**
      * @param DataAccess $dbeProblem
      * @param DataAccess $dbeCallActivity
@@ -2178,9 +2121,8 @@ class BUActivity extends Business
         );
     }
 
-
     /*
-  Update total hours worked by activity user today
+  Send an alert email if number of activities per SR per day exceeds system max
   */
 
     /**
@@ -2399,6 +2341,11 @@ class BUActivity extends Business
         );
     }
 
+
+    /*
+  Update total hours worked by activity user today
+  */
+
     /**
      * Sends email to sales when future on-site activity logged
      *
@@ -2595,6 +2542,69 @@ class BUActivity extends Business
         return $this->db->affected_rows;
     }
 
+    function updateCallActivityPriority($callActivityID, $priority, $reason)
+    {
+        $dbeCallActivity = new DBECallActivity($this);
+        $dbeCallActivity->getRow($callActivityID);
+        $problem = new DBEProblem($this);
+        $problemID = $dbeCallActivity->getValue(DBECallActivity::problemID);
+        $problem->getRow($problemID);
+        $oldPriority = $problem->getValue(DBEJProblem::priority);
+        if ($oldPriority != $priority) {
+            $slaResponseHours =
+                $this->getSlaResponseHours(
+                    $problem->getValue(DBEJProblem::priority),
+                    $problem->getValue(DBEJProblem::customerID),
+                    $dbeCallActivity->getValue(DBECallActivity::contactID)
+                );
+
+            $problem->setValue(
+                DBEJProblem::slaResponseHours,
+                $slaResponseHours
+            );
+            $problem->setValue(DBEProblem::priority, $priority);
+            $problem->updateRow();
+
+            $this->sendPriorityChangedEmail($oldPriority, $priority, $slaResponseHours, $callActivityID);
+
+            $this->logOperationalActivity(
+                $problemID,
+                'Priority Changed from ' . $oldPriority . ' to ' . $problem->getValue(DBEJProblem::priority) .
+                $reason
+            );
+            return true;
+        }
+        return false;
+    }
+
+    private function sendPriorityChangedEmail($oldPriority, $newPriority, $sla, ?int $activityId)
+    {
+        $dbejCallactivity = new DBEJCallActivity($this);
+        $dbejCallactivity->getRow($activityId);
+
+        $serviceRequestId = $dbejCallactivity->getValue(DBEJCallActivity::problemID);
+        $buActivity = new BUActivity($this);
+        $lastActivity = $buActivity->getLastActivityInProblem($serviceRequestId);
+        $status = $this->getServiceRequestStatusText($dbejCallactivity);
+        $data = new \CNCLTD\TwigDTOs\PriorityChangedDTO(
+            $serviceRequestId,
+            $lastActivity->getValue(DBEJCallActivity::reason),
+            $dbejCallactivity->getValue(DBEJCallActivity::contactFirstName),
+            $oldPriority,
+            $newPriority,
+            $sla,
+            $status
+        );
+        $selfFlag = DBEContact::workUpdatesEmailFlag;
+        $othersFlag = DBEContact::othersWorkUpdatesEmailFlag;
+
+        $subject = "Service Request {$serviceRequestId} - {$dbejCallactivity->getValue(DBEJCallActivity::emailSubjectSummary)} - Updated";
+
+        $template = '@customerFacing/ServicePriorityChanged/ServicePriorityChanged.html.twig';
+
+        $this->sendCustomerEmail($template, $data, $dbejCallactivity, $selfFlag, $othersFlag, $subject);
+    }
+
     function computeDiff($from,
                          $to
     )
@@ -2760,14 +2770,14 @@ class BUActivity extends Business
         );
 
 
-            $this->sendSalesRequestReplyEmail(
-                $newCallActivity,
-                $subject,
-                $requestingUserID,
-                $approval,
-                $hasAttachments,
-                $notifySales
-            );
+        $this->sendSalesRequestReplyEmail(
+            $newCallActivity,
+            $subject,
+            $requestingUserID,
+            $approval,
+            $hasAttachments,
+            $notifySales
+        );
 
 
         $dbeCallActivity = new DBECallActivity($this);
@@ -3890,7 +3900,7 @@ class BUActivity extends Business
         }
     }
 
-    function travelActivityForCustomerEngineerTodayExists(
+        function travelActivityForCustomerEngineerTodayExists(
         $customerID,
         $siteNo,
         $userID,
@@ -3910,7 +3920,7 @@ class BUActivity extends Business
 
     } // end check default site contacts exists
 
-    /**
+/**
      * Create travel activities using site maxTravelHours field from address
      *
      * 1: startTime - maxTravelTime
@@ -6322,7 +6332,7 @@ class BUActivity extends Business
         );
     }
 
-    /**
+        /**
      * @param $callActivityID
      * @param DataSet $dsCallActivity
      * @param bool $includeTravel
@@ -6427,7 +6437,7 @@ class BUActivity extends Business
 
     } // end email to customer
 
-    function linkActivities($fromCallActivityID,
+function linkActivities($fromCallActivityID,
                             $toCallActivityID,
                             $wholeProblem = TRUE
     )
@@ -6510,7 +6520,7 @@ class BUActivity extends Business
 
     }
 
-    /**
+        /**
      * @param DataSet $dsCallActivity
      * @param CTCNC $ctActivity
      * @return bool
@@ -6536,7 +6546,7 @@ class BUActivity extends Business
 
     } // end email to customer
 
-    /**
+/**
      * @param DataSet $dsCallActivity
      * @param CTCNC $ctActivity
      * @return bool
@@ -8263,6 +8273,7 @@ FROM
 
         return true;
     }
+
     /**
      * @param DBEContact $primaryMainContactDS
      * @param DBEContact $notAuthorisedContact
@@ -8848,7 +8859,7 @@ FROM
         );
     }
 
-    /**
+        /**
      * @param $problemID
      * @throws Exception
      */
@@ -8886,7 +8897,7 @@ FROM
         $dbePendingReopenedDelete->deleteRow($dbePendingReopened->getValue(DBEPendingReopened::id));
     } // end sendServiceReallocatedEmail
 
-    /**
+/**
      * @param AutomatedRequest $automatedRequest
      * @return bool
      * @throws Exception

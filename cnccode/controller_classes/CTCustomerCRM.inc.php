@@ -54,7 +54,7 @@ class CTCustomerCRM extends CTCustomer
         parent::initialProcesses();
     } // end search
 
-function setSite(&$siteArray)
+    function setSite(&$siteArray)
     {
         if (!is_array($siteArray)) {
             return;
@@ -109,7 +109,7 @@ function setSite(&$siteArray)
         }
     }
 
-        /**
+    /**
      * @param DataSet|DBEntity $dbSource
      * @param DataSet $dsDestination
      * @return bool
@@ -146,7 +146,7 @@ function setSite(&$siteArray)
         return ($dsDestination->replicate($dbSource));
     } // end search
 
-        function setSiteNo($siteNo)
+    function setSiteNo($siteNo)
     {
         $this->setNumericVar(
             'siteNo',
@@ -397,7 +397,7 @@ function setSite(&$siteArray)
         }
     }
 
-function search()
+    function search()
     {
 
         $this->setMethodName('search');

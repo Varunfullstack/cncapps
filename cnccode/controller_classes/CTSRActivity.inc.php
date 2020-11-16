@@ -534,17 +534,12 @@ class CTSRActivity extends CTCNC
         $body = file_get_contents('php://input');
         $body = json_decode($body);
         $callActivityID = $body->callActivityID;
-        //echo $body->priority; exit;
         if ($callActivityID)
             $dbejCallActType->getRow($body->callActTypeID);
         $buActivity->getActivityByID(
             $callActivityID,
             $dsCallActivity
         );
-
-        //$dbeCallActivity->getRow($callActivityID);
-        //$dbeContact->getRow($body->contactID);
-
 
         $previousStartTime = $dsCallActivity->getValue(DBECallActivity::startTime);
         $previousEndTime = $dsCallActivity->getValue(DBECallActivity::endTime);

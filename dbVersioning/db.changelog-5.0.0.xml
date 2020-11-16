@@ -1,0 +1,101 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="release-v5.0.0-0">
+        <tagDatabase tag="release-v5.0.0"/>
+    </changeSet>
+    <include file="db.changelog-issue948.xml"/>
+    <include file="db.changelog-issue977_.xml"/>
+    <include file="db.changelog-issue1049.xml"/>
+    <include file="db.changelog-issue1015.xml"/>
+    <include file="db.changelog-issue1053.xml"/>
+    <changeSet id="release-v5.0.0-1" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="callacttype" columnName="cat_problem_flag"/>
+        </preConditions>
+        <dropColumn tableName="callacttype" columnName="cat_problem_flag"/>
+        <rollback>
+            <addColumn tableName="callacttype">
+                <column name="cat_problem_flag" remarks="OBSOLETE" type="CHAR(1)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet id="release-v5.0.0-2" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="callacttype" columnName="cat_action_flag"/>
+        </preConditions>
+        <dropColumn tableName="callacttype" columnName="cat_action_flag"/>
+        <rollback>
+            <addColumn tableName="callacttype">
+                <column name="cat_action_flag" remarks="OBSOLETE" type="CHAR(1)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet id="release-v5.0.0-3" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="callacttype" columnName="cat_resolve_flag"/>
+        </preConditions>
+        <dropColumn tableName="callacttype" columnName="cat_resolve_flag"/>
+        <rollback>
+            <addColumn tableName="callacttype">
+                <column name="cat_resolve_flag" remarks="OBSOLETE" type="CHAR(1)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet id="release-v5.0.0-4" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="callacttype" columnName="cat_r_problem_flag"/>
+        </preConditions>
+        <dropColumn tableName="callacttype" columnName="cat_r_problem_flag"/>
+        <rollback>
+            <addColumn tableName="callacttype">
+                <column name="cat_r_problem_flag" remarks="OBSOLETE" type="CHAR(1)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet id="release-v5.0.0-5" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="callacttype" columnName="cat_r_action_flag"/>
+        </preConditions>
+        <dropColumn tableName="callacttype" columnName="cat_r_action_flag"/>
+        <rollback>
+            <addColumn tableName="callacttype">
+                <column name="cat_r_action_flag" remarks="OBSOLETE" type="CHAR(1)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet id="release-v5.0.0-6" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="callacttype" columnName="cat_r_resolve_flag"/>
+        </preConditions>
+        <dropColumn tableName="callacttype" columnName="cat_r_resolve_flag"/>
+        <rollback>
+            <addColumn tableName="callacttype">
+                <column name="cat_r_resolve_flag" remarks="OBSOLETE" type="CHAR(1)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet id="release-v5.0.0-7" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="callacttype" columnName="allowSCRFlag"/>
+        </preConditions>
+        <dropColumn tableName="callacttype" columnName="allowSCRFlag"/>
+        <rollback>
+            <addColumn tableName="callacttype">
+                <column name="allowSCRFlag" remarks="OBSOLETE" type="CHAR(1)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet id="release-v5.0.0-8" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="callacttype" columnName="showNotChargeableFlag"/>
+        </preConditions>
+        <dropColumn tableName="callacttype" columnName="showNotChargeableFlag"/>
+        <rollback>
+            <addColumn tableName="callacttype">
+                <column name="showNotChargeableFlag" remarks="OBSOLETE" type="CHAR(1)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

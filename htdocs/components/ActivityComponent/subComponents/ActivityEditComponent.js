@@ -271,7 +271,7 @@ class ActivityEditComponent extends MainComponent {
         }
     };
     isValid = async (data) => {
-        console.log(data);
+
         if (data.callActTypeID == "") {
             //this.alert("Please select Activity Type");
             this.alert("Please select Activity Type");
@@ -397,17 +397,11 @@ class ActivityEditComponent extends MainComponent {
 
             }
         }
-        console.log(data.assetName == "" && (this.state.data.emptyAssetReason == "" || this.state.data.emptyAssetReason == null || !this.state.data.emptyAssetReasonNotify));
-        if (data.assetName == "" && (this.state.data.emptyAssetReason == "" || this.state.data.emptyAssetReason == null || !this.state.data.emptyAssetReasonNotify)) {
-            const reson = await this.prompt("Please provide the reason of not listing an asset", 500, this.state.data.emptyAssetReason);
-            console.log(reson);
-            if (reson != false) {
-                this.state.data.emptyAssetReason = reson;
-                this.state.data.emptyAssetReasonNotify = true;
-                this.setState({data: this.state.data}, () => this.updateActivity(false));
-                console.log("reason", this.state.data);
-            }
-            return false;
+        // console.log(!data.assetName && !this.state.data.emptyAssetReason, data.emptyAssetReason, this.state.data.emptyAssetReason);
+        if (!data.assetName && !this.state.data.emptyAssetReason) {
+            const reason = await this.prompt("Please provide the reason of not listing an asset", 500, this.state.data.emptyAssetReason);
+            this.state.data.emptyAssetReason = reason;
+            return !!reason;
         }
         return true;
     };
@@ -795,7 +789,10 @@ class ActivityEditComponent extends MainComponent {
                 break;
             case this.activityStatus.Fixed:
                 // let result=await this.await this.confirm("Are you sure this SR is fixed?");
-                if (!await this.confirm("Are you sure this SR is fixed?")) return;
+                if (!await this.isValid(data)) {
+                    return false;
+                }
+                if (!await this.confirm("Are you sure this SR is fixed?")) return false;
                 // console.log("continue.....");
                 //return;
                 break;
@@ -816,6 +813,7 @@ class ActivityEditComponent extends MainComponent {
                     return;
                 break;
         }
+        console.log('this should not run!!');
         this.setState({data}, () => this.updateActivity(autoSave));
     };
     checkCncAction = async (data, type) => {
@@ -1597,7 +1595,7 @@ class ActivityEditComponent extends MainComponent {
             ),
             footer: el(
                 "div",
-                {key: "footer", style: {display: "flex", justifyContent: "space-between"}},
+                {key: "footer", style: {display: "flex", justifyContent: "flex-end"}},
                 el(
                     "button",
                     {className: "float-left", onClick: () => this.handleTemplateSend(templateType)},
@@ -1890,7 +1888,7 @@ class ActivityEditComponent extends MainComponent {
                 style: {width: "100%"},
                 value: this.state.data.assetName || "",
             },
-            el("option", {key: "default", value: ""}),
+            el("option", {key: "default", value: ""}, this.state.data.emptyAssetReason || ""),
             assets.map((s) =>
                 el(
                     "option",

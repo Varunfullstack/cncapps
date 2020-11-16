@@ -59,7 +59,7 @@ class OrderHistoryModalComponent extends React.Component {
                 pk: "indx",
             });
             const footer = el(React.Fragment, {key: "footer"}, [
-                el("button", {key: "btnCancel", onClick: handleOnClose}, "Cancel"),
+                el("button", {key: "btnCancel", onClick: handleOnClose}, "Close"),
             ]);
             return el(Modal, {
                 key: "Modal",

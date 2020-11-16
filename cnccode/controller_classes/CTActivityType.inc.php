@@ -182,35 +182,11 @@ class CTActivityType extends CTCNC
                 'minHoursMessage'                  => Controller::htmlDisplayText(
                     $dsCallActType->getMessage(DBECallActType::minHours)
                 ),
-                'allowSCRFlagChecked'              => Controller::htmlChecked(
-                    $dsCallActType->getValue(DBECallActType::allowSCRFlag)
-                ),
                 'requireCheckFlagChecked'          => Controller::htmlChecked(
                     $dsCallActType->getValue(DBECallActType::requireCheckFlag)
                 ),
-                'allowReasonFlagChecked'           => Controller::htmlChecked(
-                    $dsCallActType->getValue(DBECallActType::allowReasonFlag)
-                ),
-                'allowActionFlagChecked'           => Controller::htmlChecked(
-                    $dsCallActType->getValue(DBECallActType::allowActionFlag)
-                ),
-                'allowFinalStatusFlagChecked'      => Controller::htmlChecked(
-                    $dsCallActType->getValue(DBECallActType::allowFinalStatusFlag)
-                ),
-                'reqReasonFlagChecked'             => Controller::htmlChecked(
-                    $dsCallActType->getValue(DBECallActType::reqReasonFlag)
-                ),
-                'reqActionFlagChecked'             => Controller::htmlChecked(
-                    $dsCallActType->getValue(DBECallActType::reqActionFlag)
-                ),
-                'reqFinalStatusFlagChecked'        => Controller::htmlChecked(
-                    $dsCallActType->getValue(DBECallActType::reqFinalStatusFlag)
-                ),
                 'activeFlagChecked'                => Controller::htmlChecked(
                     $dsCallActType->getValue(DBECallActType::activeFlag)
-                ),
-                'showNotChargeableFlagChecked'     => Controller::htmlChecked(
-                    $dsCallActType->getValue(DBECallActType::showNotChargeableFlag)
                 ),
                 'engineerOvertimeFlagChecked'      => Controller::htmlChecked(
                     $dsCallActType->getValue(DBECallActType::engineerOvertimeFlag)
@@ -334,7 +310,6 @@ class CTActivityType extends CTCNC
                     "curValueFlag"                     => $dbeCallActType->getValue(DBECallActType::curValueFlag),
                     "requireCheckFlag"                 => $dbeCallActType->getValue(DBECallActType::requireCheckFlag),
                     'onSiteFlag'                       => $dbeCallActType->getValue(DBECallActType::onSiteFlag),
-                    'reqReasonFlag'                    => $dbeCallActType->getValue(DBECallActType::reqReasonFlag),
                     'catRequireCNCNextActionCNCAction' => $dbeCallActType->getValue(
                         DBECallActType::catRequireCNCNextActionCNCAction
                     ),
@@ -364,29 +339,9 @@ class CTActivityType extends CTCNC
         $dsCallActType = new DataSet($this);
         $this->buActivityType->getAllTypes($dsCallActType);
         $types = array();
-        // $urlCreate = Controller::buildLink(
-        //     $_SERVER['PHP_SELF'],
-        //     array(
-        //         'action' => CTACTIVITYTYPE_ACT_CREATE
-        //     )
-        // );
-
-        // $this->template->set_var(
-        //     array('urlCreate' => $urlCreate)
-        // );
-
         if ($dsCallActType->rowCount()) {
             while ($dsCallActType->fetchNext()) {
                 $callActTypeID = $dsCallActType->getValue(DBECallActType::callActTypeID);
-                // $urlEdit =
-                //     Controller::buildLink(
-                //         $_SERVER['PHP_SELF'],
-                //         array(
-                //             'action'        => CTACTIVITYTYPE_ACT_EDIT,
-                //             'callActTypeID' => $callActTypeID
-                //         )
-                //     );
-                // $txtEdit = '[edit]';
                 array_push(
                     $types,
                     array(
@@ -407,24 +362,10 @@ class CTActivityType extends CTCNC
                         'minHours'                         => Controller::htmlInputText(
                             $dsCallActType->getValue(DBECallActType::minHours)
                         ),
-                        'allowSCRFlag'                     => $dsCallActType->getValue(DBECallActType::allowSCRFlag),
                         'requireCheckFlag'                 => $dsCallActType->getValue(
                             DBECallActType::requireCheckFlag
                         ),
-                        'allowReasonFlag'                  => $dsCallActType->getValue(DBECallActType::allowReasonFlag),
-                        'allowActionFlag'                  => $dsCallActType->getValue(DBECallActType::allowActionFlag),
-                        'allowFinalStatusFlag'             => $dsCallActType->getValue(
-                            DBECallActType::allowFinalStatusFlag
-                        ),
-                        'reqReasonFlag'                    => $dsCallActType->getValue(DBECallActType::reqReasonFlag),
-                        'reqActionFlag'                    => $dsCallActType->getValue(DBECallActType::reqActionFlag),
-                        'reqFinalStatusFlag'               => $dsCallActType->getValue(
-                            DBECallActType::reqFinalStatusFlag
-                        ),
                         'activeFlag'                       => $dsCallActType->getValue(DBECallActType::activeFlag),
-                        'showNotChargeableFlag'            => $dsCallActType->getValue(
-                            DBECallActType::showNotChargeableFlag
-                        ),
                         'engineerOvertimeFlag'             => $dsCallActType->getValue(
                             DBECallActType::engineerOvertimeFlag
                         ),
@@ -452,7 +393,7 @@ class CTActivityType extends CTCNC
                         "order"                            => $dsCallActType->getValue(DBECallActType::orderNum),
                     )
                 );
-            }//while $dsCallActType->fetchNext()
+            }
         }
         return $types;
     }

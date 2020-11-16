@@ -41,7 +41,7 @@ class ActivityFollowOn extends MainComponent {
             key: "followOnModal",
             show: true,
             width: 400,
-            title: "Create a Follow Activity",
+            title: "Create a follow on activity",
             onClose: this.handleCancel,
             content: el(
                 "div",

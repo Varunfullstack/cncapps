@@ -4,6 +4,7 @@ import Spinner from "../../shared/Spinner/Spinner";
 import {padEnd, sort} from "../../utils/utils.js";
 import MainComponent from "../../shared/MainComponent.js";
 import React from 'react';
+
 class CustomerSiteComponent extends MainComponent {
     el = React.createElement;
     apiCutsomer = new APICustomers();
@@ -184,9 +185,8 @@ class CustomerSiteComponent extends MainComponent {
             return;
         }
         if (data.assetName == "" && data.emptyAssetReason == "") {
-            console.log("no asset");
             const emptyAssetReason = await this.prompt(
-                "Please provide the reason of no Asset", 600
+                "Please provide a reason for not specifying an asset", 600
             );
             if (!emptyAssetReason) return;
             else {

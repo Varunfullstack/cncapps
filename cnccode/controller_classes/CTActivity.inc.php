@@ -1555,11 +1555,11 @@ class CTActivity extends CTCNC
      * @throws Exception
      */
     function displayActivity()
-    {        
-        $newUrl=str_replace("Activity.php","SRActivity.php",$this->getFullPath());
+    {
+        $newUrl = str_replace("Activity.php", "SRActivity.php", $this->getFullPath());
         header('Location: ' . $newUrl);
-        return; 
-       // 
+        return;
+        //
         $this->setMethodName('displayActivity');
         $this->setPageTitle('Activity');
         $dsCallActivity = new DataSet($this);
@@ -2703,7 +2703,7 @@ class CTActivity extends CTCNC
     }
 
     private function getProblemRaiseIcon($dbeJProblem)
-    {        
+    {
         if (isset($dbeJProblem)) {
             $raiseTypeId = $dbeJProblem->getValue(DBEProblem::raiseTypeId);
             if (isset($raiseTypeId) && $raiseTypeId != null) {
@@ -4107,7 +4107,7 @@ class CTActivity extends CTCNC
                 $lastActivityText = "$date $startTime - $endTime ($duration) $activityType - $contactName - $siteAddress - $userName";
 
                 $lastActivityReason = $reason;
-                $lastCncNextAction=$activitiesByProblemID->getValue(DBEJCallActivity::cncNextAction);
+                $lastCncNextAction = $activitiesByProblemID->getValue(DBEJCallActivity::cncNextAction);
             }
             $this->template->parse(
                 'rows',
@@ -5079,20 +5079,8 @@ class CTActivity extends CTCNC
                         date('H:i')
                     );
                 }
-                // required fields
-                if ($dbeCallActType->getValue(DBECallActType::reqReasonFlag) == 'Y' && !trim(
-                        $this->dsCallActivity->getValue(DBEJCallActivity::reason)
-                    )) {
-                    $this->formError = true;
-                    $this->dsCallActivity->setMessage(
-                        DBEJCallActivity::reason,
-                        'Required'
-                    );
-                }
 
-                if ($dbeCallActType->getValue(DBECallActType::reqReasonFlag) == 'Y' && !trim(
-                        $this->dsCallActivity->getValue(DBEJCallActivity::reason)
-                    )) {
+                if (!trim($this->dsCallActivity->getValue(DBEJCallActivity::reason))) {
                     $this->formError = true;
                     $this->dsCallActivity->setMessage(
                         DBEJCallActivity::reason,
@@ -5534,7 +5522,7 @@ class CTActivity extends CTCNC
 
         $urlNext =
             Controller::buildLink(
-                //$_SERVER['PHP_SELF'],
+            //$_SERVER['PHP_SELF'],
                 "SRActivity.php",
                 array(
                     'action'         => CTACTIVITY_ACT_EDIT_ACTIVITY,
@@ -6100,9 +6088,9 @@ class CTActivity extends CTCNC
     function gatherFixedInformation()
     {
         // go to new react page
-        $newUrl=str_replace("Activity.php","SRActivity.php",$this->getFullPath());
+        $newUrl = str_replace("Activity.php", "SRActivity.php", $this->getFullPath());
         header('Location: ' . $newUrl);
-        return; 
+        return;
         $this->setMethodName('gatherFixedInformation');
 
         $this->setTemplateFiles(

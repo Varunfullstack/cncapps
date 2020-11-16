@@ -19,8 +19,12 @@
 </script>
 <style>
     input[type=text], select {
+        -ms-box-sizing: content-box;
+        -moz-box-sizing: content-box;
+        -webkit-box-sizing: content-box;
+        box-sizing: content-box;
         padding: 5px;
-        width: 230px;
+        width: 243px;
         font-size: 14px
     }
 
@@ -72,9 +76,9 @@
                     maxlength="50"
                     customer-search
             >
-                <button>search <i class="fa fa-search"
-                                  aria-hidden="true"
-                ></i></button>
+                <button>
+                    Search
+                </button>
             </td>
         </tr>
         <tr>
@@ -112,9 +116,9 @@
                 </option>
                 <!-- END customerLeadStatusBlock -->
             </select>
-            <button onclick="searchCustomers()">search <i class="fa fa-search"
-                                                          aria-hidden="true"
-            ></i></button>
+            <button onclick="searchCustomers()">
+                Search
+            </button>
         </td>
     </tr>
 </table>
