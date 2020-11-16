@@ -73,53 +73,13 @@ class ActivityListComponent extends MainComponent {
                 sortable: true,
             },
             {
-                label: "Allow SCR Printing",
-                path: "allowSCRFlag",
-                sortable: true,
-            },
-            {
                 label: "Require Checking",
                 path: "requireCheckFlag",
                 sortable: true,
             },
             {
-                label: "Allow Reason",
-                path: "allowReasonFlag",
-                sortable: true,
-            },
-            {
-                label: "Allow Action",
-                path: "allowActionFlag",
-                sortable: true,
-            },
-            {
-                label: "Allow Final",
-                path: "allowFinalStatusFlag",
-                sortable: true,
-            },
-            {
-                label: "Require Reason",
-                path: "reqReasonFlag",
-                sortable: true,
-            },
-            {
-                label: "Require Action",
-                path: "reqActionFlag",
-                sortable: true,
-            },
-            {
-                label: "Require Final",
-                path: "reqFinalStatusFlag",
-                sortable: true,
-            },
-            {
                 label: "Travel",
                 path: "travelFlag",
-                sortable: true,
-            },
-            {
-                label: "Show No Charge",
-                path: "showNotChargeableFlag",
                 sortable: true,
             },
             {
@@ -233,53 +193,13 @@ class ActivityListComponent extends MainComponent {
                 sortable: true,
             },
             {
-                label: "Allow SCR Printing",
-                path: "allowSCRFlag",
-                sortable: true,
-            },
-            {
                 label: "Require Checking",
                 path: "requireCheckFlag",
                 sortable: true,
             },
             {
-                label: "Allow Reason",
-                path: "allowReasonFlag",
-                sortable: true,
-            },
-            {
-                label: "Allow Action",
-                path: "allowActionFlag",
-                sortable: true,
-            },
-            {
-                label: "Allow Final",
-                path: "allowFinalStatusFlag",
-                sortable: true,
-            },
-            {
-                label: "Require Reason",
-                path: "reqReasonFlag",
-                sortable: true,
-            },
-            {
-                label: "Require Action",
-                path: "reqActionFlag",
-                sortable: true,
-            },
-            {
-                label: "Require Final",
-                path: "reqFinalStatusFlag",
-                sortable: true,
-            },
-            {
                 label: "Travel",
                 path: "travelFlag",
-                sortable: true,
-            },
-            {
-                label: "Show No Charge",
-                path: "showNotChargeableFlag",
                 sortable: true,
             },
             {
