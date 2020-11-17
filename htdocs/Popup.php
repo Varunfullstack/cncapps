@@ -22,6 +22,9 @@ $currentVersion = \CNCLTD\Utils::getCurrentChangelogVersion();
     <link rel='stylesheet'
           href='components/dist/PopUpComponent.css?<?= $currentVersion ?>'
     >
+    <link rel="stylesheet"
+          href="screen.css"
+    >
     <script src='components/dist/PopUpComponent.js?<?= $currentVersion ?>'></script>
 </head>
 <body>
