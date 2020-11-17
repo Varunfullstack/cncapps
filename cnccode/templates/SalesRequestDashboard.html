@@ -56,8 +56,9 @@
                         if (type === 'sort') {
                             return data.length;
                         }
-                        return data.map(documentId => {
-                            return "<a href='/Activity.php?action=viewFile&callDocumentID=" + documentId + "' target='_blank'><i class='fa fa-paperclip'></i></a>";
+
+                        return data.map(item => {
+                            return "<a href='/Activity.php?action=viewFile&callDocumentID=" + item.documentId + "' target='_blank'><i class='fa fa-paperclip'></i></a>";
                         }).join('');
                     }
                 },
