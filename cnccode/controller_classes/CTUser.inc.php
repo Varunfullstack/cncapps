@@ -87,14 +87,14 @@ class CTUser extends CTCNC
             $cookieVars,
             $cfg
         );
-        $noPermissionList=["all","active","getCurrentUser"];
+        $noPermissionList = ["all", "active", "getCurrentUser"];
         $roles = SENIOR_MANAGEMENT_PERMISSION;
-        $key=array_search( $_REQUEST["action"],$noPermissionList);        
-        if(false === $key)
-        if (!self::hasPermissions($roles)) {
-            Header("Location: /NotAllowed.php");
-            exit;
-        }
+        $key = array_search(@$_REQUEST["action"], $noPermissionList);
+        if (false === $key)
+            if (!self::hasPermissions($roles)) {
+                Header("Location: /NotAllowed.php");
+                exit;
+            }
         $this->setMenuId(903);
         $this->buUser = new BUUser($this);
         $this->dsUser = new DSForm($this);
@@ -270,15 +270,15 @@ class CTUser extends CTCNC
                     ]
                 );
                 break;
-                case "getCurrentUser":
-                    echo $this->getCurrentUser();
-                    exit;
-                case "all":
-                    echo json_encode($this->getAllUsers());
-                    exit;
-                case "active":                
-                    echo json_encode($this->getActiveUsers());
-                    exit;
+            case "getCurrentUser":
+                echo $this->getCurrentUser();
+                exit;
+            case "all":
+                echo json_encode($this->getAllUsers());
+                exit;
+            case "active":
+                echo json_encode($this->getActiveUsers());
+                exit;
             case CTUSER_ACT_DISPLAY_LIST:
             default:
                 $this->displayList();
@@ -381,7 +381,7 @@ class CTUser extends CTCNC
             $dbeCustomer->getRow();
             $siteCustomerString = $dbeCustomer->getValue(DBECustomer::name);
         }
-         
+
         $this->template->setVar(
             array(
                 'userID'                                     => $dsUser->getValue(DBEJUser::userID),
@@ -649,9 +649,9 @@ class CTUser extends CTCNC
                 'streamOneLicenseManagementChecked'             => Controller::htmlChecked(
                     $dsUser->getValue(DBEJUser::streamOneLicenseManagement)
                 ),
-                'execludeFromSDManagerDashboardChecked'           =>  
-                    $dsUser->getValue(DBEUser::execludeFromSDManagerDashboard)? 'checked' : null
-                 ,
+                'execludeFromSDManagerDashboardChecked'         =>
+                    $dsUser->getValue(DBEUser::execludeFromSDManagerDashboard) ? 'checked' : null
+                ,
             )
         );
         // manager selection
@@ -995,6 +995,63 @@ class CTUser extends CTCNC
         $this->parsePage();
     }
 
+    function getCurrentUser()
+    {
+        $dbeJUser = new DBEJUser($this);
+        $dbeJUser->setValue(
+            DBEJUser::userID,
+            $this->dbeUser->getValue(DBEUser::userID)
+        );
+        $dbeJUser->getRow();
+        return json_encode(
+            [
+                'firstName'             => $dbeJUser->getValue(DBEJUser::firstName),
+                'lastName'              => $dbeJUser->getValue(DBEJUser::lastName),
+                'id'                    => $dbeJUser->getValue(DBEJUser::userID),
+                'email'                 => $dbeJUser->getEmail(),
+                'isSDManger'            => $this->isSdManager(),
+                'isExpenseApprover'     => $dbeJUser->getValue(DBEJUser::isExpenseApprover),
+                'globalExpenseApprover' => $dbeJUser->getValue(DBEJUser::globalExpenseApprover),
+                'teamID'                => $dbeJUser->getValue(DBEJUser::teamID),
+                'teamLevel'             => $dbeJUser->getValue(DBEJUser::teamLevel),
+            ]
+        );
+    }
+
+    function getAllUsers()
+    {
+        $dbeUser = new DBEUser($this);
+        $dbeUser->getRows(false);  // include inActive users
+        $users = array();
+        while ($dbeUser->fetchNext()) {
+            array_push(
+                $users,
+                array(
+                    'id'   => $dbeUser->getValue(DBEUser::userID),
+                    'name' => $dbeUser->getValue(DBEUser::name)
+                )
+            );
+        }
+        return $users;
+    }
+
+    function getActiveUsers()
+    {
+        $dbeUser = new DBEUser($this);
+        $dbeUser->getRows(true);  // include inActive users
+        $users = array();
+        while ($dbeUser->fetchNext()) {
+            array_push(
+                $users,
+                array(
+                    'id'   => $dbeUser->getValue(DBEUser::userID),
+                    'name' => $dbeUser->getValue(DBEUser::name)
+                )
+            );
+        }
+        return $users;
+    }
+
     /**
      * Display list of users
      * @access private
@@ -1097,55 +1154,5 @@ class CTUser extends CTCNC
             true
         );
         $this->parsePage();
-    }
-    function getCurrentUser()
-    {        
-        $dbeJUser=new DBEJUser($this);
-        $dbeJUser->setValue(
-            DBEJUser::userID,
-            $this->dbeUser->getValue(DBEUser::userID)
-        );
-        $dbeJUser->getRow();
-        return json_encode( [
-            'firstName' =>  $dbeJUser->getValue(DBEJUser::firstName),
-            'lastName' =>  $dbeJUser->getValue(DBEJUser::lastName),
-            'id' =>  $dbeJUser->getValue(DBEJUser::userID),
-            'email' =>  $dbeJUser->getEmail(),
-            'isSDManger'=>$this->isSdManager(),
-            'isExpenseApprover' =>  $dbeJUser->getValue(DBEJUser::isExpenseApprover),
-            'globalExpenseApprover' =>  $dbeJUser->getValue(DBEJUser::globalExpenseApprover),
-            'teamID' =>  $dbeJUser->getValue(DBEJUser::teamID),
-            'teamLevel'=> $dbeJUser->getValue(DBEJUser::teamLevel),
-        ]);
-    }
-    function getAllUsers()
-    {
-        $dbeUser = new DBEUser($this);
-        $dbeUser->getRows(false);  // include inActive users
-        $users=array();
-        while ($dbeUser->fetchNext()) {
-            array_push($users,
-                array(                     
-                    'id'       => $dbeUser->getValue(DBEUser::userID),
-                    'name'     => $dbeUser->getValue(DBEUser::name)
-                )
-            );            
-        }
-        return $users;
-    }
-    function getActiveUsers()
-    {
-        $dbeUser = new DBEUser($this);
-        $dbeUser->getRows(true);  // include inActive users
-        $users=array();
-        while ($dbeUser->fetchNext()) {
-            array_push($users,
-                array(                     
-                    'id'       => $dbeUser->getValue(DBEUser::userID),
-                    'name'     => $dbeUser->getValue(DBEUser::name)
-                )
-            );            
-        }
-        return $users;
     }
 }
