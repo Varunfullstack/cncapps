@@ -104,7 +104,6 @@ class ActivityEditComponent extends MainComponent {
         ]).then(async (result) => {
             const currentUser = result[4];
             let callActTypes = result[0];
-            console.log(currentUser, callActTypes);
 
 
             if (!currentUser.isSDManger) {
@@ -132,7 +131,6 @@ class ActivityEditComponent extends MainComponent {
         const {filters} = this.state;
 
         this.api.getCallActivityDetails(callActivityID, filters).then((res) => {
-            console.log(res);
             const {filters} = this.state;
             filters.monitorSR = res.monitoringFlag == "1" ? true : false;
             filters.criticalSR = res.criticalFlag == "1" ? true : false;
@@ -148,7 +146,6 @@ class ActivityEditComponent extends MainComponent {
             res.callActTypeIDOld = res.callActTypeID;
             res.orignalPriority = res.priority;
             const session = this.getSessionActivity(res.callActivityID);
-            console.log('session', session);
             if (session) {
                 res.customerNotes = session.customerNotesTemplate || res.customerNotes;
                 res.internalNotes = session.internalNotesTemplate || res.internalNotes;
@@ -175,9 +172,7 @@ class ActivityEditComponent extends MainComponent {
                     }),
                 this.apiCustomer.getCustomerAssets(res.customerId)
             ]).then((result) => {
-                // console.log('res',result);
                 const currentContact = result[0].find((c) => c.id == res.contactID);
-                //console.log(currentContact);
                 let assets = sort(result[3], "name");
                 assets = assets.map((asset) => {
                     if (
@@ -251,7 +246,6 @@ class ActivityEditComponent extends MainComponent {
                 "emptyAssetReason",
                 "completeDate"
             ]);
-            console.log(finalData);
 
             this.api
                 .updateActivity(finalData)
@@ -365,7 +359,6 @@ class ActivityEditComponent extends MainComponent {
             case this.activityStatus.CustomerAction:
                 const dateMoment = moment(data.alarmDate);
 
-                //console.log('alarmTime',data.alarmTime,data.alarmDate,dateMoment.isValid(), dateMoment.isSameOrBefore(moment(), "minute"));
                 if (
                     !dateMoment.isValid() ||
                     dateMoment.isSameOrBefore(moment(), "minute") ||
@@ -401,7 +394,7 @@ class ActivityEditComponent extends MainComponent {
         if (!data.assetName && !this.state.data.emptyAssetReason) {
             const reason = await this.prompt("Please provide the reason of not listing an asset", 500, this.state.data.emptyAssetReason);
             this.state.data.emptyAssetReason = reason;
-            const updatedData =  {...this.state.data, emptyAssetReason: reason};
+            const updatedData = {...this.state.data, emptyAssetReason: reason};
             this.setState({updatedData});
             return false;
         }
@@ -411,7 +404,6 @@ class ActivityEditComponent extends MainComponent {
     setValue = (label, value) => {
         const {data} = this.state;
         data[label] = value;
-        console.log(`label: ${label}, value: ${value}, data: ${JSON.stringify(data)}`);
         this.setState({data});
     };
     //-----------------Template
@@ -637,7 +629,6 @@ class ActivityEditComponent extends MainComponent {
         var reason = await this.prompt(
             "Please provide your reason to request additional time", 600
         );
-        console.log(reason);
         if (!reason) {
             return;
         }
@@ -645,7 +636,6 @@ class ActivityEditComponent extends MainComponent {
             data.callActivityID,
             reason
         );
-        console.log(result);
         this.alert("Additional time has been requested");
     };
     getActionsButtons = () => {
@@ -760,7 +750,6 @@ class ActivityEditComponent extends MainComponent {
             let activities = this.getSessionNotes().filter(a => a.id != data.callActivityID);
             activities.push(activityEdit);
             sessionStorage.setItem("activityEdit", JSON.stringify(activities));
-            //console.log("auto save");
         }, 10000);
     }
     getSessionNotes = () => {
@@ -796,7 +785,6 @@ class ActivityEditComponent extends MainComponent {
                     return false;
                 }
                 if (!await this.confirm("Are you sure this SR is fixed?")) return false;
-                // console.log("continue.....");
                 //return;
                 break;
             case this.activityStatus.Escalate:
@@ -816,7 +804,6 @@ class ActivityEditComponent extends MainComponent {
                     return;
                 break;
         }
-        console.log('this should not run!!');
         this.setState({data}, () => this.updateActivity(autoSave));
     };
     checkCncAction = async (data, type) => {
@@ -847,7 +834,6 @@ class ActivityEditComponent extends MainComponent {
     }
     checkOnHold = async (data, type) => {
         if (type && type.catRequireCNCNextActionOnHold == 1 && (data.cncNextActionTemplate == '' || data.cncNextActionTemplate == null)) {
-            console.log('error');
             this.alert(`CNC Next Action is required for ${type.description} when the next action is On Hold`)
             return false;
         }
@@ -987,7 +973,6 @@ class ActivityEditComponent extends MainComponent {
     };
 
     deleteDocument = async (id) => {
-        console.log(id);
         if (await this.confirm("Are you sure you want to remove this document?")) {
             await this.api.deleteDocument(this.state.currentActivity, id);
             const {data} = this.state;
@@ -1025,7 +1010,6 @@ class ActivityEditComponent extends MainComponent {
     getContactsElement = () => {
         const {el} = this;
         const {data, contacts, currentContact} = this.state;
-        //console.log(contacts);
         const contactsGroup = groupBy(contacts, "siteTitle");
         return el('div', {style: {display: "flex", flexDirection: "row", border: 0, marginRight: -6, padding: 0}}, el(
             "select",
@@ -1470,7 +1454,6 @@ class ActivityEditComponent extends MainComponent {
         const {uploadFiles} = this.state;
         if (uploadFiles) {
             let names = "";
-            //console.log(uploadFiles);
             for (let i = 0; i < uploadFiles.length; i++) {
                 names += uploadFiles[i].name + "  ,";
             }
@@ -1498,7 +1481,6 @@ class ActivityEditComponent extends MainComponent {
 
     // Parts used, change requestm and sales request
     handleTemplateChanged = (event) => {
-        //console.log(event.target.value);
         const id = event.target.value;
         const {templateOptions} = this.state;
         let templateDefault = "";
@@ -1751,7 +1733,6 @@ class ActivityEditComponent extends MainComponent {
 
     getTimeBudgetElement = () => {
         const {data, currentUser} = this.state;
-        //console.log(currentUser);
 
         switch (currentUser?.teamID) {
             case TeamType.Helpdesk:
@@ -1773,7 +1754,6 @@ class ActivityEditComponent extends MainComponent {
     }
     getTimeBudget = () => {
         const {data, currentUser} = this.state;
-        //console.log(currentUser);
         switch (currentUser?.teamID) {
             case TeamType.Helpdesk:
                 return data?.hdRemainMinutes;
@@ -1797,7 +1777,6 @@ class ActivityEditComponent extends MainComponent {
         // get from local storage
         let obj = localStorage.getItem(key);
         let userObj = {userID: currentUser.id, contactID: data.contactID, notes: data.contactNotes};
-        //console.log(userObj,obj);
         let alertObject;
         const today = moment().format("YYYY-MM-DD");
         if (data.contactNotes && data.contactNotes != "") {
@@ -1836,7 +1815,6 @@ class ActivityEditComponent extends MainComponent {
     getPriorityChangeReason = () => {
         const {data, priorityReasons} = this.state;
         const {el} = this;
-        //console.log(priorityReasons);
         return el(StandardTextModal,
             {
                 options: priorityReasons,
@@ -1849,7 +1827,6 @@ class ActivityEditComponent extends MainComponent {
             });
     }
     handlePriorityTemplateChange = (value) => {
-        console.log("priority changed", value);
         const {data} = this.state;
         if (value != "" && value != undefined) {
             //data.priorityChangeReason=value;
@@ -1863,7 +1840,6 @@ class ActivityEditComponent extends MainComponent {
                 )[0].id
             }
             this.api.changeProblemPriority(payload).then(result => {
-                console.log(result);
                 if (result) {
                     data.priorityChangeReason = null;
                     data.orignalPriority = data.priority;
@@ -1907,7 +1883,6 @@ class ActivityEditComponent extends MainComponent {
         const {data, assets} = this.state;
         if (value != "") {
             const index = assets.findIndex((a) => a.name == value);
-            //  console.log(value,index,assets[index]);
             const asset = assets[index];
             data.assetName = value;
             data.assetTitle =
