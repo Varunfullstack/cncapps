@@ -5526,7 +5526,8 @@ class CTActivity extends CTCNC
                 "SRActivity.php",
                 array(
                     'action'         => CTACTIVITY_ACT_EDIT_ACTIVITY,
-                    'callActivityID' => $newActivityID
+                    'callActivityID' => $newActivityID,
+                    'isFollow'=>true
                 )
             );
 
