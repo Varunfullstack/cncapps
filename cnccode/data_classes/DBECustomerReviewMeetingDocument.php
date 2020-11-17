@@ -5,7 +5,7 @@
  * Date: 24/09/2018
  * Time: 12:00
  */
-
+global $cfg;
 require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBECustomerReviewMeetingDocument extends DBEntity
@@ -22,8 +22,8 @@ class DBECustomerReviewMeetingDocument extends DBEntity
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)

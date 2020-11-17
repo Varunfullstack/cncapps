@@ -249,9 +249,7 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
      */
     private function sendDocuments()
     {
-        if (!$this->getParam('meetingDate')) {
-            throw new Exception('Meeting date is missing');
-        }
+
         if (!$this->getParam('templateType')) {
             throw new Exception('Template Type is missing');
         }
@@ -259,14 +257,30 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
             throw new Exception('Customer ID is missing');
         }
 
-        $meetingDate = $this->getParam('meetingDate');
         $templateType = $this->getParam('templateType');
         $customerID = $this->getParam('customerID');
 
-        $template = '@customerFacing/ITReviewMeetingAgenda/ITReviewMeetingAgenda.html.twig';
+        $context = [
+            "senderFirstName" => $this->dbeUser->getValue(DBEUser::firstName),
+            "senderLastName"  => $this->dbeUser->getValue(DBEUser::lastName),
+        ];
 
-        if ($templateType !== self::IT_REVIEW_MEETING_AGENDA) {
-            $template = '@customerFacing/ReviewMeetingResponse/ReviewMeetingResponse.html.twig';
+        $template = '@customerFacing/ReviewMeetingResponse/ReviewMeetingResponse.html.twig';
+        if ($templateType == self::IT_REVIEW_MEETING_AGENDA) {
+            $meetingTime = $this->getParam('meetingTime');
+
+            $meetingDate = $this->getParam('meetingDate');
+
+            if (!$this->getParam('meetingDate')) {
+                throw new Exception('Meeting Date is missing');
+            }
+
+            if (!$this->getParam('meetingTime')) {
+                throw new Exception('Meeting Time is missing');
+            }
+            $dateTime = DateTime::createFromFormat(DATE_MYSQL_DATETIME, "{$meetingDate} {$meetingTime}");
+            $context['meetingDateTime'] = $dateTime;
+            $template = '@customerFacing/ITReviewMeetingAgenda/ITReviewMeetingAgenda.html.twig';
         }
 
         global $twig;
@@ -275,13 +289,7 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
         $dbeContact->getReviewContactsByCustomerID($customerID);
 
         $buMail = new BUMail($this);
-        $body = $twig->render(
-            $template,
-            [
-                "senderFirstName" => $this->dbeUser->getValue(DBEUser::firstName),
-                "senderLastName"  => $this->dbeUser->getValue(DBEUser::lastName),
-            ]
-        );
+        $body = $twig->render($template, $context);
         $subject = "CNC Review Meeting Documents";
         $recipientsArray = [];
         while ($dbeContact->fetchNext()) {

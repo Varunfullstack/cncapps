@@ -1,6 +1,7 @@
 {% extends '@customerFacing/wrapper.html.twig' %}
 {# @var senderFirstName string #}
 {# @var senderLastName string #}
+{# @var meetingDateTime \DateTimeInterface #}
 {% block replyText %}
 {% endblock %}
 {% block headerTitle %}
@@ -15,6 +16,9 @@
     <p>
         The documents for our forthcoming review meeting have been uploaded to your customer portal, please take a few
         moments to review ready for our discussion and we look forward to seeing you soon.
+    </p>
+    <p>
+        We look forward to seeing you on the {{ meetingDateTime | date('jS F \\a\\t g:ia') }}
     </p>
     <p>
         Many thanks

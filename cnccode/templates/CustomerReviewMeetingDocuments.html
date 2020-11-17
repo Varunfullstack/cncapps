@@ -14,6 +14,11 @@
     }
 </style>
 <script>
+    let meetingTimeContainer;
+    let meetingTimeInput;
+    let templateSelector;
+    let sendReviewMeetingEmailsBtn;
+
     function sendReviewMeetingEmails() {
         //retrieve the ids
         const formData = new FormData();
@@ -23,11 +28,14 @@
         if (!formData.get('meetingDate')) {
             return;
         }
-        const templateType = $('#templateType').val();
+        const templateType = templateSelector.value;
         const customerID = $('#customerID').val();
         formData.append("templateType", templateType);
         formData.append("customerID", customerID);
 
+        if (templateType === "IT_REVIEW_MEETING_AGENDA") {
+            formData.append('meetingTime', meetingTimeInput.value);
+        }
 
         fetch(
             "{sendReviewEmails}", {
@@ -53,10 +61,20 @@
     }
 
     function checkSendReviewMeetingEmails() {
-        if ($('#templateType').val()) {
-            $('#sendReviewMeetingEmailsBtn').attr('disabled', false);
+        const selectedTemplate = templateSelector.value;
+        if (selectedTemplate) {
+            if (selectedTemplate === 'IT_REVIEW_MEETING_AGENDA') {
+                meetingTimeContainer.style.display = 'inline-block'
+                sendReviewMeetingEmailsBtn.disabled = !meetingTimeInput.value;
+            } else {
+                meetingTimeContainer.style.display = 'none'
+                meetingTimeContainer.value = "";
+                sendReviewMeetingEmailsBtn.disabled = false;
+            }
         } else {
-            $('#sendReviewMeetingEmailsBtn').attr('disabled', true);
+            meetingTimeContainer.style.display = 'none'
+            meetingTimeContainer.value = "";
+            sendReviewMeetingEmailsBtn.disabled = true;
         }
     }
 
@@ -216,11 +234,18 @@
     }
 
     window.addEventListener('DOMContentLoaded', function () {
+
+        meetingTimeContainer = document.getElementById('meetingTimeContainer');
+        meetingTimeInput = document.getElementById('meetingTimeInput');
+        templateSelector = document.getElementById('templateType');
+        sendReviewMeetingEmailsBtn = document.getElementById('sendReviewMeetingEmailsBtn');
+
         $('#customerString')[0].addEventListener('autocompleteselect', function ($event) {
             $('#customerID').val($event.detail.item.value);
             $('#uploadSection').show();
             fetchTableData($event.detail.item.value);
             fetchReviewContactsData($event.detail.item.value);
+            checkSendReviewMeetingEmails();
         });
     });
 
@@ -313,6 +338,16 @@
             <option value="{templateType}">{templateTypeDescription}</option>
             <!-- END templateTypeBlock -->
         </select>
+        <label id="meetingTimeContainer"
+        >
+            <span>Meeting Time:</span>
+            <input
+                    onchange="checkSendReviewMeetingEmails()"
+                    type="time"
+                    id="meetingTimeInput"
+            >
+        </label>
+
         <button disabled
                 onclick="sendReviewMeetingEmails()"
                 id="sendReviewMeetingEmailsBtn"
