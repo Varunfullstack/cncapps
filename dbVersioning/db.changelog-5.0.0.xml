@@ -1,7 +1,7 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.2.xsd">
     <changeSet author="pavwebdev" id="release-v5.0.0-0">
         <tagDatabase tag="release-v5.0.0"/>
     </changeSet>
@@ -97,5 +97,44 @@
                 <column name="showNotChargeableFlag" remarks="OBSOLETE" type="CHAR(1)"/>
             </addColumn>
         </rollback>
+    </changeSet>
+    <changeSet id="release-v5.0.0-9" author="pavwebdev">
+        <sql splitStatements="true">
+            UPDATE
+                contact
+            SET `initialLoggingEmailFlag`       = 'Y',
+                workUpdatesEmailFlag            = 'Y',
+                fixedEmailFlag                  = 'Y',
+                con_mailflag11                  = 'Y',
+                `othersInitialLoggingEmailFlag` = IF(
+                        contact.`supportLevel` IN ('main', 'supervisor'),
+                        'Y',
+                        othersInitialLoggingEmailFlag
+                    ),
+                `othersWorkUpdatesEmailFlag`    = IF(
+                        contact.`supportLevel` IN ('main', 'supervisor'),
+                        'Y',
+                        othersWorkUpdatesEmailFlag
+                    ),
+                othersFixedEmailFlag            = IF(
+                        contact.`supportLevel` IN ('main', 'supervisor'),
+                        'Y',
+                        othersFixedEmailFlag
+                    )
+            WHERE contact.`active`
+
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet id="release-v5.0.0-10" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                select column_default = 'Y' from information_schema.`COLUMNS` where
+                information_schema.`COLUMNS`.`TABLE_SCHEMA` = database() and information_schema.`COLUMNS`.`TABLE_NAME` =
+                "contact" and information_schema.`COLUMNS`.`COLUMN_NAME` = 'con_mailflag11'
+            </sqlCheck>
+        </preConditions>
+        <addDefaultValue tableName="contact" columnName="con_mailflag11" columnDataType="char(1)" defaultValue="Y"/>
+        <rollback/>
     </changeSet>
 </databaseChangeLog>
