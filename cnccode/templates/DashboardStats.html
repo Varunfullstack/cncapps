@@ -5,6 +5,17 @@
         width: 80%;
     }
 </style>
+<div>
+    <h3>Daily Stats <i class="fal fa-expand-arrows fa-2x pointer"></i></h3>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelector('i.fa-expand-arrows').addEventListener('click', () => {
+                window.open('Popup.php?action=dailyStats', 'popup', 'width=920,height=300')
+            })
+        })
+    </script>
+</div>
 <div class="container">
     <div>
         {thing1}
