@@ -6,8 +6,8 @@ class APIActivity extends APIMain {
         return fetch(`${ApiUrls.SRActivity}getCallActivity&callActivityID=${callActivityID}&includeTravel=${filters.showTravel}&includeOperationalTasks=${filters.showOperationalTasks}&includeServerGuardUpdates=${filters.showServerGaurdUpdates}`).then(res => res.json());
     }
 
-    unlinkSalesOrder(linkedOrdheadId) {
-        return fetch(`Activity.php?action=unlinkSalesOrder&activityId=${linkedOrdheadId}`);
+    unlinkSalesOrder(serviceRequestId) {
+        return fetch(`Activity.php?action=unlinkSalesOrder&serviceRequestId=${serviceRequestId}`);
     }
 
     setActivityCritical(callActivityID) {

@@ -251,11 +251,10 @@ class CTActivity extends CTCNC
                     return $this->skipSalesOrder();
                 }
                 return $this->search();
-
-                break;
             case 'unlinkSalesOrder':
                 $this->unlinkSalesOrder();
-                break;
+                echo json_encode(["status" => "ok"]);
+                exit;
             case 'displayServiceRequestForContactPopup':
                 $this->serviceRequestsForContactPopup();
                 break;
@@ -1434,28 +1433,15 @@ class CTActivity extends CTCNC
 
     private function unlinkSalesOrder()
     {
-        $activityId = @$_REQUEST['activityId'];
+        $serviceRequestId = @$_REQUEST['serviceRequestId'];
 
-        if (!$activityId) {
-            throw new Exception('Activity ID is missing');
+        if (!$serviceRequestId) {
+            throw new Exception('Service Request Id is missing');
         }
-
-        $dbeCallActivity = new DBECallActivity($this);
-        $dbeCallActivity->getRow($activityId);
-        $problemId = $dbeCallActivity->getValue(DBECallActivity::problemID);
         $dbeProblem = new DBEProblem($this);
-        $dbeProblem->getRow($problemId);
+        $dbeProblem->getRow($serviceRequestId);
         $dbeProblem->setValue(DBEProblem::linkedSalesOrderID, null);
         $dbeProblem->updateRow();
-        $urlNext =
-            Controller::buildLink(
-                'SRActivity.php',
-                array(
-                    'action'         => 'displayActivity',
-                    'callActivityID' => $activityId
-                )
-            );
-        header('Location: ' . $urlNext);
     }
 
     /**

@@ -121,10 +121,8 @@ class ActivityDisplayComponent extends MainComponent {
                     data?.sitePostcode}
                 </a>
                 <div>
-                    <a
-                        className={data?.customerNameDisplayClass}
-                        href={`Customer.php?action=dispEdit&customerId=${data?.customerId}`}
-                        target="_blank"
+                    <a href={`Customer.php?action=dispEdit&customerId=${data?.customerId}`}
+                       target="_blank"
                     >
                         {data?.contactName + " "}
                     </a>
@@ -216,7 +214,7 @@ class ActivityDisplayComponent extends MainComponent {
                 title: "Unlink Sales order",
                 content: el('a', {
                     className: "fal fa-unlink fa-2x m-5 pointer icon",
-                    onClick: () => this.handleUnlink(data?.linkedSalesOrderID)
+                    onClick: () => this.handleUnlink(data?.linkedSalesOrderID, data?.problemID, data?.callActivityID)
                 })
             }) : null,
             el(ToolTip, {
@@ -332,11 +330,11 @@ class ActivityDisplayComponent extends MainComponent {
         const w = window.open(`Activity.php?action=editLinkedSalesOrder&htmlFmt=popup&callActivityID=${callActivityID}`, 'reason', 'scrollbars=yes,resizable=yes,height=150,width=250,copyhistory=no, menubar=0');
         w.onbeforeunload = () => this.loadCallActivity();
     }
-    handleUnlink = async (linkedSalesOrderID) => {
+    handleUnlink = async (linkedSalesOrderID, serviceRequestId, activityId) => {
         const res = await this.confirm(`Are you sure you want to unlink this request to Sales Order ${linkedSalesOrderID}`);
         if (res) {
-            await this.api.unlinkSalesOrder(linkedSalesOrderID);
-            this.loadCallActivity();
+            await this.api.unlinkSalesOrder(serviceRequestId);
+            await this.loadCallActivity(activityId);
         }
     }
 

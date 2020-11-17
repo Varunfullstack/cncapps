@@ -554,7 +554,8 @@ class ActivityEditComponent extends MainComponent {
                         onClick: () =>
                             this.handleUnlink(
                                 data?.callActivityID,
-                                data?.linkedSalesOrderID
+                                data?.linkedSalesOrderID,
+                                data?.problemID
                             ),
                     }),
                 })
@@ -875,12 +876,12 @@ class ActivityEditComponent extends MainComponent {
         );
         w.onbeforeunload = () => this.loadCallActivity(callActivityID);
     };
-    handleUnlink = async (callActivityID, linkedSalesOrderID) => {
+    handleUnlink = async (callActivityID, linkedSalesOrderID, serviceRequestId) => {
         const res = await this.confirm(
             `Are you sure you want to unlink this request to Sales Order ${linkedSalesOrderID}`
         );
         if (res) {
-            await this.api.unlinkSalesOrder(callActivityID);
+            await this.api.unlinkSalesOrder(serviceRequestId);
             this.loadCallActivity(callActivityID);
         }
     };
