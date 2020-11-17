@@ -1005,7 +1005,7 @@ Sizes: [
                                                                             {% block leftFooter %}
                                                                                 Click
                                                                                 <a
-                                                                                        href="{%- block serviceRequestURL %}{% endblock %}"
+                                                                                        href="{%- block serviceRequestURL -%}{%- endblock -%}"
                                                                                 >here</a>
                                                                                 to see more details on our portal
                                                                             {% endblock %}
@@ -1020,13 +1020,10 @@ Sizes: [
                                                                     {% block rightFooter %}
                                                                         <tr>
                                                                             <td style="padding: 20px">
-
-
                                                                                 {% block footerStatusTitle %}
                                                                                     Service Request Status:
                                                                                 {% endblock %}
                                                                                 <span class="statusValue">
-
                                                                                 {% block footerStatus %}
 
                                                                                 {% endblock %}
@@ -1034,17 +1031,17 @@ Sizes: [
 
                                                                             </td>
                                                                         </tr>
-                                                                        <tr>
-                                                                            <td style="padding-left: 20px;padding-right: 20px;padding-bottom: 20px">
-                                                                                {% block feedback %}
+                                                                        {% block feedback %}
+                                                                            <tr>
+                                                                                <td style="padding-left: 20px;padding-right: 20px;padding-bottom: 20px">
                                                                                     Please click <a href="
 			                                                                        {% block feedbackURL %}
 			                                                                        {% endblock %}"
-                                                                                >here</a> to give us feedback on
+                                                                                    >here</a> to give us feedback on
                                                                                     your experience
-                                                                                {% endblock %}
-                                                                            </td>
-                                                                        </tr>
+                                                                                </td>
+                                                                            </tr>
+                                                                        {% endblock %}
 
                                                                     {% endblock %}
                                                                 </table>
