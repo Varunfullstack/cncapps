@@ -1036,10 +1036,12 @@ class BUProblemSLA extends Business
     {
         $SQL =
             "SELECT
-          DISTINCT pro_problemno
+          pro_problemno
         FROM
           problem
         WHERE
+              pro_date_raised >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+            and
           (
             SELECT
               COUNT(*)
@@ -1052,8 +1054,7 @@ class BUProblemSLA extends Business
             . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . ',' .
             CONFIG_COMPLETED_ACTIVITY_TYPE_ID . ')' .
             " ) = 0
-          AND pro_status IN ('F', 'C')
-          AND pro_date_raised >= '2013-01-01'";
+          AND pro_status IN ('F', 'C')";
 
         $results = $this->db->query($SQL);
 
