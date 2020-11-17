@@ -6,6 +6,8 @@ This project changes will be shown here.
 - Issue 1072 - Activity Breakdown within SR
 ### Changed
 - Issue 1053 - New email templates
+### Fixed
+- Issue 1078 - Sales Request Dashboard Attachment Link error
 
 ## [v4.12.0] - 2020-11-10
 ### Added
