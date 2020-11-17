@@ -2,13 +2,14 @@ import MainComponent from "../../shared/MainComponent.js";
 import * as React from "react";
 import APIActivity from "../../services/APIActivity.js";
 import { groupBy, params } from "../../utils/utils.js";
+import Spinner from "../../shared/Spinner/Spinner.js";
  
 class TimeBreakdownComponent extends MainComponent {
   el = React.createElement;
   api = new APIActivity();
   constructor(props) {
     super(props);
-    this.state = { data: [] };
+    this.state = { data: [] ,loading:true};
   }
 
   componentDidMount() {
@@ -17,7 +18,8 @@ class TimeBreakdownComponent extends MainComponent {
         data=data.map(d=>{
           return {...d,sname:d.firstName[0]+d.lastName[0]}
         })
-        this.setState({ data });
+        
+        this.setState({ data,loading:false });
         console.log('data',data);
       });
   }
@@ -31,35 +33,95 @@ class TimeBreakdownComponent extends MainComponent {
         prev.push(cur);
         return prev;
     },[]);
-    console.log("users",users,dataGroup);
+    //console.log("users",users,dataGroup);
+    if(data.length==0)
+    return <div style={{display: "flex",justifyContent:"center",alignItems:"center"}}><h2>There has been no time logged against this request yet.</h2></div>
 
     return (
-      <div style={{display: "flex",justifyContent:"center",alignItems:"center"}}>
-      <table className="table table-striped" style={{width:500}}>
-        <thead>
-          <tr>
-              <th>Activity</th>
-              {users.map(u=><th key={u}>{u}</th>)}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <table className="table table"  >
+          <thead>
+            <tr>
+              <th className="text-align-left">Activity</th>
+              {users.map((u) => (
+                <th className="text-align-left" key={u}>{u}</th>
+              ))}
               <th>Total</th>
-           </tr>
-        </thead>
-        <tbody>          
-            {dataGroup.map(g=>
-            <tr key={g.groupName}>
-            <td>{g.groupName}</td>
-            {users.map(u=><td key={u} style={{color:this.getColor(g.items,u)}}>{this.getUserTime(g.items,u)}</td>)}
-            <td>{this.getActivityTypeTime(g.groupName)}</td>
             </tr>
-            )}          
-        </tbody>
-        <tfoot>
+          </thead>
+          <tbody>
+            {dataGroup.map((g) => (
+              <tr key={g.groupName}>
+                <td>{g.groupName}</td>
+                {users.map((u) => (
+                  <td key={u} className="text-align-left" style={{ color: this.getColor(g.items, u) }}>
+                    {this.getUserTime(g.items, u)}
+                  </td>
+                ))}
+                <td  className="text-align-left">{this.getActivityTypeTime(g.groupName)}</td>
+              </tr>
+            ))}
+            <tr style={{height:15}}> </tr>
+            <tr>
+              <td>In hours Total</td>
+              {users.map((u) => (
+                <td  className="text-align-left" key={u} style={{ color: "" }}>
+                  {this.getUserTotalInHour(u)}
+                </td>
+              ))}
+              {/* <td>{this.getTotalInHour()}</td> */}
+            </tr>
+            <tr>
+              <td>Out of hours Total </td>
+              {users.map((u) => (
+                <td  className="text-align-left" key={u} style={{ color: "" }}>
+                  {this.getUserTotalOutHour(u)}
+                </td>
+              ))}
+              {/* <td>{this.getTotalOutHour()}</td> */}
+            </tr>
+            <tr style={{height:15}}> </tr>
+
+            <tr>
+              <td style={{ textAlign: "left" }}>Total</td>
+              {users.map((u) => (
+                <td  className="text-align-left" key={u} style={{ textAlign: "left" }}>
+                  {this.getUserTotal(u)}
+                </td>
+              ))}
+              {/* <th style={{textAlign:"left"}}>{this.getTotalTime()}</th> */}
+            </tr>
+          </tbody>
+        </table>
+        <table className="table table  " style={{ marginTop:20}} >
+          <tbody style={{fontWeight:"bold"}}>
           <tr>
-            <th  style={{textAlign:"left"}}>Total</th>
-            {users.map(u=><th key={u} style={{textAlign:"left"}}>{this.getUserTotal(u)}</th>)}
-            <th style={{textAlign:"left"}}>{this.getTotalTime()}</th>
+            <td>Chargeable Total (in hours)</td>
+            <td>{this.getTotalInHour()}</td>
           </tr>
-        </tfoot>
-      </table>
+          <tr>
+            <td>Chargeable Total (out of hours) </td>
+            <td>{this.getTotalOutHour()}</td>
+          </tr>
+          <tr style={{height:15}}> </tr>
+          <tr>
+            <td>Grand Total (in hours) </td>
+            <td>{this.getGrandTotalInHour()}</td>
+          </tr>
+
+          <tr>
+            <td>Grand Total (out of hours)</td>
+            <td>{this.getGrandTotalOutHour()}</td>
+          </tr>
+          </tbody>
+        </table>
       </div>
     );
   };
@@ -101,13 +163,13 @@ class TimeBreakdownComponent extends MainComponent {
   {
     const {data}=this.state;
     const items=data.filter(u=>u.sname==sname);
-    console.log(items);
+    //console.log(items);
     const sum=items.reduce((prev,cur)=>{
       if(cur)
         prev +=parseFloat(cur.inHours)+parseFloat(cur.outHours);
       return prev ;
     },0);
-    console.log(sum);
+    //console.log(sum);
     return sum.toFixed(2);
   }
   getTotalTime()
@@ -119,8 +181,65 @@ class TimeBreakdownComponent extends MainComponent {
       return prev;
     },0).toFixed(2);   
   }
+  getTotalInHour(){
+    const {data}=this.state;
+    const inTotal=data.reduce((prev,cur)=>{
+      if(cur&&(cur.caa_callacttypeno==4||cur.caa_callacttypeno==8))
+      return prev+parseFloat(cur.inHours);
+      else return prev;
+    },0).toFixed(2);
+    return inTotal;
+  }
+  getGrandTotalInHour(){
+    const {data}=this.state;
+    const inTotal=data.reduce((prev,cur)=>{
+      if(cur)
+      return prev+parseFloat(cur.inHours);
+      else return prev;
+    },0).toFixed(2);
+    return inTotal;
+  }
+  getUserTotalInHour(userName){
+    const {data}=this.state;
+    const inTotal=data.reduce((prev,cur)=>{
+      if(cur&&cur.sname==userName)
+      return prev+parseFloat(cur.inHours);
+      else return prev;
+    },0).toFixed(2);
+    return inTotal;
+  }
+  getGrandTotalOutHour(){
+    const {data}=this.state;
+    const outTotal=data.reduce((prev,cur)=>{
+      if(cur)
+        return prev+parseFloat(cur.outHours);
+      else return prev;
+    },0).toFixed(2);
+    return outTotal;
+  }
+  getTotalOutHour(){
+    const {data}=this.state;
+    const outTotal=data.reduce((prev,cur)=>{
+      if(cur&&(cur.caa_callacttypeno==4||cur.caa_callacttypeno==8))
+        return prev+parseFloat(cur.outHours);
+      else return prev;
+    },0).toFixed(2);
+    return outTotal;
+  }
+  getUserTotalOutHour(userName){
+    const {data}=this.state;
+    const outTotal=data.reduce((prev,cur)=>{
+      if(cur&&cur.sname==userName)
+      return prev+parseFloat(cur.outHours);
+      else return prev;
+    },0).toFixed(2);
+    return outTotal;
+  }
   render() {
-    return this.getTimeBreakdownElement();
+    return <div>
+      <Spinner show= {this.state.loading}></Spinner>
+     {this.getTimeBreakdownElement()}
+     </div>
   }
 }
 export default TimeBreakdownComponent;
