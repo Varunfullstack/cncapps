@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [v5.0.0]
 ### Added
 - Issue 1072 - Activity Breakdown within SR
+- Issue 1073 - IT Review Meeting Dates
 ### Changed
 - Issue 1053 - New email templates
 - Issue 810 - Heavy SQL usage improvements
