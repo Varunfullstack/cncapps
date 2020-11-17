@@ -1,6 +1,34 @@
 <?php
-require_once("config.inc.php");
 global $cfg;
+
+use CNCLTD\CustomerValidation\CustomerValidation;
+use CNCLTD\LoggerCLI;
+
+require_once(__DIR__ . "/../htdocs/config.inc.php");
+
+require_once($cfg ["path_bu"] . "/BUHeader.inc.php");
+require_once($cfg ["path_bu"] . "/BUMail.inc.php");
+
+$logName = 'CustomerValidation';
+$logger = new LoggerCLI($logName);
+
+// increasing execution time to infinity...
+ini_set('max_execution_time', 0);
+
+if (!is_cli()) {
+    echo 'This script can only be ran from command line';
+    exit;
+}
+// Script example.php
+$shortopts = "d";
+$longopts = [];
+$options = getopt($shortopts, $longopts);
+$debugMode = false;
+if (isset($options['d'])) {
+    $debugMode = true;
+}
+$thing = null;
+
 require_once($cfg['path_ct'] . '/CTContact.inc.php');
 require_once($cfg['path_bu'] . '/BUContact.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
@@ -17,12 +45,12 @@ $dsCustomers = new DataSet($thing);
 $buCustomer = new BUCustomer($thing);
 $buCustomer->getActiveCustomers($dsCustomers, true);
 $dbeContact = new DBEContact($thing);
-
+/** @var CustomerValidation[] $customersFailingValidation */
 $customersFailingValidation = [];
 
 while ($dsCustomers->fetchNext()) {
     $customerID = $dsCustomers->getValue(DBECustomer::customerID);
-    $customerValidation = new \CNCLTD\CustomerValidation\CustomerValidation(
+    $customerValidation = new CustomerValidation(
         $dsCustomers->getValue(DBECustomer::name),
         $customerID
     );
@@ -32,39 +60,14 @@ while ($dsCustomers->fetchNext()) {
 }
 
 if (!count($customersFailingValidation)) {
-    echo 'No Errors were found';
+    $logger->info('No Errors were found');
     return;
 }
 
 $buMail = new BUMail($thing);
 $body = $twig->render('@internal/contactValidationFailedEmail.html.twig', ["customers" => $customersFailingValidation]);
-echo $body;
+$logger->notice('We found errors, sending email');
 $senderEmail = "sales@" . CONFIG_PUBLIC_DOMAIN;
 $toEmail = "contactvalidation@" . CONFIG_PUBLIC_DOMAIN;
 $subject = "Customers with invalid contact configurations";
-$hdrs = array(
-    'From'         => $senderEmail,
-    'To'           => $toEmail,
-    'Subject'      => $subject,
-    'Date'         => date("r"),
-    'Content-Type' => 'text/html; charset=UTF-8'
-);
-
-$buMail->mime->setHTMLBody($body);
-
-$mime_params = array(
-    'text_encoding' => '7bit',
-    'text_charset'  => 'UTF-8',
-    'html_charset'  => 'UTF-8',
-    'head_charset'  => 'UTF-8'
-);
-$body = $buMail->mime->get($mime_params);
-
-$hdrs = $buMail->mime->headers($hdrs);
-
-$buMail->putInQueue(
-    $senderEmail,
-    $toEmail,
-    $hdrs,
-    $body
-);
+$buMail->sendSimpleEmail($body, $subject, $toEmail, $senderEmail);

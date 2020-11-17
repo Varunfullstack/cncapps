@@ -6,23 +6,28 @@
  * Time: 11:26
  */
 
-require_once("config.inc.php");
+require_once(__DIR__ . "/../htdocs/config.inc.php");
 global $cfg;
+
+$logName = 'LocalPCCNCAdminPasswordUpdate';
+$logger = new LoggerCLI($logName);
+
+// increasing execution time to infinity...
+ini_set('max_execution_time', 0);
+
 require_once($cfg["path_dbe"] . "/DBEPortalCustomerDocument.php");
 require_once($cfg["path_dbe"] . "/DBEOSSupportDates.php");
 require_once($cfg["path_dbe"] . "/DBEUser.inc.php");
 require_once($cfg["path_dbe"] . "/DBECustomer.inc.php");
 require_once($cfg['path_bu'] . '/BUPassword.inc.php');
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
-$logName = 'localPCCNCAdminPasswordUpdate';
-$logger = new \CNCLTD\LoggerCLI($logName);
+
 global $db;
 
 if (!is_cli()) {
     echo 'This script can only be ran from command line';
     exit;
 }
-
 
 // Script example.php
 $shortopts = "c:";  // Required value

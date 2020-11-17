@@ -9,15 +9,32 @@
 
 use CNCLTD\PendingTimeRequestsWithoutServiceRequestCollection;
 
-require_once("config.inc.php");
+require_once(__DIR__ . "/../htdocs/config.inc.php");
 global $cfg;
+
+$logName = 'SendPendingRequestsEmails';
+$logger = new LoggerCLI($logName);
+
+// increasing execution time to infinity...
+ini_set('max_execution_time', 0);
+
+if (!is_cli()) {
+    echo 'This script can only be ran from command line';
+    exit;
+}
+// Script example.php
+$shortopts = "d";
+$longopts = [];
+$options = getopt($shortopts, $longopts);
+$debugMode = false;
+if (isset($options['d'])) {
+    $debugMode = true;
+}
 require_once($cfg['path_dbe'] . '/DBECallActivity.inc.php');
 require_once($cfg["path_dbe"] . "/DBEJCallActivity.php");
 require_once($cfg["path_bu"] . "/BUActivity.inc.php");
 require_once($cfg["path_bu"] . "/BUHeader.inc.php");
 
-
-global $cfg;
 $thing = null;
 
 processTimeRequestsEmails();
