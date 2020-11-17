@@ -36,6 +36,9 @@ class ActivityEditComponent extends MainComponent {
         super(props);
         this.state = {
             ...this.state,
+            customerContactActivityDurationThresholdValue: null,
+            remoteSupportActivityDurationThresholdValue: null,
+            activityDurationWarned: false,
             _activityLoaded: false,
             uploadFiles: [],
             contacts: [],
@@ -159,6 +162,8 @@ class ActivityEditComponent extends MainComponent {
                 res.reasonTemplate = session.reasonTemplate || res.reasonTemplate;
             }
             Promise.all([
+                this.api.getCustomerContactActivityDurationThresholdValue(),
+                this.api.getRemoteSupportActivityDurationThresholdValue(),
                 this.apiCustomer.getCustomerContacts(res.customerId, res.contactID),
                 this.apiCustomer.getCustomerSites(res.customerId),
                 this.api
@@ -172,9 +177,9 @@ class ActivityEditComponent extends MainComponent {
                         return contracts;
                     }),
                 this.apiCustomer.getCustomerAssets(res.customerId)
-            ]).then((result) => {
-                const currentContact = result[0].find((c) => c.id == res.contactID);
-                let assets = sort(result[3], "name");
+            ]).then(([customerContactActivityDurationThresholdValue, remoteSupportActivityDurationThresholdValue, contacts, sites, contracts, assets]) => {
+                const currentContact = contacts.find((c) => c.id == res.contactID);
+                assets = sort(assets, "name");
                 assets = assets.map((asset) => {
                     if (
                         asset.BiosName.indexOf("VMware") >= 0 ||
@@ -182,17 +187,19 @@ class ActivityEditComponent extends MainComponent {
                     ) {
                         asset.BiosVer = "";
                     }
-                    // asset.name=padEnd(asset.name,150);
                     return asset;
                 });
 
                 this.setState({
+                    customerContactActivityDurationThresholdValue,
+                    remoteSupportActivityDurationThresholdValue,
+                    activityDurationWarned: false,
                     filters,
                     data: res,
                     currentActivity: res.callActivityID,
-                    contacts: result[0],
-                    sites: result[1],
-                    contracts: result[2],
+                    contacts,
+                    sites,
+                    contracts,
                     _activityLoaded: true,
                     currentContact,
                     assets
@@ -338,18 +345,22 @@ class ActivityEditComponent extends MainComponent {
                     )
                 );
                 const durationHours = duration.asHours();
-                const durationMinutes = duration.asMinutes();
-
                 if (data.endTime < data.startTime) {
                     this.alert("End time must be after start time!");
                     return false;
                 }
-                if ([4, 8, 11, 18].indexOf(data.callActTypeID) > -1) {
-                    if (data.actUserTeamId <= 4) {
-                        let usedTime = 0;
-                        let allocatedTime = 0;
-                        if (data.actUserTeamId == 1) {
-                        }
+                debugger;
+                console.log(durationHours, data.callActType, this.state.customerContactActivityDurationThresholdValue);
+                if (data.callActType.id === 11 && durationHours > this.state.customerContactActivityDurationThresholdValue) {
+                    const response = await this.confirm(`This Customer Contact is over ${this.state.customerContactActivityDurationThresholdValue} hours, are you sure this is the correct activity type?`);
+                    if (!response) {
+                        return false;
+                    }
+                }
+
+                if(data.callActType.id === 8 && durationHours > this.state.remoteSupportActivityDurationThresholdValue){
+                    if (!await this.confirm(`This Remote Support is over ${this.state.remoteSupportActivityDurationThresholdValue} hours, did you mean to put in these times for the activity?`)) {
+                        return false;
                     }
                 }
             }
@@ -691,13 +702,6 @@ class ActivityEditComponent extends MainComponent {
                 value: data?.alarmTime,
                 onChange: (value) => this.setValue("alarmTime", value),
             }) : null,
-            // data?.callActTypeID != 59
-            //   ? el(
-            //       "button",
-            //       { onClick: () => this.setNextStatus(this.activityStatus.Escalate) },
-            //       "Escalate"
-            //     )
-            //   : null,
             el(
                 "button",
                 {onClick: () => this.handleTemplateDisplay("changeRequest"), className: "btn-info"},

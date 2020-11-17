@@ -25,6 +25,8 @@ class CTSRActivity extends CTCNC
 {
     const GREEN = '#BDF8BA';
     const CONTENT = '#F4f4f2';
+    const GET_CUSTOMER_CONTACT_ACTIVITY_DURATION_THRESHOLD_VALUE = "getCustomerContactActivityDurationThresholdValue";
+    const GET_REMOTE_SUPPORT_ACTIVITY_DURATION_THRESHOLD_VALUE = "getRemoteSupportActivityDurationThresholdValue";
     public $serverGuardArray =
         array(
             ""  => "Please select",
@@ -124,6 +126,26 @@ class CTSRActivity extends CTCNC
             case "changeProblemPriority":
                 echo json_encode($this->changeProblemPriority());
                 exit;
+            case self::GET_CUSTOMER_CONTACT_ACTIVITY_DURATION_THRESHOLD_VALUE:
+            {
+                $buHeader = new BUHeader($this);
+                $dsHeader = new DataSet($this);
+                $buHeader->getHeader($dsHeader);
+                echo json_encode(
+                    ["status" => "ok", "data" => $dsHeader->getValue(DBEHeader::customerContactWarnHours)]
+                );
+                exit;
+            }
+            case self::GET_REMOTE_SUPPORT_ACTIVITY_DURATION_THRESHOLD_VALUE:
+            {
+                $buHeader = new BUHeader($this);
+                $dsHeader = new DataSet($this);
+                $buHeader->getHeader($dsHeader);
+                echo json_encode(
+                    ["status" => "ok", "data" => $dsHeader->getValue(DBEHeader::remoteSupportWarnHours)]
+                );
+                exit;
+            }
             default:
                 $this->setTemplate();
                 break;
@@ -731,31 +753,31 @@ class CTSRActivity extends CTCNC
                     return 'You cannot assign more time than left over';
                 }
             }
-            // check time exceed
-            $buHeader = new BUHeader($this);
-            $dsHeader = new DataSet($this);
-            $buHeader->getHeader($dsHeader);
-
-            if (
-                $dbeCallActivity->getValue(
-                    DBEJCallActivity::callActTypeID
-                ) == CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID &&
-                $durationHours > $dsHeader->getValue(DBEHeader::customerContactWarnHours)
-            ) {
-                return
-                    'Warning: Duration exceeds ' . $dsHeader->getValue(
-                        DBEHeader::customerContactWarnHours
-                    ) . ' hours';
-            }
-            if ($dbeCallActivity->getValue(
-                    DBEJCallActivity::callActTypeID
-                ) == CONFIG_REMOTE_TELEPHONE_ACTIVITY_TYPE_ID) {
-                if ($durationHours > $dsHeader->getValue(DBEHeader::remoteSupportWarnHours)) {
-                    return 'Warning: Activity duration exceeds ' . $dsHeader->getValue(
-                            DBEHeader::remoteSupportWarnHours
-                        ) . ' hours';
-                }
-            }
+//            // check time exceed
+//            $buHeader = new BUHeader($this);
+//            $dsHeader = new DataSet($this);
+//            $buHeader->getHeader($dsHeader);
+//
+//            if (
+//                $dbeCallActivity->getValue(
+//                    DBEJCallActivity::callActTypeID
+//                ) == CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID &&
+//                $durationHours > $dsHeader->getValue(DBEHeader::customerContactWarnHours)
+//            ) {
+//                return
+//                    'Warning: Duration exceeds ' . $dsHeader->getValue(
+//                        DBEHeader::customerContactWarnHours
+//                    ) . ' hours';
+//            }
+//            if ($dbeCallActivity->getValue(
+//                    DBEJCallActivity::callActTypeID
+//                ) == CONFIG_REMOTE_TELEPHONE_ACTIVITY_TYPE_ID) {
+//                if ($durationHours > $dsHeader->getValue(DBEHeader::remoteSupportWarnHours)) {
+//                    return 'Warning: Activity duration exceeds ' . $dsHeader->getValue(
+//                            DBEHeader::remoteSupportWarnHours
+//                        ) . ' hours';
+//                }
+//            }
         }
         return '';
     }

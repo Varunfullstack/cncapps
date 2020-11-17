@@ -123,6 +123,13 @@ class APIActivity extends APIMain {
     changeProblemPriority(body) {
         return this.post(`${ApiUrls.SRActivity}changeProblemPriority`, body).then(res => res.json());
     }
+
+    getCustomerContactActivityDurationThresholdValue() {
+        return fetch(`${ApiUrls.SRActivity}getCustomerContactActivityDurationThresholdValue`).then(res => res.json()).then(res => res.data);
+    }
+    getRemoteSupportActivityDurationThresholdValue() {
+        return fetch(`${ApiUrls.SRActivity}getRemoteSupportActivityDurationThresholdValue`).then(res => res.json()).then(res => res.data);
+    }
 }
 
 export default APIActivity;
