@@ -349,8 +349,6 @@ class ActivityEditComponent extends MainComponent {
                     this.alert("End time must be after start time!");
                     return false;
                 }
-                debugger;
-                console.log(durationHours, data.callActType, this.state.customerContactActivityDurationThresholdValue);
                 if (data.callActType.id === 11 && durationHours > this.state.customerContactActivityDurationThresholdValue) {
                     const response = await this.confirm(`This Customer Contact is over ${this.state.customerContactActivityDurationThresholdValue} hours, are you sure this is the correct activity type?`);
                     if (!response) {
