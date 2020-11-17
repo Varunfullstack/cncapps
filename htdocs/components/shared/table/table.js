@@ -45,7 +45,7 @@ class Table extends React.Component {
     componentDidMount() {
         if (this.props.allowRowOrder) {
             setTimeout(() => {
-                $("#table" + this.props.key + " tbody").sortable({
+                $("#table" + this.props.id + " tbody").sortable({
                     helper: this.fixHelperModified,
                     stop: this.updateIndex
                 }).disableSelection()
@@ -176,18 +176,18 @@ class Table extends React.Component {
             )
             ,
             el("table", {
-                key: "table" + this.props.key,
-                id: "table" + this.props.key,
+                key: "table" + this.props.id,
+                id: "table" + this.props.id,
                 className: "table table-striped"
             }, [
                 el(TableHeader, {
-                    key: "tableHeader",
+                    id: "tableHeader",
                     columns: columns,
                     sortColumn: sortColumn,
                     onSort: this.handleSort,
                 }),
                 filterData.length > 0 ? el(TableBody, {
-                        key: "tableBody",
+                        id: "tableBody",
                         data: filterData,
                         columns,
                         pk,
@@ -195,7 +195,7 @@ class Table extends React.Component {
                         selectedKey,
                     })
                     : null,
-                hasFooter ? el(TableFooter, {key: "tableFooter", columns}) : null
+                hasFooter ? el(TableFooter, {id: "tableFooter", columns}) : null
             ]),
         ];
     }

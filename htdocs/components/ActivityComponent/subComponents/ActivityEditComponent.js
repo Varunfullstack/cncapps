@@ -1425,7 +1425,7 @@ class ActivityEditComponent extends MainComponent {
             el("label", {className: "label m-5", style: {display: "block"}}, "Documents"),
             data?.documents.length > 0
                 ? el(Table, {
-                    key: "documents",
+                    id: "documents",
                     data: data?.documents || [],
                     columns: columns,
                     pk: "id",

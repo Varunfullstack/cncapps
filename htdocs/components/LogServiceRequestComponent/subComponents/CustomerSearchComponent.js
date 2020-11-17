@@ -234,7 +234,7 @@ class CustomerSearchComponent extends React.Component {
             .sort((a, b) => (a.order > b.order ? 1 : -1));
 
         return el(Table, {
-            key: "customers",
+            id: "customers",
             data: customers || [],
             columns: columns,
             pk: "con_contno",

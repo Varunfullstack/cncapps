@@ -343,7 +343,7 @@ class InboxOpenSRComponent extends React.Component {
             .sort((a, b) => (a.order > b.order ? 1 : -1));
         const {data} = this.state;
         return el(Table, {
-            key: "helpDesk",
+            id: "helpDesk",
             data: data || [],
             columns: columns,
             pk: "problemID",

@@ -178,7 +178,7 @@ class NewOrderComponent extends React.Component {
 
         return this.el('div', {key: "tableContainer", style: {maxWidth: 1200, overflowY: 'auto', maxHeight: 600}},
             this.el(Table, {
-                key: "lines",
+                id: "lines",
                 data: filteredProductList || [],
                 columns: columns,
                 defaultSortPath: "skuType",
@@ -244,7 +244,7 @@ class NewOrderComponent extends React.Component {
 
             return this.el("div", {key: "cartContainer", style: {width: 1200}}, [
                 this.el(Table, {
-                    key: "cartItems",
+                    id: "cartItems",
                     data: items || [],
                     columns: columns,
                     defaultSortPath: "sku",

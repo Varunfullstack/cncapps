@@ -6,6 +6,7 @@ import ReactDOM from 'react-dom';
 
 import './../style.css';
 import './../SDManagerDashboardComponent/SDManagerDashboardComponent.css';
+import TimeBreakdownComponent from "../ActivityComponent/subComponents/TimeBreakdownComponent";
 
 class PopUpComponent extends MainComponent {
     el = React.createElement
@@ -21,6 +22,8 @@ class PopUpComponent extends MainComponent {
         if (action === "dailyStats") {
             return el(DailyStatsComponent);
         }
+        if(action==="timeBreakdown")
+            return el(TimeBreakdownComponent);
 
         return el('label', null, "Not Found")
     }

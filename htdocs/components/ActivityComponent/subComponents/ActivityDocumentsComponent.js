@@ -110,7 +110,7 @@ class ActivityDocumentsComponent extends MainComponent {
             ),
             documents?.length > 0
                 ? el(Table, {
-                    key: "documents",
+                    id: "documents",
                     data: documents,
                     columns: columns,
                     pk: "id",

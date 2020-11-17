@@ -161,7 +161,7 @@ class InboxToBeLoggedComponent extends React.Component {
         const {data} = this.props;
 
         return el(Table, {
-            key: "tobeLogged",
+            id: "tobeLogged",
             data: data || [],
             columns: columns,
             pk: "cpCustomerProblemID",

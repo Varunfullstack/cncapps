@@ -115,7 +115,7 @@ class CustomerSRComponent extends React.Component {
             .sort((a, b) => (a.order > b.order ? 1 : -1));
 
         return el(Table, {
-            key: "Sr",
+            id: "Sr",
             data: items || [],
             columns: columns,
             pk: "activityID",

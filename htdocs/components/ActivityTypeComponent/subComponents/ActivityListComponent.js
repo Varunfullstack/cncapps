@@ -269,7 +269,7 @@ class ActivityListComponent extends MainComponent {
             {style: {width: filterColumn != 'all' ? 500 : "100%"}},
             this.getColumnsFilter(),
             this.el(Table, {
-                key: "activityList",
+                id: "activityList",
                 data: types || [],
                 columns: columnsFilter,
                 pk: "callActTypeID",

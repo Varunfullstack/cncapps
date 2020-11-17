@@ -87,8 +87,8 @@ class CTUser extends CTCNC
             $cookieVars,
             $cfg
         );
-        $noPermissionList = ["all", "active", "getCurrentUser"];
         $roles = SENIOR_MANAGEMENT_PERMISSION;
+        $noPermissionList=["all","active","getCurrentUser"];
         $key = array_search(@$_REQUEST["action"], $noPermissionList);
         if (false === $key)
             if (!self::hasPermissions($roles)) {

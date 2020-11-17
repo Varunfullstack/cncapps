@@ -334,7 +334,7 @@ class SDManagerDashboardComponent extends MainComponent {
                 },
             ]
             return el(Table, {
-                key: "queueData",
+                id: "queueData",
                 data: queueData || [],
                 columns: columns,
                 pk: "problemID",
@@ -371,7 +371,7 @@ class SDManagerDashboardComponent extends MainComponent {
             ]
             return el('div', {style: {width: 500}},
                 el(Table, {
-                    key: "queueData",
+                    id: "queueData",
                     data: queueData || [],
                     columns: columns,
                     pk: "customerID",

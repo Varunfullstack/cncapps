@@ -281,6 +281,13 @@ class ActivityDisplayComponent extends MainComponent {
                     href: `Activity.php?action=addToCalendar&callActivityID=${data?.callActivityID}`
                 })
             }),
+            el(ToolTip, {
+                title: "Time Breakdown",
+                content: el('a', {
+                    className: "fal fa-calculator-alt fa-2x m-5 pointer icon",                    
+                    onClick: () => window.open(`Popup.php?action=timeBreakdown&problemID=${data?.problemID}`, 'popup', 'width=800,height=400')
+                })
+            }),
             data?.allowSCRFlag == 'Y' ? el(ToolTip, {
                 title: "Send client a visit confirmation email",
                 content: el('i', {
@@ -450,7 +457,7 @@ class ActivityDisplayComponent extends MainComponent {
                 },
             ]
             return el('div', {style: {width: 300}}, el(Table, {
-                key: "onSiteActivities",
+                id: "onSiteActivities",
                 data: onSiteActivities || [],
                 columns: columns,
                 pk: "callActivityID",
@@ -757,7 +764,7 @@ class ActivityDisplayComponent extends MainComponent {
         return el('div', {className: "activities-container"},
             el('label', {style: {display: "block"}}, "Documents"),
             data?.documents.length > 0 ? el(Table, {
-                key: "documents",
+                id: "documents",
                 data: data?.documents || [],
                 columns: columns,
                 pk: "id",
@@ -843,7 +850,7 @@ class ActivityDisplayComponent extends MainComponent {
             return el('div', {className: "activities-container"},
                 el('label', {style: {display: "block"}}, "Expenses"),
                 el(Table, {
-                    key: "expenses",
+                    id: "expenses",
                     data: data?.expenses || [],
                     columns: columns,
                     pk: "id",

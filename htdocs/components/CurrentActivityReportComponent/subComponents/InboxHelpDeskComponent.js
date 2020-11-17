@@ -332,7 +332,7 @@ class InboxHelpDeskComponent extends React.Component {
         const {data} = this.props;
 
         return el(Table, {
-            key: "helpDesk",
+            id: "helpDesk",
             data: data || [],
             columns: columns,
             pk: "problemID",

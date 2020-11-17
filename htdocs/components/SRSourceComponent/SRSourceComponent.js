@@ -307,7 +307,7 @@ class SRSourceComponent extends React.Component {
         const {result} = this.state.search;
         if (result != null) {
             return this.el(Table, {
-                key: 'reaulttable',
+                id: 'reaulttable',
                 data: result,
                 columns: columns,
                 defaultSortPath: 'CallReference',

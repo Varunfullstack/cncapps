@@ -51,7 +51,7 @@ class OrderHistoryModalComponent extends React.Component {
 
             //prepare body
             const body = el(Table, {
-                key: "items",
+                id: "items",
                 data: items || [],
                 columns: columns,
                 defaultSortPath: "createdOn",

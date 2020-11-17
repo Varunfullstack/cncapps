@@ -126,6 +126,9 @@ class CTSRActivity extends CTCNC
             case "changeProblemPriority":
                 echo json_encode($this->changeProblemPriority());
                 exit;
+            case "usedBudgetData":
+                echo json_encode($this->usedBudgetData());
+                exit;
             case self::GET_CUSTOMER_CONTACT_ACTIVITY_DURATION_THRESHOLD_VALUE:
             {
                 $buHeader = new BUHeader($this);
@@ -753,31 +756,6 @@ class CTSRActivity extends CTCNC
                     return 'You cannot assign more time than left over';
                 }
             }
-//            // check time exceed
-//            $buHeader = new BUHeader($this);
-//            $dsHeader = new DataSet($this);
-//            $buHeader->getHeader($dsHeader);
-//
-//            if (
-//                $dbeCallActivity->getValue(
-//                    DBEJCallActivity::callActTypeID
-//                ) == CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID &&
-//                $durationHours > $dsHeader->getValue(DBEHeader::customerContactWarnHours)
-//            ) {
-//                return
-//                    'Warning: Duration exceeds ' . $dsHeader->getValue(
-//                        DBEHeader::customerContactWarnHours
-//                    ) . ' hours';
-//            }
-//            if ($dbeCallActivity->getValue(
-//                    DBEJCallActivity::callActTypeID
-//                ) == CONFIG_REMOTE_TELEPHONE_ACTIVITY_TYPE_ID) {
-//                if ($durationHours > $dsHeader->getValue(DBEHeader::remoteSupportWarnHours)) {
-//                    return 'Warning: Activity duration exceeds ' . $dsHeader->getValue(
-//                            DBEHeader::remoteSupportWarnHours
-//                        ) . ' hours';
-//                }
-//            }
         }
         return '';
     }
@@ -1282,6 +1260,106 @@ class CTSRActivity extends CTCNC
         }
         return null;
     }
+
+    function usedBudgetData()
+    {
+        $problemID=$_REQUEST["problemID"];
+        $startTime = '08:00';
+        $endTime = '18:00';
+
+        // here we get the information about the inHours and outOfHours time used
+        $query = "SELECT 
+  ROUND(
+      COALESCE(
+          SUM(
+        IF(
+        isBankHoliday (`caa_date`),
+          0,
+          TIME_TO_SEC(
+            IF(
+                caa_endtime < '$startTime',
+              '$startTime',
+              IF(
+                  caa_endtime > '$endTime',
+                '$endTime',
+                caa_endtime
+              )
+            )
+          ) - TIME_TO_SEC(
+            IF(
+                caa_starttime >= '$startTime',
+              IF(
+                  caa_starttime > '$endTime',
+                '$endTime',
+                caa_starttime
+              ),
+              '$startTime'
+            )
+          )
+        )
+      ) / 3600,
+      0
+    ),
+    2
+  ) AS inHours,
+  ROUND(
+      COALESCE(
+          SUM(
+        IF(
+        isBankHoliday (`caa_date`),
+          COALESCE(
+              TIME_TO_SEC(caa_endtime) - TIME_TO_SEC(caa_starttime),
+              0
+          ),
+          IF(
+              caa_starttime < '$startTime',
+            COALESCE(
+                TIME_TO_SEC(IF(caa_endtime >  '$startTime',  '$startTime', caa_endtime)) - TIME_TO_SEC(caa_starttime),
+                0
+            ),
+            0
+          ) + IF(
+        caa_endtime > '$endTime',
+            COALESCE(
+                TIME_TO_SEC(caa_endtime) - TIME_TO_SEC(IF(caa_starttime < '$endTime', '$endTime', caa_starttime)),
+                0
+            ),
+            0
+          )
+        )
+      ) / 3600,
+      0
+    ),
+    2
+  ) AS outHours,
+  callactivity.`caa_callacttypeno`,
+  callacttype.`cat_desc`,
+  callactivity.`caa_consno`,
+  consultant.`firstName`,
+  consultant.`lastName` 
+FROM
+  callactivity 
+  LEFT JOIN problem 
+    ON callactivity.`caa_problemno` = problem.`pro_problemno` 
+  LEFT JOIN callacttype 
+    ON callactivity.`caa_callacttypeno` = callacttype.`cat_callacttypeno` 
+  LEFT JOIN consultant 
+    ON `callactivity`.`caa_consno` = consultant.`cns_consno` 
+WHERE problem.`pro_problemno` = $problemID and caa_starttime <> '' and caa_starttime is not null and caa_endtime <> '' and caa_endtime is not null 
+and callactivity.`caa_callacttypeno` <> 51 and callactivity.`caa_callacttypeno` <> 60 and callactivity.`caa_callacttypeno` <> 35 and caa_consno <> 67
+GROUP BY caa_callacttypeno,
+  caa_consno";
+
+        global $db;
+
+        $db->query($query);
+        $data = [];
+        while ($db->next_record(MYSQLI_ASSOC)) {
+            $data[] = $db->Record;
+        }
+        return $data;
+    }
+
 }
 
 ?>

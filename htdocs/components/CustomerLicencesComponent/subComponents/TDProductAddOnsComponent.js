@@ -42,7 +42,7 @@ class TDProductAddOnsComponent extends React.Component {
         ];
         if (addOns) {
             return this.el(Table, {
-                key: 'skuName',
+                id: 'skuName',
                 data: addOns || [],
                 columns: columns,
                 defaultSortPath: 'skuName',

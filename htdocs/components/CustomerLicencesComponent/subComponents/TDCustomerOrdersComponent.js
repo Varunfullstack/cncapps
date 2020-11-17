@@ -236,7 +236,7 @@ class TDCustomerOrdersComponent extends React.Component {
 
             return [totalElement,
                 this.el(Table, {
-                    key: "subscriptions",
+                    id: "subscriptions",
                     data: results || [],
                     columns: columns,
                     defaultSortPath: "lineStatus",
@@ -699,7 +699,7 @@ class TDCustomerOrdersComponent extends React.Component {
             return [
                 totalElement,
                 el(Table, {
-                    key: "addOns",
+                    id: "addOns",
                     data: allAddOns || [],
                     columns: columns,
                     defaultSortPath: "quantity",

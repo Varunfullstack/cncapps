@@ -297,7 +297,7 @@ class InboxPendingReopenedComponent extends MainComponent {
         const {data} = this.props;
 
         return el(Table, {
-            key: "pendingReopend",
+            id: "pendingReopend",
             data: data || [],
             columns: columns,
             pk: "pendingReopenSR",

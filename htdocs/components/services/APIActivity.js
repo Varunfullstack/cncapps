@@ -130,6 +130,11 @@ class APIActivity extends APIMain {
     getRemoteSupportActivityDurationThresholdValue() {
         return fetch(`${ApiUrls.SRActivity}getRemoteSupportActivityDurationThresholdValue`).then(res => res.json()).then(res => res.data);
     }
+
+    getTimeBreakdown(problemId)
+    {
+        return this.get(`${ApiUrls.SRActivity}usedBudgetData&problemID=${problemId}`)
+    }
 }
 
 export default APIActivity;

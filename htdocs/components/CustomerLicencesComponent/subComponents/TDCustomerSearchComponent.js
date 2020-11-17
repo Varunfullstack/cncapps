@@ -146,7 +146,7 @@ class TDCustomerSearchComponent extends React.Component {
         ];
         {
             return this.el(Table, {
-                key: "reaulttable",
+                id: "reaulttable",
                 data: filteredResult || [],
                 columns: columns,
                 defaultSortPath: "cncCustName",
