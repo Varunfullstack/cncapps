@@ -14,6 +14,7 @@ import MainComponent from "../../shared/MainComponent.js";
 import APIStandardText from "../../services/APIStandardText.js";
 import Modal from "../../shared/Modal/modal";
 import React from 'react';
+import moment from "moment";
 
 class ActivityEditComponent extends MainComponent {
     el = React.createElement;
@@ -267,8 +268,7 @@ class ActivityEditComponent extends MainComponent {
     };
     isValid = async (data) => {
 
-        if (data.callActTypeID == "") {
-            //this.alert("Please select Activity Type");
+        if (!data.callActTypeID) {
             this.alert("Please select Activity Type");
             return false;
         }
@@ -276,7 +276,7 @@ class ActivityEditComponent extends MainComponent {
             this.alert("Please select Customer Site");
             return false;
         }
-        if (data.contactID == "") {
+        if (!data.contactID) {
             this.alert("Please select Contact");
             return false;
         }
@@ -808,52 +808,53 @@ class ActivityEditComponent extends MainComponent {
     };
     checkCncAction = async (data, type) => {
 
-        if (type && type.catRequireCNCNextActionCNCAction == 1 && (data.cncNextActionTemplate == '' || data.cncNextActionTemplate == null)) {
+        if (type && type.catRequireCNCNextActionCNCAction == 1 && !data.cncNextActionTemplate) {
             this.alert(`CNC Next Action is required for ${type.description} when the next action is CNC Action`)
             return false;
         }
-        if (type && type.catRequireCNCNextActionCNCAction == 2 && (data.cncNextActionTemplate == '' || data.cncNextActionTemplate == null)) {
+        if (type && type.catRequireCNCNextActionCNCAction == 2 && !data.cncNextActionTemplate) {
             if (!await this.confirm(`Are you sure you don't want to put an entry for CNC Next Action?`))
                 return false;
         }
         if (data.hideFromCustomerFlag != 'Y' && data.problemHideFromCustomerFlag != 'Y') {
-            if (type && type.catRequireCustomerNoteCNCAction == 1 && (data.customerNotesTemplate == '' || data.customerNotesTemplate == null)) {
+            if (type && type.catRequireCustomerNoteCNCAction == 1 && !data.customerNotesTemplate) {
                 this.alert(`Customer Notes are required for ${type.description} when the next action is CNC Action`)
                 return false;
             }
-            if (type && type.catRequireCustomerNoteCNCAction == 2 && (data.customerNotesTemplate == '' || data.customerNotesTemplate == null)) {
+            if (type && type.catRequireCustomerNoteCNCAction == 2 && !data.customerNotesTemplate) {
                 if (!await this.confirm(`Are you sure you don't want to put an entry for Customer Notes?`))
                     return false;
             }
         }
-        if (data.hideFromCustomerFlag == 'Y' && data.problemHideFromCustomerFlag != 'Y' && data.customerNotesTemplate != '') {
+        if (data.hideFromCustomerFlag == 'Y' && data.problemHideFromCustomerFlag != 'Y' && data.customerNotesTemplate) {
+            console.log(data.hideFromCustomerFlag, data.problemHideFromCustomerFlag, data.customerNotesTemplate);
             this.alert(`Hide from customer can't be set because there is a customer note`);
             return false;
         }
         return true;
     }
     checkOnHold = async (data, type) => {
-        if (type && type.catRequireCNCNextActionOnHold == 1 && (data.cncNextActionTemplate == '' || data.cncNextActionTemplate == null)) {
+        if (type && type.catRequireCNCNextActionOnHold == 1 && !data.cncNextActionTemplate) {
             this.alert(`CNC Next Action is required for ${type.description} when the next action is On Hold`)
             return false;
         }
-        if (type && type.catRequireCNCNextActionOnHold == 2 && (data.cncNextActionTemplate == '' || data.cncNextActionTemplate == null)) {
+        if (type && type.catRequireCNCNextActionOnHold == 2 && !data.cncNextActionTemplate) {
             if (!await this.confirm(`Are you sure you don't want to put an entry for CNC Next Action?`))
                 return false;
 
         }
         if (data.hideFromCustomerFlag != 'Y' && data.problemHideFromCustomerFlag != 'Y') {
-            if (type && type.catRequireCustomerNoteOnHold == 1 && (data.customerNotesTemplate == '' || data.customerNotesTemplate == null)) {
+            if (type && type.catRequireCustomerNoteOnHold == 1 && !data.customerNotesTemplate) {
                 this.alert(`Customer Notes are required for ${type.description} when the next action is On Hold`)
                 return false;
             }
-            if (type && type.catRequireCustomerNoteOnHold == 2 && (data.customerNotesTemplate == '' || data.customerNotesTemplate == null)) {
+            if (type && type.catRequireCustomerNoteOnHold == 2 && !data.customerNotesTemplate) {
 
                 if (!await this.confirm(`Are you sure you don't want to put an entry for Customer Notes?`))
                     return false;
             }
         }
-        if (data.hideFromCustomerFlag == 'Y' && data.problemHideFromCustomerFlag != 'Y' && data.customerNotesTemplate != '') {
+        if (data.hideFromCustomerFlag == 'Y' && data.problemHideFromCustomerFlag != 'Y' && !data.customerNotesTemplate) {
             this.alert(`Hide from customer can't be set because there is a customer note`);
             return false;
         }
@@ -1273,7 +1274,6 @@ class ActivityEditComponent extends MainComponent {
                     null,
                     this.getElementControl("Contact", "Contact",
                         this.getContactsElement(),
-                        // ...this.getContactPhone(),
                     ),
                     data?.problemHideFromCustomerFlag == "N" ? el(
                         "td",
@@ -1288,15 +1288,15 @@ class ActivityEditComponent extends MainComponent {
                     data?.problemHideFromCustomerFlag == "N" ? el(
                         "td",
                         {key: "td2"},
-
                         el(Toggle, {
-                            disabled: (data?.hideFromCustomerFlag == "Y" || data?.problemHideFromCustomerFlag == "Y"),
+                            disabled: data?.problemHideFromCustomerFlag == "Y",
                             checked: data?.hideFromCustomerFlag == "Y" ? true : false,
-                            onChange: (value) =>
+                            onChange: ($event) => {
                                 this.setValue(
                                     "hideFromCustomerFlag",
-                                    data?.hideFromCustomerFlag == "Y" ? "N" : "Y"
-                                ),
+                                    $event.target.checked ? "Y" : "N"
+                                )
+                            }
                         }),
                     ) : null,
                     this.getElementControl(
