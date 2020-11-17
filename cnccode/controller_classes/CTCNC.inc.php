@@ -383,7 +383,7 @@ class CTCNC extends Controller
             "StarterLeaverManagement.php"
         );
 
-       
+
         if ($this->isUserSDManager()) {
             $menu->addSection(
                 "SDManagement",
@@ -392,8 +392,7 @@ class CTCNC extends Controller
                 "SD Management"
             );
         }
-       
-        
+
 
         $this->addConditionalMenu(
             $menu,
@@ -632,18 +631,8 @@ class CTCNC extends Controller
 
     private function getDefaultSDManagerMenu()
     {
-        
-        $items=[
-            // [
-            //     "id"    => 222,
-            //     "label" => "Manager Dashboard",
-            //     "href"  => "SDManagerDashboard.php?action=react"
-            // ],
-            // [
-            //     "id"    => 201,
-            //     "label" => "Manager Dashboard P5",
-            //     "href"  => "SDManagerDashboard.php?showP5=true&SP"
-            // ],
+
+        $items = [
             [
                 "id"    => 202,
                 "label" => "Time Requests",
@@ -747,15 +736,19 @@ class CTCNC extends Controller
                 "href"  => "PasswordServices.php"
             ],
         ];
-        if( $this->dbeUser->getValue(DBEUser::changeInitialDateAndTimeFlag)=='Y')
-        $items= array_merge(
-            [[
-                "id"    => 201,
-                "label" => "SD Management",
-                "href"  => "SDManagerDashboard.php?action=react"
-            ]],$items);        
+        if ($this->dbeUser->getValue(DBEUser::changeInitialDateAndTimeFlag) == 'Y')
+            $items = array_merge(
+                [
+                    [
+                        "id"    => 201,
+                        "label" => "SD Management",
+                        "href"  => "SDManagerDashboard.php"
+                    ]
+                ],
+                $items
+            );
         return $items;
-        
+
     }
 
     protected function isAppraiser()
@@ -1191,6 +1184,35 @@ class CTCNC extends Controller
         return ($flag == 'N' ? null : CT_CHECKED);
     }
 
+    function getLabtechDB()
+    {
+        $dsn = 'mysql:host=' . LABTECH_DB_HOST . ';dbname=' . LABTECH_DB_NAME;
+        $options = [
+            PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
+        ];
+        $labtechDB = new PDO(
+            $dsn,
+            LABTECH_DB_USERNAME,
+            LABTECH_DB_PASSWORD,
+            $options
+        );
+        return $labtechDB;
+    }
+
+    function getFullPath()
+    {
+        // redirect to new page
+        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
+            $url = "https://";
+        else
+            $url = "http://";
+        // Append the host(domain name, ip) to the URL.
+        $url .= $_SERVER['HTTP_HOST'];
+        // Append the requested resource location to the URL
+        $url .= $_SERVER['REQUEST_URI'];
+        return $url;
+    }
+
     protected function isExpenseApprover()
     {
         return $this->dbeUser->getValue(DBEUser::isExpenseApprover) || $this->dbeUser->getValue(
@@ -1241,32 +1263,5 @@ class CTCNC extends Controller
             $js_code = '<script>' . $js_code . '</script>';
         }
         echo $js_code;
-    }
-    function getLabtechDB()
-    {
-        $dsn = 'mysql:host=' . LABTECH_DB_HOST . ';dbname=' . LABTECH_DB_NAME;
-        $options = [
-            PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
-        ];
-        $labtechDB = new PDO(
-            $dsn,
-            LABTECH_DB_USERNAME,
-            LABTECH_DB_PASSWORD,
-            $options
-        );
-        return  $labtechDB;
-    }
-    function getFullPath()
-    {
-        // redirect to new page
-        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
-            $url = "https://";
-        else
-            $url = "http://";
-        // Append the host(domain name, ip) to the URL.   
-        $url .= $_SERVER['HTTP_HOST'];
-        // Append the requested resource location to the URL   
-        $url .= $_SERVER['REQUEST_URI'];
-        return $url;
     }
 }

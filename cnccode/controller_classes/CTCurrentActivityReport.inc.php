@@ -523,10 +523,6 @@ class CTCurrentActivityReport extends CTCNC
                     "teamID"            => $dbeUser->getValue(DBEUser::teamID),
                 );
             array_push($allocatedUser, $userRow);
-            // if ($dbeUser->getValue(DBEUser::appearInQueueFlag) == 'Y') {
-
-            //     $this->filterUser[$dbeUser->getValue(DBEUser::userID)] = $userRow;
-            // }
         }
         return json_encode($allocatedUser);
     }
@@ -682,8 +678,7 @@ class CTCurrentActivityReport extends CTCNC
     }
 
     /**
-     * @param $pendingReopenedID
-     * @param $result
+     * @return int
      * @throws Exception
      */
     private function processPendingReopened()
@@ -693,18 +688,11 @@ class CTCurrentActivityReport extends CTCNC
         $result = $body->result;
         if (isset($pendingReopenedID) && isset($result)) {
             $dbePendingReopened = new DBEPendingReopened($this);
-            switch ($result) {
-                case 'R':
-                {
-                    $dbePendingReopened->getRow($pendingReopenedID);
-                    $this->buActivity->approvePendingReopened($dbePendingReopened);
-                    break;
-                }
-                case 'D':
-                {
-                    $dbePendingReopened->deleteRow($pendingReopenedID);
-                    break;
-                }
+            if ($result == 'R') {
+                $dbePendingReopened->getRow($pendingReopenedID);
+                $this->buActivity->approvePendingReopened($dbePendingReopened);
+            } elseif ($result == 'D') {
+                $dbePendingReopened->deleteRow($pendingReopenedID);
             }
             return 1;
         }
