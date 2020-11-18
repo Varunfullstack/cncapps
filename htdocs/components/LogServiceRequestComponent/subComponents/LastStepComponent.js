@@ -75,7 +75,6 @@ class LastStepComponent extends MainComponent {
             notFirstTimeFixOptions: result[3],
             data,
         });
-        this.checkStartWorkNow();
     };
     getChkProblemBefore = () => {
         const {el, handleCheckBoxChange} = this;
@@ -157,7 +156,6 @@ class LastStepComponent extends MainComponent {
     };
     handleNext = () => {
         const {data} = this.state;
-        this.checkStartWorkNow();
         data.userID = null;
         data.completeDate = null;
         if (this.isValid()) this.props.updateSRData(data, true);
@@ -439,27 +437,6 @@ class LastStepComponent extends MainComponent {
 
     };
 
-    checkStartWorkNow = async () => {
-        const {currentUser} = this.props.data;
-        const {customer} = this.props.data;
-        const {data} = this.state;
-        const result = true;
-        let _showModal = false;
-        let modalType = null;
-        if (
-            customer.hasServiceDesk != null &&
-            currentUser.teamID == TeamType.Helpdesk &&
-            data.notStartWorkReason == "" &&
-            !data.startWork
-        ) {
-            if (!await this.confirm("Do you want to start working on this now?")) {
-                _showModal = true;
-                modalType = this.modalType.notStartWorkReason;
-            } else data.startWork = true;
-        }
-        if (result) this.setState({data, _showModal, modalType});
-        return true;
-    };
     isValid = () => {
         const {data, requireAuthorize} = this.state;
         const {currentUser} = this.props.data;
