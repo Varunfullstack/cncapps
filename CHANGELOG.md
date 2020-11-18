@@ -2,6 +2,8 @@
 This project changes will be shown here.
 
 ## [v5.0.0]
+### Added
+- Issue 1080 - Add items to a contract
 ### Changed
 - Issue 1053 - New email templates
 
