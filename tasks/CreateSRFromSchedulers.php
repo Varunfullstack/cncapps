@@ -1,13 +1,5 @@
 <?php
 
-
-/**
- * Created by PhpStorm.
- * User: fizdalf
- * Date: 17/12/2018
- * Time: 11:26
- */
-
 use CNCLTD\LoggerCLI;
 
 require_once(__DIR__ . "/../htdocs/config.inc.php");

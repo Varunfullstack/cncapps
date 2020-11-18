@@ -1,10 +1,5 @@
 <?php
 
-/**
- * Created by Mustafa Taha. *
- * Date: 20/07/2020
- */
-
 use CNCLTD\Exceptions\MissingLicenseException;
 use CNCLTD\LoggerCLI;
 use CNCLTD\StreamOneProcessing\ContractData;

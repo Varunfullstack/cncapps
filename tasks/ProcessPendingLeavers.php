@@ -1,18 +1,34 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: fizdalf
- * Date: 14/02/2019
- * Time: 10:59
- */
+use CNCLTD\LoggerCLI;
 
-require_once("config.inc.php");
+require_once(__DIR__ . "/../htdocs/config.inc.php");
 global $cfg;
+
+$logName = 'ProcessPendingLeavers';
+$logger = new LoggerCLI($logName);
+
+// increasing execution time to infinity...
+ini_set('max_execution_time', 0);
+
+if (!is_cli()) {
+    echo 'This script can only be ran from command line';
+    exit;
+}
+// Script example.php
+$shortopts = "d";
+$longopts = [
+    "toScreen"
+];
+$options = getopt($shortopts, $longopts);
+$debugMode = false;
+if (isset($options['d'])) {
+    $debugMode = true;
+}
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 require_once($cfg["path_bu"] . '/BUContact.inc.php');
 
 
-$outputToScreen = isset($_GET['toScreen']);
+$outputToScreen = isset($options['toScreen']);
 $something = null;
 $buContact = new BUContact($something);
 

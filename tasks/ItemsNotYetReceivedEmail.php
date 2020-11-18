@@ -1,17 +1,33 @@
 <?php
-/**
- * notify certain CNC users about outstanding support calls
- *
- * called as scheduled task at given time every day
- *
- * @authors Karim Ahmed - Sweet Code Limited
- */
+use CNCLTD\LoggerCLI;
 
-require_once("config.inc.php");
+require_once(__DIR__ . "/../htdocs/config.inc.php");
+global $cfg;
+
+$logName = 'DailySalesRequestEmail';
+$logger = new LoggerCLI($logName);
+
+// increasing execution time to infinity...
+ini_set('max_execution_time', 0);
+
+if (!is_cli()) {
+    echo 'This script can only be ran from command line';
+    exit;
+}
+// Script example.php
+$shortopts = "d";
+$longopts = [
+    "toScreen"
+];
+$options = getopt($shortopts, $longopts);
+$debugMode = false;
+if (isset($options['d'])) {
+    $debugMode = true;
+}
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 require_once($cfg["path_bu"] . '/BUItemsNotYetReceived.php');
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
-$outputToScreen = isset($_GET['toScreen']);
+$outputToScreen = isset($options['toScreen']);
 $thing = null;
 $buItemsNotYetReceived = new BUItemsNotYetReceived($thing);
 
@@ -24,7 +40,6 @@ $headers .= "Content-Type: text/html";
 
 
 $result = $buItemsNotYetReceived->getItemsNotYetReceived();
-
 
 usort(
     $result,
@@ -60,33 +75,10 @@ if (!$outputToScreen) {
     $buMail = new BUMail($thing);
 
     $toEmail = 'unreceivedpo@' . CONFIG_PUBLIC_DOMAIN;
+    $subject = 'Purchase Order Status Report';
+    $fromEmail = CONFIG_SALES_EMAIL;
 
-    $hdrs = array(
-        'From'         => CONFIG_SALES_EMAIL,
-        'To'           => $toEmail,
-        'Subject'      => 'Purchase Order Status Report',
-        'Date'         => date("r"),
-        'Content-Type' => 'text/html; charset=UTF-8'
-    );
-
-    $buMail->mime->setHTMLBody($body);
-
-    $mime_params = array(
-        'text_encoding' => '7bit',
-        'text_charset'  => 'UTF-8',
-        'html_charset'  => 'UTF-8',
-        'head_charset'  => 'UTF-8'
-    );
-    $body = $buMail->mime->get($mime_params);
-
-    $hdrs = $buMail->mime->headers($hdrs);
-
-    $buMail->putInQueue(
-        CONFIG_SALES_EMAIL,
-        $toEmail,
-        $hdrs,
-        $body
-    );
+    $buMail->sendSimpleEmail($body, $subject, $toEmail, $fromEmail);
 } else {
     echo $body;
 }

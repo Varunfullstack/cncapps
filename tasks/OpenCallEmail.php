@@ -1,17 +1,31 @@
 <?php
-/**
- * notify each CNC users about their outstanding support calls
- *
- * called as scheduled task at given time every day
- *
- * @authors Karim Ahmed - Sweet Code Limited
- */
+use CNCLTD\LoggerCLI;
 
-ini_set('max_execution_time', 50000);
+require_once(__DIR__ . "/../htdocs/config.inc.php");
+global $cfg;
 
+$logName = 'OpenCallEmail';
+$logger = new LoggerCLI($logName);
+
+// increasing execution time to infinity...
+ini_set('max_execution_time', 0);
+
+if (!is_cli()) {
+    echo 'This script can only be ran from command line';
+    exit;
+}
+// Script example.php
+$shortopts = "d";
+$longopts = [
+    "outputEmails"
+];
+$options = getopt($shortopts, $longopts);
+$debugMode = false;
+if (isset($options['d'])) {
+    $debugMode = true;
+}
 $thing = null;
-require_once("config.inc.php");
-require_once("../cnccode/business_classes/BUMail.inc.php");
+require_once($cfg["path_bu"] . "/BUMail.inc.php");
 
 define(
     'OS_CALL_EMAIL_FROM_USER',
@@ -31,7 +45,7 @@ $domain = CONFIG_PUBLIC_DOMAIN;
 
 //we are going to use this to add to the monitoring db
 $dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME;
-$options = [
+$databaseOptions = [
     PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
 ];
 
@@ -39,7 +53,7 @@ if (!$pdoDB = new PDO(
     $dsn,
     DB_USER,
     DB_PASSWORD,
-    $options
+    $databaseOptions
 )) {
     echo 'Could not connect to mysql host ' . DB_HOST;
     exit;
@@ -57,7 +71,7 @@ class EngineerActivity
     public $engineerManagerId;
 }
 
-$outputEmails = isset($_REQUEST['outputEmails']);
+$outputEmails = isset($options['outputEmails']);
 
 $query =
     'SELECT

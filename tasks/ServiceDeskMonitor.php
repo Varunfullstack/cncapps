@@ -1,34 +1,44 @@
 <?php
-/**
- * Action Alert Email controller
- * CNC Ltd
- *
- * @access public
- * @authors Karim Ahmed - Sweet Code Limited
- */
-require_once("config.inc.php");
+use CNCLTD\LoggerCLI;
+require_once(__DIR__ . "/../htdocs/config.inc.php");
 global $cfg;
+
+$logName = 'DailySalesRequestEmail';
+$logger = new LoggerCLI($logName);
+
+// increasing execution time to infinity...
+ini_set('max_execution_time', 0);
+
+if (!is_cli()) {
+    echo 'This script can only be ran from command line';
+    exit;
+}
+// Script example.php
+$shortopts = "d";
+$longopts = [
+    "dryRun",
+    "serviceRequestId:"
+];
+$options = getopt($shortopts, $longopts);
+$debugMode = false;
+if (isset($options['d'])) {
+    $debugMode = true;
+}
 require_once($cfg['path_bu'] . '/BUProblemSLA.inc.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 $thing = null;
 
 $dryRun = false;
-if (isset($_REQUEST['dryRun'])) {
+if (isset($options['dryRun'])) {
     $dryRun = true;
 }
-
-$problemID = null;
-if (isset($_REQUEST['problemID'])) {
-    $problemID = $_REQUEST['problemID'];
-}
-
-$debug = null;
-if (isset($_REQUEST['debug'])) {
-    $debug = $_REQUEST['debug'];
+$serviceRequestId = null;
+if (isset($options['serviceRequestId'])) {
+    $serviceRequestId = $options['serviceRequestId'];
 }
 
 $buProblemSLA = new BUProblemSLA($thing);
-$buProblemSLA->monitor($dryRun, $problemID, $debug);
+$buProblemSLA->monitor($dryRun, $serviceRequestId, $debugMode);
 echo "Service Desk Monitor Routine Finished";
 //
 echo 'Start processing future SR\n';
