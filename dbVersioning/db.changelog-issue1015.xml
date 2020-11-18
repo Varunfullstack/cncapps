@@ -17,8 +17,13 @@
             </column>
         </addColumn>
         <sql>
-         update consultant set execludeFromSDManagerDashboard=1 where cns_consno in(2,3,84,152) ;          
+            update consultant
+            set execludeFromSDManagerDashboard=1
+            where cns_consno in (2, 3, 84, 152);
         </sql>
+        <rollback>
+            <dropColumn tableName="consultant" columnName="execludeFromSDManagerDashboard"/>
+        </rollback>
     </changeSet>
-   
+
 </databaseChangeLog>
