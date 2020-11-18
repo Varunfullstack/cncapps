@@ -1117,35 +1117,39 @@ class ActivityEditComponent extends MainComponent {
     };
     getTimeElement = () => {
         const {data} = this.state;
-        const {el} = this;
-        return el(
-            "div",
-            {
-                style: {
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "flex-start",
-                    alignItems: "center",
-                },
-            },
-            data.callActivityID ? el(Timer, {
-                key: "startTime",
-                disabled: data?.isInitalDisabled,
-                value: data?.startTime,
-                onChange: (value) => this.setValue("startTime", value),
-            }) : null,
-            el(
-                "label",
-                {className: "m-2", style: {color: "#992211", whiteSpace: "nowrap"}},
-                "To"
-            ),
-            data.callActivityID ? el(Timer, {
-                key: "endTime",
-                disabled: data?.isInitalDisabled,
-                value: data?.endTime,
-                onChange: (value) => this.setValue("endTime", value),
-            }) : null
-        );
+        const renderStartTimeInput = () => {
+            if (!data.callActivityID) {
+                return '';
+            }
+            return <input type="time"
+                          key="startTime"
+                          disabled={data?.isInitalDisabled}
+                          value={data?.startTime}
+                          onChange={(value) => this.setValue("startTime", value)}
+            />
+        }
+        const renderEndTimeInput = () => {
+            if (!data.callActivityID) {
+                return '';
+            }
+            return <input type="time"
+                          key="endTime"
+                          disabled={data?.isInitalDisabled}
+                          value={data?.endTime}
+                          onChange={(value) => this.setValue("endTime", value)}
+            />
+        }
+
+        return <div style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "flex-start",
+            alignItems: "center",
+        }}>
+            {renderStartTimeInput()}
+            <label className="m-2" style={{color: "#992211", whiteSpace: "nowrap"}}>To</label>
+            {renderEndTimeInput()}
+        </div>
     };
     getPriority = () => {
         const {el} = this;
