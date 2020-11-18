@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [v5.0.0]
 ### Changed
 - Issue 1053 - New email templates
+- Issue 1082 - Updated time picker
 
 ## [v4.12.0] - 2020-11-10
 ### Added
