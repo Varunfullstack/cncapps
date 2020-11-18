@@ -193,3 +193,4 @@ export const isEmptyTime = (time) => {
         return true;
     else return false;
 }
+export const MYSQL_DATE_FORMAT = 'YYYY-MM-DD';

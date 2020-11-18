@@ -245,6 +245,7 @@ class CTCNC extends Controller
                          $cfg
     )
     {
+        
         if ($this->getParam('action')) {
             $this->setAction($this->getAction());
         }
@@ -263,7 +264,7 @@ class CTCNC extends Controller
         $this->favouriteMenu = new FavouriteMenu($this->userID);
 
         $this->user = new BUUser($this);
-
+       
         parent::__construct(
             $requestMethod,
             $postVars,
@@ -497,6 +498,7 @@ class CTCNC extends Controller
             ["favouriteItems" => $menu->getFavouriteItems()]
         );
         $this->template->setVar('favouritesMenuItems', $favouriteItemsHTML);
+        //$this->loadReactCSS("modal.css");
         parent::parsePage();
     }
 

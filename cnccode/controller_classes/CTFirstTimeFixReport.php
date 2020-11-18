@@ -60,6 +60,7 @@ class CTFirstTimeFixReport extends CTCNC
                         $this->getParam('endDate')
                     );
                 }
+                //echo json_encode(["engineerID"=>$this->getParam('engineerID')]); exit;
                 echo json_encode(
                     $this->getFirstTimeFixData(
                         @$this->getParam('customerID'),
@@ -256,6 +257,7 @@ ORDER BY engineer.firstName";
             'userBlock',
             'hdUsers'
         );
+        $this->loadReactScript('FirstTimeFixReportComponent.js');
 
         foreach ($hdUsers as $user) {
 
@@ -302,7 +304,8 @@ ORDER BY engineer.firstName";
             'FirstTimeFixReport',
             true
         );
-
+       
         $this->parsePage();
+       
     }
 }

@@ -87,7 +87,7 @@ class CTUser extends CTCNC
             $cookieVars,
             $cfg
         );
-        $noPermissionList = ["all", "active", "getCurrentUser"];
+        $noPermissionList=["all","active","getCurrentUser","getUsersByTeamLevel"];
         $roles = SENIOR_MANAGEMENT_PERMISSION;
         $key = array_search(@$_REQUEST["action"], $noPermissionList);
         if (false === $key)
@@ -270,15 +270,18 @@ class CTUser extends CTCNC
                     ]
                 );
                 break;
-            case "getCurrentUser":
-                echo $this->getCurrentUser();
-                exit;
-            case "all":
-                echo json_encode($this->getAllUsers());
-                exit;
-            case "active":
-                echo json_encode($this->getActiveUsers());
-                exit;
+                case "getCurrentUser":
+                    echo $this->getCurrentUser();
+                    exit;
+                case "all":
+                    echo json_encode($this->getAllUsers());
+                    exit;
+                case "active":                
+                    echo json_encode($this->getActiveUsers());
+                    exit;
+                case "getUsersByTeamLevel":
+                    echo json_encode($this->getUsersByTeamLevel());
+                    exit;
             case CTUSER_ACT_DISPLAY_LIST:
             default:
                 $this->displayList();
@@ -1154,5 +1157,26 @@ class CTUser extends CTCNC
             true
         );
         $this->parsePage();
+    }
+    
+    function getUsersByTeamLevel()
+    {
+        $teamLevel=$_REQUEST["teamLevel"];
+        if(isset($teamLevel))
+        {
+        $hdUsers = (new BUUser($this))->getUsersByTeamLevel( $teamLevel);
+        $users=array();
+        foreach ($hdUsers as $user) {
+            array_push( $users,
+                array(
+                    'userName' => $user['userName'],
+                    'userID'   => $user['cns_consno']
+                )
+            );
+
+        }
+        return $users;
+        }
+        else return [];
     }
 }

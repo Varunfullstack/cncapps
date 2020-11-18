@@ -146,6 +146,9 @@ class CTSRActivity extends CTCNC
                 );
                 exit;
             }
+            case "getNotAttemptFirstTimeFix":
+                echo json_encode($this->getNotAttemptFirstTimeFix());
+                exit;
             default:
                 $this->setTemplate();
                 break;
@@ -1281,6 +1284,44 @@ class CTSRActivity extends CTCNC
             }
         }
         return null;
+    }
+
+    function getNotAttemptFirstTimeFix()
+    {
+        $problemID=$_REQUEST["problemID"]??null;
+        $userID=$_REQUEST["userID"]??null;
+        $startDate=$_REQUEST["startDate"]??null;
+        $endDate=$_REQUEST["endDate"]??null;
+
+        $query="SELECT p.`id`,p.userID,p.`problemID`,p.`reason`,p.`createAt`,CONCAT(c.`firstName`,' ',c.`lastName`) userName ,cus_name customerName
+        FROM `problemnotstartreason` p  JOIN `consultant` c ON p.`userID`=c.`cns_consno`
+        JOIN problem on problem.pro_problemno= p.`problemID`
+        JOIN customer  cu on cu.cus_custno = problem.pro_custno
+        where 1=1 ";
+        $params=[];
+        if(isset($problemID)&&$problemID!='')
+        {
+            $query .=" and p.`problemID`=:problemID";
+            $params["problemID"]=$problemID;
+        }
+        if(isset($userID)&&$userID!='')
+        {
+            $query .=" and p.`userID`=:userID";
+            $params["userID"]=$userID;
+        }
+        if(isset($startDate)&&$startDate!='')
+        {
+            $query .=" and p.`createAt` >=:startDate";
+            $params["startDate"]=$startDate;
+        }
+        if(isset($endDate)&&$endDate!='')
+        {
+            $query .=" and p.`createAt` <=:endDate";
+            $params["endDate"]=$endDate;
+        }
+        //return ["query"=>$query,"params"=>$params];
+        $result=DBConnect::fetchAll($query,$params);
+        return $result;
     }
 }
 

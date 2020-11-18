@@ -130,6 +130,9 @@ class APIActivity extends APIMain {
     getRemoteSupportActivityDurationThresholdValue() {
         return fetch(`${ApiUrls.SRActivity}getRemoteSupportActivityDurationThresholdValue`).then(res => res.json()).then(res => res.data);
     }
+    getNotAttemptFirstTimeFix(startDate,endDate,customerID,enginnerID){
+        return this.get(`${ApiUrls.SRActivity}getNotAttemptFirstTimeFix&startDate=${startDate}&endDate=${endDate}&userID=${enginnerID}&customerID=${customerID}`);
+    }
 }
 
 export default APIActivity;

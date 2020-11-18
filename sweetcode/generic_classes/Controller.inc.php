@@ -1117,7 +1117,7 @@ class Controller extends BaseObject
         $_REQUEST[$string] = $value;
     }
 
-    protected function loadReactCSS(string $string)
+    public function loadReactCSS(string $string)
     {
         $version = $this->getVersion();
         if (!$this->template) {
@@ -1138,7 +1138,7 @@ class Controller extends BaseObject
         return $this->cachedVersion;
     }
 
-    protected function loadReactScript(string $string)
+    public function loadReactScript(string $string)
     {
         $version = $this->getVersion();
         if (!$this->template) {
