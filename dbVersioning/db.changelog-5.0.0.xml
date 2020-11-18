@@ -78,17 +78,6 @@
     </changeSet>
     <changeSet id="release-v5.0.0-7" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
-            <columnExists tableName="callacttype" columnName="allowSCRFlag"/>
-        </preConditions>
-        <dropColumn tableName="callacttype" columnName="allowSCRFlag"/>
-        <rollback>
-            <addColumn tableName="callacttype">
-                <column name="allowSCRFlag" remarks="OBSOLETE" type="CHAR(1)"/>
-            </addColumn>
-        </rollback>
-    </changeSet>
-    <changeSet id="release-v5.0.0-8" author="pavwebdev">
-        <preConditions onFail="MARK_RAN">
             <columnExists tableName="callacttype" columnName="showNotChargeableFlag"/>
         </preConditions>
         <dropColumn tableName="callacttype" columnName="showNotChargeableFlag"/>
@@ -98,7 +87,7 @@
             </addColumn>
         </rollback>
     </changeSet>
-    <changeSet id="release-v5.0.0-9" author="pavwebdev">
+    <changeSet id="release-v5.0.0-8" author="pavwebdev">
         <sql splitStatements="true">
             UPDATE
                 contact
@@ -126,7 +115,7 @@
         </sql>
         <rollback/>
     </changeSet>
-    <changeSet id="release-v5.0.0-10" author="pavwebdev">
+    <changeSet id="release-v5.0.0-9" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 select column_default = 'Y' from information_schema.`COLUMNS` where
