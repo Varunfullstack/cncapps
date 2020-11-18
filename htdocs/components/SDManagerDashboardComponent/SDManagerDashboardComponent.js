@@ -194,8 +194,8 @@ class SDManagerDashboardComponent extends MainComponent {
             this.loadAllocatedUsers();
             const {filter} = this.state;
             this.api.getQueue(id, filter).then((queueData) => {
-                queueData=queueData.map(p=>{
-                    return {...p,workBgColor:this.getProblemWorkColor(p)}
+                queueData = queueData.map(p => {
+                    return {...p, workBgColor: this.getProblemWorkColor(p)}
                 });
                 console.log(queueData);
 
@@ -221,23 +221,21 @@ class SDManagerDashboardComponent extends MainComponent {
             onCancel: () => this.setState({showFollowOn: false})
         }) : null;
     }
+
     // end of shared methods
     getProblemWorkTitle(problem) {
-        let title = "";
-        if (problem.workBgColor == null) title = "Work on this request";
-        if (problem.hoursRemainingBgColor == "#FFF5B3")
-            title = "Request not started yet";
-        if (problem.workBgColor == "#BDF8BA")
-            title = "Request being worked on by somebody else";
-        return title;
+        if (problem.workBgColor == null || problem.workBgColor === '#C6C6C6') return "Work on this request";
+        if (problem.workBgColor === "#FFF5B3") return "Request not started yet";
+        if (problem.workBgColor === "#BDF8BA") return "Request being worked on by somebody else";
+        return "";
     }
+
     getProblemWorkColor(problem) {
-        let color = "#C6C6C6";
-        if (problem.bgColour == null) color = "#C6C6C6";
-        if (problem.hoursRemainingBgColor == "#FFF5B3") color = "#FFF5B3";
-        if (problem.bgColour == "#BDF8BA") color = "#BDF8BA";
-        return color;
+        if (problem.hoursRemainingBgColor === "#FFF5B3") return "#FFF5B3";
+        if (problem.bgColour === "#BDF8BA") return "#BDF8BA";
+        return "#C6C6C6";
     }
+
     getQueueElement = () => {
         const {filter, queueData} = this.state;
         const {el} = this;
@@ -253,28 +251,29 @@ class SDManagerDashboardComponent extends MainComponent {
                     hdClassName: "text-center",
                     className: "text-center",
                     content: (problem) =>
-                    el(ToolTip,{title: this.getProblemWorkTitle(problem),
-                    content:                
-                            el(
-                                "div",
-                                {key: "img1", onClick: () => this.startWork(problem)},
-                                el("i", {
-                                    className:
-                                        (problem.workBgColor === "#C6C6C6"
-                                            ? "fal fa-play"
-                                            : "fad fa-play ") +
-                                        " fa-2x  pointer inbox-icon" +
-                                        problem.workHidden || "",
-                                    style: {
-                                        color: problem.workBgColor,
-                                        "--fa-primary-color":
-                                            problem.workBgColor == "#FFF5B3" ? "gold" : "#32a852",
-                                        "--fa-secondary-color":
-                                            problem.workBgColor == "#FFF5B3" ? "gray" : "gray",
-                                    },
-                                })
-                            )
-                            }),
+                        el(ToolTip, {
+                            title: this.getProblemWorkTitle(problem),
+                            content:
+                                el(
+                                    "div",
+                                    {key: "img1", onClick: () => this.startWork(problem)},
+                                    el("i", {
+                                        className:
+                                            (problem.workBgColor === "#C6C6C6"
+                                                ? "fal fa-play"
+                                                : "fad fa-play ") +
+                                            " fa-2x  pointer inbox-icon" +
+                                            problem.workHidden || "",
+                                        style: {
+                                            color: problem.workBgColor,
+                                            "--fa-primary-color":
+                                                problem.workBgColor == "#FFF5B3" ? "gold" : "#32a852",
+                                            "--fa-secondary-color":
+                                                problem.workBgColor == "#FFF5B3" ? "gray" : "gray",
+                                        },
+                                    })
+                                )
+                        }),
                 },
                 {
                     hide: false,
@@ -311,7 +310,7 @@ class SDManagerDashboardComponent extends MainComponent {
                             })
                             : null,
                 },
-    
+
                 {
                     hide: false,
                     order: 4,
@@ -388,7 +387,7 @@ class SDManagerDashboardComponent extends MainComponent {
                     icon: "fal fa-2x fa-signal color-gray2 pointer",
                     sortable: false,
                     className: "text-center",
-                   // classNameColumn: "priorityBgColor",
+                    // classNameColumn: "priorityBgColor",
                 },
                 {
                     path: "",
