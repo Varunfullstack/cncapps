@@ -32,7 +32,6 @@ class StandardTextModal extends React.Component {
             this.props.onChange(this.state.templateValue);
     }
     handleTemplateChanged = (event) => {
-        console.log(event.target.value);
         const id = event.target.value;
         const {templateOptions} = this.state;
         let templateDefault = '';
@@ -59,7 +58,7 @@ class StandardTextModal extends React.Component {
                 onClose: () => this.props.onCancel ? this.props.onCancel() : this.setState({_showModal: false}),
                 title: templateTitle,
                 show: _showModal,
-                content: el('div', {key: 'conatiner', style: {height: 150}},
+                content: el('div', {key: 'container', style: {height: 150}},
                     templateOptions.length > 0 ? el('select', {onChange: this.handleTemplateChanged}, el('option', {
                         key: 'empty',
                         value: -1
@@ -86,7 +85,6 @@ class StandardTextModal extends React.Component {
     static getDerivedStateFromProps(props, current_state) {
 
         if (current_state && current_state._showModal !== props.show) {
-            console.log("====================>", current_state, props);
             current_state._showModal = props.show;
             current_state.templateValue = props.value;
             current_state.templateDefault = props.value;

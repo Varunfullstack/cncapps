@@ -47,6 +47,7 @@ class ActivityEditComponent extends MainComponent {
             assets: [],
             currentContact: null,
             currentUser: null,
+            emptyAssetReasonModalShowing: false,
             data: {
                 curValue: "",
                 documents: [],
@@ -83,6 +84,7 @@ class ActivityEditComponent extends MainComponent {
             users: [],
             contracts: [],
             priorityReasons: [],
+            noAssetStandardTextItems: [],
             filters: {
                 showTravel: false,
                 showOperationalTasks: false,
@@ -104,22 +106,20 @@ class ActivityEditComponent extends MainComponent {
             this.api.getRootCauses(),
             this.apiUser.getCurrentUser(),
             this.apiStandardText.getOptionsByType("Priority Change Reason"),
+            this.apiStandardText.getOptionsByType("Missing Asset Reason"),
 
-        ]).then(async (result) => {
-            const currentUser = result[4];
-            let callActTypes = result[0];
-
-
+        ]).then(async ([activityTypes, activeUsers, priorities, rootCauses, currentUser, priorityChangeReasonStandardTextItems, noAssetStandardTextItems]) => {
             if (!currentUser.isSDManger) {
-                callActTypes = callActTypes.filter(c => c.visibleInSRFlag == 'Y')
+                activityTypes = activityTypes.filter(c => c.visibleInSRFlag == 'Y')
             }
             this.setState({
-                callActTypes,
-                users: result[1],
-                priorities: result[2],
-                rootCauses: result[3],
+                callActTypes: activityTypes,
+                users: activeUsers,
+                priorities,
+                rootCauses,
                 currentUser,
-                priorityReasons: result[5],
+                priorityReasons: priorityChangeReasonStandardTextItems,
+                noAssetStandardTextItems
             });
             setTimeout(() => this.autoSave(), 2000);
         });
@@ -135,10 +135,8 @@ class ActivityEditComponent extends MainComponent {
         const {filters} = this.state;
 
         this.api.getCallActivityDetails(callActivityID, filters).then((res) => {
-            const {filters} = this.state;
-            filters.monitorSR = res.monitoringFlag == "1" ? true : false;
-            filters.criticalSR = res.criticalFlag == "1" ? true : false;
-            //res.date=moment(res.date).format("YYYY-MM-DD");
+            filters.monitorSR = res.monitoringFlag == "1";
+            filters.criticalSR = res.criticalFlag == "1";
             res.documents = res.documents.map((d) => {
                 d.createDate = moment(d.createDate).format("DD/MM/YYYY");
                 return d;
@@ -148,6 +146,7 @@ class ActivityEditComponent extends MainComponent {
             res.internalNotesTemplate = res.internalNotes;
             res.customerNotesTemplate = res.customerNotes;
             res.callActTypeIDOld = res.callActTypeID;
+            console.log(res);
             res.orignalPriority = res.priority;
             const session = this.getSessionActivity(res.callActivityID);
             if (session) {
@@ -172,9 +171,8 @@ class ActivityEditComponent extends MainComponent {
                         res.contractCustomerItemID,
                         res.linkedSalesOrderID > 0
                     )
-                    .then((res) => {
-                        const contracts = groupBy(res, "renewalType");
-                        return contracts;
+                    .then((contracts) => {
+                        return groupBy(contracts, "renewalType");
                     }),
                 this.apiCustomer.getCustomerAssets(res.customerId)
             ]).then(([customerContactActivityDurationThresholdValue, remoteSupportActivityDurationThresholdValue, contacts, sites, contracts, assets]) => {
@@ -356,7 +354,7 @@ class ActivityEditComponent extends MainComponent {
                     }
                 }
 
-                if(data.callActType.id === 8 && durationHours > this.state.remoteSupportActivityDurationThresholdValue){
+                if (data.callActType.id === 8 && durationHours > this.state.remoteSupportActivityDurationThresholdValue) {
                     if (!await this.confirm(`This Remote Support is over ${this.state.remoteSupportActivityDurationThresholdValue} hours, did you mean to put in these times for the activity?`)) {
                         return false;
                     }
@@ -401,10 +399,7 @@ class ActivityEditComponent extends MainComponent {
             }
         }
         if (!data.assetName && !this.state.data.emptyAssetReason) {
-            const reason = await this.prompt("Please provide the reason of not listing an asset", 500, this.state.data.emptyAssetReason);
-            this.state.data.emptyAssetReason = reason;
-            const updatedData = {...this.state.data, emptyAssetReason: reason};
-            this.setState({updatedData});
+            this.setState({emptyAssetReasonModalShowing: true});
             return false;
         }
         return true;
@@ -419,7 +414,7 @@ class ActivityEditComponent extends MainComponent {
     getProjectsElement = () => {
         const {data} = this.state;
         const {el} = this;
-        if (data && data.projects.length > 0) {
+        if (data?.projects?.length > 0) {
             return el(
                 "div",
                 {
@@ -1829,6 +1824,40 @@ class ActivityEditComponent extends MainComponent {
                 onCancel: () => this.handlePriorityTemplateChange('')
             });
     }
+
+    getNoAssetModal = () => {
+        const {data, noAssetStandardTextItems, emptyAssetReasonModalShowing} = this.state;
+        const {el} = this;
+        return el(StandardTextModal,
+            {
+                options: noAssetStandardTextItems,
+                value: data.emptyAssetReason,
+                show: emptyAssetReasonModalShowing,
+                title: "Please provide the reason of not listing an asset",
+                okTitle: "OK",
+                onChange: (value) => {
+                    if(!value) {
+                        return;
+                    }
+                    this.setState({
+                        emptyAssetReasonModalShowing: false,
+                        data: {
+                            ...this.state.data,
+                            emptyAssetReason: value
+                        }
+                    })
+                },
+                onCancel: () => {
+                    this.setState({
+                        emptyAssetReasonModalShowing: false,
+                        data: {
+                            ...this.state.data,
+                            emptyAssetReason: ""
+                        }
+                    })
+                }
+            });
+    }
     handlePriorityTemplateChange = (value) => {
         const {data} = this.state;
         if (value != "" && value != undefined) {
@@ -1906,6 +1935,7 @@ class ActivityEditComponent extends MainComponent {
             this.getConfirm(),
             this.getPrompt(),
             this.getPriorityChangeReason(),
+            this.getNoAssetModal(),
             this.getProjectsElement(),
             this.getHeader(),
             el("div", {className: "activities-edit-container"}, this.getActions()),
