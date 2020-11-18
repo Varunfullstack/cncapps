@@ -10,6 +10,7 @@ This project changes will be shown here.
 - Issue 810 - Heavy SQL usage improvements
 ### Fixed
 - Issue 1078 - Sales Request Dashboard Attachment Link error
+- Issue 1077 - Service Requests By Customer Report Broken
 
 
 ## [v4.12.0] - 2020-11-10

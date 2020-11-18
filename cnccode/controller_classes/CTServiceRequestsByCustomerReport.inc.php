@@ -65,8 +65,6 @@ class CTServiceRequestsByCustomerReport extends CTCNC
 
     function email()
     {
-        var_dump('test');
-        exit;
         $this->setMethodName('email');
         $dsSearchForm = $this->initialiseSearchForm();
         $days = $this->getParam('days');
