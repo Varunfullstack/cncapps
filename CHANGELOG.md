@@ -12,6 +12,7 @@ This project changes will be shown here.
 - Issue 1053 - New email templates
 - Issue 810 - Heavy SQL usage improvements
 - Issue 1074 - Migrate non tasks to tasks
+- Issue 1083 - Upgrade Spellchecker
 ### Fixed
 - Issue 1078 - Sales Request Dashboard Attachment Link error
 - Issue 1077 - Service Requests By Customer Report Broken

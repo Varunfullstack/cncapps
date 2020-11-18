@@ -82,10 +82,10 @@ export default class CKEditor extends React.Component {
                 ],
                 ["NumberedList", "BulletedList"],
                 ["Table"],
-                [ "Font", "FontSize"],
+                ["Font", "FontSize"],
                 ["Link"],
             ],
-            extraPlugins: "font,wordcount,scayt",
+            extraPlugins: "font,wordcount",
             fontSize_sizes:
                 "8/8pt;9/9pt;10/10pt;11/11pt;12/12pt;14/14pt;16/16pt;18/18pt;20/20pt;22/22pt;24/24pt;26/26pt;28/28pt;36/36pt;48/48pt;72/72pt",
             wordcount: {
@@ -96,12 +96,10 @@ export default class CKEditor extends React.Component {
             width: this.props.width || "auto",
             height: this.props.height || 220,
             resize_minHeight: this.props.height || 220,
-            removePlugins: 'liststyle,tabletools,language,tableselection',
-            scayt_customerId: 'LHXUCjpl0y2gdBb',
-            scayt_autoStartup: true,
-            grayt_autoStartup: true,
-            scayt_sLang: "en_GB",
+            removePlugins: 'liststyle,tabletools,language,tableselection,scayt,wsc',
             disableNativeSpellChecker: true,
+            wsc_customDictionaryIds: '100920',
+
         };
     }
 
