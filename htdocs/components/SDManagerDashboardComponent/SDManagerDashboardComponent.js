@@ -224,10 +224,25 @@ class SDManagerDashboardComponent extends MainComponent {
 
     // end of shared methods
     getProblemWorkTitle(problem) {
-        if (problem.workBgColor == null || problem.workBgColor === '#C6C6C6') return "Work on this request";
-        if (problem.workBgColor === "#FFF5B3") return "Request not started yet";
-        if (problem.workBgColor === "#BDF8BA") return "Request being worked on by somebody else";
-        return "";
+        if (problem.isBeingWorkedOn) {
+            return "Request being worked on by somebody else";
+        }
+        if (problem.status === "I") {
+            return "Request not started yet";
+        }
+        return "Work on this request";
+    }
+
+    getWorkIconClassName(problem) {
+
+        const commonClasses = "fa-play fa-2x pointer";
+        if (problem.isBeingWorkedOn) {
+            return `being-worked-on fad ${commonClasses}`;
+        }
+        if (problem.status === "I") {
+            return `not-yet-started fad ${commonClasses}`
+        }
+        return `start-work fal ${commonClasses}`;
     }
 
     getProblemWorkColor(problem) {
@@ -258,19 +273,7 @@ class SDManagerDashboardComponent extends MainComponent {
                                     "div",
                                     {key: "img1", onClick: () => this.startWork(problem)},
                                     el("i", {
-                                        className:
-                                            (problem.workBgColor === "#C6C6C6"
-                                                ? "fal fa-play"
-                                                : "fad fa-play ") +
-                                            " fa-2x  pointer inbox-icon" +
-                                            problem.workHidden || "",
-                                        style: {
-                                            color: problem.workBgColor,
-                                            "--fa-primary-color":
-                                                problem.workBgColor == "#FFF5B3" ? "gold" : "#32a852",
-                                            "--fa-secondary-color":
-                                                problem.workBgColor == "#FFF5B3" ? "gray" : "gray",
-                                        },
+                                        className: this.getWorkIconClassName(problem)
                                     })
                                 )
                         }),
@@ -284,7 +287,7 @@ class SDManagerDashboardComponent extends MainComponent {
                     sortable: false,
                     toolTip: "Special Attention customer / contact",
                     content: (problem) =>
-                        problem.customerNameDisplayClass != null
+                        problem.specialAttentionCustomer
                             ? el("i", {
                                 className:
                                     "fal fa-2x fa-star color-gray pointer float-right inbox-icon",
@@ -409,7 +412,7 @@ class SDManagerDashboardComponent extends MainComponent {
                 {
                     path: "hoursRemaining",
                     label: "",
-                    hdToolTip: "Open Hours: Green = Awaiting Customer Blue = CNC Yellow = Not Started",
+                    hdToolTip: "Open Hours",
                     hdClassName: "text-center",
                     icon: "fal fa-2x fa-clock  color-gray2 pointer",
                     sortable: false,

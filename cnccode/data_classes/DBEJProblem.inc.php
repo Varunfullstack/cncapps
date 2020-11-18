@@ -33,7 +33,8 @@ class DBEJProblem extends DBEProblem
     const dashboardSortColumn = "dashboardSortColumn";
     const hoursRemaining = 'hoursRemaining';
     const specialAttentionContactFlag = "specialAttentionContactFlag";
-    const referredFlag="referredFlag";
+    const referredFlag = "referredFlag";
+    const lastEndTime = "lastEndTime";
 
     /**
      * calls constructor()
@@ -174,6 +175,13 @@ class DBEJProblem extends DBEProblem
             "last.caa_starttime"
         );
         $this->addColumn(
+            self::lastEndTime,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "last.caa_endtime"
+        );
+
+        $this->addColumn(
             self::lastUserID,
             DA_INTEGER,
             DA_ALLOW_NULL,
@@ -203,7 +211,7 @@ class DBEJProblem extends DBEProblem
             DA_ALLOW_NULL,
             'pro_working_hours - pro_sla_response_hours'
         );
-        
+
         $this->addColumn(
             self::specialAttentionContactFlag,
             DA_YN_FLAG,
@@ -211,10 +219,10 @@ class DBEJProblem extends DBEProblem
             '(select contact.specialAttentionContactFlag from contact where con_contno = initial.caa_contno)'
         );
         $this->addColumn(
-          self::referredFlag,
-          DA_STRING,
-          DA_ALLOW_NULL,
-          'customer.cus_referred'
+            self::referredFlag,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            'customer.cus_referred'
         );
         $this->setAddColumnsOff();
         $this->setPK(0);
@@ -405,12 +413,13 @@ class DBEJProblem extends DBEProblem
         $this->setQueryString($sql);
         return (parent::getRows());
     }
-  /*
-    Get Awaiting, In-progress and future SRs by Queue
 
-    */
+    /*
+      Get Awaiting, In-progress and future SRs by Queue
+
+      */
     function getRowsByQueueNoWithFuture($queueNo,
-                              $unassignedOnly = false
+                                        $unassignedOnly = false
     )
     {
         $sql =
@@ -445,6 +454,7 @@ class DBEJProblem extends DBEProblem
         $this->setQueryString($sql);
         return (parent::getRows());
     }
+
     function getRow($pkID)
     {
         $this->setPKValue($pkID);
@@ -747,7 +757,7 @@ class DBEJProblem extends DBEProblem
         WHERE " . $this->getDBColumnName(self::customerID) . ' <> 282  and ' . $this->getDBColumnName(
                 self::status
             ) . ' in ("I","P")  ';
-            $sql .= ' and (consultant.execludeFromSDManagerDashboard=0 or consultant.cns_consno is null) ';
+        $sql .= ' and (consultant.execludeFromSDManagerDashboard=0 or consultant.cns_consno is null) ';
         if (!$showHelpDesk) {
             $sql .= ' and pro_queue_no <> 1 ';
         }
@@ -983,6 +993,7 @@ class DBEJProblem extends DBEProblem
 
         return (parent::getRows());
     }
+
     /**
      * put your comment there...
      *
@@ -1013,9 +1024,9 @@ class DBEJProblem extends DBEProblem
               WHERE ca.caa_problemno = pro_problemno
               AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             )
-        WHERE 1=1";        
-        $sql .=" AND pro_custno=$customerID";
-        $sql .=" AND pro_status <> 'C' and pro_status <> 'F' ";
+        WHERE 1=1";
+        $sql .= " AND pro_custno=$customerID";
+        $sql .= " AND pro_status <> 'C' and pro_status <> 'F' ";
         $sql .= " ORDER BY pro_alarm_date, pro_alarm_time";
         $this->setQueryString($sql);
         return (parent::getRows());

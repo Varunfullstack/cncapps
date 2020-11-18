@@ -199,7 +199,7 @@ class CTCurrentActivityReport extends CTCNC
             }
 
 
-            if ($serviceRequests->getValue(DBEJProblem::lastCallActTypeID) == null) {
+            if ($serviceRequests->getValue(DBEJProblem::lastEndTime) == null) {
                 $workBgColor = self::GREEN; // green = in progress
             } else {
                 $workBgColor = self::CONTENT;
@@ -383,12 +383,6 @@ class CTCurrentActivityReport extends CTCNC
 
         return $bgColour;
     }
-    //$this->renderQueue(1);  // Helpdesk
-    //$this->renderQueue(2);  // Escalations
-    //$this->renderQueue(3);  // Sales
-    //$this->renderQueue(4);  // Small Projects
-    //$this->renderQueue(5);  // Projects
-    //$this->renderQueue(6);  //Fixed
 
     protected function pickColor($value)
     {
@@ -400,6 +394,12 @@ class CTCurrentActivityReport extends CTCNC
             return 'green';
         }
     }
+    //$this->renderQueue(1);  // Helpdesk
+    //$this->renderQueue(2);  // Escalations
+    //$this->renderQueue(3);  // Sales
+    //$this->renderQueue(4);  // Small Projects
+    //$this->renderQueue(5);  // Projects
+    //$this->renderQueue(6);  //Fixed
 
     /**
      * @param $problemID
@@ -466,7 +466,7 @@ class CTCurrentActivityReport extends CTCNC
 
         return $string;
 
-    } // end function displayReport
+    }
 
     function getCustomerNameDisplayClass(
         $specialAttentionFlag,
@@ -486,7 +486,7 @@ class CTCurrentActivityReport extends CTCNC
         }
 
         return null;
-    }
+    } // end function displayReport
 
     /**
      * @throws Exception
@@ -771,6 +771,53 @@ class CTCurrentActivityReport extends CTCNC
         $this->setMethodName('getHelpDeskInbox');
 
         return json_encode($this->renderQueue(1));
-    }  // end finaliseProblem
+    }
+
+    /**
+     * @param DBEProblem|DataSet $dbeProblem
+     * @return bool
+     */
+    protected function getIsSLABreached($dbeProblem)
+    {
+        $status = $dbeProblem->getValue(DBEJProblem::status);
+        $priority = $dbeProblem->getValue(DBEJProblem::priority);
+        $slaResponseHours = $dbeProblem->getValue(DBEJProblem::slaResponseHours);
+        $workingHours = $dbeProblem->getValue(DBEJProblem::workingHours);
+        $respondedHours = $dbeProblem->getValue(DBEJProblem::respondedHours);
+        if ($slaResponseHours == 0) {
+            $slaResponseHours = 1;
+        }
+
+        if ($priority == 5) {
+            return false;
+        }
+        if ($status != 'I' && $respondedHours <= $slaResponseHours) {
+            return false;
+        }
+
+        $percentageSLA = ($workingHours / $slaResponseHours);
+        if ($status == 'I' && $percentageSLA < 1) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param DBEJProblem|DataSet $dbeProblem
+     * @return bool
+     */
+    protected function isRequestBeingWorkedOn($dbeProblem)
+    {
+        $dateString = $dbeProblem->getValue(DBEJProblem::lastDate);
+        $timeString = $dbeProblem->getValue(DBEJProblem::lastStartTime);
+        $activityDateTime = DateTime::createFromFormat('Y-m-d H:i', "$dateString $timeString");
+
+        if ($activityDateTime > (new DateTime())) {
+            return false;
+        }
+
+        return !$dbeProblem->getValue(DBEJProblem::lastEndTime);
+    }
 
 }
