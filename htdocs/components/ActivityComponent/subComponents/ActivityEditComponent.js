@@ -10,7 +10,7 @@ import APIStandardText from "../../services/APIStandardText.js";
 import React, {Fragment} from 'react';
 import moment from "moment";
 import StandardTextModal from "../../Modals/StandardTextModal";
-import {TeamType} from "../../utils/utils";
+import {padEnd, TeamType} from "../../utils/utils";
 import CKEditor from "../../shared/CKEditor";
 import Modal from "../../shared/Modal/modal";
 import Table from "../../shared/table/table";
