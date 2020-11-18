@@ -2,6 +2,8 @@
 This project changes will be shown here.
 
 ## [v5.0.0]
+### Added
+- Issue 1079 - Show Direct Debit items on the meeting agenda
 ### Changed
 - Issue 1053 - New email templates
 

@@ -335,7 +335,7 @@ class CTCustomerReviewMeeting extends CTCNC
 
                 foreach ($itemTypes as $typeName => $itemTypeContainer) {
 
-                    $itemTypeHeader = '<tr><td colspan="4"><h3>' . $typeName . '</h3></td></tr>';
+                    $itemTypeHeader = '<tr><td colspan="5"><h3>' . $typeName . '</h3></td></tr>';
 
                     $nonEditableTemplate->set_var(
                         array(
@@ -405,6 +405,7 @@ class CTCustomerReviewMeeting extends CTCNC
                                     'coveredItemsString' => $coveredItemsString,
                                     'itemClass'          => $itemClass,
                                     'customerID'         => $customerId,
+                                    'directDebit'        => $item['directDebit'] ? 'Yes' : null
                                 )
                             );
                             $nonEditableTemplate->parse(
