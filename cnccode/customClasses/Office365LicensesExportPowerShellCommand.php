@@ -46,7 +46,6 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Template;
-use Twig\TwigFilter;
 use UnexpectedValueException;
 
 class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
@@ -164,15 +163,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                         $dbeContact->getRow($primaryMainContactId);
                         $subject = "Warning - Some Mailboxes Are Almost Full";
                         $emailTo = $dbeContact->getValue(DBEContact::email);
-                        $hdrs = array(
-                            'From'         => CONFIG_SUPPORT_EMAIL,
-                            'To'           => $emailTo,
-                            'Subject'      => $subject,
-                            'Date'         => date("r"),
-                            'Content-Type' => 'text/html; charset=UTF-8'
-                        );
 
-                        $mime = new Mail_mime();
                         global $twig;
 
                         usort(
@@ -189,27 +180,13 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                                 "mailboxes"        => $this->warningMailboxes
                             ]
                         );
-
-                        $mime->setHTMLBody($body);
-
-                        $mime_params = array(
-                            'text_encoding' => '7bit',
-                            'text_charset'  => 'UTF-8',
-                            'html_charset'  => 'UTF-8',
-                            'head_charset'  => 'UTF-8'
-                        );
-
-                        $body = $mime->get($mime_params);
-
-                        $hdrs = $mime->headers($hdrs);
-
+                        
                         $buMail = new BUMail($this);
 
-                        $buMail->putInQueue(
-                            CONFIG_SUPPORT_EMAIL,
+                        $buMail->sendSimpleEmail(
+                            $body,
+                            $subject,
                             $emailTo,
-                            $hdrs,
-                            $body
                         );
                     }
 
