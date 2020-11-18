@@ -247,8 +247,8 @@ ORDER BY engineer.firstName";
             )
         );
 
-        $this->loadReactScript('SpinnerHolderComponent.js');
-        $this->loadReactCSS('SpinnerHolderComponent.css');
+//        $this->loadReactScript('SpinnerHolderComponent.js');
+//        $this->loadReactCSS('SpinnerHolderComponent.css');
 
         $hdUsers = (new BUUser($this))->getUsersByTeamLevel(1);
 
@@ -258,6 +258,7 @@ ORDER BY engineer.firstName";
             'hdUsers'
         );
         $this->loadReactScript('FirstTimeFixReportComponent.js');
+        $this->loadReactCSS('FirstTimeFixReportComponent.css');
 
         foreach ($hdUsers as $user) {
 
