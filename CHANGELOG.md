@@ -6,6 +6,8 @@ This project changes will be shown here.
 - Issue 1072 - Activity Breakdown within SR
 - Issue 1073 - IT Review Meeting Dates
 - Issue 1079 - Show Direct Debit items on the meeting agenda
+- Issue 1080 - Add items to a contract
+- Issue 977 - New Current Activity
 ### Changed
 - Issue 1053 - New email templates
 - Issue 810 - Heavy SQL usage improvements
