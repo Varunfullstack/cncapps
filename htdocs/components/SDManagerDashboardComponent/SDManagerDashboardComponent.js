@@ -34,16 +34,16 @@ class SDManagerDashboardComponent extends MainComponent {
             allocatedUsers: []
         };
         this.tabs = [
-            {id: 1, title: "Shortest SLA Remaining", showP5: true, icon: null},
-            {id: 2, title: "Current Open P1 Requests", showP5: false, icon: null},
-            {id: 3, title: "Shortest SLA Fix Remaining", showP5: false, icon: null},
-            {id: 4, title: "Critical Service Requests", showP5: false, icon: null},
-            {id: 5, title: "Current Open SRs", showP5: true, icon: null},
-            {id: 6, title: "Oldest Updated SRs", showP5: true, icon: null},
-            {id: 7, title: "Longest Open SR", showP5: true, icon: null},
-            {id: 8, title: "Most Hours Logged", showP5: true, icon: null},
-            {id: 9, title: "Customer", showP5: false, icon: null},
-            {id: 10, title: "Daily Stats", showP5: false, icon: null},
+            {id: 1, title: "Shortest SLA Remaining", icon: null},
+            {id: 2, title: "Current Open P1 Requests", icon: null},
+            {id: 3, title: "Shortest SLA Fix Remaining", icon: null},
+            {id: 4, title: "Critical Service Requests", icon: null},
+            {id: 5, title: "Current Open SRs", icon: null},
+            {id: 6, title: "Oldest Updated SRs", icon: null},
+            {id: 7, title: "Longest Open SR", icon: null},
+            {id: 8, title: "Most Hours Logged", icon: null},
+            {id: 9, title: "Customer", icon: null},
+            {id: 10, title: "Daily Stats", icon: null},
 
         ];
     }
@@ -69,19 +69,14 @@ class SDManagerDashboardComponent extends MainComponent {
         else return "";
     };
     setActiveTab = (code) => {
-        console.log("tab change");
         const {filter} = this.state;
         filter.activeTab = code;
         this.saveFilter(filter);
-        //this.saveFilterToLocalStorage(filter);
         this.setState({filter, queueData: []});
     };
 
     getTabsElement = () => {
         const {el, tabs} = this;
-        const {filter} = this.state;
-        let tabsFilter = tabs;
-        if (filter.p5) tabsFilter = tabs.filter((t) => t.showP5 == true);
         return el(
             "div",
             {
@@ -89,7 +84,7 @@ class SDManagerDashboardComponent extends MainComponent {
                 className: "tab-container",
                 style: {flexWrap: "wrap", justifyContent: "space-between", maxWidth: 1200}
             },
-            tabsFilter.map((t) => {
+            tabs.map((t) => {
                 return el(
                     "i",
                     {
