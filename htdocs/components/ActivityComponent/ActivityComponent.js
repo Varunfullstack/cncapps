@@ -6,7 +6,6 @@ import ActivityDisplayComponent from "./subComponents/ActivityDisplayComponent";
 import ActivityEditComponent from "./subComponents/ActivityEditComponent";
 import GatherFixedInformationComponent from "./subComponents/GatherFixedInformationComponent";
 import GatherManagementReviewDetailsComponent from "./subComponents/GatherManagementReviewDetailsComponent";
-
 import './ActivityComponent.css';
 import '../style.css';
 

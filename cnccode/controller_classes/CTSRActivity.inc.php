@@ -149,6 +149,9 @@ class CTSRActivity extends CTCNC
                 );
                 exit;
             }
+            case "toggleHoldForQAFlag":
+                echo json_encode($this->setToggleHoldForQAFlag());
+                exit;
             case 'getLastActivityInServiceRequest':
                 $buActivity       = new BUActivity($this);
                 $serviceRequestId = $this->getParam('serviceRequestId');
@@ -342,6 +345,7 @@ class CTSRActivity extends CTCNC
             'assetName'                       => $dbeProblem->getValue(DBEProblem::assetName),
             'assetTitle'                      => $dbeProblem->getValue(DBEProblem::assetTitle),
             "emptyAssetReason"                => $dbeProblem->getValue(DBEProblem::emptyAssetReason),
+            "holdForQA"                       =>$dbeProblem->getValue(DBEProblem::holdForQA),
         ];
     }
 
@@ -1375,6 +1379,19 @@ GROUP BY caa_callacttypeno,
             $data[] = $db->Record;
         }
         return $data;
+    }
+    function setToggleHoldForQAFlag()
+    {
+        $problemID=$this->getParam("problemID");
+        if(isset($problemID))
+        {
+        $dbeProblem=new DBEProblem($this);
+        $dbeProblem->getRow($problemID);
+        $dbeProblem->setValue(DBEProblem::holdForQA,!$dbeProblem->getValue(DBEProblem::holdForQA));
+        $dbeProblem->updateRow();
+        return ["state"=>true];
+        }
+        return ["state"=>false];
     }
 
 

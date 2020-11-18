@@ -40,10 +40,11 @@ class ActivityDisplayComponent extends MainComponent {
                 showOperationalTasks: false,
                 showServerGuardUpdates: false,
                 criticalSR: false,
-                monitorSR: false
-            },
+                monitorSR: false,
+                holdForQA:false
         }
     }
+        }
 
     componentDidMount() {
         this.loadFilterSession();
@@ -81,6 +82,7 @@ class ActivityDisplayComponent extends MainComponent {
         })
         filters.monitorSR = res.monitoringFlag == "1";
         filters.criticalSR = res.criticalFlag == "1";
+        filters.holdForQA=res.holdForQA;
         this.setState({filters, data: res, currentActivity: +res.callActivityID, currentUser});
 
     }
@@ -371,20 +373,22 @@ class ActivityDisplayComponent extends MainComponent {
                 ...filters,
                 showTravel,
                 showOperationalTasks,
-                showServerGaurdUpdates
+                showServerGuardUpdates
             }
         }
         this.setState({filters})
     }
     handleTogaleChange = async (filter) => {
-        const {filters, currentActivity} = this.state;
+        const {filters, currentActivity,data} = this.state;
         filters[filter] = !filters[filter];
         this.setState({filters});
-
-        if (filter == "criticalSR")
+        const problemID=data.problemID;
+        if (filter === "criticalSR")
             await this.api.setActivityCritical(currentActivity);
         if (filter == "monitorSR")
             await this.api.setActivityMonitoring(currentActivity);
+        if (filter === "holdForQA")
+            await this.api.setProblemHoldForQA(problemID);
         this.saveFilterSession();
         this.loadCallActivity(currentActivity);
     }
@@ -472,7 +476,7 @@ class ActivityDisplayComponent extends MainComponent {
         } else return null;
     }
     getActivitiesElement = () => {
-        const {data, currentActivity} = this.state;
+        const {data, currentActivity,currentUser} = this.state;
         const {el} = this;
 
         const dateLen = maxLength(data?.activities || [], 'date') + 10;
@@ -530,11 +534,12 @@ class ActivityDisplayComponent extends MainComponent {
                 this.getCurrentActivityIndxElement(data, currentActivity)
             ),
             el('div', {style: {display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center"}},
+            currentUser.isSDManger?this.getToggle("QA", 'holdForQA'):null,
                 this.getToggle("Critical SR", 'criticalSR'),
                 this.getToggle("Monitor SR", 'monitorSR'),
-                this.getToggle("Show Travel", "showTravel"),
-                this.getToggle("Show Operational Tasks", "showOperationalTasks"),
-                this.getToggle("Show ServerGuard Updates", "showServerGaurdUpdates"),
+                this.getToggle("Travel", "showTravel"),
+                this.getToggle("Operational Tasks", "showOperationalTasks"),
+                this.getToggle("ServerGuard Updates", "showServerGuardUpdates"),
                 el('label', {className: "ml-5"}, 'Activity hours: '),
                 el('label', null, data?.totalActivityDurationHours),
                 el('label', {className: "ml-5"}, 'Chargeable hours: '),
