@@ -1,11 +1,5 @@
 <?php
-/**
- * Check that the mail queue has no emails older than 15 minutes
- *
- * If it does then email graham and gary and Karim
- *
- * @authors Karim Ahmed - Sweet Code Limited
- */
+use CNCLTD\LoggerCLI;
 require_once(__DIR__ . "/../htdocs/config.inc.php");
 global $cfg;
 

@@ -1,11 +1,5 @@
 <?php
-/**
- * notify certain CNC users about outstanding support calls
- *
- * called as scheduled task at given time every day
- *
- * @authors Karim Ahmed - Sweet Code Limited
- */
+use CNCLTD\LoggerCLI;
 
 require_once(__DIR__ . "/../htdocs/config.inc.php");
 global $cfg;
