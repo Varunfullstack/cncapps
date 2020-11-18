@@ -11,6 +11,7 @@ import ReactDOM from 'react-dom';
 
 import './../style.css';
 import './SDManagerDashboardComponent.css';
+import ActivityFollowOn from "../Modals/ActivityFollowOn";
 
 class SDManagerDashboardComponent extends MainComponent {
     el = React.createElement;
@@ -21,6 +22,7 @@ class SDManagerDashboardComponent extends MainComponent {
     constructor(props) {
         super(props);
         this.state = {
+            ...this.state,
             filter: {
                 hd: false,
                 es: false,
@@ -192,16 +194,164 @@ class SDManagerDashboardComponent extends MainComponent {
             this.loadAllocatedUsers();
             const {filter} = this.state;
             this.api.getQueue(id, filter).then((queueData) => {
+                queueData=queueData.map(p=>{
+                    return {...p,workBgColor:this.getProblemWorkColor(p)}
+                });
+                console.log(queueData);
+
                 this.setState({queueData})
             });
         } else return [];
 
     };
+    startWork = async (problem) => {
+        if (problem.lastCallActTypeID != null) {
+            this.setState({showFollowOn: true, followOnActivity: problem})
+        } else {
+            this.alert("Another user is currently working on this SR");
+        }
+    };
+    getFollowOnElement = () => {
+        const {showFollowOn, followOnActivity} = this.state;
+        const startWork = true;
+        return showFollowOn ? this.el(ActivityFollowOn, {
+            startWork,
+            key: "followOnModal",
+            callActivityID: followOnActivity.callActivityID,
+            onCancel: () => this.setState({showFollowOn: false})
+        }) : null;
+    }
+    // end of shared methods
+    getProblemWorkTitle(problem) {
+        let title = "";
+        if (problem.workBgColor == null) title = "Work on this request";
+        if (problem.hoursRemainingBgColor == "#FFF5B3")
+            title = "Request not started yet";
+        if (problem.workBgColor == "#BDF8BA")
+            title = "Request being worked on by somebody else";
+        return title;
+    }
+    getProblemWorkColor(problem) {
+        let color = "#C6C6C6";
+        if (problem.bgColour == null) color = "#C6C6C6";
+        if (problem.hoursRemainingBgColor == "#FFF5B3") color = "#FFF5B3";
+        if (problem.bgColour == "#BDF8BA") color = "#BDF8BA";
+        return color;
+    }
     getQueueElement = () => {
         const {filter, queueData} = this.state;
         const {el} = this;
         if (filter.activeTab < 9) {
             const columns = [
+                {
+                    hide: false,
+                    order: 1,
+                    path: null,
+                    label: "",
+                    key: "work",
+                    sortable: false,
+                    hdClassName: "text-center",
+                    className: "text-center",
+                    content: (problem) =>
+                    el(ToolTip,{title: this.getProblemWorkTitle(problem),
+                    content:                
+                            el(
+                                "div",
+                                {key: "img1", onClick: () => this.startWork(problem)},
+                                el("i", {
+                                    className:
+                                        (problem.workBgColor === "#C6C6C6"
+                                            ? "fal fa-play"
+                                            : "fad fa-play ") +
+                                        " fa-2x  pointer inbox-icon" +
+                                        problem.workHidden || "",
+                                    style: {
+                                        color: problem.workBgColor,
+                                        "--fa-primary-color":
+                                            problem.workBgColor == "#FFF5B3" ? "gold" : "#32a852",
+                                        "--fa-secondary-color":
+                                            problem.workBgColor == "#FFF5B3" ? "gray" : "gray",
+                                    },
+                                })
+                            )
+                            }),
+                },
+                {
+                    hide: false,
+                    order: 2,
+                    path: null,
+                    key: "custsomerIcon",
+                    label: "",
+                    sortable: false,
+                    toolTip: "Special Attention customer / contact",
+                    content: (problem) =>
+                        problem.customerNameDisplayClass != null
+                            ? el("i", {
+                                className:
+                                    "fal fa-2x fa-star color-gray pointer float-right inbox-icon",
+                                key: "starIcon",
+                            })
+                            : null,
+                },
+                {
+                    hide: false,
+                    order: 3,
+                    path: null,
+                    key: "hoursRemainingIcon",
+                    label: "",
+                    sortable: false,
+                    toolTip: "On Hold",
+                    className: "text-center",
+                    content: (problem) =>
+                        problem.hoursRemainingBgColor === "#BDF8BA"
+                            ? el("i", {
+                                className: "fal  fa-user-clock color-gray pointer inbox-icon",
+                                key: "icon",
+                                style: {float: "right"},
+                            })
+                            : null,
+                },
+    
+                {
+                    hide: false,
+                    order: 4,
+                    path: null,
+                    key: "problemIdIcon",
+                    label: "",
+                    sortable: false,
+                    className: "text-center",
+                    toolTip: "SLA Failed for this Service Request",
+                    content: (problem) =>
+                        problem.bgColour == "#F8A5B6"
+                            ? el("i", {
+                                className:
+                                    "fal fa-2x fa-bell-slash color-gray pointer inbox-icon",
+                                title: "",
+                                key: "icon",
+                            })
+                            : null,
+                },
+                {
+                    hide: false,
+                    order: 4.1,
+                    path: null,
+                    key: "Future Icon",
+                    label: "",
+                    sortable: false,
+                    content: (problem) =>
+                        moment(problem.alarmDateTime) > moment()
+                            ? addToolTip(
+                            el("i", {
+                                className:
+                                    "fal fa-2x fa-alarm-snooze color-gray pointer float-right inbox-icon",
+                                key: "starIcon",
+                            }),
+                            `This Service Request is scheduled for the future date of ${moment(
+                                problem.alarmDateTime
+                            ).format("DD/MM/YYYY HH:mm")}`
+                            )
+                            : null,
+                },
                 {
                     path: "problemID",
                     label: "",
@@ -210,7 +360,7 @@ class SDManagerDashboardComponent extends MainComponent {
                     icon: "fal fa-2x fa-hashtag color-gray2 pointer",
                     sortable: false,
                     className: "text-center",
-                    backgroundColorColumn: "bgColour",
+                    //backgroundColorColumn: "bgColour",
                     classNameColumn: "",
                     content: (problem) => el('a', {
                         href: `Activity.php?action=displayLastActivity&problemID=${problem.problemID}`,
@@ -224,7 +374,7 @@ class SDManagerDashboardComponent extends MainComponent {
                     hdClassName: "text-center",
                     icon: "fal fa-2x fa-building color-gray2 pointer",
                     sortable: false,
-                    classNameColumn: "customerNameDisplayClass",
+                    //classNameColumn: "customerNameDisplayClass",
                     content: (problem) => el('a', {
                         href: `SalesOrder.php?action=search&customerID=${problem.customerID}`,
                         target: '_blank'
@@ -238,7 +388,7 @@ class SDManagerDashboardComponent extends MainComponent {
                     icon: "fal fa-2x fa-signal color-gray2 pointer",
                     sortable: false,
                     className: "text-center",
-                    classNameColumn: "priorityBgColor",
+                   // classNameColumn: "priorityBgColor",
                 },
                 {
                     path: "",
@@ -265,7 +415,7 @@ class SDManagerDashboardComponent extends MainComponent {
                     icon: "fal fa-2x fa-clock  color-gray2 pointer",
                     sortable: false,
                     className: "text-center",
-                    backgroundColorColumn: "hoursRemainingBgColor"
+                    //backgroundColorColumn: "hoursRemainingBgColor"
                 },
                 {
                     path: "totalActivityDurationHours",
@@ -441,6 +591,8 @@ class SDManagerDashboardComponent extends MainComponent {
     render() {
         const {el} = this;
         return el("div", null,
+            this.getAlert(),
+            this.getFollowOnElement(),
             this.getFilterElement(),
             this.getTabsElement(),
             this.getQueueElement(),

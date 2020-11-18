@@ -33,7 +33,7 @@ class DBEJProblem extends DBEProblem
     const dashboardSortColumn = "dashboardSortColumn";
     const hoursRemaining = 'hoursRemaining';
     const specialAttentionContactFlag = "specialAttentionContactFlag";
-
+    const referredFlag="referredFlag";
 
     /**
      * calls constructor()
@@ -203,14 +203,19 @@ class DBEJProblem extends DBEProblem
             DA_ALLOW_NULL,
             'pro_working_hours - pro_sla_response_hours'
         );
-
+        
         $this->addColumn(
             self::specialAttentionContactFlag,
             DA_YN_FLAG,
             DA_ALLOW_NULL,
             '(select contact.specialAttentionContactFlag from contact where con_contno = initial.caa_contno)'
         );
-
+        $this->addColumn(
+          self::referredFlag,
+          DA_STRING,
+          DA_ALLOW_NULL,
+          'customer.cus_referred'
+        );
         $this->setAddColumnsOff();
         $this->setPK(0);
     }

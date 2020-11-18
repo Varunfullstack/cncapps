@@ -288,6 +288,19 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
                 $problemID
             );
             $dbeProblem->getRow();
+            $hoursRemainingBgColor="";
+            if ($problems->getValue(DBEJProblem::respondedHours) == 0 && $problems->getValue(
+                DBEJProblem::status
+            ) == 'I') {
+            /*
+            Initial SRs that have not yet been responded to
+            */
+            $hoursRemainingBgColor = self::AMBER;
+            } elseif ($problems->getValue(DBEJProblem::awaitingCustomerResponseFlag) == 'Y') {
+                $hoursRemainingBgColor = self::GREEN;
+            } else {
+                $hoursRemainingBgColor = self::BLUE;
+            }
 
             $totalActivityDurationHours = $problems->getValue(DBEJProblem::totalActivityDurationHours);
             array_push(
@@ -343,6 +356,15 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
                     'activityCount'          => $activityCount,
                     'teamID'                 => $problems->getValue(DBEJProblem::teamID),
                     "engineerId"             => $problems->getValue(DBEJProblem::userID),
+                    "hoursRemainingBgColor"  =>$hoursRemainingBgColor,
+                    "workHidden"             => $problems->getValue(DBECustomer::referredFlag) == 'Y',
+                    'customerNameDisplayClass'   => $this->getCustomerNameDisplayClass(
+                        $problems->getValue(DBEJProblem::specialAttentionFlag),
+                        $problems->getValue(DBEJProblem::specialAttentionEndDate),
+                        $problems->getValue(DBEJProblem::specialAttentionContactFlag)
+                    ),
+                    "lastCallActTypeID"      =>$problems->getValue(DBEJProblem::lastCallActTypeID),
+                    "callActivityID"         =>$problems->getValue(DBEJProblem::callActivityID)
                 )
             );
 
