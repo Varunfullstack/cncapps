@@ -16,6 +16,7 @@ This project changes will be shown here.
 - Issue 1078 - Sales Request Dashboard Attachment Link error
 - Issue 1077 - Service Requests By Customer Report Broken
 - Issue 1020 - Deleting Sales Order lines doesn't update the total until the page is reloaded
+- Issue 1076 - Internal email formatting
 
 ## [v4.12.0] - 2020-11-10
 ### Added
