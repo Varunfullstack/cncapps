@@ -117,7 +117,8 @@ class FirstTimeFixReportComponent extends MainComponent {
         // this.setState({loading:true})
         if (this.isValid())
             Promise.all([
-                this.apiFirstTimeFixReport.search(filter.startDate,
+                this.apiFirstTimeFixReport.search(
+                  filter.startDate,
                     filter.endDate,
                     filter.customerID,
                     filter.engineerID),
@@ -190,7 +191,7 @@ class FirstTimeFixReportComponent extends MainComponent {
                            target={"_blank"}
                         > {e.problemID}</a>
                     </td>
-                    <td dangerouslySetInnerHTML={e.reason}></td>
+                    <td dangerouslySetInnerHTML={{__html: e.reason}}></td>
                 </tr>
             )}
             </tbody>

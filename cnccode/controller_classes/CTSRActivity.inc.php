@@ -1292,7 +1292,7 @@ class CTSRActivity extends CTCNC
         $userID=$_REQUEST["userID"]??null;
         $startDate=$_REQUEST["startDate"]??null;
         $endDate=$_REQUEST["endDate"]??null;
-
+        $customerID=$_REQUEST["customerID"]??null;
         $query="SELECT p.`id`,p.userID,p.`problemID`,p.`reason`,p.`createAt`,CONCAT(c.`firstName`,' ',c.`lastName`) userName ,cus_name customerName
         FROM `problemnotstartreason` p  JOIN `consultant` c ON p.`userID`=c.`cns_consno`
         JOIN problem on problem.pro_problemno= p.`problemID`
@@ -1303,6 +1303,11 @@ class CTSRActivity extends CTCNC
         {
             $query .=" and p.`problemID`=:problemID";
             $params["problemID"]=$problemID;
+        }
+        if(isset($customerID)&&$customerID!='')
+        {
+            $query .=" and problem.pro_custno=:customerID";
+            $params["customerID"]=$customerID;
         }
         if(isset($userID)&&$userID!='')
         {
