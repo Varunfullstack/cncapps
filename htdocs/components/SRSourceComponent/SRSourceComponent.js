@@ -93,7 +93,7 @@ class SRSourceComponent extends React.Component {
                     const updatedSearch = {...this.state.search};
                     updatedSearch.result = result;
                     updatedSearch.resultSummary = this.getSummary(result);
-                    //console.log(result);
+
                     this.setState({search: updatedSearch, showSpinner: false});
                 });
         }
@@ -105,15 +105,7 @@ class SRSourceComponent extends React.Component {
         this.setState({search}, () => this.valid());
     };
     valid = () => {
-        let isValid = true;
-        // const search = { ...this.state.search };
-        // search.errors = [];
-        // if (!search.customer){
-        //    search.errors["customer"] = "Please select customer";
-        //    isValid=false;
-        // }
-        // this.setState({ search });
-        return isValid;
+        return true;
     };
     makeid = (length = 5) => {
         var result = '';

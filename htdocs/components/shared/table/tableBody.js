@@ -4,7 +4,7 @@ import React from 'react';
 class TableBody extends React.Component {
     el = React.createElement;
     index = 0;
-    get = (o, p) => p != null ? p.split('.').reduce((a, v) => a != undefined && a[v], o) : '';
+    get = (o, p) => p != null ? p.split('.').reduce((a, v) => a !== undefined && a[v], o) : '';
 
     makeid(length = 5) {
         var result = "";
@@ -29,7 +29,7 @@ class TableBody extends React.Component {
             data.map((item, index) => el("tr", {
                 key: (pk ? item[pk] : item[0]).toString() + makeid().toString(),
                 id: (pk ? item[pk] : null).toString(),
-                className: selected && pk && selected[pk] == item[pk] && selected[selectedKey] === item[selectedKey] ? 'selected' : null
+                className: selected && pk && selected[pk] === item[pk] && selected[selectedKey] === item[selectedKey] ? 'selected' : null
             }, columns.map(c => el("td", {
                     key: c.path || c.key || c.label.replace(' ', '') + makeid().toString(),
                     className: (c.className ? c.className : ' ') + " " + (c.classNameColumn ? this.get(item, c.classNameColumn) : '')

@@ -70,7 +70,7 @@ class FixedServiceRequestCountComponent extends React.Component {
         })
             .then(r => r.json())
             .then(response => {
-                if (response.status != 'ok') {
+                if (response.status !== 'ok') {
                     throw new Error('Failed to pull data');
                 }
                 return response.data;
@@ -88,7 +88,7 @@ class FixedServiceRequestCountComponent extends React.Component {
         })
             .then(r => r.json())
             .then(response => {
-                if (response.status != 'ok') {
+                if (response.status !== 'ok') {
                     throw new Error('Failed to pull data');
                 }
                 return response.data;
@@ -301,7 +301,7 @@ class FixedServiceRequestCountComponent extends React.Component {
                                 currentTeam.timeRequests += +row.timeRequests;
                                 currentTeam.changeRequests += +row.changeRequests;
                                 currentTeam.operationalTasks += +row.operationalTasks;
-                                const foundFirstTimeFixData = firstTimeFixData.engineers.find(x => x.id == row.userId);
+                                const foundFirstTimeFixData = firstTimeFixData.engineers.find(x => x.id === row.userId);
 
                                 let firstTimeFixTotalRaised = null;
                                 let firstTimeFixPct = null;
@@ -333,7 +333,7 @@ class FixedServiceRequestCountComponent extends React.Component {
                                 )
                             }
                             previousTeam = currentTeam;
-                            if (index == array.length - 1) {
+                            if (index === array.length - 1) {
                                 this.footerRow(acc, teamPerformanceData, previousTeam);
                             }
                             return acc;

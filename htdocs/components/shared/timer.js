@@ -16,12 +16,12 @@ class Timer extends React.Component {
     }
 
     validHours = (hours) => {
-        if (hours && hours != "" && parseInt(hours) < 24 && hours >= 0)
+        if (hours && hours !== "" && parseInt(hours) < 24 && hours >= 0)
             return hours;
         else return "";
     }
     validMinutes = (minutes) => {
-        if (minutes && minutes != "" && minutes < 60 && minutes >= 0)
+        if (minutes && minutes !== "" && minutes < 60 && minutes >= 0)
             return minutes;
         else return "";
     }
@@ -31,7 +31,7 @@ class Timer extends React.Component {
         data.minutes = this.validMinutes(minutes);
         this.setState({data});
         if (this.props.onChange) {
-            const val = (data.hours != "" ? data.hours : "00") + ":" + (data.minutes != "" ? data.minutes : "00")
+            const val = (data.hours !== "" ? data.hours : "00") + ":" + (data.minutes !== "" ? data.minutes : "00")
             this.props.onChange(val);
         }
     }

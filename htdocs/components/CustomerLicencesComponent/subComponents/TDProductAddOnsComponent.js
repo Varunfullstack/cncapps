@@ -55,13 +55,13 @@ class TDProductAddOnsComponent extends React.Component {
     getAddons() {
 
         const {skus} = this.props;
-        console.log(skus);
+
         if (skus && skus.length > 0)
             this.apiCustomerLicenses.getProductBySKU({
                 "skus": skus
             }).then(result => {
-                console.log("getProductBySKU", result);
-                if (result.Result == 'Success') {
+
+                if (result.Result === 'Success') {
                     this.setState({productDetails: result.BodyText.productDetails});
                     this.addonsLoad = true;
 

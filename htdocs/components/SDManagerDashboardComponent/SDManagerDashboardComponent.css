@@ -3,24 +3,27 @@
     flex-direction: column;
     min-width: 195px;
     min-height: 150px;
-    justify-content:  flex-star;
+    justify-content: flex-start;
     padding: 10px;
     margin: 5px;
     background: gray;
     align-items: center;
 
 }
-.sd-card td{
+
+.sd-card td {
     font-family: Arial, Tahoma, Helvetica, sans-serif;
     font-size: 20px;
-    padding: 0px;
+    padding: 0;
     padding-right: 5px;
     white-space: nowrap;
 }
-.sd-card table{
-    border-spacing:0px
+
+.sd-card table {
+    border-spacing: 0
 }
-.sd-card-title{
+
+.sd-card-title {
     margin-top: 5px;
     font-size: 22px;
     font-weight: bold;

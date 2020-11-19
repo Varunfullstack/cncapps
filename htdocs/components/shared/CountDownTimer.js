@@ -6,7 +6,7 @@ class CountDownTimer extends React.Component {
 
     constructor(props) {
         super(props);
-        console.log(props.seconds);
+
         this.state = {
             time: {},
             seconds: props.seconds,
@@ -28,12 +28,12 @@ class CountDownTimer extends React.Component {
         });
 
         // Check if we're at zero.
-        if (seconds == 0) {
+        if (seconds === 0) {
             clearInterval(this.timer);
         }
     };
     startTimer = () => {
-        if (this.timer == 0 && this.state.seconds > 0) {
+        if (this.timer === 0 && this.state.seconds > 0) {
             this.timer = setInterval(this.countDown, 1000);
         }
     };
@@ -47,12 +47,11 @@ class CountDownTimer extends React.Component {
         let divisor_for_seconds = divisor_for_minutes % 60;
         let seconds = Math.ceil(divisor_for_seconds);
 
-        let obj = {
+        return {
             h: hours,
             m: minutes,
             s: seconds,
         };
-        return obj;
     }
 
     getRemainTime = () => {

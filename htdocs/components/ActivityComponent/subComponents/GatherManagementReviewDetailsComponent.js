@@ -40,7 +40,7 @@ class GatherManagementReviewDetailsComponent extends MainComponent {
     };
     handleOnSave = () => {
         const {description} = this.state;
-        if (description == "") {
+        if (description === "") {
             this.alert("Please enter reason for management review");
             return;
         }

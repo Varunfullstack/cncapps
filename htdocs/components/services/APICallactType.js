@@ -1,8 +1,8 @@
-import { groupBy, sort } from "../utils/utils.js";
+import {sort} from "../utils/utils.js";
 import APIMain from "./APIMain.js";
 import ApiUrls from "./ApiUrls.js";
 
- 
+
 class APICallactType extends APIMain{    
     get(id)
     {

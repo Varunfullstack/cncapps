@@ -10,7 +10,7 @@ class Stepper extends React.Component {
 
     handleOnClick = (step) => {
 
-        if (this.props.onChange && (!step?.disabled && true))
+        if (this.props.onChange && (!step?.disabled))
             this.props.onChange(step);
     }
 

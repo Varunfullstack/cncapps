@@ -2,6 +2,7 @@ import Table from "./../../shared/table/table";
 import CurrentActivityService from "../services/CurrentActivityService";
 
 import React from 'react';
+import {ColumnRenderer} from "./ColumnRenderer";
 
 class InboxProjectsComponent extends React.Component {
     code = "P";
@@ -32,160 +33,16 @@ class InboxProjectsComponent extends React.Component {
             getAllocatedElement,
         } = this.props;
         let columns = [
-            {
-                hide: false,
-                order: 1,
-                path: null,
-                label: "",
-                key: "work",
-                sortable: false,
-                className: "text-center",
-                hdClassName: "text-center",
-                content: (problem) =>
-                    addToolTip(
-                        el(
-                            "div",
-                            {key: "img1", onClick: () => startWork(problem, this.code)},
-                            el("i", {
-                                className:
-                                    (problem.workBtnColor === "#C6C6C6"
-                                        ? "fal fa-play"
-                                        : "fad fa-play ") +
-                                    " fa-2x  pointer inbox-icon" +
-                                    problem.workHidden || "",
-                                style: {
-                                    color: problem.workBtnColor,
-                                    "--fa-primary-color":
-                                        problem.workBtnColor == "#FFF5B3" ? "gold" : "#32a852",
-                                    "--fa-secondary-color":
-                                        problem.workBtnColor == "#FFF5B3" ? "gray" : "gray",
-                                },
-                            })
-                        ),
-                        problem.workBtnTitle
-                    ),
-            },
-            {
-                hide: false,
-                order: 2,
-                path: null,
-                key: "custsomerIcon",
-                label: "",
-                sortable: false,
-                toolTip: "Special Attention customer / contact",
-                content: (problem) =>
-                    problem.customerNameDisplayClass != null
-                        ? el("i", {
-                            className:
-                                "fal fa-2x fa-star color-gray pointer float-right inbox-icon",
-                            key: "starIcon",
-                        })
-                        : null,
-            },
-            {
-                hide: false,
-                order: 4.1,
-                path: null,
-                key: "Future Icon",
-                label: "",
-                sortable: false,
-                content: (problem) =>
-                    moment(problem.alarmDateTime) > moment()
-                        ? addToolTip(
-                        el("i", {
-                            className:
-                                "fal fa-2x fa-alarm-snooze color-gray pointer float-right inbox-icon",
-                            key: "starIcon",
-                        }),
-                        `This Service Request is scheduled for the future date of ${moment(
-                            problem.alarmDateTime
-                        ).format("DD/MM/YYYY HH:mm")}`
-                        )
-                        : null,
-            },
-            {
-                hide: false,
-                order: 10,
-                path: null,
-                label: "",
-                key: "moreTime",
-                hdToolTip: "Amount of time left on the Service Request",
-                icon: "fal fa-2x fa-stopwatch color-gray2 ",
-                width: "40",
-                sortable: false,
-                hdClassName: "text-center",
-                className: "text-center",
-                toolTip: "Request more time",
-                content: (problem) => [
-                    el(
-                        "div",
-                        {
-                            key: "img1",
-                            style: {display: "flex", flexDirection: "row", width: "100%", alignItems: "center"},
-                            onClick: () => requestAdditionalTime(problem)
-                        },
-                        el(
-                            "i",
-                            {
-                                className: "fal fa-2x fa-hourglass-end color-gray inbox-icon float-left",
-                                style: {cursor: "pointer", width: 20},
-                            },
-                            ""
-                        ),
-                        el(
-                            "span",
-                            {
-                                key: "span1",
-                                className: "float-right",
-                                style: {},
-                            },
-                            `${problem.projectTeamRemaining}`
-                        )
-                    ),
-                ],
-            },
-            {
-                hide: false,
-                order: 3,
-                path: null,
-                key: "hoursRemainingIcon",
-                label: "",
-                sortable: false,
-                toolTip: "On Hold",
-                className: "text-center",
-                content: (problem) =>
-                    problem.hoursRemainingBgColor === "#BDF8BA"
-                        ? el("i", {
-                            className: "fal  fa-user-clock color-gray pointer inbox-icon",
-                            key: "icon",
-                            style: {float: "right"},
-                        })
-                        : null,
-            },
-
-            {
-                hide: false,
-                order: 4,
-                path: null,
-                key: "problemIdIcon",
-                label: "",
-                sortable: false,
-                className: "text-center",
-                toolTip: "SLA Failed for this Service Request",
-                content: (problem) =>
-                    problem.bgColour == "#F8A5B6"
-                        ? el("i", {
-                            className:
-                                "fal fa-2x fa-bell-slash color-gray pointer inbox-icon",
-                            title: "",
-                            key: "icon",
-                        })
-                        : null,
-            },
+            ColumnRenderer.getWorkIconColumn(startWork, this.code),
+            ColumnRenderer.getSpecialAttentionColumn(),
+            ColumnRenderer.getFutureWorkColumn(),
+            ColumnRenderer.getRequestTimeColumn(requestAdditionalTime),
+            ColumnRenderer.getOnHoldColumn(),
+            ColumnRenderer.getSLABreachedColumn(),
             {
                 hide: false,
                 order: 8,
-                path: "hoursRemaining",
+                path: "hoursRemainingForSLA",
                 key: "hoursRemainingLabel",
                 label: "",
                 hdToolTip: "Hours the Service Request has been open",
@@ -257,18 +114,7 @@ class InboxProjectsComponent extends React.Component {
                         problem.customerName
                     ),
             },
-            {
-                hide: false,
-                order: 11,
-                path: "priority",
-                label: "",
-                hdToolTip: "Service Request Priority",
-                icon: "fal fa-2x fa-signal color-gray2 ",
-                sortable: false,
-                hdClassName: "text-center",
-                className: "text-center",
-                backgroundColorColumn: "priorityBgColor"
-            },
+            ColumnRenderer.getPriorityColumn(),
             {
                 hide: false,
                 order: 12,
@@ -325,7 +171,7 @@ class InboxProjectsComponent extends React.Component {
                     ),
             });
         columns = columns
-            .filter((c) => c.hide == false)
+            .filter((c) => c.hide === false)
             .sort((a, b) => (a.order > b.order ? 1 : -1));
         const {data} = this.props;
 
@@ -351,13 +197,13 @@ class InboxProjectsComponent extends React.Component {
                         const index = prev.findIndex(
                             (p) => p.name === current.engineerName
                         );
-                        if (index == -1)
+                        if (index === -1)
                             prev.push({name: current.engineerName, total: 1});
                         else prev[index].total += 1;
                         return prev;
                     }, [])
                     .map((p) => {
-                        if (p.name != null && p.name != "") {
+                        if (p.name != null && p.name !== "") {
                             p.name = p.name.replace("  ", " ");
                             const arr = p.name.split(" ");
                             p.name = arr[0][0] + arr[1][0];

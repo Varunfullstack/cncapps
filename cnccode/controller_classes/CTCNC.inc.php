@@ -292,18 +292,6 @@ class CTCNC extends Controller
         return $this->dbeUser;
     }
 
-    static function truncate($reason,
-                             $length = 100
-    )
-    {
-        return substr(
-            common_stripEverything($reason),
-            0,
-            $length
-        );
-
-    }
-
     function canAccess($roles)
     {
         $perms = explode(

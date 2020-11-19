@@ -1,5 +1,6 @@
 import Table from "./../../shared/table/table";
 import React from 'react';
+
 class CustomerSRComponent extends React.Component {
     el = React.createElement;
 
@@ -111,7 +112,7 @@ class CustomerSRComponent extends React.Component {
             }
         ];
         columns = columns
-            .filter((c) => c.hide == false)
+            .filter((c) => c.hide === false)
             .sort((a, b) => (a.order > b.order ? 1 : -1));
 
         return el(Table, {
@@ -126,7 +127,7 @@ class CustomerSRComponent extends React.Component {
     render() {
         const {items} = this.props;
         const {getTableElement, el} = this;
-        console.log(items.length);
+
         return (
             el('div', null, getTableElement(items))
         );

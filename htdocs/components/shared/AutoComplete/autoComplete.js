@@ -1,4 +1,6 @@
-"use strict";  import React from 'react';
+"use strict";
+import React from 'react';
+
 class AutoComplete extends React.Component {
   constructor(props) {
     super(props);
@@ -18,7 +20,7 @@ class AutoComplete extends React.Component {
   }
   // Event fired when the input value is changed
   onChange = (e) => {
-    //console.log(e.currentTarget.value);
+
     let { items, displayLength ,displayColumn} = this.props;
     if (!displayLength) displayLength = 10;
     const userInput = e.currentTarget.value;
@@ -55,7 +57,7 @@ class AutoComplete extends React.Component {
     {
     const {displayColumn,onSelect}=this.props;
     // Update the user input and reset the rest of the state
-    //console.log('click',item);
+
     this.setState({
       activeSuggestion: 0,
        showSuggestions: false,
@@ -69,8 +71,8 @@ class AutoComplete extends React.Component {
   onKeyDown = (e) => {
     const { activeSuggestion, filteredSuggestions,userInput } = this.state;
     const {displayColumn,onSelect}   =this.props;
-    //console.log(userInput);
-    if(userInput.length==0)
+
+    if(userInput.length===0)
     {
       this.setState({
         activeSuggestion: -1,
@@ -191,7 +193,7 @@ class AutoComplete extends React.Component {
           }, displayColumn ? suggestion[displayColumn] : suggestion);
         }));
       } else {
-        if(userInput!="")
+        if(userInput!=="")
         suggestionsListComponent =React.createElement("div", {
           className: "no-suggestions"
         }, React.createElement("em", null, errorMessage ? errorMessage : "No items "));

@@ -41,7 +41,7 @@ class NewOrderComponent extends React.Component {
                 state.selectedDomain = '';
         }
 
-        ////console.log(endCustomer.BodyText.endCustomerDetails);
+        //
         const currentUser = await this.apiCustomerLicenses.getCurrentUser();
         let productList = await this.apiCustomerLicenses.getLocalProducts();
 
@@ -50,16 +50,16 @@ class NewOrderComponent extends React.Component {
             return p;
         });
         let pages = productList.length / 20;
-        //console.log(productList);
-        //console.log(Math.ceil( pages));
+
+
 
         for (let i = 0; i < productList.length; i += 20) {
             const chunck = productList.slice(i, i + 20);
-            //console.log("chunck", chunck);
+
             let streamOneProducts = await this.apiCustomerLicenses.getProductBySKU({
                 skus: chunck.map((p) => p.sku),
             });
-            //console.log("streamOneProduct", streamOneProducts);
+
             productList = productList.map((p) => {
                 const streamProduct = streamOneProducts.BodyText.productDetails.filter(
                     (s) => s.sku === p.sku
@@ -73,7 +73,7 @@ class NewOrderComponent extends React.Component {
         }
 
 
-        //console.log(productList);
+
         if (state.endCustomer.email)
             state = {
                 ...state,
@@ -84,7 +84,7 @@ class NewOrderComponent extends React.Component {
                 },
             };
         else this.setState({error: "Please select customer"});
-        //console.log("state",state);
+
         this.setState({...state});
         this.hideSpinner();
     }
@@ -96,12 +96,12 @@ class NewOrderComponent extends React.Component {
         this.setState({_showSpinner: false});
     };
     // handleProductListChange = (event) => {
-    //   ////console.log(event.target.value);
+    //   //
     //   const { productList } = this.state;
     //   const selectedCategory = productList.filter(
     //     (p) => p.listingName == event.target.value
     //   )[0];
-    //   ////console.log(selectedCategory);
+    //   //
     //   this.setState({
     //     selectedCategoryName: event.target.value,
     //     selectedCategory,
@@ -136,7 +136,7 @@ class NewOrderComponent extends React.Component {
     }
 
     handleProductQuantity = (event, product) => {
-        ////console.log(event.target.value,product);
+        //
         const {filteredProductList} = this.state;
         let index = filteredProductList.map((s) => s.sku).indexOf(product.sku);
         filteredProductList[index].quantity = event.target.value;
@@ -211,7 +211,7 @@ class NewOrderComponent extends React.Component {
     };
     getOrderFinalItemsElement = () => {
         let items = this.getFinalOrderItems();
-        //console.log(items);
+
         const columns = [
             {
                 path: "sku",
@@ -262,8 +262,7 @@ class NewOrderComponent extends React.Component {
         } else return null;
     };
     valid = (customer) => {
-        if (
-            !customer.companyName ||
+        return !(!customer.companyName ||
             !customer.firstName ||
             !customer.lastName ||
             !customer.email ||
@@ -271,27 +270,24 @@ class NewOrderComponent extends React.Component {
             !customer.addressLine1 ||
             !customer.country ||
             !customer.postalCode ||
-            !customer.city
-        )
-            return false;
-        else return true;
+            !customer.city);
     };
     handleSubmit = () => {
         let items = this.getFinalOrderItems();
         const {endCustomer, selectedDomain, currentUser} = this.state;
 
-        if (items.length == 0) {
+        if (items.length === 0) {
             alert("Your cart is empty Please set product quantities");
             return;
         }
         if (!this.valid(endCustomer)) {
             this.setState({errorMessage: null, _showCustomerModal: true});
-            return;
+
         }
         // place order
         else {
             this.showSpinner();
-            //console.log(endCustomer, selectedDomain);
+
             const lines = items.map((item) => {
                 if (selectedDomain)
                     return {
@@ -330,11 +326,11 @@ class NewOrderComponent extends React.Component {
             if (endCustomer.endCustomerId == null) {
                 order.placeOrders[0].endCustomer = {...endCustomer}
             }
-            // //console.log(order);
+            //
             // this.hideSpinner();
             // return;
             this.apiCustomerLicenses.addOrder(order).then((res) => {
-                //console.log(res);
+
                 if (
                     res.Result === "Success" &&
                     res.BodyText.placeOrdersDetails[0].result === "success"
@@ -346,7 +342,7 @@ class NewOrderComponent extends React.Component {
         }
     };
     handleCustomerOnSumbit = (customer) => {
-        //console.log(customer);
+
         this.setState({_showCustomerModal: false, endCustomer: customer});
         setTimeout(() => this.handleSubmit(), 100)
 
@@ -355,7 +351,7 @@ class NewOrderComponent extends React.Component {
         this.setState({_showCustomerModal: false});
     }
     handleSearch = (event) => {
-        //console.log(event.target.value);
+
         const value = event.target.value;
         const {productList} = this.state;
         const filteredProductList = productList.filter(p =>
@@ -365,7 +361,7 @@ class NewOrderComponent extends React.Component {
             p.skuType.toLowerCase().indexOf(value) >= 0 ||
             p.listingName.toLowerCase().indexOf(value) >= 0 ||
             p.quantity.toString().toLowerCase().indexOf(value) >= 0);
-        //console.log(filteredProductList);
+
         this.setState({filteredProductList});
     }
 

@@ -69,8 +69,8 @@ class Table extends React.Component {
     updateIndex = (e, ui) => {
         const currentItemId = $(ui.item[0]).attr('id');
         const nextItemId = $(ui.item[0]).next().attr('id');
-        const currentItem = this.props.data.filter(i => i[this.props.pk] == currentItemId)[0];
-        const nextItem = this.props.data.filter(i => i[this.props.pk] == nextItemId)[0];
+        const currentItem = this.props.data.filter(i => i[this.props.pk] === currentItemId)[0];
+        const nextItem = this.props.data.filter(i => i[this.props.pk] === nextItemId)[0];
         if (this.props.onOrderChange)
             this.props.onOrderChange(currentItem, nextItem);
     };
@@ -91,15 +91,15 @@ class Table extends React.Component {
             if (
                 this.get(a, path) > this.get(b, path) ||
                 this.get(a, path) == null ||
-                this.get(a, path) == undefined
+                this.get(a, path) === undefined
             )
-                return order == "asc" ? 1 : -1;
+                return order === "asc" ? 1 : -1;
             if (
                 this.get(a, path) < this.get(b, path) ||
                 this.get(b, path) == null ||
-                this.get(a, path) == undefined
+                this.get(a, path) === undefined
             )
-                return order == "asc" ? -1 : 1;
+                return order === "asc" ? -1 : 1;
             else return 0;
         });
     };
@@ -107,7 +107,7 @@ class Table extends React.Component {
         clearTimeout(this.delayTimer);
         event.persist();
         this.delayTimer = setTimeout(() => {
-            console.log(event.target.value);
+
             this.setState({searchFilter: event.target.value});
         }, 1000); // Will do the ajax stuff after 1000 ms, or 1 s
     };
@@ -118,7 +118,7 @@ class Table extends React.Component {
         if (searchFilter && searchFilter.length > 0) {
             for (let i = 0; i < data.length; i++) {
                 for (let j = 0; j < columns.length; j++) {
-                    if (columns[j].path != null && columns[j].path != "") {
+                    if (columns[j].path != null && columns[j].path !== "") {
                         if (
                             data[i][columns[j].path] &&
                             data[i][columns[j].path]

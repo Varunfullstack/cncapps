@@ -44,9 +44,7 @@ class InboxToBeLoggedComponent extends React.Component {
                         el(
                             "div",
                             {key: "deleteIcon", onClick: () => deleteSR(problem, this.code)},
-                            el("i", {
-                                className: "fal fa-trash-alt color-gray pointer inbox-icon",
-                            })
+                            el("i", {className: "fal fa-trash-alt color-gray pointer inbox-icon",})
                         ),
                         "Delete"
                     ),
@@ -156,7 +154,7 @@ class InboxToBeLoggedComponent extends React.Component {
         ];
 
         columns = columns
-            .filter((c) => c.hide == false)
+            .filter((c) => c.hide === false)
             .sort((a, b) => (a.order > b.order ? 1 : -1));
         const {data} = this.props;
 
@@ -170,9 +168,7 @@ class InboxToBeLoggedComponent extends React.Component {
     };
 
     render() {
-        const {el, getTableElement} = this;
-        const {data} = this.props;
-        // console.log(data);
+        const {getTableElement} = this;
         return [
             getTableElement(),
         ];

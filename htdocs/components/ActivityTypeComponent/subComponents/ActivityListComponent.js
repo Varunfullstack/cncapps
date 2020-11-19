@@ -258,15 +258,15 @@ class ActivityListComponent extends MainComponent {
                 })
             },
         ];
-        let columnsFilter = [];
-        if (filterColumn != 'all')
+        let columnsFilter;
+        if (filterColumn !== 'all')
             columnsFilter = columns.filter(c => c.path === filterColumn || c.path === "" || c.path === "description");
         else
             columnsFilter = [...columns];
 
         return this.el(
             "div",
-            {style: {width: filterColumn != 'all' ? 500 : "100%"}},
+            {style: {width: filterColumn !== 'all' ? 500 : "100%"}},
             this.getColumnsFilter(),
             this.el(Table, {
                 id: "activityList",
@@ -281,7 +281,7 @@ class ActivityListComponent extends MainComponent {
     }
     handleOrderChange = (current, next) => {
         const {types} = this.state;
-        console.log(current, next);
+
         const last = types.filter(t => t.order < next.order);
         const currentIndx = types.findIndex(t => t.callActTypeID === current.callActTypeID);
         if (last.length > 0) {
@@ -292,7 +292,7 @@ class ActivityListComponent extends MainComponent {
         }
 
         this.apiCallactType.updateActivityTypeOrder(current.callActTypeID, types[currentIndx].order).then(res => {
-            console.log(res);
+
             sort(types, "order");
             this.setState({types});
         });

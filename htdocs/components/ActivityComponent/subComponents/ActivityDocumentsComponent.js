@@ -123,7 +123,7 @@ class ActivityDocumentsComponent extends MainComponent {
         const {uploadFiles} = this.state;
         if (uploadFiles) {
             let names = "";
-            //console.log(uploadFiles);
+
             for (let i = 0; i < uploadFiles.length; i++) {
                 names += uploadFiles[i].name + "  ,";
             }
@@ -141,7 +141,7 @@ class ActivityDocumentsComponent extends MainComponent {
                 uploadFiles,
                 "userfile[]"
             );
-            console.log(result);
+
             this.setState({uploadFiles: []});
             if (this.props.onUpload)
                 this.props.onUpload(result);
@@ -156,7 +156,7 @@ class ActivityDocumentsComponent extends MainComponent {
         this.fileUploader.current.click();
     };
     deleteDocument = async (id) => {
-        console.log(id);
+
         if (await this.confirm("Are you sure you want to remove this document?")) {
             await this.api.deleteDocument(this.state.currentActivity, id);
             if (this.props.onDelete)

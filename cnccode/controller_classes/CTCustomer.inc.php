@@ -8,6 +8,7 @@
  */
 
 use CNCLTD\Encryption;
+use CNCLTD\Utils;
 
 global $cfg;
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
@@ -3528,11 +3529,11 @@ class CTCustomer extends CTCNC
                     'contactDateRaised'             => Controller::dateYMDtoDMY(
                         $dsContactSrs->getValue(DBEJProblem::dateRaised)
                     ),
-                    'contactReason'                 => self::truncate(
+                    'contactReason'                 => Utils::truncate(
                         $dsContactSrs->getValue(DBEJProblem::reason),
                         100
                     ),
-                    'contactLastReason'             => self::truncate(
+                    'contactLastReason'             => Utils::truncate(
                         $dsContactSrs->getValue(DBEJProblem::lastReason),
                         100
                     ),
@@ -3583,11 +3584,11 @@ class CTCustomer extends CTCNC
                     'dateRaised'             => Controller::dateYMDtoDMY(
                         $dsActiveSrs->getValue(DBEJProblem::dateRaised)
                     ),
-                    'reason'                 => self::truncate(
+                    'reason'                 => Utils::truncate(
                         $dsActiveSrs->getValue(DBEJProblem::reason),
                         100
                     ),
-                    'lastReason'             => self::truncate(
+                    'lastReason'             => Utils::truncate(
                         $dsActiveSrs->getValue(DBEJProblem::lastReason),
                         100
                     ),

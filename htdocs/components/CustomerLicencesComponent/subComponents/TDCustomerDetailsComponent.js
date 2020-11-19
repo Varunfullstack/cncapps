@@ -49,14 +49,14 @@ class TDCustomerDetailsComponent extends React.Component {
         const {customers} = this.props;
         const queryParams = new URLSearchParams(window.location.search);
         const endCustomerId = queryParams.get("endCustomerId");
-        const result = customers.filter(c => c.endCustomerId == endCustomerId)
+        const result = customers.filter(c => c.endCustomerId === endCustomerId)
         if (result.length > 0) {
             let data = result[0];
             data.firstName = data.name.split(' ')[0];
             data.lastName = data.name.split(' ')[1];
             data.newCustomerId = null;
             this.setState({data: result[0], mode: "edit"});
-            console.log(result[0]);
+
         }
         this.apiCustomerLicenses
             .getCustomers()
@@ -169,7 +169,7 @@ class TDCustomerDetailsComponent extends React.Component {
                     data.email,
                     true,
                     errors["email"],
-                    mode == "edit"
+                    mode === "edit"
                 ),
                 this.getCustomerElement(
                     "Phone 1",
@@ -306,7 +306,7 @@ class TDCustomerDetailsComponent extends React.Component {
         if (event != null) {
             data.newCustomerId = event.id;
             data.cncCustName = event.name;
-            console.log(event);
+
         } else {
             data.newCustomerId = null;
             data.cncCustName = "";
@@ -318,7 +318,7 @@ class TDCustomerDetailsComponent extends React.Component {
 
         if (event != null) {
             data.city = event.name;
-            console.log(event);
+
         } else {
             data.city = null;
         }
@@ -327,31 +327,31 @@ class TDCustomerDetailsComponent extends React.Component {
     handleOnSave = () => {
 
         const {data, mode} = this.state;
-        console.log(data);
+
         this.showSpinner();
 
-        if (mode == "insert") {
+        if (mode === "insert") {
             this.apiCustomerLicenses
                 .addTechDataCustomer(data)
                 .then((result) => {
-                    console.log("add customer result", result);
+
                     this.hideSpinner();
-                    if (result.Result == "Failed") {
+                    if (result.Result === "Failed") {
                         const errors = result.ErrorMessage;
                         this.setState({errors});
                     }
                 });
-        } else if (mode == "edit") {
+        } else if (mode === "edit") {
             console.log('edit customer')
             this.apiCustomerLicenses
                 .updateTechDataCustomer(data.endCustomerId, data)
                 .then((result) => {
                     this.hideSpinner();
-                    console.log("update customer result", result);
-                    if (result.Result == "Failed") {
+
+                    if (result.Result === "Failed") {
                         const errors = result.ErrorMessage;
                         this.setState({errors});
-                    } else if (result.Result == "Success") {
+                    } else if (result.Result === "Success") {
                         this.handleOnCancel();
                     }
                 });
@@ -360,8 +360,8 @@ class TDCustomerDetailsComponent extends React.Component {
 
     getCustomerDetails = (endCustomerId) => {
         this.apiCustomerLicenses.getCustomerDetails(endCustomerId).then((res) => {
-            console.log("Customer", res);
-            if (res.Result == "Success") {
+
+            if (res.Result === "Success") {
                 const data = {...res.BodyText.endCustomerDetails};
                 this.setState({data, mode: "edit"});
             }

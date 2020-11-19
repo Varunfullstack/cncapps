@@ -3,7 +3,7 @@ import CurrentActivityService from "../CurrentActivityReportComponent/services/C
 import Table from "../shared/table/table";
 import Toggle from "../shared/Toggle";
 import ToolTip from "../shared/ToolTip";
-import {SRQueues} from "../utils/utils";
+import {getServiceRequestWorkTitle, getWorkIconClassName, SRQueues} from "../utils/utils";
 import DailyStatsComponent from "./subComponents/DailyStatsComponent";
 import APISDManagerDashboard from "./services/APISDManagerDashboard";
 import React from 'react';
@@ -11,6 +11,8 @@ import ReactDOM from 'react-dom';
 
 import './../style.css';
 import './SDManagerDashboardComponent.css';
+import ActivityFollowOn from "../Modals/ActivityFollowOn";
+import moment from "moment";
 
 class SDManagerDashboardComponent extends MainComponent {
     el = React.createElement;
@@ -21,6 +23,7 @@ class SDManagerDashboardComponent extends MainComponent {
     constructor(props) {
         super(props);
         this.state = {
+            ...this.state,
             filter: {
                 hd: false,
                 es: false,
@@ -57,9 +60,9 @@ class SDManagerDashboardComponent extends MainComponent {
 
     loadAllocatedUsers = () => {
         const {filter, allocatedUsers} = this.state;
-        if (filter.activeTab < 9 && allocatedUsers.length == 0)
+        if (filter.activeTab < 9 && allocatedUsers.length === 0)
             this.apiCurrentActivityService.getAllocatedUsers().then((res) => {
-                //console.log(res);
+
                 this.setState({allocatedUsers: res});
             });
     }
@@ -186,17 +189,147 @@ class SDManagerDashboardComponent extends MainComponent {
         if (id < 10) {
             this.loadAllocatedUsers();
             const {filter} = this.state;
-            this.api.getQueue(id, filter).then((queueData) => {
-                this.setState({queueData})
-            });
+            this.api.getQueue(id, filter)
+                .then((queueData) => {
+                    this.setState({queueData})
+                });
         } else return [];
 
     };
+    startWork = async (problem) => {
+        if (problem.lastCallActTypeID != null) {
+            this.setState({showFollowOn: true, followOnActivity: problem})
+        } else {
+            this.alert("Another user is currently working on this SR");
+        }
+    };
+    getFollowOnElement = () => {
+        const {showFollowOn, followOnActivity} = this.state;
+        const startWork = true;
+        return showFollowOn ? this.el(ActivityFollowOn, {
+            startWork,
+            key: "followOnModal",
+            callActivityID: followOnActivity.callActivityID,
+            onCancel: () => this.setState({showFollowOn: false})
+        }) : null;
+    }
+
+
+    addToolTip = (element, title) => {
+        return this.el(
+            "div",
+            {className: "tooltip"},
+            element,
+            this.el("div", {className: "tooltiptext tooltip-bottom"}, title)
+        );
+    };
+
     getQueueElement = () => {
         const {filter, queueData} = this.state;
         const {el} = this;
         if (filter.activeTab < 9) {
             const columns = [
+                {
+                    hide: false,
+                    order: 1,
+                    path: null,
+                    label: "",
+                    key: "work",
+                    sortable: false,
+                    hdClassName: "text-center",
+                    className: "text-center",
+                    content: (problem) =>
+                        el(ToolTip, {
+                            title: getServiceRequestWorkTitle(problem),
+                            content:
+                                el(
+                                    "div",
+                                    {key: "img1", onClick: () => this.startWork(problem)},
+                                    el("i", {
+                                        className: getWorkIconClassName(problem)
+                                    })
+                                )
+                        }),
+                },
+                {
+                    hide: false,
+                    order: 2,
+                    path: null,
+                    key: "custsomerIcon",
+                    label: "",
+                    sortable: false,
+                    toolTip: "Special Attention customer / contact",
+                    content: (problem) =>
+                        problem.specialAttentionCustomer
+                            ? el("i", {
+                                className:
+                                    "fal fa-2x fa-star color-gray pointer float-right inbox-icon",
+                                key: "starIcon",
+                            })
+                            : null,
+                },
+                {
+                    hide: false,
+                    order: 3,
+                    path: null,
+                    key: "hoursRemainingIcon",
+                    label: "",
+                    sortable: false,
+                    toolTip: "On Hold",
+                    className: "text-center",
+                    content: (problem) => {
+                        if (!problem.awaitingCustomerResponse) {
+                            return;
+                        }
+                        return (
+                            <i className="fal  fa-user-clock color-gray pointer inbox-icon"
+                               key="icon"
+                               style={{float: "right"}}
+                            />
+                        )
+                    }
+                },
+
+                {
+                    hide: false,
+                    order: 4,
+                    path: null,
+                    key: "problemIdIcon",
+                    label: "",
+                    sortable: false,
+                    className: "text-center",
+                    toolTip: "SLA Failed for this Service Request",
+                    content: (problem) => {
+                        if (!problem.isSLABreached) {
+                            return null;
+                        }
+                        return (
+                            <i className="fal fa-2x fa-bell-slash color-gray pointer inbox-icon"
+                               title=""
+                               key="icon"
+                            />
+                        )
+                    },
+                },
+                {
+                    hide: false,
+                    order: 4.1,
+                    path: null,
+                    key: "Future Icon",
+                    label: "",
+                    sortable: false,
+                    content: (problem) => {
+                        const momentAlarmDateTime = moment(problem.alarmDateTime, 'YYYY-MM-DD HH:mm:ss');
+                        if (!problem.alarmDateTime || !momentAlarmDateTime.isValid() || (momentAlarmDateTime.isSameOrBefore(moment()))) {
+                            return null;
+                        }
+                        return this.addToolTip(
+                            <i className="fal fa-2x fa-alarm-snooze color-gray pointer float-right inbox-icon"
+                               key="starIcon"
+                            />,
+                            `This Service Request is scheduled for the future date of ${momentAlarmDateTime.format("DD/MM/YYYY HH:mm")}`)
+                    },
+                },
                 {
                     path: "problemID",
                     label: "",
@@ -205,7 +338,6 @@ class SDManagerDashboardComponent extends MainComponent {
                     icon: "fal fa-2x fa-hashtag color-gray2 pointer",
                     sortable: false,
                     className: "text-center",
-                    backgroundColorColumn: "bgColour",
                     classNameColumn: "",
                     content: (problem) => el('a', {
                         href: `Activity.php?action=displayLastActivity&problemID=${problem.problemID}`,
@@ -219,7 +351,6 @@ class SDManagerDashboardComponent extends MainComponent {
                     hdClassName: "text-center",
                     icon: "fal fa-2x fa-building color-gray2 pointer",
                     sortable: false,
-                    classNameColumn: "customerNameDisplayClass",
                     content: (problem) => el('a', {
                         href: `SalesOrder.php?action=search&customerID=${problem.customerID}`,
                         target: '_blank'
@@ -233,7 +364,6 @@ class SDManagerDashboardComponent extends MainComponent {
                     icon: "fal fa-2x fa-signal color-gray2 pointer",
                     sortable: false,
                     className: "text-center",
-                    classNameColumn: "priorityBgColor",
                 },
                 {
                     path: "",
@@ -253,14 +383,13 @@ class SDManagerDashboardComponent extends MainComponent {
                     }),
                 },
                 {
-                    path: "hoursRemaining",
+                    path: "hoursRemainingForSLA",
                     label: "",
-                    hdToolTip: "Open Hours: Green = Awaiting Customer Blue = CNC Yellow = Not Started",
+                    hdToolTip: "Open Hours",
                     hdClassName: "text-center",
                     icon: "fal fa-2x fa-clock  color-gray2 pointer",
                     sortable: false,
                     className: "text-center",
-                    backgroundColorColumn: "hoursRemainingBgColor"
                 },
                 {
                     path: "totalActivityDurationHours",
@@ -321,11 +450,14 @@ class SDManagerDashboardComponent extends MainComponent {
                     path: "dateTime",
                     label: "",
                     key: "dateTime",
-                    hdToolTip: "Purple = Updated by another user OR has an alarm date in past",
+                    content: serviceRequest => {
+                        const dateTime = moment(serviceRequest.dateTime, 'YYYY-MM-DD HH:mm:ss');
+                        return dateTime.format('DD/MM/YYYY HH:mm');
+                    },
+                    hdToolTip: "Time",
                     icon: "fal fa-2x fa-calendar color-gray2 ",
                     sortable: false,
                     hdClassName: "text-center",
-                    backgroundColorColumn: "updatedBgColor",
                 },
             ]
             return el(Table, {
@@ -335,7 +467,7 @@ class SDManagerDashboardComponent extends MainComponent {
                 pk: "problemID",
                 search: true,
             });
-        } else if (filter.activeTab == 9) {
+        } else if (filter.activeTab === 9) {
             const columns = [
                 {
                     path: "customerName",
@@ -374,7 +506,7 @@ class SDManagerDashboardComponent extends MainComponent {
 
                 })
             );
-        } else if (filter.activeTab == 10) {
+        } else if (filter.activeTab === 10) {
             return el(DailyStatsComponent);
         }
     }
@@ -416,7 +548,7 @@ class SDManagerDashboardComponent extends MainComponent {
     };
 
     handleUserOnSelect = (event, problem, code) => {
-        const engineerId = event.target.value != "" ? event.target.value : 0;
+        const engineerId = event.target.value !== "" ? event.target.value : 0;
         problem.engineerId = engineerId;
         this.apiCurrentActivityService
             .allocateUser(problem.problemID, engineerId)
@@ -427,7 +559,7 @@ class SDManagerDashboardComponent extends MainComponent {
             });
     };
     getTeamCode = (teamID) => {
-        const queues = SRQueues.filter(q => q.teamID == teamID);
+        const queues = SRQueues.filter(q => q.teamID === teamID);
         if (queues.length > 0)
             return queues[0].code;
         else return ""
@@ -436,6 +568,8 @@ class SDManagerDashboardComponent extends MainComponent {
     render() {
         const {el} = this;
         return el("div", null,
+            this.getAlert(),
+            this.getFollowOnElement(),
             this.getFilterElement(),
             this.getTabsElement(),
             this.getQueueElement(),

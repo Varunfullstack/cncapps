@@ -50,7 +50,7 @@ class OutOfHoursReportComponent extends React.Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (this.state.selectedYear !== prevState.selectedYear) {
-            console.log(this.state.selectedYear, prevState.selectedYear);
+
             this.fetchData();
         }
     }
@@ -100,7 +100,7 @@ class OutOfHoursReportComponent extends React.Component {
             },
             {}
         );
-        console.log(dataTable);
+
         return [
             ...Object.keys(dataTable).map(customerName => {
                 return (

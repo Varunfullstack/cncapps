@@ -9,6 +9,7 @@
  */
 
 use CNCLTD\DailyReport\ContactsWithOpenServiceRequests;
+use CNCLTD\Utils;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 
 global $cfg;
@@ -121,7 +122,7 @@ GROUP BY t.month;
                     );
 
                 $description = substr(
-                    common_stripEverything($row[3]),
+                    Utils::stripEverything($row[3]),
                     0,
                     50
                 );
@@ -394,7 +395,7 @@ GROUP BY t.month;
                         'serviceRequestID'    => $row[1],
                         'assignedTo'          => $row[2],
                         'description'         => substr(
-                            common_stripEverything($row[3]),
+                            Utils::stripEverything($row[3]),
                             0,
                             50
                         ),
@@ -425,7 +426,7 @@ GROUP BY t.month;
                             ',',
                             '',
                             substr(
-                                common_stripEverything($row[3]),
+                                Utils::stripEverything($row[3]),
                                 0,
                                 50
                             )
@@ -1004,7 +1005,7 @@ GROUP BY t.month;
                         'serviceRequestID' => $row[1],
                         'assignedTo'       => $row[2],
                         'description'      => substr(
-                            common_stripEverything($row[3]),
+                            Utils::stripEverything($row[3]),
                             0,
                             50
                         ),
@@ -1023,7 +1024,7 @@ GROUP BY t.month;
                             ',',
                             '',
                             substr(
-                                common_stripEverything($row[3]),
+                                Utils::stripEverything($row[3]),
                                 0,
                                 50
                             )
@@ -1157,7 +1158,7 @@ GROUP BY t.month;
                         'customer'         => $row[0],
                         'serviceRequestID' => $row[1],
                         'description'      => substr(
-                            common_stripEverything($row[2]),
+                            Utils::stripEverything($row[2]),
                             0,
                             50
                         ),
@@ -1174,7 +1175,7 @@ GROUP BY t.month;
                             ',',
                             '',
                             substr(
-                                common_stripEverything($row[2]),
+                                Utils::stripEverything($row[2]),
                                 0,
                                 50
                             )

@@ -39,12 +39,12 @@ export default class MainComponent extends React.Component {
     }
 
     redirectPost(url, data) {
-        var form = document.createElement("form");
+        let form = document.createElement("form");
         document.body.appendChild(form);
         form.method = "post";
         form.action = url;
-        for (var name in data) {
-            var input = document.createElement("input");
+        for (let name in data) {
+            let input = document.createElement("input");
             input.type = "hidden";
             input.name = name;
             input.value = data[name];
@@ -118,7 +118,7 @@ export default class MainComponent extends React.Component {
         return this.el(Confirm, {...confirm, onClose: this.handleConfirmClose, key: 'confirm'});
     }
     handleConfirmClose = (value) => {
-        //  console.log(value);
+        //
         const {confirm} = this.state;
         confirm.show = false;
         confirm.message = "";
@@ -154,7 +154,7 @@ export default class MainComponent extends React.Component {
         return this.el(Prompt, {...prompt, onClose: this.handlePromptClose, key: "prompt"});
     }
     handlePromptClose = (value) => {
-        //console.log(value);
+
         const {prompt} = this.state;
         prompt.show = false;
         prompt.title = "";

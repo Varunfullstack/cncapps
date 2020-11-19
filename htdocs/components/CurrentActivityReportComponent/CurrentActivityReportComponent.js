@@ -11,11 +11,12 @@ import Spinner from './../shared/Spinner/Spinner';
 import MainComponent from '../shared/MainComponent';
 import ActivityFollowOn from '../Modals/ActivityFollowOn';
 import InboxOpenSRComponent from './subComponents/InboxOpenSRComponent';
-import {sort} from '../utils/utils';
+import {getServiceRequestWorkTitle, sort} from '../utils/utils';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
 import '../style.css';
+import moment from "moment";
 
 class CurrentActivityReportComponent extends MainComponent {
     el = React.createElement;
@@ -157,7 +158,7 @@ class CurrentActivityReportComponent extends MainComponent {
         else return "";
     };
     setActiveTab = (code) => {
-        console.log("tab change");
+
         const {filter} = this.state;
         filter.activeTab = code;
         this.loadQueue(code);
@@ -173,7 +174,7 @@ class CurrentActivityReportComponent extends MainComponent {
             .getCurrentUser()
             .then((res) => {
                 if (res.isSDManger)
-                    this.teams.filter(t => t.id == 11)[0].display = true;
+                    this.teams.filter(t => t.id === 11)[0].display = true;
                 this.setState({currentUser: res})
             });
         this.loadQueue(filter.activeTab);
@@ -194,7 +195,7 @@ class CurrentActivityReportComponent extends MainComponent {
             filter = JSON.parse(filter);
         else
             filter = {activeTab: "H", userFilter: ""};
-        console.log('filter', filter);
+
         return filter;
     }
     saveFilterToLocalStorage = (filter) => {
@@ -204,7 +205,7 @@ class CurrentActivityReportComponent extends MainComponent {
         const {handleUserFilterOnSelect} = this;
         const {filter} = this.state;
         if (code) {
-            if (code != "OSR")
+            if (code !== "OSR")
                 this.showSpinner();
             switch (code) {
                 case "H":
@@ -220,7 +221,7 @@ class CurrentActivityReportComponent extends MainComponent {
                     this.apiCurrentActivityService.getEscalationsInbox().then((res) => {
                         const escalationInbox = this.prepareResult(res);
                         const escalationInboxFiltered = [...escalationInbox];
-                        console.log("escalationInboxFiltered", escalationInboxFiltered);
+
                         this.setState({
                             _showSpinner: false,
                             escalationInbox,
@@ -231,7 +232,7 @@ class CurrentActivityReportComponent extends MainComponent {
                     this.apiCurrentActivityService.getSalesInbox().then((res) => {
                         const salesInbox = this.prepareResult(res);
                         const salesInboxFiltered = [...salesInbox];
-                        console.log("salesInboxFiltered", salesInboxFiltered);
+
 
                         this.setState({
                             _showSpinner: false,
@@ -297,7 +298,7 @@ class CurrentActivityReportComponent extends MainComponent {
                 .then((res) => {
                     const openSRInbox = this.prepareResult(res);
                     sort(openSRInbox, "queueNo");
-                    console.log("openSRInbox", openSRInbox, openSRInbox.length);
+
                     this.setState(
                         {
                             _showSpinner: false,
@@ -336,7 +337,7 @@ class CurrentActivityReportComponent extends MainComponent {
         let options = teams.map(t => {
             return {id: t.queueNumber, title: t.code, canMove: t.canMove}
         })
-            .filter((e) => e.title != code && e.canMove == true);
+            .filter((e) => e.title !== code && e.canMove === true);
         return el(
             "select",
             {
@@ -388,7 +389,7 @@ class CurrentActivityReportComponent extends MainComponent {
         }
     };
     handleUserOnSelect = (event, problem, code) => {
-        const engineerId = event.target.value != "" ? event.target.value : 0;
+        const engineerId = event.target.value !== "" ? event.target.value : 0;
         problem.engineerId = engineerId;
         this.apiCurrentActivityService
             .allocateUser(problem.problemID, engineerId)
@@ -432,34 +433,15 @@ class CurrentActivityReportComponent extends MainComponent {
     getTeamId(code) {
         return this.teams.filter(t => t.code === code)[0].id;
     }
-
-    // end of shared methods
-    getProblemWorkTitle(problem) {
-        let title = "";
-        if (problem.workBgColor == null) title = "Work on this request";
-        if (problem.hoursRemainingBgColor == "#FFF5B3")
-            title = "Request not started yet";
-        if (problem.workBgColor == "#BDF8BA")
-            title = "Request being worked on by somebody else";
-        return title;
-    }
-
-    getProblemWorkColor(problem) {
-        let color = "#C6C6C6";
-        if (problem.workBgColor == null) color = "#C6C6C6";
-        if (problem.hoursRemainingBgColor == "#FFF5B3") color = "#FFF5B3";
-        if (problem.workBgColor == "#BDF8BA") color = "#BDF8BA";
-        return color;
-    }
-
+    
     prepareResult = (result) => {
         result.map((problem) => {
-            problem.workBtnTitle = this.getProblemWorkTitle(problem);
-            problem.workBtnColor = this.getProblemWorkColor(problem);
+            problem.workBtnTitle = getServiceRequestWorkTitle(problem);
             problem.alarmDateTime = problem.alarmDateTime?.trim(" ");
-            if (moment(problem.alarmDateTime) > moment())
-                console.log("Future", problem.problemID);
-            delete problem.date;
+            problem.priorityClass = problem.priority === 1 ? 'priority-one' : '';
+            if (moment(problem.alarmDateTime) > moment()) {
+                delete problem.date;
+            }
             delete problem.engineerDropDown;
             delete problem.linkAllocateAdditionalTime;
             delete problem.queueOptions;
@@ -476,7 +458,7 @@ class CurrentActivityReportComponent extends MainComponent {
             delete problem.urlCustomer;
             delete problem.workOnClick;
         });
-        const emptyAlarm = result.filter((p) => p.alarmDateTime == null || p.alarmDateTime == '');
+        const emptyAlarm = result.filter((p) => p.alarmDateTime == null || p.alarmDateTime === '');
         const old = result.filter((p) => moment(p.alarmDateTime) <= moment());
         const feature = result
             .filter((p) => moment(p.alarmDateTime) > moment())
@@ -527,11 +509,10 @@ class CurrentActivityReportComponent extends MainComponent {
         });
     };
     filterData = (engineerId, data) => {
-        const result = data.filter(
+        return data.filter(
             (p) =>
                 p.engineerId === null || p.engineerId == engineerId || engineerId === ""
         );
-        return result;
     };
     getEngineersFilterElement = () => {
         const {el, handleUserFilterOnSelect,} = this;
@@ -569,7 +550,7 @@ class CurrentActivityReportComponent extends MainComponent {
         );
     };
     deleteSR = (problem, code) => {
-        console.log('delete', problem);
+
         this.apiCurrentActivityService.deleteSR(problem.cpCustomerProblemID).then(res => {
             this.loadQueue(code);
         }, error => {

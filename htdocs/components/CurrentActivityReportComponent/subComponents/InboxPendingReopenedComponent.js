@@ -26,7 +26,7 @@ class InboxPendingReopenedComponent extends MainComponent {
         if (code === 'R' && !(await this.confirm("Are you sure you want to reopen?"))) return;
         if (code === 'D' && !(await this.confirm("Are you sure you want to delete?"))) return;
 
-        if (code == 'R' || code === 'D')
+        if (code === 'R' || code === 'D')
             this.apiCurrentActivityService.processPendingReopened(problem.pendingReopenedID, code).then(res => {
                 this.props.loadQueue(this.code);
             })
@@ -39,7 +39,7 @@ class InboxPendingReopenedComponent extends MainComponent {
                 pendingReopenedID: problem.pendingReopenedID,
                 deletePending: true,
             };
-            console.log(data);
+
             this.redirectPost("Activity.php", data);
         }
     }
@@ -292,7 +292,7 @@ class InboxPendingReopenedComponent extends MainComponent {
         ];
 
         columns = columns
-            .filter((c) => c.hide == false)
+            .filter((c) => c.hide === false)
             .sort((a, b) => (a.order > b.order ? 1 : -1));
         const {data} = this.props;
 
@@ -308,7 +308,7 @@ class InboxPendingReopenedComponent extends MainComponent {
     render() {
         const {el, getTableElement} = this;
         const {data} = this.props;
-        // console.log(data);
+
         return el('div', null,
             this.getConfirm(),
             getTableElement(),

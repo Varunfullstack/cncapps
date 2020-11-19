@@ -16,7 +16,7 @@ class CustomerDetailsModalComponent extends React.Component {
     }
 
     componentDidMount() {
-        //console.log("mount....................", this.props.customer);
+
         // let {  customer } = this.props;
         // this.setState({customer});
     }
@@ -66,8 +66,7 @@ class CustomerDetailsModalComponent extends React.Component {
         return customer;
     };
     valid = (customer) => {
-        if (
-            !customer.companyName ||
+        return !(!customer.companyName ||
             !customer.firstName ||
             !customer.lastName ||
             !customer.email ||
@@ -75,10 +74,7 @@ class CustomerDetailsModalComponent extends React.Component {
             !customer.addressLine1 ||
             !customer.country ||
             !customer.postalCode ||
-            !customer.city
-        )
-            return false;
-        else return true;
+            !customer.city);
     };
 
     getCustomerElement(
@@ -128,7 +124,7 @@ class CustomerDetailsModalComponent extends React.Component {
 
     handleOnSave = () => {
         const customer = {...this.props.customer, ...this.state.customer};
-        console.log(customer);
+
         if (customer.country == null)
             customer.country = "GB";
         if (this.valid(customer)) {
@@ -145,13 +141,13 @@ class CustomerDetailsModalComponent extends React.Component {
         const {el, handleCityOnSelect, handleOnSave, handleOnCancel} = this;
         let {customer: customerSt, errors} = this.state;
         let customerProps = this.props.customer;
-        //console.log(customerSt);
+
         const customer = this.correctObject({...customerProps, ...customerSt});
         // this.setState({customer});
         let errorMessage = "";
         if (typeof errors === "string") errorMessage = errors;
 
-        //console.log(customer);
+
         return el(
             "table",
             {key: "table", style: {width: 500}},
@@ -291,17 +287,16 @@ class CustomerDetailsModalComponent extends React.Component {
             const customer = {...this.state.customer};
             customer.city = event.name;
             this.setState({customer});
-            //console.log(event);
+
         }
     };
 
     getFooter = () => {
         const {el, handleOnClose, handleOkButton, handleOnSave} = this;
-        const footer = el(React.Fragment, {key: "footer"}, [
+        return el(React.Fragment, {key: "footer"}, [
             el("button", {key: "btnCancel", onClick: handleOnClose}, "Cancel"),
             el("button", {key: "btnSubmit", onClick: handleOnSave}, "Ok"),
         ]);
-        return footer;
     };
 
     render() {
