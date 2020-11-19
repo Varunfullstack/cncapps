@@ -27,12 +27,19 @@ class DBEJProblem extends DBEProblem
     const lastUserID                       = "lastUserID";
     const lastDate                         = "lastDate";
     const lastAwaitingCustomerResponseFlag = "lastAwaitingCustomerResponseFlag";
+<<<<<<< HEAD
     const dashboardSortColumn              = "dashboardSortColumn";
     const hoursRemainingForSLA             = 'hoursRemainingForSLA';
     const specialAttentionContactFlag      = "specialAttentionContactFlag";
     const referredFlag                     = "referredFlag";
     const lastEndTime                      = "lastEndTime";
     const alarmDateTime                    = "alarmDateTime";
+=======
+    const dashboardSortColumn = "dashboardSortColumn";
+    const hoursRemaining = 'hoursRemaining';
+    const specialAttentionContactFlag = "specialAttentionContactFlag";
+    
+>>>>>>> 6ec20f5e (add fixed date)
 
     /**
      * calls constructor()
@@ -216,6 +223,7 @@ class DBEJProblem extends DBEProblem
             DA_ALLOW_NULL,
             '(select contact.specialAttentionContactFlag from contact where con_contno = initial.caa_contno)'
         );
+<<<<<<< HEAD
         $this->addColumn(
             self::referredFlag,
             DA_STRING,
@@ -232,6 +240,9 @@ class DBEJProblem extends DBEProblem
                 COALESCE(CONCAT(pro_alarm_time,':00'), '00:00:00')
             )"
         );
+=======
+        
+>>>>>>> 6ec20f5e (add fixed date)
         $this->setAddColumnsOff();
         $this->setPK(0);
     }
@@ -754,21 +765,37 @@ FROM {$this->getTableName()}
                                      $showProjects = true
     )
     {
-      $fixedDate="";
+      
       $includeFixed="";
       if($orderBy=="holdForQA")
       {
-        $fixedDate=" , (select caa_date from callactivity where caa_callacttypeno=57 and caa_problemno=pro_problemno ) fixedDate ";
-        $includeFixed=",'F'";
+        $this->setAddColumnsOn();
+        $this->addColumn(
+          "proFixedDate",
+          DA_STRING,
+          DA_ALLOW_NULL,
+          "(select DATE_FORMAT(caa_date,'%Y-%m-%d') from callactivity where caa_callacttypeno=57 and caa_problemno=pro_problemno )"
+      );
+      $this->setAddColumnsOff();
+      $includeFixed=",'F'";
       }
 
         $sql =
+<<<<<<< HEAD
             "SELECT {$this->getDBColumnNamesAsString()}, 
                 {$this->getDBColumnName(self::workingHours)} - {$this->getDBColumnName(self::slaResponseHours) } as hoursRemaining,
                  fixingEngineer.cns_name as fixedByEngineerName,
                  fixingTeam.name as fixedByTeamName
              FROM {$this->getTableName()}
              LEFT JOIN customer ON cus_custno = pro_custno
+=======
+            "SELECT " . $this->getDBColumnNamesAsString() . ', ' . $this->getDBColumnName(
+                self::workingHours
+            ) . ' - ' . $this->getDBColumnName(self::slaResponseHours) . ' as hoursRemaining' .
+           
+            " FROM " . $this->getTableName() .            
+            " LEFT JOIN customer ON cus_custno = pro_custno
+>>>>>>> 6ec20f5e (add fixed date)
            LEFT JOIN consultant ON cns_consno = pro_consno
            left join team on consultant.teamID = team.teamID
           JOIN callactivity `initial`
