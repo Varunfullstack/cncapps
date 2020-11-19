@@ -23,9 +23,9 @@ require_once($cfg['path_dbe'] . '/DBEJCallActivity.php');
 
 class CTSRActivity extends CTCNC
 {
-    const GREEN = '#BDF8BA';
+    const GREEN   = '#BDF8BA';
     const CONTENT = '#F4f4f2';
-    public $serverGuardArray =
+    public  $serverGuardArray =
         array(
             ""  => "Please select",
             "Y" => "ServerGuard Related",
@@ -124,6 +124,15 @@ class CTSRActivity extends CTCNC
             case "changeProblemPriority":
                 echo json_encode($this->changeProblemPriority());
                 exit;
+            case 'getLastActivityInServiceRequest':
+                $buActivity       = new BUActivity($this);
+                $serviceRequestId = $this->getParam('serviceRequestId');
+                if (!$serviceRequestId) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(250, "Service request Id is required");
+                }
+                $dbeActivity = $buActivity->getLastActivityInProblem($this->getParam('serviceRequestId'));
+                echo json_encode(["status" => "ok", "data" => $dbeActivity->getValue(DBECallActivity::callActivityID)]);
+                exit;
             default:
                 $this->setTemplate();
                 break;
@@ -137,15 +146,15 @@ class CTSRActivity extends CTCNC
         //get call activity
 
         $dbejCallActivity = new DBEJCallActivity($this);
-        $dbeProblem = new DBEProblem($this);
+        $dbeProblem       = new DBEProblem($this);
         $dbejCallActivity->setPKValue($callActivityID);
         $dbejCallActivity->getRow();
         $problemID = $dbejCallActivity->getValue(DBECallActivity::problemID);
         $dbeProblem->setPKValue($problemID);
         $dbeProblem->getRow();
-        $customerId = $dbejCallActivity->getValue(DBEJCallActivity::customerID);
-        $contactID = $dbejCallActivity->getValue(DBEJCallActivity::contactID);
-        $siteId = $dbejCallActivity->getValue(DBEJCallActivity::siteNo);
+        $customerId  = $dbejCallActivity->getValue(DBEJCallActivity::customerID);
+        $contactID   = $dbejCallActivity->getValue(DBEJCallActivity::contactID);
+        $siteId      = $dbejCallActivity->getValue(DBEJCallActivity::siteNo);
         $projectLink = BUProject::getCurrentProjectLink(
             $customerId
         );
@@ -153,15 +162,15 @@ class CTSRActivity extends CTCNC
         $dbeCustomer->setPKValue($customerId);
         $dbeCustomer->getRow();
         $customerNameDisplayClass = $this->getCustomerNameDisplayClass($dbeCustomer);
-        $dbeContact = new DBEContact($this);
+        $dbeContact               = new DBEContact($this);
         $dbeContact->setPKValue($contactID);
         $dbeContact->getRow();
         $dbeSite = new DBESite($this);
         $dbeSite->setPKValue($siteId);
         $dbeSite->setValue(DBESite::customerID, $customerId);
         $dbeSite->getRowByCustomerIDSiteNo();
-        $buActivity = new BUActivity($this);
-        $buUser = new BUUser($this);
+        $buActivity      = new BUActivity($this);
+        $buUser          = new BUUser($this);
         $dbeLastActivity = $buActivity->getLastActivityInProblem($problemID);
 
         if (
@@ -169,15 +178,15 @@ class CTSRActivity extends CTCNC
             $dbeLastActivity->getValue(DBEJCallActivity::userID) != $GLOBALS['auth']->is_authenticated()
         ) {
             $currentUserBgColor = self::GREEN;
-            $currentUser = $dbeLastActivity->getValue(
+            $currentUser        = $dbeLastActivity->getValue(
                     DBEJCallActivity::userName
                 ) . ' Is Adding New Activity To This Request Now';
         } else {
             $currentUserBgColor = self::CONTENT;
-            $currentUser = null;
+            $currentUser        = null;
         }
         $expenses = $this->getActivityExpenses($callActivityID);
-        $dbeUser = $this->getDbeUser();
+        $dbeUser  = $this->getDbeUser();
         $dbeUser->setValue(
             DBEUser::userID,
             $this->userID
@@ -185,14 +194,14 @@ class CTSRActivity extends CTCNC
         $dbeUser->getRow();
         $dbeUserActivity = new DBEUser($this);
         $dbeUserActivity->getRow($dbejCallActivity->getValue(DBEJCallActivity::userID));
-        $hdAssignedMinutes = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
-        $esAssignedMinutes = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
-        $imAssignedMinutes = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
+        $hdAssignedMinutes          = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
+        $esAssignedMinutes          = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
+        $imAssignedMinutes          = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
         $projectTeamAssignedMinutes = $dbeProblem->getValue(DBEProblem::projectTeamLimitMinutes);
-        $projectUsedMinutes = $buActivity->getUsedTimeForProblemAndTeam($problemID, 5);
-        $hdUsedMinutes = $buActivity->getHDTeamUsedTime($problemID);
-        $esUsedMinutes = $buActivity->getESTeamUsedTime($problemID);
-        $imUsedMinutes = $buActivity->getSPTeamUsedTime($problemID);
+        $projectUsedMinutes         = $buActivity->getUsedTimeForProblemAndTeam($problemID, 5);
+        $hdUsedMinutes              = $buActivity->getHDTeamUsedTime($problemID);
+        $esUsedMinutes              = $buActivity->getESTeamUsedTime($problemID);
+        $imUsedMinutes              = $buActivity->getSPTeamUsedTime($problemID);
         return [
             "callActivityID"                  => $callActivityID,
             "problemID"                       => $problemID,
@@ -358,11 +367,11 @@ class CTSRActivity extends CTCNC
      */
     function getOtherActivity($problemID)
     {
-        $includeTravel = $_REQUEST["includeTravel"] == 'true' ? true : false;
-        $includeOperationalTasks = $_REQUEST["includeOperationalTasks"] == 'true' ? true : false;
+        $includeTravel             = $_REQUEST["includeTravel"] == 'true' ? true : false;
+        $includeOperationalTasks   = $_REQUEST["includeOperationalTasks"] == 'true' ? true : false;
         $includeServerGuardUpdates = $_REQUEST["includeServerGuardUpdates"] == 'true' ? true : false;
-        $dbejCallActivity = new DBEJCallActivity($this);
-        $activities = array();
+        $dbejCallActivity          = new DBEJCallActivity($this);
+        $activities                = array();
         $dbejCallActivity->getRowsByproblemID(
             $problemID,
             $includeTravel,
@@ -396,7 +405,7 @@ class CTSRActivity extends CTCNC
     private function getOnSiteActivity($callActivityID)
     {
         $buActivity = new BUActivity($this);
-        $db = $buActivity->getOnSiteActivitiesWithinFiveDaysOfActivity($callActivityID);
+        $db         = $buActivity->getOnSiteActivitiesWithinFiveDaysOfActivity($callActivityID);
         $activities = array();
         while ($db->next_record()) {
             array_push(
@@ -504,9 +513,9 @@ class CTSRActivity extends CTCNC
         try {
             $buActivity = new BUActivity($this);
             $this->setMethodName('messageToSales');
-            $body = file_get_contents('php://input');
-            $body = json_decode($body);
-            $message = $body->message;
+            $body           = file_get_contents('php://input');
+            $body           = json_decode($body);
+            $message        = $body->message;
             $callActivityID = $body->callActivityID;
             if (!$callActivityID) {
                 http_response_code(400);
@@ -527,13 +536,13 @@ class CTSRActivity extends CTCNC
     function updateCallActivity()
     {
         $this->setMethodName('updateCallActivity');
-        $buActivity = new BUActivity($this);
-        $dbeProblem = new DBEProblem($this);
+        $buActivity      = new BUActivity($this);
+        $dbeProblem      = new DBEProblem($this);
         $dbejCallActType = new DBEJCallActType($this);
-        $dsCallActivity = new DataSet($this);
-        $body = file_get_contents('php://input');
-        $body = json_decode($body);
-        $callActivityID = $body->callActivityID;
+        $dsCallActivity  = new DataSet($this);
+        $body            = file_get_contents('php://input');
+        $body            = json_decode($body);
+        $callActivityID  = $body->callActivityID;
         if ($callActivityID)
             $dbejCallActType->getRow($body->callActTypeID);
         $buActivity->getActivityByID(
@@ -542,8 +551,8 @@ class CTSRActivity extends CTCNC
         );
 
         $previousStartTime = $dsCallActivity->getValue(DBECallActivity::startTime);
-        $previousEndTime = $dsCallActivity->getValue(DBECallActivity::endTime);
-        $formError = (!$dsCallActivity->populateFromArray(["1" => $body]));
+        $previousEndTime   = $dsCallActivity->getValue(DBECallActivity::endTime);
+        $formError         = (!$dsCallActivity->populateFromArray(["1" => $body]));
 
 
         if ($formError) {
@@ -677,9 +686,9 @@ class CTSRActivity extends CTCNC
 
     function validTime($body, $dbeProblem, $buActivity, $dbeCallActivity)
     {
-        $problemID = $dbeCallActivity->getValue(DBECallActivity::problemID);
+        $problemID      = $dbeCallActivity->getValue(DBECallActivity::problemID);
         $callActivityID = $dbeCallActivity->getValue(DBECallActivity::callActivityID);
-        $durationHours = common_convertHHMMToDecimal(
+        $durationHours  = common_convertHHMMToDecimal(
                 $body->endTime
             ) - common_convertHHMMToDecimal($body->startTime);
 
@@ -691,36 +700,36 @@ class CTSRActivity extends CTCNC
             $body->callActTypeID,
             [4, 8, 11, 18]
         )) {
-            $userID = $body->userID;
+            $userID  = $body->userID;
             $dbeUser = new DBEUser($this);
             $dbeUser->getRow($userID);
             $teamID = $dbeUser->getValue(DBEUser::teamID);
             if ($teamID <= 4) {
-                $usedTime = 0;
+                $usedTime      = 0;
                 $allocatedTime = 0;
                 if ($teamID == 1) {
-                    $usedTime = $buActivity->getHDTeamUsedTime(
+                    $usedTime      = $buActivity->getHDTeamUsedTime(
                         $problemID,
                         $callActivityID
                     );
                     $allocatedTime = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
                 }
                 if ($teamID == 2) {
-                    $usedTime = $buActivity->getESTeamUsedTime(
+                    $usedTime      = $buActivity->getESTeamUsedTime(
                         $problemID,
                         $callActivityID
                     );
                     $allocatedTime = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
                 }
                 if ($teamID == 4) {
-                    $usedTime = $buActivity->getSPTeamUsedTime(
+                    $usedTime      = $buActivity->getSPTeamUsedTime(
                         $problemID,
                         $callActivityID
                     );
                     $allocatedTime = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
                 }
                 if ($teamID == 5) {
-                    $usedTime = $buActivity->getUsedTimeForProblemAndTeam(
+                    $usedTime      = $buActivity->getUsedTimeForProblemAndTeam(
                         $problemID,
                         5,
                         $callActivityID
@@ -770,11 +779,11 @@ class CTSRActivity extends CTCNC
     )
     {
         $customerID = $_REQUEST["customerId"];
-        $contactID = $_REQUEST["contactID"];
+        $contactID  = $_REQUEST["contactID"];
         if (!isset($customerID))
             return [];
         $dbeContact = new DBEContact($this);
-        $dbeSite = new DBESite($this);
+        $dbeSite    = new DBESite($this);
         $dbeContact->getRowsByCustomerID(
             $customerID,
             false,
@@ -782,23 +791,23 @@ class CTSRActivity extends CTCNC
             true
         );
 
-        $contacts = array();
+        $contacts   = array();
         $lastSiteNo = null;
         while ($dbeContact->fetchNext()) {
-            $dataDelegate = "";
+            $dataDelegate          = "";
             $startMainContactStyle = null;
-            $endMainContactStyle = null;
+            $endMainContactStyle   = null;
 
             if ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelMain) {
                 $startMainContactStyle = '*';
-                $endMainContactStyle = '*';
+                $endMainContactStyle   = '*';
             } elseif ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelDelegate) {
                 $startMainContactStyle = '- Delegate';
-                $endMainContactStyle = '- Delegate';
-                $dataDelegate = "data-delegate='true'";
+                $endMainContactStyle   = '- Delegate';
+                $dataDelegate          = "data-delegate='true'";
             } elseif ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelSupervisor) {
                 $startMainContactStyle = '- Supervisor';
-                $endMainContactStyle = '- Supervisor';
+                $endMainContactStyle   = '- Supervisor';
             }
 
             $dbeSite->setValue(
@@ -887,12 +896,12 @@ class CTSRActivity extends CTCNC
 
     function getCustomerContracts()
     {
-        $customerID = $_REQUEST["customerId"];
+        $customerID             = $_REQUEST["customerId"];
         $contractCustomerItemID = $_REQUEST["contractCustomerItemID"];
-        $linkedToSalesOrder = $_REQUEST["linkedToSalesOrder"];
-        $contracts = array();
-        $buCustomerItem = new BUCustomerItem($this);
-        $dsContract = new DataSet($this);
+        $linkedToSalesOrder     = $_REQUEST["linkedToSalesOrder"];
+        $contracts              = array();
+        $buCustomerItem         = new BUCustomerItem($this);
+        $dsContract             = new DataSet($this);
         if ($customerID) {
             $buCustomerItem->getContractsByCustomerID(
                 $customerID,
@@ -939,7 +948,7 @@ class CTSRActivity extends CTCNC
 
     function getRootCauses()
     {
-        $rootCauses = array();
+        $rootCauses  = array();
         $buRootCause = new BURootCause($this);
         $dsRootCause = new DataSet($this);
         $buRootCause->getAll($dsRootCause);
@@ -974,13 +983,13 @@ class CTSRActivity extends CTCNC
 
         try {
 
-            $body = file_get_contents('php://input');
-            $body = json_decode($body);
-            $buActivity = new BUActivity($this);
-            $body->date = date(DATE_MYSQL_DATE);
-            $body->startTime = date('H:i');
-            $body->dateRaised = date(DATE_MYSQL_DATE);
-            $body->timeRaised = date('H:i');
+            $body                = file_get_contents('php://input');
+            $body                = json_decode($body);
+            $buActivity          = new BUActivity($this);
+            $body->date          = date(DATE_MYSQL_DATE);
+            $body->startTime     = date('H:i');
+            $body->dateRaised    = date(DATE_MYSQL_DATE);
+            $body->timeRaised    = date('H:i');
             $body->callActTypeID = CONFIG_INITIAL_ACTIVITY_TYPE_ID;
             //return ["team"=>$body->notStartWorkReason];
             $dsCallActivity = $buActivity->createActivityFromJson($body);
@@ -1028,7 +1037,7 @@ class CTSRActivity extends CTCNC
                 if (isset($body->customerproblemno) && $body->customerproblemno != null) {
                     $buActivity->deleteCustomerRaisedRequest($body->customerproblemno);
                 }
-                $problemID = $dsCallActivity->getValue(DBEJCallActivity::problemID);
+                $problemID  = $dsCallActivity->getValue(DBEJCallActivity::problemID);
                 $dbeProblem = new DBEProblem($this);
                 $dbeProblem->getRow($problemID);
                 return [
@@ -1047,7 +1056,7 @@ class CTSRActivity extends CTCNC
     function getCallActivityType()
     {
         $callActivityID = $this->getParam("callActivityID");
-        $callActivity = new DBECallActivity($this);
+        $callActivity   = new DBECallActivity($this);
         $callActivity->getRow($callActivityID);
         return $callActivity->getValue(DBECallActivity::callActTypeID);
     }
@@ -1112,7 +1121,7 @@ class CTSRActivity extends CTCNC
         if (!isset($problemID))
             return null;
 
-        $buActivity = new BUActivity($this);
+        $buActivity       = new BUActivity($this);
         $dbeJCallActivity = $buActivity->getFirstActivityInServiceRequest($problemID, 57);//initial activity
         if ($dbeJCallActivity)
             return [
@@ -1183,20 +1192,24 @@ class CTSRActivity extends CTCNC
 
     function getTitle()
     {
-        $action = $this->getAction();
+        $action         = $this->getAction();
+        $problemID      = $this->getParam('serviceRequestId');
+        $callActivityID = null;
         if (isset($_REQUEST['callActivityID'])) {
             $dbeCallActivity = new DBECallActivity($this);
-            $callActivityID = $_REQUEST['callActivityID'];
+            $callActivityID  = $_REQUEST['callActivityID'];
             if (isset($callActivityID)) {
                 $dbeCallActivity->setPKValue($callActivityID);
                 $dbeCallActivity->getRow();
                 $problemID = $dbeCallActivity->getValue(DBECallActivity::problemID);
-                $dbeProblem = new DBEProblem($this);
-                $dbeProblem->setPKValue($problemID);
-                $dbeProblem->getRow();
-
             }
         }
+        $dbeProblem = new DBEProblem($this);
+        if ($problemID) {
+            $dbeProblem->setPKValue($problemID);
+            $dbeProblem->getRow();
+        }
+
 
         switch ($action) {
             case "displayActivity":
@@ -1223,35 +1236,35 @@ class CTSRActivity extends CTCNC
                 $dbeProblemRaiseType->getRow();
                 $return = "<div style='font-size: 14px;font-weight: 100; display:inline-block'>
                   <div class='tooltip' > ";
-                $title = "";
+                $title  = "";
                 switch ($dbeProblemRaiseType->getValue(DBEProblemRaiseType::description)) {
                     case 'Email':
                         $return .= "<i class='fal fa-envelope ml-5 pointer' style='font-size: 18px;' ></i>";
-                        $title = "This Service Request was raised by email";
+                        $title  = "This Service Request was raised by email";
                         break;
                     case 'Portal':
                         $return .= "<i class='icon-chrome_icon' style='font-size: 18px; margin:5px; color:#000080 ' ></i>";
-                        $title = "This Service Request was raised by the portal";
+                        $title  = "This Service Request was raised by the portal";
                         break;
                     case 'Phone':
                         $return .= "<i class='fal fa-phone ml-5 pointer' style='font-size: 18px;' ></i>";
-                        $title = "This Service Request was raised by phone";
+                        $title  = "This Service Request was raised by phone";
                         break;
                     case 'On site':
                         $return .= "<i class='fal fa-building ml-5 pointer' style='font-size: 18px;' ></i>";
-                        $title = "This Service Request was raised by an on site engineer";
+                        $title  = "This Service Request was raised by an on site engineer";
                         break;
                     case 'Alert':
                         $return .= "<i class='fal fa-bell ml-5 pointer' style='font-size: 18px;' ></i>";
-                        $title = "This Service Request was raised by an alert";
+                        $title  = "This Service Request was raised by an alert";
                         break;
                     case 'Sales':
                         $return .= "<i class='fal fa-shopping-cart ml-5 pointer' style='font-size: 18px;' ></i>";
-                        $title = "This Service Request was raised via Sales";
+                        $title  = "This Service Request was raised via Sales";
                         break;
                     case 'Manual':
                         $return .= "<i class='fal fa-user-edit ml-5 pointer' style='font-size: 18px;' ></i>";
-                        $title = "This Service Request was raised manually";
+                        $title  = "This Service Request was raised manually";
                         break;
                 }
                 $return .= "<div class='tooltiptext tooltip-bottom' style='width:300px' >$title</div> </div> ";

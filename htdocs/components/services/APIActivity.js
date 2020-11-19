@@ -123,6 +123,10 @@ class APIActivity extends APIMain {
     changeProblemPriority(body) {
         return this.post(`${ApiUrls.SRActivity}changeProblemPriority`, body).then(res => res.json());
     }
+
+    getLastActivityInServiceRequest(serviceRequestId) {
+        return fetch(`${ApiUrls.SRActivity}getLastActivityInServiceRequest&serviceRequestId=${serviceRequestId}`).then(res => res.json());
+    }
 }
 
 export default APIActivity;

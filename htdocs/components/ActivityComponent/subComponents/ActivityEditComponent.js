@@ -729,20 +729,19 @@ class ActivityEditComponent extends MainComponent {
     };
     handleCancel = async (data) => {
         let text = "Are you sure you want to cancel?";
-        let willDelete =false;        
-        if (data?.callActTypeID == 59||params.get("isFollow")) {
-            text = "This will delete the Change Request activity, please confirm.";
-            willDelete=true;
+        let willDelete = false;
+        if (params.get("isFollow")) {
+            text = "This will delete the activity, please confirm.";
+            willDelete = true;
         }
-        
+
         if (await this.confirm(text)) {
-            if(willDelete)
-            this.api.deleteActivity(data.callActivityID).then(res=>{
-                console.log(res);
-                document.location=`CurrentActivityReport.php`;
-            })
+            if (willDelete)
+                this.api.deleteActivity(data.callActivityID).then(res => {
+                    document.location = `SRActivity.php?action=displayActivity&serviceRequestId=${data.problemID}`;
+                })
             else
-            document.location = `SRActivity.php?action=displayActivity&callActivityID=${data.callActivityID}`;
+                document.location = `SRActivity.php?action=displayActivity&callActivityID=${data.callActivityID}`;
         }
     };
     autoSave = () => {
