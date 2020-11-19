@@ -20,7 +20,7 @@ class OrderHistoryModalComponent extends React.Component {
         let items = [];
         if (this.props.items)
             items = [...this.props.items] || [];
-        //console.log(items);
+
 
         if (items) {
             // items = [...this.props.items];

@@ -25,14 +25,6 @@ class CurrentActivityService extends APIMain {
         return fetch(`${this.baseURL}getProjectsInbox`).then(res => res.json());
     }
 
-    getFixedInbox() {
-        return fetch(`${this.baseURL}getFixedInbox`).then(res => res.json());
-    }
-
-    getFutureInbox() {
-        return fetch(`${this.baseURL}getFutureInbox`).then(res => res.json());
-    }
-
     getToBeLoggedInbox() {
         return fetch(`${this.baseURL}getToBeLoggedInbox`).then(res => res.json());
     }

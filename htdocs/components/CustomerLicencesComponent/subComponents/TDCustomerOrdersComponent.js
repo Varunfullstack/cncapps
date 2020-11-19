@@ -68,7 +68,7 @@ class TDCustomerOrdersComponent extends React.Component {
             //const orders=await this.apiCustomerLicenses.getSubscriptionsByEmail(endCustomerEmail);
             const allSubscriptions = await this.getCustomerOrders(endCustomerEmail);
 
-            console.log(allSubscriptions);
+
             const currentUser = await this.apiCustomerLicenses.getCurrentUser();
             setTimeout(() => {
                 this.setState({currentUser, endCustomerEmail, results: allSubscriptions, endCustomer});
@@ -250,7 +250,7 @@ class TDCustomerOrdersComponent extends React.Component {
     };
     handleOrderHistory = (order) => {
 
-        console.log(order);
+
         const {selectedOrderLine} = this.state;
         //getOrderHistory
         if (order.subscriptionHistory.length > 0) {
@@ -292,7 +292,7 @@ class TDCustomerOrdersComponent extends React.Component {
             handleSetOrderStatus,
         } = this;
         const inactive =
-            selectedOrderLine?.lineStatus === "inactive" ? true : false;
+            selectedOrderLine?.lineStatus === "inactive";
         //prepare body
         const body = el("div", {key: "body"}, [
             el(
@@ -305,12 +305,12 @@ class TDCustomerOrdersComponent extends React.Component {
                 el(
                     "span",
                     {key: "spanStatusCompleted", className: "green-text"},
-                    selectedOrderLine?.lineStatus == "active" ? "Active" : ""
+                    selectedOrderLine?.lineStatus === "active" ? "Active" : ""
                 ),
                 el(
                     "span",
                     {key: "spanStatusNotCompleted", className: "red-text"},
-                    selectedOrderLine?.lineStatus == "inactive" ? "Inactive" : ""
+                    selectedOrderLine?.lineStatus === "inactive" ? "Inactive" : ""
                 ),
             ]),
             el("hr", {key: "hr1"}),
@@ -437,8 +437,8 @@ class TDCustomerOrdersComponent extends React.Component {
         this.apiCustomerLicenses
             .updateOrder({modifyOrders: [body]})
             .then((res) => {
-                if (res.Result == "Success") {
-                    if (res.BodyText.modifyOrdersDetails[0].status == "success") {
+                if (res.Result === "Success") {
+                    if (res.BodyText.modifyOrdersDetails[0].status === "success") {
                         this.setState({
                             showModal: false,
                             orderUpdateError: null,
@@ -485,8 +485,8 @@ class TDCustomerOrdersComponent extends React.Component {
         this.apiCustomerLicenses
             .updateOrder({modifyOrders: [body]})
             .then((res) => {
-                if (res.Result == "Success") {
-                    if (res.BodyText.modifyOrdersDetails[0].status == "success") {
+                if (res.Result === "Success") {
+                    if (res.BodyText.modifyOrdersDetails[0].status === "success") {
                         this.setState({
                             showModal: false,
                             orderUpdateError: null,
@@ -535,7 +535,7 @@ class TDCustomerOrdersComponent extends React.Component {
                 skus: [order.sku],
             });
 
-            if (product.Result == "Success") {
+            if (product.Result === "Success") {
                 //get price list for all addons
                 let productAddOns = product?.BodyText?.productDetails[0]?.addOns;
                 const addOnsProductList = productAddOns?.map((a) => {
@@ -550,7 +550,7 @@ class TDCustomerOrdersComponent extends React.Component {
                         page: i + 1,
                     };
                     let prices = await this.apiCustomerLicenses.getProductsPrices(obj);
-                    if (prices.Result == "Success") {
+                    if (prices.Result === "Success") {
                         prices.BodyText.pricingDetails.map((adn) => {
                             for (let j = 0; j < productAddOns.length; j++) {
                                 productAddOns[j].quantity = 0;
@@ -746,7 +746,7 @@ class TDCustomerOrdersComponent extends React.Component {
             },
         };
 
-        if (addon.quantity == 0) {
+        if (addon.quantity === 0) {
             body.addOns[0].action = "suspend";
             delete body.addOns[0].newQuantity;
             delete body.addOns[0].quantity;
@@ -756,7 +756,7 @@ class TDCustomerOrdersComponent extends React.Component {
             this.apiCustomerLicenses
                 .updateSubscriptionAddOns({modifyAddons: body})
                 .then((res) => {
-                    if (res.Result == "Success") {
+                    if (res.Result === "Success") {
                         this.setState({
                             showModal: false,
                             orderUpdateError: null,
@@ -779,7 +779,7 @@ class TDCustomerOrdersComponent extends React.Component {
             this.apiCustomerLicenses
                 .purchaseSubscriptionAddOns({orderAddons: body})
                 .then((res) => {
-                    if (res.Result == "Success") {
+                    if (res.Result === "Success") {
                         this.setState({
                             showModal: false,
                             orderUpdateError: null,
@@ -827,7 +827,7 @@ class TDCustomerOrdersComponent extends React.Component {
             handleUpdateOrderAddOn,
         } = this;
         const inactive =
-            selectedOrderLine?.lineStatus === "inactive" ? true : false;
+            selectedOrderLine?.lineStatus === "inactive";
         //prepare body
         const body = el("div", {key: "body"}, [
             el(
@@ -842,12 +842,12 @@ class TDCustomerOrdersComponent extends React.Component {
                 el(
                     "span",
                     {key: "spanStatusCompleted", className: "green-text"},
-                    selectedOrderLine?.lineStatus == "active" ? "Active" : ""
+                    selectedOrderLine?.lineStatus === "active" ? "Active" : ""
                 ),
                 el(
                     "span",
                     {key: "spanStatusNotCompleted", className: "red-text"},
-                    selectedOrderLine?.lineStatus == "inactive" ? "Inactive" : ""
+                    selectedOrderLine?.lineStatus === "inactive" ? "Inactive" : ""
                 ),
             ]),
             el("hr", {key: "hr1"}),

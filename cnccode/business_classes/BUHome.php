@@ -6,6 +6,8 @@
  * Time: 11:46
  */
 
+use CNCLTD\Utils;
+
 require_once ($cfg['path_gc']) . '/Controller.inc.php';
 
 class BUHome
@@ -449,7 +451,7 @@ ORDER BY caa_date ASC,
 
         while ($row = $result->fetch_assoc()) {
             $row['reason'] = substr(
-                common_stripEverything($row['reason']),
+                Utils::stripEverything($row['reason']),
                 0,
                 120
             );

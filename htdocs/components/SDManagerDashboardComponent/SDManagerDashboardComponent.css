@@ -14,13 +14,13 @@
 .sd-card td {
     font-family: Arial, Tahoma, Helvetica, sans-serif;
     font-size: 20px;
-    padding: 0px;
+    padding: 0;
     padding-right: 5px;
     white-space: nowrap;
 }
 
 .sd-card table {
-    border-spacing: 0px
+    border-spacing: 0
 }
 
 .sd-card-title {
@@ -42,6 +42,6 @@
 }
 
 .start-work {
-    color: rgb(198,198,198);
+    color: rgb(198, 198, 198);
     --fa-secondary-color: gray;
 }

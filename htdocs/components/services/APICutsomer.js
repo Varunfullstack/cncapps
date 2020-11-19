@@ -1,8 +1,8 @@
-import { groupBy, sort } from "../utils/utils.js";
+import {sort} from "../utils/utils.js";
 import APIMain from "./APIMain.js";
 import ApiUrls from "./ApiUrls.js";
 
- 
+
 class APICustomers extends APIMain{    
     searchCustomers(q) {
         return fetch(`${ApiUrls.Customer}searchCustomers&q=${q}`).then(res => res.json());

@@ -12,15 +12,15 @@ export function sort(array, path, order = "asc") {
         if (
             get(a, path) > get(b, path) ||
             get(a, path) == null ||
-            get(a, path) == undefined
+            get(a, path) === undefined
         )
-            return order == "asc" ? 1 : -1;
+            return order === "asc" ? 1 : -1;
         if (
             get(a, path) < get(b, path) ||
             get(b, path) == null ||
-            get(a, path) == undefined
+            get(a, path) === undefined
         )
-            return order == "asc" ? -1 : 1;
+            return order === "asc" ? -1 : 1;
         else return 0;
     });
 }
@@ -120,7 +120,7 @@ export const TeamType = {
  * @param {string} propertyName
  */
 export function groupBy(items, propertyName) {
-    const groupItems = items.reduce(function (prev, current) {
+    return items.reduce(function (prev, current) {
         // get group index and group by renewalType
         const index = prev
             ? prev.findIndex((g) => g.groupName === current[propertyName])
@@ -136,7 +136,6 @@ export function groupBy(items, propertyName) {
         }
         return prev;
     }, []);
-    return groupItems;
 }
 
 /**
@@ -151,12 +150,12 @@ export function padEnd(value, length, char) {
     var ctx = canvas.getContext("2d");
     ctx.font = "11px Arial";
     var width = ctx.measureText(value).width;
-    //console.log(width);
+
     const spaceCount = (length - width) / 3.05615234375;
     for (let i = 0; i < spaceCount; i++)
         value += char;
     canvas.remove();
-    //console.log(value,value.length);
+
     return value;
 }
 
@@ -189,7 +188,5 @@ export const Chars = {
     WhiteSpace: "&nbsp;"
 }
 export const isEmptyTime = (time) => {
-    if (time == "" || time == null || time == "00:00" || time == "")
-        return true;
-    else return false;
+    return time === "" || time == null || time === "00:00" || time === "";
 }

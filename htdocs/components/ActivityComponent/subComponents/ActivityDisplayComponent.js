@@ -9,6 +9,7 @@ import ActivityFollowOn from "../../Modals/ActivityFollowOn.js";
 import MainComponent from "../../shared/MainComponent.js";
 import * as React from 'react';
 import Modal from "../../shared/Modal/modal";
+import moment from "moment";
 
 class ActivityDisplayComponent extends MainComponent {
     api = new APIActivity();
@@ -54,7 +55,7 @@ class ActivityDisplayComponent extends MainComponent {
     loadCallActivity = async (callActivityID) => {
         const {filters} = this.state;
         const typeId = await this.api.getCallActivityTypeId(callActivityID);
-        console.log(typeId);
+
         switch (typeId) {
             case 60: //Operational Task
                 filters.showOperationalTasks = true;
@@ -68,14 +69,14 @@ class ActivityDisplayComponent extends MainComponent {
         }
         const currentUser = await this.api.getCurrentUser();
         const res = await this.api.getCallActivityDetails(callActivityID, filters);
-        console.log(res);
+
         res.activities = res.activities.map(a => {
             a.date = a.dateEngineer.split('-')[0];
             a.enginner = a.dateEngineer.split('-')[1];
             return a;
         })
-        filters.monitorSR = res.monitoringFlag == "1" ? true : false;
-        filters.criticalSR = res.criticalFlag == "1" ? true : false;
+        filters.monitorSR = res.monitoringFlag === "1";
+        filters.criticalSR = res.criticalFlag === "1";
         this.setState({filters, data: res, currentActivity: res.callActivityID, currentUser});
 
     }
@@ -146,7 +147,7 @@ class ActivityDisplayComponent extends MainComponent {
     getActions = () => {
         const {el} = this;
         const {data, currentUser} = this.state;
-        console.log(currentUser);
+
         return el('div', {
                 className: "activities-container",
                 style: {display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center"}
@@ -172,14 +173,14 @@ class ActivityDisplayComponent extends MainComponent {
                 })
             }),
             this.getGab(),
-            data?.canEdit == 'ALL_GOOD' ? el(ToolTip, {
+            data?.canEdit === 'ALL_GOOD' ? el(ToolTip, {
                 title: "Edit",
                 content: el('a', {
                     className: "fal fa-edit fa-2x m-5 pointer icon",
                     href: `SRActivity.php?action=editActivity&callActivityID=${data?.callActivityID}`
                 })
             }) : null,
-            data?.canEdit != 'ALL_GOOD' ? el(ToolTip, {
+            data?.canEdit !== 'ALL_GOOD' ? el(ToolTip, {
                 title: data?.canEdit,
                 content: el('i', {className: "fal fa-edit fa-2x m-5 pointer icon-disable"})
             }) : null,
@@ -267,7 +268,7 @@ class ActivityDisplayComponent extends MainComponent {
                     href: `Activity.php?action=createFollowOnActivity&callActivityID=${data?.callActivityID}&callActivityTypeID=22`
                 })
             }) : null,
-            currentUser.isSDManger && data?.problemHideFromCustomerFlag == 'Y' ? el(ToolTip, {
+            currentUser.isSDManger && data?.problemHideFromCustomerFlag === 'Y' ? el(ToolTip, {
                 title: "Unhide SR",
                 content: el('i', {
                     className: "fal fa-eye-slash fa-2x m-5 pointer icon",
@@ -281,7 +282,7 @@ class ActivityDisplayComponent extends MainComponent {
                     href: `Activity.php?action=addToCalendar&callActivityID=${data?.callActivityID}`
                 })
             }),
-            data?.allowSCRFlag == 'Y' ? el(ToolTip, {
+            data?.allowSCRFlag === 'Y' ? el(ToolTip, {
                 title: "Send client a visit confirmation email",
                 content: el('i', {
                     className: "fal fa-envelope fa-2x m-5 pointer icon",
@@ -299,7 +300,7 @@ class ActivityDisplayComponent extends MainComponent {
         }
     }
     handleUnhideSR = async (data) => {
-        if (data?.isSDManger && data?.problemHideFromCustomerFlag == 'Y') {
+        if (data?.isSDManger && data?.problemHideFromCustomerFlag === 'Y') {
             if (await this.confirm('This will unhide the SR from the customer and can\'t be undone, are you sure?')) {
                 await this.api.unHideSrActivity(data.callActivityID);
                 data.problemHideFromCustomerFlag = 'N';
@@ -367,7 +368,7 @@ class ActivityDisplayComponent extends MainComponent {
         const {filters, currentActivity} = this.state;
         filters[filter] = !filters[filter];
         this.setState({filters});
-        console.log(filter === "criticalSR", filters[filter]);
+
         if (filter === "criticalSR")
             await this.api.setActivityCritical(currentActivity);
         if (filter === "monitorSR")
@@ -393,12 +394,12 @@ class ActivityDisplayComponent extends MainComponent {
         const {el} = this;
         if (!data)
             return null;
-        const indx = data.activities.findIndex(a => a.callActivityID == currentActivity);
+        const indx = data.activities.findIndex(a => a.callActivityID === currentActivity);
         return el('div', {className: "ml-5"}, el('strong', null, (indx + 1)), el('label', null, ` of ${data.activities.length}`))
     }
     goNextActivity = () => {
         const {data, currentActivity} = this.state;
-        let index = data.activities.findIndex(a => a.callActivityID == currentActivity);
+        let index = data.activities.findIndex(a => a.callActivityID === currentActivity);
         if (index < (data.activities.length - 1)) {
             index++;
             this.setState({currentActivity: data.activities[index].callActivityID});
@@ -408,7 +409,7 @@ class ActivityDisplayComponent extends MainComponent {
     }
     goPrevActivity = () => {
         const {data, currentActivity} = this.state;
-        let index = data.activities.findIndex(a => a.callActivityID == currentActivity);
+        let index = data.activities.findIndex(a => a.callActivityID === currentActivity);
         if (index > 0) {
             index--;
             this.setState({currentActivity: data.activities[index].callActivityID});
@@ -418,8 +419,8 @@ class ActivityDisplayComponent extends MainComponent {
     }
     goLastActivity = () => {
         const {data, currentActivity} = this.state;
-        let index = data.activities.findIndex(a => a.callActivityID == currentActivity);
-        if (index != (data.activities.length - 1)) {
+        let index = data.activities.findIndex(a => a.callActivityID === currentActivity);
+        if (index !== (data.activities.length - 1)) {
             index = data.activities.length - 1;
             this.setState({currentActivity: data.activities[index].callActivityID});
             this.loadCallActivity(data.activities[index].callActivityID);
@@ -427,8 +428,8 @@ class ActivityDisplayComponent extends MainComponent {
     }
     goFirstActivity = () => {
         const {data, currentActivity} = this.state;
-        let index = data.activities.findIndex(a => a.callActivityID == currentActivity);
-        if (index != 0) {
+        let index = data.activities.findIndex(a => a.callActivityID === currentActivity);
+        if (index !== 0) {
             index = 0;
             this.setState({currentActivity: data.activities[index].callActivityID});
             this.loadCallActivity(data.activities[index].callActivityID);
@@ -461,11 +462,11 @@ class ActivityDisplayComponent extends MainComponent {
     getActivitiesElement = () => {
         const {data, currentActivity} = this.state;
         const {el} = this;
-        //console.log(maxLength( data?.activities||[],'contactName'));
+
         const dateLen = maxLength(data?.activities || [], 'date') + 10;
         const engineerLen = maxLength(data?.activities || [], 'enginner') + 10;
         const contactName = maxLength(data?.activities || [], 'contactName') + 10;
-        const indx = data?.activities.findIndex(a => a.callActivityID == currentActivity);
+        const indx = data?.activities.findIndex(a => a.callActivityID === currentActivity);
         return el('div', {className: "activities-container"},
             el('div', {style: {width: "100%", display: "flex", alignItems: "center", justifyContent: "center"}},
                 el(ToolTip, {
@@ -484,7 +485,7 @@ class ActivityDisplayComponent extends MainComponent {
                     })
                 }),
                 el('select', {value: currentActivity, onChange: this.handleActivityChange},
-                    indx == -1 ? el('option', {value: null}, "") : null,
+                    indx === -1 ? el('option', {value: null}, "") : null,
                     data?.activities.map(a =>
                         el('option', {
                             key: "cl" + a.callActivityID, value: a.callActivityID,
@@ -635,11 +636,11 @@ class ActivityDisplayComponent extends MainComponent {
         );
     }
     deleteDocument = async (id) => {
-        console.log(id);
+
         if (await this.confirm('Are you sure you want to remove this document?')) {
             await this.api.deleteDocument(this.state.currentActivity, id);
             const {data} = this.state;
-            data.documents = data.documents.filter(d => d.id != id);
+            data.documents = data.documents.filter(d => d.id !== id);
             this.setState({data});
         }
     }
@@ -661,7 +662,7 @@ class ActivityDisplayComponent extends MainComponent {
                     el('tr', null,
                         el('td', {className: "display-label"}, "Priority"),
                         el('td', {className: "display-content"}, data?.priority),
-                        el('td', {style: {textAlign: "center"}, colSpan: 1}, data?.problemHideFromCustomerFlag == "Y" ?
+                        el('td', {style: {textAlign: "center"}, colSpan: 1}, data?.problemHideFromCustomerFlag === "Y" ?
                             el("label", {
                                 style: {
                                     color: "red",
@@ -713,7 +714,7 @@ class ActivityDisplayComponent extends MainComponent {
 
     }
     getAwaitingTitle = (data) => {
-        if (data?.problemStatus != "F" && data?.problemStatus != "C") {
+        if (data?.problemStatus !== "F" && data?.problemStatus !== "C") {
             if (data?.awaitingCustomerResponseFlag === 'N')
                 return " - Awaiting CNC";
             else if (data?.awaitingCustomerResponseFlag === 'Y')
@@ -787,7 +788,7 @@ class ActivityDisplayComponent extends MainComponent {
         const {uploadFiles} = this.state;
         if (uploadFiles) {
             let names = "";
-            console.log(uploadFiles);
+
             for (let i = 0; i < uploadFiles.length; i++) {
                 names += uploadFiles[i].name + "  ,";
             }
@@ -855,14 +856,14 @@ class ActivityDisplayComponent extends MainComponent {
     }
     // Parts used, change requestm and sales request
     handleTemplateChanged = (event) => {
-        console.log(event.target.value);
+
         const id = event.target.value;
         const {templateOptions} = this.state;
-        let templateDefault = '';
+        let templateDefault;
         let templateOptionId = null;
         let templateValue = '';
         if (id >= 0) {
-            const op = templateOptions.filter(s => s.id == id)[0];
+            const op = templateOptions.filter(s => s.id === id)[0];
             templateDefault = op.template;
             templateValue = op.template;
             templateOptionId = op.id;
@@ -876,7 +877,7 @@ class ActivityDisplayComponent extends MainComponent {
     }
     handleTemplateSend = async (type) => {
         const {templateValue, templateOptionId, data, currentActivity} = this.state;
-        if (templateValue == '') {
+        if (templateValue === '') {
             this.alert('Please enter detials');
             return;
         }
@@ -888,7 +889,7 @@ class ActivityDisplayComponent extends MainComponent {
                 await this.api.sendChangeRequest(data.problemID, payload);
                 break;
             case "partsUsed":
-                var object = {
+                const object = {
                     message: templateValue,
                     callActivityID: currentActivity,
                 };
@@ -970,7 +971,7 @@ class ActivityDisplayComponent extends MainComponent {
     }
     getFollowOnElement = () => {
         const {data, showFollowOn} = this.state;
-        const startWork = data?.problemStatus == 'I' && data?.serverGuard == 'N' && data?.hideFromCustomerFlag == 'N';
+        const startWork = data?.problemStatus === 'I' && data?.serverGuard === 'N' && data?.hideFromCustomerFlag === 'N';
         return showFollowOn ? this.el(ActivityFollowOn, {
             startWork,
             key: "followOnModal",

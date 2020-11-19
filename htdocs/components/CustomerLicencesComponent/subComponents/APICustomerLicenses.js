@@ -121,10 +121,6 @@ class APICustomerLicenses extends APIMain {
     }
 
     // update cnc item
-    activeCncItem(customerId, sku) {
-        return fetch(`${this.baseURL}activeCncItem&customerId=${customerId}&sku=${sku}`, {method: 'POST'}).then(res => res.json());
-
-    }
 
     deactiveCncItemBySku(customerId, sku) {
 

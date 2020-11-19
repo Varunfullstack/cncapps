@@ -53,7 +53,7 @@ class GatherFixedInformationComponent extends MainComponent {
             this.apiActivity.getDocuments(activity.callActivityID, activity.problemID),
             this.apiActivity.getInitialActivity(activity.problemID)
         ]);
-        console.log(activity, result);
+
         const {data} = this.state;
         data.rootCauseID = activity.rootCauseID;
         data.contractCustomerItemID = activity.contractCustomerItemID || "99";
@@ -139,7 +139,7 @@ class GatherFixedInformationComponent extends MainComponent {
                         null,
                         el("td", {className: "display-label "}, "Summary of Resolution"),
                         el("td", null, el(CKEditor, {
-                            minCharCount: activity.problemHideFromCustomerFlag == 'N' ? 160 : -1,
+                            minCharCount: activity.problemHideFromCustomerFlag === 'N' ? 160 : -1,
                             disableClipboard: true,
                             value: initialActivity?.reason,
                             onChange: (value) => this.setValue("resolutionSummary", value),
@@ -240,11 +240,11 @@ class GatherFixedInformationComponent extends MainComponent {
     getPartsUsed = () => {
         const {showModal, modalType} = this.state;
         const {el} = this;
-        //console.log(priorityReasons);
+
         return el(StandardTextModal,
             {
                 options: [],
-                show: showModal && modalType == this.modalTypes.partsUsed,
+                show: showModal && modalType === this.modalTypes.partsUsed,
                 title: "Parts Used",
                 okTitle: "Send",
                 onChange: this.handlePartsUsedReason,
@@ -264,17 +264,17 @@ class GatherFixedInformationComponent extends MainComponent {
         const {showModal, modalType} = this.state;
         let {salesOptions} = this.state;
         const {el} = this;
-        if (salesOptions.length == 0) {
+        if (salesOptions.length === 0) {
             this.apiStandardText.getOptionsByType("Sales Request")
                 .then(salesOptions => {
                     this.setState({salesOptions});
                 })
         }
-        //console.log(priorityReasons);
+
         return el(StandardTextModal,
             {
                 options: salesOptions,
-                show: showModal && modalType == this.modalTypes.sales,
+                show: showModal && modalType === this.modalTypes.sales,
                 title: "Sales Request",
                 okTitle: "Send",
                 onChange: this.handleSalesReason,
@@ -283,7 +283,7 @@ class GatherFixedInformationComponent extends MainComponent {
             });
     }
     handleSalesType = (typeId) => {
-        console.log(typeId);
+
         this.setState({templateTypeId: typeId});
     }
     handleSalesReason = async (value) => {
@@ -303,8 +303,8 @@ class GatherFixedInformationComponent extends MainComponent {
     }
     handleSave = () => {
         const {activity, data} = this.state;
-        console.log(activity, data);
-        if (data.contractCustomerItemID == "99") {
+
+        if (data.contractCustomerItemID === "99") {
             this.alert("Please select contract");
             return;
         }
@@ -316,7 +316,7 @@ class GatherFixedInformationComponent extends MainComponent {
             this.alert("You must enter more text in the summary information");
             return;
         }
-        if (activity.problemHideFromCustomerFlag == 'N' && data.resolutionSummary.length < 160) {
+        if (activity.problemHideFromCustomerFlag === 'N' && data.resolutionSummary.length < 160) {
             this.alert("The resolution summary must have at least 160 characters");
             return;
         }

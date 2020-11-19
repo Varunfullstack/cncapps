@@ -156,7 +156,7 @@ class InboxToBeLoggedComponent extends React.Component {
         ];
 
         columns = columns
-            .filter((c) => c.hide == false)
+            .filter((c) => c.hide === false)
             .sort((a, b) => (a.order > b.order ? 1 : -1));
         const {data} = this.props;
 
@@ -172,7 +172,7 @@ class InboxToBeLoggedComponent extends React.Component {
     render() {
         const {el, getTableElement} = this;
         const {data} = this.props;
-        // console.log(data);
+
         return [
             getTableElement(),
         ];

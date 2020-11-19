@@ -1,4 +1,5 @@
 import React from 'react';
+
 export const RadioButtonsType={vertical:"vertical",horizontal:"horizontal"};
 export default class RadioButtons extends React.Component {
     el = React.createElement;

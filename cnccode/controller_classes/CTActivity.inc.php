@@ -9,6 +9,7 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
+use CNCLTD\Utils;
 global $cfg;
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
@@ -1011,7 +1012,7 @@ class CTActivity extends CTCNC
                         'listActivityCount'         => $dsSearchResults->getValue(DBECallActivitySearch::activityCount),
                         'listOrderLink'             => $salesOrderLink,
                         'reason'                    => substr(
-                            common_stripEverything($reason),
+                            Utils::stripEverything($reason),
                             0,
                             50
                         ),
@@ -1414,13 +1415,17 @@ class CTActivity extends CTCNC
                 str_replace(
                     ',',
                     '\'',
-                    addslashes(common_stripEverything($this->dsSearchResults->getValue(DBECallActivitySearch::reason)))
+                    addslashes(
+                        Utils::stripEverything($this->dsSearchResults->getValue(DBECallActivitySearch::reason))
+                    )
                 ) . "," .
                 str_replace(
                     ',',
                     '\'',
                     addslashes(
-                        common_stripEverything($this->dsSearchResults->getValue(DBECallActivitySearch::internalNotes))
+                        Utils::stripEverything(
+                            $this->dsSearchResults->getValue(DBECallActivitySearch::internalNotes)
+                        )
                     )
                 ) . "," .
                 $this->dsSearchResults->getExcelValue(DBECallActivitySearch::managementReviewReason) . "," .
@@ -1498,11 +1503,11 @@ class CTActivity extends CTCNC
                     'contactDateRaised'             => Controller::dateYMDtoDMY(
                         $dsContactSrs->getValue(DBEJProblem::dateRaised)
                     ),
-                    'contactReason'                 => self::truncate(
+                    'contactReason'                 => Utils::truncate(
                         $dsContactSrs->getValue(DBEJProblem::reason),
                         100
                     ),
-                    'contactLastReason'             => self::truncate(
+                    'contactLastReason'             => Utils::truncate(
                         $dsContactSrs->getValue(DBEJProblem::lastReason),
                         100
                     ),
@@ -3285,11 +3290,11 @@ class CTActivity extends CTCNC
                     'contactDateRaised'             => Controller::dateYMDtoDMY(
                         $dsContactSrs->getValue(DBEJProblem::dateRaised)
                     ),
-                    'contactReason'                 => self::truncate(
+                    'contactReason'                 => Utils::truncate(
                         $dsContactSrs->getValue(DBEJProblem::reason),
                         100
                     ),
-                    'contactLastReason'             => self::truncate(
+                    'contactLastReason'             => Utils::truncate(
                         $dsContactSrs->getValue(DBEJProblem::lastReason),
                         100
                     ),
@@ -3348,11 +3353,11 @@ class CTActivity extends CTCNC
                     'dateRaised'             => Controller::dateYMDtoDMY(
                         $dsActiveSrs->getValue(DBEJProblem::dateRaised)
                     ),
-                    'reason'                 => self::truncate(
+                    'reason'                 => Utils::truncate(
                         $dsActiveSrs->getValue(DBEJProblem::reason),
                         100
                     ),
-                    'lastReason'             => self::truncate(
+                    'lastReason'             => Utils::truncate(
                         $dsActiveSrs->getValue(DBEJProblem::lastReason),
                         100
                     ),

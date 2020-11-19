@@ -242,7 +242,7 @@ class ExpenseBreakdownYearToDateComponent extends React.Component {
                                         key: expenseType + '-row'
                                     },
                                     [
-                                        this.el('th', {key: expenseType + '-title'}, expenseType == "Mileage" ? "Mileage (Miles)" : expenseType),
+                                        this.el('th', {key: expenseType + '-title'}, expenseType === "Mileage" ? "Mileage (Miles)" : expenseType),
                                         ...tableData[expenseType].map((value, idx) => {
                                             return this.el(
                                                 'td',
@@ -258,7 +258,7 @@ class ExpenseBreakdownYearToDateComponent extends React.Component {
                                                         }
                                                     },
                                                 },
-                                                value.toFixed(2) + (expenseType == "Mileage" ? ` (${mileage[idx]})` : '')
+                                                value.toFixed(2) + (expenseType === "Mileage" ? ` (${mileage[idx]})` : '')
                                             )
                                         })
                                     ]

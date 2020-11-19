@@ -2,21 +2,22 @@
     width: 100%;
     margin-bottom: 1rem;
     color: #212529;
-    border-spacing: 0px;
+    border-spacing: 0;
 
-    }
-    
-    .table th,
-    .table td {
+}
+
+.table th,
+.table td {
     padding: 0.1rem;
     vertical-align: middle;
     /* border-top: 1px solid #dee2e6; */
-    }
-    
-    .table thead th {
+}
+
+.table thead th {
     vertical-align: bottom;
     border-bottom: 2px solid #dee2e6;
 }
+
 .fixedServiceRequestCountComponent-table .table th, .fixedServiceRequestCountComponent-table .table td {
     padding: 0.5rem;
 }
@@ -25,6 +26,7 @@
     font-weight: bold;
     padding-bottom: 2.2rem;
 }
+
 .fixedServiceRequestCountComponent-table .table .teamHeader th {
     font-size: large;
 }
@@ -367,14 +369,17 @@
 
 .table-responsive > .table-bordered {
     border: 0;
-    }
-    .table .selected{
-        background-color: #c2d8ee !important;
-    }
-    .table .selected td{
-        border-color: #c2d8ee !important;
-    }
-    .table .footer{
-        font-size: 20px;
-        font-weight: bold;
-    }
+}
+
+.table .selected {
+    background-color: #c2d8ee !important;
+}
+
+.table .selected td {
+    border-color: #c2d8ee !important;
+}
+
+.table .footer {
+    font-size: 20px;
+    font-weight: bold;
+}

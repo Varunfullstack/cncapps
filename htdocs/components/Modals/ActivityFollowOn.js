@@ -26,9 +26,9 @@ class ActivityFollowOn extends MainComponent {
         ]).then((result) => {
             const currentUser = result[1];
             let types = result[0];
-            console.log(currentUser, types);
+
             if (!currentUser.isSDManger) {
-                types = types.filter(c => c.visibleInSRFlag == 'Y')
+                types = types.filter(c => c.visibleInSRFlag === 'Y')
             }
             this.setState({types});
         });
@@ -74,7 +74,7 @@ class ActivityFollowOn extends MainComponent {
     handleCreate = async () => {
         const {startWork, callActivityID} = this.props;
         const {callActTypeID} = this.state;
-        if (callActTypeID == "") {
+        if (callActTypeID === "") {
             await this.alert("Please select Activity Type");
             return;
         }

@@ -7,34 +7,34 @@ require_once($cfg["path_dbe"] . "/DBEProblem.inc.php");
 
 class DBEJProblem extends DBEProblem
 {
-    const customerName = "customerName";
-    const specialAttentionFlag = "specialAttentionFlag";
-    const specialAttentionEndDate = "specialAttentionEndDate";
-    const dateRaisedDMY = "dateRaisedDMY";
-    const timeRaised = "timeRaised";
-    const totalActivityHours = "totalActivityHours";
-    const hoursElapsed = "hoursElapsed";
-    const engineerName = "engineerName";
-    const teamID = "teamID";
-    const engineerLogname = "engineerLogname";
-    const engineerInitials = "engineerInitials";
-    const slaDueHours = "slaDueHours";
-    const callActivityID = "callActivityID";
-    const serverGuard = "serverGuard";
-    const reason = "reason";
-    const lastCallActivityID = "lastCallActivityID";
-    const lastServerGuard = "lastServerGuard";
-    const lastReason = "lastReason";
-    const lastCallActTypeID = "lastCallActTypeID";
-    const lastStartTime = "lastStartTime";
-    const lastUserID = "lastUserID";
-    const lastDate = "lastDate";
+    const customerName                     = "customerName";
+    const specialAttentionFlag             = "specialAttentionFlag";
+    const specialAttentionEndDate          = "specialAttentionEndDate";
+    const dateRaisedDMY                    = "dateRaisedDMY";
+    const timeRaised                       = "timeRaised";
+    const totalActivityHours               = "totalActivityHours";
+    const hoursElapsed                     = "hoursElapsed";
+    const engineerName                     = "engineerName";
+    const teamID                           = "teamID";
+    const engineerLogname                  = "engineerLogname";
+    const engineerInitials                 = "engineerInitials";
+    const slaDueHours                      = "slaDueHours";
+    const callActivityID                   = "callActivityID";
+    const serverGuard                      = "serverGuard";
+    const reason                           = "reason";
+    const lastCallActivityID               = "lastCallActivityID";
+    const lastServerGuard                  = "lastServerGuard";
+    const lastReason                       = "lastReason";
+    const lastCallActTypeID                = "lastCallActTypeID";
+    const lastStartTime                    = "lastStartTime";
+    const lastUserID                       = "lastUserID";
+    const lastDate                         = "lastDate";
     const lastAwaitingCustomerResponseFlag = "lastAwaitingCustomerResponseFlag";
-    const dashboardSortColumn = "dashboardSortColumn";
-    const hoursRemaining = 'hoursRemaining';
-    const specialAttentionContactFlag = "specialAttentionContactFlag";
-    const referredFlag = "referredFlag";
-    const lastEndTime = "lastEndTime";
+    const dashboardSortColumn              = "dashboardSortColumn";
+    const hoursRemainingForSLA             = 'hoursRemainingForSLA';
+    const specialAttentionContactFlag      = "specialAttentionContactFlag";
+    const referredFlag                     = "referredFlag";
+    const lastEndTime                      = "lastEndTime";
 
     /**
      * calls constructor()
@@ -206,7 +206,7 @@ class DBEJProblem extends DBEProblem
             "pro_sla_response_hours - pro_working_hours "
         );
         $this->addColumn(
-            self::hoursRemaining,
+            self::hoursRemainingForSLA,
             DA_FLOAT,
             DA_ALLOW_NULL,
             'pro_working_hours - pro_sla_response_hours'
@@ -418,13 +418,11 @@ class DBEJProblem extends DBEProblem
       Get Awaiting, In-progress and future SRs by Queue
 
       */
-    function getRowsByQueueNoWithFuture($queueNo,
-                                        $unassignedOnly = false
-    )
+    function getRowsByQueueNoWithFuture($queueNo)
     {
         $sql =
             "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
+            ", pro_consno is not null as isAssigned FROM " . $this->getTableName() .
             " LEFT JOIN customer ON cus_custno = pro_custno
            LEFT JOIN consultant ON cns_consno = pro_consno
 
@@ -445,12 +443,7 @@ class DBEJProblem extends DBEProblem
 
           AND pro_queue_no = $queueNo";
 
-        if ($unassignedOnly) {
-            $sql .= " AND pro_consno is null";
-
-        } else {
-            $sql .= " AND pro_consno is not null";
-        }
+        $sql .= " order by isAssigned asc, {$this->getDBColumnName(self::dashboardSortColumn)} asc";
         $this->setQueryString($sql);
         return (parent::getRows());
     }
@@ -852,7 +845,7 @@ class DBEJProblem extends DBEProblem
                 $sql .= " and  " . $this->getDBColumnName(self::criticalFlag) . " = 'Y' order by hoursRemaining desc ";
                 break;
             case 'currentOpenSRs':
-                $sql .= " and last.caa_callacttypeno is null order by hoursRemaining desc";
+                $sql .= " and last.caa_endtime is null and last.caa_date <= curdate() and last.caa_starttime <= TIME(NOW())  order by hoursRemaining desc";
                 break;
         }
 
@@ -1032,6 +1025,105 @@ class DBEJProblem extends DBEProblem
         return (parent::getRows());
     }
 
+    function isSpecialAttention()
+    {
+        $isSpecialAttentionCustomer = $this->getValue(self::specialAttentionFlag) == 'Y';
+        $isSpecialAttentionExpired  = $this->getValue(self::specialAttentionEndDate) < date('Y-m-d');
+        $isSpecialAttentionContact  = $this->getValue(self::specialAttentionContactFlag) == 'Y';
+        if (($isSpecialAttentionCustomer && !$isSpecialAttentionExpired) || $isSpecialAttentionContact) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    function isRequestBeingWorkedOn()
+    {
+        $dateString       = $this->getValue(DBEJProblem::lastDate);
+        $timeString       = $this->getValue(DBEJProblem::lastStartTime);
+        $activityDateTime = DateTime::createFromFormat('Y-m-d H:i', "$dateString $timeString");
+
+        if ($activityDateTime > (new DateTime())) {
+            return false;
+        }
+
+        return !$this->getValue(DBEJProblem::lastEndTime);
+    }
+
+    function isSLABreached()
+    {
+        $status           = $this->getValue(DBEJProblem::status);
+        $priority         = $this->getValue(DBEJProblem::priority);
+        $slaResponseHours = $this->getValue(DBEJProblem::slaResponseHours);
+        $workingHours     = $this->getValue(DBEJProblem::workingHours);
+        $respondedHours   = $this->getValue(DBEJProblem::respondedHours);
+        if ($slaResponseHours == 0) {
+            $slaResponseHours = 1;
+        }
+
+        if ($priority == 5) {
+            return false;
+        }
+        if ($status != 'I' && $respondedHours <= $slaResponseHours) {
+            return false;
+        }
+
+        $percentageSLA = ($workingHours / $slaResponseHours);
+        if ($status == 'I' && $percentageSLA < 1) {
+            return false;
+        }
+
+        return true;
+    }
+
+    function isOnHold()
+    {
+        return $this->getValue(DBEJProblem::awaitingCustomerResponseFlag) == 'Y';
+    }
+
+    function getDateTime(): ?DateTimeInterface
+    {
+        $dateTime = DateTime::createFromFormat(
+            DATE_MYSQL_DATETIME,
+            "{$this->lastDate()} {$this->properTime()}"
+        );
+        if (!$dateTime) {
+            return null;
+        }
+        return $dateTime;
+    }
+
+    function lastDate()
+    {
+        return $this->getValue(self::lastDate);
+    }
+
+    private function properTime()
+    {
+        return $this->getValue(self::lastStartTime) ? "{$this->getValue(self::lastStartTime)}:00" : null;
+    }
+
+    public function alarmDateTime(): ?DateTimeInterface
+    {
+        if (!$this->getValue(self::alarmDate)) {
+            return null;
+        }
+        $dateTime = DateTime::createFromFormat(
+            DATE_MYSQL_DATETIME,
+            "{$this->getValue(self::alarmDate)} {$this->getValue(self::alarmTime)}:00"
+        );
+        if (!$dateTime) {
+            return null;
+        }
+        return $dateTime;
+    }
+
+    public function isWorkHidden()
+    {
+        return $this->getValue(DBECustomer::referredFlag) == 'Y';
+    }
 }
 
 ?>

@@ -12,6 +12,7 @@ import ReactDOM from 'react-dom';
 import './../style.css';
 import './SDManagerDashboardComponent.css';
 import ActivityFollowOn from "../Modals/ActivityFollowOn";
+import moment from "moment";
 
 class SDManagerDashboardComponent extends MainComponent {
     el = React.createElement;
@@ -59,9 +60,9 @@ class SDManagerDashboardComponent extends MainComponent {
 
     loadAllocatedUsers = () => {
         const {filter, allocatedUsers} = this.state;
-        if (filter.activeTab < 9 && allocatedUsers.length == 0)
+        if (filter.activeTab < 9 && allocatedUsers.length === 0)
             this.apiCurrentActivityService.getAllocatedUsers().then((res) => {
-                //console.log(res);
+
                 this.setState({allocatedUsers: res});
             });
     }
@@ -71,7 +72,6 @@ class SDManagerDashboardComponent extends MainComponent {
         else return "";
     };
     setActiveTab = (code) => {
-        console.log("tab change");
         const {filter} = this.state;
         filter.activeTab = code;
         this.saveFilter(filter);
@@ -83,7 +83,7 @@ class SDManagerDashboardComponent extends MainComponent {
         const {el, tabs} = this;
         const {filter} = this.state;
         let tabsFilter = tabs;
-        if (filter.p5) tabsFilter = tabs.filter((t) => t.showP5 == true);
+        if (filter.p5) tabsFilter = tabs.filter((t) => t.showP5 === true);
         return el(
             "div",
             {
@@ -193,14 +193,10 @@ class SDManagerDashboardComponent extends MainComponent {
         if (id < 10) {
             this.loadAllocatedUsers();
             const {filter} = this.state;
-            this.api.getQueue(id, filter).then((queueData) => {
-                queueData = queueData.map(p => {
-                    return {...p, workBgColor: this.getProblemWorkColor(p)}
+            this.api.getQueue(id, filter)
+                .then((queueData) => {
+                    this.setState({queueData})
                 });
-                console.log(queueData);
-
-                this.setState({queueData})
-            });
         } else return [];
 
     };
@@ -222,10 +218,9 @@ class SDManagerDashboardComponent extends MainComponent {
         }) : null;
     }
 
-    // end of shared methods
     getProblemWorkTitle(problem) {
         if (problem.isBeingWorkedOn) {
-            return "Request being worked on by somebody else";
+            return "Request being worked on currently";
         }
         if (problem.status === "I") {
             return "Request not started yet";
@@ -245,11 +240,14 @@ class SDManagerDashboardComponent extends MainComponent {
         return `start-work fal ${commonClasses}`;
     }
 
-    getProblemWorkColor(problem) {
-        if (problem.hoursRemainingBgColor === "#FFF5B3") return "#FFF5B3";
-        if (problem.bgColour === "#BDF8BA") return "#BDF8BA";
-        return "#C6C6C6";
-    }
+    addToolTip = (element, title) => {
+        return this.el(
+            "div",
+            {className: "tooltip"},
+            element,
+            this.el("div", {className: "tooltiptext tooltip-bottom"}, title)
+        );
+    };
 
     getQueueElement = () => {
         const {filter, queueData} = this.state;
@@ -304,14 +302,17 @@ class SDManagerDashboardComponent extends MainComponent {
                     sortable: false,
                     toolTip: "On Hold",
                     className: "text-center",
-                    content: (problem) =>
-                        problem.hoursRemainingBgColor === "#BDF8BA"
-                            ? el("i", {
-                                className: "fal  fa-user-clock color-gray pointer inbox-icon",
-                                key: "icon",
-                                style: {float: "right"},
-                            })
-                            : null,
+                    content: (problem) => {
+                        if (!problem.awaitingCustomerResponse) {
+                            return;
+                        }
+                        return (
+                            <i className="fal  fa-user-clock color-gray pointer inbox-icon"
+                               key="icon"
+                               style={{float: "right"}}
+                            />
+                        )
+                    }
                 },
 
                 {
@@ -323,15 +324,17 @@ class SDManagerDashboardComponent extends MainComponent {
                     sortable: false,
                     className: "text-center",
                     toolTip: "SLA Failed for this Service Request",
-                    content: (problem) =>
-                        problem.bgColour == "#F8A5B6"
-                            ? el("i", {
-                                className:
-                                    "fal fa-2x fa-bell-slash color-gray pointer inbox-icon",
-                                title: "",
-                                key: "icon",
-                            })
-                            : null,
+                    content: (problem) => {
+                        if (!problem.isSLABreached) {
+                            return null;
+                        }
+                        return (
+                            <i className="fal fa-2x fa-bell-slash color-gray pointer inbox-icon"
+                               title=""
+                               key="icon"
+                            />
+                        )
+                    },
                 },
                 {
                     hide: false,
@@ -340,19 +343,17 @@ class SDManagerDashboardComponent extends MainComponent {
                     key: "Future Icon",
                     label: "",
                     sortable: false,
-                    content: (problem) =>
-                        moment(problem.alarmDateTime) > moment()
-                            ? addToolTip(
-                            el("i", {
-                                className:
-                                    "fal fa-2x fa-alarm-snooze color-gray pointer float-right inbox-icon",
-                                key: "starIcon",
-                            }),
-                            `This Service Request is scheduled for the future date of ${moment(
-                                problem.alarmDateTime
-                            ).format("DD/MM/YYYY HH:mm")}`
-                            )
-                            : null,
+                    content: (problem) => {
+                        const momentAlarmDateTime = moment(problem.alarmDateTime, 'YYYY-MM-DD HH:mm:ss');
+                        if (!problem.alarmDateTime || !momentAlarmDateTime.isValid() || (momentAlarmDateTime.isSameOrBefore(moment()))) {
+                            return null;
+                        }
+                        return this.addToolTip(
+                            <i className="fal fa-2x fa-alarm-snooze color-gray pointer float-right inbox-icon"
+                               key="starIcon"
+                            />,
+                            `This Service Request is scheduled for the future date of ${momentAlarmDateTime.format("DD/MM/YYYY HH:mm")}`)
+                    },
                 },
                 {
                     path: "problemID",
@@ -362,7 +363,6 @@ class SDManagerDashboardComponent extends MainComponent {
                     icon: "fal fa-2x fa-hashtag color-gray2 pointer",
                     sortable: false,
                     className: "text-center",
-                    //backgroundColorColumn: "bgColour",
                     classNameColumn: "",
                     content: (problem) => el('a', {
                         href: `Activity.php?action=displayLastActivity&problemID=${problem.problemID}`,
@@ -376,7 +376,6 @@ class SDManagerDashboardComponent extends MainComponent {
                     hdClassName: "text-center",
                     icon: "fal fa-2x fa-building color-gray2 pointer",
                     sortable: false,
-                    //classNameColumn: "customerNameDisplayClass",
                     content: (problem) => el('a', {
                         href: `SalesOrder.php?action=search&customerID=${problem.customerID}`,
                         target: '_blank'
@@ -390,7 +389,6 @@ class SDManagerDashboardComponent extends MainComponent {
                     icon: "fal fa-2x fa-signal color-gray2 pointer",
                     sortable: false,
                     className: "text-center",
-                    // classNameColumn: "priorityBgColor",
                 },
                 {
                     path: "",
@@ -410,14 +408,13 @@ class SDManagerDashboardComponent extends MainComponent {
                     }),
                 },
                 {
-                    path: "hoursRemaining",
+                    path: "hoursRemainingForSLA",
                     label: "",
                     hdToolTip: "Open Hours",
                     hdClassName: "text-center",
                     icon: "fal fa-2x fa-clock  color-gray2 pointer",
                     sortable: false,
                     className: "text-center",
-                    //backgroundColorColumn: "hoursRemainingBgColor"
                 },
                 {
                     path: "totalActivityDurationHours",
@@ -478,11 +475,14 @@ class SDManagerDashboardComponent extends MainComponent {
                     path: "dateTime",
                     label: "",
                     key: "dateTime",
-                    hdToolTip: "Purple = Updated by another user OR has an alarm date in past",
+                    content: serviceRequest => {
+                        const dateTime = moment(serviceRequest.dateTime, 'YYYY-MM-DD HH:mm:ss');
+                        return dateTime.format('DD/MM/YYYY HH:mm');
+                    },
+                    hdToolTip: "Time",
                     icon: "fal fa-2x fa-calendar color-gray2 ",
                     sortable: false,
                     hdClassName: "text-center",
-                    backgroundColorColumn: "updatedBgColor",
                 },
             ]
             return el(Table, {
@@ -492,7 +492,7 @@ class SDManagerDashboardComponent extends MainComponent {
                 pk: "problemID",
                 search: true,
             });
-        } else if (filter.activeTab == 9) {
+        } else if (filter.activeTab === 9) {
             const columns = [
                 {
                     path: "customerName",
@@ -531,7 +531,7 @@ class SDManagerDashboardComponent extends MainComponent {
 
                 })
             );
-        } else if (filter.activeTab == 10) {
+        } else if (filter.activeTab === 10) {
             return el(DailyStatsComponent);
         }
     }
@@ -573,7 +573,7 @@ class SDManagerDashboardComponent extends MainComponent {
     };
 
     handleUserOnSelect = (event, problem, code) => {
-        const engineerId = event.target.value != "" ? event.target.value : 0;
+        const engineerId = event.target.value !== "" ? event.target.value : 0;
         problem.engineerId = engineerId;
         this.apiCurrentActivityService
             .allocateUser(problem.problemID, engineerId)
@@ -584,7 +584,7 @@ class SDManagerDashboardComponent extends MainComponent {
             });
     };
     getTeamCode = (teamID) => {
-        const queues = SRQueues.filter(q => q.teamID == teamID);
+        const queues = SRQueues.filter(q => q.teamID === teamID);
         if (queues.length > 0)
             return queues[0].code;
         else return ""

@@ -42,7 +42,7 @@ class CustomerSiteComponent extends MainComponent {
 
         const sites = result[0];
         let assets = sort(result[1], "name");
-        if (sites.length == 1) data.siteNo = sites[0].id;
+        if (sites.length === 1) data.siteNo = sites[0].id;
         assets = assets.map((asset) => {
             if (
                 asset.BiosName.indexOf("VMware") >= 0 ||
@@ -89,9 +89,9 @@ class CustomerSiteComponent extends MainComponent {
     };
     handleAssetSelect = (value) => {
         const {data, assets} = this.state;
-        if (value != "") {
-            const index = assets.findIndex((a) => a.name == value);
-            //  console.log(value,index,assets[index]);
+        if (value !== "") {
+            const index = assets.findIndex((a) => a.name === value);
+            //
             const asset = assets[index];
             data.assetName = value;
             data.assetTitle =
@@ -179,12 +179,12 @@ class CustomerSiteComponent extends MainComponent {
         data.nextStep = 4;
         data.reason = data.reasonTemplate;
         data.internalNotes = data.internalNotesTemplate;
-        console.log(data);
-        if (data.siteNo == -1) {
+
+        if (data.siteNo === -1) {
             this.alert("Please select customer site");
             return;
         }
-        if (data.assetName == "" && data.emptyAssetReason == "") {
+        if (data.assetName === "" && data.emptyAssetReason === "") {
             const emptyAssetReason = await this.prompt(
                 "Please provide a reason for not specifying an asset", 600
             );
@@ -194,11 +194,11 @@ class CustomerSiteComponent extends MainComponent {
                 this.setValue("emptyAssetReason", emptyAssetReason);
             }
         }
-        if (data.emailSubjectSummary == "") {
+        if (data.emailSubjectSummary === "") {
             this.alert("You must enter Email Subject Summary");
             return;
         }
-        if (data.reason == "") {
+        if (data.reason === "") {
             this.alert("Please enter details");
             return;
         }

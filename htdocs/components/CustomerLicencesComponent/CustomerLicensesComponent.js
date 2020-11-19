@@ -37,7 +37,7 @@ class CustomerLicensesComponent extends React.Component {
     async componentDidMount() {
         this.showSpinner();
         let customers = await this.apiCustomerLicenses.getStreamOneCustomersLocal();
-        console.log(customers);
+
         customers = customers.map(c => {
             c.name = c.name.replace("  ", " ");
             c.firstName = c.name.split(' ')[0];

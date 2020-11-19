@@ -103,7 +103,7 @@ class TDCustomerSearchComponent extends React.Component {
         if (this.props.onAddNew) this.props.onAddNew();
     };
     handleEdit = (customer) => {
-        console.log(customer);
+
         window.location =
             "/CustomerLicenses.php?action=editCustomer&endCustomerId=" +
             customer.endCustomerId;

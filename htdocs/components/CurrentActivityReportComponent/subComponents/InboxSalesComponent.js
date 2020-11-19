@@ -56,9 +56,9 @@ class InboxSalesComponent extends React.Component {
                                 style: {
                                     color: problem.workBtnColor,
                                     "--fa-primary-color":
-                                        problem.workBtnColor == "#FFF5B3" ? "gold" : "#32a852",
+                                        problem.workBtnColor === "#FFF5B3" ? "gold" : "#32a852",
                                     "--fa-secondary-color":
-                                        problem.workBtnColor == "#FFF5B3" ? "gray" : "gray",
+                                        problem.workBtnColor === "#FFF5B3" ? "gray" : "gray",
                                 },
                             })
                         ),
@@ -174,7 +174,7 @@ class InboxSalesComponent extends React.Component {
                 className: "text-center",
                 toolTip: "SLA Failed for this Service Request",
                 content: (problem) =>
-                    problem.bgColour == "#F8A5B6"
+                    problem.bgColour === "#F8A5B6"
                         ? el("i", {
                             className:
                                 "fal fa-2x fa-bell-slash color-gray pointer inbox-icon",
@@ -186,7 +186,7 @@ class InboxSalesComponent extends React.Component {
             {
                 hide: false,
                 order: 8,
-                path: "hoursRemaining",
+                path: "hoursRemainingForSLA",
                 key: "hoursRemainingLabel",
                 label: "",
                 hdToolTip: "Hours the Service Request has been open",
@@ -329,7 +329,7 @@ class InboxSalesComponent extends React.Component {
                     ),
             });
         columns = columns
-            .filter((c) => c.hide == false)
+            .filter((c) => c.hide === false)
             .sort((a, b) => (a.order > b.order ? 1 : -1));
         const {data} = this.props;
 
@@ -355,13 +355,13 @@ class InboxSalesComponent extends React.Component {
                         const index = prev.findIndex(
                             (p) => p.name === current.engineerName
                         );
-                        if (index == -1)
+                        if (index === -1)
                             prev.push({name: current.engineerName, total: 1});
                         else prev[index].total += 1;
                         return prev;
                     }, [])
                     .map((p) => {
-                        if (p.name != null && p.name != "") {
+                        if (p.name != null && p.name !== "") {
                             p.name = p.name.replace("  ", " ");
                             const arr = p.name.split(" ");
                             p.name = arr[0][0] + arr[1][0];
@@ -387,7 +387,7 @@ class InboxSalesComponent extends React.Component {
                         ),
                         el("dd", {key: "total"}, future),
                     ]);
-                //console.log(items);
+
                 return [
                     ...[
                         el(
@@ -407,7 +407,7 @@ class InboxSalesComponent extends React.Component {
     render() {
         const {el, getTableElement, getSrByUsersSummaryElement} = this;
         const {data} = this.props;
-        //console.log(data);
+
 
         return [
             el(

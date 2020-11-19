@@ -7,6 +7,10 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use CNCLTD\SDManagerDashboard\ServiceRequestSummaryDTO;
+use CNCLTD\Utils;
+
 global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
@@ -19,18 +23,20 @@ require_once($cfg['path_dbe'] . '/DBEPendingReopened.php');
 class CTCurrentActivityReport extends CTCNC
 {
 
-    const AMBER = '#FFF5B3';
-    const RED = '#F8A5B6';
-    const GREEN = '#BDF8BA';
+    const AMBER                  = '#FFF5B3';
+    const RED                    = '#F8A5B6';
+    const GREEN                  = '#BDF8BA';
     const
         /** @noinspection SpellCheckingInspection */
-        BLUE = '#b2daff';
-    const CONTENT = null;
-    const PURPLE = '#dcbdff';
-    const ORANGE = '#FFE6AB';
-    var $filterUser = array();
+          BLUE                   = '#b2daff';
+    const CONTENT                = null;
+    const PURPLE                 = '#dcbdff';
+    const ORANGE                 = '#FFE6AB';
+    const FIXED_AWAITING_CLOSURE = 6;
+    const CUSTOMER_OPEN_SR       = 13;
+    var $filterUser    = array();
     var $allocatedUser = array();
-    var $priority = array();
+    var $priority      = array();
     var $loggedInUserIsSdManager;
     var $customerFilterList;
     /**
@@ -58,7 +64,7 @@ class CTCurrentActivityReport extends CTCNC
             $cookieVars,
             $cfg
         );
-        $this->buActivity = new BUActivity($this);
+        $this->buActivity     = new BUActivity($this);
         $this->buCustomerItem = new BUCustomerItem($this);
 
         if ($checkPermissions) {
@@ -143,350 +149,23 @@ class CTCurrentActivityReport extends CTCNC
 
     private function renderQueue($queueNo)
     {
-        /** @var DBEProblem|DataSet $serviceRequests */
-        $serviceRequests = new DataSet($this);
-        if ($queueNo == 6) {
-            /* fixed awaiting closure */
-            $this->buActivity->getProblemsByStatus(
+        if ($queueNo == self::FIXED_AWAITING_CLOSURE) {
+            $serviceRequests = $this->buActivity->getProblemsByStatus(
                 'F',
-                $serviceRequests,
                 false
             );
-
-        } else if ($queueNo == 13) {
-            /* fixed awaiting closure */
-            $this->buActivity->getCustomerOpenSR(
-                $_REQUEST["customerID"],
-                $serviceRequests
-            );
-
+        } else if ($queueNo == self::CUSTOMER_OPEN_SR) {
+            $serviceRequests = $this->buActivity->getCustomerOpenSR($_REQUEST["customerID"]);
         } else {
-            $this->buActivity->getProblemsByQueueNoWithFuture(
-                $queueNo,
-                $serviceRequests
-            );
+            $serviceRequests = $this->buActivity->getProblemsByQueueNoWithFuture($queueNo);
         }
 
-        $queueOptions = [
-            '<option>-</option>',
-        ];
-
-        $result = array();
-        $rowCount = 0;
-        $buHeader = new BUHeader($this);
-        $buHeader->getHeader($dsHeader);
+        $result = [];
         while ($serviceRequests->fetchNext()) {
-            $rowCount++;
-            $bgColour = $this->getResponseColour(
-                $serviceRequests->getValue(DBEJProblem::status),
-                $serviceRequests->getValue(DBEJProblem::priority),
-                $serviceRequests->getValue(DBEJProblem::slaResponseHours),
-                $serviceRequests->getValue(DBEJProblem::workingHours),
-                $serviceRequests->getValue(DBEJProblem::respondedHours)
-            );
-
-            if ($serviceRequests->getValue(DBEJProblem::respondedHours) == 0 && $serviceRequests->getValue(
-                    DBEJProblem::status
-                ) == 'I') {
-                /*
-                Initial SRs that have not yet been responded to
-                */
-                $hoursRemainingBgColor = self::AMBER;
-            } elseif ($serviceRequests->getValue(DBEJProblem::awaitingCustomerResponseFlag) == 'Y') {
-                $hoursRemainingBgColor = self::GREEN;
-            } else {
-                $hoursRemainingBgColor = self::BLUE;
-            }
-
-
-            if ($serviceRequests->getValue(DBEJProblem::lastEndTime) == null) {
-                $workBgColor = self::GREEN; // green = in progress
-            } else {
-                $workBgColor = self::CONTENT;
-            }
-
-            if ($serviceRequests->getValue(DBEJProblem::priority) == 1) {
-                $priorityBgColor = self::ORANGE;
-            } else {
-                $priorityBgColor = self::CONTENT;
-            }
-
-
-            $problemID = $serviceRequests->getValue(DBEJProblem::problemID);
-            $buActivity = new BUActivity($this);
-
-            $hdUsedMinutes = $buActivity->getHDTeamUsedTime($problemID);
-            $esUsedMinutes = $buActivity->getESTeamUsedTime($problemID);
-            $spUsedMinutes = $buActivity->getSPTeamUsedTime($problemID);
-            $projectUsedMinutes = $buActivity->getUsedTimeForProblemAndTeam($problemID, 5);
-
-            $dbeProblem = new DBEProblem($this);
-            $dbeProblem->setValue(
-                DBEProblem::problemID,
-                $problemID
-            );
-            $dbeProblem->getRow();
-
-            $hdAssignedMinutes = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
-            $esAssignedMinutes = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
-            $smallProjectsTeamAssignedMinutes = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
-            $projectTeamAssignedMinutes = $dbeProblem->getValue(DBEProblem::projectTeamLimitMinutes);
-
-            $hdRemaining = $hdAssignedMinutes - $hdUsedMinutes;
-            $esRemaining = $esAssignedMinutes - $esUsedMinutes;
-            $smallProjectsTeamRemaining = $smallProjectsTeamAssignedMinutes - $spUsedMinutes;
-            $projectTeamRemaining = $projectTeamAssignedMinutes - $projectUsedMinutes;
-
-
-            $hoursRemaining = number_format(
-                $serviceRequests->getValue(DBEJProblem::workingHours) - $serviceRequests->getValue(
-                    DBEJProblem::slaResponseHours
-                ),
-                1
-            );
-
-
-            $dbeCustomer = new DBECustomer($this);
-            $dbeCustomer->getRow($serviceRequests->getValue(DBEJProblem::customerID));
-            $hideWork = $dbeCustomer->getValue(DBECustomer::referredFlag) == 'Y';
-
-            array_push(
-                $result,
-
-                array(
-                    //'queueOptions'               => implode($queueOptions),
-                    //'workOnClick'                => $workOnClick,
-                    'hoursRemaining'             => $hoursRemaining,
-                    //'updatedBgColor'             => $updatedBgColor,
-                    'priorityBgColor'            => $priorityBgColor,
-                    'hoursRemainingBgColor'      => $hoursRemainingBgColor,
-                    //'totalActivityDurationHours' => $totalActivityDurationHours,
-                    //'timeSpentColorClass'        => $timeSpentColorClass,
-                    'hdRemaining'                => $hdRemaining,
-                    'esRemaining'                => $esRemaining,
-                    'smallProjectsTeamRemaining' => $smallProjectsTeamRemaining,
-                    "projectTeamRemaining"       => $projectTeamRemaining,
-                    'hdColor'                    => $this->pickColor($hdRemaining),
-                    'esColor'                    => $this->pickColor($esRemaining),
-                    'smallProjectsTeamColor'     => $this->pickColor($smallProjectsTeamRemaining),
-                    'projectTeamColor'           => $this->pickColor($projectTeamRemaining),
-                    //'urlCustomer'                => $urlCustomer,
-                    'time'                       => $serviceRequests->getValue(DBEJProblem::lastStartTime),
-                    'date'                       => Controller::dateYMDtoDMY(
-                        $serviceRequests->getValue(DBEJProblem::lastDate)
-                    ),
-                    'updated'                    => $serviceRequests->getValue(
-                            DBEJProblem::lastDate
-                        ) . " " . $serviceRequests->getValue(DBEJProblem::lastStartTime),
-                    'problemID'                  => $serviceRequests->getValue(DBEJProblem::problemID),
-                    'problemStatus'              => $serviceRequests->getValue(DBEJProblem::status),
-                    'reason'                     => CTCurrentActivityReport::truncate(
-                        $serviceRequests->getValue(DBEJProblem::reason),
-                        150
-                    ),
-                    'urlProblemHistoryPopup'     => $this->getProblemHistoryLink(
-                        $serviceRequests->getValue(DBEJProblem::problemID)
-                    ),
-                    'engineerDropDown'           => $this->getAllocatedUserDropdown(
-                        $serviceRequests->getValue(DBEJProblem::problemID),
-                        $serviceRequests->getValue(DBEJProblem::userID)
-                    ),
-                    'engineerName'               => $serviceRequests->getValue(DBEJProblem::engineerName),
-                    'engineerId'                 => $serviceRequests->getValue(DBEJProblem::userID),
-                    'customerName'               => $serviceRequests->getValue(DBEJProblem::customerName),
-                    'customerNameDisplayClass'   => $this->getCustomerNameDisplayClass(
-                        $serviceRequests->getValue(DBEJProblem::specialAttentionFlag),
-                        $serviceRequests->getValue(DBEJProblem::specialAttentionEndDate),
-                        $serviceRequests->getValue(DBEJProblem::specialAttentionContactFlag)
-                    ),
-                    //'urlViewActivity'            => $urlViewActivity,
-                    //'linkAllocateAdditionalTime' => $linkAllocateAdditionalTime,
-                    'slaResponseHours'           => number_format(
-                        $serviceRequests->getValue(DBEJProblem::slaResponseHours),
-                        1
-                    ),
-                    'priority'                   => Controller::htmlDisplayText(
-                        $serviceRequests->getValue(DBEJProblem::priority)
-                    ),
-                    'alarmDateTime'              => $serviceRequests->getValue(
-                            DBEJProblem::alarmDate
-                        ) . ' ' . $serviceRequests->getValue(DBEJProblem::alarmTime),
-                    'bgColour'                   => $bgColour,
-                    'workBgColor'                => $workBgColor,
-                    'workHidden'                 => $hideWork ? 'hidden' : null,
-                    "callActivityID"             => $serviceRequests->getValue(DBEJProblem::callActivityID),
-                    "lastCallActTypeID"          => $serviceRequests->getValue(DBEJProblem::lastCallActTypeID),
-                    'customerID'                 => $serviceRequests->getValue(DBEJProblem::customerID),
-                    'queueNo'                    => $serviceRequests->getValue(DBEJProblem::queueNo),
-
-                )
-            );
-        } // end while
+            $result[] = ServiceRequestSummaryDTO::fromDBEJProblem($serviceRequests);
+        }
         return $result;
-        $this->template->set_var(
-            array(
-                'queue' . $queueNo . 'Count' => $rowCount,
-                'queue' . $queueNo . 'Name'  => $this->buActivity->workQueueDescriptionArray[$queueNo],
-
-            )
-        );
     }
-
-    function getResponseColour(
-        $status,
-        $priority,
-        $slaResponseHours,
-        $workingHours,
-        $respondedHours
-    )
-    {
-        /*
-        Prevent divide by zero error
-        */
-        if ($slaResponseHours == 0) {
-            $slaResponseHours = 1;
-        }
-        /*
-        priority 5 always green
-        */
-        if ($priority == 5) {
-            $bgColour = self::GREEN; /// green
-        } else {
-            if ($status == 'I') {
-                /* initial status so calculate */
-
-                $percentageSLA = ($workingHours / $slaResponseHours);
-
-                if ($percentageSLA <= 0.75) {
-
-                    $bgColour = self::GREEN; /// green
-
-                } elseif ($percentageSLA > 0.75 and $percentageSLA < 1) {
-
-                    $bgColour = self::AMBER; // amber
-
-                } else {
-
-                    $bgColour = self::RED; // red
-
-                }
-
-            } else {
-                // Status is beyond initial so use recorded
-                if ($respondedHours <= $slaResponseHours) {
-                    $bgColour = self::GREEN;  // within SLA
-                } else {
-                    $bgColour = self::RED;    // Missed SLA
-                }
-            }
-        }
-
-        return $bgColour;
-    }
-
-    protected function pickColor($value)
-    {
-        if ($value <= 5) {
-            return 'red';
-        } else if ($value >= 6 && $value <= 20) {
-            return '#FFBF00';
-        } else {
-            return 'green';
-        }
-    }
-    //$this->renderQueue(1);  // Helpdesk
-    //$this->renderQueue(2);  // Escalations
-    //$this->renderQueue(3);  // Sales
-    //$this->renderQueue(4);  // Small Projects
-    //$this->renderQueue(5);  // Projects
-    //$this->renderQueue(6);  //Fixed
-
-    /**
-     * @param $problemID
-     * @return mixed|string
-     * @throws Exception
-     */
-    function getProblemHistoryLink($problemID)
-    {
-        return Controller::buildLink(
-            'Activity.php',
-            array(
-                'action'    => 'problemHistoryPopup',
-                'problemID' => $problemID,
-                'htmlFmt'   => CT_HTML_FMT_POPUP
-            )
-        );
-
-    }
-
-    /**
-     * return list of user options for dropdown
-     *
-     * @param $problemID
-     * @param mixed $selectedID
-     * @return string
-     * @throws Exception
-     */
-    function getAllocatedUserDropdown($problemID,
-                                      $selectedID
-    )
-    {
-
-        // user selection
-        $userSelected = ($selectedID == 0) ? CT_SELECTED : null;
-
-        $urlAllocateUser =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'    => 'allocateUser',
-                    'userID'    => '0',
-                    'problemID' => $problemID
-                )
-            );
-
-        $string = '<option ' . $userSelected . ' value="' . $urlAllocateUser . '"></option>';
-
-        foreach ($this->allocatedUser as $value) {
-
-            $userSelected = ($selectedID == $value['userID']) ? CT_SELECTED : null;
-            $urlAllocateUser =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'    => 'allocateUser',
-                        'userID'    => $value['userID'],
-                        'problemID' => $problemID
-                    )
-                );
-
-            $string .= '<option ' . $userSelected . ' value="' . $urlAllocateUser . '">' . $value['userName'] . '</option>';
-
-        }
-
-        return $string;
-
-    }
-
-    function getCustomerNameDisplayClass(
-        $specialAttentionFlag,
-        $specialAttentionEndDate,
-        $specialAttentionContactFlag
-    )
-    {
-        if (
-            $specialAttentionFlag == 'Y' &&
-            $specialAttentionEndDate >= date('Y-m-d')
-        ) {
-            return 'specialAttentionCustomer';
-        }
-
-        if ($specialAttentionContactFlag == 'Y') {
-            return 'specialAttentionContact';
-        }
-
-        return null;
-    } // end function displayReport
 
     /**
      * @throws Exception
@@ -494,8 +173,8 @@ class CTCurrentActivityReport extends CTCNC
     function changeQueue()
     {
         $problemID = $this->getParam('problemID');
-        $newQueue = $this->getParam('queue');
-        $reason = $this->getParam('reason');
+        $newQueue  = $this->getParam('queue');
+        $reason    = $this->getParam('reason');
         $this->buActivity->escalateProblemByProblemID(
             $problemID,
             $reason,
@@ -555,13 +234,13 @@ class CTCurrentActivityReport extends CTCNC
         Requests raised via the customer portal
         */
         $customerRaisedRequests->next_record();
-        $count = 0;
+        $count  = 0;
         $result = array();
         if ($customerRaisedRequests->Record) {
             do {
 
 
-                $urlCustomer =
+                $urlCustomer       =
                     Controller::buildLink(
                         'SalesOrder.php',
                         array(
@@ -581,7 +260,7 @@ class CTCurrentActivityReport extends CTCNC
                         );
                 }
 
-                $truncatedReason = CTCurrentActivityReport::truncate(
+                $truncatedReason = Utils::truncate(
                     $customerRaisedRequests->Record['cpr_reason'],
                     150
                 );
@@ -617,26 +296,26 @@ class CTCurrentActivityReport extends CTCNC
     function getPendingReopenedRequests()
     {
         $pendingReopenedRequests = $this->buActivity->getPendingReopenedRequests();
-        $result = array();
+        $result                  = array();
         if ($pendingReopenedRequests && count($pendingReopenedRequests)) {
 
             foreach ($pendingReopenedRequests as $pendingReopenedRequest) {
-                $pendingReopenSRURL = Controller::buildLink(
+                $pendingReopenSRURL              = Controller::buildLink(
                     'Activity.php',
                     array(
                         'action'    => 'displayLastActivity',
                         'problemID' => $pendingReopenedRequest['problemID']
                     )
                 );
-                $pendingReopenSR = $pendingReopenedRequest['problemID'];
-                $pendingReopenCustomerName = $pendingReopenedRequest['customerName'];
-                $pendingReopenedPriority = $pendingReopenedRequest['priority'];
-                $truncatedReason = CTCurrentActivityReport::truncate(
+                $pendingReopenSR                 = $pendingReopenedRequest['problemID'];
+                $pendingReopenCustomerName       = $pendingReopenedRequest['customerName'];
+                $pendingReopenedPriority         = $pendingReopenedRequest['priority'];
+                $truncatedReason                 = Utils::truncate(
                     $pendingReopenedRequest['reason'],
                     150
                 );
                 $pendingReopenDescriptionSummary = $truncatedReason;
-                $pendingReopenDescriptionURL =
+                $pendingReopenDescriptionURL     =
                     Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
@@ -665,7 +344,7 @@ class CTCurrentActivityReport extends CTCNC
             }
         }
         return json_encode($result);
-    }
+    } // end function displayReport
 
     /**
      * @throws Exception
@@ -683,9 +362,9 @@ class CTCurrentActivityReport extends CTCNC
      */
     private function processPendingReopened()
     {
-        $body = json_decode(file_get_contents('php://input'));
+        $body              = json_decode(file_get_contents('php://input'));
         $pendingReopenedID = $body->pendingReopenedID;
-        $result = $body->result;
+        $result            = $body->result;
         if (isset($pendingReopenedID) && isset($result)) {
             $dbePendingReopened = new DBEPendingReopened($this);
             if ($result == 'R') {
@@ -766,6 +445,145 @@ class CTCurrentActivityReport extends CTCNC
         $this->parsePage();
     }
 
+    function getResponseColour(
+        $status,
+        $priority,
+        $slaResponseHours,
+        $workingHours,
+        $respondedHours
+    )
+    {
+        /*
+        Prevent divide by zero error
+        */
+        if ($slaResponseHours == 0) {
+            $slaResponseHours = 1;
+        }
+        /*
+        priority 5 always green
+        */
+        if ($priority == 5) {
+            $bgColour = self::GREEN; /// green
+        } else {
+            if ($status == 'I') {
+                /* initial status so calculate */
+
+                $percentageSLA = ($workingHours / $slaResponseHours);
+
+                if ($percentageSLA <= 0.75) {
+
+                    $bgColour = self::GREEN; /// green
+
+                } elseif ($percentageSLA > 0.75 and $percentageSLA < 1) {
+
+                    $bgColour = self::AMBER; // amber
+
+                } else {
+
+                    $bgColour = self::RED; // red
+
+                }
+
+            } else {
+                // Status is beyond initial so use recorded
+                if ($respondedHours <= $slaResponseHours) {
+                    $bgColour = self::GREEN;  // within SLA
+                } else {
+                    $bgColour = self::RED;    // Missed SLA
+                }
+            }
+        }
+
+        return $bgColour;
+    }
+
+    /**
+     * @param $problemID
+     * @return mixed|string
+     * @throws Exception
+     */
+    function getProblemHistoryLink($problemID)
+    {
+        return Controller::buildLink(
+            'Activity.php',
+            array(
+                'action'    => 'problemHistoryPopup',
+                'problemID' => $problemID,
+                'htmlFmt'   => CT_HTML_FMT_POPUP
+            )
+        );
+
+    }
+
+    /**
+     * return list of user options for dropdown
+     *
+     * @param $problemID
+     * @param mixed $selectedID
+     * @return string
+     * @throws Exception
+     */
+    function getAllocatedUserDropdown($problemID,
+                                      $selectedID
+    )
+    {
+
+        // user selection
+        $userSelected = ($selectedID == 0) ? CT_SELECTED : null;
+
+        $urlAllocateUser =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'    => 'allocateUser',
+                    'userID'    => '0',
+                    'problemID' => $problemID
+                )
+            );
+
+        $string = '<option ' . $userSelected . ' value="' . $urlAllocateUser . '"></option>';
+
+        foreach ($this->allocatedUser as $value) {
+
+            $userSelected    = ($selectedID == $value['userID']) ? CT_SELECTED : null;
+            $urlAllocateUser =
+                Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action'    => 'allocateUser',
+                        'userID'    => $value['userID'],
+                        'problemID' => $problemID
+                    )
+                );
+
+            $string .= '<option ' . $userSelected . ' value="' . $urlAllocateUser . '">' . $value['userName'] . '</option>';
+
+        }
+
+        return $string;
+
+    }
+
+    function getCustomerNameDisplayClass(
+        $specialAttentionFlag,
+        $specialAttentionEndDate,
+        $specialAttentionContactFlag
+    )
+    {
+        if (
+            $specialAttentionFlag == 'Y' &&
+            $specialAttentionEndDate >= date('Y-m-d')
+        ) {
+            return 'specialAttentionCustomer';
+        }
+
+        if ($specialAttentionContactFlag == 'Y') {
+            return 'specialAttentionContact';
+        }
+
+        return null;
+    }
+
     function getHelpDeskInbox()
     {
         $this->setMethodName('getHelpDeskInbox');
@@ -773,51 +591,15 @@ class CTCurrentActivityReport extends CTCNC
         return json_encode($this->renderQueue(1));
     }
 
-    /**
-     * @param DBEProblem|DataSet $dbeProblem
-     * @return bool
-     */
-    protected function getIsSLABreached($dbeProblem)
+    protected function pickColor($value)
     {
-        $status = $dbeProblem->getValue(DBEJProblem::status);
-        $priority = $dbeProblem->getValue(DBEJProblem::priority);
-        $slaResponseHours = $dbeProblem->getValue(DBEJProblem::slaResponseHours);
-        $workingHours = $dbeProblem->getValue(DBEJProblem::workingHours);
-        $respondedHours = $dbeProblem->getValue(DBEJProblem::respondedHours);
-        if ($slaResponseHours == 0) {
-            $slaResponseHours = 1;
+        if ($value <= 5) {
+            return 'red';
+        } else if ($value >= 6 && $value <= 20) {
+            return '#FFBF00';
+        } else {
+            return 'green';
         }
-
-        if ($priority == 5) {
-            return false;
-        }
-        if ($status != 'I' && $respondedHours <= $slaResponseHours) {
-            return false;
-        }
-
-        $percentageSLA = ($workingHours / $slaResponseHours);
-        if ($status == 'I' && $percentageSLA < 1) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @param DBEJProblem|DataSet $dbeProblem
-     * @return bool
-     */
-    protected function isRequestBeingWorkedOn($dbeProblem)
-    {
-        $dateString = $dbeProblem->getValue(DBEJProblem::lastDate);
-        $timeString = $dbeProblem->getValue(DBEJProblem::lastStartTime);
-        $activityDateTime = DateTime::createFromFormat('Y-m-d H:i', "$dateString $timeString");
-
-        if ($activityDateTime > (new DateTime())) {
-            return false;
-        }
-
-        return !$dbeProblem->getValue(DBEJProblem::lastEndTime);
     }
 
 }

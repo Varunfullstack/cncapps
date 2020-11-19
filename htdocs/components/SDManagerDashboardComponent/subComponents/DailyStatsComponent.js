@@ -37,7 +37,7 @@ class DailyStatsComponent extends MainComponent {
 
     loadDashBoard = () => {
         this.apiSDManagerDashboard.getDailyStatsSummary().then((result) => {
-            console.log(result);
+
             this.loading = false;
             this.setState({showSpinner: false, summary: result});
         });
@@ -69,10 +69,9 @@ class DailyStatsComponent extends MainComponent {
         if (data.length > 0) {
             const {el} = this;
             const getPriorityData = (id) => {
-                const obj = data.filter((d) => d.priority == id);
+                const obj = data.filter((d) => d.priority === id);
                 if (obj.length > 0) return obj[0].total;
                 else return 0;
-                s;
             };
             const totalSR = data.reduce((prev, curr) => {
                 prev = prev + parseInt(curr.total);
@@ -122,11 +121,11 @@ class DailyStatsComponent extends MainComponent {
         if (data.length > 0) {
             const {el} = this;
             const getTeamTitle = (id) => {
-                const team = SRQueues.filter((t) => t.teamID == id);
+                const team = SRQueues.filter((t) => t.teamID === id);
                 if (team.length > 0) return team[0].name;
             };
             const getTeamTotal = (id) => {
-                const team = data.filter((t) => t.teamID == id);
+                const team = data.filter((t) => t.teamID === id);
                 if (team.length > 0) return team[0].total;
             };
             const totalSR = data.reduce((prev, curr) => {
@@ -174,7 +173,7 @@ class DailyStatsComponent extends MainComponent {
         } else return null;
     };
     getDailySourceCard = (data, backgroundColor = "#C6C6C6", textColor = "#3C3C3C") => {
-        if (data.length == 0) {
+        if (data.length === 0) {
             data = [
                 {description: "Email", total: "0"},
                 {description: "Alert", total: "0"},
@@ -188,19 +187,19 @@ class DailyStatsComponent extends MainComponent {
             const {el} = this;
             const dataDisplay = data.filter(
                 (d) =>
-                    d.description == "Phone" ||
-                    d.description == "Email" ||
-                    d.description == "Alert" ||
-                    d.description == "Portal"
+                    d.description === "Phone" ||
+                    d.description === "Email" ||
+                    d.description === "Alert" ||
+                    d.description === "Portal"
             );
             const dataOthers = data.filter(
                 (d) =>
-                    d.description != "Phone" &&
-                    d.description != "Email" &&
-                    d.description != "Alert" &&
-                    d.description != "Portal"
+                    d.description !== "Phone" &&
+                    d.description !== "Email" &&
+                    d.description !== "Alert" &&
+                    d.description !== "Portal"
             );
-            console.log(dataOthers);
+
             const dataOthersTotal = dataOthers.reduce((prev, curr) => {
                 prev = prev + parseInt(curr.total);
                 return prev;

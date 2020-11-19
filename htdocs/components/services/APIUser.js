@@ -1,7 +1,7 @@
 import APIMain from "./APIMain.js";
 import ApiUrls from "./ApiUrls.js";
 
- 
+
 class APIUser extends APIMain{    
     getAllUsers() {
         return fetch(`${ApiUrls.User}all`).then(res => res.json());

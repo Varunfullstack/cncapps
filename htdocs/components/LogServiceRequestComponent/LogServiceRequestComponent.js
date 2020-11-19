@@ -46,13 +46,12 @@ export default class LogServiceRequestComponent extends MainComponent {
         return this.steps;
     };
     handleStepChange = (step) => {
-        console.log("step", step);
+
         this.setState({activeStep: step.id})
         let {steps} = this.state;
         steps = steps.map(s => {
-            s.active = false;
-            if (s.id <= step.id)
-                s.active = true;
+
+            s.active = s.id <= step.id;
             return s
         });
         this.setState({steps});
@@ -87,7 +86,7 @@ export default class LogServiceRequestComponent extends MainComponent {
                 this.setState({data});
             })
         }
-        console.log('Id', Id);
+
     }
     setActiveStep = (step) => {
         const {steps} = this.state;
@@ -100,16 +99,16 @@ export default class LogServiceRequestComponent extends MainComponent {
     updateSRData = async (data, save = false) => {
         const newData = {...this.state.data, ...data};
         this.setActiveStep(newData.nextStep);
-        console.log(newData);
+
         this.setState({data: newData});
         if (save) {
             const customData = {...newData};
             this.setState({_showSpinner: true});
-            if (newData.internalNotes.indexOf(newData.internalNotesAppend) == -1)
+            if (newData.internalNotes.indexOf(newData.internalNotesAppend) === -1)
                 newData.internalNotes += newData.internalNotesAppend;
             newData.callActTypeID = null;
             const result = await this.api.createProblem(customData);
-            console.log(result);
+
             if (result.status) {
 
                 if (newData.uploadFiles.length > 0)

@@ -23,16 +23,16 @@ class BUProblemSLA extends Business
 {
 
 //    const SYSTEM_INSTALLED_DATE = '2010-03-24';
-    const DAYS_UNTIL_COMPLETE = 3;
-    const hour = 3600;          // hour in seconds
-    const halfHour = 1800;      // half-hour in seconds
-    const day = 43200;     // one day in seconds
-    const quarterHour = 900;
-    const twoMinutes = 120;
-    const fiveMinutes = 300;
-    const thirtySeconds = 30;
-    const tenMinutes = 600;
-    const workingHoursAlertLimit = 40;
+    const DAYS_UNTIL_COMPLETE                   = 3;
+    const hour                                  = 3600;          // hour in seconds
+    const halfHour                              = 1800;      // half-hour in seconds
+    const day                                   = 43200;     // one day in seconds
+    const quarterHour                           = 900;
+    const twoMinutes                            = 120;
+    const fiveMinutes                           = 300;
+    const thirtySeconds                         = 30;
+    const tenMinutes                            = 600;
+    const workingHoursAlertLimit                = 40;
     const special_attention_customer_alert_days = 3;
 
     private $startSupportTime;
@@ -71,9 +71,9 @@ class BUProblemSLA extends Business
     {
         parent::__construct($owner);
         // build a list of UK Bank Holidays in over 3 years
-        $lastYearBH = common_getUkBankHolidays(date('Y') - 1);
-        $thisYearBH = common_getUkBankHolidays(date('Y'));
-        $nextYearBH = common_getUkBankHolidays(date('Y') + 1);
+        $lastYearBH           = common_getUkBankHolidays(date('Y') - 1);
+        $thisYearBH           = common_getUkBankHolidays(date('Y'));
+        $nextYearBH           = common_getUkBankHolidays(date('Y') + 1);
         $this->ukBankHolidays = array_merge(
             $lastYearBH,
             $thisYearBH,
@@ -98,7 +98,7 @@ class BUProblemSLA extends Business
 
         $this->endSupportTime = $dsHeader->getValue(DBEHeader::billingEndTime);
 
-        $this->srAutocompleteThresholdHours = $dsHeader->getValue(DBEHeader::srAutocompleteThresholdHours);
+        $this->srAutocompleteThresholdHours              = $dsHeader->getValue(DBEHeader::srAutocompleteThresholdHours);
         $this->startersLeaversAutoCompleteThresholdHours = $dsHeader->getValue(
             DBEHeader::srStartersLeaversAutoCompleteThresholdHours
         );
@@ -110,18 +110,17 @@ class BUProblemSLA extends Business
         $this->dbeJCallActivityFix = new DBEJCallActivity($this);
 
         $this->dbeCallActivity = new DBECallActivity($this);
-        $this->dbeProblem = new DBEProblem($this);
+        $this->dbeProblem      = new DBEProblem($this);
 
         $this->dbeJCallActivity = new DBEJCallActivity($this);
-        $this->dbeJProblem = new DBEJProblem($this);
+        $this->dbeJProblem      = new DBEJProblem($this);
     }
 
     function checkFixSLATask(\CNCLTD\LoggerCLI $logger)
     {
-        $dsProblems = new DataSet($this);
-        $this->buActivity->getProblemsByStatus(
-            'I',
-            $dsProblems
+
+        $dsProblems = $this->buActivity->getProblemsByStatus(
+            'I'
         ); // initial status
 
         $logger->info('Processing Initial SR\'s');
@@ -134,9 +133,8 @@ class BUProblemSLA extends Business
             }
         }
 
-        $this->buActivity->getProblemsByStatus(
-            'P',
-            $dsProblems
+        $dsProblems = $this->buActivity->getProblemsByStatus(
+            'P'
         ); // in progress status
         while ($dsProblems->fetchNext()) {
             $dbeProblem = new DBEJProblem($this);
@@ -198,7 +196,7 @@ class BUProblemSLA extends Business
         $engineerName = $DBEProblem->getValue(DBEJProblem::engineerName) ? $DBEProblem->getValue(
             DBEJProblem::engineerName
         ) : "NOBODY";
-        $subject = "Fix SLA FAILED - SR for {$DBEProblem->getValue(DBEJProblem::customerName)} assigned to {$engineerName} has failed the agreed fix SLA";
+        $subject      = "Fix SLA FAILED - SR for {$DBEProblem->getValue(DBEJProblem::customerName)} assigned to {$engineerName} has failed the agreed fix SLA";
         $this->sendSLAEmail($DBEProblem, $subject, '@internal/fixSLABreachedEmail.html.twig');
     }
 
@@ -218,7 +216,7 @@ class BUProblemSLA extends Business
             global $twig;
 
             $urlActivity = SITE_URL . "/Activity.php?action=displayActivity&callActivityID={$dbeJCallActivity->getPKValue()}";
-            $body = $twig->render(
+            $body        = $twig->render(
                 $twigTemplate,
                 [
                     "serviceRequestId" => $activityRef,
@@ -243,7 +241,7 @@ class BUProblemSLA extends Business
                 'html_charset'  => 'UTF-8',
                 'head_charset'  => 'UTF-8'
             );
-            $body = $buMail->mime->get($mime_params);
+            $body        = $buMail->mime->get($mime_params);
 
             $hdrs = $buMail->mime->headers($hdrs);
 
@@ -267,17 +265,15 @@ class BUProblemSLA extends Business
         $engineerName = $DBEProblem->getValue(DBEJProblem::engineerName) ? $DBEProblem->getValue(
             DBEJProblem::engineerName
         ) : "NOBODY";
-        $subject = "Fix SLA WARNING - SR for {$DBEProblem->getValue(DBEJProblem::customerName) } assigned to {$engineerName} is close to breaching the agreed fix SLA";
+        $subject      = "Fix SLA WARNING - SR for {$DBEProblem->getValue(DBEJProblem::customerName) } assigned to {$engineerName} is close to breaching the agreed fix SLA";
         $this->sendSLAEmail($DBEProblem, $subject, '@internal/fixSLAWarningEmail.html.twig');
     }
 
     function monitor($dryRun = false, $problemID = null, $debug = false, $fixSLAOnly = false)
     {
-        $dsProblems = new DataSet($this);
         $this->debug = $debug;
-        $this->buActivity->getProblemsByStatus(
-            'I',
-            $dsProblems
+        $dsProblems  = $this->buActivity->getProblemsByStatus(
+            'I'
         ); // initial status
 
         $percentageSLA = 0;
@@ -297,7 +293,7 @@ class BUProblemSLA extends Business
             }
             $this->dbeProblem->getRow($dsProblems->getValue(DBEProblem::problemID));
             $workingHours = $this->getWorkingHours($dsProblems->getValue(DBEProblem::problemID));
-            $hoursToSLA = $dsProblems->getValue(DBEProblem::slaResponseHours) - $workingHours;
+            $hoursToSLA   = $dsProblems->getValue(DBEProblem::slaResponseHours) - $workingHours;
             /*
             Send an alert email to managers if within 20 minutes of SLA response hours and not priority 4 or 5
             */
@@ -352,9 +348,8 @@ class BUProblemSLA extends Business
 
         echo "<H2>In Progress</H2>";
 
-        $this->buActivity->getProblemsByStatus(
-            'P',
-            $dsProblems
+        $dsProblems = $this->buActivity->getProblemsByStatus(
+            'P'
         ); // in progress status
 
         while ($dsProblems->fetchNext()) {
@@ -392,9 +387,8 @@ class BUProblemSLA extends Business
             }
         }
 
-        $this->buActivity->getProblemsByStatus(
+        $dsProblems = $this->buActivity->getProblemsByStatus(
             'P',
-            $dsProblems,
             true
         ); // in progress future alarm date status
 
@@ -530,7 +524,9 @@ class BUProblemSLA extends Business
         */
         if ($this->dbeJProblem->getValue(DBEProblem::workingHoursCalculatedToTime)) {
             $addHoursSinceLastCalculation = true;
-            $utCalculationStart = strtotime($this->dbeJProblem->getValue(DBEProblem::workingHoursCalculatedToTime));
+            $utCalculationStart           = strtotime(
+                $this->dbeJProblem->getValue(DBEProblem::workingHoursCalculatedToTime)
+            );
             if ($this->debug) {
                 echo '<div>This SR does have calculated time already: ' . print_r(
                         $utCalculationStart
@@ -541,7 +537,7 @@ class BUProblemSLA extends Business
 
         } else {
             $addHoursSinceLastCalculation = false;
-            $utCalculationStart = strtotime($this->dbeJProblem->getValue(DBEProblem::dateRaised));
+            $utCalculationStart           = strtotime($this->dbeJProblem->getValue(DBEProblem::dateRaised));
             if ($this->debug) {
                 echo '<div>This SR does NOT have calculated time already, so we look at the date raised: ' . $this->dbeJProblem->getValue(
                         DBEProblem::dateRaised
@@ -587,12 +583,12 @@ class BUProblemSLA extends Business
         */
 
 
-        $utCounter = $utStart;
+        $utCounter       = $utStart;
         $includedSeconds = 0;
-        $pauseStart = null;
-        $pauseEnd = null;
+        $pauseStart      = null;
+        $pauseEnd        = null;
         if (count($pauseArray)) {
-            $pauseEnd = current($pauseArray);                     // the value is the end
+            $pauseEnd   = current($pauseArray);                     // the value is the end
             $pauseStart = key($pauseArray);                       // the key is the start
         }
 
@@ -613,12 +609,12 @@ class BUProblemSLA extends Business
                 $utCounter
             );
 
-            $dateYMD = substr(
+            $dateYMD   = substr(
                 $dateAll,
                 0,
                 10
             );
-            $time = substr(
+            $time      = substr(
                 $dateAll,
                 11,
                 5
@@ -630,9 +626,9 @@ class BUProblemSLA extends Business
             );
 
 
-            $isWeekend = $dayOfWeek > 5;
+            $isWeekend      = $dayOfWeek > 5;
             $isBankHolidays = in_array($dateYMD, $this->ukBankHolidays);
-            $isAfterHours = $time > $this->endSupportTime;
+            $isAfterHours   = $time > $this->endSupportTime;
 
             if ($this->debug) {
                 echo "<div> isWeekend: " . ($isWeekend ? 'True' : 'False') . " isHolidays: " . ($isBankHolidays ? "True" : "False") . " isAfterHours: " . ($isAfterHours ? 'True' : 'False') . "</div>";
@@ -668,7 +664,7 @@ class BUProblemSLA extends Business
                     echo '<div>There are no pauses left, add thirty seconds</div>';
                 }
                 $includedSeconds += self::thirtySeconds;
-                $utCounter += self::thirtySeconds;
+                $utCounter       += self::thirtySeconds;
                 continue;
 
             }
@@ -678,7 +674,7 @@ class BUProblemSLA extends Business
                     echo '<div>We haven not reached the next pause ..so add 30 seconds</div>';
                 }
                 $includedSeconds += self::thirtySeconds;
-                $utCounter += self::thirtySeconds;
+                $utCounter       += self::thirtySeconds;
                 continue;
             }
 
@@ -690,7 +686,7 @@ class BUProblemSLA extends Business
                 continue;
             } else {                                                 // reached end of current pause so load next
                 // get Next pause. returns false if none left
-                $pauseEnd = next($pauseArray);
+                $pauseEnd   = next($pauseArray);
                 $pauseStart = key($pauseArray);
             }
             if ($this->debug) {
@@ -791,7 +787,7 @@ class BUProblemSLA extends Business
                 'html_charset'  => 'UTF-8',
                 'head_charset'  => 'UTF-8'
             );
-            $body = $buMail->mime->get($mime_params);
+            $body        = $buMail->mime->get($mime_params);
 
             $hdrs = $buMail->mime->headers($hdrs);
 
@@ -812,10 +808,8 @@ class BUProblemSLA extends Business
     function autoCompletion()
     {
         $dbeCustomer = new DBECustomer($this);
-        $dsProblems = new DataSet($this);
-        $this->buActivity->getProblemsByStatus(
+        $dsProblems  = $this->buActivity->getProblemsByStatus(
             'F',
-            $dsProblems,
             true
         ); // fixed status
 
@@ -830,7 +824,7 @@ class BUProblemSLA extends Business
                 <div>
                 Problem: <?= $problemID ?>
                 <?php
-                $buActivity = new BUActivity($this);
+                $buActivity    = new BUActivity($this);
                 $fixedActivity = $buActivity->getFixedActivityInServiceRequest($problemID);
                 if (!$fixedActivity) {
                     ?>
@@ -863,7 +857,7 @@ class BUProblemSLA extends Business
                 */
 
                 $dbeCustomer->getRow($this->dbeProblem->getValue(DBEProblem::customerID));
-                $buCustomerItem = new BUCustomerItem($this);
+                $buCustomerItem  = new BUCustomerItem($this);
                 $startersLeavers = [62, 58];
 
                 $serverCareContractID = $serverCareContractID = $buCustomerItem->getValidServerCareContractID(
@@ -875,7 +869,7 @@ class BUProblemSLA extends Business
                     ) <= $this->startersLeaversAutoCompleteThresholdHours;
 
                 $fixedDateCheck = $fixedDate <= time();
-                $reasonCheck = in_array(
+                $reasonCheck    = in_array(
                     $this->dbeProblem->getValue(DBEProblem::rootCauseID),
                     $startersLeavers
                 );
@@ -967,11 +961,11 @@ class BUProblemSLA extends Business
 
         $dbeUser = new DBEUser($this);
         $dbeUser->getRow($createdByUserID);
-        $teamId = $dbeUser->getValue(DBEUser::teamID);
+        $teamId  = $dbeUser->getValue(DBEUser::teamID);
         $dbeTeam = new DBETeam($this);
         $dbeTeam->getRow($teamId);
         $managerId = $dbeTeam->getValue(DBETeam::leaderId);
-        $manager = new DBEUser($this);
+        $manager   = new DBEUser($this);
         $manager->getRow($managerId);
 
         $activityURL = SITE_URL . Controller::formatForHTML(
@@ -983,7 +977,7 @@ class BUProblemSLA extends Business
 
         global $twig;
 
-        $body = $twig->render(
+        $body    = $twig->render(
             '@internal/toBeClosedSRMissingFixedEmail.html.twig',
             [
                 "serviceRequestLink" => $activityURL,
@@ -1166,7 +1160,7 @@ class BUProblemSLA extends Business
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-        $body = $buMail->mime->get($mime_params);
+        $body        = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 
@@ -1185,10 +1179,8 @@ class BUProblemSLA extends Business
      */
     function updateFixDurations()
     {
-        $dsProblems = new DataSet($this);
-        $this->buActivity->getProblemsByStatus(
-            'C',
-            $dsProblems
+        $dsProblems = $this->buActivity->getProblemsByStatus(
+            'C'
         ); // completed
 
         while ($dsProblems->fetchNext()) {
@@ -1205,7 +1197,7 @@ class BUProblemSLA extends Business
             $this->dbeProblem->updateRow();
 
         }
-    } // end  getWorkingHoursBetweenDates
+    }
 
     /**
      * Calculate 3 working days in the future skipping non-work days
@@ -1213,7 +1205,7 @@ class BUProblemSLA extends Business
     function getCompleteDate()
     {
 
-        $utNowDate = date('U');                                                        // unix date now
+        $utNowDate  = date('U');                                                        // unix date now
         $ymdNowDate = date(
             'Y-m-d',
             $utNowDate

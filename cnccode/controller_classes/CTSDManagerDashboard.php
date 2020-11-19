@@ -1,5 +1,8 @@
 <?php
 global $cfg;
+
+use CNCLTD\SDManagerDashboard\ServiceRequestSummaryDTO;
+
 require_once($cfg['path_ct'] . '/CTCurrentActivityReport.inc.php');
 require_once($cfg['path_bu'] . '/BUSecondSite.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
@@ -78,15 +81,15 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         $queue = $_REQUEST["queue"];
         if (!isset($queue))
             return [];
-        $buProblem = new BUActivity($this);
-        $problems = new DataSet($this);
-        $isP5 = $_REQUEST["p5"] == "true";
-        $showHelpDesk = $_REQUEST["hd"] == "true";
-        $showEscalation = $_REQUEST["es"] == "true";
+        $buProblem         = new BUActivity($this);
+        $problems          = new DataSet($this);
+        $isP5              = $_REQUEST["p5"] == "true";
+        $showHelpDesk      = $_REQUEST["hd"] == "true";
+        $showEscalation    = $_REQUEST["es"] == "true";
         $showSmallProjects = $_REQUEST["sp"] == "true";
-        $showProjects = $_REQUEST["p"] == "true";
-        $limit = $_REQUEST["limit"] ?? 10;
-        $code = 'shortestSLARemaining';
+        $showProjects      = $_REQUEST["p"] == "true";
+        $limit             = $_REQUEST["limit"] ?? 10;
+        $code              = 'shortestSLARemaining';
         if ($queue == 9) {
             return $this->renderOpenSRByCustomerJson(
                 $showHelpDesk,
@@ -122,17 +125,17 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
                 $code = 'mostHoursLogged';
                 break;
         }
-        $buProblem->getSDDashBoardData(
-            $problems,
-            $limit,
-            $code,
-            $isP5,
-            $showHelpDesk,
-            $showEscalation,
-            $showSmallProjects,
-            $showProjects
+        return $this->renderQueueJson(
+            $buProblem->getSDDashBoardData(
+                $limit,
+                $code,
+                $isP5,
+                $showHelpDesk,
+                $showEscalation,
+                $showSmallProjects,
+                $showProjects
+            )
         );
-        return $this->renderQueueJson($problems);
     }
 
     /**
@@ -181,14 +184,13 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
               customer WHERE cus_custno <> 282 ORDER BY openSRCount DESC LIMIT $limit";
 
         /** @var mysqli_result $result */
-        $result = $db->query($query);
+        $result   = $db->query($query);
         $problems = [];
         while ($row = $result->fetch_assoc()) {
             array_push(
                 $problems,
                 array(
                     'customerName' => $row['cus_name'],
-                    //'srCount'      => "<A href='CurrentActivityReport.php?action=setFilter&selectedCustomerID=" . $row['cus_custno'] . "'>" . $row["openSRCount"] . "</A>"
                     'srCount'      => $row["openSRCount"],
                     "customerID"   => $row["cus_custno"],
                 )
@@ -198,81 +200,18 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
     }
 
     /**
-     * @param DataSet $problems
+     * @param DBEJProblem $problems
      * @return mixed|void|null
      * @throws Exception
      */
-    private function renderQueueJson(DataSet $problems)
+    private function renderQueueJson(DBEJProblem $problems)
     {
-        $rowCount = 0;
         $result = [];
         if (!$problems->rowCount()) {
-            return [];
+            return $result;
         }
-
         while ($problems->fetchNext()) {
-            $rowCount++;
-            $buActivity = new BUActivity($this);
-            $activityCount = $buActivity->getActivityCount($problems->getValue(DBEJProblem::problemID));
-
-            $alarmDateTimeDisplay = null;
-            if ($problems->getValue(DBEProblem::alarmDate)) {
-                $alarmDateTimeDisplay = Controller::dateYMDtoDMY(
-                        $problems->getValue(DBEJProblem::alarmDate)
-                    ) . ' ' . $problems->getValue(DBEJProblem::alarmTime);
-            }
-
-            $totalActivityDurationHours = $problems->getValue(DBEJProblem::totalActivityDurationHours);
-            array_push(
-                $result,
-                array(
-                    'hoursRemaining'             => $problems->getValue(DBEJProblem::hoursRemaining),
-                    'isBeingWorkedOn'            => $this->isRequestBeingWorkedOn($problems),
-                    'status'                     => $problems->getValue(DBEProblem::status),
-                    'isSLABreached'              => $this->getIsSLABreached($problems),
-                    'totalActivityDurationHours' => $totalActivityDurationHours,
-                    'time'                       => $problems->getValue(DBEJProblem::lastStartTime),
-                    'date'                       => Controller::dateYMDtoDMY(
-                        $problems->getValue(DBEJProblem::lastDate)
-                    ),
-                    'dateTime'                   => Controller::dateYMDtoDMY(
-                            $problems->getValue(DBEJProblem::lastDate)
-                        ) . ' ' . $problems->getValue(DBEJProblem::lastStartTime),
-
-                    'problemID'                => $problems->getValue(DBEJProblem::problemID),
-                    'reason'                   => self::truncate($problems->getValue(DBEJProblem::reason), 150),
-                    'urlProblemHistoryPopup'   => $this->getProblemHistoryLink(
-                        $problems->getValue(DBEJProblem::problemID)
-                    ),
-                    'engineerDropDown'         => $this->getAllocatedUserDropdown(
-                        $problems->getValue(DBEJProblem::problemID),
-                        $problems->getValue(DBEJProblem::userID)
-                    ),
-                    'engineerName'             => $problems->getValue(DBEJProblem::engineerName),
-                    'customerID'               => $problems->getValue(DBEJProblem::customerID),
-                    'customerName'             => $problems->getValue(DBEJProblem::customerName),
-                    'specialAttentionCustomer' =>
-                        (bool)$this->getCustomerNameDisplayClass(
-                            $problems->getValue(DBEJProblem::specialAttentionFlag),
-                            $problems->getValue(DBEJProblem::specialAttentionEndDate),
-                            $problems->getValue(DBEJProblem::specialAttentionContactFlag)
-                        ),
-                    'slaResponseHours'         => number_format(
-                        $problems->getValue(DBEJProblem::slaResponseHours),
-                        1
-                    ),
-                    'priority'                 => $problems->getValue(DBEJProblem::priority),
-                    'alarmDateTime'            => $alarmDateTimeDisplay,
-                    'activityCount'            => $activityCount,
-                    'teamID'                   => $problems->getValue(DBEJProblem::teamID),
-                    "engineerId"               => $problems->getValue(DBEJProblem::userID),
-                    "workHidden"               => $problems->getValue(DBECustomer::referredFlag) == 'Y',
-                    "lastCallActTypeID"        => $problems->getValue(DBEJProblem::lastCallActTypeID),
-                    "callActivityID"           => $problems->getValue(DBEJProblem::callActivityID)
-                )
-            );
-
-
+            $result[] = ServiceRequestSummaryDTO::fromDBEJProblem($problems,true);
         }
         return $result;
     }
@@ -280,16 +219,16 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
 
     function getDailyStatsSummary()
     {
-        $openSrTeamSummary = $this->getNumberOfOpenServiceRequestPerTeamExcludingSales();
-        $dailySourceSummary = $this->getDailySource();
-        $prioritySummary = $this->getPrioritySummary();
-        $raisedTodaySummary = $this->getRaisedToday();
-        $fixedTodaySummary = $this->getFixedToday();
-        $nearSLASummary = $this->getNearSLA();
-        $reopenTodaySummary = $this->getReopenToday();
-        $raisedStartTodaySummary = $this->getRaisedAndStartedToday();
+        $openSrTeamSummary          = $this->getNumberOfOpenServiceRequestPerTeamExcludingSales();
+        $dailySourceSummary         = $this->getDailySource();
+        $prioritySummary            = $this->getPrioritySummary();
+        $raisedTodaySummary         = $this->getRaisedToday();
+        $fixedTodaySummary          = $this->getFixedToday();
+        $nearSLASummary             = $this->getNearSLA();
+        $reopenTodaySummary         = $this->getReopenToday();
+        $raisedStartTodaySummary    = $this->getRaisedAndStartedToday();
         $uniqueCustomerTodaySummary = $this->getUniqueCustomer();
-        $breachedSLATodaySummary = $this->getBreachedSLA();
+        $breachedSLATodaySummary    = $this->getBreachedSLA();
 
         return [
             "prioritySummary"            => $prioritySummary,
@@ -356,7 +295,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
      */
     private function getRaisedToday(): array
     {
-        $query = "SELECT COUNT(DISTINCT  p.pro_problemno) total FROM `callactivity` c JOIN   problem p ON c.`caa_problemno`=p.`pro_problemno`
+        $query              = "SELECT COUNT(DISTINCT  p.pro_problemno) total FROM `callactivity` c JOIN   problem p ON c.`caa_problemno`=p.`pro_problemno`
                 WHERE 
                 pro_custno <> 282   
                 AND  caa_consno <> 67
@@ -389,7 +328,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
      */
     private function getNearSLA(): array
     {
-        $query = "SELECT COUNT(*) total FROM problem 
+        $query          = "SELECT COUNT(*) total FROM problem 
                 WHERE    
                 pro_custno <> 282
                 AND  pro_status IN ( 'I', 'P' )
