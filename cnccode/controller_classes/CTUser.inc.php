@@ -44,27 +44,27 @@ define(
 
 class CTUser extends CTCNC
 {
-    const dateOfBirth = "dateOfBirth";
-    const startDate = "startDate";
+    const dateOfBirth               = "dateOfBirth";
+    const startDate                 = "startDate";
     const pensionAdditionalPayments = "pensionAdditionalPayments";
-    const salary = "salary";
-    const salarySacrifice = "salarySacrifice";
-    const nationalInsuranceNumber = "nationalInsuranceNumber";
-    const address1 = "address1";
-    const address2 = "address2";
-    const address3 = "address3";
-    const town = "town";
-    const county = "county";
-    const postcode = "postcode";
+    const salary                    = "salary";
+    const salarySacrifice           = "salarySacrifice";
+    const nationalInsuranceNumber   = "nationalInsuranceNumber";
+    const address1                  = "address1";
+    const address2                  = "address2";
+    const address3                  = "address3";
+    const town                      = "town";
+    const county                    = "county";
+    const postcode                  = "postcode";
 
-    const absenceFormUserID = "userID";
+    const absenceFormUserID    = "userID";
     const absenceFormStartDate = "startDate";
-    const absenceFormDays = "days";
-    const sickTime = 'sickTime';
+    const absenceFormDays      = "days";
+    const sickTime             = 'sickTime';
 
 
-    const DECRYPT = 'decrypt';
-    const GetAge = 'getAge';
+    const DECRYPT                = 'decrypt';
+    const GetAge                 = 'getAge';
     const REGISTER_HALF_HOLIDAYS = 'REGISTER_HALF_HOLIDAYS';
     /** @var DSForm */
     public $dsUser;
@@ -87,9 +87,9 @@ class CTUser extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = SENIOR_MANAGEMENT_PERMISSION;
-        $noPermissionList=["all","active","getCurrentUser"];
-        $key = array_search(@$_REQUEST["action"], $noPermissionList);
+        $noPermissionList = ["all", "active", "getCurrentUser", "getUsersByTeamLevel"];
+        $roles            = SENIOR_MANAGEMENT_PERMISSION;
+        $key              = array_search(@$_REQUEST["action"], $noPermissionList);
         if (false === $key)
             if (!self::hasPermissions($roles)) {
                 Header("Location: /NotAllowed.php");
@@ -250,14 +250,14 @@ class CTUser extends CTCNC
 
                 } catch (Exception $exception) {
                     $response['status'] = "error";
-                    $response['error'] = $exception->getMessage();
+                    $response['error']  = $exception->getMessage();
                     http_response_code(400);
                 }
                 echo json_encode($response);
                 break;
             case 'getApprovalSubordinates':
                 $superiorId = $_REQUEST['superiorId'];
-                $dbeUser = new DBEUser($this);
+                $dbeUser    = new DBEUser($this);
                 $dbeUser->getApprovalSubordinates($superiorId);
                 $users = [];
                 while ($dbeUser->fetchNext()) {
@@ -278,6 +278,9 @@ class CTUser extends CTCNC
                 exit;
             case "active":
                 echo json_encode($this->getActiveUsers());
+                exit;
+            case "getUsersByTeamLevel":
+                echo json_encode($this->getUsersByTeamLevel());
                 exit;
             case CTUSER_ACT_DISPLAY_LIST:
             default:
@@ -329,7 +332,7 @@ class CTUser extends CTCNC
                 );
             $txtDelete = 'Delete';
         }
-        $urlUpdate =
+        $urlUpdate      =
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
@@ -374,7 +377,7 @@ class CTUser extends CTCNC
             );
         }
         $siteCustomerString = '';
-        $siteCustomerId = $dsUser->getValue(DBEJUser::siteCustId);
+        $siteCustomerId     = $dsUser->getValue(DBEJUser::siteCustId);
         if (isset($siteCustomerId)) {
             $dbeCustomer = new DBECustomer($this);
             $dbeCustomer->setPKValue($siteCustomerId);
@@ -843,7 +846,7 @@ class CTUser extends CTCNC
 
         foreach ($keys as $key) {
             $encryptedKeyName = 'encrypted' . ucfirst($key);
-            $encryptedValue = $this->dsUser->getValue($encryptedKeyName);
+            $encryptedValue   = $this->dsUser->getValue($encryptedKeyName);
             if (isset($userData[$key]) && $userData[$key]) {
                 $encryptedValue = Encryption::encrypt(
                     USER_ENCRYPTION_PUBLIC_KEY,
@@ -1050,6 +1053,26 @@ class CTUser extends CTCNC
             );
         }
         return $users;
+    }
+
+    function getUsersByTeamLevel()
+    {
+        $teamLevel = $_REQUEST["teamLevel"];
+        if (isset($teamLevel)) {
+            $hdUsers = (new BUUser($this))->getUsersByTeamLevel($teamLevel);
+            $users   = array();
+            foreach ($hdUsers as $user) {
+                array_push(
+                    $users,
+                    array(
+                        'userName' => $user['userName'],
+                        'userID'   => $user['cns_consno']
+                    )
+                );
+
+            }
+            return $users;
+        } else return [];
     }
 
     /**

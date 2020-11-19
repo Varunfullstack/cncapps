@@ -212,3 +212,4 @@ export const Chars = {
 export const isEmptyTime = (time) => {
     return time === "" || time == null || time === "00:00" || time === "";
 }
+export const MYSQL_DATE_FORMAT = 'YYYY-MM-DD';

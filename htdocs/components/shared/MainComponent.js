@@ -3,7 +3,8 @@ import Confirm from "./Confirm.js";
 import Prompt from "./Prompt.js";
 
 import React from 'react';
-
+import ReactDom from 'react-dom';
+ 
 export default class MainComponent extends React.Component {
 
     constructor(props) {

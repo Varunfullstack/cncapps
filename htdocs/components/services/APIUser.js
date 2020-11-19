@@ -9,6 +9,9 @@ class APIUser extends APIMain{
     getActiveUsers() {
         return fetch(`${ApiUrls.User}active`).then(res => res.json());
     } 
-     
+    getUsersByTeamLevel(teamLevel){
+        return fetch(`${ApiUrls.User}getUsersByTeamLevel&teamLevel=${teamLevel}`).then(res => res.json());
+
+    }
 }
 export default APIUser;

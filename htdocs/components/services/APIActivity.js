@@ -139,6 +139,9 @@ class APIActivity extends APIMain {
     getLastActivityInServiceRequest(serviceRequestId) {
         return fetch(`${ApiUrls.SRActivity}getLastActivityInServiceRequest&serviceRequestId=${serviceRequestId}`).then(res => res.json());
     }
+    getNotAttemptFirstTimeFix(startDate,endDate,customerID,enginnerID){
+        return this.get(`${ApiUrls.SRActivity}getNotAttemptFirstTimeFix&startDate=${startDate}&endDate=${endDate}&userID=${enginnerID}&customerID=${customerID}`);
+    }
 }
 
 export default APIActivity;
