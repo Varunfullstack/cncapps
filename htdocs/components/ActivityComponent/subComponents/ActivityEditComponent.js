@@ -1,20 +1,20 @@
 import APIActivity from "../../services/APIActivity.js";
 import APICallactType from "../../services/APICallactType.js";
-import {groupBy, isEmptyTime, padEnd, params, pick, sort, TeamType} from "../../utils/utils.js";
-import Toggle from "../../shared/Toggle.js";
-import Table from "../../shared/table/table"
-import CKEditor from "../../shared/CKEditor.js";
-import Timer from "../../shared/timer.js";
+import {groupBy, isEmptyTime, params, pick, sort} from "../../utils/utils.js";
 import ToolTip from "../../shared/ToolTip.js";
 import APICustomers from "../../services/APICutsomer.js";
 import APIUser from "../../services/APIUser.js";
 import CountDownTimer from "../../shared/CountDownTimer.js";
-import StandardTextModal from "../../Modals/StandardTextModal.js";
 import MainComponent from "../../shared/MainComponent.js";
 import APIStandardText from "../../services/APIStandardText.js";
-import Modal from "../../shared/Modal/modal";
-import React from 'react';
+import React, {Fragment} from 'react';
 import moment from "moment";
+import StandardTextModal from "../../Modals/StandardTextModal";
+import {padEnd, TeamType} from "../../utils/utils";
+import CKEditor from "../../shared/CKEditor";
+import Modal from "../../shared/Modal/modal";
+import Table from "../../shared/table/table";
+import Toggle from "../../shared/Toggle";
 
 class ActivityEditComponent extends MainComponent {
     el = React.createElement;
@@ -170,8 +170,8 @@ class ActivityEditComponent extends MainComponent {
                         res.contractCustomerItemID,
                         res.linkedSalesOrderID > 0
                     )
-                    .then((res) => {
-                        return groupBy(res, "renewalType");
+                    .then((contractsResponse) => {
+                        return groupBy(contractsResponse, "renewalType");
                     }),
                 this.apiCustomer.getCustomerAssets(res.customerId)
             ]).then(([customerContactActivityDurationThresholdValue, remoteSupportActivityDurationThresholdValue, contacts, sites, contracts, assets]) => {
@@ -361,21 +361,18 @@ class ActivityEditComponent extends MainComponent {
             }
         }
 
-        switch (data.nextStatus) {
-            case this.activityStatus.CustomerAction:
-                const dateMoment = moment(data.alarmDate);
-
-                if (
-                    !dateMoment.isValid() ||
-                    dateMoment.isSameOrBefore(moment(), "minute") ||
+        if (data.nextStatus === this.activityStatus.CustomerAction) {
+            const dateMoment = moment(data.alarmDate);
+            if (
+                !dateMoment.isValid() ||
+                dateMoment.isSameOrBefore(moment(), "minute") ||
                     data.alarmDate === "" ||
                     data.alarmTime === "00:00" ||
                     data.alarmTime === ""
-                ) {
-                    this.alert("Please provide a future date and time");
-                    return false;
-                }
-                break;
+            ) {
+                this.alert("Please provide a future date and time");
+                return false;
+            }
         }
         if (data.nextStatus === this.activityStatus.Escalate) {
             if (
@@ -636,94 +633,86 @@ class ActivityEditComponent extends MainComponent {
         if (!reason) {
             return;
         }
-        const result = await this.api.activityRequestAdditionalTime(
+        await this.api.activityRequestAdditionalTime(
             data.callActivityID,
             reason
         );
         this.alert("Additional time has been requested");
     };
-    getActionsButtons = () => {
-        const {el} = this;
-        const {data, currentUser} = this.state;
-        return el(
-            "div",
-            {
-                style: {
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    width: 1100,
-                },
-            },
-            data?.callActTypeID !== 59
-                ? el(
-                "button",
-                {
-                    onClick: () => this.setNextStatus(this.activityStatus.CncAction),
-                },
-                "CNC Action"
-                )
-                : null,
-            data?.callActTypeID !== 59
-                ? el(
-                "button",
-                {onClick: () => this.setNextStatus(this.activityStatus.Fixed)},
-                "Fixed"
-                )
-                : null,
-            data?.callActTypeID !== 59
-                ? el(
-                "button",
-                {
-                    onClick: () =>
-                        this.setNextStatus(this.activityStatus.CustomerAction),
-                },
-                "On Hold"
-                )
-                : null,
 
-            el("label", {className: "m-2"}, "Future Action"),
-            el("input", {
-                type: "date",
-                value: data?.alarmDate || "",
-                onChange: (event) => this.setValue("alarmDate", event.target.value),
-            }),
-            data.callActivityID ? el(Timer, {
-                key: "alarmTime",
-                value: data?.alarmTime,
-                onChange: (value) => this.setValue("alarmTime", value),
-            }) : null,
-            el(
-                "button",
-                {onClick: () => this.handleTemplateDisplay("changeRequest"), className: "btn-info"},
-                "Change Request"
-            ),
-            el(
-                "button",
-                {onClick: () => this.handleTemplateDisplay("salesRequest"), className: "btn-info"},
-                "Sales Request"
-            ),
-            el(
-                "button",
-                {onClick: () => this.handleTemplateDisplay("partsUsed"), className: "btn-info"},
-                "Parts Used"
-            ),
-            data?.callActTypeID !== 59
-                ? el(
-                "button",
-                {
-                    onClick: () => this.setNextStatus("Update"),
-                    disabled: !currentUser?.isSDManger
-                },
-                "Update"
-                )
-                : null,
-            data?.callActTypeID !== 59
-                ? el("button", {onClick: () => this.handleCancel(data)}, "Cancel")
-                : null
-        );
-    };
+
+    getActionsButtons = () => {
+        const {data, currentUser} = this.state;
+
+        const renderActionButtons = () => {
+            if (data?.callActType !== 59) {
+                return <Fragment>
+
+                    <button onClick={() => this.setNextStatus(this.activityStatus.CncAction)}>CNC Action</button>
+                    <button onClick={() => this.setNextStatus(this.activityStatus.Fixed)}>Fixed</button>
+                    <button onClick={() => this.setNextStatus(this.activityStatus.CustomerAction)}>On Hold</button>
+                </Fragment>
+            }
+            return "";
+        }
+
+        const renderTimeInput = () => {
+            if (!data.callActivityID) {
+                return ''
+            }
+
+
+            return (<input type="time"
+                           key="alarmTime"
+                           value={data?.alarmTime}
+                           onChange={($event) => this.setValue("alarmTime", $event.target.value)}
+            />)
+        }
+        const renderUpdateCancelButtons = () => {
+            if (data?.callActTypeID !== 59) {
+                return <Fragment>
+                    <button onClick={() => this.setNextStatus("Update")}
+                            disabled={!currentUser?.isSDManger}
+                    >Update
+                    </button>
+                    <button onClick={() => this.handleCancel(data)}>Cancel</button>
+                </Fragment>
+            }
+        }
+
+        return <div style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            width: 1100,
+        }}
+        >
+            {renderActionButtons()}
+            <label className="m-2">
+                Future Action
+            </label>
+            <input type="date"
+                   value={data?.alarmDate || ""}
+                   onChange={(event) => this.setValue("alarmDate", event.target.value)}
+            />
+            {renderTimeInput()}
+            <button onClick={() => this.handleTemplateDisplay("changeRequest")}
+                    className="btn-info"
+            > Change Request
+            </button>
+            <button onClick={() => this.handleTemplateDisplay("salesRequest")}
+                    className="btn-info"
+            > Sales Request
+            </button>
+            <button onClick={() => this.handleTemplateDisplay("partsUsed")}
+                    className="btn-info"
+            > Parts Used
+            </button>
+            {renderUpdateCancelButtons()}
+        </div>
+
+    }
     handleCancel = async (data) => {
         let text = "Are you sure you want to cancel?";
         if (data?.callActTypeID === 59) {
@@ -824,7 +813,6 @@ class ActivityEditComponent extends MainComponent {
             }
         }
         if (data.hideFromCustomerFlag === 'Y' && data.problemHideFromCustomerFlag !== 'Y' && data.customerNotesTemplate) {
-
             this.alert(`Hide from customer can't be set because there is a customer note`);
             return false;
         }
@@ -883,12 +871,11 @@ class ActivityEditComponent extends MainComponent {
     };
 
     handleContactSRHistory(contactID) {
-        const w = window.open(
+        window.open(
             `Activity.php?action=displayServiceRequestForContactPopup&contactID=${contactID}&htmlFmt=popup`,
             "reason",
             "scrollbars=yes,resizable=yes,height=400,width=1225,copyhistory=no, menubar=0"
         );
-        //w.onbeforeunload =()=>this.loadCallActivity();
     }
 
     getElement = (key, label, text, bgcolor) => {
@@ -1124,35 +1111,42 @@ class ActivityEditComponent extends MainComponent {
     };
     getTimeElement = () => {
         const {data} = this.state;
-        const {el} = this;
-        return el(
-            "div",
-            {
-                style: {
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "flex-start",
-                    alignItems: "center",
-                },
-            },
-            data.callActivityID ? el(Timer, {
-                key: "startTime",
-                disabled: data?.isInitalDisabled,
-                value: data?.startTime,
-                onChange: (value) => this.setValue("startTime", value),
-            }) : null,
-            el(
-                "label",
-                {className: "m-2", style: {color: "#992211", whiteSpace: "nowrap"}},
-                "To"
-            ),
-            data.callActivityID ? el(Timer, {
-                key: "endTime",
-                disabled: data?.isInitalDisabled,
-                value: data?.endTime,
-                onChange: (value) => this.setValue("endTime", value),
-            }) : null
-        );
+        const renderStartTimeInput = () => {
+            if (!data.callActivityID) {
+                return '';
+            }
+            return <input type="time"
+                          key="startTime"
+                          disabled={data?.isInitalDisabled}
+                          value={data?.startTime}
+                          onChange={($event) => this.setValue("startTime", $event.target.value)}
+            />
+        }
+        const renderEndTimeInput = () => {
+            if (!data.callActivityID) {
+                return '';
+            }
+            return <input type="time"
+                          key="endTime"
+                          disabled={data?.isInitalDisabled}
+                          value={data?.endTime}
+                          onChange={($event) => this.setValue("endTime", $event.target.value)}
+            />
+        }
+
+        return <div style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "flex-start",
+            alignItems: "center",
+        }}
+        >
+            {renderStartTimeInput()}
+            <label className="m-2"
+                   style={{color: "#992211", whiteSpace: "nowrap"}}
+            >To</label>
+            {renderEndTimeInput()}
+        </div>
     };
     getPriority = () => {
         const {el} = this;
@@ -1244,7 +1238,7 @@ class ActivityEditComponent extends MainComponent {
         );
     };
     getContentElement = () => {
-        const {data, callActTypes, currentUser} = this.state;
+        const {data} = this.state;
         const {el} = this;
 
         return el(
@@ -1320,7 +1314,7 @@ class ActivityEditComponent extends MainComponent {
                         "td", null,
                         el(Toggle, {
                             checked: data?.submitAsOvertime !== 0,
-                            onChange: (value) =>
+                            onChange: () =>
                                 this.setValue("submitAsOvertime", !data?.submitAsOvertime),
                         })
                     ),
@@ -1476,7 +1470,7 @@ class ActivityEditComponent extends MainComponent {
         this.fileUploader.current.click();
     };
 
-    // Parts used, change requestm and sales request
+// Parts used, change requestm and sales request
     handleTemplateChanged = (event) => {
         const id = event.target.value;
         const {templateOptions} = this.state;
@@ -1518,11 +1512,11 @@ class ActivityEditComponent extends MainComponent {
                 await this.api.sendChangeRequest(data.problemID, payload);
                 break;
             case "partsUsed":
-                var object = {
+                const object = {
                     message: templateValue,
                     callActivityID: currentActivity,
                 };
-                const result = await this.api.sendPartsUsed(object);
+                await this.api.sendPartsUsed(object);
                 break;
             case "salesRequest":
                 await this.api.sendSalesRequest(
