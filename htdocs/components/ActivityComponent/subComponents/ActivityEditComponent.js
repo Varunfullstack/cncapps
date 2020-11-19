@@ -14,7 +14,6 @@ import {padEnd, TeamType} from "../../utils/utils";
 import CKEditor from "../../shared/CKEditor";
 import Modal from "../../shared/Modal/modal";
 import Table from "../../shared/table/table";
-import Timer from "../../shared/timer";
 import Toggle from "../../shared/Toggle";
 
 class ActivityEditComponent extends MainComponent {
@@ -1145,9 +1144,12 @@ class ActivityEditComponent extends MainComponent {
             flexDirection: "row",
             justifyContent: "flex-start",
             alignItems: "center",
-        }}>
+        }}
+        >
             {renderStartTimeInput()}
-            <label className="m-2" style={{color: "#992211", whiteSpace: "nowrap"}}>To</label>
+            <label className="m-2"
+                   style={{color: "#992211", whiteSpace: "nowrap"}}
+            >To</label>
             {renderEndTimeInput()}
         </div>
     };
