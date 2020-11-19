@@ -137,7 +137,6 @@ class ActivityEditComponent extends MainComponent {
         this.api.getCallActivityDetails(callActivityID, filters).then((res) => {
             filters.monitorSR = res.monitoringFlag === "1";
             filters.criticalSR = res.criticalFlag === "1";
-            //res.date=moment(res.date).format("YYYY-MM-DD");
             res.documents = res.documents.map((d) => {
                 d.createDate = moment(d.createDate).format("DD/MM/YYYY");
                 return d;
@@ -1124,7 +1123,7 @@ class ActivityEditComponent extends MainComponent {
                           key="startTime"
                           disabled={data?.isInitalDisabled}
                           value={data?.startTime}
-                          onChange={(value) => this.setValue("startTime", value)}
+                          onChange={($event) => this.setValue("startTime", $event.target.value)}
             />
         }
         const renderEndTimeInput = () => {
@@ -1135,7 +1134,7 @@ class ActivityEditComponent extends MainComponent {
                           key="endTime"
                           disabled={data?.isInitalDisabled}
                           value={data?.endTime}
-                          onChange={(value) => this.setValue("endTime", value)}
+                          onChange={($event) => this.setValue("endTime", $event.target.value)}
             />
         }
 
