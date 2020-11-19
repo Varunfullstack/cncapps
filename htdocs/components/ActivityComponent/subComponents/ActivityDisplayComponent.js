@@ -47,7 +47,11 @@ class ActivityDisplayComponent extends MainComponent {
 
     componentDidMount() {
         this.loadFilterSession();
-        setTimeout(() => this.loadCallActivity(params.get('callActivityID')), 10);
+        if (params.get('serviceRequestId')) {
+            this.loadLastActivityInServiceRequest(params.get('serviceRequestId'));
+        } else {
+            setTimeout(() => this.loadCallActivity(params.get('callActivityID')), 10);
+        }
 
 
     }
@@ -1007,6 +1011,12 @@ class ActivityDisplayComponent extends MainComponent {
             this.getTemplateModal(),
             this.getFooter()
         );
+    }
+
+    loadLastActivityInServiceRequest(serviceRequestId) {
+        return this.api.getLastActivityInServiceRequest(serviceRequestId).then(res => {
+            return this.loadCallActivity(res.data);
+        })
     }
 }
 

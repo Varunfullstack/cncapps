@@ -135,6 +135,10 @@ class APIActivity extends APIMain {
     {
         return this.get(`${ApiUrls.SRActivity}usedBudgetData&problemID=${problemId}`)
     }
+
+    getLastActivityInServiceRequest(serviceRequestId) {
+        return fetch(`${ApiUrls.SRActivity}getLastActivityInServiceRequest&serviceRequestId=${serviceRequestId}`).then(res => res.json());
+    }
 }
 
 export default APIActivity;
