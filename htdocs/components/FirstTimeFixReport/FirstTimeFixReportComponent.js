@@ -37,7 +37,6 @@ class FirstTimeFixReportComponent extends MainComponent {
 
     componentDidMount() {
         this.apiUser.getUsersByTeamLevel(1).then((engineers) => {
-            console.log(engineers);
             this.setState({engineers});
         });
     }
@@ -51,8 +50,11 @@ class FirstTimeFixReportComponent extends MainComponent {
                     <td>Customer Name</td>
                     <td>
                         <CustomerSearch
-                            onChange={(customer) =>
-                                this.setFilter("customerID", customer.id)
+                            onChange={(customer) => {
+                                if (customer) {
+                                    this.setFilter("customerID", customer.id)
+                                }
+                            }
                             }
                         ></CustomerSearch>
                     </td>
@@ -113,12 +115,11 @@ class FirstTimeFixReportComponent extends MainComponent {
     };
     handleSearch = () => {
         const {filter} = this.state;
-        console.log(filter);
-        // this.setState({loading:true})
+        this.setState({loading: true});
         if (this.isValid())
             Promise.all([
                 this.apiFirstTimeFixReport.search(
-                  filter.startDate,
+                    filter.startDate,
                     filter.endDate,
                     filter.customerID,
                     filter.engineerID),
@@ -129,13 +130,11 @@ class FirstTimeFixReportComponent extends MainComponent {
                     filter.engineerID
                 ),
             ]).then(([firstTimeData, notAttemptFirstTimeFixData]) => {
-                console.log(firstTimeData, notAttemptFirstTimeFixData);
                 this.setState({firstTimeData, notAttemptFirstTimeFixData, loading: false});
             });
     };
     getFirstTimeElement = () => {
-        const {firstTimeData, notAttemptFirstTimeFixData} = this.state;
-        console.log(firstTimeData);
+        const {firstTimeData} = this.state;
         return <table className="table table-striped"
                       style={{width: 600}}
         >
@@ -169,7 +168,6 @@ class FirstTimeFixReportComponent extends MainComponent {
     }
     getNotFirstTimeElement = () => {
         const {notAttemptFirstTimeFixData} = this.state;
-        console.log(notAttemptFirstTimeFixData);
         return <table className="table table-striped"
                       style={{width: 1200}}
         >
@@ -177,8 +175,8 @@ class FirstTimeFixReportComponent extends MainComponent {
             <tr>
                 <th style={{width: 100}}>Name</th>
                 <th style={{width: 250}}>Customer</th>
-                <th style={{width: 50}}>problem</th>
-                <th>reason</th>
+                <th style={{width: 50}}>Problem</th>
+                <th>Reason</th>
             </tr>
             </thead>
             <tbody>
