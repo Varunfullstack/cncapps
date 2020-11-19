@@ -3,7 +3,7 @@ import CurrentActivityService from "../CurrentActivityReportComponent/services/C
 import Table from "../shared/table/table";
 import Toggle from "../shared/Toggle";
 import ToolTip from "../shared/ToolTip";
-import {SRQueues} from "../utils/utils";
+import {getServiceRequestWorkTitle, getWorkIconClassName, SRQueues} from "../utils/utils";
 import DailyStatsComponent from "./subComponents/DailyStatsComponent";
 import APISDManagerDashboard from "./services/APISDManagerDashboard";
 import React from 'react';
@@ -218,27 +218,6 @@ class SDManagerDashboardComponent extends MainComponent {
         }) : null;
     }
 
-    getProblemWorkTitle(problem) {
-        if (problem.isBeingWorkedOn) {
-            return "Request being worked on currently";
-        }
-        if (problem.status === "I") {
-            return "Request not started yet";
-        }
-        return "Work on this request";
-    }
-
-    getWorkIconClassName(problem) {
-
-        const commonClasses = "fa-play fa-2x pointer";
-        if (problem.isBeingWorkedOn) {
-            return `being-worked-on fad ${commonClasses}`;
-        }
-        if (problem.status === "I") {
-            return `not-yet-started fad ${commonClasses}`
-        }
-        return `start-work fal ${commonClasses}`;
-    }
 
     addToolTip = (element, title) => {
         return this.el(
@@ -265,13 +244,13 @@ class SDManagerDashboardComponent extends MainComponent {
                     className: "text-center",
                     content: (problem) =>
                         el(ToolTip, {
-                            title: this.getProblemWorkTitle(problem),
+                            title: getServiceRequestWorkTitle(problem),
                             content:
                                 el(
                                     "div",
                                     {key: "img1", onClick: () => this.startWork(problem)},
                                     el("i", {
-                                        className: this.getWorkIconClassName(problem)
+                                        className: getWorkIconClassName(problem)
                                     })
                                 )
                         }),

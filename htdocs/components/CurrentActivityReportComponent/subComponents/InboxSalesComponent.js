@@ -2,6 +2,7 @@ import Table from "./../../shared/table/table";
 import CurrentActivityService from "../services/CurrentActivityService";
 
 import React from 'react';
+import {ColumnRenderer} from "./ColumnRenderer";
 
 class InboxSalesComponent extends React.Component {
     code = "S";
@@ -32,77 +33,9 @@ class InboxSalesComponent extends React.Component {
             getAllocatedElement,
         } = this.props;
         let columns = [
-            {
-                hide: false,
-                order: 1,
-                path: null,
-                label: "",
-                key: "work",
-                sortable: false,
-                className: "text-center",
-                hdClassName: "text-center",
-                content: (problem) =>
-                    addToolTip(
-                        el(
-                            "div",
-                            {key: "img1", onClick: () => startWork(problem, this.code)},
-                            el("i", {
-                                className:
-                                    (problem.workBtnColor === "#C6C6C6"
-                                        ? "fal fa-play"
-                                        : "fad fa-play ") +
-                                    " fa-2x  pointer inbox-icon" +
-                                    problem.workHidden || "",
-                                style: {
-                                    color: problem.workBtnColor,
-                                    "--fa-primary-color":
-                                        problem.workBtnColor === "#FFF5B3" ? "gold" : "#32a852",
-                                    "--fa-secondary-color":
-                                        problem.workBtnColor === "#FFF5B3" ? "gray" : "gray",
-                                },
-                            })
-                        ),
-                        problem.workBtnTitle
-                    ),
-            },
-            {
-                hide: false,
-                order: 2,
-                path: null,
-                key: "custsomerIcon",
-                label: "",
-                sortable: false,
-                toolTip: "Special Attention customer / contact",
-                content: (problem) =>
-                    problem.customerNameDisplayClass != null
-                        ? el("i", {
-                            className:
-                                "fal fa-2x fa-star color-gray pointer float-right inbox-icon",
-                            key: "starIcon",
-                        })
-                        : null,
-            },
-            {
-                hide: false,
-                order: 4.1,
-                path: null,
-                key: "Future Icon",
-                label: "",
-                sortable: false,
-                content: (problem) =>
-                    moment(problem.alarmDateTime) > moment()
-                        ? addToolTip(
-                        el("i", {
-                            className:
-                                "fal fa-2x fa-alarm-snooze color-gray pointer float-right inbox-icon",
-                            key: "starIcon",
-                        }),
-                        `This Service Request is scheduled for the future date of ${moment(
-                            problem.alarmDateTime
-                        ).format("DD/MM/YYYY HH:mm")}`
-                        )
-                        : null,
-            },
+            ColumnRenderer.getWorkIconColumn(startWork, this.code),
+            ColumnRenderer.getSpecialAttentionColumn(),
+            ColumnRenderer.getFutureWorkColumn(),
             {
                 hide: true,
                 order: 10,
@@ -139,50 +72,14 @@ class InboxSalesComponent extends React.Component {
                                 className: "float-right",
                                 style: {},
                             },
-                            `${problem.hdRemaining}`
+                            `${problem.minutesRemaining}`
                         )
                     ),
                 ],
             },
-            {
-                hide: false,
-                order: 3,
-                path: null,
-                key: "hoursRemainingIcon",
-                label: "",
-                sortable: false,
-                toolTip: "On Hold",
-                className: "text-center",
-                content: (problem) =>
-                    problem.hoursRemainingBgColor === "#BDF8BA"
-                        ? el("i", {
-                            className: "fal  fa-user-clock color-gray pointer inbox-icon",
-                            //title: "On Hold",
-                            key: "icon",
-                            style: {float: "right"},
-                        })
-                        : null,
-            },
+           ColumnRenderer.getOnHoldColumn(),
 
-            {
-                hide: false,
-                order: 4,
-                path: null,
-                key: "problemIdIcon",
-                label: "",
-                sortable: false,
-                className: "text-center",
-                toolTip: "SLA Failed for this Service Request",
-                content: (problem) =>
-                    problem.bgColour === "#F8A5B6"
-                        ? el("i", {
-                            className:
-                                "fal fa-2x fa-bell-slash color-gray pointer inbox-icon",
-                            title: "",
-                            key: "icon",
-                        })
-                        : null,
-            },
+            ColumnRenderer.getSLABreachedColumn(),
             {
                 hide: false,
                 order: 8,
@@ -258,19 +155,7 @@ class InboxSalesComponent extends React.Component {
                         problem.customerName
                     ),
             },
-            {
-                hide: false,
-                order: 11,
-                path: "priority",
-                label: "",
-                hdToolTip: "Service Request Priority",
-                icon: "fal fa-2x fa-signal color-gray2 ",
-                sortable: false,
-                hdClassName: "text-center",
-                className: "text-center",
-                backgroundColorColumn: "priorityBgColor"
-
-            },
+            ColumnRenderer.getPriorityColumn(),
             {
                 hide: false,
                 order: 12,

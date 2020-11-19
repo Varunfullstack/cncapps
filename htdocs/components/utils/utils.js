@@ -7,6 +7,28 @@ export function get(o, p) {
     return p.split(".").reduce((a, v) => a[v], o);
 }
 
+export function getServiceRequestWorkTitle(serviceRequest) {
+    if (serviceRequest.isBeingWorkedOn) {
+        return "Request being worked on currently";
+    }
+    if (serviceRequest.status === "I") {
+        return "Request not started yet";
+    }
+    return "Work on this request";
+}
+
+export function getWorkIconClassName(serviceRequest) {
+
+    const commonClasses = "fa-play fa-2x pointer";
+    if (serviceRequest.isBeingWorkedOn) {
+        return `being-worked-on fad ${commonClasses}`;
+    }
+    if (serviceRequest.status === "I") {
+        return `not-yet-started fad ${commonClasses}`
+    }
+    return `start-work fal ${commonClasses}`;
+}
+
 export function sort(array, path, order = "asc") {
     return array.sort((a, b) => {
         if (

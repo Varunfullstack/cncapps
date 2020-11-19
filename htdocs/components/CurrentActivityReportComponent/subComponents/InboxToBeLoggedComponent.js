@@ -44,9 +44,7 @@ class InboxToBeLoggedComponent extends React.Component {
                         el(
                             "div",
                             {key: "deleteIcon", onClick: () => deleteSR(problem, this.code)},
-                            el("i", {
-                                className: "fal fa-trash-alt color-gray pointer inbox-icon",
-                            })
+                            el("i", {className: "fal fa-trash-alt color-gray pointer inbox-icon",})
                         ),
                         "Delete"
                     ),
@@ -170,9 +168,7 @@ class InboxToBeLoggedComponent extends React.Component {
     };
 
     render() {
-        const {el, getTableElement} = this;
-        const {data} = this.props;
-
+        const {getTableElement} = this;
         return [
             getTableElement(),
         ];

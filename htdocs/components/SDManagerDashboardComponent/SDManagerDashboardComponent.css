@@ -28,20 +28,3 @@
     font-size: 22px;
     font-weight: bold;
 }
-
-.not-yet-started {
-    color: rgb(255, 245, 179);
-    --fa-primary-color: gold;
-    --fa-secondary-color: gray;
-}
-
-.being-worked-on {
-    color: rgb(189, 248, 186);
-    --fa-primary-color: #32a852;
-    --fa-secondary-color: gray;
-}
-
-.start-work {
-    color: rgb(198, 198, 198);
-    --fa-secondary-color: gray;
-}

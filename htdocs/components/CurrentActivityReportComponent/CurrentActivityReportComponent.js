@@ -11,7 +11,7 @@ import Spinner from './../shared/Spinner/Spinner';
 import MainComponent from '../shared/MainComponent';
 import ActivityFollowOn from '../Modals/ActivityFollowOn';
 import InboxOpenSRComponent from './subComponents/InboxOpenSRComponent';
-import {sort} from '../utils/utils';
+import {getServiceRequestWorkTitle, sort} from '../utils/utils';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
@@ -434,17 +434,6 @@ class CurrentActivityReportComponent extends MainComponent {
         return this.teams.filter(t => t.code === code)[0].id;
     }
 
-    // end of shared methods
-    getProblemWorkTitle(problem) {
-        let title = "";
-        if (problem.workBgColor == null) title = "Work on this request";
-        if (problem.hoursRemainingBgColor === "#FFF5B3")
-            title = "Request not started yet";
-        if (problem.workBgColor === "#BDF8BA")
-            title = "Request being worked on by somebody else";
-        return title;
-    }
-
     getProblemWorkColor(problem) {
         let color = "#C6C6C6";
         if (problem.workBgColor == null) color = "#C6C6C6";
@@ -455,12 +444,13 @@ class CurrentActivityReportComponent extends MainComponent {
 
     prepareResult = (result) => {
         result.map((problem) => {
-            problem.workBtnTitle = this.getProblemWorkTitle(problem);
+            problem.workBtnTitle = getServiceRequestWorkTitle(problem);
             problem.workBtnColor = this.getProblemWorkColor(problem);
             problem.alarmDateTime = problem.alarmDateTime?.trim(" ");
-            if (moment(problem.alarmDateTime) > moment())
-
+            problem.priorityClass = problem.priority === 1 ? 'priority-one' : '';
+            if (moment(problem.alarmDateTime) > moment()) {
                 delete problem.date;
+            }
             delete problem.engineerDropDown;
             delete problem.linkAllocateAdditionalTime;
             delete problem.queueOptions;
