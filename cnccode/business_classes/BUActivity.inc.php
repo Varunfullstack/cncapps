@@ -7107,17 +7107,22 @@ class BUActivity extends Business
             DBEJProblem::linkedSalesOrderID,
             $ordheadID
         );
+        $buHeader = new BUHeader($this);
+        $dsHeader = new DataSet($this);
+        $buHeader->getHeader($dsHeader);
+        if($queue==3)
         $dbeProblem->setValue(
             DBEJProblem::holdForQA,
-            1
+            $dsHeader->getValue(DBEHeader::holdAllSOSmallProjectsP5sforQAReview)
+        );
+        else  if($queue==5)
+        $dbeProblem->setValue(
+            DBEJProblem::holdForQA,
+            $dsHeader->getValue(DBEHeader::holdAllSOProjectsP5sforQAReview)
         );
         $informCustomer = false;
         if ($dsInput->getValue(BURenContract::serviceRequestPriority) == 5) {
             $informCustomer = true;
-            $buHeader       = new BUHeader($this);
-            $dsHeader       = new DataSet($this);
-            $buHeader->getHeader($dsHeader);
-
             $queueProblemColumn  = $queue == 3 ? DBEProblem::smallProjectsTeamLimitMinutes : DBEProblem::projectTeamLimitMinutes;
             $queueHeaderColumn   = $queue == 3 ? DBEHeader::smallProjectsTeamLimitMinutes : DBEHeader::projectTeamLimitMinutes;
             $minutesInADayColumn = $queue == 3 ? DBEHeader::smallProjectsTeamMinutesInADay : DBEHeader::projectTeamMinutesInADay;

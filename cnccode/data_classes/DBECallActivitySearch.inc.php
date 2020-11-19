@@ -565,7 +565,7 @@ class DBECallActivitySearch extends DBEntity
                 $whereParameters .= " and pro_status in ('F','C') ";
                 break;
             case "HOLD_FOR_QA":
-                $whereParameters .= " AND holdForQA =1 ";
+                $whereParameters .= " AND caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID." AND holdForQA =1 ";
         }
         // Contract Type:
 

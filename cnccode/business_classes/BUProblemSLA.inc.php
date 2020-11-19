@@ -814,7 +814,8 @@ class BUProblemSLA extends Business
         ); // fixed status
 
         while ($dsProblems->fetchNext()) {
-
+            if($dsProblems->getValue(DBEProblem::holdForQA)==1)
+                continue;
             $problemID = $dsProblems->getValue(DBEProblem::problemID);
 
             $dbeCallActivity = $this->buActivity->getLastActivityInProblem($problemID);

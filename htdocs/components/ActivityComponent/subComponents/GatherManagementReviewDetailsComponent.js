@@ -3,7 +3,7 @@ import APIActivity from "../../services/APIActivity";
 import CKEditor from "../../shared/CKEditor";
 import ToolTip from "../../shared/ToolTip";
 import {params} from "../../utils/utils";
-
+import ReactDOM from 'react-dom';
 import React from 'react';
 
 class GatherManagementReviewDetailsComponent extends MainComponent {

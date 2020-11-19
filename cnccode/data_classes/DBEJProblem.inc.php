@@ -754,6 +754,14 @@ FROM {$this->getTableName()}
                                      $showProjects = true
     )
     {
+      $fixedDate="";
+      $includeFixed="";
+      if($orderBy=="holdForQA")
+      {
+        $fixedDate=" , (select caa_date from callactivity where caa_callacttypeno=57 and caa_problemno=pro_problemno ) fixedDate ";
+        $includeFixed=",'F'";
+      }
+
         $sql =
             "SELECT {$this->getDBColumnNamesAsString()}, 
                 {$this->getDBColumnName(self::workingHours)} - {$this->getDBColumnName(self::slaResponseHours) } as hoursRemaining,
@@ -777,9 +785,8 @@ FROM {$this->getTableName()}
             left join consultant fixingEngineer on last.caa_consno = fixingEngineer.cns_consno
             left join team fixingTeam on fixingEngineer.teamID = fixingTeam.teamID
         WHERE {$this->getDBColumnName(self::customerID) } <> 282  
-        and {$this->getDBColumnName(self::status)} in ('I','P')  
-        and (consultant.execludeFromSDManagerDashboard=0 or consultant.cns_consno is null) ";
-
+        and {$this->getDBColumnName(self::status)} in ('I','P'$includeFixed)  
+        and (consultant.execludeFromSDManagerDashboard=0 or consultant.cns_consno is null)  ";
         if (!$showHelpDesk) {
             $sql .= ' and pro_queue_no <> 1 ';
         }

@@ -192,6 +192,7 @@ class SDManagerDashboardComponent extends MainComponent {
             const {filter} = this.state;
             this.api.getQueue(id, filter)
                 .then((queueData) => {
+                console.log(queueData);
                     this.setState({queueData})
                 });
         } else return [];
@@ -475,6 +476,16 @@ class SDManagerDashboardComponent extends MainComponent {
                     sortable: false,
                     hdClassName: "text-center",
                 },
+                {
+                    display:[11].indexOf(filter.activeTab)>=0,
+                    path: "fixedDate",
+                    label: "",
+                    hdToolTip: "Fixed date",
+                    hdClassName: "text-center",
+                    icon: "fal fa-2x fa-calendar  color-gray2 pointer",
+                    sortable: false,
+                    className: "text-center",
+                 },
             ]
             columns = columns.filter(c => c.display == undefined || c.display == true);
             return el(Table, {
