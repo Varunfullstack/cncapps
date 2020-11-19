@@ -1,8 +1,5 @@
-<?php /*
-* Call activity problem table
-* @authors Karim Ahmed
-* @access public
-*/
+<?php
+global $cfg;
 require_once($cfg["path_dbe"] . "/DBEProblem.inc.php");
 
 class DBEJProblem extends DBEProblem
@@ -396,7 +393,6 @@ class DBEJProblem extends DBEProblem
 
           JOIN callactivity `initial`
             ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
-
             " JOIN callactivity `last`
             ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
               (
@@ -566,7 +562,7 @@ FROM {$this->getTableName()}
           initial.caa_contno = " . $contactID . " and pro_date_raised >= date(now() - interval 3 month) 
          ";
 
-        $sql .= " ORDER BY pro_date_raised DESC";              // in progress        
+        $sql .= " ORDER BY pro_date_raised DESC";              // in progress
         $this->setQueryString($sql);
 
         return (parent::getRows());
@@ -759,11 +755,12 @@ FROM {$this->getTableName()}
     )
     {
         $sql =
-            "SELECT " . $this->getDBColumnNamesAsString() . ', ' . $this->getDBColumnName(
-                self::workingHours
-            ) . ' - ' . $this->getDBColumnName(self::slaResponseHours) . ' as hoursRemaining' .
-            " FROM " . $this->getTableName() .
-            " LEFT JOIN customer ON cus_custno = pro_custno
+            "SELECT {$this->getDBColumnNamesAsString()}, 
+                {$this->getDBColumnName(self::workingHours)} - {$this->getDBColumnName(self::slaResponseHours) } as hoursRemaining,
+                 fixingEngineer.cns_name as fixedByEngineerName,
+                 fixingTeam.name as fixedByTeamName
+             FROM {$this->getTableName()}
+             LEFT JOIN customer ON cus_custno = pro_custno
            LEFT JOIN consultant ON cns_consno = pro_consno
            left join team on consultant.teamID = team.teamID
           JOIN callactivity `initial`
@@ -777,11 +774,12 @@ FROM {$this->getTableName()}
               WHERE ca.caa_problemno = pro_problemno
               AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
-            
-        WHERE " . $this->getDBColumnName(self::customerID) . ' <> 282  and ' . $this->getDBColumnName(
-                self::status
-            ) . ' in ("I","P")  ';
-        $sql .= ' and (consultant.execludeFromSDManagerDashboard=0 or consultant.cns_consno is null) ';
+            left join consultant fixingEngineer on last.caa_consno = fixingEngineer.cns_consno
+            left join team fixingTeam on fixingEngineer.teamID = fixingTeam.teamID
+        WHERE {$this->getDBColumnName(self::customerID) } <> 282  
+        and {$this->getDBColumnName(self::status)} in ('I','P')  
+        and (consultant.execludeFromSDManagerDashboard=0 or consultant.cns_consno is null) ";
+
         if (!$showHelpDesk) {
             $sql .= ' and pro_queue_no <> 1 ';
         }
@@ -879,8 +877,8 @@ FROM {$this->getTableName()}
                 $sql .= " and last.caa_endtime is null and last.caa_date <= curdate() and last.caa_starttime <= TIME(NOW())  order by hoursRemaining desc";
                 break;
             case "holdForQA":
-              $sql .= " and holdForQA=1";
-
+                $sql .= " and holdForQA=1";
+                break;
         }
 
         $sql .= ' limit ' . $limit;

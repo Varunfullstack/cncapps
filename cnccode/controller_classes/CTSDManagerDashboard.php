@@ -210,7 +210,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
      */
     private function renderQueueJson(DBEJProblem $problems)
     {
-        $result = [];
+        $result   = [];
         if (!$problems->rowCount()) {
             return $result;
         }
@@ -219,7 +219,6 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         }
         return $result;
     }
-
 
     function getDailyStatsSummary()
     {
@@ -253,7 +252,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
      */
     private function getNumberOfOpenServiceRequestPerTeamExcludingSales(): array
     {
-        $query = "SELECT c.`teamID`, COUNT(*) total
+        $query             = "SELECT c.`teamID`, COUNT(*) total
                 FROM problem p JOIN consultant c ON p.`pro_consno`=c.`cns_consno` 
                 WHERE 
                 pro_status<>'C' 
@@ -270,7 +269,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
      */
     private function getDailySource()
     {
-        $query = "SELECT r.`description`,COUNT(*)  total
+        $query              = "SELECT r.`description`,COUNT(*)  total
                 FROM problem p LEFT JOIN `problemraisetype` r ON p.`raiseTypeId`=r.`id`
                 WHERE    
                 pro_custno <> 282
@@ -317,7 +316,7 @@ WHERE pro_custno <> 282
      */
     private function getFixedToday(): array
     {
-        $query = "SELECT COUNT(DISTINCT  p.pro_problemno)  total
+        $query             = "SELECT COUNT(DISTINCT  p.pro_problemno)  total
                 FROM `callactivity` c JOIN   problem p ON c.`caa_problemno`=p.`pro_problemno`
                 WHERE    
                 pro_custno <> 282
@@ -333,7 +332,7 @@ WHERE pro_custno <> 282
      */
     private function getNearSLA(): array
     {
-        $query = "SELECT COUNT(*) total FROM problem 
+        $query          = "SELECT COUNT(*) total FROM problem 
                 WHERE    
                 pro_custno <> 282
                 AND  pro_status IN ( 'I', 'P' )
@@ -346,7 +345,7 @@ WHERE pro_custno <> 282
      */
     private function getReopenToday(): array
     {
-        $query = "SELECT COUNT(*) total FROM problem 
+        $query              = "SELECT COUNT(*) total FROM problem 
                 WHERE 
                 pro_custno <> 282   
                 AND `pro_reopened_date` = curdate()";
@@ -377,7 +376,7 @@ WHERE pro_custno <> 282
      */
     private function getUniqueCustomer(): array
     {
-        $query = "SELECT COUNT(DISTINCT  p.pro_custno) total FROM `callactivity` c JOIN   problem p ON c.`caa_problemno`=p.`pro_problemno`
+        $query                      = "SELECT COUNT(DISTINCT  p.pro_custno) total FROM `callactivity` c JOIN   problem p ON c.`caa_problemno`=p.`pro_problemno`
         WHERE 
         pro_custno <> 282   
         AND  caa_consno <> 67
@@ -392,8 +391,8 @@ WHERE pro_custno <> 282
      */
     private function getBreachedSLA(): array
     {
-//9- Breached SLA
-        $query = "SELECT COUNT(  DISTINCT  p.pro_problemno) total FROM `callactivity` c JOIN   problem p ON c.`caa_problemno`=p.`pro_problemno` 
+        //9- Breached SLA
+        $query                   = "SELECT COUNT(  DISTINCT  p.pro_problemno) total FROM `callactivity` c JOIN   problem p ON c.`caa_problemno`=p.`pro_problemno` 
          JOIN customer cu ON p.`pro_custno`=cu.`cus_custno`
          WHERE
           pro_custno <> 282   

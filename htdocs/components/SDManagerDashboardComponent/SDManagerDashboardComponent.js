@@ -187,7 +187,7 @@ class SDManagerDashboardComponent extends MainComponent {
         );
     };
     loadTab = (id) => {
-        if ([1,2,3,4,5,6,7,8,9,11].indexOf(id)>=0) {
+        if ([1, 2, 3, 4, 5, 6, 7, 8, 9, 11].indexOf(id) >= 0) {
             this.loadAllocatedUsers();
             const {filter} = this.state;
             this.api.getQueue(id, filter)
@@ -228,7 +228,7 @@ class SDManagerDashboardComponent extends MainComponent {
     getQueueElement = () => {
         const {filter, queueData} = this.state;
         const {el} = this;
-        if ([1,2,3,4,5,6,7,8,11].indexOf(filter.activeTab) >=0) {
+        if ([1, 2, 3, 4, 5, 6, 7, 8, 11].indexOf(filter.activeTab) >= 0) {
             let columns = [
                 {
                     hide: false,
@@ -367,7 +367,7 @@ class SDManagerDashboardComponent extends MainComponent {
                     className: "text-center",
                 },
                 {
-                    display:[11].indexOf(filter.activeTab)<0,
+                    display: [11].indexOf(filter.activeTab) < 0,
                     path: "",
                     label: "",
                     hdToolTip: "Allocate additional time",
@@ -385,7 +385,7 @@ class SDManagerDashboardComponent extends MainComponent {
                     }),
                 },
                 {
-                    display:[11].indexOf(filter.activeTab)<0,
+                    display: [11].indexOf(filter.activeTab) < 0,
                     path: "hoursRemainingForSLA",
                     label: "",
                     hdToolTip: "Open Hours",
@@ -440,7 +440,7 @@ class SDManagerDashboardComponent extends MainComponent {
                     content: (problem) => el('label', null, this.getTeamCode(problem.teamID)),
                 },
                 {
-                    display:[11].indexOf(filter.activeTab)>=0,
+                    display: [11].indexOf(filter.activeTab) >= 0,
                     path: "engineerName",
                     label: "",
                     key: "assignedUser",
@@ -451,7 +451,7 @@ class SDManagerDashboardComponent extends MainComponent {
                     //content: (problem) => this.getAllocatedElement(problem, problem.teamID),
                 },
                 {
-                    display:[11].indexOf(filter.activeTab)<0,
+                    display: [11].indexOf(filter.activeTab) < 0,
                     path: "engineerName",
                     label: "",
                     key: "assignedUser",
@@ -462,7 +462,7 @@ class SDManagerDashboardComponent extends MainComponent {
                     content: (problem) => this.getAllocatedElement(problem, problem.teamID),
                 },
                 {
-                    display:[11].indexOf(filter.activeTab)<0,
+                    display: [11].indexOf(filter.activeTab) < 0,
                     path: "dateTime",
                     label: "",
                     key: "dateTime",
@@ -476,7 +476,7 @@ class SDManagerDashboardComponent extends MainComponent {
                     hdClassName: "text-center",
                 },
             ]
-            columns=columns.filter(c=>c.display==undefined || c.display==true);
+            columns = columns.filter(c => c.display == undefined || c.display == true);
             return el(Table, {
                 id: "queueData",
                 data: queueData || [],
