@@ -433,19 +433,10 @@ class CurrentActivityReportComponent extends MainComponent {
     getTeamId(code) {
         return this.teams.filter(t => t.code === code)[0].id;
     }
-
-    getProblemWorkColor(problem) {
-        let color = "#C6C6C6";
-        if (problem.workBgColor == null) color = "#C6C6C6";
-        if (problem.hoursRemainingBgColor === "#FFF5B3") color = "#FFF5B3";
-        if (problem.workBgColor === "#BDF8BA") color = "#BDF8BA";
-        return color;
-    }
-
+    
     prepareResult = (result) => {
         result.map((problem) => {
             problem.workBtnTitle = getServiceRequestWorkTitle(problem);
-            problem.workBtnColor = this.getProblemWorkColor(problem);
             problem.alarmDateTime = problem.alarmDateTime?.trim(" ");
             problem.priorityClass = problem.priority === 1 ? 'priority-one' : '';
             if (moment(problem.alarmDateTime) > moment()) {
