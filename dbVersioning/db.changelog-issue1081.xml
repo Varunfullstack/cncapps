@@ -1,0 +1,47 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue1081-0">
+        <tagDatabase tag="issue1081"/>
+    </changeSet>
+    <changeSet id="issue1081-1" author="pavwebdev">
+        <sql splitStatements="true">
+            DELETE standardtext
+            FROM standardtext
+                     LEFT JOIN standardtexttype
+                               ON standardtexttype.`sty_standardtexttypeno` = standardtext.`stt_standardtexttypeno`
+            WHERE `standardtexttype`.`sty_desc` IN
+                  ("Priority Change Reason", "Not First Time Fix Reason", "Missing Asset Reason");
+            insert into standardtext
+            values ("This is a change request and the SLA is amended to reflect this. If this is an urgent change please call the Customer Services line via the Service Desk to amend ",
+                    )This has request been linked to a Sales Order and is now considered a project
+                Customer has requested a call back at a specific time
+        </sql>
+    </changeSet>
+
+    <changeSet id="issue1081-2" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contact" columnName="pendingFurloughActionDate"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="pendingFurloughActionDate" type="date">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue1081-3" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contact" columnName="pendingFurloughActionLevel"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="pendingFurloughActionLevel" type="char(20)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>
