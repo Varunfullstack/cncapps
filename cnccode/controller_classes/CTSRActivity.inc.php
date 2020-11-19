@@ -650,14 +650,15 @@ class CTSRActivity extends CTCNC
                 http_response_code(400);
                 return ["error" => 'Please provide an escalate reason'];
             }
-            if ($updateAwaitingCustomer) {
-                $dbeProblem->setValue(
-                    DBEProblem::awaitingCustomerResponseFlag,
-                    $dsCallActivity->getValue(DBECallActivity::awaitingCustomerResponseFlag)
-                );
-                $dbeProblem->updateRow();
-            }
             $dsCallActivity->post();
+        }
+
+        if ($updateAwaitingCustomer) {
+            $dbeProblem->setValue(
+                DBEProblem::awaitingCustomerResponseFlag,
+                $dsCallActivity->getValue(DBECallActivity::awaitingCustomerResponseFlag)
+            );
+            $dbeProblem->updateRow();
         }
 
         $enteredEndTime = $buActivity->updateCallActivity(
