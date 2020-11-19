@@ -878,6 +878,9 @@ FROM {$this->getTableName()}
             case 'currentOpenSRs':
                 $sql .= " and last.caa_endtime is null and last.caa_date <= curdate() and last.caa_starttime <= TIME(NOW())  order by hoursRemaining desc";
                 break;
+            case "holdForQA":
+              $sql .= " and holdForQA=1";
+
         }
 
         $sql .= ' limit ' . $limit;

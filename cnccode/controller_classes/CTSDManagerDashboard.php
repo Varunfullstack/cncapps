@@ -125,6 +125,9 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             case 8: //Most Hours Logged
                 $code = 'mostHoursLogged';
                 break;
+            case 11: //Held for QA
+                $code = 'holdForQA';
+                break;
         }
         return $this->renderQueueJson(
             $buProblem->getSDDashBoardData(

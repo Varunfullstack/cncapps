@@ -20,4 +20,41 @@
             <dropColumn tableName="problem" columnName="holdForQA"/>
         </rollback>
     </changeSet>
+    <changeSet id="issue1084-3" author="pavwebdevmt">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="consultant" columnName="holdAllSRsforQAReview"/>
+            </not>
+        </preConditions>         
+        <addColumn tableName="consultant">
+            <column name="holdAllSRsforQAReview" type="tinyint(1)"  defaultValue="0" >
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="consultant" columnName="holdAllSRsforQAReview"/>
+        </rollback>
+    </changeSet>
+     <changeSet id="issue1084-4" author="pavwebdevmt">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="Headert" columnName="holdAllSOSmallProjectsP5sforQAReview"/>
+            </not>
+            <not>
+                <columnExists tableName="Headert" columnName="holdAllSOProjectsP5sforQAReview"/>
+            </not>
+        </preConditions>         
+        <addColumn tableName="Headert">
+            <column name="holdAllSOSmallProjectsP5sforQAReview" type="tinyint(1)"  defaultValue="1" >
+                <constraints nullable="true"/>
+            </column>
+            <column name="holdAllSOProjectsP5sforQAReview" type="tinyint(1)"  defaultValue="1" >
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="Headert" columnName="holdAllSOSmallProjectsP5sforQAReview"/>
+            <dropColumn tableName="Headert" columnName="holdAllSOProjectsP5sforQAReview"/>
+        </rollback>
+    </changeSet>
 </databaseChangeLog>

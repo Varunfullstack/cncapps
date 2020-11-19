@@ -1406,7 +1406,13 @@ class BUActivity extends Business
             DBEJProblem::totalTravelActivityDurationHours,
             $totalTravelHours
         );
-
+        if($dsCallActivity->columnExists(DBEProblem::holdForQA)!=-1)
+        {
+            $problem->setValue(
+                DBEJProblem::holdForQA,
+                $dsCallActivity->getValue(DBEProblem::holdForQA)
+            );
+        }
 
         if (in_array($problem->getValue(DBEProblem::status), ["F", "C"])) {
             /** @var $db dbSweetcode */
@@ -7101,7 +7107,10 @@ class BUActivity extends Business
             DBEJProblem::linkedSalesOrderID,
             $ordheadID
         );
-
+        $dbeProblem->setValue(
+            DBEJProblem::holdForQA,
+            1
+        );
         $informCustomer = false;
         if ($dsInput->getValue(BURenContract::serviceRequestPriority) == 5) {
             $informCustomer = true;

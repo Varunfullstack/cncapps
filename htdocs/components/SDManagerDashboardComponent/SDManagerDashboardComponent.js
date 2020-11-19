@@ -46,6 +46,7 @@ class SDManagerDashboardComponent extends MainComponent {
             {id: 7, title: "Longest Open SR", icon: null},
             {id: 8, title: "Most Hours Logged", icon: null},
             {id: 9, title: "Customer", icon: null},
+            {id: 11, title: "Held for QA", icon: null},
             {id: 10, title: "Daily Stats", icon: null},
 
         ];
@@ -85,7 +86,7 @@ class SDManagerDashboardComponent extends MainComponent {
             {
                 key: "tab",
                 className: "tab-container",
-                style: {flexWrap: "wrap", justifyContent: "space-between", maxWidth: 1200}
+                style: {flexWrap: "wrap", justifyContent: "flex-start", maxWidth: 1300}
             },
             tabs.map((t) => {
                 return el(
@@ -94,7 +95,7 @@ class SDManagerDashboardComponent extends MainComponent {
                         key: t.id,
                         className: this.isActive(t.id) + " nowrap",
                         onClick: () => this.setActiveTab(t.id),
-                        style: {flex: "3 3 160px", flexBasis: 200}
+                        style: {width: 200}
                     },
                     t.title,
                     t.icon
@@ -186,7 +187,7 @@ class SDManagerDashboardComponent extends MainComponent {
         );
     };
     loadTab = (id) => {
-        if (id < 10) {
+        if ([1,2,3,4,5,6,7,8,9,11].indexOf(id)>=0) {
             this.loadAllocatedUsers();
             const {filter} = this.state;
             this.api.getQueue(id, filter)
@@ -227,8 +228,8 @@ class SDManagerDashboardComponent extends MainComponent {
     getQueueElement = () => {
         const {filter, queueData} = this.state;
         const {el} = this;
-        if (filter.activeTab < 9) {
-            const columns = [
+        if ([1,2,3,4,5,6,7,8,11].indexOf(filter.activeTab) >=0) {
+            let columns = [
                 {
                     hide: false,
                     order: 1,
@@ -366,6 +367,7 @@ class SDManagerDashboardComponent extends MainComponent {
                     className: "text-center",
                 },
                 {
+                    display:[11].indexOf(filter.activeTab)<0,
                     path: "",
                     label: "",
                     hdToolTip: "Allocate additional time",
@@ -383,6 +385,7 @@ class SDManagerDashboardComponent extends MainComponent {
                     }),
                 },
                 {
+                    display:[11].indexOf(filter.activeTab)<0,
                     path: "hoursRemainingForSLA",
                     label: "",
                     hdToolTip: "Open Hours",
@@ -437,6 +440,18 @@ class SDManagerDashboardComponent extends MainComponent {
                     content: (problem) => el('label', null, this.getTeamCode(problem.teamID)),
                 },
                 {
+                    display:[11].indexOf(filter.activeTab)>=0,
+                    path: "engineerName",
+                    label: "",
+                    key: "assignedUser",
+                    hdToolTip: "Service Request is assigned to this person",
+                    icon: "fal fa-2x fa-user-hard-hat color-gray2 ",
+                    sortable: false,
+                    hdClassName: "text-center",
+                    //content: (problem) => this.getAllocatedElement(problem, problem.teamID),
+                },
+                {
+                    display:[11].indexOf(filter.activeTab)<0,
                     path: "engineerName",
                     label: "",
                     key: "assignedUser",
@@ -447,6 +462,7 @@ class SDManagerDashboardComponent extends MainComponent {
                     content: (problem) => this.getAllocatedElement(problem, problem.teamID),
                 },
                 {
+                    display:[11].indexOf(filter.activeTab)<0,
                     path: "dateTime",
                     label: "",
                     key: "dateTime",
@@ -460,6 +476,7 @@ class SDManagerDashboardComponent extends MainComponent {
                     hdClassName: "text-center",
                 },
             ]
+            columns=columns.filter(c=>c.display==undefined || c.display==true);
             return el(Table, {
                 id: "queueData",
                 data: queueData || [],

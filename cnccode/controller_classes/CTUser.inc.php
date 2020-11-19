@@ -653,8 +653,11 @@ class CTUser extends CTCNC
                     $dsUser->getValue(DBEJUser::streamOneLicenseManagement)
                 ),
                 'execludeFromSDManagerDashboardChecked'         =>
-                    $dsUser->getValue(DBEUser::execludeFromSDManagerDashboard) ? 'checked' : null
+                    $dsUser->getValue(DBEUser::execludeFromSDManagerDashboard) ? 'checked' : null                
                 ,
+                'holdAllSRsforQAReviewChecked'            => $dsUser->getValue(
+                    DBEUser::holdAllSRsforQAReview
+                ) ? 'checked' : null,
             )
         );
         // manager selection

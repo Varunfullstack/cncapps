@@ -718,6 +718,17 @@
             </td>
         </tr>
         <tr>
+            <td class="promptText">Hold all SRs for QA Review</td>
+            <td class="fieldText">
+                <input name="user[1][holdAllSRsforQAReview]"
+                       type="checkbox"  
+                       value="true"                                          
+                       {DISABLED}
+                       {holdAllSRsforQAReviewChecked}
+                />
+            </td>
+        </tr>
+        <tr>
             <td class="promptText">&nbsp;</td>
             <td class="fieldText">&nbsp;</td>
         </tr>
@@ -997,7 +1008,7 @@
             <td colspan="2">
                 <h3>Specific Permissions</h3>
             </td>
-        </tr>
+        </tr>                
         <tr>
             <td class="promptText">Starter & Leaver question management</td>
             <td class="fieldText">
@@ -1089,7 +1100,7 @@
                 <input name="user[1][createRenewalSalesOrdersFlag]"
                        type="checkbox"
                        id="user[1][createRenewalSalesOrdersFlag]"
-                       value="Y"
+                       value="0"
                        {DISABLED}
                        {createRenewalSalesOrdersFlagChecked}
                 />

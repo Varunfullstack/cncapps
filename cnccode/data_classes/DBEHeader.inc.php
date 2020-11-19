@@ -111,7 +111,8 @@ class DBEHeader extends DBEntity
     const smallProjectsTeamManagementTimeApprovalMinutes = "smallProjectsTeamManagementTimeApprovalMinutes";
     const fixSLABreachWarningHours = "fixSLABreachWarningHours";
     const computerLastSeenThresholdDays = "computerLastSeenThresholdDays";
-
+    const holdAllSOSmallProjectsP5sforQAReview="holdAllSOSmallProjectsP5sforQAReview";
+    const holdAllSOProjectsP5sforQAReview="holdAllSOProjectsP5sforQAReview";
     /**
      * calls constructor()
      * @access public
@@ -620,6 +621,8 @@ class DBEHeader extends DBEntity
         $this->addColumn(self::smallProjectsTeamManagementTimeApprovalMinutes, DA_INTEGER, DA_NOT_NULL);
         $this->addColumn(self::fixSLABreachWarningHours, DA_FLOAT, DA_NOT_NULL, null, 2.5);
         $this->addColumn(self::computerLastSeenThresholdDays, DA_INTEGER, DA_NOT_NULL);
+        $this->addColumn(self::holdAllSOProjectsP5sforQAReview, DA_BOOLEAN, DA_NOT_NULL);
+        $this->addColumn(self::holdAllSOSmallProjectsP5sforQAReview, DA_BOOLEAN, DA_NOT_NULL);
 
         $this->setPK(0);
         $this->setAddColumnsOff();

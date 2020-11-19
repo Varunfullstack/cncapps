@@ -609,7 +609,8 @@ class CTSRActivity extends CTCNC
             $dsCallActivity->setValue(DBECallActivity::overtimeApprovedDate, null);
             $dsCallActivity->setValue(DBECallActivity::overtimeApprovedBy, null);
         }
-
+       
+     
         // if no end time set then set to time now
         if (
             $body->nextStatus != 'update' &&
@@ -643,6 +644,13 @@ class CTSRActivity extends CTCNC
                 http_response_code(400);
                 return ["error" => 'Can not fix, there are open activities on this request'];
             }
+            //check Hold all SRs for QA Review
+            if($this->dbeUser->getValue(DBEUser::holdAllSRsforQAReview)==1)
+            {
+                 
+                $dsCallActivity->addColumn(DBEProblem::holdForQA,DA_BOOLEAN,false);
+                $dsCallActivity->setValue(DBEProblem::holdForQA,1);
+            } 
         }
         $dsCallActivity->setUpdateModeUpdate();
         if (isset($body->submitAsOvertime)) {
