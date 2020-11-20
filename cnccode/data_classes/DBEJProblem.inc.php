@@ -35,6 +35,7 @@ class DBEJProblem extends DBEProblem
     const specialAttentionContactFlag      = "specialAttentionContactFlag";
     const referredFlag                     = "referredFlag";
     const lastEndTime                      = "lastEndTime";
+    const alarmDateTime                    = "alarmDateTime";
 
     /**
      * calls constructor()
@@ -223,6 +224,16 @@ class DBEJProblem extends DBEProblem
             DA_STRING,
             DA_ALLOW_NULL,
             'customer.cus_referred'
+        );
+        $this->addColumn(
+            self::alarmDateTime,
+            DA_DATETIME,
+            DA_ALLOW_NULL,
+            "            CONCAT(
+                pro_alarm_date,
+                ' ',
+                COALESCE(CONCAT(pro_alarm_time,':00'), '00:00:00')
+            )"
         );
         $this->setAddColumnsOff();
         $this->setPK(0);
@@ -421,8 +432,10 @@ class DBEJProblem extends DBEProblem
     function getRowsByQueue($queueNo)
     {
         $sql =
-            "SELECT {$this->getDBColumnNamesAsString()}
-            , pro_consno is not null as isAssigned FROM {$this->getTableName()}
+            "SELECT {$this->getDBColumnNamesAsString()}            , 
+       pro_consno is not null as isAssigned,
+pro_alarm_date is not null as hasAlarmDate
+FROM {$this->getTableName()}
              LEFT JOIN customer ON cus_custno = pro_custno
            LEFT JOIN consultant ON cns_consno = pro_consno
 
@@ -443,7 +456,8 @@ class DBEJProblem extends DBEProblem
 
           AND pro_queue_no = $queueNo";
 
-        $sql .= " order by hasAlarmDate asc,   isAssigned asc, {$this->getDBColumnName(self::dashboardSortColumn)} asc";
+        $sql .= " order by hasAlarmDate asc, CONCAT( pro_alarm_date, ' ', coalesce(concat(pro_alarm_time,':00') , '00:00:00') ) asc,   isAssigned asc, {$this->getDBColumnName(self::dashboardSortColumn)} asc";
+
         $this->setQueryString($sql);
         return (parent::getRows());
     }
@@ -1124,12 +1138,12 @@ class DBEJProblem extends DBEProblem
 
     public function alarmDateTime(): ?DateTimeInterface
     {
-        if (!$this->getValue(self::alarmDate)) {
+        if (!$this->getValue(self::alarmDateTime)) {
             return null;
         }
         $dateTime = DateTime::createFromFormat(
             DATE_MYSQL_DATETIME,
-            "{$this->getValue(self::alarmDate)} {$this->getValue(self::alarmTime)}:00"
+            $this->getValue(DBEJProblem::alarmDateTime)
         );
         if (!$dateTime) {
             return null;

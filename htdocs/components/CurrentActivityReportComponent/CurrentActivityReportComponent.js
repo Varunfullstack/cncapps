@@ -433,37 +433,38 @@ class CurrentActivityReportComponent extends MainComponent {
     }
 
     prepareResult = (result) => {
-        result.map((problem) => {
+        return result.map((problem) => {
             problem.workBtnTitle = getServiceRequestWorkTitle(problem);
-            problem.alarmDateTime = problem.alarmDateTime?.trim(" ");
-            problem.priorityClass = problem.priority === 1 ? 'priority-one' : '';
-            if (moment(problem.alarmDateTime) > moment()) {
-                delete problem.date;
-            }
-            delete problem.engineerDropDown;
-            delete problem.linkAllocateAdditionalTime;
-            delete problem.queueOptions;
-            delete problem.slaResponseHours;
-            delete problem.time;
-            delete problem.timeSpentColorClass;
-            delete problem.totalActivityDurationHours;
-            delete problem.updated;
-            delete problem.updatedBgColor;
-            delete problem.urlCustomer;
-            delete problem.urlProblemHistoryPopup;
-            delete problem.urlViewActivity;
-            delete problem.urlCustomer;
-            delete problem.urlCustomer;
-            delete problem.workOnClick;
+            return problem;
+            // problem.alarmDateTime = problem.alarmDateTime?.trim(" ");
+            // problem.priorityClass = problem.priority === 1 ? 'priority-one' : '';
+            // if (moment(problem.alarmDateTime) > moment()) {
+            //     delete problem.date;
+            // }
+            // delete problem.engineerDropDown;
+            // delete problem.linkAllocateAdditionalTime;
+            // delete problem.queueOptions;
+            // delete problem.slaResponseHours;
+            // delete problem.time;
+            // delete problem.timeSpentColorClass;
+            // delete problem.totalActivityDurationHours;
+            // delete problem.updated;
+            // delete problem.updatedBgColor;
+            // delete problem.urlCustomer;
+            // delete problem.urlProblemHistoryPopup;
+            // delete problem.urlViewActivity;
+            // delete problem.urlCustomer;
+            // delete problem.urlCustomer;
+            // delete problem.workOnClick;
         });
-        const emptyAlarm = result.filter((p) => p.alarmDateTime == null || p.alarmDateTime === '');
-        const old = result.filter((p) => moment(p.alarmDateTime) <= moment());
-        const feature = result
-            .filter((p) => moment(p.alarmDateTime) > moment())
-            .sort((a, b) =>
-                moment(a.alarmDateTime) > moment(b.alarmDateTime) ? 1 : -1
-            );
-        return [...old, ...emptyAlarm, ...feature];
+        // const emptyAlarm = result.filter((p) => p.alarmDateTime == null || p.alarmDateTime === '');
+        // const old = result.filter((p) => moment(p.alarmDateTime) <= moment());
+        // const feature = result
+        //     .filter((p) => moment(p.alarmDateTime) > moment())
+        //     .sort((a, b) =>
+        //         moment(a.alarmDateTime) > moment(b.alarmDateTime) ? 1 : -1
+        //     );
+        // return [...old, ...emptyAlarm, ...feature];
     };
     handleUserFilterOnSelect = (userId) => {
         const userFilter = userId;

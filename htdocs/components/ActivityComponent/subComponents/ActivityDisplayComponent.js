@@ -478,6 +478,7 @@ class ActivityDisplayComponent extends MainComponent {
         const dateLen = maxLength(data?.activities || [], 'date') + 10;
         const engineerLen = maxLength(data?.activities || [], 'enginner') + 10;
         const contactName = maxLength(data?.activities || [], 'contactName') + 10;
+        console.log(currentActivity);
         const indx = data?.activities.findIndex(a => a.callActivityID === currentActivity);
         return el('div', {className: "activities-container"},
             el('div', {style: {width: "100%", display: "flex", alignItems: "center", justifyContent: "center"}},
