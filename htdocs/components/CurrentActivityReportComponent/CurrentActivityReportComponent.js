@@ -96,7 +96,7 @@ class CurrentActivityReportComponent extends MainComponent {
                 code: 'PR',
                 queueNumber: 11,
                 order: 7,
-                display: true,
+                display: false,
                 icon: null,
                 canMove: false
             },
