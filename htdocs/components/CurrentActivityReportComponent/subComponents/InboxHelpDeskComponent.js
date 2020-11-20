@@ -35,32 +35,14 @@ class InboxHelpDeskComponent extends React.Component {
             ColumnRenderer.getWorkIconColumn(startWork, this.code),
             ColumnRenderer.getSpecialAttentionColumn(),
             ColumnRenderer.getFutureWorkColumn(),
-           ColumnRenderer.getRequestTimeColumn(requestAdditionalTime),
-            {
-                hide: false,
-                order: 3,
-                path: null,
-                key: "hoursRemainingIcon",
-                label: "",
-                sortable: false,
-                toolTip: "On Hold",
-                className: "text-center",
-                content: (problem) =>
-                    problem.hoursRemainingBgColor === "#BDF8BA"
-                        ? el("i", {
-                            className: "fal  fa-user-clock color-gray pointer inbox-icon",
-                            key: "icon",
-                            style: {float: "right"},
-                        })
-                        : null,
-            },
-
+            ColumnRenderer.getRequestTimeColumn(requestAdditionalTime),
+            ColumnRenderer.getOnHoldColumn(),
             ColumnRenderer.getSLABreachedColumn(),
             {
                 hide: false,
                 order: 8,
                 path: "hoursRemainingForSLA",
-                key: "hoursRemainingLabel",
+                key: "hoursRemainingForSLA",
                 label: "",
                 hdToolTip: "Hours the Service Request has been open",
                 icon: "fal fa-2x  fa-clock color-gray2 ",
@@ -72,7 +54,7 @@ class InboxHelpDeskComponent extends React.Component {
                     el(
                         "label",
                         {key: "label", style: {verticalAlign: "middle"}},
-                        problem.hoursRemaining
+                        problem.hoursRemainingForSLA
                     ),
                 ],
             },

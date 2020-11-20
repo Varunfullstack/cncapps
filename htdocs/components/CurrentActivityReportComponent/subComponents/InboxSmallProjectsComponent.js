@@ -43,7 +43,7 @@ class InboxSmallProjectsComponent extends React.Component {
                 hide: false,
                 order: 8,
                 path: "hoursRemainingForSLA",
-                key: "hoursRemainingLabel",
+                key: "hoursRemainingForSLA",
                 label: "",
                 hdToolTip: "Hours the Service Request has been open",
                 icon: "fal fa-2x  fa-clock color-gray2 ",
@@ -55,7 +55,7 @@ class InboxSmallProjectsComponent extends React.Component {
                     el(
                         "label",
                         {key: "label", style: {verticalAlign: "middle"}},
-                        problem.hoursRemaining
+                        problem.hoursRemainingForSLA
                     ),
                 ],
             },
