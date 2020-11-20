@@ -456,7 +456,7 @@ FROM {$this->getTableName()}
 
           AND pro_queue_no = $queueNo";
 
-        $sql .= " order by hasAlarmDate asc, CONCAT( pro_alarm_date, ' ', coalesce(concat(pro_alarm_time,':00') , '00:00:00') ) asc,   isAssigned asc, {$this->getDBColumnName(self::dashboardSortColumn)} asc";
+        $sql .= " order by hasAlarmDate asc, CONCAT( pro_alarm_date, ' ', coalesce(concat(pro_alarm_time,':00') , '00:00:00') ) asc,   isAssigned asc, {$this->getDBColumnName(self::workingHours)} desc";
 
         $this->setQueryString($sql);
         return (parent::getRows());
