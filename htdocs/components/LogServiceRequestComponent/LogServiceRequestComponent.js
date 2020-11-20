@@ -12,7 +12,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './LogServiceRequestComponent.css'
 import './../style.css';
-
+import '../shared/ToolTip.css'
 
 export default class LogServiceRequestComponent extends MainComponent {
     el = React.createElement;

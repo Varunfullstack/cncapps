@@ -9,6 +9,8 @@ import ToolTip from "../../shared/ToolTip.js";
 import {groupBy, params} from "../../utils/utils.js";
 import ActivityDocumentsComponent from "./ActivityDocumentsComponent.js";
 
+import React from 'react';
+
 class GatherFixedInformationComponent extends MainComponent {
     el = React.createElement;
 
@@ -154,7 +156,7 @@ class GatherFixedInformationComponent extends MainComponent {
 
     getContracts = () => {
         const {el} = this;
-        const {activity, contracts, data} = this.state;
+        const { contracts, data} = this.state;
 
         return el(
             "select",
@@ -189,7 +191,7 @@ class GatherFixedInformationComponent extends MainComponent {
     };
     getRootCause = () => {
         const {el} = this;
-        const {activity, rootCauses, data} = this.state;
+        const { rootCauses, data} = this.state;
 
         return el(
             "select",
@@ -218,7 +220,7 @@ class GatherFixedInformationComponent extends MainComponent {
             callActivityID: activity?.callActivityID
         });
     };
-    handleDocumentsUploads = async (result) => {
+    handleDocumentsUploads = async () => {
         const {activity} = this.state;
         const documents = await this.apiActivity.getDocuments(activity.callActivityID, activity.problemID);
         this.setState({documents});

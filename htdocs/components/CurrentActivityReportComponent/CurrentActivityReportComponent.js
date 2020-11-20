@@ -16,6 +16,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import '../style.css';
+import '../shared/ToolTip.css'
 import moment from "moment";
 
 class CurrentActivityReportComponent extends MainComponent {

@@ -3,7 +3,7 @@ import * as React from "react";
 import APIActivity from "../../services/APIActivity.js";
 import { groupBy, params } from "../../utils/utils.js";
 import Spinner from "../../shared/Spinner/Spinner.js";
- 
+
 class TimeBreakdownComponent extends MainComponent {
   el = React.createElement;
   api = new APIActivity();

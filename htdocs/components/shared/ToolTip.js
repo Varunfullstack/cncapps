@@ -1,5 +1,7 @@
 import React from 'react';
 
+import './ToolTip.css';
+
 class ToolTip extends React.Component {
     el = React.createElement;
 

@@ -1825,7 +1825,7 @@ class ActivityEditComponent extends MainComponent {
                 options: noAssetStandardTextItems,
                 value: data.emptyAssetReason,
                 show: emptyAssetReasonModalShowing,
-                title: "Please provide the reason of not listing an asset",
+                title: "Please provide the reason of not listing an asset test",
                 okTitle: "OK",
                 onChange: (value) => {
                     if(!value) {
