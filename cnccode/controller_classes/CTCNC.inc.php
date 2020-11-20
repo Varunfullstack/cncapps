@@ -230,8 +230,8 @@ class CTCNC extends Controller
 {
     var $userID;
     /** @var DBEUser */
-    public $dbeUser;
-    var $dbeTeam;
+    public  $dbeUser;
+    var     $dbeTeam;
     private $user;
     /**
      * @var FavouriteMenu
@@ -245,7 +245,7 @@ class CTCNC extends Controller
                          $cfg
     )
     {
-        
+
         if ($this->getParam('action')) {
             $this->setAction($this->getAction());
         }
@@ -264,7 +264,7 @@ class CTCNC extends Controller
         $this->favouriteMenu = new FavouriteMenu($this->userID);
 
         $this->user = new BUUser($this);
-       
+
         parent::__construct(
             $requestMethod,
             $postVars,
@@ -358,66 +358,74 @@ class CTCNC extends Controller
             )
         );
 
+        $technicalSection = [
+            "key"  => "Technical",
+            "icon" => 'fal fa-laptop',
+        ];
+
         if ($this->hasPermissions(TECHNICAL_PERMISSION)) {
-            $menu->addSection("Technical", 'fal fa-laptop', $this->getDefaultTechnicalMenu(), null);
+            $menu->addSection($technicalSection['key'], $technicalSection['icon'], $this->getDefaultTechnicalMenu());
         }
 
         $this->addConditionalMenu(
             $menu,
-            'fal fa-laptop',
-            "Technical",
+            $technicalSection['icon'],
+            $technicalSection['key'],
             $this->isStarterLeaverManger(),
             114,
             "Starter Leaver Management",
             "StarterLeaverManagement.php"
         );
 
+        $SDManagerSection = [
+            "key"   => "SDManagement",
+            "icon"  => 'fal fa-chalkboard-teacher',
+            "label" => "SD Management",
+        ];
 
         if ($this->isUserSDManager()) {
             $menu->addSection(
-                "SDManagement",
-                'fal fa-chalkboard-teacher',
+                $SDManagerSection["key"],
+                $SDManagerSection["icon"],
                 $this->getDefaultSDManagerMenu(),
-                "SD Management"
+                $SDManagerSection["label"],
             );
         }
 
 
         $this->addConditionalMenu(
             $menu,
-            'fa-chalkboard-teacher',
-            "SDManagement",
+            $SDManagerSection["icon"],
+            $SDManagerSection["key"],
             $this->isAppraiser(),
             223,
             "Staff Appraisals",
             "StaffAppraisalQuestionnaire.php",
-            "SD Management"
+            $SDManagerSection["label"]
         );
 
+        $salesSection = [
+            "key"  => "Sales",
+            "icon" => 'fal fa-tag',
+        ];
 
         if ($this->hasPermissions(SALES_PERMISSION)) {
-            $menu->addSection("Sales", 'fal fa-tag', $this->getDefaultSalesMenu());
+            $menu->addSection($salesSection['key'], $salesSection['icon'], $this->getDefaultSalesMenu());
             $this->addConditionalMenu(
                 $menu,
-                'fal fa-tag',
-                "Sales",
+                $salesSection['icon'],
+                $salesSection['key'],
                 $this->dbeUser->getValue(DBEUser::streamOneLicenseManagement) == 1,
                 313,
                 "StreamOne Licenses",
                 "CustomerLicenses.php?action=searchCustomers"
             );
-
-            // [
-            //     "id"    => 312,
-            //     "label" => "StreamOne Licenses",
-            //     "href"  => "CustomerLicenses.php?action=searchCustomers",
-            // ],
         }
 
         $this->addConditionalMenu(
             $menu,
-            'fa-tag',
-            "Sales",
+            $salesSection['icon'],
+            $salesSection['key'],
             $this->dbeUser->getValue(DBEUser::createRenewalSalesOrdersFlag) == 'Y',
             312,
             "Create Renewals Sales Orders",
@@ -458,24 +466,21 @@ class CTCNC extends Controller
             $menu->addSection("Management", 'fal fa-project-diagram', $this->getDefaultManagementMenu());
         }
 
-        $this->addConditionalMenu(
-            $menu,
-            'fal fa-user',
+        $menu->addSection(
             $this->getDbeUser()->getValue(DBEUser::name),
-            true,
-            1001,
-            "Expenses/Overtime",
-            "ExpenseDashboard.php"
-        );
-
-        $this->addConditionalMenu(
-            $menu,
             'fal fa-user',
-            $this->getDbeUser()->getValue(DBEUser::name),
-            true,
-            1002,
-            "My Account",
-            "MySettings.php"
+            [
+                [
+                    "id"    => 1001,
+                    "label" => "Expenses/Overtime",
+                    "href"  => "ExpenseDashboard.php",
+                ],
+                [
+                    "id"    => 1002,
+                    "label" => "My Account",
+                    "href"  => "MySettings.php",
+                ],
+            ]
         );
 
         global $twig;
@@ -486,7 +491,6 @@ class CTCNC extends Controller
             ["favouriteItems" => $menu->getFavouriteItems()]
         );
         $this->template->setVar('favouritesMenuItems', $favouriteItemsHTML);
-        //$this->loadReactCSS("modal.css");
         parent::parsePage();
     }
 
@@ -1176,8 +1180,8 @@ class CTCNC extends Controller
 
     function getLabtechDB()
     {
-        $dsn = 'mysql:host=' . LABTECH_DB_HOST . ';dbname=' . LABTECH_DB_NAME;
-        $options = [
+        $dsn       = 'mysql:host=' . LABTECH_DB_HOST . ';dbname=' . LABTECH_DB_NAME;
+        $options   = [
             PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
         ];
         $labtechDB = new PDO(
@@ -1227,7 +1231,7 @@ class CTCNC extends Controller
 
     protected function fetchAll($query, $params)
     {
-        $db = new PDO(
+        $db   = new PDO(
             'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8',
             DB_USER,
             DB_PASSWORD

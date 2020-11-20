@@ -426,7 +426,7 @@ class ActivityEditComponent extends MainComponent {
                 data.projects.map((p) =>
                     el(
                         "a",
-                        {key: p.projectID, href: p.editUrl, className: "link-round mr-4"},
+                        {key: p.projectID, href: p.editUrl, className: "link-round mr-4", target:'_blank'},
                         p.description
                     )
                 )

@@ -3,6 +3,8 @@ import Spinner from "../../shared/Spinner/Spinner";
 import APICustomers from "../../services/APICutsomer";
 import React from 'react';
 
+import './CustomerSearchComponent.css';
+
 class CustomerSearchComponent extends React.Component {
     el = React.createElement;
     apiCutsomer = new APICustomers();
@@ -97,7 +99,7 @@ class CustomerSearchComponent extends React.Component {
                 icon: "fal fa-2x fa-building color-gray2 ",
                 sortable: false,
                 width: "220",
-                hdClassName: "text-center",
+                hdClassName: "",
                 textColorColumn: "color",
                 content: (customer) =>
                     el(
@@ -117,7 +119,7 @@ class CustomerSearchComponent extends React.Component {
                 hdToolTip: "Customer Site",
                 icon: "fal fa-2x  fa-location color-gray2 ",
                 sortable: false,
-                hdClassName: "text-center",
+                hdClassName: "",
                 textColorColumn: "color",
                 content: (customer) =>
                     el(
@@ -137,7 +139,7 @@ class CustomerSearchComponent extends React.Component {
                 hdToolTip: "Contact",
                 icon: "fal fa-2x  fa-user color-gray2 ",
                 sortable: false,
-                hdClassName: "text-center",
+                hdClassName: "",
                 textColorColumn: "color",
                 content: (customer) =>
                     el(
@@ -157,7 +159,7 @@ class CustomerSearchComponent extends React.Component {
                 hdToolTip: "Position",
                 icon: "fal fa-2x  fa-id-card-alt color-gray2 ",
                 sortable: false,
-                hdClassName: "text-center",
+                hdClassName: "",
                 textColorColumn: "color",
                 content: (customer) =>
                     el(
@@ -177,7 +179,7 @@ class CustomerSearchComponent extends React.Component {
                 hdToolTip: "Support Level",
                 icon: "fal fa-2x fa-layer-group color-gray2 ",
                 sortable: false,
-                hdClassName: "text-center",
+                hdClassName: "",
                 textColorColumn: "color",
                 content: (customer) =>
                     el(
@@ -197,7 +199,7 @@ class CustomerSearchComponent extends React.Component {
                 hdToolTip: "Contact Phone",
                 icon: "fal fa-2x fa-phone color-gray2 ",
                 sortable: false,
-                hdClassName: "text-center",
+                hdClassName: "",
                 textColorColumn: "color",
                 content: (customer) =>
                     el(
@@ -217,7 +219,7 @@ class CustomerSearchComponent extends React.Component {
                 hdToolTip: "Notes",
                 icon: "fal fa-2x fa-file-alt color-gray2 ",
                 sortable: false,
-                hdClassName: "text-center",
+                hdClassName: "",
                 textColorColumn: "color",
                 content: (customer) =>
                     el(
@@ -246,7 +248,7 @@ class CustomerSearchComponent extends React.Component {
     render() {
         const {el, getSearchElement, getCustomersElement} = this;
         const {_showSpinner} = this.state;
-        return el("div", null,
+        return el("div", {className: "customer-search-component"},
             el(Spinner, {show: _showSpinner}),
             getSearchElement(),
             getCustomersElement());

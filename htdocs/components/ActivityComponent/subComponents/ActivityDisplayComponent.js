@@ -98,6 +98,7 @@ class ActivityDisplayComponent extends MainComponent {
                     data.projects.map(p => (
                             <a key={p.projectID}
                                href={p.editUrl}
+                               target='_blank'
                                className="link-round mr-4"
                             >{p.description}
                             </a>
