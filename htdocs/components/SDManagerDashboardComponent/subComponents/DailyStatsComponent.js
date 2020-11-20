@@ -37,7 +37,6 @@ class DailyStatsComponent extends MainComponent {
 
     loadDashBoard = () => {
         this.apiSDManagerDashboard.getDailyStatsSummary().then((result) => {
-
             this.loading = false;
             this.setState({showSpinner: false, summary: result});
         });
