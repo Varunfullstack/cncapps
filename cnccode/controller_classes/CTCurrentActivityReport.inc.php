@@ -157,7 +157,7 @@ class CTCurrentActivityReport extends CTCNC
         } else if ($queueNo == self::CUSTOMER_OPEN_SR) {
             $serviceRequests = $this->buActivity->getCustomerOpenSR($_REQUEST["customerID"]);
         } else {
-            $serviceRequests = $this->buActivity->getProblemsByQueueNoWithFuture($queueNo);
+            $serviceRequests = $this->buActivity->getProblemsByQueue($queueNo);
         }
 
         $result = [];

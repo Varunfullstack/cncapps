@@ -26,7 +26,6 @@ class TimeBreakdownComponent extends MainComponent {
     }
 
     getTimeBreakdownElement = () => {
-        const {el} = this;
         const {data} = this.state;
         const dataGroup = groupBy(data, "cat_desc");
         const users = data.map(d => d.sname).reduce((prev, cur) => {
@@ -34,7 +33,6 @@ class TimeBreakdownComponent extends MainComponent {
                 prev.push(cur);
             return prev;
         }, []);
-        //console.log("users",users,dataGroup);
         if (data.length == 0)
             return <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}><h2>There has been no
                 time logged against this request yet.</h2></div>
@@ -48,7 +46,7 @@ class TimeBreakdownComponent extends MainComponent {
                     alignItems: "center",
                 }}
             >
-                <table className="table table">
+                <table className="table oddRows">
                     <thead>
                     <tr>
                         <th className="text-align-left">Activity</th>
@@ -113,7 +111,7 @@ class TimeBreakdownComponent extends MainComponent {
                     </tr>
                     </tbody>
                 </table>
-                <table className="table table  "
+                <table className="table oddRows"
                        style={{marginTop: 20}}
                 >
                     <tbody style={{fontWeight: "bold"}}>

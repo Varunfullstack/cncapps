@@ -1,5 +1,5 @@
 import CKEditor from "../../shared/CKEditor.js";
-import APICustomers from "../../services/APICutsomer.js";
+import APICustomers from "../../services/ApiCustomers.js";
 import Spinner from "../../shared/Spinner/Spinner";
 import {padEnd, sort} from "../../utils/utils.js";
 import MainComponent from "../../shared/MainComponent.js";
@@ -7,7 +7,7 @@ import React from 'react';
 
 class CustomerSiteComponent extends MainComponent {
     el = React.createElement;
-    apiCutsomer = new APICustomers();
+    apicustomer = new APICustomers();
 
     constructor(props) {
         super(props);
@@ -32,12 +32,12 @@ class CustomerSiteComponent extends MainComponent {
     }
 
     componentDidMount = async () => {
-        const {apiCutsomer} = this;
+        const {apicustomer} = this;
         const {data} = this.state;
         this.showSpinner();
         const result = await Promise.all([
-            apiCutsomer.getCustomerSites(this.props.customerId),
-            apiCutsomer.getCustomerAssets(this.props.customerId),
+            apicustomer.getCustomerSites(this.props.customerId),
+            apicustomer.getCustomerAssets(this.props.customerId),
         ]);
 
         const sites = result[0];

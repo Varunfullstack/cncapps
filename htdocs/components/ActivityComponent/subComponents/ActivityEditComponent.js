@@ -2,7 +2,7 @@ import APIActivity from "../../services/APIActivity.js";
 import APICallactType from "../../services/APICallactType.js";
 import {groupBy, isEmptyTime, params, pick, sort} from "../../utils/utils.js";
 import ToolTip from "../../shared/ToolTip.js";
-import APICustomers from "../../services/APICutsomer.js";
+import APICustomers from "../../services/APICustomers.js";
 import APIUser from "../../services/APIUser.js";
 import CountDownTimer from "../../shared/CountDownTimer.js";
 import MainComponent from "../../shared/MainComponent.js";

@@ -122,22 +122,22 @@ define(
 
 class CTCustomer extends CTCNC
 {
-    const GET_CUSTOMER_REVIEW_CONTACTS = "getCustomerReviewContacts";
-    const DECRYPT = "decrypt";
-    const contactFormTitleClass = 'TitleClass';
-    const contactFormFirstNameClass = 'FirstNameClass';                      // Used when searching for an entity by string
-    const contactFormLastNameClass = 'LastNameClass';                      // Used when searching for an entity by string
-    const contactFormEmailClass = 'EmailClass';                      // Used when searching for an entity by string
-    const contactFormHasPassword = 'hasPassword';                      // Used when searching for an entity by string
-    const siteFormAdd1Class = 'Add1Class';                      // Used when searching for an entity by string
-    const siteFormTownClass = 'TownClass';                      // Used when searching for an entity by string
-    const siteFormPostcodeClass = 'PostcodeClass';                      // Used when searching for an entity by string
-    const customerFormNameClass = 'NameClass';                                // Used when searching for customer
-    const customerFormInvoiceSiteMessage = 'InvoiceSiteMessage';
-    const customerFormDeliverSiteMessage = 'DeliverSiteMessage';
-    const customerFormSectorMessage = 'SectorMessage';
+    const GET_CUSTOMER_REVIEW_CONTACTS               = "getCustomerReviewContacts";
+    const DECRYPT                                    = "decrypt";
+    const contactFormTitleClass                      = 'TitleClass';
+    const contactFormFirstNameClass                  = 'FirstNameClass';                      // Used when searching for an entity by string
+    const contactFormLastNameClass                   = 'LastNameClass';                      // Used when searching for an entity by string
+    const contactFormEmailClass                      = 'EmailClass';                      // Used when searching for an entity by string
+    const contactFormHasPassword                     = 'hasPassword';                      // Used when searching for an entity by string
+    const siteFormAdd1Class                          = 'Add1Class';                      // Used when searching for an entity by string
+    const siteFormTownClass                          = 'TownClass';                      // Used when searching for an entity by string
+    const siteFormPostcodeClass                      = 'PostcodeClass';                      // Used when searching for an entity by string
+    const customerFormNameClass                      = 'NameClass';                                // Used when searching for customer
+    const customerFormInvoiceSiteMessage             = 'InvoiceSiteMessage';
+    const customerFormDeliverSiteMessage             = 'DeliverSiteMessage';
+    const customerFormSectorMessage                  = 'SectorMessage';
     const customerFormSpecialAttentionEndDateMessage = 'specialAttentionEndDateMessage';
-    const customerFormLastReviewMeetingDateMessage = 'lastReviewMeetingDateMessage';
+    const customerFormLastReviewMeetingDateMessage   = 'lastReviewMeetingDateMessage';
     public $customerID;
     public $customerString;
     public $contactString;
@@ -155,7 +155,7 @@ class CTCustomer extends CTCNC
     public $siteNo;
     public $contactID;
     public $dsHeader;
-    var $orderTypeArray = array(
+    var    $orderTypeArray = array(
         "I" => "Initial",
         "Q" => "Quotation",
         "P" => "Part Despatched",
@@ -199,7 +199,7 @@ class CTCustomer extends CTCNC
 
         $this->setMenuId(303);
         $this->buCustomer = new BUCustomer($this);
-        $this->dsContact = new DataSet($this);
+        $this->dsContact  = new DataSet($this);
         $this->dsContact->copyColumnsFrom($this->buCustomer->dbeContact);
         $this->dsContact->addColumn(
             self::contactFormTitleClass,
@@ -381,7 +381,7 @@ class CTCustomer extends CTCNC
                 );
             }
             $validEmail = true;
-            $email = !@$value['email'] ? null : $value['email'];
+            $email      = !@$value['email'] ? null : $value['email'];
 
 
             $this->dsContact->setValue(
@@ -1038,7 +1038,7 @@ class CTCustomer extends CTCNC
                 } catch (Exception $exception) {
                     http_response_code(400);
                     $response["status"] = "error";
-                    $response["error"] = $exception->getMessage();
+                    $response["error"]  = $exception->getMessage();
                 }
 
                 echo json_encode($response);
@@ -1051,7 +1051,7 @@ class CTCustomer extends CTCNC
                 } catch (Exception $exception) {
                     http_response_code(400);
                     $response["status"] = "error";
-                    $response["error"] = $exception->getMessage();
+                    $response["error"]  = $exception->getMessage();
                 }
 
                 echo json_encode($response);
@@ -1059,12 +1059,12 @@ class CTCustomer extends CTCNC
             case self::GET_CUSTOMER_REVIEW_CONTACTS:
                 $response = [];
                 try {
-                    $response['data'] = $this->getCustomerReviewContacts();
+                    $response['data']   = $this->getCustomerReviewContacts();
                     $response["status"] = "ok";
                 } catch (Exception $exception) {
                     http_response_code(400);
                     $response["status"] = "error";
-                    $response["error"] = $exception->getMessage();
+                    $response["error"]  = $exception->getMessage();
                 }
 
                 echo json_encode($response);
@@ -1079,27 +1079,27 @@ class CTCustomer extends CTCNC
                     );
                 } catch (Exception $exception) {
                     $response['status'] = "error";
-                    $response['error'] = $exception->getMessage();
+                    $response['error']  = $exception->getMessage();
                     http_response_code(400);
                 }
                 echo json_encode($response);
                 break;
             case "removeSupportAndRefer":
                 $customerID = @$this->getParam('customerID');
-                $response = ['status' => 'ok'];
+                $response   = ['status' => 'ok'];
                 try {
                     $this->removeSupportForAllUsersAndReferCustomer($customerID);
                 } catch (Exception $exception) {
                     $response['status'] = "error";
-                    $response['error'] = $exception->getMessage();
+                    $response['error']  = $exception->getMessage();
                     http_response_code(400);
                 }
                 echo json_encode($response);
                 break;
             case 'searchName':
                 $itemsPerPage = 20;
-                $page = 1;
-                $term = '';
+                $page         = 1;
+                $term         = '';
                 if (isset($_REQUEST['term'])) {
                     $term = $_REQUEST['term'];
                 }
@@ -1111,7 +1111,7 @@ class CTCustomer extends CTCNC
                 if (isset($_REQUEST['page'])) {
                     $page = $_REQUEST['page'];
                 }
-                $dsResult = new DataSet($this);
+                $dsResult   = new DataSet($this);
                 $buCustomer = new BUCustomer($this);
                 $buCustomer->getActiveCustomers($dsResult);
                 $customers = [];
@@ -1129,32 +1129,32 @@ class CTCustomer extends CTCNC
             case "getCurrentUser":
                 echo $this->getCurrentUser();
                 exit;
-            case "searchCustomers": 
+            case "searchCustomers":
                 echo json_encode($this->searchCustomers());
-                exit;  
-            case "getCustomerSR": 
+                exit;
+            case "getCustomerSR":
                 echo json_encode($this->getCustomerSR());
-                exit;                
+                exit;
                 break;
-            case "getCustomerSites": 
+            case "getCustomerSites":
                 echo json_encode($this->getCustomerSites());
-                exit;                
+                exit;
                 break;
-            case "getCustomerAssets": 
+            case "getCustomerAssets":
                 echo json_encode($this->getCustomerAssets());
-                exit;                
-                break;    
-            case "contacts": 
+                exit;
+                break;
+            case "contacts":
                 echo json_encode($this->getCustomerContacts());
-                exit;                
-                break; 
-            case "projects": 
+                exit;
+                break;
+            case "projects":
                 echo json_encode($this->getCustomerProjects());
-                exit;                
-                break; 
+                exit;
+                break;
             case "contracts":
-                    echo json_encode($this->getCustomerContracts());
-                    exit;
+                echo json_encode($this->getCustomerContracts());
+                exit;
             case "getCustomersHaveOpenSR":
                 echo json_encode($this->getCustomersHaveOpenSR());
                 exit;
@@ -1472,11 +1472,11 @@ class CTCustomer extends CTCNC
         );
 // Parameters
         $this->setPageTitle("Customer");
-        $submitURL = Controller::buildLink(
+        $submitURL        = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array('action' => CTCUSTOMER_ACT_SEARCH)
         );
-        $createURL = Controller::buildLink(
+        $createURL        = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array('action' => CTCUSTOMER_ACT_ADDCUSTOMER)
         );
@@ -1560,7 +1560,7 @@ class CTCustomer extends CTCNC
     function displayEditForm()
     {
         $this->setMethodName('displayEditForm');
-        $deleteCustomerURL = null;
+        $deleteCustomerURL  = null;
         $deleteCustomerText = null;
         if ($this->getAction() != CTCUSTOMER_ACT_ADDCUSTOMER) {
             if ((!$this->formError) && ($this->getAction(
@@ -1580,7 +1580,7 @@ class CTCustomer extends CTCNC
                 $this->getCustomerID(),
                 $this->userID
             )) {
-                $deleteCustomerURL = Controller::buildLink(
+                $deleteCustomerURL  = Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'     => CTCUSTOMER_ACT_DELETECUSTOMER,
@@ -1693,7 +1693,7 @@ class CTCustomer extends CTCNC
                         'customerID' => $this->getCustomerID(),
                     )
                 );
-            $customerFolderLink =
+            $customerFolderLink      =
                 '<a href="' . $urlCreateCustomerFolder . '" title="Create Folder">Create Customer Folder</a>';
         }
         $renewalLinkURL =
@@ -1739,7 +1739,7 @@ class CTCustomer extends CTCNC
                     'showInactiveContacts' => '1'
                 )
             );
-        $showInactiveSitesURL =
+        $showInactiveSitesURL    =
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
@@ -1748,7 +1748,7 @@ class CTCustomer extends CTCNC
                     'showInactiveSites' => '1'
                 )
             );
-        $bodyTagExtras = 'onLoad="loadNote(\'last\')"';
+        $bodyTagExtras           = 'onLoad="loadNote(\'last\')"';
 
         $urlContactPopup =
             Controller::buildLink(
@@ -1790,7 +1790,7 @@ class CTCustomer extends CTCNC
         }
 
 
-        $buItem = new BUCustomerItem($this);
+        $buItem           = new BUCustomerItem($this);
         $forceDirectDebit = false;
         if ($this->dsCustomer->getValue(DBECustomer::customerID)) {
             $forceDirectDebit = $buItem->clientHasDirectDebit($this->dsCustomer->getValue(DBECustomer::customerID));
@@ -2246,7 +2246,7 @@ class CTCustomer extends CTCNC
                     CTCUSTOMER_CLS_TABLE_EDIT_HEADER_UC
                 );
             }
-            $addContactURL =
+            $addContactURL  =
                 Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
@@ -2255,14 +2255,14 @@ class CTCustomer extends CTCNC
                         'siteNo'     => $this->dsSite->getValue(DBESite::siteNo)
                     )
                 );
-            $deleteSiteURL = null;
+            $deleteSiteURL  = null;
             $deleteSiteText = null;
             // If we can delete this site set the link
             if ($this->buCustomer->canDeleteSite(
                 $this->dsSite->getValue(DBESite::customerID),
                 $this->dsSite->getValue(DBESite::siteNo)
             )) {
-                $deleteSiteURL = Controller::buildLink(
+                $deleteSiteURL  = Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'     => CTCUSTOMER_ACT_DELETESITE,
@@ -2477,13 +2477,13 @@ class CTCustomer extends CTCNC
 
         } // end foreach
 
-        $mainCount = 0;
+        $mainCount       = 0;
         $supervisorCount = 0;
-        $supportCount = 0;
-        $delegateCount = 0;
-        $furloughCount = 0;
-        $noLevelCount = 0;
-        $totalCount = 0;
+        $supportCount    = 0;
+        $delegateCount   = 0;
+        $furloughCount   = 0;
+        $noLevelCount    = 0;
+        $totalCount      = 0;
 
         while ($this->dsContact->fetchNext()) {
 
@@ -2504,8 +2504,8 @@ class CTCustomer extends CTCNC
                 'customLetters',
                 null
             );
-            $dearJohnURL = null;
-            $dmLetterURL = null;
+            $dearJohnURL       = null;
+            $dmLetterURL       = null;
             $deleteContactLink = null;
 
             if ($this->dsContact->getValue(DBEContact::contactID)) {
@@ -2543,14 +2543,14 @@ class CTCustomer extends CTCNC
                 /** @noinspection HtmlDeprecatedAttribute */
                 $deleteContactLink =
                     '<a href="' . $deleteContactURL . '"><img align=middle border=0 hspace=2 src="images/icondelete.gif" alt="Delete contact" onClick="if(!confirm(\'Are you sure you want to delete this contact?\')) return(false)"></a>';
-                $dearJohnURL =
+                $dearJohnURL       =
                     Controller::buildLink(
                         'DearJohnForm.php',
                         array(
                             'contactID' => $this->dsContact->getValue(DBEContact::contactID)
                         )
                     );
-                $dmLetterURL =
+                $dmLetterURL       =
                     Controller::buildLink(
                         'DMLetterForm.php',
                         array(
@@ -2929,7 +2929,7 @@ class CTCustomer extends CTCNC
 
         while ($dbeSite->fetchNext()) {
             $siteSelected = ($siteNo == $dbeSite->getValue(DBESite::siteNo)) ? CT_SELECTED : null;
-            $siteDesc = $dbeSite->getValue(DBESite::siteNo);
+            $siteDesc     = $dbeSite->getValue(DBESite::siteNo);
 
             $this->template->set_var(
                 array(
@@ -3294,7 +3294,7 @@ class CTCustomer extends CTCNC
     protected function saveContactPassword()
     {
         $contactID = $this->getParam('contactID');
-        $password = $this->getParam('password');
+        $password  = $this->getParam('password');
 
         if (!$contactID || !$password) {
             throw new Exception("Contact ID and Password required");
@@ -3371,6 +3371,329 @@ class CTCustomer extends CTCNC
         return $this->buCustomer->removeSupportForAllUsersAndReferCustomer($customerID);
     }
 
+    function getCurrentUser()
+    {
+        return json_encode(
+            [
+                'firstName'   => $this->dbeUser->getValue(DBEJUser::firstName),
+                'lastName'    => $this->dbeUser->getValue(DBEJUser::lastName),
+                'id'          => $this->dbeUser->getValue(DBEJUser::userID),
+                'email'       => $this->dbeUser->getEmail(),
+                'isSdManager' => $this->isSdManager(),
+            ]
+        );
+    }
+
+    /**
+     * search customer by name and contact name
+     * @return array
+     */
+    function searchCustomers()
+    {
+        $q = $_GET["q"];
+        if (!$db = mysqli_connect(
+            DB_HOST,
+            DB_USER,
+            DB_PASSWORD
+        )) {
+            echo 'Could not connect to mysql host ' . DB_HOST;
+            exit;
+        }
+
+        $query =
+            "SELECT 
+                cus_custno,
+                cus_name,
+                con_contno,
+                add_town AS site_name,
+                concat(contact.con_first_name,' ',contact.con_last_name) contact_name,                
+                contact.con_first_name,
+                contact.con_last_name,
+                contact.con_phone,
+                contact.con_notes,
+                address.add_phone,
+                supportLevel,
+                con_position,
+                cus_referred,
+                specialAttentionContactFlag = 'Y' as specialAttentionContact,
+                (
+                SELECT
+                    COUNT(*)
+                FROM
+                    problem
+                WHERE
+                    pro_custno = cus_custno
+                    AND pro_status IN( 'I', 'P')
+                ) AS openSrCount,
+                (SELECT cui_itemno IS NOT NULL FROM custitem WHERE custitem.`cui_itemno` = 4111 AND custitem.`declinedFlag` <> 'Y' AND custitem.`cui_custno` = customer.`cus_custno` and renewalStatus  <> 'D' limit 1) AS hasPrepay,
+                (SELECT item.`itm_desc` FROM custitem LEFT JOIN item ON cui_itemno = item.`itm_itemno` WHERE itm_desc LIKE '%servicedesk%' AND custitem.`declinedFlag` <> 'Y' AND custitem.`cui_custno` = customer.`cus_custno` limit 1 ) AS hasServiceDesk,
+                cus_special_attention_flag specialAttentionCustomer
+                FROM customer
+    
+                JOIN contact ON con_custno = cus_custno
+                JOIN address ON add_custno = cus_custno AND add_siteno = con_siteno
+                WHERE supportLevel is not null ";
+        if ($q && $q != "") {
+            mysqli_select_db(
+                $db,
+                DB_NAME
+            );
+            $query .= " AND (";
+            $query .= " concat(con_first_name,' ',con_last_name) LIKE '%" . mysqli_real_escape_string(
+                    $db,
+                    $q
+                ) . "%' ";
+            $query .= " OR customer.cus_name LIKE '%" . mysqli_real_escape_string(
+                    $db,
+                    $q
+                ) . "%' ";
+            $query .= " OR customer.cus_custno LIKE '%" . mysqli_real_escape_string(
+                    $db,
+                    $q
+                ) . "%' ";
+            $query .= " ) ";
+        }
+        $query .= " and active 
+                    ORDER BY cus_name, con_last_name, con_first_name 
+                    ";
+        // echo $query;
+        // exit;
+        $result = mysqli_query(
+            $db,
+            $query
+        );
+        return mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+    }
+
+    function getCustomerSR()
+    {
+        $this->setMethodName("getCustomerSR");
+        $buActivity  = new BUActivity($this);
+        $customerId  = $_GET['customerId'];
+        $dsActiveSrs = $buActivity->getActiveProblemsByCustomer($customerId);
+        $customerSR  = array();
+        while ($dsActiveSrs->fetchNext()) {
+
+            $urlProblemHistoryPopup =
+                Controller::buildLink(
+                    'Activity.php',
+                    array(
+                        'action'    => 'problemHistoryPopup',
+                        'problemID' => $dsActiveSrs->getValue(DBEJProblem::problemID),
+                        'htmlFmt'   => CT_HTML_FMT_POPUP
+                    )
+                );
+            array_push(
+                $customerSR,
+                array(
+                    'problemID'              => $dsActiveSrs->getValue(DBEJProblem::problemID),
+                    'dateRaised'             => $dsActiveSrs->getValue(DBEJProblem::dateRaised),
+                    'reason'                 => Utils::truncate($dsActiveSrs->getValue(DBEJProblem::reason), 100),
+                    'lastReason'             => Utils::truncate(
+                        $dsActiveSrs->getValue(DBEJProblem::lastReason),
+                        100
+                    ),
+                    'engineerName'           => $dsActiveSrs->getValue(DBEJProblem::engineerName),
+                    'activityID'             => $dsActiveSrs->getValue(DBEJProblem::lastCallActivityID),
+                    'contactName'            => $dsActiveSrs->getValue('contactName'),
+                    'contactId'              => $dsActiveSrs->getValue('contactId'),
+                    'urlProblemHistoryPopup' => $urlProblemHistoryPopup,
+                    'priority'               => $dsActiveSrs->getValue(DBEJProblem::priority),
+                    'status'                 => $dsActiveSrs->getValue(DBEJProblem::status),
+                    'isSpecialAttention'     => $this->isSpecialAttention($dsActiveSrs)
+                )
+            );
+        }
+        return $customerSR;
+    }
+
+    private function isSpecialAttention($dbejProblem)
+    {
+        return $dbejProblem->getValue(DBEJProblem::specialAttentionContactFlag) == 'Y' || $dbejProblem->getValue(
+                DBEJProblem::specialAttentionFlag
+            ) == 'Y';
+    }
+
+    function getCustomerSites()
+    {
+        $customerId = $_GET["customerId"];
+        if (!$customerId)
+            return [];
+        $dbeSite = new DBESite($this);
+        $dbeSite->setValue(
+            DBESite::customerID,
+            $customerId
+        );
+        $dbeSite->getRowsByCustomerID();
+        $sites = array();
+        while ($dbeSite->fetchNext()) {
+            $siteDesc = $dbeSite->getValue(DBESite::add1) . ' ' . $dbeSite->getValue(
+                    DBESite::town
+                ) . ' ' . $dbeSite->getValue(DBESite::postcode);
+            $siteNo   = $dbeSite->getValue(DBESite::siteNo);
+            array_push($sites, ["id" => $siteNo, "title" => $siteDesc]);
+        }
+        return $sites;
+    }
+
+    function getCustomerAssets()
+    {
+        $customerId = $_GET["customerId"];
+        $labtechDB  = $this->getLabtechDB();
+        $query      = "select  computers.name,computers.assetTag,computers.LastUsername,  computers.BiosVer, computers.BiosName  from computers 
+        join clients on 
+            computers.clientid = clients.clientid
+            and clients.externalID = $customerId          
+        ";
+        $statement  = $labtechDB->prepare($query);
+        $test       = $statement->execute();
+        $data       = $statement->fetchAll(PDO::FETCH_ASSOC);
+        return $data;
+    }
+
+    /**
+     * @param $customerID
+     * @param $contactID
+     * @param string $templateName
+     */
+    function getCustomerContacts()
+    {
+        $customerID = $_REQUEST["customerID"];
+        $dbeContact = new DBEContact($this);
+        $dbeSite    = new DBESite($this);
+        $dbeContact->getRowsByCustomerID(
+            $customerID,
+            false,
+            true,
+            true
+        );
+        $contacts = array();
+        while ($dbeContact->fetchNext()) {
+            $startMainContactStyle = null;
+            $endMainContactStyle   = null;
+
+            if ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelMain) {
+                $startMainContactStyle = '*';
+                $endMainContactStyle   = '*';
+            } elseif ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelDelegate) {
+                $startMainContactStyle = '- Delegate';
+                $endMainContactStyle   = '- Delegate';
+            } elseif ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelSupervisor) {
+                $startMainContactStyle = '- Supervisor';
+                $endMainContactStyle   = '- Supervisor';
+            }
+
+            $dbeSite->setValue(
+                DBESite::customerID,
+                $dbeContact->getValue(DBEContact::customerID)
+            );
+            $dbeSite->setValue(
+                DBESite::siteNo,
+                $dbeContact->getValue(DBEContact::siteNo)
+            );
+            $dbeSite->getRow();
+
+            $name = $dbeContact->getValue(DBEContact::firstName) . ' ' . $dbeContact->getValue(DBEContact::lastName);
+
+            if ($dbeContact->getValue(DBEContact::position)) {
+                $name .= ' (' . $dbeContact->getValue(DBEContact::position) . ')';
+            }
+            array_push(
+                $contacts,
+                array(
+                    'id'                    => $dbeContact->getValue(DBEContact::contactID),
+                    'name'                  => $name,
+                    'firstName'             => $dbeContact->getValue(DBEContact::firstName),
+                    'lastName'              => $dbeContact->getValue(DBEContact::lastName),
+                    'startMainContactStyle' => $startMainContactStyle,
+                    'endMainContactStyle'   => $endMainContactStyle,
+                    'siteNo'                => $endMainContactStyle,
+                    'siteTitle'             => $dbeSite->getValue(DBESite::add1) . ' ' . $dbeSite->getValue(
+                            DBESite::town
+                        ) . ' ' . $dbeSite->getValue(DBESite::postcode),
+                    "sitePhone"             => $dbeSite->getValue(DBESite::phone),
+                    "contactPhone"          => $dbeContact->getValue(DBEContact::phone),
+                    "contactMobilePhone"    => $dbeContact->getValue(DBEContact::mobilePhone),
+                    "contactEmail"          => $dbeContact->getValue(DBEContact::email),
+                    'contactSupportLevel'   => $dbeContact->getValue(DBEContact::supportLevel),
+                    "notes"                 => $dbeContact->getValue(DBEContact::notes)
+
+                )
+            );
+        }
+        return $contacts;
+    }
+
+    function getCustomerProjects()
+    {
+        $customerID = $_REQUEST["customerID"];
+        return BUProject::getCustomerProjects($customerID);
+    }
+
+    function getCustomerContracts()
+    {
+        $customerID             = $_REQUEST["customerId"];
+        $contractCustomerItemID = $_REQUEST["contractCustomerItemID"];
+        $linkedToSalesOrder     = $_REQUEST["linkedToSalesOrder"];
+        $contracts              = array();
+        $buCustomerItem         = new BUCustomerItem($this);
+        $dsContract             = new DataSet($this);
+        if ($customerID) {
+            $buCustomerItem->getContractsByCustomerID(
+                $customerID,
+                $dsContract,
+                null
+            );
+        }
+
+        if (!$contractCustomerItemID) {
+            array_push($contracts, ["id" => "", "name" => "tandMSelected", "renewalType" => null]);
+        }
+
+        // if ($linkedToSalesOrder) {
+        //     $this->template->set_var(
+        //         [
+
+        //             'salesOrderReason' => "- Must be selected because this is linked to a Sales Order"
+        //         ]
+
+        //     );
+        // }
+        while ($dsContract->fetchNext()) {
+
+            $description = $dsContract->getValue(DBEJContract::itemDescription) . ' ' . $dsContract->getValue(
+                    DBEJContract::adslPhone
+                ) . ' ' . $dsContract->getValue(DBEJContract::notes) . ' ' . $dsContract->getValue(
+                    DBEJContract::postcode
+                );
+            array_push(
+                $contracts,
+                array(
+                    'contractCustomerItemID' => $dsContract->getValue(DBEJContract::customerItemID),
+                    'contractDescription'    => $description,
+                    'prepayContract'         => $dsContract->getValue(DBEJContract::itemTypeID) == 57,
+                    'isDisabled'             => !$dsContract->getValue(
+                        DBEJContract::allowSRLog
+                    ) || $linkedToSalesOrder == 'true' ? true : false,
+                    'renewalType'            => $dsContract->getValue(DBEJContract::renewalType)
+                )
+            );
+        }
+        return $contracts;
+    }
+
+    function getCustomersHaveOpenSR()
+    {
+        $customers = DBConnect::fetchAll(
+            "SELECT `cus_custno` id,`cus_name` name FROM`customer` WHERE `cus_custno` IN(
+            SELECT  `pro_custno` FROM `problem` WHERE `pro_status` <> 'C' AND `pro_status` <> 'F'
+            )
+            ",
+            []
+        );
+        return $customers;
+    }
 
     /**
      * Update details
@@ -3419,358 +3742,5 @@ class CTCustomer extends CTCNC
         } else {
             $this->displayEditForm();
         }
-    }
-    function getCurrentUser()
-    {
-        return json_encode( [
-            'firstName' => $this->dbeUser->getValue(DBEJUser::firstName),
-            'lastName' => $this->dbeUser->getValue(DBEJUser::lastName),
-            'id' => $this->dbeUser->getValue(DBEJUser::userID),
-            'email' => $this->dbeUser->getEmail(),
-            'isSdManager'=>$this->isSdManager(),
-        ]);
-    }
-    /**
-     * search customer by name and contact name
-     * @return array
-     */
-    function searchCustomers()
-    {
-        $q=$_GET["q"];
-        if (!$db = mysqli_connect(
-            DB_HOST,
-            DB_USER,
-            DB_PASSWORD
-        )) {
-            echo 'Could not connect to mysql host ' . DB_HOST;
-            exit;
-        }
-       
-        $query =
-                "SELECT 
-                cus_custno,
-                cus_name,
-                con_contno,
-                add_town AS site_name,
-                concat(contact.con_first_name,' ',contact.con_last_name) contact_name,                
-                contact.con_first_name,
-                contact.con_last_name,
-                contact.con_phone,
-                contact.con_notes,
-                address.add_phone,
-                supportLevel,
-                con_position,
-                cus_referred,
-                specialAttentionContactFlag = 'Y' as specialAttentionContact,
-                (
-                SELECT
-                    COUNT(*)
-                FROM
-                    problem
-                WHERE
-                    pro_custno = cus_custno
-                    AND pro_status IN( 'I', 'P')
-                ) AS openSrCount,
-                (SELECT cui_itemno IS NOT NULL FROM custitem WHERE custitem.`cui_itemno` = 4111 AND custitem.`declinedFlag` <> 'Y' AND custitem.`cui_custno` = customer.`cus_custno` and renewalStatus  <> 'D' limit 1) AS hasPrepay,
-                (SELECT item.`itm_desc` FROM custitem LEFT JOIN item ON cui_itemno = item.`itm_itemno` WHERE itm_desc LIKE '%servicedesk%' AND custitem.`declinedFlag` <> 'Y' AND custitem.`cui_custno` = customer.`cus_custno` limit 1 ) AS hasServiceDesk,
-                cus_special_attention_flag specialAttentionCustomer
-                FROM customer
-    
-                JOIN contact ON con_custno = cus_custno
-                JOIN address ON add_custno = cus_custno AND add_siteno = con_siteno
-                WHERE supportLevel is not null ";
-        if ($q&&$q!="") {
-            mysqli_select_db(
-                $db,
-                DB_NAME
-            );
-            $query .= " AND (";
-            $query .= " concat(con_first_name,' ',con_last_name) LIKE '%" . mysqli_real_escape_string(
-                $db, $q) . "%' ";                         
-            $query .= " OR customer.cus_name LIKE '%" . mysqli_real_escape_string(
-                $db, $q) . "%' ";
-            $query .= " OR customer.cus_custno LIKE '%" . mysqli_real_escape_string(
-                    $db, $q) . "%' ";
-            $query .=" ) ";
-        }
-        $query .= " and active 
-                    ORDER BY cus_name, con_last_name, con_first_name 
-                    ";
-        // echo $query;
-        // exit;
-        $result = mysqli_query(
-            $db,
-            $query
-        );
-        return mysqli_fetch_all( $result,MYSQLI_ASSOC);
-         
-    }
-    function getCustomerSR()
-    {
-        $this->setMethodName("getCustomerSR");
-        $buActivity = new BUActivity($this);
-        $customerId=$_GET['customerId'];
-        $contactId=$_GET['contactId'];
-        $dsContactSrs = $buActivity->getProblemsByContact($contactId);
-        $contactSR=array();
-        while ($dsContactSrs->fetchNext()) {
-            $urlProblemHistoryPopup =
-                Controller::buildLink(
-                    'Activity.php',
-                    array(
-                        'action'    => 'problemHistoryPopup',
-                        'problemID' => $dsContactSrs->getValue(DBEJProblem::problemID),
-                        'htmlFmt'   => CT_HTML_FMT_POPUP
-                    )
-                );
-            array_push($contactSR,    
-                array(
-                    'contactProblemID'              => $dsContactSrs->getValue(DBEJProblem::problemID),
-                    'contactDateRaised'             => Controller::dateYMDtoDMY(
-                        $dsContactSrs->getValue(DBEJProblem::dateRaised)
-                    ),
-                    'contactReason'                 => Utils::truncate(
-                        $dsContactSrs->getValue(DBEJProblem::reason),
-                        100
-                    ),
-                    'contactLastReason'             => Utils::truncate(
-                        $dsContactSrs->getValue(DBEJProblem::lastReason),
-                        100
-                    ),
-                    'contactEngineerName'           => $dsContactSrs->getValue(DBEJProblem::engineerName),
-                    'shouldBeHidden'                => $dsContactSrs->getValue(
-                        DBEJProblem::status
-                    ) == 'C' ? 'hidden' : null,
-                    'contactActivityID'             => $dsContactSrs->getValue(DBEJProblem::lastCallActivityID),
-                    'contactUrlProblemHistoryPopup' => $urlProblemHistoryPopup,
-                    'contactPriority'               => $dsContactSrs->getValue(DBEJProblem::priority),
-                    'contactPriorityClass'          => $dsContactSrs->getValue(
-                        DBEJProblem::priority
-                    ) == 1 ? 'redRow' : null,
-                    "status"=>$dsContactSrs->getValue(DBEJProblem::status),
-                )
-            );
-
-           
-
-        }
-        $dsActiveSrs = $buActivity->getActiveProblemsByCustomer($customerId);
-        $customerSR=array();
-        while ($dsActiveSrs->fetchNext()) {
-
-            $urlCreateFollowOn =
-                Controller::buildLink(
-                    'Activity.php',
-                    array(
-                        'action'         => 'createFollowOnActivity',
-                        'callActivityID' => $dsActiveSrs->getValue(DBEJProblem::lastCallActivityID),
-                        'reason'         => $this->getParam('reason')
-                    )
-                );
-
-            $urlProblemHistoryPopup =
-                Controller::buildLink(
-                    'Activity.php',
-                    array(
-                        'action'    => 'problemHistoryPopup',
-                        'problemID' => $dsActiveSrs->getValue(DBEJProblem::problemID),
-                        'htmlFmt'   => CT_HTML_FMT_POPUP
-                    )
-                );
-            array_push(
-                $customerSR,
-                array(
-                    'problemID'              => $dsActiveSrs->getValue(DBEJProblem::problemID),
-                    'dateRaised'             => Controller::dateYMDtoDMY(
-                        $dsActiveSrs->getValue(DBEJProblem::dateRaised)
-                    ),
-                    'reason'                 => Utils::truncate(
-                        $dsActiveSrs->getValue(DBEJProblem::reason),
-                        100
-                    ),
-                    'lastReason'             => Utils::truncate(
-                        $dsActiveSrs->getValue(DBEJProblem::lastReason),
-                        100
-                    ),
-                    'engineerName'           => $dsActiveSrs->getValue(DBEJProblem::engineerName),
-                    'activityID'             => $dsActiveSrs->getValue(DBEJProblem::lastCallActivityID),
-                    'urlProblemHistoryPopup' => $urlProblemHistoryPopup,
-                    'priority'               => $dsActiveSrs->getValue(DBEJProblem::priority),
-                    'priorityClass'          => $dsActiveSrs->getValue(
-                        DBEJProblem::priority
-                    ) == 1 ? 'class="redRow"' : null
-                )
-            );
-        }
-         return  ["contactSR"=>$contactSR,"customerSR"=> $customerSR];
-    }
-    function getCustomerAssets()
-    {
-        $customerId=$_GET["customerId"];
-        $labtechDB= $this->getLabtechDB();
-        $query="select  computers.name,computers.assetTag,computers.LastUsername,  computers.BiosVer, computers.BiosName  from computers 
-        join clients on 
-            computers.clientid = clients.clientid
-            and clients.externalID = $customerId          
-        ";
-        $statement = $labtechDB->prepare($query);
-        $test = $statement->execute();
-        $data = $statement->fetchAll(PDO::FETCH_ASSOC);
-        return $data;
-    }
-    function getCustomerSites()
-    {
-        $customerId = $_GET["customerId"];
-        if (!$customerId)
-            return [];
-        $dbeSite = new DBESite($this);
-        $dbeSite->setValue(
-            DBESite::customerID,
-            $customerId
-        );
-        $dbeSite->getRowsByCustomerID();
-        $sites=array();
-        while ($dbeSite->fetchNext()) {
-            $siteDesc = $dbeSite->getValue(DBESite::add1) . ' ' . $dbeSite->getValue(
-                DBESite::town
-            ) . ' ' . $dbeSite->getValue(DBESite::postcode);
-            $siteNo = $dbeSite->getValue(DBESite::siteNo);
-            array_push( $sites,["id"=>$siteNo,"title"=>$siteDesc]);
-        }
-        return $sites;
-    }
-    /**
-     * @param $customerID
-     * @param $contactID
-     * @param string $templateName
-     */
-    function getCustomerContacts() {
-        $customerID = $_REQUEST["customerID"];
-        $dbeContact = new DBEContact($this);
-        $dbeSite = new DBESite($this);
-        $dbeContact->getRowsByCustomerID(
-            $customerID,
-            false,
-            true,
-            true
-        );
-        $contacts = array();        
-        while ($dbeContact->fetchNext()) {            
-            $startMainContactStyle = null;
-            $endMainContactStyle = null;
-
-            if ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelMain) {
-                $startMainContactStyle = '*';
-                $endMainContactStyle = '*';
-            } elseif ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelDelegate) {
-                $startMainContactStyle = '- Delegate';
-                $endMainContactStyle = '- Delegate';                
-            } elseif ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelSupervisor) {
-                $startMainContactStyle = '- Supervisor';
-                $endMainContactStyle = '- Supervisor';
-            }
-
-            $dbeSite->setValue(
-                DBESite::customerID,
-                $dbeContact->getValue(DBEContact::customerID)
-            );
-            $dbeSite->setValue(
-                DBESite::siteNo,
-                $dbeContact->getValue(DBEContact::siteNo)
-            );
-            $dbeSite->getRow();
-
-            $name = $dbeContact->getValue(DBEContact::firstName) . ' ' . $dbeContact->getValue(DBEContact::lastName);
-
-            if ($dbeContact->getValue(DBEContact::position)) {
-                $name .= ' (' . $dbeContact->getValue(DBEContact::position) . ')';
-            }
-            array_push(
-                $contacts,
-                array(
-                    'id'                    => $dbeContact->getValue(DBEContact::contactID),
-                    'name'                  => $name,
-                    'firstName'              =>$dbeContact->getValue(DBEContact::firstName) ,
-                    'lastName'              => $dbeContact->getValue(DBEContact::lastName),
-                    'startMainContactStyle' => $startMainContactStyle,
-                    'endMainContactStyle'   => $endMainContactStyle,
-                    'siteNo'   => $endMainContactStyle,
-                    'siteTitle'=>$dbeSite->getValue(DBESite::add1) . ' ' . $dbeSite->getValue(
-                        DBESite::town
-                    ) . ' ' . $dbeSite->getValue(DBESite::postcode),
-                    "sitePhone"=>$dbeSite->getValue(DBESite::phone),
-                    "contactPhone"=>$dbeContact->getValue(DBEContact::phone),   
-                    "contactMobilePhone"=>$dbeContact->getValue(DBEContact::mobilePhone),
-                    "contactEmail"=>$dbeContact->getValue(DBEContact::email),
-                    'contactSupportLevel'=> $dbeContact->getValue(DBEContact::supportLevel),
-                    "notes"=>$dbeContact->getValue(DBEContact::notes)
-
-                )
-            );
-        }
-        return $contacts;
-    }
-    function getCustomerProjects()
-    {
-        $customerID = $_REQUEST["customerID"];
-        return BUProject::getCustomerProjects($customerID);
-    }
-    function getCustomerContracts()
-    {
-        $customerID = $_REQUEST["customerId"];
-        $contractCustomerItemID = $_REQUEST["contractCustomerItemID"];
-        $linkedToSalesOrder = $_REQUEST["linkedToSalesOrder"];
-        $contracts = array();
-        $buCustomerItem = new BUCustomerItem($this);
-        $dsContract = new DataSet($this);
-        if ($customerID) {
-            $buCustomerItem->getContractsByCustomerID(
-                $customerID,
-                $dsContract,
-                null
-            );
-        }
-
-        if (!$contractCustomerItemID) {
-            array_push($contracts,["id" => "", "name" => "tandMSelected", "renewalType" =>null]);
-        }
-
-        // if ($linkedToSalesOrder) {
-        //     $this->template->set_var(
-        //         [
-
-        //             'salesOrderReason' => "- Must be selected because this is linked to a Sales Order"
-        //         ]
-
-        //     );
-        // } 
-        while ($dsContract->fetchNext()) {
-
-            $description = $dsContract->getValue(DBEJContract::itemDescription) . ' ' . $dsContract->getValue(
-                DBEJContract::adslPhone
-            ) . ' ' . $dsContract->getValue(DBEJContract::notes) . ' ' . $dsContract->getValue(
-                DBEJContract::postcode
-            );
-            array_push($contracts,
-                array(
-                    'contractCustomerItemID' => $dsContract->getValue(DBEJContract::customerItemID),
-                    'contractDescription'    => $description,
-                    'prepayContract'         => $dsContract->getValue(DBEJContract::itemTypeID) == 57,
-                    'isDisabled'             => !$dsContract->getValue(
-                        DBEJContract::allowSRLog
-                    ) || $linkedToSalesOrder=='true' ? true : false,
-                    'renewalType'           => $dsContract->getValue(DBEJContract::renewalType)
-                )
-            );            
-         }
-         return $contracts;
-    } 
-    function getCustomersHaveOpenSR()
-    {
-        $customers=DBConnect::fetchAll("SELECT `cus_custno` id,`cus_name` name FROM`customer` WHERE `cus_custno` IN(
-            SELECT  `pro_custno` FROM `problem` WHERE `pro_status` <> 'C' AND `pro_status` <> 'F'
-            )
-            ",[]);
-        return $customers;
     }
 }

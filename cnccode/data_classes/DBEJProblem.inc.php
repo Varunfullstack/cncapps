@@ -418,12 +418,12 @@ class DBEJProblem extends DBEProblem
       Get Awaiting, In-progress and future SRs by Queue
 
       */
-    function getRowsByQueueNoWithFuture($queueNo)
+    function getRowsByQueue($queueNo)
     {
         $sql =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            ", pro_consno is not null as isAssigned FROM " . $this->getTableName() .
-            " LEFT JOIN customer ON cus_custno = pro_custno
+            "SELECT {$this->getDBColumnNamesAsString()}
+            , pro_consno is not null as isAssigned FROM {$this->getTableName()}
+             LEFT JOIN customer ON cus_custno = pro_custno
            LEFT JOIN consultant ON cns_consno = pro_consno
 
           JOIN callactivity `initial`
@@ -443,7 +443,7 @@ class DBEJProblem extends DBEProblem
 
           AND pro_queue_no = $queueNo";
 
-        $sql .= " order by isAssigned asc, {$this->getDBColumnName(self::dashboardSortColumn)} asc";
+        $sql .= " order by hasAlarmDate asc,   isAssigned asc, {$this->getDBColumnName(self::dashboardSortColumn)} asc";
         $this->setQueryString($sql);
         return (parent::getRows());
     }
@@ -484,10 +484,25 @@ class DBEJProblem extends DBEProblem
      */
     function getActiveProblemsByCustomer($customerID)
     {
+        $this->setAddColumnsOn();
+        $this->addColumn(
+            "contactName",
+            DA_STRING,
+            true,
+            "concat(contact.con_first_name, ' ', contact.con_last_name)"
+        );
+
+        $this->addColumn(
+            "contactId",
+            DA_STRING,
+            true,
+            "initial.caa_contno"
+        );
+
         $sql =
-            "SELECT DISTINCT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " LEFT JOIN customer ON cus_custno = pro_custno
+            "SELECT DISTINCT {$this->getDBColumnNamesAsString()}
+             FROM {$this->getTableName()}
+             LEFT JOIN customer ON cus_custno = pro_custno
           JOIN callactivity `initial`
             ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
 
@@ -500,7 +515,9 @@ class DBEJProblem extends DBEProblem
               WHERE ca.caa_problemno = pro_problemno
               AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
+            
            LEFT JOIN consultant ON cns_consno = pro_consno
+           left join contact on contact.con_contno = initial.caa_contno
         WHERE
           pro_custno = $customerID
           AND pro_status <> 'C'";

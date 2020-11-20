@@ -1,4 +1,4 @@
-import APICustomers from "../../services/APICutsomer";
+import APICustomers from "../../services/APICustomers";
 import AutoComplete from "../../shared/AutoComplete/autoComplete.js";
 import Table from "./../../shared/table/table";
 import CurrentActivityService from "../services/CurrentActivityService";

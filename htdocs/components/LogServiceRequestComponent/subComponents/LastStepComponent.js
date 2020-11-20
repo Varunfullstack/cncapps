@@ -1,5 +1,5 @@
 import Toggle from "../../shared/Toggle.js";
-import APICustomers from "../../services/APICutsomer.js";
+import APICustomers from "../../services/ApiCustomers.js";
 import {groupBy, SRQueues, TeamType} from "../../utils/utils.js";
 import APIStandardText from "../../services/APIStandardText.js";
 import StandardTextModal from "../../Modals/StandardTextModal.js";

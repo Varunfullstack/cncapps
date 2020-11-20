@@ -1,0 +1,8 @@
+.service-request-summary {
+    display: flex;
+    flex-direction: row;
+}
+
+.service-request-summary dt {
+    padding-left: 10px;
+}

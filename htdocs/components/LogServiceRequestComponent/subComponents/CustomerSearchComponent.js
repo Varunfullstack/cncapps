@@ -1,13 +1,13 @@
 import Table from "./../../shared/table/table";
 import Spinner from "../../shared/Spinner/Spinner";
-import APICustomers from "../../services/APICutsomer";
+import APICustomers from "../../services/APICustomers";
 import React from 'react';
 
 import './CustomerSearchComponent.css';
 
 class CustomerSearchComponent extends React.Component {
     el = React.createElement;
-    apiCutsomer = new APICustomers();
+    apiCustomer = new APICustomers();
     delayTimer;
 
     constructor(props) {
@@ -31,12 +31,17 @@ class CustomerSearchComponent extends React.Component {
         this.setState({_showSpinner: false});
     }
     handleCustomerSearch = (event) => {
+
         this.setState({searchValue: event.target.value})
+        if (event.target.value.length <= 2) {
+            return;
+        }
+
         clearTimeout(this.delayTimer);
         event.persist();
         this.delayTimer = setTimeout(() => {
             this.showSpinner();
-            this.apiCutsomer.searchCustomers(event.target.value)
+            this.apiCustomer.searchCustomers(event.target.value)
                 .then(customers => {
                     return customers.map(c => {
                         if (c.supportLevel === 'main')
@@ -64,7 +69,7 @@ class CustomerSearchComponent extends React.Component {
         //const projects= await ;
         if (this.props.updateSRData)
             this.props.updateSRData({customer, customerID: customer.cus_custno, nextStep: 2});
-        this.apiCutsomer.getCustomerProjects(customer.cus_custno).then(projects => {
+        this.apiCustomer.getCustomerProjects(customer.cus_custno).then(projects => {
             if (this.props.updateSRData)
                 this.props.updateSRData({projects});
         })

@@ -220,9 +220,9 @@ class CurrentActivityReportComponent extends MainComponent {
                     break;
                 case "E":
                     this.apiCurrentActivityService.getEscalationsInbox().then((res) => {
+                        console.log('Straight from the API', res);
                         const escalationInbox = this.prepareResult(res);
-                        const escalationInboxFiltered = [...escalationInbox];
-
+                        console.log('After process', escalationInbox);
                         this.setState({
                             _showSpinner: false,
                             escalationInbox,
@@ -232,9 +232,6 @@ class CurrentActivityReportComponent extends MainComponent {
                 case "S":
                     this.apiCurrentActivityService.getSalesInbox().then((res) => {
                         const salesInbox = this.prepareResult(res);
-                        const salesInboxFiltered = [...salesInbox];
-
-
                         this.setState({
                             _showSpinner: false,
                             salesInbox,
@@ -493,6 +490,7 @@ class CurrentActivityReportComponent extends MainComponent {
             userFilter,
             escalationInbox
         );
+
         const openSRInboxFiltered = this.filterData(userFilter, openSRInbox);
         const toBeLoggedInboxFiltered = toBeLoggedInbox;
         const pendingReopenedInboxFiltered = pendingReopenedInbox;

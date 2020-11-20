@@ -1,4 +1,4 @@
-import APICustomers from "../services/APICutsomer.js";
+import APICustomers from "../services/APICustomers.js";
 import MainComponent from "../shared/MainComponent.js";
 import AutoComplete from "./AutoComplete/autoComplete.js";
 import React from "react";
