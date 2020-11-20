@@ -355,13 +355,17 @@ WHERE pro_custno <> 282
      */
     private function getRaisedAndStartedToday(): array
     {
-        $query = "SELECT COUNT(DISTINCT  p.pro_problemno) total FROM `callactivity` c JOIN   problem p ON c.`caa_problemno`=p.`pro_problemno`
-         WHERE 
-         pro_custno <> 282   
-         AND  caa_consno <> 67
-         AND caa_callacttypeno NOT IN (60, 35)
-         AND pro_status IN ('P')
-         AND pro_date_raised >=  CURDATE() AND pro_date_raised < CURDATE() + INTERVAL 1 DAY";
+        $query = "SELECT
+  COUNT(pro_problemno) as total
+FROM
+  `callactivity` c
+  JOIN problem p
+    ON c.`caa_problemno` = p.`pro_problemno`
+WHERE pro_custno <> 282
+    AND caa_callacttypeno = 51
+  and pro_status = 'P'
+  AND pro_date_raised >= CURDATE()
+  AND pro_date_raised < CURDATE() + INTERVAL 1 DAY";
         return DBConnect::fetchOne($query, []);
     }
 
