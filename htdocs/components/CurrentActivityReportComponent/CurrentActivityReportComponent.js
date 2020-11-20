@@ -174,7 +174,7 @@ class CurrentActivityReportComponent extends MainComponent {
         this.apiCurrentActivityService
             .getCurrentUser()
             .then((res) => {
-                if (res.isSDManger)
+                if (res.isSDManger || res.serviceRequestQueueManager)
                     this.teams.filter(t => t.id === 11)[0].display = true;
                 this.setState({currentUser: res})
             });
@@ -434,7 +434,7 @@ class CurrentActivityReportComponent extends MainComponent {
     getTeamId(code) {
         return this.teams.filter(t => t.code === code)[0].id;
     }
-    
+
     prepareResult = (result) => {
         result.map((problem) => {
             problem.workBtnTitle = getServiceRequestWorkTitle(problem);
