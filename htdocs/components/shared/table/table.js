@@ -69,15 +69,15 @@ class Table extends React.Component {
     updateIndex = (e, ui) => {
         const currentItemId = $(ui.item[0]).attr('id');
         const nextItemId = $(ui.item[0]).next().attr('id');
-        const currentItem = this.props.data.filter(i => i[this.props.pk] === currentItemId)[0];
-        const nextItem = this.props.data.filter(i => i[this.props.pk] === nextItemId)[0];
+        const currentItem = this.props.data.filter(i => i[this.props.pk] == currentItemId)[0];
+        const nextItem = this.props.data.filter(i => i[this.props.pk] == nextItemId)[0];
         if (this.props.onOrderChange)
             this.props.onOrderChange(currentItem, nextItem);
     };
     handleSort = (sortColumn) => {
 
         for (let i = 0; i < this.props.columns.length; i++) {
-            if (this.props.columns[i].path === sortColumn.path) {
+            if (this.props.columns[i].path == sortColumn.path) {
                 //check if column is sortable
                 const sortable = this.props.columns[i].sortable ? this.props.columns[i].sortable : false;
                 if (sortable)
@@ -91,15 +91,15 @@ class Table extends React.Component {
             if (
                 this.get(a, path) > this.get(b, path) ||
                 this.get(a, path) == null ||
-                this.get(a, path) === undefined
+                this.get(a, path) == undefined
             )
-                return order === "asc" ? 1 : -1;
+                return order == "asc" ? 1 : -1;
             if (
                 this.get(a, path) < this.get(b, path) ||
                 this.get(b, path) == null ||
-                this.get(a, path) === undefined
+                this.get(a, path) == undefined
             )
-                return order === "asc" ? -1 : 1;
+                return order == "asc" ? -1 : 1;
             else return 0;
         });
     };

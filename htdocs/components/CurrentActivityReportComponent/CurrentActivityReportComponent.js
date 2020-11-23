@@ -16,6 +16,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import '../style.css';
+import '../shared/ToolTip.css'
 import moment from "moment";
 
 class CurrentActivityReportComponent extends MainComponent {
@@ -95,7 +96,7 @@ class CurrentActivityReportComponent extends MainComponent {
                 code: 'PR',
                 queueNumber: 11,
                 order: 7,
-                display: true,
+                display: false,
                 icon: null,
                 canMove: false
             },
@@ -154,7 +155,7 @@ class CurrentActivityReportComponent extends MainComponent {
     };
     isActive = (code) => {
         const {filter} = this.state;
-        if (filter.activeTab === code) return "active";
+        if (filter.activeTab == code) return "active";
         else return "";
     };
     setActiveTab = (code) => {
@@ -173,8 +174,8 @@ class CurrentActivityReportComponent extends MainComponent {
         this.apiCurrentActivityService
             .getCurrentUser()
             .then((res) => {
-                if (res.isSDManger)
-                    this.teams.filter(t => t.id === 11)[0].display = true;
+                if (res.isSDManger || res.serviceRequestQueueManager)
+                    this.teams.filter(t => t.id == 11)[0].display = true;
                 this.setState({currentUser: res})
             });
         this.loadQueue(filter.activeTab);
@@ -220,8 +221,6 @@ class CurrentActivityReportComponent extends MainComponent {
                 case "E":
                     this.apiCurrentActivityService.getEscalationsInbox().then((res) => {
                         const escalationInbox = this.prepareResult(res);
-                        const escalationInboxFiltered = [...escalationInbox];
-
                         this.setState({
                             _showSpinner: false,
                             escalationInbox,
@@ -231,9 +230,6 @@ class CurrentActivityReportComponent extends MainComponent {
                 case "S":
                     this.apiCurrentActivityService.getSalesInbox().then((res) => {
                         const salesInbox = this.prepareResult(res);
-                        const salesInboxFiltered = [...salesInbox];
-
-
                         this.setState({
                             _showSpinner: false,
                             salesInbox,
@@ -262,7 +258,7 @@ class CurrentActivityReportComponent extends MainComponent {
                     this.apiCurrentActivityService.getToBeLoggedInbox().then((res) => {
                         const toBeLoggedInbox = this.prepareResult(res);
                         if (toBeLoggedInbox.length > 0)
-                            this.teams.filter(t => t.code === 'TBL')[0].icon = "fal fa-asterisk";
+                            this.teams.filter(t => t.code == 'TBL')[0].icon = "fal fa-asterisk";
                         this.setState({
                             _showSpinner: false,
                             toBeLoggedInbox,
@@ -273,7 +269,7 @@ class CurrentActivityReportComponent extends MainComponent {
                     this.apiCurrentActivityService.getPendingReopenedInbox().then((res) => {
                         const pendingReopenedInbox = this.prepareResult(res);
                         if (pendingReopenedInbox.length > 0)
-                            this.teams.filter(t => t.code === 'PR')[0].icon = "fal fa-asterisk";
+                            this.teams.filter(t => t.code == 'PR')[0].icon = "fal fa-asterisk";
                         this.setState({
                             _showSpinner: false,
                             pendingReopenedInbox,
@@ -312,7 +308,7 @@ class CurrentActivityReportComponent extends MainComponent {
     // Shared methods
     moveToAnotherTeam = async ({target}, problem, code) => {
         let answer = null;
-        if (problem.problemStatus === "P") {
+        if (problem.problemStatus == "P") {
             answer = await this.prompt(
                 "Please provide a reason for moving this SR into a different queue"
             );
@@ -337,7 +333,7 @@ class CurrentActivityReportComponent extends MainComponent {
         let options = teams.map(t => {
             return {id: t.queueNumber, title: t.code, canMove: t.canMove}
         })
-            .filter((e) => e.title !== code && e.canMove === true);
+            .filter((e) => e.title !== code && e.canMove == true);
         return el(
             "select",
             {
@@ -403,7 +399,7 @@ class CurrentActivityReportComponent extends MainComponent {
         const {el, handleUserOnSelect} = this;
         const {allocatedUsers} = this.state;
         const teamId = this.getTeamId(code);
-        const currentTeam = allocatedUsers.filter((u) => u.teamID === teamId);
+        const currentTeam = allocatedUsers.filter((u) => u.teamID == teamId);
         const otherTeams = allocatedUsers.filter((u) => u.teamID !== teamId);
         return el(
             "select",
@@ -421,7 +417,7 @@ class CurrentActivityReportComponent extends MainComponent {
                         {
                             value: p.userID,
                             key: "option" + p.userID,
-                            className: teamId === p.teamID ? "in-team" : "",
+                            className: teamId == p.teamID ? "in-team" : "",
                         },
                         p.fullName
                     )
@@ -431,41 +427,42 @@ class CurrentActivityReportComponent extends MainComponent {
     };
 
     getTeamId(code) {
-        return this.teams.filter(t => t.code === code)[0].id;
+        return this.teams.filter(t => t.code == code)[0].id;
     }
-    
+
     prepareResult = (result) => {
-        result.map((problem) => {
+        return result.map((problem) => {
             problem.workBtnTitle = getServiceRequestWorkTitle(problem);
-            problem.alarmDateTime = problem.alarmDateTime?.trim(" ");
-            problem.priorityClass = problem.priority === 1 ? 'priority-one' : '';
-            if (moment(problem.alarmDateTime) > moment()) {
-                delete problem.date;
-            }
-            delete problem.engineerDropDown;
-            delete problem.linkAllocateAdditionalTime;
-            delete problem.queueOptions;
-            delete problem.slaResponseHours;
-            delete problem.time;
-            delete problem.timeSpentColorClass;
-            delete problem.totalActivityDurationHours;
-            delete problem.updated;
-            delete problem.updatedBgColor;
-            delete problem.urlCustomer;
-            delete problem.urlProblemHistoryPopup;
-            delete problem.urlViewActivity;
-            delete problem.urlCustomer;
-            delete problem.urlCustomer;
-            delete problem.workOnClick;
+            return problem;
+            // problem.alarmDateTime = problem.alarmDateTime?.trim(" ");
+            // problem.priorityClass = problem.priority == 1 ? 'priority-one' : '';
+            // if (moment(problem.alarmDateTime) > moment()) {
+            //     delete problem.date;
+            // }
+            // delete problem.engineerDropDown;
+            // delete problem.linkAllocateAdditionalTime;
+            // delete problem.queueOptions;
+            // delete problem.slaResponseHours;
+            // delete problem.time;
+            // delete problem.timeSpentColorClass;
+            // delete problem.totalActivityDurationHours;
+            // delete problem.updated;
+            // delete problem.updatedBgColor;
+            // delete problem.urlCustomer;
+            // delete problem.urlProblemHistoryPopup;
+            // delete problem.urlViewActivity;
+            // delete problem.urlCustomer;
+            // delete problem.urlCustomer;
+            // delete problem.workOnClick;
         });
-        const emptyAlarm = result.filter((p) => p.alarmDateTime == null || p.alarmDateTime === '');
-        const old = result.filter((p) => moment(p.alarmDateTime) <= moment());
-        const feature = result
-            .filter((p) => moment(p.alarmDateTime) > moment())
-            .sort((a, b) =>
-                moment(a.alarmDateTime) > moment(b.alarmDateTime) ? 1 : -1
-            );
-        return [...old, ...emptyAlarm, ...feature];
+        // const emptyAlarm = result.filter((p) => p.alarmDateTime == null || p.alarmDateTime == '');
+        // const old = result.filter((p) => moment(p.alarmDateTime) <= moment());
+        // const feature = result
+        //     .filter((p) => moment(p.alarmDateTime) > moment())
+        //     .sort((a, b) =>
+        //         moment(a.alarmDateTime) > moment(b.alarmDateTime) ? 1 : -1
+        //     );
+        // return [...old, ...emptyAlarm, ...feature];
     };
     handleUserFilterOnSelect = (userId) => {
         const userFilter = userId;
@@ -492,6 +489,7 @@ class CurrentActivityReportComponent extends MainComponent {
             userFilter,
             escalationInbox
         );
+
         const openSRInboxFiltered = this.filterData(userFilter, openSRInbox);
         const toBeLoggedInboxFiltered = toBeLoggedInbox;
         const pendingReopenedInboxFiltered = pendingReopenedInbox;
@@ -511,7 +509,7 @@ class CurrentActivityReportComponent extends MainComponent {
     filterData = (engineerId, data) => {
         return data.filter(
             (p) =>
-                p.engineerId === null || p.engineerId == engineerId || engineerId === ""
+                p.engineerId == null || p.engineerId == engineerId || engineerId == ""
         );
     };
     getEngineersFilterElement = () => {
@@ -520,7 +518,7 @@ class CurrentActivityReportComponent extends MainComponent {
 
         let code = filter.activeTab;
         const teamId = this.getTeamId(code);
-        const currentTeam = allocatedUsers.filter((u) => u.teamID === teamId);
+        const currentTeam = allocatedUsers.filter((u) => u.teamID == teamId);
         const otherTeams = allocatedUsers.filter((u) => u.teamID !== teamId);
 
         return el(
@@ -541,7 +539,7 @@ class CurrentActivityReportComponent extends MainComponent {
                         {
                             value: p.userID,
                             key: "option" + p.userID,
-                            className: teamId === p.teamID ? "in-team" : "",
+                            className: teamId == p.teamID ? "in-team" : "",
                         },
                         p.fullName
                     )

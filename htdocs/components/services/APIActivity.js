@@ -127,19 +127,20 @@ class APIActivity extends APIMain {
     getCustomerContactActivityDurationThresholdValue() {
         return fetch(`${ApiUrls.SRActivity}getCustomerContactActivityDurationThresholdValue`).then(res => res.json()).then(res => res.data);
     }
+
     getRemoteSupportActivityDurationThresholdValue() {
         return fetch(`${ApiUrls.SRActivity}getRemoteSupportActivityDurationThresholdValue`).then(res => res.json()).then(res => res.data);
     }
 
-    getTimeBreakdown(problemId)
-    {
+    getTimeBreakdown(problemId) {
         return this.get(`${ApiUrls.SRActivity}usedBudgetData&problemID=${problemId}`)
     }
 
     getLastActivityInServiceRequest(serviceRequestId) {
         return fetch(`${ApiUrls.SRActivity}getLastActivityInServiceRequest&serviceRequestId=${serviceRequestId}`).then(res => res.json());
     }
-    getNotAttemptFirstTimeFix(startDate,endDate,customerID,enginnerID){
+
+    getNotAttemptFirstTimeFix(startDate, endDate, customerID, enginnerID) {
         return this.get(`${ApiUrls.SRActivity}getNotAttemptFirstTimeFix&startDate=${startDate}&endDate=${endDate}&userID=${enginnerID}&customerID=${customerID}`);
     }
 }

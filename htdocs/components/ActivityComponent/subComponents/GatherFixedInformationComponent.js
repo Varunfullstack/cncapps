@@ -1,13 +1,15 @@
 import MainComponent from "../../shared/MainComponent.js";
 import StandardTextModal from "../../Modals/StandardTextModal.js";
 import APIActivity from "../../services/APIActivity.js";
-import APICustomers from "../../services/APICutsomer.js";
+import APICustomers from "../../services/APICustomers.js";
 import APIStandardText from "../../services/APIStandardText.js";
 import CKEditor from "../../shared/CKEditor.js";
 import Toggle from "../../shared/Toggle.js";
 import ToolTip from "../../shared/ToolTip.js";
 import {groupBy, params} from "../../utils/utils.js";
-import ActivityDocumentsComponent from "./ActivityDocumentsComponent.js";
+
+import React from 'react';
+import ActivityDocumentUploader from "./ActivityDocumentUploader";
 
 class GatherFixedInformationComponent extends MainComponent {
     el = React.createElement;
@@ -139,7 +141,7 @@ class GatherFixedInformationComponent extends MainComponent {
                         null,
                         el("td", {className: "display-label "}, "Summary of Resolution"),
                         el("td", null, el(CKEditor, {
-                            minCharCount: activity.problemHideFromCustomerFlag === 'N' ? 160 : -1,
+                            minCharCount: activity.problemHideFromCustomerFlag == 'N' ? 160 : -1,
                             disableClipboard: true,
                             value: initialActivity?.reason,
                             onChange: (value) => this.setValue("resolutionSummary", value),
@@ -154,7 +156,7 @@ class GatherFixedInformationComponent extends MainComponent {
 
     getContracts = () => {
         const {el} = this;
-        const {activity, contracts, data} = this.state;
+        const {contracts, data} = this.state;
 
         return el(
             "select",
@@ -189,7 +191,7 @@ class GatherFixedInformationComponent extends MainComponent {
     };
     getRootCause = () => {
         const {el} = this;
-        const {activity, rootCauses, data} = this.state;
+        const {rootCauses, data} = this.state;
 
         return el(
             "select",
@@ -206,19 +208,26 @@ class GatherFixedInformationComponent extends MainComponent {
             )
         );
     };
-    //-----------------documents
-    getDocuments = () => {
-        const {el} = this;
+
+    async deleteDocument(id) {
         const {documents, activity} = this.state;
-        return el(ActivityDocumentsComponent, {
-            documents,
-            onUpload: () => this.handleDocumentsUploads(),
-            onDelete: () => this.handleDocumentsUploads(),
-            problemID: activity?.problemID,
-            callActivityID: activity?.callActivityID
-        });
+        if (await this.confirm('Are you sure you want to remove this document?')) {
+            await this.apiActivity.deleteDocument(activity.callActivityID, id);
+            this.setState({documents: documents.filter(d => d.id !== id)});
+        }
+    }
+
+    getDocuments = () => {
+        const {documents, activity} = this.state;
+        return <ActivityDocumentUploader
+            onDeleteDocument={(id) => this.deleteDocument(id)}
+            onFilesUploaded={() => this.handleDocumentsUploads()}
+            serviceRequestId={activity.problemID}
+            activityId={activity.callActivityID}
+            documents={documents}
+        />
     };
-    handleDocumentsUploads = async (result) => {
+    handleDocumentsUploads = async () => {
         const {activity} = this.state;
         const documents = await this.apiActivity.getDocuments(activity.callActivityID, activity.problemID);
         this.setState({documents});
@@ -244,7 +253,7 @@ class GatherFixedInformationComponent extends MainComponent {
         return el(StandardTextModal,
             {
                 options: [],
-                show: showModal && modalType === this.modalTypes.partsUsed,
+                show: showModal && modalType == this.modalTypes.partsUsed,
                 title: "Parts Used",
                 okTitle: "Send",
                 onChange: this.handlePartsUsedReason,
@@ -264,7 +273,7 @@ class GatherFixedInformationComponent extends MainComponent {
         const {showModal, modalType} = this.state;
         let {salesOptions} = this.state;
         const {el} = this;
-        if (salesOptions.length === 0) {
+        if (salesOptions.length == 0) {
             this.apiStandardText.getOptionsByType("Sales Request")
                 .then(salesOptions => {
                     this.setState({salesOptions});
@@ -274,7 +283,7 @@ class GatherFixedInformationComponent extends MainComponent {
         return el(StandardTextModal,
             {
                 options: salesOptions,
-                show: showModal && modalType === this.modalTypes.sales,
+                show: showModal && modalType == this.modalTypes.sales,
                 title: "Sales Request",
                 okTitle: "Send",
                 onChange: this.handleSalesReason,
@@ -304,7 +313,7 @@ class GatherFixedInformationComponent extends MainComponent {
     handleSave = () => {
         const {activity, data} = this.state;
 
-        if (data.contractCustomerItemID === "99") {
+        if (data.contractCustomerItemID == "99") {
             this.alert("Please select contract");
             return;
         }
@@ -316,7 +325,7 @@ class GatherFixedInformationComponent extends MainComponent {
             this.alert("You must enter more text in the summary information");
             return;
         }
-        if (activity.problemHideFromCustomerFlag === 'N' && data.resolutionSummary.length < 160) {
+        if (activity.problemHideFromCustomerFlag == 'N' && data.resolutionSummary.length < 160) {
             this.alert("The resolution summary must have at least 160 characters");
             return;
         }
@@ -340,6 +349,7 @@ class GatherFixedInformationComponent extends MainComponent {
             {style: {width: 1000}},
             this.getAlert(),
             this.getHeader(),
+            this.getConfirm(),
             this.getDetails(),
             this.getDocuments(),
             this.getActions(),

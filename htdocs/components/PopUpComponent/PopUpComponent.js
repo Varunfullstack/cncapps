@@ -19,10 +19,10 @@ class PopUpComponent extends MainComponent {
     render() {
         const {el} = this;
         const action = params.get("action");
-        if (action === "dailyStats") {
+        if (action == "dailyStats") {
             return el(DailyStatsComponent);
         }
-        if(action==="timeBreakdown")
+        if(action=="timeBreakdown")
             return el(TimeBreakdownComponent);
 
         return el('label', null, "Not Found")

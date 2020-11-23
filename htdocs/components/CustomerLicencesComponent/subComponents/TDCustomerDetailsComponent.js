@@ -49,7 +49,7 @@ class TDCustomerDetailsComponent extends React.Component {
         const {customers} = this.props;
         const queryParams = new URLSearchParams(window.location.search);
         const endCustomerId = queryParams.get("endCustomerId");
-        const result = customers.filter(c => c.endCustomerId === endCustomerId)
+        const result = customers.filter(c => c.endCustomerId == endCustomerId)
         if (result.length > 0) {
             let data = result[0];
             data.firstName = data.name.split(' ')[0];
@@ -125,7 +125,7 @@ class TDCustomerDetailsComponent extends React.Component {
         } = this;
         const {cncCustomers, data, errors, mode} = this.state;
         let errorMessage = "";
-        if (typeof errors === "string") errorMessage = errors;
+        if (typeof errors == "string") errorMessage = errors;
         return el(
             "table",
             {key: "table", style: {width: 500}},
@@ -169,7 +169,7 @@ class TDCustomerDetailsComponent extends React.Component {
                     data.email,
                     true,
                     errors["email"],
-                    mode === "edit"
+                    mode == "edit"
                 ),
                 this.getCustomerElement(
                     "Phone 1",
@@ -330,28 +330,27 @@ class TDCustomerDetailsComponent extends React.Component {
 
         this.showSpinner();
 
-        if (mode === "insert") {
+        if (mode == "insert") {
             this.apiCustomerLicenses
                 .addTechDataCustomer(data)
                 .then((result) => {
 
                     this.hideSpinner();
-                    if (result.Result === "Failed") {
+                    if (result.Result == "Failed") {
                         const errors = result.ErrorMessage;
                         this.setState({errors});
                     }
                 });
-        } else if (mode === "edit") {
-            console.log('edit customer')
+        } else if (mode == "edit") {
             this.apiCustomerLicenses
                 .updateTechDataCustomer(data.endCustomerId, data)
                 .then((result) => {
                     this.hideSpinner();
 
-                    if (result.Result === "Failed") {
+                    if (result.Result == "Failed") {
                         const errors = result.ErrorMessage;
                         this.setState({errors});
-                    } else if (result.Result === "Success") {
+                    } else if (result.Result == "Success") {
                         this.handleOnCancel();
                     }
                 });
@@ -361,7 +360,7 @@ class TDCustomerDetailsComponent extends React.Component {
     getCustomerDetails = (endCustomerId) => {
         this.apiCustomerLicenses.getCustomerDetails(endCustomerId).then((res) => {
 
-            if (res.Result === "Success") {
+            if (res.Result == "Success") {
                 const data = {...res.BodyText.endCustomerDetails};
                 this.setState({data, mode: "edit"});
             }

@@ -4,8 +4,8 @@ class TableHeader extends React.Component {
     el = React.createElement;
     raiseSort = (path) => {
         const sortColumn = {...this.props.sortColumn};
-        if (this.props.sortColumn != null && sortColumn.path === path)
-            sortColumn.order = sortColumn.order === "asc" ? "desc" : "asc";
+        if (this.props.sortColumn != null && sortColumn.path == path)
+            sortColumn.order = sortColumn.order == "asc" ? "desc" : "asc";
         else {
             sortColumn.path = path;
             sortColumn.order = "asc";
@@ -20,12 +20,12 @@ class TableHeader extends React.Component {
         if (this.props.sortColumn != null) {
             if (
                 column.path !== this.props.sortColumn.path &&
-                (column.sortable === undefined || column.sortable === false)
+                (column.sortable == undefined || column.sortable == false)
             )
                 return null;
-            if (column.path === this.props.sortColumn.path) {
+            if (column.path == this.props.sortColumn.path) {
                 style = null;
-                if (this.props.sortColumn.order === "asc") {
+                if (this.props.sortColumn.order == "asc") {
                     key = "fa-sort-up";
                     className = "fa fa-sort-up";
                 } else {
@@ -34,7 +34,7 @@ class TableHeader extends React.Component {
                 }
             }
         }
-        if (column.sortable === true) return this.el("i", {key, className, style});
+        if (column.sortable == true) return this.el("i", {key, className, style});
         return null;
     };
 

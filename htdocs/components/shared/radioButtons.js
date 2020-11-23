@@ -26,7 +26,7 @@ export default class RadioButtons extends React.Component {
         }
 
         if (items && items.length > 0) {
-            return el('div', {key: 'divRadioList', className: 'radio-list'+(mode===RadioButtonsType.horizontal?" horizontal":"")+(center?" content-center ":"")}, [
+            return el('div', {key: 'divRadioList', className: 'radio-list'+(mode==RadioButtonsType.horizontal?" horizontal":"")+(center?" content-center ":"")}, [
                 items.map(item => el('div', {key: 'div' + item.id, className: 'radio'}, [
                     el('label', {key: 'lb' + item.id}, [
                         el('input', {
@@ -34,7 +34,7 @@ export default class RadioButtons extends React.Component {
                             type: "radio",
                             disabled: disabled ? 'disabled' : null,
                             value: item.id,
-                            checked: selectedOption === item.id,
+                            checked: selectedOption == item.id,
                             onChange: () => handleOnChange(item.id)
                         }),
                         el('span', {key: 'span' + item.id}, item.name)

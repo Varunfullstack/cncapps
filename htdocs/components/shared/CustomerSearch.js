@@ -1,4 +1,4 @@
-import APICustomers from "../services/APICutsomer.js";
+import APICustomers from "../services/APICustomers.js";
 import MainComponent from "../shared/MainComponent.js";
 import AutoComplete from "./AutoComplete/autoComplete.js";
 import React from "react";
@@ -15,7 +15,6 @@ class CustomerSearch extends MainComponent {
        this.apiCustomer.getCustomers().then(customers=>this.setState({customers}))
    }
    handleOnCustomerSelect=(value)=>{
-       console.log(value);
        if(this.props.onChange)
         this.props.onChange(value)
    }

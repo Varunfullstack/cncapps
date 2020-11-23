@@ -1,5 +1,6 @@
 import Table from "./../../shared/table/table";
 import React from 'react';
+import moment from "moment";
 
 class CustomerSRComponent extends React.Component {
     el = React.createElement;
@@ -9,7 +10,7 @@ class CustomerSRComponent extends React.Component {
         this.state = {}
     }
 
-    getTableElement = (items) => {
+    getTableElement = (items, showContactColumn) => {
         const {el} = this;
         const {openProblemHistory, newSrActivity} = this.props;
         let columns = [
@@ -33,18 +34,16 @@ class CustomerSRComponent extends React.Component {
                 hide: false,
                 order: 1.1,
                 path: null,
-                key: "custsomerIcon",
+                key: "customerIcon",
                 label: "",
                 sortable: false,
-                toolTip: "Special Attention customer",
-                content: (problem) =>
-                    problem.priority === 1
-                        ? el("i", {
-                            className:
-                                "fal fa-2x fa-exclamation-triangle color-gray pointer float-right inbox-icon",
-                            key: "starIcon",
-                        })
-                        : null,
+                toolTip: "Special Attention customer or contact",
+                content: (problem) => {
+                    if (!problem.isSpecialAttention) {
+                        return null;
+                    }
+                    return <i className="fal fa-2x fa-exclamation-triangle color-gray pointer float-right inbox-icon"/>
+                }
             },
             {
                 hide: false,
@@ -69,6 +68,21 @@ class CustomerSRComponent extends React.Component {
                 sortable: false,
                 hdClassName: "text-center",
                 className: "text-center",
+                content: problem => {
+                    return moment(problem.dateRaised, 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm')
+                }
+            },
+            {
+                hide: !showContactColumn,
+                order: 2.1,
+                path: "contactName",
+                label: "",
+                key: "contactName",
+                hdToolTip: "Contact",
+                icon: "fal fa-2x fa-user color-gray2 ",
+                sortable: false,
+                hdClassName: "text-center",
+                className: "",
             },
             {
                 hide: false,
@@ -108,11 +122,11 @@ class CustomerSRComponent extends React.Component {
                 icon: "fal fa-2x fa-user-hard-hat color-gray2 ",
                 sortable: false,
                 hdClassName: "text-center",
-                className: "text-center",
+                className: "",
             }
         ];
         columns = columns
-            .filter((c) => c.hide === false)
+            .filter((c) => c.hide == false)
             .sort((a, b) => (a.order > b.order ? 1 : -1));
 
         return el(Table, {
@@ -125,11 +139,11 @@ class CustomerSRComponent extends React.Component {
     }
 
     render() {
-        const {items} = this.props;
+        const {items, showContactColumn} = this.props;
         const {getTableElement, el} = this;
 
         return (
-            el('div', null, getTableElement(items))
+            el('div', null, getTableElement(items, showContactColumn))
         );
     }
 }

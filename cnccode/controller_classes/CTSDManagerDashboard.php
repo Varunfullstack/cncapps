@@ -10,6 +10,8 @@ require_once($cfg["path_dbe"] . "/DBConnect.php");
 
 class CTSDManagerDashboard extends CTCurrentActivityReport
 {
+    const DAILY_STATS_SUMMARY = "dailyStatsSummary";
+
     function __construct($requestMethod,
                          $postVars,
                          $getVars,
@@ -25,13 +27,13 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             $cfg,
             false
         );
-        if (!self::isSdManager()) {
+        $action = @$_REQUEST['action'];
+        if ($action != self::DAILY_STATS_SUMMARY && !self::isSdManager()) {
             Header("Location: /NotAllowed.php");
             exit;
         }
 
         $this->setMenuId(201);
-
     }
 
     /**
@@ -66,8 +68,8 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             case "getQueue":
                 echo json_encode($this->getQueue());
                 exit;
-            case "dailyStatsSummary":
-                echo json_encode($this->getDailyStatsSummary());
+            case self::DAILY_STATS_SUMMARY:
+                echo json_encode($this->getDailyStatsSummary(), JSON_NUMERIC_CHECK);
                 exit;
             case "react":
             default:
@@ -82,7 +84,6 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         if (!isset($queue))
             return [];
         $buProblem         = new BUActivity($this);
-        $problems          = new DataSet($this);
         $isP5              = $_REQUEST["p5"] == "true";
         $showHelpDesk      = $_REQUEST["hd"] == "true";
         $showEscalation    = $_REQUEST["es"] == "true";
@@ -211,7 +212,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             return $result;
         }
         while ($problems->fetchNext()) {
-            $result[] = ServiceRequestSummaryDTO::fromDBEJProblem($problems,true);
+            $result[] = ServiceRequestSummaryDTO::fromDBEJProblem($problems, true);
         }
         return $result;
     }
@@ -295,15 +296,17 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
      */
     private function getRaisedToday(): array
     {
-        $query              = "SELECT COUNT(DISTINCT  p.pro_problemno) total FROM `callactivity` c JOIN   problem p ON c.`caa_problemno`=p.`pro_problemno`
-                WHERE 
-                pro_custno <> 282   
-                AND  caa_consno <> 67
-                AND caa_callacttypeno NOT IN (60, 35)
-                AND pro_status IN ('F')
-                AND pro_date_raised >=  CURDATE() AND pro_date_raised < CURDATE() + INTERVAL 1 DAY";
-        $raisedTodaySummary = DBConnect::fetchOne($query, []);
-        return array($query, $raisedTodaySummary);
+        $query = "SELECT
+  COUNT(pro_problemno) as total
+FROM
+  `callactivity` c
+  JOIN problem p
+    ON c.`caa_problemno` = p.`pro_problemno`
+WHERE pro_custno <> 282
+    AND caa_callacttypeno = 51
+  AND pro_date_raised >= CURDATE()
+  AND pro_date_raised < CURDATE() + INTERVAL 1 DAY";
+        return DBConnect::fetchOne($query, []);
     }
 
     /**
@@ -315,10 +318,9 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
                 FROM `callactivity` c JOIN   problem p ON c.`caa_problemno`=p.`pro_problemno`
                 WHERE    
                 pro_custno <> 282
-                AND pro_consno <> 67
-                AND pro_status <> 'I'
-                AND c.`caa_callacttypeno`=57
-                AND pro_date_raised >=  CURDATE() AND pro_date_raised < CURDATE() + INTERVAL 1 DAY";
+                and pro_consno <> 67 OR pro_consno IS NULL
+                AND c.`caa_callacttypeno` = 57
+                AND c.`caa_date` = CURDATE()                ";
         return DBConnect::fetchOne($query, []);
 
     }
@@ -328,13 +330,12 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
      */
     private function getNearSLA(): array
     {
-        $query          = "SELECT COUNT(*) total FROM problem 
+        $query = "SELECT COUNT(*) total FROM problem 
                 WHERE    
                 pro_custno <> 282
                 AND  pro_status IN ( 'I', 'P' )
                 AND  pro_alarm_date <= curdate() and (pro_alarm_time is null or pro_alarm_time  < time(NOW()))";
-        $nearSLASummary = DBConnect::fetchOne($query, []);
-        return array($query, $nearSLASummary);
+        return DBConnect::fetchOne($query, []);
     }
 
     /**
@@ -354,13 +355,17 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
      */
     private function getRaisedAndStartedToday(): array
     {
-        $query = "SELECT COUNT(DISTINCT  p.pro_problemno) total FROM `callactivity` c JOIN   problem p ON c.`caa_problemno`=p.`pro_problemno`
-         WHERE 
-         pro_custno <> 282   
-         AND  caa_consno <> 67
-         AND caa_callacttypeno NOT IN (60, 35)
-         AND pro_status IN ('P')
-         AND pro_date_raised >=  CURDATE() AND pro_date_raised < CURDATE() + INTERVAL 1 DAY";
+        $query = "SELECT
+  COUNT(pro_problemno) as total
+FROM
+  `callactivity` c
+  JOIN problem p
+    ON c.`caa_problemno` = p.`pro_problemno`
+WHERE pro_custno <> 282
+    AND caa_callacttypeno = 51
+  and pro_status = 'P'
+  AND pro_date_raised >= CURDATE()
+  AND pro_date_raised < CURDATE() + INTERVAL 1 DAY";
         return DBConnect::fetchOne($query, []);
     }
 

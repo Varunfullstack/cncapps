@@ -1,8 +1,9 @@
 import Table from "./../../shared/table/table";
 import CurrentActivityService from "../services/CurrentActivityService";
 
-import React from 'react';
+import React, {Fragment} from 'react';
 import {ColumnRenderer} from "./ColumnRenderer";
+import {ServiceRequestSummary} from "./ServiceRequestSummary";
 
 class InboxProjectsComponent extends React.Component {
     code = "P";
@@ -43,7 +44,7 @@ class InboxProjectsComponent extends React.Component {
                 hide: false,
                 order: 8,
                 path: "hoursRemainingForSLA",
-                key: "hoursRemainingLabel",
+                key: "hoursRemainingForSLA",
                 label: "",
                 hdToolTip: "Hours the Service Request has been open",
                 icon: "fal fa-2x  fa-clock color-gray2 ",
@@ -55,7 +56,7 @@ class InboxProjectsComponent extends React.Component {
                     el(
                         "label",
                         {key: "label", style: {verticalAlign: "middle"}},
-                        problem.hoursRemaining
+                        problem.hoursRemainingForSLA
                     ),
                 ],
             },
@@ -171,7 +172,7 @@ class InboxProjectsComponent extends React.Component {
                     ),
             });
         columns = columns
-            .filter((c) => c.hide === false)
+            .filter((c) => c.hide == false)
             .sort((a, b) => (a.order > b.order ? 1 : -1));
         const {data} = this.props;
 
@@ -184,78 +185,15 @@ class InboxProjectsComponent extends React.Component {
         });
     };
 
-    getSrByUsersSummaryElement = () => {
-        const {el} = this;
-        const {data} = this.props;
-        if (data) {
-            const future = data.filter((p) => moment(p.alarmDateTime) > moment())
-                .length;
-            if (data.length > 0) {
-                const items = data
-                    .reduce((prev, current) => {
-                        //check index
-                        const index = prev.findIndex(
-                            (p) => p.name === current.engineerName
-                        );
-                        if (index === -1)
-                            prev.push({name: current.engineerName, total: 1});
-                        else prev[index].total += 1;
-                        return prev;
-                    }, [])
-                    .map((p) => {
-                        if (p.name != null && p.name !== "") {
-                            p.name = p.name.replace("  ", " ");
-                            const arr = p.name.split(" ");
-                            p.name = arr[0][0] + arr[1][0];
-                        }
-                        return p;
-                    })
-                    .sort((a, b) => (a.name > b.name ? 1 : -1))
-                    .map((item) => {
-                        return [
-                            el(
-                                "dt",
-                                {key: "name", style: {paddingLeft: 10}},
-                                (item.name || "Unassigned") + ":"
-                            ),
-                            el("dd", {key: "total"}, item.total),
-                        ];
-                    })
-                    .concat([
-                        el(
-                            "dt",
-                            {key: "name", style: {paddingLeft: 10}},
-                            "Future" + ":"
-                        ),
-                        el("dd", {key: "total"}, future),
-                    ]);
-                return [
-                    ...[
-                        el(
-                            "dt",
-                            {key: "nameFuture", style: {paddingLeft: 10}},
-                            "Total" + ":"
-                        ),
-                        el("dt", {key: "totalFuture"}, data.length),
-                    ],
-                    ...items,
-                ];
-            }
-        }
-        return null;
-    };
-
     render() {
-        const {el, getTableElement, getSrByUsersSummaryElement} = this;
+        const {getTableElement} = this;
         const {data} = this.props;
-        return [
-            el(
-                "div",
-                {key: "summary", style: {display: "flex", flexDirection: "row"}},
-                getSrByUsersSummaryElement()
-            ),
-            getTableElement(),
-        ];
+        return (
+            <Fragment>
+                <ServiceRequestSummary data={data}/>
+                {getTableElement()}
+            </Fragment>
+        )
     }
 }
 

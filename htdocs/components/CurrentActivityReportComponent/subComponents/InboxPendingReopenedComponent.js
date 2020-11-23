@@ -23,14 +23,14 @@ class InboxPendingReopenedComponent extends MainComponent {
         );
     };
     processPendingReopened = async (problem, code) => {
-        if (code === 'R' && !(await this.confirm("Are you sure you want to reopen?"))) return;
-        if (code === 'D' && !(await this.confirm("Are you sure you want to delete?"))) return;
+        if (code == 'R' && !(await this.confirm("Are you sure you want to reopen?"))) return;
+        if (code == 'D' && !(await this.confirm("Are you sure you want to delete?"))) return;
 
-        if (code === 'R' || code === 'D')
+        if (code == 'R' || code == 'D')
             this.apiCurrentActivityService.processPendingReopened(problem.pendingReopenedID, code).then(res => {
                 this.props.loadQueue(this.code);
             })
-        else if (code === 'N') {
+        else if (code == 'N') {
             const data = {
                 action: 'editServiceRequestHeader',
                 contactID: problem.pendingReopenedContactID,
@@ -292,7 +292,7 @@ class InboxPendingReopenedComponent extends MainComponent {
         ];
 
         columns = columns
-            .filter((c) => c.hide === false)
+            .filter((c) => c.hide == false)
             .sort((a, b) => (a.order > b.order ? 1 : -1));
         const {data} = this.props;
 

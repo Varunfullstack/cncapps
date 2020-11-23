@@ -61,7 +61,7 @@ class TDProductAddOnsComponent extends React.Component {
                 "skus": skus
             }).then(result => {
 
-                if (result.Result === 'Success') {
+                if (result.Result == 'Success') {
                     this.setState({productDetails: result.BodyText.productDetails});
                     this.addonsLoad = true;
 

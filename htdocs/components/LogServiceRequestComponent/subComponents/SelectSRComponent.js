@@ -1,13 +1,18 @@
 import RadioButtons, {RadioButtonsType} from "../../shared/radioButtons";
 import Spinner from "../../shared/Spinner/Spinner";
-import ContactSRComponent from "./ContactSRComponent";
 import CustomerSRComponent from "./CustomerSRComponent.js";
-import SVCCustomers from "../../services/APICutsomer.js";
-import React from 'react';
+import SVCCustomers from "../../services/ApiCustomers.js";
+import React, {Fragment} from 'react';
+
+const CONTACT_SR_TAB = 'COSR';
+
+const CUSTOMER_SR_TAB = 'CUSR';
+
+const CONTACT_FIXED_TAB = 'CFSR';
 
 class SelectSRComponent extends React.Component {
     el = React.createElement;
-    apiCutsomer = new SVCCustomers();
+    apicustomer = new SVCCustomers();
 
     tabs = [];
 
@@ -15,11 +20,13 @@ class SelectSRComponent extends React.Component {
         super(props);
         this.state = {
             srType: 1,
-            activeTab: "COSR",
+            activeTab: CONTACT_SR_TAB,
             contactSR: [],
             contactFixedSR: [],
             customerSR: [],
-            _showSpinner: true
+            currentItems: [],
+            _showSpinner: true,
+            showContactColumn: false
         };
         this.initTaps();
     }
@@ -36,9 +43,9 @@ class SelectSRComponent extends React.Component {
     }
     initTaps = () => {
         this.tabs = [
-            {id: 1, title: 'Contact SR', code: 'COSR', order: 1, display: true, icon: null},
-            {id: 2, title: 'Customer SR', code: 'CUSR', order: 2, display: true, icon: null},
-            {id: 3, title: 'Contact Fixed SR', code: 'CFSR', order: 3, display: true, icon: null},
+            {id: 1, title: 'Contact SR', code: CONTACT_SR_TAB, order: 1, display: true, icon: null},
+            {id: 2, title: 'Customer SR', code: CUSTOMER_SR_TAB, order: 2, display: true, icon: null},
+            {id: 3, title: 'Contact Fixed SR', code: CONTACT_FIXED_TAB, order: 3, display: true, icon: null},
         ];
     }
     getTabsElement = () => {
@@ -70,15 +77,30 @@ class SelectSRComponent extends React.Component {
     };
     isActive = (code) => {
         const {activeTab} = this.state;
-        if (activeTab === code) return "active";
+        if (activeTab == code) return "active";
         else return "";
     };
     setActiveTab = (code) => {
-        this.setState({activeTab: code});
+        let nextState = {activeTab: code, currentItems: this.state.currentItems};
+        switch (code) {
+            case CONTACT_SR_TAB:
+                nextState.currentItems = this.state.contactSR;
+                nextState.showContactColumn = false;
+                break;
+            case CONTACT_FIXED_TAB:
+                nextState.currentItems = this.state.contactFixedSR;
+                nextState.showContactColumn = false;
+                break;
+            case CUSTOMER_SR_TAB:
+                nextState.currentItems = this.state.customerSR;
+                nextState.showContactColumn = true;
+        }
+
+        this.setState(nextState);
     };
 
     handleSrTypeChange = (srType) => {
-        if (srType === 2)
+        if (srType == 2)
             this.props.updateSRData({nextStep: 3})
         this.setState({srType});
     }
@@ -95,12 +117,12 @@ class SelectSRComponent extends React.Component {
     }
     getExistingSR = (customerId, contactId) => {
         this.showSpinner();
-        this.apiCutsomer.getCustomerSR(customerId, contactId).then(res => {
-
-            const customerSR = res.customerSR;
-            const contactSR = res.contactSR.filter(s => s.status !== "F");
-            const contactFixedSR = res.contactSR.filter(s => s.status === "F");
-            this.setState({customerSR, contactSR, contactFixedSR, _showSpinner: false});
+        this.apicustomer.getCustomerSR(customerId).then(data => {
+            const customerSR = data
+            const contactRelatedServiceRequests = data.filter(s => s.contactId == contactId);
+            const contactSR = contactRelatedServiceRequests.filter(x => x.status !== 'F');
+            const contactFixedSR = contactRelatedServiceRequests.filter(s => s.status == "F");
+            this.setState({customerSR, contactSR, contactFixedSR, currentItems: contactSR, _showSpinner: false});
         });
     }
     openProblemHistory = (problemId) => {
@@ -115,29 +137,22 @@ class SelectSRComponent extends React.Component {
     }
 
     render() {
-        const {el, getSRTypeElement, getTabsElement, openProblemHistory, newSrActivity} = this;
-        const {contactSR, contactFixedSR, customerSR, activeTab, _showSpinner} = this.state;
+        const {getSRTypeElement, getTabsElement, openProblemHistory, newSrActivity} = this;
+        const {_showSpinner, showContactColumn, currentItems} = this.state;
         return (
-            el(Spinner, {show: _showSpinner}),
-                el('div', null, getSRTypeElement(),
-                    getTabsElement(),
-                    activeTab === 'COSR' ? el(ContactSRComponent, {
-                        items: contactSR,
-                        openProblemHistory,
-                        newSrActivity
-                    }) : null,
-                    activeTab === 'CFSR' ? el(ContactSRComponent, {
-                        items: contactFixedSR,
-                        openProblemHistory,
-                        newSrActivity
-                    }) : null,
-                    activeTab === 'CUSR' ? el(CustomerSRComponent, {
-                        items: customerSR,
-                        openProblemHistory,
-                        newSrActivity
-                    }) : null,
-                )
-        );
+            <Fragment>
+                <Spinner show={_showSpinner}/>
+                <div>
+                    {getSRTypeElement()}
+                    {getTabsElement()}
+                    <CustomerSRComponent items={currentItems}
+                                         openProblemHistory={openProblemHistory}
+                                         newSrActivity={newSrActivity}
+                                         showContactColumn={showContactColumn}
+                    />
+                </div>
+            </Fragment>
+        )
     }
 }
 

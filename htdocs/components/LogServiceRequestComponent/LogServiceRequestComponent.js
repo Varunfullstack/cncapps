@@ -12,7 +12,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './LogServiceRequestComponent.css'
 import './../style.css';
-
+import '../shared/ToolTip.css'
 
 export default class LogServiceRequestComponent extends MainComponent {
     el = React.createElement;
@@ -90,7 +90,7 @@ export default class LogServiceRequestComponent extends MainComponent {
     }
     setActiveStep = (step) => {
         const {steps} = this.state;
-        const index = steps.map(s => s.id).findIndex(s => s === step);
+        const index = steps.map(s => s.id).findIndex(s => s == step);
         steps[index].display = true;
         steps[index].active = true;
         steps[index].disabled = false;
@@ -104,7 +104,7 @@ export default class LogServiceRequestComponent extends MainComponent {
         if (save) {
             const customData = {...newData};
             this.setState({_showSpinner: true});
-            if (newData.internalNotes.indexOf(newData.internalNotesAppend) === -1)
+            if (newData.internalNotes.indexOf(newData.internalNotesAppend) == -1)
                 newData.internalNotes += newData.internalNotesAppend;
             newData.callActTypeID = null;
             const result = await this.api.createProblem(customData);
@@ -118,7 +118,7 @@ export default class LogServiceRequestComponent extends MainComponent {
                         "userfile[]"
                     );
                 this.setState({_showSpinner: false});
-                if (result.raiseTypeId === 3)
+                if (result.raiseTypeId == 3)
                     await this.alert(`Please advise customer their Service Request number is: ${result.problemID}`)
                 if (result.nextURL)
                     window.location = result.nextURL;
@@ -153,20 +153,20 @@ export default class LogServiceRequestComponent extends MainComponent {
                 this.getProjectsElement(),
                 getStepper(),
                 el('div', {style: {marginTop: 30}},
-                    activeStep === 1 ? el(CustomerSearchComponent, {data, updateSRData}) : null,
-                    activeStep === 2 ? el(SelectSRComponent, {
+                    activeStep == 1 ? el(CustomerSearchComponent, {data, updateSRData}) : null,
+                    activeStep == 2 ? el(SelectSRComponent, {
                         data,
                         customerId: customer?.cus_custno,
                         contactId: customer?.con_contno,
                         updateSRData
                     }) : null,
-                    activeStep === 3 ? el(CustomerSiteComponent, {
+                    activeStep == 3 ? el(CustomerSiteComponent, {
                         data,
                         customerId: customer?.cus_custno,
                         contactId: customer?.con_contno,
                         updateSRData
                     }) : null,
-                    activeStep === 4 ? el(LastStepComponent, {
+                    activeStep == 4 ? el(LastStepComponent, {
                         data,
                         customerId: customer?.cus_custno,
                         contactId: customer?.con_contno,

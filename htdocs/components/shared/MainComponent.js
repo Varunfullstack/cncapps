@@ -3,8 +3,7 @@ import Confirm from "./Confirm.js";
 import Prompt from "./Prompt.js";
 
 import React from 'react';
-import ReactDom from 'react-dom';
- 
+
 export default class MainComponent extends React.Component {
 
     constructor(props) {
@@ -95,39 +94,49 @@ export default class MainComponent extends React.Component {
         alert.width = 500
         this.setState({alert})
     }
-    //-----------------end alert
-    //----------------confirm
-    confirm = (message, width = 500, title = "Confirm") => {
-        const {confirm} = this.state;
-        confirm.show = true;
-        confirm.width = width;
-        confirm.title = title;
-        confirm.message = message;
-        confirm.result = null;
-        this.setState({confirm});
-        return new Promise((resolve, reject) => {
-            setInterval(() => {
-                if (this.state.confirm.result != null)
-                    resolve(this.state.confirm.result);
-            }, 100);
+
+    confirm(message, width = 500, title = "Confirm") {
+        console.log('here');
+        return new Promise(resolve => {
+            this.setState(
+                {
+                    confirm: {
+                        show: true,
+                        width,
+                        title,
+                        message,
+                        onClose: (value) => {
+                            resolve(value);
+                            this.clearConfirm();
+                        }
+                    }
+                }
+            );
         });
-
-
     }
-    getConfirm = () => {
+
+    getConfirm() {
         const {confirm} = this.state;
-        return this.el(Confirm, {...confirm, onClose: this.handleConfirmClose, key: 'confirm'});
+        return (
+            <Confirm
+                show={confirm.show}
+                width={confirm.width}
+                title={confirm.title}
+                message={confirm.message}
+                onClose={confirm.onClose}
+            />
+        );
     }
-    handleConfirmClose = (value) => {
-        //
+
+    clearConfirm() {
         const {confirm} = this.state;
         confirm.show = false;
         confirm.message = "";
         confirm.title = "";
         confirm.width = 500
-        confirm.result = value;
-        this.setState({confirm})
+        this.setState({confirm});
     }
+
     //-----------------end alert
     //----------------prompt
     prompt = (title = "Prompt", width = 500, defaultValue = null) => {

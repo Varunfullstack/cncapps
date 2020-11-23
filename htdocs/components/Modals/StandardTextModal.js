@@ -33,20 +33,19 @@ class StandardTextModal extends React.Component {
     }
     handleTemplateChanged = (event) => {
 
-        const id = event.target.value;
+        const id = +event.target.value;
         const {templateOptions} = this.state;
         let templateDefault;
         let templateOptionId = null;
         let templateValue = '';
-        if (id >= 0) {
-            const op = templateOptions.filter(s => s.id === id)[0];
+        templateDefault = '';
+        if (id) {
+            const op = templateOptions.filter(s => s.id == id)[0];
             templateDefault = op.template;
             templateValue = op.template;
             templateOptionId = op.id;
             if (this.props.onTypeChange)
                 this.props.onTypeChange(id);
-        } else {
-            templateDefault = '';
         }
         this.setState({templateDefault, templateOptionId, templateValue});
     }

@@ -34,7 +34,7 @@ class MySettingsComponent extends React.Component {
     getElement(key, label, value) {
         return [
             this.el('dt', {key: key + "_label", className: 'col-3'}, label),
-            this.el('dd', {key: key + '_value', className: 'col-9'}, value === null ? '' : value),
+            this.el('dd', {key: key + '_value', className: 'col-9'}, value == null ? '' : value),
         ];
     }
 

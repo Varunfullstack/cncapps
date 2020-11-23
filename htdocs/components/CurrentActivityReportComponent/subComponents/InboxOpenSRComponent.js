@@ -1,4 +1,4 @@
-import APICustomers from "../../services/APICutsomer";
+import APICustomers from "../../services/APICustomers";
 import AutoComplete from "../../shared/AutoComplete/autoComplete.js";
 import Table from "./../../shared/table/table";
 import CurrentActivityService from "../services/CurrentActivityService";
@@ -54,7 +54,7 @@ class InboxOpenSRComponent extends React.Component {
                 hide: false,
                 order: 8,
                 path: "hoursRemainingForSLA",
-                key: "hoursRemainingLabel",
+                key: "hoursRemainingForSLA",
                 label: "",
                 hdToolTip: "Hours the Service Request has been open",
                 icon: "fal fa-2x  fa-clock color-gray2 ",
@@ -66,7 +66,7 @@ class InboxOpenSRComponent extends React.Component {
                     el(
                         "label",
                         {key: "label", style: {verticalAlign: "middle"}},
-                        problem.hoursRemaining
+                        problem.hoursRemainingForSLA
                     ),
                 ],
             },
@@ -183,7 +183,7 @@ class InboxOpenSRComponent extends React.Component {
                     ),
             });
         columns = columns
-            .filter((c) => c.hide === false)
+            .filter((c) => c.hide == false)
             .sort((a, b) => (a.order > b.order ? 1 : -1));
         const {data} = this.state;
         return el(Table, {

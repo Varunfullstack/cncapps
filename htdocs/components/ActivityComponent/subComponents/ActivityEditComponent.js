@@ -2,7 +2,7 @@ import APIActivity from "../../services/APIActivity.js";
 import APICallactType from "../../services/APICallactType.js";
 import {groupBy, isEmptyTime, params, pick, sort} from "../../utils/utils.js";
 import ToolTip from "../../shared/ToolTip.js";
-import APICustomers from "../../services/APICutsomer.js";
+import APICustomers from "../../services/APICustomers.js";
 import APIUser from "../../services/APIUser.js";
 import CountDownTimer from "../../shared/CountDownTimer.js";
 import MainComponent from "../../shared/MainComponent.js";
@@ -13,9 +13,10 @@ import StandardTextModal from "../../Modals/StandardTextModal";
 import {padEnd, TeamType} from "../../utils/utils";
 import CKEditor from "../../shared/CKEditor";
 import Modal from "../../shared/Modal/modal";
-import Table from "../../shared/table/table";
 import Toggle from "../../shared/Toggle";
+import ActivityDocumentUploader from "./ActivityDocumentUploader";
 
+// noinspection EqualityComparisonWithCoercionJS
 class ActivityEditComponent extends MainComponent {
     el = React.createElement;
     api = new APIActivity();
@@ -40,7 +41,6 @@ class ActivityEditComponent extends MainComponent {
             remoteSupportActivityDurationThresholdValue: null,
             activityDurationWarned: false,
             _activityLoaded: false,
-            uploadFiles: [],
             contacts: [],
             sites: [],
             priorities: [],
@@ -93,7 +93,6 @@ class ActivityEditComponent extends MainComponent {
                 monitorSR: false,
             },
         };
-        this.fileUploader = new React.createRef();
     }
 
     componentDidMount() {
@@ -110,7 +109,7 @@ class ActivityEditComponent extends MainComponent {
 
         ]).then(async ([activityTypes, activeUsers, priorities, rootCauses, currentUser, priorityChangeReasonStandardTextItems, noAssetStandardTextItems]) => {
             if (!currentUser.isSDManger) {
-                activityTypes = activityTypes.filter(c => c.visibleInSRFlag === 'Y')
+                activityTypes = activityTypes.filter(c => c.visibleInSRFlag == 'Y')
             }
             this.setState({
                 callActTypes: activityTypes,
@@ -135,8 +134,8 @@ class ActivityEditComponent extends MainComponent {
         const {filters} = this.state;
 
         this.api.getCallActivityDetails(callActivityID, filters).then((res) => {
-            filters.monitorSR = res.monitoringFlag === "1";
-            filters.criticalSR = res.criticalFlag === "1";
+            filters.monitorSR = res.monitoringFlag == "1";
+            filters.criticalSR = res.criticalFlag == "1";
             res.documents = res.documents.map((d) => {
                 d.createDate = moment(d.createDate).format("DD/MM/YYYY");
                 return d;
@@ -175,7 +174,7 @@ class ActivityEditComponent extends MainComponent {
                     }),
                 this.apiCustomer.getCustomerAssets(res.customerId)
             ]).then(([customerContactActivityDurationThresholdValue, remoteSupportActivityDurationThresholdValue, contacts, sites, contracts, assets]) => {
-                const currentContact = contacts.find((c) => c.id === res.contactID);
+                const currentContact = contacts.find((c) => c.id == res.contactID);
                 assets = sort(assets, "name");
                 assets = assets.map((asset) => {
                     if (
@@ -214,7 +213,7 @@ class ActivityEditComponent extends MainComponent {
         data.customerNotes = data.customerNotesTemplate;
         data.internalNotes = data.internalNotesTemplate;
         data.priority = this.state.priorities.filter(
-            (p) => p.name === data.priority
+            (p) => p.name == data.priority
         )[0].id;
         if (await this.isValid(data)) {
             delete data.activities;
@@ -276,7 +275,7 @@ class ActivityEditComponent extends MainComponent {
             this.alert("Please select Activity Type");
             return false;
         }
-        if (data.siteNo === "-1") {
+        if (data.siteNo == "-1") {
             this.alert("Please select Customer Site");
             return false;
         }
@@ -286,13 +285,13 @@ class ActivityEditComponent extends MainComponent {
         }
 
         const callActType = this.state.callActTypes.filter(
-            (c) => c.id === data.callActTypeID
+            (c) => c.id == data.callActTypeID
         )[0];
         data.callActType = callActType;
         if (
             callActType &&
-            callActType.description.indexOf("FOC") === -1 &&
-            data.siteMaxTravelHours === -1
+            callActType.description.indexOf("FOC") == -1 &&
+            data.siteMaxTravelHours == -1
         ) {
             this.alert("Travel hours need entering for this site");
             return false;
@@ -305,13 +304,13 @@ class ActivityEditComponent extends MainComponent {
             this.alert("Not a nominated support contact");
             return false;
         }
-        if (data.curValueFlag === "Y" && data.curValue === 0) {
+        if (data.curValueFlag == "Y" && data.curValue == 0) {
             this.alert("Please enter value");
             return false;
         } else {
             if (
                 callActType &&
-                callActType.reqReasonFlag === "Y" &&
+                callActType.reqReasonFlag == "Y" &&
                 !data.reason.trim()
             ) {
                 this.alert("Please Enter Activity Notes");
@@ -346,14 +345,14 @@ class ActivityEditComponent extends MainComponent {
                     this.alert("End time must be after start time!");
                     return false;
                 }
-                if (data.callActType.id === 11 && durationHours > this.state.customerContactActivityDurationThresholdValue) {
+                if (data.callActType.id == 11 && durationHours > this.state.customerContactActivityDurationThresholdValue) {
                     const response = await this.confirm(`This Customer Contact is over ${this.state.customerContactActivityDurationThresholdValue} hours, are you sure this is the correct activity type?`);
                     if (!response) {
                         return false;
                     }
                 }
 
-                if (data.callActType.id === 8 && durationHours > this.state.remoteSupportActivityDurationThresholdValue) {
+                if (data.callActType.id == 8 && durationHours > this.state.remoteSupportActivityDurationThresholdValue) {
                     if (!await this.confirm(`This Remote Support is over ${this.state.remoteSupportActivityDurationThresholdValue} hours, did you mean to put in these times for the activity?`)) {
                         return false;
                     }
@@ -361,22 +360,22 @@ class ActivityEditComponent extends MainComponent {
             }
         }
 
-        if (data.nextStatus === this.activityStatus.CustomerAction) {
+        if (data.nextStatus == this.activityStatus.CustomerAction) {
             const dateMoment = moment(data.alarmDate);
             if (
                 !dateMoment.isValid() ||
                 dateMoment.isSameOrBefore(moment(), "minute") ||
-                    data.alarmDate === "" ||
-                    data.alarmTime === "00:00" ||
-                    data.alarmTime === ""
+                data.alarmDate == "" ||
+                data.alarmTime == "00:00" ||
+                data.alarmTime == ""
             ) {
                 this.alert("Please provide a future date and time");
                 return false;
             }
         }
-        if (data.nextStatus === this.activityStatus.Escalate) {
+        if (data.nextStatus == this.activityStatus.Escalate) {
             if (
-                ["I", "F", "C"].indexOf(data.problemStatus) === -1 &&
+                ["I", "F", "C"].indexOf(data.problemStatus) == -1 &&
                 !data.escalationReason
             ) {
                 this.alert("Please provide an escalate reason");
@@ -426,7 +425,7 @@ class ActivityEditComponent extends MainComponent {
                 data.projects.map((p) =>
                     el(
                         "a",
-                        {key: p.projectID, href: p.editUrl, className: "link-round mr-4"},
+                        {key: p.projectID, href: p.editUrl, className: "link-round mr-4", target: '_blank'},
                         p.description
                     )
                 )
@@ -750,12 +749,12 @@ class ActivityEditComponent extends MainComponent {
         return JSON.parse(sessionStorage.getItem("activityEdit")) || [];
     }
     getSessionActivity = (id) => {
-        return this.getSessionNotes().find(a => a.id === id);
+        return this.getSessionNotes().find(a => a.id == id);
     }
     setNextStatus = async (status, autoSave = false) => {
         const {data, callActTypes} = this.state;
         data.nextStatus = status;
-        const type = callActTypes.find(c => c.id === data.callActTypeID);
+        const type = callActTypes.find(c => c.id == data.callActTypeID);
         switch (status) {
             case this.activityStatus.CncAction:
                 //Field Name] is required for [Activity Type] when the next action is [Update type]
@@ -781,7 +780,7 @@ class ActivityEditComponent extends MainComponent {
                 //return;
                 break;
             case this.activityStatus.Escalate:
-                if (data.problemStatus === "P") {
+                if (data.problemStatus == "P") {
                     const escalationReason = await this.prompt(
                         "Please provide your reason for escalating this SR(Required)"
                     );
@@ -801,52 +800,52 @@ class ActivityEditComponent extends MainComponent {
     };
     checkCncAction = async (data, type) => {
 
-        if (type && type.catRequireCNCNextActionCNCAction === 1 && !data.cncNextActionTemplate) {
+        if (type && type.catRequireCNCNextActionCNCAction == 1 && !data.cncNextActionTemplate) {
             this.alert(`CNC Next Action is required for ${type.description} when the next action is CNC Action`)
             return false;
         }
-        if (type && type.catRequireCNCNextActionCNCAction === 2 && !data.cncNextActionTemplate) {
+        if (type && type.catRequireCNCNextActionCNCAction == 2 && !data.cncNextActionTemplate) {
             if (!await this.confirm(`Are you sure you don't want to put an entry for CNC Next Action?`))
                 return false;
         }
         if (data.hideFromCustomerFlag !== 'Y' && data.problemHideFromCustomerFlag !== 'Y') {
-            if (type && type.catRequireCustomerNoteCNCAction === 1 && !data.customerNotesTemplate) {
+            if (type && type.catRequireCustomerNoteCNCAction == 1 && !data.customerNotesTemplate) {
                 this.alert(`Customer Notes are required for ${type.description} when the next action is CNC Action`)
                 return false;
             }
-            if (type && type.catRequireCustomerNoteCNCAction === 2 && !data.customerNotesTemplate) {
+            if (type && type.catRequireCustomerNoteCNCAction == 2 && !data.customerNotesTemplate) {
                 if (!await this.confirm(`Are you sure you don't want to put an entry for Customer Notes?`))
                     return false;
             }
         }
-        if (data.hideFromCustomerFlag === 'Y' && data.problemHideFromCustomerFlag !== 'Y' && data.customerNotesTemplate) {
+        if (data.hideFromCustomerFlag == 'Y' && data.problemHideFromCustomerFlag !== 'Y' && data.customerNotesTemplate) {
             this.alert(`Hide from customer can't be set because there is a customer note`);
             return false;
         }
         return true;
     }
     checkOnHold = async (data, type) => {
-        if (type && type.catRequireCNCNextActionOnHold === 1 && !data.cncNextActionTemplate) {
+        if (type && type.catRequireCNCNextActionOnHold == 1 && !data.cncNextActionTemplate) {
             this.alert(`CNC Next Action is required for ${type.description} when the next action is On Hold`)
             return false;
         }
-        if (type && type.catRequireCNCNextActionOnHold === 2 && !data.cncNextActionTemplate) {
+        if (type && type.catRequireCNCNextActionOnHold == 2 && !data.cncNextActionTemplate) {
             if (!await this.confirm(`Are you sure you don't want to put an entry for CNC Next Action?`))
                 return false;
 
         }
         if (data.hideFromCustomerFlag !== 'Y' && data.problemHideFromCustomerFlag !== 'Y') {
-            if (type && type.catRequireCustomerNoteOnHold === 1 && !data.customerNotesTemplate) {
+            if (type && type.catRequireCustomerNoteOnHold == 1 && !data.customerNotesTemplate) {
                 this.alert(`Customer Notes are required for ${type.description} when the next action is On Hold`)
                 return false;
             }
-            if (type && type.catRequireCustomerNoteOnHold === 2 && !data.customerNotesTemplate) {
+            if (type && type.catRequireCustomerNoteOnHold == 2 && !data.customerNotesTemplate) {
 
                 if (!await this.confirm(`Are you sure you don't want to put an entry for Customer Notes?`))
                     return false;
             }
         }
-        if (data.hideFromCustomerFlag === 'Y' && data.problemHideFromCustomerFlag !== 'Y' && !data.customerNotesTemplate) {
+        if (data.hideFromCustomerFlag == 'Y' && data.problemHideFromCustomerFlag !== 'Y' && !data.customerNotesTemplate) {
             this.alert(`Hide from customer can't be set because there is a customer note`);
             return false;
         }
@@ -964,18 +963,19 @@ class ActivityEditComponent extends MainComponent {
         );
     };
 
-    deleteDocument = async (id) => {
-        if (await this.confirm("Are you sure you want to remove this document?")) {
+    async deleteDocument(id) {
+        const {data} = this.state;
+        if (await this.confirm('Are you sure you want to remove this document?')) {
             await this.api.deleteDocument(this.state.currentActivity, id);
-            const {data} = this.state;
-            data.documents = data.documents.filter((d) => d.id !== id);
+            data.documents = data.documents.filter(d => d.id !== id);
             this.setState({data});
         }
     };
+
     getTypeElement = () => {
         const {el} = this;
         const {data, callActTypes} = this.state;
-        const found = callActTypes.filter((t) => t.id === data.callActTypeIDOld);
+        const found = callActTypes.filter((t) => t.id == data.callActTypeIDOld);
 
         return this.getElementControl(
             "Type",
@@ -985,7 +985,7 @@ class ActivityEditComponent extends MainComponent {
                 {
                     disabled:
                         data?.isInitalDisabled ||
-                        (found.length === 0 && data?.callActTypeIDOld != null),
+                        (found.length == 0 && data?.callActTypeIDOld != null),
                     required: true,
                     value: data?.callActTypeID || "",
                     onChange: (event) =>
@@ -1034,7 +1034,7 @@ class ActivityEditComponent extends MainComponent {
     };
     handleContactChange = (id) => {
         const {data, contacts} = this.state;
-        const currentContact = contacts.find((c) => c.id === id);
+        const currentContact = contacts.find((c) => c.id == id);
         data.contactID = id;
         this.setState({data, currentContact});
     };
@@ -1273,22 +1273,22 @@ class ActivityEditComponent extends MainComponent {
                     this.getElementControl("Contact", "Contact",
                         this.getContactsElement(),
                     ),
-                    data?.problemHideFromCustomerFlag === "N" ? el(
+                    data?.problemHideFromCustomerFlag == "N" ? el(
                         "td",
                         {style: {textAlign: "right"}},
                         el("label", {className: "label"}, "Hide From Customer"),
                     ) : null,
-                    data?.problemHideFromCustomerFlag === "Y" ? el(
+                    data?.problemHideFromCustomerFlag == "Y" ? el(
                         "td",
                         {style: {textAlign: "right"}, colSpan: 2},
                         el("h3", {style: {color: "red", fontSize: 14}}, "Entire SR hidden from customer"),
                     ) : null,
-                    data?.problemHideFromCustomerFlag === "N" ? el(
+                    data?.problemHideFromCustomerFlag == "N" ? el(
                         "td",
                         {key: "td2"},
                         el(Toggle, {
-                            disabled: data?.problemHideFromCustomerFlag === "Y",
-                            checked: data?.hideFromCustomerFlag === "Y",
+                            disabled: data?.problemHideFromCustomerFlag == "Y",
+                            checked: data?.hideFromCustomerFlag == "Y",
                             onChange: ($event) => {
                                 this.setValue(
                                     "hideFromCustomerFlag",
@@ -1368,113 +1368,10 @@ class ActivityEditComponent extends MainComponent {
             )
         );
     };
-    getDocumentsElement = () => {
-        const {data, uploadFiles} = this.state;
-        const {el} = this;
-        let columns = [
-            {
-                path: "Description",
-                label: "Description",
-                sortable: false,
-                content: (document) =>
-                    el(
-                        "a",
-                        {
-                            href: `Activity.php?action=viewFile&callDocumentID=${document.id}`,
-                        },
-                        document.description
-                    ),
-            },
-            {
-                path: "File",
-                label: "File",
-                sortable: false,
-                content: (document) =>
-                    el(
-                        "a",
-                        {
-                            href: `Activity.php?action=viewFile&callDocumentID=${document.id}`,
-                        },
-                        document.filename
-                    ),
-            },
-            {
-                path: "createDate",
-                label: "Date",
-                sortable: false,
-            },
-            {
-                path: "delete",
-                label: "",
-                sortable: false,
-                content: (document) =>
-                    el("i", {
-                        className: "fal fa-trash-alt pointer icon font-size-4",
-                        onClick: () => this.deleteDocument(document.id),
-                    }),
-            },
-        ];
-        return el(
-            "div",
-            {className: "activities-edit-container", style: {marginBottom: 30}},
-            el("label", {className: "label m-5", style: {display: "block"}}, "Documents"),
-            data?.documents.length > 0
-                ? el(Table, {
-                    id: "documents",
-                    data: data?.documents || [],
-                    columns: columns,
-                    pk: "id",
-                    search: false,
-                })
-                : null,
-            el("i", {
-                className: "fal fa-plus pointer icon font-size-4",
-                onClick: this.handleSelectFiles,
-            }),
-            el("input", {
-                ref: this.fileUploader,
-                name: "usefile",
-                type: "file",
-                style: {display: "none"},
-                multiple: "multiple",
-                onChange: this.handleFileSelected,
-            }),
-            this.getSelectedFilesElement(),
-            uploadFiles.length > 0
-                ? el("i", {
-                    className: "fal fa-upload pointer icon font-size-4",
-                    onClick: this.handleUpload,
-                })
-                : null
-        );
-    };
-    getSelectedFilesElement = () => {
-        const {uploadFiles} = this.state;
-        if (uploadFiles) {
-            let names = "";
-            for (let i = 0; i < uploadFiles.length; i++) {
-                names += uploadFiles[i].name + "  ,";
-            }
-            names = names.substr(0, names.length - 2);
-            return this.el("label", {className: "ml-5"}, names);
-        }
-        return null;
-    };
+
     handleUpload = async () => {
-        const {uploadFiles, data, currentActivity} = this.state;
-        await this.api.uploadFiles(
-            `Activity.php?action=uploadFile&problemID=${data.problemID}&callActivityID=${data.callActivityID}`,
-            uploadFiles,
-            "userfile[]"
-        );
+        const {currentActivity} = this.state;
         this.loadCallActivity(currentActivity);
-    };
-    handleFileSelected = (e) => {
-        const uploadFiles = [...e.target.files];
-        this.setState({uploadFiles});
-    };
-    handleSelectFiles = () => {
-        this.fileUploader.current.click();
     };
 
 // Parts used, change requestm and sales request
@@ -1485,7 +1382,7 @@ class ActivityEditComponent extends MainComponent {
         let templateOptionId = null;
         let templateValue = "";
         if (id >= 0) {
-            const op = templateOptions.filter((s) => s.id === id)[0];
+            const op = templateOptions.filter((s) => s.id == id)[0];
             templateDefault = op.template;
             templateValue = op.template;
             templateOptionId = op.id;
@@ -1507,7 +1404,7 @@ class ActivityEditComponent extends MainComponent {
             data,
             currentActivity,
         } = this.state;
-        if (templateValue === "") {
+        if (templateValue == "") {
             this.alert("Please enter detials");
             return;
         }
@@ -1790,9 +1687,9 @@ class ActivityEditComponent extends MainComponent {
                     }
                 } else {
                     //check if he seen this notes today;
-                    const found = alertObject.items.find(i => i.userID === currentUser.id
-                        && i.contactID === data.contactID
-                        && i.notes === data.contactNotes);
+                    const found = alertObject.items.find(i => i.userID == currentUser.id
+                        && i.contactID == data.contactID
+                        && i.notes == data.contactNotes);
                     if (!found) {
                         alertObject.items.push(userObj);
                         this.alert(userObj.notes);
@@ -1825,10 +1722,10 @@ class ActivityEditComponent extends MainComponent {
                 options: noAssetStandardTextItems,
                 value: data.emptyAssetReason,
                 show: emptyAssetReasonModalShowing,
-                title: "Please provide the reason of not listing an asset",
+                title: "Please provide the reason of not listing an asset test",
                 okTitle: "OK",
                 onChange: (value) => {
-                    if(!value) {
+                    if (!value) {
                         return;
                     }
                     this.setState({
@@ -1860,7 +1757,7 @@ class ActivityEditComponent extends MainComponent {
                 callActivityID: data.callActivityID,
                 priorityChangeReason: value,
                 priority: this.state.priorities.filter(
-                    (p) => p.name === data.priority
+                    (p) => p.name == data.priority
                 )[0].id
             }
             this.api.changeProblemPriority(payload).then(result => {
@@ -1906,7 +1803,7 @@ class ActivityEditComponent extends MainComponent {
     handleAssetSelect = (value) => {
         const {data, assets} = this.state;
         if (value !== "") {
-            const index = assets.findIndex((a) => a.name === value);
+            const index = assets.findIndex((a) => a.name == value);
             const asset = assets[index];
             data.assetName = value;
             data.assetTitle =
@@ -1919,25 +1816,35 @@ class ActivityEditComponent extends MainComponent {
     };
 
     render() {
-        const {el} = this;
-        return el(
-            "div",
-            {style: {width: 1080}},
-            this.getAlert(),
-            this.getConfirm(),
-            this.getPrompt(),
-            this.getPriorityChangeReason(),
-            this.getNoAssetModal(),
-            this.getProjectsElement(),
-            this.getHeader(),
-            el("div", {className: "activities-edit-container"}, this.getActions()),
-            el("div", {className: "activities-edit-container"}, this.getActionsButtons()),
-            this.getContentElement(),
-            this.getActivityNotes(),
-            this.getCustomerNotes(),
-            this.getActivityInternalNotes(),
-            this.getDocumentsElement(),
-            this.getTemplateModal()
+        const {data} = this.state;
+        return (
+            <div style={{width: 1080}}>
+                {this.getAlert()}
+                {this.getConfirm()}
+                {this.getPrompt()}
+                {this.getPriorityChangeReason()}
+                {this.getNoAssetModal()}
+                {this.getProjectsElement()}
+                {this.getHeader()}
+                <div className="activities-edit-container">
+                    {this.getActions()}
+                </div>
+                <div className="activities-edit-container">
+                    {this.getActionsButtons()}
+                </div>
+                {this.getContentElement()}
+                {this.getActivityNotes()}
+                {this.getCustomerNotes()}
+                {this.getActivityInternalNotes()}
+                <ActivityDocumentUploader
+                    onDeleteDocument={(id) => this.deleteDocument(id)}
+                    onFilesUploaded={() => this.handleUpload()}
+                    serviceRequestId={data?.problemID}
+                    activityId={data?.callActivityID}
+                    documents={data?.documents}
+                />
+                {this.getTemplateModal()}
+            </div>
         );
     }
 }

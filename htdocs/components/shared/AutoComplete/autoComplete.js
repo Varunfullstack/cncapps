@@ -72,7 +72,7 @@ class AutoComplete extends React.Component {
     const { activeSuggestion, filteredSuggestions,userInput } = this.state;
     const {displayColumn,onSelect}   =this.props;
 
-    if(userInput.length===0)
+    if(userInput.length==0)
     {
       this.setState({
         activeSuggestion: -1,
@@ -83,7 +83,7 @@ class AutoComplete extends React.Component {
       onSelect(null);
       return;
     }
-    if(e.keyCode===27) //esc
+    if(e.keyCode==27) //esc
     {
         this.setState({
             activeSuggestion: 0,
@@ -95,7 +95,7 @@ class AutoComplete extends React.Component {
     }
     // User pressed the enter key, update the input and close the
     // suggestions
-    if (e.keyCode === 13) {
+    if (e.keyCode == 13) {
       this.setState({
         activeSuggestion: 0,
         showSuggestions: false,
@@ -105,16 +105,16 @@ class AutoComplete extends React.Component {
       onSelect(filteredSuggestions[activeSuggestion]);
     }
     // User pressed the up arrow, decrement the index
-    else if (e.keyCode === 38) {
-      if (activeSuggestion === 0) {
+    else if (e.keyCode == 38) {
+      if (activeSuggestion == 0) {
         return;
       }
 
       this.setState({ activeSuggestion: activeSuggestion - 1 });
     }
     // User pressed the down arrow, increment the index
-    else if (e.keyCode === 40) {
-      if (activeSuggestion - 1 === filteredSuggestions.length) {
+    else if (e.keyCode == 40) {
+      if (activeSuggestion - 1 == filteredSuggestions.length) {
         return;
       }
 
@@ -126,7 +126,7 @@ class AutoComplete extends React.Component {
      const {userInput}=this.state;
      displayLength=displayLength??10;
      let {filteredSuggestions}=this.state;
-     if(filteredSuggestions.length===0&&userInput==='') // display first n of items
+     if(filteredSuggestions.length==0&&userInput=='') // display first n of items
      {
         filteredSuggestions=items.slice(0,displayLength);
         if (items.length > displayLength) {
@@ -182,7 +182,7 @@ class AutoComplete extends React.Component {
         }, filteredSuggestions.map((suggestion, index) => {
           let className; // Flag the active suggestion with a class
         
-          if (index === activeSuggestion) {
+          if (index == activeSuggestion) {
             className = "suggestion-active";
           }
          

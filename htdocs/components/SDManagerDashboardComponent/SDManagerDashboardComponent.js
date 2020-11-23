@@ -60,7 +60,7 @@ class SDManagerDashboardComponent extends MainComponent {
 
     loadAllocatedUsers = () => {
         const {filter, allocatedUsers} = this.state;
-        if (filter.activeTab < 9 && allocatedUsers.length === 0)
+        if (filter.activeTab < 9 && allocatedUsers.length == 0)
             this.apiCurrentActivityService.getAllocatedUsers().then((res) => {
 
                 this.setState({allocatedUsers: res});
@@ -68,7 +68,7 @@ class SDManagerDashboardComponent extends MainComponent {
     }
     isActive = (code) => {
         const {filter} = this.state;
-        if (filter.activeTab === code) return "active";
+        if (filter.activeTab == code) return "active";
         else return "";
     };
     setActiveTab = (code) => {
@@ -467,7 +467,7 @@ class SDManagerDashboardComponent extends MainComponent {
                 pk: "problemID",
                 search: true,
             });
-        } else if (filter.activeTab === 9) {
+        } else if (filter.activeTab == 9) {
             const columns = [
                 {
                     path: "customerName",
@@ -506,7 +506,7 @@ class SDManagerDashboardComponent extends MainComponent {
 
                 })
             );
-        } else if (filter.activeTab === 10) {
+        } else if (filter.activeTab == 10) {
             return el(DailyStatsComponent);
         }
     }
@@ -520,7 +520,7 @@ class SDManagerDashboardComponent extends MainComponent {
     getAllocatedElement = (problem, teamId) => {
         const {el} = this;
         const {allocatedUsers} = this.state;
-        const currentTeam = allocatedUsers.filter((u) => u.teamID === teamId);
+        const currentTeam = allocatedUsers.filter((u) => u.teamID == teamId);
         const otherTeams = allocatedUsers.filter((u) => u.teamID !== teamId);
         return el(
             "select",
@@ -538,7 +538,7 @@ class SDManagerDashboardComponent extends MainComponent {
                         {
                             value: p.userID,
                             key: "option" + p.userID,
-                            className: teamId === p.teamID ? "in-team" : "",
+                            className: teamId == p.teamID ? "in-team" : "",
                         },
                         p.fullName
                     )
@@ -559,7 +559,7 @@ class SDManagerDashboardComponent extends MainComponent {
             });
     };
     getTeamCode = (teamID) => {
-        const queues = SRQueues.filter(q => q.teamID === teamID);
+        const queues = SRQueues.filter(q => q.teamID == teamID);
         if (queues.length > 0)
             return queues[0].code;
         else return ""

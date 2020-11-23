@@ -1,11 +1,13 @@
 import Table from "./../../shared/table/table";
 import Spinner from "../../shared/Spinner/Spinner";
-import APICustomers from "../../services/APICutsomer";
+import APICustomers from "../../services/APICustomers";
 import React from 'react';
+
+import './CustomerSearchComponent.css';
 
 class CustomerSearchComponent extends React.Component {
     el = React.createElement;
-    apiCutsomer = new APICustomers();
+    apiCustomer = new APICustomers();
     delayTimer;
 
     constructor(props) {
@@ -29,15 +31,20 @@ class CustomerSearchComponent extends React.Component {
         this.setState({_showSpinner: false});
     }
     handleCustomerSearch = (event) => {
+
         this.setState({searchValue: event.target.value})
+        if (event.target.value.length <= 2) {
+            return;
+        }
+
         clearTimeout(this.delayTimer);
         event.persist();
         this.delayTimer = setTimeout(() => {
             this.showSpinner();
-            this.apiCutsomer.searchCustomers(event.target.value)
+            this.apiCustomer.searchCustomers(event.target.value)
                 .then(customers => {
                     return customers.map(c => {
-                        if (c.supportLevel === 'main')
+                        if (c.supportLevel == 'main')
                             c.color = 'red';
                         return c;
                     });
@@ -62,7 +69,7 @@ class CustomerSearchComponent extends React.Component {
         //const projects= await ;
         if (this.props.updateSRData)
             this.props.updateSRData({customer, customerID: customer.cus_custno, nextStep: 2});
-        this.apiCutsomer.getCustomerProjects(customer.cus_custno).then(projects => {
+        this.apiCustomer.getCustomerProjects(customer.cus_custno).then(projects => {
             if (this.props.updateSRData)
                 this.props.updateSRData({projects});
         })
@@ -80,7 +87,7 @@ class CustomerSearchComponent extends React.Component {
                 sortable: false,
                 textColorColumn: "color",
                 content: (customer) =>
-                    customer.specialAttentionContact === '1' || customer.specialAttentionCustomer === 'Y' ?
+                    customer.specialAttentionContact == '1' || customer.specialAttentionCustomer == 'Y' ?
                         el(
                             "i",
                             {
@@ -97,7 +104,7 @@ class CustomerSearchComponent extends React.Component {
                 icon: "fal fa-2x fa-building color-gray2 ",
                 sortable: false,
                 width: "220",
-                hdClassName: "text-center",
+                hdClassName: "",
                 textColorColumn: "color",
                 content: (customer) =>
                     el(
@@ -117,7 +124,7 @@ class CustomerSearchComponent extends React.Component {
                 hdToolTip: "Customer Site",
                 icon: "fal fa-2x  fa-location color-gray2 ",
                 sortable: false,
-                hdClassName: "text-center",
+                hdClassName: "",
                 textColorColumn: "color",
                 content: (customer) =>
                     el(
@@ -137,7 +144,7 @@ class CustomerSearchComponent extends React.Component {
                 hdToolTip: "Contact",
                 icon: "fal fa-2x  fa-user color-gray2 ",
                 sortable: false,
-                hdClassName: "text-center",
+                hdClassName: "",
                 textColorColumn: "color",
                 content: (customer) =>
                     el(
@@ -157,7 +164,7 @@ class CustomerSearchComponent extends React.Component {
                 hdToolTip: "Position",
                 icon: "fal fa-2x  fa-id-card-alt color-gray2 ",
                 sortable: false,
-                hdClassName: "text-center",
+                hdClassName: "",
                 textColorColumn: "color",
                 content: (customer) =>
                     el(
@@ -177,7 +184,7 @@ class CustomerSearchComponent extends React.Component {
                 hdToolTip: "Support Level",
                 icon: "fal fa-2x fa-layer-group color-gray2 ",
                 sortable: false,
-                hdClassName: "text-center",
+                hdClassName: "",
                 textColorColumn: "color",
                 content: (customer) =>
                     el(
@@ -197,7 +204,7 @@ class CustomerSearchComponent extends React.Component {
                 hdToolTip: "Contact Phone",
                 icon: "fal fa-2x fa-phone color-gray2 ",
                 sortable: false,
-                hdClassName: "text-center",
+                hdClassName: "",
                 textColorColumn: "color",
                 content: (customer) =>
                     el(
@@ -217,7 +224,7 @@ class CustomerSearchComponent extends React.Component {
                 hdToolTip: "Notes",
                 icon: "fal fa-2x fa-file-alt color-gray2 ",
                 sortable: false,
-                hdClassName: "text-center",
+                hdClassName: "",
                 textColorColumn: "color",
                 content: (customer) =>
                     el(
@@ -231,7 +238,7 @@ class CustomerSearchComponent extends React.Component {
             },
         ];
         columns = columns
-            .filter((c) => c.hide === false)
+            .filter((c) => c.hide == false)
             .sort((a, b) => (a.order > b.order ? 1 : -1));
 
         return el(Table, {
@@ -246,7 +253,7 @@ class CustomerSearchComponent extends React.Component {
     render() {
         const {el, getSearchElement, getCustomersElement} = this;
         const {_showSpinner} = this.state;
-        return el("div", null,
+        return el("div", {className: "customer-search-component"},
             el(Spinner, {show: _showSpinner}),
             getSearchElement(),
             getCustomersElement());

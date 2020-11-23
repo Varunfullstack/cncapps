@@ -284,12 +284,10 @@ class SRSourceComponent extends React.Component {
                 path: "Contract", label: "Contract", sortable: true,
                 content: (sr) => {
                     let contractDisplay = sr.Contract;
-                    if ((sr.status === 'C' || sr.status === 'F') && sr.pro_contract_cuino === null)
+                    if ((sr.status == 'C' || sr.status == 'F') && sr.pro_contract_cuino == null)
                         contractDisplay = "T&M";
-                    else if ((sr.status === 'I' || sr.status === 'P') && sr.pro_contract_cuino === null) {
+                    else if ((sr.status == 'I' || sr.status == 'P') && sr.pro_contract_cuino == null) {
                         contractDisplay = '';
-                        //console.log(contractDisplay)
-
                     }
                     return this.el('label', {key: 'contractDisplay' + sr.CallReference}, contractDisplay);
                 }

@@ -1,8 +1,9 @@
 import Table from "./../../shared/table/table";
 import CurrentActivityService from "../services/CurrentActivityService";
 
-import React from 'react';
+import React, {Fragment} from 'react';
 import {ColumnRenderer} from "./ColumnRenderer";
+import {ServiceRequestSummary} from "./ServiceRequestSummary";
 
 class InboxSmallProjectsComponent extends React.Component {
     code = "SP";
@@ -23,7 +24,7 @@ class InboxSmallProjectsComponent extends React.Component {
         );
     };
     getTableElement = () => {
-        const {el, addToolTip} = this;
+        const {el} = this;
         const {
             getMoveElement,
             srDescription,
@@ -43,7 +44,7 @@ class InboxSmallProjectsComponent extends React.Component {
                 hide: false,
                 order: 8,
                 path: "hoursRemainingForSLA",
-                key: "hoursRemainingLabel",
+                key: "hoursRemainingForSLA",
                 label: "",
                 hdToolTip: "Hours the Service Request has been open",
                 icon: "fal fa-2x  fa-clock color-gray2 ",
@@ -51,13 +52,11 @@ class InboxSmallProjectsComponent extends React.Component {
                 width: "55",
                 hdClassName: "text-center",
                 className: "text-center",
-                content: (problem) => [
-                    el(
-                        "label",
-                        {key: "label", style: {verticalAlign: "middle"}},
-                        problem.hoursRemaining
-                    ),
-                ],
+                content: (problem) => (
+                    <label style={{verticalAlign: "middle"}}>
+                        {problem.hoursRemainingForSLA}
+                    </label>
+                )
             },
             {
                 hide: false,
@@ -82,16 +81,15 @@ class InboxSmallProjectsComponent extends React.Component {
                 sortable: false,
                 hdClassName: "text-center",
                 className: "text-center",
-                content: (problem) =>
-                    el(
-                        "a",
-                        {
-                            href: `Activity.php?action=displayLastActivity&problemID=${problem.problemID}`,
-                            target: "_blank",
-                            key: "link",
-                        },
-                        problem.problemID
-                    ),
+                content: (problem) => (
+                    <a
+                        href={`Activity.php?action=displayLastActivity&problemID=${problem.problemID}`}
+                        target="_blank"
+                        key="link"
+                    >
+                        {problem.problemID}
+                    </a>
+                )
             },
             {
                 hide: false,
@@ -161,101 +159,37 @@ class InboxSmallProjectsComponent extends React.Component {
                 hdClassName: "text-center",
                 className: "text-center",
                 toolTip: "Allocate more time",
-                content: (problem) =>
-                    el(
-                        "div",
-                        {onClick: () => allocateAdditionalTime(problem)},
-                        el("i", {
-                            className: "fal fa-2x fa-hourglass-start color-gray inbox-icon",
-                            style: {cursor: "pointer"},
-                        })
-                    ),
+                content: (problem) => {
+                    return (
+                        <div onClick={() => allocateAdditionalTime(problem)}>
+                            <i className="fal fa-2x fa-hourglass-start color-gray inbox-icon"
+                               style={{cursor: "pointer"}}
+                            />
+                        </div>
+                    )
+                }
             });
         columns = columns
-            .filter((c) => c.hide === false)
+            .filter((c) => c.hide == false)
             .sort((a, b) => (a.order > b.order ? 1 : -1));
         const {data} = this.props;
 
-        return el(Table, {
-            id: "helpDesk",
-            data: data || [],
-            columns: columns,
-            pk: "problemID",
-            search: true,
-        });
-    };
-
-    getSrByUsersSummaryElement = () => {
-        const {el} = this;
-        const {data} = this.props;
-        if (data) {
-            const future = data.filter((p) => moment(p.alarmDateTime) > moment())
-                .length;
-            if (data.length > 0) {
-                const items = data
-                    .reduce((prev, current) => {
-                        const index = prev.findIndex(
-                            (p) => p.name === current.engineerName
-                        );
-                        if (index === -1)
-                            prev.push({name: current.engineerName, total: 1});
-                        else prev[index].total += 1;
-                        return prev;
-                    }, [])
-                    .map((p) => {
-                        if (p.name != null && p.name !== "") {
-                            p.name = p.name.replace("  ", " ");
-                            const arr = p.name.split(" ");
-                            p.name = arr[0][0] + arr[1][0];
-                        }
-                        return p;
-                    })
-                    .sort((a, b) => (a.name > b.name ? 1 : -1))
-                    .map((item) => {
-                        return [
-                            el(
-                                "dt",
-                                {key: "name", style: {paddingLeft: 10}},
-                                (item.name || "Unassigned") + ":"
-                            ),
-                            el("dd", {key: "total"}, item.total),
-                        ];
-                    })
-                    .concat([
-                        el(
-                            "dt",
-                            {key: "name", style: {paddingLeft: 10}},
-                            "Future" + ":"
-                        ),
-                        el("dd", {key: "total"}, future),
-                    ]);
-                return [
-                    ...[
-                        el(
-                            "dt",
-                            {key: "nameFuture", style: {paddingLeft: 10}},
-                            "Total" + ":"
-                        ),
-                        el("dt", {key: "totalFuture"}, data.length),
-                    ],
-                    ...items,
-                ];
-            }
-        }
-        return null;
+        return <Table id="helpDesk"
+                      data={data || []}
+                      columns={columns}
+                      pk="problemID"
+                      search={true}
+        />
     };
 
     render() {
-        const {el, getTableElement, getSrByUsersSummaryElement} = this;
         const {data} = this.props;
-        return [
-            el(
-                "div",
-                {key: "summary", style: {display: "flex", flexDirection: "row"}},
-                getSrByUsersSummaryElement()
-            ),
-            getTableElement(),
-        ];
+        return (
+            <Fragment>
+                <ServiceRequestSummary data={data}/>
+                {this.getTableElement()}
+            </Fragment>
+        )
     }
 }
 

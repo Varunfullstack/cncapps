@@ -41,11 +41,10 @@ class TDOrderDetailsComponent extends React.Component {
 
 
         this.apiCustomerLicenses.getVendors(page).then(response => {
-            if (response.Result === 'Success') {
+            if (response.Result == 'Success') {
                 let vendors = [...this.state.vendors];
                 vendors = vendors.concat(response.BodyText.vendors);
                 this.setState({vendors});
-                console.log(page, response.BodyText.totalPages)
                 if (page < response.BodyText.totalPages)
                     this.fetchAllVendors(page + 1)
             }
@@ -105,7 +104,7 @@ class TDOrderDetailsComponent extends React.Component {
         } = this;
         const {vendors, errors, products, data} = this.state;
         let errorMessage = "";
-        if (typeof errors === "string")
+        if (typeof errors == "string")
         return el(
             "table",
             {key: "table", style: {maxWidth: 1000}},
@@ -190,47 +189,43 @@ class TDOrderDetailsComponent extends React.Component {
         this.setState({data});
     }
     handleProductSelect = (product) => {
-        console.log(product)
         const data = {...this.state.data};
         data.product = product;
         this.setState({data});
     }
     handleVendorSelect = (vendor) => {
-        console.log(vendor)
         const data = {...this.state.data};
         data.vendor = vendor;
         this.apiCustomerLicenses.getProductsByVendor(vendor.id, 10).then(res => {
-            if (res.Result === 'Success') {
+            if (res.Result == 'Success') {
 
                 this.setState({products: res.BodyText.products.vendors[0].listings});
             }
-            console.log('vendor products', res.Result)
         })
         this.setState({data});
     }
     handleOnSave = () => {
 
         const {data, mode} = this.state;
-        if (mode === "insert") {
+        if (mode == "insert") {
             this.apiCustomerLicenses
                 .addTechDataCustomer(this.state.data)
                 .then((result) => {
 
-                    if (result.Result === "Failed") {
+                    if (result.Result == "Failed") {
                         const errors = result.ErrorMessage;
                         this.setState({errors});
                     }
                 });
-        } else if (mode === "edit") {
-            console.log('edit customer')
+        } else if (mode == "edit") {
             this.apiCustomerLicenses
                 .updateTechDataCustomer(this.state.data.id, this.state.data)
                 .then((result) => {
 
-                    if (result.Result === "Failed") {
+                    if (result.Result == "Failed") {
                         const errors = result.ErrorMessage;
                         this.setState({errors});
-                    } else if (result.Result === "Success") {
+                    } else if (result.Result == "Success") {
                         this.handleOnCancel();
                     }
                 });
@@ -240,7 +235,7 @@ class TDOrderDetailsComponent extends React.Component {
     getCustomerDetails = (endCustomerId) => {
         this.apiCustomerLicenses.getCustomerDetails(endCustomerId).then((res) => {
 
-            if (res.Result === "Success") {
+            if (res.Result == "Success") {
                 const data = {...res.BodyText.endCustomerDetails};
 
                 //this.setState({ data, mode: "edit" });

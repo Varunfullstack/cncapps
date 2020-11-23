@@ -16,7 +16,7 @@ export class StreamOneService {
 
                 const res = await this.apiCustomerLicenses.getAllSubscriptions(1);
 
-                if (res.Result === "Success") {
+                if (res.Result == "Success") {
                     const pages = res.BodyText.totalPages;
 
                     this.appendOrders(res.BodyText.subscriptions);
@@ -24,7 +24,7 @@ export class StreamOneService {
                         const resChild = await this.apiCustomerLicenses.getAllSubscriptions(
                             i
                         );
-                        if (resChild.Result === "Success")
+                        if (resChild.Result == "Success")
                             this.appendOrders(resChild.BodyText.subscriptions);
                     }
                 }
@@ -62,7 +62,7 @@ export class StreamOneService {
         //1595593770262 1595593788826
         const orders = this.getOrders();
         if (orders.length > 0)
-            return orders.filter((o) => o.endCustomerEmail === email);
+            return orders.filter((o) => o.endCustomerEmail == email);
     }
 
     chekTimeExpire() {

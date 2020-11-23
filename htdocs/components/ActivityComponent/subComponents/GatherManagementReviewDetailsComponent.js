@@ -4,6 +4,8 @@ import CKEditor from "../../shared/CKEditor";
 import ToolTip from "../../shared/ToolTip";
 import {params} from "../../utils/utils";
 
+import React from 'react';
+
 class GatherManagementReviewDetailsComponent extends MainComponent {
     el = React.createElement;
     apiActivity = new APIActivity();
@@ -40,7 +42,7 @@ class GatherManagementReviewDetailsComponent extends MainComponent {
     };
     handleOnSave = () => {
         const {description} = this.state;
-        if (description === "") {
+        if (description == "") {
             this.alert("Please enter reason for management review");
             return;
         }

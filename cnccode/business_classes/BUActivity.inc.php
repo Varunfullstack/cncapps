@@ -6909,11 +6909,11 @@ class BUActivity extends Business
      * @param $queueNo
      * @return DBEJProblem
      */
-    function getProblemsByQueueNoWithFuture($queueNo
+    function getProblemsByQueue($queueNo
     )
     {
         $dbeJProblem = new DBEJProblem($this);
-        $dbeJProblem->getRowsByQueueNoWithFuture($queueNo);
+        $dbeJProblem->getRowsByQueue($queueNo);
         return $dbeJProblem;
     }
 

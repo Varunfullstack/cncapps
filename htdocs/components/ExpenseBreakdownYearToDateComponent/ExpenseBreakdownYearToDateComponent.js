@@ -123,7 +123,7 @@ class ExpenseBreakdownYearToDateComponent extends React.Component {
             acc[expense.expenseTypeDescription][acc[expense.expenseTypeDescription].length - 1] += expense.value;
             totalRow[expenseMonth - 1] += expense.value;
             totalRow[totalRow.length - 1] += expense.value;
-            if (expense.expenseTypeDescription === 'Mileage') {
+            if (expense.expenseTypeDescription == 'Mileage') {
                 mileage[expenseMonth - 1] += expense.mileage;
                 mileage[mileage.length - 1] += expense.mileage;
                 mileageDetail[expenseMonth - 1].push(expense);
@@ -204,7 +204,7 @@ class ExpenseBreakdownYearToDateComponent extends React.Component {
                                             "Expense Type"
                                         )
                                     }
-                                    if (index === array.length - 1) {
+                                    if (index == array.length - 1) {
                                         return this.el(
                                             'th',
                                             {
@@ -242,23 +242,23 @@ class ExpenseBreakdownYearToDateComponent extends React.Component {
                                         key: expenseType + '-row'
                                     },
                                     [
-                                        this.el('th', {key: expenseType + '-title'}, expenseType === "Mileage" ? "Mileage (Miles)" : expenseType),
+                                        this.el('th', {key: expenseType + '-title'}, expenseType == "Mileage" ? "Mileage (Miles)" : expenseType),
                                         ...tableData[expenseType].map((value, idx) => {
                                             return this.el(
                                                 'td',
                                                 {
                                                     style: {
                                                         textAlign: "right",
-                                                        cursor: expenseType === 'Mileage' ? 'pointer' : null
+                                                        cursor: expenseType == 'Mileage' ? 'pointer' : null
                                                     },
                                                     key: expenseType + idx,
                                                     onClick: $even => {
-                                                        if (expenseType === 'Mileage') {
+                                                        if (expenseType == 'Mileage') {
                                                             this.setState({selectedDetail: idx});
                                                         }
                                                     },
                                                 },
-                                                value.toFixed(2) + (expenseType === "Mileage" ? ` (${mileage[idx]})` : '')
+                                                value.toFixed(2) + (expenseType == "Mileage" ? ` (${mileage[idx]})` : '')
                                             )
                                         })
                                     ]

@@ -29,7 +29,7 @@ class TableBody extends React.Component {
             data.map((item, index) => el("tr", {
                 key: (pk ? item[pk] : item[0]).toString() + makeid().toString(),
                 id: (pk ? item[pk] : null).toString(),
-                className: selected && pk && selected[pk] === item[pk] && selected[selectedKey] === item[selectedKey] ? 'selected' : null
+                className: selected && pk && selected[pk] == item[pk] && selected[selectedKey] == item[selectedKey] ? 'selected' : null
             }, columns.map(c => el("td", {
                     key: c.path || c.key || c.label.replace(' ', '') + makeid().toString(),
                     className: (c.className ? c.className : ' ') + " " + (c.classNameColumn ? this.get(item, c.classNameColumn) : '')

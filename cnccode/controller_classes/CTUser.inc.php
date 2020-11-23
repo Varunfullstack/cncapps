@@ -1008,15 +1008,16 @@ class CTUser extends CTCNC
         $dbeJUser->getRow();
         return json_encode(
             [
-                'firstName'             => $dbeJUser->getValue(DBEJUser::firstName),
-                'lastName'              => $dbeJUser->getValue(DBEJUser::lastName),
-                'id'                    => $dbeJUser->getValue(DBEJUser::userID),
-                'email'                 => $dbeJUser->getEmail(),
-                'isSDManger'            => $this->isSdManager(),
-                'isExpenseApprover'     => $dbeJUser->getValue(DBEJUser::isExpenseApprover),
-                'globalExpenseApprover' => $dbeJUser->getValue(DBEJUser::globalExpenseApprover),
-                'teamID'                => $dbeJUser->getValue(DBEJUser::teamID),
-                'teamLevel'             => $dbeJUser->getValue(DBEJUser::teamLevel),
+                'firstName'                  => $dbeJUser->getValue(DBEJUser::firstName),
+                'lastName'                   => $dbeJUser->getValue(DBEJUser::lastName),
+                'id'                         => $dbeJUser->getValue(DBEJUser::userID),
+                'email'                      => $dbeJUser->getEmail(),
+                'isSDManger'                 => $this->isSdManager(),
+                'isExpenseApprover'          => $dbeJUser->getValue(DBEJUser::isExpenseApprover),
+                'globalExpenseApprover'      => $dbeJUser->getValue(DBEJUser::globalExpenseApprover),
+                'teamID'                     => $dbeJUser->getValue(DBEJUser::teamID),
+                'teamLevel'                  => $dbeJUser->getValue(DBEJUser::teamLevel),
+                'serviceRequestQueueManager' => $dbeJUser->getValue(DBEJUser::changeInitialDateAndTimeFlag) == 'Y'
             ]
         );
     }

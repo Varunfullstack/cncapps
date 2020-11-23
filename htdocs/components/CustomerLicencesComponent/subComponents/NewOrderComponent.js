@@ -32,7 +32,7 @@ class NewOrderComponent extends React.Component {
         const endCustomerEmail = queryParams.get("email");
         let state = {};
         this.showSpinner();
-        const customerSerach = this.props.customers.filter(c => c.email === endCustomerEmail);
+        const customerSerach = this.props.customers.filter(c => c.email == endCustomerEmail);
         if (customerSerach.length > 0) {
             state.endCustomer = customerSerach[0];
             if (state.endCustomer.MsDomain && state.endCustomer.MsDomain.length > 0) {
@@ -62,7 +62,7 @@ class NewOrderComponent extends React.Component {
 
             productList = productList.map((p) => {
                 const streamProduct = streamOneProducts.BodyText.productDetails.filter(
-                    (s) => s.sku === p.sku
+                    (s) => s.sku == p.sku
                 );
                 if (streamProduct.length > 0) {
                     p = {...p, ...streamProduct[0]};
@@ -167,7 +167,7 @@ class NewOrderComponent extends React.Component {
                         value: p.quantity,
                         min: 0,
                         type: "number",
-                        disabled: p.skuType === "Add On Subscription",
+                        disabled: p.skuType == "Add On Subscription",
                         style: {maxWidth: 40},
                         onChange: (event) => handleProductQuantity(event, p),
                     }),
@@ -193,7 +193,7 @@ class NewOrderComponent extends React.Component {
         const {filteredProductList} = this.state;
         let _pIndex = -1;
         filteredProductList.forEach((element, pIndex) => {
-            if (element.sku === item.sku) _pIndex = pIndex;
+            if (element.sku == item.sku) _pIndex = pIndex;
         });
         if (_pIndex >= 0)
             filteredProductList[_pIndex].quantity = 0;
@@ -234,7 +234,6 @@ class NewOrderComponent extends React.Component {
             },
         ];
         if (items) {
-            ////////console.log('selectedOrderLine',selectedOrderLine)
             let total = 0;
             if (items.length > 0)
                 total = items
@@ -276,7 +275,7 @@ class NewOrderComponent extends React.Component {
         let items = this.getFinalOrderItems();
         const {endCustomer, selectedDomain, currentUser} = this.state;
 
-        if (items.length === 0) {
+        if (items.length == 0) {
             alert("Your cart is empty Please set product quantities");
             return;
         }
@@ -332,8 +331,8 @@ class NewOrderComponent extends React.Component {
             this.apiCustomerLicenses.addOrder(order).then((res) => {
 
                 if (
-                    res.Result === "Success" &&
-                    res.BodyText.placeOrdersDetails[0].result === "success"
+                    res.Result == "Success" &&
+                    res.BodyText.placeOrdersDetails[0].result == "success"
                 )
                     window.location = `/CustomerLicenses.php?action=searchOrders&email=${endCustomer.email}&tap=saas`;
                 else this.setState({errorMessage: res.ErrorMessage});
