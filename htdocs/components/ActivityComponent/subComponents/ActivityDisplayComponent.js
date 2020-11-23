@@ -11,6 +11,7 @@ import * as React from 'react';
 import Modal from "../../shared/Modal/modal";
 import moment from "moment";
 
+// noinspection EqualityComparisonWithCoercionJS
 class ActivityDisplayComponent extends MainComponent {
     api = new APIActivity();
 
@@ -25,7 +26,7 @@ class ActivityDisplayComponent extends MainComponent {
             },
             uploadFiles: [],
             data: null,
-            currentActivity: '',
+            currentActivity: null,
             _showModal: false,
             templateOptions: [],
             templateOptionId: null,
@@ -79,9 +80,9 @@ class ActivityDisplayComponent extends MainComponent {
             a.enginner = a.dateEngineer.split('-')[1];
             return a;
         })
-        filters.monitorSR = res.monitoringFlag === "1";
-        filters.criticalSR = res.criticalFlag === "1";
-        this.setState({filters, data: res, currentActivity: res.callActivityID, currentUser});
+        filters.monitorSR = res.monitoringFlag == "1";
+        filters.criticalSR = res.criticalFlag == "1";
+        this.setState({filters, data: res, currentActivity: +res.callActivityID, currentUser});
 
     }
     getProjectsElement = () => {
@@ -178,7 +179,7 @@ class ActivityDisplayComponent extends MainComponent {
                 })
             }),
             this.getGab(),
-            data?.canEdit === 'ALL_GOOD' ? el(ToolTip, {
+            data?.canEdit == 'ALL_GOOD' ? el(ToolTip, {
                 title: "Edit",
                 content: el('a', {
                     className: "fal fa-edit fa-2x m-5 pointer icon",
@@ -190,7 +191,7 @@ class ActivityDisplayComponent extends MainComponent {
                 content: el('i', {className: "fal fa-edit fa-2x m-5 pointer icon-disable"})
             }) : null,
             (data?.canDelete && data?.problemStatus !== "C") ? el(ToolTip, {
-                title: data?.activities.length === 1 ? "Delete Request" : "Delete Activity",
+                title: data?.activities.length == 1 ? "Delete Request" : "Delete Activity",
                 content: el('i', {
                     className: "fal fa-trash-alt fa-2x m-5 pointer icon",
                     onClick: () => this.handleDelete(data)
@@ -273,7 +274,7 @@ class ActivityDisplayComponent extends MainComponent {
                     href: `Activity.php?action=createFollowOnActivity&callActivityID=${data?.callActivityID}&callActivityTypeID=22`
                 })
             }) : null,
-            currentUser.isSDManger && data?.problemHideFromCustomerFlag === 'Y' ? el(ToolTip, {
+            currentUser.isSDManger && data?.problemHideFromCustomerFlag == 'Y' ? el(ToolTip, {
                 title: "Unhide SR",
                 content: el('i', {
                     className: "fal fa-eye-slash fa-2x m-5 pointer icon",
@@ -294,7 +295,7 @@ class ActivityDisplayComponent extends MainComponent {
                     onClick: () => window.open(`Popup.php?action=timeBreakdown&problemID=${data?.problemID}`, 'popup', 'width=800,height=400')
                 })
             }),
-            data?.allowSCRFlag === 'Y' ? el(ToolTip, {
+            data?.allowSCRFlag == 'Y' ? el(ToolTip, {
                 title: "Send client a visit confirmation email",
                 content: el('i', {
                     className: "fal fa-envelope fa-2x m-5 pointer icon",
@@ -312,7 +313,7 @@ class ActivityDisplayComponent extends MainComponent {
         }
     }
     handleUnhideSR = async (data) => {
-        if (data?.isSDManger && data?.problemHideFromCustomerFlag === 'Y') {
+        if (data?.isSDManger && data?.problemHideFromCustomerFlag == 'Y') {
             if (await this.confirm('This will unhide the SR from the customer and can\'t be undone, are you sure?')) {
                 await this.api.unHideSrActivity(data.callActivityID);
                 data.problemHideFromCustomerFlag = 'N';
@@ -322,7 +323,7 @@ class ActivityDisplayComponent extends MainComponent {
     }
     handleDelete = async (data) => {
         let deleteActivity = false;
-        if (data.activities.length === 1) {
+        if (data.activities.length == 1) {
             if (await this.confirm('Deleting this activity will remove all traces of this Service Request from the system. Are you sure?'))
                 deleteActivity = true;
         } else if (await this.confirm('Delete this activity?'))
@@ -363,9 +364,9 @@ class ActivityDisplayComponent extends MainComponent {
         const item = sessionStorage.getItem('displayActivityFilter');
         let {filters} = this.state;
         if (item) {
-            const showTravel = params.get("toggleIncludeTravel") === "1";
-            const showOperationalTasks = params.get("toggleIncludeOperationalTasks") === "1";
-            const showServerGuardUpdates = params.get("toggleIncludeServerGuardUpdates") === "1";
+            const showTravel = params.get("toggleIncludeTravel") == "1";
+            const showOperationalTasks = params.get("toggleIncludeOperationalTasks") == "1";
+            const showServerGuardUpdates = params.get("toggleIncludeServerGuardUpdates") == "1";
             filters = JSON.parse(item);
             filters = {
                 ...filters,
@@ -381,9 +382,9 @@ class ActivityDisplayComponent extends MainComponent {
         filters[filter] = !filters[filter];
         this.setState({filters});
 
-        if (filter === "criticalSR")
+        if (filter == "criticalSR")
             await this.api.setActivityCritical(currentActivity);
-        if (filter === "monitorSR")
+        if (filter == "monitorSR")
             await this.api.setActivityMonitoring(currentActivity);
         this.saveFilterSession();
         this.loadCallActivity(currentActivity);
@@ -406,12 +407,12 @@ class ActivityDisplayComponent extends MainComponent {
         const {el} = this;
         if (!data)
             return null;
-        const indx = data.activities.findIndex(a => a.callActivityID === currentActivity);
+        const indx = data.activities.findIndex(a => a.callActivityID == +currentActivity);
         return el('div', {className: "ml-5"}, el('strong', null, (indx + 1)), el('label', null, ` of ${data.activities.length}`))
     }
     goNextActivity = () => {
         const {data, currentActivity} = this.state;
-        let index = data.activities.findIndex(a => a.callActivityID === currentActivity);
+        let index = data.activities.findIndex(a => a.callActivityID == +currentActivity);
         if (index < (data.activities.length - 1)) {
             index++;
             this.setState({currentActivity: data.activities[index].callActivityID});
@@ -421,7 +422,7 @@ class ActivityDisplayComponent extends MainComponent {
     }
     goPrevActivity = () => {
         const {data, currentActivity} = this.state;
-        let index = data.activities.findIndex(a => a.callActivityID === currentActivity);
+        let index = data.activities.findIndex(a => a.callActivityID == +currentActivity);
         if (index > 0) {
             index--;
             this.setState({currentActivity: data.activities[index].callActivityID});
@@ -431,7 +432,7 @@ class ActivityDisplayComponent extends MainComponent {
     }
     goLastActivity = () => {
         const {data, currentActivity} = this.state;
-        let index = data.activities.findIndex(a => a.callActivityID === currentActivity);
+        let index = data.activities.findIndex(a => a.callActivityID == +currentActivity);
         if (index !== (data.activities.length - 1)) {
             index = data.activities.length - 1;
             this.setState({currentActivity: data.activities[index].callActivityID});
@@ -440,7 +441,7 @@ class ActivityDisplayComponent extends MainComponent {
     }
     goFirstActivity = () => {
         const {data, currentActivity} = this.state;
-        let index = data.activities.findIndex(a => a.callActivityID === currentActivity);
+        let index = data.activities.findIndex(a => a.callActivityID == +currentActivity);
         if (index !== 0) {
             index = 0;
             this.setState({currentActivity: data.activities[index].callActivityID});
@@ -478,8 +479,8 @@ class ActivityDisplayComponent extends MainComponent {
         const dateLen = maxLength(data?.activities || [], 'date') + 10;
         const engineerLen = maxLength(data?.activities || [], 'enginner') + 10;
         const contactName = maxLength(data?.activities || [], 'contactName') + 10;
-        console.log(currentActivity);
-        const indx = data?.activities.findIndex(a => a.callActivityID === currentActivity);
+        const indx = data?.activities.findIndex(a => +a.callActivityID == +currentActivity);
+        console.log(+currentActivity, indx, data?.activities);
         return el('div', {className: "activities-container"},
             el('div', {style: {width: "100%", display: "flex", alignItems: "center", justifyContent: "center"}},
                 el(ToolTip, {
@@ -498,7 +499,7 @@ class ActivityDisplayComponent extends MainComponent {
                     })
                 }),
                 el('select', {value: currentActivity, onChange: this.handleActivityChange},
-                    indx === -1 ? el('option', {value: null}, "") : null,
+                    indx == -1 ? el('option', {value: null}, "") : null,
                     data?.activities.map(a =>
                         el('option', {
                             key: "cl" + a.callActivityID, value: a.callActivityID,
@@ -544,7 +545,7 @@ class ActivityDisplayComponent extends MainComponent {
     }
     getHiddenSRElement = (data) => {
         const {el} = this;
-        if (data?.problemHideFromCustomerFlag === 'Y')
+        if (data?.problemHideFromCustomerFlag == 'Y')
             return this.el('div', {style: {display: "flex", justifyContent: "center", alignItems: "center"}},
                 el('h1', {style: {color: "red"}}, "Hidden From Customer")
             )
@@ -675,7 +676,7 @@ class ActivityDisplayComponent extends MainComponent {
                     el('tr', null,
                         el('td', {className: "display-label"}, "Priority"),
                         el('td', {className: "display-content"}, data?.priority),
-                        el('td', {style: {textAlign: "center"}, colSpan: 1}, data?.problemHideFromCustomerFlag === "Y" ?
+                        el('td', {style: {textAlign: "center"}, colSpan: 1}, data?.problemHideFromCustomerFlag == "Y" ?
                             el("label", {
                                 style: {
                                     color: "red",
@@ -728,9 +729,9 @@ class ActivityDisplayComponent extends MainComponent {
     }
     getAwaitingTitle = (data) => {
         if (data?.problemStatus !== "F" && data?.problemStatus !== "C") {
-            if (data?.awaitingCustomerResponseFlag === 'N')
+            if (data?.awaitingCustomerResponseFlag == 'N')
                 return " - Awaiting CNC";
-            else if (data?.awaitingCustomerResponseFlag === 'Y')
+            else if (data?.awaitingCustomerResponseFlag == 'Y')
                 return " - On Hold";
             else
                 return "";
@@ -876,7 +877,7 @@ class ActivityDisplayComponent extends MainComponent {
         let templateOptionId = null;
         let templateValue = '';
         if (id >= 0) {
-            const op = templateOptions.filter(s => s.id === id)[0];
+            const op = templateOptions.filter(s => s.id == id)[0];
             templateDefault = op.template;
             templateValue = op.template;
             templateOptionId = op.id;
@@ -890,7 +891,7 @@ class ActivityDisplayComponent extends MainComponent {
     }
     handleTemplateSend = async (type) => {
         const {templateValue, templateOptionId, data, currentActivity} = this.state;
-        if (templateValue === '') {
+        if (templateValue == '') {
             this.alert('Please enter detials');
             return;
         }
@@ -984,7 +985,7 @@ class ActivityDisplayComponent extends MainComponent {
     }
     getFollowOnElement = () => {
         const {data, showFollowOn} = this.state;
-        const startWork = data?.problemStatus === 'I' && data?.serverGuard === 'N' && data?.hideFromCustomerFlag === 'N';
+        const startWork = data?.problemStatus == 'I' && data?.serverGuard == 'N' && data?.hideFromCustomerFlag == 'N';
         return showFollowOn ? this.el(ActivityFollowOn, {
             startWork,
             key: "followOnModal",

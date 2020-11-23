@@ -265,7 +265,7 @@ class FixedServiceRequestCountComponent extends React.Component {
                                     engineers: []
                                 };
 
-                                if (row.teamId === 1) {
+                                if (row.teamId == 1) {
                                     teams[row.teamId].firstTimeFixRaised = firstTimeFixData.totalRaised;
                                     teams[row.teamId].firstTimeFixPercentAttempted = firstTimeFixData.firstTimeFixAttemptedPct;
                                     teams[row.teamId].firstTimeFixPercentAchieved = firstTimeFixData.firstTimeFixAchievedPct;
@@ -301,7 +301,7 @@ class FixedServiceRequestCountComponent extends React.Component {
                                 currentTeam.timeRequests += +row.timeRequests;
                                 currentTeam.changeRequests += +row.changeRequests;
                                 currentTeam.operationalTasks += +row.operationalTasks;
-                                const foundFirstTimeFixData = firstTimeFixData.engineers.find(x => x.id === row.userId);
+                                const foundFirstTimeFixData = firstTimeFixData.engineers.find(x => x.id == row.userId);
 
                                 let firstTimeFixTotalRaised = null;
                                 let firstTimeFixPct = null;
@@ -333,7 +333,7 @@ class FixedServiceRequestCountComponent extends React.Component {
                                 )
                             }
                             previousTeam = currentTeam;
-                            if (index === array.length - 1) {
+                            if (index == array.length - 1) {
                                 this.footerRow(acc, teamPerformanceData, previousTeam);
                             }
                             return acc;
@@ -409,7 +409,7 @@ class FixedServiceRequestCountComponent extends React.Component {
                                     {
                                         type: 'radio',
                                         name: 'selection',
-                                        checked: selectedState === SelectionState.YEAR_TO_DATE,
+                                        checked: selectedState == SelectionState.YEAR_TO_DATE,
                                         key: 'yearToDateInput',
                                         onChange: () => {
                                             this.setState({selectedState: SelectionState.YEAR_TO_DATE});
@@ -437,7 +437,7 @@ class FixedServiceRequestCountComponent extends React.Component {
                                     {
                                         type: 'radio',
                                         name: 'selection',
-                                        checked: selectedState === SelectionState.SPECIFIC_YEAR_MONTH,
+                                        checked: selectedState == SelectionState.SPECIFIC_YEAR_MONTH,
                                         key: 'specificMonthInput',
                                         onChange: () => {
                                             this.setState({selectedState: SelectionState.SPECIFIC_YEAR_MONTH});
@@ -465,7 +465,7 @@ class FixedServiceRequestCountComponent extends React.Component {
                                     {
                                         type: 'radio',
                                         name: 'selection',
-                                        checked: selectedState === SelectionState.CUSTOM_DATES,
+                                        checked: selectedState == SelectionState.CUSTOM_DATES,
                                         key: 'customDatesInput',
                                         onChange: () => {
                                             this.setState({selectedState: SelectionState.CUSTOM_DATES});
@@ -481,7 +481,7 @@ class FixedServiceRequestCountComponent extends React.Component {
                                 )
                             ]
                         ),
-                        selectedState === SelectionState.SPECIFIC_YEAR_MONTH ?
+                        selectedState == SelectionState.SPECIFIC_YEAR_MONTH ?
                             this.el('input', {
                                 type: 'month',
                                 value: yearMonth,
@@ -491,7 +491,7 @@ class FixedServiceRequestCountComponent extends React.Component {
                                 },
                                 key: 'yearMonthInput'
                             }) :
-                            selectedState === SelectionState.CUSTOM_DATES ?
+                            selectedState == SelectionState.CUSTOM_DATES ?
                                 (
                                     <React.Fragment key="datesContainer">
                                         <input type="date"

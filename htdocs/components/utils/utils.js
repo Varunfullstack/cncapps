@@ -11,7 +11,7 @@ export function getServiceRequestWorkTitle(serviceRequest) {
     if (serviceRequest.isBeingWorkedOn) {
         return "Request being worked on currently";
     }
-    if (serviceRequest.status === "I") {
+    if (serviceRequest.status == "I") {
         return "Request not started yet";
     }
     return "Work on this request";
@@ -23,7 +23,7 @@ export function getWorkIconClassName(serviceRequest) {
     if (serviceRequest.isBeingWorkedOn) {
         return `being-worked-on fad ${commonClasses}`;
     }
-    if (serviceRequest.status === "I") {
+    if (serviceRequest.status == "I") {
         return `not-yet-started fad ${commonClasses}`
     }
     return `start-work fal ${commonClasses}`;
@@ -34,15 +34,15 @@ export function sort(array, path, order = "asc") {
         if (
             get(a, path) > get(b, path) ||
             get(a, path) == null ||
-            get(a, path) === undefined
+            get(a, path) == undefined
         )
-            return order === "asc" ? 1 : -1;
+            return order == "asc" ? 1 : -1;
         if (
             get(a, path) < get(b, path) ||
             get(b, path) == null ||
-            get(a, path) === undefined
+            get(a, path) == undefined
         )
-            return order === "asc" ? -1 : 1;
+            return order == "asc" ? -1 : 1;
         else return 0;
     });
 }
@@ -61,13 +61,13 @@ export function makeid(length = 5) {
 export function exportCSV(items, fileName, header = []) {
     const replacer = (key, value) => {
         // specify how you want to handle null values here
-        value = value === null ? "" : value;
+        value = value == null ? "" : value;
         value.replace(value, "\n");
         value.replace(value, "\r");
         return value;
     };
     if (items.length > 0) {
-        if (header.length === 0) header = Object.keys(items[0]);
+        if (header.length == 0) header = Object.keys(items[0]);
         let csv = items.map((row) =>
             header
                 .map((fieldName) => JSON.stringify(row[fieldName], replacer))
@@ -97,7 +97,7 @@ export function exportCSV(items, fileName, header = []) {
 
 export function distinct(array, propertyName) {
     const d = (value, index, self) => {
-        return self.map(a => a[propertyName]).indexOf(value[propertyName]) === index;
+        return self.map(a => a[propertyName]).indexOf(value[propertyName]) == index;
     }
     return array.filter(d);
 }
@@ -145,9 +145,9 @@ export function groupBy(items, propertyName) {
     return items.reduce(function (prev, current) {
         // get group index and group by renewalType
         const index = prev
-            ? prev.findIndex((g) => g.groupName === current[propertyName])
+            ? prev.findIndex((g) => g.groupName == current[propertyName])
             : -1;
-        if ((prev && prev.length == 0) || index === -1) {
+        if ((prev && prev.length == 0) || index == -1) {
             const obj = {
                 groupName: current[propertyName],
                 items: [current],
@@ -210,6 +210,6 @@ export const Chars = {
     WhiteSpace: "&nbsp;"
 }
 export const isEmptyTime = (time) => {
-    return time === "" || time == null || time === "00:00" || time === "";
+    return time == "" || time == null || time == "00:00" || time == "";
 }
 export const MYSQL_DATE_FORMAT = 'YYYY-MM-DD';

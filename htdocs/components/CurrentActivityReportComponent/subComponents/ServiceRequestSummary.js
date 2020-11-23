@@ -18,7 +18,7 @@ export class ServiceRequestSummary extends Component {
 
         const summary = data.reduce((acc, item) => {
             acc.total++;
-            const isInitial = item.status === 'I'
+            const isInitial = item.status == 'I'
             acc.initial += isInitial;
             if (item.engineerName) {
                 const key = item.engineerName.match(/\b(\w)/g).join('');

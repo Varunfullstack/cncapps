@@ -183,7 +183,7 @@ class InboxOpenSRComponent extends React.Component {
                     ),
             });
         columns = columns
-            .filter((c) => c.hide === false)
+            .filter((c) => c.hide == false)
             .sort((a, b) => (a.order > b.order ? 1 : -1));
         const {data} = this.state;
         return el(Table, {

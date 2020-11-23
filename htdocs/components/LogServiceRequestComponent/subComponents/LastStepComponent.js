@@ -199,8 +199,11 @@ class LastStepComponent extends MainComponent {
         data.completeDate = null;
         data.userID = null;
         this.setState({data});
-        if (this.isValid())
+        if (this.isValid()) {
             this.props.updateSRData(data, true);
+        } else {
+            this.setState({data: {...this.state.data, startWork: false}})
+        }
     };
     getProblemPriority = () => {
         const {el, setValue} = this;
@@ -235,7 +238,7 @@ class LastStepComponent extends MainComponent {
     };
     handleCheckListChange = (value) => {
         const {data, checkList} = this.state;
-        const index = checkList.findIndex((c) => c.id === value);
+        const index = checkList.findIndex((c) => c.id == value);
         if (index > -1) {
             data.internalNotesAppend = checkList[index].content;
         } else data.internalNotesAppend = "";
@@ -312,9 +315,9 @@ class LastStepComponent extends MainComponent {
         const {data} = this.state;
         let requireAuthorize;
         //contactID
-        const contact = contacts.find((item) => item.id === contactID);
+        const contact = contacts.find((item) => item.id == contactID);
 
-        if (contact?.startMainContactStyle === "- Delegate") requireAuthorize = true;
+        if (contact?.startMainContactStyle == "- Delegate") requireAuthorize = true;
         else {
             requireAuthorize = false;
             data.authorisedBy = "";
@@ -328,7 +331,7 @@ class LastStepComponent extends MainComponent {
 
         const contactSupervisor = groupBy(
             contacts.filter((contact) => {
-                return contact.startMainContactStyle === "*" || contact.startMainContactStyle === "- Supervisor";
+                return contact.startMainContactStyle == "*" || contact.startMainContactStyle == "- Supervisor";
             }),
             "siteTitle"
         );
@@ -371,7 +374,7 @@ class LastStepComponent extends MainComponent {
         const {el} = this;
         const {data} = this.state;
         let queueFiltered = SRQueues;
-        if (this.props.data.customer.hasPrepay === "1")
+        if (this.props.data.customer.hasPrepay == "1")
             queueFiltered = SRQueues.filter((q) => q.id !== 6);
         return el(
             "tr",
@@ -400,7 +403,7 @@ class LastStepComponent extends MainComponent {
         const {_showModal, modalType, noWorkOptions, data} = this.state;
         if (!_showModal) return null;
         return el(StandardTextModal, {
-            show: _showModal && modalType === this.modalType.notStartWorkReason,
+            show: _showModal && modalType == this.modalType.notStartWorkReason,
             options: noWorkOptions,
             value: data.notStartWorkReason,
             title: "Please provide a reason why you aren't offering a first time fix",
@@ -419,7 +422,7 @@ class LastStepComponent extends MainComponent {
         const {_showModal, modalType, notFirstTimeFixOptions, data} = this.state;
         if (!_showModal) return null;
         return el(StandardTextModal, {
-            show: _showModal && modalType === this.modalType.notFirstTimeFixReason && data.notFirstTimeFixReason == null,
+            show: _showModal && modalType == this.modalType.notFirstTimeFixReason && data.notFirstTimeFixReason == null,
             options: notFirstTimeFixOptions,
             value: data.notFirstTimeFixReason,
             title: "Reason for not attempting a First Time Fix",
@@ -441,29 +444,29 @@ class LastStepComponent extends MainComponent {
     isValid = () => {
         const {data, requireAuthorize} = this.state;
         const {currentUser} = this.props.data;
-        if (data.contactID === -1) {
+        if (data.contactID == -1) {
             this.alert("Please select contact");
             return false;
         }
-        if (requireAuthorize && data.authorisedBy === "") {
+        if (requireAuthorize && data.authorisedBy == "") {
             this.alert("Please Select Authorize By");
             return false;
         }
 
-        if (data.priority === -1) {
+        if (data.priority == -1) {
             this.alert("Please select priority");
             return false;
         }
-        if (data.queueNo === -1) {
+        if (data.queueNo == -1) {
             this.alert("Please select queue");
             return false;
         }
 
-        if (data.reason === "") {
+        if (data.reason == "") {
             this.alert("Please select queue");
             return false;
         }
-        if (currentUser.teamLevel === 1 && data.queueNo === TeamType.Helpdesk && (data.notFirstTimeFixReason == null || data.notFirstTimeFixReason === "")) {
+        if (currentUser.teamLevel == 1 && data.queueNo == TeamType.Helpdesk && (data.notFirstTimeFixReason == null || data.notFirstTimeFixReason == "")) {
 
             const _showModal = true;
             const modalType = this.modalType.notFirstTimeFixReason;

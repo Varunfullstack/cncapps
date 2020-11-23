@@ -260,7 +260,7 @@ class ActivityListComponent extends MainComponent {
         ];
         let columnsFilter;
         if (filterColumn !== 'all')
-            columnsFilter = columns.filter(c => c.path === filterColumn || c.path === "" || c.path === "description");
+            columnsFilter = columns.filter(c => c.path == filterColumn || c.path == "" || c.path == "description");
         else
             columnsFilter = [...columns];
 
@@ -283,9 +283,9 @@ class ActivityListComponent extends MainComponent {
         const {types} = this.state;
 
         const last = types.filter(t => t.order < next.order);
-        const currentIndx = types.findIndex(t => t.callActTypeID === current.callActTypeID);
+        const currentIndx = types.findIndex(t => t.callActTypeID == current.callActTypeID);
         if (last.length > 0) {
-            const prevIndex = types.findIndex(t => t.callActTypeID === last[last.length - 1].callActTypeID);
+            const prevIndex = types.findIndex(t => t.callActTypeID == last[last.length - 1].callActTypeID);
             types[currentIndx].order = types[prevIndex].order + 0.01;
         } else {
             types[currentIndx].order = types[0].order - 0.01;

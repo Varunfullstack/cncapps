@@ -36,7 +36,7 @@ class CurrentActivityService extends APIMain {
     startActivityWork(callActivityId) {
         return fetch(`${this.activityUrl}createFollowOnActivity&callActivityID=${callActivityId}`).then(res => {
             console.log(res)
-            if (res.status === 200)
+            if (res.status == 200)
                 window.open(res.url, '_blank');
         });
     }

@@ -60,7 +60,7 @@ class TDCustomerOrdersComponent extends React.Component {
         const {customers} = this.state;
         if (endCustomerEmail) {
             this.showSpinner();
-            const customerSerach = customers.filter(c => c.email === endCustomerEmail);
+            const customerSerach = customers.filter(c => c.email == endCustomerEmail);
             let endCustomer = null;
             if (customerSerach.length > 0)
                 endCustomer = customerSerach[0];
@@ -96,13 +96,13 @@ class TDCustomerOrdersComponent extends React.Component {
     getCustomerOrders = async (endCustomerEmail) => {
         const orders = await this.apiCustomerLicenses.getSubscriptionsByEmail(endCustomerEmail);
         let allSubscriptions = [];
-        if (orders.Result === "Success") {
+        if (orders.Result == "Success") {
             allSubscriptions = orders.BodyText.subscriptions; //first page
             const totalpages = orders.BodyText.totalPages;
             if (totalpages > 1) {
                 for (let i = 2; i <= totalpages; i++) {
                     const temp = await this.apiCustomerLicenses.getSubscriptionsByEmail(endCustomerEmail);
-                    if (temp.Result === 'Success') {
+                    if (temp.Result == 'Success') {
                         allSubscriptions = [...allSubscriptions, ...orders.BodyText.subscriptions]; //other page
                     }
                 }
@@ -148,7 +148,7 @@ class TDCustomerOrdersComponent extends React.Component {
                 label: "Line Status",
                 sortable: true,
                 content: (o) =>
-                    o.lineStatus === "processing" || o.lineStatus === "in_process" || o.lineStatus === "pending"
+                    o.lineStatus == "processing" || o.lineStatus == "in_process" || o.lineStatus == "pending"
                         ? el("div", {
                             key: "divSpin" + o.orderNumber,
                             className: "loader-content-sm",
@@ -160,7 +160,7 @@ class TDCustomerOrdersComponent extends React.Component {
                 label: "CNC Status",
                 sortable: true,
                 content: (o) =>
-                    o.lineStatus !== 'active' ? 'NA' : (o.cncStatus === true ?
+                    o.lineStatus !== 'active' ? 'NA' : (o.cncStatus == true ?
                         el('i', {className: "fa fa-check "}) :
                         el("label", {
                             key: "divCncStatus" + o.orderNumber,
@@ -292,7 +292,7 @@ class TDCustomerOrdersComponent extends React.Component {
             handleSetOrderStatus,
         } = this;
         const inactive =
-            selectedOrderLine?.lineStatus === "inactive";
+            selectedOrderLine?.lineStatus == "inactive";
         //prepare body
         const body = el("div", {key: "body"}, [
             el(
@@ -305,12 +305,12 @@ class TDCustomerOrdersComponent extends React.Component {
                 el(
                     "span",
                     {key: "spanStatusCompleted", className: "green-text"},
-                    selectedOrderLine?.lineStatus === "active" ? "Active" : ""
+                    selectedOrderLine?.lineStatus == "active" ? "Active" : ""
                 ),
                 el(
                     "span",
                     {key: "spanStatusNotCompleted", className: "red-text"},
-                    selectedOrderLine?.lineStatus === "inactive" ? "Inactive" : ""
+                    selectedOrderLine?.lineStatus == "inactive" ? "Inactive" : ""
                 ),
             ]),
             el("hr", {key: "hr1"}),
@@ -422,7 +422,7 @@ class TDCustomerOrdersComponent extends React.Component {
                 isEndCustomer: false,
             },
         };
-        if (modalDefaultAction === 1) {
+        if (modalDefaultAction == 1) {
             body.newQuantity = selectedOrderLine.quantity;
             body.agreementDetails = {
                 firstName: endCustomer.firstName,
@@ -432,13 +432,13 @@ class TDCustomerOrdersComponent extends React.Component {
                 phoneNumber: endCustomer.phone1,
             };
         }
-        if (modalDefaultAction === 2) body.action = "suspend";
+        if (modalDefaultAction == 2) body.action = "suspend";
         this.showSpinner();
         this.apiCustomerLicenses
             .updateOrder({modifyOrders: [body]})
             .then((res) => {
-                if (res.Result === "Success") {
-                    if (res.BodyText.modifyOrdersDetails[0].status === "success") {
+                if (res.Result == "Success") {
+                    if (res.BodyText.modifyOrdersDetails[0].status == "success") {
                         this.setState({
                             showModal: false,
                             orderUpdateError: null,
@@ -447,7 +447,7 @@ class TDCustomerOrdersComponent extends React.Component {
                         });
                         this.refreshOrders(2);
                         this.refreshOrders(10);
-                    } else if (res.BodyText.modifyOrdersDetails[0].status === "failed")
+                    } else if (res.BodyText.modifyOrdersDetails[0].status == "failed")
                         this.setState({
                             orderUpdateError: res.BodyText.modifyOrdersDetails[0].message,
                             modalElement: this.getModalOrderElement()
@@ -485,8 +485,8 @@ class TDCustomerOrdersComponent extends React.Component {
         this.apiCustomerLicenses
             .updateOrder({modifyOrders: [body]})
             .then((res) => {
-                if (res.Result === "Success") {
-                    if (res.BodyText.modifyOrdersDetails[0].status === "success") {
+                if (res.Result == "Success") {
+                    if (res.BodyText.modifyOrdersDetails[0].status == "success") {
                         this.setState({
                             showModal: false,
                             orderUpdateError: null,
@@ -518,7 +518,7 @@ class TDCustomerOrdersComponent extends React.Component {
             //2- update product quantity and price
             const selectedOrderLine = {...this.state.selectedOrderLine};
             const line = orderAddons.BodyText.orderInfo.lines.filter(
-                (l) => l.sku === selectedOrderLine.sku
+                (l) => l.sku == selectedOrderLine.sku
             );
             selectedOrderLine.addOns = line && line.length > 0 && line[0].addOns;
             if (selectedOrderLine.addOns)
@@ -535,7 +535,7 @@ class TDCustomerOrdersComponent extends React.Component {
                 skus: [order.sku],
             });
 
-            if (product.Result === "Success") {
+            if (product.Result == "Success") {
                 //get price list for all addons
                 let productAddOns = product?.BodyText?.productDetails[0]?.addOns;
                 const addOnsProductList = productAddOns?.map((a) => {
@@ -550,11 +550,11 @@ class TDCustomerOrdersComponent extends React.Component {
                         page: i + 1,
                     };
                     let prices = await this.apiCustomerLicenses.getProductsPrices(obj);
-                    if (prices.Result === "Success") {
+                    if (prices.Result == "Success") {
                         prices.BodyText.pricingDetails.map((adn) => {
                             for (let j = 0; j < productAddOns.length; j++) {
                                 productAddOns[j].quantity = 0;
-                                if (productAddOns[j].sku === adn.sku) {
+                                if (productAddOns[j].sku == adn.sku) {
                                     productAddOns[j] = {...productAddOns[j], ...adn};
                                 }
                             }
@@ -565,7 +565,7 @@ class TDCustomerOrdersComponent extends React.Component {
                 // update selectedOrderLine addons prices
                 for (let k = 0; k < selectedOrderLine?.addOns?.length; k++) {
                     for (let l = 0; l < productAddOns.length; l++) {
-                        if (selectedOrderLine.addOns[k].sku === productAddOns[l].sku) {
+                        if (selectedOrderLine.addOns[k].sku == productAddOns[l].sku) {
                             selectedOrderLine.addOns[k] = {
                                 ...productAddOns[l],
                                 ...selectedOrderLine.addOns[k],
@@ -608,7 +608,7 @@ class TDCustomerOrdersComponent extends React.Component {
         const allAddOns = productDetails?.addOns?.map((a) => {
             if (selectedOrderLine?.addOns) {
                 const addonTemp = selectedOrderLine.addOns.filter(
-                    (a2) => a2.sku === a.sku
+                    (a2) => a2.sku == a.sku
                 );
                 const newAddon =
                     addonTemp.length > 0 ? {...a, ...addonTemp[0]} : {...a};
@@ -638,7 +638,7 @@ class TDCustomerOrdersComponent extends React.Component {
                     label: "Quantity",
                     sortable: true,
                     content: (a) =>
-                        a.addOnStatus === "processing" || a.addOnStatus === "in_process"
+                        a.addOnStatus == "processing" || a.addOnStatus == "in_process"
                             ? el("div", {
                                 key: "divSpin" + a.sku,
                                 className: "loader-content-sm",
@@ -719,7 +719,7 @@ class TDCustomerOrdersComponent extends React.Component {
         } = this.state;
 
         const inOrderList = selectedOrderLine.addOns ? selectedOrderLine.addOns.filter(
-            (a) => a.sku === addon.sku
+            (a) => a.sku == addon.sku
         ) : [];
         let body = {
             orderNumber: selectedOrderLine.orderNumber,
@@ -746,7 +746,7 @@ class TDCustomerOrdersComponent extends React.Component {
             },
         };
 
-        if (addon.quantity === 0) {
+        if (addon.quantity == 0) {
             body.addOns[0].action = "suspend";
             delete body.addOns[0].newQuantity;
             delete body.addOns[0].quantity;
@@ -756,7 +756,7 @@ class TDCustomerOrdersComponent extends React.Component {
             this.apiCustomerLicenses
                 .updateSubscriptionAddOns({modifyAddons: body})
                 .then((res) => {
-                    if (res.Result === "Success") {
+                    if (res.Result == "Success") {
                         this.setState({
                             showModal: false,
                             orderUpdateError: null,
@@ -764,7 +764,7 @@ class TDCustomerOrdersComponent extends React.Component {
                         });
                         setTimeout(() => this.getAddons(selectedOrderLine), 3000);
                         setTimeout(() => this.getAddons(selectedOrderLine), 15000);
-                    } else if (res.Result === "Failed")
+                    } else if (res.Result == "Failed")
                         this.setState({
                             orderUpdateError: res.ErrorMessage,
                         });
@@ -779,7 +779,7 @@ class TDCustomerOrdersComponent extends React.Component {
             this.apiCustomerLicenses
                 .purchaseSubscriptionAddOns({orderAddons: body})
                 .then((res) => {
-                    if (res.Result === "Success") {
+                    if (res.Result == "Success") {
                         this.setState({
                             showModal: false,
                             orderUpdateError: null,
@@ -787,7 +787,7 @@ class TDCustomerOrdersComponent extends React.Component {
                         });
                         setTimeout(() => this.getAddons(selectedOrderLine), 3000);
                         setTimeout(() => this.getAddons(selectedOrderLine), 15000);
-                    } else if (res.Result === "Failed")
+                    } else if (res.Result == "Failed")
                         this.setState({
                             orderUpdateError: res.ErrorMessage,
                         });
@@ -827,7 +827,7 @@ class TDCustomerOrdersComponent extends React.Component {
             handleUpdateOrderAddOn,
         } = this;
         const inactive =
-            selectedOrderLine?.lineStatus === "inactive";
+            selectedOrderLine?.lineStatus == "inactive";
         //prepare body
         const body = el("div", {key: "body"}, [
             el(
@@ -842,12 +842,12 @@ class TDCustomerOrdersComponent extends React.Component {
                 el(
                     "span",
                     {key: "spanStatusCompleted", className: "green-text"},
-                    selectedOrderLine?.lineStatus === "active" ? "Active" : ""
+                    selectedOrderLine?.lineStatus == "active" ? "Active" : ""
                 ),
                 el(
                     "span",
                     {key: "spanStatusNotCompleted", className: "red-text"},
-                    selectedOrderLine?.lineStatus === "inactive" ? "Inactive" : ""
+                    selectedOrderLine?.lineStatus == "inactive" ? "Inactive" : ""
                 ),
             ]),
             el("hr", {key: "hr1"}),

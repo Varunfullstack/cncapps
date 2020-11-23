@@ -145,7 +145,7 @@ class CustomerDetailsModalComponent extends React.Component {
         const customer = this.correctObject({...customerProps, ...customerSt});
         // this.setState({customer});
         let errorMessage = "";
-        if (typeof errors === "string") errorMessage = errors;
+        if (typeof errors == "string") errorMessage = errors;
 
 
         return el(

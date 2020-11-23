@@ -77,7 +77,7 @@ class SelectSRComponent extends React.Component {
     };
     isActive = (code) => {
         const {activeTab} = this.state;
-        if (activeTab === code) return "active";
+        if (activeTab == code) return "active";
         else return "";
     };
     setActiveTab = (code) => {
@@ -100,7 +100,7 @@ class SelectSRComponent extends React.Component {
     };
 
     handleSrTypeChange = (srType) => {
-        if (srType === 2)
+        if (srType == 2)
             this.props.updateSRData({nextStep: 3})
         this.setState({srType});
     }
@@ -119,9 +119,9 @@ class SelectSRComponent extends React.Component {
         this.showSpinner();
         this.apicustomer.getCustomerSR(customerId).then(data => {
             const customerSR = data
-            const contactRelatedServiceRequests = data.filter(s => s.contactId === contactId);
+            const contactRelatedServiceRequests = data.filter(s => s.contactId == contactId);
             const contactSR = contactRelatedServiceRequests.filter(x => x.status !== 'F');
-            const contactFixedSR = contactRelatedServiceRequests.filter(s => s.status === "F");
+            const contactFixedSR = contactRelatedServiceRequests.filter(s => s.status == "F");
             this.setState({customerSR, contactSR, contactFixedSR, currentItems: contactSR, _showSpinner: false});
         });
     }

@@ -44,7 +44,7 @@ class CustomerSearchComponent extends React.Component {
             this.apiCustomer.searchCustomers(event.target.value)
                 .then(customers => {
                     return customers.map(c => {
-                        if (c.supportLevel === 'main')
+                        if (c.supportLevel == 'main')
                             c.color = 'red';
                         return c;
                     });
@@ -87,7 +87,7 @@ class CustomerSearchComponent extends React.Component {
                 sortable: false,
                 textColorColumn: "color",
                 content: (customer) =>
-                    customer.specialAttentionContact === '1' || customer.specialAttentionCustomer === 'Y' ?
+                    customer.specialAttentionContact == '1' || customer.specialAttentionCustomer == 'Y' ?
                         el(
                             "i",
                             {
@@ -238,7 +238,7 @@ class CustomerSearchComponent extends React.Component {
             },
         ];
         columns = columns
-            .filter((c) => c.hide === false)
+            .filter((c) => c.hide == false)
             .sort((a, b) => (a.order > b.order ? 1 : -1));
 
         return el(Table, {

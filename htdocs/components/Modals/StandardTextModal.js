@@ -40,7 +40,7 @@ class StandardTextModal extends React.Component {
         let templateValue = '';
         templateDefault = '';
         if (id) {
-            const op = templateOptions.filter(s => s.id === id)[0];
+            const op = templateOptions.filter(s => s.id == id)[0];
             templateDefault = op.template;
             templateValue = op.template;
             templateOptionId = op.id;
