@@ -234,7 +234,6 @@ class NewOrderComponent extends React.Component {
             },
         ];
         if (items) {
-            ////////console.log('selectedOrderLine',selectedOrderLine)
             let total = 0;
             if (items.length > 0)
                 total = items

@@ -13,8 +13,8 @@ import StandardTextModal from "../../Modals/StandardTextModal";
 import {padEnd, TeamType} from "../../utils/utils";
 import CKEditor from "../../shared/CKEditor";
 import Modal from "../../shared/Modal/modal";
-import Table from "../../shared/table/table";
 import Toggle from "../../shared/Toggle";
+import ActivityDocumentUploader from "./ActivityDocumentUploader";
 
 // noinspection EqualityComparisonWithCoercionJS
 class ActivityEditComponent extends MainComponent {
@@ -41,7 +41,6 @@ class ActivityEditComponent extends MainComponent {
             remoteSupportActivityDurationThresholdValue: null,
             activityDurationWarned: false,
             _activityLoaded: false,
-            uploadFiles: [],
             contacts: [],
             sites: [],
             priorities: [],
@@ -94,7 +93,6 @@ class ActivityEditComponent extends MainComponent {
                 monitorSR: false,
             },
         };
-        this.fileUploader = new React.createRef();
     }
 
     componentDidMount() {
@@ -965,14 +963,15 @@ class ActivityEditComponent extends MainComponent {
         );
     };
 
-    deleteDocument = async (id) => {
-        if (await this.confirm("Are you sure you want to remove this document?")) {
+    async deleteDocument(id) {
+        const {data} = this.state;
+        if (await this.confirm('Are you sure you want to remove this document?')) {
             await this.api.deleteDocument(this.state.currentActivity, id);
-            const {data} = this.state;
-            data.documents = data.documents.filter((d) => d.id !== id);
+            data.documents = data.documents.filter(d => d.id !== id);
             this.setState({data});
         }
     };
+
     getTypeElement = () => {
         const {el} = this;
         const {data, callActTypes} = this.state;
@@ -1369,113 +1368,10 @@ class ActivityEditComponent extends MainComponent {
             )
         );
     };
-    getDocumentsElement = () => {
-        const {data, uploadFiles} = this.state;
-        const {el} = this;
-        let columns = [
-            {
-                path: "Description",
-                label: "Description",
-                sortable: false,
-                content: (document) =>
-                    el(
-                        "a",
-                        {
-                            href: `Activity.php?action=viewFile&callDocumentID=${document.id}`,
-                        },
-                        document.description
-                    ),
-            },
-            {
-                path: "File",
-                label: "File",
-                sortable: false,
-                content: (document) =>
-                    el(
-                        "a",
-                        {
-                            href: `Activity.php?action=viewFile&callDocumentID=${document.id}`,
-                        },
-                        document.filename
-                    ),
-            },
-            {
-                path: "createDate",
-                label: "Date",
-                sortable: false,
-            },
-            {
-                path: "delete",
-                label: "",
-                sortable: false,
-                content: (document) =>
-                    el("i", {
-                        className: "fal fa-trash-alt pointer icon font-size-4",
-                        onClick: () => this.deleteDocument(document.id),
-                    }),
-            },
-        ];
-        return el(
-            "div",
-            {className: "activities-edit-container", style: {marginBottom: 30}},
-            el("label", {className: "label m-5", style: {display: "block"}}, "Documents"),
-            data?.documents.length > 0
-                ? el(Table, {
-                    id: "documents",
-                    data: data?.documents || [],
-                    columns: columns,
-                    pk: "id",
-                    search: false,
-                })
-                : null,
-            el("i", {
-                className: "fal fa-plus pointer icon font-size-4",
-                onClick: this.handleSelectFiles,
-            }),
-            el("input", {
-                ref: this.fileUploader,
-                name: "usefile",
-                type: "file",
-                style: {display: "none"},
-                multiple: "multiple",
-                onChange: this.handleFileSelected,
-            }),
-            this.getSelectedFilesElement(),
-            uploadFiles.length > 0
-                ? el("i", {
-                    className: "fal fa-upload pointer icon font-size-4",
-                    onClick: this.handleUpload,
-                })
-                : null
-        );
-    };
-    getSelectedFilesElement = () => {
-        const {uploadFiles} = this.state;
-        if (uploadFiles) {
-            let names = "";
-            for (let i = 0; i < uploadFiles.length; i++) {
-                names += uploadFiles[i].name + "  ,";
-            }
-            names = names.substr(0, names.length - 2);
-            return this.el("label", {className: "ml-5"}, names);
-        }
-        return null;
-    };
+
     handleUpload = async () => {
-        const {uploadFiles, data, currentActivity} = this.state;
-        await this.api.uploadFiles(
-            `Activity.php?action=uploadFile&problemID=${data.problemID}&callActivityID=${data.callActivityID}`,
-            uploadFiles,
-            "userfile[]"
-        );
+        const {currentActivity} = this.state;
         this.loadCallActivity(currentActivity);
-    };
-    handleFileSelected = (e) => {
-        const uploadFiles = [...e.target.files];
-        this.setState({uploadFiles});
-    };
-    handleSelectFiles = () => {
-        this.fileUploader.current.click();
     };
 
 // Parts used, change requestm and sales request
@@ -1920,25 +1816,35 @@ class ActivityEditComponent extends MainComponent {
     };
 
     render() {
-        const {el} = this;
-        return el(
-            "div",
-            {style: {width: 1080}},
-            this.getAlert(),
-            this.getConfirm(),
-            this.getPrompt(),
-            this.getPriorityChangeReason(),
-            this.getNoAssetModal(),
-            this.getProjectsElement(),
-            this.getHeader(),
-            el("div", {className: "activities-edit-container"}, this.getActions()),
-            el("div", {className: "activities-edit-container"}, this.getActionsButtons()),
-            this.getContentElement(),
-            this.getActivityNotes(),
-            this.getCustomerNotes(),
-            this.getActivityInternalNotes(),
-            this.getDocumentsElement(),
-            this.getTemplateModal()
+        const {data} = this.state;
+        return (
+            <div style={{width: 1080}}>
+                {this.getAlert()}
+                {this.getConfirm()}
+                {this.getPrompt()}
+                {this.getPriorityChangeReason()}
+                {this.getNoAssetModal()}
+                {this.getProjectsElement()}
+                {this.getHeader()}
+                <div className="activities-edit-container">
+                    {this.getActions()}
+                </div>
+                <div className="activities-edit-container">
+                    {this.getActionsButtons()}
+                </div>
+                {this.getContentElement()}
+                {this.getActivityNotes()}
+                {this.getCustomerNotes()}
+                {this.getActivityInternalNotes()}
+                <ActivityDocumentUploader
+                    onDeleteDocument={(id) => this.deleteDocument(id)}
+                    onFilesUploaded={() => this.handleUpload()}
+                    serviceRequestId={data?.problemID}
+                    activityId={data?.callActivityID}
+                    documents={data?.documents}
+                />
+                {this.getTemplateModal()}
+            </div>
         );
     }
 }

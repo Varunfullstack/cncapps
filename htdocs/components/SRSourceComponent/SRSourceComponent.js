@@ -288,8 +288,6 @@ class SRSourceComponent extends React.Component {
                         contractDisplay = "T&M";
                     else if ((sr.status == 'I' || sr.status == 'P') && sr.pro_contract_cuino == null) {
                         contractDisplay = '';
-                        //console.log(contractDisplay)
-
                     }
                     return this.el('label', {key: 'contractDisplay' + sr.CallReference}, contractDisplay);
                 }

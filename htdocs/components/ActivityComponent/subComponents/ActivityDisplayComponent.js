@@ -10,6 +10,7 @@ import MainComponent from "../../shared/MainComponent.js";
 import * as React from 'react';
 import Modal from "../../shared/Modal/modal";
 import moment from "moment";
+import ActivityDocumentUploader from "./ActivityDocumentUploader";
 
 // noinspection EqualityComparisonWithCoercionJS
 class ActivityDisplayComponent extends MainComponent {
@@ -24,7 +25,6 @@ class ActivityDisplayComponent extends MainComponent {
                 isExpenseApprover: 0,
                 isSDManger: false
             },
-            uploadFiles: [],
             data: null,
             currentActivity: null,
             _showModal: false,
@@ -41,9 +41,8 @@ class ActivityDisplayComponent extends MainComponent {
                 showServerGuardUpdates: false,
                 criticalSR: false,
                 monitorSR: false
-            }
+            },
         }
-        this.fileUploader = new React.createRef();
     }
 
     componentDidMount() {
@@ -340,7 +339,7 @@ class ActivityDisplayComponent extends MainComponent {
         window.open("Password.php?action=generate&htmlFmt=popup", 'reason', 'scrollbars=yes,resizable=yes,height=524,width=855,copyhistory=no, menubar=0');
     }
     handleSalesOrder = (callActivityID) => {
-        console.log('opened')
+
         const w = window.open(`Activity.php?action=editLinkedSalesOrder&htmlFmt=popup&callActivityID=${callActivityID}`, 'reason', 'scrollbars=yes,resizable=yes,height=150,width=250,copyhistory=no, menubar=0');
         w.onbeforeunload = () => this.loadCallActivity();
     }
@@ -480,7 +479,7 @@ class ActivityDisplayComponent extends MainComponent {
         const engineerLen = maxLength(data?.activities || [], 'enginner') + 10;
         const contactName = maxLength(data?.activities || [], 'contactName') + 10;
         const indx = data?.activities.findIndex(a => +a.callActivityID == +currentActivity);
-        console.log(+currentActivity, indx, data?.activities);
+
         return el('div', {className: "activities-container"},
             el('div', {style: {width: "100%", display: "flex", alignItems: "center", justifyContent: "center"}},
                 el(ToolTip, {
@@ -649,15 +648,16 @@ class ActivityDisplayComponent extends MainComponent {
             ), el('div', {dangerouslySetInnerHTML: {__html: data?.customerNotes}})
         );
     }
-    deleteDocument = async (id) => {
 
+    async deleteDocument(id) {
+        const {data} = this.state;
         if (await this.confirm('Are you sure you want to remove this document?')) {
             await this.api.deleteDocument(this.state.currentActivity, id);
-            const {data} = this.state;
             data.documents = data.documents.filter(d => d.id !== id);
             this.setState({data});
         }
     }
+
     getContentElement = () => {
         const {data} = this.state;
         const {el} = this;
@@ -738,93 +738,12 @@ class ActivityDisplayComponent extends MainComponent {
         } else return "";
 
     }
-    getDocumentsElement = () => {
-        const {data, uploadFiles} = this.state;
-        const {el} = this;
-        let columns = [
-            {
-                path: "Description",
-                label: "Description",
-                sortable: false,
-                content: (document) => el('a', {href: `Activity.php?action=viewFile&callDocumentID=${document.id}`}, document.description)
-            },
-            {
-                path: "File",
-                label: "File",
-                sortable: false,
-                content: (document) => el('a', {href: `Activity.php?action=viewFile&callDocumentID=${document.id}`}, document.filename)
-            },
-            {
-                path: "createDate",
-                label: "Date",
-                sortable: false,
-            },
-            {
-                path: "delete",
-                label: "",
-                sortable: false,
-                content: (document) => el('i', {
-                    className: "fal fa-trash-alt pointer icon font-size-4",
-                    onClick: () => this.deleteDocument(document.id)
-                })
-            },
-        ]
-        return el('div', {className: "activities-container"},
-            el('label', {style: {display: "block"}}, "Documents"),
-            data?.documents.length > 0 ? el(Table, {
-                id: "documents",
-                data: data?.documents || [],
-                columns: columns,
-                pk: "id",
-                search: false,
-            }) : null,
-            el('div', {style: {width: 20}}, el(ToolTip, {
-                title: "Add document",
-                content: el('i', {className: "fal fa-plus pointer icon font-size-4", onClick: this.handleSelectFiles})
-            }),),
-            el('input', {
-                ref: this.fileUploader,
-                name: 'usefile',
-                type: "file",
-                style: {display: "none"},
-                multiple: "multiple",
-                onChange: this.handleFileSelected
-            }),
-            this.getSelectedFilesElement(),
-            uploadFiles.length > 0 ? el(ToolTip, {
-                width: 30,
-                title: "Upload documents",
-                content: el('i', {className: "fal fa-upload pointer icon font-size-4", onClick: this.handleUpload})
-            }) : null,
-        );
-    }
-    getSelectedFilesElement = () => {
-        const {uploadFiles} = this.state;
-        if (uploadFiles) {
-            let names = "";
 
-            for (let i = 0; i < uploadFiles.length; i++) {
-                names += uploadFiles[i].name + "  ,";
-            }
-            names = names.substr(0, names.length - 2)
-            return this.el('label', {className: "ml-5"}, names)
-        }
-        return null;
-    }
-    handleUpload = async () => {
-        const {uploadFiles, data, currentActivity} = this.state;
-        await this.api.uploadFiles(`Activity.php?action=uploadFile&problemID=${data.problemID}&callActivityID=${data.callActivityID}`
-            , uploadFiles, "userfile[]");
+    handleUpload() {
+        const {currentActivity} = this.state;
         this.loadCallActivity(currentActivity);
-        this.setState({uploadFiles: []})
     }
-    handleFileSelected = (e) => {
-        const uploadFiles = [...e.target.files];
-        this.setState({uploadFiles})
-    }
-    handleSelectFiles = () => {
-        this.fileUploader.current.click();
-    }
+
     getExpensesElement = () => {
         const {data, currentUser} = this.state;
         const {el} = this;
@@ -995,24 +914,32 @@ class ActivityDisplayComponent extends MainComponent {
     }
 
     render() {
-        const {el} = this;
-        return el('div', {style: {width: 1000}},
-            this.getAlert(),
-            this.getConfirm(),
-            this.getPrompt(),
-            this.getFollowOnElement(),
-            this.getProjectsElement(),
-            this.getHeader(),
-            this.getActions(),
-            this.getActivitiesElement(),
-            this.getContentElement(),
-            this.getDetialsElement(),
-            this.getCustomerNotesElement(),
-            this.getNotesElement(),
-            this.getDocumentsElement(),
-            this.getExpensesElement(),
-            this.getTemplateModal(),
-            this.getFooter()
+        const {data} = this.state;
+        return (
+            <div style={{width: 1000}}>
+                {this.getAlert()}
+                {this.getConfirm()}
+                {this.getPrompt()}
+                {this.getFollowOnElement()}
+                {this.getProjectsElement()}
+                {this.getHeader()}
+                {this.getActions()}
+                {this.getActivitiesElement()}
+                {this.getContentElement()}
+                {this.getDetialsElement()}
+                {this.getCustomerNotesElement()}
+                {this.getNotesElement()}
+                <ActivityDocumentUploader
+                    onDeleteDocument={(id) => this.deleteDocument(id)}
+                    onFilesUploaded={() => this.handleUpload()}
+                    serviceRequestId={data?.problemID}
+                    activityId={data?.callActivityID}
+                    documents={data?.documents}
+                />
+                {this.getExpensesElement()}
+                {this.getTemplateModal()}
+                {this.getFooter()}
+            </div>
         );
     }
 

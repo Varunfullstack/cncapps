@@ -342,7 +342,6 @@ class TDCustomerDetailsComponent extends React.Component {
                     }
                 });
         } else if (mode == "edit") {
-            console.log('edit customer')
             this.apiCustomerLicenses
                 .updateTechDataCustomer(data.endCustomerId, data)
                 .then((result) => {

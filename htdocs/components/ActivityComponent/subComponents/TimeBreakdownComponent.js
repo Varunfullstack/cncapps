@@ -21,7 +21,6 @@ class TimeBreakdownComponent extends MainComponent {
                 })
 
                 this.setState({data, loading: false});
-                console.log('data', data);
             });
     }
 
@@ -173,13 +172,11 @@ class TimeBreakdownComponent extends MainComponent {
     getUserTotal = (sname) => {
         const {data} = this.state;
         const items = data.filter(u => u.sname == sname);
-        //console.log(items);
         const sum = items.reduce((prev, cur) => {
             if (cur)
                 prev += parseFloat(cur.inHours) + parseFloat(cur.outHours);
             return prev;
         }, 0);
-        //console.log(sum);
         return sum.toFixed(2);
     }
 

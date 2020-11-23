@@ -5,6 +5,7 @@ import APIStandardText from "../../services/APIStandardText.js";
 import StandardTextModal from "../../Modals/StandardTextModal.js";
 import MainComponent from "../../shared/MainComponent.js";
 import React from 'react';
+import DragAndDropUploaderComponent from "../../shared/DragAndDropUploaderComponent/DragAndDropUploaderComponent";
 
 class LastStepComponent extends MainComponent {
     el = React.createElement;
@@ -477,34 +478,17 @@ class LastStepComponent extends MainComponent {
         return true;
     };
     getDocumentsElement = () => {
-        const {el} = this;
-        return el(
-            "div",
-            null,
-            el("h3", null, "Upload Documents"),
-            el("input", {
-                ref: this.fileUploader,
-                name: "usefile",
-                type: "file",
-                style: {display: "none"},
-                multiple: "multiple",
-                onChange: this.handleFileSelected,
-            }),
-            el("i", {
-                className: "fal fa-plus pointer icon font-size-4",
-                onClick: this.handleSelectFiles,
-            })
-        );
+        return (
+            <div style={{position: 'relative'}}>
+                <h3>Upload Documents</h3>
+                <DragAndDropUploaderComponent onFilesChanged={(files, type) => this.handleFileSelected(files, type)}>
+                </DragAndDropUploaderComponent>
+                {this.getSelectedFilesElement()}
+            </div>
+        )
     };
-    handleSelectFiles = () => {
-        this.fileUploader.current.click();
-    };
-    handleFileSelected = (e) => {
-        const uploadFiles = [...e.target.files];
-
-        const {data} = this.state;
-        data.uploadFiles = uploadFiles;
-        this.setState({data});
+    handleFileSelected = (files) => {
+        this.setState({data: {...this.state.data, uploadFiles: [...files]}});
     };
     getSelectedFilesElement = () => {
         const {uploadFiles} = this.state.data;
@@ -565,18 +549,16 @@ class LastStepComponent extends MainComponent {
     };
 
     render() {
-        const {el, getElements} = this;
-        return el(
-            "div",
-            {style: {width: 800}},
-            getElements(),
-            this.getConfirm(),
-            this.getAlert(),
-            this.getDocumentsElement(),
-            this.getSelectedFilesElement(),
-            this.getNotStartReasonElement(),
-            this.getNotFirstTimeFixReasonElement(),
-            this.getNextButton(),
+        return (
+            <div style={{width: 800}}>
+                {this.getElements()}
+                {this.getConfirm()}
+                {this.getAlert()}
+                {this.getDocumentsElement()}
+                {this.getNotStartReasonElement()}
+                {this.getNotFirstTimeFixReasonElement()}
+                {this.getNextButton()}
+            </div>
         );
     }
 }

@@ -11,18 +11,18 @@ class ToolTip extends React.Component {
     }
 
     render() {
-        const {el} = this;
-        const {title, content, width} = this.props;
-        return el('div', {style: {width: width}}, el(
-            "div",
-            {className: "tooltip"},
-            content,
-            el(
-                "div",
-                {className: "tooltiptext tooltip-bottom"},
-                title ? title : "",
-            ),
-        ),);
+        const {title, children, width, content} = this.props;
+        return (
+            <div style={{width: width}}>
+                <div className="tooltip">
+                    {children}
+                    {content}
+                    <div className="tooltiptext tooltip-bottom">
+                        {title}
+                    </div>
+                </div>
+            </div>
+        );
     }
 }
 

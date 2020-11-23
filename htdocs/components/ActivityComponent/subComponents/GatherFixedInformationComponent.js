@@ -7,9 +7,9 @@ import CKEditor from "../../shared/CKEditor.js";
 import Toggle from "../../shared/Toggle.js";
 import ToolTip from "../../shared/ToolTip.js";
 import {groupBy, params} from "../../utils/utils.js";
-import ActivityDocumentsComponent from "./ActivityDocumentsComponent.js";
 
 import React from 'react';
+import ActivityDocumentUploader from "./ActivityDocumentUploader";
 
 class GatherFixedInformationComponent extends MainComponent {
     el = React.createElement;
@@ -156,7 +156,7 @@ class GatherFixedInformationComponent extends MainComponent {
 
     getContracts = () => {
         const {el} = this;
-        const { contracts, data} = this.state;
+        const {contracts, data} = this.state;
 
         return el(
             "select",
@@ -191,7 +191,7 @@ class GatherFixedInformationComponent extends MainComponent {
     };
     getRootCause = () => {
         const {el} = this;
-        const { rootCauses, data} = this.state;
+        const {rootCauses, data} = this.state;
 
         return el(
             "select",
@@ -208,17 +208,24 @@ class GatherFixedInformationComponent extends MainComponent {
             )
         );
     };
-    //-----------------documents
-    getDocuments = () => {
-        const {el} = this;
+
+    async deleteDocument(id) {
         const {documents, activity} = this.state;
-        return el(ActivityDocumentsComponent, {
-            documents,
-            onUpload: () => this.handleDocumentsUploads(),
-            onDelete: () => this.handleDocumentsUploads(),
-            problemID: activity?.problemID,
-            callActivityID: activity?.callActivityID
-        });
+        if (await this.confirm('Are you sure you want to remove this document?')) {
+            await this.apiActivity.deleteDocument(activity.callActivityID, id);
+            this.setState({documents: documents.filter(d => d.id !== id)});
+        }
+    }
+
+    getDocuments = () => {
+        const {documents, activity} = this.state;
+        return <ActivityDocumentUploader
+            onDeleteDocument={(id) => this.deleteDocument(id)}
+            onFilesUploaded={() => this.handleDocumentsUploads()}
+            serviceRequestId={activity.problemID}
+            activityId={activity.callActivityID}
+            documents={documents}
+        />
     };
     handleDocumentsUploads = async () => {
         const {activity} = this.state;
@@ -342,6 +349,7 @@ class GatherFixedInformationComponent extends MainComponent {
             {style: {width: 1000}},
             this.getAlert(),
             this.getHeader(),
+            this.getConfirm(),
             this.getDetails(),
             this.getDocuments(),
             this.getActions(),

@@ -15,7 +15,6 @@ class CustomerSearch extends MainComponent {
        this.apiCustomer.getCustomers().then(customers=>this.setState({customers}))
    }
    handleOnCustomerSelect=(value)=>{
-       console.log(value);
        if(this.props.onChange)
         this.props.onChange(value)
    }

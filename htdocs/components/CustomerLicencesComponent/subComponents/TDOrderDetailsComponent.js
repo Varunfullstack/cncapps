@@ -45,7 +45,6 @@ class TDOrderDetailsComponent extends React.Component {
                 let vendors = [...this.state.vendors];
                 vendors = vendors.concat(response.BodyText.vendors);
                 this.setState({vendors});
-                console.log(page, response.BodyText.totalPages)
                 if (page < response.BodyText.totalPages)
                     this.fetchAllVendors(page + 1)
             }
@@ -190,13 +189,11 @@ class TDOrderDetailsComponent extends React.Component {
         this.setState({data});
     }
     handleProductSelect = (product) => {
-        console.log(product)
         const data = {...this.state.data};
         data.product = product;
         this.setState({data});
     }
     handleVendorSelect = (vendor) => {
-        console.log(vendor)
         const data = {...this.state.data};
         data.vendor = vendor;
         this.apiCustomerLicenses.getProductsByVendor(vendor.id, 10).then(res => {
@@ -204,7 +201,6 @@ class TDOrderDetailsComponent extends React.Component {
 
                 this.setState({products: res.BodyText.products.vendors[0].listings});
             }
-            console.log('vendor products', res.Result)
         })
         this.setState({data});
     }
@@ -222,7 +218,6 @@ class TDOrderDetailsComponent extends React.Component {
                     }
                 });
         } else if (mode == "edit") {
-            console.log('edit customer')
             this.apiCustomerLicenses
                 .updateTechDataCustomer(this.state.data.id, this.state.data)
                 .then((result) => {

@@ -220,9 +220,7 @@ class CurrentActivityReportComponent extends MainComponent {
                     break;
                 case "E":
                     this.apiCurrentActivityService.getEscalationsInbox().then((res) => {
-                        console.log('Straight from the API', res);
                         const escalationInbox = this.prepareResult(res);
-                        console.log('After process', escalationInbox);
                         this.setState({
                             _showSpinner: false,
                             escalationInbox,
