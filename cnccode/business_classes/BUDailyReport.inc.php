@@ -1298,7 +1298,7 @@ reporter.con_last_name
 pro_date_raised AS raisedOn,
 IF(
 problem.pro_awaiting_customer_response_flag = 'Y',
-'Awaiting Customer',
+'On Hold',
 'In Progress'
 ) AS status,
 callactivity.reason AS details,
