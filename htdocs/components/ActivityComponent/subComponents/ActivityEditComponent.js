@@ -1630,7 +1630,6 @@ class ActivityEditComponent extends MainComponent {
                 ? el(CKEditor, {
                     id: "customerNotes",
                     value: data?.customerNotes,
-                    height: 100,
                     inline: true,
                     onChange: (value) => this.setValue("customerNotesTemplate", value),
                 })
