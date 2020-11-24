@@ -504,11 +504,7 @@ class ActivityDisplayComponent extends MainComponent {
                             key: "cl" + a.callActivityID, value: a.callActivityID,
 
                             dangerouslySetInnerHTML: {
-                                __html: padEnd(a.callActivityID, 50, Chars.WhiteSpace)
-                                    + padEnd(a.date, dateLen, Chars.WhiteSpace)
-                                    + padEnd(a.enginner, engineerLen, Chars.WhiteSpace)
-                                    + padEnd(a.contactName, contactName, Chars.WhiteSpace)
-                                    + (a.activityType || '')
+                                __html: this.getActivityChangeOptionText(a, dateLen, engineerLen, contactName)
                             }
                         }))
                 ),
@@ -542,6 +538,15 @@ class ActivityDisplayComponent extends MainComponent {
             // this.getOnsiteActivities(data?.onSiteActivities)
         );
     }
+
+    getActivityChangeOptionText(a, dateLen, engineerLen, contactName) {
+        return padEnd(a.callActivityID, 50, Chars.WhiteSpace)
+            + padEnd(a.date, dateLen, Chars.WhiteSpace)
+            + padEnd(a.enginner, engineerLen, Chars.WhiteSpace)
+            + padEnd(a.contactName, contactName, Chars.WhiteSpace)
+            + (a.activityType || '');
+    }
+
     getHiddenSRElement = (data) => {
         const {el} = this;
         if (data?.problemHideFromCustomerFlag == 'Y')
