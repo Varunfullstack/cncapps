@@ -374,13 +374,17 @@ WHERE pro_custno <> 282
      */
     private function getUniqueCustomer(): array
     {
-        $query = "SELECT COUNT(DISTINCT  p.pro_custno) total FROM `callactivity` c JOIN   problem p ON c.`caa_problemno`=p.`pro_problemno`
-        WHERE 
-        pro_custno <> 282   
-        AND  caa_consno <> 67
-        AND caa_callacttypeno NOT IN (60, 35)
-        AND pro_status IN ('F')
-        AND pro_date_raised >=  CURDATE() AND pro_date_raised < CURDATE() + INTERVAL 1 DAY";
+        $query = "SELECT
+  COUNT(DISTINCT pro_custno) total
+FROM
+  `callactivity` c
+  JOIN problem
+    ON problem.`pro_problemno` = c.`caa_problemno`
+WHERE pro_custno <> 282
+  AND caa_consno <> 67
+  AND caa_callacttypeno = 51
+  AND `caa_date` >= CURDATE()
+  AND caa_date < CURDATE() + INTERVAL 1 DAY";
         return DBConnect::fetchOne($query, []);
     }
 
