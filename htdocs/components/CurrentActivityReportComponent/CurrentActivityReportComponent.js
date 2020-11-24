@@ -17,7 +17,6 @@ import ReactDOM from 'react-dom';
 
 import '../style.css';
 import '../shared/ToolTip.css'
-import moment from "moment";
 
 class CurrentActivityReportComponent extends MainComponent {
     el = React.createElement;
@@ -308,7 +307,7 @@ class CurrentActivityReportComponent extends MainComponent {
     // Shared methods
     moveToAnotherTeam = async ({target}, problem, code) => {
         let answer = null;
-        if (problem.problemStatus == "P") {
+        if (problem.status === "P") {
             answer = await this.prompt(
                 "Please provide a reason for moving this SR into a different queue"
             );
@@ -434,35 +433,7 @@ class CurrentActivityReportComponent extends MainComponent {
         return result.map((problem) => {
             problem.workBtnTitle = getServiceRequestWorkTitle(problem);
             return problem;
-            // problem.alarmDateTime = problem.alarmDateTime?.trim(" ");
-            // problem.priorityClass = problem.priority == 1 ? 'priority-one' : '';
-            // if (moment(problem.alarmDateTime) > moment()) {
-            //     delete problem.date;
-            // }
-            // delete problem.engineerDropDown;
-            // delete problem.linkAllocateAdditionalTime;
-            // delete problem.queueOptions;
-            // delete problem.slaResponseHours;
-            // delete problem.time;
-            // delete problem.timeSpentColorClass;
-            // delete problem.totalActivityDurationHours;
-            // delete problem.updated;
-            // delete problem.updatedBgColor;
-            // delete problem.urlCustomer;
-            // delete problem.urlProblemHistoryPopup;
-            // delete problem.urlViewActivity;
-            // delete problem.urlCustomer;
-            // delete problem.urlCustomer;
-            // delete problem.workOnClick;
         });
-        // const emptyAlarm = result.filter((p) => p.alarmDateTime == null || p.alarmDateTime == '');
-        // const old = result.filter((p) => moment(p.alarmDateTime) <= moment());
-        // const feature = result
-        //     .filter((p) => moment(p.alarmDateTime) > moment())
-        //     .sort((a, b) =>
-        //         moment(a.alarmDateTime) > moment(b.alarmDateTime) ? 1 : -1
-        //     );
-        // return [...old, ...emptyAlarm, ...feature];
     };
     handleUserFilterOnSelect = (userId) => {
         const userFilter = userId;
