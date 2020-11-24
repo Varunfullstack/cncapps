@@ -1,7 +1,7 @@
 import MainComponent from "../shared/MainComponent.js";
 import ActivityListComponent from "./subComponents/ActivityListComponent.js";
 
-import React from 'react';
+import React, {Fragment} from 'react';
 import ReactDOM from 'react-dom';
 import '../style.css';
 
@@ -14,7 +14,14 @@ class ActivityTypeComponent extends MainComponent {
     }
 
     render() {
-        return this.el(ActivityListComponent);
+        return <Fragment>
+            <i className="fal fa-plus"
+               onClick={() => {
+                   window.location = '/ActivityType.php?action=createActivityType'
+               }}
+            />
+            <ActivityListComponent/>
+        </Fragment>
     }
 }
 
