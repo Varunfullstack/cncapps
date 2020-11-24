@@ -392,6 +392,17 @@ class CTCNC extends Controller
             );
         }
 
+        $this->addConditionalMenu(
+            $menu,
+            $SDManagerSection['icon'],
+            $SDManagerSection['key'],
+            $this->isSdManager() || $this->dbeUser->getValue(DBEUser::changeInitialDateAndTimeFlag) == 'Y',
+            201,
+            "SD Management",
+            "SDManagerDashboard.php",
+            $SDManagerSection['label']
+        );
+
 
         $this->addConditionalMenu(
             $menu,
@@ -626,7 +637,7 @@ class CTCNC extends Controller
     private function getDefaultSDManagerMenu()
     {
 
-        $items = [
+        return [
             [
                 "id"    => 202,
                 "label" => "Time Requests",
@@ -730,18 +741,6 @@ class CTCNC extends Controller
                 "href"  => "PasswordServices.php"
             ],
         ];
-        if ($this->dbeUser->getValue(DBEUser::changeInitialDateAndTimeFlag) == 'Y')
-            $items = array_merge(
-                [
-                    [
-                        "id"    => 201,
-                        "label" => "SD Management",
-                        "href"  => "SDManagerDashboard.php"
-                    ]
-                ],
-                $items
-            );
-        return $items;
 
     }
 
