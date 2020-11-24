@@ -88,7 +88,7 @@ class ActivityEditComponent extends MainComponent {
             filters: {
                 showTravel: false,
                 showOperationalTasks: false,
-                showServerGaurdUpdates: false,
+                showServerGuardUpdates: false,
                 criticalSR: false,
                 monitorSR: false,
             },

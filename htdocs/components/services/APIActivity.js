@@ -3,7 +3,7 @@ import ApiUrls from "./ApiUrls.js";
 
 class APIActivity extends APIMain {
     getCallActivityDetails(callActivityID, filters) {
-        return fetch(`${ApiUrls.SRActivity}getCallActivity&callActivityID=${callActivityID}&includeTravel=${filters.showTravel}&includeOperationalTasks=${filters.showOperationalTasks}&includeServerGuardUpdates=${filters.showServerGaurdUpdates}`).then(res => res.json());
+        return fetch(`${ApiUrls.SRActivity}getCallActivity&callActivityID=${callActivityID}&includeTravel=${filters.showTravel}&includeOperationalTasks=${filters.showOperationalTasks}&includeServerGuardUpdates=${filters.showServerGuardUpdates}`).then(res => res.json());
     }
 
     unlinkSalesOrder(serviceRequestId) {

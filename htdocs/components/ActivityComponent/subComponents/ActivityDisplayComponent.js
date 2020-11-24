@@ -371,7 +371,7 @@ class ActivityDisplayComponent extends MainComponent {
                 ...filters,
                 showTravel,
                 showOperationalTasks,
-                showServerGaurdUpdates
+                showServerGuardUpdates
             }
         }
         this.setState({filters})
@@ -534,7 +534,7 @@ class ActivityDisplayComponent extends MainComponent {
                 this.getToggle("Monitor SR", 'monitorSR'),
                 this.getToggle("Show Travel", "showTravel"),
                 this.getToggle("Show Operational Tasks", "showOperationalTasks"),
-                this.getToggle("Show ServerGuard Updates", "showServerGaurdUpdates"),
+                this.getToggle("Show ServerGuard Updates", "showServerGuardUpdates"),
                 el('label', {className: "ml-5"}, 'Activity hours: '),
                 el('label', null, data?.totalActivityDurationHours),
                 el('label', {className: "ml-5"}, 'Chargeable hours: '),
