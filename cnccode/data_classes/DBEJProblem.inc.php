@@ -28,12 +28,15 @@ class DBEJProblem extends DBEProblem
     const lastDate                         = "lastDate";
     const lastAwaitingCustomerResponseFlag = "lastAwaitingCustomerResponseFlag";
     const dashboardSortColumn              = "dashboardSortColumn";
-    const hoursRemaining                   = 'hoursRemaining';
+    const hoursRemainingForSLA             = 'hoursRemaining';
     const specialAttentionContactFlag      = "specialAttentionContactFlag";
-    const QUEUE_TEAM                       = 'queueTeam';
+    const referredFlag                     = "referredFlag";
+    const lastEndTime                      = "lastEndTime";
+    const alarmDateTime                    = "alarmDateTime";
+    const QUEUE_TEAM_ID                    = 'queueTeamId';
     const FIXED_DATE                       = "fixedDate";
     const ENGINEER_FIXED_NAME              = 'engineerFixedName';
-    const FIXED_TEAM_NAME                  = 'fixedTeamName';
+    const FIXED_TEAM_ID                    = 'fixedTeamId';
 
 
     /**
@@ -175,6 +178,13 @@ class DBEJProblem extends DBEProblem
             "last.caa_starttime"
         );
         $this->addColumn(
+            self::lastEndTime,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "last.caa_endtime"
+        );
+
+        $this->addColumn(
             self::lastUserID,
             DA_INTEGER,
             DA_ALLOW_NULL,
@@ -199,7 +209,7 @@ class DBEJProblem extends DBEProblem
             "pro_sla_response_hours - pro_working_hours "
         );
         $this->addColumn(
-            self::hoursRemaining,
+            self::hoursRemainingForSLA,
             DA_FLOAT,
             DA_ALLOW_NULL,
             'pro_working_hours - pro_sla_response_hours'
@@ -211,7 +221,22 @@ class DBEJProblem extends DBEProblem
             DA_ALLOW_NULL,
             '(select contact.specialAttentionContactFlag from contact where con_contno = initial.caa_contno)'
         );
-
+        $this->addColumn(
+            self::referredFlag,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            'customer.cus_referred'
+        );
+        $this->addColumn(
+            self::alarmDateTime,
+            DA_DATETIME,
+            DA_ALLOW_NULL,
+            "            CONCAT(
+                pro_alarm_date,
+                ' ',
+                COALESCE(CONCAT(pro_alarm_time,':00'), '00:00:00')
+            )"
+        );
         $this->addColumn(
             self::FIXED_DATE,
             DA_STRING,
@@ -225,16 +250,16 @@ class DBEJProblem extends DBEProblem
             "fixedEngineer.cns_name"
         );
         $this->addColumn(
-            self::FIXED_TEAM_NAME,
+            self::FIXED_TEAM_ID,
             DA_STRING,
             DA_ALLOW_NULL,
-            'fixedTeam.name'
+            'fixedTeam.teamID'
         );
         $this->addColumn(
-            self::QUEUE_TEAM,
+            self::QUEUE_TEAM_ID,
             DA_STRING,
             DA_ALLOW_NULL,
-            'queueTeam.name'
+            'queueTeam.teamID'
         );
 
         $this->setAddColumnsOff();
@@ -537,10 +562,25 @@ left join callactivity fixed
      */
     function getActiveProblemsByCustomer($customerID)
     {
+        $this->setAddColumnsOn();
+        $this->addColumn(
+            "contactName",
+            DA_STRING,
+            true,
+            "concat(contact.con_first_name, ' ', contact.con_last_name)"
+        );
+
+        $this->addColumn(
+            "contactId",
+            DA_STRING,
+            true,
+            "initial.caa_contno"
+        );
+
         $sql =
-            "SELECT DISTINCT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " LEFT JOIN customer ON cus_custno = pro_custno
+            "SELECT DISTINCT {$this->getDBColumnNamesAsString()}
+             FROM {$this->getTableName()}
+             LEFT JOIN customer ON cus_custno = pro_custno
           JOIN callactivity `initial`
             ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
 
@@ -554,6 +594,7 @@ left join callactivity fixed
               AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
            LEFT JOIN consultant ON cns_consno = pro_consno
+           left join contact on contact.con_contno = initial.caa_contno
            left join callactivity fixed 
             on fixed.caa_problemno = pro_problemno and fixed.caa_callacttypeno = " . CONFIG_FIXED_ACTIVITY_TYPE_ID . " 
             left join consultant fixedEngineer on fixed.caa_consno = fixedEngineer.cns_consno
@@ -817,8 +858,10 @@ left join callactivity fixed
     {
 
         $includeFixed = "";
-        if ($orderBy == "holdForQA") {
+        $isHoldForQA  = $orderBy == "holdForQA";
+        if ($isHoldForQA) {
             $includeFixed = ",'F'";
+
         }
 
         $sql =
@@ -846,24 +889,27 @@ left join callactivity fixed
             left join consultant fixedEngineer on fixed.caa_consno = fixedEngineer.cns_consno
             left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
             left join team queueTeam on queueTeam.level = pro_queue_no 
-        WHERE " . $this->getDBColumnName(self::customerID) . ' <> 282  and ' . $this->getDBColumnName(
-                self::status
-            ) . " in ('I','P'$includeFixed)  ";
-        $sql .= ' and (consultant.execludeFromSDManagerDashboard=0 or consultant.cns_consno is null) ';
-        if (!$showHelpDesk) {
-            $sql .= ' and pro_queue_no <> 1 ';
-        }
+        WHERE {$this->getDBColumnName(                self::status            ) } in ('I','P'$includeFixed)  ";
 
-        if (!$showEscalation) {
-            $sql .= ' and pro_queue_no <> 2 ';
-        }
 
-        if (!$showSmallProjects) {
-            $sql .= ' and pro_queue_no <> 3 ';
-        }
+        if (!$isHoldForQA) {
+            $sql .= "{$this->getDBColumnName(self::customerID)} <> 282 and (consultant.cns_consno is null or consultant.execludeFromSDManagerDashboard = 0) and pro_queue_no <> 7";
+        } else {
+            if (!$showHelpDesk) {
+                $sql .= ' and pro_queue_no <> 1 ';
+            }
 
-        if (!$showProjects) {
-            $sql .= ' and pro_queue_no <> 5 ';
+            if (!$showEscalation) {
+                $sql .= ' and pro_queue_no <> 2 ';
+            }
+
+            if (!$showSmallProjects) {
+                $sql .= ' and pro_queue_no <> 3 ';
+            }
+
+            if (!$showProjects) {
+                $sql .= ' and pro_queue_no <> 5 ';
+            }
         }
 
         if ($isP5) {
@@ -871,11 +917,13 @@ left join callactivity fixed
                     self::priority
                 ) . ' = 5 and  team.' . DBETeam::level . " <= 3";
         } else {
-            $sql .= 'and ' . $this->getDBColumnName(
-                    self::priority
-                ) . ' <= 4 and ' . $this->getDBColumnName(
-                    self::priority
-                ) . ' > 0 ';
+            if (!$isHoldForQA) {
+                $sql .= 'and ' . $this->getDBColumnName(
+                        self::priority
+                    ) . ' <= 4 and ' . $this->getDBColumnName(
+                        self::priority
+                    ) . ' > 0 ';
+            }
         }
 
         switch ($orderBy) {
@@ -944,7 +992,7 @@ left join callactivity fixed
                 $sql .= " and  " . $this->getDBColumnName(self::criticalFlag) . " = 'Y' order by hoursRemaining desc ";
                 break;
             case 'currentOpenSRs':
-                $sql .= " and last.caa_callacttypeno is null order by hoursRemaining desc";
+                $sql .= " and last.caa_endtime is null and last.caa_date <= curdate() and last.caa_starttime <= TIME(NOW())  order by hoursRemaining desc";
                 break;
             case "holdForQA":
                 $sql .= " and holdForQA=1";
@@ -954,7 +1002,7 @@ left join callactivity fixed
         $sql .= ' limit ' . $limit;
         $this->setQueryString($sql);
 
-        return (parent::getRow());
+        return (parent::getRows());
     }
 
     public function getDashBoardEngineersInSRRows($engineersMaxCount = 3,
@@ -1142,6 +1190,105 @@ left join callactivity fixed
         return (parent::getRows());
     }
 
+    function isSpecialAttention()
+    {
+        $isSpecialAttentionCustomer = $this->getValue(self::specialAttentionFlag) == 'Y';
+        $isSpecialAttentionExpired  = $this->getValue(self::specialAttentionEndDate) < date('Y-m-d');
+        $isSpecialAttentionContact  = $this->getValue(self::specialAttentionContactFlag) == 'Y';
+        if (($isSpecialAttentionCustomer && !$isSpecialAttentionExpired) || $isSpecialAttentionContact) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    function isRequestBeingWorkedOn()
+    {
+        $dateString       = $this->getValue(DBEJProblem::lastDate);
+        $timeString       = $this->getValue(DBEJProblem::lastStartTime);
+        $activityDateTime = DateTime::createFromFormat('Y-m-d H:i', "$dateString $timeString");
+
+        if ($activityDateTime > (new DateTime())) {
+            return false;
+        }
+
+        return !$this->getValue(DBEJProblem::lastEndTime);
+    }
+
+    function isSLABreached()
+    {
+        $status           = $this->getValue(DBEJProblem::status);
+        $priority         = $this->getValue(DBEJProblem::priority);
+        $slaResponseHours = $this->getValue(DBEJProblem::slaResponseHours);
+        $workingHours     = $this->getValue(DBEJProblem::workingHours);
+        $respondedHours   = $this->getValue(DBEJProblem::respondedHours);
+        if ($slaResponseHours == 0) {
+            $slaResponseHours = 1;
+        }
+
+        if ($priority == 5) {
+            return false;
+        }
+        if ($status != 'I' && $respondedHours <= $slaResponseHours) {
+            return false;
+        }
+
+        $percentageSLA = ($workingHours / $slaResponseHours);
+        if ($status == 'I' && $percentageSLA < 1) {
+            return false;
+        }
+
+        return true;
+    }
+
+    function isOnHold()
+    {
+        return $this->getValue(DBEJProblem::awaitingCustomerResponseFlag) == 'Y';
+    }
+
+    function getDateTime(): ?DateTimeInterface
+    {
+        $dateTime = DateTime::createFromFormat(
+            DATE_MYSQL_DATETIME,
+            "{$this->lastDate()} {$this->properTime()}"
+        );
+        if (!$dateTime) {
+            return null;
+        }
+        return $dateTime;
+    }
+
+    function lastDate()
+    {
+        return $this->getValue(self::lastDate);
+    }
+
+    private function properTime()
+    {
+        return $this->getValue(self::lastStartTime) ? "{$this->getValue(self::lastStartTime)}:00" : null;
+    }
+
+    public function alarmDateTime(): ?DateTimeInterface
+    {
+        if (!$this->getValue(self::alarmDateTime)) {
+            return null;
+        }
+        $dateTime = DateTime::createFromFormat(
+            DATE_MYSQL_DATETIME,
+            $this->getValue(DBEJProblem::alarmDateTime)
+        );
+        if (!$dateTime) {
+            return null;
+        }
+        return $dateTime;
+    }
+
+    public function isWorkHidden()
+    {
+        return $this->getValue(DBECustomer::referredFlag) == 'Y';
+    }
 }
 
 ?>

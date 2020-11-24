@@ -192,7 +192,7 @@ class SDManagerDashboardComponent extends MainComponent {
             const {filter} = this.state;
             this.api.getQueue(id, filter)
                 .then((queueData) => {
-                console.log(queueData);
+                    console.log(queueData);
                     this.setState({queueData})
                 });
         } else return [];
@@ -438,10 +438,25 @@ class SDManagerDashboardComponent extends MainComponent {
                     icon: "fal fa-2x fa-users color-gray2 ",
                     sortable: false,
                     hdClassName: "text-center",
-                    content: (problem) => el('label', null, this.getTeamCode(problem.teamID)),
+                    content: (problem) => {
+                        let teamCode = problem.teamID;
+                        if (filter.activeTab == 11) {
+                            if (problem.fixedDate) {
+                                teamCode = problem.fixedTeamId;
+                            }
+                            if (!problem.engineerId) {
+                                teamCode = problem.queueTeamId
+                            }
+                        }
+                        return (
+                            <label>
+                                {this.getTeamCode(teamCode)}
+                            </label>
+                        )
+                    },
                 },
                 {
-                    display: [11].indexOf(filter.activeTab) >= 0,
+                    display: filter.activeTab == 11,
                     path: "engineerName",
                     label: "",
                     key: "assignedUser",
@@ -449,6 +464,12 @@ class SDManagerDashboardComponent extends MainComponent {
                     icon: "fal fa-2x fa-user-hard-hat color-gray2 ",
                     sortable: false,
                     hdClassName: "text-center",
+                    content: problem => {
+                        if (problem.fixedDate) {
+                            return problem.engineerFixedName;
+                        }
+                        return problem.engineerName;
+                    }
                 },
                 {
                     display: [11].indexOf(filter.activeTab) < 0,
@@ -485,7 +506,7 @@ class SDManagerDashboardComponent extends MainComponent {
                     sortable: false,
                     className: "text-center",
                     content: (problem => {
-                        if (!problem.fixedDate) {
+                        if (!problem.dateTime) {
                             return null;
                         }
                         return moment(problem.fixedDate, 'YYYY-MM-DD').format('DD/MM/YYYY')

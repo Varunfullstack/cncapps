@@ -112,6 +112,22 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
      * @var bool|float|int|mixed|string
      */
     private $minutesRemaining;
+    /**
+     * @var bool|float|int|string|null
+     */
+    private $queueTeamId;
+    /**
+     * @var bool|float|int|string|null
+     */
+    private $fixedDate;
+    /**
+     * @var bool|float|int|string|null
+     */
+    private $engineerFixedName;
+    /**
+     * @var bool|float|int|string|null
+     */
+    private $fixedTeamId;
 
 
     /**
@@ -191,6 +207,11 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
         $instance->lastCallActTypeID          = $problem->getValue(DBEJProblem::lastCallActTypeID);
         $instance->callActivityID             = $problem->getValue(DBEJProblem::callActivityID);
         $instance->minutesRemaining           = $minutesRemaining;
+        $instance->queueTeamId                = $problem->getValue(DBEJProblem::QUEUE_TEAM_ID);
+        $instance->fixedDate                  = $problem->getValue(DBEJProblem::FIXED_DATE);
+        $instance->engineerFixedName          = $problem->getValue(DBEJProblem::ENGINEER_FIXED_NAME);
+        $instance->fixedTeamId                = $problem->getValue(DBEJProblem::FIXED_TEAM_ID);
+
         return $instance;
     }
 
@@ -234,7 +255,11 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
             "workHidden"                 => $this->workHidden,
             "lastCallActTypeID"          => $this->lastCallActTypeID,
             "callActivityID"             => $this->callActivityID,
-            "minutesRemaining"           => $this->minutesRemaining
+            "minutesRemaining"           => $this->minutesRemaining,
+            "queueTeamId"                => $this->queueTeamId,
+            "fixedDate"                  => $this->fixedDate,
+            "engineerFixedName"          => $this->engineerFixedName,
+            "fixedTeamId"                => $this->fixedTeamId,
         ];
     }
 
