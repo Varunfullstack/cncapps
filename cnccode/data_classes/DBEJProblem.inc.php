@@ -27,19 +27,14 @@ class DBEJProblem extends DBEProblem
     const lastUserID                       = "lastUserID";
     const lastDate                         = "lastDate";
     const lastAwaitingCustomerResponseFlag = "lastAwaitingCustomerResponseFlag";
-<<<<<<< HEAD
     const dashboardSortColumn              = "dashboardSortColumn";
-    const hoursRemainingForSLA             = 'hoursRemainingForSLA';
+    const hoursRemaining                   = 'hoursRemaining';
     const specialAttentionContactFlag      = "specialAttentionContactFlag";
-    const referredFlag                     = "referredFlag";
-    const lastEndTime                      = "lastEndTime";
-    const alarmDateTime                    = "alarmDateTime";
-=======
-    const dashboardSortColumn = "dashboardSortColumn";
-    const hoursRemaining = 'hoursRemaining';
-    const specialAttentionContactFlag = "specialAttentionContactFlag";
-    
->>>>>>> 6ec20f5e (add fixed date)
+    const QUEUE_TEAM                       = 'queueTeam';
+    const FIXED_DATE                       = "fixedDate";
+    const ENGINEER_FIXED_NAME              = 'engineerFixedName';
+    const FIXED_TEAM_NAME                  = 'fixedTeamName';
+
 
     /**
      * calls constructor()
@@ -180,13 +175,6 @@ class DBEJProblem extends DBEProblem
             "last.caa_starttime"
         );
         $this->addColumn(
-            self::lastEndTime,
-            DA_STRING,
-            DA_ALLOW_NULL,
-            "last.caa_endtime"
-        );
-
-        $this->addColumn(
             self::lastUserID,
             DA_INTEGER,
             DA_ALLOW_NULL,
@@ -211,7 +199,7 @@ class DBEJProblem extends DBEProblem
             "pro_sla_response_hours - pro_working_hours "
         );
         $this->addColumn(
-            self::hoursRemainingForSLA,
+            self::hoursRemaining,
             DA_FLOAT,
             DA_ALLOW_NULL,
             'pro_working_hours - pro_sla_response_hours'
@@ -223,26 +211,32 @@ class DBEJProblem extends DBEProblem
             DA_ALLOW_NULL,
             '(select contact.specialAttentionContactFlag from contact where con_contno = initial.caa_contno)'
         );
-<<<<<<< HEAD
+
         $this->addColumn(
-            self::referredFlag,
+            self::FIXED_DATE,
             DA_STRING,
             DA_ALLOW_NULL,
-            'customer.cus_referred'
+            "(select DATE_FORMAT(caa_date,'%Y-%m-%d') from callactivity where caa_callacttypeno=57 and caa_problemno=pro_problemno )"
         );
         $this->addColumn(
-            self::alarmDateTime,
-            DA_DATETIME,
+            self::ENGINEER_FIXED_NAME,
+            DA_STRING,
             DA_ALLOW_NULL,
-            "            CONCAT(
-                pro_alarm_date,
-                ' ',
-                COALESCE(CONCAT(pro_alarm_time,':00'), '00:00:00')
-            )"
+            "fixedEngineer.cns_name"
         );
-=======
-        
->>>>>>> 6ec20f5e (add fixed date)
+        $this->addColumn(
+            self::FIXED_TEAM_NAME,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            'fixedTeam.name'
+        );
+        $this->addColumn(
+            self::QUEUE_TEAM,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            'queueTeam.name'
+        );
+
         $this->setAddColumnsOff();
         $this->setPK(0);
     }
@@ -279,6 +273,11 @@ class DBEJProblem extends DBEProblem
               WHERE ca.caa_problemno = pro_problemno
               AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             )
+            left join callactivity fixed 
+            on fixed.caa_problemno = pro_problemno and fixed.caa_callacttypeno = " . CONFIG_FIXED_ACTIVITY_TYPE_ID . " 
+            left join consultant fixedEngineer on fixed.caa_consno = fixedEngineer.cns_consno
+            left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
+            left join team queueTeam on queueTeam.level = pro_queue_no
         WHERE 1=1";
         if ($status) {
             $sql .=
@@ -317,6 +316,11 @@ class DBEJProblem extends DBEProblem
               WHERE ca.caa_problemno = pro_problemno
               AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             )
+            left join callactivity fixed 
+            on fixed.caa_problemno = pro_problemno and fixed.caa_callacttypeno = " . CONFIG_FIXED_ACTIVITY_TYPE_ID . " 
+            left join consultant fixedEngineer on fixed.caa_consno = fixedEngineer.cns_consno
+            left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
+            left join team queueTeam on queueTeam.level = pro_queue_no
         WHERE pro_status IN ( 'I', 'P' )
           AND CONCAT( pro_alarm_date, ' ', coalesce(pro_alarm_time, '00:00:00') )  > NOW()
       ORDER BY pro_alarm_date, pro_alarm_time";
@@ -345,6 +349,11 @@ class DBEJProblem extends DBEProblem
               WHERE ca.caa_problemno = pro_problemno
               AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             )
+            left join callactivity fixed 
+            on fixed.caa_problemno = pro_problemno and fixed.caa_callacttypeno = " . CONFIG_FIXED_ACTIVITY_TYPE_ID . " 
+            left join consultant fixedEngineer on fixed.caa_consno = fixedEngineer.cns_consno
+            left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
+            left join team queueTeam on queueTeam.level = pro_queue_no
         WHERE pro_status IN ( 'I', 'P' )
           AND (
              CASE problem.`pro_priority`
@@ -380,6 +389,11 @@ class DBEJProblem extends DBEProblem
               WHERE ca.caa_problemno = pro_problemno
               AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             )
+            left join callactivity fixed 
+            on fixed.caa_problemno = pro_problemno and fixed.caa_callacttypeno = " . CONFIG_FIXED_ACTIVITY_TYPE_ID . " 
+            left join consultant fixedEngineer on fixed.caa_consno = fixedEngineer.cns_consno
+            left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
+            left join team queueTeam on queueTeam.level = pro_queue_no
         WHERE pro_status IN ( 'I', 'P' )
           AND CONCAT( pro_alarm_date, ' ', coalesce(pro_alarm_time, '00:00:00') )  < NOW()
       ORDER BY pro_alarm_date, pro_alarm_time";
@@ -404,6 +418,7 @@ class DBEJProblem extends DBEProblem
 
           JOIN callactivity `initial`
             ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
+
             " JOIN callactivity `last`
             ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
               (
@@ -413,7 +428,11 @@ class DBEJProblem extends DBEProblem
               WHERE ca.caa_problemno = pro_problemno
               AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
-
+left join callactivity fixed 
+            on fixed.caa_problemno = pro_problemno and fixed.caa_callacttypeno = " . CONFIG_FIXED_ACTIVITY_TYPE_ID . " 
+            left join consultant fixedEngineer on fixed.caa_consno = fixedEngineer.cns_consno
+            left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
+            left join team queueTeam on queueTeam.level = pro_queue_no
         WHERE pro_status IN( 'I', 'P' )
 
           AND pro_queue_no = $queueNo
@@ -436,14 +455,14 @@ class DBEJProblem extends DBEProblem
       Get Awaiting, In-progress and future SRs by Queue
 
       */
-    function getRowsByQueue($queueNo)
+    function getRowsByQueueNoWithFuture($queueNo,
+                                        $unassignedOnly = false
+    )
     {
         $sql =
-            "SELECT {$this->getDBColumnNamesAsString()}            , 
-       pro_consno is not null as isAssigned,
-pro_alarm_date is not null as hasAlarmDate
-FROM {$this->getTableName()}
-             LEFT JOIN customer ON cus_custno = pro_custno
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " LEFT JOIN customer ON cus_custno = pro_custno
            LEFT JOIN consultant ON cns_consno = pro_consno
 
           JOIN callactivity `initial`
@@ -458,13 +477,21 @@ FROM {$this->getTableName()}
               WHERE ca.caa_problemno = pro_problemno
               AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
-
+left join callactivity fixed 
+            on fixed.caa_problemno = pro_problemno and fixed.caa_callacttypeno = " . CONFIG_FIXED_ACTIVITY_TYPE_ID . " 
+            left join consultant fixedEngineer on fixed.caa_consno = fixedEngineer.cns_consno
+            left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
+            left join team queueTeam on queueTeam.level = pro_queue_no
         WHERE pro_status IN( 'I', 'P' )
 
           AND pro_queue_no = $queueNo";
 
-        $sql .= " order by hasAlarmDate asc, CONCAT( pro_alarm_date, ' ', coalesce(concat(pro_alarm_time,':00') , '00:00:00') ) asc,   isAssigned asc, {$this->getDBColumnName(self::workingHours)} desc";
+        if ($unassignedOnly) {
+            $sql .= " AND pro_consno is null";
 
+        } else {
+            $sql .= " AND pro_consno is not null";
+        }
         $this->setQueryString($sql);
         return (parent::getRows());
     }
@@ -491,6 +518,11 @@ FROM {$this->getTableName()}
               WHERE ca.caa_problemno = pro_problemno
               AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
+            left join callactivity fixed 
+            on fixed.caa_problemno = pro_problemno and fixed.caa_callacttypeno = " . CONFIG_FIXED_ACTIVITY_TYPE_ID . " 
+            left join consultant fixedEngineer on fixed.caa_consno = fixedEngineer.cns_consno
+            left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
+            left join team queueTeam on queueTeam.level = pro_queue_no
             
         WHERE " . $this->getPKWhere();
 
@@ -505,25 +537,10 @@ FROM {$this->getTableName()}
      */
     function getActiveProblemsByCustomer($customerID)
     {
-        $this->setAddColumnsOn();
-        $this->addColumn(
-            "contactName",
-            DA_STRING,
-            true,
-            "concat(contact.con_first_name, ' ', contact.con_last_name)"
-        );
-
-        $this->addColumn(
-            "contactId",
-            DA_STRING,
-            true,
-            "initial.caa_contno"
-        );
-
         $sql =
-            "SELECT DISTINCT {$this->getDBColumnNamesAsString()}
-             FROM {$this->getTableName()}
-             LEFT JOIN customer ON cus_custno = pro_custno
+            "SELECT DISTINCT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " LEFT JOIN customer ON cus_custno = pro_custno
           JOIN callactivity `initial`
             ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
 
@@ -536,9 +553,12 @@ FROM {$this->getTableName()}
               WHERE ca.caa_problemno = pro_problemno
               AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
-            
            LEFT JOIN consultant ON cns_consno = pro_consno
-           left join contact on contact.con_contno = initial.caa_contno
+           left join callactivity fixed 
+            on fixed.caa_problemno = pro_problemno and fixed.caa_callacttypeno = " . CONFIG_FIXED_ACTIVITY_TYPE_ID . " 
+            left join consultant fixedEngineer on fixed.caa_consno = fixedEngineer.cns_consno
+            left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
+            left join team queueTeam on queueTeam.level = pro_queue_no
         WHERE
           pro_custno = $customerID
           AND pro_status <> 'C'";
@@ -569,11 +589,16 @@ FROM {$this->getTableName()}
               AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
            LEFT JOIN consultant ON cns_consno = pro_consno
+           left join callactivity fixed 
+            on fixed.caa_problemno = pro_problemno and fixed.caa_callacttypeno = " . CONFIG_FIXED_ACTIVITY_TYPE_ID . " 
+            left join consultant fixedEngineer on fixed.caa_consno = fixedEngineer.cns_consno
+            left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
+            left join team queueTeam on queueTeam.level = pro_queue_no
         WHERE
           initial.caa_contno = " . $contactID . " and pro_date_raised >= date(now() - interval 3 month) 
          ";
 
-        $sql .= " ORDER BY pro_date_raised DESC";              // in progress
+        $sql .= " ORDER BY pro_date_raised DESC";              // in progress        
         $this->setQueryString($sql);
 
         return (parent::getRows());
@@ -599,6 +624,11 @@ FROM {$this->getTableName()}
               AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
            LEFT JOIN consultant ON cns_consno = pro_consno
+           left join callactivity fixed 
+            on fixed.caa_problemno = pro_problemno and fixed.caa_callacttypeno = " . CONFIG_FIXED_ACTIVITY_TYPE_ID . " 
+            left join consultant fixedEngineer on fixed.caa_consno = fixedEngineer.cns_consno
+            left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
+            left join team queueTeam on queueTeam.level = pro_queue_no
         WHERE
           pro_custno = $customerID" .
             " AND cast(" . $this->getDBColumnName(
@@ -633,6 +663,11 @@ FROM {$this->getTableName()}
               AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
            LEFT JOIN consultant ON cns_consno = pro_consno
+           left join callactivity fixed 
+            on fixed.caa_problemno = pro_problemno and fixed.caa_callacttypeno = " . CONFIG_FIXED_ACTIVITY_TYPE_ID . " 
+            left join consultant fixedEngineer on fixed.caa_consno = fixedEngineer.cns_consno
+            left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
+            left join team queueTeam on queueTeam.level = pro_queue_no
         WHERE
           pro_custno = $customerID" .
             " AND cast(" . $this->getDBColumnName(
@@ -669,6 +704,11 @@ FROM {$this->getTableName()}
               AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
            LEFT JOIN consultant ON cns_consno = pro_consno
+           left join callactivity fixed 
+            on fixed.caa_problemno = pro_problemno and fixed.caa_callacttypeno = " . CONFIG_FIXED_ACTIVITY_TYPE_ID . " 
+            left join consultant fixedEngineer on fixed.caa_consno = fixedEngineer.cns_consno
+            left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
+            left join team queueTeam on queueTeam.level = pro_queue_no
         WHERE
           pro_custno = $customerID" .
             " AND cast(" . $this->getDBColumnName(self::dateRaised) . " as date) BETWEEN '" .
@@ -702,6 +742,11 @@ FROM {$this->getTableName()}
               AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
            LEFT JOIN consultant ON cns_consno = pro_consno
+           left join callactivity fixed 
+            on fixed.caa_problemno = pro_problemno and fixed.caa_callacttypeno = " . CONFIG_FIXED_ACTIVITY_TYPE_ID . " 
+            left join consultant fixedEngineer on fixed.caa_consno = fixedEngineer.cns_consno
+            left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
+            left join team queueTeam on queueTeam.level = pro_queue_no
         WHERE
           pro_custno = $customerID" .
             " AND cast(" . $this->getDBColumnName(
@@ -739,6 +784,11 @@ FROM {$this->getTableName()}
               AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
            LEFT JOIN consultant ON cns_consno = pro_consno
+           left join callactivity fixed 
+            on fixed.caa_problemno = pro_problemno and fixed.caa_callacttypeno = " . CONFIG_FIXED_ACTIVITY_TYPE_ID . " 
+            left join consultant fixedEngineer on fixed.caa_consno = fixedEngineer.cns_consno
+            left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
+            left join team queueTeam on queueTeam.level = pro_queue_no
         WHERE
           pro_custno = $customerID" .
             " AND cast(" . $this->getDBColumnName(self::dateRaised) . " as date) BETWEEN '" .
@@ -765,37 +815,19 @@ FROM {$this->getTableName()}
                                      $showProjects = true
     )
     {
-      
-      $includeFixed="";
-      if($orderBy=="holdForQA")
-      {
-        $this->setAddColumnsOn();
-        $this->addColumn(
-          "proFixedDate",
-          DA_STRING,
-          DA_ALLOW_NULL,
-          "(select DATE_FORMAT(caa_date,'%Y-%m-%d') from callactivity where caa_callacttypeno=57 and caa_problemno=pro_problemno )"
-      );
-      $this->setAddColumnsOff();
-      $includeFixed=",'F'";
-      }
+
+        $includeFixed = "";
+        if ($orderBy == "holdForQA") {
+            $includeFixed = ",'F'";
+        }
 
         $sql =
-<<<<<<< HEAD
-            "SELECT {$this->getDBColumnNamesAsString()}, 
-                {$this->getDBColumnName(self::workingHours)} - {$this->getDBColumnName(self::slaResponseHours) } as hoursRemaining,
-                 fixingEngineer.cns_name as fixedByEngineerName,
-                 fixingTeam.name as fixedByTeamName
-             FROM {$this->getTableName()}
-             LEFT JOIN customer ON cus_custno = pro_custno
-=======
             "SELECT " . $this->getDBColumnNamesAsString() . ', ' . $this->getDBColumnName(
                 self::workingHours
             ) . ' - ' . $this->getDBColumnName(self::slaResponseHours) . ' as hoursRemaining' .
-           
-            " FROM " . $this->getTableName() .            
+
+            " FROM " . $this->getTableName() .
             " LEFT JOIN customer ON cus_custno = pro_custno
->>>>>>> 6ec20f5e (add fixed date)
            LEFT JOIN consultant ON cns_consno = pro_consno
            left join team on consultant.teamID = team.teamID
           JOIN callactivity `initial`
@@ -809,11 +841,15 @@ FROM {$this->getTableName()}
               WHERE ca.caa_problemno = pro_problemno
               AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
-            left join consultant fixingEngineer on last.caa_consno = fixingEngineer.cns_consno
-            left join team fixingTeam on fixingEngineer.teamID = fixingTeam.teamID
-        WHERE {$this->getDBColumnName(self::customerID) } <> 282  
-        and {$this->getDBColumnName(self::status)} in ('I','P'$includeFixed)  
-        and (consultant.execludeFromSDManagerDashboard=0 or consultant.cns_consno is null)  ";
+            left join callactivity fixed 
+            on fixed.caa_problemno = pro_problemno and fixed.caa_callacttypeno = " . CONFIG_FIXED_ACTIVITY_TYPE_ID . " 
+            left join consultant fixedEngineer on fixed.caa_consno = fixedEngineer.cns_consno
+            left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
+            left join team queueTeam on queueTeam.level = pro_queue_no 
+        WHERE " . $this->getDBColumnName(self::customerID) . ' <> 282  and ' . $this->getDBColumnName(
+                self::status
+            ) . " in ('I','P'$includeFixed)  ";
+        $sql .= ' and (consultant.execludeFromSDManagerDashboard=0 or consultant.cns_consno is null) ';
         if (!$showHelpDesk) {
             $sql .= ' and pro_queue_no <> 1 ';
         }
@@ -908,11 +944,11 @@ FROM {$this->getTableName()}
                 $sql .= " and  " . $this->getDBColumnName(self::criticalFlag) . " = 'Y' order by hoursRemaining desc ";
                 break;
             case 'currentOpenSRs':
-                $sql .= " and last.caa_endtime is null and last.caa_date <= curdate() and last.caa_starttime <= TIME(NOW())  order by hoursRemaining desc";
+                $sql .= " and last.caa_callacttypeno is null order by hoursRemaining desc";
                 break;
             case "holdForQA":
                 $sql .= " and holdForQA=1";
-                break;
+
         }
 
         $sql .= ' limit ' . $limit;
@@ -950,6 +986,11 @@ FROM {$this->getTableName()}
               WHERE ca.caa_problemno = pro_problemno
               AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
+            left join callactivity fixed 
+            on fixed.caa_problemno = pro_problemno and fixed.caa_callacttypeno = " . CONFIG_FIXED_ACTIVITY_TYPE_ID . " 
+            left join consultant fixedEngineer on fixed.caa_consno = fixedEngineer.cns_consno
+            left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
+            left join team queueTeam on queueTeam.level = pro_queue_no
             
         WHERE " . $this->getDBColumnName(self::customerID) . ' <> 282  and ' . $this->getDBColumnName(
                 self::status
@@ -1042,6 +1083,11 @@ FROM {$this->getTableName()}
               AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
            LEFT JOIN consultant ON cns_consno = pro_consno
+           left join callactivity fixed 
+            on fixed.caa_problemno = pro_problemno and fixed.caa_callacttypeno = " . CONFIG_FIXED_ACTIVITY_TYPE_ID . " 
+            left join consultant fixedEngineer on fixed.caa_consno = fixedEngineer.cns_consno
+            left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
+            left join team queueTeam on queueTeam.level = pro_queue_no
         WHERE
           pro_contno = $contactID
           AND pro_status <> 'C'";
@@ -1083,6 +1129,11 @@ FROM {$this->getTableName()}
               WHERE ca.caa_problemno = pro_problemno
               AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             )
+            left join callactivity fixed 
+            on fixed.caa_problemno = pro_problemno and fixed.caa_callacttypeno = " . CONFIG_FIXED_ACTIVITY_TYPE_ID . " 
+            left join consultant fixedEngineer on fixed.caa_consno = fixedEngineer.cns_consno
+            left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
+            left join team queueTeam on queueTeam.level = pro_queue_no
         WHERE 1=1";
         $sql .= " AND pro_custno=$customerID";
         $sql .= " AND pro_status <> 'C' and pro_status <> 'F' ";
@@ -1091,105 +1142,6 @@ FROM {$this->getTableName()}
         return (parent::getRows());
     }
 
-    function isSpecialAttention()
-    {
-        $isSpecialAttentionCustomer = $this->getValue(self::specialAttentionFlag) == 'Y';
-        $isSpecialAttentionExpired  = $this->getValue(self::specialAttentionEndDate) < date('Y-m-d');
-        $isSpecialAttentionContact  = $this->getValue(self::specialAttentionContactFlag) == 'Y';
-        if (($isSpecialAttentionCustomer && !$isSpecialAttentionExpired) || $isSpecialAttentionContact) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * @return bool
-     */
-    function isRequestBeingWorkedOn()
-    {
-        $dateString       = $this->getValue(DBEJProblem::lastDate);
-        $timeString       = $this->getValue(DBEJProblem::lastStartTime);
-        $activityDateTime = DateTime::createFromFormat('Y-m-d H:i', "$dateString $timeString");
-
-        if ($activityDateTime > (new DateTime())) {
-            return false;
-        }
-
-        return !$this->getValue(DBEJProblem::lastEndTime);
-    }
-
-    function isSLABreached()
-    {
-        $status           = $this->getValue(DBEJProblem::status);
-        $priority         = $this->getValue(DBEJProblem::priority);
-        $slaResponseHours = $this->getValue(DBEJProblem::slaResponseHours);
-        $workingHours     = $this->getValue(DBEJProblem::workingHours);
-        $respondedHours   = $this->getValue(DBEJProblem::respondedHours);
-        if ($slaResponseHours == 0) {
-            $slaResponseHours = 1;
-        }
-
-        if ($priority == 5) {
-            return false;
-        }
-        if ($status != 'I' && $respondedHours <= $slaResponseHours) {
-            return false;
-        }
-
-        $percentageSLA = ($workingHours / $slaResponseHours);
-        if ($status == 'I' && $percentageSLA < 1) {
-            return false;
-        }
-
-        return true;
-    }
-
-    function isOnHold()
-    {
-        return $this->getValue(DBEJProblem::awaitingCustomerResponseFlag) == 'Y';
-    }
-
-    function getDateTime(): ?DateTimeInterface
-    {
-        $dateTime = DateTime::createFromFormat(
-            DATE_MYSQL_DATETIME,
-            "{$this->lastDate()} {$this->properTime()}"
-        );
-        if (!$dateTime) {
-            return null;
-        }
-        return $dateTime;
-    }
-
-    function lastDate()
-    {
-        return $this->getValue(self::lastDate);
-    }
-
-    private function properTime()
-    {
-        return $this->getValue(self::lastStartTime) ? "{$this->getValue(self::lastStartTime)}:00" : null;
-    }
-
-    public function alarmDateTime(): ?DateTimeInterface
-    {
-        if (!$this->getValue(self::alarmDateTime)) {
-            return null;
-        }
-        $dateTime = DateTime::createFromFormat(
-            DATE_MYSQL_DATETIME,
-            $this->getValue(DBEJProblem::alarmDateTime)
-        );
-        if (!$dateTime) {
-            return null;
-        }
-        return $dateTime;
-    }
-
-    public function isWorkHidden()
-    {
-        return $this->getValue(DBECustomer::referredFlag) == 'Y';
-    }
 }
 
 ?>
