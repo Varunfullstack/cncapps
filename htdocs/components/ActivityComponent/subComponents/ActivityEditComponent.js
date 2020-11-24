@@ -800,57 +800,98 @@ class ActivityEditComponent extends MainComponent {
     };
     checkCncAction = async (data, type) => {
 
-        if (type && type.catRequireCNCNextActionCNCAction == 1 && !data.cncNextActionTemplate) {
+        if (this.checkNextCNCActionRequired(type, data)) {
             this.alert(`CNC Next Action is required for ${type.description} when the next action is CNC Action`)
             return false;
         }
-        if (type && type.catRequireCNCNextActionCNCAction == 2 && !data.cncNextActionTemplate) {
+        if (this.checkOptionalCNCActionAndEmptyDescription(type, data)) {
             if (!await this.confirm(`Are you sure you don't want to put an entry for CNC Next Action?`))
                 return false;
         }
-        if (data.hideFromCustomerFlag !== 'Y' && data.problemHideFromCustomerFlag !== 'Y') {
-            if (type && type.catRequireCustomerNoteCNCAction == 1 && !data.customerNotesTemplate) {
+        if (this.checkHiddenFromCustomer(data)) {
+            if (this.checkCustomerNotesRequired(type, data)) {
                 this.alert(`Customer Notes are required for ${type.description} when the next action is CNC Action`)
                 return false;
             }
-            if (type && type.catRequireCustomerNoteCNCAction == 2 && !data.customerNotesTemplate) {
+            if (this.checkCustomerNotesOptionalAndEmptyDescription(type, data)) {
                 if (!await this.confirm(`Are you sure you don't want to put an entry for Customer Notes?`))
                     return false;
             }
         }
-        if (data.hideFromCustomerFlag == 'Y' && data.problemHideFromCustomerFlag !== 'Y' && data.customerNotesTemplate) {
+        if (this.checkNotHiddenFromCustomerAndCustomerNoteSet(data)) {
             this.alert(`Hide from customer can't be set because there is a customer note`);
             return false;
         }
         return true;
     }
+
+    checkNotHiddenFromCustomerAndCustomerNoteSet(data) {
+        return this.checkHiddenFromCustomer(data) && data.customerNotesTemplate;
+    }
+
+    checkCustomerNotesOptionalAndEmptyDescription(type, data) {
+        return type && type.catRequireCustomerNoteCNCAction == 2 && !data.customerNotesTemplate;
+    }
+
+    checkCustomerNotesRequired(type, data) {
+        return type && type.catRequireCustomerNoteCNCAction == 1 && !data.customerNotesTemplate;
+    }
+
+    checkHiddenFromCustomer(data) {
+        return data.hideFromCustomerFlag !== 'Y' && data.problemHideFromCustomerFlag !== 'Y';
+    }
+
+    checkOptionalCNCActionAndEmptyDescription(type, data) {
+        return type && type.catRequireCNCNextActionCNCAction == 2 && !data.cncNextActionTemplate;
+    }
+
+    checkNextCNCActionRequired(type, data) {
+        return type && type.catRequireCNCNextActionCNCAction == 1 && !data.cncNextActionTemplate;
+    }
+
     checkOnHold = async (data, type) => {
-        if (type && type.catRequireCNCNextActionOnHold == 1 && !data.cncNextActionTemplate) {
+        if (this.checkNectCNCActionRequiredOnHold(type, data)) {
             this.alert(`CNC Next Action is required for ${type.description} when the next action is On Hold`)
             return false;
         }
-        if (type && type.catRequireCNCNextActionOnHold == 2 && !data.cncNextActionTemplate) {
+        if (this.checkNextCNCActionOptionalAndDesctiptionEmptyOnHold(type, data)) {
             if (!await this.confirm(`Are you sure you don't want to put an entry for CNC Next Action?`))
                 return false;
 
         }
-        if (data.hideFromCustomerFlag !== 'Y' && data.problemHideFromCustomerFlag !== 'Y') {
-            if (type && type.catRequireCustomerNoteOnHold == 1 && !data.customerNotesTemplate) {
+        if (this.checkHiddenFromCustomer(data)) {
+            if (this.checkCustomerNotesRequiredOnHold(type, data)) {
                 this.alert(`Customer Notes are required for ${type.description} when the next action is On Hold`)
                 return false;
             }
-            if (type && type.catRequireCustomerNoteOnHold == 2 && !data.customerNotesTemplate) {
-
+            if (this.checkCustomerNotesOptionalAndEmptyDescriptionOnHold(type, data)) {
                 if (!await this.confirm(`Are you sure you don't want to put an entry for Customer Notes?`))
                     return false;
             }
         }
-        if (data.hideFromCustomerFlag == 'Y' && data.problemHideFromCustomerFlag !== 'Y' && !data.customerNotesTemplate) {
+        if (this.checkNotHiddenFromCustomerAndCustomerNoteSet(data)) {
             this.alert(`Hide from customer can't be set because there is a customer note`);
             return false;
         }
         return true;
     }
+
+    checkCustomerNotesOptionalAndEmptyDescriptionOnHold(type, data) {
+        return type && type.catRequireCustomerNoteOnHold == 2 && !data.customerNotesTemplate;
+    }
+
+    checkCustomerNotesRequiredOnHold(type, data) {
+        return type && type.catRequireCustomerNoteOnHold == 1 && !data.customerNotesTemplate;
+    }
+
+    checkNextCNCActionOptionalAndDesctiptionEmptyOnHold(type, data) {
+        return type && type.catRequireCNCNextActionOnHold == 2 && !data.cncNextActionTemplate;
+    }
+
+    checkNectCNCActionRequiredOnHold(type, data) {
+        return type && type.catRequireCNCNextActionOnHold == 1 && !data.cncNextActionTemplate;
+    }
+
     handleGeneratPassword = () => {
         window.open(
             "Password.php?action=generate&htmlFmt=popup",
