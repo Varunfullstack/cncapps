@@ -126,4 +126,5 @@
         <addDefaultValue tableName="contact" columnName="con_mailflag11" columnDataType="char(1)" defaultValue="Y"/>
         <rollback/>
     </changeSet>
+    <include file="db.changelog-issue1088.xml"/>
 </databaseChangeLog>
