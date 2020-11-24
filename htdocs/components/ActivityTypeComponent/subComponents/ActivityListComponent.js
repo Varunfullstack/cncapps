@@ -17,10 +17,14 @@ class ActivityListComponent extends MainComponent {
         }
     }
 
-    componentDidMount = async () => {
+    async getItems() {
         const types = await this.apiCallactType.getAllWithDetails();
         sort(types, "order");
         this.setState({types})
+    }
+
+    componentDidMount = async () => {
+        this.getItems();
     }
     getColumnsFilter = () => {
         const {el} = this;
@@ -139,8 +143,9 @@ class ActivityListComponent extends MainComponent {
         const {el} = this;
         const columns = [
             {
-                label: "",
-                path: "",
+                label: "#",
+                path: "order",
+                sortable: true,
                 content: (type) =>
                     this.el(Icon, {
                         title: "Move Down",
@@ -275,27 +280,18 @@ class ActivityListComponent extends MainComponent {
                 pk: "callActTypeID",
                 search: true,
                 allowRowOrder: true,
-                onOrderChange: this.handleOrderChange
+                onOrderChange: this.handleOrderChange,
+                defaultSortPath: 'order',
+                defaultSortOrder: 'asc'
             })
         );
     }
     handleOrderChange = (current, next) => {
-        const {types} = this.state;
-
-        const last = types.filter(t => t.order < next.order);
-        const currentIndx = types.findIndex(t => t.callActTypeID == current.callActTypeID);
-        if (last.length > 0) {
-            const prevIndex = types.findIndex(t => t.callActTypeID == last[last.length - 1].callActTypeID);
-            types[currentIndx].order = types[prevIndex].order + 0.01;
-        } else {
-            types[currentIndx].order = types[0].order - 0.01;
-        }
-
-        this.apiCallactType.updateActivityTypeOrder(current.callActTypeID, types[currentIndx].order).then(res => {
-
-            sort(types, "order");
-            this.setState({types});
-        });
+        console.log(current, next);
+        this.apiCallactType.updateActivityTypeOrder(current, next)
+            .then(res => {
+                return this.getItems();
+            });
     }
     handleEdit = (type) => {
         window.location = `ActivityType.php?action=editActivityType&callActTypeID=${type.callActTypeID}`

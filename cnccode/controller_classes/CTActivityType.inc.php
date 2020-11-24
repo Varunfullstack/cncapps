@@ -6,6 +6,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUActivityType.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
@@ -26,9 +27,9 @@ class CTActivityType extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
-        $roles = MAINTENANCE_PERMISSION;
+        $roles            = MAINTENANCE_PERMISSION;
         $noPermissionList = ["getCallActTypes", "getAllDetails", "updateActivityTypeOrder"];
-        $key = array_search(@$_REQUEST["action"], $noPermissionList);
+        $key              = array_search(@$_REQUEST["action"], $noPermissionList);
         if ($key === false && !self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
@@ -36,7 +37,7 @@ class CTActivityType extends CTCNC
 
         $this->setMenuId(801);
         $this->buActivityType = new BUActivityType($this);
-        $this->dsCallActType = new DSForm($this);
+        $this->dsCallActType  = new DSForm($this);
         $this->dsCallActType->copyColumnsFrom($this->buActivityType->dbeCallActType);
         $this->dsCallActType->addColumn(DBEJCallActType::itemDescription, DA_STRING, DA_ALLOW_NULL);
     }
@@ -66,7 +67,8 @@ class CTActivityType extends CTCNC
                 exit;
             case CTACTIVITYTYPE_ACT_DISPLAY_LIST:
             case "updateActivityTypeOrder":
-                echo json_encode($this->updateActivityTypeOrder());
+                $this->updateActivityTypeOrder();
+                echo json_encode(["status" => "ok"]);
                 exit;
             default:
                 $this->displayList();
@@ -112,21 +114,21 @@ class CTActivityType extends CTCNC
             );
             $txtDelete = 'Delete';
         }
-        $urlUpdate = Controller::buildLink(
+        $urlUpdate      = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action'        => CTACTIVITYTYPE_ACT_UPDATE,
                 'callActTypeID' => $callActTypeID
             )
         );
-        $urlItemPopup = Controller::buildLink(
+        $urlItemPopup   = Controller::buildLink(
             CTCNC_PAGE_ITEM,
             array(
                 'action'  => CTCNC_ACT_DISP_ITEM_POPUP,
                 'htmlFmt' => CT_HTML_FMT_POPUP
             )
         );
-        $urlItemEdit =
+        $urlItemEdit    =
             Controller::buildLink(
                 CTCNC_PAGE_ITEM,
                 array(
@@ -410,17 +412,25 @@ class CTActivityType extends CTCNC
 
     function updateActivityTypeOrder()
     {
-        $callActTypeID = $_REQUEST["callActTypeID"];
-        $order = $_REQUEST["order"];
-        if (!isset($callActTypeID) || !isset($order)) {
-            http_response_code(400);
-            return ["status" => 0];
+        $data = $this->getJSONData();
+
+        if (!isset($data['fromActivityTypeId'])) {
+            throw new \CNCLTD\Exceptions\JsonHttpException(23, 'fromActivityTypeId is required');
         }
-        $dbeCallActType = new DBECallActType($this);
-        $dbeCallActType->getRow($callActTypeID);
-        $dbeCallActType->setValue(DBECallActType::orderNum, $order);
-        $dbeCallActType->updateRow();
-        return ["status" => 1];
+        $dbeActivityTypeFrom = new DBECallActType($this);
+        $dbeActivityTypeFrom->getRow($data['fromActivityTypeId']);
+
+        if (!isset($data['toActivityTypeId'])) {
+            $dbeActivityTypeFrom->moveItemToBottom($data['fromActivityTypeId']);
+            return;
+        }
+
+        $dbeActivityTypeTo = new DBECallActType($this);
+        $dbeActivityTypeTo->getRow($data['toActivityTypeId']);
+        $dbeActivityTypeFrom->swapPlaces(
+            $dbeActivityTypeFrom->getValue(DBECallActType::orderNum),
+            $dbeActivityTypeTo->getValue(DBECallActType::orderNum)
+        );
     }
 
     /**

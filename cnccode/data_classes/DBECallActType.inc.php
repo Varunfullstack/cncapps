@@ -8,6 +8,8 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBECallActType extends DBEntity
 {
+    use \CNCLTD\SortableDBE;
+
     const callActTypeID = "callActTypeID";
     const description = "description";
     const oohMultiplier = "oohMultiplier";
@@ -89,7 +91,7 @@ class DBECallActType extends DBEntity
         );
         $this->addColumn(self::catRequireCustomerNoteOnHold, DA_INTEGER, DA_ALLOW_NULL, 'catRequireCustomerNoteOnHold');
         $this->addColumn(self::minMinutesAllowed, DA_INTEGER, DA_NOT_NULL, 'minMinutesAllowed');
-        $this->addColumn(self::orderNum, DA_FLOAT, DA_NOT_NULL, 'orderNum');
+        $this->addColumn(self::orderNum, DA_INTEGER, DA_NOT_NULL, 'orderNum');
         $this->setAddColumnsOff();
         $this->setPK(0);
     }
@@ -106,6 +108,22 @@ class DBECallActType extends DBEntity
         $ret = (parent::getRows());
     }
 
+    protected function getSortOrderForItem($id)
+    {
+        $this->getRow($id);
+        return $this->getValue(self::orderNum);
+    }
+
+    protected function getSortOrderColumnName()
+    {
+         return $this->getDBColumnName(self::orderNum);
+    }
+
+    protected function getDB()
+    {
+        global $db;
+        return $db;
+    }
 }
 
 ?>

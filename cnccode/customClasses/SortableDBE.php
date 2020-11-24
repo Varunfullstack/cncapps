@@ -40,7 +40,7 @@ trait SortableDBE
 
     abstract protected function getDB();
 
-    private function swapPlaces($oldOrderId, $newOrderId)
+    public function swapPlaces($oldOrderId, $newOrderId)
     {
         $query = "UPDATE
   {$this->getTableName()}

@@ -74,7 +74,21 @@ class Table extends React.Component {
         if (this.props.onOrderChange)
             this.props.onOrderChange(currentItem, nextItem);
     };
+
+    disableSortable() {
+        return $("#table" + this.props.id + " tbody").sortable('option', "disabled", true);
+    }
+
+    enableSortable() {
+        return $("#table" + this.props.id + " tbody").sortable('option', "disabled", false);
+    }
+
     handleSort = (sortColumn) => {
+        if (sortColumn.path !== this.props.defaultSortPath || sortColumn.order !== this.props.defaultSortOrder) {
+            this.disableSortable();
+        } else {
+            this.enableSortable();
+        }
 
         for (let i = 0; i < this.props.columns.length; i++) {
             if (this.props.columns[i].path == sortColumn.path) {
@@ -104,6 +118,11 @@ class Table extends React.Component {
         });
     };
     handleSearch = (event) => {
+        if (event.target.value) {
+            this.disableSortable();
+        } else {
+            this.enableSortable();
+        }
         clearTimeout(this.delayTimer);
         event.persist();
         this.delayTimer = setTimeout(() => {
