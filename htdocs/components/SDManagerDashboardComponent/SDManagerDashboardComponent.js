@@ -449,7 +449,6 @@ class SDManagerDashboardComponent extends MainComponent {
                     icon: "fal fa-2x fa-user-hard-hat color-gray2 ",
                     sortable: false,
                     hdClassName: "text-center",
-                    //content: (problem) => this.getAllocatedElement(problem, problem.teamID),
                 },
                 {
                     display: [11].indexOf(filter.activeTab) < 0,
@@ -477,7 +476,7 @@ class SDManagerDashboardComponent extends MainComponent {
                     hdClassName: "text-center",
                 },
                 {
-                    display:[11].indexOf(filter.activeTab)>=0,
+                    display: [11].indexOf(filter.activeTab) >= 0,
                     path: "fixedDate",
                     label: "",
                     hdToolTip: "Fixed date",
@@ -485,7 +484,13 @@ class SDManagerDashboardComponent extends MainComponent {
                     icon: "fal fa-2x fa-calendar  color-gray2 pointer",
                     sortable: false,
                     className: "text-center",
-                 },
+                    content: (problem => {
+                        if (!problem.fixedDate) {
+                            return null;
+                        }
+                        return moment(problem.fixedDate, 'YYYY-MM-DD').format('DD/MM/YYYY')
+                    })
+                },
             ]
             columns = columns.filter(c => c.display == undefined || c.display == true);
             return el(Table, {

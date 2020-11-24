@@ -216,7 +216,7 @@ class DBEJProblem extends DBEProblem
             self::FIXED_DATE,
             DA_STRING,
             DA_ALLOW_NULL,
-            "(select DATE_FORMAT(caa_date,'%Y-%m-%d') from callactivity where caa_callacttypeno=57 and caa_problemno=pro_problemno )"
+            "fixed.caa_date"
         );
         $this->addColumn(
             self::ENGINEER_FIXED_NAME,

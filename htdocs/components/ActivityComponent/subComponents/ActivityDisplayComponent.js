@@ -41,9 +41,9 @@ class ActivityDisplayComponent extends MainComponent {
                 showServerGuardUpdates: false,
                 criticalSR: false,
                 monitorSR: false,
-                holdForQA:false
+                holdForQA: false
+            }
         }
-    }
         }
 
     componentDidMount() {
@@ -82,7 +82,7 @@ class ActivityDisplayComponent extends MainComponent {
         })
         filters.monitorSR = res.monitoringFlag == "1";
         filters.criticalSR = res.criticalFlag == "1";
-        filters.holdForQA=res.holdForQA;
+        filters.holdForQA = res.holdForQA;
         this.setState({filters, data: res, currentActivity: +res.callActivityID, currentUser});
 
     }
@@ -379,10 +379,10 @@ class ActivityDisplayComponent extends MainComponent {
         this.setState({filters})
     }
     handleTogaleChange = async (filter) => {
-        const {filters, currentActivity,data} = this.state;
+        const {filters, currentActivity, data} = this.state;
         filters[filter] = !filters[filter];
         this.setState({filters});
-        const problemID=data.problemID;
+        const problemID = data.problemID;
         if (filter === "criticalSR")
             await this.api.setActivityCritical(currentActivity);
         if (filter == "monitorSR")
@@ -476,7 +476,7 @@ class ActivityDisplayComponent extends MainComponent {
         } else return null;
     }
     getActivitiesElement = () => {
-        const {data, currentActivity,currentUser} = this.state;
+        const {data, currentActivity, currentUser} = this.state;
         const {el} = this;
 
         const dateLen = maxLength(data?.activities || [], 'date') + 10;
@@ -534,7 +534,7 @@ class ActivityDisplayComponent extends MainComponent {
                 this.getCurrentActivityIndxElement(data, currentActivity)
             ),
             el('div', {style: {display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center"}},
-            currentUser.isSDManger?this.getToggle("QA", 'holdForQA'):null,
+                currentUser.isSDManger ? this.getToggle("QA", 'holdForQA') : null,
                 this.getToggle("Critical SR", 'criticalSR'),
                 this.getToggle("Monitor SR", 'monitorSR'),
                 this.getToggle("Travel", "showTravel"),
