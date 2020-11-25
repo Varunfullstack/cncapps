@@ -85,12 +85,6 @@ class CTCurrentActivityReport extends CTCNC
      */
     function defaultAction()
     {
-        //$this->renderQueue(1);  // Helpdesk
-        //$this->renderQueue(2);  // Escalations
-        //$this->renderQueue(4);  // Sales wrong
-        //$this->renderQueue(3);  // Small Projects
-        //$this->renderQueue(5);  // Projects
-        //$this->renderQueue(6);  //Fixed
         switch ($this->getAction()) {
             case "getHelpDeskInbox":
                 echo json_encode($this->renderQueue(1));

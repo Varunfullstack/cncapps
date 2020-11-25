@@ -427,23 +427,23 @@ class DBEJProblem extends DBEProblem
         return (parent::getRows());
     }
 
-    /*
-    Get Awaiting and In-progress SRs by Queue
 
-    */
-    function getRowsByQueueNo($queueNo,
-                              $unassignedOnly = false
-    )
+    /*
+      Get Awaiting, In-progress and future SRs by Queue
+
+      */
+    function getRowsByQueueNoWithFuture($queueNo)
     {
         $sql =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " LEFT JOIN customer ON cus_custno = pro_custno
+            "SELECT {$this->getDBColumnNamesAsString()}, pro_alarm_date is not null as hasAlarmDate,
+             consultant.cns_consno is not null as isAssigned
+             FROM {$this->getTableName()}
+             LEFT JOIN customer ON cus_custno = pro_custno
            LEFT JOIN consultant ON cns_consno = pro_consno
 
           JOIN callactivity `initial`
-            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
-
+            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = "
+            . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
             " JOIN callactivity `last`
             ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
               (
@@ -453,7 +453,7 @@ class DBEJProblem extends DBEProblem
               WHERE ca.caa_problemno = pro_problemno
               AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
-left join callactivity fixed 
+            left join callactivity fixed 
             on fixed.caa_problemno = pro_problemno and fixed.caa_callacttypeno = " . CONFIG_FIXED_ACTIVITY_TYPE_ID . " 
             left join consultant fixedEngineer on fixed.caa_consno = fixedEngineer.cns_consno
             left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
@@ -461,62 +461,9 @@ left join callactivity fixed
         WHERE pro_status IN( 'I', 'P' )
 
           AND pro_queue_no = $queueNo
-        
-          AND ( " . $this->getDBColumnName(self::alarmDate) . " is null or CONCAT( " . $this->getDBColumnName(
-                self::alarmDate
-            ) . " , ' ' , coalesce(" . $this->getDBColumnName(self::alarmTime) . ", '00:00:00') ) <= NOW() )";
+          order by hasAlarmDate asc, CONCAT( pro_alarm_date, ' ', coalesce(concat(pro_alarm_time,':00') , '00:00:00') ) asc,   isAssigned asc, {$this->getDBColumnName(self::workingHours)} desc
+          ";
 
-        if ($unassignedOnly) {
-            $sql .= " AND pro_consno is null";
-
-        } else {
-            $sql .= " AND pro_consno is not null";
-        }
-        $this->setQueryString($sql);
-        return (parent::getRows());
-    }
-
-    /*
-      Get Awaiting, In-progress and future SRs by Queue
-
-      */
-    function getRowsByQueueNoWithFuture($queueNo,
-                                        $unassignedOnly = false
-    )
-    {
-        $sql =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " LEFT JOIN customer ON cus_custno = pro_custno
-           LEFT JOIN consultant ON cns_consno = pro_consno
-
-          JOIN callactivity `initial`
-            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
-
-            " JOIN callactivity `last`
-            ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
-              (
-              SELECT
-                MAX( ca.caa_callactivityno )
-              FROM callactivity ca
-              WHERE ca.caa_problemno = pro_problemno
-              AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
-            ) 
-left join callactivity fixed 
-            on fixed.caa_problemno = pro_problemno and fixed.caa_callacttypeno = " . CONFIG_FIXED_ACTIVITY_TYPE_ID . " 
-            left join consultant fixedEngineer on fixed.caa_consno = fixedEngineer.cns_consno
-            left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
-            left join team queueTeam on queueTeam.level = pro_queue_no
-        WHERE pro_status IN( 'I', 'P' )
-
-          AND pro_queue_no = $queueNo";
-
-        if ($unassignedOnly) {
-            $sql .= " AND pro_consno is null";
-
-        } else {
-            $sql .= " AND pro_consno is not null";
-        }
         $this->setQueryString($sql);
         return (parent::getRows());
     }

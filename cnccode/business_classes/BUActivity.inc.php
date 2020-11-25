@@ -6875,51 +6875,13 @@ class BUActivity extends Business
 
     /**
      * @param $queueNo
-     * @param DataSet $dsResults
-     */
-    function getProblemsByQueueNo($queueNo,
-                                  &$dsResults
-    )
-    {
-        $dbeJProblem = new DBEJProblem($this);
-        $dbeJProblem->getRowsByQueueNo(
-            $queueNo,
-            true
-        ); // unassigned first
-        $this->getData(
-            $dbeJProblem,
-            $dsResults
-        );
-
-        $dsResults->sortAscending(
-            'dashboardSortColumn'
-        );
-        $dbeJProblem->getRowsByQueueNo($queueNo);       // then assigned
-
-        $dsAssignedResults = new DataSet($this);
-        $this->getData(
-            $dbeJProblem,
-            $dsAssignedResults
-        );
-
-        $dsAssignedResults->sortAscending(
-            'dashboardSortColumn'
-        );
-
-        $dsResults->setClearRowsBeforeReplicateOff();
-
-        $dsResults->replicate($dsAssignedResults);
-    }
-
-    /**
-     * @param $queueNo
      * @return DBEJProblem
      */
     function getProblemsByQueue($queueNo
     )
     {
         $dbeJProblem = new DBEJProblem($this);
-        $dbeJProblem->getRowsByQueue($queueNo);
+        $dbeJProblem->getRowsByQueueNoWithFuture($queueNo);
         return $dbeJProblem;
     }
 
