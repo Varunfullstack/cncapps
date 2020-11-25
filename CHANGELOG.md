@@ -16,6 +16,7 @@ This project changes will be shown here.
 - Issue 1082 - Updated time picker
 - Issue 1061 - First Time Fix Report Enhancements
 - Issue 1092 - Daily SR Report Formatting
+- Issue 1103 - Fixed SR Email to include faces for survey feedback
 ### Fixed
 - Issue 1078 - Sales Request Dashboard Attachment Link error
 - Issue 1077 - Service Requests By Customer Report Broken
