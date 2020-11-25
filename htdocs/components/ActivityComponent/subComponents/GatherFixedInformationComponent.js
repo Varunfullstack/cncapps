@@ -10,8 +10,7 @@ import {groupBy, params} from "../../utils/utils.js";
 
 import React from 'react';
 import ActivityDocumentUploader from "./ActivityDocumentUploader";
-import ReactDOM from 'react-dom';
-import React    from 'react';
+
 class GatherFixedInformationComponent extends MainComponent {
     el = React.createElement;
     apiActivity = new APIActivity();
