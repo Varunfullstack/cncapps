@@ -17,7 +17,9 @@ class APIActivity extends APIMain {
     setActivityMonitoring(callActivityID) {
         return fetch(`Activity.php?action=toggleMonitoringFlag&callActivityID=${callActivityID}`);
     }
-
+    setProblemHoldForQA(problemID) {
+        return fetch(`SRActivity.php?action=toggleHoldForQAFlag&problemID=${problemID}`);
+    }
     deleteActivity(callActivityID) {
         return fetch(`Activity.php?action=deleteCallActivity&callActivityID=${callActivityID}`);
 

@@ -4,16 +4,16 @@ import APIActivity from "../../services/APIActivity.js";
 import APICustomers from "../../services/APICustomers.js";
 import APIStandardText from "../../services/APIStandardText.js";
 import CKEditor from "../../shared/CKEditor.js";
-import Toggle from "../../shared/Toggle.js";
 import ToolTip from "../../shared/ToolTip.js";
+import Toggle from "../../shared/Toggle.js";
 import {groupBy, params} from "../../utils/utils.js";
 
 import React from 'react';
 import ActivityDocumentUploader from "./ActivityDocumentUploader";
-
+import ReactDOM from 'react-dom';
+import React    from 'react';
 class GatherFixedInformationComponent extends MainComponent {
     el = React.createElement;
-
     apiActivity = new APIActivity();
     apiCustomer = new APICustomers();
     apiStandardText = new APIStandardText();

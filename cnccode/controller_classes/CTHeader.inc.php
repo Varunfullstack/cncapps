@@ -648,7 +648,13 @@ class CTHeader extends CTCNC
                     DBEHeader::yearlySicknessThresholdWarning
                 ),
                 'urlItemPopup'                                           => $urlItemPopup,
-                'urlUpdate'                                              => $urlUpdate
+                'urlUpdate'                                              => $urlUpdate,
+                DBEHeader::holdAllSOSmallProjectsP5sforQAReview                => $dsHeader->getValue(
+                    DBEHeader::holdAllSOSmallProjectsP5sforQAReview
+                )?"checked":null,
+                DBEHeader::holdAllSOProjectsP5sforQAReview                => $dsHeader->getValue(
+                    DBEHeader::holdAllSOProjectsP5sforQAReview
+                )?"checked":null,
             ]
         );
 

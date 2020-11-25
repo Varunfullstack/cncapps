@@ -521,6 +521,7 @@ class DBECallActivitySearch extends DBEntity
                     " AND caa_status = 'C' AND " . $this->getDBColumnName(self::contractCustomerItemID) . " is null
             AND pro_status = 'F'
             AND pro_complete_date <= now()
+            AND holdForQA =0
             AND caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID;
                 break;
             /*
@@ -531,7 +532,7 @@ class DBECallActivitySearch extends DBEntity
                     " AND caa_status = 'C' AND " . $this->getDBColumnName(self::contractCustomerItemID) . " is not null 
             AND pro_status = 'F'
             AND pro_complete_date <= now()
-            
+            AND holdForQA =0
             AND " . $this->getDBColumnName(self::activityDurationHours) . " > 
             (
               SELECT
@@ -563,6 +564,8 @@ class DBECallActivitySearch extends DBEntity
             case 'FIXED_OR_COMPLETED':
                 $whereParameters .= " and pro_status in ('F','C') ";
                 break;
+            case "HOLD_FOR_QA":
+                $whereParameters .= " AND caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID." AND holdForQA =1 ";
         }
         // Contract Type:
 

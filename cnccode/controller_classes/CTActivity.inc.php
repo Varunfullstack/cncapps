@@ -173,7 +173,8 @@ class CTActivity extends CTCNC
             "CHECKED_T_AND_M"     => "Checked T&M Due Completion",
             "CHECKED_NON_T_AND_M" => "Checked Non-T&M Due Completion",
             "UNCHECKED"           => "Unchecked",
-            "FIXED_OR_COMPLETED"  => "Fixed Or Completed"
+            "FIXED_OR_COMPLETED"  => "Fixed Or Completed",
+            "HOLD_FOR_QA"  => "Hold for QA"
         );
 
     function __construct($requestMethod,

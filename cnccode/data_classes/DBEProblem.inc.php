@@ -68,7 +68,7 @@ class DBEProblem extends DBEntity
     const repeatProblem = "repeatProblem";
     const notFirstTimeFixReason = "notFirstTimeFixReason";
     const emptyAssetReason = "emptyAssetReason";
-
+    const holdForQA="holdForQA";
     /**
      * calls constructor()
      * @access public
@@ -431,7 +431,12 @@ class DBEProblem extends DBEntity
             DA_TEXT,
             DA_ALLOW_NULL
         );
-
+        $this->addColumn(
+            self::holdForQA,
+            DA_BOOLEAN,
+            DA_ALLOW_NULL
+        );
+        
         $this->setAddColumnsOff();
         $this->setPK(0);
         if ($pkID) {

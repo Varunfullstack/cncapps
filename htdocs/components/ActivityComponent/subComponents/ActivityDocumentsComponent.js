@@ -3,8 +3,7 @@ import APIActivity from "../../services/APIActivity.js";
 import Table from "../../shared/table/table";
 import ToolTip from "../../shared/ToolTip.js";
 
-import React from 'react';
-
+import React    from 'react';
 class ActivityDocumentsComponent extends MainComponent {
     el = React.createElement;
     api = new APIActivity();
