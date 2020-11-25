@@ -12,6 +12,6 @@
                 c.`TABLE_NAME` = "item" AND c.`COLUMN_NAME` = 'itm_unit_of_sale' AND c.`CHARACTER_MAXIMUM_LENGTH` = 20
             </sqlCheck>
         </preConditions>
-        <modifyDataType tableName="item" columnName="itm_unit_of_sale" newDataType="varchar(25)"/>
+        <modifyDataType tableName="item" columnName="itm_unit_of_sale" newDataType="varchar(25) CHARSET utf8 COLLATE utf8_general_ci NULL"/>
     </changeSet>
 </databaseChangeLog>
