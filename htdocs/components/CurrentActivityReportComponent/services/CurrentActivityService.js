@@ -81,6 +81,24 @@ class CurrentActivityService extends APIMain {
     getCustomerOpenSR(customerID) {
         return fetch(`${this.baseURL}getCustomerOpenSR&customerID=${customerID}`).then(res => res.json());
     }
+
+    assignToBeLoggedToServiceRequest(toBeLogged, serviceRequestId) {
+        return fetch(`${this.activityUrl}assignToBeLoggedToServiceRequest`, {
+            method: 'POST',
+            body: JSON.stringify({toBeLogged, serviceRequestId})
+        })
+            .then(res => res.json())
+            .catch(error => {
+                throw new Error('Failed to parse json');
+            })
+            .then(res => {
+                if (res.status !== 'ok') {
+                    throw new Error(res.message || "Failed to assign to be logged");
+                }
+            })
+
+
+    }
 }
 
 export default CurrentActivityService;

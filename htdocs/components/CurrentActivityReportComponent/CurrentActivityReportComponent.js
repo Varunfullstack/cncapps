@@ -541,6 +541,19 @@ class CurrentActivityReportComponent extends MainComponent {
         }) : null;
     }
 
+    async assignToRequest(toBeLoggedRequest) {
+        const value = await this.prompt("Please provide the service request Id to be added to");
+        if (!value) {
+            return;
+        }
+        try {
+            await this.apiCurrentActivityService.assignToBeLoggedToServiceRequest(toBeLoggedRequest.cpCustomerProblemID, value);
+            this.loadQueue('TBL');
+        } catch (err) {
+            this.alert(err.toString());
+        }
+    }
+
     render() {
         const {
             el,
@@ -560,7 +573,7 @@ class CurrentActivityReportComponent extends MainComponent {
             srCustomerDescription,
             getFollowOnElement,
             getCustomerOpenSR,
-
+            assignToRequest,
         } = this;
         const {
             helpDeskInboxFiltered,
@@ -673,6 +686,7 @@ class CurrentActivityReportComponent extends MainComponent {
                     deleteSR,
                     createNewSR,
                     srCustomerDescription,
+                    assignToRequest: (toBeLoggedRequest) => this.assignToRequest(toBeLoggedRequest)
                 })
                 : null,
 
