@@ -840,7 +840,7 @@ class DBEJProblem extends DBEProblem
 
 
         if (!$isHoldForQA) {
-            $sql .= "{$this->getDBColumnName(self::customerID)} <> 282 and (consultant.cns_consno is null or consultant.execludeFromSDManagerDashboard = 0) and pro_queue_no <> 7";
+            $sql .= " and {$this->getDBColumnName(self::customerID)} <> 282 and (consultant.cns_consno is null or consultant.execludeFromSDManagerDashboard = 0) and pro_queue_no <> 7 ";
         } else {
             if (!$showHelpDesk) {
                 $sql .= ' and pro_queue_no <> 1 ';
