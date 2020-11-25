@@ -127,4 +127,5 @@
         <rollback/>
     </changeSet>
     <include file="db.changelog-issue1099.xml"/>
+    <include file="db.changelog-issue1081.xml"/>
 </databaseChangeLog>

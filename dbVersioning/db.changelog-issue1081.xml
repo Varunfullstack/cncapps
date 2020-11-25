@@ -1,0 +1,96 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue1081-0">
+        <tagDatabase tag="issue1081"/>
+    </changeSet>
+    <changeSet id="issue1081-1" author="pavwebdev">
+        <sql splitStatements="true">
+            DELETE standardtext
+            FROM standardtext
+                     LEFT JOIN standardtexttype
+                               ON standardtexttype.`sty_standardtexttypeno` = standardtext.`stt_standardtexttypeno`
+            WHERE `standardtexttype`.`sty_desc` IN
+                  ("Priority Change Reason", "Not First Time Fix Reason", "Missing Asset Reason");
+            INSERT INTO standardtext (stt_desc,
+                                      stt_text,
+                                      stt_standardtexttypeno)
+            VALUES ("Change - not a fix",
+                    "This is a change request and the SLA is amended to reflect this. If this is an urgent change please call the Customer Services line via the Service Desk to amend",
+                    (SELECT sty_standardtexttypeno
+                     FROM standardtexttype
+                     WHERE sty_desc = "Priority Change Reason")),
+                   ("Projec Work",
+                    "This has request been linked to a Sales Order and is now considered a project",
+                    (SELECT sty_standardtexttypeno
+                     FROM standardtexttype
+                     WHERE sty_desc = "Priority Change Reason")),
+                   ("More urgent",
+                    "The urgency of this reported issue has been increased",
+                    (SELECT sty_standardtexttypeno
+                     FROM standardtexttype
+                     WHERE sty_desc = "Priority Change Reason")),
+                   ("Less Urgent",
+                    "The reported issue is no longer as urgent",
+                    (SELECT sty_standardtexttypeno
+                     FROM standardtexttype
+                     WHERE sty_desc = "Priority Change Reason")),
+                   ("Scheduled for later",
+                    "Customer has requested a call back at a specific time",
+                    (SELECT sty_standardtexttypeno
+                     FROM standardtexttype
+                     WHERE sty_desc = "Not First Time Fix Reason")),
+                   ("Indirectly Reported",
+                    "Customer has reported this on behalf of somebody else",
+                    (SELECT sty_standardtexttypeno
+                     FROM standardtexttype
+                     WHERE sty_desc = "Not First Time Fix Reason")),
+                   ("I'm too busy",
+                    "I'm too busy right now",
+                    (SELECT sty_standardtexttypeno
+                     FROM standardtexttype
+                     WHERE sty_desc = "Not First Time Fix Reason")),
+                   ("Beyond my skills",
+                    "The issue is too complicated for me",
+                    (SELECT sty_standardtexttypeno
+                     FROM standardtexttype
+                     WHERE sty_desc = "Not First Time Fix Reason")),
+                   ("Needs escalation",
+                    "Issue needs to be dealt with by another team",
+                    (SELECT sty_standardtexttypeno
+                     FROM standardtexttype
+                     WHERE sty_desc = "Not First Time Fix Reason")),
+                   ("Mobile phone / tablet",
+                    "Mobile phone / tablet",
+                    (SELECT sty_standardtexttypeno
+                     FROM standardtexttype
+                     WHERE sty_desc = "Missing Asset Reason")),
+                   ("Printer",
+                    "Device is a printer",
+                    (SELECT sty_standardtexttypeno
+                     FROM standardtexttype
+                     WHERE sty_desc = "Missing Asset Reason")),
+                   ("Network Device",
+                    "Device is a router / firewall",
+                    (SELECT sty_standardtexttypeno
+                     FROM standardtexttype
+                     WHERE sty_desc = "Missing Asset Reason")),
+                   ("Cloud Service",
+                    "Pure cloud service such as Mimecast or Microsoft 365",
+                    (SELECT sty_standardtexttypeno
+                     FROM standardtexttype
+                     WHERE sty_desc = "Missing Asset Reason")),
+                   ("Major project",
+                    "This is a major project with no specific asset",
+                    (SELECT sty_standardtexttypeno
+                     FROM standardtexttype
+                     WHERE sty_desc = "Missing Asset Reason")),
+                   ("Sales Activity",
+                    "Sales activity such as quoting, customer review meeting",
+                    (SELECT sty_standardtexttypeno
+                     FROM standardtexttype
+                     WHERE sty_desc = "Missing Asset Reason"));
+        </sql>
+    </changeSet>
+</databaseChangeLog>
