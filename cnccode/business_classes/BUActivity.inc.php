@@ -1406,8 +1406,7 @@ class BUActivity extends Business
             DBEJProblem::totalTravelActivityDurationHours,
             $totalTravelHours
         );
-        if($dsCallActivity->columnExists(DBEProblem::holdForQA)!=-1)
-        {
+        if ($dsCallActivity->columnExists(DBEProblem::holdForQA) != -1) {
             $problem->setValue(
                 DBEJProblem::holdForQA,
                 $dsCallActivity->getValue(DBEProblem::holdForQA)
@@ -7072,19 +7071,19 @@ class BUActivity extends Business
         $buHeader = new BUHeader($this);
         $dsHeader = new DataSet($this);
         $buHeader->getHeader($dsHeader);
-        if($queue==3)
-        $dbeProblem->setValue(
-            DBEJProblem::holdForQA,
-            $dsHeader->getValue(DBEHeader::holdAllSOSmallProjectsP5sforQAReview)
-        );
-        else  if($queue==5)
-        $dbeProblem->setValue(
-            DBEJProblem::holdForQA,
-            $dsHeader->getValue(DBEHeader::holdAllSOProjectsP5sforQAReview)
-        );
+        if ($queue == 3)
+            $dbeProblem->setValue(
+                DBEJProblem::holdForQA,
+                $dsHeader->getValue(DBEHeader::holdAllSOSmallProjectsP5sforQAReview)
+            );
+        else if ($queue == 5)
+            $dbeProblem->setValue(
+                DBEJProblem::holdForQA,
+                $dsHeader->getValue(DBEHeader::holdAllSOProjectsP5sforQAReview)
+            );
         $informCustomer = false;
         if ($dsInput->getValue(BURenContract::serviceRequestPriority) == 5) {
-            $informCustomer = true;
+            $informCustomer      = true;
             $queueProblemColumn  = $queue == 3 ? DBEProblem::smallProjectsTeamLimitMinutes : DBEProblem::projectTeamLimitMinutes;
             $queueHeaderColumn   = $queue == 3 ? DBEHeader::smallProjectsTeamLimitMinutes : DBEHeader::projectTeamLimitMinutes;
             $minutesInADayColumn = $queue == 3 ? DBEHeader::smallProjectsTeamMinutesInADay : DBEHeader::projectTeamMinutesInADay;
@@ -7520,8 +7519,6 @@ FROM
         add_postcode,
         con_notes,
         cus_tech_notes
-
-
       FROM
         customerproblem
         LEFT JOIN contact ON con_contno = cpr_contno
@@ -12083,6 +12080,70 @@ FROM
         $dbeJProblem->getCustomerOpenRows($customerID);
         return $dbeJProblem;
 
+    }
+
+    /**
+     * @param DBEProblem $DBEProblem
+     * @param $cpr_reason
+     * @param DBEUser $currentUser
+     */
+    public function addCustomerContactActivityToServiceRequest(DBEProblem $DBEProblem,
+                                                               $cpr_reason,
+                                                               DBEUser $currentUser
+    )
+    {
+        $initialActivity = $this->getFirstActivityInServiceRequest(
+            $DBEProblem->getValue(DBEProblem::problemID),
+            CONFIG_INITIAL_ACTIVITY_TYPE_ID
+        );
+        $dbeCallActivity = new DBECallActivity($this);
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::callActivityID,
+            null
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::siteNo,
+            $initialActivity->getValue(DBECallActivity::siteNo)
+        ); // contact default siteno
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::contactID,
+            $initialActivity->getValue(DBECallActivity::contactID)
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::callActTypeID,
+            CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::date,
+            date(DATE_MYSQL_DATE)
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::startTime,
+            date('H:i')
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::endTime,
+            date('H:i')
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::status,
+            'C'
+        );
+
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::reason,
+            $cpr_reason
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::problemID,
+            $DBEProblem->getValue(DBEProblem::problemID)
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::userID,
+            $currentUser->getValue(DBEUser::userID)
+        );
+
+        $dbeCallActivity->insertRow();
     }
 
 }
