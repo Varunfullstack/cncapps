@@ -43,6 +43,35 @@
         }
     }
 
+    function updatePrice(type, value) {
+        prompt('This will update all the Cost prices for all active contracts. Are you sure?')
+    }
+
+    priceUpdate = {
+        COST: 'cost',
+        SALE: 'sale'
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const updateUnitCostContractButton = document.getElementById('updateUnitCostContractButton');
+        const updateUnitSaleContractButton = document.getElementById('updateUnitSaleContractButton');
+        const curUnitCostInput = document.querySelector("[name='item[1][curUnitCost]']");
+        const curUnitSaleInput = document.querySelector("[name='item[1][curUnitSale]']");
+
+        if ({allowGlobalPricingUpdate}) {
+            updateUnitCostContractButton.addEventListener('click', () => {
+                updatePrice(priceUpdate.COST, curUnitCostInput.value);
+
+            })
+            updateUnitSaleContractButton.addEventListener('click', () => {
+                updatePrice(priceUpdate.SALE, curUnitSaleInput.value);
+            })
+            updateUnitCostContractButton.style.display = "inline-block";
+            updateUnitSaleContractButton.style.display = "inline-block";
+        }
+
+    })
+
 </SCRIPT>
 <form name="itemForm"
       method="post"
@@ -147,7 +176,12 @@
                         align="right"
                         size="10"
                         maxlength="10"
-                > <font class="formErrorMessage">{curUnitCostMessage}</font>
+                >
+                <button id="updateUnitCostContractButton"
+                        style="display: none"
+                >Update Contract Pricing
+                </button>
+                <font class="formErrorMessage">{curUnitCostMessage}</font>
             </td>
         </tr>
         <tr>
@@ -160,7 +194,12 @@
                         align="right"
                         size="10"
                         maxlength="10"
-                > <font class="formErrorMessage">{curUnitSaleMessage}</font>
+                >
+                <button id="updateUnitSaleContractButton"
+                        style="display: none"
+                >Update Contract Pricing
+                </button>
+                <font class="formErrorMessage">{curUnitSaleMessage}</font>
             </td>
         </tr>
         <tr>
