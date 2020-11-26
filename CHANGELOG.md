@@ -24,6 +24,7 @@ This project changes will be shown here.
 - Issue 1077 - Service Requests By Customer Report Broken
 - Issue 1020 - Deleting Sales Order lines doesn't update the total until the page is reloaded
 - Issue 1076 - Internal email formatting
+- Issue 1109 - Overtime / Expense denial reasons missing
 ### Removed
 - Issue 1089 - Duplicate item on user page
 

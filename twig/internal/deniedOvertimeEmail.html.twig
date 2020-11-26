@@ -1,7 +1,13 @@
 {% extends "@internal/wrapper.html.twig" %}
 {% block content %}
-    Your overtime for {{ overtime.customerName }} for  {{ overtime.duration }} on {{ overtime.date }} has been denied because of the following reason:
+    <p>
+        Your overtime for {{ overtime.customerName }} for {{ overtime.duration }} on {{ overtime.date }} has been denied
+        because of the following reason:
+    </p>
     <p>
         {{ overtime.deniedReason }}
+    </p>
+    <p>
+        <a href="{{ overtime.activityURL }}">{{ overtime.serviceRequestId }}</a>
     </p>
 {% endblock %}
