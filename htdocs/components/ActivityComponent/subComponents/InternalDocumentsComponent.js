@@ -100,7 +100,7 @@ export class InternalDocumentsComponent extends MainComponent {
                     <label className="label  mt-5 mr-3 ml-1 mb-5"
                            style={{display: "block"}}
                     >
-                        Service Request Documents
+                        Internal Documents
                     </label>
                     <ToolTip width="15"
                              title="Documents here are not visible to the customer in their portal."
