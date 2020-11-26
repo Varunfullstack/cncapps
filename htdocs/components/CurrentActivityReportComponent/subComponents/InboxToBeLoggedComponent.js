@@ -27,6 +27,7 @@ class InboxToBeLoggedComponent extends React.Component {
             deleteSR,
             createNewSR,
             srCustomerDescription,
+            assignToRequest
         } = this.props;
         let columns = [
             {
@@ -51,6 +52,23 @@ class InboxToBeLoggedComponent extends React.Component {
             },
             {
                 hide: false,
+                order: 1.1,
+                path: null,
+                label: "",
+                key: "New",
+                sortable: false,
+                className: "text-center",
+                hdClassName: "text-center",
+                backgroundColorColumn: "cpBgColor",
+                content: (problem) =>
+                    addToolTip(
+                        <div onClick={() => assignToRequest(problem)}>
+                            <i className="fal fa-file-plus color-gray pointer inbox-icon"/></div>,
+                        "Add to existing Service Request"
+                    ),
+            },
+            {
+                hide: false,
                 order: 2,
                 path: null,
                 label: "",
@@ -61,13 +79,8 @@ class InboxToBeLoggedComponent extends React.Component {
                 backgroundColorColumn: "cpBgColor",
                 content: (problem) =>
                     addToolTip(
-                        el(
-                            "div",
-                            {key: "newIcon", onClick: () => createNewSR(problem, this.code)},
-                            el("i", {
-                                className: "fal fa-plus color-gray pointer inbox-icon",
-                            })
-                        ),
+                        <div onClick={() => createNewSR(problem, this.code)}>
+                            <i className="fal fa-plus color-gray pointer inbox-icon"/></div>,
                         "Create New Service Request"
                     ),
             },
