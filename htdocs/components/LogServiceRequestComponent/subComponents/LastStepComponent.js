@@ -6,6 +6,7 @@ import StandardTextModal from "../../Modals/StandardTextModal.js";
 import MainComponent from "../../shared/MainComponent.js";
 import React from 'react';
 import DragAndDropUploaderComponent from "../../shared/DragAndDropUploaderComponent/DragAndDropUploaderComponent";
+import ToolTip from "../../shared/ToolTip";
 
 class LastStepComponent extends MainComponent {
     el = React.createElement;
@@ -45,6 +46,7 @@ class LastStepComponent extends MainComponent {
                 notStartWorkReasonTemplate: data.notStartWorkReasonTemplate || "",
                 startWork: false,
                 authorisedBy: "",
+                internalDocuments: []
             },
         };
         this.fileUploader = new React.createRef();
@@ -477,20 +479,48 @@ class LastStepComponent extends MainComponent {
 
         return true;
     };
-    getDocumentsElement = () => {
+
+    getDocumentsElement() {
         return (
             <div style={{position: 'relative'}}>
-                <h3>Upload Documents</h3>
+                <h3>Upload Customer Documents</h3>
+                <ToolTip width="15"
+                         title="Documents here are visible to the customer in their portal."
+                >
+                    <i className="fal fa-info-circle mt-5 pointer icon"/>
+                </ToolTip>
                 <DragAndDropUploaderComponent onFilesChanged={(files, type) => this.handleFileSelected(files, type)}>
                 </DragAndDropUploaderComponent>
                 {this.getSelectedFilesElement()}
             </div>
         )
-    };
-    handleFileSelected = (files) => {
+    }
+
+    getInternalDocumentsElement() {
+        return (
+            <div style={{position: 'relative'}}>
+                <h3>Upload Internal Documents</h3>
+                <ToolTip width="15"
+                         title="Documents here are not visible to the customer in their portal."
+                >
+                    <i className="fal fa-info-circle mt-5 pointer icon"/>
+                </ToolTip>
+                <DragAndDropUploaderComponent onFilesChanged={(files, type) => this.handleInternalDocumentAdded(files, type)}>
+                </DragAndDropUploaderComponent>
+                {this.getSelectedInternalDocuments()}
+            </div>
+        )
+    }
+
+    handleFileSelected(files) {
         this.setState({data: {...this.state.data, uploadFiles: [...files]}});
     };
-    getSelectedFilesElement = () => {
+
+    handleInternalDocumentAdded(files) {
+        this.setState({data: {...this.state.data, internalDocuments: [...files]}});
+    }
+
+    getSelectedFilesElement() {
         const {uploadFiles} = this.state.data;
         const {el} = this;
         return el(
@@ -513,10 +543,41 @@ class LastStepComponent extends MainComponent {
                 )
             )
         );
+    }
+
+    getSelectedInternalDocuments() {
+        const {internalDocuments} = this.state.data;
+        const {el} = this;
+        return el(
+            "table",
+            {className: "table table-striped", style: {maxWidth: 400}},
+            el(
+                "tbody",
+                null,
+                internalDocuments.map((file) =>
+                    el(
+                        "tr",
+                        {key: file.name + 'tr'},
+                        el("td", {key: file.name + 'td'}, file.name),
+                        el("td", {key: file.name + 'trash'}, el("i", {
+                            className: "fal fa-trash pointer icon float-right",
+                            title: "delete file",
+                            onClick: () => this.deleteInternalDocument(file)
+                        }))
+                    )
+                )
+            )
+        );
     };
+
     deleteDocument = (file) => {
         let {data} = this.state;
         data.uploadFiles = data.uploadFiles.filter(f => f.name !== file.name);
+        this.setState({data});
+    }
+    deleteInternalDocument = (file) => {
+        let {data} = this.state;
+        data.internalDocuments = data.internalDocuments.filter(f => f.name !== file.name);
         this.setState({data});
     }
     getElements = () => {
@@ -555,6 +616,7 @@ class LastStepComponent extends MainComponent {
                 {this.getConfirm()}
                 {this.getAlert()}
                 {this.getDocumentsElement()}
+                {this.getInternalDocumentsElement()}
                 {this.getNotStartReasonElement()}
                 {this.getNotFirstTimeFixReasonElement()}
                 {this.getNextButton()}

@@ -9,6 +9,7 @@ This project changes will be shown here.
 - Issue 1080 - Add items to a contract
 - Issue 977 - New Current Activity
 - Issue 1095 - Feature: Assign To Be Logged to existing request
+- Issue 1094 - SR Documents that customers can't see
 ### Changed
 - Issue 1053 - New email templates
 - Issue 810 - Heavy SQL usage improvements

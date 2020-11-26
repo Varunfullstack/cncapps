@@ -10,7 +10,8 @@ import MainComponent from "../../shared/MainComponent.js";
 import * as React from 'react';
 import Modal from "../../shared/Modal/modal";
 import moment from "moment";
-import ActivityDocumentUploader from "./ActivityDocumentUploader";
+import CustomerDocumentUploader from "./CustomerDocumentUploader";
+import {InternalDocumentsComponent} from "./InternalDocumentsComponent";
 
 // noinspection EqualityComparisonWithCoercionJS
 class ActivityDisplayComponent extends MainComponent {
@@ -939,13 +940,14 @@ class ActivityDisplayComponent extends MainComponent {
                 {this.getDetialsElement()}
                 {this.getCustomerNotesElement()}
                 {this.getNotesElement()}
-                <ActivityDocumentUploader
+                <CustomerDocumentUploader
                     onDeleteDocument={(id) => this.deleteDocument(id)}
                     onFilesUploaded={() => this.handleUpload()}
                     serviceRequestId={data?.problemID}
                     activityId={data?.callActivityID}
                     documents={data?.documents}
                 />
+                <InternalDocumentsComponent serviceRequestId={data?.problemID}/>
                 {this.getExpensesElement()}
                 {this.getTemplateModal()}
                 {this.getFooter()}

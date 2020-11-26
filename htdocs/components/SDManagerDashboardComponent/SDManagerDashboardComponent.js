@@ -192,7 +192,6 @@ class SDManagerDashboardComponent extends MainComponent {
             const {filter} = this.state;
             this.api.getQueue(id, filter)
                 .then((queueData) => {
-                    console.log(queueData);
                     this.setState({queueData})
                 });
         } else return [];

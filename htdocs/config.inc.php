@@ -18,7 +18,7 @@ function is_cli()
 
 function cli_echo($string, $color = null)
 {
-    $restoreColor = "\e[0m";
+    $restoreColor   = "\e[0m";
     $applyColorCode = null;
     switch ($color) {
         case "error":
@@ -88,7 +88,7 @@ function escape_win32_argv(string $value): string
         return '""';
     }
 
-    $quote = false;
+    $quote    = false;
     $replacer = function ($match) use ($value, &$quote) {
         switch ($match[0][0]) { // only inspect the first byte of the match
 
@@ -162,8 +162,8 @@ function money_format($format, $number)
     $locale = localeconv();
     preg_match_all($regex, $format, $matches, PREG_SET_ORDER);
     foreach ($matches as $fmatch) {
-        $value = floatval($number);
-        $flags = array(
+        $value      = floatval($number);
+        $flags      = array(
             'fillchar'  => preg_match('/\=(.)/', $fmatch[1], $match) ?
                 $match[1] : ' ',
             'nogroup'   => preg_match('/\^/', $fmatch[1]) > 0,
@@ -172,15 +172,15 @@ function money_format($format, $number)
             'nosimbol'  => preg_match('/\!/', $fmatch[1]) > 0,
             'isleft'    => preg_match('/\-/', $fmatch[1]) > 0
         );
-        $width = trim($fmatch[2]) ? (int)$fmatch[2] : 0;
-        $left = trim($fmatch[3]) ? (int)$fmatch[3] : 0;
-        $right = trim($fmatch[4]) ? (int)$fmatch[4] : $locale['int_frac_digits'];
+        $width      = trim($fmatch[2]) ? (int)$fmatch[2] : 0;
+        $left       = trim($fmatch[3]) ? (int)$fmatch[3] : 0;
+        $right      = trim($fmatch[4]) ? (int)$fmatch[4] : $locale['int_frac_digits'];
         $conversion = $fmatch[5];
 
         $positive = true;
         if ($value < 0) {
             $positive = false;
-            $value *= -1;
+            $value    *= -1;
         }
         $letter = $positive ? 'p' : 'n';
 
@@ -260,7 +260,7 @@ define(
 
 function var_debug($variable, $strlen = 100, $width = 25, $depth = 10, $i = 0, &$objects = array())
 {
-    $search = array("\0", "\a", "\b", "\f", "\n", "\r", "\t", "\v");
+    $search  = array("\0", "\a", "\b", "\f", "\n", "\r", "\t", "\v");
     $replace = array('\0', '\a', '\b', '\f', '\n', '\r', '\t', '\v');
 
     $string = '';
@@ -285,7 +285,7 @@ function var_debug($variable, $strlen = 100, $width = 25, $depth = 10, $i = 0, &
             $string .= '???';
             break;
         case 'string':
-            $len = strlen($variable);
+            $len      = strlen($variable);
             $variable = str_replace($search, $replace, substr($variable, 0, $strlen), $count);
             $variable = substr($variable, 0, $strlen);
             if ($len < $strlen) $string .= '"' . $variable . '"';
@@ -296,10 +296,10 @@ function var_debug($variable, $strlen = 100, $width = 25, $depth = 10, $i = 0, &
             if ($i == $depth) $string .= 'array(' . $len . ') {...}';
             elseif (!$len) $string .= 'array(0) {}';
             else {
-                $keys = array_keys($variable);
+                $keys   = array_keys($variable);
                 $spaces = str_repeat(' ', $i * 2);
                 $string .= "array($len)\n" . $spaces . '{';
-                $count = 0;
+                $count  = 0;
                 foreach ($keys as $key) {
                     if ($count == $width) {
                         $string .= "\n" . $spaces . "  ...";
@@ -319,13 +319,13 @@ function var_debug($variable, $strlen = 100, $width = 25, $depth = 10, $i = 0, &
             else if ($i == $depth)
                 $string .= get_class($variable) . ' {...}';
             else {
-                $id = array_push($objects, $variable);
-                $array = (array)$variable;
-                $spaces = str_repeat(' ', $i * 2);
-                $string .= get_class($variable) . "#$id\n" . $spaces . '{';
+                $id         = array_push($objects, $variable);
+                $array      = (array)$variable;
+                $spaces     = str_repeat(' ', $i * 2);
+                $string     .= get_class($variable) . "#$id\n" . $spaces . '{';
                 $properties = array_keys($array);
                 foreach ($properties as $property) {
-                    $name = str_replace("\0", ':', trim($property));
+                    $name   = str_replace("\0", ':', trim($property));
                     $string .= "\n" . $spaces . "  [$name] => ";
                     $string .= var_debug($array[$property], $strlen, $width, $depth, $i + 1, $objects);
                 }
@@ -483,8 +483,8 @@ define(
 );
 
 $onPavilionWebServer = false;
-$GLOBALS['php7'] = true;
-$php7 = true;
+$GLOBALS['php7']     = true;
+$php7                = true;
 
 $environment = [
 
@@ -515,7 +515,7 @@ if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line c
 
 } else {                // command line call so assume live and force HTTP_HOST value
 
-    $server_type = getEnvironmentByPath();
+    $server_type                         = getEnvironmentByPath();
     $GLOBALS['isRunningFromCommandLine'] = true;
 }
 
@@ -1086,6 +1086,10 @@ define(
     BASE_DRIVE . '/htdocs/PDF-resources'
 );
 define(
+    'INTERNAL_DOCUMENTS_FOLDER',
+    BASE_DRIVE . '/serviceRequestsDocuments'
+);
+define(
     "APPLICATION_DIR",
     BASE_DRIVE . "/cnccode"
 );
@@ -1635,30 +1639,30 @@ define(
     DATE_MYSQL_DATE . ' ' . DATE_MYSQL_TIME
 );
 
-$cfg["postToSco"] = FALSE;
+$cfg["postToSco"]   = FALSE;
 $cfg["txt_chevron"] = "&gt;";
 
 // System paths and URLs
-$cfg["cnclogo_path"] = IMAGES_DIR . '/cnc_logo.png';
-$cfg["cncaddress_path"] = IMAGES_DIR . '/cncaddress.gif';
+$cfg["cnclogo_path"]      = IMAGES_DIR . '/cnc_logo.png';
+$cfg["cncaddress_path"]   = IMAGES_DIR . '/cncaddress.gif';
 $cfg["cncwatermark_path"] = IMAGES_DIR . '/CNC_watermarkActualSize.png';
 
-$cfg["php_extension"] = ".php";
-$cfg["html_extension"] = ".html";
-$cfg["home"] = "index.php";
-$cfg["path_templates"] = APPLICATION_DIR . "/templates";
-$cfg["path_test_templates"] = APPLICATION_DIR . "/test_templates";
-$cfg["path_lib"] = APPLICATION_DIR . "/lib";
-$cfg["path_lang_strings"] = APPLICATION_DIR . "/localise_english.inc.php";
-$cfg["path_test_strings"] = APPLICATION_DIR . "/localise_test.inc.php";
-$cfg["path_dbe"] = APPLICATION_DIR . "/data_classes";
-$cfg["path_bu"] = APPLICATION_DIR . "/business_classes";
-$cfg["path_ct"] = APPLICATION_DIR . "/controller_classes";
-$cfg["path_gc"] = SWEETCODE_DIR . "/generic_classes";
-$cfg["path_func"] = APPLICATION_DIR . "/functions";
-$cfg["path_db_backup"] = "\\\\cncnas2\\DATA\\CNCAPPS_Raw_Backup";
-$cfg["path_uc"] = APPLICATION_DIR . "/utility_classes";
-$cfg["path_phplib_classes"] = APPLICATION_DIR . "/lib";
+$cfg["php_extension"]        = ".php";
+$cfg["html_extension"]       = ".html";
+$cfg["home"]                 = "index.php";
+$cfg["path_templates"]       = APPLICATION_DIR . "/templates";
+$cfg["path_test_templates"]  = APPLICATION_DIR . "/test_templates";
+$cfg["path_lib"]             = APPLICATION_DIR . "/lib";
+$cfg["path_lang_strings"]    = APPLICATION_DIR . "/localise_english.inc.php";
+$cfg["path_test_strings"]    = APPLICATION_DIR . "/localise_test.inc.php";
+$cfg["path_dbe"]             = APPLICATION_DIR . "/data_classes";
+$cfg["path_bu"]              = APPLICATION_DIR . "/business_classes";
+$cfg["path_ct"]              = APPLICATION_DIR . "/controller_classes";
+$cfg["path_gc"]              = SWEETCODE_DIR . "/generic_classes";
+$cfg["path_func"]            = APPLICATION_DIR . "/functions";
+$cfg["path_db_backup"]       = "\\\\cncnas2\\DATA\\CNCAPPS_Raw_Backup";
+$cfg["path_uc"]              = APPLICATION_DIR . "/utility_classes";
+$cfg["path_phplib_classes"]  = APPLICATION_DIR . "/lib";
 $cfg["path_phpunit_classes"] = APPLICATION_DIR . "/phpunit_classes";
 // --------------------------------------------------------------------------
 

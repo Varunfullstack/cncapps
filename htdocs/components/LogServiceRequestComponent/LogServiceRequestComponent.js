@@ -111,12 +111,19 @@ export default class LogServiceRequestComponent extends MainComponent {
 
             if (result.status) {
 
-                if (newData.uploadFiles.length > 0)
+                if (newData.uploadFiles.length > 0) {
+
                     await this.api.uploadFiles(
                         `Activity.php?action=uploadFile&problemID=${result.problemID}&callActivityID=${result.callActivityID}`,
                         newData.uploadFiles,
                         "userfile[]"
                     );
+                }
+
+                if (newData.internalDocuments.length > 0) {
+                    await this.api.addServiceRequestFiles(result.problemID, newData.internalDocuments);
+                }
+
                 this.setState({_showSpinner: false});
                 if (result.raiseTypeId == 3)
                     await this.alert(`Please advise customer their Service Request number is: ${result.problemID}`)

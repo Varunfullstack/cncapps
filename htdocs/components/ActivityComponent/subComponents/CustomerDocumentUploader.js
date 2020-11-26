@@ -4,7 +4,9 @@ import DragAndDropUploaderComponent from "../../shared/DragAndDropUploaderCompon
 import Table from "../../shared/table/table";
 import APIActivity from "../../services/APIActivity";
 
-export default class ActivityDocumentUploader extends React.PureComponent {
+import './CustomerDocumentUploader.css';
+
+export default class CustomerDocumentUploader extends React.PureComponent {
     api = new APIActivity();
 
     constructor(props, context) {
@@ -84,14 +86,14 @@ export default class ActivityDocumentUploader extends React.PureComponent {
         ]
 
         return (
-            <div className="round-container"
+            <div className="round-container customer-documents-uploader"
                  style={{position: "relative"}}
             >
                 <div className="flex-row">
                     <label className="label  mt-5 mr-3 ml-1 mb-5"
                            style={{display: "block"}}
                     >
-                        Documents
+                        Customer Documents
                     </label>
                     <ToolTip width="15"
                              title="Documents here are visible to the customer in their portal."

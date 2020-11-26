@@ -1,6 +1,8 @@
 import APIMain from "./APIMain.js";
 import ApiUrls from "./ApiUrls.js";
 
+import {getBase64} from "../utils/utils";
+
 class APIActivity extends APIMain {
     getCallActivityDetails(callActivityID, filters) {
         return fetch(`${ApiUrls.SRActivity}getCallActivity&callActivityID=${callActivityID}&includeTravel=${filters.showTravel}&includeOperationalTasks=${filters.showOperationalTasks}&includeServerGuardUpdates=${filters.showServerGuardUpdates}`).then(res => res.json());
@@ -17,9 +19,11 @@ class APIActivity extends APIMain {
     setActivityMonitoring(callActivityID) {
         return fetch(`Activity.php?action=toggleMonitoringFlag&callActivityID=${callActivityID}`);
     }
+
     setProblemHoldForQA(problemID) {
         return fetch(`SRActivity.php?action=toggleHoldForQAFlag&problemID=${problemID}`);
     }
+
     deleteActivity(callActivityID) {
         return fetch(`Activity.php?action=deleteCallActivity&callActivityID=${callActivityID}`);
 
@@ -144,6 +148,41 @@ class APIActivity extends APIMain {
 
     getNotAttemptFirstTimeFix(startDate, endDate, customerID, enginnerID) {
         return this.get(`${ApiUrls.SRActivity}getNotAttemptFirstTimeFix&startDate=${startDate}&endDate=${endDate}&userID=${enginnerID}&customerID=${customerID}`);
+    }
+
+    getDocumentsForServiceRequest(serviceRequestId) {
+        return fetch(`${ApiUrls.SRActivity}getDocumentsForServiceRequest&serviceRequestId=${serviceRequestId}`)
+            .then(res => res.json())
+            .then(res => res.data);
+    }
+
+
+    async addServiceRequestFiles(serviceRequestId, uploadFiles) {
+        const base64Files = await Promise.all(uploadFiles.map(x => {
+                return getBase64(x).then(base64 => {
+                    return {
+                        name: x.name,
+                        file: base64
+                    }
+                })
+            })
+        );
+        const payload = {
+            serviceRequestId,
+            files: base64Files,
+        }
+
+        return fetch(`${ApiUrls.SRActivity}uploadInternalDocument`, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        })
+    }
+
+    async deleteInternalDocument(id) {
+        return fetch(`${ApiUrls.SRActivity}deleteInternalDocument&documentId=${id}`, {
+            method: 'DELETE'
+        })
+            .then(res => res.json())
     }
 }
 

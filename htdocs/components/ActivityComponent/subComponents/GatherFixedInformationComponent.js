@@ -9,7 +9,7 @@ import Toggle from "../../shared/Toggle.js";
 import {groupBy, params} from "../../utils/utils.js";
 
 import React from 'react';
-import ActivityDocumentUploader from "./ActivityDocumentUploader";
+import CustomerDocumentUploader from "./CustomerDocumentUploader";
 
 class GatherFixedInformationComponent extends MainComponent {
     el = React.createElement;
@@ -218,7 +218,7 @@ class GatherFixedInformationComponent extends MainComponent {
 
     getDocuments = () => {
         const {documents, activity} = this.state;
-        return <ActivityDocumentUploader
+        return <CustomerDocumentUploader
             onDeleteDocument={(id) => this.deleteDocument(id)}
             onFilesUploaded={() => this.handleDocumentsUploads()}
             serviceRequestId={activity.problemID}

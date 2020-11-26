@@ -96,7 +96,6 @@ export default class MainComponent extends React.Component {
     }
 
     confirm(message, width = 500, title = "Confirm") {
-        console.log('here');
         return new Promise(resolve => {
             this.setState(
                 {
