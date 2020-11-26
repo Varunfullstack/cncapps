@@ -287,7 +287,6 @@ class ActivityListComponent extends MainComponent {
         );
     }
     handleOrderChange = (current, next) => {
-        console.log(current, next);
         this.apiCallactType.updateActivityTypeOrder(current, next)
             .then(res => {
                 return this.getItems();

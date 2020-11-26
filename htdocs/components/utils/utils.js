@@ -213,3 +213,16 @@ export const isEmptyTime = (time) => {
     return time == "" || time == null || time == "00:00" || time == "";
 }
 export const MYSQL_DATE_FORMAT = 'YYYY-MM-DD';
+
+export function getBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function () {
+            resolve(reader.result);
+        };
+        reader.onerror = function (error) {
+            reject(error);
+        };
+    })
+}

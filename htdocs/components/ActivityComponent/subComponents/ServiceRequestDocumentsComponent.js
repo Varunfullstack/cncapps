@@ -3,34 +3,44 @@ import ToolTip from "../../shared/ToolTip";
 import DragAndDropUploaderComponent from "../../shared/DragAndDropUploaderComponent/DragAndDropUploaderComponent";
 import Table from "../../shared/table/table";
 import APIActivity from "../../services/APIActivity";
+import MainComponent from "../../shared/MainComponent";
 
-export default class ActivityDocumentUploader extends React.PureComponent {
+export class ServiceRequestDocumentsComponent extends MainComponent {
     api = new APIActivity();
 
     constructor(props, context) {
         super(props, context);
         this.state = {
+            ...this.state,
+            documents: [],
             uploadFiles: []
         }
     }
 
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (prevProps.serviceRequestId !== this.props.serviceRequestId) {
+            this.loadDocuments(this.props.serviceRequestId);
+        }
+    }
+
+    async loadDocuments(serviceRequestId) {
+        const documents = await this.api.getDocumentsForServiceRequest(serviceRequestId);
+        this.setState({documents});
+    }
+
     async deleteDocument(id) {
-        const {onDeleteDocument} = this.props;
-        onDeleteDocument(id);
+        if (await this.confirm('Are you sure you want to remove this document?')) {
+            await this.api.deleteServiceRequestDocument(id);
+            this.setState({documents: [...this.state.documents.filter(d => d.id !== id)]});
+        }
     }
 
     async handleUpload() {
         const {uploadFiles} = this.state;
-        const {onFilesUploaded, serviceRequestId, activityId} = this.props;
-        await this.api.uploadFiles(
-            `Activity.php?action=uploadFile&problemID=${serviceRequestId}&callActivityID=${activityId}`,
-            uploadFiles,
-            "userfile[]"
-        );
+        const {serviceRequestId} = this.props;
+        await this.api.addServiceRequestFiles(serviceRequestId, uploadFiles)
         this.setState({uploadFiles: []});
-        if (onFilesUploaded) {
-            onFilesUploaded();
-        }
+        this.loadDocuments(serviceRequestId);
     }
 
     getSelectedFilesElement() {
@@ -42,32 +52,26 @@ export default class ActivityDocumentUploader extends React.PureComponent {
         return null;
     }
 
-    handleFileSelected(files, type) {
+    handleFileSelected(files) {
         const uploadFiles = [...files];
         this.setState({uploadFiles})
     }
 
     render() {
-        const {uploadFiles} = this.state;
-        const {documents} = this.props;
 
+        const {uploadFiles, documents} = this.state;
         let columns = [
             {
-                path: "Description",
-                label: "Description",
-                sortable: false,
-                content: (document) => (
-                    <a href={`Activity.php?action=viewFile&callDocumentID=${document.id}`}>{document.description}</a>)
-            },
-            {
-                path: "File",
+                path: "originalFileName",
                 label: "File",
                 sortable: false,
                 content: (document) => (
-                    <a href={`Activity.php?action=viewFile&callDocumentID=${document.id}`}>{document.filename}</a>)
+                    <a target="_blank"
+                       href={`SRActivity.php?action=viewServiceRequestDocument&documentId=${document.id}`}
+                    >{document.originalFileName}</a>)
             },
             {
-                path: "createDate",
+                path: "createdAt",
                 label: "Date",
                 sortable: false,
             },
@@ -84,17 +88,19 @@ export default class ActivityDocumentUploader extends React.PureComponent {
         ]
 
         return (
+
             <div className="round-container"
                  style={{position: "relative"}}
             >
+                {this.getConfirm()}
                 <div className="flex-row">
                     <label className="label  mt-5 mr-3 ml-1 mb-5"
                            style={{display: "block"}}
                     >
-                        Documents
+                        Service Request Documents
                     </label>
                     <ToolTip width="15"
-                             title="Documents here are visible to the customer in their portal."
+                             title="Documents here are not visible to the customer in their portal."
                     >
                         <i className="fal fa-info-circle mt-5 pointer icon"/>
                     </ToolTip>

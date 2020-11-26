@@ -14,7 +14,8 @@ import {padEnd, TeamType} from "../../utils/utils";
 import CKEditor from "../../shared/CKEditor";
 import Modal from "../../shared/Modal/modal";
 import Toggle from "../../shared/Toggle";
-import ActivityDocumentUploader from "./ActivityDocumentUploader";
+import CustomerDocumentUploader from "./CustomerDocumentUploader";
+import {ServiceRequestDocumentsComponent} from "./ServiceRequestDocumentsComponent";
 
 // noinspection EqualityComparisonWithCoercionJS
 class ActivityEditComponent extends MainComponent {
@@ -1876,13 +1877,14 @@ class ActivityEditComponent extends MainComponent {
                 {this.getActivityNotes()}
                 {this.getCustomerNotes()}
                 {this.getActivityInternalNotes()}
-                <ActivityDocumentUploader
+                <CustomerDocumentUploader
                     onDeleteDocument={(id) => this.deleteDocument(id)}
                     onFilesUploaded={() => this.handleUpload()}
                     serviceRequestId={data?.problemID}
                     activityId={data?.callActivityID}
                     documents={data?.documents}
                 />
+                <ServiceRequestDocumentsComponent serviceRequestId={data?.problemID}/>
                 {this.getTemplateModal()}
             </div>
         );
