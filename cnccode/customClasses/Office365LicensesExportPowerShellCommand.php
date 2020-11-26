@@ -349,13 +349,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
 
             $logger->info('All good!!. Creating file ' . $fileName);
         } catch (Exception $exception) {
-            print_r(
-                Calculation::getInstance(
-                    $spreadsheet
-                )->getDebugLog()
-                    ->getLog()
-            );
-            var_dump($exception->getTraceAsString());
             $logger->error('Failed to save file, possibly file open: ' . $exception->getMessage());
         }
 
