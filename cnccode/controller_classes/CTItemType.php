@@ -63,11 +63,8 @@ class CTItemType extends CTCNC
                     http_response_code(400);
                     throw new Exception('ID is missing');
                 }
-
                 $DBEItemType = new DBEItemType($this);
-
                 $DBEItemType->getRow($this->getParam('id'));
-
                 if (!$DBEItemType->rowCount) {
                     http_response_code(404);
                     exit;
@@ -76,20 +73,15 @@ class CTItemType extends CTCNC
                 echo json_encode(["status" => "ok"]);
                 break;
             case 'update':
-
                 if (!$this->getParam('id')) {
                     throw new Exception('ID is missing');
                 }
-
                 $DBEItemType = new DBEItemType($this);
-
                 $DBEItemType->getRow($this->getParam('id'));
-
                 if (!$DBEItemType->rowCount) {
                     http_response_code(404);
                     exit;
                 }
-
                 $DBEItemType->setValue(
                     DBEItemType::description,
                     $this->getParam('description')
@@ -101,6 +93,10 @@ class CTItemType extends CTCNC
                 $DBEItemType->setValue(DBEItemType::active, !!json_decode($this->getParam('active')));
                 $DBEItemType->setValue(DBEItemType::reoccurring, !!json_decode($this->getParam('reoccurring')));
                 $DBEItemType->setValue(
+                    DBEItemType::allowGlobalPriceUpdate,
+                    !!json_decode($this->getParam('allowGlobalPriceUpdate'))
+                );
+                $DBEItemType->setValue(
                     DBEItemType::showInCustomerReview,
                     !!json_decode($this->getParam('showInCustomerReview'))
                 );
@@ -109,7 +105,6 @@ class CTItemType extends CTCNC
                 break;
             case 'create':
                 $DBEItemType = new DBEItemType($this);
-
                 $DBEItemType->setValue(
                     DBEItemType::description,
                     $this->getParam('description')
@@ -118,34 +113,35 @@ class CTItemType extends CTCNC
                     DBEItemType::stockcat,
                     $this->getParam('stockcat')
                 );
-
                 $DBEItemType->setValue(DBEItemType::active, !!$this->getParam('active'));
                 $DBEItemType->setValue(DBEItemType::reoccurring, !!$this->getParam('reoccurring'));
+                $DBEItemType->setValue(
+                    DBEItemType::allowGlobalPriceUpdate,
+                    !!json_decode($this->getParam('allowGlobalPriceUpdate'))
+                );
                 $DBEItemType->setValue(
                     DBEItemType::showInCustomerReview,
                     !!json_decode($this->getParam('showInCustomerReview'))
                 );
                 $DBEItemType->setValue($DBEItemType::sortOrder, $DBEItemType->getNextSortOrder());
                 $DBEItemType->insertRow();
-
                 echo json_encode(
                     [
-                        "id"                   => $DBEItemType->getValue(DBEItemType::itemTypeID),
-                        "description"          => $DBEItemType->getValue(DBEItemType::description),
-                        "active"               => $DBEItemType->getValue(DBEItemType::active),
-                        "reoccurring"          => $DBEItemType->getValue(DBEItemType::reoccurring),
-                        "stockcat"             => $DBEItemType->getValue(DBEItemType::stockcat),
-                        "showInCustomerReview" => $DBEItemType->getValue(DBEItemType::showInCustomerReview),
-                        "sortOrder"            => $DBEItemType->getValue(DBEItemType::sortOrder)
+                        "id"                     => $DBEItemType->getValue(DBEItemType::itemTypeID),
+                        "description"            => $DBEItemType->getValue(DBEItemType::description),
+                        "active"                 => $DBEItemType->getValue(DBEItemType::active),
+                        "reoccurring"            => $DBEItemType->getValue(DBEItemType::reoccurring),
+                        "stockcat"               => $DBEItemType->getValue(DBEItemType::stockcat),
+                        "showInCustomerReview"   => $DBEItemType->getValue(DBEItemType::showInCustomerReview),
+                        "sortOrder"              => $DBEItemType->getValue(DBEItemType::sortOrder),
+                        "allowGlobalPriceUpdate" => $DBEItemType->getValue(DBEItemType::allowGlobalPriceUpdate)
                     ],
                     JSON_NUMERIC_CHECK
                 );
-
                 break;
             case 'getStockCat':
                 $dbeStockCat = new DBEStockcat($this);
                 $dbeStockCat->getRows(DBEStockcat::stockcat);
-
                 $data = [];
                 while ($dbeStockCat->fetchNext()) {
                     $data[] = [
@@ -165,24 +161,24 @@ class CTItemType extends CTCNC
                 break;
             case 'getData':
                 $DBEItemTypes = new DBEItemType($this);
-
                 $DBEItemTypes->getRows(DBEItemType::sortOrder);
                 $data = [];
                 while ($DBEItemTypes->fetchNext()) {
                     $data[] = [
-                        "id"                   => $DBEItemTypes->getValue(DBEItemType::itemTypeID),
-                        "description"          => $DBEItemTypes->getValue(DBEItemType::description),
-                        "active"               => $DBEItemTypes->getValue(DBEItemType::active),
-                        "reoccurring"          => $DBEItemTypes->getValue(DBEItemType::reoccurring),
-                        "stockcat"             => $DBEItemTypes->getValue(DBEItemType::stockcat),
-                        "showInCustomerReview" => $DBEItemTypes->getValue(DBEItemType::showInCustomerReview),
-                        "sortOrder"            => $DBEItemTypes->getValue(DBEItemType::sortOrder)
+                        "id"                     => $DBEItemTypes->getValue(DBEItemType::itemTypeID),
+                        "description"            => $DBEItemTypes->getValue(DBEItemType::description),
+                        "active"                 => $DBEItemTypes->getValue(DBEItemType::active),
+                        "reoccurring"            => $DBEItemTypes->getValue(DBEItemType::reoccurring),
+                        "stockcat"               => $DBEItemTypes->getValue(DBEItemType::stockcat),
+                        "showInCustomerReview"   => $DBEItemTypes->getValue(DBEItemType::showInCustomerReview),
+                        "sortOrder"              => $DBEItemTypes->getValue(DBEItemType::sortOrder),
+                        "allowGlobalPriceUpdate" => $DBEItemTypes->getValue(DBEItemType::allowGlobalPriceUpdate),
                     ];
                 }
                 echo json_encode($data, JSON_NUMERIC_CHECK);
                 break;
             case self::SEARCH_BY_DESCRIPTION:
-                $data = $this->getJSONData();
+                $data        = $this->getJSONData();
                 $description = "";
                 if (!empty($data['description'])) {
                     $description = $data['description'];
@@ -241,36 +237,30 @@ class CTItemType extends CTCNC
             'ItemType',
             'ItemTypes'
         );
-
-
         $this->template->parse(
             'CONTENTS',
             'ItemType',
             true
         );
-
         $URLDeleteItem = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             [
                 'action' => 'delete'
             ]
         );
-
         $URLUpdateItem = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             [
                 'action' => 'update'
             ]
         );
-
         $URLCreateItem = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             [
                 'action' => 'create'
             ]
         );
-
-        $URLGetData = Controller::buildLink(
+        $URLGetData    = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             [
                 'action' => 'getData'
@@ -284,7 +274,6 @@ class CTItemType extends CTCNC
                 "URLGetData"    => $URLGetData
             ]
         );
-
         $this->parsePage();
     }
 

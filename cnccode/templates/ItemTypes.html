@@ -9,6 +9,7 @@
             <th>Reoccurring</th>
             <th>Active</th>
             <th>Show In Customer Review</th>
+            <th>Allow Global Price Update</th>
             <th></th>
         </tr>
         </thead>
@@ -45,6 +46,14 @@
                 {% ^showInCustomerReview %}
                 <i class='fa fa-times'></i>
                 {% /showInCustomerReview %}
+            </td>
+            <td>
+                {% #allowGlobalPriceUpdate %}
+                <i class='fa fa-check'></i>
+                {% /allowGlobalPriceUpdate %}
+                {% ^allowGlobalPriceUpdate %}
+                <i class='fa fa-times'></i>
+                {% /allowGlobalPriceUpdate %}
             </td>
             <td class="buttons">
                 <button class="editButton">Edit</button>
@@ -99,7 +108,15 @@
     let rules = [];
 
     function newRule() {
-        return {id: null, description: "", active: null, reoccurring: null, stockcat: null, showInCustomerReview: null};
+        return {
+            id: null,
+            description: "",
+            active: null,
+            reoccurring: null,
+            stockcat: null,
+            showInCustomerReview: null,
+            allowGlobalPriceUpdate: null
+        };
     }
 
     function fetchData() {
@@ -276,6 +293,7 @@
         $('#licenseInput').val(rule.license);
         $('#reoccurringInput')[0].checked = rule.reoccurring;
         $('#showInCustomerReviewInput')[0].checked = rule.showInCustomerReview;
+        $('#allowGlobalPriceUpdateInput')[0].checked = rule.allowGlobalPriceUpdate;
         renderStockCat(rule);
     }
 
@@ -308,6 +326,10 @@
 
     function updateShowInCustomerReview() {
         currentRule.showInCustomerReview = $('#showInCustomerReviewInput').is(':checked');
+    }
+
+    function updateAllowGlobalPriceUpdate() {
+        currentRule.allowGlobalPriceUpdate = $('#allowGlobalPriceUpdateInput').is(':checked');
     }
 
     function updateStockcat() {
@@ -371,6 +393,17 @@
                name="showInCustomerReview"
                onchange="updateShowInCustomerReview()"
                id="showInCustomerReviewInput"
+        >
+    </div>
+    <div>
+        <div style="width: 100px; display: inline-block">
+            Allow Global Price Update
+        </div>
+        <input type="checkbox"
+               value="true"
+               name="allowGlobalPriceUpdate"
+               onchange="updateAllowGlobalPriceUpdate()"
+               id="allowGlobalPriceUpdateInput"
         >
     </div>
     <div>
