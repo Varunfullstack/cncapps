@@ -1168,6 +1168,7 @@ WHERE
             $overtimeApprovedValue = $overtimeDurationApproved;
             if (!$overtimeApprovedValue) {
                 $buExpense             = new BUExpense($this);
+
                 $overtimeApprovedValue = number_format($buExpense->calculateOvertime($activityId), 2, '.', '');
             }
             $dbeCallActivity->setValue(

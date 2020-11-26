@@ -1,6 +1,4 @@
 <?php
-
-
 /**
  * Created by PhpStorm.
  * User: fizdalf
@@ -19,28 +17,25 @@ require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUExpense.inc.php');
 global $db;
 $logName = 'CheckAutoApproveExpensesOvertime';
-$logger = new LoggerCLI($logName);
-
+$logger  = new LoggerCLI($logName);
 // increasing execution time to infinity...
 ini_set('max_execution_time', 0);
-
 if (!is_cli()) {
     echo 'This script can only be ran from command line';
     exit;
 }
 // Script example.php
 $shortopts = "d";
-$longopts = [];
-$options = getopt($shortopts, $longopts);
+$longopts  = [];
+$options   = getopt($shortopts, $longopts);
 $debugMode = false;
 if (isset($options['d'])) {
     $debugMode = true;
 }
-$thing = null;
+$thing   = null;
 $expense = new DBEExpense($thing);
 $expense->getUnapprovedExpense();
 $checkedUsers = [];
-
 while ($expense->nextRecord()) {
     $logger->info('Verifying expense with ID: ' . $expense->getValue(DBEExpense::expenseID));
     $activity = new DBECallActivity($thing);
@@ -56,14 +51,11 @@ while ($expense->nextRecord()) {
     $dbeExpense->updateRow();
 
 }
-
 $callactivity = new DBECallActivity($thing);
 $callactivity->getUnapprovedOvertime();
-
 while ($callactivity->nextRecord()) {
     $logger->info('Verifying overtime activity with ID: ' . $callactivity->getValue(DBECallActivity::callActivityID));
     $userID = $callactivity->getValue(DBECallActivity::userID);
-
     $logger->info(
         'The user with ID : ' . $userID . ' owner of this overtime has auto approve enable, proceeding to approve overtime '
     );
@@ -75,13 +67,12 @@ while ($callactivity->nextRecord()) {
     $activity->setValue(
         DBECallActivity::overtimeDurationApproved,
         number_format(
-            $buExpense->calculateOvertime($callactivity->getValue(DBECallActivity::callActivityID)),
+        $buExpense->calculateOvertime($callactivity->getValue(DBECallActivity::callActivityID)),
             2,
             '.',
             ''
         )
     );
-
     $activity->updateRow();
 }
 
