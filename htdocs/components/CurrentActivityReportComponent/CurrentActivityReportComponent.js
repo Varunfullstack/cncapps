@@ -542,7 +542,7 @@ class CurrentActivityReportComponent extends MainComponent {
     }
 
     async assignToRequest(toBeLoggedRequest) {
-        const value = await this.prompt("Please provide the service request Id to be added to");
+        const value = await this.prompt("Number of the Service Request to add this update to");
         if (!value) {
             return;
         }
