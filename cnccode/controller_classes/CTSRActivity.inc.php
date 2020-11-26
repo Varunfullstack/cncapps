@@ -2,10 +2,10 @@
 global $cfg;
 
 use CNCLTD\Exceptions\JsonHttpException;
-use CNCLTD\ServiceRequestDocuments\Base64FileDTO;
-use CNCLTD\ServiceRequestDocuments\Entity\ServiceRequestDocumentMapper;
-use CNCLTD\ServiceRequestDocuments\ServiceRequestDocumentRepository;
-use CNCLTD\ServiceRequestDocuments\UseCases\AddDocumentsToServiceRequest;
+use CNCLTD\InternalDocuments\Base64FileDTO;
+use CNCLTD\InternalDocuments\Entity\InternalDocumentMapper;
+use CNCLTD\InternalDocuments\InternalDocumentRepository;
+use CNCLTD\InternalDocuments\UseCases\AddDocumentsToServiceRequest;
 
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBECallActivity.inc.php');
@@ -52,16 +52,16 @@ class CTSRActivity extends CTCNC
     const SAVE_MANAGEMENT_REVIEW_DETAILS                         = "saveManagementReviewDetails";
     const CHANGE_PROBLEM_PRIORITY                                = "changeProblemPriority";
     const USED_BUDGET_DATA                                       = "usedBudgetData";
-    const UPLOAD_SERVICE_REQUEST_DOCUMENT                        = "uploadServiceRequestDocument";
-    const VIEW_SERVICE_REQUEST_DOCUMENT                          = 'viewServiceRequestDocument';
-    const DELETE_SERVICE_REQUEST_DOCUMENT                        = 'deleteServiceRequestDocument';
+    const UPLOAD_INTERNAL_DOCUMENT                        = "uploadInternalDocument";
+    const VIEW_INTERNAL_DOCUMENT                          = 'viewInternalDocument';
+    const DELETE_INTERNAL_DOCUMENT                        = 'deleteInternalDocument';
     public  $serverGuardArray = array(
         ""  => "Please select",
         "Y" => "ServerGuard Related",
         "N" => "Not ServerGuard Related"
     );
     private $buActivity;
-    private $serviceRequestDocumentRepository;
+    private $internalDocumentRepository;
 
     function __construct($requestMethod,
                          $postVars,
@@ -87,7 +87,7 @@ class CTSRActivity extends CTCNC
             RENEWALS_PERMISSION,
         ];
         $this->buActivity                       = new BUActivity($this);
-        $this->serviceRequestDocumentRepository = new ServiceRequestDocumentRepository();
+        $this->internalDocumentRepository = new InternalDocumentRepository();
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
@@ -143,14 +143,14 @@ class CTSRActivity extends CTCNC
             case self::GET_DOCUMENTS_FOR_SERVICE_REQUEST:
                 echo json_encode($this->getDocumentsForServiceRequestController());
                 exit;
-            case self::UPLOAD_SERVICE_REQUEST_DOCUMENT:
+            case self::UPLOAD_INTERNAL_DOCUMENT:
                 echo json_encode($this->addServiceRequestsUploadedDocuments());
                 exit;
-            case self::VIEW_SERVICE_REQUEST_DOCUMENT:
-                $this->viewServiceRequestDocument();
+            case self::VIEW_INTERNAL_DOCUMENT:
+                $this->viewInternalDocument();
                 exit;
-            case self::DELETE_SERVICE_REQUEST_DOCUMENT:
-                echo json_encode($this->deleteServiceRequestDocument());
+            case self::DELETE_INTERNAL_DOCUMENT:
+                echo json_encode($this->deleteInternalDocument());
                 exit;
             case self::SAVE_FIXED_INFORMATION:
                 echo json_encode($this->saveFixedInformation());
@@ -1413,8 +1413,8 @@ GROUP BY caa_callacttypeno,
     private function getDocumentsForServiceRequestController()
     {
         $serviceRequestId = $this->getParam('serviceRequestId');
-        $documents        = $this->serviceRequestDocumentRepository->getServiceRequestsDocuments($serviceRequestId);
-        $documentsJSON    = ServiceRequestDocumentMapper::fromDomainArrayToJSONDTO(
+        $documents        = $this->internalDocumentRepository->getServiceRequestsDocuments($serviceRequestId);
+        $documentsJSON    = InternalDocumentMapper::fromDomainArrayToJSONDTO(
             $documents
         );
         return ["status" => "ok", "data" => $documentsJSON];
@@ -1427,37 +1427,37 @@ GROUP BY caa_callacttypeno,
         $filesArray       = @$data['files'];
         $files            = Base64FileDTO::fromArray($filesArray);
         $usecase          = new AddDocumentsToServiceRequest(
-            $this->serviceRequestDocumentRepository, new DBEProblem($this)
+            $this->internalDocumentRepository, new DBEProblem($this)
         );
         $usecase->__invoke($serviceRequestId, $files);
         return ["status" => "ok"];
     }
 
-    private function viewServiceRequestDocument()
+    private function viewInternalDocument()
     {
         $documentId = $this->getParam('documentId');
         if (!$documentId) {
             throw new JsonHttpException(25, "Document Id required");
         }
         try {
-            $serviceRequestDocument = $this->serviceRequestDocumentRepository->getById($documentId);
-            header('Content-type: ' . $serviceRequestDocument->mimeType());
-            header('Content-Disposition: attachment; filename="' . $serviceRequestDocument->originalFileName() . '"');
-            echo $serviceRequestDocument->getFileContents();
+            $internalDocument = $this->internalDocumentRepository->getById($documentId);
+            header('Content-type: ' . $internalDocument->mimeType());
+            header('Content-Disposition: attachment; filename="' . $internalDocument->originalFileName() . '"');
+            echo $internalDocument->getFileContents();
         } catch (Exception $exception) {
             throw new JsonHttpException(51, "Document not found");
         }
     }
 
-    private function deleteServiceRequestDocument()
+    private function deleteInternalDocument()
     {
         $documentId = $this->getParam('documentId');
         if (!$documentId) {
             throw new JsonHttpException(25, "Document Id required");
         }
         try {
-            $serviceRequestDocument = $this->serviceRequestDocumentRepository->getById($documentId);
-            $this->serviceRequestDocumentRepository->deleteDocument($serviceRequestDocument);
+            $internalDocument = $this->internalDocumentRepository->getById($documentId);
+            $this->internalDocumentRepository->deleteDocument($internalDocument);
             return ["status" => "ok"];
         } catch (\Exception $exception) {
             throw new JsonHttpException(2215, "Failed to delete document");

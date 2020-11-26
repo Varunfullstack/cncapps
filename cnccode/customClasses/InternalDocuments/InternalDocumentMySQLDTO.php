@@ -1,10 +1,10 @@
 <?php
 
 
-namespace CNCLTD\ServiceRequestDocuments;
+namespace CNCLTD\InternalDocuments;
 
 
-class ServiceRequestDocumentMySQLDTO
+class InternalDocumentMySQLDTO
 {
     public $id;
     public $serviceRequestId;

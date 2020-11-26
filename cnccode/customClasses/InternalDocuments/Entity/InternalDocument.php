@@ -1,11 +1,11 @@
 <?php
 
-namespace CNCLTD\ServiceRequestDocuments\Entity;
+namespace CNCLTD\InternalDocuments\Entity;
 
-use CNCLTD\ServiceRequestDocuments\Base64FileDTO;
+use CNCLTD\InternalDocuments\Base64FileDTO;
 use DataURI\Parser;
 
-class ServiceRequestDocument
+class InternalDocument
 {
     private $id;
     private $serviceRequestId;
@@ -16,7 +16,7 @@ class ServiceRequestDocument
 
 
     /**
-     * ServiceRequestDocument constructor.
+     * InternalDocument constructor.
      * @param $id
      * @param $serviceRequestId
      * @param $originalFileName
@@ -46,7 +46,7 @@ class ServiceRequestDocument
         $originalFileName = $base64FileDTO->name;
         $extension        = pathinfo($base64FileDTO->name, PATHINFO_EXTENSION);
         $storedFileName   = uniqid() . ".{$extension}";
-        $path             = SERVICE_REQUEST_DOCUMENTS_FOLDER . "/{$serviceRequestId}";
+        $path             = INTERNAL_DOCUMENTS_FOLDER . "/{$serviceRequestId}";
         if (!is_dir($path)) {
             mkdir($path, null, true);
             if (!is_dir($path)) {
@@ -77,7 +77,7 @@ class ServiceRequestDocument
 
     public function getFilePath()
     {
-        return SERVICE_REQUEST_DOCUMENTS_FOLDER . "/{$this->serviceRequestId}/{$this->storedFileName}";
+        return INTERNAL_DOCUMENTS_FOLDER . "/{$this->serviceRequestId}/{$this->storedFileName}";
     }
 
     public function getFileContents()

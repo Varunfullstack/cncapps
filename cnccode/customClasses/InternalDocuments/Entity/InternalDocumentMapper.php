@@ -1,15 +1,15 @@
 <?php
 
-namespace CNCLTD\ServiceRequestDocuments\Entity;
+namespace CNCLTD\InternalDocuments\Entity;
 
-use CNCLTD\ServiceRequestDocuments\ServiceRequestDocumentDTO;
-use CNCLTD\ServiceRequestDocuments\ServiceRequestDocumentMySQLDTO;
+use CNCLTD\InternalDocuments\InternalDocumentDTO;
+use CNCLTD\InternalDocuments\InternalDocumentMySQLDTO;
 
-class ServiceRequestDocumentMapper
+class InternalDocumentMapper
 {
-    public static function fromMYSQLtoDomain(ServiceRequestDocumentMySQLDTO $fromPersistence): ServiceRequestDocument
+    public static function fromMYSQLtoDomain(InternalDocumentMySQLDTO $fromPersistence): InternalDocument
     {
-        return ServiceRequestDocument::create(
+        return InternalDocument::create(
             $fromPersistence->id,
             $fromPersistence->serviceRequestId,
             $fromPersistence->originalFileName,
@@ -22,16 +22,16 @@ class ServiceRequestDocumentMapper
     public static function fromDomainArrayToJSONDTO($arrayOfDomainObjects)
     {
         return array_map(
-            function (ServiceRequestDocument $element) {
+            function (InternalDocument $element) {
                 return static::fromDomainToJSONDTO($element);
             },
             $arrayOfDomainObjects
         );
     }
 
-    private static function fromDomainToJSONDTO(ServiceRequestDocument $element): ServiceRequestDocumentDTO
+    private static function fromDomainToJSONDTO(InternalDocument $element): InternalDocumentDTO
     {
-        $dto                   = new ServiceRequestDocumentDTO();
+        $dto                   = new InternalDocumentDTO();
         $dto->id               = $element->id();
         $dto->originalFileName = $element->originalFileName();
         $dto->storedFileName   = $element->storedFileName();

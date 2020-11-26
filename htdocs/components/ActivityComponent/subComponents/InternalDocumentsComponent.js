@@ -4,8 +4,9 @@ import DragAndDropUploaderComponent from "../../shared/DragAndDropUploaderCompon
 import Table from "../../shared/table/table";
 import APIActivity from "../../services/APIActivity";
 import MainComponent from "../../shared/MainComponent";
+import './InternalDocumentsComponent.css';
 
-export class ServiceRequestDocumentsComponent extends MainComponent {
+export class InternalDocumentsComponent extends MainComponent {
     api = new APIActivity();
 
     constructor(props, context) {
@@ -30,7 +31,7 @@ export class ServiceRequestDocumentsComponent extends MainComponent {
 
     async deleteDocument(id) {
         if (await this.confirm('Are you sure you want to remove this document?')) {
-            await this.api.deleteServiceRequestDocument(id);
+            await this.api.deleteInternalDocument(id);
             this.setState({documents: [...this.state.documents.filter(d => d.id !== id)]});
         }
     }
@@ -65,9 +66,11 @@ export class ServiceRequestDocumentsComponent extends MainComponent {
                 path: "originalFileName",
                 label: "File",
                 sortable: false,
+                class: 'align-left',
+                hdClassName: 'align-left',
                 content: (document) => (
                     <a target="_blank"
-                       href={`SRActivity.php?action=viewServiceRequestDocument&documentId=${document.id}`}
+                       href={`SRActivity.php?action=viewInternalDocument&documentId=${document.id}`}
                     >{document.originalFileName}</a>)
             },
             {
@@ -89,7 +92,7 @@ export class ServiceRequestDocumentsComponent extends MainComponent {
 
         return (
 
-            <div className="round-container"
+            <div className="round-container internal-documents-component"
                  style={{position: "relative"}}
             >
                 {this.getConfirm()}

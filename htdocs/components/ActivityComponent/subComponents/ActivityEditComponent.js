@@ -15,7 +15,7 @@ import CKEditor from "../../shared/CKEditor";
 import Modal from "../../shared/Modal/modal";
 import Toggle from "../../shared/Toggle";
 import CustomerDocumentUploader from "./CustomerDocumentUploader";
-import {ServiceRequestDocumentsComponent} from "./ServiceRequestDocumentsComponent";
+import {InternalDocumentsComponent} from "./InternalDocumentsComponent";
 
 // noinspection EqualityComparisonWithCoercionJS
 class ActivityEditComponent extends MainComponent {
@@ -1884,7 +1884,7 @@ class ActivityEditComponent extends MainComponent {
                     activityId={data?.callActivityID}
                     documents={data?.documents}
                 />
-                <ServiceRequestDocumentsComponent serviceRequestId={data?.problemID}/>
+                <InternalDocumentsComponent serviceRequestId={data?.problemID}/>
                 {this.getTemplateModal()}
             </div>
         );

@@ -1,6 +1,6 @@
 <?php
 
-namespace CNCLTD\ServiceRequestDocuments;
+namespace CNCLTD\InternalDocuments;
 class Base64FileDTO
 {
     public $file;

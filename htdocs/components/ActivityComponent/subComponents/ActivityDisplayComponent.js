@@ -11,7 +11,7 @@ import * as React from 'react';
 import Modal from "../../shared/Modal/modal";
 import moment from "moment";
 import CustomerDocumentUploader from "./CustomerDocumentUploader";
-import {ServiceRequestDocumentsComponent} from "./ServiceRequestDocumentsComponent";
+import {InternalDocumentsComponent} from "./InternalDocumentsComponent";
 
 // noinspection EqualityComparisonWithCoercionJS
 class ActivityDisplayComponent extends MainComponent {
@@ -947,7 +947,7 @@ class ActivityDisplayComponent extends MainComponent {
                     activityId={data?.callActivityID}
                     documents={data?.documents}
                 />
-                <ServiceRequestDocumentsComponent serviceRequestId={data?.problemID}/>
+                <InternalDocumentsComponent serviceRequestId={data?.problemID}/>
                 {this.getExpensesElement()}
                 {this.getTemplateModal()}
                 {this.getFooter()}

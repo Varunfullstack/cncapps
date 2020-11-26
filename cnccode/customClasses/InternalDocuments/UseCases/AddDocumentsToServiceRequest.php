@@ -1,28 +1,28 @@
 <?php
 
-namespace CNCLTD\ServiceRequestDocuments\UseCases;
+namespace CNCLTD\InternalDocuments\UseCases;
 
-use CNCLTD\ServiceRequestDocuments\Base64FileDTO;
-use CNCLTD\ServiceRequestDocuments\Entity\ServiceRequestDocument;
-use CNCLTD\ServiceRequestDocuments\ServiceRequestDocumentRepository;
+use CNCLTD\InternalDocuments\Base64FileDTO;
+use CNCLTD\InternalDocuments\Entity\InternalDocument;
+use CNCLTD\InternalDocuments\InternalDocumentRepository;
 
 class AddDocumentsToServiceRequest
 {
     /**
-     * @var ServiceRequestDocumentRepository
+     * @var InternalDocumentRepository
      */
-    private $serviceRequestDocumentRepository;
+    private $internalDocumentRepository;
     /**
      * @var \DBEProblem
      */
     private $problem;
 
-    public function __construct(ServiceRequestDocumentRepository $serviceRequestDocumentRepository,
+    public function __construct(InternalDocumentRepository $internalDocumentRepository,
                                 \DBEProblem $problem
     )
     {
 
-        $this->serviceRequestDocumentRepository = $serviceRequestDocumentRepository;
+        $this->internalDocumentRepository = $internalDocumentRepository;
         $this->problem                          = $problem;
     }
 
@@ -40,14 +40,14 @@ class AddDocumentsToServiceRequest
             throw new \Exception('Service request does not exist');
         }
         foreach ($files as $file) {
-            $id                     = $this->serviceRequestDocumentRepository->getNextId();
+            $id                     = $this->internalDocumentRepository->getNextId();
 
-            $serviceRequestDocument = ServiceRequestDocument::createFromBase64URIFileObject(
+            $internalDocument = InternalDocument::createFromBase64URIFileObject(
                 $file,
                 $serviceRequestId,
                 $id
             );
-            $this->serviceRequestDocumentRepository->save($serviceRequestDocument);
+            $this->internalDocumentRepository->save($internalDocument);
         }
 
     }

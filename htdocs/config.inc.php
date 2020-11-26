@@ -1086,7 +1086,7 @@ define(
     BASE_DRIVE . '/htdocs/PDF-resources'
 );
 define(
-    'SERVICE_REQUEST_DOCUMENTS_FOLDER',
+    'INTERNAL_DOCUMENTS_FOLDER',
     BASE_DRIVE . '/serviceRequestsDocuments'
 );
 define(

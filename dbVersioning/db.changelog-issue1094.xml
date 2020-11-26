@@ -8,10 +8,10 @@
     <changeSet id="issue1094-1" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="serviceRequestDocument"/>
+                <tableExists tableName="internalDocument"/>
             </not>
         </preConditions>
-        <createTable tableName="serviceRequestDocument">
+        <createTable tableName="internalDocument">
             <column name="id" type="bigint(8)">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="PRIMARY"/>
             </column>

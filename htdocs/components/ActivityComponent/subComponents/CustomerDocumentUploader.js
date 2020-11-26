@@ -4,6 +4,8 @@ import DragAndDropUploaderComponent from "../../shared/DragAndDropUploaderCompon
 import Table from "../../shared/table/table";
 import APIActivity from "../../services/APIActivity";
 
+import './CustomerDocumentUploader.css';
+
 export default class CustomerDocumentUploader extends React.PureComponent {
     api = new APIActivity();
 
@@ -84,7 +86,7 @@ export default class CustomerDocumentUploader extends React.PureComponent {
         ]
 
         return (
-            <div className="round-container"
+            <div className="round-container customer-documents-uploader"
                  style={{position: "relative"}}
             >
                 <div className="flex-row">

@@ -172,14 +172,14 @@ class APIActivity extends APIMain {
             files: base64Files,
         }
 
-        return fetch(`${ApiUrls.SRActivity}uploadServiceRequestDocument`, {
+        return fetch(`${ApiUrls.SRActivity}uploadInternalDocument`, {
             method: 'POST',
             body: JSON.stringify(payload)
         })
     }
 
-    async deleteServiceRequestDocument(id) {
-        return fetch(`${ApiUrls.SRActivity}deleteServiceRequestDocument&documentId=${id}`, {
+    async deleteInternalDocument(id) {
+        return fetch(`${ApiUrls.SRActivity}deleteInternalDocument&documentId=${id}`, {
             method: 'DELETE'
         })
             .then(res => res.json())
