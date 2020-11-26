@@ -43,8 +43,20 @@
         }
     }
 
-    function updatePrice(type, value) {
-        prompt('This will update all the Cost prices for all active contracts. Are you sure?')
+    function updatePrice(type, value, itemId) {
+        if (!confirm('This will update all the ' + type + ' prices for all active contracts. Are you sure?')) {
+            return;
+        }
+        fetch('?action=updateContractsPrice', {
+            method: 'POST',
+            body: JSON.stringify({
+                type,
+                value,
+                itemId
+            })
+        }).then(res => res.json()).then(() => {
+            location.reload();
+        })
     }
 
     priceUpdate = {
@@ -57,14 +69,14 @@
         const updateUnitSaleContractButton = document.getElementById('updateUnitSaleContractButton');
         const curUnitCostInput = document.querySelector("[name='item[1][curUnitCost]']");
         const curUnitSaleInput = document.querySelector("[name='item[1][curUnitSale]']");
-
+        const itemIdInput = document.querySelector("[name='item[1][itemID]']");
         if ({allowGlobalPricingUpdate}) {
             updateUnitCostContractButton.addEventListener('click', () => {
-                updatePrice(priceUpdate.COST, curUnitCostInput.value);
+                updatePrice(priceUpdate.COST, curUnitCostInput.value, itemIdInput.value);
 
             })
             updateUnitSaleContractButton.addEventListener('click', () => {
-                updatePrice(priceUpdate.SALE, curUnitSaleInput.value);
+                updatePrice(priceUpdate.SALE, curUnitSaleInput.value, itemIdInput.value);
             })
             updateUnitCostContractButton.style.display = "inline-block";
             updateUnitSaleContractButton.style.display = "inline-block";
@@ -179,6 +191,7 @@
                 >
                 <button id="updateUnitCostContractButton"
                         style="display: none"
+                        type="button"
                 >Update Contract Pricing
                 </button>
                 <font class="formErrorMessage">{curUnitCostMessage}</font>
@@ -197,6 +210,7 @@
                 >
                 <button id="updateUnitSaleContractButton"
                         style="display: none"
+                        type="button"
                 >Update Contract Pricing
                 </button>
                 <font class="formErrorMessage">{curUnitSaleMessage}</font>
