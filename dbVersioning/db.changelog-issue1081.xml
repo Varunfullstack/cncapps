@@ -21,12 +21,12 @@
                     (SELECT sty_standardtexttypeno
                      FROM standardtexttype
                      WHERE sty_desc = "Priority Change Reason")),
-                   ("Projec Work",
+                   ("Project Work",
                     "This has request been linked to a Sales Order and is now considered a project",
                     (SELECT sty_standardtexttypeno
                      FROM standardtexttype
                      WHERE sty_desc = "Priority Change Reason")),
-                   ("More urgent",
+                   ("More Urgent",
                     "The urgency of this reported issue has been increased",
                     (SELECT sty_standardtexttypeno
                      FROM standardtexttype

@@ -56,14 +56,14 @@
             catRequireCNCNextActionCNCAction=1,
             catRequireCustomerNoteCNCAction=2,
             catRequireCNCNextActionOnHold=1,
-            catRequireCustomerNoteOnHold=2
+            catRequireCustomerNoteOnHold=1
             where cat_callacttypeno=8;
 
             update callacttype set 
             catRequireCNCNextActionCNCAction=1,
             catRequireCustomerNoteCNCAction=2,
             catRequireCNCNextActionOnHold=1,
-            catRequireCustomerNoteOnHold=2
+            catRequireCustomerNoteOnHold=1
             where cat_callacttypeno=18;
 
             update callacttype set 
