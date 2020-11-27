@@ -174,15 +174,16 @@ WHERE custitem.`cui_itemno` = ?
   AND declinedFlag <> 'Y'
   AND customer.`cus_referred` <> 'Y'";
                 $query     = $costQuery;
-                $DBEItem   = new DBEItem($this);
-                $DBEItem->getRow($itemId);
+                $item      = new DBEItem($this);
+                $item->getRow($itemId);
                 $column = DBEItem::curUnitCost;
                 if ($type == 'sale') {
                     $query  = $saleQuery;
                     $column = DBEItem::curUnitSale;
                 }
-                $DBEItem->setValue($column, $value);
-                $DBEItem->updateRow();
+                $oldPrice = $item->getValue($column);
+                $item->setValue($column, $value);
+                $item->updateRow();
                 $result = $db->preparedQuery(
                     $query,
                     [
@@ -199,6 +200,25 @@ WHERE custitem.`cui_itemno` = ?
                             "value" => $itemId
                         ]
                     ]
+                );
+                $buMail = new BUMail($this);
+                global $twig;
+                $body      = $twig->render(
+                    '@internal/ContractPricingChangedEmail.html.twig',
+                    [
+                        "oldPrice"        => $oldPrice,
+                        "newPrice"        => $value,
+                        "type"            => $type,
+                        "itemDescription" => $item->getValue(DBEItem::description),
+                        "engineerName"    => $this->dbeUser->getValue(DBEUser::name)
+                    ]
+                );
+                $subject   = "Global Price Update Performed";
+                $recipient = "sales@" . CONFIG_PUBLIC_DOMAIN;
+                $buMail->sendSimpleEmail(
+                    $body,
+                    $subject,
+                    $recipient,
                 );
                 echo json_encode(["status" => "ok"]);
                 exit;
