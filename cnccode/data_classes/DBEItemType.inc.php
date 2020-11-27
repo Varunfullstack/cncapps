@@ -14,13 +14,14 @@ class DBEItemType extends DBCNCEntity
 
     use SortableDBE;
 
-    const itemTypeID = "itemTypeID";
-    const description = "description";
-    const stockcat = "stockcat";
-    const reoccurring = "reoccurring";
-    const active = "active";
-    const showInCustomerReview = "showInCustomerReview";
-    const sortOrder = "sortOrder";
+    const itemTypeID             = "itemTypeID";
+    const description            = "description";
+    const stockcat               = "stockcat";
+    const reoccurring            = "reoccurring";
+    const active                 = "active";
+    const showInCustomerReview   = "showInCustomerReview";
+    const sortOrder              = "sortOrder";
+    const allowGlobalPriceUpdate = "allowGlobalPriceUpdate";
 
 
     /**
@@ -73,22 +74,26 @@ class DBEItemType extends DBCNCEntity
             null,
             true
         );
-
         $this->addColumn(
             self::sortOrder,
             DA_INTEGER,
             DA_NOT_NULL
         );
-
+        $this->addColumn(
+            self::allowGlobalPriceUpdate,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            false
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
 
     function getCustomerReviewRows($arbitrarySort = false)
     {
-        $statement =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() . " where " . $this->getDBColumnName(
+        $statement = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " where " . $this->getDBColumnName(
                 self::active
             ) . " and " . $this->getDBColumnName(self::showInCustomerReview);
         if ($arbitrarySort) {
@@ -104,9 +109,7 @@ class DBEItemType extends DBCNCEntity
     {
         global $db;
         $escapedDescription = mysqli_real_escape_string($db->link_id(), $description);
-        $statement =
-            "SELECT {$this->getDBColumnNamesAsString()} as distinctDescription  FROM {$this->getTableName()} where  {$this->getDBColumnName(self::description)} like '%{$escapedDescription}%' order by {$this->getDBColumnName(self::description)}";
-
+        $statement          = "SELECT {$this->getDBColumnNamesAsString()} as distinctDescription  FROM {$this->getTableName()} where  {$this->getDBColumnName(self::description)} like '%{$escapedDescription}%' order by {$this->getDBColumnName(self::description)}";
         $this->setQueryString($statement);
         $ret = (parent::getRows());
     }

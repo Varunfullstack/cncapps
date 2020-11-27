@@ -1,0 +1,14 @@
+{% extends "@internal/wrapper.html.twig" %}
+
+
+{% block content %}
+    <p>
+        {{ engineerName }} updated {{ itemDescription }} pricing for all active contracts.
+    </p>
+    <p>
+        The old {{ type }} was: {{ oldPrice | format_currency('GBP') }}
+    </p>
+    <p>
+        The new {{ type }} is: {{ newPrice | format_currency('GBP') }}
+    </p>
+{% endblock %}
