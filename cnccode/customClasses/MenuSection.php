@@ -1,7 +1,6 @@
 <?php
 
 namespace CNCLTD;
-
 class MenuSection
 {
     private $key;
@@ -18,7 +17,7 @@ class MenuSection
      */
     public function __construct($key, $icon, $name = null)
     {
-        $this->key = $key;
+        $this->key  = $key;
         $this->name = $name;
         if (!$name) {
             $this->name = $key;
@@ -63,6 +62,16 @@ class MenuSection
     public function getItems(): array
     {
         return $this->items;
+    }
+
+    public function sortItems()
+    {
+        uasort(
+            $this->items,
+            function (MenuItem $a, MenuItem $b) {
+                return $a->getId() - $b->getId();
+            }
+        );
     }
 
     /**

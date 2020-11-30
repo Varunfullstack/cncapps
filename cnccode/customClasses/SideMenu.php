@@ -1,8 +1,6 @@
 <?php
 
 namespace CNCLTD;
-
-
 class SideMenu
 {
     /** @var MenuSection[] */
@@ -29,7 +27,7 @@ class SideMenu
         if ($this->getSection($key)) {
             throw new \Exception("This key already exists");
         }
-        $section = new MenuSection($key, $icon, $name);
+        $section              = new MenuSection($key, $icon, $name);
         $this->sections[$key] = $section;
         $section->addItemsFromArray($items);
         foreach ($section->getItems() as $item) {
@@ -77,5 +75,12 @@ class SideMenu
     public function getSections()
     {
         return $this->sections;
+    }
+
+    public function sort()
+    {
+        foreach ($this->sections as $section) {
+            $section->sortItems();
+        }
     }
 }
