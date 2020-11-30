@@ -487,7 +487,7 @@ class ActivityEditComponent extends MainComponent {
                 el(
                     "a",
                     {
-                        href: `mailto:${currentContact?.contactEmail}?subject=Service Request ${data?.problemID}`,
+                        href: `mailto:${currentContact?.contactEmail}?subject=${data?.serviceRequestEmailSubject}`,
                     },
                     el("i", {className: "fal fa-envelope ml-5"})
                 ),
@@ -1828,7 +1828,7 @@ class ActivityEditComponent extends MainComponent {
                 style: {width: "100%"},
                 value: this.state.data.assetName || "",
             },
-            el("option", {key: "default", value: ""}, this.state.data.emptyAssetReason || ""),
+            el("option", {key: "default", value: ""}, (this.state.data.emptyAssetReason && this.state.data.emptyAssetReason.substr(0,20) )|| ""),
             assets.map((s) =>
                 el(
                     "option",

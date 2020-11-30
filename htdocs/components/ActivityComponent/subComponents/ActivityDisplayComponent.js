@@ -142,7 +142,7 @@ class ActivityDisplayComponent extends MainComponent {
                     {data?.contactMobilePhone ?
                         <a href={`tel:${data?.contactMobilePhone}`}>{data?.contactMobilePhone}</a> : null
                     }
-                    <a href={`mailto:${data?.contactEmail}?subject=Service Request ${data?.problemID}`}>
+                    <a href={`mailto:${data?.contactEmail}?subject=${data?.serviceRequestEmailSubject}`}>
                         <i className="fal fa-envelope ml-5"/>
                     </a>
                 </div>
@@ -726,7 +726,7 @@ class ActivityDisplayComponent extends MainComponent {
                     el('tr', null,
                         el('td', {colSpan: 4}),
                         el('td', {className: "display-label"}, "Asset"),
-                        el('td', {colSpan: 3}, data?.assetName),
+                        el('td', {colSpan: 3}, data?.assetName || (data?.emptyAssetReason && data.emptyAssetReason.substr(0, 20)) || ''),
                     ),
 
                     data?.currentUser ? el('tr', null,
