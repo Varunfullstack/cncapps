@@ -809,7 +809,7 @@ class ActivityEditComponent extends MainComponent {
             if (!await this.confirm(`Are you sure you don't want to put an entry for CNC Next Action?`))
                 return false;
         }
-        if (this.checkHiddenFromCustomer(data)) {
+        if (this.isHiddenFromCustomer(data)) {
             if (this.checkCustomerNotesRequired(type, data)) {
                 this.alert(`Customer Notes are required for ${type.description} when the next action is CNC Action`)
                 return false;
@@ -827,7 +827,7 @@ class ActivityEditComponent extends MainComponent {
     }
 
     checkNotHiddenFromCustomerAndCustomerNoteSet(data) {
-        return this.checkHiddenFromCustomer(data) && data.customerNotesTemplate;
+        return this.isHiddenFromCustomer(data) && data.customerNotesTemplate;
     }
 
     checkCustomerNotesOptionalAndEmptyDescription(type, data) {
@@ -838,8 +838,8 @@ class ActivityEditComponent extends MainComponent {
         return type && type.catRequireCustomerNoteCNCAction == 1 && !data.customerNotesTemplate;
     }
 
-    checkHiddenFromCustomer(data) {
-        return data.hideFromCustomerFlag !== 'Y' && data.problemHideFromCustomerFlag !== 'Y';
+    isHiddenFromCustomer(data) {
+        return data.hideFromCustomerFlag == 'Y' || data.problemHideFromCustomerFlag == 'Y';
     }
 
     checkOptionalCNCActionAndEmptyDescription(type, data) {
@@ -860,7 +860,7 @@ class ActivityEditComponent extends MainComponent {
                 return false;
 
         }
-        if (this.checkHiddenFromCustomer(data)) {
+        if (this.isHiddenFromCustomer(data)) {
             if (this.checkCustomerNotesRequiredOnHold(type, data)) {
                 this.alert(`Customer Notes are required for ${type.description} when the next action is On Hold`)
                 return false;
