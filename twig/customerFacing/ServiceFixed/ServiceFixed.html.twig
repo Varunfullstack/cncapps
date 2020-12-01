@@ -45,6 +45,6 @@
     Fixed
 {% endblock %}
 
-{% block feedbackURL %}
-    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ serviceRequestId }}
-{% endblock %}
+{%- block feedbackURL -%}
+    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ data.serviceRequestId }}
+{%- endblock -%}

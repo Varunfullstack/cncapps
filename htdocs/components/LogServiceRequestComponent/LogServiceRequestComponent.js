@@ -143,7 +143,8 @@ export default class LogServiceRequestComponent extends MainComponent {
                 data.projects.map(p => el("a", {
                     key: p.projectID,
                     href: p.editUrl,
-                    className: "link-round"
+                    className: "link-round",
+                    target: '_blank'
                 }, p.description))
             )
         } else return null;

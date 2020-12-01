@@ -193,8 +193,7 @@ WHERE callactivity.caa_status = 'O'
             'TimeRequestDashboard',
             'TimeRequestDashboard'
         );
-        $this->loadReactScript('SpinnerHolderComponent.js');
-        $this->loadReactCSS('SpinnerHolderComponent.css');
+
         $this->setPageTitle('Time Request Dashboard');
         $buHeader = new BUHeader($this);
         $dsHeader = new DataSet($this);

@@ -110,8 +110,7 @@ class CTContractMatrix extends CTCNC
         );
 // Parameters
         $this->setPageTitle("Contract Matrix");
-        $this->loadReactScript('SpinnerHolderComponent.js');
-        $this->loadReactCSS('SpinnerHolderComponent.css');
+
         $this->template->parse(
             'CONTENTS',
             'ContractMatrix',

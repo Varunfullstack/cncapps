@@ -351,7 +351,7 @@ class CTUser extends CTCNC
         $this->setTemplateFiles(
             array('UserEdit' => 'UserEdit.inc')
         );
-        $this->template->setVar('javaScript', "<link rel='stylesheet' href='components/shared/ToolTip.css'>");
+
         $this->template->set_block(
             'UserEdit',
             'levelBlock',

@@ -433,8 +433,7 @@ class CTCustomerCRM extends CTCustomer
                     'CustomerCRM' => 'CRMSearch.inc'
                 )
             );
-            $this->loadReactScript('SpinnerHolderComponent.js');
-            $this->loadReactCSS('SpinnerHolderComponent.css');
+
             $urlSubmit = Controller::buildLink(
                 $_SERVER ['PHP_SELF'],
                 array('action' => CTCNC_ACT_SEARCH)

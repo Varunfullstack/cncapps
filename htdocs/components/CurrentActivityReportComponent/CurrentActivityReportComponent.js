@@ -328,11 +328,11 @@ class CurrentActivityReportComponent extends MainComponent {
      * Move to another queue
      */
     getMoveElement = (code, problem, defaultValue = null) => {
+        console.log(code,problem, defaultValue);
         const {el, moveToAnotherTeam, teams} = this;
-        let options = teams.map(t => {
-            return {id: t.queueNumber, title: t.code, canMove: t.canMove}
-        })
-            .filter((e) => e.title !== code && e.canMove == true);
+        let options = teams
+            .map(t => ({id: t.queueNumber, title: t.code, canMove: t.canMove}))
+                .filter((e) => e.title !== code && e.canMove == true);
         return el(
             "select",
             {

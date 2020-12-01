@@ -18,5 +18,19 @@
         </sql>
         <rollback/>
     </changeSet>
+    <changeSet id="issue1115-2" author="pavwebdev">
+        <sql splitStatements="true">
+            <![CDATA[
+            UPDATE
+                problem
+                    LEFT JOIN callactivity
+                    ON callactivity.`caa_problemno` = problem.`pro_problemno`
+                        AND callactivity.`caa_callacttypeno` = 51
+            SET `emailSubjectSummary` = LEFT(callactivity.reason, 50)
+            WHERE problem.`pro_status` IN ("I", "P", "F")
+            ]]>
+        </sql>
+        <rollback/>
+    </changeSet>
 
 </databaseChangeLog>

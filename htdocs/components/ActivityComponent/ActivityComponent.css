@@ -30,6 +30,10 @@
 
 }
 
+#tableexpenses .tooltip {
+    justify-content: left;
+}
+
 .activities-edit-container {
     width: 1080px;
     margin-top: 5px;

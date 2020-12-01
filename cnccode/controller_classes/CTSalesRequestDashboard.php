@@ -139,8 +139,7 @@ WHERE callactivity.salesRequestStatus = 'O'
             'SalesRequestDashboard'
         );
 
-        $this->loadReactScript('SpinnerHolderComponent.js');
-        $this->loadReactCSS('SpinnerHolderComponent.css');
+
 
         $this->setPageTitle('Sales Request Dashboard');
 

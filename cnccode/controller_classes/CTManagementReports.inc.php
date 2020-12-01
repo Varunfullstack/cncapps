@@ -14,7 +14,6 @@ require_once($cfg['path_dbe'] . '/DBECustomer.inc.php');
 require_once($cfg['path_func'] . '/Common.inc.php');
 require_once($cfg['path_bu'] . '/BUSector.inc.php');
 require_once($cfg['path_dbe'] . '/DBESector.inc.php');
-
 require_once("Mail.php");
 require_once("Mail/mime.php");
 
@@ -44,11 +43,9 @@ class CTManagementReports extends CTCNC
             case 'SalesByCustomer':
                 $this->SalesByCustomer();
                 break;
-
             case 'SpendBySupplier':
                 $this->spendBySupplier();
                 break;
-
             case 'SpendByCategory':
                 $this->spendByCategory();
                 break;
@@ -59,7 +56,6 @@ class CTManagementReports extends CTCNC
                     $this->getParam('sector'),
                     $this->getParam('noOfPcs')
                 );
-
                 echo json_encode($data);
                 break;
             case 'SpendByManufacturer':
@@ -76,25 +72,16 @@ class CTManagementReports extends CTCNC
     {
         $this->setMenuId(505);
         $this->setMethodName('SalesByCustomer');
-
         $this->setTemplateFiles('ManagementReportsSalesCustomer', 'ManagementReportsSalesCustomer.inc');
-        $this->loadReactScript('SpinnerHolderComponent.js');
-        $this->loadReactCSS('SpinnerHolderComponent.css');
-
         $this->setPageTitle("Sales By Customer Profile");
-
         // year selector
         $this->template->set_block('ManagementReportsSalesCustomer', 'yearBlock', 'years');
         $this->parseYearSelector($this->getParam('year'));
         // sector selector
         $this->template->set_block('ManagementReportsSalesCustomer', 'sectorBlock', 'sectors');
         $this->parseSectorSelector($this->getParam('sectorID'));
-
         // noOfPcs selector
-
         $this->parseNoOfPcs($this->template, $this->getParam('noOfPcs'));
-
-
         $customerPopupURL = Controller::buildLink(
             CTCNC_PAGE_CUSTOMER,
             array(
@@ -102,7 +89,6 @@ class CTManagementReports extends CTCNC
                 'htmlFmt' => CT_HTML_FMT_POPUP
             )
         );
-
         $fetchDataUrl = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
@@ -115,7 +101,6 @@ class CTManagementReports extends CTCNC
             $dbeCustomer->getRow($this->getParam('customerID'));
             $customerName = $dbeCustomer->getValue(DBECustomer::name);
         }
-
         $this->template->set_var(
             array(
                 'customerPopupURL' => $customerPopupURL,
@@ -126,9 +111,7 @@ class CTManagementReports extends CTCNC
                 'fetchDataUrl'     => $fetchDataUrl
             )
         );
-
         $this->template->parse("CONTENTS", "ManagementReportsSalesCustomer");
-
         $this->parsePage();
 
     }
@@ -141,18 +124,15 @@ class CTManagementReports extends CTCNC
     function parseYearSelector($selectedYear)
     {
         $thisYear = date('Y');
-
         for ($year = $thisYear; $year >= $thisYear - 3; $year--) {
 
             $yearSelected = ($selectedYear == $year) ? CT_SELECTED : null;
-
             $this->template->set_var(
                 array(
                     'yearSelected' => $yearSelected,
                     'year'         => $year
                 )
             );
-
             $this->template->parse('years', 'yearBlock', true);
         }
     } // end function spendBySupplier
@@ -161,11 +141,8 @@ class CTManagementReports extends CTCNC
     {
 
         $buSector = new BUSector($this);
-
         $dsResults = new DataSet($this);
         $buSector->getAll($dsResults);
-
-
         $this->template->set_var(
             array(
                 'selectedSector'    => $selectedSectorID ? CT_SELECTED : null,
@@ -173,15 +150,12 @@ class CTManagementReports extends CTCNC
                 'sectorDescription' => "Search All"
             )
         );
-
         $this->template->parse('sectors', 'sectorBlock', true);
-
         while ($dsResults->fetchNext()) {
 
-            $sectorID = $dsResults->getValue(DBESector::sectorID);
+            $sectorID          = $dsResults->getValue(DBESector::sectorID);
             $sectorDescription = $dsResults->getValue(DBESector::description);
-            $selectedSector = ($selectedSectorID == $sectorID) ? CT_SELECTED : null;
-
+            $selectedSector    = ($selectedSectorID == $sectorID) ? CT_SELECTED : null;
             $this->template->set_var(
                 array(
                     'selectedSector'    => $selectedSector,
@@ -189,7 +163,6 @@ class CTManagementReports extends CTCNC
                     'sectorDescription' => $sectorDescription
                 )
             );
-
             $this->template->parse('sectors', 'sectorBlock', true);
         }
     }
@@ -207,14 +180,12 @@ class CTManagementReports extends CTCNC
             "51-99",
             "100+"
         ];
-
         foreach ($options as $option) {
             $isSelected = $selectedNoOfPcs ? ($selectedNoOfPcs == $option ? CT_SELECTED : null) : ($option === "Search All" ? CT_SELECTED : null);
-            $value = $option;
+            $value      = $option;
             if ($option === 'Search All') {
                 $value = null;
             }
-
             $this->template->set_var(
                 array(
                     'noOfPcsSelected'    => $isSelected ? CT_SELECTED : null,
@@ -222,7 +193,6 @@ class CTManagementReports extends CTCNC
                     'noOfPcsValue'       => $value
                 )
             );
-
             $this->template->parse('noOfPcsSelector', 'noOfPcsBlock', true);
         }
     }
@@ -234,15 +204,11 @@ class CTManagementReports extends CTCNC
     {
         $this->setMenuId(506);
         $this->setMethodName('spendBySupplier');
-
         $this->setTemplateFiles('ManagementReportsSpendSupplier', 'ManagementReportsSpendSupplier.inc');
-
         $this->setPageTitle("Spend By Supplier");
-
         // year selector
         $this->template->set_block('ManagementReportsSpendSupplier', 'yearBlock', 'years');
         $this->parseYearSelector($this->getParam('year'));
-
         $supplierPopupURL = Controller::buildLink(
             CTCNC_PAGE_SUPPLIER,
             array(
@@ -250,8 +216,7 @@ class CTManagementReports extends CTCNC
                 'htmlFmt' => CT_HTML_FMT_POPUP
             )
         );
-
-        $results = $this->buManagementReports->getSpendBySupplier(
+        $results      = $this->buManagementReports->getSpendBySupplier(
             $this->getParam('supplierID'),
             $this->getParam('year')
         );
@@ -261,25 +226,22 @@ class CTManagementReports extends CTCNC
             $dbeSupplier->getRow($this->getParam('supplierID'));
             $supplierName = $dbeSupplier->getValue(DBESupplier::name);
         }
-
         $this->template->set_block('ManagementReportsSpendSupplier', 'resultsBlock', 'results');
         while ($row = $results->fetch_object()) {
 
             $suppliers[] = $row->supplier;
-            $value[1][] = $row->month1;
-            $value[2][] = $row->month2;
-            $value[3][] = $row->month3;
-            $value[4][] = $row->month4;
-            $value[5][] = $row->month5;
-            $value[6][] = $row->month6;
-            $value[7][] = $row->month7;
-            $value[8][] = $row->month8;
-            $value[9][] = $row->month9;
+            $value[1][]  = $row->month1;
+            $value[2][]  = $row->month2;
+            $value[3][]  = $row->month3;
+            $value[4][]  = $row->month4;
+            $value[5][]  = $row->month5;
+            $value[6][]  = $row->month6;
+            $value[7][]  = $row->month7;
+            $value[8][]  = $row->month8;
+            $value[9][]  = $row->month9;
             $value[10][] = $row->month10;
             $value[11][] = $row->month11;
             $value[12][] = $row->month12;
-
-
             $this->template->set_var(
                 array(
                     'supplier' => Controller::htmlDisplayText($row->supplier),
@@ -296,23 +258,11 @@ class CTManagementReports extends CTCNC
                     'month11'  => Controller::formatNumber($row->month11, 0),
                     'month12'  => Controller::formatNumber($row->month12, 0),
                     'total'    => Controller::formatNumber(
-                        $row->month1 +
-                        $row->month2 +
-                        $row->month3 +
-                        $row->month4 +
-                        $row->month5 +
-                        $row->month6 +
-                        $row->month7 +
-                        $row->month8 +
-                        $row->month9 +
-                        $row->month10 +
-                        $row->month11 +
-                        $row->month12,
+                        $row->month1 + $row->month2 + $row->month3 + $row->month4 + $row->month5 + $row->month6 + $row->month7 + $row->month8 + $row->month9 + $row->month10 + $row->month11 + $row->month12,
                         0
                     )
                 )
             );
-
             $this->template->parse('results', 'resultsBlock', true);
         }
         $urlGenerateReport = Controller::buildLink(
@@ -329,9 +279,7 @@ class CTManagementReports extends CTCNC
                 'supplierID'        => $this->getParam('supplierID')
             )
         );
-
         $this->template->parse("CONTENTS", "ManagementReportsSpendSupplier");
-
         $this->parsePage();
 
     } // end function salesByCustomer
@@ -342,39 +290,30 @@ class CTManagementReports extends CTCNC
     function spendByCategory()
     {
         $this->setMethodName('spendByCategory');
-
         $this->setTemplateFiles('ManagementReportsSpendCategory', 'ManagementReportsSpendCategory.inc');
-
         $this->setPageTitle("Spend By Category");
-
         // year selector
         $this->template->set_block('ManagementReportsSpendCategory', 'yearBlock', 'years');
         $this->parseYearSelector($this->getParam('year'));
-
-        $results =
-            $this->buManagementReports->getSpendByCategory(
-                $this->getParam('year')
-            );
-
+        $results = $this->buManagementReports->getSpendByCategory(
+            $this->getParam('year')
+        );
         $this->template->set_block('ManagementReportsSpendCategory', 'resultsBlock', 'results');
-
         while ($row = $results->fetch_object()) {
 
             $categories[] = $row->category;
-            $value[1][] = $row->month1;
-            $value[2][] = $row->month2;
-            $value[3][] = $row->month3;
-            $value[4][] = $row->month4;
-            $value[5][] = $row->month5;
-            $value[6][] = $row->month6;
-            $value[7][] = $row->month7;
-            $value[8][] = $row->month8;
-            $value[9][] = $row->month9;
-            $value[10][] = $row->month10;
-            $value[11][] = $row->month11;
-            $value[12][] = $row->month12;
-
-
+            $value[1][]   = $row->month1;
+            $value[2][]   = $row->month2;
+            $value[3][]   = $row->month3;
+            $value[4][]   = $row->month4;
+            $value[5][]   = $row->month5;
+            $value[6][]   = $row->month6;
+            $value[7][]   = $row->month7;
+            $value[8][]   = $row->month8;
+            $value[9][]   = $row->month9;
+            $value[10][]  = $row->month10;
+            $value[11][]  = $row->month11;
+            $value[12][]  = $row->month12;
             $this->template->set_var(
                 array(
                     'category' => Controller::htmlDisplayText($row->category),
@@ -391,42 +330,26 @@ class CTManagementReports extends CTCNC
                     'month11'  => Controller::formatNumber($row->month11, 0),
                     'month12'  => Controller::formatNumber($row->month12, 0),
                     'total'    => Controller::formatNumber(
-                        $row->month1 +
-                        $row->month2 +
-                        $row->month3 +
-                        $row->month4 +
-                        $row->month5 +
-                        $row->month6 +
-                        $row->month7 +
-                        $row->month8 +
-                        $row->month9 +
-                        $row->month10 +
-                        $row->month11 +
-                        $row->month12,
+                        $row->month1 + $row->month2 + $row->month3 + $row->month4 + $row->month5 + $row->month6 + $row->month7 + $row->month8 + $row->month9 + $row->month10 + $row->month11 + $row->month12,
                         0
                     )
                 )
             );
-
             $this->template->parse('results', 'resultsBlock', true);
         }
-
         $urlGenerateReport = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action' => 'SpendByCategory'
             )
         );
-
         $this->template->set_var(
             array(
                 'urlGenerateReport' => $urlGenerateReport,
                 'categoryID'        => $this->getParam('categoryID')
             )
         );
-
         $this->template->parse("CONTENTS", "ManagementReportsSpendCategory");
-
         $this->parsePage();
 
     }
@@ -438,11 +361,10 @@ class CTManagementReports extends CTCNC
      * @param null| $pcs
      * @return array
      */
-    function salesByCustomerData(
-        $year,
-        $customerId = null,
-        $sector = null,
-        $pcs = null
+    function salesByCustomerData($year,
+                                 $customerId = null,
+                                 $sector = null,
+                                 $pcs = null
     )
     {
 
@@ -476,9 +398,8 @@ class CTManagementReports extends CTCNC
             case '100+':
                 $minPcs = 100;
         }
-
         $results = $this->buManagementReports->getSalesByCustomer($customerId, $year, $sector, $minPcs, $maxPcs);
-        $data = [];
+        $data    = [];
         while ($row = $results->fetch_object()) {
 
             $data[] = [
@@ -524,7 +445,6 @@ class CTManagementReports extends CTCNC
             return null;
         }
         $date = DateTime::createFromFormat(DATE_MYSQL_DATE, $dateString);
-
         if (!$date) {
             return null;
         }
@@ -538,42 +458,20 @@ class CTManagementReports extends CTCNC
     {
         $this->setMenuId(507);
         $this->setMethodName('spendByManufacturer');
-
         $this->setTemplateFiles('ManagementReportsSpendManufacturer', 'ManagementReportsSpendManufacturer.inc');
-
         $this->setPageTitle("Spend By Manufacturer");
-
         // year selector
         $this->template->set_block('ManagementReportsSpendManufacturer', 'yearBlock', 'years');
         $this->parseYearSelector($this->getParam('year'));
-
-        $results =
-            $this->buManagementReports->getSpendByManufacturer(
-                $this->getParam('manufacturerName'),
-                $this->getParam('year')
-            );
-
+        $results = $this->buManagementReports->getSpendByManufacturer(
+            $this->getParam('manufacturerName'),
+            $this->getParam('year')
+        );
         $this->template->set_block('ManagementReportsSpendManufacturer', 'resultsBlock', 'results');
-
         $grandTotal = 0;
-
         while ($row = $results->fetch_object()) {
-            $total =
-                $row->month1 +
-                $row->month2 +
-                $row->month3 +
-                $row->month4 +
-                $row->month5 +
-                $row->month6 +
-                $row->month7 +
-                $row->month8 +
-                $row->month9 +
-                $row->month10 +
-                $row->month11 +
-                $row->month12;
-
+            $total = $row->month1 + $row->month2 + $row->month3 + $row->month4 + $row->month5 + $row->month6 + $row->month7 + $row->month8 + $row->month9 + $row->month10 + $row->month11 + $row->month12;
             $grandTotal += $total;
-
             $this->template->set_var(
                 array(
                     'manufacturer' => Controller::htmlDisplayText($row->manufacturer),
@@ -592,17 +490,14 @@ class CTManagementReports extends CTCNC
                     'total'        => Controller::formatNumber($total, 0)
                 )
             );
-
             $this->template->parse('results', 'resultsBlock', true);
         }
-
         $urlGenerateReport = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action' => 'spendByManufacturer'
             )
         );
-
         $this->template->set_var(
             array(
                 'urlGenerateReport' => $urlGenerateReport,
@@ -610,9 +505,7 @@ class CTManagementReports extends CTCNC
                 'grandTotal'        => Controller::formatNumber($grandTotal, 0)
             )
         );
-
         $this->template->parse("CONTENTS", "ManagementReportsSpendManufacturer");
-
         $this->parsePage();
 
     }

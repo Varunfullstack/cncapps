@@ -261,14 +261,13 @@ class ActivityDisplayComponent extends MainComponent {
                 })
             }),
             this.getSpacer(),
-            (data?.activityTypeHasExpenses) ? el(ToolTip, {
+            this.shouldShowExpenses(data, currentUser) ? el(ToolTip, {
                 title: "Expenses",
                 content: el('a', {
                     className: "fal fa-coins fa-2x m-5 pointer icon",
                     href: `Expense.php?action=view&callActivityID=${data?.callActivityID}`
                 })
             }) : this.getSpacer(),
-            //(currentUser.isExpenseApprover||currentUser.globalExpenseApprover)? el(ToolTip,{title:"Expenses",content: el('a',{className:"fal fa-coins fa-2x m-5 pointer icon",href:`Expense.php?action=view&callActivityID=${data?.callActivityID}`})}):this.getSpacer(),
             data?.problemStatus !== "C" ? el(ToolTip, {
                 title: "Add Travel",
                 content: el('a', {
@@ -306,6 +305,11 @@ class ActivityDisplayComponent extends MainComponent {
             }) : this.getSpacer(),
         );
     }
+
+    shouldShowExpenses(data, currentUser) {
+        return data?.activityTypeHasExpenses && (data.userID == currentUser.id || currentUser.globalExpenseApprover || currentUser.isExpenseApprover);
+    }
+
     getSpacer = () => {
         return this.el('span', {style: {width: 35}})
     }
@@ -759,44 +763,64 @@ class ActivityDisplayComponent extends MainComponent {
         const {data, currentUser} = this.state;
         const {el} = this;
         const totalExpenses = data?.expenses.map(e => e.value).reduce((p, c) => p + c, 0);
-        //if(currentUser.isExpenseApprover||currentUser.globalExpenseApprover)
-        if (data?.activityTypeHasExpenses) {
-            let columns = [
-                {
-                    path: "expenseType",
-                    label: "Expense",
-                    sortable: false,
-                    footerContent: (c) => el('label', null, 'Total')
-                },
-                {
-                    path: "mileage",
-                    label: "Miles",
-                    sortable: false,
-                },
-                {
-                    path: "value",
-                    label: "Amount",
-                    sortable: false,
-                    footerContent: (c) => el('label', null, totalExpenses)
-                },
-                {
-                    path: "vatFlag",
-                    label: "VAT included",
-                    sortable: false,
-                },
-            ]
-            return el('div', {className: "activities-container"},
-                el('label', {style: {display: "block"}}, "Expenses"),
-                el(Table, {
-                    id: "expenses",
-                    data: data?.expenses || [],
-                    columns: columns,
-                    pk: "id",
-                    search: false,
-                    hasFooter: true
+        if (!this.shouldShowExpenses(data, currentUser)) {
+            return '';
+        }
+
+        let columns = [
+            {
+                path: "expenseType",
+                label: "Expense",
+                sortable: false,
+                footerContent: (c) => el('label', null, 'Total')
+            },
+            {
+                path: "mileage",
+                label: "Miles",
+                sortable: false,
+            },
+            {
+                path: "value",
+                label: "Amount",
+                sortable: false,
+                footerContent: (c) => el('label', null, totalExpenses)
+            },
+            {
+                path: "vatFlag",
+                label: "VAT included",
+                sortable: false,
+            },
+        ]
+
+        return el(
+            "div",
+            {className: "round-container"},
+            el(
+                "div",
+                {className: "flex-row"},
+                el(
+                    "label",
+                    {className: "label mt-5 mr-3 ml-1 mb-5", style: {display: "block"}},
+                    "Internal Notes"
+                ),
+                el(ToolTip, {
+                    width: 15,
+                    title:
+                        "These are the Expenses associated with this activity.",
+                    content: el("i", {
+                        className: "fal fa-info-circle mt-5 pointer icon",
+                    }),
                 })
-            );
-        } else return null;
+            ),
+            el(Table, {
+                id: "expenses",
+                data: data?.expenses || [],
+                columns: columns,
+                pk: "id",
+                search: false,
+                hasFooter: true
+            })
+        );
     }
     // Parts used, change requestm and sales request
     handleTemplateChanged = (event) => {

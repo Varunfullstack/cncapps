@@ -411,7 +411,7 @@ class NewOrderComponent extends React.Component {
             el("i", {
                 key: "submit",
                 onClick: handleSubmit,
-                className: 'fa fa-shopping-cart fa-2x pointer',
+                className: 'fal fa-shopping-cart fa-2x pointer',
                 title: "Place Order"
             },),
         ]);

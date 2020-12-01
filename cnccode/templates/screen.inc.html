@@ -39,7 +39,11 @@
             actionItems: ['ignoreAll', 'settings', 'proofreadDialog']
         };
     </script>
-
+    <script src="/components/dist/SpinnerHolderComponent.js" ></script>
+    <link href="/components/dist/SpinnerHolderComponent.css"
+          rel="stylesheet"
+          type="text/css"
+    >
     <link href="/screen.css?cache=7"
           rel="stylesheet"
           type="text/css"
@@ -51,380 +55,375 @@
     <link rel="stylesheet"
           href="fonts/style.css"
     >
-</head>
 
-<link rel="stylesheet"
-      type="text/css"
-      href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.css"
-/>
-<link rel="stylesheet"
-      type="text/css"
-      href=".javascript/loadingModal/css/jquery.loadingModal.min.css"
->
-<link rel="stylesheet"
-      href=".javascript/datetime-local-polyfill/datetime-local-polyfill.css"
->
-<link rel="stylesheet"
-      href=".javascript/date-polyfill/date-polyfill.css"
->
-<link rel="stylesheet"
-      href=".javascript/jquery-ui-1.12.1/jquery-ui.min.css"
->
-<link rel="stylesheet"
-      href="https://cdn.datatables.net/fixedheader/3.1.6/css/fixedHeader.dataTables.min.css"
->
-<link rel="stylesheet"
-      href="css/boilerplate.min.css"
->
-<script src="https://unpkg.com/@webcomponents/webcomponentsjs@2.2.4/webcomponents-loader.js"
-        defer
-></script>
-<script src="/moment/moment.min.js"
-        defer
-></script>
-<script src=".javascript/jquery-3.3.1.js"
-></script>
-<script type="text/javascript"
-        src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/pdfmake.min.js"
-        defer
-></script>
-<script type="text/javascript"
-        src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js"
-        defer
-></script>
-<script type="text/javascript"
-        src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.js"
-        defer
-></script>
-<script type="text/javascript"
-        src="//cdn.datatables.net/plug-ins/1.10.19/sorting/date-eu.js"
-        defer
-></script>
-<script src=".javascript/customerPicker.js"
-        type="module"
-        defer
-></script>
-<script src=".javascript/siteLookup.js"
-        defer
-></script>
-<script src=".javascript/rrule.min.js"
-        defer
-></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js"
-        integrity="sha256-L3S3EDEk31HcLA5C6T2ovHvOcD80+fgqaCDt2BAi92o="
-        crossorigin="anonymous"
-        defer
-></script>
-<!-- <script src="https://kit.fontawesome.com/d41abfe641.js"
-        crossorigin="anonymous"
-        defer
-></script> -->
-<script src=".javascript/jquery.mask.min.js"></script>
-<script type="text/javascript"
-        src=".javascript/handlebars-v4.0.11.js"
-        defer
-></script>
-<script type="text/javascript"
-        src=".javascript/mustache.min.js"
-        defer
-></script>
-<script type="application/javascript"
-        src=".javascript/mustache-wax.min.js"
-        defer
-></script>
-<script src=".javascript/uploader.js?cache=1"
-        defer
-></script>
-<script src=".javascript/contactLookup.js"
-        defer
-></script>
-<script src=".javascript/telephoneValidator.js"
-        defer
-></script>
-<script src="https://cdn.datatables.net/select/1.3.0/js/dataTables.select.min.js"
-        defer
-></script>
-<script src=".javascript/loadingModal/js/jquery.loadingModal.min.js"
-        defer
-></script>
-<script src="https://cdn.datatables.net/select/1.3.0/js/dataTables.select.min.js"
-        defer
-></script>
-<script src="https://cdn.datatables.net/fixedheader/3.1.6/js/dataTables.fixedHeader.min.js"
-        defer
-></script>
-<script src=".javascript/jquery-datatables-checkboxes-1.2.11/js/dataTables.checkboxes.js"
-        defer
-></script>
-<script src="CommonJS.js"
-        defer
-></script>
-<script type="text/javascript"
-        src="ckeditor/ckeditor.js"
-        defer
-></script>
-<script type="application/javascript"
-        src=".javascript/salesRequest.js"
-        defer
-></script>
-<script type="application/javascript"
-        src=".javascript/changeRequest.js"
-        defer
-></script>
-<script type="application/javascript"
-        src=".javascript/customerSearch.js"
-        defer
-></script>
-<script type="application/javascript"
-        src=".javascript/modernizr.js"
-        defer
->
+    <link rel="stylesheet"
+          type="text/css"
+          href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.css"
+    />
+    <link rel="stylesheet"
+          type="text/css"
+          href=".javascript/loadingModal/css/jquery.loadingModal.min.css"
+    >
+    <link rel="stylesheet"
+          href=".javascript/datetime-local-polyfill/datetime-local-polyfill.css"
+    >
+    <link rel="stylesheet"
+          href=".javascript/date-polyfill/date-polyfill.css"
+    >
+    <link rel="stylesheet"
+          href=".javascript/jquery-ui-1.12.1/jquery-ui.min.css"
+    >
+    <link rel="stylesheet"
+          href="https://cdn.datatables.net/fixedheader/3.1.6/css/fixedHeader.dataTables.min.css"
+    >
+    <link rel="stylesheet"
+          href="css/boilerplate.min.css"
+    >
+    <script src="https://unpkg.com/@webcomponents/webcomponentsjs@2.2.4/webcomponents-loader.js"
+            defer
+    ></script>
+    <script src="/moment/moment.min.js"
+            defer
+    ></script>
+    <script src=".javascript/jquery-3.3.1.js"
+    ></script>
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/pdfmake.min.js"
+            defer
+    ></script>
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js"
+            defer
+    ></script>
+    <script type="text/javascript"
+            src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.js"
+            defer
+    ></script>
+    <script type="text/javascript"
+            src="//cdn.datatables.net/plug-ins/1.10.19/sorting/date-eu.js"
+            defer
+    ></script>
+    <script src=".javascript/customerPicker.js"
+            type="module"
+            defer
+    ></script>
+    <script src=".javascript/siteLookup.js"
+            defer
+    ></script>
+    <script src=".javascript/rrule.min.js"
+            defer
+    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js"
+            integrity="sha256-L3S3EDEk31HcLA5C6T2ovHvOcD80+fgqaCDt2BAi92o="
+            crossorigin="anonymous"
+            defer
+    ></script>
+    <!-- <script src="https://kit.fontawesome.com/d41abfe641.js"
+            crossorigin="anonymous"
+            defer
+    ></script> -->
+    <script src=".javascript/jquery.mask.min.js"></script>
+    <script type="text/javascript"
+            src=".javascript/handlebars-v4.0.11.js"
+            defer
+    ></script>
+    <script type="text/javascript"
+            src=".javascript/mustache.min.js"
+            defer
+    ></script>
+    <script type="application/javascript"
+            src=".javascript/mustache-wax.min.js"
+            defer
+    ></script>
+    <script src=".javascript/uploader.js?cache=1"
+            defer
+    ></script>
+    <script src=".javascript/contactLookup.js"
+            defer
+    ></script>
+    <script src=".javascript/telephoneValidator.js"
+            defer
+    ></script>
+    <script src="https://cdn.datatables.net/select/1.3.0/js/dataTables.select.min.js"
+            defer
+    ></script>
+    <script src=".javascript/loadingModal/js/jquery.loadingModal.min.js"
+            defer
+    ></script>
+    <script src="https://cdn.datatables.net/select/1.3.0/js/dataTables.select.min.js"
+            defer
+    ></script>
+    <script src="https://cdn.datatables.net/fixedheader/3.1.6/js/dataTables.fixedHeader.min.js"
+            defer
+    ></script>
+    <script src=".javascript/jquery-datatables-checkboxes-1.2.11/js/dataTables.checkboxes.js"
+            defer
+    ></script>
+    <script src="CommonJS.js"
+            defer
+    ></script>
+    <script type="text/javascript"
+            src="ckeditor/ckeditor.js"
+            defer
+    ></script>
+    <script type="application/javascript"
+            src=".javascript/salesRequest.js"
+            defer
+    ></script>
+    <script type="application/javascript"
+            src=".javascript/customerSearch.js"
+            defer
+    ></script>
+    <script type="application/javascript"
+            src=".javascript/modernizr.js"
+            defer
+    >
 
-</script>
-<script src=".javascript/datetime-local-polyfill/datetime-local-polyfill.min.js"
-        defer
-></script>
-<script src=".javascript/date-polyfill/date-polyfill.min.js"
-        defer
-></script>
-<script src="https://cdn.polyfill.io/v2/polyfill.min.js"
-        defer
-></script>
-<script src=".javascript/fromDateToDate.js?cache=2"
-        defer
-></script>
-<script src=".javascript/jquery-ui-1.12.1/jquery-ui.js"
-        defer
-></script>
-<SCRIPT TYPE="text/javascript">
-    const menuId = "{menuId}";
-    let modal;
-    let wrapper;
-    let modalOpen;
-    let sidebar;
-    let mainContent;
-    let favouriteMenu;
-    let doWeHaveFavourites = false;
-    let activeSubmenu;
+    </script>
+    <script src=".javascript/datetime-local-polyfill/datetime-local-polyfill.min.js"
+            defer
+    ></script>
+    <script src=".javascript/date-polyfill/date-polyfill.min.js"
+            defer
+    ></script>
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js"
+            defer
+    ></script>
+    <script src=".javascript/fromDateToDate.js?cache=2"
+            defer
+    ></script>
+    <script src=".javascript/jquery-ui-1.12.1/jquery-ui.js"
+            defer
+    ></script>
+    <SCRIPT TYPE="text/javascript">
+        const menuId = "{menuId}";
+        let modal;
+        let wrapper;
+        let modalOpen;
+        let sidebar;
+        let mainContent;
+        let favouriteMenu;
+        let doWeHaveFavourites = false;
+        let activeSubmenu;
 
-    window.addEventListener('DOMContentLoaded', function () {
-        sidebar = $(".sidebar");
-        mainContent = $("#main");
-        modal = $("#changemodal");
-        wrapper = $("#changemodal-wrapper");
-        favouriteMenu = document.getElementById('favouriteMenuItem');
-        modalOpen = false;
-
-        $("#close-button").on("click", function (event) {
-            closeChangelogModal();
-        });
-
-        document.addEventListener('click', (event) => {
-            let a = event.target;
-            if (a !== sidebar && isCollapsed) {
-                // close any open menus...
-                $('#leftside-navigation ul ul').slideUp();
-            }
-        })
-
-        /* Loop through all dropdown buttons to toggle between hiding and showing its dropdown content - This allows the user to have multiple dropdowns without any conflict */
-        // [].slice.call(document.querySelectorAll('select.cs-select')).forEach(function (el) {
-        //     new SelectFx(el);
-        // });
-
-        const childrenContainer = favouriteMenu.querySelector('.children');
-        doWeHaveFavourites = childrenContainer.childElementCount > 0;
-        var isCollapsed = localStorage.getItem('menuCollapsed');
-
-        if (isCollapsed) {
-            collapseMenu();
-        } else {
-            expandMenu();
-        }
-
-        function collapseMenu() {
-            setMenuState(true);
-        }
-
-        function expandMenu() {
-            setMenuState(false);
-        }
-
-        function toggleMenu() {
-            if (isCollapsed) {
-                expandMenu();
-            } else {
-                collapseMenu();
-            }
-
-        }
-
-        function setMenuState(collapsed) {
-            isCollapsed = collapsed;
-            if (collapsed) {
-                sidebar[0].classList.add('collapsed');
-                mainContent[0].classList.add('expanded');
-                localStorage.setItem('menuCollapsed', '1');
-            } else {
-                sidebar[0].classList.remove('collapsed');
-                mainContent[0].classList.remove('expanded');
-                localStorage.removeItem('menuCollapsed');
-                if (doWeHaveFavourites) {
-                    $(childrenContainer).slideDown();
-                }
-                openCurrentMenuItem();
-            }
-            //sidebar[0].classList.remove('no-transition')
-        }
-
-
-        $("#leftside-navigation .sub-menu > a").click(function (e) {
-            activeSubmenu = $(this);
-            let elementsQuery = '#leftside-navigation ul .sub-menu:not(.not-slide)  ul';
-            if (isCollapsed || !doWeHaveFavourites) {
-                elementsQuery = '#leftside-navigation ul ul';
-            }
-            $(elementsQuery).slideUp();
-            $(this).next().is(":visible") || $(this).next().slideDown();
-
-            e.stopPropagation()
-        });
-
-        $("#sidebarToggle").click(function (e) {
-            var image = $("#cnc-logo");
-            var current = image.attr("src");
-            var swap = image.attr("data-swap");
-            image.attr('src', swap).attr("data-swap", current);
-            toggleMenu();
-        });
-
-        function openCurrentMenuItem() {
-            if (menuId) {
-                let selector = document.querySelector('li[data-menu-id="' + menuId + '"]');
-                if (selector) {
-                    selector.closest('.sub-menu').getElementsByTagName('a')[0].click();
-                    selector.classList.add('active');
-                    const parent = $('li.active').parent('ul').parent('li');
-                    parent.addClass('active');
-                }
-            }
-        }
-
-        jQuery('.selectpicker').selectpicker;
-
-
-        $('#menuToggle').on('click', function (event) {
-            $('body').toggleClass('open');
-            if ($('body').hasClass('open')) {
-                $('[data-toggle="dropdown"]').tooltip();
-            }
-        });
-
-        $('.search-trigger').on('click', function (event) {
-            event.preventDefault();
-            event.stopPropagation();
-            $('.search-trigger').parent('.header-left').addClass('open');
-        });
-
-        $('.search-close').on('click', function (event) {
-            event.preventDefault();
-            event.stopPropagation();
-            $('.search-trigger').parent('.header-left').removeClass('open');
-        });
-
-    });
-
-    function popup(mylink, windowname) {
-        if (!window.focus) return true;
-        var href;
-        if (typeof (mylink) == 'string')
-            href = mylink;
-        else
-            href = mylink.href;
-        window.open(href, windowname, 'width=400,height=400,scrollbars=yes, resizable=yes');
-    }
-
-    function getDate(element) {
-        var date;
-        try {
-            date = $.datepicker.parseDate(dateFormat, element.value);
-        } catch (error) {
-            date = null;
-        }
-
-        return date;
-    }
-
-
-    function listener(evt) {
-        evt = evt || window.event;
-        if (evt.keyCode == 27 && modalOpen) {
-            closeChangelogModal();
-        }
-    }
-
-    function openChangelogModal() {
-        setTimeout(function () {
-            modalOpen = true;
-        }, 300);
-        wrapper.css("display", 'block');
-        modal.css("display", 'block');
-        wrapper.attr("class", "animated fadeIn");
-        modal.attr("class", "animated zoomIn");
-        window.addEventListener('keyup', listener, false);
-    }
-
-    function closeChangelogModal() {
-        setTimeout(function () {
-            wrapper.css("display", 'none');
-            modal.css("display", 'none');
+        window.addEventListener('DOMContentLoaded', function () {
+            sidebar = $(".sidebar");
+            mainContent = $("#main");
+            modal = $("#changemodal");
+            wrapper = $("#changemodal-wrapper");
+            favouriteMenu = document.getElementById('favouriteMenuItem');
             modalOpen = false;
-        }, 300);
-        wrapper.attr("class", "animated fadeOut");
-        modal.attr("class", "animated zoomOut");
-        window.removeEventListener('keyup', listener, false);
-    }
 
-    function toggleChangelogModal() {
-        if (modalOpen) {
-            closeChangelogModal();
-        } else {
-            openChangelogModal();
-        }
-    }
+            $("#close-button").on("click", function (event) {
+                closeChangelogModal();
+            });
 
-    function toggleFavourite(itemId, unflag) {
-        let action = "flagAsFavourite";
-        if (unflag) {
-            action = "unflagAsFavourite";
-        }
-        fetch('index.php?menuItemId=' + itemId + "&action=" + action).then(response => {
-            window.location.reload();
-        });
-        return false;
-    }
-
-    (function () {
-        document.addEventListener('keyup', listener, false);
-        document.addEventListener("click", function (e) {
-            var level = 0;
-            for (var element = e.target; element; element = element.parentNode) {
-                if (element.id === 'changemodal') {
-                    return;
+            document.addEventListener('click', (event) => {
+                let a = event.target;
+                if (a !== sidebar && isCollapsed) {
+                    // close any open menus...
+                    $('#leftside-navigation ul ul').slideUp();
                 }
-                level++;
-            }
-            if (modalOpen) closeChangelogModal();
-        });
-    })();
+            })
 
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-        defer
-        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-        crossorigin="anonymous"
-></script>
-{javaScript}
+            /* Loop through all dropdown buttons to toggle between hiding and showing its dropdown content - This allows the user to have multiple dropdowns without any conflict */
+            // [].slice.call(document.querySelectorAll('select.cs-select')).forEach(function (el) {
+            //     new SelectFx(el);
+            // });
+
+            const childrenContainer = favouriteMenu.querySelector('.children');
+            doWeHaveFavourites = childrenContainer.childElementCount > 0;
+            var isCollapsed = localStorage.getItem('menuCollapsed');
+
+            if (isCollapsed) {
+                collapseMenu();
+            } else {
+                expandMenu();
+            }
+
+            function collapseMenu() {
+                setMenuState(true);
+            }
+
+            function expandMenu() {
+                setMenuState(false);
+            }
+
+            function toggleMenu() {
+                if (isCollapsed) {
+                    expandMenu();
+                } else {
+                    collapseMenu();
+                }
+
+            }
+
+            function setMenuState(collapsed) {
+                isCollapsed = collapsed;
+                if (collapsed) {
+                    sidebar[0].classList.add('collapsed');
+                    mainContent[0].classList.add('expanded');
+                    localStorage.setItem('menuCollapsed', '1');
+                } else {
+                    sidebar[0].classList.remove('collapsed');
+                    mainContent[0].classList.remove('expanded');
+                    localStorage.removeItem('menuCollapsed');
+                    if (doWeHaveFavourites) {
+                        $(childrenContainer).slideDown();
+                    }
+                    openCurrentMenuItem();
+                }
+                //sidebar[0].classList.remove('no-transition')
+            }
+
+
+            $("#leftside-navigation .sub-menu > a").click(function (e) {
+                activeSubmenu = $(this);
+                let elementsQuery = '#leftside-navigation ul .sub-menu:not(.not-slide)  ul';
+                if (isCollapsed || !doWeHaveFavourites) {
+                    elementsQuery = '#leftside-navigation ul ul';
+                }
+                $(elementsQuery).slideUp();
+                $(this).next().is(":visible") || $(this).next().slideDown();
+
+                e.stopPropagation()
+            });
+
+            $("#sidebarToggle").click(function (e) {
+                var image = $("#cnc-logo");
+                var current = image.attr("src");
+                var swap = image.attr("data-swap");
+                image.attr('src', swap).attr("data-swap", current);
+                toggleMenu();
+            });
+
+            function openCurrentMenuItem() {
+                if (menuId) {
+                    let selector = document.querySelector('li[data-menu-id="' + menuId + '"]');
+                    if (selector) {
+                        selector.closest('.sub-menu').getElementsByTagName('a')[0].click();
+                        selector.classList.add('active');
+                        const parent = $('li.active').parent('ul').parent('li');
+                        parent.addClass('active');
+                    }
+                }
+            }
+
+            jQuery('.selectpicker').selectpicker;
+
+
+            $('#menuToggle').on('click', function (event) {
+                $('body').toggleClass('open');
+                if ($('body').hasClass('open')) {
+                    $('[data-toggle="dropdown"]').tooltip();
+                }
+            });
+
+            $('.search-trigger').on('click', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                $('.search-trigger').parent('.header-left').addClass('open');
+            });
+
+            $('.search-close').on('click', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                $('.search-trigger').parent('.header-left').removeClass('open');
+            });
+
+        });
+
+        function popup(mylink, windowname) {
+            if (!window.focus) return true;
+            var href;
+            if (typeof (mylink) == 'string')
+                href = mylink;
+            else
+                href = mylink.href;
+            window.open(href, windowname, 'width=400,height=400,scrollbars=yes, resizable=yes');
+        }
+
+        function getDate(element) {
+            var date;
+            try {
+                date = $.datepicker.parseDate(dateFormat, element.value);
+            } catch (error) {
+                date = null;
+            }
+
+            return date;
+        }
+
+
+        function listener(evt) {
+            evt = evt || window.event;
+            if (evt.keyCode == 27 && modalOpen) {
+                closeChangelogModal();
+            }
+        }
+
+        function openChangelogModal() {
+            setTimeout(function () {
+                modalOpen = true;
+            }, 300);
+            wrapper.css("display", 'block');
+            modal.css("display", 'block');
+            wrapper.attr("class", "animated fadeIn");
+            modal.attr("class", "animated zoomIn");
+            window.addEventListener('keyup', listener, false);
+        }
+
+        function closeChangelogModal() {
+            setTimeout(function () {
+                wrapper.css("display", 'none');
+                modal.css("display", 'none');
+                modalOpen = false;
+            }, 300);
+            wrapper.attr("class", "animated fadeOut");
+            modal.attr("class", "animated zoomOut");
+            window.removeEventListener('keyup', listener, false);
+        }
+
+        function toggleChangelogModal() {
+            if (modalOpen) {
+                closeChangelogModal();
+            } else {
+                openChangelogModal();
+            }
+        }
+
+        function toggleFavourite(itemId, unflag) {
+            let action = "flagAsFavourite";
+            if (unflag) {
+                action = "unflagAsFavourite";
+            }
+            fetch('index.php?menuItemId=' + itemId + "&action=" + action).then(response => {
+                window.location.reload();
+            });
+            return false;
+        }
+
+        (function () {
+            document.addEventListener('keyup', listener, false);
+            document.addEventListener("click", function (e) {
+                var level = 0;
+                for (var element = e.target; element; element = element.parentNode) {
+                    if (element.id === 'changemodal') {
+                        return;
+                    }
+                    level++;
+                }
+                if (modalOpen) closeChangelogModal();
+            });
+        })();
+
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+            defer
+            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+            crossorigin="anonymous"
+    ></script>
+    {javaScript}
 
 </head>
 <body>

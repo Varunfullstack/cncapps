@@ -198,8 +198,7 @@ class CTRenewalReport extends CTCNC
             'RenewalReport.inc'
         );
 
-        $this->loadReactScript('SpinnerHolderComponent.js');
-        $this->loadReactCSS('SpinnerHolderComponent.css');
+
 
         if ($customerID) {
             $calledFromSearch = true;

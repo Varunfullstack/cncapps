@@ -129,8 +129,7 @@ where reviewDate IS NOT NULL
 
         $this->setTemplateFiles('CustomerReviewList', 'CustomerReviewList.inc');
 
-        $this->loadReactScript('SpinnerHolderComponent.js');
-        $this->loadReactCSS('SpinnerHolderComponent.css');
+
         $this->template->parse('CONTENTS', 'CustomerReviewList', true);
 
         $this->parsePage();
