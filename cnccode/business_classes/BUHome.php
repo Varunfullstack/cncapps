@@ -438,6 +438,40 @@ ORDER BY caa_date ASC,
     function updateAll()
     {
         global $db;
+
+        $db->query("INSERT INTO user_time_log (
+  userID,
+  teamLevel,
+  loggedDate,
+  dayHours,
+  startedTime,
+  loggedHours
+)
+SELECT
+  consultant.`cns_consno`,
+  team.`level`,
+  CURRENT_DATE,
+  consultant.`standardDayHours`,
+  MIN(callactivity.`caa_starttime`),
+  0
+FROM
+  consultant
+  JOIN team
+    ON team.`teamID` = consultant.`teamID`
+  JOIN callactivity
+    ON callactivity.`caa_consno` = consultant.`cns_consno`
+    AND callactivity.`caa_date` = CURRENT_DATE
+    AND callactivity.`caa_starttime` IS NOT NULL
+    AND callactivity.`caa_endtime` IS NOT NULL
+  LEFT JOIN user_time_log
+    ON user_time_log.`userID` = callactivity.`caa_consno`
+    AND loggedDate = CURRENT_DATE
+WHERE user_time_log.`userTimeLogID` IS NULL
+  AND consultant.`activeFlag` = 'Y'
+  AND cns_consno <> 67
+  AND cns_consno IS NOT NULL
+  GROUP BY consultant.`cns_consno`");
+
         $firstTimeFix   = $this->getFirstTimeFixData();
         $fixedAndReopen = $this->getFixedAndReopenData();
         $upcomingVisits = $this->getUpcomingVisits();
