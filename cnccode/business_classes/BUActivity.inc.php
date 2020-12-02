@@ -10771,10 +10771,10 @@ FROM
     }
 
     /**
-     * @param DBECallActivity $dsCallActivity
+     * @param  $dsCallActivity
      * @return string
      */
-    private function trimmedCustomerNotes(DBECallActivity $dsCallActivity): string
+    private function trimmedCustomerNotes( $dsCallActivity): string
     {
         return trim(
             html_entity_decode(
