@@ -1357,8 +1357,9 @@ class BUActivity extends Business
                 $this->db->query($sql);
             }
         }
-        $hasNewReasonAndItsFinishedAndHasCustomerNotes =
-            (!isset($oldReason) || $oldReason != $newReason) && $dsCallActivity->getValue(                DBEJCallActivity::endTime            ) && trim($dsCallActivity->getValue(DBECallActivity::customerNotes));
+        $hasNewReasonAndItsFinishedAndHasCustomerNotes = (!isset($oldReason) || $oldReason != $newReason) && $dsCallActivity->getValue(
+                DBEJCallActivity::endTime
+            ) && trim(html_entity_decode(strip_tags($dsCallActivity->getValue(DBECallActivity::customerNotes))));
         if ($hasNewReasonAndItsFinishedAndHasCustomerNotes) {
             $this->sendActivityLoggedEmail($dbeCallActivity->getValue(DBEJCallActivity::callActivityID));
         }
@@ -8264,17 +8265,17 @@ FROM
         $firstActivity                 = $buActivity->getFirstActivityInServiceRequest($serviceRequestId);
         global $db;
         $feedbackTokenGenerator = new \CNCLTD\FeedbackTokenGenerator($db);
-        $data                          = new \CNCLTD\TwigDTOs\ServiceRequestFixedDTO(
+        $data                   = new \CNCLTD\TwigDTOs\ServiceRequestFixedDTO(
             $fixedActivityInServiceRequest->getValue(DBEJCallActivity::contactFirstName),
             $firstActivity->getValue(DBEJCallActivity::reason),
             $fixedActivityInServiceRequest->getValue(DBEJCallActivity::reason),
             $serviceRequestId,
             $feedbackTokenGenerator->getTokenForServiceRequestId($serviceRequestId)
         );
-        $selfFlag                      = DBEContact::fixedEmailFlag;
-        $othersFlag                    = DBEContact::othersFixedEmailFlag;
-        $subject                       = "Service Request {$serviceRequestId} - {$serviceRequest->getValue(DBEProblem::emailSubjectSummary)} - Fixed";
-        $template                      = '@customerFacing/ServiceFixed/ServiceFixed.html.twig';
+        $selfFlag               = DBEContact::fixedEmailFlag;
+        $othersFlag             = DBEContact::othersFixedEmailFlag;
+        $subject                = "Service Request {$serviceRequestId} - {$serviceRequest->getValue(DBEProblem::emailSubjectSummary)} - Fixed";
+        $template               = '@customerFacing/ServiceFixed/ServiceFixed.html.twig';
         $this->sendCustomerEmail($template, $data, $fixedActivityInServiceRequest, $selfFlag, $othersFlag, $subject);
     }
 
