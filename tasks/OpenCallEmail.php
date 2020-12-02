@@ -185,7 +185,7 @@ foreach ($engineers as $engineerId => $engineerActivities) {
             ?>
             <TR>
                 <TD>
-                    <A href="<?= SITE_URL ?>/Activity.php?action=displayActivity&callActivityID=<?php print $engineerActivity->activityId ?>"><?php print $engineerActivity->activityId ?></A>
+                    <A href="<?= SITE_URL ?>/SRActivity.php?action=displayActivity&callActivityID=<?php print $engineerActivity->activityId ?>"><?php print $engineerActivity->activityId ?></A>
                 </TD>
                 <TD>
                     <?php print $engineerActivity->customerName ?>
@@ -301,7 +301,7 @@ foreach ($managers as $managerId => $manager) {
                     }
                     ?>
                     <TD>
-                        <A href="<?= SITE_URL ?>/Activity.php?action=displayActivity&callActivityID=<?= $openActivity->activityId ?>"><?= $openActivity->activityId ?></A>
+                        <A href="<?= SITE_URL ?>/SRActivity.php?action=displayActivity&callActivityID=<?= $openActivity->activityId ?>"><?= $openActivity->activityId ?></A>
                     </TD>
 
                     <TD>

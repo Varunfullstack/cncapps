@@ -855,7 +855,7 @@ WHERE
                     "type"             => $dbeExpenseType->getValue(DBEExpenseType::description),
                     "value"            => $dbeExpense->getValue(DBEExpense::value),
                     "deniedReason"     => $dbeExpense->getValue(DBEExpense::deniedReason),
-                    "activityURL"      => SITE_URL . "/Activity.php?action=displayActivity&callActivityID=" . $dbeCallActivity->getValue(
+                    "activityURL"      => SITE_URL . "/SRActivity.php?action=displayActivity&callActivityID=" . $dbeCallActivity->getValue(
                             DBECallActivity::callActivityID
                         ),
                     "serviceRequestId" => $serviceRequestId
@@ -1251,7 +1251,7 @@ WHERE
                         'd-m-Y'
                     ),
                     "deniedReason"     => $dbeCallActivity->getValue(DBECallActivity::overtimeDeniedReason),
-                    "activityURL"      => SITE_URL . "/Activity.php?action=displayActivity&callActivityID=" . $dbeCallActivity->getValue(
+                    "activityURL"      => SITE_URL . "/SRActivity.php?action=displayActivity&callActivityID=" . $dbeCallActivity->getValue(
                             DBECallActivity::callActivityID
                         ),
                     "serviceRequestId" => $serviceRequestId

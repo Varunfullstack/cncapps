@@ -119,7 +119,7 @@ class CTChangeRequestDashboard extends CTCNC
                 ]
             );
             $srLink = "<a href='$srLink'>SR</a>";
-//            http://cncdev7:85/Activity.php?action=changeRequestReview&callActivityID=1813051&fromEmail=true
+
             $processCRLink = Controller::buildLink(
                 'Activity.php',
                 [

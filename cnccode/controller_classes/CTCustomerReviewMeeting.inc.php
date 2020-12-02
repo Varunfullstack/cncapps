@@ -511,10 +511,9 @@ class CTCustomerReviewMeeting extends CTCNC
 
                     $urlServiceRequest =
                         Controller::buildLink(
-                            'Activity.php',
+                            'SRActivity.php',
                             array(
-                                'action'    => 'displayLastActivity',
-                                'problemID' => $dsReviews->getValue(DBEProblem::problemID)
+                                'serviceRequestId' => $dsReviews->getValue(DBEProblem::problemID)
                             )
                         );
 

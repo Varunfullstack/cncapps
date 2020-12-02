@@ -268,7 +268,7 @@ class ItemNotYetReceived implements JsonSerializable
 
     public function getServiceRequestURL()
     {
-        return SITE_URL . "/Activity.php?problemID=" . $this->getServiceRequestID() . "&action=displayLastActivity";
+        return SITE_URL . "/SRActivity.php?action=displayActivity&serviceRequestId=" . $this->getServiceRequestID();
     }
 
     /**

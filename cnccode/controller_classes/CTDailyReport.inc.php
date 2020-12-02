@@ -184,10 +184,9 @@ class CTDailyReport extends CTCNC
 
                 $urlRequest =
                     Controller::buildLink(
-                        'Activity.php',
+                        'SRActivity.php',
                         array(
-                            'problemID' => $row[1],
-                            'action'    => 'displayLastActivity'
+                            'serviceRequestId' => $row[1],
                         )
                     );
 
@@ -259,16 +258,16 @@ class CTDailyReport extends CTCNC
 
                 $urlRequest =
                     Controller::buildLink(
-                        'Activity.php',
+                        'SRActivity.php',
                         array(
-                            'problemID' => $row[1],
-                            'action'    => 'displayLastActivity'
+                            'serviceRequestId' => $row[1],
+
                         )
                     );
 
                 $urlActivity =
                     Controller::buildLink(
-                        'Activity.php',
+                        'SRActivity.php',
                         array(
                             'callActivityID' => $row[2],
                             'action'         => 'displayActivity'
@@ -348,16 +347,16 @@ class CTDailyReport extends CTCNC
 
                 $urlRequest =
                     Controller::buildLink(
-                        'Activity.php',
+                        'SRActivity.php',
                         array(
-                            'problemID' => $row[1],
-                            'action'    => 'displayLastActivity'
+                            'serviceRequestId' => $row[1],
+
                         )
                     );
 
                 $urlActivity =
                     Controller::buildLink(
-                        'Activity.php',
+                        'SRActivity.php',
                         array(
                             'callActivityID' => $row[2],
                             'action'         => 'displayActivity'

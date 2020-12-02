@@ -87,7 +87,7 @@ class InboxProjectsComponent extends React.Component {
                     el(
                         "a",
                         {
-                            href: `Activity.php?action=displayLastActivity&problemID=${problem.problemID}`,
+                            href: `SRActivity.php?action=displayActivity&serviceRequestId=${problem.problemID}`,
                             target: "_blank",
                             key: "link",
                         },

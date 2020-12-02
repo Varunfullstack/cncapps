@@ -295,10 +295,9 @@ class CTCurrentActivityReport extends CTCNC
 
             foreach ($pendingReopenedRequests as $pendingReopenedRequest) {
                 $pendingReopenSRURL              = Controller::buildLink(
-                    'Activity.php',
+                    'SRActivity.php',
                     array(
-                        'action'    => 'displayLastActivity',
-                        'problemID' => $pendingReopenedRequest['problemID']
+                        'serviceRequestId' => $pendingReopenedRequest['problemID']
                     )
                 );
                 $pendingReopenSR                 = $pendingReopenedRequest['problemID'];

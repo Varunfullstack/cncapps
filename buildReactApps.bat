@@ -1,1 +1,1 @@
-pushd htdocs\components\ && npm install  && npm run build
+pushd htdocs\components\ && npm install  && npm run build && popd

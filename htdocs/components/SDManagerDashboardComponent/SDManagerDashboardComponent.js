@@ -341,7 +341,7 @@ class SDManagerDashboardComponent extends MainComponent {
                     className: "text-center",
                     classNameColumn: "",
                     content: (problem) => el('a', {
-                        href: `Activity.php?action=displayLastActivity&problemID=${problem.problemID}`,
+                        href: `SRActivity.php?action=displayActivity&serviceRequestId=${problem.problemID}`,
                         target: '_blank'
                     }, problem.problemID)
                 },

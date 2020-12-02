@@ -1778,7 +1778,7 @@ class CTActivity extends CTCNC
         $dbeCallActivity = $this->buActivity->getFirstActivityInServiceRequest($this->getParam('problemID'));
         $this->redirectToDisplay($dbeCallActivity->getValue(DBEJCallActivity::callActivityID));
 
-    }// end function displayActivity()
+    }
 
     /**
      * Redirect to call page
@@ -2836,8 +2836,7 @@ class CTActivity extends CTCNC
         $urlNext = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
-                'action'    => 'displayLastActivity',
-                'problemID' => $problemID
+                'serviceRequestId' => $problemID
             )
         );
         if (!$problemID) {
@@ -4019,7 +4018,7 @@ class CTActivity extends CTCNC
                 'historyLink'                   => $this->getProblemHistoryLink(
                     $dsCallActivity->getValue(DBEJCallActivity::problemID)
                 ),
-                'SRLink'                        => "<a href='Activity.php?action=displayLastActivity&problemID=" . $dsCallActivity->getValue(
+                'SRLink'                        => "<a href='SRActivity.php?serviceRequestId=" . $dsCallActivity->getValue(
                         DBEJCallActivity::problemID
                     ) . "' target='_blank'>SR</a>",
                 'uploadErrors'                  => $errorFile,

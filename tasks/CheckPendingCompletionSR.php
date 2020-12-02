@@ -106,7 +106,7 @@ while ($db->next_record(MYSQLI_ASSOC)) {
     }
 
     $items[] = [
-        "activityLink"   => SITE_URL . "/Activity.php?action=displayActivity&callActivityID=" . $db->Record['activityId'],
+        "activityLink"   => SITE_URL . "/SRActivity.php?action=displayActivity&callActivityID=" . $db->Record['activityId'],
         "serviceRequest" => $db->Record['serviceRequestId'],
         "customerName"   => $db->Record['customerName'],
         "fixedBy"        => $db->Record['fixedBy'],

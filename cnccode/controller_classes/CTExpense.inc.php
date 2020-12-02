@@ -165,7 +165,7 @@ class CTExpense extends CTCNC
 
         $urlCallActivity =
             Controller::buildLink(
-                'Activity.php',
+                'SRActivity.php',
                 array(
                     'action'         => 'displayActivity',
                     'callActivityID' => $dsCallActivity->getValue(DBEJCallActivity::callActivityID)

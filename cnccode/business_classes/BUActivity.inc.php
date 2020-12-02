@@ -1582,7 +1582,7 @@ class BUActivity extends Business
             'page',
             'MonitoringEmail.inc.html'
         );
-        $urlActivity              = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+        $urlActivity              = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
         $durationHours            = common_convertHHMMToDecimal(
                 $dbeJCallActivity->getValue(DBEJCallActivity::endTime)
@@ -1704,7 +1704,7 @@ class BUActivity extends Business
             'HighActivityAlertEmail.inc.html'
         );
         $dbeJCallActivity = $this->getFirstActivityInServiceRequest($problemID);
-        $urlActivity      = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+        $urlActivity      = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
         $template->setVar(
             array(
@@ -1813,7 +1813,7 @@ class BUActivity extends Business
         );
         $dbeJCallActivity = new DBEJCallActivity($this);
         $dbeJCallActivity->getRow($callActivity->getValue(DBECallActivity::callActivityID));
-        $urlActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+        $urlActivity = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
         $template->setVar(
             array(
@@ -1879,7 +1879,7 @@ class BUActivity extends Business
             'page',
             'SpecialAttentionEmail.inc.html'
         );
-        $urlActivity              = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+        $urlActivity              = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
         $durationHours            = common_convertHHMMToDecimal(
                 $dbeJCallActivity->getValue(DBEJCallActivity::endTime)
@@ -1966,7 +1966,7 @@ class BUActivity extends Business
             'page',
             'CriticalEmail.inc.html'
         );
-        $urlActivity              = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+        $urlActivity              = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
         $durationHours            = common_convertHHMMToDecimal(
                 $dbeJCallActivity->getValue(DBEJCallActivity::endTime)
@@ -2054,7 +2054,7 @@ class BUActivity extends Business
             'page',
             'FutureVisitEmail.inc.html'
         );
-        $urlActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+        $urlActivity = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
         $template->setVar(
             array(
@@ -2545,10 +2545,10 @@ class BUActivity extends Business
         $userName         = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(
                 DBEUser::lastName
             );
-        $urlFirstActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dsInitial->getValue(
+        $urlFirstActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/SRActivity.php?action=displayActivity&callActivityID=' . $dsInitial->getValue(
                 DBEJCallActivity::callActivityID
             );
-        $urlLastActivity  = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeCallActivity->getValue(
+        $urlLastActivity  = 'http://' . $_SERVER ['HTTP_HOST'] . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             );
         $template->setVar(
@@ -2868,7 +2868,7 @@ class BUActivity extends Business
             'page',
             'ServiceTimeAllocatedEmail.inc.html'
         );
-        $urlDisplayActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJLastCallActivity->getValue(
+        $urlDisplayActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJLastCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             );
         $userName           = $dbeUser->getValue(DBEUser::firstName) . ' ' . $dbeUser->getValue(DBEUser::lastName);
@@ -2961,10 +2961,10 @@ class BUActivity extends Business
         $userName         = $requestingUser->getValue(DBEUser::firstName) . ' ' . $requestingUser->getValue(
                 DBEUser::lastName
             );
-        $urlFirstActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dsInitial->getValue(
+        $urlFirstActivity = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dsInitial->getValue(
                 DBEJCallActivity::callActivityID
             );
-        $urlLastActivity  = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeCallActivity->getValue(
+        $urlLastActivity  = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             );
         $template->setVar(
@@ -3184,10 +3184,10 @@ class BUActivity extends Business
         $urlChangeControlRequest = SITE_URL . '/Activity.php?action=changeControlRequest&callActivityID=' . $dbeCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             );
-        $urlFirstActivity        = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dsInitial->getValue(
+        $urlFirstActivity        = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dsInitial->getValue(
                 DBEJCallActivity::callActivityID
             );
-        $urlLastActivity         = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeCallActivity->getValue(
+        $urlLastActivity         = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             );
         $template->setVar(
@@ -3300,10 +3300,10 @@ class BUActivity extends Business
         $urlChangeControlRequest = SITE_URL . '/Activity.php?action=changeRequestReview&callActivityID=' . $dbeCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             ) . '&fromEmail=true';
-        $urlFirstActivity        = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dsInitialCallActivity->getValue(
+        $urlFirstActivity        = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dsInitialCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             );
-        $urlLastActivity         = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeCallActivity->getValue(
+        $urlLastActivity         = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             );
         $template->setVar(
@@ -5246,7 +5246,7 @@ class BUActivity extends Business
         );
         $dbeJCallActivity = $this->getFirstActivityInServiceRequest($newProblemID);
         $subject          = 'Similar activity added for ' . $dbeJProblem->getValue(DBEJProblem::customerName);
-        $urlActivity      = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+        $urlActivity      = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
         $template->setVar(
             array(
@@ -5333,7 +5333,7 @@ class BUActivity extends Business
                     <TD nowrap
                         style="background-color:#E0DFE3"
                     ><A
-                                href="<?= SITE_URL ?>/Activity.php?action=displayActivity&callActivityID=<?= $this->dbeCallActivitySearch->getPKValue(
+                                href="<?= SITE_URL ?>/SRActivity.php?action=displayActivity&callActivityID=<?= $this->dbeCallActivitySearch->getPKValue(
                                 ); ?>"
                         ><?php
                             echo $this->dbeCallActivitySearch->getPKValue();
@@ -5910,7 +5910,7 @@ class BUActivity extends Business
         );
         $dbeJCallActivity     = $this->getFirstActivityInServiceRequest($problemID);
         $dbeJLastCallActivity = $this->getLastActivityInProblem($problemID);
-        $urlActivity          = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJLastCallActivity->getPKValue(
+        $urlActivity          = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJLastCallActivity->getPKValue(
             );
         $assignedByUserName   = (string)$DBUser->getValue(DBEUser::name);
         $template->setVar(
@@ -6406,7 +6406,7 @@ class BUActivity extends Business
             'SalesRequestAlertEmail.inc.html'
         );
         $dbeJCallActivity  = $this->getFirstActivityInServiceRequest($problemID);
-        $urlActivity       = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+        $urlActivity       = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
         $projectURL        = SITE_URL . '/Project.php?action=add&customerID=' . $dbeJCallActivity->getValue(
                 DBEJCallActivity::customerID
@@ -7680,7 +7680,7 @@ FROM
             'PriorityOneReopenedEmail.inc.html'
         );
         $dbeJCallActivity = $this->getFirstActivityInServiceRequest($problemID);
-        $urlActivity      = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+        $urlActivity      = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
         $template->setVar(
             array(
@@ -8212,7 +8212,7 @@ FROM
         $dbeJCallActivity = $this->getLastActivityInProblem($problemID);
         $fixedBy          = $dbeJCallActivity->getValue(DBEJCallActivity::userName);
         $fixSummary       = $dbeJCallActivity->getValue(DBEJCallActivity::reason);
-        $urlActivity      = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $initialID;
+        $urlActivity      = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $initialID;
         $template->setVar(
             array(
                 'activityRef'                 => $activityRef,
@@ -8263,11 +8263,14 @@ FROM
         $buActivity                    = new BUActivity($this);
         $fixedActivityInServiceRequest = $buActivity->getFixedActivityInServiceRequest($serviceRequestId);
         $firstActivity                 = $buActivity->getFirstActivityInServiceRequest($serviceRequestId);
+        global $db;
+        $feedbackTokenGenerator = new \CNCLTD\FeedbackTokenGenerator($db);
         $data                          = new \CNCLTD\TwigDTOs\ServiceRequestFixedDTO(
             $fixedActivityInServiceRequest->getValue(DBEJCallActivity::contactFirstName),
             $firstActivity->getValue(DBEJCallActivity::reason),
             $fixedActivityInServiceRequest->getValue(DBEJCallActivity::reason),
             $serviceRequestId,
+            $feedbackTokenGenerator->getTokenForServiceRequestId($serviceRequestId)
         );
         $selfFlag                      = DBEContact::fixedEmailFlag;
         $othersFlag                    = DBEContact::othersFixedEmailFlag;
@@ -9453,7 +9456,7 @@ FROM
             'page',
             'ManagementReviewSummaryAddedEmail.inc.html'
         );
-        $urlActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJProblem->getValue(
+        $urlActivity = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJProblem->getValue(
                 DBEJCallActivity::callActivityID
             );
         $template->setVar(
@@ -9969,10 +9972,10 @@ FROM
         $urlSalesRequestReview = SITE_URL . '/Activity.php?action=salesRequestReview&callActivityID=' . $salesRequestActivity->getValue(
                 DBEJCallActivity::callActivityID
             ) . '&fromEmail=true';
-        $urlFirstActivity      = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dsInitialCallActivity->getValue(
+        $urlFirstActivity      = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dsInitialCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             );
-        $urlLastActivity       = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $lastActivity->getValue(
+        $urlLastActivity       = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $lastActivity->getValue(
                 DBEJCallActivity::callActivityID
             );
         $template->setVar(

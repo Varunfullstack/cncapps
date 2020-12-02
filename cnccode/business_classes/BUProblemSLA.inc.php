@@ -215,7 +215,7 @@ class BUProblemSLA extends Business
             $activityRef = $dbeJCallActivity->getValue(DBEJCallActivity::problemID);
             global $twig;
 
-            $urlActivity = SITE_URL . "/Activity.php?action=displayActivity&callActivityID={$dbeJCallActivity->getPKValue()}";
+            $urlActivity = SITE_URL . "/SRActivity.php?action=displayActivity&callActivityID={$dbeJCallActivity->getPKValue()}";
             $body        = $twig->render(
                 $twigTemplate,
                 [
@@ -742,7 +742,7 @@ class BUProblemSLA extends Business
                 'SlaAlertEmail.inc.html'
             );
 
-            $urlActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+            $urlActivity = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
                 );
 
             $template->setVar(
@@ -970,7 +970,7 @@ class BUProblemSLA extends Business
         $manager->getRow($managerId);
 
         $activityURL = SITE_URL . Controller::formatForHTML(
-                '/Activity.php?action=displayLastActivity&problemID=' . $serviceRequestId,
+                '/SRActivity.php?action=displayActivity&serviceRequestId=' . $serviceRequestId,
                 1
             );
 
