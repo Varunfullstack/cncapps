@@ -38,12 +38,12 @@
     </p>
 {% endblock %}
 
-{% block serviceRequestURL %}https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ data.serviceRequestId }}{% endblock %}
+{%- block serviceRequestURL -%}https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ data.serviceRequestId }}{%- endblock -%}
 
 {% block footerStatus %}
     Fixed
 {% endblock %}
 
-{% block feedbackURL %}
-    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ serviceRequestId }}
-{% endblock %}
+{%- block feedbackURL -%}
+    {{ constant('PORTAL_FEEDBACK_URL') }}{{ data.feedbackToken }}
+{%- endblock -%}

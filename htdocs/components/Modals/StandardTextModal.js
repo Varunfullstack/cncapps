@@ -76,8 +76,9 @@ class StandardTextModal extends React.Component {
                         })
                         : null),
                 footer: el('div', {key: "footer"},
+                    el('button', {onClick: this.handleTemplateOk}, okTitle),
                     el('button', {onClick: () => this.props.onCancel ? this.props.onCancel() : this.setState({_showModal: false})}, "Cancel"),
-                    el('button', {onClick: this.handleTemplateOk}, okTitle))
+                )
             }
         )
     }

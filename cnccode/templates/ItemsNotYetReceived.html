@@ -104,7 +104,7 @@
                             return '';
                         }
                         const anchor = document.createElement('a');
-                        anchor.href = "Activity.php?action=displayLastActivity&problemID=" + data;
+                        anchor.href = "SRActivity.php?action=displayActivity&serviceRequestId=" + data;
                         anchor.text = data;
                         anchor.target = '_blank';
                         return anchor.outerHTML;

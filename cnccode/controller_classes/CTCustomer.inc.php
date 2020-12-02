@@ -1263,8 +1263,7 @@ class CTCustomer extends CTCNC
             'CustomerReviewList',
             'CustomerReviewList.inc'
         );
-        $this->loadReactScript('SpinnerHolderComponent.js');
-        $this->loadReactCSS('SpinnerHolderComponent.css');
+
 
         $this->setPageTitle("My Daily Call List");
 

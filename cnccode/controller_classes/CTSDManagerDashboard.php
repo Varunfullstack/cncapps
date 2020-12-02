@@ -252,14 +252,17 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
      */
     private function getNumberOfOpenServiceRequestPerTeamExcludingSales(): array
     {
-        $query             = "SELECT c.`teamID`, COUNT(*) total
-                FROM problem p JOIN consultant c ON p.`pro_consno`=c.`cns_consno` 
-                WHERE 
-                pro_status<>'C' 
-                AND pro_status<>'F'
-                AND c.teamID<>7 
-                AND pro_custno <> 282
-                GROUP BY c.`teamID`";
+        $query             = "SELECT
+  c.`teamID`,
+  COUNT(*) total
+FROM
+  problem p
+  JOIN team c
+    ON c.level = p.pro_queue_no
+WHERE pro_status NOT IN ('C', 'F')
+  AND c.teamID < 6
+  AND pro_custno <> 282
+GROUP BY c.`teamID`";
         return DBConnect::fetchAll($query, []);
     }
 

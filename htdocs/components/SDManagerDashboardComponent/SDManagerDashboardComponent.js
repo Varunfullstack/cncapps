@@ -341,7 +341,7 @@ class SDManagerDashboardComponent extends MainComponent {
                     className: "text-center",
                     classNameColumn: "",
                     content: (problem) => el('a', {
-                        href: `Activity.php?action=displayLastActivity&problemID=${problem.problemID}`,
+                        href: `SRActivity.php?action=displayActivity&serviceRequestId=${problem.problemID}`,
                         target: '_blank'
                     }, problem.problemID)
                 },
@@ -488,6 +488,9 @@ class SDManagerDashboardComponent extends MainComponent {
                     key: "dateTime",
                     content: serviceRequest => {
                         const dateTime = moment(serviceRequest.dateTime, 'YYYY-MM-DD HH:mm:ss');
+                        if(!dateTime.isValid()){
+                            return null;
+                        }
                         return dateTime.format('DD/MM/YYYY HH:mm');
                     },
                     hdToolTip: "Time",
@@ -505,7 +508,7 @@ class SDManagerDashboardComponent extends MainComponent {
                     sortable: false,
                     className: "text-center",
                     content: (problem => {
-                        if (!problem.dateTime) {
+                        if (!problem.fixedDate) {
                             return null;
                         }
                         return moment(problem.fixedDate, 'YYYY-MM-DD').format('DD/MM/YYYY')

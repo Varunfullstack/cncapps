@@ -1,8 +1,6 @@
 <?php
 
-
 namespace CNCLTD\SDManagerDashboard;
-
 
 use BUActivity;
 use CNCLTD\Utils;
@@ -128,6 +126,10 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
      * @var bool|float|int|string|null
      */
     private $fixedTeamId;
+    /**
+     * @var bool|float|int|string|null
+     */
+    private $queueNo;
 
 
     /**
@@ -146,11 +148,10 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
             $buActivity    = new BUActivity($stuff);
             $activityCount = $buActivity->getActivityCount($serviceRequestId);
         }
-
         $buActivity      = new BUActivity($stuff);
         $usedMinutes     = 0;
         $assignedMinutes = 0;
-        switch ($problem->getValue(DBEJProblem::teamID)) {
+        switch ($problem->getValue(DBEJProblem::QUEUE_TEAM_ID)) {
             case 1:
             {
                 $usedMinutes     = $buActivity->getHDTeamUsedTime($serviceRequestId);
@@ -178,9 +179,7 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
             default:
                 break;
         }
-
-        $minutesRemaining = $assignedMinutes - $usedMinutes;
-
+        $minutesRemaining                     = $assignedMinutes - $usedMinutes;
         $instance->hoursRemainingForSLA       = $problem->getValue(DBEJProblem::hoursRemainingForSLA);
         $instance->isBeingWorkedOn            = $problem->isRequestBeingWorkedOn();
         $instance->status                     = $problem->getValue(DBEJProblem::status);
@@ -211,7 +210,7 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
         $instance->fixedDate                  = $problem->getValue(DBEJProblem::FIXED_DATE);
         $instance->engineerFixedName          = $problem->getValue(DBEJProblem::ENGINEER_FIXED_NAME);
         $instance->fixedTeamId                = $problem->getValue(DBEJProblem::FIXED_TEAM_ID);
-
+        $instance->queueNo                    = $problem->getValue(DBEJProblem::queueNo);
         return $instance;
     }
 
@@ -260,6 +259,7 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
             "fixedDate"                  => $this->fixedDate,
             "engineerFixedName"          => $this->engineerFixedName,
             "fixedTeamId"                => $this->fixedTeamId,
+            "queueNo"                    => $this->queueNo,
         ];
     }
 

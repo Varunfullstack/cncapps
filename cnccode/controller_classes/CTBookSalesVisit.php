@@ -441,7 +441,7 @@ class CTBookSalesVisit extends CTCNC
         $bookedActivityURL = '';
         if ($bookedActivity) {
             $bookedActivityURL = Controller::buildLink(
-                'Activity.php',
+                'SRActivity.php',
                 array(
                     'action'         => 'displayActivity',
                     'callActivityID' => $bookedActivity

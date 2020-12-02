@@ -52,9 +52,9 @@ class CTSRActivity extends CTCNC
     const SAVE_MANAGEMENT_REVIEW_DETAILS                         = "saveManagementReviewDetails";
     const CHANGE_PROBLEM_PRIORITY                                = "changeProblemPriority";
     const USED_BUDGET_DATA                                       = "usedBudgetData";
-    const UPLOAD_INTERNAL_DOCUMENT                        = "uploadInternalDocument";
-    const VIEW_INTERNAL_DOCUMENT                          = 'viewInternalDocument';
-    const DELETE_INTERNAL_DOCUMENT                        = 'deleteInternalDocument';
+    const UPLOAD_INTERNAL_DOCUMENT                               = "uploadInternalDocument";
+    const VIEW_INTERNAL_DOCUMENT                                 = 'viewInternalDocument';
+    const DELETE_INTERNAL_DOCUMENT                               = 'deleteInternalDocument';
     public  $serverGuardArray = array(
         ""  => "Please select",
         "Y" => "ServerGuard Related",
@@ -77,7 +77,7 @@ class CTSRActivity extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles                                  = [
+        $roles                            = [
             SALES_PERMISSION,
             ACCOUNTS_PERMISSION,
             TECHNICAL_PERMISSION,
@@ -86,7 +86,7 @@ class CTSRActivity extends CTCNC
             MAINTENANCE_PERMISSION,
             RENEWALS_PERMISSION,
         ];
-        $this->buActivity                       = new BUActivity($this);
+        $this->buActivity                 = new BUActivity($this);
         $this->internalDocumentRepository = new InternalDocumentRepository();
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
@@ -303,6 +303,7 @@ class CTSRActivity extends CTCNC
             "problemStatus"                   => $dbejCallActivity->getValue(DBEJCallActivity::problemStatus),
             "serverGuard"                     => $dbejCallActivity->getValue(DBEJCallActivity::serverGuard),
             "problemHideFromCustomerFlag"     => $dbeProblem->getValue(DBEProblem::hideFromCustomerFlag),
+            "serviceRequestEmailSubject"      => $dbeProblem->getValue(DBEProblem::emailSubjectSummary),
             "canEdit"                         => $buActivity->checkActivityEditionByProblem(
                 $dbejCallActivity,
                 $this,

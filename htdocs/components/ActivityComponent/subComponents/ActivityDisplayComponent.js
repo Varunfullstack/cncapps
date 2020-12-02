@@ -142,7 +142,7 @@ class ActivityDisplayComponent extends MainComponent {
                     {data?.contactMobilePhone ?
                         <a href={`tel:${data?.contactMobilePhone}`}>{data?.contactMobilePhone}</a> : null
                     }
-                    <a href={`mailto:${data?.contactEmail}?subject=Service Request ${data?.problemID}`}>
+                    <a href={`mailto:${data?.contactEmail}?subject=${data?.serviceRequestEmailSubject}`}>
                         <i className="fal fa-envelope ml-5"/>
                     </a>
                 </div>
@@ -180,7 +180,7 @@ class ActivityDisplayComponent extends MainComponent {
                     target: "_blank"
                 })
             }),
-            this.getGab(),
+            this.getSpacer(),
             data?.canEdit == 'ALL_GOOD' ? el(ToolTip, {
                 title: "Edit",
                 content: el('a', {
@@ -203,7 +203,7 @@ class ActivityDisplayComponent extends MainComponent {
                 title: "Delete Activity",
                 content: el('i', {className: "fal fa-trash-alt fa-2x m-5 pointer  icon-disable",})
             }) : null,
-            this.getGab(),
+            this.getSpacer(),
             data?.linkedSalesOrderID ? el(ToolTip, {
                 title: "Sales Order",
                 content: el('a', {
@@ -244,7 +244,7 @@ class ActivityDisplayComponent extends MainComponent {
                 })
             }),
 
-            this.getGab(),
+            this.getSpacer(),
             el(ToolTip, {
                 title: "Contact SR History",
                 content: el('a', {
@@ -260,15 +260,14 @@ class ActivityDisplayComponent extends MainComponent {
                     target: "_blank"
                 })
             }),
-            this.getGab(),
-            (data?.activityTypeHasExpenses) ? el(ToolTip, {
+            this.getSpacer(),
+            this.shouldShowExpenses(data, currentUser) ? el(ToolTip, {
                 title: "Expenses",
                 content: el('a', {
                     className: "fal fa-coins fa-2x m-5 pointer icon",
                     href: `Expense.php?action=view&callActivityID=${data?.callActivityID}`
                 })
-            }) : this.getGab(),
-            //(currentUser.isExpenseApprover||currentUser.globalExpenseApprover)? el(ToolTip,{title:"Expenses",content: el('a',{className:"fal fa-coins fa-2x m-5 pointer icon",href:`Expense.php?action=view&callActivityID=${data?.callActivityID}`})}):this.getGab(),
+            }) : this.getSpacer(),
             data?.problemStatus !== "C" ? el(ToolTip, {
                 title: "Add Travel",
                 content: el('a', {
@@ -282,7 +281,7 @@ class ActivityDisplayComponent extends MainComponent {
                     className: "fal fa-eye-slash fa-2x m-5 pointer icon",
                     onClick: () => this.handleUnhideSR(data)
                 })
-            }) : this.getGab(),
+            }) : this.getSpacer(),
             el(ToolTip, {
                 title: "Calendar",
                 content: el('a', {
@@ -303,10 +302,15 @@ class ActivityDisplayComponent extends MainComponent {
                     className: "fal fa-envelope fa-2x m-5 pointer icon",
                     onClick: () => this.handleConfirmEmail(data)
                 })
-            }) : this.getGab(),
+            }) : this.getSpacer(),
         );
     }
-    getGab = () => {
+
+    shouldShowExpenses(data, currentUser) {
+        return data?.activityTypeHasExpenses && (data.userID == currentUser.id || currentUser.globalExpenseApprover || currentUser.isExpenseApprover);
+    }
+
+    getSpacer = () => {
         return this.el('span', {style: {width: 35}})
     }
     handleConfirmEmail = async (data) => {
@@ -726,7 +730,7 @@ class ActivityDisplayComponent extends MainComponent {
                     el('tr', null,
                         el('td', {colSpan: 4}),
                         el('td', {className: "display-label"}, "Asset"),
-                        el('td', {colSpan: 3}, data?.assetName),
+                        el('td', {colSpan: 3}, data?.assetName || (data?.emptyAssetReason && data.emptyAssetReason.substr(0, 20)) || ''),
                     ),
 
                     data?.currentUser ? el('tr', null,
@@ -759,44 +763,64 @@ class ActivityDisplayComponent extends MainComponent {
         const {data, currentUser} = this.state;
         const {el} = this;
         const totalExpenses = data?.expenses.map(e => e.value).reduce((p, c) => p + c, 0);
-        //if(currentUser.isExpenseApprover||currentUser.globalExpenseApprover)
-        if (data?.activityTypeHasExpenses) {
-            let columns = [
-                {
-                    path: "expenseType",
-                    label: "Expense",
-                    sortable: false,
-                    footerContent: (c) => el('label', null, 'Total')
-                },
-                {
-                    path: "mileage",
-                    label: "Miles",
-                    sortable: false,
-                },
-                {
-                    path: "value",
-                    label: "Amount",
-                    sortable: false,
-                    footerContent: (c) => el('label', null, totalExpenses)
-                },
-                {
-                    path: "vatFlag",
-                    label: "VAT included",
-                    sortable: false,
-                },
-            ]
-            return el('div', {className: "activities-container"},
-                el('label', {style: {display: "block"}}, "Expenses"),
-                el(Table, {
-                    id: "expenses",
-                    data: data?.expenses || [],
-                    columns: columns,
-                    pk: "id",
-                    search: false,
-                    hasFooter: true
+        if (!this.shouldShowExpenses(data, currentUser)) {
+            return '';
+        }
+
+        let columns = [
+            {
+                path: "expenseType",
+                label: "Expense",
+                sortable: false,
+                footerContent: (c) => el('label', null, 'Total')
+            },
+            {
+                path: "mileage",
+                label: "Miles",
+                sortable: false,
+            },
+            {
+                path: "value",
+                label: "Amount",
+                sortable: false,
+                footerContent: (c) => el('label', null, totalExpenses)
+            },
+            {
+                path: "vatFlag",
+                label: "VAT included",
+                sortable: false,
+            },
+        ]
+
+        return el(
+            "div",
+            {className: "round-container"},
+            el(
+                "div",
+                {className: "flex-row"},
+                el(
+                    "label",
+                    {className: "label mt-5 mr-3 ml-1 mb-5", style: {display: "block"}},
+                    "Internal Notes"
+                ),
+                el(ToolTip, {
+                    width: 15,
+                    title:
+                        "These are the Expenses associated with this activity.",
+                    content: el("i", {
+                        className: "fal fa-info-circle mt-5 pointer icon",
+                    }),
                 })
-            );
-        } else return null;
+            ),
+            el(Table, {
+                id: "expenses",
+                data: data?.expenses || [],
+                columns: columns,
+                pk: "id",
+                search: false,
+                hasFooter: true
+            })
+        );
     }
     // Parts used, change requestm and sales request
     handleTemplateChanged = (event) => {

@@ -31,14 +31,14 @@ class BUDailyReport extends Business
 
     function getOutstandingReportAvailableYears()
     {
-        $query = "SELECT  DISTINCT YEAR(date) AS year  FROM  sevenDayersPerformanceLog";
+        $query  = "SELECT  DISTINCT YEAR(date) AS year  FROM  sevenDayersPerformanceLog";
         $result = $this->db->query($query);
         return array_map(function ($item) { return $item['year']; }, $result->fetch_all(MYSQLI_ASSOC));
     }
 
     function getOutstandingReportPerformanceDataForYear($year)
     {
-        $query = "SELECT
+        $query  = "SELECT
   avg(olderThan7Days) as olderThan7DaysAvg,
   avg(target) as targetAvg,
   `month`
@@ -58,10 +58,10 @@ GROUP BY t.month;
 
     function getOutstandingReportPerformanceDataBetweenDates(DateTime $startDate, DateTime $endDate)
     {
-        $query = "SELECT *  FROM sevenDayersPerformanceLog where `date` between ? and ?";
+        $query           = "SELECT *  FROM sevenDayersPerformanceLog where `date` between ? and ?";
         $startDateString = $startDate->format(DATE_MYSQL_DATE);
-        $endDateString = $endDate->format(DATE_MYSQL_DATE);
-        $statement = $this->db->prepare($query);
+        $endDateString   = $endDate->format(DATE_MYSQL_DATE);
+        $statement       = $this->db->prepare($query);
         $statement->bind_param('ss', $startDateString, $endDateString);
         $statement->execute();
         $result = $statement->get_result();
@@ -71,15 +71,13 @@ GROUP BY t.month;
     function fixedIncidents($daysAgo, $generateLog = false)
     {
         $this->setMethodName('fixedIncidents');
-
         $fixedRequests = $this->getFixedRequests($daysAgo);
-        $row = $fixedRequests->fetch_row();
-        $requests = 0;
+        $row           = $fixedRequests->fetch_row();
+        $requests      = 0;
         if ($row) {
             $requests = 1;
             $template = new Template (
-                EMAIL_TEMPLATE_DIR,
-                "remove"
+                EMAIL_TEMPLATE_DIR, "remove"
             );
             $template->set_file(
                 'page',
@@ -90,11 +88,9 @@ GROUP BY t.month;
                 'requestBlock',
                 'requests'
             );
-
             /* csv file template */
             $csvTemplate = new Template (
-                EMAIL_TEMPLATE_DIR,
-                "remove"
+                EMAIL_TEMPLATE_DIR, "remove"
             );
             $csvTemplate->set_file(
                 'page',
@@ -105,28 +101,22 @@ GROUP BY t.month;
                 'requestBlock',
                 'requests'
             );
-
             $controller = new Controller(
                 '', $nothing, $nothing, $nothing, $nothing
             );
-
             do {
 
-                $urlRequest =
-                    $controller->buildLink(
-                        SITE_URL . '/Activity.php',
-                        array(
-                            'problemID' => $row[1],
-                            'action'    => 'displayLastActivity'
-                        )
-                    );
-
+                $urlRequest  = $controller->buildLink(
+                    SITE_URL . '/SRActivity.php',
+                    array(
+                        'serviceRequestId' => $row[1]
+                    )
+                );
                 $description = substr(
                     Utils::stripEverything($row[3]),
                     0,
                     50
                 );
-
                 $template->setVar(
                     array(
                         'customer'          => $row[0],
@@ -141,13 +131,11 @@ GROUP BY t.month;
                         'urlRequest'        => $urlRequest
                     )
                 );
-
                 $template->parse(
                     'requests',
                     'requestBlock',
                     true
                 );
-
                 $csvTemplate->setVar(
                     array(
                         'customer'          => $row[0],
@@ -161,7 +149,6 @@ GROUP BY t.month;
                         'contract'          => $row[8]
                     )
                 );
-
                 $csvTemplate->parse(
                     'requests',
                     'requestBlock',
@@ -169,7 +156,6 @@ GROUP BY t.month;
                 );
                 $requests++;
             } while ($row = $fixedRequests->fetch_row());
-
             $template->setVar(
                 [
                     'totalRequests' => $requests - 1
@@ -180,29 +166,24 @@ GROUP BY t.month;
                 'page',
                 true
             );
-
             $body = $template->get_var('output');
-
             $csvTemplate->parse(
                 'output',
                 'page',
                 true
             );
-
             $csvFileString = $csvTemplate->get_var('output');
-
             $this->sendByEmailTo(
                 'fixedyesterday@' . CONFIG_PUBLIC_DOMAIN,
                 'Service requests fixed yesterday',
                 $body,
                 $csvFileString
             );
-
             echo $body;
 
         }
         if ($generateLog) {
-            $date = (new DateTime('yesterday'))->format(DATE_MYSQL_DATE);
+            $date  = (new DateTime('yesterday'))->format(DATE_MYSQL_DATE);
             $query = "INSERT INTO sevenDayersPerformanceLog (date, totalClosedSRs) VALUES ('$date', $requests)  ON DUPLICATE KEY UPDATE totalClosedSRs = $requests;";
             $this->db->query($query);
         }
@@ -210,8 +191,7 @@ GROUP BY t.month;
 
     function getFixedRequests($daysAgo = 1)
     {
-        $sql =
-            "SELECT 
+        $sql = "SELECT 
         cus_name AS `customer`,
         pro_problemno AS `requestID`,
         cns_name AS `fixedBy`,
@@ -246,7 +226,6 @@ GROUP BY t.month;
         ) 
       ORDER BY customer,
         pro_problemno ";
-
         return $this->db->query($sql);
     } // end function outstandingIncidents
 
@@ -258,21 +237,17 @@ GROUP BY t.month;
     )
     {
 
-        $buMail = new BUMail($this);
-
-        $hdrs = array(
+        $buMail            = new BUMail($this);
+        $hdrs              = array(
             'From'         => $senderEmail,
             'To'           => $toEmail,
             'Subject'      => $subject,
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
-
         $cssToInlineStyles = new CssToInlineStyles();
-        $body = $cssToInlineStyles->convert($body);
-
+        $body              = $cssToInlineStyles->convert($body);
         $buMail->mime->setHTMLBody($body);
-
         if ($attachment) {
             $buMail->mime->addAttachment(
                 $attachment,
@@ -281,24 +256,20 @@ GROUP BY t.month;
                 false
             );
         }
-
         $mime_params = array(
             'text_encoding' => '7bit',
             'text_charset'  => 'UTF-8',
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
+        $body        = $buMail->mime->get($mime_params);
+        $hdrs        = $buMail->mime->headers($hdrs);
         $buMail->putInQueue(
             $senderEmail,
             $toEmail,
             $hdrs,
             $body      // to SD Managers
         );
-
         echo "SENT";
 
     } // end function
@@ -330,65 +301,51 @@ GROUP BY t.month;
     {
 
         $this->setMethodName('outstandingIncidents');
-
         $outstandingRequests = $this->getOustandingRequests(
             $daysAgo,
             $priorityFiveOnly
         );
-        $totalRequests = 0;
-        $openFor = 0;
+        $totalRequests       = 0;
+        $openFor             = 0;
         if ($row = $outstandingRequests->fetch_row()) {
 
             $template = new Template (
-                EMAIL_TEMPLATE_DIR,
-                "remove"
+                EMAIL_TEMPLATE_DIR, "remove"
             );
-
             $template->set_file(
                 'page',
                 'ServiceOutstandingReportEmail.inc.html'
             );
-
             $template->set_block(
                 'page',
                 'requestBlock',
                 'requests'
             );
-
             $csvTemplate = new Template (
-                EMAIL_TEMPLATE_DIR,
-                "remove"
+                EMAIL_TEMPLATE_DIR, "remove"
             );
-
             $csvTemplate->set_file(
                 'page',
                 'ServiceOutstandingReportEmail.inc.csv'
             );
-
             $csvTemplate->set_block(
                 'page',
                 'requestBlock',
                 'requests'
             );
-
             $controller = new Controller(
                 '', $nothing, $nothing, $nothing, $nothing
             );
-
-            $buHeader = new BUHeader($this);
-            $dsHeader = new DataSet($this);
+            $buHeader   = new BUHeader($this);
+            $dsHeader   = new DataSet($this);
             $buHeader->getHeader($dsHeader);
-
             do {
-                $urlRequest =
-                    $controller->buildLink(
-                        SITE_URL . '/Activity.php',
-                        array(
-                            'problemID' => $row[1],
-                            'action'    => 'displayLastActivity'
-                        )
-                    );
-
+                $urlRequest = $controller->buildLink(
+                    SITE_URL . '/SRActivity.php',
+                    array(
+                        'serviceRequestId' => $row[1]
+                    )
+                );
                 $template->setVar(
                     array(
                         'customer'            => $row[0],
@@ -416,7 +373,6 @@ GROUP BY t.month;
                         'redThreshold'        => $dsHeader->getValue(DBEHeader::sevenDayerRedDays)
                     )
                 );
-
                 $csvTemplate->setVar(
                     array(
                         'customer'         => $row[0],
@@ -439,7 +395,6 @@ GROUP BY t.month;
                         'awaiting'         => $row[10] == 'I' ? 'Not Started' : ($row[9] == 'Y' ? 'Customer' : 'CNC'),
                     )
                 );
-
                 $template->parse(
                     'requests',
                     'requestBlock',
@@ -454,42 +409,35 @@ GROUP BY t.month;
                 $openFor += $row[4];
 
             } while ($row = $outstandingRequests->fetch_row());
-
             $csvTemplate->parse(
                 'output',
                 'page',
                 true
             );
-            $csvFile = $csvTemplate->get_var('output');
-            $select = "";
+            $csvFile     = $csvTemplate->get_var('output');
+            $select      = "";
             $performance = "";
             if ($dashboard) {
 
                 $select = '<div style="width: 150px;display: inline-block">Select Days:</div><select onchange="changeDays()">';
-
                 foreach ([0, 1, 2, 3, 4, 5, 6, 7] as $day) {
 
                     $selected = $daysAgo == $day ? 'selected' : '';
-
-                    $select .= '<option ' . $selected . ' value="' . $day . '">' . $day . '</option>';
+                    $select   .= '<option ' . $selected . ' value="' . $day . '">' . $day . '</option>';
 
                 }
-                $select .= '</select>';
-
-                $query = "SELECT  DISTINCT YEAR(date) AS YEAR  FROM  sevenDayersPerformanceLog";
-                $result = $this->db->query($query);
-                $data = $result->fetch_all(MYSQLI_ASSOC);
-
+                $select       .= '</select>';
+                $query        = "SELECT  DISTINCT YEAR(date) AS YEAR  FROM  sevenDayersPerformanceLog";
+                $result       = $this->db->query($query);
+                $data         = $result->fetch_all(MYSQLI_ASSOC);
                 $selectedYear = $selectedYear ? $selectedYear : (new DateTime())->format('Y');
-
-                $performance = '<script> function yearChanged(){
+                $performance  = '<script> function yearChanged(){
                  let url = new URL(location.href);
                  url.searchParams.set("selectedYear", this.event.target.value);
                  location.href = url.toString();
 } </script>   
                 <select name="searchYear" id="yearSelector" onchange="yearChanged()">
                    ';
-
                 foreach ($data as $datum) {
                     $performance .= '<option value="' . $datum['YEAR'] . '"';
                     if ($datum['YEAR'] == $selectedYear) {
@@ -497,7 +445,6 @@ GROUP BY t.month;
                     }
                     $performance .= '>' . $datum['YEAR'] . '</option>';
                 }
-
                 $performance .= '
                 </select>
 <table id="team-performance">
@@ -557,7 +504,6 @@ GROUP BY t.month;
                 $openFor / $totalRequests,
                 1
             ) : null;
-
             if ($generateLog) {
                 $date = (new DateTime('yesterday'))->format(DATE_MYSQL_DATE);
                 // we don't have an entry for today ..so create it
@@ -580,24 +526,19 @@ GROUP BY t.month;
                     'isDashboard'        => $dashboard ? 'true' : 'false'
                 )
             );
-
-
             if (!$onScreen) {
                 if ($priorityFiveOnly) {
                     $subject = 'Priority 5';
                 } else {
                     $subject = 'Priority 1-4';
                 }
-
                 $subject .= ' SRs Outstanding For ' . $daysAgo . ' Days';
-
                 $template->parse(
                     'output',
                     'page',
                     true
                 );
                 $body = $template->get_var('output');
-
                 $this->sendByEmailTo(
                     'sropenfordays@' . CONFIG_PUBLIC_DOMAIN,
                     $subject,
@@ -611,14 +552,11 @@ GROUP BY t.month;
                             $csvFile
                         ) . '" download="outstanding.csv">Download CSV</a>';
                 }
-
                 $template->setVar(
                     [
                         'csvLink' => $csvLink
                     ]
-
                 );
-
                 $template->parse(
                     'output',
                     'page',
@@ -626,7 +564,6 @@ GROUP BY t.month;
                 );
                 $body = $template->get_var('output');
             }
-
             if ($dashboard) {
                 return $body;
             } else {
@@ -640,8 +577,7 @@ GROUP BY t.month;
                                    $priorityFiveOnly = false
     )
     {
-        $sql =
-            "SELECT 
+        $sql = "SELECT 
         cus_name AS `customer`,
         pro_problemno AS `requestID`,
         cns_name AS `assignedTo`,
@@ -679,16 +615,13 @@ GROUP BY t.month;
           DATE(pro_date_raised) <= DATE(
           DATE_SUB(NOW(), INTERVAL $daysAgo DAY)) 
           AND pro_status NOT IN ('F', 'C')";
-
         if ($priorityFiveOnly) {
             $sql .= " AND pro_priority = 5";
         } else {
             $sql .= " AND pro_priority < 5";
         }
-
         $sql .= "      ORDER BY customer,
         pro_problemno";
-
         return $this->db->query($sql);
     } // end function
 
@@ -696,49 +629,39 @@ GROUP BY t.month;
     {
 
         $this->setMethodName('focActivities');
-
         $activities = $this->getFocActivities($daysAgo);
-
         if ($row = $activities->fetch_row()) {
 
             $template = new Template (
-                EMAIL_TEMPLATE_DIR,
-                "remove"
+                EMAIL_TEMPLATE_DIR, "remove"
             );
-
             $template->set_file(
                 'page',
                 'ServiceFocReportEmail.inc.html'
             );
-
             $template->set_block(
                 'page',
                 'activityBlock',
                 'activities'
             );
-
             $controller = new Controller(
                 '', $nothing, $nothing, $nothing, $nothing
             );
             do {
 
-                $urlRequest =
-                    $controller->buildLink(
-                        SITE_URL . '/Activity.php',
-                        array(
-                            'problemID' => $row[1],
-                            'action'    => 'displayLastActivity'
-                        )
-                    );
-
-                $urlActivity =
-                    $controller->buildLink(
-                        SITE_URL . '/Activity.php',
-                        array(
-                            'callActivityID' => $row[2],
-                            'action'         => 'displayActivity'
-                        )
-                    );
+                $urlRequest  = $controller->buildLink(
+                    SITE_URL . '/SRActivity.php',
+                    array(
+                        'serviceRequestId' => $row[1],
+                    )
+                );
+                $urlActivity = $controller->buildLink(
+                    SITE_URL . '/SRActivity.php',
+                    array(
+                        'callActivityID' => $row[2],
+                        'action'         => 'displayActivity'
+                    )
+                );
                 $template->setVar(
                     array(
                         'customer'         => $row[0],
@@ -755,7 +678,6 @@ GROUP BY t.month;
                         'urlActivity'      => $urlActivity
                     )
                 );
-
                 $template->parse(
                     'activities',
                     'activityBlock',
@@ -763,21 +685,17 @@ GROUP BY t.month;
                 );
 
             } while ($row = $activities->fetch_row());
-
             $template->parse(
                 'output',
                 'page',
                 true
             );
-
             $body = $template->get_var('output');
-
             $this->sendByEmailTo(
                 'focyesterday@' . CONFIG_PUBLIC_DOMAIN,
                 'FOC activities logged yesterday',
                 $body
             );
-
             echo $body;
 
         }
@@ -786,8 +704,7 @@ GROUP BY t.month;
 
     function getFocActivities($daysAgo = 1)
     {
-        $sql =
-            "SELECT
+        $sql = "SELECT
           cus_name AS `customer`,
           caa_problemno AS `requestID`,
           caa_callactivityno AS `activityID`,
@@ -814,57 +731,45 @@ GROUP BY t.month;
           hours >= .5
         ORDER BY
           cus_name, caa_problemno";
-
         return $this->db->query($sql);
     }
 
     function prepayOverValue($daysAgo)
     {
         $this->setMethodName('focActivities');
-
         $activities = $this->getPrePayActivitiesOverValue($daysAgo);
-
         if ($row = $activities->fetch_row()) {
 
             $template = new Template (
-                EMAIL_TEMPLATE_DIR,
-                "remove"
+                EMAIL_TEMPLATE_DIR, "remove"
             );
-
             $template->set_file(
                 'page',
                 'ServicePrepayOverValueReportEmail.inc.html'
             );
-
             $template->set_block(
                 'page',
                 'activityBlock',
                 'activities'
             );
-
             $controller = new Controller(
                 '', $nothing, $nothing, $nothing, $nothing
             );
-
             do {
 
-                $urlRequest =
-                    $controller->buildLink(
-                        SITE_URL . '/Activity.php',
-                        array(
-                            'problemID' => $row[1],
-                            'action'    => 'displayLastActivity'
-                        )
-                    );
-
-                $urlActivity =
-                    $controller->buildLink(
-                        SITE_URL . '/Activity.php',
-                        array(
-                            'callActivityID' => $row[2],
-                            'action'         => 'displayActivity'
-                        )
-                    );
+                $urlRequest  = $controller->buildLink(
+                    SITE_URL . '/SRActivity.php',
+                    array(
+                        'serviceRequestId' => $row[1],
+                    )
+                );
+                $urlActivity = $controller->buildLink(
+                    SITE_URL . '/SRActivity.php',
+                    array(
+                        'callActivityID' => $row[2],
+                        'action'         => 'displayActivity'
+                    )
+                );
                 $template->setVar(
                     array(
                         'customer'         => $row[0],
@@ -880,7 +785,6 @@ GROUP BY t.month;
                         'contract'         => $row[8]
                     )
                 );
-
                 $template->parse(
                     'activities',
                     'activityBlock',
@@ -888,17 +792,13 @@ GROUP BY t.month;
                 );
 
             } while ($row = $activities->fetch_row());
-
             $template->parse(
                 'output',
                 'page',
                 true
             );
-
             $body = $template->get_var('output');
-
             echo $body;
-
             $this->sendByEmailTo(
                 CONFIG_SALES_MANAGER_EMAIL,
                 'Pre-pay activities logged yesterday over GBP 100 in value',
@@ -912,8 +812,7 @@ GROUP BY t.month;
 
     function getPrePayActivitiesOverValue($daysAgo = 1)
     {
-        $sql =
-            "SELECT
+        $sql = "SELECT
           cus_name AS `customer`,
           caa_problemno AS `requestID`,
           caa_callactivityno AS `activityID`,
@@ -939,66 +838,50 @@ GROUP BY t.month;
          Cost >= 100
         ORDER BY
           cus_name, caa_problemno";
-
         return $this->db->query($sql);
     }
 
     public function p5IncidentsWithoutSalesOrders()
     {
         $this->setMethodName('outstandingIncidents');
-
         $outstandingRequests = $this->getP5IncidentsWithoutSalesOrders();
-
         if ($row = $outstandingRequests->fetch_row()) {
 
             $template = new Template (
-                EMAIL_TEMPLATE_DIR,
-                "remove"
+                EMAIL_TEMPLATE_DIR, "remove"
             );
-
             $template->set_file(
                 'page',
                 'P5NoSalesReportEmail.inc.html'
             );
-
             $template->set_block(
                 'page',
                 'requestBlock',
                 'requests'
             );
-
             $csvTemplate = new Template (
-                EMAIL_TEMPLATE_DIR,
-                "remove"
+                EMAIL_TEMPLATE_DIR, "remove"
             );
-
             $csvTemplate->set_file(
                 'page',
                 'P5NoSalesReportEmail.inc.csv'
             );
-
             $csvTemplate->set_block(
                 'page',
                 'requestBlock',
                 'requests'
             );
-
             $controller = new Controller(
                 '', $nothing, $nothing, $nothing, $nothing
             );
-
-            $title = "P5 SRs with no SO";
-
+            $title      = "P5 SRs with no SO";
             do {
-                $urlRequest =
-                    $controller->buildLink(
-                        SITE_URL . '/Activity.php',
-                        array(
-                            'problemID' => $row[1],
-                            'action'    => 'displayLastActivity'
-                        )
-                    );
-
+                $urlRequest = $controller->buildLink(
+                    SITE_URL . '/SRActivity.php',
+                    array(
+                        'serviceRequestId' => $row[1],
+                    )
+                );
                 $template->setVar(
                     array(
                         'customer'         => $row[0],
@@ -1014,7 +897,6 @@ GROUP BY t.month;
                         'title'            => $title
                     )
                 );
-
                 $csvTemplate->setVar(
                     array(
                         'customer'         => $row[0],
@@ -1032,7 +914,6 @@ GROUP BY t.month;
                         'durationHours'    => $row[4],
                     )
                 );
-
                 $template->parse(
                     'requests',
                     'requestBlock',
@@ -1045,30 +926,25 @@ GROUP BY t.month;
                 );
 
             } while ($row = $outstandingRequests->fetch_row());
-
             $template->parse(
                 'output',
                 'page',
                 true
             );
             $body = $template->get_var('output');
-
             $csvTemplate->parse(
                 'output',
                 'page',
                 true
             );
             $csvFile = $csvTemplate->get_var('output');
-
             $subject = $title;
-
             $this->sendByEmailTo(
                 ' nosalesorder@' . CONFIG_PUBLIC_DOMAIN,
                 $subject,
                 $body,
                 $csvFile
             );
-
             echo $body;
 
         }
@@ -1100,59 +976,44 @@ GROUP BY t.month;
     public function p5WithSalesOrderAndContractAssigned()
     {
         $this->setMethodName('outstandingIncidents');
-
         $outstandingRequests = $this->getP5WithSalesOrdersAndContractAssigned();
-
         if ($row = $outstandingRequests->fetch_row()) {
 
             $template = new Template (
-                EMAIL_TEMPLATE_DIR,
-                "remove"
+                EMAIL_TEMPLATE_DIR, "remove"
             );
-
             $template->set_file(
                 'page',
                 'P5WithSalesAndContractReportEmail.inc.html'
             );
-
             $template->set_block(
                 'page',
                 'requestBlock',
                 'requests'
             );
-
             $csvTemplate = new Template (
-                EMAIL_TEMPLATE_DIR,
-                "remove"
+                EMAIL_TEMPLATE_DIR, "remove"
             );
-
             $csvTemplate->set_file(
                 'page',
                 'P5WithSalesAndContractReportEmail.inc.csv'
             );
-
             $csvTemplate->set_block(
                 'page',
                 'requestBlock',
                 'requests'
             );
-
-            $title = "P5 SRs with SO and not T&M";
-
+            $title      = "P5 SRs with SO and not T&M";
             $controller = new Controller(
                 '', $nothing, $nothing, $nothing, $nothing
             );
-
             do {
-                $urlRequest =
-                    $controller->buildLink(
-                        SITE_URL . '/Activity.php',
-                        array(
-                            'problemID' => $row[1],
-                            'action'    => 'displayLastActivity'
-                        )
-                    );
-
+                $urlRequest = $controller->buildLink(
+                    SITE_URL . '/SRActivity.php',
+                    array(
+                        'serviceRequestId' => $row[1],
+                    )
+                );
                 $template->setVar(
                     array(
                         'customer'         => $row[0],
@@ -1166,7 +1027,6 @@ GROUP BY t.month;
                         'title'            => $title
                     )
                 );
-
                 $csvTemplate->setVar(
                     array(
                         'customer'         => $row[0],
@@ -1182,7 +1042,6 @@ GROUP BY t.month;
                         ),
                     )
                 );
-
                 $template->parse(
                     'requests',
                     'requestBlock',
@@ -1195,30 +1054,25 @@ GROUP BY t.month;
                 );
 
             } while ($row = $outstandingRequests->fetch_row());
-
             $template->parse(
                 'output',
                 'page',
                 true
             );
             $body = $template->get_var('output');
-
             $csvTemplate->parse(
                 'output',
                 'page',
                 true
             );
             $csvFile = $csvTemplate->get_var('output');
-
             $subject = $title;
-
             $this->sendByEmailTo(
                 ' nosalesorder@' . CONFIG_PUBLIC_DOMAIN,
                 $subject,
                 $body,
                 $csvFile
             );
-
             echo $body;
 
         }
@@ -1252,21 +1106,18 @@ WHERE pro_priority = 5
     public function contactOpenSRReport($onScreen = false)
     {
         $this->setMethodName('contactOpenSRReport');
-
         $contactOpenSRReportData = $this->getContactOpenSRReportData();
         global $twig;
         foreach ($contactOpenSRReportData as $contactWithOpenServiceRequests) {
 
-            $body = $twig->render(
+            $body    = $twig->render(
                 '@customerFacing/OpenServiceRequestReport/OpenServiceRequestReport.html.twig',
                 [
                     "data"     => $contactWithOpenServiceRequests,
                     "onScreen" => $onScreen
                 ]
             );
-
             $subject = "Open Service Request Report - " . (new DateTime())->format('Y-m-d');
-
             if (!$onScreen) {
                 $this->sendByEmailTo(
                     $contactWithOpenServiceRequests->getContactEmail(),
@@ -1276,7 +1127,6 @@ WHERE pro_priority = 5
                     'customerReports@' . CONFIG_PUBLIC_DOMAIN
                 );
             }
-
             echo '<br><div>Sent to Email ' . $contactWithOpenServiceRequests->getContactEmail() . '</div><br>';
             echo $body;
         }
@@ -1288,7 +1138,7 @@ WHERE pro_priority = 5
      */
     private function getContactOpenSRReportData()
     {
-        $sql = "SELECT
+        $sql    = "SELECT
 problem.pro_problemno AS id,
 CONCAT_WS(
 ' ',
@@ -1323,15 +1173,11 @@ AND problem.pro_hide_from_customer_flag <> 'Y'
 AND problem.pro_priority >= 1 AND problem.pro_priority <= 4
 AND (contact.supportLevel = 'Main' OR reporter.con_contno = contact.con_contno )
 ORDER BY pro_date_raised";
-
         $result = $this->db->query($sql);
-
         if (!$result) {
             throw  new Exception($this->db->error);
         }
-
         $contactOpenSRReportData = new ContactsWithOpenServiceRequests();
-
         while ($row = $result->fetch_assoc()) {
             $contactOpenSRReportData->add(
                 $row['contactID'],

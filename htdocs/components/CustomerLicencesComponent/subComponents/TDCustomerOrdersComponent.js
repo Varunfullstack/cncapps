@@ -161,7 +161,7 @@ class TDCustomerOrdersComponent extends React.Component {
                 sortable: true,
                 content: (o) =>
                     o.lineStatus !== 'active' ? 'NA' : (o.cncStatus == true ?
-                        el('i', {className: "fa fa-check "}) :
+                        el('i', {className: "fal fa-check "}) :
                         el("label", {
                             key: "divCncStatus" + o.orderNumber,
                             className: "error-message",
@@ -182,7 +182,7 @@ class TDCustomerOrdersComponent extends React.Component {
                                 {
                                     key: "btnManageTenant",
                                     onClick: () => handleAddOns(c),
-                                    className: 'fa  fa-cart-plus pointer',
+                                    className: 'fal fa-cart-plus pointer',
 
                                 },
                             )
@@ -198,7 +198,7 @@ class TDCustomerOrdersComponent extends React.Component {
                             el("i", {
                                 key: "btnManageTenant",
                                 onClick: () => handleManageTenant(c),
-                                className: 'pointer fa fa-pencil',
+                                className: 'pointer fal fa-pencil',
 
                             })
                     })
@@ -216,7 +216,7 @@ class TDCustomerOrdersComponent extends React.Component {
                                 {
                                     key: "btnHistory",
                                     onClick: () => handleOrderHistory(c),
-                                    className: 'fa fa-history pointer'
+                                    className: 'fal fa-history pointer'
                                 }
                             ),
                     })
@@ -340,7 +340,6 @@ class TDCustomerOrdersComponent extends React.Component {
             el("span", {key: "s3", className: "error-message", style: {display: "block"}}, orderUpdateError),
         ]);
         const footer = el(React.Fragment, {key: "footer"}, [
-            el("button", {key: "btnCancel", onClick: handleOnClose}, "Cancel"),
             !inactive
                 ? el(
                 "button",
@@ -358,6 +357,7 @@ class TDCustomerOrdersComponent extends React.Component {
                 "Activate"
                 )
                 : null,
+            el("button", {key: "btnCancel", onClick: handleOnClose}, "Cancel"),
         ]);
         this.setState({
             modalElement: el(Modal, {
@@ -662,7 +662,7 @@ class TDCustomerOrdersComponent extends React.Component {
                                 className: "error-message",
                                 style: {whiteSpace: "nowrap", marginLeft: 0}
                             }, "Not Found") :
-                            el('i', {className: "fa fa-check "})
+                            el('i', {className: "fal fa-check "})
 
                 },
                 {
@@ -670,7 +670,7 @@ class TDCustomerOrdersComponent extends React.Component {
                     label: "Edit",
                     sortable: false,
                     content: (c) =>
-                        el("i", {onClick: () => handleAddonEdit(c), className: 'pointer fa fa-pencil', title: "Edit"})
+                        el("i", {onClick: () => handleAddonEdit(c), className: 'pointer fal fa-pencil', title: "Edit"})
                 },
                 {
                     path: null,
@@ -680,7 +680,7 @@ class TDCustomerOrdersComponent extends React.Component {
                         el("i", {
                             onClick: () => handleAddonHistory(addon),
                             title: "History",
-                            className: 'fa fa-history pointer'
+                            className: 'fal fa-history pointer'
                         }),
                 },
             ];
@@ -866,7 +866,6 @@ class TDCustomerOrdersComponent extends React.Component {
             el("span", {key: "s4", className: "error-message", style: {display: "block"}}, orderUpdateError),
         ]);
         const footer = el(React.Fragment, {key: "footer"}, [
-            el("button", {key: "btnCancel", onClick: handleOnClose}, "Cancel"),
             el(
                 "button",
                 {
@@ -876,6 +875,7 @@ class TDCustomerOrdersComponent extends React.Component {
                 },
                 "Submit"
             ),
+            el("button", {key: "btnCancel", onClick: handleOnClose}, "Cancel"),
         ]);
         this.setState({
             modalElement: el(Modal, {
@@ -935,7 +935,7 @@ class TDCustomerOrdersComponent extends React.Component {
                     title: "Place New Order", content: el('i', {
                         key: 'btnNewOrder',
                         onClick: handleNewOrder,
-                        className: 'fa fa-shopping-cart fa-2x pointer',
+                        className: 'fal fa-shopping-cart fa-2x pointer',
 
                     })
                 })),

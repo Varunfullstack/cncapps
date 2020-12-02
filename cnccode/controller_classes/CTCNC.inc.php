@@ -495,6 +495,7 @@ class CTCNC extends Controller
         );
 
         global $twig;
+        $menu->sort();
         $sideMenu = $twig->render('@internal/sideMenu/sideMenuItems.html.twig', ["sideMenu" => $menu]);
         $this->template->setVar("sideMenu", $sideMenu);
         $favouriteItemsHTML = $twig->render(

@@ -451,7 +451,7 @@ class DBEJProblem extends DBEProblem
                 MAX( ca.caa_callactivityno )
               FROM callactivity ca
               WHERE ca.caa_problemno = pro_problemno
-              AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
+              and ca.caa_callacttypeno NOT IN(43,55,59,60,61)
             ) 
             left join callactivity fixed 
             on fixed.caa_problemno = pro_problemno and fixed.caa_callacttypeno = " . CONFIG_FIXED_ACTIVITY_TYPE_ID . " 
@@ -488,7 +488,7 @@ class DBEJProblem extends DBEProblem
                 MAX( ca.caa_callactivityno )
               FROM callactivity ca
               WHERE ca.caa_problemno = pro_problemno
-              AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
+              and ca.caa_callacttypeno NOT IN(43,55,59,60,61)
             ) 
             left join callactivity fixed 
             on fixed.caa_problemno = pro_problemno and fixed.caa_callacttypeno = " . CONFIG_FIXED_ACTIVITY_TYPE_ID . " 
@@ -538,7 +538,7 @@ class DBEJProblem extends DBEProblem
                 MAX( ca.caa_callactivityno )
               FROM callactivity ca
               WHERE ca.caa_problemno = pro_problemno
-              AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
+              and ca.caa_callacttypeno NOT IN(43,55,59,60,61)
             ) 
            LEFT JOIN consultant ON cns_consno = pro_consno
            left join contact on contact.con_contno = initial.caa_contno
@@ -574,7 +574,7 @@ class DBEJProblem extends DBEProblem
                 MAX( ca.caa_callactivityno )
               FROM callactivity ca
               WHERE ca.caa_problemno = pro_problemno
-              AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
+              and ca.caa_callacttypeno NOT IN(43,55,59,60,61)
             ) 
            LEFT JOIN consultant ON cns_consno = pro_consno
            left join callactivity fixed 
@@ -609,7 +609,7 @@ class DBEJProblem extends DBEProblem
               FROM callactivity ca
               WHERE ca.caa_problemno = pro_problemno
               and (pro_status in ('F','C') and ca.caa_callacttypeno = " . CONFIG_FIXED_ACTIVITY_TYPE_ID . " or (ca.caa_callacttypeno in (4,8) and ca.caa_hide_from_customer_flag = 'N') )
-              AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
+              and ca.caa_callacttypeno NOT IN(43,55,59,60,61)
             ) 
            LEFT JOIN consultant ON cns_consno = pro_consno
            left join callactivity fixed 
@@ -648,7 +648,7 @@ class DBEJProblem extends DBEProblem
                 MAX( ca.caa_callactivityno )
               FROM callactivity ca
               WHERE ca.caa_problemno = pro_problemno
-              AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
+              and ca.caa_callacttypeno NOT IN(43,55,59,60,61)
             ) 
            LEFT JOIN consultant ON cns_consno = pro_consno
            left join callactivity fixed 
@@ -689,7 +689,7 @@ class DBEJProblem extends DBEProblem
                 MAX( ca.caa_callactivityno )
               FROM callactivity ca
               WHERE ca.caa_problemno = pro_problemno
-              AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
+              and ca.caa_callacttypeno NOT IN(43,55,59,60,61)
             ) 
            LEFT JOIN consultant ON cns_consno = pro_consno
            left join callactivity fixed 
@@ -727,7 +727,7 @@ class DBEJProblem extends DBEProblem
                 MAX( ca.caa_callactivityno )
               FROM callactivity ca
               WHERE ca.caa_problemno = pro_problemno
-              AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
+              and ca.caa_callacttypeno NOT IN(43,55,59,60,61)
             ) 
            LEFT JOIN consultant ON cns_consno = pro_consno
            left join callactivity fixed 
@@ -769,7 +769,7 @@ class DBEJProblem extends DBEProblem
                 MAX( ca.caa_callactivityno )
               FROM callactivity ca
               WHERE ca.caa_problemno = pro_problemno
-              AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
+              and ca.caa_callacttypeno NOT IN(43,55,59,60,61)
             ) 
            LEFT JOIN consultant ON cns_consno = pro_consno
            left join callactivity fixed 
@@ -829,7 +829,7 @@ class DBEJProblem extends DBEProblem
                 MAX( ca.caa_callactivityno )
               FROM callactivity ca
               WHERE ca.caa_problemno = pro_problemno
-              AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
+              and ca.caa_callacttypeno NOT IN(43,55,59,60,61)
             ) 
             left join callactivity fixed 
             on fixed.caa_problemno = pro_problemno and fixed.caa_callacttypeno = " . CONFIG_FIXED_ACTIVITY_TYPE_ID . " 
@@ -979,7 +979,7 @@ class DBEJProblem extends DBEProblem
                 MAX( ca.caa_callactivityno )
               FROM callactivity ca
               WHERE ca.caa_problemno = pro_problemno
-              AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
+              and ca.caa_callacttypeno NOT IN(43,55,59,60,61)
             ) 
             left join callactivity fixed 
             on fixed.caa_problemno = pro_problemno and fixed.caa_callacttypeno = " . CONFIG_FIXED_ACTIVITY_TYPE_ID . " 
@@ -1075,7 +1075,7 @@ class DBEJProblem extends DBEProblem
                 MAX( ca.caa_callactivityno )
               FROM callactivity ca
               WHERE ca.caa_problemno = pro_problemno
-              AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
+              and ca.caa_callacttypeno NOT IN(43,55,59,60,61)
             ) 
            LEFT JOIN consultant ON cns_consno = pro_consno
            left join callactivity fixed 

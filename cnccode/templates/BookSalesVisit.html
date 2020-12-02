@@ -173,17 +173,14 @@
                 <div align="right">Meeting Time</div>
             </td>
             <td>
-                <input type="text"
+                <input type="time"
                        name="form[0][meetingTime]"
                        value="{meetingTime}"
                        size="10"
+                       min="08:00:00"
+                       max="18:00:00"
                        maxlength="10"
-                       class="timePicker"
                        required
-                       autocomplete="off"
-                       data-timepicker-min-time="08:00"
-                       data-timepicker-max-time="18:00"
-                       data-timepicker-format="H:i"
                 >
                 <span class="formErrorMessage">{meetingTimeMessage}</span>
             </td>

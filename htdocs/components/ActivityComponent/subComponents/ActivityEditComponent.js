@@ -16,8 +16,11 @@ import Modal from "../../shared/Modal/modal";
 import Toggle from "../../shared/Toggle";
 import CustomerDocumentUploader from "./CustomerDocumentUploader";
 import {InternalDocumentsComponent} from "./InternalDocumentsComponent";
+import {ActivityHeaderComponent} from "./ActivityHeaderComponent";
 
 // noinspection EqualityComparisonWithCoercionJS
+const hiddenAndCustomerNoteAlertMessage = `Customer note must be empty when the activity or entire SR is hidden.`;
+
 class ActivityEditComponent extends MainComponent {
     el = React.createElement;
     api = new APIActivity();
@@ -322,7 +325,6 @@ class ActivityEditComponent extends MainComponent {
                 return false;
             }
             if (data.callActTypeID !== 51) {
-                //CONFIG_INITIAL_ACTIVITY_TYPE_ID
                 const firstActivity = data.activities[0];
                 const startDate =
                     moment(data.date).format("YYYY-MM-DD") + " " + data.startTime;
@@ -487,7 +489,7 @@ class ActivityEditComponent extends MainComponent {
                 el(
                     "a",
                     {
-                        href: `mailto:${currentContact?.contactEmail}?subject=Service Request ${data?.problemID}`,
+                        href: `mailto:${currentContact?.contactEmail}?subject=${data?.serviceRequestEmailSubject}`,
                     },
                     el("i", {className: "fal fa-envelope ml-5"})
                 ),
@@ -809,7 +811,7 @@ class ActivityEditComponent extends MainComponent {
             if (!await this.confirm(`Are you sure you don't want to put an entry for CNC Next Action?`))
                 return false;
         }
-        if (this.checkHiddenFromCustomer(data)) {
+        if (!this.isHiddenFromCustomer(data)) {
             if (this.checkCustomerNotesRequired(type, data)) {
                 this.alert(`Customer Notes are required for ${type.description} when the next action is CNC Action`)
                 return false;
@@ -820,14 +822,14 @@ class ActivityEditComponent extends MainComponent {
             }
         }
         if (this.checkNotHiddenFromCustomerAndCustomerNoteSet(data)) {
-            this.alert(`Hide from customer can't be set because there is a customer note`);
+            this.alert(hiddenAndCustomerNoteAlertMessage);
             return false;
         }
         return true;
     }
 
     checkNotHiddenFromCustomerAndCustomerNoteSet(data) {
-        return this.checkHiddenFromCustomer(data) && data.customerNotesTemplate;
+        return this.isHiddenFromCustomer(data) && data.customerNotesTemplate;
     }
 
     checkCustomerNotesOptionalAndEmptyDescription(type, data) {
@@ -838,8 +840,8 @@ class ActivityEditComponent extends MainComponent {
         return type && type.catRequireCustomerNoteCNCAction == 1 && !data.customerNotesTemplate;
     }
 
-    checkHiddenFromCustomer(data) {
-        return data.hideFromCustomerFlag !== 'Y' && data.problemHideFromCustomerFlag !== 'Y';
+    isHiddenFromCustomer(data) {
+        return data.hideFromCustomerFlag == 'Y' || data.problemHideFromCustomerFlag == 'Y';
     }
 
     checkOptionalCNCActionAndEmptyDescription(type, data) {
@@ -851,6 +853,7 @@ class ActivityEditComponent extends MainComponent {
     }
 
     checkOnHold = async (data, type) => {
+
         if (this.checkNectCNCActionRequiredOnHold(type, data)) {
             this.alert(`CNC Next Action is required for ${type.description} when the next action is On Hold`)
             return false;
@@ -860,7 +863,8 @@ class ActivityEditComponent extends MainComponent {
                 return false;
 
         }
-        if (this.checkHiddenFromCustomer(data)) {
+
+        if (!this.isHiddenFromCustomer(data)) {
             if (this.checkCustomerNotesRequiredOnHold(type, data)) {
                 this.alert(`Customer Notes are required for ${type.description} when the next action is On Hold`)
                 return false;
@@ -871,7 +875,7 @@ class ActivityEditComponent extends MainComponent {
             }
         }
         if (this.checkNotHiddenFromCustomerAndCustomerNoteSet(data)) {
-            this.alert(`Hide from customer can't be set because there is a customer note`);
+            this.alert(hiddenAndCustomerNoteAlertMessage);
             return false;
         }
         return true;
@@ -1791,9 +1795,6 @@ class ActivityEditComponent extends MainComponent {
     handlePriorityTemplateChange = (value) => {
         const {data} = this.state;
         if (value !== "" && value !== undefined) {
-            //data.priorityChangeReason=value;
-            //data.orignalPriority=data.priority;
-            //this.setState({data});
             const payload = {
                 callActivityID: data.callActivityID,
                 priorityChangeReason: value,
@@ -1828,7 +1829,7 @@ class ActivityEditComponent extends MainComponent {
                 style: {width: "100%"},
                 value: this.state.data.assetName || "",
             },
-            el("option", {key: "default", value: ""}, this.state.data.emptyAssetReason || ""),
+            el("option", {key: "default", value: ""}, (this.state.data.emptyAssetReason && this.state.data.emptyAssetReason.substr(0,20) )|| ""),
             assets.map((s) =>
                 el(
                     "option",
@@ -1866,7 +1867,7 @@ class ActivityEditComponent extends MainComponent {
                 {this.getPriorityChangeReason()}
                 {this.getNoAssetModal()}
                 {this.getProjectsElement()}
-                {this.getHeader()}
+                <ActivityHeaderComponent serviceRequestData={data}/>
                 <div className="activities-edit-container">
                     {this.getActions()}
                 </div>
