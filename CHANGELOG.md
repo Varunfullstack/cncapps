@@ -11,6 +11,7 @@ This project changes will be shown here.
 - Issue 1095 - Feature: Assign To Be Logged to existing request
 - Issue 1094 - SR Documents that customers can't see
 - Issue 1086 - Global Update of Subscription items for contracts
+- Issue 1118 - Include logging and sickness summary on user performance
 ### Changed
 - Issue 1053 - New email templates
 - Issue 810  - Heavy SQL usage improvements
