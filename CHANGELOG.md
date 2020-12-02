@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 1116 -  Include friendly Mac OS names
+
 ## [v5.0.6] - 2020-12-18
 ### Fixed
 - Fixed Daily Stats "Fixed Today" value
