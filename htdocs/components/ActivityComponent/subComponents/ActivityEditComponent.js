@@ -811,7 +811,7 @@ class ActivityEditComponent extends MainComponent {
             if (!await this.confirm(`Are you sure you don't want to put an entry for CNC Next Action?`))
                 return false;
         }
-        if (this.isHiddenFromCustomer(data)) {
+        if (!this.isHiddenFromCustomer(data)) {
             if (this.checkCustomerNotesRequired(type, data)) {
                 this.alert(`Customer Notes are required for ${type.description} when the next action is CNC Action`)
                 return false;
