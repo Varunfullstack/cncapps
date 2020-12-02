@@ -1357,10 +1357,9 @@ class BUActivity extends Business
                 $this->db->query($sql);
             }
         }
-        $hasNewReasonAndItsFinished = (!isset($oldReason) || $oldReason != $newReason) && $dsCallActivity->getValue(
-                DBEJCallActivity::endTime
-            );
-        if ($hasNewReasonAndItsFinished) {
+        $hasNewReasonAndItsFinishedAndHasCustomerNotes =
+            (!isset($oldReason) || $oldReason != $newReason) && $dsCallActivity->getValue(                DBEJCallActivity::endTime            ) && $dsCallActivity->getValue(DBECallActivity::customerNotes);
+        if ($hasNewReasonAndItsFinishedAndHasCustomerNotes) {
             $this->sendActivityLoggedEmail($dbeCallActivity->getValue(DBEJCallActivity::callActivityID));
         }
         $this->sendMonitoringEmails($dbeCallActivity->getValue(DBEJCallActivity::callActivityID));
