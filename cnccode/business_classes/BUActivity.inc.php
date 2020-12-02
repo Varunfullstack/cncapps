@@ -1357,9 +1357,10 @@ class BUActivity extends Business
                 $this->db->query($sql);
             }
         }
+        $trimmedCustomerNotes = $this->trimmedCustomerNotes($dsCallActivity);
         $hasNewReasonAndItsFinishedAndHasCustomerNotes = (!isset($oldReason) || $oldReason != $newReason) && $dsCallActivity->getValue(
                 DBEJCallActivity::endTime
-            ) && trim(html_entity_decode(strip_tags($dsCallActivity->getValue(DBECallActivity::customerNotes))));
+            ) && $trimmedCustomerNotes;
         if ($hasNewReasonAndItsFinishedAndHasCustomerNotes) {
             $this->sendActivityLoggedEmail($dbeCallActivity->getValue(DBEJCallActivity::callActivityID));
         }
@@ -10767,6 +10768,19 @@ FROM
             }
         }
         return $oneOffSelectedComment ?? $recurringSelectedComment;
+    }
+
+    /**
+     * @param DBECallActivity $dsCallActivity
+     * @return string
+     */
+    private function trimmedCustomerNotes(DBECallActivity $dsCallActivity): string
+    {
+        return trim(
+            html_entity_decode(
+                strip_tags(str_replace('&nbsp;', '', $dsCallActivity->getValue(DBECallActivity::customerNotes)))
+            )
+        );
     }
 
 }
