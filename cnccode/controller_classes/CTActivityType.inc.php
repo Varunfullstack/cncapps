@@ -34,7 +34,6 @@ class CTActivityType extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
-
         $this->setMenuId(801);
         $this->buActivityType = new BUActivityType($this);
         $this->dsCallActType  = new DSForm($this);
@@ -85,7 +84,6 @@ class CTActivityType extends CTCNC
     {
         $this->setMethodName('edit');
         $dsCallActType = &$this->dsCallActType; // ref to class var
-
         if (!$this->getFormError()) {
             if ($this->getAction() == CTACTIVITYTYPE_ACT_EDIT) {
                 $this->buActivityType->getActivityTypeByID($this->getParam('callActTypeID'), $dsCallActType);
@@ -128,21 +126,19 @@ class CTActivityType extends CTCNC
                 'htmlFmt' => CT_HTML_FMT_POPUP
             )
         );
-        $urlItemEdit    =
-            Controller::buildLink(
-                CTCNC_PAGE_ITEM,
-                array(
-                    'action'  => CTCNC_ACT_ITEM_EDIT,
-                    'htmlFmt' => CT_HTML_FMT_POPUP
-                )
-            );
-        $urlDisplayList =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTACTIVITYTYPE_ACT_DISPLAY_LIST
-                )
-            );
+        $urlItemEdit    = Controller::buildLink(
+            CTCNC_PAGE_ITEM,
+            array(
+                'action'  => CTCNC_ACT_ITEM_EDIT,
+                'htmlFmt' => CT_HTML_FMT_POPUP
+            )
+        );
+        $urlDisplayList = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => CTACTIVITYTYPE_ACT_DISPLAY_LIST
+            )
+        );
         $this->setPageTitle('Edit Activity Type');
         $this->setTemplateFiles(
             array('ActivityTypeEdit' => 'ActivityTypeEdit.inc')
@@ -224,7 +220,6 @@ class CTActivityType extends CTCNC
                     DBECallActType::catRequireCustomerNoteOnHold
                 ),
                 'minMinutesAllowed'                => $dsCallActType->getValue(DBECallActType::minMinutesAllowed),
-
             )
         );
         $this->template->parse('CONTENTS', 'ActivityTypeEdit', true);
@@ -265,7 +260,6 @@ class CTActivityType extends CTCNC
     {
         $this->setMethodName('update');
         $this->formError = (!$this->dsCallActType->populateFromArray($this->getParam('callActType')));
-        //echo  $this->dsCallActType->getValue(DBECallActType::catRequireCNCNextActionCNCAction); exit;
         if ($this->formError) {
             if (!$this->dsCallActType->getValue(DBECallActType::callActTypeID)) {
                 $this->setAction(CTACTIVITYTYPE_ACT_EDIT);
@@ -275,9 +269,7 @@ class CTActivityType extends CTCNC
             $this->edit();
             exit;
         }
-
         $this->buActivityType->updateActivityType($this->dsCallActType);
-
         $urlNext = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
@@ -327,6 +319,9 @@ class CTActivityType extends CTCNC
                     'visibleInSRFlag'                  => $dbeCallActType->getValue(DBECallActType::visibleInSRFlag),
                     'minMinutesAllowed'                => $dbeCallActType->getValue(DBECallActType::minMinutesAllowed),
                     'order'                            => $dbeCallActType->getValue(DBECallActType::orderNum),
+                    "activityNotesRequired"            => $dbeCallActType->getValue(
+                        DBECallActType::activityNotesRequired
+                    )
                 ]
             );
         }
@@ -393,6 +388,9 @@ class CTActivityType extends CTCNC
                             DBECallActType::minMinutesAllowed
                         ),
                         "order"                            => $dsCallActType->getValue(DBECallActType::orderNum),
+                        "activityNotesRequired"            => $dsCallActType->getValue(
+                            DBECallActType::activityNotesRequired
+                        )
                     )
                 );
             }
@@ -402,29 +400,23 @@ class CTActivityType extends CTCNC
 
     function getCatRequireTitle($value)
     {
-        if ($value == 0)
-            return "Off";
-        if ($value == 1)
-            return "On";
-        if ($value == 2)
-            return "Optional";
+        if ($value == 0) return "Off";
+        if ($value == 1) return "On";
+        if ($value == 2) return "Optional";
     }
 
     function updateActivityTypeOrder()
     {
         $data = $this->getJSONData();
-
         if (!isset($data['fromActivityTypeId'])) {
             throw new \CNCLTD\Exceptions\JsonHttpException(23, 'fromActivityTypeId is required');
         }
         $dbeActivityTypeFrom = new DBECallActType($this);
         $dbeActivityTypeFrom->getRow($data['fromActivityTypeId']);
-
         if (!isset($data['toActivityTypeId'])) {
             $dbeActivityTypeFrom->moveItemToBottom($data['fromActivityTypeId']);
             return;
         }
-
         $dbeActivityTypeTo = new DBECallActType($this);
         $dbeActivityTypeTo->getRow($data['toActivityTypeId']);
         $dbeActivityTypeFrom->swapPlaces(
@@ -447,7 +439,6 @@ class CTActivityType extends CTCNC
         );
         $this->loadReactScript('ActivityTypeComponent.js');
         $this->loadReactCSS('ActivityTypeComponent.css');
-
         $this->template->parse('CONTENTS', 'ActivityTypeList', true);
         $this->parsePage();
     }

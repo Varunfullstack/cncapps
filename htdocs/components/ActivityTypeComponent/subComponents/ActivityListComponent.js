@@ -233,6 +233,11 @@ class ActivityListComponent extends MainComponent {
                 sortable: true,
             },
             {
+                label: "Activity Notes Required",
+                path: "activityNotesRequired",
+                sortable: true,
+            },
+            {
                 label: "Require CNC Next Action, CNC Action",
                 path: "catRequireCNCNextActionCNCAction",
                 sortable: true,
