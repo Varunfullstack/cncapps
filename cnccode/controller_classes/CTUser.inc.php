@@ -1015,7 +1015,7 @@ class CTUser extends CTCNC
                 'lastName'                   => $dbeJUser->getValue(DBEJUser::lastName),
                 'id'                         => $dbeJUser->getValue(DBEJUser::userID),
                 'email'                      => $dbeJUser->getEmail(),
-                'isSDManger'                 => $this->isSdManager(),
+                'isSDManager'                 => $this->isSdManager(),
                 'isExpenseApprover'          => $dbeJUser->getValue(DBEJUser::isExpenseApprover),
                 'globalExpenseApprover'      => $dbeJUser->getValue(DBEJUser::globalExpenseApprover),
                 'teamID'                     => $dbeJUser->getValue(DBEJUser::teamID),

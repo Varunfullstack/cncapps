@@ -27,7 +27,7 @@ class ActivityFollowOn extends MainComponent {
             const currentUser = result[1];
             let types = result[0];
 
-            if (!currentUser.isSDManger) {
+            if (!currentUser.isSDManager) {
                 types = types.filter(c => c.visibleInSRFlag == 'Y')
             }
             this.setState({types});

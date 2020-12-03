@@ -24,7 +24,7 @@ class ActivityDisplayComponent extends MainComponent {
             currentUser: {
                 globalExpenseApprover: 0,
                 isExpenseApprover: 0,
-                isSDManger: false
+                isSDManager: false
             },
             data: null,
             currentActivity: null,
@@ -275,7 +275,7 @@ class ActivityDisplayComponent extends MainComponent {
                     href: `Activity.php?action=createFollowOnActivity&callActivityID=${data?.callActivityID}&callActivityTypeID=22`
                 })
             }) : null,
-            currentUser.isSDManger && data?.problemHideFromCustomerFlag == 'Y' ? el(ToolTip, {
+            currentUser.isSDManager && data?.problemHideFromCustomerFlag == 'Y' ? el(ToolTip, {
                 title: "Unhide SR",
                 content: el('i', {
                     className: "fal fa-eye-slash fa-2x m-5 pointer icon",
@@ -319,7 +319,7 @@ class ActivityDisplayComponent extends MainComponent {
         }
     }
     handleUnhideSR = async (data) => {
-        if (data?.isSDManger && data?.problemHideFromCustomerFlag == 'Y') {
+        if (data?.isSDManager && data?.problemHideFromCustomerFlag == 'Y') {
             if (await this.confirm('This will unhide the SR from the customer and can\'t be undone, are you sure?')) {
                 await this.api.unHideSrActivity(data.callActivityID);
                 data.problemHideFromCustomerFlag = 'N';
@@ -535,7 +535,7 @@ class ActivityDisplayComponent extends MainComponent {
                 this.getCurrentActivityIndxElement(data, currentActivity)
             ),
             el('div', {style: {display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center"}},
-                currentUser.isSDManger ? this.getToggle("QA", 'holdForQA') : null,
+                currentUser.isSDManager ? this.getToggle("QA", 'holdForQA') : null,
                 this.getToggle("Critical SR", 'criticalSR'),
                 this.getToggle("Monitor SR", 'monitorSR'),
                 this.getToggle("Travel", "showTravel"),

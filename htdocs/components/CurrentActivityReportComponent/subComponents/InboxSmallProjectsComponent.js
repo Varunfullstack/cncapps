@@ -146,7 +146,7 @@ class InboxSmallProjectsComponent extends React.Component {
                 content: (problem) => getAllocatedElement(problem, this.code),
             },
         ];
-        if (this.props?.currentUser?.isSDManger)
+        if (this.props?.currentUser?.isSDManager)
             columns.push({
                 hide: false,
                 order: 9,

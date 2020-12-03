@@ -34,8 +34,8 @@ export default class MainComponent extends React.Component {
         };
     }
 
-    isSDManger(user) {
-        return user.isSDManger;
+    isSDManager(user) {
+        return user.isSDManager;
     }
 
     redirectPost(url, data) {

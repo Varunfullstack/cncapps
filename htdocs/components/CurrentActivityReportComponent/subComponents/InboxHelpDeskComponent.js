@@ -149,7 +149,7 @@ class InboxHelpDeskComponent extends React.Component {
             },
         ];
 
-        if (this.props?.currentUser?.isSDManger)
+        if (this.props?.currentUser?.isSDManager)
             columns.push({
                 hide: false,
                 order: 9,

@@ -85,6 +85,7 @@ class ActivityEditComponent extends MainComponent {
             templateTitle: "",
             contactNotes: "",
             callActTypes: [],
+            notSDManagerActivityTypes: [],
             users: [],
             contracts: [],
             priorityReasons: [],
@@ -112,11 +113,11 @@ class ActivityEditComponent extends MainComponent {
             this.apiStandardText.getOptionsByType("Missing Asset Reason"),
 
         ]).then(async ([activityTypes, activeUsers, priorities, rootCauses, currentUser, priorityChangeReasonStandardTextItems, noAssetStandardTextItems]) => {
-            if (!currentUser.isSDManger) {
-                activityTypes = activityTypes.filter(c => c.visibleInSRFlag == 'Y')
-            }
+            const notSDManagerActivityTypes = activityTypes.filter(c => c.visibleInSRFlag === 'Y');
+
             this.setState({
                 callActTypes: activityTypes,
+                notSDManagerActivityTypes,
                 users: activeUsers,
                 priorities,
                 rootCauses,
@@ -370,7 +371,7 @@ class ActivityEditComponent extends MainComponent {
                 return false;
             }
 
-            if(!data.alarmDate){
+            if (!data.alarmDate) {
                 this.alert("Please provide a valid future date");
                 return false;
             }
@@ -680,10 +681,13 @@ class ActivityEditComponent extends MainComponent {
             />)
         }
         const renderUpdateCancelButtons = () => {
+
             if (data?.callActTypeID !== 59) {
+                const isEnabled = currentUser?.isSDManager || !(data?.callActType === 51 && data?.problemStatus === 'I');
+
                 return <Fragment>
                     <button onClick={() => this.setNextStatus("Update")}
-                            disabled={!currentUser?.isSDManger}
+                            disabled={!isEnabled}
                     >Update
                     </button>
                     <button onClick={() => this.handleCancel(data)}>Cancel</button>
@@ -1025,12 +1029,17 @@ class ActivityEditComponent extends MainComponent {
             data.documents = data.documents.filter(d => d.id !== id);
             this.setState({data});
         }
-    };
+    }
 
     getTypeElement = () => {
         const {el} = this;
-        const {data, callActTypes} = this.state;
-        const found = callActTypes.filter((t) => t.id == data.callActTypeIDOld);
+        const {data, callActTypes, notSDManagerActivityTypes, currentUser} = this.state;
+        const selectedActivityType = callActTypes.find((t) => t.id == data.callActTypeID);
+        const isEnabled = currentUser?.isSDManager || (!currentUser?.isSDManager && selectedActivityType && selectedActivityType.visibleInSRFlag === 'Y')
+        let activityTypesToShow = notSDManagerActivityTypes;
+        if (!isEnabled || currentUser?.isSDManager) {
+            activityTypesToShow = callActTypes;
+        }
 
         return this.getElementControl(
             "Type",
@@ -1038,9 +1047,7 @@ class ActivityEditComponent extends MainComponent {
             el(
                 "select",
                 {
-                    disabled:
-                        data?.isInitalDisabled ||
-                        (found.length == 0 && data?.callActTypeIDOld != null),
+                    disabled: !isEnabled,
                     required: true,
                     value: data?.callActTypeID || "",
                     onChange: (event) =>
@@ -1048,7 +1055,7 @@ class ActivityEditComponent extends MainComponent {
                     style: {width: "100%"}
                 },
                 el("option", {key: "empty", value: ""}, "Please select"),
-                callActTypes?.map((t) =>
+                activityTypesToShow.map((t) =>
                     el("option", {key: t.id, value: t.id}, t.description)
                 )
             )

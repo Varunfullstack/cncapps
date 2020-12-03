@@ -315,7 +315,7 @@ class CTSRActivity extends CTCNC
                         MAINTENANCE_PERMISSION
                     )),
             "hasExpenses"                     => count($expenses) ? true : false,
-            "isSDManger"                      => $buUser->isSdManager($this->userID),
+            "isSDManager"                      => $buUser->isSdManager($this->userID),
             "hideFromCustomerFlag"            => $dbejCallActivity->getValue(DBEJCallActivity::hideFromCustomerFlag),
             "allowSCRFlag"                    => $dbejCallActivity->getValue(DBEJCallActivity::allowSCRFlag),
             "priority"                        => $buActivity->priorityArray[$dbejCallActivity->getValue(

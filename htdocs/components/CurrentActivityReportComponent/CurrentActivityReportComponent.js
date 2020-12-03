@@ -173,7 +173,7 @@ class CurrentActivityReportComponent extends MainComponent {
         this.apiCurrentActivityService
             .getCurrentUser()
             .then((res) => {
-                if (res.isSDManger || res.serviceRequestQueueManager)
+                if (res.isSDManager || res.serviceRequestQueueManager)
                     this.teams.filter(t => t.id == 11)[0].display = true;
                 this.setState({currentUser: res})
             });
