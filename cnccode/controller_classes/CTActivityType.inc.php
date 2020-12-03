@@ -201,6 +201,9 @@ class CTActivityType extends CTCNC
                 'visibleInSRFlagChecked'           => Controller::htmlChecked(
                     $dsCallActType->getValue(DBECallActType::visibleInSRFlag)
                 ),
+                'activityNotesRequiredChecked'     => Controller::htmlChecked(
+                    $dsCallActType->getValue(DBECallActType::activityNotesRequired)
+                ),
                 'urlUpdate'                        => $urlUpdate,
                 'urlDelete'                        => $urlDelete,
                 'txtDelete'                        => $txtDelete,
