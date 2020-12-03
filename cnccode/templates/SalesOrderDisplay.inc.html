@@ -598,7 +598,7 @@
             })
 
             document.querySelectorAll('.updatedTimeLink').forEach(el => {
-                const {domainPart, searchParams} = el.href.split('?');
+                const [domainPart, searchParams] = el.href.split('?');
                 const params = new URLSearchParams(searchParams);
                 params.set('updatedTime', newValue);
                 el.href = domainPart + '?' + params.toString();
