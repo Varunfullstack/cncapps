@@ -47,9 +47,9 @@
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="callacttype" columnName="cat_r_problem_flag"/>
         </preConditions>
-        <renameColumn tableName="callacttype" oldColumnName="cat_r_problem_flag" newColumnName="activityNotesRequired"/>
+        <renameColumn tableName="callacttype" oldColumnName="cat_r_problem_flag" newColumnName="activityNotesRequired" columnDataType="char(1) CHARACTER SET utf8 COLLATE utf8_general_ci"/>
         <rollback>
-            <renameColumn tableName="callacttype" oldColumnName="activityNotesRequired" newColumnName="cat_r_problem_flag"/>
+            <renameColumn tableName="callacttype" oldColumnName="activityNotesRequired" newColumnName="cat_r_problem_flag" columnDataType="char(1) CHARACTER SET utf8 COLLATE utf8_general_ci"/>
         </rollback>
     </changeSet>
     <changeSet id="release-v5.0.0-5" author="pavwebdev">

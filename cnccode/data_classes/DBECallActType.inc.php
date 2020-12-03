@@ -10,29 +10,29 @@ class DBECallActType extends DBEntity
 {
     use \CNCLTD\SortableDBE;
 
-    const callActTypeID = "callActTypeID";
-    const description = "description";
-    const oohMultiplier = "oohMultiplier";
-    const itemID = "itemID";
-    const maxHours = "maxHours";
-    const minHours = "minHours";
-    const customerEmailFlag = "customerEmailFlag";
-    const requireCheckFlag = "requireCheckFlag";
-    const curValueFlag = "curValueFlag";
-    const travelFlag = "travelFlag";
-    const activeFlag = "activeFlag";
-    const engineerOvertimeFlag = "engineerOvertimeFlag";
-    const onSiteFlag = "onSiteFlag";
-    const allowSCRFlag = "allowSCRFlag";
-    const portalDisplayFlag = "portalDisplayFlag";
-
-    const visibleInSRFlag = "visibleInSRFlag";
+    const callActTypeID                    = "callActTypeID";
+    const description                      = "description";
+    const oohMultiplier                    = "oohMultiplier";
+    const itemID                           = "itemID";
+    const maxHours                         = "maxHours";
+    const minHours                         = "minHours";
+    const customerEmailFlag                = "customerEmailFlag";
+    const requireCheckFlag                 = "requireCheckFlag";
+    const curValueFlag                     = "curValueFlag";
+    const travelFlag                       = "travelFlag";
+    const activeFlag                       = "activeFlag";
+    const engineerOvertimeFlag             = "engineerOvertimeFlag";
+    const onSiteFlag                       = "onSiteFlag";
+    const allowSCRFlag                     = "allowSCRFlag";
+    const portalDisplayFlag                = "portalDisplayFlag";
+    const activityNotesRequired            = "activityNotesRequired";
+    const visibleInSRFlag                  = "visibleInSRFlag";
     const catRequireCNCNextActionCNCAction = "catRequireCNCNextActionCNCAction";
-    const catRequireCustomerNoteCNCAction = "catRequireCustomerNoteCNCAction";
-    const catRequireCNCNextActionOnHold = "catRequireCNCNextActionOnHold";
-    const catRequireCustomerNoteOnHold = "catRequireCustomerNoteOnHold";
-    const minMinutesAllowed = "minMinutesAllowed";
-    const orderNum = "orderNum";
+    const catRequireCustomerNoteCNCAction  = "catRequireCustomerNoteCNCAction";
+    const catRequireCNCNextActionOnHold    = "catRequireCNCNextActionOnHold";
+    const catRequireCustomerNoteOnHold     = "catRequireCustomerNoteOnHold";
+    const minMinutesAllowed                = "minMinutesAllowed";
+    const orderNum                         = "orderNum";
 
     /**
      * calls constructor()
@@ -62,7 +62,12 @@ class DBECallActType extends DBEntity
             self::curValueFlag,
             DA_YN,
             DA_NOT_NULL
-        );                                                        // is this activity type a currency value
+        );
+        $this->addColumn(
+            self::activityNotesRequired,
+            DA_YN,
+            DA_NOT_NULL
+        );
         $this->addColumn(self::allowSCRFlag, DA_YN, DA_NOT_NULL);
         $this->addColumn(self::travelFlag, DA_YN, DA_NOT_NULL);            // is this a travel activity?
         $this->addColumn(self::activeFlag, DA_YN, DA_NOT_NULL);            // is	this an active activity?
@@ -70,7 +75,6 @@ class DBECallActType extends DBEntity
         $this->addColumn(self::onSiteFlag, DA_YN, DA_NOT_NULL, "cat_on_site_flag");
         $this->addColumn(self::portalDisplayFlag, DA_YN, DA_NOT_NULL, "cat_portal_display_flag");
         $this->addColumn(self::visibleInSRFlag, DA_YN, DA_NOT_NULL, 'cat_visible_in_sr_flag');
-
         $this->addColumn(
             self::catRequireCNCNextActionCNCAction,
             DA_INTEGER,
@@ -98,12 +102,8 @@ class DBECallActType extends DBEntity
 
     function getActiveAndVisibleRows($onlyVisibleInSR = false)
     {
-        $statement =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " WHERE activeFlag = 'Y'" .
-            ($onlyVisibleInSR ? ' and cat_visible_in_sr_flag = "Y" ' : '') .
-            " ORDER BY cat_desc";
+        $statement = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " WHERE activeFlag = 'Y'" . ($onlyVisibleInSR ? ' and cat_visible_in_sr_flag = "Y" ' : '') . " ORDER BY cat_desc";
         $this->setQueryString($statement);
         $ret = (parent::getRows());
     }
@@ -116,7 +116,7 @@ class DBECallActType extends DBEntity
 
     protected function getSortOrderColumnName()
     {
-         return $this->getDBColumnName(self::orderNum);
+        return $this->getDBColumnName(self::orderNum);
     }
 
     protected function getDB()
