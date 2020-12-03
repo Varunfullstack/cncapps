@@ -51,6 +51,7 @@ class StandardTextModal extends React.Component {
     }
     getTemplateModal = () => {
         const {templateOptions, _showModal, templateTitle, key, okTitle, templateDefault} = this.state;
+        const {noEditor} = this.props;
         const {el} = this;
         return el(Modal, {
                 width: 900,
@@ -66,15 +67,24 @@ class StandardTextModal extends React.Component {
                         key: s.id,
                         value: s.id
                     }, s.name))) : null,
-                    _showModal ? el(CKEditor, {
+                    noEditor ?
+                        el("input", {
+                            key: 'salesRequestEditor',
+                            id: 'salesRequest',
+                            type: 'text',
+                            value: templateDefault,
+                            onChange: ($event) => this.handleTemplateValueChange($event.target.value),
+                            height: 100
+                        }) :
+                        el(CKEditor, {
                             key: 'salesRequestEditor',
                             id: 'salesRequest',
                             value: templateDefault,
                             onChange: this.handleTemplateValueChange,
                             inline: true,
                             height: 100
-                        })
-                        : null),
+                        }),
+                ),
                 footer: el('div', {key: "footer"},
                     el('button', {onClick: this.handleTemplateOk}, okTitle),
                     el('button', {onClick: () => this.props.onCancel ? this.props.onCancel() : this.setState({_showModal: false})}, "Cancel"),

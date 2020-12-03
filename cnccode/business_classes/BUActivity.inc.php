@@ -1357,7 +1357,7 @@ class BUActivity extends Business
                 $this->db->query($sql);
             }
         }
-        $trimmedCustomerNotes = $this->trimmedCustomerNotes($dsCallActivity);
+        $trimmedCustomerNotes                          = $this->trimmedCustomerNotes($dsCallActivity);
         $hasNewReasonAndItsFinishedAndHasCustomerNotes = (!isset($oldReason) || $oldReason != $newReason) && $dsCallActivity->getValue(
                 DBEJCallActivity::endTime
             ) && $trimmedCustomerNotes;
@@ -5034,6 +5034,9 @@ class BUActivity extends Business
             DBEProblem::customerID,
             $body->customerID
         );
+        if ($body->customerproblemno) {
+            $dbeProblem->setValue(DBEProblem::raiseTypeId, $this->getProblemRaiseType(BUProblemRaiseType::EMAIL));
+        }
         $dbeProblem->setValue(
             DBEProblem::dateRaised,
             $dateTimeRaised
@@ -6604,7 +6607,7 @@ FROM
         cpr_customerproblemno = $customerproblemno
         ";
         $db->query($queryString);
-        $db->next_record();
+        $db->next_record(MYSQLI_ASSOC);
         return $db->Record;
 
     }
@@ -6809,11 +6812,9 @@ FROM
     )
     {
         $db     = new dbSweetcode(); // database connection for query
-        $reason = '<div>' . $record->getSubjectLine() . '</div>';
+        $reason = $record->getTextBody();
         if ($record->getHtmlBody()) {
-            $reason .= $record->getHtmlBody();
-        } else {
-            $reason .= $record->getTextBody();
+            $reason = $record->getHtmlBody();
         }
         if ($prependMessage) {
             $reason = $prependMessage . $reason;
@@ -6832,7 +6833,9 @@ FROM
         cpr_serverguard_flag = ?,
         cpr_send_email = ?,
         cpr_priority = ?,
-        cpr_reason = ?";
+        cpr_reason = ?,
+        cpr_subject = ?
+        ";
         $parameters  = [
             [
                 'type'  => 'i',
@@ -6873,6 +6876,10 @@ FROM
             [
                 'type'  => 's',
                 'value' => $reason
+            ],
+            [
+                "type"  => "s",
+                "value" => $record->getSubjectLine()
             ]
         ];
         $db->preparedQuery(
@@ -10774,7 +10781,7 @@ FROM
      * @param  $dsCallActivity
      * @return string
      */
-    private function trimmedCustomerNotes( $dsCallActivity): string
+    private function trimmedCustomerNotes($dsCallActivity): string
     {
         return trim(
             html_entity_decode(

@@ -76,11 +76,15 @@ class Table extends React.Component {
     };
 
     disableSortable() {
-        return $("#table" + this.props.id + " tbody").sortable('option', "disabled", true);
+        if (this.props.allowRowOrder) {
+            return $("#table" + this.props.id + " tbody").sortable('option', "disabled", true);
+        }
     }
 
     enableSortable() {
-        return $("#table" + this.props.id + " tbody").sortable('option', "disabled", false);
+        if (this.props.allowRowOrder) {
+            return $("#table" + this.props.id + " tbody").sortable('option', "disabled", false);
+        }
     }
 
     handleSort = (sortColumn) => {

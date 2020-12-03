@@ -1723,12 +1723,12 @@ class ActivityEditComponent extends MainComponent {
         const {data, currentUser} = this.state;
         const key = "contactNotesAlert";
         // get from local storage
-        let obj = localStorage.getItem(key);
+        let jsonString = localStorage.getItem(key);
         let userObj = {userID: currentUser.id, contactID: data.contactID, notes: data.contactNotes};
         let alertObject;
         const today = moment().format("YYYY-MM-DD");
         if (data.contactNotes && data.contactNotes !== "") {
-            if (!obj) {
+            if (!jsonString) {
                 this.alert(data.contactNotes, 500, "Contact Note");
                 alertObject = {
                     date: today,
@@ -1737,7 +1737,7 @@ class ActivityEditComponent extends MainComponent {
                     ]
                 }
             } else {
-                alertObject = JSON.parse(obj);
+                alertObject = JSON.parse(jsonString);
                 if (alertObject.date !== today)// clear if not today
                 {
                     alertObject = {
@@ -1783,6 +1783,7 @@ class ActivityEditComponent extends MainComponent {
                 options: noAssetStandardTextItems,
                 value: data.emptyAssetReason,
                 show: emptyAssetReasonModalShowing,
+                noEditor: true,
                 title: "Please provide the reason of not listing an asset test",
                 okTitle: "OK",
                 onChange: (value) => {
