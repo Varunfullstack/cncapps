@@ -92,5 +92,6 @@
                      FROM standardtexttype
                      WHERE sty_desc = "Missing Asset Reason"));
         </sql>
+        <rollback/>
     </changeSet>
 </databaseChangeLog>

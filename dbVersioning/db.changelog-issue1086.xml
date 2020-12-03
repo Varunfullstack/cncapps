@@ -26,6 +26,7 @@
             set allowGlobalPriceUpdate = 1
             where ity_itemtypeno = 29
         </sql>
+        <rollback/>
     </changeSet>
 
 </databaseChangeLog>

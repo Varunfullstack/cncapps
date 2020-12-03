@@ -49,7 +49,7 @@
             ]]>
         </sql>
         <rollback>
-            <modifyDataType columnName="callacttype" newDataType="float" tableName="callacttype"/>
+            <modifyDataType columnName="orderNum" newDataType="float" tableName="callacttype"/>
         </rollback>
     </changeSet>
 
