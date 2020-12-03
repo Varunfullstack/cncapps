@@ -363,22 +363,31 @@ class ActivityEditComponent extends MainComponent {
             }
         }
 
-        if (data.nextStatus == this.activityStatus.CustomerAction) {
-            const dateMoment = moment(data.alarmDate);
+        if (data.nextStatus === this.activityStatus.CustomerAction) {
+
+            if (!data.alarmTime) {
+                this.alert("Please provide a valid time");
+                return false;
+            }
+
+            if(!data.alarmDate){
+                this.alert("Please provide a valid future date");
+                return false;
+            }
+
+            const dateMoment = moment(`${data.alarmDate} ${data.alarmTime}`, 'YYYY-MM-DD HH:mm');
+
             if (
                 !dateMoment.isValid() ||
-                dateMoment.isSameOrBefore(moment(), "minute") ||
-                data.alarmDate == "" ||
-                data.alarmTime == "00:00" ||
-                data.alarmTime == ""
+                dateMoment.isSameOrBefore(moment(), "minute")
             ) {
                 this.alert("Please provide a future date and time");
                 return false;
             }
         }
-        if (data.nextStatus == this.activityStatus.Escalate) {
+        if (data.nextStatus === this.activityStatus.Escalate) {
             if (
-                ["I", "F", "C"].indexOf(data.problemStatus) == -1 &&
+                ["I", "F", "C"].indexOf(data.problemStatus) === -1 &&
                 !data.escalationReason
             ) {
                 this.alert("Please provide an escalate reason");
@@ -1829,7 +1838,10 @@ class ActivityEditComponent extends MainComponent {
                 style: {width: "100%"},
                 value: this.state.data.assetName || "",
             },
-            el("option", {key: "default", value: ""}, (this.state.data.emptyAssetReason && this.state.data.emptyAssetReason.substr(0,20) )|| ""),
+            el("option", {
+                key: "default",
+                value: ""
+            }, (this.state.data.emptyAssetReason && this.state.data.emptyAssetReason.substr(0, 20)) || ""),
             assets.map((s) =>
                 el(
                     "option",
