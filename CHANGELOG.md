@@ -29,6 +29,7 @@ This project changes will be shown here.
 - Issue 1020 - Deleting Sales Order lines doesn't update the total until the page is reloaded
 - Issue 1076 - Internal email formatting
 - Issue 1109 - Overtime / Expense denial reasons missing
+- Issue 1112 - Sales order updated by another user
 ### Removed
 - Issue 1089 - Duplicate item on user page
 
