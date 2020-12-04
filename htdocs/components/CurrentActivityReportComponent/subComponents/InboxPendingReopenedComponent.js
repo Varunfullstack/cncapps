@@ -38,6 +38,7 @@ class InboxPendingReopenedComponent extends MainComponent {
                 reason: atob(problem.base64Reason),
                 pendingReopenedID: problem.pendingReopenedID,
                 deletePending: true,
+                raiseTypeId: 1
             };
 
             this.redirectPost("Activity.php", data);

@@ -2116,6 +2116,7 @@ class CTActivity extends CTCNC
             $this->updateSession('internalNotes', $this->getParam('internalNotes'));
             $this->updateSession('callActTypeID', CONFIG_INITIAL_ACTIVITY_TYPE_ID);
             $this->updateSession('customerID', $this->getParam('customerID'));
+            $this->updateSession('raiseTypeId', $this->getParam('raiseTypeId'));
             if ($this->getParam('pendingReopenedID')) $this->updateSession(
                 'pendingReopenedID',
                 $this->getParam('pendingReopenedID')
@@ -2264,6 +2265,9 @@ class CTActivity extends CTCNC
         if (!$this->hasPermissions(SUPERVISOR_PERMISSION)) {
             $disabled = CTCNC_HTML_DISABLED;
         }
+        if (!isset($backURL)) {
+            $backURL = null;
+        }
         $this->template->set_var(
             array(
                 'callActivityID'              => @$_SESSION[$this->sessionKey]['callActivityID'],
@@ -2300,6 +2304,7 @@ class CTActivity extends CTCNC
                 'generatePasswordLink'        => $this->getGeneratePasswordLink(),
                 'DISABLED'                    => $disabled,
                 'submitURL'                   => $submitURL,
+                'raiseTypeId'                 => @$_SESSION[$this->sessionKey]['raiseTypeId'],
                 'backURL'                     => $backURL
             )
         );

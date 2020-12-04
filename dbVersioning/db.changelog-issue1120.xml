@@ -1,0 +1,33 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue1120-0">
+        <tagDatabase tag="issue1120"/>
+    </changeSet>
+    <changeSet id="issue1120-1" author="pavwebdev">
+        <preConditions>
+            <not>
+                <columnExists tableName="customerproblem" columnName="emailSubject"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customerproblem">
+            <column name="emailSubject" type="varchar(50)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue1120-2" author="pavwebdev">
+        <sql>
+            INSERT INTO standardtext(`stt_desc`, `stt_text`, `stt_standardtexttypeno`)
+            VALUES ("Non company computer",
+                    "This computer is not owned by the company, it's a personal device belonging to the contact",
+                    (select sty_standardtexttypeno from standardtexttype where sty_desc = "Missing Asset Reason"));
+            INSERT INTO standardtext(`stt_desc`, `stt_text`, `stt_standardtexttypeno`)
+            VALUES ("Asset not found",
+                    "Asset does not have the agent installed. Please install the agent as part of this work.",
+                    (select sty_standardtexttypeno from standardtexttype where sty_desc = "Missing Asset Reason"));
+        </sql>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>

@@ -315,7 +315,7 @@ class CTSRActivity extends CTCNC
                         MAINTENANCE_PERMISSION
                     )),
             "hasExpenses"                     => count($expenses) ? true : false,
-            "isSDManager"                      => $buUser->isSdManager($this->userID),
+            "isSDManager"                     => $buUser->isSdManager($this->userID),
             "hideFromCustomerFlag"            => $dbejCallActivity->getValue(DBEJCallActivity::hideFromCustomerFlag),
             "allowSCRFlag"                    => $dbejCallActivity->getValue(DBEJCallActivity::allowSCRFlag),
             "priority"                        => $buActivity->priorityArray[$dbejCallActivity->getValue(
@@ -997,8 +997,7 @@ class CTSRActivity extends CTCNC
             $body->dateRaised    = date(DATE_MYSQL_DATE);
             $body->timeRaised    = date('H:i');
             $body->callActTypeID = CONFIG_INITIAL_ACTIVITY_TYPE_ID;
-            //return ["team"=>$body->notStartWorkReason];
-            $dsCallActivity = $buActivity->createActivityFromJson($body);
+            $dsCallActivity      = $buActivity->createActivityFromJson($body);
             if (isset($dsCallActivity)) {
                 if (isset($body->pendingReopenedID) && isset($body->deletePending) && $body->deletePending == 'true') {
                     //delete pending
@@ -1016,13 +1015,14 @@ class CTSRActivity extends CTCNC
                         $GLOBALS['auth']->is_authenticated(),
                         $this->getParam('moveToUsersQueue')
                     );
-                    //$nextURL ="Activity.php?action=createFollowOnActivity&callActivityID=".$newActivityID ."&moveToUsersQueue=1";
-                    $nextURL = "SRActivity.php?action=editActivity&callActivityID=" . $newActivityID;
+                    $nextURL       = "SRActivity.php?action=editActivity&callActivityID=" . $newActivityID;
                 } else {
                     $nextURL = "CurrentActivityReport.php";
                 }
-                $currentUser = $this->getDbeUser();
-                if (!$body->startWork && $currentUser->getValue(DBEUser::teamID) == 1) {
+                $currentUser    = $this->getDbeUser();
+                $buCustomerItem = new BUCustomerItem($this);
+                $hasServiceDesk = $buCustomerItem->customerHasServiceDeskContract($body->customerID);
+                if (!$body->startWork && $currentUser->getValue(DBEUser::teamID) == 1 && $hasServiceDesk) {
                     //$body->notStartWorkReason
                     $dbeProblemNotStartReason = new DBEProblemNotStartReason($this);
                     $dbeProblemNotStartReason->setValue(

@@ -469,7 +469,7 @@ class LastStepComponent extends MainComponent {
             this.alert("Please select queue");
             return false;
         }
-        if (currentUser.teamLevel == 1 && data.queueNo == TeamType.Helpdesk && (data.notFirstTimeFixReason == null || data.notFirstTimeFixReason == "") && customer.hasServiceDesk) {
+        if (currentUser.teamLevel == 1 && data.queueNo == TeamType.Helpdesk && (!data.notFirstTimeFixReason) && customer.hasServiceDesk) {
 
             const _showModal = true;
             const modalType = this.modalType.notFirstTimeFixReason;

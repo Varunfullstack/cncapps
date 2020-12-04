@@ -209,7 +209,7 @@ class CustomerSiteComponent extends MainComponent {
                 options: noAssetStandardTextItems,
                 value: data.emptyAssetReason,
                 show: emptyAssetReasonModalShowing,
-                title: "Please provide the reason of not listing an asset test",
+                title: "Please provide the reason of not listing an asset",
                 okTitle: "OK",
                 onChange: (value) => {
                     if (!value) {

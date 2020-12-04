@@ -4627,6 +4627,9 @@ class BUActivity extends Business
     private function setProblemRaise($dbeProblem, $callActivity, $raiseType = null)
     {
         if (!isset($dbeProblem) && !isset($callActivity)) return null;
+        if ($dbeProblem->getValue(DBEProblem::raiseTypeId)) {
+            return;
+        }
         if ($raiseType != null) {
             $dbeProblem->setValue(
                 DBEProblem::raiseTypeId,
@@ -4740,6 +4743,10 @@ class BUActivity extends Business
             @$_SESSION [$sessionKey] ['customerID']
         );
         $dbeProblem->setValue(
+            DBEProblem::raiseTypeId,
+            @$_SESSION[$sessionKey]["raiseTypeId"]
+        );
+        $dbeProblem->setValue(
             DBEProblem::dateRaised,
             $dateTimeRaised
         );
@@ -4804,6 +4811,7 @@ class BUActivity extends Business
             @$_SESSION [$sessionKey] ['projectID']
         );
         $dbeProblem->insertRow();
+        $this->setProblemRaise($dbeProblem, $dsCallActivity);
         if ($_SESSION[$sessionKey]['monitorSRFlag'] === 'Y') {
             $this->toggleMonitoringFlag($dbeProblem->getPKValue());
         }
@@ -4881,7 +4889,6 @@ class BUActivity extends Business
             $GLOBALS['auth']->is_authenticated()
         ); // user that created activity
         $dsCallActivity->post();
-        $this->setProblemRaise($dbeProblem, $dsCallActivity); //createActivityFromSession
         $dbeContact = null;
         if (@$_SESSION[$sessionKey]['contactID']) {
             $dbeContact = new DBEContact($this);
@@ -5034,8 +5041,10 @@ class BUActivity extends Business
             DBEProblem::customerID,
             $body->customerID
         );
-        if ($body->customerproblemno) {
+        if (isset($body->customerproblemno)) {
             $dbeProblem->setValue(DBEProblem::raiseTypeId, $this->getProblemRaiseType(BUProblemRaiseType::EMAIL));
+            $customerRaisedRequest = $this->getCustomerRaisedRequest($body->customerproblemno);
+            $dbeProblem->setValue(DBEProblem::emailSubjectSummary, $customerRaisedRequest['emailSubject']);
         }
         $dbeProblem->setValue(
             DBEProblem::dateRaised,
@@ -5113,10 +5122,12 @@ class BUActivity extends Business
             DBEProblem::repeatProblem,
             $body->repeatProblem ? 1 : 0
         );
-        if (isset($body->notFirstTimeFixReason)) $dbeProblem->setValue(
-            DBEProblem::notFirstTimeFixReason,
-            $body->notFirstTimeFixReason
-        );
+        if (isset($body->notFirstTimeFixReason)) {
+            $dbeProblem->setValue(
+                DBEProblem::notFirstTimeFixReason,
+                $body->notFirstTimeFixReason
+            );
+        }
         $dbeProblem->insertRow();
         if ($body->monitorSRFlag) {
             $this->toggleMonitoringFlag($dbeProblem->getPKValue());
@@ -6596,7 +6607,8 @@ FROM
         add_add3,
         add_postcode,
         con_notes,
-        cus_tech_notes
+        cus_tech_notes,
+        emailSubject
       FROM
         customerproblem
         LEFT JOIN contact ON con_contno = cpr_contno
@@ -6834,7 +6846,7 @@ FROM
         cpr_send_email = ?,
         cpr_priority = ?,
         cpr_reason = ?,
-        cpr_subject = ?
+        emailSubject = ?
         ";
         $parameters  = [
             [

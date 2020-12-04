@@ -31,7 +31,7 @@
             $('.contactPhone').html(result.phone);
         }).catch(function () {
         }).then(function () {
-               spinnerComponent.hideSpinner();
+            spinnerComponent.hideSpinner();
         });
 
     }
@@ -74,6 +74,12 @@
            id="priority"
            value="{priority}"
     >
+
+    <input type="hidden"
+           name="raiseTypeId"
+           id="raiseTypeId"
+           value="{raiseTypeId}"
+    />
 
     <table>
         <tr>

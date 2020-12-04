@@ -3452,7 +3452,7 @@ class CTCustomer extends CTCNC
                 ) . "%' ";
             $query .= " ) ";
         }
-        $query .= " and active 
+        $query .= " and active and cus_referred <> 'Y'
                     ORDER BY cus_name, con_last_name, con_first_name 
                     ";
         // echo $query;

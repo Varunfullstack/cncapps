@@ -148,6 +148,15 @@
             })
     }
 
+    function formatDate(string) {
+        if (!string) {
+            return null;
+        }
+
+        const date = moment(string);
+        return date.format('DD-MM-YYYY');
+    }
+
     function fetchTableData(customerID) {
         var object = {
             customerID: customerID
@@ -178,10 +187,10 @@
                             // this is the first item which dictates the current
                             $('#currentMeetingTable tbody').append(
                                 "<tr data-document-id='" + item.documentID + "'>" +
-                                "<td>" + item.reviewMeetingDate + "</td>" +
+                                "<td>" + (formatDate(item.reviewMeetingDate)) + "</td>" +
                                 "<td><a href='?action=downloadDocument&documentID=" + item.documentID + "' target='_blank'>" + item.fileName + "</a></td>" +
                                 "<td>" + item.uploadedBy + "</td>" +
-                                "<td>" + item.uploadedAt + "</td>" +
+                                "<td>" + (formatDate(item.uploadedAt)) + "</td>" +
                                 "<td>" + "<button onclick='deleteDocument(" + item.documentID + ")'><i class='fal fa-trash-alt'></i></button>" + "</td>" +
                                 "</tr>"
                             );
@@ -191,10 +200,10 @@
                         if (item.reviewMeetingDate === result[0].reviewMeetingDate) {
                             $('#currentMeetingTable tbody').append(
                                 "<tr  data-document-id='" + item.documentID + "'>" +
-                                "<td>" + item.reviewMeetingDate + "</td>" +
+                                "<td>" + (formatDate(item.reviewMeetingDate)) + "</td>" +
                                 "<td><a href='?action=downloadDocument&documentID=" + item.documentID + "' target='_blank'>" + item.fileName + "</a></td>" +
                                 "<td>" + item.uploadedBy + "</td>" +
-                                "<td>" + item.uploadedAt + "</td>" +
+                                "<td>" + (formatDate(item.uploadedAt)) + "</td>" +
                                 "<td>" + "<button onclick='deleteDocument(" + item.documentID + ")'><i class='fal fa-trash-alt'></i></button>" + "</td>" +
                                 "</tr>"
                             );
@@ -215,10 +224,10 @@
 
                         previousMeetingsTableBody.append(
                             "<tr id='" + item.documentID + "'>" +
-                            "<td>" + item.reviewMeetingDate + "</td>" +
+                            "<td>" + (formatDate(item.reviewMeetingDate)) + "</td>" +
                             "<td><a href='?action=downloadDocument&documentID=" + item.documentID + "' target='_blank'>" + item.fileName + "</a></td>" +
                             "<td>" + item.uploadedBy + "</td>" +
-                            "<td>" + item.uploadedAt + "</td>" +
+                            "<td>" + (formatDate(item.uploadedAt)) + "</td>" +
                             "</tr>"
                         );
 
