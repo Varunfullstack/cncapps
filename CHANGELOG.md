@@ -22,6 +22,7 @@ This project changes will be shown here.
 - Issue 1092 - Daily SR Report Formatting
 - Issue 1103 - Fixed SR Email to include faces for survey feedback
 - Issue 1087 - M365 Mailbox show largest mailbox limit & exclude Leavers
+- Issue 1108 - User Time Log not always updating.
 ### Fixed
 - Issue 1078 - Sales Request Dashboard Attachment Link error
 - Issue 1077 - Service Requests By Customer Report Broken
