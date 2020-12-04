@@ -14,7 +14,14 @@ class Alert extends React.Component {
 
     render() {
         const {el} = this;
-        const {title, width, message} = this.props;
+        const {title, width, message, isHTML} = this.props;
+
+        let content = el('label', {key: "label"}, message);
+
+        if (isHTML) {
+            content = (<label dangerouslySetInnerHTML={{__html: message}}/>)
+        }
+
         return (el(
             Modal, {
                 title: title || "Alert",
@@ -22,7 +29,7 @@ class Alert extends React.Component {
                 width: width || 300,
                 onClose: () => this.close(),
                 footer: el('button', {key: "btnOk", onClick: () => this.close()}, "OK"),
-                content: el('label', {key: "label"}, message)
+                content
             }
         ));
     }

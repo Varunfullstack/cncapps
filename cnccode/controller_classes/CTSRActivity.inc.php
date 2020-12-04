@@ -1047,11 +1047,12 @@ class CTSRActivity extends CTCNC
                 $dbeProblem = new DBEProblem($this);
                 $dbeProblem->getRow($problemID);
                 return [
-                    "status"         => 1,
-                    "nextURL"        => $nextURL,
-                    "problemID"      => $problemID,
-                    "callActivityID" => $dsCallActivity->getValue(DBEJCallActivity::callActivityID),
-                    "raiseTypeId"    => $dbeProblem->getValue(DBEProblem::raiseTypeId)
+                    "status"           => 1,
+                    "nextURL"          => $nextURL,
+                    "problemID"        => $problemID,
+                    "callActivityID"   => $dsCallActivity->getValue(DBEJCallActivity::callActivityID),
+                    "raiseTypeId"      => $dbeProblem->getValue(DBEProblem::raiseTypeId),
+                    "SLAResponseHours" => $dbeProblem->getValue(DBEProblem::slaResponseHours)
                 ];
             } else return ["status" => 0];
         } catch (Exception $exception) {

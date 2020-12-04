@@ -15,6 +15,7 @@ export default class MainComponent extends React.Component {
                 title: "",
                 width: 500,
                 message: "",
+                isHTML: false
             },
             confirm: {
                 show: false,
@@ -62,12 +63,13 @@ export default class MainComponent extends React.Component {
     }
 
     //----------------alert
-    alert = (message, width = 500, title = "Alert") => {
+    alert = (message, width = 500, title = "Alert", isHTML = false) => {
         const {alert} = this.state;
         alert.show = true;
         alert.width = width;
         alert.title = title;
         alert.message = message;
+        alert.isHTML = isHTML;
         this.setState({alert});
         return new Promise((resolve, reject) => {
             setInterval(() => {
@@ -83,6 +85,7 @@ export default class MainComponent extends React.Component {
             width={alert.width}
             title={alert.title}
             message={alert.message}
+            isHTML={alert.isHTML}
             onClose={() => this.handleAlertClose()}
         />;
     }

@@ -60,7 +60,10 @@ class StandardTextModal extends React.Component {
                 title: templateTitle,
                 show: _showModal,
                 content: el('div', {key: 'container', style: {height: 150}},
-                    templateOptions.length > 0 ? el('select', {onChange: this.handleTemplateChanged}, el('option', {
+                    templateOptions.length > 0 ? el('select', {
+                        onChange: this.handleTemplateChanged,
+                        style: {display: "block"}
+                    }, el('option', {
                         key: 'empty',
                         value: -1
                     }, "-- Pick an option --"), templateOptions.map(s => el('option', {
@@ -68,13 +71,18 @@ class StandardTextModal extends React.Component {
                         value: s.id
                     }, s.name))) : null,
                     noEditor ?
-                        el("input", {
+                        el("textarea", {
                             key: 'salesRequestEditor',
                             id: 'salesRequest',
-                            type: 'text',
                             value: templateDefault,
-                            onChange: ($event) => this.handleTemplateValueChange($event.target.value),
-                            height: 100
+                            onChange: ($event) => {
+                                console.log($event);
+                                this.handleTemplateValueChange($event.target.value)
+                            },
+                            style: {
+                                height: "100px",
+                                width: "700px"
+                            },
                         }) :
                         el(CKEditor, {
                             key: 'salesRequestEditor',

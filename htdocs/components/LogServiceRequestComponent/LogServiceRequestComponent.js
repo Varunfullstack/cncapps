@@ -125,10 +125,17 @@ export default class LogServiceRequestComponent extends MainComponent {
                 }
 
                 this.setState({_showSpinner: false});
-                if (result.raiseTypeId == 3)
-                    await this.alert(`Please advise customer their Service Request number is: ${result.problemID}`)
-                if (result.nextURL)
-                    window.location = result.nextURL;
+                if (result.raiseTypeId == 3) {
+                    await this.alert(
+                        `<p>Please advise customer their Service Request number is: ${result.problemID}.</p><p>The SLA for priority ${data.priority} request is ${result.SLAResponseHours} hour${result.SLAResponseHours > 1 ? 's' : ''}</p>`,
+                        500,
+                        'Alert',
+                        true
+                    );
+                    if (result.nextURL) {
+                        window.location = result.nextURL;
+                    }
+                }
             }
             this.setState({_showSpinner: false});
 

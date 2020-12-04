@@ -86,6 +86,8 @@ class CustomerSearchComponent extends React.Component {
                 label: "",
                 sortable: false,
                 textColorColumn: "color",
+                hdToolTip: 'special attention',
+                toolTip: "Special Attention customer / contact",
                 content: (customer) =>
                     customer.specialAttentionContact == '1' || customer.specialAttentionCustomer == 'Y' ?
                         el(

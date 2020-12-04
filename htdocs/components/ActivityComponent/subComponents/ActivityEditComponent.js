@@ -289,22 +289,25 @@ class ActivityEditComponent extends MainComponent {
             return false;
         }
 
-        const callActType = this.state.callActTypes.filter(
-            (c) => c.id == data.callActTypeID
-        )[0];
-        data.callActType = callActType;
-        if (
-            callActType &&
-            callActType.description.indexOf("FOC") == -1 &&
-            data.siteMaxTravelHours == -1
-        ) {
-            this.alert("Travel hours need entering for this site");
-            return false;
-        }
+        const callActType = this.state.callActTypes.find((c) => c.id == data.callActTypeID);
         if (!callActType) {
             this.alert("Please select activity type");
             return false;
         }
+
+        if (callActType.activityNotesRequired === 'Y' && !data.reasonTemplate) {
+            this.alert("Please Enter Activity Notes");
+            return false;
+        }
+
+        data.callActType = callActType;
+
+        if (callActType.description.indexOf("FOC") == -1 &&
+            data.siteMaxTravelHours == -1) {
+            this.alert("Travel hours need entering for this site");
+            return false;
+        }
+
         if (!data.contactSupportLevel) {
             this.alert("Not a nominated support contact");
             return false;
@@ -659,7 +662,6 @@ class ActivityEditComponent extends MainComponent {
         const renderActionButtons = () => {
             if (data?.callActType !== 59) {
                 return <Fragment>
-
                     <button onClick={() => this.setNextStatus(this.activityStatus.CncAction)}>CNC Action</button>
                     <button onClick={() => this.setNextStatus(this.activityStatus.Fixed)}>Fixed</button>
                     <button onClick={() => this.setNextStatus(this.activityStatus.CustomerAction)}>On Hold</button>
@@ -792,6 +794,7 @@ class ActivityEditComponent extends MainComponent {
                 if (!await this.isValid(data)) {
                     return false;
                 }
+
                 if (!await this.confirm("Are you sure this SR is fixed?")) return false;
                 //return;
                 break;
@@ -1784,7 +1787,7 @@ class ActivityEditComponent extends MainComponent {
                 value: data.emptyAssetReason,
                 show: emptyAssetReasonModalShowing,
                 noEditor: true,
-                title: "Please provide the reason of not listing an asset test",
+                title: "Please provide the reason of not listing an asset",
                 okTitle: "OK",
                 onChange: (value) => {
                     if (!value) {
