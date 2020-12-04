@@ -115,23 +115,25 @@ class FirstTimeFixReportComponent extends MainComponent {
     };
     handleSearch = () => {
         const {filter} = this.state;
+        if (!this.isValid()) {
+            return;
+        }
         this.setState({loading: true});
-        if (this.isValid())
-            Promise.all([
-                this.apiFirstTimeFixReport.search(
-                    filter.startDate,
-                    filter.endDate,
-                    filter.customerID,
-                    filter.engineerID),
-                this.apiActivity.getNotAttemptFirstTimeFix(
-                    filter.startDate,
-                    filter.endDate,
-                    filter.customerID,
-                    filter.engineerID
-                ),
-            ]).then(([firstTimeData, notAttemptFirstTimeFixData]) => {
-                this.setState({firstTimeData, notAttemptFirstTimeFixData, loading: false});
-            });
+        Promise.all([
+            this.apiFirstTimeFixReport.search(
+                filter.startDate,
+                filter.endDate,
+                filter.customerID,
+                filter.engineerID),
+            this.apiActivity.getNotAttemptFirstTimeFix(
+                filter.startDate,
+                filter.endDate,
+                filter.customerID,
+                filter.engineerID
+            ),
+        ]).then(([firstTimeData, notAttemptFirstTimeFixData]) => {
+            this.setState({firstTimeData, notAttemptFirstTimeFixData, loading: false});
+        });
     };
     getFirstTimeElement = () => {
         const {firstTimeData} = this.state;
@@ -208,7 +210,7 @@ class FirstTimeFixReportComponent extends MainComponent {
     render() {
         return <div>
             {this.getAlert()}
-            <Spinner show={this.state.loading}></Spinner>
+            <Spinner show={this.state.loading}/>
             {this.getSearchElement()}
             <h3>Staff Figures</h3>
             {this.getFirstTimeElement()}
