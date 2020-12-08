@@ -13,9 +13,6 @@ class LastStepComponent extends MainComponent {
 
     apiCustomer = new APICustomers();
     apiStandardText = new APIStandardText();
-    modalType = {
-        notFirstTimeFixReason: "notFirstTimeFixReason"
-    }
 
     constructor(props) {
         super(props);
@@ -28,7 +25,6 @@ class LastStepComponent extends MainComponent {
             contacts: [],
             _showModal: false,
             requireAuthorize: false,
-            modalType: null,
             data: {
                 uploadFiles: [],
                 repeatProblem: data.repeatProblem || false,
@@ -162,8 +158,7 @@ class LastStepComponent extends MainComponent {
         const {currentUser, customer} = this.props.data;
         if (currentUser.teamLevel == 1 && data.queueNo == TeamType.Helpdesk && (!data.notFirstTimeFixReason) && customer.hasServiceDesk) {
             const _showModal = true;
-            const modalType = this.modalType.notFirstTimeFixReason;
-            this.setState({modalType, _showModal});
+            this.setState({_showModal});
             return false;
         }
         if (this.isValid()) this.props.updateSRData(data, true);
@@ -416,7 +411,7 @@ class LastStepComponent extends MainComponent {
             title: "Reason for not attempting a First Time Fix",
             okTitle: "OK",
             onChange: this.handleNotFirstTimeFixReason,
-            onCancel: () => this.setState({_showModal: false, modalType: null})
+            onCancel: () => this.setState({_showModal: false})
         });
     };
     handleNotFirstTimeFixReason = (value) => {
@@ -424,7 +419,7 @@ class LastStepComponent extends MainComponent {
             const {data} = this.state;
             data.notFirstTimeFixReason = value;
             data.startWork = true;
-            this.setState({data, _showModal: false, modalType: null});
+            this.setState({data, _showModal: false});
             this.addToQueue();
         }
 
