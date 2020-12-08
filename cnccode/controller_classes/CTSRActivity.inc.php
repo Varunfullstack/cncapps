@@ -1027,7 +1027,7 @@ class CTSRActivity extends CTCNC
                         DBEProblemNotStartReason::problemID,
                         $dsCallActivity->getValue(DBEJCallActivity::problemID)
                     );
-                    $dbeProblemNotStartReason->setValue(DBEProblemNotStartReason::reason, $body->notStartWorkReason);
+                    $dbeProblemNotStartReason->setValue(DBEProblemNotStartReason::reason, $body->notFirstTimeFixReason);
                     $dbeProblemNotStartReason->setValue(
                         DBEProblemNotStartReason::userID,
                         $currentUser->getValue(DBEUser::userID)
