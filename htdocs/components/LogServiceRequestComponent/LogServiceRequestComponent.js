@@ -109,6 +109,7 @@ export default class LogServiceRequestComponent extends MainComponent {
             newData.callActTypeID = null;
             const result = await this.api.createProblem(customData);
 
+
             if (result.status) {
                 if (newData.uploadFiles.length > 0) {
                     await this.api.uploadFiles(
@@ -132,7 +133,9 @@ export default class LogServiceRequestComponent extends MainComponent {
                     );
                 }
                 if (result.nextURL) {
-                    window.location = result.nextURL;
+                    console.log(result.nextURL);
+
+                    // window.location = result.nextURL;
                 }
             }
             this.setState({_showSpinner: false});

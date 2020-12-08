@@ -1004,6 +1004,7 @@ class CTSRActivity extends CTCNC
                     $dbePendingReopened = new DBEPendingReopened($this);
                     $dbePendingReopened->deleteRow($body->pendingReopenedID);
                 }
+                $nextURL = "CurrentActivityReport.php";
                 if ($body->startWork) {
                     $newActivityID = $buActivity->createFollowOnActivity(
                         $dsCallActivity->getValue(DBEJCallActivity::callActivityID),
@@ -1016,8 +1017,6 @@ class CTSRActivity extends CTCNC
                         $this->getParam('moveToUsersQueue')
                     );
                     $nextURL       = "SRActivity.php?action=editActivity&callActivityID=" . $newActivityID;
-                } else {
-                    $nextURL = "CurrentActivityReport.php";
                 }
                 $currentUser    = $this->getDbeUser();
                 $buCustomerItem = new BUCustomerItem($this);
