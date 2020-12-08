@@ -14,7 +14,6 @@ class LastStepComponent extends MainComponent {
     apiCustomer = new APICustomers();
     apiStandardText = new APIStandardText();
     modalType = {
-        notStartWorkReason: "notStartWorkReason",
         notFirstTimeFixReason: "notFirstTimeFixReason"
     }
 
@@ -42,8 +41,6 @@ class LastStepComponent extends MainComponent {
                 startTime: data.startTime || "",
                 date: data.date || "",
                 queueNo: data.queueNo || -1,
-                notStartWorkReason: data.notStartWorkReason || "",
-                notStartWorkReasonTemplate: data.notStartWorkReasonTemplate || "",
                 startWork: false,
                 authorisedBy: "",
                 internalDocuments: []
@@ -158,10 +155,17 @@ class LastStepComponent extends MainComponent {
         data[prop] = value;
         this.setState({data});
     };
-    handleNext = () => {
+    addToQueue = () => {
         const {data} = this.state;
         data.userID = null;
         data.completeDate = null;
+        const {currentUser, customer} = this.props.data;
+        if (currentUser.teamLevel == 1 && data.queueNo == TeamType.Helpdesk && (!data.notFirstTimeFixReason) && customer.hasServiceDesk) {
+            const _showModal = true;
+            const modalType = this.modalType.notFirstTimeFixReason;
+            this.setState({modalType, _showModal});
+            return false;
+        }
         if (this.isValid()) this.props.updateSRData(data, true);
     };
     getNextButton = () => {
@@ -182,7 +186,7 @@ class LastStepComponent extends MainComponent {
             null,
             el(
                 "button",
-                {onClick: this.handleNext, className: "float-right"},
+                {onClick: this.addToQueue, className: "float-right"},
                 "Add To Queue"
             ),
             !this.state.data.startWork && customer.hasServiceDesk
@@ -401,31 +405,12 @@ class LastStepComponent extends MainComponent {
             )
         );
     };
-    getNotStartReasonElement = () => {
-        const {el} = this;
-        const {_showModal, modalType, noWorkOptions, data} = this.state;
-        if (!_showModal) return null;
-        return el(StandardTextModal, {
-            show: _showModal && modalType == this.modalType.notStartWorkReason,
-            options: noWorkOptions,
-            value: data.notStartWorkReason,
-            title: "Please provide a reason why you aren't offering a first time fix",
-            okTitle: "OK",
-            onChange: this.handleNoWorkReason,
-            onCancel: () => this.setState({_showModal: false})
-        });
-    };
-    handleNoWorkReason = (value) => {
-        const {data} = this.state;
-        data.notStartWorkReason = value;
-        this.setState({data, _showModal: false});
-    };
     getNotFirstTimeFixReasonElement = () => {
         const {el} = this;
-        const {_showModal, modalType, notFirstTimeFixOptions, data} = this.state;
+        const {_showModal, notFirstTimeFixOptions, data} = this.state;
         if (!_showModal) return null;
         return el(StandardTextModal, {
-            show: _showModal && modalType == this.modalType.notFirstTimeFixReason && data.notFirstTimeFixReason == null,
+            show: _showModal && !data.notFirstTimeFixReason,
             options: notFirstTimeFixOptions,
             value: data.notFirstTimeFixReason,
             title: "Reason for not attempting a First Time Fix",
@@ -440,15 +425,13 @@ class LastStepComponent extends MainComponent {
             data.notFirstTimeFixReason = value;
             data.startWork = true;
             this.setState({data, _showModal: false, modalType: null});
-            this.handleNext();
+            this.addToQueue();
         }
 
     };
 
     isValid = () => {
         const {data, requireAuthorize} = this.state;
-
-        const {currentUser, customer} = this.props.data;
         if (data.contactID == -1) {
             this.alert("Please select contact");
             return false;
@@ -471,14 +454,6 @@ class LastStepComponent extends MainComponent {
             this.alert("Please select queue");
             return false;
         }
-        if (currentUser.teamLevel == 1 && data.queueNo == TeamType.Helpdesk && (!data.notFirstTimeFixReason) && customer.hasServiceDesk) {
-
-            const _showModal = true;
-            const modalType = this.modalType.notFirstTimeFixReason;
-            this.setState({modalType, _showModal});
-            return false;
-        }
-
         return true;
     };
 
@@ -619,7 +594,6 @@ class LastStepComponent extends MainComponent {
                 {this.getAlert()}
                 {this.getDocumentsElement()}
                 {this.getInternalDocumentsElement()}
-                {this.getNotStartReasonElement()}
                 {this.getNotFirstTimeFixReasonElement()}
                 {this.getNextButton()}
             </div>
