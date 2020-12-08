@@ -110,9 +110,7 @@ export default class LogServiceRequestComponent extends MainComponent {
             const result = await this.api.createProblem(customData);
 
             if (result.status) {
-
                 if (newData.uploadFiles.length > 0) {
-
                     await this.api.uploadFiles(
                         `Activity.php?action=uploadFile&problemID=${result.problemID}&callActivityID=${result.callActivityID}`,
                         newData.uploadFiles,
@@ -132,9 +130,9 @@ export default class LogServiceRequestComponent extends MainComponent {
                         'Alert',
                         true
                     );
-                    if (result.nextURL) {
-                        window.location = result.nextURL;
-                    }
+                }
+                if (result.nextURL) {
+                    window.location = result.nextURL;
                 }
             }
             this.setState({_showSpinner: false});
