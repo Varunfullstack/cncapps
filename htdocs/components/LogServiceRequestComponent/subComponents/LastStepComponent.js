@@ -418,7 +418,6 @@ class LastStepComponent extends MainComponent {
         if (value !== "") {
             const {data} = this.state;
             data.notFirstTimeFixReason = value;
-            data.startWork = true;
             this.setState({data, _showModal: false});
             this.addToQueue();
         }
