@@ -446,7 +446,8 @@ class LastStepComponent extends MainComponent {
 
     isValid = () => {
         const {data, requireAuthorize} = this.state;
-        const {currentUser} = this.props.data;
+
+        const {currentUser, customer} = this.props.data;
         if (data.contactID == -1) {
             this.alert("Please select contact");
             return false;
@@ -469,7 +470,7 @@ class LastStepComponent extends MainComponent {
             this.alert("Please select queue");
             return false;
         }
-        if (currentUser.teamLevel == 1 && data.queueNo == TeamType.Helpdesk && (!data.notFirstTimeFixReason) && data.customer.hasServiceDesk) {
+        if (currentUser.teamLevel == 1 && data.queueNo == TeamType.Helpdesk && (!data.notFirstTimeFixReason) && customer.hasServiceDesk) {
 
             const _showModal = true;
             const modalType = this.modalType.notFirstTimeFixReason;
