@@ -133,9 +133,7 @@ export default class LogServiceRequestComponent extends MainComponent {
                     );
                 }
                 if (result.nextURL) {
-                    console.log(result.nextURL);
-
-                    // window.location = result.nextURL;
+                    window.location = result.nextURL;
                 }
             }
             this.setState({_showSpinner: false});
