@@ -47,9 +47,12 @@
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="callacttype" columnName="cat_r_problem_flag"/>
         </preConditions>
-        <renameColumn tableName="callacttype" oldColumnName="cat_r_problem_flag" newColumnName="activityNotesRequired" columnDataType="char(1) CHARACTER SET utf8 COLLATE utf8_general_ci"/>
+        <renameColumn tableName="callacttype" oldColumnName="cat_r_problem_flag" newColumnName="activityNotesRequired"
+                      columnDataType="char(1) CHARACTER SET utf8 COLLATE utf8_general_ci"/>
         <rollback>
-            <renameColumn tableName="callacttype" oldColumnName="activityNotesRequired" newColumnName="cat_r_problem_flag" columnDataType="char(1) CHARACTER SET utf8 COLLATE utf8_general_ci"/>
+            <renameColumn tableName="callacttype" oldColumnName="activityNotesRequired"
+                          newColumnName="cat_r_problem_flag"
+                          columnDataType="char(1) CHARACTER SET utf8 COLLATE utf8_general_ci"/>
         </rollback>
     </changeSet>
     <changeSet id="release-v5.0.0-5" author="pavwebdev">
@@ -132,4 +135,5 @@
     <include file="db.changelog-issue1086.xml"/>
     <include file="db.changelog-issue1115.xml"/>
     <include file="db.changelog-issue1120.xml"/>
+    <include file="db.changelog-issue1124.xml"/>
 </databaseChangeLog>

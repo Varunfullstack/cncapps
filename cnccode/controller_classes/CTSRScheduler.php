@@ -6,7 +6,6 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
-
 global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBESRScheduler.php');
@@ -46,11 +45,8 @@ class CTSRScheduler extends CTCNC
                     http_response_code(400);
                     throw new Exception('ID is missing');
                 }
-
                 $toDeleteItem = new DBESRScheduler($this);
-
                 $toDeleteItem->getRow($this->getParam('id'));
-
                 if (!$toDeleteItem->rowCount) {
                     http_response_code(404);
                     exit;
@@ -59,15 +55,11 @@ class CTSRScheduler extends CTCNC
                 echo json_encode(["status" => "ok"]);
                 break;
             case 'update':
-
                 if (!$this->getParam('id')) {
                     throw new Exception('ID is missing');
                 }
-
                 $toUpdateItem = new DBESRScheduler($this);
-
                 $toUpdateItem->getRow($this->getParam('id'));
-
                 if (!$toUpdateItem->rowCount) {
                     http_response_code(404);
                     exit;
@@ -87,9 +79,8 @@ class CTSRScheduler extends CTCNC
                 $toUpdateItem->setValue(DBESRScheduler::internalNotes, $this->getParam('internalNotes'));
                 $toUpdateItem->setValue(DBESRScheduler::updatedBy, $this->userID);
                 $toUpdateItem->setValue(DBESRScheduler::updatedAt, (new DateTime())->format(DATE_MYSQL_DATE));
-
+                $toUpdateItem->setValue(DBESRScheduler::emailSubjectSummary, $this->getParam('emailSubjectSummary'));
                 // before we update we want to test the rule
-
                 try {
                     $rrule = new \RRule\RRule($this->getParam('rruleString'));
                 } catch (\Exception $exception) {
@@ -97,7 +88,6 @@ class CTSRScheduler extends CTCNC
                     http_response_code(400);
                     exit;
                 }
-
                 $toUpdateItem->updateRow();
                 echo json_encode(["status" => "ok"]);
                 break;
@@ -108,8 +98,8 @@ class CTSRScheduler extends CTCNC
                     http_response_code(400);
                     exit;
                 }
-                $customerId = $data['customerId'];
-                $salesOrderId = $data['salesOrderId'];
+                $customerId    = $data['customerId'];
+                $salesOrderId  = $data['salesOrderId'];
                 $dbeSalesOrder = new DBEOrdhead($this);
                 $dbeSalesOrder->getRow($salesOrderId);
                 $answer = $dbeSalesOrder->getValue(DBEOrdhead::customerID) == $customerId;
@@ -131,7 +121,7 @@ class CTSRScheduler extends CTCNC
                 $newItem->setValue(DBESRScheduler::updatedBy, $this->userID);
                 $newItem->setValue(DBESRScheduler::createdAt, (new DateTime())->format(DATE_MYSQL_DATETIME));
                 $newItem->setValue(DBESRScheduler::updatedAt, (new DateTime())->format(DATE_MYSQL_DATETIME));
-
+                $newItem->setValue(DBESRScheduler::emailSubjectSummary, $this->getParam('emailSubjectSummary'));
                 try {
                     $rrule = new \RRule\RRule($this->getParam('rruleString'));
                 } catch (\Exception $exception) {
@@ -139,16 +129,12 @@ class CTSRScheduler extends CTCNC
                     http_response_code(400);
                     exit;
                 }
-
                 $newItem->insertRow();
-
                 $toReturn = $this->populateSRSchedulerObjectFromDB($newItem);
-
                 echo json_encode(
                     $toReturn,
                     JSON_NUMERIC_CHECK
                 );
-
                 break;
             case 'getData':
                 $dbeSrScheduler = new DBESRScheduler($this);
@@ -157,9 +143,8 @@ class CTSRScheduler extends CTCNC
                 while ($dbeSrScheduler->fetchNext()) {
                     $result[] = $this->populateSRSchedulerObjectFromDB($dbeSrScheduler);
                 }
-
-                $draw = $_REQUEST['draw'];
-                $order = $_REQUEST['order'];
+                $draw    = $_REQUEST['draw'];
+                $order   = $_REQUEST['order'];
                 $columns = $_REQUEST['columns'];
                 if (count($order)) {
                     usort(
@@ -167,8 +152,8 @@ class CTSRScheduler extends CTCNC
                         function ($item1, $item2) use ($order, $columns) {
                             $idx = 0;
                             do {
-                                $orderItem = $order[$idx];
-                                $columnIdx = $orderItem['column'];
+                                $orderItem  = $order[$idx];
+                                $columnIdx  = $orderItem['column'];
                                 $columnName = $columns[$columnIdx]['name'];
                                 if (!array_key_exists($columnName, $item1)) {
                                     throw new Exception("Column name does not exist {$columnName}");
@@ -206,9 +191,9 @@ class CTSRScheduler extends CTCNC
      */
     private function populateSRSchedulerObjectFromDB($dbeSrScheduler)
     {
-        $row = $dbeSrScheduler->jsonSerialize();
-        $customerId = $dbeSrScheduler->getValue(DBESRScheduler::customerId);
-        $row['customerName'] = $this->getAssociatedObjectData(
+        $row                    = $dbeSrScheduler->jsonSerialize();
+        $customerId             = $dbeSrScheduler->getValue(DBESRScheduler::customerId);
+        $row['customerName']    = $this->getAssociatedObjectData(
             $customerId,
             'customers',
             function ($id) {
@@ -217,8 +202,8 @@ class CTSRScheduler extends CTCNC
                 return $dbeCustomer->getValue(DBECustomer::name);
             }
         );
-        $siteNo = $dbeSrScheduler->getValue(DBESRScheduler::siteNo);
-        $siteKey = "$customerId-$siteNo";
+        $siteNo                 = $dbeSrScheduler->getValue(DBESRScheduler::siteNo);
+        $siteKey                = "$customerId-$siteNo";
         $row['siteDescription'] = $this->getAssociatedObjectData(
             $siteKey,
             'sites',
@@ -230,9 +215,8 @@ class CTSRScheduler extends CTCNC
                     ) . ' ' . $dsResult->getValue(DBESite::postcode);
             }
         );
-
-        $contactId = $dbeSrScheduler->getValue(DBESRScheduler::contactId);
-        $row['contactName'] = $this->getAssociatedObjectData(
+        $contactId              = $dbeSrScheduler->getValue(DBESRScheduler::contactId);
+        $row['contactName']     = $this->getAssociatedObjectData(
             $contactId,
             'contacts',
             function ($id) {
@@ -243,22 +227,19 @@ class CTSRScheduler extends CTCNC
                     ) . " " . $dbeContact->getValue(DBEContact::lastName);
             }
         );
-        $createdById = $dbeSrScheduler->getValue(DBESRScheduler::createdBy);
-        $getUserNameCB = function ($id) {
+        $createdById            = $dbeSrScheduler->getValue(DBESRScheduler::createdBy);
+        $getUserNameCB          = function ($id) {
             $dbeUser = new DBEUser($this);
             $dbeUser->getRow($id);
             return $dbeUser->getValue(DBEUser::name);
         };
-
-        $row['createdByName'] = $this->getAssociatedObjectData(
+        $row['createdByName']   = $this->getAssociatedObjectData(
             $createdById,
             'users',
             $getUserNameCB
         );
-
-        $updatedById = $dbeSrScheduler->getValue(DBESRScheduler::updatedBy);
-
-        $row['updatedByName'] = $this->getAssociatedObjectData(
+        $updatedById            = $dbeSrScheduler->getValue(DBESRScheduler::updatedBy);
+        $row['updatedByName']   = $this->getAssociatedObjectData(
             $updatedById,
             'users',
             $getUserNameCB
@@ -290,8 +271,6 @@ class CTSRScheduler extends CTCNC
         $this->setTemplateFiles(
             array('SRSchedulerList' => 'SRSchedulerList')
         );
-
-
         $this->template->parse('CONTENTS', 'SRSchedulerList', true);
         $this->parsePage();
     }
