@@ -44,17 +44,18 @@ class CTSRActivity extends CTCNC
     const GET_PRIORITIES                                         = "getPriorities";
     const GET_CUSTOMER_SITES                                     = "getCustomerSites";
     const GET_CUSTOMER_CONTACTS                                  = "getCustomerContacts";
-    const UPDATE_ACTIVITY                                        = "updateActivity";
-    const MESSAGE_TO_SALES                                       = "messageToSales";
-    const GET_CALL_ACTIVITY                                      = "getCallActivity";
-    const SAVE_FIXED_INFORMATION                                 = "saveFixedInformation";
-    const GET_INITIAL_ACTIVITY                                   = "getInitialActivity";
-    const SAVE_MANAGEMENT_REVIEW_DETAILS                         = "saveManagementReviewDetails";
-    const CHANGE_PROBLEM_PRIORITY                                = "changeProblemPriority";
-    const USED_BUDGET_DATA                                       = "usedBudgetData";
-    const UPLOAD_INTERNAL_DOCUMENT                               = "uploadInternalDocument";
-    const VIEW_INTERNAL_DOCUMENT                                 = 'viewInternalDocument';
-    const DELETE_INTERNAL_DOCUMENT                               = 'deleteInternalDocument';
+    const UPDATE_ACTIVITY                = "updateActivity";
+    const MESSAGE_TO_SALES               = "messageToSales";
+    const GET_CALL_ACTIVITY              = "getCallActivity";
+    const SAVE_FIXED_INFORMATION         = "saveFixedInformation";
+    const GET_INITIAL_ACTIVITY           = "getInitialActivity";
+    const SAVE_MANAGEMENT_REVIEW_DETAILS = "saveManagementReviewDetails";
+    const CHANGE_PROBLEM_PRIORITY        = "changeProblemPriority";
+    const USED_BUDGET_DATA               = "usedBudgetData";
+    const UPLOAD_INTERNAL_DOCUMENT       = "uploadInternalDocument";
+    const VIEW_INTERNAL_DOCUMENT         = 'viewInternalDocument';
+    const DELETE_INTERNAL_DOCUMENT       = 'deleteInternalDocument';
+    const REMOTE_SUPPORT_ACTIVITY_TYPE_ID                              = 8;
     public  $serverGuardArray = array(
         ""  => "Please select",
         "Y" => "ServerGuard Related",
@@ -1008,7 +1009,7 @@ class CTSRActivity extends CTCNC
                 if ($body->startWork) {
                     $newActivityID = $buActivity->createFollowOnActivity(
                         $dsCallActivity->getValue(DBEJCallActivity::callActivityID),
-                        $this->getParam('callActivityTypeID'),
+                        self::REMOTE_SUPPORT_ACTIVITY_TYPE_ID,
                         false,
                         $this->getParam('reason'),
                         true,

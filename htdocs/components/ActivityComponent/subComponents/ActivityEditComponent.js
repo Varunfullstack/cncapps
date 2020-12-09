@@ -341,6 +341,11 @@ class ActivityEditComponent extends MainComponent {
                     return false;
                 }
             }
+
+            if(callActType.requireCheckFlag === 'N' && callActType.onSiteFlag === 'N' && !data.endTime){
+                data.endTime = moment().format('HH:mm');
+            }
+
             if (data.endTime) {
                 const duration = moment.duration(
                     moment(data.date + " " + data.endTime).diff(
