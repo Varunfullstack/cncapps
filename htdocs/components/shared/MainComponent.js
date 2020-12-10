@@ -30,7 +30,8 @@ export default class MainComponent extends React.Component {
                 width: 500,
                 message: "",
                 value: null,
-                defaultValue: null
+                defaultValue: null,
+                isEditor: false
             },
         };
     }
@@ -141,13 +142,14 @@ export default class MainComponent extends React.Component {
 
     //-----------------end alert
     //----------------prompt
-    prompt = (title = "Prompt", width = 500, defaultValue = null) => {
+    prompt = (title = "Prompt", width = 500, defaultValue = null, isEditor = false) => {
         const {prompt} = this.state;
         prompt.show = true;
         prompt.width = width;
         prompt.title = title;
         prompt.value = null;
         prompt.defaultValue = defaultValue;
+        prompt.isEditor = isEditor;
         this.setState({prompt});
         let handleInterval = null;
         return new Promise((resolve, reject) => {

@@ -42,7 +42,7 @@ class CustomerSRComponent extends React.Component {
                     if (!problem.isSpecialAttention) {
                         return null;
                     }
-                    return <i className="fal fa-2x fa-exclamation-triangle color-gray pointer float-right inbox-icon"/>
+                    return <i className="fal fa-2x fa-star color-gray pointer float-right inbox-icon"/>
                 }
             },
             {

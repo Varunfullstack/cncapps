@@ -37,6 +37,7 @@ class DBEJProblem extends DBEProblem
     const FIXED_DATE                       = "fixedDate";
     const ENGINEER_FIXED_NAME              = 'engineerFixedName';
     const FIXED_TEAM_ID                    = 'fixedTeamId';
+    const IS_FIX_SLA_BREACHED              = 'isFixSLABreached';
 
 
     /**
@@ -183,7 +184,6 @@ class DBEJProblem extends DBEProblem
             DA_ALLOW_NULL,
             "last.caa_endtime"
         );
-
         $this->addColumn(
             self::lastUserID,
             DA_INTEGER,
@@ -214,7 +214,6 @@ class DBEJProblem extends DBEProblem
             DA_ALLOW_NULL,
             'pro_working_hours - pro_sla_response_hours'
         );
-
         $this->addColumn(
             self::specialAttentionContactFlag,
             DA_YN_FLAG,
@@ -261,7 +260,17 @@ class DBEJProblem extends DBEProblem
             DA_ALLOW_NULL,
             'queueTeam.teamID'
         );
-
+        $this->addColumn(
+            self::IS_FIX_SLA_BREACHED,
+            DA_BOOLEAN,
+            DA_ALLOW_NULL,
+            'CASE 
+	WHEN `pro_priority` = 1 THEN customer.`slaP1PenaltiesAgreed` && customer.`slaFixHoursP1` - problem.pro_working_hours <= 0
+	WHEN `pro_priority` = 2 THEN customer.`slaP2PenaltiesAgreed` && customer.`slaFixHoursP2` - problem.pro_working_hours <= 0
+	WHEN `pro_priority` = 3 THEN customer.`slaP3PenaltiesAgreed` && customer.`slaFixHoursP3` - problem.pro_working_hours <= 0
+	else 0
+	END'
+        );
         $this->setAddColumnsOff();
         $this->setPK(0);
     }
@@ -278,16 +287,11 @@ class DBEJProblem extends DBEProblem
                              $includeAutomaticallyFixed = false
     )
     {
-        $sql =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " LEFT JOIN customer ON cus_custno = pro_custno
+        $sql = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " LEFT JOIN customer ON cus_custno = pro_custno
            LEFT JOIN consultant ON cns_consno = pro_consno
 
           JOIN callactivity `initial`
-            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
-
-            " 
+            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID . " 
           
             JOIN callactivity `last`
             ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
@@ -305,34 +309,25 @@ class DBEJProblem extends DBEProblem
             left join team queueTeam on queueTeam.level = pro_queue_no
         WHERE 1=1";
         if ($status) {
-            $sql .=
-                " AND pro_status = '" . $status . "'";
+            $sql .= " AND pro_status = '" . $status . "'";
         }
         /* Exclude future dated */
         $sql .= " AND (pro_alarm_date is null or CONCAT( pro_alarm_date, ' ', pro_alarm_time ) <= NOW())";
-
         if ($status == 'F' && !$includeAutomaticallyFixed) {
             $sql .= " AND last.caa_consno <> " . USER_SYSTEM;
         }
-
         $sql .= " ORDER BY pro_alarm_date, pro_alarm_time";
-
         $this->setQueryString($sql);
         return (parent::getRows());
     }
 
     function getFutureRows()
     {
-        $sql =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " LEFT JOIN customer ON cus_custno = pro_custno
+        $sql = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " LEFT JOIN customer ON cus_custno = pro_custno
            LEFT JOIN consultant ON cns_consno = pro_consno
 
           JOIN callactivity `initial`
-            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
-
-            " JOIN callactivity `last`
+            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID . " JOIN callactivity `last`
             ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
               (
               SELECT
@@ -350,22 +345,16 @@ class DBEJProblem extends DBEProblem
           AND CONCAT( pro_alarm_date, ' ', coalesce(pro_alarm_time, '00:00:00') )  > NOW()
       ORDER BY pro_alarm_date, pro_alarm_time";
         $this->setQueryString($sql);
-
         return (parent::getRows());
     }
 
     function getSLAWarningRows()
     {
-        $sql =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " LEFT JOIN customer ON cus_custno = pro_custno
+        $sql = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " LEFT JOIN customer ON cus_custno = pro_custno
            LEFT JOIN consultant ON cns_consno = pro_consno
            
           JOIN callactivity `initial`
-            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
-
-            " JOIN callactivity `last`
+            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID . " JOIN callactivity `last`
             ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
               (
               SELECT
@@ -390,22 +379,16 @@ class DBEJProblem extends DBEProblem
           )
       ORDER BY pro_alarm_date, pro_alarm_time";
         $this->setQueryString($sql);
-
         return (parent::getRows());
     }
 
     function getAlarmReachedRows()
     {
-        $sql =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " LEFT JOIN customer ON cus_custno = pro_custno
+        $sql = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " LEFT JOIN customer ON cus_custno = pro_custno
            LEFT JOIN consultant ON cns_consno = pro_consno
 
           JOIN callactivity `initial`
-            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
-
-            " JOIN callactivity `last`
+            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID . " JOIN callactivity `last`
             ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
               (
               SELECT
@@ -423,7 +406,6 @@ class DBEJProblem extends DBEProblem
           AND CONCAT( pro_alarm_date, ' ', coalesce(pro_alarm_time, '00:00:00') )  < NOW()
       ORDER BY pro_alarm_date, pro_alarm_time";
         $this->setQueryString($sql);
-
         return (parent::getRows());
     }
 
@@ -434,17 +416,14 @@ class DBEJProblem extends DBEProblem
       */
     function getRowsByQueueNoWithFuture($queueNo)
     {
-        $sql =
-            "SELECT {$this->getDBColumnNamesAsString()}, pro_alarm_date is not null as hasAlarmDate,
+        $sql = "SELECT {$this->getDBColumnNamesAsString()}, pro_alarm_date is not null as hasAlarmDate,
              consultant.cns_consno is not null as isAssigned
              FROM {$this->getTableName()}
              LEFT JOIN customer ON cus_custno = pro_custno
            LEFT JOIN consultant ON cns_consno = pro_consno
 
           JOIN callactivity `initial`
-            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = "
-            . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
-            " JOIN callactivity `last`
+            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID . " JOIN callactivity `last`
             ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
               (
               SELECT
@@ -463,7 +442,6 @@ class DBEJProblem extends DBEProblem
           AND pro_queue_no = $queueNo
           order by hasAlarmDate asc, CONCAT( pro_alarm_date, ' ', coalesce(concat(pro_alarm_time,':00') , '00:00:00') ) asc,   isAssigned asc, {$this->getDBColumnName(self::workingHours)} desc
           ";
-
         $this->setQueryString($sql);
         return (parent::getRows());
     }
@@ -471,17 +449,11 @@ class DBEJProblem extends DBEProblem
     function getRow($pkID)
     {
         $this->setPKValue($pkID);
-
-        $sql =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " LEFT JOIN customer ON cus_custno = pro_custno
+        $sql = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " LEFT JOIN customer ON cus_custno = pro_custno
            LEFT JOIN consultant ON cns_consno = pro_consno
 
           JOIN callactivity `initial`
-            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
-
-            " JOIN callactivity `last`
+            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID . " JOIN callactivity `last`
             ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
               (
               SELECT
@@ -497,9 +469,7 @@ class DBEJProblem extends DBEProblem
             left join team queueTeam on queueTeam.level = pro_queue_no
             
         WHERE " . $this->getPKWhere();
-
         $this->setQueryString($sql);
-
         return (parent::getRow());
     }
 
@@ -516,22 +486,17 @@ class DBEJProblem extends DBEProblem
             true,
             "concat(contact.con_first_name, ' ', contact.con_last_name)"
         );
-
         $this->addColumn(
             "contactId",
             DA_STRING,
             true,
             "initial.caa_contno"
         );
-
-        $sql =
-            "SELECT DISTINCT {$this->getDBColumnNamesAsString()}
+        $sql = "SELECT DISTINCT {$this->getDBColumnNamesAsString()}
              FROM {$this->getTableName()}
              LEFT JOIN customer ON cus_custno = pro_custno
           JOIN callactivity `initial`
-            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
-
-            " JOIN callactivity `last`
+            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID . " JOIN callactivity `last`
             ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
               (
               SELECT
@@ -550,24 +515,16 @@ class DBEJProblem extends DBEProblem
         WHERE
           pro_custno = $customerID
           AND pro_status <> 'C'";
-
         $sql .= " ORDER BY pro_date_raised DESC";              // in progress
-
         $this->setQueryString($sql);
-
         return (parent::getRows());
     }
 
     function getProblemsByContactID($contactID)
     {
-        $sql =
-            "SELECT DISTINCT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " LEFT JOIN customer ON cus_custno = pro_custno
+        $sql = "SELECT DISTINCT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " LEFT JOIN customer ON cus_custno = pro_custno
           JOIN callactivity `initial`
-            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
-
-            " JOIN callactivity `last`
+            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID . " JOIN callactivity `last`
             ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
               (
               SELECT
@@ -585,23 +542,16 @@ class DBEJProblem extends DBEProblem
         WHERE
           initial.caa_contno = " . $contactID . " and pro_date_raised >= date(now() - interval 3 month) 
          ";
-
-        $sql .= " ORDER BY pro_date_raised DESC";              // in progress        
+        $sql .= " ORDER BY pro_date_raised DESC";              // in progress
         $this->setQueryString($sql);
-
         return (parent::getRows());
     }
 
     public function getP1byCustomerIdLast30Days($customerID)
     {
-        $sql =
-            "SELECT DISTINCT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " LEFT JOIN customer ON cus_custno = pro_custno
+        $sql = "SELECT DISTINCT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " LEFT JOIN customer ON cus_custno = pro_custno
           JOIN callactivity `initial`
-            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
-
-            " JOIN callactivity `last`
+            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID . " JOIN callactivity `last`
             ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
               (
               SELECT
@@ -618,30 +568,21 @@ class DBEJProblem extends DBEProblem
             left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
             left join team queueTeam on queueTeam.level = pro_queue_no
         WHERE
-          pro_custno = $customerID" .
-            " AND cast(" . $this->getDBColumnName(
+          pro_custno = $customerID" . " AND cast(" . $this->getDBColumnName(
                 self::dateRaised
-            ) . " as date)  BETWEEN CURDATE() - INTERVAL 30 DAY AND CURDATE()" .
-            " and " . $this->getDBColumnName(self::hideFromCustomerFlag) . " <> 'Y'" .
-            " and " . $this->getDBColumnName(self::priority) . " = 1";
-
+            ) . " as date)  BETWEEN CURDATE() - INTERVAL 30 DAY AND CURDATE()" . " and " . $this->getDBColumnName(
+                self::hideFromCustomerFlag
+            ) . " <> 'Y'" . " and " . $this->getDBColumnName(self::priority) . " = 1";
         $sql .= " ORDER BY pro_date_raised DESC";
-
         $this->setQueryString($sql);
-
         return parent::getRows();
     }
 
     public function getStartersSRByCustomerIDLast12Months($customerID)
     {
-        $sql =
-            "SELECT DISTINCT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " LEFT JOIN customer ON cus_custno = pro_custno
+        $sql = "SELECT DISTINCT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " LEFT JOIN customer ON cus_custno = pro_custno
           JOIN callactivity `initial`
-            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
-
-            " JOIN callactivity `last`
+            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID . " JOIN callactivity `last`
             ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
               (
               SELECT
@@ -657,16 +598,13 @@ class DBEJProblem extends DBEProblem
             left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
             left join team queueTeam on queueTeam.level = pro_queue_no
         WHERE
-          pro_custno = $customerID" .
-            " AND cast(" . $this->getDBColumnName(
+          pro_custno = $customerID" . " AND cast(" . $this->getDBColumnName(
                 self::dateRaised
-            ) . " as date) BETWEEN CURDATE() - INTERVAL 12 month AND CURDATE()" .
-            " and " . $this->getDBColumnName(self::hideFromCustomerFlag) . " <> 'Y'" .
-            " and " . $this->getDBColumnName(self::rootCauseID) . " = 58";
-
+            ) . " as date) BETWEEN CURDATE() - INTERVAL 12 month AND CURDATE()" . " and " . $this->getDBColumnName(
+                self::hideFromCustomerFlag
+            ) . " <> 'Y'" . " and " . $this->getDBColumnName(self::rootCauseID) . " = 58";
         $sql .= " ORDER BY pro_date_raised DESC";
         $this->setQueryString($sql);
-
         return parent::getRows();
     }
 
@@ -675,14 +613,9 @@ class DBEJProblem extends DBEProblem
                                                          DateTimeInterface $endDate
     )
     {
-        $sql =
-            "SELECT DISTINCT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " LEFT JOIN customer ON cus_custno = pro_custno
+        $sql = "SELECT DISTINCT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " LEFT JOIN customer ON cus_custno = pro_custno
           JOIN callactivity `initial`
-            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
-
-            " JOIN callactivity `last`
+            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID . " JOIN callactivity `last`
             ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
               (
               SELECT
@@ -698,29 +631,23 @@ class DBEJProblem extends DBEProblem
             left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
             left join team queueTeam on queueTeam.level = pro_queue_no
         WHERE
-          pro_custno = $customerID" .
-            " AND cast(" . $this->getDBColumnName(self::dateRaised) . " as date) BETWEEN '" .
-            $startDate->format('Y-m-d') . "' AND  '" . $endDate->format('Y-m-d')
-            . "' " .
-            " and " . $this->getDBColumnName(self::hideFromCustomerFlag) . " <> 'Y'" .
-            " and " . $this->getDBColumnName(self::rootCauseID) . " = 58";
-
+          pro_custno = $customerID" . " AND cast(" . $this->getDBColumnName(
+                self::dateRaised
+            ) . " as date) BETWEEN '" . $startDate->format('Y-m-d') . "' AND  '" . $endDate->format(
+                'Y-m-d'
+            ) . "' " . " and " . $this->getDBColumnName(
+                self::hideFromCustomerFlag
+            ) . " <> 'Y'" . " and " . $this->getDBColumnName(self::rootCauseID) . " = 58";
         $sql .= " ORDER BY pro_date_raised DESC";
         $this->setQueryString($sql);
-
         return parent::getRows();
     }
 
     public function getLeaversSRByCustomerIDLast12Months($customerID)
     {
-        $sql =
-            "SELECT DISTINCT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " LEFT JOIN customer ON cus_custno = pro_custno
+        $sql = "SELECT DISTINCT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " LEFT JOIN customer ON cus_custno = pro_custno
           JOIN callactivity `initial`
-            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
-
-            " JOIN callactivity `last`
+            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID . " JOIN callactivity `last`
             ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
               (
               SELECT
@@ -736,17 +663,13 @@ class DBEJProblem extends DBEProblem
             left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
             left join team queueTeam on queueTeam.level = pro_queue_no
         WHERE
-          pro_custno = $customerID" .
-            " AND cast(" . $this->getDBColumnName(
+          pro_custno = $customerID" . " AND cast(" . $this->getDBColumnName(
                 self::dateRaised
-            ) . " as date) BETWEEN CURDATE() - INTERVAL 12 month AND CURDATE()" .
-            " and " . $this->getDBColumnName(self::hideFromCustomerFlag) . " <> 'Y'" .
-            " and " . $this->getDBColumnName(self::rootCauseID) . " = 62";
-
+            ) . " as date) BETWEEN CURDATE() - INTERVAL 12 month AND CURDATE()" . " and " . $this->getDBColumnName(
+                self::hideFromCustomerFlag
+            ) . " <> 'Y'" . " and " . $this->getDBColumnName(self::rootCauseID) . " = 62";
         $sql .= " ORDER BY pro_date_raised DESC";
-
         $this->setQueryString($sql);
-
         return parent::getRows();
     }
 
@@ -755,14 +678,9 @@ class DBEJProblem extends DBEProblem
                                                         DateTimeInterface $endDate
     )
     {
-        $sql =
-            "SELECT DISTINCT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " LEFT JOIN customer ON cus_custno = pro_custno
+        $sql = "SELECT DISTINCT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " LEFT JOIN customer ON cus_custno = pro_custno
           JOIN callactivity `initial`
-            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
-
-            " JOIN callactivity `last`
+            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID . " JOIN callactivity `last`
             ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
               (
               SELECT
@@ -778,19 +696,15 @@ class DBEJProblem extends DBEProblem
             left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
             left join team queueTeam on queueTeam.level = pro_queue_no
         WHERE
-          pro_custno = $customerID" .
-            " AND cast(" . $this->getDBColumnName(self::dateRaised) . " as date) BETWEEN '" .
-            $startDate->format('Y-m-d')
-            . "' AND  '" .
-            $endDate->format('Y-m-d')
-            . "' " .
-            " and " . $this->getDBColumnName(self::hideFromCustomerFlag) . " <> 'Y'" .
-            " and " . $this->getDBColumnName(self::rootCauseID) . " = 62";
-
+          pro_custno = $customerID" . " AND cast(" . $this->getDBColumnName(
+                self::dateRaised
+            ) . " as date) BETWEEN '" . $startDate->format('Y-m-d') . "' AND  '" . $endDate->format(
+                'Y-m-d'
+            ) . "' " . " and " . $this->getDBColumnName(
+                self::hideFromCustomerFlag
+            ) . " <> 'Y'" . " and " . $this->getDBColumnName(self::rootCauseID) . " = 62";
         $sql .= " ORDER BY pro_date_raised DESC";
-
         $this->setQueryString($sql);
-
         return parent::getRows();
     }
 
@@ -810,19 +724,15 @@ class DBEJProblem extends DBEProblem
             $includeFixed = ",'F'";
 
         }
-
-        $sql =
-            "SELECT " . $this->getDBColumnNamesAsString() . ', ' . $this->getDBColumnName(
+        $sql = "SELECT " . $this->getDBColumnNamesAsString() . ', ' . $this->getDBColumnName(
                 self::workingHours
-            ) . ' - ' . $this->getDBColumnName(self::slaResponseHours) . ' as hoursRemaining' .
-
-            " FROM " . $this->getTableName() .
-            " LEFT JOIN customer ON cus_custno = pro_custno
+            ) . ' - ' . $this->getDBColumnName(
+                self::slaResponseHours
+            ) . ' as hoursRemaining' . " FROM " . $this->getTableName() . " LEFT JOIN customer ON cus_custno = pro_custno
            LEFT JOIN consultant ON cns_consno = pro_consno
            left join team on consultant.teamID = team.teamID
           JOIN callactivity `initial`
-            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
-            " JOIN callactivity `last`
+            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID . " JOIN callactivity `last`
             ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
               (
               SELECT
@@ -837,28 +747,22 @@ class DBEJProblem extends DBEProblem
             left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
             left join team queueTeam on queueTeam.level = pro_queue_no 
         WHERE {$this->getDBColumnName(                self::status            ) } in ('I','P'$includeFixed)  ";
-
-
-        if (!$isHoldForQA) {
+        if ($isHoldForQA) {
             $sql .= " and {$this->getDBColumnName(self::customerID)} <> 282 and (consultant.cns_consno is null or consultant.execludeFromSDManagerDashboard = 0) and pro_queue_no <> 7 ";
         } else {
             if (!$showHelpDesk) {
                 $sql .= ' and pro_queue_no <> 1 ';
             }
-
             if (!$showEscalation) {
                 $sql .= ' and pro_queue_no <> 2 ';
             }
-
             if (!$showSmallProjects) {
                 $sql .= ' and pro_queue_no <> 3 ';
             }
-
             if (!$showProjects) {
                 $sql .= ' and pro_queue_no <> 5 ';
             }
         }
-
         if ($isP5) {
             $sql .= 'and ' . $this->getDBColumnName(
                     self::priority
@@ -872,7 +776,6 @@ class DBEJProblem extends DBEProblem
                     ) . ' > 0 ';
             }
         }
-
         switch ($orderBy) {
 
             case 'shortestSLAFixRemaining':
@@ -888,7 +791,7 @@ class DBEJProblem extends DBEProblem
 	WHEN `pro_priority` = 1 THEN customer.`slaFixHoursP1`
 	WHEN `pro_priority` = 2 THEN customer.`slaFixHoursP2`
 	WHEN `pro_priority` = 3 THEN customer.`slaFixHoursP3`
-	END - problem.pro_working_hours > 0
+	END - problem.pro_working_hours 
 	AND 
   CASE
 	WHEN `pro_priority` = 1 THEN customer.`slaFixHoursP1`
@@ -900,7 +803,6 @@ class DBEJProblem extends DBEProblem
 	WHEN `pro_priority` = 2 THEN customer.`slaFixHoursP2`
 	WHEN `pro_priority` = 3 THEN customer.`slaFixHoursP3`
 	END - problem.pro_working_hours ASC';
-
                 break;
             }
             case 'shortestSLARemaining':
@@ -912,14 +814,11 @@ class DBEJProblem extends DBEProblem
                 break;
             }
             case 'currentOpenP1Requests':
-
                 $sql .= ' and ' . $this->getDBColumnName(
                         self::priority
                     ) . ' = 1 ';
-
                 $sql .= ' order by pro_sla_response_hours - pro_working_hours asc';
                 break;
-
             case 'oldestUpdatedSR':
             {
                 $sql .= ' order by last.caa_date asc, last.caa_starttime desc';
@@ -945,10 +844,8 @@ class DBEJProblem extends DBEProblem
                 $sql .= " and holdForQA=1";
 
         }
-
         $sql .= ' limit ' . $limit;
         $this->setQueryString($sql);
-
         return (parent::getRows());
     }
 
@@ -962,17 +859,15 @@ class DBEJProblem extends DBEProblem
                                                   $showProjects = true
     )
     {
-        $sql =
-            "SELECT " . $this->getDBColumnNamesAsString() . ', ' . $this->getDBColumnName(
+        $sql = "SELECT " . $this->getDBColumnNamesAsString() . ', ' . $this->getDBColumnName(
                 self::workingHours
-            ) . ' - ' . $this->getDBColumnName(self::slaResponseHours) . ' as hoursRemaining' .
-            " FROM " . $this->getTableName() .
-            " LEFT JOIN customer ON cus_custno = pro_custno
+            ) . ' - ' . $this->getDBColumnName(
+                self::slaResponseHours
+            ) . ' as hoursRemaining' . " FROM " . $this->getTableName() . " LEFT JOIN customer ON cus_custno = pro_custno
            LEFT JOIN consultant ON cns_consno = pro_consno
 
           JOIN callactivity `initial`
-            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
-            " JOIN callactivity `last`
+            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID . " JOIN callactivity `last`
             ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
               (
               SELECT
@@ -990,23 +885,18 @@ class DBEJProblem extends DBEProblem
         WHERE " . $this->getDBColumnName(self::customerID) . ' <> 282  and ' . $this->getDBColumnName(
                 self::status
             ) . " in ('I','P') ";
-
         if (!$showHelpDesk) {
             $sql .= ' and pro_queue_no <> 1 ';
         }
-
         if (!$showEscalation) {
             $sql .= ' and pro_queue_no <> 2 ';
         }
-
         if (!$showSmallProjects) {
             $sql .= ' and pro_queue_no <> 3 ';
         }
         if (!$showProjects) {
             $sql .= ' and pro_queue_no <> 5 ';
         }
-
-
         if ($isP5) {
             $sql .= ' and ' . $this->getDBColumnName(
                     self::priority
@@ -1018,8 +908,6 @@ class DBEJProblem extends DBEProblem
                     self::priority
                 ) . ' > 0 ';
         }
-
-
         $sql .= " and pro_problemno IN 
   (SELECT 
     test.pro_problemno 
@@ -1052,23 +940,17 @@ class DBEJProblem extends DBEProblem
     GROUP BY pro_problemno 
     ORDER BY engineers DESC) test 
   WHERE test.engineers >= $engineersMaxCount) ";
-
         $sql .= " limit $limit";
         $this->setQueryString($sql);
-
         return (parent::getRow());
 
     }
 
     public function getOpenRowsByContactID($contactID)
     {
-        $sql =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " LEFT JOIN customer ON cus_custno = pro_custno
+        $sql = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " LEFT JOIN customer ON cus_custno = pro_custno
           JOIN callactivity `initial`
-            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
-            " JOIN callactivity `last`
+            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID . " JOIN callactivity `last`
             ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
               (
               SELECT
@@ -1086,11 +968,8 @@ class DBEJProblem extends DBEProblem
         WHERE
           pro_contno = $contactID
           AND pro_status <> 'C'";
-
         $sql .= " ORDER BY pro_date_raised DESC";              // in progress
-
         $this->setQueryString($sql);
-
         return (parent::getRows());
     }
 
@@ -1104,16 +983,11 @@ class DBEJProblem extends DBEProblem
      */
     function getCustomerOpenRows($customerID)
     {
-        $sql =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " LEFT JOIN customer ON cus_custno = pro_custno
+        $sql = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " LEFT JOIN customer ON cus_custno = pro_custno
            LEFT JOIN consultant ON cns_consno = pro_consno
 
           JOIN callactivity `initial`
-            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
-
-            " 
+            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID . " 
           
             JOIN callactivity `last`
             ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
@@ -1156,11 +1030,9 @@ class DBEJProblem extends DBEProblem
         $dateString       = $this->getValue(DBEJProblem::lastDate);
         $timeString       = $this->getValue(DBEJProblem::lastStartTime);
         $activityDateTime = DateTime::createFromFormat('Y-m-d H:i', "$dateString $timeString");
-
         if ($activityDateTime > (new DateTime())) {
             return false;
         }
-
         return !$this->getValue(DBEJProblem::lastEndTime);
     }
 
@@ -1174,19 +1046,16 @@ class DBEJProblem extends DBEProblem
         if ($slaResponseHours == 0) {
             $slaResponseHours = 1;
         }
-
         if ($priority == 5) {
             return false;
         }
         if ($status != 'I' && $respondedHours <= $slaResponseHours) {
             return false;
         }
-
         $percentageSLA = ($workingHours / $slaResponseHours);
         if ($status == 'I' && $percentageSLA < 1) {
             return false;
         }
-
         return true;
     }
 

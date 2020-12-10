@@ -20,7 +20,14 @@ export default class CKEditor extends React.Component {
     }
 
     componentDidUpdate = (prevProps, prevState) => {
+
     };
+
+    componentWillUnmount() {
+        if (CKEDITOR.instances[this.elementName]) {
+            CKEDITOR.instances[this.elementName].destroy(true);
+        }
+    }
 
     render() {
         if (this.state.reinit) {
@@ -43,14 +50,16 @@ export default class CKEditor extends React.Component {
         );
     }
 
-    initEditor = () => {
+    initEditor() {
         if (CKEDITOR.instances[this.elementName]) {
             CKEDITOR.instances[this.elementName].destroy(true);
         }
-        if (this.props.inline)
-            CKEDITOR.inline(this.elementName, this.getCKEditorConfig());
-        else
-            CKEDITOR.replace(this.elementName, this.getCKEditorConfig());
+        if (document.getElementById(this.elementName)) {
+            if (this.props.inline)
+                CKEDITOR.inline(this.elementName, this.getCKEditorConfig());
+            else
+                CKEDITOR.replace(this.elementName, this.getCKEditorConfig());
+        }
         if (CKEDITOR.instances[this.elementName]) {
             if (this.props.disableClipboard)
                 CKEDITOR.instances[this.elementName].on("paste", function (evt) {
@@ -65,6 +74,7 @@ export default class CKEditor extends React.Component {
             );
         }
     };
+
     getCKEditorConfig = () => {
         return {
             contentsCss: "/screen.css",

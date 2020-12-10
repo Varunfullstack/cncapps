@@ -25,6 +25,7 @@ class GatherFixedInformationComponent extends MainComponent {
             activity: null,
             rootCauses: [],
             contracts: [],
+            groupedContracts: [],
             initialActivity: null,
             data: {
                 managementReviewFlag: false,
@@ -44,7 +45,7 @@ class GatherFixedInformationComponent extends MainComponent {
         const activity = await this.apiActivity.getCallActivityBasicInfo(
             params.get("callActivityID")
         );
-        const result = await Promise.all([
+        const [rootCauses, customerContracts, documents, initialActivity] = await Promise.all([
             this.apiActivity.getRootCauses(),
             this.apiCustomer.getCustomerContracts(
                 activity.customerID,
@@ -58,15 +59,20 @@ class GatherFixedInformationComponent extends MainComponent {
         const {data} = this.state;
         data.rootCauseID = activity.rootCauseID;
         data.contractCustomerItemID = activity.contractCustomerItemID || "99";
-        if (!params.get("resolutionSummary"))
-            data.resolutionSummaryDefault = result[3]?.reason;
+        if (!params.get("resolutionSummary")) {
+            data.resolutionSummaryDefault = initialActivity?.reason;
+            data.resolutionSummary = data.resolutionSummaryDefault;
+        }
         this.setState({
-            data, activity, rootCauses: result[0],
-            contracts: groupBy(result[1], "renewalType"),
-            documents: result[2],
-            initialActivity: result[3],
-        });
-    };
+            data,
+            activity,
+            rootCauses: rootCauses,
+            contracts: customerContracts,
+            groupedContracts: groupBy(customerContracts, "renewalType"),
+            documents: documents,
+            initialActivity: initialActivity,
+        })
+    }
 
     getHeader = () => {
         const {el} = this;
@@ -153,9 +159,26 @@ class GatherFixedInformationComponent extends MainComponent {
         );
     };
 
+    async updateContract(contractCustomerItemID) {
+        if (contractCustomerItemID) {
+            const {contracts, activity} = this.state;
+
+            const isPrepay = contracts.find(x => x.contractCustomerItemID == contractCustomerItemID).prepayContract;
+
+            if (isPrepay) {
+                const response = await fetch(`Activity.php?action=checkPrepay&problemID=${activity.problemID}`).then(res => res.json());
+                if (response.hiddenCharges) {
+                    this.alert("There are hidden chargeable activities on this request, you must change these if you are going to use the PrePay contact");
+                    return;
+                }
+            }
+        }
+        this.setValue("contractCustomerItemID", contractCustomerItemID);
+    }
+
     getContracts = () => {
         const {el} = this;
-        const {contracts, data} = this.state;
+        const {groupedContracts, data, activity} = this.state;
 
         return el(
             "select",
@@ -163,17 +186,20 @@ class GatherFixedInformationComponent extends MainComponent {
                 key: "contracts",
                 required: true,
                 value: data?.contractCustomerItemID,
-                onChange: (event) =>
-                    this.setValue("contractCustomerItemID", event.target.value),
+                onChange: (event) => this.updateContract(event.target.value)
+                ,
                 style: {width: "100%"},
             },
             el("option", {key: "empty", value: 99}, "Please select"),
-            el("option", {key: "tandm", value: ""}, "T&M"),
-            contracts?.map((t, index) =>
+            el("option", {
+                key: "tandm",
+                value: ""
+            }, "T&M" + (activity.linkedSalesOrderID ? " - Must be selected because this is linked to a Sales Order" : '')),
+            groupedContracts?.map((t, index) =>
                 el(
                     "optgroup",
                     {key: t.groupName, label: t.groupName},
-                    contracts[index].items.map((i) =>
+                    groupedContracts[index].items.map((i) =>
                         el(
                             "option",
                             {
@@ -188,6 +214,25 @@ class GatherFixedInformationComponent extends MainComponent {
             )
         );
     };
+
+    updateRootCause(rootCauseId) {
+        this.setValue("rootCauseID", rootCauseId);
+
+        if (rootCauseId) {
+            const {rootCauses} = this.state;
+            const foundRootCause = rootCauses.find(x => x.id == rootCauseId);
+            if (foundRootCause && foundRootCause.fixedText) {
+                this.setState({
+                    initialActivity: {
+                        ...this.state.initialActivity,
+                        reason: atob(foundRootCause.fixedText)
+                    }
+                })
+            }
+        }
+
+    }
+
     getRootCause = () => {
         const {el} = this;
         const {rootCauses, data} = this.state;
@@ -199,7 +244,7 @@ class GatherFixedInformationComponent extends MainComponent {
                 style: {maxWidth: 200, width: "100%"},
                 required: true,
                 value: data?.rootCauseID || "",
-                onChange: (event) => this.setValue("rootCauseID", event.target.value),
+                onChange: (event) => this.updateRootCause(event.target.value),
             },
             el("option", {key: "empty", value: ""}, "Not known"),
             rootCauses?.map((t) =>
@@ -345,7 +390,7 @@ class GatherFixedInformationComponent extends MainComponent {
         const {activity} = this.state;
         return activity?.callActivityID ? el(
             "div",
-            {style: {width: 1000}},
+            {style: {width: "90%"}},
             this.getAlert(),
             this.getHeader(),
             this.getConfirm(),

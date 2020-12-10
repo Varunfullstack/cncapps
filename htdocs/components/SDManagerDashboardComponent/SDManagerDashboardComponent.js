@@ -14,6 +14,14 @@ import './SDManagerDashboardComponent.css';
 import ActivityFollowOn from "../Modals/ActivityFollowOn";
 import moment from "moment";
 
+const CUSTOMER_TAB = 9;
+
+const HELD_FOR_QA_TAB = 11;
+
+const DAILY_STATS_TAB = 10;
+
+const SHORTEST_SLA_FIX_REMAINING = 3;
+
 class SDManagerDashboardComponent extends MainComponent {
     el = React.createElement;
     tabs = [];
@@ -39,15 +47,15 @@ class SDManagerDashboardComponent extends MainComponent {
         this.tabs = [
             {id: 1, title: "Shortest SLA Remaining", icon: null},
             {id: 2, title: "Current Open P1 Requests", icon: null},
-            {id: 3, title: "Shortest SLA Fix Remaining", icon: null},
+            {id: SHORTEST_SLA_FIX_REMAINING, title: "Shortest SLA Fix Remaining", icon: null},
             {id: 4, title: "Critical Service Requests", icon: null},
             {id: 5, title: "Current Open SRs", icon: null},
             {id: 6, title: "Oldest Updated SRs", icon: null},
             {id: 7, title: "Longest Open SR", icon: null},
             {id: 8, title: "Most Hours Logged", icon: null},
-            {id: 9, title: "Customer", icon: null},
-            {id: 11, title: "Held for QA", icon: null},
-            {id: 10, title: "Daily Stats", icon: null},
+            {id: CUSTOMER_TAB, title: "Customer", icon: null},
+            {id: HELD_FOR_QA_TAB, title: "Held for QA", icon: null},
+            {id: DAILY_STATS_TAB, title: "Daily Stats", icon: null},
 
         ];
     }
@@ -61,7 +69,7 @@ class SDManagerDashboardComponent extends MainComponent {
 
     loadAllocatedUsers = () => {
         const {filter, allocatedUsers} = this.state;
-        if (filter.activeTab < 9 && allocatedUsers.length == 0)
+        if (filter.activeTab < CUSTOMER_TAB && allocatedUsers.length == 0)
             this.apiCurrentActivityService.getAllocatedUsers().then((res) => {
 
                 this.setState({allocatedUsers: res});
@@ -132,69 +140,69 @@ class SDManagerDashboardComponent extends MainComponent {
     }
 
     getFilterElement = () => {
-        const {el} = this;
         const {filter} = this.state;
-        return el(
-            "div",
-            {className: "m-5"},
-            el("label", {className: "mr-3 ml-5"}, "HD"),
-            el(Toggle, {
-                disabled: false,
-                checked: filter.hd,
-                onChange: (value) => this.setFilterValue("hd", !filter.hd),
-            }),
+        const shouldBeHidden = [
+            CUSTOMER_TAB,
+            HELD_FOR_QA_TAB,
+            DAILY_STATS_TAB
+        ].findIndex(x => x === filter.activeTab) > -1;
 
-            el("label", {className: "mr-3 ml-5"}, "ES"),
-            el(Toggle, {
-                disabled: false,
-                checked: filter.es,
-                onChange: (value) => this.setFilterValue("es", !filter.es),
-            }),
 
-            el("label", {className: "mr-3 ml-5"}, "SP"),
-            el(Toggle, {
-                disabled: false,
-                checked: filter.sp,
-                onChange: (value) => this.setFilterValue("sp", !filter.sp),
-            }),
+        return (
+            <div className="m-5">
+                {
+                    shouldBeHidden ? '' :
+                        <React.Fragment>
 
-            el("label", {className: "mr-3 ml-5"}, "P"),
-            el(Toggle, {
-                disabled: false,
-                checked: filter.p,
-                onChange: (value) => this.setFilterValue("p", !filter.p),
-            }),
-
-            el("label", {className: "mr-3 ml-5"}, "P5"),
-            el(Toggle, {
-                disabled: false,
-                checked: filter.p5,
-                onChange: (value) => this.setFilterValue("p5", !filter.p5),
-            }),
-
-            el("label", {className: "mr-3 ml-5"}, "Limit"),
-            el('select', {
-                    value: filter.limit,
-                    onChange: (event) => this.setFilterValue("limit", event.target.value),
-                },
-                el("option", {value: 5}, 5),
-                el("option", {value: 10}, 10),
-                el("option", {value: 15}, 15),
-                el("option", {value: 20}, 20),
-                el("option", {value: 25}, 25),
-                el("option", {value: 30}, 30),
-            )
+                            <label className="mr-3 ml-5">HD</label>
+                            <Toggle checked={filter.hd}
+                                    onChange={(value) => this.setFilterValue("hd", !filter.hd)}
+                            />
+                            <label className="mr-3 ml-5">ES</label>
+                            <Toggle checked={filter.es}
+                                    onChange={(value) => this.setFilterValue("es", !filter.es)}
+                            />
+                            <label className="mr-3 ml-5">SP</label>
+                            <Toggle checked={filter.sp}
+                                    onChange={(value) => this.setFilterValue("sp", !filter.sp)}
+                            />
+                            <label className="mr-3 ml-5">P</label>
+                            <Toggle checked={filter.p}
+                                    onChange={(value) => this.setFilterValue("p", !filter.p)}
+                            />
+                            <label className="mr-3 ml-5">P5</label>
+                            <Toggle checked={filter.p5}
+                                    onChange={(value) => this.setFilterValue("p5", !filter.p5)}
+                            />
+                        </React.Fragment>
+                }
+                <label className="mr-3 ml-5">
+                    Limit
+                </label>
+                <select value={filter.limit}
+                        onChange={(event) => this.setFilterValue("limit", event.target.value)}
+                >
+                    <option value="5"> 5</option>
+                    <option value="10"> 10</option>
+                    <option value="15"> 15</option>
+                    <option value="20"> 20</option>
+                    <option value="25"> 25</option>
+                    <option value="30"> 30</option>
+                </select>
+            </div>
         );
-    };
+    }
     loadTab = (id) => {
-        if ([1, 2, 3, 4, 5, 6, 7, 8, 9, 11].indexOf(id) >= 0) {
+        if ([1, 2, 3, 4, 5, 6, 7, 8, CUSTOMER_TAB, HELD_FOR_QA_TAB].indexOf(id) >= 0
+        ) {
             this.loadAllocatedUsers();
             const {filter} = this.state;
             this.api.getQueue(id, filter)
                 .then((queueData) => {
                     this.setState({queueData})
                 });
-        } else return [];
+        } else
+            return [];
 
     };
     startWork = async (problem) => {
@@ -203,7 +211,8 @@ class SDManagerDashboardComponent extends MainComponent {
         } else {
             this.alert("Another user is currently working on this SR");
         }
-    };
+    }
+    ;
     getFollowOnElement = () => {
         const {showFollowOn, followOnActivity} = this.state;
         const startWork = true;
@@ -223,12 +232,13 @@ class SDManagerDashboardComponent extends MainComponent {
             element,
             this.el("div", {className: "tooltiptext tooltip-bottom"}, title)
         );
-    };
+    }
+    ;
 
     getQueueElement = () => {
         const {filter, queueData} = this.state;
         const {el} = this;
-        if ([1, 2, 3, 4, 5, 6, 7, 8, 11].indexOf(filter.activeTab) >= 0) {
+        if ([1, 2, 3, SHORTEST_SLA_FIX_REMAINING, 5, 6, 7, 8, HELD_FOR_QA_TAB].indexOf(filter.activeTab) >= 0) {
             let columns = [
                 {
                     hide: false,
@@ -299,9 +309,9 @@ class SDManagerDashboardComponent extends MainComponent {
                     label: "",
                     sortable: false,
                     className: "text-center",
-                    toolTip: "SLA Failed for this Service Request",
+                    toolTip: "SLA or Fixed SLA Failed for this Service Request",
                     content: (problem) => {
-                        if (!problem.isSLABreached) {
+                        if (!problem.isSLABreached && !problem.isFixedSLABreached) {
                             return null;
                         }
                         return (
@@ -367,7 +377,7 @@ class SDManagerDashboardComponent extends MainComponent {
                     className: "text-center",
                 },
                 {
-                    display: [11].indexOf(filter.activeTab) < 0,
+                    display: [HELD_FOR_QA_TAB].indexOf(filter.activeTab) < 0,
                     path: "",
                     label: "",
                     hdToolTip: "Allocate additional time",
@@ -385,7 +395,7 @@ class SDManagerDashboardComponent extends MainComponent {
                     }),
                 },
                 {
-                    display: [11].indexOf(filter.activeTab) < 0,
+                    display: [HELD_FOR_QA_TAB].indexOf(filter.activeTab) < 0,
                     path: "hoursRemainingForSLA",
                     label: "",
                     hdToolTip: "Open Hours",
@@ -439,7 +449,7 @@ class SDManagerDashboardComponent extends MainComponent {
                     hdClassName: "text-center",
                     content: (problem) => {
                         let teamCode = problem.teamID;
-                        if (filter.activeTab == 11) {
+                        if (filter.activeTab == HELD_FOR_QA_TAB) {
                             if (problem.fixedDate) {
                                 teamCode = problem.fixedTeamId;
                             }
@@ -455,7 +465,7 @@ class SDManagerDashboardComponent extends MainComponent {
                     },
                 },
                 {
-                    display: filter.activeTab == 11,
+                    display: filter.activeTab == HELD_FOR_QA_TAB,
                     path: "engineerName",
                     label: "",
                     key: "assignedUser",
@@ -471,7 +481,7 @@ class SDManagerDashboardComponent extends MainComponent {
                     }
                 },
                 {
-                    display: [11].indexOf(filter.activeTab) < 0,
+                    display: [HELD_FOR_QA_TAB].indexOf(filter.activeTab) < 0,
                     path: "engineerName",
                     label: "",
                     key: "assignedUser",
@@ -482,13 +492,13 @@ class SDManagerDashboardComponent extends MainComponent {
                     content: (problem) => this.getAllocatedElement(problem, problem.teamID),
                 },
                 {
-                    display: [11].indexOf(filter.activeTab) < 0,
+                    display: [HELD_FOR_QA_TAB].indexOf(filter.activeTab) < 0,
                     path: "dateTime",
                     label: "",
                     key: "dateTime",
                     content: serviceRequest => {
                         const dateTime = moment(serviceRequest.dateTime, 'YYYY-MM-DD HH:mm:ss');
-                        if(!dateTime.isValid()){
+                        if (!dateTime.isValid()) {
                             return null;
                         }
                         return dateTime.format('DD/MM/YYYY HH:mm');
@@ -499,7 +509,7 @@ class SDManagerDashboardComponent extends MainComponent {
                     hdClassName: "text-center",
                 },
                 {
-                    display: [11].indexOf(filter.activeTab) >= 0,
+                    display: [HELD_FOR_QA_TAB].indexOf(filter.activeTab) >= 0,
                     path: "fixedDate",
                     label: "",
                     hdToolTip: "Fixed date",
@@ -523,7 +533,7 @@ class SDManagerDashboardComponent extends MainComponent {
                 pk: "problemID",
                 search: true,
             });
-        } else if (filter.activeTab == 9) {
+        } else if (filter.activeTab == CUSTOMER_TAB) {
             const columns = [
                 {
                     path: "customerName",
@@ -531,24 +541,15 @@ class SDManagerDashboardComponent extends MainComponent {
                     hdToolTip: "Customer",
                     hdClassName: "text-center",
                     icon: "fal fa-2x fa-building color-gray2 pointer",
-                    sortable: false,
-                    content: (problem) => el('a', {
-                        href: `SalesOrder.php?action=search&customerID=${problem.customerID}`,
-                        target: '_blank'
-                    }, problem.customerName)
+                    sortable: false
                 },
                 {
                     path: "srCount",
                     label: "",
-                    hdToolTip: "Number Of Activities",
+                    hdToolTip: "Number of open Service Requests",
                     hdClassName: "text-center",
                     icon: "fal fa-2x fa-sigma color-gray2 pointer",
                     sortable: false,
-                    className: "text-center",
-                    content: (problem) => el('a', {
-                        href: `CurrentActivityReport.php?action=setFilter&selectedCustomerID=${problem.customerID}`,
-                        target: '_blank'
-                    }, problem.srCount)
 
                 }
             ]
@@ -572,7 +573,8 @@ class SDManagerDashboardComponent extends MainComponent {
             "reason",
             "scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0"
         );
-    };
+    }
+    ;
     getAllocatedElement = (problem, teamId) => {
         const {el} = this;
         const {allocatedUsers} = this.state;
@@ -601,7 +603,8 @@ class SDManagerDashboardComponent extends MainComponent {
                 ),
             ]
         );
-    };
+    }
+    ;
 
     handleUserOnSelect = (event, problem, code) => {
         const engineerId = event.target.value !== "" ? event.target.value : 0;
@@ -613,7 +616,8 @@ class SDManagerDashboardComponent extends MainComponent {
                     this.loadTab(this.state.filter.activeTab);
                 }
             });
-    };
+    }
+    ;
     getTeamCode = (teamID) => {
         const queues = SRQueues.filter(q => q.teamID == teamID);
         if (queues.length > 0)
@@ -636,6 +640,7 @@ class SDManagerDashboardComponent extends MainComponent {
 export default SDManagerDashboardComponent;
 
 document.addEventListener('DOMContentLoaded', () => {
-    const domContainer = document.querySelector("#reactMainSDManagerDashboard");
-    ReactDOM.render(React.createElement(SDManagerDashboardComponent), domContainer);
-})
+        const domContainer = document.querySelector("#reactMainSDManagerDashboard");
+        ReactDOM.render(React.createElement(SDManagerDashboardComponent), domContainer);
+    }
+)

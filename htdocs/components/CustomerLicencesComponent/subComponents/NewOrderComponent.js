@@ -52,7 +52,6 @@ class NewOrderComponent extends React.Component {
         let pages = productList.length / 20;
 
 
-
         for (let i = 0; i < productList.length; i += 20) {
             const chunck = productList.slice(i, i + 20);
 
@@ -71,7 +70,6 @@ class NewOrderComponent extends React.Component {
                 return p;
             });
         }
-
 
 
         if (state.endCustomer.email)
@@ -154,7 +152,7 @@ class NewOrderComponent extends React.Component {
                 sortable: true,
             },
             {path: "skuName", label: "Product Name", sortable: true},
-            {path: "cost", label: "Unit Price", sortable: true, content: (p) => el("label", null, "₤" + p.cost)},
+            {path: "cost", label: "Unit Price", sortable: true, content: (p) => (<label>&pound;{p.cost}</label>)},
             {path: "skuType", label: 'Product Type', sortable: true},
             {path: "listingName", label: 'Listing Name', sortable: true},
             {

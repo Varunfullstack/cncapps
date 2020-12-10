@@ -6,7 +6,7 @@
         <tagDatabase tag="issue1124"/>
     </changeSet>
     <changeSet id="issue1124-1" author="pavwebdev">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="srscheduler" columnName="emailSubjectSummary"/>
             </not>
@@ -17,5 +17,85 @@
             </column>
         </addColumn>
     </changeSet>
-    
+    <changeSet id="issue1124-2" author="pavwebdev">
+        <sql>
+            UPDATE problem
+            SET problem.`pro_alarm_time` = "00:00"
+            WHERE problem.`pro_alarm_date` > CURRENT_DATE
+              AND pro_alarm_time IS NULL;
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet id="issue1124-3" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT C.`CHARACTER_MAXIMUM_LENGTH` = 50 FROM information_schema.`COLUMNS` c WHERE c.`TABLE_SCHEMA` =
+                DATABASE() AND c.`TABLE_NAME` = "headert" AND c.`COLUMN_NAME` = "hed_priority_1_desc";
+            </sqlCheck>
+        </preConditions>
+        <modifyDataType tableName="headert" columnName="hed_priority_1_desc" newDataType="char(80)"/>
+        <rollback>
+            <modifyDataType tableName="headert" columnName="hed_priority_1_desc" newDataType="char(50)"/>
+        </rollback>
+    </changeSet>
+    <changeSet id="issue1124-4" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT C.`CHARACTER_MAXIMUM_LENGTH` = 50 FROM information_schema.`COLUMNS` c WHERE c.`TABLE_SCHEMA` =
+                DATABASE() AND c.`TABLE_NAME` = "headert" AND c.`COLUMN_NAME` = "hed_priority_2_desc";
+            </sqlCheck>
+        </preConditions>
+        <modifyDataType tableName="headert" columnName="hed_priority_2_desc" newDataType="char(80)"/>
+        <rollback>
+            <modifyDataType tableName="headert" columnName="hed_priority_2_desc" newDataType="char(50)"/>
+        </rollback>
+    </changeSet>
+    <changeSet id="issue1124-5" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT C.`CHARACTER_MAXIMUM_LENGTH` = 50 FROM information_schema.`COLUMNS` c WHERE c.`TABLE_SCHEMA` =
+                DATABASE() AND c.`TABLE_NAME` = "headert" AND c.`COLUMN_NAME` = "hed_priority_3_desc";
+            </sqlCheck>
+        </preConditions>
+        <modifyDataType tableName="headert" columnName="hed_priority_3_desc" newDataType="char(80)"/>
+        <rollback>
+            <modifyDataType tableName="headert" columnName="hed_priority_3_desc" newDataType="char(50)"/>
+        </rollback>
+    </changeSet>
+    <changeSet id="issue1124-6" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT C.`CHARACTER_MAXIMUM_LENGTH` = 50 FROM information_schema.`COLUMNS` c WHERE c.`TABLE_SCHEMA` =
+                DATABASE() AND c.`TABLE_NAME` = "headert" AND c.`COLUMN_NAME` = "hed_priority_4_desc";
+            </sqlCheck>
+        </preConditions>
+        <modifyDataType tableName="headert" columnName="hed_priority_4_desc" newDataType="char(80)"/>
+        <rollback>
+            <modifyDataType tableName="headert" columnName="hed_priority_4_desc" newDataType="char(50)"/>
+        </rollback>
+    </changeSet>
+    <changeSet id="issue1124-7" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT C.`CHARACTER_MAXIMUM_LENGTH` = 50 FROM information_schema.`COLUMNS` c WHERE c.`TABLE_SCHEMA` =
+                DATABASE() AND c.`TABLE_NAME` = "headert" AND c.`COLUMN_NAME` = "hed_priority_5_desc";
+            </sqlCheck>
+        </preConditions>
+        <modifyDataType tableName="headert" columnName="hed_priority_5_desc" newDataType="char(80)"/>
+        <rollback>
+            <modifyDataType tableName="headert" columnName="hed_priority_5_desc" newDataType="char(50)"/>
+        </rollback>
+    </changeSet>
+    <changeSet id="issue1124-8" author="pavwebdev">
+        <sql>
+            update headert
+            set hed_priority_1_desc = "It's affecting everybody (P1)",
+                hed_priority_2_desc = "It's affecting more than just one person but they can work (P2)",
+                hed_priority_3_desc = "It's only affecting this person (P3)",
+                hed_priority_4_desc = "Change and not a fault (P4)",
+                hed_priority_5_desc = "Project work (P5)";
+        </sql>
+        <rollback/>
+    </changeSet>
+
 </databaseChangeLog>

@@ -53,8 +53,6 @@ class APIActivity extends APIMain {
 
     sendSalesRequest(customerId, problemID, data) {
         let url = 'Activity.php?action=sendSalesRequest&problemID=' + problemID;
-        if (customerId)
-            url = 'CreateSalesRequest.php?action=createSalesRequest&customerID=' + customerId;
         return this.postFormData(url, data).then(res => res.json());
     }
 
@@ -77,7 +75,7 @@ class APIActivity extends APIMain {
     }
 
     activityRequestAdditionalTime(callActivityID, reason) {
-        let url = `Activity.php?action=requestAdditionalTime&callActivityID=${callActivityID}&reason=${reason}`;
+        let url = `Activity.php?action=requestAdditionalTime&callActivityID=${callActivityID}&reason=${encodeURIComponent(reason)}`;
         return fetch(url);
     }
 

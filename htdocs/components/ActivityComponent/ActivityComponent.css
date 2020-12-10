@@ -35,10 +35,14 @@
 }
 
 .activities-edit-container {
-    width: 1080px;
     margin-top: 5px;
     border: 1px solid #bdbec1;
     border-radius: 5px;
+    width: 100%;
+}
+
+.activities-container table .activities-container th, .activities-container td {
+    /*border: 1px solid black;*/
 }
 
 .activity-details-flex {

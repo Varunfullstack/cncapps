@@ -40,7 +40,7 @@ class StandardTextModal extends React.Component {
         let templateValue = '';
         templateDefault = '';
         if (id) {
-            const op = templateOptions.filter(s => s.id == id)[0];
+            const op = templateOptions.find(s => s.id == id);
             templateDefault = op.template;
             templateValue = op.template;
             templateOptionId = op.id;
@@ -65,7 +65,7 @@ class StandardTextModal extends React.Component {
                         style: {display: "block"}
                     }, el('option', {
                         key: 'empty',
-                        value: -1
+                        value: null
                     }, "-- Pick an option --"), templateOptions.map(s => el('option', {
                         key: s.id,
                         value: s.id
@@ -76,7 +76,6 @@ class StandardTextModal extends React.Component {
                             id: 'salesRequest',
                             value: templateDefault,
                             onChange: ($event) => {
-                                console.log($event);
                                 this.handleTemplateValueChange($event.target.value)
                             },
                             style: {

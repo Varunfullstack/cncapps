@@ -1213,7 +1213,10 @@ class CTCNC extends Controller
                 DBEUser::globalExpenseApprover
             );
     }
-
+    protected  function isSRQueueManager()
+    {
+        return $this->dbeUser->getValue(DBEJUser::changeInitialDateAndTimeFlag) == 'Y';
+    }
     protected function isSdManager()
     {
         return $this->dbeUser->getValue(DBEJUser::receiveSdManagerEmailFlag) == 'Y';

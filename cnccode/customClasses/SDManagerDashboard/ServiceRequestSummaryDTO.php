@@ -131,6 +131,11 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
      */
     private $queueNo;
 
+    /**
+     * @var bool
+     */
+    private $isFixSLABreached;
+
 
     /**
      * ServiceRequestSummaryDTO constructor.
@@ -211,6 +216,7 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
         $instance->engineerFixedName          = $problem->getValue(DBEJProblem::ENGINEER_FIXED_NAME);
         $instance->fixedTeamId                = $problem->getValue(DBEJProblem::FIXED_TEAM_ID);
         $instance->queueNo                    = $problem->getValue(DBEJProblem::queueNo);
+        $instance->isFixSLABreached           = $problem->getValue(DBEJProblem::IS_FIX_SLA_BREACHED);
         return $instance;
     }
 
@@ -260,6 +266,7 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
             "engineerFixedName"          => $this->engineerFixedName,
             "fixedTeamId"                => $this->fixedTeamId,
             "queueNo"                    => $this->queueNo,
+            "isFixedSLABreached"         => $this->isFixSLABreached,
         ];
     }
 

@@ -140,6 +140,7 @@ class CustomerSiteComponent extends MainComponent {
             el("input", {
                 maxLength: 50,
                 style: {width: 292, margin: 2},
+                className: 'spellcheck',
                 onChange: (event) =>
                     this.setValue("emailSubjectSummary", event.target.value),
                 value: this.state.data.emailSubjectSummary,

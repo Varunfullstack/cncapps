@@ -51,6 +51,7 @@ class ActivityEditComponent extends MainComponent {
             assets: [],
             currentContact: null,
             currentUser: null,
+            allowLeaving: false,
             emptyAssetReasonModalShowing: false,
             data: {
                 curValue: "",
@@ -102,6 +103,15 @@ class ActivityEditComponent extends MainComponent {
 
     componentDidMount() {
         this.loadCallActivity(params.get("callActivityID"));
+
+        window.addEventListener('beforeunload', (e) => {
+            if (!this.state.allowLeaving) {
+                e.preventDefault(); // If you prevent default behavior in Mozilla Firefox prompt will always be shown
+                // Chrome requires returnValue to be set
+                e.returnValue = '';
+            }
+        })
+
         // lodaing lookups
         Promise.all([
             this.apiCallactType.getAll(),
@@ -210,71 +220,80 @@ class ActivityEditComponent extends MainComponent {
     }
 
     // update>
-    updateActivity = async (autoSave = false) => {
+    async updateActivity(autoSave = false) {
         const data = {...this.state.data};
-
+        this.setState({allowLeaving: true});
         data.reason = data.reasonTemplate;
         data.cncNextAction = data.cncNextActionTemplate;
         data.customerNotes = data.customerNotesTemplate;
         data.internalNotes = data.internalNotesTemplate;
-        data.priority = this.state.priorities.filter(
-            (p) => p.name == data.priority
-        )[0].id;
-        if (await this.isValid(data)) {
-            delete data.activities;
-            delete data.onSiteActivities;
-            delete data.documents;
-            const finalData = pick(data, [
-                "callActivityID",
-                "alarmDate",
-                "alarmTime",
-                "callActTypeID",
-                "curValue",
-                "contactID",
-                "date",
-                "siteNo",
-                "startTime",
-                "endTime",
-                "userID",
-                "contactNotes",
-                "techNotes",
-                "reason",
-                "internalNotes",
-                "nextStatus",
-                "escalationReason",
-                "customerNotes",
-                "cncNextAction",
-                "priority",
-                "priorityChangeReason",
-                "assetName",
-                "assetTitle",
-                "rootCauseID",
-                "contractCustomerItemID",
-                "hideFromCustomerFlag",
-                "submitAsOvertime",
-                "emptyAssetReason",
-                "completeDate"
-            ]);
+        data.priority = this.state.priorities.find((p) => p.name == data.priority).id;
 
-            this.api
-                .updateActivity(finalData)
-                .then((response) => {
-                    //return; // update>
-                    if (response.error) this.alert(response.error);
-                    else {
-                        if (!autoSave) {
-                            if (response.redirectTo) document.location = response.redirectTo;
-                            else
-                                document.location = `SRActivity.php?action=displayActivity&callActivityID=${data.callActivityID}`;
-                        }
+        delete data.activities;
+        delete data.onSiteActivities;
+        delete data.documents;
+        const finalData = pick(data, [
+            "callActivityID",
+            "alarmDate",
+            "alarmTime",
+            "callActTypeID",
+            "curValue",
+            "contactID",
+            "date",
+            "siteNo",
+            "startTime",
+            "endTime",
+            "userID",
+            "contactNotes",
+            "techNotes",
+            "reason",
+            "internalNotes",
+            "nextStatus",
+            "escalationReason",
+            "customerNotes",
+            "cncNextAction",
+            "priority",
+            "priorityChangeReason",
+            "assetName",
+            "assetTitle",
+            "rootCauseID",
+            "contractCustomerItemID",
+            "hideFromCustomerFlag",
+            "submitAsOvertime",
+            "emptyAssetReason",
+            "completeDate"
+        ]);
+
+        this.api
+            .updateActivity(finalData)
+            .then((response) => {
+                //return; // update>
+                if (response.error) this.alert(response.error);
+                else {
+                    if (!autoSave) {
+                        if (response.redirectTo) document.location = response.redirectTo;
+                        else
+                            document.location = `SRActivity.php?action=displayActivity&callActivityID=${data.callActivityID}`;
                     }
-                })
-                .catch((ex) => {
-                    this.alert(ex.error);
-                });
+                }
+            })
+            .catch((ex) => {
+                this.alert(ex.error);
+            });
+    }
+
+    async isValid(data) {
+
+        const callActType = this.state.callActTypes.find((c) => c.id == data.callActTypeID);
+        if (!callActType) {
+            this.alert("Please select activity type");
+            return false;
         }
-    };
-    isValid = async (data) => {
+
+        if (callActType.activityNotesRequired === 'Y' && !data.reasonTemplate) {
+            this.alert("Please Enter Activity Notes");
+            return false;
+        }
 
         if (!data.callActTypeID) {
             this.alert("Please select Activity Type");
@@ -286,17 +305,6 @@ class ActivityEditComponent extends MainComponent {
         }
         if (!data.contactID) {
             this.alert("Please select Contact");
-            return false;
-        }
-
-        const callActType = this.state.callActTypes.find((c) => c.id == data.callActTypeID);
-        if (!callActType) {
-            this.alert("Please select activity type");
-            return false;
-        }
-
-        if (callActType.activityNotesRequired === 'Y' && !data.reasonTemplate) {
-            this.alert("Please Enter Activity Notes");
             return false;
         }
 
@@ -342,7 +350,7 @@ class ActivityEditComponent extends MainComponent {
                 }
             }
 
-            if(callActType.requireCheckFlag === 'N' && callActType.onSiteFlag === 'N' && !data.endTime){
+            if (callActType.requireCheckFlag === 'N' && callActType.onSiteFlag === 'N' && !data.endTime) {
                 data.endTime = moment().format('HH:mm');
             }
 
@@ -372,28 +380,6 @@ class ActivityEditComponent extends MainComponent {
             }
         }
 
-        if (data.nextStatus === this.activityStatus.CustomerAction) {
-
-            if (!data.alarmTime) {
-                this.alert("Please provide a valid time");
-                return false;
-            }
-
-            if (!data.alarmDate) {
-                this.alert("Please provide a valid future date");
-                return false;
-            }
-
-            const dateMoment = moment(`${data.alarmDate} ${data.alarmTime}`, 'YYYY-MM-DD HH:mm');
-
-            if (
-                !dateMoment.isValid() ||
-                dateMoment.isSameOrBefore(moment(), "minute")
-            ) {
-                this.alert("Please provide a future date and time");
-                return false;
-            }
-        }
         if (data.nextStatus === this.activityStatus.Escalate) {
             if (
                 ["I", "F", "C"].indexOf(data.problemStatus) === -1 &&
@@ -648,7 +634,9 @@ class ActivityEditComponent extends MainComponent {
 
     handleExtraTime = async (data) => {
         const reason = await this.prompt(
-            "Please provide your reason to request additional time", 600, data.cncNextAction
+            "Please provide your reason to request additional time",
+            600,
+            data.cncNextAction, true
         );
         if (!reason) {
             return;
@@ -744,6 +732,7 @@ class ActivityEditComponent extends MainComponent {
         }
 
         if (await this.confirm(text)) {
+            this.setState({allowLeaving: true});
             if (willDelete)
                 this.api.deleteActivity(data.callActivityID).then(res => {
                     document.location = `SRActivity.php?action=displayActivity&serviceRequestId=${data.problemID}`;
@@ -754,6 +743,7 @@ class ActivityEditComponent extends MainComponent {
     };
     autoSave = () => {
         this.autoSavehandler = setInterval(() => {
+            console.log('autosaving');
             const {data} = this.state;
             const activityEdit = {
                 id: data.callActivityID,
@@ -778,6 +768,11 @@ class ActivityEditComponent extends MainComponent {
         const {data, callActTypes} = this.state;
         data.nextStatus = status;
         const type = callActTypes.find(c => c.id == data.callActTypeID);
+
+        if (!await this.isValid(data)) {
+            return;
+        }
+
         switch (status) {
             case this.activityStatus.CncAction:
                 //Field Name] is required for [Activity Type] when the next action is [Update type]
@@ -795,11 +790,6 @@ class ActivityEditComponent extends MainComponent {
 
                 break;
             case this.activityStatus.Fixed:
-                // let result=await this.await this.confirm("Are you sure this SR is fixed?");
-                if (!await this.isValid(data)) {
-                    return false;
-                }
-
                 if (!await this.confirm("Are you sure this SR is fixed?")) return false;
                 //return;
                 break;
@@ -834,11 +824,11 @@ class ActivityEditComponent extends MainComponent {
         }
         if (!this.isHiddenFromCustomer(data)) {
             if (this.checkCustomerNotesRequired(type, data)) {
-                this.alert(`Customer Notes are required for ${type.description} when the next action is CNC Action`)
+                this.alert(`Customer Summary are required for ${type.description} when the next action is CNC Action`)
                 return false;
             }
             if (this.checkCustomerNotesOptionalAndEmptyDescription(type, data)) {
-                if (!await this.confirm(`Are you sure you don't want to put an entry for Customer Notes?`))
+                if (!await this.confirm(`Are you sure you don't want to put an entry for Customer Summary?`))
                     return false;
             }
         }
@@ -875,7 +865,7 @@ class ActivityEditComponent extends MainComponent {
 
     checkOnHold = async (data, type) => {
 
-        if (this.checkNectCNCActionRequiredOnHold(type, data)) {
+        if (this.checkNextCNCActionRequiredOnHold(type, data)) {
             this.alert(`CNC Next Action is required for ${type.description} when the next action is On Hold`)
             return false;
         }
@@ -899,6 +889,26 @@ class ActivityEditComponent extends MainComponent {
             this.alert(hiddenAndCustomerNoteAlertMessage);
             return false;
         }
+
+        if (!data.alarmTime) {
+            this.alert("Please provide a future date & time");
+            return false;
+        }
+
+        if (!data.alarmDate) {
+            this.alert("Please provide a future date & time");
+            return false;
+        }
+
+        const dateMoment = moment(`${data.alarmDate} ${data.alarmTime}`, 'YYYY-MM-DD HH:mm');
+
+        if (
+            !dateMoment.isValid() ||
+            dateMoment.isSameOrBefore(moment(), "minute")
+        ) {
+            this.alert("Please provide a future date & time");
+            return false;
+        }
         return true;
     }
 
@@ -914,7 +924,7 @@ class ActivityEditComponent extends MainComponent {
         return type && type.catRequireCNCNextActionOnHold == 2 && !data.cncNextActionTemplate;
     }
 
-    checkNectCNCActionRequiredOnHold(type, data) {
+    checkNextCNCActionRequiredOnHold(type, data) {
         return type && type.catRequireCNCNextActionOnHold == 1 && !data.cncNextActionTemplate;
     }
 
@@ -1390,7 +1400,7 @@ class ActivityEditComponent extends MainComponent {
                     el(
                         "td", null,
                         el(Toggle, {
-                            checked: data?.submitAsOvertime !== 0,
+                            checked: data?.submitAsOvertime,
                             onChange: () =>
                                 this.setValue("submitAsOvertime", !data?.submitAsOvertime),
                         })
@@ -1484,6 +1494,7 @@ class ActivityEditComponent extends MainComponent {
         switch (type) {
             case "changeRequest":
                 await this.api.sendChangeRequest(data.problemID, payload);
+                this.alert('Change Request Sent');
                 break;
             case "partsUsed":
                 const object = {
@@ -1491,6 +1502,7 @@ class ActivityEditComponent extends MainComponent {
                     callActivityID: currentActivity,
                 };
                 await this.api.sendPartsUsed(object);
+                this.alert('Parts Used Sent');
                 break;
             case "salesRequest":
                 await this.api.sendSalesRequest(
@@ -1498,6 +1510,7 @@ class ActivityEditComponent extends MainComponent {
                     data.problemID,
                     payload
                 );
+                this.alert('Sales Request Sent');
                 break;
         }
         this.loadCallActivity(currentActivity);
@@ -1888,7 +1901,7 @@ class ActivityEditComponent extends MainComponent {
     render() {
         const {data} = this.state;
         return (
-            <div style={{width: 1080}}>
+            <div style={{width: "90%"}}>
                 {this.getAlert()}
                 {this.getConfirm()}
                 {this.getPrompt()}

@@ -25,6 +25,7 @@ class LastStepComponent extends MainComponent {
             contacts: [],
             _showModal: false,
             requireAuthorize: false,
+            prioritiesDescriptions: [],
             data: {
                 uploadFiles: [],
                 repeatProblem: data.repeatProblem || false,
@@ -45,8 +46,12 @@ class LastStepComponent extends MainComponent {
         this.fileUploader = new React.createRef();
     }
 
+    getPrioritiesDescriptions() {
+        return fetch('Header.php?action=getPrioritiesDescriptions').then(res => res.json()).then(response => response.data);
+    }
+
     componentDidMount = async () => {
-        const result = await Promise.all([
+        const [standardTextTypes, customerContacts, noWorkOptions, noFirstTimeFixOptions, prioritiesDescriptions] = await Promise.all([
             this.apiStandardText.getAllTypes(),
             this.apiCustomer.getCustomerContacts(this.props.data.customerID),
             this.apiStandardText.getOptionsByType(
@@ -55,21 +60,23 @@ class LastStepComponent extends MainComponent {
             this.apiStandardText.getOptionsByType(
                 "Not First Time Fix Reason"
             ),
+            this.getPrioritiesDescriptions()
         ]);
 
         const {data} = this.state;
         data.contactID = this.props.data.customer.con_contno;
         let requireAuthorize = this.checkContactNeedAuthorize(
             data.contactID,
-            result[1]
+            customerContacts
         );
         this.setState({
             requireAuthorize,
-            checkList: result[0],
-            contacts: result[1],
-            standardTextList: result[0],
-            noWorkOptions: result[2],
-            notFirstTimeFixOptions: result[3],
+            checkList: standardTextTypes,
+            contacts: customerContacts,
+            standardTextList: standardTextTypes,
+            noWorkOptions: noWorkOptions,
+            notFirstTimeFixOptions: noFirstTimeFixOptions,
+            prioritiesDescriptions,
             data,
         });
     };
@@ -209,7 +216,7 @@ class LastStepComponent extends MainComponent {
     };
     getProblemPriority = () => {
         const {el, setValue} = this;
-        const {data} = this.state;
+        const {data, prioritiesDescriptions} = this.state;
         return el(
             "tr",
             null,
@@ -225,15 +232,11 @@ class LastStepComponent extends MainComponent {
                         style: {width: 200},
                     },
                     el("option", {value: -1}, "Select Priority"),
-                    el("option", {value: 1}, "It's affecting everybody (P1)"),
-                    el(
-                        "option",
-                        {value: 2},
-                        "It's affecting more than just one person but they can work (P2)"
-                    ),
-                    el("option", {value: 3}, "It's only affecting me (P3)"),
-                    el("option", {value: 4}, "This is a change and not a fault (P4)"),
-                    el("option", {value: 5}, "This is a project work (P5)")
+                    ...prioritiesDescriptions.map(x => {
+                        return <option value={x.id}>
+                            {x.description}
+                        </option>
+                    }),
                 )
             )
         );

@@ -28,13 +28,14 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             false
         );
         $action = @$_REQUEST['action'];
-        if ($action != self::DAILY_STATS_SUMMARY && !self::isSdManager()) {
+        if ($action != self::DAILY_STATS_SUMMARY && !self::isSdManager() && !self::isSRQueueManager() ) {
             Header("Location: /NotAllowed.php");
             exit;
         }
-
         $this->setMenuId(201);
     }
+
+
 
     /**
      * Route to function based upon action passed
@@ -45,7 +46,6 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         switch ($this->getAction()) {
             case 'allocateUser':
                 $options = [];
-
                 if ($this->getSessionParam('HD')) {
                     $options['HD'] = true;
                 }
@@ -61,10 +61,8 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
                 if ($this->getSessionParam('showP5')) {
                     $options['showP5'] = true;
                 }
-
                 $this->allocateUser($options);
                 break;
-
             case "getQueue":
                 echo json_encode($this->getQueue());
                 exit;
@@ -81,8 +79,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
     function getQueue()
     {
         $queue = $_REQUEST["queue"];
-        if (!isset($queue))
-            return [];
+        if (!isset($queue)) return [];
         $buProblem         = new BUActivity($this);
         $isP5              = $_REQUEST["p5"] == "true";
         $showHelpDesk      = $_REQUEST["hd"] == "true";
@@ -170,23 +167,18 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         if (!$showHelpDesk) {
             $query .= ' and pro_queue_no <> 1 ';
         }
-
         if (!$showEscalation) {
             $query .= ' and pro_queue_no <> 2 ';
         }
-
         if (!$showSmallProjects) {
             $query .= ' and pro_queue_no <> 3 ';
         }
-
         if (!$showProjects) {
             $query .= ' and pro_queue_no <> 5 ';
         }
-
         $query .= " ) openSRCount 
             FROM
               customer WHERE cus_custno <> 282 ORDER BY openSRCount DESC LIMIT $limit";
-
         /** @var mysqli_result $result */
         $result   = $db->query($query);
         $problems = [];
@@ -210,7 +202,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
      */
     private function renderQueueJson(DBEJProblem $problems)
     {
-        $result   = [];
+        $result = [];
         if (!$problems->rowCount()) {
             return $result;
         }
@@ -232,7 +224,6 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         $raisedStartTodaySummary    = $this->getRaisedAndStartedToday();
         $uniqueCustomerTodaySummary = $this->getUniqueCustomer();
         $breachedSLATodaySummary    = $this->getBreachedSLA();
-
         return [
             "prioritySummary"            => $prioritySummary,
             "openSrTeamSummary"          => $openSrTeamSummary,
@@ -252,7 +243,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
      */
     private function getNumberOfOpenServiceRequestPerTeamExcludingSales(): array
     {
-        $query             = "SELECT
+        $query = "SELECT
   c.`teamID`,
   COUNT(*) total
 FROM
@@ -272,7 +263,7 @@ GROUP BY c.`teamID`";
      */
     private function getDailySource()
     {
-        $query              = "SELECT r.`description`,COUNT(*)  total
+        $query = "SELECT r.`description`,COUNT(*)  total
                 FROM problem p LEFT JOIN `problemraisetype` r ON p.`raiseTypeId`=r.`id`
                 WHERE    
                 pro_custno <> 282
@@ -319,7 +310,7 @@ WHERE pro_custno <> 282
      */
     private function getFixedToday(): array
     {
-        $query             = "SELECT
+        $query = "SELECT
   COUNT(p.`pro_problemno`) AS total
 FROM
   `callactivity` c
@@ -333,8 +324,11 @@ WHERE pro_custno <> 282
   AND c.`caa_callacttypeno` = 57
   AND c.`caa_date` = CURDATE()
 GROUP BY p.`pro_problemno`               ";
-        return DBConnect::fetchOne($query, []);
-
+        $result = DBConnect::fetchOne($query, []);
+        if (!$result) {
+            return ["total" => 0];
+        }
+        return $result;
     }
 
     /**
@@ -342,7 +336,7 @@ GROUP BY p.`pro_problemno`               ";
      */
     private function getNearSLA(): array
     {
-        $query          = "SELECT COUNT(*) total FROM problem 
+        $query = "SELECT COUNT(*) total FROM problem 
                 WHERE    
                 pro_custno <> 282
                 AND  pro_status IN ( 'I', 'P' )
@@ -355,7 +349,7 @@ GROUP BY p.`pro_problemno`               ";
      */
     private function getReopenToday(): array
     {
-        $query              = "SELECT COUNT(*) total FROM problem 
+        $query = "SELECT COUNT(*) total FROM problem 
                 WHERE 
                 pro_custno <> 282   
                 AND `pro_reopened_date` = curdate()";
@@ -406,7 +400,7 @@ WHERE pro_custno <> 282
     private function getBreachedSLA(): array
     {
         //9- Breached SLA
-        $query                   = "SELECT COUNT(  DISTINCT  p.pro_problemno) total FROM `callactivity` c JOIN   problem p ON c.`caa_problemno`=p.`pro_problemno` 
+        $query = "SELECT COUNT(  DISTINCT  p.pro_problemno) total FROM `callactivity` c JOIN   problem p ON c.`caa_problemno`=p.`pro_problemno` 
          JOIN customer cu ON p.`pro_custno`=cu.`cus_custno`
          WHERE
           pro_custno <> 282   

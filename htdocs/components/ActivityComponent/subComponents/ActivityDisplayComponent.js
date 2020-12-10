@@ -14,6 +14,8 @@ import CustomerDocumentUploader from "./CustomerDocumentUploader";
 import {InternalDocumentsComponent} from "./InternalDocumentsComponent";
 
 // noinspection EqualityComparisonWithCoercionJS
+const emptyAssetReasonCharactersToShow = 30;
+
 class ActivityDisplayComponent extends MainComponent {
     api = new APIActivity();
 
@@ -676,11 +678,13 @@ class ActivityDisplayComponent extends MainComponent {
     getContentElement = () => {
         const {data} = this.state;
         const {el} = this;
+
+
         return el('div', {className: "activities-container"},
             el('table', {style: {width: "100%"}},
                 el('tbody', null,
                     el('tr', null,
-                        el('td', {className: "display-label"}, "Status"),
+                        el('td', {className: "display-label", style: {width: "80px"}}, "Status"),
                         el('td', {className: "display-content"}, data?.problemStatusDetials + this.getAwaitingTitle(data)),
                         el('td', {className: "display-label"}, data?.authorisedBy ? "Authorised by" : ''),
                         el('td', {className: "display-content"}, data?.authorisedBy),
@@ -730,7 +734,7 @@ class ActivityDisplayComponent extends MainComponent {
                     el('tr', null,
                         el('td', {colSpan: 4}),
                         el('td', {className: "display-label"}, "Asset"),
-                        el('td', {colSpan: 3}, data?.assetName || (data?.emptyAssetReason && data.emptyAssetReason.substr(0, 20)) || ''),
+                        el('td', {colSpan: 3}, data?.assetName || (data?.emptyAssetReason) || ''),
                     ),
 
                     data?.currentUser ? el('tr', null,
@@ -855,6 +859,7 @@ class ActivityDisplayComponent extends MainComponent {
         switch (type) {
             case "changeRequest":
                 await this.api.sendChangeRequest(data.problemID, payload);
+                this.alert('Change Request Sent');
                 break;
             case "partsUsed":
                 const object = {
@@ -862,6 +867,7 @@ class ActivityDisplayComponent extends MainComponent {
                     callActivityID: currentActivity,
                 };
                 const result = await this.api.sendPartsUsed(object);
+                this.alert('Parts Used Sent');
                 break;
             case "salesRequest":
                 await this.api.sendSalesRequest(
@@ -869,6 +875,7 @@ class ActivityDisplayComponent extends MainComponent {
                     data.problemID,
                     payload
                 );
+                this.alert('Sales Request Sent');
                 break;
         }
         this.loadCallActivity(currentActivity);
@@ -891,8 +898,9 @@ class ActivityDisplayComponent extends MainComponent {
                     })
                 ),
                 footer: el('div', {key: "footer"},
+                    el('button', {onClick: () => this.handleTemplateSend(templateType)}, "Send"),
                     el('button', {onClick: () => this.setState({_showModal: false})}, "Cancel"),
-                    el('button', {onClick: () => this.handleTemplateSend(templateType)}, "Send"))
+                )
             }
         )
     }
@@ -951,7 +959,7 @@ class ActivityDisplayComponent extends MainComponent {
     render() {
         const {data} = this.state;
         return (
-            <div style={{width: 1000}}>
+            <div style={{width: "90%"}}>
                 {this.getAlert()}
                 {this.getConfirm()}
                 {this.getPrompt()}
