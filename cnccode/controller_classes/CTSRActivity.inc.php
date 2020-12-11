@@ -1022,7 +1022,7 @@ class CTSRActivity extends CTCNC
                 $currentUser    = $this->getDbeUser();
                 $buCustomerItem = new BUCustomerItem($this);
                 $hasServiceDesk = $buCustomerItem->customerHasServiceDeskContract($body->customerID);
-                if (!$body->startWork && $currentUser->getValue(DBEUser::teamID) == 1 && $hasServiceDesk) {
+                if (!$body->startWork && $body->priority == 1 && $currentUser->getValue(DBEUser::teamID) == 1 && $hasServiceDesk) {
                     $dbeProblemNotStartReason = new DBEProblemNotStartReason($this);
                     $dbeProblemNotStartReason->setValue(
                         DBEProblemNotStartReason::problemID,
