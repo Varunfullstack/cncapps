@@ -144,7 +144,7 @@ class ActivityDisplayComponent extends MainComponent {
                     {data?.contactMobilePhone ?
                         <a href={`tel:${data?.contactMobilePhone}`}>{data?.contactMobilePhone}</a> : null
                     }
-                    <a href={`mailto:${data?.contactEmail}?subject=${data?.serviceRequestEmailSubject}`}>
+                    <a href={`mailto:${data?.contactEmail}?cc=support@cnc-ltd.co.uk&subject=${data?.serviceRequestEmailSubject}`}>
                         <i className="fal fa-envelope ml-5"/>
                     </a>
                 </div>

@@ -49,7 +49,7 @@ export class ActivityHeaderComponent extends React.Component {
                             </span>
                         : null
                     }
-                    <a href={`mailto:${serviceRequestData.contactEmail}?subject=Service Request ${serviceRequestData.problemID} - ${serviceRequestData.serviceRequestEmailSubject} - Update`}>
+                    <a href={`mailto:${serviceRequestData.contactEmail}?cc=support@cnc-ltd.co.uk&subject=Service Request ${serviceRequestData.problemID} - ${serviceRequestData.serviceRequestEmailSubject} - Update`}>
                                 <i className="fal fa-envelope ml-5"/>
                     </a>
                 </span>

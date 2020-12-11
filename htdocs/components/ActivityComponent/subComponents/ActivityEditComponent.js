@@ -493,7 +493,7 @@ class ActivityEditComponent extends MainComponent {
                 el(
                     "a",
                     {
-                        href: `mailto:${currentContact?.contactEmail}?subject=${data?.serviceRequestEmailSubject}`,
+                        href: `mailto:${currentContact?.contactEmail}?cc=support@cnc-ltd.co.uk&subject=${data?.serviceRequestEmailSubject}`,
                     },
                     el("i", {className: "fal fa-envelope ml-5"})
                 ),
@@ -1159,7 +1159,7 @@ class ActivityEditComponent extends MainComponent {
                     "a",
                     {
                         key: "contactEmail",
-                        href: `mailto:${data.contactEmail}?subject=${subject}`,
+                        href: `mailto:${data.contactEmail}?cc=support@cnc-ltd.co.uk&subject=${subject}`,
                     },
                     el("i", {
                         key: "contactEmailicon",
