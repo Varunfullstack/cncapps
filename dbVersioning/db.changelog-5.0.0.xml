@@ -136,4 +136,12 @@
     <include file="db.changelog-issue1115.xml"/>
     <include file="db.changelog-issue1120.xml"/>
     <include file="db.changelog-issue1124.xml"/>
+    <changeSet id="release-v5.0.0-10" author="pavwebdev">
+        <sql>
+            update consultant
+            set queueManager = 1
+            where cns_consno in (57, 83, 105);
+        </sql>
+        <rollback/>
+    </changeSet>
 </databaseChangeLog>

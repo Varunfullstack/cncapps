@@ -356,7 +356,7 @@ class CTSRActivity extends CTCNC
             'alarmDateMessage'                => $dbejCallActivity->getValue(DBEJCallActivity::alarmDate),
             'alarmTimeMessage'                => $dbejCallActivity->getValue(DBEJCallActivity::alarmTime),
             'canChangeInitialDateAndTime'     => $dbeUser->getValue(
-                DBEUser::changeInitialDateAndTimeFlag
+                DBEUser::queueManager
             ) == 'Y' ? true : false,
             "isInitalDisabled"                => $this->isInitalDisabled($dbejCallActivity),
             'contactSupportLevel'             => $dbeContact->getValue(DBEContact::supportLevel),

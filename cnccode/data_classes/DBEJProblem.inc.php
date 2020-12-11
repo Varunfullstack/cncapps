@@ -746,9 +746,9 @@ class DBEJProblem extends DBEProblem
             left join consultant fixedEngineer on fixed.caa_consno = fixedEngineer.cns_consno
             left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
             left join team queueTeam on queueTeam.level = pro_queue_no 
-        WHERE {$this->getDBColumnName(                self::status            ) } in ('I','P'$includeFixed)  ";
+        WHERE {$this->getDBColumnName(                self::status            ) } in ('I','P'$includeFixed) and pro_queue_no <> 7 and (consultant.cns_consno is null or not consultant.excludeFromSDManagerDashboard) ";
         if ($isHoldForQA) {
-            $sql .= " and {$this->getDBColumnName(self::customerID)} <> 282 and (consultant.cns_consno is null or consultant.execludeFromSDManagerDashboard = 0) and pro_queue_no <> 7 ";
+            $sql .= " and {$this->getDBColumnName(self::customerID)} <> 282 ";
         } else {
             if (!$showHelpDesk) {
                 $sql .= ' and pro_queue_no <> 1 ';

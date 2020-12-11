@@ -36,7 +36,29 @@ class CustomerSiteComponent extends MainComponent {
         };
     }
 
+    cleanupListener() {
+        this.listenerCleanupFunc();
+    }
+
+    registerListener() {
+        const beforeUnloadFn = (e) => {
+            e.preventDefault(); // If you prevent default behavior in Mozilla Firefox prompt will always be shown
+            // Chrome requires returnValue to be set
+            e.returnValue = '';
+        };
+        window.addEventListener('beforeunload', beforeUnloadFn);
+        this.listenerCleanupFunc = () => {
+            window.removeEventListener('beforeunload', beforeUnloadFn);
+        }
+    }
+
+    componentWillUnmount() {
+        this.cleanupListener();
+    }
+
     componentDidMount = async () => {
+
+        this.registerListener();
         const {apicustomer} = this;
         const {data} = this.state;
         this.showSpinner();

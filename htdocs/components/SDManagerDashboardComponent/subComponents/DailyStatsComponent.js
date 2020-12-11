@@ -247,7 +247,7 @@ class DailyStatsComponent extends MainComponent {
         const {el} = this;
         return el('i', {
             className: "fal fa-expand-arrows fa-2x pointer",
-            onClick: () => window.open('Popup.php?action=dailyStats', 'popup', 'width=920,height=300')
+            onClick: () => window.open('popup.php?action=dailyStats', 'popup', 'width=1250,height=400')
         })
     }
 

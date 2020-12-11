@@ -396,7 +396,7 @@ class CTCNC extends Controller
             $menu,
             $SDManagerSection['icon'],
             $SDManagerSection['key'],
-            $this->isSdManager() || $this->dbeUser->getValue(DBEUser::changeInitialDateAndTimeFlag) == 'Y',
+            $this->isSdManager() || $this->dbeUser->getValue(DBEUser::queueManager) == 'Y',
             201,
             "SD Management",
             "SDManagerDashboard.php",
@@ -1215,7 +1215,7 @@ class CTCNC extends Controller
     }
     protected  function isSRQueueManager()
     {
-        return $this->dbeUser->getValue(DBEJUser::changeInitialDateAndTimeFlag) == 'Y';
+        return $this->dbeUser->getValue(DBEJUser::queueManager) == 'Y';
     }
     protected function isSdManager()
     {

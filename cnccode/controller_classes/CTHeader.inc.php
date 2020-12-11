@@ -43,11 +43,6 @@ class CTHeader extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = SENIOR_MANAGEMENT_PERMISSION;
-        if (!self::hasPermissions($roles)) {
-            Header("Location: /NotAllowed.php");
-            exit;
-        }
         $this->setMenuId(901);
         $this->buHeader = new BUHeader($this);
         $this->dsHeader = new DSForm($this);
@@ -60,9 +55,15 @@ class CTHeader extends CTCNC
      */
     function defaultAction()
     {
-        $this->checkPermissions(MAINTENANCE_PERMISSION);
+
         switch ($this->getAction()) {
             case CTHEADER_ACT_UPDATE:
+                $this->checkPermissions(MAINTENANCE_PERMISSION);
+                $roles = SENIOR_MANAGEMENT_PERMISSION;
+                if (!self::hasPermissions($roles)) {
+                    Header("Location: /NotAllowed.php");
+                    exit;
+                }
                 $this->update();
                 break;
             case self::GET_PRIORITIES_DESCRIPTIONS:
@@ -72,6 +73,12 @@ class CTHeader extends CTCNC
             }
             case CTHEADER_ACT_EDIT:
             default:
+                $this->checkPermissions(MAINTENANCE_PERMISSION);
+                $roles = SENIOR_MANAGEMENT_PERMISSION;
+                if (!self::hasPermissions($roles)) {
+                    Header("Location: /NotAllowed.php");
+                    exit;
+                }
                 $this->edit();
                 break;
         }

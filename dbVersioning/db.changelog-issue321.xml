@@ -9,17 +9,14 @@
     <changeSet author="pavwebdev" id="issue321-1531213570-1">
         <preConditions onFail="MARK_RAN">
             <not>
-                <columnExists tableName="consultant" columnName="changeInitialDateAndTimeFlag"/>
+                <columnExists tableName="consultant" columnName="queueManager"/>
             </not>
         </preConditions>
         <addColumn tableName="consultant">
-            <column name="changeInitialDateAndTimeFlag" type="char(1)" defaultValue="N"/>
+            <column name="queueManager" type="tinyint(1)" defaultValue="0"/>
         </addColumn>
-        <sql>
-            update consultant set changeInitialDateAndTimeFlag = 'N'
-        </sql>
         <rollback>
-            <dropColumn tableName="consultant" columnName="changeInitialDateAndTimeFlag"/>
+            <dropColumn tableName="consultant" columnName="queueManager"/>
         </rollback>
     </changeSet>
 </databaseChangeLog>

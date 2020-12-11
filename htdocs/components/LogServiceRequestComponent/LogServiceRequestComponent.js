@@ -64,7 +64,6 @@ export default class LogServiceRequestComponent extends MainComponent {
     };
 
     componentDidMount() {
-
         this.api.getCurrentUser().then(user => {
             const {data} = this.state;
             data.currentUser = user;

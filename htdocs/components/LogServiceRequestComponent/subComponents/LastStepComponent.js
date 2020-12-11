@@ -26,6 +26,7 @@ class LastStepComponent extends MainComponent {
             _showModal: false,
             requireAuthorize: false,
             prioritiesDescriptions: [],
+            isAllowedToLeave: false,
             data: {
                 uploadFiles: [],
                 repeatProblem: data.repeatProblem || false,
@@ -46,11 +47,34 @@ class LastStepComponent extends MainComponent {
         this.fileUploader = new React.createRef();
     }
 
+    cleanupListener() {
+        this.listenerCleanupFunc();
+    }
+
+    registerListener() {
+        const beforeUnloadFn = (e) => {
+            if (!this.state.isAllowedToLeave) {
+                e.preventDefault(); // If you prevent default behavior in Mozilla Firefox prompt will always be shown
+                // Chrome requires returnValue to be set
+                e.returnValue = '';
+            }
+        };
+        window.addEventListener('beforeunload', beforeUnloadFn);
+        this.listenerCleanupFunc = () => {
+            window.removeEventListener('beforeunload', beforeUnloadFn);
+        }
+    }
+
+    componentWillUnmount() {
+        this.cleanupListener();
+    }
+
     getPrioritiesDescriptions() {
         return fetch('Header.php?action=getPrioritiesDescriptions').then(res => res.json()).then(response => response.data);
     }
 
     componentDidMount = async () => {
+        this.registerListener();
         const [standardTextTypes, customerContacts, noWorkOptions, noFirstTimeFixOptions, prioritiesDescriptions] = await Promise.all([
             this.apiStandardText.getAllTypes(),
             this.apiCustomer.getCustomerContacts(this.props.data.customerID),
@@ -168,7 +192,11 @@ class LastStepComponent extends MainComponent {
             this.setState({_showModal});
             return false;
         }
-        if (this.isValid()) this.props.updateSRData(data, true);
+        if (this.isValid()) {
+
+            this.props.updateSRData(data, true);
+            this.setState({isAllowedToLeave: true});
+        }
     };
     getNextButton = () => {
         const {el} = this;
@@ -210,6 +238,7 @@ class LastStepComponent extends MainComponent {
         this.setState({data});
         if (this.isValid()) {
             this.props.updateSRData(data, true);
+            this.setState({isAllowedToLeave: true});
         } else {
             this.setState({data: {...this.state.data, startWork: false}})
         }

@@ -9,70 +9,71 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEUser extends DBEntity
 {
-    const userID = "userID";
-    const managerID = "managerID";
-    const name = "name";
-    const salutation = "salutation";
-    const add1 = "add1";
-    const add2 = "add2";
-    const add3 = "add3";
-    const town = "town";
-    const county = "county";
-    const postcode = "postcode";
-    const username = "username";
-    const employeeNo = "employeeNo";
-    const petrolRate = "petrolRate";
-    const perms = "perms";
-    const signatureFilename = "signatureFilename";
-    const jobTitle = "jobTitle";
-    const firstName = "firstName";
-    const lastName = "lastName";
-    const activeFlag = "activeFlag";
-    const helpdeskFlag = "helpdeskFlag";
-    const hourlyPayRate = "hourlyPayRate";
-    const teamID = "teamID";
+    const userID                    = "userID";
+    const managerID                 = "managerID";
+    const name                      = "name";
+    const salutation                = "salutation";
+    const add1                      = "add1";
+    const add2                      = "add2";
+    const add3                      = "add3";
+    const town                      = "town";
+    const county                    = "county";
+    const postcode                  = "postcode";
+    const username                  = "username";
+    const employeeNo                = "employeeNo";
+    const petrolRate                = "petrolRate";
+    const perms                     = "perms";
+    const signatureFilename         = "signatureFilename";
+    const jobTitle                  = "jobTitle";
+    const firstName                 = "firstName";
+    const lastName                  = "lastName";
+    const activeFlag                = "activeFlag";
+    const helpdeskFlag              = "helpdeskFlag";
+    const hourlyPayRate             = "hourlyPayRate";
+    const teamID                    = "teamID";
     const receiveSdManagerEmailFlag = "receiveSdManagerEmailFlag";
-    const changePriorityFlag = "changePriorityFlag";
-    const appearInQueueFlag = "appearInQueueFlag";
-    const standardDayHours = "standardDayHours";
-    const admin = 'admin';
-    const excludeFromStatsFlag = "excludeFromStatsFlag";
-    const changeInitialDateAndTimeFlag = 'changeInitialDateAndTimeFlag';
-    const projectManagementFlag = 'projectManagementFlag';
+    const changePriorityFlag        = "changePriorityFlag";
+    const appearInQueueFlag         = "appearInQueueFlag";
+    const standardDayHours          = "standardDayHours";
+    const admin                     = 'admin';
+    const excludeFromStatsFlag      = "excludeFromStatsFlag";
+    const queueManager              = 'queueManager';
+    const projectManagementFlag     = 'projectManagementFlag';
 
-    const encryptedDateOfBirth = "encryptedDateOfBirth";
-    const startDate = "startDate";
-    const companyHealthcareStartDate = "companyHealthcareStartDate";
-    const enhancedCNC2YearPensionStartDate = "enhancedCNC2YearPensionStartDate";
-    const encryptedPensionAdditionalPayments = "encryptedPensionAdditionalPayments";
-    const encryptedSalary = "encryptedSalary";
-    const encryptedSalarySacrifice = "encryptedSalarySacrifice";
-    const hoursWorkedInAWeek = "hoursWorkedInAWeek";
-    const encryptedNationalInsuranceNumber = "encryptedNationalInsuranceNumber";
-    const encryptedAddress1 = "encryptedAddress1";
-    const encryptedAddress2 = "encryptedAddress2";
-    const encryptedAddress3 = "encryptedAddress3";
-    const encryptedTown = "encryptedTown";
-    const encryptedCounty = "encryptedCounty";
-    const encryptedPostcode = "encryptedPostcode";
-    const staffAppraiserFlag = 'staffAppraiserFlag';
-    const passwordLevel = 'passwordLevel';
-    const changeSRContractsFlag = 'changeSRContractsFlag';
-    const starterLeaverQuestionManagementFlag = 'starterLeaverQuestionManagementFlag';
+    const encryptedDateOfBirth                   = "encryptedDateOfBirth";
+    const startDate                              = "startDate";
+    const companyHealthcareStartDate             = "companyHealthcareStartDate";
+    const enhancedCNC2YearPensionStartDate       = "enhancedCNC2YearPensionStartDate";
+    const encryptedPensionAdditionalPayments     = "encryptedPensionAdditionalPayments";
+    const encryptedSalary                        = "encryptedSalary";
+    const encryptedSalarySacrifice               = "encryptedSalarySacrifice";
+    const hoursWorkedInAWeek                     = "hoursWorkedInAWeek";
+    const encryptedNationalInsuranceNumber       = "encryptedNationalInsuranceNumber";
+    const encryptedAddress1                      = "encryptedAddress1";
+    const encryptedAddress2                      = "encryptedAddress2";
+    const encryptedAddress3                      = "encryptedAddress3";
+    const encryptedTown                          = "encryptedTown";
+    const encryptedCounty                        = "encryptedCounty";
+    const encryptedPostcode                      = "encryptedPostcode";
+    const staffAppraiserFlag                     = 'staffAppraiserFlag';
+    const passwordLevel                          = 'passwordLevel';
+    const changeSRContractsFlag                  = 'changeSRContractsFlag';
+    const starterLeaverQuestionManagementFlag    = 'starterLeaverQuestionManagementFlag';
     const offsiteBackupAdditionalPermissionsFlag = 'offsiteBackupAdditionalPermissionsFlag';
-    const salesPasswordAccess = 'salesPasswordAccess';
-    const createRenewalSalesOrdersFlag = "createRenewalSalesOrdersFlag";
-    const expenseApproverID = 'expenseApproverID';
-    const autoApproveExpenses = 'autoApproveExpenses';
-    const isExpenseApprover = "isExpenseApprover";
-    const globalExpenseApprover = "globalExpenseApprover";
-    const additionalTimeLevelApprover = "additionalTimeLevelApprover";
-    const sendEmailWhenAssignedService = "sendEmailAssignedService";
-    const basedAtCustomerSite = "basedAtCustomerSite";
-    const siteCustId = "siteCustId";
-    const streamOneLicenseManagement = "streamOneLicenseManagement";
-    const execludeFromSDManagerDashboard ="execludeFromSDManagerDashboard";
-    const holdAllSRsforQAReview="holdAllSRsforQAReview";
+    const salesPasswordAccess                    = 'salesPasswordAccess';
+    const createRenewalSalesOrdersFlag           = "createRenewalSalesOrdersFlag";
+    const expenseApproverID                      = 'expenseApproverID';
+    const autoApproveExpenses                    = 'autoApproveExpenses';
+    const isExpenseApprover                      = "isExpenseApprover";
+    const globalExpenseApprover                  = "globalExpenseApprover";
+    const additionalTimeLevelApprover            = "additionalTimeLevelApprover";
+    const sendEmailWhenAssignedService           = "sendEmailAssignedService";
+    const basedAtCustomerSite                    = "basedAtCustomerSite";
+    const siteCustId                             = "siteCustId";
+    const streamOneLicenseManagement             = "streamOneLicenseManagement";
+    const excludeFromSDManagerDashboard          = "excludeFromSDManagerDashboard";
+    const holdAllSRsforQAReview                  = "holdAllSRsforQAReview";
+
     /**
      * calls constructor()
      * @access public
@@ -96,7 +97,6 @@ class DBEUser extends DBEntity
             DA_ALLOW_NULL,
             "cns_manager"
         );
-
         $this->addColumn(
             self::name,
             DA_STRING,
@@ -238,19 +238,18 @@ class DBEUser extends DBEntity
             DA_YN,
             DA_NOT_NULL
         );
-
         $this->addColumn(
             self::projectManagementFlag,
             DA_YN,
             DA_NOT_NULL
         );
-
         $this->addColumn(
-            self::changeInitialDateAndTimeFlag,
-            DA_YN,
-            DA_NOT_NULL
+            self::queueManager,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            false
         );
-
         $this->addColumn(
             self::encryptedDateOfBirth,
             DA_TEXT,
@@ -326,31 +325,26 @@ class DBEUser extends DBEntity
             DA_TEXT,
             DA_ALLOW_NULL
         );
-
         $this->addColumn(
             self::staffAppraiserFlag,
             DA_YN,
             DA_NOT_NULL
         );
-
         $this->addColumn(
             self::passwordLevel,
             DA_INTEGER,
             DA_NOT_NULL
         );
-
         $this->addColumn(
             self::changeSRContractsFlag,
             DA_YN,
             DA_NOT_NULL
         );
-
         $this->addColumn(
             self::starterLeaverQuestionManagementFlag,
             DA_YN,
             DA_NOT_NULL
         );
-
         $this->addColumn(
             self::offsiteBackupAdditionalPermissionsFlag,
             DA_YN,
@@ -374,12 +368,12 @@ class DBEUser extends DBEntity
             DA_NOT_NULL
         );
         $this->addColumn(
-            self::execludeFromSDManagerDashboard,
+            self::excludeFromSDManagerDashboard,
             DA_BOOLEAN,
             DA_NOT_NULL,
-            'execludeFromSDManagerDashboard',
+            'excludeFromSDManagerDashboard',
             '0'
-        );        
+        );
         $this->addColumn(
             self::expenseApproverID,
             DA_ID,
@@ -392,7 +386,6 @@ class DBEUser extends DBEntity
             null,
             0
         );
-
         $this->addColumn(
             self::isExpenseApprover,
             DA_BOOLEAN,
@@ -429,20 +422,13 @@ class DBEUser extends DBEntity
     {
 
         $this->setMethodName("getRows");
-
-        $queryString =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " JOIN team ON team.teamID = consultant.teamID";
-
+        $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " JOIN team ON team.teamID = consultant.teamID";
         if ($activeOnly) {
             $queryString .= ' WHERE consultant.activeFlag = "Y"';
         }
-
         $queryString .= ' ORDER BY firstName, lastName';
-
         $this->setQueryString($queryString);
-
         return (parent::getRows());
     }
 
@@ -450,15 +436,10 @@ class DBEUser extends DBEntity
     {
 
         $this->setMethodName("getRowsInGroup");
-
         $this->setQueryString(
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " WHERE activeFlag = 'Y'" .
-            " AND cns_perms LIKE '%" . $group . "%'"
-
+            "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " WHERE activeFlag = 'Y'" . " AND cns_perms LIKE '%" . $group . "%'"
         );
-
         return (parent::getRows());
     }
 
@@ -467,32 +448,24 @@ class DBEUser extends DBEntity
         $sql = "select * from permissions inner join " . $this->getTableName() . " on " . $this->getPKName(
             ) . " = permissions.userID where page = '$page'";
         $this->setQueryString($sql);
-
         return (parent::getRows());
     }
 
     function getActiveWithPermission($permission)
     {
         $permission = mysqli_real_escape_string($this->db->link_id(), $permission);
-        $query = "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " WHERE activeFlag = 'Y' and cns_perms like '%$permission%' ORDER BY firstName, lastName";
-
+        $query      = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " WHERE activeFlag = 'Y' and cns_perms like '%$permission%' ORDER BY firstName, lastName";
         $this->setQueryString($query);
-
         return (parent::getRows());
     }
 
     function getActiveUsers()
     {
         $this->setMethodName("getRowsInGroup");
-
-        $query = "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " WHERE activeFlag = 'Y' ORDER BY firstName, lastName";
-
+        $query = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " WHERE activeFlag = 'Y' ORDER BY firstName, lastName";
         $this->setQueryString($query);
-
         return (parent::getRows());
     }
 
@@ -504,14 +477,14 @@ class DBEUser extends DBEntity
     public function getAppraisalUsers()
     {
         $ignoredUsers = [67, 97, 111, 115];
-        $query = "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName(
+        $query        = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " WHERE " . $this->getDBColumnName(
                 self::userID
             ) . " not in (select distinct managers." . $this->getDBColumnName(
                 self::managerID
-            ) . " from " . $this->tableName . " managers) and " .
-            $this->getDBColumnName(self::activeFlag) . " = 'Y' and " . $this->getDBColumnName(
+            ) . " from " . $this->tableName . " managers) and " . $this->getDBColumnName(
+                self::activeFlag
+            ) . " = 'Y' and " . $this->getDBColumnName(
                 self::userID
             ) . " not in (" . implode(
                 ',',
@@ -523,9 +496,8 @@ class DBEUser extends DBEntity
 
     public function getApproverUsers()
     {
-        $query = "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName(
+        $query = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " WHERE " . $this->getDBColumnName(
                 self::isExpenseApprover
             ) . " = 1  and " . $this->getDBColumnName(self::activeFlag) . " = 'Y'";
         $this->setQueryString($query);
@@ -534,9 +506,8 @@ class DBEUser extends DBEntity
 
     public function getSickReportUsers()
     {
-        $query = "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName(
+        $query = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " WHERE " . $this->getDBColumnName(
                 self::activeFlag
             ) . " = 'Y' and  ";
         $this->setQueryString($query);
@@ -553,7 +524,6 @@ class DBEUser extends DBEntity
                           (select 1 from {$this->getTableName()} test where {$this->getDBColumnName(self::isExpenseApprover)} and {$this->getDBColumnName(self::userID)} = {$superiorId})
                     )  order by cns_name";
         $this->setQueryString($query);
-
         return parent::getRows();
     }
 }
