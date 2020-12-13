@@ -117,6 +117,9 @@ class ActivityDisplayComponent extends MainComponent {
     getHeader = () => {
 
         const {data} = this.state;
+        if(!data){
+            return '';
+        }
         return (
             <div style={{display: "flex", flexDirection: "column"}}>
                 <a
