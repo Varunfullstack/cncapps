@@ -439,78 +439,6 @@ class ActivityEditComponent extends MainComponent {
             );
         } else return null;
     };
-    getHeader = () => {
-        const {el} = this;
-        const {data, currentContact} = this.state;
-        return el(
-            "div",
-            {style: {display: "flex", flexDirection: "column"}},
-
-            el(
-                "a",
-                {
-                    className: data?.customerNameDisplayClass,
-                    href: `Customer.php?action=dispEdit&customerId=${data?.customerId}`,
-                    target: "_blank",
-                },
-                data?.customerName +
-                ", " +
-                data?.siteAdd1 +
-                ", " +
-                data?.siteAdd2 +
-                ", " +
-                data?.siteAdd3 +
-                ", " +
-                data?.siteTown +
-                ", " +
-                data?.sitePostcode
-            ),
-            el('div', null,
-                el('a', {href: `Customer.php?action=dispEdit&customerId=${data?.customerId}`}, currentContact?.firstName + ' ' + currentContact?.lastName + "  "),
-                el(
-                    "a",
-                    {href: `tel:${currentContact?.sitePhone}`},
-                    currentContact?.sitePhone
-                ),
-                currentContact?.contactPhone ? el("label", null, " DDI: ") : null,
-                currentContact?.contactPhone
-                    ? el(
-                    "a",
-                    {href: `tel:${currentContact?.contactPhone}`},
-                    currentContact?.contactPhone
-                    )
-                    : null,
-                currentContact?.contactMobilePhone
-                    ? el("label", null, " Mobile: ")
-                    : null,
-                currentContact?.contactMobilePhone
-                    ? el(
-                    "a",
-                    {href: `tel:${currentContact?.contactMobilePhone}`},
-                    currentContact?.contactMobilePhone
-                    )
-                    : null,
-                el(
-                    "a",
-                    {
-                        href: `mailto:${currentContact?.contactEmail}?cc=support@cnc-ltd.co.uk&subject=${data?.serviceRequestEmailSubject}`,
-                    },
-                    el("i", {className: "fal fa-envelope ml-5"})
-                ),
-                !currentContact?.contactSupportLevel
-                    ? el(
-                    "span",
-                    {key: "contactSupportLevel", className: "ml-2"},
-                    "Not a nominated support contact"
-                    )
-                    : null,
-                el("p", {className: "formErrorMessage mt-2"}, data?.contactNotes),
-                el("p", {
-                    className: "  mt-2",
-                    style: {color: "red", fontWeight: "bold", whiteSpace: "nowrap"}
-                }, data?.techNotes)
-            ));
-    };
 
     getActions = () => {
         const {el} = this;
@@ -1118,67 +1046,7 @@ class ActivityEditComponent extends MainComponent {
         data.contactID = id;
         this.setState({data, currentContact});
     };
-    getContactPhone = () => {
-        const {data} = this.state;
-        const {el} = this;
-        let elements = [];
-        if (data?.sitePhone)
-            elements.push(
-                el(
-                    "a",
-                    {key: "sitePhone", href: `tel:${data.sitePhone}`},
-                    data.sitePhone
-                )
-            );
-        if (data?.contactPhone) {
-            elements.push(el("label", {key: "contactPhonelabel"}, " DDI: "));
-            elements.push(
-                el(
-                    "a",
-                    {key: "contactPhone", href: `tel:${data.contactPhone}`},
-                    data.contactPhone
-                )
-            );
-        }
-        if (data?.contactMobilePhone) {
-            elements.push(
-                el("label", {key: "contactMobilePhonelabel"}, " Mobile: ")
-            );
-            elements.push(
-                el(
-                    "a",
-                    {key: "contactMobilePhone", href: `tel:${data.contactMobilePhone}`},
-                    data.contactMobilePhone
-                )
-            );
-        }
-        if (data?.contactEmail) {
-            const subject = `Service Request ${data.problemID}`;
-            elements.push(
-                el(
-                    "a",
-                    {
-                        key: "contactEmail",
-                        href: `mailto:${data.contactEmail}?cc=support@cnc-ltd.co.uk&subject=${subject}`,
-                    },
-                    el("i", {
-                        key: "contactEmailicon",
-                        className: "fal fa-envelope icon ml-2",
-                    })
-                )
-            );
-        }
-        if (!data?.contactSupportLevel) {
-            elements.push(
-                el(
-                    "span",
-                    {key: "contactSupportLevel", className: "ml-2"},
-                    "Not a nominated support contact"
-                )
-            );
-        }
-        return elements;
-    };
+
     getSites = () => {
         const {el} = this;
         const {data, sites} = this.state;
