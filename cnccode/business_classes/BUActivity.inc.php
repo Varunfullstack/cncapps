@@ -5090,9 +5090,13 @@ class BUActivity extends Business
             DBEProblem::criticalFlag,
             $body->criticalSRFlag ? 'Y' : 'N'
         );
+        $notes = $body->internalNotes;
+        if (isset($body->internalNotesAppend)) {
+            $notes .= $body->internalNotesAppend;
+        }
         $dbeProblem->setValue(
             DBEProblem::internalNotes,
-            $body->internalNotes
+            $notes
         );
         $dbeProblem->setValue(
             DBEProblem::contactID,
