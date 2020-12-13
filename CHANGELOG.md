@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v5.0.0]
+## [v5.0.0] - 2020-12-13
 ### Added
 - Issue 1072 - Activity Breakdown within SR
 - Issue 1073 - IT Review Meeting Dates
