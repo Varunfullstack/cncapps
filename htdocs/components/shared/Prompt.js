@@ -33,7 +33,7 @@ class Prompt extends React.Component {
         const {isEditor} = this.props;
 
         if (isEditor) {
-            return <CKEditor onchange={(value) => this.setState({reason: value})} value={defaultValue}/>
+            return <CKEditor onChange={(value) => this.setState({reason: value})} value={defaultValue}/>
         }
 
         return <textarea key="input"

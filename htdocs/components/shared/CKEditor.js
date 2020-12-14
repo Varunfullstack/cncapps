@@ -69,7 +69,9 @@ export default class CKEditor extends React.Component {
                 "change",
                 function () {
                     let data = CKEDITOR.instances[this.elementName].getData();
-                    this.props.onChange(data);
+                    if (this.props.onChange) {
+                        this.props.onChange(data);
+                    }
                 }.bind(this)
             );
         }

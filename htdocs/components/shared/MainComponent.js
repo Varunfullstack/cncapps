@@ -6,6 +6,8 @@ import React from 'react';
 
 export default class MainComponent extends React.Component {
 
+    promptCallback;
+
     constructor(props) {
         super(props);
         this.el = React.createElement;
@@ -151,17 +153,11 @@ export default class MainComponent extends React.Component {
         prompt.defaultValue = defaultValue;
         prompt.isEditor = isEditor;
         this.setState({prompt});
-        let handleInterval = null;
         return new Promise((resolve, reject) => {
-            handleInterval = setInterval(() => {
-                if (this.state.prompt.value != null) {
-                    resolve(this.state.prompt.value);
-                    clearInterval(handleInterval);
-                }
-            }, 100);
+            this.promptCallback = (value) => {
+                resolve(value)
+            }
         });
-
-
     }
     getPrompt = () => {
         const {prompt} = this.state;
@@ -174,6 +170,7 @@ export default class MainComponent extends React.Component {
         prompt.title = "";
         prompt.width = 500
         prompt.value = value;
+        this.promptCallback(value);
         this.setState({prompt})
     }
     //-----------------end alert
