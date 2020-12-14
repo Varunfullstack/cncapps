@@ -179,9 +179,8 @@ FROM
     ON approver.`cns_consno` = callactivity.`overtimeApprovedBy`
   join headert
     on headert.`headerID` = 1
-WHERE 
-      caa_endtime 
-  and caa_endtime is not null and
+WHERE      
+  caa_endtime is not null and
       (caa_status = \'C\'
     OR caa_status = \'A\'
           )
