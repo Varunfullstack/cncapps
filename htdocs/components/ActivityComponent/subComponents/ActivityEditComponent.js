@@ -1044,6 +1044,12 @@ class ActivityEditComponent extends MainComponent {
         const {data, contacts} = this.state;
         const currentContact = contacts.find((c) => c.id == id);
         data.contactID = id;
+        data.contactName = currentContact.name;
+        data.contactPhone = currentContact.contactPhone;
+        data.contactMobilePhone = currentContact.contactMobilePhone;
+        data.contactEmail = currentContact.contactEmail;
+        data.contactNotes = currentContact.notes;
+
         this.setState({data, currentContact});
     };
 
