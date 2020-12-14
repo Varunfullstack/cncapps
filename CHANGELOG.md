@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.0.1] - 2020-12-14
+## Fixed
+- Fix issue with importing automated requests
+- Fix issue with additional time requests
+
 ## [v5.0.0] - 2020-12-13
 ### Added
 - Issue 1072 - Activity Breakdown within SR
