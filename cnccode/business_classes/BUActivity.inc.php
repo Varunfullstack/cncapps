@@ -6895,7 +6895,7 @@ FROM
             ],
             [
                 "type"  => "s",
-                "value" => $record->getSubjectLine()
+                "value" => substr($record->getSubjectLine(),0,50)
             ]
         ];
         $db->preparedQuery(

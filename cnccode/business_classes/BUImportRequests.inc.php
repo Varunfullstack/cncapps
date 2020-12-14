@@ -23,17 +23,14 @@ class BUImportRequests extends Business
     {
         parent::__construct($owner);
         $this->buActivity = new BUActivity($this);
-        $this->updateDb = new dbSweetcode;
+        $this->updateDb   = new dbSweetcode;
     }
 
     public function createServiceRequests()
     {
         $db = new dbSweetcode();
-
         echo "Start Import<BR/>";
-
         $processedMessages = 0;
-
         //TODO: create a class that represents the automated_request row
         /*
         Putting a limit on this means that if the process gets behind it will process in batches
@@ -50,14 +47,11 @@ class BUImportRequests extends Business
       ORDER BY
         automatedRequestId
       LIMIT 15";
-
         $db->query($sql);
-
         $toDelete = [];
         /** @var \CNCLTD\AutomatedRequest $automatedRequest */
         while ($automatedRequest = $db->nextObjectRecord(\CNCLTD\AutomatedRequest::class)) {
             echo 'Start processing ' . $automatedRequest->getAutomatedRequestID() . "<BR/>";
-
             echo '<br>Description: ';
             echo $automatedRequest->getTextBody();
             echo '<br>';
@@ -66,7 +60,6 @@ class BUImportRequests extends Business
                 $automatedRequest
             )) {      // error string returned
                 echo $automatedRequest->getAutomatedRequestID() . " processed successfully<BR/>";
-
                 $processedMessages++;
             } else {
                 echo $automatedRequest->getAutomatedRequestID() . " failed<BR/>";
@@ -81,9 +74,7 @@ class BUImportRequests extends Business
             $toDelete[] = $automatedRequest->getAutomatedRequestID();
 
         } // end while
-
         echo $processedMessages . " requests imported<BR/>";
-
         if (count($toDelete)) {
             echo 'Deleting requests';
             $sql = "DELETE FROM automated_request
@@ -93,9 +84,7 @@ class BUImportRequests extends Business
                 ) . ")";
             $db->query($sql);
         }
-
         echo "End<BR/>";
-
         return $processedMessages;
 
     }
@@ -118,15 +107,11 @@ class BUImportRequests extends Business
     )
     {
         global $cfg;
-
         $buMail = new BUMail($this);
-
         $senderEmail = CONFIG_SUPPORT_EMAIL;
-        $toEmail = "CNCServiceDesk@" . CONFIG_PUBLIC_DOMAIN;
-
+        $toEmail     = "CNCServiceDesk@" . CONFIG_PUBLIC_DOMAIN;
         $template = new Template(
-            $cfg["path_templates"],
-            "remove"
+            $cfg["path_templates"], "remove"
         );
         $template->set_file(
             'page',
@@ -158,7 +143,6 @@ class BUImportRequests extends Business
             true
         );
         $body = $template->get_var('output');
-
         $hdrs = array(
             'From'         => $senderEmail,
             'To'           => $toEmail,
@@ -167,18 +151,14 @@ class BUImportRequests extends Business
             'Content-Type' => 'text/html; charset=UTF-8'
         );
         $buMail->mime->setHTMLBody($body);
-
         $mime_params = array(
             'text_encoding' => '7bit',
             'text_charset'  => 'UTF-8',
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-
         $body = $buMail->mime->get($mime_params);
-
         $hdrs = $buMail->mime->headers($hdrs);
-
         $buMail->putInQueue(
             $senderEmail,
             $toEmail,
