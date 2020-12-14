@@ -1,6 +1,12 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.0.2] - 2020-12-14
+### Fixed
+- Activity flagged as overtime not showing in dashboard.
+- Spellchecker stops working when enabled on email subject summary textbox.
+- Update contact details when changing the service request contact
+
 ## [v5.0.0] - 2020-12-13
 ### Added
 - Issue 1072 - Activity Breakdown within SR
