@@ -747,7 +747,7 @@ class ActivityDisplayComponent extends MainComponent {
                     el('tr', null,
                         el('td', {colSpan: 4}),
                         el('td', {className: "display-label"}, "Asset"),
-                        el('td', {colSpan: 3}, data?.assetName || (data?.emptyAssetReason) || ''),
+                        el('td', {colSpan: 3, className: "nowrap"}, data?.assetName || (data?.emptyAssetReason) || ''),
                     ),
 
                     data?.currentUser ? el('tr', null,

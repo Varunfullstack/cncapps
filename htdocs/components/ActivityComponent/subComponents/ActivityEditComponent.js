@@ -501,7 +501,7 @@ class ActivityEditComponent extends MainComponent {
                     content: el("a", {
                         className: "fal fa-tag fa-2x m-5 pointer icon",
                         href: "javascript:void(0);",
-                        onClick: ($event) =>                              this.handleSalesOrder(data?.callActivityID,                                 data?.problemID)                        ,
+                        onClick: ($event) => this.handleSalesOrder(data?.callActivityID, data?.problemID),
                     }),
                 })
                 : null,
@@ -1744,10 +1744,12 @@ class ActivityEditComponent extends MainComponent {
                 style: {width: "100%"},
                 value: this.state.data.assetName || "",
             },
-            el("option", {
-                key: "default",
-                value: ""
-            }, (this.state.data.emptyAssetReason && this.state.data.emptyAssetReason.substr(0, 20)) || ""),
+            el(
+                "option", {
+                    key: "default",
+                    value: ""
+                }, this.state.data.emptyAssetReason || ""
+            ),
             assets.map((s) =>
                 el(
                     "option",
