@@ -18,9 +18,12 @@ import ReactDOM from 'react-dom';
 import '../style.css';
 import '../shared/ToolTip.css'
 
+const AUTORELOAD_INTERVAL_TIME = 0.5 * 60 * 1000;
+
 class CurrentActivityReportComponent extends MainComponent {
     el = React.createElement;
     apiCurrentActivityService;
+    autoReloadInterval;
     teams;
 
     constructor(props) {
@@ -157,11 +160,34 @@ class CurrentActivityReportComponent extends MainComponent {
         if (filter.activeTab == code) return "active";
         else return "";
     };
+
+    checkAutoReload(code) {
+        const specificAutoReload = {
+            'H': 0,
+            'E': 0,
+            'SP': 0,
+            'P': 0,
+            'S': 0,
+        };
+        if (this.autoReloadInterval) {
+            clearInterval(this.autoReloadInterval);
+        }
+        if (code in specificAutoReload) {
+            this.autoReloadInterval = setInterval(() => {
+                this.loadQueue(code);
+                this.loadQueue('TBL');
+                this.loadQueue('PR');
+            }, AUTORELOAD_INTERVAL_TIME);
+        }
+
+    }
+
     setActiveTab = (code) => {
 
         const {filter} = this.state;
         filter.activeTab = code;
         this.loadQueue(code);
+        this.checkAutoReload(code);
         this.saveFilterToLocalStorage(filter);
         this.setState({filter});
     };
@@ -179,14 +205,8 @@ class CurrentActivityReportComponent extends MainComponent {
             });
         this.loadQueue(filter.activeTab);
         this.loadQueue('TBL');
-        setInterval(() => {
-            this.loadQueue('TBL');
-        }, 4 * 60 * 1000);
         this.loadQueue('PR');
-        setInterval(() => {
-            this.loadQueue('PR');
-        }, 4 * 60 * 1000);
-
+        this.checkAutoReload(filter.activeTab);
     };
 
     getLocalStorageFilter = () => {
