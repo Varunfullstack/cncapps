@@ -58,9 +58,9 @@ class DailyStatsComponent extends MainComponent {
                 this.getTotalCard("Unique Customers", summary.uniqueCustomerTodaySummary.total, "#00628B", "#E6E6E6"),
                 this.getTotalCard("Near SLA", summary.nearSLASummary.total),
                 this.getTotalCard("Raised Today", summary.raisedTodaySummary.total, "#00628B", "#E6E6E6"),
-                this.getTotalCard("Today's Started", summary.reopenTodaySummary.total),
+                this.getTotalCard("Today's Started", summary.raisedStartTodaySummary.total),
                 this.getTotalCard("Fixed Today", summary.fixedTodaySummary.total, "#00628B", "#E6E6E6"),
-                this.getTotalCard("Reopened Today", summary.raisedStartTodaySummary.total),
+                this.getTotalCard("Reopened Today", summary.reopenTodaySummary.total),
                 this.getTotalCard("Breached SLA", summary.breachedSLATodaySummary.total, "#00628B", "#E6E6E6"),
             ));
     };
@@ -233,8 +233,13 @@ class DailyStatsComponent extends MainComponent {
             );
         } else return null;
     };
-    getTotalCard = (label, total, backgroundColor = "#C6C6C6", textColor = "#3C3C3C") => {
+    getTotalCard = (label, total, backgroundColor = "#C6C6C6", textColor = "#3C3C3C", tooltip = null) => {
         const {el} = this;
+        // const label = tooltip ? (
+        //     <label className="sd-card-title">
+        //
+        //     </label>
+        // ) : null;
         return el(
             "div",
             {className: "sd-card ", style: {backgroundColor: backgroundColor, color: textColor}},

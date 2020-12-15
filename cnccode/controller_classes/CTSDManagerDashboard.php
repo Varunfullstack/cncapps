@@ -28,13 +28,12 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             false
         );
         $action = @$_REQUEST['action'];
-        if ($action != self::DAILY_STATS_SUMMARY && !self::isSdManager() && !self::isSRQueueManager() ) {
+        if ($action != self::DAILY_STATS_SUMMARY && !self::isSdManager() && !self::isSRQueueManager()) {
             Header("Location: /NotAllowed.php");
             exit;
         }
         $this->setMenuId(201);
     }
-
 
 
     /**
@@ -310,7 +309,7 @@ WHERE pro_custno <> 282
      */
     private function getFixedToday(): array
     {
-        $query = "SELECT
+        $query  = "SELECT
   COUNT(p.`pro_problemno`) AS total
 FROM
   `callactivity` c
@@ -387,7 +386,6 @@ FROM
   JOIN problem
     ON problem.`pro_problemno` = c.`caa_problemno`
 WHERE pro_custno <> 282
-  AND caa_consno <> 67
   AND caa_callacttypeno = 51
   AND `caa_date` >= CURDATE()
   AND caa_date < CURDATE() + INTERVAL 1 DAY";
