@@ -44,18 +44,18 @@ class CTSRActivity extends CTCNC
     const GET_PRIORITIES                                         = "getPriorities";
     const GET_CUSTOMER_SITES                                     = "getCustomerSites";
     const GET_CUSTOMER_CONTACTS                                  = "getCustomerContacts";
-    const UPDATE_ACTIVITY                = "updateActivity";
-    const MESSAGE_TO_SALES               = "messageToSales";
-    const GET_CALL_ACTIVITY              = "getCallActivity";
-    const SAVE_FIXED_INFORMATION         = "saveFixedInformation";
-    const GET_INITIAL_ACTIVITY           = "getInitialActivity";
-    const SAVE_MANAGEMENT_REVIEW_DETAILS = "saveManagementReviewDetails";
-    const CHANGE_PROBLEM_PRIORITY        = "changeProblemPriority";
-    const USED_BUDGET_DATA               = "usedBudgetData";
-    const UPLOAD_INTERNAL_DOCUMENT       = "uploadInternalDocument";
-    const VIEW_INTERNAL_DOCUMENT         = 'viewInternalDocument';
-    const DELETE_INTERNAL_DOCUMENT       = 'deleteInternalDocument';
-    const REMOTE_SUPPORT_ACTIVITY_TYPE_ID                              = 8;
+    const UPDATE_ACTIVITY                                        = "updateActivity";
+    const MESSAGE_TO_SALES                                       = "messageToSales";
+    const GET_CALL_ACTIVITY                                      = "getCallActivity";
+    const SAVE_FIXED_INFORMATION                                 = "saveFixedInformation";
+    const GET_INITIAL_ACTIVITY                                   = "getInitialActivity";
+    const SAVE_MANAGEMENT_REVIEW_DETAILS                         = "saveManagementReviewDetails";
+    const CHANGE_PROBLEM_PRIORITY                                = "changeProblemPriority";
+    const USED_BUDGET_DATA                                       = "usedBudgetData";
+    const UPLOAD_INTERNAL_DOCUMENT                               = "uploadInternalDocument";
+    const VIEW_INTERNAL_DOCUMENT                                 = 'viewInternalDocument';
+    const DELETE_INTERNAL_DOCUMENT                               = 'deleteInternalDocument';
+    const REMOTE_SUPPORT_ACTIVITY_TYPE_ID                        = 8;
     public  $serverGuardArray = array(
         ""  => "Please select",
         "Y" => "ServerGuard Related",
@@ -559,7 +559,6 @@ class CTSRActivity extends CTCNC
      */
     function isInitalDisabled($dbejCallActivity)
     {
-        $initial_disabled = false;
         if (in_array(
             $dbejCallActivity->getValue(DBEJCallActivity::callActTypeID),
             array(
@@ -567,11 +566,9 @@ class CTSRActivity extends CTCNC
                 CONFIG_CHANGE_REQUEST_ACTIVITY_TYPE_ID
             )
         )) {
-            if (!$this->hasPermissions(MAINTENANCE_PERMISSION)) {
-                $initial_disabled = true;
-            }
+            return !$this->isSdManager() && !$this->isSRQueueManager();
         }
-        return $initial_disabled;
+        return false;
     }
 
     function messageToSales()
@@ -1022,7 +1019,9 @@ class CTSRActivity extends CTCNC
                 $currentUser    = $this->getDbeUser();
                 $buCustomerItem = new BUCustomerItem($this);
                 $hasServiceDesk = $buCustomerItem->customerHasServiceDeskContract($body->customerID);
-                if (!$body->startWork && $body->priority == 1 && $currentUser->getValue(DBEUser::teamID) == 1 && $hasServiceDesk) {
+                if (!$body->startWork && $body->priority == 1 && $currentUser->getValue(
+                        DBEUser::teamID
+                    ) == 1 && $hasServiceDesk) {
                     $dbeProblemNotStartReason = new DBEProblemNotStartReason($this);
                     $dbeProblemNotStartReason->setValue(
                         DBEProblemNotStartReason::problemID,
