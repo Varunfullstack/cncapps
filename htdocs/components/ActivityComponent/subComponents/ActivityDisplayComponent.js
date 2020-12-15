@@ -87,6 +87,7 @@ class ActivityDisplayComponent extends MainComponent {
         filters.criticalSR = res.criticalFlag == "1";
         filters.holdForQA = res.holdForQA;
         this.setState({filters, data: res, currentActivity: +res.callActivityID, currentUser});
+        return '';
 
     }
     getProjectsElement = () => {
@@ -117,7 +118,7 @@ class ActivityDisplayComponent extends MainComponent {
     getHeader = () => {
 
         const {data} = this.state;
-        if(!data){
+        if (!data) {
             return '';
         }
         return (
@@ -147,7 +148,9 @@ class ActivityDisplayComponent extends MainComponent {
                     {data?.contactMobilePhone ?
                         <a href={`tel:${data?.contactMobilePhone}`}>{data?.contactMobilePhone}</a> : null
                     }
-                    <a href={`mailto:${data?.contactEmail}?cc=support@cnc-ltd.co.uk&subject=Service Request ${data?.problemID} - ${data.serviceRequestEmailSubject} - Update`} target="_blank">
+                    <a href={`mailto:${data?.contactEmail}?cc=support@cnc-ltd.co.uk&subject=Service Request ${data?.problemID} - ${data.serviceRequestEmailSubject} - Update`}
+                       target="_blank"
+                    >
                         <i className="fal fa-envelope ml-5"/>
                     </a>
                 </div>
@@ -221,7 +224,7 @@ class ActivityDisplayComponent extends MainComponent {
                 title: "Sales Order",
                 content: el('a', {
                     className: "fal fa-tag fa-2x m-5 pointer icon",
-                    onClick: () => this.handleSalesOrder(data?.callActivityID)
+                    onClick: () => this.handleSalesOrder(data?.callActivityID, data?.problemID)
                 })
             }) : null,
             data?.linkedSalesOrderID ? el(ToolTip, {
@@ -350,10 +353,17 @@ class ActivityDisplayComponent extends MainComponent {
     handleGeneratPassword = () => {
         window.open("Password.php?action=generate&htmlFmt=popup", 'reason', 'scrollbars=yes,resizable=yes,height=524,width=855,copyhistory=no, menubar=0');
     }
-    handleSalesOrder = (callActivityID) => {
-
-        const w = window.open(`Activity.php?action=editLinkedSalesOrder&htmlFmt=popup&callActivityID=${callActivityID}`, 'reason', 'scrollbars=yes,resizable=yes,height=150,width=250,copyhistory=no, menubar=0');
-        w.onbeforeunload = () => this.loadCallActivity();
+    handleSalesOrder = async (activityId, serviceRequestId) => {
+        const salesOrderId = await this.prompt('Sales Order ID:');
+        if (!salesOrderId) {
+            return;
+        }
+        try {
+            await this.api.linkSalesOrder(serviceRequestId, salesOrderId);
+            this.loadCallActivity(activityId);
+        } catch (e) {
+            this.alert(e.toString());
+        }
     }
     handleUnlink = async (linkedSalesOrderID, serviceRequestId, activityId) => {
         const res = await this.confirm(`Are you sure you want to unlink this request to Sales Order ${linkedSalesOrderID}`);

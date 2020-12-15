@@ -477,6 +477,7 @@ class ActivityEditComponent extends MainComponent {
                     content: el("a", {
                         className: "fal fa-tag fa-2x m-5 pointer icon",
                         href: `SalesOrder.php?action=displaySalesOrder&ordheadID=${data?.linkedSalesOrderID}`,
+                        target: '_blank'
                     }),
                 })
                 : null,
@@ -499,7 +500,8 @@ class ActivityEditComponent extends MainComponent {
                     title: "Sales Order",
                     content: el("a", {
                         className: "fal fa-tag fa-2x m-5 pointer icon",
-                        onClick: () => this.handleSalesOrder(data?.callActivityID),
+                        href: "javascript:void(0);",
+                        onClick: ($event) =>                              this.handleSalesOrder(data?.callActivityID,                                 data?.problemID)                        ,
                     }),
                 })
                 : null,
@@ -863,13 +865,17 @@ class ActivityEditComponent extends MainComponent {
             "scrollbars=yes,resizable=yes,height=524,width=855,copyhistory=no, menubar=0"
         );
     };
-    handleSalesOrder = (callActivityID) => {
-        const w = window.open(
-            `Activity.php?action=editLinkedSalesOrder&htmlFmt=popup&callActivityID=${callActivityID}`,
-            "reason",
-            "scrollbars=yes,resizable=yes,height=150,width=250,copyhistory=no, menubar=0"
-        );
-        w.onbeforeunload = () => this.loadCallActivity(callActivityID);
+    handleSalesOrder = async (callActivityID, serviceRequestId) => {
+        const salesOrderId = await this.prompt('Sales Order ID:');
+        if (!salesOrderId) {
+            return;
+        }
+        try {
+            await this.api.linkSalesOrder(serviceRequestId, salesOrderId);
+            this.loadCallActivity(callActivityID);
+        } catch (e) {
+            this.alert(e.toString());
+        }
     };
     handleUnlink = async (callActivityID, linkedSalesOrderID, serviceRequestId) => {
         const res = await this.confirm(

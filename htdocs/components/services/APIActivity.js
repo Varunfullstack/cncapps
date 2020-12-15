@@ -182,6 +182,21 @@ class APIActivity extends APIMain {
         })
             .then(res => res.json())
     }
+
+    async linkSalesOrder(serviceRequestId, salesOrderId) {
+        return fetch(`Activity.php?action=assignLinkedSalesOrderToServiceRequest`,
+            {
+                method: 'POST',
+                body: JSON.stringify({serviceRequestId, salesOrderId})
+            }
+        )
+            .then(res => res.json())
+            .then(res => {
+                if (res.status !== 'ok') {
+                    throw new Error(res.message);
+                }
+            })
+    }
 }
 
 export default APIActivity;
