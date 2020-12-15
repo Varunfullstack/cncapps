@@ -1492,6 +1492,10 @@ class BUActivity extends Business
             $selfFlag,
             $othersFlag
         );
+        if(!$emailRecipients){
+            return;
+        }
+
         $this->sendEmail($body, $subject, $emailRecipients);
     }
 
