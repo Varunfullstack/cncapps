@@ -3,7 +3,7 @@ import {Chars, maxLength, padEnd, params} from "../../utils/utils.js";
 import Toggle from "../../shared/Toggle.js";
 import Table from "../../shared/table/table"
 
-import CKEditor from "../../shared/CKEditor.js";
+import CNCCKEditor from "../../shared/CNCCKEditor.js";
 import ToolTip from "../../shared/ToolTip.js";
 import ActivityFollowOn from "../../Modals/ActivityFollowOn.js";
 import MainComponent from "../../shared/MainComponent.js";
@@ -895,7 +895,7 @@ class ActivityDisplayComponent extends MainComponent {
                     templateOptions.length > 0 ? el('select', {onChange: this.handleTemplateChanged},
                         el('option', {key: 'empty', value: -1}, "-- Pick an option --"),
                         templateOptions.map(s => el('option', {key: s.id, value: s.id}, s.name))) : null,
-                    el(CKEditor, {
+                    el(CNCCKEditor, {
                         key: 'salesRequestEditor', id: 'salesRequest', value: templateDefault
                         , onChange: this.handleTemplateValueChange
                     })

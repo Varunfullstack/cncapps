@@ -1,6 +1,6 @@
 import Modal from "./Modal/modal";
 import React from 'react';
-import CKEditor from "./CKEditor";
+import CNCCKEditor from "./CNCCKEditor";
 
 class Prompt extends React.Component {
     el = React.createElement;
@@ -33,7 +33,7 @@ class Prompt extends React.Component {
         const {isEditor} = this.props;
 
         if (isEditor) {
-            return <CKEditor onchange={(value) => this.setState({reason: value})} value={defaultValue}/>
+            return <CNCCKEditor onchange={(value) => this.setState({reason: value})} value={defaultValue}/>
         }
 
         return <textarea key="input"

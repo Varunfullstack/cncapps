@@ -1,4 +1,4 @@
-import CKEditor from "../shared/CKEditor";
+import CNCCKEditor from "../shared/CNCCKEditor";
 import Modal from "../shared/Modal/modal";
 import React from 'react';
 
@@ -83,12 +83,12 @@ class StandardTextModal extends React.Component {
                                 width: "700px"
                             },
                         }) :
-                        el(CKEditor, {
+                        el(CNCCKEditor, {
                             key: 'salesRequestEditor',
                             id: 'salesRequest',
                             value: templateDefault,
                             onChange: this.handleTemplateValueChange,
-                            inline: true,
+                            type: "inline",
                             height: 100
                         }),
                 ),

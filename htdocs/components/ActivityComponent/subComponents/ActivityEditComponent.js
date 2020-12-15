@@ -11,7 +11,7 @@ import React, {Fragment} from 'react';
 import moment from "moment";
 import StandardTextModal from "../../Modals/StandardTextModal";
 import {padEnd, TeamType} from "../../utils/utils";
-import CKEditor from "../../shared/CKEditor";
+import CNCCKEditor from "../../shared/CNCCKEditor";
 import Modal from "../../shared/Modal/modal";
 import Toggle from "../../shared/Toggle";
 import CustomerDocumentUploader from "./CustomerDocumentUploader";
@@ -1332,21 +1332,17 @@ class ActivityEditComponent extends MainComponent {
     handleTemplateChanged = (event) => {
         const id = event.target.value;
         const {templateOptions} = this.state;
-        let templateDefault = "";
         let templateOptionId = null;
         let templateValue = "";
         if (id >= 0) {
-            const op = templateOptions.filter((s) => s.id == id)[0];
-            templateDefault = op.template;
+            const op = templateOptions.find((s) => s.id == id);
             templateValue = op.template;
             templateOptionId = op.id;
-        } else {
-            templateDefault = "";
         }
-        setTimeout(
-            () => this.setState({templateDefault, templateOptionId, templateValue}),
-            200
-        );
+        const test = () => {
+            this.setState({templateOptionId, templateValue});
+        }
+        test();
     };
     handleTemplateValueChange = (value) => {
         this.setState({templateValue: value});
@@ -1359,7 +1355,7 @@ class ActivityEditComponent extends MainComponent {
             currentActivity,
         } = this.state;
         if (templateValue == "") {
-            this.alert("Please enter detials");
+            this.alert("Please enter details");
             return;
         }
         const payload = new FormData();
@@ -1392,7 +1388,7 @@ class ActivityEditComponent extends MainComponent {
     };
     getTemplateModal = () => {
         const {
-            templateDefault,
+            templateValue,
             templateOptions,
             _showModal,
             templateTitle,
@@ -1420,11 +1416,11 @@ class ActivityEditComponent extends MainComponent {
                     )
                     : null,
                 this.state._activityLoaded
-                    ? el(CKEditor, {
+                    ? el(CNCCKEditor, {
                         key: "salesRequestEditor",
                         id: "salesRequest",
-                        value: templateDefault,
-                        inline: true,
+                        value: templateValue,
+                        type: "inline",
                         onChange: this.handleTemplateValueChange,
                     })
                     : null
@@ -1473,6 +1469,7 @@ class ActivityEditComponent extends MainComponent {
     getActivityNotes() {
         const {el} = this;
         const {data} = this.state;
+
         return el(
             "div",
             {style: {display: "flex", flexDirection: "row"}},
@@ -1490,10 +1487,10 @@ class ActivityEditComponent extends MainComponent {
                     })
                 ),
                 this.state._activityLoaded
-                    ? el(CKEditor, {
+                    ? el(CNCCKEditor, {
                         id: "reason",
                         value: data?.reason,
-                        inline: true,
+                        type: "inline",
                         onChange: (value) => this.setValue("reasonTemplate", value),
                     })
                     : null
@@ -1512,10 +1509,10 @@ class ActivityEditComponent extends MainComponent {
                     })
                 ),
                 this.state._activityLoaded
-                    ? el(CKEditor, {
+                    ? el(CNCCKEditor, {
                         id: "cncNextAction",
                         value: data?.cncNextAction,
-                        inline: true,
+                        type: "inline",
 
                         onChange: (value) => this.setValue("cncNextActionTemplate", value),
                     })
@@ -1543,10 +1540,10 @@ class ActivityEditComponent extends MainComponent {
                 })
             ),
             this.state._activityLoaded
-                ? el(CKEditor, {
+                ? el(CNCCKEditor, {
                     id: "customerNotes",
                     value: data?.customerNotes,
-                    inline: true,
+                    type: "inline",
                     onChange: (value) => this.setValue("customerNotesTemplate", value),
                 })
                 : null
@@ -1572,10 +1569,10 @@ class ActivityEditComponent extends MainComponent {
                 })
             ),
             this.state._activityLoaded
-                ? el(CKEditor, {
+                ? el(CNCCKEditor, {
                     id: "internal",
                     value: data?.internalNotes,
-                    inline: true,
+                    type: "inline",
                     onChange: (value) => this.setValue("internalNotesTemplate", value),
                 })
                 : null

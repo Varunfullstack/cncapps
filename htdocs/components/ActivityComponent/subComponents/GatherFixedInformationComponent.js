@@ -3,7 +3,7 @@ import StandardTextModal from "../../Modals/StandardTextModal.js";
 import APIActivity from "../../services/APIActivity.js";
 import APICustomers from "../../services/APICustomers.js";
 import APIStandardText from "../../services/APIStandardText.js";
-import CKEditor from "../../shared/CKEditor.js";
+import CNCCKEditor from "../../shared/CNCCKEditor.js";
 import ToolTip from "../../shared/ToolTip.js";
 import Toggle from "../../shared/Toggle.js";
 import {groupBy, params} from "../../utils/utils.js";
@@ -145,12 +145,12 @@ class GatherFixedInformationComponent extends MainComponent {
                         "tr",
                         null,
                         el("td", {className: "display-label "}, "Summary of Resolution"),
-                        el("td", null, el(CKEditor, {
+                        el("td", null, el(CNCCKEditor, {
                             minCharCount: activity.problemHideFromCustomerFlag == 'N' ? 160 : -1,
                             disableClipboard: true,
                             value: initialActivity?.reason,
                             onChange: (value) => this.setValue("resolutionSummary", value),
-                            inline: true,
+                            type: "inline",
 
                         }))
                     ),

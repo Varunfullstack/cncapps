@@ -1,4 +1,4 @@
-import CKEditor from "../../shared/CKEditor.js";
+import CNCCKEditor from "../../shared/CNCCKEditor.js";
 import APICustomers from "../../services/ApiCustomers.js";
 import Spinner from "../../shared/Spinner/Spinner";
 import {padEnd, sort} from "../../utils/utils.js";
@@ -177,10 +177,10 @@ class CustomerSiteComponent extends MainComponent {
             null,
             el("label", {className: "site-label"}, "Details"),
 
-            el(CKEditor, {
+            el(CNCCKEditor, {
                 id: "reason",
                 value: this.state.data.reason,
-                inline: true,
+                type: "inline",
                 height: 200,
                 onChange: (data) => this.setValue("reasonTemplate", data),
             }),
@@ -188,10 +188,10 @@ class CustomerSiteComponent extends MainComponent {
                 "div",
                 {style: {marginTop: 30}},
                 el("label", {className: "mt-5"}, "Internal Notes"),
-                el(CKEditor, {
+                el(CNCCKEditor, {
                     id: "internalNotes",
                     value: this.state.data.internalNotes,
-                    inline: true,
+                    type: "inline",
                     height: 150,
                     onChange: (data) => this.setValue("internalNotesTemplate", data),
                 })
