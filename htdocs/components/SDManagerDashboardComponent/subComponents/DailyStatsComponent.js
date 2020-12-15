@@ -233,13 +233,8 @@ class DailyStatsComponent extends MainComponent {
             );
         } else return null;
     };
-    getTotalCard = (label, total, backgroundColor = "#C6C6C6", textColor = "#3C3C3C", tooltip = null) => {
+    getTotalCard = (label, total, backgroundColor = "#C6C6C6", textColor = "#3C3C3C") => {
         const {el} = this;
-        // const label = tooltip ? (
-        //     <label className="sd-card-title">
-        //
-        //     </label>
-        // ) : null;
         return el(
             "div",
             {className: "sd-card ", style: {backgroundColor: backgroundColor, color: textColor}},
