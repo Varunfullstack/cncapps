@@ -1219,7 +1219,7 @@ class BUActivity extends Business
         $chargeableHours  = $result->fetch_object()->chargeableHours;
         $problem          = new DBEProblem($this);
         $problem->getRow($dsCallActivity->getValue(DBEJCallActivity::problemID));
-        $oldPriority = $problem->getValue(DBEJProblem::priority);
+
         $problem->setValue(
             DBEJProblem::contractCustomerItemID,
             $dsCallActivity->getValue(DBEJCallActivity::contractCustomerItemID)
@@ -2219,7 +2219,7 @@ class BUActivity extends Business
         $oldPriority = $problem->getValue(DBEJProblem::priority);
         if ($oldPriority != $priority) {
             $slaResponseHours = $this->getSlaResponseHours(
-                $problem->getValue(DBEJProblem::priority),
+                $priority,
                 $problem->getValue(DBEJProblem::customerID),
                 $dbeCallActivity->getValue(DBECallActivity::contactID)
             );
