@@ -84,7 +84,7 @@ class GatherFixedInformationComponent extends MainComponent {
                 title: "SR",
                 content: el("a", {
                     className: "fal fa-hashtag fa-2x icon pointer m-4",
-                    href: `SRActivity.php?serviceRequestId=${activity?.problemID}`,
+                    href: `SRActivity.php?action=displayActivity&serviceRequestId=${activity?.problemID}`,
                     target: "_blank",
                 }),
             }),
