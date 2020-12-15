@@ -39,7 +39,6 @@ class DBECallActivitySearch extends DBEntity
     const contractCustomerItemID = "contractCustomerItemID";
     const contractDescription = "contractDescription";
     const underContractFlag = "underContractFlag";
-    const allowSCRFlag = "allowSCRFlag";
     const slaResponseHours = "slaResponseHours";
     const respondedHours = "respondedHours";
     const workingHours = "workingHours";
@@ -243,11 +242,6 @@ class DBECallActivitySearch extends DBEntity
             DA_YN,
             DA_ALLOW_NULL,
             "caa_under_contract"
-        );
-        $this->addColumn(
-            self::allowSCRFlag,
-            DA_YN,
-            DA_ALLOW_NULL
         );
         $this->addColumn(
             self::slaResponseHours,

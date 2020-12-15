@@ -221,12 +221,14 @@ class CTSRActivity extends CTCNC
         $problemID = $dbejCallActivity->getValue(DBECallActivity::problemID);
         $dbeProblem->setPKValue($problemID);
         $dbeProblem->getRow();
-        $customerId  = $dbejCallActivity->getValue(DBEJCallActivity::customerID);
-        $contactID   = $dbejCallActivity->getValue(DBEJCallActivity::contactID);
-        $siteId      = $dbejCallActivity->getValue(DBEJCallActivity::siteNo);
-        $projectLink = BUProject::getCurrentProjectLink(
+        $customerId      = $dbejCallActivity->getValue(DBEJCallActivity::customerID);
+        $contactID       = $dbejCallActivity->getValue(DBEJCallActivity::contactID);
+        $siteId          = $dbejCallActivity->getValue(DBEJCallActivity::siteNo);
+        $projectLink     = BUProject::getCurrentProjectLink(
             $customerId
         );
+        $dbeActivityType = new DBECallActType($this);
+        $dbeActivityType->getRow($dbejCallActivity->getValue(DBECallActivity::callActTypeID));
         $dbeCustomer = new DBECustomer($this);
         $dbeCustomer->setPKValue($customerId);
         $dbeCustomer->getRow();
@@ -312,13 +314,11 @@ class CTSRActivity extends CTCNC
             ),
             "canDelete"                       => !$dbejCallActivity->getValue(
                     DBEJCallActivity::endTime
-                ) || ($dbejCallActivity->getValue(DBEJCallActivity::status) != 'A' && $this->hasPermissions(
-                        MAINTENANCE_PERMISSION
-                    )),
+                ) || ($dbejCallActivity->getValue(DBEJCallActivity::status) != 'A' && ($this->isSdManager(
+                        ) || $this->isSRQueueManager())),
             "hasExpenses"                     => count($expenses) ? true : false,
             "isSDManager"                     => $buUser->isSdManager($this->userID),
             "hideFromCustomerFlag"            => $dbejCallActivity->getValue(DBEJCallActivity::hideFromCustomerFlag),
-            "allowSCRFlag"                    => $dbejCallActivity->getValue(DBEJCallActivity::allowSCRFlag),
             "priority"                        => $buActivity->priorityArray[$dbejCallActivity->getValue(
                 DBEJCallActivity::priority
             )],
@@ -377,7 +377,7 @@ class CTSRActivity extends CTCNC
             "projectId"                       => $dbejCallActivity->getValue(DBEJCallActivity::projectID),
             "projects"                        => BUProject::getCustomerProjects($customerId),
             "cncNextAction"                   => $dbejCallActivity->getValue(DBEJCallActivity::cncNextAction),
-            "customerNotes"                   => $dbejCallActivity->getValue(DBEJCallActivity::customerNotes),
+            "customerSummary"                 => $dbejCallActivity->getValue(DBEJCallActivity::customerSummary),
             'activityTypeHasExpenses'         => BUActivityType::hasExpenses(
                 $dbejCallActivity->getValue(DBEJCallActivity::callActTypeID)
             ),
@@ -385,6 +385,7 @@ class CTSRActivity extends CTCNC
             'assetTitle'                      => $dbeProblem->getValue(DBEProblem::assetTitle),
             "emptyAssetReason"                => $dbeProblem->getValue(DBEProblem::emptyAssetReason),
             "holdForQA"                       => $dbeProblem->getValue(DBEProblem::holdForQA),
+            "isOnSiteActivity"                => $dbeActivityType->getValue(DBECallActType::onSiteFlag) == 'Y'
         ];
     }
 

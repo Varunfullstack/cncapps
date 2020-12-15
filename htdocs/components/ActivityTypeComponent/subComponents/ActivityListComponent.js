@@ -77,11 +77,6 @@ class ActivityListComponent extends MainComponent {
                 sortable: true,
             },
             {
-                label: "Allow SCR Printing",
-                path: "allowSCRFlag",
-                sortable: true,
-            },
-            {
                 label: "Require Checking",
                 path: "requireCheckFlag",
                 sortable: true,
@@ -205,11 +200,6 @@ class ActivityListComponent extends MainComponent {
             {
                 label: "Portal",
                 path: "portalDisplayFlag",
-                sortable: true,
-            },
-            {
-                label: "Allow SCR Printing",
-                path: "allowSCRFlag",
                 sortable: true,
             },
             {

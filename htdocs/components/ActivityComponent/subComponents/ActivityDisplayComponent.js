@@ -304,7 +304,7 @@ class ActivityDisplayComponent extends MainComponent {
                     onClick: () => window.open(`Popup.php?action=timeBreakdown&problemID=${data?.problemID}`, 'popup', 'width=800,height=400')
                 })
             }),
-            data?.allowSCRFlag == 'Y' ? el(ToolTip, {
+            data?.isOnSiteActivity ? el(ToolTip, {
                 title: "Send client a visit confirmation email",
                 content: el('i', {
                     className: "fal fa-envelope fa-2x m-5 pointer icon",
@@ -322,6 +322,11 @@ class ActivityDisplayComponent extends MainComponent {
         return this.el('span', {style: {width: 35}})
     }
     handleConfirmEmail = async (data) => {
+        if (!data.customerSummary) {
+            this.alert('Please enter Customer Summary information in the activity before sending a visit confirmation.');
+            return;
+        }
+
         if (await this.confirm('Are you sure you want to send the client a confirmation email?')) {
             await this.api.sendActivityVisitEmail(data.callActivityID);
         }
@@ -660,7 +665,7 @@ class ActivityDisplayComponent extends MainComponent {
             })
         );
     }
-    getCustomerNotesElement = () => {
+    getcustomerSummaryElement = () => {
         const {el} = this;
         const {data} = this.state;
         return el('div', {className: "round-container"},
@@ -675,7 +680,7 @@ class ActivityDisplayComponent extends MainComponent {
                     title: "This information will be sent to the customer in an email unless the entire Service Request is hidden.",
                     content: el("i", {className: "fal fa-info-circle mt-5 pointer icon"})
                 })
-            ), el('div', {dangerouslySetInnerHTML: {__html: data?.customerNotes}})
+            ), el('div', {dangerouslySetInnerHTML: {__html: data?.customerSummary}})
         );
     }
 
@@ -983,7 +988,7 @@ class ActivityDisplayComponent extends MainComponent {
                 {this.getActivitiesElement()}
                 {this.getContentElement()}
                 {this.getDetialsElement()}
-                {this.getCustomerNotesElement()}
+                {this.getcustomerSummaryElement()}
                 {this.getNotesElement()}
                 <CustomerDocumentUploader
                     onDeleteDocument={(id) => this.deleteDocument(id)}

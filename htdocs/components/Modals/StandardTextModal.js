@@ -1,6 +1,6 @@
-import CNCCKEditor from "../shared/CNCCKEditor";
 import Modal from "../shared/Modal/modal";
 import React from 'react';
+import CNCCKEditor from "../shared/CNCCKEditor";
 
 /**
  * options : show,options,value,title,okTitle
@@ -8,108 +8,126 @@ import React from 'react';
  */
 class StandardTextModal extends React.Component {
     el = React.createElement;
+    static defaultProps = {
+        show: false,
+        options: [],
+        value: "",
+        title: "",
+        okTitle: "send",
+    }
 
     constructor(props) {
         super(props);
         this.state = {
-            _showModal: this.props.show || false,
-            templateOptions: this.props.options || [],
-            templateValue: this.props.value,
-            templateDefault: this.props.value,
-            templateTitle: this.props.title,
-            templateOptionId: -1,
-            key: this.props.key,
-            okTitle: this.props.okTitle || 'send',
+            selectedOptionId: null,
+            value: this.props.value,
         }
     }
 
-    handleTemplateValueChange = (templateValue) => {
-        this.setState({templateValue});
+    initialState() {
+        return {selectedOptionId: null, value: this.props.value};
+    }
+
+    handleTemplateValueChange = (value) => {
+        this.setState({value});
     }
     handleTemplateOk = () => {
-        this.setState({_showModal: false})
         if (this.props.onChange)
-            this.props.onChange(this.state.templateValue);
+            this.props.onChange(this.state.value);
+        this.setState(this.initialState());
     }
     handleTemplateChanged = (event) => {
 
         const id = +event.target.value;
-        const {templateOptions} = this.state;
-        let templateDefault;
-        let templateOptionId = null;
-        let templateValue = '';
-        templateDefault = '';
+        const {options} = this.props;
+        let selectedOptionId = null;
+        let value = '';
         if (id) {
-            const op = templateOptions.find(s => s.id == id);
-            templateDefault = op.template;
-            templateValue = op.template;
-            templateOptionId = op.id;
+            const op = options.find(s => s.id == id);
+            value = op.template;
+            selectedOptionId = op.id;
             if (this.props.onTypeChange)
                 this.props.onTypeChange(id);
         }
-        this.setState({templateDefault, templateOptionId, templateValue});
+        this.setState({selectedOptionId, value});
     }
-    getTemplateModal = () => {
-        const {templateOptions, _showModal, templateTitle, key, okTitle, templateDefault} = this.state;
-        const {noEditor} = this.props;
-        const {el} = this;
-        return el(Modal, {
-                width: 900,
-                key,
-                onClose: () => this.props.onCancel ? this.props.onCancel() : this.setState({_showModal: false}),
-                title: templateTitle,
-                show: _showModal,
-                content: el('div', {key: 'container', style: {height: 150}},
-                    templateOptions.length > 0 ? el('select', {
-                        onChange: this.handleTemplateChanged,
-                        style: {display: "block"}
-                    }, el('option', {
-                        key: 'empty',
-                        value: null
-                    }, "-- Pick an option --"), templateOptions.map(s => el('option', {
-                        key: s.id,
-                        value: s.id
-                    }, s.name))) : null,
-                    noEditor ?
-                        el("textarea", {
-                            key: 'salesRequestEditor',
-                            id: 'salesRequest',
-                            value: templateDefault,
-                            onChange: ($event) => {
-                                this.handleTemplateValueChange($event.target.value)
-                            },
-                            style: {
-                                height: "100px",
-                                width: "700px"
-                            },
-                        }) :
-                        el(CNCCKEditor, {
-                            key: 'salesRequestEditor',
-                            id: 'salesRequest',
-                            value: templateDefault,
-                            onChange: this.handleTemplateValueChange,
-                            type: "inline",
-                            height: 100
-                        }),
-                ),
-                footer: el('div', {key: "footer"},
-                    el('button', {onClick: this.handleTemplateOk}, okTitle),
-                    el('button', {onClick: () => this.props.onCancel ? this.props.onCancel() : this.setState({_showModal: false})}, "Cancel"),
-                )
-            }
+
+    onCancel() {
+        this.props.onCancel();
+        this.setState(this.initialState());
+    }
+
+    renderOptions() {
+        const {options} = this.props;
+        if (!options.length) {
+            return "";
+        }
+        return (
+
+            <select onChange={this.handleTemplateChanged}
+                    style={{display: "block"}}
+            >
+                <option key="empty"
+                        value={null}
+                >-- Pick an option --
+                </option>
+                {options.map(s => (
+                    <option key={s.id}
+                            value={s.id}
+                    >{s.name}</option>)
+                )}
+            </select>
         )
     }
 
-    static getDerivedStateFromProps(props, current_state) {
-
-        if (current_state && current_state._showModal !== props.show) {
-            current_state._showModal = props.show;
-            current_state.templateValue = props.value;
-            current_state.templateDefault = props.value;
-            current_state.templateOptions = props.options;
-            return current_state;
+    renderEditableField() {
+        const {noEditor} = this.props;
+        const {value} = this.state;
+        if (noEditor) {
+            return (
+                <textarea
+                    value={value}
+                    onChange={($event) => {
+                        this.handleTemplateValueChange($event.target.value)
+                    }}
+                    style={{height: "100px", width: "700px"}}
+                />
+            )
         }
-        return current_state;
+
+        return (
+            <CNCCKEditor key={'salesRequest'}
+                         id={"salesRequest"}
+                         value={value}
+                         onChange={(v) => this.handleTemplateValueChange(v)}
+                         type={"inline"}
+                         height="100"
+                         className="CNCCKEditor"
+            />
+        )
+    }
+
+    getTemplateModal = () => {
+        const {title, okTitle, show} = this.props;
+        const {el} = this;
+        return el(Modal, {
+                width: 900,
+                onClose: () => this.onCancel(),
+                title,
+                show,
+                className: "standardTextModal",
+                content: (
+                    <div style={{height: 150}}>
+                        {this.renderOptions()}
+                        {this.renderEditableField()}
+                    </div>
+                ),
+                footer: el('div', {key: "footer"},
+                    el('button', {onClick: this.handleTemplateOk}, okTitle),
+                    el('button', {onClick: () => this.onCancel()}, "Cancel"),
+                )
+            }
+        )
     }
 
     render() {

@@ -18,9 +18,10 @@ export class Modal extends React.Component {
         const {el, handleClose} = this;
         const {show, width, title, content, footer} = this.props;
         let maxWidth = "70%";
+        const className = `modal ${this.props.className}`;
         if (width) maxWidth = width;
         if (show) {
-            return el("div", {key: "myModal", className: "modal"}, [
+            return el("div", {key: "myModal", className}, [
                 el(
                     "div",
                     {

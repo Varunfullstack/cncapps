@@ -115,13 +115,11 @@ class CustomerSiteComponent extends MainComponent {
     };
     handleAssetSelect = (value) => {
         const {data, assets} = this.state;
-        if (value !== "") {
-            const index = assets.findIndex((a) => a.name == value);
-            //
-            const asset = assets[index];
+        const asset = assets.find((a) => a.name == value);
+        if (asset) {
             data.assetName = value;
-            data.assetTitle =
-                asset.name + " " + asset.LastUsername + " " + asset.BiosVer;
+            data.assetTitle = asset.name + " " + asset.LastUsername + " " + asset.BiosVer;
+            data.emptyAssetReason = "";
         } else {
             data.assetName = "";
             data.assetTitle = "";
@@ -227,13 +225,15 @@ class CustomerSiteComponent extends MainComponent {
     getNoAssetModal = () => {
         const {data, noAssetStandardTextItems, emptyAssetReasonModalShowing} = this.state;
         const {el} = this;
-        return el(StandardTextModal,
+        return el(
+            StandardTextModal,
             {
                 options: noAssetStandardTextItems,
                 value: data.emptyAssetReason,
                 show: emptyAssetReasonModalShowing,
                 title: "Please provide the reason of not listing an asset",
                 okTitle: "OK",
+                noEditor: true,
                 onChange: (value) => {
                     if (!value) {
                         return;

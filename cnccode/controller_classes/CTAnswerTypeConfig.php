@@ -25,7 +25,7 @@ class CTAnswerTypeConfig extends CTCNC
             $cfg
         );
         $roles = [
-            "maintenance",
+            MAINTENANCE_PERMISSION
         ];
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
@@ -63,11 +63,8 @@ class CTAnswerTypeConfig extends CTCNC
         $this->setTemplateFiles(
             array('AnswerTypeConfigList' => 'AnswerTypeConfigList')
         );
-
         $answerType = new DBEAnswerType($this);
-
         $answerType->getConfigurableAnswerTypes();
-
         if ($answerType->rowCount() > 0) {
             $this->template->set_block(
                 'AnswerTypeConfigList',
@@ -83,8 +80,6 @@ class CTAnswerTypeConfig extends CTCNC
                         'answerTypeID' => $answerType->getValue(DBEAnswerType::answerTypeID)
                     )
                 );
-
-
                 $this->template->set_var(
                     array(
                         'answerTypeName'      => $answerType->getValue(DBEAnswerType::description),
@@ -115,30 +110,23 @@ class CTAnswerTypeConfig extends CTCNC
 
 
         $answerType = new DBEAnswerType($this);
-
         $answerType->getRow($answerTypeID);
-
         $this->setPageTitle('AnswerType Config: ' . $answerType->getValue(DBEAnswerType::description));
-
         switch ($answerTypeID) {
             case 5:
                 $this->setTemplateFiles(
                     array('Config' => 'AnswerTypeConfig5')
                 );
-
                 $configOptions = $answerType->getValue(DBEAnswerType::answerOptions);
-
                 $values = [null, null, null, null, null, null, null, null];
                 if ($configOptions) {
                     $values = json_decode($configOptions);
                 }
-
                 $this->template->set_block(
                     'Config',
                     'ratingValueBlock',
                     'ratingValue'
                 );
-
                 for ($i = 0; $i < 8; $i++) {
                     $this->template->set_var(
                         array(
@@ -146,14 +134,12 @@ class CTAnswerTypeConfig extends CTCNC
                             'ratingValueValue' => isset($values[$i]) ? $values[$i] : ""
                         )
                     );
-
                     $this->template->parse(
                         'ratingValue',
                         'ratingValueBlock',
                         true
                     );
                 }
-
                 $this->template->setVar(
                     [
                         "saveURL" => Controller::buildLink(
@@ -165,11 +151,8 @@ class CTAnswerTypeConfig extends CTCNC
                         )
                     ]
                 );
-
                 break;
         }
-
-
         $this->template->parse(
             'CONTENTS',
             'Config',
@@ -184,20 +167,15 @@ class CTAnswerTypeConfig extends CTCNC
     private function saveConfig()
     {
         $answerTypeID = $this->getParam('answerTypeID');
-
         $answerType = new DBEAnswerType($this);
-
         $answerType->getRow($answerTypeID);
-
         switch ($answerTypeID) {
             case 5:
                 $config = $this->getParam('config');
-
                 $answerType->setValue(
                     DBEAnswerType::answerOptions,
                     json_encode($config)
                 );
-
                 $answerType->updateRow();
         }
         return $this->displayList();

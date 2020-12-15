@@ -10,44 +10,45 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 class DBECallActivity extends DBEntity
 {
 
-    const callActivityID = "callActivityID";
-    const siteNo = "siteNo";
-    const contactID = "contactID";
-    const sequenceNo = "sequenceNo";
-    const callActTypeID = "callActTypeID";
-    const problemID = "problemID";
-    const date = "date";
-    const startTime = "startTime";
-    const endTime = "endTime";
-    const status = "status";
-    const expenseExportFlag = "expenseExportFlag";
-    const reason = "reason";
-    const internalNotes = "internalNotes";
-    const curValue = "curValue";
-    const statementYearMonth = "statementYearMonth";
-    const customerItemID = "customerItemID";
-    const underContractFlag = "underContractFlag";
-    const authorisedFlag = "authorisedFlag";
-    const userID = "userID";
-    const serverGuard = "serverGuard";
-    const parentCallActivityID = "parentCallActivityID";
-    const awaitingCustomerResponseFlag = "awaitingCustomerResponseFlag";
-    const loggingErrorFlag = "loggingErrorFlag";
-    const escalationAcceptedFlag = "escalationAcceptedFlag";
-    const hideFromCustomerFlag = "hideFromCustomerFlag";
-    const secondsiteErrorServer = "secondsiteErrorServer";
+    const callActivityID                = "callActivityID";
+    const siteNo                        = "siteNo";
+    const contactID                     = "contactID";
+    const sequenceNo                    = "sequenceNo";
+    const callActTypeID                 = "callActTypeID";
+    const problemID                     = "problemID";
+    const date                          = "date";
+    const startTime                     = "startTime";
+    const endTime                       = "endTime";
+    const status                        = "status";
+    const expenseExportFlag             = "expenseExportFlag";
+    const reason                        = "reason";
+    const internalNotes                 = "internalNotes";
+    const curValue                      = "curValue";
+    const statementYearMonth            = "statementYearMonth";
+    const customerItemID                = "customerItemID";
+    const underContractFlag             = "underContractFlag";
+    const authorisedFlag                = "authorisedFlag";
+    const userID                        = "userID";
+    const serverGuard                   = "serverGuard";
+    const parentCallActivityID          = "parentCallActivityID";
+    const awaitingCustomerResponseFlag  = "awaitingCustomerResponseFlag";
+    const loggingErrorFlag              = "loggingErrorFlag";
+    const escalationAcceptedFlag        = "escalationAcceptedFlag";
+    const hideFromCustomerFlag          = "hideFromCustomerFlag";
+    const secondsiteErrorServer         = "secondsiteErrorServer";
     const secondsiteErrorCustomerItemID = "secondsiteErrorCustomerItemID";
-    const salesRequestStatus = 'salesRequestStatus';
-    const overtimeApprovedDate = "overtimeApprovedDate";
-    const overtimeApprovedBy = "overtimeApprovedBy";
-    const overtimeDeniedReason = "overtimeDeniedReason";
-    const overtimeExportedFlag = 'overtimeExportedFlag';
-    const isSalesRequestSR = 'isSalesRequestSR';
-    const requestType = 'requestType';
-    const submitAsOvertime = "submitAsOvertime";
-    const overtimeDurationApproved = "overtimeDurationApproved";
-    const customerNotes = "customerNotes";
-    const cncNextAction = "cncNextAction";
+    const salesRequestStatus            = 'salesRequestStatus';
+    const overtimeApprovedDate          = "overtimeApprovedDate";
+    const overtimeApprovedBy            = "overtimeApprovedBy";
+    const overtimeDeniedReason          = "overtimeDeniedReason";
+    const overtimeExportedFlag          = 'overtimeExportedFlag';
+    const isSalesRequestSR              = 'isSalesRequestSR';
+    const requestType                   = 'requestType';
+    const submitAsOvertime              = "submitAsOvertime";
+    const overtimeDurationApproved      = "overtimeDurationApproved";
+    const customerSummary               = "customerNotes";
+    const cncNextAction                 = "cncNextAction";
+
     /**
      * calls constructor()
      * @access public
@@ -125,7 +126,6 @@ class DBECallActivity extends DBEntity
             DA_STRING,
             DA_NOT_NULL,
             "caa_status"
-
         );
         $this->addColumn(
             self::expenseExportFlag,
@@ -143,7 +143,6 @@ class DBECallActivity extends DBEntity
             DA_TEXT,
             DA_ALLOW_NULL
         );
-
         $this->addColumn(
             self::curValue,
             DA_FLOAT,
@@ -227,19 +226,15 @@ class DBECallActivity extends DBEntity
             DA_ALLOW_NULL,
             'caa_secondsite_error_cuino'
         );
-
         $this->addColumn(
             self::salesRequestStatus,
             DA_TEXT,
             DA_ALLOW_NULL
         );
-        
-        
         $this->addColumn(self::overtimeApprovedDate, DA_DATETIME, DA_ALLOW_NULL);
         $this->addColumn(self::overtimeApprovedBy, DA_ID, DA_ALLOW_NULL);
         $this->addColumn(self::overtimeDeniedReason, DA_STRING, DA_ALLOW_NULL);
         $this->addColumn(self::overtimeExportedFlag, DA_YN, DA_NOT_NULL, 'caa_ot_exp_flag', 'N');
-
         $this->addColumn(
             self::isSalesRequestSR,
             DA_BOOLEAN,
@@ -247,13 +242,11 @@ class DBECallActivity extends DBEntity
             null,
             0
         );
-
         $this->addColumn(
             self::requestType,
             DA_ID,
             DA_ALLOW_NULL
         );
-
         $this->addColumn(
             self::submitAsOvertime,
             DA_BOOLEAN,
@@ -261,25 +254,21 @@ class DBECallActivity extends DBEntity
             null,
             0
         );
-
         $this->addColumn(
             self::overtimeDurationApproved,
             DA_FLOAT,
             DA_ALLOW_NULL
         );
-
         $this->addColumn(
-            self::customerNotes,
+            self::customerSummary,
             DA_TEXT,
             DA_ALLOW_NULL
         );
-
         $this->addColumn(
             self::cncNextAction,
             DA_TEXT,
             DA_ALLOW_NULL
         );
-
         $this->setPK(0);
         $this->setAddColumnsOff();
         $this->db->connect();
@@ -290,12 +279,9 @@ class DBECallActivity extends DBEntity
     )
     {
 
-        $query =
-            "UPDATE " . $this->getTableName() .
-            " SET " . $this->getDBColumnName(self::problemID) . " = ? " .
-            " WHERE " . $this->getDBColumnName(self::problemID) . " = ?";
-
-
+        $query      = "UPDATE " . $this->getTableName() . " SET " . $this->getDBColumnName(
+                self::problemID
+            ) . " = ? " . " WHERE " . $this->getDBColumnName(self::problemID) . " = ?";
         $parameters = [
             [
                 'type'  => 'i',
@@ -305,7 +291,6 @@ class DBECallActivity extends DBEntity
                 'type'  => 'i',
                 'value' => $fromProblemID
             ],
-
         ];
         return $this->db->prepareQuery(
             $query,
@@ -320,10 +305,8 @@ class DBECallActivity extends DBEntity
     )
     {
         $this->setQueryString(
-            "SELECT COUNT(*) FROM " . $this->getTableName() .
-            " JOIN problem ON pro_problemno = caa_problemno 
-			  WHERE pro_custno =" . $customerID .
-            " AND " . $this->getDBColumnName(self::siteNo) . "=" . $siteNo
+            "SELECT COUNT(*) FROM " . $this->getTableName() . " JOIN problem ON pro_problemno = caa_problemno 
+			  WHERE pro_custno =" . $customerID . " AND " . $this->getDBColumnName(self::siteNo) . "=" . $siteNo
         );
         if ($this->runQuery()) {
             if ($this->nextRecord()) {
@@ -334,21 +317,21 @@ class DBECallActivity extends DBEntity
         return 0;
     }
 
-    function countTravelRowsForTodayByCustomerSiteNoEngineer(
-        $customerID,
-        $siteNo,
-        $userID,
-        $date
+    function countTravelRowsForTodayByCustomerSiteNoEngineer($customerID,
+                                                             $siteNo,
+                                                             $userID,
+                                                             $date
     )
     {
         $this->setQueryString(
-            "SELECT COUNT(*) FROM " . $this->getTableName() .
-            " JOIN problem ON pro_problemno = caa_problemno " .
-            " WHERE pro_custno =" . $customerID .
-            " AND " . $this->getDBColumnName(self::siteNo) . "=" . $siteNo .
-            " AND " . $this->getDBColumnName(self::callActTypeID) . "=" . CONFIG_TRAVEL_ACTIVITY_TYPE_ID .
-            " AND " . $this->getDBColumnName(self::date) . "= '" . $date . "'" .
-            " AND " . $this->getDBColumnName(self::userID) . "=" . $userID
+            "SELECT COUNT(*) FROM " . $this->getTableName(
+            ) . " JOIN problem ON pro_problemno = caa_problemno " . " WHERE pro_custno =" . $customerID . " AND " . $this->getDBColumnName(
+                self::siteNo
+            ) . "=" . $siteNo . " AND " . $this->getDBColumnName(
+                self::callActTypeID
+            ) . "=" . CONFIG_TRAVEL_ACTIVITY_TYPE_ID . " AND " . $this->getDBColumnName(
+                self::date
+            ) . "= '" . $date . "'" . " AND " . $this->getDBColumnName(self::userID) . "=" . $userID
         );
         if ($this->runQuery()) {
             if ($this->nextRecord()) {
@@ -362,10 +345,12 @@ class DBECallActivity extends DBEntity
     function countEngineerRowsByProblem($problemID)
     {
         $this->setQueryString(
-            "SELECT COUNT(*) FROM " . $this->getTableName() .
-            " WHERE caa_problemno =" . $problemID .
-            " AND " . $this->getDBColumnName(self::userID) . "<>" . USER_SYSTEM .
-            " AND " . $this->getDBColumnName(self::callActTypeID) . "<>" . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID
+            "SELECT COUNT(*) FROM " . $this->getTableName(
+            ) . " WHERE caa_problemno =" . $problemID . " AND " . $this->getDBColumnName(
+                self::userID
+            ) . "<>" . USER_SYSTEM . " AND " . $this->getDBColumnName(
+                self::callActTypeID
+            ) . "<>" . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID
         );
         if ($this->runQuery()) {
             if ($this->nextRecord()) {
@@ -379,12 +364,9 @@ class DBECallActivity extends DBEntity
     function countSendEmailActivities($problemID)
     {
         $this->setQueryString(
-            "SELECT COUNT(*) FROM " . $this->getTableName() .
-            " JOIN callacttype ON cat_callacttypeno = caa_callacttypeno" .
-            " WHERE caa_problemno =" . $problemID .
-            " AND customerEmailFlag = 'Y'"
+            "SELECT COUNT(*) FROM " . $this->getTableName(
+            ) . " JOIN callacttype ON cat_callacttypeno = caa_callacttypeno" . " WHERE caa_problemno =" . $problemID . " AND customerEmailFlag = 'Y'"
         );
-
         if ($this->runQuery()) {
             if ($this->nextRecord()) {
                 $this->resetQueryString();

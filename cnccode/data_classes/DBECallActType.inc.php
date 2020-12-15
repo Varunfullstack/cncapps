@@ -23,7 +23,6 @@ class DBECallActType extends DBEntity
     const activeFlag                       = "activeFlag";
     const engineerOvertimeFlag             = "engineerOvertimeFlag";
     const onSiteFlag                       = "onSiteFlag";
-    const allowSCRFlag                     = "allowSCRFlag";
     const portalDisplayFlag                = "portalDisplayFlag";
     const activityNotesRequired            = "activityNotesRequired";
     const visibleInSRFlag                  = "visibleInSRFlag";
@@ -68,7 +67,6 @@ class DBECallActType extends DBEntity
             DA_YN,
             DA_NOT_NULL
         );
-        $this->addColumn(self::allowSCRFlag, DA_YN, DA_NOT_NULL);
         $this->addColumn(self::travelFlag, DA_YN, DA_NOT_NULL);            // is this a travel activity?
         $this->addColumn(self::activeFlag, DA_YN, DA_NOT_NULL);            // is	this an active activity?
         $this->addColumn(self::engineerOvertimeFlag, DA_YN, DA_NOT_NULL);            // Allow engineer overtime

@@ -1016,3 +1016,12 @@ input:checked + .slider:before {
 .priority-one {
     background-color: #FFE6AB;
 }
+
+.CNCCKEditor {
+    border: 1px #ffffff solid;
+}
+
+.standardTextModal textarea {
+    color: white;
+    background-color: #575757;
+}

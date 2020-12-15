@@ -22,11 +22,14 @@ export default class CNCCKEditor extends React.Component {
     render() {
 
         return (
-            <div style={{display: "inline-table", height: this.props.height, width: this.props.width || "100%",}}>
+            <div style={{display: "inline-table", height: this.props.height, width: this.props.width || "100%",}}
+                 className={this.props.className}
+            >
                 <CKEditor type={this.props.type || 'inline'}
                           config={this.getCNCCKEditorConfig()}
                           data={this.props.value}
                           onChange={evt => this.props.onChange(evt.editor.getData())}
+                          readOnly={this.props.readOnly}
                 >
                 </CKEditor>
             </div>
