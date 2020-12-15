@@ -191,7 +191,8 @@ class Table extends React.Component {
                             key: "inpSearch",
                             onChange: handleSearch,
                             className: "form-control",
-                            style: {width: 250}
+                            style: {width: 250},
+                            type: 'search'
                         })
                     ])
                     : null,
