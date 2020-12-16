@@ -171,6 +171,14 @@ export class ColumnRenderer {
             hdClassName: "text-center",
             className: "text-center",
             classNameColumn: 'priorityClass',
+            content: (problem) => {
+                if (problem.priority !== 1) {
+                    return problem.priority;
+                }
+                return this.addToolTip(
+                    <i className="fal fa-2x fa-exclamation-triangle color-gray"/>,
+                    `Priority 1`)
+            }
         }
     }
 }

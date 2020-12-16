@@ -399,10 +399,10 @@ class CTCurrentActivityReport extends CTCNC
         $this->setMethodName('setTemplate');
         $this->template->setVar("menuId", 103);
         $action = $this->getAction();
-        $this->setPageTitle('Service Requests');
+        $this->setPageTitle('Current Service Requests');
         switch ($action) {
             case 'inbox':
-                $this->setPageTitle('Service Requests');
+                $this->setPageTitle('Current Service Requests');
                 break;
         }
         $this->setTemplateFiles(

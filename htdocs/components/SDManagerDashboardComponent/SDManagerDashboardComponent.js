@@ -394,6 +394,14 @@ class SDManagerDashboardComponent extends MainComponent {
                     icon: "fal fa-2x fa-signal color-gray2 pointer",
                     sortable: false,
                     className: "text-center",
+                    content: problem => {
+                        if (problem.priority !== 1) {
+                            return problem.priority;
+                        }
+                        return this.addToolTip(
+                            <i className="fal fa-2x fa-exclamation-triangle color-gray"/>,
+                            `Priority 1`)
+                    }
                 },
                 {
                     display: [HELD_FOR_QA_TAB].indexOf(filter.activeTab) < 0,
