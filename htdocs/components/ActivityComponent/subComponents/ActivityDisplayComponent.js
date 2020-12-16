@@ -911,7 +911,7 @@ class ActivityDisplayComponent extends MainComponent {
                         el('option', {key: 'empty', value: -1}, "-- Pick an option --"),
                         templateOptions.map(s => el('option', {key: s.id, value: s.id}, s.name))) : null,
                     el(CNCCKEditor, {
-                        key: 'salesRequestEditor', id: 'salesRequest', value: templateDefault
+                        key: 'salesRequestEditor', name: 'salesRequest', value: templateDefault
                         , onChange: this.handleTemplateValueChange
                     })
                 ),

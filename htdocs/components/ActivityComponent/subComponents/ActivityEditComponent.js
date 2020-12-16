@@ -1423,7 +1423,7 @@ class ActivityEditComponent extends MainComponent {
                 this.state._activityLoaded
                     ? el(CNCCKEditor, {
                         key: "salesRequestEditor",
-                        id: "salesRequest",
+                        name: "salesRequest",
                         value: templateValue,
                         type: "inline",
                         onChange: this.handleTemplateValueChange,
@@ -1493,9 +1493,10 @@ class ActivityEditComponent extends MainComponent {
                 ),
                 this.state._activityLoaded
                     ? el(CNCCKEditor, {
-                        id: "reason",
+                        name: "reason",
                         value: data?.reason,
                         type: "inline",
+                        style: {height: '50px'},
                         onChange: (value) => this.setValue("reasonTemplate", value),
                     })
                     : null
@@ -1515,10 +1516,9 @@ class ActivityEditComponent extends MainComponent {
                 ),
                 this.state._activityLoaded
                     ? el(CNCCKEditor, {
-                        id: "cncNextAction",
+                        name: "cncNextAction",
                         value: data?.cncNextAction,
                         type: "inline",
-
                         onChange: (value) => this.setValue("cncNextActionTemplate", value),
                     })
                     : null
@@ -1546,7 +1546,7 @@ class ActivityEditComponent extends MainComponent {
             ),
             this.state._activityLoaded
                 ? el(CNCCKEditor, {
-                    id: "customerNotes",
+                    name: "customerNotes",
                     value: data?.customerNotes,
                     type: "inline",
                     onChange: (value) => this.setValue("customerNotesTemplate", value),
@@ -1575,7 +1575,7 @@ class ActivityEditComponent extends MainComponent {
             ),
             this.state._activityLoaded
                 ? el(CNCCKEditor, {
-                    id: "internal",
+                    name: "internal",
                     value: data?.internalNotes,
                     type: "inline",
                     onChange: (value) => this.setValue("internalNotesTemplate", value),

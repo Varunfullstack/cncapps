@@ -97,10 +97,9 @@ class StandardTextModal extends React.Component {
 
         return (
             <CNCCKEditor key={'salesRequest'}
-                         id={"salesRequest"}
+                         name="salesRequest"
                          value={value}
                          onChange={(v) => this.handleTemplateValueChange(v)}
-                         type={"inline"}
                          height="100"
                          className="CNCCKEditor"
             />

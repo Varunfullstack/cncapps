@@ -33,7 +33,10 @@ class Prompt extends React.Component {
         const {isEditor} = this.props;
 
         if (isEditor) {
-            return <CNCCKEditor onchange={(value) => this.setState({reason: value})} value={defaultValue}/>
+            return <CNCCKEditor name="prompt"
+                                onchange={(value) => this.setState({reason: value})}
+                                value={defaultValue}
+            />
         }
 
         return <textarea key="input"

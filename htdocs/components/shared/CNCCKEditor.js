@@ -1,38 +1,26 @@
 import React from 'react';
 import CKEditor from 'ckeditor4-react';
 
-/**
- * paramters
- * onChange > function
- * inline bool default =false
- */
 export default class CNCCKEditor extends React.Component {
     el = React.createElement;
 
     constructor(props) {
         super(props);
-        this.state = {
-            value: this.props.value,
-            reinit: false,
-            height: this.props.height,
-        };
     }
-
 
     render() {
 
         return (
-            <div style={{display: "inline-table", height: this.props.height, width: this.props.width || "100%",}}
-                 className={this.props.className}
+            <CKEditor type={this.props.type || 'inline'}
+                      config={this.getCNCCKEditorConfig()}
+                      data={this.props.value}
+                      onChange={evt => this.props.onChange(evt.editor.getData())}
+                      readOnly={this.props.readOnly}
+                      className={this.props.className}
+                      style={{minHeight: "30px", height: '80%'}}
+                      name={this.props.name}
             >
-                <CKEditor type={this.props.type || 'inline'}
-                          config={this.getCNCCKEditorConfig()}
-                          data={this.props.value}
-                          onChange={evt => this.props.onChange(evt.editor.getData())}
-                          readOnly={this.props.readOnly}
-                >
-                </CKEditor>
-            </div>
+            </CKEditor>
         );
     }
 
@@ -65,8 +53,8 @@ export default class CNCCKEditor extends React.Component {
                 minCharCount: !this.props.minCharCount ? -1 : this.props.minCharCount
             },
             width: this.props.width || "auto",
-            height: this.props.height || 220,
-            resize_minHeight: this.props.height || 220,
+            height: this.props.height || 500,
+            resize_minHeight: this.props.height || 500,
             removePlugins: 'liststyle,tabletools,language,tableselection,scayt,wsc',
             disableNativeSpellChecker: true,
             wsc_customDictionaryIds: '100920',

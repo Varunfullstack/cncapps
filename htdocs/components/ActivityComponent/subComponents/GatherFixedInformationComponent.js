@@ -146,6 +146,7 @@ class GatherFixedInformationComponent extends MainComponent {
                         null,
                         el("td", {className: "display-label "}, "Summary of Resolution"),
                         el("td", null, el(CNCCKEditor, {
+                            name:'summaryOfResolution',
                             minCharCount: activity.problemHideFromCustomerFlag == 'N' ? 160 : -1,
                             disableClipboard: true,
                             value: initialActivity?.reason,

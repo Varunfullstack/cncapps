@@ -176,9 +176,8 @@ class CustomerSiteComponent extends MainComponent {
             el("label", {className: "site-label"}, "Details"),
 
             el(CNCCKEditor, {
-                id: "reason",
+                name: "reason",
                 value: this.state.data.reason,
-                type: "inline",
                 height: 200,
                 onChange: (data) => this.setValue("reasonTemplate", data),
             }),
@@ -187,9 +186,8 @@ class CustomerSiteComponent extends MainComponent {
                 {style: {marginTop: 30}},
                 el("label", {className: "mt-5"}, "Internal Notes"),
                 el(CNCCKEditor, {
-                    id: "internalNotes",
                     value: this.state.data.internalNotes,
-                    type: "inline",
+                    name: 'internalNotes',
                     height: 150,
                     onChange: (data) => this.setValue("internalNotesTemplate", data),
                 })
