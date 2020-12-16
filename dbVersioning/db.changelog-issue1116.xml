@@ -8,38 +8,41 @@
     <changeSet id="issue1116-1" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
             <not>
-                <columnExists tableName="contact" columnName="pendingFurloughAction"/>
+                <columnExists tableName="ossupportdates" columnName="friendlyName"/>
             </not>
         </preConditions>
-        <addColumn tableName="contact">
-            <column name="pendingFurloughAction" type="tinyint">
+        <addColumn tableName="ossupportdates">
+            <column name="friendlyName" type="varchar(50)">
                 <constraints nullable="true"/>
             </column>
         </addColumn>
     </changeSet>
-
     <changeSet id="issue1116-2" author="pavwebdev">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <columnExists tableName="contact" columnName="pendingFurloughActionDate"/>
-            </not>
+        <preConditions>
+            <columnExists tableName="ossupportdates" columnName="friendlyName"/>
         </preConditions>
-        <addColumn tableName="contact">
-            <column name="pendingFurloughActionDate" type="date">
-                <constraints nullable="true"/>
-            </column>
-        </addColumn>
-    </changeSet>
-    <changeSet id="issue1116-3" author="pavwebdev">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <columnExists tableName="contact" columnName="pendingFurloughActionLevel"/>
-            </not>
-        </preConditions>
-        <addColumn tableName="contact">
-            <column name="pendingFurloughActionLevel" type="char(20)">
-                <constraints nullable="true"/>
-            </column>
-        </addColumn>
+        <sql>
+            update osSupportDates
+            set friendlyName = case
+                                   when version like '10.0.%' then 'Cheetah'
+                                   when version like '10.1.%' then 'Puma'
+                                   when version like '10.2.%' then 'Jaguar'
+                                   when version like '10.3.%' then 'Panther'
+                                   when version like '10.4.%' then 'Tiger'
+                                   when version like '10.5.%' then 'Leopard'
+                                   when version like '10.6.%' then 'Snow Leopard'
+                                   when version like '10.7.%' then 'Lion'
+                                   when version like '10.8.%' then 'Mountain Lion'
+                                   when version like '10.9.%' then 'Mavericks'
+                                   when version like '10.10.%' then 'Yosemite'
+                                   when version like '10.11.%' then 'El Capitan'
+                                   when version like '10.12.%' then 'Sierra'
+                                   when version like '10.13.%' then 'High Sierra'
+                                   when version like '10.14.%' then 'Mojave'
+                                   when version like '10.15.%' then 'Catalina'
+                                   when version like '11.0.%' then 'Big Sur'
+                end where name like 'Mac OS X%'
+        </sql>
+        <rollback/>
     </changeSet>
 </databaseChangeLog>
