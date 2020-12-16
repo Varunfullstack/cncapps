@@ -13,18 +13,14 @@ use Twig\Error\SyntaxError;
 require_once(__DIR__ . "/../htdocs/config.inc.php");
 global $cfg;
 global $db;
-
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUMail.inc.php');
 require_once($cfg['path_bu'] . '/BUTechDataApi.inc.php');
 require_once($cfg['path_dbe'] . '/DBECustomerItem.inc.php');
 require_once($cfg['path_dbe'] . '/DBEStreamOneCustomers.inc.php');
 require_once($cfg['path_dbe'] . '/DBECustomer.inc.php');
-
-
 $logName = 'UpdatePriceItemFromStreamOne';
-$logger = new LoggerCLI($logName);
-
+$logger  = new LoggerCLI($logName);
 // increasing execution time to infinity...
 ini_set('max_execution_time', 0);
 if (!is_cli()) {
@@ -33,49 +29,46 @@ if (!is_cli()) {
 }
 // Script example.php
 $shortopts = "df";
-$longopts = [];
-$options = getopt($shortopts, $longopts);
+$longopts  = [];
+$options   = getopt($shortopts, $longopts);
 $debugMode = false;
 if (isset($options['d'])) {
     $debugMode = true;
 }
 $forcedMode = isset($options['f']);
-$thing = null;
+$thing      = null;
 //**************************************************update item prices */
 //------ get all ccna items
 $query = "SELECT  itm_itemno,itm_unit_of_sale, itm_sstk_cost ,itm_desc , partNoOld FROM  item WHERE isStreamOne=1";
 $db->query($query);
 $cncItems = $db->fetchAll(MYSQLI_ASSOC);
-
-$search = null;
+$search              = null;
 $search["vendorIds"] = [397];
-$search["page"] = 1;
-$search["lines"] = [
+$search["page"]      = 1;
+$search["lines"]     = [
     ["sku" => "SK4665", "quantity" => 1],
     ["sku" => "SK4663", "quantity" => 1]
 ];
 foreach ($cncItems as $item) {
     array_push($search["lines"], ["sku" => $item["itm_unit_of_sale"], "quantity" => 1]);
 }
-
 $updatedItems = [];
-
 //------ fetch StreamOne Data
-$pages = ceil(count($cncItems) / 10);
+$pages          = ceil(count($cncItems) / 10);
 $buStreamOneApi = new BUTechDataApi($thing);
 for ($page = 1; $page <= $pages; $page++) {
     $search['page'] = $page;
-    $encodedSearch = json_encode($search);
+    $encodedSearch  = json_encode($search);
     $streamOneItems = json_decode($buStreamOneApi->getProductsPrices($encodedSearch), true);
     if ($streamOneItems["Result"] === "Success") {
         //start to compare prices
         foreach ($streamOneItems["BodyText"]['pricingDetails'] as $streamOneItem) {
 
             foreach ($cncItems as $cncItem) {
-                if (
-                    $cncItem['itm_unit_of_sale'] == $streamOneItem['sku'] &&
-                    round($cncItem['itm_sstk_cost'], 2) != round($streamOneItem['unitResellerCost'], 2)
-                ) {
+                if ($cncItem['itm_unit_of_sale'] == $streamOneItem['sku'] && round(
+                        $cncItem['itm_sstk_cost'],
+                        2
+                    ) != round($streamOneItem['unitResellerCost'], 2)) {
                     //compare price of item
                     array_push(
                         $updatedItems,
@@ -95,41 +88,35 @@ for ($page = 1; $page <= $pages; $page++) {
 if (!empty($updatedItems)) {
     // start update item with new prices
     foreach ($updatedItems as $key => $item) {
-        $newValue = round($item["newPrice"], 2);
+        $newValue                       = round($item["newPrice"], 2);
         $updatedItems[$key]["newPrice"] = $newValue;
         $db->query("update item set itm_sstk_cost=$newValue where itm_itemno=$item[id]");
     }
-
     //send email to sales to tell them there is an update to price
-    $buMail = new BUMail($thing);
+    $buMail      = new BUMail($thing);
     $senderEmail = CONFIG_SUPPORT_EMAIL;
-    $toEmail = CONFIG_SALES_EMAIL;
-    $hdrs = array(
+    $toEmail     = CONFIG_SALES_EMAIL;
+    $hdrs        = array(
         'From'         => $senderEmail,
         'To'           => $toEmail,
         'Subject'      => 'The cost price of a StreamOne Office 365 license has changed',
         'Date'         => date("r"),
         'Content-Type' => 'text/html; charset=UTF-8'
     );
-
     global $twig;
     $html = $twig->render(
         '@internal/streamOnePricesUpdate.html.twig',
         ["items" => $updatedItems]
     );
     $buMail->mime->setHTMLBody($html);
-
     $mime_params = array(
         'text_encoding' => '7bit',
         'text_charset'  => 'UTF-8',
         'html_charset'  => 'UTF-8',
         'head_charset'  => 'UTF-8'
     );
-
     $body = $buMail->mime->get($mime_params);
-
     $hdrs = $buMail->mime->headers($hdrs);
-
     $buMail->putInQueue(
         $senderEmail,
         $toEmail,
@@ -139,47 +126,42 @@ if (!empty($updatedItems)) {
 }
 //**************************************get all customers */
 // fetch all stream one customers
-
-
 $allSubscriptions = [];
-$allCustomers = json_decode($buStreamOneApi->searchCustomers(json_encode(["noOfRecords" => 500])));
+$allCustomers     = json_decode($buStreamOneApi->searchCustomers(json_encode(["noOfRecords" => 500])));
 if ($allCustomers->Result == "Success") {
     //BodyText.endCustomersDetails
     // now we have all streamOne Customers
     $streamOneCustomers = array_map(
         function ($item) {
-            $item->name = $item->firstName . ' ' . $item->lastName;
+            $item->name          = $item->firstName . ' ' . $item->lastName;
             $item->endCustomerPO = $item->companyName;
             return $item;
         },
         $allCustomers->BodyText->endCustomersDetails
     );
     // get all subscriptions
-
     $firstSubscription = json_decode($buStreamOneApi->getAllSubscriptions(1));
     if ($firstSubscription->Result == "Success") {
         //"totalRecords":457,"totalPages":23,"page":1,"recordsPerPage":20,"subscriptions":
         $totalPages = $firstSubscription->BodyText->totalPages;
-        $pages = array();
+        $pages      = array();
         for ($i = 2; $i <= $totalPages; $i++) {
             array_push($pages, $i);
         }
-
-        $subscriptions = $firstSubscription->BodyText->subscriptions;
+        $subscriptions    = $firstSubscription->BodyText->subscriptions;
         $allSubscriptions = array_merge($allSubscriptions, $subscriptions);
-        $allRequests = $buStreamOneApi->getAllSubscriptionsSync($pages);
+        $allRequests      = $buStreamOneApi->getAllSubscriptionsSync($pages);
         for ($i = 0; $i < count($allRequests); $i++) {
 
-            $temp = $allRequests[$i];
+            $temp             = $allRequests[$i];
             $allSubscriptions = array_merge($allSubscriptions, $temp["BodyText"]["subscriptions"]);
         }
-
         //----------------------------end update customer items seats from stream one
         //now we have all subscription and we need to map it to customers
         $subscriptionsContacts = [];
         foreach ($allSubscriptions as $subscription) {
             foreach ($subscription as $key => $value) {
-                $value = (object)$value;
+                $value   = (object)$value;
                 $contact = [
                     "companyName"   => $value->company,
                     "email"         => $value->endCustomerEmail,
@@ -187,17 +169,15 @@ if ($allCustomers->Result == "Success") {
                     "endCustomerPO" => isset($value->endCustomerPO) ? $value->endCustomerPO : null,
                     "MsDomain"      => isset($value->additionalData) ? [$value->additionalData] : null,
                 ];
-                $found = false;
+                $found   = false;
                 foreach ($subscriptionsContacts as $inContact) {
-                    if ($inContact->email == $contact["email"])
-                        $found = true;
+                    if ($inContact->email == $contact["email"]) $found = true;
                 }
                 if (!$found) {
                     array_push($subscriptionsContacts, (object)$contact);
                 }
             }
         }
-
         // now we have all subscription contacts and then we need to merge it with customers
         foreach ($subscriptionsContacts as $orderContact) {
             $found = false;
@@ -220,43 +200,62 @@ if ($allCustomers->Result == "Success") {
             foreach ($streamOneCustomers as $customer) {
                 $dbeStreamOneCustomers = new DBEStreamOneCustomers($thing);
                 $dbeStreamOneCustomers->setPKValue($i);
-                if (isset($customer->addressLine1))
-                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::addressLine1, $customer->addressLine1);
-                if (isset($customer->addressLine2))
-                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::addressLine2, $customer->addressLine2);
-                if (isset($customer->city))
-                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::city, $customer->city);
-                if (isset($customer->companyName))
-                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::companyName, $customer->companyName);
-                if (isset($customer->country))
-                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::country, $customer->country);
-                if (isset($customer->createdOn))
-                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::createdOn, $customer->createdOn);
-                if (isset($customer->email))
-                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::email, $customer->email);
-                if (isset($customer->endCustomerId))
-                    $dbeStreamOneCustomers->setValue(
-                        DBEStreamOneCustomers::endCustomerId,
-                        $customer->endCustomerId
-                    );
-                if (isset($customer->endCustomerPO))
-                    $dbeStreamOneCustomers->setValue(
-                        DBEStreamOneCustomers::endCustomerPO,
-                        $customer->endCustomerPO
-                    );
-                if (isset($customer->MsDomain))
-                    $dbeStreamOneCustomers->setValue(
-                        DBEStreamOneCustomers::MsDomain,
-                        json_encode($customer->MsDomain)
-                    );
-                if (isset($customer->name))
-                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::name, $customer->name);
-                if (isset($customer->phone1))
-                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::phone1, $customer->phone1);
-                if (isset($customer->postalCode))
-                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::postalCode, $customer->postalCode);
-                if (isset($customer->title))
-                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::title, $customer->title);
+                if (isset($customer->addressLine1)) $dbeStreamOneCustomers->setValue(
+                    DBEStreamOneCustomers::addressLine1,
+                    $customer->addressLine1
+                );
+                if (isset($customer->addressLine2)) $dbeStreamOneCustomers->setValue(
+                    DBEStreamOneCustomers::addressLine2,
+                    $customer->addressLine2
+                );
+                if (isset($customer->city)) $dbeStreamOneCustomers->setValue(
+                    DBEStreamOneCustomers::city,
+                    $customer->city
+                );
+                if (isset($customer->companyName)) $dbeStreamOneCustomers->setValue(
+                    DBEStreamOneCustomers::companyName,
+                    $customer->companyName
+                );
+                if (isset($customer->country)) $dbeStreamOneCustomers->setValue(
+                    DBEStreamOneCustomers::country,
+                    $customer->country
+                );
+                if (isset($customer->createdOn)) $dbeStreamOneCustomers->setValue(
+                    DBEStreamOneCustomers::createdOn,
+                    $customer->createdOn
+                );
+                if (isset($customer->email)) $dbeStreamOneCustomers->setValue(
+                    DBEStreamOneCustomers::email,
+                    $customer->email
+                );
+                if (isset($customer->endCustomerId)) $dbeStreamOneCustomers->setValue(
+                    DBEStreamOneCustomers::endCustomerId,
+                    $customer->endCustomerId
+                );
+                if (isset($customer->endCustomerPO)) $dbeStreamOneCustomers->setValue(
+                    DBEStreamOneCustomers::endCustomerPO,
+                    $customer->endCustomerPO
+                );
+                if (isset($customer->MsDomain)) $dbeStreamOneCustomers->setValue(
+                    DBEStreamOneCustomers::MsDomain,
+                    json_encode($customer->MsDomain)
+                );
+                if (isset($customer->name)) $dbeStreamOneCustomers->setValue(
+                    DBEStreamOneCustomers::name,
+                    $customer->name
+                );
+                if (isset($customer->phone1)) $dbeStreamOneCustomers->setValue(
+                    DBEStreamOneCustomers::phone1,
+                    $customer->phone1
+                );
+                if (isset($customer->postalCode)) $dbeStreamOneCustomers->setValue(
+                    DBEStreamOneCustomers::postalCode,
+                    $customer->postalCode
+                );
+                if (isset($customer->title)) $dbeStreamOneCustomers->setValue(
+                    DBEStreamOneCustomers::title,
+                    $customer->title
+                );
                 $dbeStreamOneCustomers->insertRow();
                 $inserted++;
                 $i = $i + 1;
@@ -266,12 +265,11 @@ if ($allCustomers->Result == "Success") {
     }
 
 }
-
 //******************************* update customer licences number and status */
 // now we have all subscriptions,  streamone customers and cnc items
 //----------------------------start update customer items seats from stream one
 //2- get all subscriptions details
-$count = 0;
+$count    = 0;
 $orderIds = array();
 foreach ($allSubscriptions as $item) {
     foreach ($item as $key => $sub) {
@@ -279,30 +277,22 @@ foreach ($allSubscriptions as $item) {
         array_push($orderIds, $sub->orderNumber);
     }
 }
-
 $logger->info("Loading all subscriptions and related addOns from streamOne.....");
 $orderDetails = $buStreamOneApi->getProductsDetails($orderIds, 40);
-
 $allAddonLicenses = getAddonLicensesFromOrders($orderDetails);
 syncAddons($allAddonLicenses, $cncItems, $forcedMode, $logger);
-$updatedItems = 0;
+$updatedItems       = 0;
 $updatedItemsAddOns = 0;
-
 $subscription = null;
 $logger->info("All subscriptions number :" . count($allSubscriptions));
-
 $missingLicensesErrors = [];
-
 //get all customer subscriptions
 $streamOneLicensesToCheck = [];
-
 foreach ($allAddonLicenses as $addonLicense) {
     $streamOneLicensesToCheck[] = new StreamOneLicenseData(
-        $addonLicense->sku,
-        $addonLicense->email
+        $addonLicense->sku, $addonLicense->email
     );
 }
-
 foreach ($allSubscriptions as $item) {
     foreach ($item as $subscription) {
         $subscription = (object)$subscription;
@@ -310,11 +300,9 @@ foreach ($allSubscriptions as $item) {
 
             if ($subscription->lineStatus == 'active') {
                 $streamOneLicensesToCheck[] = new StreamOneLicenseData(
-                    $subscription->sku,
-                    $subscription->endCustomerEmail
+                    $subscription->sku, $subscription->endCustomerEmail
                 );
             }
-
             updateContracts(
                 $cncItems,
                 $subscription->sku,
@@ -333,23 +321,19 @@ foreach ($allSubscriptions as $item) {
         }
     }
 }
-
-
+$logger->info("Received StreamOne Licences", $streamOneLicensesToCheck);
 checkAllContractsHaveAMatchingStreamOneLicense($streamOneLicensesToCheck, $logger);
-
-
 if (!empty($missingLicensesErrors)) {
-    $buMail = new BUMail($thing);
+    $buMail      = new BUMail($thing);
     $senderEmail = CONFIG_SUPPORT_EMAIL;
-    $toEmail = CONFIG_SALES_EMAIL;
-    $hdrs = array(
+    $toEmail     = CONFIG_SALES_EMAIL;
+    $hdrs        = array(
         'From'         => $senderEmail,
         'To'           => $toEmail,
         'Subject'      => 'StreamOne licenses not listed for customers',
         'Date'         => date("r"),
         'Content-Type' => 'text/html; charset=UTF-8'
     );
-
     global $twig;
     $html = $twig->render(
         '@internal/streamOneMissingLicensesEmail.html.twig',
@@ -363,18 +347,14 @@ if (!empty($missingLicensesErrors)) {
         ]
     );
     $buMail->mime->setHTMLBody($html);
-
     $mime_params = array(
         'text_encoding' => '7bit',
         'text_charset'  => 'UTF-8',
         'html_charset'  => 'UTF-8',
         'head_charset'  => 'UTF-8'
     );
-
     $body = $buMail->mime->get($mime_params);
-
     $hdrs = $buMail->mime->headers($hdrs);
-
     $buMail->putInQueue(
         $senderEmail,
         $toEmail,
@@ -382,13 +362,11 @@ if (!empty($missingLicensesErrors)) {
         $body
     );
 }
-
 $logger->info('updated customers items  ' . $updatedItems);
 $logger->info('updated customers items addOns  ' . $updatedItemsAddOns);
-
 function getAddonLicensesFromOrders($orderDetails)
 {
-    $allAddons = [];
+    $allAddons   = [];
     $orderUnique = [];
     foreach ($orderDetails as $order) {
         $order = $order["BodyText"]["orderInfo"];
@@ -418,7 +396,6 @@ function getAddonLicensesFromOrders($orderDetails)
     }
     return $allAddons;
 }
-
 
 function syncAddons($allAddons, $cncItems, $forcedMode, LoggerCLI $logger)
 {
@@ -467,7 +444,7 @@ WHERE item.`isStreamOne`
     ";
     $db->query($query);
     $contractsByStreamOneEmailAndSKUCollection = new ContractsByStreamOneEmailAndSKUCollection();
-    $contractDataFactory = new ContractDataFactory();
+    $contractDataFactory                       = new ContractDataFactory();
     while ($db->next_record(MYSQLI_ASSOC)) {
         try {
             $contractsByStreamOneEmailAndSKUCollection->add($contractDataFactory->fromDB($db->Record));
@@ -489,7 +466,6 @@ function checkAllContractsHaveAMatchingStreamOneLicense(array $licensesToCheck, 
 {
 
     $contractsCollection = getContractsToCheck($loggerCLI);
-
     $contractsCollection->checkLicenses($licensesToCheck);
     $elementsNotChecked = $contractsCollection->getNotFlaggedContracts();
     sendMissingStreamOneLicenseForContractEmail($elementsNotChecked);
@@ -511,23 +487,20 @@ function getCustomerFromLicenseEmail($email)
     if (!$customerCache) {
         $customerCache = [];
     }
-
     if (!array_key_exists($email, $customerCache)) {
-        $dbeCustomer = new DBECustomer($that);
+        $dbeCustomer           = new DBECustomer($that);
         $customerCache[$email] = null;
         if ($dbeCustomer->getCustomerByStreamOneEmail($email)) {
             $customerCache[$email] = $dbeCustomer->getRowAsAssocArray();
         }
     }
-
     return $customerCache[$email];
 }
 
 function getItemId($cncItems, $sku)
 {
     foreach ($cncItems as $item) {
-        if ($item['itm_unit_of_sale'] == $sku || $item['partNoOld'] == $sku)
-            return $item['itm_itemno'];
+        if ($item['itm_unit_of_sale'] == $sku || $item['partNoOld'] == $sku) return $item['itm_itemno'];
     }
     return null;
 }
@@ -545,9 +518,9 @@ function sendMissingStreamOneLicenseForContractEmail(array $contracts)
     }
     global $twig;
     $fromEmail = CONFIG_SUPPORT_EMAIL;
-    $buMail = new BUMail($thing);
-    $toEmail = "sales@cnc-ltd.co.uk";
-    $body = $twig->render('@internal/missingStreamOneLicenseForContractEmail.html.twig', ["items" => $contracts]);
+    $buMail    = new BUMail($thing);
+    $toEmail   = "sales@cnc-ltd.co.uk";
+    $body      = $twig->render('@internal/missingStreamOneLicenseForContractEmail.html.twig', ["items" => $contracts]);
     $buMail->mime->setHTMLBody($body);
     $mime_params = array(
         'text_encoding' => '7bit',
@@ -555,17 +528,14 @@ function sendMissingStreamOneLicenseForContractEmail(array $contracts)
         'html_charset'  => 'UTF-8',
         'head_charset'  => 'UTF-8'
     );
-    $body = $buMail->mime->get($mime_params);
-
+    $body        = $buMail->mime->get($mime_params);
     $hdrs = array(
         'From'         => $fromEmail,
         'Subject'      => "Missing Stream One License for contract",
         'Content-Type' => 'text/html; charset=UTF-8',
         'To'           => $toEmail
     );
-
     $hdrs = $buMail->mime->headers($hdrs);
-
     $buMail->putInQueue(
         $fromEmail,
         $toEmail,
@@ -578,28 +548,25 @@ function sendMissingStreamOneLicenseForContractEmail(array $contracts)
 function sendContractsWithDuplicatedSKUAlert(\CNCLTD\StreamOneProcessing\ContractWithDuplicatedSKU $contractWithDuplicatedSKU
 )
 {
-    $fromEmail = CONFIG_SUPPORT_EMAIL;
-    $buMail = new BUMail($thing);
-    $toEmail = "sales@cnc-ltd.co.uk";
-    $body = $buMail->mime->setHTMLBody($contractWithDuplicatedSKU->getMessage());
-    $subject = $body;
+    $fromEmail   = CONFIG_SUPPORT_EMAIL;
+    $buMail      = new BUMail($thing);
+    $toEmail     = "sales@cnc-ltd.co.uk";
+    $body        = $buMail->mime->setHTMLBody($contractWithDuplicatedSKU->getMessage());
+    $subject     = $body;
     $mime_params = array(
         'text_encoding' => '7bit',
         'text_charset'  => 'UTF-8',
         'html_charset'  => 'UTF-8',
         'head_charset'  => 'UTF-8'
     );
-    $body = $buMail->mime->get($mime_params);
-
+    $body        = $buMail->mime->get($mime_params);
     $hdrs = array(
         'From'         => $fromEmail,
         'Subject'      => $subject,
         'Content-Type' => 'text/html; charset=UTF-8',
         'To'           => $toEmail
     );
-
     $hdrs = $buMail->mime->headers($hdrs);
-
     $buMail->putInQueue(
         $fromEmail,
         $toEmail,
@@ -634,16 +601,13 @@ function updateContracts($cncItems,
         "Attempting to update licenses for {$sku} and email {$licenseEmail} with {$units} and status {$licenseStatus}"
     );
     $customer = getCustomerFromLicenseEmail($licenseEmail);
-
     if (!$customer) {
         throw new Exception(
             "Could not find a customer that matches the SKU: {$sku} and email {$licenseEmail} in CNCAPPS"
         );
     }
-
-    $customerId = $customer['customerID'];
+    $customerId   = $customer['customerID'];
     $customerName = $customer['name'];
-
     $itemId = getItemId($cncItems, $sku);
     if (!$itemId) {
         if ($licenseStatus == 'active') {
@@ -659,7 +623,6 @@ function updateContracts($cncItems,
                                 and cui_custno = {$customerId}
                                 and cui_itemno =  {$itemId}"
     );
-
     $temp = $db->fetchAll();
     if (empty($temp)) {
         if ($licenseStatus == 'active') {
@@ -669,11 +632,9 @@ function updateContracts($cncItems,
         }
         return;
     }
-
     if (((int)$units != (int)$temp[0]["units"] || $forcedMode) && $licenseStatus == "active") {
         $salePriceAnnum = ($temp[0]['salePrice'] * $units) * 12;
-        $costAnnum = ($unitPrice * $units) * 12;
-
+        $costAnnum      = ($unitPrice * $units) * 12;
         $params = [
             [
                 "type"  => "i",
@@ -700,14 +661,12 @@ function updateContracts($cncItems,
                 "value" => $itemId
             ],
         ];
-
         $result = $db->preparedQuery(
             "update custitem set cui_users = ? , costPricePerMonth = ?, cui_cost_price = ?, cui_sale_price = ? where   renewalStatus='R'  AND declinedFlag='N'
                             and cui_custno = ?
                             and cui_itemno = ?",
             $params
         );
-
         $loggerCLI->notice(
             "Customer {$customerName} licenses for {$sku} have been changed from {$temp[0]["units"]} to {$units} "
         );

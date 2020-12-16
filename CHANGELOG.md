@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+## Added
+- Issue 1130 - M365 Streamone missing licenses sometimes incorrectly reported.
+
 ## [v5.0.1] - 2020-12-14
 ## Fixed
 - Fix issue with importing automated requests
