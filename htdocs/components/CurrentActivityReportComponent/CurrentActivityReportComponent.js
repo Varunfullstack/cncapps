@@ -18,7 +18,7 @@ import ReactDOM from 'react-dom';
 import '../style.css';
 import '../shared/ToolTip.css'
 
-const AUTORELOAD_INTERVAL_TIME = 0.5 * 60 * 1000;
+const AUTORELOAD_INTERVAL_TIME = 4 * 60 * 1000;
 
 class CurrentActivityReportComponent extends MainComponent {
     el = React.createElement;
