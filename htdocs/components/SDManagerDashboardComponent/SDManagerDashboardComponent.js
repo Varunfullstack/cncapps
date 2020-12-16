@@ -161,7 +161,6 @@ class SDManagerDashboardComponent extends MainComponent {
         const {filter} = this.state;
         const shouldBeHidden = [
             CUSTOMER_TAB,
-            HELD_FOR_QA_TAB,
             DAILY_STATS_TAB
         ].findIndex(x => x === filter.activeTab) > -1;
 
