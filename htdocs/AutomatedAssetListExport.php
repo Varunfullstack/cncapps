@@ -20,12 +20,10 @@ require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUPassword.inc.php');
 require __DIR__ . '/../vendor/autoload.php';
 global $db;
-
-$dbeCustomer = new DBECustomer($thing);
-
+$dbeCustomer     = new DBECustomer($thing);
 $generateSummary = isset($_REQUEST['generateSummary']);
-$customerID = isset($_REQUEST['customerID']) ? $_REQUEST['customerID'] : null;
-$runOnce = false;
+$customerID      = isset($_REQUEST['customerID']) ? $_REQUEST['customerID'] : null;
+$runOnce         = false;
 if ($customerID) {
     $dbeCustomer->getRow($customerID);
     $runOnce = true;
@@ -33,21 +31,16 @@ if ($customerID) {
     $dbeCustomer->getActiveCustomers();
 }
 //we are going to use this to add to the monitoring db
-$dsn = 'mysql:host=' . LABTECH_DB_HOST . ';dbname=' . LABTECH_DB_NAME;
-$options = [
+$dsn               = 'mysql:host=' . LABTECH_DB_HOST . ';dbname=' . LABTECH_DB_NAME;
+$options           = [
     PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
 ];
-$labtechDB = new PDO(
-    $dsn,
-    LABTECH_DB_USERNAME,
-    LABTECH_DB_PASSWORD,
-    $options
+$labtechDB         = new PDO(
+    $dsn, LABTECH_DB_USERNAME, LABTECH_DB_PASSWORD, $options
 );
 $DBEOSSupportDates = new DBEOSSupportDates($thing);
-
 $DBEOSSupportDates->getRows();
 $fakeTable = null;
-
 while ($DBEOSSupportDates->fetchNext()) {
     if (!$DBEOSSupportDates->getValue(DBEOSSupportDates::endOfLifeDate)) {
         continue;
@@ -55,46 +48,39 @@ while ($DBEOSSupportDates->fetchNext()) {
     if ($fakeTable) {
         $fakeTable .= " union all ";
     }
-    $date = DateTime::createFromFormat('Y-m-d', $DBEOSSupportDates->getValue(DBEOSSupportDates::endOfLifeDate));
-
+    $date      = DateTime::createFromFormat('Y-m-d', $DBEOSSupportDates->getValue(DBEOSSupportDates::endOfLifeDate));
     $fakeTable .= " select '" . $DBEOSSupportDates->getValue(
             DBEOSSupportDates::name
         ) . "' as osName,  '" . $DBEOSSupportDates->getValue(
             DBEOSSupportDates::version
         ) . "' as version, '" . $date->format('d/m/Y') . "' as endOfSupportDate, " . $DBEOSSupportDates->getValue(
             DBEOSSupportDates::isServer
-        ) . " as isServer ";
+        ) . " as isServer,  " . ($DBEOSSupportDates->getValue(
+            DBEOSSupportDates::friendlyName
+        ) ? "'" . $DBEOSSupportDates->getValue(DBEOSSupportDates::friendlyName) . "'" : 'null') . " as friendlyName";
 }
-
 if (!$fakeTable) {
-    $fakeTable = "select null as endOfSupportDate, null as osName, null as version, false as isServer";
+    $fakeTable = "select null as endOfSupportDate, null as osName, null as version, false as isServer, '' as friendlyName";
 }
-
-$BUHeader = new BUHeader($thing);
+$BUHeader  = new BUHeader($thing);
 $dbeHeader = new DataSet($thing);
 $BUHeader->getHeader($dbeHeader);
 $thresholdDays = $dbeHeader->getValue(DBEHeader::OSSupportDatesThresholdDays);
-
 if (!$thresholdDays) {
     throw new UnexpectedValueException('OS Support Dates Threshold days is empty');
 }
-
-$buCustomer = new BUCustomer($thing);
+$buCustomer    = new BUCustomer($thing);
 $thresholdDate = new DateTime();
 $thresholdDate->add(new DateInterval('P' . $thresholdDays . 'D'));
-
-$today = new DateTime();
-
+$today             = new DateTime();
 $currentSummaryRow = 1;
 if ($generateSummary) {
     $summarySpreadSheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
     $summarySpreadSheet->getDefaultStyle()->getFont()->setName('Arial');
     $summarySpreadSheet->getDefaultStyle()->getFont()->setSize(10);
     $summarySheet = $summarySpreadSheet->getActiveSheet();
-    $isHeaderSet = false;
+    $isHeaderSet  = false;
 }
-
-
 function getUnrepeatedUsername($str)
 {
     $n = strlen($str);
@@ -102,9 +88,9 @@ function getUnrepeatedUsername($str)
         return $str;
     }
     $length = 3;
-    $match = false;
+    $match  = false;
     do {
-        $prospect = substr($str, 0, $length);
+        $prospect        = substr($str, 0, $length);
         $restOfTheString = substr($str, $length, $length);
         if (strlen($restOfTheString) < $length) {
             return $str;
@@ -119,16 +105,14 @@ function getUnrepeatedUsername($str)
                 return $prospect;
             }
         }
-
         $length++;
     } while (!$match && $length < $n);
-
     return $prospect;
 }
 
 while ($runOnce || $dbeCustomer->fetchNext()) {
-    $runOnce = false;
-    $query = /** @lang MySQL */
+    $runOnce      = false;
+    $query        = /** @lang MySQL */
         'SELECT 
   locations.name AS "Location",
   computers.name AS "Computer Name",
@@ -196,7 +180,8 @@ IF(
     STR_TO_DATE(computers.VirusDefs, \'%Y%m%d\'),
     \'%d/%m/%Y\'
   ) AS "AV Definition",
-(select isServer from (' . $fakeTable . ') f where computers.os = f.osName and computers.version like concat(\'%\', f.version, \'%\') limit 1) as `isServer`
+(select isServer from (' . $fakeTable . ') f where computers.os = f.osName and computers.version like concat(\'%\', f.version, \'%\') limit 1) as `isServer`,
+(select friendlyName from (' . $fakeTable . ') f where computers.os = f.osName and computers.version like concat(\'%\', f.version, \'%\') limit 1) as `friendlyName`
 FROM
   computers 
   LEFT JOIN (clients) 
@@ -272,12 +257,11 @@ ON computers.computerid = processor.computerid
     where clients.externalID = ? and  ServiceVersion
 GROUP BY computers.computerid 
 ORDER BY Location, `Computer Name`';
-    $customerID = $dbeCustomer->getValue(DBECustomer::customerID);
+    $customerID   = $dbeCustomer->getValue(DBECustomer::customerID);
     $customerName = $dbeCustomer->getValue(DBECustomer::name);
-
     echo '<div>Getting Labtech Data for Customer: ' . $customerID . ' - ' . $customerName . '</div>';
     $statement = $labtechDB->prepare($query);
-    $test = $statement->execute(
+    $test      = $statement->execute(
         [
             $customerID
         ]
@@ -291,28 +275,28 @@ ORDER BY Location, `Computer Name`';
         echo ' </div>';
         continue;
     }
-    $data = $statement->fetchAll(PDO::FETCH_ASSOC);
+    $data       = $statement->fetchAll(PDO::FETCH_ASSOC);
     $purgedData = [];
     foreach ($data as $key => $datum) {
-        $text = $datum['Last User'];
-        $text = str_replace('null', "", $text);
-        $data[$key]['Last User'] = getUnrepeatedUsername($text);
-        $data[$key]['CPU'] = preg_replace('/\s+/', ' ', $data[$key]['CPU']);
-        $data[$key]['Model'] = preg_replace('/\s+/', ' ', $data[$key]['Model']);
+        $text                         = $datum['Last User'];
+        $text                         = str_replace('null', "", $text);
+        $data[$key]['Last User']      = getUnrepeatedUsername($text);
+        $data[$key]['CPU']            = preg_replace('/\s+/', ' ', $data[$key]['CPU']);
+        $data[$key]['Model']          = preg_replace('/\s+/', ' ', $data[$key]['Model']);
         $data[$key]['Office Version'] = ucwords($data[$key]['Office Version']);
+        if (isset($data[$key]['friendlyName'])) {
+            $data[$key]['Operating System'] .= " - " . $data[$key]['friendlyName'];
+        }
         $purgedRow = $data[$key];
         unset($purgedRow['isServer']);
         $purgedData[] = $purgedRow;
     }
-
-
     if (count($data)) {
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $spreadsheet->getDefaultStyle()->getFont()->setName('Arial');
         $spreadsheet->getDefaultStyle()->getFont()->setSize(10);
         $sheet = $spreadsheet->getActiveSheet();
-
-        $keys = array_keys($purgedData[0]);
+        $keys  = array_keys($purgedData[0]);
         $sheet->fromArray($keys);
         $sheet->fromArray(
             $purgedData,
@@ -326,22 +310,18 @@ ORDER BY Location, `Computer Name`';
                 $summarySheet->getStyle("A1:{$summarySheet->getHighestColumn()}1")->getFont()->setBold(true);
                 $isHeaderSet = true;
             }
-
             $summaryData = array_map(
                 function ($originalData) use ($customerName) {
                     return array_merge(["Customer Name" => $customerName], $originalData);
                 },
                 $data
             );
-
             $summarySheet->fromArray($summaryData, null, 'A' . $currentSummaryRow);
         }
         $highestColumn = $sheet->getHighestColumn();
-        $highestRow = $sheet->getHighestRow();
+        $highestRow    = $sheet->getHighestRow();
         $sheet->getStyle("A1:{$highestColumn}1")->getFont()->setBold(true);
-
-
-        $dateTime = new DateTime();
+        $dateTime       = new DateTime();
         $legendRowStart = $highestRow + 2;
         $sheet->fromArray(
             [
@@ -352,19 +332,13 @@ ORDER BY Location, `Computer Name`';
             null,
             'A' . $legendRowStart
         );
-        $sheet->getStyle("A{$legendRowStart}:A$legendRowStart")
-            ->getFill()
-            ->setFillType(Fill::FILL_SOLID)
-            ->getStartColor()
-            ->setARGB("FFFFEB9C");
-        $sheet->getStyle("A" . ($legendRowStart + 1) . ":A" . ($legendRowStart + 1))
-            ->getFill()
-            ->setFillType(Fill::FILL_SOLID)
-            ->getStartColor()
-            ->setARGB("FFFFC7CE");
-
-
-        $pcs = 0;
+        $sheet->getStyle("A{$legendRowStart}:A$legendRowStart")->getFill()->setFillType(
+            Fill::FILL_SOLID
+        )->getStartColor()->setARGB("FFFFEB9C");
+        $sheet->getStyle("A" . ($legendRowStart + 1) . ":A" . ($legendRowStart + 1))->getFill()->setFillType(
+            Fill::FILL_SOLID
+        )->getStartColor()->setARGB("FFFFC7CE");
+        $pcs     = 0;
         $servers = 0;
         for ($i = 0; $i < count($data); $i++) {
             if (!$data[$i]['isServer']) {
@@ -377,37 +351,27 @@ ORDER BY Location, `Computer Name`';
                 continue;
             }
             $date = DateTime::createFromFormat('d/m/Y', $data[$i]['OS End of Support Date']);
-
             if (!$date) {
                 continue;
             }
             $currentRow = 2 + $i;
-
-            $color = null;
+            $color      = null;
             if ($date <= $thresholdDate) {
                 $color = "FFFFEB9C";
             }
-
             if ($date <= $today) {
                 $color = "FFFFC7CE";
             }
-
             if ($color) {
-                $sheet->getStyle("A$currentRow:$highestColumn$currentRow")
-                    ->getFill()
-                    ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                    ->getStartColor()
-                    ->setARGB($color);
-
+                $sheet->getStyle("A$currentRow:$highestColumn$currentRow")->getFill()->setFillType(
+                    \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID
+                )->getStartColor()->setARGB($color);
                 if ($generateSummary) {
                     $currentSummaryStyleRow = $currentSummaryRow + $i;
                     $summarySheet->getStyle(
                         "A$currentSummaryStyleRow:{$summarySheet->getHighestColumn()}$currentSummaryStyleRow"
-                    )
-                        ->getFill()
-                        ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                        ->getStartColor()
-                        ->setARGB($color);
+                    )->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor(
+                    )->setARGB($color);
                 }
             }
         }
@@ -423,30 +387,26 @@ ORDER BY Location, `Computer Name`';
                 $summarySheet->getStyle("A1:U1")->getFont()->setBold(true);
                 $isHeaderSet = true;
             }
-
             $summaryData = array_map(
                 function ($originalData) use ($customerName) {
                     return array_merge(["Customer Name" => $customerName], $originalData);
                 },
                 $data
             );
-
             $summarySheet->fromArray($summaryData, null, 'A' . $currentSummaryRow);
         }
         $sheet->getStyle("A1:T1")->getFont()->setBold(true);
-
         $sheet->setAutoFilter(
             $sheet->calculateWorksheetDimension()
         );
         $currentSummaryRow += count($data);
         foreach (range('A', $highestColumn) as $col) {
-            $sheet->getColumnDimension($col)
-                ->setAutoSize(true);
+            $sheet->getColumnDimension($col)->setAutoSize(true);
         }
         $sheet->getStyle($sheet->calculateWorksheetDimension())->getAlignment()->setHorizontal('center');
-        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer         = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
         $customerFolder = $buCustomer->getCustomerFolderPath($customerID);
-        $folderName = $customerFolder . "\Review Meetings\\";
+        $folderName     = $customerFolder . "\Review Meetings\\";
         if (!file_exists($folderName)) {
             mkdir(
                 $folderName,
@@ -454,8 +414,6 @@ ORDER BY Location, `Computer Name`';
                 true
             );
         }
-
-
         $fileName = $folderName . "Current Asset List Extract.xlsx";
         try {
             $writer->save(
@@ -463,12 +421,10 @@ ORDER BY Location, `Computer Name`';
             );
             $dbeCustomerDocument = new DBEPortalCustomerDocument($thing);
             $dbeCustomerDocument->getCurrentAssetList($customerID);
-
             $dbeCustomerDocument->setValue(
                 DBEPortalCustomerDocument::file,
                 file_get_contents($fileName)
             );
-
             if (!$dbeCustomerDocument->getValue(
                     DBEPortalCustomerDocument::createdDate
                 ) || $dbeCustomerDocument->getValue(DBEPortalCustomerDocument::createdDate) == '0000-00-00 00:00:00') {
@@ -478,7 +434,6 @@ ORDER BY Location, `Computer Name`';
                     (new DateTime())->format(DATE_MYSQL_DATETIME)
                 );
             }
-
             if (!$dbeCustomerDocument->rowCount) {
                 $dbeCustomerDocument->setValue(
                     DBEPortalCustomerDocument::customerID,
@@ -500,18 +455,15 @@ ORDER BY Location, `Computer Name`';
                     DBEPortalCustomerDocument::mainContactOnlyFlag,
                     'Y'
                 );
-
                 $dbeCustomerDocument->insertRow();
             } else {
                 $dbeCustomerDocument->updateRow();
             }
-
             $updateCustomer = new DBECustomer($thing);
             $updateCustomer->getRow($customerID);
             $updateCustomer->setValue(DBECustomer::noOfPCs, $pcs);
             $updateCustomer->setValue(DBECustomer::noOfServers, $servers);
             $updateCustomer->updateRow();
-
             echo '<div>Data was found at labtech, creating file ' . $fileName . '</div>';
         } catch (\Exception $exception) {
             echo '<div>Failed to save file, possibly file open</div>';
@@ -527,12 +479,10 @@ if ($generateSummary) {
     $summarySheet->setAutoFilter($summarySheet->calculateWorksheetDimension());
     $summarySheet->getStyle($summarySheet->calculateWorksheetDimension())->getAlignment()->setHorizontal('center');
     foreach (range('A', $summarySheet->getHighestDataColumn()) as $col) {
-        $summarySheet->getColumnDimension($col)
-            ->setAutoSize(true);
+        $summarySheet->getColumnDimension($col)->setAutoSize(true);
     }
-    $password = \CNCLTD\Utils::generateStrongPassword(16);
-
-    $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($summarySpreadSheet);
+    $password   = \CNCLTD\Utils::generateStrongPassword(16);
+    $writer     = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($summarySpreadSheet);
     $folderName = TECHNICAL_DIR;
     if (!file_exists($folderName)) {
         mkdir(
@@ -542,20 +492,18 @@ if ($generateSummary) {
         );
     }
     $tempFileName = $folderName . "\\temp.xlsx";
-
-    $buPassword = new BUPassword($thing);
+    $buPassword   = new BUPassword($thing);
     try {
         $writer->save(
             $tempFileName
         );
         $definitiveFileName = $folderName . "\\Asset List Export.zip";
-        $zip = new ZipArchive();
-        $res = $zip->open($definitiveFileName, ZipArchive::CREATE);
+        $zip                = new ZipArchive();
+        $res                = $zip->open($definitiveFileName, ZipArchive::CREATE);
         if ($res === true) {
             $zip->addFile($tempFileName, 'Asset List Export.xlsx');
             $zip->setEncryptionName('Asset List Export.xlsx', ZipArchive::EM_AES_256, $password);
             $zip->close();
-
             $dbePassword = new DBEPassword($thing);
             $dbePassword->getAutomatedFullAssetListPasswordItem();
             $dbePassword->setValue(DBEPassword::password, $buPassword->encrypt($password));
