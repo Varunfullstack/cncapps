@@ -16,4 +16,14 @@
             </addColumn>
         </rollback>
     </changeSet>
+    <changeSet id="hotfix-v5.0.2-2" author="pavwebdev">
+        <modifyDataType tableName="mail_queue" columnName="recipient" newDataType="varchar(3000)"/>
+        <rollback/>
+    </changeSet>
+    <changeSet id="hotfix-v5.0.2-3" author="pavwebdev">
+        <modifyDataType tableName="mail_queue" columnName="sender" newDataType="varchar(300)"/>
+    </changeSet>
+    <changeSet id="hotfix-v5.0.2-4" author="pavwebdev">
+        <modifyDataType tableName="mail_queue" columnName="ip" newDataType="varchar(60)"/>
+    </changeSet>
 </databaseChangeLog>
