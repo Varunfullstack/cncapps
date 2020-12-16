@@ -1,6 +1,22 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.0.2] - 2020-12-14
+### Fixed
+- Activity flagged as overtime not showing in dashboard.
+- Spellchecker stops working when enabled on email subject summary textbox.
+- Updated contact details when changing the service request contact
+- Fix SR URL links for First Time Fix & Fixed Summary
+- Changed permissions for Queue Managers
+- Changed sort order of SRs in Current Request Page to reflect on screen values
+- Visit Confirmation Emails now use Customer Summary information
+- Allow typing in modal boxes
+### Added
+- Added a clearance cross to filter box on Current Request Page
+- Various dashboards have additional auto refresh functions
+- Email sending will skip when no email address is found to help with future fault finding
+- Priority 1 text has been changed to an icon
+
 ## [v5.0.1] - 2020-12-14
 ## Fixed
 - Fix issue with importing automated requests

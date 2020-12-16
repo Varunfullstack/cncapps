@@ -342,9 +342,10 @@ GROUP BY t.month;
             do {
                 $urlRequest = $controller->buildLink(
                     SITE_URL . '/SRActivity.php',
-                    array(
+                    [
+                        "action"           => "displayActivity",
                         'serviceRequestId' => $row[1]
-                    )
+                    ]
                 );
                 $template->setVar(
                     array(

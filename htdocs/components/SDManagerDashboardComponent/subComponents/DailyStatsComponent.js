@@ -58,9 +58,9 @@ class DailyStatsComponent extends MainComponent {
                 this.getTotalCard("Unique Customers", summary.uniqueCustomerTodaySummary.total, "#00628B", "#E6E6E6"),
                 this.getTotalCard("Near SLA", summary.nearSLASummary.total),
                 this.getTotalCard("Raised Today", summary.raisedTodaySummary.total, "#00628B", "#E6E6E6"),
-                this.getTotalCard("Today's Started", summary.reopenTodaySummary.total),
+                this.getTotalCard("Today's Started", summary.raisedStartTodaySummary.total),
                 this.getTotalCard("Fixed Today", summary.fixedTodaySummary.total, "#00628B", "#E6E6E6"),
-                this.getTotalCard("Reopened Today", summary.raisedStartTodaySummary.total),
+                this.getTotalCard("Reopened Today", summary.reopenTodaySummary.total),
                 this.getTotalCard("Breached SLA", summary.breachedSLATodaySummary.total, "#00628B", "#E6E6E6"),
             ));
     };

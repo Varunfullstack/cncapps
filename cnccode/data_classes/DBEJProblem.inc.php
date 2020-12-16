@@ -440,8 +440,9 @@ class DBEJProblem extends DBEProblem
         WHERE pro_status IN( 'I', 'P' )
 
           AND pro_queue_no = $queueNo
-          order by hasAlarmDate asc, CONCAT( pro_alarm_date, ' ', coalesce(concat(pro_alarm_time,':00') , '00:00:00') ) asc,   isAssigned asc, {$this->getDBColumnName(self::workingHours)} desc
+          order by hasAlarmDate asc, CONCAT( pro_alarm_date, ' ', coalesce(concat(pro_alarm_time,':00') , '00:00:00') ) asc,   isAssigned asc, {$this->getDBColumnName(self::hoursRemainingForSLA)} desc
           ";
+
         $this->setQueryString($sql);
         return (parent::getRows());
     }

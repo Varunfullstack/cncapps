@@ -22,7 +22,6 @@ class DBEJCallActivity extends DBECallActivity
     const requireCheckFlag = "requireCheckFlag";
     const onSiteFlag = "onSiteFlag";
     const travelFlag = "travelFlag";
-    const allowSCRFlag = "allowSCRFlag";
     const userName = "userName";
     const userAccount = "userAccount";
     const durationMinutes = "durationMinutes";
@@ -108,11 +107,6 @@ class DBEJCallActivity extends DBECallActivity
         );
         $this->addColumn(
             self::travelFlag,
-            DA_YN,
-            DA_ALLOW_NULL
-        );
-        $this->addColumn(
-            self::allowSCRFlag,
             DA_YN,
             DA_ALLOW_NULL
         );

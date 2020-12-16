@@ -178,7 +178,7 @@ class Mail_Queue_Container_db extends Mail_Queue_Container
         $query = sprintf(
             "SELECT * FROM %s
                            WHERE sent_time IS NULL
-                             AND try_sent < %d
+                             AND (try_sent < %d or try_sent is null)
                              AND time_to_send <= %s
                              and (instanceId is null or  time_to_send <= DATE_SUB(NOW(),INTERVAL 30 MINUTE)) 
                         ORDER BY time_to_send limit 1",

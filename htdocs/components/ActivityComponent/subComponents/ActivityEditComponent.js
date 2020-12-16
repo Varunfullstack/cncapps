@@ -11,7 +11,7 @@ import React, {Fragment} from 'react';
 import moment from "moment";
 import StandardTextModal from "../../Modals/StandardTextModal";
 import {padEnd, TeamType} from "../../utils/utils";
-import CKEditor from "../../shared/CKEditor";
+import CNCCKEditor from "../../shared/CNCCKEditor";
 import Modal from "../../shared/Modal/modal";
 import Toggle from "../../shared/Toggle";
 import CustomerDocumentUploader from "./CustomerDocumentUploader";
@@ -477,6 +477,7 @@ class ActivityEditComponent extends MainComponent {
                     content: el("a", {
                         className: "fal fa-tag fa-2x m-5 pointer icon",
                         href: `SalesOrder.php?action=displaySalesOrder&ordheadID=${data?.linkedSalesOrderID}`,
+                        target: '_blank'
                     }),
                 })
                 : null,
@@ -499,7 +500,8 @@ class ActivityEditComponent extends MainComponent {
                     title: "Sales Order",
                     content: el("a", {
                         className: "fal fa-tag fa-2x m-5 pointer icon",
-                        onClick: () => this.handleSalesOrder(data?.callActivityID),
+                        href: "javascript:void(0);",
+                        onClick: ($event) => this.handleSalesOrder(data?.callActivityID, data?.problemID),
                     }),
                 })
                 : null,
@@ -671,7 +673,6 @@ class ActivityEditComponent extends MainComponent {
     };
     autoSave = () => {
         this.autoSavehandler = setInterval(() => {
-            console.log('autosaving');
             const {data} = this.state;
             const activityEdit = {
                 id: data.callActivityID,
@@ -751,31 +752,31 @@ class ActivityEditComponent extends MainComponent {
                 return false;
         }
         if (!this.isHiddenFromCustomer(data)) {
-            if (this.checkCustomerNotesRequired(type, data)) {
+            if (this.checkcustomerNotesRequired(type, data)) {
                 this.alert(`Customer Summary are required for ${type.description} when the next action is CNC Action`)
                 return false;
             }
-            if (this.checkCustomerNotesOptionalAndEmptyDescription(type, data)) {
+            if (this.checkcustomerNotesOptionalAndEmptyDescription(type, data)) {
                 if (!await this.confirm(`Are you sure you don't want to put an entry for Customer Summary?`))
                     return false;
             }
         }
-        if (this.checkNotHiddenFromCustomerAndCustomerNoteSet(data)) {
+        if (this.checkNotHiddenFromCustomerAndcustomerNoteset(data)) {
             this.alert(hiddenAndCustomerNoteAlertMessage);
             return false;
         }
         return true;
     }
 
-    checkNotHiddenFromCustomerAndCustomerNoteSet(data) {
+    checkNotHiddenFromCustomerAndcustomerNoteset(data) {
         return this.isHiddenFromCustomer(data) && data.customerNotesTemplate;
     }
 
-    checkCustomerNotesOptionalAndEmptyDescription(type, data) {
+    checkcustomerNotesOptionalAndEmptyDescription(type, data) {
         return type && type.catRequireCustomerNoteCNCAction == 2 && !data.customerNotesTemplate;
     }
 
-    checkCustomerNotesRequired(type, data) {
+    checkcustomerNotesRequired(type, data) {
         return type && type.catRequireCustomerNoteCNCAction == 1 && !data.customerNotesTemplate;
     }
 
@@ -804,16 +805,16 @@ class ActivityEditComponent extends MainComponent {
         }
 
         if (!this.isHiddenFromCustomer(data)) {
-            if (this.checkCustomerNotesRequiredOnHold(type, data)) {
-                this.alert(`Customer Notes are required for ${type.description} when the next action is On Hold`)
+            if (this.checkcustomerNotesRequiredOnHold(type, data)) {
+                this.alert(`Customer Summary are required for ${type.description} when the next action is On Hold`)
                 return false;
             }
-            if (this.checkCustomerNotesOptionalAndEmptyDescriptionOnHold(type, data)) {
-                if (!await this.confirm(`Are you sure you don't want to put an entry for Customer Notes?`))
+            if (this.checkcustomerNotesOptionalAndEmptyDescriptionOnHold(type, data)) {
+                if (!await this.confirm(`Are you sure you don't want to put an entry for Customer Summary?`))
                     return false;
             }
         }
-        if (this.checkNotHiddenFromCustomerAndCustomerNoteSet(data)) {
+        if (this.checkNotHiddenFromCustomerAndcustomerNoteset(data)) {
             this.alert(hiddenAndCustomerNoteAlertMessage);
             return false;
         }
@@ -840,11 +841,11 @@ class ActivityEditComponent extends MainComponent {
         return true;
     }
 
-    checkCustomerNotesOptionalAndEmptyDescriptionOnHold(type, data) {
+    checkcustomerNotesOptionalAndEmptyDescriptionOnHold(type, data) {
         return type && type.catRequireCustomerNoteOnHold == 2 && !data.customerNotesTemplate;
     }
 
-    checkCustomerNotesRequiredOnHold(type, data) {
+    checkcustomerNotesRequiredOnHold(type, data) {
         return type && type.catRequireCustomerNoteOnHold == 1 && !data.customerNotesTemplate;
     }
 
@@ -863,13 +864,17 @@ class ActivityEditComponent extends MainComponent {
             "scrollbars=yes,resizable=yes,height=524,width=855,copyhistory=no, menubar=0"
         );
     };
-    handleSalesOrder = (callActivityID) => {
-        const w = window.open(
-            `Activity.php?action=editLinkedSalesOrder&htmlFmt=popup&callActivityID=${callActivityID}`,
-            "reason",
-            "scrollbars=yes,resizable=yes,height=150,width=250,copyhistory=no, menubar=0"
-        );
-        w.onbeforeunload = () => this.loadCallActivity(callActivityID);
+    handleSalesOrder = async (callActivityID, serviceRequestId) => {
+        const salesOrderId = await this.prompt('Sales Order ID:');
+        if (!salesOrderId) {
+            return;
+        }
+        try {
+            await this.api.linkSalesOrder(serviceRequestId, salesOrderId);
+            this.loadCallActivity(callActivityID);
+        } catch (e) {
+            this.alert(e.toString());
+        }
     };
     handleUnlink = async (callActivityID, linkedSalesOrderID, serviceRequestId) => {
         const res = await this.confirm(
@@ -1044,6 +1049,12 @@ class ActivityEditComponent extends MainComponent {
         const {data, contacts} = this.state;
         const currentContact = contacts.find((c) => c.id == id);
         data.contactID = id;
+        data.contactName = currentContact.name;
+        data.contactPhone = currentContact.contactPhone;
+        data.contactMobilePhone = currentContact.contactMobilePhone;
+        data.contactEmail = currentContact.contactEmail;
+        data.contactNotes = currentContact.notes;
+
         this.setState({data, currentContact});
     };
 
@@ -1326,21 +1337,17 @@ class ActivityEditComponent extends MainComponent {
     handleTemplateChanged = (event) => {
         const id = event.target.value;
         const {templateOptions} = this.state;
-        let templateDefault = "";
         let templateOptionId = null;
         let templateValue = "";
         if (id >= 0) {
-            const op = templateOptions.filter((s) => s.id == id)[0];
-            templateDefault = op.template;
+            const op = templateOptions.find((s) => s.id == id);
             templateValue = op.template;
             templateOptionId = op.id;
-        } else {
-            templateDefault = "";
         }
-        setTimeout(
-            () => this.setState({templateDefault, templateOptionId, templateValue}),
-            200
-        );
+        const test = () => {
+            this.setState({templateOptionId, templateValue});
+        }
+        test();
     };
     handleTemplateValueChange = (value) => {
         this.setState({templateValue: value});
@@ -1353,7 +1360,7 @@ class ActivityEditComponent extends MainComponent {
             currentActivity,
         } = this.state;
         if (templateValue == "") {
-            this.alert("Please enter detials");
+            this.alert("Please enter details");
             return;
         }
         const payload = new FormData();
@@ -1386,7 +1393,7 @@ class ActivityEditComponent extends MainComponent {
     };
     getTemplateModal = () => {
         const {
-            templateDefault,
+            templateValue,
             templateOptions,
             _showModal,
             templateTitle,
@@ -1414,11 +1421,11 @@ class ActivityEditComponent extends MainComponent {
                     )
                     : null,
                 this.state._activityLoaded
-                    ? el(CKEditor, {
+                    ? el(CNCCKEditor, {
                         key: "salesRequestEditor",
-                        id: "salesRequest",
-                        value: templateDefault,
-                        inline: true,
+                        name: "salesRequest",
+                        value: templateValue,
+                        type: "inline",
                         onChange: this.handleTemplateValueChange,
                     })
                     : null
@@ -1467,6 +1474,7 @@ class ActivityEditComponent extends MainComponent {
     getActivityNotes() {
         const {el} = this;
         const {data} = this.state;
+
         return el(
             "div",
             {style: {display: "flex", flexDirection: "row"}},
@@ -1484,10 +1492,11 @@ class ActivityEditComponent extends MainComponent {
                     })
                 ),
                 this.state._activityLoaded
-                    ? el(CKEditor, {
-                        id: "reason",
+                    ? el(CNCCKEditor, {
+                        name: "reason",
                         value: data?.reason,
-                        inline: true,
+                        type: "inline",
+                        style: {height: '50px'},
                         onChange: (value) => this.setValue("reasonTemplate", value),
                     })
                     : null
@@ -1506,11 +1515,10 @@ class ActivityEditComponent extends MainComponent {
                     })
                 ),
                 this.state._activityLoaded
-                    ? el(CKEditor, {
-                        id: "cncNextAction",
+                    ? el(CNCCKEditor, {
+                        name: "cncNextAction",
                         value: data?.cncNextAction,
-                        inline: true,
-
+                        type: "inline",
                         onChange: (value) => this.setValue("cncNextActionTemplate", value),
                     })
                     : null
@@ -1518,7 +1526,7 @@ class ActivityEditComponent extends MainComponent {
         );
     }
 
-    getCustomerNotes() {
+    getcustomerNotes() {
         const {el} = this;
         const {data} = this.state;
         return el(
@@ -1537,10 +1545,10 @@ class ActivityEditComponent extends MainComponent {
                 })
             ),
             this.state._activityLoaded
-                ? el(CKEditor, {
-                    id: "customerNotes",
+                ? el(CNCCKEditor, {
+                    name: "customerNotes",
                     value: data?.customerNotes,
-                    inline: true,
+                    type: "inline",
                     onChange: (value) => this.setValue("customerNotesTemplate", value),
                 })
                 : null
@@ -1566,10 +1574,10 @@ class ActivityEditComponent extends MainComponent {
                 })
             ),
             this.state._activityLoaded
-                ? el(CKEditor, {
-                    id: "internal",
+                ? el(CNCCKEditor, {
+                    name: "internal",
                     value: data?.internalNotes,
-                    inline: true,
+                    type: "inline",
                     onChange: (value) => this.setValue("internalNotesTemplate", value),
                 })
                 : null
@@ -1735,10 +1743,12 @@ class ActivityEditComponent extends MainComponent {
                 style: {width: "100%"},
                 value: this.state.data.assetName || "",
             },
-            el("option", {
-                key: "default",
-                value: ""
-            }, (this.state.data.emptyAssetReason && this.state.data.emptyAssetReason.substr(0, 20)) || ""),
+            el(
+                "option", {
+                    key: "default",
+                    value: ""
+                }, this.state.data.emptyAssetReason || ""
+            ),
             assets.map((s) =>
                 el(
                     "option",
@@ -1754,11 +1764,10 @@ class ActivityEditComponent extends MainComponent {
     handleAssetSelect = (value) => {
         const {data, assets} = this.state;
         if (value !== "") {
-            const index = assets.findIndex((a) => a.name == value);
-            const asset = assets[index];
+            const asset = assets.find((a) => a.name == value);
             data.assetName = value;
-            data.assetTitle =
-                asset.name + " " + asset.LastUsername + " " + asset.BiosVer;
+            data.assetTitle = asset.name + " " + asset.LastUsername + " " + asset.BiosVer;
+            data.emptyAssetReason = "";
         } else {
             data.assetName = "";
             data.assetTitle = "";
@@ -1785,7 +1794,7 @@ class ActivityEditComponent extends MainComponent {
                 </div>
                 {this.getContentElement()}
                 {this.getActivityNotes()}
-                {this.getCustomerNotes()}
+                {this.getcustomerNotes()}
                 {this.getActivityInternalNotes()}
                 <CustomerDocumentUploader
                     onDeleteDocument={(id) => this.deleteDocument(id)}

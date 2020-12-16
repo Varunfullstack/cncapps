@@ -10,6 +10,14 @@ class CustomerSRComponent extends React.Component {
         this.state = {}
     }
 
+    addToolTip = (element, title) => {
+        return this.el(
+            "div",
+            {className: "tooltip"},
+            element,
+            this.el("div", {className: "tooltiptext tooltip-bottom"}, title)
+        );
+    }
     getTableElement = (items, showContactColumn) => {
         const {el} = this;
         const {openProblemHistory, newSrActivity} = this.props;
@@ -112,6 +120,14 @@ class CustomerSRComponent extends React.Component {
                 sortable: false,
                 hdClassName: "text-center",
                 className: "text-center",
+                content: problem => {
+                    if (problem.priority !== 1) {
+                        return problem.priority;
+                    }
+                    return this.addToolTip(
+                        <i className="fal fa-2x fa-exclamation-triangle color-gray"/>,
+                        `Priority 1`)
+                }
             },
             {
                 hide: false,

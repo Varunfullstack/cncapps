@@ -1,9 +1,8 @@
 import MainComponent from "../../shared/MainComponent";
 import APIActivity from "../../services/APIActivity";
-import CKEditor from "../../shared/CKEditor";
+import CNCCKEditor from "../../shared/CNCCKEditor";
 import ToolTip from "../../shared/ToolTip";
 import {params} from "../../utils/utils";
-import ReactDOM from 'react-dom';
 import React from 'react';
 
 class GatherManagementReviewDetailsComponent extends MainComponent {
@@ -36,7 +35,12 @@ class GatherManagementReviewDetailsComponent extends MainComponent {
                 className: "m-5",
                 style: {fontSize: 18, display: "block"}
             }, "Why does this SR require review by management?"),
-            el(CKEditor, {height: 200, inline: true, onChange: (description) => this.setState({description})}),
+            el(CNCCKEditor, {
+                name: 'managementReviewDetails',
+                height: 200,
+                type: "inline",
+                onChange: (description) => this.setState({description})
+            }),
             el('button', {onClick: this.handleOnSave}, "Save")
         );
     };

@@ -44,18 +44,18 @@ class CTSRActivity extends CTCNC
     const GET_PRIORITIES                                         = "getPriorities";
     const GET_CUSTOMER_SITES                                     = "getCustomerSites";
     const GET_CUSTOMER_CONTACTS                                  = "getCustomerContacts";
-    const UPDATE_ACTIVITY                = "updateActivity";
-    const MESSAGE_TO_SALES               = "messageToSales";
-    const GET_CALL_ACTIVITY              = "getCallActivity";
-    const SAVE_FIXED_INFORMATION         = "saveFixedInformation";
-    const GET_INITIAL_ACTIVITY           = "getInitialActivity";
-    const SAVE_MANAGEMENT_REVIEW_DETAILS = "saveManagementReviewDetails";
-    const CHANGE_PROBLEM_PRIORITY        = "changeProblemPriority";
-    const USED_BUDGET_DATA               = "usedBudgetData";
-    const UPLOAD_INTERNAL_DOCUMENT       = "uploadInternalDocument";
-    const VIEW_INTERNAL_DOCUMENT         = 'viewInternalDocument';
-    const DELETE_INTERNAL_DOCUMENT       = 'deleteInternalDocument';
-    const REMOTE_SUPPORT_ACTIVITY_TYPE_ID                              = 8;
+    const UPDATE_ACTIVITY                                        = "updateActivity";
+    const MESSAGE_TO_SALES                                       = "messageToSales";
+    const GET_CALL_ACTIVITY                                      = "getCallActivity";
+    const SAVE_FIXED_INFORMATION                                 = "saveFixedInformation";
+    const GET_INITIAL_ACTIVITY                                   = "getInitialActivity";
+    const SAVE_MANAGEMENT_REVIEW_DETAILS                         = "saveManagementReviewDetails";
+    const CHANGE_PROBLEM_PRIORITY                                = "changeProblemPriority";
+    const USED_BUDGET_DATA                                       = "usedBudgetData";
+    const UPLOAD_INTERNAL_DOCUMENT                               = "uploadInternalDocument";
+    const VIEW_INTERNAL_DOCUMENT                                 = 'viewInternalDocument';
+    const DELETE_INTERNAL_DOCUMENT                               = 'deleteInternalDocument';
+    const REMOTE_SUPPORT_ACTIVITY_TYPE_ID                        = 8;
     public  $serverGuardArray = array(
         ""  => "Please select",
         "Y" => "ServerGuard Related",
@@ -221,12 +221,14 @@ class CTSRActivity extends CTCNC
         $problemID = $dbejCallActivity->getValue(DBECallActivity::problemID);
         $dbeProblem->setPKValue($problemID);
         $dbeProblem->getRow();
-        $customerId  = $dbejCallActivity->getValue(DBEJCallActivity::customerID);
-        $contactID   = $dbejCallActivity->getValue(DBEJCallActivity::contactID);
-        $siteId      = $dbejCallActivity->getValue(DBEJCallActivity::siteNo);
-        $projectLink = BUProject::getCurrentProjectLink(
+        $customerId      = $dbejCallActivity->getValue(DBEJCallActivity::customerID);
+        $contactID       = $dbejCallActivity->getValue(DBEJCallActivity::contactID);
+        $siteId          = $dbejCallActivity->getValue(DBEJCallActivity::siteNo);
+        $projectLink     = BUProject::getCurrentProjectLink(
             $customerId
         );
+        $dbeActivityType = new DBECallActType($this);
+        $dbeActivityType->getRow($dbejCallActivity->getValue(DBECallActivity::callActTypeID));
         $dbeCustomer = new DBECustomer($this);
         $dbeCustomer->setPKValue($customerId);
         $dbeCustomer->getRow();
@@ -312,13 +314,11 @@ class CTSRActivity extends CTCNC
             ),
             "canDelete"                       => !$dbejCallActivity->getValue(
                     DBEJCallActivity::endTime
-                ) || ($dbejCallActivity->getValue(DBEJCallActivity::status) != 'A' && $this->hasPermissions(
-                        MAINTENANCE_PERMISSION
-                    )),
+                ) || ($dbejCallActivity->getValue(DBEJCallActivity::status) != 'A' && ($this->isSdManager(
+                        ) || $this->isSRQueueManager())),
             "hasExpenses"                     => count($expenses) ? true : false,
             "isSDManager"                     => $buUser->isSdManager($this->userID),
             "hideFromCustomerFlag"            => $dbejCallActivity->getValue(DBEJCallActivity::hideFromCustomerFlag),
-            "allowSCRFlag"                    => $dbejCallActivity->getValue(DBEJCallActivity::allowSCRFlag),
             "priority"                        => $buActivity->priorityArray[$dbejCallActivity->getValue(
                 DBEJCallActivity::priority
             )],
@@ -377,7 +377,7 @@ class CTSRActivity extends CTCNC
             "projectId"                       => $dbejCallActivity->getValue(DBEJCallActivity::projectID),
             "projects"                        => BUProject::getCustomerProjects($customerId),
             "cncNextAction"                   => $dbejCallActivity->getValue(DBEJCallActivity::cncNextAction),
-            "customerNotes"                   => $dbejCallActivity->getValue(DBEJCallActivity::customerNotes),
+            "customerNotes"                 => $dbejCallActivity->getValue(DBEJCallActivity::customerSummary),
             'activityTypeHasExpenses'         => BUActivityType::hasExpenses(
                 $dbejCallActivity->getValue(DBEJCallActivity::callActTypeID)
             ),
@@ -385,6 +385,7 @@ class CTSRActivity extends CTCNC
             'assetTitle'                      => $dbeProblem->getValue(DBEProblem::assetTitle),
             "emptyAssetReason"                => $dbeProblem->getValue(DBEProblem::emptyAssetReason),
             "holdForQA"                       => $dbeProblem->getValue(DBEProblem::holdForQA),
+            "isOnSiteActivity"                => $dbeActivityType->getValue(DBECallActType::onSiteFlag) == 'Y'
         ];
     }
 
@@ -559,7 +560,6 @@ class CTSRActivity extends CTCNC
      */
     function isInitalDisabled($dbejCallActivity)
     {
-        $initial_disabled = false;
         if (in_array(
             $dbejCallActivity->getValue(DBEJCallActivity::callActTypeID),
             array(
@@ -567,11 +567,9 @@ class CTSRActivity extends CTCNC
                 CONFIG_CHANGE_REQUEST_ACTIVITY_TYPE_ID
             )
         )) {
-            if (!$this->hasPermissions(MAINTENANCE_PERMISSION)) {
-                $initial_disabled = true;
-            }
+            return !$this->isSdManager() && !$this->isSRQueueManager();
         }
-        return $initial_disabled;
+        return false;
     }
 
     function messageToSales()
@@ -1022,7 +1020,9 @@ class CTSRActivity extends CTCNC
                 $currentUser    = $this->getDbeUser();
                 $buCustomerItem = new BUCustomerItem($this);
                 $hasServiceDesk = $buCustomerItem->customerHasServiceDeskContract($body->customerID);
-                if (!$body->startWork && $body->priority == 1 && $currentUser->getValue(DBEUser::teamID) == 1 && $hasServiceDesk) {
+                if (!$body->startWork && $body->priority == 1 && $currentUser->getValue(
+                        DBEUser::teamID
+                    ) == 1 && $hasServiceDesk) {
                     $dbeProblemNotStartReason = new DBEProblemNotStartReason($this);
                     $dbeProblemNotStartReason->setValue(
                         DBEProblemNotStartReason::problemID,

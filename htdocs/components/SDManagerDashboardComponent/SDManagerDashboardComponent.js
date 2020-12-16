@@ -13,6 +13,7 @@ import './../style.css';
 import './SDManagerDashboardComponent.css';
 import ActivityFollowOn from "../Modals/ActivityFollowOn";
 import moment from "moment";
+import Spinner from "../shared/Spinner/Spinner";
 
 const CUSTOMER_TAB = 9;
 
@@ -22,16 +23,20 @@ const DAILY_STATS_TAB = 10;
 
 const SHORTEST_SLA_FIX_REMAINING = 3;
 
+const AUTO_RELOAD_TIME = 60 * 1000;
+
 class SDManagerDashboardComponent extends MainComponent {
     el = React.createElement;
     tabs = [];
     api = new APISDManagerDashboard();
     apiCurrentActivityService = new CurrentActivityService();
+    intervalRef;
 
     constructor(props) {
         super(props);
         this.state = {
             ...this.state,
+            showSpinner: false,
             filter: {
                 hd: false,
                 es: false,
@@ -71,7 +76,6 @@ class SDManagerDashboardComponent extends MainComponent {
         const {filter, allocatedUsers} = this.state;
         if (filter.activeTab < CUSTOMER_TAB && allocatedUsers.length == 0)
             this.apiCurrentActivityService.getAllocatedUsers().then((res) => {
-
                 this.setState({allocatedUsers: res});
             });
     }
@@ -85,7 +89,18 @@ class SDManagerDashboardComponent extends MainComponent {
         filter.activeTab = code;
         this.saveFilter(filter);
         this.setState({filter, queueData: []});
+        this.checkAutoReloading();
     };
+
+    checkAutoReloading() {
+        if (this.intervalRef) {
+            clearInterval(this.intervalRef);
+        }
+        this.intervalRef = setInterval(() => {
+            const {filter} = this.state;
+            this.loadTab(filter.activeTab);
+        }, AUTO_RELOAD_TIME)
+    }
 
     getTabsElement = () => {
         const {el, tabs} = this;
@@ -126,7 +141,10 @@ class SDManagerDashboardComponent extends MainComponent {
         let filter = localStorage.getItem("SDManagerDashboardFilter");
         if (filter) filter = JSON.parse(filter);
         else filter = this.state.filter;
-        this.setState({filter}, () => this.loadTab(filter.activeTab));
+        this.setState({filter}, () => {
+            this.loadTab(filter.activeTab)
+            this.checkAutoReloading();
+        });
     };
     setFilterValue = (property, value) => {
         const {filter} = this.state;
@@ -142,11 +160,8 @@ class SDManagerDashboardComponent extends MainComponent {
     getFilterElement = () => {
         const {filter} = this.state;
         const shouldBeHidden = [
-            CUSTOMER_TAB,
-            HELD_FOR_QA_TAB,
             DAILY_STATS_TAB
         ].findIndex(x => x === filter.activeTab) > -1;
-
 
         return (
             <div className="m-5">
@@ -197,9 +212,10 @@ class SDManagerDashboardComponent extends MainComponent {
         ) {
             this.loadAllocatedUsers();
             const {filter} = this.state;
+            this.setState({showSpinner: true});
             this.api.getQueue(id, filter)
                 .then((queueData) => {
-                    this.setState({queueData})
+                    this.setState({queueData, showSpinner: false})
                 });
         } else
             return [];
@@ -375,6 +391,14 @@ class SDManagerDashboardComponent extends MainComponent {
                     icon: "fal fa-2x fa-signal color-gray2 pointer",
                     sortable: false,
                     className: "text-center",
+                    content: problem => {
+                        if (problem.priority !== 1) {
+                            return problem.priority;
+                        }
+                        return this.addToolTip(
+                            <i className="fal fa-2x fa-exclamation-triangle color-gray"/>,
+                            `Priority 1`)
+                    }
                 },
                 {
                     display: [HELD_FOR_QA_TAB].indexOf(filter.activeTab) < 0,
@@ -628,6 +652,7 @@ class SDManagerDashboardComponent extends MainComponent {
     render() {
         const {el} = this;
         return el("div", null,
+            el(Spinner, {key: "spinner", show: this.state.showSpinner}),
             this.getAlert(),
             this.getFollowOnElement(),
             this.getFilterElement(),

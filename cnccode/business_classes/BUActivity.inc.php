@@ -1219,7 +1219,7 @@ class BUActivity extends Business
         $chargeableHours  = $result->fetch_object()->chargeableHours;
         $problem          = new DBEProblem($this);
         $problem->getRow($dsCallActivity->getValue(DBEJCallActivity::problemID));
-        $oldPriority = $problem->getValue(DBEJProblem::priority);
+
         $problem->setValue(
             DBEJProblem::contractCustomerItemID,
             $dsCallActivity->getValue(DBEJCallActivity::contractCustomerItemID)
@@ -1433,7 +1433,7 @@ class BUActivity extends Business
         $status     = $this->getServiceRequestStatusText($dbejCallactivity);
         $data       = new \CNCLTD\TwigDTOs\ActivityLoggedDTO(
             $dbejCallactivity->getValue(DBEJCallActivity::contactFirstName),
-            $dbejCallactivity->getValue(DBEJCallActivity::customerNotes),
+            $dbejCallactivity->getValue(DBEJCallActivity::customerSummary),
             $dbejCallactivity->getValue(DBEJCallActivity::userName),
             $dbejCallactivity->getValue(DBEJCallActivity::problemID),
             $status
@@ -1492,6 +1492,10 @@ class BUActivity extends Business
             $selfFlag,
             $othersFlag
         );
+        if(!$emailRecipients){
+            return;
+        }
+
         $this->sendEmail($body, $subject, $emailRecipients);
     }
 
@@ -2219,7 +2223,7 @@ class BUActivity extends Business
         $oldPriority = $problem->getValue(DBEJProblem::priority);
         if ($oldPriority != $priority) {
             $slaResponseHours = $this->getSlaResponseHours(
-                $problem->getValue(DBEJProblem::priority),
+                $priority,
                 $problem->getValue(DBEJProblem::customerID),
                 $dbeCallActivity->getValue(DBECallActivity::contactID)
             );
@@ -6487,7 +6491,7 @@ class BUActivity extends Business
         $data       = new \CNCLTD\TwigDTOs\SalesOrderServiceRequestCreatedDTO(
             $dbejCallactivity->getValue(DBEJCallActivity::contactFirstName),
             $dbejCallactivity->getValue(DBEJCallActivity::problemID),
-            $dbejCallactivity->getValue(DBEJCallActivity::customerNotes),
+            $dbejCallactivity->getValue(DBEJCallActivity::customerSummary),
             $team,
             $status
         );
@@ -7620,7 +7624,7 @@ FROM
         $dbeCallActivity->setValue(DBEJCallActivity::overtimeDurationApproved, null);
         $dbeCallActivity->setValue(DBEJCallActivity::expenseExportFlag, 'N');
         $dbeCallActivity->setValue(DBEJCallActivity::cncNextAction, null);
-        $dbeCallActivity->setValue(DBEJCallActivity::customerNotes, null);
+        $dbeCallActivity->setValue(DBEJCallActivity::customerSummary, null);
         $dbeCallActivity->setValue(
             DBEJCallActivity::serverGuard,
             $dbeCallActivity->getValue(DBEJCallActivity::serverGuard)
@@ -8588,7 +8592,7 @@ FROM
             $dsSite->getValue(DBESite::postcode),
             Controller::dateYMDtoDMY($dsCallActivity->getValue(DBEJCallActivity::date)),
             $visitActivityTimeOfTheDay,
-            trim($dsCallActivity->getValue(DBEJCallActivity::reason)),
+            trim($dsCallActivity->getValue(DBEJCallActivity::customerSummary)),
             $serviceRequestId,
         );
         $bcc             = [
@@ -10801,7 +10805,7 @@ FROM
     {
         return trim(
             html_entity_decode(
-                strip_tags(str_replace('&nbsp;', '', $dsCallActivity->getValue(DBECallActivity::customerNotes)))
+                strip_tags(str_replace('&nbsp;', '', $dsCallActivity->getValue(DBECallActivity::customerSummary)))
             )
         );
     }

@@ -120,46 +120,47 @@ define(
 class CTActivity extends CTCNC
 {
 
-    const GREEN                                     = '#BDF8BA';
-    const CONTENT                                   = '#F4f4f2';
-    const ASSIGN_TO_BE_LOGGED_TO_SERVICE_REQUEST    = 'assignToBeLoggedToServiceRequest';
-    const CHECK_PREPAY                              = 'checkPrepay';
-    const AUTHORISING_CONTACTS                      = 'authorisingContacts';
-    const CONTACT_NOTES                             = 'contactNotes';
-    const SALES_REQUEST_REVIEW                      = 'salesRequestReview';
-    const SEND_CHANGE_REQUEST                       = 'sendChangeRequest';
-    const SEND_SALES_REQUEST                        = 'sendSalesRequest';
-    const UNHIDE_SR                                 = 'unhideSR';
-    const TOGGLE_MONITORING_FLAG                    = 'toggleMonitoringFlag';
-    const UPDATE_HISTORIC_USER_TIME_LOGS            = 'updateHistoricUserTimeLogs';
-    const GET_SERVER_TIME                           = 'getServerTime';
-    const TOGGLE_CRITICAL_FLAG                      = 'toggleCriticalFlag';
-    const TOGGLE_DO_NEXT_FLAG                       = 'toggleDoNextFlag';
-    const MESSAGE_TO_SALES                          = 'messageToSales';
-    const MANAGER_COMMENT_POPUP                     = 'managerCommentPopup';
-    const CONTRACT_LIST_POPUP                       = 'contractListPopup';
-    const REQUEST_ADDITIONAL_TIME                   = 'requestAdditionalTime';
-    const ALLOCATE_ADDITIONAL_TIME                  = 'allocateAdditionalTime';
-    const GATHER_MANAGEMENT_REVIEW_DETAILS          = 'gatherManagementReviewDetails';
-    const GATHER_FIXED_INFORMATION                  = 'gatherFixedInformation';
-    const AUTO_UPDATE                               = 'autoUpdate';
-    const LINK_PROBLEMS                             = 'linkProblems';
-    const SET_PROBLEM_COMPLETE                      = 'setProblemComplete';
-    const SET_PROBLEM_FIXED                         = 'setProblemFixed';
-    const DISPLAY_SERVICE_REQUEST                   = 'displayServiceRequest';
-    const UPDATE_REQUEST_FROM_CUSTOMER_REQUEST      = 'updateRequestFromCustomerRequest';
-    const CREATE_REQUEST_FROM_CUSTOMER_REQUEST      = 'createRequestFromCustomerRequest';
-    const CREATE_FOLLOW_ON_ACTIVITY                 = 'createFollowOnActivity';
-    const CUSTOMER_PROBLEM_POPUP                    = 'customerProblemPopup';
-    const PROBLEM_HISTORY_POPUP                     = 'problemHistoryPopup';
-    const EDIT_LINKED_SALES_ORDER                   = 'editLinkedSalesOrder';
-    const EDIT_SERVICE_REQUEST_HEADER               = 'editServiceRequestHeader';
-    const DISPLAY_OPEN_SRS                          = 'displayOpenSrs';
-    const EDIT_VALUE_ONLY_SERVICE_REQUEST           = 'editValueOnlyServiceRequest';
-    const DISPLAY_LAST_ACTIVITY                     = 'displayLastActivity';
-    const DISPLAY_FIRST_ACTIVITY                    = 'displayFirstActivity';
-    const DISPLAY_SERVICE_REQUEST_FOR_CONTACT_POPUP = 'displayServiceRequestForContactPopup';
-    const UNLINK_SALES_ORDER                        = 'unlinkSalesOrder';
+    const GREEN                                        = '#BDF8BA';
+    const CONTENT                                      = '#F4f4f2';
+    const ASSIGN_TO_BE_LOGGED_TO_SERVICE_REQUEST       = 'assignToBeLoggedToServiceRequest';
+    const CHECK_PREPAY                                 = 'checkPrepay';
+    const AUTHORISING_CONTACTS                         = 'authorisingContacts';
+    const CONTACT_NOTES                                = 'contactNotes';
+    const SALES_REQUEST_REVIEW                         = 'salesRequestReview';
+    const SEND_CHANGE_REQUEST                          = 'sendChangeRequest';
+    const SEND_SALES_REQUEST                           = 'sendSalesRequest';
+    const UNHIDE_SR                                    = 'unhideSR';
+    const TOGGLE_MONITORING_FLAG                       = 'toggleMonitoringFlag';
+    const UPDATE_HISTORIC_USER_TIME_LOGS               = 'updateHistoricUserTimeLogs';
+    const GET_SERVER_TIME                              = 'getServerTime';
+    const TOGGLE_CRITICAL_FLAG                         = 'toggleCriticalFlag';
+    const TOGGLE_DO_NEXT_FLAG                          = 'toggleDoNextFlag';
+    const MESSAGE_TO_SALES                             = 'messageToSales';
+    const MANAGER_COMMENT_POPUP                        = 'managerCommentPopup';
+    const CONTRACT_LIST_POPUP                          = 'contractListPopup';
+    const REQUEST_ADDITIONAL_TIME                      = 'requestAdditionalTime';
+    const ALLOCATE_ADDITIONAL_TIME                     = 'allocateAdditionalTime';
+    const GATHER_MANAGEMENT_REVIEW_DETAILS             = 'gatherManagementReviewDetails';
+    const GATHER_FIXED_INFORMATION                     = 'gatherFixedInformation';
+    const AUTO_UPDATE                                  = 'autoUpdate';
+    const LINK_PROBLEMS                                = 'linkProblems';
+    const SET_PROBLEM_COMPLETE                         = 'setProblemComplete';
+    const SET_PROBLEM_FIXED                            = 'setProblemFixed';
+    const DISPLAY_SERVICE_REQUEST                      = 'displayServiceRequest';
+    const UPDATE_REQUEST_FROM_CUSTOMER_REQUEST         = 'updateRequestFromCustomerRequest';
+    const CREATE_REQUEST_FROM_CUSTOMER_REQUEST         = 'createRequestFromCustomerRequest';
+    const CREATE_FOLLOW_ON_ACTIVITY                    = 'createFollowOnActivity';
+    const CUSTOMER_PROBLEM_POPUP                       = 'customerProblemPopup';
+    const PROBLEM_HISTORY_POPUP                        = 'problemHistoryPopup';
+    const EDIT_LINKED_SALES_ORDER                      = 'editLinkedSalesOrder';
+    const EDIT_SERVICE_REQUEST_HEADER                  = 'editServiceRequestHeader';
+    const DISPLAY_OPEN_SRS                             = 'displayOpenSrs';
+    const EDIT_VALUE_ONLY_SERVICE_REQUEST              = 'editValueOnlyServiceRequest';
+    const DISPLAY_LAST_ACTIVITY                        = 'displayLastActivity';
+    const DISPLAY_FIRST_ACTIVITY                       = 'displayFirstActivity';
+    const DISPLAY_SERVICE_REQUEST_FOR_CONTACT_POPUP    = 'displayServiceRequestForContactPopup';
+    const UNLINK_SALES_ORDER                           = 'unlinkSalesOrder';
+    const ASSIGN_LINKED_SALES_ORDER_TO_SERVICE_REQUEST = 'assignLinkedSalesOrderToServiceRequest';
     public $statusArrayCustomer = array(
         "A" => "Active",
         "E" => "Ended",
@@ -312,6 +313,9 @@ class CTActivity extends CTCNC
             case self::EDIT_LINKED_SALES_ORDER:
                 $this->editLinkedSalesOrder();
                 break;
+            case self::ASSIGN_LINKED_SALES_ORDER_TO_SERVICE_REQUEST:
+                $this->assignLinkedSalesOrderToServiceRequestController();
+                exit;
             case self::PROBLEM_HISTORY_POPUP:
                 $this->problemHistoryPopup();
                 break;
@@ -2578,7 +2582,7 @@ class CTActivity extends CTCNC
                             $callActivityID,
                             $linkedOrderID
                         );
-                        echo '<script type="text/javascript"> window.opener.location.reload(false); window.close(); </script>';
+                        echo '<script type="text/javascript"> window.close(); </script>';
                     }
                 } else {
                     $errorMessage = "Sales Order Does Not Exist";
@@ -5059,5 +5063,40 @@ WHERE caa_problemno = ?
     {
         $usecase = new \CNCLTD\core\domain\usecases\AssignToBeLoggedToServiceRequest();
         $usecase->__invoke($toBeLogged, $serviceRequestId, $this->dbeUser);
+    }
+
+    private function assignLinkedSalesOrderToServiceRequestController()
+    {
+        $jsonData         = $this->getJSONData();
+        $serviceRequestId = $jsonData['serviceRequestId'];
+        $salesOrderId     = $jsonData['salesOrderId'];
+        $dbeSalesOrder    = new DBEOrdhead($this);
+        try {
+
+            if (!$dbeSalesOrder->getRow($salesOrderId)) {
+                error_log('sales order does not exist ..return json error');
+                throw new \CNCLTD\Exceptions\JsonHttpException(123, "Sales Order Does Not Exist");
+            }
+            $dbeProblem = new DBEProblem($this);
+            if (!$dbeProblem->getRow($serviceRequestId)) {
+                throw new \CNCLTD\Exceptions\JsonHttpException(123, "Service Request Does Not Exist");
+            }
+            if ($dbeProblem->getValue(DBEProblem::linkedSalesOrderID)) {
+                throw new \CNCLTD\Exceptions\JsonHttpException(123, "Service Request already has a linked sales order");
+            }
+            if ($dbeSalesOrder->getValue(DBEOrdhead::customerID) !== $dbeProblem->getValue(DBEProblem::customerID)) {
+                throw new \CNCLTD\Exceptions\JsonHttpException(
+                    123, "The given sales order does not belong to the customer of the Service Request"
+                );
+            }
+            $dbeProblem->setValue(
+                DBEJProblem::linkedSalesOrderID,
+                $salesOrderId
+            );
+            $dbeProblem->updateRow();
+            echo json_encode(["status" => "ok"]);
+        } catch (Exception $exception) {
+            echo $exception->getMessage();
+        }
     }
 }

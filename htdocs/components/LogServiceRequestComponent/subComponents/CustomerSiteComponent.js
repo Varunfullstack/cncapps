@@ -1,4 +1,4 @@
-import CKEditor from "../../shared/CKEditor.js";
+import CNCCKEditor from "../../shared/CNCCKEditor.js";
 import APICustomers from "../../services/ApiCustomers.js";
 import Spinner from "../../shared/Spinner/Spinner";
 import {padEnd, sort} from "../../utils/utils.js";
@@ -115,13 +115,11 @@ class CustomerSiteComponent extends MainComponent {
     };
     handleAssetSelect = (value) => {
         const {data, assets} = this.state;
-        if (value !== "") {
-            const index = assets.findIndex((a) => a.name == value);
-            //
-            const asset = assets[index];
+        const asset = assets.find((a) => a.name == value);
+        if (asset) {
             data.assetName = value;
-            data.assetTitle =
-                asset.name + " " + asset.LastUsername + " " + asset.BiosVer;
+            data.assetTitle = asset.name + " " + asset.LastUsername + " " + asset.BiosVer;
+            data.emptyAssetReason = "";
         } else {
             data.assetName = "";
             data.assetTitle = "";
@@ -177,10 +175,9 @@ class CustomerSiteComponent extends MainComponent {
             null,
             el("label", {className: "site-label"}, "Details"),
 
-            el(CKEditor, {
-                id: "reason",
+            el(CNCCKEditor, {
+                name: "reason",
                 value: this.state.data.reason,
-                inline: true,
                 height: 200,
                 onChange: (data) => this.setValue("reasonTemplate", data),
             }),
@@ -188,10 +185,9 @@ class CustomerSiteComponent extends MainComponent {
                 "div",
                 {style: {marginTop: 30}},
                 el("label", {className: "mt-5"}, "Internal Notes"),
-                el(CKEditor, {
-                    id: "internalNotes",
+                el(CNCCKEditor, {
                     value: this.state.data.internalNotes,
-                    inline: true,
+                    name: 'internalNotes',
                     height: 150,
                     onChange: (data) => this.setValue("internalNotesTemplate", data),
                 })
@@ -227,13 +223,15 @@ class CustomerSiteComponent extends MainComponent {
     getNoAssetModal = () => {
         const {data, noAssetStandardTextItems, emptyAssetReasonModalShowing} = this.state;
         const {el} = this;
-        return el(StandardTextModal,
+        return el(
+            StandardTextModal,
             {
                 options: noAssetStandardTextItems,
                 value: data.emptyAssetReason,
                 show: emptyAssetReasonModalShowing,
                 title: "Please provide the reason of not listing an asset",
                 okTitle: "OK",
+                noEditor: true,
                 onChange: (value) => {
                     if (!value) {
                         return;

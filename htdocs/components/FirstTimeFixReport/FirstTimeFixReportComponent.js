@@ -187,7 +187,7 @@ class FirstTimeFixReportComponent extends MainComponent {
                     <td>{e.userName}</td>
                     <td>{e.customerName}</td>
                     <td>
-                        <a href={`SRActivity.php?serviceRequestId=${e.problemID}`}
+                        <a href={`SRActivity.php?action=displayActivity&serviceRequestId=${e.problemID}`}
                            target={"_blank"}
                         > {e.problemID}</a>
                     </td>
