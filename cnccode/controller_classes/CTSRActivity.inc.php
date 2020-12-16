@@ -377,7 +377,7 @@ class CTSRActivity extends CTCNC
             "projectId"                       => $dbejCallActivity->getValue(DBEJCallActivity::projectID),
             "projects"                        => BUProject::getCustomerProjects($customerId),
             "cncNextAction"                   => $dbejCallActivity->getValue(DBEJCallActivity::cncNextAction),
-            "customerSummary"                 => $dbejCallActivity->getValue(DBEJCallActivity::customerSummary),
+            "customerNotes"                 => $dbejCallActivity->getValue(DBEJCallActivity::customerSummary),
             'activityTypeHasExpenses'         => BUActivityType::hasExpenses(
                 $dbejCallActivity->getValue(DBEJCallActivity::callActTypeID)
             ),

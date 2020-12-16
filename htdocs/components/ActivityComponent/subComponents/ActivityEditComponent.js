@@ -70,8 +70,8 @@ class ActivityEditComponent extends MainComponent {
                 submitAsOvertime: 0,
                 cncNextAction: "",
                 cncNextActionTemplate: "",
-                customerSummary: "",
-                customerSummaryTemplate: "",
+                customerNotes: "",
+                customerNotesTemplate: "",
                 priorityChangeReason: "",
                 emptyAssetReason: "",
                 emptyAssetReasonNotify: false
@@ -158,17 +158,17 @@ class ActivityEditComponent extends MainComponent {
             res.reasonTemplate = res.reason;
             res.cncNextActionTemplate = res.cncNextAction;
             res.internalNotesTemplate = res.internalNotes;
-            res.customerSummaryTemplate = res.customerSummary;
+            res.customerNotesTemplate = res.customerNotes;
             res.callActTypeIDOld = res.callActTypeID;
             res.orignalPriority = res.priority;
             const session = this.getSessionActivity(res.callActivityID);
             if (session) {
-                res.customerSummary = session.customerSummaryTemplate || res.customerSummary;
+                res.customerNotes = session.customerNotesTemplate || res.customerNotes;
                 res.internalNotes = session.internalNotesTemplate || res.internalNotes;
                 res.cncNextAction = session.cncNextActionTemplate || res.cncNextAction;
                 res.reason = session.reasonTemplate || res.reason;
 
-                res.customerSummaryTemplate = session.customerSummaryTemplate || res.customerSummaryTemplate;
+                res.customerNotesTemplate = session.customerNotesTemplate || res.customerNotesTemplate;
                 res.internalNotesTemplate = session.internalNotesTemplate || res.internalNotesTemplate;
                 res.cncNextActionTemplate = session.cncNextActionTemplate || res.cncNextActionTemplate;
                 res.reasonTemplate = session.reasonTemplate || res.reasonTemplate;
@@ -225,7 +225,7 @@ class ActivityEditComponent extends MainComponent {
         this.setState({allowLeaving: true});
         data.reason = data.reasonTemplate;
         data.cncNextAction = data.cncNextActionTemplate;
-        data.customerSummary = data.customerSummaryTemplate;
+        data.customerNotes = data.customerNotesTemplate;
         data.internalNotes = data.internalNotesTemplate;
         data.priority = this.state.priorities.find((p) => p.name == data.priority).id;
 
@@ -250,7 +250,7 @@ class ActivityEditComponent extends MainComponent {
             "internalNotes",
             "nextStatus",
             "escalationReason",
-            "customerSummary",
+            "customerNotes",
             "cncNextAction",
             "priority",
             "priorityChangeReason",
@@ -679,7 +679,7 @@ class ActivityEditComponent extends MainComponent {
                 internalNotesTemplate: data.internalNotesTemplate,
                 cncNextActionTemplate: data.cncNextActionTemplate,
                 reasonTemplate: data.reasonTemplate,
-                customerSummaryTemplate: data.customerSummaryTemplate,
+                customerNotesTemplate: data.customerNotesTemplate,
             }
             let activities = this.getSessionNotes().filter(a => a.id !== data.callActivityID);
             activities.push(activityEdit);
@@ -752,32 +752,32 @@ class ActivityEditComponent extends MainComponent {
                 return false;
         }
         if (!this.isHiddenFromCustomer(data)) {
-            if (this.checkcustomerSummaryRequired(type, data)) {
+            if (this.checkcustomerNotesRequired(type, data)) {
                 this.alert(`Customer Summary are required for ${type.description} when the next action is CNC Action`)
                 return false;
             }
-            if (this.checkcustomerSummaryOptionalAndEmptyDescription(type, data)) {
+            if (this.checkcustomerNotesOptionalAndEmptyDescription(type, data)) {
                 if (!await this.confirm(`Are you sure you don't want to put an entry for Customer Summary?`))
                     return false;
             }
         }
-        if (this.checkNotHiddenFromCustomerAndcustomerSummaryet(data)) {
+        if (this.checkNotHiddenFromCustomerAndcustomerNoteset(data)) {
             this.alert(hiddenAndCustomerNoteAlertMessage);
             return false;
         }
         return true;
     }
 
-    checkNotHiddenFromCustomerAndcustomerSummaryet(data) {
-        return this.isHiddenFromCustomer(data) && data.customerSummaryTemplate;
+    checkNotHiddenFromCustomerAndcustomerNoteset(data) {
+        return this.isHiddenFromCustomer(data) && data.customerNotesTemplate;
     }
 
-    checkcustomerSummaryOptionalAndEmptyDescription(type, data) {
-        return type && type.catRequireCustomerNoteCNCAction == 2 && !data.customerSummaryTemplate;
+    checkcustomerNotesOptionalAndEmptyDescription(type, data) {
+        return type && type.catRequireCustomerNoteCNCAction == 2 && !data.customerNotesTemplate;
     }
 
-    checkcustomerSummaryRequired(type, data) {
-        return type && type.catRequireCustomerNoteCNCAction == 1 && !data.customerSummaryTemplate;
+    checkcustomerNotesRequired(type, data) {
+        return type && type.catRequireCustomerNoteCNCAction == 1 && !data.customerNotesTemplate;
     }
 
     isHiddenFromCustomer(data) {
@@ -805,16 +805,16 @@ class ActivityEditComponent extends MainComponent {
         }
 
         if (!this.isHiddenFromCustomer(data)) {
-            if (this.checkcustomerSummaryRequiredOnHold(type, data)) {
+            if (this.checkcustomerNotesRequiredOnHold(type, data)) {
                 this.alert(`Customer Summary are required for ${type.description} when the next action is On Hold`)
                 return false;
             }
-            if (this.checkcustomerSummaryOptionalAndEmptyDescriptionOnHold(type, data)) {
+            if (this.checkcustomerNotesOptionalAndEmptyDescriptionOnHold(type, data)) {
                 if (!await this.confirm(`Are you sure you don't want to put an entry for Customer Summary?`))
                     return false;
             }
         }
-        if (this.checkNotHiddenFromCustomerAndcustomerSummaryet(data)) {
+        if (this.checkNotHiddenFromCustomerAndcustomerNoteset(data)) {
             this.alert(hiddenAndCustomerNoteAlertMessage);
             return false;
         }
@@ -841,12 +841,12 @@ class ActivityEditComponent extends MainComponent {
         return true;
     }
 
-    checkcustomerSummaryOptionalAndEmptyDescriptionOnHold(type, data) {
-        return type && type.catRequireCustomerNoteOnHold == 2 && !data.customerSummaryTemplate;
+    checkcustomerNotesOptionalAndEmptyDescriptionOnHold(type, data) {
+        return type && type.catRequireCustomerNoteOnHold == 2 && !data.customerNotesTemplate;
     }
 
-    checkcustomerSummaryRequiredOnHold(type, data) {
-        return type && type.catRequireCustomerNoteOnHold == 1 && !data.customerSummaryTemplate;
+    checkcustomerNotesRequiredOnHold(type, data) {
+        return type && type.catRequireCustomerNoteOnHold == 1 && !data.customerNotesTemplate;
     }
 
     checkNextCNCActionOptionalAndDesctiptionEmptyOnHold(type, data) {
@@ -1526,7 +1526,7 @@ class ActivityEditComponent extends MainComponent {
         );
     }
 
-    getcustomerSummary() {
+    getcustomerNotes() {
         const {el} = this;
         const {data} = this.state;
         return el(
@@ -1546,10 +1546,10 @@ class ActivityEditComponent extends MainComponent {
             ),
             this.state._activityLoaded
                 ? el(CNCCKEditor, {
-                    id: "customerSummary",
-                    value: data?.customerSummary,
+                    id: "customerNotes",
+                    value: data?.customerNotes,
                     type: "inline",
-                    onChange: (value) => this.setValue("customerSummaryTemplate", value),
+                    onChange: (value) => this.setValue("customerNotesTemplate", value),
                 })
                 : null
         );
@@ -1794,7 +1794,7 @@ class ActivityEditComponent extends MainComponent {
                 </div>
                 {this.getContentElement()}
                 {this.getActivityNotes()}
-                {this.getcustomerSummary()}
+                {this.getcustomerNotes()}
                 {this.getActivityInternalNotes()}
                 <CustomerDocumentUploader
                     onDeleteDocument={(id) => this.deleteDocument(id)}

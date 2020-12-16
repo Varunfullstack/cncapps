@@ -322,7 +322,7 @@ class ActivityDisplayComponent extends MainComponent {
         return this.el('span', {style: {width: 35}})
     }
     handleConfirmEmail = async (data) => {
-        if (!data.customerSummary) {
+        if (!data.customerNotes) {
             this.alert('Please enter Customer Summary information in the activity before sending a visit confirmation.');
             return;
         }
@@ -665,7 +665,7 @@ class ActivityDisplayComponent extends MainComponent {
             })
         );
     }
-    getcustomerSummaryElement = () => {
+    getcustomerNotesElement = () => {
         const {el} = this;
         const {data} = this.state;
         return el('div', {className: "round-container"},
@@ -680,7 +680,7 @@ class ActivityDisplayComponent extends MainComponent {
                     title: "This information will be sent to the customer in an email unless the entire Service Request is hidden.",
                     content: el("i", {className: "fal fa-info-circle mt-5 pointer icon"})
                 })
-            ), el('div', {dangerouslySetInnerHTML: {__html: data?.customerSummary}})
+            ), el('div', {dangerouslySetInnerHTML: {__html: data?.customerNotes}})
         );
     }
 
@@ -988,7 +988,7 @@ class ActivityDisplayComponent extends MainComponent {
                 {this.getActivitiesElement()}
                 {this.getContentElement()}
                 {this.getDetialsElement()}
-                {this.getcustomerSummaryElement()}
+                {this.getcustomerNotesElement()}
                 {this.getNotesElement()}
                 <CustomerDocumentUploader
                     onDeleteDocument={(id) => this.deleteDocument(id)}
