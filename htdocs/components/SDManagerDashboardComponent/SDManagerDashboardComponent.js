@@ -164,7 +164,6 @@ class SDManagerDashboardComponent extends MainComponent {
             DAILY_STATS_TAB
         ].findIndex(x => x === filter.activeTab) > -1;
 
-
         return (
             <div className="m-5">
                 {
