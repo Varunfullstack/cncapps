@@ -1,9 +1,9 @@
 import MainComponent from "../../shared/MainComponent";
 import APIActivity from "../../services/APIActivity";
-import CNCCKEditor from "../../shared/CNCCKEditor";
 import ToolTip from "../../shared/ToolTip";
 import {params} from "../../utils/utils";
 import React from 'react';
+import EditorFieldComponent from "../../shared/EditorField/EditorFieldComponent";
 
 class GatherManagementReviewDetailsComponent extends MainComponent {
     el = React.createElement;
@@ -14,35 +14,34 @@ class GatherManagementReviewDetailsComponent extends MainComponent {
         this.state = {...this.state, description: ""};
     }
 
+    getHistoryLink() {
+        return <a
+            className="fal fa-history fa-2x icon pointer m-4"
+            href={`Activity.php?problemID=${params.get("problemID")}&action=problemHistoryPopup&htmlFmt=popup`}
+            target="_blank"
+        />
+    }
+
     getElements = () => {
-        const {el} = this;
-        return el(
-            "div",
-            {style: {flex: 1, width: 850, justifyContent: "flext-start"}},
-            el(ToolTip, {
-                    width: 50,
-                    title: "History",
-                    content: el("a", {
-                        className: "fal fa-history fa-2x icon pointer m-4",
-                        href: `Activity.php?problemID=${params.get(
-                            "problemID"
-                        )}&action=problemHistoryPopup&htmlFmt=popup`,
-                        target: "_blank",
-                    }),
-                }
-            ),
-            el('label', {
-                className: "m-5",
-                style: {fontSize: 18, display: "block"}
-            }, "Why does this SR require review by management?"),
-            el(CNCCKEditor, {
-                name: 'managementReviewDetails',
-                height: 200,
-                type: "inline",
-                onChange: ($event) => this.setState({description: $event.editor.getData()})
-            }),
-            el('button', {onClick: this.handleOnSave}, "Save")
-        );
+        const {description} = this.state;
+
+        return <div style={{flex: 1, width: 850, justifyContent: "flext-start"}}>
+            <ToolTip width="50"
+                     title="History"
+                     content={this.getHistoryLink()}
+            />
+            <label className="m-5"
+                   style={{fontSize: 18, display: "block"}}
+            >
+                Why does this SR require review by management?
+            </label>
+            <EditorFieldComponent name="managementReviewDetails"
+                                  value={description}
+                                  onChange={(value) => this.setState({description: value})}
+            />
+
+            <button onClick={this.handleOnSave}>Save</button>
+        </div>
     };
     handleOnSave = () => {
         const {description} = this.state;

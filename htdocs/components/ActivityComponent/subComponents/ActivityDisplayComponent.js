@@ -910,10 +910,20 @@ class ActivityDisplayComponent extends MainComponent {
                     templateOptions.length > 0 ? el('select', {onChange: this.handleTemplateChanged},
                         el('option', {key: 'empty', value: -1}, "-- Pick an option --"),
                         templateOptions.map(s => el('option', {key: s.id, value: s.id}, s.name))) : null,
-                    el(CNCCKEditor, {
-                        key: 'salesRequestEditor', name: 'salesRequest', value: templateDefault
-                        , onChange: this.handleTemplateValueChange
-                    })
+                    el('div', {className: 'modal_editor'},
+                        el('div', {id: 'top2'}),
+                        el(CNCCKEditor, {
+                            key: "salesRequestEditor",
+                            name: "salesRequest",
+                            value: templateDefault,
+                            type: "inline",
+                            onChange: this.handleTemplateValueChange,
+                            sharedSpaces: true,
+                            top: "top2",
+                            bottom: "bottom2"
+                        }),
+                        el('div', {id: 'bottom2'}),
+                    )
                 ),
                 footer: el('div', {key: "footer"},
                     el('button', {onClick: () => this.handleTemplateSend(templateType)}, "Send"),

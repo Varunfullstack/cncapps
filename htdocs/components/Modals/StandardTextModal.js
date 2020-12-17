@@ -96,13 +96,19 @@ class StandardTextModal extends React.Component {
         }
 
         return (
-            <CNCCKEditor key={'salesRequest'}
-                         name="salesRequest"
-                         value={value}
-                         onChange={($event) => this.handleTemplateValueChange($event.editor.getData())}
-                         height="100"
-                         className="CNCCKEditor"
-            />
+            <React.Fragment>
+                <div>
+
+                </div>
+                <CNCCKEditor key={'salesRequest'}
+                             name="salesRequest"
+                             value={value}
+                             onChange={($event) => this.handleTemplateValueChange($event.editor.getData())}
+                             height="100"
+                             className="CNCCKEditor"
+                />
+            </React.Fragment>
+
         )
     }
 

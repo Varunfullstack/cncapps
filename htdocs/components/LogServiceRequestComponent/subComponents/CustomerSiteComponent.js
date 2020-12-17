@@ -1,4 +1,3 @@
-import CNCCKEditor from "../../shared/CNCCKEditor.js";
 import APICustomers from "../../services/ApiCustomers.js";
 import Spinner from "../../shared/Spinner/Spinner";
 import {padEnd, sort} from "../../utils/utils.js";
@@ -6,6 +5,7 @@ import MainComponent from "../../shared/MainComponent.js";
 import React from 'react';
 import StandardTextModal from "../../Modals/StandardTextModal";
 import APIStandardText from "../../services/APIStandardText";
+import EditorFieldComponent from "../../shared/EditorField/EditorFieldComponent";
 
 class CustomerSiteComponent extends MainComponent {
     el = React.createElement;
@@ -169,29 +169,27 @@ class CustomerSiteComponent extends MainComponent {
     };
 
     getNotesElement = () => {
-        const {el} = this;
-        return el(
-            "div",
-            null,
-            el("label", {className: "site-label"}, "Details"),
-
-            el(CNCCKEditor, {
-                name: "reason",
-                value: this.state.data.reason,
-                height: 200,
-                onChange: ($event) => this.setValue("reasonTemplate", $event.editor.getData()),
-            }),
-            el(
-                "div",
-                {style: {marginTop: 30}},
-                el("label", {className: "mt-5"}, "Internal Notes"),
-                el(CNCCKEditor, {
-                    value: this.state.data.internalNotes,
-                    name: 'internalNotes',
-                    height: 150,
-                    onChange: ($event) => this.setValue("internalNotesTemplate", $event.editor.getData()),
-                })
-            )
+        return (
+            <React.Fragment>
+                <div>
+                    <label className="site-label">
+                        Details
+                    </label>
+                    <EditorFieldComponent name="reason"
+                                          value={this.state.data.reason}
+                                          onChange={(value) => this.setValue("reasonTemplate", value)}
+                    />
+                </div>
+                <div>
+                    <label className="site-label">
+                        Internal Notes
+                    </label>
+                    <EditorFieldComponent name="internalNotes"
+                                          value={this.state.data.internalNotes}
+                                          onChange={(value) => this.setValue("internalNotesTemplate", value)}
+                    />
+                </div>
+            </React.Fragment>
         );
     };
     handleNext = async () => {

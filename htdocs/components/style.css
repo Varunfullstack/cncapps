@@ -1029,3 +1029,21 @@ input:checked + .slider:before {
     color: white;
     background-color: #575757;
 }
+
+.inline_editor_field {
+    border: 1px solid #bdbec1;
+}
+
+.inline_editor_field .cke_editable_inline {
+    min-height: 28px;
+    padding: 4px;
+}
+
+.modal_editor {
+    border: 1px solid #bdbec1;
+}
+
+.modal_editor .cke_editable_inline {
+    min-height: 42px;
+    padding: 4px;
+}

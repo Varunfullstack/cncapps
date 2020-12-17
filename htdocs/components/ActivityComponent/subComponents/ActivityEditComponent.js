@@ -17,6 +17,7 @@ import Toggle from "../../shared/Toggle";
 import CustomerDocumentUploader from "./CustomerDocumentUploader";
 import {InternalDocumentsComponent} from "./InternalDocumentsComponent";
 import {ActivityHeaderComponent} from "./ActivityHeaderComponent";
+import EditorFieldComponent from "../../shared/EditorField/EditorFieldComponent";
 
 // noinspection EqualityComparisonWithCoercionJS
 const hiddenAndCustomerNoteAlertMessage = `Customer note must be empty when the activity or entire SR is hidden.`;
@@ -1421,13 +1422,23 @@ class ActivityEditComponent extends MainComponent {
                     )
                     : null,
                 this.state._activityLoaded
-                    ? el(CNCCKEditor, {
-                        key: "salesRequestEditor",
-                        name: "salesRequest",
-                        value: templateValue,
-                        type: "inline",
-                        onChange: this.handleTemplateValueChange,
-                    })
+                    ?
+
+                    el('div', {className: 'modal_editor'},
+                        el('div', {id: 'top2'}),
+                        el(CNCCKEditor, {
+                            key: "salesRequestEditor",
+                            name: "salesRequest",
+                            value: templateValue,
+                            type: "inline",
+                            onChange: this.handleTemplateValueChange,
+                            sharedSpaces: true,
+                            top: "top2",
+                            bottom: "bottom2"
+                        }),
+                        el('div', {id: 'bottom2'}),
+                    )
+
                     : null
             ),
             footer: el(
@@ -1492,17 +1503,15 @@ class ActivityEditComponent extends MainComponent {
                     })
                 ),
                 this.state._activityLoaded
-                    ? el(CNCCKEditor, {
-                        name: "reason",
-                        value: data?.reason,
-                        type: "inline",
-                        style: {flex: "1 0 auto"},
-                        onChange: ($event) => this.setValue("reasonTemplate", $event.editor.getData()),
-                    })
+                    ?
+                    <EditorFieldComponent name="reason"
+                                          value={data?.reason}
+                                          onChange={(value) => this.setValue("reasonTemplate", value)}
+                    />
                     : null
             ),
             el('div', {className: "round-container flex-1"},
-                el('div', {className: "flex-row", style: {flex: "0 1 auto"} },
+                el('div', {className: "flex-row", style: {flex: "0 1 auto"}},
                     el(
                         "label",
                         {className: "label m-5 mr-2", style: {display: "block"}},
@@ -1515,13 +1524,11 @@ class ActivityEditComponent extends MainComponent {
                     })
                 ),
                 this.state._activityLoaded
-                    ? el(CNCCKEditor, {
-                        name: "cncNextAction",
-                        value: data?.cncNextAction,
-                        type: "inline",
-
-                        onChange: ($event) => this.setValue("cncNextActionTemplate",  $event.editor.getData()),
-                    })
+                    ?
+                    <EditorFieldComponent name="cncNextAction"
+                                          value={data?.cncNextAction}
+                                          onChange={(value) => this.setValue("cncNextActionTemplate", value)}
+                    />
                     : null
             )
         );
@@ -1546,12 +1553,11 @@ class ActivityEditComponent extends MainComponent {
                 })
             ),
             this.state._activityLoaded
-                ? el(CNCCKEditor, {
-                    name: "customerNotes",
-                    value: data?.customerNotes,
-                    type: "inline",
-                    onChange: ($event) => this.setValue("customerNotesTemplate", $event.editor.getData()),
-                })
+                ?
+                <EditorFieldComponent name="customerNotes"
+                                      value={data?.customerNotes}
+                                      onChange={(value) => this.setValue("customerNotesTemplate", value)}
+                />
                 : null
         );
     }
@@ -1575,12 +1581,11 @@ class ActivityEditComponent extends MainComponent {
                 })
             ),
             this.state._activityLoaded
-                ? el(CNCCKEditor, {
-                    name: "internal",
-                    value: data?.internalNotes,
-                    type: "inline",
-                    onChange: ($event) => this.setValue("internalNotesTemplate",$event.editor.getData()),
-                })
+                ?
+                <EditorFieldComponent name="internal"
+                                      value={data?.internalNotes}
+                                      onChange={(value) => this.setValue("internalNotesTemplate", value)}
+                />
                 : null
         );
     }

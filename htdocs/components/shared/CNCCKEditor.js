@@ -19,7 +19,7 @@ class CNCCKEditor extends React.Component {
     }
 
     _initEditor() {
-        const {readOnly, type, onBeforeLoad, style, data} = this.props;
+        const {readOnly, type, onBeforeLoad, style, value, disableClipboard} = this.props;
         const config = this.getCNCCKEditorConfig();
         config.readOnly = readOnly;
 
@@ -49,20 +49,24 @@ class CNCCKEditor extends React.Component {
             if (type === 'inline' && !readOnly) {
                 editor.on('instanceReady', () => {
                     editor.setReadOnly(false);
-                    console.log('setting stiles here');
                     editor.container.setStyles(style);
                 }, null, null, -1);
             }
 
+            if (disableClipboard) {
+                editor.on('paste', (evt) => {
+                    evt.stop();
+                })
+            }
+
             if (style && type !== 'inline') {
                 editor.on('loaded', () => {
-                    console.log('trying to set styles here', style);
                     editor.container.setStyles(style);
                 });
             }
 
-            if (data) {
-                editor.setData(data);
+            if (value) {
+                editor.setData(value);
             }
         }).catch(console.error);
     }
@@ -79,8 +83,8 @@ class CNCCKEditor extends React.Component {
             return;
         }
 
-        if (prevProps.data !== props.data && editor.getData() !== props.data) {
-            editor.setData(props.data);
+        if (prevProps.value !== props.value && editor.getData() !== props.value) {
+            editor.setData(props.value);
         }
 
         if (prevProps.readOnly !== props.readOnly) {
@@ -88,7 +92,6 @@ class CNCCKEditor extends React.Component {
         }
 
         if (prevProps.style !== props.style && editor.container) {
-            console.log('trying to set styles here, container exists', props.style);
             editor.container.setStyles(props.style);
         }
 
@@ -131,13 +134,13 @@ class CNCCKEditor extends React.Component {
         return <div id={this.props.name}
                     name={this.props.name}
                     style={this.props.style}
-                    className="CNCCKEditor black"
                     ref={ref => (this.element = ref)}
+                    className="testing"
         />;
     }
 
     getCNCCKEditorConfig = () => {
-        return {
+        const defaultConfig = {
             contentsCss: "/screen.css",
             toolbarStartupExpanded: false,
             toolbar: "CNCToolbar",
@@ -167,11 +170,20 @@ class CNCCKEditor extends React.Component {
             width: this.props.width || "auto",
             height: this.props.height || 500,
             resize_minHeight: this.props.height || 500,
-            removePlugins: 'liststyle,tabletools,language,tableselection,scayt,wsc',
+            removePlugins: "liststyle,tabletools,language,tableselection,scayt,wsc",
             disableNativeSpellChecker: true,
             wsc_customDictionaryIds: '100920',
-
         };
+
+        if (this.props.sharedSpaces) {
+            defaultConfig.extraPlugins += ",sharedspace";
+            defaultConfig.removePlugins += ",floatingspace,maximize,resize";
+            defaultConfig.sharedSpaces = {
+                top: this.props.top,
+                bottom: this.props.bottom
+            };
+        }
+        return defaultConfig;
     }
 
 
@@ -182,20 +194,20 @@ CNCCKEditor.propTypes = {
         'classic',
         'inline'
     ]),
-    data: PropTypes.string,
+    value: PropTypes.string,
     config: PropTypes.object,
     name: PropTypes.string,
     style: PropTypes.object,
     readOnly: PropTypes.bool,
-    onBeforeLoad: PropTypes.func
+    onBeforeLoad: PropTypes.func,
+    minCharCount: PropTypes.number,
 };
 
 CNCCKEditor.defaultProps = {
     type: 'classic',
-    data: '',
+    value: '',
     config: {},
-    readOnly: false,
-    style: {border: "1px solid #595959"}
+    readOnly: false
 };
 
 CNCCKEditor.editorUrl = 'https://cdn.ckeditor.com/4.15.1/standard-all/ckeditor.js';
