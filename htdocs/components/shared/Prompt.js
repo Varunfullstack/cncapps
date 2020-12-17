@@ -34,7 +34,7 @@ class Prompt extends React.Component {
 
         if (isEditor) {
             return <CNCCKEditor name="prompt"
-                                onChange={(value) => this.setState({reason: value})}
+                                onChange={($event) => this.setState({reason: $event.editor.getData()})}
                                 value={defaultValue}
             />
         }

@@ -1021,6 +1021,10 @@ input:checked + .slider:before {
     border: 1px #ffffff solid;
 }
 
+.CNCCKEditor .black {
+    border-color: black;
+}
+
 .standardTextModal textarea {
     color: white;
     background-color: #575757;

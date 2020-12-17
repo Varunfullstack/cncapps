@@ -39,7 +39,7 @@ class GatherManagementReviewDetailsComponent extends MainComponent {
                 name: 'managementReviewDetails',
                 height: 200,
                 type: "inline",
-                onChange: (description) => this.setState({description})
+                onChange: ($event) => this.setState({description: $event.editor.getData()})
             }),
             el('button', {onClick: this.handleOnSave}, "Save")
         );

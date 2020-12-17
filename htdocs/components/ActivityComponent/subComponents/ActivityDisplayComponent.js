@@ -862,8 +862,8 @@ class ActivityDisplayComponent extends MainComponent {
         }
         this.setState({templateDefault, templateOptionId, templateValue});
     }
-    handleTemplateValueChange = (value) => {
-        this.setState({templateValue: value})
+    handleTemplateValueChange = ($event) => {
+        this.setState({templateValue: $event.editor.getData()})
     }
     handleTemplateSend = async (type) => {
         const {templateValue, templateOptionId, data, currentActivity} = this.state;

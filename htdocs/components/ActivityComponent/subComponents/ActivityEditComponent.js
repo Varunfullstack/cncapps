@@ -1349,8 +1349,8 @@ class ActivityEditComponent extends MainComponent {
         }
         test();
     };
-    handleTemplateValueChange = (value) => {
-        this.setState({templateValue: value});
+    handleTemplateValueChange = ($event) => {
+        this.setState({templateValue: $event.editor.getData()});
     };
     handleTemplateSend = async (type) => {
         const {
@@ -1477,9 +1477,9 @@ class ActivityEditComponent extends MainComponent {
 
         return el(
             "div",
-            {style: {display: "flex", flexDirection: "row"}},
-            el('div', {className: "round-container flex-2 mr-5"},
-                el('div', {className: "flex-row"},
+            {className: "flex-row"},
+            el('div', {className: "round-container flex-2 mr-5 flex-column"},
+                el('div', {className: "flex-row", style: {flex: "0 1 auto"}},
                     el(
                         "label",
                         {className: "label m-5 mr-2", style: {display: "block"}},
@@ -1496,13 +1496,13 @@ class ActivityEditComponent extends MainComponent {
                         name: "reason",
                         value: data?.reason,
                         type: "inline",
-                        style: {height: '50px'},
-                        onChange: (value) => this.setValue("reasonTemplate", value),
+                        style: {flex: "1 0 auto"},
+                        onChange: ($event) => this.setValue("reasonTemplate", $event.editor.getData()),
                     })
                     : null
             ),
             el('div', {className: "round-container flex-1"},
-                el('div', {className: "flex-row"},
+                el('div', {className: "flex-row", style: {flex: "0 1 auto"} },
                     el(
                         "label",
                         {className: "label m-5 mr-2", style: {display: "block"}},
@@ -1519,14 +1519,15 @@ class ActivityEditComponent extends MainComponent {
                         name: "cncNextAction",
                         value: data?.cncNextAction,
                         type: "inline",
-                        onChange: (value) => this.setValue("cncNextActionTemplate", value),
+
+                        onChange: ($event) => this.setValue("cncNextActionTemplate",  $event.editor.getData()),
                     })
                     : null
             )
         );
     }
 
-    getcustomerNotes() {
+    getCustomerNotes() {
         const {el} = this;
         const {data} = this.state;
         return el(
@@ -1549,7 +1550,7 @@ class ActivityEditComponent extends MainComponent {
                     name: "customerNotes",
                     value: data?.customerNotes,
                     type: "inline",
-                    onChange: (value) => this.setValue("customerNotesTemplate", value),
+                    onChange: ($event) => this.setValue("customerNotesTemplate", $event.editor.getData()),
                 })
                 : null
         );
@@ -1578,7 +1579,7 @@ class ActivityEditComponent extends MainComponent {
                     name: "internal",
                     value: data?.internalNotes,
                     type: "inline",
-                    onChange: (value) => this.setValue("internalNotesTemplate", value),
+                    onChange: ($event) => this.setValue("internalNotesTemplate",$event.editor.getData()),
                 })
                 : null
         );
@@ -1794,7 +1795,7 @@ class ActivityEditComponent extends MainComponent {
                 </div>
                 {this.getContentElement()}
                 {this.getActivityNotes()}
-                {this.getcustomerNotes()}
+                {this.getCustomerNotes()}
                 {this.getActivityInternalNotes()}
                 <CustomerDocumentUploader
                     onDeleteDocument={(id) => this.deleteDocument(id)}

@@ -179,7 +179,7 @@ class CustomerSiteComponent extends MainComponent {
                 name: "reason",
                 value: this.state.data.reason,
                 height: 200,
-                onChange: (data) => this.setValue("reasonTemplate", data),
+                onChange: ($event) => this.setValue("reasonTemplate", $event.editor.getData()),
             }),
             el(
                 "div",
@@ -189,7 +189,7 @@ class CustomerSiteComponent extends MainComponent {
                     value: this.state.data.internalNotes,
                     name: 'internalNotes',
                     height: 150,
-                    onChange: (data) => this.setValue("internalNotesTemplate", data),
+                    onChange: ($event) => this.setValue("internalNotesTemplate", $event.editor.getData()),
                 })
             )
         );
