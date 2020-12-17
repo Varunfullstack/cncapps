@@ -65,16 +65,28 @@ class CustomerSearchComponent extends React.Component {
         });
     };
     handleCustomerSelect = (customer) => {
-        //
-        //const projects= await ;
-        if (this.props.updateSRData)
+        if (customer.supportLevel === 'furlough') {
+            return;
+        }
+        if (this.props.updateSRData) {
             this.props.updateSRData({customer, customerID: customer.cus_custno, nextStep: 2});
+        }
         this.apiCustomer.getCustomerProjects(customer.cus_custno).then(projects => {
             if (this.props.updateSRData)
                 this.props.updateSRData({projects});
         })
-
     }
+
+    getLink(customer, field) {
+        return (
+            <label className={customer.supportLevel === 'furlough' ? '' : "pointer"}
+                   onClick={() => this.handleCustomerSelect(customer)}
+            >
+                {customer[field]}
+            </label>
+        );
+    }
+
     getCustomersElement = () => {
         const {el, handleCustomerSelect} = this;
         const {customers} = this.state;
@@ -108,15 +120,7 @@ class CustomerSearchComponent extends React.Component {
                 width: "220",
                 hdClassName: "",
                 textColorColumn: "color",
-                content: (customer) =>
-                    el(
-                        "label",
-                        {
-                            className: "pointer",
-                            onClick: () => handleCustomerSelect(customer)
-                        },
-                        customer.cus_name
-                    ),
+                content: (customer) => this.getLink(customer, 'cus_name'),
             },
             {
                 hide: false,
@@ -128,15 +132,7 @@ class CustomerSearchComponent extends React.Component {
                 sortable: false,
                 hdClassName: "",
                 textColorColumn: "color",
-                content: (customer) =>
-                    el(
-                        "label",
-                        {
-                            className: "pointer",
-                            onClick: () => handleCustomerSelect(customer)
-                        },
-                        customer.site_name
-                    ),
+                content: (customer) => this.getLink(customer, 'site_name'),
             },
             {
                 hide: false,
@@ -148,15 +144,7 @@ class CustomerSearchComponent extends React.Component {
                 sortable: false,
                 hdClassName: "",
                 textColorColumn: "color",
-                content: (customer) =>
-                    el(
-                        "label",
-                        {
-                            className: "pointer",
-                            onClick: () => handleCustomerSelect(customer)
-                        },
-                        customer.contact_name
-                    ),
+                content: (customer) => this.getLink(customer, 'contact_name'),
             },
             {
                 hide: false,
@@ -168,15 +156,7 @@ class CustomerSearchComponent extends React.Component {
                 sortable: false,
                 hdClassName: "",
                 textColorColumn: "color",
-                content: (customer) =>
-                    el(
-                        "label",
-                        {
-                            className: "pointer",
-                            onClick: () => handleCustomerSelect(customer)
-                        },
-                        customer.con_position
-                    ),
+                content: (customer) => this.getLink(customer, 'con_position'),
             },
             {
                 hide: false,
@@ -188,15 +168,7 @@ class CustomerSearchComponent extends React.Component {
                 sortable: false,
                 hdClassName: "",
                 textColorColumn: "color",
-                content: (customer) =>
-                    el(
-                        "label",
-                        {
-                            className: "pointer",
-                            onClick: () => handleCustomerSelect(customer)
-                        },
-                        customer.supportLevel
-                    ),
+                content: (customer) => this.getLink(customer, 'supportLevel'),
             },
             {
                 hide: false,
@@ -208,15 +180,7 @@ class CustomerSearchComponent extends React.Component {
                 sortable: false,
                 hdClassName: "",
                 textColorColumn: "color",
-                content: (customer) =>
-                    el(
-                        "label",
-                        {
-                            className: "pointer",
-                            onClick: () => handleCustomerSelect(customer)
-                        },
-                        customer.con_phone
-                    ),
+                content: (customer) => this.getLink(customer, 'con_phone'),
             },
             {
                 hide: false,
@@ -228,15 +192,7 @@ class CustomerSearchComponent extends React.Component {
                 sortable: false,
                 hdClassName: "",
                 textColorColumn: "color",
-                content: (customer) =>
-                    el(
-                        "label",
-                        {
-                            className: "pointer",
-                            onClick: () => handleCustomerSelect(customer)
-                        },
-                        customer.con_notes
-                    ),
+                content: (customer) => this.getLink(customer, 'con_notes'),
             },
         ];
         columns = columns

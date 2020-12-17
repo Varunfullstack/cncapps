@@ -341,14 +341,23 @@ class ActivityDisplayComponent extends MainComponent {
         }
     }
     handleDelete = async (data) => {
-        let deleteActivity = false;
-        if (data.activities.length == 1) {
-            if (await this.confirm('Deleting this activity will remove all traces of this Service Request from the system. Are you sure?'))
-                deleteActivity = true;
-        } else if (await this.confirm('Delete this activity?'))
-            deleteActivity = true;
-        if (deleteActivity)
-            this.api.deleteActivity(data.callActivityID).then(res => this.goPrevActivity())
+
+        const isLastActivity = data.activities.length === 1
+        let message = 'Delete this activity?';
+
+        if (isLastActivity) {
+            message = 'Deleting this activity will remove all traces of this Service Request from the system. Are you sure?';
+        }
+        if (!await this.confirm(message)) {
+            return;
+        }
+        this.api.deleteActivity(data.callActivityID).then(res => {
+            if (isLastActivity) {
+                window.location = 'CurrentActivityReport.php';
+                return;
+            }
+            this.goPrevActivity()
+        })
 
     }
     handleFollowOn = async () => {
@@ -599,7 +608,7 @@ class ActivityDisplayComponent extends MainComponent {
             el('label', {style: {textAlign: "left", whiteSpace: "nowrap", marginLeft: 5}}, text),
         )
     }
-    getDetialsElement = () => {
+    getDetailsElement = () => {
         const {el} = this;
         const {data} = this.state;
         return el("div", {className: "flex-row"},
@@ -997,7 +1006,7 @@ class ActivityDisplayComponent extends MainComponent {
                 {this.getActions()}
                 {this.getActivitiesElement()}
                 {this.getContentElement()}
-                {this.getDetialsElement()}
+                {this.getDetailsElement()}
                 {this.getcustomerNotesElement()}
                 {this.getNotesElement()}
                 <CustomerDocumentUploader

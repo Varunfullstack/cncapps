@@ -533,7 +533,7 @@ class SDManagerDashboardComponent extends MainComponent {
                     hdClassName: "text-center",
                 },
                 {
-                    display: [HELD_FOR_QA_TAB].indexOf(filter.activeTab) >= 0,
+                    display: HELD_FOR_QA_TAB === filter.activeTab,
                     path: "fixedDate",
                     label: "",
                     hdToolTip: "Fixed date",
@@ -542,9 +542,10 @@ class SDManagerDashboardComponent extends MainComponent {
                     sortable: false,
                     className: "text-center",
                     content: (problem => {
-                        if (!problem.fixedDate) {
+                        if (!problem.fixedDate || ["F", "C"].indexOf(problem.status) === -1) {
                             return null;
                         }
+
                         return moment(problem.fixedDate, 'YYYY-MM-DD').format('DD/MM/YYYY')
                     })
                 },

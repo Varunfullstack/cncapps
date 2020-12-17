@@ -1219,7 +1219,6 @@ class BUActivity extends Business
         $chargeableHours  = $result->fetch_object()->chargeableHours;
         $problem          = new DBEProblem($this);
         $problem->getRow($dsCallActivity->getValue(DBEJCallActivity::problemID));
-
         $problem->setValue(
             DBEJProblem::contractCustomerItemID,
             $dsCallActivity->getValue(DBEJCallActivity::contractCustomerItemID)
@@ -1228,6 +1227,7 @@ class BUActivity extends Business
             DBEJProblem::internalNotes,
             $dsCallActivity->getValue(DBEJCallActivity::internalNotes)
         );
+
         $problem->setValue(
             DBEJProblem::completeDate,
             $dsCallActivity->getValue(DBEJCallActivity::completeDate)
@@ -1440,10 +1440,9 @@ class BUActivity extends Business
         );
         $template   = '@customerFacing/ActivityLogged/ActivityLogged.html.twig';
         $subject    = "Service Request {$dbejCallactivity->getValue(DBEJCallActivity::problemID)} - {$dbejCallactivity->getValue(DBEJCallActivity::emailSubjectSummary)} - Updated";
-        $selfFlag   = DBEContact::workUpdatesEmailFlag;
         $othersFlag = DBEContact::othersWorkUpdatesEmailFlag;
-        $this->sendCustomerEmail($template, $data, $dbejCallactivity, $selfFlag, $othersFlag, $subject);
-    } // end sendUpdatedByAnotherUserEmail
+        $this->sendCustomerEmail($template, $data, $dbejCallactivity, $othersFlag, $subject);
+    }
 
     /**
      * @param DBEJCallActivity $dbejCallactivity
@@ -1464,9 +1463,9 @@ class BUActivity extends Business
      * @param string $template
      * @param $data
      * @param DBEJCallActivity $dbejCallactivity
-     * @param string $selfFlag
      * @param string $othersFlag
      * @param string $subject
+     * @param string|null $selfFlag
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
@@ -1474,9 +1473,9 @@ class BUActivity extends Business
     private function sendCustomerEmail(string $template,
                                        $data,
                                        DBEJCallActivity $dbejCallactivity,
-                                       string $selfFlag,
                                        string $othersFlag,
-                                       string $subject
+                                       string $subject,
+                                       ?string $selfFlag = null
     ): void
     {
         if (!$this->shouldSendCustomerEmail($dbejCallactivity)) {
@@ -1489,13 +1488,12 @@ class BUActivity extends Business
         );
         $emailRecipients = $this->getEmailRecipients(
             $dbejCallactivity,
-            $selfFlag,
-            $othersFlag
+            $othersFlag,
+            $selfFlag
         );
-        if(!$emailRecipients){
+        if (!$emailRecipients) {
             return;
         }
-
         $this->sendEmail($body, $subject, $emailRecipients);
     }
 
@@ -1516,15 +1514,15 @@ class BUActivity extends Business
     }
 
     private function getEmailRecipients(DBEJCallActivity $dbejCallactivity,
-                                        string $selfFlag,
-                                        string $othersFlag
+                                        string $othersFlag,
+                                        ?string $selfFlag = null
     )
     {
         $dbeSelfContact = new DBEContact($this);
         $contactID      = $dbejCallactivity->getValue(DBEJCallActivity::contactID);
         $dbeSelfContact->getRow($contactID);
         $emails = [];
-        if ($dbeSelfContact->getValue($selfFlag) == 'Y') {
+        if (!$selfFlag || $dbeSelfContact->getValue($selfFlag) == 'Y') {
             $emails[] = $dbeSelfContact->getValue(DBEContact::email);
         }
         $dbeProblem = new DBEProblem($this);
@@ -2260,11 +2258,10 @@ class BUActivity extends Business
             $sla,
             $status
         );
-        $selfFlag         = DBEContact::workUpdatesEmailFlag;
         $othersFlag       = DBEContact::othersWorkUpdatesEmailFlag;
         $subject          = "Service Request {$serviceRequestId} - {$dbejCallactivity->getValue(DBEJCallActivity::emailSubjectSummary)} - Updated";
         $template         = '@customerFacing/ServicePriorityChanged/ServicePriorityChanged.html.twig';
-        $this->sendCustomerEmail($template, $data, $dbejCallactivity, $selfFlag, $othersFlag, $subject);
+        $this->sendCustomerEmail($template, $data, $dbejCallactivity, $othersFlag, $subject);
     }
 
     function computeDiff($from,
@@ -5001,7 +4998,7 @@ class BUActivity extends Business
         $subject    = "Service Request {$serviceRequestId} - {$dbejCallactivity->getValue(DBEJCallActivity::emailSubjectSummary)} - Logged";
         $selfFlag   = DBEContact::initialLoggingEmailFlag;
         $othersFlag = DBEContact::othersInitialLoggingEmailFlag;
-        $this->sendCustomerEmail($template, $data, $dbejCallactivity, $selfFlag, $othersFlag, $subject);
+        $this->sendCustomerEmail($template, $data, $dbejCallactivity, $othersFlag, $subject);
     }
 
     /**
@@ -6499,7 +6496,7 @@ class BUActivity extends Business
         $subject    = "Service Request {$dbejCallactivity->getValue(DBEJCallActivity::problemID)} - {$dbejCallactivity->getValue(DBEJCallActivity::emailSubjectSummary)} - Logged";
         $selfFlag   = DBEContact::initialLoggingEmailFlag;
         $othersFlag = DBEContact::initialLoggingEmailFlag;
-        $this->sendCustomerEmail($template, $data, $dbejCallactivity, $selfFlag, $othersFlag, $subject);
+        $this->sendCustomerEmail($template, $data, $dbejCallactivity, $othersFlag, $subject, $selfFlag);
     }
 
     function getOnSiteActivitiesWithinFiveDaysOfActivity($callActivityID)
@@ -6899,7 +6896,7 @@ FROM
             ],
             [
                 "type"  => "s",
-                "value" => substr($record->getSubjectLine(),0,50)
+                "value" => substr($record->getSubjectLine(), 0, 50)
             ]
         ];
         $db->preparedQuery(
@@ -8300,11 +8297,10 @@ FROM
             $serviceRequestId,
             $feedbackTokenGenerator->getTokenForServiceRequestId($serviceRequestId)
         );
-        $selfFlag               = DBEContact::fixedEmailFlag;
         $othersFlag             = DBEContact::othersFixedEmailFlag;
         $subject                = "Service Request {$serviceRequestId} - {$serviceRequest->getValue(DBEProblem::emailSubjectSummary)} - Fixed";
         $template               = '@customerFacing/ServiceFixed/ServiceFixed.html.twig';
-        $this->sendCustomerEmail($template, $data, $fixedActivityInServiceRequest, $selfFlag, $othersFlag, $subject);
+        $this->sendCustomerEmail($template, $data, $fixedActivityInServiceRequest, $othersFlag, $subject);
     }
 
     function getFixedActivityInServiceRequest($problemID)
@@ -8575,9 +8571,7 @@ FROM
         $dbeProblem->getRow($serviceRequestId);
         $emailSubjectToAppend      = $dbeProblem->getValue(DBEProblem::emailSubjectSummary);
         $contactEmail              = $dsCallActivity->getValue(DBEJCallActivity::contactEmail);
-        $recipientsArray           = [
-            $contactEmail
-        ];
+        $recipientsArray           = [$contactEmail];
         $visitActivityTimeOfTheDay = 'afternoon';
         if ($dsCallActivity->getValue(DBEJCallActivity::startTime) < '12:00') {
             $visitActivityTimeOfTheDay = 'morning';

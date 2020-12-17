@@ -122,14 +122,14 @@ class InboxPendingReopenedComponent extends MainComponent {
                 order: 4,
                 path: "receivedDate",
                 label: "",
-                key: "recievedDate",
+                key: "receivedDate",
                 sortable: false,
                 className: "text-center nowrap",
                 hdClassName: "text-center",
                 icon: "fal fa-2x fa-calendar-alt color-gray2 ",
                 hdToolTip: "Date and time email was received",
                 content: (problem) =>
-                    el('span', null, moment(problem.recievedDate).format("DD/MM/YYYY HH:mm"))
+                    el('span', null, moment(problem.receivedDate).format("DD/MM/YYYY HH:mm"))
             },
             {
                 hide: false,
