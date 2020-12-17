@@ -195,6 +195,7 @@ CNCCKEditor.defaultProps = {
     data: '',
     config: {},
     readOnly: false,
+    style: {border: "1px solid #595959"}
 };
 
 CNCCKEditor.editorUrl = 'https://cdn.ckeditor.com/4.15.1/standard-all/ckeditor.js';
