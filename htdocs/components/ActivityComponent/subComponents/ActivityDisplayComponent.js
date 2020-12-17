@@ -587,11 +587,13 @@ class ActivityDisplayComponent extends MainComponent {
     }
 
     getHiddenSRElement = (data) => {
-        const {el} = this;
-        if (data?.problemHideFromCustomerFlag == 'Y')
-            return this.el('div', {style: {display: "flex", justifyContent: "center", alignItems: "center"}},
-                el('h1', {style: {color: "red"}}, "Hidden From Customer")
-            )
+        if (data?.problemHideFromCustomerFlag !== 'Y' && data?.hideFromCustomerFlag !== 'Y') {
+            return;
+        }
+        return <label style={{color: "red", fontWeight: "bold", fontSize: 14}}
+        >
+            {data?.hideFromCustomerFlag === 'Y' ? 'Activity hidden from customer' : 'Entire SR hidden from customer'}
+        </label>
     }
     getElement = (label, text, bgcolor) => {
         const {el} = this;
@@ -722,14 +724,12 @@ class ActivityDisplayComponent extends MainComponent {
                     el('tr', null,
                         el('td', {className: "display-label"}, "Priority"),
                         el('td', {className: "display-content"}, data?.priority),
-                        el('td', {style: {textAlign: "center"}, colSpan: 1}, data?.problemHideFromCustomerFlag == "Y" ?
-                            el("label", {
-                                style: {
-                                    color: "red",
-                                    fontWeight: "bold",
-                                    fontSize: 14
-                                }
-                            }, "Entire SR hidden from customer") : null
+                        (
+                            <td style={{textAlign: "center"}}
+                                colSpan="1"
+                            >
+                                {this.getHiddenSRElement(data)}
+                            </td>
                         ),
                         el('td', null),
 
