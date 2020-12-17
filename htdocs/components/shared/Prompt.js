@@ -1,6 +1,6 @@
 import Modal from "./Modal/modal";
 import React from 'react';
-import CNCCKEditor from "./CNCCKEditor";
+import EditorFieldComponent from "./EditorField/EditorFieldComponent";
 
 class Prompt extends React.Component {
     el = React.createElement;
@@ -33,9 +33,9 @@ class Prompt extends React.Component {
         const {isEditor} = this.props;
 
         if (isEditor) {
-            return <CNCCKEditor name="prompt"
-                                onChange={($event) => this.setState({reason: $event.editor.getData()})}
-                                value={defaultValue}
+            return <EditorFieldComponent name="prompt"
+                                         onChange={(value) => this.setState({reason: value})}
+                                         value={defaultValue}
             />
         }
 

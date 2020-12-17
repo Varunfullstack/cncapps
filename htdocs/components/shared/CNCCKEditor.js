@@ -170,9 +170,11 @@ class CNCCKEditor extends React.Component {
             width: this.props.width || "auto",
             height: this.props.height || 500,
             resize_minHeight: this.props.height || 500,
-            removePlugins: "liststyle,tabletools,language,tableselection,scayt,wsc",
+            removePlugins: "liststyle,tabletools,language,tableselection,scayt,wsc,magicline",
             disableNativeSpellChecker: true,
             wsc_customDictionaryIds: '100920',
+            font_defaultLabel: 'Arial',
+            fontSize_defaultLabel: '10pt',
         };
 
         if (this.props.sharedSpaces) {
