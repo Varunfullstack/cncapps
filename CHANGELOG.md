@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v5.0.3]
+## [v5.0.3] - 2020-12-17
 ### Fixed
 - Fixed issue with gather fixed information when clicking the "Fixed" button while editing an activity.
 
