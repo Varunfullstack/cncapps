@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.0.3]
+### Fixed
+- Fixed issue with gather fixed information when clicking the "Fixed" button while editing an activity.
+
 ## [v5.0.2] - 2020-12-14
 ### Fixed
 - Activity flagged as overtime not showing in dashboard.
