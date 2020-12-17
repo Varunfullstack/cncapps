@@ -150,7 +150,7 @@ class GatherFixedInformationComponent extends MainComponent {
                             minCharCount: activity.problemHideFromCustomerFlag == 'N' ? 160 : -1,
                             disableClipboard: true,
                             value: initialActivity?.reason,
-                            onChange: (value) => this.setValue("resolutionSummary", value),
+                            onChange: ($event) => this.setValue("resolutionSummary", $event.editor.getData()),
                             type: "inline",
 
                         }))
