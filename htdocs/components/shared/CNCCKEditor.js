@@ -179,12 +179,14 @@ class CNCCKEditor extends React.Component {
 
         if (this.props.sharedSpaces) {
             defaultConfig.extraPlugins += ",sharedspace";
-            defaultConfig.removePlugins += ",floatingspace,maximize,resize";
+            defaultConfig.removePlugins += ",floatingspace,maximize,resize,elementspath";
             defaultConfig.sharedSpaces = {
                 top: this.props.top,
                 bottom: this.props.bottom
             };
         }
+
+
         return defaultConfig;
     }
 
