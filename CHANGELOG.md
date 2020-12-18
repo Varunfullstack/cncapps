@@ -1,6 +1,12 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.0.6] - 2020-12-18
+### Fixed
+- Fixed Daily Stats "Fixed Today" value
+- Fixed issues with SLA values wrongly assigned while there was a priority change issue
+- Fixed issue with filtering by queue in Held For QA
+
 ## [v5.0.5] - 2020-12-18
 ### Changed
 - Redirect the user to Current Activity Report after deleting the last activity (deleting the whole SR)
@@ -12,7 +18,6 @@ This project changes will be shown here.
 - Fix issue preventing the "Activity Hidden from customer".
 ### Removed
 - Remove "Magic Line" in editor
-
 
 ## [v5.0.4] - 2020-12-17
 ### Fixed
