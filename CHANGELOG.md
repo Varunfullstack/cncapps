@@ -1,6 +1,19 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.0.5] - 2020-12-18
+### Changed
+- Redirect the user to Current Activity Report after deleting the last activity (deleting the whole SR)
+- Change various mails sent to customer regarding actions in CNC to ignore the flags per contact and force them to 
+  always send.
+- Show Fixed Date in On Held For QA of SD Manager Dashboard only when the SR is Fixed.
+### Fixed
+- Fix issue with Standard Text creation.
+- Fix issue preventing the "Activity Hidden from customer".
+### Removed
+- Remove "Magic Line" in editor
+
+
 ## [v5.0.4] - 2020-12-17
 ### Fixed
 - Fixed issues with editor fields
