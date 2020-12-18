@@ -442,7 +442,6 @@ class DBEJProblem extends DBEProblem
           AND pro_queue_no = $queueNo
           order by hasAlarmDate asc, CONCAT( pro_alarm_date, ' ', coalesce(concat(pro_alarm_time,':00') , '00:00:00') ) asc,   isAssigned asc, {$this->getDBColumnName(self::hoursRemainingForSLA)} desc
           ";
-
         $this->setQueryString($sql);
         return (parent::getRows());
     }
@@ -748,21 +747,17 @@ class DBEJProblem extends DBEProblem
             left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
             left join team queueTeam on queueTeam.level = pro_queue_no 
         WHERE {$this->getDBColumnName(                self::status            ) } in ('I','P'$includeFixed) and pro_queue_no <> 7 and (consultant.cns_consno is null or not consultant.excludeFromSDManagerDashboard) ";
-        if ($isHoldForQA) {
-            $sql .= " and {$this->getDBColumnName(self::customerID)} <> 282 ";
-        } else {
-            if (!$showHelpDesk) {
-                $sql .= ' and pro_queue_no <> 1 ';
-            }
-            if (!$showEscalation) {
-                $sql .= ' and pro_queue_no <> 2 ';
-            }
-            if (!$showSmallProjects) {
-                $sql .= ' and pro_queue_no <> 3 ';
-            }
-            if (!$showProjects) {
-                $sql .= ' and pro_queue_no <> 5 ';
-            }
+        if (!$showHelpDesk) {
+            $sql .= ' and pro_queue_no <> 1 ';
+        }
+        if (!$showEscalation) {
+            $sql .= ' and pro_queue_no <> 2 ';
+        }
+        if (!$showSmallProjects) {
+            $sql .= ' and pro_queue_no <> 3 ';
+        }
+        if (!$showProjects) {
+            $sql .= ' and pro_queue_no <> 5 ';
         }
         if ($isP5) {
             $sql .= 'and ' . $this->getDBColumnName(
