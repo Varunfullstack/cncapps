@@ -334,7 +334,7 @@ WHERE pro_custno <> 282
     private function getNearSLA(): array
     {
         $query = "SELECT
-  *
+  count(*) as total
 FROM
   problem
 WHERE pro_custno <> 282
