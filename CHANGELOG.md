@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Rename instance of ATP to Defender
+
 ## [v5.0.7] - 2020-12-22
 ### Changed
 - Daily Stats tweaks to exclude non human touched SRs for raised & reopened.
