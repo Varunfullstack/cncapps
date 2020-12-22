@@ -637,7 +637,11 @@ class BUProblemSLA extends Business
             CONFIG_INITIAL_ACTIVITY_TYPE_ID
         )) {
 
-            $toBeBreachedOn = (new DateTime())->add(DateInterval::createFromDateString($hoursToSLA . ' hours'));
+            if ($hoursToSLA < 0) {
+                $hoursToSLA = 0;
+            }
+            $minutes        = floor($hoursToSLA * 60);
+            $toBeBreachedOn = (new DateTime())->add(new DateInterval("PT{$minutes}M"));
             $senderEmail    = CONFIG_SUPPORT_EMAIL;
             if ($dbeJProblem->getValue(DBEJProblem::engineerLogname)) {
                 $toEmail = $dbeJProblem->getValue(DBEJProblem::engineerLogname) . '@' . CONFIG_PUBLIC_DOMAIN;

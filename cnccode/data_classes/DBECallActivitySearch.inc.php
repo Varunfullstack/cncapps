@@ -606,7 +606,15 @@ class DBECallActivitySearch extends DBEntity
 
         if ($breachedSlaOption == 'B') {
             $whereParameters .=
-                " AND pro_responded_hours > pro_sla_response_hours";
+                " AND (
+    (
+      pro_status = 'I'
+      AND pro_sla_response_hours - pro_working_hours <= 0
+    )
+    OR (
+      `pro_responded_hours` > pro_sla_response_hours
+    )
+  )";
         } elseif ($breachedSlaOption == 'N') {
             $whereParameters .=
                 " AND pro_responded_hours <= pro_sla_response_hours";

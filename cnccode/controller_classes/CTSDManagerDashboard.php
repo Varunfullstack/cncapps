@@ -333,11 +333,14 @@ WHERE pro_custno <> 282
      */
     private function getNearSLA(): array
     {
-        $query = "SELECT COUNT(*) total FROM problem 
-                WHERE    
-                pro_custno <> 282
-                AND  pro_status IN ( 'I', 'P' )
-                AND  pro_alarm_date <= curdate() and (pro_alarm_time is null or pro_alarm_time  < time(NOW()))";
+        $query = "SELECT
+  *
+FROM
+  problem
+WHERE pro_custno <> 282
+  AND pro_status = 'I'
+  AND pro_priority <> 5
+  AND pro_sla_response_hours - pro_working_hours <= 0.3 AND pro_sla_response_hours - pro_working_hours >= 0";
         return DBConnect::fetchOne($query, []);
     }
 
@@ -370,7 +373,7 @@ FROM
     ON c.`caa_problemno` = p.`pro_problemno`
 WHERE pro_custno <> 282
     AND caa_callacttypeno = 51
-  and pro_status = 'P'
+  and pro_status <> 'I'
   AND pro_date_raised >= CURDATE()
   AND pro_date_raised < CURDATE() + INTERVAL 1 DAY";
         return DBConnect::fetchOne($query, []);
@@ -400,18 +403,25 @@ WHERE pro_custno <> 282
     private function getBreachedSLA(): array
     {
         //9- Breached SLA
-        $query = "SELECT COUNT(  DISTINCT  p.pro_problemno) total FROM `callactivity` c JOIN   problem p ON c.`caa_problemno`=p.`pro_problemno` 
-         JOIN customer cu ON p.`pro_custno`=cu.`cus_custno`
-         WHERE
-          pro_custno <> 282   
-            AND pro_priority <> 5
-            AND pro_working_hours > CASE pro_priority
-                                   WHEN 1 THEN slaFixHoursP1
-                                   WHEN 2 THEN slaFixHoursP2
-                                   WHEN 3 THEN slaFixHoursP3
-                                   WHEN 4 THEN slaFixHoursP4
-                                   ELSE 0 END
-         AND pro_date_raised >=  CURDATE() AND pro_date_raised < CURDATE() + INTERVAL 1 DAY";
+        $query = "SELECT
+  COUNT(pro_problemno) AS total
+FROM
+  problem p
+  JOIN customer cu
+    ON p.`pro_custno` = cu.`cus_custno`
+WHERE pro_custno <> 282
+  AND pro_priority <> 5
+  AND (
+    (
+      pro_status = 'I'
+      AND pro_sla_response_hours - pro_working_hours <= 0
+    )
+    OR (
+      `pro_responded_hours` > pro_sla_response_hours
+    )
+  )
+  AND pro_date_raised >= CURDATE()
+  AND pro_date_raised < (CURDATE() + INTERVAL 1 DAY);  ";
         return DBConnect::fetchOne($query, []);
     }
 
