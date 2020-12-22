@@ -1,6 +1,6 @@
 import APIActivity from "../../services/APIActivity.js";
 import APICallactType from "../../services/APICallactType.js";
-import {groupBy, isEmptyTime, params, pick, sort} from "../../utils/utils.js";
+import {groupBy, isEmptyTime, params, pick} from "../../utils/utils.js";
 import ToolTip from "../../shared/ToolTip.js";
 import APICustomers from "../../services/APICustomers.js";
 import APIUser from "../../services/APIUser.js";
@@ -50,11 +50,9 @@ class ActivityEditComponent extends MainComponent {
             contacts: [],
             sites: [],
             priorities: [],
-            assets: [],
             currentContact: null,
             currentUser: null,
             allowLeaving: false,
-            emptyAssetReasonModalShowing: false,
             data: {
                 curValue: "",
                 documents: [],
@@ -92,7 +90,6 @@ class ActivityEditComponent extends MainComponent {
             users: [],
             contracts: [],
             priorityReasons: [],
-            noAssetStandardTextItems: [],
             filters: {
                 showTravel: false,
                 showOperationalTasks: false,
@@ -122,9 +119,7 @@ class ActivityEditComponent extends MainComponent {
             this.api.getRootCauses(),
             this.apiUser.getCurrentUser(),
             this.apiStandardText.getOptionsByType("Priority Change Reason"),
-            this.apiStandardText.getOptionsByType("Missing Asset Reason"),
-
-        ]).then(async ([activityTypes, activeUsers, priorities, rootCauses, currentUser, priorityChangeReasonStandardTextItems, noAssetStandardTextItems]) => {
+        ]).then(async ([activityTypes, activeUsers, priorities, rootCauses, currentUser, priorityChangeReasonStandardTextItems]) => {
             const notSDManagerActivityTypes = activityTypes.filter(c => c.visibleInSRFlag === 'Y');
 
             this.setState({
@@ -135,7 +130,6 @@ class ActivityEditComponent extends MainComponent {
                 rootCauses,
                 currentUser,
                 priorityReasons: priorityChangeReasonStandardTextItems,
-                noAssetStandardTextItems
             });
             setTimeout(() => this.autoSave(), 2000);
         });
@@ -188,20 +182,10 @@ class ActivityEditComponent extends MainComponent {
                     )
                     .then((contractsResponse) => {
                         return groupBy(contractsResponse, "renewalType");
-                    }),
-                this.apiCustomer.getCustomerAssets(res.customerId)
-            ]).then(([customerContactActivityDurationThresholdValue, remoteSupportActivityDurationThresholdValue, contacts, sites, contracts, assets]) => {
+                    })
+            ]).then(([customerContactActivityDurationThresholdValue, remoteSupportActivityDurationThresholdValue, contacts, sites, contracts]) => {
                 const currentContact = contacts.find((c) => c.id == res.contactID);
-                assets = sort(assets, "name");
-                assets = assets.map((asset) => {
-                    if (
-                        asset.BiosName.indexOf("VMware") >= 0 ||
-                        asset.BiosName.indexOf("Virtual Machine") >= 0
-                    ) {
-                        asset.BiosVer = "";
-                    }
-                    return asset;
-                });
+
 
                 this.setState({
                     customerContactActivityDurationThresholdValue,
@@ -215,7 +199,6 @@ class ActivityEditComponent extends MainComponent {
                     contracts,
                     _activityLoaded: true,
                     currentContact,
-                    assets
                 }, () => setTimeout(() => this.checkContactNotesAlert(), 2000));
             });
         });
@@ -403,7 +386,7 @@ class ActivityEditComponent extends MainComponent {
             }
         }
         if (!data.assetName && !this.state.data.emptyAssetReason) {
-            this.setState({emptyAssetReasonModalShowing: true});
+            this.alert("Please select an asset or a reason");
             return false;
         }
         return true;
@@ -1679,40 +1662,6 @@ class ActivityEditComponent extends MainComponent {
             });
     }
 
-    getNoAssetModal = () => {
-        const {data, noAssetStandardTextItems, emptyAssetReasonModalShowing} = this.state;
-        const {el} = this;
-        return el(StandardTextModal,
-            {
-                options: noAssetStandardTextItems,
-                value: data.emptyAssetReason,
-                show: emptyAssetReasonModalShowing,
-                noEditor: true,
-                title: "Please provide the reason of not listing an asset",
-                okTitle: "OK",
-                onChange: (value) => {
-                    if (!value) {
-                        return;
-                    }
-                    this.setState({
-                        emptyAssetReasonModalShowing: false,
-                        data: {
-                            ...this.state.data,
-                            emptyAssetReason: value
-                        }
-                    })
-                },
-                onCancel: () => {
-                    this.setState({
-                        emptyAssetReasonModalShowing: false,
-                        data: {
-                            ...this.state.data,
-                            emptyAssetReason: ""
-                        }
-                    })
-                }
-            });
-    }
     handlePriorityTemplateChange = (value) => {
         const {data} = this.state;
         if (value !== "" && value !== undefined) {
@@ -1742,6 +1691,9 @@ class ActivityEditComponent extends MainComponent {
     }
     getAssetsElement = () => {
         const {data} = this.state;
+        if (!data || !data.customerId) {
+            return '';
+        }
         return <AssetListSelectorComponent
             noAssetReason={data.emptyAssetReason}
             assetName={data.assetName}
@@ -1780,7 +1732,6 @@ class ActivityEditComponent extends MainComponent {
                 {this.getConfirm()}
                 {this.getPrompt()}
                 {this.getPriorityChangeReason()}
-                {this.getNoAssetModal()}
                 {this.getProjectsElement()}
                 <ActivityHeaderComponent serviceRequestData={data}/>
                 <div className="activities-edit-container">

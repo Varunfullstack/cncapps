@@ -31,11 +31,11 @@ export default class AssetListSelectorComponent extends React.PureComponent {
             selectedOption: null
         }
         if (this.props.noAssetReason) {
-            this.selectedOption = {isAsset: false, template: this.props.noAssetReason};
+            this.state.selectedOption = {isAsset: false, template: this.props.noAssetReason};
         }
         if (this.props.assetName) {
             const [name, userName, biosVer] = this.props.assetTitle.split(' ');
-            this.selectedOption = {isAsset: true, name: this.props.assetName, LastUsername: userName, BiosVer: biosVer};
+            this.state.selectedOption = {isAsset: true, name: this.props.assetName, LastUsername: userName, BiosVer: biosVer};
         }
     }
 

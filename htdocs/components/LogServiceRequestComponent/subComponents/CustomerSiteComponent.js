@@ -2,7 +2,6 @@ import APICustomers from "../../services/ApiCustomers.js";
 import Spinner from "../../shared/Spinner/Spinner";
 import MainComponent from "../../shared/MainComponent.js";
 import React from 'react';
-import StandardTextModal from "../../Modals/StandardTextModal";
 import APIStandardText from "../../services/APIStandardText";
 import EditorFieldComponent from "../../shared/EditorField/EditorFieldComponent";
 import AssetListSelectorComponent from "../../shared/AssetListSelectorComponent/AssetListSelectorComponent";
@@ -207,42 +206,6 @@ class CustomerSiteComponent extends MainComponent {
         this.props.updateSRData(data);
     };
 
-    getNoAssetModal = () => {
-        const {data, noAssetStandardTextItems, emptyAssetReasonModalShowing} = this.state;
-        const {el} = this;
-        return el(
-            StandardTextModal,
-            {
-                options: noAssetStandardTextItems,
-                value: data.emptyAssetReason,
-                show: emptyAssetReasonModalShowing,
-                title: "Please provide the reason of not listing an asset",
-                okTitle: "OK",
-                noEditor: true,
-                onChange: (value) => {
-                    if (!value) {
-                        return;
-                    }
-                    this.setState({
-                        emptyAssetReasonModalShowing: false,
-                        data: {
-                            ...this.state.data,
-                            emptyAssetReason: value
-                        }
-                    })
-                },
-                onCancel: () => {
-                    this.setState({
-                        emptyAssetReasonModalShowing: false,
-                        data: {
-                            ...this.state.data,
-                            emptyAssetReason: ""
-                        }
-                    })
-                }
-            });
-    }
-
     getNextButton = () => {
         const {el, handleNext} = this;
         return el(
@@ -267,7 +230,6 @@ class CustomerSiteComponent extends MainComponent {
             el(Spinner, {show: _showSpinner}),
             this.getPrompt(),
             this.getAlert(),
-            this.getNoAssetModal(),
             getSitesElement(),
             getAssetElement(),
             this.getEmailSubjectSummary(),
