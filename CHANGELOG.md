@@ -1,6 +1,14 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.0.7] - 2020-12-22
+### Changed
+- Daily Stats tweaks to exclude non human touched SRs for raised & reopened.
+### Fixed
+- Fixed Contract Schedule page formatting.
+- Fixed Open SRs mismatch between SD manager dashboard and OpenCallEmail.
+- Fixed Critical SR in SD Manager Dashboard showing empty always. 
+
 ## [v5.0.6] - 2020-12-18
 ### Fixed
 - Fixed Daily Stats "Fixed Today" value

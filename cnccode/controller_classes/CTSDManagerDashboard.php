@@ -292,7 +292,7 @@ GROUP BY c.`teamID`";
     private function getRaisedToday(): array
     {
         $query = "SELECT
-  COUNT(pro_problemno) as total
+  COUNT(distinct pro_problemno) as total
 FROM
   `callactivity` c
   JOIN problem p
@@ -310,18 +310,17 @@ WHERE pro_custno <> 282
     private function getFixedToday(): array
     {
         $query  = "SELECT
-  COUNT(DISTINCT p.pro_problemno) AS total
+  COUNT(DISTINCT pro_problemno) AS total
 FROM
-  callactivity c
-  JOIN problem p
-    ON c.caa_problemno = p.pro_problemno
+  problem p
+  JOIN `callactivity` c
+    ON c.`caa_problemno` = p.`pro_problemno` AND c.caa_callacttypeno = 51
+    LEFT JOIN callactivity FIXED
+    ON fixed.caa_problemno = p.`pro_problemno` AND fixed.`caa_callacttypeno` = 57
 WHERE pro_custno <> 282
-  AND (
-    pro_consno <> 67
-    OR pro_consno IS NULL
-  )
-  AND c.caa_callacttypeno = 57
-  AND c.caa_date = CURDATE()";
+  AND pro_date_raised >= CURDATE()
+  AND pro_date_raised < CURDATE() + INTERVAL 1 DAY
+  AND (fixed.`caa_callactivityno` IS NULL OR fixed.`caa_consno` <> 67)";
         $result = DBConnect::fetchOne($query, []);
         if (!$result) {
             return ["total" => 0];
@@ -347,10 +346,14 @@ WHERE pro_custno <> 282
      */
     private function getReopenToday(): array
     {
-        $query = "SELECT COUNT(*) total FROM problem 
-                WHERE 
-                pro_custno <> 282   
-                AND `pro_reopened_date` = curdate()";
+        $query = "SELECT
+COUNT(*)  AS total
+  FROM
+  problem
+  LEFT JOIN callactivity AS FIXED ON problem.`pro_problemno` = fixed.`caa_problemno` AND fixed.`caa_date` = CURDATE() AND fixed.`caa_callacttypeno` = 57
+WHERE pro_custno <> 282
+  AND `pro_reopened_date` = CURDATE()
+  AND (fixed.`caa_callactivityno` IS NULL OR fixed.`caa_consno` <> 67)";
         return DBConnect::fetchOne($query, []);
     }
 

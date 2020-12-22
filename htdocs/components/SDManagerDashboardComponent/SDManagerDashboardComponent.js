@@ -25,6 +25,8 @@ const SHORTEST_SLA_FIX_REMAINING = 3;
 
 const AUTO_RELOAD_TIME = 60 * 1000;
 
+const CRITICAL_SERVICE_REQUESTS = 4;
+
 class SDManagerDashboardComponent extends MainComponent {
     el = React.createElement;
     tabs = [];
@@ -53,7 +55,7 @@ class SDManagerDashboardComponent extends MainComponent {
             {id: 1, title: "Shortest SLA Remaining", icon: null},
             {id: 2, title: "Current Open P1 Requests", icon: null},
             {id: SHORTEST_SLA_FIX_REMAINING, title: "Shortest SLA Fix Remaining", icon: null},
-            {id: 4, title: "Critical Service Requests", icon: null},
+            {id: CRITICAL_SERVICE_REQUESTS, title: "Critical Service Requests", icon: null},
             {id: 5, title: "Current Open SRs", icon: null},
             {id: 6, title: "Oldest Updated SRs", icon: null},
             {id: 7, title: "Longest Open SR", icon: null},
@@ -208,7 +210,7 @@ class SDManagerDashboardComponent extends MainComponent {
         );
     }
     loadTab = (id) => {
-        if ([1, 2, 3, 4, 5, 6, 7, 8, CUSTOMER_TAB, HELD_FOR_QA_TAB].indexOf(id) >= 0
+        if ([1, 2, 3, CRITICAL_SERVICE_REQUESTS, 5, 6, 7, 8, CUSTOMER_TAB, HELD_FOR_QA_TAB].indexOf(id) >= 0
         ) {
             this.loadAllocatedUsers();
             const {filter} = this.state;
@@ -254,7 +256,7 @@ class SDManagerDashboardComponent extends MainComponent {
     getQueueElement = () => {
         const {filter, queueData} = this.state;
         const {el} = this;
-        if ([1, 2, 3, SHORTEST_SLA_FIX_REMAINING, 5, 6, 7, 8, HELD_FOR_QA_TAB].indexOf(filter.activeTab) >= 0) {
+        if ([1, 2, 3, CRITICAL_SERVICE_REQUESTS, SHORTEST_SLA_FIX_REMAINING, 5, 6, 7, 8, HELD_FOR_QA_TAB].indexOf(filter.activeTab) >= 0) {
             let columns = [
                 {
                     hide: false,
