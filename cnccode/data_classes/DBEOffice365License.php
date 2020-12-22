@@ -13,7 +13,7 @@ class DBEOffice365License extends DBEntity
     const license = "license";
     const mailboxLimit = "mailboxLimit";
     const reportOnSpareLicenses = "reportOnSpareLicenses";
-    const includesATP = 'includesATP';
+    const includesDefender      = 'includesATP';
 
     /**
      * calls constructor()
@@ -52,7 +52,7 @@ class DBEOffice365License extends DBEntity
             DA_NOT_NULL
         );
         $this->addColumn(
-            self::includesATP,
+            self::includesDefender,
             DA_BOOLEAN,
             DA_NOT_NULL
         );

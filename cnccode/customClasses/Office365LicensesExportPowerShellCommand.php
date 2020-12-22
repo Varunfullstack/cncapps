@@ -580,7 +580,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                     $this->logger->warning('Raising a Customer Leaver with License SR while processing Mailboxes');
                     $this->raiseCustomerLeaverWithLicenseSR($dbeCustomer, $datum['DisplayName']);
                 }
-                $licensesWithATP = 0;
+                $licensesWithDefender = 0;
 
                 foreach ($datum['Licenses'] as $license) {
                     $dbeOffice365Licenses->getRowForLicense($license);
@@ -591,8 +591,8 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                             $licenseValue
                         );
 
-                        if ($dbeOffice365Licenses->getValue(DBEOffice365License::includesATP)) {
-                            $licensesWithATP++;
+                        if ($dbeOffice365Licenses->getValue(DBEOffice365License::includesDefender)) {
+                            $licensesWithDefender++;
                         }
                         $currentMailboxLimit = $dbeOffice365Licenses->getValue(DBEOffice365License::mailboxLimit);
                         if ($currentMailboxLimit && (!$mailboxLimit || $currentMailboxLimit > $mailboxLimit)) {
@@ -604,8 +604,8 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                     }
                 }
 
-                if ($licensesWithATP > 1) {
-                    $this->raiseMultipleATPLicensesSR($dbeCustomer, $datum['DisplayName']);
+                if ($licensesWithDefender > 1) {
+                    $this->raiseMultipleDefenderLicensesSR($dbeCustomer, $datum['DisplayName']);
                 }
             }
             $licensesArray = explode(", ", $licenseValue);
@@ -1063,9 +1063,9 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $dbeCallActivity->insertRow();
     }
 
-    function raiseMultipleATPLicensesSR(DBECustomer $dbeCustomer, $userName)
+    function raiseMultipleDefenderLicensesSR(DBECustomer $dbeCustomer, $userName)
     {
-        $details = "<p>The username $userName has multiple M365 licenses that include ATP, please review and correct.</p>";
+        $details = "<p>The username $userName has multiple M365 licenses that include Defender, please review and correct.</p>";
         $this->raiseCustomerServiceRequest($dbeCustomer, $details);
     }
 
