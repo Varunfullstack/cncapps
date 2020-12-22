@@ -10,7 +10,7 @@ import APIStandardText from "../../services/APIStandardText.js";
 import React, {Fragment} from 'react';
 import moment from "moment";
 import StandardTextModal from "../../Modals/StandardTextModal";
-import {padEnd, TeamType} from "../../utils/utils";
+import {TeamType} from "../../utils/utils";
 import CNCCKEditor from "../../shared/CNCCKEditor";
 import Modal from "../../shared/Modal/modal";
 import Toggle from "../../shared/Toggle";
@@ -18,6 +18,7 @@ import CustomerDocumentUploader from "./CustomerDocumentUploader";
 import {InternalDocumentsComponent} from "./InternalDocumentsComponent";
 import {ActivityHeaderComponent} from "./ActivityHeaderComponent";
 import EditorFieldComponent from "../../shared/EditorField/EditorFieldComponent";
+import AssetListSelectorComponent from "../../shared/AssetListSelectorComponent/AssetListSelectorComponent";
 
 // noinspection EqualityComparisonWithCoercionJS
 const hiddenAndCustomerNoteAlertMessage = `Customer note must be empty when the activity or entire SR is hidden.`;
@@ -1740,43 +1741,33 @@ class ActivityEditComponent extends MainComponent {
         }
     }
     getAssetsElement = () => {
-        const {assets} = this.state;
-        const {el} = this;
-        return el(
-            "select",
-            {
-                onChange: (event) => this.handleAssetSelect(event.target.value),
-                style: {width: "100%"},
-                value: this.state.data.assetName || "",
-            },
-            el(
-                "option", {
-                    key: "default",
-                    value: ""
-                }, this.state.data.emptyAssetReason || ""
-            ),
-            assets.map((s) =>
-                el(
-                    "option",
-                    {
-                        value: s.name,
-                        key: `asset${s.name}`,
-                        dangerouslySetInnerHTML: {__html: padEnd(s.name, 110, "&nbsp;") + padEnd(s.LastUsername, 170, "&nbsp;") + " " + s.BiosVer}
-                    }
-                )
-            )
-        );
+        const {data} = this.state;
+        return <AssetListSelectorComponent
+            noAssetReason={data.emptyAssetReason}
+            assetName={data.assetName}
+            assetTitle={data.assetTitle}
+            customerId={data.customerId}
+            onChange={value => this.handleAssetSelect(value)}
+        />
     }
     handleAssetSelect = (value) => {
-        const {data, assets} = this.state;
-        if (value !== "") {
-            const asset = assets.find((a) => a.name == value);
-            data.assetName = value;
-            data.assetTitle = asset.name + " " + asset.LastUsername + " " + asset.BiosVer;
+        const {data} = this.state;
+
+        if (!value) {
+            data.assetName = "";
+            data.assetTitle = "";
+            data.emptyAssetReason = "";
+            return
+        }
+
+        if (value.isAsset) {
+            data.assetName = value.name;
+            data.assetTitle = value.name + " " + value.LastUsername + " " + value.BiosVer;
             data.emptyAssetReason = "";
         } else {
             data.assetName = "";
             data.assetTitle = "";
+            data.emptyAssetReason = value.template;
         }
         this.setState({data});
     };

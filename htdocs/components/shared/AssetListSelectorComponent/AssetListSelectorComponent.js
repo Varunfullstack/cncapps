@@ -21,11 +21,21 @@ export default class AssetListSelectorComponent extends React.PureComponent {
 
     constructor(props, context) {
         super(props, context);
+
+
         this.state = {
             noAssetReasons: [],
             assets: [],
             maxUserNameLength: 0,
-            maxComputerNameLength: 0
+            maxComputerNameLength: 0,
+            selectedOption: null
+        }
+        if (this.props.noAssetReason) {
+            this.selectedOption = {isAsset: false, template: this.props.noAssetReason};
+        }
+        if (this.props.assetName) {
+            const [name, userName, biosVer] = this.props.assetTitle.split(' ');
+            this.selectedOption = {isAsset: true, name: this.props.assetName, LastUsername: userName, BiosVer: biosVer};
         }
     }
 
