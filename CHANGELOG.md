@@ -1,6 +1,15 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.0.8] - 2020-12-22
+### Changed
+- Changed Activity SLA Breached criteria to include initial activities
+### Fixed
+- Fixed Daily Stats Today's Started. 
+- Fixed Daily Stats Breached SLA.
+- Fixed Daily Stats Near SLA.
+- Fixed Search forms typos.
+
 ## [v5.0.7] - 2020-12-22
 ### Changed
 - Daily Stats tweaks to exclude non human touched SRs for raised & reopened.
