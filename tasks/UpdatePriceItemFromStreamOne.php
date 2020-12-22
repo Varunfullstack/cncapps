@@ -41,7 +41,7 @@ $thing      = null;
 //------ get all ccna items
 $query = "SELECT  itm_itemno,itm_unit_of_sale, itm_sstk_cost ,itm_desc , partNoOld FROM  item WHERE isStreamOne=1";
 $db->query($query);
-$cncItems = $db->fetchAll(MYSQLI_ASSOC);
+$cncItems            = $db->fetchAll(MYSQLI_ASSOC);
 $search              = null;
 $search["vendorIds"] = [397];
 $search["page"]      = 1;
@@ -115,8 +115,8 @@ if (!empty($updatedItems)) {
         'html_charset'  => 'UTF-8',
         'head_charset'  => 'UTF-8'
     );
-    $body = $buMail->mime->get($mime_params);
-    $hdrs = $buMail->mime->headers($hdrs);
+    $body        = $buMail->mime->get($mime_params);
+    $hdrs        = $buMail->mime->headers($hdrs);
     $buMail->putInQueue(
         $senderEmail,
         $toEmail,
@@ -278,12 +278,12 @@ foreach ($allSubscriptions as $item) {
     }
 }
 $logger->info("Loading all subscriptions and related addOns from streamOne.....");
-$orderDetails = $buStreamOneApi->getProductsDetails($orderIds, 40);
+$orderDetails     = $buStreamOneApi->getProductsDetails($orderIds, 40);
 $allAddonLicenses = getAddonLicensesFromOrders($orderDetails);
 syncAddons($allAddonLicenses, $cncItems, $forcedMode, $logger);
 $updatedItems       = 0;
 $updatedItemsAddOns = 0;
-$subscription = null;
+$subscription       = null;
 $logger->info("All subscriptions number :" . count($allSubscriptions));
 $missingLicensesErrors = [];
 //get all customer subscriptions
@@ -322,6 +322,7 @@ foreach ($allSubscriptions as $item) {
     }
 }
 $logger->info("Received StreamOne Licences", $streamOneLicensesToCheck);
+storeReceivedData($streamOneLicensesToCheck);
 checkAllContractsHaveAMatchingStreamOneLicense($streamOneLicensesToCheck, $logger);
 if (!empty($missingLicensesErrors)) {
     $buMail      = new BUMail($thing);
@@ -353,8 +354,8 @@ if (!empty($missingLicensesErrors)) {
         'html_charset'  => 'UTF-8',
         'head_charset'  => 'UTF-8'
     );
-    $body = $buMail->mime->get($mime_params);
-    $hdrs = $buMail->mime->headers($hdrs);
+    $body        = $buMail->mime->get($mime_params);
+    $hdrs        = $buMail->mime->headers($hdrs);
     $buMail->putInQueue(
         $senderEmail,
         $toEmail,
@@ -364,6 +365,17 @@ if (!empty($missingLicensesErrors)) {
 }
 $logger->info('updated customers items  ' . $updatedItems);
 $logger->info('updated customers items addOns  ' . $updatedItemsAddOns);
+function storeReceivedData($data)
+{
+    var_dump($data);
+    $date    = new DateTime();
+    $logPath = APPLICATION_LOGS . "/UpdatePriceItemFromStreamOne-{$date->format('Y-m-d')}.json";
+    file_put_contents($logPath, json_encode($data));
+    if (json_last_error()) {
+        var_dump(json_last_error_msg());
+    }
+}
+
 function getAddonLicensesFromOrders($orderDetails)
 {
     $allAddons   = [];
@@ -529,13 +541,13 @@ function sendMissingStreamOneLicenseForContractEmail(array $contracts)
         'head_charset'  => 'UTF-8'
     );
     $body        = $buMail->mime->get($mime_params);
-    $hdrs = array(
+    $hdrs        = array(
         'From'         => $fromEmail,
         'Subject'      => "Missing Stream One License for contract",
         'Content-Type' => 'text/html; charset=UTF-8',
         'To'           => $toEmail
     );
-    $hdrs = $buMail->mime->headers($hdrs);
+    $hdrs        = $buMail->mime->headers($hdrs);
     $buMail->putInQueue(
         $fromEmail,
         $toEmail,
@@ -560,13 +572,13 @@ function sendContractsWithDuplicatedSKUAlert(\CNCLTD\StreamOneProcessing\Contrac
         'head_charset'  => 'UTF-8'
     );
     $body        = $buMail->mime->get($mime_params);
-    $hdrs = array(
+    $hdrs        = array(
         'From'         => $fromEmail,
         'Subject'      => $subject,
         'Content-Type' => 'text/html; charset=UTF-8',
         'To'           => $toEmail
     );
-    $hdrs = $buMail->mime->headers($hdrs);
+    $hdrs        = $buMail->mime->headers($hdrs);
     $buMail->putInQueue(
         $fromEmail,
         $toEmail,
@@ -608,7 +620,7 @@ function updateContracts($cncItems,
     }
     $customerId   = $customer['customerID'];
     $customerName = $customer['name'];
-    $itemId = getItemId($cncItems, $sku);
+    $itemId       = getItemId($cncItems, $sku);
     if (!$itemId) {
         if ($licenseStatus == 'active') {
             throw new MissingLicenseException(
@@ -635,7 +647,7 @@ function updateContracts($cncItems,
     if (((int)$units != (int)$temp[0]["units"] || $forcedMode) && $licenseStatus == "active") {
         $salePriceAnnum = ($temp[0]['salePrice'] * $units) * 12;
         $costAnnum      = ($unitPrice * $units) * 12;
-        $params = [
+        $params         = [
             [
                 "type"  => "i",
                 "value" => $units
@@ -661,7 +673,7 @@ function updateContracts($cncItems,
                 "value" => $itemId
             ],
         ];
-        $result = $db->preparedQuery(
+        $result         = $db->preparedQuery(
             "update custitem set cui_users = ? , costPricePerMonth = ?, cui_cost_price = ?, cui_sale_price = ? where   renewalStatus='R'  AND declinedFlag='N'
                             and cui_custno = ?
                             and cui_itemno = ?",
