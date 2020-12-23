@@ -1704,22 +1704,16 @@ class ActivityEditComponent extends MainComponent {
     }
     handleAssetSelect = (value) => {
         const {data} = this.state;
-
-        if (!value) {
-            data.assetName = "";
-            data.assetTitle = "";
-            data.emptyAssetReason = "";
-            return
-        }
-
-        if (value.isAsset) {
-            data.assetName = value.name;
-            data.assetTitle = value.name + " " + value.LastUsername + " " + value.BiosVer;
-            data.emptyAssetReason = "";
-        } else {
-            data.assetName = "";
-            data.assetTitle = "";
-            data.emptyAssetReason = value.template;
+        data.assetName = "";
+        data.assetTitle = "";
+        data.emptyAssetReason = "";
+        if (value) {
+            if (value.isAsset) {
+                data.assetName = value.name;
+                data.assetTitle = value.name + " " + value.LastUsername + " " + value.BiosVer;
+            } else {
+                data.emptyAssetReason = value.template;
+            }
         }
         this.setState({data});
     };

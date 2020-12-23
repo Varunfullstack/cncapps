@@ -136,6 +136,7 @@ export default class AssetListSelectorComponent extends React.PureComponent {
                 </span>
                     <button onClick={() => {
                         this.setState({selectedOption: null});
+                        this.props.onChange(null);
                     }}
                     >
                         X
@@ -153,25 +154,48 @@ export default class AssetListSelectorComponent extends React.PureComponent {
                           renderOption={(value, state) => {
                               if (value.isAsset) {
                                   return (
-                                      <React.Fragment>
+                                      <React.Fragment style={{}}
+                                      >
                                           <div style={{
                                               display: "inline-block",
-                                              width: `${maxComputerNameLength}em`
+                                              width: `${maxComputerNameLength + 4}ch`, fontSize: 12,
+                                              fontFamily: "Arial",
+                                              letterSpacing: "normal"
                                           }}
                                           >
                                               {value.name}
                                           </div>
-                                          <div style={{display: "inline-block", width: `${maxUserNameLength}em`}}>
+                                          <div style={{
+                                              display: "inline-block", width: `${maxUserNameLength + 4}ch`,
+                                              fontSize: 12,
+                                              fontFamily: "Arial",
+                                              letterSpacing: "normal"
+                                          }}
+                                          >
                                               {value.LastUsername}
                                           </div>
-                                          <div style={{display: "inline-block"}}>
+                                          <div style={{
+                                              display: "inline-block",
+                                              fontSize: 12,
+                                              fontFamily: "Arial",
+                                              letterSpacing: "normal"
+                                          }}
+                                          >
                                               {value.BiosVer}
                                           </div>
                                       </React.Fragment>
                                   )
                               }
                               return <React.Fragment>
+                                  <span style={{
+                                      fontSize: 12,
+                                      fontFamily: "Arial",
+                                      letterSpacing: "normal"
+                                  }}
+                                  >
+
                                   {value.template}
+                                  </span>
                               </React.Fragment>
                           }}
                           onChange={(event, value, reason) => this.onChange(event, value, reason)}
