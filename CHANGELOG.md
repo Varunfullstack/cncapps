@@ -3,6 +3,7 @@ This project changes will be shown here.
 
 ## [unreleased]
 ## Added
+- Issue 1116 -  Include friendly Mac OS names
 - Issue 1130 - M365 Streamone missing licenses sometimes incorrectly reported.
 
 ## [v5.0.8] - 2020-12-22
