@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1147 - Export Contacts to include option for customer referred status
+
 ## [v5.0.8] - 2020-12-22
 ### Changed
 - Changed Activity SLA Breached criteria to include initial activities
