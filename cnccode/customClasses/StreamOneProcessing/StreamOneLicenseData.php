@@ -1,10 +1,7 @@
 <?php
 
-
 namespace CNCLTD\StreamOneProcessing;
-
-
-class StreamOneLicenseData
+class StreamOneLicenseData implements \JsonSerializable
 {
     private $sku;
     private $endCustomerEmail;
@@ -16,7 +13,7 @@ class StreamOneLicenseData
      */
     public function __construct($sku, $endCustomerEmail)
     {
-        $this->sku = $sku;
+        $this->sku              = $sku;
         $this->endCustomerEmail = $endCustomerEmail;
     }
 
@@ -37,4 +34,8 @@ class StreamOneLicenseData
     }
 
 
+    public function jsonSerialize()
+    {
+        return get_object_vars($this);
+    }
 }
