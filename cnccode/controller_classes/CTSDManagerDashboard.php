@@ -310,17 +310,16 @@ WHERE pro_custno <> 282
     private function getFixedToday(): array
     {
         $query  = "SELECT
-  COUNT(DISTINCT pro_problemno) AS total
+  COUNT(DISTINCT p.`pro_problemno`) AS total
 FROM
-  problem p
-  JOIN `callactivity` c
-    ON c.`caa_problemno` = p.`pro_problemno` AND c.caa_callacttypeno = 51
-    LEFT JOIN callactivity FIXED
-    ON fixed.caa_problemno = p.`pro_problemno` AND fixed.`caa_callacttypeno` = 57
+  callactivity c
+  JOIN problem p
+    ON c.caa_problemno = p.pro_problemno
 WHERE pro_custno <> 282
-  AND pro_date_raised >= CURDATE()
-  AND pro_date_raised < CURDATE() + INTERVAL 1 DAY
-  AND (fixed.`caa_callactivityno` IS NULL OR fixed.`caa_consno` <> 67)";
+  AND c.`caa_consno` <> 67
+  AND c.caa_callacttypeno = 57
+  AND c.caa_date = CURDATE()
+  AND pro_status = 'F'";
         $result = DBConnect::fetchOne($query, []);
         if (!$result) {
             return ["total" => 0];
