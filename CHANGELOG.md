@@ -5,6 +5,7 @@ This project changes will be shown here.
 ## Added
 - Issue 1116 - Include friendly Mac OS names
 - Issue 1130 - M365 Streamone missing licenses sometimes incorrectly reported.
+- Issue 1150 - Add Generate Password link to new password creation
 ### Changed
 - Issue 1120 - Rename instance of ATP to Defender
 - Issue 1131 - Sales Order Search Page Enhancements
