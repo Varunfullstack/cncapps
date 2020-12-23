@@ -1097,6 +1097,12 @@ class ActivityEditComponent extends MainComponent {
                    style={{color: "#992211", whiteSpace: "nowrap"}}
             >To</label>
             {renderEndTimeInput()}
+            <span onClick={() => {
+                this.setValue("endTime", moment().format('HH:mm'))
+            }}
+            >
+                <i className="fal fa-clock"></i>
+            </span>
         </div>
     };
     getPriority = () => {

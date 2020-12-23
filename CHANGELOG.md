@@ -7,6 +7,7 @@ This project changes will be shown here.
 - Issue 1130 - M365 Streamone missing licenses sometimes incorrectly reported.
 - Issue 1150 - Add Generate Password link to new password creation
 - Issue 1159 - Add Pre-Pay users to Service Contract Ratio.
+- Issue 1153 - Add clock icon to add current time to activity edit
 ### Changed
 - Issue 1120 - Rename instance of ATP to Defender
 - Issue 1131 - Sales Order Search Page Enhancements
