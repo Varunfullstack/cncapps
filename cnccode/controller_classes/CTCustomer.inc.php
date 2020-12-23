@@ -3543,7 +3543,8 @@ class CTCustomer extends CTCNC
         $query      = "select  computers.name,computers.assetTag,computers.LastUsername,  computers.BiosVer, computers.BiosName  from computers 
         join clients on 
             computers.clientid = clients.clientid
-            and clients.externalID = $customerId          
+            and clients.externalID = $customerId     
+            order by computers.name, computers.LastUsername, computers.BiosVer
         ";
         $statement  = $labtechDB->prepare($query);
         $test       = $statement->execute();

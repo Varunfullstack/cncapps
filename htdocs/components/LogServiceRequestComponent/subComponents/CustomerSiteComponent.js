@@ -1,11 +1,10 @@
 import APICustomers from "../../services/ApiCustomers.js";
 import Spinner from "../../shared/Spinner/Spinner";
-import {padEnd, sort} from "../../utils/utils.js";
 import MainComponent from "../../shared/MainComponent.js";
 import React from 'react';
-import StandardTextModal from "../../Modals/StandardTextModal";
 import APIStandardText from "../../services/APIStandardText";
 import EditorFieldComponent from "../../shared/EditorField/EditorFieldComponent";
+import AssetListSelectorComponent from "../../shared/AssetListSelectorComponent/AssetListSelectorComponent";
 
 class CustomerSiteComponent extends MainComponent {
     el = React.createElement;
@@ -62,23 +61,13 @@ class CustomerSiteComponent extends MainComponent {
         const {apicustomer} = this;
         const {data} = this.state;
         this.showSpinner();
-        let [sites, assets, noAssetStandardTextItems] = await Promise.all([
+        let [sites] = await Promise.all([
             apicustomer.getCustomerSites(this.props.customerId),
-            apicustomer.getCustomerAssets(this.props.customerId),
-            this.apiStandardText.getOptionsByType("Missing Asset Reason")
         ]);
-        assets = sort(assets, "name");
+
         if (sites.length == 1) data.siteNo = sites[0].id;
-        assets = assets.map((asset) => {
-            if (
-                asset.BiosName.indexOf("VMware") >= 0 ||
-                asset.BiosName.indexOf("Virtual Machine") >= 0
-            ) {
-                asset.BiosVer = "";
-            }
-            return asset;
-        });
-        this.setState({sites, data, assets, _showSpinner: false, noAssetStandardTextItems});
+
+        this.setState({sites, data, _showSpinner: false});
     };
     showSpinner = () => {
         this.setState({_showSpinner: true});
@@ -114,40 +103,34 @@ class CustomerSiteComponent extends MainComponent {
         this.setState({data});
     };
     handleAssetSelect = (value) => {
-        const {data, assets} = this.state;
-        const asset = assets.find((a) => a.name == value);
-        if (asset) {
-            data.assetName = value;
-            data.assetTitle = asset.name + " " + asset.LastUsername + " " + asset.BiosVer;
-            data.emptyAssetReason = "";
-        } else {
-            data.assetName = "";
-            data.assetTitle = "";
+        const {data} = this.state;
+        data.assetName = "";
+        data.assetTitle = "";
+        data.emptyAssetReason = "";
+        if (value) {
+            if (value.isAsset) {
+                data.assetName = value.name;
+                data.assetTitle = value.name + " " + value.LastUsername + " " + value.BiosVer;
+            } else {
+                data.emptyAssetReason = value.template;
+            }
         }
+
         this.setState({data});
     };
     getAssetElement = () => {
-        const {assets, data} = this.state;
+        const {customerId} = this.props;
         return (
             <div>
+
                 <label className="site-label">
                     Asset
                 </label>
-                <select onChange={(event) => this.handleAssetSelect(event.target.value)}
-                        className="site-select"
-                        value={data.assetName}
-                >
-                    <option selected={data.emptyAssetReason}>
-                        {data.emptyAssetReason}
-                    </option>
-                    {
-                        assets.map((s) => (
-                            <option value={s.name}
-                                    dangerouslySetInnerHTML={{__html: padEnd(s.name, 110, "&nbsp;") + padEnd(s.LastUsername, 170, "&nbsp;") + " " + s.BiosVer}}
-                            />
-                        ))
-                    }
-                </select>
+                <div style={{display: 'inline-block', width: "500px"}}>
+                    <AssetListSelectorComponent customerId={customerId}
+                                                onChange={value => this.handleAssetSelect(value)}
+                    />
+                </div>
             </div>
         )
     };
@@ -202,8 +185,8 @@ class CustomerSiteComponent extends MainComponent {
             this.alert("Please select customer site");
             return;
         }
-        if (data.assetName == "" && data.emptyAssetReason == "") {
-            this.setState({emptyAssetReasonModalShowing: true});
+        if (!data.assetName && !data.emptyAssetReason) {
+            this.alert("Please select an asset or a reason");
             return;
         }
         if (data.emailSubjectSummary == "") {
@@ -217,42 +200,6 @@ class CustomerSiteComponent extends MainComponent {
 
         this.props.updateSRData(data);
     };
-
-    getNoAssetModal = () => {
-        const {data, noAssetStandardTextItems, emptyAssetReasonModalShowing} = this.state;
-        const {el} = this;
-        return el(
-            StandardTextModal,
-            {
-                options: noAssetStandardTextItems,
-                value: data.emptyAssetReason,
-                show: emptyAssetReasonModalShowing,
-                title: "Please provide the reason of not listing an asset",
-                okTitle: "OK",
-                noEditor: true,
-                onChange: (value) => {
-                    if (!value) {
-                        return;
-                    }
-                    this.setState({
-                        emptyAssetReasonModalShowing: false,
-                        data: {
-                            ...this.state.data,
-                            emptyAssetReason: value
-                        }
-                    })
-                },
-                onCancel: () => {
-                    this.setState({
-                        emptyAssetReasonModalShowing: false,
-                        data: {
-                            ...this.state.data,
-                            emptyAssetReason: ""
-                        }
-                    })
-                }
-            });
-    }
 
     getNextButton = () => {
         const {el, handleNext} = this;
@@ -278,7 +225,6 @@ class CustomerSiteComponent extends MainComponent {
             el(Spinner, {show: _showSpinner}),
             this.getPrompt(),
             this.getAlert(),
-            this.getNoAssetModal(),
             getSitesElement(),
             getAssetElement(),
             this.getEmailSubjectSummary(),

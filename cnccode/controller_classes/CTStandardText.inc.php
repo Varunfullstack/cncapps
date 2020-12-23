@@ -34,6 +34,9 @@ define(
 
 class CTStandardText extends CTCNC
 {
+    const GET_SALES_REQUEST_OPTIONS  = "getSalesRequestOptions";
+    const GET_CHANGE_REQUEST_OPTIONS = "getChangeRequestOptions";
+    const GET_BY_TYPE                = "getByType";
     /** @var DSForm */
     public $dsStandardText;
     /** @var BUStandardText */
@@ -81,7 +84,7 @@ class CTStandardText extends CTCNC
                 $this->checkPermissions(MAINTENANCE_PERMISSION);
                 $this->update();
                 break;
-            case "getSalesRequestOptions":
+            case self::GET_SALES_REQUEST_OPTIONS:
                 try {
                     $data = $this->getStandardTextOptionsForType('Sales Request');
                 } catch (Exception $exception) {
@@ -96,7 +99,7 @@ class CTStandardText extends CTCNC
                 );
 
                 break;
-            case "getChangeRequestOptions" :
+            case self::GET_CHANGE_REQUEST_OPTIONS :
                 try {
                     $data = $this->getStandardTextOptionsForType("Change Request");
                 } catch (Exception $exception) {
@@ -110,7 +113,7 @@ class CTStandardText extends CTCNC
                     JSON_NUMERIC_CHECK
                 );
                 break;
-                case "getByType" :
+                case self::GET_BY_TYPE :
                     //UnableToOfferFirstTimeFixReasonOptions
                     try {
                         $data = $this->getStandardTextOptionsForType($_REQUEST["type"]);
