@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 1153 - Add clock icon to add current time to activity edit
+
 ## [v5.0.8] - 2020-12-22
 ### Changed
 - Changed Activity SLA Breached criteria to include initial activities
