@@ -2629,6 +2629,8 @@ class BUActivity extends Business
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($dbeLastActivity->getValue(DBEJCallActivity::callActivityID));
         $dbeCallActivity->setPKValue(null);
+        $dbeCallActivity->setValue(DBECallActivity::cncNextAction, null);
+        $dbeCallActivity->setValue(DBECallActivity::customerSummary, $resolutionSummary);
         $dbeCallActivity->setValue(
             DBEJCallActivity::date,
             date(DATE_MYSQL_DATE)
@@ -8293,7 +8295,7 @@ FROM
         $data                   = new \CNCLTD\TwigDTOs\ServiceRequestFixedDTO(
             $fixedActivityInServiceRequest->getValue(DBEJCallActivity::contactFirstName),
             $firstActivity->getValue(DBEJCallActivity::reason),
-            $fixedActivityInServiceRequest->getValue(DBEJCallActivity::reason),
+            $fixedActivityInServiceRequest->getValue(DBEJCallActivity::customerSummary),
             $serviceRequestId,
             $feedbackTokenGenerator->getTokenForServiceRequestId($serviceRequestId)
         );
