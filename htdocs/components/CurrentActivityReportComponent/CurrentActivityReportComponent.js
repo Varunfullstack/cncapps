@@ -437,7 +437,7 @@ class CurrentActivityReportComponent extends MainComponent {
                             key: "option" + p.userID,
                             className: teamId == p.teamID ? "in-team" : "",
                         },
-                        p.fullName
+                        p.userName
                     )
                 ),
             ]
@@ -531,7 +531,7 @@ class CurrentActivityReportComponent extends MainComponent {
                             key: "option" + p.userID,
                             className: teamId == p.teamID ? "in-team" : "",
                         },
-                        p.fullName
+                        p.userName
                     )
                 ),
             ]
