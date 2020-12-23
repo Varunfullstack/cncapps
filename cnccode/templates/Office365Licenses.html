@@ -18,7 +18,7 @@
             <th>Mailbox Limit(MB)</th>
             <th>Friendly Name</th>
             <th>Report on Spare Licenses</th>
-            <th>Includes ATP</th>
+            <th>Includes Defender</th>
             <th></th>
         </tr>
         </thead>
@@ -44,12 +44,12 @@
                 {% /reportOnSpareLicenses %}
             </td>
             <td>
-                {% #includesATP %}
+                {% #includesDefender %}
                 <i class='fa fa-check'></i>
-                {% /includesATP %}
-                {% ^includesATP %}
+                {% /includesDefender %}
+                {% ^includesDefender %}
                 <i class='fa fa-times'></i>
-                {% /includesATP %}
+                {% /includesDefender %}
             </td>
             <td class="buttons">
                 <button class="editButton">Edit</button>
@@ -72,17 +72,10 @@
     let rules = [];
 
     function newRule() {
-        return {replacement: "", license: null, mailboxLimit: null, reportOnSpareLicenses: false, includesATP: false};
+        return {replacement: "", license: null, mailboxLimit: null, reportOnSpareLicenses: false, includesDefender: false};
     }
 
-    $.ajax({
-        url: '{URLGetData}',
-        method: 'GET',
-        dataType: 'JSON'
-    }).then(function (result) {
-        rules = result;
-        drawList();
-    });
+
 
 
     let editingItem = null;
@@ -99,6 +92,14 @@
     }
 
     window.addEventListener('DOMContentLoaded', function () {
+        $.ajax({
+            url: '{URLGetData}',
+            method: 'GET',
+            dataType: 'JSON'
+        }).then(function (result) {
+            rules = result;
+            drawList();
+        });
         Mustache.tags = ['{%', '%}'];
         addButton = $('.addButton');
         saveButton = $('.saveButton');
@@ -215,7 +216,7 @@
         $('#mailboxLimitInput').val(rule.mailboxLimit);
         $('#licenseInput').val(rule.license);
         $('#reportOnSpareLicensesInput')[0].checked = (rule.reportOnSpareLicenses);
-        $('#includesATPInput')[0].checked = rule.includesATP;
+        $('#includesDefenderInput')[0].checked = rule.includesDefender;
     }
 
     function updateLicense() {
@@ -235,7 +236,7 @@
     }
 
     function updateIncludesATP() {
-        currentRule.includesATP = $('#includesATPInput').is(':checked');
+        currentRule.includesDefender = $('#includesDefenderInput').is(':checked');
     }
 
 </script>
@@ -289,13 +290,13 @@
     </div>
     <div>
         <div style="width: 100px; display: inline-block">
-            Includes ATP
+            Includes Defender
         </div>
         <input type="checkbox"
                value="Y"
-               name="includesATP"
+               name="includesDefender"
                onchange="updateIncludesATP()"
-               id="includesATPInput"
+               id="includesDefenderInput"
         >
     </div>
     <div>

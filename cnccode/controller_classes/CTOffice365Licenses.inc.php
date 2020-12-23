@@ -100,8 +100,8 @@ class CTOffice365Licenses extends CTCNC
                 );
 
                 $dbeOffice365License->setValue(
-                    DBEOffice365License::includesATP,
-                    json_decode($this->getParam('includesATP'))
+                    DBEOffice365License::includesDefender,
+                    json_decode($this->getParam('includesDefender'))
                 );
                 $dbeOffice365License->updateRow();
 
@@ -125,8 +125,8 @@ class CTOffice365Licenses extends CTCNC
                     (bool)$this->getParam('reportOnSpareLicenses')
                 );
                 $dbeOffice365License->setValue(
-                    DBEOffice365License::includesATP,
-                    (bool)$this->getParam('includesATP')
+                    DBEOffice365License::includesDefender,
+                    (bool)$this->getParam('includesDefender')
                 );
                 $dbeOffice365License->insertRow();
 
@@ -139,7 +139,7 @@ class CTOffice365Licenses extends CTCNC
                         "reportOnSpareLicenses" => $dbeOffice365License->getValue(
                             DBEOffice365License::reportOnSpareLicenses
                         ),
-                        "includesATP"           => $dbeOffice365License->getValue(DBEOffice365License::includesATP)
+                        "includesDefender"           => $dbeOffice365License->getValue(DBEOffice365License::includesDefender)
                     ],
                     JSON_NUMERIC_CHECK
                 );
@@ -159,7 +159,7 @@ class CTOffice365Licenses extends CTCNC
                         "reportOnSpareLicenses" => $dbeOffice365Licenses->getValue(
                             DBEOffice365License::reportOnSpareLicenses
                         ),
-                        "includesATP"           => $dbeOffice365Licenses->getValue(DBEOffice365License::includesATP)
+                        "includesDefender"           => $dbeOffice365Licenses->getValue(DBEOffice365License::includesDefender)
                     ];
                 }
                 echo json_encode($data, JSON_NUMERIC_CHECK);

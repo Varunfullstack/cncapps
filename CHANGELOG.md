@@ -5,6 +5,8 @@ This project changes will be shown here.
 ## Added
 - Issue 1116 -  Include friendly Mac OS names
 - Issue 1130 - M365 Streamone missing licenses sometimes incorrectly reported.
+### Changed
+- Rename instance of ATP to Defender
 
 ## [v5.0.8] - 2020-12-22
 ### Changed
