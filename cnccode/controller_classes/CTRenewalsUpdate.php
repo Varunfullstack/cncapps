@@ -11,6 +11,10 @@ require_once($cfg['path_dbe'] . '/DBECustomerItem.inc.php');
 
 class CTRenewalsUpdate extends CTCNC
 {
+    const UPDATE_AUTO_GENERATE_CONTRACT_INVOICE = "updateAutoGenerateContractInvoice";
+    const UPDATE_USERS                          = "updateUsers";
+    const GET_DATA                              = 'getData';
+
     function __construct($requestMethod,
                          $postVars,
                          $getVars,
@@ -42,21 +46,21 @@ class CTRenewalsUpdate extends CTCNC
     function defaultAction()
     {
         switch ($this->getAction()) {
-            case 'getData':
-                $draw = $_REQUEST['draw'];
-                $columns = $_REQUEST['columns'];
-                $search = $_REQUEST['search'];
-                $order = $_REQUEST['order'];
-                $offset = $_REQUEST['start'];
-                $limit = $_REQUEST['length'];
-
-                $columnsNames = [
+            case self::GET_DATA:
+                $draw              = $_REQUEST['draw'];
+                $columns           = $_REQUEST['columns'];
+                $search            = $_REQUEST['search'];
+                $order             = $_REQUEST['order'];
+                $offset            = $_REQUEST['start'];
+                $limit             = $_REQUEST['length'];
+                $columnsNames      = [
                     "contractName",
                     "customerName",
                     "itemBillingCategoryName",
                     "numberOfUsers",
                     "invoicePeriodMonths",
                     'nextInvoicePeriod',
+                    'autoGenerateInvoice',
                     "directDebit"
                 ];
                 $columnsDefinition = [
@@ -65,24 +69,24 @@ class CTRenewalsUpdate extends CTCNC
                     "itemBillingCategoryName" => "itemBillingCategory.name",
                     "invoicePeriodMonths"     => "custitem.invoicePeriodMonths",
                     'nextInvoicePeriod'       => 'DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` MONTH )',
-                    "directDebit"             => "directDebitFlag"
+                    'autoGenerateInvoice'     => "autoGenerateContractInvoice",
+                    "directDebit"             => "directDebitFlag",
                 ];
-
-                /** @var dbSweetcode $db */
-                global $db;
-                $countQuery = "select count(*) from custitem left join item ON itm_itemno = cui_itemno LEFT JOIN customer
+                /** @var dbSweetcode $db */ global $db;
+                $countQuery       = "select count(*) from custitem left join item ON itm_itemno = cui_itemno LEFT JOIN customer
     ON custitem.`cui_custno` = customer.`cus_custno`
   LEFT JOIN itemBillingCategory
     ON item.`itemBillingCategoryId` = itemBillingCategory.id where declinedFlag = 'N'  AND renewalTypeID = 2";
                 $totalCountResult = $db->query($countQuery);
-                $totalCount = $totalCountResult->fetch_row()[0];
-                $defaultQuery = "SELECT
+                $totalCount       = $totalCountResult->fetch_row()[0];
+                $defaultQuery     = "SELECT
   custitem.`cui_cuino` AS contractID,
   item.`itm_desc` AS contractName,
   customer.`cus_name` AS customerName,
   itemBillingCategory.name AS itemBillingCategoryName,
   custitem.`cui_users` AS numberOfUsers,
        directDebitFlag = 'Y' as directDebit,
+       autoGenerateContractInvoice = 'Y' as autoGenerateContractInvoice, 
        DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` MONTH ), '%d/%m/%Y') as invoiceFromDate,
 DATE_FORMAT(
  				DATE_SUB(
@@ -101,28 +105,25 @@ FROM
     ON item.`itemBillingCategoryId` = itemBillingCategory.id
 WHERE declinedFlag = 'N'
   AND renewalTypeID = 2 ";
-                $columnSearch = [];
-                $parameters = [];
+                $columnSearch     = [];
+                $parameters       = [];
                 foreach ($columns as $column) {
                     if (!isset($columnsDefinition[$column['data']])) {
                         continue;
                     }
-
                     if ($column['search']['value']) {
                         $columnSearch[] = $columnsDefinition[$column['data']] . " like ?";
-                        $parameters[] = [
+                        $parameters[]   = [
                             "type"  => "s",
                             "value" => "%" . $column['search']['value'] . "%"
                         ];
                     }
                 }
-
                 if (count($columnSearch)) {
-                    $wherePart = " and " . implode(" and ", $columnSearch);
+                    $wherePart    = " and " . implode(" and ", $columnSearch);
                     $defaultQuery .= $wherePart;
-                    $countQuery .= $wherePart;
+                    $countQuery   .= $wherePart;
                 }
-
                 $orderBy = [];
                 if (count($order)) {
                     foreach ($order as $orderItem) {
@@ -138,37 +139,35 @@ WHERE declinedFlag = 'N'
                         $defaultQuery .= (" order by " . implode(' , ', $orderBy));
                     }
                 }
-                $countResult = $db->preparedQuery(
+                $countResult   = $db->preparedQuery(
                     $countQuery,
                     $parameters
                 );
                 $filteredCount = $countResult->fetch_row()[0];
-
-                $defaultQuery .= " limit ?,?";
-                $parameters[] = ["type" => "i", "value" => $offset];
-                $parameters[] = ["type" => "i", "value" => $limit];
-//                var_dump($defaultQuery);
-                $result = $db->preparedQuery(
+                $defaultQuery  .= " limit ?,?";
+                $parameters[]  = ["type" => "i", "value" => $offset];
+                $parameters[]  = ["type" => "i", "value" => $limit];
+                $result        = $db->preparedQuery(
                     $defaultQuery,
                     $parameters
                 );
-                $data = array_map(
+                $data          = array_map(
                     function ($row) {
                         return [
-                            "contractID"              => $row['contractID'],
-                            "contractName"            => $row['contractName'],
-                            "customerName"            => $row['customerName'],
-                            "itemBillingCategoryName" => $row['itemBillingCategoryName'],
-                            "numberOfUsers"           => $row['numberOfUsers'],
-                            "invoicePeriodMonths"     => $row['invoicePeriodMonths'],
-                            "invoiceFromDate"         => $row['invoiceFromDate'],
-                            "invoiceToDate"           => $row['invoiceToDate'],
-                            "directDebit"             => $row['directDebit']
+                            "contractID"                  => $row['contractID'],
+                            "contractName"                => $row['contractName'],
+                            "customerName"                => $row['customerName'],
+                            "itemBillingCategoryName"     => $row['itemBillingCategoryName'],
+                            "numberOfUsers"               => $row['numberOfUsers'],
+                            "invoicePeriodMonths"         => $row['invoicePeriodMonths'],
+                            "invoiceFromDate"             => $row['invoiceFromDate'],
+                            "invoiceToDate"               => $row['invoiceToDate'],
+                            "directDebit"                 => $row['directDebit'],
+                            "autoGenerateContractInvoice" => $row['autoGenerateContractInvoice']
                         ];
                     },
                     $result->fetch_all(MYSQLI_ASSOC)
                 );
-
                 echo json_encode(
                     [
                         "draw"            => $draw,
@@ -177,37 +176,30 @@ WHERE declinedFlag = 'N'
                         "data"            => $data
                     ]
                 );
-
                 break;
-            case "updateUsers":
-                if (!isset($_REQUEST['contractID'])) {
-                    echo json_encode(["error" => "contractID is mandatory"]);
-                    http_response_code(400);
-                    exit;
-                }
-                $contractID = $_REQUEST['contractID'];
-                $dbeCustomerItem = new DBECustomerItem($this);
-                $dbeCustomerItem->getRow($contractID);
-                if (!$dbeCustomerItem->rowCount()) {
-                    echo json_encode(["error" => "Contract not found"]);
-                    http_response_code(400);
-                    exit;
-                }
-
-                $dbeCustomerItem->setValue(DBECustomerItem::users, $_REQUEST['users']);
+            case self::UPDATE_USERS:
+                $dbeCustomerItem = $this->getCustomerItemFromRequest();
+                $data            = $this->getJSONData();
+                $dbeCustomerItem->setValue(DBECustomerItem::users, $data['users']);
                 $dbeCustomerItem->setValue(
                     DBECustomerItem::curUnitCost,
-                    $_REQUEST['users'] * $dbeCustomerItem->getValue(
+                    $data['users'] * $dbeCustomerItem->getValue(
                         DBECustomerItem::costPricePerMonth
                     ) * 12
                 );
                 $dbeCustomerItem->setValue(
                     DBECustomerItem::curUnitSale,
-                    $_REQUEST['users'] * $dbeCustomerItem->getValue(
+                    $data['users'] * $dbeCustomerItem->getValue(
                         DBECustomerItem::salePricePerMonth
                     ) * 12
                 );
-
+                $dbeCustomerItem->updateRow();
+                echo json_encode(["status" => "ok"]);
+                break;
+            case self::UPDATE_AUTO_GENERATE_CONTRACT_INVOICE:
+                $dbeCustomerItem = $this->getCustomerItemFromRequest();
+                $data            = $this->getJSONData();
+                $dbeCustomerItem->setValue(DBECustomerItem::autoGenerateContractInvoice, $data['status'] ? 'Y' : 'N');
                 $dbeCustomerItem->updateRow();
                 echo json_encode(["status" => "ok"]);
                 break;
@@ -226,12 +218,39 @@ WHERE declinedFlag = 'N'
         $this->setTemplateFiles(
             array('RenewalsUpdate' => 'RenewalsUpdate')
         );
-
         $this->template->parse(
             'CONTENTS',
             'RenewalsUpdate',
             true
         );
         $this->parsePage();
+    }
+
+    private function checkContractIdIsSet(): void
+    {
+        $data = $this->getJSONData();
+        if (!isset($data['contractID'])) {
+            echo json_encode(["error" => "contractID is mandatory"]);
+            http_response_code(400);
+            exit;
+        }
+    }
+
+    /**
+     * @return DBECustomerItem
+     */
+    private function getCustomerItemFromRequest(): DBECustomerItem
+    {
+        $this->checkContractIdIsSet();
+        $data            = $this->getJSONData();
+        $contractID      = $data['contractID'];
+        $dbeCustomerItem = new DBECustomerItem($this);
+        $dbeCustomerItem->getRow($contractID);
+        if (!$dbeCustomerItem->rowCount()) {
+            echo json_encode(["error" => "Contract not found"]);
+            http_response_code(400);
+            exit;
+        }
+        return $dbeCustomerItem;
     }
 }
