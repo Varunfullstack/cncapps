@@ -15,6 +15,7 @@ This project changes will be shown here.
 - Issue 1139 - Renewals Update to include Auto Generated Invoice value
 - Issue 1122 - Asset list box enhancement
 - Issue 1154 - Engineer name dropdown change source fields
+- Issue 1151 - ITEMS FOR NEXT REVIEW MEETING.txt
 ### Fixed
 - Issue 1165 - Fixed Activity behaviour changes
 ### Removed
