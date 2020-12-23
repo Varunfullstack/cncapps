@@ -49,12 +49,12 @@ class BUCustomer extends Business
     function __construct(&$owner)
     {
         parent::__construct($owner);
-        $this->dbeCustomer = new DBECustomer($this);
-        $this->dbeSite = new DBESite($this);
-        $this->dbeContact = new DBEContact($this);
-        $this->dbeCustomerType = new DBECustomerType($this);
+        $this->dbeCustomer             = new DBECustomer($this);
+        $this->dbeSite                 = new DBESite($this);
+        $this->dbeContact              = new DBEContact($this);
+        $this->dbeCustomerType         = new DBECustomerType($this);
         $this->dbeCustomerLeadStatuses = new DBECustomerLeadStatus($this);
-        $this->buHeader = new BUHeader($this);
+        $this->buHeader                = new BUHeader($this);
         $this->buHeader->getHeader($this->dsHeader);
         $this->dsHeader->fetchNext();
     }
@@ -73,16 +73,15 @@ class BUCustomer extends Business
      * @return bool : One or more rows
      * @access public
      */
-    function getCustomersByNameMatch(
-        &$dsResults,
-        $contactString = null,
-        $phoneString = null,
-        $nameMatchString = null,
-        $town = null,
-        $newCustomerFromDate = null,
-        $newCustomerToDate = null,
-        $droppedCustomerFromDate = null,
-        $droppedCustomerToDate = null
+    function getCustomersByNameMatch(&$dsResults,
+                                     $contactString = null,
+                                     $phoneString = null,
+                                     $nameMatchString = null,
+                                     $town = null,
+                                     $newCustomerFromDate = null,
+                                     $newCustomerToDate = null,
+                                     $droppedCustomerFromDate = null,
+                                     $droppedCustomerToDate = null
     )
     {
         $this->setMethodName('getCustomersByNameMatch');
@@ -271,42 +270,33 @@ class BUCustomer extends Business
         if ($email === '') {
             return true;
         }
-
-
         $query = "select count(con_contno) as count from contact where con_email = ? and active = 1 ";
-
-
         $paramTypes = 's';
-        $params = [
+        $params     = [
             $email,
         ];
-
         if ($contactID) {
-            $query .= " and con_contno <> ? ";
+            $query      .= " and con_contno <> ? ";
             $paramTypes .= "i";
-            $params[] = +$contactID;
+            $params[]   = +$contactID;
         }
-
         if ($customerID) {
-            $query .= " and con_custno <> ?";
+            $query      .= " and con_custno <> ?";
             $paramTypes .= "i";
-            $params[] = +$customerID;
+            $params[]   = +$customerID;
         }
-
-        $params = array_merge(
+        $params   = array_merge(
             [$paramTypes],
             $params
         );
         $refArray = [];
         foreach ($params as $key => $value) $refArray[$key] = &$params[$key];
-
         $statement = $this->db->prepare($query);
         call_user_func_array(
             [$statement, 'bind_param'],
             $refArray
         );
         $result = $statement->execute() ? $statement->get_result() : false;
-
         $statement->close();
         $row = $result->fetch_assoc();
         return $row['count'] > 0;
@@ -372,7 +362,7 @@ class BUCustomer extends Business
      */
     function beforeUpdateCustomer($newRow)
     {
-        $customerID = $newRow->getPkValue();
+        $customerID      = $newRow->getPkValue();
         $currentCustomer = new DBECustomer($this);
         $currentCustomer->getRow($customerID);
         $newRow->setValue(
@@ -383,7 +373,6 @@ class BUCustomer extends Business
             DBECustomer::modifyUserID,
             $GLOBALS ['auth']->is_authenticated()
         );
-
         if ($currentCustomer->getValue(DBECustomer::lastReviewMeetingDate) != $newRow->getValue(
                 DBECustomer::lastReviewMeetingDate
             )) {
@@ -525,7 +514,6 @@ class BUCustomer extends Business
     function updateSite(&$dsData)
     {
         $this->setMethodName('updateSite');
-
         $this->dbeSite->setCallbackMethod(
             DA_AFTER_COLUMNS_CREATED,
             $this,
@@ -535,7 +523,6 @@ class BUCustomer extends Business
             $dsData,
             $this->dbeSite
         ));
-
         $this->dbeSite->resetCallbackMethod(DA_AFTER_COLUMNS_CREATED);
         return $ret;
     }
@@ -666,7 +653,6 @@ class BUCustomer extends Business
             DBEContact::othersClosureEmailFlag,
             'Y'
         );
-
         $dsContact->post();
         return TRUE;
     }
@@ -720,7 +706,7 @@ class BUCustomer extends Business
     )
     {
         $customerName = $this->dbeCustomer->getValue(DBECustomer::name);
-        $shortCode = "";
+        $shortCode    = "";
         for ($ixChar = 0; $ixChar <= strlen($customerName); $ixChar++) {
             if (substr(
                     $customerName,
@@ -739,12 +725,12 @@ class BUCustomer extends Business
                 }
             }
         }
-        $number = 1;
+        $number       = 1;
         $numberUnique = FALSE;
-        $dbeSite = new DBESite($this);
-        $sageRef = null;
+        $dbeSite      = new DBESite($this);
+        $sageRef      = null;
         while (!$numberUnique) {
-            $sageRef = $shortCode . str_pad(
+            $sageRef      = $shortCode . str_pad(
                     $number,
                     3,
                     "0",
@@ -811,7 +797,6 @@ class BUCustomer extends Business
             DBECustomer::support24HourFlag,
             'N'
         );
-
         $dsCustomer->setValue(
             DBECustomer::modifyDate,
             date('Y-m-d H:i:s')
@@ -970,7 +955,6 @@ class BUCustomer extends Business
             $dsSite
         );
         $dsContact->fetchNext();
-
         $contactPhone = null;
         if ($dsSite->getValue(DBESite::phone)) {
             $contactPhone .= '<a href="tel:' . str_replace(
@@ -993,7 +977,6 @@ class BUCustomer extends Business
                     $dsContact->getValue(DBEContact::mobilePhone)
                 ) . '">' . $dsContact->getValue(DBEContact::mobilePhone) . '</a>';
         }
-
         if ($dsContact->getValue(DBEContact::email)) {
             $subject = null;
             if ($emailSubject) {
@@ -1001,7 +984,6 @@ class BUCustomer extends Business
             }
             $contactPhone .= "&nbsp;<a href='mailto:{$dsContact->getValue(DBEContact::email)}{$subject}'><img src='images/email.gif' style='border: 0' alt='email'></a>";
         }
-
         return $contactPhone;
     }
 
@@ -1018,9 +1000,7 @@ class BUCustomer extends Business
     )
     {
         $this->setMethodName('getInvoiceContactsByCustomerID');
-
         $this->dbeContact->getInvoiceContactsByCustomerID($customerID);
-
         $ret = $this->getData(
             $this->dbeContact,
             $dsData
@@ -1044,21 +1024,16 @@ class BUCustomer extends Business
     )
     {
         $this->setMethodName('getMainSupportEmailAddresses');
-
         if (!$customerID) {
             $this->raiseError('customerID not passed');
         }
-
         $this->dbeContact->getMainSupportRowsByCustomerID($customerID);
-
         $emailList = [];
-
         while ($this->dbeContact->fetchNext()) {
             $currentContactEmail = strtolower($this->dbeContact->getValue(DBEContact::email));
             if ($currentContactEmail === strtolower($excludeEmail)) {
                 continue;
             }
-
             if (array_key_exists($currentContactEmail, $emailList)) {
                 continue;
             }
@@ -1084,9 +1059,7 @@ class BUCustomer extends Business
         if ($userID != USER_GJ) {
             return false;
         }
-
         // sales orders
-
         $dbeOrdhead = new DBEOrdhead($this);
         $dbeOrdhead->setValue(
             DBEOrdhead::customerID,
@@ -1096,7 +1069,6 @@ class BUCustomer extends Business
             return FALSE;
         }
         // calls
-
         $dbeProblem = new DBEProblem($this);
         $dbeProblem->setValue(
             DBEProblem::customerID,
@@ -1106,7 +1078,6 @@ class BUCustomer extends Business
             return FALSE;
         }
         // customer items
-
         $dbeCustomerItem = new DBECustomerItem($this);
         $dbeCustomerItem->setValue(
             DBECustomerItem::customerID,
@@ -1116,7 +1087,6 @@ class BUCustomer extends Business
             return FALSE;
         }
         // invoices
-
         $dbeInvhead = new DBEInvhead($this);
         $dbeInvhead->setValue(
             DBEInvhead::customerID,
@@ -1187,7 +1157,6 @@ class BUCustomer extends Business
             return FALSE;
         }
         // calls
-
         $dbeCallActivity = new DBECallActivity($this);
         if ($dbeCallActivity->countRowsByCustomerSiteNo(
                 $customerID,
@@ -1209,11 +1178,9 @@ class BUCustomer extends Business
     )
     {
         $this->setMethodName('getMainSupportContacts');
-
         if (!$customerID) {
             $this->raiseError('customerID not passed');
         }
-
         $this->dbeContact->getMainSupportRowsByCustomerID(
             $customerID,
             $includeSupervisors
@@ -1261,7 +1228,6 @@ class BUCustomer extends Business
                 )
             ];
         }
-
         return $contacts;
     }
 
@@ -1270,15 +1236,12 @@ class BUCustomer extends Business
      * @param $customerID
      * @return array
      */
-    function getReviewContacts($customerID
-    )
+    function getReviewContacts($customerID)
     {
         $this->setMethodName('getMainSupportContacts');
-
         if (!$customerID) {
             $this->raiseError('customerID not passed');
         }
-
         $this->dbeContact->getReviewContactsByCustomerID(
             $customerID
         );
@@ -1322,7 +1285,6 @@ class BUCustomer extends Business
                 ),
             ];
         }
-
         return $contacts;
     }
 
@@ -1416,42 +1378,41 @@ class BUCustomer extends Business
         /*
         Then sub/folders
         */
-        $subfolders =
-            array(
-                'Client Information Forms',
-                'CNC Internet',
-                'Current Documentation',
-                'E-Support Packs',
-                'PC Build Sheets',
-                'Projects',
-                'Review Meetings',
-                'Software Licencing',
-                'Vulnerability Scans',
-                'Disaster Recovery Process'
-            );
-
+        $subfolders = array(
+            'Client Information Forms',
+            'CNC Internet',
+            'Current Documentation',
+            'E-Support Packs',
+            'PC Build Sheets',
+            'Projects',
+            'Review Meetings',
+            'Software Licencing',
+            'Vulnerability Scans',
+            'Disaster Recovery Process'
+        );
         foreach ($subfolders as $folder) {
             $this->createFolderIfNotExist($dir . '/' . $folder);
         }
         /*
         Then these under Current Documentation
         */
-        $subfolders =
-            array(
-                'Documents and Forms',
-                'Old Documentation',
-                'Photos',
-                'Bitlocker Recovery Keys'
-            );
-
+        $subfolders = array(
+            'Documents and Forms',
+            'Old Documentation',
+            'Photos',
+            'Bitlocker Recovery Keys'
+        );
         foreach ($subfolders as $folder) {
             $this->createFolderIfNotExist($dir . '/Current Documentation/' . $folder);
         }
-
         $this->createFolderIfNotExist($dir . '/Current Documentation/Documents and Forms/Starters & Leavers');
-
         $this->createFolderIfNotExist($dir . '/Review Meetings/Analysis & Reports');
+        $itemsForNextMeetingFilePath = $dir . '/Review Meetings/ITEMS FOR NEXT REVIEW MEETING.txt';
+        if (!file_exists($itemsForNextMeetingFilePath)) {
+            file_put_contents($itemsForNextMeetingFilePath, null);
+        }
     }
+
 
     function getCustomerFolderPath($customerID)
     {
@@ -1469,7 +1430,6 @@ class BUCustomer extends Business
         if (file_exists($folderName)) {
             return;
         }
-
         return mkdir($folderName, 0777, true);
     }
 
@@ -1477,7 +1437,6 @@ class BUCustomer extends Business
     {
 
         $dir = $this->getCustomerFolderPath($customerID);
-
         if (is_dir($dir)) {
             return $this->getCustomerFolderPathFromBrowser($customerID);
         } else {
@@ -1496,14 +1455,12 @@ class BUCustomer extends Business
     {
 
         $dir = $this->getCurrentDocumentsFolderPath($customerID);
-
         /* check to see if the folder exists */
         if (!is_dir($dir)) {
 
             mkdir($dir);
 
         }
-
         return $this->getCurrentDocumentsFolderPathFromBrowser($customerID);
 
     }
@@ -1522,10 +1479,9 @@ class BUCustomer extends Business
 
     }
 
-    function getDailyCallList(
-        CTCNC $controller,
-        &$dsResults,
-        $sortColumn = false
+    function getDailyCallList(CTCNC $controller,
+                              &$dsResults,
+                              $sortColumn = false
     )
     {
         if ($controller->hasPermissions(TECHNICAL_PERMISSION)) {
@@ -1533,17 +1489,14 @@ class BUCustomer extends Business
         } else {
             $reviewUserID = $GLOBALS['auth']->is_authenticated();
         }
-
         $this->dbeCustomer->getReviewList(
             $reviewUserID,
             $sortColumn
         );
-
         $ret = $this->getData(
             $this->dbeCustomer,
             $dsResults
         );
-
         return $ret;
     }
 
@@ -1560,7 +1513,6 @@ class BUCustomer extends Business
             $dsResults
         );
         $gotRow = $dsResults->fetchNext();
-
         return $gotRow;
     }
 
@@ -1586,11 +1538,10 @@ class BUCustomer extends Business
 
     function hasDefaultInvoiceContactsAtAllSites($customerID)
     {
-        $db = new dbSweetcode (); // database connection for query
+        $db          = new dbSweetcode (); // database connection for query
         $dbeCustomer = new DBECustomer($this);
-        $dbeSite = new DBESite($this);
-        $sql =
-            "SELECT COUNT(*) AS recCount
+        $dbeSite     = new DBESite($this);
+        $sql         = "SELECT COUNT(*) AS recCount
 			FROM {$dbeCustomer->getTableName()}
 				JOIN {$dbeSite->getTableName()} ON {$dbeCustomer->getDBColumnName(DBECustomer::customerID)} = {$dbeSite->getDBColumnName(DBESite::customerID)} AND {$dbeCustomer->getDBColumnName(DBECustomer::invoiceSiteNo)} = {$dbeSite->getDBColumnName(DBESite::siteNo)}
 			WHERE
@@ -1598,10 +1549,8 @@ class BUCustomer extends Business
 				AND {$dbeCustomer->getDBColumnName(DBECustomer::becameCustomerDate)} is not null and {$dbeCustomer->getDBColumnName(DBECustomer::droppedCustomerDate)} is null
 				AND {$dbeCustomer->getDBColumnName(DBECustomer::mailshotFlag)} = 'Y'
 				AND {$dbeCustomer->getDBColumnName(DBECustomer::customerID)} = " . $customerID;
-
         $db->query($sql);
         $db->next_record();
-
         return $db->Record ['recCount'];
 
     }
@@ -1623,9 +1572,7 @@ class BUCustomer extends Business
     {
         $dbeJContract = new DBEJContract($this);
         $dbeJContract->getPrePayContracts($customerId);
-
         $array = $dbeJContract->getRowAsArray();
-
         return !!count($array);
     }
 
@@ -1637,13 +1584,10 @@ class BUCustomer extends Business
     {
         $this->dbeCustomer->getRow($customerID);
         $primaryMainContactID = $this->dbeCustomer->getValue(DBECustomer::primaryMainContactID);
-
         if (!$primaryMainContactID) {
             return null;
         }
-
         $dbeContact = new DBEContact($this);
-
         $dbeContact->getRow($primaryMainContactID);
         return $dbeContact;
     }

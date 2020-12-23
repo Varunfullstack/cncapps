@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1151 - ITEMS FOR NEXT REVIEW MEETING.txt
+
 ## [v5.0.8] - 2020-12-22
 ### Changed
 - Changed Activity SLA Breached criteria to include initial activities
