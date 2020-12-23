@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Removed
+- Issue 1143 - Remove 'PLEASE RENEW FOR 2 YEARS' text from generated SSL renewal service requests.
+
 ## [v5.0.8] - 2020-12-22
 ### Changed
 - Changed Activity SLA Breached criteria to include initial activities
