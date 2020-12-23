@@ -1,7 +1,4 @@
 <style>
-    .progressIndicator {
-        position: relative;
-    }
 
     .loading:not(:required):after {
         font-size: 7px !important;
@@ -11,13 +8,8 @@
 
     let table = null;
 
-    function changeUsers() {
-        console.log($(event.target).data());
-        const loadingIndicator = event.target.nextElementSibling;
-
+    function showRowLoadingIndicator(tr) {
         const rowOverlay = document.createElement('div');
-        const td = event.target.parentElement;
-        const tr = td.parentElement;
         const trPosition = tr.getBoundingClientRect();
         rowOverlay.style.height = String(trPosition.height);
         rowOverlay.style.width = String(trPosition.width);
@@ -34,16 +26,42 @@
         indicatorHolder.append(indicator);
         rowOverlay.append(indicatorHolder);
         document.body.append(rowOverlay);
-        $.ajax(
+        return rowOverlay;
+    }
+
+    function hideRowLoadingIndicator(rowOverlay) {
+        rowOverlay.parentNode.removeChild(rowOverlay);
+    }
+
+    function changeUsers() {
+        const td = event.target.parentElement;
+        const tr = td.parentElement;
+        const rowOverlay = showRowLoadingIndicator(tr);
+        fetch(
             '?action=updateUsers',
             {
                 method: 'POST',
-                dataType: 'json',
-                data: {contractID: $(event.target).data().contractId, users: event.target.value}
+                body: JSON.stringify({contractID: $(event.target).data().contractId, users: event.target.value})
             }
         ).then(result => {
-            rowOverlay.parentNode.removeChild(rowOverlay);
+            hideRowLoadingIndicator(rowOverlay);
         })
+    }
+
+    function changeAutoGenerate() {
+        const td = event.target.parentElement;
+        const tr = td.parentElement;
+        const rowOverlay = showRowLoadingIndicator(tr);
+        fetch(
+            '?action=updateAutoGenerateContractInvoice',
+            {
+                method: 'POST',
+                body: JSON.stringify({contractID: $(event.target).data().contractId, status: event.target.checked})
+            }
+        )
+            .then(result => {
+                hideRowLoadingIndicator(rowOverlay);
+            });
     }
 
     window.addEventListener('DOMContentLoaded', function () {
@@ -119,7 +137,7 @@
                 {data: "itemBillingCategoryName"},
                 {
                     data: "numberOfUsers", sortable: false, searchable: false, render: function (data, type, row) {
-                        return '<input value="' + data + '" onchange="changeUsers()" data-contract-id="' + row.contractID + '"><div class="progressIndicator"></div>'
+                        return '<input value="' + data + '" onchange="changeUsers()" data-contract-id="' + row.contractID + '">'
                     }
                 },
                 {data: 'invoicePeriodMonths'},
@@ -129,6 +147,13 @@
                     render: function (data, type, row) {
                         return "from " + row.invoiceFromDate + " to " + row.invoiceToDate;
 
+                    }
+                },
+                {
+                    data: 'autoGenerateContractInvoice',
+                    name: 'autoGenerateContractInvoice',
+                    render: function (data, type, row) {
+                        return '<input type="checkbox"' + (data ? 'checked' : '') + ' onchange="changeAutoGenerate()" data-contract-id="' + row.contractID + '" ' + (row.directDebit ? 'onclick="return false;"' : '') + '>'
                     }
                 },
                 {
@@ -157,6 +182,7 @@
         <th data-no-search="true">Number of Users</th>
         <th data-no-search="true">Invoice Interval(Months)</th>
         <th data-no-search="true">Next Invoice Period</th>
+        <th data-no-search="true">Auto-gen Invoice</th>
         <th data-no-search="true">DD</th>
     </tr>
     </thead>
@@ -168,6 +194,7 @@
         <th>Number of Users</th>
         <th>Invoice Interval(Months)</th>
         <th>Next Invoice Period</th>
+        <th>Auto-gen Invoice</th>
         <th>DD</th>
     </tr>
     </tfoot>
