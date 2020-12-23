@@ -8,6 +8,7 @@ This project changes will be shown here.
 ### Changed
 - Issue 1120 - Rename instance of ATP to Defender
 - Issue 1131 - Sales Order Search Page Enhancements
+- Issue 1149 - Starter Leaver question formatting.
 
 ## [v5.0.8] - 2020-12-22
 ### Changed
