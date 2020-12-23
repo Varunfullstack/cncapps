@@ -2,7 +2,6 @@ import {Autocomplete} from "@material-ui/lab";
 import APICustomers from "../../services/APICustomers";
 import APIStandardText from "../../services/APIStandardText";
 import React from 'react';
-import {TextField} from "@material-ui/core";
 
 import striptags from "striptags";
 
@@ -35,7 +34,12 @@ export default class AssetListSelectorComponent extends React.PureComponent {
         }
         if (this.props.assetName) {
             const [name, userName, biosVer] = this.props.assetTitle.split(' ');
-            this.state.selectedOption = {isAsset: true, name: this.props.assetName, LastUsername: userName, BiosVer: biosVer};
+            this.state.selectedOption = {
+                isAsset: true,
+                name: this.props.assetName,
+                LastUsername: userName,
+                BiosVer: biosVer
+            };
         }
     }
 
@@ -141,20 +145,20 @@ export default class AssetListSelectorComponent extends React.PureComponent {
         }
 
         return (
-            <Autocomplete renderInput={(params) => <TextField {...params} label="Select an Asset"
-                                                              variant="outlined"
-            />}
-                          options={this.getOptions()}
+            <Autocomplete options={this.getOptions()}
                           filterOptions={(options, state) => this.filterOptions(options, state)}
                           getOptionLabel={(option) => this.getOptionText(option)}
                           clearOnBlur={false}
-                          debug={true}
                           value={selectedOption}
                           renderOption={(value, state) => {
                               if (value.isAsset) {
                                   return (
                                       <React.Fragment>
-                                          <div style={{display: "inline-block", width: `${maxComputerNameLength}em`}}>
+                                          <div style={{
+                                              display: "inline-block",
+                                              width: `${maxComputerNameLength}em`
+                                          }}
+                                          >
                                               {value.name}
                                           </div>
                                           <div style={{display: "inline-block", width: `${maxUserNameLength}em`}}>
@@ -171,6 +175,16 @@ export default class AssetListSelectorComponent extends React.PureComponent {
                               </React.Fragment>
                           }}
                           onChange={(event, value, reason) => this.onChange(event, value, reason)}
+                          renderInput={params => {
+                              const {inputProps, InputLabelProps, InputProps} = params;
+                              return (
+                                  <div ref={InputProps.ref}>
+                                      <label {...InputLabelProps} >
+                                          <input {...inputProps} style={{width: "100%"}}/>
+                                      </label>
+                                  </div>
+                              )
+                          }}
             />
         );
     }
