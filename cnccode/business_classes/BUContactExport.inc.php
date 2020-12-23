@@ -31,26 +31,22 @@ class BUContactExport extends Business
      * @param $contractItemIDs
      * @return bool|mysqli_result
      */
-    function search(
-        $dsSearchForm,
-        $contractItemIDs
+    function search($dsSearchForm,
+                    $contractItemIDs
     )
     {
         $buHeader = new BUHeader($this);
         $dsHeader = new DataSet($this);
         $buHeader->getHeader($dsHeader);
         $dbeCustomer = new DBECustomer($this);
-        $DBEContact = new DBEContact($this);
+        $DBEContact  = new DBEContact($this);
         $dbeCustItem = new DBECustomerItem($this);
-        $dbeSite = new DBESite($this);
-        $query =
-            "SELECT DISTINCT";
-
+        $dbeSite     = new DBESite($this);
+        $query       = "SELECT DISTINCT";
         if ($dsSearchForm->getValue(CTContactExport::searchFormExportEmailOnlyFlag) == 'Y') {
             $query .= " {$DBEContact->getDBColumnName(DBEContact::email)} AS EmailAddress";
         } else {
-            $query .=
-                " 
+            $query .= " 
                 {$DBEContact->getDBColumnName($DBEContact::customerID)} as CustomerID,
         {$DBEContact->getDBColumnName($DBEContact::title)} AS Title,
         {$DBEContact->getDBColumnName($DBEContact::lastName)} AS LastName,
@@ -70,8 +66,6 @@ class BUContactExport extends Business
         {$DBEContact->getDBColumnName($DBEContact::email)} AS EmailAddress,
         CONCAT({$DBEContact->getDBColumnName($DBEContact::firstName)},' ',{$DBEContact->getDBColumnName($DBEContact::lastName)}) AS DisplayName,
         {$dbeCustomer->getDBColumnName(DBECustomer::becameCustomerDate)} is not null and {$dbeCustomer->getDBColumnName(DBECustomer::droppedCustomerDate)} is null AS Prospect";
-
-
             if ($dsSearchForm->getValue(CTContactExport::searchFormSendMailshotFlag)) {
                 $query .= ", {$dbeCustomer->getDBColumnName(DBECustomer::mailshotFlag)} AS `Mailshot`";
             }
@@ -108,32 +102,24 @@ class BUContactExport extends Business
             if ($dsSearchForm->getValue(DBEContact::hrUser)) {
                 $query .= ", {$DBEContact->getDBColumnName($DBEContact::hrUser)} as HR";
             }
-
             if ($dsSearchForm->getValue(DBEContact::reviewUser)) {
                 $query .= ", {$DBEContact->getDBColumnName($DBEContact::reviewUser)} as review";
             }
-
             $query .= ", active";
 
         }// end
-
         $query .= "
       FROM {$DBEContact->getTableName()}
       JOIN {$dbeSite->getTableName()} ON
         ({$DBEContact->getDBColumnName($DBEContact::siteNo)} = {$dbeSite->getDBColumnName(DBESite::siteNo)}  AND {$DBEContact->getDBColumnName($DBEContact::customerID)} = {$dbeSite->getDBColumnName(DBESite::customerID)})
       JOIN {$dbeCustomer->getTableName()} ON
         {$DBEContact->getDBColumnName($DBEContact::customerID)} = {$dbeCustomer->getDBColumnName(DBECustomer::customerID)}";
-
         if ($contractItemIDs) {
 
-            $query .=
-                " JOIN {$dbeCustItem->getTableName()}  ON {$dbeCustItem->getDBColumnName(DBECustomerItem::customerID)} = {$dbeCustomer->getDBColumnName(DBECustomer::customerID)}";
+            $query .= " JOIN {$dbeCustItem->getTableName()}  ON {$dbeCustItem->getDBColumnName(DBECustomerItem::customerID)} = {$dbeCustomer->getDBColumnName(DBECustomer::customerID)}";
         }
-
         $query .= " WHERE 1 = 1 ";
-
         $query .= " and active =  " . ($dsSearchForm->getValue(DBEContact::active) ? '1' : '0');
-
         if ($dsSearchForm->getValue(DBEContact::supportLevel)) {
             $selectedOptions = json_decode($dsSearchForm->getValue(DBEContact::supportLevel));
             if (count($selectedOptions) < 5) {
@@ -146,10 +132,8 @@ class BUContactExport extends Business
                         $selectedOptions,
                         1
                     );
-                    $hasNone = true;
+                    $hasNone         = true;
                 }
-
-
                 if ($hasNone) {
                     if (count($selectedOptions)) {
                         $query .= " and ( {$DBEContact->getDBColumnName($DBEContact::supportLevel)} is null or {$DBEContact->getDBColumnName($DBEContact::supportLevel)} = '' or {$DBEContact->getDBColumnName($DBEContact::supportLevel)} in (" . implode(
@@ -175,11 +159,9 @@ class BUContactExport extends Business
                 }
             }
         }
-
         $searchCriteria = $dsSearchForm->getValue(CTContactExport::searchCriteria);
         if ($contractItemIDs) {
-            $query .=
-                " AND  ( {$dbeCustItem->getDBColumnName(DBECustomerItem::declinedFlag)} = 'N' ";
+            $query .= " AND  ( {$dbeCustItem->getDBColumnName(DBECustomerItem::declinedFlag)} = 'N' ";
             if ($searchCriteria === 'AND') {
                 $query .= "AND {$dbeCustItem->getDBColumnName(DBECustomerItem::itemID)} IN(
                     " . implode(
@@ -199,13 +181,10 @@ class BUContactExport extends Business
                     ) . ") )";
             }
         }
-
         if ($dsSearchForm->getValue(CTContactExport::searchFormExportEmailOnlyFlag)) {
             $query .= " AND {$DBEContact->getDBColumnName($DBEContact::email)} <> '' and {$DBEContact->getDBColumnName($DBEContact::email)} is not null ";
         }
-
         $possibleOrQueries = "";
-
         if ($dsSearchForm->getValue(DBEContact::customerID)) {
             if (strlen($possibleOrQueries)) {
                 $possibleOrQueries .= $searchCriteria;
@@ -217,22 +196,32 @@ class BUContactExport extends Business
                 $possibleOrQueries .= $searchCriteria;
             }
             $dbeCustomer = new DBECustomer($this);
-            $condition = "  ( {$dbeCustomer->getDBColumnName(
+            $condition   = "  ( {$dbeCustomer->getDBColumnName(
                     DBECustomer::becameCustomerDate
                 )} is null or {$dbeCustomer->getDBColumnName(DBECustomer::droppedCustomerDate)} is not null) ";
-
             if ($dsSearchForm->getValue(CTContactExport::searchFormProspectFlag) != 'Y') {
                 $possibleOrQueries .= "  not {$condition}";
             } else {
                 $possibleOrQueries .= $condition;
             }
         }
-
         if ($dsSearchForm->getValue(DBEContact::sendMailshotFlag)) {
             if (strlen($possibleOrQueries)) {
                 $possibleOrQueries .= $searchCriteria;
             }
             $possibleOrQueries .= "  {$dbeCustomer->getDBColumnName(DBECustomer::mailshotFlag)} =  'Y' ";
+        }
+        if ($dsSearchForm->getValue(CTContactExport::searchFormReferredFlag)) {
+            if (strlen($possibleOrQueries)) {
+                $possibleOrQueries .= $searchCriteria;
+            }
+            $dbeCustomer = new DBECustomer($this);
+            $condition   = "   {$dbeCustomer->getDBColumnName(DBECustomer::referredFlag)} = 'Y' ";
+            if ($dsSearchForm->getValue(CTContactExport::searchFormReferredFlag) != 'Y') {
+                $possibleOrQueries .= "  not {$condition}";
+            } else {
+                $possibleOrQueries .= $condition;
+            }
         }
         if ($dsSearchForm->getValue(DBEContact::mailshot2Flag)) {
             if (strlen($possibleOrQueries)) {
@@ -270,21 +259,18 @@ class BUContactExport extends Business
             }
             $possibleOrQueries .= "  {$DBEContact->getDBColumnName($DBEContact::mailshot11Flag)} =  'Y' ";
         }
-
         if ($dsSearchForm->getValue(DBEContact::hrUser)) {
             if (strlen($possibleOrQueries)) {
                 $possibleOrQueries .= $searchCriteria;
             }
             $possibleOrQueries .= " {$DBEContact->getDBColumnName($DBEContact::hrUser)}  = 'Y' ";
         }
-
         if ($dsSearchForm->getValue(DBEContact::reviewUser)) {
             if (strlen($possibleOrQueries)) {
                 $possibleOrQueries .= $searchCriteria;
             }
             $possibleOrQueries .= " {$DBEContact->getDBColumnName($DBEContact::reviewUser)} = 'Y' ";
         }
-
         if (strlen($possibleOrQueries)) {
             $query .= " and (" . $possibleOrQueries . ")";
         }
@@ -303,40 +289,33 @@ class BUContactExport extends Business
     )
     {
         $senderEmail = $dsForm->getValue(CTContactExport::searchFormFromEmailAddress);
-        $body = $dsForm->getValue(CTContactExport::searchFormEmailBody);
-        $subject = $dsForm->getValue(CTContactExport::searchFormEmailSubject);
+        $body        = $dsForm->getValue(CTContactExport::searchFormEmailBody);
+        $subject     = $dsForm->getValue(CTContactExport::searchFormEmailSubject);
         /*
         Loop through contacts sending email to each
         */
         while ($row = $results->fetch_array(MYSQLI_ASSOC)) {
-            $buMail = new BUMail($this);
-
+            $buMail  = new BUMail($this);
             $toEmail = $row['EmailAddress'];
-
-            $hdrs = array(
+            $hdrs    = array(
                 'From'         => $senderEmail,
                 'To'           => $toEmail,
                 'Subject'      => $subject,
                 'Date'         => date("r"),
                 'Content-Type' => 'text/html; charset=UTF-8'
             );
-
             // add name to top of email
             $body = str_replace('[%ContactFirstName%]', $row['FirstName'], $body);
             $body = str_replace('[%ContactLastName%]', $row['LastName'], $body);
             $buMail->mime->setHTMLBody($body);
-
             $mime_params = array(
                 'text_encoding' => '7bit',
                 'text_charset'  => 'UTF-8',
                 'html_charset'  => 'UTF-8',
                 'head_charset'  => 'UTF-8'
             );
-
-            $thisBody = $buMail->mime->get($mime_params);
-
-            $hdrs = $buMail->mime->headers($hdrs);
-
+            $thisBody    = $buMail->mime->get($mime_params);
+            $hdrs        = $buMail->mime->headers($hdrs);
             $buMail->putInQueue(
                 $senderEmail,
                 $toEmail,

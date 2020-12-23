@@ -16,6 +16,7 @@ This project changes will be shown here.
 - Issue 1122 - Asset list box enhancement
 - Issue 1154 - Engineer name dropdown change source fields
 - Issue 1151 - ITEMS FOR NEXT REVIEW MEETING.txt
+- Issue 1147 - Export Contacts to include option for customer referred status
 ### Fixed
 - Issue 1165 - Fixed Activity behaviour changes
 ### Removed

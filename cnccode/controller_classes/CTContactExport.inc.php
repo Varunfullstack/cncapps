@@ -18,24 +18,25 @@ require_once($cfg['path_dbe'] . '/DBEStandardText.inc.php');
 
 class CTContactExport extends CTCNC
 {
-    const searchFormCustomerID = 'customerID';
-    const searchFormSendMailshotFlag = 'sendMailshotFlag';
-    const searchFormMailshot2Flag = 'mailshot2Flag';
-    const searchFormMailshot3Flag = 'mailshot3Flag';
-    const searchFormMailshot4Flag = 'mailshot4Flag';
-    const searchFormMailshot8Flag = 'mailshot8Flag';
-    const searchFormMailshot9Flag = 'mailshot9Flag';
-    const searchFormMailshot11Flag = 'mailshot11Flag';
+    const searchFormCustomerID          = 'customerID';
+    const searchFormSendMailshotFlag    = 'sendMailshotFlag';
+    const searchFormMailshot2Flag       = 'mailshot2Flag';
+    const searchFormMailshot3Flag       = 'mailshot3Flag';
+    const searchFormMailshot4Flag       = 'mailshot4Flag';
+    const searchFormMailshot8Flag       = 'mailshot8Flag';
+    const searchFormMailshot9Flag       = 'mailshot9Flag';
+    const searchFormMailshot11Flag      = 'mailshot11Flag';
     const searchFormExportEmailOnlyFlag = 'exportEmailOnlyFlag';
-    const searchFormContractItemID = 'contractItemID';
-    const searchFormProspectFlag = 'prospectFlag';
-    const searchFormFromEmailAddress = 'fromEmailAddress';
-    const searchFormEmailSubject = 'emailSubject';
-    const searchFormEmailBody = 'emailBody';
-    const searchFormSupportLevel = 'supportLevel';
-    const searchFormReviewUser = 'reviewUser';
-    const searchFormHrUser = 'hrUser';
-    const searchCriteria = 'searchCriteria';
+    const searchFormContractItemID      = 'contractItemID';
+    const searchFormProspectFlag        = 'prospectFlag';
+    const searchFormFromEmailAddress    = 'fromEmailAddress';
+    const searchFormEmailSubject        = 'emailSubject';
+    const searchFormEmailBody           = 'emailBody';
+    const searchFormSupportLevel        = 'supportLevel';
+    const searchFormReviewUser          = 'reviewUser';
+    const searchFormHrUser              = 'hrUser';
+    const searchCriteria                = 'searchCriteria';
+    const searchFormReferredFlag        = "referredFlag";
 
 
     /**
@@ -45,12 +46,11 @@ class CTContactExport extends CTCNC
      * @access  private
      */
     public $dsContact;
-    public $prospectFlags =
-        array(
-            'Customers and Prospects' => null,
-            'Prospects'               => 'Y',
-            'Customers'               => 'N'
-        );
+    public $prospectFlags = array(
+        'Customers and Prospects' => null,
+        'Prospects'               => 'Y',
+        'Customers'               => 'N'
+    );
     /**
      * @var BUContactExport
      */
@@ -128,24 +128,20 @@ WHERE customer.`cus_referred` <> 'Y'
     OR contact.`con_mobile_phone`
   ) 
   AND `active`";
-
         $db->query($query);
-
         $count = 0;
-
         $files = [];
-
-        $zip = new ZipArchive();
+        $zip   = new ZipArchive();
         $zip->open(
             '3cxExport.zip',
             ZipArchive::CREATE | ZipArchive::OVERWRITE
         );
         $files[] = 'export0.csv';
-        $file = fopen(
+        $file    = fopen(
             'export0.csv',
             "w"
         );
-        $header = [
+        $header  = [
             'FirstName',
             "LastName",
             "Company",
@@ -166,7 +162,6 @@ WHERE customer.`cus_referred` <> 'Y'
             $header
         );
         $maxRows = 499;
-
         while ($db->next_record(MYSQLI_ASSOC)) {
             if ($count == $maxRows) {
                 // we need to close the previous file
@@ -178,7 +173,7 @@ WHERE customer.`cus_referred` <> 'Y'
                     $files[count($files) - 1],
                     'w'
                 );
-                $str = implode(
+                $str  = implode(
                         ",",
                         $header
                     ) . "\n";
@@ -186,7 +181,6 @@ WHERE customer.`cus_referred` <> 'Y'
                     $file,
                     $str
                 );
-
                 $count = 0;
             }
             $data = [
@@ -233,7 +227,7 @@ WHERE customer.`cus_referred` <> 'Y'
                 null,
                 null
             ];
-            $str = implode(
+            $str  = implode(
                     ',',
                     $data
                 ) . "\n";
@@ -246,18 +240,12 @@ WHERE customer.`cus_referred` <> 'Y'
         // we need to close the previous file
         fclose($file);
         $zip->addFile($files[count($files) - 1]);
-
-
         $zip->close();
-
         foreach ($files as $file) {
             unlink($file);
         }
-
         $fileData = file_get_contents('3cxExport.zip');
-
         unlink('3cxExport.zip');
-
         return base64_encode($fileData);
     } // end function displaySearchForm
 
@@ -269,7 +257,6 @@ WHERE customer.`cus_referred` <> 'Y'
     function export()
     {
         $this->setMethodName('search');
-
         $dsSearchForm = new DSForm ($this);
         $dsSearchForm->addColumn(self::searchCriteria, DA_STRING, DA_NOT_NULL);
         $dsSearchForm->addColumn(
@@ -286,6 +273,12 @@ WHERE customer.`cus_referred` <> 'Y'
             self::searchFormMailshot2Flag,
             DA_YN,
             DA_ALLOW_NULL
+        );
+        $dsSearchForm->addColumn(
+            self::searchFormReferredFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            'N'
         );
         $dsSearchForm->addColumn(
             self::searchFormMailshot3Flag,
@@ -322,13 +315,11 @@ WHERE customer.`cus_referred` <> 'Y'
             DA_YN,
             DA_ALLOW_NULL
         );
-
         $dsSearchForm->addColumn(
             self::searchFormProspectFlag,
             DA_YN,
             DA_ALLOW_NULL
         );
-
         $dsSearchForm->addColumn(
             self::searchFormFromEmailAddress,
             DA_STRING,
@@ -344,19 +335,16 @@ WHERE customer.`cus_referred` <> 'Y'
             DA_STRING,
             DA_ALLOW_NULL
         );
-
         $dsSearchForm->addColumn(
             self::searchFormSupportLevel,
             DA_ARRAY,
             DA_ALLOW_NULL
         );
-
         $dsSearchForm->addColumn(
             self::searchFormReviewUser,
             DA_YN_FLAG,
             DA_ALLOW_NULL
         );
-
         $dsSearchForm->addColumn(
             self::searchFormHrUser,
             DA_YN_FLAG,
@@ -368,34 +356,29 @@ WHERE customer.`cus_referred` <> 'Y'
             DA_NOT_NULL,
             false
         );
-
-
         $buHeader = new BUHeader($this);
         $dsHeader = new DataSet($this);
         $buHeader->getHeader($dsHeader);
         $contractItemIDs = array();
-
-        $searchCriteria = 'AND';
+        $searchCriteria  = 'AND';
         if ($this->getParam('Export') || $this->getParam('SendEmail')) {
 
             $searchForm = $this->getParam('searchForm')[1];
-
             foreach ($searchForm as $key => $value) {
                 if ($searchForm[$key] === '') {
                     $searchForm[$key] = null;
                 }
             }
-
+            if (empty($searchForm[self::searchFormReferredFlag])) {
+                $searchForm[self::searchFormReferredFlag] = 'N';
+            }
             if (isset($searchForm['supportLevel'])) {
                 $searchForm['supportLevel'] = json_encode($searchForm['supportLevel']);
             }
-
             $dsSearchForm->populateFromArray([$searchForm]);
-
             if ($this->getParam('contractItemIDs')) {
                 $contractItemIDs = $this->getParam('contractItemIDs');
             }
-
             if ($this->getParam('SendEmail')) {
                 $dsSearchForm->setValue(
                     self::searchFormExportEmailOnlyFlag,
@@ -404,12 +387,10 @@ WHERE customer.`cus_referred` <> 'Y'
             }
             $dsSearchForm->setValue(self::searchCriteria, $this->getParam('searchCriteria'));
             $searchCriteria = $this->getParam('searchCriteria');
-            $results =
-                $this->buContactExport->search(
-                    $dsSearchForm,
-                    $contractItemIDs
-                );
-
+            $results = $this->buContactExport->search(
+                $dsSearchForm,
+                $contractItemIDs
+            );
             if ($this->getParam('Export')) {
                 $this->generateCSV($results);
                 exit;
@@ -433,7 +414,6 @@ WHERE customer.`cus_referred` <> 'Y'
                         'Required'
                     );
                 }
-
                 if (count($dsSearchForm->message) == 0) {
                     $this->buContactExport->sendEmail(
                         $dsSearchForm,
@@ -443,28 +423,24 @@ WHERE customer.`cus_referred` <> 'Y'
             }
 
         }
-
         $this->setTemplateFiles(
             'ContactExport',
             'ContactExport.inc'
         );
-
-        $urlSubmit = Controller::buildLink(
+        $urlSubmit        = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action' => CTCNC_ACT_SEARCH
             )
         );
-
-        $urlCustomerPopup =
-            Controller::buildLink(
-                CTCNC_PAGE_CUSTOMER,
-                array(
-                    'action'  => CTCNC_ACT_DISP_CUST_POPUP,
-                    'htmlFmt' => CT_HTML_FMT_POPUP
-                )
-            );
-        $customerString = null;
+        $urlCustomerPopup = Controller::buildLink(
+            CTCNC_PAGE_CUSTOMER,
+            array(
+                'action'  => CTCNC_ACT_DISP_CUST_POPUP,
+                'htmlFmt' => CT_HTML_FMT_POPUP
+            )
+        );
+        $customerString   = null;
         if ($dsSearchForm->getValue(self::searchFormCustomerID)) {
             $buCustomer = new BUCustomer ($this);
             $dsCustomer = new DataSet($this);
@@ -474,13 +450,11 @@ WHERE customer.`cus_referred` <> 'Y'
             );
             $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
-
         $this->template->set_block(
             'ContactExport',
             'supportLevelBlock',
             'selectSupportLevel'
         );
-
         $buContact = new BUContact($this);
         $buContact->supportLevelDropDown(
             '--',
@@ -491,9 +465,7 @@ WHERE customer.`cus_referred` <> 'Y'
             'selectSupportLevel',
             'supportLevelBlock'
         );
-
         $this->setPageTitle('Export Contacts');
-
         $this->template->set_var(
             array(
                 'customerID'                   => $dsSearchForm->getValue(self::searchFormCustomerID),
@@ -552,6 +524,9 @@ WHERE customer.`cus_referred` <> 'Y'
                 'reviewUserChecked'            => Controller::htmlChecked(
                     $dsSearchForm->getValue(DBEContact::reviewUser)
                 ),
+                'referredFlagChecked'          => Controller::htmlChecked(
+                    $dsSearchForm->getValue(self::searchFormReferredFlag)
+                ),
                 'activeChecked'                => $dsSearchForm->getValue(DBEContact::active) ? 'checked' : 'null',
                 'hrUserChecked'                => Controller::htmlChecked(
                     $dsSearchForm->getValue(DBEContact::hrUser)
@@ -568,25 +543,20 @@ WHERE customer.`cus_referred` <> 'Y'
                 "orSelected"                   => $searchCriteria == 'OR' ? 'selected' : null,
             )
         );
-
         // contract item selector
-
         $dbeItem = new DBEItem($this);
         $dbeItem->getRenewalTypeRows(2);
-
         $this->template->set_block(
             'ContactExport',
             'contractItemBlock',
             'contractItemRows'
         );
-
         while ($dbeItem->fetchNext()) {
 
             $itemChecked = (in_array(
                 $dbeItem->getValue(DBEItem::itemID),
                 $contractItemIDs
             )) ? CT_CHECKED : null;
-
             $this->template->set_var(
                 array(
                     'contractItemIDChecked'   => $itemChecked,
@@ -600,9 +570,7 @@ WHERE customer.`cus_referred` <> 'Y'
                 true
             );
         }
-
         // quotation item selector
-
         $dbeItem = new DBEItem($this);
         $dbeItem->getRenewalTypeRows(3);
         $this->template->set_block(
@@ -610,7 +578,6 @@ WHERE customer.`cus_referred` <> 'Y'
             'prospectFlagBlock',
             'prospectFlags'
         );
-
         foreach ($this->prospectFlags as $index => $value) {
 
             $this->template->set_var(
@@ -628,13 +595,11 @@ WHERE customer.`cus_referred` <> 'Y'
                 true
             );
         }
-
         $this->template->parse(
             'CONTENTS',
             'ContactExport',
             true
         );
-
         $this->parsePage();
 
     }
@@ -650,9 +615,7 @@ WHERE customer.`cus_referred` <> 'Y'
         $fileName = 'contacts.csv';
         Header('Content-type: text/plain');
         Header('Content-Disposition: attachment; filename=' . $fileName);
-
         $firstRow = true;
-
         while ($row = $resultSet->fetch_array(MYSQLI_ASSOC)) {
             /*
             Column names in first row
@@ -670,20 +633,17 @@ WHERE customer.`cus_referred` <> 'Y'
             foreach ($row as $key => $value) {
                 $row[$key] = '"' . $value . '"';
             }
-
             echo implode(
                     ',',
                     $row
                 ) . "\n";
         }
-
         $this->pageClose();
         exit;
     }
 
-    function standardTextList(
-        $template,
-        $block
+    function standardTextList($template,
+                              $block
     )
     {
         $dbeStandardText = new DBEStandardText($this);
@@ -691,18 +651,15 @@ WHERE customer.`cus_referred` <> 'Y'
             DBEStandardText::stt_standardtexttypeno,
             CONFIG_STANDARD_TEXT_TYPE_EMAIL
         );
-
         $dbeStandardText->getRowsByColumn(
             DBEStandardText::stt_standardtexttypeno,
             'stt_desc'
         );
-
         $this->template->set_block(
             $template,
             $block,
             'rows'
         );
-
         while ($dbeStandardText->fetchNext()) {
 
             $this->template->set_var(
