@@ -124,7 +124,7 @@ class CustomerSiteComponent extends MainComponent {
             <div>
 
                 <label className="site-label">
-                    Details
+                    Asset
                 </label>
                 <div style={{display: 'inline-block', width: "500px"}}>
                     <AssetListSelectorComponent customerId={customerId}
