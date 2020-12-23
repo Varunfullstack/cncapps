@@ -3,7 +3,7 @@ This project changes will be shown here.
 
 ## [unreleased]
 ### Changed
-- Renewals Update to include Auto Generated Invoice value
+- Issue 1139 - Renewals Update to include Auto Generated Invoice value
 
 ## [v5.0.8] - 2020-12-22
 ### Changed
