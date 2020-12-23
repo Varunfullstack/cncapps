@@ -12,6 +12,7 @@ This project changes will be shown here.
 - Issue 1131 - Sales Order Search Page Enhancements
 - Issue 1149 - Starter Leaver question formatting.
 - Issue 1139 - Renewals Update to include Auto Generated Invoice value
+- Issue 1122 - Asset list box enhancement
 ### Fixed
 - Issue 1165 - Fixed Activity behaviour changes
 ### Removed
