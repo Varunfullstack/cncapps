@@ -524,8 +524,7 @@ class BURenContract extends Business
                     $serviceRequestText = '<p>' . $internalNotes . '</p>
                         <p>Please update SSL contract item internal notes with the servers that have the SSL installed 
                         onto: <a href="' . SITE_URL . '/RenContract.php?action=edit&ID=' . $renContractId . '">Contract</a></p> 
-                        <p>Please check that the above SSL Certificate is still required before renewing</p>
-                        <p style="color: red">PLEASE RENEW FOR 2 YEARS</p>';
+                        <p>Please check that the above SSL Certificate is still required before renewing</p>';
                     $dsInput->setValue(
                         self::serviceRequestText,
                         $serviceRequestText
@@ -543,7 +542,6 @@ class BURenContract extends Business
                         $dsInput,
                         false,
                         3,
-
                     );
                 }
                 $dsLinkedItems = new DataSet($this);
