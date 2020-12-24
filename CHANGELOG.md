@@ -2,7 +2,7 @@
 This project changes will be shown here.
 
 ## [v5.1.0] - 2020-12-23
-## Added
+### Added
 - Issue 1116 - Include friendly Mac OS names
 - Issue 1130 - M365 Streamone missing licenses sometimes incorrectly reported.
 - Issue 1150 - Add Generate Password link to new password creation
