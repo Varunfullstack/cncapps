@@ -21,6 +21,11 @@ define(
     "DA_STRING",
     "string"
 );
+
+define(
+    "DA_PROBLEM_STATUS",
+    "problem_status"
+);
 define(
     "DA_TEXT",
     "string"

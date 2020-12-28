@@ -135,7 +135,6 @@ class BUUser extends Business
     )
     {
         global $db;
-
         $db->query(
             "SELECT
         team.level as teamLevel,
@@ -148,51 +147,40 @@ class BUUser extends Business
         cns_consno = $userID"
         );
         $db->next_record();
-        $teamLevel = $db->Record['teamLevel'];
+        $teamLevel        = $db->Record['teamLevel'];
         $standardDayHours = $db->Record['standardDayHours'];
-
-        $thisYearBh = common_getUKBankHolidays(date('Y'));
-        $nextYearBh = common_getUKBankHolidays(date('Y') + 1);
-
+        $thisYearBh       = common_getUKBankHolidays(date('Y'));
+        $nextYearBh       = common_getUKBankHolidays(date('Y') + 1);
         if ($sickTime != 'F') {
             $days = 1;
         }
-
-        $bankHolidays =
-            array_merge(
-                $thisYearBh,
-                $nextYearBh
-            );
+        $bankHolidays = array_merge(
+            $thisYearBh,
+            $nextYearBh
+        );
         /*
         Create a record with zero hours logged for each workday
         */
-        $dayCount = 0;
-
+        $dayCount       = 0;
         $loggedDayCount = 0;    // count of days that have been applied
-
         while ($loggedDayCount < $days) {
 
             $uDateToTry = strtotime($startDate . ' +' . $dayCount . ' day'); //UNIX
-
-            $dayOfWeek = date(
+            $dayOfWeek  = date(
                 'N',
                 $uDateToTry
             );
-
-            $dateToTry = date(
+            $dateToTry  = date(
                 'Y-m-d',
                 $uDateToTry
             );
-
             // Exclude bank holidays and weekends
-
             if (!in_array(
                     $dateToTry,
                     $bankHolidays
                 ) & $dayOfWeek < 6) {
 
                 $loggedDayCount++;
-
                 $this->logAbsentDate(
                     $userID,
                     $teamLevel,
@@ -203,16 +191,11 @@ class BUUser extends Business
             }
             $dayCount++;
         }
-
-
-        /** @var Environment */
-        global $twig;
-
+        /** @var Environment */ global $twig;
         $dbeUser = new DBEUser($this);
         $dbeUser->getRow($userID);
-
         $subject = 'Staff Member ' . $dbeUser->getValue(DBEUser::name) . ' has been reported as sick';
-        $body = $twig->render(
+        $body    = $twig->render(
             '@internal/userReportedSickEmail.html.twig',
             [
                 "staffName"      => $dbeUser->getValue(DBEUser::name),
@@ -224,34 +207,25 @@ class BUUser extends Business
                 "sickTime"       => $sickTime == 'A' ? 'morning' : 'afternoon'
             ]
         );
-
-        $emailTo = "sicknessalert@cnc-ltd.co.uk";
-
-        $hdrs = array(
+        $emailTo = "sicknessalert@" . CONFIG_PUBLIC_DOMAIN;
+        $hdrs    = array(
             'From'         => CONFIG_SUPPORT_EMAIL,
             'To'           => $emailTo,
             'Subject'      => $subject,
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
-
-        $mime = new Mail_mime();
-
+        $mime    = new Mail_mime();
         $mime->setHTMLBody($body);
-
         $mime_params = array(
             'text_encoding' => '7bit',
             'text_charset'  => 'UTF-8',
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-
-        $body = $mime->get($mime_params);
-
-        $hdrs = $mime->headers($hdrs);
-
-        $buMail = new BUMail($this);
-
+        $body        = $mime->get($mime_params);
+        $hdrs        = $mime->headers($hdrs);
+        $buMail      = new BUMail($this);
         $buMail->putInQueue(
             CONFIG_SUPPORT_EMAIL,
             $emailTo,
@@ -268,9 +242,7 @@ class BUUser extends Business
     )
     {
         global $db;
-
-        $sql =
-            "replace INTO user_time_log
+        $sql = "replace INTO user_time_log
         (
         `userID`,
         `teamLevel`,
@@ -284,7 +256,6 @@ class BUUser extends Business
         (
           ?,?,?,0,?,'00:00:00',?
         )";
-
         return $db->preparedQuery(
             $sql,
             [
@@ -297,10 +268,27 @@ class BUUser extends Business
         );
     }
 
+    function logHalfHoliday($userID, $date)
+    {
+        global $db;
+        $db->preparedQuery(
+            "insert ignore into userHalfHolidays values(?,?)",
+            [
+                [
+                    "type"  => "i",
+                    "value" => $userID,
+                ],
+                [
+                    "type"  => "s",
+                    "value" => $date,
+                ]
+            ]
+        );
+    }
+
     function userTimeHasBeenLogged($ID)
     {
         global $db;
-
         $db->query(
             "SELECT
         COUNT(*)
@@ -311,9 +299,7 @@ class BUUser extends Business
         userID = $ID
         AND loggedDate = DATE( NOW() )"
         );
-
         $db->next_record();
-
         return $db->Record[0];
     }
 
@@ -328,6 +314,7 @@ class BUUser extends Business
                       loggedHours,
                       cncLoggedHours,
                       holiday,
+                      holidayHours,       
                       CONCAT(
                         consultant.`firstName`,
                         ' ',
@@ -347,15 +334,13 @@ class BUUser extends Business
                         ON userID = consultant.`cns_consno` 
                     WHERE teamLevel = ?
                       ";
-
         if ($hideExcluded) {
             $query .= ' and consultant.excludeFromStatsFlag <> "Y"';
         }
-
-        $query .= " ORDER BY userID,
+        $query     .= " ORDER BY userID,
                       user_time_log.loggedDate ASC";
         $statement = $db->preparedQuery($query, [["type" => "i", "value" => $teamLevel]]);
-        $rows = [];
+        $rows      = [];
         while ($row = $statement->fetch_assoc()) {
             $rows[] = $row;
         }
@@ -374,7 +359,6 @@ class BUUser extends Business
     )
     {
         global $db;
-
         $query = "
         SELECT 
   getLoggedTimeAvg (
@@ -410,6 +394,7 @@ class BUUser extends Business
   loggedDate,
   user_time_log.`loggedHours`,
   user_time_log.`cncLoggedHours`,
+  user_time_log.holidayHours,
   holiday,
   userID,
   CASE
@@ -454,7 +439,6 @@ ORDER BY user_time_log.`loggedDate` DESC
         while ($db->next_record(1)) {
             $rows[] = $db->Record;
         }
-
         return $rows;
     }
 
@@ -466,7 +450,6 @@ ORDER BY user_time_log.`loggedDate` DESC
     )
     {
         global $db;
-
         $db->query(
             "SELECT 
         cns_name,
@@ -486,26 +469,59 @@ ORDER BY user_time_log.`loggedDate` DESC
           AND userID = $userID    
       GROUP BY cns_consno"
         );
-
         $db->next_record();
-
         return $db->Record;
 
+    }
+
+    function getUserPerformanceByUserBetweenDates($userId, DateTimeInterface $startDate, DateTimeInterface $endDate)
+    {
+        global $db;
+        $statement = $db->preparedQuery(
+            "SELECT 
+        cns_name,
+        teamLevel,
+        SUM( loggedHours + cncLoggedHours ) AS loggedHours,
+        SUM( dayHours ) AS dayHours,
+        ( SUM( loggedHours+cncLoggedHours ) / SUM( dayHours ) ) * 100 AS performancePercentage,
+        sum(sickTime in ('A','P')) as halfSickDays,
+        sum(sickTime = 'F') as fullSickDays
+      FROM
+        user_time_log 
+        JOIN consultant 
+          ON cns_consno = userID 
+      WHERE
+          loggedDate >= ? and loggedDate <= ?
+          AND userID = ?    
+      GROUP BY cns_consno",
+            [
+                [
+                    "type"  => 's',
+                    "value" => $startDate->format(DATE_MYSQL_DATE),
+                ],
+                [
+                    "type"  => 's',
+                    "value" => $endDate->format(DATE_MYSQL_DATE),
+                ],
+                [
+                    "type"  => 'i',
+                    "value" => $userId,
+                ],
+            ]
+        );
+        return $statement->fetch_array(MYSQLI_ASSOC);
     }
 
     public function getLevelByUserID($userID)
     {
         if ($userID) {
             $this->dbeUser->getRow($userID);
-
             $dbeTeam = new DBETeam($this);
             $dbeTeam->getRow($this->dbeUser->getValue(DBEUser::teamID));
             $ret = $dbeTeam->getValue(DBETeam::level);
         } else {
             $ret = 0;
         }
-
-
         return $ret;
     }
 
@@ -527,11 +543,9 @@ ORDER BY user_time_log.`loggedDate` DESC
         firstName, lastName";
         $db->query($query);
         $ret = array();
-
         while ($db->next_record()) {
             $ret[] = $db->Record;
         }
-
         return $ret;
 
     }

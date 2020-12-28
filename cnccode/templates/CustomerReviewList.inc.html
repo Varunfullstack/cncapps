@@ -1,4 +1,6 @@
 <H2>Daily Call List</H2>
+
+
 <style>
     .details-pane {
         display: none;
@@ -97,11 +99,11 @@
                 url: "?action=getData",
                 type: "GET",
                 dataSrc: (response) => {
-                    $.LoadingOverlay('hide');
+                    spinnerComponent.hideSpinner();
                     return response.data;
                 },
                 data: (data) => {
-                    $.LoadingOverlay("show", {text: 'Running your search, please wait'});
+                    spinnerComponent.showSpinner();
                     return data;
                 }
             },

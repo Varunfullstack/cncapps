@@ -1,0 +1,85 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue1035-0">
+        <tagDatabase tag="issue1035"/>
+    </changeSet>
+    <changeSet id="issue1035-1" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="inclusiveOOHCallOuts"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="inclusiveOOHCallOuts" type="int(2)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue1035-2" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="customerCallOuts"/>
+            </not>
+        </preConditions>
+        <createTable tableName="customerCallOuts">
+            <column name="id" autoIncrement="true" type="int(11)">
+                <constraints primaryKeyName="PRIMARY" primaryKey="true" nullable="false"/>
+            </column>
+            <column name="customerId" type="int(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="createdAt" type="datetime" defaultValueComputed="NOW()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="chargeable" type="int(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="salesOrderHeaderId" type="int(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="freebie" type="int(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="issue1035-3" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyTableName="customerCallOuts"
+                                            foreignKeyName="fk_customerCallOuts_customerId"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseTableName="customerCallOuts" baseColumnNames="customerId"
+                                 constraintName="fk_customerCallOuts_customerId"
+                                 referencedTableName="customer"
+                                 referencedColumnNames="cus_custno"
+                                 onDelete="CASCADE"
+                                 onUpdate="CASCADE"
+        />
+    </changeSet>
+    <changeSet id="issue1035-4" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyTableName="customerCallOuts"
+                                            foreignKeyName="fk_customerCallOuts_salesOrderHeaderId"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseTableName="customerCallOuts" baseColumnNames="salesOrderHeaderId"
+                                 constraintName="fk_customerCallOuts_salesOrderHeaderId"
+                                 referencedTableName="ordhead"
+                                 referencedColumnNames="odh_ordno"
+                                 onDelete="RESTRICT"
+                                 onUpdate="CASCADE"
+        />
+    </changeSet>
+    <changeSet id="issue1035-5" author="pavwebdev">
+        <sql>
+            update customer
+            set inclusiveOOHCallOuts = 2
+            where cus_custno in (520, 2065, 6585);
+        </sql>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>

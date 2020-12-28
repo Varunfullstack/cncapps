@@ -1,4 +1,5 @@
 <script src=".javascript/accounting.min.js"></script>
+
 <script>
     function submitOnReturn() {
         if (event.keyCode == 13) {
@@ -51,6 +52,7 @@
                     }
                 },
                 {data: "noOfServers"},
+                {data: "becameCustomerDate"},
                 {
                     data: "totalSales",
                     render: moneyFormat
@@ -190,7 +192,7 @@
             object[key] = value;
         });
         var json = JSON.stringify(object);
-        $.LoadingOverlay("show", {text: 'Running your search, please wait'});
+        spinnerComponent.showSpinner();
         $.ajax({
             url: '{fetchDataUrl}',
             method: 'POST',
@@ -210,7 +212,7 @@
         }).catch(function () {
 
         }).then(function () {
-            $.LoadingOverlay('hide');
+            spinnerComponent.hideSpinner();
         });
         return false;
     }
@@ -312,6 +314,11 @@
         <td nowrap="nowrap"
             bgcolor="#F3F3F3"
         ><strong>Servers</strong></td>
+        <td nowrap="nowrap"
+            bgcolor="#F3F3F3"
+        >
+            <strong>Became Customer</strong>
+        </td>
         <td colspan="2"
             align="center"
             bgcolor="#F3F3F3"
@@ -370,7 +377,7 @@
             bgcolor="#E1E1E1"
         >&nbsp;
         </td>
-        <td colspan="3">&nbsp;</td>
+        <td colspan="4">&nbsp;</td>
         <td align="right"
             nowrap="nowrap"
             bgcolor="#CCCCCC"
@@ -521,6 +528,9 @@
         <td align="right"
             nowrap="nowrap"
         >{noOfServers}
+        </td>
+        <td>
+
         </td>
         <td width="50"
             align="right"

@@ -26,7 +26,8 @@ class CTSRSource extends CTCNC
         $getVars,
         $cookieVars,
         $cfg
-    ) {
+    )
+    {
         parent::__construct(
             $requestMethod,
             $postVars,
@@ -52,7 +53,7 @@ class CTSRSource extends CTCNC
             case "searchSR":
                 echo json_encode($this->search());
                 exit;
-            break;          
+                break;
             default:
                 $this->setTemplate();
         }
@@ -98,34 +99,38 @@ class CTSRSource extends CTCNC
                 strtotime($body->toDate)
             )
         );
-        if($body->customerID)
-        $dsSearchForm->setValue(
-            BUServiceRequestReport::searchFormCustomerID,
-            $body->customerID
-        );
-        $results = $this->buServiceRequestReport->search($dsSearchForm,true)->fetch_all(MYSQLI_ASSOC);      
+        if ($body->customerID)
+            $dsSearchForm->setValue(
+                BUServiceRequestReport::searchFormCustomerID,
+                $body->customerID
+            );
+        $results = $this->buServiceRequestReport->search($dsSearchForm, true)->fetch_all(MYSQLI_ASSOC);
         foreach ($results as &$sr) {
             $sr['srLink'] = Controller::buildLink(
-                'Activity.php',
+                'SRActivity.php',
                 [
                     "callActivityID" => $sr['inialActivity'],
                     "action"         => "displayActivity"
                 ]
             );
-        }       
-        return $results;            
-         
+        }
+        return $results;
+
     }
+
     function setTemplate()
     {
 
-        $this->setMethodName('search');   
+        $this->setMethodName('search');
         $this->setPageTitle('Service Request Source');
         $this->setTemplateFiles(
             'SRSource',
             'SRSource.inc'
         );
-      
+
+        $this->loadReactScript('SRSourceComponent.js');
+        $this->loadReactCSS('SRSourceComponent.css');
+
         $this->template->parse(
             'CONTENTS',
             'SRSource',
@@ -133,6 +138,6 @@ class CTSRSource extends CTCNC
         );
         $this->parsePage();
 
-    } 
-   
+    }
+
 }

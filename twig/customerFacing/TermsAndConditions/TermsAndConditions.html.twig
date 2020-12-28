@@ -1,0 +1,29 @@
+{% extends '@customerFacing/wrapper.html.twig' %}
+{# @var contactFirstName string #}
+{% block replyText %}
+{% endblock %}
+{% block headerTitle %}
+    Terms and Conditions
+{% endblock %}
+
+{% block headerContet %}
+    It's official and here's the proof
+{% endblock %}
+
+{% block content %}
+    <p>{{ contactFirstName }}</p>
+    <p>
+        Please find attached a copy of the Terms & Conditions that you have recently accepted, which will also be
+        available via your portal.
+    </p>
+{% endblock %}
+
+{% block serviceRequestURL %}
+    https://www.cnc-ltd.co.uk/portal/documents/
+{% endblock %}
+
+{% block rightFooter %}
+    <br>
+    &nbsp;
+    <br>
+{% endblock %}

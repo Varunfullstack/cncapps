@@ -1,0 +1,16 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdevmt" id="hotfix-v4.6.1-0">
+        <tagDatabase tag="hotfix-v4.6.1"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="hotfix-v4.6.1-0">
+        <sqlFile endDelimiter="#" path="/getContractInvoiceDifference.sql" stripComments="true"/>
+        <rollback>
+            <sql>
+                drop function if exists getContractInvoiceDifference;
+            </sql>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

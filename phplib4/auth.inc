@@ -76,6 +76,7 @@ class Auth
     {
         global $sess;
 
+
         ## This is for performance, I guess but I'm not sure if it could
         ## be safely removed -- negro
         if (!$this->in) {
@@ -93,8 +94,7 @@ class Auth
         #  2) Logged in (valid auth info)
         #  3) Login in progress (if $this->cancel_login, revert to state 1)
 
-
-        if ($this->is_authenticated()) {
+        if ($testUID = $this->is_authenticated()) {
             $uid = $this->auth["uid"];
             switch ($uid) {
                 case "form":
@@ -117,10 +117,12 @@ class Auth
                     break;
             }
         } else {
+
             # User is not (yet) authenticated
             $this->unauth();
             $state = 1;
         }
+
         switch ($state) {
             case 1:
                 # No valid auth info or auth is expired
@@ -253,21 +255,24 @@ class Auth
      */
     function is_authenticated()
     {
+        if (!empty($this->auth['uid']) && $this->auth['uid'] === 'form') {
+            return true;
+        }
         $sessionStartDateTime = new DateTime();
         $nowDateTime = new DateTime();
         $sessionStartTimestamp = @$this->auth['sessionStartTimestamp'];
-        $expiredSession = true;
         if ($sessionStartTimestamp) {
             $sessionStartDateTime->setTimestamp($sessionStartTimestamp);
             $expiredSession = $nowDateTime->format('j') !== $sessionStartDateTime->format('j');
+            if ($expiredSession) {
+                return false;
+            }
         }
+
+
         if (
-            isset($this->auth["uid"])
-            &&
-            $this->auth["uid"]
-            &&
+            !empty($this->auth["uid"]) &&
             (($this->lifetime <= 0) || (time() < $this->auth["exp"]))
-            && !$expiredSession
         ) {
             # If more than $this->refresh minutes are passed since last check,
             # perform auth data refreshing. Refresh is only done when current

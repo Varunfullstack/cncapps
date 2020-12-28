@@ -102,7 +102,7 @@ $buMail = new BUMail($thing);
 $buMail->mime->setHTMLBody($body);
 $hdrs_array = array(
     'From'         => CONFIG_SUPPORT_EMAIL,
-    'To'           => "ContactChanges@cnc-ltd.co.uk",
+    'To'           => "ContactChanges@" . CONFIG_PUBLIC_DOMAIN,
     'Subject'      => "Contact Change Audit Log",
     'Content-Type' => 'text/html; charset=UTF-8'
 );
@@ -117,7 +117,7 @@ $body = $buMail->mime->get($mime_params);
 $hdrs = $buMail->mime->headers($hdrs_array);
 $buMail->putInQueue(
     CONFIG_SUPPORT_EMAIL,
-    "ContactChanges@cnc-ltd.co.uk",
+    "ContactChanges@" . CONFIG_PUBLIC_DOMAIN,
     $hdrs,
     $body
 );

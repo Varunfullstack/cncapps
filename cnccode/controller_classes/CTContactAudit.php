@@ -133,6 +133,7 @@ class CTContactAudit extends CTCNC
             $_SERVER['PHP_SELF'],
             array('action' => 'search')
         );
+
         $customerPopupURL =
             Controller::buildLink(
                 CTCNC_PAGE_CUSTOMER,

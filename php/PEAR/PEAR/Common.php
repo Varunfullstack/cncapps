@@ -121,7 +121,7 @@ $GLOBALS['_PEAR_Common_script_phases'] = array('pre-install', 'post-install', 'p
  * @version    Release: 1.9.4
  * @link       http://pear.php.net/package/PEAR
  * @since      Class available since Release 1.4.0a1
- * @deprecated This class will disappear, and its components will be spread
+ * @deprecated This class will disappear, and its subComponents will be spread
  *             into smaller classes, like the AT&T breakup, as of Release 1.4.0a1
  */
 class PEAR_Common extends PEAR

@@ -1,6 +1,7 @@
 
 <?php
 require_once("config.inc.php");
+global $cfg;
 require_once($cfg["path_ct"]."/CTMySettings.inc.php");
 session_start();
 page_open(
@@ -24,11 +25,5 @@ $ctMySettings->execute();
  
 page_close();
 ?>
-<link rel="stylesheet" href="components/style.css">
- 
-
-<script src="js/react.development.js" crossorigin></script>
-<script src="js/react-dom.development.js" crossorigin></script>
- <script type="module" src='components/CMPMySettings.js?version=<?= time() ?>'></script>
 
  

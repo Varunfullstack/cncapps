@@ -1,0 +1,128 @@
+{% extends '@customerFacing/wrapper.html.twig' %}
+{# @var data CNCLTD\TwigDTOs\DirectDebitInvoiceDTO #}
+{% block replyText %}
+{% endblock %}
+{% block headerTitle %}
+    Billing Notice
+{% endblock %}
+
+{% block headerContet %}
+    Advance Notification of a Direct Debit Collection
+{% endblock %}
+
+{% block content %}
+    <table class="fullWidthTable">
+        <tbody>
+        <tr>
+            <td>
+                {{ data.contactName }}
+            </td>
+            <td style="text-align: right">
+                Computer & Network Consultants Ltd
+            </td>
+        </tr>
+        <tr>
+            <td>
+                {{ data.companyName }}
+            </td>
+            <td style="text-align: right">
+                CNC House
+            </td>
+        </tr>
+        <tr>
+            <td>
+                {{ data.addressLine1 }}
+            </td>
+            <td style="text-align: right">
+                Lady Bee Enterprise Centre
+            </td>
+        </tr>
+        <tr>
+            <td>
+                {{ data.town }}
+            </td>
+            <td style="text-align: right">
+                Albion Street
+            </td>
+        </tr>
+        <tr>
+            <td>
+                {{ data.county }}
+            </td>
+            <td style="text-align: right">
+                Southwick
+            </td>
+        </tr>
+        <tr>
+            <td>
+                {{ data.postCode }}
+            </td>
+            <td style="text-align: right"
+            Brighton
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Date:{{ data.date }}
+            </td>
+            <td> style="text-align: right"
+            BN42 4BW</td>
+        </tr>
+        </tbody>
+    </table>
+    <p>{{ data.contactName }}</p>
+    <p>
+        We're writing to let you know that we'll be collecting the following payment by Direct Debit on or just after
+        the advised date.
+    </p>
+
+
+    <table class="report-table">
+        <tbody>
+        <tr>
+            <td> Service User Name:</td>
+            <td> Computer &amp; Network Consultants Ltd</td>
+        </tr>
+        <tr>
+            <td> Service User Number:</td>
+            <td> 446364</td>
+        </tr>
+        <tr>
+            <td> Reference:</td>
+            <td>{{ data.invoiceNo }}</td>
+        </tr>
+        <tr>
+            <td> Payment Date:</td>
+            <td>{{ data.paymentDate }}</td>
+        </tr>
+        <tr>
+            <td> Amount:</td>
+            <td> {{ data.totalAmount | format_currency('GBP',{fraction_digit:2}) }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <p>
+        If any of the above details are incorrect, please call us as soon as possible on 01273 384100 or e-mail us at
+        accounts@cnc-ltd.co.uk. If your details are correct you don't need to do anything and your Direct Debit will be
+        processed as normal using the reference above.
+    </p>
+    <p>
+        Should the amount, date or frequency of your Direct Debit change, we will notify you at least 10 working days in
+        advance.
+    </p>
+
+    <p>
+        Thanks
+		<br>
+		CNC Accounts Team
+    </p>
+{% endblock %}
+
+{% block leftFooter %}
+    <br><br>
+{% endblock %}
+
+{% block rightFooter %}
+
+{% endblock %}

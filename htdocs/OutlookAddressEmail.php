@@ -12,7 +12,7 @@ require_once("config.inc.php");
 require_once($cfg["path_bu"] . "/BUMail.inc.php");
 
 $thing = null;
-define('EMAIL_FROM_USER', 'sales@cnc-ltd.co.uk');
+define('EMAIL_FROM_USER', 'sales@' . CONFIG_PUBLIC_DOMAIN);
 define('EMAIL_SUBJECT', 'Outlook address file');
 define('FORMAT_MYSQL_UK_DATE', '%e/%c/%Y');
 define('FORMAT_MYSQL_UK_DATETIME', '%e/%c/%Y %h:%m');
@@ -123,7 +123,7 @@ while ($row = mysqli_fetch_assoc($result)) // Data
 {
     $row_string = '';
 
-    foreach ($row AS $key => $column) {
+    foreach ($row as $key => $column) {
 
         $column = trim($column);
 
@@ -133,9 +133,9 @@ while ($row = mysqli_fetch_assoc($result)) // Data
         */
         if (
             (
-                strpos($key, 'phone') !== false OR
-                strpos($key, 'Phone') !== false OR
-                strpos($key, 'fax') !== false OR
+                strpos($key, 'phone') !== false or
+                strpos($key, 'Phone') !== false or
+                strpos($key, 'fax') !== false or
                 strpos($key, 'Fax') !== false
             )
             && strpos($column, ' ') === false
@@ -143,7 +143,7 @@ while ($row = mysqli_fetch_assoc($result)) // Data
             /*
             Split after 2nd
             */
-            if (strpos($column, '01') == 0 OR strpos($column, '07') == 0) {
+            if (strpos($column, '01') == 0 or strpos($column, '07') == 0) {
                 $column = substr($column, 0, 1) . ' ' . substr($column, 2, strlen($column) - 1);
 
             } else {

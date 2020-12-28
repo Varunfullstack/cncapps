@@ -84,6 +84,8 @@ class CTItemsNotYetReceived extends CTCNC
             'ItemsNotYetReceived',
             'ItemsNotYetReceived'
         );
+
+
         $this->template->parse(
             'CONTENTS',
             'ItemsNotYetReceived',

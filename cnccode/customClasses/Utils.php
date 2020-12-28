@@ -4,8 +4,23 @@
 namespace CNCLTD;
 
 
+use DateTimeInterface;
+
 class Utils
 {
+    /**
+     * @param DateTimeInterface|null $dateTime
+     * @param string $format
+     * @return string|null
+     */
+    public static function dateTimeToString(?DateTimeInterface $dateTime, $format = DATE_MYSQL_DATETIME): ?string
+    {
+        if (!$dateTime) {
+            return null;
+        }
+        return $dateTime->format($format);
+    }
+
     public static function generateStrongPassword($length = 15, $add_dashes = false, $available_sets = 'luds')
     {
         $sets = array();
@@ -17,11 +32,11 @@ class Utils
             $sets[] = '23456789';
         if (strpos($available_sets, 's') !== false)
             $sets[] = '!@#$%&*?';
-        $all = '';
+        $all      = '';
         $password = '';
         foreach ($sets as $set) {
             $password .= $set[self::tweak_array_rand(str_split($set))];
-            $all .= $set;
+            $all      .= $set;
         }
         $all = str_split($all);
         for ($i = 0; $i < $length - count($sets); $i++)
@@ -49,5 +64,109 @@ class Utils
         } else {
             return array_rand($array);
         }
+    }
+
+    public static function getCurrentChangelogVersion()
+    {
+        $changelog = file_get_contents(BASE_DRIVE . '/CHANGELOG.md');
+        $re        = '/\[(v\d+\.\d+\.\d+)\]/m';
+        preg_match($re, $changelog, $matches);
+        return $matches[1];
+    }
+
+    public static function truncate($reason,
+                                    $length = 100
+    )
+    {
+        return substr(
+            self::stripEverything($reason),
+            0,
+            $length
+        );
+
+    }
+
+    /**
+     * strip html tages
+     *
+     * @param mixed $description
+     * @return string
+     */
+    public static function stripEverything($description)
+    {
+        $description = str_replace(
+            "\r\n",
+            '',
+            trim($description)
+        );
+        $description = str_replace(
+            "\r",
+            '',
+            trim($description)
+        );
+        $description = str_replace(
+            "\n",
+            '',
+            $description
+        );
+        $description = str_replace(
+            "\t",
+            '',
+            $description
+        );
+        $description = str_replace(
+            '<br />',
+            "",
+            $description
+        );
+        $description = str_replace(
+            '<br/>',
+            "",
+            $description
+        );
+        $description = str_replace(
+            '<BR/>',
+            "",
+            $description
+        );
+        $description = str_replace(
+            '<BR>',
+            "",
+            $description
+        );
+        $description = str_replace(
+            '<p>',
+            "",
+            $description
+        );
+        $description = str_replace(
+            '</p>',
+            "",
+            $description
+        );
+        $description = str_replace(
+            '<P>',
+            "",
+            $description
+        );
+        $description = str_replace(
+            '</P>',
+            "",
+            $description
+        );
+        $description = str_replace(
+            '&nbsp;',
+            " ",
+            $description
+        );
+        $description = str_replace(
+            '&quot;',
+            "'",
+            $description
+        );
+        $description = strip_tags($description);
+        $description = trim($description);
+        return $description;
+
     }
 }

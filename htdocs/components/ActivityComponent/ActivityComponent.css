@@ -1,0 +1,74 @@
+
+.test {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    text-align: center;
+    border-radius: 5px;
+}
+
+.display-active-menu {
+    line-height: 30px;
+}
+
+.display-active-menu div {
+    background-color: #dbdbdb;
+    border-top: white solid 1px;
+}
+
+.display-active-menu div:hover {
+    background-color: #bdbec1;
+    cursor: pointer;
+}
+
+.activities-container {
+
+    margin-top: 5px;
+    border: 1px solid #bdbec1;
+    border-radius: 5px;
+
+}
+
+#tableexpenses .tooltip {
+    justify-content: left;
+}
+
+.activities-edit-container {
+    margin-top: 5px;
+    border: 1px solid #bdbec1;
+    border-radius: 5px;
+    width: 100%;
+}
+
+.activities-container table .activities-container th, .activities-container td {
+    /*border: 1px solid black;*/
+}
+
+.activity-details-flex {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+.label {
+    /* width: 80px; */
+    color: #992211;
+    white-space: nowrap;
+}
+
+.display-label {
+    text-align: right;
+    color: #992211;
+    white-space: nowrap;
+}
+
+.display-content {
+    text-align: left;
+    white-space: nowrap;
+}
+
+.formErrorMessage {
+    font-size: 12px !important;
+    font-weight: bold !important;
+
+}

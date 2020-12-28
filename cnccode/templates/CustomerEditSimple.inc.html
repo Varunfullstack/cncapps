@@ -31,14 +31,14 @@
     }
 
     .lockedIcon::before {
-        font-family: "FontAwesome", serif;
-        content: '\f023';
-        color: green;
+        font-family: "Font Awesome 5 Pro", serif;
+        content: '\f084';
+        color: lightgreen;
     }
 
     .unlockedIcon::before {
-        font-family: "FontAwesome", serif;
-        content: '\f13e';
+        font-family: "Font Awesome 5 Pro", serif;
+        content: '\f084';
         color: red;
     }
 
@@ -730,6 +730,7 @@
         float: right
     }
 </style>
+
 <span class="formError">{errorMessage}</span>
 <a href="{deleteCustomerURL}"
    onClick="if(!confirm('Are you sure you want to delete this customer?')) return(false)"
@@ -742,8 +743,6 @@
 {renewalLink}
 <BR>
 {passwordLink}
-<BR>
-{customerFolderLink}
 <br>
 {thirdPartyContactsLink}
 <br>
@@ -752,6 +751,20 @@
 >
 
 </div>
+<tr>
+    <td class="content">Inclusive OOH Call Outs</td>
+    <td class="content">
+        <input {disabled}
+               type="number"
+               name="form[customer][{customerID}][inclusiveOOHCallOuts]"
+               value="{inclusiveOOHCallOuts}"
+               step="1"
+               max="99"
+               min="0"
+        >
+        Per Month
+    </td>
+</tr>
 
 <!--Bootstrap CDN-->
 <link rel="stylesheet"

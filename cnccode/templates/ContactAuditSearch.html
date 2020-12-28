@@ -1,5 +1,7 @@
 <!-- Template: Customer.inc.html -->
+
 <script type="application/javascript">
+
     function submitOnReturn() {
         if (event.keyCode == 13) {
             document.searchForm.submit();
@@ -52,7 +54,10 @@
                 {data: "othersPendingClosureEmailFlag"},
                 {data: "othersClosureEmailFlag"},
                 {data: "pendingLeaverFlag"},
-                {data: "pendingLeaverDate"}
+                {data: "pendingLeaverDate"},
+                {data: "pendingFurloughAction"},
+                {data: "pendingFurloughActionDate"},
+                {data: "pendingFurloughActionLevel"},
             ]
         });
 
@@ -78,8 +83,7 @@
         endDate ? data.endDate = endDate : null;
         firstName ? data.firstName = firstName : null;
         lastName ? data.lastName = lastName : null;
-
-        $.LoadingOverlay("show", {text: 'Running your search, please wait'});
+        spinnerComponent.showSpinner();
         $.ajax({
             url: '?action=doSearch',
             method: 'POST',
@@ -99,12 +103,11 @@
         }).catch(function () {
 
         }).then(function () {
-            $.LoadingOverlay('hide');
+            spinnerComponent.hideSpinner();
         });
         return false;
     }
 </script>
-
 <form name="form"
       method="post"
       onsubmit="return searchContactAudit();"
@@ -222,6 +225,9 @@
         <th>othersClosureEmailFlag</th>
         <th>pendingLeaverFlag</th>
         <th>pendingLeaverDate</th>
+        <th>pendingFurloughAction</th>
+        <th>pendingFurloughActionDate</th>
+        <th>pendingFurloughActionLevel</th>
     </tr>
     </thead>
     <tbody>

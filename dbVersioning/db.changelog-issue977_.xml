@@ -1,0 +1,111 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdevmt" id="issue977-2">
+        <tagDatabase tag="issue977"/>
+    </changeSet>
+    <changeSet id="issue977-3" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="callactivity" columnName="customerNotes"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="callactivity">
+            <column name="customerNotes" type="longtext">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="callactivity">
+            <column name="cncNextAction" type="longtext">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue977-4" author="pavwebdevmt">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="callacttype" columnName="catRequireCNCNextActionCNCAction"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="callacttype">
+            <column name="catRequireCNCNextActionCNCAction" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="callacttype">
+            <column name="catRequireCustomerNoteCNCAction" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="callacttype">
+            <column name="catRequireCNCNextActionOnHold" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="callacttype">
+            <column name="catRequireCustomerNoteOnHold" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+       
+    </changeSet>
+    <changeSet id="issue977-5" author="pavwebdevmt">        
+        <sql>
+            update callacttype set 
+            catRequireCNCNextActionCNCAction=1,
+            catRequireCustomerNoteCNCAction=2,
+            catRequireCNCNextActionOnHold=1,
+            catRequireCustomerNoteOnHold=1
+            where cat_callacttypeno=8;
+
+            update callacttype set 
+            catRequireCNCNextActionCNCAction=1,
+            catRequireCustomerNoteCNCAction=2,
+            catRequireCNCNextActionOnHold=1,
+            catRequireCustomerNoteOnHold=1
+            where cat_callacttypeno=18;
+
+            update callacttype set 
+            catRequireCNCNextActionCNCAction=2,
+            catRequireCustomerNoteCNCAction=1,
+            catRequireCNCNextActionOnHold=1,
+            catRequireCustomerNoteOnHold=1
+            where cat_callacttypeno=11;
+
+            update callacttype set 
+            catRequireCNCNextActionCNCAction=2,
+            catRequireCustomerNoteCNCAction=1,
+            catRequireCNCNextActionOnHold=1,
+            catRequireCustomerNoteOnHold=1
+            where cat_callacttypeno=4;
+
+            update callacttype set 
+            catRequireCNCNextActionCNCAction=2,
+            catRequireCustomerNoteCNCAction=1,
+            catRequireCNCNextActionOnHold=1,
+            catRequireCustomerNoteOnHold=1
+            where cat_callacttypeno=7;
+        </sql>       
+    </changeSet>
+    <changeSet id="issue977-6" author="pavwebdevmt">        
+        <sql>
+            INSERT INTO  standardtexttype (sty_desc) VALUES  ('Priority Change Reason');
+            INSERT INTO `standardtext` (  
+            `stt_desc`,
+            `stt_text`,
+            `stt_standardtexttypeno`,
+            `salesRequestEmail`,
+            `salesRequestUnassignFlag`
+            )
+            SELECT   
+                'This is a change rather than a fix.',
+                'This is a change rather than a fix.',
+                `sty_standardtexttypeno`,
+                NULL,
+                'N'
+            FROM `standardtexttype`
+            WHERE `sty_desc`='Priority Change Reason';
+        </sql>       
+    </changeSet>
+</databaseChangeLog>

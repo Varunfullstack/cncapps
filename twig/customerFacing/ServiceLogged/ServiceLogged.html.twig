@@ -1,0 +1,59 @@
+{% extends '@customerFacing/wrapper.html.twig' %}
+{# @var data \CNCLTD\TwigDTOs\ServiceRequestLoggedDTO #}
+
+{% block headerTitle %}
+    Service Request Information
+{% endblock %}
+
+{% block headerContet %}
+    A new Service Request has been created
+{% endblock %}
+
+{% block content %}
+    <p>{{ data.contactFirstName }}</p>
+    <p>Service Request {{ data.serviceRequestId }} has been logged with our Service Desk so we'll work on this in the
+        background and only update you when we've got something important to share or ask you.
+    </p>
+    <table style="width: 100%">
+        <tr>
+            <td class="details">
+                {{ data.reason |raw }}
+            </td>
+        </tr>
+    </table>
+    <p>
+        Priority {{ data.priority }} -
+        {% if data.serviceRequestStatus == 'Logged' %}
+            We'll aim to respond to this request within {{ data.SLA }} working hour{{ data.SLA > 1 ? 's' :'' }} but after an initial review we may adjust the priority but we'll inform you if we do.
+        {% else %}
+            We've started working on this immediately.
+        {% endif %}
+    </p>
+
+    {% if data.raisedAutomatically %}
+        <p>
+            {% if not data.isLoggedOutOfHours %}
+                This request has been submitted to the relevant team who will contact you to arrange any and all appropriate
+                action.
+            {% elseif data.support24 %}
+                This request will be responded to when the office is next open, but if you have an out of hours PIN
+                code listed on our customer portal, you may call our offices to speak to one of our on-call technicians.  Please note that there are extra charges for this service as detailed in the guide on our portal for service outside our core opening hours of Monday - Friday 07:30 - 20:00.
+            {% elseif data.hasServiceDesk %}
+                This request will be responded to when the office is next open, but if you have an out of hours PIN
+                code listed on our customer portal, you may call our offices to speak to one of our on-call technicians.
+            {% else %}
+                This request will be responded to when the office is next open.
+            {% endif %}
+        </p>
+    {% endif %}
+{% endblock %}
+
+{% block serviceRequestURL %}https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ data.serviceRequestId }}{% endblock %}
+
+{% block footerStatus %}
+    {{ data.serviceRequestStatus }}
+{% endblock %}
+
+{% block feedback %}
+    <br>
+{% endblock %}

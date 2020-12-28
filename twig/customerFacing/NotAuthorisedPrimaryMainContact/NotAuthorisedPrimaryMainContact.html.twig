@@ -1,0 +1,31 @@
+{% extends '@customerFacing/wrapper.html.twig' %}
+{# @var data CNCLTD\TwigDTOs\PrimaryMainContactNotAuthorisedNotification #}
+{% block replyText %}
+{% endblock %}
+{% block headerTitle %}
+    Information Notice
+{% endblock %}
+
+{% block headerContet %}
+    Sorry, something didn't quite work for one of your staff
+{% endblock %}
+
+{% block content %}
+
+    <p>{{ data.primaryMainContactFirstName }}</p>
+    <p>{{ data.contactFirstName }} {{ data.contactLastName }} has tried to raise a support request with us but they
+        currently have the support level {{ data.contactSupportLevel }} and as such are unable to do so.
+    </p>
+    <p>
+        You will need to contact us on their behalf to progress this request and in future, if you would like them to be
+        able to raise requests themselves, then please log onto our portal and change their support level.
+    </p>
+{% endblock %}
+
+{% block serviceRequestURL %}
+    https://www.cnc-ltd.co.uk/portal/contacts/
+{% endblock %}
+
+{% block rightFooter %}
+
+{% endblock %}

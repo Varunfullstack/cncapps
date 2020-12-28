@@ -14,8 +14,7 @@
         <td width="141" class="listHeadText">Portal</td>
         <td width="265" class="listHeadText">Allow SCR Printing</td>
         <td width="265" class="listHeadText">Requires Checking</td>
-        <td width="265" class="listHeadText">Allow Expenses</td>
-        <td width="265" class="listHeadText">Allow Reason</td>
+         <td width="265" class="listHeadText">Allow Reason</td>
         <td width="141" class="listHeadText">Allow Action</td>
         <td width="141" class="listHeadText">Allow Final</td>
         <td width="141" class="listHeadText">Require Reason</td>
@@ -25,6 +24,12 @@
         <td width="141" class="listHeadText">Show No Charge</td>
         <td width="141" class="listHeadText">Engineer Overtime</td>
         <td width="141" class="listHeadText">On-site</td>
+        <td width="141" class="listHeadText">Require CNC Next Action, CNC Action</td>
+        <td width="141" class="listHeadText">Require CNC Next Action, On Hold</td>
+        <td width="141" class="listHeadText">Require Customer Note, CNC Action</td>
+        <td width="141" class="listHeadText">Require Customer Note, On Hold</td>   
+        <td width="141" class="listHeadText">Minimum Minutes Allowed</td>   
+
         <td class="listHeadText">&nbsp;</td>
     </tr>
     <!-- BEGIN typeBlock -->
@@ -40,7 +45,6 @@
         <td class="orderLineItem">{maxHours}</td>
         <td class="orderLineItem">{customerEmailFlag}</td>
         <td class="orderLineItem">{portalDisplayFlag}</td>
-        <td class="orderLineItem">{allowSCRFlag}</td>
         <td class="orderLineItem">{requireCheckFlag}</td>
         <td class="orderLineItem">{allowReasonFlag}</td>
         <td class="orderLineItem">{allowActionFlag}</td>
@@ -52,7 +56,11 @@
         <td class="orderLineItem">{showNotChargeableFlag}</td>
         <td class="orderLineItem">{engineerOvertimeFlag}</td>
         <td class="orderLineItem">{onSiteFlag}</td>
-        <td class="orderLineItem">&nbsp;</td>
+        <td class="orderLineItem">{catRequireCNCNextActionCNCAction}</td>
+        <td class="orderLineItem">{catRequireCNCNextActionOnHold}</td>
+        <td class="orderLineItem">{catRequireCustomerNoteCNCAction}</td>
+        <td class="orderLineItem">{catRequireCustomerNoteOnHold}</td>
+        <td class="orderLineItem">{minMinutesAllowed}</td>
         <td class="orderLineItem">
             <DIV align="left"><A href="{urlEdit}" title="Edit activity type details">{txtEdit}</a>
                 <A href="{urlDelete}" title="Delete this type"

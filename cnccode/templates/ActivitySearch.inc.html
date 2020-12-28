@@ -94,14 +94,22 @@
             elm.closest('tr').find('[type="checkbox"]').prop('checked', false);
         }
     }
+
+    function sumbit(value) {
+        $('#searchForm').remove('#CSV');
+        $('#searchForm').remove('#Search');
+        $('#searchForm').append('<input type="hidden" value="' + value + '" name="' + value + '"  />');
+        $('#searchForm').submit();
+
+    }
 </script>
 <style type="text/css">
-    <!--
-    .style2 {
-        font-size: x-small
-    }
 
-    -->
+    /* .style2 {
+        font-size: x-small
+    } */
+
+
 </style>
 
 <!--<P class="formErrorMessage">{formError} test</P>-->
@@ -326,11 +334,9 @@
                         name="activity[1][individualActivitySpentTime]"
                         value="{individualActivitySpentTime}"
                 >
-            </td>
-        </tr>
-        <tr>
-            <td>&nbsp;</td>
-            <td class="info style2">Search like 4.5, > 4.5, >= 4.5, < 4.5, <= 4.5 or <> 4.5
+                <span>
+                    Search like 4.5, > 4.5, >= 4.5, < 4.5, <= 4.5 or <> 4.5
+                </span>
             </td>
         </tr>
         <tr>
@@ -341,14 +347,11 @@
                         name="activity[1][serviceRequestSpentTime]"
                         value="{serviceRequestSpentTime}"
                 >
+                <span>
+                    Search like 4.5, > 4.5, >= 4.5, < 4.5, <= 4.5 or <> 4.5
+                </span>
             </td>
         </tr>
-        <tr>
-            <td>&nbsp;</td>
-            <td class="info style2">Search like 4.5, > 4.5, >= 4.5, < 4.5, <= 4.5 or <> 4.5
-            </td>
-        </tr>
-
         <tr>
             <td class="promptText">
                 <div align="right">Search for</div>
@@ -360,12 +363,14 @@
                        size="100"
                        maxlength="100"
                 >
-                <button type="button"
-                        onclick="alert('+Office and +essentials – will search for any text that’s Office AND Essentials\n'+
-'“Office 365” and +premium – will search for any text that’s “Office 365” AND there’s also Premium\n'+
-'Office 365 premium – will search for any of those key words (i.e. its Office OR 365 OR Premium)')"
-                >Help
-                </button>
+                <i name="Help"
+                   class="fal fa-question-square fa-2x icon m-5"
+                   onclick="alert('+Office and +essentials – will search for any text that’s Office AND Essentials\n'+
+                '“Office 365” and +premium – will search for any text that’s “Office 365” AND there’s also Premium\n'+
+                'Office 365 premium – will search for any of those key words (i.e. its Office OR 365 OR Premium)')"
+                ></i>
+
+
             </td>
         </tr>
         <tr>
@@ -406,19 +411,36 @@
         <tr>
             <td>&nbsp;</td>
             <td>
-                <input type="submit"
-                       name="Search"
-                       value="Search"
-                >
-                <input type="submit"
-                       name="CSV"
-                       value="CSV"
-                >
-                <input type="button"
-                       name="Clear"
-                       value="Clear"
-                       onClick="document.location='Activity.php'"
-                /></td>
+                <div style="display: flex;flex-direction: row;width:100px">
+                    <div class="tooltip">
+                        <i name="SearchIcon"
+                           class="fal fa-search fa-2x icon m-5 pointer"
+                           onclick="sumbit('Search')"
+                        ></i>
+                        <div class="tooltiptext tooltip-bottom">
+                            Search
+                        </div>
+                    </div>
+                    <div class="tooltip">
+                        <i name="CSVIcon"
+                           class="fal fa-file-csv fa-2x icon m-5 pointer"
+                           onclick="sumbit('CSV')"
+                        ></i>
+                        <div class="tooltiptext tooltip-bottom">
+                            Export Results to CSV file
+                        </div>
+                    </div>
+                    <div class="tooltip">
+                        <i name="clearIcon"
+                           class="fal fa-sync fa-2x icon m-5 pointer"
+                           onclick="document.location='Activity.php'"
+                        ></i>
+                        <div class="tooltiptext tooltip-bottom">
+                            Clear Inputs
+                        </div>
+                    </div>
+                </div>
+            </td>
         </tr>
     </table>
     {rowsFound} activities found

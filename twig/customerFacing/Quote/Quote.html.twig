@@ -1,0 +1,46 @@
+{% extends '@customerFacing/wrapper.html.twig' %}
+{# @var salutation string #}
+{# @var isOrderForm boolean #}
+{# @var apiURL string #}
+{# @var senderFirstName string #}
+{# @var senderLastName string #}
+{% block replyText %}
+{% endblock %}
+{% block headerTitle %}
+    Quote Notification
+{% endblock %}
+
+{% block headerContet %}
+    Here is the quotation you have been waiting for...
+{% endblock %}
+
+{% block content %}
+    <p>{{ salutation }}</p>
+    {% if isOrderForm %}
+        <p>Please find attached a quotation for your attention.</p>
+        <p>If you have any questions please do not hesitate to contact us.</p>
+        <p>To allow us to process your order please complete, sign and return at your earliest convenience.</p>
+    {% else %}
+        <p>
+            With reference to your recent enquiry, I have great pleasure in providing you with the following prices.
+            Full details are attached or click on <a href="{{ apiURL }}">this link</a> to receive the electronic quote
+            to sign.
+        </p>
+    {% endif %}
+    <p>
+        Many thanks
+    </p>
+    <p>
+        {{ senderFirstName }} {{ senderLastName }}
+    </p>
+{% endblock %}
+
+{% block leftFooter %}
+    <br>
+    &nbsp;
+    <br>
+{% endblock %}
+
+{% block rightFooter %}
+
+{% endblock %}

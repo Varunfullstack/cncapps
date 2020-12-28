@@ -1,3 +1,4 @@
+
 <script>
     let dataTable = null;
     let redSelect = null;
@@ -57,12 +58,12 @@
                 url: "?action=getData",
                 type: "GET",
                 dataSrc: (response) => {
-                    $.LoadingOverlay('hide');
+                    spinnerComponent.hideSpinner();
                     return response;
                 },
                 data: (data) => {
+                    spinnerComponent.showSpinner();
                     data.daysAgo = daysAgoSelector.selectedOptions[0].value;
-                    $.LoadingOverlay("show", {text: 'Running your search, please wait'});
                     return data;
                 }
             },
@@ -103,7 +104,7 @@
                             return '';
                         }
                         const anchor = document.createElement('a');
-                        anchor.href = "Activity.php?action=displayLastActivity&problemID=" + data;
+                        anchor.href = "SRActivity.php?action=displayActivity&serviceRequestId=" + data;
                         anchor.text = data;
                         anchor.target = '_blank';
                         return anchor.outerHTML;

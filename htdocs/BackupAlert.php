@@ -17,7 +17,7 @@ $thing = null;
 
 define(
     'BACKUP_ALERT_EMAIL_FROM_USER',
-    'sales@cnc-ltd.co.uk'
+    'sales@' . CONFIG_PUBLIC_DOMAIN
 );
 define(
     'BACKUP_ALERT_EMAIL_SUBJECT',
@@ -76,7 +76,7 @@ if ($error) {
 
     $hdrs = array(
         'To'      => $send_to_email,
-        'From' => BACKUP_ALERT_EMAIL_FROM_USER,
+        'From'    => BACKUP_ALERT_EMAIL_FROM_USER,
         'Subject' => BACKUP_ALERT_EMAIL_SUBJECT
     );
 
@@ -87,7 +87,7 @@ if ($error) {
         $send_to_email,
         $hdrs,
         $body
-        );
+    );
 
 } else {
     echo "Backup OK";

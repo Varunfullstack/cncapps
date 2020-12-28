@@ -25,7 +25,7 @@ require_once($cfg["path_func"] . "/activity.inc.php");
 
 class BUExpense extends Business
 {
-    const exportDataSetEndDate = 'endDate';
+    const exportDataSetEndDate       = 'endDate';
     const expensesNextProcessingDate = "expensesNextProcessingDate";
     public $dbeJExpense;
 
@@ -67,10 +67,8 @@ class BUExpense extends Business
     {
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($callActivityID);
-
         $dbeExpenseType = new DBEExpenseType($this);
         $dbeExpenseType->getRow(2);                                        // default to mileage
-
         $dbeExpense = new DBEExpense($this);
         $dbeExpense->setValue(
             DBEExpense::expenseID,
@@ -122,7 +120,6 @@ class BUExpense extends Business
         // get the call activity no to return
         $dbeExpense = new DBEExpense($this);
         $dbeExpense->getRow($expenseID);
-
         if ($dbeExpense->getValue(DBEExpense::exportedFlag) == 'Y' || $dbeExpense->getValue(
                 DBEExpense::deniedReason
             ) || $dbeExpense->getValue(DBEExpense::approvedBy)) {
@@ -231,19 +228,20 @@ class BUExpense extends Business
                                        $dbeUser
     )
     {
-        /** @var dbSweetcode $db */
-        global $db;
+        /** @var dbSweetcode $db */ global $db;
         $this->setMethodName('exportEngineerExpenses');
-        $date = DateTime::createFromFormat(DATE_MYSQL_DATE, $dsData->getValue(self::exportDataSetEndDate));
-        $nextProcessingDate = DateTime::createFromFormat(
+        $date                     = DateTime::createFromFormat(
+            DATE_MYSQL_DATE,
+            $dsData->getValue(self::exportDataSetEndDate)
+        );
+        $nextProcessingDate       = DateTime::createFromFormat(
             DATE_MYSQL_DATE,
             $dsData->getValue(self::expensesNextProcessingDate)
         );
-
-        $expenses = $this->getExpenseToDateExportData($date);
-        $overtimeActivities = $this->getOvertimeToDateExportData($date);
-        $engineersData = [];
-        $monthYear = substr(
+        $expenses                 = $this->getExpenseToDateExportData($date);
+        $overtimeActivities       = $this->getOvertimeToDateExportData($date);
+        $engineersData            = [];
+        $monthYear                = substr(
                 $dsData->getValue(self::exportDataSetEndDate),
                 5,
                 2
@@ -252,7 +250,6 @@ class BUExpense extends Business
                 0,
                 4
             );
-
         $overtimeToFlagAsExported = [];
         $expensesToFlagAsExported = [];
         foreach ($expenses as $expenseExportItem) {
@@ -261,18 +258,17 @@ class BUExpense extends Business
                 $expensesToFlagAsExported[] = $expenseExportItem;
                 continue;
             }
-
             if (!isset($engineersData[$expenseExportItem->engineerName])) {
                 $engineersData[$expenseExportItem->engineerName] = new \CNCLTD\ExpenseOvertimeEngineerExport(
                     $monthYear
                 );
             }
-            $engineersData[$expenseExportItem->engineerName]->expenses[] = $expenseExportItem;
-            $engineersData[$expenseExportItem->engineerName]->userName = $expenseExportItem->engineerUserName;
-            $engineersData[$expenseExportItem->engineerName]->firstName = $expenseExportItem->engineerFirstName;
-            $engineersData[$expenseExportItem->engineerName]->lastName = $expenseExportItem->engineerLastName;
-            $engineersData[$expenseExportItem->engineerName]->expenseNetTotal += $expenseExportItem->netValue;
-            $engineersData[$expenseExportItem->engineerName]->expenseVATTotal += $expenseExportItem->VATValue;
+            $engineersData[$expenseExportItem->engineerName]->expenses[]        = $expenseExportItem;
+            $engineersData[$expenseExportItem->engineerName]->userName          = $expenseExportItem->engineerUserName;
+            $engineersData[$expenseExportItem->engineerName]->firstName         = $expenseExportItem->engineerFirstName;
+            $engineersData[$expenseExportItem->engineerName]->lastName          = $expenseExportItem->engineerLastName;
+            $engineersData[$expenseExportItem->engineerName]->expenseNetTotal   += $expenseExportItem->netValue;
+            $engineersData[$expenseExportItem->engineerName]->expenseVATTotal   += $expenseExportItem->VATValue;
             $engineersData[$expenseExportItem->engineerName]->expenseGrossTotal += $expenseExportItem->grossValue;
             if ($expenseExportItem->payeTaxable) {
                 $engineersData[$expenseExportItem->engineerName]->payeTotal += $expenseExportItem->grossValue;
@@ -281,7 +277,7 @@ class BUExpense extends Business
             }
             $engineersData[$expenseExportItem->engineerName]->employeeNumber = $expenseExportItem->employeeNumber;
         }
-        $buHeader = new BUHeader($this);
+        $buHeader  = new BUHeader($this);
         $dbeHeader = new DataSet($this);
         $buHeader->getHeader($dbeHeader);
         foreach ($overtimeActivities as $overtimeExportItem) {
@@ -290,45 +286,39 @@ class BUExpense extends Business
                 $overtimeToFlagAsExported[] = $overtimeExportItem;
                 continue;
             }
-
             if (!isset($engineersData[$overtimeExportItem->engineerName])) {
                 $engineersData[$overtimeExportItem->engineerName] = new \CNCLTD\ExpenseOvertimeEngineerExport(
                     $monthYear
                 );
             }
             $engineersData[$overtimeExportItem->engineerName]->overtimeActivities[] = $overtimeExportItem;
-            $engineersData[$overtimeExportItem->engineerName]->userName = $overtimeExportItem->engineerUserName;
-            $engineersData[$overtimeExportItem->engineerName]->firstName = $overtimeExportItem->engineerFirstName;
-            $engineersData[$overtimeExportItem->engineerName]->lastName = $overtimeExportItem->engineerLastName;
-            $engineersData[$overtimeExportItem->engineerName]->employeeNumber = $overtimeExportItem->employeeNumber;
-            $engineersData[$overtimeExportItem->engineerName]->overtimeTotal += $overtimeExportItem->overtimeValue;
+            $engineersData[$overtimeExportItem->engineerName]->userName             = $overtimeExportItem->engineerUserName;
+            $engineersData[$overtimeExportItem->engineerName]->firstName            = $overtimeExportItem->engineerFirstName;
+            $engineersData[$overtimeExportItem->engineerName]->lastName             = $overtimeExportItem->engineerLastName;
+            $engineersData[$overtimeExportItem->engineerName]->employeeNumber       = $overtimeExportItem->employeeNumber;
+            $engineersData[$overtimeExportItem->engineerName]->overtimeTotal        += $overtimeExportItem->overtimeValue;
 
         }
-
         $expenseJournalCSVData = [];
-        $summaryReportCSVData = [];
+        $summaryReportCSVData  = [];
         if ($runType == 'Export') {
 
             /** @var OvertimeExportItem $toIgnoreOvertimeActivity */
             foreach ($overtimeToFlagAsExported as $toIgnoreOvertimeActivity) {
-                $queryString =
-                    "UPDATE callactivity SET caa_ot_exp_flag = 'Y'
+                $queryString = "UPDATE callactivity SET caa_ot_exp_flag = 'Y'
                     WHERE caa_callactivityno = ?";
                 $db->preparedQuery($queryString, [["type" => "i", "value" => $toIgnoreOvertimeActivity->activityId]]);
             }
             /** @var ExpenseExportItem $toIgnoreExpense */
             foreach ($expensesToFlagAsExported as $toIgnoreExpense) {
-                $queryString =
-                    "UPDATE expense SET exp_exported_flag = 'Y'
+                $queryString = "UPDATE expense SET exp_exported_flag = 'Y'
                     WHERE exp_expenseno = ?";
                 $db->preparedQuery($queryString, [["type" => "i", "value" => $toIgnoreExpense->expenseId]]);
             }
         }
-
         if (!count($engineersData)) {
             return false;
         }
-
         /**
          * @var string $engineerName
          * @var \CNCLTD\ExpenseOvertimeEngineerExport $engineersDatum
@@ -338,32 +328,24 @@ class BUExpense extends Business
                 $this->sendEngineerOvertimeExpenseSummaryEmail($engineersDatum);
                 // we have to send the individual emails with the expenses and overtime data
                 // we have to flag all the expenses and overtime as exported
-
                 $queryString = "update headert set expensesNextProcessingDate = ?";
-
                 $db->preparedQuery(
                     $queryString,
                     [["type" => "s", "value" => $nextProcessingDate->format(DATE_MYSQL_DATE)]]
                 );
-
                 foreach ($engineersDatum->expenses as $expenseExportItem) {
                     // update exported flag
-                    $queryString =
-                        "UPDATE expense SET exp_exported_flag = 'Y'
+                    $queryString = "UPDATE expense SET exp_exported_flag = 'Y'
                     WHERE exp_expenseno = ? ";
                     $db->preparedQuery($queryString, [["type" => "i", "value" => $expenseExportItem->expenseId]]);
                 }
-
                 /** @var OvertimeExportItem $overtimeActivity */
                 foreach ($engineersDatum->overtimeActivities as $overtimeActivity) {
-                    $queryString =
-                        "UPDATE callactivity SET caa_ot_exp_flag = 'Y'
+                    $queryString = "UPDATE callactivity SET caa_ot_exp_flag = 'Y'
                     WHERE caa_callactivityno = ?";
-
                     $db->preparedQuery($queryString, [["type" => "i", "value" => $overtimeActivity->activityId]]);
                 }
             }
-
             if ($engineersDatum->expenseGrossTotal) {
                 // from the total for each engineer we have to generate the expenses journal data
                 $expenseJournalCSVData[] = [
@@ -378,7 +360,6 @@ class BUExpense extends Business
                     'T9',
                     0
                 ];
-
                 $expenseJournalCSVData[] = [
                     'JD',
                     '',
@@ -392,7 +373,6 @@ class BUExpense extends Business
                     0
                 ];
             }
-
             if ($engineersDatum->expenseVATTotal) {
                 $expenseJournalCSVData[] = [
                     'JD',
@@ -407,8 +387,6 @@ class BUExpense extends Business
                     0
                 ];
             }
-
-
             $summaryReportCSVData[] = [
                 $engineersDatum->employeeNumber,
                 $engineersDatum->firstName,
@@ -418,7 +396,6 @@ class BUExpense extends Business
                 $engineersDatum->payeTotal,
             ];
         }
-
         if (count($summaryReportCSVData)) {
             usort(
                 $summaryReportCSVData,
@@ -426,8 +403,7 @@ class BUExpense extends Business
                     return $a[0] <=> $b[0];
                 }
             );
-
-            $summaryCSV = array_merge(
+            $summaryCSV       = array_merge(
                 [
                     ["Staff No.", "Forename", "Surname", "Expenses", "Overtime(Hours)", "Bonus"]
                 ],
@@ -438,10 +414,8 @@ class BUExpense extends Business
             if (count($expenseJournalCSVData)) {
                 $journalCSVString = $this->array2csv($expenseJournalCSVData);
             }
-
             $this->sendResultToEmail($dbeUser, $summaryCSVString, $journalCSVString);
         }
-
         return true;
     }
 
@@ -451,8 +425,7 @@ class BUExpense extends Business
      */
     private function getExpenseToDateExportData(DateTimeInterface $date)
     {
-        /** @var dbSweetcode $db */
-        global $db;
+        /** @var dbSweetcode $db */ global $db;
         $queryString = "
         SELECT
   DATE_FORMAT(
@@ -507,9 +480,8 @@ WHERE expense.exp_exported_flag <> 'Y'
 ORDER BY cns_name,
   caa_date,
   caa_starttime";
-
-        $result = $db->preparedQuery($queryString, [["type" => 's', "value" => $date->format(DATE_MYSQL_DATE)]]);
-        $toReturn = [];
+        $result      = $db->preparedQuery($queryString, [["type" => 's', "value" => $date->format(DATE_MYSQL_DATE)]]);
+        $toReturn    = [];
         while ($object = $result->fetch_object(ExpenseExportItem::class)) {
             $toReturn[] = $object;
         }
@@ -522,9 +494,7 @@ ORDER BY cns_name,
      */
     private function getOvertimeToDateExportData(DateTime $date)
     {
-        /** @var dbSweetcode $db */
-        global $db;
-
+        /** @var dbSweetcode $db */ global $db;
         $queryString = "
     SELECT cus_name                                                       as customerName,
        DATE_FORMAT(
@@ -559,10 +529,8 @@ WHERE caa_date <= ?
   AND caa_endtime <> caa_starttime
   AND callacttype.engineerOvertimeFlag = 'Y'
 ORDER BY cns_name, caa_date";
-
-
-        $result = $db->preparedQuery($queryString, [["type" => 's', "value" => $date->format(DATE_MYSQL_DATE)]]);
-        $toReturn = [];
+        $result      = $db->preparedQuery($queryString, [["type" => 's', "value" => $date->format(DATE_MYSQL_DATE)]]);
+        $toReturn    = [];
         while ($object = $result->fetch_object(OvertimeExportItem::class)) {
             $toReturn[] = $object;
         }
@@ -571,39 +539,32 @@ ORDER BY cns_name, caa_date";
 
     private function sendEngineerOvertimeExpenseSummaryEmail(\CNCLTD\ExpenseOvertimeEngineerExport $engineersDatum)
     {
-        /** @var \Twig\Environment $twig */
-        global $twig;
-        $body = $twig->render(
+        /** @var \Twig\Environment $twig */ global $twig;
+        $body      = $twig->render(
             '@internal/expensesOvertimeIndividualEmail.html.twig',
             [
                 "data" => $engineersDatum,
             ]
         );
-
-        $buMail = new BUMail($this);
+        $buMail    = new BUMail($this);
         $fromEmail = CONFIG_SALES_EMAIL;
-        $toEmail = $engineersDatum->userName . '@' . CONFIG_PUBLIC_DOMAIN;
-        $subject = "Overtime/Expenses for " . $engineersDatum->monthYear;
-        $hdrs = array(
+        $toEmail   = $engineersDatum->userName . '@' . CONFIG_PUBLIC_DOMAIN;
+        $subject   = "Overtime/Expenses for " . $engineersDatum->monthYear;
+        $hdrs      = array(
             'From'    => $fromEmail,
             'To'      => $toEmail,
             'Subject' => $subject
         );
-
-        $mime = new Mail_mime();
-
+        $mime      = new Mail_mime();
         $mime->setHTMLBody($body);
-
         $mime_params = array(
             'text_encoding' => '7bit',
             'text_charset'  => 'UTF-8',
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-
-        $body = $mime->get($mime_params);
-
-        $hdrs = $mime->headers($hdrs);
+        $body        = $mime->get($mime_params);
+        $hdrs        = $mime->headers($hdrs);
         $buMail->putInQueue(
             $fromEmail,
             $toEmail,
@@ -621,7 +582,6 @@ ORDER BY cns_name, caa_date";
     *
     * if $runType = CTEXPENSE_ACT_EXPORT_TRIAL then we only send the summary email and don't update exported flags 
     */
-
     private function array2csv($data, $delimiter = ",", $enclosure = '"', $escape_char = "\\")
     {
         $buffer = fopen('php://temp', 'r+');
@@ -644,36 +604,29 @@ ORDER BY cns_name, caa_date";
      */
     function sendResultToEmail($fromUser, $summaryCSVString, $journalCSVString = null)
     {
-        $buMail = new BUMail($this);
-        $toEmail = "payroll@cnc-ltd.co.uk";
+        $buMail    = new BUMail($this);
+        $toEmail   = "payroll@" . CONFIG_PUBLIC_DOMAIN;
         $fromEmail = $fromUser->getValue(DBEUser::username) . "@" . CONFIG_PUBLIC_DOMAIN;
-        $hdrs = array(
+        $hdrs      = array(
             'From'    => $fromEmail,
             'To'      => $toEmail,
             'Subject' => 'Expenses/Overtime Export'
         );
-
-        $crlf = "\r\n";
-
-        $mime = new Mail_mime($crlf);
-
+        $crlf      = "\r\n";
+        $mime      = new Mail_mime($crlf);
         $mime->setTXTBody('Please find attached the expenses and overtime data.');
-
         $mime->addAttachment($summaryCSVString, 'application/octet-stream', 'Monthly Summary Report.csv', false);
         if ($journalCSVString) {
             $mime->addAttachment($journalCSVString, 'application/octet-stream', 'Expense-Journal.csv', false);
         }
-
         $mime_params = array(
             'text_encoding' => '7bit',
             'text_charset'  => 'UTF-8',
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-        $body = $mime->get($mime_params);
-
-        $hdrs = $mime->headers($hdrs);
-
+        $body        = $mime->get($mime_params);
+        $hdrs        = $mime->headers($hdrs);
         $buMail->putInQueue(
             $fromEmail,
             $toEmail,
@@ -694,38 +647,40 @@ ORDER BY cns_name, caa_date";
         $buHeader = new BUHeader($this);
         $buHeader->getHeader($dsHeader);
         $officeStartTime = common_convertHHMMToDecimal($dsHeader->getValue(DBEHeader::overtimeStartTime));
-        $officeEndTime = common_convertHHMMToDecimal($dsHeader->getValue(DBEHeader::overtimeEndTime));
-        $shiftStartTime = common_convertHHMMToDecimal($dbejCallactivity->getValue(DBEJCallActivity::startTime));
-        $shiftEndTime = common_convertHHMMToDecimal($dbejCallactivity->getValue(DBEJCallActivity::endTime));
-        $affectedUser = new DBEUser($this);
+        $officeEndTime   = common_convertHHMMToDecimal($dsHeader->getValue(DBEHeader::overtimeEndTime));
+        $shiftStartTime  = common_convertHHMMToDecimal($dbejCallactivity->getValue(DBEJCallActivity::startTime));
+        $shiftEndTime    = common_convertHHMMToDecimal($dbejCallactivity->getValue(DBEJCallActivity::endTime));
+        $affectedUser    = new DBEUser($this);
         $affectedUser->getRow($dbejCallactivity->getValue(DBEJCallActivity::userID));
-
         $activityType = new DBECallActType($this);
         $activityType->getRow($dbejCallactivity->getValue(DBEJCallActivity::callActTypeID));
         if ($dbejCallactivity->getValue(DBECallActivity::overtimeDurationApproved)) {
             return $dbejCallactivity->getValue(DBECallActivity::overtimeDurationApproved);
         }
-
         if (!$activityType->getValue(DBECallActType::engineerOvertimeFlag) == 'Y' || !$dbejCallactivity->getValue(
                 DBECallActivity::submitAsOvertime
             )) {
             return 0;
         }
-
-        if ($activityType->getValue(DBECallActType::callActTypeID) != 22) {
+        if ($activityType->getValue(DBECallActType::callActTypeID) != CONFIG_ENGINEER_TRAVEL_ACTIVITY_TYPE_ID) {
             return $shiftEndTime - $shiftStartTime;
         }
+        $activityDateString = $dbejCallactivity->getValue(DBEJCallActivity::date);
+        $activityDate       = DateTime::createFromFormat(DATE_MYSQL_DATE, $activityDateString);
+        $dayOfTheWeek       = $activityDate->format('N');
+        $bankHolidays       = common_getUKBankHolidays($activityDate->format('Y'));
+        if (in_array($dayOfTheWeek, [6, 7]) || in_array($activityDateString, $bankHolidays)) {
+            return $shiftEndTime - $shiftStartTime;
+        }
+        if ($shiftStartTime >= $officeStartTime && $shiftStartTime < $officeEndTime) {
+            $shiftStartTime = $officeEndTime;
+        }
+        if ($shiftEndTime > $officeStartTime && $shiftEndTime < $officeEndTime) {
+            $shiftEndTime = $officeStartTime;
+        }
+        if ($officeEndTime < $officeStartTime) {
 
-        if ($shiftStartTime > $officeEndTime || $shiftEndTime < $officeStartTime) {
             return 0;
-        }
-
-        if ($shiftStartTime < $officeStartTime) {
-            $shiftStartTime = $officeStartTime;
-        }
-
-        if ($shiftEndTime > $officeEndTime) {
-            $shiftEndTime = $officeEndTime;
         }
         return $shiftEndTime - $shiftStartTime;
     }

@@ -62,7 +62,13 @@ class DBEProblem extends DBEntity
     const projectTeamTimeAlertFlag = "projectTeamTimeAlertFlag";
     const raiseTypeId = "raiseTypeId";
     const salesRequestAssignedUserId = "salesRequestAssignedUserId";
-
+    const emailSubjectSummary = "emailSubjectSummary";
+    const assetName = "assetName";
+    const assetTitle = "assetTitle";
+    const repeatProblem = "repeatProblem";
+    const notFirstTimeFixReason = "notFirstTimeFixReason";
+    const emptyAssetReason = "emptyAssetReason";
+    const holdForQA="holdForQA";
     /**
      * calls constructor()
      * @access public
@@ -395,12 +401,58 @@ class DBEProblem extends DBEntity
             DA_ID,
             DA_ALLOW_NULL
         );
-
+        $this->addColumn(
+            self::emailSubjectSummary,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::assetName,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::assetTitle,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::repeatProblem,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::notFirstTimeFixReason,
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::emptyAssetReason,
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::holdForQA,
+            DA_BOOLEAN,
+            DA_ALLOW_NULL
+        );
+        
         $this->setAddColumnsOff();
         $this->setPK(0);
         if ($pkID) {
             $this->getRow($pkID);
         }
+    }
+
+    public static function statusFromDB($dbValue)
+    {
+        $matches = [
+            "I" => "Logged",
+            "P" => "In Progress",
+            "F" => "Fixed",
+            "C" => "Closed"
+        ];
+        return $matches[$dbValue];
     }
 
     public function getManagementReviews($customerID,

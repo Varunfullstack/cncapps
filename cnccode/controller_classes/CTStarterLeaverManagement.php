@@ -55,12 +55,14 @@ class CTStarterLeaverManagement extends CTCNC
 
         switch ($this->getAction()) {
             case 'addQuestion':
+
                 try {
                     $this->addQuestion();
                 } catch (Exception $exception) {
                     $this->formErrorMessage = $exception->getMessage();
                     $this->formError = true;
                     $this->displayList();
+                    exit;
                 }
 
                 $location = 'Location: StarterLeaverManagement.php';
@@ -127,12 +129,12 @@ class CTStarterLeaverManagement extends CTCNC
             throw new Exception('Customer is not set');
         }
 
-        if ($this->getParam('type')) {
-            $this->getParam('question')['formType'] = $this->getParam('type');
-        }
 
         $questionData = $this->getParam('question');
 
+        if ($this->getParam('type')) {
+            $questionData[DBEStarterLeaverQuestion::formType] = $this->getParam('type');
+        }
 
         $dbeStarterLeaverQuestion = new DBEStarterLeaverQuestion($this);
 
@@ -145,10 +147,13 @@ class CTStarterLeaverManagement extends CTCNC
             DBEStarterLeaverQuestion::customerID,
             $questionData[DBEStarterLeaverQuestion::customerID]
         );
+
+
         $dbeStarterLeaverQuestion->setValue(
             DBEStarterLeaverQuestion::formType,
             $questionData[DBEStarterLeaverQuestion::formType]
         );
+
         $dbeStarterLeaverQuestion->setValue(
             DBEStarterLeaverQuestion::name,
             $questionData[DBEStarterLeaverQuestion::name]
@@ -178,7 +183,6 @@ class CTStarterLeaverManagement extends CTCNC
             DBEStarterLeaverQuestion::type,
             $questionData[DBEStarterLeaverQuestion::type]
         );
-
         $dbeStarterLeaverQuestion->insertRow();
     }
 

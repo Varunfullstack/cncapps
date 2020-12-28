@@ -1,0 +1,35 @@
+{% extends '@customerFacing/wrapper.html.twig' %}
+{# @var data \CNCLTD\TwigDTOs\SalesOrderServiceRequestCreatedDTO #}
+{% block headerTitle %}
+    Service Request Information
+{% endblock %}
+
+{% block headerContet %}
+    A new Service Request has been raised
+{% endblock %}
+
+{% block content %}
+    <p>{{ data.contactFirstName }}</p>
+    <p> Service Request {{ data.serviceRequestId }} has been created with our Service Desk.  We'll work on this in the background and update you when we've got something important to share or ask you.
+    </p>
+    <p>{{ data.reason }}</p>
+    <p>
+        Priority: 5 - Project Work
+    </p>
+    <p>
+        This request has been submitted to our {{ data.teamName }} team who will contact you to arrange any further
+        action.
+    </p>
+{% endblock %}
+
+{% block serviceRequestURL %}
+    https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ data.serviceRequestId }}
+{% endblock %}
+
+{% block footerStatus %}
+    {{ data.serviceRequestStatus }}
+{% endblock %}
+
+{% block feedback %}
+    <br>
+{% endblock %}

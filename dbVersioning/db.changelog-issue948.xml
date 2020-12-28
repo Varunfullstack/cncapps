@@ -1,0 +1,92 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdevmt" id="issue948-0">
+        <tagDatabase tag="issue948"/>
+    </changeSet>
+    <changeSet id="issue948-1" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="problem" columnName="emailSubjectSummary"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="problem">
+            <column name="emailSubjectSummary" type="nvarchar(100)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>    
+    <changeSet id="issue948-2" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="problem" columnName="emptyAssetReason"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="problem">
+            <column name="emptyAssetReason" type="nvarchar(200)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="assetName" type="varchar(50)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="assetTitle" type="varchar(100)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+         <sql>
+            INSERT INTO  standardtexttype (sty_desc) VALUES  ('Unable to offer First Time Fix reason');
+         </sql>
+    </changeSet>    
+     <changeSet id="issue948-3" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="problem" columnName="repeatProblem"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="problem">
+            <column name="repeatProblem" type="TINYINT(1)" defaultValue="0">
+                <constraints nullable="true"/>
+            </column>            
+        </addColumn>         
+    </changeSet>    
+    <changeSet id="issue948-4" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="problemNotStartReason"/>
+            </not>
+        </preConditions>
+        <createTable tableName="problemNotStartReason">
+            <column name="id" type="int(11)" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="problemID" type="int(11) UNSIGNED"  >
+                <constraints nullable="false"/>                                  
+            </column>
+            <column name="userID" type="int(11)" >
+                <constraints nullable="false"/>                                  
+            </column>
+            <column name="reason" type="varchar(500)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="createAt" type="TIMESTAMP"  defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>  
+        <addForeignKeyConstraint baseTableName="problemNotStartReason" baseColumnNames="problemID"
+                                 constraintName="fk_problemNotStartReason_problem"
+                                 referencedTableName="problem"
+                                 referencedColumnNames="pro_problemno"
+                                 onDelete="CASCADE"
+        />
+        <addForeignKeyConstraint baseTableName="problemNotStartReason" baseColumnNames="userID"
+                                 constraintName="fk_problemNotStartReason_user"
+                                 referencedTableName="consultant"
+                                 referencedColumnNames="cns_consno"
+                                 onDelete="CASCADE"
+        />
+        <rollback>
+            <dropTable tableName="problemNotStartReason"/>           
+        </rollback>
+    </changeSet>    
+</databaseChangeLog>

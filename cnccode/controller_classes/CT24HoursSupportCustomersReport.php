@@ -29,7 +29,71 @@ class CT24HoursSupportCustomersReport extends CTCNC
      */
     function defaultAction()
     {
-        $this->display24HourSupportCustomers();
+        switch ($this->getAction()) {
+            case 'getCallOutYears':
+            {
+
+                global $db;
+                $statement = $db->preparedQuery(
+                    'SELECT DISTINCT YEAR(createdAt) as years FROM customercallouts GROUP BY YEAR(createdAt)',
+                    []
+                );
+                $result = [];
+                while ($row = $statement->fetch_array(MYSQLI_NUM)) {
+                    $result[] = $row[0];
+                }
+                echo json_encode(
+                    [
+                        "status" => "ok",
+                        "data"   => $result
+                    ]
+                );
+                exit;
+            }
+            case 'getOutOfHoursData':
+            {
+                global $db;
+
+                $query = "SELECT id,customerId, `cus_name` as customerName, createdAt, chargeable, salesOrderHeaderId FROM customerCallOuts LEFT JOIN customer ON customer.`cus_custno` = customerCallOuts.customerId where 1";
+                $params = [];
+                $startDate = new DateTime('first day of this year');
+                $endDate = new DateTime('last day of this year');
+                if (!empty($_REQUEST['startDate'])) {
+                    $startDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $_REQUEST['startDate']);
+                    if (!$startDate) {
+                        throw new \CNCLTD\Exceptions\JsonHttpException('startDate format should be YYYY-MM-DD');
+                    }
+                    $query .= " and createdAt >= ?";
+                    $params[] = [
+                        "type"  => "s",
+                        "value" => $startDate->format(DATE_MYSQL_DATE)
+                    ];
+                }
+                if (!empty($_REQUEST['endDate'])) {
+                    $endDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $_REQUEST['endDate']);
+                    if (!$endDate) {
+                        throw new \CNCLTD\Exceptions\JsonHttpException('endDate format should be YYYY-MM-DD');
+                    }
+                    $query .= " and createdAt <= ?";
+                    $params[] = [
+                        "type"  => "s",
+                        "value" => $endDate->format(DATE_MYSQL_DATE)
+                    ];
+                }
+
+                $statement = $db->preparedQuery($query, $params);
+                echo json_encode(
+                    [
+                        "status" => "ok",
+                        "data"   => $statement->fetch_all(MYSQLI_ASSOC),
+                    ]
+                );
+                exit;
+            }
+            default:
+                $this->display24HourSupportCustomers();
+        }
+
     }
 
     /**
@@ -56,6 +120,8 @@ class CT24HoursSupportCustomersReport extends CTCNC
                 'customerBlock',
                 'customers'
             );
+
+            $this->loadReactScript('OutOfHoursReportComponent.js');
 
             while ($dsCustomer->fetchNext()) {
 

@@ -22,7 +22,6 @@ class DBEJCallActivity extends DBECallActivity
     const requireCheckFlag = "requireCheckFlag";
     const onSiteFlag = "onSiteFlag";
     const travelFlag = "travelFlag";
-    const allowSCRFlag = "allowSCRFlag";
     const userName = "userName";
     const userAccount = "userAccount";
     const durationMinutes = "durationMinutes";
@@ -64,7 +63,10 @@ class DBEJCallActivity extends DBECallActivity
     const hdPauseCount = "hdPauseCount";
     const allocatedUserID = "allocatedUserID";
     const queueNo = "queueNo";
-    const caaConsno="caa_consno";
+    const caaConsno = "caa_consno";
+    const assetName = "assetName";
+    const assetTitle = "assetTitle";
+    const emailSubjectSummary = "emailSubjectSummary";
 
     var $fromString;
 
@@ -105,11 +107,6 @@ class DBEJCallActivity extends DBECallActivity
         );
         $this->addColumn(
             self::travelFlag,
-            DA_YN,
-            DA_ALLOW_NULL
-        );
-        $this->addColumn(
-            self::allowSCRFlag,
             DA_YN,
             DA_ALLOW_NULL
         );
@@ -269,6 +266,13 @@ class DBEJCallActivity extends DBECallActivity
             "problem.pro_status"
         );
         $this->addColumn(
+            self::emailSubjectSummary,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "problem.emailSubjectSummary"
+        );
+
+        $this->addColumn(
             self::requestAwaitingCustomerResponseFlag,
             DA_STRING,
             DA_ALLOW_NULL,
@@ -370,7 +374,19 @@ class DBEJCallActivity extends DBECallActivity
             DA_ALLOW_NULL,
             "caa_consno"
         );
- 
+        $this->addColumn(
+            self::assetName,
+            DA_TEXT,
+            DA_ALLOW_NULL,
+            "problem.assetName"
+        );
+        $this->addColumn(
+            self::assetTitle,
+            DA_TEXT,
+            DA_ALLOW_NULL,
+            "problem.assetTitle"
+        );
+
         $this->setAddColumnsOff();
 
         $this->fromString =

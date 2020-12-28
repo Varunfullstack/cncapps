@@ -1,7 +1,7 @@
 <!-- Template: RenewalReport.inc.html -->
+
 <style>
-    .wrong
-    {
+    .wrong {
         color: red;
         font-weight: bold;
     }
@@ -36,25 +36,6 @@
         </option>
         <!-- END toSignContactsBlock -->
     </select>
-    <label for="signableTemplate">
-        Template
-    </label>
-    <select name="signableTemplate"
-            id="signableTemplate"
-            onchange="changedSignableTemplate()"
-            {disabled}
-    >
-        <option selected
-                value=""
-        >-- Pick a Template --
-        </option>
-        <!-- BEGIN templateBlock -->
-        <option value="{templateID}">
-            {templateDesc}
-        </option>
-        <!-- END templateBlock -->
-    </select>
-
     <button type="button"
             id="sendSignable"
             disabled
@@ -67,9 +48,6 @@
 
     const showOfficeButton = {showOfficeButton};
 
-    function changedSignableTemplate() {
-        checkSendSignable();
-    }
 
     function runOfficeReport(customerID) {
         alert('This process can take up to 30 minutes to complete, depending on the customer size, please check customer Review Folder later.');
@@ -137,7 +115,7 @@
             customerID: {customerID},
             contractsIDs: contractsIds
         };
-        $.LoadingOverlay("show", {text: 'Generating preview, please wait'});
+        spinnerComponent.showSpinner();
 
         $.ajax({
             url: '?action=previewPDF',
@@ -150,13 +128,13 @@
             window.open(result.PDFPath);
             var signableContact = $('#signableContact').val();
             checkSendSignable(signableContact);
-            $.LoadingOverlay('hide');
+            spinnerComponent.hideSpinner();
         });
     }
 
     function checkSendSignable() {
 
-        if (currentPDFPath && $('#signableContact').val() && $('#signableTemplate').val()) {
+        if (currentPDFPath && $('#signableContact').val()) {
             $('#sendSignable').prop('disabled', false);
         } else {
             $('#sendSignable').prop('disabled', true);
@@ -175,7 +153,6 @@
                 contactID: $('#signableContact').val(),
                 PDFPath: currentPDFPath,
                 customerID: {customerID},
-                signableTemplateID: $('#signableTemplate').val()
             };
 
             $.ajax({

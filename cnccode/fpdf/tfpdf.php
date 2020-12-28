@@ -1522,7 +1522,7 @@ class tFPDF
             fclose($f);
         } else {
             // Use temporary file
-            $tmp = tempnam('.', 'gif');
+            $tmp = @tempnam('.', 'gif');
             if (!$tmp)
                 $this->Error('Unable to create a temporary file');
             if (!imagepng($im, $tmp))

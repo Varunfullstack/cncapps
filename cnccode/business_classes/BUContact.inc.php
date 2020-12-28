@@ -482,10 +482,21 @@ class BUContact extends Business
 
     }
 
+
+
     public function getTodayLeaverContacts(&$dsResults)
     {
         $this->setMethodName('getContactByCustomerID');
         $this->dbeContact->getTodayLeavers();
+        $this->getData(
+            $this->dbeContact,
+            $dsResults
+        );
+    }
+    public function getContactsWithPendingFurloughActionForToday(&$dsResults)
+    {
+        $this->setMethodName('getContactByCustomerID');
+        $this->dbeContact->getContactsWithPendingFurloughActionForToday();
         $this->getData(
             $this->dbeContact,
             $dsResults

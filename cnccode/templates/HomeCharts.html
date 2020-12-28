@@ -118,14 +118,17 @@
                     dataTable.addColumn('number', 'Hours Logged All Clients(except CNC)');
                     dataTable.addColumn({type: 'string', role: 'style'});
                     dataTable.addColumn('number', 'Hours Logged Against CNC')
-
+                    dataTable.addColumn('number', 'Holiday Hours');
+                    dataTable.addColumn('number', 'Sum',);
                     dataTable.addRows(
                         item.dataPoints.map(function (row) {
                             return [
                                 new Date(row['date']),
                                 row['loggedHours'],
                                 row['isHolidays'] ? 'green' : null,
-                                row['cncLoggedHours']
+                                row['cncLoggedHours'],
+                                row['holidayHours'],
+                                row['loggedHours'] + row['cncLoggedHours'] + row['holidayHours'],
                             ]
                         })
                     );
@@ -133,16 +136,19 @@
 
                     const storedOptions = {
                         title: item.userName,
-                        trendlines: {0: {}},
+                        trendlines: {3: {color: '#3c3c3c'}},
                         legend: 'none',
                         isStacked: true,
+                        seriesType: 'bars',
                         series: {
                             0: {color: '#0082b9'},
                             1: {color: '#c6c6c6'},
+                            2: {color: 'green'},
+                            3: {type: 'line', areaOpacity: 0, lineWidth: 0, tooltip: {trigger: 'none'}},
                         }
                     };
 
-                    var chart = new google.visualization.ColumnChart(test[0]);
+                    var chart = new google.visualization.ComboChart(test[0]);
                     chart.draw(dataTable, storedOptions);
                 })
             })

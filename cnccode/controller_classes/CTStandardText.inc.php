@@ -34,6 +34,9 @@ define(
 
 class CTStandardText extends CTCNC
 {
+    const GET_SALES_REQUEST_OPTIONS  = "getSalesRequestOptions";
+    const GET_CHANGE_REQUEST_OPTIONS = "getChangeRequestOptions";
+    const GET_BY_TYPE                = "getByType";
     /** @var DSForm */
     public $dsStandardText;
     /** @var BUStandardText */
@@ -81,7 +84,7 @@ class CTStandardText extends CTCNC
                 $this->checkPermissions(MAINTENANCE_PERMISSION);
                 $this->update();
                 break;
-            case "getSalesRequestOptions":
+            case self::GET_SALES_REQUEST_OPTIONS:
                 try {
                     $data = $this->getStandardTextOptionsForType('Sales Request');
                 } catch (Exception $exception) {
@@ -96,7 +99,7 @@ class CTStandardText extends CTCNC
                 );
 
                 break;
-            case "getChangeRequestOptions" :
+            case self::GET_CHANGE_REQUEST_OPTIONS :
                 try {
                     $data = $this->getStandardTextOptionsForType("Change Request");
                 } catch (Exception $exception) {
@@ -109,8 +112,25 @@ class CTStandardText extends CTCNC
                     $data,
                     JSON_NUMERIC_CHECK
                 );
-
                 break;
+                case self::GET_BY_TYPE :
+                    //UnableToOfferFirstTimeFixReasonOptions
+                    try {
+                        $data = $this->getStandardTextOptionsForType($_REQUEST["type"]);
+                    } catch (Exception $exception) {
+                        $data = [
+                            "error" => $exception->getMessage()
+                        ];
+                    }
+    
+                    echo json_encode(
+                        $data,
+                        JSON_NUMERIC_CHECK
+                    );
+                    break;
+            case "getList":
+                echo json_encode($this->getList());
+                exit;
             case CTSTANDARDTEXT_ACT_DISPLAY_LIST:
             default:
                 $this->checkPermissions(MAINTENANCE_PERMISSION);
@@ -216,27 +236,32 @@ class CTStandardText extends CTCNC
 
         $this->template->set_var(
             array(
-                'stt_standardtextno'              => $stt_standardtextno,
-                'stt_desc'                        => Controller::htmlInputText(
+                'stt_standardtextno'                        => $stt_standardtextno,
+                'stt_desc'                                  => Controller::htmlInputText(
                     $dsStandardText->getValue(DBEStandardText::stt_desc)
                 ),
-                'stt_descMessage'                 => Controller::htmlDisplayText(
+                'stt_descMessage'                           => Controller::htmlDisplayText(
                     $dsStandardText->getMessage(DBEStandardText::stt_desc)
                 ),
-                'stt_text'                        => Controller::htmlInputText(
+                'stt_text'                                  => Controller::htmlInputText(
                     $dsStandardText->getValue(DBEStandardText::stt_text)
                 ),
-                'stt_textMessage'                 => Controller::htmlDisplayText(
+                'stt_textMessage'                           => Controller::htmlDisplayText(
                     $dsStandardText->getMessage(DBEStandardText::stt_text)
                 ),
-                'urlUpdate'                       => $urlUpdate,
-                'urlDelete'                       => $urlDelete,
-                'txtDelete'                       => $txtDelete,
-                'urlDisplayList'                  => $urlDisplayList,
-                'salesRequestEmail'               => $dsStandardText->getValue(DBEStandardText::salesRequestEmail),
-                'salesRequestUnassignFlagChecked' => $this->getChecked(
+                'urlUpdate'                                 => $urlUpdate,
+                'urlDelete'                                 => $urlDelete,
+                'txtDelete'                                 => $txtDelete,
+                'urlDisplayList'                            => $urlDisplayList,
+                'salesRequestEmail'                         => $dsStandardText->getValue(
+                    DBEStandardText::salesRequestEmail
+                ),
+                'salesRequestUnassignFlagChecked'           => $this->getChecked(
                     $dsStandardText->getValue(DBEStandardText::salesRequestUnassignFlag)
-                )
+                ),
+                'salesRequestDoNotNotifySalesOptionChecked' => $this->dsStandardText->getValue(
+                    DBEStandardText::salesRequestDoNotNotifySalesOption
+                ) ? 'checked' : null
             )
         );
 
@@ -431,5 +456,32 @@ class CTStandardText extends CTCNC
             true
         );
         $this->parsePage();
+    }
+      /**
+     * Display list of types
+     * @access private
+     * @throws Exception
+     */
+    function getList()
+    {
+        $this->setMethodName('getList');        
+        $dsStandardText = new DataSet($this);
+        $this->buStandardText->getAllTypes($dsStandardText);        
+        
+        $list=array();
+        if ($dsStandardText->rowCount() > 0) {            
+            while ($dsStandardText->fetchNext()) {
+                $stt_standardtextno = $dsStandardText->getValue(DBEStandardText::stt_standardtextno);
+                array_push(  $list,
+                            array(
+                                'id' => $stt_standardtextno,
+                                'title'           => $dsStandardText->getValue(DBEStandardText::stt_desc),
+                                'content'           => $dsStandardText->getValue(DBEStandardText::stt_text),
+                            )
+                        );
+  
+            }
+        }  
+        return   $list;     
     }
 }

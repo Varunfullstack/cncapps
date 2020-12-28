@@ -237,7 +237,7 @@
         if (didError) {
           if (!didSetError) {
             // The callback errored, but the error event never fired.
-            error = new Error('An error was thrown inside one of your components, but React ' + "doesn't know what it was. This is likely due to browser " + 'flakiness. React does its best to preserve the "Pause on ' + 'exceptions" behavior of the DevTools, which requires some ' + "DEV-mode only tricks. It's possible that these don't work in " + 'your browser. Try triggering the error in production mode, ' + 'or switching to a modern browser. If you suspect that this is ' + 'actually an issue with React, please file an issue.');
+            error = new Error('An error was thrown inside one of your subComponents, but React ' + "doesn't know what it was. This is likely due to browser " + 'flakiness. React does its best to preserve the "Pause on ' + 'exceptions" behavior of the DevTools, which requires some ' + "DEV-mode only tricks. It's possible that these don't work in " + 'your browser. Try triggering the error in production mode, ' + 'or switching to a modern browser. If you suspect that this is ' + 'actually an issue with React, please file an issue.');
           } else if (isCrossOriginError) {
             error = new Error("A cross-origin error was thrown. React doesn't have access to " + 'the actual error object in development. ' + 'See https://fb.me/react-crossorigin-error for more information.');
           }
@@ -749,7 +749,7 @@
 
   function finishEventHandler() {
     // Here we wait until all updates have propagated, which is important
-    // when using controlled components within layers:
+    // when using controlled subComponents within layers:
     // https://github.com/facebook/react/issues/1698
     // Then we restore state of any controlled component.
     var controlledComponentsHavePendingUpdates = needsStateRestore();
@@ -1795,7 +1795,7 @@
     };
     /**
      * Provide a linked `value` attribute for controlled forms. You should not use
-     * this outside of the ReactDOM controlled form components.
+     * this outside of the ReactDOM controlled form subComponents.
      */
 
     ReactControlledValuePropTypes.checkPropTypes = function (tagName, props) {
@@ -3638,7 +3638,7 @@
   }
 
   function handleTopLevel(bookKeeping) {
-    var targetInst = bookKeeping.targetInst; // Loop through the hierarchy, in case there's any nested components.
+    var targetInst = bookKeeping.targetInst; // Loop through the hierarchy, in case there's any nested subComponents.
     // It's important that we build the array of ancestors before calling any
     // event handlers, because event handlers can modify the DOM, leading to
     // inconsistencies with ReactMount's node cache. See #1105.
@@ -5556,9 +5556,9 @@
         didWarnValueNull = true;
 
         if (type === 'select' && props.multiple) {
-          error('`value` prop on `%s` should not be null. ' + 'Consider using an empty array when `multiple` is set to `true` ' + 'to clear the component or `undefined` for uncontrolled components.', type);
+          error('`value` prop on `%s` should not be null. ' + 'Consider using an empty array when `multiple` is set to `true` ' + 'to clear the component or `undefined` for uncontrolled subComponents.', type);
         } else {
-          error('`value` prop on `%s` should not be null. ' + 'Consider using an empty string to clear the component or `undefined` ' + 'for uncontrolled components.', type);
+          error('`value` prop on `%s` should not be null. ' + 'Consider using an empty string to clear the component or `undefined` ' + 'for uncontrolled subComponents.', type);
         }
       }
     }
@@ -5992,7 +5992,7 @@
         // allow <SVG> or <mATH>.
 
         if (!isCustomComponentTag && type !== type.toLowerCase()) {
-          error('<%s /> is using incorrect casing. ' + 'Use PascalCase for React components, ' + 'or lowercase for HTML elements.', type);
+          error('<%s /> is using incorrect casing. ' + 'Use PascalCase for React subComponents, ' + 'or lowercase for HTML elements.', type);
         }
       }
 
@@ -6112,7 +6112,7 @@
       case 'input':
         initWrapperState(domElement, rawProps);
         props = getHostProps(domElement, rawProps);
-        trapBubbledEvent(TOP_INVALID, domElement); // For controlled components we always need to ensure we're listening
+        trapBubbledEvent(TOP_INVALID, domElement); // For controlled subComponents we always need to ensure we're listening
         // to onChange. Even if there is no listener.
 
         ensureListeningTo(rootContainerElement, 'onChange');
@@ -6126,7 +6126,7 @@
       case 'select':
         initWrapperState$1(domElement, rawProps);
         props = getHostProps$2(domElement, rawProps);
-        trapBubbledEvent(TOP_INVALID, domElement); // For controlled components we always need to ensure we're listening
+        trapBubbledEvent(TOP_INVALID, domElement); // For controlled subComponents we always need to ensure we're listening
         // to onChange. Even if there is no listener.
 
         ensureListeningTo(rootContainerElement, 'onChange');
@@ -6135,7 +6135,7 @@
       case 'textarea':
         initWrapperState$2(domElement, rawProps);
         props = getHostProps$3(domElement, rawProps);
-        trapBubbledEvent(TOP_INVALID, domElement); // For controlled components we always need to ensure we're listening
+        trapBubbledEvent(TOP_INVALID, domElement); // For controlled subComponents we always need to ensure we're listening
         // to onChange. Even if there is no listener.
 
         ensureListeningTo(rootContainerElement, 'onChange');
@@ -6456,7 +6456,7 @@
 
       case 'input':
         initWrapperState(domElement, rawProps);
-        trapBubbledEvent(TOP_INVALID, domElement); // For controlled components we always need to ensure we're listening
+        trapBubbledEvent(TOP_INVALID, domElement); // For controlled subComponents we always need to ensure we're listening
         // to onChange. Even if there is no listener.
 
         ensureListeningTo(rootContainerElement, 'onChange');
@@ -6468,7 +6468,7 @@
 
       case 'select':
         initWrapperState$1(domElement, rawProps);
-        trapBubbledEvent(TOP_INVALID, domElement); // For controlled components we always need to ensure we're listening
+        trapBubbledEvent(TOP_INVALID, domElement); // For controlled subComponents we always need to ensure we're listening
         // to onChange. Even if there is no listener.
 
         ensureListeningTo(rootContainerElement, 'onChange');
@@ -6476,7 +6476,7 @@
 
       case 'textarea':
         initWrapperState$2(domElement, rawProps);
-        trapBubbledEvent(TOP_INVALID, domElement); // For controlled components we always need to ensure we're listening
+        trapBubbledEvent(TOP_INVALID, domElement); // For controlled subComponents we always need to ensure we're listening
         // to onChange. Even if there is no listener.
 
         ensureListeningTo(rootContainerElement, 'onChange');
@@ -9228,7 +9228,7 @@
     // Batching is necessary here in order to ensure that all event handlers run
     // before the next rerender (including event handlers attached to ancestor
     // elements instead of directly on the input). Without this, controlled
-    // components don't work properly in conjunction with event bubbling because
+    // subComponents don't work properly in conjunction with event bubbling because
     // the component is rerendered and the value reverted before all the event
     // handlers can run. See https://github.com/facebook/react/issues/708.
 
@@ -9625,7 +9625,7 @@
       }
 
       if (from === to) {
-        // Nothing pertains to our managed components.
+        // Nothing pertains to our managed subComponents.
         return null;
       }
 
@@ -10433,7 +10433,7 @@
   };
 
   var shouldIgnoreFiber = function (fiber) {
-    // Host components should be skipped in the timeline.
+    // Host subComponents should be skipped in the timeline.
     // We could check typeof fiber.type, but does this work with RN?
     switch (fiber.tag) {
       case HostRoot:
@@ -11382,7 +11382,7 @@
     var pendingComponentWillReceivePropsWarnings = [];
     var pendingUNSAFE_ComponentWillReceivePropsWarnings = [];
     var pendingComponentWillUpdateWarnings = [];
-    var pendingUNSAFE_ComponentWillUpdateWarnings = []; // Tracks components we have already warned about.
+    var pendingUNSAFE_ComponentWillUpdateWarnings = []; // Tracks subComponents we have already warned about.
 
     var didWarnAboutUnsafeLifecycles = new Set();
 
@@ -11392,7 +11392,7 @@
         return;
       }
 
-      if (typeof instance.componentWillMount === 'function' && // Don't warn about react-lifecycles-compat polyfilled components.
+      if (typeof instance.componentWillMount === 'function' && // Don't warn about react-lifecycles-compat polyfilled subComponents.
       instance.componentWillMount.__suppressDeprecationWarning !== true) {
         pendingComponentWillMountWarnings.push(fiber);
       }
@@ -11485,41 +11485,41 @@
       if (UNSAFE_componentWillMountUniqueNames.size > 0) {
         var sortedNames = setToSortedString(UNSAFE_componentWillMountUniqueNames);
 
-        error('Using UNSAFE_componentWillMount in strict mode is not recommended and may indicate bugs in your code. ' + 'See https://fb.me/react-unsafe-component-lifecycles for details.\n\n' + '* Move code with side effects to componentDidMount, and set initial state in the constructor.\n' + '\nPlease update the following components: %s', sortedNames);
+        error('Using UNSAFE_componentWillMount in strict mode is not recommended and may indicate bugs in your code. ' + 'See https://fb.me/react-unsafe-component-lifecycles for details.\n\n' + '* Move code with side effects to componentDidMount, and set initial state in the constructor.\n' + '\nPlease update the following subComponents: %s', sortedNames);
       }
 
       if (UNSAFE_componentWillReceivePropsUniqueNames.size > 0) {
         var _sortedNames = setToSortedString(UNSAFE_componentWillReceivePropsUniqueNames);
 
-        error('Using UNSAFE_componentWillReceiveProps in strict mode is not recommended ' + 'and may indicate bugs in your code. ' + 'See https://fb.me/react-unsafe-component-lifecycles for details.\n\n' + '* Move data fetching code or side effects to componentDidUpdate.\n' + "* If you're updating state whenever props change, " + 'refactor your code to use memoization techniques or move it to ' + 'static getDerivedStateFromProps. Learn more at: https://fb.me/react-derived-state\n' + '\nPlease update the following components: %s', _sortedNames);
+        error('Using UNSAFE_componentWillReceiveProps in strict mode is not recommended ' + 'and may indicate bugs in your code. ' + 'See https://fb.me/react-unsafe-component-lifecycles for details.\n\n' + '* Move data fetching code or side effects to componentDidUpdate.\n' + "* If you're updating state whenever props change, " + 'refactor your code to use memoization techniques or move it to ' + 'static getDerivedStateFromProps. Learn more at: https://fb.me/react-derived-state\n' + '\nPlease update the following subComponents: %s', _sortedNames);
       }
 
       if (UNSAFE_componentWillUpdateUniqueNames.size > 0) {
         var _sortedNames2 = setToSortedString(UNSAFE_componentWillUpdateUniqueNames);
 
-        error('Using UNSAFE_componentWillUpdate in strict mode is not recommended ' + 'and may indicate bugs in your code. ' + 'See https://fb.me/react-unsafe-component-lifecycles for details.\n\n' + '* Move data fetching code or side effects to componentDidUpdate.\n' + '\nPlease update the following components: %s', _sortedNames2);
+        error('Using UNSAFE_componentWillUpdate in strict mode is not recommended ' + 'and may indicate bugs in your code. ' + 'See https://fb.me/react-unsafe-component-lifecycles for details.\n\n' + '* Move data fetching code or side effects to componentDidUpdate.\n' + '\nPlease update the following subComponents: %s', _sortedNames2);
       }
 
       if (componentWillMountUniqueNames.size > 0) {
         var _sortedNames3 = setToSortedString(componentWillMountUniqueNames);
 
-        warn('componentWillMount has been renamed, and is not recommended for use. ' + 'See https://fb.me/react-unsafe-component-lifecycles for details.\n\n' + '* Move code with side effects to componentDidMount, and set initial state in the constructor.\n' + '* Rename componentWillMount to UNSAFE_componentWillMount to suppress ' + 'this warning in non-strict mode. In React 17.x, only the UNSAFE_ name will work. ' + 'To rename all deprecated lifecycles to their new names, you can run ' + '`npx react-codemod rename-unsafe-lifecycles` in your project source folder.\n' + '\nPlease update the following components: %s', _sortedNames3);
+        warn('componentWillMount has been renamed, and is not recommended for use. ' + 'See https://fb.me/react-unsafe-component-lifecycles for details.\n\n' + '* Move code with side effects to componentDidMount, and set initial state in the constructor.\n' + '* Rename componentWillMount to UNSAFE_componentWillMount to suppress ' + 'this warning in non-strict mode. In React 17.x, only the UNSAFE_ name will work. ' + 'To rename all deprecated lifecycles to their new names, you can run ' + '`npx react-codemod rename-unsafe-lifecycles` in your project source folder.\n' + '\nPlease update the following subComponents: %s', _sortedNames3);
       }
 
       if (componentWillReceivePropsUniqueNames.size > 0) {
         var _sortedNames4 = setToSortedString(componentWillReceivePropsUniqueNames);
 
-        warn('componentWillReceiveProps has been renamed, and is not recommended for use. ' + 'See https://fb.me/react-unsafe-component-lifecycles for details.\n\n' + '* Move data fetching code or side effects to componentDidUpdate.\n' + "* If you're updating state whenever props change, refactor your " + 'code to use memoization techniques or move it to ' + 'static getDerivedStateFromProps. Learn more at: https://fb.me/react-derived-state\n' + '* Rename componentWillReceiveProps to UNSAFE_componentWillReceiveProps to suppress ' + 'this warning in non-strict mode. In React 17.x, only the UNSAFE_ name will work. ' + 'To rename all deprecated lifecycles to their new names, you can run ' + '`npx react-codemod rename-unsafe-lifecycles` in your project source folder.\n' + '\nPlease update the following components: %s', _sortedNames4);
+        warn('componentWillReceiveProps has been renamed, and is not recommended for use. ' + 'See https://fb.me/react-unsafe-component-lifecycles for details.\n\n' + '* Move data fetching code or side effects to componentDidUpdate.\n' + "* If you're updating state whenever props change, refactor your " + 'code to use memoization techniques or move it to ' + 'static getDerivedStateFromProps. Learn more at: https://fb.me/react-derived-state\n' + '* Rename componentWillReceiveProps to UNSAFE_componentWillReceiveProps to suppress ' + 'this warning in non-strict mode. In React 17.x, only the UNSAFE_ name will work. ' + 'To rename all deprecated lifecycles to their new names, you can run ' + '`npx react-codemod rename-unsafe-lifecycles` in your project source folder.\n' + '\nPlease update the following subComponents: %s', _sortedNames4);
       }
 
       if (componentWillUpdateUniqueNames.size > 0) {
         var _sortedNames5 = setToSortedString(componentWillUpdateUniqueNames);
 
-        warn('componentWillUpdate has been renamed, and is not recommended for use. ' + 'See https://fb.me/react-unsafe-component-lifecycles for details.\n\n' + '* Move data fetching code or side effects to componentDidUpdate.\n' + '* Rename componentWillUpdate to UNSAFE_componentWillUpdate to suppress ' + 'this warning in non-strict mode. In React 17.x, only the UNSAFE_ name will work. ' + 'To rename all deprecated lifecycles to their new names, you can run ' + '`npx react-codemod rename-unsafe-lifecycles` in your project source folder.\n' + '\nPlease update the following components: %s', _sortedNames5);
+        warn('componentWillUpdate has been renamed, and is not recommended for use. ' + 'See https://fb.me/react-unsafe-component-lifecycles for details.\n\n' + '* Move data fetching code or side effects to componentDidUpdate.\n' + '* Rename componentWillUpdate to UNSAFE_componentWillUpdate to suppress ' + 'this warning in non-strict mode. In React 17.x, only the UNSAFE_ name will work. ' + 'To rename all deprecated lifecycles to their new names, you can run ' + '`npx react-codemod rename-unsafe-lifecycles` in your project source folder.\n' + '\nPlease update the following subComponents: %s', _sortedNames5);
       }
     };
 
-    var pendingLegacyContextWarning = new Map(); // Tracks components we have already warned about.
+    var pendingLegacyContextWarning = new Map(); // Tracks subComponents we have already warned about.
 
     var didWarnAboutLegacyContext = new Set();
 
@@ -11564,7 +11564,7 @@
         var sortedNames = setToSortedString(uniqueNames);
         var firstComponentStack = getStackByFiberInDevAndProd(firstFiber);
 
-        error('Legacy context API has been detected within a strict-mode tree.' + '\n\nThe old API will be supported in all 16.x releases, but applications ' + 'using it should migrate to the new version.' + '\n\nPlease update the following components: %s' + '\n\nLearn more about this warning here: https://fb.me/react-legacy-context' + '%s', sortedNames, firstComponentStack);
+        error('Legacy context API has been detected within a strict-mode tree.' + '\n\nThe old API will be supported in all 16.x releases, but applications ' + 'using it should migrate to the new version.' + '\n\nPlease update the following subComponents: %s' + '\n\nLearn more about this warning here: https://fb.me/react-legacy-context' + '%s', sortedNames, firstComponentStack);
       });
     };
 
@@ -11887,7 +11887,7 @@
       }
 
       if (didMatch) {
-        // We have a match. This only drills down to the closest host components.
+        // We have a match. This only drills down to the closest host subComponents.
         // There's no need to search deeper because for the purpose of giving
         // visual feedback, "flashing" outermost parent rectangles is sufficient.
         findHostInstancesForFiberShallowly(fiber, hostInstances);
@@ -12221,7 +12221,7 @@
       // This warning would fire if you read context inside a Hook like useMemo.
       // Unlike the class check below, it's not enforced in production for perf.
       if (isDisallowedContextReadInDEV) {
-        error('Context can only be read while React is rendering. ' + 'In classes, you can read it in the render method or getDerivedStateFromProps. ' + 'In function components, you can read it directly in the function body, but not ' + 'inside Hooks like useReducer() or useMemo().');
+        error('Context can only be read while React is rendering. ' + 'In classes, you can read it in the render method or getDerivedStateFromProps. ' + 'In function subComponents, you can read it directly in the function body, but not ' + 'inside Hooks like useReducer() or useMemo().');
       }
     }
 
@@ -12245,7 +12245,7 @@
       if (lastContextDependency === null) {
         if (!(currentlyRenderingFiber !== null)) {
           {
-            throw Error( "Context can only be read while React is rendering. In classes, you can read it in the render method or getDerivedStateFromProps. In function components, you can read it directly in the function body, but not inside Hooks like useReducer() or useMemo()." );
+            throw Error( "Context can only be read while React is rendering. In classes, you can read it in the render method or getDerivedStateFromProps. In function subComponents, you can read it directly in the function body, but not inside Hooks like useReducer() or useMemo()." );
           }
         } // This is the first dependency for this component. Create a new list.
 
@@ -12601,7 +12601,7 @@
       // This should be fine because the only two other things that contribute to
       // expiration time are props and context. We're already in the middle of the
       // begin phase by the time we start processing the queue, so we've already
-      // dealt with the props. Context in components that specify
+      // dealt with the props. Context in subComponents that specify
       // shouldComponentUpdate is tricky; but we'll have to account for
       // that regardless.
 
@@ -13061,7 +13061,7 @@
           if (!didWarnAboutLegacyLifecyclesAndDerivedState.has(_componentName)) {
             didWarnAboutLegacyLifecyclesAndDerivedState.add(_componentName);
 
-            error('Unsafe legacy lifecycles will not be called for components using new component APIs.\n\n' + '%s uses %s but also contains the following legacy lifecycles:%s%s%s\n\n' + 'The above lifecycles should be removed. Learn more about this warning here:\n' + 'https://fb.me/react-unsafe-component-lifecycles', _componentName, newApiName, foundWillMountName !== null ? "\n  " + foundWillMountName : '', foundWillReceivePropsName !== null ? "\n  " + foundWillReceivePropsName : '', foundWillUpdateName !== null ? "\n  " + foundWillUpdateName : '');
+            error('Unsafe legacy lifecycles will not be called for subComponents using new component APIs.\n\n' + '%s uses %s but also contains the following legacy lifecycles:%s%s%s\n\n' + 'The above lifecycles should be removed. Learn more about this warning here:\n' + 'https://fb.me/react-unsafe-component-lifecycles', _componentName, newApiName, foundWillMountName !== null ? "\n  " + foundWillMountName : '', foundWillReceivePropsName !== null ? "\n  " + foundWillReceivePropsName : '', foundWillUpdateName !== null ? "\n  " + foundWillUpdateName : '');
           }
         }
       }
@@ -13175,8 +13175,8 @@
     if (typeof getDerivedStateFromProps === 'function') {
       applyDerivedStateFromProps(workInProgress, ctor, getDerivedStateFromProps, newProps);
       instance.state = workInProgress.memoizedState;
-    } // In order to support react-lifecycles-compat polyfilled components,
-    // Unsafe lifecycles should not be invoked for components using the new APIs.
+    } // In order to support react-lifecycles-compat polyfilled subComponents,
+    // Unsafe lifecycles should not be invoked for subComponents using the new APIs.
 
 
     if (typeof ctor.getDerivedStateFromProps !== 'function' && typeof instance.getSnapshotBeforeUpdate !== 'function' && (typeof instance.UNSAFE_componentWillMount === 'function' || typeof instance.componentWillMount === 'function')) {
@@ -13211,8 +13211,8 @@
     var hasNewLifecycles = typeof getDerivedStateFromProps === 'function' || typeof instance.getSnapshotBeforeUpdate === 'function'; // Note: During these life-cycles, instance.props/instance.state are what
     // ever the previously attempted to render - not the "current". However,
     // during componentDidUpdate we pass the "current" props.
-    // In order to support react-lifecycles-compat polyfilled components,
-    // Unsafe lifecycles should not be invoked for components using the new APIs.
+    // In order to support react-lifecycles-compat polyfilled subComponents,
+    // Unsafe lifecycles should not be invoked for subComponents using the new APIs.
 
     if (!hasNewLifecycles && (typeof instance.UNSAFE_componentWillReceiveProps === 'function' || typeof instance.componentWillReceiveProps === 'function')) {
       if (oldProps !== newProps || oldContext !== nextContext) {
@@ -13244,8 +13244,8 @@
     var shouldUpdate = checkHasForceUpdateAfterProcessing() || checkShouldComponentUpdate(workInProgress, ctor, oldProps, newProps, oldState, newState, nextContext);
 
     if (shouldUpdate) {
-      // In order to support react-lifecycles-compat polyfilled components,
-      // Unsafe lifecycles should not be invoked for components using the new APIs.
+      // In order to support react-lifecycles-compat polyfilled subComponents,
+      // Unsafe lifecycles should not be invoked for subComponents using the new APIs.
       if (!hasNewLifecycles && (typeof instance.UNSAFE_componentWillMount === 'function' || typeof instance.componentWillMount === 'function')) {
         startPhaseTimer(workInProgress, 'componentWillMount');
 
@@ -13305,8 +13305,8 @@
     var hasNewLifecycles = typeof getDerivedStateFromProps === 'function' || typeof instance.getSnapshotBeforeUpdate === 'function'; // Note: During these life-cycles, instance.props/instance.state are what
     // ever the previously attempted to render - not the "current". However,
     // during componentDidUpdate we pass the "current" props.
-    // In order to support react-lifecycles-compat polyfilled components,
-    // Unsafe lifecycles should not be invoked for components using the new APIs.
+    // In order to support react-lifecycles-compat polyfilled subComponents,
+    // Unsafe lifecycles should not be invoked for subComponents using the new APIs.
 
     if (!hasNewLifecycles && (typeof instance.UNSAFE_componentWillReceiveProps === 'function' || typeof instance.componentWillReceiveProps === 'function')) {
       if (oldProps !== newProps || oldContext !== nextContext) {
@@ -13346,8 +13346,8 @@
     var shouldUpdate = checkHasForceUpdateAfterProcessing() || checkShouldComponentUpdate(workInProgress, ctor, oldProps, newProps, oldState, newState, nextContext);
 
     if (shouldUpdate) {
-      // In order to support react-lifecycles-compat polyfilled components,
-      // Unsafe lifecycles should not be invoked for components using the new APIs.
+      // In order to support react-lifecycles-compat polyfilled subComponents,
+      // Unsafe lifecycles should not be invoked for subComponents using the new APIs.
       if (!hasNewLifecycles && (typeof instance.UNSAFE_componentWillUpdate === 'function' || typeof instance.componentWillUpdate === 'function')) {
         startPhaseTimer(workInProgress, 'componentWillUpdate');
 
@@ -13481,7 +13481,7 @@
 
           if (!(ownerFiber.tag === ClassComponent)) {
             {
-              throw Error( "Function components cannot have string refs. We recommend using useRef() instead. Learn more about using refs safely here: https://fb.me/react-strict-mode-string-ref" );
+              throw Error( "Function subComponents cannot have string refs. We recommend using useRef() instead. Learn more about using refs safely here: https://fb.me/react-strict-mode-string-ref" );
             }
           }
 
@@ -13933,7 +13933,7 @@
               break;
             }
 
-            error('Encountered two children with the same key, `%s`. ' + 'Keys should be unique so that components maintain their identity ' + 'across updates. Non-unique keys may cause children to be ' + 'duplicated and/or omitted — the behavior is unsupported and ' + 'could change in a future version.', key);
+            error('Encountered two children with the same key, `%s`. ' + 'Keys should be unique so that subComponents maintain their identity ' + 'across updates. Non-unique keys may cause children to be ' + 'duplicated and/or omitted — the behavior is unsupported and ' + 'could change in a future version.', key);
 
             break;
         }
@@ -14915,7 +14915,7 @@
     // didScheduleRenderPhaseUpdate = false;
     // TODO Warn if no hooks are used at all during mount, then some are used during update.
     // Currently we will identify the update render as a mount because memoizedState === null.
-    // This is tricky because it's valid for certain types of components (e.g. React.lazy)
+    // This is tricky because it's valid for certain types of subComponents (e.g. React.lazy)
     // Using memoizedState to differentiate between mount/update only works if at least one stateful hook is used.
     // Non-stateful hooks (e.g. context) don't get added to memoizedState,
     // so memoizedState would be null during updates and mounts.
@@ -15822,7 +15822,7 @@
 
   {
     var warnInvalidContextAccess = function () {
-      error('Context can only be read while React is rendering. ' + 'In classes, you can read it in the render method or getDerivedStateFromProps. ' + 'In function components, you can read it directly in the function body, but not ' + 'inside Hooks like useReducer() or useMemo().');
+      error('Context can only be read while React is rendering. ' + 'In classes, you can read it in the render method or getDerivedStateFromProps. ' + 'In function subComponents, you can read it directly in the function body, but not ' + 'inside Hooks like useReducer() or useMemo().');
     };
 
     var warnInvalidHookAccess = function () {
@@ -16835,7 +16835,7 @@
 
     var type = fiber.type; // If we have any remaining hydratable nodes, we need to delete them now.
     // We only do this deeper than head and body since they tend to have random
-    // other nodes in them. We also ignore components with pure text content in
+    // other nodes in them. We also ignore subComponents with pure text content in
     // side of them.
     // TODO: Better heuristic.
 
@@ -16951,7 +16951,7 @@
       nextChildren = renderWithHooks(current, workInProgress, render, nextProps, ref, renderExpirationTime);
 
       if ( workInProgress.mode & StrictMode) {
-        // Only double-render components with Hooks
+        // Only double-render subComponents with Hooks
         if (workInProgress.memoizedState !== null) {
           nextChildren = renderWithHooks(current, workInProgress, render, nextProps, ref, renderExpirationTime);
         }
@@ -17169,7 +17169,7 @@
       nextChildren = renderWithHooks(current, workInProgress, Component, nextProps, context, renderExpirationTime);
 
       if ( workInProgress.mode & StrictMode) {
-        // Only double-render components with Hooks
+        // Only double-render subComponents with Hooks
         if (workInProgress.memoizedState !== null) {
           nextChildren = renderWithHooks(current, workInProgress, Component, nextProps, context, renderExpirationTime);
         }
@@ -17667,7 +17667,7 @@
       {
 
         if ( workInProgress.mode & StrictMode) {
-          // Only double-render components with Hooks
+          // Only double-render subComponents with Hooks
           if (workInProgress.memoizedState !== null) {
             value = renderWithHooks(null, workInProgress, Component, props, context, renderExpirationTime);
           }
@@ -17710,7 +17710,7 @@
         if (!didWarnAboutFunctionRefs[warningKey]) {
           didWarnAboutFunctionRefs[warningKey] = true;
 
-          error('Function components cannot be given refs. ' + 'Attempts to access this ref will fail. ' + 'Did you mean to use React.forwardRef()?%s', info);
+          error('Function subComponents cannot be given refs. ' + 'Attempts to access this ref will fail. ' + 'Did you mean to use React.forwardRef()?%s', info);
         }
       }
 
@@ -17718,7 +17718,7 @@
         var _componentName2 = getComponentName(Component) || 'Unknown';
 
         if (!didWarnAboutGetDerivedStateOnFunctionComponent[_componentName2]) {
-          error('%s: Function components do not support getDerivedStateFromProps.', _componentName2);
+          error('%s: Function subComponents do not support getDerivedStateFromProps.', _componentName2);
 
           didWarnAboutGetDerivedStateOnFunctionComponent[_componentName2] = true;
         }
@@ -17728,7 +17728,7 @@
         var _componentName3 = getComponentName(Component) || 'Unknown';
 
         if (!didWarnAboutContextTypeOnFunctionComponent[_componentName3]) {
-          error('%s: Function components do not support contextType.', _componentName3);
+          error('%s: Function subComponents do not support contextType.', _componentName3);
 
           didWarnAboutContextTypeOnFunctionComponent[_componentName3] = true;
         }
@@ -19641,7 +19641,7 @@
         // https://github.com/facebook/react/pull/13384
       }
 
-      var componentNameMessage = componentName ? "The above error occurred in the <" + componentName + "> component:" : 'The above error occurred in one of your React components:';
+      var componentNameMessage = componentName ? "The above error occurred in the <" + componentName + "> component:" : 'The above error occurred in one of your React subComponents:';
       var errorBoundaryMessage; // errorBoundaryFound check is sufficient; errorBoundaryName check is to satisfy Flow.
 
       if (errorBoundaryFound && errorBoundaryName) {
@@ -20023,9 +20023,9 @@
 
       case HostComponent:
         {
-          var _instance2 = finishedWork.stateNode; // Renderers may schedule work to be done after host components are mounted
+          var _instance2 = finishedWork.stateNode; // Renderers may schedule work to be done after host subComponents are mounted
           // (eg DOM renderer may schedule auto-focus for inputs and form controls).
-          // These effects should only be committed when components are first mounted,
+          // These effects should only be committed when subComponents are first mounted,
           // aka when there is no current/alternate.
 
           if (current === null && finishedWork.effectTag & Update) {
@@ -20589,14 +20589,14 @@
           // When we go into a portal, it becomes the parent to remove from.
           // We will reassign it back when we pop the portal on the way up.
           currentParent = node.stateNode.containerInfo;
-          currentParentIsContainer = true; // Visit children because portals might contain host components.
+          currentParentIsContainer = true; // Visit children because portals might contain host subComponents.
 
           node.child.return = node;
           node = node.child;
           continue;
         }
       } else {
-        commitUnmount(finishedRoot, node, renderPriorityLevel); // Visit children because we may find more host components below.
+        commitUnmount(finishedRoot, node, renderPriorityLevel); // Visit children because we may find more host subComponents below.
 
         if (node.child !== null) {
           node.child.return = node;
@@ -20672,7 +20672,7 @@
             // this case.
 
             var oldProps = current !== null ? current.memoizedProps : newProps;
-            var type = finishedWork.type; // TODO: Type the updateQueue to be specific to host components.
+            var type = finishedWork.type; // TODO: Type the updateQueue to be specific to host subComponents.
 
             var updatePayload = finishedWork.updateQueue;
             finishedWork.updateQueue = null;
@@ -21166,7 +21166,7 @@
 
   var workInProgressRootLatestProcessedExpirationTime = Sync;
   var workInProgressRootLatestSuspenseTimeout = Sync;
-  var workInProgressRootCanSuspendUsingConfig = null; // The work left over by components that were visited during this render. Only
+  var workInProgressRootCanSuspendUsingConfig = null; // The work left over by subComponents that were visited during this render. Only
   // includes unprocessed updates, not work in bailed out children.
 
   var workInProgressRootNextUnprocessedUpdateTime = NoWork; // If we're pinged while rendering we don't always restart immediately.
@@ -21194,7 +21194,7 @@
   var NESTED_PASSIVE_UPDATE_LIMIT = 50;
   var nestedPassiveUpdateCount = 0;
   var interruptedBy = null; // Marks the need to reschedule pending interactions at these expiration times
-  // during the commit phase. This enables them to be traced across components
+  // during the commit phase. This enables them to be traced across subComponents
   // that spawn new work during render. E.g. hidden boundaries, suspended SSR
   // hydration or SuspenseList.
 
@@ -23275,7 +23275,7 @@
       var tag = fiber.tag;
 
       if (tag !== HostRoot && tag !== ClassComponent && tag !== FunctionComponent && tag !== ForwardRef && tag !== MemoComponent && tag !== SimpleMemoComponent && tag !== Block) {
-        // Only warn for user-defined components, not internal ones like Suspense.
+        // Only warn for user-defined subComponents, not internal ones like Suspense.
         return;
       }
       // the problematic code almost always lies inside that component.
@@ -24097,7 +24097,7 @@
 
             {
               {
-                throw Error( "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: " + (type == null ? type : typeof type) + "." + info );
+                throw Error( "Element type is invalid: expected a string (for built-in subComponents) or a class/function (for composite subComponents) but got: " + (type == null ? type : typeof type) + "." + info );
               }
             }
           }
@@ -24647,7 +24647,7 @@
         fiber.memoizedProps = _assign({}, fiber.memoizedProps);
         scheduleWork(fiber, Sync);
       }
-    }; // Support DevTools props for function components, forwardRef, memo, host components, etc.
+    }; // Support DevTools props for function subComponents, forwardRef, memo, host subComponents, etc.
 
 
     overrideProps = function (fiber, path, value) {
@@ -24796,11 +24796,11 @@
       var hasNonRootReactChild = !!(rootEl && getInstanceFromNode$1(rootEl));
 
       if (hasNonRootReactChild && !isRootRenderedBySomeReact) {
-        error('render(...): Replacing React-rendered children with a new root ' + 'component. If you intended to update the children of this node, ' + 'you should instead have the existing children update their state ' + 'and render the new components instead of calling ReactDOM.render.');
+        error('render(...): Replacing React-rendered children with a new root ' + 'component. If you intended to update the children of this node, ' + 'you should instead have the existing children update their state ' + 'and render the new subComponents instead of calling ReactDOM.render.');
       }
 
       if (container.nodeType === ELEMENT_NODE && container.tagName && container.tagName.toUpperCase() === 'BODY') {
-        error('render(): Rendering components directly into document.body is ' + 'discouraged, since its children are often manipulated by third-party ' + 'scripts and browser extensions. This may lead to subtle ' + 'reconciliation issues. Try rendering into a container element created ' + 'for your app.');
+        error('render(): Rendering subComponents directly into document.body is ' + 'discouraged, since its children are often manipulated by third-party ' + 'scripts and browser extensions. This may lead to subtle ' + 'reconciliation issues. Try rendering into a container element created ' + 'for your app.');
       }
     };
   }

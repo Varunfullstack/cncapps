@@ -28,7 +28,7 @@
                 <tr>
                     <td>{{ expense.staffName }}</td>
                     <td>
-                        <a href="{{ serverURL }}/Activity.php?action=displayActivity&callActivityID={{ expense.activityId }}"> {{ expense.serviceRequestId }}</a>
+                        <a href="{{ serverURL }}/SRActivity.php?action=displayActivity&callActivityID={{ expense.activityId }}"> {{ expense.serviceRequestId }}</a>
                     </td>
                     <td>{{ expense.dateSubmitted }}</td>
                     <td>{{ expense.expenseTypeDescription }} </td>
@@ -56,7 +56,7 @@
                 <tr>
                     <td>{{ overtime.staffName }}</td>
                     <td>
-                        <a href="{{ serverURL }}/Activity.php?action=displayActivity&callActivityID={{ overtime.activityId }}" {{ overtime.serviceRequestId }}
+                        <a href="{{ serverURL }}/SRActivity.php?action=displayActivity&callActivityID={{ overtime.activityId }}" {{ overtime.serviceRequestId }}
                     </td>
                     <td>{{ overtime.dateSubmitted }}</td>
                     <td>{{ overtime.overtimeValue }} </td>

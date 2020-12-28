@@ -698,15 +698,6 @@
             </td>
         </tr>
         <tr>
-            <td class="promptText">Change SR Priority</td>
-            <td class="fieldText"><INPUT name="user[1][changePriorityFlag]"
-                                         {DISABLED}
-                                         type="checkbox"
-                                         value="Y"
-                                         {changePriorityFlagChecked}
-            ></td>
-        </tr>
-        <tr>
             <td class="promptText">Additional Time Level Approver</td>
             <td class="fieldText">
                 <input name="user[1][additionalTimeLevelApprover]"
@@ -714,6 +705,17 @@
                        value="true"
                        {DISABLED}
                        {additionalTimeLevelApproverChecked}
+                />
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Hold all SRs for QA Review</td>
+            <td class="fieldText">
+                <input name="user[1][holdAllSRsforQAReview]"
+                       type="checkbox"  
+                       value="true"                                          
+                       {DISABLED}
+                       {holdAllSRsforQAReviewChecked}
                 />
             </td>
         </tr>
@@ -942,15 +944,43 @@
                 ></td>
         </tr>
         <tr>
-            <td class="promptText">Change Initial Activity Date And Time</td>
+            <td class="promptText">
+                <div class="tooltip" style="justify-content: flex-end;">SR Queue Manager
+                    <div class="tooltiptext tooltip-bottom">
+                        Change Initial Activity Date And Time, allocate time, change queues and re-open SRs
+                    </div>
+                </div>
+                
+            </td>
+            
             <td class="fieldText">
-                <input name="user[1][changeInitialDateAndTimeFlag]"
+                <input name="user[1][queueManager]"
                        type="checkbox"
-                       id="user[1][changeInitialDateAndTimeFlag]"
+                       id="user[1][queueManager]"
                        value="Y"
                        {DISABLED}
-                       {changeInitialDateAndTimeFlagChecked}
+                       {queueManagerChecked}
                 />
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div class="tooltip" style="justify-content: flex-end;">Exclude from SDManger Dashboard
+                    <div class="tooltiptext tooltip-bottom">
+                        Exclude from SDManger Dashboard
+                    </div>
+                </div>
+                
+            </td>
+            
+            <td class="fieldText">
+                <input name="user[1][excludeFromSDManagerDashboard]"
+                       type="checkbox"
+                       id="user[1][excludeFromSDManagerDashboard]"
+                       {DISABLED}
+                       {excludeFromSDManagerDashboardChecked}
+                />
+                
             </td>
         </tr>
         <tr>
@@ -969,7 +999,7 @@
             <td colspan="2">
                 <h3>Specific Permissions</h3>
             </td>
-        </tr>
+        </tr>                
         <tr>
             <td class="promptText">Starter & Leaver question management</td>
             <td class="fieldText">

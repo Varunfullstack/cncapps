@@ -1,15 +1,19 @@
 <script>
+    const spinnerReady = new Promise((resolve, reject) => {
+        window.addEventListener('SpinnerReady', () => {
+            resolve();
+        })
+    })
+
     function processRenewal() {
         if (!confirm('Are you sure?')) {
             return;
         }
         const optionSelected = $('#renewalProcessSelector')[0].selectedOptions[0];
-        $('body').loadingModal({
-            text: 'Please wait while finishing the operation...'
-        });
 
+        spinnerComponent.showSpinner();
         $.ajax(optionSelected.dataset.url).then(result => {
-            $('body').loadingModal('hide');
+            spinnerComponent.hideSpinner();
             alert('Operation Completed');
         })
 

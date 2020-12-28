@@ -1,0 +1,48 @@
+{% extends '@customerFacing/wrapper.html.twig' %}
+{# @var data \CNCLTD\TwigDTOs\SalesInvoiceEmailDTO #}
+{% block replyText %}
+{% endblock %}
+{% block styles %}
+
+    table.salesInvoice td {
+    padding: 5px;
+    color:#7a7a7a
+    }
+
+{% endblock %}
+{% block headerTitle %}
+    Invoice Notification
+{% endblock %}
+
+{% block headerContet %}
+    You've got bills to pay
+{% endblock %}
+
+{% block content %}
+    <p>Please find attached the following invoice(s) for your attention: </p>
+
+    <table class="salesInvoice">
+        <tbody>
+        <tr>
+            <td>Invoice</td>
+            <td>Amount £(ex VAT)</td>
+        </tr>
+        {% for invoice in data.invoices %}
+            <tr>
+                <td>{{ invoice.id }}</td>
+                <td>{{ invoice.amount | format_currency('GBP',{fraction_digit:2}) }}</td>
+            </tr>
+        {% endfor %}
+        <tr>
+            <td>Total</td>
+            <td>{{ data.totalAmount | format_currency('GBP',{fraction_digit:2}) }}</td>
+        </tr>
+        </tbody>
+    </table>
+{% endblock %}
+{% block serviceRequestURL %}https://www.cnc-ltd.co.uk/portal/invoices/{% endblock %}
+
+{% block rightFooter %}
+
+{% endblock %}
+

@@ -202,7 +202,7 @@ class BUPDFSalesQuote extends Business
         $dbeQuotation->setValue(DBEQuotation::salutation, $salutation);
         $dbeQuotation->setValue(DBEQuotation::emailSubject, $emailSubject);
         $dbeQuotation->setValue(DBEQuotation::fileExtension, 'pdf');
-        $dbeQuotation->setValue(DBEQuotation::documentType, 'quotation');
+        $dbeQuotation->setValue(DBEQuotation::documentType, 'quote');
         $dbeQuotation->setValue(DBEQuotation::deliveryContactID, $dsOrdhead->getValue(DBEOrdhead::delContactID));
         $dbeQuotation->setValue(DBEQuotation::deliverySiteAdd1, $dsOrdhead->getValue(DBEOrdhead::delAdd1));
         $dbeQuotation->setValue(DBEQuotation::deliverySiteAdd2, $dsOrdhead->getValue(DBEOrdhead::delAdd2));
@@ -269,8 +269,8 @@ class BUPDFSalesQuote extends Business
         $buPDF->CR();
         $buPDF->printString('If you need to vary the quote in any way, please email the changes to ');
         $buPDF->printString(
-            'sales@cnc-ltd.co.uk',
-            'mailto:sales@cnc-ltd.co.uk?Subject=Quote%20' . $ordheadID . '/' . $versionNo
+            'sales@' . CONFIG_PUBLIC_DOMAIN,
+            'mailto:sales@' . CONFIG_PUBLIC_DOMAIN . '?Subject=Quote%20' . $ordheadID . '/' . $versionNo
         );
         $buPDF->printString(
             ', quoting ' . $ordheadID . '/' . $versionNo . ' and we will send a revised order form to you.'
@@ -293,20 +293,21 @@ class BUPDFSalesQuote extends Business
         $buPDF->printString('COMPUTER & NETWORK CONSULTANTS LTD');
         $buPDF->CR();
         $buPDF->CR();
+
         if ($dsUser->getValue(DBEUser::signatureFilename)) {
+            $signatureHeight = 20;
             $filePath = IMAGES_DIR . '/' . $dsUser->getValue(DBEUser::signatureFilename);
             if (!file_exists($filePath)) {
                 throw new Exception('Could not find the signature file for the user in: ' . $filePath);
             }
-            $buPDF->placeImageAt(
+            $buPDF->pdf->Image(
                 $filePath,
-                'PNG',
-                10,
-                35
+                null,
+                null,
+                0,
+                $signatureHeight
             );
         }
-        $buPDF->CR();
-        $buPDF->CR();
         $buPDF->CR();
         $buPDF->printString($dsUser->getValue(DBEUser::firstName) . ' ' . $dsUser->getValue(DBEUser::lastName));
         $buPDF->CR();
@@ -597,21 +598,9 @@ class BUPDFSalesQuote extends Business
             $userID,
             $dsUser
         );
-
-        $quoteFile = 'quotes/' . $dbeQuotation->getValue(DBEOrdhead::ordheadID) . '_' . $dbeQuotation->getValue(
-                DBEQuotation::versionNo
-            ) . '.pdf';
-
-        $subject = $emailSubject;
-
-        $template = new Template (
-            EMAIL_TEMPLATE_DIR,
-            "remove"
-        );
-        $template->set_file(
-            'page',
-            'QuoteReminderEmail.html'
-        );
+        $quoteFileName = "{$dbeQuotation->getValue(DBEOrdhead::ordheadID)}_{$dbeQuotation->getValue(DBEQuotation::versionNo)}.pdf";
+        $quoteFile = "quotes/{$quoteFileName}";
+        global $twig;
 
         $DBEJRenQuotation = new DBEJRenQuotation($this);
         $DBEJRenQuotation->getRowsBySalesOrderID($dsOrdhead->getValue(DBEOrdhead::ordheadID));
@@ -622,64 +611,35 @@ class BUPDFSalesQuote extends Business
 
         $DBEJRenQuotation->fetchNext();
 
-        $sentDateValue = $dbeQuotation->getValue(DBEQuotation::sentDateTime);
-        $sentDate = DateTime::createFromFormat(
-            'Y-m-d H:i:s',
-            $sentDateValue
-        );
+        $contactFirstName = $dsDeliveryContact->getValue(DBEContact::firstName);
+        $renewalType = $DBEJRenQuotation->getValue(DBEJRenQuotation::type);
 
-        $template->set_var(
+        $body = $twig->render(
+            '@customerFacing/QuoteReminder/QuoteReminder.html.twig',
             [
-                'contactFirstName' => $dsDeliveryContact->getValue(DBEContact::firstName),
-                'renewalType'      => $DBEJRenQuotation->getValue(DBEJRenQuotation::type),
-                'sentDate'         => $sentDate->format('d/m/Y')
+                "contactFirstName" => $contactFirstName,
+                "renewalType"      => $renewalType
             ]
         );
+        $recipientsArray = [
+            $dsOrdhead->getValue(DBEOrdhead::delContactEmail),
+            CONFIG_SALES_EMAIL
+        ];
 
-        $template->parse(
-            'output',
-            'page',
+        $attachments = new \CNCLTD\Email\AttachmentCollection();
+        $attachments->add(
+            $quoteFile,
+            'application/pdf',
+            $quoteFileName,
             true
         );
-
-        $body = $template->get_var('output');
-        $toEmail = $dsOrdhead->getValue(DBEOrdhead::delContactEmail);
-        $senderEmail = "sales@cnc-ltd.co.uk";
-
-        $hdrs = array(
-            'From'         => $senderEmail,
-            'To'           => $toEmail,
-            'Subject'      => $subject,
-            'Date'         => date("r"),
-            'Content-Type' => 'text/html; charset=UTF-8'
+        $buMail->sendEmailWithAttachments(
+            $body,
+            $emailSubject,
+            implode(',', $recipientsArray),
+            $attachments,
+            CONFIG_SALES_EMAIL
         );
-
-        $buMail->mime->setHTMLBody($body);
-
-        $buMail->mime->addAttachment(
-            $quoteFile,
-            'application/pdf'
-        );
-
-        $mime_params = array(
-            'text_encoding' => '7bit',
-            'text_charset'  => 'UTF-8',
-            'html_charset'  => 'UTF-8',
-            'head_charset'  => 'UTF-8'
-        );
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
-        $toEmail .= ',' . CONFIG_SALES_EMAIL;
-
-        return $buMail->putInQueue(
-            $senderEmail,
-            $toEmail,
-            $hdrs,
-            $body
-        );
-
     }
 
     /**
@@ -731,53 +691,12 @@ class BUPDFSalesQuote extends Business
 
         $subject = ucwords($body);
 
-        $senderEmail = $dsUser->getValue(DBEUser::username) . '@cnc-ltd.co.uk';
+        $senderEmail = $dsUser->getValue(DBEUser::username) . '@' . CONFIG_PUBLIC_DOMAIN;
         $senderName = $dsUser->getValue(DBEUser::firstName) . ' ' . $dsUser->getValue(DBEUser::lastName);
+        global $twig;
 
-        $message =
-            '<html lang="en">
-        <head >
-        <title>Quote</title>
-        <style type="text/css">
-        <!--
-        BODY, P, TD, TH {
-          font-family: Arial, Helvetica, sans-serif;
-          font-size: 10pt;
-        }
-        .singleBorder {
-          border: #e1e1f0 2px solid;
-        }
-        TABLE {
-          border-spacing: 1px;
-        }
-        -->
-        </style>
-        </head>
-        <body>
-      ';
-        // Send email with attachment
-        $message .= '<P>' . $dbeQuotation->getValue(DBEQuotation::salutation) . '</P>';
-        if ($dbeQuotation->getValue(DBEQuotation::documentType) == 'order form') {
-            $message .= '<P>Please find attached a quotation for your attention.</P>';
-            $message .= '<P>If you have any questions please do not hesitate to contact us.</P>';
-            $message .= ' To allow us to process your order please complete, sign and return at your earliest convenience';
-        } else {
-            $apiURL = API_URL . "/acceptQuotation?code={$dbeQuotation->getValue(DBEQuotation::confirmCode)}";
-            $message .= "
-            <p>With reference to your recent enquiry, I have great pleasure in providing you with the following prices.
-             Full details are attached or click on <a href='{$apiURL}'>this link</a> to receive the electronic quote to sign.</p>";
-        }
+        $apiURL = API_URL . "/acceptQuotation?code={$dbeQuotation->getValue(DBEQuotation::confirmCode)}";
 
-        $message .= '<P>Regards,</P>';
-
-        $message .=
-            '</body>
-        </html>';
-
-        ini_set(
-            "sendmail_from",
-            $senderEmail
-        );    // the envelope from address
 
         $toEmail = $dsOrdhead->getValue(DBEJOrdhead::delContactEmail);
 
@@ -789,7 +708,19 @@ class BUPDFSalesQuote extends Business
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
-        $buMail->mime->setHTMLBody($message);
+        $buMail->mime->setHTMLBody(
+            $twig->render(
+                '@customerFacing/Quote/Quote.html.twig',
+                [
+                    "isOrderForm"     => $dbeQuotation->getValue(DBEQuotation::documentType) == 'order form',
+                    "apiURL"          => $apiURL,
+                    "salutation"      => $dbeQuotation->getValue(DBEQuotation::salutation),
+                    "senderFirstName" => $dsUser->getValue(DBEUser::firstName),
+                    "senderLastName"  => $dsUser->getValue(DBEUser::lastName),
+                    "introduction"    => $dbeQuotation->getValue(DBEQuotation::salutation)
+                ]
+            )
+        );
 
         $buMail->mime->addAttachment(
             $quoteFile,

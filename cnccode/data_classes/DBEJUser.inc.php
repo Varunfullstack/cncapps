@@ -13,6 +13,8 @@ class DBEJUser extends DBEUser
     const firstName = "firstName";
     const lastName = "lastName";
     const activeFlag = "activeFlag";
+    const teamLevel = "teamLevel";
+
     /**
      * calls constructor()
      * @access public
@@ -27,33 +29,40 @@ class DBEJUser extends DBEUser
         $this->addColumn(
             self::signatureFilename,
             DA_STRING,
-            DA_ALLOW_NULL
+            DA_ALLOW_NULL,
+            "consultant.signatureFilename"
         );
         $this->addColumn(
             self::jobTitle,
             DA_STRING,
-            DA_NOT_NULL
+            DA_NOT_NULL,
+            "consultant.jobTitle"
         );
         $this->addColumn(
             self::firstName,
             DA_STRING,
-            DA_NOT_NULL
+            DA_NOT_NULL,
+            "consultant.firstName"
         );
         $this->addColumn(
             self::lastName,
             DA_STRING,
-            DA_NOT_NULL
+            DA_NOT_NULL,
+            "consultant.lastName"
         );
         $this->addColumn(
             self::activeFlag,
             DA_YN,
-            DA_NOT_NULL
+            DA_NOT_NULL,
+            "consultant.activeFlag"
         );
        
-        
-
-
-
+        $this->addColumn(
+            self::teamLevel,
+            DA_YN,
+            DA_NOT_NULL,
+            "team.level"
+        );
 
         $this->setAddColumnsOff();
     }
@@ -81,9 +90,11 @@ class DBEJUser extends DBEUser
         $this->setQueryString(
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            ' LEFT JOIN userext ON ' . $this->getTableName() . '.' . $this->getPKDBName() . '=userext.userID' .
+            ' LEFT JOIN userext ON ' . $this->getTableName() . '.' . $this->getPKDBName() . '=userext.userID ' .
+            ' LEFT JOIN team ON  '. $this->getTableName() . '.'. self::teamID.'=team.teamID '.
             " WHERE " . $this->getPKWhere()
         );
+        
         return (parent::getRow());
     }
 }

@@ -10,6 +10,7 @@
 
 use CNCLTD\AutomatedRequest;
 use CNCLTD\SolarwindsAccountItem;
+use CNCLTD\TwigDTOs\SiteVisitDTO;
 
 global $cfg;
 require_once($cfg ["path_gc"] . "/Business.inc.php");
@@ -42,9 +43,9 @@ require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 require_once($cfg ["path_bu"] . "/BUStandardText.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJPorhead.inc.php");
 require_once($cfg["path_dbe"] . "/DBEPendingReopened.php");
+require_once($cfg['path_dbe'] . '/DBECallDocumentWithoutFile.php');
 require_once($cfg["path_ct"] . "/CTProject.inc.php");
 require_once($cfg ["path_bu"] . "/BUProblemRaiseType.inc.php");
-
 define(
     'BUACTIVITY_RESOLVED',
     9
@@ -53,118 +54,113 @@ define(
 class BUActivity extends Business
 {
 
-    const hour = 3600;          // hour in seconds
-    const halfHour = 1800;      // half-hour in seconds
-    const day = 43200;     // one day in seconds
-    const quarterHour = 900;
-    const InitialCustomerEmailCategory = 'initialCustomerEmailCategory';
-    const WorkStartedCustomerEmailCategory = 'workStartedCustomerEmailCategory';
-    const WorkUpdatesCustomerEmailCategory = 'workUpdatesCustomerEmailCategory';
-    const FixedCustomerEmailCategory = 'completedCustomerEmailCategory';
+    const hour                                = 3600;          // hour in seconds
+    const halfHour                            = 1800;      // half-hour in seconds
+    const day                                 = 43200;     // one day in seconds
+    const quarterHour                         = 900;
+    const InitialCustomerEmailCategory        = 'initialCustomerEmailCategory';
+    const WorkStartedCustomerEmailCategory    = 'workStartedCustomerEmailCategory';
+    const WorkUpdatesCustomerEmailCategory    = 'workUpdatesCustomerEmailCategory';
+    const FixedCustomerEmailCategory          = 'completedCustomerEmailCategory';
     const PendingClosureCustomerEmailCategory = 'autoCloseCustomerEmailCategory';
-    const ClosureCustomerEmailCategory = 'closureCustomerEmailCategory';
-    const WorkUpdatesPriorityChanged = 'workUpdatesPriorityChanged';
-    const WorkUpdatesActivityLogged = 'workUpdatesActivityLogged';
-    const Initial24HSupport = 'initial24HSupport';
-    const InitialNot24HSupport = 'InitialNot24HSupport';
-    const Fixed = 'completedFixed';
-    const FixedReopen = 'completedReopen';
+    const ClosureCustomerEmailCategory        = 'closureCustomerEmailCategory';
+    const WorkUpdatesPriorityChanged          = 'workUpdatesPriorityChanged';
+    const WorkUpdatesActivityLogged           = 'workUpdatesActivityLogged';
+    const Initial24HSupport                   = 'initial24HSupport';
+    const InitialNot24HSupport                = 'InitialNot24HSupport';
+    const Fixed                               = 'completedFixed';
+    const FixedReopen                         = 'completedReopen';
 
-    const searchFormStatus = 'status';
-    const searchFormCustomerID = 'customerID';
-    const searchFormUserID = 'userID';
-    const searchFormRootCauseID = 'rootCauseID';
-    const searchFormContractCustomerItemID = 'contractCustomerItemID';
-    const searchFormPriority = 'priority';
-    const searchFormCustomerName = 'customerName';
-    const searchFormActivityText = 'activityText';
-    const searchFormServiceRequestSpentTime = 'serviceRequestSpentTime';
+    const searchFormStatus                      = 'status';
+    const searchFormCustomerID                  = 'customerID';
+    const searchFormUserID                      = 'userID';
+    const searchFormRootCauseID                 = 'rootCauseID';
+    const searchFormContractCustomerItemID      = 'contractCustomerItemID';
+    const searchFormPriority                    = 'priority';
+    const searchFormCustomerName                = 'customerName';
+    const searchFormActivityText                = 'activityText';
+    const searchFormServiceRequestSpentTime     = 'serviceRequestSpentTime';
     const searchFormIndividualActivitySpentTime = 'individualActivitySpentTime';
-    const searchFormFromDate = 'fromDate';
-    const searchFormToDate = 'toDate';
-    const searchFormCallActivityID = 'callActivityID';
-    const searchFormProblemID = 'problemID';
-    const searchFormCallActTypeID = 'callActTypeID';
-    const searchFormContractType = 'contractType';
-    const searchFormLinkedSalesOrderID = 'linkedSalesOrderID';
-    const searchFormManagementReviewOnly = 'managementReviewOnly';
-    const searchFormBreachedSlaOption = 'breachedSlaOption';
-    const searchFormFixSLAOption = "searchFormFixSLAOption";
-    const searchFormOverFixSLAWorkingHours = "searchFormOverFixSLAWorkingHours";
+    const searchFormFromDate                    = 'fromDate';
+    const searchFormToDate                      = 'toDate';
+    const searchFormCallActivityID              = 'callActivityID';
+    const searchFormProblemID                   = 'problemID';
+    const searchFormCallActTypeID               = 'callActTypeID';
+    const searchFormContractType                = 'contractType';
+    const searchFormLinkedSalesOrderID          = 'linkedSalesOrderID';
+    const searchFormManagementReviewOnly        = 'managementReviewOnly';
+    const searchFormBreachedSlaOption           = 'breachedSlaOption';
+    const searchFormFixSLAOption                = "searchFormFixSLAOption";
+    const searchFormOverFixSLAWorkingHours      = "searchFormOverFixSLAWorkingHours";
 
     const customerActivityMonthFormCustomerID = 'customerID';
-    const customerActivityMonthFormFromDate = 'fromDate';
-    const customerActivityMonthFormToDate = 'toDate';
+    const customerActivityMonthFormFromDate   = 'fromDate';
+    const customerActivityMonthFormToDate     = 'toDate';
 
 
-    const exportDataSetEndDate = 'endDate';
+    const exportDataSetEndDate    = 'endDate';
     const exportDataSetPreviewRun = 'previewRun';
 
-    const exportPrePayActivitiesFormCustomerName = 'customerName';
+    const exportPrePayActivitiesFormCustomerName    = 'customerName';
     const exportPrePayActivitiesFormPreviousBalance = 'previousBalance';
-    const exportPrePayActivitiesFormCurrentBalance = 'currentBalance';
-    const exportPrePayActivitiesFormExpiryDate = 'expiryDate';
-    const exportPrePayActivitiesFormTopUp = 'topUp';
-    const exportPrePayActivitiesFormContacts = 'contacts';
-    const exportPrePayActivitiesFormContractType = 'contractType';
-    const exportPrePayActivitiesFormWebFileLink = 'webFileLink';
+    const exportPrePayActivitiesFormCurrentBalance  = 'currentBalance';
+    const exportPrePayActivitiesFormExpiryDate      = 'expiryDate';
+    const exportPrePayActivitiesFormTopUp           = 'topUp';
+    const exportPrePayActivitiesFormContacts        = 'contacts';
+    const exportPrePayActivitiesFormContractType    = 'contractType';
+    const exportPrePayActivitiesFormWebFileLink     = 'webFileLink';
 
-    const customerActivityFormCustomerID = 'customerID';
-    const customerActivityFormUserID = 'userID';
+    const customerActivityFormCustomerID   = 'customerID';
+    const customerActivityFormUserID       = 'userID';
     const customerActivityFormContractType = 'contractType';
     const customerActivityFormCustomerName = 'customerName';
-    const customerActivityFormFromDate = 'fromDate';
-    const customerActivityFormToDate = 'toDate';
-    const SalesOrderCreatedRequest = 'SalesOrderCreatedRequest';
+    const customerActivityFormFromDate     = 'fromDate';
+    const customerActivityFormToDate       = 'toDate';
+    const SalesOrderCreatedRequest         = 'SalesOrderCreatedRequest';
 
 
     /** @var Template */
     public $template;
-    var $csvSummaryFileHandle;
-    var $totalCost = 0;
-    var $loggedInEmail = null;
-    var $loggedInUserID = null;
-    var $standardVatRate = 0;
+    var    $csvSummaryFileHandle;
+    var    $totalCost       = 0;
+    var    $loggedInEmail   = null;
+    var    $loggedInUserID  = null;
+    var    $standardVatRate = 0;
     /**
      *
      * @var DBEJCallActivity
      */
-    public $dbeJCallActivity = null;
+    public $dbeJCallActivity          = null;
     public $priorityArray;
-    public $problemStatusArray =
-        array(
-            "I" => "Initial",
-            "P" => "In Progress",
-            "F" => "Fixed",
-            "C" => "Confirmed Completed"
-        );
-    public $breachedSlaOptionArray =
-        array(
-            "B" => "SLA Breached",
-            "N" => "SLA Met"
-        );
-    public $awaitingCustomerArray =
-        array(
-            "Y" => "Customer",
-            "N" => "CNC"
-        );
-    public $workQueueDescriptionArray =
-        array(
-            "1" => "Helpdesk",
-            "2" => "Escalations",
-            "3" => "Small Projects",
-            "4" => "Sales",
-            "5" => "Projects",
-            "6" => "Fixed",
-            "7" => "Future"
-        );
-    public $allocatedMinutesArray =
-        array(
-            15 => 15,
-            30 => 30,
-            45 => 45,
-            60 => 60
-        );
+    public $problemStatusArray        = array(
+        "I" => "Initial",
+        "P" => "In Progress",
+        "F" => "Fixed",
+        "C" => "Confirmed Completed"
+    );
+    public $breachedSlaOptionArray    = array(
+        "B" => "SLA Breached",
+        "N" => "SLA Met"
+    );
+    public $awaitingCustomerArray     = array(
+        "Y" => "Customer",
+        "N" => "CNC"
+    );
+    public $workQueueDescriptionArray = array(
+        "1" => "Helpdesk",
+        "2" => "Escalations",
+        "3" => "Small Projects",
+        "4" => "Sales",
+        "5" => "Projects",
+        "6" => "Fixed",
+        "7" => "Future"
+    );
+    public $allocatedMinutesArray     = array(
+        15 => 15,
+        30 => 30,
+        45 => 45,
+        60 => 60
+    );
     /** @var DataSet */
     public $dsHeader;
     /**
@@ -191,21 +187,18 @@ class BUActivity extends Business
     function __construct(&$owner)
     {
         parent::__construct($owner);
-
-        $this->dbeJCallActivity = new DBEJCallActivity($this);
+        $this->dbeJCallActivity      = new DBEJCallActivity($this);
         $this->dbeCallActivitySearch = new DBECallActivitySearch($this);
-        $this->dbeUser = new DBEUser($this);
-        $buHeader = new BUHeader($this);
+        $this->dbeUser               = new DBEUser($this);
+        $buHeader                    = new BUHeader($this);
         $buHeader->getHeader($this->dsHeader);
-        $this->priorityArray =
-            array(
-                1 => $this->dsHeader->getValue(DBEHeader::priority1Desc),
-                2 => $this->dsHeader->getValue(DBEHeader::priority2Desc),
-                3 => $this->dsHeader->getValue(DBEHeader::priority3Desc),
-                4 => $this->dsHeader->getValue(DBEHeader::priority4Desc),
-                5 => $this->dsHeader->getValue(DBEHeader::priority5Desc)
-            );
-
+        $this->priorityArray = array(
+            1 => $this->dsHeader->getValue(DBEHeader::priority1Desc),
+            2 => $this->dsHeader->getValue(DBEHeader::priority2Desc),
+            3 => $this->dsHeader->getValue(DBEHeader::priority3Desc),
+            4 => $this->dsHeader->getValue(DBEHeader::priority4Desc),
+            5 => $this->dsHeader->getValue(DBEHeader::priority5Desc)
+        );
         if (isset($GLOBALS['auth'])) {
             $this->loggedInUserID = $GLOBALS['auth']->is_authenticated();
         } else {
@@ -323,14 +316,12 @@ class BUActivity extends Business
             DA_STRING,
             DA_ALLOW_NULL
         );
-
         $dsData->addColumn(
             self::searchFormOverFixSLAWorkingHours,
             DA_BOOLEAN,
             DA_NOT_NULL,
             false
         );
-
         $dsData->setValue(
             self::searchFormCustomerID,
             null
@@ -420,12 +411,11 @@ class BUActivity extends Business
      * @param bool $sortDirection
      * @param bool $limit
      */
-    function search(
-        &$dsSearchForm,
-        &$dsResults,
-        $sortColumn = false,
-        $sortDirection = false,
-        $limit = true
+    function search(&$dsSearchForm,
+                    &$dsResults,
+                    $sortColumn = false,
+                    $sortDirection = false,
+                    $limit = true
     )
     {
         $this->dbeCallActivitySearch->getRowsBySearchCriteria(
@@ -453,7 +443,6 @@ class BUActivity extends Business
             trim($dsSearchForm->getValue(self::searchFormOverFixSLAWorkingHours))
         );
         $this->dbeCallActivitySearch->fetchNext();
-
         $dsResults->replicate($this->dbeCallActivitySearch); // into a dataset for return
     } // end sendServiceRemovedEmail
 
@@ -461,35 +450,30 @@ class BUActivity extends Business
   Email to GL when a new activity is created that has same description/customerID
   as initial activity of a recently removed Request
   */
-
     function sendEmailToSales($callActivityID,
                               $message
     )
     {
         $dbeUser = new DBEUser($this);
         $dbeUser->getRow($GLOBALS['auth']->is_authenticated());
-
         $this->sendPartsUsedEmail(
             $callActivityID,
             $dbeUser->getValue(DBEUser::firstName) . ' ' . $dbeUser->getValue(DBEUser::lastName),
             date(DATE_MYSQL_DATE),
             $message
         );
-
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($callActivityID);
-
         $dbeProblem = new DBEProblem($this);
         $dbeProblem->getRow($dbeCallActivity->getValue(DBECallActivity::problemID));
         $dbeProblem->setValue(
             DBEJProblem::internalNotes,
-            $dbeProblem->getValue(DBEProblem::internalNotes) . '<BR/><BR/><STRONG>' .
-            'Parts Used on ' . date('d/m/Y H:i') . ' from  ' .
-            $dbeUser->getValue(DBEUser::firstName) . ' ' . $dbeUser->getValue(DBEUser::lastName) .
-            '</STRONG><BR/><BR/>' .
-            $message
+            $dbeProblem->getValue(DBEProblem::internalNotes) . '<BR/><BR/><STRONG>' . 'Parts Used on ' . date(
+                'd/m/Y H:i'
+            ) . ' from  ' . $dbeUser->getValue(DBEUser::firstName) . ' ' . $dbeUser->getValue(
+                DBEUser::lastName
+            ) . '</STRONG><BR/><BR/>' . $message
         );
-
         $dbeProblem->updateRow();
     }
 
@@ -500,11 +484,10 @@ class BUActivity extends Business
      * @param $dateCreated
      * @param bool $emailBody
      */
-    function sendPartsUsedEmail(
-        $callActivityID,
-        $engineerName,
-        $dateCreated,
-        $emailBody = false
+    function sendPartsUsedEmail($callActivityID,
+                                $engineerName,
+                                $dateCreated,
+                                $emailBody = false
     )
     {
         $dbeJCallActivity = new DBEJCallActivity($this);
@@ -514,9 +497,7 @@ class BUActivity extends Business
             "<BR/>",
             $emailBody
         );
-
-        $template = new Template(EMAIL_TEMPLATE_DIR);
-
+        $template  = new Template(EMAIL_TEMPLATE_DIR);
         $template->setFile(
             'internalFurtherActionEmail',
             'InternalFurtherActionEmail.html'
@@ -532,17 +513,13 @@ class BUActivity extends Business
         } else {
             $content = $emailBody . "<BR/><BR/>";
         }
-
-
         $activityURL = SITE_URL . Controller::formatForHTML(
-                '/Activity.php?action=displayActivity&callActivityID=' . $callActivityID,
+                '/SRActivity.php?action=displayActivity&callActivityID=' . $callActivityID,
                 1
             );
-
-        $subject = 'Parts used for ' . $dbeJCallActivity->getValue(
+        $subject     = 'Parts used for ' . $dbeJCallActivity->getValue(
                 DBEJCallActivity::customerName
             ) . ' against activity ' . $callActivityID . ' today(' . date('d/m/Y') . ')';
-
         $template->setVar(
             [
                 "content"      => $content,
@@ -551,41 +528,30 @@ class BUActivity extends Business
                 "activityURL"  => $activityURL,
             ]
         );
-
         $template->parse(
             'OUTPUT',
             "internalFurtherActionEmail"
         );
-
-        $body = $template->getVar('OUTPUT');
-
+        $body    = $template->getVar('OUTPUT');
         $emailTo = CONFIG_SALES_EMAIL;
-
-        $hdrs = array(
+        $hdrs    = array(
             'From'         => CONFIG_SUPPORT_EMAIL,
             'To'           => $emailTo,
             'Subject'      => $subject,
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
-
-        $mime = new Mail_mime();
-
+        $mime    = new Mail_mime();
         $mime->setHTMLBody($body);
-
         $mime_params = array(
             'text_encoding' => '7bit',
             'text_charset'  => 'UTF-8',
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-
-        $body = $mime->get($mime_params);
-
-        $hdrs = $mime->headers($hdrs);
-
-        $buMail = new BUMail($this);
-
+        $body        = $mime->get($mime_params);
+        $hdrs        = $mime->headers($hdrs);
+        $buMail      = new BUMail($this);
         $buMail->putInQueue(
             CONFIG_SUPPORT_EMAIL,
             $emailTo,
@@ -664,10 +630,9 @@ class BUActivity extends Business
         );
         $dsCallActivity->setValue(
             DBEJCallActivity::siteDesc,
-            $dsSite->getValue(DBESite::add1) .
-            ' ' . $dsSite->getValue(DBESite::add2) .
-            ' ' .
-            $dsSite->getValue(DBESite::town)
+            $dsSite->getValue(DBESite::add1) . ' ' . $dsSite->getValue(DBESite::add2) . ' ' . $dsSite->getValue(
+                DBESite::town
+            )
         );
         $dsCallActivity->post();
     }
@@ -682,14 +647,11 @@ class BUActivity extends Business
     {
 
         $dbeCallActivity = new DBECallActivity($this);
-
         $dbeCallActivity->getRow($callActivityID);
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::callActTypeID,
             CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID
         );
-
         $dbeCallActivity->updateRow();
 
     } // end sendSpecialAttentionEmail
@@ -699,56 +661,40 @@ class BUActivity extends Business
      *
      * @param mixed $problemID
      */
-    function sendRequestCompletedEarlyEmail(
-        $problemID
-    )
+    function sendRequestCompletedEarlyEmail($problemID)
     {
-        $buMail = new BUMail($this);
-
+        $buMail      = new BUMail($this);
         $dbeJProblem = new DBEJProblem($this);
         $dbeJProblem->getRow($problemID);
-
         $senderEmail = CONFIG_SUPPORT_EMAIL;
-
-        $toEmail = false; // Sd managers only
-
+        $toEmail     = false; // Sd managers only
         $activityRef = $problemID . ' ' . $dbeJProblem->getValue(DBEJProblem::customerName);
-
-        $template = new Template(
-            EMAIL_TEMPLATE_DIR,
-            "remove"
+        $template    = new Template(
+            EMAIL_TEMPLATE_DIR, "remove"
         );
         $template->set_file(
             'page',
             'RequestCompletedEarlyEmail.inc.html'
         );
-
-        $dbeJCallActivity = $this->getFirstActivityInProblem($problemID);
-
-        $urlActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+        $dbeJCallActivity = $this->getFirstActivityInServiceRequest($problemID);
+        $urlActivity      = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
-
         $template->setVar(
             array(
-                'activityRef'  => $activityRef,
-                'reason'       => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
-                'engineerName' => $dbeJProblem->getValue(DBEJProblem::engineerName),
-                'customerName' => $dbeJProblem->getValue(DBEJProblem::customerName),
-                'urlActivity'  => $urlActivity,
-                'CONFIG_SERVICE_REQUEST_DESC'
-                               => CONFIG_SERVICE_REQUEST_DESC
-
+                'activityRef'                 => $activityRef,
+                'reason'                      => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
+                'engineerName'                => $dbeJProblem->getValue(DBEJProblem::engineerName),
+                'customerName'                => $dbeJProblem->getValue(DBEJProblem::customerName),
+                'urlActivity'                 => $urlActivity,
+                'CONFIG_SERVICE_REQUEST_DESC' => CONFIG_SERVICE_REQUEST_DESC
             )
         );
-
         $template->parse(
             'output',
             'page',
             true
         );
-
         $body = $template->get_var('output');
-
         $hdrs = array(
             'From'         => $senderEmail,
             'To'           => $toEmail,
@@ -756,20 +702,15 @@ class BUActivity extends Business
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
-
         $buMail->mime->setHTMLBody($body);
-
         $mime_params = array(
             'text_encoding' => '7bit',
             'text_charset'  => 'UTF-8',
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
+        $body        = $buMail->mime->get($mime_params);
+        $hdrs        = $buMail->mime->headers($hdrs);
         $buMail->putInQueue(
             $senderEmail,
             $toEmail,
@@ -778,21 +719,18 @@ class BUActivity extends Business
         );
     }
 
-    function getFirstActivityInProblem($problemID, $typeID = null)
+    function getFirstActivityInServiceRequest($problemID, $typeID = null)
     {
 
         $dbeCallActivity = new DBEJCallActivity($this);
-
         $dbeCallActivity->getRowsByProblemID(
             $problemID,
             false
         );
-
         while ($dbeCallActivity->fetchNext()) {
             if (!$typeID) {
                 return $dbeCallActivity;
             }
-
             if ($dbeCallActivity->getValue(DBEJCallActivity::callActTypeID) == $typeID) {
                 return $dbeCallActivity;
             }
@@ -807,7 +745,6 @@ class BUActivity extends Business
             $callActivityID,
             $dsCallActivity
         );
-
         $this->escalateProblemByProblemID($dsCallActivity->getValue(DBEJCallActivity::problemID), $reason);
     }
 
@@ -822,7 +759,6 @@ class BUActivity extends Business
     {
         $this->dbeJCallActivity->setPKValue($callActivityID);
         $this->dbeJCallActivity->getRow();
-
         return ($this->getData(
             $this->dbeJCallActivity,
             $dsResults
@@ -836,16 +772,12 @@ class BUActivity extends Business
     {
 
         $dbeProblem = new DBEProblem(
-            $this,
-            $problemID
+            $this, $problemID
         );
-
         $oldQueueNo = $dbeProblem->getValue(DBEJProblem::queueNo);
-
         if (!$newQueueNo) {
             $newQueueNo = $dbeProblem->getValue(DBEJProblem::queueNo) + 1;
         }
-
         if ($newQueueNo < $oldQueueNo) {
             return $this->deEscalateProblemByProblemID(
                 $problemID,
@@ -853,7 +785,6 @@ class BUActivity extends Business
                 $newQueueNo
             );
         }
-
         if ($oldQueueNo < 5) {
 
 
@@ -861,23 +792,18 @@ class BUActivity extends Business
                 DBEJProblem::queueNo,
                 $newQueueNo
             );
-
             $dbeProblem->setValue(
                 DBEJProblem::userID,
                 null
             );
-
             $dbeProblem->setValue(
                 DBEJProblem::escalatedUserID,
                 $this->loggedInUserID
             );
-
             $dbeProblem->setValue(
                 DBEJProblem::awaitingCustomerResponseFlag,
                 'N'
             );
-
-
             $dbeProblem->updateRow();
             $message = "{$this->dbeUser->getValue(DBEUser::name)} Escalated from {$this->workQueueDescriptionArray[$oldQueueNo]} to {$this->workQueueDescriptionArray[$newQueueNo]}";
             if ($dbeProblem->getValue(DBEProblem::status) == 'P') {
@@ -899,16 +825,12 @@ class BUActivity extends Business
     {
 
         $dbeProblem = new DBEProblem(
-            $this,
-            $problemID
+            $this, $problemID
         );
-
         $oldQueueNo = $dbeProblem->getValue(DBEJProblem::queueNo);
-
         if (!$newQueueNo) {
             $newQueueNo = $oldQueueNo - 1;
         }
-
         if ($newQueueNo > $oldQueueNo) {
             return $this->escalateProblemByProblemID(
                 $problemID,
@@ -916,7 +838,6 @@ class BUActivity extends Business
                 $newQueueNo
             );
         }
-
         if ($oldQueueNo > 1) {
 
 
@@ -924,7 +845,6 @@ class BUActivity extends Business
                 DBEJProblem::queueNo,
                 $newQueueNo
             );
-
             $dbeProblem->setValue(
                 DBEJProblem::userID,
                 null
@@ -933,7 +853,6 @@ class BUActivity extends Business
                 DBEJProblem::awaitingCustomerResponseFlag,
                 'N'
             );
-
             $dbeProblem->updateRow();
             $message = "{$this->dbeUser->getValue(DBEUser::name)} Deescalated from {$this->workQueueDescriptionArray[$oldQueueNo]} to {$this->workQueueDescriptionArray[$newQueueNo]}";
             if ($dbeProblem->getValue(DBEProblem::status) == 'P') {
@@ -961,8 +880,7 @@ class BUActivity extends Business
                                     $resetAwaitingCustomer = false
     )
     {
-        $lastActivity = $this->getLastActivityInProblem($problemID);
-
+        $lastActivity    = $this->getLastActivityInProblem($problemID);
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($lastActivity->getValue(DBEJCallActivity::callActivityID));
         $dbeCallActivity->setPKValue(null);
@@ -1001,7 +919,6 @@ class BUActivity extends Business
             DBEJCallActivity::status,
             'C'
         );              // Checked
-
         $dbeCallActivity->insertRow();
     }
 
@@ -1009,14 +926,12 @@ class BUActivity extends Business
     {
 
         $dbeCallActivity = new DBEJCallActivity($this);
-
         $dbeCallActivity->getRowsByProblemID(
             $problemID,
             false,
             true,
             true
         ); // 3rd param= descending date
-
         if ($dbeCallActivity->fetchNext()) {
             return $dbeCallActivity;
         } else {
@@ -1034,10 +949,8 @@ class BUActivity extends Business
     {
 
         $dbeProblem = new DBEProblem(
-            $this,
-            $problemID
+            $this, $problemID
         );
-
         $dbeProblem->setValue(
             DBEJProblem::status,
             'P'
@@ -1047,27 +960,21 @@ class BUActivity extends Business
                 DBEJProblem::userID,
                 $dbeProblem->getValue(DBEJProblem::fixedUserID)
             ); // reallocate
-
-
             $dbeUser = new DBEJUser($this);
             $dbeUser->setValue(
                 DBEJUser::userID,
                 $dbeProblem->getValue(DBEJProblem::fixedUserID)
             );
             $dbeUser->getRow();
-
             $teamID = $dbeUser->getValue(DBEJUser::teamID);
-
             switch ($teamID) {
                 case 1:
-
                     if ($dbeProblem->getValue(DBEProblem::hdLimitMinutes) <= 0) {
                         $dbeProblem->setValue(
                             DBEProblem::hdLimitMinutes,
                             5
                         );
                     }
-
                     break;
                 case 2:
                     if ($dbeProblem->getValue(DBEProblem::esLimitMinutes) <= 0) {
@@ -1096,14 +1003,7 @@ class BUActivity extends Business
             }
 
         }
-
         $dbeProblem->updateRow();
-
-        $this->sendEmailToCustomer(
-            $problemID,
-            self::FixedCustomerEmailCategory
-        );
-
         $this->logOperationalActivity(
             $problemID,
             'Reopened'
@@ -1112,349 +1012,15 @@ class BUActivity extends Business
     }
 
     /**
-     * Sends email to client when a service request it's priority changed
-     *
-     * @param $problemID
-     * @param $category
-     * @param $subCategory
-     * @param null $callActivityID
-     * @throws Exception
-     */
-    function sendEmailToCustomer(
-        $problemID,
-        $category,
-        $subCategory = null,
-        $callActivityID = null
-    )
-    {
-        $dbeJProblem = new DBEJProblem($this);
-        $dbeJProblem->getRow($problemID);
-
-        $dbeFirstActivity = $this->getFirstActivityInProblem($problemID, CONFIG_INITIAL_ACTIVITY_TYPE_ID);
-        $dbeLastActivity = $this->getLastActivityInProblem($problemID);
-
-        $dbeCallActType = new DBECallActType($this);
-
-        if ($dbeLastActivity) {
-            $dbeCallActType->getRow($dbeLastActivity->getValue(DBEJCallActivity::callActTypeID));
-        } else {
-            $dbeCallActType->getRow($dbeFirstActivity->getValue(DBEJCallActivity::callActTypeID));
-        }
-
-        if (
-            $dbeJProblem->getValue(DBEJProblem::hideFromCustomerFlag) == 'Y' ||
-            $dbeFirstActivity->getValue(DBEJCallActivity::serverGuard) == 'Y' ||
-            $dbeLastActivity->getValue(DBECallActivity::hideFromCustomerFlag) == 'Y'
-        ) {
-            return; // no email to customer for this request
-        }
-
-
-        $templateName = null;
-        $subjectSuffix = null;
-
-        $contactID = $dbeLastActivity->getValue(DBECallActivity::contactID);
-
-        $contact = new DBEContact($this);
-        $contact->getRow($contactID);
-
-        $dbeCustomer = new DBECustomer($this);
-        $dbeCustomer->getRow($dbeJProblem->getValue(DBEJProblem::customerID));
-
-        $buCustomer = new BUCustomer($this);
-        $mainSupportContacts = $buCustomer->getMainSupportContacts(
-            $dbeJProblem->getValue(DBEJProblem::customerID),
-            $contact->getValue(DBEContact::supportLevel) === DBEContact::supportLevelDelegate
-        );
-
-        $emails = "";
-        $fields = [];
-        if ($dbeJProblem->getValue(DBEJProblem::rootCauseID)) {
-            $dbeRootCause = new DBERootCause($this);
-            $dbeRootCause->getRow($dbeJProblem->getValue(DBEJProblem::rootCauseID));
-            $rootCause = $dbeRootCause->getValue(DBERootCause::description);
-        } else {
-            $rootCause = 'Unknown';
-        }
-        $selfFlagName = null;
-        $othersFlagName = null;
-        $responseDetails = ", " . strtolower($this->getResponseDetails($dbeFirstActivity));
-        switch ($category) {
-            case self::SalesOrderCreatedRequest:
-                // the last activity should be an initial
-                if (
-                    $dbeFirstActivity->getValue(DBECallActivity::callActTypeID) !=
-                    $dbeLastActivity->getValue(
-                        DBECallActivity::callActTypeID
-                    )
-                ) {
-                    throw new Exception('Flagged as initial, but the last and first activities do not match');
-                }
-                $selfFlagName = DBEContact::initialLoggingEmailFlag;
-                $othersFlagName = DBEContact::othersInitialLoggingEmailFlag;
-                $responseDetails = null;
-
-                switch ($dbeJProblem->getValue(DBEProblem::queueNo)) {
-                    case 3:
-                        $fields['submittedTo'] = 'Small Projects';
-                        break;
-                    case 5:
-                        $fields['submittedTo'] = 'Projects';
-                        break;
-                }
-
-
-                $templateName = 'ServiceLoggedEmail';
-                $subjectSuffix = 'New Request Logged';
-                break;
-            case  self::InitialCustomerEmailCategory:
-
-                // the last activity should be an initial
-                if (
-                    $dbeFirstActivity->getValue(DBECallActivity::callActTypeID) !=
-                    $dbeLastActivity->getValue(
-                        DBECallActivity::callActTypeID
-                    )
-                ) {
-                    throw new Exception('Flagged as initial, but the last and first activities do not match');
-                }
-                $selfFlagName = DBEContact::initialLoggingEmailFlag;
-                $othersFlagName = DBEContact::othersInitialLoggingEmailFlag;
-
-                if ($dbeJProblem->getValue(DBEJProblem::priority) == 5) {
-                    $fields['submittedTo'] = 'Project Team';
-                } else {
-                    $fields['submittedTo'] = 'Service Desk';
-                }
-
-                $templateName = 'ServiceLoggedEmail';
-                $subjectSuffix = 'New Request Logged';
-
-                break;
-            case self::WorkStartedCustomerEmailCategory:
-                $selfFlagName = DBEContact::workStartedEmailFlag;
-                $othersFlagName = DBEContact::othersWorkStartedEmailFlag;
-
-                $templateName = 'WorkCommencedEmail';
-                $subjectSuffix = 'Work Started';
-                break;
-            case self::WorkUpdatesCustomerEmailCategory:
-                $selfFlagName = DBEContact::workUpdatesEmailFlag;
-                $othersFlagName = DBEContact::othersWorkUpdatesEmailFlag;
-                break;
-            case self::FixedCustomerEmailCategory:
-                $selfFlagName = DBEContact::fixedEmailFlag;
-                $othersFlagName = DBEContact::othersFixedEmailFlag;
-                break;
-            case self::PendingClosureCustomerEmailCategory:
-                $selfFlagName = DBEContact::pendingClosureEmailFlag;
-                $othersFlagName = DBEContact::othersPendingClosureEmailFlag;
-
-                $fixedUserID = $dbeJProblem->getValue(DBEJProblem::fixedUserID);
-                $dbeFixedUser = new DBEUser($this);
-                $dbeFixedUser->getRow($fixedUserID);
-                $templateName = 'ServiceCompletionAlertEmail';
-
-                $completeDate = $dbeJProblem->getValue(DBEProblem::completeDate);
-                $fields['reason'] = $dbeFirstActivity->getValue(DBEJCallActivity::reason);
-                $fields['completeDate'] = Controller::dateYMDtoDMY($completeDate);
-                $fixedActivity = $this->getFixedActivityInProblem($problemID);
-                $fields['fixedActivityReason'] = $fixedActivity->getValue(DBEJCallActivity::reason);
-                $fields['resolvedEngineerName'] = $dbeFixedUser->getValue(
-                        DBEUser::firstName
-                    ) . ' ' . $dbeFixedUser->getValue(
-                        DBEUser::lastName
-                    );
-
-                $subjectSuffix = 'Pending Closure on ' . Controller::dateYMDtoDMY($completeDate);
-                $fields['rootCause'] = $rootCause;
-                break;
-            case self::ClosureCustomerEmailCategory:
-                $selfFlagName = DBEContact::closureEmailFlag;
-                $othersFlagName = DBEContact::othersClosureEmailFlag;
-                $templateName = 'ServiceCompletedEmail';
-                $subjectSuffix = 'Now Closed';
-                $fixedActivity = $this->getFixedActivityInProblem($problemID);
-                $fields['reason'] = $dbeFirstActivity->getValue(DBEJCallActivity::reason);
-                $fields['rootCause'] = $rootCause;
-                $fields['fixedActivityReason'] = $fixedActivity->getValue(DBEJCallActivity::reason);
-                break;
-        }
-
-        if ($contact->getValue($selfFlagName) == 'Y') {
-            $emails = $contact->getValue(DBEContact::email);
-        }
-
-        foreach ($mainSupportContacts as $supportContact) {
-            if ($supportContact[DBEContact::contactID] == $contactID ||
-                $supportContact[$othersFlagName] != 'Y' ||
-                ($supportContact[DBEContact::supportLevel] == DBEContact::supportLevelSupervisor &&
-                    $contact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelDelegate)
-                && $dbeJProblem->getValue(DBEProblem::authorisedBy) != $supportContact[DBEContact::contactID]
-            ) {
-                continue;
-            }
-
-
-            if (!empty($emails)) {
-                $emails .= ',';
-            }
-            $emails .= $supportContact[DBEContact::email];
-        }
-
-        switch ($subCategory) {
-            case self::Initial24HSupport:
-                $templateName = 'ServiceLoggedEmail24h';
-                break;
-            case self::InitialNot24HSupport:
-                $templateName = 'ServiceLoggedEmailNot24h';
-                break;
-            case self::WorkUpdatesPriorityChanged:
-                $templateName = 'ServicePriorityChangedEmail';
-                $subjectSuffix = 'Priority Changed';
-                break;
-            case self::WorkUpdatesActivityLogged:
-                $templateName = 'ActivityLoggedCustomerEmail';
-                if ($dbeCallActType->getValue(DBEJCallActType::customerEmailFlag) != 'Y') {
-                    return;
-                }
-                $fields['extra'] = 'The service request requires further action by CNC as detailed above. 
-                We will contact you when this commences or if we need further information.';
-                $subjectSuffix = 'Requires Further Action By CNC';
-                if (
-                    $dbeLastActivity->getValue(DBEJCallActivity::awaitingCustomerResponseFlag) == 'Y'
-                ) {
-
-                    $subjectSuffix = 'Requires YOUR Attention';
-                    $fields['extra'] = "The service request requires YOUR attention as detailed above. 
-                    Please note that we will take NO further action until we hear from you.";
-                }
-
-                break;
-            case self::FixedReopen:
-                $templateName = 'ServiceReopenedEmail';
-                $subjectSuffix = 'Reopened';
-                break;
-
-            case self::Fixed:
-
-                if ($dbeJProblem->getValue(DBEJProblem::fixedUserID) == USER_SYSTEM) {
-                    return;
-                }
-                $templateName = 'ServiceFixedEmail';
-                $subjectSuffix = 'Fixed';
-
-                $fields['completeDate'] = Controller::dateYMDtoDMY(
-                    $dbeJProblem->getValue(DBEJProblem::completeDate)
-                );
-                $fields['rootCause'] = $rootCause;
-                break;
-        }
-
-        $buMail = new BUMail($this);
-
-
-        $senderEmail = CONFIG_SUPPORT_EMAIL;
-        if (empty($emails)) {
-            return;                     // no email recipients so abort
-        }
-
-        $template = new Template(
-            EMAIL_TEMPLATE_DIR,
-            "remove"
-        );
-        $template->set_file(
-            'page',
-            $templateName . '.inc.html'
-        );
-
-        $technicianResponsibleName = $dbeJProblem->getValue(DBEJProblem::engineerName);
-        $activityReason = $dbeLastActivity->getValue(DBEJCallActivity::reason);
-
-        if ($callActivityID) {
-            $dbeCallActivity = new DBEJCallActivity($this);
-            $dbeCallActivity->getRow($callActivityID);
-            $technicianResponsibleName = $dbeCallActivity->getValue(DBEJCallActivity::userName);
-            $activityReason = $dbeCallActivity->getValue(DBECallActivity::reason);
-        }
-
-        $template->setVar(
-            array(
-                'contactFirstName'      => $contact->getValue(DBEContact::firstName),
-                'activityRef'           => $problemID,
-                'CONFIG_SERVICE_REQUEST_DESC'
-                                        => CONFIG_SERVICE_REQUEST_DESC,
-                'priority'              => $this->priorityArray[$dbeJProblem->getValue(DBEJProblem::priority)],
-                'reason'                => $dbeFirstActivity->getValue(DBEJCallActivity::reason),
-                'lastActivityReason'    => $activityReason,
-                'responseDetails'       => $responseDetails,
-                'technicianResponsible' => $technicianResponsibleName
-            )
-        );
-
-        foreach ($fields as $key => $value) {
-
-            $template->setVar(
-                $key,
-                $value
-            );
-
-        }
-
-        $template->parse(
-            'output',
-            'page',
-            true
-        );
-
-        $body = $template->get_var('output');
-
-        $subject = CONFIG_SERVICE_REQUEST_DESC . ' ' . $problemID;
-
-        if ($subjectSuffix) {
-            $subject .= ' - ' . $subjectSuffix;
-        }
-
-        $hdrs = array(
-            'From'         => $senderEmail,
-            'To'           => $emails,
-            'Subject'      => $subject,
-            'Date'         => date("r"),
-            'Content-Type' => 'text/html; charset=UTF-8'
-        );
-
-        $buMail->mime->setHTMLBody($body);
-
-        $mime_params = array(
-            'text_encoding' => '7bit',
-            'text_charset'  => 'UTF-8',
-            'html_charset'  => 'UTF-8',
-            'head_charset'  => 'UTF-8'
-        );
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
-        $buMail->putInQueue(
-            $senderEmail,
-            $emails,
-            $hdrs,
-            $body
-        );
-    }
-
-    /**
      * @param DBEJCallActivity $dbeJCallActivity
      * @return string
      */
     function getResponseDetails($dbeJCallActivity)
     {
-        $slaResponseHours =
-            $this->getSlaResponseHours(
-                $dbeJCallActivity->getValue(DBEJCallActivity::priority),
-                $dbeJCallActivity->getValue(DBEJCallActivity::customerID)
-            );
-
+        $slaResponseHours = $this->getSlaResponseHours(
+            $dbeJCallActivity->getValue(DBEJCallActivity::priority),
+            $dbeJCallActivity->getValue(DBEJCallActivity::customerID)
+        );
         if ($slaResponseHours > 0) {
             $responseDetails = 'we will respond to your ' . strtolower(
                     CONFIG_SERVICE_REQUEST_DESC
@@ -1467,7 +1033,6 @@ class BUActivity extends Business
                     CONFIG_SERVICE_REQUEST_DESC
                 ) . ' is outside the scope of your service level agreement it will be responded to on a best endeavours basis';
         }
-
         return $responseDetails;
     }
 
@@ -1478,9 +1043,7 @@ class BUActivity extends Business
     {
         $dbeCustomer = new DBECustomer($this);
         $dbeCustomer->getRow($customerID);
-
         $priorityValue = null;
-
         switch ($priority) {
             case 1:
                 $priorityValue = DBECustomer::slaP1;
@@ -1498,101 +1061,59 @@ class BUActivity extends Business
                 $priorityValue = DBECustomer::slaP5;
                 break;
         }
-
-        $slaHours = $dbeCustomer->getValue($priorityValue);
-
+        $slaHours   = $dbeCustomer->getValue($priorityValue);
         $dbeContact = null;
         if ($contactID) {
             $dbeContact = new DBEContact($this);
             $dbeContact->getRow($contactID);
         }
-
         /*
     Special attention customers get half of normal SLA
     */
-        if (
-            ($dbeCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' &&
-                $dbeCustomer->getValue(DBECustomer::specialAttentionEndDate) >= date('Y-m-d')) ||
-            ($dbeContact && $dbeContact->getValue(DBEContact::specialAttentionContactFlag) == 'Y')
-        ) {
+        if (($dbeCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' && $dbeCustomer->getValue(
+                    DBECustomer::specialAttentionEndDate
+                ) >= date('Y-m-d')) || ($dbeContact && $dbeContact->getValue(
+                    DBEContact::specialAttentionContactFlag
+                ) == 'Y')) {
             $slaHours = $slaHours / 2;
         }
-
         return $slaHours;
     }
-
-    function getFixedActivityInProblem($problemID)
-    {
-
-        $dbeCallActivity = new DBEJCallActivity($this);
-
-        $dbeCallActivity->getRowsByProblemID(
-            $problemID,
-            false,
-            false,
-            true,
-            null,
-            false,
-            CONFIG_FIXED_ACTIVITY_TYPE_ID
-
-        );
-
-        if ($dbeCallActivity->fetchNext()) {
-            return $dbeCallActivity;
-        } else {
-            return false;
-        }
-    } // end sendUpdatedByAnotherUserEmail
 
     function sendPriorityFiveFixedEmail($problemID)
     {
         $dbeJProblem = new DBEJProblem($this);
         $dbeJProblem->getRow($problemID);
-
-        $buMail = new BUMail($this);
-
-
+        $buMail      = new BUMail($this);
         $senderEmail = CONFIG_SUPPORT_EMAIL;
 //        $senderName = 'CNC Support Department';
-
-        $toEmail = false;
-
+        $toEmail     = false;
         $activityRef = $problemID . ' ' . $dbeJProblem->getValue(DBEJProblem::customerName);
-
-        $template = new Template(
-            EMAIL_TEMPLATE_DIR,
-            "remove"
+        $template    = new Template(
+            EMAIL_TEMPLATE_DIR, "remove"
         );
         $template->set_file(
             'page',
             'PriorityFiveFixedEmail.inc.html'
         );
-
-        $dbeJCallActivity = $this->getFirstActivityInProblem($problemID);
-
-        $urlActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+        $dbeJCallActivity = $this->getFirstActivityInServiceRequest($problemID);
+        $urlActivity      = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
-
         $template->setVar(
             array(
-                'activityRef'  => $activityRef,
-                'reason'       => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
-                'customerName' => $dbeJProblem->getValue(DBEJProblem::customerName),
-                'urlActivity'  => $urlActivity,
-                'CONFIG_SERVICE_REQUEST_DESC'
-                               => CONFIG_SERVICE_REQUEST_DESC
-
+                'activityRef'                 => $activityRef,
+                'reason'                      => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
+                'customerName'                => $dbeJProblem->getValue(DBEJProblem::customerName),
+                'urlActivity'                 => $urlActivity,
+                'CONFIG_SERVICE_REQUEST_DESC' => CONFIG_SERVICE_REQUEST_DESC
             )
         );
-
         $template->parse(
             'output',
             'page',
             true
         );
-
         $body = $template->get_var('output');
-
         $hdrs = array(
             'From'         => $senderEmail,
             'To'           => $toEmail,
@@ -1602,27 +1123,22 @@ class BUActivity extends Business
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
-
         $buMail->mime->setHTMLBody($body);
-
         $mime_params = array(
             'text_encoding' => '7bit',
             'text_charset'  => 'UTF-8',
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
+        $body        = $buMail->mime->get($mime_params);
+        $hdrs        = $buMail->mime->headers($hdrs);
         $buMail->putInQueue(
             $senderEmail,
             $toEmail,
             $hdrs,
             $body
         );
-    }
+    } // end sendUpdatedByAnotherUserEmail
 
     /**
      * Create or update activity
@@ -1631,25 +1147,22 @@ class BUActivity extends Business
      * @return bool
      * @throws Exception
      */
-    function updateCallActivity($dsCallActivity
-    )
+    function updateCallActivity($dsCallActivity)
     {
-
+        $priorityChangeReason = $dsCallActivity->getValue("priorityChangeReason");
+        if (isset($priorityChangeReason) && $priorityChangeReason != '') $priorityChangeReason = '<br/>Reason: ' . $priorityChangeReason;
         $this->setMethodName('updateCallActivity');
         $dbeCallActivity = new DBECallActivity($this);
-        $oldEndTime = null; // new activity
-        $newReason = null;
+        $oldEndTime      = null; // new activity
+        $newReason       = null;
         if ($dsCallActivity->getValue(DBEJCallActivity::callActivityID) != 0) {
             $dbeCallActivity->getRow($dsCallActivity->getValue(DBEJCallActivity::callActivityID));
             $oldEndTime = $dbeCallActivity->getValue(DBEJCallActivity::endTime);
-            $oldReason = $dbeCallActivity->getValue(DBEJCallActivity::reason);
-            $newReason = $dsCallActivity->getValue(DBEJCallActivity::reason);
+            $oldReason  = $dbeCallActivity->getValue(DBEJCallActivity::reason);
+            $newReason  = $dsCallActivity->getValue(DBEJCallActivity::reason);
         }
-
         $dbeCallActType = new DBECallActType($this);
         $dbeCallActType->getRow($dsCallActivity->getValue(DBEJCallActivity::callActTypeID));
-
-
         // if this activity will now have an end time and the type specifies that we do not need to check it, set status to checked
         if (!$oldEndTime && $dsCallActivity->getValue(DBEJCallActivity::endTime)) {
             if ($dbeCallActType->getValue(DBECallActType::requireCheckFlag) == 'N') {
@@ -1669,22 +1182,18 @@ class BUActivity extends Business
             $dbeCallActivity
         );
         /**Get total hours spent*/
-        $sql =
-            "SELECT
+        $sql        = "SELECT
         SUM( TIME_TO_SEC(caa_endtime) - TIME_TO_SEC(caa_starttime) ) / 3600 AS totalHours
       FROM
           callactivity
       WHERE
           caa_problemno = " . $dsCallActivity->getValue(DBEJProblem::problemID);
-
-        $result = $this->db->query($sql);
+        $result     = $this->db->query($sql);
         $totalHours = $result->fetch_object()->totalHours;
-
         /*
     Get total travel hours spent
     */
-        $sql =
-            "SELECT
+        $sql              = "SELECT
         SUM( TIME_TO_SEC(caa_endtime) - TIME_TO_SEC(caa_starttime) ) / 3600 AS totalHours
       FROM
           callactivity ca
@@ -1692,13 +1201,9 @@ class BUActivity extends Business
       WHERE
           cat.travelFlag = 'Y'
           AND ca.caa_problemno = " . $dsCallActivity->getValue(DBEJProblem::problemID);
-
-
-        $result = $this->db->query($sql);
+        $result           = $this->db->query($sql);
         $totalTravelHours = $result->fetch_object()->totalHours;
-
-        $sql =
-            "SELECT
+        $sql              = "SELECT
         SUM( TIME_TO_SEC(caa_endtime) - TIME_TO_SEC(caa_starttime) ) / 3600 AS chargeableHours
       FROM
         callactivity
@@ -1707,24 +1212,22 @@ class BUActivity extends Business
         JOIN callacttype ON cat_callacttypeno = caa_callacttypeno
         JOIN item AS at_item ON cat_itemno = at_item.itm_itemno
       WHERE
-        caa_problemno = " . $dsCallActivity->getValue(DBEJCallActivity::problemID) .
-            " AND  at_item.itm_sstk_price  > 0";
-
-        $result = $this->db->query($sql);
-        $chargeableHours = $result->fetch_object()->chargeableHours;
-        $problem = new DBEProblem($this);
-
+        caa_problemno = " . $dsCallActivity->getValue(
+                DBEJCallActivity::problemID
+            ) . " AND  at_item.itm_sstk_price  > 0";
+        $result           = $this->db->query($sql);
+        $chargeableHours  = $result->fetch_object()->chargeableHours;
+        $problem          = new DBEProblem($this);
         $problem->getRow($dsCallActivity->getValue(DBEJCallActivity::problemID));
-        $oldPriority = $problem->getValue(DBEJProblem::priority);
         $problem->setValue(
             DBEJProblem::contractCustomerItemID,
             $dsCallActivity->getValue(DBEJCallActivity::contractCustomerItemID)
         );
-
         $problem->setValue(
             DBEJProblem::internalNotes,
             $dsCallActivity->getValue(DBEJCallActivity::internalNotes)
         );
+
         $problem->setValue(
             DBEJProblem::completeDate,
             $dsCallActivity->getValue(DBEJCallActivity::completeDate)
@@ -1737,56 +1240,76 @@ class BUActivity extends Business
             DBEJProblem::alarmTime,
             $dsCallActivity->getValue(DBEJCallActivity::alarmTime)
         );
-
         $problem->setValue(
             DBEJProblem::priority,
             $dsCallActivity->getValue(DBEJCallActivity::priority)
         );
-
         $problem->setValue(
             DBEJProblem::projectID,
             $dsCallActivity->getValue(DBEJCallActivity::projectID)
         );
-
         $problem->setValue(
             DBEJProblem::rootCauseID,
             $dsCallActivity->getValue(DBEJCallActivity::rootCauseID)
         );
-
         $problem->setValue(
             DBEJProblem::totalActivityDurationHours,
             $totalHours
         );
-
         $problem->setValue(
             DBEJProblem::totalTravelActivityDurationHours,
             $totalTravelHours
         );
-
+        if ($dsCallActivity->columnExists(DBEProblem::holdForQA) != -1) {
+            $problem->setValue(
+                DBEJProblem::holdForQA,
+                $dsCallActivity->getValue(DBEProblem::holdForQA)
+            );
+        }
         if (in_array($problem->getValue(DBEProblem::status), ["F", "C"])) {
-            /** @var $db dbSweetcode */
-            global $db;
+            /** @var $db dbSweetcode */ global $db;
             $resultset = $db->preparedQuery(
                 'select getOpenHours(?)',
                 [["type" => "i", "value" => $problem->getValue(DBEProblem::problemID)]]
             );
-            $row = $resultset->fetch_row();
+            $row       = $resultset->fetch_row();
             $problem->setValue(
                 DBEProblem::openHours,
                 $row[0]
             );
         }
-
         $problem->setValue(
             DBEJProblem::chargeableActivityDurationHours,
             $chargeableHours
         );
-
         $problem->setValue(
             DBEJProblem::workingHoursCalculatedToTime,
             null
         );
-
+        if ($dsCallActivity->getValue(DBEJCallActivity::assetName)) {
+            $problem->setValue(
+                DBEProblem::assetName,
+                $dsCallActivity->getValue(DBEJCallActivity::assetName)
+            );
+            $problem->setValue(
+                DBEJProblem::assetTitle,
+                $dsCallActivity->getValue(DBEJCallActivity::assetTitle)
+            );
+            $problem->setValue(DBEProblem::emptyAssetReason, null);
+        } else {
+            $problem->setValue(
+                DBEJProblem::emptyAssetReason,
+                $dsCallActivity->getValue(DBEProblem::emptyAssetReason)
+            );
+            $problem->setValue(
+                DBEJProblem::assetName,
+                null
+            );
+            $problem->setValue(
+                DBEJProblem::assetTitle,
+                null
+            );
+        }
         // if amended initial call activity date/time then set the problem date raised field to match
         if ($dsCallActivity->getValue(DBEJCallActivity::callActTypeID) == CONFIG_INITIAL_ACTIVITY_TYPE_ID) {
             $problem->setValue(
@@ -1796,9 +1319,7 @@ class BUActivity extends Business
                 ) . ':00'
             );
         }
-
         $problem->updateRow();
-
         /*
          * Have the contact notes been changed?
          * If so then update contact table with new notes
@@ -1806,20 +1327,14 @@ class BUActivity extends Business
         if ($dsCallActivity->getValue(DBEJCallActivity::contactNotes) && $dsCallActivity->getValue(
                 DBEJCallActivity::contactID
             )) {
-            $sql =
-                "SELECT con_notes
+            $sql      = "SELECT con_notes
           FROM contact
           WHERE con_contno = " . $dsCallActivity->getValue(DBEJCallActivity::contactID);
-
             $oldNotes = $this->db->query($sql)->fetch_object()->con_notes;
-            if (
-                $oldNotes != $dsCallActivity->getValue(DBEJCallActivity::contactNotes)
-            ) {
+            if ($oldNotes != $dsCallActivity->getValue(DBEJCallActivity::contactNotes)) {
 
                 $dbeContact = new DBEContact($this);
-
                 $dbeContact->getRow($dsCallActivity->getValue(DBEJCallActivity::contactID));
-
                 $dbeContact->setValue(
                     DBEContact::notes,
                     $dsCallActivity->getValue(DBEJCallActivity::contactNotes)
@@ -1830,86 +1345,42 @@ class BUActivity extends Business
         if ($dsCallActivity->getValue(DBEJCallActivity::techNotes) && $dsCallActivity->getValue(
                 DBEJCallActivity::customerID
             )) {
-            $sql =
-                "SELECT cus_tech_notes
+            $sql          = "SELECT cus_tech_notes
           FROM customer
           WHERE cus_custno = " . $dsCallActivity->getValue(DBEJCallActivity::customerID);
-
             $oldTechNotes = $this->db->query($sql)->fetch_object()->cus_tech_notes;
-
-            if (
-                $oldTechNotes != $dsCallActivity->getValue(DBEJCallActivity::techNotes)
-            ) {
-                $sql =
-                    "UPDATE customer
-              SET cus_tech_notes = '" . $dsCallActivity->getValue(DBEJCallActivity::techNotes) .
-                    "' WHERE cus_custno = " . $dsCallActivity->getValue(DBEJCallActivity::customerID);
-
+            if ($oldTechNotes != $dsCallActivity->getValue(DBEJCallActivity::techNotes)) {
+                $sql = "UPDATE customer
+              SET cus_tech_notes = '" . $dsCallActivity->getValue(
+                        DBEJCallActivity::techNotes
+                    ) . "' WHERE cus_custno = " . $dsCallActivity->getValue(DBEJCallActivity::customerID);
                 $this->db->query($sql);
             }
         }
-        if (
-            $oldPriority != $problem->getValue(DBEJProblem::priority)
-        ) {
-            $slaResponseHours =
-                $this->getSlaResponseHours(
-                    $problem->getValue(DBEJProblem::priority),
-                    $problem->getValue(DBEJProblem::customerID),
-                    $dbeCallActivity->getValue(DBECallActivity::contactID)
-                );
-
-            $problem->setValue(
-                DBEJProblem::slaResponseHours,
-                $slaResponseHours
-            );
-            $problem->updateRow();
-
-            $this->sendEmailToCustomer(
-                $dsCallActivity->getValue(DBEJProblem::problemID),
-                self::WorkUpdatesCustomerEmailCategory,
-                self::WorkUpdatesPriorityChanged
-            );
-
-            $this->logOperationalActivity(
-                $dsCallActivity->getValue(DBEJCallActivity::problemID),
-                'Priority Changed from ' . $oldPriority . ' to ' . $problem->getValue(DBEJProblem::priority)
-            );
-        } else {
-            if ((!isset($oldReason) || (isset($oldReason) && $oldReason != $newReason)) && $dsCallActivity->getValue(
-                    DBEJCallActivity::endTime
-                )) {
-                $this->sendEmailToCustomer(
-                    $dsCallActivity->getValue(DBEJProblem::problemID),
-                    self::WorkUpdatesCustomerEmailCategory,
-                    self::WorkUpdatesActivityLogged,
-                    $dsCallActivity->getValue(DBEJCallActivity::callActivityID)
-                );
-            }
+        $trimmedCustomerNotes                          = $this->trimmedCustomerNotes($dsCallActivity);
+        $hasNewReasonAndItsFinishedAndHasCustomerNotes = (!isset($oldReason) || $oldReason != $newReason) && $dsCallActivity->getValue(
+                DBEJCallActivity::endTime
+            ) && $trimmedCustomerNotes;
+        if ($hasNewReasonAndItsFinishedAndHasCustomerNotes) {
+            $this->sendActivityLoggedEmail($dbeCallActivity->getValue(DBEJCallActivity::callActivityID));
         }
-
         $this->sendMonitoringEmails($dbeCallActivity->getValue(DBEJCallActivity::callActivityID));
-
-
         /*
     Send emails UNLESS this is an escalation or change request activity type
     */
-        if (
-        !in_array(
+        if (!in_array(
             $dbeCallActivity->getValue(DBEJCallActivity::callActTypeID),
             array(
                 CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID,
                 CONFIG_CHANGE_REQUEST_ACTIVITY_TYPE_ID
             )
-        )
-        ) {
+        )) {
 
             $this->highActivityAlertCheck($problem->getValue(DBEJProblem::problemID));
-
             $this->updatedByAnotherUser(
                 $problem,
                 $dbeCallActivity
             );
-
             $buCustomer = new BUCustomer($this);
             $dsCustomer = new DataSet($this);
             $buCustomer->getCustomerByID(
@@ -1921,51 +1392,170 @@ class BUActivity extends Business
                 $dbeContact = new DBEContact($this);
                 $dbeContact->getRow($dsCallActivity->getValue(DBEJCallActivity::contactID));
             }
-
-
-            if (
-                ($dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' &&
-                    $dsCustomer->getValue(DBECustomer::specialAttentionEndDate) >= date(
+            if (($dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' && $dsCustomer->getValue(
+                        DBECustomer::specialAttentionEndDate
+                    ) >= date(
                         'Y-m-d'
-                    )) || ($dbeContact && $dbeContact->getValue(DBEContact::specialAttentionContactFlag) == 'Y')
-
-            ) {
+                    )) || ($dbeContact && $dbeContact->getValue(DBEContact::specialAttentionContactFlag) == 'Y')) {
                 $this->sendSpecialAttentionEmail($dbeCallActivity->getPKValue());
             }
-
             if ($problem->getValue(DBEJProblem::criticalFlag) == 'Y') {
                 $this->sendCriticalEmail($dbeCallActivity->getValue(DBEJCallActivity::callActivityID));
             }
-
-
             /*
       If this is a future on-site visit then send notification email( issue #8750 )
       */
-            if (
-                !$dbeCallActivity->getValue(DBEJCallActivity::endTime) &
-                $dbeCallActivity->getValue(DBEJCallActivity::date) >= date('Y-m-d')
-            ) {
+            if (!$dbeCallActivity->getValue(DBEJCallActivity::endTime) & $dbeCallActivity->getValue(
+                    DBEJCallActivity::date
+                ) >= date('Y-m-d')) {
                 $this->sendFutureVisitEmail($dbeCallActivity->getValue(DBEJCallActivity::callActivityID));
             }
         }
-
         if ($dbeCallActivity->getValue(DBEJCallActivity::userID) != USER_SYSTEM) {
             $this->updateTotalUserLoggedHours(
                 $dbeCallActivity->getValue(DBEJCallActivity::userID),
                 $dbeCallActivity->getValue(DBEJCallActivity::date)
             );
         }
-
         return $enteredEndTime;
-    } // end sendUpdatedByAnotherUserEmail
+    }
+
+    /**
+     * @param $activityId
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     */
+    private function sendActivityLoggedEmail($activityId)
+    {
+        $dbejCallactivity = new DBEJCallActivity($this);
+        $dbejCallactivity->getRow($activityId);
+        $status     = $this->getServiceRequestStatusText($dbejCallactivity);
+        $data       = new \CNCLTD\TwigDTOs\ActivityLoggedDTO(
+            $dbejCallactivity->getValue(DBEJCallActivity::contactFirstName),
+            $dbejCallactivity->getValue(DBEJCallActivity::customerSummary),
+            $dbejCallactivity->getValue(DBEJCallActivity::userName),
+            $dbejCallactivity->getValue(DBEJCallActivity::problemID),
+            $status
+        );
+        $template   = '@customerFacing/ActivityLogged/ActivityLogged.html.twig';
+        $subject    = "Service Request {$dbejCallactivity->getValue(DBEJCallActivity::problemID)} - {$dbejCallactivity->getValue(DBEJCallActivity::emailSubjectSummary)} - Updated";
+        $othersFlag = DBEContact::othersWorkUpdatesEmailFlag;
+        $this->sendCustomerEmail($template, $data, $dbejCallactivity, $othersFlag, $subject);
+    }
+
+    /**
+     * @param DBEJCallActivity $dbejCallactivity
+     * @return string
+     */
+    private function getServiceRequestStatusText(DBEJCallActivity $dbejCallactivity): string
+    {
+        $status = DBEProblem::statusFromDB($dbejCallactivity->getValue(DBEJCallActivity::problemStatus));
+        if ($dbejCallactivity->getValue(DBEJCallActivity::problemStatus) === 'P' && $dbejCallactivity->getValue(
+                DBEJCallActivity::awaitingCustomerResponseFlag
+            ) == 'Y') {
+            $status = "On Hold";
+        }
+        return $status;
+    }
+
+    /**
+     * @param string $template
+     * @param $data
+     * @param DBEJCallActivity $dbejCallactivity
+     * @param string $othersFlag
+     * @param string $subject
+     * @param string|null $selfFlag
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     */
+    private function sendCustomerEmail(string $template,
+                                       $data,
+                                       DBEJCallActivity $dbejCallactivity,
+                                       string $othersFlag,
+                                       string $subject,
+                                       ?string $selfFlag = null
+    ): void
+    {
+        if (!$this->shouldSendCustomerEmail($dbejCallactivity)) {
+            return;
+        }
+        global $twig;
+        $body            = $twig->render(
+            $template,
+            ["data" => $data]
+        );
+        $emailRecipients = $this->getEmailRecipients(
+            $dbejCallactivity,
+            $othersFlag,
+            $selfFlag
+        );
+        if (!$emailRecipients) {
+            return;
+        }
+        $this->sendEmail($body, $subject, $emailRecipients);
+    }
+
+    private function shouldSendCustomerEmail(DBEJCallActivity $dbejCallactivity)
+    {
+        $dbeProblem       = new DBEProblem($this);
+        $serviceRequestId = $dbejCallactivity->getValue(DBEJCallActivity::problemID);
+        $dbeProblem->getRow($serviceRequestId);
+        $dbeCallActType = new DBECallActType($this);
+        $dbeCallActType->getRow($dbejCallactivity->getValue(DBEJCallActivity::callActTypeID));
+        $dbeFirstActivity = $this->getFirstActivityInServiceRequest($serviceRequestId);
+        return $dbeCallActType->getValue(DBEJCallActType::customerEmailFlag) == 'Y' && $dbeProblem->getValue(
+                DBEProblem::hideFromCustomerFlag
+            ) == 'N' && $dbeFirstActivity->getValue(
+                DBEJCallActivity::serverGuard
+            ) == 'N' && $dbejCallactivity->getValue(DBECallActivity::hideFromCustomerFlag) == 'N';
+
+    }
+
+    private function getEmailRecipients(DBEJCallActivity $dbejCallactivity,
+                                        string $othersFlag,
+                                        ?string $selfFlag = null
+    )
+    {
+        $dbeSelfContact = new DBEContact($this);
+        $contactID      = $dbejCallactivity->getValue(DBEJCallActivity::contactID);
+        $dbeSelfContact->getRow($contactID);
+        $emails = [];
+        if (!$selfFlag || $dbeSelfContact->getValue($selfFlag) == 'Y') {
+            $emails[] = $dbeSelfContact->getValue(DBEContact::email);
+        }
+        $dbeProblem = new DBEProblem($this);
+        $dbeProblem->getRow($dbejCallactivity->getValue(DBEJCallActivity::problemID));
+        $buCustomer          = new BUCustomer($this);
+        $mainSupportContacts = $buCustomer->getMainSupportContacts(
+            $dbejCallactivity->getValue(DBEJCallActivity::customerID),
+            $dbeSelfContact->getValue(DBEContact::supportLevel) === DBEContact::supportLevelDelegate
+        );
+        foreach ($mainSupportContacts as $supportContact) {
+            if ($supportContact[DBEContact::contactID] == $contactID || $supportContact[$othersFlag] != 'Y' || ($supportContact[DBEContact::supportLevel] == DBEContact::supportLevelSupervisor && $dbeSelfContact->getValue(
+                        DBEContact::supportLevel
+                    ) == DBEContact::supportLevelDelegate) && $dbeProblem->getValue(
+                    DBEProblem::authorisedBy
+                ) != $supportContact[DBEContact::contactID]) {
+                continue;
+            }
+            $emails[] = $supportContact[DBEContact::email];
+        }
+        return implode(',', $emails);
+    }
+
+    private function sendEmail(string $body, string $subject, string $emailRecipients)
+    {
+        $buMail = new BUMail($this);
+        $buMail->sendSimpleEmail($body, $subject, $emailRecipients);
+    } // end sendRequestCompletedEarlyEmail
 
     private function sendMonitoringEmails($callActivityID)
     {
-        $buMail = new BUMail($this);
-
+        $buMail           = new BUMail($this);
         $dbeJCallActivity = new DBEJCallActivity($this);
         $dbeJCallActivity->getRow($callActivityID);
-
         $validActivityTypeIDs = [
             4,
             7,
@@ -1976,49 +1566,36 @@ class BUActivity extends Business
             55,
             59,
         ];
-
         if (!in_array(
             $dbeJCallActivity->getValue(DBEJCallActivity::callActTypeID),
             $validActivityTypeIDs
         )) {
             return;
         }
-
         $monitoringPeople = $this->getPeopleMonitoringProblem($dbeJCallActivity->getValue(DBEJCallActivity::problemID));
-
-
-        $senderEmail = CONFIG_SUPPORT_EMAIL;
+        $senderEmail      = CONFIG_SUPPORT_EMAIL;
 //        $senderName = 'CNC Support Department';
-
         $activityRef = $dbeJCallActivity->getValue(DBEJCallActivity::problemID) . ' ' . $dbeJCallActivity->getValue(
                 DBEJCallActivity::customerName
             );
-
-        $template = new Template(
-            EMAIL_TEMPLATE_DIR,
-            "remove"
+        $template    = new Template(
+            EMAIL_TEMPLATE_DIR, "remove"
         );
         $template->set_file(
             'page',
             'MonitoringEmail.inc.html'
         );
-
-        $urlActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+        $urlActivity              = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
-
-        $durationHours = common_convertHHMMToDecimal(
+        $durationHours            = common_convertHHMMToDecimal(
                 $dbeJCallActivity->getValue(DBEJCallActivity::endTime)
             ) - common_convertHHMMToDecimal($dbeJCallActivity->getValue(DBEJCallActivity::startTime));
-
         $awaitingCustomerResponse = null;
-
         if ($dbeJCallActivity->getValue(DBEJCallActivity::requestAwaitingCustomerResponseFlag) == 'Y') {
             $awaitingCustomerResponse = 'Awaiting Customer';
         } else {
             $awaitingCustomerResponse = 'Awaiting CNC';
         }
-
-
         $template->setVar(
             array(
                 'activityRef'                 => $activityRef,
@@ -2041,15 +1618,12 @@ class BUActivity extends Business
                 'CONFIG_SERVICE_REQUEST_DESC' => CONFIG_SERVICE_REQUEST_DESC
             )
         );
-
         $template->parse(
             'output',
             'page',
             true
         );
-
         $body = $template->get_var('output');
-
         $buMail->mime->setHTMLBody($body);
         $mime_params = array(
             'text_encoding' => '7bit',
@@ -2057,12 +1631,10 @@ class BUActivity extends Business
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-
-        $body = $buMail->mime->get($mime_params);
+        $body        = $buMail->mime->get($mime_params);
         foreach ($monitoringPeople as $monitoringPerson) {
-            $toEmail = $monitoringPerson['cns_logname'] . '@cnc-ltd.co.uk';
-
-            $hdrs = array(
+            $toEmail = $monitoringPerson['cns_logname'] . '@' . CONFIG_PUBLIC_DOMAIN;
+            $hdrs    = array(
                 'From'         => $senderEmail,
                 'To'           => $toEmail,
                 'Subject'      => 'Monitored SR ' . $dbeJCallActivity->getValue(
@@ -2071,9 +1643,7 @@ class BUActivity extends Business
                 'Date'         => date("r"),
                 'Content-Type' => 'text/html; charset=UTF-8'
             );
-
-            $hdrs = $buMail->mime->headers($hdrs);
-
+            $hdrs    = $buMail->mime->headers($hdrs);
             $buMail->putInQueue(
                 $senderEmail,
                 $toEmail,
@@ -2088,10 +1658,7 @@ class BUActivity extends Business
     private function getPeopleMonitoringProblem($problemID)
     {
         global $db;
-
         $sql = "SELECT * FROM problem_monitoring left join consultant on problem_monitoring.cons_no = consultant.cns_consno WHERE problemId = $problemID";
-
-
         $db->query($sql);
         $data = [];
         while ($db->next_record()) {
@@ -2104,78 +1671,59 @@ class BUActivity extends Business
     {
 
 
-        $sql =
-            "SELECT
+        $sql             = "SELECT
         COUNT(*) as activityCount
       FROM
         callactivity
       WHERE
         caa_problemno = $problemID
         AND caa_date = CURDATE()";
-
-
         $totalActivities = 0;
-        $result = $this->db->query($sql);
+        $result          = $this->db->query($sql);
         if ($result) {
             $totalActivities = $result->fetch_object()->activityCount;
         } else {
             var_dump($this->db->error_list);
         }
-
         if ($totalActivities == $this->dsHeader->getValue(DBEJHeader::highActivityAlertCount)) {
             $this->sendHighActivityAlertEmail($problemID);
         }
 
-    } // end sendRequestCompletedEarlyEmail
+    }
 
     function sendHighActivityAlertEmail($problemID)
     {
         $dbeJProblem = new DBEJProblem($this);
         $dbeJProblem->getRow($problemID);
-
-        $buMail = new BUMail($this);
-
-
+        $buMail      = new BUMail($this);
         $senderEmail = CONFIG_SUPPORT_EMAIL;
-
-        $toEmail = 'srhighactivity@' . CONFIG_PUBLIC_DOMAIN;
-
+        $toEmail     = 'srhighactivity@' . CONFIG_PUBLIC_DOMAIN;
         $activityRef = $problemID . ' ' . $dbeJProblem->getValue(DBEJProblem::customerName);
-
-        $template = new Template(
-            EMAIL_TEMPLATE_DIR,
-            "remove"
+        $template    = new Template(
+            EMAIL_TEMPLATE_DIR, "remove"
         );
         $template->set_file(
             'page',
             'HighActivityAlertEmail.inc.html'
         );
-
-        $dbeJCallActivity = $this->getFirstActivityInProblem($problemID);
-
-        $urlActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+        $dbeJCallActivity = $this->getFirstActivityInServiceRequest($problemID);
+        $urlActivity      = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
-
         $template->setVar(
             array(
-                'activityRef'  => $activityRef,
-                'reason'       => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
-                'customerName' => $dbeJProblem->getValue(DBEJProblem::customerName),
-                'urlActivity'  => $urlActivity,
-                'CONFIG_SERVICE_REQUEST_DESC'
-                               => CONFIG_SERVICE_REQUEST_DESC
-
+                'activityRef'                 => $activityRef,
+                'reason'                      => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
+                'customerName'                => $dbeJProblem->getValue(DBEJProblem::customerName),
+                'urlActivity'                 => $urlActivity,
+                'CONFIG_SERVICE_REQUEST_DESC' => CONFIG_SERVICE_REQUEST_DESC
             )
         );
-
         $template->parse(
             'output',
             'page',
             true
         );
-
         $body = $template->get_var('output');
-
         $hdrs = array(
             'From'         => $senderEmail,
             'To'           => $toEmail,
@@ -2185,20 +1733,15 @@ class BUActivity extends Business
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
-
         $buMail->mime->setHTMLBody($body);
-
         $mime_params = array(
             'text_encoding' => '7bit',
             'text_charset'  => 'UTF-8',
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
+        $body        = $buMail->mime->get($mime_params);
+        $hdrs        = $buMail->mime->headers($hdrs);
         $buMail->putInQueue(
             $senderEmail,
             $toEmail,
@@ -2217,15 +1760,14 @@ class BUActivity extends Business
     {
 
         $dbeJLastActivity = $this->getLastActivityInProblem($dbeProblem->getValue(DBEJProblem::problemID));
-        if (
-            $dbeCallActivity->getValue(DBEJCallActivity::callActTypeID) != CONFIG_INITIAL_ACTIVITY_TYPE_ID and
-            // Always include activity triggered by an email from the customer
-            $this->loggedInUserID == USER_SYSTEM and $dbeCallActivity->getValue(DBEJCallActivity::serverGuard) == 'N' or
-            (
-                /*
+        if ($dbeCallActivity->getValue(
+                DBEJCallActivity::callActTypeID
+            ) != CONFIG_INITIAL_ACTIVITY_TYPE_ID and // Always include activity triggered by an email from the customer
+            $this->loggedInUserID == USER_SYSTEM and $dbeCallActivity->getValue(
+                DBEJCallActivity::serverGuard
+            ) == 'N' or (/*
         Don't send unwanted alerts
-        */
-                $dbeProblem->getValue(DBEJProblem::userID) != $dbeJLastActivity->getValue(
+        */ $dbeProblem->getValue(DBEJProblem::userID) != $dbeJLastActivity->getValue(
                     DBEJCallActivity::userID
                 ) && // exclude previous user same as assigned user
                 $dbeProblem->getValue(
@@ -2235,8 +1777,7 @@ class BUActivity extends Business
                 $dbeCallActivity->getValue(
                     DBEJCallActivity::endTime
                 )                // exclude future scheduled activity
-            )
-        ) {
+            )) {
             $this->sendUpdatedByAnotherUserEmail(
                 $dbeProblem->getValue(DBEJProblem::problemID),
                 $dbeCallActivity
@@ -2260,34 +1801,23 @@ class BUActivity extends Business
             ) == USER_SYSTEM) {
             return;       // not assigned to anyone or assigned to System user
         }
-        $buMail = new BUMail($this);
-
-
+        $buMail      = new BUMail($this);
         $senderEmail = CONFIG_SUPPORT_EMAIL;
-
-        $dbeUser = new DBEUser($this);
+        $dbeUser     = new DBEUser($this);
         $dbeUser->getRow($dbeJProblem->getValue(DBEJProblem::userID));
-        $toEmail = $dbeUser->getValue(DBEUser::username) . '@' . CONFIG_PUBLIC_DOMAIN;
-
+        $toEmail     = $dbeUser->getValue(DBEUser::username) . '@' . CONFIG_PUBLIC_DOMAIN;
         $activityRef = $problemID . ' ' . $dbeJProblem->getValue(DBEJProblem::customerName);
-
-        $template = new Template(
-            EMAIL_TEMPLATE_DIR,
-            "remove"
+        $template    = new Template(
+            EMAIL_TEMPLATE_DIR, "remove"
         );
         $template->set_file(
             'page',
             'NotifyUpdatedByAnotherUserEmail.inc.html'
         );
-
-
         $dbeJCallActivity = new DBEJCallActivity($this);
         $dbeJCallActivity->getRow($callActivity->getValue(DBECallActivity::callActivityID));
-
-
-        $urlActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+        $urlActivity = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
-
         $template->setVar(
             array(
                 'activityRef'                 => $activityRef,
@@ -2296,18 +1826,14 @@ class BUActivity extends Business
                 'urlActivity'                 => $urlActivity,
                 'CONFIG_SERVICE_REQUEST_DESC' => CONFIG_SERVICE_REQUEST_DESC,
                 'userName'                    => $dbeJCallActivity->getValue(DBEJCallActivity::userName)
-
             )
         );
-
         $template->parse(
             'output',
             'page',
             true
         );
-
         $body = $template->get_var('output');
-
         $hdrs = array(
             'From'         => $senderEmail,
             'To'           => $toEmail,
@@ -2315,323 +1841,15 @@ class BUActivity extends Business
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
-
         $buMail->mime->setHTMLBody($body);
-
         $mime_params = array(
             'text_encoding' => '7bit',
             'text_charset'  => 'UTF-8',
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
-        $buMail->putInQueue(
-            $senderEmail,
-            $toEmail,
-            $hdrs,
-            $body
-        );
-    }
-
-    /**
-     * Sends email to service desk managers when activity logged against  customer
-     *
-     * @param $callActivityID
-     */
-    function sendSpecialAttentionEmail($callActivityID)
-    {
-        $buMail = new BUMail($this);
-
-        $dbeJCallActivity = new DBEJCallActivity($this);
-        $dbeJCallActivity->getRow($callActivityID);
-
-        $senderEmail = CONFIG_SUPPORT_EMAIL;
-
-        $activityRef = $dbeJCallActivity->getValue(DBEJCallActivity::problemID) . ' ' . $dbeJCallActivity->getValue(
-                DBEJCallActivity::customerName
-            );
-
-        $template = new Template(
-            EMAIL_TEMPLATE_DIR,
-            "remove"
-        );
-        $template->set_file(
-            'page',
-            'SpecialAttentionEmail.inc.html'
-        );
-
-        $urlActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
-            );
-
-        $durationHours = common_convertHHMMToDecimal(
-                $dbeJCallActivity->getValue(DBEJCallActivity::endTime)
-            ) - common_convertHHMMToDecimal($dbeJCallActivity->getValue(DBEJCallActivity::startTime));
-
-        $awaitingCustomerResponse = null;
-
-        if ($dbeJCallActivity->getValue(DBEJCallActivity::requestAwaitingCustomerResponseFlag) == 'Y') {
-            $awaitingCustomerResponse = 'Awaiting Customer';
-        } else {
-            $awaitingCustomerResponse = 'Awaiting CNC';
-        }
-
-        $template->setVar(
-            array(
-                'activityRef'   => $activityRef,
-                'urlActivity'   => $urlActivity,
-                'userName'      => $dbeJCallActivity->getValue(DBEJCallActivity::userName),
-                'durationHours' => round(
-                    $durationHours,
-                    2
-                ),
-                'requestStatus' => $this->problemStatusArray[$dbeJCallActivity->getValue(
-                    DBEJCallActivity::problemStatus
-                )],
-                'awaitingCustomerResponse'
-                                => $awaitingCustomerResponse,
-                'customerName'  => $dbeJCallActivity->getValue(DBEJCallActivity::customerName),
-                'reason'        => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
-                'CONFIG_SERVICE_REQUEST_DESC'
-                                => CONFIG_SERVICE_REQUEST_DESC
-
-            )
-        );
-
-        $userID = $dbeJCallActivity->getValue(DBEJCallActivity::userID);
-        $dbeUser = new DBEUser($this);
-        $dbeUser->getRow($userID);
-        $teamID = $dbeUser->getValue(DBEUser::teamID);
-        $team = new DBETeam($this);
-        $team->getRow($teamID);
-        $manager = new DBEUser($this);
-        $manager->getRow($team->getValue(DBETeam::leaderId));
-        $managerEmail = $manager->getValue(DBEUser::username) . '@' . CONFIG_PUBLIC_DOMAIN;
-
-        $template->parse(
-            'output',
-            'page',
-            true
-        );
-
-        $body = $template->get_var('output');
-
-        $toEmail = 'srspecialattention@' . CONFIG_PUBLIC_DOMAIN . ",$managerEmail";
-
-
-        $hdrs = array(
-            'From'         => $senderEmail,
-            'To'           => $toEmail,
-            'Subject'      => 'Special Attention Activity ' . $dbeJCallActivity->getValue(
-                    DBEJCallActivity::customerName
-                ) . ': ' . $dbeJCallActivity->getValue(DBEJCallActivity::activityType),
-            'Date'         => date("r"),
-            'Content-Type' => 'text/html; charset=UTF-8'
-        );
-
-        $buMail->mime->setHTMLBody($body);
-
-        $mime_params = array(
-            'text_encoding' => '7bit',
-            'text_charset'  => 'UTF-8',
-            'html_charset'  => 'UTF-8',
-            'head_charset'  => 'UTF-8'
-        );
-
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
-        $buMail->putInQueue(
-            $senderEmail,
-            $toEmail,
-            $hdrs,
-            $body
-        );
-    }
-
-    function sendCriticalEmail($callActivityID)
-    {
-        $buMail = new BUMail($this);
-
-        $dbeJCallActivity = new DBEJCallActivity($this);
-        $dbeJCallActivity->getRow($callActivityID);
-
-        $senderEmail = CONFIG_SUPPORT_EMAIL;
-
-        $activityRef = $dbeJCallActivity->getValue(DBEJCallActivity::problemID) . ' ' . $dbeJCallActivity->getValue(
-                DBEJCallActivity::customerName
-            );
-
-        $template = new Template(
-            EMAIL_TEMPLATE_DIR,
-            "remove"
-        );
-        $template->set_file(
-            'page',
-            'CriticalEmail.inc.html'
-        );
-
-        $urlActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
-            );
-
-        $durationHours = common_convertHHMMToDecimal(
-                $dbeJCallActivity->getValue(DBEJCallActivity::endTime)
-            ) - common_convertHHMMToDecimal($dbeJCallActivity->getValue(DBEJCallActivity::startTime));
-
-        $awaitingCustomerResponse = null;
-
-        if ($dbeJCallActivity->getValue(DBEJCallActivity::requestAwaitingCustomerResponseFlag) == 'Y') {
-            $awaitingCustomerResponse = 'Awaiting Customer';
-        } else {
-            $awaitingCustomerResponse = 'Awaiting CNC';
-        }
-
-        $template->setVar(
-            array(
-                'activityRef'   => $activityRef,
-                'urlActivity'   => $urlActivity,
-                'userName'      => $dbeJCallActivity->getValue(DBEJCallActivity::userName),
-                'durationHours' => round(
-                    $durationHours,
-                    2
-                ),
-                'requestStatus' => $this->problemStatusArray[$dbeJCallActivity->getValue(
-                    DBEJCallActivity::problemStatus
-                )],
-                'awaitingCustomerResponse'
-                                => $awaitingCustomerResponse,
-                'customerName'  => $dbeJCallActivity->getValue(DBEJCallActivity::customerName),
-                'reason'        => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
-                'CONFIG_SERVICE_REQUEST_DESC'
-                                => CONFIG_SERVICE_REQUEST_DESC
-
-            )
-        );
-
-        $template->parse(
-            'output',
-            'page',
-            true
-        );
-
-        $body = $template->get_var('output');
-
-        $toEmail = 'criticalactivity@' . CONFIG_PUBLIC_DOMAIN;
-
-        $hdrs = array(
-            'From'         => $senderEmail,
-            'To'           => $toEmail,
-            'Subject'      => 'Critical SR Activity For ' . $dbeJCallActivity->getValue(
-                    DBEJCallActivity::customerName
-                ) . ': ' . $dbeJCallActivity->getValue(DBEJCallActivity::activityType),
-            'Date'         => date("r"),
-            'Content-Type' => 'text/html; charset=UTF-8'
-        );
-
-        $buMail->mime->setHTMLBody($body);
-
-        $mime_params = array(
-            'text_encoding' => '7bit',
-            'text_charset'  => 'UTF-8',
-            'html_charset'  => 'UTF-8',
-            'head_charset'  => 'UTF-8'
-        );
-
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
-        $buMail->putInQueue(
-            $senderEmail,
-            $toEmail,
-            $hdrs,
-            $body
-        );
-    }
-
-    /**
-     * Sends email to sales when future on-site activity logged
-     *
-     * @param $callActivityID
-     */
-    function sendFutureVisitEmail($callActivityID)
-    {
-        $buMail = new BUMail($this);
-
-        $dbeJCallActivity = new DBEJCallActivity($this);
-        $dbeJCallActivity->getRow($callActivityID);
-
-        $senderEmail = CONFIG_SUPPORT_EMAIL;
-
-        $toEmail = CONFIG_SALES_EMAIL;
-
-        $activityRef = $dbeJCallActivity->getValue(DBEJCallActivity::problemID) . ' ' . $dbeJCallActivity->getValue(
-                DBEJCallActivity::customerName
-            );
-
-        $template = new Template(
-            EMAIL_TEMPLATE_DIR,
-            "remove"
-        );
-        $template->set_file(
-            'page',
-            'FutureVisitEmail.inc.html'
-        );
-
-        $urlActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
-            );
-
-        $template->setVar(
-            array(
-                'activityRef'   => $activityRef,
-                'urlActivity'   => $urlActivity,
-                'userName'      => $dbeJCallActivity->getValue(DBEJCallActivity::userName),
-                'requestStatus' => $this->problemStatusArray[$dbeJCallActivity->getValue(
-                    DBEJCallActivity::problemStatus
-                )],
-                'customerName'  => $dbeJCallActivity->getValue(DBEJCallActivity::customerName),
-                'reason'        => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
-                'CONFIG_SERVICE_REQUEST_DESC'
-                                => CONFIG_SERVICE_REQUEST_DESC
-
-            )
-        );
-
-        $template->parse(
-            'output',
-            'page',
-            true
-        );
-
-        $body = $template->get_var('output');
-
-        $hdrs = array(
-            'From'         => $senderEmail,
-            'To'           => $toEmail,
-            'Subject'      => 'Future Visit To ' . $dbeJCallActivity->getValue(
-                    DBEJCallActivity::customerName
-                ) . ' Logged : ' . $dbeJCallActivity->getValue(DBEJCallActivity::activityType),
-            'Date'         => date("r"),
-            'Content-Type' => 'text/html; charset=UTF-8'
-        );
-
-        $buMail->mime->setHTMLBody($body);
-
-        $mime_params = array(
-            'text_encoding' => '7bit',
-            'text_charset'  => 'UTF-8',
-            'html_charset'  => 'UTF-8',
-            'head_charset'  => 'UTF-8'
-        );
-
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
+        $body        = $buMail->mime->get($mime_params);
+        $hdrs        = $buMail->mime->headers($hdrs);
         $buMail->putInQueue(
             $senderEmail,
             $toEmail,
@@ -2643,6 +1861,248 @@ class BUActivity extends Business
     /*
   Send an alert email if number of activities per SR per day exceeds system max
   */
+    /**
+     * Sends email to service desk managers when activity logged against  customer
+     *
+     * @param $callActivityID
+     */
+    function sendSpecialAttentionEmail($callActivityID)
+    {
+        $buMail           = new BUMail($this);
+        $dbeJCallActivity = new DBEJCallActivity($this);
+        $dbeJCallActivity->getRow($callActivityID);
+        $senderEmail = CONFIG_SUPPORT_EMAIL;
+        $activityRef = $dbeJCallActivity->getValue(DBEJCallActivity::problemID) . ' ' . $dbeJCallActivity->getValue(
+                DBEJCallActivity::customerName
+            );
+        $template    = new Template(
+            EMAIL_TEMPLATE_DIR, "remove"
+        );
+        $template->set_file(
+            'page',
+            'SpecialAttentionEmail.inc.html'
+        );
+        $urlActivity              = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+            );
+        $durationHours            = common_convertHHMMToDecimal(
+                $dbeJCallActivity->getValue(DBEJCallActivity::endTime)
+            ) - common_convertHHMMToDecimal($dbeJCallActivity->getValue(DBEJCallActivity::startTime));
+        $awaitingCustomerResponse = null;
+        if ($dbeJCallActivity->getValue(DBEJCallActivity::requestAwaitingCustomerResponseFlag) == 'Y') {
+            $awaitingCustomerResponse = 'Awaiting Customer';
+        } else {
+            $awaitingCustomerResponse = 'Awaiting CNC';
+        }
+        $template->setVar(
+            array(
+                'activityRef'                 => $activityRef,
+                'urlActivity'                 => $urlActivity,
+                'userName'                    => $dbeJCallActivity->getValue(DBEJCallActivity::userName),
+                'durationHours'               => round(
+                    $durationHours,
+                    2
+                ),
+                'requestStatus'               => $this->problemStatusArray[$dbeJCallActivity->getValue(
+                    DBEJCallActivity::problemStatus
+                )],
+                'awaitingCustomerResponse'    => $awaitingCustomerResponse,
+                'customerName'                => $dbeJCallActivity->getValue(DBEJCallActivity::customerName),
+                'reason'                      => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
+                'CONFIG_SERVICE_REQUEST_DESC' => CONFIG_SERVICE_REQUEST_DESC
+            )
+        );
+        $userID  = $dbeJCallActivity->getValue(DBEJCallActivity::userID);
+        $dbeUser = new DBEUser($this);
+        $dbeUser->getRow($userID);
+        $teamID = $dbeUser->getValue(DBEUser::teamID);
+        $team   = new DBETeam($this);
+        $team->getRow($teamID);
+        $manager = new DBEUser($this);
+        $manager->getRow($team->getValue(DBETeam::leaderId));
+        $managerEmail = $manager->getValue(DBEUser::username) . '@' . CONFIG_PUBLIC_DOMAIN;
+        $template->parse(
+            'output',
+            'page',
+            true
+        );
+        $body    = $template->get_var('output');
+        $toEmail = 'srspecialattention@' . CONFIG_PUBLIC_DOMAIN . ",$managerEmail";
+        $hdrs    = array(
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => 'Special Attention Activity ' . $dbeJCallActivity->getValue(
+                    DBEJCallActivity::customerName
+                ) . ': ' . $dbeJCallActivity->getValue(DBEJCallActivity::activityType),
+            'Date'         => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
+        );
+        $buMail->mime->setHTMLBody($body);
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
+        );
+        $body        = $buMail->mime->get($mime_params);
+        $hdrs        = $buMail->mime->headers($hdrs);
+        $buMail->putInQueue(
+            $senderEmail,
+            $toEmail,
+            $hdrs,
+            $body
+        );
+    }
+
+    function sendCriticalEmail($callActivityID)
+    {
+        $buMail           = new BUMail($this);
+        $dbeJCallActivity = new DBEJCallActivity($this);
+        $dbeJCallActivity->getRow($callActivityID);
+        $senderEmail = CONFIG_SUPPORT_EMAIL;
+        $activityRef = $dbeJCallActivity->getValue(DBEJCallActivity::problemID) . ' ' . $dbeJCallActivity->getValue(
+                DBEJCallActivity::customerName
+            );
+        $template    = new Template(
+            EMAIL_TEMPLATE_DIR, "remove"
+        );
+        $template->set_file(
+            'page',
+            'CriticalEmail.inc.html'
+        );
+        $urlActivity              = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+            );
+        $durationHours            = common_convertHHMMToDecimal(
+                $dbeJCallActivity->getValue(DBEJCallActivity::endTime)
+            ) - common_convertHHMMToDecimal($dbeJCallActivity->getValue(DBEJCallActivity::startTime));
+        $awaitingCustomerResponse = null;
+        if ($dbeJCallActivity->getValue(DBEJCallActivity::requestAwaitingCustomerResponseFlag) == 'Y') {
+            $awaitingCustomerResponse = 'Awaiting Customer';
+        } else {
+            $awaitingCustomerResponse = 'Awaiting CNC';
+        }
+        $template->setVar(
+            array(
+                'activityRef'                 => $activityRef,
+                'urlActivity'                 => $urlActivity,
+                'userName'                    => $dbeJCallActivity->getValue(DBEJCallActivity::userName),
+                'durationHours'               => round(
+                    $durationHours,
+                    2
+                ),
+                'requestStatus'               => $this->problemStatusArray[$dbeJCallActivity->getValue(
+                    DBEJCallActivity::problemStatus
+                )],
+                'awaitingCustomerResponse'    => $awaitingCustomerResponse,
+                'customerName'                => $dbeJCallActivity->getValue(DBEJCallActivity::customerName),
+                'reason'                      => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
+                'CONFIG_SERVICE_REQUEST_DESC' => CONFIG_SERVICE_REQUEST_DESC
+            )
+        );
+        $template->parse(
+            'output',
+            'page',
+            true
+        );
+        $body    = $template->get_var('output');
+        $toEmail = 'criticalactivity@' . CONFIG_PUBLIC_DOMAIN;
+        $hdrs    = array(
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => 'Critical SR Activity For ' . $dbeJCallActivity->getValue(
+                    DBEJCallActivity::customerName
+                ) . ': ' . $dbeJCallActivity->getValue(DBEJCallActivity::activityType),
+            'Date'         => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
+        );
+        $buMail->mime->setHTMLBody($body);
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
+        );
+        $body        = $buMail->mime->get($mime_params);
+        $hdrs        = $buMail->mime->headers($hdrs);
+        $buMail->putInQueue(
+            $senderEmail,
+            $toEmail,
+            $hdrs,
+            $body
+        );
+    }
+
+
+    /*
+  Update total hours worked by activity user today
+  */
+    /**
+     * Sends email to sales when future on-site activity logged
+     *
+     * @param $callActivityID
+     */
+    function sendFutureVisitEmail($callActivityID)
+    {
+        $buMail           = new BUMail($this);
+        $dbeJCallActivity = new DBEJCallActivity($this);
+        $dbeJCallActivity->getRow($callActivityID);
+        $senderEmail = CONFIG_SUPPORT_EMAIL;
+        $toEmail     = CONFIG_SALES_EMAIL;
+        $activityRef = $dbeJCallActivity->getValue(DBEJCallActivity::problemID) . ' ' . $dbeJCallActivity->getValue(
+                DBEJCallActivity::customerName
+            );
+        $template    = new Template(
+            EMAIL_TEMPLATE_DIR, "remove"
+        );
+        $template->set_file(
+            'page',
+            'FutureVisitEmail.inc.html'
+        );
+        $urlActivity = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+            );
+        $template->setVar(
+            array(
+                'activityRef'                 => $activityRef,
+                'urlActivity'                 => $urlActivity,
+                'userName'                    => $dbeJCallActivity->getValue(DBEJCallActivity::userName),
+                'requestStatus'               => $this->problemStatusArray[$dbeJCallActivity->getValue(
+                    DBEJCallActivity::problemStatus
+                )],
+                'customerName'                => $dbeJCallActivity->getValue(DBEJCallActivity::customerName),
+                'reason'                      => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
+                'CONFIG_SERVICE_REQUEST_DESC' => CONFIG_SERVICE_REQUEST_DESC
+            )
+        );
+        $template->parse(
+            'output',
+            'page',
+            true
+        );
+        $body = $template->get_var('output');
+        $hdrs = array(
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => 'Future Visit To ' . $dbeJCallActivity->getValue(
+                    DBEJCallActivity::customerName
+                ) . ' Logged : ' . $dbeJCallActivity->getValue(DBEJCallActivity::activityType),
+            'Date'         => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
+        );
+        $buMail->mime->setHTMLBody($body);
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
+        );
+        $body        = $buMail->mime->get($mime_params);
+        $hdrs        = $buMail->mime->headers($hdrs);
+        $buMail->putInQueue(
+            $senderEmail,
+            $toEmail,
+            $hdrs,
+            $body
+        );
+    }
 
     function updateTotalUserLoggedHours($userID,
                                         $date
@@ -2650,10 +2110,11 @@ class BUActivity extends Business
     {
 
         $startTime = '07:00';
-        $endTime = '18:30';
-        $sql =
-            "UPDATE 
-              user_time_log 
+        $endTime   = '18:30';
+        $sql       = "UPDATE 
+              user_time_log left join userHalfHolidays on userHalfHolidays.date = loggedDate and userHalfHolidays.userId = user_time_log.userID
+              join consultant on cns_consno = user_time_log.userID
+              join headert 
             SET
               loggedHours = 
               (SELECT 
@@ -2686,7 +2147,7 @@ class BUActivity extends Business
                 JOIN callacttype
                   ON cat_callacttypeno = caa_callacttypeno
                 join problem on callactivity.caa_problemno = problem.pro_problemno
-              WHERE caa_consno = userID 
+              WHERE caa_consno = user_time_log.userID 
                 AND caa_date = loggedDate 
                 AND callacttype.travelFlag <> 'Y' 
                 AND caa_starttime < '$endTime' 
@@ -2717,27 +2178,90 @@ class BUActivity extends Business
                     0
                   ),
                   2
-                ) 
+                )
               FROM
                 callactivity 
                 JOIN callacttype
                   ON cat_callacttypeno = caa_callacttypeno
                 join problem on callactivity.caa_problemno = problem.pro_problemno
-              WHERE caa_consno = userID 
+              WHERE caa_consno = user_time_log.userID 
                 AND caa_date = loggedDate 
                 AND callacttype.travelFlag <> 'Y' 
                 AND caa_starttime < '$endTime' 
                 AND caa_endtime > '$startTime'
                 and problem.pro_custno = 282
                   ),
-                holiday = 0
-            WHERE userID = $userID 
+                holiday = 0,
+                holidayHours = if(userHalfHolidays.userId is null or teamLevel > 5 , 0,               
+                      standardDayHours  * (
+                      case teamLevel 
+                      when 1 then hed_hd_team_target_log_percentage
+                      when 2 then hed_es_team_target_log_percentage
+                      when 3 then hed_im_team_target_log_percentage
+                      when 5 then projectTeamTargetLogPercentage
+                      end
+                    
+                      ) * 0.5 /100        
+                )
+            WHERE user_time_log.userID = $userID 
               AND loggedDate = '$date' ";
         if (!$this->db->query($sql)) {
             return false;
         }
-
         return $this->db->affected_rows;
+    }
+
+    function updateCallActivityPriority($callActivityID, $priority, $reason)
+    {
+        $dbeCallActivity = new DBECallActivity($this);
+        $dbeCallActivity->getRow($callActivityID);
+        $problem   = new DBEProblem($this);
+        $problemID = $dbeCallActivity->getValue(DBECallActivity::problemID);
+        $problem->getRow($problemID);
+        $oldPriority = $problem->getValue(DBEJProblem::priority);
+        if ($oldPriority != $priority) {
+            $slaResponseHours = $this->getSlaResponseHours(
+                $priority,
+                $problem->getValue(DBEJProblem::customerID),
+                $dbeCallActivity->getValue(DBECallActivity::contactID)
+            );
+            $problem->setValue(
+                DBEJProblem::slaResponseHours,
+                $slaResponseHours
+            );
+            $problem->setValue(DBEProblem::priority, $priority);
+            $problem->updateRow();
+            $this->sendPriorityChangedEmail($oldPriority, $priority, $slaResponseHours, $callActivityID);
+            $this->logOperationalActivity(
+                $problemID,
+                'Priority Changed from ' . $oldPriority . ' to ' . $problem->getValue(DBEJProblem::priority) . $reason
+            );
+            return true;
+        }
+        return false;
+    }
+
+    private function sendPriorityChangedEmail($oldPriority, $newPriority, $sla, ?int $activityId)
+    {
+        $dbejCallactivity = new DBEJCallActivity($this);
+        $dbejCallactivity->getRow($activityId);
+        $serviceRequestId = $dbejCallactivity->getValue(DBEJCallActivity::problemID);
+        $buActivity       = new BUActivity($this);
+        $lastActivity     = $buActivity->getLastActivityInProblem($serviceRequestId);
+        $status           = $this->getServiceRequestStatusText($dbejCallactivity);
+        $data             = new \CNCLTD\TwigDTOs\PriorityChangedDTO(
+            $serviceRequestId,
+            $lastActivity->getValue(DBEJCallActivity::reason),
+            $dbejCallactivity->getValue(DBEJCallActivity::contactFirstName),
+            $oldPriority,
+            $newPriority,
+            $sla,
+            $status
+        );
+        $othersFlag       = DBEContact::othersWorkUpdatesEmailFlag;
+        $subject          = "Service Request {$serviceRequestId} - {$dbejCallactivity->getValue(DBEJCallActivity::emailSubjectSummary)} - Updated";
+        $template         = '@customerFacing/ServicePriorityChanged/ServicePriorityChanged.html.twig';
+        $this->sendCustomerEmail($template, $data, $dbejCallactivity, $othersFlag, $subject);
     }
 
     function computeDiff($from,
@@ -2745,22 +2269,20 @@ class BUActivity extends Business
     )
     {
         $diffValues = array();
-        $diffMask = array();
-
-        $dm = array();
-        $n1 = count($from);
-        $n2 = count($to);
-
+        $diffMask   = array();
+        $dm         = array();
+        $n1         = count($from);
+        $n2         = count($to);
         for ($j = -1; $j < $n2; $j++) $dm[-1][$j] = 0;
         for ($i = -1; $i < $n1; $i++) $dm[$i][-1] = 0;
         for ($i = 0; $i < $n1; $i++) {
             for ($j = 0; $j < $n2; $j++) {
                 if ($from[$i] == $to[$j]) {
-                    $ad = $dm[$i - 1][$j - 1];
+                    $ad         = $dm[$i - 1][$j - 1];
                     $dm[$i][$j] = $ad + 1;
                 } else {
-                    $a1 = $dm[$i - 1][$j];
-                    $a2 = $dm[$i][$j - 1];
+                    $a1         = $dm[$i - 1][$j];
+                    $a2         = $dm[$i][$j - 1];
                     $dm[$i][$j] = max(
                         $a1,
                         $a2
@@ -2768,14 +2290,13 @@ class BUActivity extends Business
                 }
             }
         }
-
         $i = $n1 - 1;
         $j = $n2 - 1;
         while (($i > -1) || ($j > -1)) {
             if ($j > -1) {
                 if ($dm[$i][$j - 1] == $dm[$i][$j]) {
                     $diffValues[] = $to[$j];
-                    $diffMask[] = 1;
+                    $diffMask[]   = 1;
                     $j--;
                     continue;
                 }
@@ -2783,41 +2304,36 @@ class BUActivity extends Business
             if ($i > -1) {
                 if ($dm[$i - 1][$j] == $dm[$i][$j]) {
                     $diffValues[] = $from[$i];
-                    $diffMask[] = -1;
+                    $diffMask[]   = -1;
                     $i--;
                     continue;
                 }
             }
             {
                 $diffValues[] = $from[$i];
-                $diffMask[] = 0;
+                $diffMask[]   = 0;
                 $i--;
                 $j--;
             }
         }
-
         $diffValues = array_reverse($diffValues);
-        $diffMask = array_reverse($diffMask);
-
+        $diffMask   = array_reverse($diffMask);
         return array('values' => $diffValues, 'mask' => $diffMask);
     }
-
-
-    /*
-  Update total hours worked by activity user today
-  */
 
     /**
      * @param $callActivityID
      * @param $userID
      * @param $response
      * @param $comments
+     * @param bool $notifySales
      * @throws Exception
      */
     public function salesRequestProcess($callActivityID,
                                         $userID,
                                         $response,
-                                        $comments
+                                        $comments,
+                                        $notifySales = true
     )
     {
         $dsCallActivity = new DataSet($this);
@@ -2825,44 +2341,32 @@ class BUActivity extends Business
             $callActivityID,
             $dsCallActivity
         );
-
-
         $requestingUserID = $dsCallActivity->getValue(DBEJCallActivity::userID);
-
         $this->dbeUser->getRow($userID);
-
-
         $userName = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(DBEUser::lastName);
         $approval = false;
-        $problem = new DBEProblem($this);
+        $problem  = new DBEProblem($this);
         $problem->getRow($dsCallActivity->getValue(DBECallActivity::problemID));
         $subject = null;
-        $reason = null;
+        $reason  = null;
         switch ($response) {
 
             case 'A':
-                $reason = '<p>The following sales request has been approved by ' . $userName . '</p>';
-
-                $subject = 'Sales Request approved';
+                $reason   = '<p>The following sales request has been approved by ' . $userName . '</p>';
+                $subject  = 'Sales Request approved';
                 $approval = true;
-
                 break;
-
             case 'D':
-                $reason = '<p>The following sales request has been denied by ' . $userName . '</p>';
-
+                $reason  = '<p>The following sales request has been denied by ' . $userName . '</p>';
                 $subject = 'Sales Request denied';
-
                 $problem->setValue(
                     DBEProblem::userID,
                     $requestingUserID
                 );
-
                 break;
             default:
                 throw new Exception('Invalid response value');
         }
-
         $problem->setValue(
             DBEProblem::alarmDate,
             null
@@ -2871,24 +2375,27 @@ class BUActivity extends Business
             DBEProblem::alarmTime,
             null
         );
-
         $problem->updateRow();
+        $dbeJCallDocument = new DBECallDocumentWithoutFile($this);
+        $dbeJCallDocument->setValue(
+            DBECallDocumentWithoutFile::callActivityID,
+            $callActivityID
+        );
+        $dbeJCallDocument->getRowsByColumn(DBECallDocumentWithoutFile::callActivityID);
+        $hasAttachments = $dbeJCallDocument->rowCount();
         /*
     Append any comments
     */
-        $subject .= ' for ' . $dsCallActivity->getValue(DBEJCallActivity::customerName) . ' by ' . $userName .
-            ' for SR ' . $dsCallActivity->getValue(DBEJCallActivity::problemID);
-
+        $subject .= ' for ' . $dsCallActivity->getValue(
+                DBEJCallActivity::customerName
+            ) . ' by ' . $userName . ' for SR ' . $dsCallActivity->getValue(DBEJCallActivity::problemID);
         if ($comments) {
             $reason .= '<div style="color: red"><p>Comments:</p>' . $comments . '</div>';
         }
-
         /*
     and the original request
     */
-        $reason .= '<p></p>' . $dsCallActivity->getValue(DBEJCallActivity::reason);
-
-
+        $reason          .= '<p></p>' . $dsCallActivity->getValue(DBEJCallActivity::reason);
         $newCallActivity = $this->createSalesRequestActivity(
             $dsCallActivity->getValue(DBEJCallActivity::problemID),
             $reason,
@@ -2896,45 +2403,37 @@ class BUActivity extends Business
             false,
             $dsCallActivity->getValue(DBECallActivity::requestType)
         );
-
-
         $this->sendSalesRequestReplyEmail(
             $newCallActivity,
             $subject,
             $requestingUserID,
-            $approval
+            $approval,
+            $hasAttachments,
+            $notifySales
         );
-
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($callActivityID);
         $dbeCallActivity->setValue(
             DBECallActivity::salesRequestStatus,
             'C'
         );
-
         $dbeCallActivity->updateRow();
-
         if ($dsCallActivity->getValue(DBECallActivity::isSalesRequestSR)) {
             $dbeCustomer = new DBECustomer($this);
             $dbeCustomer->getRow($problem->getValue(DBEProblem::customerID));
-            $initialActivity = $this->getFirstActivityInProblem($problem->getValue(DBEProblem::problemID));
-            $dbeUser = new DBEUser($this);
+            $initialActivity = $this->getFirstActivityInServiceRequest($problem->getValue(DBEProblem::problemID));
+            $dbeUser         = new DBEUser($this);
             $dbeUser->getRow($initialActivity->getValue(DBECallActivity::userID));
             $resolutionSummary = "The sales request for " . $dbeCustomer->getValue(
                     DBECustomer::name
-                ) .
-                " submitted by " .
-                $dbeUser->getValue(DBEUser::firstName) .
-                " " .
-                $dbeUser->getValue(DBEUser::lastName) .
-                " was " .
-                ($approval ? "approved" : "denied") .
-                " by " . $userName;
+                ) . " submitted by " . $dbeUser->getValue(DBEUser::firstName) . " " . $dbeUser->getValue(
+                    DBEUser::lastName
+                ) . " was " . ($approval ? "approved" : "denied") . " by " . $userName;
             $this->createFixedActivity($dbeCallActivity->getValue(DBECallActivity::problemID), $resolutionSummary);
             $problem->setValue(DBEProblem::status, 'F');
-            $completeDate = (new DateTime())->add(new DateInterval('P2D'));
+            $completeDate   = (new DateTime())->add(new DateInterval('P2D'));
             $buCustomerItem = new BUCustomerItem($this);
-            $dsResults = new DataSet($this);
+            $dsResults      = new DataSet($this);
             $buCustomerItem->getContractsByCustomerID($problem->getValue(DBEProblem::customerID), $dsResults, 17839);
             if ($dsResults->rowCount()) {
                 $dsResults->fetchNext();
@@ -2943,7 +2442,6 @@ class BUActivity extends Business
                     $dsResults->getValue(DBECustomerItem::customerItemID)
                 );
             }
-
             $problem->setValue(DBEProblem::completeDate, $completeDate->format(DATE_MYSQL_DATE));
             $problem->updateRow();
         }
@@ -2965,7 +2463,7 @@ class BUActivity extends Business
                                                $standardTextId = null
     )
     {
-        $lastActivity = $this->getLastActivityInProblem($problemID);
+        $lastActivity    = $this->getLastActivityInProblem($problemID);
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($lastActivity->getValue(DBEJCallActivity::callActivityID));
         $dbeCallActivity->setPKValue(null);
@@ -3012,12 +2510,9 @@ class BUActivity extends Business
             DBEJCallActivity::salesRequestStatus,
             $status
         );
-
         $dbeCallActivity->insertRow();
-
         $DBEJCallActivity = new DBEJCallActivity($this);
         $DBEJCallActivity->getRow($dbeCallActivity->getPKValue());
-
         return $DBEJCallActivity;
     }
 
@@ -3026,37 +2521,38 @@ class BUActivity extends Business
      * @param string $subject
      * @param string|int $requestingUserID
      * @param bool $approval
+     * @param bool $hasAttachments
+     * @param bool $notifySales
      */
     private function sendSalesRequestReplyEmail($dbeCallActivity,
                                                 $subject,
                                                 $requestingUserID,
-                                                $approval = false
+                                                $approval = false,
+                                                $hasAttachments = false,
+                                                $notifySales = true
     )
     {
-        $buMail = new BUMail($this);
+        $buMail    = new BUMail($this);
         $problemID = $dbeCallActivity->getValue(DBEJCallActivity::problemID);
         $this->dbeUser->getRow($dbeCallActivity->getValue(DBEJCallActivity::userID));
-        $dsInitial = $this->getFirstActivityInProblem($problemID);
+        $dsInitial   = $this->getFirstActivityInServiceRequest($problemID);
         $senderEmail = CONFIG_SUPPORT_EMAIL;
-
-        $template = new Template(
-            EMAIL_TEMPLATE_DIR,
-            "remove"
+        $template    = new Template(
+            EMAIL_TEMPLATE_DIR, "remove"
         );
-
         $template->set_file(
             'page',
             'SalesRequestReplyEmail.inc.html'
         );
-
-        $userName = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(DBEUser::lastName);
-        $urlFirstActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dsInitial->getValue(
+        $userName         = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(
+                DBEUser::lastName
+            );
+        $urlFirstActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/SRActivity.php?action=displayActivity&callActivityID=' . $dsInitial->getValue(
                 DBEJCallActivity::callActivityID
             );
-        $urlLastActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeCallActivity->getValue(
+        $urlLastActivity  = 'http://' . $_SERVER ['HTTP_HOST'] . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             );
-
         $template->setVar(
             array(
                 'problemID'        => $problemID,
@@ -3064,34 +2560,29 @@ class BUActivity extends Business
                 'subject'          => $subject,
                 'urlLastActivity'  => $urlLastActivity,
                 'requestReason'    => $dbeCallActivity->getValue(DBEJCallActivity::reason),
-                'urlFirstActivity' => $urlFirstActivity
+                'urlFirstActivity' => $urlFirstActivity,
+                'attachmentsLine'  => $hasAttachments ? "<p style='color: red'>This request has attachments associated with it, please make sure you review them.</p>" : null
             )
         );
-
         $template->parse(
             'output',
             'page',
             true
         );
-
         $body = $template->get_var('output');
         /*
     Send reply to allocated user
     */
         $this->dbeUser->getRow($requestingUserID);
-
         $dbeStandardText = new DBEStandardText($this);
         $dbeStandardText->getRow($dbeCallActivity->getValue(DBECallActivity::requestType));
         $toEmail = $dbeStandardText->getValue(DBEStandardText::salesRequestEmail);
-
         $toEmail .= ',' . $this->dbeUser->getValue(
                 DBEUser::username
             ) . '@' . CONFIG_PUBLIC_DOMAIN;
-
-        if ($approval) {
+        if ($approval && $notifySales) {
             $toEmail .= ',sales@' . CONFIG_PUBLIC_DOMAIN;
         }
-
         $hdrs = array(
             'From'         => $senderEmail,
             'To'           => $toEmail,
@@ -3099,21 +2590,15 @@ class BUActivity extends Business
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
-
         $buMail->mime->setHTMLBody($body);
-
         $mime_params = array(
             'text_encoding' => '7bit',
             'text_charset'  => 'UTF-8',
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
-
+        $body        = $buMail->mime->get($mime_params);
+        $hdrs        = $buMail->mime->headers($hdrs);
         $buMail->putInQueue(
             $senderEmail,
             $toEmail,
@@ -3122,6 +2607,10 @@ class BUActivity extends Business
         );
     }
 
+    /*
+  Check to se whether this site record requires travel hours added to the site record.
+  i.e. is this a chargeable activity and does this site have zero travel hours.
+  */
     /**
      * @param $problemID
      * @param $resolutionSummary
@@ -3136,12 +2625,12 @@ class BUActivity extends Business
         /*
     Start with duplicate of last activity
     */
-
         $dbeLastActivity = $this->getLastActivityInProblem($problemID);
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($dbeLastActivity->getValue(DBEJCallActivity::callActivityID));
-
         $dbeCallActivity->setPKValue(null);
+        $dbeCallActivity->setValue(DBECallActivity::cncNextAction, null);
+        $dbeCallActivity->setValue(DBECallActivity::customerSummary, $resolutionSummary);
         $dbeCallActivity->setValue(
             DBEJCallActivity::date,
             date(DATE_MYSQL_DATE)
@@ -3155,13 +2644,9 @@ class BUActivity extends Business
         if ($dbeProblem->getValue(DBEProblem::hideFromCustomerFlag) == 'N') {
             $dbeCallActivity->setValue(DBECallActivity::hideFromCustomerFlag, 'N');
         }
-
-
         $endTime = $dbeCallActivity->getValue(DBEJCallActivity::startTime);
-
         if (!$zeroTime) {
             $endTime = $this->getEndtime(CONFIG_FIXED_ACTIVITY_TYPE_ID);
-
             $dbeProblem->setValue(
                 DBEProblem::esLimitMinutes,
                 $dbeProblem->getValue(DBEProblem::esLimitMinutes) + 3
@@ -3176,32 +2661,26 @@ class BUActivity extends Business
             );
             $dbeProblem->updateRow();
         }
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::endTime,
             $endTime
         );
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::userID,
             $this->loggedInUserID
         );
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::callActTypeID,
             CONFIG_FIXED_ACTIVITY_TYPE_ID
         );
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::siteNo,
             $dbeLastActivity->getValue(DBEJCallActivity::siteNo)
         );
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::reason,
             $resolutionSummary
         );
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::serverGuard,
             'N'
@@ -3224,17 +2703,14 @@ class BUActivity extends Business
         if (!$startTime) {
             $startTime = null; // use time now
         }
-
         switch ($callActTypeID) {
 
             case CONFIG_INITIAL_ACTIVITY_TYPE_ID:
                 $minutesToAdd = 5;
                 break;
-
             case CONFIG_FIXED_ACTIVITY_TYPE_ID:
                 $minutesToAdd = 3;
                 break;
-
             case CONFIG_CHANGE_REQUEST_ACTIVITY_TYPE_ID:
                 $minutesToAdd = 4;
                 break;
@@ -3260,17 +2736,13 @@ class BUActivity extends Business
             $callActivityID,
             $dsCallActivity
         );
-
         $requestingUserID = $dsCallActivity->getValue(DBEJCallActivity::userID);
-        $requestingUser = new DBEUser($this);
+        $requestingUser   = new DBEUser($this);
         $requestingUser->getRow($requestingUserID);
-
-
         $reviewingUser = new DBEUser($this);
         $reviewingUser->getRow($userID);
-        $BUUser = new BUUser($this);
+        $BUUser    = new BUUser($this);
         $teamLevel = $BUUser->getLevelByUserID($requestingUserID);
-
         switch ($response) {
             case 'A':
                 $this->allocateAdditionalTime(
@@ -3280,7 +2752,6 @@ class BUActivity extends Business
                     $comments,
                     $reviewingUser
                 );
-
                 $this->logOperationalActivity(
                     $dsCallActivity->getValue(DBECallActivity::problemID),
                     "<p>Additional time allocated to {$this->getTeamName($teamLevel)} Team: {$minutes} minutes</p><p>{$comments}</p>"
@@ -3301,7 +2772,6 @@ class BUActivity extends Business
             case 'DEL':
                 break;
         }
-
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($dsCallActivity->getValue(DBEJCallActivity::callActivityID));
         $dbeCallActivity->setUpdateModeUpdate();
@@ -3309,7 +2779,6 @@ class BUActivity extends Business
             DBEJCallActivity::status,
             'C'
         );
-
         $dbeCallActivity->post();
     }
 
@@ -3333,7 +2802,6 @@ class BUActivity extends Business
     {
         $this->dbeProblem = new DBEProblem($this);
         $this->dbeProblem->getRow($problemID);
-
         if ($teamLevel == 1) {
             $this->dbeProblem->setValue(
                 DBEProblem::hdLimitMinutes,
@@ -3371,9 +2839,7 @@ class BUActivity extends Business
                 'N'
             );
         }
-
         $this->dbeProblem->updateRow();
-
         $this->sendTimeAllocatedEmail(
             $minutes,
             $comments,
@@ -3386,42 +2852,30 @@ class BUActivity extends Business
                                             string $managerName
     )
     {
-        $buMail = new BUMail($this);
-
-        $problemID = $this->dbeProblem->getValue(DBEJProblem::problemID);
-        $dbeUser = new DBEUser($this);
-
+        $buMail       = new BUMail($this);
+        $problemID    = $this->dbeProblem->getValue(DBEJProblem::problemID);
+        $dbeUser      = new DBEUser($this);
         $assignedUser = $this->dbeProblem->getValue(DBEProblem::userID);
-
         if (!$assignedUser) {
             return;
         }
-
         $dbeUser->getRow($assignedUser);
-
         $senderEmail = CONFIG_SUPPORT_EMAIL;
 //        $senderName = 'CNC Support Department';
-
-        $dbeJCallActivity = $this->getFirstActivityInProblem($problemID);
+        $dbeJCallActivity     = $this->getFirstActivityInServiceRequest($problemID);
         $dbeJLastCallActivity = $this->getLastActivityInProblem($problemID);
-
-        $toEmail = $dbeUser->getValue(DBEUser::username) . '@' . CONFIG_PUBLIC_DOMAIN;
-
-        $template = new Template(
-            EMAIL_TEMPLATE_DIR,
-            "remove"
+        $toEmail              = $dbeUser->getValue(DBEUser::username) . '@' . CONFIG_PUBLIC_DOMAIN;
+        $template             = new Template(
+            EMAIL_TEMPLATE_DIR, "remove"
         );
         $template->set_file(
             'page',
             'ServiceTimeAllocatedEmail.inc.html'
         );
-
-        $urlDisplayActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJLastCallActivity->getValue(
+        $urlDisplayActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJLastCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             );
-
-        $userName = $dbeUser->getValue(DBEUser::firstName) . ' ' . $dbeUser->getValue(DBEUser::lastName);
-
+        $userName           = $dbeUser->getValue(DBEUser::firstName) . ' ' . $dbeUser->getValue(DBEUser::lastName);
         $template->setVar(
             array(
                 'problemID'          => $problemID,
@@ -3438,41 +2892,31 @@ class BUActivity extends Business
                 'managerName'        => $managerName
             )
         );
-
         $template->parse(
             'output',
             'page',
             true
         );
-
-        $body = $template->get_var('output');
-
-
+        $body    = $template->get_var('output');
         $subject = 'Additional ' . $minutes . ' minutes Allocated to SR ' . $problemID . ' ' . $dbeJLastCallActivity->getValue(
                 DBEJCallActivity::customerName
             );
-
-        $hdrs = array(
+        $hdrs    = array(
             'From'         => $senderEmail,
             'To'           => $toEmail,
             'Subject'      => $subject,
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
-
         $buMail->mime->setHTMLBody($body);
-
         $mime_params = array(
             'text_encoding' => '7bit',
             'text_charset'  => 'UTF-8',
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
+        $body        = $buMail->mime->get($mime_params);
+        $hdrs        = $buMail->mime->headers($hdrs);
         $buMail->putInQueue(
             $senderEmail,
             $toEmail,
@@ -3480,11 +2924,6 @@ class BUActivity extends Business
             $body
         );
     }
-
-    /*
-  Check to se whether this site record requires travel hours added to the site record.
-  i.e. is this a chargeable activity and does this site have zero travel hours.
-  */
 
     public function getTeamName($teamLevel)
     {
@@ -3512,31 +2951,26 @@ class BUActivity extends Business
                                                 $reviewingUser
     )
     {
-        $buMail = new BUMail($this);
-
-        $problemID = $dbeCallActivity->getValue(DBEJCallActivity::problemID);
-        $dsInitial = $this->getFirstActivityInProblem($problemID);
+        $buMail      = new BUMail($this);
+        $problemID   = $dbeCallActivity->getValue(DBEJCallActivity::problemID);
+        $dsInitial   = $this->getFirstActivityInServiceRequest($problemID);
         $senderEmail = CONFIG_SUPPORT_EMAIL;
-
-        $template = new Template(
-            EMAIL_TEMPLATE_DIR,
-            "remove"
+        $template    = new Template(
+            EMAIL_TEMPLATE_DIR, "remove"
         );
-
         $template->set_file(
             'page',
             'TimeRequestDeniedEmail.inc.html'
         );
-
-        $userName = $requestingUser->getValue(DBEUser::firstName) . ' ' . $requestingUser->getValue(DBEUser::lastName);
-        $urlFirstActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dsInitial->getValue(
+        $userName         = $requestingUser->getValue(DBEUser::firstName) . ' ' . $requestingUser->getValue(
+                DBEUser::lastName
+            );
+        $urlFirstActivity = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dsInitial->getValue(
                 DBEJCallActivity::callActivityID
             );
-
-        $urlLastActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeCallActivity->getValue(
+        $urlLastActivity  = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             );
-
         $template->setVar(
             array(
                 'problemID'         => $problemID,
@@ -3547,39 +2981,29 @@ class BUActivity extends Business
                 'reviewingUserName' => $reviewingUser->getValue(DBEUser::name)
             )
         );
-
         $template->parse(
             'output',
             'page',
             true
         );
-
-        $body = $template->get_var('output');
-
+        $body    = $template->get_var('output');
         $toEmail = $requestingUser->getValue(DBEUser::username) . '@' . CONFIG_PUBLIC_DOMAIN;
-
-        $hdrs = array(
+        $hdrs    = array(
             'From'         => $senderEmail,
             'To'           => $toEmail,
             'Subject'      => "Time Request Denied - SR " . $problemID,
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
-
         $buMail->mime->setHTMLBody($body);
-
         $mime_params = array(
             'text_encoding' => '7bit',
             'text_charset'  => 'UTF-8',
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
-
+        $body        = $buMail->mime->get($mime_params);
+        $hdrs        = $buMail->mime->headers($hdrs);
         $buMail->putInQueue(
             $senderEmail,
             $toEmail,
@@ -3606,33 +3030,31 @@ class BUActivity extends Business
             $callActivityID,
             $dsCallActivity
         );
-        $requestingUserID = $dsCallActivity->getValue(DBEJCallActivity::userID);
+        $requestingUserID  = $dsCallActivity->getValue(DBEJCallActivity::userID);
         $changeRequestType = $dsCallActivity->getValue(DBEJCallActivity::requestType);
         $this->dbeUser->getRow($userID);
-
         $userName = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(DBEUser::lastName);
-        $subject = null;
+        $subject  = null;
         switch ($response) {
 
             case 'A':
-                $reason = '<p>The following change request has been approved by ' . $userName . '</p>';
+                $reason  = '<p>The following change request has been approved by ' . $userName . '</p>';
                 $subject = 'Change Request approved';
-                $status = 'C';
+                $status  = 'C';
                 break;
             case 'D':
-                $reason = '<p>The following change request has been denied by ' . $userName . '</p>';
+                $reason  = '<p>The following change request has been denied by ' . $userName . '</p>';
                 $subject = 'Change Request denied';
-                $status = 'C';
+                $status  = 'C';
                 break;
             case 'I':
-                $reason = '<p>Further details/discussion requested by ' . $userName . '</p>';
+                $reason  = '<p>Further details/discussion requested by ' . $userName . '</p>';
                 $subject = 'More information/discussion required for change request';
-                $status = 'O';
+                $status  = 'O';
                 break;
             default:
                 throw new Exception('Invalid response');
         }
-
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($dsCallActivity->getValue(DBEJCallActivity::callActivityID));
         $dbeCallActivity->setUpdateModeUpdate();
@@ -3640,14 +3062,13 @@ class BUActivity extends Business
             DBEJCallActivity::status,
             $status
         );
-
         $dbeCallActivity->post();
         /*
     Append any comments
     */
-        $subject .= ' for ' . $dsCallActivity->getValue(DBEJCallActivity::customerName) . ' by ' . $userName .
-            ' for SR ' . $dsCallActivity->getValue(DBEJCallActivity::problemID);
-
+        $subject .= ' for ' . $dsCallActivity->getValue(
+                DBEJCallActivity::customerName
+            ) . ' by ' . $userName . ' for SR ' . $dsCallActivity->getValue(DBEJCallActivity::problemID);
         if ($comments) {
             $reason .= '<div style="color: red"><p>Comments:</p>' . $comments . '</div>';
         }
@@ -3655,16 +3076,13 @@ class BUActivity extends Business
     and the original request
     */
         $reason .= '<p></p>' . $dsCallActivity->getValue(DBEJCallActivity::reason);
-
         $this->resetProblemAlarm($dsCallActivity->getValue(DBEJCallActivity::problemID));
-
         $newCallActivity = $this->createChangeRequestActivity(
             $dsCallActivity->getValue(DBEJCallActivity::problemID),
             $reason,
             'C',
             $changeRequestType
         );
-
         $this->sendChangeRequestReplyEmail(
             $newCallActivity,
             $subject,
@@ -3695,26 +3113,22 @@ class BUActivity extends Business
      * @return DataAccess|DBECallActivity
      * @throws Exception
      */
-    function createChangeRequestActivity(
-        $problemID,
-        $message,
-        $status = "C",
-        $standardTextId = null
+    function createChangeRequestActivity($problemID,
+                                         $message,
+                                         $status = "C",
+                                         $standardTextId = null
     )
     {
 
-        $lastActivity = $this->getLastActivityInProblem($problemID);
+        $lastActivity   = $this->getLastActivityInProblem($problemID);
         $dbeNewActivity = new DBECallActivity($this);
         $dbeNewActivity->getRow($lastActivity->getValue(DBEJCallActivity::callActivityID));
         $dbeNewActivity->setPKValue(null);
-
         $dbeNewActivity->setValue(
             DBEJCallActivity::date,
             date('Y-m-d')
         );         // today
-
         $startTime = date('H:i');
-
         $dbeNewActivity->setValue(
             DBEJCallActivity::startTime,
             $startTime
@@ -3743,7 +3157,6 @@ class BUActivity extends Business
         $dbeNewActivity->insertRow();
         $DBEJCallActivity = new DBEJCallActivity($this);
         $DBEJCallActivity->getRow($dbeNewActivity->getPKValue());
-
         return $DBEJCallActivity;
     }
 
@@ -3757,36 +3170,30 @@ class BUActivity extends Business
                                                  $requestingUserID
     )
     {
-        $buMail = new BUMail($this);
-
+        $buMail    = new BUMail($this);
         $problemID = $dbeCallActivity->getValue(DBEJCallActivity::problemID);
-        $dsInitial = $this->getFirstActivityInProblem($problemID);
+        $dsInitial = $this->getFirstActivityInServiceRequest($problemID);
         $this->dbeUser->getRow($dbeCallActivity->getValue(DBEJCallActivity::userID));
-
         $senderEmail = CONFIG_SUPPORT_EMAIL;
-
-        $template = new Template(
-            EMAIL_TEMPLATE_DIR,
-            "remove"
+        $template    = new Template(
+            EMAIL_TEMPLATE_DIR, "remove"
         );
-
         $template->set_file(
             'page',
             'ChangeRequestReplyEmail.inc.html'
         );
-
-        $userName = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(DBEUser::lastName);
-
+        $userName                = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(
+                DBEUser::lastName
+            );
         $urlChangeControlRequest = SITE_URL . '/Activity.php?action=changeControlRequest&callActivityID=' . $dbeCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             );
-        $urlFirstActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dsInitial->getValue(
+        $urlFirstActivity        = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dsInitial->getValue(
                 DBEJCallActivity::callActivityID
             );
-        $urlLastActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeCallActivity->getValue(
+        $urlLastActivity         = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             );
-
         $template->setVar(
             array(
                 'problemID'               => $problemID,
@@ -3798,58 +3205,45 @@ class BUActivity extends Business
                 'urlFirstActivity'        => $urlFirstActivity
             )
         );
-
         $template->parse(
             'output',
             'page',
             true
         );
-
         $body = $template->get_var('output');
         /*
     Send reply to allocated user
     */
         $this->dbeUser->getRow($requestingUserID);
-
-        $toEmail = 'changerequestreply@' . CONFIG_PUBLIC_DOMAIN;
-
+        $toEmail      = 'changerequestreply@' . CONFIG_PUBLIC_DOMAIN;
         $emailsByTeam = [
-            1 => "changerequestshelpdesk@cnc-ltd.co.uk",
-            2 => "changerequestsEscalations@cnc-ltd.co.uk",
-            4 => "changerequestssmallprojects@cnc-ltd.co.uk",
-            5 => "changerequestsprojects@cnc-ltd.co.uk",
+            1 => "changerequestshelpdesk@" . CONFIG_PUBLIC_DOMAIN,
+            2 => "changerequestsEscalations@" . CONFIG_PUBLIC_DOMAIN,
+            4 => "changerequestssmallprojects@" . CONFIG_PUBLIC_DOMAIN,
+            5 => "changerequestsprojects@" . CONFIG_PUBLIC_DOMAIN,
         ];
-
         if (isset($emailsByTeam[$this->dbeUser->getValue(DBEUser::teamID)])) {
             $toEmail = $emailsByTeam[$this->dbeUser->getValue(DBEUser::teamID)];
         }
-
         $toEmail .= ',' . $this->dbeUser->getValue(
                 DBEUser::username
             ) . '@' . CONFIG_PUBLIC_DOMAIN;
-
-        $hdrs = array(
+        $hdrs    = array(
             'From'         => $senderEmail,
             'To'           => $toEmail,
             'Subject'      => $subject,
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
-
         $buMail->mime->setHTMLBody($body);
-
         $mime_params = array(
             'text_encoding' => '7bit',
             'text_charset'  => 'UTF-8',
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
-
+        $body        = $buMail->mime->get($mime_params);
+        $hdrs        = $buMail->mime->headers($hdrs);
         $buMail->putInQueue(
             $senderEmail,
             $toEmail,
@@ -3869,14 +3263,12 @@ class BUActivity extends Business
                                       $type
     )
     {
-        $buStandardText = new BUStandardText($this);
-
+        $buStandardText  = new BUStandardText($this);
         $dbeStandardText = new DataSet($this);
         $buStandardText->getStandardTextByID(
             $type,
             $dbeStandardText
         );
-
         // we have to create an open "sales activity"
         $salesRequestActivity = $this->createChangeRequestActivity(
             $problemID,
@@ -3884,49 +3276,40 @@ class BUActivity extends Business
             "O",
             $dbeStandardText->getValue(DBEStandardText::stt_standardtextno)
         );
-
         $this->sendChangeRequestEmail($salesRequestActivity);
     }
+
+//end completeSRs
 
     /**
      * @param DBECallActivity $dbeCallActivity
      */
     private function sendChangeRequestEmail($dbeCallActivity)
     {
-        $buMail = new BUMail($this);
-
-        $problemID = $dbeCallActivity->getValue(DBEJCallActivity::problemID);
-
-        $dsInitialCallActivity = $this->getFirstActivityInProblem($problemID);
-
-
+        $buMail                = new BUMail($this);
+        $problemID             = $dbeCallActivity->getValue(DBEJCallActivity::problemID);
+        $dsInitialCallActivity = $this->getFirstActivityInServiceRequest($problemID);
         $this->dbeUser->getRow($dbeCallActivity->getValue(DBEJCallActivity::userID));
-
         $senderEmail = CONFIG_SUPPORT_EMAIL;
-
-        $template = new Template(
-            EMAIL_TEMPLATE_DIR,
-            "remove"
+        $template    = new Template(
+            EMAIL_TEMPLATE_DIR, "remove"
         );
-
         $template->set_file(
             'page',
             'ChangeRequestEmail.inc.html'
         );
-
-        $userName = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(DBEUser::lastName);
-
+        $userName                = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(
+                DBEUser::lastName
+            );
         $urlChangeControlRequest = SITE_URL . '/Activity.php?action=changeRequestReview&callActivityID=' . $dbeCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             ) . '&fromEmail=true';
-
-        $urlFirstActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dsInitialCallActivity->getValue(
+        $urlFirstActivity        = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dsInitialCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             );
-        $urlLastActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeCallActivity->getValue(
+        $urlLastActivity         = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             );
-
         $template->setVar(
             array(
                 'problemID'               => $problemID,
@@ -3938,54 +3321,41 @@ class BUActivity extends Business
                 'urlFirstActivity'        => $urlFirstActivity,
             )
         );
-
         $template->parse(
             'output',
             'page',
             true
         );
-
-        $body = $template->get_var('output');
-        $toEmail = 'changerequest@' . CONFIG_PUBLIC_DOMAIN;
-
+        $body         = $template->get_var('output');
+        $toEmail      = 'changerequest@' . CONFIG_PUBLIC_DOMAIN;
         $emailsByTeam = [
-            1 => "changerequestshelpdesk@cnc-ltd.co.uk",
-            2 => "changerequestsEscalations@cnc-ltd.co.uk",
-            4 => "changerequestssmallprojects@cnc-ltd.co.uk",
-            5 => "changerequestsprojects@cnc-ltd.co.uk",
+            1 => "changerequestshelpdesk@" . CONFIG_PUBLIC_DOMAIN,
+            2 => "changerequestsEscalations@" . CONFIG_PUBLIC_DOMAIN,
+            4 => "changerequestssmallprojects@" . CONFIG_PUBLIC_DOMAIN,
+            5 => "changerequestsprojects@" . CONFIG_PUBLIC_DOMAIN,
         ];
-
         if (isset($emailsByTeam[$this->dbeUser->getValue(DBEUser::teamID)])) {
             $toEmail = $emailsByTeam[$this->dbeUser->getValue(DBEUser::teamID)];
         }
-
-
         $subject = 'Change Request for ' . $dsInitialCallActivity->getValue(
                 DBEJCallActivity::customerName
             ) . ' by ' . $userName . ' for SR' . $problemID;
-
-
-        $hdrs = array(
+        $hdrs    = array(
             'From'         => $senderEmail,
             'To'           => $toEmail,
             'Subject'      => $subject,
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
-
         $buMail->mime->setHTMLBody($body);
-
         $mime_params = array(
             'text_encoding' => '7bit',
             'text_charset'  => 'UTF-8',
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
+        $body        = $buMail->mime->get($mime_params);
+        $hdrs        = $buMail->mime->headers($hdrs);
         $buMail->putInQueue(
             $senderEmail,
             $toEmail,
@@ -3996,19 +3366,16 @@ class BUActivity extends Business
 
     function updateAllHistoricUserLoggedHours(DateTime $startDate = null)
     {
-        $sql =
-            "SELECT
+        $sql = "SELECT
         userID,
         loggedDate
       FROM
         user_time_log";
-
         if ($startDate) {
             $sql .= " where loggedDate >= '" . $startDate->format('Y-m-d') . "'";
         }
-        $sql .= " and holiday = 0 ";
-        $sql .= " order by loggedDate asc, userID";
-        $result = $this->db->query($sql);
+        $sql          .= " and holiday = 0  order by loggedDate asc, userID";
+        $result       = $this->db->query($sql);
         $userTimeLogs = $result->fetch_all(MYSQLI_ASSOC);
         foreach ($userTimeLogs as $record) {
             $affectedRows = $this->updateTotalUserLoggedHours(
@@ -4019,25 +3386,21 @@ class BUActivity extends Business
         }
     }
 
-    function travelActivityForCustomerEngineerTodayExists(
-        $customerID,
-        $siteNo,
-        $userID,
-        $date
+    function travelActivityForCustomerEngineerTodayExists($customerID,
+                                                          $siteNo,
+                                                          $userID,
+                                                          $date
     )
     {
         $dbeCallActivity = new DBECallActivity($this);
-
-        return (
-        $dbeCallActivity->countTravelRowsForTodayByCustomerSiteNoEngineer(
+        return ($dbeCallActivity->countTravelRowsForTodayByCustomerSiteNoEngineer(
             $customerID,
             $siteNo,
             $userID,
             $date
-        )
-        );
+        ));
 
-    }
+    } // end check default site contacts exists
 
     /**
      * Create travel activities using site maxTravelHours field from address
@@ -4060,7 +3423,6 @@ class BUActivity extends Business
         $dbeCallActivity->getRow($callActivityID);
         $dbeProblem = new DBEProblem($this);
         $dbeProblem->getRow($dbeCallActivity->getValue(DBEJCallActivity::problemID));
-
         $buSite = new BUSite($this);
         $dsSite = new DataSet($this);
         $buSite->getSiteByID(
@@ -4068,17 +3430,12 @@ class BUActivity extends Business
             $dbeCallActivity->getValue(DBEJCallActivity::siteNo),
             $dsSite
         );
-
         $activityStartTime = $dbeCallActivity->getValue(DBEJCallActivity::startTime);
-
-        $travelStart = common_convertDecimalToHHMM(
+        $travelStart       = common_convertDecimalToHHMM(
             common_convertHHMMToDecimal($activityStartTime) - $dsSite->getValue(DBESite::maxTravelHours)
         );
-
         $dbeTravelActivity = $dbeCallActivity;
-
         $dbeTravelActivity->setPKValue(null);
-
         $dbeTravelActivity->setValue(
             DBEJCallActivity::startTime,
             $travelStart
@@ -4099,31 +3456,31 @@ class BUActivity extends Business
             DBEJCallActivity::reason,
             null
         );
-
         $dbeTravelActivity->insertRow();
     }
 
+    /*
+    work out whether a top-up is required and if so then generate one
+    We generate a top-up T&M call so that this can later be amended and/or checked and used to generate a sales
+    order for the top-up amount.
+    This call will now appear on
+  */
     function needsTravelHoursAdding($callActTypeID,
                                     $customerID,
                                     $siteNo
     )
     {
 
-        $ret = false;
-
+        $ret            = false;
         $dbeCallActType = new DBECallActType($this);
-
         $dbeCallActType->getRow($callActTypeID);
-
         $typeDescription = $dbeCallActType->getValue(DBEJCallActType::description);
-
         if (strpos(
                 $typeDescription,
                 'FOC'
             ) === FALSE) {
 
             $dbeSite = new DBESite($this);
-
             $dbeSite->setValue(
                 DBESite::customerID,
                 $customerID
@@ -4132,38 +3489,28 @@ class BUActivity extends Business
                 DBESite::siteNo,
                 $siteNo
             );
-
             $dbeSite->getRowByCustomerIDSiteNo();
-
             if ($dbeSite->getValue(DBESite::maxTravelHours) == -1) {  // new value for travel not set
-
                 $ret = true;
 
             }
 
         }
-
         return $ret;
 
     }
-
-//end completeSRs
 
     function deleteCallActivity($callActivityID)
     {
 
         $this->setMethodName('deleteCallActivity');
-
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($callActivityID);
-
         $problemID = $dbeCallActivity->getValue(DBEJCallActivity::problemID);
-
         if ($this->countActivitiesInProblem($problemID) == 2) {
             /* This is the start-work activity (initial + 1 )so reset the responded hours */
             $dbeProblem = new DBEProblem(
-                $this,
-                $problemID
+                $this, $problemID
             );
             $dbeProblem->setValue(
                 DBEJProblem::respondedHours,
@@ -4177,17 +3524,12 @@ class BUActivity extends Business
         if ($this->countActivitiesInProblem($problemID) == 1) {
 
             $this->sendServiceRemovedEmail($problemID);
-
             $dbeProblem = new DBEProblem($this);
-
             $dbeProblem->deleteRow($problemID);
-
             $problemID = false;
 
         }
-
         $dbeCallActivity->deleteRow($callActivityID);
-
         return $problemID;
 
     }
@@ -4196,12 +3538,10 @@ class BUActivity extends Business
     {
 
         $dbeCallActivity = new DBECallActivity($this);
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::problemID,
             $problemID
         );
-
         return $dbeCallActivity->countRowsByColumn(DBEJCallActivity::problemID);
 
     }
@@ -4209,62 +3549,52 @@ class BUActivity extends Business
     function sendServiceRemovedEmail($problemID)
     {
 
-        $buMail = new BUMail($this);
-
+        $buMail      = new BUMail($this);
         $dbeJProblem = new DBEJProblem($this);
         $dbeJProblem->getRow($problemID);
-
         $senderEmail = CONFIG_SUPPORT_EMAIL;
-        $toEmail = 'sremoved@' . CONFIG_PUBLIC_DOMAIN;
-
+        $toEmail     = 'sremoved@' . CONFIG_PUBLIC_DOMAIN;
         $activityRef = $problemID . ' ' . $dbeJProblem->getValue(DBEJProblem::customerName);
-
-        $template = new Template(
-            EMAIL_TEMPLATE_DIR,
-            "remove"
+        $template    = new Template(
+            EMAIL_TEMPLATE_DIR, "remove"
         );
         $template->set_file(
             'page',
             'ServiceRemovedEmail.inc.html'
         );
-
-        $dbeJCallActivity = $this->getFirstActivityInProblem($problemID);
-
-        $status = null;
-
+        $dbeJCallActivity = $this->getFirstActivityInServiceRequest($problemID);
+        $status           = null;
         if ($dbeJProblem->getValue(DBEJProblem::status)) {
             $status = $this->problemStatusArray[$dbeJProblem->getValue(DBEJProblem::status)];
         }
-
         $template->setVar(
             array(
-                'activityRef'    => $activityRef,
-                'customerName'   => $dbeJProblem->getValue(DBEJProblem::customerName),
-                'reason'         => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
-                'status'         => $status,
-                'awaitingStatus' => ($dbeJProblem->getValue(
+                'activityRef'                 => $activityRef,
+                'customerName'                => $dbeJProblem->getValue(DBEJProblem::customerName),
+                'reason'                      => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
+                'status'                      => $status,
+                'awaitingStatus'              => ($dbeJProblem->getValue(
                         DBEJProblem::awaitingCustomerResponseFlag
                     ) == 'Y') ? 'Customer' : 'CNC',
-                'dateRaisedDMY'  => $dbeJProblem->getValue(DBEJProblem::dateRaisedDMY),
-                'timeRaised'     => $dbeJProblem->getValue(DBEJProblem::timeRaised),
-                'respondedHours' => common_convertDecimalToHHMM($dbeJProblem->getValue(DBEJProblem::respondedHours)),
-                'workingHours'   => common_convertDecimalToHHMM($dbeJProblem->getValue(DBEJProblem::workingHours)),
-                'engineerName'   => $dbeJProblem->getValue(DBEJProblem::engineerName),
-                'removedByUser'  => $this->dbeUser->getValue(DBEUser::name),
-                'CONFIG_SERVICE_REQUEST_DESC'
-                                 => CONFIG_SERVICE_REQUEST_DESC
-
+                'dateRaisedDMY'               => $dbeJProblem->getValue(DBEJProblem::dateRaisedDMY),
+                'timeRaised'                  => $dbeJProblem->getValue(DBEJProblem::timeRaised),
+                'respondedHours'              => common_convertDecimalToHHMM(
+                    $dbeJProblem->getValue(DBEJProblem::respondedHours)
+                ),
+                'workingHours'                => common_convertDecimalToHHMM(
+                    $dbeJProblem->getValue(DBEJProblem::workingHours)
+                ),
+                'engineerName'                => $dbeJProblem->getValue(DBEJProblem::engineerName),
+                'removedByUser'               => $this->dbeUser->getValue(DBEUser::name),
+                'CONFIG_SERVICE_REQUEST_DESC' => CONFIG_SERVICE_REQUEST_DESC
             )
         );
-
         $template->parse(
             'output',
             'page',
             true
         );
-
         $body = $template->get_var('output');
-
         $hdrs = array(
             'From'         => $senderEmail,
             'To'           => $toEmail,
@@ -4272,27 +3602,22 @@ class BUActivity extends Business
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
-
         $buMail->mime->setHTMLBody($body);
-
         $mime_params = array(
             'text_encoding' => '7bit',
             'text_charset'  => 'UTF-8',
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
+        $body        = $buMail->mime->get($mime_params);
+        $hdrs        = $buMail->mime->headers($hdrs);
         $buMail->putInQueue(
             $senderEmail,
             $toEmail,
             $hdrs,
             $body
         );
-    } // end check default site contacts exists
+    }
 
     function setActivityStatusChecked($callactivityID)
     {
@@ -4304,13 +3629,6 @@ class BUActivity extends Business
         );
         return ($dbeCallActivity->updateRow());
     }
-
-    /*
-    work out whether a top-up is required and if so then generate one
-    We generate a top-up T&M call so that this can later be amended and/or checked and used to generate a sales
-    order for the top-up amount.
-    This call will now appear on
-  */
 
     function setActivityStatusAuthorised($callactivityID)
     {
@@ -4342,7 +3660,6 @@ class BUActivity extends Business
             'Y'
         );
         $dbeCallActivity->updateRow();
-
         $dbeProblem = new DBEProblem($this);
         $dbeProblem->getRow($dbeCallActivity->getValue(DBEJCallActivity::problemID));
         $dbeProblem->setValue(
@@ -4402,19 +3719,13 @@ class BUActivity extends Business
     function skipSalesOrdersForActivities($activityIDArray)
     {
         $this->setMethodName('skipSalesOrdersForActivities');
-
         $dbeJCallActivity = new DBEJCallActivity($this);
-
         /* these come back in customerID order */
         $dbeJCallActivity->getRowsInIdArray($activityIDArray);
-
         if ($dbeJCallActivity->rowCount() == 0) {
             return FALSE; // no activities so return false
         }
-
         $dbeCallActivity = new DBECallActivity($this); // for status update
-
-
         while ($dbeJCallActivity->fetchNext()) {
 
             $dbeProblem = new DBEJProblem($this);
@@ -4431,14 +3742,12 @@ class BUActivity extends Business
                     $shouldSetActivitiesToAuthorised = false;
                 }
             }
-
             if ($shouldSetActivitiesToAuthorised) {
                 // Set all activities on the parent SR to Authorised status
                 $dbeCallActivity->setAllActivitiesToAuthorisedByProblemID(
                     $dbeJCallActivity->getValue(DBEJCallActivity::problemID)
                 );
             }
-
             $this->setProblemToCompleted($dbeJCallActivity->getValue(DBEJCallActivity::problemID));
         }
         return true;
@@ -4457,22 +3766,17 @@ class BUActivity extends Business
     function setProblemToCompleted($problemID)
     {
 
-        $dbeFirstCallActivity = $this->getFirstActivityInProblem($problemID);
-
+        $dbeFirstCallActivity = $this->getFirstActivityInServiceRequest($problemID);
         if ($dbeFirstCallActivity->getValue(DBEJCallActivity::problemStatus) == 'C') {
             echo 'sorry the first activity is not of status C';
             return null;
         }
-
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($dbeFirstCallActivity->getValue(DBEJCallActivity::callActivityID));
-
-
         $reason = '<P>Completed</P>';
         $userID = $this->loggedInUserID;
         // create a completion activity
         $dbeCallActivity->setPKValue(null);
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::problemID,
             $problemID
@@ -4506,14 +3810,10 @@ class BUActivity extends Business
             $reason
         );
         $dbeCallActivity->insertRow();
-
         $newActivityID = $dbeCallActivity->getPKValue();
-
-        $dbeProblem = new DBEProblem(
-            $this,
-            $problemID
+        $dbeProblem    = new DBEProblem(
+            $this, $problemID
         );
-
         $dbeProblem->setValue(
             DBEJProblem::status,
             'C'
@@ -4522,9 +3822,7 @@ class BUActivity extends Business
             DBEJProblem::awaitingCustomerResponseFlag,
             'N'
         );
-
-        /** @var $db dbSweetcode */
-        global $db;
+        /** @var $db dbSweetcode */ global $db;
         $statement = $db->preparedQuery(
             'select getOpenHours(?)',
             [["type" => "i", "value" => $dbeProblem->getValue(DBEProblem::problemID)]]
@@ -4534,12 +3832,6 @@ class BUActivity extends Business
             $statement->fetch_array(MYSQLI_NUM)[0]
         );
         $dbeProblem->updateRow();
-
-        $this->sendEmailToCustomer(
-            $problemID,
-            self::ClosureCustomerEmailCategory
-        );
-
         return $newActivityID;
 
     }
@@ -4548,22 +3840,19 @@ class BUActivity extends Business
     {
         $db = new dbSweetcode(); // database connection for query
         $this->setMethodName('createSalesOrderFromActivities');
-        $dbeJCallActivity = new DBEJCallActivity($this);
-        $this->dbeProblem = new DBEProblem($this);
-
+        $dbeJCallActivity    = new DBEJCallActivity($this);
+        $this->dbeProblem    = new DBEProblem($this);
         $activityIDsAsString = implode(
             ',',
             $activityIDArray
         );
         // Get a list of the associated problem id's
-        $select =
-            "SELECT
+        $select = "SELECT
         DISTINCT caa_problemno
       FROM
         callactivity
       WHERE
         caa_callactivityno IN( $activityIDsAsString )";
-
         $db->query($select);
         $problemIDArray = [];
         while ($db->next_record()) {
@@ -4574,9 +3863,7 @@ class BUActivity extends Business
             ',',
             $problemIDArray
         );
-
-        $select =
-            "SELECT
+        $select             = "SELECT
         caa_callactivityno
       FROM
         callactivity
@@ -4584,22 +3871,20 @@ class BUActivity extends Business
       WHERE
         caa_problemno IN( $problemIDsAsString ) and caa_callacttypeno <> 43
         AND pro_contract_cuino is null";
-
         $db->query($select);
         $finalActivityIDArray = [];
         while ($db->next_record()) {
             $finalActivityIDArray[] = $db->Record['caa_callactivityno'];
         }
-
         // Get full activity rows(these come back in customerID, date order)
         $dbeJCallActivity->getRowsInIdArray($finalActivityIDArray);
         if ($dbeJCallActivity->rowCount() == 0) {
             return FALSE; // no activities so return false
         }
         /* need to loop activities checking for change of Request Number(problemID) */
-        $buSalesOrder = new BUSalesOrder($this);
-        $dbeOrdline = new DBEOrdline($this);
-        $ordheadID = null;
+        $buSalesOrder  = new BUSalesOrder($this);
+        $dbeOrdline    = new DBEOrdline($this);
+        $ordheadID     = null;
         $lastProblemID = null;
         $toInsertLines = [];
         while ($dbeJCallActivity->fetchNext()) {
@@ -4611,8 +3896,7 @@ class BUActivity extends Business
                 $dbeCallActivity->updateRow();
                 continue;
             }
-
-            $problemID = $dbeJCallActivity->getValue(DBEJCallActivity::problemID);
+            $problemID  = $dbeJCallActivity->getValue(DBEJCallActivity::problemID);
             $customerID = $dbeJCallActivity->getValue(DBEJCallActivity::customerID);
             if ($problemID != $lastProblemID) {
                 $lastProblemID = $problemID;
@@ -4625,7 +3909,6 @@ class BUActivity extends Business
                     $toInsertLines = [];
                 }
                 // we have to create a new order ..or reuse an existing not closed order
-
                 $ordheadID = null;
                 // If the SR is linked to an open sales order then we append details to that Order
                 if ($dbeJCallActivity->getValue(DBEJCallActivity::linkedSalesOrderID)) {
@@ -4638,10 +3921,9 @@ class BUActivity extends Business
                         $ordheadID = $dbeJCallActivity->getValue(DBEJCallActivity::linkedSalesOrderID);
                     }
                 }
-
                 if (!$ordheadID) {
-                    $dsOrdhead = new DataSet($this);
-                    $dsOrdline = new DataSet($this);
+                    $dsOrdhead  = new DataSet($this);
+                    $dsOrdline  = new DataSet($this);
                     $dsCustomer = new DBECustomer($this);
                     $dsCustomer->getRow($customerID);
                     $buSalesOrder->initialiseOrder(
@@ -4662,7 +3944,6 @@ class BUActivity extends Business
                         $dsOrdhead->getValue(DBEOrdhead::partInvoice),
                         $dsOrdhead->getValue(DBEOrdhead::addItem)
                     );
-
                     $ordheadID = $dsOrdhead->getValue(DBEOrdhead::ordheadID);
                     // Link SR to new Order
                     $this->dbeProblem->getRow($problemID);
@@ -4672,7 +3953,6 @@ class BUActivity extends Business
                     );
                     $this->dbeProblem->updateRow();
                 }
-
                 // Create the comment line with the SR number
                 $dbeOrdline->setValue(DBEJOrdline::ordheadID, $ordheadID);
                 $dbeOrdline->setValue(DBEJOrdline::customerID, $customerID);
@@ -4701,7 +3981,6 @@ class BUActivity extends Business
             $toUpdateActivity->updateRow();
 
         }
-
         if (count($toInsertLines)) {
             foreach ($toInsertLines as $insertLine) {
                 $insertLine->insertRow();
@@ -4716,13 +3995,12 @@ class BUActivity extends Business
     private function updateConsolidatedLineFromActivity(&$toInsertLines, $dbeJCallActivity, $ordheadId)
     {
         $consultantName = $dbeJCallActivity->getValue(DBEJCallActivity::userName);
-        $customerID = $dbeJCallActivity->getValue(DBEJCallActivity::customerID);
+        $customerID     = $dbeJCallActivity->getValue(DBEJCallActivity::customerID);
         $dbeCallActType = new DBECallActType($this);
         $dbeCallActType->getRow($dbeJCallActivity->getValue(DBEJCallActivity::callActTypeID));
-
         /* mantis 359: Apply maximum travel hours to travel type activities */
         if ($dbeCallActType->getValue(DBEJCallActivity::travelFlag) == 'Y') {
-            $dsSite = new DataSet($this);
+            $dsSite     = new DataSet($this);
             $buCustomer = new BUCustomer($this);
             $buCustomer->getSiteByCustomerIDSiteNo(
                 $customerID,
@@ -4734,7 +4012,6 @@ class BUActivity extends Business
             // use the max hours field from call activity
             $max_hours = $dbeCallActType->getValue(DBECallActType::maxHours);
         }
-
         // this function is found in Functions/Activity
         getRatesAndHours(
             $dbeJCallActivity->getValue(DBEJCallActivity::date),
@@ -4751,14 +4028,12 @@ class BUActivity extends Business
             $outOfHoursRate,
             $normalRate
         );
-
         $description = $consultantName . ' - Consultancy';
         if ($normalHours > 0) {
             $insertKey = "$description - $normalRate";
             if (!isset($toInsertLines[$insertKey])) {
                 $toInsertLines[$insertKey] = $this->initializeSOLineFromActivity($description, $normalRate, $ordheadId);
             }
-
             $toInsertLines[$insertKey]->setValue(
                 DBEJOrdline::qtyOrdered,
                 $toInsertLines[$insertKey]->getValue(DBEJOrdline::qtyOrdered) + $normalHours
@@ -4768,7 +4043,6 @@ class BUActivity extends Business
                 $toInsertLines[$insertKey]->getValue(DBEOrdline::curTotalSale) + ($normalHours * $normalRate)
             );
         }
-
         if ($beforeHours > 0 || $afterHours > 0) {
             $insertKey = "$description - $outOfHoursRate";
             if (!isset($toInsertLines[$insertKey])) {
@@ -4779,12 +4053,10 @@ class BUActivity extends Business
                     CONFIG_CONSULTANCY_OUT_OF_HOURS_LABOUR_ITEMID
                 );
             }
-
             $toInsertLines[$insertKey]->setValue(
                 DBEJOrdline::qtyOrdered,
                 $toInsertLines[$insertKey]->getValue(DBEOrdline::qtyOrdered) + $beforeHours + $afterHours
             );
-
             $toInsertLines[$insertKey]->setValue(
                 DBEJOrdline::curTotalSale,
                 $toInsertLines[$insertKey]->getValue(
@@ -4814,7 +4086,6 @@ class BUActivity extends Business
             DBEJOrdline::itemID,
             $itemID
         );
-
         $dbeOrderLine->setValue(
             DBEJOrdline::curUnitCost,
             0
@@ -4827,7 +4098,6 @@ class BUActivity extends Business
             DBEJOrdline::curUnitSale,
             $rate
         );
-
         $dbeOrderLine->setValue(
             DBEJOrdline::description,
             $description
@@ -4850,9 +4120,7 @@ class BUActivity extends Business
     function completeSRs($activityIDArray)
     {
         $this->setMethodName('completeSRs');
-
         $dbeCallActivity = new DBECallActivity($this);
-
         foreach ($activityIDArray as $activityID) {
             $dbeCallActivity->getRow($activityID);
             $this->setProblemToCompleted($dbeCallActivity->getValue(DBEJCallActivity::problemID));
@@ -4897,11 +4165,9 @@ class BUActivity extends Business
             );
             $dbeCustomerItem->updateRow();
         }
-
         if ($newBalance >= 100) {
             return 0;
         }
-
         if ($newBalance < 0) {
             // value of the top-up activity is the GSC item price plus amount required to clear balance
             $topUpValue = (0 - $newBalance) + $Record ['gscTopUpAmount'];
@@ -4915,10 +4181,12 @@ class BUActivity extends Business
                 $topUpValue
             );
         }
-
         return $topUpValue;
     }
 
+    /*
+  get first last next and previous activities in this chain
+  */
     /**
      * @param $Record
      * @param $topUpValue
@@ -4929,21 +4197,17 @@ class BUActivity extends Business
     )
     {
         $this->setMethodName('createTopUpSalesOrder');
-
         $buHeader = new BUHeader($this);
         $buHeader->getHeader($dsHeader);
-
         $buCustomer = new BUCustomer($this);
         $buCustomer->getCustomerByID(
             $Record ['custno'],
             $dsCustomer
         );
-
-        $dsOrdhead = new DataSet($this);
+        $dsOrdhead  = new DataSet($this);
         $dbeOrdline = new DataSet($this);
         // create sales order header with correct field values
         $buSalesOrder = new BUSalesOrder($this);
-
         $buSalesOrder->initialiseOrder(
             $dsOrdhead,
             $dbeOrdline,
@@ -4974,14 +4238,11 @@ class BUActivity extends Business
             $dsOrdhead->getValue(DBEOrdhead::partInvoice),
             $dsOrdhead->getValue(DBEOrdhead::addItem)
         );
-
-        $ordheadID = $dsOrdhead->getValue(DBEOrdhead::ordheadID);
+        $ordheadID  = $dsOrdhead->getValue(DBEOrdhead::ordheadID);
         $sequenceNo = 1;
-
         // get topUp item details
         $dbeItem = new DBEItem($this);
         $dbeItem->getRow(CONFIG_DEF_PREPAY_TOPUP_ITEMID);
-
         // create order line
         $dbeOrdline = new DBEOrdline($this);
         $dbeOrdline->setValue(
@@ -5087,7 +4348,6 @@ class BUActivity extends Business
                 0,
                 10
             ) . $endDate . '.html';
-
         $dsResults->setUpdateModeInsert();
         $dsResults->setValue(
             self::exportPrePayActivitiesFormCustomerName,
@@ -5124,102 +4384,6 @@ class BUActivity extends Business
         $dsResults->post();
     }
 
-    /**
-     * @param $statementFilepath
-     * @param DataSet $dsContact
-     * @param $balance
-     * @param $date
-     * @param $topUpValue
-     */
-    function sendGSCStatement($statementFilepath,
-                              &$dsContact,
-                              $balance,
-                              $date,
-                              $topUpValue
-    )
-    {
-
-        $buMail = new BUMail($this);
-
-        $id_user = $this->loggedInUserID;
-        $this->dbeUser->getRow($id_user);
-
-//        $statementFilename = basename($statementFilepath);
-
-        $senderEmail = CONFIG_SALES_EMAIL;
-        //    $buMail->mime_boundary = "----=_NextPart_" . md5(time());
-        while ($dsContact->fetchNext()) {
-            // Send email with attachment
-            $message = '<body><p class=MsoNormal style="font: normal 2px Arial, sans-serif ;color: navy" ><span style=\'font-size:10.0pt;color:black\'>';
-            $message .= 'Dear ' . $dsContact->getValue(DBEContact::firstName) . ',';
-            $message .= '<!--suppress CheckTagEmptyBody --><o:p></o:p></span></p>';
-            $message .= '<p class=MsoNormal><span style=\'font-size:10.0pt;color:black\'>';
-            // Temporary:
-            $message .= 'Please find attached your latest Pre-Pay Contract statement, on which there
-is currently a balance of ';
-            $message .= '&pound;' . common_numberFormat($balance) . ' + VAT.';
-            $message .= '</p>';
-
-            $message .= '<p class=MsoNormal style="font: normal 2px Arial, sans-serif ;color: navy"><span style=\'font-size:10.0pt;color:black\'>';
-            $message .= 'If you have any queries relating to any of the items detailed on this statement, then please notify us within 7 days so that we can make any adjustments if applicable.';
-            $message .= '</p>';
-
-            if ($balance <= 100) {
-                $message .= '<p class=MsoNormal"  style="font: normal 2px Arial, sans-serif ;color: navy"><span style=\'font-size:10.0pt;color:black\'>';
-                $message .= 'If no response to the contrary is received within 7 days of this statement, then we will automatically raise an invoice for &pound;' . common_numberFormat(
-                        $topUpValue * (1 + ($this->standardVatRate / 100))
-                    ) . ' Inc VAT.';
-                $message .= '</p>';
-            }
-
-            $message .= '<p class=MsoNormal style="font: normal 2px Arial, sans-serif ;color: navy"><span style=\'font-size:10.0pt;color:black\'>';
-            $message .= 'Are you aware that you can receive up to &pound;500 for the referral of any company made to CNC that results in the purchase of a support contract?  Please call us for further information.';
-            $message .= '</p>';
-
-            $subject = 'Pre-Pay Contract Statement: ' . Controller::dateYMDtoDMY($date);
-
-            $toEmail = $dsContact->getValue(DBEContact::firstName) . ' ' .
-                $dsContact->getValue(DBEContact::lastName) . '<' . $dsContact->getValue(DBEContact::email) . '>';
-
-            $senderName = null;
-
-            // create mime
-            $html = '<html lang="en">' . $message . '</html>';
-//            $file = '$statementFilename';
-//      $crlf = "\n";
-
-            $hdrs = array(
-                'From'         => $senderName . " <" . $senderEmail . ">",
-                'To'           => $toEmail,
-                'Subject'      => $subject,
-                'Content-Type' => 'text/html; charset=UTF-8'
-            );
-
-            $buMail->mime->setHTMLBody($html);
-            $buMail->mime->addAttachment(
-                $statementFilepath,
-                'text/html'
-            );
-            $mime_params = array(
-                'text_encoding' => '7bit',
-                'text_charset'  => 'UTF-8',
-                'html_charset'  => 'UTF-8',
-                'head_charset'  => 'UTF-8'
-            );
-
-            $body = $buMail->mime->get($mime_params);
-            $hdrs = $buMail->mime->headers($hdrs);
-
-            $buMail->putInQueue(
-                $senderEmail,
-                $toEmail,
-                $hdrs,
-                $body
-            );
-        } // end while
-
-    }
-
     function postRowToPrePayExportFile(&$csvFileHandle,
                                        $timeFrameFlag,
                                        &$Record,
@@ -5251,7 +4415,6 @@ is currently a balance of ';
                 $details
             );
         }
-
         if ($timeFrameFlag == 'M') { // Monetary value is treated as-is. e.g. Top-up should be a positive value
             $value = $hours * $rate;
         } else {
@@ -5260,7 +4423,6 @@ is currently a balance of ';
         $contacts = trim($Record ['cns_name']) . '/' . trim($Record ['con_first_name']) . ' ' . trim(
                 $Record ['con_last_name']
             );
-
         // to CSV file
         fwrite(
             $csvFileHandle,
@@ -5272,23 +4434,20 @@ is currently a balance of ';
             '"' . common_numberFormat($value) . '"' . // value
             "\r\n"
         );
-
-        $postcode = $Record ['add_postcode'];
+        $postcode    = $Record ['add_postcode'];
         $activityRef = $Record ['caa_callactivityno'];
-        $hours = common_numberFormat($hours);
+        $hours       = common_numberFormat($hours);
         if ($timeFrameFlag == 'M') { // Monetary value like topUp
-            $contacts = null;
-            $postcode = null;
+            $contacts    = null;
+            $postcode    = null;
             $activityRef = null;
-            $hours = null;
+            $hours       = null;
         }
-
         // don't display zero values
         $displayValue = null;
         if ($value != 0) {
             $displayValue = common_numberFormat($value);
         }
-
         $this->template->set_var(
             array(
                 'activityDate'     => $Record ['activityDate'],
@@ -5301,13 +4460,11 @@ is currently a balance of ';
                 'activityCost'     => $displayValue
             )
         );
-
         $this->template->parse(
             'lines',
             'lineBlock',
             true
         );
-
         $this->totalCost += $value;
     }
 
@@ -5317,14 +4474,12 @@ is currently a balance of ';
     )
     {
 
-        $reason = 'Top-up - Invoice No ' . $invoiceID;
-
-        $callActivityID = $this->createActivityFromCustomerID(
+        $reason          = 'Top-up - Invoice No ' . $invoiceID;
+        $callActivityID  = $this->createActivityFromCustomerID(
             $customerID,
             false,
             'C'
         );
-
         $dbeCustomerItem = new DBECustomerItem($this);
         if ($dbeCustomerItem->getGSCRow($customerID)) {
             // set fields to topUp
@@ -5372,39 +4527,29 @@ is currently a balance of ';
         return true;
     }
 
-    /*
-  get first last next and previous activities in this chain
-  */
-
-    function createActivityFromCustomerID(
-        $customerID,
-        $userID = false,
-        $problemStatus = 'I',
-        $contractCustomerItemID = false
+    function createActivityFromCustomerID($customerID,
+                                          $userID = false,
+                                          $problemStatus = 'I',
+                                          $contractCustomerItemID = false
     )
     {
 
         if (!$userID) {
             $userID = ( string )$GLOBALS['auth']->is_authenticated();
         }
-
         $buCustomer = new BUCustomer($this);
-
         $dsCustomer = new DataSet($this);
-
         $buCustomer->getCustomerByID(
             $customerID,
             $dsCustomer
         );
         $buSite = new BUSite($this);
-
         $dsSite = new DataSet($this);
         $buSite->getSiteByID(
             $customerID,
             $dsCustomer->getValue(DBECustomer::deliverSiteNo),
             $dsSite
         );
-
         // create new problem here
         $dbeProblem = new DBEProblem($this);
         $dbeProblem->setValue(
@@ -5428,7 +4573,6 @@ is currently a balance of ';
             $contractCustomerItemID
         );
         $dbeProblem->insertRow();
-
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->setValue(
             DBEJCallActivity::callActivityID,
@@ -5478,17 +4622,17 @@ is currently a balance of ';
             DBEJCallActivity::curValue,
             0.00
         );
-
         $dbeCallActivity->insertRow();
         $this->setProblemRaise($dbeProblem, $dbeCallActivity); //createActivityFromCustomerID
-
         return $dbeCallActivity->getPKValue();
     }
 
     private function setProblemRaise($dbeProblem, $callActivity, $raiseType = null)
     {
-        if (!isset($dbeProblem) && !isset($callActivity))
-            return null;
+        if (!isset($dbeProblem) && !isset($callActivity)) return null;
+        if ($dbeProblem->getValue(DBEProblem::raiseTypeId)) {
+            return;
+        }
         if ($raiseType != null) {
             $dbeProblem->setValue(
                 DBEProblem::raiseTypeId,
@@ -5507,34 +4651,28 @@ is currently a balance of ';
                 $teamId = $dbeUser->getValue(DBEUser::teamID);
             }
         }
-
-
         //For each problem, where callactivity.caa_callacttypeno = 57 and callactivity.caa_serverguard = Y, then set the problem source as Alert.
-        if (
-            isset($dbeProblem) && isset($callActivity)
-            && $callActivity->getValue(DBEJCallActivity::callActTypeID) == 57
-            && $callActivity->getValue(DBEJCallActivity::serverGuard) == 'Y'
-        ) {
+        if (isset($dbeProblem) && isset($callActivity) && $callActivity->getValue(
+                DBEJCallActivity::callActTypeID
+            ) == 57 && $callActivity->getValue(DBEJCallActivity::serverGuard) == 'Y') {
             $dbeProblem->setValue(
                 DBEProblem::raiseTypeId,
                 $this->getProblemRaiseType(BUProblemRaiseType::ALERT)
             );
-        } else if (
-            isset($dbeProblem) && isset($callActivity)
-            && $dbeProblem->getValue(DBEJProblem::linkedSalesOrderID) > 0
-            //&& $dbeProblem->getValue(DBEJProblem::priority) == 5
+        } else if (isset($dbeProblem) && isset($callActivity) && $dbeProblem->getValue(
+                DBEJProblem::linkedSalesOrderID
+            ) > 0//&& $dbeProblem->getValue(DBEJProblem::priority) == 5
         ) {
             $dbeProblem->setValue(
                 DBEProblem::raiseTypeId,
                 $this->getProblemRaiseType(BUProblemRaiseType::SALES)
             );
         } else if //For each problem, where callactivity.caa_callactivityno = 57 and callactivity.caa_consno = 67 and callactivity.caa_serverguard = N, then set the problem source as Email.
-        (
-            isset($dbeProblem) && isset($callActivity)
-            && $callActivity->getValue(DBEJCallActivity::callActTypeID) == 57
-            && $callActivity->getValue(DBEJCallActivity::caaConsno) == 67
-            && $callActivity->getValue(DBEJCallActivity::serverGuard) == 'N'
-        ) {
+        (isset($dbeProblem) && isset($callActivity) && $callActivity->getValue(
+                DBEJCallActivity::callActTypeID
+            ) == 57 && $callActivity->getValue(DBEJCallActivity::caaConsno) == 67 && $callActivity->getValue(
+                DBEJCallActivity::serverGuard
+            ) == 'N') {
             $dbeProblem->setValue(
                 DBEProblem::raiseTypeId,
                 $this->getProblemRaiseType(BUProblemRaiseType::EMAIL)
@@ -5542,9 +4680,9 @@ is currently a balance of ';
         } else if (isset($teamId) && $teamId == 1) //created by help desk
         {
             $raiseType = BUProblemRaiseType::PHONE;
-            if ($dbeUser->getValue(DBEUser::basedAtCustomerSite) == 1 &&
-                $dbeProblem->getValue(DBEProblem::customerID) == $dbeUser->getValue(DBEUser::siteCustId))
-                $raiseType = BUProblemRaiseType::ONSITE;
+            if ($dbeUser->getValue(DBEUser::basedAtCustomerSite) == 1 && $dbeProblem->getValue(
+                    DBEProblem::customerID
+                ) == $dbeUser->getValue(DBEUser::siteCustId)) $raiseType = BUProblemRaiseType::ONSITE;
             $dbeProblem->setValue(
                 DBEProblem::raiseTypeId,
                 $this->getProblemRaiseType($raiseType)
@@ -5555,16 +4693,14 @@ is currently a balance of ';
                 $this->getProblemRaiseType(BUProblemRaiseType::MANUAL)
             );
         }
-
-        if (isset($dbeProblem))
-            $dbeProblem->updateRow();
+        if (isset($dbeProblem)) $dbeProblem->updateRow();
     }
 
     private function getProblemRaiseType($description)
     {
         $buProblemRaiseType = new BUProblemRaiseType($this);
-        $id = null;
-        $id = $buProblemRaiseType->getProblemRaiseTypeByName($description)['id'];
+        $id                 = null;
+        $id                 = $buProblemRaiseType->getProblemRaiseTypeByName($description)['id'];
         return $id;
     }
 
@@ -5576,22 +4712,18 @@ is currently a balance of ';
     function createActivityFromSession($sessionKey)
     {
         $dbeCallActivity = new DBECallActivity($this);
-        $dsCallActivity = new DataSet($this);
+        $dsCallActivity  = new DataSet($this);
         $dsCallActivity->copyColumnsFrom($dbeCallActivity);
         $dsCallActivity->setNull(DBECallActivity::callActivityID, DA_ALLOW_NULL);
-
-        $dateTimeRaised = $_SESSION [$sessionKey] ['dateRaised'] . ' ' . $_SESSION [$sessionKey] ['timeRaised'] . ':00';
-
+        $dateTimeRaised   = $_SESSION [$sessionKey] ['dateRaised'] . ' ' . $_SESSION [$sessionKey] ['timeRaised'] . ':00';
         $slaResponseHours = $this->getSlaResponseHours(
             $_SESSION [$sessionKey] ['priority'],
             $_SESSION [$sessionKey] ['customerID'],
             $_SESSION [$sessionKey] ['contactID']
         );
-
         /*
     * Create a new problem
     */
-
         $dbeProblem = new DBEProblem($this);
         $dbeProblem->setValue(
             DBEProblem::hdLimitMinutes,
@@ -5614,15 +4746,17 @@ is currently a balance of ';
             @$_SESSION [$sessionKey] ['customerID']
         );
         $dbeProblem->setValue(
+            DBEProblem::raiseTypeId,
+            @$_SESSION[$sessionKey]["raiseTypeId"]
+        );
+        $dbeProblem->setValue(
             DBEProblem::dateRaised,
             $dateTimeRaised
         );
         $userID = null;
-
         if (@$_SESSION[$sessionKey]['userID']) {
             $userID = @$_SESSION[$sessionKey]['userID'];
         }
-
         $dbeProblem->setValue(
             DBEProblem::userID,
             $userID
@@ -5631,12 +4765,10 @@ is currently a balance of ';
             DBEProblem::rootCauseID,
             @$_SESSION [$sessionKey] ['rootCauseID']
         );
-
         $dbeProblem->setValue(
             DBEProblem::authorisedBy,
             @$_SESSION[$sessionKey]['authorisedBy']
         );
-
         $dbeProblem->setValue(
             DBEProblem::status,
             'I'
@@ -5645,12 +4777,10 @@ is currently a balance of ';
             DBEProblem::slaResponseHours,
             $slaResponseHours
         );
-
         $queueNo = 1;
         if (isset($_SESSION[$sessionKey]['queueNo'])) {
             $queueNo = $_SESSION[$sessionKey]['queueNo'];
         }
-
         $dbeProblem->setValue(
             DBEProblem::queueNo,
             $queueNo
@@ -5663,12 +4793,10 @@ is currently a balance of ';
             DBEProblem::hideFromCustomerFlag,
             @$_SESSION [$sessionKey] ['hideFromCustomerFlag']
         );
-
         $dbeProblem->setValue(
             DBEProblem::criticalFlag,
             @$_SESSION [$sessionKey] ['criticalSRFlag']
         );
-
         $dbeProblem->setValue(
             DBEProblem::internalNotes,
             @$_SESSION [$sessionKey] ['internalNotes']
@@ -5685,19 +4813,15 @@ is currently a balance of ';
             DBEProblem::projectID,
             @$_SESSION [$sessionKey] ['projectID']
         );
-
-
         $dbeProblem->insertRow();
-
+        $this->setProblemRaise($dbeProblem, $dsCallActivity);
         if ($_SESSION[$sessionKey]['monitorSRFlag'] === 'Y') {
             $this->toggleMonitoringFlag($dbeProblem->getPKValue());
         }
-
         $endTime = $this->getEndtime(
             @$_SESSION [$sessionKey] ['callActTypeID'],
             @$_SESSION [$sessionKey] ['timeRaised']
         );
-
         $dsCallActivity->setUpdateModeInsert();
         $dsCallActivity->setValue(
             DBEJCallActivity::callActivityID,
@@ -5747,7 +4871,6 @@ is currently a balance of ';
             DBEJCallActivity::serverGuard,
             @$_SESSION [$sessionKey] ['serverGuard']
         );
-
         $dsCallActivity->setValue(
             DBEJCallActivity::curValue,
             @$_SESSION [$sessionKey] ['curValue']
@@ -5769,48 +4892,37 @@ is currently a balance of ';
             $GLOBALS['auth']->is_authenticated()
         ); // user that created activity
         $dsCallActivity->post();
-        $this->setProblemRaise($dbeProblem, $dsCallActivity); //createActivityFromSession
-
         $dbeContact = null;
         if (@$_SESSION[$sessionKey]['contactID']) {
             $dbeContact = new DBEContact($this);
             $dbeContact->getRow($_SESSION[$sessionKey]['contactID']);
         }
-
         $this->updateDataAccessObject(
             $dsCallActivity,
             $dbeCallActivity
         ); // Update the DB
         if ($dbeProblem->getValue(DBEJProblem::hideFromCustomerFlag) == 'N') {       // skip work commenced
-
             if ($dbeProblem->getValue(DBEJProblem::priority) == 5) {
                 $fields['submittedTo'] = 'Project Team';
             } else {
                 $fields['submittedTo'] = 'Service Desk';
             }
-            $this->sendEmailToCustomer(
-                $dbeProblem->getPKValue(),
-                self::InitialCustomerEmailCategory
-            );
+            $this->sendManuallyLoggedServiceRequestEmail($dsCallActivity->getValue(DBEJCallActivity::callActivityID));
         }
-
-
         $buCustomer = new BUCustomer($this);
         $dsCustomer = new DataSet($this);
         $buCustomer->getCustomerByID(
             @$_SESSION[$sessionKey]['customerID'],
             $dsCustomer
         );
-
-        if (($dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' &&
-                $dsCustomer->getValue(DBECustomer::specialAttentionEndDate) >= date(
+        if (($dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' && $dsCustomer->getValue(
+                    DBECustomer::specialAttentionEndDate
+                ) >= date(
                     'Y-m-d'
                 )) || ($dbeContact && $dbeContact->getValue(DBEContact::specialAttentionContactFlag) == 'Y')) {
             $this->sendSpecialAttentionEmail($dbeCallActivity->getPKValue());
         }
-
         unset($_SESSION[$sessionKey]);
-
         return $dsCallActivity;
     }
 
@@ -5823,7 +4935,6 @@ is currently a balance of ';
             $db->query("insert into problem_monitoring(problemId, cons_no) values ($problemID, $userID)");
             return;
         }
-
         //we need to disable it
         $db->query("delete from problem_monitoring where problemId = $problemID and cons_no = $userID");
     }
@@ -5831,14 +4942,309 @@ is currently a balance of ';
     public function checkMonitoringFlag($problemID)
     {
         global $db;
-
         $userID = $this->loggedInUserID;
-
-        $sql = "SELECT * FROM problem_monitoring WHERE problemId = $problemID and cons_no = $userID";
-
-
+        $sql    = "SELECT * FROM problem_monitoring WHERE problemId = $problemID and cons_no = $userID";
         $db->query($sql);
         return !!$db->num_rows();
+    }
+
+    public function sendManuallyLoggedServiceRequestEmail($activityId)
+    {
+        $this->sendServiceRequestLoggedEmail($activityId, false);
+    }
+
+    private function sendServiceRequestLoggedEmail($activityId, $raisedAutomatically)
+    {
+        $dbejCallactivity = new DBEJCallActivity($this);
+        $dbejCallactivity->getRow($activityId);
+        $status                               = $this->getServiceRequestStatusText($dbejCallactivity);
+        $priority                             = $dbejCallactivity->getValue(DBEJCallActivity::priority);
+        $serviceRequestId                     = $dbejCallactivity->getValue(DBEJCallActivity::problemID);
+        $customerId                           = $dbejCallactivity->getValue(DBEJCallActivity::customerID);
+        $slaResponseHours                     = $this->getSlaResponseHours(
+            $priority,
+            $customerId,
+            $dbejCallactivity->getValue(DBECallActivity::contactID)
+        );
+        $isLoggedOutsideServiceDeskTimeLimits = false;
+        $has24HourSupport                     = false;
+        $hasServiceDesk                       = false;
+        if ($raisedAutomatically) {
+            $raisedTime            = $dbejCallactivity->getValue(DBEJCallActivity::startTime);
+            $startTimeOf24HSupport = $this->dsHeader->getValue(DBEHeader::serviceDeskNotification24hBegin);
+            $endTimeOf24HSupport   = $this->dsHeader->getValue(DBEHeader::serviceDeskNotification24hEnd);
+            if ($raisedTime < $startTimeOf24HSupport || $raisedTime > $endTimeOf24HSupport) {
+                $isLoggedOutsideServiceDeskTimeLimits = true;
+                $dbeCustomer                          = new DBECustomer($this);
+                $dbeCustomer->getRow($customerId);
+                $has24HourSupport = $dbeCustomer->getValue(DBECustomer::support24HourFlag) == 'Y';
+                if (!$has24HourSupport) {
+                    $buCustomerItem = new BUCustomerItem($this);
+                    $hasServiceDesk = $buCustomerItem->customerHasServiceDeskContract($customerId);
+                }
+            }
+        }
+        $data       = new \CNCLTD\TwigDTOs\ServiceRequestLoggedDTO(
+            $serviceRequestId,
+            $dbejCallactivity->getValue(DBEJCallActivity::contactFirstName),
+            $dbejCallactivity->getValue(DBEJCallActivity::reason),
+            $priority,
+            $status,
+            $slaResponseHours,
+            $isLoggedOutsideServiceDeskTimeLimits,
+            $hasServiceDesk,
+            $has24HourSupport,
+            $raisedAutomatically
+        );
+        $template   = '@customerFacing/ServiceLogged/ServiceLogged.html.twig';
+        $subject    = "Service Request {$serviceRequestId} - {$dbejCallactivity->getValue(DBEJCallActivity::emailSubjectSummary)} - Logged";
+        $selfFlag   = DBEContact::initialLoggingEmailFlag;
+        $othersFlag = DBEContact::othersInitialLoggingEmailFlag;
+        $this->sendCustomerEmail($template, $data, $dbejCallactivity, $othersFlag, $subject);
+    }
+
+    /**
+     * @param $body json data
+     * @return DataSet
+     * @throws Exception
+     */
+    function createActivityFromJson($body)
+    {
+        $dbeCallActivity = new DBECallActivity($this);
+        $dsCallActivity  = new DataSet($this);
+        $dsCallActivity->copyColumnsFrom($dbeCallActivity);
+        $dsCallActivity->setNull(DBECallActivity::callActivityID, DA_ALLOW_NULL);
+        $dateTimeRaised   = $body->dateRaised . ' ' . $body->timeRaised . ':00';
+        $slaResponseHours = $this->getSlaResponseHours(
+            $body->priority,
+            $body->customerID,
+            $body->contactID
+        );
+        /*
+    * Create a new problem
+    */
+        $dbeProblem = new DBEProblem($this);
+        $dbeProblem->setValue(
+            DBEProblem::hdLimitMinutes,
+            $this->dsHeader->getValue(DBEHeader::hdTeamLimitMinutes)
+        );
+        $dbeProblem->setValue(
+            DBEProblem::esLimitMinutes,
+            $this->dsHeader->getValue(DBEHeader::esTeamLimitMinutes)
+        );
+        $dbeProblem->setValue(
+            DBEProblem::smallProjectsTeamLimitMinutes,
+            $this->dsHeader->getValue(DBEHeader::smallProjectsTeamLimitMinutes)
+        );
+        $dbeProblem->setValue(
+            DBEProblem::projectTeamLimitMinutes,
+            $this->dsHeader->getValue(DBEHeader::projectTeamLimitMinutes)
+        );
+        $dbeProblem->setValue(
+            DBEProblem::customerID,
+            $body->customerID
+        );
+        if (isset($body->customerproblemno)) {
+            $dbeProblem->setValue(DBEProblem::raiseTypeId, $this->getProblemRaiseType(BUProblemRaiseType::EMAIL));
+            $customerRaisedRequest = $this->getCustomerRaisedRequest($body->customerproblemno);
+            $dbeProblem->setValue(DBEProblem::emailSubjectSummary, $customerRaisedRequest['emailSubject']);
+        }
+        $dbeProblem->setValue(
+            DBEProblem::dateRaised,
+            $dateTimeRaised
+        );
+        $userID = null;
+        if ($body->userID) {
+            $userID = $body->userID;
+        }
+        $dbeProblem->setValue(
+            DBEProblem::userID,
+            $userID
+        );
+        $dbeProblem->setValue(
+            DBEProblem::rootCauseID,
+            $body->rootCauseID ?? null
+        );
+        $dbeProblem->setValue(
+            DBEProblem::authorisedBy,
+            $body->authorisedBy ?? null
+        );
+        $dbeProblem->setValue(
+            DBEProblem::status,
+            $body->startWork ? 'P' : 'I'
+        );
+        $dbeProblem->setValue(
+            DBEProblem::slaResponseHours,
+            $slaResponseHours
+        );
+        $dbeProblem->setValue(
+            DBEProblem::queueNo,
+            $body->queueNo ?? 1
+        ); // initial queue number
+        $dbeProblem->setValue(
+            DBEProblem::priority,
+            $body->priority
+        );
+        $dbeProblem->setValue(
+            DBEProblem::hideFromCustomerFlag,
+            $body->hideFromCustomerFlag ? 'Y' : 'N'
+        );
+        $dbeProblem->setValue(
+            DBEProblem::criticalFlag,
+            $body->criticalSRFlag ? 'Y' : 'N'
+        );
+        $notes = $body->internalNotes;
+        if (isset($body->internalNotesAppend)) {
+            $notes .= $body->internalNotesAppend;
+        }
+        $dbeProblem->setValue(
+            DBEProblem::internalNotes,
+            $notes
+        );
+        $dbeProblem->setValue(
+            DBEProblem::contactID,
+            $body->contactID
+        );
+        $dbeProblem->setValue(
+            DBEProblem::contractCustomerItemID,
+            $body->contractCustomerItemID ?? null
+        );
+        $dbeProblem->setValue(
+            DBEProblem::projectID,
+            $body->projectID ?? null
+        );
+        $dbeProblem->setValue(
+            DBEProblem::emailSubjectSummary,
+            $body->emailSubjectSummary ?? null
+        );
+        $dbeProblem->setValue(
+            DBEProblem::assetName,
+            $body->assetName ?? null
+        );
+        $dbeProblem->setValue(
+            DBEProblem::assetTitle,
+            $body->assetTitle ?? null
+        );
+        $dbeProblem->setValue(
+            DBEProblem::repeatProblem,
+            $body->repeatProblem ? 1 : 0
+        );
+        if (isset($body->notFirstTimeFixReason)) {
+            $dbeProblem->setValue(
+                DBEProblem::notFirstTimeFixReason,
+                $body->notFirstTimeFixReason
+            );
+        }
+        $dbeProblem->insertRow();
+        if ($body->monitorSRFlag) {
+            $this->toggleMonitoringFlag($dbeProblem->getPKValue());
+        }
+        $endTime = $this->getEndtime(
+            $body->callActTypeID,
+            $body->timeRaised
+        );
+        $dsCallActivity->setUpdateModeInsert();
+        $dsCallActivity->setValue(
+            DBEJCallActivity::callActivityID,
+            0
+        );
+        $dsCallActivity->setValue(
+            DBEJCallActivity::siteNo,
+            $body->siteNo
+        );
+        $dsCallActivity->setValue(
+            DBEJCallActivity::contactID,
+            $body->contactID
+        );
+        $dsCallActivity->setValue(
+            DBEJCallActivity::callActTypeID,
+            $body->callActTypeID ?? null
+        );
+        $dsCallActivity->setValue(
+            DBEJCallActivity::problemID,
+            $dbeProblem->getPKValue()
+        );
+        $dsCallActivity->setValue(
+            DBEJCallActivity::date,
+            $body->dateRaised
+        );
+        $dsCallActivity->setValue(
+            DBEJCallActivity::startTime,
+            $body->timeRaised
+        );
+        $dsCallActivity->setValue(
+            DBEJCallActivity::endTime,
+            $endTime
+        );
+        $dsCallActivity->setValue(
+            DBEJCallActivity::status,
+            'C'
+        ); // Checked
+        $dsCallActivity->setValue(
+            DBEJCallActivity::expenseExportFlag,
+            'N'
+        );
+        $dsCallActivity->setValue(
+            DBEJCallActivity::reason,
+            $body->reason
+        );
+        $dsCallActivity->setValue(
+            DBEJCallActivity::serverGuard,
+            $body->serverGuard ?? null
+        );
+        $dsCallActivity->setValue(
+            DBEJCallActivity::curValue,
+            $body->curValue ?? null
+        );
+        $dsCallActivity->setValue(
+            DBEJCallActivity::statementYearMonth,
+            null
+        );
+        $dsCallActivity->setValue(
+            DBEJCallActivity::customerItemID,
+            null
+        );
+        $dsCallActivity->setValue(
+            DBEJCallActivity::authorisedFlag,
+            'Y'
+        );
+        $dsCallActivity->setValue(
+            DBEJCallActivity::userID,
+            $GLOBALS['auth']->is_authenticated()
+        ); // user that created activity
+        $dsCallActivity->post();
+        $this->setProblemRaise($dbeProblem, $dsCallActivity); //createActivityFromSession
+        $dbeContact = null;
+        if ($body->contactID) {
+            $dbeContact = new DBEContact($this);
+            $dbeContact->getRow($body->contactID);
+        }
+        $this->updateDataAccessObject(
+            $dsCallActivity,
+            $dbeCallActivity
+        ); // Update the DB
+        if ($dbeProblem->getValue(DBEJProblem::hideFromCustomerFlag) == 'N') {       // skip work commenced
+            if ($dbeProblem->getValue(DBEJProblem::priority) == 5) {
+                $fields['submittedTo'] = 'Project Team';
+            } else {
+                $fields['submittedTo'] = 'Service Desk';
+            }
+            $this->sendServiceRequestLoggedEmail($dsCallActivity->getValue(DBECallActivity::callActivityID), false);
+        }
+        $buCustomer = new BUCustomer($this);
+        $dsCustomer = new DataSet($this);
+        $buCustomer->getCustomerByID(
+            $body->customerID,
+            $dsCustomer
+        );
+        if (($dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' && $dsCustomer->getValue(
+                    DBECustomer::specialAttentionEndDate
+                ) >= date(
+                    'Y-m-d'
+                )) || ($dbeContact && $dbeContact->getValue(DBEContact::specialAttentionContactFlag) == 'Y')) {
+            $this->sendSpecialAttentionEmail($dbeCallActivity->getPKValue());
+        }
+        return $dsCallActivity;
     }
 
     function sendServiceReAddedEmail($newProblemID,
@@ -5846,56 +5252,39 @@ is currently a balance of ';
     )
     {
 
-        $buMail = new BUMail($this);
-
+        $buMail      = new BUMail($this);
         $dbeJProblem = new DBEJProblem($this);
         $dbeJProblem->getRow($newProblemID);
-
         $senderEmail = CONFIG_SUPPORT_EMAIL;
 //        $senderName = 'CNC Support Department';
-
         $toEmail = false; // sdManager only
-
 //        $activityRef = $newProblemID . ' ' . $dbeJProblem->getValue(DBEJProblem::customerName);
-
         $template = new Template(
-            EMAIL_TEMPLATE_DIR,
-            "remove"
+            EMAIL_TEMPLATE_DIR, "remove"
         );
         $template->set_file(
             'page',
             'ServiceReAddedEmail.inc.html'
         );
-
-        $dbeJCallActivity = $this->getFirstActivityInProblem($newProblemID);
-
-        $subject = 'Similar activity added for ' . $dbeJProblem->getValue(DBEJProblem::customerName);
-
-        $urlActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+        $dbeJCallActivity = $this->getFirstActivityInServiceRequest($newProblemID);
+        $subject          = 'Similar activity added for ' . $dbeJProblem->getValue(DBEJProblem::customerName);
+        $urlActivity      = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
-
         $template->setVar(
             array(
-
-                'newProblemID' => $newProblemID,
-                'oldProblemID' => $oldProblemID,
-                'urlActivity'  => $urlActivity,
-                'customerName' => $dbeJProblem->getValue(DBEJProblem::customerName),
-                'CONFIG_SERVICE_REQUEST_DESC'
-                               => CONFIG_SERVICE_REQUEST_DESC
-
+                'newProblemID'                => $newProblemID,
+                'oldProblemID'                => $oldProblemID,
+                'urlActivity'                 => $urlActivity,
+                'customerName'                => $dbeJProblem->getValue(DBEJProblem::customerName),
+                'CONFIG_SERVICE_REQUEST_DESC' => CONFIG_SERVICE_REQUEST_DESC
             )
         );
-
-
         $template->parse(
             'output',
             'page',
             true
         );
-
         $body = $template->get_var('output');
-
         $hdrs = array(
             'From'         => $senderEmail,
             'To'           => $toEmail,
@@ -5903,20 +5292,15 @@ is currently a balance of ';
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
-
         $buMail->mime->setHTMLBody($body);
-
         $mime_params = array(
             'text_encoding' => '7bit',
             'text_charset'  => 'UTF-8',
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
+        $body        = $buMail->mime->get($mime_params);
+        $hdrs        = $buMail->mime->headers($hdrs);
         $buMail->putInQueue(
             $senderEmail,
             $toEmail,
@@ -5928,9 +5312,7 @@ is currently a balance of ';
     function sendUncheckedActivityEmail()
     {
         $buMail = new BUMail($this);
-
         $this->setMethodName('sendUncheckedActivityEmail');
-
         $this->dbeCallActivitySearch->getRowsBySearchCriteria(
             null,
             null,
@@ -5949,10 +5331,8 @@ is currently a balance of ';
             null,
             'N'
         );
-
         $senderEmail = CONFIG_SUPPORT_EMAIL;
-        $toEmail = false;
-
+        $toEmail     = false;
         ob_start();
         ?>
         <html lang="en">
@@ -5975,7 +5355,7 @@ is currently a balance of ';
                     <TD nowrap
                         style="background-color:#E0DFE3"
                     ><A
-                                href="<?= SITE_URL ?>/Activity.php?action=displayActivity&callActivityID=<?= $this->dbeCallActivitySearch->getPKValue(
+                                href="<?= SITE_URL ?>/SRActivity.php?action=displayActivity&callActivityID=<?= $this->dbeCallActivitySearch->getPKValue(
                                 ); ?>"
                         ><?php
                             echo $this->dbeCallActivitySearch->getPKValue();
@@ -6009,7 +5389,6 @@ is currently a balance of ';
         <?php
         $message = ob_get_contents();
         ob_end_clean();
-
         $hdrs = array(
             'From'         => $senderEmail,
             'To'           => $toEmail,
@@ -6017,21 +5396,16 @@ is currently a balance of ';
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
-
 //        $buCustomer = new BUCustomer($this);
-
         $buMail->mime->setHTMLBody($message);
-
         $mime_params = array(
             'text_encoding' => '7bit',
             'text_charset'  => 'UTF-8',
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
+        $body        = $buMail->mime->get($mime_params);
+        $hdrs        = $buMail->mime->headers($hdrs);
         return $buMail->putInQueue(
             $senderEmail,
             $toEmail,
@@ -6061,7 +5435,6 @@ is currently a balance of ';
         if (!$description) {
             $this->raiseError('description not passed');
         }
-
         return $this->addDocument(
             $problemID,
             $userfile ['tmp_name'],
@@ -6086,15 +5459,12 @@ is currently a balance of ';
             DBEJCallDocument::problemID,
             $problemID
         );
-
         if (strlen($fileName) > 100) {
             $fileName = substr($fileName, -100);
         }
-
         if (strlen($description) > 150) {
             $description = substr($description, 0, 150);
         }
-
         $dbeCallDocument->setValue(
             DBEJCallDocument::file,
             fread(
@@ -6117,7 +5487,6 @@ is currently a balance of ';
             DBEJCallDocument::fileLength,
             ( int )$fileSizeBytes
         );
-
         $dbeCallDocument->setValue(
             DBEJCallDocument::createUserID,
             $this->loggedInUserID
@@ -6130,7 +5499,6 @@ is currently a balance of ';
             DBEJCallDocument::fileMIMEType,
             ( string )$mimeType
         );
-
         return ($dbeCallDocument->insertRow());
     }
 
@@ -6141,24 +5509,20 @@ is currently a balance of ';
     {
 
         $dbeCustomerItem = new DBECustomerItem($this);
-
         if ($dbeCustomerItem->getGSCRow($customerID)) {
-            $reason = 'Prepay Adjustment';
-
-            $callActivityID = $this->createActivityFromCustomerID(
+            $reason          = 'Prepay Adjustment';
+            $callActivityID  = $this->createActivityFromCustomerID(
                 $customerID,
                 false,
                 'C',
                 $dbeCustomerItem->getValue(DBECustomerItem::customerItemID)
             );
-
             $dbeCallActivity = new DBECallActivity($this);
             $dbeCallActivity->getRow($callActivityID);
             $dbeCallActivity->setValue(
                 DBEJCallActivity::callActTypeID,
                 CONFIG_CONTRACT_ADJUSTMENT_ACTIVITY_TYPE_ID
             );
-
             $dbeCallActivity->setValue(
                 DBEJCallActivity::date,
                 $date
@@ -6247,24 +5611,20 @@ is currently a balance of ';
      * @param bool $includeServerGuardUpdates
      * @return bool
      */
-    function getNavigateLinks(
-        $callActivityID,
-        &$dsCallActivity,
-        $includeTravel = false,
-        $includeOperationalTasks = false,
-        $includeServerGuardUpdates = false
+    function getNavigateLinks($callActivityID,
+                              &$dsCallActivity,
+                              $includeTravel = false,
+                              $includeOperationalTasks = false,
+                              $includeServerGuardUpdates = false
     )
     {
         $navigateLinksArray = false;
-
-        $dbeCallActivity = new DBEJCallActivity($this);
+        $dbeCallActivity    = new DBEJCallActivity($this);
         $dbeCallActivity->getRow($callActivityID);
         $problemID = $dbeCallActivity->getValue(DBEJCallActivity::problemID);
-
         if (!$problemID) {
             $this->raiseError('No problemID for activityID ' . $callActivityID);
         }
-
         $dbeCallActivity->getRowsByProblemID(
             $problemID,
             $includeTravel,
@@ -6273,36 +5633,28 @@ is currently a balance of ';
             false,
             $includeServerGuardUpdates
         );
-
         $this->getData(
             $dbeCallActivity,
             $dsCallActivity
         );
-
-        $navigateLinksArray ['first'] = false;
-        $navigateLinksArray ['last'] = false;
-        $navigateLinksArray ['next'] = false;
+        $navigateLinksArray ['first']    = false;
+        $navigateLinksArray ['last']     = false;
+        $navigateLinksArray ['next']     = false;
         $navigateLinksArray ['previous'] = false;
-
-        $lastID = false;
-
-        $followingIDIsNextID = false;
-
-        $rowCount = 0;
-        $thisID = null;
+        $lastID                          = false;
+        $followingIDIsNextID             = false;
+        $rowCount                        = 0;
+        $thisID                          = null;
         while ($dsCallActivity->fetchNext()) {
             $rowCount++;
             $thisID = $dsCallActivity->getValue(DBEJCallActivity::callActivityID);
-
             if (!$lastID) { // first activity in set
                 $navigateLinksArray ['first'] = $thisID;
             }
-
             if ($followingIDIsNextID) { // next activity in set
                 $navigateLinksArray ['next'] = $thisID;
-                $followingIDIsNextID = false;
+                $followingIDIsNextID         = false;
             }
-
             if ($thisID == $callActivityID) { // current in set is our activity
                 $navigateLinksArray ['thisRowNumber'] = $rowCount;
                 if ($lastID) {
@@ -6310,39 +5662,30 @@ is currently a balance of ';
                 }
                 $followingIDIsNextID = true;
             }
-
             $lastID = $dsCallActivity->getValue(DBEJCallActivity::callActivityID);
         }
-
         if (!@$navigateLinksArray ['next']) {
             $navigateLinksArray ['last'] = false;
         }
-
         if ($thisID !== $callActivityID) {
             $navigateLinksArray ['last'] = $thisID;
         }
-
         if ($callActivityID == @$navigateLinksArray ['first']) {
             $navigateLinksArray ['first'] = false;
         }
-
         if (@$navigateLinksArray ['next'] == @$navigateLinksArray ['last']) {
             $navigateLinksArray ['next'] = false;
         }
-
         if (@$navigateLinksArray ['first'] == @$navigateLinksArray ['previous']) {
             $navigateLinksArray ['previous'] = false;
         }
-
         if (!@$navigateLinksArray ['thisRowNumber']) {
             $navigateLinksArray ['thisRowNumber'] = 1;
         }
-
         $dsCallActivity->initialise();
-
         return $navigateLinksArray;
 
-    }
+    } // end email to customer
 
     function linkActivities($fromCallActivityID,
                             $toCallActivityID,
@@ -6351,16 +5694,13 @@ is currently a balance of ';
     {
 
         $dbeCallActivity = new DBECallActivity($this);
-
-        $fromProblemID = null;
-        $toProblemID = null;
-
+        $fromProblemID   = null;
+        $toProblemID     = null;
         if (!$dbeCallActivity->getRow($fromCallActivityID)) {
             $this->raiseError('link to activity ' . $fromCallActivityID . ' does not exist');
         } else {
             $toProblemID = $dbeCallActivity->getValue(DBEJCallActivity::problemID);
         }
-
         if (!$dbeCallActivity->getRow($toCallActivityID)) {
             $this->raiseError('activity ' . $toCallActivityID . ' does not exist');
         } else {
@@ -6377,33 +5717,26 @@ is currently a balance of ';
                 DBEJCallActivity::problemID,
                 $toProblemID
             );
-
             $dbeCallActivity->updateRow();
         }
 
     }
 
-    function updateTextFields(
-        $callActivityID,
-        $reason,
-        $internalNotes
+    function updateTextFields($callActivityID,
+                              $reason,
+                              $internalNotes
     )
     {
         $dbeCallActivity = new DBECallActivity($this);
-
         if (!$dbeCallActivity->getRow($callActivityID)) {
 
             echo 'Activity ' . $callActivityID . ' not found';
             exit;
 
         }
-
         $dbeProblem = new DBEProblem($this);
         $dbeProblem->getRow($dbeCallActivity->getValue(DBEJCallActivity::problemID));
-
-        if (
-            trim($reason) && $reason != $dbeCallActivity->getValue(DBEJCallActivity::reason)
-        ) {
+        if (trim($reason) && $reason != $dbeCallActivity->getValue(DBEJCallActivity::reason)) {
             $dbeCallActivity->setValue(
                 DBEJCallActivity::reason,
                 $reason
@@ -6412,10 +5745,7 @@ is currently a balance of ';
 
 
         }
-
-        if (
-            trim($internalNotes) && $internalNotes != $dbeProblem->getValue(DBEJProblem::internalNotes)
-        ) {
+        if (trim($internalNotes) && $internalNotes != $dbeProblem->getValue(DBEJProblem::internalNotes)) {
 
             $dbeProblem->setValue(
                 DBEJProblem::internalNotes,
@@ -6440,38 +5770,62 @@ is currently a balance of ';
             )->isApprover()) {
             return "This activity has overtime which has been processed so it can't be edited.";
         }
-
         // status is NOT Authorised AND NOT Checked
         $dbeProblem = new DBEProblem($this);
         $dbeProblem->getRow($dsCallActivity->getValue(DBECallActivity::problemID));
-        if ($dbeProblem->getValue(DBEProblem::status) == 'C' && !$ctActivity->isUserSDManager()
-        ) {
+        if ($dbeProblem->getValue(DBEProblem::status) == 'C' && !$ctActivity->isUserSDManager()) {
             return "This request has been completed and can't be edited.";
         }
+        return 'ALL_GOOD';
 
+    } // end email to customer
+
+    /**
+     * @param DataSet $dsCallActivity
+     * @param CTCNC $ctActivity
+     * @return bool
+     */
+    function checkActivityEditionByProblem($dsCallActivity, $ctActivity, $dbeProblem)
+    {
+        if ($dsCallActivity->getValue(DBECallActivity::overtimeExportedFlag) == 'Y' && !$ctActivity->getDbeUser(
+            )->isApprover()) {
+            return "This activity has overtime which has been processed so it can't be edited.";
+        }
+        // status is NOT Authorised AND NOT Checked
+        if ($dbeProblem->getValue(DBEProblem::status) == 'C' && !$ctActivity->isUserSDManager()) {
+            return "This request has been completed and can't be edited.";
+        }
         return 'ALL_GOOD';
 
     }
 
-    function finaliseActivity(
-        $callActivityID,
-        $onSite = false
+    /**
+     * Create copy of this activity but with:
+     *    start time now and end time not set
+     *   User = current user
+     *    date = today
+     *    reason = finalStatus( from old activity )
+     *    Status = not completed
+     *
+     * $moveToUsersQueue: Whether to move the SR to the logged in user's queue
+     *
+     * @access private
+     * @authors Karim Ahmed - Sweet Code Limited
+     */
+    function finaliseActivity($callActivityID,
+                              $onSite = false
     )
     {
 
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($callActivityID);
-
         $dbeProblem = new DBEProblem($this);
         $dbeProblem->getRow($dbeCallActivity->getValue(DBEJCallActivity::problemID));
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::status,
             'C'
         );              // checked for billing
-
         $dbeCallActivity->updateRow();
-
         // if this is onSite then the report and email generated when the send time is confirmed
         if ($dbeProblem->getValue(DBEJProblem::hideFromCustomerFlag) == 'N' && !$onSite) {
             //TODO: check this ..as the function doesn't exist
@@ -6487,49 +5841,27 @@ is currently a balance of ';
             $dbeProblem->getValue(DBEJProblem::customerID),
             $dsCustomer
         );
-
-
         $dbeContact = null;
         if ($dbeCallActivity->getValue(DBECallActivity::contactID)) {
             $dbeContact = new DBEContact($this);
             $dbeContact->getRow($dbeCallActivity->getValue(DBECallActivity::contactID));
         }
-
-        if (
-            ($dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' &&
-                $dsCustomer->getValue(DBECustomer::specialAttentionEndDate) >= date('Y-m-d'))
-            ||
-            (
-                $dbeContact && $dbeContact->getValue(DBEContact::specialAttentionContactFlag) == 'Y'
-            )
-        ) {
+        if (($dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' && $dsCustomer->getValue(
+                    DBECustomer::specialAttentionEndDate
+                ) >= date('Y-m-d')) || ($dbeContact && $dbeContact->getValue(
+                    DBEContact::specialAttentionContactFlag
+                ) == 'Y')) {
             $this->sendSpecialAttentionEmail($dbeCallActivity->getPKValue());
         }
-
         if ($dbeProblem->getValue(DBEJProblem::criticalFlag) == 'Y') {
             $this->sendCriticalEmail($callActivityID);
         }
-
         $this->getActivityByID(
             $callActivityID,
             $dsCallActivity
         );
         return $dsCallActivity;
-    } // end email to customer
-
-    /**
-     * Create copy of this activity but with:
-     *    start time now and end time not set
-     *   User = current user
-     *    date = today
-     *    reason = finalStatus( from old activity )
-     *    Status = not completed
-     *
-     * $moveToUsersQueue: Whether to move the SR to the logged in user's queue
-     *
-     * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
-     */
+    }
 
     /**
      * Allocate an technician to a request, sending an email to the engineer if this request
@@ -6547,9 +5879,7 @@ is currently a balance of ';
         if (!$this->dbeProblem) {
             $this->dbeProblem = new DBEProblem($this);
         }
-
         $this->dbeProblem->getRow($problemID);
-
         /*
     Send an email to the new person new user is not "unallocated" user
     */
@@ -6562,12 +5892,10 @@ is currently a balance of ';
                 $allocatedBy
             );
         }
-
         $this->dbeProblem->setValue(
             DBEJProblem::userID,
             $userID
         );
-
         $this->dbeProblem->updateRow();
     }
 
@@ -6587,38 +5915,26 @@ is currently a balance of ';
         if ($newUserID == 0) {
             return;
         }
-
-        $buMail = new BUMail($this);
-
+        $buMail      = new BUMail($this);
         $dbeJProblem = new DBEJProblem($this);
         $dbeJProblem->getRow($problemID);
-
         $this->dbeUser->getRow($newUserID);
-
         $senderEmail = CONFIG_SUPPORT_EMAIL;
 //        $senderName = 'CNC Support Department';
-
-        $toEmail = $this->dbeUser->getValue(DBEUser::username) . '@' . CONFIG_PUBLIC_DOMAIN;
-
+        $toEmail     = $this->dbeUser->getValue(DBEUser::username) . '@' . CONFIG_PUBLIC_DOMAIN;
         $activityRef = $problemID . ' ' . $dbeJProblem->getValue(DBEJProblem::customerName);
-
-        $template = new Template(
-            EMAIL_TEMPLATE_DIR,
-            "remove"
+        $template    = new Template(
+            EMAIL_TEMPLATE_DIR, "remove"
         );
         $template->set_file(
             'page',
             'ServiceReallocatedEmail.inc.html'
         );
-
-        $dbeJCallActivity = $this->getFirstActivityInProblem($problemID);
+        $dbeJCallActivity     = $this->getFirstActivityInServiceRequest($problemID);
         $dbeJLastCallActivity = $this->getLastActivityInProblem($problemID);
-
-        $urlActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJLastCallActivity->getPKValue(
+        $urlActivity          = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJLastCallActivity->getPKValue(
             );
-
-        $assignedByUserName = (string)$DBUser->getValue(DBEUser::name);
-
+        $assignedByUserName   = (string)$DBUser->getValue(DBEUser::name);
         $template->setVar(
             array(
                 'activityRef'                 => $activityRef,
@@ -6628,40 +5944,31 @@ is currently a balance of ';
                 'lastDetails'                 => $dbeJLastCallActivity->getValue(DBEJCallActivity::reason),
                 'assignedByUserName'          => $assignedByUserName,
                 'CONFIG_SERVICE_REQUEST_DESC' => CONFIG_SERVICE_REQUEST_DESC
-
             )
         );
-
         $template->parse(
             'output',
             'page',
             true
         );
-
-        $body = $template->get_var('output');
-
+        $body    = $template->get_var('output');
         $subject = CONFIG_SERVICE_REQUEST_DESC . ' ' . $activityRef . ' allocated to you by ' . $assignedByUserName;
-
-        $hdrs = array(
+        $hdrs    = array(
             'From'         => $senderEmail,
             'To'           => $toEmail,
             'Subject'      => $subject,
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
-
         $buMail->mime->setHTMLBody($body);
-
         $mime_params = array(
             'text_encoding' => '7bit',
             'text_charset'  => 'UTF-8',
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
+        $body        = $buMail->mime->get($mime_params);
+        $hdrs        = $buMail->mime->headers($hdrs);
         $buMail->putInQueue(
             $senderEmail,
             $toEmail,
@@ -6675,24 +5982,21 @@ is currently a balance of ';
     )
     {
         $dbeJProblem = new DBEJProblem($this);
-
         $dbeJProblem->getOpenRowsByContactID($contactID);
-
         $this->getData(
             $dbeJProblem,
             $dsResults
         );
-    } // end email to customer
+    }
 
     /**
      * Get problems by status
      *
      * @param mixed $status
-     * @param mixed $dsResults
      * @param bool $includeAutomaticallyFixed
+     * @return DBEJProblem
      */
     function getProblemsByStatus($status,
-                                 &$dsResults,
                                  $includeAutomaticallyFixed = true
     )
     {
@@ -6701,11 +6005,7 @@ is currently a balance of ';
             $status,
             $includeAutomaticallyFixed
         );
-        $this->getData(
-            $dbeJProblem,
-            $dsResults
-        );
-
+        return $dbeJProblem;
     }
 
     /**
@@ -6722,7 +6022,6 @@ is currently a balance of ';
         );
         return $dsResults;
     }
-
 
     function getSLAWarningProblems()
     {
@@ -6744,9 +6043,7 @@ is currently a balance of ';
     function getFutureProblems(&$dsResults)
     {
         $dbeJProblem = new DBEJProblem($this);
-
         $dbeJProblem->getFutureRows();
-
         $this->getData(
             $dbeJProblem,
             $dsResults
@@ -6756,40 +6053,13 @@ is currently a balance of ';
 
     /**
      * @param $queueNo
-     * @param DataSet $dsResults
+     * @return DBEJProblem
      */
-    function getProblemsByQueueNo($queueNo,
-                                  &$dsResults
-    )
+    function getProblemsByQueue($queueNo)
     {
         $dbeJProblem = new DBEJProblem($this);
-        $dbeJProblem->getRowsByQueueNo(
-            $queueNo,
-            true
-        ); // unassigned first
-        $this->getData(
-            $dbeJProblem,
-            $dsResults
-        );
-
-        $dsResults->sortAscending(
-            'dashboardSortColumn'
-        );
-        $dbeJProblem->getRowsByQueueNo($queueNo);       // then assigned
-
-        $dsAssignedResults = new DataSet($this);
-        $this->getData(
-            $dbeJProblem,
-            $dsAssignedResults
-        );
-
-        $dsAssignedResults->sortAscending(
-            'dashboardSortColumn'
-        );
-
-        $dsResults->setClearRowsBeforeReplicateOff();
-
-        $dsResults->replicate($dsAssignedResults);
+        $dbeJProblem->getRowsByQueueNoWithFuture($queueNo);
+        return $dbeJProblem;
     }
 
     /**
@@ -6801,14 +6071,11 @@ is currently a balance of ';
     function getActiveProblemsByCustomer($customerID)
     {
         $dbeJProblem = new DBEJProblem($this);
-
         $dbeJProblem->getActiveProblemsByCustomer($customerID);
-
         $this->getData(
             $dbeJProblem,
             $dsResults
         );
-
         return $dsResults;
 
     }
@@ -6818,9 +6085,7 @@ is currently a balance of ';
         if (!$this->dbeProblem) {
             $this->dbeProblem = new DBEProblem($this);
         }
-
         $this->dbeProblem->getRow($problemID);
-
         if ($this->dbeProblem->getValue(DBEJProblem::criticalFlag) == 'Y') {
             $this->dbeProblem->setValue(
                 DBEJProblem::criticalFlag,
@@ -6841,6 +6106,7 @@ is currently a balance of ';
      * @param DataSet $dsInput
      * @param bool|int|array $selectedOrderLine
      * @param int $queue
+     * @param null $serviceRequestEmailSubjectSummary
      * @return string
      * @throws Exception
      */
@@ -6851,35 +6117,28 @@ is currently a balance of ';
     )
     {
         $buSalesOrder = new BUSalesOrder($this);
-
-        $dbeItem = new DBEItem($this);
-        $dbeItemType = new DBEItemType($this);
-        $dsOrdhead = new DataSet($this);
-        $dsOrdline = new DataSet($this);
+        $dbeItem      = new DBEItem($this);
+        $dbeItemType  = new DBEItemType($this);
+        $dsOrdhead    = new DataSet($this);
+        $dsOrdline    = new DataSet($this);
         $buSalesOrder->getOrderByOrdheadID(
             $ordheadID,
             $dsOrdhead,
             $dsOrdline
         );
-
-
-        $dateRaised = date(DATE_MYSQL_DATE . ' ' . DATE_MYSQL_TIME);
-        $timeRaised = date(CONFIG_MYSQL_TIME_HOURS_MINUTES);
-
-        $internalNotes = '<P>' . str_replace(
-                "\r\n",
-                "",
-                $dsInput->getValue(BURenContract::serviceRequestText)
-            ) . '</P>';
-
+        $dateRaised              = date(DATE_MYSQL_DATE . ' ' . DATE_MYSQL_TIME);
+        $timeRaised              = date(CONFIG_MYSQL_TIME_HOURS_MINUTES);
+        $cleanServiceRequestText = str_replace("\r\n", "", $dsInput->getValue(BURenContract::serviceRequestText));
+        $internalNotes           = "
+<p>Sales Order Number: {$ordheadID}</p>
+<p>{$cleanServiceRequestText}</p>";
         if ($dsInput->getValue(BURenContract::etaDate)) {
-            $internalNotes .=
-                '<P>ETA: ' . Controller::dateYMDtoDMY($dsInput->getValue(BURenContract::etaDate)) . '</P><BR/>';
+            $internalNotes .= '<P>ETA: ' . Controller::dateYMDtoDMY(
+                    $dsInput->getValue(BURenContract::etaDate)
+                ) . '</P><BR/>';
         } else {
-            $internalNotes .=
-                '<P>ETA: TBA</P><BR/>';
+            $internalNotes .= '<P>ETA: TBA</P><BR/>';
         }
-
         /*
     Determine whether delivery is direct or via CNC and set a note accordingly
     */
@@ -6888,38 +6147,31 @@ is currently a balance of ';
             DBEJPorhead::ordheadID,
             $ordheadID
         );
-
         if ($dbePorhead->countRowsByColumn(DBEJPorhead::ordheadID)) {
 
             $dbePorhead->setValue(
                 DBEJPorhead::ordheadID,
                 $ordheadID
             );
-
             $dbePorhead->getRowsByColumn(DBEJPorhead::ordheadID);
-
             $directDelivery = false;
             while ($dbePorhead->fetchNext()) {
                 if ($dbePorhead->getValue(DBEPorhead::directDeliveryFlag) == 'Y') {
                     $directDelivery = true;
                 }
             }
-
             if ($directDelivery) {
                 $internalNotes .= '<P>Delivery is direct to site</P><BR/>';
             } else {
                 $internalNotes .= '<P>Delivery is to CNC</P>';
             }
         }
-
-        $slaResponseHours =
-            $this->getSlaResponseHours(
-                $dsInput->getValue(BURenContract::serviceRequestPriority),
-                $dsOrdhead->getValue(DBEOrdhead::customerID),
-                $dsOrdhead->getValue(DBEOrdhead::delContactID)
-            );
-
-        $dbeProblem = new DBEProblem($this);
+        $slaResponseHours = $this->getSlaResponseHours(
+            $dsInput->getValue(BURenContract::serviceRequestPriority),
+            $dsOrdhead->getValue(DBEOrdhead::customerID),
+            $dsOrdhead->getValue(DBEOrdhead::delContactID)
+        );
+        $dbeProblem       = new DBEProblem($this);
         $dbeProblem->setValue(
             DBEJProblem::customerID,
             $dsOrdhead->getValue(DBEOrdhead::customerID)
@@ -6960,11 +6212,9 @@ is currently a balance of ';
             DBEJProblem::contactID,
             $dsOrdhead->getValue(DBEOrdhead::delContactID)
         );
-
         if ($dsInput->getValue(BURenContract::serviceRequestCustomerItemID) == -1) {
             $dsInput->setValue(BURenContract::serviceRequestCustomerItemID, null);
         }
-
         $dbeProblem->setValue(
             DBEJProblem::contractCustomerItemID,
             $dsInput->getValue(BURenContract::serviceRequestCustomerItemID)
@@ -6977,18 +6227,22 @@ is currently a balance of ';
             DBEJProblem::linkedSalesOrderID,
             $ordheadID
         );
-
+        $buHeader = new BUHeader($this);
+        $dsHeader = new DataSet($this);
+        $buHeader->getHeader($dsHeader);
+        if ($queue == 3) $dbeProblem->setValue(
+            DBEJProblem::holdForQA,
+            $dsHeader->getValue(DBEHeader::holdAllSOSmallProjectsP5sforQAReview)
+        ); else if ($queue == 5) $dbeProblem->setValue(
+            DBEJProblem::holdForQA,
+            $dsHeader->getValue(DBEHeader::holdAllSOProjectsP5sforQAReview)
+        );
         $informCustomer = false;
         if ($dsInput->getValue(BURenContract::serviceRequestPriority) == 5) {
-            $informCustomer = true;
-            $buHeader = new BUHeader($this);
-            $dsHeader = new DataSet($this);
-            $buHeader->getHeader($dsHeader);
-
-            $queueProblemColumn = $queue == 3 ? DBEProblem::smallProjectsTeamLimitMinutes : DBEProblem::projectTeamLimitMinutes;
-            $queueHeaderColumn = $queue == 3 ? DBEHeader::smallProjectsTeamLimitMinutes : DBEHeader::projectTeamLimitMinutes;
+            $informCustomer      = true;
+            $queueProblemColumn  = $queue == 3 ? DBEProblem::smallProjectsTeamLimitMinutes : DBEProblem::projectTeamLimitMinutes;
+            $queueHeaderColumn   = $queue == 3 ? DBEHeader::smallProjectsTeamLimitMinutes : DBEHeader::projectTeamLimitMinutes;
             $minutesInADayColumn = $queue == 3 ? DBEHeader::smallProjectsTeamMinutesInADay : DBEHeader::projectTeamMinutesInADay;
-
             $dbeProblem->setValue(
                 $queueProblemColumn,
                 $dsHeader->getValue($queueHeaderColumn)
@@ -6999,9 +6253,7 @@ is currently a balance of ';
                 $dsOrdHead,
                 $dsOrdlineBudget
             );
-
             $minutesInADay = $dsHeader->getValue($minutesInADayColumn);
-
             $normalMinutes = 0;
             while ($dsOrdlineBudget->fetchNext()) {
 
@@ -7020,49 +6272,38 @@ is currently a balance of ';
                     }
                 }
             }
-
             if ($normalMinutes > 0) {
                 $dbeProblem->setValue($queueProblemColumn, $normalMinutes);
             }
         }
-
-
+        $dbeProblem->setValue(DBEProblem::hdLimitMinutes, 10);
+        $dbeProblem->setValue(
+            DBEProblem::emailSubjectSummary,
+            $this->getSuitableEmailSubjectSummary($ordheadID, $selectedOrderLine)
+        );
         $dbeProblem->insertRow();
-
         $reason = "<p>An order has been received for the items below:</p>";
-
         // insert selected items
         $reason .= '<table>';
-
         $reason .= '<tr><td><strong>Qty</strong></td><td><strong>Item</strong></td></tr>';
-
         $dsOrdline->initialise();
-
         while ($dsOrdline->fetchNext()) {
-
-            if (!$selectedOrderLine ||
-                in_array(
+            if (!$selectedOrderLine || in_array(
                     "{$dsOrdline->getValue(DBEOrdline::id)}",
                     $selectedOrderLine
-                )
-            ) {
+                )) {
                 $reason .= '<tr><td>';
-
                 if ($dsOrdline->getValue(DBEOrdline::lineType) == 'I') {
                     $reason .= $dsOrdline->getValue(DBEOrdline::qtyOrdered);
                 } else {
                     $reason .= '&nbsp;';
                 }
-
-
                 $reason .= '</td><td>' . $dsOrdline->getValue(DBEOrdline::description) . '</td></tr>';
             }
 
-        } // end while
-
-        $reason .= '</table>';
+        }
+        $reason          .= '</table>';
         $dbeCallActivity = new DBECallActivity($this);
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::callActivityID,
             null
@@ -7091,9 +6332,7 @@ is currently a balance of ';
             DBEJCallActivity::startTime,
             $timeRaised
         );
-
         $endTime = $this->getEndtime(CONFIG_INITIAL_ACTIVITY_TYPE_ID);
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::endTime,
             $endTime
@@ -7148,27 +6387,24 @@ is currently a balance of ';
         //$dbeCallActivity->setValue( 'overtimeExportedFlag', 'N' );
         $dbeCallActivity->insertRow();
         $this->setProblemRaise($dbeProblem, $dbeCallActivity, BUProblemRaiseType::SALES); //createSalesServiceRequest
-        $db = new dbSweetcode(); // database connection for query
-
-        $sql =
-            "UPDATE
+        $db  = new dbSweetcode(); // database connection for query
+        $sql = "UPDATE
       ordhead
     SET
       odh_service_request_text = null,
       odh_service_request_custitemno = 0
     WHERE
       odh_ordno = " . $ordheadID;
-
         $db->query($sql);
-
         $ret = $dbeProblem->getPKValue();
         /*
     Email to AC
     */
         $this->sendSalesRequestAlertEmail($ret);
-
         if ($informCustomer) {
-            $this->sendEmailToCustomer($dbeProblem->getValue(DBEProblem::problemID), self::SalesOrderCreatedRequest);
+            $this->sendSalesOrderServiceRequestCreatedEmail(
+                $dbeCallActivity->getValue(DBECallActivity::callActivityID)
+            );
         }
         return $ret;
 
@@ -7177,64 +6413,46 @@ is currently a balance of ';
     function sendSalesRequestAlertEmail($problemID)
     {
 
-        $buMail = new BUMail($this);
-
+        $buMail      = new BUMail($this);
         $dbeJProblem = new DBEJProblem($this);
         $dbeJProblem->getRow($problemID);
-
-
         $senderEmail = CONFIG_SUPPORT_EMAIL;
-
         $this->dbeUser->getRow();
-        $toEmail = 'newproject' . '@' . CONFIG_PUBLIC_DOMAIN;
-
+        $toEmail     = 'newproject' . '@' . CONFIG_PUBLIC_DOMAIN;
         $activityRef = $problemID . ' ' . $dbeJProblem->getValue(DBEJProblem::customerName);
-
-        $template = new Template(
-            EMAIL_TEMPLATE_DIR,
-            "remove"
+        $template    = new Template(
+            EMAIL_TEMPLATE_DIR, "remove"
         );
         $template->set_file(
             'page',
             'SalesRequestAlertEmail.inc.html'
         );
-
-        $dbeJCallActivity = $this->getFirstActivityInProblem($problemID);
-
-        $urlActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+        $dbeJCallActivity  = $this->getFirstActivityInServiceRequest($problemID);
+        $urlActivity       = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
-
-        $projectURL = SITE_URL . '/Project.php?action=add&customerID=' . $dbeJCallActivity->getValue(
+        $projectURL        = SITE_URL . '/Project.php?action=add&customerID=' . $dbeJCallActivity->getValue(
                 DBEJCallActivity::customerID
             );
-
         $createProjectLink = "<a href='" . $projectURL . "'>Click here to create a project for this request</a>";
-
         $template->setVar(
             array(
-                'activityRef'       => $activityRef,
-                'urlActivity'       => $urlActivity,
-                'customerName'      => $dbeJProblem->getValue(DBEJProblem::customerName),
-                'reason'            => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
-                'createProjectLink' => $createProjectLink,
-                'internalNotes'     =>
-                    $dbeJCallActivity->getValue(
-                        DBEJCallActivity::internalNotes
-                    ),
-                'CONFIG_SERVICE_REQUEST_DESC'
-                                    => CONFIG_SERVICE_REQUEST_DESC
-
+                'activityRef'                 => $activityRef,
+                'urlActivity'                 => $urlActivity,
+                'customerName'                => $dbeJProblem->getValue(DBEJProblem::customerName),
+                'reason'                      => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
+                'createProjectLink'           => $createProjectLink,
+                'internalNotes'               => $dbeJCallActivity->getValue(
+                    DBEJCallActivity::internalNotes
+                ),
+                'CONFIG_SERVICE_REQUEST_DESC' => CONFIG_SERVICE_REQUEST_DESC
             )
         );
-
         $template->parse(
             'output',
             'page',
             true
         );
-
         $body = $template->get_var('output');
-
         $hdrs = array(
             'From'         => $senderEmail,
             'To'           => $toEmail,
@@ -7244,20 +6462,15 @@ is currently a balance of ';
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
-
         $buMail->mime->setHTMLBody($body);
-
         $mime_params = array(
             'text_encoding' => '7bit',
             'text_charset'  => 'UTF-8',
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
+        $body        = $buMail->mime->get($mime_params);
+        $hdrs        = $buMail->mime->headers($hdrs);
         $buMail->putInQueue(
             $senderEmail,
             $toEmail,
@@ -7266,17 +6479,36 @@ is currently a balance of ';
         );
     }
 
+    private function sendSalesOrderServiceRequestCreatedEmail(int $activityId)
+    {
+        $dbejCallactivity = new DBEJCallActivity($this);
+        $dbejCallactivity->getRow($activityId);
+        $status     = $this->getServiceRequestStatusText($dbejCallactivity);
+        $dbeProblem = new DBEProblem($this);
+        $dbeProblem->getRow($dbejCallactivity->getValue(DBEJCallActivity::problemID));
+        $team       = $dbeProblem->getValue(DBEProblem::queueNo) === 3 ? "Small Projects" : "Project";
+        $data       = new \CNCLTD\TwigDTOs\SalesOrderServiceRequestCreatedDTO(
+            $dbejCallactivity->getValue(DBEJCallActivity::contactFirstName),
+            $dbejCallactivity->getValue(DBEJCallActivity::problemID),
+            $dbejCallactivity->getValue(DBEJCallActivity::customerSummary),
+            $team,
+            $status
+        );
+        $template   = '@customerFacing/SalesOrderServiceRequestCreated/SalesOrderServiceRequestCreated.html.twig';
+        $subject    = "Service Request {$dbejCallactivity->getValue(DBEJCallActivity::problemID)} - {$dbejCallactivity->getValue(DBEJCallActivity::emailSubjectSummary)} - Logged";
+        $selfFlag   = DBEContact::initialLoggingEmailFlag;
+        $othersFlag = DBEContact::initialLoggingEmailFlag;
+        $this->sendCustomerEmail($template, $data, $dbejCallactivity, $othersFlag, $subject, $selfFlag);
+    }
+
     function getOnSiteActivitiesWithinFiveDaysOfActivity($callActivityID)
     {
         $dbeJCallActivity = new DBEJCallActivity($this);
         $dbeJCallActivity->getRow($callActivityID);
-
         $activityDate = $dbeJCallActivity->getValue(DBEJCallActivity::date);
-        $customerID = $dbeJCallActivity->getValue(DBEJCallActivity::customerID);
-
-        $db = new dbSweetcode(); // database connection for query
-
-        $queryString = "
+        $customerID   = $dbeJCallActivity->getValue(DBEJCallActivity::customerID);
+        $db           = new dbSweetcode(); // database connection for query
+        $queryString  = "
       SELECT
         caa_callactivityno,
         caa_problemno,
@@ -7292,9 +6524,7 @@ is currently a balance of ';
         AND cat_on_site_flag = 'Y'
         AND caa_date BETWEEN DATE_SUB( '$activityDate', INTERVAL 7 DAY ) AND DATE_ADD( '$activityDate', INTERVAL 7 DAY )
         AND caa_callactivityno <> $callActivityID ";
-
         $db->query($queryString);
-
         return $db;
 
     }
@@ -7304,8 +6534,7 @@ is currently a balance of ';
      */
     function getPendingReopenedRequests()
     {
-        $db = new dbSweetcode(); // database connection for query
-
+        $db          = new dbSweetcode(); // database connection for query
         $queryString = "
       SELECT
   pendingReopened.id,
@@ -7322,14 +6551,13 @@ FROM
   LEFT JOIN problem ON pendingReopened.problemID = problem.`pro_problemno`
   LEFT JOIN customer ON problem.pro_custno = customer.`cus_custno`
   ";
-        $result = $db->query($queryString);
+        $result      = $db->query($queryString);
         return $result->fetch_all(MYSQLI_ASSOC);
     }
 
     function getCustomerRaisedRequests()
     {
-        $db = new dbSweetcode(); // database connection for query
-
+        $db          = new dbSweetcode(); // database connection for query
         $queryString = "
       SELECT
         cpr_customerproblemno,
@@ -7350,9 +6578,7 @@ FROM
         LEFT JOIN customer ON cus_custno = con_custno
       ORDER BY
         cus_name, cpr_reason";
-
         $db->query($queryString);
-
         return $db;
 
     }
@@ -7364,8 +6590,7 @@ FROM
      */
     function getCustomerRaisedRequest($customerproblemno)
     {
-        $db = new dbSweetcode(); // database connection for query
-
+        $db          = new dbSweetcode(); // database connection for query
         $queryString = "
       SELECT
         cpr_customerproblemno,
@@ -7389,9 +6614,8 @@ FROM
         add_add3,
         add_postcode,
         con_notes,
-        cus_tech_notes
-
-
+        cus_tech_notes,
+        emailSubject
       FROM
         customerproblem
         LEFT JOIN contact ON con_contno = cpr_contno
@@ -7401,11 +6625,8 @@ FROM
       WHERE
         cpr_customerproblemno = $customerproblemno
         ";
-
         $db->query($queryString);
-
-        $db->next_record();
-
+        $db->next_record(MYSQLI_ASSOC);
         return $db->Record;
 
     }
@@ -7416,15 +6637,13 @@ FROM
      */
     function deleteCustomerRaisedRequest($customerproblemno)
     {
-        $db = new dbSweetcode(); // database connection for query
-
+        $db          = new dbSweetcode(); // database connection for query
         $queryString = "
       DELETE FROM
         customerproblem
       WHERE
         cpr_customerproblemno = $customerproblemno
         ";
-
         $db->query($queryString);
     }
 
@@ -7437,30 +6656,22 @@ FROM
                        $table
     )
     {
-        $sql =
-            "SELECT
+        $sql = "SELECT
             nextid
           FROM
             db_sequence
           WHERE
             seq_name = '$table'";
-
         $db->query($sql);
-
         $db->next_record();
-
         $nextid = $db->Record[0] + 1;
-
-        $sql =
-            "UPDATE
+        $sql    = "UPDATE
             db_sequence
           SET
             nextid = nextid + 1
           WHERE
             seq_name = '$table'";
-
         $db->query($sql);
-
         return $nextid;
     }
 
@@ -7469,8 +6680,7 @@ FROM
      * @return bool|mixed
      * @throws Exception
      */
-    function processAutomaticRequest(AutomatedRequest $automatedRequest
-    )
+    function processAutomaticRequest(AutomatedRequest $automatedRequest)
     {
 
         $details = $automatedRequest->getTextBody();
@@ -7489,32 +6699,25 @@ FROM
             );
         }
         echo "<div>We do have a customer ID, we can continue: " . $automatedRequest->getCustomerID() . "</div>";
-
         if ($automatedRequest->getServiceRequestID()) {
 
             echo "<div>We do have a Service Request ID: " . $automatedRequest->getServiceRequestID() . "</div>";
-
             $dbeProblem = new DBEProblem($this);
-
             $dbeProblem->getRow($automatedRequest->getServiceRequestID());
             if (!$dbeProblem->rowCount()) {
                 echo "<div>The service request doesn't exist </div>";
                 // create a new service request
                 return $this->raiseNewRequestFromImport($automatedRequest);
             }
-
             $dbeContact = new DBEContact($this);
-
             $dbeContact->setValue(
                 DBEContact::email,
                 $automatedRequest->getSenderEmailAddress()
             );
             $dbeContact->getRowsByColumn(DBEContact::email);
-
             $status = $dbeProblem->getValue(DBEProblem::status);
             if ($status == 'C') {   // is request completed?
                 echo "<div>The found service request is closed, raising a new service request</div>";
-
                 if (!$dbeContact->fetchNext() || $dbeContact->getValue(
                         DBEContact::customerID
                     ) != $automatedRequest->getCustomerID()) {
@@ -7532,14 +6735,12 @@ FROM
                 }
                 return $this->raiseNewRequestFromImport($automatedRequest);
             }
-
             if (!$dbeContact->fetchNext()) {
                 echo "<div>We have tried to pull a the contact from the sender email, but we couldn't find it</div>";
-                $details = '<div style="color: red">Update from email received from ' . $automatedRequest->getSenderEmailAddress(
+                $details         = '<div style="color: red">Update from email received from ' . $automatedRequest->getSenderEmailAddress(
                     ) . ' on ' . date(
                         DATE_MYSQL_DATETIME
                     ) . " who was not the original service request initiator</div>" . $details;
-
                 $dbeLastActivity = $this->getLastActivityInProblem($automatedRequest->getServiceRequestID());
                 $this->createFollowOnActivity(
                     $dbeLastActivity->getValue(DBEJCallActivity::callActivityID),
@@ -7553,7 +6754,6 @@ FROM
                     true,
                     true
                 );
-
                 if ($automatedRequest->getAttachment() == 'Y') {
                     $this->processAttachment(
                         $automatedRequest->getServiceRequestID(),
@@ -7562,13 +6762,11 @@ FROM
                 }
                 return true;
             }
-
             if ($dbeContact->getValue(DBEContact::customerID) != $automatedRequest->getCustomerID()) {
-                $details = '<div style="color: red">Update from email received from ' . $automatedRequest->getSenderEmailAddress(
+                $details         = '<div style="color: red">Update from email received from ' . $automatedRequest->getSenderEmailAddress(
                     ) . ' on ' . date(
                         DATE_MYSQL_DATETIME
                     ) . " who was not the original service request initiator</div>" . $details;
-
                 $dbeLastActivity = $this->getLastActivityInProblem($automatedRequest->getServiceRequestID());
                 $this->createFollowOnActivity(
                     $dbeLastActivity->getValue(DBEJCallActivity::callActivityID),
@@ -7582,7 +6780,6 @@ FROM
                     true,
                     true
                 );
-
                 if ($automatedRequest->getAttachment() == 'Y') {
                     $this->processAttachment(
                         $automatedRequest->getServiceRequestID(),
@@ -7591,16 +6788,13 @@ FROM
                 }
                 return true;
             }
-
             $dbeLastActivity = $this->getLastActivityInProblem($automatedRequest->getServiceRequestID());
-
             if ($dbeProblem->getValue(DBEProblem::contactID) != $dbeContact->getValue(DBEContact::contactID)) {
                 $details = '<div style="color: red">Update from email received from ' . $automatedRequest->getSenderEmailAddress(
                     ) . ' on ' . date(
                         DATE_MYSQL_DATETIME
                     ) . " who was not the original service request initiator</div>" . $details;
             }
-
             $this->createFollowOnActivity(
                 $dbeLastActivity->getValue(DBEJCallActivity::callActivityID),
                 CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID,
@@ -7613,24 +6807,19 @@ FROM
                 true,
                 true
             );
-
             if ($automatedRequest->getAttachment() == 'Y') {
                 $this->processAttachment(
                     $automatedRequest->getServiceRequestID(),
                     $automatedRequest
                 );
             }
-
             return true;
         }
         echo "<div>We do not have a service request ID</div>";
-
         if ($automatedRequest->getServerGuardFlag() == 'Y') {
             echo '<div>This is SERVER GUARD request!</div>';
             return $this->processServerGuard($automatedRequest);
         }
-
-
         return $this->raiseNewRequestFromImport($automatedRequest);
     }
 
@@ -7641,21 +6830,14 @@ FROM
                                       $source = 'S'
     )
     {
-        $db = new dbSweetcode(); // database connection for query
-
-        $reason = '<div>' . $record->getSubjectLine() . '</div>';
-
+        $db     = new dbSweetcode(); // database connection for query
+        $reason = $record->getTextBody();
         if ($record->getHtmlBody()) {
-            $reason .= $record->getHtmlBody();
-        } else {
-            $reason .= $record->getTextBody();
+            $reason = $record->getHtmlBody();
         }
-
         if ($prependMessage) {
             $reason = $prependMessage . $reason;
         }
-
-
         $queryString = "
       INSERT INTO
         customerproblem
@@ -7670,9 +6852,10 @@ FROM
         cpr_serverguard_flag = ?,
         cpr_send_email = ?,
         cpr_priority = ?,
-        cpr_reason = ?";
-
-        $parameters = [
+        cpr_reason = ?,
+        emailSubject = ?
+        ";
+        $parameters  = [
             [
                 'type'  => 'i',
                 'value' => $record->getCustomerID()
@@ -7712,9 +6895,12 @@ FROM
             [
                 'type'  => 's',
                 'value' => $reason
+            ],
+            [
+                "type"  => "s",
+                "value" => substr($record->getSubjectLine(), 0, 50)
             ]
         ];
-
         $db->preparedQuery(
             $queryString,
             $parameters
@@ -7739,7 +6925,6 @@ FROM
         echo "<div>We are trying to raise a new request</div>";
         $customerID = $record->getCustomerID();
         $dbeProblem = new DBEProblem($this);
-
         $dbeContact = new DBEContact($this);
         $dbeContact->setValue(
             DBEContact::email,
@@ -7750,15 +6935,21 @@ FROM
         if (!$dbeContact->rowCount || $serverGuard) {
             echo "<div>The sender contact was not found, or this is a server Guard,  we need to pull the primary contact of the customer: " . $customerID . "</div>";
             $buCustomer = new BUCustomer($this);
-
             $dbeContact = $buCustomer->getPrimaryContact($customerID);
-
+            if (!$dbeContact->rowCount()) {
+                $this->addCustomerRaisedRequest(
+                    $record,
+                    null,
+                    null,
+                    "There is no primary contact associated with the customer: {$customerID} "
+                );
+                return;
+            }
             if (!$serverGuard) {
                 $prependMessage = '<div style="color: red">Utility alert sent from email ' . $record->getSenderEmailAddress(
                     ) . ' on ' . date(
                         DATE_MYSQL_DATETIME
                     ) . "</div>";
-
                 if ($this->isWhitelistedUtilityEmail($record->getSenderEmailAddress())) {
                     echo '<div> The sender email is whitelisted</div>';
                     $forceHidden = true;
@@ -7772,8 +6963,6 @@ FROM
                     );
                 }
             }
-
-
             if (!$dbeContact || !$dbeContact->rowCount) {
 
                 echo "<div>We couldn't find a primary contact, -> to be logged</div>";
@@ -7797,7 +6986,6 @@ FROM
                     ) . ' on ' . date(
                         DATE_MYSQL_DATETIME
                     ) . "</div>";
-
                 return $this->addCustomerRaisedRequest(
                     $record,
                     null,
@@ -7806,18 +6994,13 @@ FROM
                 );
             }
         }
-
-
         $supportLevel = $dbeContact->getValue(DBEContact::supportLevel);
-
         echo "<div>The sender contact support level is : $supportLevel</div>";
-
         $allowedLevels = [
             DBEContact::supportLevelMain,
             DBEContact::supportLevelSupervisor,
             DBEContact::supportLevelSupport
         ];
-
         if (!in_array(
             $supportLevel,
             $allowedLevels
@@ -7827,14 +7010,11 @@ FROM
                 $dbeContact
             );
         }
-
-
         $slaResponseHours = $this->getSlaResponseHours(
             $record->getPriority(),
             $customerID,
             $dbeContact->getValue(DBEContact::contactID)
         );
-
         /*
     Determine site to use.
 
@@ -7843,18 +7023,15 @@ FROM
     Otherwise use site of main contact.
     */
         $siteNo = false;
-
         if ($record->getPostcode()) {
             $siteNo = $this->getSiteNoByCustomerPostcode(
                 $customerID,
                 $record->getPostcode()
             );
         }
-
         if (!$siteNo) {
             $siteNo = $dbeContact->getValue(DBEContact::siteNo);
         }
-
         $dbeProblem->setValue(
             DBEProblem::hdLimitMinutes,
             $this->dsHeader->getValue(DBEHeader::hdTeamLimitMinutes)
@@ -7875,6 +7052,7 @@ FROM
             DBEProblem::slaResponseHours,
             $slaResponseHours
         );
+        $dbeProblem->setValue(DBEProblem::emailSubjectSummary, substr($record->getSubjectLine(), 0, 100));
         $dbeProblem->setValue(
             DBEProblem::customerID,
             $customerID
@@ -7895,7 +7073,6 @@ FROM
             DBEProblem::contactID,
             $dbeContact->getValue(DBEContact::contactID)
         );
-
         /* @todo confirm with GL */
         if ($record->getSendEmail() == 'A') {
             $dbeProblem->setValue(
@@ -7908,20 +7085,18 @@ FROM
                 'Y'
             );
         }
-
         if ($forceHidden) {
             $dbeProblem->setValue(
                 DBEJProblem::hideFromCustomerFlag,
                 'Y'
             );
         }
-
+        $raisedDateTime = new DateTime($record->getCreateDateTime());
         if (!$record->getQueueNo()) {
             $queueNo = 1;
         } else {
             $queueNo = $record->getQueueNo();
         }
-
         $dbeProblem->setValue(
             DBEJProblem::queueNo,
             $queueNo
@@ -7946,17 +7121,13 @@ FROM
             DBEJProblem::userID,
             null
         );        // not allocated
-
         $raiseTypeId = $record->getServerGuardFlag() == 'Y' ? BUProblemRaiseType::ALERTID : BUProblemRaiseType::EMAILID;
         $dbeProblem->setValue(
             DBEJProblem::raiseTypeId,
             $raiseTypeId
         );
         $dbeProblem->insertRow();
-
-
         $dbeCallActivity = new DBECallActivity($this);
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::callActivityID,
             0
@@ -7975,14 +7146,13 @@ FROM
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::date,
-            date(DATE_MYSQL_DATE)
+            $raisedDateTime->format(DATE_MYSQL_DATE)
         );
-        $startTime = date('H:i');
+        $startTime = $raisedDateTime->format('H:i');
         $dbeCallActivity->setValue(
             DBEJCallActivity::startTime,
             $startTime
         );
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::endTime,
             $startTime
@@ -7995,15 +7165,12 @@ FROM
             DBEJCallActivity::serverGuard,
             $record->getServerGuardFlag()
         );
-
         $details = $record->getSubjectLine() . " ";
-
         if (!$forcedDetails) {
             $details .= $record->getTextBody();
         } else {
             $details .= $forcedDetails;
         }
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::reason,
             Controller::formatForHTML($details)
@@ -8016,218 +7183,134 @@ FROM
             DBEJCallActivity::userID,
             USER_SYSTEM
         );
-
         $dbeCallActivity->insertRow();
         // $this->setProblemRaise($dbeProblem,$dbeCallActivity); // raiseNewRequestFromImport
-
         if ($record->getAttachment() == 'Y') {
             $this->processAttachment(
                 $dbeProblem->getPKValue(),
                 $record
             );
         }
-
-
         $dsCustomer = new DBECustomer($this);
         $dsCustomer->getRow($customerID);
-
-        $testTime = (new DateTime($record->getCreateDateTime()))->format('H:i');
-
-        $startTime = $this->dsHeader->getValue(DBEHeader::serviceDeskNotification24hBegin);
-        $endTime = $this->dsHeader->getValue(DBEHeader::serviceDeskNotification24hEnd);
-        echo '<br>test time is : ' . $testTime;
-        echo '<br>startTime is : ' . $startTime;
-        echo '<br>endTime is : ' . $endTime;
-
-
-        $subCategory = null;
-        if ($testTime < $startTime || $testTime > $endTime) {
-            echo '<div>Should be special email</div>';
-            $has24HourSupport = $dsCustomer->getValue(DBECustomer::support24HourFlag) == 'Y';
-            $buCustomerItem = new BUCustomerItem($this);
-
-            $hasServiceDesk = $buCustomerItem->customerHasServiceDeskContract($customerID);
-
-            if ($has24HourSupport || $hasServiceDesk) {
-                echo '<div>does have 24h support</div>';
-                $subCategory = self::Initial24HSupport;
-            } else {
-                echo '<div>does NOT have 24h support</div>';
-                $subCategory = self::InitialNot24HSupport;
-            }
-        } else {
-            echo '<div>Should be normal email</div>';
-        }
-
-        $this->sendEmailToCustomer(
-            $dbeProblem->getPKValue(),
-            self::InitialCustomerEmailCategory,
-            $subCategory
-        );
-
+        $this->sendAutomaticallyLoggedServiceRequestEmail($dbeCallActivity->getValue(DBECallActivity::callActivityID));
         return true;
     }
 
     function isWhitelistedUtilityEmail($email)
     {
         $dbeUtilityEmail = new DBEUtilityEmail($this);
-
         $dbeUtilityEmail->getRowsByEmail($email);
-
         return $dbeUtilityEmail->rowCount;
     }
 
+    /**
+     * @param AutomatedRequest $record
+     * @param DBEContact $dbeContact
+     * @return bool
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     */
     private function contactNotAuthorized(AutomatedRequest $record,
                                           DBEContact $dbeContact
     )
     {
         echo '<div>The sender was not authorized, send an email to the sender and to the primary contact</div>';
-
-        $buCustomer = new BUCustomer($this);
+        $buCustomer           = new BUCustomer($this);
         $primaryMainContactDS = $buCustomer->getPrimaryContact($record->getCustomerID());
-
-
-        $senderEmail = CONFIG_SUPPORT_EMAIL;
-        $toEmail = $primaryMainContactDS->getValue(DBEContact::email);
-
-        $contactName = $dbeContact->getValue(
-                DBEContact::firstName
-            ) . " " . $dbeContact->getValue(DBEContact::lastName);
-
-        if ($primaryMainContactDS->rowCount) {
-            $buMail = new BUMail($this);
-            $template = new Template(
-                EMAIL_TEMPLATE_DIR,
-                "remove"
+        if (!$primaryMainContactDS || !$primaryMainContactDS->rowCount()) {
+            $this->addCustomerRaisedRequest(
+                $record,
+                null,
+                null,
+                "There is no primary contact associated with the customer: {$record->getCustomerID()} "
             );
-            $template->set_file(
-                'page',
-                'NotAuthorisedPrimaryMainContactEmail.html'
-            );
-
-
-            $template->setVar(
-                [
-                    "primaryMainContactName" => $primaryMainContactDS->getValue(DBEContact::firstName),
-                    "contactName"            => $contactName,
-                    "contactSupportLevel"    => $dbeContact->getValue(DBEContact::supportLevel)
-                ]
-            );
-
-            $template->parse(
-                'output',
-                'page',
-                true
-            );
-
-            $body = $template->get_var('output');
-
-            $hdrs = array(
-                'From'         => $senderEmail,
-                'To'           => $toEmail,
-                'Subject'      => $contactName . " is not authorised to initiate support calls",
-                'Date'         => date("r"),
-                'Content-Type' => 'text/html; charset=UTF-8'
-            );
-
-            $buMail->mime->setHTMLBody($body);
-
-            $fileName = $dbeContact->getValue(DBEContact::firstName) . " " . $dbeContact->getValue(
-                    DBEContact::lastName
-                ) . " Request At " . (new DateTime())->format('d-m-Y H:i') . '.html';
-            $buMail->mime->addAttachment(
-                $record->getHtmlBody(),
-                'application/octet-stream',
-                $fileName,
-                false
-            );
-
-            $mime_params = array(
-                'text_encoding' => '7bit',
-                'text_charset'  => 'UTF-8',
-                'html_charset'  => 'UTF-8',
-                'head_charset'  => 'UTF-8'
-            );
-
-            $body = $buMail->mime->get($mime_params);
-
-            $hdrs = $buMail->mime->headers($hdrs);
-
-            $buMail->putInQueue(
-                $senderEmail,
-                $toEmail,
-                $hdrs,
-                $body
-            );
-
+            return;
         }
-        $buMail = new BUMail($this);
-        $template = new Template(
-            EMAIL_TEMPLATE_DIR,
-            "remove"
-        );
-        $template->set_file(
-            'page',
-            'NotAuthorisedContactEmail.html'
-        );
-        $toEmail = $dbeContact->getValue(DBEContact::email);
-
-        $template->setVar(
-            [
-                "contactFirstName" => $dbeContact->getValue(DBEContact::firstName)
-            ]
-        );
-
-        $template->parse(
-            'output',
-            'page',
-            true
-        );
-
-        $body = $template->get_var('output');
-
-        $hdrs = array(
-            'From'         => $senderEmail,
-            'To'           => $toEmail,
-            'Subject'      => "Not authorised to initiate support",
-            'Date'         => date("r"),
-            'Content-Type' => 'text/html; charset=UTF-8'
-        );
-
-        $buMail->mime->setHTMLBody($body);
-
-        $mime_params = array(
-            'text_encoding' => '7bit',
-            'text_charset'  => 'UTF-8',
-            'html_charset'  => 'UTF-8',
-            'head_charset'  => 'UTF-8'
-        );
-
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
-        $buMail->putInQueue(
-            $senderEmail,
-            $toEmail,
-            $hdrs,
-            $body
-        );
-
-
+        if ($primaryMainContactDS->rowCount) {
+            $this->notifyPrimaryMainContactAboutNotAuthoriseContact(
+                $primaryMainContactDS,
+                $dbeContact,
+                $record->getHtmlBody()
+            );
+        }
+        $this->sendNotAuthorisedContact($dbeContact);
         return true;
     }
 
-    function getSiteNoByCustomerPostcode(
-        $customerID,
-        $postcode
+    /**
+     * @param DBEContact $primaryMainContactDS
+     * @param DBEContact $notAuthorisedContact
+     * @param $receivedEmailHTML
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     */
+    private function notifyPrimaryMainContactAboutNotAuthoriseContact(DBEContact $primaryMainContactDS,
+                                                                      DBEContact $notAuthorisedContact,
+                                                                      $receivedEmailHTML
+    )
+    {
+        global $twig;
+        $notAuthorisedContactFirstName = $notAuthorisedContact->getValue(DBEContact::firstName);
+        $notAuthorisedContactLastName  = $notAuthorisedContact->getValue(DBEContact::lastName);
+        $data                          = new \CNCLTD\TwigDTOs\PrimaryMainContactNotAuthorisedNotification(
+            $primaryMainContactDS->getValue(DBEContact::firstName),
+            $notAuthorisedContactFirstName,
+            $notAuthorisedContactLastName,
+            $notAuthorisedContact->getValue(DBEContact::supportLevel),
+        );
+        $body                          = $twig->render(
+            '@customerFacing/NotAuthorisedPrimaryMainContact/NotAuthorisedPrimaryMainContact.html.twig',
+            ["data" => $data]
+        );
+        $contactName                   = "{$notAuthorisedContactFirstName} {$notAuthorisedContactLastName}";
+        $buMail                        = new BUMail($this);
+        $subject                       = "{$contactName} is not authorised to initiate support calls";
+        $requestDate                   = (new DateTime())->format('d-m-Y H:i');
+        $fileName                      = " {$contactName} Request At {$requestDate}.html";
+        $attachments                   = new \CNCLTD\Email\AttachmentCollection();
+        $attachments->add(
+            $receivedEmailHTML,
+            'application/octet-stream',
+            $fileName,
+            false
+        );
+        $buMail->sendEmailWithAttachments(
+            $body,
+            $subject,
+            $primaryMainContactDS->getValue(DBEContact::email),
+            $attachments
+        );
+    }
+
+    private function sendNotAuthorisedContact(DBEContact $dbeContact)
+    {
+        global $twig;
+        $toEmail    = $dbeContact->getValue(DBEContact::email);
+        $buCustomer = new BUCustomer($this);
+        $contacts   = $buCustomer->getMainSupportContacts($dbeContact->getValue(DBEContact::customerID), true);
+        $body       = $twig->render(
+            '@customerFacing/NotAuthorisedContact/NotAuthorisedContact.html.twig',
+            [
+                "data" => [
+                    "contactFirstName" => $dbeContact->getValue(DBEContact::firstName),
+                    "supportContacts"  => $contacts
+                ]
+            ]
+        );
+        $subject    = "Not Authorised To Initiate Support";
+        $this->sendEmail($body, $subject, $toEmail);
+    }
+
+    function getSiteNoByCustomerPostcode($customerID,
+                                         $postcode
     )
     {
         global $db;
-
         $postcode = trim($postcode);
-
-        $sql = "
+        $sql      = "
       SELECT 
         add_siteno
       
@@ -8236,7 +7319,6 @@ FROM
          
       WHERE add_custno = $customerID 
         AND add_postcode = '$postcode'";
-
         $db->query($sql);
         if ($db->next_record()) {
             $ret = $db->Record['add_siteno'];
@@ -8259,7 +7341,6 @@ FROM
             ',',
             $record->getAttachmentFilename()
         );
-
         foreach ($filePaths as $filePath) {
 
             if ($handle = fopen(
@@ -8275,19 +7356,16 @@ FROM
                 } else {
                     $attachmentMimeType = null;   // failed to locate magic file for MimeTypes
                 }
-
                 // Trying to prevent a bug with finfo_file that duplicates the mimeType
                 if (substr_count($attachmentMimeType, "/") > 1) {
-                    $forwardSlashPosition = strpos($attachmentMimeType, '/');
+                    $forwardSlashPosition        = strpos($attachmentMimeType, '/');
                     $startOfNextMimeTypePosition = strpos(
                         $attachmentMimeType,
                         substr($attachmentMimeType, 0, $forwardSlashPosition),
                         $forwardSlashPosition + 2
                     );
-                    $attachmentMimeType = substr($attachmentMimeType, 0, $startOfNextMimeTypePosition - 1);
+                    $attachmentMimeType          = substr($attachmentMimeType, 0, $startOfNextMimeTypePosition - 1);
                 }
-
-
                 $this->addDocument(
                     $problemID,
                     $filePath,
@@ -8296,7 +7374,6 @@ FROM
                     basename($filePath),
                     $attachmentMimeType
                 );
-
                 fclose($handle);
                 unlink($filePath);
             } else {
@@ -8304,6 +7381,11 @@ FROM
                 echo $errorString;
             }
         }
+    }
+
+    public function sendAutomaticallyLoggedServiceRequestEmail($activityId)
+    {
+        $this->sendServiceRequestLoggedEmail($activityId, true);
     }
 
     /**
@@ -8321,39 +7403,33 @@ FROM
      * @return string
      * @throws Exception
      */
-    function createFollowOnActivity(
-        $callActivityID,
-        $callActivityTypeID = false,
-        $contactID = false,
-        $passedReason = false,
-        $ifUnallocatedSetToCurrentUser = true,
-        $setEndTimeToNow = false,
-        $userID = USER_SYSTEM,
-        $moveToUsersQueue = false,
-        $resetAwaitingCustomerResponse = false,
-        $comesFromAutomatedRequest = false,
-        $comesFromPendingReopened = false
+    function createFollowOnActivity($callActivityID,
+                                    $callActivityTypeID = false,
+                                    $contactID = false,
+                                    $passedReason = false,
+                                    $ifUnallocatedSetToCurrentUser = true,
+                                    $setEndTimeToNow = false,
+                                    $userID = USER_SYSTEM,
+                                    $moveToUsersQueue = false,
+                                    $resetAwaitingCustomerResponse = false,
+                                    $comesFromAutomatedRequest = false,
+                                    $comesFromPendingReopened = false
     )
     {
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($callActivityID);
-        $reason = $passedReason;
-
+        $reason   = $passedReason;
         $isTravel = false;
-
-        $endTime = null;                // default no end time
-
+        $endTime  = null;                // default no end time
         if ($callActivityTypeID) {
             $dbeCallActType = new DBECallActType($this);
             $dbeCallActType->getRow($callActivityTypeID);
             if ($dbeCallActType->getValue(DBECallActType::travelFlag) == 'Y') {
                 $isTravel = true;
             }
-
             if ($callActivityTypeID == CONFIG_CHANGE_REQUEST_ACTIVITY_TYPE_ID) {
 
                 $endTime = $this->getEndtime(CONFIG_CHANGE_REQUEST_ACTIVITY_TYPE_ID);
-
                 /*
         Pre-populate reason
         */
@@ -8361,12 +7437,9 @@ FROM
 <table border='1' style='border: solid black 1px'><thead><tr><td></td><td>Details</td></tr></thead><tbody><tr><td>System:</td><td></td></tr><tr><td>Summary of problem:</td><td></td></tr><tr><td>Change Requested:</td><td></td></tr><tr><td>Method to test change if successful:</td><td></td></tr><tr><td>Reversion plan if unsuccessful:</td><td></td></tr></tbody></table>";
             }
         }
-
-        $problemID = $dbeCallActivity->getValue(DBEJCallActivity::problemID);
-
+        $problemID  = $dbeCallActivity->getValue(DBEJCallActivity::problemID);
         $dbeProblem = new DBEProblem($this);
         $dbeProblem->getRow($problemID);
-
         $dbeCustomer = new DBECustomer($this);
         $dbeCustomer->getRow($dbeProblem->getValue(DBEJProblem::customerID));
         /*
@@ -8378,25 +7451,21 @@ FROM
                 DBEJProblem::userID,
                 $userID
             );
-
             if ($moveToUsersQueue) {
                 /*
         Set queue same as allocated user's teamLevel (max queue no = 3)
         */
                 $teamLevel = $this->getLevelByUserID($userID);
-
                 if ($teamLevel <= 3) {
                     $queueNo = $teamLevel;
                 } else {
                     $queueNo = 5; // managers
                 }
-
                 $dbeProblem->setValue(
                     DBEJProblem::queueNo,
                     $queueNo
                 );
             }
-
             $dbeProblem->updateRow();
 
         }
@@ -8404,15 +7473,12 @@ FROM
     When SR is currently at Initial status and a user other than System is logging
     an activity other than travel, record the Responded hours and set to In Progress status.
     */
-
         $isReopen = false;
-
         if (!$isTravel) {
 
             if ($dbeProblem->getValue(DBEJProblem::status) == 'I' && $userID != USER_SYSTEM) {
 
                 $respondedHours = $dbeProblem->getValue(DBEJProblem::workingHours);
-
                 $dbeProblem->setValue(
                     DBEJProblem::respondedHours,
                     $respondedHours
@@ -8421,26 +7487,12 @@ FROM
                     DBEJProblem::startedUserID,
                     $userID
                 );
-
                 $dbeProblem->setValue(
                     DBEJProblem::status,
                     'P'
                 );
-                /*
-        Send work started email except for Hide from Customer OR Sales Order related SRs
-        */
-                if (
-                    $dbeProblem->getValue(DBEJProblem::hideFromCustomerFlag) == 'N' and
-                    !$dbeProblem->getValue(DBEJProblem::linkedSalesOrderID)
-                ) {
-                    $this->sendEmailToCustomer(
-                        $problemID,
-                        self::WorkStartedCustomerEmailCategory
-                    );
-                }
             } elseif ($dbeProblem->getValue(DBEJProblem::status) == 'F') {
                 //Reopen
-
                 if ($comesFromAutomatedRequest) {
                     return $this->createPendingReopened(
                         $problemID,
@@ -8455,17 +7507,14 @@ FROM
                     DBEJProblem::status,
                     'P'
                 );    // in progress
-
                 $dbeProblem->setValue(
                     DBEJProblem::reopenedFlag,
                     'Y'
                 );
-
                 $dbeProblem->setValue(
                     DBEJProblem::reopenedDate,
                     (new DateTime())->format('Y-m-d')
                 );
-
                 if ($dbeProblem->getValue(DBEJProblem::fixedUserID) != USER_SYSTEM) {
                     /*
          if priority = 1 then notify fixed user that it has been reopened WITHOUT
@@ -8480,10 +7529,8 @@ FROM
                     DBEJProblem::userID,
                     null
                 );
-
                 $reason = '<P>Reopened</P>' . $reason;
             }
-
             $dbeProblem->setValue(
                 DBEJProblem::alarmDate,
                 null
@@ -8498,7 +7545,6 @@ FROM
         } else {
             $dbeCallActivity->setValue(DBECallActivity::submitAsOvertime, 1);
         }
-
         if ($setEndTimeToNow) {
 
             $endTime = date('H:i');      // Set to current time
@@ -8509,10 +7555,8 @@ FROM
                 $endTime = $this->getEndtime($callActivityTypeID);
             } else {
                 $endTime = date('H:i');    // Set to current time if system user
-
             }
         }
-
         if ($endTime) {
             $dbeCallActivity->setValue(
                 DBEJCallActivity::status,
@@ -8524,7 +7568,6 @@ FROM
                 'O'
             ); // Leave open
         }
-
         if ($callActivityTypeID == CONFIG_CHANGE_REQUEST_ACTIVITY_TYPE_ID) {
             //if this is a change request ..leave it open as in "pending change request"
             $dbeCallActivity->setValue(
@@ -8533,13 +7576,10 @@ FROM
             );
         }
         $dbeCallActivity->setPKValue(null);
-
         $activityUserID = $userID;
-
         if (!$contactID) {
             $contactID = $dbeCallActivity->getValue(DBEJCallActivity::contactID);
         }
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::hideFromCustomerFlag,
             'N'
@@ -8582,12 +7622,12 @@ FROM
         $dbeCallActivity->setValue(DBEJCallActivity::overtimeDeniedReason, null);
         $dbeCallActivity->setValue(DBEJCallActivity::overtimeDurationApproved, null);
         $dbeCallActivity->setValue(DBEJCallActivity::expenseExportFlag, 'N');
-
+        $dbeCallActivity->setValue(DBEJCallActivity::cncNextAction, null);
+        $dbeCallActivity->setValue(DBEJCallActivity::customerSummary, null);
         $dbeCallActivity->setValue(
             DBEJCallActivity::serverGuard,
             $dbeCallActivity->getValue(DBEJCallActivity::serverGuard)
         );
-
         if ($resetAwaitingCustomerResponse) {
 
             $dbeProblem->setValue(
@@ -8595,31 +7635,23 @@ FROM
                 'N'
             );
             $dbeProblem->updateRow();
-
             $dbeCallActivity->setValue(
                 DBECallActivity::awaitingCustomerResponseFlag,
                 'N'
             );
         }
-
         $dbeCallActivity->insertRow();
-
         $ret = $dbeCallActivity->getPKValue();
-
         $this->highActivityAlertCheck($dbeProblem->getValue(DBEJProblem::problemID));
-
-
         if ($passedReason) {
             $this->updatedByAnotherUser(
                 $dbeProblem,
                 $dbeCallActivity
             );
         }
-
         if ($isReopen) {
             $this->automaticallyApprovePendingReopenedForSR($dbeProblem->getValue(DBEProblem::problemID));
         }
-
         return $ret;
     }
 
@@ -8633,7 +7665,6 @@ FROM
     {
         if ($userID) {
             $this->dbeUser->getRow($userID);
-
             $dbeTeam = new DBETeam($this);
             $dbeTeam->getRow($this->dbeUser->getValue(DBEJUser::teamID));
             $ret = $dbeTeam->getValue(DBETeam::level);
@@ -8660,54 +7691,39 @@ FROM
     {
         $dbeJProblem = new DBEJProblem($this);
         $dbeJProblem->getRow($problemID);
-
-        $buMail = new BUMail($this);
-
+        $buMail      = new BUMail($this);
         $senderEmail = CONFIG_SUPPORT_EMAIL;
 //        $senderName = 'CNC Support Department';
-
         $this->dbeUser->getRow($dbeJProblem->getValue(DBEJProblem::fixedUserID));
-
-        $toEmail = $this->dbeUser->getValue(
+        $toEmail     = $this->dbeUser->getValue(
                 DBEJUser::username
             ) . '@' . CONFIG_PUBLIC_DOMAIN . ',' . 'srp1reopened@' . CONFIG_PUBLIC_DOMAIN;
-
         $activityRef = $problemID . ' ' . $dbeJProblem->getValue(DBEJProblem::customerName);
-
-        $template = new Template(
-            EMAIL_TEMPLATE_DIR,
-            "remove"
+        $template    = new Template(
+            EMAIL_TEMPLATE_DIR, "remove"
         );
         $template->set_file(
             'page',
             'PriorityOneReopenedEmail.inc.html'
         );
-
-        $dbeJCallActivity = $this->getFirstActivityInProblem($problemID);
-
-        $urlActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+        $dbeJCallActivity = $this->getFirstActivityInServiceRequest($problemID);
+        $urlActivity      = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
-
         $template->setVar(
             array(
-                'activityRef'  => $activityRef,
-                'reason'       => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
-                'customerName' => $dbeJProblem->getValue(DBEJProblem::customerName),
-                'urlActivity'  => $urlActivity,
-                'CONFIG_SERVICE_REQUEST_DESC'
-                               => CONFIG_SERVICE_REQUEST_DESC
-
+                'activityRef'                 => $activityRef,
+                'reason'                      => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
+                'customerName'                => $dbeJProblem->getValue(DBEJProblem::customerName),
+                'urlActivity'                 => $urlActivity,
+                'CONFIG_SERVICE_REQUEST_DESC' => CONFIG_SERVICE_REQUEST_DESC
             )
         );
-
         $template->parse(
             'output',
             'page',
             true
         );
-
         $body = $template->get_var('output');
-
         $hdrs = array(
             'From'         => $senderEmail,
             'To'           => $toEmail,
@@ -8717,19 +7733,15 @@ FROM
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
-
         $buMail->mime->setHTMLBody($body);
-
         $mime_params = array(
             'text_encoding' => '7bit',
             'text_charset'  => 'UTF-8',
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
+        $body        = $buMail->mime->get($mime_params);
+        $hdrs        = $buMail->mime->headers($hdrs);
         $buMail->putInQueue(
             $senderEmail,
             $toEmail,
@@ -8750,7 +7762,7 @@ FROM
         while ($dbePendingReopened->fetchNext()) {
             $this->approvePendingReopened($dbePendingReopened);
         }
-    }
+    } // end sendPriorityOneReopenedEmail
 
     /**
      * @param DBEPendingReopened|DataSet $dbePendingReopened
@@ -8774,7 +7786,7 @@ FROM
         );
         $dbePendingReopenedDelete = new DBEPendingReopened($this);
         $dbePendingReopenedDelete->deleteRow($dbePendingReopened->getValue(DBEPendingReopened::id));
-    }
+    } // end sendServiceReallocatedEmail
 
     /**
      * @param AutomatedRequest $automatedRequest
@@ -8788,33 +7800,25 @@ FROM
             /* Create new request */
             $details = $automatedRequest->getSubjectLine() . "\n\n" . $details . "\n\n";
             $details .= 'Raised from ServerGuard on ' . date(DATE_MYSQL_DATETIME);
-
             $this->raiseNewRequestFromImport(
                 $automatedRequest,
                 $details,
                 true
             );
-
             return true;       // nothing more to do
         }
-
         if ($automatedRequest->getMonitorStatus() == 'S') { // success
-
-            $request =
-                $this->getRequestByCustPostcodeMonitorNameAgentName(
-                    $automatedRequest->getCustomerID(),
-                    $automatedRequest->getPostcode(),
-                    $automatedRequest->getMonitorName(),
-                    $automatedRequest->getMonitorAgentName()
-                );
-
+            $request = $this->getRequestByCustPostcodeMonitorNameAgentName(
+                $automatedRequest->getCustomerID(),
+                $automatedRequest->getPostcode(),
+                $automatedRequest->getMonitorName(),
+                $automatedRequest->getMonitorAgentName()
+            );
             if ($request) {
 
-                $details = $automatedRequest->getSubjectLine() . "\n\n" . $details . "\n\n";
-                $details .= 'Issue resolved - from ServerGuard';
-
+                $details         = $automatedRequest->getSubjectLine() . "\n\n" . $details . "\n\n";
+                $details         .= 'Issue resolved - from ServerGuard';
                 $dbeLastActivity = $this->getLastActivityInProblem($request['pro_problemno']);
-
                 $this->createFollowOnActivity(
                     $dbeLastActivity->getValue(DBEJCallActivity::callActivityID),
                     CONFIG_SERVER_GUARD_UPDATE_ACTIVITY_TYPE_ID,
@@ -8823,7 +7827,6 @@ FROM
                     false,
                     true
                 );
-
                 /*
         if the request has engineer activity(i.e. more than just the 1 initial activity)
         then set to awaiting CNC.
@@ -8853,68 +7856,60 @@ FROM
             }
 
         } else { // failed
-            $request =
-                $this->getRequestByCustPostcodeMonitorNameAgentName(
-                    $automatedRequest->getCustomerID(),
-                    $automatedRequest->getPostcode(),
-                    $automatedRequest->getMonitorName(),
-                    $automatedRequest->getMonitorAgentName()
-                );
+            $request = $this->getRequestByCustPostcodeMonitorNameAgentName(
+                $automatedRequest->getCustomerID(),
+                $automatedRequest->getPostcode(),
+                $automatedRequest->getMonitorName(),
+                $automatedRequest->getMonitorAgentName()
+            );
             if ($request && $request['pro_status'] != 'C') { // request exists that is not completed
-
-                $details = $automatedRequest->getSubjectLine() . "\n\n" . $details . "\n\n";
-                $details .= 'Updated from ServerGuard';
-
+                $details         = $automatedRequest->getSubjectLine() . "\n\n" . $details . "\n\n";
+                $details         .= 'Updated from ServerGuard';
                 $dbeLastActivity = $this->getLastActivityInProblem($request['pro_problemno']);
-                $callActivityID =
-                    $this->createFollowOnActivity(
-                        $dbeLastActivity->getValue(DBEJCallActivity::callActivityID),
-                        CONFIG_SERVER_GUARD_UPDATE_ACTIVITY_TYPE_ID,
-                        $request['pro_contno'],
-                        $details,
-                        false,
-                        true
-                    );
+                $callActivityID  = $this->createFollowOnActivity(
+                    $dbeLastActivity->getValue(DBEJCallActivity::callActivityID),
+                    CONFIG_SERVER_GUARD_UPDATE_ACTIVITY_TYPE_ID,
+                    $request['pro_contno'],
+                    $details,
+                    false,
+                    true
+                );
                 $this->setActivityAwaitingCNC($callActivityID);
-
                 if ($automatedRequest->getAttachment() == 'Y') {
                     $this->processAttachment(
                         $request['pro_problemno'],
                         $automatedRequest
                     );
                 }
-
                 return true;
             } else {
                 /* Create new request */
                 $details = $automatedRequest->getSubjectLine() . "\n\n" . $details . "\n\n";
                 $details .= 'Raised from ServerGuard on ' . date(DATE_MYSQL_DATETIME);
-
                 $this->raiseNewRequestFromImport(
                     $automatedRequest,
                     $details,
                     true
                 );
-
                 return true;       // nothing more to do
             }
         }
     }
 
-    function getRequestByCustPostcodeMonitorNameAgentName(
-        $customerID,
-        $postcode,
-        $monitorName,
-        $monitorAgentName
+    /*
+  Send email to SD Managers requesting more time to be allocated to SR
+  */
+    function getRequestByCustPostcodeMonitorNameAgentName($customerID,
+                                                          $postcode,
+                                                          $monitorName,
+                                                          $monitorAgentName
     )
     {
         global $db;
-
-        $postcode = trim($postcode);
-        $monitorName = trim($monitorName);
+        $postcode         = trim($postcode);
+        $monitorName      = trim($monitorName);
         $monitorAgentName = trim($monitorAgentName);
-
-        $sql = "
+        $sql              = "
       SELECT 
         pro_problemno,
         pro_status,
@@ -8932,8 +7927,7 @@ FROM
         AND pro_status NOT IN ('C') 
         AND add_postcode = ?
       ORDER BY pro_date_raised DESC";
-
-        $parameters = [
+        $parameters       = [
             [
                 'type'  => 'i',
                 'value' => $customerID
@@ -8965,10 +7959,12 @@ FROM
     {
 
         $dbeCallActivity = new DBECallActivity($this);
-
         return $dbeCallActivity->countEngineerRowsByProblem($problemID);
     }
 
+    /*
+  Send email to SD Managers requesting more time to be allocated to SR
+  */
     /**
      * sets problem out of pause mode by un-setting flag on activity
      *
@@ -8989,7 +7985,6 @@ FROM
             'N'
         );
         $dbeCallActivity->updateRow();
-
         $dbeProblem = new DBEProblem($this);
         $dbeProblem->getRow($dbeCallActivity->getValue(DBEJCallActivity::problemID));
         $dbeProblem->setValue(
@@ -9028,12 +8023,11 @@ FROM
      * @return bool
      * @throws Exception
      */
-    function setProblemToFixed(
-        $problemID,
-        $fixedUserID = null,
-        $contractCustomerItemID = null,
-        $rootCauseID = null,
-        $resolutionSummary = null
+    function setProblemToFixed($problemID,
+                               $fixedUserID = null,
+                               $contractCustomerItemID = null,
+                               $rootCauseID = null,
+                               $resolutionSummary = null
     )
     {
         /*
@@ -9042,25 +8036,16 @@ FROM
         if ($this->countOpenActivitiesInRequest($problemID) > 0) {
             return false;
         }
-
         $dbeProblem = new DBEProblem(
-            $this,
-            $problemID
+            $this, $problemID
         );
-
-
         if (!$fixedUserID) {
             $fixedUserID = $this->loggedInUserID;
         }
-
         $dbeUser = new DBEUser($this);
         $dbeUser->getRow($fixedUserID);
-
-
         $closingUserTeamID = $dbeUser->getValue(DBEUser::teamID);
-        $minutesToAdd = $this->dsHeader->getValue(DBEHeader::closingSRBufferMinutes);
-
-
+        $minutesToAdd      = $this->dsHeader->getValue(DBEHeader::closingSRBufferMinutes);
         switch ($closingUserTeamID) {
             case 1:
                 $dbeProblem->setValue(
@@ -9086,8 +8071,6 @@ FROM
                     $dbeProblem->getValue(DBEProblem::projectTeamLimitMinutes) + $minutesToAdd
                 );
         }
-
-
         $dbeProblem->setValue(
             DBEJProblem::fixedUserID,
             $fixedUserID
@@ -9116,22 +8099,14 @@ FROM
             DBEJProblem::rootCauseID,
             $rootCauseID
         );
-
-
         $buProblemSLA = new BUProblemSLA($this);
-
         $dbeProblem->setValue(
             DBEJProblem::completeDate,
             $buProblemSLA->getCompleteDate()
         );
-
-
         $dbeProblem->updateRow();
-
         $this->closeActivitiesWithEndTime($problemID);
-
         $dbeJCallActivity = $this->getActivitiesByProblemID($problemID);
-
         while ($dbeJCallActivity->fetchNext()) {
             if ($dbeJCallActivity->getValue(DBEJCallActivity::callActTypeID) == 57) {
                 $dbeCallActivity = new DBECallActivity($this);
@@ -9140,24 +8115,19 @@ FROM
                     DBEJCallActivity::callActTypeID,
                     11
                 );
-
                 $dbeCallActivity->setValue(
                     DBEJCallActivity::reason,
                     '<div>Fixed Explanation</div>' . $dbeJCallActivity->getValue(DBEJCallActivity::reason)
                 );
-
                 $dbeCallActivity->updateRow();
             }
         }
-
         $this->createFixedActivity(
             $problemID,
             $resolutionSummary,
             $fixedUserID == USER_SYSTEM
         );
-
-        /** @var $db dbSweetcode */
-        global $db;
+        /** @var $db dbSweetcode */ global $db;
         $statement = $db->preparedQuery(
             'select getOpenHours(?)',
             [["type" => "i", "value" => $dbeProblem->getValue(DBEProblem::problemID)]]
@@ -9172,23 +8142,13 @@ FROM
             error_log("Trying to calculate open hours for $problemID didn't produce any results?");
         }
         $dbeProblem->updateRow();
-
-
         $this->sendMonitoringEmails(
             $this->getLastActivityInProblem($problemID)->getValue(DBEJCallActivity::callActivityID)
         );
         if ($dbeProblem->getValue(DBEJProblem::escalatedUserID)) {
             $this->sendNotifyEscalatorUserEmail($problemID);
         }
-        /*
-    email to client (last activity will contain the fix summary)
-    */
-        $this->sendEmailToCustomer(
-            $problemID,
-            self::FixedCustomerEmailCategory,
-            self::Fixed
-        );
-
+        $this->sendFixedEmail($problemID);
         return true;
     }
 
@@ -9202,8 +8162,7 @@ FROM
                                           $exceptCallActivityID = false
     )
     {
-        $sql =
-            "SELECT
+        $sql = "SELECT
         COUNT( * ) AS openActivityCount
       FROM
           callactivity
@@ -9211,11 +8170,9 @@ FROM
           (caa_endtime is null or caa_endtime = '')
             AND
             caa_problemno = " . $problemID;
-
         if ($exceptCallActivityID) {
             $sql .= " AND caa_callactivityno <> " . $exceptCallActivityID;
         }
-
         $result = $this->db->query($sql);
         if (!$result) {
             throw new Exception('Failed to retrieve data:' . $this->db->error);
@@ -9226,8 +8183,7 @@ FROM
 
     public function closeActivitiesWithEndTime($problemID)
     {
-        /** @var $db dbSweetcode */
-        global $db;
+        /** @var $db dbSweetcode */ global $db;
         /* do stuff here */
         $sql = "update callactivity  set caa_status  = 'C'  WHERE caa_problemno = ? and caa_endtime is not null and caa_endtime <> '' ";
         $db->preparedQuery(
@@ -9248,10 +8204,9 @@ FROM
             $problemID,
             false
         );
-
         return $this->dbeJCallActivity;
 
-    } // end sendPriorityOneReopenedEmail
+    }
 
     /**
      * Sends email to the technician that escalated request to let them know request is fixed
@@ -9261,63 +8216,47 @@ FROM
     function sendNotifyEscalatorUserEmail($problemID)
     {
 
-        $buMail = new BUMail($this);
-
+        $buMail      = new BUMail($this);
         $dbeJProblem = new DBEJProblem($this);
         $dbeJProblem->getRow($problemID);
-
         $senderEmail = CONFIG_SUPPORT_EMAIL;
 //        $senderName = 'CNC Support Department';
-
         $dbeUser = new DBEUser($this);
         $dbeUser->getRow($dbeJProblem->getValue(DBEJProblem::escalatedUserID));
-        $toEmail = $dbeUser->getValue(DBEJUser::username) . '@' . CONFIG_PUBLIC_DOMAIN;
-
+        $toEmail     = $dbeUser->getValue(DBEJUser::username) . '@' . CONFIG_PUBLIC_DOMAIN;
         $activityRef = $problemID . ' ' . $dbeJProblem->getValue(DBEJProblem::customerName);
-
-        $template = new Template (
-            EMAIL_TEMPLATE_DIR,
-            "remove"
+        $template    = new Template (
+            EMAIL_TEMPLATE_DIR, "remove"
         );
         $template->set_file(
             'page',
             'NotifyEscalatorEmail.inc.html'
         );
-
-        $dbeJCallActivity = $this->getFirstActivityInProblem($problemID);
-        $originalReason = $dbeJCallActivity->getValue(DBEJCallActivity::reason);
-        $customerName = $dbeJCallActivity->getValue(DBEJCallActivity::customerName);
-        $initialID = $dbeJCallActivity->getPKValue();
-
+        $dbeJCallActivity = $this->getFirstActivityInServiceRequest($problemID);
+        $originalReason   = $dbeJCallActivity->getValue(DBEJCallActivity::reason);
+        $customerName     = $dbeJCallActivity->getValue(DBEJCallActivity::customerName);
+        $initialID        = $dbeJCallActivity->getPKValue();
         $dbeJCallActivity = $this->getLastActivityInProblem($problemID);
-        $fixedBy = $dbeJCallActivity->getValue(DBEJCallActivity::userName);
-        $fixSummary = $dbeJCallActivity->getValue(DBEJCallActivity::reason);
-
-        $urlActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $initialID;
-
-
+        $fixedBy          = $dbeJCallActivity->getValue(DBEJCallActivity::userName);
+        $fixSummary       = $dbeJCallActivity->getValue(DBEJCallActivity::reason);
+        $urlActivity      = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $initialID;
         $template->setVar(
             array(
-                'activityRef'  => $activityRef,
-                'reason'       => $originalReason,
-                'customerName' => $customerName,
-                'fixSummary'   => $fixSummary,
-                'urlActivity'  => $urlActivity,
-                'fixedBy'      => $fixedBy,
-                'CONFIG_SERVICE_REQUEST_DESC'
-                               => CONFIG_SERVICE_REQUEST_DESC
-
+                'activityRef'                 => $activityRef,
+                'reason'                      => $originalReason,
+                'customerName'                => $customerName,
+                'fixSummary'                  => $fixSummary,
+                'urlActivity'                 => $urlActivity,
+                'fixedBy'                     => $fixedBy,
+                'CONFIG_SERVICE_REQUEST_DESC' => CONFIG_SERVICE_REQUEST_DESC
             )
         );
-
         $template->parse(
             'output',
             'page',
             true
         );
-
         $body = $template->get_var('output');
-
         $hdrs = array(
             'From'         => $senderEmail,
             'To'           => $toEmail,
@@ -9327,27 +8266,64 @@ FROM
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
-
         $buMail->mime->setHTMLBody($body);
-
         $mime_params = array(
             'text_encoding' => '7bit',
             'text_charset'  => 'UTF-8',
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
+        $body        = $buMail->mime->get($mime_params);
+        $hdrs        = $buMail->mime->headers($hdrs);
         $buMail->putInQueue(
             $senderEmail,
             $toEmail,
             $hdrs,
             $body
         );
-    } // end sendServiceReallocatedEmail
+    }
 
+    private function sendFixedEmail($serviceRequestId)
+    {
+        $serviceRequest = new DBEProblem($this);
+        $serviceRequest->getRow($serviceRequestId);
+        $buActivity                    = new BUActivity($this);
+        $fixedActivityInServiceRequest = $buActivity->getFixedActivityInServiceRequest($serviceRequestId);
+        $firstActivity                 = $buActivity->getFirstActivityInServiceRequest($serviceRequestId);
+        global $db;
+        $feedbackTokenGenerator = new \CNCLTD\FeedbackTokenGenerator($db);
+        $data                   = new \CNCLTD\TwigDTOs\ServiceRequestFixedDTO(
+            $fixedActivityInServiceRequest->getValue(DBEJCallActivity::contactFirstName),
+            $firstActivity->getValue(DBEJCallActivity::reason),
+            $fixedActivityInServiceRequest->getValue(DBEJCallActivity::customerSummary),
+            $serviceRequestId,
+            $feedbackTokenGenerator->getTokenForServiceRequestId($serviceRequestId)
+        );
+        $othersFlag             = DBEContact::othersFixedEmailFlag;
+        $subject                = "Service Request {$serviceRequestId} - {$serviceRequest->getValue(DBEProblem::emailSubjectSummary)} - Fixed";
+        $template               = '@customerFacing/ServiceFixed/ServiceFixed.html.twig';
+        $this->sendCustomerEmail($template, $data, $fixedActivityInServiceRequest, $othersFlag, $subject);
+    }
+
+    function getFixedActivityInServiceRequest($problemID)
+    {
+
+        $dbeCallActivity = new DBEJCallActivity($this);
+        $dbeCallActivity->getRowsByProblemID(
+            $problemID,
+            false,
+            false,
+            true,
+            null,
+            false,
+            CONFIG_FIXED_ACTIVITY_TYPE_ID
+        );
+        if ($dbeCallActivity->fetchNext()) {
+            return $dbeCallActivity;
+        } else {
+            return false;
+        }
+    }
 
     /**
      * @param $problemID
@@ -9356,23 +8332,17 @@ FROM
     {
         $dbeProblem = new DBEProblem($this);
         $dbeProblem->getRow($problemID);
-
         $dbeProblem->setValue(DBEProblem::awaitingCustomerResponseFlag, 'N');
         $dbeProblem->setValue(DBEProblem::alarmDate, null);
         $dbeProblem->setValue(DBEProblem::alarmTime, null);
         $dbeProblem->updateRow();
-
-        $firstActivity = $this->getFirstActivityInProblem($problemID);
-
-        $contactID = $firstActivity->getValue(DBECallActivity::contactID);
-
-        $dbeContact = new DBEContact($this);
+        $firstActivity = $this->getFirstActivityInServiceRequest($problemID);
+        $contactID     = $firstActivity->getValue(DBECallActivity::contactID);
+        $dbeContact    = new DBEContact($this);
         $dbeContact->getRow($contactID);
-        $siteNo = $dbeContact->getValue(DBEContact::siteNo);
+        $siteNo          = $dbeContact->getValue(DBEContact::siteNo);
         $dbeCallActivity = new DBECallActivity($this);
-
         $dbeCallActivity->setValue(DBEJCallActivity::awaitingCustomerResponseFlag, 'N');
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::siteNo,
             $siteNo
@@ -9394,7 +8364,6 @@ FROM
             DBEJCallActivity::startTime,
             $time
         );
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::endTime,
             $time
@@ -9411,32 +8380,22 @@ FROM
             DBEJCallActivity::userID,
             USER_SYSTEM
         );
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::problemID,
             $dbeProblem->getValue(DBEProblem::problemID)
         );
-
         $dbeCallActivity->insertRow();
-
         $this->updatedByAnotherUser(
             $dbeProblem,
             $dbeCallActivity
         );
     }
 
-    /*
-  Send email to SD Managers requesting more time to be allocated to SR
-  */
-
     function getContactInfo($record)
     {
         global $db;
         $sql = "select con_contno, con_custno, con_siteno, supportLevel, (SELECT customer.primaryMainContactID FROM customer WHERE customer.`cus_custno` = con_custno) = con_contno AS isPrimaryMain from contact where con_email = $record[senderEmailAddress] and con_custno <> 0";
-
-
         $db->query($sql);
-
         if ($db->next_record()) {
             return [
                 "contactID"     => $db->Record[0],
@@ -9446,10 +8405,8 @@ FROM
                 "isPrimaryMain" => $db->Record[4]
             ];
         }
-
         //we haven't found a guy we need to extract the domain from email and try to find a matching customer
-
-        $sender = trim(
+        $sender      = trim(
             strtolower(
                 preg_replace(
                     "/([\w\s]+)<([\S@._-]*)>/",
@@ -9458,14 +8415,11 @@ FROM
                 )
             )
         );
-
-        $pieces = explode(
+        $pieces      = explode(
             '@',
             $sender
         );
         $emailDomain = strtolower(trim($pieces[1]));
-
-
         //try to find a specific contact by email
         $sql = "
             SELECT
@@ -9481,14 +8435,13 @@ FROM
             ) . "'
               AND con_custno <> 0 
               AND (supportLevel = 'main' or supportLevel = 'support' or supportLevel = 'delegate')";
-
         $db->query($sql);
         if ($db->next_record()) {
             $ret['isSupportContact'] = true;
-            $ret['isMainContact'] = false;
-            $ret['contactID'] = $db->Record[0];
-            $ret['customerID'] = $db->Record[1];
-            $ret['siteNo'] = $db->Record[2];
+            $ret['isMainContact']    = false;
+            $ret['contactID']        = $db->Record[0];
+            $ret['customerID']       = $db->Record[1];
+            $ret['siteNo']           = $db->Record[2];
         } /*
 
 
@@ -9522,9 +8475,7 @@ FROM
             ) . "'
               AND con_custno <> 0 
               AND (supportLevel = 'main' or supportLevel = 'support')";
-
         $db->query($sql);
-
         if ($db->next_record()) {
             return [
                 "contactID"     => $db->Record[0],
@@ -9534,10 +8485,7 @@ FROM
                 "isPrimaryMain" => $db->Record[4]
             ];
         }
-
-
         //we could not identify a specific contact but we might be able to identify the customer
-
         $sql = "
           SELECT 
             con_custno,
@@ -9546,9 +8494,7 @@ FROM
             contact 
           WHERE con_email LIKE '%$emailDomain%' 
             AND con_custno <> 0";
-
         $db->query($sql);
-
         if ($db->next_record()) {
             return [
                 "contactID"     => null,
@@ -9558,8 +8504,6 @@ FROM
                 "isPrimaryMain" => null
             ];
         }
-
-
         return null;
     }
 
@@ -9567,7 +8511,6 @@ FROM
     {
 
         global $db;
-
         $sql = "
           SELECT
             pro_manager_comment
@@ -9575,15 +8518,10 @@ FROM
             problem
           WHERE
             pro_problemno = $problemID";
-
         $db->query($sql);
         $db->next_record();
         return $db->Record[0];
     }
-
-    /*
-  Send email to SD Managers requesting more time to be allocated to SR
-  */
 
     function updateManagerComment($problemID,
                                   $details
@@ -9591,15 +8529,13 @@ FROM
     {
 
         global $db;
-
-        $sql = "
+        $sql        = "
           UPDATE
             problem
           SET
             pro_manager_comment = ?
           WHERE
             pro_problemno = ?";
-
         $parameters = [
             [
                 'type'  => 's',
@@ -9610,7 +8546,6 @@ FROM
                 'value' => $problemID,
             ]
         ];
-
         $db->preparedQuery(
             $sql,
             $parameters
@@ -9620,130 +8555,58 @@ FROM
     function sendSiteVisitEmail($callActivityID)
     {
         $buMail = new BUMail($this);
-
-        $template = new Template(
-            EMAIL_TEMPLATE_DIR,
-            "remove"
-        );
-        $template->set_file(
-            'page',
-            'SiteVisitEmail.inc.html'
-        );
+        global $twig;
         $dsCallActivity = new DataSet($this);
         $this->getActivityByID(
             $callActivityID,
             $dsCallActivity
         );
-
         $buSite = new BUSite($this);
         $dsSite = new DataSet($this);
-
         $buSite->getSiteByID(
             $dsCallActivity->getValue(DBEJCallActivity::customerID),
             $dsCallActivity->getValue(DBEJCallActivity::siteNo),
             $dsSite
         );
-        $buCustomer = new BUCustomer($this);
-
-        $callRef = $dsCallActivity->getValue(DBEJCallActivity::problemID);
-
-        $senderEmail = CONFIG_SUPPORT_EMAIL;
-        $senderName = 'CNC Support Department';
-
-        $toEmail = $dsCallActivity->getValue(DBEJCallActivity::contactEmail);
-
+        $dbeProblem       = new DBEProblem($this);
+        $serviceRequestId = $dsCallActivity->getValue(DBEJCallActivity::problemID);
+        $dbeProblem->getRow($serviceRequestId);
+        $emailSubjectToAppend      = $dbeProblem->getValue(DBEProblem::emailSubjectSummary);
+        $contactEmail              = $dsCallActivity->getValue(DBEJCallActivity::contactEmail);
+        $recipientsArray           = [$contactEmail];
+        $visitActivityTimeOfTheDay = 'afternoon';
         if ($dsCallActivity->getValue(DBEJCallActivity::startTime) < '12:00') {
-            $amOrPM = 'morning';
-//            $startHHMM = '0900';
-//            $endHHMM = '1200';
-        } else {
-            $amOrPM = 'afternoon';
-//            $startHHMM = '1200';
-//            $endHHMM = '1700';
+            $visitActivityTimeOfTheDay = 'morning';
         }
-
-        $template->set_var(
-            array(
-                'scrRef'           => $callRef,
-                'userName'         => $dsCallActivity->getValue(DBEJCallActivity::userName),
-                'contactEmail'     => $toEmail,
-                'senderEmail'      => $senderEmail,
-                'senderName'       => $senderName,
-                'contactFirstName' => $dsCallActivity->getValue(DBEJCallActivity::contactFirstName),
-                'contactPhone'     => $buCustomer->getContactPhone(
-                    $dsCallActivity->getValue(DBEJCallActivity::contactID)
-                ),
-                'date'             => Controller::dateYMDtoDMY($dsCallActivity->getValue(DBEJCallActivity::date)),
-                'amOrPM'           => $amOrPM,
-                'startTime'        => $dsCallActivity->getValue(DBEJCallActivity::startTime),
-                'reason'           => trim($dsCallActivity->getValue(DBEJCallActivity::reason)),
-                'add1'             => $dsSite->getValue(DBESite::add1),
-                'add2'             => $dsSite->getValue(DBESite::add2),
-                'add3'             => $dsSite->getValue(DBESite::add3),
-                'town'             => $dsSite->getValue(DBESite::town),
-                'county'           => $dsSite->getValue(DBESite::county),
-                'postcode'         => $dsSite->getValue(DBESite::postcode)
-            )
+        $data            = new SiteVisitDTO(
+            $dsCallActivity->getValue(DBEJCallActivity::contactFirstName),
+            $dsCallActivity->getValue(DBEJCallActivity::userName),
+            $dsSite->getValue(DBESite::add1),
+            $dsSite->getValue(DBESite::add2),
+            $dsSite->getValue(DBESite::add3),
+            $dsSite->getValue(DBESite::town),
+            $dsSite->getValue(DBESite::postcode),
+            Controller::dateYMDtoDMY($dsCallActivity->getValue(DBEJCallActivity::date)),
+            $visitActivityTimeOfTheDay,
+            trim($dsCallActivity->getValue(DBEJCallActivity::customerSummary)),
+            $serviceRequestId,
         );
-        $template->parse(
-            'output',
-            'page',
-            true
+        $bcc             = [
+            $dsCallActivity->getValue(DBEJCallActivity::userAccount) . '@' . CONFIG_PUBLIC_DOMAIN,
+            CONFIG_SALES_EMAIL,
+            "VisitConfirmation@" . CONFIG_PUBLIC_DOMAIN
+        ];
+        $recipientsArray = array_merge($recipientsArray, $bcc);
+        $buCustomer      = new BUCustomer($this);
+        $cc              = $buCustomer->getMainSupportEmailAddresses(
+            $dsCallActivity->getValue(DBEJCallActivity::customerID),
+            $contactEmail
         );
-        $body = $template->get_var('output');
-
-
-        // cc to main customer support contact
-        $buCustomer = new BUCustomer($this);
-
-        $cc = false;
-
-        if (
-        $mainSupportEmailAddresses =
-            $buCustomer->getMainSupportEmailAddresses(
-                $dsCallActivity->getValue(DBEJCallActivity::customerID),
-                $toEmail
-            )
-        ) {
-            $cc = $mainSupportEmailAddresses;
-        }
-
-        $buMail->mime->setHTMLBody($body);
-
-        $mime_params = array(
-            'text_encoding' => '7bit',
-            'text_charset'  => 'UTF-8',
-            'html_charset'  => 'UTF-8',
-            'head_charset'  => 'UTF-8'
-        );
-        $body = $buMail->mime->get($mime_params);
-
-        $bcc = $dsCallActivity->getValue(DBEJCallActivity::userAccount) . '@cnc-ltd.co.uk' . ',' .
-            CONFIG_SALES_EMAIL . ',' . "VisitConfirmation@cnc-ltd.co.uk";
-
-        $recipients = $toEmail . ',' . $bcc . ',' . $cc;
-
-        $hdrs = array(
-            'From'         => $senderEmail,
-            'To'           => $toEmail,
-            'Subject'      => 'On-Site Visit Confirmation for Service Request ' . $callRef,
-            'Date'         => date("r"),
-            'Content-Type' => 'text/html; charset=UTF-8'
-        );
-
-        if ($cc) {
-            $hdrs['Cc'] = $cc;
-        }
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
-        $buMail->putInQueue(
-            $senderEmail,
-            $recipients,
-            $hdrs,
-            $body
-        );
-
+        $recipientsArray = array_merge($recipientsArray, $cc);
+        $recipients      = implode(",", $recipientsArray);
+        $subject         = "On-Site Visit Confirmation for Service Request {$serviceRequestId} {$emailSubjectToAppend}";
+        $body            = $twig->render('@customerFacing/SiteVisit/SiteVisit.html.twig', ["data" => $data]);
+        $buMail->sendSimpleEmail($body, $subject, $recipients, CONFIG_SUPPORT_EMAIL, $cc);
     }
 
     /**
@@ -9753,80 +8616,65 @@ FROM
     public function clearSystemSrQueue()
     {
         global $db;
-
         $sql = "
           SELECT
             pro_problemno
           FROM
             problem
           WHERE
-            pro_consno = " . USER_SYSTEM .
-            " AND pro_status = 'I'";
-
+            pro_consno = " . USER_SYSTEM . " AND pro_status = 'I'";
         $db->query($sql);
         $ids = array();
         while ($db->next_record()) {
             $ids[] = $db->Record[0];
         }
-
         foreach ($ids as $id) {
             $this->sendServiceRemovedEmail($id);
         }
-
         if (count($ids) > 0) {
             $idsAsString = implode(
                 ',',
                 $ids
             );
-            $sql = "
+            $sql         = "
             DELETE FROM
               problem
             WHERE
               pro_problemno IN(" . $idsAsString . ")";
-
-
             $db->query($sql);
-
             $sql = "
             DELETE FROM
               callactivity
             WHERE
               caa_problemno IN(" . $idsAsString . ")";
-
             $db->query($sql);
 
         }// end if
-
     }
 
     function raiseWebrootCustomerNotMatchedSR(\CNCLTD\WebrootAPI\Site $site)
     {
-        $details = "<p>This customer doesn't match CNCAPPS for their Webroot protection, please review and correct</p>
+        $details    = "<p>This customer doesn't match CNCAPPS for their Webroot protection, please review and correct</p>
 <p>Customer Name: {$site->siteName}</p>";
-        $priority = 4;
+        $priority   = 4;
         $dbeContact = new DBEContact($this);
         $customerID = 282;
         $dbeContact->getMainSupportRowsByCustomerID($customerID);
-
         if (!$dbeContact->fetchNext()) {
             return; // no main support contact so abort
         }
-
         $dbeCallActivity = new DBECallActivity($this);
         /*
     Is there an existing activity for this exact problem?
 
     If so, we will append to that SR
     */
-
-        $slaResponseHours =
-            $this->getSlaResponseHours(
-                $priority,
-                $customerID,
-                $dbeContact->getValue(DBEContact::contactID)
-            );
-
-        $dbeProblem = new DBEProblem($this);
+        $slaResponseHours = $this->getSlaResponseHours(
+            $priority,
+            $customerID,
+            $dbeContact->getValue(DBEContact::contactID)
+        );
+        $dbeProblem       = new DBEProblem($this);
         /* create new issue */
         $dbeProblem->setValue(
             DBEProblem::slaResponseHours,
@@ -9885,9 +8733,7 @@ FROM
             BUProblemRaiseType::ALERTID
         );
         $dbeProblem->insertRow();
-
         $problemID = $dbeProblem->getPKValue();
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::callActivityID,
             null
@@ -9920,7 +8766,6 @@ FROM
             DBEJCallActivity::status,
             'C'
         );
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::reason,
             $details
@@ -9933,49 +8778,40 @@ FROM
             DBEJCallActivity::userID,
             USER_SYSTEM
         );
-
         $dbeCallActivity->insertRow();
     }
-
 
     function raiseSolarwindsFailedBackupRequest(SolarwindsAccountItem $accountItem)
     {
         $dbeCustomerItem = new DBEJRenContract($this);
         $dbeCustomerItem->setValue(DBEJRenContract::customerItemID, $accountItem->contractId);
         $dbeCustomerItem->getRow();
-        $details = "<p>Customer " . $dbeCustomerItem->getValue(DBEJRenContract::customerName) . " has not had a successful Office 365 backup for over 24 hours.</p>
+        $details    = "<p>Customer " . $dbeCustomerItem->getValue(DBEJRenContract::customerName) . " has not had a successful Office 365 backup for over 24 hours.</p>
                     <p>The last backup was " . $accountItem->lastSuccessfulBackupDate->format('d-m-Y H:i') . ".</p>";
-        $priority = 2;
-
+        $priority   = 2;
         $dbeProblem = new DBEProblem($this);
-
         $dbeContact = new DBEContact($this);
         $customerID = $dbeCustomerItem->getValue(DBECustomerItem::customerID);
         $dbeContact->getMainSupportRowsByCustomerID($customerID);
-
         if (!$dbeContact->fetchNext()) {
             return; // no main support contact so abort
         }
-
         $dbeCallActivity = new DBECallActivity($this);
         /*
     Is there an existing activity for this exact problem?
 
     If so, we will append to that SR
     */
-        $callActivityID = $this->getActivityWithMatchingDescriptionAndContractForCustomer(
+        $callActivityID   = $this->getActivityWithMatchingDescriptionAndContractForCustomer(
             $customerID,
             $accountItem->contractId,
             $details
         );
-
-        $slaResponseHours =
-            $this->getSlaResponseHours(
-                $priority,
-                $customerID,
-                $dbeContact->getValue(DBEContact::contactID)
-            );
-
+        $slaResponseHours = $this->getSlaResponseHours(
+            $priority,
+            $customerID,
+            $dbeContact->getValue(DBEContact::contactID)
+        );
         if (!$callActivityID) {
             /* create new issue */
             $dbeProblem->setValue(
@@ -10039,9 +8875,7 @@ FROM
                 BUProblemRaiseType::ALERTID
             );
             $dbeProblem->insertRow();
-
             $problemID = $dbeProblem->getPKValue();
-
             $dbeCallActivity->setValue(
                 DBEJCallActivity::callActivityID,
                 null
@@ -10074,7 +8908,6 @@ FROM
                 DBEJCallActivity::status,
                 'C'
             );
-
             $dbeCallActivity->setValue(
                 DBEJCallActivity::reason,
                 $details
@@ -10087,7 +8920,6 @@ FROM
                 DBEJCallActivity::userID,
                 USER_SYSTEM
             );
-
             $dbeCallActivity->insertRow();
 
         } else {
@@ -10118,7 +8950,6 @@ FROM
     {
 
         global $db;
-
         $sql = "
         SELECT
           ca.caa_callactivityno
@@ -10131,7 +8962,6 @@ FROM
           AND p.pro_status IN ('P', 'F' )
           AND ca.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID . "
           AND ca.reason LIKE '%" . trim(addslashes($matchText)) . "%'";
-
         $db->query($sql);
         if ($db->next_record()) {
             return $db->Record['caa_callactivityno'];
@@ -10152,28 +8982,24 @@ FROM
      * @param bool $isReplication
      * @throws Exception
      */
-    function raiseSecondSiteMissingImageRequest(
-        $customerID,
-        $serverName,
-        $serverCustomerItemID,
-        $contractCustomerItemID,
-        $missingLetters,
-        $missingImages,
-        $isReplication = false
+    function raiseSecondSiteMissingImageRequest($customerID,
+                                                $serverName,
+                                                $serverCustomerItemID,
+                                                $contractCustomerItemID,
+                                                $missingLetters,
+                                                $missingImages,
+                                                $isReplication = false
     )
     {
 
         $detailsWithoutDriveLetters = '<p><strong>' . ($isReplication ? 'Replication - ' : '') . 'The following image(s) have not been found for ' . $serverName;
-
-        $details = $detailsWithoutDriveLetters . ': ' . implode(
+        $details                    = $detailsWithoutDriveLetters . ': ' . implode(
                 ',',
                 $missingLetters
             ) . '</strong></p>';
-
         foreach ($missingImages as $image) {
             $details .= '<ul>' . $image . '</ul>';
         }
-
         $this->createSecondsiteSR(
             $customerID,
             $contractCustomerItemID,
@@ -10194,47 +9020,38 @@ FROM
      * @param $serverCustomerItemID
      * @throws Exception
      */
-    function createSecondsiteSR(
-        $customerID,
-        $contractCustomerItemID,
-        $matchText,
-        $details,
-        $serverName,
-        $serverCustomerItemID,
-        $raiseTypeId = null
+    function createSecondsiteSR($customerID,
+                                $contractCustomerItemID,
+                                $matchText,
+                                $details,
+                                $serverName,
+                                $serverCustomerItemID,
+                                $raiseTypeId = null
     )
     {
-        $priority = 2;
-
+        $priority   = 2;
         $dbeProblem = new DBEProblem($this);
-
         $dbeContact = new DBEContact($this);
-
         $dbeContact->getMainSupportRowsByCustomerID($customerID);
-
         if (!$dbeContact->fetchNext()) {
             return; // no main support contact so abort
         }
-
         $dbeCallActivity = new DBECallActivity($this);
         /*
     Is there an existing activity for this exact problem?
 
     If so, we will append to that SR
     */
-        $callActivityID = $this->getActivityWithMatchingDescriptionAndContractForCustomer(
+        $callActivityID   = $this->getActivityWithMatchingDescriptionAndContractForCustomer(
             $customerID,
             $contractCustomerItemID,
             $matchText
         );
-
-        $slaResponseHours =
-            $this->getSlaResponseHours(
-                $priority,
-                $customerID,
-                $dbeContact->getValue(DBEContact::contactID)
-            );
-
+        $slaResponseHours = $this->getSlaResponseHours(
+            $priority,
+            $customerID,
+            $dbeContact->getValue(DBEContact::contactID)
+        );
         if (!$callActivityID) {
             /* create new issue */
             $dbeProblem->setValue(
@@ -10289,20 +9106,16 @@ FROM
                 DBEProblem::projectTeamLimitMinutes,
                 $this->dsHeader->getValue(DBEHeader::projectTeamLimitMinutes)
             );
-
             $dbeProblem->setValue(
                 DBEProblem::userID,
                 null
             );        // not allocated
-            if ($raiseTypeId != null)
-                $dbeProblem->setValue(
-                    DBEProblem::raiseTypeId,
-                    $raiseTypeId
-                );
+            if ($raiseTypeId != null) $dbeProblem->setValue(
+                DBEProblem::raiseTypeId,
+                $raiseTypeId
+            );
             $dbeProblem->insertRow();
-
             $problemID = $dbeProblem->getPKValue();
-
             $dbeCallActivity->setValue(
                 DBEJCallActivity::callActivityID,
                 null
@@ -10359,7 +9172,6 @@ FROM
                 DBEJCallActivity::userID,
                 USER_SYSTEM
             );
-
             $dbeCallActivity->insertRow();
         } else {
 
@@ -10384,17 +9196,15 @@ FROM
      * @param bool $isReplication
      * @throws Exception
      */
-    function raiseSecondSiteLocationNotFoundRequest(
-        $customerID,
-        $serverName,
-        $serverCustomerItemID,
-        $contractCustomerItemID,
-        $networkPath,
-        $isReplication = false
+    function raiseSecondSiteLocationNotFoundRequest($customerID,
+                                                    $serverName,
+                                                    $serverCustomerItemID,
+                                                    $contractCustomerItemID,
+                                                    $networkPath,
+                                                    $isReplication = false
     )
     {
         $details = '<p><strong>' . ($isReplication ? 'Replication - ' : null) . 'Image Location ' . $networkPath . ' cannot be found for ' . $serverName . '</p>';
-
         $this->createSecondsiteSR(
             $customerID,
             $contractCustomerItemID,
@@ -10415,18 +9225,14 @@ FROM
             $callActivityID,
             $dsCallActivity
         );
-
-        $problemID = $dsCallActivity->getValue(DBEJCallActivity::problemID);
-
+        $problemID  = $dsCallActivity->getValue(DBEJCallActivity::problemID);
         $dbeProblem = new DBEProblem($this);
-
         $dbeProblem->getRow($problemID);
         $dbeProblem->setValue(
             DBEJProblem::linkedSalesOrderID,
             $salesOrderID
         );
         $dbeProblem->updateRow();
-
         return;
 
     }
@@ -10437,9 +9243,7 @@ FROM
     public function getOpenSrsByUser()
     {
         global $db;
-
-        $sql =
-            "SELECT
+        $sql = "SELECT
           CONCAT( SUBSTR( firstName, 1, 1),SUBSTR( lastName, 1, 1 )) AS initials,
           COUNT(*) AS count
   
@@ -10450,9 +9254,7 @@ FROM
   
         WHERE  
           pro_status IN ('I', 'P')
-          AND caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
-
-            " GROUP BY
+          AND caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID . " GROUP BY
           pro_consno order by pro_consno";
         $ret = [];
         $db->query($sql);
@@ -10467,13 +9269,11 @@ FROM
                                           $callActivityID
     )
     {
+        $requesterID = $GLOBALS['auth']->is_authenticated();
         if ($callActivityID) {
             $dbeJCallActivity = new DBEJCallActivity($this);
             $dbeJCallActivity->getRow($callActivityID);
             $problemID = $dbeJCallActivity->getValue(DBECallActivity::problemID);
-            $requesterID = $dbeJCallActivity->getValue(DBEJCallActivity::userID);
-        } else {
-            $requesterID = $GLOBALS['auth']->is_authenticated();
         }
         $this->createTimeRequestsActivity(
             $problemID,
@@ -10488,12 +9288,9 @@ FROM
     )
     {
         $dbeJLastCallActivity = $this->getLastActivityInProblem($problemID);
-
-        $dbeNewActivity = new DBECallActivity($this);
+        $dbeNewActivity       = new DBECallActivity($this);
         $dbeNewActivity->getRow($dbeJLastCallActivity->getValue(DBEJCallActivity::callActivityID));
-
         $dbeNewActivity->setPKValue(null);
-
         $dbeNewActivity->setValue(
             DBEJCallActivity::date,
             date('Y-m-d')
@@ -10522,9 +9319,7 @@ FROM
             DBEJCallActivity::reason,
             $reason
         );
-
         $dbeNewActivity->insertRow();
-
         return $dbeNewActivity->getPKValue();
     }
 
@@ -10541,18 +9336,14 @@ FROM
     )
     {
         global $db;
-
-        $sql =
-            "SELECT
+        $sql = "SELECT
         SUM( (loggedHours+cncLoggedHours) / dayHours ) * 100 as performancePercentage
       FROM
         user_time_log
       WHERE
         loggedDate >= DATE_SUB( DATE( NOW() ), INTERVAL $daysToDate DAY )
       AND userID = $userID";
-
         $db->query($sql);
-
         $db->next_record();
         return $db->Record[0];
     }
@@ -10581,17 +9372,13 @@ FROM
         } else {
             $date = new DateTime($date);
         }
-
         $bankHolidays = common_getUkBankHolidays($date->format('Y'));
-
         if (in_array(
                 $date->format('Y-m-d'),
                 $bankHolidays
             ) || $date->format('N') > 5) {
             return; // ignore holidays
         }
-
-
         $this->dbeUser->getRows(true);
         while ($this->dbeUser->fetchNext()) {
             $this->createUserTimeLogRecord(
@@ -10618,7 +9405,6 @@ FROM
     )
     {
         global $db;
-
         if (!$date) {
             $date = new DateTime();
         }
@@ -10633,7 +9419,7 @@ FROM
         cns_consno = $userID"
         );
         $db->next_record();
-        $teamLevel = $db->Record['teamLevel'];
+        $teamLevel        = $db->Record['teamLevel'];
         $standardDayHours = $db->Record['standardDayHours'];
         /*
     Set logged hours to the target for the team
@@ -10643,12 +9429,9 @@ FROM
         } else {
             $targetPercentage = $this->dsHeader->getValue(DBEJHeader::esTeamTargetLogPercentage);
         }
-
-        $loggedHours = $standardDayHours * ($targetPercentage / 100);
-
+        $loggedHours   = $standardDayHours * ($targetPercentage / 100);
         $dateFormatted = $date->format('Y-m-d');
-        $sql =
-            "INSERT IGNORE INTO user_time_log
+        $sql           = "INSERT IGNORE INTO user_time_log
         (
         `userID`,
         `teamLevel`,
@@ -10668,7 +9451,6 @@ FROM
           '00:00:00',
           1
         )";
-
         $db->query($sql);
     }
 
@@ -10686,49 +9468,39 @@ FROM
         /*
     Send email to managers
     */
-        $buMail = new BUMail($this);
-
+        $buMail      = new BUMail($this);
         $dbeJProblem = new DBEJProblem($this);
         $dbeJProblem->getRow($problemID);
-
         $senderEmail = CONFIG_SUPPORT_EMAIL;
 //        $senderName = 'CNC Support Department';
-
         $template = new Template(
-            EMAIL_TEMPLATE_DIR,
-            "remove"
+            EMAIL_TEMPLATE_DIR, "remove"
         );
         $template->set_file(
             'page',
             'ManagementReviewSummaryAddedEmail.inc.html'
         );
-
-        $urlActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJProblem->getValue(
+        $urlActivity = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJProblem->getValue(
                 DBEJCallActivity::callActivityID
             );
-
         $template->setVar(
             array(
-                'problemID'     => $problemID,
-                'urlActivity'   => $urlActivity,
-                'customerName'  => $dbeJProblem->getValue(DBEJProblem::customerName),
-                'initialReason' => $dbeJProblem->getValue(DBEJProblem::reason),
-                'fixSummary'    => $dbeJProblem->getValue(DBEJProblem::lastReason),
-                'managementReviewReason'
-                                => $dbeJProblem->getValue(DBEJProblem::managementReviewReason)
+                'problemID'              => $problemID,
+                'urlActivity'            => $urlActivity,
+                'customerName'           => $dbeJProblem->getValue(DBEJProblem::customerName),
+                'initialReason'          => $dbeJProblem->getValue(DBEJProblem::reason),
+                'fixSummary'             => $dbeJProblem->getValue(DBEJProblem::lastReason),
+                'managementReviewReason' => $dbeJProblem->getValue(DBEJProblem::managementReviewReason)
             )
         );
-
         $template->parse(
             'output',
             'page',
             true
         );
-
-        $body = $template->get_var('output');
+        $body    = $template->get_var('output');
         $toEmail = 'managementreview@' . CONFIG_PUBLIC_DOMAIN;
-
-        $hdrs = array(
+        $hdrs    = array(
             'From'         => $senderEmail,
             'To'           => $toEmail,
             'Subject'      => 'Management Review Summary Added ' . $dbeJProblem->getValue(
@@ -10737,28 +9509,21 @@ FROM
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
-
         $buMail->mime->setHTMLBody($body);
-
         $mime_params = array(
             'text_encoding' => '7bit',
             'text_charset'  => 'UTF-8',
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
-
+        $body        = $buMail->mime->get($mime_params);
+        $hdrs        = $buMail->mime->headers($hdrs);
         $buMail->putInQueue(
             $senderEmail,
             $toEmail,
             $hdrs,
             $body
         );
-
         $this->logOperationalActivity(
             $problemID,
             $text
@@ -10785,7 +9550,6 @@ FROM
             $startDate,
             $endDate
         );
-
         return ($this->getData(
             $dbeProblem,
             $dsResults
@@ -10799,10 +9563,8 @@ FROM
     )
     {
         global $db;
-
         /* count SRs */
-        $sql =
-            "SELECT 
+        $sql = "SELECT 
         cus_name,
         SUM( TIME_TO_SEC(caa_endtime) - TIME_TO_SEC(caa_starttime) ) / 3600 AS hours,
         COUNT( DISTINCT pro_problemno ) AS srCount
@@ -10816,44 +9578,34 @@ FROM
       WHERE
         callacttype.`travelFlag` = 'N'
         AND caa_endtime is not null and caa_endtime <> '' ";
-
         if ($days) {
-            $sql .=
-                " AND caa_date >= DATE_SUB( NOW(), INTERVAL $days DAY )";
+            $sql .= " AND caa_date >= DATE_SUB( NOW(), INTERVAL $days DAY )";
         } else if ($fromDate) {
             $sql .= " AND caa_date >= '$fromDate' ";
-
             if ($toDate) {
                 $sql .= " AND caa_date <= '$toDate' ";
             }
         }
-
-        $sql .=
-
-            " GROUP BY
+        $sql .= " GROUP BY
         pro_custno
 
       ORDER BY 
         hours DESC;";
-
         $db->query($sql);
         /*
     Get grand total hours
     */
         $grandTotalHours = 0;
-
-        $results = array();
-
+        $results         = array();
         while ($db->next_record()) {
 
             $grandTotalHours += $db->Record['hours'];
-            $results[] = $db->Record;
+            $results[]       = $db->Record;
         }
         /*
     Calculate percentages
     */
         $ret = array();
-
         foreach ($results as $result) {
             $result['percentage'] = 0;
             if ($grandTotalHours) {
@@ -10881,19 +9633,15 @@ FROM
     )
     {
         global $db;
-
-        $sql =
-            "SELECT sum(time_to_sec(timediff(caa_endtime, caa_starttime)) / 60) AS amountOfTime
+        $sql = "SELECT sum(time_to_sec(timediff(caa_endtime, caa_starttime)) / 60) AS amountOfTime
             FROM
               `problem`
               LEFT JOIN callactivity ON callactivity.`caa_problemno` = problem.`pro_problemno`
               LEFT JOIN consultant ON caa_consno = cns_consno
             WHERE  pro_problemno = $problemID AND teamID = $teamID AND caa_starttime AND caa_endtime and caa_callacttypeno in (4, 8, 11, 18)";
-
         if ($excludedActivityID) {
             $sql .= " and caa_callactivityno <> $excludedActivityID";
         }
-
         $db->query($sql);
         $db->next_record();
         return empty($db->Record['amountOfTime']) ? 0 : $db->Record['amountOfTime'];
@@ -10929,8 +9677,17 @@ FROM
         return $db->query($sql);
     }
 
-    public function getSDDashBoardData($problems,
-                                       $limit,
+    /**
+     * @param $limit
+     * @param string $order
+     * @param false $isP5
+     * @param bool $showHelpDesk
+     * @param bool $showEscalation
+     * @param bool $showSmallProjects
+     * @param bool $showProjects
+     * @return DBEJProblem
+     */
+    public function getSDDashBoardData($limit,
                                        $order = 'shortestSLARemaining',
                                        $isP5 = false,
                                        $showHelpDesk = true,
@@ -10949,12 +9706,7 @@ FROM
             $showSmallProjects,
             $showProjects
         );
-
-        $this->getData(
-            $dbeJProblem,
-            $problems
-        );
-
+        return $dbeJProblem;
     }
 
     /**
@@ -10991,7 +9743,6 @@ FROM
     )
     {
         $dbeJProblem = new DBEJProblem($this);
-
         $dbeJProblem->getDashBoardEngineersInSRRows(
             $engineersMaxCount,
             $pastHours,
@@ -11002,7 +9753,6 @@ FROM
             $showSmallProjects,
             $showProjects
         );
-
         $this->getData(
             $dbeJProblem,
             $problems
@@ -11027,7 +9777,7 @@ FROM
                                      $files = null
     )
     {
-        $dbeContact = new DBEContact($this);
+        $dbeContact  = new DBEContact($this);
         $dbeCustomer = new DBECustomer($this);
         if ($createSR) {
             $dbeProblem = new DBEProblem($this);
@@ -11074,12 +9824,10 @@ FROM
                 DBEProblem::dateRaised,
                 date(DATE_MYSQL_DATETIME)
             );
-
             $dbeProblem->setValue(
                 DBEJProblem::hideFromCustomerFlag,
                 'Y'
             );
-
             $dbeProblem->setValue(
                 DBEJProblem::queueNo,
                 7
@@ -11088,20 +9836,17 @@ FROM
                 DBEJProblem::rootCauseID,
                 59
             );
-
             $dbeProblem->setValue(
                 DBEJProblem::awaitingCustomerResponseFlag,
                 'N'
             );
-
             $dbeProblem->setValue(
                 DBEJProblem::userID,
                 $this->dbeUser->getValue(DBEUser::userID)
             );
             $dbeProblem->insertRow();
             $problemID = $dbeProblem->getPKValue();
-
-            $dbeSite = new DBESite($this);
+            $dbeSite   = new DBESite($this);
             $dbeSite->setValue(DBESite::customerID, $customerID);
             $dbeSite->getRowsByCustomerID();
             $dbeSite->fetchNext();
@@ -11134,7 +9879,6 @@ FROM
                 DBEJCallActivity::startTime,
                 $startTime
             );
-
             $dbeCallActivity->setValue(
                 DBEJCallActivity::endTime,
                 $startTime
@@ -11154,15 +9898,12 @@ FROM
             $dbeCallActivity->insertRow();
             $this->setProblemRaise($dbeProblem, $dbeCallActivity, BUProblemRaiseType::SALES); //sendSalesRequest
         }
-
-        $buStandardText = new BUStandardText($this);
-
+        $buStandardText  = new BUStandardText($this);
         $dbeStandardText = new DataSet($this);
         $buStandardText->getStandardTextByID(
             $type,
             $dbeStandardText
         );
-
         // we have to create an open "sales activity"
         $salesRequestActivity = $this->createSalesRequestActivity(
             $problemID,
@@ -11171,7 +9912,6 @@ FROM
             $createSR,
             $dbeStandardText->getValue(DBEStandardText::stt_standardtextno)
         );
-
         if ($files) {
             foreach ($files['name'] as $idx => $fileItem) {
                 $dbeCallDocument = new DBECallDocument($this);
@@ -11206,19 +9946,15 @@ FROM
                 $dbeCallDocument->insertRow();
             }
         }
-
-
         $destEmail = $dbeStandardText->getValue(DBEStandardText::salesRequestEmail);
-        $problem = new DBEProblem($this);
+        $problem   = new DBEProblem($this);
         $problem->getRow($problemID);
-
         if ($dbeStandardText->getValue(DBEStandardText::salesRequestUnassignFlag) == 'Y') {
             $problem->setValue(
                 DBEProblem::userID,
                 null
             );
         }
-
         if ($type != "New Starter/Office 365 License") {
             $alarmDate = (new DateTime())->add(new DateInterval('P1D'));
             $problem->setValue(
@@ -11231,7 +9967,6 @@ FROM
             );
         }
         $problem->updateRow();
-
         $this->sendSalesRequestEmail(
             $salesRequestActivity,
             $destEmail
@@ -11242,37 +9977,31 @@ FROM
                                            $email
     )
     {
-        $buMail = new BUMail($this);
-        $problemID = $salesRequestActivity->getValue(DBEJCallActivity::problemID);
-        $dsInitialCallActivity = $this->getFirstActivityInProblem($problemID);
-        $lastActivity = $this->getLastActivityInProblem($problemID);
+        $buMail                = new BUMail($this);
+        $problemID             = $salesRequestActivity->getValue(DBEJCallActivity::problemID);
+        $dsInitialCallActivity = $this->getFirstActivityInServiceRequest($problemID);
+        $lastActivity          = $this->getLastActivityInProblem($problemID);
         $this->dbeUser->getRow($this->loggedInUserID);
-
         $senderEmail = CONFIG_SUPPORT_EMAIL;
-
-        $template = new Template(
-            EMAIL_TEMPLATE_DIR,
-            "remove"
+        $template    = new Template(
+            EMAIL_TEMPLATE_DIR, "remove"
         );
-
         $template->set_file(
             'page',
             'SalesRequestEmail.html'
         );
-
-        $userName = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(DBEUser::lastName);
-
-
+        $userName              = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(
+                DBEUser::lastName
+            );
         $urlSalesRequestReview = SITE_URL . '/Activity.php?action=salesRequestReview&callActivityID=' . $salesRequestActivity->getValue(
                 DBEJCallActivity::callActivityID
             ) . '&fromEmail=true';
-        $urlFirstActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dsInitialCallActivity->getValue(
+        $urlFirstActivity      = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dsInitialCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             );
-        $urlLastActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $lastActivity->getValue(
+        $urlLastActivity       = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $lastActivity->getValue(
                 DBEJCallActivity::callActivityID
             );
-
         $template->setVar(
             array(
                 'problemID'              => $problemID,
@@ -11283,43 +10012,32 @@ FROM
                 'urlFirstActivity'       => $urlFirstActivity,
             )
         );
-
         $template->parse(
             'output',
             'page',
             true
         );
-
-        $body = $template->get_var('output');
-
+        $body    = $template->get_var('output');
         $toEmail = $email;
-
         $subject = 'Sales Request submitted for ' . $dsInitialCallActivity->getValue(
                 DBEJCallActivity::customerName
             ) . ' by ' . $userName . ' for SR' . $problemID;
-
-
-        $hdrs = array(
+        $hdrs    = array(
             'From'         => $senderEmail,
             'To'           => $toEmail,
             'Subject'      => $subject,
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
-
         $buMail->mime->setHTMLBody($body);
-
         $mime_params = array(
             'text_encoding' => '7bit',
             'text_charset'  => 'UTF-8',
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
+        $body        = $buMail->mime->get($mime_params);
+        $hdrs        = $buMail->mime->headers($hdrs);
         $buMail->putInQueue(
             $senderEmail,
             $toEmail,
@@ -11331,51 +10049,42 @@ FROM
     public function getProblemsByContact($contactID)
     {
         $dbeJProblem = new DBEJProblem($this);
-
         $dbeJProblem->getProblemsByContactID($contactID);
-
         $this->getData(
             $dbeJProblem,
             $dsResults
         );
-
         return $dsResults;
     }
 
-    function createActivityLeasedLineExpire(
-        $customerID,
-        $custItemID,
-        $itemDescription,
-        $expireDate,
-        $problemStatus = 'I',
-        $priority = 5,
-        $hideFromCustomerFlag = 'Y'
+    function createActivityLeasedLineExpire($customerID,
+                                            $custItemID,
+                                            $itemDescription,
+                                            $expireDate,
+                                            $problemStatus = 'I',
+                                            $priority = 5,
+                                            $hideFromCustomerFlag = 'Y'
     )
     {
 
         $this->setMethodName('createActivityLeasedLineExpire');
-        $reason = "The contract for" . '  :  ' . $itemDescription . ' will be expired on '
-            . $expireDate;
+        $reason = "The contract for" . '  :  ' . $itemDescription . ' will be expired on ' . $expireDate;
         //$contractCustomerItemID =`custitem_contract`.cic_contractcuino
         $problemStatus = 'I';
-        $userID = 67;  // qsystem
-        $buCustomer = new BUCustomer($this);
-
-        $dsCustomer = new DataSet($this);
-
+        $userID        = 67;  // qsystem
+        $buCustomer    = new BUCustomer($this);
+        $dsCustomer    = new DataSet($this);
         $buCustomer->getCustomerByID(
             $customerID,
             $dsCustomer
         );
         $buSite = new BUSite($this);
-
         $dsSite = new DataSet($this);
         $buSite->getSiteByID(
             $customerID,
             $dsCustomer->getValue(DBECustomer::deliverSiteNo),
             $dsSite
         );
-
         // create new problem here
         $dbeProblem = new DBEProblem($this);
         $dbeProblem->setValue(
@@ -11402,16 +10111,13 @@ FROM
             DBEJProblem::hideFromCustomerFlag,
             $hideFromCustomerFlag
         );
-
         $dbeProblem->insertRow();
-
         $this->addInitialActivityToNewRequest(
             $dbeProblem,
             $dsSite->getValue(DBESite::siteNo),
             $dsSite->getValue(DBESite::invoiceContactID),
             $reason
         );
-
 //callactivity.salesRequestStatus = 'O' and caa_callacttypeno = 43
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->setValue(
@@ -11470,13 +10176,11 @@ FROM
             DBEJCallActivity::requestType,
             102 // Internet Line Quote
         );
-
         $dbeCallActivity->insertRow();
-        // send email to grahaml@cnc-ltd.co.uk
-        $buMail = new BUMail($this);
+        $buMail      = new BUMail($this);
         $senderEmail = CONFIG_SUPPORT_EMAIL;
         $activityRef = $dbeProblem->getPKValue() . ' ' . $dsCustomer->getValue(DBECustomer::name);
-        $data = [
+        $data        = [
             "custItemID"      => $custItemID,
             "itemDescription" => $itemDescription,
             "customerName"    => $dsCustomer->getValue(DBECustomer::name),
@@ -11486,41 +10190,35 @@ FROM
         ];
         // $content ="The service #ServiceName at #CustomerName comes to the end of contract on the #expireDate.
         // Please review to ensure that appropriate action is taken and a proposal submitted to the customer.";
-
         // $content=str_replace("#ServiceName","<a href='/RenBroadband.php?action=edit&ID=$custItemID' title='$itemDescription'>$itemDescription</a>",$content);
         // $content=str_replace("#CustomerName", $dsCustomer->getValue(DBECustomer::name),$content);
         // $content=str_replace("#expireDate", $expireDate,$content);
         global $twig;
-        $body = $twig->render(
+        $body            = $twig->render(
             '@internal/activityLeasedLineExpire.html.twig',
             [
                 "data" => $data
             ]
         );
-
         $dbeStandardText = new DBEStandardText($this);
         $dbeStandardText->getRow($dbeCallActivity->getValue(DBECallActivity::requestType));
         $toEmail = $dbeStandardText->getValue(DBEStandardText::salesRequestEmail);
-
-        $hdrs = array(
+        $hdrs    = array(
             'From'    => $senderEmail,
             'To'      => $toEmail,
             'Subject' => "Leased line contract expiry notification",
             // CONFIG_SERVICE_REQUEST_DESC . ' ' . $activityRef . ' - Will expire',
             'Date'    => date("r")
         );
-
         $buMail->mime->setHTMLBody($body);
-
         $mime_params = array(
             'text_encoding' => '7bit',
             'text_charset'  => 'UTF-8',
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-
-        $body = $buMail->mime->get($mime_params);
-        $hdrs = $buMail->mime->headers($hdrs);
+        $body        = $buMail->mime->get($mime_params);
+        $hdrs        = $buMail->mime->headers($hdrs);
         $buMail->putInQueue(
             $senderEmail,
             $toEmail,
@@ -11548,7 +10246,6 @@ FROM
         if ($oldProblemID) {
             $reason .= 'This incident refers to incident ' . $oldProblemID . ' which has already been completed.';
         }
-
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->setValue(
             DBEJCallActivity::siteNo,
@@ -11570,9 +10267,7 @@ FROM
             DBEJCallActivity::startTime,
             date('H:i')
         );
-
         $endTime = $this->getEndtime(CONFIG_INITIAL_ACTIVITY_TYPE_ID);
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::endTime,
             $endTime
@@ -11603,32 +10298,28 @@ FROM
      */
     public function raiseWebrootContractNotFound(\CNCLTD\WebrootAPI\Site $site, DBECustomer $dbeCustomer)
     {
-        $details = "<p>Customer {$dbeCustomer->getValue(DBECustomer::name)} does not have a Webroot contract but has the software deployed.  Please review this and create the contract.</p>";
-        $priority = 4;
+        $details    = "<p>Customer {$dbeCustomer->getValue(DBECustomer::name)} does not have a Webroot contract but has the software deployed.  Please review this and create the contract.</p>";
+        $priority   = 4;
         $customerID = $dbeCustomer->getValue(DBECustomer::customerID);
         $dbeContact = new DBEContact($this);
         $dbeContact->getMainSupportRowsByCustomerID($customerID);
-
         if (!$dbeContact->fetchNext()) {
             throw new Exception(
                 "Customer {$customerID} does not have any Main Support Contacts"
             ); // no main support contact so abort
         }
-
         $dbeCallActivity = new DBECallActivity($this);
         /*
     Is there an existing activity for this exact problem?
 
     If so, we will append to that SR
     */
-        $slaResponseHours =
-            $this->getSlaResponseHours(
-                $priority,
-                $customerID,
-                $dbeContact->getValue(DBEContact::contactID)
-            );
-
-        $dbeProblem = new DBEProblem($this);
+        $slaResponseHours = $this->getSlaResponseHours(
+            $priority,
+            $customerID,
+            $dbeContact->getValue(DBEContact::contactID)
+        );
+        $dbeProblem       = new DBEProblem($this);
         /* create new issue */
         $dbeProblem->setValue(
             DBEProblem::slaResponseHours,
@@ -11687,9 +10378,7 @@ FROM
             BUProblemRaiseType::ALERTID
         );
         $dbeProblem->insertRow();
-
         $problemID = $dbeProblem->getPKValue();
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::callActivityID,
             null
@@ -11722,7 +10411,6 @@ FROM
             DBEJCallActivity::status,
             'C'
         );
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::reason,
             $details
@@ -11735,38 +10423,32 @@ FROM
             DBEJCallActivity::userID,
             USER_SYSTEM
         );
-
         $dbeCallActivity->insertRow();
     }
 
     function raiseDuoCustomerNotMatchedSR(\CNCLTD\DUOApi\Account $account)
     {
-        $details = "<p>This customer doesn't match CNCAPPS for their DUO protection, please review and correct</p>
+        $details    = "<p>This customer doesn't match CNCAPPS for their DUO protection, please review and correct</p>
 <p>Customer Name: {$account->name}</p>";
-        $priority = 4;
+        $priority   = 4;
         $dbeContact = new DBEContact($this);
         $customerID = 282;
         $dbeContact->getMainSupportRowsByCustomerID($customerID);
-
         if (!$dbeContact->fetchNext()) {
             return; // no main support contact so abort
         }
-
         $dbeCallActivity = new DBECallActivity($this);
         /*
     Is there an existing activity for this exact problem?
 
     If so, we will append to that SR
     */
-
-        $slaResponseHours =
-            $this->getSlaResponseHours(
-                $priority,
-                $customerID,
-                $dbeContact->getValue(DBEContact::contactID)
-            );
-
-        $dbeProblem = new DBEProblem($this);
+        $slaResponseHours = $this->getSlaResponseHours(
+            $priority,
+            $customerID,
+            $dbeContact->getValue(DBEContact::contactID)
+        );
+        $dbeProblem       = new DBEProblem($this);
         /* create new issue */
         $dbeProblem->setValue(
             DBEProblem::slaResponseHours,
@@ -11825,9 +10507,7 @@ FROM
             BUProblemRaiseType::ALERTID
         );
         $dbeProblem->insertRow();
-
         $problemID = $dbeProblem->getPKValue();
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::callActivityID,
             null
@@ -11860,7 +10540,6 @@ FROM
             DBEJCallActivity::status,
             'C'
         );
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::reason,
             $details
@@ -11873,7 +10552,6 @@ FROM
             DBEJCallActivity::userID,
             USER_SYSTEM
         );
-
         $dbeCallActivity->insertRow();
     }
 
@@ -11884,32 +10562,28 @@ FROM
      */
     public function raiseDuoContractNotFound(\CNCLTD\DUOApi\Account $account, DBECustomer $dbeCustomer)
     {
-        $details = "<p>Customer {$dbeCustomer->getValue(DBECustomer::name)} does not have a Duo contract but has the software deployed.  Please review this and create the contract.</p>";
-        $priority = 4;
+        $details    = "<p>Customer {$dbeCustomer->getValue(DBECustomer::name)} does not have a Duo contract but has the software deployed.  Please review this and create the contract.</p>";
+        $priority   = 4;
         $customerID = $dbeCustomer->getValue(DBECustomer::customerID);
         $dbeContact = new DBEContact($this);
         $dbeContact->getMainSupportRowsByCustomerID($customerID);
-
         if (!$dbeContact->fetchNext()) {
             throw new Exception(
                 "Customer {$customerID} does not have any Main Support Contacts"
             ); // no main support contact so abort
         }
-
         $dbeCallActivity = new DBECallActivity($this);
         /*
     Is there an existing activity for this exact problem?
 
     If so, we will append to that SR
     */
-        $slaResponseHours =
-            $this->getSlaResponseHours(
-                $priority,
-                $customerID,
-                $dbeContact->getValue(DBEContact::contactID)
-            );
-
-        $dbeProblem = new DBEProblem($this);
+        $slaResponseHours = $this->getSlaResponseHours(
+            $priority,
+            $customerID,
+            $dbeContact->getValue(DBEContact::contactID)
+        );
+        $dbeProblem       = new DBEProblem($this);
         /* create new issue */
         $dbeProblem->setValue(
             DBEProblem::slaResponseHours,
@@ -11968,9 +10642,7 @@ FROM
             BUProblemRaiseType::ALERTID
         );
         $dbeProblem->insertRow();
-
         $problemID = $dbeProblem->getPKValue();
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::callActivityID,
             null
@@ -12003,7 +10675,6 @@ FROM
             DBEJCallActivity::status,
             'C'
         );
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::reason,
             $details
@@ -12016,8 +10687,123 @@ FROM
             DBEJCallActivity::userID,
             USER_SYSTEM
         );
-
         $dbeCallActivity->insertRow();
+    }
+
+    /**
+     * Get problems by status
+     *
+     * @param $customerID
+     * @return DBEJProblem
+     */
+    function getCustomerOpenSR($customerID)
+    {
+        $dbeJProblem = new DBEJProblem($this);
+        $dbeJProblem->getCustomerOpenRows($customerID);
+        return $dbeJProblem;
+
+    }
+
+    /**
+     * @param DBEProblem $DBEProblem
+     * @param $cpr_reason
+     * @param DBEUser $currentUser
+     */
+    public function addCustomerContactActivityToServiceRequest(DBEProblem $DBEProblem,
+                                                               $cpr_reason,
+                                                               DBEUser $currentUser
+    )
+    {
+        $initialActivity = $this->getFirstActivityInServiceRequest(
+            $DBEProblem->getValue(DBEProblem::problemID),
+            CONFIG_INITIAL_ACTIVITY_TYPE_ID
+        );
+        $dbeCallActivity = new DBECallActivity($this);
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::callActivityID,
+            null
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::siteNo,
+            $initialActivity->getValue(DBECallActivity::siteNo)
+        ); // contact default siteno
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::contactID,
+            $initialActivity->getValue(DBECallActivity::contactID)
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::callActTypeID,
+            CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::date,
+            date(DATE_MYSQL_DATE)
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::startTime,
+            date('H:i')
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::endTime,
+            date('H:i')
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::status,
+            'C'
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::reason,
+            $cpr_reason
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::problemID,
+            $DBEProblem->getValue(DBEProblem::problemID)
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::userID,
+            $currentUser->getValue(DBEUser::userID)
+        );
+        $dbeCallActivity->insertRow();
+    }
+
+    private function getSuitableEmailSubjectSummary($ordheadID, $selectedOrderLine)
+    {
+        $ordline = new DBEOrdline($this);
+        $ordline->getLinesForOrder($ordheadID);
+        $oneOffSelectedComment    = null;
+        $recurringSelectedComment = null;
+        while ($ordline->fetchNext()) {
+            if ($ordline->getValue(DBEOrdline::lineType) === DBEOrdline::LINE_TYPE_COMMENT) {
+                if (!$selectedOrderLine || in_array(
+                        "{$ordline->getValue(DBEOrdline::id)}",
+                        $selectedOrderLine
+                    )) {
+                    if ($ordline->getValue(DBEOrdline::isRecurring)) {
+                        if (!$recurringSelectedComment) {
+                            $recurringSelectedComment = $ordline->getValue(DBEOrdline::description);
+                        }
+                    } else {
+                        if (!$oneOffSelectedComment) {
+                            $oneOffSelectedComment = $ordline->getValue(DBEOrdline::description);
+                        }
+                    }
+                }
+            }
+        }
+        return $oneOffSelectedComment ?? $recurringSelectedComment;
+    }
+
+    /**
+     * @param  $dsCallActivity
+     * @return string
+     */
+    private function trimmedCustomerNotes($dsCallActivity): string
+    {
+        return trim(
+            html_entity_decode(
+                strip_tags(str_replace('&nbsp;', '', $dsCallActivity->getValue(DBECallActivity::customerSummary)))
+            )
+        );
     }
 
 }

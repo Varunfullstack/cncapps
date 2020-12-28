@@ -1,0 +1,55 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="hotfix-v4.11.2-0">
+        <tagDatabase tag="hotfix-v4.11.2"/>
+    </changeSet>
+    <changeSet id="hotfix-v4.11.2-1" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contactAuditLog" columnName="pendingFurloughAction"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contactAuditLog">
+            <column name="pendingFurloughAction" type="tinyint">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="hotfix-v4.11.2-2" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contactAuditLog" columnName="pendingFurloughActionDate"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contactAuditLog">
+            <column name="pendingFurloughActionDate" type="date">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="hotfix-v4.11.2-3" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contactAuditLog" columnName="pendingFurloughActionLevel"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contactAuditLog">
+            <column name="pendingFurloughActionLevel" type="char(20)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="hotfix-v4.11.2-4" author="pavwebdev">
+        <sql>
+            UPDATE problem
+            SET raiseTypeId = 7
+            WHERE raiseTypeId IS NULL
+              AND problem.`pro_rootcauseno` = 59
+              AND YEAR(pro_date_raised) = 2020;
+        </sql>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>

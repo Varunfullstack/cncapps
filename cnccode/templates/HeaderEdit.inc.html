@@ -221,7 +221,7 @@
                 <input
                         {DISABLED}
                         required
-                        type="text"
+                        type="time"
                         name="header[1][billingStartTime]"
                         value="{billingStartTime}"
                         size="5"
@@ -235,7 +235,7 @@
                 <input
                         {DISABLED}
                         required
-                        type="text"
+                        type="time"
                         name="header[1][billingEndTime]"
                         value="{billingEndTime}"
                         size="5"
@@ -249,7 +249,7 @@
                 <input
                         {DISABLED}
                         required
-                        type="text"
+                        type="time"
                         name="header[1][overtimeStartTime]"
                         value="{overtimeStartTime}"
                         size="5"
@@ -263,7 +263,7 @@
                 <input
                         {DISABLED}
                         required
-                        type="text"
+                        type="time"
                         name="header[1][overtimeEndTime]"
                         value="{overtimeEndTime}"
                         size="5"
@@ -814,7 +814,7 @@
                 <input
                         {DISABLED}
                         required
-                        type="text"
+                        type="time"
                         name="header[1][serviceDeskNotification24hBegin]"
                         value="{serviceDeskNotification24hBegin}"
                         size="5"
@@ -828,7 +828,7 @@
                 <input
                         {DISABLED}
                         required
-                        type="text"
+                        type="time"
                         name="header[1][serviceDeskNotification24hEnd]"
                         value="{serviceDeskNotification24hEnd}"
                         size="5"
@@ -899,7 +899,7 @@
             <td class="promptText">Days In Advance Expenses Next Month Alert</td>
             <td class="inputText">
                 <input style="width: 56px"
-                        {DISABLED}
+                       {DISABLED}
                        type="number"
                        name="header[1][daysInAdvanceExpensesNextMonthAlert]"
                        value="{daysInAdvanceExpensesNextMonthAlert}"
@@ -1291,7 +1291,44 @@
                 >{customerReviewMeetingText}</textarea>
             </td>
         </tr>
-
+        <tr>
+            <td class="promptText">Computers seen online within XX Days</td>
+            <td class="inputText">
+                <input {DISABLED}
+                       name="header[1][computerLastSeenThresholdDays]"
+                       value="{computerLastSeenThresholdDays}"
+                       type="number"
+                       max="100"
+                       min="0"
+                       step="1"
+                       title="Threshold to ignore computers from the report if they have been seen within CWA, CWC & Webroot console within these days"
+                       required
+                >
+                <span class="formErrorMessage">{computerLastSeenThresholdDaysMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Hold all SO Small Projects P5s for for QA Review</td>
+            <td class="fieldText">
+                <input name="header[1][holdAllSOSmallProjectsP5sforQAReview]"
+                       type="checkbox"
+                       value="true"
+                       {DISABLED}
+                       {holdAllSOSmallProjectsP5sforQAReview}
+                />
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Hold all SO Projects P5s for for QA Review</td>
+            <td class="fieldText">
+                <input name="header[1][holdAllSOProjectsP5sforQAReview]"
+                       type="checkbox"
+                       value="true"
+                       {DISABLED}
+                       {holdAllSOProjectsP5sforQAReview}
+                />
+            </td>
+        </tr>
     </table>
     <BR>
     <table>
@@ -1448,8 +1485,8 @@
                         type="text"
                         name="header[1][priority1Desc]"
                         value="{priority1Desc}"
-                        size="50"
-                        maxlength="50"
+                        size="80"
+                        maxlength="80"
                 > <span class="formErrorMessage">{priority1DescMessage}</span>
             </td>
         </tr>
@@ -1462,8 +1499,8 @@
                         type="text"
                         name="header[1][priority2Desc]"
                         value="{priority2Desc}"
-                        size="50"
-                        maxlength="50"
+                        size="80"
+                        maxlength="80"
                 > <span class="formErrorMessage">{priority2DescMessage}</span>
             </td>
         </tr>
@@ -1476,8 +1513,8 @@
                         type="text"
                         name="header[1][priority3Desc]"
                         value="{priority3Desc}"
-                        size="50"
-                        maxlength="50"
+                        size="80"
+                        maxlength="80"
                 > <span class="formErrorMessage">{priority3DescMessage}</span>
             </td>
         </tr>
@@ -1490,8 +1527,8 @@
                         type="text"
                         name="header[1][priority4Desc]"
                         value="{priority4Desc}"
-                        size="50"
-                        maxlength="50"
+                        size="80"
+                        maxlength="80"
                 > <span class="formErrorMessage">{priority4DescMessage}</span>
             </td>
         </tr>
@@ -1504,11 +1541,12 @@
                         type="text"
                         name="header[1][priority5Desc]"
                         value="{priority5Desc}"
-                        size="50"
-                        maxlength="50"
+                        size="80"
+                        maxlength="80"
                 > <span class="formErrorMessage">{priority5DescMessage}</span>
             </td>
         </tr>
+
 
     </table>
 

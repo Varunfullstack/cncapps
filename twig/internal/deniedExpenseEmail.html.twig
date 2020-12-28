@@ -1,7 +1,11 @@
 {% extends "@internal/wrapper.html.twig" %}
 {% block content %}
-    Your expense for {{ expense.type }} for  {{ 'GBP'|currency_symbol }}{{ expense.value }} has been denied because of the following reason:
+    Your expense for {{ expense.type }} for  {{ expense.value | format_currency('GBP',{fraction_digit:2}) }} has been denied because of the following reason:
     <p>
         {{ expense.deniedReason }}
+    </p>
+    <p>
+    <p>
+        <a href="{{ expense.activityURL }}">{{ expense.serviceRequestId }}</a>
     </p>
 {% endblock %}

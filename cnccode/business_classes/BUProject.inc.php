@@ -23,6 +23,16 @@ class BUProject extends Business
         $this->dbeProject = new DBEProject($this);
     }
 
+    function updateProject(&$dsData)
+    {
+        $this->setMethodName('updateProject');
+        $this->updateDataAccessObject(
+            $dsData,
+            $this->dbeProject
+        );
+        return TRUE;
+    }
+
     /**
      * @param $customerID
      * @return string
@@ -65,38 +75,64 @@ class BUProject extends Business
         return $link;
 
     }
-
-    function getProjectsByCustomerID($customerID,
-                                     &$dsResults,
-                                     $activityDate = false
-    )
+    /**
+     * @param $customerID
+     * @return array
+     * @throws Exception
+     */
+    public static function getCustomerProjects($customerID)
     {
-        $this->dbeProject->getRowsByCustomerID(
+        if(!isset($customerID))
+        return [];
+        $thing = null;
+        $buProject = new BUProject($thing);
+        $dsProject = new DataSet($thing);
+        $buProject->getProjectsByCustomerID(
             $customerID,
-            $activityDate
+            $dsProject,
+            date(DATE_MYSQL_DATE)
         );
-        return ($this->getData(
-            $this->dbeProject,
-            $dsResults
-        ));
+        $projects=array();
+        while ($dsProject->fetchNext()) {
+            $url = Controller::buildLink(
+                'Project.php',
+                array(
+                    'action'    => 'edit',
+                    'projectID' => $dsProject->getValue(DBEProject::projectID),
+                )
+            );
+            array_push($projects,
+            [
+                "projectID"=> $dsProject->getValue(DBEProject::projectID),
+                "description"=>$dsProject->getValue(DBEProject::description),
+                "editUrl"=> $url
+            ]);
+        }
+        return $projects;
     }
-
-    function updateProject(&$dsData)
-    {
-        $this->setMethodName('updateProject');
-        $this->updateDataAccessObject(
-            $dsData,
-            $this->dbeProject
-        );
-        return TRUE;
-    }
-
     function getProjectByID($ID,
                             &$dsResults
     )
     {
         $this->dbeProject->setPKValue($ID);
         $this->dbeProject->getRow();
+        return ($this->getData(
+            $this->dbeProject,
+            $dsResults
+        ));
+    }
+
+    function getProjectsByCustomerID($customerID,
+                                     &$dsResults,
+                                     $activityDate = false
+    )
+    {
+        if(!isset($customerID))
+        return [];
+        $this->dbeProject->getRowsByCustomerID(
+            $customerID,
+            $activityDate
+        );
         return ($this->getData(
             $this->dbeProject,
             $dsResults

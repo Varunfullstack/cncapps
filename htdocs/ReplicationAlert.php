@@ -15,7 +15,7 @@ require_once("config.inc.php");
 require_once("Mail.php");
 require_once("Mail/Mime.php");
 
-define('EMAIL_FROM_USER', 'sales@cnc-ltd.co.uk');
+define('EMAIL_FROM_USER', 'sales@' . CONFIG_PUBLIC_DOMAIN);
 define('EMAIL_SUBJECT', 'Replication Problem Alert');
 
 define('MASTER_HOST', 'cncapps');
@@ -72,8 +72,8 @@ if ($error) {
     $error .= 'You should only be concerned if you get lots of these messages. If you stop getting them then the connection is up  and replication has caught up again.' . "\n";
 
     $hdrs_array = array(
-        'From' => EMAIL_FROM_USER,
-        'To' => $send_to_email,
+        'From'    => EMAIL_FROM_USER,
+        'To'      => $send_to_email,
         'Subject' => EMAIL_SUBJECT
     );
 
@@ -82,9 +82,9 @@ if ($error) {
     $mime->setTxtBody($error);
     $mime_params = array(
         'text_encoding' => '7bit',
-        'text_charset' => 'UTF-8',
-        'html_charset' => 'UTF-8',
-        'head_charset' => 'UTF-8'
+        'text_charset'  => 'UTF-8',
+        'html_charset'  => 'UTF-8',
+        'head_charset'  => 'UTF-8'
     );
     $body = $mime->get($mime_params);
 

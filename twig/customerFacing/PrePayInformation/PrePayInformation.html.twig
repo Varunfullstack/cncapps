@@ -1,0 +1,44 @@
+{% extends '@customerFacing/wrapper.html.twig' %}
+{# @var contactFirstName string #}
+{# @var balance float #}
+{# @var topUpAmount float #}
+{% block replyText %}
+{% endblock %}
+{% block headerTitle %}
+    PrePay Statement
+{% endblock %}
+
+{% block headerContet %}
+    We're keeping you in the picture
+{% endblock %}
+
+{% block content %}
+
+    <p>{{ contactFirstName }}</p>
+    <p>
+        Please find attached your latest Pre-Pay Contract statement which 
+		currently has a balance of {{ balance | format_currency('GBP',{fraction_digit:2}) }} + VAT.
+    </p>
+    <p>
+        If you have any queries relating to any of the items detailed on this statement, then please notify us within 7
+        days so that we can make any adjustments if applicable.
+    </p>
+    {% if balance <= 100 %}
+    <p>
+        If no response to the contrary is received within 7 days of this statement, then we will automatically raise an
+        invoice for {{ topUpAmount | format_currency('GBP',{fraction_digit:2}) }} Inc VAT.
+    </p>
+    {% endif %}
+    <p>
+        Are you aware that you can receive up to &pound;500 for the referral of any company made to CNC that results in
+        the purchase of a support contract? Please call us for further information.
+    </p>
+{% endblock %}
+
+{% block serviceRequestURL %}
+    https://www.cnc-ltd.co.uk/portal/documents/
+{% endblock %}
+
+{% block rightFooter %}
+
+{% endblock %}

@@ -1,3 +1,4 @@
+<!-- 
 <style>
     label {
         float: left;
@@ -40,7 +41,7 @@
         }
 
         var json = JSON.stringify(object);
-        $.LoadingOverlay("show", {text: 'Running your search, please wait'});
+        spinnerComponent.showSpinner();
         $.ajax({
             url: '{fetchDataURL}',
             method: 'POST',
@@ -80,13 +81,13 @@
         }).catch(function () {
 
         }).then(function () {
-            $.LoadingOverlay('hide');
+            spinnerComponent.hideSpinner();
         });
         return false;
     }
 
-</script>
-<form action=""
+</script> -->
+<!-- <form action=""
       onsubmit="return doSearch();"
 >
     <div>
@@ -140,9 +141,9 @@
                value="Search"
         >
     </div>
-</form>
+</form> -->
 <div class="firstTimeFixContainer">
-    <div class="parentLoading">
+    <!-- <div class="parentLoading">
         <table class="firstTimeFix"
                id="firstTimeFiguresTable"
         >
@@ -183,6 +184,6 @@
             </tr>
             </tbody>
         </table>
-    </div>
-
+    </div> -->
+    <div id="reactFirstTimeFixReport" name="reactFirstTimeFixReport"></div>
 </div>

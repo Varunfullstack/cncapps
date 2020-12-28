@@ -10,24 +10,27 @@ class DBEOrdline extends DBEntity
 {
     use \CNCLTD\SortableWithQueryDBE;
 
-    const id = "id";
-    const lineType = "lineType";
-    const ordheadID = "ordheadID";
-    const sequenceNo = "sequenceNo";
-    const customerID = "customerID";
-    const itemID = "itemID";
-    const stockcat = "stockcat";
-    const description = "description";
-    const qtyOrdered = "qtyOrdered";
-    const qtyDespatched = "qtyDespatched";
-    const qtyLastDespatched = "qtyLastDespatched";
-    const supplierID = "supplierID";
-    const curUnitCost = "curUnitCost";
-    const curTotalCost = "curTotalCost";
-    const curUnitSale = "curUnitSale";
-    const curTotalSale = "curTotalSale";
+    const LINE_TYPE_ITEM    = 'I';
+    const LINE_TYPE_COMMENT = 'C';
+
+    const id                    = "id";
+    const lineType              = "lineType";
+    const ordheadID             = "ordheadID";
+    const sequenceNo            = "sequenceNo";
+    const customerID            = "customerID";
+    const itemID                = "itemID";
+    const stockcat              = "stockcat";
+    const description           = "description";
+    const qtyOrdered            = "qtyOrdered";
+    const qtyDespatched         = "qtyDespatched";
+    const qtyLastDespatched     = "qtyLastDespatched";
+    const supplierID            = "supplierID";
+    const curUnitCost           = "curUnitCost";
+    const curTotalCost          = "curTotalCost";
+    const curUnitSale           = "curUnitSale";
+    const curTotalSale          = "curTotalSale";
     const renewalCustomerItemID = "renewalCustomerItemID";
-    const isRecurring = "isRecurring";
+    const isRecurring           = "isRecurring";
 
     /**
      * calls constructor()
@@ -185,10 +188,13 @@ class DBEOrdline extends DBEntity
             );
         }
         $this->setQueryString(
-            'UPDATE ' . $this->getTableName() .
-            ' SET ' . $this->getDBColumnName(self::sequenceNo) . '=' . $this->getDBColumnName(self::sequenceNo) . '+1' .
-            ' WHERE ' . $this->getDBColumnName(self::ordheadID) . ' = ' . $this->getFormattedValue(self::ordheadID) .
-            ' AND ' . $this->getDBColumnName(self::sequenceNo) . ' >= ' . $this->getFormattedValue(self::sequenceNo)
+            'UPDATE ' . $this->getTableName() . ' SET ' . $this->getDBColumnName(
+                self::sequenceNo
+            ) . '=' . $this->getDBColumnName(self::sequenceNo) . '+1' . ' WHERE ' . $this->getDBColumnName(
+                self::ordheadID
+            ) . ' = ' . $this->getFormattedValue(self::ordheadID) . ' AND ' . $this->getDBColumnName(
+                self::sequenceNo
+            ) . ' >= ' . $this->getFormattedValue(self::sequenceNo)
         );
         $ret = $this->runQuery();
         $this->resetQueryString();
@@ -213,10 +219,13 @@ class DBEOrdline extends DBEntity
             );
         }
         $this->setQueryString(
-            'UPDATE ' . $this->getTableName() .
-            ' SET ' . $this->getDBColumnName(self::sequenceNo) . '=' . $this->getDBColumnName(self::sequenceNo) . '-1' .
-            ' WHERE ' . $this->getDBColumnName(self::ordheadID) . ' = ' . $this->getValue(self::ordheadID) .
-            ' AND ' . $this->getDBColumnName(self::sequenceNo) . ' >= ' . $this->getValue(self::sequenceNo)
+            'UPDATE ' . $this->getTableName() . ' SET ' . $this->getDBColumnName(
+                self::sequenceNo
+            ) . '=' . $this->getDBColumnName(self::sequenceNo) . '-1' . ' WHERE ' . $this->getDBColumnName(
+                self::ordheadID
+            ) . ' = ' . $this->getValue(self::ordheadID) . ' AND ' . $this->getDBColumnName(
+                self::sequenceNo
+            ) . ' >= ' . $this->getValue(self::sequenceNo)
         );
         $ret = $this->runQuery();
         $this->resetQueryString();
@@ -268,14 +277,9 @@ class DBEOrdline extends DBEntity
             $this->raiseError('ordheadID not set');
         }
         $this->setQueryString(
-            "SELECT DISTINCT  odl_suppno, odl_stockcat, " .
-            "odl_itemno, odl_d_unit, SUM(odl_qty_ord) " .
-            "FROM ordline " .
-            "WHERE odl_ordno = " . $this->getValue(self::ordheadID) .
-            " AND odl_type = 'I' " .
-            "GROUP BY odl_suppno, odl_stockcat, " .
-            "odl_itemno, odl_d_unit " .
-            "ORDER BY odl_suppno"
+            "SELECT DISTINCT  odl_suppno, odl_stockcat, " . "odl_itemno, odl_d_unit, SUM(odl_qty_ord) " . "FROM ordline " . "WHERE odl_ordno = " . $this->getValue(
+                self::ordheadID
+            ) . " AND odl_type = 'I' " . "GROUP BY odl_suppno, odl_stockcat, " . "odl_itemno, odl_d_unit " . "ORDER BY odl_suppno"
         );
         return (parent::getRows());
     }
@@ -285,18 +289,15 @@ class DBEOrdline extends DBEntity
     )
     {
         $this->setMethodName("getRow");
-
         if ($ordheadID == '') {
             $this->raiseError('ordheadID not set');
         }
-
         $this->setQueryString(
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " WHERE odl_ordno = " . $ordheadID .
-            " AND " . $this->getDBColumnName(self::sequenceNo) . " = " . $sequenceNo
+            "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " WHERE odl_ordno = " . $ordheadID . " AND " . $this->getDBColumnName(
+                self::sequenceNo
+            ) . " = " . $sequenceNo
         );
-
         return (parent::getRow());
     }
 
@@ -314,6 +315,14 @@ class DBEOrdline extends DBEntity
         //we are going to move this to be the end of the list..and then delete it
         $this->moveItemToBottom();
         return parent::deleteRow($pkValue);
+    }
+
+    public function getLinesForOrder($ordheadID)
+    {
+        $this->setQueryString(
+            "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} WHERE odl_ordno = {$ordheadID} order by {$this->getDBColumnName(self::isRecurring)} , {$this->getDBColumnName(self::sequenceNo)} "
+        );
+        $this->getRows();
     }
 
     protected function getSortOrderColumnName()

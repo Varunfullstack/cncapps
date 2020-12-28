@@ -13,19 +13,16 @@ body {
     font-weight: 900;
   }
 
-  .unlockedIcon::before {
-    font-family: 'Font Awesome 5 Free' !important;
-    content: '\f13e';
-    color: red;
-    font-weight: 900 !important;
+  .lockedIcon::before {
+    font-family: "Font Awesome 5 Pro", serif;
+    content: '\f084';
+    color: lightgreen;
   }
 
-  .lockedIcon::before {
-    font-family: 'Font Awesome 5 Free' !important;
-    content: '\f023';
-    color: green;
-    font-weight: 900 !important;
-
+  .unlockedIcon::before {
+    font-family: "Font Awesome 5 Pro", serif;
+    content: '\f084';
+    color: red;
   }
 }
 

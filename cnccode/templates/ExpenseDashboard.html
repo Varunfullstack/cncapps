@@ -12,21 +12,86 @@
     }
 
 </style>
+<div id="callOutApprovalDialog"
+     style="display: none"
+     title="Call Out Approval"
+>
+    <label>
+        <select>
+            <option selected
+                    value="1"
+            >
+                Chargeable
+            </option>
+            <option value="0">
+                Not Chargeable
+            </option>
+        </select>
+    </label>
+    <div id="notChargeableReasonContainer">
+        <input name="notChargeableReason">
+    </div>
+    <div>
+        <button name="sendCallOutApproval"
+                onclick="sendCallOutApproval()"
+        >Send
+        </button>
+        <button name="cancelCallOutApproval"
+                onclick="cancelCallOutApproval()"
+        >Cancel
+        </button>
+    </div>
+</div>
 <script>
+    const CALL_OUT_EXPENSE_TYPE_ID = 11;
     let expensesTable = null;
     let overtimeTable = null;
+    let callOutApprovalDialog = null;
+    let notChargeableReasonContainer = null;
+    let sendCallOutApprovalButton = null;
+    let notChargeableReasonInput = null;
+    let callOutExpenseId = null;
 
-    function approveExpenseRequest(expenseId) {
-        return fetch("?action=approveExpense&id=" + expenseId)
+    function sendCallOutApproval() {
+        return approveExpenseRequest(callOutExpenseId, notChargeableReasonInput.value)
+            .then(data => {
+                if (data.error) {
+                    return alert(data.error);
+                }
+                expensesTable.ajax.reload();
+            })
+            .then(() => {
+                cancelCallOutApproval();
+            })
+    }
+
+    function cancelCallOutApproval() {
+        $(callOutApprovalDialog).dialog('close');
+        callOutExpenseId = null;
+        notChargeableReasonInput.value = '';
+    }
+
+    function approveExpenseRequest(expenseId, callOutNotChargeableReason) {
+        let baseQuery = "?action=approveExpense&id=" + expenseId;
+        if (callOutNotChargeableReason) {
+            baseQuery += "&notChargeableCallOutReason=" + callOutNotChargeableReason;
+        }
+        return fetch(baseQuery)
             .then(response => {
                 return response.json();
             })
     }
 
-    function approveExpense(expenseId) {
+    function approveExpense(expenseId, expenseTypeId) {
 
         const rowsSelected = expensesTable.column(0).checkboxes.selected();
         if (!rowsSelected.length) {
+
+            if (expenseTypeId === CALL_OUT_EXPENSE_TYPE_ID) {
+                callOutExpenseId = expenseId;
+                return $(callOutApprovalDialog).dialog('open');
+            }
+
             return approveExpenseRequest(expenseId).then(data => {
                 expensesTable.column(0).checkboxes.deselectAll();
                 if (data.error) {
@@ -267,7 +332,38 @@
         });
     }
 
+    function processChargeableSelectorChange(value) {
+        if (+value) {
+            notChargeableReasonContainer.style.display = 'none';
+            updateSendCallOutApprovalButtonState(true);
+        } else {
+            notChargeableReasonContainer.style.display = 'block';
+            updateSendCallOutApprovalButtonState(false);
+            notChargeableReasonInput.value = "";
+        }
+    }
+
+    function updateSendCallOutApprovalButtonState(isEnabled) {
+        sendCallOutApprovalButton.disabled = !isEnabled;
+    }
+
     window.addEventListener('DOMContentLoaded', function () {
+        callOutApprovalDialog = document.getElementById('callOutApprovalDialog');
+        notChargeableReasonContainer = document.getElementById('notChargeableReasonContainer');
+        notChargeableReasonInput = notChargeableReasonContainer.querySelector('input[name="notChargeableReason"]');
+        sendCallOutApprovalButton = document.querySelector('button[name="sendCallOutApproval"]');
+        const callOutApprovalSelector = callOutApprovalDialog.querySelector('select');
+        $(callOutApprovalDialog).dialog({autoOpen: false, width: 910});
+
+        notChargeableReasonContainer.addEventListener('change', $event => {
+            updateSendCallOutApprovalButtonState($event.target.value)
+        })
+
+        callOutApprovalSelector.addEventListener('change', ($event) => {
+            processChargeableSelectorChange($event.target.value);
+        })
+        processChargeableSelectorChange(callOutApprovalSelector.value);
+
         expensesTable = $('#expensesTable').DataTable({
             dom: 'lfrtip',
             columnDefs: [
@@ -283,7 +379,7 @@
                 {data: "staffName", name: 'staffName'},
                 {
                     data: "serviceRequestId", name: "serviceRequestId", render: (data, type, row, meta) => {
-                        return '<a href="Activity.php?action=displayActivity&callActivityID=' + row.activityId + '" target="_blank">' + data + '</a>';
+                        return '<a href="SRActivity.php?action=displayActivity&callActivityID=' + row.activityId + '" target="_blank">' + data + '</a>';
                     },
                     width: '7%'
                 },
@@ -346,7 +442,7 @@
                         }
 
                         if (row.status === 'Pending') {
-                            return '<button onclick="approveExpense(' + row.id + ')" data-expense-id="row.id"><i class="fa fa-check"></i></button><button onclick="denyExpense(' + row.id + ')"><i class="fa fa-times"></i></button><button onclick="deleteExpense(' + row.id + ')"><i class="fa fa-trash"></i></button> ';
+                            return '<button onclick="approveExpense(' + row.id + ', ' + row.expenseTypeId + ')" data-expense-id="row.id"><i class="fa fa-check"></i></button><button onclick="denyExpense(' + row.id + ')"><i class="fa fa-times"></i></button><button onclick="deleteExpense(' + row.id + ')"><i class="fa fa-trash"></i></button> ';
                         }
                         return "";
                     }
@@ -355,11 +451,11 @@
             order: [[10, "desc"]],
             serverSide: true,
             ajax: {
-                url: "?action=getExpensesData",
+                url: "?action=getExpensesDataTableData",
                 type: "GET"
             },
             rowCallback(row, data, displayNum, displayIndex, dataIndex) {
-                if (data.status === 'Pending') {
+                if (data.status === 'Pending' && data.expenseTypeId != CALL_OUT_EXPENSE_TYPE_ID) {
                     $(row).removeClass('no-select');
                 } else {
                     $('td:eq(0)', row).html('');
@@ -402,7 +498,7 @@
                 {data: "staffName", name: 'staffName'},
                 {
                     data: "serviceRequestId", name: "serviceRequestId", render: (data, type, row, meta) => {
-                        return '<a href="Activity.php?action=displayActivity&callActivityID=' + row.activityId + '" target="_blank">' + data + '</a>';
+                        return '<a href="SRActivity.php?action=displayActivity&callActivityID=' + row.activityId + '" target="_blank">' + data + '</a>';
                     }
                 },
                 {

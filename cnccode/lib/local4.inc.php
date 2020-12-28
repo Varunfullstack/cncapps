@@ -166,13 +166,11 @@ class auSweetcode extends Auth
         global $sess;
         global $_PHPLIB;
         global $cfg;
-        //$GLOBALS['loginMessage'] = ''; // reset message
         include(PHPLIB_PAGE_LOGIN);
     }
 
     function auth_validatelogin()
     {
-
         if (isset($_POST["username"])) {
             $this->auth["uname"] = $_POST["username"];
         } else { // KA: added this so that PHP Notice isn't raised

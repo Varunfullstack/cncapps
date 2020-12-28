@@ -1,0 +1,39 @@
+{% extends '@customerFacing/wrapper.html.twig' %}
+{# @var integer activityRef #}
+{# @var string lastActivityReason #}
+{# @var string technicianResponsible #}
+{# @var string extra #}
+{# @var string contactFirstName #}
+{% block replyText %}
+{% endblock %}
+{% block headerTitle %}
+    Contracts
+{% endblock %}
+
+{% block headerContet %}
+    It's official and here's the proof
+{% endblock %}
+
+{% block content %}
+    <p>{{ contactFirstName }}</p>
+    {% if hasRenewals %}
+        <p>
+            Please find attached all your contract schedules as requested. If you have any questions please do not
+            hesitate to contact us.
+        </p>
+    {% else %}
+        <p>
+            You've requested renewal information from our portal but you don't have any at this time. If you believe
+            this is incorrect please contact sales@cnc-ltd.co.uk.
+        </p>
+    {% endif %}
+{% endblock %}
+
+{% block serviceRequestURL %}
+    https://www.cnc-ltd.co.uk/portal/renewals/
+{% endblock %}
+
+
+{% block rightFooter %}
+
+{% endblock %}

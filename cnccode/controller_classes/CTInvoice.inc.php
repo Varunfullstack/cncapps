@@ -547,7 +547,7 @@ class CTInvoice extends CTCNC
         } else {    // if we are re-displaying header then only need lines
             $dsInvhead->initialise();
             $dsInvhead->fetchNext();
-            $this->buInvoice->getLinesByID(
+            $this->buInvoice->getInvoiceLines(
                 $dsInvhead->getValue(DBEInvhead::invheadID),
                 $dsInvline
             );
@@ -1186,7 +1186,7 @@ class CTInvoice extends CTCNC
                 }
             } else {
                 $lines = new DataSet($this);
-                $this->buInvoice->getLinesByID($this->getParam('invheadID'), $lines);
+                $this->buInvoice->getInvoiceLines($this->getParam('invheadID'), $lines);
                 $sequenceNo = 1;
                 while ($lines->fetchNext()) {
                     $sequenceNo = $lines->getValue(DBEInvline::sequenceNo);

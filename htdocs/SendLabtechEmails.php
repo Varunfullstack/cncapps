@@ -35,7 +35,7 @@ foreach ($emails as $emailData) {
 
 
     $hdrs = array(
-        'From'         => 'sg@cnc-ltd.co.uk',
+        'From'         => 'sg@' . CONFIG_PUBLIC_DOMAIN,
         'To'           => $toEmail,
         'Subject'      => $emailData['Subject'],
         'Date'         => date("r"),

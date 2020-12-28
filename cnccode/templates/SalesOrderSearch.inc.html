@@ -167,38 +167,34 @@
                 >
                 <font class="formErrorMessage">{toDateMessage}</font></td>
         </tr>
-        <tr>
-            <td>&nbsp;</td>
-            <td>
-                <input type="button"
-                       name="Search"
-                       value="Search"
-                       onClick="submit();"
-                >
-                <input type="button"
-                       name="CreateQuote"
-                       value="New Manual Quote"
-                       onClick="createQuote();"
-                >
-                <input type="button"
-                       name="TemplatedQuote"
-                       value="New Templated Quote"
-                       onClick="createTemplatedQuote();"
-                >
-                <input type="button"
-                       name="CreateOrder"
-                       value="New Order"
-                       onClick="createOrder();"
-                >
-                <input type="button"
-                       name="Clear"
-                       value="Clear"
-                       onClick="document.location='{clearURL}'"
-                ></td>
-        </tr>
     </table>
+    <input type="button"
+           name="Search"
+           value="Search"
+           onClick="submit();"
+    >
+    <input type="button"
+           name="CreateQuote"
+           value="New Manual Quote"
+           onClick="createQuote();"
+    >
+    <input type="button"
+           name="TemplatedQuote"
+           value="New Templated Quote"
+           onClick="createTemplatedQuote();"
+    >
+    <input type="button"
+           name="CreateOrder"
+           value="New Order"
+           onClick="createOrder();"
+    >
+    <input type="button"
+           name="Clear"
+           value="Clear"
+           onClick="document.location='{clearURL}'"
+    >
 </form>
-<table width="628"
+<table width="900"
        border="0"
        cellpadding="1"
        cellspacing="1"
@@ -225,6 +221,10 @@
             class="listHeadText"
         >Cust PO Ref
         </td>
+        <td width="375"
+            class="listHeadText"
+        >First Comment
+        </td>
     </tr>
     <!-- BEGIN orderBlock -->
     <!--	<tr onMouseOver="this.bgColor='#FFFFCC';" onMouseOut="this.bgColor='';">  -->
@@ -243,6 +243,7 @@
         <td class="listItemText">{listOrderType}</td>
         <td class="listItemText">{listOrderDate}</td>
         <td class="listItemText">{listCustPORef}</td>
+        <td class="listItemText">{firstComment}</td>
     </tr>
     <!-- END orderBlock -->
 </table>

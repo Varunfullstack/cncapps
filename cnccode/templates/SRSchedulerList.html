@@ -57,6 +57,7 @@
         details: null,
         internalNotes: null,
         linkedSalesOrderId: null,
+        emailSubjectSummary: null
     };
     let currentRRule = {
         freq: null,
@@ -83,6 +84,7 @@
     let rruleTable = null;
     let priorityInput = null;
     let linkedSalesOrderInput = null;
+    let emailSubjectSummaryInput = null;
     let linkedSalesOrderContainer = null;
     let hideFromCustomerInput = null;
     let teamSelectInput = null;
@@ -106,7 +108,8 @@
             teamId: null,
             details: null,
             internalNotes: null,
-            linkedSalesOrderId: null
+            linkedSalesOrderId: null,
+            emailSubjectSummary: null
         };
     }
 
@@ -218,6 +221,7 @@
                         return "<i class='fa " + className + "'></i>"
                     }
                 },
+                {data: "emailSubjectSummary", name: "emailSubjectSummary"},
                 {data: "priority", name: "priority"},
                 {
                     data: "linkedSalesOrderId", name: 'linkedSalesOrderId', render: (data, type) => {
@@ -273,6 +277,7 @@
         contactNameInput = $('#contactNameInput');
         priorityInput = $('#priority');
         linkedSalesOrderInput = $('#linkedSalesOrder');
+        emailSubjectSummaryInput = document.getElementById('emailSubjectSummary');
         linkedSalesOrderContainer = $('#linkedSalesOrderContainer');
         hideFromCustomerInput = $('#hideFromCustomer');
         teamSelectInput = $('#team');
@@ -455,6 +460,10 @@
             return false;
         }
 
+        if (!currentSRScheduler.emailSubjectSummary) {
+            alert('Email Subject Summary is required');
+        }
+
         return true;
     }
 
@@ -515,6 +524,7 @@
         priorityInput.val(srScheduler.priority);
         teamSelectInput.val(srScheduler.teamId);
         linkedSalesOrderInput.val(srScheduler.linkedSalesOrderId);
+        emailSubjectSummaryInput.value = srScheduler.emailSubjectSummary;
         detailsEditor.setData(srScheduler.details);
         internalNotesEditor.setData(srScheduler.internalNotes);
         hideFromCustomerInput[0].checked = srScheduler.hideFromCustomer;
@@ -637,6 +647,10 @@
         currentSRScheduler.hideFromCustomer = hideFromCustomerInput[0].checked;
     }
 
+    function updateEmailSubjectSummary() {
+        currentSRScheduler.emailSubjectSummary = emailSubjectSummaryInput.value;
+    }
+
     function updateLinkedSalesOrder() {
         console.log('updateLinkedSalesOrder called');
         // check if the sales order provided is for the same customer
@@ -716,8 +730,8 @@
             <option value="">Please Select</option>
             <option value="1">P1 - Critical Impact/System Down</option>
             <option value="2">P2 - High Impact</option>
-            <option value="3">P3 - Standard Service Request</option>
-            <option value="4">P4 - Change Request</option>
+            <option value="3">P3 - It's only affecting this person</option>
+            <option value="4">P4 - Change and not a fault</option>
             <option value="5">P5 - Project Work</option>
         </select>
     </div>
@@ -748,6 +762,17 @@
             <option value="5">Projects</option>
             <option value="4">Sales</option>
         </select>
+    </div>
+    <div>
+        <div style="width: 100px; display: inline-block">
+            Email Subject Summary
+        </div>
+        <input type="text"
+               maxlength="100"
+               size="100"
+               id="emailSubjectSummary"
+               onchange="updateEmailSubjectSummary()"
+        >
     </div>
     <div id="linkedSalesOrderContainer">
         <div style="width: 100px; display: inline-block">
@@ -1113,6 +1138,7 @@
             <th>Site</th>
             <th>Rule</th>
             <th>Hide?</th>
+            <th>Email Subject Summary</th>
             <th>Priority</th>
             <th>Linked SO</th>
             <th>Created At</th>

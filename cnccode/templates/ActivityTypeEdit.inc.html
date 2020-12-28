@@ -30,6 +30,13 @@
                 'items', 'scrollbars=yes,resizable=no,width=610,height=560,copyhistory=no, menubar=0')
         }
     }
+    setTimeout(()=>{
+        $("select").each(
+            (index,element)=>{                
+                $(element).val( $(element).attr('value'));
+            }
+        );        
+    },1)
 </SCRIPT>
 <TABLE width="200px" border="0" cellpadding="2" cellspacing="1">
     <TR>
@@ -100,7 +107,7 @@
             </td>
         </tr>
         <tr>
-            <td class="promptText">Minumum hours to charge</td>
+            <td class="promptText">Minimum hours to charge</td>
             <td class="fieldText">
                 <input type="text"
                        id="minHours"
@@ -140,59 +147,10 @@
             </td>
         </tr>
         <tr>
-            <td class="promptText">Allow SCR Printing</td>
-            <td class="fieldText">
-                <INPUT name="callActType[1][allowSCRFlag]" {DISABLED} type="checkbox" value="Y"
-                       {allowSCRFlagChecked}>
-            </td>
-        </tr>
-        <tr>
             <td class="promptText">Requires Checking</td>
             <td class="fieldText">
                 <INPUT name="callActType[1][requireCheckFlag]" {DISABLED} type="checkbox" value="Y"
                        {requireCheckFlagChecked}>
-            </td>
-        </tr>
-        <tr>
-            <td class="promptText">Allow Reason Details</td>
-            <td class="fieldText">
-                <INPUT name="callActType[1][allowReasonFlag]" {DISABLED} type="checkbox" value="Y"
-                       {allowReasonFlagChecked}>
-            </td>
-        </tr>
-        <tr>
-            <td class="promptText">Allow Action Details</td>
-            <td class="fieldText">
-                <INPUT name="callActType[1][allowActionFlag]" {DISABLED} type="checkbox" value="Y"
-                       {allowActionFlagChecked}>
-            </td>
-        </tr>
-        <tr>
-            <td class="promptText">Allow Final Status Details</td>
-            <td class="fieldText">
-                <INPUT name="callActType[1][allowFinalStatusFlag]" {DISABLED} type="checkbox"
-                       value="Y" {allowFinalStatusFlagChecked}>
-            </td>
-        </tr>
-        <tr>
-            <td class="promptText">Require Reason Details</td>
-            <td class="fieldText">
-                <INPUT name="callActType[1][reqReasonFlag]" {DISABLED} type="checkbox" value="Y"
-                       {reqReasonFlagChecked}>
-            </td>
-        </tr>
-        <tr>
-            <td class="promptText">Require Action Details</td>
-            <td class="fieldText">
-                <INPUT name="callActType[1][reqActionFlag]" {DISABLED} type="checkbox" value="Y"
-                       {reqActionFlagChecked}>
-            </td>
-        </tr>
-        <tr>
-            <td class="promptText">Require Final Status Details</td>
-            <td class="fieldText">
-                <INPUT name="callActType[1][reqFinalStatusFlag]" {DISABLED} type="checkbox" value="Y"
-                       {reqFinalStatusFlagChecked}>
             </td>
         </tr>
         <tr>
@@ -210,6 +168,13 @@
             </td>
         </tr>
         <tr>
+            <td class="promptText">Activity notes required?</td>
+            <td class="fieldText">
+                <input name="callActType[1][activityNotesRequired]" {DISABLED} type="checkbox" value="Y"
+                       {activityNotesRequiredChecked}/>
+            </td>
+        </tr>
+        <tr>
             <td class="promptText">Show in portal?</td>
             <td class="fieldText">
                 <input name="callActType[1][portalDisplayFlag]" {DISABLED} type="checkbox" value="Y"
@@ -224,19 +189,62 @@
             </td>
         </tr>
         <tr>
-            <td class="promptText">Show Non-chargable text on emails ?</td>
-            <td class="fieldText">
-                <input name="callActType[1][showNotChargeableFlag]" type="checkbox"
-                       title="If this type has no charge, do not display not chargable on activity emails"
-                       value="Y" {DISABLED} {showNotChargeableFlagChecked}/>
-            </td>
-        </tr>
-        <tr>
             <td class="promptText">Allow engineer overtime</td>
             <td class="fieldText">
                 <input name="callActType[1][engineerOvertimeFlag]" type="checkbox"
                        title="Do not pay engineer overtime" value="Y" {DISABLED}
                        {engineerOvertimeFlagChecked}/>
+            </td>
+        </tr>
+
+
+        <tr>
+            <td class="promptText">Require CNC Next Action, CNC Action</td>
+            <td class="fieldText">          
+                <select name="callActType[1][catRequireCNCNextActionCNCAction]" {DISABLED} value="{catRequireCNCNextActionCNCAction}">
+                    <option value="0">Off</option>
+                    <option value="1">On</option>
+                    <option value="2">Optional</option>
+                </select> 
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Require CNC Next Action, On Hold</td>
+            <td class="fieldText">
+               
+                <select name="callActType[1][catRequireCNCNextActionOnHold]" {DISABLED} value="{catRequireCNCNextActionOnHold}">
+                    <option value="0">Off</option>
+                    <option value="1">On</option>
+                    <option value="2">Optional</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Require Customer Note, CNC Action</td>
+            <td class="fieldText">              
+                <select name="callActType[1][catRequireCustomerNoteCNCAction]" {DISABLED} value="{catRequireCustomerNoteCNCAction}">
+                    <option value="0">Off</option>
+                    <option value="1">On</option>
+                    <option value="2">Optional</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Require Customer Note, On Hold</td>
+            <td class="fieldText">               
+                <select name="callActType[1][catRequireCustomerNoteOnHold]" {DISABLED} value="{catRequireCustomerNoteOnHold}">
+                    <option value="0">Off</option>
+                    <option value="1">On</option>
+                    <option value="2">Optional</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Minimum Minutes Allowed</td>
+            <td class="fieldText">     
+                <input name="callActType[1][minMinutesAllowed]" type="number"
+                 value="{minMinutesAllowed}" {DISABLED}
+              />               
             </td>
         </tr>
         <tr>

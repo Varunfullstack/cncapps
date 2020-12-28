@@ -35,6 +35,14 @@ a.disabled {
     color: black;
 }
 
+button > a {
+    color: #FFFFFF;
+}
+
+button > a:hover {
+    text-decoration: none;
+}
+
 TD, INPUT, SELECT, TEXTAREA {
     font-family: Arial, Tahoma, Helvetica, sans-serif;
     font-size: 12px;
@@ -854,7 +862,8 @@ table.fixed_header {
     display: block;
 }
 
-input[type="button"], input[type="submit"], button, input[type="reset"], .custom-file-upload {
+/*Old button design*/
+/* input[type="button"], input[type="submit"], button, input[type="reset"], .custom-file-upload {
 
     background-color: #C6C6C6;
     color: black;
@@ -877,8 +886,68 @@ input[type="button"][disabled], input[type="submit"][disabled], button[disabled]
     background-color: #efefef;
     color: #C6C6C6;
     cursor: not-allowed;
+} */
+/*new Button design*/
+input[type="button"], input[type="submit"], button, input[type="reset"], .custom-file-upload {
+    display: inline-block;
+    margin-bottom: 0;
+    font-weight: normal;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    cursor: pointer;
+    background-image: none;
+    border: 1px solid transparent;
+    padding: 3px 6px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    border-radius: 4px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    /*secondary*/
+    color: #fff;
+    background-color: #6c757d;
+    border-color: #6c757d;
+    margin: 2px;
 }
 
+input[type="button"]:hover, input[type="submit"]:hover, button:hover, input[type="reset"]:hover, .custom-file-upload:hover {
+    color: #fff;
+    background-color: #5a6268;
+    border-color: #545b62;
+    text-decoration: none;
+}
+
+input[type="button"]:focus, input[type="submit"]:focus, button:focus, input[type="reset"]:focus, .custom-file-upload:focus {
+    text-decoration: none;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, .5);
+}
+
+input[type="button"]:active, input[type="submit"]:active, button:active, input[type="reset"]:active, .custom-file-upload:active {
+    background-image: none;
+    outline: 0;
+    -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+}
+
+input[type="button"][disabled], input[type="submit"][disabled], button[disabled], input[type="reset"][disabled], .custom-file-upload[disabled] {
+    cursor: not-allowed;
+    filter: alpha(opacity=65);
+    opacity: 0.65;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+.btn-info {
+    background-color: #0082B9 !important;
+}
+
+/*end*/
 table.cell-padding-1 th, table.cell-padding-1 td {
     padding: 1px;
 }
@@ -1053,4 +1122,31 @@ input[type=number] {
 
 #autocompleteItem .ui-autocomplete-input {
     width: 300px;
+}
+
+table.sticky-header {
+    position: relative;
+}
+
+table.sticky-header thead th {
+    position: sticky;
+    top: 0;
+    background: white;
+}
+
+.icon {
+    color: #404041;
+}
+
+.icon-size1 {
+    color: #404041;
+    font-size: 18px;
+}
+
+.m-5 {
+    margin: 5pt;
+}
+
+.pointer {
+    cursor: pointer;
 }

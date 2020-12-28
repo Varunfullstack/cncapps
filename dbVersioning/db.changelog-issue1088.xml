@@ -1,0 +1,20 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue1088-0">
+        <tagDatabase tag="issue1088"/>
+    </changeSet>
+    <changeSet id="issue1088-1" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) FROM `information_schema`.`COLUMNS` c WHERE c.`TABLE_SCHEMA` = DATABASE() AND
+                c.`TABLE_NAME` = "item" AND c.`COLUMN_NAME` = 'itm_unit_of_sale' AND c.`CHARACTER_MAXIMUM_LENGTH` = 20
+            </sqlCheck>
+        </preConditions>
+        <modifyDataType tableName="item" columnName="itm_unit_of_sale" newDataType="varchar(25) CHARSET utf8 COLLATE utf8_general_ci NULL"/>
+        <rollback>
+            <modifyDataType tableName="item" columnName="itm_unit_of_sale" newDataType="varchar(20) CHARSET utf8 COLLATE utf8_general_ci NULL"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

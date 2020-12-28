@@ -1,0 +1,35 @@
+{% extends '@customerFacing/wrapper.html.twig' %}
+{# @var data \CNCLTD\TwigDTOs\NotAuthorisedContactDTO #}
+{% block replyText %}
+{% endblock %}
+{% block headerTitle %}
+    Information Notice
+{% endblock %}
+
+{% block headerContet %}
+    Sorry, something didn't quite work out
+{% endblock %}
+
+{% block content %}
+    <p>{{ data.contactFirstName }}</p>
+    <p>
+        We're sorry but you are not authorised to raise support directly with CNC and this request has not been logged.
+    </p>
+    <p>
+        Please ask one of the following people in your organisation to phone in on your behalf to progress your request.
+    </p>
+    <ul>
+        {% for contact in data.supportContacts %}
+            <li>
+                {{ contact.firstName }} {{ contact.lastName }}
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+
+{% block leftFooter %}
+    <br><br>
+{% endblock %}
+
+{% block rightFooter %}
+{% endblock %}

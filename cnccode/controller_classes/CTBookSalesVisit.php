@@ -197,6 +197,7 @@ class CTBookSalesVisit extends CTCNC
             DBEProblem::projectTeamLimitMinutes,
             $buActivity->dsHeader->getValue(DBEHeader::projectTeamLimitMinutes)
         );
+        $dbeProblem->setValue(DBEProblem::raiseTypeId, 7);
         $dbeProblem->setValue(
             DBEProblem::slaResponseHours,
             $buActivity->getSlaResponseHours(
@@ -440,7 +441,7 @@ class CTBookSalesVisit extends CTCNC
         $bookedActivityURL = '';
         if ($bookedActivity) {
             $bookedActivityURL = Controller::buildLink(
-                'Activity.php',
+                'SRActivity.php',
                 array(
                     'action'         => 'displayActivity',
                     'callActivityID' => $bookedActivity

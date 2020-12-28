@@ -1,0 +1,49 @@
+<!-- Template: UserAbsenceEdit.inc.html -->
+<h2>{userName}</h2>
+<TABLE width="200px"
+       border="0"
+       cellpadding="2"
+       cellspacing="1"
+>
+
+    <form method="post"
+          action="{urlUpdate}"
+          name="absence-form"
+          AUTOCOMPLETE="OFF"
+    >
+        <table width="700px"
+               border="0"
+        >
+            <input type="hidden"
+                   name="userId"
+                   value="{userID}"
+            >
+            <tr>
+                <td class="promptText">Date</td>
+                <td class="fieldText">
+                    <input name="date"
+                           id="startDate"
+                           type="date"
+                           value="{startDate}"
+                           size="10"
+                           maxlength="10"
+                           autocomplete="off"
+                           required
+                    >
+                    <span class="formErrorMessage">{startDateMessage}</span>
+                </td>
+            </tr>
+
+            <tr>
+                <td>&nbsp;</td>
+                <td class="formErrorMessage">
+                    <input type="submit"
+                           name="Submit"
+                           value="Update"
+                    >
+                </td>
+            </tr>
+        </table>
+    </form>
+    <!-- End Template: UserEdit.inc.html -->
+</TABLE>

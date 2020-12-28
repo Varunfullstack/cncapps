@@ -1,0 +1,33 @@
+{% extends '@customerFacing/wrapper.html.twig' %}
+{# @var date string #}
+{# @var contactFirstName string #}
+{% block replyText %}
+{% endblock %}
+{% block headerTitle %}
+    Information Notice
+{% endblock %}
+
+{% block headerContet %}
+    UK Bank Holiday approaching
+{% endblock %}
+
+{% block content %}
+    <p>{{ contactFirstName }}</p>
+    <p>
+        Please be aware that {{ date }} is a national holiday in UK so the CNC ServiceDesk will be closed. If you are a
+        customer with 24x7 support, you may contact us by calling +441273384111 and using the security access code
+        displayed on your customer portal at https://www.cnc-ltd.co.uk.
+    </p>
+    <p>
+        If your query is not of an urgent nature please e-mail us at support@cnc-ltd.co.uk and we will respond on the
+        next working day.
+    </p>
+{% endblock %}
+
+{% block leftFooter %}
+    <br><br>
+{% endblock %}
+
+{% block rightFooter %}
+
+{% endblock %}

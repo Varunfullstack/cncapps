@@ -82,6 +82,7 @@
                 if (!options) {
                     options = [];
                 }
+                options = options.sort((a, b) => a.localeCompare(b));
             }
             return options;
         }
@@ -97,6 +98,7 @@
             }
             let options = getOptions();
             options.push(option);
+            options = options.sort((a, b) => a.localeCompare(b));
             optionElm.value = null;
             storeOptions(options);
             redrawOptionsHolder(options);
@@ -236,7 +238,7 @@
                            class="optionsString"
                     >
                     <input type="text"
-                           placeholder="type an option and hit Enter to add it"
+                           placeholder="type an option and press Add to add it"
                            class="optionValue"
                     >
                     <button type="button"

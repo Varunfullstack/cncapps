@@ -1,0 +1,48 @@
+{% extends '@customerFacing/wrapper.html.twig' %}
+{# @var data \CNCLTD\TwigDTOs\ServiceRequestFixedDTO #}
+{% block headerTitle %}
+    Service Request Information
+{% endblock %}
+
+{% block headerContet %}
+    There's been an update to your service request
+{% endblock %}
+
+{% block content %}
+    <p>{{ data.contactFirstName }}</p>
+    <p>Good news, we've marked this as fixed on our system and here's a summary of the original request and resolution below.
+    </p>
+
+    <p>Original Request:</p>
+    <table style="width: 100%">
+        <tr>
+            <td class="details">
+                {{ data.firstActivityReason | raw }}
+            </td>
+        </tr>
+    </table>
+    <p>
+        Resolution Summary:
+    </p>
+    <table style="width: 100%">
+        <tr>
+            <td class="details">
+                {{ data.lastActivityReason | raw }}
+            </td>
+        </tr>
+    </table>
+    <p>
+        If you believe that this is not resolved, simply reply to this email within a couple of days and 
+        we'll investigate further before re-opening.
+    </p>
+{% endblock %}
+
+{%- block serviceRequestURL -%}https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ data.serviceRequestId }}{%- endblock -%}
+
+{% block footerStatus %}
+    Fixed
+{% endblock %}
+
+{%- block feedbackURL -%}
+    {{ constant('PORTAL_FEEDBACK_URL') }}{{ data.feedbackToken }}
+{%- endblock -%}

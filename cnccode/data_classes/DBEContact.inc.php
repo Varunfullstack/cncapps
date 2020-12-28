@@ -8,6 +8,10 @@ require_once($cfg["path_dbe"] . "/DBCNCEntity.inc.php");
 
 class DBEContact extends DBCNCEntity
 {
+    const FURLOUGH_ACTION_TO_FURLOUGH = 1;
+    const FURLOUGH_ACTION_TO_UNFURLOUGH = 2;
+
+
     const contactID = "contactID";
     const siteNo = "siteNo";
     const customerID = "customerID";
@@ -62,6 +66,9 @@ class DBEContact extends DBCNCEntity
     const specialAttentionContactFlag = "specialAttentionContactFlag";
     const linkedInURL = "linkedInURL";
     const active = "active";
+    const pendingFurloughAction = 'pendingFurloughAction';
+    const pendingFurloughActionDate = 'pendingFurloughActionDate';
+    const pendingFurloughActionLevel = 'pendingFurloughActionLevel';
 
     /**
      * calls constructor()
@@ -341,6 +348,23 @@ class DBEContact extends DBCNCEntity
             null,
             1
         );
+
+        $this->addColumn(
+            self::pendingFurloughAction,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+        );
+        $this->addColumn(
+            self::pendingFurloughActionDate,
+            DA_DATE,
+            DA_ALLOW_NULL,
+        );
+        $this->addColumn(
+            self::pendingFurloughActionLevel,
+            DA_STRING,
+            DA_ALLOW_NULL,
+        );
+
 
         $this->setPK(0);
         $this->setAddColumnsOff();
@@ -873,6 +897,21 @@ WHERE {$this->getDBColumnName(self::supportLevel)} is not null
         $db->query($query);
 
         return parent::deleteRow($pkValue);
+    }
+
+
+    public function getContactsWithPendingFurloughActionForToday()
+    {
+        $sqlQuery =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " left join customer on con_custno = cus_custno 
+             WHERE " .
+            $this->getDBColumnName(self::pendingFurloughAction) . " is not null  and active and " .
+            $this->getDBColumnName(self::pendingFurloughActionDate) . " <= curdate() ";
+        $this->setQueryString($sqlQuery);
+        $this->getRows();
+        return $this;
     }
 
     public function getTodayLeavers()

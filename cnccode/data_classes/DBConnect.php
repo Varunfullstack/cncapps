@@ -21,11 +21,47 @@ class DBConnect
     final private function __construct()
     {
         try {
+            //create new PDO connection
             self::getDB();
-        } catch (Exception $e) {
+        } catch (PDOException $e) {
             //Exception handling
         }
     }
+
+    /**
+     * Creates a new PDO connection using
+     * the mysql constants
+     */
+    public function getDB()
+    {
+        if (self::$pdo === null) {
+            self::$pdo = new PDO(
+                'mysql:dbname=' . DB_NAME . ";" .
+                "host=" . DB_HOST . ";",
+                DB_USER,
+                DB_PASSWORD,
+                [PDO::MYSQL_ATTR_INIT_COMMAND => "SET time_zone = '+00:00'"]
+
+            );
+
+            //exception enabled
+            self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            self::$pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+        }
+        return self::$pdo;
+    }
+    public static function execute($query, $params = null)
+    {
+        if ($params) {
+            $stmt = self::instance()->getDB()->prepare($query);
+            if ($params)
+                foreach ($params as $key => $value)
+                $stmt->bindParam($key, $params[$key]);
+            return $stmt->execute();
+        } else
+            return self::instance()->getDB()->prepare($query)->execute();
+    }
+     
 
     /**
      * Returns the singleton instance
@@ -39,25 +75,9 @@ class DBConnect
         return self::$db;
     }
 
-    /**
-     * Creates a new PDO connection using
-     * the mysql constants
-     */
-    public function getDB()
+    final public function __destruct()
     {
-        if (self::$pdo === null) {
-            self::$pdo = new PDO(
-                'mysql:dbname=' . DB . ";" .
-                "host=" . HOST_NAME . ";charset=utf8mb4",
-                USER,
-                PWD
-
-            );
-
-            //exception enabled
-            self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        }
-        return self::$pdo;
+        self::$pdo = null;
     }
 
     /**
@@ -67,9 +87,36 @@ class DBConnect
     {
         // TODO: Implement __clone() method.
     }
-
-    final public function __destruct()
+    public static function fetchOne($query,$params=null)
     {
-        self::$pdo = null;
+        $stmt=self::instance()->getDB()->prepare($query);
+        if($params)
+        foreach($params as $key=>$value)
+            $stmt->bindParam($key,  $params[ $key]);
+
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+    public static function fetchAll($query,$params)
+    {
+        $stmt=self::instance()->getDB()->prepare($query);
+        foreach($params as $key=>$value)
+        {
+            if(($params[ $key]!=null||$params[ $key]=='0')&&is_numeric($params[ $key]))
+            {
+                $params[ $key]=(int)$params[ $key];
+                $stmt->bindParam($key,  $params[ $key],PDO::PARAM_INT);
+            }
+            else
+                $stmt->bindParam($key,  $params[ $key]);
+
+        }
+        
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    public static function lastInsertedId()
+    {
+       return DBConnect::instance()->getDB()->lastInsertId();
     }
 }

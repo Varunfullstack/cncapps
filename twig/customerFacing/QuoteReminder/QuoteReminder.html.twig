@@ -1,0 +1,43 @@
+{% extends '@customerFacing/wrapper.html.twig' %}
+{# @var string contactFirstName #}
+{# @var string renewalType #}
+{# @var senderFirstName string #}
+{# @var senderLastName string #}
+{% block replyText %}
+{% endblock %}
+{% block headerTitle %}
+    Quote Reminder
+{% endblock %}
+
+{% block headerContet %}
+    We know you're busy, so here's a gentle reminder
+{% endblock %}
+
+{% block content %}
+    <p>{{ contactFirstName }}</p>
+    <p>
+        We recently sent you a renewal quotation for {{ renewalType }} as this will soon expire, a copy of which is
+        attached.
+    </p>
+
+    <p>
+        If you would like to proceed, follow the instructions on the quotation to electronically sign the order but if
+        you have any questions, please contact us in advance of the renewal date.
+    </p>
+    <p>
+        Many thanks
+    </p>
+    <p>
+        {{ senderFirstName }} {{ senderLastName }}
+    </p>
+{% endblock %}
+
+{% block leftFooter %}
+    <br>
+    &nbsp;
+    <br>
+{% endblock %}
+
+{% block rightFooter %}
+
+{% endblock %}

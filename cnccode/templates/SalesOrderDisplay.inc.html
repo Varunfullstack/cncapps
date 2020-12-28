@@ -596,6 +596,14 @@
             document.querySelectorAll('input[name="updatedTime"]').forEach(el => {
                 el.value = newValue;
             })
+
+            document.querySelectorAll('.updatedTimeLink').forEach(el => {
+                const [domainPart, searchParams] = el.href.split('?');
+                const params = new URLSearchParams(searchParams);
+                params.set('updatedTime', newValue);
+                el.href = domainPart + '?' + params.toString();
+            })
+
         }
 
         function getUpdatedTimeCurrentValue() {
@@ -705,13 +713,20 @@
             }
             const tbody = row.closest('tbody');
             const grandTotals = Array.from(tbody.querySelectorAll('tr')).reduce((sums, tr) => {
-                const lineItemCostTotalInput = tr.querySelector('.lineItemCostTotal');
-                if (!lineItemCostTotalInput) {
+                const lineItemQuantityOrderedInput = tr.querySelector('.lineItemQuantityOrdered');
+                if (!lineItemQuantityOrderedInput) {
                     return sums;
                 }
-                sums.costGrandTotal += parseFloat(tr.querySelector('.lineItemCostTotal').textContent);
-                sums.saleGrandTotal += parseFloat(tr.querySelector('.lineItemSaleTotal').textContent);
-                sums.profitAmountGrandTotal += parseFloat(tr.querySelector('.lineItemProfitAmount').textContent);
+                const lineItemUnitCostInput = tr.querySelector('.lineItemUnitCost');
+                const lineItemUnitSaleInput = tr.querySelector('.lineItemUnitSale');
+
+                const lineItemCostTotal = parseFloat(lineItemUnitCostInput.value) * parseFloat(lineItemQuantityOrderedInput.value);
+                const lineItemSaleTotal = parseFloat(lineItemUnitSaleInput.value) * parseFloat(lineItemQuantityOrderedInput.value);
+                const profitAmount = lineItemSaleTotal - lineItemCostTotal;
+
+                sums.costGrandTotal += lineItemCostTotal
+                sums.saleGrandTotal += lineItemSaleTotal;
+                sums.profitAmountGrandTotal += profitAmount
                 return sums;
             }, {
                 costGrandTotal: 0,

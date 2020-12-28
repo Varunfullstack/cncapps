@@ -1,14 +1,6 @@
-<script type="module">
-    import TypeAheadSearch from "/components/utils/TypeAheadSearch.js";
+<script>
 
     let table;
-
-    function renderReactElement(component, props, targetNode, callback) {
-        const reactElement = React.createElement(TypeAheadSearch, props, null);
-        ReactDOM.render(reactElement, targetNode, callback);
-        return reactElement;
-    }
-
     const debounce = (func, wait) => {
         let timeout;
         return function executedFunction(...args) {
@@ -67,7 +59,7 @@
                         autocompleteSelectedCallBack: (selectedItem) => {
                             props.value = selectedItem.label;
                             performSearch(selectedItem.label, key);
-                            renderReactElement(TypeAheadSearch, props, domContainer)
+                            document.renderTypeAheadComponent(props, domContainer)
                         },
                         searchRequest: (term, itemsToShow, responseCB) => {
                             fetch(
@@ -89,13 +81,13 @@
                         onInputChange: (value) => {
                             props.value = value;
                             performSearch(value, key);
-                            renderReactElement(TypeAheadSearch, props, domContainer)
+                            document.renderTypeAheadComponent(props, domContainer)
                         },
                         readOnly: false,
                         showClear: false,
                     }
 
-                    renderReactElement(TypeAheadSearch, props, domContainer);
+                    document.renderTypeAheadComponent(props, domContainer);
                     th.appendChild(domContainer);
                     break;
                 }

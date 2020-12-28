@@ -3032,7 +3032,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    options.blockParams = options.blockParams || [];
 
-	    // These changes will propagate to the other compiler components
+	    // These changes will propagate to the other compiler subComponents
 	    var knownHelpers = options.knownHelpers;
 	    options.knownHelpers = {
 	      'helperMissing': true,

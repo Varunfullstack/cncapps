@@ -147,7 +147,7 @@ $mime_params = array(
     'head_charset'  => 'UTF-8'
 );
 $body = $buMail->mime->get($mime_params);
-$toEmail = "cwaclientlocationcheck@cnc-ltd.co.uk";
+$toEmail = "cwaclientlocationcheck@" . CONFIG_PUBLIC_DOMAIN;
 $hdrs = array(
     'To'           => $toEmail,
     'From'         => CONFIG_SUPPORT_EMAIL,

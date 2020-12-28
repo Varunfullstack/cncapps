@@ -1,7 +1,7 @@
 import { Config } from '@stencil/core';
 
 export const config: Config = {
-  namespace: 'cncapps-components',
+  namespace: 'cncapps-subComponents',
   taskQueue: 'async',
   outputTargets: [
     {

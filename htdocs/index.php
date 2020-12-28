@@ -1,15 +1,7 @@
 <?php
 require_once("config.inc.php");
+global $cfg;
 require_once($cfg["path_ct"] . "/CTHome.inc.php");
-
-//if ($_REQUEST['action'] == 'logout') {
-//    $sessionClass = PHPLIB_CLASSNAME_SESSION;
-//    $sess = new $sessionClass;
-//    $sess->delete();
-//    header('Location:');
-//    exit;
-//}
-
 
 session_start();
 page_open(
@@ -20,7 +12,7 @@ page_open(
         ''
     )
 );
-GLOBAL $cfg;
+global $cfg;
 header("Cache-control: private");
 $ctPage = new CTHome(
     $_SERVER['REQUEST_METHOD'],

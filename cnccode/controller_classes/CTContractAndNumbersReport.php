@@ -6,7 +6,6 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
-
 global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 
@@ -18,7 +17,6 @@ class CTContractAndNumbersReport extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
-
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
     }
 
@@ -40,10 +38,8 @@ class CTContractAndNumbersReport extends CTCNC
     function csvContractAndNumbersReport()
     {
         $csv_export = '';
-        $db = $this->getContractAndNumberData();
-
+        $db         = $this->getContractAndNumberData();
         $headersSet = false;
-
         while ($db->next_record()) {
             $row = $db->Record;
             if (!$headersSet) {
@@ -64,10 +60,8 @@ class CTContractAndNumbersReport extends CTCNC
                     'virtualServers'              => $row['virtualServers'],
                     'physicalServers'             => $row['physicalServers'],
                     'serverCareContract'          => $row['serverCareContract']
-
                 )
             );
-
             $this->template->parse(
                 'contracts',
                 'contractItemBlock',
@@ -80,10 +74,7 @@ class CTContractAndNumbersReport extends CTCNC
     private function getContractAndNumberData()
     {
         global $db; //PHPLib DB object
-
-
-        $queryString =
-            "SELECT
+        $queryString = "SELECT
   `cus_custno`,
   cus_name AS customerName,
   serviceDeskProduct,
@@ -94,8 +85,8 @@ class CTContractAndNumbersReport extends CTCNC
   COALESCE(virtualServers,0) AS virtualServers,
   COALESCE(physicalServers,0) AS physicalServers,
   COALESCE(serverCareContract,0) AS serverCareContract,
-  concat('M ',coalesce(mainCount, 0),', SV ',coalesce(supervisorCount,0),', S ', coalesce(supportCount, 0),', D ', coalesce(delegateCount, 0),', T ', coalesce(totalCount, 0)) as supportedUsers,
-  totalCount > serviceDeskUsers as moreUsersThanExpected 
+  concat('M ',coalesce(mainCount, 0),', SV ',coalesce(supervisorCount,0),', S ', coalesce(supportCount, 0),', D ', coalesce(delegateCount, 0),', N ', coalesce(noLevelCount, 0),', T ', coalesce(totalCount, 0) ) as supportedUsers,
+  actualSupportedUsersCount > serviceDeskUsers as moreUsersThanExpected 
 FROM
   customer
   LEFT JOIN
@@ -166,15 +157,18 @@ left join (
   SUM(
     contact.`supportLevel` = 'delegate'
   ) AS delegateCount,
-  sum(1) as totalCount 
+  SUM(
+    contact.`supportLevel` is null
+  ) AS noLevelCount,
+  sum(1) as totalCount,
+  sum(contact.supportLevel is not null) as actualSupportedUsersCount
 from
   contact 
-where supportLevel is not null 
+where contact.active 
 GROUP BY con_custno 
 ) supportUsers on supportUsers.con_custno = customer.cus_custno
 WHERE serviceDeskProduct IS NOT NULL OR serverCareProduct IS NOT NULL
 ORDER BY cus_name   ";
-
         $db->query($queryString);
         return $db;
     }
@@ -186,22 +180,16 @@ ORDER BY cus_name   ";
     {
         $this->setMenuId(504);
         $this->setPageTitle("Service Contracts Ratio");
-
         $this->setTemplateFiles(
             'ContractAndNumbersReport',
             'ContractAndNumbersReport'
         );
-
-
         $db = $this->getContractAndNumberData();
-
-
         $this->template->set_block(
             'ContractAndNumbersReport',
             'contractItemBlock',
             'contracts'
         );
-
         while ($db->next_record()) {
             $row = $db->Record;
             $this->template->set_var(
@@ -217,27 +205,35 @@ ORDER BY cus_name   ";
                     'serverCareContract'          => $row['serverCareContract'],
                     'supportedUsers'              => $row['supportedUsers'],
                     'moreThanExpectedClass'       => $row['moreUsersThanExpected'] ? "red" : null
-
                 )
             );
-
             $this->template->parse(
                 'contracts',
                 'contractItemBlock',
                 true
             );
         }
-
-
+        /** @var $db dbSweetcode */ global $db;
+        $query = "SELECT
+  COUNT(*) AS total
+FROM
+  custitem
+  JOIN customer
+    ON customer.`cus_custno` = custitem.`cui_custno`
+    JOIN contact ON contact.`con_custno` = customer.cus_custno AND contact.`active`
+WHERE cui_itemno = 4111
+  AND cui_expiry_date >= NOW()
+  AND renewalStatus <> 'D'
+  AND declinedFlag <> 'Y'";
+        $db->query($query);
+        $db->next_record(MYSQLI_ASSOC);
+        $this->template->setVar('totalPrePaySupportUsers', $db->Record['total']);
         $this->template->parse(
             'CONTENTS',
             'ContractAndNumbersReport',
             true
         );
-
-
         $this->parsePage();
-
         exit;
     }
 
@@ -253,17 +249,12 @@ ORDER BY cus_name   ";
         $this->setTemplateFiles(
             array('ChangeLog' => 'About.inc')
         );
-
-        $changelog = ViewerFactory::createMarkdownHtmlViewer(__DIR__ . '/../../CHANGELOG.md')
-            ->frame(false)
-            ->styles(false)
-            ->downloadLinks(false)
+        $changelog = ViewerFactory::createMarkdownHtmlViewer(__DIR__ . '/../../CHANGELOG.md')->frame(false)->styles(
+            false
+        )->downloadLinks(false)
 //            ->modal(true)
-            ->scripts(false)
-            ->build();
-
+            ->scripts(false)->build();
         $this->template->set_var('changeLog', $changelog);
-
         $this->template->parse('CONTENTS', 'ChangeLog', true);
         $this->parsePage();
     }

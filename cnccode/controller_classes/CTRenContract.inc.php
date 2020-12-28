@@ -127,6 +127,17 @@ class CTRenContract extends CTCNC
             case 'update':
                 $this->update();
                 break;
+            case 'addItemToContract':
+                $contractCustomerItemId = $this->getParam('contractCustomerItemId');
+                $itemToAddId = $this->getParam('itemToAddId');
+                try {
+                    $this->addItemToContract($contractCustomerItemId, $itemToAddId);
+                    $data = ["status" => "ok"];
+                } catch (\Exception $exception) {
+                    $data = ["status" => "error", "message" => $exception->getMessage()];
+                }
+                echo json_encode($data);
+                exit;
             case 'createRenewalsSalesOrders':
                 $this->createRenewalsSalesOrders();
                 break;
@@ -771,6 +782,29 @@ class CTRenContract extends CTCNC
         header('Location: ' . $urlNext);
     }
 
+    private function addItemToContract($contractCustomerItemId, $itemToAddId)
+    {
+        if (!$contractCustomerItemId || !$itemToAddId) {
+            throw new InvalidArgumentException('ContractCustomerItemId and itemToAddId is mandatory');
+        }
+        $dsRenContract = new DataSet($this);
+        $this->buRenContract->getRenContractByID(
+            $contractCustomerItemId,
+            $dsRenContract
+        );
+        $customerId = $dsRenContract->getValue(DBEJRenContract::customerID);
+        $dbeCustomerItem = new DBECustomerItem($this);
+        if (!$dbeCustomerItem->getRow($itemToAddId)) {
+            throw new Exception('Item not found');
+        }
+
+        if ($customerId !== $dbeCustomerItem->getValue(DBECustomerItem::customerID)) {
+            throw new Exception('The item does not belong to the same customer');
+        }
+
+        $dbeCustomerItem->addContract($itemToAddId, $contractCustomerItemId);
+    }
+
     /**
      * This function creates quotes for the contract renewals that are due
      *
@@ -840,7 +874,16 @@ class CTRenContract extends CTCNC
                         'invoiceToDate'   => Controller::dateYMDtoDMY(
                             $dsRenContract->getValue(DBEJRenContract::invoiceToDate)
                         ),
+                        'quantity'        => $dsRenContract->getValue(DBEJRenContract::users),
                         'notes'           => Controller::dateYMDtoDMY($dsRenContract->getValue(DBEJRenContract::notes)),
+                        'costAnnum'       => utf8MoneyFormat(
+                            UK_MONEY_FORMAT,
+                            $dsRenContract->getValue(DBEJContract::curUnitCost)
+                        ),
+                        'saleAnnum'       => utf8MoneyFormat(
+                            UK_MONEY_FORMAT,
+                            $dsRenContract->getValue(DBEJContract::curUnitSale)
+                        ),
                         'urlEdit'         => $urlEdit,
                         'urlList'         => $urlList,
                         'txtEdit'         => $txtEdit

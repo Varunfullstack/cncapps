@@ -1,0 +1,35 @@
+{% extends '@customerFacing/wrapper.html.twig' %}
+{# @var string contactFirstName #}
+{# @var senderFirstName string #}
+{# @var senderLastName string #}
+{% block replyText %}
+{% endblock %}
+{% block headerTitle %}
+    Account Management
+{% endblock %}
+
+{% block headerContet %}
+    Here's the paperwork
+{% endblock %}
+
+{% block content %}
+    <p>
+        Thanks for taking the time to meet with us, I've now uploaded a formal response to your customer
+        along with a copy of the review documents should you wish to look at them.</p>
+	<p>
+        Many thanks
+    </p>
+    <p>
+        {{ senderFirstName }} {{ senderLastName }}
+    </p>
+{% endblock %}
+
+{% block leftFooter %}
+    <br>
+    Click <a href="https://www.cnc-ltd.co.uk/portal/documents/">here</a> to go view the documents on our portal.
+    <br>
+{% endblock %}
+
+{% block rightFooter %}
+
+{% endblock %}

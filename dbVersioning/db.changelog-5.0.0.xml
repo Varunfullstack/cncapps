@@ -1,0 +1,147 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.2.xsd">
+    <changeSet author="pavwebdev" id="release-v5.0.0-0">
+        <tagDatabase tag="release-v5.0.0"/>
+    </changeSet>
+    <include file="db.changelog-issue948.xml"/>
+    <include file="db.changelog-issue977_.xml"/>
+    <include file="db.changelog-issue1049.xml"/>
+    <include file="db.changelog-issue1015.xml"/>
+    <include file="db.changelog-issue1053.xml"/>
+    <changeSet id="release-v5.0.0-1" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="callacttype" columnName="cat_problem_flag"/>
+        </preConditions>
+        <dropColumn tableName="callacttype" columnName="cat_problem_flag"/>
+        <rollback>
+            <addColumn tableName="callacttype">
+                <column name="cat_problem_flag" remarks="OBSOLETE" type="CHAR(1)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet id="release-v5.0.0-2" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="callacttype" columnName="cat_action_flag"/>
+        </preConditions>
+        <dropColumn tableName="callacttype" columnName="cat_action_flag"/>
+        <rollback>
+            <addColumn tableName="callacttype">
+                <column name="cat_action_flag" remarks="OBSOLETE" type="CHAR(1)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet id="release-v5.0.0-3" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="callacttype" columnName="cat_resolve_flag"/>
+        </preConditions>
+        <dropColumn tableName="callacttype" columnName="cat_resolve_flag"/>
+        <rollback>
+            <addColumn tableName="callacttype">
+                <column name="cat_resolve_flag" remarks="OBSOLETE" type="CHAR(1)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet id="release-v5.0.0-4" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="callacttype" columnName="cat_r_problem_flag"/>
+        </preConditions>
+        <renameColumn tableName="callacttype" oldColumnName="cat_r_problem_flag" newColumnName="activityNotesRequired"
+                      columnDataType="char(1) CHARACTER SET utf8 COLLATE utf8_general_ci"/>
+        <rollback>
+            <renameColumn tableName="callacttype" oldColumnName="activityNotesRequired"
+                          newColumnName="cat_r_problem_flag"
+                          columnDataType="char(1) CHARACTER SET utf8 COLLATE utf8_general_ci"/>
+        </rollback>
+    </changeSet>
+    <changeSet id="release-v5.0.0-5" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="callacttype" columnName="cat_r_action_flag"/>
+        </preConditions>
+        <dropColumn tableName="callacttype" columnName="cat_r_action_flag"/>
+        <rollback>
+            <addColumn tableName="callacttype">
+                <column name="cat_r_action_flag" remarks="OBSOLETE" type="CHAR(1)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet id="release-v5.0.0-6" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="callacttype" columnName="cat_r_resolve_flag"/>
+        </preConditions>
+        <dropColumn tableName="callacttype" columnName="cat_r_resolve_flag"/>
+        <rollback>
+            <addColumn tableName="callacttype">
+                <column name="cat_r_resolve_flag" remarks="OBSOLETE" type="CHAR(1)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet id="release-v5.0.0-7" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="callacttype" columnName="showNotChargeableFlag"/>
+        </preConditions>
+        <dropColumn tableName="callacttype" columnName="showNotChargeableFlag"/>
+        <rollback>
+            <addColumn tableName="callacttype">
+                <column name="showNotChargeableFlag" remarks="OBSOLETE" type="CHAR(1)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet id="release-v5.0.0-8" author="pavwebdev">
+        <sql splitStatements="true">
+            UPDATE
+                contact
+            SET `initialLoggingEmailFlag`       = 'Y',
+                workUpdatesEmailFlag            = 'Y',
+                fixedEmailFlag                  = 'Y',
+                con_mailflag11                  = 'Y',
+                `othersInitialLoggingEmailFlag` = IF(
+                        contact.`supportLevel` IN ('main', 'supervisor'),
+                        'Y',
+                        othersInitialLoggingEmailFlag
+                    ),
+                `othersWorkUpdatesEmailFlag`    = IF(
+                        contact.`supportLevel` IN ('main', 'supervisor'),
+                        'Y',
+                        othersWorkUpdatesEmailFlag
+                    ),
+                othersFixedEmailFlag            = IF(
+                        contact.`supportLevel` IN ('main', 'supervisor'),
+                        'Y',
+                        othersFixedEmailFlag
+                    )
+            WHERE contact.`active`
+
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet id="release-v5.0.0-9" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                select column_default = 'Y' from information_schema.`COLUMNS` where
+                information_schema.`COLUMNS`.`TABLE_SCHEMA` = database() and information_schema.`COLUMNS`.`TABLE_NAME` =
+                "contact" and information_schema.`COLUMNS`.`COLUMN_NAME` = 'con_mailflag11'
+            </sqlCheck>
+        </preConditions>
+        <addDefaultValue tableName="contact" columnName="con_mailflag11" columnDataType="char(1)" defaultValue="Y"/>
+        <rollback/>
+    </changeSet>
+    <include file="db.changelog-issue1099.xml"/>
+    <include file="db.changelog-issue1081.xml"/>
+    <include file="db.changelog-issue1088.xml"/>
+    <include file="db.changelog-issue1084.xml"/>
+    <include file="db.changelog-issue1094.xml"/>
+    <include file="db.changelog-issue1086.xml"/>
+    <include file="db.changelog-issue1115.xml"/>
+    <include file="db.changelog-issue1120.xml"/>
+    <include file="db.changelog-issue1124.xml"/>
+    <changeSet id="release-v5.0.0-10" author="pavwebdev">
+        <sql>
+            update consultant
+            set queueManager = 1
+            where cns_consno in (57, 83, 105);
+        </sql>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>

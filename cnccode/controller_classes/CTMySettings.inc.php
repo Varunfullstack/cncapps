@@ -16,13 +16,15 @@ class CTMySettings extends CTCNC
 {
     /** @var DSForm */
     public $dsUser;
+
     function __construct(
         $requestMethod,
         $postVars,
         $getVars,
         $cookieVars,
         $cfg
-    ) {
+    )
+    {
         parent::__construct(
             $requestMethod,
             $postVars,
@@ -51,8 +53,8 @@ class CTMySettings extends CTCNC
             case "getMySettings":
                 echo json_encode($this->getMyData());
                 exit;
-            case "sendEmailAssignedService":                
-                echo  $this->setSendEmailAssignedService();
+            case "sendEmailAssignedService":
+                echo $this->setSendEmailAssignedService();
                 exit;
             default:
                 $this->getTemplate();
@@ -68,6 +70,9 @@ class CTMySettings extends CTCNC
             )
         );
         $this->setPageTitle('My Account');
+        $this->loadReactScript('MySettingsComponent.js');
+        $this->loadReactCSS('MySettingsComponent.css');
+
         $this->template->parse(
             'CONTENTS',
             'MySettings',
@@ -83,76 +88,76 @@ class CTMySettings extends CTCNC
         $dsUser = new DataSet($this);
         $BUUser->getUserByID($this->userID, $dsUser);
         //$BUUser->getUserByID(29, $dsUser);
-        $teamId=$dsUser->getValue(DBEJUser::teamID);
-        $managerId=$dsUser->getValue(DBEJUser::managerID);
-        $userId=$dsUser->getValue(DBEJUser::userID);
+        $teamId = $dsUser->getValue(DBEJUser::teamID);
+        $managerId = $dsUser->getValue(DBEJUser::managerID);
+        $userId = $dsUser->getValue(DBEJUser::userID);
         $result = array(
-            'name' => $dsUser->getValue(DBEJUser::name),
-            'jobTitle' => $dsUser->getValue(DBEJUser::jobTitle),
-            'team' =>  !$teamId?'':$this->getTeamName($teamId),
-            'manager' =>  !$managerId?'':$this->getMangerName($managerId),
-            'employeeNo' => $dsUser->getValue(DBEJUser::employeeNo),
-            'startDate' => $dsUser->getValue(DBEJUser::startDate), 
-            'sendEmailAssignedService' => $dsUser->getValue(DBEJUser::sendEmailWhenAssignedService),                       
-            'userLog' =>$this->getUserTimeLog($userId)
+            'name'                     => $dsUser->getValue(DBEJUser::name),
+            'jobTitle'                 => $dsUser->getValue(DBEJUser::jobTitle),
+            'team'                     => !$teamId ? '' : $this->getTeamName($teamId),
+            'manager'                  => !$managerId ? '' : $this->getMangerName($managerId),
+            'employeeNo'               => $dsUser->getValue(DBEJUser::employeeNo),
+            'startDate'                => $dsUser->getValue(DBEJUser::startDate),
+            'sendEmailAssignedService' => $dsUser->getValue(DBEJUser::sendEmailWhenAssignedService),
+            'userLog'                  => $this->getUserTimeLog($userId)
         );
         return $result;
     }
+
     function getTeamName($teamId)
     {
         $buTeam = new BUTeam($this);
         $dsTeam = new DataSet($this);
-        $buTeam->getTeamByID($teamId,$dsTeam);
-        return  $dsTeam->getValue(DBETeam::name);
+        $buTeam->getTeamByID($teamId, $dsTeam);
+        return $dsTeam->getValue(DBETeam::name);
     }
+
     function getMangerName($mangerId)
     {
         $BUUser = new BUUser($this);
         $dsUser = new DataSet($this);
-        $BUUser->getUserByID($mangerId,$dsUser);
-        return  $dsUser->getValue(DBEJUser::name);
+        $BUUser->getUserByID($mangerId, $dsUser);
+        return $dsUser->getValue(DBEJUser::name);
     }
+
     function getUserTimeLog($userId)
     {
-        $sql="select * from user_time_log where userID=:userId 
+        $sql = "select * from user_time_log where userID=:userId 
                 ORDER BY  `loggedDate` DESC  
-                limit 5";        
-        return $this->fetchAll($sql,['userId'=>$userId]);
+                limit 5";
+        return $this->fetchAll($sql, ['userId' => $userId]);
     }
-    
-    public  function fetchAll($query,$params)
-    {         
+
+    public function fetchAll($query, $params)
+    {
         $db = new PDO(
             'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8',
             DB_USER,
             DB_PASSWORD
         );
-        $stmt=$db->prepare($query,$params);
-        foreach($params as $key=>$value)
-        {
-            if(($params[ $key]!=null||$params[ $key]=='0')&&is_numeric($params[ $key]))
-            {
-                $params[ $key]=(int)$params[ $key];
-                $stmt->bindParam($key,  $params[ $key],PDO::PARAM_INT);
-            }
-            else
-                $stmt->bindParam($key,  $params[ $key]);
-        }        
+        $stmt = $db->prepare($query, $params);
+        foreach ($params as $key => $value) {
+            if (($params[$key] != null || $params[$key] == '0') && is_numeric($params[$key])) {
+                $params[$key] = (int)$params[$key];
+                $stmt->bindParam($key, $params[$key], PDO::PARAM_INT);
+            } else
+                $stmt->bindParam($key, $params[$key]);
+        }
         $stmt->execute();
-        $result=$stmt->fetchAll(PDO::FETCH_ASSOC);        
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
         return $result;
     }
 
     function setSendEmailAssignedService()
-    {   
-        $newVal= $this->getParam('sendEmailAssignedService');
-        if(!isset($newVal))
-         return false;
-        $dbeUser= new DBEUser($this);
-        $dbeUser->setValue(DBEJUser::userID,$this->userID);
+    {
+        $newVal = $this->getParam('sendEmailAssignedService');
+        if (!isset($newVal))
+            return false;
+        $dbeUser = new DBEUser($this);
+        $dbeUser->setValue(DBEJUser::userID, $this->userID);
         $dbeUser->getRow();
-        $dbeUser->setValue(DBEJUser::sendEmailWhenAssignedService,$newVal);
+        $dbeUser->setValue(DBEJUser::sendEmailWhenAssignedService, $newVal);
         $dbeUser->updateRow();
-        return true;   
+        return true;
     }
 }

@@ -114,7 +114,7 @@ define(
     "POUND_CHAR",
     chr(163)
 );
-
+global $cfg;
 require_once($cfg["path_gc"] . "/BaseObject.inc.php");
 
 class Controller extends BaseObject
@@ -137,6 +137,7 @@ class Controller extends BaseObject
     var $htmlFmt = CT_HTML_FMT_SCREEN;
     var $formErrorMessage = "";        // HTML formatting
     var $action = "";
+    protected $cachedVersion;
     private $pageTitle = "";
     private $pageHeader = "";
 
@@ -669,7 +670,7 @@ class Controller extends BaseObject
 
     function setPageTitle($pageTitle, string $pageHeader = null)
     {
-        $this->pageTitle = $pageTitle;
+        $this->pageTitle = explode('<', $pageTitle)[0];
         $this->pageHeader = $pageTitle;
         if ($pageHeader) {
             $this->pageHeader = $pageHeader;
@@ -1114,6 +1115,42 @@ class Controller extends BaseObject
     protected function setParam(string $string, $value)
     {
         $_REQUEST[$string] = $value;
+    }
+
+    public function loadReactCSS(string $string)
+    {
+        $version = $this->getVersion();
+        if (!$this->template) {
+            throw new Exception('Please define a template first');
+        }
+        $this->template->setVar(
+            'javaScript',
+            "<link rel='stylesheet'  href='components/dist/$string?$version'>",
+            true
+        );
+    }
+
+    protected function getVersion()
+    {
+        if (!$this->cachedVersion) {
+            $this->cachedVersion = \CNCLTD\Utils::getCurrentChangelogVersion();
+        }
+        return $this->cachedVersion;
+    }
+
+    public function loadReactScript(string $string)
+    {
+        $version = $this->getVersion();
+        if (!$this->template) {
+            throw new Exception('Please define a template first');
+        }
+
+        $this->template->setVar(
+            'javaScript',
+            "<script src='components/dist/$string?$version'></script>",
+            true
+        );
+
     }
 }// End of class
 ?>

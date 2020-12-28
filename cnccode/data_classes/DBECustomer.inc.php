@@ -76,6 +76,8 @@ class DBECustomer extends DBCNCEntity
     const slaP3PenaltiesAgreed = "slaP3PenaltiesAgreed";
     const streamOneEmail = "streamOneEmail";
     const lastUpdatedDateTime = "lastUpdatedDateTime";
+    const inclusiveOOHCallOuts = "inclusiveOOHCallOuts";
+
 
     /**
      * calls constructor()
@@ -481,6 +483,15 @@ class DBECustomer extends DBCNCEntity
             DATE_MYSQL_DATETIME,
             DA_NOT_NULL
         );
+        $this->addColumn(
+            self::inclusiveOOHCallOuts,
+            DA_INTEGER,
+            DA_NOT_NULL,
+            null,
+            0
+        );
+
+
         $this->setPK(0);
         $this->setAddColumnsOff();
     }

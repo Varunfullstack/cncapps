@@ -15,6 +15,8 @@ class CTTeamAndUserStatistics extends CTCNC
 {
     const searchFormFromDate = 'fromDate';
     const searchFormToDate = 'toDate';
+    const GET_FIXED_SERVICE_REQUEST_DATA = "GET_FIXED_SERVICE_REQUEST_DATA";
+    const GET_TEAM_PERFORMANCE_DATA = "GET_TEAM_PERFORMANCE_DATA";
 
     private $dsSearchForm = '';
     private $buEscalationReport;
@@ -60,7 +62,160 @@ class CTTeamAndUserStatistics extends CTCNC
      */
     function defaultAction()
     {
-        $this->search();
+        switch ($this->getAction()) {
+            case self::GET_TEAM_PERFORMANCE_DATA:
+                $data = $this->getJSONData();
+
+                if (empty($data['startDate'])) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(
+                        400,
+                        'Please provide a start date in YYYY-MM-DD format'
+                    );
+                }
+                $startDate = $data['startDate'];
+                if (empty($data['endDate'])) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(
+                        400, 'Please provide a end date in YYYY-MM-DD format'
+                    );
+                }
+                $endDate = $data['endDate'];
+                $startYearMonthArray = explode('-', $startDate);
+                $startYearMonth = "{$startYearMonthArray[0]}-{$startYearMonthArray[1]}";
+                $endYearMonthArray = explode('-', $endDate);
+                $endYearMonth = "{$endYearMonthArray[0]}-{$endYearMonthArray[1]}";
+
+                global $db;
+                $query = "
+                SELECT
+  AVG(hdTeamActualSlaPercentage) AS hdTeamAvgSLAPercentage,
+  AVG(hdTeamActualFixHours) AS hdTeamAvgFixHours,
+  AVG(`esTeamActualSlaPercentage`) AS esTeamAvgSLAPercentage,
+  AVG(`esTeamActualFixHours`) AS esTeamAvgFixHours,
+  AVG(`imTeamActualSlaPercentage`) AS spTeamAvgSLAPercentage,
+  AVG(`imTeamActualFixHours`) AS spTeamAvgFixHours,
+  AVG(`projectTeamActualSlaPercentage`) AS pTeamAvgSLAPercentage,
+  AVG(`projectTeamActualFixHours`) AS pTeamAvgFixHours
+FROM
+  team_performance
+WHERE CONCAT(
+    team_performance.`year`,
+    '-',
+    LPAD(team_performance.`month`, 2, 0)
+  ) >= ?
+  AND CONCAT(
+    team_performance.`year`,
+    '-',
+    LPAD(team_performance.`month`, 2, 0)
+  ) <= ?
+                ";
+                $teamPerformanceResult = $db->preparedQuery(
+                    $query,
+                    [
+                        [
+                            "type"  => "s",
+                            "value" => $startYearMonth
+                        ],
+                        [
+                            "type"  => "s",
+                            "value" => $endYearMonth
+                        ],
+                    ]
+                );
+                $teamPerformanceData = $teamPerformanceResult->fetch_array(MYSQLI_ASSOC);
+
+                echo json_encode(
+                    [
+                        "status" => "ok",
+                        "data"   => $teamPerformanceData
+                    ]
+                );
+                break;
+            case self::GET_FIXED_SERVICE_REQUEST_DATA:
+                $data = $this->getJSONData();
+
+                if (empty($data['startDate'])) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(
+                        400,
+                        'Please provide a start date in YYYY-MM-DD format'
+                    );
+                }
+                $startDate = $data['startDate'];
+                if (empty($data['endDate'])) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(
+                        400, 'Please provide a end date in YYYY-MM-DD format'
+                    );
+                }
+                $endDate = $data['endDate'];
+
+                global $db;
+                $query = "
+                       SELECT
+  consultant.`cns_name` AS userName,
+  consultant.`cns_consno` AS userId,
+  consultant.`teamID` as teamId,
+  SUM(isFixed) AS `fixed`,
+  SUM(isInitial) AS raised,
+  SUM(isTimeRequest) AS timeRequests,
+  SUM(isTechnicalChangeRequest) AS changeRequests,
+  SUM(isOperationalTask) AS operationalTasks
+FROM
+  (SELECT
+    callactivity.`caa_consno` AS userId,
+    callactivity.`caa_problemno` AS `srId`,
+    SUM(
+      callactivity.`caa_callacttypeno` = 57
+    ) AS isFixed,
+    SUM(
+      callactivity.`caa_callacttypeno` = 51
+    ) AS isInitial,
+    SUM(
+      callactivity.`caa_callacttypeno` = 61
+    ) AS isTimeRequest,
+    SUM(
+      callactivity.`caa_callacttypeno` = 59
+    ) AS isTechnicalChangeRequest,
+    SUM(
+      callactivity.`caa_callacttypeno` = 60
+    ) AS isOperationalTask
+  FROM
+    callactivity
+  WHERE callactivity.`caa_date` >= ? and callactivity.`caa_date` <= ? 
+    AND callactivity.`caa_consno` <> 67
+  GROUP BY callactivity.`caa_problemno`,
+    callactivity.`caa_consno`) a
+  LEFT JOIN consultant
+    ON consultant.`cns_consno` = a.`userId`
+WHERE consultant.`teamID` <= 5
+GROUP BY a.userId
+ORDER BY teamId,
+  userName             
+                ";
+                $result = $db->preparedQuery(
+                    $query,
+                    [
+                        [
+                            "type"  => "s",
+                            "value" => $startDate
+                        ],
+                        [
+                            "type"  => "s",
+                            "value" => $endDate
+                        ],
+                    ]
+                );
+                $teamPerformanceData = $result->fetch_all(MYSQLI_ASSOC);
+
+                echo json_encode(
+                    [
+                        "status" => "ok",
+                        "data"   => $teamPerformanceData
+                    ]
+                );
+
+                break;
+            default:
+                $this->search();
+        }
     }
 
     /**
@@ -109,13 +264,15 @@ class CTTeamAndUserStatistics extends CTCNC
                 'EscalationReport' => 'EscalationReport.inc'
             )
         );
+        $this->loadReactCSS('FixedServiceRequestCountComponent.css');
+        $this->loadReactScript('FixedServiceRequestCountComponent.js');
 
         $urlSubmit = Controller::buildLink(
             $_SERVER ['PHP_SELF'],
             array('action' => CTCNC_ACT_SEARCH)
         );
 
-        $this->setPageTitle('Escalation Report');
+        $this->setPageTitle('Team & User Statistics', 'Engineer Service Request Statistics');
 
         $this->template->set_var(
             array(
@@ -129,7 +286,6 @@ class CTTeamAndUserStatistics extends CTCNC
                 'technicianReport' => $technicianReport
             )
         );
-
         $this->template->parse(
             'CONTENTS',
             'EscalationReport',

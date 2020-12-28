@@ -194,14 +194,12 @@ class QuestionnaireReportGenerator
         while ($row = $freeText->fetch_object()) {
             $context['textQuestions'][] = [
                 'freeTextQuestion' => $row->que_desc,
-                'freeTextAnswer'   => str_replace('\\', '', $row->ans_answer),
-                'freeTextName'     => str_replace('\\', '', $row->ans_name),
-                'freeTextDate'     => str_replace('\\', '', $row->answerDate),
+                'freeTextAnswer'   => $row->ans_answer,
+                'freeTextName'     => $row->ans_name,
+                'freeTextDate'     => $row->answerDate,
                 'freeTextCustomer' => $row->cus_name,
             ];
         }
-
-
         $context['questionnaireDescription'] = $questionnaire->qur_desc;
         $context['rating1Description'] = $questionnaire->qur_rating_1_desc;
         $context['rating5Description'] = $questionnaire->qur_rating_5_desc;
@@ -354,16 +352,15 @@ class QuestionnaireReportGenerator
        ";
 
 
-
         $mysqliResult = $this->db->preparedQuery(
             $sql,
             [
                 [
-                    "type" => "s",
+                    "type"  => "s",
                     "value" => $this->startDate->format(DATE_MYSQL_DATE)
                 ],
                 [
-                    "type" => "s",
+                    "type"  => "s",
                     "value" => $this->endDate->format(DATE_MYSQL_DATE)
                 ],
             ]

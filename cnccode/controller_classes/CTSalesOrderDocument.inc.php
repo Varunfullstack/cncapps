@@ -25,13 +25,6 @@ class CTSalesOrderDocument extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
-        $roles = [
-            'sales'
-        ];
-        if (!self::hasPermissions($roles)) {
-            Header("Location: /NotAllowed.php");
-            exit;
-        }
         $this->buSalesOrderDocument = new BUSalesOrderDocument($this);
         $this->dsSalesOrderDocument = new DSForm($this);
         $this->dsSalesOrderDocument->copyColumnsFrom($this->buSalesOrderDocument->dbeSalesOrderDocument);
@@ -47,12 +40,15 @@ class CTSalesOrderDocument extends CTCNC
         switch ($this->getAction()) {
             case CTSALESORDERDOCUMENT_ACT_EDIT:
             case CTSALESORDERDOCUMENT_ACT_ADD:
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->edit();
                 break;
             case CTSALESORDERDOCUMENT_ACT_DELETE:
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->delete();
                 break;
             case CTSALESORDERDOCUMENT_ACT_UPDATE:
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->update();
                 break;
             case 'viewFile':

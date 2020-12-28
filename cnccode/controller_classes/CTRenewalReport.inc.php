@@ -198,6 +198,8 @@ class CTRenewalReport extends CTCNC
             'RenewalReport.inc'
         );
 
+
+
         if ($customerID) {
             $calledFromSearch = true;
         } else {
@@ -649,7 +651,7 @@ class CTRenewalReport extends CTCNC
         $email = $dbeContact->getValue(DBEContact::email);
         global $server_type;
         if ($server_type !== MAIN_CONFIG_SERVER_TYPE_LIVE) {
-            $email = "sales@cnc-ltd.co.uk";
+            $email = "sales@" . CONFIG_PUBLIC_DOMAIN;
         }
 
         $envelopeDocument = new DocumentWithoutTemplate(
@@ -687,54 +689,16 @@ class CTRenewalReport extends CTCNC
 
 
         if ($response && $response->http == 202) {
+
+            global $twig;
+            $subject = "CNC Contracts and Terms & Conditions to be signed";
+            $body = $twig->render(
+                '@customerFacing/RenewalContractsToBeSigned/RenewalContractsToBeSigned.html.twig',
+                ["contactFirstName" => $firstName]
+            );
+
             $buMail = new BUMail($this);
-
-            $hdrs = array(
-                'From'         => 'support@cnc-ltd.co.uk',
-                'To'           => $email,
-                'Subject'      => "CNC Contracts and Terms & Conditions to be signed",
-                'Date'         => date("r"),
-                'Content-Type' => 'text/html; charset=UTF-8'
-            );
-
-            $buStandardText = new BUStandardText($this);
-            $standardTexts = new DataSet($this);
-            $buStandardText->getStandardTextByID(
-                $templateID,
-                $standardTexts
-            );
-
-            $body = $standardTexts->getValue(DBEStandardText::stt_text);
-
-            $body = str_replace(
-                "[%contactFirstName%]",
-                $firstName,
-                $body
-            );
-            $body = str_replace(
-                "[%contactLastName%]",
-                $lastName,
-                $body
-            );
-
-            $buMail->mime->setHTMLBody($body);
-
-            $mime_params = array(
-                'text_encoding' => '7bit',
-                'text_charset'  => 'UTF-8',
-                'html_charset'  => 'UTF-8',
-                'head_charset'  => 'UTF-8'
-            );
-
-            $body = $buMail->mime->get($mime_params);
-
-            $hdrs = $buMail->mime->headers($hdrs);
-
-            $buMail->send(
-                $email,
-                $hdrs,
-                $body
-            );
+            $buMail->sendSimpleEmail($body, $subject, $email);
 
             $dbeCustomer = new DBECustomer($this);
             $dbeCustomer->getRow($customerID);

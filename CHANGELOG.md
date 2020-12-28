@@ -8,6 +8,238 @@ This project changes will be shown here.
 - Issue 914 - Customer Page Customer Notes, Projects, Portal Documents Rewrite
 - Issue 915 - Customer Page Sites Rewrite
 
+## [v5.1.0] - 2020-12-23
+## Added
+- Issue 1116 - Include friendly Mac OS names
+- Issue 1130 - M365 Streamone missing licenses sometimes incorrectly reported.
+- Issue 1150 - Add Generate Password link to new password creation
+- Issue 1159 - Add Pre-Pay users to Service Contract Ratio.
+- Issue 1153 - Add clock icon to add current time to activity edit
+### Changed
+- Issue 1120 - Rename instance of ATP to Defender
+- Issue 1131 - Sales Order Search Page Enhancements
+- Issue 1149 - Starter Leaver question formatting.
+- Issue 1139 - Renewals Update to include Auto Generated Invoice value
+- Issue 1122 - Asset list box enhancement
+- Issue 1154 - Engineer name dropdown change source fields
+- Issue 1151 - ITEMS FOR NEXT REVIEW MEETING.txt
+- Issue 1147 - Export Contacts to include option for customer referred status
+### Fixed
+- Issue 1165 - Fixed Activity behaviour changes
+### Removed
+- Issue 1143 - Remove 'PLEASE RENEW FOR 2 YEARS' text from generated SSL renewal service requests.
+
+## [v5.0.8] - 2020-12-22
+### Changed
+- Changed Activity SLA Breached criteria to include initial activities
+### Fixed
+- Fixed Daily Stats Today's Started. 
+- Fixed Daily Stats Breached SLA.
+- Fixed Daily Stats Near SLA.
+- Fixed Search forms typos.
+
+## [v5.0.7] - 2020-12-22
+### Changed
+- Daily Stats tweaks to exclude non human touched SRs for raised & reopened.
+### Fixed
+- Fixed Contract Schedule page formatting.
+- Fixed Open SRs mismatch between SD manager dashboard and OpenCallEmail.
+- Fixed Critical SR in SD Manager Dashboard showing empty always. 
+
+## [v5.0.6] - 2020-12-18
+### Fixed
+- Fixed Daily Stats "Fixed Today" value
+- Fixed issues with SLA values wrongly assigned while there was a priority change issue
+- Fixed issue with filtering by queue in Held For QA
+
+## [v5.0.5] - 2020-12-18
+### Changed
+- Redirect the user to Current Activity Report after deleting the last activity (deleting the whole SR)
+- Change various mails sent to customer regarding actions in CNC to ignore the flags per contact and force them to 
+  always send.
+- Show Fixed Date in On Held For QA of SD Manager Dashboard only when the SR is Fixed.
+### Fixed
+- Fix issue with Standard Text creation.
+- Fix issue preventing the "Activity Hidden from customer".
+### Removed
+- Remove "Magic Line" in editor
+
+## [v5.0.4] - 2020-12-17
+### Fixed
+- Fixed issues with editor fields
+
+## [v5.0.3] - 2020-12-17
+### Fixed
+- Fixed issue with gather fixed information when clicking the "Fixed" button while editing an activity.
+
+## [v5.0.2] - 2020-12-14
+### Fixed
+- Activity flagged as overtime not showing in dashboard.
+- Spellchecker stops working when enabled on email subject summary textbox.
+- Updated contact details when changing the service request contact
+- Fix SR URL links for First Time Fix & Fixed Summary
+- Changed permissions for Queue Managers
+- Changed sort order of SRs in Current Request Page to reflect on screen values
+- Visit Confirmation Emails now use Customer Summary information
+- Allow typing in modal boxes
+### Added
+- Added a clearance cross to filter box on Current Request Page
+- Various dashboards have additional auto refresh functions
+- Email sending will skip when no email address is found to help with future fault finding
+- Priority 1 text has been changed to an icon
+
+## [v5.0.1] - 2020-12-14
+## Fixed
+- Fix issue with importing automated requests
+- Fix issue with additional time requests
+
+## [v5.0.0] - 2020-12-13
+### Added
+- Issue 1072 - Activity Breakdown within SR
+- Issue 1073 - IT Review Meeting Dates
+- Issue 1079 - Show Direct Debit items on the meeting agenda
+- Issue 1080 - Add items to a contract
+- Issue 977  - New Current Activity
+- Issue 1095 - Feature: Assign To Be Logged to existing request
+- Issue 1094 - SR Documents that customers can't see
+- Issue 1086 - Global Update of Subscription items for contracts
+- Issue 1118 - Include logging and sickness summary on user performance
+### Changed
+- Issue 1053 - New email templates
+- Issue 810  - Heavy SQL usage improvements
+- Issue 1074 - Migrate non tasks to tasks
+- Issue 1083 - Upgrade Spellchecker
+- Issue 1082 - Updated time picker
+- Issue 1061 - First Time Fix Report Enhancements
+- Issue 1092 - Daily SR Report Formatting
+- Issue 1103 - Fixed SR Email to include faces for survey feedback
+- Issue 1087 - M365 Mailbox show largest mailbox limit & exclude Leavers
+- Issue 1108 - User Time Log not always updating.
+### Fixed
+- Issue 1078 - Sales Request Dashboard Attachment Link error
+- Issue 1077 - Service Requests By Customer Report Broken
+- Issue 1020 - Deleting Sales Order lines doesn't update the total until the page is reloaded
+- Issue 1076 - Internal email formatting
+- Issue 1109 - Overtime / Expense denial reasons missing
+- Issue 1112 - Sales order updated by another user
+### Removed
+- Issue 1089 - Duplicate item on user page
+
+## [v4.12.0] - 2020-11-10
+### Added
+- Issue 906 - Sales Order Permissions for Non Sales People
+- Issue 1065 - Include Costs in Contract Renewals Page
+- Issue 1062 - Include email address in Microsoft 365 export
+### Changed
+- Issue 1025 - Option to not notify Sales on Sales Request Approvals
+- Issue 1063 - Review Meeting Enhancements - Leavers & Contract Numbers
+### Fixed
+- Issue 1068 - Unable to unhide an activity
+- Issue 1070 - ReviewList.php not loading any details
+
+## [v4.11.2] - 2020-11-09
+### Changed
+- Change SR created through Book Sales Visit to have raiseTypeId 7
+### Fixed
+- Fixed issue with creating new Stream One orders
+- Fixed issue with Contact Audit search
+- Fixed issue with Office 365 Licenses Includes ATP field not saving correctly
+
+## [v4.11.1] - 2020-11-06
+### Fixed
+- Fixed issue with time request dashboard spinner
+
+## [v4.11.0] - 2020-11-06
+### Added
+- Issue 1057 - Enhance Furlough Status Processing
+### Changed
+- Issue 1041 - Page Loading Spinner
+- Issue 1019 - StreamOne Alert if a CNCAPPS license existing but not in StreamOne
+### Fixed
+- Issue 1017 - Import Requests stuck when there's no main contact
+
+## [v4.10.2] - 2020-10-30
+### Fixed
+- Office365LicenseExport not sending alert emails for mailboxes over the limit
+- Create Customer folder shows twice in customer page
+
+## [v4.10.1] - 2020-10-29
+### Fixed
+- Fixed issue with Time Request Dashboard breaking when there's a time request activity without SR assigned, also added means of 
+informing about this odd issue.
+
+## [v4.10.0] - 2020-10-26
+### Added
+- Include non exported expenses in expensesBreakdownYearToDate
+- Add disclaimer showing non exported expenses added to expensesBreakdownYearToDate
+- Add number of units/users to RenContract.php report
+- Add became customer to SalesByCustomer management report
+- Add 10 minutes to helpdesk when creating SR from Sales Order
+- Issue 973 - SR Feedback API
+
+## [v4.9.2] - 2020-10-23
+### Change
+- Change the maximum size of the position field in the customer page
+### Fixed
+- Time Request email issues
+- Remove limits on Time Request, Change Request and Sales Request dashboards
+- Change the query to make sure we get all the open activities in OpenCallEmail
+
+## [v4.9.1] - 2020-10-22
+### Fixed
+- Pending Time Requests Email not showing the data
+- Failed creation of leaver questions
+
+## [v4.9.0] - 2020-10-20
+### Added
+- Issue 1016 - Automated Request Monitor
+- Issue 1042 - Include Sales Order number in SR Creation
+### Changed
+- Issue 1014 - Allow sorting data by columns in the Various Dashboards
+- Issue 1023 - Notify on duplicate MS ATP licenses assigned to a user
+- Issue 1008 - Include 'None' contacts in reports
+
+## [v4.8.0] - 2020-10-14
+### Added
+- Issue 1035 - Customer Call Out Process Improvements
+- Issue 1037 - SD Dashboard to include SRs about to breach Fix SLA
+### Changed
+- Issue 1018 - Sales requests with attachments to include attachment notification
+### Fixed
+- Quote PDF Signature Placement
+
+## [v4.7.2] - 2020-10-09
+### Fixed
+- Fixed issue with not allowing decimal places in expense values
+
+## [v4.7.1] - 2020-10-08
+### Fixed
+- Fixed issue with sales orders
+
+## [v4.7.0] - 2020-10-08
+### Added
+- Issue 1012 - Automatic Webroot Deactivation
+- Issue 1031 - Add total Balance onto ContractReport
+### Changed
+- Issue 1010 - Team & User Statistics visual improvements.
+- Issue 1027 - Expenses & Overtime Reporting.
+### Fixed
+- Issue 1013 - Questionnaire export to CSV incorrect data & formatting improvements
+- Issue 1026 - OS Support Dates not sorting on Is Server
+- Issue 1022 - SSL Renewals Installation Charge Sales Order Location
+
+## [v4.6.1] - 2020-10-06
+### Added
+- Add SQL Function for Contract difference Calculation
+
+## [v4.6.0] - 2020-09-17
+### Added
+- Issue 976 - ServiceDesk Team Individual Stats
+- Issue 967 - Record half day holidays to assign logged hours
+### Fixed
+- Issue 969 - Login page needs two attempts to login initially
+- Issue 1009 - Asset list drive space incorrect in some cases
+
 ## [v4.5.6] - 2020-09-14
 ### Fixed
 - Fixed issue when creating SR from Sales Order not picking up all the selected lines
@@ -21,7 +253,6 @@ This project changes will be shown here.
 ## [v4.5.4] - 2020-09-02
 ### Added
 - Add the ability to add items to Credit Notes
-
 
 ## [v4.5.3] - 2020-09-01
 ### Fixed

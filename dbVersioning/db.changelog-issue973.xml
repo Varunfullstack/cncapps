@@ -1,0 +1,53 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue973-0">
+        <tagDatabase tag="issue973"/>
+    </changeSet>
+    <changeSet id="issue973-1" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="feedbackToken"/>
+            </not>
+        </preConditions>
+        <createTable tableName="feedbackToken">
+            <column name="id" type="int(11)" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PRIMARY"/>
+            </column>
+            <column name="token" type="varchar(25)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="serviceRequestId" type="int(11)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="issue973-2" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="customerFeedback"/>
+            </not>
+        </preConditions>
+        <createTable tableName="customerFeedback">
+            <column name="id" type="int(11)" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PRIMARY"/>
+            </column>
+            <column name="serviceRequestId" type="int(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="contactId" type="int(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value" type="int(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="comments" type="text">
+                <constraints nullable="true"/>
+            </column>
+            <column name="createdAt" type="datetime" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

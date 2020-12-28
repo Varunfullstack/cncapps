@@ -8,8 +8,9 @@
 
 
 require_once("config.inc.php");
-require_once($cfg["path_ct"]."/CTTimeRequestDashboard.php");
-session_start();
+global $cfg;
+require_once($cfg["path_ct"] . "/CTTimeRequestDashboard.php");
+//session_start();
 page_open(
     array(
         'sess' => PHPLIB_CLASSNAME_SESSION,
@@ -18,9 +19,9 @@ page_open(
         ''
     )
 );
-GLOBAL $cfg;
+global $cfg;
 header("Cache-control: private");
-$ctContact= new CTTimeRequestDashboard(
+$ctContact = new CTTimeRequestDashboard(
     $_SERVER['REQUEST_METHOD'],
     $_POST,
     $_GET,

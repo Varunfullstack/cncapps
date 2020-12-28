@@ -1,5 +1,6 @@
 <?php
 require_once("config.inc.php");
+global $cfg;
 require_once($cfg["path_ct"] . "/CTSDManagerDashboard.php");
 session_start();
 page_open(
@@ -10,7 +11,7 @@ page_open(
         ''
     )
 );
-GLOBAL $cfg;
+global $cfg;
 header("Cache-control: private");
 $ctSecondsite = new CTSDManagerDashboard(
     $_SERVER['REQUEST_METHOD'],
@@ -21,3 +22,5 @@ $ctSecondsite = new CTSDManagerDashboard(
 );
 $ctSecondsite->execute();
 page_close();
+
+?>

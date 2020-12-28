@@ -1,1 +1,1 @@
-pushd htdocs\components\customerEditMain && npm install && npm run build && popd
+pushd htdocs\components\ && npm install  && npm run build && popd

@@ -5,10 +5,30 @@
 <script src=".javascript/DirectDebitLogic.js"
 >
 </script>
+<script>
+    function addItem() {
+        const itemId = prompt('ID of the item to add');
+        if (!itemId) {
+            return;
+        }
+        fetch('?action=addItemToContract&contractCustomerItemId={customerItemID}&itemToAddId=' + itemId)
+            .then(res => res.json())
+            .then(res => {
+                if (res.status !== 'ok') {
+                    throw new Error(res.message);
+                }
+                document.location.reload();
+            })
+            .catch(error => {
+                alert(error);
+            })
+    }
+</script>
 <style>
     .fieldText input[type=number] {
         width: 95px;
     }
+
 </style>
 <script language='JavaScript'>
     const clientCheckDirectDebit = {clientCheckDirectDebit};
@@ -500,6 +520,9 @@
     </table>
 </form>
 <H3>Covered Items</H3>
+<button onclick="addItem()">
+    Add Item
+</button>
 <table class="singleBorder">
     <!-- BEGIN coveredItemsBlock -->
     <tr class="singleBorder">

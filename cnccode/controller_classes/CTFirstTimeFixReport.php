@@ -5,6 +5,7 @@
  * Date: 07/08/2018
  * Time: 9:42
  */
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUUser.inc.php');
 
@@ -59,6 +60,7 @@ class CTFirstTimeFixReport extends CTCNC
                         $this->getParam('endDate')
                     );
                 }
+                //echo json_encode(["engineerID"=>$this->getParam('engineerID')]); exit;
                 echo json_encode(
                     $this->getFirstTimeFixData(
                         @$this->getParam('customerID'),
@@ -88,6 +90,7 @@ class CTFirstTimeFixReport extends CTCNC
     ' ',
     engineer.`lastName`
   ) AS name,
+  engineer.cns_consno as engineerId,
   SUM(
     COALESCE(
       (SELECT 
@@ -150,21 +153,27 @@ FROM
     AND initial.caa_callacttypeno = 51 
   JOIN consultant engineer 
     ON initial.`caa_consno` = engineer.`cns_consno` 
+   JOIN
+    (SELECT
+      COUNT(item.`itm_itemno`) AS items,
+      custitem.`cui_custno`
+    FROM
+      custitem
+      JOIN item
+        ON cui_itemno = itm_itemno
+    WHERE itm_servercare_flag = 'Y'
+      AND (
+        itm_desc <> 'Pre-Pay Contract'
+        OR itm_desc <> 'T & M'
+      )
+      AND cui_expiry_date >= NOW()
+      AND renewalStatus <> 'D'
+      AND declinedFlag <> 'Y'
+    GROUP BY cui_custno) a
+    ON a.cui_custno = problem.`pro_custno`
+    AND items
 WHERE problem.`pro_custno` <> 282 
-  AND problem.raiseTypeId=3
-  AND 
-  (SELECT 
-    COUNT(item.`itm_itemno`) 
-  FROM
-    custitem 
-    JOIN item 
-      ON cui_itemno = itm_itemno 
-  WHERE custitem.`cui_custno` = pro_custno 
-    AND itm_servercare_flag = 'Y' 
-    AND (itm_desc <> 'Pre-Pay Contract' OR  itm_desc <> 'T & M')
-    AND cui_expiry_date >= NOW() 
-    AND renewalStatus <> 'D' 
-    AND declinedFlag <> 'Y') > 0 
+  AND problem.raiseTypeId = 3
   AND engineer.`teamID` = 1 ";
 
 
@@ -201,6 +210,7 @@ ORDER BY engineer.firstName";
 
         while ($row = $result->fetch_assoc()) {
             $data["engineers"][] = [
+                'id'                    => $row['engineerId'],
                 'name'                  => $row['name'],
                 'firstTimeFix'          => $row['firstTimeFix'],
                 'attemptedFirstTimeFix' => $row['attemptedFirstTimeFix'],
@@ -208,18 +218,20 @@ ORDER BY engineer.firstName";
             ];
 
 
-            $totalRaised += $row['totalRaised'];
-            $totalAttempted += $row['attemptedFirstTimeFix'];
-            $totalAchieved += $row['firstTimeFix'];
+            $data['totalRaised'] += $row['totalRaised'];
+            $data['totalAttempted'] += $row['attemptedFirstTimeFix'];
+            $data['totalAchieved'] += $row['firstTimeFix'];
         }
 
-        $data['firstTimeFixAttemptedPct'] = $totalRaised > 0 ? round(
-            ($totalAttempted / $totalRaised) * 100
+        $data['firstTimeFixAttemptedPct'] = $data['totalRaised'] > 0 ? round(
+            ($data['totalAttempted'] / $data['totalRaised']) * 100
         ) : 'N/A';
-        $data['firstTimeFixAchievedPct'] = $totalRaised > 0 ? round(
-            ($totalAchieved / $totalRaised) * 100
+        $data['firstTimeFixAchievedPct'] = $data['totalRaised'] > 0 ? round(
+            ($data['totalAchieved'] / $data['totalRaised']) * 100
         ) : 'N/A';
-        $data['phonedThroughRequests'] = $totalRaised;
+        $data['phonedThroughRequests'] = $data['totalRaised'];
+
+
         return $data;
     }
 
@@ -235,6 +247,8 @@ ORDER BY engineer.firstName";
             )
         );
 
+//        $this->loadReactScript('SpinnerHolderComponent.js');
+//        $this->loadReactCSS('SpinnerHolderComponent.css');
 
         $hdUsers = (new BUUser($this))->getUsersByTeamLevel(1);
 
@@ -243,6 +257,8 @@ ORDER BY engineer.firstName";
             'userBlock',
             'hdUsers'
         );
+        $this->loadReactScript('FirstTimeFixReportComponent.js');
+        $this->loadReactCSS('FirstTimeFixReportComponent.css');
 
         foreach ($hdUsers as $user) {
 
@@ -289,7 +305,8 @@ ORDER BY engineer.firstName";
             'FirstTimeFixReport',
             true
         );
-
+       
         $this->parsePage();
+       
     }
 }

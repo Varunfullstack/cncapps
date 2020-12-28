@@ -1,0 +1,17 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdevMt" id="issue1053-0">
+        <tagDatabase tag="issue1053"/>
+    </changeSet>
+    <changeSet id="issue1053-1" author="pavwebdev">
+        <sql>
+            update quotation
+            set documentType = "quote"
+            where documentType = "quotation";
+        </sql>
+        <rollback/>
+    </changeSet>
+
+</databaseChangeLog>

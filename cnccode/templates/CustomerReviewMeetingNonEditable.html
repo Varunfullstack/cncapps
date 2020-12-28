@@ -1,4 +1,5 @@
 <script type="text/javascript"
+<script type="text/javascript"
         src="https://www.gstatic.com/charts/loader.js"
 ></script>
 <script type="text/javascript">
@@ -129,13 +130,15 @@
         <thead>
         <tr>
             <th colspan="2">&nbsp;</th>
+            <th>
+                Quantity
+            </th>
+            <th>Direct Debit</th>
             <th>Annual Fee(&pound;)</th>
         </tr>
 
         </thead>
         <tbody>
-
-
         <!-- BEGIN itemBlock -->
         {itemTypeHeader}
         <tr class="{itemClass}">
@@ -143,7 +146,12 @@
                 {description}
             </td>
             <td class="content">{notes}{coveredItemsString}</td>
-            <td class="contentRightAlign" align="right">{salePrice}</td>
+            <td class="content">{quantity}</td>
+            <td class="content">{directDebit}</td>
+            <td class="contentRightAlign"
+                align="right"
+            >{salePrice}
+            </td>
         </tr>
         <!-- END itemBlock -->
         </tbody>
@@ -249,8 +257,11 @@
         <!-- END userBlock -->
         </tbody>
     </table>
+    <p>
+        * Indicates no longer at the company.
+    </p>
 </div>
 
-<div class="reportSection diskSpaceReportSection" >
+<div class="reportSection diskSpaceReportSection">
     {diskSpaceSection}
 </div>

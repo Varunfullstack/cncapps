@@ -185,7 +185,7 @@ class TTFParser
 						$offset += 2*2 + $skip;
 					}
 					while($flags & 32); // MORE_COMPONENTS
-					$glyph['components'] = $a;
+					$glyph['subComponents'] = $a;
 				}
 			}
 		}
@@ -381,9 +381,9 @@ class TTFParser
 		{
 			$this->glyphs[$id]['ssid'] = count($this->subsettedGlyphs);
 			$this->subsettedGlyphs[] = $id;
-			if(isset($this->glyphs[$id]['components']))
+			if(isset($this->glyphs[$id]['subComponents']))
 			{
-				foreach($this->glyphs[$id]['components'] as $cid)
+				foreach($this->glyphs[$id]['subComponents'] as $cid)
 					$this->AddGlyph($cid);
 			}
 		}
@@ -533,10 +533,10 @@ class TTFParser
 			$glyph = $this->glyphs[$id];
 			fseek($this->f, $tableOffset+$glyph['offset'], SEEK_SET);
 			$glyph_data = $this->Read($glyph['length']);
-			if(isset($glyph['components']))
+			if(isset($glyph['subComponents']))
 			{
 				// Composite glyph
-				foreach($glyph['components'] as $offset=>$cid)
+				foreach($glyph['subComponents'] as $offset=>$cid)
 				{
 					$ssid = $this->glyphs[$cid]['ssid'];
 					$glyph_data = substr_replace($glyph_data, pack('n',$ssid), $offset, 2);

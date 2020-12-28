@@ -55,15 +55,16 @@ define(
 
 class CTItem extends CTCNC
 {
-    public const ADD_CHILD_ITEM = "ADD_CHILD_ITEM";
-    public const REMOVE_CHILD_ITEM = "REMOVE_CHILD_ITEM";
-    const GET_CHILD_ITEMS = "GET_CHILD_ITEMS";
-    const GET_PARENT_ITEMS = "GET_PARENT_ITEMS";
-    const SEARCH_ITEMS = "SEARCH_ITEMS";
-    const CHECK_ITEM_RECURRING = "CHECK_ITEM_RECURRING";
-    const DATA_TABLE_GET_DATA = "DATA_TABLE_GET_DATA";
-    const SEARCH_ITEMS_JSON = "SEARCH_ITEMS_JSON";
-    const GET_ITEM = 'GET_ITEM';
+    public const ADD_CHILD_ITEM         = "ADD_CHILD_ITEM";
+    public const REMOVE_CHILD_ITEM      = "REMOVE_CHILD_ITEM";
+    const        GET_CHILD_ITEMS        = "GET_CHILD_ITEMS";
+    const        GET_PARENT_ITEMS       = "GET_PARENT_ITEMS";
+    const        SEARCH_ITEMS           = "SEARCH_ITEMS";
+    const        CHECK_ITEM_RECURRING   = "CHECK_ITEM_RECURRING";
+    const        DATA_TABLE_GET_DATA    = "DATA_TABLE_GET_DATA";
+    const        SEARCH_ITEMS_JSON      = "SEARCH_ITEMS_JSON";
+    const        GET_ITEM               = 'GET_ITEM';
+    const        UPDATE_CONTRACTS_PRICE = 'updateContractsPrice';
     /** @var DSForm */
     public $dsItem;
     /**
@@ -128,7 +129,6 @@ class CTItem extends CTCNC
                 if (!key_exists('childItemId', $data) || !isset($data['childItemId'])) {
                     throw new JsonHttpException(400, 'child item id is mandatory');
                 }
-
                 $this->addChildItem($data['itemId'], $data['childItemId']);
                 $dbeItem = new DBEItem($this);
                 $dbeItem->getRow($data['childItemId']);
@@ -145,6 +145,83 @@ class CTItem extends CTCNC
                 $this->removeChildItem($data['itemId'], $data['childItemId']);
                 echo json_encode(["status" => "ok"]);
                 break;
+            case self::UPDATE_CONTRACTS_PRICE:
+                $data = $this->getJSONData();
+                $type = @$data['type'];
+                if (!$type) {
+                    throw new JsonHttpException(1, 'type is required');
+                }
+                $value  = @$data['value'];
+                $itemId = @$data['itemId'];
+                if (!$itemId) {
+                    throw new JsonHttpException(1, 'itemId is required');
+                }
+                global $db;
+                $costQuery = "UPDATE
+  custitem
+  LEFT JOIN customer
+    ON custitem.`cui_custno` = customer.`cus_custno` SET custitem.`costPricePerMonth` = ?, custitem.`cui_cost_price` = ? * custitem.`cui_users` * 12
+WHERE custitem.`cui_itemno` = ?
+  AND renewalStatus <> 'D'
+  AND declinedFlag <> 'Y'
+  AND customer.`cus_referred` <> 'Y'";
+                $saleQuery = "UPDATE
+  custitem
+  LEFT JOIN customer
+    ON custitem.`cui_custno` = customer.`cus_custno` SET custitem.`salePricePerMonth` = ?, custitem.`cui_sale_price` = ? * custitem.`cui_users` * 12
+WHERE custitem.`cui_itemno` = ?
+  AND renewalStatus <> 'D'
+  AND declinedFlag <> 'Y'
+  AND customer.`cus_referred` <> 'Y'";
+                $query     = $costQuery;
+                $item      = new DBEItem($this);
+                $item->getRow($itemId);
+                $column = DBEItem::curUnitCost;
+                if ($type == 'sale') {
+                    $query  = $saleQuery;
+                    $column = DBEItem::curUnitSale;
+                }
+                $oldPrice = $item->getValue($column);
+                $item->setValue($column, $value);
+                $item->updateRow();
+                $result = $db->preparedQuery(
+                    $query,
+                    [
+                        [
+                            "type"  => "d",
+                            "value" => $value
+                        ],
+                        [
+                            "type"  => "d",
+                            "value" => $value
+                        ],
+                        [
+                            "type"  => "i",
+                            "value" => $itemId
+                        ]
+                    ]
+                );
+                $buMail = new BUMail($this);
+                global $twig;
+                $body      = $twig->render(
+                    '@internal/ContractPricingChangedEmail.html.twig',
+                    [
+                        "oldPrice"        => $oldPrice,
+                        "newPrice"        => $value,
+                        "type"            => $type,
+                        "itemDescription" => $item->getValue(DBEItem::description),
+                        "engineerName"    => $this->dbeUser->getValue(DBEUser::name)
+                    ]
+                );
+                $subject   = "Global Price Update Performed";
+                $recipient = "sales@" . CONFIG_PUBLIC_DOMAIN;
+                $buMail->sendSimpleEmail(
+                    $body,
+                    $subject,
+                    $recipient,
+                );
+                echo json_encode(["status" => "ok"]);
+                exit;
             case self::GET_CHILD_ITEMS:
                 if (!$this->getParam('itemId')) {
                     throw new JsonHttpException(400, 'Item Id is mandatory');
@@ -156,7 +233,6 @@ class CTItem extends CTCNC
                     $rows[] = $dbeItem->getRowAsAssocArray();
                 }
                 echo json_encode(["status" => "ok", "data" => $rows]);
-
                 break;
             case self::GET_PARENT_ITEMS:
                 if (!$this->getParam('itemId')) {
@@ -169,7 +245,6 @@ class CTItem extends CTCNC
                     $rows[] = $dbeItem->getRowAsAssocArray();
                 }
                 echo json_encode(["status" => "ok", "data" => $rows]);
-
                 break;
             case self::GET_ITEM:
                 if (!$this->getParam('itemId')) {
@@ -187,10 +262,9 @@ class CTItem extends CTCNC
                 );
                 break;
             case self::SEARCH_ITEMS_JSON:
-                $data = self::getJSONData();
-                $term = '';
+                $data  = self::getJSONData();
+                $term  = '';
                 $limit = null;
-
                 if (!empty($data['term'])) {
                     $term = $data['term'];
                 }
@@ -199,7 +273,6 @@ class CTItem extends CTCNC
                 }
                 $this->setParam('term', $term);
                 $this->setParam('limit', $limit);
-
             case self::SEARCH_ITEMS:
                 $dbeItem = new DBEItem($this);
                 $dbeItem->getRowsByDescriptionOrPartNoSearch($this->getParam('term'), null, $this->getParam('limit'));
@@ -211,18 +284,16 @@ class CTItem extends CTCNC
                 break;
             case self::DATA_TABLE_GET_DATA:
             case 'getData':
-
-                $dbeItem = new DBEItem($this);
-                $dbeItemType = new DBEItemType($this);
-                $dbeManufacturer = new DBEManufacturer($this);
-                $draw = $_REQUEST['draw'];
-                $columns = $_REQUEST['columns'];
-                $search = $_REQUEST['search'];
-                $order = $_REQUEST['order'];
-                $offset = $_REQUEST['start'];
-                $limit = $_REQUEST['length'];
-
-                $columnsNames = [
+                $dbeItem           = new DBEItem($this);
+                $dbeItemType       = new DBEItemType($this);
+                $dbeManufacturer   = new DBEManufacturer($this);
+                $draw              = $_REQUEST['draw'];
+                $columns           = $_REQUEST['columns'];
+                $search            = $_REQUEST['search'];
+                $order             = $_REQUEST['order'];
+                $offset            = $_REQUEST['start'];
+                $limit             = $_REQUEST['length'];
+                $columnsNames      = [
                     "description",
                     "costPrice",
                     "salePrice",
@@ -244,8 +315,7 @@ class CTItem extends CTCNC
                     "discontinued"  => 'item.itm_discontinued',
                     "renewalTypeId" => 'renewalTypeID'
                 ];
-
-                $columnsTypes = [
+                $columnsTypes      = [
                     "description"   => 'like',
                     "costPrice"     => 'like',
                     "salePrice"     => 'like',
@@ -256,15 +326,13 @@ class CTItem extends CTCNC
                     "manufacturer"  => 'like',
                     "discontinued"  => 'explicitString'
                 ];
-
-                /** @var dbSweetcode $db */
-                global $db;
-                $countQuery = "select count(*) FROM {$dbeItem->getTableName()}
+                /** @var dbSweetcode $db */ global $db;
+                $countQuery       = "select count(*) FROM {$dbeItem->getTableName()}
          left join {$dbeItemType->getTableName()} on {$dbeItem->getDBColumnName(DBEItem::itemTypeID)} = {$dbeItemType->getDBColumnName(DBEItemType::itemTypeID)}
          left join {$dbeManufacturer->getTableName()} on {$dbeItem->getDBColumnName(DBEItem::manufacturerID)} = {$dbeManufacturer->getDBColumnName(DBEManufacturer::manufacturerID)}";
                 $totalCountResult = $db->query($countQuery);
-                $totalCount = $totalCountResult->fetch_row()[0];
-                $defaultQuery = "select 
+                $totalCount       = $totalCountResult->fetch_row()[0];
+                $defaultQuery     = "select 
                     {$dbeItem->getDBColumnName(DBEItem::itemID)} as 'id',
                     {$dbeItem->getDBColumnName(DBEItem::description)} as 'description',
                     {$dbeItem->getDBColumnName(DBEItem::curUnitCost)} as 'costPrice',
@@ -284,32 +352,31 @@ class CTItem extends CTCNC
                 FROM {$dbeItem->getTableName()}
          left join {$dbeItemType->getTableName()} on {$dbeItem->getDBColumnName(DBEItem::itemTypeID)} = {$dbeItemType->getDBColumnName(DBEItemType::itemTypeID)}
          left join {$dbeManufacturer->getTableName()} on {$dbeItem->getDBColumnName(DBEItem::manufacturerID)} = {$dbeManufacturer->getDBColumnName(DBEManufacturer::manufacturerID)} where 1 ";
-                $columnSearch = [];
-                $parameters = [];
+                $columnSearch     = [];
+                $parameters       = [];
                 foreach ($columns as $column) {
                     if (!isset($columnsDefinition[$column['data']])) {
                         continue;
                     }
-
                     if ($column['search']['value']) {
                         switch ($columnsTypes[$column['data']]) {
                             case 'explicitInt':
                                 $columnSearch[] = $columnsDefinition[$column['data']] . " = ?";
-                                $parameters[] = [
+                                $parameters[]   = [
                                     "type"  => "i",
                                     "value" => $column['search']['value']
                                 ];
                                 break;
                             case 'explicitString':
                                 $columnSearch[] = $columnsDefinition[$column['data']] . " = ?";
-                                $parameters[] = [
+                                $parameters[]   = [
                                     "type"  => "s",
                                     "value" => $column['search']['value']
                                 ];
                                 break;
                             case 'like':
                                 $columnSearch[] = $columnsDefinition[$column['data']] . " like ?";
-                                $parameters[] = [
+                                $parameters[]   = [
                                     "type"  => "s",
                                     "value" => "%" . $column['search']['value'] . "%"
                                 ];
@@ -317,11 +384,10 @@ class CTItem extends CTCNC
                         }
                     }
                 }
-
                 if (count($columnSearch)) {
-                    $wherePart = " and " . implode(" and ", $columnSearch);
+                    $wherePart    = " and " . implode(" and ", $columnSearch);
                     $defaultQuery .= $wherePart;
-                    $countQuery .= $wherePart;
+                    $countQuery   .= $wherePart;
                 }
                 $orderBy = [];
                 if (count($order)) {
@@ -338,21 +404,19 @@ class CTItem extends CTCNC
                         $defaultQuery .= (" order by " . implode(' , ', $orderBy));
                     }
                 }
-                $countResult = $db->preparedQuery(
+                $countResult   = $db->preparedQuery(
                     $countQuery,
                     $parameters
                 );
                 $filteredCount = $countResult->fetch_row()[0];
-
-                $defaultQuery .= " limit ?,?";
-                $parameters[] = ["type" => "i", "value" => $offset];
-                $parameters[] = ["type" => "i", "value" => $limit];
-                $result = $db->preparedQuery(
+                $defaultQuery  .= " limit ?,?";
+                $parameters[]  = ["type" => "i", "value" => $offset];
+                $parameters[]  = ["type" => "i", "value" => $limit];
+                $result        = $db->preparedQuery(
                     $defaultQuery,
                     $parameters
                 );
-                $data = $result->fetch_all(MYSQLI_ASSOC);
-
+                $data          = $result->fetch_all(MYSQLI_ASSOC);
                 echo json_encode(
                     [
                         "draw"            => +$draw,
@@ -361,7 +425,6 @@ class CTItem extends CTCNC
                         "data"            => $data
                     ]
                 );
-
                 break;
             case self::CHECK_ITEM_RECURRING:
             {
@@ -371,7 +434,7 @@ class CTItem extends CTCNC
                 }
                 $dbeItem = new DBEItem($this);
                 $dbeItem->getRow($data['itemId']);
-                $itemTypeId = $dbeItem->getValue(DBEItem::itemTypeID);
+                $itemTypeId  = $dbeItem->getValue(DBEItem::itemTypeID);
                 $dbeItemType = new DBEItemType($this);
                 $dbeItemType->getRow($itemTypeId);
                 echo json_encode(["status" => "ok", "data" => $dbeItemType->getValue(DBEItemType::reoccurring)]);
@@ -423,39 +486,40 @@ class CTItem extends CTCNC
         } else {
             $urlSubmit = $this->itemFormPrepareEdit();
         }
-
-        $urlManufacturerPopup =
-            Controller::buildLink(
-                'Manufacturer.php',
-                array(
-                    'action'  => 'displayPopup',
-                    'htmlFmt' => CT_HTML_FMT_POPUP
-                )
-            );
-
-        $urlManufacturerEdit =
-            Controller::buildLink(
-                'Manufacturer.php',
-                array(
-                    'action'  => 'editManufacturer',
-                    'htmlFmt' => CT_HTML_FMT_POPUP
-                )
-            );
-
-        $manufacturerName = null;
+        $urlManufacturerPopup = Controller::buildLink(
+            'Manufacturer.php',
+            array(
+                'action'  => 'displayPopup',
+                'htmlFmt' => CT_HTML_FMT_POPUP
+            )
+        );
+        $urlManufacturerEdit  = Controller::buildLink(
+            'Manufacturer.php',
+            array(
+                'action'  => 'editManufacturer',
+                'htmlFmt' => CT_HTML_FMT_POPUP
+            )
+        );
+        $manufacturerName     = null;
         if ($this->dsItem->getValue(DBEItem::manufacturerID)) {
             $dbeManufacturer = new DBEManufacturer($this);
             $dbeManufacturer->getRow($this->dsItem->getValue(DBEItem::manufacturerID));
             $manufacturerName = $dbeManufacturer->getValue(DBEManufacturer::name);
         }
-
-        // template
         $this->setTemplateFiles(
             'ItemEdit',
             'ItemEdit.inc'
         );
+        $allowGlobalPricingUpdate = false;
+        $itemTypeId               = $this->dsItem->getValue(DBEItem::itemTypeID);
+        if ($itemTypeId) {
+            $itemType = new DBEItemType($this);
+            $itemType->getRow($itemTypeId);
+            $allowGlobalPricingUpdate = $itemType->getValue(DBEItemType::allowGlobalPriceUpdate);
+        }
         $this->template->set_var(
             array(
+                'allowGlobalPricingUpdate'       => $allowGlobalPricingUpdate ? 'true' : 'false',
                 'itemID'                         => $this->dsItem->getValue(DBEItem::itemID),
                 'description'                    => Controller::htmlInputText(
                     $this->dsItem->getValue(DBEItem::description)
@@ -505,15 +569,14 @@ class CTItem extends CTCNC
                 ),
                 'allowSRLog'                     => $this->dsItem->getValue(DBEItem::allowSRLog) ? "checked" : null,
                 'isStreamOne'                    => $this->dsItem->getValue(DBEItem::isStreamOne) ? "checked" : null,
-                'javaScript'                     => '<script src="js/react.development.js" crossorigin></script>
-                    <script src="js/react-dom.development.js" crossorigin></script>
-                    <script type="module" src=\'components/ChildItemComponent/ChildAndParentItems.js\'></script>'
             )
         );
         $this->parseItemTypeSelector($this->dsItem->getValue(DBEItem::itemTypeID));
         $this->parseRenewalTypeSelector($this->dsItem->getValue(DBEItem::renewalTypeID));
         $this->parseWarrantySelector($this->dsItem->getValue(DBEItem::warrantyID));
         $this->parseItemBillingCategorySelector($this->dsItem->getValue(DBEItem::itemBillingCategoryID));
+        $this->loadReactScript('ChildAndParentItems.js');
+        $this->loadReactCSS('ChildAndParentItems.css');
         $this->template->parse(
             'CONTENTS',
             'ItemEdit',
@@ -541,15 +604,13 @@ class CTItem extends CTCNC
                 $renewalTypeID
             );
         }
-        return (
-        Controller::buildLink(
+        return (Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action'  => CTITEM_ACT_ITEM_INSERT,
                 'htmlFmt' => CT_HTML_FMT_POPUP
             )
-        )
-        );
+        ));
     }
 
     /**
@@ -574,16 +635,13 @@ class CTItem extends CTCNC
                 $this->displayFatalError(CTITEM_MSG_ITEM_NOT_FND);
             }
         }
-
         $params = [
             'action' => CTITEM_ACT_ITEM_UPDATE,
         ];
-
         if ($this->getParam('htmlFmt')) {
             $params['htmlFmt'] = CT_HTML_FMT_POPUP;
         }
-        return (
-        Controller::buildLink(
+        return (Controller::buildLink(
             $_SERVER['PHP_SELF'],
             $params
         ));
@@ -628,9 +686,7 @@ class CTItem extends CTCNC
             'renewalTypeBlock',
             'renewals'
         );
-
         $allowedDirectDebitRenewals = [1, 2, 5];
-
         while ($dbeRenewalType->fetchNext()) {
             $this->template->set_var(
                 array(
@@ -720,7 +776,6 @@ class CTItem extends CTCNC
             $this->displayFatalError(CTITEM_MSG_ITEM_ARRAY_NOT_PASSED);
             return;
         }
-
         //$this->buItem->initialiseNewItem($this->dsItem);
         if (!$this->dsItem->populateFromArray($this->getParam('item'))) {
             $this->setFormErrorOn();
@@ -734,8 +789,7 @@ class CTItem extends CTCNC
             exit;
         }
         $this->buItem->updateItem($this->dsItem);
-        $itemID = $this->dsItem->getPKValue();
-
+        $itemID  = $this->dsItem->getPKValue();
         $urlNext = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
@@ -743,7 +797,6 @@ class CTItem extends CTCNC
                 'itemID' => $itemID,
             )
         );
-
         if ($this->getParam('htmlFmt')) {
             // this forces update of itemID back through Javascript to parent HTML window
             $urlNext = Controller::buildLink(
@@ -755,7 +808,6 @@ class CTItem extends CTCNC
                 )
             );
         }
-
         header('Location: ' . $urlNext);
     }
 
@@ -775,7 +827,6 @@ class CTItem extends CTCNC
     function addChildItem($parentItemId, $childItemId)
     {
         global $db;
-
         $query = "insert ignore into childItem values(?,?) ";
         $db->preparedQuery(
             $query,
@@ -795,7 +846,6 @@ class CTItem extends CTCNC
     function removeChildItem($parentItemId, $childItemId)
     {
         global $db;
-
         $query = "delete from childItem where parentItemId = ? and childItemId = ?";
         $db->preparedQuery(
             $query,
@@ -820,13 +870,11 @@ class CTItem extends CTCNC
     function displayItemSelectPopup()
     {
         common_decodeQueryArray($_REQUEST);
-
         if ($this->getParam('renewalTypeID')) {
             $renewalTypeID = $this->getParam('renewalTypeID');
         } else {
             $renewalTypeID = false;
         }
-
         $this->setMethodName('displayItemSelectPopup');
         // this may be required in a number of situations
         $urlCreate = Controller::buildLink(
@@ -837,7 +885,6 @@ class CTItem extends CTCNC
                 'htmlFmt'       => CT_HTML_FMT_POPUP
             )
         );
-
         // A single slash means create new item
         if ($this->getParam('itemDescription'){0} == '/') {
             header('Location: ' . $urlCreate);
@@ -849,7 +896,6 @@ class CTItem extends CTCNC
             $dsItem,
             $renewalTypeID
         );
-
         $this->template->set_var(
             array(
                 'parentIDField'               => @$_SESSION['itemParentIDField'],
@@ -908,25 +954,20 @@ class CTItem extends CTCNC
                     'ItemSelectPopup.inc'
                 );
             }
-
-            $returnTo = $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'];
-
-            $urlDiscontinue =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'   => 'discontinue',
-                        'returnTo' => $returnTo
-                    )
-                );
-
+            $returnTo       = $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'];
+            $urlDiscontinue = Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'   => 'discontinue',
+                    'returnTo' => $returnTo
+                )
+            );
             $this->template->set_var(
                 array(
                     'urlItemCreate'  => $urlCreate,
                     'urlDiscontinue' => $urlDiscontinue
                 )
             );
-
             // Parameters
             $this->setPageTitle('Item Selection');
             $dbeItemBillingCategory = new DBEItemBillingCategory($this);
@@ -1002,15 +1043,7 @@ class CTItem extends CTCNC
             'ItemList',
             'ItemList'
         );
-
-        $this->template->setVar(
-            [
-                'javaScript' => '<script src="js/react.development.js" crossorigin></script>
-                    <script src="js/react-dom.development.js" crossorigin></script>
-                    <script type="module" src=\'components/utils/TypeAheadSearch.js\'></script>'
-            ]
-        );
-
+        $this->loadReactScript('ItemListTypeAheadRenderer.js');
         $this->template->parse('CONTENTS', 'ItemList');
         $this->parsePage();
     }

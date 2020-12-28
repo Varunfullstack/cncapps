@@ -39,7 +39,6 @@ class DBECallActivitySearch extends DBEntity
     const contractCustomerItemID = "contractCustomerItemID";
     const contractDescription = "contractDescription";
     const underContractFlag = "underContractFlag";
-    const allowSCRFlag = "allowSCRFlag";
     const slaResponseHours = "slaResponseHours";
     const respondedHours = "respondedHours";
     const workingHours = "workingHours";
@@ -243,11 +242,6 @@ class DBECallActivitySearch extends DBEntity
             DA_YN,
             DA_ALLOW_NULL,
             "caa_under_contract"
-        );
-        $this->addColumn(
-            self::allowSCRFlag,
-            DA_YN,
-            DA_ALLOW_NULL
         );
         $this->addColumn(
             self::slaResponseHours,
@@ -521,6 +515,7 @@ class DBECallActivitySearch extends DBEntity
                     " AND caa_status = 'C' AND " . $this->getDBColumnName(self::contractCustomerItemID) . " is null
             AND pro_status = 'F'
             AND pro_complete_date <= now()
+            AND holdForQA =0
             AND caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID;
                 break;
             /*
@@ -531,7 +526,7 @@ class DBECallActivitySearch extends DBEntity
                     " AND caa_status = 'C' AND " . $this->getDBColumnName(self::contractCustomerItemID) . " is not null 
             AND pro_status = 'F'
             AND pro_complete_date <= now()
-            
+            AND holdForQA =0
             AND " . $this->getDBColumnName(self::activityDurationHours) . " > 
             (
               SELECT
@@ -563,6 +558,8 @@ class DBECallActivitySearch extends DBEntity
             case 'FIXED_OR_COMPLETED':
                 $whereParameters .= " and pro_status in ('F','C') ";
                 break;
+            case "HOLD_FOR_QA":
+                $whereParameters .= " AND caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID." AND holdForQA =1 ";
         }
         // Contract Type:
 
@@ -609,7 +606,15 @@ class DBECallActivitySearch extends DBEntity
 
         if ($breachedSlaOption == 'B') {
             $whereParameters .=
-                " AND pro_responded_hours > pro_sla_response_hours";
+                " AND (
+    (
+      pro_status = 'I'
+      AND pro_sla_response_hours - pro_working_hours <= 0
+    )
+    OR (
+      `pro_responded_hours` > pro_sla_response_hours
+    )
+  )";
         } elseif ($breachedSlaOption == 'N') {
             $whereParameters .=
                 " AND pro_responded_hours <= pro_sla_response_hours";

@@ -1,0 +1,56 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue1099-0">
+        <tagDatabase tag="issue1099"/>
+    </changeSet>
+    <changeSet id="issue1099-1" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sqlCheck expectedResult="1">
+                    SELECT COUNT(*) FROM
+                    information_schema.columns
+                    WHERE table_name = "callacttype"
+                    AND table_schema = DATABASE()
+                    and column_name = "orderNum"
+                    and data_type = "int"
+                </sqlCheck>
+            </not>
+        </preConditions>
+        <modifyDataType tableName="callacttype" columnName="orderNum" newDataType="int(10)"/>
+        <sql>
+            <![CDATA[
+            update callacttype
+            set orderNum = case cat_callacttypeno
+                               when 8 then 1
+                               when 11 then 2
+                               when 18 then 3
+                               when 4 then 4
+                               when 7 then 5
+                               when 22 then 6
+                               when 6 then 7
+                               when 60 then 8
+                               when 59 then 9
+                               when 61 then 10
+                               when 43 then 11
+                               when 55 then 12
+                               when 51 then 13
+                               when 57 then 14
+                               when 35 then 15
+                               when 37 then 16
+                               when 39 then 17
+                               else 17 + `cat_callacttypeno` end;
+            UPDATE callacttype
+            SET orderNum = (SELECT COUNT(*)
+                            FROM (SELECT * FROM callacttype ORDER BY orderNum) t
+                            WHERE t.orderNum <= callacttype.`orderNum`)
+            WHERE orderNum > 17;
+            ]]>
+        </sql>
+        <rollback>
+            <modifyDataType columnName="orderNum" newDataType="float" tableName="callacttype"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

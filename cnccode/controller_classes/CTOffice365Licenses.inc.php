@@ -99,7 +99,12 @@ class CTOffice365Licenses extends CTCNC
                     json_decode($this->getParam('reportOnSpareLicenses'))
                 );
 
+                $dbeOffice365License->setValue(
+                    DBEOffice365License::includesDefender,
+                    json_decode($this->getParam('includesDefender'))
+                );
                 $dbeOffice365License->updateRow();
+
                 echo json_encode(["status" => "ok"]);
                 break;
             case 'create':
@@ -117,7 +122,11 @@ class CTOffice365Licenses extends CTCNC
                 $dbeOffice365License->setValue(DBEOffice365License::license, $this->getParam('license'));
                 $dbeOffice365License->setValue(
                     DBEOffice365License::reportOnSpareLicenses,
-                    !!$this->getParam('reportOnSpareLicenses')
+                    (bool)$this->getParam('reportOnSpareLicenses')
+                );
+                $dbeOffice365License->setValue(
+                    DBEOffice365License::includesDefender,
+                    (bool)$this->getParam('includesDefender')
                 );
                 $dbeOffice365License->insertRow();
 
@@ -129,7 +138,8 @@ class CTOffice365Licenses extends CTCNC
                         "mailboxLimit"          => $dbeOffice365License->getValue(DBEOffice365License::mailboxLimit),
                         "reportOnSpareLicenses" => $dbeOffice365License->getValue(
                             DBEOffice365License::reportOnSpareLicenses
-                        )
+                        ),
+                        "includesDefender"           => $dbeOffice365License->getValue(DBEOffice365License::includesDefender)
                     ],
                     JSON_NUMERIC_CHECK
                 );
@@ -148,7 +158,8 @@ class CTOffice365Licenses extends CTCNC
                         "mailboxLimit"          => $dbeOffice365Licenses->getValue(DBEOffice365License::mailboxLimit),
                         "reportOnSpareLicenses" => $dbeOffice365Licenses->getValue(
                             DBEOffice365License::reportOnSpareLicenses
-                        )
+                        ),
+                        "includesDefender"           => $dbeOffice365Licenses->getValue(DBEOffice365License::includesDefender)
                     ];
                 }
                 echo json_encode($data, JSON_NUMERIC_CHECK);

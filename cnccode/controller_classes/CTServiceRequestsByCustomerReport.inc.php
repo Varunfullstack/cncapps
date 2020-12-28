@@ -65,8 +65,6 @@ class CTServiceRequestsByCustomerReport extends CTCNC
 
     function email()
     {
-        var_dump('test');
-        exit;
         $this->setMethodName('email');
         $dsSearchForm = $this->initialiseSearchForm();
         $days = $this->getParam('days');
@@ -80,7 +78,7 @@ class CTServiceRequestsByCustomerReport extends CTCNC
         if ($results) {
             $buMail = new BUMail($this);
             $senderEmail = CONFIG_SUPPORT_EMAIL;
-            $toEmail = 'monthlysdreport@cnc-ltd.co.uk';
+            $toEmail = 'monthlysdreport@' . CONFIG_PUBLIC_DOMAIN;
 
             $this->template = new Template(
                 EMAIL_TEMPLATE_DIR,

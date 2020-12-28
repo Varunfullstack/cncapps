@@ -8,21 +8,22 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBESRScheduler extends DBEntity implements JsonSerializable
 {
-    const id = "id";
-    const customerId = "customerId";
-    const rruleString = "rruleString";
-    const contactId = "contactId";
-    const siteNo = "siteNo";
-    const priority = "priority";
-    const hideFromCustomer = "hideFromCustomer";
-    const teamId = "teamId";
-    const details = "details";
-    const internalNotes = "internalNotes";
-    const createdBy = 'createdBy';
-    const updatedBy = "updatedBy";
-    const createdAt = "createdAt";
-    const updatedAt = "updatedAt";
-    const linkedSalesOrderId = "linkedSalesOrderId";
+    const id                  = "id";
+    const customerId          = "customerId";
+    const rruleString         = "rruleString";
+    const contactId           = "contactId";
+    const siteNo              = "siteNo";
+    const priority            = "priority";
+    const hideFromCustomer    = "hideFromCustomer";
+    const teamId              = "teamId";
+    const details             = "details";
+    const internalNotes       = "internalNotes";
+    const createdBy           = 'createdBy';
+    const updatedBy           = "updatedBy";
+    const createdAt           = "createdAt";
+    const updatedAt           = "updatedAt";
+    const linkedSalesOrderId  = "linkedSalesOrderId";
+    const emailSubjectSummary = "emailSubjectSummary";
 
     /**
      * calls constructor()
@@ -87,7 +88,6 @@ class DBESRScheduler extends DBEntity implements JsonSerializable
             DA_TEXT,
             DA_ALLOW_NULL
         );
-
         $this->addColumn(
             self::createdBy,
             DA_ID,
@@ -113,6 +113,11 @@ class DBESRScheduler extends DBEntity implements JsonSerializable
             DA_ID,
             DA_ALLOW_NULL
         );
+        $this->addColumn(
+            self::emailSubjectSummary,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
         $this->setAddColumnsOff();
         $this->setPK(0);
     }
@@ -123,21 +128,22 @@ class DBESRScheduler extends DBEntity implements JsonSerializable
     public function jsonSerialize()
     {
         return [
-            DBESRScheduler::id                 => $this->getValue(DBESRScheduler::id),
-            DBESRScheduler::customerId         => $this->getValue(DBESRScheduler::customerId),
-            DBESRScheduler::rruleString        => $this->getValue(DBESRScheduler::rruleString),
-            DBESRScheduler::contactId          => $this->getValue(DBESRScheduler::contactId),
-            DBESRScheduler::siteNo             => $this->getValue(DBESRScheduler::siteNo),
-            DBESRScheduler::priority           => $this->getValue(DBESRScheduler::priority),
-            DBESRScheduler::hideFromCustomer   => $this->getValue(DBESRScheduler::hideFromCustomer),
-            DBESRScheduler::teamId             => $this->getValue(DBESRScheduler::teamId),
-            DBESRScheduler::details            => $this->getValue(DBESRScheduler::details),
-            DBESRScheduler::internalNotes      => $this->getValue(DBESRScheduler::internalNotes),
-            DBESRScheduler::createdBy          => $this->getValue(DBESRScheduler::createdBy),
-            DBESRScheduler::updatedBy          => $this->getValue(DBESRScheduler::updatedBy),
-            DBESRScheduler::createdAt          => $this->getValue(DBESRScheduler::createdAt),
-            DBESRScheduler::updatedAt          => $this->getValue(DBESRScheduler::updatedAt),
-            DBESRScheduler::linkedSalesOrderId => $this->getValue(DBESRScheduler::linkedSalesOrderId)
+            self::id                  => $this->getValue(self::id),
+            self::customerId          => $this->getValue(self::customerId),
+            self::rruleString         => $this->getValue(self::rruleString),
+            self::contactId           => $this->getValue(self::contactId),
+            self::siteNo              => $this->getValue(self::siteNo),
+            self::priority            => $this->getValue(self::priority),
+            self::hideFromCustomer    => $this->getValue(self::hideFromCustomer),
+            self::teamId              => $this->getValue(self::teamId),
+            self::details             => $this->getValue(self::details),
+            self::internalNotes       => $this->getValue(self::internalNotes),
+            self::createdBy           => $this->getValue(self::createdBy),
+            self::updatedBy           => $this->getValue(self::updatedBy),
+            self::createdAt           => $this->getValue(self::createdAt),
+            self::updatedAt           => $this->getValue(self::updatedAt),
+            self::linkedSalesOrderId  => $this->getValue(self::linkedSalesOrderId),
+            self::emailSubjectSummary => $this->getValue(self::emailSubjectSummary)
         ];
     }
 
