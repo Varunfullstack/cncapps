@@ -1,8 +1,14 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.1.1] - 2020-12-28
+### Removed
+- Remove the friendly name column from the Asset List Extract.
+### Added
+- Add the possibility of editing/adding OS Support Dates Items with friendly names.
+
 ## [v5.1.0] - 2020-12-23
-## Added
+### Added
 - Issue 1116 - Include friendly Mac OS names
 - Issue 1130 - M365 Streamone missing licenses sometimes incorrectly reported.
 - Issue 1150 - Add Generate Password link to new password creation
