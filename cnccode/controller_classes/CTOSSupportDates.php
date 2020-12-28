@@ -51,11 +51,8 @@ class CTOSSupportDates extends CTCNC
                     http_response_code(400);
                     throw new Exception('ID is missing');
                 }
-
                 $DBEOSSupportDates = new DBEOSSupportDates($this);
-
                 $DBEOSSupportDates->getRow($_REQUEST['id']);
-
                 if (!$DBEOSSupportDates->rowCount) {
                     http_response_code(404);
                     exit;
@@ -64,34 +61,28 @@ class CTOSSupportDates extends CTCNC
                 echo json_encode(["status" => "ok"]);
                 break;
             case 'update':
-
                 if (!isset($_REQUEST['id'])) {
                     throw new Exception('ID is missing');
                 }
-
                 $DBEOSSupportDates = new DBEOSSupportDates($this);
-
                 $DBEOSSupportDates->getRow($_REQUEST['id']);
-
                 if (!$DBEOSSupportDates->rowCount) {
                     http_response_code(404);
                     exit;
                 }
-
                 $availabilityDateString = $_REQUEST['availabilityDate'];
-                $endOfLifeDateString = $_REQUEST['endOfLifeDate'];
-
+                $endOfLifeDateString    = $_REQUEST['endOfLifeDate'];
                 $DBEOSSupportDates->setValue(DBEOSSupportDates::name, $_REQUEST['name']);
                 $DBEOSSupportDates->setValue(DBEOSSupportDates::version, $_REQUEST['version']);
                 $DBEOSSupportDates->setValue(DBEOSSupportDates::availabilityDate, $availabilityDateString);
                 $DBEOSSupportDates->setValue(DBEOSSupportDates::endOfLifeDate, $endOfLifeDateString);
                 $DBEOSSupportDates->setValue(DBEOSSupportDates::isServer, $this->getParam('isServer') === 'on');
+                $DBEOSSupportDates->setValue(DBEOSSupportDates::friendlyName, $_REQUEST['friendlyName']);
                 $DBEOSSupportDates->updateRow();
                 echo json_encode(["status" => "ok"]);
                 break;
             case 'create':
-                $DBEOSSupportDates = new DBEOSSupportDates($this);
-
+                $DBEOSSupportDates      = new DBEOSSupportDates($this);
                 $availabilityDateString = $_REQUEST['availabilityDate'];
                 if ($availabilityDateString) {
                     $availabilityDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $availabilityDateString);
@@ -100,7 +91,6 @@ class CTOSSupportDates extends CTCNC
                     }
                     $availabilityDateString = $availabilityDate->format(DATE_MYSQL_DATE);
                 }
-
                 $endOfLifeDateString = $_REQUEST['endOfLifeDate'];
                 if ($endOfLifeDateString) {
                     $endOfLifeDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $endOfLifeDateString);
@@ -109,15 +99,13 @@ class CTOSSupportDates extends CTCNC
                     }
                     $endOfLifeDateString = $endOfLifeDate->format(DATE_MYSQL_DATE);
                 }
-
-
                 $DBEOSSupportDates->setValue(DBEOSSupportDates::name, $_REQUEST['name']);
                 $DBEOSSupportDates->setValue(DBEOSSupportDates::version, $_REQUEST['version']);
                 $DBEOSSupportDates->setValue(DBEOSSupportDates::availabilityDate, $availabilityDateString);
                 $DBEOSSupportDates->setValue(DBEOSSupportDates::endOfLifeDate, $endOfLifeDateString);
                 $DBEOSSupportDates->setValue(DBEOSSupportDates::isServer, $this->getParam('isServer') === 'on');
+                $DBEOSSupportDates->setValue(DBEOSSupportDates::friendlyName, $_REQUEST['friendlyName']);
                 $DBEOSSupportDates->insertRow();
-
                 echo json_encode(
                     [
                         "id"               => $DBEOSSupportDates->getValue(DBEOSSupportDates::id),
@@ -126,18 +114,15 @@ class CTOSSupportDates extends CTCNC
                         "availabilityDate" => $DBEOSSupportDates->getValue(DBEOSSupportDates::availabilityDate),
                         "endOfLifeDate"    => $DBEOSSupportDates->getValue(DBEOSSupportDates::endOfLifeDate),
                         "threshold"        => $this->dsSystemHeader->getValue(DBEHeader::OSSupportDatesThresholdDays),
-                        "isServer"         => $DBEOSSupportDates->getValue(DBEOSSupportDates::isServer)
+                        "isServer"         => $DBEOSSupportDates->getValue(DBEOSSupportDates::isServer),
+                        "friendlyName"     => $DBEOSSupportDates->getValue(DBEOSSupportDates::friendlyName),
                     ],
                     JSON_NUMERIC_CHECK
                 );
-
                 break;
             case 'getData':
                 $DBEOSSupportDates = new DBEOSSupportDates($this);
-
                 $DBEOSSupportDates->getRows();
-
-
                 $data = [];
                 while ($DBEOSSupportDates->fetchNext()) {
 
@@ -149,7 +134,8 @@ class CTOSSupportDates extends CTCNC
                         "availabilityDate" => $DBEOSSupportDates->getValue(DBEOSSupportDates::availabilityDate),
                         "endOfLifeDate"    => $DBEOSSupportDates->getValue(DBEOSSupportDates::endOfLifeDate),
                         "threshold"        => $this->dsSystemHeader->getValue(DBEHeader::OSSupportDatesThresholdDays),
-                        "isServer"         => $DBEOSSupportDates->getValue(DBEOSSupportDates::isServer)
+                        "isServer"         => $DBEOSSupportDates->getValue(DBEOSSupportDates::isServer),
+                        "friendlyName"     => $DBEOSSupportDates->getValue(DBEOSSupportDates::friendlyName),
                     ];
                 }
                 echo json_encode(
@@ -162,10 +148,8 @@ class CTOSSupportDates extends CTCNC
                     JSON_NUMERIC_CHECK
                 );
                 break;
-
             case 'getMissingRowsData':
                 $DBEOSSupportDates = new DBEOSSupportDates($this);
-
                 $DBEOSSupportDates->getRows();
                 $data = [];
                 while ($DBEOSSupportDates->fetchNext()) {
@@ -174,45 +158,33 @@ class CTOSSupportDates extends CTCNC
                         "version" => $DBEOSSupportDates->getValue(DBEOSSupportDates::version)
                     ];
                 }
-
-                $dsn = 'mysql:host=' . LABTECH_DB_HOST . ';dbname=' . LABTECH_DB_NAME;
-                $options = [
+                $dsn          = 'mysql:host=' . LABTECH_DB_HOST . ';dbname=' . LABTECH_DB_NAME;
+                $options      = [
                     PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
                 ];
-                $labtechDB = new PDO(
-                    $dsn,
-                    LABTECH_DB_USERNAME,
-                    LABTECH_DB_PASSWORD,
-                    $options
+                $labtechDB    = new PDO(
+                    $dsn, LABTECH_DB_USERNAME, LABTECH_DB_PASSWORD, $options
                 );
-
                 $labtechQuery = $labtechDB->query(
                     'SELECT computers.`OS` as name, computers.`Version` as version  FROM computers GROUP BY OS, VERSION '
                 );
-
-                $labtechData = $labtechQuery->fetchAll(PDO::FETCH_ASSOC);
-
-                $missingRows = [];
+                $labtechData  = $labtechQuery->fetchAll(PDO::FETCH_ASSOC);
+                $missingRows  = [];
                 foreach ($labtechData as $labtechDatum) {
                     // ignore those rows from labtech that don't have a correct version number, also extract only the version number
                     if (!preg_match('/\d+\.\d+\.\d+/', $labtechDatum['version'], $matches)) {
                         continue;
                     }
-
                     $possibleMissingRow = [
                         "name"    => $labtechDatum['name'],
                         "version" => $matches[0]
                     ];
-
                     if ($this->arrayFind($data, $possibleMissingRow)) {
                         // we have found the guy....nothing to look at here move along
                         continue;
                     }
-
                     $missingRows[] = $possibleMissingRow;
                 }
-
-
                 echo json_encode(
                     [
                         "draw"            => 1,
@@ -251,33 +223,27 @@ class CTOSSupportDates extends CTCNC
             'OSSupportDates',
             'OSSupportDates'
         );
-
         $this->template->parse(
             'CONTENTS',
             'OSSupportDates',
             true
         );
-
-        $URLDeleteItem = Controller::buildLink(
+        $URLDeleteItem        = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             ['action' => 'delete']
         );
-
-        $URLUpdateItem = Controller::buildLink(
+        $URLUpdateItem        = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             ['action' => 'update']
         );
-
-        $URLCreateItem = Controller::buildLink(
+        $URLCreateItem        = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             ['action' => 'create']
         );
-
-        $URLGetData = Controller::buildLink(
+        $URLGetData           = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             ['action' => 'getData']
         );
-
         $URLGetMissingRowData = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             ['action' => 'getMissingRowsData']
@@ -291,7 +257,6 @@ class CTOSSupportDates extends CTCNC
                 "URLGetMissingRowsData" => $URLGetMissingRowData
             ]
         );
-
         $this->parsePage();
     }
 

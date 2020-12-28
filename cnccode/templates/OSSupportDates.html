@@ -95,6 +95,13 @@
             >
         </div>
         <div>
+            <span>OS Friendly Name:</span>
+            <br>
+            <input type="text"
+                   name="friendlyName"
+            >
+        </div>
+        <div>
             <button class="addButton"
                     type="button"
                     hidden
@@ -134,6 +141,7 @@
             form.elements['availabilityDate'].value = data.availabilityDate;
             form.elements['endOfLifeDate'].value = data.endOfLifeDate;
             form.elements['isServer'].checked = data.isServer;
+            form.elements['friendlyName'].value = data.friendlyName;
         }
 
         if (data && data.id) {
@@ -158,6 +166,7 @@
         form.elements['version'].value = null;
         form.elements['availabilityDate'].value = null;
         form.elements['endOfLifeDate'].value = null;
+        form.elements['friendlyName'].value = null;
     }
 
     window.addEventListener('DOMContentLoaded', function () {
@@ -183,7 +192,8 @@
                                 "name": rows[0].name,
                                 "version": rows[0].version,
                                 "availabilityDate": null,
-                                "endOfLifeDate": null
+                                "endOfLifeDate": null,
+                                "friendlyName": null
                             };
                             showEdit(newOSSupport);
                         },
@@ -307,6 +317,9 @@
                         }
                         return "<i class='fa fa-times'></i>";
                     }
+                },
+                {
+                    data: "friendlyName"
                 }
             ],
             columnDefs: [
@@ -435,6 +448,7 @@
         <th>Availability Date</th>
         <th>EOL Date</th>
         <th>Is Server</th>
+        <th>Friendly Name</th>
     </tr>
     </thead>
     <tbody>
