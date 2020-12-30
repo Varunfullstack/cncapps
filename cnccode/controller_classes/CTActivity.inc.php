@@ -4299,7 +4299,7 @@ class CTActivity extends CTCNC
     /**
      * Request more time for SR
      * Called via AJAX request from ActivityEdit
-     */
+     */    
     function requestAdditionalTime()
     {
         if (!$this->getParam('problemID') && !$this->getParam('callActivityID')) {
@@ -4313,7 +4313,7 @@ class CTActivity extends CTCNC
             $this->getParam('callActivityID')
         );
     }
-
+    //not used
     /**
      * @throws Exception
      */
@@ -4368,7 +4368,7 @@ class CTActivity extends CTCNC
                 $this->getParam('comments')
             );
             $nextURL = Controller::buildLink(
-                'ChangeRequestDashboard.php?HD&ES&SP&P',
+                'RequestDashBoard.php?HD&ES&SP&P',//'ChangeRequestDashboard.php?HD&ES&SP&P',
                 array()
             );
             header('Location: ' . $nextURL);
@@ -4528,7 +4528,7 @@ class CTActivity extends CTCNC
                 $minutes
             );
             $nextURL = Controller::buildLink(
-                'TimeRequestDashboard.php',
+                'RequestDashBoard.php',//'TimeRequestDashboard.php',
                 array()
             );
             header('Location: ' . $nextURL);
@@ -4891,7 +4891,7 @@ class CTActivity extends CTCNC
         }
         return ["status" => "ok"];
     }
-
+    //not used
     /**
      * @throws Exception
      */
@@ -4945,7 +4945,7 @@ class CTActivity extends CTCNC
                 $notify
             );
             $nextURL = Controller::buildLink(
-                'SalesRequestDashboard.php',
+                'RequestDashBoard.php',//'SalesRequestDashboard.php',
                 array()
             );
             header('Location: ' . $nextURL);

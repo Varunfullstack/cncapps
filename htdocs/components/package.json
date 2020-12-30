@@ -37,6 +37,10 @@
         "build:PopUpComponent": "parcel build PopUpComponent/PopUpComponent.js --public-url /components/dist",
         "start:FirstTimeFixReportComponent": "parcel  FirstTimeFixReport/FirstTimeFixReportComponent.js --public-url /components/dist",
         "build:FirstTimeFixReportComponent": "parcel build FirstTimeFixReport/FirstTimeFixReportComponent.js --public-url /components/dist",
+
+        "start:RequestDashboardComponent": "parcel  RequestDashboardComponent/RequestDashboardComponent.js --public-url /components/dist",
+        "build:RequestDashboardComponent": "parcel build RequestDashboardComponent/RequestDashboardComponent.js --public-url /components/dist",
+
         "build": "npm run build:ChildItemComponent && npm run build:CustomerLicensesComponent && npm run build:ExpenseBreakdownYearToDateComponent && npm run build:FixedServiceRequestCountComponent && npm run build:ItemListTypeAheadRenderer && npm run build:MySettingsComponent && npm run build:OutOfHoursReportComponent && npm run build:SpinnerHolder && npm run build:SRSourceComponent && npm run build:ActivityComponent      && npm run build:ActivityTypeComponent      && npm run build:CurrentActivityReportComponent      && npm run build:LogServiceRequestComponent      && npm run build:SDManagerDashboardComponent      && npm run build:PopUpComponent && npm run build:FirstTimeFixReportComponent",
         "testConcurrency": "concurrently --kill-others \"npm run build:ChildItemComponent\" \"npm run build:CustomerLicensesComponent\" \"npm run build:ExpenseBreakdownYearToDateComponent\" \"npm run build:FixedServiceRequestCountComponent\" \"npm run build:ItemListTypeAheadRenderer\" \"npm run build:MySettingsComponent\" \"npm run build:OutOfHoursReportComponent\" \"npm run build:SpinnerHolder\" \"npm run build:SRSourceComponent\" \"npm run build:ActivityComponent\" \"npm run build:ActivityTypeComponent\" \"npm run build:CurrentActivityReportComponent\" \"npm run build:LogServiceRequestComponent\" \"npm run build:SDManagerDashboardComponent\" \"npm run build:PopUpComponent\""
     },

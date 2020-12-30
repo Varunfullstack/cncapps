@@ -135,12 +135,13 @@ class CNCCKEditor extends React.Component {
                     name={this.props.name}
                     style={this.props.style}
                     ref={ref => (this.element = ref)}
-                    className="testing"
+                    className="testing" 
         />;
     }
 
     getCNCCKEditorConfig = () => {
         const defaultConfig = {
+            startupFocus : this.props.autofocus||false,
             contentsCss: "/screen.css",
             toolbarStartupExpanded: false,
             toolbar: "CNCToolbar",

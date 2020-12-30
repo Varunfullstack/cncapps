@@ -179,7 +179,7 @@ class Table extends React.Component {
             this.sort(filterData, this.state.sortColumn.path, this.state.sortColumn.order);
         }
         return [
-            el("div", {className: "flex-row"},
+            el("div", {className: "flex-row",key:"tableSearch"},
                 search
                     ? el("div", {key: "tableSearch", style: {marginBottom: 5}, className: "flex-row"}, [
                         el(
@@ -205,12 +205,14 @@ class Table extends React.Component {
                 className: "table table-striped"
             }, [
                 el(TableHeader, {
+                    key:"tableHeader",
                     id: "tableHeader",
                     columns: columns,
                     sortColumn: sortColumn,
                     onSort: this.handleSort,
                 }),
                 filterData.length > 0 ? el(TableBody, {
+                        key:"TableBody",
                         id: "tableBody",
                         data: filterData,
                         columns,
@@ -219,7 +221,7 @@ class Table extends React.Component {
                         selectedKey,
                     })
                     : null,
-                hasFooter ? el(TableFooter, {id: "tableFooter", columns}) : null
+                hasFooter ? el(TableFooter, { key:"tableFooter",id: "tableFooter", columns}) : null
             ]),
         ];
     }
