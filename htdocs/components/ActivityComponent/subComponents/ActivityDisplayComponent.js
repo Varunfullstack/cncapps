@@ -56,8 +56,6 @@ class ActivityDisplayComponent extends MainComponent {
         } else {
             setTimeout(() => this.loadCallActivity(params.get('callActivityID')), 10);
         }
-        this.alert("test");
-
     }
 
     loadCallActivity = async (callActivityID) => {

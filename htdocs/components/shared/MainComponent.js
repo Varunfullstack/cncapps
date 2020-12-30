@@ -90,7 +90,15 @@ export default class MainComponent extends React.Component {
             message={alert.message}
             isHTML={alert.isHTML}
             onClose={() => this.handleAlertClose()}
+            onAutoClose={this.handleAlertAutoClose}
+            autoClose={true}
         />;
+    }
+    handleAlertAutoClose=()=>{
+        const {alert} = this.state;
+        alert.show=false;
+        this.setState({alert});
+        console.log("auto close");
     }
     handleAlertClose = () => {
         const {alert} = this.state;
