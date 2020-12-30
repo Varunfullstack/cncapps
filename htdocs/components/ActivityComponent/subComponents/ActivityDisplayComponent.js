@@ -56,7 +56,7 @@ class ActivityDisplayComponent extends MainComponent {
         } else {
             setTimeout(() => this.loadCallActivity(params.get('callActivityID')), 10);
         }
-
+        this.alert("test");
 
     }
 
@@ -912,11 +912,11 @@ class ActivityDisplayComponent extends MainComponent {
         const {templateDefault, templateOptions, _showModal, templateTitle, templateType} = this.state;
         const {el} = this;
         return el(
-            Modal, {
+            Modal, {//autoFocus:true
                 width: 900, key: templateType, onClose: () => this.setState({_showModal: false}),
                 title: templateTitle, show: _showModal,
                 content: el('div', {key: 'conatiner'},
-                    templateOptions.length > 0 ? el('select', {onChange: this.handleTemplateChanged},
+                    templateOptions.length > 0 ? el('select', {onChange: this.handleTemplateChanged, autoFocus:true},
                         el('option', {key: 'empty', value: -1}, "-- Pick an option --"),
                         templateOptions.map(s => el('option', {key: s.id, value: s.id}, s.name))) : null,
                     el('div', {className: 'modal_editor'},

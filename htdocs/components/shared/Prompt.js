@@ -57,7 +57,7 @@ class Prompt extends React.Component {
                 width: width || 500,
                 onClose: () => this.close(),
                 footer: [
-                    el('button', {key: "btnOk", onClick: () => this.close()}, "OK"),
+                    el('button', {key: "btnOk", onClick: () => this.close(),autoFocus:true}, "OK"),
                     el('button', {key: "btncancel", onClick: () => this.close(true)}, "Cancel"),
                 ],
                 content: this.getContent(defaultValue)

@@ -64,7 +64,7 @@ class StandardTextModal extends React.Component {
         }
         return (
 
-            <select onChange={this.handleTemplateChanged}
+            <select onChange={this.handleTemplateChanged} autoFocus="true"
                     style={{display: "block"}}
             >
                 <option key="empty"
@@ -86,6 +86,7 @@ class StandardTextModal extends React.Component {
         if (noEditor) {
             return (
                 <textarea
+                    autoFocus="true"
                     value={value}
                     onChange={($event) => {
                         this.handleTemplateValueChange($event.target.value)

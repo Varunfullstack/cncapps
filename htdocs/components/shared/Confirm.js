@@ -22,7 +22,7 @@ class Confirm extends React.Component {
                 onClose={() => this.close()}
                 footer={
                     <Fragment>
-                        <button onClick={() => this.close(true)}>Yes</button>
+                        <button onClick={() => this.close(true)} autoFocus="true">Yes</button>
                         <button onClick={() => this.close(false)}>No</button>
                     </Fragment>
                 }

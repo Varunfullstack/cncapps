@@ -1392,7 +1392,7 @@ class ActivityEditComponent extends MainComponent {
         } = this.state;
         const {el} = this;
 
-        return el(Modal, {
+        return el(Modal, {//autoFocus:true
             width: 900,
             key: templateType,
             onClose: () => this.setState({_showModal: false}),
@@ -1404,7 +1404,7 @@ class ActivityEditComponent extends MainComponent {
                 templateOptions.length > 0
                     ? el(
                     "select",
-                    {onChange: this.handleTemplateChanged},
+                    {onChange: this.handleTemplateChanged },
                     el("option", {key: "empty", value: -1}, "-- Pick an option --"),
                     templateOptions.map((s) =>
                         el("option", {key: s.id, value: s.id}, s.name)
@@ -1424,7 +1424,8 @@ class ActivityEditComponent extends MainComponent {
                             onChange: this.handleTemplateValueChange,
                             sharedSpaces: true,
                             top: "top2",
-                            bottom: "bottom2"
+                            bottom: "bottom2",
+                            autoFocus:true
                         }),
                         el('div', {id: 'bottom2'}),
                     )

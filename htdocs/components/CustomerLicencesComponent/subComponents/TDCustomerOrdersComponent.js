@@ -334,6 +334,7 @@ class TDCustomerOrdersComponent extends React.Component {
                 disabled: modalDefaultAction !== 1 || inactive,
                 value: selectedOrderLine?.quantity,
                 onChange: handleChange,
+                autoFocus:true
             }),
             el("br", {key: "br1"}),
             el("label", {key: "l3"}, "Only applicable when changing seat number "),
