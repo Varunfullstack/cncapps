@@ -164,7 +164,7 @@ class ChangeRequestComponent extends MainComponent {
                                     sharedSpaces={true}
                                     top="top2"
                                     bottom="bottom2"
-                                    autofocus="true"
+                                    autoFocus="true"
                                 >
                                 </CNCCKEditor>
                                 <div id="bottom2"></div>

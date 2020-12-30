@@ -141,7 +141,7 @@ class CNCCKEditor extends React.Component {
 
     getCNCCKEditorConfig = () => {
         const defaultConfig = {
-            startupFocus : this.props.autofocus||false,
+            startupFocus : this.props.autoFocus||false,
             contentsCss: "/screen.css",
             toolbarStartupExpanded: false,
             toolbar: "CNCToolbar",
