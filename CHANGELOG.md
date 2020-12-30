@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v5.1.1] - 2020-12-28
+## [v5.1.1] - 2020-12-30
 ### Removed
 - Remove the friendly name column from the Asset List Extract.
 ### Added
