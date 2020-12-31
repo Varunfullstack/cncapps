@@ -27,7 +27,7 @@ class Alert extends React.Component {
         if (this.state.autoClose) {     
             this.timeInterval = setInterval(() => {
               let { autoCloseTimer } = this.state;             
-              if (autoCloseTimer > 0) {
+              if (autoCloseTimer > 1) {
                 autoCloseTimer--;
                 this.setState({ autoCloseTimer });
               } else if (this.props.onAutoClose) 
