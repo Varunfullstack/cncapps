@@ -31,7 +31,7 @@ processChangeRequestsEmails();
 function processChangeRequestsEmails()
 {
     $dbejCallActivity = new DBEJCallActivity($thing);
-    $dbejCallActivity->getPendingChangeRequestRows();
+    $dbejCallActivity->getPendingChangeRequestRows(true,true,true,true);
     $pendingHDRequests = [];
     $pendingESRequests = [];
     $pendingIMRequests = [];
