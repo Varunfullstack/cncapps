@@ -1165,6 +1165,7 @@ problem
 INNER JOIN contact
 ON contact.con_custno = problem.pro_custno
 AND contact.con_mailflag11 = 'Y'
+AND contact.active = '1'
 LEFT JOIN callactivity
 ON callactivity.caa_problemno = problem.pro_problemno
 AND callactivity.caa_callacttypeno = 51
