@@ -11,6 +11,7 @@ class Prompt extends React.Component {
             show: false,
             title: "",
             width: 300,
+            height:this.props.height,
             reason: this.props.defaultValue
         }
     }
@@ -38,6 +39,7 @@ class Prompt extends React.Component {
                                          value={defaultValue}
                                          hasToolbar={true}
                                          autoFocus={true}
+                                         style={{width:this.props.width-40,height:this.props.height}}
             />
         }
 

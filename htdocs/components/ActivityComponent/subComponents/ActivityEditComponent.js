@@ -551,7 +551,7 @@ class ActivityEditComponent extends MainComponent {
         const reason = await this.prompt(
             "Please provide your reason to request additional time",
             600,
-            data.cncNextAction, true
+            data.cncNextAction, true,50
         );
         if (!reason) {
             return;

@@ -30,6 +30,7 @@ export default class MainComponent extends React.Component {
                 show: false,
                 title: "",
                 width: 500,
+                height:20,
                 message: "",
                 value: null,
                 defaultValue: null,
@@ -152,10 +153,11 @@ export default class MainComponent extends React.Component {
 
     //-----------------end alert
     //----------------prompt
-    prompt = (title = "Prompt", width = 500, defaultValue = null, isEditor = false) => {
+    prompt = (title = "Prompt", width = 500, defaultValue = null, isEditor = false,height=20) => {
         const {prompt} = this.state;
         prompt.show = true;
         prompt.width = width;
+        prompt.height=height;
         prompt.title = title;
         prompt.value = null;
         prompt.defaultValue = defaultValue;
