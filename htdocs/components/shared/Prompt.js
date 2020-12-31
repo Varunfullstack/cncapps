@@ -36,6 +36,8 @@ class Prompt extends React.Component {
             return <EditorFieldComponent name="prompt"
                                          onChange={(value) => this.setState({reason: value})}
                                          value={defaultValue}
+                                         hasToolbar={true}
+                                         autoFocus={true}
             />
         }
 

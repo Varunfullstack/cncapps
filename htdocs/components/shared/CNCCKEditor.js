@@ -130,12 +130,16 @@ class CNCCKEditor extends React.Component {
     }
 
     render() {
-        return <div id={this.props.name}
-                    name={this.props.name}
-                    style={this.props.style}
-                    ref={ref => (this.element = ref)}
-                    className="testing"
-        />;
+        return <div>
+            <div id="top"></div>
+            <div id={this.props.name}
+                        name={this.props.name}
+                        style={this.props.style}
+                        ref={ref => (this.element = ref)}
+                        className="testing"
+            />
+            <div id="bottom"></div>
+        </div>;
     }
 
     getCNCCKEditorConfig = () => {
@@ -181,8 +185,8 @@ class CNCCKEditor extends React.Component {
             defaultConfig.extraPlugins += ",sharedspace";
             defaultConfig.removePlugins += ",floatingspace,maximize,resize,elementspath";
             defaultConfig.sharedSpaces = {
-                top: this.props.top,
-                bottom: this.props.bottom
+                top: this.props.top||"top",
+                bottom: this.props.bottom||"bottom"
             };
         }
 
