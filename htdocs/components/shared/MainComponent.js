@@ -98,7 +98,7 @@ export default class MainComponent extends React.Component {
         const {alert} = this.state;
         alert.show=false;
         this.setState({alert});
-        console.log("auto close");
+        //console.log("auto close");
     }
     handleAlertClose = () => {
         const {alert} = this.state;

@@ -43,7 +43,6 @@ class CNCCKEditor extends React.Component {
             const editor = this.editor = CKEDITOR[constructor](this.element, config);
 
             this._attachEventHandlers();
-
             // We must force editability of the inline editor to prevent `element-conflict` error.
             // It can't be done via config due to CKEditor 4 upstream issue (#57, ckeditor/ckeditor4#3866).
             if (type === 'inline' && !readOnly) {
@@ -141,6 +140,7 @@ class CNCCKEditor extends React.Component {
 
     getCNCCKEditorConfig = () => {
         const defaultConfig = {
+            startupFocus : this.props.autoFocus||false,
             contentsCss: "/screen.css",
             toolbarStartupExpanded: false,
             toolbar: "CNCToolbar",

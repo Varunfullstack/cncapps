@@ -7,26 +7,35 @@ class Alert extends React.Component {
     constructor(props) {
         super(props);
         this.state={
-            autoCloseTimer:3 //in seconds
+            autoCloseTimer:3, //in seconds,
+            autoClose:false,
+            show:false
         }
     }
     componentDidUpdate(prevProps, prevState) {
         if(!this.props.show)
-        this.clearTimer();
-    }
-    componentDidMount(){
-        if (this.props.autoClose) {
-          this.timeInterval = setInterval(() => {
-            let { autoCloseTimer } = this.state;
-            if (autoCloseTimer > 0) {
-              autoCloseTimer--;
-              this.setState({ autoCloseTimer });
-            } else if (this.props.onAutoClose) 
-            {                
-                this.props.onAutoClose();
-            }
-          }, 1000);
+            this.clearTimer();
+        if(!prevProps.show&&this.props.show)
+        {
+            this.setState({show:this.props.show,autoClose:this.props.autoClose,autoCloseTimer:3 },
+                ()=>this.startTimer());
         }
+    }   
+    componentDidMount(){
+    }
+    startTimer=()=>{        
+        if (this.state.autoClose) {     
+            this.timeInterval = setInterval(() => {
+              let { autoCloseTimer } = this.state;             
+              if (autoCloseTimer > 0) {
+                autoCloseTimer--;
+                this.setState({ autoCloseTimer });
+              } else if (this.props.onAutoClose) 
+              {                
+                  this.props.onAutoClose();
+              }
+            }, 1000);
+          }
     }
     componentWillUnmount() {
      this.clearTimer();
