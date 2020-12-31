@@ -173,7 +173,7 @@ class SalesRequestComponent extends MainComponent {
                 path: "salesRequestAssignedUserId",
                 label: "",
                 key: "assignedTo",
-                hdToolTip: "Being Reviewed By'",
+                hdToolTip: "Being Reviewed By",
                 icon: "fal fa-2x fa-user-hard-hat color-gray2 ",
                 sortable: false,
                 hdClassName: "text-center",

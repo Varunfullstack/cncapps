@@ -25,7 +25,7 @@ class TimeRequestComponent extends MainComponent {
             data:{
                 status:null,
                 allocatedTimeAmount:'minutes',
-                allocatedTimeValue:0,
+                allocatedTimeValue:'',
                 comments:null,
                 callActivityID:null
             }
@@ -197,7 +197,7 @@ class TimeRequestComponent extends MainComponent {
         //console.log(activity);
         const {data}=this.state;
         data.comments="";
-        data.allocatedTimeValue=0;
+        data.allocatedTimeValue='';
         data.allocatedTimeAmount="minutes";
         this.setState({showProcessTimeModal:true,currentActivity:activity,data});
         this.setValue("callActivityID",activity.callActivityID);
@@ -217,7 +217,7 @@ class TimeRequestComponent extends MainComponent {
                         <tr>
                             <td>Granted Minutes	</td>
                             <td>
-                                <input autoFocus={true} type="number" style={{marginLeft: 0}} onChange={($event)=>this.setValue('allocatedTimeValue',$event.target.value)} value={this.state.data.allocatedTimeValue}></input>
+                                <input autoFocus={true}   style={{marginLeft: 0}} onChange={($event)=>this.setValue('allocatedTimeValue',$event.target.value)} value={this.state.data.allocatedTimeValue}></input>
                                 <select onChange={($event)=>this.setValue('allocatedTimeAmount',$event.target.value)} value={this.state.data.allocatedTimeAmount}>
                                     <option value="minutes">Minutes</option>
                                     <option  value="hours">Hours</option>
@@ -254,6 +254,11 @@ class TimeRequestComponent extends MainComponent {
     handleDeny=()=>{
         const {data}=this.state;
         data.status="Deny";        
+        if(!parseInt(data.allocatedTimeValue))
+        {
+            this.alert("Please enter avalid time value");
+            return;
+        }
         this.api.setTimeRequest(data).then(result=>{
             if(result.status)
             {
@@ -267,12 +272,17 @@ class TimeRequestComponent extends MainComponent {
         this.setState({showProcessTimeModal:false});
     }
     handleApprove=()=>{
-        if(this.state.data.allocatedTimeValue==0||this.state.data.allocatedTimeValue<=0)
-        {
-        this.alert("Please enter Granted Time");
-        return;
-        }
         const {data}=this.state;
+        if(data.allocatedTimeValue==''||data.allocatedTimeValue<=0)
+        {
+            this.alert("Please enter Granted Time");
+            return;
+        }
+        if(!parseInt(data.allocatedTimeValue))
+        {
+            this.alert("Please enter avalid time value");
+            return;
+        }        
         data.status="Approve";        
         this.api.setTimeRequest(data).then(result=>{
             if(result.status)
