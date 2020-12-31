@@ -715,7 +715,7 @@ class DBEJCallActivity extends DBECallActivity
         }
 
         if (!$showSmallProjects) {
-            $query .= " and team.teamID <> 3 ";
+            $query .= " and team.teamID <> 4 ";
         }
 
         if (!$showProjects) {
