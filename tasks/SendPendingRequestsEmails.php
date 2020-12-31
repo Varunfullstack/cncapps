@@ -115,7 +115,7 @@ function addPendingTimeRequestToArray(&$array,
 function processTimeRequestsEmails()
 {
     $dbejCallActivity = new DBEJCallActivity($thing);
-    $dbejCallActivity->getPendingTimeRequestRows();
+    $dbejCallActivity->getPendingTimeRequestRows(true,true,true,true);
     $pendingHDRequests      = [];
     $pendingESRequests      = [];
     $pendingIMRequests      = [];
