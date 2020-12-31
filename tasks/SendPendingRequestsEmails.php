@@ -277,7 +277,7 @@ function sendTimeRequestsEmail($teamEmail,
     $buMail = new BUMail($thing);
     $senderEmail = CONFIG_SUPPORT_EMAIL;
     global $twig;
-    $body = $twig->render('@internal/pendingTimeRequestsEmail.html.twig', ["items" => $requests]);
+    $body = $twig->render('@internal/pendingTimeRequestsEmail.html.twig', ["items" => $requests,"requestDashUrl"=>SITE_URL."/RequestDashBoard.php?timeRequest"]);
     $toEmail = $teamEmail;
     $hdrs = array(
         'From'         => $senderEmail,

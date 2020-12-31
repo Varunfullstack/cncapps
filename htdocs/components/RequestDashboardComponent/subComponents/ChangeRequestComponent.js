@@ -31,9 +31,12 @@ class ChangeRequestComponent extends MainComponent {
         this.api=new APIRequestDashboard();
     }
     
-    componentWillReceiveProps(nextProps) {        
-        this.setState({activities:nextProps.activities});       
-      }
+    // componentWillReceiveProps(nextProps) {        
+    //     this.setState({activities:nextProps.activities});       
+    // }
+    static getDerivedStateFromProps(props, current_state) {
+        return {...current_state, ...props};
+    }
     componentDidMount() {  
     }
     onRefresh=()=>{
@@ -164,7 +167,7 @@ class ChangeRequestComponent extends MainComponent {
                                     sharedSpaces={true}
                                     top="top2"
                                     bottom="bottom2"
-                                    autoFocus="true"
+                                    autoFocus={true}
                                 >
                                 </CNCCKEditor>
                                 <div id="bottom2"></div>

@@ -33,10 +33,13 @@ class TimeRequestComponent extends MainComponent {
         this.api=new APIRequestDashboard();
     }
     
-    componentWillReceiveProps(nextProps) {
-        ////console.log('nextProps',nextProps);        
-        this.setState({activities:nextProps.activities});        
-      }
+    // componentWillReceiveProps(nextProps) {
+    //     ////console.log('nextProps',nextProps);        
+    //     this.setState({activities:nextProps.activities});        
+    //   }
+    static getDerivedStateFromProps(props, current_state) {
+        return {...current_state, ...props};
+    }
     componentDidMount() { 
     }
     // loadData()
@@ -192,7 +195,11 @@ class TimeRequestComponent extends MainComponent {
     }
     processTimeRequest(activity){
         //console.log(activity);
-        this.setState({showProcessTimeModal:true,currentActivity:activity});
+        const {data}=this.state;
+        data.comments="";
+        data.allocatedTimeValue=0;
+        data.allocatedTimeAmount="minutes";
+        this.setState({showProcessTimeModal:true,currentActivity:activity,data});
         this.setValue("callActivityID",activity.callActivityID);
     }
     getTimeRequestModal=()=>{
@@ -210,7 +217,7 @@ class TimeRequestComponent extends MainComponent {
                         <tr>
                             <td>Granted Minutes	</td>
                             <td>
-                                <input autoFocus="true" type="number" style={{marginLeft: 0}} onChange={($event)=>this.setValue('allocatedTimeValue',$event.target.value)} value={this.state.data.allocatedTimeValue}></input>
+                                <input autoFocus={true} type="number" style={{marginLeft: 0}} onChange={($event)=>this.setValue('allocatedTimeValue',$event.target.value)} value={this.state.data.allocatedTimeValue}></input>
                                 <select onChange={($event)=>this.setValue('allocatedTimeAmount',$event.target.value)} value={this.state.data.allocatedTimeAmount}>
                                     <option value="minutes">Minutes</option>
                                     <option  value="hours">Hours</option>

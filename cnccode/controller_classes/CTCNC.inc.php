@@ -621,6 +621,11 @@ class CTCNC extends Controller
             //     "href"  => "SalesRequestDashboard.php"
             // ],
             [
+                "id"    => 202,
+                "label" => "Request Dashboard",
+                "href"  => "RequestDashBoard.php"
+            ],
+            [
                 "id"    => 205,
                 "label" => "Schedule SR",
                 "href"  => "SRScheduler.php"
@@ -705,11 +710,7 @@ class CTCNC extends Controller
                 "label" => "Password Services",
                 "href"  => "PasswordServices.php"
             ],
-            [
-                "id"    => 225,
-                "label" => "Request Dashboard",
-                "href"  => "RequestDashBoard.php"
-            ],
+            
         ];
 
     }

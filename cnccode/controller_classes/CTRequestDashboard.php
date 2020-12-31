@@ -34,7 +34,7 @@ class CTRequestDashboard extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
-        $this->setMenuId(225);
+        $this->setMenuId(202);
     }
 
 
@@ -211,7 +211,7 @@ class CTRequestDashboard extends CTCNC
     function setTimeRequest()
     {
         $body = json_decode(file_get_contents('php://input'));
-        $buActivity=new BUActivity($this);
+        $buActivity = new BUActivity($this);
         $this->setMethodName('setTimeRequest');
         $buHeader = new BUHeader($this);
         $buHeader->getHeader($dsHeader);
@@ -221,85 +221,81 @@ class CTRequestDashboard extends CTCNC
             $callActivityID,
             $dsCallActivity
         );
-        $problemID        = $dsCallActivity->getValue(DBEJCallActivity::problemID); 
+        $problemID        = $dsCallActivity->getValue(DBEJCallActivity::problemID);
         $dbeProblem       = new DBEProblem($this);
-        $dbeProblem->getRow($problemID);         
+        $dbeProblem->getRow($problemID);
         $requestorID = $dsCallActivity->getValue(DBECallActivity::userID);
         $dbeUser     = new DBEUser($this);
         $dbeUser->getRow($requestorID);
-        $teamID             = $dbeUser->getValue(DBEUser::teamID);        
+        $teamID             = $dbeUser->getValue(DBEUser::teamID);
         $assignedMinutes    = 0;
 
         $isOverLimit        = false;
         switch ($teamID) {
-            case 1:                
-                $assignedMinutes    = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);                
+            case 1:
+                $assignedMinutes    = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
                 $isOverLimit        = $assignedMinutes >= $dsHeader->getValue(
-                        DBEHeader::hdTeamManagementTimeApprovalMinutes
-                    );
+                    DBEHeader::hdTeamManagementTimeApprovalMinutes
+                );
                 break;
-            case 2:                
-                $assignedMinutes    = $dbeProblem->getValue(DBEProblem::esLimitMinutes);                
+            case 2:
+                $assignedMinutes    = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
                 $isOverLimit        = $assignedMinutes >= $dsHeader->getValue(
-                        DBEHeader::esTeamManagementTimeApprovalMinutes
-                    );
+                    DBEHeader::esTeamManagementTimeApprovalMinutes
+                );
                 break;
             case 4:
-                $assignedMinutes    = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);              
+                $assignedMinutes    = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
                 $isOverLimit        = $assignedMinutes >= $dsHeader->getValue(
-                        DBEHeader::smallProjectsTeamManagementTimeApprovalMinutes
-                    );
+                    DBEHeader::smallProjectsTeamManagementTimeApprovalMinutes
+                );
                 break;
             case 5:
                 $assignedMinutes    = $dbeProblem->getValue(DBEProblem::projectTeamLimitMinutes);
-               
         }
-         
-        {
+        switch ($body->status) {
 
-            switch ($body->status ) {
+            case 'Approve':
+                if ($isOverLimit && !$this->dbeUser->getValue(DBEUser::additionalTimeLevelApprover)) {
+                    throw new Exception('You do not have enough permissions to proceed');
+                }
+                $option = 'A';
+                break;
+            case 'Deny':
+                $option = 'D';
+                break;
+            case 'Delete':
+            default:
+                if ($isOverLimit && !$this->dbeUser->getValue(DBEUser::additionalTimeLevelApprover)) {
+                    throw new Exception('You do not have enough permissions to proceed');
+                }
+                $option = 'DEL';
+                break;
+        }
+        $minutes = 0;
+        switch ($body->allocatedTimeAmount) {
+            case 'minutes':
+                $minutes = $body->allocatedTimeValue;
+                break;
+            case 'hours':
+                $minutes = $body->allocatedTimeValue * 60;
+                break;
+            case 'days':
+                $buHeader = new BUHeader($this);
+                /** @var $dsHeader DataSet */
+                $buHeader->getHeader($dsHeader);
+                $minutesInADay = $dsHeader->getValue(DBEHeader::smallProjectsTeamMinutesInADay);
+                $minutes       = $minutesInADay * $body->allocatedTimeValue;
+        }
+        $buActivity->timeRequestProcess(
+            $callActivityID,
+            $this->userID,
+            $option,
+            $body->comments,
+            $minutes
+        );
 
-                case 'Approve':
-                    if ($isOverLimit && !$this->dbeUser->getValue(DBEUser::additionalTimeLevelApprover)) {
-                        throw new Exception('You do not have enough permissions to proceed');
-                    }
-                    $option = 'A';
-                    break;
-                case 'Deny':
-                    $option = 'D';
-                    break;
-                case 'Delete':
-                default:
-                    if ($isOverLimit && !$this->dbeUser->getValue(DBEUser::additionalTimeLevelApprover)) {
-                        throw new Exception('You do not have enough permissions to proceed');
-                    }
-                    $option = 'DEL';
-                    break;
-            }
-            $minutes = 0;
-            switch ($body->allocatedTimeAmount ) {
-                case 'minutes':
-                    $minutes = $body->allocatedTimeValue ;
-                    break;
-                case 'hours':
-                    $minutes = $body->allocatedTimeValue * 60;
-                    break;
-                case 'days':
-                    $buHeader = new BUHeader($this);
-                    /** @var $dsHeader DataSet */
-                    $buHeader->getHeader($dsHeader);
-                    $minutesInADay = $dsHeader->getValue(DBEHeader::smallProjectsTeamMinutesInADay);
-                    $minutes       = $minutesInADay * $body->allocatedTimeValue;
-            }
-            $buActivity->timeRequestProcess(
-                $callActivityID,
-                $this->userID,
-                $option,
-                $body->comments,
-                $minutes
-            );       
-        }      
-        return ["status"=>true];
+        return ["status" => true];
 
     }
     //--------------change request

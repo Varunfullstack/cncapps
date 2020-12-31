@@ -35,9 +35,12 @@ class SalesRequestComponent extends MainComponent {
         this.apiUsers=new  APIUser();
     }
     
-    componentWillReceiveProps(nextProps) {
-        this.setState({activities:nextProps.activities} );
-      }
+    // componentWillReceiveProps(nextProps) {
+    //     this.setState({activities:nextProps.activities} );
+    //   }
+    static getDerivedStateFromProps(props, current_state) {
+        return {...current_state, ...props};
+    }
     componentDidMount() {          
         this.getAllocateUsers();
     }
@@ -232,7 +235,7 @@ class SalesRequestComponent extends MainComponent {
                                     sharedSpaces={true}
                                     top="top2"
                                     bottom="bottom2"
-                                    autoFocus="true"
+                                    autoFocus={true}
                                 >
                                 </CNCCKEditor>
                                 <div id="bottom2"></div>
