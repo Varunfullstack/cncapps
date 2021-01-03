@@ -180,7 +180,10 @@ class CustomerSiteComponent extends MainComponent {
         data.nextStep = 4;
         data.reason = data.reasonTemplate;
         data.internalNotes = data.internalNotesTemplate;
-
+        if(await this.editorHasProblems())
+        {
+            return;
+        }
         if (data.siteNo == -1) {
             this.alert("Please select customer site");
             return;

@@ -1,5 +1,8 @@
 # Changelog
 This project changes will be shown here.
+## [v5.1.1] - 2021-01-03
+### Added
+- Issue 1148 - Set max number of mistakes in editor
 
 ## [v5.1.1] - 2020-12-30
 ### Removed
