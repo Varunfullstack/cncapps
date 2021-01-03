@@ -3304,7 +3304,7 @@ class BUActivity extends Business
         // $urlChangeControlRequest = SITE_URL . '/Activity.php?action=changeRequestReview&callActivityID=' . $dbeCallActivity->getValue(
         //         DBEJCallActivity::callActivityID
         //     ) . '&fromEmail=true';
-        $urlChangeControlRequest = SITE_URL."/RequestDashBoard.php?changeRequest";
+        $urlChangeControlRequest = SITE_URL."/RequestDashBoard.php";
         $urlFirstActivity        = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dsInitialCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             );
@@ -9997,7 +9997,7 @@ FROM
         // $urlSalesRequestReview = SITE_URL . '/Activity.php?action=salesRequestReview&callActivityID=' . $salesRequestActivity->getValue(
         //         DBEJCallActivity::callActivityID
         //     ) . '&fromEmail=true';
-        $urlSalesRequestReview = SITE_URL."/RequestDashBoard.php?salesRequest";
+        $urlSalesRequestReview = SITE_URL."/RequestDashBoard.php";
         $urlFirstActivity      = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dsInitialCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             );

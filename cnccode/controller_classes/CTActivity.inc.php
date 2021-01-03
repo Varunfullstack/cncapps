@@ -4368,7 +4368,7 @@ class CTActivity extends CTCNC
                 $this->getParam('comments')
             );
             $nextURL = Controller::buildLink(
-                'RequestDashBoard.php?HD&ES&SP&P',//'ChangeRequestDashboard.php?HD&ES&SP&P',
+                'RequestDashBoard.php',//'ChangeRequestDashboard.php?HD&ES&SP&P',
                 array()
             );
             header('Location: ' . $nextURL);
