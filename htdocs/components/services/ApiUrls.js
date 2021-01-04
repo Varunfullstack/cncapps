@@ -6,4 +6,5 @@ export default class ApiUrls{
  static callActType="/ActivityType.php?action=";
  static sdDashboard="/SDManagerDashboard.php?action=";
  static FirstTimeFixReport="/FirstTimeFixReport.php?action=";
+ static KPIReport="/KPIReport.php?action=";
 }
