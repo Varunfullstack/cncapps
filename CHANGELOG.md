@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.1.2] - 2021-01-04
+### Fixed
+- Fixed issue with truncated activity description and UTF8
+
 ## [v5.1.1] - 2020-12-30
 ### Removed
 - Remove the friendly name column from the Asset List Extract.

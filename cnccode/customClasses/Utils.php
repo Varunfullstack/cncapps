@@ -1,13 +1,56 @@
 <?php
 
-
 namespace CNCLTD;
-
 
 use DateTimeInterface;
 
 class Utils
 {
+    public static function isJSONBroken($mixed)
+    {
+        json_encode($mixed);
+        return json_last_error() !== JSON_ERROR_NONE;
+    }
+
+    public static function findBrokenJSON($array)
+    {
+        if (!$array) {
+            return;
+        }
+        if (!self::isJSONBroken($array)) {
+            return null;
+        }
+        foreach ($array as $key => $value) {
+            $test = [$key => $value];
+            if (!self::isJSONBroken($test)) {
+                continue;
+            }
+            return $key;
+        }
+        return;
+    }
+
+    public static function utf8ize($mixed)
+    {
+        if (is_array($mixed)) {
+            foreach ($mixed as $key => $value) {
+                if (is_string($value) && $value) {
+                    var_dump('here');
+                    $test = json_encode($value);
+                    if (!$test) {
+                        var_dump($key, $value);
+                        exit;
+                    }
+                }
+                $mixed[$key] = self::utf8ize($value);
+
+            }
+        } elseif (is_string($mixed)) {
+            return mb_convert_encoding($mixed, "UTF-8", "UTF-8");
+        }
+        return $mixed;
+    }
+
     /**
      * @param DateTimeInterface|null $dateTime
      * @param string $format
@@ -24,14 +67,10 @@ class Utils
     public static function generateStrongPassword($length = 15, $add_dashes = false, $available_sets = 'luds')
     {
         $sets = array();
-        if (strpos($available_sets, 'l') !== false)
-            $sets[] = 'abcdefghjkmnpqrstuvwxyz';
-        if (strpos($available_sets, 'u') !== false)
-            $sets[] = 'ABCDEFGHJKMNPQRSTUVWXYZ';
-        if (strpos($available_sets, 'd') !== false)
-            $sets[] = '23456789';
-        if (strpos($available_sets, 's') !== false)
-            $sets[] = '!@#$%&*?';
+        if (strpos($available_sets, 'l') !== false) $sets[] = 'abcdefghjkmnpqrstuvwxyz';
+        if (strpos($available_sets, 'u') !== false) $sets[] = 'ABCDEFGHJKMNPQRSTUVWXYZ';
+        if (strpos($available_sets, 'd') !== false) $sets[] = '23456789';
+        if (strpos($available_sets, 's') !== false) $sets[] = '!@#$%&*?';
         $all      = '';
         $password = '';
         foreach ($sets as $set) {
@@ -39,11 +78,9 @@ class Utils
             $all      .= $set;
         }
         $all = str_split($all);
-        for ($i = 0; $i < $length - count($sets); $i++)
-            $password .= $all[self::tweak_array_rand($all)];
+        for ($i = 0; $i < $length - count($sets); $i++) $password .= $all[self::tweak_array_rand($all)];
         $password = str_shuffle($password);
-        if (!$add_dashes)
-            return $password;
+        if (!$add_dashes) return $password;
         $dash_len = floor(sqrt($length));
         $dash_str = '';
         while (strlen($password) > $dash_len) {
@@ -78,10 +115,11 @@ class Utils
                                     $length = 100
     )
     {
-        return substr(
+        return mb_substr(
             self::stripEverything($reason),
             0,
-            $length
+            $length,
+            "utf-8"
         );
 
     }
