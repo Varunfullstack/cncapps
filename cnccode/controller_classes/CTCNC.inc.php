@@ -889,6 +889,11 @@ class CTCNC extends Controller
                 "label" => "Customer Profitability Export",
                 "href"  => "CustomerProfitabilityMonthsReport.php",
             ],
+            [
+                "id"    => 513,
+                "label" => "KPI Reports",
+                "href"  => "KPIReport.php",
+            ],
         ];
     }
 
