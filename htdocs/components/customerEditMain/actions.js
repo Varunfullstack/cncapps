@@ -96,8 +96,8 @@ import {
 } from "./actionTypes";
 import {updateCustomer, updateNote, updateSite} from "./helpers";
 import {OutOfDateError} from "./helpers/OutOfDateError";
-import debounce from "../../utils/debounce";
-import {fileToBase64} from "../../utils/utils";
+import debounce from "../utils/debounce";
+import {fileToBase64} from "../utils/utils";
 import {getEditingNote, getEditingSite} from "./selectors";
 
 export const VisibilityFilterOptions = {

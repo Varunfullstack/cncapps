@@ -2,7 +2,7 @@ import React, {Fragment} from 'react';
 import * as HTMLReactParser from 'html-react-parser'
 import moment from "moment";
 import {connect} from "react-redux";
-import {entityMapToArray} from "../../utils/utils";
+import {entityMapToArray} from "../utils/utils";
 import {addNewProject, deleteProject, hideNewProjectModal, newProjectFieldUpdate, showNewProjectModal} from "./actions";
 import AddProjectModalComponent from "./modals/AddProjectModalComponent";
 import {getProjects} from "./selectors";
