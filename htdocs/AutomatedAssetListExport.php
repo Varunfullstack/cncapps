@@ -287,6 +287,7 @@ ORDER BY Location, `Computer Name`';
         if (isset($data[$key]['friendlyName'])) {
             $data[$key]['Operating System'] .= " - " . $data[$key]['friendlyName'];
         }
+        unset($data[$key]['friendlyName']);
         $purgedRow = $data[$key];
         unset($purgedRow['isServer']);
         $purgedData[] = $purgedRow;

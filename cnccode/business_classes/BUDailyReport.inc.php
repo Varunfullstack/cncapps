@@ -109,7 +109,8 @@ GROUP BY t.month;
                 $urlRequest  = $controller->buildLink(
                     SITE_URL . '/SRActivity.php',
                     array(
-                        'serviceRequestId' => $row[1]
+                        'serviceRequestId' => $row[1],
+                        "action" => "displayActivity"
                     )
                 );
                 $description = substr(
@@ -276,7 +277,6 @@ GROUP BY t.month;
 
     /**
      * Customer
-     * Incident No (Link)
      * Details
      * Assigned technician
      * Engineering time spent
@@ -654,6 +654,7 @@ GROUP BY t.month;
                     SITE_URL . '/SRActivity.php',
                     array(
                         'serviceRequestId' => $row[1],
+                        'action'         => 'displayActivity'
                     )
                 );
                 $urlActivity = $controller->buildLink(
@@ -881,6 +882,7 @@ GROUP BY t.month;
                     SITE_URL . '/SRActivity.php',
                     array(
                         'serviceRequestId' => $row[1],
+                        "action" => "displayActivity"
                     )
                 );
                 $template->setVar(
@@ -1013,6 +1015,7 @@ GROUP BY t.month;
                     SITE_URL . '/SRActivity.php',
                     array(
                         'serviceRequestId' => $row[1],
+                        "action" => "displayActivity"
                     )
                 );
                 $template->setVar(
@@ -1162,6 +1165,7 @@ problem
 INNER JOIN contact
 ON contact.con_custno = problem.pro_custno
 AND contact.con_mailflag11 = 'Y'
+AND contact.active = '1'
 LEFT JOIN callactivity
 ON callactivity.caa_problemno = problem.pro_problemno
 AND callactivity.caa_callacttypeno = 51

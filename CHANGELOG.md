@@ -1,15 +1,25 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased] 
+## [unreleased]
 ### Changed
 - Issue 909 - Update GUI on Customer Page
 - Issue 913 - Customer Page Main Section Rewrite
 - Issue 914 - Customer Page Customer Notes, Projects, Portal Documents Rewrite
 - Issue 915 - Customer Page Sites Rewrite
 
+## [v5.1.2] - 2021-01-04
+### Fixed
+- Fixed issue with truncated activity description and UTF8
+
+## [v5.1.1] - 2020-12-30
+### Removed
+- Remove the friendly name column from the Asset List Extract.
+### Added
+- Add the possibility of editing/adding OS Support Dates Items with friendly names.
+
 ## [v5.1.0] - 2020-12-23
-## Added
+### Added
 - Issue 1116 - Include friendly Mac OS names
 - Issue 1130 - M365 Streamone missing licenses sometimes incorrectly reported.
 - Issue 1150 - Add Generate Password link to new password creation
