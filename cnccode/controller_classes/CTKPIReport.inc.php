@@ -93,10 +93,10 @@ class CTKPIReport extends CTCNC
         }
         if($to!='')
         {
-            $query .="  AND callactivity.caa_date >= :to ";
+            $query .="  AND callactivity.caa_date <= :to ";
             $params["to"]=$to;
         }
-        $query .="GROUP BY callactivity.caa_date";        
+        $query .="GROUP BY callactivity.caa_date order by date";        
         return DBConnect::fetchAll($query,$params);
     }
 }
