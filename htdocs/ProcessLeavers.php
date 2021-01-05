@@ -70,23 +70,7 @@ while ($dsContact->fetchNext()) {
         'N'
     );
     $dbeContact->setValue(
-        DBEContact::workStartedEmailFlag,
-        'N'
-    );
-    $dbeContact->setValue(
-        DBEContact::workUpdatesEmailFlag,
-        'N'
-    );
-    $dbeContact->setValue(
         DBEContact::fixedEmailFlag,
-        'N'
-    );
-    $dbeContact->setValue(
-        DBEContact::pendingClosureEmailFlag,
-        'N'
-    );
-    $dbeContact->setValue(
-        DBEContact::closureEmailFlag,
         'N'
     );
     $dbeContact->setValue(

@@ -495,24 +495,8 @@ class CTCustomer extends CTCNC
                 $this->getYN(@$value['initialLoggingEmailFlag'])
             );
             $this->dsContact->setValue(
-                DBEContact::workStartedEmailFlag,
-                $this->getYN(@$value['workStartedEmailFlag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::workUpdatesEmailFlag,
-                $this->getYN(@$value['workUpdatesEmailFlag'])
-            );
-            $this->dsContact->setValue(
                 DBEContact::fixedEmailFlag,
                 $this->getYN(@$value['fixedEmailFlag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::pendingClosureEmailFlag,
-                $this->getYN(@$value['pendingClosureEmailFlag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::closureEmailFlag,
-                $this->getYN(@$value['closureEmailFlag'])
             );
             $this->dsContact->setValue(
                 DBEContact::othersInitialLoggingEmailFlag,
@@ -1670,11 +1654,7 @@ class CTCustomer extends CTCNC
                 "hrUser"                        => $contact->getValue(DBEContact::hrUser),
                 "supportLevel"                  => $contact->getValue(DBEContact::supportLevel),
                 "initialLoggingEmailFlag"       => $contact->getValue(DBEContact::initialLoggingEmailFlag),
-                "workStartedEmailFlag"          => $contact->getValue(DBEContact::workStartedEmailFlag),
-                "workUpdatesEmailFlag"          => $contact->getValue(DBEContact::workUpdatesEmailFlag),
                 "fixedEmailFlag"                => $contact->getValue(DBEContact::fixedEmailFlag),
-                "pendingClosureEmailFlag"       => $contact->getValue(DBEContact::pendingClosureEmailFlag),
-                "closureEmailFlag"              => $contact->getValue(DBEContact::closureEmailFlag),
                 "othersInitialLoggingEmailFlag" => $contact->getValue(DBEContact::othersInitialLoggingEmailFlag),
                 "othersWorkStartedEmailFlag"    => $contact->getValue(DBEContact::othersWorkStartedEmailFlag),
                 "othersWorkUpdatesEmailFlag"    => $contact->getValue(DBEContact::othersWorkUpdatesEmailFlag),
@@ -1952,12 +1932,7 @@ class CTCustomer extends CTCNC
             'CustomerEdit',
             'CustomerEditSimple.inc'
         );
-
-//        $this->template->setVar(
-//            'javaScript',
-//            "<script src='/components/customerEditMain/dist/CustomerEditComponent.js?version=1.0.0'></script>"
-//        );
-
+        $this->loadReactScript('CustomerEditComponent.js');
 // Parameters
         $title = "Customer - " . $this->dsCustomer->getValue(DBECustomer::name);
         $color = "red";
@@ -2788,20 +2763,8 @@ class CTCustomer extends CTCNC
                     'initialLoggingEmailFlagChecked'       => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::initialLoggingEmailFlag)
                     ),
-                    'workStartedEmailFlagChecked'          => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::workStartedEmailFlag)
-                    ),
-                    'workUpdatesEmailFlagChecked'          => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::workUpdatesEmailFlag)
-                    ),
                     'fixedEmailFlagChecked'                => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::fixedEmailFlag)
-                    ),
-                    'pendingClosureEmailFlagChecked'       => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::pendingClosureEmailFlag)
-                    ),
-                    'closureEmailFlagChecked'              => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::closureEmailFlag)
                     ),
                     'othersInitialLoggingEmailFlagChecked' => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::othersInitialLoggingEmailFlag)
@@ -3668,12 +3631,6 @@ class CTCustomer extends CTCNC
             );
         }
         return $contacts;
-    }
-
-    function getCustomerProjects()
-    {
-        $customerID = $_REQUEST["customerID"];
-        return BUProject::getCustomerProjects($customerID);
     }
 
     function getCustomerContracts()

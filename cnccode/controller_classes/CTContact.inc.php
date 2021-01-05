@@ -295,20 +295,8 @@ class CTContact extends CTCNC
                 'initialLoggingEmailFlagChecked'       => $this->getChecked(
                     $this->dsContact->getValue(DBEContact::initialLoggingEmailFlag)
                 ),
-                'workStartedEmailFlagChecked'          => $this->getChecked(
-                    $this->dsContact->getValue(DBEContact::workStartedEmailFlag)
-                ),
-                'workUpdatesEmailFlagChecked'          => $this->getChecked(
-                    $this->dsContact->getValue(DBEContact::workUpdatesEmailFlag)
-                ),
                 'fixedEmailFlagChecked'                => $this->getChecked(
                     $this->dsContact->getValue(DBEContact::fixedEmailFlag)
-                ),
-                'pendingClosureEmailFlagChecked'       => $this->getChecked(
-                    $this->dsContact->getValue(DBEContact::pendingClosureEmailFlag)
-                ),
-                'closureEmailFlagChecked'              => $this->getChecked(
-                    $this->dsContact->getValue(DBEContact::closureEmailFlag)
                 ),
                 'othersInitialLoggingEmailFlagChecked' => $this->getChecked(
                     $this->dsContact->getValue(DBEContact::othersInitialLoggingEmailFlag)

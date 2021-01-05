@@ -1638,20 +1638,8 @@ class CTCustomerCRM extends CTCustomer
                     'initialLoggingEmailFlagChecked'       => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::initialLoggingEmailFlag)
                     ),
-                    'workStartedEmailFlagChecked'          => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::workStartedEmailFlag)
-                    ),
-                    'workUpdatesEmailFlagChecked'          => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::workUpdatesEmailFlag)
-                    ),
                     'fixedEmailFlagChecked'                => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::fixedEmailFlag)
-                    ),
-                    'pendingClosureEmailFlagChecked'       => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::pendingClosureEmailFlag)
-                    ),
-                    'closureEmailFlagChecked'              => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::closureEmailFlag)
                     ),
                     'othersInitialLoggingEmailFlagChecked' => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::othersInitialLoggingEmailFlag)
@@ -1801,6 +1789,7 @@ class CTCustomerCRM extends CTCustomer
             }
 
         }
+
         $this->template->setVar(
             'javaScript',
             "<script src='components/customerEditMain/dist/CustomerReviewComponent.js?version=1.0.0'></script><script src=components/customerEditMain/dist/CustomerNotesComponent.js?version=1.0.0'></script>",

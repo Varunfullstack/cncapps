@@ -54,6 +54,10 @@ class CustomerEditMain extends React.PureComponent {
 
         const {customerId} = customer;
         return (
+            // <React.Profiler id="customerMainComponent" onRender={(data) => {
+            //     console.log(data);
+            // }}>
+
 
             <div className="mt-3">
                 <div className="row">
@@ -607,7 +611,7 @@ class CustomerEditMain extends React.PureComponent {
                     </div>
                 </div>
             </div>
-
+            // </React.Profiler>
         )
     }
 

@@ -33,7 +33,6 @@ class DBEJCallActivity extends DBECallActivity
     const contactNotes = "contactNotes";
     const techNotes = "techNotes";
     const contactEmail = "contactEmail";
-    const workStartedEmailFlag = "workStartedEmailFlag";
     const autoCloseEmailFlag = "autoCloseEmailFlag";
     const dateEngineer = "dateEngineer";
     const contractCustomerItemID = "contractCustomerItemID";
@@ -181,12 +180,6 @@ class DBEJCallActivity extends DBECallActivity
             DA_STRING,
             DA_ALLOW_NULL,
             "con_email"
-        );
-        $this->addColumn(
-            self::workStartedEmailFlag,
-            DA_YN,
-            DA_ALLOW_NULL,
-            "con_work_started_email_flag"
         );
         $this->addColumn(
             self::autoCloseEmailFlag,

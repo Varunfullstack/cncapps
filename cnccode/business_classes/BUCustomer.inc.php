@@ -643,23 +643,7 @@ class BUCustomer extends Business
             'Y'
         );
         $dsContact->setValue(
-            DBEContact::workStartedEmailFlag,
-            'Y'
-        );
-        $dsContact->setValue(
-            DBEContact::workUpdatesEmailFlag,
-            'Y'
-        );
-        $dsContact->setValue(
             DBEContact::fixedEmailFlag,
-            'Y'
-        );
-        $dsContact->setValue(
-            DBEContact::pendingClosureEmailFlag,
-            'Y'
-        );
-        $dsContact->setValue(
-            DBEContact::closureEmailFlag,
             'Y'
         );
         $dsContact->setValue(
@@ -1176,15 +1160,6 @@ class BUCustomer extends Business
                 DBEContact::initialLoggingEmailFlag       => $this->dbeContact->getValue(
                     DBEContact::initialLoggingEmailFlag
                 ),
-                DBEContact::workStartedEmailFlag          => $this->dbeContact->getValue(
-                    DBEContact::workStartedEmailFlag
-                ),
-                DBEContact::workUpdatesEmailFlag          => $this->dbeContact->getValue(
-                    DBEContact::workUpdatesEmailFlag
-                ),
-                DBEContact::pendingClosureEmailFlag       => $this->dbeContact->getValue(
-                    DBEContact::pendingClosureEmailFlag
-                ),
                 DBEContact::fixedEmailFlag                => $this->dbeContact->getValue(
                     DBEContact::fixedEmailFlag
                 ),
@@ -1236,29 +1211,11 @@ class BUCustomer extends Business
                 DBEContact::initialLoggingEmailFlag       => $this->dbeContact->getValue(
                     DBEContact::initialLoggingEmailFlag
                 ),
-                DBEContact::workStartedEmailFlag          => $this->dbeContact->getValue(
-                    DBEContact::workStartedEmailFlag
-                ),
-                DBEContact::workUpdatesEmailFlag          => $this->dbeContact->getValue(
-                    DBEContact::workUpdatesEmailFlag
-                ),
-                DBEContact::pendingClosureEmailFlag       => $this->dbeContact->getValue(
-                    DBEContact::pendingClosureEmailFlag
-                ),
                 DBEContact::fixedEmailFlag                => $this->dbeContact->getValue(
                     DBEContact::fixedEmailFlag
                 ),
                 DBEContact::othersInitialLoggingEmailFlag => $this->dbeContact->getValue(
                     DBEContact::initialLoggingEmailFlag
-                ),
-                DBEContact::othersWorkStartedEmailFlag    => $this->dbeContact->getValue(
-                    DBEContact::workStartedEmailFlag
-                ),
-                DBEContact::othersWorkUpdatesEmailFlag    => $this->dbeContact->getValue(
-                    DBEContact::workUpdatesEmailFlag
-                ),
-                DBEContact::othersPendingClosureEmailFlag => $this->dbeContact->getValue(
-                    DBEContact::pendingClosureEmailFlag
                 ),
                 DBEContact::othersFixedEmailFlag          => $this->dbeContact->getValue(
                     DBEContact::fixedEmailFlag
