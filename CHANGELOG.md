@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [v5.1.3] - 2021-01-05
 ### Fixed
 - Fixed issue with wrong date in Customer Review Meeting Documents emails.
+- Fixed issue with Empty asset reason not being saved when logging a new Service Request
 
 ## [v5.1.2] - 2021-01-04
 ### Fixed
