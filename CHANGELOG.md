@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.1.4] - 2021-01-05
+### Fixed
+- Fixed issue with holdForQA accepting null value.
+
 ## [v5.1.3] - 2021-01-05
 ### Fixed
 - Fixed issue with wrong date in Customer Review Meeting Documents emails.

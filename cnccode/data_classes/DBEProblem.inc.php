@@ -434,7 +434,9 @@ class DBEProblem extends DBEntity
         $this->addColumn(
             self::holdForQA,
             DA_BOOLEAN,
-            DA_ALLOW_NULL
+            DA_NOT_NULL,
+            null,
+            false
         );
         
         $this->setAddColumnsOff();
