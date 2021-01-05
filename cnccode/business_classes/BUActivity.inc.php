@@ -1227,7 +1227,6 @@ class BUActivity extends Business
             DBEJProblem::internalNotes,
             $dsCallActivity->getValue(DBEJCallActivity::internalNotes)
         );
-
         $problem->setValue(
             DBEJProblem::completeDate,
             $dsCallActivity->getValue(DBEJCallActivity::completeDate)
@@ -5124,6 +5123,10 @@ class BUActivity extends Business
         $dbeProblem->setValue(
             DBEProblem::assetTitle,
             $body->assetTitle ?? null
+        );
+        $dbeProblem->setValue(
+            DBEProblem::emptyAssetReason,
+            $body->emptyAssetReason ?? null
         );
         $dbeProblem->setValue(
             DBEProblem::repeatProblem,
