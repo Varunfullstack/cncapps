@@ -72,7 +72,6 @@ while ($test->fetchNext()) {
             "mailshot9Flag"        => $test->getValue(DBEJContactAudit::mailshot9Flag),
             "mailshot11Flag"       => $test->getValue(DBEJContactAudit::mailshot11Flag),
             "notes"                => $test->getValue(DBEJContactAudit::notes),
-            "workStartedEmailFlag" => $test->getValue(DBEJContactAudit::workStartedEmailFlag),
             "createdByContactId"   => $test->getValue(DBEJContactAudit::createdByContactId),
             "createdByUserId"      => $test->getValue(DBEJContactAudit::createdByUserId),
             "createdAt"            => $test->getValue(DBEJContactAudit::createdAt),

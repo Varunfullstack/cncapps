@@ -513,22 +513,6 @@ class CustomerCRMComponent extends React.PureComponent {
                                         {/*        </div>*/}
 
                                         {/*        <div className="col-lg-2">*/}
-                                        {/*            <label htmlFor="work">Work</label>*/}
-                                        {/*            <div className="form-group form-inline">*/}
-                                        {/*                <label className="switch">*/}
-                                        {/*                    <input id="work"*/}
-
-                                        {/*                           type="checkbox"*/}
-                                        {/*                           name="form[contact][{contactID}][workUpdatesEmailFlag]"*/}
-                                        {/*                           value="Y"*/}
-
-                                        {/*                           className="tick_field"*/}
-                                        {/*                    />*/}
-                                        {/*                    <span className="slider round"/>*/}
-                                        {/*                </label>*/}
-                                        {/*            </div>*/}
-                                        {/*        </div>*/}
-                                        {/*        <div className="col-lg-2">*/}
                                         {/*            <label htmlFor="fixed">Fixed</label>*/}
                                         {/*            <div className="form-group form-inline">*/}
                                         {/*                <label className="switch">*/}

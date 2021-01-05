@@ -48,10 +48,7 @@ class DBEContact extends DBCNCEntity
     const supportLevelFurlough = 'furlough';
 
     const initialLoggingEmailFlag = 'initialLoggingEmailFlag';
-    const workStartedEmailFlag = "workStartedEmailFlag";
-    const workUpdatesEmailFlag = 'workUpdatesEmailFlag';
     const fixedEmailFlag = 'fixedEmailFlag';
-    const pendingClosureEmailFlag = "pendingClosureEmailFlag";
     const closureEmailFlag = 'closureEmailFlag';
 
     const othersInitialLoggingEmailFlag = 'othersInitialLoggingEmailFlag';
@@ -253,31 +250,7 @@ class DBEContact extends DBCNCEntity
         );
 
         $this->addColumn(
-            self::workStartedEmailFlag,
-            DA_YN,
-            DA_NOT_NULL
-        );
-
-        $this->addColumn(
-            self::workUpdatesEmailFlag,
-            DA_YN,
-            DA_NOT_NULL
-        );
-
-        $this->addColumn(
             self::fixedEmailFlag,
-            DA_YN,
-            DA_NOT_NULL
-        );
-
-        $this->addColumn(
-            self::pendingClosureEmailFlag,
-            DA_YN,
-            DA_NOT_NULL
-        );
-
-        $this->addColumn(
-            self::closureEmailFlag,
             DA_YN,
             DA_NOT_NULL
         );
