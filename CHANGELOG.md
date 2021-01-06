@@ -4,6 +4,8 @@ This project changes will be shown here.
 ## [v5.1.4] - 2021-01-05
 ### Fixed
 - Fixed issue with holdForQA accepting null value.
+- Fixed issue with direct debit invoices not being flagged as printed.
+- Fixed issue with direct debit invoices not being attached to the emails that get sent to customers.
 
 ## [v5.1.3] - 2021-01-05
 ### Fixed

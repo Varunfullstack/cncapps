@@ -1239,7 +1239,6 @@ class BUInvoice extends Business
                 $fileName,
                 true
             );
-            unlink($generatedInvoiceFilePath);
 
             $dsCustomer = new DataSet($this);
             $buCustomer->getCustomerByID(
@@ -1343,12 +1342,12 @@ class BUInvoice extends Business
     /**
      * @param DBEInvhead $dbeInvhead
      * @param DataSet $invoiceWithAllDirectDebitServicesPerCustomer
-     * @param bool|null $dateToUse
+     * @param string|null $dateToUse
      * @return String
      */
     private function generateAndStorePDFForInvoice(DBEInvhead $dbeInvhead,
                                                    DataSet $invoiceWithAllDirectDebitServicesPerCustomer,
-                                                   ?bool $dateToUse
+                                                   ?string $dateToUse
     ): string
     {
         $dbeInvhead->getRow($invoiceWithAllDirectDebitServicesPerCustomer->getValue(DBEInvhead::invheadID));
