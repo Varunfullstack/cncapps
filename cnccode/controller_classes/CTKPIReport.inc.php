@@ -15,6 +15,7 @@ require_once($cfg["path_dbe"] . "/DBConnect.php");
 class CTKPIReport extends CTCNC
 {
     const GET_SRFIXED="SRFixed";
+    const GET_PRIORITY_RAISED="priorityRiased";
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
@@ -40,6 +41,9 @@ class CTKPIReport extends CTCNC
         switch ($this->getAction()) {
             case self::GET_SRFIXED:
                 echo json_encode($this->getSRFixedData());
+                exit;
+            case self::GET_PRIORITY_RAISED:
+                echo json_encode($this->getPriorityRaisedData());
                 exit;
             default:
                 $this->setTemplate();
@@ -67,6 +71,7 @@ class CTKPIReport extends CTCNC
     {
         $from=$_REQUEST["from"];
         $to=$_REQUEST["to"];
+        $customerID=$_REQUEST["customerID"];
         $query="SELECT
         SUM(1) allTeams,
         SUM(consultant.`teamID` = 1) AS helpDeskFixedActivities,
@@ -96,7 +101,51 @@ class CTKPIReport extends CTCNC
             $query .="  AND callactivity.caa_date <= :to ";
             $params["to"]=$to;
         }
+        if($customerID!='')
+        {
+            $query .="  AND p.pro_custno = :pro_custno ";
+            $params["pro_custno"]=$customerID;
+        }
         $query .="GROUP BY callactivity.caa_date order by date";        
+        return DBConnect::fetchAll($query,$params);
+    }
+    function getPriorityRaisedData()
+    {
+        $from=$_REQUEST["from"];
+        $to=$_REQUEST["to"];
+        $customerID=$_REQUEST["customerID"];
+        $query=" SELECT
+        
+        DATE_FORMAT( problem.pro_date_raised,'%Y-%m-%d') AS date,
+        SUM(1) AS raisedAll,
+        SUM(pro_priority = 1) AS P1,
+        SUM(pro_priority = 2) AS P2,
+        SUM(pro_priority = 3) AS P3,
+        SUM(pro_priority = 4) AS P4
+        FROM
+        problem
+        JOIN customer
+        ON customer.cus_custno = problem.pro_custno
+
+      WHERE     problem.pro_priority < 5
+        AND problem.`pro_custno`<>282 ";
+        $params=array();
+        if($from!='')
+        {
+            $query .="  AND problem.pro_date_raised >= :from ";
+            $params["from"]=$from;
+        }
+        if($to!='')
+        {
+            $query .="  AND problem.pro_date_raised <= :to ";
+            $params["to"]=$to;
+        }
+        if($customerID!='')
+        {
+            $query .="  AND problem.pro_custno = :pro_custno ";
+            $params["pro_custno"]=$customerID;
+        }
+        $query .=" GROUP BY problem.pro_date_raised order by date";        
         return DBConnect::fetchAll($query,$params);
     }
 }

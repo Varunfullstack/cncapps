@@ -9,23 +9,33 @@ import './../shared/table/table.css';
 import APIKPIReport from './services/APIKPIReport';
 import {Bar,Line } from 'react-chartjs-2';
 import { groupBy, sort } from '../utils/utils';
+import SRFixedComponent from './subComponents/SRFixedComponent';
+import CustomerSearch from '../shared/CustomerSearch';
+import PrioritiesRaisedComponent from './subComponents/PrioritiesRaisedComponent';
+export const ReportType= { Daily: "day", Weekly: "week", Monthly: "month" }
+
 export default class KPIReportComponent extends MainComponent {
   api;
   ResultType;
   colors;
+  reports;
+  reportParamters;
+  REP_SR_FIXED=1;
+  REP_PRIORITIES_RAISED=2;
   constructor(props) {
     super(props);
-    this.ResultType = { Daily: "day", Weekly: "week", Monthly: "month" };
+    this.ResultType = ReportType;
     this.state = {
       ...this.state,
       filter: {
         from: this.getInitStartDate(),
         to: this.getInitEndDate(),
         resultType: this.ResultType.Weekly,
+        customerID:''
       },
       data: [],
-      filterData: [],
-      dataLabels: [],
+      reports:[],
+      activeReport:null
     };
     this.api = new APIKPIReport();
     this.colors = {
@@ -43,6 +53,7 @@ export default class KPIReportComponent extends MainComponent {
         border: "rgb(172, 172, 172)",
       },
     };
+    this.reportParamters={dateFrom:'dateFrom',dateTo:'dateTo',customer:'customer',resultType:'resultType'};
     moment.locale("en");
     moment.updateLocale("en", {
       week: {
@@ -52,335 +63,211 @@ export default class KPIReportComponent extends MainComponent {
   }
   
   componentDidMount() {
-    this.handleReportView();
+    this.getReports();
+  }
+  getReports=()=>{
+    let { activeReport } = this.state;
+    const reports=[
+      {
+        id:this.REP_SR_FIXED,
+        title:"SR Fixed",
+        paramters:[
+          this.reportParamters.dateFrom,
+          this.reportParamters.dateTo,
+          this.reportParamters.customer,
+          this.reportParamters.resultType,
+        ]      
+      },
+      {
+        id:this.REP_PRIORITIES_RAISED,
+        title:"Priorities Raised",
+        paramters:[
+          this.reportParamters.dateFrom,
+          this.reportParamters.dateTo,
+          this.reportParamters.customer,
+          this.reportParamters.resultType,
+        ]      
+      }
+    ];    
+    if(!activeReport)
+      activeReport=reports[0];
+    this.setState({reports,activeReport},()=> this.handleReportView()) ;
   }
   getInitStartDate(){
     return moment().subtract(6, 'months').format('YYYY-MM-DD');
   }
   getInitEndDate(){
-    //console.log("end date",moment().subtract(1, 'weeks').startOf('w')).format('YYYY-MM-DD');
+    ////console.log("end date",moment().subtract(1, 'weeks').startOf('w')).format('YYYY-MM-DD');
     return moment().subtract(1, 'weeks').startOf('w').format('YYYY-MM-DD');
   }
   setFilter = (field, value) => {
     const { filter,data } = this.state;
     filter[field] = value;
-    this.setState({ filter },()=>this.setChartData(data));
-    console.log(filter);
+    this.setState({ filter });
+    //console.log(filter);
   };
+
   getFilterElement = () => {
-    const { filter } = this.state;
+    const { filter, reports } = this.state;
     return (
-      <div>
-        <label>Start date</label>
-        <input
-          type="date"
-          value={filter.from}
-          onChange={($event) => this.setFilter("from", $event.target.value)}
-        ></input>
-        <label>End date</label>
-        <input
-          type="date"
-          value={filter.to}
-          onChange={($event) => this.setFilter("to", $event.target.value)}
-        ></input>
-        <select
-          value={filter.resultType}
-          onChange={($event) =>
-            this.setFilter("resultType", $event.target.value)
-          }
-        >
-          <option value="day">Daily</option>
-          <option value="week">Weekly</option>
-          <option value="month">Monthly</option>
-        </select>
-        <button onClick={this.handleReportView}>GO</button>
-      </div>
+      <table>
+        <tbody>
+          <tr>
+            <td>Report</td>
+            <td>
+              <select style={{ width: 140 }} onChange={this.handleReportChange}>
+                {reports.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.title}
+                  </option>
+                ))}
+              </select>
+            </td>
+            {this.hasParamter(this.reportParamters.resultType) ? (
+              <td>Type</td>
+            ) : null}
+            {this.hasParamter(this.reportParamters.resultType) ? (
+              <td>
+                <select
+                  style={{ width: 140 }}
+                  value={filter.resultType}
+                  onChange={($event) =>
+                    this.setFilter("resultType", $event.target.value)
+                  }
+                >
+                  <option value="day">Daily</option>
+                  <option value="week">Weekly</option>
+                  <option value="month">Monthly</option>
+                </select>
+              </td>
+            ) : null}
+          </tr>
+          <tr>
+            {this.hasParamter(this.reportParamters.dateFrom) ? (
+              <React.Fragment>
+                <td>
+                  <label>Start date</label>
+                </td>
+
+                <td>
+                  <input
+                    type="date"
+                    value={filter.from}
+                    onChange={($event) =>
+                      this.setFilter("from", $event.target.value)
+                    }
+                  ></input>
+                </td>
+              </React.Fragment>
+            ) : null}
+            {this.hasParamter(this.reportParamters.dateTo) ? (
+              <React.Fragment>
+                <td>
+                  <label>End date</label>
+                </td>
+                <td>
+                  <input
+                    type="date"
+                    value={filter.to}
+                    onChange={($event) =>
+                      this.setFilter("to", $event.target.value)
+                    }
+                  ></input>
+                </td>
+              </React.Fragment>
+            ) : null}
+          </tr>
+          <tr>
+            {this.hasParamter(this.reportParamters.customer) ? (
+              <React.Fragment>
+                <td>Customer</td>
+                <td colSpan={3}>
+                  <CustomerSearch
+                    onChange={(customer) =>
+                      this.setFilter("customerID", customer.id)
+                    }
+                    width={340}
+                  ></CustomerSearch>
+                </td>
+              </React.Fragment>
+            ) : null}
+            <td>
+              <button onClick={this.handleReportView}>GO</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     );
-  };
+  };  
+  handleReportChange=($event)=>{
+    const id=$event.target.value;
+    const {reports}=this.state;    
+    let activeReport=reports[reports.map(r=>r.id).indexOf(parseInt(id))];
+    this.setState({activeReport});
+  }
+  hasParamter=(paramter)=>{
+    const {activeReport}=this.state;    
+    return activeReport!=null&&activeReport.paramters.indexOf(paramter)>=0;    
+  }
   handleReportView = () => {
-    const { filter } = this.state;
+    const { filter,activeReport } = this.state;
     this.setState({ _showSpinner: true });
     if (filter.from == "") {
       this.alert("You must enter the start date");
       return;
     }
-    this.api.getSRFixed(filter.from, filter.to).then((data) => {
-      console.log(data);
-      
-      this.setState({ data, _showSpinner: false },()=>this.setChartData(data));
-    });
+    switch(activeReport?.id)
+    {
+      case this.REP_SR_FIXED:
+        this.api.getSRFixed(filter.from, filter.to,filter.customerID).then((data) => {      
+          data=data.filter(a=>{        
+             if (moment(a.date).day() == 6 || moment(a.date).day() == 0)
+               return false;
+             else return true;
+          });
+          //console.log(data);
+          this.setState({ data, _showSpinner: false });
+        });
+        break;
+      case this.REP_PRIORITIES_RAISED:
+        this.api.getPriorityRaised(filter.from, filter.to,filter.customerID).then((data) => {      
+          data=data.filter(a=>{        
+             if (moment(a.date).day() == 6 || moment(a.date).day() == 0)
+               return false;
+             else return true;
+          });
+          //console.log(data);
+          this.setState({ data, _showSpinner: false } );
+        });
+        break;
+    }
+    
   };
-  processData = (data) => {
-    const teams = [
-      {
-        label: "Escalations",
-        data: [],
-        fill: false,
-        backgroundColor: "rgb(255, 99, 132)",
-        borderColor: "rgba(255, 99, 132, 0.2)",
-      },
-    ];
-  };
-  getDailyData(data) {
-    const borderWidth = 2;
-    const fill = false;
-    return [
-      {
-        label: "Escalations",
-        data: data.map((d) => d.escalationsFixedActivities),
-        backgroundColor: this.colors.Escalation.background,
-        borderColor: this.colors.Escalation.border,
-        borderWidth,
-        fill,
-      },
-      {
-        label: "Helpdesk",
-        data: data.map((d) => d.helpDeskFixedActivities),
-        backgroundColor: this.colors.Helpdesk.background,
-        borderColor: this.colors.Helpdesk.border,
-        borderWidth,
-        fill,
-      },
-      {
-        label: "Projects",
-        data: data.map((d) => d.projectsActivities),
-        backgroundColor: this.colors.Project.background,
-        borderColor: this.colors.Project.border,
-        borderWidth,
-        fill,
-      },
-      {
-        label: "Small Projects",
-        data: data.map((d) => d.smallProjectsActivities),
-        backgroundColor: this.colors.SmallProject.background,
-        borderColor: this.colors.SmallProject.border,
-        borderWidth,
-        fill,
-      },
-    ];
-  }
-  getWeeks(data, property) {
-    let gdata = data.map((d) => {
-      const dt = moment(d.date);
-      return { value: d[property], date: d.date, week: dt.week() + dt.year() };
-    }); 
-    gdata =groupBy(gdata, "week").map((g, i) => {
-      g.week = g.items[0].date;
-      g.value = g.items.reduce(
-        (prev, current) => prev + parseInt(current.value),
-        0
-      );
-      return g;
-    });
-
-    return gdata;
-  }
-  getWeeklyLabels(data) {
-    return this.getWeeks(data, "escalationsFixedActivities").map((d) => d.week);
-  }
-  getWeeklyData(data) {
-    //get data by teams
-    const borderWidth = 2;
-    const fill = false;
-    let teams = [
-      {
-        label: "Escalations",
-        data: this.getWeeks(data, "escalationsFixedActivities").map(
-          (d) => d.value
-        ),
-        backgroundColor: this.colors.Escalation.background,
-        borderColor: this.colors.Escalation.border,
-        borderWidth,
-        fill,
-      },
-      {
-        label: "Helpdesk",
-        data: this.getWeeks(data, "helpDeskFixedActivities").map(
-          (d) => d.value
-        ),
-        backgroundColor: this.colors.Helpdesk.background,
-        borderColor: this.colors.Helpdesk.border,
-        borderWidth,
-        fill,
-      },
-      {
-        label: "Projects",
-        data: this.getWeeks(data, "projectsActivities").map((d) => d.value),
-        backgroundColor: this.colors.Project.background,
-        borderColor: this.colors.Project.border,
-        borderWidth,
-        fill,
-      },
-      {
-        label: "Small Projects",
-        data: this.getWeeks(data, "smallProjectsActivities").map(
-          (d) => d.value
-        ),
-        backgroundColor: this.colors.SmallProject.background,
-        borderColor: this.colors.SmallProject.border,
-        borderWidth,
-        fill,
-      },
-    ];
-    console.log(teams);
-    return teams;
-  }
-  getMonths(data, property) {
-    let gdata = data.map((d) => {
-      const dt = moment(d.date);
-      return {
-        value: d[property],
-        date: d.date,
-        month: dt.format("MMM") + " " + dt.year(),
+  getActivChart=()=>{
+    const {activeReport, data,filter} = this.state;
+    console.log(activeReport,this.REP_PRIORITIES_RAISED);
+    switch(activeReport?.id)
+    {
+      case this.REP_SR_FIXED:
+        return <SRFixedComponent data={data} filter={filter} colors={this.colors}></SRFixedComponent>;
+      case this.REP_PRIORITIES_RAISED:
+        return <PrioritiesRaisedComponent data={data} filter={filter} colors={this.colors}></PrioritiesRaisedComponent>;
         
-      };
-    });
-     
-    gdata = groupBy(gdata, "month").map((g, i) => {
-      g.month = g.groupName;
-      g.value = g.items.reduce(
-        (prev, current) => prev + parseInt(current.value),
-        0
-      );
-      return g;
-    });
-   
-    return gdata;
-  }
-  getMonthlyLabels(data) {
-    return this.getMonths(data, "escalationsFixedActivities").map(
-      (d) => d.month
-    );
-  }
-  getMonthlyData(data) {
-    //get data by teams
-    const borderWidth = 2;
-    const fill = false;
-    let teams = [
-      {
-        label: "Escalations",
-        data: this.getMonths(data, "escalationsFixedActivities").map(
-          (d) => d.value
-        ),
-        backgroundColor: this.colors.Escalation.background,
-        borderColor: this.colors.Escalation.border,
-        borderWidth,
-        fill,
-      },
-      {
-        label: "Helpdesk",
-        data: this.getMonths(data, "helpDeskFixedActivities").map(
-          (d) => d.value
-        ),
-        backgroundColor: this.colors.Helpdesk.background,
-        borderColor: this.colors.Helpdesk.border,
-        borderWidth,
-        fill,
-      },
-      {
-        label: "Projects",
-        data: this.getMonths(data, "projectsActivities").map((d) => d.value),
-        backgroundColor: this.colors.Project.background,
-        borderColor: this.colors.Project.border,
-        borderWidth,
-        fill,
-      },
-      {
-        label: "Small Projects",
-        data: this.getMonths(data, "smallProjectsActivities").map(
-          (d) => d.value
-        ),
-        backgroundColor: this.colors.SmallProject.background,
-        borderColor: this.colors.SmallProject.border,
-        borderWidth,
-        fill,
-      },
-    ];
-    console.log(teams);
-    return teams;
-  }
-  setChartData = (data) => {
-    const {  filter } = this.state;
-    let filterData = [];
-    let labels = [];
-    if (filter.resultType == this.ResultType.Daily) {
-      filterData = this.getDailyData(data);
-      labels = data.map((a) => a.date);
+      default:
+        return null;
     }
-    if (filter.resultType == this.ResultType.Weekly) {
-      filterData = this.getWeeklyData(data);
-      labels = this.getWeeklyLabels(data);
-    }
-    if (filter.resultType == this.ResultType.Monthly) {
-      filterData = this.getMonthlyData(data);
-      labels = this.getMonthlyLabels(data);
-    }
-    this.setState({ filterData, dataLabels: labels });
-  };
-  getChart = () => {
-    const { filterData, dataLabels } = this.state;
-    const chartData = {
-      labels: dataLabels,
-      datasets: filterData,
-    };
-    const options = {
-       maintainAspectRatio: false,
-      scales: {
-        yAxes: [
-          {
-            ticks: {
-              beginAtZero: true,
-            },
-          },
-        ],
-      },
-    };
-    return <div style={{height:"80vh",width:"85vw"}} >
-     <Line data={chartData} options={options} height="90%" />
-     </div>
-           
-    ;
-  };
-  getDataTable = () => {
-    const { filterData, dataLabels } = this.state;
-    console.log(dataLabels);
-    return (
-      <table className="table table-striped">
-        <thead>
-          <tr>
-            <th></th>
-            {filterData.map((d) => (
-              <th>{d.label}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-        
-              {
-                dataLabels.map((l,indx)=>{
-                  return  <tr>
-                            <td>{l}</td>
-                            {filterData.map((d) => (
-                              <td>{d.data[indx]}</td>
-                            ))}
-                          </tr>;
-                })
-              }
-          
-        </tbody>
-      </table>
-    );
-  };
+  }
   render() {
-    const { _showSpinner } = this.state;
+    const { _showSpinner,data,filter,reports } = this.state;
+    
     return (
       <div>
         <Spinner show={_showSpinner}></Spinner>
         {this.getAlert()}
         <h3>Filter Data</h3>
         {this.getFilterElement()}        
-        {this.getChart()}
-        {/*this.getDataTable()*/}
+               
+        {this.getActivChart()}
       </div>
     );
   }
