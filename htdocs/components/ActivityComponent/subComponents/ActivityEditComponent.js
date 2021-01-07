@@ -268,10 +268,11 @@ class ActivityEditComponent extends MainComponent {
     }
 
     async isValid(data) {
-        // check words problem
-        if(await this.editorHasProblems())
+        await this.editorHasProblems();
+        // check words problem        
+        if(!this.isHiddenFromCustomer(data)&&await this.editorHasProblems())
         {
-            return;
+            return false;
         }
         const callActType = this.state.callActTypes.find((c) => c.id == data.callActTypeID);
         if (!callActType) {
