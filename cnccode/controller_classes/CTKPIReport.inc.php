@@ -16,6 +16,8 @@ class CTKPIReport extends CTCNC
 {
     const GET_SRFIXED="SRFixed";
     const GET_PRIORITY_RAISED="priorityRiased";
+    const GET_PRIORITY_RAISED_ALLOW_SR="priorityRiasedAllowSR";
+    const GET_QUOTATION_CONVERSION="quotationConversion";
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
@@ -44,6 +46,12 @@ class CTKPIReport extends CTCNC
                 exit;
             case self::GET_PRIORITY_RAISED:
                 echo json_encode($this->getPriorityRaisedData());
+                exit;
+            case self::GET_PRIORITY_RAISED_ALLOW_SR:
+                echo json_encode($this->getPriorityRaisedDataAllowSR());
+                exit;
+            case self::GET_QUOTATION_CONVERSION:
+                echo json_encode($this->getQuotationConversion());
                 exit;
             default:
                 $this->setTemplate();
@@ -148,4 +156,82 @@ class CTKPIReport extends CTCNC
         $query .=" GROUP BY problem.pro_date_raised order by date";        
         return DBConnect::fetchAll($query,$params);
     }
+    function getPriorityRaisedDataAllowSR()
+    {
+        $from=$_REQUEST["from"];
+        $to=$_REQUEST["to"];
+        $customerID=$_REQUEST["customerID"];
+        $query=" SELECT
+        
+        DATE_FORMAT( problem.pro_date_raised,'%Y-%m-%d') AS date,
+        SUM(1) AS raisedAll,
+        SUM(pro_priority = 1) AS P1,
+        SUM(pro_priority = 2) AS P2,
+        SUM(pro_priority = 3) AS P3,
+        SUM(pro_priority = 4) AS P4
+        FROM
+        problem
+        JOIN customer
+        ON customer.cus_custno = problem.pro_custno
+        LEFT JOIN custitem
+            ON pro_contract_cuino = cui_cuino
+        LEFT JOIN item
+            ON cui_itemno = itm_itemno
+       WHERE     
+            problem.pro_priority < 5
+        AND problem.`pro_custno`<>282 
+        AND allowSRLog=1
+        ";
+        $params=array();
+        if($from!='')
+        {
+            $query .="  AND problem.pro_date_raised >= :from ";
+            $params["from"]=$from;
+        }
+        if($to!='')
+        {
+            $query .="  AND problem.pro_date_raised <= :to ";
+            $params["to"]=$to;
+        }
+        if($customerID!='')
+        {
+            $query .="  AND problem.pro_custno = :pro_custno ";
+            $params["pro_custno"]=$customerID;
+        }
+        $query .=" GROUP BY problem.pro_date_raised order by date";        
+        return DBConnect::fetchAll($query,$params);
+    }
+    function getQuotationConversion(){
+        $from=$_REQUEST["from"];
+        $to=$_REQUEST["to"];
+        $customerID=$_REQUEST["customerID"];
+        $query="SELECT 
+        quote.odh_quotation_create_date date,
+        COUNT(*) quote,        
+        COUNT(order.odh_custno) conversion
+        FROM ordhead AS `quote` 
+        LEFT JOIN ordhead AS `order` 
+            ON `order`.odh_quotation_ordno = `quote`.odh_ordno 
+        WHERE 
+        1=1 ";
+        $params=array();
+        if($from!='')
+        {
+            $query .="  AND `quote`.odh_quotation_create_date >= :from ";
+            $params["from"]=$from;
+        }
+        if($to!='')
+        {
+            $query .="  AND `quote`.odh_quotation_create_date <= :to ";
+            $params["to"]=$to;
+        }
+        if($customerID!='')
+        {
+            $query .="  AND quote.odh_custno = :custno ";
+            $params["custno"]=$customerID;
+        }
+        $query .=" GROUP BY  date order by date";        
+        return DBConnect::fetchAll($query,$params);       
+    }
+
 }

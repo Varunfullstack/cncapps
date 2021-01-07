@@ -5,9 +5,11 @@ import APIKPIReport from './../services/APIKPIReport';
 import {Line } from 'react-chartjs-2';
 import { groupBy } from '../../utils/utils';
 import { ReportType } from '../KPIReportComponent';
+import { KPIReportHelper } from '../helper/KPIReportHelper';
 export default class SRFixedComponent extends MainComponent {
   api;  
   colors;
+  helper=new KPIReportHelper();
   constructor(props) {
     super(props);    
     this.state = {
@@ -15,7 +17,21 @@ export default class SRFixedComponent extends MainComponent {
       data: this.props.data,    
       filter:this.props.filter        
     };    
-    this.colors=this.props.colors;
+    this.colors = {
+      Escalation: {
+        background: "rgb(238, 126, 48)",
+        border: "rgb(238, 126, 48)",
+      },
+      Helpdesk: {
+        background: "rgb(69, 115, 195)",
+        border: "rgb(69, 115, 195)",
+      },
+      Project: { background: "rgb(255, 192, 0)", border: "rgb(255, 192, 0)" },
+      SmallProject: {
+        background: "rgb(172, 172, 172)",
+        border: "rgb(172, 172, 172)",
+      },
+    };
   }
    
   static getDerivedStateFromProps(props,state)
@@ -63,24 +79,9 @@ export default class SRFixedComponent extends MainComponent {
       },
     ];
   }
-  getWeeks(data, property) {
-    let gdata = data.map((d) => {
-      const dt = moment(d.date);
-      return { value: d[property], date: d.date, week: dt.week() + dt.year() };
-    }); 
-    gdata =groupBy(gdata, "week").map((g, i) => {
-      g.week = g.items[0].date;
-      g.value = g.items.reduce(
-        (prev, current) => prev + parseInt(current.value),
-        0
-      );
-      return g;
-    });
-
-    return gdata;
-  }
+ 
   getWeeklyLabels(data) {
-    return this.getWeeks(data, "escalationsFixedActivities").map((d) => d.week);
+    return this.helper.getWeeks(data, "escalationsFixedActivities").map((d) => d.week);
   }
   getWeeklyData(data) {
     //get data by teams
@@ -89,7 +90,7 @@ export default class SRFixedComponent extends MainComponent {
     let teams = [
       {
         label: "Escalations",
-        data: this.getWeeks(data, "escalationsFixedActivities").map(
+        data: this.helper.getWeeks(data, "escalationsFixedActivities").map(
           (d) => d.value
         ),
         backgroundColor: this.colors.Escalation.background,
@@ -99,7 +100,7 @@ export default class SRFixedComponent extends MainComponent {
       },
       {
         label: "Helpdesk",
-        data: this.getWeeks(data, "helpDeskFixedActivities").map(
+        data: this.helper.getWeeks(data, "helpDeskFixedActivities").map(
           (d) => d.value
         ),
         backgroundColor: this.colors.Helpdesk.background,
@@ -109,7 +110,7 @@ export default class SRFixedComponent extends MainComponent {
       },
       {
         label: "Projects",
-        data: this.getWeeks(data, "projectsActivities").map((d) => d.value),
+        data: this.helper.getWeeks(data, "projectsActivities").map((d) => d.value),
         backgroundColor: this.colors.Project.background,
         borderColor: this.colors.Project.border,
         borderWidth,
@@ -117,7 +118,7 @@ export default class SRFixedComponent extends MainComponent {
       },
       {
         label: "Small Projects",
-        data: this.getWeeks(data, "smallProjectsActivities").map(
+        data: this.helper.getWeeks(data, "smallProjectsActivities").map(
           (d) => d.value
         ),
         backgroundColor: this.colors.SmallProject.background,
@@ -129,30 +130,9 @@ export default class SRFixedComponent extends MainComponent {
     //console.log(teams);
     return teams;
   }
-  getMonths(data, property) {
-    let gdata = data.map((d) => {
-      const dt = moment(d.date);
-      return {
-        value: d[property],
-        date: d.date,
-        month: dt.format("MMM") + " " + dt.year(),
-        
-      };
-    });
-     
-    gdata = groupBy(gdata, "month").map((g, i) => {
-      g.month = g.groupName;
-      g.value = g.items.reduce(
-        (prev, current) => prev + parseInt(current.value),
-        0
-      );
-      return g;
-    });
-   
-    return gdata;
-  }
+ 
   getMonthlyLabels(data) {
-    return this.getMonths(data, "escalationsFixedActivities").map(
+    return this.helper.getMonths(data, "escalationsFixedActivities").map(
       (d) => d.month
     );
   }
@@ -163,7 +143,7 @@ export default class SRFixedComponent extends MainComponent {
     let teams = [
       {
         label: "Escalations",
-        data: this.getMonths(data, "escalationsFixedActivities").map(
+        data: this.helper.getMonths(data, "escalationsFixedActivities").map(
           (d) => d.value
         ),
         backgroundColor: this.colors.Escalation.background,
@@ -173,7 +153,7 @@ export default class SRFixedComponent extends MainComponent {
       },
       {
         label: "Helpdesk",
-        data: this.getMonths(data, "helpDeskFixedActivities").map(
+        data: this.helper.getMonths(data, "helpDeskFixedActivities").map(
           (d) => d.value
         ),
         backgroundColor: this.colors.Helpdesk.background,
@@ -183,7 +163,7 @@ export default class SRFixedComponent extends MainComponent {
       },
       {
         label: "Projects",
-        data: this.getMonths(data, "projectsActivities").map((d) => d.value),
+        data: this.helper.getMonths(data, "projectsActivities").map((d) => d.value),
         backgroundColor: this.colors.Project.background,
         borderColor: this.colors.Project.border,
         borderWidth,
@@ -191,7 +171,7 @@ export default class SRFixedComponent extends MainComponent {
       },
       {
         label: "Small Projects",
-        data: this.getMonths(data, "smallProjectsActivities").map(
+        data: this.helper.getMonths(data, "smallProjectsActivities").map(
           (d) => d.value
         ),
         backgroundColor: this.colors.SmallProject.background,

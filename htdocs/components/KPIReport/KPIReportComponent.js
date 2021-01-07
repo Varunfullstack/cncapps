@@ -12,6 +12,7 @@ import { groupBy, sort } from '../utils/utils';
 import SRFixedComponent from './subComponents/SRFixedComponent';
 import CustomerSearch from '../shared/CustomerSearch';
 import PrioritiesRaisedComponent from './subComponents/PrioritiesRaisedComponent';
+import QuotationConversionComponent from './subComponents/QuotationConversionComponent';
 export const ReportType= { Daily: "day", Weekly: "week", Monthly: "month" }
 
 export default class KPIReportComponent extends MainComponent {
@@ -22,6 +23,8 @@ export default class KPIReportComponent extends MainComponent {
   reportParamters;
   REP_SR_FIXED=1;
   REP_PRIORITIES_RAISED=2;
+  REP_PRIORITIES_RAISED_ALLOW_SR=3;
+  REP_QUOTATION_CONVERSION=4;
   constructor(props) {
     super(props);
     this.ResultType = ReportType;
@@ -37,22 +40,7 @@ export default class KPIReportComponent extends MainComponent {
       reports:[],
       activeReport:null
     };
-    this.api = new APIKPIReport();
-    this.colors = {
-      Escalation: {
-        background: "rgb(238, 126, 48)",
-        border: "rgb(238, 126, 48)",
-      },
-      Helpdesk: {
-        background: "rgb(69, 115, 195)",
-        border: "rgb(69, 115, 195)",
-      },
-      Project: { background: "rgb(255, 192, 0)", border: "rgb(255, 192, 0)" },
-      SmallProject: {
-        background: "rgb(172, 172, 172)",
-        border: "rgb(172, 172, 172)",
-      },
-    };
+    this.api = new APIKPIReport();    
     this.reportParamters={dateFrom:'dateFrom',dateTo:'dateTo',customer:'customer',resultType:'resultType'};
     moment.locale("en");
     moment.updateLocale("en", {
@@ -76,7 +64,7 @@ export default class KPIReportComponent extends MainComponent {
           this.reportParamters.dateTo,
           this.reportParamters.customer,
           this.reportParamters.resultType,
-        ]      
+        ]
       },
       {
         id:this.REP_PRIORITIES_RAISED,
@@ -86,7 +74,27 @@ export default class KPIReportComponent extends MainComponent {
           this.reportParamters.dateTo,
           this.reportParamters.customer,
           this.reportParamters.resultType,
-        ]      
+        ]
+      },
+      {
+        id:this.REP_PRIORITIES_RAISED_ALLOW_SR,
+        title:"Priorities Raised Allow SR",
+        paramters:[
+          this.reportParamters.dateFrom,
+          this.reportParamters.dateTo,
+          this.reportParamters.customer,
+          this.reportParamters.resultType,
+        ]
+      },
+      {
+        id:this.REP_QUOTATION_CONVERSION,
+        title:"Quotation Conversion",
+        paramters:[
+          this.reportParamters.dateFrom,
+          this.reportParamters.dateTo,
+          this.reportParamters.customer,
+          this.reportParamters.resultType,
+        ]
       }
     ];    
     if(!activeReport)
@@ -183,8 +191,10 @@ export default class KPIReportComponent extends MainComponent {
                 <td>Customer</td>
                 <td colSpan={3}>
                   <CustomerSearch
-                    onChange={(customer) =>
+                    onChange={(customer) =>{
+                      if(customer!=null)
                       this.setFilter("customerID", customer.id)
+                    }
                     }
                     width={340}
                   ></CustomerSearch>
@@ -220,39 +230,56 @@ export default class KPIReportComponent extends MainComponent {
     {
       case this.REP_SR_FIXED:
         this.api.getSRFixed(filter.from, filter.to,filter.customerID).then((data) => {      
-          data=data.filter(a=>{        
-             if (moment(a.date).day() == 6 || moment(a.date).day() == 0)
-               return false;
-             else return true;
-          });
-          //console.log(data);
-          this.setState({ data, _showSpinner: false });
+          this.processData(data);
         });
         break;
       case this.REP_PRIORITIES_RAISED:
         this.api.getPriorityRaised(filter.from, filter.to,filter.customerID).then((data) => {      
-          data=data.filter(a=>{        
-             if (moment(a.date).day() == 6 || moment(a.date).day() == 0)
-               return false;
-             else return true;
-          });
-          //console.log(data);
-          this.setState({ data, _showSpinner: false } );
+          this.processData(data);
         });
-        break;
+      break;
+      case this.REP_PRIORITIES_RAISED_ALLOW_SR:
+        this.api.getPriorityRaisedAllowSR(filter.from, filter.to,filter.customerID).then((data) => {      
+          this.processData(data);
+        });
+      break;
+      case this.REP_QUOTATION_CONVERSION:
+        this.api.getQuotationConversion(filter.from, filter.to,filter.customerID).then((data) => {      
+          this.processData(data,false);
+        });
+      break;
     }
     
   };
+  processData=(data,skipWeekEnds=true)=>{
+    const { filter } = this.state;
+    if (skipWeekEnds) {
+      data = data.filter((a) => {
+        if (moment(a.date).day() == 6 || moment(a.date).day() == 0)
+          return false;
+        else return true;
+      });
+    }
+    if (data.length <= 100) filter.resultType = this.ResultType.Daily;
+    if (data.length > 100 && data.length < 200)
+      filter.resultType = this.ResultType.Weekly;
+    else filter.resultType = this.ResultType.Monthly;
+    console.log(data);
+    this.setState({ data, _showSpinner: false, filter });
+  }
   getActivChart=()=>{
     const {activeReport, data,filter} = this.state;
-    console.log(activeReport,this.REP_PRIORITIES_RAISED);
+    //console.log(activeReport,this.REP_PRIORITIES_RAISED);
     switch(activeReport?.id)
     {
       case this.REP_SR_FIXED:
         return <SRFixedComponent data={data} filter={filter} colors={this.colors}></SRFixedComponent>;
       case this.REP_PRIORITIES_RAISED:
-        return <PrioritiesRaisedComponent data={data} filter={filter} colors={this.colors}></PrioritiesRaisedComponent>;
-        
+        return <PrioritiesRaisedComponent data={data} filter={filter} ></PrioritiesRaisedComponent>;
+      case this.REP_PRIORITIES_RAISED_ALLOW_SR:
+        return <PrioritiesRaisedComponent data={data} filter={filter} ></PrioritiesRaisedComponent>;
+      case this.REP_QUOTATION_CONVERSION:
+        return <QuotationConversionComponent data={data} filter={filter}></QuotationConversionComponent>      
       default:
         return null;
     }

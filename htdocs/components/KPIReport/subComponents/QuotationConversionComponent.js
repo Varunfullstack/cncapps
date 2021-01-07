@@ -2,11 +2,11 @@
 import MainComponent from '../../shared/MainComponent'
 import React from 'react';
 import APIKPIReport from './../services/APIKPIReport';
-import {Line } from 'react-chartjs-2';
+import {Line,Bar } from 'react-chartjs-2';
 import { groupBy } from '../../utils/utils';
 import { ReportType } from '../KPIReportComponent';
 import { KPIReportHelper } from '../helper/KPIReportHelper';
-export default class PrioritiesRaisedComponent extends MainComponent {
+export default class QuotationConversionComponent extends MainComponent {
   api;  
   colors;
   helper=new KPIReportHelper();
@@ -18,22 +18,14 @@ export default class PrioritiesRaisedComponent extends MainComponent {
       filter:this.props.filter        
     };    
     this.colors={
-      p1:{
+      quote:{
         background: "rgb(238, 126, 48)",
         border: "rgb(238, 126, 48)",
       },
-      p2:{
+      conversion:{
         background: "rgb(69, 115, 195)",
         border: "rgb(69, 115, 195)",
-      },
-      p3:{
-        background: "rgb(255, 192, 0)", 
-        border: "rgb(255, 192, 0)"
-      },
-      p4:{
-        background: "rgb(172, 172, 172)",
-        border: "rgb(172, 172, 172)",
-      },
+      },      
     };
   }
    
@@ -49,42 +41,26 @@ export default class PrioritiesRaisedComponent extends MainComponent {
     const fill = false;
     return [
       {
-        label: "P1",
-        data: data.map((d) => d.P1),
-        backgroundColor: this.colors.p1.background,
-        borderColor: this.colors.p1.border,
+        label: "Quote",
+        data: data.map((d) => d.quote),
+        backgroundColor: this.colors.quote.background,
+        borderColor: this.colors.quote.border,
         borderWidth,
         fill,
       },
       {
-        label: "P2",
-        data: data.map((d) => d.P2),
-        backgroundColor: this.colors.p2.background,
-        borderColor: this.colors.p2.border,
+        label: "Conversion",
+        data: data.map((d) => d.conversion),
+        backgroundColor: this.colors.conversion.background,
+        borderColor: this.colors.conversion.border,
         borderWidth,
         fill,
-      },
-      {
-        label: "P3",
-        data: data.map((d) => d.P3),
-        backgroundColor: this.colors.p3.background,
-        borderColor: this.colors.p3.border,
-        borderWidth,
-        fill,
-      },
-      {
-        label: "P4",
-        data: data.map((d) => d.P4),
-        backgroundColor: this.colors.p4.background,
-        borderColor: this.colors.p4.border,
-        borderWidth,
-        fill,
-      },
+      }
     ];
   }
-
+   
   getWeeklyLabels(data) {
-    return this.helper.getWeeks(data, "P1").map((d) => d.week);
+    return this.helper.getWeeks(data, "quote").map((d) => d.week);
   }
   getWeeklyData(data) {
     //get data by teams
@@ -92,50 +68,32 @@ export default class PrioritiesRaisedComponent extends MainComponent {
     const fill = false;
     let teams = [
       {
-        label: "P1",
-        data: this.helper.getWeeks(data, "P1").map(
+        label: "Quote",
+        data: this.helper.getWeeks(data, "quote").map(
           (d) => d.value
         ),
-        backgroundColor: this.colors.p1.background,
-        borderColor: this.colors.p1.border,
+        backgroundColor: this.colors.quote.background,
+        borderColor: this.colors.quote.border,
         borderWidth,
         fill,
       },
       {
-        label: "P2",
-        data: this.helper.getWeeks(data, "P2").map(
+        label: "Conversion",
+        data: this.helper.getWeeks(data, "conversion").map(
           (d) => d.value
         ),
-        backgroundColor: this.colors.p2.background,
-        borderColor: this.colors.p2.border,
+        backgroundColor: this.colors.conversion.background,
+        borderColor: this.colors.conversion.border,
         borderWidth,
         fill,
-      },
-      {
-        label: "P3",
-        data: this.helper.getWeeks(data, "P3").map((d) => d.value),
-        backgroundColor: this.colors.p3.background,
-        borderColor: this.colors.p3.border,
-        borderWidth,
-        fill,
-      },
-      {
-        label: "P4",
-        data: this.helper.getWeeks(data, "P4").map(
-          (d) => d.value
-        ),
-        backgroundColor: this.colors.p4.background,
-        borderColor: this.colors.p4.border,
-        borderWidth,
-        fill,
-      },
+      }
     ];
     //console.log(teams);
     return teams;
   }
- 
+  
   getMonthlyLabels(data) {
-    return this.helper.getMonths(data, "P1").map(
+    return this.helper.getMonths(data, "quote").map(
       (d) => d.month
     );
   }
@@ -145,43 +103,25 @@ export default class PrioritiesRaisedComponent extends MainComponent {
     const fill = false;
     let teams = [
       {
-        label: "P1",
-        data: this.helper.getMonths(data, "P1").map(
+        label: "Quote",
+        data: this.helper.getMonths(data, "quote").map(
           (d) => d.value
         ),
-        backgroundColor: this.colors.p1.background,
-        borderColor: this.colors.p1.border,
+        backgroundColor: this.colors.quote.background,
+        borderColor: this.colors.quote.border,
         borderWidth,
         fill,
       },
       {
-        label: "P2",
-        data: this.helper.getMonths(data, "P2").map(
+        label: "Conversion",
+        data: this.helper.getMonths(data, "conversion").map(
           (d) => d.value
         ),
-        backgroundColor: this.colors.p2.background,
-        borderColor: this.colors.p2.border,
+        backgroundColor: this.colors.conversion.background,
+        borderColor: this.colors.conversion.border,
         borderWidth,
         fill,
-      },
-      {
-        label: "P3",
-        data: this.helper.getMonths(data, "P3").map((d) => d.value),
-        backgroundColor: this.colors.p3.background,
-        borderColor: this.colors.p3.border,
-        borderWidth,
-        fill,
-      },
-      {
-        label: "P4",
-        data: this.helper.getMonths(data, "P4").map(
-          (d) => d.value
-        ),
-        backgroundColor: this.colors.p4.background,
-        borderColor: this.colors.p4.border,
-        borderWidth,
-        fill,
-      },
+      }
     ];
     //console.log(teams);
     return teams;
@@ -217,14 +157,14 @@ export default class PrioritiesRaisedComponent extends MainComponent {
         yAxes: [
           {
             ticks: {
-              beginAtZero: false,
+              beginAtZero: true,
             },
           },
         ],
       },
     };
     return <div style={{height:"80vh",width:"85vw"}} >
-     <Line data={chartData} options={options}  />
+     <Bar data={chartData} options={options}  />
      </div>
            
     ;

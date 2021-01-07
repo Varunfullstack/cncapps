@@ -7,6 +7,11 @@ export default class APIKPIReport extends APIMain {
     }
     getPriorityRaised(startDate,endDate,customerID){
         return this.get(`${ApiUrls.KPIReport}priorityRiased&from=${startDate}&to=${endDate}&customerID=${customerID}`);
-
+    }
+    getPriorityRaisedAllowSR(startDate,endDate,customerID){
+        return this.get(`${ApiUrls.KPIReport}priorityRiasedAllowSR&from=${startDate}&to=${endDate}&customerID=${customerID}`);
+    }
+    getQuotationConversion(startDate,endDate,customerID){
+        return this.get(`${ApiUrls.KPIReport}quotationConversion&from=${startDate}&to=${endDate}&customerID=${customerID}`);
     }
 }
