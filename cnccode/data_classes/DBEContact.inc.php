@@ -49,14 +49,10 @@ class DBEContact extends DBCNCEntity
 
     const initialLoggingEmailFlag = 'initialLoggingEmailFlag';
     const fixedEmailFlag = 'fixedEmailFlag';
-    const closureEmailFlag = 'closureEmailFlag';
 
     const othersInitialLoggingEmailFlag = 'othersInitialLoggingEmailFlag';
-    const othersWorkStartedEmailFlag = "othersWorkStartedEmailFlag";
     const othersWorkUpdatesEmailFlag = 'othersWorkUpdatesEmailFlag';
     const othersFixedEmailFlag = 'othersFixedEmailFlag';
-    const othersPendingClosureEmailFlag = "othersPendingClosureEmailFlag";
-    const othersClosureEmailFlag = 'othersClosureEmailFlag';
 
     const pendingLeaverFlag = 'pendingLeaverFlag';
     const pendingLeaverDate = 'pendingLeaverDate';
@@ -260,33 +256,13 @@ class DBEContact extends DBCNCEntity
             DA_YN,
             DA_NOT_NULL
         );
-
-        $this->addColumn(
-            self::othersWorkStartedEmailFlag,
-            DA_YN,
-            DA_NOT_NULL
-        );
-
         $this->addColumn(
             self::othersWorkUpdatesEmailFlag,
             DA_YN,
             DA_NOT_NULL
         );
-
         $this->addColumn(
             self::othersFixedEmailFlag,
-            DA_YN,
-            DA_NOT_NULL
-        );
-
-        $this->addColumn(
-            self::othersPendingClosureEmailFlag,
-            DA_YN,
-            DA_NOT_NULL
-        );
-
-        $this->addColumn(
-            self::othersClosureEmailFlag,
             DA_YN,
             DA_NOT_NULL
         );

@@ -618,23 +618,11 @@ class BUCustomer extends Business
             'Y'
         );
         $dsContact->setValue(
-            DBEContact::othersWorkStartedEmailFlag,
-            'Y'
-        );
-        $dsContact->setValue(
             DBEContact::othersWorkUpdatesEmailFlag,
             'Y'
         );
         $dsContact->setValue(
             DBEContact::othersFixedEmailFlag,
-            'Y'
-        );
-        $dsContact->setValue(
-            DBEContact::othersPendingClosureEmailFlag,
-            'Y'
-        );
-        $dsContact->setValue(
-            DBEContact::othersClosureEmailFlag,
             'Y'
         );
         $dsContact->post();
@@ -1186,21 +1174,12 @@ class BUCustomer extends Business
                 DBEContact::othersInitialLoggingEmailFlag => $this->dbeContact->getValue(
                     DBEContact::othersInitialLoggingEmailFlag
                 ),
-                DBEContact::othersWorkStartedEmailFlag    => $this->dbeContact->getValue(
-                    DBEContact::othersWorkStartedEmailFlag
-                ),
                 DBEContact::othersWorkUpdatesEmailFlag    => $this->dbeContact->getValue(
                     DBEContact::othersWorkUpdatesEmailFlag
-                ),
-                DBEContact::othersPendingClosureEmailFlag => $this->dbeContact->getValue(
-                    DBEContact::othersPendingClosureEmailFlag
                 ),
                 DBEContact::othersFixedEmailFlag          => $this->dbeContact->getValue(
                     DBEContact::othersFixedEmailFlag
                 ),
-                DBEContact::othersClosureEmailFlag        => $this->dbeContact->getValue(
-                    DBEContact::othersClosureEmailFlag
-                )
             ];
         }
         return $contacts;

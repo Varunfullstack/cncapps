@@ -1644,21 +1644,13 @@ class CTCustomerCRM extends CTCustomer
                     'othersInitialLoggingEmailFlagChecked' => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::othersInitialLoggingEmailFlag)
                     ),
-                    'othersWorkStartedEmailFlagChecked'    => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::othersWorkStartedEmailFlag)
-                    ),
                     'othersWorkUpdatesEmailFlagChecked'    => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::othersWorkUpdatesEmailFlag)
                     ),
                     'othersFixedEmailFlagChecked'          => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::othersFixedEmailFlag)
                     ),
-                    'othersPendingClosureEmailFlagChecked' => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::othersPendingClosureEmailFlag)
-                    ),
-                    'othersClosureEmailFlagChecked'        => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::othersClosureEmailFlag)
-                    ),
+
                     'hrUserFlagChecked'                    => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::hrUser)
                     ),
