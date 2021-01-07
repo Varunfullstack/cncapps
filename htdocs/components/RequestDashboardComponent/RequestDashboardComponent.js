@@ -44,9 +44,9 @@ class RequestDashboardComponent extends MainComponent {
             changRequests:[],
             timeRequests:[],
             tabs : [
-                {id: this.TIME_REQUEST, title: "Time Request", icon: null},
-                {id: this.CHANGE_REQUEST, title: "Change Request", icon: null},
-                {id: this.SALES_REQUEST, title: "Sales Request", icon: null},
+                {id: this.TIME_REQUEST, title: "Time Request", icon: null,hasP5:true},
+                {id: this.CHANGE_REQUEST, title: "Change Request", icon: null,hasP5:true},
+                {id: this.SALES_REQUEST, title: "Sales Request", icon: null,hasP5:false},
             ]
         };
         
@@ -211,11 +211,14 @@ class RequestDashboardComponent extends MainComponent {
     }
     
     getFilterElement = () => {
-        const {filter} = this.state;         
+        const {filter,tabs} = this.state;             
+        const tab=tabs.find(t=>t.id==filter.activeTab);
+        
         return (
             <div className="m-5">
                 {
                         <React.Fragment>
+                            {tab.hasP5? <React.Fragment>
                             <label className="mr-3 ml-5">HD</label>
                             <Toggle checked={filter.hd}
                                     onChange={(value) => this.setFilterValue("hd", !filter.hd)}
@@ -232,10 +235,14 @@ class RequestDashboardComponent extends MainComponent {
                             <Toggle checked={filter.p}
                                     onChange={(value) => this.setFilterValue("p", !filter.p)}
                             />
-                            <label className="mr-3 ml-5">P5</label>
-                            <Toggle checked={filter.p5}
-                                    onChange={(value) => this.setFilterValue("p5", !filter.p5)}
-                            />
+                            
+                                    <label className="mr-3 ml-5">P5</label>
+                                    <Toggle checked={filter.p5}
+                                            onChange={(value) => this.setFilterValue("p5", !filter.p5)}
+                                    />
+                                    </React.Fragment>:null
+                            }
+                            
                         </React.Fragment>
                 }
                 <label className="mr-3 ml-5">

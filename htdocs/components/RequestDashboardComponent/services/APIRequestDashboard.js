@@ -20,9 +20,14 @@ export default class APIRequestDashboard extends APIMain {
     getSalesRequest(filter)
     {
         //console.log('filter',filter);
-       
+        const salesFilter={...filter};
+        salesFilter.p5=false;
+        salesFilter.hd=true;
+        salesFilter.es=true;
+        salesFilter.p=true;
+        salesFilter.sp=true;
         return fetch(
-            `${ApiUrls.RequestDashboard}getSalesRequest&`+this.getTeams(filter)
+            `${ApiUrls.RequestDashboard}getSalesRequest&`+this.getTeams(salesFilter)
           ).then((res) => res.json());
     }  
     getTeams(filter)
