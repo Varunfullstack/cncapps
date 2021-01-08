@@ -8,4 +8,5 @@ export default class ApiUrls{
  static FirstTimeFixReport="/FirstTimeFixReport.php?action=";
  static RequestDashboard="/RequestDashBoard.php?action=";
 
+ static KPIReport="/KPIReport.php?action=";
 }
