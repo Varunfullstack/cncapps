@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unrelased]
+### Added
+- Issue 1160 - KPI Graphs for performance
+
 ## [v5.1.1] - 2020-12-30
 ### Removed
 - Remove the friendly name column from the Asset List Extract.
