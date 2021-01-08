@@ -180,8 +180,8 @@ class CustomerSiteComponent extends MainComponent {
         data.nextStep = 4;
         data.reason = data.reasonTemplate;
         data.internalNotes = data.internalNotesTemplate;
-        if(await this.editorHasProblems())
-        {
+        const hasGrammaticalErrors = await this.editorHasProblems();
+        if (hasGrammaticalErrors) {
             return;
         }
         if (data.siteNo == -1) {

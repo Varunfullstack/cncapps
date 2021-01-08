@@ -4,10 +4,12 @@ import Prompt from "./Prompt.js";
 
 import React from 'react';
 import APIHeader from '../services/APIHeader';
+
 export default class MainComponent extends React.Component {
 
     promptCallback;
     api;
+
     constructor(props) {
         super(props);
         this.el = React.createElement;
@@ -30,14 +32,14 @@ export default class MainComponent extends React.Component {
                 show: false,
                 title: "",
                 width: 500,
-                height:20,
+                height: 20,
                 message: "",
                 value: null,
                 defaultValue: null,
                 isEditor: false
             },
         };
-        this.apiHeader=new APIHeader();
+        this.apiHeader = new APIHeader();
     }
 
     isSDManager(user) {
@@ -96,9 +98,9 @@ export default class MainComponent extends React.Component {
             autoClose={true}
         />;
     }
-    handleAlertAutoClose=()=>{
+    handleAlertAutoClose = () => {
         const {alert} = this.state;
-        alert.show=false;
+        alert.show = false;
         this.setState({alert});
         //console.log("auto close");
     }
@@ -154,11 +156,11 @@ export default class MainComponent extends React.Component {
 
     //-----------------end alert
     //----------------prompt
-    prompt = (title = "Prompt", width = 500, defaultValue = null, isEditor = false,height=20) => {
+    prompt = (title = "Prompt", width = 500, defaultValue = null, isEditor = false, height = 20) => {
         const {prompt} = this.state;
         prompt.show = true;
         prompt.width = width;
-        prompt.height=height;
+        prompt.height = height;
         prompt.title = title;
         prompt.value = null;
         prompt.defaultValue = defaultValue;
@@ -190,26 +192,21 @@ export default class MainComponent extends React.Component {
         data[property] = value;
         this.setState({data});
     }
-    editorHasProblems= async()=>{
-        return new Promise(resolve => {
-        this.apiHeader.getNumberOfAllowedMistaks().then(nMistaks=>{
-            console.log("nMistaks",nMistaks);
+    editorHasProblems = async () => {
+        return this.apiHeader.getNumberOfAllowedMistaks().then(nMistaks => {
             const wscInstances = WEBSPELLCHECKER.getInstances();
-            let count=0;
-            wscInstances.forEach(instance => {
-                count +=instance.getProblemsCount();
-            });
-            console.log(wscInstances,count);
-            if(count>nMistaks)        
-            {
+            let count = wscInstances.reduce((acc, instance) => {
+                const containerNode = instance.getContainerNode();
+                if (containerNode.dataset && containerNode.dataset.excludeFromErrorCount === "true") {
+                    return acc;
+                }
+                return acc + instance.getProblemsCount();
+            }, 0)
+            if (count > nMistaks) {
                 this.alert("You have too many spelling or grammatical errors, please correct them before proceeding.");
-                resolve(true);            
+                return true
             }
-            else 
-                resolve(false);
-            });
+            return false;
         });
-        
-       
     }
 }

@@ -134,13 +134,14 @@ class CNCCKEditor extends React.Component {
                     name={this.props.name}
                     style={this.props.style}
                     ref={ref => (this.element = ref)}
+                    data-exclude-from-error-count={this.props.excludeFromErrorCount || false}
                     className="testing"
         />;
     }
 
     getCNCCKEditorConfig = () => {
         const defaultConfig = {
-            startupFocus : this.props.autoFocus||false,
+            // startupFocus : this.props.autoFocus||false,
             contentsCss: "/screen.css",
             toolbarStartupExpanded: false,
             toolbar: "CNCToolbar",
@@ -170,17 +171,12 @@ class CNCCKEditor extends React.Component {
             width: this.props.width || "auto",
             height: this.props.height || 500,
             resize_minHeight: this.props.height || 500,
-            removePlugins: "wsc,liststyle,tabletools,language,tableselection,magicline",            
+            removePlugins: "liststyle,tabletools,language,tableselection,magicline",
             disableNativeSpellChecker: true,
             wsc_customDictionaryIds: '100920',
             font_defaultLabel: 'Arial',
             fontSize_defaultLabel: '10pt',            
-            scayt_autoStartup: true,
-            grayt_autoStartup: true,
-            scayt_ignoreAllCapsWords : true,
-            scayt_ignoreDomainNames : true,
-            scayt_ignoreWordsWithMixedCases : true,
-            scayt_ignoreWordsWithNumbers : true,
+
         };
 
         if (this.props.sharedSpaces) {
