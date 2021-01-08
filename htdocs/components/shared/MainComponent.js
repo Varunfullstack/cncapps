@@ -193,7 +193,7 @@ export default class MainComponent extends React.Component {
         this.setState({data});
     }
     editorHasProblems = async () => {
-        return this.apiHeader.getNumberOfAllowedMistaks().then(nMistaks => {
+        return this.apiHeader.getNumberOfAllowedMistaks().then(nMistakes => {
             const wscInstances = WEBSPELLCHECKER.getInstances();
             let count = wscInstances.reduce((acc, instance) => {
                 const containerNode = instance.getContainerNode();
@@ -202,7 +202,7 @@ export default class MainComponent extends React.Component {
                 }
                 return acc + instance.getProblemsCount();
             }, 0)
-            if (count > nMistaks) {
+            if (count > nMistakes) {
                 this.alert("You have too many spelling or grammatical errors, please correct them before proceeding.");
                 return true
             }
