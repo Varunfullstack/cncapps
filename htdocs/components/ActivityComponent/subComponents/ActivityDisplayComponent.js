@@ -830,7 +830,7 @@ class ActivityDisplayComponent extends MainComponent {
                 el(
                     "label",
                     {className: "label mt-5 mr-3 ml-1 mb-5", style: {display: "block"}},
-                    "Internal Notes"
+                    "Expenses"
                 ),
                 el(ToolTip, {
                     width: 15,
