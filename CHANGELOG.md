@@ -2,8 +2,11 @@
 This project changes will be shown here.
 
 ## [unreleased]
+### Added
+- Issue 1038 - Add means of monitoring the licensing data received from StreamOne. 
 ### Changed
 - Issue 1170 - Modal Popup GUI Improvements
+- Issue 1164 - Combine Dashboards for Change, Sales and Time Requests
 
 ## [v5.1.1] - 2020-12-30
 ### Removed
