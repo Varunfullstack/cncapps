@@ -255,7 +255,7 @@ class CTCNC extends Controller
         );
         $dbeUser->getRow();
         $this->favouriteMenu = new FavouriteMenu($this->userID);
-        $this->user = new BUUser($this);
+        $this->user          = new BUUser($this);
         parent::__construct(
             $requestMethod,
             $postVars,
@@ -321,7 +321,7 @@ class CTCNC extends Controller
     function parsePage()
     {
         global $userName;
-        $menu = new SideMenu($this->favouriteMenu);
+        $menu      = new SideMenu($this->favouriteMenu);
         $urlLogout = Controller::buildLink(
             $_SERVER ['PHP_SELF'],
             array('action' => CTCNC_ACT_LOGOUT)
@@ -863,11 +863,6 @@ class CTCNC extends Controller
                 "id"    => 507,
                 "label" => "Spend/Manufacturer",
                 "href"  => "ManagementReports.php?action=SpendByManufacturer",
-            ],
-            [
-                "id"    => 508,
-                "label" => "Quotation Conversion",
-                "href"  => "QuotationConversionReport.php",
             ],
             [
                 "id"    => 509,
