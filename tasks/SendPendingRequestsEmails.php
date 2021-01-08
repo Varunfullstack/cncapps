@@ -31,7 +31,7 @@ processChangeRequestsEmails();
 function processChangeRequestsEmails()
 {
     $dbejCallActivity = new DBEJCallActivity($thing);
-    $dbejCallActivity->getPendingChangeRequestRows();
+    $dbejCallActivity->getPendingChangeRequestRows(true,true,true,true);
     $pendingHDRequests = [];
     $pendingESRequests = [];
     $pendingIMRequests = [];
@@ -115,7 +115,7 @@ function addPendingTimeRequestToArray(&$array,
 function processTimeRequestsEmails()
 {
     $dbejCallActivity = new DBEJCallActivity($thing);
-    $dbejCallActivity->getPendingTimeRequestRows();
+    $dbejCallActivity->getPendingTimeRequestRows(true,true,true,true);
     $pendingHDRequests      = [];
     $pendingESRequests      = [];
     $pendingIMRequests      = [];
@@ -277,7 +277,7 @@ function sendTimeRequestsEmail($teamEmail,
     $buMail = new BUMail($thing);
     $senderEmail = CONFIG_SUPPORT_EMAIL;
     global $twig;
-    $body = $twig->render('@internal/pendingTimeRequestsEmail.html.twig', ["items" => $requests]);
+    $body = $twig->render('@internal/pendingTimeRequestsEmail.html.twig', ["items" => $requests,"requestDashUrl"=>SITE_URL."/RequestDashBoard.php"]);
     $toEmail = $teamEmail;
     $hdrs = array(
         'From'         => $senderEmail,

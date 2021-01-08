@@ -58,7 +58,8 @@ class Alert extends React.Component {
             content = (<label dangerouslySetInnerHTML={{__html: message}}/>)
         }
 
-        return (el(
+        return (el('div',{style:{zIndex:101, position: "absolute"}},
+        el(
             Modal, {
                 title: title || "Alert",
                 show: this.props.show,
@@ -67,7 +68,7 @@ class Alert extends React.Component {
                 footer: el('button', {key: "btnOk", onClick: () => this.close(),autoFocus:true}, "OK "+this.state.autoCloseTimer),
                 content
             }
-        ));
+        )));
     }
 }
 

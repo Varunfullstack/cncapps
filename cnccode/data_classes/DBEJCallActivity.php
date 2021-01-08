@@ -8,7 +8,7 @@
 
 
 require_once __DIR__ . '/DBECallActivity.inc.php';
-
+require_once($cfg["path_dbe"] . "/DBConnect.php");
 /*
 * Call activity join
 * @authors Karim Ahmed
@@ -415,7 +415,9 @@ class DBEJCallActivity extends DBECallActivity
             " LEFT JOIN " .
             " consultant as completed_user ON callactivity.caa_completed_consno = completed_user.cns_consno" .
             " LEFT JOIN " .
-            " rootcause ON rootcause.rtc_rootcauseno = problem.pro_rootcauseno";
+            " rootcause ON rootcause.rtc_rootcauseno = problem.pro_rootcauseno".
+            " LEFT JOIN  " .
+            " team ON consultant.teamID = team.teamID";
     }
 
     function getRow($callActivityID = null)
@@ -602,10 +604,12 @@ class DBEJCallActivity extends DBECallActivity
      * @param bool $showProjects
      * @return bool
      */
-    function getPendingChangeRequestRows($showHelpDesk = true,
-                                         $showEscalations = true,
-                                         $showSmallProjects = true,
-                                         $showProjects = true
+    function getPendingChangeRequestRows($showHelpDesk = false,
+                                         $showEscalations = false,
+                                         $showSmallProjects = false,
+                                         $showProjects = false,
+                                         $isP5=false,
+                                         $limit=0
     )
     {
 
@@ -631,30 +635,97 @@ class DBEJCallActivity extends DBECallActivity
         if (!$showProjects) {
             $query .= " and pro_queue_no <> 5 ";
         }
-
+        if($isP5)
+            $query .= " and problem.pro_priority = 5 and  team.level <= 3 ";
+        if($limit>0)
+        $query .= " limit $limit";
         $this->setQueryString($query);
         return (parent::getRows());
     }
 
-    function getPendingTimeRequestRows()
-    {
+    function getPendingTimeRequestRows($showHelpDesk=false, $showEscalation=false , $showSmallProjects=false, $showProjects=false ,$isP5=false,$limit=0)
+    {        
         $query =
             "SELECT " .
             $this->getDBColumnNamesAsString() .
             " FROM " . $this->fromString .
-            " WHERE callactivity.caa_status = 'O' and caa_callacttypeno = 61";
+            " WHERE callactivity.caa_status = 'O' and caa_callacttypeno = 61 ";
+        if (!$showHelpDesk) {
+            $query .= " and team.teamID <> 1 ";
+        }
+
+        if (!$showEscalation) {
+            $query .= " and  team.teamID <> 2 ";
+        }
+
+        if (!$showSmallProjects) {
+            $query .= " and team.teamID <> 4 ";
+        }
+
+        if (!$showProjects) {
+            $query .= " and team.teamID <> 5 ";
+        }
+        if ($isP5) {
+            $query .= " and problem.pro_priority = 5 and  team.level <= 3 ";
+        }       
+        // echo  $query;
+        // exit;
+        if($limit>0)
+        $query .= " limit $limit";
         $this->setQueryString($query);
         return (parent::getRows());
     }
 
-    public function getPendingSalesRequestRows()
+    public function getPendingSalesRequestRows($showHelpDesk=false, $showEscalation=false , $showSmallProjects=false, $showProjects=false ,$isP5=false,$limit=0)
     {
+        // $query="SELECT " .
+        //     $this->getDBColumnNamesAsString() .
+        //     " FROM " . $this->fromString .
+        //     " WHERE callactivity.salesRequestStatus = 'O' and caa_callacttypeno = 43";
+        // $this->setQueryString($query);
+        // return (parent::getRows());
+
         $query =
-            "SELECT " .
-            $this->getDBColumnNamesAsString() .
-            " FROM " . $this->fromString .
-            " WHERE callactivity.salesRequestStatus = 'O' and caa_callacttypeno = 43";
-        $this->setQueryString($query);
-        return (parent::getRows());
+            "SELECT
+            customer.cus_name AS customerName,
+            callactivity.`caa_problemno` AS problemID,
+            callactivity.`reason` AS requestBody,
+            consultant.cns_name AS requestedBy,
+            CONCAT(callactivity.`caa_date`,' ',callactivity.`caa_starttime`,':00') AS requestedDateTime,
+            callactivity.`caa_callactivityno` AS callActivityID,            
+            standardtext.`stt_desc` AS `type`,
+            problem.`salesRequestAssignedUserId`,
+            standardtext.salesRequestDoNotNotifySalesOption
+            FROM
+            callactivity 
+            LEFT JOIN standardtext ON callactivity.`requestType` = standardtext.`stt_standardtextno`
+            LEFT JOIN problem ON callactivity.`caa_problemno` = problem.`pro_problemno`
+            LEFT JOIN customer ON problem.`pro_custno` = customer.`cus_custno`
+            LEFT JOIN consultant ON callactivity.`caa_consno` = consultant.cns_consno
+            LEFT JOIN   team ON consultant.teamID = team.teamID
+            WHERE callactivity.salesRequestStatus = 'O'
+            AND caa_callacttypeno = 43 ";
+
+        if (!$showHelpDesk) {
+            $query .= " and team.teamID <> 1 ";
+        }
+
+        if (!$showEscalation) {
+            $query .= " and  team.teamID <> 2 ";
+        }
+
+        if (!$showSmallProjects) {
+            $query .= " and team.teamID <> 4 ";
+        }
+
+        if (!$showProjects) {
+            $query .= " and team.teamID <> 5 ";
+        }
+        if ($isP5) {
+            $query .= " and problem.pro_priority = 5 and  team.level <= 3 ";
+        }
+        if ($limit > 0)
+        $query .= " limit $limit";
+        return DBConnect::fetchAll($query,[]);
     }
 }
