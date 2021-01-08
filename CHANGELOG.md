@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v5.2.0]
 ### Added
 - Issue 1038 - Add means of monitoring the licensing data received from StreamOne.
 - Issue 1160 - KPI Graphs for performance
@@ -9,6 +9,7 @@ This project changes will be shown here.
 - Issue 1170 - Modal Popup GUI Improvements
 - Issue 1164 - Combine Dashboards for Change, Sales and Time Requests
 - Issue 1148 - Set max number of mistakes in editor
+- Issue 1179 - Change Summary Of Resolution min character required.
 
 ## [v5.1.1] - 2020-12-30
 ### Removed

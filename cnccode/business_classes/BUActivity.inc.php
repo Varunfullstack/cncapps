@@ -1227,7 +1227,6 @@ class BUActivity extends Business
             DBEJProblem::internalNotes,
             $dsCallActivity->getValue(DBEJCallActivity::internalNotes)
         );
-
         $problem->setValue(
             DBEJProblem::completeDate,
             $dsCallActivity->getValue(DBEJCallActivity::completeDate)
@@ -1494,7 +1493,13 @@ class BUActivity extends Business
         if (!$emailRecipients) {
             return;
         }
-        $this->sendEmail($body, $subject, $emailRecipients);
+        $createdBy = $dbejCallactivity->getValue(DBEJCallActivity::caaConsno);
+        $user      = new DBEUser($this);
+        $bcc       = null;
+        if ($user->getValue(DBEUser::bccOnCustomerEmails)) {
+            $bcc = $user->getEmail();
+        }
+        $this->sendEmail($body, $subject, $emailRecipients, $bcc);
     }
 
     private function shouldSendCustomerEmail(DBEJCallActivity $dbejCallactivity)
@@ -1545,11 +1550,11 @@ class BUActivity extends Business
         return implode(',', $emails);
     }
 
-    private function sendEmail(string $body, string $subject, string $emailRecipients)
+    private function sendEmail(string $body, string $subject, string $emailRecipients, ?string $bcc = null)
     {
         $buMail = new BUMail($this);
-        $buMail->sendSimpleEmail($body, $subject, $emailRecipients);
-    } // end sendRequestCompletedEarlyEmail
+        $buMail->sendSimpleEmail($body, $subject, $emailRecipients, CONFIG_SUPPORT_EMAIL, null, $bcc);
+    }
 
     private function sendMonitoringEmails($callActivityID)
     {
@@ -3298,13 +3303,13 @@ class BUActivity extends Business
             'page',
             'ChangeRequestEmail.inc.html'
         );
-        $userName                = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(
+        $userName = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(
                 DBEUser::lastName
             );
         // $urlChangeControlRequest = SITE_URL . '/Activity.php?action=changeRequestReview&callActivityID=' . $dbeCallActivity->getValue(
         //         DBEJCallActivity::callActivityID
         //     ) . '&fromEmail=true';
-        $urlChangeControlRequest = SITE_URL."/RequestDashBoard.php";
+        $urlChangeControlRequest = SITE_URL . "/RequestDashBoard.php";
         $urlFirstActivity        = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dsInitialCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             );
@@ -9991,13 +9996,13 @@ FROM
             'page',
             'SalesRequestEmail.html'
         );
-        $userName              = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(
+        $userName = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(
                 DBEUser::lastName
             );
         // $urlSalesRequestReview = SITE_URL . '/Activity.php?action=salesRequestReview&callActivityID=' . $salesRequestActivity->getValue(
         //         DBEJCallActivity::callActivityID
         //     ) . '&fromEmail=true';
-        $urlSalesRequestReview = SITE_URL."/RequestDashBoard.php";
+        $urlSalesRequestReview = SITE_URL . "/RequestDashBoard.php";
         $urlFirstActivity      = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dsInitialCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             );

@@ -532,6 +532,9 @@ class CTUser extends CTCNC
                 'activeFlagChecked'                             => Controller::htmlChecked(
                     $dsUser->getValue(DBEUser::activeFlag)
                 ),
+                "bccOnCustomerEmailsChecked"                    => $dsUser->getValue(
+                    DBEUser::bccOnCustomerEmails
+                ) ? "checked" : "",
                 'globalExpenseApproverChecked'                  => $dsUser->getValue(
                     DBEUser::globalExpenseApprover
                 ) ? 'checked' : null,

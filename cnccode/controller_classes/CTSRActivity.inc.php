@@ -665,7 +665,6 @@ class CTSRActivity extends CTCNC
             }
             //check Hold all SRs for QA Review
             if ($this->dbeUser->getValue(DBEUser::holdAllSRsforQAReview) == 1) {
-
                 $dsCallActivity->addColumn(DBEProblem::holdForQA, DA_BOOLEAN, false);
                 $dsCallActivity->setValue(DBEProblem::holdForQA, 1);
             }
