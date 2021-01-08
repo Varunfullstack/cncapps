@@ -3,11 +3,11 @@ import Confirm from "./Confirm.js";
 import Prompt from "./Prompt.js";
 
 import React from 'react';
-
+import APIHeader from '../services/APIHeader';
 export default class MainComponent extends React.Component {
 
     promptCallback;
-
+    api;
     constructor(props) {
         super(props);
         this.el = React.createElement;
@@ -37,6 +37,7 @@ export default class MainComponent extends React.Component {
                 isEditor: false
             },
         };
+        this.apiHeader=new APIHeader();
     }
 
     isSDManager(user) {
@@ -188,5 +189,27 @@ export default class MainComponent extends React.Component {
         const {data} = this.state;
         data[property] = value;
         this.setState({data});
+    }
+    editorHasProblems= async()=>{
+        return new Promise(resolve => {
+        this.apiHeader.getNumberOfAllowedMistaks().then(nMistaks=>{
+            console.log("nMistaks",nMistaks);
+            const wscInstances = WEBSPELLCHECKER.getInstances();
+            let count=0;
+            wscInstances.forEach(instance => {
+                count +=instance.getProblemsCount();
+            });
+            console.log(wscInstances,count);
+            if(count>nMistaks)        
+            {
+                this.alert("You have too many spelling or grammatical errors, please correct them before proceeding.");
+                resolve(true);            
+            }
+            else 
+                resolve(false);
+            });
+        });
+        
+       
     }
 }

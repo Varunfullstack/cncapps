@@ -205,7 +205,7 @@ class ActivityEditComponent extends MainComponent {
     }
 
     // update>
-    async updateActivity(autoSave = false) {
+    async updateActivity(autoSave = false) {        
         const data = {...this.state.data};
         this.setState({allowLeaving: true});
         data.reason = data.reasonTemplate;
@@ -268,7 +268,12 @@ class ActivityEditComponent extends MainComponent {
     }
 
     async isValid(data) {
-
+        await this.editorHasProblems();
+        // check words problem        
+        if(!this.isHiddenFromCustomer(data)&&await this.editorHasProblems())
+        {
+            return false;
+        }
         const callActType = this.state.callActTypes.find((c) => c.id == data.callActTypeID);
         if (!callActType) {
             this.alert("Please select activity type");
@@ -385,10 +390,12 @@ class ActivityEditComponent extends MainComponent {
 
             }
         }
+        
         if (!data.assetName && !this.state.data.emptyAssetReason) {
             this.alert("Please select an asset or a reason");
             return false;
         }
+        
         return true;
     };
 

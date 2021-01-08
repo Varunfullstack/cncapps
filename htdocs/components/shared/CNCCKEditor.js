@@ -16,8 +16,8 @@ class CNCCKEditor extends React.Component {
     componentDidMount() {
 
         this._initEditor();
-    }
-
+    }     
+    
     _initEditor() {
         const {readOnly, type, onBeforeLoad, style, value, disableClipboard} = this.props;
         const config = this.getCNCCKEditorConfig();
@@ -170,11 +170,17 @@ class CNCCKEditor extends React.Component {
             width: this.props.width || "auto",
             height: this.props.height || 500,
             resize_minHeight: this.props.height || 500,
-            removePlugins: "liststyle,tabletools,language,tableselection,scayt,wsc,magicline",
+            removePlugins: "wsc,liststyle,tabletools,language,tableselection,magicline",            
             disableNativeSpellChecker: true,
             wsc_customDictionaryIds: '100920',
             font_defaultLabel: 'Arial',
-            fontSize_defaultLabel: '10pt',
+            fontSize_defaultLabel: '10pt',            
+            scayt_autoStartup: true,
+            grayt_autoStartup: true,
+            scayt_ignoreAllCapsWords : true,
+            scayt_ignoreDomainNames : true,
+            scayt_ignoreWordsWithMixedCases : true,
+            scayt_ignoreWordsWithNumbers : true,
         };
 
         if (this.props.sharedSpaces) {

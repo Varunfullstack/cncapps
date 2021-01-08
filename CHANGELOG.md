@@ -8,6 +8,7 @@ This project changes will be shown here.
 ### Changed
 - Issue 1170 - Modal Popup GUI Improvements
 - Issue 1164 - Combine Dashboards for Change, Sales and Time Requests
+- Issue 1148 - Set max number of mistakes in editor
 
 ## [v5.1.1] - 2020-12-30
 ### Removed
