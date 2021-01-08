@@ -44,9 +44,9 @@ class RequestDashboardComponent extends MainComponent {
             changRequests:[],
             timeRequests:[],
             tabs : [
-                {id: this.TIME_REQUEST, title: "Time Request", icon: null,hasP5:true},
-                {id: this.CHANGE_REQUEST, title: "Change Request", icon: null,hasP5:true},
-                {id: this.SALES_REQUEST, title: "Sales Request", icon: null,hasP5:false},
+                {id: this.TIME_REQUEST, title: "Time Requests", icon: null,hasP5:true},
+                {id: this.CHANGE_REQUEST, title: "Change Requests", icon: null,hasP5:true},
+                {id: this.SALES_REQUEST, title: "Sales Requests", icon: null,hasP5:false},
             ]
         };
         
