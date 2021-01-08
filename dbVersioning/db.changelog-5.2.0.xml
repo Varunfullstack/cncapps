@@ -22,7 +22,7 @@
         <sql>
             <![CDATA[
             update consultant left join team on consultant.teamID = team.teamID
-            set bcOnCustomerEmails = 1
+            set bccOnCustomerEmails = 1
             where team.level <= 5 and consultant.activeFlag = 'Y'
             ]]>
         </sql>

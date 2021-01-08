@@ -39,7 +39,7 @@ class BUMail extends Business
         $this->mailQueue = new Mail_Queue (
             $GLOBALS['db_options'], $GLOBALS['mail_options']
         );
-        $this->buUser = new BUUser($this);
+        $this->buUser    = new BUUser($this);
     }
 
     function sendEmailWithAttachments($body,
@@ -73,8 +73,8 @@ class BUMail extends Business
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-        $body = $mime->get($mime_params);
-        $hdrs = $mime->headers($hdrs);
+        $body        = $mime->get($mime_params);
+        $hdrs        = $mime->headers($hdrs);
         $this->putInQueue($fromEmail, $recipients, $hdrs, $body);
     }
 
@@ -129,7 +129,7 @@ class BUMail extends Business
                              $recipients,
                              $fromEmail = CONFIG_SUPPORT_EMAIL,
                              $cc = null,
-                             ?string $bcc = []
+                             ?string $bcc = null
     )
     {
         if ($bcc) {
@@ -153,8 +153,8 @@ class BUMail extends Business
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-        $body = $mime->get($mime_params);
-        $hdrs = $mime->headers($hdrs);
+        $body        = $mime->get($mime_params);
+        $hdrs        = $mime->headers($hdrs);
         $this->putInQueue($fromEmail, $recipients, $hdrs, $body);
     }
 
@@ -175,10 +175,10 @@ class BUMail extends Business
             $toEmail,
             $headers
         );
-        $mail = new Mail_smtp(
+        $mail       = new Mail_smtp(
             $GLOBALS ['mail_options']
         );
-        $sent = $mail->send(
+        $sent       = $mail->send(
             $parameters['toEmail'],
             $parameters['headers'],
             $body
