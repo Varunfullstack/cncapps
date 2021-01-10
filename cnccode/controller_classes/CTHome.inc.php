@@ -106,6 +106,9 @@ class CTHome extends CTCNC
                     throw new \CNCLTD\Exceptions\JsonHttpException(123, $exception->getMessage());
                 }
                 break;
+            case 'react':
+                $this->displayReact();
+                break;
             default:
                 $this->display();
                 break;
@@ -325,6 +328,47 @@ class CTHome extends CTCNC
             $this->displayUserPerformanceReport();
         }
         $this->displayCharts();
+        $this->parsePage();
+    } // end display projects
+
+    /**
+     * @throws Exception
+     */
+    function displayReact()
+    {
+        /**
+         * if user is only in the technical group then display the current activity dash-board
+         */
+        if ($this->hasPermissions(TECHNICAL_PERMISSION) && !$this->hasPermissions(
+                SUPERVISOR_PERMISSION
+            ) && !$this->hasPermissions(MAINTENANCE_PERMISSION) && !$this->hasPermissions(ACCOUNTS_PERMISSION)) {
+
+            $urlNext = Controller::buildLink(
+                'CurrentActivityReport.php',
+                array()
+            );
+            header('Location: ' . $urlNext);
+            exit;
+
+        }
+        /*
+        Otherwise display other sections based upon group membership
+        */
+        
+        $this->setTemplateFiles(
+            'HOME',
+            'Home.rct'
+        );
+        
+        $this->template->parse(
+            'HOME',
+            'Home.rct',
+            true
+        );
+
+        $this->loadReactScript('HomeComponent.js');
+        $this->loadReactCSS('HomeComponent.css');
+
         $this->parsePage();
     } // end display projects
 
