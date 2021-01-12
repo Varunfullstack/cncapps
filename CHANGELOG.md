@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v5.2.0]
+## [v5.2.0] - 2021-01-12
 ### Added
 - Issue 1038 - Add means of monitoring the licensing data received from StreamOne.
 - Issue 1160 - KPI Graphs for performance
