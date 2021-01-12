@@ -113,6 +113,7 @@ class DBEHeader extends DBEntity
     const computerLastSeenThresholdDays = "computerLastSeenThresholdDays";
     const holdAllSOSmallProjectsP5sforQAReview="holdAllSOSmallProjectsP5sforQAReview";
     const holdAllSOProjectsP5sforQAReview="holdAllSOProjectsP5sforQAReview";
+    const numberOfAllowedMistakes="numberOfAllowedMistakes";
     /**
      * calls constructor()
      * @access public
@@ -623,7 +624,7 @@ class DBEHeader extends DBEntity
         $this->addColumn(self::computerLastSeenThresholdDays, DA_INTEGER, DA_NOT_NULL);
         $this->addColumn(self::holdAllSOProjectsP5sforQAReview, DA_BOOLEAN, DA_NOT_NULL);
         $this->addColumn(self::holdAllSOSmallProjectsP5sforQAReview, DA_BOOLEAN, DA_NOT_NULL);
-
+        $this->addColumn(self::numberOfAllowedMistakes, DA_INTEGER, DA_NOT_NULL);
         $this->setPK(0);
         $this->setAddColumnsOff();
     }

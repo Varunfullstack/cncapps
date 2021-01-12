@@ -255,7 +255,7 @@ class CTCNC extends Controller
         );
         $dbeUser->getRow();
         $this->favouriteMenu = new FavouriteMenu($this->userID);
-        $this->user = new BUUser($this);
+        $this->user          = new BUUser($this);
         parent::__construct(
             $requestMethod,
             $postVars,
@@ -321,7 +321,7 @@ class CTCNC extends Controller
     function parsePage()
     {
         global $userName;
-        $menu = new SideMenu($this->favouriteMenu);
+        $menu      = new SideMenu($this->favouriteMenu);
         $urlLogout = Controller::buildLink(
             $_SERVER ['PHP_SELF'],
             array('action' => CTCNC_ACT_LOGOUT)
@@ -605,20 +605,25 @@ class CTCNC extends Controller
     {
 
         return [
+            // [
+            //     "id"    => 202,
+            //     "label" => "Time Requests",
+            //     "href"  => "TimeRequestDashboard.php"
+            // ],
+            // [
+            //     "id"    => 203,
+            //     "label" => "Change Requests",
+            //     "href"  => "ChangeRequestDashboard.php?HD=null&ES=null&SP=null&P=null"
+            // ],
+            // [
+            //     "id"    => 204,
+            //     "label" => "Sales Requests",
+            //     "href"  => "SalesRequestDashboard.php"
+            // ],
             [
                 "id"    => 202,
-                "label" => "Time Requests",
-                "href"  => "TimeRequestDashboard.php"
-            ],
-            [
-                "id"    => 203,
-                "label" => "Change Requests",
-                "href"  => "ChangeRequestDashboard.php?HD=null&ES=null&SP=null&P=null"
-            ],
-            [
-                "id"    => 204,
-                "label" => "Sales Requests",
-                "href"  => "SalesRequestDashboard.php"
+                "label" => "Request Dashboard",
+                "href"  => "RequestDashBoard.php"
             ],
             [
                 "id"    => 205,
@@ -705,6 +710,7 @@ class CTCNC extends Controller
                 "label" => "Password Services",
                 "href"  => "PasswordServices.php"
             ],
+            
         ];
 
     }
@@ -865,11 +871,6 @@ class CTCNC extends Controller
                 "href"  => "ManagementReports.php?action=SpendByManufacturer",
             ],
             [
-                "id"    => 508,
-                "label" => "Quotation Conversion",
-                "href"  => "QuotationConversionReport.php",
-            ],
-            [
                 "id"    => 509,
                 "label" => "Customer Profitability",
                 "href"  => "CustomerProfitabilityReport.php",
@@ -888,6 +889,11 @@ class CTCNC extends Controller
                 "id"    => 512,
                 "label" => "Customer Profitability Export",
                 "href"  => "CustomerProfitabilityMonthsReport.php",
+            ],
+            [
+                "id"    => 513,
+                "label" => "KPI Reports",
+                "href"  => "KPIReport.php",
             ],
         ];
     }

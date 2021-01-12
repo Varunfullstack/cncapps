@@ -33,7 +33,7 @@ export default class AssetListSelectorComponent extends React.PureComponent {
             this.state.selectedOption = {isAsset: false, template: this.props.noAssetReason};
         }
         if (this.props.assetName) {
-            const [name, userName, biosVer] = this.props.assetTitle.split(' ');
+            const [, userName, biosVer] = this.props.assetTitle.split(' ');
             this.state.selectedOption = {
                 isAsset: true,
                 name: this.props.assetName,
@@ -151,11 +151,10 @@ export default class AssetListSelectorComponent extends React.PureComponent {
                           getOptionLabel={(option) => this.getOptionText(option)}
                           clearOnBlur={false}
                           value={selectedOption}
-                          renderOption={(value, state) => {
+                          renderOption={(value) => {
                               if (value.isAsset) {
                                   return (
-                                      <React.Fragment style={{}}
-                                      >
+                                      <React.Fragment>
                                           <div style={{
                                               display: "inline-block",
                                               width: `${maxComputerNameLength + 4}ch`, fontSize: 12,

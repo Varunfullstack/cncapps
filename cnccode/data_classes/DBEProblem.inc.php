@@ -8,67 +8,68 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEProblem extends DBEntity
 {
-    const problemID = "problemID";
-    const customerID = "customerID";
-    const priority = "priority";
-    const userID = "userID";
-    const status = "status";
-    const dateRaised = "dateRaised";
-    const fixedUserID = "fixedUserID";
-    const fixedDate = "fixedDate";
-    const respondedHours = "respondedHours";
-    const workingHours = "workingHours";
-    const sentSlaAlertFlag = "sentSlaAlertFlag";
-    const internalNotes = "internalNotes";
-    const completionAlertCount = "completionAlertCount";
-    const completeDate = "completeDate";
-    const hideFromCustomerFlag = "hideFromCustomerFlag";
-    const alarmDate = "alarmDate";
-    const alarmTime = "alarmTime";
-    const totalActivityDurationHours = "totalActivityDurationHours";
+    const problemID                        = "problemID";
+    const customerID                       = "customerID";
+    const priority                         = "priority";
+    const userID                           = "userID";
+    const status                           = "status";
+    const dateRaised                       = "dateRaised";
+    const fixedUserID                      = "fixedUserID";
+    const fixedDate                        = "fixedDate";
+    const respondedHours                   = "respondedHours";
+    const workingHours                     = "workingHours";
+    const sentSlaAlertFlag                 = "sentSlaAlertFlag";
+    const internalNotes                    = "internalNotes";
+    const completionAlertCount             = "completionAlertCount";
+    const completeDate                     = "completeDate";
+    const hideFromCustomerFlag             = "hideFromCustomerFlag";
+    const alarmDate                        = "alarmDate";
+    const alarmTime                        = "alarmTime";
+    const totalActivityDurationHours       = "totalActivityDurationHours";
     const totalTravelActivityDurationHours = "totalTravelActivityDurationHours";
-    const chargeableActivityDurationHours = "chargeableActivityDurationHours";
-    const slaResponseHours = "slaResponseHours";
-    const escalatedFlag = "escalatedFlag";
-    const escalatedUserID = "escalatedUserID";
-    const reopenedFlag = "reopenedFlag";
-    const contractCustomerItemID = "contractCustomerItemID";
-    const contactID = "contactID";
-    const rejectedUserID = "rejectedUserID";
-    const doNextFlag = "doNextFlag";
-    const rootCauseID = "rootCauseID";
-    const workingHoursAlertSentFlag = "workingHoursAlertSentFlag";
-    const awaitingCustomerResponseFlag = "awaitingCustomerResponseFlag";
-    const workingHoursCalculatedToTime = "workingHoursCalculatedToTime";
-    const monitorAgentName = "monitorAgentName";
-    const monitorName = "monitorName";
-    const projectID = "projectID";
-    const linkedSalesOrderID = "linkedSalesOrderID";
-    const criticalFlag = "criticalFlag";
-    const queueNo = "queueNo";
-    const hdLimitMinutes = "hdLimitHours";
-    const esLimitMinutes = "esLimitHours";
-    const smallProjectsTeamLimitMinutes = "imLimitHours";
-    const projectTeamLimitMinutes = 'projectTeamLimitMinutes';
-    const hdTimeAlertFlag = "hdTimeAlertFlag";
-    const esTimeAlertFlag = "esTimeAlertFlag";
-    const smallProjectsTeamTimeAlertFlag = "imTimeAlertFlag";
-    const hdPauseCount = "hdPauseCount";
-    const managementReviewReason = "managementReviewReason";
-    const startedUserID = "startedUserID";
-    const reopenedDate = "reopenedDate";
-    const authorisedBy = "authorisedBy";
-    const openHours = "openHours";
-    const projectTeamTimeAlertFlag = "projectTeamTimeAlertFlag";
-    const raiseTypeId = "raiseTypeId";
-    const salesRequestAssignedUserId = "salesRequestAssignedUserId";
-    const emailSubjectSummary = "emailSubjectSummary";
-    const assetName = "assetName";
-    const assetTitle = "assetTitle";
-    const repeatProblem = "repeatProblem";
-    const notFirstTimeFixReason = "notFirstTimeFixReason";
-    const emptyAssetReason = "emptyAssetReason";
-    const holdForQA="holdForQA";
+    const chargeableActivityDurationHours  = "chargeableActivityDurationHours";
+    const slaResponseHours                 = "slaResponseHours";
+    const escalatedFlag                    = "escalatedFlag";
+    const escalatedUserID                  = "escalatedUserID";
+    const reopenedFlag                     = "reopenedFlag";
+    const contractCustomerItemID           = "contractCustomerItemID";
+    const contactID                        = "contactID";
+    const rejectedUserID                   = "rejectedUserID";
+    const doNextFlag                       = "doNextFlag";
+    const rootCauseID                      = "rootCauseID";
+    const workingHoursAlertSentFlag        = "workingHoursAlertSentFlag";
+    const awaitingCustomerResponseFlag     = "awaitingCustomerResponseFlag";
+    const workingHoursCalculatedToTime     = "workingHoursCalculatedToTime";
+    const monitorAgentName                 = "monitorAgentName";
+    const monitorName                      = "monitorName";
+    const projectID                        = "projectID";
+    const linkedSalesOrderID               = "linkedSalesOrderID";
+    const criticalFlag                     = "criticalFlag";
+    const queueNo                          = "queueNo";
+    const hdLimitMinutes                   = "hdLimitHours";
+    const esLimitMinutes                   = "esLimitHours";
+    const smallProjectsTeamLimitMinutes    = "imLimitHours";
+    const projectTeamLimitMinutes          = 'projectTeamLimitMinutes';
+    const hdTimeAlertFlag                  = "hdTimeAlertFlag";
+    const esTimeAlertFlag                  = "esTimeAlertFlag";
+    const smallProjectsTeamTimeAlertFlag   = "imTimeAlertFlag";
+    const hdPauseCount                     = "hdPauseCount";
+    const managementReviewReason           = "managementReviewReason";
+    const startedUserID                    = "startedUserID";
+    const reopenedDate                     = "reopenedDate";
+    const authorisedBy                     = "authorisedBy";
+    const openHours                        = "openHours";
+    const projectTeamTimeAlertFlag         = "projectTeamTimeAlertFlag";
+    const raiseTypeId                      = "raiseTypeId";
+    const salesRequestAssignedUserId       = "salesRequestAssignedUserId";
+    const emailSubjectSummary              = "emailSubjectSummary";
+    const assetName                        = "assetName";
+    const assetTitle                       = "assetTitle";
+    const repeatProblem                    = "repeatProblem";
+    const notFirstTimeFixReason            = "notFirstTimeFixReason";
+    const emptyAssetReason                 = "emptyAssetReason";
+    const holdForQA                        = "holdForQA";
+
     /**
      * calls constructor()
      * @access public
@@ -378,19 +379,16 @@ class DBEProblem extends DBEntity
             DA_ALLOW_NULL,
             "pro_started_consno"
         );
-
         $this->addColumn(
             self::authorisedBy,
             DA_INTEGER,
             DA_ALLOW_NULL
         );
-
         $this->addColumn(
             self::openHours,
             DA_FLOAT,
             DA_ALLOW_NULL
         );
-
         $this->addColumn(
             self::raiseTypeId,
             DA_INTEGER,
@@ -438,7 +436,6 @@ class DBEProblem extends DBEntity
             null,
             false
         );
-        
         $this->setAddColumnsOff();
         $this->setPK(0);
         if ($pkID) {
@@ -464,29 +461,26 @@ class DBEProblem extends DBEntity
     {
 
         $this->setQueryString(
-
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName(self::customerID) . ' = ' . $customerID .
-            " AND " . $this->getDBColumnName(self::completeDate) . " BETWEEN '" .
-            $startDate->format('Y-m-d') . "' AND '" . $endDate->format('Y-m-d') . "' AND " .
-            $this->getDBColumnName(self::managementReviewReason) . "<> ''"
+            "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " WHERE " . $this->getDBColumnName(
+                self::customerID
+            ) . ' = ' . $customerID . " AND " . $this->getDBColumnName(
+                self::completeDate
+            ) . " BETWEEN '" . $startDate->format('Y-m-d') . "' AND '" . $endDate->format(
+                'Y-m-d'
+            ) . "' AND " . $this->getDBColumnName(self::managementReviewReason) . "<> ''"
         );
-
         return parent::getRows();
     }
 
     public function getToCheckCriticalFlagSRs()
     {
         $this->setQueryString(
-
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName(self::status) . " in ('I','P') AND " . $this->getDBColumnName(
+            "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " WHERE " . $this->getDBColumnName(self::status) . " in ('I','P') AND " . $this->getDBColumnName(
                 self::priority
             ) . " in (1,2,3)"
         );
-
         return parent::getRows();
     }
 }

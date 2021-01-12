@@ -43,7 +43,6 @@ class CNCCKEditor extends React.Component {
             const editor = this.editor = CKEDITOR[constructor](this.element, config);
 
             this._attachEventHandlers();
-
             // We must force editability of the inline editor to prevent `element-conflict` error.
             // It can't be done via config due to CKEditor 4 upstream issue (#57, ckeditor/ckeditor4#3866).
             if (type === 'inline' && !readOnly) {
@@ -131,16 +130,22 @@ class CNCCKEditor extends React.Component {
     }
 
     render() {
-        return <div id={this.props.name}
-                    name={this.props.name}
-                    style={this.props.style}
-                    ref={ref => (this.element = ref)}
-                    className="testing"
-        />;
+        return <div>
+            <div key="top" id="top"/>
+            <div id={this.props.name}
+                 key="field"
+                 name={this.props.name}
+                 style={this.props.style}
+                 ref={ref => (this.element = ref)}
+                 className="testing"
+            />
+            <div key="bottom" id="bottom"/>
+        </div>;
     }
 
     getCNCCKEditorConfig = () => {
         const defaultConfig = {
+            // startupFocus : this.props.autoFocus||false,
             contentsCss: "/screen.css",
             toolbarStartupExpanded: false,
             toolbar: "CNCToolbar",
@@ -170,7 +175,7 @@ class CNCCKEditor extends React.Component {
             width: this.props.width || "auto",
             height: this.props.height || 500,
             resize_minHeight: this.props.height || 500,
-            removePlugins: "liststyle,tabletools,language,tableselection,scayt,wsc,magicline",
+            removePlugins: "liststyle,tabletools,language,tableselection,magicline",
             disableNativeSpellChecker: true,
             wsc_customDictionaryIds: '100920',
             font_defaultLabel: 'Arial',
@@ -181,12 +186,10 @@ class CNCCKEditor extends React.Component {
             defaultConfig.extraPlugins += ",sharedspace";
             defaultConfig.removePlugins += ",floatingspace,maximize,resize,elementspath";
             defaultConfig.sharedSpaces = {
-                top: this.props.top,
-                bottom: this.props.bottom
+                top: this.props.top || "top",
+                bottom: this.props.bottom || "bottom"
             };
         }
-
-
         return defaultConfig;
     }
 

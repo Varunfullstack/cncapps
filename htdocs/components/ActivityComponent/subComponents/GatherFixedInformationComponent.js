@@ -149,7 +149,7 @@ class GatherFixedInformationComponent extends MainComponent {
                             <EditorFieldComponent name="summaryOfResolution"
                                                   value={initialActivity?.reason}
                                                   onChange={(value) => this.setValue("resolutionSummary", value)}
-                                                  minCharCount={activity.problemHideFromCustomerFlag == 'N' ? 160 : -1}
+                                                  minCharCount={activity.problemHideFromCustomerFlag == 'N' ? 60 : -1}
                                                   disableClipboard={true}
                             />
                         )

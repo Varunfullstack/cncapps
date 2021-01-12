@@ -55,6 +55,7 @@ class ActivityFollowOn extends MainComponent {
                         onChange: (event) =>
                             this.setState({callActTypeID: event.target.value}),
                         style: {width: "100%", marginBottom: 20},
+                        autoFocus:true
 
                     },
                     el("option", {key: "empty", value: ""}, "Please select"),

@@ -3,10 +3,12 @@ import Confirm from "./Confirm.js";
 import Prompt from "./Prompt.js";
 
 import React from 'react';
+import APIHeader from '../services/APIHeader';
 
 export default class MainComponent extends React.Component {
 
     promptCallback;
+    api;
 
     constructor(props) {
         super(props);
@@ -30,12 +32,14 @@ export default class MainComponent extends React.Component {
                 show: false,
                 title: "",
                 width: 500,
+                height: 20,
                 message: "",
                 value: null,
                 defaultValue: null,
                 isEditor: false
             },
         };
+        this.apiHeader = new APIHeader();
     }
 
     isSDManager(user) {
@@ -90,7 +94,15 @@ export default class MainComponent extends React.Component {
             message={alert.message}
             isHTML={alert.isHTML}
             onClose={() => this.handleAlertClose()}
+            onAutoClose={this.handleAlertAutoClose}
+            autoClose={true}
         />;
+    }
+    handleAlertAutoClose = () => {
+        const {alert} = this.state;
+        alert.show = false;
+        this.setState({alert});
+        //console.log("auto close");
     }
     handleAlertClose = () => {
         const {alert} = this.state;
@@ -144,10 +156,11 @@ export default class MainComponent extends React.Component {
 
     //-----------------end alert
     //----------------prompt
-    prompt = (title = "Prompt", width = 500, defaultValue = null, isEditor = false) => {
+    prompt = (title = "Prompt", width = 500, defaultValue = null, isEditor = false, height = 20) => {
         const {prompt} = this.state;
         prompt.show = true;
         prompt.width = width;
+        prompt.height = height;
         prompt.title = title;
         prompt.value = null;
         prompt.defaultValue = defaultValue;
@@ -178,5 +191,22 @@ export default class MainComponent extends React.Component {
         const {data} = this.state;
         data[property] = value;
         this.setState({data});
+    }
+    editorHasProblems = async () => {
+        return this.apiHeader.getNumberOfAllowedMistaks().then(nMistakes => {
+            const wscInstances = WEBSPELLCHECKER.getInstances();
+            let count = wscInstances.reduce((acc, instance) => {
+                const containerNode = instance.getContainerNode();
+                if (containerNode.dataset && containerNode.dataset.excludeFromErrorCount === "true") {
+                    return acc;
+                }
+                return acc + instance.getProblemsCount();
+            }, 0)
+            if (count > nMistakes) {
+                this.alert("You have too many spelling or grammatical errors, please correct them before proceeding.");
+                return true
+            }
+            return false;
+        });
     }
 }

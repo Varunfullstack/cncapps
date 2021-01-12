@@ -269,6 +269,12 @@ class ActivityEditComponent extends MainComponent {
 
     async isValid(data) {
 
+        if (!this.isHiddenFromCustomer(data)) {
+            const hasGrammaticalErrors = await this.editorHasProblems();
+            if (hasGrammaticalErrors) {
+                return false;
+            }
+        }
         const callActType = this.state.callActTypes.find((c) => c.id == data.callActTypeID);
         if (!callActType) {
             this.alert("Please select activity type");
@@ -385,12 +391,14 @@ class ActivityEditComponent extends MainComponent {
 
             }
         }
+
         if (!data.assetName && !this.state.data.emptyAssetReason) {
             this.alert("Please select an asset or a reason");
             return false;
         }
+
         return true;
-    };
+    }
 
     setValue = (label, value) => {
         const {data} = this.state;
@@ -485,8 +493,8 @@ class ActivityEditComponent extends MainComponent {
                     title: "Sales Order",
                     content: el("a", {
                         className: "fal fa-tag fa-2x m-5 pointer icon",
-                        href: "javascript:void(0);",
-                        onClick: ($event) => this.handleSalesOrder(data?.callActivityID, data?.problemID),
+                        href: "#",
+                        onClick: () => this.handleSalesOrder(data?.callActivityID, data?.problemID),
                     }),
                 })
                 : null,
@@ -548,10 +556,11 @@ class ActivityEditComponent extends MainComponent {
     }
 
     handleExtraTime = async (data) => {
+
         const reason = await this.prompt(
             "Please provide your reason to request additional time",
             600,
-            data.cncNextAction, true
+            data.cncNextAction, false, 50
         );
         if (!reason) {
             return;
@@ -586,7 +595,7 @@ class ActivityEditComponent extends MainComponent {
 
             return (<input type="time"
                            key="alarmTime"
-                           value={data?.alarmTime}
+                           value={data?.alarmTime || ""}
                            onChange={($event) => this.setValue("alarmTime", $event.target.value)}
             />)
         }
@@ -649,7 +658,7 @@ class ActivityEditComponent extends MainComponent {
         if (await this.confirm(text)) {
             this.setState({allowLeaving: true});
             if (willDelete)
-                this.api.deleteActivity(data.callActivityID).then(res => {
+                this.api.deleteActivity(data.callActivityID).then(() => {
                     document.location = `SRActivity.php?action=displayActivity&serviceRequestId=${data.problemID}`;
                 })
             else
@@ -688,21 +697,22 @@ class ActivityEditComponent extends MainComponent {
         }
 
         switch (status) {
-            case this.activityStatus.CncAction:
+            case this.activityStatus.CncAction: {
                 //Field Name] is required for [Activity Type] when the next action is [Update type]
-
-                let cncValid = await this.checkCncAction(data, type);
+                const cncValid = await this.checkCncAction(data, type);
                 if (!cncValid)
                     return;
                 break;
-            case this.activityStatus.CustomerAction://holding
+            }
+
+            case this.activityStatus.CustomerAction: {
+                //holding
                 //Field Name] is required for [Activity Type] when the next action is [Update type]
-                let holdValid = await this.checkOnHold(data, type);
+                const holdValid = await this.checkOnHold(data, type);
                 if (!holdValid)
                     return;
-                //if (!await this.confirm("Are you sure this SR is On Hold?")) return;
-
                 break;
+            }
             case this.activityStatus.Fixed:
                 if (!await this.confirm("Are you sure this SR is fixed?")) return false;
                 //return;
@@ -1069,7 +1079,7 @@ class ActivityEditComponent extends MainComponent {
             return <input type="time"
                           key="startTime"
                           disabled={data?.isInitalDisabled}
-                          value={data?.startTime}
+                          value={data?.startTime || ""}
                           onChange={($event) => this.setValue("startTime", $event.target.value)}
             />
         }
@@ -1080,7 +1090,7 @@ class ActivityEditComponent extends MainComponent {
             return <input type="time"
                           key="endTime"
                           disabled={data?.isInitalDisabled}
-                          value={data?.endTime}
+                          value={data?.endTime || ""}
                           onChange={($event) => this.setValue("endTime", $event.target.value)}
             />
         }
@@ -1101,97 +1111,140 @@ class ActivityEditComponent extends MainComponent {
                 this.setValue("endTime", moment().format('HH:mm'))
             }}
             >
-                <i className="fal fa-clock"></i>
+                <i className="fal fa-clock"/>
             </span>
         </div>
     };
     getPriority = () => {
-        const {el} = this;
         const {data, priorities} = this.state;
-        return el(
-            "select",
-            {
-                key: "priorities",
-                disabled: !data.canChangePriorityFlag,
-                required: true,
-                value: data?.priority,
-                onChange: (event) => this.setValue("priority", event.target.value),
-                style: {width: "100%"}
-            },
-            el("option", {key: "empty", value: null}, "Please select"),
-            priorities?.map((t) => el("option", {key: t.id, value: t.name}, t.name))
+        return (
+            <select key="priorities"
+                    disabled={!data.canChangePriorityFlag}
+                    required={true}
+                    value={data?.priority}
+                    onChange={(event) => this.setValue("priority", event.target.value)}
+                    style={{width: "100%"}}
+            >
+                <option key="empty"
+                        value={null}
+                >
+                    Please select
+                </option>
+                {
+                    priorities?.map((t) => <option key={t.id}
+                                                   value={t.name}
+                    >{t.name}</option>)
+                }
+            </select>
         );
     };
     getUsersElement = () => {
-        const {el} = this;
         const {data, users} = this.state;
 
-        return el(
-            "select",
-            {
-                key: "users",
-                required: true,
-                value: data?.userID,
-                onChange: (event) => this.setValue("userID", event.target.value),
-                style: {width: "100%"}
-            },
-            el("option", {key: "empty", value: null}, "Please select"),
-            users?.map((t) => el("option", {key: t.id, value: t.id}, t.name))
+        return (
+            <select
+                key={"users"}
+                required={true}
+                value={data?.userID}
+                onChange={(event) => this.setValue("userID", event.target.value)}
+                style={{width: "100%"}}
+            >
+
+                <option
+                    key={"empty"}
+                    value={null}
+                >
+                    Please select
+                </option>
+                {
+                    users?.map((t) => <option
+                            key={t.id}
+                            value={t.name}
+                        > t.name</option>
+                    )
+                }
+            </select>
         );
     };
     getContracts = () => {
-        const {el} = this;
         const {data, contracts} = this.state;
 
-        return el(
-            "select",
-            {
-                key: "contracts",
-                required: true,
-                disabled: !data?.changeSRContractsFlag,
-                value: data?.contractCustomerItemID || "",
-                onChange: (event) => this.setValue("contractCustomerItemID", event.target.value),
-                style: {width: "100%"}
-            },
-            el("option", {key: "empty", value: 99}, "Please select"),
-            el("option", {key: "tandm", value: ""}, "T&M"),
-            contracts?.map((t, index) =>
-                el(
-                    "optgroup",
-                    {key: t.groupName, label: t.groupName},
-                    contracts[index].items.map((i) =>
-                        el(
-                            "option",
-                            {
-                                key: i.contractCustomerItemID,
-                                disabled: i.isDisabled,
-                                value: i.contractCustomerItemID,
-                            },
-                            i.contractDescription
+        return (
+            <select
+
+                key={"contracts"}
+                required={true}
+                disabled={!data?.changeSRContractsFlag}
+                value={data?.contractCustomerItemID || ""}
+                onChange={(event) => this.setValue("contractCustomerItemID", event.target.value)}
+                style={{width: "100%"}}
+            >
+                <option
+                    key={"empty"}
+                    value={99}
+                >Please select
+                </option>
+                <option
+                    key={"tandm"}
+                    value={""}
+                >T&M
+                </option>
+                {
+                    contracts?.map((t, index) => (
+                            <optgroup
+                                key={t.groupName}
+                                label={t.groupName}
+                            >
+                                {
+
+                                    contracts[index].items.map((i) =>
+
+                                        <option key={i.contractCustomerItemID}
+                                                disabled={i.isDisabled}
+                                                value={i.contractCustomerItemID}
+                                        >
+                                            {i.contractDescription}
+                                        </option>
+                                    )
+                                }
+                            </optgroup>
                         )
                     )
-                )
-            )
+                }
+            </select>
         );
     };
     getRootCause = () => {
-        const {el} = this;
+
         const {data, rootCauses} = this.state;
 
-        return el(
-            "select",
-            {
-                key: "rootCauses",
-                disabled: !data.canChangePriorityFlag,
-                style: {maxWidth: 200, width: "100%"},
-                required: true,
-                value: data?.rootCauseID || "",
-                onChange: (event) => this.setValue("rootCauseID", event.target.value),
-            },
-            el("option", {key: "empty", value: ""}, "Not known"),
-            rootCauses?.map((t) =>
-                el("option", {key: t.id, value: t.id}, t.description)
-            )
+        return (
+            <select
+                key={"rootCauses"}
+                disabled={!data.canChangePriorityFlag}
+                style={{maxWidth: 200, width: "100%"}}
+                required={true}
+                value={data?.rootCauseID || ""}
+                onChange={(event) => this.setValue("rootCauseID", event.target.value)}
+            >
+                <option
+                    key={"empty"}
+                    value={""}
+                >
+                    Not known
+                </option>
+
+                {
+                    rootCauses?.map((t) =>
+                        <option
+                            key={t.id}
+                            value={t.id}
+                        >
+                            {t.description}
+                        </option>
+                    )
+                }
+            </select>
         );
     };
     getContentElement = () => {
@@ -1362,7 +1415,7 @@ class ActivityEditComponent extends MainComponent {
                 await this.api.sendChangeRequest(data.problemID, payload);
                 this.alert('Change Request Sent');
                 break;
-            case "partsUsed":
+            case "partsUsed": {
                 const object = {
                     message: templateValue,
                     callActivityID: currentActivity,
@@ -1370,6 +1423,7 @@ class ActivityEditComponent extends MainComponent {
                 await this.api.sendPartsUsed(object);
                 this.alert('Parts Used Sent');
                 break;
+            }
             case "salesRequest":
                 await this.api.sendSalesRequest(
                     data.customerId,
@@ -1392,19 +1446,19 @@ class ActivityEditComponent extends MainComponent {
         } = this.state;
         const {el} = this;
 
-        return el(Modal, {
+        return el(Modal, {//autoFocus:true
             width: 900,
             key: templateType,
-            onClose: () => this.setState({_showModal: false}),
+            onClose: () => this.setState({_showModal: false, templateValue: ""}),
             title: templateTitle,
             show: _showModal,
             content: el(
                 "div",
-                {key: "conatiner"},
+                {key: "container"},
                 templateOptions.length > 0
                     ? el(
                     "select",
-                    {onChange: this.handleTemplateChanged},
+                    {onChange: this.handleTemplateChanged, autoFocus: true},
                     el("option", {key: "empty", value: -1}, "-- Pick an option --"),
                     templateOptions.map((s) =>
                         el("option", {key: s.id, value: s.id}, s.name)
@@ -1424,7 +1478,8 @@ class ActivityEditComponent extends MainComponent {
                             onChange: this.handleTemplateValueChange,
                             sharedSpaces: true,
                             top: "top2",
-                            bottom: "bottom2"
+                            bottom: "bottom2",
+                            autoFocus: templateOptions.length <= 0
                         }),
                         el('div', {id: 'bottom2'}),
                     )
@@ -1495,7 +1550,7 @@ class ActivityEditComponent extends MainComponent {
                 this.state._activityLoaded
                     ?
                     <EditorFieldComponent name="reason"
-                                          value={data?.reason}
+                                          value={data?.reason || ""}
                                           onChange={(value) => this.setValue("reasonTemplate", value)}
                     />
                     : null
@@ -1516,7 +1571,7 @@ class ActivityEditComponent extends MainComponent {
                 this.state._activityLoaded
                     ?
                     <EditorFieldComponent name="cncNextAction"
-                                          value={data?.cncNextAction}
+                                          value={data?.cncNextAction || ""}
                                           onChange={(value) => this.setValue("cncNextActionTemplate", value)}
                     />
                     : null
@@ -1545,7 +1600,7 @@ class ActivityEditComponent extends MainComponent {
             this.state._activityLoaded
                 ?
                 <EditorFieldComponent name="customerNotes"
-                                      value={data?.customerNotes}
+                                      value={data?.customerNotes || ""}
                                       onChange={(value) => this.setValue("customerNotesTemplate", value)}
                 />
                 : null
@@ -1573,8 +1628,9 @@ class ActivityEditComponent extends MainComponent {
             this.state._activityLoaded
                 ?
                 <EditorFieldComponent name="internal"
-                                      value={data?.internalNotes}
+                                      value={data?.internalNotes || ""}
                                       onChange={(value) => this.setValue("internalNotesTemplate", value)}
+                                      excludeFromErrorCount={true}
                 />
                 : null
         );

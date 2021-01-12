@@ -665,7 +665,6 @@ class CTSRActivity extends CTCNC
             }
             //check Hold all SRs for QA Review
             if ($this->dbeUser->getValue(DBEUser::holdAllSRsforQAReview) == 1) {
-
                 $dsCallActivity->addColumn(DBEProblem::holdForQA, DA_BOOLEAN, false);
                 $dsCallActivity->setValue(DBEProblem::holdForQA, 1);
             }
@@ -908,7 +907,6 @@ class CTSRActivity extends CTCNC
     function getCustomerContracts()
     {
         $customerID             = $_REQUEST["customerId"];
-        $contractCustomerItemID = $_REQUEST["contractCustomerItemID"];
         $linkedToSalesOrder     = $_REQUEST["linkedToSalesOrder"];
         $contracts              = array();
         $buCustomerItem         = new BUCustomerItem($this);
@@ -920,16 +918,6 @@ class CTSRActivity extends CTCNC
                 null
             );
         }
-        if (!$contractCustomerItemID) {
-            array_push($contracts, ["id" => "", "name" => "tandMSelected", "renewalType" => null]);
-        }
-        // if ($linkedToSalesOrder) {
-        //     $this->template->set_var(
-        //         [
-        //             'salesOrderReason' => "- Must be selected because this is linked to a Sales Order"
-        //         ]
-        //     );
-        // }
         while ($dsContract->fetchNext()) {
 
             $description = $dsContract->getValue(DBEJContract::itemDescription) . ' ' . $dsContract->getValue(
