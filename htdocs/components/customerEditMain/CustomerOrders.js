@@ -5,9 +5,6 @@ import {connect} from "react-redux";
 import {getOrders} from "./selectors";
 
 class CustomerOrders extends React.PureComponent {
-    el = React.createElement;
-
-
     constructor(props) {
         super(props);
     }

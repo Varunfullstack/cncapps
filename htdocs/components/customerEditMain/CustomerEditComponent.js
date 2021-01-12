@@ -12,6 +12,7 @@ import PortalCustomerDocumentsComponent from "./PortalCustomerDocumentsComponent
 import SitesList from "./customerSites/SitesList";
 import CustomerOrders from "./CustomerOrders";
 import CustomerCRMComponent from "./CustomerCRMComponent";
+import ContactsComponent from "./ContactsComponent";
 
 const store = configureStore();
 
@@ -79,7 +80,7 @@ class CustomerEditComponent extends React.PureComponent {
                                     <Tab eventKey="contacts"
                                          title="Contacts"
                                     >
-
+                                        <ContactsComponent/>
                                     </Tab>
                                     <Tab eventKey="crm"
                                          title="CRM"
