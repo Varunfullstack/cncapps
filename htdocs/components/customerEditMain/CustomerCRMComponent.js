@@ -111,7 +111,7 @@ class CustomerCRMComponent extends React.PureComponent {
                                                     <td>
                                                         <input type="text"
                                                                className="form-control input-sm"
-                                                               value={site.address1}
+                                                               value={site.address1 || ""}
                                                                onChange={$event => {
                                                                    onUpdateSiteField('address1', $event.target.value)
                                                                }}
@@ -123,7 +123,7 @@ class CustomerCRMComponent extends React.PureComponent {
                                                     <td>
                                                         <input type="text"
                                                                className="form-control input-sm"
-                                                               value={site.address2}
+                                                               value={site.address2 ||""}
                                                                onChange={$event => {
                                                                    onUpdateSiteField('address2', $event.target.value)
                                                                }}
@@ -135,7 +135,7 @@ class CustomerCRMComponent extends React.PureComponent {
                                                     <td>
                                                         <input type="text"
                                                                className="form-control input-sm"
-                                                               value={site.address3}
+                                                               value={site.address3 ||""}
                                                                onChange={$event => {
                                                                    onUpdateSiteField('address3', $event.target.value)
                                                                }}
@@ -146,7 +146,7 @@ class CustomerCRMComponent extends React.PureComponent {
                                                     <td>Town</td>
                                                     <td><input type="text"
                                                                className="form-control input-sm"
-                                                               value={site.town}
+                                                               value={site.town || ""}
                                                                onChange={$event => {
                                                                    onUpdateSiteField('town', $event.target.value)
                                                                }}
@@ -158,7 +158,7 @@ class CustomerCRMComponent extends React.PureComponent {
                                                     <td>
                                                         <input type="text"
                                                                className="form-control input-sm"
-                                                               value={site.county}
+                                                               value={site.county || ""}
                                                                onChange={$event => {
                                                                    onUpdateSiteField('county', $event.target.value)
                                                                }}
@@ -170,7 +170,7 @@ class CustomerCRMComponent extends React.PureComponent {
                                                     <td>
                                                         <input type="text"
                                                                className="form-control input-sm"
-                                                               value={site.postcode}
+                                                               value={site.postcode || ""}
                                                                onChange={$event => {
                                                                    onUpdateSiteField('postcode', $event.target.value)
                                                                }}
@@ -182,7 +182,7 @@ class CustomerCRMComponent extends React.PureComponent {
                                                     <td>
                                                         <input type="text"
                                                                className="form-control input-sm"
-                                                               value={site.phone}
+                                                               value={site.phone ||""}
                                                                onChange={$event => {
                                                                    onUpdateSiteField('phone', $event.target.value)
                                                                }}

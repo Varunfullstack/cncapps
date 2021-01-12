@@ -34,7 +34,7 @@ class CustomerEditMain extends React.PureComponent {
         this.updateCustomerField(event.target.name, event.target.checked);
     }
 
-    handleUpdateGenericField($event) {
+    handleUpdateGenericField = ($event) => {
         this.updateCustomerField($event.target.name, $event.target.value);
     }
 
@@ -353,7 +353,7 @@ class CustomerEditMain extends React.PureComponent {
                                         <label htmlFor="">Sort Code</label>
                                         <div className="form-group">
                                             <EncryptedTextInput encryptedValue={customer.sortCode}
-                                                                onChange={($event) => this.updateCustomerField('sortCode', $event)}
+                                                                onChange={this.handleUpdateGenericField}
                                                                 mask='99-99-99'
                                                                 name="sortCode"
                                             />
@@ -364,7 +364,8 @@ class CustomerEditMain extends React.PureComponent {
                                         <div className="form-group">
                                             <EncryptedTextInput className="form-control input-sm"
                                                                 encryptedValue={customer.accountName || ''}
-                                                                onChange={($event) => this.updateCustomerField('accountName', $event)}
+                                                                name="accountName"
+                                                                onChange={this.handleUpdateGenericField}
                                             />
                                         </div>
                                     </div>
@@ -373,8 +374,9 @@ class CustomerEditMain extends React.PureComponent {
                                         <div className="form-group">
                                             <EncryptedTextInput
                                                 encryptedValue={customer.accountNumber}
-                                                onChange={($event) => this.updateCustomerField('accountNumber', $event)}
+                                                onChange={this.handleUpdateGenericField}
                                                 mask='99999999'
+                                                name="accountNumber"
                                             />
                                         </div>
                                     </div>

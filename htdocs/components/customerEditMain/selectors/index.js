@@ -9,6 +9,8 @@ const getMappedContacts = createSelector(
     }
 )
 
+export const getAllContacts = getMappedContacts;
+
 const getSitesState = (state) => state.sites;
 const getSitesByIds = createSelector(
     [getSitesState],
