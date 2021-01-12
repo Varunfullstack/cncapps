@@ -1,29 +1,28 @@
 import MainComponent from "../shared/MainComponent";
-import CurrentActivityService from "../CurrentActivityReportComponent/services/CurrentActivityService";
-import Table from "../shared/table/table";
 import Toggle from "../shared/Toggle";
-import ToolTip from "../shared/ToolTip";
 import React from 'react';
-import ReactDOM from 'react-dom';
 import './../style.css';
 import './RequestDashboardComponent.css';
 import Spinner from "../shared/Spinner/Spinner";
-//childs
+import ReactDOM from 'react-dom';
+
 import TimeRequestComponent from "./subComponents/TimeRequestComponent";
 import ChangeRequestComponent from "./subComponents/ChangeRequestComponent";
 import SalesRequestComponent from "./subComponents/SalesRequestComponent";
 import APIRequestDashboard from "./services/APIRequestDashboard";
+
 class RequestDashboardComponent extends MainComponent {
     el = React.createElement;
-    tabs = []; 
+    tabs = [];
     intervalRef;
     //constants
-    TIME_REQUEST=1;
-    CHANGE_REQUEST=2;
-    SALES_REQUEST=3;
+    TIME_REQUEST = 1;
+    CHANGE_REQUEST = 2;
+    SALES_REQUEST = 3;
     AUTO_RELOAD_TIME = 60 * 1000;
-    
+
     api;
+
     constructor(props) {
         super(props);
         this.state = {
@@ -40,57 +39,58 @@ class RequestDashboardComponent extends MainComponent {
             },
             queueData: [],
             allocatedUsers: [],
-            salesRequests:[],
-            changRequests:[],
-            timeRequests:[],
-            tabs : [
-                {id: this.TIME_REQUEST, title: "Time Requests", icon: null,hasP5:true},
-                {id: this.CHANGE_REQUEST, title: "Change Requests", icon: null,hasP5:true},
-                {id: this.SALES_REQUEST, title: "Sales Requests", icon: null,hasP5:false},
+            salesRequests: [],
+            changRequests: [],
+            timeRequests: [],
+            tabs: [
+                {id: this.TIME_REQUEST, title: "Time Requests", icon: null, hasP5: true},
+                {id: this.CHANGE_REQUEST, title: "Change Requests", icon: null, hasP5: true},
+                {id: this.SALES_REQUEST, title: "Sales Requests", icon: null, hasP5: false},
             ]
         };
-        
-        this.api=new APIRequestDashboard();
+
+        this.api = new APIRequestDashboard();
     }
 
     componentDidMount() {
-        this.loadFilterFromStorage();      
-       
+        this.loadFilterFromStorage();
+
     }
-    componentWillUnmount(){
-        if(this.intervalRef)
-        clearInterval(this.intervalRef);
+
+    componentWillUnmount() {
+        if (this.intervalRef)
+            clearInterval(this.intervalRef);
     }
-    setIcon=(tab,icon)=>{
-        const {tabs}=this.state;
-        const indx=tabs.map(t=>t.id).indexOf(tab);
-        tabs[indx].icon=icon;
-        this.setState({tabs});        
+
+    setIcon = (tab, icon) => {
+        const {tabs} = this.state;
+        const indx = tabs.map(t => t.id).indexOf(tab);
+        tabs[indx].icon = icon;
+        this.setState({tabs});
     }
-    checkHaveData=()=>{
-        if(this.state.timeRequests.length>0)
-        this.setIcon(this.TIME_REQUEST,"fal fa-asterisk");
-        if(this.state.changRequests.length>0)
-        this.setIcon(this.CHANGE_REQUEST,"fal fa-asterisk");
-        if(this.state.salesRequests.length>0)
-        this.setIcon(this.SALES_REQUEST,"fal fa-asterisk");
+    checkHaveData = () => {
+        if (this.state.timeRequests.length > 0)
+            this.setIcon(this.TIME_REQUEST, "fal fa-asterisk");
+        if (this.state.changRequests.length > 0)
+            this.setIcon(this.CHANGE_REQUEST, "fal fa-asterisk");
+        if (this.state.salesRequests.length > 0)
+            this.setIcon(this.SALES_REQUEST, "fal fa-asterisk");
     }
-    loadData=()=>{
-        const {filter}=this.state;
-        this.setState({showSpinner:true});
+    loadData = () => {
+        const {filter} = this.state;
+        this.setState({showSpinner: true});
         Promise.all([
-            this.api.getTimeRequest(filter), 
+            this.api.getTimeRequest(filter),
             this.api.getSalesRequest(filter),
             this.api.getChangeRequest(filter)
-        ]).then(([timeRequests,salesRequests,changRequests])=>{             
-            this.setState({timeRequests,salesRequests,changRequests,showSpinner:false},()=>this.checkHaveData());
+        ]).then(([timeRequests, salesRequests, changRequests]) => {
+            this.setState({timeRequests, salesRequests, changRequests, showSpinner: false}, () => this.checkHaveData());
         })
 
     }
-    loadTab=()=>{
-        const {filter}=this.state;
-        switch(filter.activeTab)
-        {
+    loadTab = () => {
+        const {filter} = this.state;
+        switch (filter.activeTab) {
             case this.TIME_REQUEST:
                 this.getTimeRequests();
                 break;
@@ -102,33 +102,30 @@ class RequestDashboardComponent extends MainComponent {
         }
 
     }
-    getTimeRequests=()=>{
-        const {filter}=this.state;
-        if(filter!=null)
-        {
-            this.setState({showSpinner:true});
-            this.api.getTimeRequest(filter).then(timeRequests=>{                
-                this.setState({timeRequests,showSpinner:false});
+    getTimeRequests = () => {
+        const {filter} = this.state;
+        if (filter != null) {
+            this.setState({showSpinner: true});
+            this.api.getTimeRequest(filter).then(timeRequests => {
+                this.setState({timeRequests, showSpinner: false});
             })
         }
     }
-    getChangeRequests=()=>{
-        const {filter}=this.state;
-        if(filter!=null)
-        {
-            this.setState({showSpinner:true});
-            this.api.getChangeRequest(filter).then(changRequests=>{
-                this.setState({changRequests,showSpinner:false});
+    getChangeRequests = () => {
+        const {filter} = this.state;
+        if (filter != null) {
+            this.setState({showSpinner: true});
+            this.api.getChangeRequest(filter).then(changRequests => {
+                this.setState({changRequests, showSpinner: false});
             })
         }
     }
-    getSalesRequests=()=>{
-        const {filter}=this.state;
-        if(filter!=null)
-        {
-            this.setState({showSpinner:true});
-            this.api.getSalesRequest(filter).then(salesRequests=>{                
-                this.setState({salesRequests,showSpinner:false});
+    getSalesRequests = () => {
+        const {filter} = this.state;
+        if (filter != null) {
+            this.setState({showSpinner: true});
+            this.api.getSalesRequest(filter).then(salesRequests => {
+                this.setState({salesRequests, showSpinner: false});
             })
         }
     }
@@ -149,14 +146,14 @@ class RequestDashboardComponent extends MainComponent {
         if (this.intervalRef) {
             clearInterval(this.intervalRef);
         }
-        this.intervalRef = setInterval(() => {            
+        this.intervalRef = setInterval(() => {
             this.loadData();
         }, this.AUTO_RELOAD_TIME)
     }
 
     getTabsElement = () => {
         const {el} = this;
-        const {tabs}=this.state;
+        const {tabs} = this.state;
         return el(
             "div",
             {
@@ -181,7 +178,7 @@ class RequestDashboardComponent extends MainComponent {
                                 fontSize: "12px",
                                 marginTop: "-15px",
                                 marginRight: "-5px",
-                                
+
                                 color: "#000",
                             },
                         })
@@ -194,7 +191,7 @@ class RequestDashboardComponent extends MainComponent {
         let filter = localStorage.getItem("RequestDashboardFilter");
         if (filter) filter = JSON.parse(filter);
         else filter = this.state.filter;
-        this.setState({filter}, () => {            
+        this.setState({filter}, () => {
             this.checkAutoReloading();
             this.loadData();
         });
@@ -209,41 +206,37 @@ class RequestDashboardComponent extends MainComponent {
         localStorage.setItem("RequestDashboardFilter", JSON.stringify(filter));
         this.loadTab();
     }
-    
+
     getFilterElement = () => {
-        const {filter,tabs} = this.state;             
-        const tab=tabs.find(t=>t.id==filter.activeTab);
-        
+        const {filter, tabs} = this.state;
+        const tab = tabs.find(t => t.id == filter.activeTab);
+
         return (
             <div className="m-5">
                 {
-                        <React.Fragment>
-                            {tab.hasP5? <React.Fragment>
-                            <label className="mr-3 ml-5">HD</label>
-                            <Toggle checked={filter.hd}
-                                    onChange={(value) => this.setFilterValue("hd", !filter.hd)}
-                            />
-                            <label className="mr-3 ml-5">ES</label>
-                            <Toggle checked={filter.es}
-                                    onChange={(value) => this.setFilterValue("es", !filter.es)}
-                            />
-                            <label className="mr-3 ml-5">SP</label>
-                            <Toggle checked={filter.sp}
-                                    onChange={(value) => this.setFilterValue("sp", !filter.sp)}
-                            />
-                            <label className="mr-3 ml-5">P</label>
-                            <Toggle checked={filter.p}
-                                    onChange={(value) => this.setFilterValue("p", !filter.p)}
-                            />
-                            
-                                    <label className="mr-3 ml-5">P5</label>
-                                    <Toggle checked={filter.p5}
-                                            onChange={(value) => this.setFilterValue("p5", !filter.p5)}
-                                    />
-                                    </React.Fragment>:null
-                            }
-                            
-                        </React.Fragment>
+                    tab.hasP5 ? <React.Fragment>
+                        <label className="mr-3 ml-5">HD</label>
+                        <Toggle checked={filter.hd}
+                                onChange={() => this.setFilterValue("hd", !filter.hd)}
+                        />
+                        <label className="mr-3 ml-5">ES</label>
+                        <Toggle checked={filter.es}
+                                onChange={() => this.setFilterValue("es", !filter.es)}
+                        />
+                        <label className="mr-3 ml-5">SP</label>
+                        <Toggle checked={filter.sp}
+                                onChange={() => this.setFilterValue("sp", !filter.sp)}
+                        />
+                        <label className="mr-3 ml-5">P</label>
+                        <Toggle checked={filter.p}
+                                onChange={() => this.setFilterValue("p", !filter.p)}
+                        />
+
+                        <label className="mr-3 ml-5">P5</label>
+                        <Toggle checked={filter.p5}
+                                onChange={() => this.setFilterValue("p5", !filter.p5)}
+                        />
+                    </React.Fragment> : null
                 }
                 <label className="mr-3 ml-5">
                     Limit
@@ -261,8 +254,8 @@ class RequestDashboardComponent extends MainComponent {
             </div>
         );
     }
-    
-     
+
+
     addToolTip = (element, title) => {
         return this.el(
             "div",
@@ -272,24 +265,40 @@ class RequestDashboardComponent extends MainComponent {
         );
     };
 
-    getActiveTab=()=>{
-        const {filter,timeRequests,changRequests,salesRequests}=this.state;
-        switch(filter.activeTab){
+    getActiveTab = () => {
+        const {filter, timeRequests, changRequests, salesRequests} = this.state;
+        switch (filter.activeTab) {
             case this.TIME_REQUEST:
-                return <TimeRequestComponent filter={filter} activities={timeRequests} onRefresh={this.loadTab}></TimeRequestComponent>
+                return <TimeRequestComponent filter={filter}
+                                             activities={timeRequests}
+                                             onRefresh={this.loadTab}
+                />
             case this.CHANGE_REQUEST:
-                return <ChangeRequestComponent filter={filter} activities={changRequests} onRefresh={this.loadTab}></ChangeRequestComponent>
+                return <ChangeRequestComponent filter={filter}
+                                               activities={changRequests}
+                                               onRefresh={this.loadTab}
+                />
             case this.SALES_REQUEST:
-                return <SalesRequestComponent filter={filter} activities={salesRequests} onRefresh={this.loadTab}></SalesRequestComponent>
+                return <SalesRequestComponent filter={filter}
+                                              activities={salesRequests}
+                                              onRefresh={this.loadTab}
+                />
         }
     }
+
     render() {
-        const {el} = this;
-        return el("div", null,            
-            el(Spinner, {key: "spinner", show: this.state.showSpinner}),
-            this.getFilterElement(),
-            this.getTabsElement(),
-            this.getActiveTab()
+
+        return (
+            <div>
+
+                <Spinner key="spinner"
+                         show={this.state.showSpinner}
+                >
+                </Spinner>
+                {this.getFilterElement()}
+                {this.getTabsElement()}
+                {this.getActiveTab()}
+            </div>
         );
     }
 }

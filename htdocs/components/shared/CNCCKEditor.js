@@ -16,8 +16,8 @@ class CNCCKEditor extends React.Component {
     componentDidMount() {
 
         this._initEditor();
-    }     
-    
+    }
+
     _initEditor() {
         const {readOnly, type, onBeforeLoad, style, value, disableClipboard} = this.props;
         const config = this.getCNCCKEditorConfig();
@@ -130,13 +130,17 @@ class CNCCKEditor extends React.Component {
     }
 
     render() {
-        return <div id={this.props.name}
-                    name={this.props.name}
-                    style={this.props.style}
-                    ref={ref => (this.element = ref)}
-                    data-exclude-from-error-count={this.props.excludeFromErrorCount || false}
-                    className="testing"
-        />;
+        return <div>
+            <div key="top" id="top"/>
+            <div id={this.props.name}
+                 key="field"
+                 name={this.props.name}
+                 style={this.props.style}
+                 ref={ref => (this.element = ref)}
+                 className="testing"
+            />
+            <div key="bottom" id="bottom"/>
+        </div>;
     }
 
     getCNCCKEditorConfig = () => {
@@ -175,20 +179,17 @@ class CNCCKEditor extends React.Component {
             disableNativeSpellChecker: true,
             wsc_customDictionaryIds: '100920',
             font_defaultLabel: 'Arial',
-            fontSize_defaultLabel: '10pt',            
-
+            fontSize_defaultLabel: '10pt',
         };
 
         if (this.props.sharedSpaces) {
             defaultConfig.extraPlugins += ",sharedspace";
             defaultConfig.removePlugins += ",floatingspace,maximize,resize,elementspath";
             defaultConfig.sharedSpaces = {
-                top: this.props.top,
-                bottom: this.props.bottom
+                top: this.props.top || "top",
+                bottom: this.props.bottom || "bottom"
             };
         }
-
-
         return defaultConfig;
     }
 

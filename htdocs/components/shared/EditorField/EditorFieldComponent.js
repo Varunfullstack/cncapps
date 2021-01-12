@@ -15,6 +15,7 @@ export default class EditorFieldComponent extends React.PureComponent {
                              value={value}
                              type="inline"
                              style={style}
+                             key="cncEditor"
                              onChange={($event) => onChange($event.editor.getData())}
                              minCharCount={minCharCount}
                              disableClipboard={disableClipboard}

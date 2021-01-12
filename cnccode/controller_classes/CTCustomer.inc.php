@@ -3634,7 +3634,6 @@ class CTCustomer extends CTCNC
     function getCustomerContracts()
     {
         $customerID             = $_REQUEST["customerId"];
-        $contractCustomerItemID = $_REQUEST["contractCustomerItemID"];
         $linkedToSalesOrder     = $_REQUEST["linkedToSalesOrder"];
         $contracts              = array();
         $buCustomerItem         = new BUCustomerItem($this);
@@ -3646,20 +3645,6 @@ class CTCustomer extends CTCNC
                 null
             );
         }
-
-        if (!$contractCustomerItemID) {
-            array_push($contracts, ["id" => "", "name" => "tandMSelected", "renewalType" => null]);
-        }
-
-        // if ($linkedToSalesOrder) {
-        //     $this->template->set_var(
-        //         [
-
-        //             'salesOrderReason' => "- Must be selected because this is linked to a Sales Order"
-        //         ]
-
-        //     );
-        // }
         while ($dsContract->fetchNext()) {
 
             $description = $dsContract->getValue(DBEJContract::itemDescription) . ' ' . $dsContract->getValue(
