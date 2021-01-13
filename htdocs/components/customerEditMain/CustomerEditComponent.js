@@ -12,7 +12,7 @@ import PortalCustomerDocumentsComponent from "./PortalCustomerDocumentsComponent
 import SitesList from "./customerSites/SitesList";
 import CustomerOrders from "./CustomerOrders";
 import CustomerCRMComponent from "./CustomerCRMComponent";
-import ContactsComponent from "./ContactsComponent";
+import ContactsComponent from "./contacts/ContactsComponent";
 
 const store = configureStore();
 

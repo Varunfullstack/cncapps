@@ -180,8 +180,20 @@
             <addColumn tableName="contactAuditLog">
                 <column name="othersClosureEmailFlag" type="char(1)" defaultValue="Y"/>
             </addColumn>
-
         </rollback>
     </changeSet>
+    <changeSet author="pavwebdev" id="issue916-15">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="statementContactId"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="statementContactId">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 
 </databaseChangeLog>
