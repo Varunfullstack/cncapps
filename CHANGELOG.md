@@ -1,9 +1,15 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.2.1] - 2021-01-13
+### Fixed
+- Fixed issue with usernames not showing in a dropdown when editing an activity.
+### Changed
+- Changed behaviour of Sales Request endpoint to include P5 results even when the P5 filter is not sent.
+
 ## [v5.2.0] - 2021-01-12
 ### Added
-- Issue 1038 - Add means of monitoring the licensing data received from StreamOne.
+- Issue 1038 - Add the means of monitoring the licensing data received from StreamOne.
 - Issue 1160 - KPI Graphs for performance
 ### Changed
 - Issue 1170 - Modal Popup GUI Improvements
