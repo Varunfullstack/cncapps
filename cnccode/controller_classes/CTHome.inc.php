@@ -120,7 +120,10 @@ class CTHome extends CTCNC
                 break;
             case 'react':
                 $this->displayReact();
-                break;            
+                break;           
+            case 'charts' :
+                $this->displayChartsWithoutMenu();
+                break;
             default:
                 $this->display();
                 break;
@@ -1017,7 +1020,27 @@ class CTHome extends CTCNC
     }
 
     private function displayCharts()
+    {        
+        $this->setTemplateFiles(
+            'HomeCharts',
+            'HomeCharts'
+        );
+        $this->template->set_var(
+            [
+                "userLevel" => $teamLevel = $this->buUser->getLevelByUserID($this->userID),
+                "userID"    => $this->buUser->dbeUser->getValue(DBEUser::userID),
+                "isManager" => $this->buUser->isSdManager($this->userID) ? 'true' : 'false',
+            ]
+        );
+        $this->template->parse(
+            'CONTENTS',
+            'HomeCharts',
+            true
+        );     
+    }
+    private function displayChartsWithoutMenu()
     {
+        $this->setHTMLFmt(CT_HTML_FMT_POPUP);
         $this->setTemplateFiles(
             'HomeCharts',
             'HomeCharts'
@@ -1034,6 +1057,7 @@ class CTHome extends CTCNC
             'HomeCharts',
             true
         );
+        $this->parsePage();
     }
 
     /**

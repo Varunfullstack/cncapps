@@ -22,7 +22,7 @@ class HomeComponent extends MainComponent {
     constructor(props) {
         super(props);
         this.state={
-            cards:this.getCards(true),
+            cards:this.getCards(false),
             showSpinner:false,
             upcomingVisit:[],
             salesFigures:{},
@@ -191,20 +191,25 @@ class HomeComponent extends MainComponent {
                 title:"User Charts",
                 minimize:false,
                 position: "relative", 
-                height: 473, 
-                width: 1166, 
+                height: 390, 
+                width: 1635, 
                 left: "", 
                 top: "",
                 scroll:false,
             },
             
         ];
-        if(isOrigin)
-            return origin;
-        if(cards)
-            return JSON.parse(cards);
-        else 
-            return origin;        
+        
+        if (isOrigin) return origin;
+        const savedCards = JSON.parse(cards);
+        if (savedCards.length > 0) {
+          // merge saved to originial
+          for (let i = 0; i < origin.length; i++) {
+            const indx = savedCards.map((c) => c.id).indexOf(origin[i].id);
+            if (indx >= 0) origin[i] = { ...origin[i], ...savedCards[indx] };
+          }
+        }
+        return origin;        
     }
     getCardsElement=()=>{
         let {cards}=this.state;
@@ -610,36 +615,14 @@ class HomeComponent extends MainComponent {
     }
     handleReset=()=>{
         let {cards}=this.state;        
-        for(let i=0; i<cards.length;i++)
-        {
-            cards[i].order=cards[i].id;
-            cards[i].top="";
-            cards[i].left="";
-            cards[i].width="";
-            cards[i].height="";
-        }
-        
+        cards=this.getCards(true);        
         this.setState({cards},()=>this.saveOrder());
     }
     getDailyStats=()=>{
-        return <iframe style={{border:0,overflow:"hidden",overflowX:"hidden",overflowY:"hidden",height:"80%",minWidth:"200",position:"absolute",top:70,left:0,right:0,bottom:0}}  width="100%" height="100%" src="https://cncdev2.cnc-ltd.co.uk/popup.php?action=dailyStats"></iframe>
+        return <iframe style={{border:0,overflow:"hidden",overflowX:"hidden",overflowY:"hidden",height:"80%",minWidth:"200",position:"absolute",top:70,left:0,right:0,bottom:0}}  width="100%" height="100%" src="popup.php?action=dailyStats"></iframe>
     }
     getTeamCharts(){
-        return (
-          <div>
-            <select
-              name="team"              
-              style={{display: "inline-block"}}
-            >
-              <option value="1" >
-                Help Desk Team
-              </option>
-              <option value="2">Escalations Team</option>
-              <option value="3">Small Projects Team</option>
-              <option value="5">Projects Team</option>
-            </select>
-          </div>
-        );
+        return <iframe style={{border:0,overflow:"hidden",overflowX:"hidden",overflowY:"hidden",height:"80%",minWidth:"200",position:"absolute",top:70,left:0,right:0,bottom:0}}  width="100%" height="100%" src="index.php?action=charts"></iframe>
     }
     render() {        
         return (

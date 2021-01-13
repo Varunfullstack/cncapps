@@ -13,13 +13,19 @@
 ></script>
 <style>
     .chart {
-        width: 100%;
+        /* width: 100%; */
         min-height: 200px;
+        
     }
 
     .item {
-        width: 30%;
+        /* width: 30%; */
+        flex-basis: 500px;
         margin: 8px;
+        box-shadow: 0 2px 4px 0 rgba(0,0,0,.15);
+        border-radius: 10px;
+        padding: 0.2rem;
+        transition: .3s;
     }
 
     .container {
@@ -206,7 +212,7 @@
         flex: 0 0 50%;
     }
 </style>
-<br>
+
 <select name="team"
         class="teamSelector"
         id="teamSelector"
