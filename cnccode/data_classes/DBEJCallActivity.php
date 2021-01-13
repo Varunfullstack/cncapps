@@ -541,7 +541,6 @@ class DBEJCallActivity extends DBECallActivity
      * @param bool $showEscalations
      * @param bool $showSmallProjects
      * @param bool $showProjects
-     * @param bool $isP5
      * @param int $limit
      * @return bool
      */
@@ -549,7 +548,6 @@ class DBEJCallActivity extends DBECallActivity
                                          $showEscalations = false,
                                          $showSmallProjects = false,
                                          $showProjects = false,
-                                         $isP5 = false,
                                          $limit = 0
     )
     {
@@ -569,11 +567,6 @@ class DBEJCallActivity extends DBECallActivity
         if (!$showProjects) {
             $query .= " and pro_queue_no <> 5 ";
         }
-        if ($isP5) {
-            $query .= " and problem.pro_priority = 5 and  team.level <= 3 ";
-        } else {
-            $query .= " and problem.pro_priority < 5";
-        }
         if ($limit > 0) {
             $query .= " limit $limit";
         }
@@ -585,7 +578,6 @@ class DBEJCallActivity extends DBECallActivity
                                        $showEscalation = false,
                                        $showSmallProjects = false,
                                        $showProjects = false,
-                                       $isP5 = false,
                                        $limit = 0
     )
     {
@@ -603,11 +595,6 @@ class DBEJCallActivity extends DBECallActivity
         if (!$showProjects) {
             $query .= " and team.teamID <> 5 ";
         }
-        if ($isP5) {
-            $query .= " and problem.pro_priority = 5 and  team.level <= 3 ";
-        } else {
-            $query .= " and problem.pro_priority < 5";
-        }
         if ($limit > 0) {
             $query .= " limit $limit";
         }
@@ -619,7 +606,6 @@ class DBEJCallActivity extends DBECallActivity
                                                $showEscalation = false,
                                                $showSmallProjects = false,
                                                $showProjects = false,
-                                               $isP5 = false,
                                                $limit = 0
     )
     {
@@ -653,9 +639,6 @@ class DBEJCallActivity extends DBECallActivity
         }
         if (!$showProjects) {
             $query .= " and team.teamID <> 5 ";
-        }
-        if ($isP5) {
-            $query .= " and problem.pro_priority = 5 and  team.level <= 3 ";
         }
         if ($limit > 0) {
             $query .= " limit $limit";

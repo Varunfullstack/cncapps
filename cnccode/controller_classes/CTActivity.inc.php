@@ -77,14 +77,6 @@ define(
     'addToCalendar'
 );
 define(
-    'CTACTIVITY_ACT_CHANGE_REQUEST_REVIEW',
-    'changeRequestReview'
-);
-define(
-    'CTACTIVITY_ACT_TIME_REQUEST_REVIEW',
-    'timeRequestReview'
-);
-define(
     'CTACTIVITY_ACT_UPLOAD_FILE',
     'uploadFile'
 );
@@ -126,7 +118,6 @@ class CTActivity extends CTCNC
     const CHECK_PREPAY                                 = 'checkPrepay';
     const AUTHORISING_CONTACTS                         = 'authorisingContacts';
     const CONTACT_NOTES                                = 'contactNotes';
-    const SALES_REQUEST_REVIEW                         = 'salesRequestReview';
     const SEND_CHANGE_REQUEST                          = 'sendChangeRequest';
     const SEND_SALES_REQUEST                           = 'sendSalesRequest';
     const UNHIDE_SR                                    = 'unhideSR';
@@ -394,12 +385,6 @@ class CTActivity extends CTCNC
                 $this->requestAdditionalTime();
                 echo json_encode(["status" => "ok"]);
                 break;
-            case CTACTIVITY_ACT_CHANGE_REQUEST_REVIEW:
-                $this->changeRequestReview();
-                break;
-            case CTACTIVITY_ACT_TIME_REQUEST_REVIEW;
-                $this->timeRequestReview();
-                break;
             case self::CONTRACT_LIST_POPUP:
                 $this->contractListPopup();
                 break;
@@ -444,9 +429,6 @@ class CTActivity extends CTCNC
                 break;
             case self::SEND_CHANGE_REQUEST:
                 echo json_encode($this->sendChangeRequest());
-                break;
-            case self::SALES_REQUEST_REVIEW:
-                $this->salesRequestReview();
                 break;
             case self::CONTACT_NOTES:
                 $buCustomer = new BUCustomer($this);
@@ -4299,7 +4281,7 @@ class CTActivity extends CTCNC
     /**
      * Request more time for SR
      * Called via AJAX request from ActivityEdit
-     */    
+     */
     function requestAdditionalTime()
     {
         if (!$this->getParam('problemID') && !$this->getParam('callActivityID')) {
@@ -4312,275 +4294,6 @@ class CTActivity extends CTCNC
             $this->getParam('reason'),
             $this->getParam('callActivityID')
         );
-    }
-    //not used
-    /**
-     * @throws Exception
-     */
-    function changeRequestReview()
-    {
-
-        $this->setMethodName('changeRequestReview');
-        $callActivityID = $this->getParam('callActivityID');
-        $dsCallActivity = new DataSet($this);
-        $this->buActivity->getActivityByID(
-            $callActivityID,
-            $dsCallActivity
-        );
-        $problemID        = $dsCallActivity->getValue(DBEJCallActivity::problemID);
-        $dbeFirstActivity = $this->buActivity->getFirstActivityInServiceRequest($problemID);
-        $this->setTemplateFiles(
-            array(
-                'ServiceChangeRequestReview' => 'ServiceChangeRequestReview.inc'
-            )
-        );
-        $this->setPageTitle("Review Change Request");
-        if ($this->getParam('fromEmail')) {
-            $url = Controller::buildLink(
-                'Activity.php',
-                [
-                    "action"         => CTACTIVITY_ACT_CHANGE_REQUEST_REVIEW,
-                    "callActivityID" => $this->getParam('callActivityID')
-                ]
-            );
-            header('Location: ' . $url);
-            exit;
-        }
-        if ($_SERVER['REQUEST_METHOD'] == 'POST' && !$this->getParam('fromEmail')) {
-
-            switch ($this->getParam('Submit')) {
-
-                case 'Approve':
-                    $option = 'A';
-                    break;
-                case 'Deny':
-                    $option = 'D';
-                    break;
-                case 'Further Details Required':
-                default:
-                    $option = 'I';
-                    break;
-            }
-            $this->buActivity->changeRequestProcess(
-                $callActivityID,
-                $this->userID,
-                $option,
-                $this->getParam('comments')
-            );
-            $nextURL = Controller::buildLink(
-                'RequestDashBoard.php',//'ChangeRequestDashboard.php?HD&ES&SP&P',
-                array()
-            );
-            header('Location: ' . $nextURL);
-            exit;
-        }
-        $urlProblemHistoryPopup = Controller::buildLink(
-            'Activity.php',
-            array(
-                'action'    => 'problemHistoryPopup',
-                'problemID' => $problemID,
-                'htmlFmt'   => CT_HTML_FMT_POPUP
-            )
-        );
-        $submitURL              = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'action' => CTACTIVITY_ACT_CHANGE_REQUEST_REVIEW,
-            )
-        );
-        $this->template->set_var(
-            array(
-                'callActivityID'         => $callActivityID,
-                'problemID'              => $problemID,
-                'customerID'             => $dbeFirstActivity->getValue(DBEJCallActivity::customerID),
-                'customerName'           => $dbeFirstActivity->getValue(DBEJCallActivity::customerName),
-                'requestDetails'         => $dsCallActivity->getValue(DBEJCallActivity::reason),
-                'userName'               => $dsCallActivity->getValue(DBEJCallActivity::userName),
-                'submitUrl'              => $submitURL,
-                'urlProblemHistoryPopup' => $urlProblemHistoryPopup
-            )
-        );
-        $this->template->parse(
-            'CONTENTS',
-            'ServiceChangeRequestReview',
-            true
-        );
-        $this->parsePage();
-
-    }
-
-    /**
-     * @throws Exception
-     */
-    function timeRequestReview()
-    {
-
-        $this->setMethodName('timeRequestReview');
-        $buHeader = new BUHeader($this);
-        $buHeader->getHeader($dsHeader);
-        $callActivityID = $this->getParam('callActivityID');
-        $dsCallActivity = new DataSet($this);
-        $this->buActivity->getActivityByID(
-            $callActivityID,
-            $dsCallActivity
-        );
-        $problemID        = $dsCallActivity->getValue(DBEJCallActivity::problemID);
-        $dbeFirstActivity = $this->buActivity->getFirstActivityInServiceRequest($problemID);
-        $dbeProblem       = new DBEProblem($this);
-        $dbeProblem->getRow($problemID);
-        $this->setTemplateFiles(
-            array(
-                'ServiceTimeRequestReview' => 'ServiceTimeRequestReview.inc'
-            )
-        );
-        $this->setPageTitle("Time Request");
-        $requestorID = $dsCallActivity->getValue(DBECallActivity::userID);
-        $dbeUser     = new DBEUser($this);
-        $dbeUser->getRow($requestorID);
-        $teamID             = $dbeUser->getValue(DBEUser::teamID);
-        $teamName           = null;
-        $usedMinutes        = 0;
-        $assignedMinutes    = 0;
-        $remainingTimeLimit = null;
-        $isOverLimit        = false;
-        switch ($teamID) {
-            case 1:
-                $usedMinutes        = $this->buActivity->getHDTeamUsedTime($problemID);
-                $assignedMinutes    = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
-                $teamName           = 'Help Desk';
-                $remainingTimeLimit = $dsHeader->getValue(
-                        DBEHeader::hdTeamManagementTimeApprovalMinutes
-                    ) - $assignedMinutes;
-                $isOverLimit        = $assignedMinutes >= $dsHeader->getValue(
-                        DBEHeader::hdTeamManagementTimeApprovalMinutes
-                    );
-                break;
-            case 2:
-                $usedMinutes        = $this->buActivity->getESTeamUsedTime($problemID);
-                $assignedMinutes    = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
-                $teamName           = 'Escalation';
-                $remainingTimeLimit = $dsHeader->getValue(
-                        DBEHeader::esTeamManagementTimeApprovalMinutes
-                    ) - $assignedMinutes;
-                $isOverLimit        = $assignedMinutes >= $dsHeader->getValue(
-                        DBEHeader::esTeamManagementTimeApprovalMinutes
-                    );
-                break;
-            case 4:
-                $usedMinutes        = $this->buActivity->getSPTeamUsedTime($problemID);
-                $assignedMinutes    = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
-                $teamName           = 'Small Projects';
-                $remainingTimeLimit = $dsHeader->getValue(
-                        DBEHeader::smallProjectsTeamManagementTimeApprovalMinutes
-                    ) - $assignedMinutes;
-                $isOverLimit        = $assignedMinutes >= $dsHeader->getValue(
-                        DBEHeader::smallProjectsTeamManagementTimeApprovalMinutes
-                    );
-                break;
-            case 5:
-                $usedMinutes        = $this->buActivity->getUsedTimeForProblemAndTeam($problemID, 5);
-                $assignedMinutes    = $dbeProblem->getValue(DBEProblem::projectTeamLimitMinutes);
-                $teamName           = 'Projects';
-                $remainingTimeLimit = 'Infinity';
-        }
-        $leftOnBudget = $assignedMinutes - $usedMinutes;
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
-            switch ($this->getParam('Submit')) {
-
-                case 'Approve':
-                    if ($isOverLimit && !$this->dbeUser->getValue(DBEUser::additionalTimeLevelApprover)) {
-                        throw new Exception('You do not have enough permissions to proceed');
-                    }
-                    $option = 'A';
-                    break;
-                case 'Deny':
-                    $option = 'D';
-                    break;
-                case 'Delete':
-                default:
-                    if ($isOverLimit && !$this->dbeUser->getValue(DBEUser::additionalTimeLevelApprover)) {
-                        throw new Exception('You do not have enough permissions to proceed');
-                    }
-                    $option = 'DEL';
-                    break;
-            }
-            $minutes = 0;
-            switch ($this->getParam('allocatedTimeAmount')) {
-                case 'minutes':
-                    $minutes = $this->getParam('allocatedTimeValue');
-                    break;
-                case 'hours':
-                    $minutes = $this->getParam('allocatedTimeValue') * 60;
-                    break;
-                case 'days':
-                    $buHeader = new BUHeader($this);
-                    /** @var $dsHeader DataSet */
-                    $buHeader->getHeader($dsHeader);
-                    $minutesInADay = $dsHeader->getValue(DBEHeader::smallProjectsTeamMinutesInADay);
-                    $minutes       = $minutesInADay * $this->getParam('allocatedTimeValue');
-            }
-            $this->buActivity->timeRequestProcess(
-                $callActivityID,
-                $this->userID,
-                $option,
-                $this->getParam('comments'),
-                $minutes
-            );
-            $nextURL = Controller::buildLink(
-                'RequestDashBoard.php',//'TimeRequestDashboard.php',
-                array()
-            );
-            header('Location: ' . $nextURL);
-            exit;
-        }
-        $urlProblemHistoryPopup = Controller::buildLink(
-            'Activity.php',
-            array(
-                'action'    => 'problemHistoryPopup',
-                'problemID' => $problemID,
-                'htmlFmt'   => CT_HTML_FMT_POPUP
-            )
-        );
-        $submitURL              = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'action' => CTACTIVITY_ACT_CHANGE_REQUEST_REVIEW,
-            )
-        );
-        $this->template->set_var(
-            array(
-                'callActivityID'              => $callActivityID,
-                'problemID'                   => $problemID,
-                'customerID'                  => $dbeFirstActivity->getValue(DBEJCallActivity::customerID),
-                'customerName'                => $dbeFirstActivity->getValue(DBEJCallActivity::customerName),
-                'requestDetails'              => $dsCallActivity->getValue(DBEJCallActivity::reason),
-                'userName'                    => $dsCallActivity->getValue(DBEJCallActivity::userName),
-                'submitUrl'                   => $submitURL,
-                'urlProblemHistoryPopup'      => $urlProblemHistoryPopup,
-                'requesterTeamName'           => $teamName,
-                'notes'                       => $dsCallActivity->getValue(DBEJCallActivity::reason),
-                'requestedDateTime'           => $dsCallActivity->getValue(
-                        DBEJCallActivity::date
-                    ) . ' ' . $dsCallActivity->getValue(DBEJCallActivity::startTime),
-                'remainingLimitTime'          => $remainingTimeLimit,
-                'chargeableHours'             => $dbeProblem->getValue(DBEJProblem::chargeableActivityDurationHours),
-                'timeSpentSoFar'              => $usedMinutes,
-                'timeLeftOnBudget'            => $leftOnBudget,
-                'requesterTeam'               => $teamName,
-                'additionalTimeLimitApprover' => $this->dbeUser->getValue(
-                    DBEUser::additionalTimeLevelApprover
-                ) ? 'true' : 'false',
-                'minutesInADay'               => $dsHeader->getValue(DBEHeader::smallProjectsTeamMinutesInADay)
-            )
-        );
-        $this->template->parse(
-            'CONTENTS',
-            'ServiceTimeRequestReview',
-            true
-        );
-        $this->parsePage();
-
     }
 
     /**
@@ -4890,103 +4603,6 @@ class CTActivity extends CTCNC
             return ["status" => "error", "message" => $exception->getMessage()];
         }
         return ["status" => "ok"];
-    }
-    //not used
-    /**
-     * @throws Exception
-     */
-    function salesRequestReview()
-    {
-        $this->setMethodName('salesRequestReview');
-        $callActivityID = $this->getParam('callActivityID');
-        $dsCallActivity = new DataSet($this);
-        $this->buActivity->getActivityByID(
-            $callActivityID,
-            $dsCallActivity
-        );
-        if ($dsCallActivity->getValue(DBECallActivity::salesRequestStatus) !== 'O') {
-
-            $this->template->setVar(
-                'CONTENTS',
-                'This Sales Request has already been processed',
-                true
-            );
-            $this->parsePage();
-            exit;
-        }
-        $problemID        = $dsCallActivity->getValue(DBEJCallActivity::problemID);
-        $dbeFirstActivity = $this->buActivity->getFirstActivityInServiceRequest($problemID);
-        $this->setTemplateFiles(
-            array(
-                'ServiceSalesRequestReview' => 'ServiceSalesRequestReview.inc'
-            )
-        );
-        $this->setPageTitle("Review Sales Request");
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $notify = true;
-            switch ($this->getParam('Submit')) {
-
-                case 'Approve Without Notifying Sales':
-                    $notify = false;
-                case 'Approve':
-                    $option = 'A';
-                    break;
-                case 'Deny':
-                    $option = 'D';
-                    break;
-                default:
-                    throw new Exception('Action not valid');
-            }
-            $this->buActivity->salesRequestProcess(
-                $callActivityID,
-                $this->userID,
-                $option,
-                $this->getParam('comments'),
-                $notify
-            );
-            $nextURL = Controller::buildLink(
-                'RequestDashBoard.php',//'SalesRequestDashboard.php',
-                array()
-            );
-            header('Location: ' . $nextURL);
-            exit;
-        }
-        $urlProblemHistoryPopup = Controller::buildLink(
-            'Activity.php',
-            array(
-                'action'    => 'problemHistoryPopup',
-                'problemID' => $problemID,
-                'htmlFmt'   => CT_HTML_FMT_POPUP
-            )
-        );
-        $submitURL              = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'action' => CTACTIVITY_ACT_CHANGE_REQUEST_REVIEW,
-            )
-        );
-        $standardText           = new DBEStandardText($this);
-        $standardText->getRow($dsCallActivity->getValue(DBECallActivity::requestType));
-        $showDoNotNotifyOption = $standardText->getValue(DBEStandardText::salesRequestDoNotNotifySalesOption);
-        $this->template->set_var(
-            array(
-                'callActivityID'         => $callActivityID,
-                'problemID'              => $problemID,
-                'customerID'             => $dbeFirstActivity->getValue(DBEJCallActivity::customerID),
-                'customerName'           => $dbeFirstActivity->getValue(DBEJCallActivity::customerName),
-                'requestDetails'         => $dsCallActivity->getValue(DBEJCallActivity::reason),
-                'userName'               => $dsCallActivity->getValue(DBEJCallActivity::userName),
-                'submitUrl'              => $submitURL,
-                'urlProblemHistoryPopup' => $urlProblemHistoryPopup,
-                'showDoNotNotifySales'   => $showDoNotNotifyOption ? "1" : "0"
-            )
-        );
-        $this->template->parse(
-            'CONTENTS',
-            'ServiceSalesRequestReview',
-            true
-        );
-        $this->parsePage();
     }
 
     /**

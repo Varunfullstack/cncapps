@@ -38,7 +38,7 @@ function processChangeRequestsEmails()
     while ($dbejCallActivity->fetchNext()) {
         $problemID  = $dbejCallActivity->getValue(DBEJCallActivity::problemID);
         $srURL      = SITE_URL . "/SRActivity.php?serviceRequestId={$problemID}";
-        $processURL = SITE_URL . "/Activity.php?callActivityID={$dbejCallActivity->getValue(DBEJCallActivity::callActivityID)}&action=changeRequestReview";
+        $processURL = SITE_URL . "/RequestDashboard.php";
         $requestingUserID = $dbejCallActivity->getValue(DBEJCallActivity::userID);
         $requestingUser   = new DBEUser($thing);
         $requestingUser->getRow($requestingUserID);
@@ -93,9 +93,7 @@ function addPendingTimeRequestToArray(&$array,
     $srURL = SITE_URL . "/SRActivity.php?serviceRequestId=" . $DBEJCallActivity->getValue(
             DBEJCallActivity::problemID
         );
-    $processURL = SITE_URL . '/Activity.php?callActivityID=' . $DBEJCallActivity->getValue(
-            DBEJCallActivity::callActivityID
-        ) . '&action=timeRequestReview';
+    $processURL = SITE_URL . '/RequestDashboard.php';
     $leftOnBudget = $assignedMinutes - $usedMinutes;
     $array[] = new \CNCLTD\PendingTimeRequestTwigDTO(
         $DBEJCallActivity->getValue(DBEJCallActivity::customerName),

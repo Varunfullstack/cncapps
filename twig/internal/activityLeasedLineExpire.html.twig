@@ -1,11 +1,14 @@
 {% extends "@internal/wrapper.html.twig" %}
-{# @var data  #}
+{# @var data #}
 {% block content %}
 
     <p style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt;">
-        The service <a href='{{data.SITE_URL}}/RenBroadband.php?action=edit&ID={{data.custItemID}}' title='{{data.itemDescription}}'>{{data.itemDescription}}</a>        
-        at {{data.customerName}} comes to the end of contract on the {{data.expireDate}}.        
-        Please review <a href='{{data.SITE_URL}}/Activity.php?callActivityID={{data.callActivityID}}&action=salesRequestReview' >this sales request</a> to ensure that appropriate action is taken and a proposal submitted to the customer.
+        The service <a href='{{ data.SITE_URL }}/RenBroadband.php?action=edit&ID={{ data.custItemID }}'
+                       title='{{ data.itemDescription }}'
+        >{{ data.itemDescription }}</a>
+        at {{ data.customerName }} comes to the end of contract on the {{ data.expireDate }}.
+        Please review <a href='{{ data.SITE_URL }}/RequestDashBoard.php'>this sales request</a> to ensure that
+        appropriate action is taken and a proposal submitted to the customer.
     </p>
 
 {% endblock %}

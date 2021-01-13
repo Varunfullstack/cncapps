@@ -8,13 +8,18 @@ require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 
 class CTRequestDashboard extends CTCNC
 {
-    const GET_TIME_REQUEST   = "getTimeRequest";
-    const GET_CHANGE_REQUEST = "getChangeRequest";
-    const GET_SALES_REQUEST  = "getSalesRequest";
-    const SET_TIME_REQUEST   = "setTimeRequest";
-    const SET_CHANGE_REQUEST = "processChangeRequest";
-    const SET_ALLOCATE_USER  = "setAllocateUser";
-    const SET_SALES_REQUEST  = "processSalesRequest";
+    const GET_TIME_REQUEST                = "getTimeRequest";
+    const GET_CHANGE_REQUEST              = "getChangeRequest";
+    const GET_SALES_REQUEST               = "getSalesRequest";
+    const SET_TIME_REQUEST                = "setTimeRequest";
+    const SET_CHANGE_REQUEST              = "processChangeRequest";
+    const SET_ALLOCATE_USER               = "setAllocateUser";
+    const SET_SALES_REQUEST               = "processSalesRequest";
+    const APPROVE_WITHOUT_NOTIFYING_SALES = 'Approve Without Notifying Sales';
+    const APPROVE                         = 'Approve';
+    const DENY                            = 'Deny';
+    const FURTHER_DETAILS_REQUIRED        = 'Further Details Required';
+    const DELETE                          = 'Delete';
 
     function __construct($requestMethod,
                          $postVars,
@@ -98,32 +103,22 @@ class CTRequestDashboard extends CTCNC
         $showEscalation    = isset($_REQUEST['ES']);
         $showSmallProjects = isset($_REQUEST['SP']);
         $showProjects      = isset($_REQUEST['P']);
-        $isP5              = isset($_REQUEST['P5']);
         $limit             = $this->getParam("limit");
         $dbejCallActivity->getPendingTimeRequestRows(
             $showHelpDesk,
             $showEscalation,
             $showSmallProjects,
             $showProjects,
-            $isP5,
             $limit
         );
         $buActivity = new BUActivity($this);
         $buHeader   = new BUHeader($this);
         $dsHeader   = new DataSet($this);
         $buHeader->getHeader($dsHeader);
-        $isAdditionalTimeApprover = $this->dbeUser->getValue(DBEUser::additionalTimeLevelApprover);
-        $result                   = array();
+        $result = array();
         while ($dbejCallActivity->fetchNext()) {
             $problemID        = $dbejCallActivity->getValue(DBEJCallActivity::problemID);
             $lastActivity     = $buActivity->getLastActivityInProblem($problemID);
-            $processCRLink    = Controller::buildLink(
-                'Activity.php',
-                [
-                    "callActivityID" => $dbejCallActivity->getValue(DBEJCallActivity::callActivityID),
-                    "action"         => "timeRequestReview"
-                ]
-            );
             $requestingUserID = $dbejCallActivity->getValue(DBEJCallActivity::userID);
             $requestingUser   = new DBEUser($this);
             $requestingUser->getRow($requestingUserID);
@@ -165,9 +160,6 @@ class CTRequestDashboard extends CTCNC
                     $assignedMinutes = $dbeProblem->getValue(DBEProblem::projectTeamLimitMinutes);
                     $teamName        = 'Projects';
             }
-            if ($isOverLimit && !$isAdditionalTimeApprover) {
-                $processCRLink = '';
-            }
             $leftOnBudget            = $assignedMinutes - $usedMinutes;
             $requestedDateTimeString = $dbejCallActivity->getValue(
                     DBEJCallActivity::date
@@ -180,11 +172,9 @@ class CTRequestDashboard extends CTCNC
                 $result,
                 [
                     'customerName'      => $dbejCallActivity->getValue(DBEJCallActivity::customerName),
-                    //'srLink'            => $srLink,
                     'notes'             => $dbejCallActivity->getValue(DBEJCallActivity::reason),
                     'requestedBy'       => $dbejCallActivity->getValue(DBEJCallActivity::userName),
                     'requestedDateTime' => $requestedDateTimeString,
-                    'processCRLink'     => $processCRLink,
                     'chargeableHours'   => $dbeProblem->getValue(DBEJProblem::chargeableActivityDurationHours),
                     'timeSpentSoFar'    => round($usedMinutes),
                     'timeLeftOnBudget'  => $leftOnBudget,
@@ -220,47 +210,15 @@ class CTRequestDashboard extends CTCNC
         $requestorID = $dsCallActivity->getValue(DBECallActivity::userID);
         $dbeUser     = new DBEUser($this);
         $dbeUser->getRow($requestorID);
-        $teamID          = $dbeUser->getValue(DBEUser::teamID);
-        $assignedMinutes = 0;
-        $isOverLimit     = false;
-        switch ($teamID) {
-            case 1:
-                $assignedMinutes = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
-                $isOverLimit     = $assignedMinutes >= $dsHeader->getValue(
-                        DBEHeader::hdTeamManagementTimeApprovalMinutes
-                    );
-                break;
-            case 2:
-                $assignedMinutes = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
-                $isOverLimit     = $assignedMinutes >= $dsHeader->getValue(
-                        DBEHeader::esTeamManagementTimeApprovalMinutes
-                    );
-                break;
-            case 4:
-                $assignedMinutes = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
-                $isOverLimit     = $assignedMinutes >= $dsHeader->getValue(
-                        DBEHeader::smallProjectsTeamManagementTimeApprovalMinutes
-                    );
-                break;
-            case 5:
-                $assignedMinutes = $dbeProblem->getValue(DBEProblem::projectTeamLimitMinutes);
-        }
         switch ($body->status) {
-
-            case 'Approve':
-                if ($isOverLimit && !$this->dbeUser->getValue(DBEUser::additionalTimeLevelApprover)) {
-                    throw new Exception('You do not have enough permissions to proceed');
-                }
+            case self::APPROVE:
                 $option = 'A';
                 break;
-            case 'Deny':
+            case self::DENY:
                 $option = 'D';
                 break;
-            case 'Delete':
+            case self::DELETE:
             default:
-                if ($isOverLimit && !$this->dbeUser->getValue(DBEUser::additionalTimeLevelApprover)) {
-                    throw new Exception('You do not have enough permissions to proceed');
-                }
                 $option = 'DEL';
                 break;
         }
@@ -290,21 +248,18 @@ class CTRequestDashboard extends CTCNC
 
     }
 
-    //--------------change request
     function getChangeRequestData()
     {
         $showHelpDesk      = isset($_REQUEST['HD']);
         $showEscalation    = isset($_REQUEST['ES']);
         $showSmallProjects = isset($_REQUEST['SP']);
         $showProjects      = isset($_REQUEST['P']);
-        $isP5              = isset($_REQUEST['P5']);
         $dbejCallActivity  = new DBEJCallActivity($this);
         $dbejCallActivity->getPendingChangeRequestRows(
             $showHelpDesk,
             $showEscalation,
             $showSmallProjects,
-            $showProjects,
-            $isP5
+            $showProjects
         );
         $result = [];
         while ($dbejCallActivity->fetchNext()) {
@@ -328,16 +283,16 @@ class CTRequestDashboard extends CTCNC
     function processChangeRequest()
     {
         $this->setMethodName('processChangeRequest');
-        $body           = json_decode(file_get_contents('php://input'));
+        $body           = $this->getJSONData();
         $callActivityID = $body->callActivityID;
         switch ($body->status) {
-            case 'Approve':
+            case self::APPROVE:
                 $option = 'A';
                 break;
-            case 'Deny':
+            case self::DENY:
                 $option = 'D';
                 break;
-            case 'Further Details Required':
+            case self::FURTHER_DETAILS_REQUIRED:
             default:
                 $option = 'I';
                 break;
@@ -352,21 +307,18 @@ class CTRequestDashboard extends CTCNC
         return ["status" => true];
     }
 
-    //-----------------sales request
     function getSalesRequestData()
     {
         $showHelpDesk      = isset($_REQUEST['HD']);
         $showEscalation    = isset($_REQUEST['ES']);
         $showSmallProjects = isset($_REQUEST['SP']);
         $showProjects      = isset($_REQUEST['P']);
-        $isP5              = isset($_REQUEST['P5']);
         $dbejCallActivity  = new DBEJCallActivity($this);
         $result            = $dbejCallActivity->getPendingSalesRequestRows(
             $showHelpDesk,
             $showEscalation,
             $showSmallProjects,
-            $showProjects,
-            $isP5
+            $showProjects
         );
         $result            = array_map(
             function ($request) {
@@ -387,65 +339,8 @@ class CTRequestDashboard extends CTCNC
             },
             $result
         );
-        //$result = [];
-        // while ($dbejCallActivity->fetchNext()) {
-        //     $result[] = [
-        //         'customerName'     => $dbejCallActivity->getValue(DBEJCallActivity::customerName),
-        //         'problemID' => $dbejCallActivity->getValue(DBEJCallActivity::problemID),
-        //         'requestBody'      => $dbejCallActivity->getValue(DBEJCallActivity::reason),
-        //         'requestedBy'    => $dbejCallActivity->getValue(DBEJCallActivity::userAccount),
-        //         'requestedDateTime'      => $dbejCallActivity->getValue(
-        //                 DBEJCallActivity::date
-        //             ) . ' ' . $dbejCallActivity->getValue(DBEJCallActivity::startTime) . ':00',
-        //         'callActivityID'       => $dbejCallActivity->getValue(DBEJCallActivity::callActivityID),
-        //         'type'    => $dbejCallActivity->getValue("type"),
-        //         'salesRequestAssignedUserId'=>$dbejCallActivity->getValue('salesRequestAssignedUserId'),
-        //     ];
-        // }
         return $result;
-        /*
-                global $db;
-                        $query = "
-                                SELECT
-                                callactivity.`caa_callactivityno` AS activityId,
-                                callactivity.`caa_problemno` AS serviceRequestId,
-                                standardtext.`stt_desc` AS `type`,
-                                customer.cus_name AS customerName,
-                                callactivity.`reason` AS requestBody,
-                                CONCAT(callactivity.`caa_date`,' ',callactivity.`caa_starttime`,':00') AS requestedAt,
-                                consultant.cns_name AS requesterName,
-                                problem.`salesRequestAssignedUserId`
-                                FROM
-                                callactivity
-                                LEFT JOIN standardtext ON callactivity.`requestType` = standardtext.`stt_standardtextno`
-                                LEFT JOIN problem ON callactivity.`caa_problemno` = problem.`pro_problemno`
-                                LEFT JOIN customer ON problem.`pro_custno` = customer.`cus_custno`
-                                LEFT JOIN consultant ON callactivity.`caa_consno` = consultant.cns_consno
-                                WHERE callactivity.salesRequestStatus = 'O'
-                                AND caa_callacttypeno = 43";
-                        $statement = $db->preparedQuery($query, []);
-                        $requests = $statement->fetch_all(MYSQLI_ASSOC);
-                        $requests = array_map(
-                            function ($request) {
-                                $dbeJCallDocument = new DBECallDocumentWithoutFile($this);
-                                $dbeJCallDocument->setValue(
-                                    DBECallDocumentWithoutFile::callActivityID,
-                                    $request['activityId']
-                                );
-                                $dbeJCallDocument->getRowsByColumn(DBECallDocumentWithoutFile::callActivityID);
-                                $request['attachments'] = [];
-                                while ($dbeJCallDocument->fetchNext()) {
-                                    $request['attachments'][] = [
-                                        "documentId" => $dbeJCallDocument->getValue(DBECallDocumentWithoutFile::callDocumentID)
-                                    ];
-                                }
-                                return $request;
-                            },
-                            $requests
-                        );
-                        echo json_encode(["status" => "ok", "data" => $requests]);
-                        exit;
-                        */
+
     }
 
     function setAllocateUser()
@@ -468,7 +363,7 @@ class CTRequestDashboard extends CTCNC
     function processSalesRequest()
     {
         $this->setMethodName('processSalesRequest');
-        $body           = json_decode(file_get_contents('php://input'));
+        $body           = $this->getJSONData();
         $callActivityID = $body->callActivityID;
         $dsCallActivity = new DataSet($this);
         $buActivity     = new BUActivity($this);
@@ -477,30 +372,33 @@ class CTRequestDashboard extends CTCNC
             $dsCallActivity
         );
         if ($dsCallActivity->getValue(DBECallActivity::salesRequestStatus) !== 'O') {
-            return ["status" => false, "error" => "This Sales Request has already been processed"];
+            throw new \CNCLTD\Exceptions\JsonHttpException(2005, "This sales request has already been processed");
         }
         {
             $notify = true;
             switch ($body->status) {
-
-                case 'Approve Without Notifying Sales':
+                case self::APPROVE_WITHOUT_NOTIFYING_SALES:
                     $notify = false;
-                case 'Approve':
+                case self::APPROVE:
                     $option = 'A';
                     break;
-                case 'Deny':
+                case self::DENY:
                     $option = 'D';
                     break;
                 default:
-                    throw new Exception('Action not valid');
+                    throw new \CNCLTD\Exceptions\JsonHttpException(2006, 'Action not valid');
             }
-            $buActivity->salesRequestProcess(
-                $callActivityID,
-                $this->userID,
-                $option,
-                $body->comments,
-                $notify
-            );
+            try {
+                $buActivity->salesRequestProcess(
+                    $callActivityID,
+                    $this->userID,
+                    $option,
+                    $body->comments,
+                    $notify
+                );
+            } catch (\Exception $exception) {
+                throw new \CNCLTD\Exceptions\JsonHttpException(2007, $exception->getMessage());
+            }
         }
         return ["status" => true];
     }

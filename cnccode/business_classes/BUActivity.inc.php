@@ -2364,6 +2364,9 @@ class BUActivity extends Business
             case 'D':
                 $reason  = '<p>The following sales request has been denied by ' . $userName . '</p>';
                 $subject = 'Sales Request denied';
+                if (!$comments) {
+                    throw new Exception('Comments are required when denying');
+                }
                 $problem->setValue(
                     DBEProblem::userID,
                     $requestingUserID
@@ -3306,9 +3309,6 @@ class BUActivity extends Business
         $userName = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(
                 DBEUser::lastName
             );
-        // $urlChangeControlRequest = SITE_URL . '/Activity.php?action=changeRequestReview&callActivityID=' . $dbeCallActivity->getValue(
-        //         DBEJCallActivity::callActivityID
-        //     ) . '&fromEmail=true';
         $urlChangeControlRequest = SITE_URL . "/RequestDashBoard.php";
         $urlFirstActivity        = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dsInitialCallActivity->getValue(
                 DBEJCallActivity::callActivityID
@@ -10000,12 +10000,9 @@ FROM
             'page',
             'SalesRequestEmail.html'
         );
-        $userName = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(
+        $userName              = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(
                 DBEUser::lastName
             );
-        // $urlSalesRequestReview = SITE_URL . '/Activity.php?action=salesRequestReview&callActivityID=' . $salesRequestActivity->getValue(
-        //         DBEJCallActivity::callActivityID
-        //     ) . '&fromEmail=true';
         $urlSalesRequestReview = SITE_URL . "/RequestDashBoard.php";
         $urlFirstActivity      = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dsInitialCallActivity->getValue(
                 DBEJCallActivity::callActivityID
