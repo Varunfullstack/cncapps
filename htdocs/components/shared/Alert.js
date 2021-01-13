@@ -65,7 +65,7 @@ class Alert extends React.Component {
                 show: this.props.show,
                 width: width || 300,
                 onClose: () => this.close(),
-                footer: el('button', {key: "btnOk", onClick: () => this.close(),autoFocus:true}, "OK "+this.state.autoCloseTimer),
+                footer: el('button', {key: "btnOk", onClick: () => this.close(),autoFocus:true}, `OK ${this.props.autoClose ? this.state.autoCloseTimer : ""}`),
                 content
             }
         )));
