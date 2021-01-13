@@ -656,8 +656,6 @@ class DBEJCallActivity extends DBECallActivity
         }
         if ($isP5) {
             $query .= " and problem.pro_priority = 5 and  team.level <= 3 ";
-        } else {
-            $query .= " and problem.pro_priority < 5";
         }
         if ($limit > 0) {
             $query .= " limit $limit";
