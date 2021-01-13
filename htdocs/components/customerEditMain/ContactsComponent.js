@@ -493,7 +493,7 @@ class ContactsComponent extends React.PureComponent {
     render() {
         return (
             <div className="mt-3">
-                <div className="row">
+                <div className="row" key="firstRow">
                     <div className="col-md-12">
                         <h2>Contacts</h2>
                     </div>
