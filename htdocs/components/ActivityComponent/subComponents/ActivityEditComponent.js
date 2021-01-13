@@ -1159,7 +1159,7 @@ class ActivityEditComponent extends MainComponent {
                 {
                     users?.map((t) => <option
                             key={t.id}
-                            value={t.name}
+                            value={t.id}
                         >{t.name}</option>
                     )
                 }
