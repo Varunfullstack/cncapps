@@ -10,8 +10,7 @@ import {groupBy, params} from "../../utils/utils.js";
 import React from 'react';
 import CustomerDocumentUploader from "./CustomerDocumentUploader";
 import EditorFieldComponent from "../../shared/EditorField/EditorFieldComponent";
-
-const RESOLUTION_SUMMARY_MIN_CHARS = 60;
+import {RESOLUTION_SUMMARY_MIN_CHARS} from "../../CONFIG_CONSTANTS";
 
 class GatherFixedInformationComponent extends MainComponent {
     el = React.createElement;
