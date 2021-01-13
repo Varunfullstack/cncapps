@@ -235,6 +235,11 @@ class TimeRequestComponent extends MainComponent {
     handleDeny = () => {
         const {data} = this.state;
         data.status = "Deny";
+        if (!data.comments) {
+            this.alert("Please enter a comment");
+            return;
+        }
+
         this.api.setTimeRequest(data).then(result => {
             if (result.status) {
                 this.setState({showProcessTimeModal: false});

@@ -118,7 +118,6 @@ class CTRequestDashboard extends CTCNC
         $result = array();
         while ($dbejCallActivity->fetchNext()) {
             $problemID        = $dbejCallActivity->getValue(DBEJCallActivity::problemID);
-            $lastActivity     = $buActivity->getLastActivityInProblem($problemID);
             $requestingUserID = $dbejCallActivity->getValue(DBEJCallActivity::userID);
             $requestingUser   = new DBEUser($this);
             $requestingUser->getRow($requestingUserID);
@@ -181,7 +180,7 @@ class CTRequestDashboard extends CTCNC
                     'requesterTeam'     => $teamName,
                     'alertRow'          => $requestedDateTime < $alertTime ? 'warning' : null,
                     'approvalLevel'     => $isOverLimit ? 'Mgmt' : 'Team Lead',
-                    "callActivityID"    => $lastActivity->getValue(DBEJCallActivity::callActivityID),
+                    "callActivityID"    => $dbejCallActivity->getValue(DBEJCallActivity::callActivityID),
                     'problemID'         => $dbejCallActivity->getValue(DBEJCallActivity::problemID),
                 ]
             );
