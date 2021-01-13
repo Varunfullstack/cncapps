@@ -128,7 +128,8 @@ export default class LogServiceRequestComponent extends MainComponent {
                         `<p>Please advise customer their Service Request number is: ${result.problemID}.</p><p>The SLA for priority ${data.priority} request is ${result.SLAResponseHours} hour${result.SLAResponseHours > 1 ? 's' : ''}</p>`,
                         500,
                         'Alert',
-                        true
+                        true,
+                        false
                     );
                 }
                 if (result.nextURL) {
