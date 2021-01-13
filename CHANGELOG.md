@@ -4,8 +4,12 @@ This project changes will be shown here.
 ## [v5.2.1] - 2021-01-13
 ### Fixed
 - Fixed issue with usernames not showing in a dropdown when editing an activity.
+- Fixed issue with user dropdown not selecting the correct value. 
 ### Changed
 - Changed behaviour of Sales Request endpoint to include P5 results even when the P5 filter is not sent.
+- Prevented autoClose timer countdown to show when autoclose is disabled.
+- Stop LogServiceRequest "Advise Customer" alert from closing automatically.
+ 
 
 ## [v5.2.0] - 2021-01-12
 ### Added
