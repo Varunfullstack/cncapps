@@ -19,7 +19,8 @@ export default class MainComponent extends React.Component {
                 title: "",
                 width: 500,
                 message: "",
-                isHTML: false
+                isHTML: false,
+                autoClose: true,
             },
             confirm: {
                 show: false,
@@ -70,13 +71,14 @@ export default class MainComponent extends React.Component {
     }
 
     //----------------alert
-    alert = (message, width = 500, title = "Alert", isHTML = false) => {
+    alert = (message, width = 500, title = "Alert", isHTML = false, autoClose = true) => {
         const {alert} = this.state;
         alert.show = true;
         alert.width = width;
         alert.title = title;
         alert.message = message;
         alert.isHTML = isHTML;
+        alert.autoClose = autoClose;
         this.setState({alert});
         return new Promise((resolve, reject) => {
             setInterval(() => {
@@ -95,7 +97,7 @@ export default class MainComponent extends React.Component {
             isHTML={alert.isHTML}
             onClose={() => this.handleAlertClose()}
             onAutoClose={this.handleAlertAutoClose}
-            autoClose={true}
+            autoClose={alert.autoClose}
         />;
     }
     handleAlertAutoClose = () => {
@@ -200,6 +202,11 @@ export default class MainComponent extends React.Component {
                 if (containerNode.dataset && containerNode.dataset.excludeFromErrorCount === "true") {
                     return acc;
                 }
+
+                if (!instance.isAllModulesReady()) {
+                    return acc;
+                }
+
                 return acc + instance.getProblemsCount();
             }, 0)
             if (count > nMistakes) {
