@@ -1,4 +1,4 @@
-import {getAllContacts, getMainContacts, getMappedContacts, getOrders} from "./selectors";
+import {getAllContacts, getMappedContacts} from "./selectors";
 import {updateCustomerField} from "./actions";
 import {connect} from "react-redux";
 
@@ -9,10 +9,12 @@ class ContactsComponent extends React.PureComponent {
     renderContacts() {
         const {contacts} = this.props;
         return contacts.map(contact => (
-            <div className="row" key={contact.contactID}>
+            <div className="row"
+                 key={contact.contactID}
+            >
                 <div className="col-md-12">
                     <table className="table table-hover">
-                        <thead>
+                        <thead key="head">
                         <tr>
                             <th>Full Name</th>
                             <th>Position</th>
@@ -25,7 +27,7 @@ class ContactsComponent extends React.PureComponent {
                             <th>HR</th>
                         </tr>
                         </thead>
-                        <tbody>
+                        <tbody key="body">
                         <tr data-toggle="collapse"
                             data-target="#accordion{contact1234}"
                             className="clickable"
