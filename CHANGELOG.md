@@ -3,8 +3,14 @@ This project changes will be shown here.
 
 ## [v5.2.2] - 2021-01-13
 ### Changed
-- Disabled Webspellchecker rule DASH_RULE
-
+- Disabled Webspellchecker rule DASH_RULE.
+- Only force to enter comments when denying a request (time/change/sales).
+### Fixed
+- Fixed issue where time request had to be denied with a time value. 
+- Fixed several typos in Request Dashboard.
+- Fixed denied time requests not being processed correctly.
+### Removed
+- Removed P5 filter from Request Dashboard.
 
 ## [v5.2.1] - 2021-01-13
 ### Fixed
