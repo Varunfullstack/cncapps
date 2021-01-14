@@ -3306,7 +3306,7 @@ class BUActivity extends Business
             'page',
             'ChangeRequestEmail.inc.html'
         );
-        $userName = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(
+        $userName                = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(
                 DBEUser::lastName
             );
         $urlChangeControlRequest = SITE_URL . "/RequestDashBoard.php";
@@ -7347,13 +7347,17 @@ FROM
     )
     {
 
+        $attachmentFilename = $record->getAttachmentFilename();
+        if (!$attachmentFilename) {
+            return;
+        }
         $filePaths = explode(
             ',',
-            $record->getAttachmentFilename()
+            $attachmentFilename
         );
         foreach ($filePaths as $filePath) {
 
-            if ($handle = fopen(
+            if (@$handle = fopen(
                 $filePath,
                 'r'
             )) {
