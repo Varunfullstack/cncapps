@@ -67,7 +67,6 @@ while ($test->fetchNext()) {
             "sendMailshotFlag"     => $test->getValue(DBEJContactAudit::sendMailshotFlag),
             "mailshot2Flag"        => $test->getValue(DBEJContactAudit::mailshot2Flag),
             "mailshot3Flag"        => $test->getValue(DBEJContactAudit::mailshot3Flag),
-            "mailshot4Flag"        => $test->getValue(DBEJContactAudit::mailshot4Flag),
             "mailshot8Flag"        => $test->getValue(DBEJContactAudit::mailshot8Flag),
             "mailshot9Flag"        => $test->getValue(DBEJContactAudit::mailshot9Flag),
             "mailshot11Flag"       => $test->getValue(DBEJContactAudit::mailshot11Flag),

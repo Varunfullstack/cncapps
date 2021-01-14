@@ -590,10 +590,6 @@ class BUCustomer extends Business
             $this->dsHeader->getValue(DBEHeader::mailshot3FlagDef)
         );
         $dsContact->setValue(
-            DBEContact::mailshot4Flag,
-            $this->dsHeader->getValue(DBEHeader::mailshot4FlagDef)
-        );
-        $dsContact->setValue(
             DBEContact::mailshot8Flag,
             $this->dsHeader->getValue(DBEHeader::mailshot8FlagDef)
         );

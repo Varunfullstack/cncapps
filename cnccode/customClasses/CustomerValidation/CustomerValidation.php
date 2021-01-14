@@ -29,7 +29,6 @@ class CustomerValidation
         $atLeastOneAtMostOneStatement = false;
         $atLeastOneMain = false;
         $atLeastOneReview = false;
-        $statementCount = 0;
         $atLeastOneTopUp = !$buCustomer->hasPrepayContract($this->customerId);
         $atLeastOneReport = false;
 
@@ -41,15 +40,6 @@ class CustomerValidation
 
             if ($dsContacts->getValue(\DBEContact::mailshot2Flag) == 'Y' && !$atLeastOneInvoice) {
                 $atLeastOneInvoice = true;
-            }
-
-            if ($dsContacts->getValue(\DBEContact::mailshot4Flag) == 'Y') {
-                if (!$atLeastOneAtMostOneStatement && !$statementCount) {
-                    $atLeastOneAtMostOneStatement = true;
-                    $statementCount++;
-                } else {
-                    $atLeastOneAtMostOneStatement = false;
-                }
             }
 
             if ($dsContacts->getValue(
@@ -119,6 +109,8 @@ class CustomerValidation
         if (!$atLeastOneReport) {
             $this->globalValidationErrors[] = new ValidationError("At least one contact must have Report flag checked");
         }
+
+
     }
 
     public function getCustomerURL()

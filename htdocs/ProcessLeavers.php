@@ -42,10 +42,6 @@ while ($dsContact->fetchNext()) {
         'N'
     );
     $dbeContact->setValue(
-        DBEContact::mailshot4Flag,
-        'N'
-    );
-    $dbeContact->setValue(
         DBEContact::mailshot8Flag,
         'N'
     );

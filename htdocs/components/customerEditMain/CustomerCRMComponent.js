@@ -596,23 +596,6 @@ class CustomerCRMComponent extends React.PureComponent {
                                         {/*            </div>*/}
                                         {/*        </div>*/}
                                         {/*        <div className="col-lg-2">*/}
-                                        {/*            <label htmlFor="stm">Stm<span/></label>*/}
-                                        {/*            <div className="form-group form-inline">*/}
-                                        {/*                <label className="switch">*/}
-                                        {/*                    <input*/}
-                                        {/*                        id="stm"*/}
-                                        {/*                        type="checkbox"*/}
-                                        {/*                        name="form[contact][0][mailshot4Flag]"*/}
-                                        {/*                        value="Y"*/}
-                                        {/*                        className="stmCheckBox form-control"*/}
-                                        {/*                        data-validation="atLeastOneAtMostOne"*/}
-                                        {/*                        data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"*/}
-                                        {/*                    />*/}
-                                        {/*                    <span className="slider round"/>*/}
-                                        {/*                </label>*/}
-                                        {/*            </div>*/}
-                                        {/*        </div>*/}
-                                        {/*        <div className="col-lg-2">*/}
                                         {/*            <label htmlFor="hr">HR<span/></label>*/}
                                         {/*            <div className="form-group form-inline">*/}
                                         {/*                <label className="switch">*/}

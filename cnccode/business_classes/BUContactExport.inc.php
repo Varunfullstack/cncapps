@@ -79,11 +79,6 @@ class BUContactExport extends Business
                         DBEHeader::mailshot3FlagDesc
                     ) . "`";
             }
-            if ($dsSearchForm->getValue(CTContactExport::searchFormMailshot4Flag)) {
-                $query .= ", {$DBEContact->getDBColumnName($DBEContact::mailshot4Flag)} AS `" . $dsHeader->getValue(
-                        DBEHeader::mailshot4FlagDesc
-                    ) . "`";
-            }
             if ($dsSearchForm->getValue(CTContactExport::searchFormMailshot8Flag)) {
                 $query .= ", {$DBEContact->getDBColumnName($DBEContact::mailshot8Flag)} AS `" . $dsHeader->getValue(
                         DBEHeader::mailshot8FlagDesc
@@ -234,12 +229,6 @@ class BUContactExport extends Business
                 $possibleOrQueries .= $searchCriteria;
             }
             $possibleOrQueries .= "  {$DBEContact->getDBColumnName($DBEContact::mailshot3Flag)} =  'Y' ";
-        }
-        if ($dsSearchForm->getValue(DBEContact::mailshot4Flag)) {
-            if (strlen($possibleOrQueries)) {
-                $possibleOrQueries .= $searchCriteria;
-            }
-            $possibleOrQueries .= "  {$DBEContact->getDBColumnName($DBEContact::mailshot4Flag)} =  'Y' ";
         }
         if ($dsSearchForm->getValue(DBEContact::mailshot8Flag)) {
             if (strlen($possibleOrQueries)) {
