@@ -455,10 +455,6 @@ class CTCustomer extends CTCNC
                 $this->getYN(@$value['mailshot3Flag'])
             );
             $this->dsContact->setValue(
-                DBEContact::mailshot4Flag,
-                $this->getYN(@$value['mailshot4Flag'])
-            );
-            $this->dsContact->setValue(
                 DBEContact::mailshot8Flag,
                 $this->getYN(@$value['mailshot8Flag'])
             );
@@ -1549,7 +1545,6 @@ class CTCustomer extends CTCNC
                 "accountsFlag"                  => $contact->getValue(DBEContact::accountsFlag),
                 "mailshot2Flag"                 => $contact->getValue(DBEContact::mailshot2Flag),
                 "mailshot3Flag"                 => $contact->getValue(DBEContact::mailshot3Flag),
-                "mailshot4Flag"                 => $contact->getValue(DBEContact::mailshot4Flag),
                 "mailshot8Flag"                 => $contact->getValue(DBEContact::mailshot8Flag),
                 "mailshot9Flag"                 => $contact->getValue(DBEContact::mailshot9Flag),
                 "mailshot11Flag"                => $contact->getValue(DBEContact::mailshot11Flag),
@@ -2052,9 +2047,6 @@ class CTCustomer extends CTCNC
                 ),
                 'mailshot3FlagDesc'                       => $this->buCustomer->dsHeader->getValue(
                     DBEHeader::mailshot3FlagDesc
-                ),
-                'mailshot4FlagDesc'                       => $this->buCustomer->dsHeader->getValue(
-                    DBEHeader::mailshot4FlagDesc
                 ),
                 'mailshot8FlagDesc'                       => $this->buCustomer->dsHeader->getValue(
                     DBEHeader::mailshot8FlagDesc
@@ -2562,9 +2554,6 @@ class CTCustomer extends CTCNC
                     ),
                     'mailshot3FlagChecked'                 => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::mailshot3Flag)
-                    ),
-                    'mailshot4FlagChecked'                 => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::mailshot4Flag)
                     ),
                     'mailshot8FlagChecked'                 => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::mailshot8Flag)

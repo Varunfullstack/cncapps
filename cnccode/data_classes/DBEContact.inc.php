@@ -30,7 +30,6 @@ class DBEContact extends DBCNCEntity
     const accountsFlag = "accountsFlag";
     const mailshot2Flag = "mailshot2Flag";
     const mailshot3Flag = "mailshot3Flag";
-    const mailshot4Flag = "mailshot4Flag";
     const mailshot8Flag = "mailshot8Flag";
     const mailshot9Flag = "mailshot9Flag";
     const mailshot11Flag = "mailshot11Flag";
@@ -181,12 +180,6 @@ class DBEContact extends DBCNCEntity
             DA_YN,
             DA_NOT_NULL,
             "con_mailflag3"
-        );
-        $this->addColumn(
-            self::mailshot4Flag,
-            DA_YN,
-            DA_NOT_NULL,
-            "con_mailflag4"
         );
         $this->addColumn(
             self::mailshot8Flag,

@@ -348,10 +348,6 @@ class BUContact extends Business
             $dsHeader->getValue(DBEHeader::mailshot3FlagDef)
         );
         $dsResults->setValue(
-            DBEContact::mailshot4Flag,
-            $dsHeader->getValue(DBEHeader::mailshot4FlagDef)
-        );
-        $dsResults->setValue(
             DBEContact::mailshot8Flag,
             $dsHeader->getValue(DBEHeader::mailshot8FlagDef)
         );
@@ -392,10 +388,6 @@ class BUContact extends Business
         );
         $dsResults->setValue(
             DBEContact::mailshot3Flag,
-            'N'
-        );
-        $dsResults->setValue(
-            DBEContact::mailshot4Flag,
             'N'
         );
         $dsResults->setValue(

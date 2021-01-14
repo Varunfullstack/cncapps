@@ -4,7 +4,6 @@ import * as PropTypes from "prop-types";
 export class ContactComponent extends React.Component {
 
 
-
     render() {
         return <div className="row"
 
@@ -192,7 +191,7 @@ export class ContactComponent extends React.Component {
                                     </div>
                                     <div className="col-lg-4">
                                         <div className="form-group">
-                                            <label htmlFor="">Notes<span></span></label>
+                                            <label htmlFor="">Notes<span/></label>
                                             <input
 
                                                 name="form[contact][{contactID}][notes]"
@@ -226,7 +225,7 @@ export class ContactComponent extends React.Component {
                                     <div className="col-lg-2">
                                         <div className="form-group">
                                             <label htmlFor="">Failed
-                                                Login<span></span></label>
+                                                Login<span/></label>
                                             <input
 
                                                 name="form[contact][{contactID}][failedLoginCount]"
@@ -248,7 +247,7 @@ export class ContactComponent extends React.Component {
                                                        value="Y"
                                                        className="tick_field"
                                                 />
-                                                <span className="slider round"></span>
+                                                <span className="slider round"/>
                                             </label>
                                         </div>
                                     </div>
@@ -264,7 +263,7 @@ export class ContactComponent extends React.Component {
                                                        title="Check to show this site is overseas and not in the UK"
                                                        value="Y"
                                                 />
-                                                <span className="slider round"></span>
+                                                <span className="slider round"/>
                                             </label>
                                         </div>
                                     </div>
@@ -281,7 +280,7 @@ export class ContactComponent extends React.Component {
                                                        data-type="accounts"
                                                        data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
                                                 />
-                                                <span className="slider round"></span>
+                                                <span className="slider round"/>
                                             </label>
                                         </div>
                                     </div>
@@ -298,7 +297,7 @@ export class ContactComponent extends React.Component {
                                                        data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
                                                        className="tick_field"
                                                 />
-                                                <span className="slider round"></span>
+                                                <span className="slider round"/>
                                             </label>
                                         </div>
                                     </div>
@@ -315,7 +314,7 @@ export class ContactComponent extends React.Component {
                                                        data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
                                                        className="tick_field"
                                                 />
-                                                <span className="slider round"></span>
+                                                <span className="slider round"/>
                                             </label>
                                         </div>
                                     </div>
@@ -329,29 +328,12 @@ export class ContactComponent extends React.Component {
                                                        value="Y"
                                                        className="form-control input-sm"
                                                 />
-                                                <span className="slider round"></span>
+                                                <span className="slider round"/>
                                             </label>
                                         </div>
                                     </div>
                                     <div className="col-lg-2">
-                                        <label htmlFor="stm">Stm<span></span></label>
-                                        <div className="form-group form-inline">
-                                            <label className="switch">
-                                                <input id="stm"
-                                                       type="checkbox"
-                                                       name="form[contact][0][mailshot4Flag]"
-                                                       value="Y"
-                                                       className="stmCheckBox form-control"
-                                                       data-validation="atLeastOneAtMostOne"
-                                                       data-type="statement"
-                                                       data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
-                                                />
-                                                <span className="slider round"></span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-2">
-                                        <label htmlFor="hr">HR<span></span></label>
+                                        <label htmlFor="hr">HR<span/></label>
                                         <div className="form-group form-inline">
                                             <label className="switch">
                                                 <input id="hr"
@@ -360,12 +342,12 @@ export class ContactComponent extends React.Component {
                                                        value="Y"
                                                        className="form-control input-sm"
                                                 />
-                                                <span className="slider round"></span>
+                                                <span className="slider round"/>
                                             </label>
                                         </div>
                                     </div>
                                     <div className="col-lg-2">
-                                        <label htmlFor="review">Review<span></span></label>
+                                        <label htmlFor="review">Review<span/></label>
                                         <div className="form-group form-inline">
                                             <label className="switch">
                                                 <input id="review"
@@ -377,12 +359,12 @@ export class ContactComponent extends React.Component {
                                                        data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
                                                        className="form-control input-sm"
                                                 />
-                                                <span className="slider round"></span>
+                                                <span className="slider round"/>
                                             </label>
                                         </div>
                                     </div>
                                     <div className="col-lg-2">
-                                        <label htmlFor="top">Top<span></span></label>
+                                        <label htmlFor="top">Top<span/></label>
                                         <div className="form-group form-inline">
                                             <label className="switch">
                                                 <input id="top"
@@ -393,12 +375,12 @@ export class ContactComponent extends React.Component {
                                                        data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
                                                        className="form-control input-sm"
                                                 />
-                                                <span className="slider round"></span>
+                                                <span className="slider round"/>
                                             </label>
                                         </div>
                                     </div>
                                     <div className="col-lg-2">
-                                        <label htmlFor="sr-rep">SR Rep<span></span></label>
+                                        <label htmlFor="sr-rep">SR Rep<span/></label>
                                         <div className="form-group form-inline">
                                             <label className="switch">
                                                 <input id="sr-rep"
@@ -407,12 +389,12 @@ export class ContactComponent extends React.Component {
                                                        value="Y"
                                                        className="form-control input-sm"
                                                 />
-                                                <span className="slider round"></span>
+                                                <span className="slider round"/>
                                             </label>
                                         </div>
                                     </div>
                                     <div className="col-lg-2">
-                                        <label htmlFor="mailshot">Mailshot<span></span></label>
+                                        <label htmlFor="mailshot">Mailshot<span/></label>
                                         <div className="form-group form-inline">
                                             <label className="switch">
                                                 <input id="mailshot"
@@ -421,7 +403,7 @@ export class ContactComponent extends React.Component {
                                                        value="Y"
                                                        className="form-control input-sm"
                                                 />
-                                                <span className="slider round"></span>
+                                                <span className="slider round"/>
                                             </label>
                                         </div>
                                     </div>
@@ -435,7 +417,7 @@ export class ContactComponent extends React.Component {
                                                        value="Y"
                                                        className="form-control input-sm"
                                                 />
-                                                <span className="slider round"></span>
+                                                <span className="slider round"/>
                                             </label>
                                         </div>
                                     </div>

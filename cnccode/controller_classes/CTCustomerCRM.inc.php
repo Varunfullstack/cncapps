@@ -872,9 +872,6 @@ class CTCustomerCRM extends CTCustomer
                 'mailshot3FlagDesc'                  => $this->buCustomer->dsHeader->getValue(
                     DBEHeader::mailshot3FlagDesc
                 ),
-                'mailshot4FlagDesc'                  => $this->buCustomer->dsHeader->getValue(
-                    DBEHeader::mailshot4FlagDesc
-                ),
                 'mailshot8FlagDesc'                  => $this->buCustomer->dsHeader->getValue(
                     DBEHeader::mailshot8FlagDesc
                 ),
@@ -1619,9 +1616,6 @@ class CTCustomerCRM extends CTCustomer
                     ),
                     'mailshot3FlagChecked'                 => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::mailshot3Flag)
-                    ),
-                    'mailshot4FlagChecked'                 => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::mailshot4Flag)
                     ),
                     'mailshot8FlagChecked'                 => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::mailshot8Flag)

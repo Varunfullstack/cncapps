@@ -319,9 +319,6 @@ class CTContact extends CTCNC
                 'mailshot3FlagDesc'                    => Controller::htmlDisplayText(
                     $dsHeader->getValue(DBEHeader::mailshot3FlagDesc)
                 ),
-                'mailshot4FlagDesc'                    => Controller::htmlDisplayText(
-                    $dsHeader->getValue(DBEHeader::mailshot4FlagDesc)
-                ),
                 'mailshot8FlagDesc'                    => Controller::htmlDisplayText(
                     $dsHeader->getValue(DBEHeader::mailshot8FlagDesc)
                 ),
@@ -336,9 +333,6 @@ class CTContact extends CTCNC
                 ),
                 'mailshot3FlagChecked'                 => Controller::htmlChecked(
                     $this->dsContact->getValue(DBEContact::mailshot3Flag)
-                ),
-                'mailshot4FlagChecked'                 => Controller::htmlChecked(
-                    $this->dsContact->getValue(DBEContact::mailshot4Flag)
                 ),
                 'mailshot8FlagChecked'                 => Controller::htmlChecked(
                     $this->dsContact->getValue(DBEContact::mailshot8Flag)

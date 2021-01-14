@@ -183,16 +183,122 @@
         </rollback>
     </changeSet>
     <changeSet author="pavwebdev" id="issue916-15">
+        <comment>
+            This assigns at least one STM contact for each customer
+        </comment>
+        <sql>
+           <![CDATA[
+            UPDATE
+                contact
+                    JOIN
+                    (SELECT c.`con_contno`
+                     FROM (SELECT *
+                           FROM contact) c
+                              LEFT JOIN
+                          (SELECT COUNT(*) AS totalStatementContacts,
+                                  con_custno
+                           FROM contact b
+                           WHERE b.con_mailflag4 = 'Y'
+                           GROUP BY b.con_custno) a
+                          ON c.con_custno = a.con_custno
+                     WHERE con_suppno = 0
+                       AND (
+                             a.totalStatementContacts < 1
+                             OR a.totalStatementContacts IS NULL
+                         )
+                     GROUP BY c.con_custno) d
+                    ON contact.`con_contno` = d.con_contno
+            SET con_mailflag4 = 'Y';
+            ]]>
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue916-16">
+        <comment>
+            This makes sure that each customer has AT MOST one STM contact
+        </comment>
+        <sql>
+           <![CDATA[
+            UPDATE
+                contact
+                    JOIN
+                    (SELECT c.`con_contno`
+                     FROM (SELECT *
+                           FROM contact) c
+                              LEFT JOIN
+                          (SELECT COUNT(*) AS totalStatementContacts,
+                                  con_custno
+                           FROM contact b
+                           WHERE b.con_mailflag4 = 'Y'
+                           GROUP BY b.con_custno) a
+                          ON c.con_custno = a.con_custno
+                     WHERE con_suppno = 0
+                       AND (
+                             a.totalStatementContacts < 1
+                             OR a.totalStatementContacts IS NULL
+                         )
+                     GROUP BY c.con_custno) d
+                    ON contact.`con_contno` = d.con_contno
+            SET con_mailflag4 = 'Y';
+            ]]>
+        </sql>
+        <rollback/>
+    </changeSet>
+
+    <changeSet author="pavwebdev" id="issue916-17">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="customer" columnName="statementContactId"/>
             </not>
         </preConditions>
         <addColumn tableName="customer">
-            <column name="statementContactId">
+            <column name="statementContactId" type="tinyint(1)" defaultValue="0">
                 <constraints nullable="false"/>
             </column>
         </addColumn>
+
+        <sql>
+            update customer
+            set statementContactId = (select con_contno
+                                      from contact
+                                      where con_custno = customer.cus_custno
+                                        and con_mailflag4 = 'Y'
+                                      limit 1)
+        </sql>
+        <rollback/>
+    </changeSet>
+
+    <changeSet author="pavwebdev" id="issue916-18">
+        <dropColumn tableName="contact" columnName="con_mailflag4"/>
+        <rollback>
+            <addColumn tableName="contact">
+                <column name="con_mailflag4" remarks="Refer to header table for meaning" type="CHAR(1)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue916-19">
+        <dropColumn tableName="contactAuditLog" columnName="con_mailflag4"/>
+        <rollback>
+            <addColumn tableName="contactAuditLog">
+                <column name="con_mailflag4" remarks="Refer to header table for meaning" type="CHAR(1)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue916-20">
+        <dropColumn tableName="headert" columnName="hed_mailflg4_def"/>
+        <rollback>
+            <addColumn tableName="headert">
+                <column name="hed_mailflg4_def" remarks="Contact Flag Default Value" type="CHAR(1)" defaultValue="N"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue916-21">
+        <dropColumn tableName="headert" columnName="hed_mailflg4_desc"/>
+        <rollback>
+            <addColumn tableName="headert">
+                <column name="hed_mailflg4_desc" remarks="Contact Flag Description" type="CHAR(30)" defaultValue="Stm"/>
+            </addColumn>
+        </rollback>
     </changeSet>
 
 
