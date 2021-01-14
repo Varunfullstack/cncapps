@@ -1632,7 +1632,7 @@ class ActivityEditComponent extends MainComponent {
                                       onChange={(value) => this.setValue("internalNotesTemplate", value)}
                                       excludeFromErrorCount={true}
                 />
-                : null
+                : console.log('test')
         );
     }
 

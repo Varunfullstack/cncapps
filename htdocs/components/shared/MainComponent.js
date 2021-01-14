@@ -199,7 +199,7 @@ export default class MainComponent extends React.Component {
             const wscInstances = WEBSPELLCHECKER.getInstances();
             let count = wscInstances.reduce((acc, instance) => {
                 const containerNode = instance.getContainerNode();
-                if (containerNode.dataset && containerNode.dataset.excludeFromErrorCount === "true") {
+                if (containerNode.classList.contains('excludeFromErrorCount')) {
                     return acc;
                 }
 

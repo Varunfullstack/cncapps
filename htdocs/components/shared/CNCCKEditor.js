@@ -130,16 +130,22 @@ class CNCCKEditor extends React.Component {
     }
 
     render() {
+        console.log(this.props.excludeFromErrorCount);
+        console.log(this.props.excludeFromErrorCount);
         return <div>
-            <div key="top" id="top"/>
+            <div key="top"
+                 id="top"
+            />
             <div id={this.props.name}
                  key="field"
                  name={this.props.name}
                  style={this.props.style}
                  ref={ref => (this.element = ref)}
-                 className="testing"
+                 className={`testing ${this.props.excludeFromErrorCount ? 'excludeFromErrorCount' : ''}`}
             />
-            <div key="bottom" id="bottom"/>
+            <div key="bottom"
+                 id="bottom"
+            />
         </div>;
     }
 
