@@ -26,7 +26,6 @@ require_once($cfg["path_bu"] . "/BUExternalItem.inc.php");
 require_once($cfg["path_bu"] . "/BUCustomerItem.inc.php");
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg["path_dbe"] . "/DBConnect.php");
-
 // Parameters
 define(
     'CTCUSTOMER_VAL_NONE_SELECTED',
@@ -138,6 +137,7 @@ class CTCustomer extends CTCNC
     const customerFormSectorMessage                  = 'SectorMessage';
     const customerFormSpecialAttentionEndDateMessage = 'specialAttentionEndDateMessage';
     const customerFormLastReviewMeetingDateMessage   = 'lastReviewMeetingDateMessage';
+    const CONTACTS_ACTION                            = "contacts";
     public $customerID;
     public $customerString;
     public $contactString;
@@ -191,12 +191,10 @@ class CTCustomer extends CTCNC
             "sales",
             "technical"
         ];
-
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
-
         $this->setMenuId(303);
         $this->buCustomer = new BUCustomer($this);
         $this->dsContact  = new DataSet($this);
@@ -221,13 +219,11 @@ class CTCustomer extends CTCNC
             DA_STRING,
             DA_ALLOW_NULL
         );
-
         $this->dsContact->addColumn(
             self::contactFormHasPassword,
             DA_BOOLEAN,
             DA_NOT_NULL
         );
-
         $this->dsSite = new DataSet($this);
         $this->dsSite->setIgnoreNULLOn();
         $this->dsSite->copyColumnsFrom($this->buCustomer->dbeSite);
@@ -294,13 +290,11 @@ class CTCustomer extends CTCNC
         )) {          // For some reason the dynamically generated call to setContact from retrieveHTMLVars does not
             return;                                // pass a valid array so I avoid a crash like this! Same for setSite() below.
         }
-
         foreach ($contactArray as $value) {
             if (@$value['contactID']) {
 
                 $dbeContact = new DBEContact($this);
                 $dbeContact->getRow($value['contactID']);
-
                 $this->dsContact->setValue(
                     DBEContact::portalPassword,
                     $dbeContact->getValue(DBEContact::portalPassword)
@@ -310,7 +304,6 @@ class CTCustomer extends CTCNC
                     $dbeContact->getValue(DBEContact::active)
                 );
             }
-
             $this->dsContact->setUpdateModeInsert();
             $this->dsContact->setValue(
                 DBEContact::contactID,
@@ -328,12 +321,10 @@ class CTCustomer extends CTCNC
                 DBEContact::siteNo,
                 @$value['siteNo']
             );
-
             $this->dsContact->setValue(
                 DBEContact::linkedInURL,
                 @$value['linkedInURL']
             );
-
             $this->dsContact->setValue(
                 DBEContact::title,
                 @$value['title']
@@ -368,7 +359,6 @@ class CTCustomer extends CTCNC
                 DBEContact::firstName,
                 @$value['firstName']
             );
-
             $this->dsContact->setValue(
                 self::contactFormFirstNameClass,
                 null
@@ -382,8 +372,6 @@ class CTCustomer extends CTCNC
             }
             $validEmail = true;
             $email      = !@$value['email'] ? null : $value['email'];
-
-
             $this->dsContact->setValue(
                 self::contactFormEmailClass,
                 null
@@ -405,14 +393,12 @@ class CTCustomer extends CTCNC
 
 
             }
-
             if ($validEmail) {
                 $this->dsContact->setValue(
                     DBEContact::email,
                     $email
                 );
             }
-
             $this->dsContact->setValue(
                 DBEContact::phone,
                 @$value['phone']
@@ -433,23 +419,18 @@ class CTCustomer extends CTCNC
                 DBEContact::fax,
                 @$value['fax']
             );
-
             $this->dsContact->setValue(
                 DBEContact::accountsFlag,
                 $this->getYN(@$value['accountsFlag'])
             );
-
             $this->dsContact->setValue(
                 DBEContact::supportLevel,
                 @$value['supportLevel']
             );
-
             $this->dsContact->setValue(
                 DBEContact::reviewUser,
                 $this->getYN(@$value['reviewUser'])
             );
-
-
             $this->dsContact->setValue(
                 DBEContact::specialAttentionContactFlag,
                 $this->getYN(@$value['specialAttentionContactFlag'])
@@ -538,34 +519,27 @@ class CTCustomer extends CTCNC
                 DBEContact::hrUser,
                 $this->getYN(@$value['hrUser'])
             );
-
             $this->dsContact->setValue(
                 DBEContact::sendMailshotFlag,
                 $this->getYN(@$value['sendMailshotFlag'])
             );
-
             $this->dsContact->setValue(
                 DBEContact::failedLoginCount,
                 @$value['failedLoginCount']
             );
-
             $this->dsContact->setValue(
                 DBEContact::pendingLeaverFlag,
                 $this->getYN(@$value[DBEContact::pendingLeaverFlag])
             );
-
             $this->dsContact->setValue(
                 DBEContact::pendingLeaverDate,
                 @$value[DBEContact::pendingLeaverDate]
             );
-
             // Determine whether a new contact is to be added
             if (!$this->dsContact->getValue(DBEContact::contactID)) {
-                if (
-                    ($this->dsContact->getValue(DBEContact::title)) |
-                    ($this->dsContact->getValue(DBEContact::firstName)) |
-                    ($this->dsContact->getValue(DBEContact::lastName))
-                ) {
+                if (($this->dsContact->getValue(DBEContact::title)) | ($this->dsContact->getValue(
+                        DBEContact::firstName
+                    )) | ($this->dsContact->getValue(DBEContact::lastName))) {
                     $this->dsContact->setValue(DBEContact::active, 1);
                     $this->dsContact->post();
                 }
@@ -697,7 +671,6 @@ class CTCustomer extends CTCNC
         if (!is_array($customerArray)) {
             return;
         }
-
         foreach ($customerArray as $key => $value) {
             $this->dsCustomer->setUpdateModeInsert();
             $this->dsCustomer->setValue(
@@ -712,7 +685,6 @@ class CTCustomer extends CTCNC
                 self::customerFormDeliverSiteMessage,
                 CTCUSTOMER_CLS_TABLE_EDIT_HEADER
             );
-
             $this->dsCustomer->setValue(
                 DBECustomer::customerID,
                 @$value['customerID']
@@ -768,38 +740,31 @@ class CTCustomer extends CTCNC
                 DBECustomer::specialAttentionEndDate,
                 @$value['specialAttentionEndDate']
             );
-
             $this->dsCustomer->setValue(
                 DBECustomer::slaP1PenaltiesAgreed,
                 @$value['slaP1PenaltiesAgreed']
             );
-
             $this->dsCustomer->setValue(
                 DBECustomer::slaP2PenaltiesAgreed,
                 @$value['slaP2PenaltiesAgreed']
             );
-
             $this->dsCustomer->setValue(
                 DBECustomer::slaP3PenaltiesAgreed,
                 @$value['slaP3PenaltiesAgreed']
             );
-
-            if (
-                $this->dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' &&
-                !$this->dsCustomer->getValue(DBECustomer::specialAttentionEndDate)
-            ) {
+            if ($this->dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' && !$this->dsCustomer->getValue(
+                    DBECustomer::specialAttentionEndDate
+                )) {
                 $this->dsCustomer->setValue(
                     self::customerFormSpecialAttentionEndDateMessage,
                     'You must enter a date'
                 );
                 $this->setFormErrorOn();
             }
-
             $this->dsCustomer->setValue(
                 DBECustomer::primaryMainContactID,
                 @$value[DBECustomer::primaryMainContactID]
             );
-
             $this->dsCustomer->setValue(
                 DBECustomer::customerTypeID,
                 @$value['customerTypeID']
@@ -808,7 +773,6 @@ class CTCustomer extends CTCNC
                 DBECustomer::support24HourFlag,
                 $this->getYN(@$value['support24HourFlag'])
             );
-
             $this->dsCustomer->setValue(
                 self::customerFormSectorMessage,
                 null
@@ -832,7 +796,6 @@ class CTCustomer extends CTCNC
                 DBECustomer::createDate,
                 @$value['createDate']
             );
-
             $this->dsCustomer->setValue(
                 DBECustomer::gscTopUpAmount,
                 @$value['gscTopUpAmount']
@@ -861,17 +824,14 @@ class CTCustomer extends CTCNC
                 DBECustomer::reviewMeetingEmailSentFlag,
                 $this->getYN(@$value['reviewMeetingEmailSentFlag'])
             );
-
             $this->dsCustomer->setValue(
                 DBECustomer::reviewAction,
                 @$value['reviewAction']
-
             );
             $this->dsCustomer->setValue(
                 DBECustomer::reviewUserID,
                 @$value['reviewUserID']
             );
-
             $this->dsCustomer->setValue(
                 DBECustomer::accountManagerUserID,
                 @$value['accountManagerUserID']
@@ -884,7 +844,6 @@ class CTCustomer extends CTCNC
                 DBECustomer::noOfServers,
                 @$value['noOfServers']
             );
-
             $this->dsCustomer->setValue(
                 DBECustomer::activeDirectoryName,
                 @$value['activeDirectoryName']
@@ -925,22 +884,18 @@ class CTCustomer extends CTCNC
                 DBECustomer::slaP5,
                 @$value['slaP5']
             );
-
             $this->dsCustomer->setValue(DBECustomer::slaFixHoursP1, @$value['slaFixHoursP1']);
             $this->dsCustomer->setValue(DBECustomer::slaFixHoursP2, @$value['slaFixHoursP2']);
             $this->dsCustomer->setValue(DBECustomer::slaFixHoursP3, @$value['slaFixHoursP3']);
             $this->dsCustomer->setValue(DBECustomer::slaFixHoursP4, @$value['slaFixHoursP4']);
-
             $this->dsCustomer->setValue(
                 DBECustomer::pcxFlag,
                 $this->getYN(@$value['pcxFlag'])
             );
-
             $this->dsCustomer->setValue(
                 DBECustomer::sortCode,
                 @$value['sortCode']
             );
-
             if (isset($value['newSortCode'])) {
                 $sortCode = null;
                 if ($value['newSortCode']) {
@@ -954,8 +909,6 @@ class CTCustomer extends CTCNC
                     $sortCode
                 );
             }
-
-
             $this->dsCustomer->setValue(
                 DBECustomer::accountName,
                 @$value['accountName']
@@ -964,22 +917,18 @@ class CTCustomer extends CTCNC
                 DBECustomer::streamOneEmail,
                 @$value['streamOneEmail']
             );
-
             $this->dsCustomer->setValue(
                 DBECustomer::accountNumber,
                 @$value['accountNumber']
             );
-
             if (isset($value['newAccountNumber'])) {
                 $accountNumber = null;
-
                 if ($value['newAccountNumber']) {
                     $accountNumber = Encryption::encrypt(
                         CUSTOMERS_ENCRYPTION_PUBLIC_KEY,
                         $value['newAccountNumber']
                     );
                 }
-
                 $this->dsCustomer->setValue(
                     DBECustomer::accountNumber,
                     $accountNumber
@@ -1008,7 +957,6 @@ class CTCustomer extends CTCNC
                 $this->displayReviewList();
                 break;
             case CTCUSTOMER_ACT_SEARCH:
-
                 $this->search();
                 break;
             case CTCUSTOMER_ACT_ADDCUSTOMER:
@@ -1040,7 +988,6 @@ class CTCustomer extends CTCNC
                     $response["status"] = "error";
                     $response["error"]  = $exception->getMessage();
                 }
-
                 echo json_encode($response);
                 break;
             case 'archiveContact':
@@ -1053,7 +1000,6 @@ class CTCustomer extends CTCNC
                     $response["status"] = "error";
                     $response["error"]  = $exception->getMessage();
                 }
-
                 echo json_encode($response);
                 break;
             case self::GET_CUSTOMER_REVIEW_CONTACTS:
@@ -1066,7 +1012,6 @@ class CTCustomer extends CTCNC
                     $response["status"] = "error";
                     $response["error"]  = $exception->getMessage();
                 }
-
                 echo json_encode($response);
                 break;
             case self::DECRYPT:
@@ -1103,11 +1048,9 @@ class CTCustomer extends CTCNC
                 if (isset($_REQUEST['term'])) {
                     $term = $_REQUEST['term'];
                 }
-
                 if (isset($_REQUEST['itemsPerPage'])) {
                     $itemsPerPage = $_REQUEST['itemsPerPage'];
                 }
-
                 if (isset($_REQUEST['page'])) {
                     $page = $_REQUEST['page'];
                 }
@@ -1123,7 +1066,6 @@ class CTCustomer extends CTCNC
                         "streamOneEmail" => $dsResult->getValue(DBECustomer::streamOneEmail),
                     ];
                 }
-
                 echo json_encode($customers);
                 break;
             case "getCurrentUser":
@@ -1144,7 +1086,7 @@ class CTCustomer extends CTCNC
                 echo json_encode($this->getCustomerAssets());
                 exit;
                 break;
-            case "contacts":
+            case self::CONTACTS_ACTION:
                 echo json_encode($this->getCustomerContacts());
                 exit;
                 break;
@@ -1187,21 +1129,17 @@ class CTCustomer extends CTCNC
     function createCustomerFolder()
     {
         $this->setMethodName('createCustomerFolder');
-
         if (!$this->getCustomerID()) {
             $this->displayFatalError('CustomerID not passed');
         }
-
         $this->buCustomer->createCustomerFolder($this->getCustomerID());
-
-        $nextURL =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'     => CTCNC_ACT_DISP_EDIT,
-                    'customerID' => $this->getCustomerID()
-                )
-            );
+        $nextURL = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'     => CTCNC_ACT_DISP_EDIT,
+                'customerID' => $this->getCustomerID()
+            )
+        );
         header('Location: ' . $nextURL);
         exit;
 
@@ -1231,20 +1169,18 @@ class CTCustomer extends CTCNC
         $dsCustomer = new DataSet($this);
         if ($this->buCustomer->getNextReviewProspect($dsCustomer)) {
 
-            $nextURL =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'     => CTCNC_ACT_DISP_EDIT,
-                        'customerID' => $dsCustomer->getValue(DBECustomer::customerID)
-                    )
-                );
+            $nextURL = Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'     => CTCNC_ACT_DISP_EDIT,
+                    'customerID' => $dsCustomer->getValue(DBECustomer::customerID)
+                )
+            );
             header('Location: ' . $nextURL);
 
         } else {
             echo "There are no more prospects to review - well done!";
         }
-
         exit;
 
 
@@ -1258,37 +1194,29 @@ class CTCustomer extends CTCNC
     function displayReviewList()
     {
         $this->setMethodName('displayReviewList');
-
         $this->setTemplateFiles(
             'CustomerReviewList',
             'CustomerReviewList.inc'
         );
-
-
         $this->setPageTitle("My Daily Call List");
-
         $this->template->set_block(
             'CustomerReviewList',
             'reviewBlock',
             'reviews'
         );
-
         $dsCustomer = new DataSet($this);
         if ($this->buCustomer->getDailyCallList($this, $dsCustomer)) {
 
             $buUser = new BUUser($this);
-
             while ($dsCustomer->fetchNext()) {
 
-                $linkURL =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'     => 'displayEditForm',
-                            'customerID' => $dsCustomer->getValue(DBECustomer::customerID)
-                        )
-                    );
-
+                $linkURL = Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action'     => 'displayEditForm',
+                        'customerID' => $dsCustomer->getValue(DBECustomer::customerID)
+                    )
+                );
                 if ($dsCustomer->getValue(DBECustomer::reviewUserID)) {
                     $dsUser = new DataSet($this);
                     $buUser->getUserByID(
@@ -1299,7 +1227,6 @@ class CTCustomer extends CTCNC
                 } else {
                     $user = false;
                 }
-
                 $this->template->set_var(
                     array(
                         'customerName' => $dsCustomer->getValue(DBECustomer::name),
@@ -1310,7 +1237,6 @@ class CTCustomer extends CTCNC
                         'linkURL'      => $linkURL
                     )
                 );
-
                 $this->template->parse(
                     'reviews',
                     'reviewBlock',
@@ -1318,7 +1244,6 @@ class CTCustomer extends CTCNC
                 );
 
             }
-
             $this->template->parse(
                 'CONTENTS',
                 'CustomerReviewList',
@@ -1330,7 +1255,6 @@ class CTCustomer extends CTCNC
             echo "There are no customers to be reviewed";
         }
         $this->parsePage();
-
         exit;
 
 
@@ -1355,22 +1279,20 @@ class CTCustomer extends CTCNC
             $this->getNewCustomerToDate(),
             $this->getDroppedCustomerFromDate(),
             $this->getDroppedCustomerToDate()
-        )
-        ) {
+        )) {
             $this->setCustomerStringMessage(CTCUSTOMER_MSG_NONE_FND);
         }
         if (($this->formError) || ($this->dsCustomer->rowCount() > 1)) {
             $this->displaySearchForm();
         } else {
             // reload with this customer
-            $nextURL =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'     => CTCNC_ACT_DISP_EDIT,
-                        'customerID' => $this->dsCustomer->getValue(DBECustomer::customerID)
-                    )
-                );
+            $nextURL = Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'     => CTCNC_ACT_DISP_EDIT,
+                    'customerID' => $this->dsCustomer->getValue(DBECustomer::customerID)
+                )
+            );
             header('Location: ' . $nextURL);
             exit;
 
@@ -1479,14 +1401,13 @@ class CTCustomer extends CTCNC
             $_SERVER['PHP_SELF'],
             array('action' => CTCUSTOMER_ACT_ADDCUSTOMER)
         );
-        $customerPopupURL =
-            Controller::buildLink(
-                CTCNC_PAGE_CUSTOMER,
-                array(
-                    'action'  => CTCNC_ACT_DISP_CUST_POPUP,
-                    'htmlFmt' => CT_HTML_FMT_POPUP
-                )
-            );
+        $customerPopupURL = Controller::buildLink(
+            CTCNC_PAGE_CUSTOMER,
+            array(
+                'action'  => CTCNC_ACT_DISP_CUST_POPUP,
+                'htmlFmt' => CT_HTML_FMT_POPUP
+            )
+        );
         $this->template->set_var(
             array(
                 'contactString'           => $this->getContactString(),
@@ -1510,15 +1431,13 @@ class CTCustomer extends CTCNC
                 'customers'
             );
             while ($this->dsCustomer->fetchNext()) {
-                $customerURL =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'     => CTCNC_ACT_DISP_EDIT,
-                            'customerID' => $this->dsCustomer->getValue(DBECustomer::customerID)
-                        )
-                    );
-
+                $customerURL = Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action'     => CTCNC_ACT_DISP_EDIT,
+                        'customerID' => $this->dsCustomer->getValue(DBECustomer::customerID)
+                    )
+                );
                 $this->template->set_var(
                     array(
                         'customerName' => $this->dsCustomer->getValue(DBECustomer::name),
@@ -1572,8 +1491,6 @@ class CTCustomer extends CTCNC
                 }
             }
             $this->dsCustomer->fetchNext();
-
-
             // If we can delete this customer set the link
             if ($this->buCustomer->canDeleteCustomer(
                 $this->getCustomerID(),
@@ -1599,15 +1516,12 @@ class CTCustomer extends CTCNC
             'CustomerEdit',
             'CustomerEditSimple.inc'
         );
-
-
 // Parameters
         $title = "Customer - " . $this->dsCustomer->getValue(DBECustomer::name);
         $color = "red";
         if ($this->dsCustomer->getValue(DBECustomer::websiteURL)) {
             $color = "green";
         }
-
         $this->setPageTitle(
             $title,
             $title . ' <i class="fas fa-globe" onclick="checkWebsite()" style="color:' . $color . '"></i>'
@@ -1623,8 +1537,6 @@ class CTCustomer extends CTCNC
                 'action' => CTCUSTOMER_ACT_UPDATE
             )
         );
-
-
         if ($this->getSessionParam('save_page')) {
             $cancelURL = $this->getSessionParam('save_page');
         } else {
@@ -1633,14 +1545,13 @@ class CTCustomer extends CTCNC
                 array('action' => CTCUSTOMER_ACT_DISP_SEARCH)
             );
         }
-        $addSiteURL =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'     => CTCUSTOMER_ACT_ADDSITE,
-                    'customerID' => $this->getCustomerID(),
-                )
-            );
+        $addSiteURL = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'     => CTCUSTOMER_ACT_ADDSITE,
+                'customerID' => $this->getCustomerID(),
+            )
+        );
         if (!$this->formError) {              // Not displaying form error page so get customer record
             $this->dsCustomer->setValue(
                 self::customerFormNameClass,
@@ -1655,17 +1566,14 @@ class CTCustomer extends CTCNC
                 CTCUSTOMER_CLS_TABLE_EDIT_HEADER
             );
         }
-
         /*
         Get the list of custom letter template file names from the custom letter directory
         */
-        $dir = LETTER_TEMPLATE_DIR . "/custom/";
-
+        $dir                   = LETTER_TEMPLATE_DIR . "/custom/";
         $customLetterTemplates = [];
         if (is_dir($dir)) {
 
             $dh = opendir($dir);
-
             while (false !== ($filename = readdir($dh))) {
 
                 $ext = explode(
@@ -1673,93 +1581,73 @@ class CTCustomer extends CTCNC
                     $filename
                 );
                 $ext = $ext[count($ext) - 1];
-
                 if ($ext == 'htm') {
                     $customLetterTemplates[] = $filename;
                 }
             }
         }
-
         $customerFolderLink = null;
         if (!$this->buCustomer->customerFolderExists(
             $this->dsCustomer->getValue(DBECustomer::customerID)
         )) {
-            $urlCreateCustomerFolder =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'     => 'createCustomerFolder',
-                        'customerID' => $this->getCustomerID(),
-                    )
-                );
-            $customerFolderLink      =
-                '<a href="' . $urlCreateCustomerFolder . '" title="Create Folder">Create Customer Folder</a>';
+            $urlCreateCustomerFolder = Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'     => 'createCustomerFolder',
+                    'customerID' => $this->getCustomerID(),
+                )
+            );
+            $customerFolderLink      = '<a href="' . $urlCreateCustomerFolder . '" title="Create Folder">Create Customer Folder</a>';
         }
-        $renewalLinkURL =
-            Controller::buildLink(
-                'RenewalReport.php',
-                array(
-                    'action'     => 'produceReport',
-                    'customerID' => $this->getCustomerID()
-                )
-            );
-
-
-        $renewalLink = '<a href="' . $renewalLinkURL . '" target="_blank" title="Renewals">Renewal Information</a>';
-
-        $passwordLinkURL =
-            Controller::buildLink(
-                'Password.php',
-                array(
-                    'action'     => 'list',
-                    'customerID' => $this->getCustomerID()
-                )
-            );
-
-
-        $passwordLink = '<a href="' . $passwordLinkURL . '" target="_blank" title="Passwords">Service Passwords</a>';
-
-        $thirdPartyLinkURL = Controller::buildLink(
+        $renewalLinkURL          = Controller::buildLink(
+            'RenewalReport.php',
+            array(
+                'action'     => 'produceReport',
+                'customerID' => $this->getCustomerID()
+            )
+        );
+        $renewalLink             = '<a href="' . $renewalLinkURL . '" target="_blank" title="Renewals">Renewal Information</a>';
+        $passwordLinkURL         = Controller::buildLink(
+            'Password.php',
+            array(
+                'action'     => 'list',
+                'customerID' => $this->getCustomerID()
+            )
+        );
+        $passwordLink            = '<a href="' . $passwordLinkURL . '" target="_blank" title="Passwords">Service Passwords</a>';
+        $thirdPartyLinkURL       = Controller::buildLink(
             'ThirdPartyContact.php',
             [
                 'action'     => 'list',
                 'customerID' => $this->getCustomerID()
             ]
         );
-
-        $thirdPartyLink = '<a href="' . $thirdPartyLinkURL . '" target="_blank" title="Third Party Contacts">Third Party Contacts</a>';
-
-        $showInactiveContactsURL =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'               => 'dispEdit',
-                    'customerID'           => $this->getCustomerID(),
-                    'showInactiveContacts' => '1'
-                )
-            );
-        $showInactiveSitesURL    =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'            => 'dispEdit',
-                    'customerID'        => $this->getCustomerID(),
-                    'showInactiveSites' => '1'
-                )
-            );
+        $thirdPartyLink          = '<a href="' . $thirdPartyLinkURL . '" target="_blank" title="Third Party Contacts">Third Party Contacts</a>';
+        $showInactiveContactsURL = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'               => 'dispEdit',
+                'customerID'           => $this->getCustomerID(),
+                'showInactiveContacts' => '1'
+            )
+        );
+        $showInactiveSitesURL    = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'            => 'dispEdit',
+                'customerID'        => $this->getCustomerID(),
+                'showInactiveSites' => '1'
+            )
+        );
         $bodyTagExtras           = 'onLoad="loadNote(\'last\')"';
-
-        $urlContactPopup =
-            Controller::buildLink(
-                CTCNC_PAGE_CONTACT,
-                array(
+        $urlContactPopup         = Controller::buildLink(
+            CTCNC_PAGE_CONTACT,
+            array(
 //          'action' => CTCNC_ACT_CONTACT_EDIT,
 'htmlFmt' => CT_HTML_FMT_POPUP
-                )
-            );
-
-
-        $mainContacts = [];
+            )
+        );
+        $mainContacts            = [];
         if ($this->dsCustomer->getValue(DBECustomer::customerID)) {
             $mainContacts = $this->buCustomer->getMainSupportContacts(
                 $this->dsCustomer->getValue(DBECustomer::customerID)
@@ -1770,7 +1658,6 @@ class CTCustomer extends CTCNC
             'primaryMainContactBlock',
             'primaryMainContacts'
         );
-
         foreach ($mainContacts as $mainContact) {
             $this->template->set_var(
                 array(
@@ -1787,139 +1674,146 @@ class CTCustomer extends CTCNC
                 true
             );
         }
-
-
         $buItem           = new BUCustomerItem($this);
         $forceDirectDebit = false;
         if ($this->dsCustomer->getValue(DBECustomer::customerID)) {
             $forceDirectDebit = $buItem->clientHasDirectDebit($this->dsCustomer->getValue(DBECustomer::customerID));
         }
-
         $this->template->set_var(
             array(
-                'lastContractSent'               => $this->dsCustomer->getValue(DBECustomer::lastContractSent),
-                'urlContactPopup'                => $urlContactPopup,
-                'bodyTagExtras'                  => $bodyTagExtras,
-                /* hidden */
-                'reviewMeetingEmailSentFlag'     => $this->dsCustomer->getValue(
-                    DBECustomer::reviewMeetingEmailSentFlag
+                'lastContractSent'                        => $this->dsCustomer->getValue(DBECustomer::lastContractSent),
+                'urlContactPopup'                         => $urlContactPopup,
+                'bodyTagExtras'                           => $bodyTagExtras,
+                /* hidden */ 'reviewMeetingEmailSentFlag' => $this->dsCustomer->getValue(
+                DBECustomer::reviewMeetingEmailSentFlag
+            ),
+                'customerNotePopupLink'                   => $this->getCustomerNotePopupLink($this->getCustomerID()),
+                'showInactiveContactsURL'                 => $showInactiveContactsURL,
+                'showInactiveSitesURL'                    => $showInactiveSitesURL,
+                'customerID'                              => $this->getCustomerID() ? $this->getCustomerID() : 'null',
+                'customerName'                            => $this->dsCustomer->getValue(DBECustomer::name),
+                'reviewCount'                             => $this->buCustomer->getReviewCount(),
+                'customerFolderLink'                      => $customerFolderLink,
+                'websiteURL'                              => $this->dsCustomer->getValue(DBECustomer::websiteURL),
+                'customerNameClass'                       => $this->dsCustomer->getValue(self::customerFormNameClass),
+                'SectorMessage'                           => $this->dsCustomer->getValue(
+                    self::customerFormSectorMessage
                 ),
-                'customerNotePopupLink'          => $this->getCustomerNotePopupLink($this->getCustomerID()),
-                'showInactiveContactsURL'        => $showInactiveContactsURL,
-                'showInactiveSitesURL'           => $showInactiveSitesURL,
-                'customerID'                     => $this->getCustomerID() ? $this->getCustomerID() : 'null',
-                'customerName'                   => $this->dsCustomer->getValue(DBECustomer::name),
-                'reviewCount'                    => $this->buCustomer->getReviewCount(),
-                'customerFolderLink'             => $customerFolderLink,
-                'websiteURL'                     => $this->dsCustomer->getValue(DBECustomer::websiteURL),
-                'customerNameClass'              => $this->dsCustomer->getValue(self::customerFormNameClass),
-                'SectorMessage'                  => $this->dsCustomer->getValue(self::customerFormSectorMessage),
-                'regNo'                          => $this->dsCustomer->getValue(DBECustomer::regNo),
-                'mailshotFlagChecked'            => $this->getChecked(
+                'regNo'                                   => $this->dsCustomer->getValue(DBECustomer::regNo),
+                'mailshotFlagChecked'                     => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::mailshotFlag)
                 ),
-                'referredFlagChecked'            => $this->getChecked(
+                'referredFlagChecked'                     => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::referredFlag)
                 ),
-                'specialAttentionFlagChecked'    => $this->getChecked(
+                'specialAttentionFlagChecked'             => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::specialAttentionFlag)
                 ),
-                'specialAttentionEndDate'        => $this->dsCustomer->getValue(DBECustomer::specialAttentionEndDate),
-                'specialAttentionEndDateMessage' => $this->dsCustomer->getValue(
+                'specialAttentionEndDate'                 => $this->dsCustomer->getValue(
+                    DBECustomer::specialAttentionEndDate
+                ),
+                'specialAttentionEndDateMessage'          => $this->dsCustomer->getValue(
                     self::customerFormSpecialAttentionEndDateMessage
                 ),
-                'lastReviewMeetingDate'          => $this->dsCustomer->getValue(DBECustomer::lastReviewMeetingDate),
-                'lastReviewMeetingDateMessage'   => $this->dsCustomer->getValue(
+                'lastReviewMeetingDate'                   => $this->dsCustomer->getValue(
+                    DBECustomer::lastReviewMeetingDate
+                ),
+                'lastReviewMeetingDateMessage'            => $this->dsCustomer->getValue(
                     self::customerFormSpecialAttentionEndDateMessage
                 ),
-                'reviewMeetingBookedChecked'     => $this->dsCustomer->getValue(
+                'reviewMeetingBookedChecked'              => $this->dsCustomer->getValue(
                     DBECustomer::reviewMeetingBooked
                 ) ? 'checked' : null,
-                'inclusiveOOHCallOuts'           => $this->dsCustomer->getValue(DBECustomer::inclusiveOOHCallOuts),
-                'support24HourFlagChecked'       => $this->getChecked(
+                'inclusiveOOHCallOuts'                    => $this->dsCustomer->getValue(
+                    DBECustomer::inclusiveOOHCallOuts
+                ),
+                'support24HourFlagChecked'                => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::support24HourFlag)
                 ),
-                'pcxFlagChecked'                 => $this->getChecked(
+                'pcxFlagChecked'                          => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::pcxFlag)
                 ),
-                'createDate'                     => $this->dsCustomer->getValue(DBECustomer::createDate),
-                'mailshot2FlagDesc'              => $this->buCustomer->dsHeader->getValue(
+                'createDate'                              => $this->dsCustomer->getValue(DBECustomer::createDate),
+                'mailshot2FlagDesc'                       => $this->buCustomer->dsHeader->getValue(
                     DBEHeader::mailshot2FlagDesc
                 ),
-                'mailshot3FlagDesc'              => $this->buCustomer->dsHeader->getValue(
+                'mailshot3FlagDesc'                       => $this->buCustomer->dsHeader->getValue(
                     DBEHeader::mailshot3FlagDesc
                 ),
-                'mailshot4FlagDesc'              => $this->buCustomer->dsHeader->getValue(
+                'mailshot4FlagDesc'                       => $this->buCustomer->dsHeader->getValue(
                     DBEHeader::mailshot4FlagDesc
                 ),
-                'mailshot8FlagDesc'              => $this->buCustomer->dsHeader->getValue(
+                'mailshot8FlagDesc'                       => $this->buCustomer->dsHeader->getValue(
                     DBEHeader::mailshot8FlagDesc
                 ),
-                'mailshot9FlagDesc'              => $this->buCustomer->dsHeader->getValue(
+                'mailshot9FlagDesc'                       => $this->buCustomer->dsHeader->getValue(
                     DBEHeader::mailshot9FlagDesc
                 ),
-                'mailshot11FlagDesc'             => $this->buCustomer->dsHeader->getValue(
+                'mailshot11FlagDesc'                      => $this->buCustomer->dsHeader->getValue(
                     DBEHeader::mailshot11FlagDesc
                 ),
-                'submitURL'                      => $submitURL,
-                'renewalLink'                    => $renewalLink,
-                'passwordLink'                   => $passwordLink,
-                'thirdPartyContactsLink'         => $thirdPartyLink,
-                'deleteCustomerURL'              => $deleteCustomerURL,
-                'deleteCustomerText'             => $deleteCustomerText,
-                'cancelURL'                      => $cancelURL,
-                'disabled'                       => $this->hasPermissions(
+                'submitURL'                               => $submitURL,
+                'renewalLink'                             => $renewalLink,
+                'passwordLink'                            => $passwordLink,
+                'thirdPartyContactsLink'                  => $thirdPartyLink,
+                'deleteCustomerURL'                       => $deleteCustomerURL,
+                'deleteCustomerText'                      => $deleteCustomerText,
+                'cancelURL'                               => $cancelURL,
+                'disabled'                                => $this->hasPermissions(
                     SALES_PERMISSION
                 ) ? null : CTCNC_HTML_DISABLED,
-                'gscTopUpAmount'                 => $this->dsCustomer->getValue(DBECustomer::gscTopUpAmount),
-                'noOfServers'                    => $this->dsCustomer->getValue(DBECustomer::noOfServers),
-                'activeDirectoryName'            => $this->dsCustomer->getValue(DBECustomer::activeDirectoryName),
-                'noOfSites'                      => $this->dsCustomer->getValue(DBECustomer::noOfSites),
-                'noOfPCs'                        => $this->dsCustomer->getValue(DBECustomer::noOfPCs),
-                'modifyDate'                     => $this->dsCustomer->getValue(DBECustomer::modifyDate),
-                'reviewDate'                     => $this->dsCustomer->getValue(DBECustomer::reviewDate),
-                'reviewTime'                     => $this->dsCustomer->getValue(DBECustomer::reviewTime),
-                'becameCustomerDate'             => $this->dsCustomer->getValue(DBECustomer::becameCustomerDate),
-                'droppedCustomerDate'            => $this->dsCustomer->getValue(DBECustomer::droppedCustomerDate),
-                'reviewAction'                   => $this->dsCustomer->getValue(DBECustomer::reviewAction),
-                'comments'                       => $this->dsCustomer->getValue(DBECustomer::comments),
-                'techNotes'                      => $this->dsCustomer->getValue(DBECustomer::techNotes),
-                'slaP1'                          => $this->dsCustomer->getValue(DBECustomer::slaP1),
-                'slaP2'                          => $this->dsCustomer->getValue(DBECustomer::slaP2),
-                'slaP3'                          => $this->dsCustomer->getValue(DBECustomer::slaP3),
-                'slaP4'                          => $this->dsCustomer->getValue(DBECustomer::slaP4),
-                'slaP5'                          => $this->dsCustomer->getValue(DBECustomer::slaP5),
-                'slaP1PenaltiesAgreedChecked'    => $this->dsCustomer->getValue(
+                'gscTopUpAmount'                          => $this->dsCustomer->getValue(DBECustomer::gscTopUpAmount),
+                'noOfServers'                             => $this->dsCustomer->getValue(DBECustomer::noOfServers),
+                'activeDirectoryName'                     => $this->dsCustomer->getValue(
+                    DBECustomer::activeDirectoryName
+                ),
+                'noOfSites'                               => $this->dsCustomer->getValue(DBECustomer::noOfSites),
+                'noOfPCs'                                 => $this->dsCustomer->getValue(DBECustomer::noOfPCs),
+                'modifyDate'                              => $this->dsCustomer->getValue(DBECustomer::modifyDate),
+                'reviewDate'                              => $this->dsCustomer->getValue(DBECustomer::reviewDate),
+                'reviewTime'                              => $this->dsCustomer->getValue(DBECustomer::reviewTime),
+                'becameCustomerDate'                      => $this->dsCustomer->getValue(
+                    DBECustomer::becameCustomerDate
+                ),
+                'droppedCustomerDate'                     => $this->dsCustomer->getValue(
+                    DBECustomer::droppedCustomerDate
+                ),
+                'reviewAction'                            => $this->dsCustomer->getValue(DBECustomer::reviewAction),
+                'comments'                                => $this->dsCustomer->getValue(DBECustomer::comments),
+                'techNotes'                               => $this->dsCustomer->getValue(DBECustomer::techNotes),
+                'slaP1'                                   => $this->dsCustomer->getValue(DBECustomer::slaP1),
+                'slaP2'                                   => $this->dsCustomer->getValue(DBECustomer::slaP2),
+                'slaP3'                                   => $this->dsCustomer->getValue(DBECustomer::slaP3),
+                'slaP4'                                   => $this->dsCustomer->getValue(DBECustomer::slaP4),
+                'slaP5'                                   => $this->dsCustomer->getValue(DBECustomer::slaP5),
+                'slaP1PenaltiesAgreedChecked'             => $this->dsCustomer->getValue(
                     DBECustomer::slaP1PenaltiesAgreed
                 ) ? 'checked' : null,
-                'slaP2PenaltiesAgreedChecked'    => $this->dsCustomer->getValue(
+                'slaP2PenaltiesAgreedChecked'             => $this->dsCustomer->getValue(
                     DBECustomer::slaP2PenaltiesAgreed
                 ) ? 'checked' : null,
-                'slaP3PenaltiesAgreedChecked'    => $this->dsCustomer->getValue(
+                'slaP3PenaltiesAgreedChecked'             => $this->dsCustomer->getValue(
                     DBECustomer::slaP3PenaltiesAgreed
                 ) ? 'checked' : null,
-                'slaFixHoursP1'                  => $this->dsCustomer->getValue(DBECustomer::slaFixHoursP1),
-                'slaFixHoursP2'                  => $this->dsCustomer->getValue(DBECustomer::slaFixHoursP2),
-                'slaFixHoursP3'                  => $this->dsCustomer->getValue(DBECustomer::slaFixHoursP3),
-                'slaFixHoursP4'                  => $this->dsCustomer->getValue(DBECustomer::slaFixHoursP4),
-                'isShowingInactive'              => $this->getParam('showInactiveContacts') ? 'true' : 'false',
-                'primaryMainMandatory'           => count($mainContacts) ? 'required' : null,
-                'sortCode'                       => $this->dsCustomer->getValue(DBECustomer::sortCode),
-                'accountName'                    => $this->dsCustomer->getValue(DBECustomer::accountName),
-                'accountNumber'                  => $this->dsCustomer->getValue(DBECustomer::accountNumber),
-                'sortCodePencilColor'            => $this->dsCustomer->getValue(
+                'slaFixHoursP1'                           => $this->dsCustomer->getValue(DBECustomer::slaFixHoursP1),
+                'slaFixHoursP2'                           => $this->dsCustomer->getValue(DBECustomer::slaFixHoursP2),
+                'slaFixHoursP3'                           => $this->dsCustomer->getValue(DBECustomer::slaFixHoursP3),
+                'slaFixHoursP4'                           => $this->dsCustomer->getValue(DBECustomer::slaFixHoursP4),
+                'isShowingInactive'                       => $this->getParam('showInactiveContacts') ? 'true' : 'false',
+                'primaryMainMandatory'                    => count($mainContacts) ? 'required' : null,
+                'sortCode'                                => $this->dsCustomer->getValue(DBECustomer::sortCode),
+                'accountName'                             => $this->dsCustomer->getValue(DBECustomer::accountName),
+                'accountNumber'                           => $this->dsCustomer->getValue(DBECustomer::accountNumber),
+                'sortCodePencilColor'                     => $this->dsCustomer->getValue(
                     DBECustomer::sortCode
                 ) ? "greenPencil" : "redPencil",
-                'accountNumberPencilColor'       => $this->dsCustomer->getValue(
+                'accountNumberPencilColor'                => $this->dsCustomer->getValue(
                     DBECustomer::accountNumber
                 ) ? "greenPencil" : "redPencil",
-                'forceDirectDebit'               => $forceDirectDebit ? 'true' : 'false',
-                'streamOneEmail'                 => $this->dsCustomer->getValue(DBECustomer::streamOneEmail)
-
-
+                'forceDirectDebit'                        => $forceDirectDebit ? 'true' : 'false',
+                'streamOneEmail'                          => $this->dsCustomer->getValue(DBECustomer::streamOneEmail)
             )
         );
-
         if ((!$this->formError) & ($this->getAction(
                 ) != CTCUSTOMER_ACT_ADDCUSTOMER)) {                                                      // Only get from DB if not displaying form error(s)
             $this->template->set_var(
@@ -1929,13 +1823,11 @@ class CTCustomer extends CTCNC
                 )
             );
         }
-
         $this->template->set_block(
             'CustomerEdit',
             'customerTypeBlock',
             'customertypes'
         );
-
         $dsCustomerType = new DataSet($this);
         $this->buCustomer->getCustomerTypes($dsCustomerType);
         while ($dsCustomerType->fetchNext()) {
@@ -1954,7 +1846,6 @@ class CTCustomer extends CTCNC
                 true
             );
         }
-
         $this->template->set_block(
             'CustomerEdit',
             'reviewFrequencyBlock',
@@ -1976,7 +1867,6 @@ class CTCustomer extends CTCNC
                 true
             );
         }
-
         $buSector = new BUSector($this);
         $this->template->set_block(
             'CustomerEdit',
@@ -2034,11 +1924,9 @@ class CTCustomer extends CTCNC
             'reviewUserBlock',
             'reviewUsers'
         );
-
         $buUser = new BUUser($this);
         $dsUser = new DataSet($this);
         $buUser->getAllUsers($dsUser);
-
         while ($dsUser->fetchNext()) {
 
             $this->template->set_var(
@@ -2050,14 +1938,12 @@ class CTCustomer extends CTCNC
                         )) ? CT_SELECTED : null
                 )
             );
-
             $this->template->parse(
                 'reviewUsers',
                 'reviewUserBlock',
                 true
             );
         }
-
         /*
         Account Manager users
         */
@@ -2066,10 +1952,8 @@ class CTCustomer extends CTCNC
             'accountManagerBlock',
             'accountManagers'
         );
-
         $buUser = new BUUser($this);
         $buUser->getAllUsers($dsUser);
-
         while ($dsUser->fetchNext()) {
 
             $this->template->set_var(
@@ -2081,39 +1965,33 @@ class CTCustomer extends CTCNC
                         )) ? CT_SELECTED : null
                 )
             );
-
             $this->template->parse(
                 'accountManagers',
                 'accountManagerBlock',
                 true
             );
         }
-
         /*
         Projects
         */
-        $addProjectURL =
-            Controller::buildLink(
-                'Project.php',
-                array(
-                    'action'     => 'add',
-                    'customerID' => $this->getCustomerID()
-                )
-            );
-
+        $addProjectURL = Controller::buildLink(
+            'Project.php',
+            array(
+                'action'     => 'add',
+                'customerID' => $this->getCustomerID()
+            )
+        );
         $this->template->set_var(
             array(
                 'addProjectText' => 'Add project',
                 'addProjectURL'  => $addProjectURL
             )
         );
-
         $this->template->set_block(
             'CustomerEdit',
             'projectBlock',
             'projects'
         );      // have to declare innermost block first
-
         if ($this->getAction() != CTCUSTOMER_ACT_ADDCUSTOMER) {
 
             $buProject = new BUProject($this);
@@ -2122,31 +2000,26 @@ class CTCustomer extends CTCNC
                 $this->getCustomerID(),
                 $dsProject
             );
-
             while ($dsProject->fetchNext()) {
                 $deleteProjectLink = null;
                 $deleteProjectText = null;
                 if ($buProject->canDelete($dsProject->getValue(DBEProject::projectID))) {
-                    $deleteProjectLink =
-                        Controller::buildLink(
-                            'Project.php',
-                            array(
-                                'action'    => 'delete',
-                                'projectID' => $dsProject->getValue(DBEProject::projectID)
-                            )
-                        );
-                    $deleteProjectText = 'delete';
-                }
-
-                $editProjectLink =
-                    Controller::buildLink(
+                    $deleteProjectLink = Controller::buildLink(
                         'Project.php',
                         array(
-                            'action'    => 'edit',
+                            'action'    => 'delete',
                             'projectID' => $dsProject->getValue(DBEProject::projectID)
                         )
                     );
-
+                    $deleteProjectText = 'delete';
+                }
+                $editProjectLink = Controller::buildLink(
+                    'Project.php',
+                    array(
+                        'action'    => 'edit',
+                        'projectID' => $dsProject->getValue(DBEProject::projectID)
+                    )
+                );
                 $this->template->set_var(
                     array(
                         'projectID'         => $dsProject->getValue(DBEProject::projectID),
@@ -2169,7 +2042,6 @@ class CTCustomer extends CTCNC
                         'deleteProjectText' => $deleteProjectText
                     )
                 );
-
                 $this->template->parse(
                     'projects',
                     'projectBlock',
@@ -2177,42 +2049,34 @@ class CTCustomer extends CTCNC
                 );
             }
         }
-
         $this->template->set_block(
             'CustomerEdit',
             'selectInvoiceContactBlock',
             'invoiceContacts'
         );
-
         $this->template->set_block(
             'CustomerEdit',
             'selectDeliverContactBlock',
             'deliverContacts'
         );
-
-
         $this->template->set_block(
             'CustomerEdit',
             'siteBlock',
             'sites'
         );
-
         if ((!$this->formError) & ($this->getAction() != CTCUSTOMER_ACT_ADDCUSTOMER) & ($this->getAction(
                 ) != CTCUSTOMER_ACT_DISP_SUCCESS)) {
             // Only get from DB if not displaying form error(s)
-
             $this->buCustomer->getSitesByCustomerID(
                 $this->dsCustomer->getValue(DBECustomer::customerID),
                 $this->dsSite,
                 $this->getParam('showInactiveSites')
             );
-
             $this->buCustomer->getContactsByCustomerID(
                 $this->dsCustomer->getValue(DBECustomer::customerID),
                 $this->dsContact,
                 $this->getParam('showInactiveContacts')
             );
-
             if ($this->getAction() == CTCUSTOMER_ACT_ADDCONTACT) {
                 $this->buCustomer->addNewContactRow(
                     $this->dsContact,
@@ -2220,7 +2084,6 @@ class CTCustomer extends CTCNC
                     $this->getSiteNo()
                 );
             }
-
             if ($this->getAction() == CTCUSTOMER_ACT_ADDSITE) {
                 $this->buCustomer->addNewSiteRow(
                     $this->dsSite,
@@ -2228,7 +2091,6 @@ class CTCustomer extends CTCNC
                 );
             }
         }
-
         $this->dsSite->initialise();
         while ($this->dsSite->fetchNext()) {
             if (!$this->formError) {                                                      // Only get from DB if not displaying form error(s)
@@ -2245,15 +2107,14 @@ class CTCustomer extends CTCNC
                     CTCUSTOMER_CLS_TABLE_EDIT_HEADER_UC
                 );
             }
-            $addContactURL  =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'     => CTCUSTOMER_ACT_ADDCONTACT,
-                        'customerID' => $this->dsSite->getValue(DBESite::customerID),
-                        'siteNo'     => $this->dsSite->getValue(DBESite::siteNo)
-                    )
-                );
+            $addContactURL  = Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'     => CTCUSTOMER_ACT_ADDCONTACT,
+                    'customerID' => $this->dsSite->getValue(DBESite::customerID),
+                    'siteNo'     => $this->dsSite->getValue(DBESite::siteNo)
+                )
+            );
             $deleteSiteURL  = null;
             $deleteSiteText = null;
             // If we can delete this site set the link
@@ -2282,23 +2143,22 @@ class CTCustomer extends CTCNC
             );
             $this->template->set_var(
                 array(
-                    'add1Class'      => $this->dsSite->getValue(self::siteFormAdd1Class),
-                    'add1'           => $this->dsSite->getValue(DBESite::add1),
-                    'add2'           => $this->dsSite->getValue(DBESite::add2),
-                    'add3'           => $this->dsSite->getValue(DBESite::add3),
-                    'townClass'      => $this->dsSite->getValue(self::siteFormTownClass),
-                    'town'           => $this->dsSite->getValue(DBESite::town),
-                    'county'         => $this->dsSite->getValue(DBESite::county),
-                    'postcodeClass'  => $this->dsSite->getValue(self::siteFormPostcodeClass),
-                    'postcode'       => $this->dsSite->getValue(DBESite::postcode),
-                    'what3Words'     => $this->dsSite->getValue(DBESite::what3Words),
-                    'sitePhone'      => $this->dsSite->getValue(DBESite::phone),
-                    'siteNo'         => $this->dsSite->getValue(DBESite::siteNo),
-                    'customerID'     => $this->dsSite->getValue(DBESite::customerID),
-                    'sageRef'        => $this->dsSite->getValue(DBESite::sageRef),
-                    'debtorCode'     => $this->dsSite->getValue(DBESite::debtorCode),
-                    'maxTravelHours' => $this->dsSite->getValue(DBESite::maxTravelHours),
-
+                    'add1Class'              => $this->dsSite->getValue(self::siteFormAdd1Class),
+                    'add1'                   => $this->dsSite->getValue(DBESite::add1),
+                    'add2'                   => $this->dsSite->getValue(DBESite::add2),
+                    'add3'                   => $this->dsSite->getValue(DBESite::add3),
+                    'townClass'              => $this->dsSite->getValue(self::siteFormTownClass),
+                    'town'                   => $this->dsSite->getValue(DBESite::town),
+                    'county'                 => $this->dsSite->getValue(DBESite::county),
+                    'postcodeClass'          => $this->dsSite->getValue(self::siteFormPostcodeClass),
+                    'postcode'               => $this->dsSite->getValue(DBESite::postcode),
+                    'what3Words'             => $this->dsSite->getValue(DBESite::what3Words),
+                    'sitePhone'              => $this->dsSite->getValue(DBESite::phone),
+                    'siteNo'                 => $this->dsSite->getValue(DBESite::siteNo),
+                    'customerID'             => $this->dsSite->getValue(DBESite::customerID),
+                    'sageRef'                => $this->dsSite->getValue(DBESite::sageRef),
+                    'debtorCode'             => $this->dsSite->getValue(DBESite::debtorCode),
+                    'maxTravelHours'         => $this->dsSite->getValue(DBESite::maxTravelHours),
                     'invoiceSiteFlagChecked' => ($this->dsCustomer->getValue(
                             DBECustomer::invoiceSiteNo
                         ) == $this->dsSite->getValue(DBESite::siteNo)) ? CT_CHECKED : null,
@@ -2315,36 +2175,28 @@ class CTCustomer extends CTCNC
                     'deleteSiteURL'          => $deleteSiteURL
                 )
             );
-
             $this->template->set_block(
                 'CustomerEdit',
                 'invoiceContacts',
                 null
             );
-
-
             $this->parseContactSelector(
                 $this->dsSite->getValue(DBESite::invoiceContactID),
                 $this->dsContact,
                 'invoiceContacts',
                 'selectInvoiceContactBlock'
             );
-
             $this->template->set_block(
                 'CustomerEdit',
                 'deliverContacts',
                 null
             );
-
-
             $this->parseContactSelector(
                 $this->dsSite->getValue(DBESite::deliverContactID),
                 $this->dsContact,
                 'deliverContacts',
                 'selectDeliverContactBlock'
             );
-
-
             if ((!$this->formError) & ($this->getAction() != CTCUSTOMER_ACT_ADDCUSTOMER)) {
                 $this->template->set_var(
                     array(
@@ -2353,57 +2205,47 @@ class CTCustomer extends CTCNC
                     )
                 );
             }
-
             $this->template->parse(
                 'sites',
                 'siteBlock',
                 true
             );
         }
-
         $this->template->set_block(
             'CustomerEdit',
             'customLetterBlock',
             'customLetters'
         );      //
-
         $this->template->set_block(
             'CustomerEdit',
             'templateCustomLetterBlock',
             'templateCustomLetters'
         );
-
         $this->template->set_block(
             'CustomerEdit',
             'selectSiteBlock',
             'selectSites'
         );
-
         $this->template->set_block(
             'CustomerEdit',
             'templateSelectSiteBlock',
             'templateSelectSites'
         );
-
         $this->template->set_block(
             'CustomerEdit',
             'supportLevelBlock',
             'selectSupportLevel'
         );
-
         $this->template->set_block(
             'CustomerEdit',
             'templateSupportLevelBlock',
             'templateSelectSupportLevel'
         );
-
         $this->template->set_block(
             'CustomerEdit',
             'contactBlock',
             'contacts'
         );      // have to declare innermost block first
-
-
         $this->dsContact->initialise();
         $this->dsContact->sortAscending(DBEContact::lastName);
         $this->template->set_block(
@@ -2411,27 +2253,22 @@ class CTCustomer extends CTCNC
             'templateSelectSites',
             null
         );
-
         $this->template->set_block(
             'CustomerEdit',
             'templateSelectSupportLevel',
             null
         );
-
         $this->template->set_block(
             'CustomerEdit',
             'templateCustomLetters',
             null
         );
-
         $this->siteDropdown(
             $this->dsCustomer->getValue(DBECustomer::customerID),
             null,
             'templateSelectSites',
             'templateSelectSiteBlock'
         );
-
-
         $buContact = new BUContact($this);
         $buContact->supportLevelDropDown(
             null,
@@ -2442,32 +2279,24 @@ class CTCustomer extends CTCNC
             'templateSelectSupportLevel',
             'templateSupportLevelBlock'
         );
-
-
         /*
         Display all the custom letters
         */
         foreach ($customLetterTemplates as $index => $filename) {
 
-            $customLetterURL =
-                Controller::buildLink(
-                    'LetterForm.php',
-                    array(
-                        'contactID'      => $this->dsContact->getValue(DBEContact::contactID),
-                        'letterTemplate' => $filename
-                    )
-                );
-
-
+            $customLetterURL = Controller::buildLink(
+                'LetterForm.php',
+                array(
+                    'contactID'      => $this->dsContact->getValue(DBEContact::contactID),
+                    'letterTemplate' => $filename
+                )
+            );
             $this->template->set_var(
-
                 array(
                     'customLetterURL'  => $customLetterURL,
                     'customLetterName' => $filename
-
                 )
             );
-
             $this->template->parse(
                 'templateCustomLetters',
                 'templateCustomLetterBlock',
@@ -2475,7 +2304,6 @@ class CTCustomer extends CTCNC
             );
 
         } // end foreach
-
         $mainCount       = 0;
         $supervisorCount = 0;
         $supportCount    = 0;
@@ -2483,7 +2311,6 @@ class CTCustomer extends CTCNC
         $furloughCount   = 0;
         $noLevelCount    = 0;
         $totalCount      = 0;
-
         while ($this->dsContact->fetchNext()) {
 
             $this->template->set_block(
@@ -2491,13 +2318,11 @@ class CTCustomer extends CTCNC
                 'selectSites',
                 null
             );
-
             $this->template->set_block(
                 'CustomerEdit',
                 'selectSupportLevel',
                 null
             );
-
             $this->template->set_block(
                 'CustomerEdit',
                 'customLetters',
@@ -2506,7 +2331,6 @@ class CTCustomer extends CTCNC
             $dearJohnURL       = null;
             $dmLetterURL       = null;
             $deleteContactLink = null;
-
             if ($this->dsContact->getValue(DBEContact::contactID)) {
 
 
@@ -2530,35 +2354,29 @@ class CTCustomer extends CTCNC
                         $noLevelCount++;
                 }
                 $totalCount++;
-
-                $deleteContactURL =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'    => CTCUSTOMER_ACT_DELETECONTACT,
-                            'contactID' => $this->dsContact->getValue(DBEContact::contactID)
-                        )
-                    );
+                $deleteContactURL = Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action'    => CTCUSTOMER_ACT_DELETECONTACT,
+                        'contactID' => $this->dsContact->getValue(DBEContact::contactID)
+                    )
+                );
                 /** @noinspection HtmlDeprecatedAttribute */
-                $deleteContactLink =
-                    '<a href="' . $deleteContactURL . '"><img align=middle border=0 hspace=2 src="images/icondelete.gif" alt="Delete contact" onClick="if(!confirm(\'Are you sure you want to delete this contact?\')) return(false)"></a>';
-                $dearJohnURL       =
-                    Controller::buildLink(
-                        'DearJohnForm.php',
-                        array(
-                            'contactID' => $this->dsContact->getValue(DBEContact::contactID)
-                        )
-                    );
-                $dmLetterURL       =
-                    Controller::buildLink(
-                        'DMLetterForm.php',
-                        array(
-                            'contactID' => $this->dsContact->getValue(DBEContact::contactID)//,
-                            //                  'letterTemplate' => 'dm_letter'
-                        )
-                    );
+                $deleteContactLink = '<a href="' . $deleteContactURL . '"><img align=middle border=0 hspace=2 src="images/icondelete.gif" alt="Delete contact" onClick="if(!confirm(\'Are you sure you want to delete this contact?\')) return(false)"></a>';
+                $dearJohnURL       = Controller::buildLink(
+                    'DearJohnForm.php',
+                    array(
+                        'contactID' => $this->dsContact->getValue(DBEContact::contactID)
+                    )
+                );
+                $dmLetterURL       = Controller::buildLink(
+                    'DMLetterForm.php',
+                    array(
+                        'contactID' => $this->dsContact->getValue(DBEContact::contactID)//,
+                        //                  'letterTemplate' => 'dm_letter'
+                    )
+                );
             }
-
             $this->template->set_var(
                 array(
                     'contactID'                            => $this->dsContact->getValue(DBEContact::contactID),
@@ -2684,7 +2502,6 @@ class CTCustomer extends CTCNC
                     ) ? 'green' : 'red'
                 )
             );
-
             $this->template->set_var(
                 [
                     "mainCount"       => $mainCount,
@@ -2700,38 +2517,29 @@ class CTCustomer extends CTCNC
                 $this->dsContact->getValue(DBEContact::customerID),
                 $this->dsContact->getValue(DBEContact::siteNo)
             );
-
             $buContact = new BUContact($this);
             $buContact->supportLevelDropDown(
                 $this->dsContact->getValue(DBEContact::supportLevel),
                 $this->template
             );
-
-
             /*
             Display all the custom letters
             */
             foreach ($customLetterTemplates as $index => $filename) {
 
-                $customLetterURL =
-                    Controller::buildLink(
-                        'LetterForm.php',
-                        array(
-                            'contactID'      => $this->dsContact->getValue(DBEContact::contactID),
-                            'letterTemplate' => $filename
-                        )
-                    );
-
-
+                $customLetterURL = Controller::buildLink(
+                    'LetterForm.php',
+                    array(
+                        'contactID'      => $this->dsContact->getValue(DBEContact::contactID),
+                        'letterTemplate' => $filename
+                    )
+                );
                 $this->template->set_var(
-
                     array(
                         'customLetterURL'  => $customLetterURL,
                         'customLetterName' => $filename
-
                     )
                 );
-
                 $this->template->parse(
                     'customLetters',
                     'customLetterBlock',
@@ -2739,8 +2547,6 @@ class CTCustomer extends CTCNC
                 );
 
             } // end foreach
-
-
             $this->template->parse(
                 'contacts',
                 'contactBlock',
@@ -2748,7 +2554,6 @@ class CTCustomer extends CTCNC
             );
 
         }
-
         /*
         List of sales orders with links. Very similar to code in CTSalesOrder
         */
@@ -2758,13 +2563,11 @@ class CTCustomer extends CTCNC
 
             $ordersTemplate = new Template ($GLOBALS ["cfg"] ["path_templates"], "remove");
             $ordersTemplate->setFile('OrdersTemplate', 'CustomerEditOrders.html');
-
             $ordersTemplate->set_block(
                 'OrdersTemplate',
                 'orderBlock',
                 'orders'
             );
-
             $dbeJOrdhead = new DBEJOrdhead($this);
             $dbeJOrdhead->getRowsBySearchCriteria(
                 $this->getCustomerID(),
@@ -2775,20 +2578,16 @@ class CTCustomer extends CTCNC
                 false,
                 false
             );
-
             while ($dbeJOrdhead->fetchNext()) {
 
                 $ordheadID = $dbeJOrdhead->getPKValue();
-
-                $orderURL =
-                    Controller::buildLink(
-                        'SalesOrder.php',
-                        array(
-                            'action'    => CTCNC_ACT_DISP_SALESORDER,
-                            'ordheadID' => $ordheadID
-                        )
-                    );
-
+                $orderURL  = Controller::buildLink(
+                    'SalesOrder.php',
+                    array(
+                        'action'    => CTCNC_ACT_DISP_SALESORDER,
+                        'ordheadID' => $ordheadID
+                    )
+                );
                 $ordersTemplate->set_var(
                     array(
                         'orderURL'  => $orderURL,
@@ -2801,7 +2600,6 @@ class CTCustomer extends CTCNC
                         'custPORef' => $dbeJOrdhead->getValue(DBEJOrdhead::custPORef)
                     )
                 );
-
                 $ordersTemplate->parse(
                     'orders',
                     'orderBlock',
@@ -2810,7 +2608,6 @@ class CTCustomer extends CTCNC
 
             }
             $ordersTemplate->parse('output', 'OrdersTemplate');
-
             $this->template->setVar(
                 [
                     'orders' => $ordersTemplate->getVar('output')
@@ -2824,7 +2621,6 @@ class CTCustomer extends CTCNC
                 'CustomerEdit'
             );
         }
-
         $this->template->parse(
             'CONTENTS',
             'CustomerEdit',
@@ -2843,16 +2639,14 @@ class CTCustomer extends CTCNC
         if (!$customerID) {
             return null;
         }
-        $url =
-            Controller::buildLink(
-                'CustomerNote.php',
-                array(
-                    'action'     => 'customerNoteHistoryPopup',
-                    'customerID' => $customerID,
-                    'htmlFmt'    => CT_HTML_FMT_POPUP
-                )
-            );
-
+        $url = Controller::buildLink(
+            'CustomerNote.php',
+            array(
+                'action'     => 'customerNoteHistoryPopup',
+                'customerID' => $customerID,
+                'htmlFmt'    => CT_HTML_FMT_POPUP
+            )
+        );
         return '<A HREF="' . $url . ' " target="_blank" >Notes History</A>';
     }
 
@@ -2907,11 +2701,10 @@ class CTCustomer extends CTCNC
         }
     }
 
-    function siteDropdown(
-        $customerID,
-        $siteNo,
-        $templateName = "selectSites",
-        $blockName = 'selectSiteBlock'
+    function siteDropdown($customerID,
+                          $siteNo,
+                          $templateName = "selectSites",
+                          $blockName = 'selectSiteBlock'
     )
     {
         if (!$customerID) {
@@ -2924,12 +2717,9 @@ class CTCustomer extends CTCNC
             $customerID
         );
         $dbeSite->getRowsByCustomerID();
-
-
         while ($dbeSite->fetchNext()) {
             $siteSelected = ($siteNo == $dbeSite->getValue(DBESite::siteNo)) ? CT_SELECTED : null;
             $siteDesc     = $dbeSite->getValue(DBESite::siteNo);
-
             $this->template->set_var(
                 array(
                     'siteSelected'   => $siteSelected,
@@ -2965,7 +2755,6 @@ class CTCustomer extends CTCNC
             'portalDocumentBlock',
             'portalDocuments'
         );
-
         if ($this->getAction() != CTCUSTOMER_ACT_ADDCUSTOMER) {
 
             $buPortalCustomerDocument = new BUPortalCustomerDocument($this);
@@ -2974,59 +2763,48 @@ class CTCustomer extends CTCNC
                 $customerID,
                 $dsPortalCustomerDocument
             );
-
-            $urlAddDocument =
-                Controller::buildLink(
-                    'PortalCustomerDocument.php',
-                    array(
-                        'action'     => 'add',
-                        'customerID' => $customerID
-                    )
-                );
-
-
+            $urlAddDocument = Controller::buildLink(
+                'PortalCustomerDocument.php',
+                array(
+                    'action'     => 'add',
+                    'customerID' => $customerID
+                )
+            );
             $this->template->set_var(
                 array(
                     'txtAddDocument' => 'Add document',
                     'urlAddDocument' => $urlAddDocument
                 )
             );
-
             while ($dsPortalCustomerDocument->fetchNext()) {
 
-                $urlEditDocument =
-                    Controller::buildLink(
-                        'PortalCustomerDocument.php',
-                        array(
-                            'action'                   => 'edit',
-                            'portalCustomerDocumentID' => $dsPortalCustomerDocument->getValue(
-                                DBEPortalCustomerDocument::portalCustomerDocumentID
-                            )
+                $urlEditDocument   = Controller::buildLink(
+                    'PortalCustomerDocument.php',
+                    array(
+                        'action'                   => 'edit',
+                        'portalCustomerDocumentID' => $dsPortalCustomerDocument->getValue(
+                            DBEPortalCustomerDocument::portalCustomerDocumentID
                         )
-                    );
-
-                $urlViewFile =
-                    Controller::buildLink(
-                        'PortalCustomerDocument.php',
-                        array(
-                            'action'                   => 'viewFile',
-                            'portalCustomerDocumentID' => $dsPortalCustomerDocument->getValue(
-                                DBEPortalCustomerDocument::portalCustomerDocumentID
-                            )
+                    )
+                );
+                $urlViewFile       = Controller::buildLink(
+                    'PortalCustomerDocument.php',
+                    array(
+                        'action'                   => 'viewFile',
+                        'portalCustomerDocumentID' => $dsPortalCustomerDocument->getValue(
+                            DBEPortalCustomerDocument::portalCustomerDocumentID
                         )
-                    );
-
-                $urlDeleteDocument =
-                    Controller::buildLink(
-                        'PortalCustomerDocument.php',
-                        array(
-                            'action'                   => 'delete',
-                            'portalCustomerDocumentID' => $dsPortalCustomerDocument->getValue(
-                                DBEPortalCustomerDocument::portalCustomerDocumentID
-                            )
+                    )
+                );
+                $urlDeleteDocument = Controller::buildLink(
+                    'PortalCustomerDocument.php',
+                    array(
+                        'action'                   => 'delete',
+                        'portalCustomerDocumentID' => $dsPortalCustomerDocument->getValue(
+                            DBEPortalCustomerDocument::portalCustomerDocumentID
                         )
-                    );
-
+                    )
+                );
                 $this->template->set_var(
                     array(
                         'description'         => $dsPortalCustomerDocument->getValue(
@@ -3052,10 +2830,7 @@ class CTCustomer extends CTCNC
                     true
                 );
             } // end while
-
         } // end if
-
-
     }
 
     /**
@@ -3075,16 +2850,13 @@ class CTCustomer extends CTCNC
             $dsContact
         );
         $this->setCustomerID($dsContact->getValue(DBEContact::customerID));
-
-        $nextURL =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'     => CTCNC_ACT_DISP_EDIT,
-                    'customerID' => $this->getCustomerID()
-                )
-            );
-
+        $nextURL = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'     => CTCNC_ACT_DISP_EDIT,
+                'customerID' => $this->getCustomerID()
+            )
+        );
         if ($this->buCustomer->canDeleteContact($this->getContactID())) {
             $this->buCustomer->deleteContact($this->getContactID());
         } else {
@@ -3093,12 +2865,9 @@ class CTCustomer extends CTCNC
                 'Message',
                 'Message.inc'
             );
-
-            $message =
-                'Cannot delete contact ' .
-                $dsContact->getValue(DBEContact::firstName) . ' ' . $dsContact->getValue(DBEContact::lastName) .
-                ' because dependencies exist in the database';
-
+            $message = 'Cannot delete contact ' . $dsContact->getValue(
+                    DBEContact::firstName
+                ) . ' ' . $dsContact->getValue(DBEContact::lastName) . ' because dependencies exist in the database';
             $this->template->set_var(
                 array(
                     'message' => $message,
@@ -3155,14 +2924,13 @@ class CTCustomer extends CTCNC
         } else {
             throw new Exception('Cannot delete this site - dependencies exist');
         }
-        $nextURL =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'     => CTCNC_ACT_DISP_EDIT,
-                    'customerID' => $this->getCustomerID()
-                )
-            );
+        $nextURL = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'     => CTCNC_ACT_DISP_EDIT,
+                'customerID' => $this->getCustomerID()
+            )
+        );
         header('Location: ' . $nextURL);
         exit;
     }
@@ -3183,14 +2951,12 @@ class CTCustomer extends CTCNC
             $this->userID
         )) {
             $this->buCustomer->deleteCustomer($this->getCustomerID());
-
-            $nextURL =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTCUSTOMER_ACT_DISP_SEARCH
-                    )
-                );
+            $nextURL = Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => CTCUSTOMER_ACT_DISP_SEARCH
+                )
+            );
         } else {
             $this->setFormErrorMessage('Cannot delete this customer - dependencies exist');
             $this->setAction(CTCNC_ACT_DISP_EDIT);
@@ -3201,7 +2967,6 @@ class CTCustomer extends CTCNC
             $this->displayEditForm();
             exit;
         }
-
         header('Location: ' . $nextURL);
         exit;
     }
@@ -3254,7 +3019,6 @@ class CTCustomer extends CTCNC
                 'parentDescField' => $_SESSION['parentDescField']
             )
         );
-
 // Parameters
         $this->setPageTitle('Customer Selection');
         if ($this->dsCustomer->rowCount() > 0) {
@@ -3294,18 +3058,12 @@ class CTCustomer extends CTCNC
     {
         $contactID = $this->getParam('contactID');
         $password  = $this->getParam('password');
-
         if (!$contactID || !$password) {
             throw new Exception("Contact ID and Password required");
         }
-
         checkContactPassword($password);
-
-
         $dbeContact = new DBEContact($this);
-
         $dbeContact->getRow($contactID);
-
         $dbeContact->setValue(
             DBEContact::portalPassword,
             password_hash(
@@ -3314,7 +3072,6 @@ class CTCustomer extends CTCNC
             )
         );
         $dbeContact->updateRow();
-
         return true;
 
     }
@@ -3345,11 +3102,9 @@ class CTCustomer extends CTCNC
         if (!$this->getParam('customerID')) {
             throw new Exception('Customer ID is missing');
         }
-
         $customerID = $this->getParam('customerID');
         $dbeContact = new DBEContact($this);
         $dbeContact->getReviewContactsByCustomerID($customerID);
-
         $contacts = [];
         while ($dbeContact->fetchNext()) {
             $contacts[] = [
@@ -3357,7 +3112,6 @@ class CTCustomer extends CTCNC
                 "lastName"  => $dbeContact->getValue(DBEContact::lastName)
             ];
         }
-
         return $contacts;
     }
 
@@ -3366,7 +3120,6 @@ class CTCustomer extends CTCNC
         if (!$customerID) {
             throw new Exception('Customer Id is required');
         }
-
         return $this->buCustomer->removeSupportForAllUsersAndReferCustomer($customerID);
     }
 
@@ -3398,9 +3151,7 @@ class CTCustomer extends CTCNC
             echo 'Could not connect to mysql host ' . DB_HOST;
             exit;
         }
-
-        $query =
-            "SELECT 
+        $query = "SELECT 
                 cus_custno,
                 cus_name,
                 con_contno,
@@ -3474,15 +3225,14 @@ class CTCustomer extends CTCNC
         $customerSR  = array();
         while ($dsActiveSrs->fetchNext()) {
 
-            $urlProblemHistoryPopup =
-                Controller::buildLink(
-                    'Activity.php',
-                    array(
-                        'action'    => 'problemHistoryPopup',
-                        'problemID' => $dsActiveSrs->getValue(DBEJProblem::problemID),
-                        'htmlFmt'   => CT_HTML_FMT_POPUP
-                    )
-                );
+            $urlProblemHistoryPopup = Controller::buildLink(
+                'Activity.php',
+                array(
+                    'action'    => 'problemHistoryPopup',
+                    'problemID' => $dsActiveSrs->getValue(DBEJProblem::problemID),
+                    'htmlFmt'   => CT_HTML_FMT_POPUP
+                )
+            );
             array_push(
                 $customerSR,
                 array(
@@ -3517,8 +3267,7 @@ class CTCustomer extends CTCNC
     function getCustomerSites()
     {
         $customerId = $_GET["customerId"];
-        if (!$customerId)
-            return [];
+        if (!$customerId) return [];
         $dbeSite = new DBESite($this);
         $dbeSite->setValue(
             DBESite::customerID,
@@ -3562,28 +3311,9 @@ class CTCustomer extends CTCNC
         $customerID = $_REQUEST["customerID"];
         $dbeContact = new DBEContact($this);
         $dbeSite    = new DBESite($this);
-        $dbeContact->getRowsByCustomerID(
-            $customerID,
-            false,
-            true,
-            true
-        );
+        $dbeContact->getRowsByCustomerID($customerID, true);
         $contacts = array();
         while ($dbeContact->fetchNext()) {
-            $startMainContactStyle = null;
-            $endMainContactStyle   = null;
-
-            if ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelMain) {
-                $startMainContactStyle = '*';
-                $endMainContactStyle   = '*';
-            } elseif ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelDelegate) {
-                $startMainContactStyle = '- Delegate';
-                $endMainContactStyle   = '- Delegate';
-            } elseif ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelSupervisor) {
-                $startMainContactStyle = '- Supervisor';
-                $endMainContactStyle   = '- Supervisor';
-            }
-
             $dbeSite->setValue(
                 DBESite::customerID,
                 $dbeContact->getValue(DBEContact::customerID)
@@ -3593,32 +3323,24 @@ class CTCustomer extends CTCNC
                 $dbeContact->getValue(DBEContact::siteNo)
             );
             $dbeSite->getRow();
-
-            $name = $dbeContact->getValue(DBEContact::firstName) . ' ' . $dbeContact->getValue(DBEContact::lastName);
-
-            if ($dbeContact->getValue(DBEContact::position)) {
-                $name .= ' (' . $dbeContact->getValue(DBEContact::position) . ')';
-            }
             array_push(
                 $contacts,
                 array(
-                    'id'                    => $dbeContact->getValue(DBEContact::contactID),
-                    'name'                  => $name,
-                    'firstName'             => $dbeContact->getValue(DBEContact::firstName),
-                    'lastName'              => $dbeContact->getValue(DBEContact::lastName),
-                    'startMainContactStyle' => $startMainContactStyle,
-                    'endMainContactStyle'   => $endMainContactStyle,
-                    'siteNo'                => $endMainContactStyle,
-                    'siteTitle'             => $dbeSite->getValue(DBESite::add1) . ' ' . $dbeSite->getValue(
+                    'id'                  => $dbeContact->getValue(DBEContact::contactID),
+                    'position'            => $dbeContact->getValue(DBEContact::position),
+                    'firstName'           => $dbeContact->getValue(DBEContact::firstName),
+                    'lastName'            => $dbeContact->getValue(DBEContact::lastName),
+                    'siteNo'              => $dbeSite->getValue(DBESite::siteNo),
+                    'active'              => $dbeContact->getValue(DBEContact::active),
+                    'siteTitle'           => $dbeSite->getValue(DBESite::add1) . ' ' . $dbeSite->getValue(
                             DBESite::town
                         ) . ' ' . $dbeSite->getValue(DBESite::postcode),
-                    "sitePhone"             => $dbeSite->getValue(DBESite::phone),
-                    "contactPhone"          => $dbeContact->getValue(DBEContact::phone),
-                    "contactMobilePhone"    => $dbeContact->getValue(DBEContact::mobilePhone),
-                    "contactEmail"          => $dbeContact->getValue(DBEContact::email),
-                    'contactSupportLevel'   => $dbeContact->getValue(DBEContact::supportLevel),
-                    "notes"                 => $dbeContact->getValue(DBEContact::notes)
-
+                    "sitePhone"           => $dbeSite->getValue(DBESite::phone),
+                    "phone"        => $dbeContact->getValue(DBEContact::phone),
+                    "mobilePhone"  => $dbeContact->getValue(DBEContact::mobilePhone),
+                    "email"        => $dbeContact->getValue(DBEContact::email),
+                    'supportLevel' => $dbeContact->getValue(DBEContact::supportLevel),
+                    "notes"               => $dbeContact->getValue(DBEContact::notes)
                 )
             );
         }
@@ -3633,11 +3355,11 @@ class CTCustomer extends CTCNC
 
     function getCustomerContracts()
     {
-        $customerID             = $_REQUEST["customerId"];
-        $linkedToSalesOrder     = $_REQUEST["linkedToSalesOrder"];
-        $contracts              = array();
-        $buCustomerItem         = new BUCustomerItem($this);
-        $dsContract             = new DataSet($this);
+        $customerID         = $_REQUEST["customerId"];
+        $linkedToSalesOrder = $_REQUEST["linkedToSalesOrder"];
+        $contracts          = array();
+        $buCustomerItem     = new BUCustomerItem($this);
+        $dsContract         = new DataSet($this);
         if ($customerID) {
             $buCustomerItem->getContractsByCustomerID(
                 $customerID,
@@ -3712,15 +3434,13 @@ class CTCustomer extends CTCNC
                 header('Location: ' . $_SESSION['save_page']);
                 exit;
             } else {
-                $nextURL =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'     => CTCNC_ACT_DISP_EDIT,
-                            'customerID' => $this->getCustomerID()
-                        )
-                    );
-
+                $nextURL = Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action'     => CTCNC_ACT_DISP_EDIT,
+                        'customerID' => $this->getCustomerID()
+                    )
+                );
                 header('Location: ' . $nextURL);
                 exit;
             }

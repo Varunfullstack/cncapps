@@ -9,7 +9,6 @@ export default class EditorFieldComponent extends React.PureComponent {
 
     render() {
         const {name, value, onChange, minCharCount, disableClipboard,hasToolbar,autoFocus,style, excludeFromErrorCount} = this.props;
-        console.log(excludeFromErrorCount);
         return (
             <div className="inline_editor_field">
                 <CNCCKEditor name={name}

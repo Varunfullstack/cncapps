@@ -1,4 +1,5 @@
 import React from 'react';
+import '../ToolTip.css'
 
 class TableHeader extends React.Component {
     el = React.createElement;

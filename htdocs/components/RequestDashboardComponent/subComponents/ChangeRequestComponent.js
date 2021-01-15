@@ -146,7 +146,7 @@ class ChangeRequestComponent extends MainComponent {
             onClose: this.handleCancel,
             content: <div key="divBody">
                 <table>
-                    <tbody style={{whiteSpace: "nowrap"}}>
+                    <tbody>
                     <tr>
                         <td>Comments</td>
                     </tr>

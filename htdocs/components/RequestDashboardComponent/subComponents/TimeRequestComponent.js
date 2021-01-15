@@ -188,7 +188,7 @@ class TimeRequestComponent extends MainComponent {
             onClose: this.handleCancel,
             content: <div key="divBody">
                 <table>
-                    <tbody style={{whiteSpace: "nowrap"}}>
+                    <tbody>
                     <tr>
                         <td>Granted Minutes</td>
                         <td>

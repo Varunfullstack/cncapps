@@ -1,6 +1,6 @@
 import APIActivity from "../../services/APIActivity.js";
 import APICallactType from "../../services/APICallactType.js";
-import {groupBy, isEmptyTime, params, pick} from "../../utils/utils.js";
+import {getContactElementName, groupBy, isEmptyTime, params, pick} from "../../utils/utils.js";
 import ToolTip from "../../shared/ToolTip.js";
 import APICustomers from "../../services/APICustomers.js";
 import APIUser from "../../services/APIUser.js";
@@ -14,11 +14,11 @@ import {TeamType} from "../../utils/utils";
 import CNCCKEditor from "../../shared/CNCCKEditor";
 import Modal from "../../shared/Modal/modal";
 import Toggle from "../../shared/Toggle";
+import {ActivityHeaderComponent} from "./ActivityHeaderComponent";
 import CustomerDocumentUploader from "./CustomerDocumentUploader";
 import {InternalDocumentsComponent} from "./InternalDocumentsComponent";
-import {ActivityHeaderComponent} from "./ActivityHeaderComponent";
-import EditorFieldComponent from "../../shared/EditorField/EditorFieldComponent";
 import AssetListSelectorComponent from "../../shared/AssetListSelectorComponent/AssetListSelectorComponent";
+import EditorFieldComponent from "../../shared/EditorField/EditorFieldComponent";
 
 // noinspection EqualityComparisonWithCoercionJS
 const hiddenAndCustomerNoteAlertMessage = `Customer note must be empty when the activity or entire SR is hidden.`;
@@ -51,6 +51,7 @@ class ActivityEditComponent extends MainComponent {
             sites: [],
             priorities: [],
             currentContact: null,
+            originalContact: null,
             currentUser: null,
             allowLeaving: false,
             data: {
@@ -172,7 +173,7 @@ class ActivityEditComponent extends MainComponent {
             Promise.all([
                 this.api.getCustomerContactActivityDurationThresholdValue(),
                 this.api.getRemoteSupportActivityDurationThresholdValue(),
-                this.apiCustomer.getCustomerContacts(res.customerId, res.contactID),
+                this.apiCustomer.getCustomerContacts(res.customerId),
                 this.apiCustomer.getCustomerSites(res.customerId),
                 this.api
                     .getCustomerContracts(
@@ -186,6 +187,7 @@ class ActivityEditComponent extends MainComponent {
             ]).then(([customerContactActivityDurationThresholdValue, remoteSupportActivityDurationThresholdValue, contacts, sites, contracts]) => {
                 const currentContact = contacts.find((c) => c.id == res.contactID);
 
+                contacts = contacts.filter(x => x.id === res.contactID || (x.supportLevel && x.supportLevel != 'furlough' && x.active));
 
                 this.setState({
                     customerContactActivityDurationThresholdValue,
@@ -199,6 +201,7 @@ class ActivityEditComponent extends MainComponent {
                     contracts,
                     _activityLoaded: true,
                     currentContact,
+                    originalContact: currentContact
                 }, () => setTimeout(() => this.checkContactNotesAlert(), 2000));
             });
         });
@@ -307,7 +310,7 @@ class ActivityEditComponent extends MainComponent {
             return false;
         }
 
-        if (!data.contactSupportLevel) {
+        if (data.originalContact !== data.currentContact && !data.supportLevel) {
             this.alert("Not a nominated support contact");
             return false;
         }
@@ -1007,6 +1010,8 @@ class ActivityEditComponent extends MainComponent {
             )
         );
     };
+
+
     getContactsElement = () => {
         const {el} = this;
         const {data, contacts, currentContact} = this.state;
@@ -1028,7 +1033,7 @@ class ActivityEditComponent extends MainComponent {
                         el(
                             "option",
                             {key: "i" + item.id, value: item.id},
-                            item.name + " " + (item.startMainContactStyle || "")
+                            getContactElementName(item)
                         )
                     )
                 );
@@ -1044,10 +1049,10 @@ class ActivityEditComponent extends MainComponent {
         const {data, contacts} = this.state;
         const currentContact = contacts.find((c) => c.id == id);
         data.contactID = id;
-        data.contactName = currentContact.name;
-        data.contactPhone = currentContact.contactPhone;
-        data.contactMobilePhone = currentContact.contactMobilePhone;
-        data.contactEmail = currentContact.contactEmail;
+        data.contactName = `${currentContact.firstName} ${currentContact.lastName}`
+        data.contactPhone = currentContact.phone;
+        data.contactMobilePhone = currentContact.mobilePhone;
+        data.contactEmail = currentContact.email;
         data.contactNotes = currentContact.notes;
 
         this.setState({data, currentContact});
@@ -1632,7 +1637,7 @@ class ActivityEditComponent extends MainComponent {
                                       onChange={(value) => this.setValue("internalNotesTemplate", value)}
                                       excludeFromErrorCount={true}
                 />
-                : console.log('test')
+                : null
         );
     }
 
@@ -1641,13 +1646,17 @@ class ActivityEditComponent extends MainComponent {
 
         switch (currentUser?.teamID) {
             case TeamType.Helpdesk:
-                return this.el("h2", {style: {color: "red"}}, `HD:${data?.hdRemainMinutes}`);
+                return this.el("h2", {style: {color: "red"}}, `
+                HD:${data?.hdRemainMinutes}`);
             case TeamType.Escalations:
-                return this.el("h2", {style: {color: "red"}}, `ES:${data?.esRemainMinutes}`);
+                return this.el("h2", {style: {color: "red"}}, `
+                ES:${data?.esRemainMinutes}`);
             case TeamType.Small_Projects:
-                return this.el("h2", {style: {color: "red"}}, `SP:${data?.imRemainMinutes}`);
+                return this.el("h2", {style: {color: "red"}}, `
+                SP:${data?.imRemainMinutes}`);
             case TeamType.Projects:
-                return this.el("h2", {style: {color: "red"}}, `P:${data?.projectRemainMinutes}`);
+                return this.el("h2", {style: {color: "red"}}, `
+                P:${data?.projectRemainMinutes}`);
             default:
                 return null;
         }

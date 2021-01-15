@@ -226,3 +226,16 @@ export function getBase64(file) {
         };
     })
 }
+
+export function getContactElementName(contact) {
+    let name = `${contact.firstName} ${contact.lastName} ${contact.position ? `(${contact.position})` : ''}`;
+    let suffix = "";
+    if (contact.supportLevel == 'main') {
+        suffix = " *";
+    } else if (contact.supportLevel == 'supervisor') {
+        suffix = ' - Supervisor';
+    } else if (contact.supportLevel == 'delegate') {
+        suffix = ' - Delegate';
+    }
+    return `${name}${suffix}`
+}

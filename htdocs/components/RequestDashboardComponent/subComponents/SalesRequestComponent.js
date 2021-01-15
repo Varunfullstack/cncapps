@@ -77,7 +77,7 @@ class SalesRequestComponent extends MainComponent {
         return <select value={activity.salesRequestAssignedUserId || ""}
                        onChange={($event) => this.handleuserAllocate($event.target.value, activity)}
         >
-            <option key="empty"></option>
+            <option key="empty"/>
             {
                 users.map(user => <option key={user.id}
                                           value={user.id}
@@ -130,7 +130,7 @@ class SalesRequestComponent extends MainComponent {
                 icon: "fal fa-2x fa-file-alt  color-gray2 ",
                 hdClassName: "text-center",
                 sortable: false,
-                content: (activity) => <div dangerouslySetInnerHTML={{__html: activity?.requestBody}}></div>
+                content: (activity) => <div dangerouslySetInnerHTML={{__html: activity?.requestBody}}/>
             },
             {
                 path: "requestedBy",
@@ -215,11 +215,10 @@ class SalesRequestComponent extends MainComponent {
             columns={columns}
             pk="callActivityID"
             search="true"
-        ></Table>
+        />
     }
 
     processSalesRequest(activity) {
-        //console.log(activity);
         this.setState({showProcessTimeModal: true, currentActivity: activity});
         this.setValue("callActivityID", activity.callActivityID);
     }
@@ -236,14 +235,14 @@ class SalesRequestComponent extends MainComponent {
             onClose: this.handleCancel,
             content: <div key="divBody">
                 <table>
-                    <tbody style={{whiteSpace: "nowrap"}}>
+                    <tbody>
                     <tr>
                         <td>Comments</td>
                     </tr>
                     <tr style={{verticalAlign: "top"}}>
 
                         <td>
-                            <div id="top2"></div>
+                            <div id="top2"/>
                             <CNCCKEditor
                                 onChange={($event) => this.setValue('comments', $event.editor.getData())}
                                 style={{width: 600, height: 200}}
@@ -254,7 +253,7 @@ class SalesRequestComponent extends MainComponent {
                                 autoFocus={true}
                             >
                             </CNCCKEditor>
-                            <div id="bottom2"></div>
+                            <div id="bottom2"/>
                         </td>
                     </tr>
                     </tbody>

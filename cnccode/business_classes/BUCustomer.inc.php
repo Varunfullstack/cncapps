@@ -200,7 +200,7 @@ class BUCustomer extends Business
     }
 
     /**
-     * Get contact rows by customerID
+     * Get contact by id
      * @param $contactID
      * @param DataSet &$dsResults results
      * @return bool : Success
@@ -270,7 +270,7 @@ class BUCustomer extends Business
         if ($email === '') {
             return true;
         }
-        $query = "select count(con_contno) as count from contact where con_email = ? and active = 1 ";
+        $query      = "select count(con_contno) as count from contact where con_email = ? and active = 1 ";
         $paramTypes = 's';
         $params     = [
             $email,
