@@ -132,9 +132,7 @@ class BUMail extends Business
                              ?string $bcc = null
     )
     {
-        if ($bcc) {
-            $recipients = $recipients . "," . $bcc;
-        }
+
         $hdrs = array(
             'From'         => $fromEmail,
             'To'           => $recipients,
@@ -144,6 +142,9 @@ class BUMail extends Business
         );
         if ($cc) {
             $hdrs['Cc'] = $cc;
+        }
+        if ($bcc) {
+            $hdrs['Bcc'] = $bcc;
         }
         $mime = new Mail_mime();
         $mime->setHTMLBody($body);

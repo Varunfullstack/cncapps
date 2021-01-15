@@ -362,8 +362,8 @@ class CTRequestDashboard extends CTCNC
     function processSalesRequest()
     {
         $this->setMethodName('processSalesRequest');
-        $body           = $this->getJSONData();
-        $callActivityID = $body->callActivityID;
+        $body = $this->getJSONData();
+        $callActivityID = $body['callActivityID'];
         $dsCallActivity = new DataSet($this);
         $buActivity     = new BUActivity($this);
         $buActivity->getActivityByID(
@@ -375,7 +375,7 @@ class CTRequestDashboard extends CTCNC
         }
         {
             $notify = true;
-            switch ($body->status) {
+            switch ($body['status']) {
                 case self::APPROVE_WITHOUT_NOTIFYING_SALES:
                     $notify = false;
                 case self::APPROVE:
@@ -392,7 +392,7 @@ class CTRequestDashboard extends CTCNC
                     $callActivityID,
                     $this->userID,
                     $option,
-                    $body->comments,
+                    $body['comments'],
                     $notify
                 );
             } catch (\Exception $exception) {
