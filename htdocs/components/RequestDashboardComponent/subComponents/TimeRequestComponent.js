@@ -252,7 +252,7 @@ class TimeRequestComponent extends MainComponent {
     }
     handleApprove = () => {
         const {data} = this.state;
-        if (data.allocatedTimeValue == '' || data.allocatedTimeValue <= 0) {
+        if (!data.allocatedTimeValue) {
             this.alert("Please enter Granted Time");
             return;
         }

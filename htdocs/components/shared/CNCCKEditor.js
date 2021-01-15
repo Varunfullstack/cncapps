@@ -130,8 +130,6 @@ class CNCCKEditor extends React.Component {
     }
 
     render() {
-        console.log(this.props.excludeFromErrorCount);
-        console.log(this.props.excludeFromErrorCount);
         return <div>
             <div key="top"
                  id="top"
@@ -151,7 +149,6 @@ class CNCCKEditor extends React.Component {
 
     getCNCCKEditorConfig = () => {
         const defaultConfig = {
-            // startupFocus : this.props.autoFocus||false,
             contentsCss: "/screen.css",
             toolbarStartupExpanded: false,
             toolbar: "CNCToolbar",
