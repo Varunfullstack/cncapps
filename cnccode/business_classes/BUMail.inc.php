@@ -128,8 +128,8 @@ class BUMail extends Business
                              $subject,
                              $recipients,
                              $fromEmail = CONFIG_SUPPORT_EMAIL,
-                             $cc = null,
-                             ?string $bcc = null
+                             ?array $cc = [],
+                             ?array $bcc = []
     )
     {
 
@@ -140,11 +140,13 @@ class BUMail extends Business
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
-        if ($cc) {
-            $hdrs['Cc'] = $cc;
+        if (count($cc)) {
+            $hdrs['Cc'] = implode(',', $cc);
+            $recipients = implode(',', [$recipients, $hdrs['Cc']]);
         }
-        if ($bcc) {
-            $hdrs['Bcc'] = $bcc;
+        if (count($bcc)) {
+            $hdrs['Bcc'] = implode(',', $bcc);
+            $recipients  = implode(',', [$recipients, $hdrs['Bcc']]);
         }
         $mime = new Mail_mime();
         $mime->setHTMLBody($body);

@@ -1495,9 +1495,9 @@ class BUActivity extends Business
         }
         $createdBy = $dbejCallactivity->getValue(DBEJCallActivity::caaConsno);
         $user      = new DBEUser($this);
-        $bcc       = null;
+        $bcc       = [];
         if ($user->getValue(DBEUser::bccOnCustomerEmails)) {
-            $bcc = $user->getEmail();
+            $bcc = [$user->getEmail()];
         }
         $this->sendEmail($body, $subject, $emailRecipients, $bcc);
     }
@@ -1550,10 +1550,10 @@ class BUActivity extends Business
         return implode(',', $emails);
     }
 
-    private function sendEmail(string $body, string $subject, string $emailRecipients, ?string $bcc = null)
+    private function sendEmail(string $body, string $subject, string $emailRecipients, ?array $bcc = [])
     {
         $buMail = new BUMail($this);
-        $buMail->sendSimpleEmail($body, $subject, $emailRecipients, CONFIG_SUPPORT_EMAIL, null, $bcc);
+        $buMail->sendSimpleEmail($body, $subject, $emailRecipients, CONFIG_SUPPORT_EMAIL, [], $bcc);
     }
 
     private function sendMonitoringEmails($callActivityID)
