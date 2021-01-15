@@ -77,7 +77,7 @@ class LastStepComponent extends MainComponent {
         this.registerListener();
         const [standardTextTypes, customerContacts, noWorkOptions, noFirstTimeFixOptions, prioritiesDescriptions] = await Promise.all([
             this.apiStandardText.getAllTypes(),
-            this.apiCustomer.getCustomerContacts(this.props.data.customerID).filter(x => x.supportLevel && x.supportLevel != 'furlough' && x.active),
+            this.apiCustomer.getCustomerContacts(this.props.data.customerID).then(contacts => contacts.filter(x => x.supportLevel && x.supportLevel != 'furlough' && x.active)),
             this.apiStandardText.getOptionsByType(
                 "Unable to offer First Time Fix reason"
             ),
