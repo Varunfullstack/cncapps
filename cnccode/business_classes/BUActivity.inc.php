@@ -1495,7 +1495,8 @@ class BUActivity extends Business
         }
         $createdBy = $dbejCallactivity->getValue(DBEJCallActivity::caaConsno);
         $user      = new DBEUser($this);
-        $bcc       = [];
+        $user->getRow($createdBy);
+        $bcc = [];
         if ($user->getValue(DBEUser::bccOnCustomerEmails)) {
             $bcc = [$user->getEmail()];
         }
