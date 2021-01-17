@@ -1,0 +1,54 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdevmt" id="issue1178-0">
+        <tagDatabase tag="issue1178"/>
+    </changeSet>
+    <changeSet id="issue1178-1" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="cons_settings"/>
+            </not>
+        </preConditions>
+        <createTable tableName="cons_settings">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="consno" type="int">
+                <constraints 
+                nullable="false" 
+                foreignKeyName="consultant_fk" 
+                referencedTableName="consultant"
+                referencedColumnNames="cns_consno"/>
+            </column>
+            <column name="type" type="varchar(50)" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="settings" type="text">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>        
+        <rollback>
+            <dropTable tableName="cons_settings" cascadeConstraints="true" />                            
+        </rollback>
+    </changeSet>    
+    <changeSet id="issue1178-2" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">            
+                <tableExists tableName="cons_settings"/>            
+        </preConditions>
+        <sql>
+         <![CDATA[
+            insert into cons_settings(consno,type,settings) 
+            values(67,'home',
+            '[{"id":3,"order":1,"title":"Daily Fixed & Reopened Stats","minimize":false,"position":"relative","height":"","width":"","left":"","top":"","scroll":true,"visible":true},{"id":1,"order":2,"title":"Upcoming Visits","minimize":false,"position":"relative","height":"","width":"","left":"","top":"","scroll":true,"visible":true},{"id":4,"order":3,"title":"HD First Time Fixes","minimize":false,"position":"relative","height":"","width":"","left":"","top":"","scroll":true,"visible":true},{"id":5,"order":4,"title":"Team Performance","minimize":false,"position":"relative","height":"","width":"","left":"","top":"","scroll":true,"visible":true},{"id":6,"order":5,"title":"User Performance","minimize":false,"position":"relative","height":"","width":"","left":"","top":"","scroll":true,"visible":true},{"id":8,"order":6,"title":"User Charts","minimize":true,"position":"relative","height":390,"width":1635,"left":"","top":"","scroll":false,"visible":true},{"id":2,"order":7,"title":"Sales Figures","minimize":false,"position":"relative","height":"","width":"","left":"","top":"","scroll":true,"visible":true},{"id":7,"order":8,"title":"Daily Stats","minimize":true,"position":"relative","height":473,"width":1166,"left":"","top":"","scroll":false,"visible":true}]'
+            );
+            ]]>
+        </sql>
+        <rollback>
+            <sql>
+            delete from cons_settings where consno=67 and type='home';       
+            </sql>
+        </rollback>
+    </changeSet>    
+</databaseChangeLog>

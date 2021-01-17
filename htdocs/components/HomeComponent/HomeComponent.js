@@ -8,8 +8,10 @@ import '../shared/table/table.css';
 import APIHome from "./services/APIHome";
 import Spinner from "../shared/Spinner/Spinner";
 import MainComponent from "../shared/MainComponent";
+import APIUser from "../services/APIUser";
 class HomeComponent extends MainComponent {
     api=new APIHome();
+    apiUser=new APIUser()
     cards=[];
     CARD_UPCOMING_VISITS=1;
     CARD_SALES_FIGURES=2;
@@ -22,72 +24,133 @@ class HomeComponent extends MainComponent {
     constructor(props) {
         super(props);
         this.state={
-            cards:this.getCards(false),
+            cards:[],
             showSpinner:false,
             upcomingVisit:[],
             salesFigures:{},
             fixedReopen:[],
             firstTimeFixed:{},
             teamPerformance:[],
-            allUserPerformance:[]
+            allUserPerformance:[],
+            currentUser:null,
+            isSdManager:false,
+            minHeight:null
         }
     }
-    componentDidMount() {
-        this.initDragResize();    
+    componentDidMount=async ()=> {  
+                     
+        const currentUser=await this.api.getCurrentUser();        
+        const cards=await this.getCards(false);
+        const isSdManager=this.isSDManager(currentUser);
+        console.log('cards',cards,isSdManager);
+        this.setState({currentUser,cards,isSdManager});
         this.getData();
+        this.initDragResize(); 
+       
+    }
+    isMaster(){
+        let ret=false;
+        if(params.get('default-layout')===null)
+            ret=false;
+        else
+            ret=true; 
+        return ret;  
     }
     initDragResize=()=>{
-        setTimeout(() => {
-            $(".card").draggable({              
-            stop: this.updateIndex
-            }).disableSelection();
-            $(".card").resizable({
-                stop: this.updateIndex,
-                resize: this.updateIndex,
-            });
-        }, 100);
+        const interval=setInterval(()=>{
+            if(!this.state.showSpinner)
+            {
+                $(".card").draggable({              
+                    stop: this.updateIndex
+                    }).disableSelection();
+                    $(".card").resizable({
+                        stop: ()=>this.updateIndex(true),
+                        resize: ()=>this.updateIndex(false),
+                    });                
+                clearInterval(interval);
+                // get the max height
+                const {cards}=this.state;
+                let top=0;
+                let height=0;
+                for(let i=0;i<cards.length;i++)
+                {
+                    if(cards[i].top!=null && cards[i].top>top)
+                    {
+                        top=cards[i].top;
+                        height=cards[i].height;
+                    }
+                }
+                console.log("max top",top,height);
+                this.setState({minHeight:top+height+50});
+            }
+        },100);
+        
     }
     getData=()=>
     {
+        const userPerformance=this.state.isSdManager?this.api.getAllUserPerformance():this.api.getUserPerformance();
         const requests=[
             this.api.getUpcomingVisits(),
             this.api.getSalesFigures(),
             this.api.getFixedAndReopenData(),
             this.api.getFirstTimeFixData(),
             this.api.getTeamPerformance(),
-            this.api.getAllUserPerformance()
+            userPerformance
         ]
         this.setState({showSpinner:true});
         Promise.all(requests).then(([upcomingVisit,salesFigures,fixedReopen,firstTimeFixed,teamPerformance,allUserPerformance])=>{
             console.log(upcomingVisit,salesFigures,fixedReopen,firstTimeFixed,teamPerformance,allUserPerformance);
-            this.setState({showSpinner:false,upcomingVisit,salesFigures,fixedReopen,firstTimeFixed,teamPerformance,allUserPerformance});
+            const {cards}=this.state;            
+
+            const cardsPerms=this.applyPermission(cards,salesFigures);
+            this.setState({cards:cardsPerms,showSpinner:false,upcomingVisit,salesFigures,fixedReopen,firstTimeFixed,teamPerformance,allUserPerformance});
+        }).catch(ex=>{
+            console.log('error',ex);
         })
+    }
+    applyPermission=(cards,salesFigures)=>{
+            if(!salesFigures.status)
+            {
+                const indx=cards.map(c=>c.id).indexOf(this.CARD_SALES_FIGURES);
+                cards[indx].visible=false;
+            }
+            return cards;
     }
     /**
      *
      * @param {place element} e
      * @param {drag element} ui
      */
-    updateIndex = (e, ui) => {     
-        
+    updateIndex = (saveDB=false) => {     
        const cardsElements=document.getElementsByClassName("card");
-       const {cards}=this.state;              
+       const {cards}=this.state;   
+       console.log('resize',saveDB,cards);           
        for(let i=0;i<cardsElements.length;i++)
        {                     
-            cards[cardsElements[i].id-1].order=i+1;
-            cards[cardsElements[i].id-1].top=this.getCorrectValue(cardsElements[i].style.top);
-            cards[cardsElements[i].id-1].left=this.getCorrectValue(cardsElements[i].style.left);
-            cards[cardsElements[i].id-1].width=this.getCorrectValue(cardsElements[i].style.width);
-            cards[cardsElements[i].id-1].height=this.getCorrectValue(cardsElements[i].style.height);
-       }
-        this.saveOrder();   
-        console.log(cards);
-        this.setState({cards});
-    };
-    saveOrder=()=>{
+           const indx=cards.map(c=>c.id).indexOf(parseInt(cardsElements[i].id));
+            cards[indx].order=i+1;
+            console.log('width',i,cardsElements[i].id,cardsElements[i].style.width);
+            cards[indx].top=this.getCorrectValue(cardsElements[i].style.top);
+            cards[indx].left=this.getCorrectValue(cardsElements[i].style.left);
+            cards[indx].width=this.getCorrectValue(cardsElements[i].style.width);
+            cards[indx].height=this.getCorrectValue(cardsElements[i].style.height);
+       }        
+        console.log(cards);        
+        this.setState({cards},()=>this.saveOrder(saveDB)   );
+    };    
+    saveOrder=(saveDb=false)=>{
         const {cards}=this.state; 
-        localStorage.setItem("homeCards",JSON.stringify(cards));
-    }
+        //localStorage.setItem("homeCards",JSON.stringify(cards));
+    
+        if(saveDb&&!this.isMaster())
+            this.apiUser.saveSettings(this.state.currentUser.id,'home',cards).then(result=>{
+                console.log(result);
+            });
+        if(saveDb&&this.isMaster())
+        this.api.setDefaultLayout(cards).then(result=>{
+            console.log(result);
+        });
+    }    
     getCorrectValue(value){
         if(value)
         {
@@ -98,24 +161,89 @@ class HomeComponent extends MainComponent {
         }
         else return null;
     }
-    getCards=(isOrigin=false)=>{
-        let cards=localStorage.getItem("homeCards");
-        let origin= [
+    getCards=async (isOrigin=false)=>{
+         let origin= [
             {
-                id:this.CARD_UPCOMING_VISITS,
+                id:this.CARD_FIXED_REOPEN,
                 order:1,
-                title:"Upcoming Visits",
+                title:"Daily Fixed & Reopened Stats",
                 minimize:false,
                 position: "relative", 
-                height: "", 
-                width: "", 
+                height: 407, 
+                width: 293, 
                 left: "", 
                 top: "",
                 scroll:true,
+                visible:true,
+            },
+            {
+                id:this.CARD_UPCOMING_VISITS,
+                order:2,
+                title:"Upcoming Visits",
+                minimize:false,
+                position: "relative", 
+                height: 407, 
+                width:1142, 
+                left: "", 
+                top: "",
+                scroll:true,
+                visible:true,
+            },
+            {
+                id:this.CARD_FIRST_TIME_FIXED,
+                order:3,
+                title:"HD First Time Fixes",
+                minimize:false,
+                position: "relative", 
+                height: 407, 
+                width: 293, 
+                left: "", 
+                top: "",
+                scroll:true,
+                visible:true,
+            },
+            {
+                id:this.CARD_TEAM_PERFORMANCE,
+                order:4,
+                title:"Team Performance",
+                minimize:false,
+                position: "relative", 
+                height: 460, 
+                width: 293, 
+                left: "", 
+                top: "",
+                scroll:true,
+                visible:true,
+            },
+            {
+                id:this.CARD_USER_PERFORMANCE,
+                order:5,
+                title:"User Performance",
+                minimize:false,
+                position: "relative", 
+                height: 420, 
+                width: 293, 
+                left: "", 
+                top: "",
+                scroll:true,
+                visible:true,
+            },
+            {
+                id:this.CARD_CHARTS,
+                order:6,
+                title:"User Charts",
+                minimize:true,
+                position: "relative", 
+                height: 390, 
+                width: 1635, 
+                left: "", 
+                top: "",
+                scroll:false,
+                visible:true,
             },
             {
                 id:this.CARD_SALES_FIGURES,
-                order:2,
+                order:7,
                 title:"Sales Figures",
                 minimize:false,
                 position: "relative", 
@@ -124,101 +252,55 @@ class HomeComponent extends MainComponent {
                 left: "", 
                 top: "",
                 scroll:true,
-            },
-            {
-                id:this.CARD_FIXED_REOPEN,
-                order:3,
-                title:"Daily Fixed & Reopened Stats",
-                minimize:false,
-                position: "relative", 
-                height: "", 
-                width: "", 
-                left: "", 
-                top: "",
-                scroll:true,
-            },
-            {
-                id:this.CARD_FIRST_TIME_FIXED,
-                order:4,
-                title:"HD First Time Fixes",
-                minimize:false,
-                position: "relative", 
-                height: "", 
-                width: "", 
-                left: "", 
-                top: "",
-                scroll:true,
-            },
-            {
-                id:this.CARD_TEAM_PERFORMANCE,
-                order:5,
-                title:"Team Performance",
-                minimize:false,
-                position: "relative", 
-                height: "", 
-                width: "", 
-                left: "", 
-                top: "",
-                scroll:true,
-            },
-            {
-                id:this.CARD_USER_PERFORMANCE,
-                order:6,
-                title:"User Performance",
-                minimize:false,
-                position: "relative", 
-                height: "", 
-                width: "", 
-                left: "", 
-                top: "",
-                scroll:true,
-            },
+                visible:true,
+            },            
             {
                 id:this.CARD_DAILT_STATS,
-                order:7,
+                order:8,
                 title:"Daily Stats",
-                minimize:false,
+                minimize:true,
                 position: "relative", 
                 height: 473, 
                 width: 1166, 
                 left: "", 
                 top: "",
                 scroll:false,
+                visible:true,
             },
-            {
-                id:this.CARD_CHARTS,
-                order:8,
-                title:"User Charts",
-                minimize:false,
-                position: "relative", 
-                height: 390, 
-                width: 1635, 
-                left: "", 
-                top: "",
-                scroll:false,
-            },
+            
             
         ];
         
-        if (isOrigin) return origin;
-        const savedCards = JSON.parse(cards);
-        if (savedCards.length > 0) {
+        if (isOrigin) return origin;        
+        let cardResult;
+        if(!this.isMaster())
+        cardResult=await this.apiUser.getSettings('home');
+        else
+        cardResult=await this.api.getDefaultLayout();
+
+        let savedCards=[];
+        if(cardResult.status)
+            savedCards=cardResult.data;
+        if (savedCards&&savedCards.length > 0) {
           // merge saved to originial
           for (let i = 0; i < origin.length; i++) {
             const indx = savedCards.map((c) => c.id).indexOf(origin[i].id);
             if (indx >= 0) origin[i] = { ...origin[i], ...savedCards[indx] };
           }
         }
+
         return origin;        
     }
     getCardsElement=()=>{
-        let {cards}=this.state;
-        cards=sort(cards,"order");
+        let {cards,showSpinner}=this.state;
+        //cards=sort(cards,"order");
        // console.log(cards);
+       if(showSpinner)
+       return null;
         return (
-          <div className="drag-card " style={{display:"flex",flexDirection:"row",flexWrap:"wrap" }}>
+          <div className="drag-card " style={{ }}>
               {
-                 cards.filter(c=>!c.minimize).map(c=>
+                 cards.filter(c=>!c.minimize&&c.visible).map(c=>
                 <div key={c.id} id={c.id}  className={"card text-left "+(c.minimize?"card-colapse":"") } 
                 style={{height:c.height, width:c.width, top:c.top, left:c.left}}>
                     <div className="card-header" style={{display:"flex",flexDirection:"row", justifyContent:"space-between",alignItems:"center"}}>
@@ -242,7 +324,7 @@ class HomeComponent extends MainComponent {
         cards[indx].minimize=!cards[indx].minimize;
         this.setState({cards},()=>{
             this.initDragResize();
-            this.saveOrder();
+            this.saveOrder(true);
         });
         
     }
@@ -260,6 +342,9 @@ class HomeComponent extends MainComponent {
             case this.CARD_TEAM_PERFORMANCE:
                 return this.getTeamPerformance();
             case this.CARD_USER_PERFORMANCE:
+                if(this.state.isSdManager)
+                return this.getAllUserPerformance();
+                else 
                 return this.getUserPerformance();
             case this.CARD_DAILT_STATS:
                 return this.getDailyStats();
@@ -308,7 +393,9 @@ class HomeComponent extends MainComponent {
         </table>
     }
     getSalesFigures=()=>{
-        const { salesFigures } = this.state;
+        let { salesFigures } = this.state;
+        if(salesFigures.status)
+            salesFigures=salesFigures.data;
         return (
           <table className="table table-striped">
             <thead>
@@ -547,7 +634,7 @@ class HomeComponent extends MainComponent {
             </tbody>
         </table>
     }
-    getUserPerformance=()=>{
+    getAllUserPerformance=()=>{
         const {allUserPerformance}=this.state;
         return <div style={{display:"flex" ,flexDirection:"row" , flexWrap:"wrap"}}>
             {this.getUserTeamPerformance("Help Desk",allUserPerformance.filter(u=>u.team=='hd'))}
@@ -555,6 +642,35 @@ class HomeComponent extends MainComponent {
             {this.getUserTeamPerformance("Small Projects",allUserPerformance.filter(u=>u.team=='sp'))}
             {this.getUserTeamPerformance("Projects",allUserPerformance.filter(u=>u.team=='p'))}
         </div>
+    }
+    getUserPerformance=()=>{        
+        const up=this.state.allUserPerformance;
+        return (
+          <table className="table table-striped">
+            <thead>
+              <tr>
+                <th ></th>
+                <th>Target %</th>
+                <th>Actual %</th>
+                <th>Hours</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>Week</th>
+                <td>{up.targetPercentage}</td>
+                <td className={up.weeklyPercentageClass}>{up.weeklyPercentage}</td>
+                <td>{up.weeklyHours}</td>
+              </tr>
+              <tr>
+                <th>Month</th>
+                <td>{up.targetPercentage}</td>
+                <td className={up.monthlyPercentageClass}>{up.monthlyPercentage}</td>
+                <td>{up.monthlyHours}</td>
+              </tr>
+            </tbody>
+          </table>
+        );
     }
     getUserTeamPerformance(title,data){
         return <div style={{marginRight:25}}>
@@ -599,7 +715,7 @@ class HomeComponent extends MainComponent {
               Default Layout
             </div>
             {cards
-              .filter((c) => c.minimize == true)
+              .filter((c) => c.minimize&&c.visible)
               .map((c,i) => (
                 <div
                   key={i}
@@ -613,10 +729,15 @@ class HomeComponent extends MainComponent {
           </div>
         );
     }
-    handleReset=()=>{
-        let {cards}=this.state;        
-        cards=this.getCards(true);        
-        this.setState({cards},()=>this.saveOrder());
+    handleReset=async ()=>{
+        let {cards,salesFigures}=this.state;        
+        cards=await this.api.getDefaultLayout();
+        //cards=JSON.parse(cards);
+        //cards=await this.getCards(true);        
+        console.log('default',cards.data);
+        const cardsPerm=this.applyPermission(cards.data,salesFigures);
+
+        this.setState({cards:cardsPerm},()=>this.saveOrder(true));
     }
     getDailyStats=()=>{
         return <iframe style={{border:0,overflow:"hidden",overflowX:"hidden",overflowY:"hidden",height:"80%",minWidth:"200",position:"absolute",top:70,left:0,right:0,bottom:0}}  width="100%" height="100%" src="popup.php?action=dailyStats"></iframe>
@@ -624,13 +745,13 @@ class HomeComponent extends MainComponent {
     getTeamCharts(){
         return <iframe style={{border:0,overflow:"hidden",overflowX:"hidden",overflowY:"hidden",height:"80%",minWidth:"200",position:"absolute",top:70,left:0,right:0,bottom:0}}  width="100%" height="100%" src="index.php?action=charts"></iframe>
     }
-    render() {        
+    render() {   
+        const {minHeight} =this.state;
         return (
-            <div style={{minHeight:"97vh",marginBottom:30}}>
+            <div id="main-container" style={{minHeight:minHeight,marginBottom:50}}>
                 <Spinner show={this.state.showSpinner}></Spinner>                
                 {
-                    this.getCardsElement()
-                    
+                    this.getCardsElement()                    
                 }
                 {this.getActionBar()}
             </div>

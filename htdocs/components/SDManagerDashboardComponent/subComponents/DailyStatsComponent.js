@@ -48,10 +48,10 @@ class DailyStatsComponent extends MainComponent {
         if (this.loading)
             return null;
         return el(
-            'div', {style: {display: "flex", justifyContent: "center", maxWidth: 1200}},
+            'div', {style: {display: "flex", justifyContent: "center", maxWidth: "100vw"}},
             el(
                 "div",
-                {className: "flex-row", style: {flexWrap: "wrap", justifyContent: "left", maxWidth: 1140}},
+                {className: "flex-row", style: {flexWrap: "wrap", justifyContent: "center", maxWidth: "100vw"}},
                 this.getOpenSrCard(summary.prioritySummary),
                 this.getTeamSrCard(summary.openSrTeamSummary, "#00628B", "#E6E6E6"),
                 this.getDailySourceCard(summary.dailySourceSummary),
@@ -239,7 +239,7 @@ class DailyStatsComponent extends MainComponent {
             "div",
             {className: "sd-card ", style: {backgroundColor: backgroundColor, color: textColor}},
             el("label", {className: "sd-card-title"}, label),
-            el("label", {style: {fontSize: 40, marginTop: 30}}, total)
+            el("label", {className:'total' }, total)
         );
     };
 

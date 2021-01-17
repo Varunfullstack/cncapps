@@ -82,7 +82,9 @@
             var userId = $(this).data().userId;
             var today = moment();
             var sixtyDaysAgo = moment().subtract(60, 'days');
-            document.location = '?action=detailedCharts&engineerID=' + userId + '&startDate=' + sixtyDaysAgo.format('YYYY-MM-DD') + '&endDate=' + today.format('YYYY-MM-DD')
+            //document.location = '?action=detailedCharts&engineerID=' + userId + '&startDate=' + sixtyDaysAgo.format('YYYY-MM-DD') + '&endDate=' + today.format('YYYY-MM-DD')
+            window.open('?action=detailedCharts&engineerID=' + userId + '&startDate=' + sixtyDaysAgo.format('YYYY-MM-DD') + '&endDate=' + today.format('YYYY-MM-DD'), '_blank');
+
         });
         drawIndividualCharts(teamSelector.val());
         teamSelector.change(function () {

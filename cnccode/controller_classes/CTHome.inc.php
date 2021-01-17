@@ -28,7 +28,9 @@ class CTHome extends CTCNC
     const GET_USER_PERFORMANCE_BETWEEN_DATES = 'getUserPerformanceBetweenDates';
     const GET_SALES_FIGURES                  ='salesFigures';
     const GET_TEAM_PERFORMANCE               ='teamPerformance';
-    const GET_ALL_USER_PERFORMANCE           ='allUserPerformance';
+    const GET_ALL_USER_PERFORMANCE           ='allUserPerformance';    
+    const GET_USER_PERFORMANCE               ='userPerformance';
+    const DEFAULT_LAYOUT                     ='defaultLayout';
     /** @var DataSet|DBEHeader */
     private $dsHeader;
     /** @var BUUser */
@@ -63,6 +65,7 @@ class CTHome extends CTCNC
      */
     function defaultAction()
     {
+        $method=$_SERVER['REQUEST_METHOD'] ;
         switch ($this->getAction()) {
             case 'lastWeekHelpDesk':
                 $team = 1;
@@ -123,6 +126,15 @@ class CTHome extends CTCNC
                 break;           
             case 'charts' :
                 $this->displayChartsWithoutMenu();
+                break;
+            case self::GET_USER_PERFORMANCE:
+                echo json_encode($this->getUserPerformance());
+                break;
+            case self::DEFAULT_LAYOUT:
+                if($method=='GET')
+                echo json_encode($this->getDefaultLayout());
+                if($method=='POST')
+                echo json_encode($this->setDefaultLayout());
                 break;
             default:
                 $this->display();
@@ -1247,6 +1259,10 @@ class CTHome extends CTCNC
     //Json data
     function getSalesFigures()
     {   
+        if (!$this->hasPermissions(ACCOUNTS_PERMISSION)) {
+            http_response_code(400);
+            return ["status" => false];
+        }
         $result=[];
         $dbeSalesOrderTotals = new DBESalesOrderTotals($this);
         $dbeSalesOrderTotals->getRow();
@@ -1292,7 +1308,7 @@ class CTHome extends CTCNC
         $result['saleTotal']   = Controller::formatNumber($saleTotal);
         $result['costTotal']   = Controller::formatNumber($costTotal);
         $result['profitTotal'] = Controller::formatNumber($profitTotal);
-        return $result;
+        return ["status" => true,'data'=>$result];
     }
     function getTeamPerformance()
     {        
@@ -1636,5 +1652,62 @@ class CTHome extends CTCNC
             
         }
         return $data;        
+    }
+    function getUserPerformance()
+    {        
+        $data=[];
+        $teamLevel           = $this->buUser->getLevelByUserID($this->userID);
+        $targetLogPercentage = 0;
+        switch ($teamLevel) {
+            case 1:
+                $targetLogPercentage = $this->dsHeader->getValue(DBEHeader::hdTeamTargetLogPercentage);
+                break;
+            case 2:
+                $targetLogPercentage = $this->dsHeader->getValue(DBEHeader::esTeamTargetLogPercentage);
+                break;
+            case 3:
+                $targetLogPercentage = $this->dsHeader->getValue(DBEHeader::smallProjectsTeamTargetLogPercentage);
+                break;
+            case 5:
+                $targetLogPercentage = $this->dsHeader->getValue(DBEHeader::projectTeamTargetLogPercentage);
+        }
+        /* Extract data and build report */
+        $weekly  = $this->buUser->getUserPerformanceByUser(
+            $this->userID,
+            7
+        );
+        $monthly = $this->buUser->getUserPerformanceByUser(
+            $this->userID,
+            31
+        );
+        if ($weekly['performancePercentage'] < $targetLogPercentage) {
+            $data['weeklyPercentageClass']='performance-warn';
+        }
+        if ($monthly['performancePercentage'] < $targetLogPercentage) {
+            $data['monthlyPercentageClass']='performance-warn';
+        }
+        $data['targetPercentage']  = $targetLogPercentage;
+        $data['weeklyPercentage']  = number_format($weekly['performancePercentage'],2);
+        $data['weeklyHours']       = number_format($weekly['loggedHours'],2);
+        $data['monthlyPercentage']  = number_format($monthly['performancePercentage'],2);
+        $data['monthlyHours']       = number_format($monthly['loggedHours'],2);                    
+        return $data;
+    }
+    function getDefaultLayout(){
+        $result=DBConnect::fetchOne("select settings from cons_settings where consno=67 and type='home'");
+        return ['status'=>true,'data'=>json_decode($result['settings'])];
+    }
+    function setDefaultLayout(){
+        $body =json_decode(file_get_contents('php://input'));
+        $default=DBConnect::fetchOne("select * from cons_settings where consno=67 and type='home'");
+        if(isset($default['settings'])) //update row
+        {
+            return DBConnect::execute("update cons_settings set settings=:settings where consno=67 and type='home'",["settings"=> $body->settings]);
+        }
+        else //insert new row
+        {
+            return DBConnect::execute("insert into cons_settings(consno,type,settings) values(67,'home,:settings)",
+            ['settings'=>$body->settings]);
+        }
     }
 }
