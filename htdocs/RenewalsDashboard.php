@@ -1,6 +1,5 @@
 <?php
 require_once("config.inc.php");
-global $cfg;
 require_once($cfg["path_ct"] . "/CTRenewalsDashboard.php");
 session_start();
 page_open(
@@ -11,16 +10,16 @@ page_open(
         ''
     )
 );
-global $cfg;
+GLOBAL $cfg;
 header("Cache-control: private");
-$obj = new CTRenewalsDashboard(
+$controller = new CTRenewalsDashboard(
     $_SERVER['REQUEST_METHOD'],
     $_POST,
     $_GET,
     $_COOKIE,
     $cfg
 );
-$obj->execute();
+$controller->execute();
 page_close();
 
 ?>
