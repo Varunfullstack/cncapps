@@ -147,11 +147,13 @@ class CTDailyReport extends CTCNC
                     JSON_NUMERIC_CHECK
                 );
                 break;
+            case 'react':
+                $this->setTemplateReact();
             default :
                 break;
         }
     }
-
+    
     /**
      * @throws Exception
      */
@@ -407,5 +409,23 @@ class CTDailyReport extends CTCNC
 
 
     } // end function
+    // new design
+    function setTemplateReact()
+    {
+        $isP5 = isset($_REQUEST['showP5']);
+        $this->setPageTitle('Aged Service Requests');
+        $this->setTemplateFiles(
+            array('DailyReport' => 'DailyReport.rct')
+        );
+        $this->loadReactScript('DailyReport.js');
+        $this->loadReactCSS('DailyReport.css');
+        $this->template->parse(
+            'CONTENTS',
+            'DailyReport',
+            true
+        );
+        $this->setMenuId(110);
+        $this->parsePage();
+    }
 
 } // end of class
