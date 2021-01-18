@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.2.3] - 2021-01-18
+### Fixed
+- Fixed issue with Change request sending the wrong email when approving/denying.
+
+
 ## [v5.2.2] - 2021-01-13
 ### Changed
 - Disabled Webspellchecker rule DASH_RULE.
