@@ -61,7 +61,7 @@ export class RenHostingComponent  extends MainComponent
                 hdToolTip: "Edit",
                 hdClassName: "text-center",
                 icon: "fal fa-2x fa-edit color-gray2 pointer",
-                sortable: true,
+                sortable: false,
                 className: "text-center",
                 backgroundColorColumn:"sentQuotationColor",
                 content:(order)=>{                     

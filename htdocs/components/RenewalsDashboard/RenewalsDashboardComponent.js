@@ -32,10 +32,10 @@ class RenewalsDashboardComponent extends MainComponent {
             data:[]
         };
         this.tabs = [
-            {id: this.TAB_RENEWAL, title: "Renewal", icon: null},
-            {id: this.TAB_CONTRACT, title: "Contract", icon: null},
+            {id: this.TAB_RENEWAL, title: "Renewals", icon: null},
+            {id: this.TAB_CONTRACT, title: "Contracts", icon: null},
             {id: this.TAB_INTERNET, title: "Internet", icon: null},
-            {id: this.TAB_DOMAIN, title: "Domain", icon: null},
+            {id: this.TAB_DOMAIN, title: "Domains", icon: null},
             {id: this.TAB_HOSTING, title: "Hosting", icon: null},            
         ];
     }

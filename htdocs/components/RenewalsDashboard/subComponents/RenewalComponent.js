@@ -63,7 +63,7 @@ export class RenewalComponent extends MainComponent
                 label: "",
                 hdToolTip: "Invoice From",
                 hdClassName: "text-center",
-                icon: "fal fa-2x fa-file-invoice color-gray2 pointer",
+                icon: "fal fa-2x fa-hourglass-start color-gray2 pointer",
                 sortable: true,
                 className: "text-center",
                 backgroundColorColumn:"sentQuotationColor",
@@ -104,7 +104,7 @@ export class RenewalComponent extends MainComponent
                 hdToolTip: "Edit",
                 hdClassName: "text-center",
                 icon: "fal fa-2x fa-edit color-gray2 pointer",
-                sortable: true,
+                sortable: false,
                 className: "text-center",
                 backgroundColorColumn:"sentQuotationColor",
                 content:(order)=>{                     

@@ -26,7 +26,7 @@ export class RenBroadbandComponent extends MainComponent
                 label: "",
                 hdToolTip: "ISP",
                 hdClassName: "text-center",
-                icon: "fal fa-2x fa-hashtag color-gray2 pointer",
+                icon: "fal fa-2x fa-network-wired color-gray2 pointer",
                 sortable: true,               
              }, 
              {
@@ -50,7 +50,7 @@ export class RenBroadbandComponent extends MainComponent
                 label: "",
                 hdToolTip: "Cost/Month",
                 hdClassName: "text-center",
-                icon: "fal fa-2x fa-donate color-gray2 pointer",
+                icon: "fal fa-2x fa-coin color-gray2 pointer",
                 sortable: true,                
              },
              {
@@ -58,7 +58,7 @@ export class RenBroadbandComponent extends MainComponent
                 label: "",
                 hdToolTip: "Sale/Month",
                 hdClassName: "text-center",
-                icon: "fal fa-2x fa-dollar-sign color-gray2 pointer",
+                icon: "fal fa-2x fa-coins color-gray2 pointer",
                 sortable: true,             
              },
              {
@@ -85,7 +85,7 @@ export class RenBroadbandComponent extends MainComponent
                 hdToolTip: "Edit",
                 hdClassName: "text-center",
                 icon: "fal fa-2x fa-edit color-gray2 pointer",
-                sortable: true,
+                sortable: false,
                 className: "text-center",
                 backgroundColorColumn:"sentQuotationColor",
                 content:(order)=>{                     

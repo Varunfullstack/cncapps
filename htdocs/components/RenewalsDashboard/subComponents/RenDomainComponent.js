@@ -34,7 +34,7 @@ export class RenDomainComponent  extends MainComponent
                 label: "",
                 hdToolTip: "Domain",
                 hdClassName: "text-left",
-                icon: "fab fa-2x fa-edge color-gray2 pointer ",
+                icon: "fal fa-2x fa-at color-gray2 pointer ",
                 sortable: true,                
              },
              {
@@ -61,7 +61,7 @@ export class RenDomainComponent  extends MainComponent
                 hdToolTip: "Edit",
                 hdClassName: "text-center",
                 icon: "fal fa-2x fa-edit color-gray2 pointer",
-                sortable: true,
+                sortable: false,
                 className: "text-center",
                 backgroundColorColumn:"sentQuotationColor",
                 content:(order)=>{                     

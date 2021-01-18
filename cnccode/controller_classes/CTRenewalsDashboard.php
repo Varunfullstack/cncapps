@@ -285,7 +285,10 @@ class CTRenewalsDashboard extends CTCNC
                         ),
                         'invoiceToDate'   => Controller::dateYMDtoDMY(
                             $dsRenHosting->getValue(DBEJRenHosting::invoiceToDate)
-                        ),                        
+                        ),     
+                        'notes'                      => Controller::htmlTextArea(
+                            $dsRenHosting->getValue(DBEJRenHosting::internalNotes)
+                        )                   
                     );
             }
         }        
