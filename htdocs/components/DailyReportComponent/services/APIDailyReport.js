@@ -2,12 +2,18 @@ import APIMain from "../../services/APIMain";
 import ApiUrls from "../../services/ApiUrls";
 
 export default class APIDailyReport extends APIMain {
-  getQueue(id,filter) {
+  getOutStandingIncidents(filter) {
     return fetch(
-      `${ApiUrls.DailyReport}getQueue&queue=${id}&`+new URLSearchParams(filter).toString()
+      `${ApiUrls.AgedService}getoutstandingIncidents&`+new URLSearchParams(filter).toString()
     ).then((res) => res.json());
   }
   getDailyStatsSummary() {
-    return this.get(`${ApiUrls.DailyReport}dailyStatsSummary` );
+    return this.get(`${ApiUrls.AgedService}dailyStatsSummary` );
+  }
+  getYears() {
+    return this.get(`${ApiUrls.AgedService}years` );
+  }
+  getOutStandingPerYear(year) {
+    return this.get(`${ApiUrls.DailyReport}outstandingReportPerformanceDataForYear&year=${year}` );
   }
 }

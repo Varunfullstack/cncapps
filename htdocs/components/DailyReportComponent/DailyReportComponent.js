@@ -6,34 +6,38 @@ import Spinner from "../shared/Spinner/Spinner";
 import APIDailyReport from "./services/APIDailyReport";
  
 import './../style.css';
-import 'DailyReportComponent.css';
+import './DailyReportComponent.css';
+import DetailsComponent from "./subComponents/DetailsComponent";
+import SummaryComponent from "./subComponents/SummaryComponent";
 
 class DailyReportComponent extends MainComponent {
     el = React.createElement;
     tabs = [];
     api = new APIDailyReport(); 
     TAB_DETAILS=1;
-    TAB_SUMMARY=2;       
+    TAB_SUMMARY=2;     
+    TAB_GRAPH=3 ;
     constructor(props) {
         super(props);
         this.state = {
             ...this.state,
             showSpinner: false,
             filter: {
-                hd: false,
-                es: false,
-                sp: false,
-                p: false,
-                p5: false,
-                activeTab: 1,
-                limit: 10
+                hd: true,
+                es: true,
+                sp: true,
+                p: true,
+                p5: true,
+                activeTab: 1,       
+                daysAgo:7,         
             },
-            queueData: [],
-            allocatedUsers: []
+            data: [],
+            
         };
         this.tabs = [
-            {id: this.TAB_DETAILS, title: "Detials", icon: null},
-            {id: this.TAB_SUMMARY, title: "Summary", icon: null},            
+            {id: this.TAB_DETAILS, title: "Details", icon: null},
+            {id: this.TAB_SUMMARY, title: "Summary", icon: null},   
+            {id:this.TAB_GRAPH, title:"Graph", icon: null},   
         ];
     }
 
@@ -87,7 +91,7 @@ class DailyReportComponent extends MainComponent {
         );
     };
     loadFilterFromStorage = () => {
-        let filter = localStorage.getItem("SDManagerDashboardFilter");
+        let filter = localStorage.getItem("DailyReport");
         if (filter) filter = JSON.parse(filter);
         else filter = this.state.filter;
         this.setState({filter}, () => {
@@ -101,14 +105,13 @@ class DailyReportComponent extends MainComponent {
     };
 
     saveFilter(filter) {
-        localStorage.setItem("SDManagerDashboardFilter", JSON.stringify(filter));
+        localStorage.setItem("DailyReport", JSON.stringify(filter));
         this.loadTab(filter.activeTab);
     }
 
     getFilterElement = () => {
         const {filter} = this.state;
-        const shouldBeHidden = [
-            DAILY_STATS_TAB
+        const shouldBeHidden = [            
         ].findIndex(x => x === filter.activeTab) > -1;
 
         return (
@@ -119,56 +122,82 @@ class DailyReportComponent extends MainComponent {
 
                             <label className="mr-3 ml-5">HD</label>
                             <Toggle checked={filter.hd}
-                                    onChange={(value) => this.setFilterValue("hd", !filter.hd)}
+                                    onChange={() => this.setFilterValue("hd", !filter.hd)}
                             />
                             <label className="mr-3 ml-5">ES</label>
                             <Toggle checked={filter.es}
-                                    onChange={(value) => this.setFilterValue("es", !filter.es)}
+                                    onChange={() => this.setFilterValue("es", !filter.es)}
                             />
                             <label className="mr-3 ml-5">SP</label>
                             <Toggle checked={filter.sp}
-                                    onChange={(value) => this.setFilterValue("sp", !filter.sp)}
+                                    onChange={() => this.setFilterValue("sp", !filter.sp)}
                             />
                             <label className="mr-3 ml-5">P</label>
                             <Toggle checked={filter.p}
-                                    onChange={(value) => this.setFilterValue("p", !filter.p)}
-                            />                            
+                                    onChange={() => this.setFilterValue("p", !filter.p)}
+                            />   
+                            <label className="mr-3 ml-5">Days Ago</label>
+                            <select value={filter.daysAgo}   onChange={() => this.setFilterValue("daysAgo", event.target.value)}>
+                                <option value={0} >0 </option>
+                                <option value={1} >1 </option>
+                                <option value={2} >2 </option>
+                                <option value={3} >3 </option>
+                                <option value={4} >4 </option>
+                                <option value={5} >5 </option>
+                                <option value={6} >6 </option>
+                                <option value={7} >7 </option>
+
+                            </select>
+                             
                         </React.Fragment>
                 }
-                <label className="mr-3 ml-5">
-                    Limit
-                </label>
-                <select value={filter.limit}
-                        onChange={(event) => this.setFilterValue("limit", event.target.value)}
-                >
-                    <option value="5"> 5</option>
-                    <option value="10"> 10</option>
-                    <option value="15"> 15</option>
-                    <option value="20"> 20</option>
-                    <option value="25"> 25</option>
-                    <option value="30"> 30</option>
-                </select>
+                 
             </div>
         );
     }
-    loadTab = (id) => {
+    loadTab = async(id) => {
+        this.setState({data:[],showSpinner:true});
+        const {filter}=this.state;
         switch(id){
             case this.TAB_DETAILS:
-                console.log('load details');
+                this.api.getOutStandingIncidents(filter).then(data=>{
+                    console.log(data);
+
+                    this.setState({data,showSpinner:false});
+                });
                 break;
             case this.TAB_SUMMARY:
+                const years=await this.api.getYears();
+                const data={years}
+                console.log(data);
+                this.setState({data,showSpinner:false});
+                break;
+            case this.TAB_GRAPH:
+                this.setState({ showSpinner:false});
                 break;
         }
 
+
     };    
-    
+    getActiveTab=()=>{
+        const {filter,data}=this.state;
+        switch(filter.activeTab){
+            case this.TAB_DETAILS:
+                return <DetailsComponent data={data}></DetailsComponent>
+            case this.TAB_SUMMARY:
+                return <SummaryComponent data={data}></SummaryComponent>
+            case this.TAB_GRAPH:
+                return <iframe src="/DailyReport.php?action=showGraphs&popup" style={{border:0,width:1200,height:600}}></iframe>
+        }
+    }
     render() {
         const {el} = this;
         return el("div", null,
             el(Spinner, {key: "spinner", show: this.state.showSpinner}),
             this.getAlert(),            
             this.getFilterElement(),
-            this.getTabsElement(),            
+            this.getTabsElement(),          
+            this.getActiveTab()  
         );
     }
 }

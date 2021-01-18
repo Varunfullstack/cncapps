@@ -1,265 +1,192 @@
 import MainComponent from "../../shared/MainComponent";
-import {SRQueues} from "../../utils/utils";
-import APISDManagerDashboard from "../services/APISDManagerDashboard";
-import Spinner from './../../shared/Spinner/Spinner';
 import React from 'react';
+import Table from "../../shared/table/table";
+import { exportCSV, SRQueues } from "../../utils/utils";
 
 class DetailsComponent extends MainComponent {
-    el = React.createElement;
-    apiSDManagerDashboard = new APISDManagerDashboard();
-    intervalHandler;
-    loading = true;
 
     constructor(props) {
         super(props);
-        this.state = {
-            summary: {
-                prioritySummary: [],
-                openSrTeamSummary: [],
-                dailySourceSummary: [],
-                raisedTodaySummary: {total: 0},
-                fixedTodaySummary: {total: 0},
-                nearSLASummary: {total: 0},
-                reopenTodaySummary: {total: 0},
-            },
-            showSpinner: true,
-        };
+        
     }
 
     componentWillUnmount() {
-        clearInterval(this.intervalHandler);
+        
     }
 
     componentDidMount() {
-        this.loadDashBoard();
-        this.intervalHandler = setInterval(() => this.loadDashBoard(), 2 * 60 * 1000);
+        
     }
 
-    loadDashBoard = () => {
-        this.apiSDManagerDashboard.getDailyStatsSummary().then((result) => {
-            this.loading = false;
-            this.setState({showSpinner: false, summary: result});
-        });
-    };
-
-    getSummaryElemen = () => {
-        const {el} = this;
-        const {summary} = this.state;
-        if (this.loading)
-            return null;
-        return el(
-            'div', {style: {display: "flex", justifyContent: "center", maxWidth: "100vw"}},
-            el(
-                "div",
-                {className: "flex-row", style: {flexWrap: "wrap", justifyContent: "center", maxWidth: "100vw"}},
-                this.getOpenSrCard(summary.prioritySummary),
-                this.getTeamSrCard(summary.openSrTeamSummary, "#00628B", "#E6E6E6"),
-                this.getDailySourceCard(summary.dailySourceSummary),
-                this.getTotalCard("Unique Customers", summary.uniqueCustomerTodaySummary.total, "#00628B", "#E6E6E6"),
-                this.getTotalCard("Near SLA", summary.nearSLASummary.total),
-                this.getTotalCard("Raised Today", summary.raisedTodaySummary.total, "#00628B", "#E6E6E6"),
-                this.getTotalCard("Today's Started", summary.raisedStartTodaySummary.total),
-                this.getTotalCard("Fixed Today", summary.fixedTodaySummary.total, "#00628B", "#E6E6E6"),
-                this.getTotalCard("Reopened Today", summary.reopenTodaySummary.total),
-                this.getTotalCard("Breached SLA", summary.breachedSLATodaySummary.total, "#00628B", "#E6E6E6"),
-            ));
-    };
-    getOpenSrCard = (data, backgroundColor = "#C6C6C6", textColor = "#3C3C3C") => {
-        if (data.length > 0) {
-            const {el} = this;
-            const getPriorityData = (id) => {
-                const obj = data.filter((d) => d.priority == id);
-                if (obj.length > 0) return obj[0].total;
-                else return 0;
-            };
-            const totalSR = data.reduce((prev, curr) => {
-                prev = prev + parseInt(curr.total);
-                return prev;
-            }, 0);
-            return el(
-                "div",
-                {className: "sd-card ", style: {backgroundColor: backgroundColor, color: textColor}},
-                el("label", {className: "sd-card-title"}, "Open SRs"),
-                el(
-                    "table",
-                    null,
-                    el(
-                        "tbody",
-                        null,
-                        el(
-                            "tr",
-                            null,
-                            el("td", null, `P1  `),
-                            el("td", null, getPriorityData(1))
-                        ),
-                        el(
-                            "tr",
-                            null,
-                            el("td", null, `P2  `),
-                            el("td", null, getPriorityData(2))
-                        ),
-                        el(
-                            "tr",
-                            null,
-                            el("td", null, `P3  `),
-                            el("td", null, getPriorityData(3))
-                        ),
-                        el(
-                            "tr",
-                            null,
-                            el("td", null, `P4  `),
-                            el("td", null, getPriorityData(4))
-                        ),
-                        el("tr", null, el("td", null, `Total  `), el("td", null, totalSR))
-                    )
-                )
-            );
-        } else return null;
-    };
-    getTeamSrCard = (data, backgroundColor = "#C6C6C6", textColor = "#3C3C3C") => {
-        if (data.length > 0) {
-            const {el} = this;
-            const getTeamTitle = (id) => {
-                const team = SRQueues.filter((t) => t.teamID == id);
-                if (team.length > 0) return team[0].name;
-            };
-            const getTeamTotal = (id) => {
-                const team = data.filter((t) => t.teamID == id);
-                if (team.length > 0) return team[0].total;
-            };
-            const totalSR = data.reduce((prev, curr) => {
-                prev = prev + parseInt(curr.total);
-                return prev;
-            }, 0);
-            return el(
-                "div",
-                {className: "sd-card ", style: {backgroundColor: backgroundColor, color: textColor}},
-                el("label", {className: "sd-card-title"}, "Team SRs"),
-                el(
-                    "table",
-                    {style: {color: textColor}},
-                    el(
-                        "tbody",
-                        null,
-                        el(
-                            "tr",
-                            null,
-                            el("td", null, getTeamTitle(1)),
-                            el("td", null, getTeamTotal(1))
-                        ),
-                        el(
-                            "tr",
-                            null,
-                            el("td", null, getTeamTitle(2)),
-                            el("td", null, getTeamTotal(2))
-                        ),
-                        el(
-                            "tr",
-                            null,
-                            el("td", null, getTeamTitle(4)),
-                            el("td", null, getTeamTotal(4))
-                        ),
-                        el(
-                            "tr",
-                            null,
-                            el("td", null, getTeamTitle(5)),
-                            el("td", null, getTeamTotal(5))
-                        ),
-                        el("tr", null, el("td", null, `Total  `), el("td", null, totalSR))
-                    )
-                )
-            );
-        } else return null;
-    };
-    getDailySourceCard = (data, backgroundColor = "#C6C6C6", textColor = "#3C3C3C") => {
-        if (data.length == 0) {
-            data = [
-                {description: "Email", total: "0"},
-                {description: "Alert", total: "0"},
-                {description: "Manual", total: "0"},
-                {description: "Phone", total: "0"},
-                {description: "On site", total: "0"},
-                {description: "Sales", total: "0"}
-            ]
-        }
-        if (data.length > 0) {
-            const {el} = this;
-            const dataDisplay = data.filter(
-                (d) =>
-                    d.description == "Phone" ||
-                    d.description == "Email" ||
-                    d.description == "Alert" ||
-                    d.description == "Portal"
-            );
-            const dataOthers = data.filter(
-                (d) =>
-                    d.description !== "Phone" &&
-                    d.description !== "Email" &&
-                    d.description !== "Alert" &&
-                    d.description !== "Portal"
-            );
-
-            const dataOthersTotal = dataOthers.reduce((prev, curr) => {
-                prev = prev + parseInt(curr.total);
-                return prev;
-            }, 0);
-
-            return el(
-                "div",
-                {className: "sd-card ", style: {backgroundColor: backgroundColor, color: textColor}},
-                el("label", {className: "sd-card-title"}, "Daily SR Source"),
-                el(
-                    "table",
-                    null,
-                    el(
-                        "tbody",
-                        null,
-                        dataDisplay.map((d) =>
-                            el(
-                                "tr",
-                                {key: d.description},
-                                el("td", null, d.description),
-                                el("td", null, d.total)
-                            )
-                        ),
-                        el(
-                            "tr",
-                            {},
-                            el("td", null, "Others"),
-                            el("td", null, dataOthersTotal)
-                        )
-                    )
-                )
-            );
-        } else return null;
-    };
-    getTotalCard = (label, total, backgroundColor = "#C6C6C6", textColor = "#3C3C3C") => {
-        const {el} = this;
-        return el(
-            "div",
-            {className: "sd-card ", style: {backgroundColor: backgroundColor, color: textColor}},
-            el("label", {className: "sd-card-title"}, label),
-            el("label", {className:'total' }, total)
-        );
-    };
-
-    getDailyStatsLink = () => {
-        const {el} = this;
-        return el('i', {
-            className: "fal fa-expand-arrows fa-2x pointer",
-            onClick: () => window.open('popup.php?action=dailyStats', 'popup', 'width=1250,height=400')
+    getDetailsElement =()=>{
+        const {data}=this.props;
+        const columns=[
+            {
+               path: "customer",
+               label: "",
+               hdToolTip: "Customer",
+               hdClassName: "text-center",
+               icon: "fal fa-2x fa-building color-gray2 pointer",
+               sortable: true,
+               //className: "text-center",
+               classNameColumn:"rowClass",
+               //classNameColumn:"",
+               //toolTip:"",
+               //textColorColumn:"",
+               //allowRowOrder:false,
+               //onOrderChange:(row)=>null,
+            },
+            {
+                path: "serviceRequestID",
+                label: "",
+                hdToolTip: "SR No",
+                hdClassName: "text-center",
+                icon: "fal fa-2x fa-hashtag color-gray2 pointer",
+                sortable: true,
+                className: "text-center",
+                classNameColumn:"rowClass",
+                content:(sr)=><a target="_blank" href={`SRActivity.php?action=displayActivity&serviceRequestId=${sr.serviceRequestID}`}>{sr.serviceRequestID}</a>
+             },
+             {
+                path: "description",
+                label: "",
+                hdToolTip: "Details",
+                hdClassName: "text-center",
+                icon: "fal fa-2x fa-file-alt color-gray2 pointer",
+                sortable: true,
+                classNameColumn:"rowClass",
+                //className: "text-center",
+                
+             },
+             {
+                path: "assignedTo",
+                label: "",
+                hdToolTip: "Assigned to",
+                hdClassName: "text-center",
+                icon: "fal fa-2x fa-user-hard-hat color-gray2 pointer",
+                sortable: true,
+                classNameColumn:"rowClass",
+                //className: "text-center",
+                
+             },
+             {
+                path: "teamName",
+                label: "",
+                hdToolTip: "Team",
+                hdClassName: "text-center",
+                icon: "fal fa-2x fa-users color-gray2 pointer",
+                sortable: true,
+                classNameColumn:"rowClass",
+                //className: "text-center",
+                content:(sr)=><label>{this.getQueueName(sr.queueNo)}</label>
+                
+             },
+             {
+                path: "durationHours",
+                label: "",
+                hdToolTip: "Open For(days)",
+                hdClassName: "text-center",
+                icon: "fal fa-2x fa-clock color-gray2 pointer",
+                sortable: true,
+                classNameColumn:"rowClass",
+                //className: "text-center",
+             },
+             {
+                path: "timeSpentHours",
+                label: "",
+                hdToolTip: "Time Spent(hours)",
+                hdClassName: "text-center",
+                icon: "fal fa-2x fa-stopwatch color-gray2 pointer",
+                sortable: true,
+                classNameColumn:"rowClass",
+                //className: "text-center",
+             },
+             {
+                path: "priority",
+                label: "",
+                hdToolTip: "Priority",
+                hdClassName: "text-center",
+                icon: "fal fa-2x fa-signal color-gray2 pointer",
+                sortable: true,
+                classNameColumn:"rowClass",
+                //className: "text-center",
+             },
+             {
+                path: "lastUpdatedDate",
+                label: "",
+                hdToolTip: "Last Updated",
+                hdClassName: "text-center",
+                icon: "fal fa-2x fa-calendar  color-gray2 pointer",
+                sortable: true,
+                classNameColumn:"rowClass",
+                //className: "text-center",
+             },
+             {
+                path: "awaiting",
+                label: "",
+                hdToolTip: "Status",
+                hdClassName: "text-center",
+                icon: "fal fa-2x fa-envelope-open color-gray2 pointer",
+                sortable: true,
+                classNameColumn:"rowClass",
+                //className: "text-center",
+             },
+        ]
+        return <Table   id="details"
+        data={data || []}
+        columns={columns}
+        pk= "serviceRequestID"
+        search={true}>
+        </Table>;
+    }
+     
+    getQueueName(id){        
+        const indx=SRQueues.map(s=>s.id).indexOf(parseInt(id));        
+        if(indx>=0)
+            return SRQueues[indx].name;        
+        else return "";
+    }
+    handleCSV=()=>{
+        const {data}=this.props;        
+        const dataMap= data.map(s=>{
+            return {
+                'Customer':s.customer,
+                'SR No':s.serviceRequestID.toString(),
+                'Details':s.description,
+                'Assigned To':s.assignedTo,
+                'Team':s.teamName,
+                'Open For(days)':s.durationHours.toString(),
+                'Time Spent(hours)':s.timeSpentHours.toString(),
+                'Priority':s.priority.toString(),
+                'Last Updated':s.lastUpdatedDate,
+                'Awaiting':s.awaiting
+            }
         })
+        exportCSV(dataMap,'Aged Service Requests.csv');
     }
-
+    getAverageAgeDays=()=>{
+     
+        const {data}=this.props;         
+        const sum=data.reduce((prev,curr)=>{
+            prev +=parseFloat(curr.durationHours);
+            return prev;
+        },0);
+        console.log(sum);
+        const avg=sum/data.length;
+        return avg.toFixed(1);
+    }
     render() {
-        const {el} = this;
-        return el(
-            "div",
-            null,
-            el(Spinner, {key: "spinner", show: this.state.showSpinner}),
-            this.getSummaryElemen(),
-            this.getDailyStatsLink()
-        );
+         return <div>
+             <div style={{display:"flex",flexDirection:"row",justifyContent:"space-between",width:400}}>
+             <button  className="btn-sm" onClick={this.handleCSV}>CSV</button>
+             <h3>Total Requests :{this.props.data.length}</h3>
+             <h3>Average Age in Days :{this.getAverageAgeDays()}</h3>
+             </div>
+             
+             {
+                this.getDetailsElement()
+             }
+            </div>;
     }
 }
 

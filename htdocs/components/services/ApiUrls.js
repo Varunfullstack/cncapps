@@ -9,5 +9,7 @@ export default class ApiUrls{
  static RequestDashboard="/RequestDashboard.php?action=";
  static KPIReport="/KPIReport.php?action=";
  static Header="/Header.php?action=";
+ static AgedService="/AgedService.php?action=";
  static DailyReport="/DailyReport.php?action=";
+
 }

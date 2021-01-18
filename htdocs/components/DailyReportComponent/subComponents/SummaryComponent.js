@@ -1,265 +1,82 @@
-import MainComponent from "../../shared/MainComponent";
-import {SRQueues} from "../../utils/utils";
-import APISDManagerDashboard from "../services/APISDManagerDashboard";
-import Spinner from './../../shared/Spinner/Spinner';
 import React from 'react';
+import MainComponent from '../../shared/MainComponent';
+import APIDailyReport from '../services/APIDailyReport';
 
-class SummaryComponent extends MainComponent {
-    el = React.createElement;
-    apiSDManagerDashboard = new APISDManagerDashboard();
-    intervalHandler;
-    loading = true;
+class SummaryComponent extends MainComponent {    
+    api = new APIDailyReport(); 
 
     constructor(props) {
         super(props);
-        this.state = {
-            summary: {
-                prioritySummary: [],
-                openSrTeamSummary: [],
-                dailySourceSummary: [],
-                raisedTodaySummary: {total: 0},
-                fixedTodaySummary: {total: 0},
-                nearSLASummary: {total: 0},
-                reopenTodaySummary: {total: 0},
-            },
-            showSpinner: true,
+        this.state = {         
+            selectedYear:null,
+            yearData:[], 
+            years:[]           
         };
     }
-
-    componentWillUnmount() {
-        clearInterval(this.intervalHandler);
+    // static getderivedstatefromprops(props,state)
+    // {
+    //     if(this.props.years)
+    // }
+    componentDidMount=async()=> {        
+        const years=await this.api.getYears();
+        this.setState({years});
+        this.getYearData(years[0].YEAR);
+        console.log('years',years);
     }
 
-    componentDidMount() {
-        this.loadDashBoard();
-        this.intervalHandler = setInterval(() => this.loadDashBoard(), 2 * 60 * 1000);
-    }
+   getYearsElement=()=>{
+       const {years}=this.state;
+       const {selectedYear}=this.state;
+       let y=years.length>0?years[0].YEAR:null;       
+       if(!years)
+        return null;
+       return <select value={selectedYear||y} onChange={(event)=>this.handleYearChange(event.target.value)}>
+           {
+               years.map(y=><option key={y.YEAR} value={y.YEAR}>{y.YEAR}</option>)
+           }           
+       </select>
+   }
+   handleYearChange=(year)=>{
+    this.setState({selectedYear:year});
+    this.getYearData(year);
 
-    loadDashBoard = () => {
-        this.apiSDManagerDashboard.getDailyStatsSummary().then((result) => {
-            this.loading = false;
-            this.setState({showSpinner: false, summary: result});
-        });
-    };
-
-    getSummaryElemen = () => {
-        const {el} = this;
-        const {summary} = this.state;
-        if (this.loading)
-            return null;
-        return el(
-            'div', {style: {display: "flex", justifyContent: "center", maxWidth: "100vw"}},
-            el(
-                "div",
-                {className: "flex-row", style: {flexWrap: "wrap", justifyContent: "center", maxWidth: "100vw"}},
-                this.getOpenSrCard(summary.prioritySummary),
-                this.getTeamSrCard(summary.openSrTeamSummary, "#00628B", "#E6E6E6"),
-                this.getDailySourceCard(summary.dailySourceSummary),
-                this.getTotalCard("Unique Customers", summary.uniqueCustomerTodaySummary.total, "#00628B", "#E6E6E6"),
-                this.getTotalCard("Near SLA", summary.nearSLASummary.total),
-                this.getTotalCard("Raised Today", summary.raisedTodaySummary.total, "#00628B", "#E6E6E6"),
-                this.getTotalCard("Today's Started", summary.raisedStartTodaySummary.total),
-                this.getTotalCard("Fixed Today", summary.fixedTodaySummary.total, "#00628B", "#E6E6E6"),
-                this.getTotalCard("Reopened Today", summary.reopenTodaySummary.total),
-                this.getTotalCard("Breached SLA", summary.breachedSLATodaySummary.total, "#00628B", "#E6E6E6"),
-            ));
-    };
-    getOpenSrCard = (data, backgroundColor = "#C6C6C6", textColor = "#3C3C3C") => {
-        if (data.length > 0) {
-            const {el} = this;
-            const getPriorityData = (id) => {
-                const obj = data.filter((d) => d.priority == id);
-                if (obj.length > 0) return obj[0].total;
-                else return 0;
-            };
-            const totalSR = data.reduce((prev, curr) => {
-                prev = prev + parseInt(curr.total);
-                return prev;
-            }, 0);
-            return el(
-                "div",
-                {className: "sd-card ", style: {backgroundColor: backgroundColor, color: textColor}},
-                el("label", {className: "sd-card-title"}, "Open SRs"),
-                el(
-                    "table",
-                    null,
-                    el(
-                        "tbody",
-                        null,
-                        el(
-                            "tr",
-                            null,
-                            el("td", null, `P1  `),
-                            el("td", null, getPriorityData(1))
-                        ),
-                        el(
-                            "tr",
-                            null,
-                            el("td", null, `P2  `),
-                            el("td", null, getPriorityData(2))
-                        ),
-                        el(
-                            "tr",
-                            null,
-                            el("td", null, `P3  `),
-                            el("td", null, getPriorityData(3))
-                        ),
-                        el(
-                            "tr",
-                            null,
-                            el("td", null, `P4  `),
-                            el("td", null, getPriorityData(4))
-                        ),
-                        el("tr", null, el("td", null, `Total  `), el("td", null, totalSR))
-                    )
-                )
-            );
-        } else return null;
-    };
-    getTeamSrCard = (data, backgroundColor = "#C6C6C6", textColor = "#3C3C3C") => {
-        if (data.length > 0) {
-            const {el} = this;
-            const getTeamTitle = (id) => {
-                const team = SRQueues.filter((t) => t.teamID == id);
-                if (team.length > 0) return team[0].name;
-            };
-            const getTeamTotal = (id) => {
-                const team = data.filter((t) => t.teamID == id);
-                if (team.length > 0) return team[0].total;
-            };
-            const totalSR = data.reduce((prev, curr) => {
-                prev = prev + parseInt(curr.total);
-                return prev;
-            }, 0);
-            return el(
-                "div",
-                {className: "sd-card ", style: {backgroundColor: backgroundColor, color: textColor}},
-                el("label", {className: "sd-card-title"}, "Team SRs"),
-                el(
-                    "table",
-                    {style: {color: textColor}},
-                    el(
-                        "tbody",
-                        null,
-                        el(
-                            "tr",
-                            null,
-                            el("td", null, getTeamTitle(1)),
-                            el("td", null, getTeamTotal(1))
-                        ),
-                        el(
-                            "tr",
-                            null,
-                            el("td", null, getTeamTitle(2)),
-                            el("td", null, getTeamTotal(2))
-                        ),
-                        el(
-                            "tr",
-                            null,
-                            el("td", null, getTeamTitle(4)),
-                            el("td", null, getTeamTotal(4))
-                        ),
-                        el(
-                            "tr",
-                            null,
-                            el("td", null, getTeamTitle(5)),
-                            el("td", null, getTeamTotal(5))
-                        ),
-                        el("tr", null, el("td", null, `Total  `), el("td", null, totalSR))
-                    )
-                )
-            );
-        } else return null;
-    };
-    getDailySourceCard = (data, backgroundColor = "#C6C6C6", textColor = "#3C3C3C") => {
-        if (data.length == 0) {
-            data = [
-                {description: "Email", total: "0"},
-                {description: "Alert", total: "0"},
-                {description: "Manual", total: "0"},
-                {description: "Phone", total: "0"},
-                {description: "On site", total: "0"},
-                {description: "Sales", total: "0"}
-            ]
-        }
-        if (data.length > 0) {
-            const {el} = this;
-            const dataDisplay = data.filter(
-                (d) =>
-                    d.description == "Phone" ||
-                    d.description == "Email" ||
-                    d.description == "Alert" ||
-                    d.description == "Portal"
-            );
-            const dataOthers = data.filter(
-                (d) =>
-                    d.description !== "Phone" &&
-                    d.description !== "Email" &&
-                    d.description !== "Alert" &&
-                    d.description !== "Portal"
-            );
-
-            const dataOthersTotal = dataOthers.reduce((prev, curr) => {
-                prev = prev + parseInt(curr.total);
-                return prev;
-            }, 0);
-
-            return el(
-                "div",
-                {className: "sd-card ", style: {backgroundColor: backgroundColor, color: textColor}},
-                el("label", {className: "sd-card-title"}, "Daily SR Source"),
-                el(
-                    "table",
-                    null,
-                    el(
-                        "tbody",
-                        null,
-                        dataDisplay.map((d) =>
-                            el(
-                                "tr",
-                                {key: d.description},
-                                el("td", null, d.description),
-                                el("td", null, d.total)
-                            )
-                        ),
-                        el(
-                            "tr",
-                            {},
-                            el("td", null, "Others"),
-                            el("td", null, dataOthersTotal)
-                        )
-                    )
-                )
-            );
-        } else return null;
-    };
-    getTotalCard = (label, total, backgroundColor = "#C6C6C6", textColor = "#3C3C3C") => {
-        const {el} = this;
-        return el(
-            "div",
-            {className: "sd-card ", style: {backgroundColor: backgroundColor, color: textColor}},
-            el("label", {className: "sd-card-title"}, label),
-            el("label", {className:'total' }, total)
-        );
-    };
-
-    getDailyStatsLink = () => {
-        const {el} = this;
-        return el('i', {
-            className: "fal fa-expand-arrows fa-2x pointer",
-            onClick: () => window.open('popup.php?action=dailyStats', 'popup', 'width=1250,height=400')
-        })
-    }
-
-    render() {
-        const {el} = this;
-        return el(
-            "div",
-            null,
-            el(Spinner, {key: "spinner", show: this.state.showSpinner}),
-            this.getSummaryElemen(),
-            this.getDailyStatsLink()
-        );
+   }
+   getYearData=(year)=>{
+    this.api.getOutStandingPerYear(year).then(yearData=>{
+        console.log(yearData);  
+        this.setState({yearData})      
+    })
+   }
+   getMonthsElement=()=>{
+       const {yearData}=this.state;
+       return <table className="table table-striped" style={{maxWidth:200+yearData.length*40}}>
+           <thead>
+               <tr>
+                   <th></th>
+                   {yearData.map((y,i)=><th key={i}>{moment(y.month,'MM').format("MMM")}</th>)}
+               </tr>
+           </thead>
+           <tbody>
+               <tr>
+                   <td>Average Number of 7 Dayers	</td>
+                   {yearData.map((y,i)=><td key={i}>{y.olderThan7DaysAvg.toFixed(1)}</td>)}
+               </tr>
+               <tr>
+                   <td>Target		</td>
+                   {yearData.map((y,i)=><td key={i}>{y.targetAvg}</td>)}
+               </tr>
+           </tbody>
+       </table>
+   }
+    render() {        
+        return <div>
+            {
+                this.getYearsElement()
+            }
+            {
+                this.getMonthsElement()
+            }
+        </div> 
     }
 }
 
