@@ -3056,11 +3056,6 @@ class BUActivity extends Business
                 $subject = 'Change Request denied';
                 $status  = 'C';
                 break;
-            case 'I':
-                $reason  = '<p>Further details/discussion requested by ' . $userName . '</p>';
-                $subject = 'More information/discussion required for change request';
-                $status  = 'O';
-                break;
             default:
                 throw new Exception('Invalid response');
         }

@@ -283,17 +283,13 @@ class CTRequestDashboard extends CTCNC
     {
         $this->setMethodName('processChangeRequest');
         $body           = $this->getJSONData();
-        $callActivityID = $body->callActivityID;
-        switch ($body->status) {
+        $callActivityID = $body["callActivityID"];
+        switch ($body["status"]) {
             case self::APPROVE:
                 $option = 'A';
                 break;
             case self::DENY:
                 $option = 'D';
-                break;
-            case self::FURTHER_DETAILS_REQUIRED:
-            default:
-                $option = 'I';
                 break;
         }
         $buActivity = new BUActivity($this);
@@ -301,7 +297,7 @@ class CTRequestDashboard extends CTCNC
             $callActivityID,
             $this->userID,
             $option,
-            $body->comments
+            $body["comments"]
         );
         return ["status" => true];
     }
@@ -362,7 +358,7 @@ class CTRequestDashboard extends CTCNC
     function processSalesRequest()
     {
         $this->setMethodName('processSalesRequest');
-        $body = $this->getJSONData();
+        $body           = $this->getJSONData();
         $callActivityID = $body['callActivityID'];
         $dsCallActivity = new DataSet($this);
         $buActivity     = new BUActivity($this);
