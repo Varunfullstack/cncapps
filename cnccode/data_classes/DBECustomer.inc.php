@@ -672,7 +672,7 @@ class DBECustomer extends DBCNCEntity
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " where 
-				cus_name = '{$name}'
+				cus_name like '{$name}'
 				and {$this->getDBColumnName(DBECustomer::referredFlag)} <> 'Y' 
 				and {$this->getDBColumnName(DBECustomer::becameCustomerDate)} is not null and {$this->getDBColumnName(DBECustomer::droppedCustomerDate)} is null
 				LIMIT 1";
