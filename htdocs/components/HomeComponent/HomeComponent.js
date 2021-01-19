@@ -141,7 +141,7 @@ class HomeComponent extends MainComponent {
     saveOrder=(saveDb=false)=>{
         const {cards}=this.state; 
         //localStorage.setItem("homeCards",JSON.stringify(cards));
-    
+        this.initDragResize(); 
         if(saveDb&&!this.isMaster())
             this.apiUser.saveSettings(this.state.currentUser.id,'home',cards).then(result=>{
                 console.log(result);
@@ -740,10 +740,10 @@ class HomeComponent extends MainComponent {
         this.setState({cards:cardsPerm},()=>this.saveOrder(true));
     }
     getDailyStats=()=>{
-        return <iframe style={{border:0,overflow:"hidden",overflowX:"hidden",overflowY:"hidden",height:"80%",minWidth:"200",position:"absolute",top:40,left:0,right:0,bottom:0}}  width="100%" height="100%" src="popup.php?action=dailyStats"></iframe>
+        return <iframe style={{border:0,overflow:"hidden",overflowX:"hidden",overflowY:"hidden",height:"95%",minWidth:"200",position:"absolute",top:40,left:0,right:0,bottom:0}}  width="100%" height="100%" src="popup.php?action=dailyStats"></iframe>
     }
     getTeamCharts(){
-        return <iframe style={{border:0,overflow:"hidden",overflowX:"hidden",overflowY:"hidden",height:"80%",minWidth:"200",position:"absolute",top:25,left:0,right:0,bottom:0}}  width="100%" height="100%" src="index.php?action=charts"></iframe>
+        return <iframe style={{border:0,overflow:"hidden",overflowX:"hidden",overflowY:"hidden",height:"95%",minWidth:"200",position:"absolute",top:40,left:0,right:0,bottom:0}}  width="100%" height="100%" src="index.php?action=charts"></iframe>
     }
     render() {   
         const {minHeight} =this.state;
