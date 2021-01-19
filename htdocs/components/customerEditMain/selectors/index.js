@@ -28,6 +28,8 @@ const getMappedSites = createSelector(
     }
 )
 
+export const getAllSites = getMappedSites;
+
 export const createGetSiteContacts = () => {
     return createSelector(
         [getMappedContacts, (state, siteNo) => siteNo],

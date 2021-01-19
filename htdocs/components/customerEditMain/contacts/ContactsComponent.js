@@ -1,4 +1,4 @@
-import {getAllContacts, getMappedContacts} from "../selectors";
+import {getAllContacts, getAllSites} from "../selectors";
 import {updateCustomerField} from "../actions";
 import {connect} from "react-redux";
 
@@ -18,10 +18,11 @@ class ContactsComponent extends React.PureComponent {
     }
 
     renderContacts() {
-        const {contacts} = this.props;
+        const {contacts, sites} = this.props;
         return contacts.map(contact => (
             <ContactComponent key={contact.id}
                               contact={contact}
+                              sites={sites}
                               onChange={this.onContactChanged}
             />
         ));
@@ -66,7 +67,8 @@ class ContactsComponent extends React.PureComponent {
 
 function mapStateToProps(state) {
     return {
-        contacts: getAllContacts(state)
+        contacts: getAllContacts(state),
+        sites: getAllSites(state),
     }
 }
 
