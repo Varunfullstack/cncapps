@@ -4,14 +4,18 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import '../style.css'
+import MainComponent from '../shared/MainComponent';
+import APIMySettings from './services/APIMySettings';
 
-class MySettingsComponent extends React.Component {
+class MySettingsComponent extends MainComponent {
     el = React.createElement;
+    api=new APIMySettings();
     TAB_MY_ACCOUNT=1;
     TAB_MY_SETTINGS=2;
     constructor(props) {
         super(props);
         this.state = {
+            ...this.state,
             activeTab:this.TAB_MY_ACCOUNT
         };
         this.tabs = [
@@ -33,7 +37,7 @@ class MySettingsComponent extends React.Component {
                     data.userLog = data.userLog.map(log => {
                         return {...log, loggedDate: moment(log.loggedDate).format('DD-MM-YYYY')};
                     });
-
+                console.log(data);
                 this.setState({...data});
             })
     }
@@ -104,42 +108,75 @@ class MySettingsComponent extends React.Component {
     }
 
     handleOnClick = () => {
-        fetch('?action=sendEmailAssignedService&&sendEmailAssignedService=' + (this.state.sendEmailAssignedService ? 1 : 0), {method: 'POST'}).then(response => {
+        const body={
+            sendEmailAssignedService:(this.state.sendEmailAssignedService ? 1 : 0),
+            bccOnCustomerEmails:(this.state.bccOnCustomerEmails ? 1 : 0),
+        }
+        console.log(body);
+        this.api.saveMySettings(body).then(result=>{
+            if(result.status)
+                this.alert('Setting saved successfully');
         })
+        // fetch('?action=sendEmailAssignedService&&sendEmailAssignedService=' + (this.state.sendEmailAssignedService ? 1 : 0), {method: 'POST'}).then(response => {
+        //     this.alert('Setting saved successfully');
+        // })
     }
+    getMyAccountTab=()=>{
+       return  this.el('dl', {className: 'row', key: 'about_me'}, [
+            this.getElement('name', 'Name', this.state.name),
 
-    render() {
-        return this.getTabsElement();
+            this.getElement('jobTitle', 'Job Title', this.state.jobTitle),
+
+            this.getElement('startDate', 'Start Date', this.state.startDate),
+
+            this.getElement('lengthOfServices', 'Length Of Service', this.state.lengthOfServices + " years"),
+
+            this.getElement('manager', 'Manager', this.state.manager),
+
+            this.getElement('team', 'Team', this.state.team),
+            this.el('dt', {key: 'userLog', className: 'col-3'}, 'Last login times'),
+            this.getUserLog(),
+        ]);
+    }
+    getMySettingTab=()=>{
+        return this.el('div',{key:"container"},         
+        this.el(CheckBox,
+            {
+                key: 'sendMeEmail',
+                name: 'sendMeEmail',
+                label: "Send me an email when I'm assigned a Service Request.",
+                checked: this.state.sendEmailAssignedService,
+                onChange: ()=>this.setState({'sendEmailAssignedService':!this.state.sendEmailAssignedService})
+            }, null),
+        this.el(CheckBox,
+            {
+                key: 'bccEmail',
+                name: 'bccEmail',
+                label: "BCC on customer emails.",
+                checked: this.state.bccOnCustomerEmails,
+                onChange: ()=>this.setState({'bccOnCustomerEmails':!this.state.bccOnCustomerEmails})
+            }, null),
+        this.el('button', {key: 'btnSave', style: {width: 50}, onClick: this.handleOnClick}, 'Save')
+        );
+    }
+    getActiveTab=()=>{
+        const {activeTab}=this.state;
+        switch(activeTab)
+        {
+            case this.TAB_MY_ACCOUNT:
+                return this.getMyAccountTab();                
+            case this.TAB_MY_SETTINGS:
+                return this.getMySettingTab();
+        }
+    }
+    render() {        
         return this.el(
-            "div",
-            this.getTabsElement(),
+            "div",            
             {className: 'my-account'},
             [
-                this.el('dl', {className: 'row', key: 'about_me'}, [
-                    this.getElement('name', 'Name', this.state.name),
-
-                    this.getElement('jobTitle', 'Job Title', this.state.jobTitle),
-
-                    this.getElement('startDate', 'Start Date', this.state.startDate),
-
-                    this.getElement('lengthOfServices', 'Length Of Service', this.state.lengthOfServices + " years"),
-
-                    this.getElement('manager', 'Manager', this.state.manager),
-
-                    this.getElement('team', 'Team', this.state.team),
-                    this.el('dt', {key: 'userLog', className: 'col-3'}, 'Last login times'),
-                    this.getUserLog(),
-                ]),
-                this.el('h1', {key: 'section_title_2'}, 'My Settings'),
-                this.el(CheckBox,
-                    {
-                        key: 'sendMeEmail',
-                        name: 'sendMeEmail',
-                        label: "Send me an email when I'm assigned a Service Request.",
-                        checked: this.state.sendEmailAssignedService,
-                        onChange: this.handleOnChange
-                    }, null),
-                this.el('button', {key: 'btnSave', style: {width: 50}, onClick: this.handleOnClick}, 'Save')
+                this.getAlert(),
+                this.getTabsElement(),
+                this.getActiveTab()
             ]
         );
     }

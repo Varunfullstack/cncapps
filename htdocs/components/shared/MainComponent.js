@@ -90,6 +90,7 @@ export default class MainComponent extends React.Component {
     getAlert = () => {
         const {alert} = this.state;
         return <Alert
+            key={"alert"}
             show={alert.show}
             width={alert.width}
             title={alert.title}
