@@ -1,5 +1,8 @@
 # Changelog
 This project changes will be shown here.
+## [unrealesed]
+### Changed
+- My Settings redesign.
 
 ## [v5.2.3] - 2021-01-18
 ### Fixed
