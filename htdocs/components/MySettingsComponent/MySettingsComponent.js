@@ -7,10 +7,17 @@ import '../style.css'
 
 class MySettingsComponent extends React.Component {
     el = React.createElement;
-
+    TAB_MY_ACCOUNT=1;
+    TAB_MY_SETTINGS=2;
     constructor(props) {
         super(props);
-        this.state = {};
+        this.state = {
+            activeTab:this.TAB_MY_ACCOUNT
+        };
+        this.tabs = [
+            {id: this.TAB_MY_ACCOUNT, title: "My Account", icon: null},
+            {id: this.TAB_MY_SETTINGS, title: "My Settings", icon: null},
+        ];
     }
 
     componentDidMount() {
@@ -30,7 +37,50 @@ class MySettingsComponent extends React.Component {
                 this.setState({...data});
             })
     }
+    getTabsElement = () => {
+        const {el, tabs} = this;
+        return el(
+            "div",
+            {
+                key: "tab",
+                className: "tab-container",
+                style: {flexWrap: "wrap", justifyContent: "flex-start", maxWidth: 1300}
+            },
+            tabs.map((t) => {
+                return el(
+                    "i",
+                    {
+                        key: t.id,
+                        className: this.isActive(t.id) + " nowrap",
+                        onClick: () => this.setActiveTab(t.id),
+                        style: {width: 200}
+                    },
+                    t.title,
+                    t.icon
+                        ? el("span", {
+                            className: t.icon,
+                            style: {
+                                fontSize: "12px",
+                                marginTop: "-12px",
+                                marginLeft: "-5px",
+                                position: "absolute",
+                                color: "#000",
+                            },
+                        })
+                        : null
+                );
+            })
+        );
+    };
 
+    isActive = (code) => {
+        const {activeTab} = this.state;
+        if (activeTab == code) return "active";
+        else return "";
+    };
+    setActiveTab = (activeTab) => {         
+        this.setState({activeTab});        
+    };
     getElement(key, label, value) {
         return [
             this.el('dt', {key: key + "_label", className: 'col-3'}, label),
@@ -59,9 +109,10 @@ class MySettingsComponent extends React.Component {
     }
 
     render() {
-
+        return this.getTabsElement();
         return this.el(
             "div",
+            this.getTabsElement(),
             {className: 'my-account'},
             [
                 this.el('dl', {className: 'row', key: 'about_me'}, [
