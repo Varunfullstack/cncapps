@@ -1,6 +1,6 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
     <changeSet author="pavwebdev" id="issue916-0">
         <tagDatabase tag="issue916"/>
@@ -184,91 +184,45 @@
     </changeSet>
     <changeSet author="pavwebdev" id="issue916-15">
         <comment>
-            This assigns at least one STM contact for each customer
+            Get rid of old contacts where the customer doesn't exist anymore.
         </comment>
         <sql>
-           <![CDATA[
-            UPDATE
-                contact
-                    JOIN
-                    (SELECT c.`con_contno`
-                     FROM (SELECT *
-                           FROM contact) c
-                              LEFT JOIN
-                          (SELECT COUNT(*) AS totalStatementContacts,
-                                  con_custno
-                           FROM contact b
-                           WHERE b.con_mailflag4 = 'Y'
-                           GROUP BY b.con_custno) a
-                          ON c.con_custno = a.con_custno
-                     WHERE con_suppno = 0
-                       AND (
-                             a.totalStatementContacts < 1
-                             OR a.totalStatementContacts IS NULL
-                         )
-                     GROUP BY c.con_custno) d
-                    ON contact.`con_contno` = d.con_contno
-            SET con_mailflag4 = 'Y';
+            <![CDATA[
+            delete contact
+            from contact
+                     left join customer on customer.cus_custno = contact.con_custno
+            where cus_custno is null
+              and (con_suppno is null or con_suppno = 0);
             ]]>
         </sql>
         <rollback/>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue916-16">
-        <comment>
-            This makes sure that each customer has AT MOST one STM contact
-        </comment>
-        <sql>
-           <![CDATA[
-            UPDATE
-                contact
-                    JOIN
-                    (SELECT c.`con_contno`
-                     FROM (SELECT *
-                           FROM contact) c
-                              LEFT JOIN
-                          (SELECT COUNT(*) AS totalStatementContacts,
-                                  con_custno
-                           FROM contact b
-                           WHERE b.con_mailflag4 = 'Y'
-                           GROUP BY b.con_custno) a
-                          ON c.con_custno = a.con_custno
-                     WHERE con_suppno = 0
-                       AND (
-                             a.totalStatementContacts < 1
-                             OR a.totalStatementContacts IS NULL
-                         )
-                     GROUP BY c.con_custno) d
-                    ON contact.`con_contno` = d.con_contno
-            SET con_mailflag4 = 'Y';
-            ]]>
-        </sql>
-        <rollback/>
-    </changeSet>
-
-    <changeSet author="pavwebdev" id="issue916-17">
+    <changeSet author="pavwebdev" id="issue916-18">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="customer" columnName="statementContactId"/>
             </not>
         </preConditions>
         <addColumn tableName="customer">
-            <column name="statementContactId" type="tinyint(1)" defaultValue="0">
-                <constraints nullable="false"/>
+            <column name="statementContactId" type="bigint(11)">
+                <constraints nullable="true"/>
             </column>
         </addColumn>
-
         <sql>
             update customer
             set statementContactId = (select con_contno
                                       from contact
                                       where con_custno = customer.cus_custno
                                         and con_mailflag4 = 'Y'
+                                        and contact.active
                                       limit 1)
         </sql>
-        <rollback/>
+        <rollback>
+            <dropColumn tableName="customer" columnName="statementContactId"/>
+        </rollback>
     </changeSet>
 
-    <changeSet author="pavwebdev" id="issue916-18">
+    <changeSet author="pavwebdev" id="issue916-19">
         <dropColumn tableName="contact" columnName="con_mailflag4"/>
         <rollback>
             <addColumn tableName="contact">
@@ -276,7 +230,7 @@
             </addColumn>
         </rollback>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue916-19">
+    <changeSet author="pavwebdev" id="issue916-20">
         <dropColumn tableName="contactAuditLog" columnName="con_mailflag4"/>
         <rollback>
             <addColumn tableName="contactAuditLog">
@@ -284,7 +238,7 @@
             </addColumn>
         </rollback>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue916-20">
+    <changeSet author="pavwebdev" id="issue916-21">
         <dropColumn tableName="headert" columnName="hed_mailflg4_def"/>
         <rollback>
             <addColumn tableName="headert">
@@ -292,7 +246,7 @@
             </addColumn>
         </rollback>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue916-21">
+    <changeSet author="pavwebdev" id="issue916-22">
         <dropColumn tableName="headert" columnName="hed_mailflg4_desc"/>
         <rollback>
             <addColumn tableName="headert">
@@ -300,6 +254,4 @@
             </addColumn>
         </rollback>
     </changeSet>
-
-
 </databaseChangeLog>

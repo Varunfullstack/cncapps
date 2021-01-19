@@ -486,7 +486,6 @@ class CTCustomer extends CTCNC
                 DBEContact::othersFixedEmailFlag,
                 $this->getYN(@$value['othersFixedEmailFlag'])
             );
-
             $this->dsContact->setValue(
                 DBEContact::reviewUser,
                 $this->getYN(@$value['reviewUser'])
@@ -750,6 +749,7 @@ class CTCustomer extends CTCNC
                             "opportunityDeal"              => $dbeCustomer->getValue(DBECustomer::opportunityDeal),
                             "reviewAction"                 => $dbeCustomer->getValue(DBECustomer::reviewAction),
                             "lastContractSent"             => $dbeCustomer->getValue(DBECustomer::lastContractSent),
+                            "statementContactId"           => $dbeCustomer->getValue(DBECustomer::statementContactId)
                         ]
                     ]
                 );
@@ -869,7 +869,9 @@ class CTCustomer extends CTCNC
                 if (!isset($data['mainContractOnly'])) {
                     throw new \CNCLTD\Exceptions\JsonHttpException(400, "mainContractOnly is required");
                 }
-                $fileAndMimeType = $this->getFileDecodedAndMimeTypeFromBase64EncodedFile($data['encodedFile']);
+                $fileAndMimeType           = $this->getFileDecodedAndMimeTypeFromBase64EncodedFile(
+                    $data['encodedFile']
+                );
                 $dbePortalCustomerDocument = new DBEPortalCustomerDocument($this);
                 $dbePortalCustomerDocument->setValue(DBEPortalCustomerDocument::customerID, $data['customerId']);
                 $dbePortalCustomerDocument->setValue(DBEPortalCustomerDocument::description, $data['description']);
@@ -1186,14 +1188,14 @@ class CTCustomer extends CTCNC
             while ($dbeJOrdhead->fetchNext()) {
 
                 $ordheadID = $dbeJOrdhead->getPKValue();
-                $orderURL = Controller::buildLink(
+                $orderURL  = Controller::buildLink(
                     'SalesOrder.php',
                     array(
                         'action'    => CTCNC_ACT_DISP_SALESORDER,
                         'ordheadID' => $ordheadID
                     )
                 );
-                $orders[] = [
+                $orders[]  = [
                     'url'       => $orderURL,
                     'id'        => $ordheadID,
                     'type'      => $this->getOrderTypeDescription($dbeJOrdhead->getValue(DBEJOrdhead::type)),
@@ -1878,7 +1880,7 @@ class CTCustomer extends CTCNC
         /*
         Get the list of custom letter template file names from the custom letter directory
         */
-        $dir = LETTER_TEMPLATE_DIR . "/custom/";
+        $dir                   = LETTER_TEMPLATE_DIR . "/custom/";
         $customLetterTemplates = [];
         if (is_dir($dir)) {
 
@@ -1908,30 +1910,30 @@ class CTCustomer extends CTCNC
             );
             $customerFolderLink      = '<a href="' . $urlCreateCustomerFolder . '" title="Create Folder">Create Customer Folder</a>';
         }
-        $renewalLinkURL = Controller::buildLink(
+        $renewalLinkURL          = Controller::buildLink(
             'RenewalReport.php',
             array(
                 'action'     => 'produceReport',
                 'customerID' => $this->getCustomerID()
             )
         );
-        $renewalLink = '<a href="' . $renewalLinkURL . '" target="_blank" title="Renewals">Renewal Information</a>';
-        $passwordLinkURL = Controller::buildLink(
+        $renewalLink             = '<a href="' . $renewalLinkURL . '" target="_blank" title="Renewals">Renewal Information</a>';
+        $passwordLinkURL         = Controller::buildLink(
             'Password.php',
             array(
                 'action'     => 'list',
                 'customerID' => $this->getCustomerID()
             )
         );
-        $passwordLink = '<a href="' . $passwordLinkURL . '" target="_blank" title="Passwords">Service Passwords</a>';
-        $thirdPartyLinkURL = Controller::buildLink(
+        $passwordLink            = '<a href="' . $passwordLinkURL . '" target="_blank" title="Passwords">Service Passwords</a>';
+        $thirdPartyLinkURL       = Controller::buildLink(
             'ThirdPartyContact.php',
             [
                 'action'     => 'list',
                 'customerID' => $this->getCustomerID()
             ]
         );
-        $thirdPartyLink = '<a href="' . $thirdPartyLinkURL . '" target="_blank" title="Third Party Contacts">Third Party Contacts</a>';
+        $thirdPartyLink          = '<a href="' . $thirdPartyLinkURL . '" target="_blank" title="Third Party Contacts">Third Party Contacts</a>';
         $showInactiveContactsURL = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
@@ -1948,14 +1950,14 @@ class CTCustomer extends CTCNC
                 'showInactiveSites' => '1'
             )
         );
-        $urlContactPopup = Controller::buildLink(
+        $urlContactPopup         = Controller::buildLink(
             CTCNC_PAGE_CONTACT,
             array(
 //          'action' => CTCNC_ACT_CONTACT_EDIT,
 'htmlFmt' => CT_HTML_FMT_POPUP
             )
         );
-        $mainContacts = [];
+        $mainContacts            = [];
         if ($this->dsCustomer->getValue(DBECustomer::customerID)) {
             $mainContacts = $this->buCustomer->getMainSupportContacts(
                 $this->dsCustomer->getValue(DBECustomer::customerID)
@@ -2579,18 +2581,17 @@ class CTCustomer extends CTCNC
                     'othersFixedEmailFlagChecked'          => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::othersFixedEmailFlag)
                     ),
-
-                    'hrUserFlagChecked'                    => $this->getChecked(
+                    'hrUserFlagChecked' => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::hrUser)
                     ),
-                    'topUpValidation'                      => $this->buCustomer->hasPrepayContract(
+                    'topUpValidation'   => $this->buCustomer->hasPrepayContract(
                         DBEContact::customerID
                     ) ? 'data-validation="atLeastOne"' : null,
-                    'dearJohnURL'                          => $dearJohnURL,
-                    'dmLetterURL'                          => $dmLetterURL,
-                    'deleteContactLink'                    => $deleteContactLink,
-                    'linkedInURL'                          => $this->dsContact->getValue(DBEContact::linkedInURL),
-                    'linkedInColor'                        => $this->dsContact->getValue(
+                    'dearJohnURL'       => $dearJohnURL,
+                    'dmLetterURL'       => $dmLetterURL,
+                    'deleteContactLink' => $deleteContactLink,
+                    'linkedInURL'       => $this->dsContact->getValue(DBEContact::linkedInURL),
+                    'linkedInColor'     => $this->dsContact->getValue(
                         DBEContact::linkedInURL
                     ) ? 'green' : 'red'
                 )
@@ -2674,7 +2675,7 @@ class CTCustomer extends CTCNC
             while ($dbeJOrdhead->fetchNext()) {
 
                 $ordheadID = $dbeJOrdhead->getPKValue();
-                $orderURL = Controller::buildLink(
+                $orderURL  = Controller::buildLink(
                     'SalesOrder.php',
                     array(
                         'action'    => CTCNC_ACT_DISP_SALESORDER,

@@ -3,7 +3,7 @@ import React from 'react';
 import Select from "./Select";
 import EncryptedTextInput from "./EncryptedTextInput";
 import {connect} from "react-redux";
-import {getMainContacts} from "./selectors";
+import {getMainContacts, getAllContacts} from "./selectors";
 import {updateCustomerField} from "./actions";
 
 class CustomerEditMain extends React.PureComponent {
@@ -44,7 +44,8 @@ class CustomerEditMain extends React.PureComponent {
             customerTypes,
             sectors,
             accountManagers,
-            mainContacts
+            mainContacts,
+            allContacts
         } = this.props;
 
 
@@ -54,11 +55,6 @@ class CustomerEditMain extends React.PureComponent {
 
         const {customerId} = customer;
         return (
-            // <React.Profiler id="customerMainComponent" onRender={(data) => {
-            //     console.log(data);
-            // }}>
-
-
             <div className="mt-3">
                 <div className="row">
                     <div className="col-md-6 mb-3">
@@ -111,7 +107,7 @@ class CustomerEditMain extends React.PureComponent {
                                             />
                                         </div>
                                     </div>
-                                    <div className="col-lg-6">
+                                    <div className="col-lg-4">
                                         <label htmlFor="">Primary Main Contact</label>
                                         <div className="form-group">
                                             <Select
@@ -123,6 +119,21 @@ class CustomerEditMain extends React.PureComponent {
                                                 onChange={($value) => this.updateCustomerField('primaryMainContactID', $value)}
                                                 className='form-control input-sm'
                                                 name="primaryMainContactID"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="col-lg-4">
+                                        <label htmlFor="">Statement Contact</label>
+                                        <div className="form-group">
+                                            <Select
+                                                options={allContacts.map(x => ({
+                                                    value: x.id,
+                                                    label: `${x.firstName} ${x.lastName}`
+                                                }))}
+                                                selectedOption={customer.statementContactId || ''}
+                                                onChange={($value) => this.updateCustomerField('statementContactId', $value)}
+                                                className='form-control input-sm'
+                                                name="statementContactId"
                                             />
                                         </div>
                                     </div>
@@ -631,7 +642,8 @@ function mapStateToProps(state) {
         sectors: customerEdit.sectors,
         accountManagers: customerEdit.accountManagers,
         reviewEngineers: customerEdit.reviewEngineers,
-        mainContacts: getMainContacts(state)
+        mainContacts: getMainContacts(state),
+        allContacts : getAllContacts(state)
     }
 }
 

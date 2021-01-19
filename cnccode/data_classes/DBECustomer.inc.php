@@ -8,76 +8,76 @@ require_once($cfg["path_dbe"] . "/DBCNCEntity.inc.php");
 
 class DBECustomer extends DBCNCEntity
 {
-    const customerID = "customerID";
-    const name = "name";
-    const regNo = "regNo";
-    const invoiceSiteNo = "invoiceSiteNo";
-    const deliverSiteNo = "deliverSiteNo";
-    const mailshotFlag = "mailshotFlag";
-    const createDate = "createDate";
-    const referredFlag = "referredFlag";
-    const pcxFlag = "pcxFlag";
-    const customerTypeID = "customerTypeID";
-    const gscTopUpAmount = "gscTopUpAmount";
-    const modifyDate = "modifyDate";
-    const modifyUserID = "modifyUserID";
-    const noOfPCs = "noOfPCs";
-    const noOfServers = "noOfServers";
-    const noOfSites = "noOfSites";
-    const comments = "comments";
-    const reviewDate = "reviewDate";
-    const reviewTime = "reviewTime";
-    const reviewAction = "reviewAction";
-    const reviewUserID = "reviewUserID";
-    const sectorID = "sectorID";
-    const becameCustomerDate = "becameCustomerDate";
-    const droppedCustomerDate = "droppedCustomerDate";
-    const leadStatusId = "leadStatusId";
-    const techNotes = "techNotes";
-    const specialAttentionFlag = "specialAttentionFlag";
-    const specialAttentionEndDate = "specialAttentionEndDate";
-    const support24HourFlag = "support24HourFlag";
-    const slaP1 = "slaP1";
-    const slaP2 = "slaP2";
-    const slaP3 = "slaP3";
-    const slaP4 = "slaP4";
-    const slaP5 = "slaP5";
-    const sendContractEmail = "sendContractEmail";
-    const sendTandcEmail = "sendTandcEmail";
-    const lastReviewMeetingDate = "lastReviewMeetingDate";
+    const customerID                   = "customerID";
+    const name                         = "name";
+    const regNo                        = "regNo";
+    const invoiceSiteNo                = "invoiceSiteNo";
+    const deliverSiteNo                = "deliverSiteNo";
+    const mailshotFlag                 = "mailshotFlag";
+    const createDate                   = "createDate";
+    const referredFlag                 = "referredFlag";
+    const pcxFlag                      = "pcxFlag";
+    const customerTypeID               = "customerTypeID";
+    const gscTopUpAmount               = "gscTopUpAmount";
+    const modifyDate                   = "modifyDate";
+    const modifyUserID                 = "modifyUserID";
+    const noOfPCs                      = "noOfPCs";
+    const noOfServers                  = "noOfServers";
+    const noOfSites                    = "noOfSites";
+    const comments                     = "comments";
+    const reviewDate                   = "reviewDate";
+    const reviewTime                   = "reviewTime";
+    const reviewAction                 = "reviewAction";
+    const reviewUserID                 = "reviewUserID";
+    const sectorID                     = "sectorID";
+    const becameCustomerDate           = "becameCustomerDate";
+    const droppedCustomerDate          = "droppedCustomerDate";
+    const leadStatusId                 = "leadStatusId";
+    const techNotes                    = "techNotes";
+    const specialAttentionFlag         = "specialAttentionFlag";
+    const specialAttentionEndDate      = "specialAttentionEndDate";
+    const support24HourFlag            = "support24HourFlag";
+    const slaP1                        = "slaP1";
+    const slaP2                        = "slaP2";
+    const slaP3                        = "slaP3";
+    const slaP4                        = "slaP4";
+    const slaP5                        = "slaP5";
+    const sendContractEmail            = "sendContractEmail";
+    const sendTandcEmail               = "sendTandcEmail";
+    const lastReviewMeetingDate        = "lastReviewMeetingDate";
     const reviewMeetingFrequencyMonths = "reviewMeetingFrequencyMonths";
-    const accountManagerUserID = "accountManagerUserID";
-    const reviewMeetingEmailSentFlag = "reviewMeetingEmailSentFlag";
-    const dateMeetingConfirmed = 'dateMeetingConfirmed';
-    const meetingDateTime = 'meetingDateTime';
-    const inviteSent = 'inviteSent';
-    const reportProcessed = 'reportProcessed';
-    const reportSent = 'reportSent';
-    const crmComments = 'crmComments';
-    const companyBackground = 'companyBackground';
-    const decisionMakerBackground = 'decisionMakerBackground';
-    const opportunityDeal = 'opportunityDeal';
-    const rating = 'rating';
-    const lastContractSent = 'lastContractSent';
-    const primaryMainContactID = 'primaryMainContactID';
-    const sortCode = 'sortCode';
-    const accountName = 'accountName';
-    const accountNumber = 'accountNumber';
-    const activeDirectoryName = "activeDirectoryName";
-    const reviewMeetingBooked = 'reviewMeetingBooked';
-    const licensedOffice365Users = 'licensedOffice365Users';
-    const websiteURL = "websiteURL";
-    const slaFixHoursP1 = "slaFixHoursP1";
-    const slaFixHoursP2 = "slaFixHoursP2";
-    const slaFixHoursP3 = "slaFixHoursP3";
-    const slaFixHoursP4 = "slaFixHoursP4";
-    const slaP1PenaltiesAgreed = "slaP1PenaltiesAgreed";
-    const slaP2PenaltiesAgreed = "slaP2PenaltiesAgreed";
-    const slaP3PenaltiesAgreed = "slaP3PenaltiesAgreed";
-    const streamOneEmail = "streamOneEmail";
-    const lastUpdatedDateTime = "lastUpdatedDateTime";
-    const inclusiveOOHCallOuts = "inclusiveOOHCallOuts";
-
+    const accountManagerUserID         = "accountManagerUserID";
+    const reviewMeetingEmailSentFlag   = "reviewMeetingEmailSentFlag";
+    const dateMeetingConfirmed         = 'dateMeetingConfirmed';
+    const meetingDateTime              = 'meetingDateTime';
+    const inviteSent                   = 'inviteSent';
+    const reportProcessed              = 'reportProcessed';
+    const reportSent                   = 'reportSent';
+    const crmComments                  = 'crmComments';
+    const companyBackground            = 'companyBackground';
+    const decisionMakerBackground      = 'decisionMakerBackground';
+    const opportunityDeal              = 'opportunityDeal';
+    const rating                       = 'rating';
+    const lastContractSent             = 'lastContractSent';
+    const primaryMainContactID         = 'primaryMainContactID';
+    const sortCode                     = 'sortCode';
+    const accountName                  = 'accountName';
+    const accountNumber                = 'accountNumber';
+    const activeDirectoryName          = "activeDirectoryName";
+    const reviewMeetingBooked          = 'reviewMeetingBooked';
+    const licensedOffice365Users       = 'licensedOffice365Users';
+    const websiteURL                   = "websiteURL";
+    const slaFixHoursP1                = "slaFixHoursP1";
+    const slaFixHoursP2                = "slaFixHoursP2";
+    const slaFixHoursP3                = "slaFixHoursP3";
+    const slaFixHoursP4                = "slaFixHoursP4";
+    const slaP1PenaltiesAgreed         = "slaP1PenaltiesAgreed";
+    const slaP2PenaltiesAgreed         = "slaP2PenaltiesAgreed";
+    const slaP3PenaltiesAgreed         = "slaP3PenaltiesAgreed";
+    const streamOneEmail               = "streamOneEmail";
+    const lastUpdatedDateTime          = "lastUpdatedDateTime";
+    const inclusiveOOHCallOuts         = "inclusiveOOHCallOuts";
+    const statementContactId           = "statementContactId";
 
     /**
      * calls constructor()
@@ -292,8 +292,6 @@ class DBECustomer extends DBCNCEntity
         $this->addColumn(self::slaFixHoursP2, DA_FLOAT, DA_NOT_NULL);
         $this->addColumn(self::slaFixHoursP3, DA_FLOAT, DA_NOT_NULL);
         $this->addColumn(self::slaFixHoursP4, DA_FLOAT, DA_NOT_NULL);
-
-
         $this->addColumn(
             self::sendContractEmail,
             DA_STRING,
@@ -384,51 +382,43 @@ class DBECustomer extends DBCNCEntity
             DA_ALLOW_NULL,
             "opportunity_deal"
         );
-
         $this->addColumn(
             self::rating,
             DA_INTEGER,
             DA_ALLOW_NULL,
             "rating"
         );
-
         $this->addColumn(
             self::lastContractSent,
             DA_TEXT,
             DA_ALLOW_NULL,
             "lastContractSent"
         );
-
         $this->addColumn(
             self::primaryMainContactID,
             DA_ID,
             DA_ALLOW_NULL
         );
-
         $this->addColumn(
             self::sortCode,
             DA_STRING,
             DA_ALLOW_NULL
         );
-
         $this->addColumn(
             self::accountName,
             DA_TEXT,
             DA_ALLOW_NULL
         );
-
         $this->addColumn(
             self::accountNumber,
             DA_TEXT,
             DA_ALLOW_NULL
         );
-
         $this->addColumn(
             self::activeDirectoryName,
             DA_STRING,
             DA_NOT_NULL
         );
-
         $this->addColumn(
             self::reviewMeetingBooked,
             DA_BOOLEAN,
@@ -436,7 +426,6 @@ class DBECustomer extends DBCNCEntity
             null,
             0
         );
-
         $this->addColumn(
             self::licensedOffice365Users,
             DA_INTEGER,
@@ -449,7 +438,6 @@ class DBECustomer extends DBCNCEntity
             DA_TEXT,
             DA_ALLOW_NULL
         );
-
         $this->addColumn(
             self::slaP1PenaltiesAgreed,
             DA_BOOLEAN,
@@ -457,7 +445,6 @@ class DBECustomer extends DBCNCEntity
             null,
             false
         );
-
         $this->addColumn(
             self::slaP2PenaltiesAgreed,
             DA_BOOLEAN,
@@ -490,8 +477,11 @@ class DBECustomer extends DBCNCEntity
             null,
             0
         );
-
-
+        $this->addColumn(
+            self::statementContactId,
+            DA_INTEGER,
+            DA_ALLOW_NULL
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -515,15 +505,14 @@ class DBECustomer extends DBCNCEntity
      * @param $droppedCustomerToDate
      * @return bool Success
      */
-    function getRowsByNameMatch(
-        $contact = null,
-        $phoneNo = null,
-        $name = null,
-        $address = null,
-        $newCustomerFromDate = null,
-        $newCustomerToDate = null,
-        $droppedCustomerFromDate = null,
-        $droppedCustomerToDate = null
+    function getRowsByNameMatch($contact = null,
+                                $phoneNo = null,
+                                $name = null,
+                                $address = null,
+                                $newCustomerFromDate = null,
+                                $newCustomerToDate = null,
+                                $droppedCustomerFromDate = null,
+                                $droppedCustomerToDate = null
     )
     {
 
@@ -531,115 +520,94 @@ class DBECustomer extends DBCNCEntity
 //        if (!$contact && !$phoneNo && !$address && !$newCustomerFromDate && !$newCustomerToDate && !$droppedCustomerFromDate && !$droppedCustomerToDate) {
 //            $this->raiseError('Either contact, phone, customer name, address or dates must be set');
 //        }
-        $queryString =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName();
-
+        $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName();
         if ($address || $phoneNo) {
-            $queryString .=
-                " INNER JOIN address ON cus_custno = add_custno";
+            $queryString .= " INNER JOIN address ON cus_custno = add_custno";
         }
-
         if ($contact or $phoneNo) {
-            $queryString .=
-                " INNER JOIN contact ON cus_custno = con_custno";
+            $queryString .= " INNER JOIN contact ON cus_custno = con_custno";
         }
-
         $queryString .= " WHERE 1=1";
-
         if ($address) {
-            $queryString .=
-                " AND (add_town LIKE '%" . mysqli_real_escape_string(
+            $queryString .= " AND (add_town LIKE '%" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $address
-                ) . "%'" .
-                " OR add_add1 LIKE '%" . mysqli_real_escape_string(
+                ) . "%'" . " OR add_add1 LIKE '%" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $address
-                ) . "%'" .
-                " OR add_add2 LIKE '%" . mysqli_real_escape_string(
+                ) . "%'" . " OR add_add2 LIKE '%" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $address
-                ) . "%'" .
-                " OR add_add3 LIKE '%" . mysqli_real_escape_string(
+                ) . "%'" . " OR add_add3 LIKE '%" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $address
-                ) . "%'" .
-                " OR add_postcode LIKE '" . mysqli_real_escape_string(
+                ) . "%'" . " OR add_postcode LIKE '" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $address
-                ) . "%'" .
-                " OR add_county LIKE '%" . mysqli_real_escape_string(
+                ) . "%'" . " OR add_county LIKE '%" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $address
                 ) . "%')";
         }
-
         if ($contact) {
-            $queryString .=
-                " AND (con_first_name LIKE '%" . mysqli_real_escape_string(
+            $queryString .= " AND (con_first_name LIKE '%" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $contact
-                ) . "%'" .
-                " OR con_last_name LIKE '%" . mysqli_real_escape_string(
+                ) . "%'" . " OR con_last_name LIKE '%" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $contact
                 ) . "%')";
         }
-
         if ($phoneNo) {
-            $queryString .=
-                " AND (con_phone LIKE '%" . mysqli_real_escape_string(
+            $queryString .= " AND (con_phone LIKE '%" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $phoneNo
-                ) . "%'" .
-                " OR con_mobile_phone LIKE '%" . mysqli_real_escape_string(
+                ) . "%'" . " OR con_mobile_phone LIKE '%" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $phoneNo
-                ) . "%'" .
-                " OR add_phone LIKE '%" . mysqli_real_escape_string(
+                ) . "%'" . " OR add_phone LIKE '%" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $phoneNo
                 ) . "%')";
         }
-
         if ($newCustomerFromDate) {
-            $queryString .=
-                " AND " . $this->getDBColumnName(self::becameCustomerDate) . ">='" . mysqli_real_escape_string(
+            $queryString .= " AND " . $this->getDBColumnName(
+                    self::becameCustomerDate
+                ) . ">='" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $newCustomerFromDate
                 ) . "'";
         }
         if ($newCustomerToDate) {
-            $queryString .=
-                " AND " . $this->getDBColumnName(self::becameCustomerDate) . "<='" . mysqli_real_escape_string(
+            $queryString .= " AND " . $this->getDBColumnName(
+                    self::becameCustomerDate
+                ) . "<='" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $newCustomerToDate
                 ) . "'";
         }
-
         if ($droppedCustomerFromDate) {
-            $queryString .=
-                " AND " . $this->getDBColumnName(self::droppedCustomerDate) . ">='" . mysqli_real_escape_string(
+            $queryString .= " AND " . $this->getDBColumnName(
+                    self::droppedCustomerDate
+                ) . ">='" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $droppedCustomerFromDate
                 ) . "'";
         }
         if ($droppedCustomerToDate) {
-            $queryString .=
-                " AND " . $this->getDBColumnName(self::droppedCustomerDate) . "<='" . mysqli_real_escape_string(
+            $queryString .= " AND " . $this->getDBColumnName(
+                    self::droppedCustomerDate
+                ) . "<='" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $droppedCustomerToDate
                 ) . "'";
         }
-
         if ($name) {
             $queryString .= " AND " . $this->getDBColumnName(self::name) . " LIKE '%" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $name
                 ) . "%'";
         }
-
         $queryString .= " GROUP BY " . $this->getDBColumnName(self::customerID) . " ORDER BY " . $this->getDBColumnName(
                 self::name
             );
@@ -657,16 +625,10 @@ class DBECustomer extends DBCNCEntity
     function getReviewProspectRow()
     {
         $this->setMethodName("getReviewProspectRow");
-
-        $queryString =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " where cus_mailshot = 'Y'
+        $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " where cus_mailshot = 'Y'
 				AND reviewDate IS NULL
 				AND ( select count(*) from invhead where inh_custno = cus_custno and inh_date_printed > DATE_SUB(CURDATE() ,INTERVAL 6 MONTH ) ) = 0";
-
         $queryString .= ' LIMIT 0,1';
-
         $this->setQueryString($queryString);
         $ret = (parent::getRows());
         return $ret;
@@ -679,11 +641,8 @@ class DBECustomer extends DBCNCEntity
             return $this;
         }
         $this->setMethodName("getCustomerByName");
-        $name = mysqli_real_escape_string($this->db->link_id(), $name);
-        $queryString =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " where 
+        $name        = mysqli_real_escape_string($this->db->link_id(), $name);
+        $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " where 
 				cus_name = '{$name}'
 				and {$this->getDBColumnName(DBECustomer::referredFlag)} <> 'Y' 
 				and {$this->getDBColumnName(DBECustomer::becameCustomerDate)} is not null and {$this->getDBColumnName(DBECustomer::droppedCustomerDate)} is null
@@ -704,15 +663,10 @@ class DBECustomer extends DBCNCEntity
     function countReviewRows()
     {
         $this->setMethodName("countReviewRows");
-        $queryString =
-            "SELECT COUNT(*)
+        $queryString = "SELECT COUNT(*)
 			 FROM " . $this->getTableName();
-
-        $queryString .=
-            ' where cus_mailshot = "Y"';
-
-        $queryString .=
-            '
+        $queryString .= ' where cus_mailshot = "Y"';
+        $queryString .= '
 			and ((
 				reviewDate IS NULL
 				and ( select count(*) from invhead where inh_custno = cus_custno and inh_date_printed > DATE_SUB(CURDATE() ,INTERVAL 6 MONTH ) ) = 0
@@ -722,13 +676,10 @@ class DBECustomer extends DBCNCEntity
 				reviewDate IS NOT NULL
 				and reviewDate <= CURDATE()
 			))';
-
         $this->setQueryString($queryString);
-
         $this->runQuery();
         $this->fetchNext();
         $this->resetQueryString();
-
         return $this->getDBColumnValue(0);
     }
 
@@ -741,13 +692,8 @@ class DBECustomer extends DBCNCEntity
     function get24HourSupportCustomers()
     {
         $this->setMethodName("get24HourSupportCustomers");
-
-        $queryString =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " where cus_support_24_hour_flag = 'Y'
+        $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " where cus_support_24_hour_flag = 'Y'
       ORDER BY cus_name";
-
         $this->setQueryString($queryString);
         $ret = (parent::getRows());
         return $ret;
@@ -762,14 +708,9 @@ class DBECustomer extends DBCNCEntity
     function getSpecialAttentionCustomers()
     {
         $this->setMethodName("getSpecialAttentionCustomers");
-
-        $queryString =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " where cus_special_attention_flag = 'Y'
+        $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " where cus_special_attention_flag = 'Y'
        AND cus_special_attention_end_date > NOW()
       ORDER BY cus_name";
-
         $this->setQueryString($queryString);
         $ret = (parent::getRows());
         return $ret;
@@ -785,9 +726,7 @@ class DBECustomer extends DBCNCEntity
     function getActiveCustomers($ignoreProspects = false)
     {
         $this->setMethodName("getSpecialAttentionCustomers");
-        $queryString =
-            "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} where {$this->getDBColumnName(DBECustomer::referredFlag)} <> 'Y'";
-
+        $queryString = "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} where {$this->getDBColumnName(DBECustomer::referredFlag)} <> 'Y'";
         if ($ignoreProspects) {
             $queryString .= " and {$this->getDBColumnName(DBECustomer::becameCustomerDate)} is not null and {$this->getDBColumnName(DBECustomer::droppedCustomerDate)} is null ";
         }
@@ -801,13 +740,8 @@ class DBECustomer extends DBCNCEntity
     )
     {
         $this->setMethodName("getReviewList");
-        $queryString =
-
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            "	WHERE			
+        $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . "	WHERE			
 				reviewDate IS NOT NULL and reviewDate <= CURDATE()";
-
         if ($userID) {
             $queryString .= "
 				AND reviewUserID = " . $userID;
@@ -820,7 +754,6 @@ class DBECustomer extends DBCNCEntity
 				order by
 					reviewDate, reviewTime";
         }
-
         $this->setQueryString($queryString);
         $ret = (parent::getRows());
         return $ret;
@@ -829,11 +762,8 @@ class DBECustomer extends DBCNCEntity
     function getRenewalRequests()
     {
         $this->setMethodName("getRenewalRequests");
-        $queryString =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName(self::sendContractEmail) . " <> ''";
-
+        $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " WHERE " . $this->getDBColumnName(self::sendContractEmail) . " <> ''";
         $this->setQueryString($queryString);
         $ret = (parent::getRows());
         return $ret;
@@ -843,12 +773,8 @@ class DBECustomer extends DBCNCEntity
     {
 
         $this->setMethodName("getTandcRequests");
-        $queryString =
-
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName(self::sendTandcEmail) . " <> ''";
-
+        $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " WHERE " . $this->getDBColumnName(self::sendTandcEmail) . " <> ''";
         $this->setQueryString($queryString);
         $ret = (self::getRows());
         return $ret;
@@ -857,12 +783,10 @@ class DBECustomer extends DBCNCEntity
     function getReviewMeetingCustomers()
     {
         $this->setMethodName('getReviewMeetingCustomers');
-        $queryString =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName(self::lastReviewMeetingDate) . ' is not null and ' .
-            $this->getDBColumnName(self::referredFlag) . ' = "N" ';
-
+        $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " WHERE " . $this->getDBColumnName(
+                self::lastReviewMeetingDate
+            ) . ' is not null and ' . $this->getDBColumnName(self::referredFlag) . ' = "N" ';
         $this->setQueryString($queryString);
         $ret = (self::getRows());
         return $ret;
@@ -880,14 +804,10 @@ class DBECustomer extends DBCNCEntity
         if (!$email) {
             throw new Exception('Email is mandatory');
         }
-
         $escapedEmail = mysqli_real_escape_string($this->db->link_id(), trim($email));
-        $queryString =
-            "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} WHERE {$this->getDBColumnName(self::streamOneEmail)} like '%{$escapedEmail}%' ";
-
+        $queryString  = "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} WHERE {$this->getDBColumnName(self::streamOneEmail)} like '%{$escapedEmail}%' ";
         $this->setQueryString($queryString);
         self::getRows();
-
         if (!self::rowCount()) {
             return null;
         }
@@ -898,9 +818,7 @@ class DBECustomer extends DBCNCEntity
     public function getBreachedSpecialAttentionCustomers()
     {
         $this->setMethodName('getBreachedSpecialAttentionCustomers');
-        $queryString =
-            "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} WHERE {$this->getDBColumnName(self::specialAttentionFlag)} = 'Y' and {$this->getDBColumnName(self::specialAttentionEndDate)}  <= current_date() ";
-
+        $queryString = "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} WHERE {$this->getDBColumnName(self::specialAttentionFlag)} = 'Y' and {$this->getDBColumnName(self::specialAttentionEndDate)}  <= current_date() ";
         $this->setQueryString($queryString);
         $ret = (self::getRows());
         return $ret;

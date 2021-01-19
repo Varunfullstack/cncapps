@@ -20,7 +20,7 @@ class ContactsComponent extends React.PureComponent {
     renderContacts() {
         const {contacts} = this.props;
         return contacts.map(contact => (
-            <ContactComponent key={contact.contactID}
+            <ContactComponent key={contact.id}
                               contact={contact}
                               onChange={this.onContactChanged}
             />
@@ -30,9 +30,7 @@ class ContactsComponent extends React.PureComponent {
     render() {
         return (
             <div className="mt-3">
-                <div className="row"
-                     key="firstRow"
-                >
+                <div className="row">
                     <div className="col-md-12">
                         <h2>Contacts</h2>
                     </div>
@@ -40,7 +38,27 @@ class ContactsComponent extends React.PureComponent {
                         <button className="btn btn-sm btn-new mt-3 mb-3">Add Contact</button>
                     </div>
                 </div>
-                {this.renderContacts()}
+                <div className="row">
+                    <div className="col-md-12">
+                        <table className="table table-hover">
+                            <thead key="head">
+                            <tr>
+                                <th>Full Name</th>
+                                <th>Position</th>
+                                <th>Phone</th>
+                                <th>Mobile</th>
+                                <th>Email</th>
+                                <th>Support Level</th>
+                                <th>Inv</th>
+                                <th>HR</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {this.renderContacts()}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         )
     }
