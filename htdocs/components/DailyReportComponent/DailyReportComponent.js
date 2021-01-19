@@ -136,7 +136,7 @@ class DailyReportComponent extends MainComponent {
                             <Toggle checked={filter.p}
                                     onChange={() => this.setFilterValue("p", !filter.p)}
                             />   
-                            <label className="mr-3 ml-5">Days Ago</label>
+                            <label className="mr-3 ml-5">Open for at least {filter.daysAgo} days</label>
                             <select value={filter.daysAgo}   onChange={() => this.setFilterValue("daysAgo", event.target.value)}>
                                 <option value={0} >0 </option>
                                 <option value={1} >1 </option>
@@ -192,11 +192,12 @@ class DailyReportComponent extends MainComponent {
     }
     render() {
         const {el} = this;
+        const {filter}=this.state;
         return el("div", null,
             el(Spinner, {key: "spinner", show: this.state.showSpinner}),
             this.getAlert(),            
-            this.getFilterElement(),
-            this.getTabsElement(),          
+            this.getTabsElement(),  
+            filter.activeTab==1?this.getFilterElement():null,
             this.getActiveTab()  
         );
     }

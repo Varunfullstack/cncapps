@@ -126,7 +126,7 @@ class DetailsComponent extends MainComponent {
                 label: "",
                 hdToolTip: "Status",
                 hdClassName: "text-center",
-                icon: "fal fa-2x fa-envelope-open color-gray2 pointer",
+                icon: "fal fa-2x fa-monitor-heart-rate color-gray2 pointer",
                 sortable: true,
                 classNameColumn:"rowClass",
                 //className: "text-center",
@@ -136,7 +136,8 @@ class DetailsComponent extends MainComponent {
         data={data || []}
         columns={columns}
         pk= "serviceRequestID"
-        search={true}>
+        search={true}
+        striped={false}>
         </Table>;
     }
      

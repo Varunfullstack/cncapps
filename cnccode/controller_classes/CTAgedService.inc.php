@@ -119,7 +119,7 @@ class CTAgedService extends CTCNC
                 'description'         => substr(
                     Utils::stripEverything($row[3]),
                     0,
-                    50
+                    300
                 ),
                 'durationHours'       => $row[4],
                 'timeSpentHours'      => $row[5],

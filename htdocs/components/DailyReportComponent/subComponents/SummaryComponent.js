@@ -8,7 +8,7 @@ class SummaryComponent extends MainComponent {
     constructor(props) {
         super(props);
         this.state = {         
-            selectedYear:null,
+            selectedYear:moment().year(),
             yearData:[], 
             years:[]           
         };
@@ -20,7 +20,7 @@ class SummaryComponent extends MainComponent {
     componentDidMount=async()=> {        
         const years=await this.api.getYears();
         this.setState({years});
-        this.getYearData(years[0].YEAR);
+        this.getYearData(moment().year());
         console.log('years',years);
     }
 
@@ -59,14 +59,21 @@ class SummaryComponent extends MainComponent {
            <tbody>
                <tr>
                    <td>Average Number of 7 Dayers	</td>
-                   {yearData.map((y,i)=><td key={i}>{y.olderThan7DaysAvg.toFixed(1)}</td>)}
+                   {yearData.map((y,i)=><td key={i} style={{color:this.getColor(y.olderThan7DaysAvg,y.targetAvg)}}>{y.olderThan7DaysAvg.toFixed(1)}</td>)}
                </tr>
                <tr>
                    <td>Target		</td>
-                   {yearData.map((y,i)=><td key={i}>{y.targetAvg}</td>)}
+                   {yearData.map((y,i)=><td key={i} style={{color:this.getColor(y.olderThan7DaysAvg,y.targetAvg)}}>{y.targetAvg}</td>)}
                </tr>
            </tbody>
        </table>
+   }
+   getColor(avg,target){
+    if(avg>target)
+    return 'red';
+    if(avg<target)
+    return 'green';
+    
    }
     render() {        
         return <div>
