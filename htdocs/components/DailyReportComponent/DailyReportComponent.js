@@ -136,7 +136,7 @@ class DailyReportComponent extends MainComponent {
                             <Toggle checked={filter.p}
                                     onChange={() => this.setFilterValue("p", !filter.p)}
                             />   
-                            <label className="mr-3 ml-5">Open for at least {filter.daysAgo} days</label>
+                            <label className="mr-3 ml-5">Open for at least X days</label>
                             <select value={filter.daysAgo}   onChange={() => this.setFilterValue("daysAgo", event.target.value)}>
                                 <option value={0} >0 </option>
                                 <option value={1} >1 </option>
