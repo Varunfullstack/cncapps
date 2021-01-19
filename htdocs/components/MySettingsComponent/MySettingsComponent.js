@@ -114,8 +114,8 @@ class MySettingsComponent extends MainComponent {
         }
         console.log(body);
         this.api.saveMySettings(body).then(result=>{
-            if(result.status)
-                this.alert('Setting saved successfully');
+            // if(result.status)
+            //     this.alert('Setting saved successfully');
         })
         // fetch('?action=sendEmailAssignedService&&sendEmailAssignedService=' + (this.state.sendEmailAssignedService ? 1 : 0), {method: 'POST'}).then(response => {
         //     this.alert('Setting saved successfully');
