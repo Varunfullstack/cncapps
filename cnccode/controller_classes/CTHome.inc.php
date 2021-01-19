@@ -120,10 +120,7 @@ class CTHome extends CTCNC
                 break;
             case self::GET_ALL_USER_PERFORMANCE:
                 echo json_encode($this->getAllUsersPerformance());
-                break;
-            case 'react':
-                $this->displayReact();
-                break;           
+                break;                       
             case 'charts' :
                 $this->displayChartsWithoutMenu();
                 break;
@@ -137,7 +134,7 @@ class CTHome extends CTCNC
                 echo json_encode($this->setDefaultLayout());
                 break;
             default:
-                $this->display();
+                $this->displayReact();
                 break;
         }
     }
@@ -303,60 +300,6 @@ class CTHome extends CTCNC
         $db->next_record(MYSQLI_ASSOC);
         return $db->Record['upcomingVisitsData'];
     }
-
-    /**
-     * @throws Exception
-     */
-    function display()
-    {
-        /**
-         * if user is only in the technical group then display the current activity dash-board
-         */
-        if ($this->hasPermissions(TECHNICAL_PERMISSION) && !$this->hasPermissions(
-                SUPERVISOR_PERMISSION
-            ) && !$this->hasPermissions(MAINTENANCE_PERMISSION) && !$this->hasPermissions(ACCOUNTS_PERMISSION)) {
-
-            $urlNext = Controller::buildLink(
-                'CurrentActivityReport.php',
-                array()
-            );
-            header('Location: ' . $urlNext);
-            exit;
-
-        }
-        /*
-        Otherwise display other sections based upon group membership
-        */
-        $this->displayUpcomingVisits();
-        if ($this->hasPermissions(ACCOUNTS_PERMISSION)) {
-            $this->displaySalesFigures();
-        }
-        $this->setTemplateFiles(
-            'dashboardTest',
-            'DashboardStats'
-        );
-        $firstTimeFixFigures = $this->displayFirstTimeFixFigures();
-        $fixedReopen         = $this->displayFixedAndReopen();
-        $this->template->set_var(
-            [
-                "thing1" => $fixedReopen,
-                "thing2" => $firstTimeFixFigures
-            ]
-        );
-        $this->template->parse(
-            'CONTENTS',
-            'dashboardTest',
-            true
-        );
-        $this->displayTeamPerformanceReport();
-        if ($this->buUser->isSdManager($this->userID)) {
-            $this->displayAllUsersPerformanceReport();
-        } else {
-            $this->displayUserPerformanceReport();
-        }
-        $this->displayCharts();
-        $this->parsePage();
-    } // end display projects
 
     /**
      * @throws Exception

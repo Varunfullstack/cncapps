@@ -70,12 +70,18 @@
         });
 
         var teamSelector = $('#teamSelector');
+        var container = $('#teamIndividualCharts');
 
 
         teamSelector.val(defaultTeam);
         if (isManager) {
             teamSelector.show();
+            //container.css('margin-top','-10px');
+            //teamSelector.css('margin-top','-15px');
+
         }
+        //else 
+        //container.css('margin-top','-25px');
 
 
         $('body').on('click', '.details', function () {
@@ -228,8 +234,6 @@
     <option value="3">Small Projects Team</option>
     <option value="5">Projects Team</option>
 </select>
-<br>
-<br>
 <div id="teamIndividualCharts"
      class="container"
 >

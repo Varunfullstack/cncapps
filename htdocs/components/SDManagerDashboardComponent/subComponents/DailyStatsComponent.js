@@ -47,22 +47,42 @@ class DailyStatsComponent extends MainComponent {
         const {summary} = this.state;
         if (this.loading)
             return null;
-        return el(
-            'div', {style: {display: "flex", justifyContent: "center", maxWidth: "100vw"}},
-            el(
-                "div",
-                {className: "flex-row", style: {flexWrap: "wrap", justifyContent: "center", maxWidth: "100vw"}},
-                this.getOpenSrCard(summary.prioritySummary),
-                this.getTeamSrCard(summary.openSrTeamSummary, "#00628B", "#E6E6E6"),
-                this.getDailySourceCard(summary.dailySourceSummary),
-                this.getTotalCard("Unique Customers", summary.uniqueCustomerTodaySummary.total, "#00628B", "#E6E6E6"),
-                this.getTotalCard("Near SLA", summary.nearSLASummary.total),
-                this.getTotalCard("Raised Today", summary.raisedTodaySummary.total, "#00628B", "#E6E6E6"),
-                this.getTotalCard("Today's Started", summary.raisedStartTodaySummary.total),
-                this.getTotalCard("Fixed Today", summary.fixedTodaySummary.total, "#00628B", "#E6E6E6"),
-                this.getTotalCard("Reopened Today", summary.reopenTodaySummary.total),
-                this.getTotalCard("Breached SLA", summary.breachedSLATodaySummary.total, "#00628B", "#E6E6E6"),
-            ));
+            return <table>
+                <tbody>
+                    <tr>
+                        <td>{this.getOpenSrCard(summary.prioritySummary)}</td>
+                        <td>{this.getTeamSrCard(summary.openSrTeamSummary, "#00628B", "#E6E6E6")}</td>
+                        <td>{this.getDailySourceCard(summary.dailySourceSummary)}</td>
+                        <td>{this.getTotalCard("Unique Customers", summary.uniqueCustomerTodaySummary.total, "#00628B", "#E6E6E6")}</td>
+                        <td>{this.getTotalCard("Near SLA", summary.nearSLASummary.total)}</td>
+                    </tr>
+                    <tr>
+                        <td>{this.getTotalCard("Raised Today", summary.raisedTodaySummary.total, "#00628B", "#E6E6E6")}</td>
+                        <td>{this.getTotalCard("Today's Started", summary.raisedStartTodaySummary.total)}</td>
+                        <td>{this.getTotalCard("Fixed Today", summary.fixedTodaySummary.total, "#00628B", "#E6E6E6")}</td>
+                        <td>{this.getTotalCard("Reopened Today", summary.reopenTodaySummary.total)}</td>
+                        <td>{this.getTotalCard("Breached SLA", summary.breachedSLATodaySummary.total, "#00628B", "#E6E6E6")}</td>
+                    </tr>
+                </tbody>
+            </table>
+               
+
+        // return el(
+        //     'div', {style: {display: "flex", justifyContent: "center", maxWidth: "100vw"}},
+        //     el(
+        //         "div",
+        //         {className: "flex-row", style: {flexWrap: "wrap", justifyContent: "center", maxWidth: "100vw"}},
+        //         this.getOpenSrCard(summary.prioritySummary),
+        //         this.getTeamSrCard(summary.openSrTeamSummary, "#00628B", "#E6E6E6"),
+        //         this.getDailySourceCard(summary.dailySourceSummary),
+        //         this.getTotalCard("Unique Customers", summary.uniqueCustomerTodaySummary.total, "#00628B", "#E6E6E6"),
+        //         this.getTotalCard("Near SLA", summary.nearSLASummary.total),
+        //         this.getTotalCard("Raised Today", summary.raisedTodaySummary.total, "#00628B", "#E6E6E6"),
+        //         this.getTotalCard("Today's Started", summary.raisedStartTodaySummary.total),
+        //         this.getTotalCard("Fixed Today", summary.fixedTodaySummary.total, "#00628B", "#E6E6E6"),
+        //         this.getTotalCard("Reopened Today", summary.reopenTodaySummary.total),
+        //         this.getTotalCard("Breached SLA", summary.breachedSLATodaySummary.total, "#00628B", "#E6E6E6"),
+        //     ));
     };
     getOpenSrCard = (data, backgroundColor = "#C6C6C6", textColor = "#3C3C3C") => {
         if (data.length > 0) {

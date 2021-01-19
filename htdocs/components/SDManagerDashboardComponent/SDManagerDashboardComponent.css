@@ -3,13 +3,13 @@
     flex-direction: column;
     /* min-width: 195px;
     min-height: 150px; */
-    width: 13vw;
-    height: 11vw;
+    width: calc((100vw - 146px)/5);
+    height: calc((100vw - 146px)/5);
     /* max-width: 195px;
     max-height: 150px; */
     justify-content: flex-start;
     padding: 10px;
-    margin: 5px;
+    /* margin: 5px; */
     background: gray;
     align-items: center;
 
@@ -17,7 +17,7 @@
 
 .sd-card td {
     font-family: Arial, Tahoma, Helvetica, sans-serif;
-    font-size: 1.4vw;
+    font-size: 1.8vw;
     padding: 0;
     padding-right: 5px;
     white-space: nowrap;
@@ -30,7 +30,7 @@
 .sd-card-title {
     margin-top: 5px;
     /* font-size: 22px; */
-    font-size: 1.4vw; 
+    font-size: 2vw; 
     font-weight: bold;
 }
 
