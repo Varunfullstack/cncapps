@@ -4,176 +4,191 @@ import * as PropTypes from "prop-types";
 export class ContactComponent extends React.Component {
 
 
-    render() {
-        const {contact} = this.props;
-        console.log(contact);
+    constructor(props, context) {
+        super(props, context);
+        this.updateContact = this.updateContact.bind(this);
+        this.state = {
+            originalContact: {...this.props.contact},
+            updatedContact: {...this.props.contact}
+        }
+    }
 
-        return <React.Fragment key={`contactComponent-${contact.id}`}>
+    updateContact($event) {
+        const updatedContact = {
+            ...this.state.updatedContact,
+            [$event.target.name]: $event.target.value,
+        }
+        this.setState({updatedContact});
+    }
+
+    render() {
+        const {sites, supportLevelOptions} = this.props;
+        const {updatedContact} = this.state;
+        return <React.Fragment>
             <tr data-toggle="collapse"
-                data-target={`#accordion{contact${contact.id}}`}
+                data-target={`#accordion{contact${updatedContact.id}}`}
                 className="clickable"
-                key={`summary-${contact.id}`}
             >
-                <td>{this.props.contact.title} {this.props.contact.firstName} {this.props.contact.lastName}</td>
-                <td>{this.props.contact.position}</td>
-                <td>{this.props.contact.phone}</td>
-                <td>{this.props.contact.mobilePhone}</td>
-                <td>{this.props.contact.email}</td>
-                <td>{this.props.contact.supportLevel}</td>
-                <td>{this.props.contact.inv}</td>
-                <td>{this.props.contact.hr}</td>
+                <td>{updatedContact.title} {updatedContact.firstName} {updatedContact.lastName}</td>
+                <td>{updatedContact.position}</td>
+                <td>{updatedContact.phone}</td>
+                <td>{updatedContact.mobilePhone}</td>
+                <td>{updatedContact.email}</td>
+                <td>{updatedContact.supportLevel}</td>
+                <td>{updatedContact.inv}</td>
+                <td>{updatedContact.hr}</td>
             </tr>
-            <tr key={`detail-${contact.id}`}>
+            <tr>
                 <td colSpan="10">
-                    <div id={`accordion{contact${contact.id}}`}
+                    <div id={`accordion{contact${updatedContact.id}}`}
                          className="collapse p-1"
                     >
-                        <div className="row" key="firstRow">
-                            {/*<div className="col-lg-4">*/}
-                            {/*    <div className="form-group">*/}
-                            {/*        <label htmlFor="site">Site <span>*</span></label>*/}
-                            {/*        <select id="site"*/}
-                            {/*                name="siteNo"*/}
-                            {/*                required*/}
-                            {/*                data-type="site"*/}
-                            {/*                className="form-control input-sm"*/}
-                            {/*        >*/}
+                        <div className="row">
+                            <div className="col-lg-4">
+                                <div className="form-group">
+                                    <label htmlFor="site">Site <span>*</span></label>
+                                    <select id="site"
+                                            name="siteNo"
+                                            required
+                                            className="form-control input-sm"
+                                            onChange={this.updateContact}
+                                            value={updatedContact.siteNo || ""}
+                                    >
 
-                            {/*            /!*<option {siteSelected}*!/*/}
-                            {/*            /!*        value="{selectSiteNo}"*!/*/}
-                            {/*            /!*>{selectSiteDesc}*!/*/}
-                            {/*            /!*</option>*!/*/}
+                                        {
+                                            sites.map(site => <option key={site}
+                                                                      value={site.siteNo}
+                                            >
+                                                {`${site.town}`}
+                                            </option>)
+                                        }
+                                    </select>
+                                </div>
 
-                            {/*        </select>*/}
-                            {/*    </div>*/}
-
-                            {/*</div>*/}
-                            {/*<div className="col-lg-4">*/}
-                            {/*    <div className="form-group">*/}
-                            {/*        <label htmlFor="">Title <span>*</span></label>*/}
-                            {/*        <input*/}
-                            {/*            name="title"*/}
-                            {/*            size="2"*/}
-                            {/*            maxLength="10"*/}
-                            {/*            value={this.props.contact.title}*/}
-                            {/*            onChange={this.props.onChange}*/}
-                            {/*            required*/}
-                            {/*            className="form-control input-sm"*/}
-                            {/*        />*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
-                            {/*<div className="col-lg-4">*/}
-                            {/*    <div className="form-group">*/}
-                            {/*        <label htmlFor="">First Name*/}
-                            {/*            <span>*</span></label>*/}
-                            {/*        <input*/}
-
-                            {/*            name="form[contact][{contactID}][firstName]"*/}
-                            {/*            size="10"*/}
-                            {/*            maxLength="50"*/}
-                            {/*            value="{firstName}"*/}
-                            {/*            required*/}
-                            {/*            data-validation="required"*/}
-                            {/*            data-type="firstName"*/}
-                            {/*            className="form-control input-sm"*/}
-                            {/*        />*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
-                            {/*<div className="col-lg-4">*/}
-                            {/*    <div className="form-group">*/}
-                            {/*        <label htmlFor="">Last Name*/}
-                            {/*            <span>*</span></label>*/}
-                            {/*        <input*/}
-
-                            {/*            name="form[contact][{contactID}][lastName]"*/}
-                            {/*            size="10"*/}
-                            {/*            maxLength="50"*/}
-                            {/*            value="{lastName}"*/}
-                            {/*            required*/}
-                            {/*            data-validation="required"*/}
-                            {/*            data-type="lastName"*/}
-                            {/*            className="form-control input-sm"*/}
-                            {/*        />*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
-                            {/*<div className="col-lg-4">*/}
-                            {/*    <div className="form-group">*/}
-                            {/*        <label htmlFor="">Email <span>*</span></label>*/}
-                            {/*        <input*/}
-
-                            {/*            type="email"*/}
-                            {/*            name="form[contact][{contactID}][email]"*/}
-                            {/*            value="{email}"*/}
-                            {/*            size="25"*/}
-                            {/*            maxLength="50"*/}
-                            {/*            data-validation="emailOrEmpty server"*/}
-                            {/*            data-validation-url="/validateUniqueEmail.php"*/}
-                            {/*            data-type="email"*/}
-                            {/*            className="form-control input-sm"*/}
-                            {/*        />*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
-                            {/*<div className="col-lg-4">*/}
-                            {/*    <div className="form-group">*/}
-                            {/*        <label htmlFor="">Phone*/}
-                            {/*            <span>*</span></label>*/}
-                            {/*        <input*/}
-
-                            {/*            name="form[contact][{contactID}][phone]"*/}
-                            {/*            value="{phone}"*/}
-                            {/*            size="10"*/}
-                            {/*            maxLength="30"*/}
-                            {/*            className="form-control input-sm"*/}
-                            {/*        />*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
-                            {/*<div className="col-lg-4">*/}
-                            {/*    <div className="form-group">*/}
-                            {/*        <label htmlFor="">Mobile <span>*</span></label>*/}
-                            {/*        <input*/}
-
-                            {/*            name="form[contact][{contactID}][mobilePhone]"*/}
-                            {/*            value="{mobilePhone}"*/}
-                            {/*            size="10"*/}
-                            {/*            maxLength="30"*/}
-                            {/*            className="form-control input-sm"*/}
-                            {/*        />*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
-                            {/*<div className="col-lg-4">*/}
-                            {/*    <div className="form-group">*/}
-                            {/*        <label htmlFor="">Position*/}
-                            {/*            <span>*</span></label>*/}
-                            {/*        <input name="form[contact][{contactID}][position]"*/}
-                            {/*               id="form[contact][{contactID}][position]"*/}
-                            {/*               value="{position}"*/}
-                            {/*               size="10"*/}
-                            {/*               maxLength="20"*/}
-
-
-                            {/*               className="form-control input-sm"*/}
-                            {/*        />*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
-                            {/*<div className="col-lg-4">*/}
-                            {/*    <div className="form-group">*/}
-                            {/*        <label htmlFor="">Support Level*/}
-                            {/*            <span>*</span></label>*/}
-                            {/*        <select name="form[contact][{contactID}][supportLevel]"*/}
-                            {/*                data-validation="atLeastOneMain"*/}
-                            {/*                data-type="mainSelector"*/}
-                            {/*                data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"*/}
-                            {/*                className="form-control input-sm"*/}
-                            {/*        >*/}
-                            {/*            /!*<option {supportLevelSelected}*!/*/}
-                            {/*            /!*        data-test="{supportLevelSelected}"*!/*/}
-                            {/*            /!*        value="{supportLevelValue}"*!/*/}
-                            {/*            /!*>*!/*/}
-                            {/*            /!*    {supportLevelDescription}*!/*/}
-                            {/*            /!*</option>*!/*/}
-                            {/*        </select>*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
+                            </div>
+                            <div className="col-lg-4">
+                                <div className="form-group">
+                                    <label htmlFor="">Title <span>*</span></label>
+                                    <input
+                                        name="title"
+                                        size="2"
+                                        maxLength="10"
+                                        value={updatedContact.title || ""}
+                                        onChange={this.updateContact}
+                                        required
+                                        className="form-control input-sm"
+                                    />
+                                </div>
+                            </div>
+                            <div className="col-lg-4">
+                                <div className="form-group">
+                                    <label htmlFor="">First Name
+                                        <span>*</span></label>
+                                    <input
+                                        name="firstName"
+                                        size="10"
+                                        maxLength="50"
+                                        value={updatedContact.firstName || ""}
+                                        onChange={this.updateContact}
+                                        required
+                                        className="form-control input-sm"
+                                    />
+                                </div>
+                            </div>
+                            <div className="col-lg-4">
+                                <div className="form-group">
+                                    <label htmlFor="">Last Name
+                                        <span>*</span></label>
+                                    <input
+                                        name="lastName"
+                                        size="10"
+                                        maxLength="50"
+                                        value={updatedContact.lastName || ""}
+                                        onChange={this.updateContact}
+                                        required
+                                        className="form-control input-sm"
+                                    />
+                                </div>
+                            </div>
+                            <div className="col-lg-4">
+                                <div className="form-group">
+                                    <label htmlFor="">Email <span>*</span></label>
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        value={updatedContact.email || ""}
+                                        onChange={this.updateContact}
+                                        size="25"
+                                        maxLength="50"
+                                        className="form-control input-sm"
+                                    />
+                                </div>
+                            </div>
+                            <div className="col-lg-4">
+                                <div className="form-group">
+                                    <label htmlFor="">Phone
+                                        <span>*</span></label>
+                                    <input
+                                        name="phone"
+                                        value={updatedContact.phone || ""}
+                                        onChange={this.updateContact}
+                                        size="10"
+                                        maxLength="30"
+                                        className="form-control input-sm"
+                                    />
+                                </div>
+                            </div>
+                            <div className="col-lg-4">
+                                <div className="form-group">
+                                    <label htmlFor="">Mobile <span>*</span></label>
+                                    <input
+                                        name="mobilePhone"
+                                        value={updatedContact.mobilePhone || ""}
+                                        onChange={this.updateContact}
+                                        size="10"
+                                        maxLength="30"
+                                        className="form-control input-sm"
+                                    />
+                                </div>
+                            </div>
+                            <div className="col-lg-4">
+                                <div className="form-group">
+                                    <label htmlFor="">Position
+                                        <span>*</span></label>
+                                    <input
+                                        name="position"
+                                        value={updatedContact.position || ""}
+                                        onChange={this.updateContact}
+                                        size="10"
+                                        maxLength="20"
+                                        required
+                                        className="form-control input-sm"
+                                    />
+                                </div>
+                            </div>
+                            <div className="col-lg-4">
+                                <div className="form-group">
+                                    <label htmlFor="">Support Level
+                                        <span>*</span></label>
+                                    <select name="supportLevel"
+                                            value={updatedContact.supportLevel}
+                                            onChange={this.updateContact}
+                                            data-validation="atLeastOneMain"
+                                            data-type="mainSelector"
+                                            data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
+                                            className="form-control input-sm"
+                                    >
+                                        {
+                                            supportLevelOptions.map(supportLevelOption =>
+                                                <option
+                                                    value={supportLevelOption.value}
+                                                >
+                                                    {supportLevelOption.description}
+                                                </option>
+                                            )}
+                                    </select>
+                                </div>
+                            </div>
                             {/*<div className="col-lg-4">*/}
                             {/*    <div className="form-group">*/}
                             {/*        <label htmlFor="">Notes<span/></label>*/}
@@ -420,7 +435,9 @@ export class ContactComponent extends React.Component {
                             {/*    </label>*/}
                             {/*</div>*/}
                         </div>
-                        <div className="row" key="secondRow">
+                        <div className="row"
+                             key="secondRow"
+                        >
                             {/*<div className="col-lg-6">*/}
                             {/*    <button className="btn btn-new btn-sm">*/}
                             {/*        Save Details*/}
@@ -447,5 +464,7 @@ export class ContactComponent extends React.Component {
 
 ContactComponent.propTypes = {
     contact: PropTypes.any,
-    onChange: PropTypes.any
+    onChange: PropTypes.any,
+    sites: PropTypes.any,
+    supportLevelOptions: PropTypes.any
 };
