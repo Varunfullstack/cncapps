@@ -28,7 +28,6 @@ class Site extends React.PureComponent {
 
     render() {
         const {site, contacts, editingSite} = this.props;
-        // console.warn(`rerendered site ${site.siteNo} `);
         return (
             <Card className="site"
                   style={{width: "100%"}}
