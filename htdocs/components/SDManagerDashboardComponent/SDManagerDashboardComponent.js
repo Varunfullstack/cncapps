@@ -205,9 +205,9 @@ class SDManagerDashboardComponent extends MainComponent {
                     <option value="20"> 20</option>
                     <option value="25"> 25</option>
                     <option value="30"> 30</option>
-                    <option value="30"> 40</option>
-                    <option value="30"> 75</option>
-                    <option value="30"> 100</option>
+                    <option value="40"> 40</option>
+                    <option value="75"> 75</option>
+                    <option value="100"> 100</option>
                 </select>
             </div>
         );
