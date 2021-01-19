@@ -1,5 +1,8 @@
 # Changelog
 This project changes will be shown here.
+## [v5.2.2] - 2021-01-13
+### Changed
+- Increase limit of SD Manager Dashboard.
 
 ## [v5.2.3] - 2021-01-18
 ### Fixed
