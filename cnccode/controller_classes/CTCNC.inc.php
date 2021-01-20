@@ -903,29 +903,34 @@ class CTCNC extends Controller
         return [
             [
                 "id"    => 601,
-                "label" => "Renewal",
-                "href"  => "RenQuotation.php?action=list&orderBy=customerName&orderDirection=asc",
+                "label" => "Renewals",
+                "href"  => "RenewalsDashboard.php",
             ],
-            [
-                "id"    => 602,
-                "label" => "Contract",
-                "href"  => "RenContract.php",
-            ],
-            [
-                "id"    => 603,
-                "label" => "Internet",
-                "href"  => "RenBroadband.php",
-            ],
-            [
-                "id"    => 604,
-                "label" => "Domain",
-                "href"  => "RenDomain.php",
-            ],
-            [
-                "id"    => 605,
-                "label" => "Hosting",
-                "href"  => "RenHosting.php",
-            ],
+            // [
+            //     "id"    => 601,
+            //     "label" => "Renewal",
+            //     "href"  => "RenQuotation.php?action=list&orderBy=customerName&orderDirection=asc",
+            // ],
+            // [
+            //     "id"    => 602,
+            //     "label" => "Contract",
+            //     "href"  => "RenContract.php",
+            // ],
+            // [
+            //     "id"    => 603,
+            //     "label" => "Internet",
+            //     "href"  => "RenBroadband.php",
+            // ],
+            // [
+            //     "id"    => 604,
+            //     "label" => "Domain",
+            //     "href"  => "RenDomain.php",
+            // ],
+            // [
+            //     "id"    => 605,
+            //     "label" => "Hosting",
+            //     "href"  => "RenHosting.php",
+            // ],
             [
                 "id"    => 606,
                 "label" => "Contract Matrix",
