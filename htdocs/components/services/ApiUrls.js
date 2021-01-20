@@ -13,4 +13,5 @@ export default class ApiUrls {
     static AgedService = "/AgedService.php?action=";
     static DailyReport = "/DailyReport.php?action=";
     static MySettings = "/MySettings.php?action=";
+    static Home = "/index.php?action="
 }

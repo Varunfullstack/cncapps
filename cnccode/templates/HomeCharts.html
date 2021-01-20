@@ -13,13 +13,19 @@
 ></script>
 <style>
     .chart {
-        width: 100%;
+        /* width: 100%; */
         min-height: 200px;
+        
     }
 
     .item {
-        width: 30%;
+        /* width: 30%; */
+        flex-basis: 500px;
         margin: 8px;
+        box-shadow: 0 2px 4px 0 rgba(0,0,0,.15);
+        border-radius: 10px;
+        padding: 0.2rem;
+        transition: .3s;
     }
 
     .container {
@@ -64,19 +70,27 @@
         });
 
         var teamSelector = $('#teamSelector');
+        var container = $('#teamIndividualCharts');
 
 
         teamSelector.val(defaultTeam);
         if (isManager) {
             teamSelector.show();
+            //container.css('margin-top','-10px');
+            //teamSelector.css('margin-top','-15px');
+
         }
+        //else 
+        //container.css('margin-top','-25px');
 
 
         $('body').on('click', '.details', function () {
             var userId = $(this).data().userId;
             var today = moment();
             var sixtyDaysAgo = moment().subtract(60, 'days');
-            document.location = '?action=detailedCharts&engineerID=' + userId + '&startDate=' + sixtyDaysAgo.format('YYYY-MM-DD') + '&endDate=' + today.format('YYYY-MM-DD')
+            //document.location = '?action=detailedCharts&engineerID=' + userId + '&startDate=' + sixtyDaysAgo.format('YYYY-MM-DD') + '&endDate=' + today.format('YYYY-MM-DD')
+            window.open('?action=detailedCharts&engineerID=' + userId + '&startDate=' + sixtyDaysAgo.format('YYYY-MM-DD') + '&endDate=' + today.format('YYYY-MM-DD'), '_blank');
+
         });
         drawIndividualCharts(teamSelector.val());
         teamSelector.change(function () {
@@ -206,7 +220,7 @@
         flex: 0 0 50%;
     }
 </style>
-<br>
+
 <select name="team"
         class="teamSelector"
         id="teamSelector"
@@ -220,8 +234,6 @@
     <option value="3">Small Projects Team</option>
     <option value="5">Projects Team</option>
 </select>
-<br>
-<br>
 <div id="teamIndividualCharts"
      class="container"
 >

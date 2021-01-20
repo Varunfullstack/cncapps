@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 1192 - Aged SRs Redesign.
+- Issue 1178 - New Home page design.
 ### Changed
 - Issue 1191 - Convert Service Renewals into a dashboard.
 - Issue 1198 - Increase limit of SD Manager Dashboard.

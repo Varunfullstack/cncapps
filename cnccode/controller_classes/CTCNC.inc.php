@@ -17,6 +17,7 @@ require_once($cfg ['path_gc'] . '/Controller.inc.php');
 require_once($cfg ['path_dbe'] . '/DBEJUser.inc.php');
 require_once($cfg ['path_dbe'] . '/DBETeam.inc.php');
 require_once($cfg['path_bu'] . '/BUUser.inc.php');
+require_once($cfg["path_dbe"] . "/DBConnect.php");
 define(
     'CTCNC_ACT_DISP_CUST_POPUP',
     'dispCustPopup'
