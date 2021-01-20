@@ -19,7 +19,7 @@ require_once($cfg['path_dbe'] . '/DBEStandardText.inc.php');
 class CTContactExport extends CTCNC
 {
     const searchFormCustomerID          = 'customerID';
-    const searchFormSendMailshotFlag    = 'sendMailshotFlag';
+    const searchFormMailshot            = 'mailshot';
     const searchFormMailshot2Flag       = 'mailshot2Flag';
     const searchFormMailshot3Flag       = 'mailshot3Flag';
     const searchFormMailshot8Flag       = 'mailshot8Flag';
@@ -264,7 +264,7 @@ WHERE customer.`cus_referred` <> 'Y'
             DA_ALLOW_NULL
         );
         $dsSearchForm->addColumn(
-            self::searchFormSendMailshotFlag,
+            self::searchFormMailshot,
             DA_YN,
             DA_ALLOW_NULL
         );
@@ -381,7 +381,7 @@ WHERE customer.`cus_referred` <> 'Y'
             }
             $dsSearchForm->setValue(self::searchCriteria, $this->getParam('searchCriteria'));
             $searchCriteria = $this->getParam('searchCriteria');
-            $results = $this->buContactExport->search(
+            $results        = $this->buContactExport->search(
                 $dsSearchForm,
                 $contractItemIDs
             );
@@ -473,9 +473,7 @@ WHERE customer.`cus_referred` <> 'Y'
                 'prospectFlagCustomerSelected' => $dsSearchForm->getValue(
                     self::searchFormProspectFlag
                 ) == 'N' ? 'SELECTED' : null,
-                'sendMailshotFlagChecked'      => Controller::htmlChecked(
-                    $dsSearchForm->getValue(self::searchFormSendMailshotFlag)
-                ),
+                'mailshotChecked'              => $dsSearchForm->getValue(self::searchFormMailshot) ? "checked" : null,
                 'exportEmailOnlyFlagChecked'   => Controller::htmlChecked(
                     $dsSearchForm->getValue(self::searchFormExportEmailOnlyFlag)
                 ),

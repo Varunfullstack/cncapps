@@ -254,4 +254,115 @@
             </addColumn>
         </rollback>
     </changeSet>
+    <changeSet author="pavwebdev" id="issue916-23">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contact" columnName="fixedEmailFlag"/>
+        </preConditions>
+
+        <dropColumn tableName="contact" columnName="fixedEmailFlag"/>
+        <rollback>
+            <addColumn tableName="contact">
+                <column name="fixedEmailFlag" type="char(1)" defaultValue="Y"/>
+            </addColumn>
+
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue916-24">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contactAuditLog" columnName="fixedEmailFlag"/>
+        </preConditions>
+        <dropColumn tableName="contactAuditLog" columnName="fixedEmailFlag"/>
+        <rollback>
+            <addColumn tableName="contactAuditLog">
+                <column name="fixedEmailFlag" type="char(1)" defaultValue="Y"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue916-25">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contact" columnName="con_mailshot"/>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="mailshotTemp" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <sql>
+            update contact
+            set mailshotTemp = COALESCE(con_mailshot, 'N') = 'Y';
+        </sql>
+        <dropColumn tableName="contact" columnName="con_mailshot"/>
+        <renameColumn tableName="contact" oldColumnName="mailshotTemp" newColumnName="mailshot"
+                      columnDataType="tinyint(1)"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue916-26">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contactAuditLog" columnName="con_mailshot"/>
+        </preConditions>
+        <addColumn tableName="contactAuditLog">
+            <column name="mailshotTemp" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <sql>
+            update contactAuditLog
+            set mailshotTemp = COALESCE(con_mailshot, 'N') = 'Y';
+        </sql>
+        <dropColumn tableName="contactAuditLog" columnName="con_mailshot"/>
+        <renameColumn tableName="contactAuditLog" oldColumnName="mailshotTemp" newColumnName="mailshot"
+                      columnDataType="tinyint(1)"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue916-27">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contact" columnName="initialLoggingEmailFlag"/>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="initialLoggingEmailTemp" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <sql>
+            update contact
+            set initialLoggingEmailTemp = COALESCE(initialLoggingEmailFlag, 'N') = 'Y';
+        </sql>
+        <dropColumn tableName="contact" columnName="initialLoggingEmailFlag"/>
+        <renameColumn tableName="contact" oldColumnName="initialLoggingEmailTemp" newColumnName="initialLoggingEmail"
+                      columnDataType="tinyint(1)"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue916-28">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contactAuditLog" columnName="initialLoggingEmailFlag"/>
+        </preConditions>
+        <addColumn tableName="contactAuditLog">
+            <column name="initialLoggingEmailTemp" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <sql>
+            update contactAuditLog
+            set mailshotTemp = COALESCE(con_mailshot, 'N') = 'Y';
+        </sql>
+        <dropColumn tableName="contactAuditLog" columnName="con_mailshot"/>
+        <renameColumn tableName="contactAuditLog" oldColumnName="initialLoggingEmailTemp" newColumnName="initialLoggingEmail"
+                      columnDataType="tinyint(1)"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue916-29">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contact" columnName="con_discontinued"/>
+        </preConditions>
+        <dropColumn tableName="contact" columnName="con_discontinued"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue916-30">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contactAuditLog" columnName="con_discontinued"/>
+        </preConditions>
+        <dropColumn tableName="contactAuditLog" columnName="con_discontinued"/>
+        <rollback/>
+    </changeSet>
+
 </databaseChangeLog>

@@ -11,7 +11,7 @@ import {
 } from "../actions";
 import Site from './Site.js';
 import {SHOW_ACTIVE} from "../visibilityFilterTypes";
-import {getDeliverSiteNo, getInvoiceSiteNo, getVisibleSites} from "../selectors";
+import {getDeliverSiteNo, getInvoiceSiteNo, getVisibleSites} from "../selectors/selectors";
 import AddSiteComponent from "../modals/AddSiteComponent";
 import {Accordion} from "react-bootstrap";
 

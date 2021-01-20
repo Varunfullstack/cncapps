@@ -2,7 +2,7 @@
 import React from 'react';
 
 import {connect} from "react-redux";
-import {getOrders} from "./selectors";
+import {getOrders} from "./selectors/selectors";
 
 class CustomerOrders extends React.PureComponent {
     constructor(props) {

@@ -820,11 +820,6 @@ class CTCNC extends Controller
                 "href"  => "LeadStatusReport.php",
             ],
             [
-                "id"    => 403,
-                "label" => "Customer CRM",
-                "href"  => "CustomerCRM.php",
-            ],
-            [
                 "id"    => 404,
                 "label" => "Customer Review Meetings",
                 "href"  => "CustomerReviewMeetingsReport.php",

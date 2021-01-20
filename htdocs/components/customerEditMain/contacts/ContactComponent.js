@@ -1,5 +1,15 @@
 import React from 'react';
 import * as PropTypes from "prop-types";
+import {ContactPassword} from "./ContactPassword";
+
+const supportLevelOptions = [
+    'main',
+    'supervisor',
+    'support',
+    'delegate',
+    'furlough',
+]
+
 
 export class ContactComponent extends React.Component {
 
@@ -14,15 +24,19 @@ export class ContactComponent extends React.Component {
     }
 
     updateContact($event) {
+        let value = $event.target.value;
+        if ($event.target.type === 'checkbox') {
+            value = $event.target.checked ? "Y" : "N";
+        }
         const updatedContact = {
             ...this.state.updatedContact,
-            [$event.target.name]: $event.target.value,
+            [$event.target.name]: value,
         }
         this.setState({updatedContact});
     }
 
     render() {
-        const {sites, supportLevelOptions} = this.props;
+        const {sites} = this.props;
         const {updatedContact} = this.state;
         return <React.Fragment>
             <tr data-toggle="collapse"
@@ -140,7 +154,7 @@ export class ContactComponent extends React.Component {
                             </div>
                             <div className="col-lg-4">
                                 <div className="form-group">
-                                    <label htmlFor="">Mobile <span>*</span></label>
+                                    <label htmlFor="">Mobile</label>
                                     <input
                                         name="mobilePhone"
                                         value={updatedContact.mobilePhone || ""}
@@ -171,7 +185,7 @@ export class ContactComponent extends React.Component {
                                     <label htmlFor="">Support Level
                                         <span>*</span></label>
                                     <select name="supportLevel"
-                                            value={updatedContact.supportLevel}
+                                            value={updatedContact.supportLevel || ""}
                                             onChange={this.updateContact}
                                             data-validation="atLeastOneMain"
                                             data-type="mainSelector"
@@ -181,107 +195,115 @@ export class ContactComponent extends React.Component {
                                         {
                                             supportLevelOptions.map(supportLevelOption =>
                                                 <option
-                                                    value={supportLevelOption.value}
+                                                    value={supportLevelOption}
+                                                    key={supportLevelOption}
                                                 >
-                                                    {supportLevelOption.description}
+                                                    {supportLevelOption.replace(/^(.)|\s(.)/g, x => x.toUpperCase())}
                                                 </option>
                                             )}
                                     </select>
                                 </div>
                             </div>
-                            {/*<div className="col-lg-4">*/}
-                            {/*    <div className="form-group">*/}
-                            {/*        <label htmlFor="">Notes<span/></label>*/}
-                            {/*        <input*/}
-
-                            {/*            name="form[contact][{contactID}][notes]"*/}
-                            {/*            size="5"*/}
-                            {/*            maxLength="200"*/}
-                            {/*            value="{notes}"*/}
-                            {/*            className="form-control input-sm"*/}
-                            {/*        />*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
-                            {/*<div className="col-lg-2">*/}
-
-                            {/*    <label htmlFor="password">Password</label>*/}
-                            {/*    <div className="form-group">*/}
-                            {/*        <button id="password"*/}
-                            {/*                type="button"*/}
-                            {/*                className="form-control input-sm"*/}
-                            {/*                onClick="editEncrypted('sortCode',this)"*/}
-                            {/*        >*/}
-                            {/*            <i className="fal fa-lock {sortCodePencilColor}">*/}
-                            {/*            </i>*/}
-                            {/*        </button>*/}
-                            {/*        <input type="hidden"*/}
-                            {/*               data-contact-id="{contactID}"*/}
-                            {/*               name="form[customer][{customerID}][sortCode]"*/}
-                            {/*               className="encrypted input-sm form-control {portalPasswordButtonClass} btn btn-outline-secondary btn-block fullwidth"*/}
-                            {/*        />*/}
-                            {/*    </div>*/}
-
-                            {/*</div>*/}
-                            {/*<div className="col-lg-2">*/}
-                            {/*    <div className="form-group">*/}
-                            {/*        <label htmlFor="">Failed*/}
-                            {/*            Login<span/></label>*/}
-                            {/*        <input*/}
-
-                            {/*            name="form[contact][{contactID}][failedLoginCount]"*/}
-                            {/*            value="{failedLoginCount}"*/}
-                            {/*            size="2"*/}
-                            {/*            maxLength="5"*/}
-                            {/*            className="form-control input-sm"*/}
-                            {/*        />*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
-                            {/*<div className="col-lg-2">*/}
-                            {/*    <label htmlFor="initialLogging">Initial Logging</label>*/}
-                            {/*    <div className="form-group form-inline">*/}
-                            {/*        <label className="switch">*/}
-                            {/*            <input id="initialLogging"*/}
-                            {/*                   type="checkbox"*/}
-                            {/*                   name="form[contact][{contactID}][initialLoggingEmailFlag]"*/}
-                            {/*                   value="Y"*/}
-                            {/*                   className="tick_field"*/}
-                            {/*            />*/}
-                            {/*            <span className="slider round"/>*/}
-                            {/*        </label>*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
-                            {/*<div className="col-lg-2">*/}
-                            {/*    <label htmlFor="fixed">Fixed</label>*/}
-                            {/*    <div className="form-group form-inline">*/}
-                            {/*        <label className="switch">*/}
-                            {/*            <input className="tick_field"*/}
-                            {/*                   id="fixed"*/}
-                            {/*                   type="checkbox"*/}
-                            {/*                   name="form[site][{customerID}{siteNo}][nonUKFlag]"*/}
-                            {/*                   title="Check to show this site is overseas and not in the UK"*/}
-                            {/*                   value="Y"*/}
-                            {/*            />*/}
-                            {/*            <span className="slider round"/>*/}
-                            {/*        </label>*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
-                            {/*<div className="col-lg-2">*/}
-                            {/*    <label htmlFor="otherInitial">Other Initial</label>*/}
-                            {/*    <div className="form-group form-inline">*/}
-                            {/*        <label className="switch">*/}
-                            {/*            <input className="tick_field"*/}
-                            {/*                   id="otherInitial"*/}
-                            {/*                   type="checkbox"*/}
-                            {/*                   name="form[contact][{contactID}][accountsFlag]"*/}
-                            {/*                   value="Y"*/}
-                            {/*                   data-validation="atLeastOne"*/}
-                            {/*                   data-type="accounts"*/}
-                            {/*                   data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"*/}
-                            {/*            />*/}
-                            {/*            <span className="slider round"/>*/}
-                            {/*        </label>*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
+                            <div className="col-lg-4">
+                                <div className="form-group">
+                                    <label htmlFor="">Notes<span/></label>
+                                    <input
+                                        name="notes"
+                                        size="5"
+                                        maxLength="200"
+                                        onChange={this.updateContact}
+                                        value={updatedContact.notes || ""}
+                                        className="form-control input-sm"
+                                    />
+                                </div>
+                            </div>
+                            <div className="col-lg-2">
+                                <label htmlFor="password">Password</label>
+                                <div className="form-group">
+                                    <ContactPassword value={updatedContact.portalPassword || ""}
+                                                     onChange={this.updateContact}
+                                                     name="portalPassword"
+                                    />
+                                </div>
+                            </div>
+                            <div className="col-lg-2">
+                                <div className="form-group">
+                                    <label htmlFor="">Failed Login</label>
+                                    <input
+                                        type="number"
+                                        name="failedLoginCount"
+                                        value={updatedContact.failedLoginCount || ""}
+                                        onChange={this.updateContact}
+                                        size="2"
+                                        maxLength="5"
+                                        className="form-control input-sm"
+                                    />
+                                </div>
+                            </div>
+                            <div className="col-lg-2">
+                                <label htmlFor="initialLoggingEmailFlag">Initial Logging</label>
+                                <div className="form-group form-inline">
+                                    <label className="switch">
+                                        <input
+                                            type="checkbox"
+                                            onChange={this.updateContact}
+                                            name="initialLoggingEmailFlag"
+                                            checked={updatedContact.initialLoggingEmailFlag === 'Y'}
+                                            value="Y"
+                                            className="tick_field"
+                                        />
+                                        <span className="slider round"/>
+                                    </label>
+                                </div>
+                            </div>
+                            <div className="col-lg-2">
+                                <label htmlFor="othersInitialLoggingEmailFlag">Others Initial Logging</label>
+                                <div className="form-group form-inline">
+                                    <label className="switch">
+                                        <input
+                                            type="checkbox"
+                                            onChange={this.updateContact}
+                                            name="othersInitialLoggingEmailFlag"
+                                            checked={updatedContact.othersInitialLoggingEmailFlag === 'Y'}
+                                            value="Y"
+                                            className="tick_field"
+                                        />
+                                        <span className="slider round"/>
+                                    </label>
+                                </div>
+                            </div>
+                            <div className="col-lg-2">
+                                <label htmlFor="othersWorkUpdatesEmailFlag">Others Work Updates</label>
+                                <div className="form-group form-inline">
+                                    <label className="switch">
+                                        <input
+                                            type="checkbox"
+                                            onChange={this.updateContact}
+                                            name="othersWorkUpdatesEmailFlag"
+                                            checked={updatedContact.othersWorkUpdatesEmailFlag === 'Y'}
+                                            value="Y"
+                                            className="tick_field"
+                                        />
+                                        <span className="slider round"/>
+                                    </label>
+                                </div>
+                            </div>
+                            <div className="col-lg-2">
+                                <label htmlFor="othersFixedEmailFlag">Others Fixed</label>
+                                <div className="form-group form-inline">
+                                    <label className="switch">
+                                        <input
+                                            type="checkbox"
+                                            onChange={this.updateContact}
+                                            name="othersFixedEmailFlag"
+                                            checked={updatedContact.othersFixedEmailFlag === 'Y'}
+                                            value="Y"
+                                            className="tick_field"
+                                        />
+                                        <span className="slider round"/>
+                                    </label>
+                                </div>
+                            </div>
                             {/*<div className="col-lg-2">*/}
                             {/*    <label htmlFor="accounts">Accounts</label>*/}
                             {/*    <div className="form-group form-inline">*/}
