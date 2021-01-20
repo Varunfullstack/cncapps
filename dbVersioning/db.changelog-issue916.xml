@@ -346,23 +346,9 @@
             set mailshotTemp = COALESCE(con_mailshot, 'N') = 'Y';
         </sql>
         <dropColumn tableName="contactAuditLog" columnName="con_mailshot"/>
-        <renameColumn tableName="contactAuditLog" oldColumnName="initialLoggingEmailTemp" newColumnName="initialLoggingEmail"
+        <renameColumn tableName="contactAuditLog" oldColumnName="initialLoggingEmailTemp"
+                      newColumnName="initialLoggingEmail"
                       columnDataType="tinyint(1)"/>
         <rollback/>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue916-29">
-        <preConditions onFail="MARK_RAN">
-            <columnExists tableName="contact" columnName="con_discontinued"/>
-        </preConditions>
-        <dropColumn tableName="contact" columnName="con_discontinued"/>
-        <rollback/>
-    </changeSet>
-    <changeSet author="pavwebdev" id="issue916-30">
-        <preConditions onFail="MARK_RAN">
-            <columnExists tableName="contactAuditLog" columnName="con_discontinued"/>
-        </preConditions>
-        <dropColumn tableName="contactAuditLog" columnName="con_discontinued"/>
-        <rollback/>
-    </changeSet>
-
 </databaseChangeLog>
