@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1191 - Convert Service Renewals into a dashboard
+
 ## [v5.2.3] - 2021-01-18
 ### Fixed
 - Fixed issue with Change request sending the wrong email when approving/denying.
