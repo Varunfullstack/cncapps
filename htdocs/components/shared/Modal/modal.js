@@ -6,36 +6,78 @@ export class Modal extends React.Component {
 
     constructor(props) {
         super(props);
+        this.state={
+            startDrag:false
+        }
     }
-
+    componentDidMount() {
+        //this.getDrag();
+    }
     handleClose = () => {
         const {onClose} = this.props;
         if (onClose)
             onClose();
     }
-
+    getDrag=()=>{
+        const {show,draggable} = this.props;        
+        if( show&&(draggable||draggable===undefined))
+        {            
+            let $this=this;
+            setTimeout(()=>{
+                $(".modal-content").draggable({                    
+                    cancel: ".undraggable",
+                    start:function(){
+                                     //console.log("drag");
+                                 },     
+                    stop:function(){
+                        //console.log("stop");
+                        $this.setState({startDrag:false})
+    
+                    },  
+                }) ;
+            },500)
+        }
+    } 
+    handleMouseMove=()=>{
+        //console.log(this.state.startDrag);
+        if(!this.state.startDrag)
+         this.setState({startDrag:true},()=>this.getDrag());
+    }
+    hanldeMouseOut=()=>{
+        //console.log(this.state.startDrag);
+        if(this.state.startDrag)
+        this.setState({startDrag:false});
+    }
+    handleContainerMouseMove=()=>{
+        //console.log('container');
+        if(this.state.startDrag)
+        this.setState({startDrag:false});
+    }
     render() {
         const {el, handleClose} = this;
-        const {show, width, title, content, footer} = this.props;
+        const {show, width, title, content, footer,draggable} = this.props;
+        const {startDrag}=this.state;        
         let maxWidth = "70%";
-        const className = `modal ${this.props.className}`;
+        const className = `modal ${this.props.className}`;        
+      
         if (width) maxWidth = width;
         if (show) {
-            return el("div", {key: "myModal", className}, [
+            return el("div", {key: "myModal", className,id:'modal'}, [
                 el(
                     "div",
                     {
+                        
                         key: "modalContent",
-                        className: "modal-content",
+                        className: !startDrag?"modal-content undraggable":" modal-content",
                         style: {maxWidth},
 
                     },
                     [
-                        el("div", {key: "modalHeader", className: "modal-header"}, [
-              el("span", { key: "spanClose", className: "close fa fa-times",onClick:handleClose,style:{color:"#FFFFFF"} }),
+                        el("div", {key: "modalHeader", className: "modal-header",onMouseMove:this.handleMouseMove}, [
+                        el("span", { key: "spanClose", className: "close fa fa-times",onClick:handleClose,style:{color:"#FFFFFF"} }),
                             el("label", {key: "header", className: "modal-title"}, title),
                         ]),
-                        el("div", {key: "modalbody", className: "modal-body"}, [
+                        el("div", {key: "modalbody", className: "modal-body",onMouseMove:this.handleContainerMouseMove}, [
                             content ? content : null,
                         ]),
                         footer

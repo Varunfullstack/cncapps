@@ -1,5 +1,9 @@
 # Changelog
 This project changes will be shown here.
+## [v5.2.3] - 2021-01-18
+### Added
+- Enable draggable modal
+
 
 ## [unreleased]
 ### Added
