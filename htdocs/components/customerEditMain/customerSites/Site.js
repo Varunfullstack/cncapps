@@ -1,5 +1,5 @@
 import React from 'react'
-import {createGetEditingSiteForSite, createGetSite, createGetSiteContacts, getCustomerId} from "../selectors";
+import {createGetEditingSiteForSite, createGetSite, createGetSiteContacts, getCustomerId} from "../selectors/selectors";
 import {connect} from "react-redux";
 import {addContactToSite, deleteSite, saveSite, updateSiteField} from "../actions";
 import {AccordionCollapse, Card} from "react-bootstrap";

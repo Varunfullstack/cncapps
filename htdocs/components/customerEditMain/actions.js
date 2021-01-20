@@ -98,7 +98,7 @@ import {updateCustomer, updateNote, updateSite} from "./helpers";
 import {OutOfDateError} from "./helpers/OutOfDateError";
 import debounce from "../utils/debounce";
 import {fileToBase64} from "../utils/utils";
-import {getEditingNote, getEditingSite} from "./selectors";
+import {getEditingNote, getEditingSite} from "./selectors/selectors";
 
 export const VisibilityFilterOptions = {
     SHOW_ALL: 'SHOW_ALL',

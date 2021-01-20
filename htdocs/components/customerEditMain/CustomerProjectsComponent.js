@@ -5,7 +5,7 @@ import {connect} from "react-redux";
 import {entityMapToArray} from "../utils/utils";
 import {addNewProject, deleteProject, hideNewProjectModal, newProjectFieldUpdate, showNewProjectModal} from "./actions";
 import AddProjectModalComponent from "./modals/AddProjectModalComponent";
-import {getProjects} from "./selectors";
+import {getProjects} from "./selectors/selectors";
 
 class CustomerProjectsComponent extends React.PureComponent {
     el = React.createElement;

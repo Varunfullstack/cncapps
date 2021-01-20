@@ -1,4 +1,4 @@
-import {getAllContacts, getAllSites} from "../selectors";
+import {getAllContacts, getAllSites} from "../selectors/selectors";
 import {updateCustomerField} from "../actions";
 import {connect} from "react-redux";
 

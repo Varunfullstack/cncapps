@@ -3,7 +3,7 @@ import React from 'react';
 import Select from "./Select";
 import EncryptedTextInput from "./EncryptedTextInput";
 import {connect} from "react-redux";
-import {getMainContacts, getAllContacts} from "./selectors";
+import {getMainContacts, getAllContacts} from "./selectors/selectors";
 import {updateCustomerField} from "./actions";
 
 class CustomerEditMain extends React.PureComponent {

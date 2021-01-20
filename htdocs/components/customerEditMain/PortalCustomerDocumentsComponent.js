@@ -12,7 +12,7 @@ import {
     getPortalCustomerDocumentsIsFetching,
     getPortalCustomerDocumentsModalShown,
     getPortalCustomerDocumentsNewPortalDocument
-} from "./selectors";
+} from "./selectors/selectors";
 import AddPortalCustomerDocumentComponent from "./modals/AddPortalCustomerDocumentComponent";
 
 class PortalCustomerDocumentsComponent extends React.PureComponent {

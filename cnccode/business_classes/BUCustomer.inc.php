@@ -270,7 +270,7 @@ class BUCustomer extends Business
         if ($email === '') {
             return true;
         }
-        $query = "select count(con_contno) as count from contact where con_email = ? and active = 1 ";
+        $query      = "select count(con_contno) as count from contact where con_email = ? and active = 1 ";
         $paramTypes = 's';
         $params     = [
             $email,
@@ -401,7 +401,6 @@ class BUCustomer extends Business
         $this->setMethodName('insertCustomer');
         $ret = ($this->updateCustomer($dsData));
         $this->addNewSiteRow($dsData->getValue(DBECustomer::customerID));                        // New customerID
-
         $ret = $ret && ($this->updateSite($dsSite));
         $this->dbeSite->resetCallbackMethod(DA_BEFORE_POST);
         $this->addNewContactRow(
@@ -502,7 +501,7 @@ class BUCustomer extends Business
         $dbeCustomer = new DBECustomer($this);
         $dbeCustomer->getRow($customerID);
         $customerName = $dbeCustomer->getValue(DBECustomer::name);
-        $shortCode = "";
+        $shortCode    = "";
         for ($ixChar = 0; $ixChar <= strlen($customerName); $ixChar++) {
             if (substr(
                     $customerName,
@@ -521,12 +520,12 @@ class BUCustomer extends Business
                 }
             }
         }
-        $number = 1;
+        $number       = 1;
         $numberUnique = FALSE;
-        $dbeSite = new DBESite($this);
-        $sageRef = null;
+        $dbeSite      = new DBESite($this);
+        $sageRef      = null;
         while (!$numberUnique) {
-            $sageRef = $shortCode . str_pad(
+            $sageRef      = $shortCode . str_pad(
                     $number,
                     3,
                     "0",
@@ -603,11 +602,7 @@ class BUCustomer extends Business
             $siteNo
         );
         $dsContact->setValue(
-            DBEContact::discontinuedFlag,
-            'N'
-        );
-        $dsContact->setValue(
-            DBEContact::sendMailshotFlag,
+            DBEContact::mailshot,
             'Y'
         );
         $dsContact->setValue(
@@ -634,14 +629,7 @@ class BUCustomer extends Business
             DBEContact::mailshot11Flag,
             $this->dsHeader->getValue(DBEHeader::mailshot11FlagDef)
         );
-        $dsContact->setValue(
-            DBEContact::initialLoggingEmailFlag,
-            'Y'
-        );
-        $dsContact->setValue(
-            DBEContact::fixedEmailFlag,
-            'Y'
-        );
+        $dsContact->setValue(DBEContact::initialLoggingEmail, 1);
         $dsContact->setValue(
             DBEContact::othersInitialLoggingEmailFlag,
             'Y'
@@ -1141,11 +1129,8 @@ class BUCustomer extends Business
                 DBEContact::lastName                      => $this->dbeContact->getValue(DBEContact::lastName),
                 DBEContact::email                         => $this->dbeContact->getValue(DBEContact::email),
                 DBEContact::supportLevel                  => $this->dbeContact->getValue(DBEContact::supportLevel),
-                DBEContact::initialLoggingEmailFlag       => $this->dbeContact->getValue(
-                    DBEContact::initialLoggingEmailFlag
-                ),
-                DBEContact::fixedEmailFlag                => $this->dbeContact->getValue(
-                    DBEContact::fixedEmailFlag
+                DBEContact::initialLoggingEmail           => $this->dbeContact->getValue(
+                    DBEContact::initialLoggingEmail
                 ),
                 DBEContact::othersInitialLoggingEmailFlag => $this->dbeContact->getValue(
                     DBEContact::othersInitialLoggingEmailFlag
@@ -1183,17 +1168,14 @@ class BUCustomer extends Business
                 DBEContact::lastName                      => $this->dbeContact->getValue(DBEContact::lastName),
                 DBEContact::email                         => $this->dbeContact->getValue(DBEContact::email),
                 DBEContact::supportLevel                  => $this->dbeContact->getValue(DBEContact::supportLevel),
-                DBEContact::initialLoggingEmailFlag       => $this->dbeContact->getValue(
-                    DBEContact::initialLoggingEmailFlag
-                ),
-                DBEContact::fixedEmailFlag                => $this->dbeContact->getValue(
-                    DBEContact::fixedEmailFlag
+                DBEContact::initialLoggingEmail           => $this->dbeContact->getValue(
+                    DBEContact::initialLoggingEmail
                 ),
                 DBEContact::othersInitialLoggingEmailFlag => $this->dbeContact->getValue(
-                    DBEContact::initialLoggingEmailFlag
+                    DBEContact::othersInitialLoggingEmailFlag
                 ),
                 DBEContact::othersFixedEmailFlag          => $this->dbeContact->getValue(
-                    DBEContact::fixedEmailFlag
+                    DBEContact::othersFixedEmailFlag
                 ),
             ];
         }

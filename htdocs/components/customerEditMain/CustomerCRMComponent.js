@@ -8,7 +8,7 @@ import {
     getNewNote,
     getNewNoteModalShow,
     getReviewEngineers
-} from "./selectors";
+} from "./selectors/selectors";
 import {
     addNewNote,
     deleteNote,

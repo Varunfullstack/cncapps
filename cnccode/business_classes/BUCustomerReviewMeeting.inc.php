@@ -112,8 +112,8 @@ class BUCustomerReviewMeeting extends Business
           FROM
             contact
           WHERE
-            con_discontinued <> 'Y'
-            and reviewUser = 'Y'
+            contact.active
+            and contact.reviewUser = 'Y'
             AND con_custno = " . $customer['customerID'];
 
             $results = $this->db->query($sql);

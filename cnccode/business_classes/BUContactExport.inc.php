@@ -66,7 +66,7 @@ class BUContactExport extends Business
         {$DBEContact->getDBColumnName($DBEContact::email)} AS EmailAddress,
         CONCAT({$DBEContact->getDBColumnName($DBEContact::firstName)},' ',{$DBEContact->getDBColumnName($DBEContact::lastName)}) AS DisplayName,
         {$dbeCustomer->getDBColumnName(DBECustomer::becameCustomerDate)} is not null and {$dbeCustomer->getDBColumnName(DBECustomer::droppedCustomerDate)} is null AS Prospect";
-            if ($dsSearchForm->getValue(CTContactExport::searchFormSendMailshotFlag)) {
+            if ($dsSearchForm->getValue(CTContactExport::searchFormMailshot)) {
                 $query .= ", {$dbeCustomer->getDBColumnName(DBECustomer::mailshotFlag)} AS `Mailshot`";
             }
             if ($dsSearchForm->getValue(CTContactExport::searchFormMailshot2Flag)) {
@@ -200,7 +200,7 @@ class BUContactExport extends Business
                 $possibleOrQueries .= $condition;
             }
         }
-        if ($dsSearchForm->getValue(DBEContact::sendMailshotFlag)) {
+        if ($dsSearchForm->getValue(DBEContact::mailshot)) {
             if (strlen($possibleOrQueries)) {
                 $possibleOrQueries .= $searchCriteria;
             }

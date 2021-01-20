@@ -332,10 +332,6 @@ class BUContact extends Business
             $customerID
         );
         $dsResults->setValue(
-            DBEContact::discontinuedFlag,
-            'N'
-        );
-        $dsResults->setValue(
             DBEContact::notes,
             null
         );
@@ -378,10 +374,6 @@ class BUContact extends Business
         $this->setMethodName('initialiseUpdateContact');
         // create/populate new dataset
         $dsResults->copyColumnsFrom($this->dbeContact);
-        $dsResults->setValue(
-            DBEContact::discontinuedFlag,
-            'N'
-        );
         $dsResults->setValue(
             DBEContact::mailshot2Flag,
             'N'
