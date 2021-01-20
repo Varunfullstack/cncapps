@@ -1,5 +1,8 @@
 # Changelog
 This project changes will be shown here.
+## [unrealesed]
+### Changed
+- My Settings redesign.
 
 ## [unreleased]
 ### Added
