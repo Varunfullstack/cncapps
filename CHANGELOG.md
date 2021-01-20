@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v5.3.0]
 ### Added
 - Issue 1192 - Aged SRs Redesign.
 - Issue 1178 - New Home page design.
