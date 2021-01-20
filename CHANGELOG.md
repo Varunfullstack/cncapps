@@ -1,14 +1,11 @@
 # Changelog
 This project changes will be shown here.
-## [v5.2.3] - 2021-01-18
-### Added
-- Enable draggable modal
-
 
 ## [unreleased]
 ### Added
 - Issue 1192 - Aged SRs Redesign.
 - Issue 1178 - New Home page design.
+- Issue 1195 - Enable draggable modal.
 ### Changed
 - Issue 1191 - Convert Service Renewals into a dashboard.
 - Issue 1198 - Increase limit of SD Manager Dashboard.
