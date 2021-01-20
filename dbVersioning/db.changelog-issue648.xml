@@ -8,13 +8,81 @@
     <changeSet author="pavwebdev" id="issue648-1">
         <preConditions onFail="MARK_RAN">
             <not>
-                <columnExists tableName="backup_performance_log" columnName="isReplication"/>
+                <tableExists tableName="supplierContact"/>
             </not>
         </preConditions>
-        <addColumn tableName="backup_performance_log">
-            <column name="isReplication" type="tinyint(1)" defaultValue="0">
+        <createTable tableName="supplierContact">
+            <column name="id" type="bigint(11)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="Primary"/>
+            </column>
+            <column name="supplierId" type="bigint(11)">
+                <constraints foreignKeyName="fk_suppliercontact_supplierid" nullable="false"
+                             referencedTableName="supplier" references="sup_suppno" deleteCascade="true"/>
+            </column>
+            <column name="title" type="char(45)">
                 <constraints nullable="false"/>
             </column>
-        </addColumn>
+            <column name="position" type="char(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="firstName" type="char(25)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lastName" type="char(35)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="char(60)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="phone" type="char(25)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
     </changeSet>
+    <changeSet author="pavwebdev" id="issue648-3">
+        <
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue648-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="supplierContactAuditLog"/>
+            </not>
+        </preConditions>
+        <createTable tableName="supplierContactAuditLog">
+            <column name="action" type="char(8)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="createdAt" type="timestamp" defaultValueComputed="current_timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="userId" type="bigint(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="id" type="bigint(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="supplierId" type="bigint(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="char(45)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="position" type="char(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="firstName" type="char(25)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lastName" type="char(35)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="char(60)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="phone" type="char(25)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>
