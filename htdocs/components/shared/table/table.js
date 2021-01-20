@@ -175,6 +175,9 @@ class Table extends React.Component {
         const {handleSearch} = this;
         const el = React.createElement;
         const filterData = search ? this.filterData(data, columns) : data;
+        let striped="table-striped";
+        if(this.props.striped===false)
+        striped="";
         if (this.state.sortColumn.path != null && data.length > 0) {
             this.sort(filterData, this.state.sortColumn.path, this.state.sortColumn.order);
         }
@@ -202,7 +205,7 @@ class Table extends React.Component {
             el("table", {
                 key: "table" + this.props.id,
                 id: "table" + this.props.id,
-                className: "table table-striped"
+                className: "table "+striped
             }, [
                 el(TableHeader, {
                     key:"tableHeader",

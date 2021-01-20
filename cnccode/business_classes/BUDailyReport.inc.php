@@ -575,7 +575,11 @@ GROUP BY t.month;
     } // end function
 
     function getOustandingRequests($daysAgo = 1,
-                                   $priorityFiveOnly = false
+                                   $priorityFiveOnly = false,
+                                   $hd=true,
+                                   $es=true,
+                                   $sp=true,
+                                   $p=true
     )
     {
         $sql = "SELECT 
@@ -594,7 +598,8 @@ GROUP BY t.month;
         pro_priority as `priority`,
         team.name AS teamName,
         pro_awaiting_customer_response_flag,
-        pro_status
+        pro_status,
+        pro_queue_no queueNo
       FROM
         problem 
         JOIN customer 
@@ -621,11 +626,21 @@ GROUP BY t.month;
         } else {
             $sql .= " AND pro_priority < 5";
         }
+
+        if(!$hd)
+            $sql .= " AND pro_queue_no <>1   ";
+        if(!$es)
+            $sql .= " AND pro_queue_no <>2   ";
+        if(!$sp)
+            $sql .= " AND pro_queue_no <>3   ";
+        if(!$p)
+            $sql .= " AND pro_queue_no <>5  ";
+
         $sql .= "      ORDER BY customer,
         pro_problemno";
         return $this->db->query($sql);
     } // end function
-
+     
     function focActivities($daysAgo)
     {
 

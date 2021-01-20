@@ -10,4 +10,7 @@ export default class ApiUrls{
  static KPIReport="/KPIReport.php?action=";
  static Header="/Header.php?action=";
  static Renewals="/RenewalsDashboard.php?action=";
+ static AgedService="/AgedService.php?action=";
+ static DailyReport="/DailyReport.php?action=";
+
 }
