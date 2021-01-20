@@ -1,12 +1,12 @@
 # Changelog
 This project changes will be shown here.
-## [unrealesed] 
-### Added
-- Aged SRs Redesign
 
 ## [unreleased]
+### Added
+- Issue 1192 - Aged SRs Redesign
 ### Changed
 - Issue 1191 - Convert Service Renewals into a dashboard
+- Issue 1198 - Increase limit of SD Manager Dashboard.
 
 ## [v5.2.3] - 2021-01-18
 ### Fixed
