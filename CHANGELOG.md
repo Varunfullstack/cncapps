@@ -1,14 +1,12 @@
 # Changelog
 This project changes will be shown here.
-## [unrealesd] 
-### Added
--  Customer Information (24HoursSupportCustomersReport.php,SpecialAttentionCustomersReport.php,ContactAudit.php )
 
 ## [v5.3.0]
 ### Added
 - Issue 1192 - Aged SRs Redesign.
 - Issue 1178 - New Home page design.
 - Issue 1195 - Enable draggable modal.
+- Issue 1193 - New Customer Information Tab.
 ### Changed
 - Issue 1191 - Convert Service Renewals into a dashboard.
 - Issue 1198 - Increase limit of SD Manager Dashboard.
