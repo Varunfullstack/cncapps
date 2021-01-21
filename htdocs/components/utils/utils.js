@@ -4,7 +4,7 @@
  * @param {path} p
  */
 export function get(o, p) {
-    return p.split(".").reduce((a, v) => a[v], o);
+    return p.split(".").reduce((a, v) => a[v], o)||'';
 }
 
 export function getServiceRequestWorkTitle(serviceRequest) {

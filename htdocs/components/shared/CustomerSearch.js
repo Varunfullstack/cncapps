@@ -22,7 +22,7 @@ class CustomerSearch extends MainComponent {
             this.props.onChange(value)
     }
 
-    render() {
+    render() {        
         return this.el(AutoComplete, {
             errorMessage: "No Customer found",
             items: this.state.customers,
@@ -30,6 +30,7 @@ class CustomerSearch extends MainComponent {
             displayColumn: "name",
             pk: "id",
             width: this.props.width || 300,
+            value:this.props.customerName,
             onSelect: this.handleOnCustomerSelect,
         });
     }

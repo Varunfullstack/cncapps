@@ -14,7 +14,8 @@ class AutoComplete extends React.Component {
             showSuggestions: false,
             // What the user has entered
             userInput: "",
-            filtered: false
+            filtered: false,
+            value:''
         };
 
     }
@@ -156,7 +157,15 @@ class AutoComplete extends React.Component {
     componentDidUpdate(prevProps) {
 
     }
-
+    static getDerivedStateFromProps(props,state){        
+        if(props.value!=state.value)
+        {
+            state.value=props.value;
+            state.userInput=props.value;
+            return state;
+        }
+        else return state;
+    }
     render() {
         const {displayColumn, pk, errorMessage, required, width} = this.props;
         const {

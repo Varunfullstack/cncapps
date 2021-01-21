@@ -1,5 +1,8 @@
 # Changelog
 This project changes will be shown here.
+## [unrealesd] 
+### Added
+-  Customer Information (24HoursSupportCustomersReport.php,SpecialAttentionCustomersReport.php,ContactAudit.php )
 
 ## [v5.3.0]
 ### Added

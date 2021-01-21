@@ -103,7 +103,7 @@ class Table extends React.Component {
             }
         }
     };
-    get = (o, p) => p.split(".").reduce((a, v) => a[v], o);
+    get = (o, p) => p.split(".").reduce((a, v) => a[v], o)||'';
     sort = (array, path, order = "asc") => {
         return array.sort((a, b) => {
             if (
