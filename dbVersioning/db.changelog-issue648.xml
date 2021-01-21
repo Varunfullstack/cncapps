@@ -15,34 +15,58 @@
             <column name="id" type="bigint(11)">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="Primary"/>
             </column>
-            <column name="supplierId" type="bigint(11)">
+            <column name="supplierId" type="int(11)">
                 <constraints foreignKeyName="fk_suppliercontact_supplierid" nullable="false"
-                             referencedTableName="supplier" references="sup_suppno" deleteCascade="true"/>
+                             referencedTableName="supplier" referencedColumnNames="sup_suppno" deleteCascade="true"/>
             </column>
             <column name="title" type="char(45)">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
             <column name="position" type="char(50)">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
             <column name="firstName" type="char(25)">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
             <column name="lastName" type="char(35)">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
             <column name="email" type="char(60)">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
             <column name="phone" type="char(25)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="active" type="tinyint(1)" defaultValue="1">
                 <constraints nullable="false"/>
             </column>
         </createTable>
+        <sql splitStatements="true">
+            <![CDATA[
+            insert into supplierContact (id, supplierId, title, position, firstName, lastName, email, phone, active)
+            select con_contno,
+                   con_suppno,
+                   con_title,
+                   con_position,
+                   con_first_name,
+                   con_last_name,
+                   con_email,
+                   con_phone,
+                   active
+            from contact
+            where con_suppno is not null
+              and con_suppno <> 0;
+            delete
+            from contact
+            where con_suppno is not null
+              and con_suppno <> 0;
+            ]]>
+        </sql>
+        <rollback>
+            <dropTable tableName="supplierContact"/>
+        </rollback>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue648-3">
-        <
-    </changeSet>
-    <changeSet author="pavwebdev" id="issue648-3">
+    <changeSet author="pavwebdev" id="issue648-2">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="supplierContactAuditLog"/>
@@ -59,30 +83,87 @@
                 <constraints nullable="false"/>
             </column>
             <column name="id" type="bigint(11)">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
             <column name="supplierId" type="bigint(11)">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
             <column name="title" type="char(45)">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
             <column name="position" type="char(50)">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
             <column name="firstName" type="char(25)">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
             <column name="lastName" type="char(35)">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
             <column name="email" type="char(60)">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
             <column name="phone" type="char(25)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="active" type="tinyint(1)" defaultValue="1">
                 <constraints nullable="false"/>
             </column>
         </createTable>
+        <sql splitStatements="true">
+            <![CDATA[
+            insert into supplierContactAuditLog(action, createdAt, userId, id, supplierId, title, position, firstName,
+                                                lastName, email, phone, active)
+            select `action`,
+                   createdAt,
+                   userId,
+                   con_contno,
+                   con_suppno,
+                   con_title,
+                   con_position,
+                   con_first_name,
+                   con_last_name,
+                   con_email,
+                   con_phone,
+                   active
+            from contactAuditLog
+            where con_suppno is not null
+              and con_suppno <> 0;
+            delete
+            from contactAuditLog
+            where con_suppno is not null
+              and con_suppno <> 0;
+            ]]>
+        </sql>
+        <rollback>
+            <dropTable tableName="supplierContactAuditLog"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue648-3">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contact" columnName="con_suppno"/>
+        </preConditions>
+        <dropColumn tableName="contact" columnName="con_suppno"/>
+        <rollback>
+            <addColumn tableName="contact">
+                <column name="con_suppno" type="int(11)">
+                    <constraints nullable="true"/>
+                </column>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue648-4">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contactAuditLog" columnName="con_suppno"/>
+        </preConditions>
+        <dropColumn tableName="contactAuditLog" columnName="con_suppno"/>
+        <rollback>
+            <addColumn tableName="contactAuditLog">
+                <column name="con_suppno" type="int(11)">
+                    <constraints nullable="true"/>
+                </column>
+            </addColumn>
+        </rollback>
     </changeSet>
 
 </databaseChangeLog>

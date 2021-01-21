@@ -91,12 +91,6 @@ class DBEContact extends DBCNCEntity
             "con_custno"
         );
         $this->addColumn(
-            self::supplierID,
-            DA_ID,
-            DA_ALLOW_NULL,
-            "con_suppno"
-        );
-        $this->addColumn(
             self::title,
             DA_STRING,
             DA_ALLOW_NULL,

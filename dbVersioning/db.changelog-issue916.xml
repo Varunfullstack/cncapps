@@ -191,8 +191,7 @@
             delete contact
             from contact
                      left join customer on customer.cus_custno = contact.con_custno
-            where cus_custno is null
-              and (con_suppno is null or con_suppno = 0);
+            where cus_custno is null;
             ]]>
         </sql>
         <rollback/>
@@ -343,9 +342,9 @@
         </addColumn>
         <sql>
             update contactAuditLog
-            set mailshotTemp = COALESCE(con_mailshot, 'N') = 'Y';
+            set initialLoggingEmailTemp = COALESCE(initialLoggingEmailFlag, 'N') = 'Y';
         </sql>
-        <dropColumn tableName="contactAuditLog" columnName="con_mailshot"/>
+        <dropColumn tableName="contactAuditLog" columnName="initialLoggingEmailFlag"/>
         <renameColumn tableName="contactAuditLog" oldColumnName="initialLoggingEmailTemp"
                       newColumnName="initialLoggingEmail"
                       columnDataType="tinyint(1)"/>
