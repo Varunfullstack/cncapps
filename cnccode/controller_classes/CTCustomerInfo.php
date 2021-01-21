@@ -6,7 +6,7 @@ require_once($cfg['path_bu'] . '/BUSecondSite.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg["path_dbe"] . "/DBConnect.php");
 
-class CTCustomerInformation extends CTCurrentActivityReport
+class CTCustomerInfo extends CTCurrentActivityReport
 {
 
     function __construct($requestMethod,
@@ -51,7 +51,7 @@ class CTCustomerInformation extends CTCurrentActivityReport
     function setTemplate()
     {
         $isP5 = isset($_REQUEST['showP5']);
-        $this->setPageTitle('SD Manager Dashboard');
+        $this->setPageTitle('Customer Information');
         $this->setTemplateFiles(
             array('CustomerInfo' => 'reactCustomerInfo.rct')
         );

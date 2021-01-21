@@ -1,19 +1,13 @@
 import MainComponent from "../shared/MainComponent";
-import CurrentActivityService from "../CurrentActivityReportComponent/services/CurrentActivityService";
-import Table from "../shared/table/table";
-import Toggle from "../shared/Toggle";
-import ToolTip from "../shared/ToolTip";
-import {getServiceRequestWorkTitle, getWorkIconClassName, SRQueues} from "../utils/utils";
-import DailyStatsComponent from "./subComponents/DailyStatsComponent";
 import APICustomerInfo from "./services/APICustomerInfo";
 import React from 'react';
 import ReactDOM from 'react-dom';
+import Spinner from "../shared/Spinner/Spinner";
 
 import './../style.css';
-import './SDManagerDashboardComponent.css';
-import ActivityFollowOn from "../Modals/ActivityFollowOn";
-import moment from "moment";
-import Spinner from "../shared/Spinner/Spinner";
+//import '/CustomerInfoComponent.css';
+
+
  
 class CustomerInfoComponent extends MainComponent {
   el = React.createElement;

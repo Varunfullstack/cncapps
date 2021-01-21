@@ -1,7 +1,7 @@
 <?php
 require_once("config.inc.php");
 global $cfg;
-require_once($cfg["path_ct"] . "/CTCustomerInformation.php");
+require_once($cfg["path_ct"] . "/CTCustomerInfo.php");
 session_start();
 page_open(
     array(
@@ -13,7 +13,7 @@ page_open(
 );
 global $cfg;
 header("Cache-control: private");
-$controller = new CTCustomerInformation(
+$controller = new CTCustomerInfo(
     $_SERVER['REQUEST_METHOD'],
     $_POST,
     $_GET,
