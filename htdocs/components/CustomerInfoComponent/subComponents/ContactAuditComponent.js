@@ -6,6 +6,7 @@ import "../../shared/table/table.css";
 import { exportCSV, sort } from "../../utils/utils";
 import CustomerSearch from "../../shared/CustomerSearch";
 import Table from "../../shared/table/table";
+import ToolTip from "../../shared/ToolTip";
 class ContactAuditComponent extends MainComponent {
   api = new APICustomerInfo();
   constructor(props) {
@@ -19,6 +20,7 @@ class ContactAuditComponent extends MainComponent {
         lastName: "",
         from: moment().subtract(1, "month").format("YYYY-MM-DD"),
         to: moment().format("YYYY-MM-DD"),
+        customerName:""
       },
     };
   }
@@ -43,7 +45,10 @@ class ContactAuditComponent extends MainComponent {
   };
   handleCustomerSelect = (customer) => {
     console.log(customer);
-    this.setFilter("customerID", customer.id);
+    const {filter}=this.state;
+    filter.customerID=customer.id;
+    filter.customerName=customer.name;
+    this.setState({filter});
   };
   getSearchElement = () => {
     const { filter } = this.state;
@@ -54,7 +59,8 @@ class ContactAuditComponent extends MainComponent {
             <td>Customer</td>
             <td colSpan={3}>
               {" "}
-              <CustomerSearch
+              <CustomerSearch                
+                customerName={filter.customerName}
                 onChange={this.handleCustomerSelect}
                 width={360}
               ></CustomerSearch>
@@ -103,11 +109,28 @@ class ContactAuditComponent extends MainComponent {
             </td>
           </tr>
           <tr>
-            <td colSpan={1}>
-              <button onClick={this.handleSearch}>Search</button>
-            </td>
-            <td colSpan={1}>
-              <button onClick={this.handleExportExcel}>Excel</button>
+            <td colSpan={3}  >
+              <div style={{display:"flex",justifyContent:"center"}}>
+              <ToolTip title="Search">
+                <i
+                  className="fal fa-search fa-2x icon m-5 pointer"
+                  onClick={this.handleSearch}
+                ></i>
+              </ToolTip>
+
+              <ToolTip title="Export Results to CSV file">
+                <i
+                  className="fal fa-file-csv fa-2x icon m-5 pointer"
+                  onClick={this.handleExportExcel}
+                ></i>
+              </ToolTip>
+              <ToolTip title="Clear Inputs">
+                <i
+                  className="fal fa-sync fa-2x icon m-5 pointer"
+                  onClick={this.handleClear}
+                ></i>
+              </ToolTip>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -125,6 +148,16 @@ class ContactAuditComponent extends MainComponent {
       this.setState({ data: sort(data, "createdByUserName"),showSpinner: false });
     });
   };
+  handleClear=()=>{
+    const { filter } = this.state;
+    filter.firstName='';
+    filter.lastName='';
+    filter.from='';
+    filter.to='';
+    filter.customerID='';
+    filter.customerName='';
+    this.setState({filter})
+  }
   getDataElement = () => {
     const { data } = this.state;
     const columns = [

@@ -203,13 +203,14 @@ class CTCustomerInfo extends CTCNC
     function searchContactAudit(){
         $body=$this->getBody();
         $test = new DBEJContactAudit($this);
+        $startDate =null;
         if ($body->from!='') {
             $startDate = DateTime::createFromFormat(
                 DATE_MYSQL_DATE,
                 $body->from
             );
         }
-
+        $endDate =null;
         if ($body->to!='') {
             $endDate = DateTime::createFromFormat(
                 DATE_MYSQL_DATE,
