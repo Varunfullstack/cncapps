@@ -5,6 +5,9 @@ import ReactDOM from 'react-dom';
 import Spinner from "../shared/Spinner/Spinner";
 
 import './../style.css';
+import HourseSupportComponent from "./subComponents/HourseSupportComponent";
+import SpecialAttentionComponent from "./subComponents/SpecialAttentionComponent";
+import ContactAuditComponent from "./subComponents/ContactAuditComponent";
 //import '/CustomerInfoComponent.css';
 
 
@@ -24,7 +27,7 @@ class CustomerInfoComponent extends MainComponent {
       ...this.state,
       showSpinner: false,
       filter: {
-        activeTab: 1,
+        activeTab: 0,
       },
       data: [],
     };
@@ -42,13 +45,14 @@ class CustomerInfoComponent extends MainComponent {
   isActive = (code) => {
     const { filter } = this.state;
     if (filter.activeTab == code) return "active";
-    else return "";
+    else 
+        return "";
   };
   setActiveTab = (code) => {
     const { filter } = this.state;
     filter.activeTab = code;
     this.saveFilter(filter);
-    this.setState({ filter, data: [] });    
+    this.setState({ filter });
   };
 
   getTabsElement = () => {
@@ -95,9 +99,7 @@ class CustomerInfoComponent extends MainComponent {
     let filter = localStorage.getItem("CustomerInfo");
     if (filter) filter = JSON.parse(filter);
     else filter = this.state.filter;
-    this.setState({ filter }, () => {
-      this.getData(filter.activeTab);      
-    });
+    this.setState({ filter });
   };
 
   setFilterValue = (property, value) => {
@@ -108,23 +110,24 @@ class CustomerInfoComponent extends MainComponent {
 
   saveFilter(filter) {
     localStorage.setItem("CustomerInfo", JSON.stringify(filter));
-    this.getData(filter.activeTab);
+  
   }
 
-  getData = (id) => {
-      this.setState({showSpinner:true});
-      switch (id) {
-        case this.TAB_24HOUR_SUPPORT:
-            this.setState({showSpinner:true});
-          break;
-        case this.TAB_CONTACT_AUDIT:
-            this.setState({showSpinner:true});
-          break;
-        case this.TAB_SPECIAL_ATTENTION:
-            this.setState({showSpinner:true});
-          break;
-      }    
-  }; 
+   
+  getActiveTab=()=>{
+      const {filter}=this.state;
+      switch(filter.activeTab)
+      {
+          case this.TAB_24HOUR_SUPPORT:
+            return <HourseSupportComponent></HourseSupportComponent>;
+          case this.TAB_SPECIAL_ATTENTION:
+              return <SpecialAttentionComponent></SpecialAttentionComponent>;
+          case this.TAB_CONTACT_AUDIT:
+              return <ContactAuditComponent></ContactAuditComponent>
+          default :
+          return null;
+      }
+  }
   render() {
     const { el } = this;
     return el(
@@ -132,7 +135,8 @@ class CustomerInfoComponent extends MainComponent {
       null,
       el(Spinner, { key: "spinner", show: this.state.showSpinner }),
       this.getAlert(),            
-      this.getTabsElement()      
+      this.getTabsElement(),
+      this.getActiveTab()
     );
   }
 }

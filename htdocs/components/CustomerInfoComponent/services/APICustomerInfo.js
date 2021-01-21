@@ -2,12 +2,19 @@ import APIMain from "../../services/APIMain";
 import ApiUrls from "../../services/ApiUrls";
 
 export default class APICustomerInfo extends APIMain {
-  getQueue(id,filter) {
-    return fetch(
-      `${ApiUrls.sdDashboard}getQueue&queue=${id}&`+new URLSearchParams(filter).toString()
-    ).then((res) => res.json());
+  get24HourSupportCustomers() {
+    return fetch(`${ApiUrls.CustomerInfo}supportCustomers`).then((res) => res.json());
+  }  
+  getCallOutYears(){
+    return fetch(`${ApiUrls.CustomerInfo}callOutYears`).then((res) => res.json());
   }
-  getDailyStatsSummary() {
-    return this.get(`${ApiUrls.sdDashboard}dailyStatsSummary` );
+  getOutOfHours(from,to){
+    return fetch(`${ApiUrls.CustomerInfo}outOfHours&from=${from}&to=${to}`).then((res) => res.json());
+  }
+  getSpecialAttention(){
+    return fetch(`${ApiUrls.CustomerInfo}specialAttention`).then((res) => res.json());
+  }
+  searchContactAudit(filter){
+    return this.post(`${ApiUrls.CustomerInfo}searchContactAudit`,filter).then((res) => res.json());
   }
 }

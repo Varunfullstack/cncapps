@@ -555,15 +555,20 @@ class CTCNC extends Controller
                 "href"  => "DailyReport.php?action=outstandingIncidents&onScreen=true&dashboard=true&daysAgo=7",
                 "label" => "Aged Service Requests",
             ],
+            // [
+            //     "id"    => 111,
+            //     "href"  => "24HoursSupportCustomersReport.php",
+            //     "label" => "24 Hour Support Customers",
+            // ],
+            // [
+            //     "id"    => 112,
+            //     "href"  => "SpecialAttentionCustomersReport.php",
+            //     "label" => "Special Attention Customers",
+            // ],
             [
-                "id"    => 111,
-                "href"  => "24HoursSupportCustomersReport.php",
-                "label" => "24 Hour Support Customers",
-            ],
-            [
-                "id"    => 112,
-                "href"  => "SpecialAttentionCustomersReport.php",
-                "label" => "Special Attention Customers",
+                "id"    => 113,
+                "href"  => "CustomerInfo.php",
+                "label" => "Customer Information",
             ],
         ];
     }
@@ -835,11 +840,11 @@ class CTCNC extends Controller
     private function getDefaultReportsMenu()
     {
         return [
-            [
-                "id"    => 501,
-                "label" => "Contact Audit Log",
-                "href"  => "ContactAudit.php",
-            ],
+            // [
+            //     "id"    => 501,
+            //     "label" => "Contact Audit Log",
+            //     "href"  => "ContactAudit.php",
+            // ],
             [
                 "id"    => 502,
                 "label" => "Office 365 Backup Audit",
@@ -1217,5 +1222,8 @@ class CTCNC extends Controller
             $js_code = '<script>' . $js_code . '</script>';
         }
         echo $js_code;
+    }
+    function getBody(){
+        return json_decode(file_get_contents('php://input'));
     }
 }

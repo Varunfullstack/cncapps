@@ -4,7 +4,7 @@
  * @param {path} p
  */
 export function get(o, p) {
-    return p.split(".").reduce((a, v) => a[v], o);
+    return p.split(".").reduce((a, v) => a[v], o)||'';
 }
 
 export function getServiceRequestWorkTitle(serviceRequest) {
@@ -62,8 +62,11 @@ export function exportCSV(items, fileName, header = []) {
     const replacer = (key, value) => {
         // specify how you want to handle null values here
         value = value == null ? "" : value;
-        value.replace(value, "\n");
-        value.replace(value, "\r");
+        if(value!=null)
+        {
+            value.toString().replace(value, "\n");
+            value.toString().replace(value, "\r");
+        }
         return value;
     };
     if (items.length > 0) {
