@@ -4,7 +4,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Spinner from "../shared/Spinner/Spinner";
 import APIDailyReport from "./services/APIDailyReport";
- 
+
 import './../style.css';
 import './DailyReportComponent.css';
 import DetailsComponent from "./subComponents/DetailsComponent";
@@ -13,10 +13,11 @@ import SummaryComponent from "./subComponents/SummaryComponent";
 class DailyReportComponent extends MainComponent {
     el = React.createElement;
     tabs = [];
-    api = new APIDailyReport(); 
-    TAB_DETAILS=1;
-    TAB_SUMMARY=2;     
-    TAB_GRAPH=3 ;
+    api = new APIDailyReport();
+    TAB_DETAILS = 1;
+    TAB_SUMMARY = 2;
+    TAB_GRAPH = 3;
+
     constructor(props) {
         super(props);
         this.state = {
@@ -28,22 +29,23 @@ class DailyReportComponent extends MainComponent {
                 sp: true,
                 p: true,
                 p5: true,
-                activeTab: 1,       
-                daysAgo:7,         
+                activeTab: 1,
+                daysAgo: 7,
             },
             data: [],
-            
+
         };
         this.tabs = [
             {id: this.TAB_DETAILS, title: "Details", icon: null},
-            {id: this.TAB_SUMMARY, title: "Summary", icon: null},   
-            {id:this.TAB_GRAPH, title:"Graph", icon: null},   
+            {id: this.TAB_SUMMARY, title: "Summary", icon: null},
+            {id: this.TAB_GRAPH, title: "Graph", icon: null},
         ];
     }
 
     componentDidMount() {
-        this.loadFilterFromStorage();        
+        this.loadFilterFromStorage();
     }
+
     isActive = (code) => {
         const {filter} = this.state;
         if (filter.activeTab == code) return "active";
@@ -53,7 +55,7 @@ class DailyReportComponent extends MainComponent {
         const {filter} = this.state;
         filter.activeTab = code;
         this.saveFilter(filter);
-        this.setState({filter, queueData: []});        
+        this.setState({filter, queueData: []});
     };
     getTabsElement = () => {
         const {el, tabs} = this;
@@ -95,7 +97,7 @@ class DailyReportComponent extends MainComponent {
         if (filter) filter = JSON.parse(filter);
         else filter = this.state.filter;
         this.setState({filter}, () => {
-            this.loadTab(filter.activeTab)            
+            this.loadTab(filter.activeTab)
         });
     };
     setFilterValue = (property, value) => {
@@ -111,8 +113,7 @@ class DailyReportComponent extends MainComponent {
 
     getFilterElement = () => {
         const {filter} = this.state;
-        const shouldBeHidden = [            
-        ].findIndex(x => x === filter.activeTab) > -1;
+        const shouldBeHidden = [].findIndex(x => x === filter.activeTab) > -1;
 
         return (
             <div className="m-5">
@@ -135,70 +136,73 @@ class DailyReportComponent extends MainComponent {
                             <label className="mr-3 ml-5">P</label>
                             <Toggle checked={filter.p}
                                     onChange={() => this.setFilterValue("p", !filter.p)}
-                            />   
+                            />
                             <label className="mr-3 ml-5">Open for at least X days</label>
-                            <select value={filter.daysAgo}   onChange={() => this.setFilterValue("daysAgo", event.target.value)}>
-                                <option value={0} >0 </option>
-                                <option value={1} >1 </option>
-                                <option value={2} >2 </option>
-                                <option value={3} >3 </option>
-                                <option value={4} >4 </option>
-                                <option value={5} >5 </option>
-                                <option value={6} >6 </option>
-                                <option value={7} >7 </option>
+                            <select value={filter.daysAgo}
+                                    onChange={() => this.setFilterValue("daysAgo", event.target.value)}
+                            >
+                                {
+                                    [0, 1, 2, 3, 4, 5, 6, 7].reverse().map(x => (
+                                            <option key={x}
+                                                    value={x}
+                                            >{x}</option>
+
+                                        )
+                                    )
+                                }
 
                             </select>
-                             
+
                         </React.Fragment>
                 }
-                 
+
             </div>
         );
     }
-    loadTab = async(id) => {
-        this.setState({data:[],showSpinner:true});
-        const {filter}=this.state;
-        switch(id){
+    loadTab = async (id) => {
+        this.setState({data: [], showSpinner: true});
+        const {filter} = this.state;
+        switch (id) {
             case this.TAB_DETAILS:
-                this.api.getOutStandingIncidents(filter).then(data=>{
-                    console.log(data);
-
-                    this.setState({data,showSpinner:false});
+                this.api.getOutStandingIncidents(filter).then(data => {
+                    this.setState({data, showSpinner: false});
                 });
                 break;
             case this.TAB_SUMMARY:
-                const years=await this.api.getYears();
-                const data={years}
-                console.log(data);
-                this.setState({data,showSpinner:false});
+                const years = await this.api.getYears();
+                const data = {years}
+                this.setState({data, showSpinner: false});
                 break;
             case this.TAB_GRAPH:
-                this.setState({ showSpinner:false});
+                this.setState({showSpinner: false});
                 break;
         }
 
 
-    };    
-    getActiveTab=()=>{
-        const {filter,data}=this.state;
-        switch(filter.activeTab){
+    };
+    getActiveTab = () => {
+        const {filter, data} = this.state;
+        switch (filter.activeTab) {
             case this.TAB_DETAILS:
-                return <DetailsComponent data={data}></DetailsComponent>
+                return <DetailsComponent data={data}/>
             case this.TAB_SUMMARY:
-                return <SummaryComponent data={data}></SummaryComponent>
+                return <SummaryComponent data={data}/>
             case this.TAB_GRAPH:
-                return <iframe src="/DailyReport.php?action=showGraphs&popup" style={{border:0,width:1200,height:600}}></iframe>
+                return <iframe src="/DailyReport.php?action=showGraphs&popup"
+                               style={{border: 0, width: 1200, height: 600}}
+                />
         }
     }
+
     render() {
         const {el} = this;
-        const {filter}=this.state;
+        const {filter} = this.state;
         return el("div", null,
             el(Spinner, {key: "spinner", show: this.state.showSpinner}),
-            this.getAlert(),            
-            this.getTabsElement(),  
-            filter.activeTab==1?this.getFilterElement():null,
-            this.getActiveTab()  
+            this.getAlert(),
+            this.getTabsElement(),
+            filter.activeTab == 1 ? this.getFilterElement() : null,
+            this.getActiveTab()
         );
     }
 }

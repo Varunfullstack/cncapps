@@ -36,6 +36,9 @@ export class RenHostingComponent  extends MainComponent
                 hdClassName: "text-center",
                 icon: "fal fa-2x fa-file color-gray2 pointer",
                 sortable: true,
+                 content: order => {
+                     return order.notes ? order.notes.substr(0, 200) : ""
+                 }
              },             
              {
                 path: "invoiceFromDate",

@@ -36,8 +36,10 @@ export class RenContractComponent extends MainComponent
                 hdClassName: "text-center",
                 icon: "fal fa-2x fa-file color-gray2 pointer",
                 sortable: true,
-                className: "text-center",                
-                 
+                className: "text-center",
+                 content: order => {
+                     return order.notes ? order.notes.substr(0, 200) : ""
+                 }
              },
              {
                 path: "invoiceFromDate",
