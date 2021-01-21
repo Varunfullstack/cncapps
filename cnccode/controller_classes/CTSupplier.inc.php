@@ -50,6 +50,7 @@ define(
 
 class CTSupplier extends CTCNC
 {
+    const GET_SUPPLIERS = "getSuppliers";
     /**
      * Dataset for supplier record storage.
      *
@@ -100,6 +101,9 @@ class CTSupplier extends CTCNC
                 break;
             case CTCNC_ACT_DISP_SUPPLIER_POPUP:
                 $this->displaySupplierSelectPopup();
+                break;
+            case self::GET_SUPPLIERS:
+                $this->getSuppliersController();
                 break;
             case CTSUPPLIER_ACT_SUPPLIER_SEARCH_FORM:
             default:
@@ -373,39 +377,6 @@ class CTSupplier extends CTCNC
     }
 
     /**
-     * Search for suppliers using supplierName
-     * @access private
-     * @throws Exception
-     */
-    function search()
-    {
-        $this->setMethodName('search');
-//        if (!$this->getParam('supplierString') && !$this->getParam('address')) {
-//            $GLOBALS['supplierStringMessage'] = 'You must specify some parameters';
-//            $this->displaySearchForm();
-//            exit;
-//        } else {
-//            if (!$this->buSupplier->getSuppliersByNameMatch(
-//                $this->getParam('supplierString'),
-//                $this->dsSupplier,
-//                $this->getParam('address')                        // on the end to ensure existing code works OK
-//            )) {
-//                $GLOBALS['supplierStringMessage'] = CTSUPPLIER_MSG_NONE_FND;
-//            }
-//
-//        }
-//        if ($this->dsSupplier->rowCount() == 1) {
-//            $this->dsSupplier->fetchNext();
-//            $this->setParam('supplierID', $this->dsSupplier->getValue(DBEJSupplier::supplierID));
-//            $this->setAction(CTCNC_ACT_SUPPLIER_EDIT);
-//            $this->supplierForm();
-//        } else {
-//            $this->displaySearchForm();
-//
-//        }
-    }
-
-    /**
      * Display the search form
      * @access private
      * @throws Exception
@@ -519,5 +490,14 @@ class CTSupplier extends CTCNC
             true
         );
         $this->parsePage();
+    }
+
+    private function getSuppliersController()
+    {
+        $dbeSuppliers = new DBESupplier($this);
+        $dbeSuppliers->getRows();
+
+
+
     }
 }
