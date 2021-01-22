@@ -1,6 +1,20 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.3.1] - 2021-01-22
+### Changed
+- Changed Customer Info show only current customers/contacts for the 24 Hour support tab and Special Attention tab.
+- Changed Customer Info special attention End dates format.
+### Fixed
+- Fixed issue with sorting by dates in RenewalsDashboard.php
+- Fixed issue with RequestDashboard.php remembering previous comments when approving/denying requests.
+- Fixed issue with &nsbp; making it's way into Homdata table.
+- Fixed issue with Call Out History not pulling data when changing the year selector.
+- Fixed issue with Call Out History selector not having the current year selected by default.
+- Fixed style for Daily stats.
+- Fixed issue when creating a follow on activity for users without SDManager Permission not being able to assign 
+  the activity type
+
 ## [v5.3.0] - 2021-01-21
 ### Added
 - Issue 1192 - Aged SRs Redesign.
