@@ -4,7 +4,7 @@ import Table from "../shared/table/table";
 import Toggle from "../shared/Toggle";
 import ToolTip from "../shared/ToolTip";
 import {getServiceRequestWorkTitle, getWorkIconClassName, SRQueues} from "../utils/utils";
-import DailyStatsComponent from "./subComponents/DailyStatsComponent";
+import DailyStatsComponent from "../shared/DailyStatsComponent/DailyStatsComponent";
 import APISDManagerDashboard from "./services/APISDManagerDashboard";
 import React from 'react';
 import ReactDOM from 'react-dom';

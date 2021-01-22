@@ -7428,9 +7428,12 @@ FROM
     {
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($callActivityID);
-        $reason   = $passedReason;
-        $isTravel = false;
-        $endTime  = null;                // default no end time
+        $reason     = $passedReason;
+        $isTravel   = false;
+        $endTime    = null;                // default no end time
+        $problemID  = $dbeCallActivity->getValue(DBEJCallActivity::problemID);
+        $dbeProblem = new DBEProblem($this);
+        $dbeProblem->getRow($problemID);
         if ($callActivityTypeID) {
             $dbeCallActType = new DBECallActType($this);
             $dbeCallActType->getRow($callActivityTypeID);
@@ -7438,13 +7441,16 @@ FROM
                 $isTravel = true;
             }
             if ($callActivityTypeID == CONFIG_CHANGE_REQUEST_ACTIVITY_TYPE_ID) {
-
                 $endTime = $this->getEndtime(CONFIG_CHANGE_REQUEST_ACTIVITY_TYPE_ID);
                 /*
         Pre-populate reason
         */
                 $reason = "<!--suppress HtmlDeprecatedAttribute -->
 <table border='1' style='border: solid black 1px'><thead><tr><td></td><td>Details</td></tr></thead><tbody><tr><td>System:</td><td></td></tr><tr><td>Summary of problem:</td><td></td></tr><tr><td>Change Requested:</td><td></td></tr><tr><td>Method to test change if successful:</td><td></td></tr><tr><td>Reversion plan if unsuccessful:</td><td></td></tr></tbody></table>";
+            }
+        } else {
+            if ($dbeCallActivity->getValue(DBECallActivity::callActTypeID) == CONFIG_FIXED_ACTIVITY_TYPE_ID) {
+                $dbeCallActivity->setValue(DBECallActivity::callActTypeID, CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID);
             }
         }
         $problemID  = $dbeCallActivity->getValue(DBEJCallActivity::problemID);
@@ -7556,7 +7562,6 @@ FROM
             $dbeCallActivity->setValue(DBECallActivity::submitAsOvertime, 1);
         }
         if ($setEndTimeToNow) {
-
             $endTime = date('H:i');      // Set to current time
         } elseif ($callActivityTypeID == CONFIG_INITIAL_ACTIVITY_TYPE_ID) {
 

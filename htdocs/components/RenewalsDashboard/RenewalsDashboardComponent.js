@@ -7,41 +7,43 @@ import './../style.css';
 //import '../shared/table/table.css';
 import './RenewalsDashboardComponent.css';
 import Spinner from "../shared/Spinner/Spinner";
-import { RenewalComponent } from "./subComponents/RenewalComponent";
-import { RenContractComponent } from "./subComponents/RenContractComponent";
-import { RenBroadbandComponent } from "./subComponents/RenBroadbandComponent";
-import {RenDomainComponent } from "./subComponents/RenDomainComponent";
-import { RenHostingComponent } from "./subComponents/RenHostingComponent";
+import {RenewalComponent} from "./subComponents/RenewalComponent";
+import {RenContractComponent} from "./subComponents/RenContractComponent";
+import {RenBroadbandComponent} from "./subComponents/RenBroadbandComponent";
+import {RenDomainComponent} from "./subComponents/RenDomainComponent";
+import {RenHostingComponent} from "./subComponents/RenHostingComponent";
+
 class RenewalsDashboardComponent extends MainComponent {
     //el = React.createElement;
     tabs = [];
     api = new APIRenewals();
-    TAB_RENEWAL=1;
-    TAB_CONTRACT=2;
-    TAB_INTERNET=3;
-    TAB_DOMAIN=4;
-    TAB_HOSTING=5;
+    TAB_RENEWAL = 1;
+    TAB_CONTRACT = 2;
+    TAB_INTERNET = 3;
+    TAB_DOMAIN = 4;
+    TAB_HOSTING = 5;
+
     constructor(props) {
         super(props);
         this.state = {
             ...this.state,
-            showSpinner: false,    
-            filter:{
-                activeTab:this.TAB_RENEWAL
+            showSpinner: false,
+            filter: {
+                activeTab: this.TAB_RENEWAL
             },
-            data:[]
+            data: []
         };
         this.tabs = [
             {id: this.TAB_RENEWAL, title: "Renewals", icon: null},
             {id: this.TAB_CONTRACT, title: "Contracts", icon: null},
             {id: this.TAB_INTERNET, title: "Internet", icon: null},
             {id: this.TAB_DOMAIN, title: "Domains", icon: null},
-            {id: this.TAB_HOSTING, title: "Hosting", icon: null},            
+            {id: this.TAB_HOSTING, title: "Hosting", icon: null},
         ];
     }
 
-    componentDidMount() {     
-        const {filter}   =this.state;
+    componentDidMount() {
+        const {filter} = this.state;
         this.loadTab(filter.activeTab);
     }
 
@@ -53,7 +55,7 @@ class RenewalsDashboardComponent extends MainComponent {
     setActiveTab = (code) => {
         const {filter} = this.state;
         filter.activeTab = code;
-        this.setState({filter});        
+        this.setState({filter});
         this.loadTab(filter.activeTab);
     };
 
@@ -92,77 +94,68 @@ class RenewalsDashboardComponent extends MainComponent {
             })
         );
     };
-    
+
     loadTab = (id) => {
-        console.log(id);
-        this.setState({showSpinner:true});
-        switch(id)
-        {
+        this.setState({showSpinner: true});
+        switch (id) {
             case this.TAB_RENEWAL:
-                this.api.getRenewals().then(data=>{
-                    console.log(data);
-                    this.setState({showSpinner:false,data});
+                this.api.getRenewals().then(data => {
+                    this.setState({showSpinner: false, data});
                 });
                 break;
             case this.TAB_CONTRACT:
-                this.api.getRenContract().then(data=>{
-                    console.log(data);
-                    this.setState({showSpinner:false,data});
+                this.api.getRenContract().then(data => {
+                    this.setState({showSpinner: false, data});
                 });
                 break;
             case this.TAB_INTERNET:
-                this.api.getRenBroadband().then(data=>{
-                    console.log(data);
-                    this.setState({showSpinner:false,data});
+                this.api.getRenBroadband().then(data => {
+                    this.setState({showSpinner: false, data});
                 });
                 break;
             case this.TAB_DOMAIN:
-                this.api.getRenDomain().then(data=>{
-                    console.log(data);
-                    this.setState({showSpinner:false,data});
+                this.api.getRenDomain().then(data => {
+                    this.setState({showSpinner: false, data});
                 });
                 break;
             case this.TAB_HOSTING:
-                this.api.getRenHosting().then(data=>{
-                    console.log(data);
-                    this.setState({showSpinner:false,data});
+                this.api.getRenHosting().then(data => {
+                    this.setState({showSpinner: false, data});
                 });
                 break;
             default:
-                this.setState({showSpinner:false});
+                this.setState({showSpinner: false});
 
         }
 
     };
-    
-    getActiveElement=()=>{
-        const {filter,data}=this.state;
-        switch(filter.activeTab)
-        {
+
+    getActiveElement = () => {
+        const {filter, data} = this.state;
+        switch (filter.activeTab) {
             case this.TAB_RENEWAL:
-                return <RenewalComponent data={data}></RenewalComponent>;  
-            case this.TAB_CONTRACT:      
-                return <RenContractComponent data={data}></RenContractComponent>;  
+                return <RenewalComponent data={data}/>;
+            case this.TAB_CONTRACT:
+                return <RenContractComponent data={data}/>;
             case this.TAB_INTERNET:
-                return <RenBroadbandComponent data={data}></RenBroadbandComponent>;
+                return <RenBroadbandComponent data={data}/>;
             case this.TAB_DOMAIN:
-                return <RenDomainComponent data={data}></RenDomainComponent>;
+                return <RenDomainComponent data={data}/>;
             case this.TAB_HOSTING:
-                return <RenHostingComponent data={data}></RenHostingComponent>;
+                return <RenHostingComponent data={data}/>;
         }
     }
+
     render() {
         const {el} = this;
         return el("div", null,
             el(Spinner, {key: "spinner", show: this.state.showSpinner}),
-            this.getAlert(), 
-            this.getTabsElement(),            
+            this.getAlert(),
+            this.getTabsElement(),
             this.getActiveElement()
         );
     }
 }
-
-export default RenewalsDashboardComponent;
 
 document.addEventListener('DOMContentLoaded', () => {
         const domContainer = document.querySelector("#reactMainRenewalsDashboard");

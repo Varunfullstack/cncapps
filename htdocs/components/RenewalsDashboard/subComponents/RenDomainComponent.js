@@ -1,7 +1,7 @@
 import MainComponent from "../../shared/MainComponent";
 import React from 'react';
 import Table from "../../shared/table/table";
-import { exportCSV } from "../../utils/utils";
+import {dateFormatExcludeNull, exportCSV} from "../../utils/utils";
 
 export class RenDomainComponent  extends MainComponent
 {
@@ -44,7 +44,8 @@ export class RenDomainComponent  extends MainComponent
                 hdClassName: "text-center",
                 icon: "fal fa-2x fa-hourglass-start color-gray2 pointer",
                 sortable: true,
-                className: "text-center",                              
+                className: "text-center",
+                 content: order => dateFormatExcludeNull(order.invoiceFromDate)
              },
              {
                 path: "invoiceToDate",
@@ -53,7 +54,8 @@ export class RenDomainComponent  extends MainComponent
                 hdClassName: "text-center",
                 icon: "fal fa-2x fa-hourglass-end color-gray2 pointer",
                 sortable: true,
-                className: "text-center",                
+                className: "text-center",
+                 content: order => dateFormatExcludeNull(order.invoiceToDate)
              },
              {
                 path: "customerItemID",
@@ -71,7 +73,6 @@ export class RenDomainComponent  extends MainComponent
                 }
              },
         ]
-        console.log('data length',data.length);
         return <Table id='renewals' data={data||[]} columns={columns} pk={'customerItemID'} search={true}>
         </Table>
     }

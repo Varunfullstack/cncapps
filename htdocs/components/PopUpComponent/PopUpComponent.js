@@ -1,11 +1,10 @@
 import MainComponent from "../shared/MainComponent";
-import DailyStatsComponent from "../SDManagerDashboardComponent/subComponents/DailyStatsComponent"
+import DailyStatsComponent from "../shared/DailyStatsComponent/DailyStatsComponent"
 import {params} from "../utils/utils"
 import React from 'react';
 import ReactDOM from 'react-dom';
 
 import './../style.css';
-import './../SDManagerDashboardComponent/SDManagerDashboardComponent.css';
 import TimeBreakdownComponent from "../ActivityComponent/subComponents/TimeBreakdownComponent";
 
 class PopUpComponent extends MainComponent {
@@ -20,9 +19,9 @@ class PopUpComponent extends MainComponent {
         const {el} = this;
         const action = params.get("action");
         if (action == "dailyStats") {
-            return el(DailyStatsComponent);
+            return <DailyStatsComponent className="resizable"/>;
         }
-        if(action=="timeBreakdown")
+        if (action == "timeBreakdown")
             return el(TimeBreakdownComponent);
 
         return el('label', null, "Not Found")

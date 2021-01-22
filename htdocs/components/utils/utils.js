@@ -3,8 +3,10 @@
  * @param {object} o
  * @param {path} p
  */
+import moment from "moment";
+
 export function get(o, p) {
-    return p.split(".").reduce((a, v) => a[v], o)||'';
+    return p.split(".").reduce((a, v) => a[v], o) || '';
 }
 
 export function getServiceRequestWorkTitle(serviceRequest) {
@@ -62,10 +64,9 @@ export function exportCSV(items, fileName, header = []) {
     const replacer = (key, value) => {
         // specify how you want to handle null values here
         value = value == null ? "" : value;
-        if(value!=null)
-        {
-        value.toString().replace(value, "\n");
-        value.toString().replace(value, "\r");
+        if (value != null) {
+            value.toString().replace(value, "\n");
+            value.toString().replace(value, "\r");
         }
         return value;
     };
@@ -241,4 +242,18 @@ export function getContactElementName(contact) {
         suffix = ' - Delegate';
     }
     return `${name}${suffix}`
+}
+
+export function poundFormat(number) {
+    if (number === undefined || number === null) {
+        return null;
+    }
+    return `£${(+number).toFixed(2)}`
+}
+
+export function dateFormatExcludeNull(date, fromFormat = "YYYY-MM-DD", toFormat = "DD/MM/YYYY") {
+    if (date === undefined || date === null) {
+        return "";
+    }
+    return moment(date, fromFormat).format(toFormat);
 }

@@ -1527,9 +1527,14 @@ class BUCustomer extends Business
         return $this->dbeCustomer->countReviewRows();
     }
 
-    function get24HourSupportCustomers(&$dsResults)
+    /**
+     * @param $dsResults
+     * @param bool $onlyCurrentCustomers
+     * @return bool
+     */
+    function get24HourSupportCustomers(&$dsResults, $onlyCurrentCustomers = false)
     {
-        $this->dbeCustomer->get24HourSupportCustomers();
+        $this->dbeCustomer->get24HourSupportCustomers($onlyCurrentCustomers);
         return $this->getData(
             $this->dbeCustomer,
             $dsResults

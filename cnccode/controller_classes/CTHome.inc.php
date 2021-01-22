@@ -26,11 +26,11 @@ class CTHome extends CTCNC
     const getFixedAndReopenData              = "getFixedAndReopenData";
     const getUpcomingVisitsData              = "getUpcomingVisitsData";
     const GET_USER_PERFORMANCE_BETWEEN_DATES = 'getUserPerformanceBetweenDates';
-    const GET_SALES_FIGURES                  ='salesFigures';
-    const GET_TEAM_PERFORMANCE               ='teamPerformance';
-    const GET_ALL_USER_PERFORMANCE           ='allUserPerformance';    
-    const GET_USER_PERFORMANCE               ='userPerformance';
-    const DEFAULT_LAYOUT                     ='defaultLayout';
+    const GET_SALES_FIGURES                  = 'salesFigures';
+    const GET_TEAM_PERFORMANCE               = 'teamPerformance';
+    const GET_ALL_USER_PERFORMANCE           = 'allUserPerformance';
+    const GET_USER_PERFORMANCE               = 'userPerformance';
+    const DEFAULT_LAYOUT                     = 'defaultLayout';
     /** @var DataSet|DBEHeader */
     private $dsHeader;
     /** @var BUUser */
@@ -65,7 +65,7 @@ class CTHome extends CTCNC
      */
     function defaultAction()
     {
-        $method=$_SERVER['REQUEST_METHOD'] ;
+        $method = $_SERVER['REQUEST_METHOD'];
         switch ($this->getAction()) {
             case 'lastWeekHelpDesk':
                 $team = 1;
@@ -120,7 +120,7 @@ class CTHome extends CTCNC
                 break;
             case self::GET_ALL_USER_PERFORMANCE:
                 echo json_encode($this->getAllUsersPerformance());
-                break;                       
+                break;
             case 'charts' :
                 $this->displayChartsWithoutMenu();
                 break;
@@ -128,10 +128,8 @@ class CTHome extends CTCNC
                 echo json_encode($this->getUserPerformance());
                 break;
             case self::DEFAULT_LAYOUT:
-                if($method=='GET')
-                echo json_encode($this->getDefaultLayout());
-                if($method=='POST')
-                echo json_encode($this->setDefaultLayout());
+                if ($method == 'GET') echo json_encode($this->getDefaultLayout());
+                if ($method == 'POST') echo json_encode($this->setDefaultLayout());
                 break;
             default:
                 $this->displayReact();
@@ -324,21 +322,17 @@ class CTHome extends CTCNC
         /*
         Otherwise display other sections based upon group membership
         */
-        
         $this->setTemplateFiles(
             'HOME',
             'Home.rct'
         );
-        
         $this->template->parse(
             'CONTENTS',
             'HOME',
             true
         );
-
         $this->loadReactScript('HomeComponent.js');
         $this->loadReactCSS('HomeComponent.css');
-
         $this->parsePage();
     } // end display projects
 
@@ -975,7 +969,7 @@ class CTHome extends CTCNC
     }
 
     private function displayCharts()
-    {        
+    {
         $this->setTemplateFiles(
             'HomeCharts',
             'HomeCharts'
@@ -991,8 +985,9 @@ class CTHome extends CTCNC
             'CONTENTS',
             'HomeCharts',
             true
-        );     
+        );
     }
+
     private function displayChartsWithoutMenu()
     {
         $this->setHTMLFmt(CT_HTML_FMT_POPUP);
@@ -1199,85 +1194,91 @@ class CTHome extends CTCNC
         }
         return $this->buUser->getUserPerformanceByUserBetweenDates($data['userId'], $startDate, $endDate);
     }
+
     //Json data
     function getSalesFigures()
-    {   
+    {
         if (!$this->hasPermissions(ACCOUNTS_PERMISSION)) {
             http_response_code(400);
             return ["status" => false];
         }
-        $result=[];
+        $result              = [];
         $dbeSalesOrderTotals = new DBESalesOrderTotals($this);
         $dbeSalesOrderTotals->getRow();
-        $profit = $dbeSalesOrderTotals->getValue(DBESalesOrderTotals::saleValue) - $dbeSalesOrderTotals->getValue(
+        $profit             = $dbeSalesOrderTotals->getValue(
+                DBESalesOrderTotals::saleValue
+            ) - $dbeSalesOrderTotals->getValue(
                 DBESalesOrderTotals::costValue
-            );        
-        $result['soSale']= Controller::formatNumber($dbeSalesOrderTotals->getValue(DBESalesOrderTotals::saleValue));
-        $result['soCost']= Controller::formatNumber($dbeSalesOrderTotals->getValue(DBESalesOrderTotals::costValue));
-        $result['soProfit'] = Controller::formatNumber($profit);            
-        $profitTotal      = $profit;
-        $saleTotal        = $dbeSalesOrderTotals->getValue(DBESalesOrderTotals::saleValue);
-        $costTotal        = $dbeSalesOrderTotals->getValue(DBESalesOrderTotals::costValue);
-        $dbeInvoiceTotals = new DBEInvoiceTotals($this);
+            );
+        $result['soSale']   = Controller::formatNumber($dbeSalesOrderTotals->getValue(DBESalesOrderTotals::saleValue));
+        $result['soCost']   = Controller::formatNumber($dbeSalesOrderTotals->getValue(DBESalesOrderTotals::costValue));
+        $result['soProfit'] = Controller::formatNumber($profit);
+        $profitTotal        = $profit;
+        $saleTotal          = $dbeSalesOrderTotals->getValue(DBESalesOrderTotals::saleValue);
+        $costTotal          = $dbeSalesOrderTotals->getValue(DBESalesOrderTotals::costValue);
+        $dbeInvoiceTotals   = new DBEInvoiceTotals($this);
         $dbeInvoiceTotals->getCurrentMonthTotals();
-        $profit = $dbeInvoiceTotals->getValue(DBEInvoiceTotals::saleValue) - $dbeInvoiceTotals->getValue(
+        $profit                     = $dbeInvoiceTotals->getValue(
+                DBEInvoiceTotals::saleValue
+            ) - $dbeInvoiceTotals->getValue(
                 DBEInvoiceTotals::costValue
             );
         $result['invPrintedSale']   = Controller::formatNumber(
-                $dbeInvoiceTotals->getValue(DBEInvoiceTotals::saleValue)
+            $dbeInvoiceTotals->getValue(DBEInvoiceTotals::saleValue)
         );
         $result['invPrintedCost']   = Controller::formatNumber(
-                $dbeInvoiceTotals->getValue(DBEInvoiceTotals::costValue)
+            $dbeInvoiceTotals->getValue(DBEInvoiceTotals::costValue)
         );
-        $result['invPrintedProfit'] = Controller::formatNumber($profit);            
-        
-        $profitTotal += $profit;
-        $saleTotal   += $dbeInvoiceTotals->getValue(DBEInvoiceTotals::saleValue);
-        $costTotal   += $dbeInvoiceTotals->getValue(DBEInvoiceTotals::costValue);
+        $result['invPrintedProfit'] = Controller::formatNumber($profit);
+        $profitTotal                += $profit;
+        $saleTotal                  += $dbeInvoiceTotals->getValue(DBEInvoiceTotals::saleValue);
+        $costTotal                  += $dbeInvoiceTotals->getValue(DBEInvoiceTotals::costValue);
         $dbeInvoiceTotals->getUnprintedTotals();
-        $profit = $dbeInvoiceTotals->getValue(DBEInvoiceTotals::saleValue) - $dbeInvoiceTotals->getValue(
+        $profit                       = $dbeInvoiceTotals->getValue(
+                DBEInvoiceTotals::saleValue
+            ) - $dbeInvoiceTotals->getValue(
                 DBEInvoiceTotals::costValue
             );
         $result['invUnprintedSale']   = Controller::formatNumber(
-                    $dbeInvoiceTotals->getValue(DBEInvoiceTotals::saleValue)
+            $dbeInvoiceTotals->getValue(DBEInvoiceTotals::saleValue)
         );
         $result['invUnprintedCost']   = Controller::formatNumber(
-                    $dbeInvoiceTotals->getValue(DBEInvoiceTotals::costValue)
+            $dbeInvoiceTotals->getValue(DBEInvoiceTotals::costValue)
         );
         $result['invUnprintedProfit'] = Controller::formatNumber($profit);
-        $profitTotal += $profit;
-        $saleTotal   += $dbeInvoiceTotals->getValue(DBEInvoiceTotals::saleValue);
-        $costTotal   += $dbeInvoiceTotals->getValue(DBEInvoiceTotals::costValue);
-        $result['saleTotal']   = Controller::formatNumber($saleTotal);
-        $result['costTotal']   = Controller::formatNumber($costTotal);
-        $result['profitTotal'] = Controller::formatNumber($profitTotal);
-        return ["status" => true,'data'=>$result];
+        $profitTotal                  += $profit;
+        $saleTotal                    += $dbeInvoiceTotals->getValue(DBEInvoiceTotals::saleValue);
+        $costTotal                    += $dbeInvoiceTotals->getValue(DBEInvoiceTotals::costValue);
+        $result['saleTotal']          = Controller::formatNumber($saleTotal);
+        $result['costTotal']          = Controller::formatNumber($costTotal);
+        $result['profitTotal']        = Controller::formatNumber($profitTotal);
+        return ["status" => true, 'data' => $result];
     }
+
     function getTeamPerformance()
-    {        
-        $data=[];
-        $buTeamPerformance = new BUTeamPerformance($this);
-        $data['esTeamTargetSlaPercentage']           = $this->dsHeader->getValue(
-                    DBEHeader::esTeamTargetSlaPercentage
+    {
+        $data                                         = [];
+        $buTeamPerformance                            = new BUTeamPerformance($this);
+        $data['esTeamTargetSlaPercentage']            = $this->dsHeader->getValue(
+            DBEHeader::esTeamTargetSlaPercentage
         );
         $data['esTeamTargetFixHours']                 = $this->dsHeader->getValue(DBEHeader::esTeamTargetFixHours);
-        $data['smallProjectsTeamTargetSlaPercentage']  = $this->dsHeader->getValue(
-                    DBEHeader::smallProjectsTeamTargetSlaPercentage
+        $data['smallProjectsTeamTargetSlaPercentage'] = $this->dsHeader->getValue(
+            DBEHeader::smallProjectsTeamTargetSlaPercentage
         );
         $data['smallProjectsTeamTargetFixHours']      = $this->dsHeader->getValue(
-                    DBEHeader::smallProjectsTeamTargetFixHours
+            DBEHeader::smallProjectsTeamTargetFixHours
         );
         $data['hdTeamTargetSlaPercentage']            = $this->dsHeader->getValue(
-                    DBEHeader::hdTeamTargetSlaPercentage
+            DBEHeader::hdTeamTargetSlaPercentage
         );
         $data['hdTeamTargetFixHours']                 = $this->dsHeader->getValue(DBEHeader::hdTeamTargetFixHours);
         $data['projectTeamTargetSlaPercentage']       = $this->dsHeader->getValue(
-                    DBEHeader::projectTeamTargetSlaPercentage
+            DBEHeader::projectTeamTargetSlaPercentage
         );
         $data['projectTeamTargetFixHours']            = $this->dsHeader->getValue(
-                    DBEHeader::projectTeamTargetFixHours
+            DBEHeader::projectTeamTargetFixHours
         );
-          
         /* Extract data and build report */
         $results = $buTeamPerformance->getQuarterlyRecordsByYear(date('Y'));
         foreach ($results as $result) {
@@ -1317,7 +1318,8 @@ class CTHome extends CTCNC
             if ($result['projectTeamActualFixHours'] <= $result['projectTeamTargetFixHours']) {
                 $projectTeamFixHoursClass = 'performance-green';
             }
-            $data =(object)array_merge($data,
+            $data = (object)array_merge(
+                $data,
                 array(
                     'esTeamActualSlaPercentage' . $result['quarter']                      => number_format(
                         $result['esTeamActualSlaPercentage'],
@@ -1363,14 +1365,16 @@ class CTHome extends CTCNC
                     'smallProjectsTeamActualFixHours' . $result['quarter'] . 'Class'      => $smallProjectsTeamFixHoursClass,
                     'projectTeamActualSlaPercentage' . $result['quarter'] . 'Class'       => $projectTeamSLAPerformanceClass,
                     'projectTeamActualFixHours' . $result['quarter'] . 'Class'            => $projectTeamFixHoursClass,
-            ));
+                )
+            );
 
         }
         return $data;
     }
+
     function getAllUsersPerformance()
     {
-        $data=[];        
+        $data                                 = [];
         $hdTeamTargetLogPercentage            = $this->dsHeader->getValue(DBEHeader::hdTeamTargetLogPercentage);
         $esTeamTargetLogPercentage            = $this->dsHeader->getValue(DBEHeader::esTeamTargetLogPercentage);
         $smallProjectsTeamTargetLogPercentage = $this->dsHeader->getValue(
@@ -1414,33 +1418,31 @@ class CTHome extends CTCNC
             if ($monthly['performancePercentage'] >= $hdTeamTargetLogPercentage) {
                 $monthlyPercentageClass = 'performance-green';
             }
-            $data []=
-                array(
-                    'team'                   =>"hd",
-                    'initials'               => $user['initials'],
-                    'targetPercentage'       => $hdTeamTargetLogPercentage,
-                    'weeklyPercentage'       => number_format(
-                        $weekly['performancePercentage'],
-                        2
-                    ),
-                    'weeklyHours'            => number_format(
-                        $weekly['loggedHours'],
-                        2
-                    ),
-                    'monthlyPercentage'      => number_format(
-                        $monthly['performancePercentage'],
-                        2
-                    ),
-                    'monthlyHours'           => number_format(
-                        $monthly['loggedHours'],
-                        2
-                    ),
-                    'weeklyPercentageClass'  => $weeklyPercentageClass,
-                    'monthlyPercentageClass' => $monthlyPercentageClass                
+            $data [] = array(
+                'team'                   => "hd",
+                'initials'               => $user['initials'],
+                'targetPercentage'       => $hdTeamTargetLogPercentage,
+                'weeklyPercentage'       => number_format(
+                    $weekly['performancePercentage'],
+                    2
+                ),
+                'weeklyHours'            => number_format(
+                    $weekly['loggedHours'],
+                    2
+                ),
+                'monthlyPercentage'      => number_format(
+                    $monthly['performancePercentage'],
+                    2
+                ),
+                'monthlyHours'           => number_format(
+                    $monthly['loggedHours'],
+                    2
+                ),
+                'weeklyPercentageClass'  => $weeklyPercentageClass,
+                'monthlyPercentageClass' => $monthlyPercentageClass
             );
-            
+
         }
-                
         foreach ($esUsers as $user) {
 
             $weekly                = $this->buUser->getUserPerformanceByUser(
@@ -1465,32 +1467,30 @@ class CTHome extends CTCNC
             if ($monthly['performancePercentage'] >= $esTeamTargetLogPercentage) {
                 $monthlyPercentageClass = 'performance-green';
             }
-            $data []=
-                array(
-                    'team'                   =>'es',
-                    'initials'               => $user['initials'],
-                    'targetPercentage'       => $esTeamTargetLogPercentage,
-                    'weeklyPercentage'       => number_format(
-                        $weekly['performancePercentage'],
-                        2
-                    ),
-                    'weeklyHours'            => number_format(
-                        $weekly['loggedHours'],
-                        2
-                    ),
-                    'monthlyPercentage'      => number_format(
-                        $monthly['performancePercentage'],
-                        2
-                    ),
-                    'monthlyHours'           => number_format(
-                        $monthly['loggedHours'],
-                        2
-                    ),
-                    'weeklyPercentageClass'  => $weeklyPercentageClass,
-                    'monthlyPercentageClass' => $monthlyPercentageClass                
-            );            
+            $data [] = array(
+                'team'                   => 'es',
+                'initials'               => $user['initials'],
+                'targetPercentage'       => $esTeamTargetLogPercentage,
+                'weeklyPercentage'       => number_format(
+                    $weekly['performancePercentage'],
+                    2
+                ),
+                'weeklyHours'            => number_format(
+                    $weekly['loggedHours'],
+                    2
+                ),
+                'monthlyPercentage'      => number_format(
+                    $monthly['performancePercentage'],
+                    2
+                ),
+                'monthlyHours'           => number_format(
+                    $monthly['loggedHours'],
+                    2
+                ),
+                'weeklyPercentageClass'  => $weeklyPercentageClass,
+                'monthlyPercentageClass' => $monthlyPercentageClass
+            );
         }
-        
         foreach ($imUsers as $user) {
 
             $weekly                = $this->buUser->getUserPerformanceByUser(
@@ -1515,35 +1515,33 @@ class CTHome extends CTCNC
             if ($monthly['performancePercentage'] >= $smallProjectsTeamTargetLogPercentage) {
                 $monthlyPercentageClass = 'performance-green';
             }
-            $data []=
-                array(
-                    'team'                   =>'sp',
-                    'initials'               => $user['initials'],
-                    'targetPercentage'       => $smallProjectsTeamTargetLogPercentage,
-                    'weeklyPercentage'       => number_format(
-                        $weekly['performancePercentage'],
-                        2
-                    ),
-                    'weeklyHours'            => number_format(
-                        $weekly['loggedHours'],
-                        2
-                    ),
-                    'monthlyPercentage'      => number_format(
-                        $monthly['performancePercentage'],
-                        2
-                    ),
-                    'monthlyHours'           => number_format(
-                        $monthly['loggedHours'],
-                        2
-                    ),
-                    'weeklyPercentageClass'  => $weeklyPercentageClass,
-                    'monthlyPercentageClass' => $monthlyPercentageClass                
+            $data [] = array(
+                'team'                   => 'sp',
+                'initials'               => $user['initials'],
+                'targetPercentage'       => $smallProjectsTeamTargetLogPercentage,
+                'weeklyPercentage'       => number_format(
+                    $weekly['performancePercentage'],
+                    2
+                ),
+                'weeklyHours'            => number_format(
+                    $weekly['loggedHours'],
+                    2
+                ),
+                'monthlyPercentage'      => number_format(
+                    $monthly['performancePercentage'],
+                    2
+                ),
+                'monthlyHours'           => number_format(
+                    $monthly['loggedHours'],
+                    2
+                ),
+                'weeklyPercentageClass'  => $weeklyPercentageClass,
+                'monthlyPercentageClass' => $monthlyPercentageClass
             );
         }
         /*
         Projects team users
         */
-        
         foreach ($projectUsers as $user) {
 
             $weekly                = $this->buUser->getUserPerformanceByUser(
@@ -1568,37 +1566,37 @@ class CTHome extends CTCNC
             if ($monthly['performancePercentage'] >= $projectTeamTargetLogPercentage) {
                 $monthlyPercentageClass = 'performance-green';
             }
-            $data []=
-                array(
-                    'team'                   =>'p',
-                    'initials'               => $user['initials'],
-                    'targetPercentage'       => $projectTeamTargetLogPercentage,
-                    'weeklyPercentage'       => number_format(
-                        $weekly['performancePercentage'],
-                        2
-                    ),
-                    'weeklyHours'            => number_format(
-                        $weekly['loggedHours'],
-                        2
-                    ),
-                    'monthlyPercentage'      => number_format(
-                        $monthly['performancePercentage'],
-                        2
-                    ),
-                    'monthlyHours'           => number_format(
-                        $monthly['loggedHours'],
-                        2
-                    ),
-                    'weeklyPercentageClass'  => $weeklyPercentageClass,
-                    'monthlyPercentageClass' => $monthlyPercentageClass                
+            $data [] = array(
+                'team'                   => 'p',
+                'initials'               => $user['initials'],
+                'targetPercentage'       => $projectTeamTargetLogPercentage,
+                'weeklyPercentage'       => number_format(
+                    $weekly['performancePercentage'],
+                    2
+                ),
+                'weeklyHours'            => number_format(
+                    $weekly['loggedHours'],
+                    2
+                ),
+                'monthlyPercentage'      => number_format(
+                    $monthly['performancePercentage'],
+                    2
+                ),
+                'monthlyHours'           => number_format(
+                    $monthly['loggedHours'],
+                    2
+                ),
+                'weeklyPercentageClass'  => $weeklyPercentageClass,
+                'monthlyPercentageClass' => $monthlyPercentageClass
             );
-            
+
         }
-        return $data;        
+        return $data;
     }
+
     function getUserPerformance()
-    {        
-        $data=[];
+    {
+        $data                = [];
         $teamLevel           = $this->buUser->getLevelByUserID($this->userID);
         $targetLogPercentage = 0;
         switch ($teamLevel) {
@@ -1624,33 +1622,41 @@ class CTHome extends CTCNC
             31
         );
         if ($weekly['performancePercentage'] < $targetLogPercentage) {
-            $data['weeklyPercentageClass']='performance-warn';
+            $data['weeklyPercentageClass'] = 'performance-warn';
         }
         if ($monthly['performancePercentage'] < $targetLogPercentage) {
-            $data['monthlyPercentageClass']='performance-warn';
+            $data['monthlyPercentageClass'] = 'performance-warn';
         }
         $data['targetPercentage']  = $targetLogPercentage;
-        $data['weeklyPercentage']  = number_format($weekly['performancePercentage'],2);
-        $data['weeklyHours']       = number_format($weekly['loggedHours'],2);
-        $data['monthlyPercentage']  = number_format($monthly['performancePercentage'],2);
-        $data['monthlyHours']       = number_format($monthly['loggedHours'],2);                    
+        $data['weeklyPercentage']  = number_format($weekly['performancePercentage'], 2);
+        $data['weeklyHours']       = number_format($weekly['loggedHours'], 2);
+        $data['monthlyPercentage'] = number_format($monthly['performancePercentage'], 2);
+        $data['monthlyHours']      = number_format($monthly['loggedHours'], 2);
         return $data;
     }
-    function getDefaultLayout(){
-        $result=DBConnect::fetchOne("select settings from cons_settings where consno=67 and type='home'");
-        return ['status'=>true,'data'=>json_decode($result['settings'])];
+
+    function getDefaultLayout()
+    {
+        $result = DBConnect::fetchOne("select settings from cons_settings where consno=67 and type='home'");
+        return ['status' => true, 'data' => json_decode($result['settings'])];
     }
-    function setDefaultLayout(){
-        $body =json_decode(file_get_contents('php://input'));
-        $default=DBConnect::fetchOne("select * from cons_settings where consno=67 and type='home'");
-        if(isset($default['settings'])) //update row
+
+    function setDefaultLayout()
+    {
+        $body    = json_decode(file_get_contents('php://input'));
+        $default = DBConnect::fetchOne("select * from cons_settings where consno=67 and type='home'");
+        if (isset($default['settings'])) //update row
         {
-            return DBConnect::execute("update cons_settings set settings=:settings where consno=67 and type='home'",["settings"=> $body->settings]);
-        }
-        else //insert new row
+            return DBConnect::execute(
+                "update cons_settings set settings=:settings where consno=67 and type='home'",
+                ["settings" => $body->settings]
+            );
+        } else //insert new row
         {
-            return DBConnect::execute("insert into cons_settings(consno,type,settings) values(67,'home,:settings)",
-            ['settings'=>$body->settings]);
+            return DBConnect::execute(
+                "insert into cons_settings(consno,type,settings) values(67,'home',:settings)",
+                ['settings' => $body->settings]
+            );
         }
     }
 }

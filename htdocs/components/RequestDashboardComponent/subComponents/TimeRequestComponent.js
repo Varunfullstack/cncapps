@@ -242,13 +242,16 @@ class TimeRequestComponent extends MainComponent {
 
         this.api.setTimeRequest(data).then(result => {
             if (result.status) {
-                this.setState({showProcessTimeModal: false});
+                this.handleCancel()
                 this.onRefresh();
             }
         });
     }
     handleCancel = () => {
-        this.setState({showProcessTimeModal: false});
+        this.setState({
+            showProcessTimeModal: false,
+            data: {...this.state.data, allocatedTimeValue: '', allocatedTimeAmount: '', comments: ''}
+        });
     }
     handleApprove = () => {
         const {data} = this.state;
@@ -263,7 +266,7 @@ class TimeRequestComponent extends MainComponent {
         data.status = "Approve";
         this.api.setTimeRequest(data).then(result => {
             if (result.status) {
-                this.setState({showProcessTimeModal: false});
+                this.handleCancel();
                 this.onRefresh();
             }
         });

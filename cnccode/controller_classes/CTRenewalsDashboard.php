@@ -10,11 +10,12 @@ require_once($cfg['path_bu'] . '/BURenHosting.inc.php');
 
 class CTRenewalsDashboard extends CTCNC
 {
-    const CONST_RENEWALS='renewals';
-    const CONST_REN_CONTRACT='renContract';
-    const CONST_REN_BROADBAND='renBroadband';
-    const CONST_REN_DOMAIN='renDomain';
-    const CONST_REN_HOSTING='renHosting';
+    const CONST_RENEWALS      = 'renewals';
+    const CONST_REN_CONTRACT  = 'renContract';
+    const CONST_REN_BROADBAND = 'renBroadband';
+    const CONST_REN_DOMAIN    = 'renDomain';
+    const CONST_REN_HOSTING   = 'renHosting';
+
     function __construct($requestMethod,
                          $postVars,
                          $getVars,
@@ -29,12 +30,12 @@ class CTRenewalsDashboard extends CTCNC
             $cookieVars,
             $cfg,
             false
-        );                
+        );
         $roles = [RENEWALS_PERMISSION, TECHNICAL_PERMISSION];
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
-        }        
+        }
         $this->setMenuId(601);
     }
 
@@ -44,9 +45,9 @@ class CTRenewalsDashboard extends CTCNC
      * @throws Exception
      */
     function defaultAction()
-    {        
+    {
         $this->requestMethod;
-        switch ($this->getAction()) {            
+        switch ($this->getAction()) {
             case self::CONST_RENEWALS:
                 echo json_encode($this->getRenewalsData());
                 break;
@@ -67,10 +68,10 @@ class CTRenewalsDashboard extends CTCNC
                 break;
         }
     }
-    
+
     function setTemplate()
-    {        
-        
+    {
+
         $this->setPageTitle('Renewals Dashboard');
         $this->setTemplateFiles(
             array('RenewalsDashboard' => 'RenewalsDashboard.rct')
@@ -85,7 +86,7 @@ class CTRenewalsDashboard extends CTCNC
         $this->parsePage();
     }
 
-     /**
+    /**
      * Display list of types
      * @access private
      * @throws Exception
@@ -100,130 +101,93 @@ class CTRenewalsDashboard extends CTCNC
             $dsRenQuotation,
             'customerName'
         );
-        $data=[];
-        if ($dsRenQuotation->rowCount()) {            
-
-            while ($dsRenQuotation->fetchNext()) {                
-                $latestQuoteSent = null;
-                if ($dsRenQuotation->getValue(DBEJRenQuotation::latestQuoteSent)) {
-                    $latestQuoteSent = DateTime::createFromFormat(
-                        'Y-m-d H:i:s',
-                        $dsRenQuotation->getValue(
-                            DBEJRenQuotation::latestQuoteSent
-                        )
-                    );
-                }
-                $sent = false;
-                if ($dsRenQuotation->getValue(DBEJRenQuotation::latestQuoteSent) && $latestQuoteSent) {
-                    $sent = true;
-                }
-                $ordheadID=$dsRenQuotation->getValue(DBEJRenQuotation::ordheadID);
-                $data []=
-                    [
-                        'customerItemID'     =>$dsRenQuotation->getValue(DBEJRenQuotation::customerItemID),
-                        'orderId'            =>$dsRenQuotation->getValue(DBEJRenQuotation::ordheadID),
-                        'customerName'        => $dsRenQuotation->getValue(DBEJRenQuotation::customerName),
-                        'itemDescription'     => $dsRenQuotation->getValue(DBEJRenQuotation::itemDescription),                        
-                        'startDate'           => Controller::dateYMDtoDMY( $dsRenQuotation->getValue(DBEJRenQuotation::startDate)),
-                        'nextPeriodStartDate' => Controller::dateYMDtoDMY(
-                            $dsRenQuotation->getValue(DBEJRenQuotation::nextPeriodStartDate)
-                        ),
-                        'nextPeriodEndDate'   => Controller::dateYMDtoDMY(
-                            $dsRenQuotation->getValue(DBEJRenQuotation::nextPeriodEndDate)
-                        ),                                                                        
-                        'sentQuotationColor'  => !$ordheadID ? 'white' : ($sent ? "#B2FFB2" : "#F5AEBD"),
-                        'latestQuoteSent'     => $latestQuoteSent ? $latestQuoteSent->format('d/m/Y H:i:s') : null,
-                        'comments'            => substr(
-                            $dsRenQuotation->getValue(DBEJRenQuotation::customerItemNotes),
-                            0,
-                            30
-                        ),
-                        ];                
-            }//while $dsRenQuotation->fetchNext()
+        $data = [];
+        while ($dsRenQuotation->fetchNext()) {
+            $data [] = [
+                'customerItemID'      => $dsRenQuotation->getValue(DBEJRenQuotation::customerItemID),
+                'orderId'             => $dsRenQuotation->getValue(DBEJRenQuotation::ordheadID),
+                'customerName'        => $dsRenQuotation->getValue(DBEJRenQuotation::customerName),
+                'itemDescription'     => $dsRenQuotation->getValue(DBEJRenQuotation::itemDescription),
+                'startDate'           => $dsRenQuotation->getValue(DBEJRenQuotation::startDate),
+                'nextPeriodStartDate' => $this->getYMDDateFromDMY(
+                    $dsRenQuotation->getValue(DBEJRenQuotation::nextPeriodStartDate)
+                ),
+                'nextPeriodEndDate'   => $this->getYMDDateFromDMY(
+                    $dsRenQuotation->getValue(DBEJRenQuotation::nextPeriodEndDate)
+                ),
+                'latestQuoteSent'     => $dsRenQuotation->getValue(DBEJRenQuotation::latestQuoteSent),
+                'comments'            => substr(
+                    $dsRenQuotation->getValue(DBEJRenQuotation::customerItemNotes),
+                    0,
+                    30
+                ),
+            ];
         }
-        return  $data;
+        return $data;
     }
-     /**
+
+    /**
      * get ren contracts
      * @access private
      * @throws Exception
      */
     function getRenContractData()
     {
-        $this->setMethodName('getRenContractData');        
+        $this->setMethodName('getRenContractData');
         $dsRenContract = new DataSet($this);
         $buRenContract = new BURenContract($this);
         $buRenContract->getAll(
             $dsRenContract,
             $this->getParam('orderBy')
         );
-        $data=[];
-        if ($dsRenContract->rowCount() > 0) {            
-            while ($dsRenContract->fetchNext()) {             
-                    $data []=
-                    array(
-                        'customerItemID' => $dsRenContract->getValue(DBEJRenContract::customerItemID),
-                        'customerName'    => $dsRenContract->getValue(DBEJRenContract::customerName),
-                        'itemDescription' => $dsRenContract->getValue(DBEJRenContract::itemDescription),
-                        'invoiceFromDate' => Controller::dateYMDtoDMY(
-                            $dsRenContract->getValue(DBEJRenContract::invoiceFromDate)
-                        ),
-                        'invoiceToDate'   => Controller::dateYMDtoDMY(
-                            $dsRenContract->getValue(DBEJRenContract::invoiceToDate)
-                        ),
-                        'quantity'        => $dsRenContract->getValue(DBEJRenContract::users),
-                        'notes'           => Controller::dateYMDtoDMY($dsRenContract->getValue(DBEJRenContract::notes)),
-                        'costAnnum'       => utf8MoneyFormat(
-                            UK_MONEY_FORMAT,
-                            $dsRenContract->getValue(DBEJContract::curUnitCost)
-                        ),
-                        'saleAnnum'       => utf8MoneyFormat(
-                            UK_MONEY_FORMAT,
-                            $dsRenContract->getValue(DBEJContract::curUnitSale)
-                        )                         
-                    );
-            }
-        }        
+        $data = [];
+        while ($dsRenContract->fetchNext()) {
+            $data [] = array(
+                'customerItemID'  => $dsRenContract->getValue(DBEJRenContract::customerItemID),
+                'customerName'    => $dsRenContract->getValue(DBEJRenContract::customerName),
+                'itemDescription' => $dsRenContract->getValue(DBEJRenContract::itemDescription),
+                'invoiceFromDate' => $dsRenContract->getValue(DBEJRenContract::invoiceFromDateYMD),
+                'invoiceToDate'   => $dsRenContract->getValue(DBEJRenContract::invoiceToDateYMD),
+                'quantity'        => $dsRenContract->getValue(DBEJRenContract::users),
+                'notes'           => $dsRenContract->getValue(DBEJRenContract::notes),
+                'costAnnum'       => $dsRenContract->getValue(DBEJContract::curUnitCost),
+                'saleAnnum'       => $dsRenContract->getValue(DBEJContract::curUnitSale),
+            );
+        }
         return $data;
     }
+
     /**
-     * get Ren Broadband 
+     * get Ren Broadband
      * @access private
      * @throws Exception
      */
     function getRenBroadbandData()
     {
-        $this->setMethodName('getRenBroadbandData');        
+        $this->setMethodName('getRenBroadbandData');
         $dsRenBroadband = new DataSet($this);
         $buRenBroadband = new BURenBroadband($this);
         $buRenBroadband->getAll(
             $dsRenBroadband,
             $this->getParam('orderBy')
         );
-        $data=[];
-        if ($dsRenBroadband->rowCount() > 0) {            
-            while ($dsRenBroadband->fetchNext()) {
-               
-                $data []=                
-                    array(
-                        'customerItemID'    => $dsRenBroadband->getValue(DBEJRenBroadband::customerItemID),
-                        'customerName'      => $dsRenBroadband->getValue(DBEJRenBroadband::customerName),
-                        'itemDescription'   => $dsRenBroadband->getValue(DBEJRenBroadband::itemDescription),
-                        'ispID'             => $dsRenBroadband->getValue(DBEJRenBroadband::ispID),
-                        'adslPhone'         => $dsRenBroadband->getValue(DBEJRenBroadband::adslPhone),
-                        'salePricePerMonth' => $dsRenBroadband->getValue(DBEJRenBroadband::salePricePerMonth),
-                        'costPricePerMonth' => $dsRenBroadband->getValue(DBEJRenBroadband::costPricePerMonth),
-                        'invoiceFromDate'   => Controller::dateYMDtoDMY(
-                            $dsRenBroadband->getValue(DBEJRenBroadband::invoiceFromDate)
-                        ),
-                        'invoiceToDate'     => Controller::dateYMDtoDMY(
-                            $dsRenBroadband->getValue(DBEJRenBroadband::invoiceToDate)
-                        ),                         
-                    );
-            }
-        }        
+        $data = [];
+        while ($dsRenBroadband->fetchNext()) {
+            $data [] = array(
+                'customerItemID'    => $dsRenBroadband->getValue(DBEJRenBroadband::customerItemID),
+                'customerName'      => $dsRenBroadband->getValue(DBEJRenBroadband::customerName),
+                'itemDescription'   => $dsRenBroadband->getValue(DBEJRenBroadband::itemDescription),
+                'ispID'             => $dsRenBroadband->getValue(DBEJRenBroadband::ispID),
+                'adslPhone'         => $dsRenBroadband->getValue(DBEJRenBroadband::adslPhone),
+                'salePricePerMonth' => $dsRenBroadband->getValue(DBEJRenBroadband::salePricePerMonth),
+                'costPricePerMonth' => $dsRenBroadband->getValue(DBEJRenBroadband::costPricePerMonth),
+                'invoiceFromDate'   => $dsRenBroadband->getValue(DBEJRenBroadband::invoiceFromDateYMD),
+                'invoiceToDate'     => $dsRenBroadband->getValue(DBEJRenBroadband::invoiceToDateYMD),
+            );
+        }
         return $data;
     }
+
     /**
      * get ren domain data
      * @access private
@@ -231,33 +195,30 @@ class CTRenewalsDashboard extends CTCNC
      */
     function getRenDomainData()
     {
-        $this->setMethodName('getRenDomainData');                
+        $this->setMethodName('getRenDomainData');
         $dsRenDomain = new DataSet($this);
         $buRenDomain = new BURenDomain($this);
+
         $buRenDomain->getAll(
             $dsRenDomain,
             $this->getParam('orderBy')
         );
-        $data=[];
-        if ($dsRenDomain->rowCount() > 0) {            
+        $data = [];
+        if ($dsRenDomain->rowCount() > 0) {
             while ($dsRenDomain->fetchNext()) {
-                 $data []=
-                    array(
-                        'customerItemID'  => $dsRenDomain->getValue(DBEJCustomerItem::customerItemID),
-                        'customerName'    => $dsRenDomain->getValue(DBEJCustomerItem::customerName),
-                        'itemDescription' => $dsRenDomain->getValue(DBEJCustomerItem::itemDescription),
-                        'domain'          => $dsRenDomain->getValue(DBEJCustomerItem::notes),
-                        'invoiceFromDate' => Controller::dateYMDtoDMY(
-                            $dsRenDomain->getValue(DBEJCustomerItem::invoiceFromDate)
-                        ),
-                        'invoiceToDate'   => Controller::dateYMDtoDMY(
-                            $dsRenDomain->getValue(DBEJCustomerItem::invoiceToDate)
-                        ),
-                    );
+                $data [] = array(
+                    'customerItemID'  => $dsRenDomain->getValue(DBEJCustomerItem::customerItemID),
+                    'customerName'    => $dsRenDomain->getValue(DBEJCustomerItem::customerName),
+                    'itemDescription' => $dsRenDomain->getValue(DBEJCustomerItem::itemDescription),
+                    'domain'          => $dsRenDomain->getValue(DBEJCustomerItem::notes),
+                    'invoiceFromDate' => $dsRenDomain->getValue(DBEJCustomerItem::invoiceFromDateYMD),
+                    'invoiceToDate'   => $dsRenDomain->getValue(DBEJCustomerItem::invoiceToDateYMD),
+                );
             }
-        }        
-        return  $data;
+        }
+        return $data;
     }
+
     /**
      * Get Hosting data
      * @access private
@@ -272,26 +233,43 @@ class CTRenewalsDashboard extends CTCNC
             $dsRenHosting,
             $this->getParam('orderBy')
         );
-        $data=[];
-        if ($dsRenHosting->rowCount() > 0) {            
-            while ($dsRenHosting->fetchNext()) {                
-                $data []=
-                    array(
-                        'customerItemID'  => $dsRenHosting->getValue(DBEJRenHosting::customerItemID),
-                        'customerName'    => $dsRenHosting->getValue(DBEJRenHosting::customerName),
-                        'itemDescription' => $dsRenHosting->getValue(DBEJRenHosting::itemDescription),
-                        'invoiceFromDate' => Controller::dateYMDtoDMY(
-                            $dsRenHosting->getValue(DBEJRenHosting::invoiceFromDate)
-                        ),
-                        'invoiceToDate'   => Controller::dateYMDtoDMY(
-                            $dsRenHosting->getValue(DBEJRenHosting::invoiceToDate)
-                        ),     
-                        'notes'                      => Controller::htmlTextArea(
-                            $dsRenHosting->getValue(DBEJRenHosting::internalNotes)
-                        )                   
-                    );
+        $data = [];
+        if ($dsRenHosting->rowCount() > 0) {
+            while ($dsRenHosting->fetchNext()) {
+                $data [] = array(
+                    'customerItemID'  => $dsRenHosting->getValue(DBEJRenHosting::customerItemID),
+                    'customerName'    => $dsRenHosting->getValue(DBEJRenHosting::customerName),
+                    'itemDescription' => $dsRenHosting->getValue(DBEJRenHosting::itemDescription),
+                    'invoiceFromDate' => $dsRenHosting->getValue(DBEJRenHosting::invoiceFromDateYMD),
+                    'invoiceToDate'   => $dsRenHosting->getValue(DBEJRenHosting::invoiceToDateYMD),
+                    'notes'           => Controller::htmlTextArea(
+                        $dsRenHosting->getValue(DBEJRenHosting::internalNotes)
+                    )
+                );
             }
-        }        
+        }
         return $data;
+    }
+
+    /**
+     * @param string|null $dateString
+     * @return string|null
+     */
+    private function getYMDDateFromDMY(?string $dateString): ?string
+    {
+        if (!$dateString) {
+            return "";
+        }
+        $dateTime = DateTime::createFromFormat(
+            'd/m/Y',
+            $dateString
+        );
+        if (!$dateTime) {
+            return "";
+        }
+        return \CNCLTD\Utils::dateTimeToString(
+            $dateTime,
+            DATE_MYSQL_DATE
+        );
     }
 }

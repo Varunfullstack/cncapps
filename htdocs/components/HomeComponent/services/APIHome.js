@@ -2,41 +2,43 @@ import APIMain from "../../services/APIMain";
 import ApiUrls from "../../services/ApiUrls";
 
 export default class APIHome extends APIMain {
-    getUpcomingVisits(){
+    getUpcomingVisits() {
         return this.get(`${ApiUrls.Home}getUpcomingVisitsData`);
     }
 
-    getSalesFigures(){
-        return this.get(`${ApiUrls.Home}salesFigures`);        
+    getSalesFigures() {
+        return this.get(`${ApiUrls.Home}salesFigures`);
     }
 
-    getFixedAndReopenData(){
-        return this.get(`${ApiUrls.Home}getFixedAndReopenData`);        
+    getFixedAndReopenData() {
+        return this.get(`${ApiUrls.Home}getFixedAndReopenData`);
     }
 
-    getFirstTimeFixData(){
-        return this.get(`${ApiUrls.Home}getFirstTimeFixData`);        
+    getFirstTimeFixData() {
+        return this.get(`${ApiUrls.Home}getFirstTimeFixData`);
     }
 
-    getTeamPerformance(){
-        return this.get(`${ApiUrls.Home}teamPerformance`);        
+    getTeamPerformance() {
+        return this.get(`${ApiUrls.Home}teamPerformance`);
     }
 
-    getAllUserPerformance(){        
+    getAllUserPerformance() {
         return this.get(`${ApiUrls.Home}allUserPerformance`);
     }
 
-    getUserPerformance(){
-        return this.get(`${ApiUrls.Home}userPerformance`);        
+    getUserPerformance() {
+        return this.get(`${ApiUrls.Home}userPerformance`);
     }
-    getDefaultLayout(){
+
+    getDefaultLayout() {
         return this.get(`${ApiUrls.Home}defaultLayout`);
     }
-    setDefaultLayout(settings){
-         const body={            
-            settings:JSON.stringify(settings),            
+
+    setDefaultLayout(settings) {
+        const body = {
+            settings: JSON.stringify(settings),
         }
-        return this.post(`${ApiUrls.Home}defaultLayout`,body);
+        return this.post(`${ApiUrls.Home}defaultLayout`, body);
     }
-    
+
 }

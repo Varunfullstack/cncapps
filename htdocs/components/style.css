@@ -497,6 +497,7 @@ dd {
 .text-center {
     text-align: center;
 }
+
 .text-top {
     vertical-align: top !important;
 }
@@ -1051,6 +1052,7 @@ input:checked + .slider:before {
     min-height: 42px;
     padding: 4px;
 }
-.text-left{
+
+.text-left {
     text-align: left;
 }

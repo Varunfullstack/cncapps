@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom';
 import Spinner from "../shared/Spinner/Spinner";
 
 import './../style.css';
-import HourseSupportComponent from "./subComponents/HourseSupportComponent";
+import TwentyFourHoursSupportComponent from "./subComponents/TwentyFourHoursSupportComponent";
 import SpecialAttentionComponent from "./subComponents/SpecialAttentionComponent";
 import ContactAuditComponent from "./subComponents/ContactAuditComponent";
 //import '/CustomerInfoComponent.css';
@@ -119,7 +119,7 @@ class CustomerInfoComponent extends MainComponent {
       switch(filter.activeTab)
       {
           case this.TAB_24HOUR_SUPPORT:
-            return <HourseSupportComponent></HourseSupportComponent>;
+            return <TwentyFourHoursSupportComponent></TwentyFourHoursSupportComponent>;
           case this.TAB_SPECIAL_ATTENTION:
               return <SpecialAttentionComponent></SpecialAttentionComponent>;
           case this.TAB_CONTACT_AUDIT:

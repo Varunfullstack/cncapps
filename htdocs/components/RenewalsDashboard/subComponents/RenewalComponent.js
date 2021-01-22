@@ -1,7 +1,7 @@
 import MainComponent from "../../shared/MainComponent";
 import React from 'react';
 import Table from "../../shared/table/table";
-import {exportCSV, sort} from "../../utils/utils";
+import {dateFormatExcludeNull, exportCSV, sort} from "../../utils/utils";
 
 export class RenewalComponent extends MainComponent {
     constructor(props) {
@@ -14,14 +14,11 @@ export class RenewalComponent extends MainComponent {
         data = data.map(d => {
             if (d.orderId == null)
                 d.orderId = 0;
-            //d.nextPeriodStartDate=moment(d.nextPeriodStartDate,'DD/MM/YYYY').format("YYYY-MM-DD");
-            //d.latestQuoteSent=moment(d.nextPeriodStartDate,'DD/MM/YYYY').format("YYYY-MM-DD HH:mm");
-            if (d.sentQuotationColor == "white")
-                d.sentQuotationColor = "";
+            d.sentQuotationColor = !d.orderId ? '' : (d.latestQuoteSent ? "#B2FFB2" : "#F5AEBD");
             return d;
         });
         data = sort(data, 'orderId', 'desc');
-        console.log('sorted', data);
+
         const columns = [
             {
                 path: "customerName",
@@ -30,7 +27,6 @@ export class RenewalComponent extends MainComponent {
                 hdClassName: "text-center",
                 icon: "fal fa-2x fa-building color-gray2 pointer",
                 sortable: true,
-                //className: "text-center",
                 backgroundColorColumn: "sentQuotationColor",
             },
             {
@@ -68,6 +64,7 @@ export class RenewalComponent extends MainComponent {
                 sortable: true,
                 className: "text-center",
                 backgroundColorColumn: "sentQuotationColor",
+                content: order => dateFormatExcludeNull(order.startDate)
             },
             {
                 path: "nextPeriodStartDate",
@@ -78,6 +75,7 @@ export class RenewalComponent extends MainComponent {
                 sortable: true,
                 className: "text-center",
                 backgroundColorColumn: "sentQuotationColor",
+                content: order => dateFormatExcludeNull(order.nextPeriodStartDate)
             },
             {
                 path: "comments",
@@ -86,7 +84,6 @@ export class RenewalComponent extends MainComponent {
                 hdClassName: "text-center",
                 icon: "fal fa-2x fa-file color-gray2 pointer",
                 sortable: true,
-                //className: "text-center",
                 backgroundColorColumn: "sentQuotationColor",
                 content: order => {
                     return order.comments ? order.comments.substr(0, 200) : ""
@@ -101,6 +98,7 @@ export class RenewalComponent extends MainComponent {
                 sortable: true,
                 className: "text-center",
                 backgroundColorColumn: "sentQuotationColor",
+                content: order => dateFormatExcludeNull(order.latestQuoteSent, 'YYYY-MM-DD HH:mm:ss', 'DD/MM/YYYY HH:mm:ss')
             },
             {
                 path: "customerItemID",
@@ -120,7 +118,7 @@ export class RenewalComponent extends MainComponent {
                 }
             },
         ]
-        console.log('data length', data.length);
+
         return <Table id='renewals'
                       data={data || []}
                       columns={columns}

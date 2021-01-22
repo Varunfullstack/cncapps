@@ -179,7 +179,7 @@ class ChangeRequestComponent extends MainComponent {
     }
 
     handleCancel = () => {
-        this.setState({showProcessTimeModal: false});
+        this.setState({showProcessTimeModal: false, data: {...this.state.data, comments: ''}});
     }
 
     handleRequest = (status) => {
@@ -191,7 +191,7 @@ class ChangeRequestComponent extends MainComponent {
         data.status = status;
         this.api.processChangeRequest(data).then(result => {
             if (result.status) {
-                this.setState({showProcessTimeModal: false});
+                this.handleCancel();
                 this.onRefresh();
             }
         });

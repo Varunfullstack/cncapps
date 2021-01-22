@@ -984,7 +984,7 @@ class ActivityEditComponent extends MainComponent {
         const {el} = this;
         const {data, callActTypes, notSDManagerActivityTypes, currentUser} = this.state;
         const selectedActivityType = callActTypes.find((t) => t.id == data.callActTypeID);
-        const isEnabled = currentUser?.isSDManager || (!currentUser?.isSDManager && selectedActivityType && selectedActivityType.visibleInSRFlag === 'Y')
+        const isEnabled = currentUser?.isSDManager || (!currentUser?.isSDManager && selectedActivityType && selectedActivityType.visibleInSRFlag === 'Y') || params.get("isFollow");
         let activityTypesToShow = notSDManagerActivityTypes;
         if (!isEnabled || currentUser?.isSDManager) {
             activityTypesToShow = callActTypes;

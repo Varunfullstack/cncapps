@@ -39,9 +39,6 @@ class SalesRequestComponent extends MainComponent {
         this.apiUsers = new APIUser();
     }
 
-    // componentWillReceiveProps(nextProps) {
-    //     this.setState({activities:nextProps.activities} );
-    //   }
     static getDerivedStateFromProps(props, current_state) {
         return {...current_state, ...props};
     }
@@ -57,21 +54,9 @@ class SalesRequestComponent extends MainComponent {
     getAllocateUsers = () => {
         this.apiUsers.getActiveUsers().then(users => {
             this.setState({users});
-            //console.log(users);
         })
     }
-    // loadData()
-    // {
-    //     const {filter}=this.state;
-    //     if(filter!=null)
-    //     {
-    //         this.setState({showSpinner:true});
-    //         this.api.getSalesRequest(filter).then(activities=>{
-    //             //console.log(activities);
-    //             this.setState({activities,showSpinner:false});
-    //         })
-    //     }
-    // }
+
     getUsersElement = (activity) => {
         const {users} = this.state;
         return <select value={activity.salesRequestAssignedUserId || ""}
@@ -270,7 +255,11 @@ class SalesRequestComponent extends MainComponent {
     }
 
     handleCancel = () => {
-        this.setState({showProcessTimeModal: false});
+        this.closeModal();
+    }
+
+    closeModal = () => {
+        this.setState({showProcessTimeModal: false, data: {...data, comments: ''}});
     }
 
     handleRequest = (status) => {
@@ -287,7 +276,7 @@ class SalesRequestComponent extends MainComponent {
                     return;
                 }
 
-                this.setState({showProcessTimeModal: false});
+                this.closeModal();
                 this.onRefresh();
             });
     }
