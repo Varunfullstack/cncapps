@@ -1,7 +1,7 @@
 import MainComponent from "../../shared/MainComponent";
 import React from 'react';
 import Table from "../../shared/table/table";
-import {exportCSV, SRQueues} from "../../utils/utils";
+import {dateFormatExcludeNull, exportCSV, SRQueues} from "../../utils/utils";
 
 class DetailsComponent extends MainComponent {
 
@@ -57,7 +57,8 @@ class DetailsComponent extends MainComponent {
                 icon: "fal fa-2x fa-file-alt color-gray2 pointer",
                 sortable: true,
                 classNameColumn: "rowClass",
-                //className: "text-center",
+                className: '',
+                content: (sr) => sr.description ? sr.description.substr(0, 300) : ""
 
             },
             {
@@ -121,7 +122,7 @@ class DetailsComponent extends MainComponent {
                 icon: "fal fa-2x fa-calendar  color-gray2 pointer",
                 sortable: true,
                 classNameColumn: "rowClass",
-                //className: "text-center",
+                content: order => dateFormatExcludeNull(order.lastUpdatedDate)
             },
             {
                 path: "awaiting",
@@ -140,6 +141,8 @@ class DetailsComponent extends MainComponent {
                       pk="serviceRequestID"
                       search={true}
                       striped={false}
+                      defaultSortPath="durationHours"
+                      defaultSortOrder="desc"
         >
         </Table>;
     }

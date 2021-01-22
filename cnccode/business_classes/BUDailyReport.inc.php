@@ -110,7 +110,7 @@ GROUP BY t.month;
                     SITE_URL . '/SRActivity.php',
                     array(
                         'serviceRequestId' => $row[1],
-                        "action" => "displayActivity"
+                        "action"           => "displayActivity"
                     )
                 );
                 $description = substr(
@@ -576,10 +576,10 @@ GROUP BY t.month;
 
     function getOustandingRequests($daysAgo = 1,
                                    $priorityFiveOnly = false,
-                                   $hd=true,
-                                   $es=true,
-                                   $sp=true,
-                                   $p=true
+                                   $hd = true,
+                                   $es = true,
+                                   $sp = true,
+                                   $p = true
     )
     {
         $sql = "SELECT 
@@ -626,21 +626,15 @@ GROUP BY t.month;
         } else {
             $sql .= " AND pro_priority < 5";
         }
-
-        if(!$hd)
-            $sql .= " AND pro_queue_no <>1   ";
-        if(!$es)
-            $sql .= " AND pro_queue_no <>2   ";
-        if(!$sp)
-            $sql .= " AND pro_queue_no <>3   ";
-        if(!$p)
-            $sql .= " AND pro_queue_no <>5  ";
-
+        if (!$hd) $sql .= " AND pro_queue_no <>1   ";
+        if (!$es) $sql .= " AND pro_queue_no <>2   ";
+        if (!$sp) $sql .= " AND pro_queue_no <>3   ";
+        if (!$p) $sql .= " AND pro_queue_no <>5  ";
         $sql .= "      ORDER BY customer,
         pro_problemno";
         return $this->db->query($sql);
-    } // end function
-     
+    }
+
     function focActivities($daysAgo)
     {
 
@@ -669,7 +663,7 @@ GROUP BY t.month;
                     SITE_URL . '/SRActivity.php',
                     array(
                         'serviceRequestId' => $row[1],
-                        'action'         => 'displayActivity'
+                        'action'           => 'displayActivity'
                     )
                 );
                 $urlActivity = $controller->buildLink(
@@ -897,7 +891,7 @@ GROUP BY t.month;
                     SITE_URL . '/SRActivity.php',
                     array(
                         'serviceRequestId' => $row[1],
-                        "action" => "displayActivity"
+                        "action"           => "displayActivity"
                     )
                 );
                 $template->setVar(
@@ -1030,7 +1024,7 @@ GROUP BY t.month;
                     SITE_URL . '/SRActivity.php',
                     array(
                         'serviceRequestId' => $row[1],
-                        "action" => "displayActivity"
+                        "action"           => "displayActivity"
                     )
                 );
                 $template->setVar(

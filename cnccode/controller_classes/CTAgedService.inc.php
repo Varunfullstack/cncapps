@@ -6,6 +6,9 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use Html2Text\Html2Text;
+
 require_once($cfg ['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_bu'] . '/BUDailyReport.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomer.inc.php');
@@ -13,12 +16,12 @@ require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg["path_bu"] . "/BUHeader.inc.php");
 require_once($cfg["path_dbe"] . "/DBConnect.php");
 
-use CNCLTD\Utils;
 class CTAgedService extends CTCNC
 {
-    private $buDailyReport;   
-    const GET_OUTSTANDING_INCIDENTS ='getoutstandingIncidents';
-    const GET_YEARS='years';
+    private $buDailyReport;
+    const GET_OUTSTANDING_INCIDENTS = 'getoutstandingIncidents';
+    const GET_YEARS                 = 'years';
+
     function __construct($requestMethod,
                          $postVars,
                          $getVars,
@@ -49,20 +52,20 @@ class CTAgedService extends CTCNC
      */
     function defaultAction()
     {
-        switch ($this->getAction()) { 
+        switch ($this->getAction()) {
             case self::GET_OUTSTANDING_INCIDENTS:
-                echo json_encode($this->getOutStandingIncidents());
+                echo json_encode($this->getOutStandingIncidents(), JSON_NUMERIC_CHECK);
                 break;
             case self::GET_YEARS:
                 echo json_encode($this->getYears());
                 break;
             default :
-            $this->setTemplateReact();
+                $this->setTemplateReact();
         }
     }
-     
+
     function setTemplateReact()
-    {        
+    {
         $this->setPageTitle('Aged Service Requests');
         $this->setTemplateFiles(
             array('DailyReport' => 'DailyReport.rct')
@@ -77,16 +80,17 @@ class CTAgedService extends CTCNC
         $this->setMenuId(110);
         $this->parsePage();
     }
-    function getOutStandingIncidents(){
-        $daysAgo=$this->getParam("daysAgo")??1;
-        $data =[];
-        $hd=$this->getParam("hd")=='true';
-        $es=$this->getParam("es")=='true';
-        $sp=$this->getParam("sp")=='true';
-        $p=$this->getParam("p")=='true';
-        $p5=$this->getParam("p5")=='true';
-        $p5=false;
-        $rows=$this->buDailyReport->getOustandingRequests(
+
+    function getOutStandingIncidents()
+    {
+        $daysAgo  = $this->getParam("daysAgo") ?? 1;
+        $data     = [];
+        $hd       = $this->getParam("hd") == 'true';
+        $es       = $this->getParam("es") == 'true';
+        $sp       = $this->getParam("sp") == 'true';
+        $p        = $this->getParam("p") == 'true';
+        $p5       = false;
+        $rows     = $this->buDailyReport->getOustandingRequests(
             $daysAgo,
             $p5,
             $hd,
@@ -94,55 +98,60 @@ class CTAgedService extends CTCNC
             $sp,
             $p
         );
-        $buHeader   = new BUHeader($this);
-        $dsHeader   = new DataSet($this);
+        $buHeader = new BUHeader($this);
+        $dsHeader = new DataSet($this);
         $buHeader->getHeader($dsHeader);
-        
-        while($row = $rows->fetch_row())
-        {
-            $urlRequest  = Controller::buildLink(
+        while ($row = $rows->fetch_row()) {
+            [
+                $customer,
+                $serviceRequestId,
+                $assignedTo,
+                $description,
+                $durationHours,
+                $timeSpentHours,
+                $lastUpdatedDate,
+                $priority,
+                $teamName,
+                $status,
+                $awaitingCustomer,
+                $queueNumber,
+            ] = $row;
+            $urlRequest = Controller::buildLink(
                 SITE_URL . '/SRActivity.php',
                 array(
-                    'serviceRequestId' => $row[1],
-                    "action" => "displayActivity"
+                    'serviceRequestId' => $serviceRequestId,
+                    "action"           => "displayActivity"
                 )
             );
-            $description = substr(
-                Utils::stripEverything($row[3]),
-                0,
-                50
-            );
-            $data []= array(
-                'customer'            => $row[0],
-                'serviceRequestID'    => $row[1],
-                'assignedTo'          => $row[2],
-                'description'         => substr(
-                    Utils::stripEverything($row[3]),
-                    0,
-                    300
-                ),
-                'durationHours'       => $row[4],
-                'timeSpentHours'      => $row[5],
-                'lastUpdatedDate'     => $row[6] ? Controller::dateYMDtoDMY($row[6]) : null,
-                'lastUpdatedDateSort' => $row[6],
-                'priority'            => $row[7],
-                'teamName'            => $row[8],
-                'awaiting'            => $row[10] == 'I' ? 'Not Started' : ($row[9] == 'Y' ? 'Customer' : 'CNC'),
-                'urlRequest'          => $urlRequest,
-                'rowClass'            => $row[4] >= $dsHeader->getValue(
+            $description = (new Html2Text($description))->getText();
+            $data []     = [
+                'customer'         => $customer,
+                'serviceRequestID' => $serviceRequestId,
+                'assignedTo'       => $assignedTo,
+                'description'      => $description,
+                'durationHours'    => $durationHours,
+                'timeSpentHours'   => $timeSpentHours,
+                'lastUpdatedDate'  => $lastUpdatedDate,
+                'priority'         => $priority,
+                'teamName'         => $teamName,
+                'awaiting'         => $status == 'I' ? 'Not Started' : ($awaitingCustomer == 'Y' ? 'Customer' : 'CNC'),
+                'urlRequest'       => $urlRequest,
+                'rowClass'         => $durationHours >= $dsHeader->getValue(
                     DBEHeader::sevenDayerRedDays
-                ) ? 'red-row' : ($row[4] >= $dsHeader->getValue(
+                ) ? 'red-row' : ($durationHours >= $dsHeader->getValue(
                     DBEHeader::sevenDayerAmberDays
                 ) ? 'amber-row' : ''),
-                'amberThreshold'      => $dsHeader->getValue(DBEHeader::sevenDayerAmberDays),
-                'redThreshold'        => $dsHeader->getValue(DBEHeader::sevenDayerRedDays),
-                'queueNo'             =>$row[11]
-                );
+                'amberThreshold'   => $dsHeader->getValue(DBEHeader::sevenDayerAmberDays),
+                'redThreshold'     => $dsHeader->getValue(DBEHeader::sevenDayerRedDays),
+                'queueNo'          => $queueNumber
+            ];
         }
-        return $data; 
+        return $data;
     }
-    function getYears(){
-        return DBConnect::fetchAll("SELECT  DISTINCT YEAR(date) AS YEAR  FROM  sevenDayersPerformanceLog",[]);
+
+    function getYears()
+    {
+        return DBConnect::fetchAll("SELECT  DISTINCT YEAR(date) AS YEAR  FROM  sevenDayersPerformanceLog", []);
     }
 
 } // end of class
