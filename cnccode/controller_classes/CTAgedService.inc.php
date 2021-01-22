@@ -9,6 +9,7 @@
 
 use Html2Text\Html2Text;
 
+global $cfg;
 require_once($cfg ['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_bu'] . '/BUDailyReport.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomer.inc.php');
@@ -116,7 +117,7 @@ class CTAgedService extends CTCNC
                 $awaitingCustomer,
                 $queueNumber,
             ] = $row;
-            $urlRequest = Controller::buildLink(
+            $urlRequest  = Controller::buildLink(
                 SITE_URL . '/SRActivity.php',
                 array(
                     'serviceRequestId' => $serviceRequestId,
