@@ -1593,15 +1593,21 @@ class BUActivity extends Business
         );
         $urlActivity              = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
-        $durationHours            = common_convertHHMMToDecimal(
+        $durationHours            = round(common_convertHHMMToDecimal(
                 $dbeJCallActivity->getValue(DBEJCallActivity::endTime)
-            ) - common_convertHHMMToDecimal($dbeJCallActivity->getValue(DBEJCallActivity::startTime));
+            ) - common_convertHHMMToDecimal($dbeJCallActivity->getValue(DBEJCallActivity::startTime)),2);
+        $durationHoursInfo = "<div>{$durationHours} hours spent.</div>";
+        if($durationHours < 0 ){
+            $durationHoursInfo = "";
+        }
         $awaitingCustomerResponse = null;
         if ($dbeJCallActivity->getValue(DBEJCallActivity::requestAwaitingCustomerResponseFlag) == 'Y') {
             $awaitingCustomerResponse = 'Awaiting Customer';
         } else {
             $awaitingCustomerResponse = 'Awaiting CNC';
         }
+
+
         $template->setVar(
             array(
                 'activityRef'                 => $activityRef,
@@ -1611,10 +1617,7 @@ class BUActivity extends Business
                 'activityTypeName'            => $dbeJCallActivity->getValue(DBEJCallActivity::activityType),
                 'urlActivity'                 => $urlActivity,
                 'userName'                    => $dbeJCallActivity->getValue(DBEJCallActivity::userName),
-                'durationHours'               => round(
-                    $durationHours,
-                    2
-                ),
+                'durationHoursInfo'               => $durationHoursInfo,
                 'requestStatus'               => $this->problemStatusArray[$dbeJCallActivity->getValue(
                     DBEJCallActivity::problemStatus
                 )],
