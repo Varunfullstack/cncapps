@@ -654,7 +654,7 @@ class BUPDFInvoice extends BaseObject
         $this->_buPDF->setFont();
         $this->_buPDF->printStringAt(
             BUPDFINV_COST_BOX_LEFT_EDGE,
-            '673 8380 03'
+            'GB673838003'
         );
         $this->_buPDF->CR();
         $this->_buPDF->box(

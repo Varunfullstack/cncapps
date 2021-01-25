@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1199 - Changed VAT Number formatting.
+
 ## [v5.3.2] - 2021-01-25
 ### Fixed
 - On the home page the links in this section are opening the Activity of the SR number, rather than the Activity ID.
