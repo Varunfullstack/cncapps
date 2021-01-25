@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1186 
+
 ## [v5.3.1] - 2021-01-22
 ### Changed
 - Changed Customer Info show only current customers/contacts for the 24 Hour support tab and Special Attention tab.
