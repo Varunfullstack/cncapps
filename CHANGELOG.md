@@ -7,6 +7,7 @@ This project changes will be shown here.
 - Issue 1186 - Don't notify when assigning requests to yourself.
 - Issue 1185 - Monitored SR Time Calculations for SR with no end time.
 - Issue 1199 - Changed VAT Number formatting.
+- Issue 1203 - Changed Priority 5 email contact for new SR raised wording.
 ### Fixed
 - Issue 1185 - Calendar item from an activity has a faulty link.
 
