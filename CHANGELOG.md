@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 1185 - Monitored SR Time Calculations for SR with no end time
+
 ## [v5.3.2] - 2021-01-25
 ### Fixed
 - On the home page the links in this section are opening the Activity of the SR number, rather than the Activity ID.
