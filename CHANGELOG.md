@@ -6,6 +6,7 @@ This project changes will be shown here.
 - Issue 1206 - Include team engineers at the top of the list in the SD Dashboard when the SR is unassigned.
 - Issue 1186 - Don't notify when assigning requests to yourself.
 - Issue 1185 - Monitored SR Time Calculations for SR with no end time.
+- Issue 1199 - Changed VAT Number formatting.
 ### Fixed
 - Issue 1185 - Calendar item from an activity has a faulty link.
 
