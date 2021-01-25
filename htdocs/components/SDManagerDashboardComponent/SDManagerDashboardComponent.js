@@ -359,7 +359,8 @@ class SDManagerDashboardComponent extends MainComponent {
                             <i className="fal fa-2x fa-alarm-snooze color-gray pointer float-right inbox-icon"
                                key="starIcon"
                             />,
-                            `This Service Request is scheduled for the future date of ${momentAlarmDateTime.format("DD/MM/YYYY HH:mm")}`)
+                            `This Service Request is scheduled for the future date of ${momentAlarmDateTime.format("DD/MM/YYYY HH:mm")}`
+                        )
                     },
                 },
                 {
@@ -518,7 +519,7 @@ class SDManagerDashboardComponent extends MainComponent {
                     icon: "fal fa-2x fa-user-hard-hat color-gray2 ",
                     sortable: false,
                     hdClassName: "text-center",
-                    content: (problem) => this.getAllocatedElement(problem, problem.teamID),
+                    content: (problem) => this.getAllocatedElement(problem, problem.teamID, +problem.queueTeamId),
                 },
                 {
                     display: [HELD_FOR_QA_TAB].indexOf(filter.activeTab) < 0,
@@ -605,11 +606,14 @@ class SDManagerDashboardComponent extends MainComponent {
         );
     }
     ;
-    getAllocatedElement = (problem, teamId) => {
+    getAllocatedElement = (problem, teamId, queueTeamId) => {
         const {el} = this;
         const {allocatedUsers} = this.state;
-        const currentTeam = allocatedUsers.filter((u) => u.teamID == teamId);
-        const otherTeams = allocatedUsers.filter((u) => u.teamID !== teamId);
+        let teamIdCompare = teamId || queueTeamId;
+
+        const currentTeam = allocatedUsers.filter((u) => u.teamID == teamIdCompare);
+        const otherTeams = allocatedUsers.filter((u) => u.teamID !== teamIdCompare);
+
         return el(
             "select",
             {
@@ -626,7 +630,7 @@ class SDManagerDashboardComponent extends MainComponent {
                         {
                             value: p.userID,
                             key: "option" + p.userID,
-                            className: teamId == p.teamID ? "in-team" : "",
+                            className: teamIdCompare == p.teamID ? "in-team" : "",
                         },
                         p.fullName
                     )
