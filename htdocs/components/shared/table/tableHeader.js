@@ -4,14 +4,7 @@ import '../ToolTip.css'
 class TableHeader extends React.Component {
     el = React.createElement;
     raiseSort = (path) => {
-        const sortColumn = {...this.props.sortColumn};
-        if (this.props.sortColumn != null && sortColumn.path == path)
-            sortColumn.order = sortColumn.order == "asc" ? "desc" : "asc";
-        else {
-            sortColumn.path = path;
-            sortColumn.order = "asc";
-        }
-        this.props.onSort(sortColumn);
+        this.props.onSort(path);
     };
     renderSortIcon = (column) => {
         let key = "fa-sort";
