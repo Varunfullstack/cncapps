@@ -5921,12 +5921,14 @@ class BUActivity extends Business
         if ($newUserID == 0) {
             return;
         }
+        if ($DBUser->getValue(DBEUser::userID) == $newUserID) {
+            return;
+        }
         $buMail      = new BUMail($this);
         $dbeJProblem = new DBEJProblem($this);
         $dbeJProblem->getRow($problemID);
         $this->dbeUser->getRow($newUserID);
         $senderEmail = CONFIG_SUPPORT_EMAIL;
-//        $senderName = 'CNC Support Department';
         $toEmail     = $this->dbeUser->getValue(DBEUser::username) . '@' . CONFIG_PUBLIC_DOMAIN;
         $activityRef = $problemID . ' ' . $dbeJProblem->getValue(DBEJProblem::customerName);
         $template    = new Template(
