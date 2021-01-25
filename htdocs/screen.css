@@ -603,7 +603,7 @@ table#user-performance-escalations td, th {
     background-color: #cccccc;
 }
 
-table.second-site-image td, th {
+table.second-site-image td, table.second-site-image th {
     text-align: left;
 }
 

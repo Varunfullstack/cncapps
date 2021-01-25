@@ -1,5 +1,5 @@
 "use strict";
-import {params} from "../utils/utils";
+import {params, poundFormat} from "../utils/utils";
 import ReactDOM from 'react-dom';
 import React from 'react';
 import '../style.css';
@@ -9,7 +9,7 @@ import APIHome from "./services/APIHome";
 import Spinner from "../shared/Spinner/Spinner";
 import MainComponent from "../shared/MainComponent";
 import APIUser from "../services/APIUser";
-import DailyStatsComponent from "../shared/DailyStatsComponent/DailyStatsComponent";
+import moment from "moment";
 
 class HomeComponent extends MainComponent {
     api = new APIHome();
@@ -392,17 +392,19 @@ class HomeComponent extends MainComponent {
                 <td>
                     {moment(c.time, 'HH:mm').format('A')}
                 </td>
-                <td>
+                <td style={{whiteSpace: "nowrap"}}>
                     {c.customerName}
                 </td>
-                <td>
+                <td style={{whiteSpace: "nowrap"}}>
                     {c.engineerName}
                 </td>
                 <td>
                     {c.reason.replace(/\n/g, " ")}
                 </td>
                 <td>
-                    <a href={'/SRActivity.php?callActivityID=' + c.serviceRequestID + "&action=displayActivity"}> {c.serviceRequestID} </a>
+                    <a target="_blank"
+                       href={'/SRActivity.php?serviceRequestId=' + c.serviceRequestID + "&action=displayActivity"}
+                    > {c.serviceRequestID} </a>
                 </td>
             </tr>)}
 
@@ -427,24 +429,24 @@ class HomeComponent extends MainComponent {
                 <tbody>
                 <tr>
                     <td><strong>Cost</strong></td>
-                    <td>{salesFigures.invPrintedCost}</td>
-                    <td>{salesFigures.invUnprintedCost}</td>
-                    <td>{salesFigures.soCost}</td>
-                    <td>{salesFigures.costTotal}</td>
+                    <td style={{textAlign: "right"}}>{poundFormat(salesFigures.invPrintedCost)}</td>
+                    <td style={{textAlign: "right"}}>{poundFormat(salesFigures.invUnprintedCost)}</td>
+                    <td style={{textAlign: "right"}}>{poundFormat(salesFigures.soCost)}</td>
+                    <td style={{textAlign: "right"}}>{poundFormat(salesFigures.costTotal)}</td>
                 </tr>
                 <tr>
                     <td><strong>Sale</strong></td>
-                    <td>{salesFigures.invPrintedSale}</td>
-                    <td>{salesFigures.invUnprintedSale}</td>
-                    <td>{salesFigures.soSale}</td>
-                    <td>{salesFigures.saleTotal}</td>
+                    <td style={{textAlign: "right"}}>{poundFormat(salesFigures.invPrintedSale)}</td>
+                    <td style={{textAlign: "right"}}>{poundFormat(salesFigures.invUnprintedSale)}</td>
+                    <td style={{textAlign: "right"}}>{poundFormat(salesFigures.soSale)}</td>
+                    <td style={{textAlign: "right"}}>{poundFormat(salesFigures.saleTotal)}</td>
                 </tr>
                 <tr>
                     <td><strong>Profit</strong></td>
-                    <td>{salesFigures.invPrintedProfit}</td>
-                    <td>{salesFigures.invUnprintedProfit}</td>
-                    <td>{salesFigures.soProfit}</td>
-                    <td>{salesFigures.profitTotal}</td>
+                    <td style={{textAlign: "right"}}>{poundFormat(salesFigures.invPrintedProfit)}</td>
+                    <td style={{textAlign: "right"}}>{poundFormat(salesFigures.invUnprintedProfit)}</td>
+                    <td style={{textAlign: "right"}}>{poundFormat(salesFigures.soProfit)}</td>
+                    <td style={{textAlign: "right"}}>{poundFormat(salesFigures.profitTotal)}</td>
                 </tr>
                 </tbody>
             </table>

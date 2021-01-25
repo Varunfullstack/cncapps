@@ -95,10 +95,10 @@ class CTHome extends CTCNC
                 );
                 break;
             case self::getFirstTimeFixData:
-                echo $this->getFirstTimeFixData();
+                echo html_entity_decode($this->getFirstTimeFixData());
                 break;
             case self::getFixedAndReopenData:
-                echo $this->getFixedAndReopenData();
+                echo html_entity_decode($this->getFixedAndReopenData());
                 break;
             case self::getUpcomingVisitsData:
                 echo $this->getUpcomingVisitsData();
@@ -113,7 +113,7 @@ class CTHome extends CTCNC
                 }
                 break;
             case self::GET_SALES_FIGURES:
-                echo json_encode($this->getSalesFigures());
+                echo html_entity_decode(json_encode($this->getSalesFigures()));
                 break;
             case self::GET_TEAM_PERFORMANCE:
                 echo json_encode($this->getTeamPerformance());
@@ -296,7 +296,7 @@ class CTHome extends CTCNC
         global $db;
         $db->query("select upcomingVisitsData from homeData limit 1");
         $db->next_record(MYSQLI_ASSOC);
-        return $db->Record['upcomingVisitsData'];
+        return html_entity_decode($db->Record['upcomingVisitsData']);
     }
 
     /**
@@ -1210,9 +1210,9 @@ class CTHome extends CTCNC
             ) - $dbeSalesOrderTotals->getValue(
                 DBESalesOrderTotals::costValue
             );
-        $result['soSale']   = Controller::formatNumber($dbeSalesOrderTotals->getValue(DBESalesOrderTotals::saleValue));
-        $result['soCost']   = Controller::formatNumber($dbeSalesOrderTotals->getValue(DBESalesOrderTotals::costValue));
-        $result['soProfit'] = Controller::formatNumber($profit);
+        $result['soSale']   = $dbeSalesOrderTotals->getValue(DBESalesOrderTotals::saleValue);
+        $result['soCost']   = $dbeSalesOrderTotals->getValue(DBESalesOrderTotals::costValue);
+        $result['soProfit'] = $profit;
         $profitTotal        = $profit;
         $saleTotal          = $dbeSalesOrderTotals->getValue(DBESalesOrderTotals::saleValue);
         $costTotal          = $dbeSalesOrderTotals->getValue(DBESalesOrderTotals::costValue);
@@ -1223,13 +1223,9 @@ class CTHome extends CTCNC
             ) - $dbeInvoiceTotals->getValue(
                 DBEInvoiceTotals::costValue
             );
-        $result['invPrintedSale']   = Controller::formatNumber(
-            $dbeInvoiceTotals->getValue(DBEInvoiceTotals::saleValue)
-        );
-        $result['invPrintedCost']   = Controller::formatNumber(
-            $dbeInvoiceTotals->getValue(DBEInvoiceTotals::costValue)
-        );
-        $result['invPrintedProfit'] = Controller::formatNumber($profit);
+        $result['invPrintedSale']   = $dbeInvoiceTotals->getValue(DBEInvoiceTotals::saleValue);
+        $result['invPrintedCost']   = $dbeInvoiceTotals->getValue(DBEInvoiceTotals::costValue);
+        $result['invPrintedProfit'] = $profit;
         $profitTotal                += $profit;
         $saleTotal                  += $dbeInvoiceTotals->getValue(DBEInvoiceTotals::saleValue);
         $costTotal                  += $dbeInvoiceTotals->getValue(DBEInvoiceTotals::costValue);
@@ -1239,19 +1235,15 @@ class CTHome extends CTCNC
             ) - $dbeInvoiceTotals->getValue(
                 DBEInvoiceTotals::costValue
             );
-        $result['invUnprintedSale']   = Controller::formatNumber(
-            $dbeInvoiceTotals->getValue(DBEInvoiceTotals::saleValue)
-        );
-        $result['invUnprintedCost']   = Controller::formatNumber(
-            $dbeInvoiceTotals->getValue(DBEInvoiceTotals::costValue)
-        );
-        $result['invUnprintedProfit'] = Controller::formatNumber($profit);
+        $result['invUnprintedSale']   = $dbeInvoiceTotals->getValue(DBEInvoiceTotals::saleValue);
+        $result['invUnprintedCost']   = $dbeInvoiceTotals->getValue(DBEInvoiceTotals::costValue);
+        $result['invUnprintedProfit'] = $profit;
         $profitTotal                  += $profit;
         $saleTotal                    += $dbeInvoiceTotals->getValue(DBEInvoiceTotals::saleValue);
         $costTotal                    += $dbeInvoiceTotals->getValue(DBEInvoiceTotals::costValue);
-        $result['saleTotal']          = Controller::formatNumber($saleTotal);
-        $result['costTotal']          = Controller::formatNumber($costTotal);
-        $result['profitTotal']        = Controller::formatNumber($profitTotal);
+        $result['saleTotal']          = $saleTotal;
+        $result['costTotal']          = $costTotal;
+        $result['profitTotal']        = $profitTotal;
         return ["status" => true, 'data' => $result];
     }
 

@@ -248,7 +248,12 @@ export function poundFormat(number) {
     if (number === undefined || number === null) {
         return null;
     }
-    return `£${(+number).toFixed(2)}`
+    return new Intl.NumberFormat('en-GB', {
+        maximumFractionDigits: 2,
+        style: 'currency',
+        currency: 'GBP'
+    }).format(number);
+    // return `£${(+number).toFixed(2)}`
 }
 
 export function dateFormatExcludeNull(date, fromFormat = "YYYY-MM-DD", toFormat = "DD/MM/YYYY") {

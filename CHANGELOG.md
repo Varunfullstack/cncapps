@@ -4,6 +4,9 @@ This project changes will be shown here.
 ## [v5.3.2] - 2021-01-25
 ### Fixed
 - On the home page the links in this section are opening the Activity of the SR number, rather than the Activity ID.
+- Same section, stop the character codes from showing on the home page within Upcoming Visits.
+- Fixed style issues on Upcoming visits section of the home page.
+- Fixed style issues on the Sales Figures of the home page.
 
 ## [v5.3.1] - 2021-01-22
 ### Changed

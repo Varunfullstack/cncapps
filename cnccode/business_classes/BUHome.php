@@ -231,7 +231,7 @@ WHERE problem.`pro_custno` <> 282
             initial.caa_endtime
           )
         ) <= (5 * 60) 
-        AND callactivity.`caa_consno` = engineer.`cns_consno` limit 1)   )
+        AND callactivity.`caa_consno` = engineer.`cns_consno` limit 1)   ,0)
   ) AS attemptedFirstTimeFix,
   SUM(
     COALESCE(
@@ -263,7 +263,7 @@ WHERE problem.`pro_custno` <> 282
             fixedActivity.caa_starttime,
             remoteSupport.caa_endtime
           )
-        ) <= (5 * 60) limit 1)   )
+        ) <= (5 * 60) limit 1),0   )
   ) AS firstTimeFix,
   SUM(1) AS totalRaised  
 FROM
