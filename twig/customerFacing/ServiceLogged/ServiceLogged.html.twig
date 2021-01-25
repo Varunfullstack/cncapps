@@ -24,7 +24,11 @@
     <p>
         Priority {{ data.priority }} -
         {% if data.serviceRequestStatus == 'Logged' %}
-            We'll aim to respond to this request within {{ data.SLA }} working hour{{ data.SLA > 1 ? 's' :'' }} but after an initial review we may adjust the priority but we'll inform you if we do.
+            {% if data.priority == 5 %}
+                This work is project related and we will provide an update or be in touch to discuss the details with you soon.
+            {% else %}
+                We'll aim to respond to this request within {{ data.SLA }} working hour{{ data.SLA > 1 ? 's' :'' }} but after an initial review we may adjust the priority but we'll inform you if we do.
+            {% endif %}
         {% else %}
             We've started working on this immediately.
         {% endif %}
