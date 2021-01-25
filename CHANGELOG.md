@@ -3,7 +3,7 @@ This project changes will be shown here.
 
 ## [unreleased]
 ### Changed
-- Issue 1186 
+- Issue 1186 - Don't notify when assigning requests to yourself.
 
 ## [v5.3.1] - 2021-01-22
 ### Changed
