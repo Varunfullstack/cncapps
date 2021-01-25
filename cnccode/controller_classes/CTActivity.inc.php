@@ -3543,7 +3543,7 @@ class CTActivity extends CTCNC
         } else {
             $endTime = $dsCallActivity->getValue(DBEJCallActivity::endTime);
         }
-        $urlActivity    = SITE_URL .'/'. Controller::buildLink(
+        $urlActivity    = SITE_URL . Controller::buildLink(
                 'SRActivity.php',
                 array(
                     'callActivityID' => $dsCallActivity->getValue(DBEJCallActivity::callActivityID),

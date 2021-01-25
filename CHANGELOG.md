@@ -6,7 +6,7 @@ This project changes will be shown here.
 - Issue 1206 - Include team engineers at the top of the list in the SD Dashboard when the SR is unassigned.
 - Issue 1186 - Don't notify when assigning requests to yourself.
 ### Fixed
-- Issue 1197 - Calendar item from an activity has a faulty link.
+- Issue 1185 - Monitored SR Time Calculations for SR with no end time
 
 ## [v5.3.2] - 2021-01-25
 ### Fixed
