@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.3.2] - 2021-01-25
+### Fixed
+- On the home page the links in this section are opening the Activity of the SR number, rather than the Activity ID.
+
 ## [v5.3.1] - 2021-01-22
 ### Changed
 - Changed Customer Info show only current customers/contacts for the 24 Hour support tab and Special Attention tab.
