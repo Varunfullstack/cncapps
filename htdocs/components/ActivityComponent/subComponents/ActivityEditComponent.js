@@ -19,6 +19,7 @@ import CustomerDocumentUploader from "./CustomerDocumentUploader";
 import {InternalDocumentsComponent} from "./InternalDocumentsComponent";
 import AssetListSelectorComponent from "../../shared/AssetListSelectorComponent/AssetListSelectorComponent";
 import EditorFieldComponent from "../../shared/EditorField/EditorFieldComponent";
+import {ActivityType} from "../../shared/ActivityTypes";
 
 // noinspection EqualityComparisonWithCoercionJS
 const hiddenAndCustomerNoteAlertMessage = `Customer note must be empty when the activity or entire SR is hidden.`;
@@ -604,8 +605,8 @@ class ActivityEditComponent extends MainComponent {
         }
         const renderUpdateCancelButtons = () => {
 
-            if (data?.callActTypeID !== 59) {
-                const isEnabled = currentUser?.isSDManager || !(data?.callActType === 51 && data?.problemStatus === 'I');
+            if (data?.callActTypeID !== ActivityType.TECHNICAL_CHANGE_REQUEST) {
+                const isEnabled = currentUser?.isSDManager || !(data?.callActType === ActivityType.INITIAL && data?.problemStatus === 'I');
 
                 return <Fragment>
                     <button onClick={() => this.setNextStatus("Update")}
