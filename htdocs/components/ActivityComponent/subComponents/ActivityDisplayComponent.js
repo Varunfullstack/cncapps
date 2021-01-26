@@ -1,9 +1,16 @@
 import APIActivity from "../../services/APIActivity.js";
-import {params} from "../../utils/utils.js";
+import {Chars, maxLength, padEnd, params} from "../../utils/utils.js";
 import ToolTip from "../../shared/ToolTip.js";
 import MainComponent from "../../shared/MainComponent.js";
 import * as React from 'react';
 import {TimeBudgetElement} from "./TimeBudgetElement";
+import ActivityFollowOn from "../../Modals/ActivityFollowOn";
+import CNCCKEditor from "../../shared/CNCCKEditor";
+import Toggle from "../../shared/Toggle";
+import {InternalDocumentsComponent} from "./InternalDocumentsComponent";
+import CustomerDocumentUploader from "./CustomerDocumentUploader";
+import Modal from "../../shared/Modal/modal";
+import Table from "../../shared/table/table";
 
 // noinspection EqualityComparisonWithCoercionJS
 const emptyAssetReasonCharactersToShow = 30;
@@ -166,7 +173,7 @@ class ActivityDisplayComponent extends MainComponent {
                         />}
                     />
                     : null
-            },
+            }
             <ToolTip
                 title="History"
                 content={<a
@@ -226,7 +233,7 @@ class ActivityDisplayComponent extends MainComponent {
                         target="_blank"
                     />}
                 />
-                : null},
+                : null}
             {!data?.linkedSalesOrderID ? <ToolTip
                 title="Sales Order"
                 content={<a
@@ -269,7 +276,7 @@ class ActivityDisplayComponent extends MainComponent {
                 }
             />
 
-            {this.getSpacer()},
+            {this.getSpacer()}
             <ToolTip
                 title="Contact SR History"
                 content={<a
@@ -303,7 +310,7 @@ class ActivityDisplayComponent extends MainComponent {
                     href={`Activity.php?action=createFollowOnActivity&callActivityID=${data?.callActivityID}&callActivityTypeID=22`}
                 />
                 }
-            /> : null},
+            /> : null}
             {currentUser.isSDManager && data?.problemHideFromCustomerFlag == 'Y' ? <ToolTip
                     title="Unhide SR"
                     content={<i
@@ -318,7 +325,7 @@ class ActivityDisplayComponent extends MainComponent {
                 esRemainMinutes={data?.esRemainMinutes}
                 imRemainMinutes={data?.imRemainMinutes}
                 projectRemainMinutes={data?.projectRemainMinutes}
-            />,
+            />
             <ToolTip
                 title="Calendar"
                 content={<a
@@ -326,7 +333,7 @@ class ActivityDisplayComponent extends MainComponent {
                     href={`Activity.php?action=addToCalendar&callActivityID=${data?.callActivityID}`}
                 />
                 }
-            />,
+            />
             <ToolTip
                 title="Time Breakdown"
                 content={<a
@@ -567,7 +574,7 @@ class ActivityDisplayComponent extends MainComponent {
                         onClick: this.goPrevActivity
                     })
                 }),
-                el('select', {value: currentActivity, onChange: this.handleActivityChange},
+                el('select', {value: currentActivity || "", onChange: this.handleActivityChange},
                     indx == -1 ? el('option', {value: null}, "") : null,
                     data?.activities.map(a =>
                         el('option', {
@@ -946,9 +953,14 @@ class ActivityDisplayComponent extends MainComponent {
         return el(
             Modal, {//autoFocus:true
                 width: 900, key: templateType, onClose: () => this.setState({_showModal: false}),
-                title: templateTitle, show: _showModal,
+                title: templateTitle,
+                show: _showModal,
                 content: el('div', {key: 'conatiner'},
-                    templateOptions.length > 0 ? el('select', {onChange: this.handleTemplateChanged, autoFocus: true},
+                    templateOptions.length > 0 ? el('select', {
+                            onChange: this.handleTemplateChanged,
+                            autoFocus: true,
+                            value: ''
+                        },
                         el('option', {key: 'empty', value: -1}, "-- Pick an option --"),
                         templateOptions.map(s => el('option', {key: s.id, value: s.id}, s.name))) : null,
                     el('div', {className: 'modal_editor'},
