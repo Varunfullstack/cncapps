@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 1202 - Include icon for Fix SLA on dashboards
+
 ## [v5.3.3] - 2021-01-25
 ### Fixed
 - Sales Requests popup not clearing down.
