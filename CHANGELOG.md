@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1210 - Show Quantities for Direct Debit invoices
+
 ## [v5.3.3] - 2021-01-25
 ### Fixed
 - Sales Requests popup not clearing down.
