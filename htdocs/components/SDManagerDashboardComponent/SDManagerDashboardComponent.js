@@ -14,6 +14,7 @@ import './SDManagerDashboardComponent.css';
 import ActivityFollowOn from "../Modals/ActivityFollowOn";
 import moment from "moment";
 import Spinner from "../shared/Spinner/Spinner";
+import {ColumnRenderer} from "../CurrentActivityReportComponent/subComponents/ColumnRenderer";
 
 const CUSTOMER_TAB = 9;
 
@@ -300,6 +301,7 @@ class SDManagerDashboardComponent extends MainComponent {
                             })
                             : null,
                 },
+                ColumnRenderer.getFixSLAWarningColumn(),
                 {
                     hide: false,
                     order: 3,
