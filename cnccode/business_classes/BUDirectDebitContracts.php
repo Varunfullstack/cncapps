@@ -351,8 +351,8 @@ class BUDirectDebitContracts extends Business
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::qtyOrdered,
-                    1
-                ); // default 1
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::users)
+                );
 
                 switch ($dbeJCustomerItem->getValue(DBEDirectDebitContracts::renewalTypeID)) {
                     case CONFIG_CONTRACT_RENEWAL_TYPE_ID:
@@ -367,12 +367,12 @@ class BUDirectDebitContracts extends Business
                         );
                         $dbeOrdline->setValue(
                             DBEOrdline::curUnitSale,
-                            ($dbeJCustomerItem->getValue(DBEDirectDebitContracts::curUnitSale) / 12) *
+                            ($dbeJCustomerItem->getValue(DBEDirectDebitContracts::curUnitSale) / 12 /$dbeJCustomerItem->getValue(DBEJCustomerItem::users) ) *
                             $this->dbeDirectDebitContracts->getValue(DBEDirectDebitContracts::invoicePeriodMonths)
                         );
                         $dbeOrdline->setValue(
                             DBEOrdline::curUnitCost,
-                            ($dbeJCustomerItem->getValue(DBEDirectDebitContracts::curUnitCost) / 12) *
+                            ($dbeJCustomerItem->getValue(DBEDirectDebitContracts::curUnitCost) / 12 / $dbeJCustomerItem->getValue(DBEJCustomerItem::users)) *
                             $this->dbeDirectDebitContracts->getValue(
                                 DBEDirectDebitContracts::invoicePeriodMonths
                             )
@@ -389,12 +389,12 @@ class BUDirectDebitContracts extends Business
                         );
                         $dbeOrdline->setValue(
                             DBEOrdline::curUnitSale,
-                            $this->dbeDirectDebitContracts->getValue(DBEDirectDebitContracts::salePricePerMonth) *
+                            $this->dbeDirectDebitContracts->getValue(DBEDirectDebitContracts::salePricePerMonth/ $dbeJCustomerItem->getValue(DBEJCustomerItem::users)) *
                             $this->dbeDirectDebitContracts->getValue(DBEDirectDebitContracts::invoicePeriodMonths)
                         );
                         $dbeOrdline->setValue(
                             DBEOrdline::curUnitCost,
-                            $this->dbeDirectDebitContracts->getValue(DBEDirectDebitContracts::costPricePerMonth) *
+                            $this->dbeDirectDebitContracts->getValue(DBEDirectDebitContracts::costPricePerMonth/ $dbeJCustomerItem->getValue(DBEJCustomerItem::users)) *
                             $this->dbeDirectDebitContracts->getValue(DBEDirectDebitContracts::invoicePeriodMonths)
                         );
                         break;

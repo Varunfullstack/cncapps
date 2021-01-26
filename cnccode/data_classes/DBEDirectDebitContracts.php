@@ -5,7 +5,7 @@
  * Date: 28/09/2018
  * Time: 14:50
  */
-
+global $cfg;
 require_once($cfg["path_dbe"] . "/DBECustomerItem.inc.php");
 
 
