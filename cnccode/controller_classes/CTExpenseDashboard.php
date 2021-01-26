@@ -421,14 +421,14 @@ FROM
       ON b.staffId = consultant.`cns_consno`
   WHERE (
       (
-        consultant.`expenseApproverID` = 29
+        consultant.`expenseApproverID` = ?
         AND
         (SELECT
           1
         FROM
           consultant approvers
         WHERE approvers.isExpenseApprover
-          AND approvers.cns_consno = 29)
+          AND approvers.cns_consno = ?)
       )
       OR
       (SELECT
@@ -436,7 +436,7 @@ FROM
       FROM
         consultant globalApprovers
       WHERE globalApprovers.globalExpenseApprover
-        AND globalApprovers.cns_consno = 29) = 1
+        AND globalApprovers.cns_consno = ?) = 1
     )
     AND consultant.`activeFlag` = \"Y\") a
 WHERE YTD IS NOT NULL
