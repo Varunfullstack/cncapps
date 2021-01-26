@@ -1,9 +1,17 @@
 import React from 'react';
 import * as PropTypes from "prop-types";
 import {TeamType} from "../../utils/utils";
+import ToolTip from "../../shared/ToolTip";
 
 export function TimeBudgetElement(props) {
-    const {currentUserTeamId, hdRemainMinutes, esRemainMinutes, imRemainMinutes, projectRemainMinutes} = props;
+    const {
+        currentUserTeamId,
+        hdRemainMinutes,
+        esRemainMinutes,
+        imRemainMinutes,
+        projectRemainMinutes,
+        onExtraTimeRequest
+    } = props;
     let teamPrefix;
     let timeRemaining;
     switch (currentUserTeamId) {
@@ -15,7 +23,7 @@ export function TimeBudgetElement(props) {
             teamPrefix = 'ES';
             timeRemaining = esRemainMinutes;
             break;
-        case TeamType.Small_Projects:
+        case TeamType.SmallProjects:
             teamPrefix = 'SP';
             timeRemaining = imRemainMinutes;
             break;
@@ -26,7 +34,16 @@ export function TimeBudgetElement(props) {
         default:
             return null;
     }
-    return <h2 style={{color: "red"}}> {`${teamPrefix}:${timeRemaining}`}</h2>;
+    return (
+        <React.Fragment>
+            <ToolTip title="request time">
+                <a className="fal fa-hourglass-start fa-2x m-5 pointer icon"
+                   onClick={onExtraTimeRequest}
+                />
+            </ToolTip>
+            <h2 style={{color: "red"}}> {`${teamPrefix}:${timeRemaining}`}</h2>
+        </React.Fragment>
+    )
 }
 
 TimeBudgetElement.propTypes = {
@@ -36,4 +53,5 @@ TimeBudgetElement.propTypes = {
     esRemainMinutes: PropTypes.number,
     imRemainMinutes: PropTypes.number,
     projectRemainMinutes: PropTypes.number,
+    onExtraTimeRequest: PropTypes.func,
 };

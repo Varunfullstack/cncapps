@@ -157,6 +157,23 @@ class ActivityDisplayComponent extends MainComponent {
         );
     }
 
+    handleExtraTime = async (data) => {
+
+        const reason = await this.prompt(
+            "Please provide your reason to request additional time",
+            600,
+            data.cncNextAction, false, 50
+        );
+        if (!reason) {
+            return;
+        }
+        await this.api.activityRequestAdditionalTime(
+            data.callActivityID,
+            reason
+        );
+        this.alert("Additional time has been requested");
+    };
+
     getActions = () => {
         const {data, currentUser} = this.state;
 
@@ -325,7 +342,9 @@ class ActivityDisplayComponent extends MainComponent {
                 esRemainMinutes={data?.esRemainMinutes}
                 imRemainMinutes={data?.imRemainMinutes}
                 projectRemainMinutes={data?.projectRemainMinutes}
+                onExtraTimeRequest={() => this.handleExtraTime(data)}
             />
+            {this.getSpacer()}
             <ToolTip
                 title="Calendar"
                 content={<a

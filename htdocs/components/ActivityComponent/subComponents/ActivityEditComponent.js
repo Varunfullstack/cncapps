@@ -536,20 +536,15 @@ class ActivityEditComponent extends MainComponent {
             }),
 
             this.getEmptyAction(),
-            el(ToolTip, {
-                title: "Request more time",
-                content: el("a", {
-                    className: "fal fa-hourglass-start fa-2x m-5 pointer icon",
-                    onClick: () => this.handleExtraTime(data),
-                }),
-            }),
             (<TimeBudgetElement
                 currentUserTeamId={currentUser?.teamID}
                 hdRemainMinutes={data?.hdRemainMinutes}
                 esRemainMinutes={data?.esRemainMinutes}
                 imRemainMinutes={data?.imRemainMinutes}
                 projectRemainMinutes={data?.projectRemainMinutes}
+                onExtraTimeRequest={() => this.handleExtraTime(data)}
             />),
+            this.getEmptyAction(),
             data.hdRemainMinutes ?
                 el(ToolTip, {
                     title: "Countdown Timer",
@@ -1660,7 +1655,7 @@ class ActivityEditComponent extends MainComponent {
                 return data?.hdRemainMinutes;
             case TeamType.Escalations:
                 return data?.esRemainMinutes;
-            case TeamType.Small_Projects:
+            case TeamType.SmallProjects:
                 return data?.imRemainMinutes;
             case TeamType.Projects:
                 return data?.projectRemainMinutes;
