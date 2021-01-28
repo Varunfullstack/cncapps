@@ -14,6 +14,7 @@ This project changes will be shown here.
 - Issue 1205 - Changed the way the StreamOne Licenses are displayed.
 - Issue 1207 - Include a unit in the Expenses running totals
 - Issue 1209 - Sales Order search to include Date Last Quoted
+- Issue 1200 - Landing page update after completing a staff appraisal.
 ### Fixed
 - Issue 1185 - Calendar item from an activity has a faulty link.
 
