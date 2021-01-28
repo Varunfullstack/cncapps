@@ -11,6 +11,7 @@ This project changes will be shown here.
 - Issue 1199 - Changed VAT Number formatting.
 - Issue 1203 - Changed Priority 5 email contact for new SR raised wording.
 - Issue 1205 - Changed the way the StreamOne Licenses are displayed.
+- Issue 1207 - Include a unit in the Expenses running totals
 ### Fixed
 - Issue 1185 - Calendar item from an activity has a faulty link.
 

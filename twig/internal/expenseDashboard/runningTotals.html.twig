@@ -9,7 +9,16 @@
                 {data: "approvedValue"},
                 {data: "pendingValue"},
                 {data: 'YTD'},
-
+            ],
+            columnDefs: [
+                {
+                    targets: [1, 2, 3],
+                    className: 'dt-body-right dt-head-right'
+                },
+                {
+                    targets: [0],
+                    className: 'dt-body-left dt-head-left'
+                },
             ],
             order: [[0, "desc"]],
             serverSide: false,
@@ -38,6 +47,16 @@
 
             ],
             order: [[0, "desc"]],
+            columnDefs: [
+                {
+                    targets: [1, 2, 3],
+                    className: 'dt-body-right dt-head-right'
+                },
+                {
+                    targets: [0],
+                    className: 'dt-body-left dt-head-left'
+                },
+            ],
             serverSide: false,
             ajax: {
                 url: "?action=getOvertimeRunningTotalData",
@@ -60,9 +79,9 @@
     <thead>
     <tr>
         <th>Name</th>
-        <th>Approved</th>
-        <th>Pending</th>
-        <th>YTD</th>
+        <th>Approved (£)</th>
+        <th>Pending (£)</th>
+        <th>YTD (£)</th>
     </tr>
     </thead>
     <tbody>
@@ -74,27 +93,11 @@
     <thead>
     <tr>
         <th>Name</th>
-        <th>Approved</th>
-        <th>Pending</th>
-        <th>YTD</th>
+        <th>Approved (Hours)</th>
+        <th>Pending (Hours)</th>
+        <th>YTD (Hours)</th>
     </tr>
     </thead>
     <tbody>
-    {% for overtime in overtimes %}
-        <tr>
-            <td>
-                {{ overtime.staffName }}
-            </td>
-            <td>
-                {{ overtime.approvedValue }}
-            </td>
-            <td>
-                {{ overtime.pendingValue }}
-            </td>
-            <td>
-                {{ overtime.YTD }}
-            </td>
-        </tr>
-    {% endfor %}
     </tbody>
 </table>

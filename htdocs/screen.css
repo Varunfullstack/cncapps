@@ -582,15 +582,15 @@ span#projectRemainMinutes {
     background-color: #B2FFB2;
 }
 
-table#team-performance td, th {
+table#team-performance td, table#team-performance th {
     text-align: right;
 }
 
-table#user-performance-helpdesk td, th {
+table#user-performance-helpdesk td, table#user-performance-helpdesk th {
     text-align: right;
 }
 
-table#user-performance-escalations td, th {
+table#user-performance-escalations td, table#user-performance-escalations th {
     text-align: right;
 }
 
