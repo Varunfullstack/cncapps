@@ -122,8 +122,17 @@ while ($runOnce || $dbeCustomer->fetchNext()) {
     \'%d/%m/%Y %H:%i:%s\'
   ) AS "Last Contact",
   inv_chassis.productname AS "Model",
- if(inv_chassis.productname like "%VMware%", "Not Applicable",coalesce((select DATE_FORMAT(PurchaseDate,"%d/%m/%Y") from plugin_warrantymaster_aux where ComputerID = computers.computerid ), "Unknown")) as "Warranty Start Date",
-  if(inv_chassis.productname like "%VMware%", "Not Applicable",coalesce((select DATE_FORMAT(ExpiryDate,"%d/%m/%Y") from plugin_warrantymaster_aux where ComputerID = computers.computerid ), "Unknown")) as "Warranty Expiry Date",
+ if(inv_chassis.productname like "%VMware%", "Not Applicable",coalesce(
+     (SELECT
+        DATE_FORMAT(STR_TO_DATE(`plugin_sd_warranty_looker_upper_lookups`.`start_date`,"%c/%e/%Y"),"%d/%m/%Y") 
+      FROM
+        plugin_sd_warranty_looker_upper_lookups
+      WHERE plugin_sd_warranty_looker_upper_lookups.`computerid` = computers.computerid ), "Unknown")) as "Warranty Start Date",
+  if(inv_chassis.productname like "%VMware%", "Not Applicable",coalesce((SELECT
+        DATE_FORMAT(STR_TO_DATE(`plugin_sd_warranty_looker_upper_lookups`.`end_date`,"%c/%e/%Y"),"%d/%m/%Y") 
+      FROM
+        plugin_sd_warranty_looker_upper_lookups
+      WHERE plugin_sd_warranty_looker_upper_lookups.`computerid` = computers.computerid), "Unknown")) as "Warranty Expiry Date",
 IF(
     (SELECT
       ExpiryDate
@@ -261,6 +270,8 @@ ORDER BY Location, `Computer Name`';
     $customerName = $dbeCustomer->getValue(DBECustomer::name);
     echo '<div>Getting Labtech Data for Customer: ' . $customerID . ' - ' . $customerName . '</div>';
     $statement = $labtechDB->prepare($query);
+    var_dump($query);
+    exit;
     $test      = $statement->execute(
         [
             $customerID

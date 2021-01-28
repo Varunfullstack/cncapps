@@ -1,0 +1,22 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue1039-0">
+        <tagDatabase tag="issue1039"/>
+    </changeSet>
+    <changeSet id="issue1039-1" author="pavwebdev">
+        <sql>
+            insert into OSSupportDates(id,name, version,availabilityDate, endOfLifeDate, isServer) values
+
+            ((select nextId + 1 from db_sequence where seq_name = "ossupportdates" ),"VMware ESXi 5.1.0","5.1.0","2012-09-10-","2016-08-24",1),
+            ((select nextId + 2 from db_sequence where seq_name = "ossupportdates" ),"VMware ESXi 5.5.0","5.5.0","2013-09-22-","2018-09-19",1),
+            ((select nextId + 3 from db_sequence where seq_name = "ossupportdates" ),"VMware ESXi 6.0.0","6.0.0","2015-03-12-","2020-03-12",1),
+            ((select nextId + 4 from db_sequence where seq_name = "ossupportdates" ),"VMware ESXi 6.5.0","6.5.0","2016-11-15-","2021-11-15",1),
+            ((select nextId + 5 from db_sequence where seq_name = "ossupportdates" ),"VMware ESXi 6.7.0","6.7.0","2018-04-17-","2022-10-15",1),
+            ((select nextId + 6 from db_sequence where seq_name = "ossupportdates" ),"VMware ESXi 7.0.0","7.0.0","2020-04-02-","2022-04-02",1);
+            update db_sequence set nextId = (select max(id) + 1 from OSSupportDates ) where seq_name = "ossupportdates";
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
