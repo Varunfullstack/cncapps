@@ -881,20 +881,25 @@ class CTSalesOrder extends CTCNC
                 $this->setOrdheadID($this->dsOrdhead->getValue($ordheadIDCol));
                 $orderURL = $this->getDisplayOrderURL();
                 $this->setOrdheadID(null);
-                $comment = $this->getFirstCommentLine($this->dsOrdhead->getValue($ordheadIDCol));
+                $comment       = $this->getFirstCommentLine($this->dsOrdhead->getValue($ordheadIDCol));
+                $lastQuoteSent = $this->getLastQuotedDate($this->dsOrdhead->getValue($ordheadIDCol));
                 $this->template->set_var(
                     array(
-                        'listCustomerLink' => $customerLink,
-                        'listOrderURL'     => $orderURL,
-                        'listOrdheadID'    => $this->dsOrdhead->getValue($ordheadIDCol),
-                        'listOrderType'    => $this->getTypeDescription($this->dsOrdhead->getValue($typeCol)),
-                        'listOrderDate'    => strftime(
+                        'listCustomerLink'        => $customerLink,
+                        'listOrderURL'            => $orderURL,
+                        'listOrdheadID'           => $this->dsOrdhead->getValue($ordheadIDCol),
+                        'listOrderType'           => $this->getTypeDescription($this->dsOrdhead->getValue($typeCol)),
+                        'listOrderDate'           => strftime(
                             "%d/%m/%Y",
                             strtotime($this->dsOrdhead->getValue($dateCol))
                         ),
-                        'listCustPORef'    => $this->dsOrdhead->getValue($custPORefCol),
-                        'firstComment'     => $comment,
-                        'rowNum'           => $rowNum
+                        'listOrderLastQuotedDate' => $lastQuoteSent ? strftime(
+                            "%d/%m/%Y",
+                            strtotime($lastQuoteSent)
+                        ) : '',
+                        'listCustPORef'           => $this->dsOrdhead->getValue($custPORefCol),
+                        'firstComment'            => $comment,
+                        'rowNum'                  => $rowNum
                     )
                 );
                 $this->template->parse(
@@ -5096,5 +5101,22 @@ class CTSalesOrder extends CTCNC
             }
         }
         return "";
+    }
+
+    private function getLastQuotedDate(?float $orderId)
+    {
+        $quotes = new DataSet($this);
+        $this->buSalesOrder->getQuotationsByOrdheadID(
+            $orderId,
+            $quotes
+        );
+        $lastQuoted = null;
+        while ($quotes->fetchNext()) {
+            $sentDate = $quotes->getValue(DBEQuotation::sentDateTime);
+            if (!$lastQuoted || ($sentDate && $sentDate > $lastQuoted)) {
+                $lastQuoted = $sentDate;
+            }
+        }
+        return $lastQuoted;
     }
 }

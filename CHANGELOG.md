@@ -13,6 +13,7 @@ This project changes will be shown here.
 - Issue 1203 - Changed Priority 5 email contact for new SR raised wording.
 - Issue 1205 - Changed the way the StreamOne Licenses are displayed.
 - Issue 1207 - Include a unit in the Expenses running totals
+- Issue 1209 - Sales Order search to include Date Last Quoted
 ### Fixed
 - Issue 1185 - Calendar item from an activity has a faulty link.
 
