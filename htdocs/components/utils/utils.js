@@ -134,7 +134,7 @@ export const SRQueues = [
 export const TeamType = {
     Helpdesk: 1,
     Escalations: 2,
-    Small_Projects: 4,
+    SmallProjects: 4,
     Projects: 5,
     Directors: 6,
     Sales: 7

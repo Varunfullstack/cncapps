@@ -259,7 +259,7 @@ class SalesRequestComponent extends MainComponent {
     }
 
     closeModal = () => {
-        this.setState({showProcessTimeModal: false, data: {...data, comments: ''}});
+        this.setState({showProcessTimeModal: false, data: {...this.state.data, comments: ''}});
     }
 
     handleRequest = (status) => {

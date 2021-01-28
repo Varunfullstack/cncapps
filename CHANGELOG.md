@@ -2,6 +2,8 @@
 This project changes will be shown here.
 
 ## [unreleased]
+### Added
+- Issue 1211 - Include SR Time Remaining on the Display Activity page.
 ### Changed
 - Issue 1206 - Include team engineers at the top of the list in the SD Dashboard when the SR is unassigned.
 - Issue 1186 - Don't notify when assigning requests to yourself.
@@ -11,6 +13,10 @@ This project changes will be shown here.
 - Issue 1205 - Changed the way the StreamOne Licenses are displayed.
 ### Fixed
 - Issue 1185 - Calendar item from an activity has a faulty link.
+
+## [v5.3.3] - 2021-01-25
+### Fixed
+- Sales Requests popup not clearing down.
 
 ## [v5.3.2] - 2021-01-25
 ### Fixed

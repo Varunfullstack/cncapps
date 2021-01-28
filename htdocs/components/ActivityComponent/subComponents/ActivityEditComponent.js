@@ -19,6 +19,7 @@ import CustomerDocumentUploader from "./CustomerDocumentUploader";
 import {InternalDocumentsComponent} from "./InternalDocumentsComponent";
 import AssetListSelectorComponent from "../../shared/AssetListSelectorComponent/AssetListSelectorComponent";
 import EditorFieldComponent from "../../shared/EditorField/EditorFieldComponent";
+import {TimeBudgetElement} from "./TimeBudgetElement";
 
 // noinspection EqualityComparisonWithCoercionJS
 const hiddenAndCustomerNoteAlertMessage = `Customer note must be empty when the activity or entire SR is hidden.`;
@@ -438,7 +439,7 @@ class ActivityEditComponent extends MainComponent {
 
     getActions = () => {
         const {el} = this;
-        const {data} = this.state;
+        const {data, currentUser} = this.state;
         return el(
             "div",
             {
@@ -535,13 +536,15 @@ class ActivityEditComponent extends MainComponent {
             }),
 
             this.getEmptyAction(),
-            el(ToolTip, {
-                title: "Request more time",
-                content: el("a", {
-                    className: "fal fa-hourglass-start fa-2x m-5 pointer icon",
-                    onClick: () => this.handleExtraTime(data),
-                }),
-            }), this.getTimeBudgetElement(),
+            (<TimeBudgetElement
+                currentUserTeamId={currentUser?.teamID}
+                hdRemainMinutes={data?.hdRemainMinutes}
+                esRemainMinutes={data?.esRemainMinutes}
+                imRemainMinutes={data?.imRemainMinutes}
+                projectRemainMinutes={data?.projectRemainMinutes}
+                onExtraTimeRequest={() => this.handleExtraTime(data)}
+            />),
+            this.getEmptyAction(),
             data.hdRemainMinutes ?
                 el(ToolTip, {
                     title: "Countdown Timer",
@@ -1643,24 +1646,7 @@ class ActivityEditComponent extends MainComponent {
 
     getTimeBudgetElement = () => {
         const {data, currentUser} = this.state;
-
-        switch (currentUser?.teamID) {
-            case TeamType.Helpdesk:
-                return this.el("h2", {style: {color: "red"}}, `
-                HD:${data?.hdRemainMinutes}`);
-            case TeamType.Escalations:
-                return this.el("h2", {style: {color: "red"}}, `
-                ES:${data?.esRemainMinutes}`);
-            case TeamType.Small_Projects:
-                return this.el("h2", {style: {color: "red"}}, `
-                SP:${data?.imRemainMinutes}`);
-            case TeamType.Projects:
-                return this.el("h2", {style: {color: "red"}}, `
-                P:${data?.projectRemainMinutes}`);
-            default:
-                return null;
-        }
-
+        return
     }
     getTimeBudget = () => {
         const {data, currentUser} = this.state;
@@ -1669,7 +1655,7 @@ class ActivityEditComponent extends MainComponent {
                 return data?.hdRemainMinutes;
             case TeamType.Escalations:
                 return data?.esRemainMinutes;
-            case TeamType.Small_Projects:
+            case TeamType.SmallProjects:
                 return data?.imRemainMinutes;
             case TeamType.Projects:
                 return data?.projectRemainMinutes;
