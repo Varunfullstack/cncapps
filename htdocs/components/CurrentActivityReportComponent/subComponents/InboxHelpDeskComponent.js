@@ -23,7 +23,7 @@ class InboxHelpDeskComponent extends React.Component {
         );
     };
     getTableElement = () => {
-        const {el, addToolTip} = this;
+        const {el} = this;
         const {
             getMoveElement,
             srDescription,
@@ -35,6 +35,7 @@ class InboxHelpDeskComponent extends React.Component {
         let columns = [
             ColumnRenderer.getWorkIconColumn(startWork, this.code),
             ColumnRenderer.getSpecialAttentionColumn(),
+            ColumnRenderer.getFixSLAWarningColumn(),
             ColumnRenderer.getFutureWorkColumn(),
             ColumnRenderer.getRequestTimeColumn(requestAdditionalTime),
             ColumnRenderer.getOnHoldColumn(),

@@ -36,6 +36,7 @@ class InboxSalesComponent extends React.Component {
         let columns = [
             ColumnRenderer.getWorkIconColumn(startWork, this.code),
             ColumnRenderer.getSpecialAttentionColumn(),
+            ColumnRenderer.getFixSLAWarningColumn(),
             ColumnRenderer.getFutureWorkColumn(),
             {
                 hide: true,

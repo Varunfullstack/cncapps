@@ -33,7 +33,7 @@ class InboxOpenSRComponent extends React.Component {
     };
 
     getTableElement = () => {
-        const {el, addToolTip} = this;
+        const {el} = this;
         const {
             getMoveElement,
             srDescription,
@@ -45,10 +45,10 @@ class InboxOpenSRComponent extends React.Component {
         let columns = [
             ColumnRenderer.getWorkIconColumn(startWork, this.code),
             ColumnRenderer.getSpecialAttentionColumn(),
+            ColumnRenderer.getFixSLAWarningColumn(),
             ColumnRenderer.getFutureWorkColumn(),
-           ColumnRenderer.getRequestTimeColumn(requestAdditionalTime),
-           ColumnRenderer.getOnHoldColumn(),
-
+            ColumnRenderer.getRequestTimeColumn(requestAdditionalTime),
+            ColumnRenderer.getOnHoldColumn(),
             ColumnRenderer.getSLABreachedColumn(),
             {
                 hide: false,

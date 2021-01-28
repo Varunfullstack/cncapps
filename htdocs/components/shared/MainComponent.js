@@ -144,6 +144,7 @@ export default class MainComponent extends React.Component {
                 title={confirm.title}
                 message={confirm.message}
                 onClose={confirm.onClose}
+                key="confirmThingy"
             />
         );
     }

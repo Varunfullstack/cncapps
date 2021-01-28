@@ -136,6 +136,19 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
      */
     private $isFixSLABreached;
 
+    /** @var bool */
+    private $slaP1PenaltiesAgreed;
+    /** @var bool */
+    private $slaP2PenaltiesAgreed;
+    /** @var bool */
+    private $slaP3PenaltiesAgreed;
+    /** @var float */
+    private $slaFixHoursP1;
+    /** @var float */
+    private $slaFixHoursP2;
+    /** @var float */
+    private $slaFixHoursP3;
+
 
     /**
      * ServiceRequestSummaryDTO constructor.
@@ -156,6 +169,8 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
         $buActivity      = new BUActivity($stuff);
         $usedMinutes     = 0;
         $assignedMinutes = 0;
+        $dbeCustomer     = new \DBECustomer($problem);
+        $dbeCustomer->getRow($problem->getValue(DBEJProblem::customerID));
         switch ($problem->getValue(DBEJProblem::QUEUE_TEAM_ID)) {
             case 1:
             {
@@ -217,6 +232,12 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
         $instance->fixedTeamId                = $problem->getValue(DBEJProblem::FIXED_TEAM_ID);
         $instance->queueNo                    = $problem->getValue(DBEJProblem::queueNo);
         $instance->isFixSLABreached           = $problem->getValue(DBEJProblem::IS_FIX_SLA_BREACHED);
+        $instance->slaP1PenaltiesAgreed       = $dbeCustomer->getValue(\DBECustomer::slaP1PenaltiesAgreed);
+        $instance->slaP2PenaltiesAgreed       = $dbeCustomer->getValue(\DBECustomer::slaP2PenaltiesAgreed);
+        $instance->slaP3PenaltiesAgreed       = $dbeCustomer->getValue(\DBECustomer::slaP3PenaltiesAgreed);
+        $instance->slaFixHoursP1              = $dbeCustomer->getValue(\DBECustomer::slaFixHoursP1);
+        $instance->slaFixHoursP2              = $dbeCustomer->getValue(\DBECustomer::slaFixHoursP2);
+        $instance->slaFixHoursP3              = $dbeCustomer->getValue(\DBECustomer::slaFixHoursP3);
         return $instance;
     }
 
@@ -267,6 +288,12 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
             "fixedTeamId"                => $this->fixedTeamId,
             "queueNo"                    => $this->queueNo,
             "isFixedSLABreached"         => $this->isFixSLABreached,
+            "slaP1PenaltiesAgreed"       => $this->slaP1PenaltiesAgreed,
+            "slaP2PenaltiesAgreed"       => $this->slaP2PenaltiesAgreed,
+            "slaP3PenaltiesAgreed"       => $this->slaP3PenaltiesAgreed,
+            "slaFixHoursP1"              => $this->slaFixHoursP1,
+            "slaFixHoursP2"              => $this->slaFixHoursP2,
+            "slaFixHoursP3"              => $this->slaFixHoursP3,
         ];
     }
 

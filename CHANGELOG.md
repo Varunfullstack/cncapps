@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 1211 - Include SR Time Remaining on the Display Activity page.
+- Issue 1202 - Include icon for Fix SLA on dashboards
 ### Changed
 - Issue 1206 - Include team engineers at the top of the list in the SD Dashboard when the SR is unassigned.
 - Issue 1186 - Don't notify when assigning requests to yourself.
