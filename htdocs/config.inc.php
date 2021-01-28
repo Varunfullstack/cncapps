@@ -1474,6 +1474,10 @@ define(
     'DATE_MYSQL_DATETIME',
     DATE_MYSQL_DATE . ' ' . DATE_MYSQL_TIME
 );
+define(
+    'DATE_CNC_DATE_FORMAT',
+    'd/m/Y'
+);
 $cfg["postToSco"]   = FALSE;
 $cfg["txt_chevron"] = "&gt;";
 // System paths and URLs
