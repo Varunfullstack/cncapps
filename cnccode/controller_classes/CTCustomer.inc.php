@@ -1769,6 +1769,9 @@ class CTCustomer extends CTCNC
                 ),
                 'noOfSites'                               => $this->dsCustomer->getValue(DBECustomer::noOfSites),
                 'noOfPCs'                                 => $this->dsCustomer->getValue(DBECustomer::noOfPCs),
+                'patchManagementEligibleComputers'        => $this->dsCustomer->getValue(
+                    DBECustomer::eligiblePatchManagement
+                ),
                 'modifyDate'                              => $this->dsCustomer->getValue(DBECustomer::modifyDate),
                 'reviewDate'                              => $this->dsCustomer->getValue(DBECustomer::reviewDate),
                 'reviewTime'                              => $this->dsCustomer->getValue(DBECustomer::reviewTime),
@@ -3326,21 +3329,21 @@ class CTCustomer extends CTCNC
             array_push(
                 $contacts,
                 array(
-                    'id'                  => $dbeContact->getValue(DBEContact::contactID),
-                    'position'            => $dbeContact->getValue(DBEContact::position),
-                    'firstName'           => $dbeContact->getValue(DBEContact::firstName),
-                    'lastName'            => $dbeContact->getValue(DBEContact::lastName),
-                    'siteNo'              => $dbeSite->getValue(DBESite::siteNo),
-                    'active'              => $dbeContact->getValue(DBEContact::active),
-                    'siteTitle'           => $dbeSite->getValue(DBESite::add1) . ' ' . $dbeSite->getValue(
+                    'id'           => $dbeContact->getValue(DBEContact::contactID),
+                    'position'     => $dbeContact->getValue(DBEContact::position),
+                    'firstName'    => $dbeContact->getValue(DBEContact::firstName),
+                    'lastName'     => $dbeContact->getValue(DBEContact::lastName),
+                    'siteNo'       => $dbeSite->getValue(DBESite::siteNo),
+                    'active'       => $dbeContact->getValue(DBEContact::active),
+                    'siteTitle'    => $dbeSite->getValue(DBESite::add1) . ' ' . $dbeSite->getValue(
                             DBESite::town
                         ) . ' ' . $dbeSite->getValue(DBESite::postcode),
-                    "sitePhone"           => $dbeSite->getValue(DBESite::phone),
+                    "sitePhone"    => $dbeSite->getValue(DBESite::phone),
                     "phone"        => $dbeContact->getValue(DBEContact::phone),
                     "mobilePhone"  => $dbeContact->getValue(DBEContact::mobilePhone),
                     "email"        => $dbeContact->getValue(DBEContact::email),
                     'supportLevel' => $dbeContact->getValue(DBEContact::supportLevel),
-                    "notes"               => $dbeContact->getValue(DBEContact::notes)
+                    "notes"        => $dbeContact->getValue(DBEContact::notes)
                 )
             );
         }

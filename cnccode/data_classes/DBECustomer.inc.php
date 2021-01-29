@@ -76,6 +76,7 @@ class DBECustomer extends DBCNCEntity
     const slaP3PenaltiesAgreed         = "slaP3PenaltiesAgreed";
     const streamOneEmail               = "streamOneEmail";
     const inclusiveOOHCallOuts         = "inclusiveOOHCallOuts";
+    const eligiblePatchManagement      = "eligiblePatchManagement";
 
 
     /**
@@ -466,6 +467,13 @@ class DBECustomer extends DBCNCEntity
         );
         $this->addColumn(
             self::inclusiveOOHCallOuts,
+            DA_INTEGER,
+            DA_NOT_NULL,
+            null,
+            0
+        );
+        $this->addColumn(
+            self::eligiblePatchManagement,
             DA_INTEGER,
             DA_NOT_NULL,
             null,

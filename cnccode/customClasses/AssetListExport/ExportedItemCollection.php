@@ -2,7 +2,6 @@
 
 namespace CNCLTD\AssetListExport;
 
-use DateInterval;
 use DateTime;
 use PDO;
 
@@ -13,7 +12,6 @@ class ExportedItemCollection
     private $labTechData  = [];
     private $summaryData  = [];
     private $customerData = [];
-    private $thresholdDays;
 
 
     /**
@@ -21,12 +19,10 @@ class ExportedItemCollection
      * @param \DBECustomer $customer
      * @param OperatingSystemsSupportDatesCollection $collection
      * @param \PDO $labTechDB
-     * @param $thresholdDays
      */
     public function __construct(\DBECustomer $customer,
                                 OperatingSystemsSupportDatesCollection $collection,
-                                \PDO $labTechDB,
-                                $thresholdDays
+                                \PDO $labTechDB
     )
     {
         /** @noinspection SqlIdentifierLength */
@@ -295,7 +291,7 @@ ORDER BY computerName';
         $labtechData = $statement->fetchAll(PDO::FETCH_CLASS, LabtechAssetDTO::class);
         // we have to build the information from labtech and os support dates collection
         foreach ($labtechData as $labtechDatum) {
-            $supportDates = $collection->getMatchingOperatingSystemSupportInformation(
+            $supportDates        = $collection->getMatchingOperatingSystemSupportInformation(
                 $labtechDatum->getOperatingSystem(),
                 $labtechDatum->getVersion()
             );
@@ -339,29 +335,18 @@ ORDER BY computerName';
                 $this->pcs++;
             }
         }
-        $this->thresholdDays = $thresholdDays;
     }
 
-    public function getOSEndOfSupportDateColor($index): ?string
+    public function getOSEndOfSupportDate($index): ?DateTime
     {
         $found = @$this->labTechData[$index];
         if (!$found || !isset($found["supportDates"])) {
             return null;
         }
-        $date          = DateTime::createFromFormat(
+        return DateTime::createFromFormat(
             DATE_MYSQL_DATE,
             $found['supportDates'][\DBEOSSupportDates::endOfLifeDate]
         );
-        $thresholdDate = new DateTime();
-        $thresholdDate->add(new DateInterval('P' . $this->thresholdDays . 'D'));
-        $today = new DateTime();
-        if ($date <= $thresholdDate) {
-            return "FFFFEB9C";
-        }
-        if ($date <= $today) {
-            return "FFFFC7CE";
-        }
-        return null;
     }
 
     public function getNumberOfPcs()
@@ -387,5 +372,14 @@ ORDER BY computerName';
     public function getExportData(): array
     {
         return $this->customerData;
+    }
+
+    /**
+     * @param $index
+     * @return mixed
+     */
+    public function getOperatingSystem($index)
+    {
+        return $this->labTechData[$index]["dataItem"]->getOperatingSystem();
     }
 }

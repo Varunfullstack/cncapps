@@ -1105,6 +1105,34 @@
             </td>
         </tr>
         <tr>
+            <td class="promptText">Antivirus Out of Date Threshold Days</td>
+            <td class="inputText">
+                <input {DISABLED}
+                       type="number"
+                       max="99"
+                       name="header[1][antivirusOutOfDateThresholdDays]"
+                       value="{antivirusOutOfDateThresholdDays}"
+                       title="Threshold days"
+                       required
+                >
+                <span class="formErrorMessage">{antivirusOutOfDateThresholdDaysMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Offline agent threshold days</td>
+            <td class="inputText">
+                <input {DISABLED}
+                       type="number"
+                       max="99"
+                       name="header[1][offlineAgentThresholdDays]"
+                       value="{offlineAgentThresholdDays}"
+                       title="Threshold days"
+                       required
+                >
+                <span class="formErrorMessage">{offlineAgentThresholdDaysMessage}</span>
+            </td>
+        </tr>
+        <tr>
             <td class="promptText">7 Day Target</td>
             <td class="inputText">
                 <input {DISABLED}
