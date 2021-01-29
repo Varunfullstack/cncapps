@@ -605,7 +605,7 @@ class ActivityEditComponent extends MainComponent {
         }
         const renderUpdateCancelButtons = () => {
 
-            if (data?.callActTypeID !== ActivityType.TECHNICAL_CHANGE_REQUEST) {
+            if (data?.callActTypeID !== ActivityType.TECHNICAL_CHANGE_REQUEST || !currentUser?.isSDManager || currentUser?.serviceRequestQueueManager) {
                 const isEnabled = currentUser?.isSDManager || !(data?.callActType === ActivityType.INITIAL && data?.problemStatus === 'I');
 
                 return <Fragment>
@@ -613,7 +613,6 @@ class ActivityEditComponent extends MainComponent {
                             disabled={!isEnabled}
                     >Update
                     </button>
-                    <button onClick={() => this.handleCancel(data)}>Cancel</button>
                 </Fragment>
             }
         }
@@ -648,6 +647,10 @@ class ActivityEditComponent extends MainComponent {
             > Parts Used
             </button>
             {renderUpdateCancelButtons()}
+            <button onClick={() => this.handleCancel(data)}
+            >
+                Cancel
+            </button>
         </div>
 
     }
