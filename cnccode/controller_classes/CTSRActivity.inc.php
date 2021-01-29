@@ -377,7 +377,7 @@ class CTSRActivity extends CTCNC
             "projectId"                       => $dbejCallActivity->getValue(DBEJCallActivity::projectID),
             "projects"                        => BUProject::getCustomerProjects($customerId),
             "cncNextAction"                   => $dbejCallActivity->getValue(DBEJCallActivity::cncNextAction),
-            "customerNotes"                 => $dbejCallActivity->getValue(DBEJCallActivity::customerSummary),
+            "customerNotes"                   => $dbejCallActivity->getValue(DBEJCallActivity::customerSummary),
             'activityTypeHasExpenses'         => BUActivityType::hasExpenses(
                 $dbejCallActivity->getValue(DBEJCallActivity::callActTypeID)
             ),
@@ -385,7 +385,9 @@ class CTSRActivity extends CTCNC
             'assetTitle'                      => $dbeProblem->getValue(DBEProblem::assetTitle),
             "emptyAssetReason"                => $dbeProblem->getValue(DBEProblem::emptyAssetReason),
             "holdForQA"                       => $dbeProblem->getValue(DBEProblem::holdForQA),
-            "isOnSiteActivity"                => $dbeActivityType->getValue(DBECallActType::onSiteFlag) == 'Y'
+            "isOnSiteActivity"                => $dbeActivityType->getValue(DBECallActType::onSiteFlag) == 'Y',
+            "openHours"                       => $dbeProblem->getValue(DBEProblem::openHours),
+            "workingHours"                    => $dbeProblem->getValue(DBEProblem::workingHours),
         ];
     }
 
@@ -906,11 +908,11 @@ class CTSRActivity extends CTCNC
 
     function getCustomerContracts()
     {
-        $customerID             = $_REQUEST["customerId"];
-        $linkedToSalesOrder     = $_REQUEST["linkedToSalesOrder"];
-        $contracts              = array();
-        $buCustomerItem         = new BUCustomerItem($this);
-        $dsContract             = new DataSet($this);
+        $customerID         = $_REQUEST["customerId"];
+        $linkedToSalesOrder = $_REQUEST["linkedToSalesOrder"];
+        $contracts          = array();
+        $buCustomerItem     = new BUCustomerItem($this);
+        $dsContract         = new DataSet($this);
         if ($customerID) {
             $buCustomerItem->getContractsByCustomerID(
                 $customerID,

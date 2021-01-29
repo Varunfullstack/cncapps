@@ -628,11 +628,23 @@ class ActivityDisplayComponent extends MainComponent {
                 this.getToggle("Travel", "showTravel"),
                 this.getToggle("Operational Tasks", "showOperationalTasks"),
                 this.getToggle("ServerGuard Updates", "showServerGuardUpdates"),
-                el('label', {className: "ml-5"}, 'Activity hours: '),
+                el('label', {className: "ml-5"}, 'Request Hours: '),
                 el('label', null, data?.totalActivityDurationHours),
-                el('label', {className: "ml-5"}, 'Chargeable hours: '),
-                el('label', null, data?.chargeableActivityDurationHours)),
-            // this.getOnsiteActivities(data?.onSiteActivities)
+                el('label', {className: "ml-5"}, 'Chargeable: '),
+                el('label', null, data?.chargeableActivityDurationHours),
+                <label className="ml-5">
+                    Awaiting CNC:
+                </label>,
+                <label>
+                    {data?.workingHours}
+                </label>,
+                <label className="ml-5">
+                    On Hold:
+                </label>,
+                <label>
+                    {data?.openHours - data?.workingHours < 0 ? 0 : (data?.openHours - data?.workingHours).toFixed(2)}
+                </label>
+            ),
         );
     }
 

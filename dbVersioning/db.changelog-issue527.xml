@@ -6,11 +6,6 @@
         <tagDatabase tag="issue527"/>
     </changeSet>
     <changeSet id="1560513678-2" author="pavwebdev">
-        <sqlFile endDelimiter="#" path="/getOpenHoursFunction.sql" stripComments="true"/>
-        <rollback>
-            <sql>
-                drop function if exists getOpenHours;
-            </sql>
-        </rollback>
+        1
     </changeSet>
 </databaseChangeLog>
