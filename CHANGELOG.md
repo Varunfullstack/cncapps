@@ -20,6 +20,7 @@ This project changes will be shown here.
 ### Fixed
 - Issue 1185 - Calendar item from an activity has a faulty link.
 - Issue 1228 - Aged SRs On Hold Status
+- Issue 1227 - New project emails going to main contacts as well.
 
 ## [v5.3.3] - 2021-01-25
 ### Fixed
