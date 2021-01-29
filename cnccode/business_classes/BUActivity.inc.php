@@ -6503,7 +6503,7 @@ class BUActivity extends Business
         $template   = '@customerFacing/SalesOrderServiceRequestCreated/SalesOrderServiceRequestCreated.html.twig';
         $subject    = "Service Request {$dbejCallactivity->getValue(DBEJCallActivity::problemID)} - {$dbejCallactivity->getValue(DBEJCallActivity::emailSubjectSummary)} - Logged";
         $selfFlag   = DBEContact::initialLoggingEmailFlag;
-        $othersFlag = DBEContact::initialLoggingEmailFlag;
+        $othersFlag = DBEContact::othersInitialLoggingEmailFlag;
         $this->sendCustomerEmail($template, $data, $dbejCallactivity, $othersFlag, $subject, $selfFlag);
     }
 
