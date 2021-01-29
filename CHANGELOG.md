@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v5.4.0]
 ### Added
 - Issue 1211 - Include SR Time Remaining on the Display Activity page.
 - Issue 1202 - Include icon for Fix SLA on dashboards
