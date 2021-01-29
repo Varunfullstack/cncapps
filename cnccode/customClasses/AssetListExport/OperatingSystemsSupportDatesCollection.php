@@ -36,6 +36,9 @@ class OperatingSystemsSupportDatesCollection
     public function getMatchingOperatingSystemSupportInformation($operatingSystem, $version)
     {
         $operatingSystem = mb_convert_case($operatingSystem, MB_CASE_LOWER);
+        if (!$version) {
+            return null;
+        }
         if (!preg_match("/(\d+\.\d+(\.\d+)?)/", $version, $matches)) {
             throw new \Exception("The version does not match the regex!! $version");
         }
