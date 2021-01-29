@@ -16,6 +16,7 @@ This project changes will be shown here.
 - Issue 1209 - Sales Order search to include Date Last Quoted
 - Issue 1200 - Landing page update after completing a staff appraisal.
 - Issue 1212 - Display CNC & On Hold time in the SR
+- Issue 1220 - RenewalsUpdate Left Align headings
 ### Fixed
 - Issue 1185 - Calendar item from an activity has a faulty link.
 
