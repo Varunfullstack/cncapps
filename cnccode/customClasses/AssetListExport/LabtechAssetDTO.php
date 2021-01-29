@@ -55,7 +55,13 @@ class LabtechAssetDTO
         }
         $firstStopPosition = strpos($this->computerName, '.');
         if ($firstStopPosition > 0) {
-            $this->computerName = substr($this->computerName, 0, $firstStopPosition - 1);
+            $this->computerName = substr($this->computerName, 0, $firstStopPosition);
+        }
+        if ($this->antivirusDefinition) {
+            $testDate = \DateTime::createFromFormat(DATE_CNC_DATE_FORMAT, $this->antivirusDefinition);
+            if (!$testDate || $testDate->format(DATE_CNC_DATE_FORMAT) !== $this->antivirusDefinition) {
+                $this->antivirusDefinition = null;
+            }
         }
 
     }

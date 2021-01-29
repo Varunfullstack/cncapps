@@ -272,7 +272,7 @@ FROM
     ON clients.`ClientID` = locations.`ClientID`
     WHERE `clients`.`ExternalID` = ?
 GROUP BY plugin_vm_esxhosts.`DeviceId`
-ORDER BY computerName';
+ORDER BY location, operatingSystem desc, computerName';
         $statement            = $labTechDB->prepare($query);
         $queryExecutionResult = $statement->execute(
             [$customer->getValue(\DBECustomer::customerID), $customer->getValue(\DBECustomer::customerID)]
@@ -284,7 +284,6 @@ ORDER BY computerName';
                 );
             var_dump($query);
             echo ' </div>';
-            exit;
             return;
         }
         /** @var LabtechAssetDTO[] $labtechData */

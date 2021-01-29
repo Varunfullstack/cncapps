@@ -22,10 +22,12 @@ use UnexpectedValueException;
 class AssetListExporter
 {
     const OPERATING_SYSTEM_SOON_END_OF_LIFE_COLOR = "B59DB6";
-    const OPERATING_SYSTEM_IS_END_OF_LIFE_COLOR   = "FFFFC7CE";
+    const OPERATING_SYSTEM_IS_END_OF_LIFE_COLOR   = "FFEB9C";
     const ANTIVIRUS_OUT_OF_DATE_COLOR             = "F9B67F";
     const NO_VENDOR_WARRANTY_COLOR                = "FFC7CE";
     const OFFLINE_AGENT_COLOR                     = "C4BD97";
+    const OPERATING_SYSTEM_COLUMN_INDEX           = 14;
+    const OPERATING_SYSTEM_VERSION_COLUMN_INDEX   = 15;
     const OS_END_OF_SUPPORT_DATE_COLUMN_INDEX     = 16;
     const ANTIVIRUS_DEFINITION_COLUMN_INDEX       = 20;
     const LAST_CONTACT_COLUMN_INDEX               = 4;
@@ -138,6 +140,10 @@ class AssetListExporter
             $OSEndOfSupportDateColor = $this->getOSEndOfSupportDateColor($tabularData, $i);
             if ($OSEndOfSupportDateColor) {
                 $columnCoordinate = Coordinate::stringFromColumnIndex(self::OS_END_OF_SUPPORT_DATE_COLUMN_INDEX);
+                $this->setCellSolidColor($sheet, "{$columnCoordinate}{$currentRow}", $OSEndOfSupportDateColor);
+                $columnCoordinate = Coordinate::stringFromColumnIndex(self::OPERATING_SYSTEM_COLUMN_INDEX);
+                $this->setCellSolidColor($sheet, "{$columnCoordinate}{$currentRow}", $OSEndOfSupportDateColor);
+                $columnCoordinate = Coordinate::stringFromColumnIndex(self::OPERATING_SYSTEM_VERSION_COLUMN_INDEX);
                 $this->setCellSolidColor($sheet, "{$columnCoordinate}{$currentRow}", $OSEndOfSupportDateColor);
             }
             $antivirusOutOfDateColor = $this->getAntivirusOutOfDateColor($toExportData[$i]);
