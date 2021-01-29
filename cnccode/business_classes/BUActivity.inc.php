@@ -1266,17 +1266,20 @@ class BUActivity extends Business
             );
         }
         if (in_array($problem->getValue(DBEProblem::status), ["F", "C"])) {
-            /** @var $db dbSweetcode */ global $db;
-            $resultset = $db->preparedQuery(
-                'select getOpenHours(?)',
-                [["type" => "i", "value" => $problem->getValue(DBEProblem::problemID)]]
-            );
-            $row       = $resultset->fetch_row();
-            $problem->setValue(
-                DBEProblem::openHours,
-                $row[0]
-            );
+            $query = 'select getOpenHours(?)';
+        } else {
+            $query = "select getOpenHoursUntilNow(?)";
         }
+        /** @var $db dbSweetcode */ global $db;
+        $resultset = $db->preparedQuery(
+            $query,
+            [["type" => "i", "value" => $problem->getValue(DBEProblem::problemID)]]
+        );
+        $row       = $resultset->fetch_row();
+        $problem->setValue(
+            DBEProblem::openHours,
+            $row[0]
+        );
         $problem->setValue(
             DBEJProblem::chargeableActivityDurationHours,
             $chargeableHours
