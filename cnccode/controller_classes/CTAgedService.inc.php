@@ -113,8 +113,8 @@ class CTAgedService extends CTCNC
                 $lastUpdatedDate,
                 $priority,
                 $teamName,
-                $status,
                 $awaitingCustomer,
+                $status,
                 $queueNumber,
             ] = $row;
             $urlRequest  = Controller::buildLink(
@@ -125,7 +125,7 @@ class CTAgedService extends CTCNC
                 )
             );
             $description = (new Html2Text($description))->getText();
-            $data []     = [
+            $data [] = [
                 'customer'         => $customer,
                 'serviceRequestID' => $serviceRequestId,
                 'assignedTo'       => $assignedTo,
@@ -136,6 +136,8 @@ class CTAgedService extends CTCNC
                 'priority'         => $priority,
                 'teamName'         => $teamName,
                 'awaiting'         => $status == 'I' ? 'Not Started' : ($awaitingCustomer == 'Y' ? 'Customer' : 'CNC'),
+                "status"           => $status,
+                "awaitingCustomer" => $awaitingCustomer,
                 'urlRequest'       => $urlRequest,
                 'rowClass'         => $durationHours >= $dsHeader->getValue(
                     DBEHeader::sevenDayerRedDays

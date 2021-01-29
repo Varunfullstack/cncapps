@@ -19,6 +19,7 @@ This project changes will be shown here.
 - Issue 1220 - RenewalsUpdate Left Align headings
 ### Fixed
 - Issue 1185 - Calendar item from an activity has a faulty link.
+- Issue 1228 - Aged SRs On Hold Status
 
 ## [v5.3.3] - 2021-01-25
 ### Fixed
