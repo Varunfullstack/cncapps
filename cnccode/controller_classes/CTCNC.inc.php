@@ -538,7 +538,7 @@ class CTCNC extends Controller
             ],
             [
                 "id"    => 107,
-                "href"  => "Project.php",
+                "href"  => "Projects.php",
                 "label" => "Projects",
             ],
             [
@@ -1059,6 +1059,11 @@ class CTCNC extends Controller
                 "id"    => 811,
                 "label" => "Lead Status Types",
                 "href"  => "LeadStatusTypes.php",
+            ],
+            [
+                "id"    => 813,
+                "label" => "Project Options",
+                "href"  => "ProjectOptions.php",
             ],
         ];
     }

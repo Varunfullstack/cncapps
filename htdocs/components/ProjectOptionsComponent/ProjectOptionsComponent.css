@@ -1,0 +1,7 @@
+input:focus:required:invalid {border: 1px solid red;}
+input:required:invalid {border: 1px solid red;}
+input:required:valid { border: 1px solid black; }
+.form-group{
+    display: flex;
+    flex-direction: column;
+}

@@ -181,7 +181,8 @@ class BUProject extends Business
      * @throws Exception
      */
     public function updateLinkedSalesOrder($projectID,
-                                           $linkedOrderID
+                                           $linkedOrderID,
+                                           $orignalOrder=false
     )
     {
         $dbeSalesOrder = new DBEOrdhead($this);
@@ -198,23 +199,37 @@ class BUProject extends Business
         }
 
         $testProject = new DBEProject($this);
-
-        $testProject->setValue(
-            DBEProject::ordHeadID,
-            $linkedOrderID
-        );
-
-        $testProject->getRowByColumn(DBEProject::ordHeadID);
-
-        if ($testProject->rowCount()) {
-            throw new Exception('The Sales Order given does already have a linked project');
-        };
-
-
-        $dbeProject->setValue(
-            DBEProject::ordHeadID,
-            $linkedOrderID
-        );
+        if(!$orignalOrder)
+        {
+            $testProject->setValue(
+                DBEProject::ordHeadID,
+                $linkedOrderID
+            );      
+            $testProject->getRowByColumn(DBEProject::ordHeadID);
+            if ($testProject->rowCount()) {
+                throw new Exception('The Sales Order given does already have a linked project');
+            };
+            $dbeProject->setValue(
+                DBEProject::ordHeadID,
+                $linkedOrderID
+            );
+        }
+        else
+        {
+            $testProject->setValue(
+                DBEProject::ordOriginalHeadID,
+                $linkedOrderID
+            );      
+            $testProject->getRowByColumn(DBEProject::ordOriginalHeadID);
+            if ($testProject->rowCount()) {
+                throw new Exception('The Sales Order given does already have a linked project');
+            };
+            $dbeProject->setValue(
+                DBEProject::ordOriginalHeadID,
+                $linkedOrderID
+            );
+        }
+       
         $dbeProject->updateRow();
     }
 }// End of class

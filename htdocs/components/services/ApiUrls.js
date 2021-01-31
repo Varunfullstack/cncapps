@@ -15,4 +15,7 @@ export default class ApiUrls {
     static MySettings = "/MySettings.php?action=";
     static Home = "/index.php?action="
     static CustomerInfo = "/CustomerInfo.php?action=";
+    static Projects = "/Projects.php?action=";
+    static ProjectOptions = "/ProjectOptions.php?action=";
+
 }
