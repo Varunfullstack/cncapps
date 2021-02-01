@@ -6588,7 +6588,7 @@ FROM
         LEFT JOIN contact ON con_contno = cpr_contno
         LEFT JOIN customer ON cus_custno = con_custno
       ORDER BY
-        cus_name, cpr_reason";
+        cpr_date, cus_name, cpr_reason";
         $db->query($queryString);
         return $db;
 
