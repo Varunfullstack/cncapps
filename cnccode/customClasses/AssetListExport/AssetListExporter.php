@@ -347,7 +347,7 @@ class AssetListExporter
         $legendRowStart = $highestRow + 2;
         $sheet->fromArray(
             [
-                ["Operating System soon to be end of life"],
+                ["OS no longer supported after {$dbeHeader->getValue(DBEHeader::OSSupportDatesThresholdDays)} days"],
                 ["Operating System is end of life"],
                 ["Antivirus Out of Date By More Than {$dbeHeader->getValue(DBEHeader::antivirusOutOfDateThresholdDays)} Days"],
                 ["No Vendor Warranty"],
@@ -403,12 +403,13 @@ class AssetListExporter
         $thresholdDate = new DateTime();
         $thresholdDate->add(new DateInterval('P' . $this->osSupportDatesThresholdDays . 'D'));
         $today = new DateTime();
-        if ($date <= $thresholdDate) {
-            return self::OPERATING_SYSTEM_SOON_END_OF_LIFE_COLOR;
-        }
         if ($date <= $today) {
             return self::OPERATING_SYSTEM_IS_END_OF_LIFE_COLOR;
         }
+        if ($date <= $thresholdDate) {
+            return self::OPERATING_SYSTEM_SOON_END_OF_LIFE_COLOR;
+        }
+
         return null;
     }
 

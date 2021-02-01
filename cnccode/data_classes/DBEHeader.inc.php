@@ -633,7 +633,7 @@ class DBEHeader extends DBEntity
             DA_INTEGER,
             DA_NOT_NULL,
             null,
-            60
+            30
         );
         $this->setPK(0);
         $this->setAddColumnsOff();

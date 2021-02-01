@@ -51,7 +51,7 @@
             </not>
         </preConditions>
         <addColumn tableName="headert">
-            <column name="offlineAgentThresholdDays" type="int(2)" defaultValue="60">
+            <column name="offlineAgentThresholdDays" type="int(2)" defaultValue="30">
                 <constraints nullable="false"/>
             </column>
         </addColumn>
