@@ -9,6 +9,7 @@ use PDO;
 
 global $cfg;
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
+require_once($cfg['path_bu'] . '/BUCustomerItem.inc.php');
 
 
 class SupportedCustomerAssets
@@ -21,6 +22,8 @@ class SupportedCustomerAssets
      * @var OperatingSystemsSupportDatesCollection
      */
     private $operatingSystemsCollection;
+    private $cncContractAssets = [];
+    private $labtechAssets;
 
     public function __construct()
     {
@@ -33,14 +36,41 @@ class SupportedCustomerAssets
         $tabularData                      = new ExportedItemCollection(
             $dbeCustomer, $this->operatingSystemsCollection, $this->labTechDB
         );
+        $buCustomerItem                   = new \BUCustomerItem($this);
+        $customerAssets                   = new \DataSet($this);
+        $buCustomerItem->getCustomerItemsByContractID(28531, $customerAssets);
+        while ($customerAssets->fetchNext()) {
+            $this->cncContractAssets[strtolower($customerAssets->getValue(\DBECustomerItem::serverName))] = false;
+        }
         foreach ($tabularData->getExportData() as $key => $exportDatum) {
             if ($tabularData->isServerAsset($key)) {
-                $asset = $tabularData->getAsset($key);
-                var_dump($asset->getComputerName());
+                $asset                                   = $tabularData->getAsset($key);
+                $lowerComputerName                       = strtolower($asset->getComputerName());
+                $this->labtechAssets[$lowerComputerName] = true;
+                if (!isset($this->cncContractAssets[$lowerComputerName])) {
+                    var_dump($asset->getComputerName());
+                } else {
+                    $this->cncContractAssets[$lowerComputerName] = true;
+                }
             }
         }
-        $buCustomerItem = new \BUCustomerItem($this);
-        $customerAssets = new \DataSet($this);
-        $buCustomerItem->getCustomerItemsByContractID(28531, $customerAssets);
+        var_dump('Elements that exists in CNC that do not exist in labtech');
+        foreach ($this->cncContractAssets as $assetName => $hasAMatch) {
+            if (!$hasAMatch) {
+                var_dump($assetName);
+            }
+        }
+
+        $cncContractItem = [
+            "customerName" => "",
+            "customerItemId" => "",
+
+        ];
+
+
+        $automateAssetItem = [
+
+        ];
+
     }
 }
