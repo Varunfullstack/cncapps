@@ -22,12 +22,13 @@ This project changes will be shown here.
 - Issue 1185 - Calendar item from an activity has a faulty link.
 - Issue 1228 - Aged SRs On Hold Status
 - Issue 1227 - New project emails going to main contacts as well.
+- Issue 1225 - Change request approval sometimes forces comments.
 
 ## [v5.3.3] - 2021-01-25
 ### Fixed
 - Sales Requests popup not clearing down.
 
-## [v5.3.2] - 2021-01-25
+## [v5.3.2] - 2021-01-25 
 ### Fixed
 - On the home page the links in this section are opening the Activity of the SR number, rather than the Activity ID.
 - Same section, stop the character codes from showing on the home page within Upcoming Visits.

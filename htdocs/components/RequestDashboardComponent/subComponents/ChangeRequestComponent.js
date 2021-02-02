@@ -184,7 +184,8 @@ class ChangeRequestComponent extends MainComponent {
 
     handleRequest = (status) => {
         const {data} = this.state;
-        if (status == DENY_STATUS && data.comments == null || data.comments == '') {
+
+        if (status == DENY_STATUS && !data.comments) {
             this.alert("Please enter comments");
             return;
         }
