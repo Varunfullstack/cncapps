@@ -381,4 +381,24 @@ ORDER BY location, operatingSystem desc, computerName';
     {
         return $this->labTechData[$index]["dataItem"]->getOperatingSystem();
     }
+
+    public function isServerAsset($index): bool
+    {
+        if (!isset($this->labTechData[$index]) || !isset($this->labTechData[$index]["supportDates"]) || !$this->labTechData[$index]["supportDates"]["isServer"]) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @param int $key
+     * @return mixed|null
+     */
+    public function getAsset(int $key): ?LabtechAssetDTO
+    {
+        if (!isset($this->labTechData[$key]) || !isset($this->labTechData[$key]["dataItem"])) {
+            return null;
+        }
+        return $this->labTechData[$key]["dataItem"];
+    }
 }

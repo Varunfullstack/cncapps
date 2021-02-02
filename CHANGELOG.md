@@ -24,6 +24,10 @@ This project changes will be shown here.
 - Issue 1227 - New project emails going to main contacts as well.
 - Issue 1225 - Change request approval sometimes forces comments.
 
+## [unreleased]
+### Changed
+- Issue 1230 - Show supported / unsupported customer assets
+
 ## [v5.3.3] - 2021-01-25
 ### Fixed
 - Sales Requests popup not clearing down.
