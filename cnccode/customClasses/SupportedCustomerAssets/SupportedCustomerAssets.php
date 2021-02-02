@@ -23,12 +23,12 @@ class SupportedCustomerAssets
      */
     private $operatingSystemsCollection;
     private $cncContractAssets = [];
-    private $labtechAssets;
+    private $automateAssets    = [];
 
-    public function __construct()
+    public function __construct($customerId)
     {
         $dbeCustomer = new DBECustomer($this);
-        $dbeCustomer->getRow(520);
+        $dbeCustomer->getRow($customerId);
         $dsn                              = 'mysql:host=' . LABTECH_DB_HOST . ';dbname=' . LABTECH_DB_NAME;
         $options                          = [PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'];
         $this->labTechDB                  = new PDO($dsn, LABTECH_DB_USERNAME, LABTECH_DB_PASSWORD, $options);
@@ -37,40 +37,55 @@ class SupportedCustomerAssets
             $dbeCustomer, $this->operatingSystemsCollection, $this->labTechDB
         );
         $buCustomerItem                   = new \BUCustomerItem($this);
-        $customerAssets                   = new \DataSet($this);
+        $validContract                    = new \DataSet($this);
+        $buCustomerItem->getServerCareValidContractsByCustomerID($customerId, $validContract);
+        if (!$validContract->fetchNext()) {
+            return;
+        }
+        $customerAssets = new \DataSet($this);
         $buCustomerItem->getCustomerItemsByContractID(28531, $customerAssets);
         while ($customerAssets->fetchNext()) {
-            $this->cncContractAssets[strtolower($customerAssets->getValue(\DBECustomerItem::serverName))] = false;
+            $this->cncContractAssets[strtolower($customerAssets->getValue(\DBECustomerItem::serverName))] = [
+                "matched" => false,
+                "item"    => new NotMatchedItemDTO(
+                    $dbeCustomer->getValue(DBECustomer::name),
+                    $customerAssets->getValue(\DBECustomerItem::serverName),
+                    $customerAssets->getValue(\DBECustomerItem::customerItemID)
+                ),
+            ];
         }
         foreach ($tabularData->getExportData() as $key => $exportDatum) {
             if ($tabularData->isServerAsset($key)) {
-                $asset                                   = $tabularData->getAsset($key);
-                $lowerComputerName                       = strtolower($asset->getComputerName());
-                $this->labtechAssets[$lowerComputerName] = true;
+                $asset             = $tabularData->getAsset($key);
+                $lowerComputerName = strtolower($asset->getComputerName());
                 if (!isset($this->cncContractAssets[$lowerComputerName])) {
-                    var_dump($asset->getComputerName());
+                    $this->automateAssets[$lowerComputerName] = [
+                        "matched" => true,
+                        "item"    => new NotMatchedItemDTO(
+                            $dbeCustomer->getValue(DBECustomer::name), $asset->getComputerName()
+                        ),
+                    ];
                 } else {
-                    $this->cncContractAssets[$lowerComputerName] = true;
+                    $this->cncContractAssets[$lowerComputerName]['matched'] = true;
                 }
             }
         }
-        var_dump('Elements that exists in CNC that do not exist in labtech');
-        foreach ($this->cncContractAssets as $assetName => $hasAMatch) {
-            if (!$hasAMatch) {
-                var_dump($assetName);
-            }
-        }
+    }
 
-        $cncContractItem = [
-            "customerName" => "",
-            "customerItemId" => "",
-
-        ];
+    public function getCNCNotMatchedAssets(): array
+    {
+        return array_map(
+            function ($item) { return $item['item']; },
+            array_filter($this->cncContractAssets, function ($item) { return !$item['matched']; })
+        );
+    }
 
 
-        $automateAssetItem = [
-
-        ];
-
+    public function getAutomateNotMatchedAssets()
+    {
+        return array_map(
+            function ($item) { return $item['item']; },
+            array_filter($this->automateAssets, function ($item) { return !$item['matched']; })
+        );
     }
 }

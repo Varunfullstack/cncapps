@@ -20,7 +20,12 @@ $debugMode = false;
 if (isset($options['d'])) {
     $debugMode = true;
 }
+$thing = null;
+$dbeCustomer = new DBECustomer($thing);
+$dbeCustomer->getActiveCustomers(true);
+while ($dbeCustomer->fetchNext()){
 
+}
 $test = new \CNCLTD\SupportedCustomerAssets\SupportedCustomerAssets();
 
 
