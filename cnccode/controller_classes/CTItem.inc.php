@@ -223,16 +223,13 @@ WHERE custitem.`cui_itemno` = ?
                 echo json_encode(["status" => "ok"]);
                 exit;
             case self::GET_CHILD_ITEMS:
-                if (!$this->getParam('itemId')) {
+                $parentItemId = $this->getParam('itemId');
+                if (!$parentItemId) {
                     throw new JsonHttpException(400, 'Item Id is mandatory');
                 }
-                $dbeItem = new DBEItem($this);
-                $dbeItem->getChildItems($this->getParam('itemId'));
-                $rows = [];
-                while ($dbeItem->fetchNext()) {
-                    $rows[] = $dbeItem->getRowAsAssocArray();
-                }
-                echo json_encode(["status" => "ok", "data" => $rows]);
+                global $db;
+                $repo = new \CNCLTD\ChildItem\ChildItemRepository($db);
+                echo json_encode(["status" => "ok", "data" => $repo->getChildItemsForItem($parentItemId)]);
                 break;
             case self::GET_PARENT_ITEMS:
                 if (!$this->getParam('itemId')) {
