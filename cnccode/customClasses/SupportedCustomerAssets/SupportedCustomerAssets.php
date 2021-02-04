@@ -60,7 +60,7 @@ class SupportedCustomerAssets
                 $lowerComputerName = strtolower($asset->getComputerName());
                 if (!isset($this->cncContractAssets[$lowerComputerName])) {
                     $this->automateAssets[$lowerComputerName] = [
-                        "matched" => true,
+                        "matched" => false,
                         "item"    => new NotMatchedItemDTO(
                             $dbeCustomer->getValue(DBECustomer::name), $asset->getComputerName()
                         ),
@@ -74,26 +74,23 @@ class SupportedCustomerAssets
 
     public function getCNCNotMatchedAssets(): array
     {
-
-        return array_map(
-            function ($item) {
-                return $item['item'];
-            },
-            array_filter(
-                $this->cncContractAssets,
-                function ($item) {
-                    return !$item['matched'];
-                }
-            )
-        );
+        return $this->getNotMatchedItems($this->cncContractAssets);
     }
 
 
     public function getAutomateNotMatchedAssets(): array
     {
-        return array_map(
-            function ($item) { return $item['item']; },
-            array_filter($this->automateAssets, function ($item) { return !$item['matched']; })
+        return $this->getNotMatchedItems($this->automateAssets);
+    }
+
+    private function getNotMatchedItems($matchingList): array
+    {
+        return array_values(
+            array_map(
+                function ($item) { return $item['item']; },
+                array_filter($matchingList, function ($item) { return !$item['matched']; })
+            )
         );
     }
+
 }

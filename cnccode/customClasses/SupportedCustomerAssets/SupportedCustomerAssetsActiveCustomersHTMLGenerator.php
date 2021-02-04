@@ -26,20 +26,23 @@ class SupportedCustomerAssetsActiveCustomersHTMLGenerator
         $thing       = null;
         $dbeCustomer = new DBECustomer($thing);
         $dbeCustomer->getActiveCustomers(true);
+        $count = 0;
         while ($dbeCustomer->fetchNext()) {
-            $customerAssets                 = new \CNCLTD\SupportedCustomerAssets\SupportedCustomerAssets(
+            $customerAssets            = new \CNCLTD\SupportedCustomerAssets\SupportedCustomerAssets(
                 $dbeCustomer->getValue(DBECustomer::customerID)
             );
-            $this->cncAssetsNotMatched      = array_merge(
+            $this->cncAssetsNotMatched = array_merge(
                 $this->cncAssetsNotMatched,
                 $customerAssets->getCNCNotMatchedAssets()
             );
-            var_dump(count($this->cncAssetsNotMatched));
             $this->automateAssetsNotMatched = array_merge(
                 $this->automateAssetsNotMatched,
                 $customerAssets->getAutomateNotMatchedAssets()
             );
-            var_dump(count($this->automateAssetsNotMatched));
+            if ($count > 3) {
+                break;
+            }
+            $count++;
         }
     }
 
