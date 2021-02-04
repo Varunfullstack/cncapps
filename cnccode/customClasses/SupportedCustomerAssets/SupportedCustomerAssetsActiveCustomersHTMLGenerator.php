@@ -34,14 +34,13 @@ class SupportedCustomerAssetsActiveCustomersHTMLGenerator
                 $this->cncAssetsNotMatched,
                 $customerAssets->getCNCNotMatchedAssets()
             );
+            var_dump(count($this->cncAssetsNotMatched));
             $this->automateAssetsNotMatched = array_merge(
                 $this->automateAssetsNotMatched,
                 $customerAssets->getAutomateNotMatchedAssets()
             );
+            var_dump(count($this->automateAssetsNotMatched));
         }
-        var_dump($this->cncAssetsNotMatched);
-        var_dump($this->automateAssetsNotMatched);
-        exit;
     }
 
     public function printHTML()
@@ -64,7 +63,7 @@ class SupportedCustomerAssetsActiveCustomersHTMLGenerator
             </tr>
             </thead>
             <tbody>
-            <?
+            <?php
             /** @var NotMatchedItemDTO $item */
             foreach ($this->automateAssetsNotMatched as $item) {
                 ?>
@@ -76,7 +75,7 @@ class SupportedCustomerAssetsActiveCustomersHTMLGenerator
                         <?= $item->getComputerName(); ?>
                     </td>
                 </tr>
-                <?
+                <?php
             }
             ?>
             </tbody>
@@ -99,9 +98,9 @@ class SupportedCustomerAssetsActiveCustomersHTMLGenerator
             </tr>
             </thead>
             <tbody>
-            <?
+            <?php
             /** @var NotMatchedItemDTO $item */
-            foreach ($this->automateAssetsNotMatched as $item) {
+            foreach ($this->cncAssetsNotMatched as $item) {
                 ?>
                 <tr>
                     <td>
@@ -111,18 +110,19 @@ class SupportedCustomerAssetsActiveCustomersHTMLGenerator
                         <?= $item->getComputerName(); ?>
                     </td>
                     <td>
-                        <?
+                        <?php
                         if ($item->getCustomerItemId()) {
                             ?>
                             <a href="/CustomerItem.php?action=displayCI&customerItemID=<?= $item->getCustomerItemId(
                             ); ?>"
+                               target="_blank"
                             ><?= $item->getCustomerItemId(); ?></a>
-                            <?
+                            <?php
                         }
                         ?>
                     </td>
                 </tr>
-                <?
+                <?php
             }
             ?>
             </tbody>

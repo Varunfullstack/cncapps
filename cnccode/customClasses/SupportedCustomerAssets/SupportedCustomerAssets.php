@@ -74,14 +74,22 @@ class SupportedCustomerAssets
 
     public function getCNCNotMatchedAssets(): array
     {
+
         return array_map(
-            function ($item) { return $item['item']; },
-            array_filter($this->cncContractAssets, function ($item) { return !$item['matched']; })
+            function ($item) {
+                return $item['item'];
+            },
+            array_filter(
+                $this->cncContractAssets,
+                function ($item) {
+                    return !$item['matched'];
+                }
+            )
         );
     }
 
 
-    public function getAutomateNotMatchedAssets()
+    public function getAutomateNotMatchedAssets(): array
     {
         return array_map(
             function ($item) { return $item['item']; },
