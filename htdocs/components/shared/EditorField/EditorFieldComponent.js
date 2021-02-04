@@ -8,7 +8,17 @@ export default class EditorFieldComponent extends React.PureComponent {
     }
 
     render() {
-        const {name, value, onChange, minCharCount, disableClipboard,hasToolbar,autoFocus,style, excludeFromErrorCount} = this.props;
+        const {
+            name,
+            value,
+            onChange,
+            minCharCount,
+            disableClipboard,
+            hasToolbar,
+            autoFocus,
+            style,
+            excludeFromErrorCount
+        } = this.props;
         return (
             <div className="inline_editor_field">
                 <CNCCKEditor name={name}
@@ -16,11 +26,13 @@ export default class EditorFieldComponent extends React.PureComponent {
                              type="inline"
                              style={style}
                              key="cncEditor"
-                             onChange={($event) => onChange($event.editor.getData())}
+                             onChange={data => {
+                                 onChange(data)
+                             }}
                              minCharCount={minCharCount}
                              disableClipboard={disableClipboard}
-                             sharedSpaces={hasToolbar||false}
-                             autoFocus={autoFocus||false}
+                             sharedSpaces={hasToolbar || false}
+                             autoFocus={autoFocus || false}
                              excludeFromErrorCount={excludeFromErrorCount || false}
                 />
             </div>

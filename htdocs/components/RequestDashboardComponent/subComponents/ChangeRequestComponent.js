@@ -154,7 +154,7 @@ class ChangeRequestComponent extends MainComponent {
                         <td>
                             <div id="top2"/>
                             <CNCCKEditor
-                                onChange={($event) => this.setValue('comments', $event.editor.getData())}
+                                onChange={(data) => this.setValue('comments', data)}
                                 style={{width: 600, height: 200}}
                                 type="inline"
                                 sharedSpaces={true}
