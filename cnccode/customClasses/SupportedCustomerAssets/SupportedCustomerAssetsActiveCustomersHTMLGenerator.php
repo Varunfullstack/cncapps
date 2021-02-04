@@ -26,12 +26,11 @@ class SupportedCustomerAssetsActiveCustomersHTMLGenerator
         $thing       = null;
         $dbeCustomer = new DBECustomer($thing);
         $dbeCustomer->getActiveCustomers(true);
-        $count = 0;
         while ($dbeCustomer->fetchNext()) {
-            $customerAssets            = new \CNCLTD\SupportedCustomerAssets\SupportedCustomerAssets(
+            $customerAssets                 = new \CNCLTD\SupportedCustomerAssets\SupportedCustomerAssets(
                 $dbeCustomer->getValue(DBECustomer::customerID)
             );
-            $this->cncAssetsNotMatched = array_merge(
+            $this->cncAssetsNotMatched      = array_merge(
                 $this->cncAssetsNotMatched,
                 $customerAssets->getCNCNotMatchedAssets()
             );
@@ -39,10 +38,6 @@ class SupportedCustomerAssetsActiveCustomersHTMLGenerator
                 $this->automateAssetsNotMatched,
                 $customerAssets->getAutomateNotMatchedAssets()
             );
-            if ($count > 3) {
-                break;
-            }
-            $count++;
         }
     }
 
@@ -50,6 +45,16 @@ class SupportedCustomerAssetsActiveCustomersHTMLGenerator
     {
         ?>
         <html>
+        <head>
+            <style>
+                thead th {
+                    text-align: left;
+                }
+            </style>
+            <link href="screen.css"
+                  rel="stylesheet"
+            >
+        </head>
         <body>
         <h3>
             These items are in Automate but not covered by ServerCare Contracts

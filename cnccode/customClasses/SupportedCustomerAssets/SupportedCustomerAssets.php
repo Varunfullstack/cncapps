@@ -43,7 +43,7 @@ class SupportedCustomerAssets
             return;
         }
         $customerAssets = new \DataSet($this);
-        $buCustomerItem->getCustomerItemsByContractID(28531, $customerAssets);
+        $buCustomerItem->getCustomerItemsByContractID($validContract->getValue(\DBECustomerItem::customerItemID), $customerAssets);
         while ($customerAssets->fetchNext()) {
             $this->cncContractAssets[strtolower($customerAssets->getValue(\DBECustomerItem::serverName))] = [
                 "matched" => false,
