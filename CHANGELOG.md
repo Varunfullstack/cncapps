@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1218 - Include quantities for child items in Sales Orders
+
 ## [v5.4.0]
 ### Added
 - Issue 1211 - Include SR Time Remaining on the Display Activity page.
