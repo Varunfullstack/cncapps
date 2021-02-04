@@ -19,14 +19,16 @@ class ChildItemRepository
 
     public function getChildItemsForItem($parentItemId): array
     {
-        $this->db->preparedQuery(
+        $result = $this->db->preparedQuery(
             "SELECT * FROM item JOIN childItem ON childItem.`childItemId` = item.`itm_itemno` WHERE childItem.`parentItemId` = ?",
             [
-                "type"  => "i",
-                "value" => $parentItemId
+                [
+                    "type"  => "i",
+                    "value" => $parentItemId
+                ]
             ]
         );
-        $rows = $this->db->fetchAll(MYSQLI_ASSOC);
+        $rows = $result->fetch_all(MYSQLI_ASSOC);
         $data = [];
         foreach ($rows as $row) {
             $data[] = ChildItemDTO::fromPersistence($row);

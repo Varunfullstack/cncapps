@@ -8,13 +8,14 @@ class ChildItemDTO implements \JsonSerializable
     private $description;
     private $quantity;
 
-    public static function fromPersistence($array)
+    public static function fromPersistence($array): ChildItemDTO
     {
         $instance               = new self();
         $instance->parentItemId = $array['parentItemId'];
         $instance->childItemId  = $array['childItemId'];
         $instance->description  = $array['itm_desc'];
         $instance->quantity     = $array['quantity'];
+        return $instance;
     }
 
     /**

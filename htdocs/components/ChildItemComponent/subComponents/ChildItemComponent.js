@@ -112,7 +112,8 @@ class ChildItemComponent extends React.Component {
                         key: 'child-item-list',
                         items: childItems,
                         isDeletable: true,
-                        onDeleteItem: (itemID) => this.deleteChild(itemID)
+                        onDeleteItem: (itemID) => this.deleteChild(itemID),
+                        onQuantityChanged: (itemID, quantity) => this.updateChildItemQuantity(itemID, quantity)
                     }
                 )
             ]
@@ -166,6 +167,20 @@ class ChildItemComponent extends React.Component {
         this.setState({
             inputSearch: value
         })
+    }
+
+    updateChildItemQuantity(childItemId, quantity) {
+        const itemsURL = new URL('Item.php', location.origin);
+        itemsURL.searchParams.append("action", "UPDATE_CHILD_ITEM_QUANTITY");
+        const itemId = this.props.itemId;
+        fetch(itemsURL.toString(), {
+            method: 'POST',
+            body: JSON.stringify({itemId, childItemId, quantity})
+        })
+            .then(x => x.json())
+            .then(() => {
+                this.fetchChildItems(this.props.itemId);
+            })
     }
 }
 

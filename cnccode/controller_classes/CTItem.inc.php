@@ -55,16 +55,17 @@ define(
 
 class CTItem extends CTCNC
 {
-    public const ADD_CHILD_ITEM         = "ADD_CHILD_ITEM";
-    public const REMOVE_CHILD_ITEM      = "REMOVE_CHILD_ITEM";
-    const        GET_CHILD_ITEMS        = "GET_CHILD_ITEMS";
-    const        GET_PARENT_ITEMS       = "GET_PARENT_ITEMS";
-    const        SEARCH_ITEMS           = "SEARCH_ITEMS";
-    const        CHECK_ITEM_RECURRING   = "CHECK_ITEM_RECURRING";
-    const        DATA_TABLE_GET_DATA    = "DATA_TABLE_GET_DATA";
-    const        SEARCH_ITEMS_JSON      = "SEARCH_ITEMS_JSON";
-    const        GET_ITEM               = 'GET_ITEM';
-    const        UPDATE_CONTRACTS_PRICE = 'updateContractsPrice';
+    public const ADD_CHILD_ITEM             = "ADD_CHILD_ITEM";
+    public const REMOVE_CHILD_ITEM          = "REMOVE_CHILD_ITEM";
+    const        GET_CHILD_ITEMS            = "GET_CHILD_ITEMS";
+    const        GET_PARENT_ITEMS           = "GET_PARENT_ITEMS";
+    const        SEARCH_ITEMS               = "SEARCH_ITEMS";
+    const        CHECK_ITEM_RECURRING       = "CHECK_ITEM_RECURRING";
+    const        DATA_TABLE_GET_DATA        = "DATA_TABLE_GET_DATA";
+    const        SEARCH_ITEMS_JSON          = "SEARCH_ITEMS_JSON";
+    const        GET_ITEM                   = 'GET_ITEM';
+    const        UPDATE_CONTRACTS_PRICE     = 'updateContractsPrice';
+    const        UPDATE_CHILD_ITEM_QUANTITY = 'UPDATE_CHILD_ITEM_QUANTITY';
     /** @var DSForm */
     public $dsItem;
     /**
@@ -436,6 +437,21 @@ WHERE custitem.`cui_itemno` = ?
                 $dbeItemType->getRow($itemTypeId);
                 echo json_encode(["status" => "ok", "data" => $dbeItemType->getValue(DBEItemType::reoccurring)]);
 
+            }
+            case self::UPDATE_CHILD_ITEM_QUANTITY:
+            {
+                $data = $this->getJSONData();
+                if (!property_exists('itemId', $data) || !isset($data->itemId)) {
+                    throw new JsonHttpException(400, 'Item Id is mandatory');
+                }
+                if (!property_exists('childItemId', $data) || !isset($data->childItemId)) {
+                    throw new JsonHttpException(400, 'child item id is mandatory');
+                }
+                if (!property_exists('quantity', $data) || !isset($data->quantity)) {
+                    throw new JsonHttpException(400, 'Quantity should be 1 or more...');
+                }
+                $this->updateChildItemQuantity($data->itemId, $data->childItemId, $data->quantity);
+                echo json_encode(["status" => "ok"]);
             }
             case CTCNC_ACT_DISP_ITEM_POPUP:
                 $this->displayItemSelectPopup();
