@@ -18,6 +18,7 @@ class ChildItemComponent extends React.Component {
             selectedChildItemId: null,
             inputSearch: ''
         };
+        this.updateChildItemQuantity = this.updateChildItemQuantity.bind(this);
     }
 
     componentDidUpdate() {
@@ -113,7 +114,7 @@ class ChildItemComponent extends React.Component {
                         items: childItems,
                         isDeletable: true,
                         onDeleteItem: (itemID) => this.deleteChild(itemID),
-                        onQuantityChanged: (itemID, quantity) => this.updateChildItemQuantity(itemID, quantity)
+                        onQuantityChanged: this.updateChildItemQuantity
                     }
                 )
             ]
@@ -169,18 +170,48 @@ class ChildItemComponent extends React.Component {
         })
     }
 
-    updateChildItemQuantity(childItemId, quantity) {
+    debounce(func, wait) {
+        let timeout;
+        return function (...args) {
+            const context = this;
+            if (timeout) clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                timeout = null;
+                func.apply(context, args);
+            }, wait);
+        }
+    }
+
+    debouncedSaveChildItem = this.debounce(this.saveChildItem, 400);
+
+    saveChildItem(childItemId, parentItemId, quantity) {
         const itemsURL = new URL('Item.php', location.origin);
         itemsURL.searchParams.append("action", "UPDATE_CHILD_ITEM_QUANTITY");
-        const itemId = this.props.itemId;
         fetch(itemsURL.toString(), {
             method: 'POST',
-            body: JSON.stringify({itemId, childItemId, quantity})
+            body: JSON.stringify({parentItemId, childItemId, quantity})
         })
             .then(x => x.json())
             .then(() => {
                 this.fetchChildItems(this.props.itemId);
             })
+            .catch(() => {
+                this.fetchChildItems(this.props.itemId);
+            })
+    }
+
+    updateChildItemQuantity(childItemId, quantity) {
+        const {childItems} = this.state;
+
+        this.setState({
+            childItems: [...childItems.map(x => {
+                if (x.childItemId != childItemId || x.parentItemId != this.props.itemId) {
+                    return x;
+                }
+                return {...x, quantity}
+            })]
+        })
+        this.debouncedSaveChildItem(childItemId, this.props.itemId, quantity);
     }
 }
 

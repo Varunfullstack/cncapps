@@ -436,22 +436,23 @@ WHERE custitem.`cui_itemno` = ?
                 $dbeItemType = new DBEItemType($this);
                 $dbeItemType->getRow($itemTypeId);
                 echo json_encode(["status" => "ok", "data" => $dbeItemType->getValue(DBEItemType::reoccurring)]);
-
+                break;
             }
             case self::UPDATE_CHILD_ITEM_QUANTITY:
             {
                 $data = $this->getJSONData();
-                if (!property_exists('itemId', $data) || !isset($data->itemId)) {
-                    throw new JsonHttpException(400, 'Item Id is mandatory');
+                if (!isset($data['parentItemId'])) {
+                    throw new JsonHttpException(400, 'parentItemId is mandatory');
                 }
-                if (!property_exists('childItemId', $data) || !isset($data->childItemId)) {
+                if (!isset($data['childItemId'])) {
                     throw new JsonHttpException(400, 'child item id is mandatory');
                 }
-                if (!property_exists('quantity', $data) || !isset($data->quantity)) {
+                if (!isset($data['quantity'])) {
                     throw new JsonHttpException(400, 'Quantity should be 1 or more...');
                 }
-                $this->updateChildItemQuantity($data->itemId, $data->childItemId, $data->quantity);
+                $this->updateChildItemQuantity($data['parentItemId'], $data['childItemId'], $data['quantity']);
                 echo json_encode(["status" => "ok"]);
+                break;
             }
             case CTCNC_ACT_DISP_ITEM_POPUP:
                 $this->displayItemSelectPopup();
@@ -1088,10 +1089,10 @@ WHERE custitem.`cui_itemno` = ?
         }
     }
 
-    private function updateChildItemQuantity($itemId, $childItemId, $quantity)
+    private function updateChildItemQuantity($parentItemId, $childItemId, $quantity)
     {
         global $db;
         $repo = new \CNCLTD\ChildItem\ChildItemRepository($db);
-        $repo->updateChildItemQuantity($itemId, $childItemId, $quantity);
+        $repo->updateChildItemQuantity($parentItemId, $childItemId, $quantity);
     }
 }
