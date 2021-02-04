@@ -1,6 +1,12 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.4.1] - 2021-02-04
+### Fixed
+- Fixed issue with misspelled words not getting saved correctly.
+- Fixed cosmetic issues in First Time Fix Report.
+- Fixed searching issues in First Time Fix Report.
+
 ## [v5.4.0]
 ### Added
 - Issue 1211 - Include SR Time Remaining on the Display Activity page.
