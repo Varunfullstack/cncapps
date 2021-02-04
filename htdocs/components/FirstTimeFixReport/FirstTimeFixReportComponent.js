@@ -7,6 +7,7 @@ import APIUser from "../services/APIUser.js";
 import APIFirstTimeFixReport from "./services/APIFirstTimeFixReport.js";
 import Spinner from "../shared/Spinner/Spinner";
 import '../style.css';
+import './FirstTimeFixReportComponent.css';
 
 class FirstTimeFixReportComponent extends MainComponent {
     el = React.createElement;
@@ -137,33 +138,33 @@ class FirstTimeFixReportComponent extends MainComponent {
     };
     getFirstTimeElement = () => {
         const {firstTimeData} = this.state;
-        return <table className="table table-striped"
+        return <table className="table table-striped all-centered"
                       style={{width: 600}}
         >
             <thead>
             <tr>
-                <th>Name</th>
-                <th>Raised</th>
-                <th>Attempted</th>
-                <th>Achieved</th>
+                <th style={{textAlign: "left"}}>Name</th>
+                <th style={{textAlign: 'right'}}>Raised</th>
+                <th style={{textAlign: 'right'}}>Attempted</th>
+                <th style={{textAlign: 'right'}}>Achieved</th>
             </tr>
             </thead>
             <tbody>
             {firstTimeData?.engineers.map(e =>
                 <tr>
-                    <td>{e.name}</td>
-                    <td>{e.totalRaised}</td>
-                    <td>{e.attemptedFirstTimeFix}</td>
-                    <td>{e.firstTimeFix}</td>
+                    <td style={{textAlign: "left"}}>{e.name}</td>
+                    <td style={{textAlign: 'right'}}>{e.totalRaised}</td>
+                    <td style={{textAlign: 'right'}}>{e.attemptedFirstTimeFix}</td>
+                    <td style={{textAlign: 'right'}}>{e.firstTimeFix}</td>
                 </tr>
             )}
             </tbody>
             <tfoot>
             <tr>
-                <th>Total</th>
-                <th>{firstTimeData?.phonedThroughRequests}</th>
-                <th>{firstTimeData?.firstTimeFixAttemptedPct}%</th>
-                <th>{firstTimeData?.firstTimeFixAchievedPct}%</th>
+                <th style={{textAlign: "left"}}>Total</th>
+                <th style={{textAlign: 'right'}}>{firstTimeData?.phonedThroughRequests}</th>
+                <th style={{textAlign: 'right'}}>{firstTimeData?.firstTimeFixAttemptedPct}%</th>
+                <th style={{textAlign: 'right'}}>{firstTimeData?.firstTimeFixAchievedPct}%</th>
             </tr>
             </tfoot>
         </table>
@@ -175,23 +176,25 @@ class FirstTimeFixReportComponent extends MainComponent {
         >
             <thead>
             <tr>
-                <th style={{width: 100}}>Name</th>
-                <th style={{width: 250}}>Customer</th>
-                <th style={{width: 50}}>Problem</th>
-                <th>Reason</th>
+                <th style={{width: 100, textAlign: 'left'}}>Name</th>
+                <th style={{width: 250, textAlign: 'left'}}>Customer</th>
+                <th style={{width: 50, textAlign: 'right'}}>Problem</th>
+                <th style={{textAlign: 'left'}}>Reason</th>
             </tr>
             </thead>
             <tbody>
             {notAttemptFirstTimeFixData?.map(e =>
                 <tr>
-                    <td>{e.userName}</td>
-                    <td>{e.customerName}</td>
-                    <td>
+                    <td style={{textAlign: 'left'}}>{e.userName}</td>
+                    <td style={{textAlign: 'left'}}>{e.customerName}</td>
+                    <td style={{textAlign: 'right'}}>
                         <a href={`SRActivity.php?action=displayActivity&serviceRequestId=${e.problemID}`}
                            target={"_blank"}
                         > {e.problemID}</a>
                     </td>
-                    <td dangerouslySetInnerHTML={{__html: e.reason}}></td>
+                    <td style={{textAlign: 'left'}}
+                        dangerouslySetInnerHTML={{__html: e.reason}}
+                    />
                 </tr>
             )}
             </tbody>

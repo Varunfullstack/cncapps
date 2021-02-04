@@ -25,12 +25,10 @@ class CTFirstTimeFixReport extends CTCNC
             $cookieVars,
             $cfg
         );
-
         if (!$this->isUserSDManager()) {
             Header("Location: /NotAllowed.php");
             exit;
         }
-
         $this->setMenuId(206);
     }
 
@@ -44,7 +42,6 @@ class CTFirstTimeFixReport extends CTCNC
         switch (@$this->getAction()) {
 
             case 'fetchData':
-
                 $startDate = null;
                 if (@$this->getParam('startDate')) {
                     $startDate = DateTime::createFromFormat(
@@ -52,7 +49,6 @@ class CTFirstTimeFixReport extends CTCNC
                         $this->getParam('startDate')
                     );
                 }
-
                 $endDate = null;
                 if (@$this->getParam('endDate')) {
                     $endDate = DateTime::createFromFormat(
@@ -60,7 +56,6 @@ class CTFirstTimeFixReport extends CTCNC
                         $this->getParam('endDate')
                     );
                 }
-                //echo json_encode(["engineerID"=>$this->getParam('engineerID')]); exit;
                 echo json_encode(
                     $this->getFirstTimeFixData(
                         @$this->getParam('customerID'),
@@ -83,8 +78,7 @@ class CTFirstTimeFixReport extends CTCNC
     )
     {
         global $db;
-        $query =
-            "SELECT 
+        $query = "SELECT 
   CONCAT(
     engineer.`firstName`,
     ' ',
@@ -175,39 +169,30 @@ FROM
 WHERE problem.`pro_custno` <> 282 
   AND problem.raiseTypeId = 3
   AND engineer.`teamID` = 1 ";
-
-
         if ($customerID) {
             $query .= " and pro_custno = " . $customerID;
         }
-
         if ($engineerID) {
             $query .= " and engineer.`cns_consno` = " . $engineerID;
         }
-
         if ($startDate) {
             $query .= " and initial.caa_date >= '" . $startDate->format('Y-m-d') . "'";
         }
-
         if ($endDate) {
             $query .= " and initial.caa_date <= '" . $endDate->format('Y-m-d') . "'";
         }
-
         $query .= " GROUP BY engineer.`cns_consno` 
 ORDER BY engineer.firstName";
-
         $result = $db->query($query);
-
-        $totalRaised = 0;
+        $totalRaised    = 0;
         $totalAttempted = 0;
-        $totalAchieved = 0;
-        $data = [
+        $totalAchieved  = 0;
+        $data           = [
             "engineers"      => [],
             "totalRaised"    => 0,
             "totalAttempted" => 0,
             "totalAchieved"  => 0
         ];
-
         while ($row = $result->fetch_assoc()) {
             $data["engineers"][] = [
                 'id'                    => $row['engineerId'],
@@ -216,22 +201,17 @@ ORDER BY engineer.firstName";
                 'attemptedFirstTimeFix' => $row['attemptedFirstTimeFix'],
                 'totalRaised'           => $row['totalRaised']
             ];
-
-
-            $data['totalRaised'] += $row['totalRaised'];
+            $data['totalRaised']    += $row['totalRaised'];
             $data['totalAttempted'] += $row['attemptedFirstTimeFix'];
-            $data['totalAchieved'] += $row['firstTimeFix'];
+            $data['totalAchieved']  += $row['firstTimeFix'];
         }
-
         $data['firstTimeFixAttemptedPct'] = $data['totalRaised'] > 0 ? round(
             ($data['totalAttempted'] / $data['totalRaised']) * 100
         ) : 'N/A';
-        $data['firstTimeFixAchievedPct'] = $data['totalRaised'] > 0 ? round(
+        $data['firstTimeFixAchievedPct']  = $data['totalRaised'] > 0 ? round(
             ($data['totalAchieved'] / $data['totalRaised']) * 100
         ) : 'N/A';
-        $data['phonedThroughRequests'] = $data['totalRaised'];
-
-
+        $data['phonedThroughRequests']    = $data['totalRaised'];
         return $data;
     }
 
@@ -246,12 +226,9 @@ ORDER BY engineer.firstName";
                 'FirstTimeFixReport' => 'FirstTimeFixReport'
             )
         );
-
 //        $this->loadReactScript('SpinnerHolderComponent.js');
 //        $this->loadReactCSS('SpinnerHolderComponent.css');
-
         $hdUsers = (new BUUser($this))->getUsersByTeamLevel(1);
-
         $this->template->set_block(
             'FirstTimeFixReport',
             'userBlock',
@@ -259,7 +236,6 @@ ORDER BY engineer.firstName";
         );
         $this->loadReactScript('FirstTimeFixReportComponent.js');
         $this->loadReactCSS('FirstTimeFixReportComponent.css');
-
         foreach ($hdUsers as $user) {
 
 
@@ -269,44 +245,36 @@ ORDER BY engineer.firstName";
                     'userID'   => $user['cns_consno']
                 )
             );
-
             $this->template->parse(
                 'hdUsers',
                 'userBlock',
                 true
             );
         }
-
         $fetchURL = $urlSubmit = Controller::buildLink(
             $_SERVER ['PHP_SELF'],
             array('action' => "fetchData")
         );
-
-        $customerPopupURL =
-            Controller::buildLink(
-                CTCNC_PAGE_CUSTOMER,
-                array(
-                    'action'  => CTCNC_ACT_DISP_CUST_POPUP,
-                    'htmlFmt' => CT_HTML_FMT_POPUP
-                )
-            );
-
+        $customerPopupURL = Controller::buildLink(
+            CTCNC_PAGE_CUSTOMER,
+            array(
+                'action'  => CTCNC_ACT_DISP_CUST_POPUP,
+                'htmlFmt' => CT_HTML_FMT_POPUP
+            )
+        );
         $this->setPageTitle('First Time Fix Report');
-
         $this->template->set_var(
             array(
                 'customerPopupURL' => $customerPopupURL,
                 'fetchDataURL'     => $fetchURL
             )
         );
-
         $this->template->parse(
             'CONTENTS',
             'FirstTimeFixReport',
             true
         );
-       
         $this->parsePage();
-       
+
     }
 }
