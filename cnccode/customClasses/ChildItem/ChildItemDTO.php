@@ -17,8 +17,8 @@ class ChildItemDTO implements \JsonSerializable
         $instance->childItemId  = $array['childItemId'];
         $instance->description  = $array['itm_desc'];
         $instance->quantity     = $array['quantity'];
-        $instance->curUnitCost  = $array['curUnitCost'];
-        $instance->curUnitSale  = $array['curUnitSale'];
+        $instance->curUnitCost  = $array['itm_sstk_cost'];
+        $instance->curUnitSale  = $array['itm_sstk_price'];
         return $instance;
     }
 
