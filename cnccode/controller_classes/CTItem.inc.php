@@ -1087,4 +1087,11 @@ WHERE custitem.`cui_itemno` = ?
             );
         }
     }
+
+    private function updateChildItemQuantity($itemId, $childItemId, $quantity)
+    {
+        global $db;
+        $repo = new \CNCLTD\ChildItem\ChildItemRepository($db);
+        $repo->updateChildItemQuantity($itemId, $childItemId, $quantity);
+    }
 }

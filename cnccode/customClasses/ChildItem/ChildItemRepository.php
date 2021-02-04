@@ -28,11 +28,32 @@ class ChildItemRepository
                 ]
             ]
         );
-        $rows = $result->fetch_all(MYSQLI_ASSOC);
-        $data = [];
+        $rows   = $result->fetch_all(MYSQLI_ASSOC);
+        $data   = [];
         foreach ($rows as $row) {
             $data[] = ChildItemDTO::fromPersistence($row);
         }
         return $data;
+    }
+
+    public function updateChildItemQuantity($parentItemId, $childItemId, $quantity)
+    {
+        $result = $this->db->preparedQuery(
+            "update childItem set quantity = ? where parentItemId = ? and childItemId = ?",
+            [
+                [
+                    "type"  => "i",
+                    "value" => $quantity
+                ],
+                [
+                    "type"  => "i",
+                    "value" => $parentItemId
+                ],
+                [
+                    "type"  => "i",
+                    "value" => $childItemId
+                ],
+            ]
+        );
     }
 }
