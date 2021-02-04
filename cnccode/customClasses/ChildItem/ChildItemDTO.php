@@ -7,6 +7,8 @@ class ChildItemDTO implements \JsonSerializable
     private $childItemId;
     private $description;
     private $quantity;
+    private $curUnitCost;
+    private $curUnitSale;
 
     public static function fromPersistence($array): ChildItemDTO
     {
@@ -15,6 +17,8 @@ class ChildItemDTO implements \JsonSerializable
         $instance->childItemId  = $array['childItemId'];
         $instance->description  = $array['itm_desc'];
         $instance->quantity     = $array['quantity'];
+        $instance->curUnitCost  = $array['curUnitCost'];
+        $instance->curUnitSale  = $array['curUnitSale'];
         return $instance;
     }
 
@@ -48,6 +52,22 @@ class ChildItemDTO implements \JsonSerializable
     public function getQuantity()
     {
         return $this->quantity;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCurUnitCost()
+    {
+        return $this->curUnitCost;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCurUnitSale()
+    {
+        return $this->curUnitSale;
     }
 
     public function jsonSerialize()

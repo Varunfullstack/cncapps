@@ -4024,10 +4024,10 @@ class CTSalesOrder extends CTCNC
                 DBEOrdline::description,
                 DA_NOT_NULL
             );
-            $dbeItem = new DBEItem($this);
-            $dbeItem->getRow($this->getParam('ordline')[1]['itemID']);
+            $childItem = new DBEItem($this);
+            $childItem->getRow($this->getParam('ordline')[1]['itemID']);
             $itemType = new DBEItemType($this);
-            $itemType->getRow($dbeItem->getValue(DBEItem::itemTypeID));
+            $itemType->getRow($childItem->getValue(DBEItem::itemTypeID));
             if ($itemType->getValue(DBEItemType::reoccurring) && $recurringSequenceNumber) {
                 $sequenceNo = $recurringSequenceNumber;
             } elseif (!$itemType->getValue(DBEItemType::reoccurring) && $oneOffSequenceNumber) {
@@ -4097,21 +4097,22 @@ class CTSalesOrder extends CTCNC
         if ($this->getAction() == CTSALESORDER_ACT_INSERT_ORDLINE) {
             $this->buSalesOrder->insertNewOrderLine($this->dsOrdline);
             if ($this->dsOrdline->getValue(DBEOrdline::lineType) == 'I') {
-                $dbeItem = new DBEItem($this);
-                $itemID  = $this->dsOrdline->getValue(DBEOrdline::itemID);
-                $dbeItem->getChildItems($itemID);
-                $oneOffRowCount    = 1;
-                $recurringRowCount = 1;
-                $dbeSupplier       = new DBESupplier($this);
+                global $db;
+                $itemID              = $this->dsOrdline->getValue(DBEOrdline::itemID);
+                $childItemRepository = new \CNCLTD\ChildItem\ChildItemRepository($db);
+                $childItems          = $childItemRepository->getChildItemsForItem($itemID);
+                $oneOffRowCount      = 1;
+                $recurringRowCount   = 1;
+                $dbeSupplier         = new DBESupplier($this);
                 $dbeSupplier->getRow(53);
-                while ($dbeItem->fetchNext()) {
+                foreach ($childItems as $childItem) {
                     $toInsertChildDsOrdline = new DataSet($this);
                     $toInsertChildDsOrdline->copyColumnsFrom($dbeOrdline);
                     $toInsertChildDsOrdline->setValue(
                         DBEOrdline::ordheadID,
                         $this->dsOrdline->getValue(DBEOrdline::ordheadID)
                     );
-                    $toInsertChildDsOrdline->setValue(DBEOrdline::itemID, $dbeItem->getValue(DBEItem::itemID));
+                    $toInsertChildDsOrdline->setValue(DBEOrdline::itemID, $childItem->getChildItemId());
                     $toInsertChildDsOrdline->setValue(DBEOrdline::lineType, 'I');
                     $toInsertChildDsOrdline->setValue(
                         DBEOrdline::supplierID,
@@ -4119,22 +4120,22 @@ class CTSalesOrder extends CTCNC
                     );
                     $toInsertChildDsOrdline->setValue(
                         DBEOrdline::qtyOrdered,
-                        $this->dsOrdline->getValue(DBEOrdline::qtyOrdered)
+                        $this->dsOrdline->getValue(DBEOrdline::qtyOrdered) * $childItem->getQuantity()
                     );
                     $toInsertChildDsOrdline->setValue(
                         DBEOrdline::curUnitCost,
-                        $dbeItem->getValue(DBEItem::curUnitCost)
+                        $childItem->getCurUnitCost()
                     );
                     $toInsertChildDsOrdline->setValue(
                         DBEOrdline::curUnitSale,
-                        $dbeItem->getValue(DBEItem::curUnitSale)
+                        $childItem->getCurUnitSale()
                     );
                     $toInsertChildDsOrdline->setValue(
                         DBEOrdline::description,
-                        $dbeItem->getValue(DBEItem::description)
+                        $childItem->getDescription()
                     );
                     $dbeItemType = new DBEItemType($this);
-                    $dbeItemType->getRow($dbeItem->getValue(DBEItem::itemID));
+                    $dbeItemType->getRow($childItem->getChildItemId());
                     if ($dbeItemType->getValue(DBEItemType::reoccurring)) {
                         if ($recurringSequenceNumber) {
                             $toInsertChildDsOrdline->setValue(

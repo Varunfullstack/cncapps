@@ -17,6 +17,11 @@ class ChildItemRepository
         $this->db = $dbSweetcode;
     }
 
+    /**
+     * @param $parentItemId
+     * @return ChildItemDTO[]
+     * @throws \Exception
+     */
     public function getChildItemsForItem($parentItemId): array
     {
         $result = $this->db->preparedQuery(
