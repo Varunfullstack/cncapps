@@ -486,7 +486,7 @@
          <sql>
             INSERT INTO `reports` (`id`, `title`, `component`, `active`) VALUES('1','Projects By Consultant','RepProjectsByConsultant','1');
             INSERT INTO `reports` (`id`, `title`, `component`, `active`) VALUES('2','Projects By Consultant \"Project in progress\"','RepProjectsByConsultantInProgress','1');
-            INSERT INTO `reports` (`id`, `title`, `component`, `active`) VALUES('3','Projects By Customer \"stage falls start & end date\"','RepProjectsByCustomerStageFallsStartEnd','1');
+            INSERT INTO `reports` (`id`, `title`, `component`, `active`) VALUES('3','Projects By Customer \"stage falls start and end date\"','RepProjectsByCustomerStageFallsStartEnd','1');
             INSERT INTO `reports` (`id`, `title`, `component`, `active`) VALUES('4','Projects ','RepProjects','1');
             INSERT INTO `reports` (`id`, `title`, `component`, `active`) VALUES('5','Projects without Clousure Meeting Date ','RepProjectsWithoutClousureMeeting','1');
 
