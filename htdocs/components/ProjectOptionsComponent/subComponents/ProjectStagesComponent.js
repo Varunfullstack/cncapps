@@ -73,8 +73,11 @@ export class ProjectStagesComponent extends MainComponent {
                 <i className="fal fa-trash fa-2x pointer icon" onClick={()=>this.handleDelete(stage)}></i>
             </ToolTip>
              },
+              
         ];
-        return <Table        
+        return <Table    
+        allowRowOrder={true}
+        onOrderChange={this.handleOrderChange}    
         key="stages"
         pk="id"
         columns={columns}
@@ -83,6 +86,21 @@ export class ProjectStagesComponent extends MainComponent {
         >
 
         </Table>
+    }
+    handleOrderChange=async (current, next)=>{        
+        const {items}=this.state;
+        if(next)
+        {
+            current.stageOrder=next.stageOrder;
+            next.stageOrder=current.stageOrder+0.001;
+            await this.api.updateProjectStage(next.id,next);
+        }
+        if(!next)
+        {        
+            current.stageOrder=Math.max(...items.map(i=>i.stageOrder))+0.001;
+        }        
+        await this.api.updateProjectStage(current.id,current);
+       
     }
     handleEdit=(stage)=>{
         console.log(stage);

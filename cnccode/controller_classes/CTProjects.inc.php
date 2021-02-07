@@ -34,6 +34,7 @@ class CTProjects extends CTCNC
 {
     const DOWNLOAD_PROJECT_PLAN = "downloadProjectPlan";
     const CONST_PROJECTS = 'projects';
+    const CONST_PROJECT_STAGE = 'projectStage';
     const CONST_HISTORY='history';
     const CONST_PROJECT='project';
     const CONST_PROJECT_SUMMARY='projectSummary';
@@ -44,7 +45,12 @@ class CTProjects extends CTCNC
     const CONST_CALCULATE_BUDGET='calculateBudget';    
     const CONST_PROJECT_ISSUES='projectIssues';
     const CONST_PROJECT_STAGES='projectStagesHistory';
-
+    const CONST_PROJECT_ORIGINAL_QUOTOE_DOC='projectOriginalQuotoeDoc';
+    const CONST_PROJECTS_SUMMARY='projectsSummary';
+    const CONST_PROJECTS_SEARCH='projectsSearch';
+    const CONST_PROJECTS_CONSULTANT_IN_PROGRESS='projectsByConsultantInProgress';
+    const CONST_PROJECTS_CUSTOMER_STAGE_FALLS_STARTEND='projectsByCustomerStageFallsStartEnd';
+    const CONST_PROJECTS_WITHOUT_CLOUSURE_MEETING='projectsWithoutClousureMeeting';
     function __construct(
         $requestMethod,
         $postVars,
@@ -93,6 +99,9 @@ class CTProjects extends CTCNC
                 else if($method=='POST')
                     echo json_encode($this->updateProject(true));
                 break;
+            case self::CONST_PROJECT_STAGE:
+                echo json_encode($this->updateProjectStage());
+                break;
             case self::CONST_PROJECT_SUMMARY:
                 if($method=='GET')
                     echo json_encode($this->getProjectSummary());
@@ -136,13 +145,31 @@ class CTProjects extends CTCNC
             case self::CONST_PROJECT_STAGES:
                 echo json_encode($this->getProjectStagesHistory());
                 break;
+            case self::CONST_PROJECT_ORIGINAL_QUOTOE_DOC:
+                $this->getProjectOriginalQuotoeDoc();
+                break;
+            case self::CONST_PROJECTS_SUMMARY:
+                echo json_encode($this->getProjectsSummary(),JSON_NUMERIC_CHECK);
+                break;
+            case self::CONST_PROJECTS_SEARCH:
+                echo json_encode($this->getProjectsSearch(),JSON_NUMERIC_CHECK);
+                break;
+            case self::CONST_PROJECTS_CONSULTANT_IN_PROGRESS:
+                echo json_encode($this->getProjectsByConsultantInProgress(),JSON_NUMERIC_CHECK);
+                break;
+            case self::CONST_PROJECTS_CUSTOMER_STAGE_FALLS_STARTEND:
+                echo json_encode($this->getProjectsByCustomerStageFallsStartEnd(),JSON_NUMERIC_CHECK);
+                break;
+            case self::CONST_PROJECTS_WITHOUT_CLOUSURE_MEETING:
+                echo json_encode($this->getProjectsWithoutClousureMeeting(),JSON_NUMERIC_CHECK);
+                break;
             default:
                 $this->setTemplate();
         }
     }
     function setTemplate()
     {
-        $this->setPageTitle('Projects');
+        $this->setPageTitle('<a href="/Projects.php" style="color:#000080">Projects</a>');
         $this->setTemplateFiles(
             array('Projects' => 'Projects.rct')
         );
@@ -221,7 +248,8 @@ class CTProjects extends CTCNC
                     'createdBy'         => $project['createdBy'],
                     'comment'           => $project['comment'],                    
                     'projectStageName'         => $project['projectStageName'],
-                    'projectTypeName'   => $project['projectTypeName']
+                    'projectTypeName'   => $project['projectTypeName'],
+                    'expectedHandoverQADate'=>$project['expectedHandoverQADate'],
                 ];
         }
         return $data;
@@ -615,7 +643,7 @@ class CTProjects extends CTCNC
             $dbeProject->setValue(DBEProject::projectPlanningDate,$data->projectPlanningDate);
             $dbeProject->setValue(DBEProject::expectedHandoverQADate,$data->expectedHandoverQADate);
             $dbeProject->setValue(DBEProject::projectTypeID,$data->projectTypeID);
-            $dbeProject->setValue(DBEProject::projectStageID,$data->projectStageID);
+            //$dbeProject->setValue(DBEProject::projectStageID,$data->projectStageID);
             $dbeProject->setValue(DBEProject::originalQuoteDocumentFinalAgreed,$data->originalQuoteDocumentFinalAgreed);
             if(!$newProject)
                 $dbeProject->updateRow();
@@ -635,53 +663,76 @@ class CTProjects extends CTCNC
                 "comment"=>$data->newUpdate,
             ]);
         }
+       
+        return ['status'=>true,'projectID'=>$projectID];
+    }
+    function updateProjectStage(){
+        $projectID=@$_REQUEST["projectID"];
+        $newStageID=@$_REQUEST["newStageID"];
+        $oldStageID=@$_REQUEST["oldStageID"];
+        if(empty($projectID)||empty($newStageID)||empty($oldStageID))
+            throw new Exception('Missing data');
+        $dbeProject=new DBEProject($this);
+        $dbeProject->getRow($projectID);
+        $dbeProject->setValue(DBEProject::projectStageID,$newStageID);
+        $dbeProject->updateRow();
         // check if project stage changed
-        if(!empty($data->originProjectStageID))
+        if($newStageID!=$oldStageID)
         {
             $todayTime=strtotime(date("Y-m-d H:i:s"));
-            // get the old stage recored and update it's time
-            $oldStage=DBConnect::fetchOne("select id,createAt,stageTimeHours from ProjectStagesHistory where projectID=:projectID and stageID =:stageID",
-            ["projectID"=>$projectID,"stageID"=>$data->originProjectStageID]);
-
-            if(!empty($oldStage["id"]))
+            // clac origin time diff
+            $openDateStr=$dbeProject->getValue(DBEProject::openedDate);
+            $openDateTime=strtotime($openDateStr);
+            $timeDiffOrigin=$todayTime-$openDateTime; // time will be in seconds 
+            $timeDiffOrigin=$timeDiffOrigin/(60*60); //in hours
+            if($oldStageID!='null')
             {
-                //update stageTimeHours
-                $createDateTime=strtotime($oldStage["createAt"]);
-                $timeDiff =($todayTime-$createDateTime)/(60*60); // in hours;
-                $stageTimeHours= floatval($oldStage["stageTimeHours"]??0)+$timeDiff;
-                DBConnect::execute("update ProjectStagesHistory set stageTimeHours=:stageTimeHours where id=:id",
-                ["id"=>$oldStage["id"],"stageTimeHours"=>$stageTimeHours]);
+                // get the old stage recored and update it's time
+                $oldStage=DBConnect::fetchOne("select id,createAt,stageTimeHours from ProjectStagesHistory where projectID=:projectID and stageID =:stageID",
+                ["projectID"=>$projectID,"stageID"=>$oldStageID]);
+
+                if(!empty($oldStage["id"]))
+                {
+                    //update stageTimeHours
+                    $createDateTime=strtotime($oldStage["createAt"]);
+                    $timeDiff =($todayTime-$createDateTime)/(60*60); // in hours;
+                    $stageTimeHours= floatval($oldStage["stageTimeHours"]??0)+$timeDiff;
+                    DBConnect::execute("update ProjectStagesHistory set stageTimeHours=:stageTimeHours where id=:id",
+                    ["id"=>$oldStage["id"],"stageTimeHours"=>$stageTimeHours]);
+                }
+                else { // insert new recored subtract from project open date
+                    
+                    // insert old recored;
+                    DBConnect::execute("insert into ProjectStagesHistory(projectID,stageID,consID,stageTimeHours)
+                                        values(:projectID,:stageID,:consID,:stageTimeHours)",
+                                        [
+                                            "projectID"=>$projectID,
+                                            "stageID"=>$oldStageID,
+                                            "consID"=>$this->dbeUser->getPKValue(),
+                                            "stageTimeHours"=>$timeDiffOrigin
+                                        ]
+                                    );
+                }
             }
-            else { // subtract from project open date
-                $openDateStr=$dbeProject->getValue(DBEProject::openedDate);
-                $openDateTime=strtotime($openDateStr);
-                $timeDiff=$todayTime-$openDateTime; // time will be in seconds 
-                $timeDiff=$timeDiff/(60*60); //in hours
-               // insert old recored;
-                DBConnect::execute("insert into ProjectStagesHistory(projectID,stageID,consID,stageTimeHours)
-                                   values(:projectID,:stageID,:consID,:stageTimeHours)",
-                                   [
-                                        "projectID"=>$projectID,
-                                        "stageID"=>$data->originProjectStageID,
-                                        "consID"=>$this->dbeUser->getPKValue(),
-                                        "stageTimeHours"=>$timeDiff
-                                    ]
-                                );
+            $stageTimeHours=null;
+            if($oldStageID=='null')
+            {
+                $stageTimeHours=$timeDiffOrigin;
             }
             // insert the new stage recored         
             DBConnect::execute("insert into ProjectStagesHistory(projectID,stageID,consID,stageTimeHours)
                                 values(:projectID,:stageID,:consID,:stageTimeHours)",
                                 [
                                     "projectID"=>$projectID,
-                                    "stageID"=>$data->projectStageID,
+                                    "stageID"=>$newStageID,
                                     "consID"=>$this->dbeUser->getPKValue(),
-                                    "stageTimeHours"=>null
+                                    "stageTimeHours"=>$stageTimeHours
                                 ]
                             );
+            return ["status"=>true];
         }
-        return ['status'=>true,'projectID'=>$projectID];
+        return ["status"=>false];
     }
-    
     function uploadProjectFiles(){
         
         if (!isset($_FILES['files']) || !count($_FILES['files']['name'])) {
@@ -955,5 +1006,219 @@ class CTProjects extends CTCNC
             join projectstages ps on ps.id=p.stageID
             where projectID=:projectID",
             ["projectID"=>$projectID]);
+    }
+    function getProjectOriginalQuotoeDoc(){
+        $projectID=@$_REQUEST["projectID"];        
+        if(!$projectID)
+            throw new Exception("Project Id is missing");   
+        $dbeProject=new DBEProject($this);
+        $dbeProject->getRow($projectID);
+        
+        $file = $dbeProject->getValue(DBEProject::originalQuoteDocumentFinalAgreed);
+        if (file_exists($file)) {
+            header('Content-Description: File Transfer');
+            header('Content-Type: application/octet-stream');
+            header('Content-Disposition: attachment; filename="'.basename($file).'"');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate');
+            header('Pragma: public');
+            header('Content-Length: ' . filesize($file));
+            readfile($file);
+            exit;
+        }
+    }
+    function getProjectsSummary(){
+        $query="SELECT COUNT(*) total,stage.name
+        FROM   `project` 
+          LEFT JOIN projectstages stage ON stage.id = project.projectStageID  
+        WHERE expiryDate >= NOW() OR expiryDate IS NULL
+        GROUP BY projectStageID
+        ORDER BY stage.`stageOrder`";
+        return DBConnect::fetchAll($query);
+    }
+    //-------------------------------------------Report API
+    function getProjectsSearch(){
+        $consID=@$_REQUEST["consID"];
+        $dateFrom=@$_REQUEST["dateFrom"];
+        $dateTo=@$_REQUEST["dateTo"];
+        $projectTypeID=@$_REQUEST["stageID"];
+        $projectStageID=@$_REQUEST["typeID"];
+        // if(!$consID&&!$dateFrom&&!$dateTo)
+        //     throw new Exception("Paramter missing",404);
+        $query="
+        select  
+        p.projectID,
+        p.customerID,
+        p.description,
+        p.startDate,
+        p.expiryDate,
+        p.notes,
+        c.cus_name as customerName,
+        ps.name as projectStageName,
+        pt.name as projectTypeName
+        from project p
+        join customer c on c.cus_custno=p.customerID
+        left join projectstages ps on ps.id = p.projectStageID
+        left join projecttypes pt on  pt.id = p.projectTypeID
+        where 1=1
+        ";
+        $params=[];
+        if(!empty($consID))
+        {
+            $query .=" and consultantID=:consID";
+            $params["consID"]=$consID;
+        }
+        if(!empty($dateFrom))
+        {
+            $query .=" and startDate >=:dateFrom";
+            $params["dateFrom"]=$dateFrom;
+        }
+        if(!empty($dateTo))
+        {
+            $query .=" and startDate <=:dateTo";
+            $params["dateTo"]=$dateTo;
+        }
+        if(!empty($projectStageID))
+        {
+            $query .=" and projectStageID =:projectStageID";
+            $params["projectStageID"]=$projectStageID;
+        }
+        if(!empty($projectTypeID))
+        {
+            $query .=" and projectTypeID =:projectTypeID";
+            $params["projectTypeID"]=$projectTypeID;
+        }
+        //return    $params;
+        
+        $projects=DBConnect::fetchAll($query,$params);
+        return $projects;
+    }
+    function getProjectsByConsultantInProgress(){
+        $consID=@$_REQUEST["consID"];
+        $dateFrom=@$_REQUEST["dateFrom"];
+        $dateTo=@$_REQUEST["dateTo"];
+        if(!$consID )
+            throw new Exception("Paramter missing",404);
+        $query="
+        SELECT  
+        p.projectID,
+        p.customerID,
+        p.description,
+        p.startDate,
+        p.expiryDate,
+        p.notes,
+        c.cus_name AS customerName,
+        ps.name AS projectStageName,
+        pt.name AS projectTypeName
+        FROM project p
+        JOIN customer c ON c.cus_custno=p.customerID
+        LEFT JOIN projectstages ps ON ps.id = p.projectStageID
+        LEFT JOIN projecttypes pt ON  pt.id = p.projectTypeID
+        JOIN `projectstageshistory` psh ON psh.`projectID` = p.projectID
+        WHERE 
+        `stageID`=3 -- Project in progress
+          AND psh.`createAt` BETWEEN  p.`startDate` AND p.`expiryDate`
+        ";
+        $params=[];
+        if(!empty($consID))
+        {
+            $query .=" and consultantID=:consID";
+            $params["consID"]=$consID;
+        }         
+        if(!empty($dateFrom))
+        {
+            $query .=" and startDate >=:dateFrom";
+            $params["dateFrom"]=$dateFrom;
+        }
+        if(!empty($dateTo))
+        {
+            $query .=" and startDate <=:dateTo";
+            $params["dateTo"]=$dateTo;
+        }
+        $projects=DBConnect::fetchAll($query,$params);
+        return $projects;
+    }
+    function getProjectsByCustomerStageFallsStartEnd(){
+        $customerID=@$_REQUEST["customerID"];
+        $dateFrom=@$_REQUEST["dateFrom"];
+        $dateTo=@$_REQUEST["dateTo"];
+        if(!$customerID )
+            throw new Exception("Paramter missing",404);
+        $query="
+        SELECT  
+        p.projectID,
+        p.customerID,
+        p.description,
+        p.startDate,
+        p.expiryDate,
+        p.notes,
+        c.cus_name AS customerName,
+        ps.name AS projectStageName,
+        pt.name AS projectTypeName
+        FROM project p
+        JOIN customer c ON c.cus_custno=p.customerID
+        LEFT JOIN projectstages ps ON ps.id = p.projectStageID
+        LEFT JOIN projecttypes pt ON  pt.id = p.projectTypeID        
+        WHERE 
+        1=1
+          
+        ";
+        $params=[];
+        if(!empty($customerID))
+        {
+            $query .=" and customerID=:customerID";
+            $params["customerID"]=$customerID;
+        }     
+        $query .= " and EXISTS(select * from projectstageshistory psh where psh.`projectID` = p.projectID and psh.`createAt` BETWEEN  p.`startDate` AND p.`expiryDate`)";    
+        if(!empty($dateFrom))
+        {
+            $query .=" and startDate >=:dateFrom";
+            $params["dateFrom"]=$dateFrom;
+        }
+        if(!empty($dateTo))
+        {
+            $query .=" and startDate <=:dateTo";
+            $params["dateTo"]=$dateTo;
+        }
+        $projects=DBConnect::fetchAll($query,$params);
+        return $projects;
+    }
+    function getProjectsWithoutClousureMeeting(){
+        
+        $dateFrom=@$_REQUEST["dateFrom"];
+        $dateTo=@$_REQUEST["dateTo"];        
+        $query="
+        SELECT  
+        p.projectID,
+        p.customerID,
+        p.description,
+        p.startDate,
+        p.expiryDate,
+        p.notes,
+        c.cus_name AS customerName,
+        ps.name AS projectStageName,
+        pt.name AS projectTypeName
+        FROM project p
+        JOIN customer c ON c.cus_custno=p.customerID
+        LEFT JOIN projectstages ps ON ps.id = p.projectStageID
+        LEFT JOIN projecttypes pt ON  pt.id = p.projectTypeID        
+        WHERE 
+        projectClosureDate is null
+          
+        ";
+        $params=[];
+        if(!empty($dateFrom))
+        {
+            $query .=" and startDate >=:dateFrom";
+            $params["dateFrom"]=$dateFrom;
+        }
+        if(!empty($dateTo))
+        {
+            $query .=" and startDate <=:dateTo";
+            $params["dateTo"]=$dateTo;
+        }
+        $query .=" order by customerName";
+        $projects=DBConnect::fetchAll($query,$params);
+        return $projects;
     }
 }

@@ -12,6 +12,7 @@ import Modal from "../../shared/Modal/modal";
 import moment from "moment";
 import CustomerDocumentUploader from "./CustomerDocumentUploader";
 import {InternalDocumentsComponent} from "./InternalDocumentsComponent";
+import { LinkServiceRequestOrder } from "./LinkserviceRequestOrder.js";
 
 // noinspection EqualityComparisonWithCoercionJS
 const emptyAssetReasonCharactersToShow = 30;
@@ -38,6 +39,7 @@ class ActivityDisplayComponent extends MainComponent {
             templateType: '',
             templateTitle: '',
             selectedChangeRequestTemplateId: null,
+            showSalesOrder:false,
             filters: {
                 showTravel: false,
                 showOperationalTasks: false,
@@ -366,16 +368,7 @@ class ActivityDisplayComponent extends MainComponent {
         window.open("Password.php?action=generate&htmlFmt=popup", 'reason', 'scrollbars=yes,resizable=yes,height=524,width=855,copyhistory=no, menubar=0');
     }
     handleSalesOrder = async (activityId, serviceRequestId) => {
-        const salesOrderId = await this.prompt('Sales Order ID:');
-        if (!salesOrderId) {
-            return;
-        }
-        try {
-            await this.api.linkSalesOrder(serviceRequestId, salesOrderId);
-            this.loadCallActivity(activityId);
-        } catch (e) {
-            this.alert(e.toString());
-        }
+        this.setState({showSalesOrder:true});      
     }
     handleUnlink = async (linkedSalesOrderID, serviceRequestId, activityId) => {
         const res = await this.confirm(`Are you sure you want to unlink this request to Sales Order ${linkedSalesOrderID}`);
@@ -990,11 +983,15 @@ class ActivityDisplayComponent extends MainComponent {
             onCancel: () => this.setState({showFollowOn: false})
         }) : null;
     }
-
+    handleSalesOrderClose=()=>{
+        this.setState({showSalesOrder:false});
+        this.loadCallActivity(this.state.currentActivity);
+    }
     render() {
-        const {data} = this.state;
+        const {data,showSalesOrder} = this.state;
+        console.log("showSalesOrder",showSalesOrder);
         return (
-            <div style={{width: "90%"}}>
+            <div style={{width: "90%"}}>                
                 {this.getAlert()}
                 {this.getConfirm()}
                 {this.getPrompt()}
@@ -1018,6 +1015,8 @@ class ActivityDisplayComponent extends MainComponent {
                 {this.getExpensesElement()}
                 {this.getTemplateModal()}
                 {this.getFooter()}
+                {showSalesOrder?<LinkServiceRequestOrder serviceRequestID={data.problemID} customerId={data?.customerId} show={showSalesOrder} 
+                onClose={this.handleSalesOrderClose}></LinkServiceRequestOrder>:null}
             </div>
         );
     }

@@ -296,4 +296,187 @@
         <rollback>
         </rollback>
     </changeSet> 
+     <changeSet id="issue684-11" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">             
+                <tableExists tableName="ProjectStages" />                            
+        </preConditions>
+        <addColumn tableName="ProjectStages">
+            <column name="stageOrder" type="int" defaultValue="0" >                
+                <constraints 
+                nullable="true" 
+                 />
+            </column>                                  
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="ProjectStages" columnName="stageOrder" /> 
+        </rollback>
+    </changeSet> 
+
+    <changeSet id="issue684-12" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">             
+                <tableExists tableName="ProjectStages" />                            
+        </preConditions>
+        <modifyDataType    
+            columnName="stageOrder"  
+            newDataType="decimal(3,3)"              
+            tableName="ProjectStages"/>   
+        <rollback>
+         </rollback>
+    </changeSet> 
+    <changeSet id="issue684-14" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">             
+                <tableExists tableName="ProjectStages" />                            
+        </preConditions>
+        
+          <modifyDataType    
+            columnName="stageOrder"  
+            newDataType="float"              
+            tableName="ProjectStages"/>   
+            <sql>
+        update ProjectStages set stageOrder=id
+        </sql>
+        <rollback>
+         </rollback>
+    </changeSet> 
+    <changeSet id="issue684-15" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">  
+            <not>                
+                <tableExists tableName="reports" />
+                <tableExists tableName="reports_paramters" />
+                <tableExists tableName="reports_categories" />
+                <tableExists tableName="report_paramters" />
+                <tableExists tableName="report_categories" />
+            </not>
+        </preConditions>
+        <createTable tableName="reports">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="title" type="varchar(150)" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="component"  type="varchar(150)" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="active"  type="tinyint(1)"  defaultValue="1" >
+                <constraints nullable="false"/>
+            </column> 
+        </createTable>  
+        <createTable tableName="reports_paramters">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="title" type="varchar(150)" >
+                <constraints nullable="false"/>
+            </column> 
+            <column name="name" type="varchar(150)" >
+                <constraints nullable="false"/>
+            </column> 
+        </createTable>
+        <createTable tableName="reports_categories">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="title" type="varchar(150)" >
+                <constraints nullable="false"/>
+            </column>            
+            <column name="active"  type="tinyint(1)" defaultValue="1" >
+                <constraints nullable="false"/>
+            </column> 
+        </createTable>  
+        
+
+        <createTable tableName="report_paramters">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="reportID" type="int">
+                <constraints 
+                nullable="false" 
+                foreignKeyName="report_paramters_report_fk" 
+                referencedTableName="reports"
+                referencedColumnNames="id"/>
+            </column>
+            <column name="paramterID" type="int">
+                <constraints 
+                nullable="false" 
+                foreignKeyName="report_paramters_paramter_fk" 
+                referencedTableName="reports_paramters"
+                referencedColumnNames="id"/>
+            </column> 
+        </createTable>  
+
+        <createTable tableName="report_categories">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="reportID" type="int">
+                <constraints 
+                nullable="false" 
+                foreignKeyName="report_categories_report_fk" 
+                referencedTableName="reports"
+                referencedColumnNames="id"/>
+            </column>
+            <column name="categoryID" type="int">
+                <constraints 
+                nullable="false" 
+                foreignKeyName="report_categories_category_fk" 
+                referencedTableName="reports_categories"
+                referencedColumnNames="id"/>
+            </column> 
+        </createTable>  
+
+        <rollback>                    
+            <dropTable tableName="reports" />
+            <dropTable tableName="reports_paramters" />
+            <dropTable tableName="reports_categories" />
+            <dropTable tableName="report_paramters" />
+            <dropTable tableName="report_categories" />
+         </rollback>
+
+    </changeSet> 
+    <changeSet id="issue684-16" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">             
+                <tableExists tableName="report_paramters" />                            
+        </preConditions>
+
+        <addColumn tableName="report_paramters">
+            <column name="title" type="varchar(150)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="required" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <rollback>
+        <dropColumn tableName="report_paramters" columnName="title" />                            
+        <dropColumn tableName="report_paramters" columnName="required" />        
+         </rollback>
+    </changeSet> 
+    <changeSet id="issue684-17" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">             
+                <tableExists tableName="report_paramters" />                            
+        </preConditions>
+
+        <addColumn tableName="report_paramters">
+            <column name="paramterOrder" type="float" defaultValue="0">
+                <constraints nullable="true"/>
+            </column>          
+        </addColumn>
+        <rollback>
+        <dropColumn tableName="report_paramters" columnName="paramterOrder" />                                    
+         </rollback>
+    </changeSet> 
+    <changeSet id="issue684-18" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">             
+                <tableExists tableName="project" />                            
+        </preConditions>
+
+         <sql>
+         UPDATE project SET `projectClosureDate`=expiryDate WHERE `expiryDate` IS NOT NULL
+         </sql>
+        <rollback>
+          </rollback>
+    </changeSet> 
 </databaseChangeLog>

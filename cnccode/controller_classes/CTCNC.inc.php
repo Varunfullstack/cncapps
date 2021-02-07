@@ -1238,4 +1238,7 @@ class CTCNC extends Controller
     function getBody(){
         return json_decode(file_get_contents('php://input'));
     }
+    function hideMenu(){
+        $this->setHTMLFmt(CT_HTML_FMT_POPUP);
+    }
 }

@@ -67,4 +67,27 @@ export default class APIProjects extends APIMain {
   getProjectStagesHistory(projectID){
     return this.get(`${ApiUrls.Projects}projectStagesHistory&projectID=${projectID}`);
   }
+  updateProjectStage(projectID,oldStageID,newStageID){
+    return this.put(`${ApiUrls.Projects}projectStage&projectID=${projectID}&oldStageID=${oldStageID}&newStageID=${newStageID}`);    
+  }
+  getOriginalQuoteDocument=(projectID)=>{
+    return this.put(`${ApiUrls.Projects}projectOriginalQuotoeDoc&projectID=${projectID}`);
+
+  }
+  getPRojectsSummary(){
+    return this.get(`${ApiUrls.Projects}projectsSummary`);
+  }
+  //------------------------Report API
+  getProjectsSearch(consID='',dateFrom='',dateTo='',stageID='',typeID=''){
+    return this.get(`${ApiUrls.Projects}projectsSearch&consID=${consID}&dateFrom=${dateFrom}&dateTo=${dateTo}&stageID=${stageID}&typeID=${typeID}`);
+  }
+  getProjectsByConsultantInProgress(consID,dateFrom,dateTo){
+    return this.get(`${ApiUrls.Projects}projectsByConsultantInProgress&consID=${consID}&dateFrom=${dateFrom}&dateTo=${dateTo}`);
+  }
+  getProjectsByCustomerStageFallsStartEnd(customerID,dateFrom,dateTo){
+    return this.get(`${ApiUrls.Projects}projectsByCustomerStageFallsStartEnd&customerID=${customerID}&dateFrom=${dateFrom}&dateTo=${dateTo}`);
+  }
+  getProjectsWithoutClousureMeeting(){
+    return this.get(`${ApiUrls.Projects}projectsWithoutClousureMeeting`);
+  }
 }

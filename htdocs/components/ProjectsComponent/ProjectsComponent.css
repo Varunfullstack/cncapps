@@ -28,3 +28,13 @@
     font-size: 12px;
     line-height: 16px;
 }
+.mini-tabs{
+    display: flex;
+    flex-direction: row;
+}
+.mini-tab-item{
+    margin: 0 4px 0 4px;
+    background-color: #bdbec1;
+    padding: 5px;
+    border-radius: 10px;
+}

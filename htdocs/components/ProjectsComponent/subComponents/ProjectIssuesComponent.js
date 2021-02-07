@@ -42,7 +42,7 @@ export default class ProjectIssuesComponent extends MainComponent {
       {
          path: "engineerName",
          label: "",
-         hdToolTip: "Engineer",
+         hdToolTip: "Issue raised by",
          hdClassName: "text-center",
          icon: "fal fa-2x fa-user-hard-hat color-gray2 pointer",
          sortable: true,
@@ -52,7 +52,7 @@ export default class ProjectIssuesComponent extends MainComponent {
       {
         path: "createAt",
         label: "",
-        hdToolTip: "Create At",
+        hdToolTip: "Issue raised at",
         hdClassName: "text-center",
         icon: "fal fa-2x fa-calendar color-gray2 pointer",
         sortable: true,

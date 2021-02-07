@@ -260,7 +260,8 @@ class DBEProject extends DBEntity
   calculatedBudget,
   projectStageID,
   stage.name projectStageName,
-  ptype.name projectTypeName
+  ptype.name projectTypeName,
+  expectedHandoverQADate
 FROM
   project 
   LEFT JOIN consultant engineer ON project.consultantID = engineer.cns_consno

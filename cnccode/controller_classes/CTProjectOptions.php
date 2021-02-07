@@ -41,7 +41,7 @@ class CTProjectOptions extends CTCNC
         switch ($this->getAction()) {             
             case self::CONS_PROJECT_STAGES:
                 if($method=='GET')
-                    echo json_encode($this->getProjectStages());
+                    echo json_encode($this->getProjectStages(),JSON_NUMERIC_CHECK);
                 else if($method=='POST')
                     echo json_encode($this->addProjectStage());
                 else if($method=='DELETE')
@@ -83,13 +83,18 @@ class CTProjectOptions extends CTCNC
 
     //------------------start ProjectStages
     function getProjectStages(){
-        return DBConnect::fetchAll("select id, name from projectstages",[]);
+        return DBConnect::fetchAll("select id, name,stageOrder from projectstages order by stageOrder");
     }
 
     function addProjectStage(){
         $body=$this->getBody();
         if($body->name!='')
-        return ["status"=>DBConnect::execute(" insert into projectstages(name) values(:name)",["name"=>$body->name])];
+        {
+            $stageOrder=DBConnect::fetchOne("select max(stageOrder)+1 stageOrder from projectstages")["stageOrder"];
+            $status=DBConnect::execute(" insert into projectstages(name,stageOrder) values(:name,:stageOrder)",
+            ["name"=>$body->name,"stageOrder"=>$stageOrder]);
+            return ["status"=>$status];
+        }
         else return ["status"=>false];
     }
 
@@ -99,9 +104,8 @@ class CTProjectOptions extends CTCNC
         $type=DBConnect::fetchOne("select * from projectstages where id=:id",["id"=>$id]);
         if(!$type)
             throw new Exception("Not found",404);
-
-        return ["status"=>DBConnect::execute("update projectstages set name=:name where id=:id",
-                ["id"=>$id,"name"=>$body->name])];
+        return ["status"=>DBConnect::execute("update projectstages set name=:name,stageOrder=:stageOrder where id=:id",
+                ["id"=>$id,"name"=>$body->name,"stageOrder"=>$body->stageOrder])];
     }
 
     function deleteProjectStage(){

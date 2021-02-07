@@ -20,7 +20,8 @@ export default class CurrentProjectsComponent extends MainComponent {
       currentProject: null,
       history: [],
       mode: "list", // list, add , edit
-      projectID:null
+      projectID:null,
+      projectsSummary:this.props.projectsSummary
     };
   }
 
@@ -38,13 +39,30 @@ export default class CurrentProjectsComponent extends MainComponent {
       projects.map((p) => {
         p.inHoursClass =this.helper.getRedClass(p.inHoursUsed , p.inHoursBudget);
         p.outHoursClass =this.helper.getRedClass(p.outHoursUsed , p.outHoursBudget);
-      });
+      }); 
       this.setState({ projects, showSpinner: false });
     });
   }
 
   getProjectsElement = () => {
-    const { projects } = this.state;
+    let { projects } = this.state;
+    const {projectsSummary}=this.props;
+    //apply Filter
+    console.log('projectsSummary',projectsSummary);
+    if(projectsSummary){
+      projects= projects.filter(p=>{
+        if(p.projectStageName==null)
+        return true;
+        const indx=projectsSummary.map(s=>s.name).indexOf(p.projectStageName);
+        if(indx>=0&&!projectsSummary[indx].filter)
+        {
+          return false;
+        }
+        else 
+        return true;
+        
+      })
+    }
     //console.log(projects.length);
     const columns = [
         {
@@ -53,7 +71,7 @@ export default class CurrentProjectsComponent extends MainComponent {
             sortable: true,
             hdToolTip: "Customer Name",
             icon: "fal fa-2x fa-building color-gray2 pointer",
-    
+            //content:(project)=><a style={{color:'black'}} href={`Projects.php?action=edit&&projectID=${project.projectID}`}>{project.customerName}</a>
             //className: "text-center",
           },
       {
@@ -64,6 +82,8 @@ export default class CurrentProjectsComponent extends MainComponent {
         icon:"fal fa-2x fa-file color-gray2 pointer",
         //className: "text-center",
         // content:(project)=><a href={`/Project.php?action=edit&projectID=${project.projectID}`} target="_blank">{project.description}</a>
+        content:(project)=><a style={{color:'black'}} href={`Projects.php?action=edit&&projectID=${project.projectID}`}>{project.description}</a>
+
       },    
       {
         path: "projectStageName",
@@ -87,7 +107,7 @@ export default class CurrentProjectsComponent extends MainComponent {
         path: "assignedEngineer",
         //label: "Engineer",
         sortable: true,
-        hdToolTip: "Engineer",
+        hdToolTip: "Issue raised by",
         icon: "fal fa-2x fa-user-hard-hat color-gray2 pointer",
         //className: "text-center",
       },
@@ -135,7 +155,7 @@ export default class CurrentProjectsComponent extends MainComponent {
       {
         path: "outHoursBudgetUsed",
         //label: "OOHB & OOHU ",
-        hdToolTip:"Outside of hours budget / used",
+        hdToolTip:"Out of hours budget / used",
         icon: "fal fa-2x fa-house-night color-gray2 pointer",
 
         sortable: true,
@@ -272,7 +292,6 @@ export default class CurrentProjectsComponent extends MainComponent {
           </div>
           {this.getHistoryModal()}
           {this.getProjectsElement()}
-          <strong>Total Projects :{this.state.projects.length}</strong>
         </div>
       );
    

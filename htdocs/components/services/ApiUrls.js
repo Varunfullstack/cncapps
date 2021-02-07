@@ -17,5 +17,6 @@ export default class ApiUrls {
     static CustomerInfo = "/CustomerInfo.php?action=";
     static Projects = "/Projects.php?action=";
     static ProjectOptions = "/ProjectOptions.php?action=";
-
+    static Reports = "/Reports.php?action=";
+    static SalesOrder = "/SalesOrder.php?action=";
 }

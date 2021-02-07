@@ -37,7 +37,7 @@ export default class ProjectStagesHistoryComponent extends MainComponent {
             label: "",
             hdToolTip: "Project Stage",
             hdClassName: "text-center",
-            icon: "fal fa-2x fa-text color-gray2 pointer",
+            icon: "fal fa-2x fa-step-forward color-gray2 pointer",
             sortable: true,
             className: "text-center",
             width:150
@@ -45,7 +45,7 @@ export default class ProjectStagesHistoryComponent extends MainComponent {
       {
          path: "stageTimeHours",
          label: "",
-         hdToolTip: "Spent Stage time hours",
+         hdToolTip: "Days spent at this stage",
          hdClassName: "text-center",
          icon: "fal fa-2x fa-hourglass-half color-gray2 pointer",
          sortable: true,
@@ -56,7 +56,7 @@ export default class ProjectStagesHistoryComponent extends MainComponent {
       {
         path: "engineerName",
         label: "",
-        hdToolTip: "Engineer",
+        hdToolTip: "Stage changed by",
         hdClassName: "text-center",
         icon: "fal fa-2x fa-user-hard-hat color-gray2 pointer",
         sortable: true,
@@ -66,7 +66,7 @@ export default class ProjectStagesHistoryComponent extends MainComponent {
       {
         path: "createAt",
         label: "",
-        hdToolTip: "Create At",
+        hdToolTip: "Stage changed at",
         hdClassName: "text-center",
         icon: "fal fa-2x fa-calendar color-gray2 pointer",
         sortable: true,
@@ -90,11 +90,11 @@ export default class ProjectStagesHistoryComponent extends MainComponent {
       if(stage.stageTimeHours==null)
       {
           const createAt=moment(stage.createAt); 
-          const duration=moment.duration( moment().diff(createAt));          
-          return duration.asHours().toFixed(2);
+          const duration=moment.duration( moment().diff(createAt));  
+           return duration.asDays().toFixed(2);
       }
       else 
-      return stage.stageTimeHours;
+      return (stage.stageTimeHours/24).toFixed(2);
   }
   render() {      
     return <div>

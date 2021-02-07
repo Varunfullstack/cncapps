@@ -1,0 +1,23 @@
+input{
+    width: 200px;
+    border:1px solid;
+    margin-right: 0px;
+    box-sizing: unset !important;
+    box-shadow: unset;
+    padding: 2px;
+    font-size: 12px;
+    line-height: 16px;
+}
+select{
+    width: 200px;
+    border:1px solid;
+    margin-right: 0px;
+    box-sizing: unset !important;
+    box-shadow: unset;
+    padding: 2px;
+    font-size: 12px;
+    line-height: 16px;
+}
+.red-border{
+    border:1px solid red;
+}

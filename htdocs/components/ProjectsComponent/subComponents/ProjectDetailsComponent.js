@@ -13,6 +13,7 @@ import ProjectIssuesComponent from "./ProjectIssuesComponent";
 import ProjectSummaryComponent from "./ProjectSummaryComponent";
 import APIProjectOptions from "../../ProjectOptionsComponent/services/APIProjectOptions";
 import ProjectStagesHistoryComponent from "./ProjectStagesHistoryComponent";
+import APISalesOrders from "../../services/APISalesOrders";
 
 export default class ProjectDetailsComponent extends MainComponent {
   tabs = [];
@@ -24,6 +25,7 @@ export default class ProjectDetailsComponent extends MainComponent {
   TAB_PROJECT_STAGES=6;
   api = new APIProjects();
   apiUsers=new APIUser();
+  apiSalesOrder=new APISalesOrders();
   helper=new ProjectsHelper();
   apiProjectOptions=new APIProjectOptions();
   constructor(props) {
@@ -60,15 +62,16 @@ export default class ProjectDetailsComponent extends MainComponent {
       projectStages:[],
       projectTypes:[],
       engineers:[],
-      projectStagesHistory:[]
+      projectStagesHistory:[],
+      salesOrders:[]
     };
     this.tabs = [
       { id: this.TAB_DETAILS, title: "Details", icon: null,visible:true },
       //{ id: this.TAB_HISTORY, title: "History", icon: null,visible:this.props.mode=='edit' },      
       { id: this.TAB_TIME_BREAKDOWN, title: "Time Breakdown", icon: null,visible:this.props.mode=='edit' },      
-      { id: this.TAB_PROJECT_ISSUES, title: "Project Issues", icon: null,visible:this.props.mode=='edit' },      
-      { id: this.TAB_PROJECT_SUMMARY, title: "Project Summary", icon: null,visible:this.props.mode=='edit' },      
-      { id: this.TAB_PROJECT_STAGES, title: "Project Stages History", icon: null,visible:this.props.mode=='edit' },      
+      { id: this.TAB_PROJECT_STAGES, title: "Project Stages History", icon: null,visible:this.props.mode=='edit' },
+      { id: this.TAB_PROJECT_ISSUES, title: "Project Issues", icon: null,visible:this.props.mode=='edit' },
+      { id: this.TAB_PROJECT_SUMMARY, title: "Post Project Summary", icon: null,visible:this.props.mode=='edit' },      
     ];
   }
 
@@ -107,6 +110,8 @@ export default class ProjectDetailsComponent extends MainComponent {
             console.log({...this.state.data,...data},budgetData);
             data.inHoursQuantity='';
             data.outOfHoursQuantity='';
+            if(data.originalQuoteDocumentFinalAgreed!=''&&data.originalQuoteDocumentFinalAgreed!=null)
+            data.originalQuoteDocumentFinalAgreed="file://///"+data.originalQuoteDocumentFinalAgreed;
             this.setState({data:{...this.state.data,...data},budgetData,showSpinner:false,projectStagesHistory});
         });
     }
@@ -186,7 +191,7 @@ export default class ProjectDetailsComponent extends MainComponent {
                       <td>Project Summary</td>
                       <td> <CNCCKEditor 
                             readOnly={disabled=='disabled'} 
-                            value= {data.notes} 
+                            value= {data.notes||''} 
                             onChange={(event)=>this.handleSummaryChange(event) }
                             type="inline"
                             style={{width:700,minHeight:40}}
@@ -199,7 +204,7 @@ export default class ProjectDetailsComponent extends MainComponent {
                           Project Type
                       </td>
                       <td>
-                        <select  className="input" value={data.projectTypeID} onChange={(event)=>this.setValue('projectTypeID',event.target.value)} >
+                        <select  className="input" value={data.projectTypeID||''} onChange={(event)=>this.setValue('projectTypeID',event.target.value)} >
                           <option value=""></option>
                           {projectTypes.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}
                         </select>                          
@@ -208,30 +213,30 @@ export default class ProjectDetailsComponent extends MainComponent {
 
                   <tr>
                       <td>Project Opened Date</td>
-                      <td><input  className="input" disabled={disabled}  type="date" value= {data.openedDate} onChange={(event)=>this.setValue('openedDate',event.target.value)}></input></td>
+                      <td><input  className="input" disabled={disabled}  type="date" value= {data.openedDate||''} onChange={(event)=>this.setValue('openedDate',event.target.value)}></input></td>
                   </tr>
                   <tr>
                       <td>Project Planning Date	</td>
-                      <td><input  className="input" disabled={disabled}  type="date" value= {data.projectPlanningDate} onChange={(event)=>this.setValue('projectPlanningDate',event.target.value)}></input></td>
+                      <td><input  className="input" disabled={disabled}  type="date" value= {data.projectPlanningDate||''} onChange={(event)=>this.setValue('projectPlanningDate',event.target.value)}></input></td>
                   </tr>
                   <tr>
                       <td>Project Commencement Date	</td>
-                      <td><input  className="input" disabled={disabled}  type="date" value= {data.commenceDate} onChange={(event)=>this.setValue('commenceDate',event.target.value)}></input></td>
+                      <td><input  className="input" disabled={disabled}  type="date" value= {data.commenceDate||''} onChange={(event)=>this.setValue('commenceDate',event.target.value)}></input></td>
                   </tr>
                   <tr>
                       <td>Expected handover to QA date	</td>
-                      <td><input  className="input" disabled={disabled}  type="date" value= {data.expectedHandoverQADate} onChange={(event)=>this.setValue('expectedHandoverQADate',event.target.value)}></input></td>
+                      <td><input  className="input" disabled={disabled}  type="date" value= {data.expectedHandoverQADate||''} onChange={(event)=>this.setValue('expectedHandoverQADate',event.target.value)}></input></td>
                   </tr>
                   <tr>
                       <td>Completed Date		</td>
-                      <td><input  className="input"  disabled={disabled}  type="date" value= {data.completedDate} onChange={(event)=>this.setValue('completedDate',event.target.value)}></input></td>
+                      <td><input  className="input"  disabled={disabled}  type="date" value= {data.completedDate||''} onChange={(event)=>this.setValue('completedDate',event.target.value)}></input></td>
                   </tr> 
                   <tr>
                       <td>
                           Project Manager
                       </td>
                       <td>
-                        <select  className="input" value= {data.projectManager} onChange={(event)=>this.setValue('projectManager',event.target.value)} >
+                        <select  className="input" value= {data.projectManager||''} onChange={(event)=>this.setValue('projectManager',event.target.value)} >
                           <option value=''></option>
                           {engineers.map(s=><option key={s.id} value={s.id} >{s.name}</option>)}
                         </select>                          
@@ -240,7 +245,7 @@ export default class ProjectDetailsComponent extends MainComponent {
                   <tr>
                       <td>Project Engineer</td>
                       <td>
-                          <select  className="input" disabled={disabled}  value={data.projectEngineer} onChange={(event)=>this.setValue('projectEngineer',event.target.value)}>
+                          <select  className="input" disabled={disabled}  value={data.projectEngineer||''} onChange={(event)=>this.setValue('projectEngineer',event.target.value)}>
                             <option value={null}>Select Engineer</option>
                               { users.map(u=><option key={u.id} value={u.id}>{u.name}</option>)}
                           </select>
@@ -255,7 +260,7 @@ export default class ProjectDetailsComponent extends MainComponent {
                   <tr>
                       <td>Original Quote Document with final agreed document</td>
                       <td>
-                          <input  className="input" disabled={disabled} value={data.originalQuoteDocumentFinalAgreed} onChange={(event)=>this.setValue('originalQuoteDocumentFinalAgreed',event.target.value)}></input>
+                          <input  className="input" disabled={disabled} value={data.originalQuoteDocumentFinalAgreed||''} onChange={(event)=>this.setValue('originalQuoteDocumentFinalAgreed',event.target.value)}></input>
                       </td>
                   </tr>
                   <tr>
@@ -277,7 +282,7 @@ export default class ProjectDetailsComponent extends MainComponent {
                           Project Stage
                       </td>
                       <td>
-                        <select  className="input" value= {data.projectStageID}  
+                        <select  className="input" value= {data.projectStageID||''}  
                         onChange={(event)=>this.handleProjectStage(event.target.value)} 
                         >
                           <option value=''></option>
@@ -307,11 +312,16 @@ export default class ProjectDetailsComponent extends MainComponent {
     const {data}=this.state;
     const confirm=await this.confirm("Are you sure you want to change the status?");
     if(confirm)
-    {      
-      if(data.originProjectStageID==null)
-        data.originProjectStageID=data.projectStageID;
+    { 
+      data.originProjectStageID=data.projectStageID;
       data.projectStageID=projectStageID;
       this.setState({data});
+      this.api.updateProjectStage(data.projectID,data.originProjectStageID,data.projectStageID).then(result=>{
+        console.log(result);
+        if(result.status)
+          this.api.getProjectStagesHistory(data.projectID)
+          .then(projectStagesHistory=>this.setState({projectStagesHistory}));
+      });
     }
   }
   }
@@ -666,14 +676,8 @@ getActionsElement=()=>{
           <i className="fal fa-building fa-2x icon pointer"></i>
         </a>
       </ToolTip>
-      {data.ordHeadID ? (
-        <ToolTip title="Unlink Sales Order" width={30}>
-          <i
-            className="fal fa-unlink fa-2x m-5 pointer icon"
-            onClick={this.handleUnlinkSalesOrder}
-          ></i>
-        </ToolTip>
-      ) : null}
+
+      
       {data.ordHeadID ?  <ToolTip title="Sales Order" width={30}>
         <a href={`SalesOrder.php?action=displaySalesOrder&ordheadID=${data.ordHeadID}`}   target="_blank">
           <i
@@ -690,16 +694,15 @@ getActionsElement=()=>{
               ></i>
             </ToolTip>:null
       }
-
-      <div style={{width:15}}></div>
-{data.ordOriginalHeadID ? (
+      {data.ordHeadID ? (
         <ToolTip title="Unlink Sales Order" width={30}>
           <i
-            className="fa fa-unlink fa-2x m-5 pointer icon"
-            onClick={()=>this.handleUnlinkSalesOrder(true)}
+            className="fal fa-unlink fa-2x m-5 pointer icon"
+            onClick={this.handleUnlinkSalesOrder}
           ></i>
         </ToolTip>
       ) : null}
+      <div style={{width:15}}></div>
       {data.ordOriginalHeadID ?  <ToolTip title="Sales Order" width={30}>
         <a href={`SalesOrder.php?action=displaySalesOrder&ordheadID=${data.ordOriginalHeadID}`}   target="_blank">
           <i
@@ -716,7 +719,14 @@ getActionsElement=()=>{
               ></i>
             </ToolTip>:null
       }
-
+      {data.ordOriginalHeadID ? (
+        <ToolTip title="Unlink Sales Order" width={30}>
+          <i
+            className="fa fa-unlink fa-2x m-5 pointer icon"
+            onClick={()=>this.handleUnlinkSalesOrder(true)}
+          ></i>
+        </ToolTip>
+      ) : null}
 
       {data.ordHeadID ? (
         <ToolTip title="SR" width={30}>
@@ -734,19 +744,21 @@ getActionsElement=()=>{
       {data.hasProjectPlan?
       <ToolTip title="Project Plan" width={30}>
         <a  href={`/Projects.php?action=projectFiles&projectID=${data.projectID}`}>
-          <i className="fal fa-chart-pie-alt fa-2x m-5 pointer icon"></i>
+          <i className="fal fa-analytics fa-2x m-5 pointer icon"></i>
         </a>        
       </ToolTip>:null
       }
       { !this.isEmpty(data.originalQuoteDocumentFinalAgreed)?
-      <ToolTip title="Original Quote Document with final agreed document" width={30}>
-        <a  href={data.originalQuoteDocumentFinalAgreed} target="_blank">
-          <i className="fa fa-chart-pie-alt fa-2x m-5 pointer icon"></i>
-        </a>        
+      <ToolTip title="Original Quote Document with final agreed document" width={30}>        
+          <i className="fal fa-file-check fa-2x m-5 pointer icon" onClick={this.handleDownloadOriginalQuote}></i>        
       </ToolTip>:null
       }
     </div>
   );
+}
+handleDownloadOriginalQuote=()=>{
+  const {data}=this.state;
+  window.location=`Projects.php?action=projectOriginalQuotoeDoc&projectID=${data.projectID}`;
 }
 handlecalculateBudget=()=>{
   const {data}=this.state;
@@ -765,11 +777,16 @@ handleUnlinkSalesOrder=async (originalOrder=false)=>{
   this.getData();
 }
 
-handleSalesOrder=(originalOrder=false)=>{
-  this.setState({showSalesOrder:true,originalOrder})
+handleSalesOrder=async (originalOrder=false)=>{
+  const {data}=this.state;
+  this.apiSalesOrder.getCustomerInitialSalesOrders(data.customerID).then(salesOrders=>{
+    console.log('salesOrders',salesOrders);
+    this.setState({showSalesOrder:true,originalOrder,salesOrders,newOrdHeadID:''})
+
+  });
 }
 getSalesOrderModal=()=>{
-  const {showSalesOrder,newOrdHeadID,originalOrder}=this.state;
+  const {showSalesOrder,newOrdHeadID,originalOrder,salesOrders}=this.state;
   ////console.log(showSalesOrder);
   let title="Linked to Sales Order";
   if(originalOrder)
@@ -779,7 +796,7 @@ getSalesOrderModal=()=>{
       key="orderModal"
       title={title}
       onClose={() => this.setState({ showSalesOrder: false })}
-      width={400}
+      width={800}
       show={showSalesOrder}
       content={
         <div key="content">
@@ -787,6 +804,26 @@ getSalesOrderModal=()=>{
             <label>Order Number </label>
             <input  type="number" value={newOrdHeadID} onChange={(event)=>this.setState({newOrdHeadID:event.target.value})}></input>
           </div>
+          <table className="table table-striped">
+            <tbody>
+              {salesOrders.map(order=><tr style={{cursor:"pointer"}} key={order.orderID} onClick={()=>this.setState({newOrdHeadID:order.orderID})}>
+                <td>
+                  <ToolTip title="Select Order">
+                    <i className="fal fa-check fa-2x icon pointer" style={{color:"white"}}></i>
+                  </ToolTip>
+                  
+                </td>
+                <td>
+                  <a className="white" href={`/SalesOrder.php?action=displaySalesOrder&ordheadID=${order.orderID}`} target="_blank">
+                  {order.orderID}
+                  </a>                  
+                </td>
+                <td>{this.getCorrectDate(order.date)}</td>
+                <td>{order.firstComment}</td>
+              </tr>)}
+              
+            </tbody>
+          </table>
         </div>
       }
       footer={
@@ -826,7 +863,8 @@ handleUpdateSalesOrder=()=>{
 }
 isProjectStageSelectedBefore=(stageID)=>{
   const {projectStagesHistory}=this.state;
-  return projectStagesHistory.map(h=>h.id).indexOf(stageID)>=0;
+  //console.log(projectStagesHistory);
+  return projectStagesHistory.map(h=>h.stageID).indexOf(stageID)>=0;
 }
   render() {  
     const {mode}  =this.state;

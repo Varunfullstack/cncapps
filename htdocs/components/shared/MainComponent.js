@@ -223,6 +223,7 @@ export default class MainComponent extends React.Component {
         format +=" HH:mm";
         if(date!='' && date!=null)
         return moment(date).format(format);
+        else return '';
     }
     isEmpty(variable){
         if(variable==null || variable==undefined || variable=='')

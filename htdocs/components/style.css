@@ -1070,3 +1070,8 @@ input:required:valid { border: 1px solid black; }
     background-color: #bdbec1 !important;
     color: #000;
 }
+
+select:focus:required:invalid {border: 1px solid red;}
+select:required:invalid {border: 1px solid red;}
+select:required:valid { border: 1px solid black; }
+ 
