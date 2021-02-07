@@ -19,7 +19,7 @@ class ProjectsComponent extends MainComponent {
   constructor(props) {
     super(props);
     this.state = {
-      activeTab:this.TAB_CALENDAR,      
+      activeTab:this.TAB_CURRENT_PROJECTS,      
       totalProjects:0,
       summary:'',
       projectsSummary:[]
