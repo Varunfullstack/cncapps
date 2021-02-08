@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 1152 - Added Feedback in home and mysettings.
+
+
 ## [v5.4.1] - 2021-02-04
 ### Fixed
 - Fixed issue with misspelled words not getting saved correctly.

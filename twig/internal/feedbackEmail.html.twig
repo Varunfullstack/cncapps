@@ -1,0 +1,28 @@
+{% extends "@internal/wrapper.html.twig" %}
+{# @var data #}
+{% block content %}
+ <h1>Here's the details of your feedback.</h1>
+    <table>
+      <tr>
+        <td>Customer: </td>
+        <td>{{customer}}</td>
+      </tr>
+      <tr>
+        <td>Service Request: </td>
+        <td><a href="{{urlService}}">{{serviceRequestId}}</a>
+        </td>
+      </tr>
+      <tr>
+        <td>Feedback rating: </td>
+        <td>{{rate}}</td>
+      </tr>
+      <tr>
+        <td>Comments: </td>
+        <td></td>
+      </tr>
+      <tr>
+        <td colspan="2">{{comments}}</td>        
+      </tr>
+    </table> 
+
+{% endblock %}

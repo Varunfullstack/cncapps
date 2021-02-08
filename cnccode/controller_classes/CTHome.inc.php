@@ -31,6 +31,7 @@ class CTHome extends CTCNC
     const GET_ALL_USER_PERFORMANCE           = 'allUserPerformance';
     const GET_USER_PERFORMANCE               = 'userPerformance';
     const DEFAULT_LAYOUT                     = 'defaultLayout';
+    const GET_FEEDBACK_TEAMS                 = 'teamsFeedback';
     /** @var DataSet|DBEHeader */
     private $dsHeader;
     /** @var BUUser */
@@ -130,6 +131,9 @@ class CTHome extends CTCNC
             case self::DEFAULT_LAYOUT:
                 if ($method == 'GET') echo json_encode($this->getDefaultLayout());
                 if ($method == 'POST') echo json_encode($this->setDefaultLayout());
+                break;
+            case self::GET_FEEDBACK_TEAMS:
+                echo json_encode($this->getFeedbackTeams(),JSON_NUMERIC_CHECK);
                 break;
             default:
                 $this->displayReact();
@@ -1650,5 +1654,72 @@ class CTHome extends CTCNC
                 ['settings' => $body->settings]
             );
         }
+    }
+    function getFeedbackTeams(){
+        $query="SELECT       
+                    COUNT(IF(f.value=1, 1, NULL)) happy,
+                    COUNT(IF(f.value=2, 1, NULL)) average,
+                    COUNT(IF(f.value=3, 1, NULL)) unhappy,
+                    cons.teamID,
+                    'Q1' quarter
+                FROM `customerfeedback` f 
+                    JOIN problem ON problem.`pro_problemno`=f.serviceRequestId
+                    JOIN callactivity cal ON cal.caa_problemno=f.serviceRequestId
+                    JOIN `consultant`  cons ON cons.`cns_consno`=cal.`caa_consno`
+                WHERE cal.caa_callacttypeno=51
+                    AND f.`createdAt` >= DATE_FORMAT(NOW(), '%Y-01-01') 
+                    AND f.`createdAt` < DATE_FORMAT(NOW(), '%Y-04-01')
+                    AND  cons.teamID<=5
+                GROUP BY   cons.teamID   
+            UNION         
+                SELECT       
+                    COUNT(IF(f.value=1, 1, NULL)) happy,
+                    COUNT(IF(f.value=2, 1, NULL)) average,
+                    COUNT(IF(f.value=3, 1, NULL)) unhappy,
+                    cons.teamID,
+                    'Q2' quarter
+                FROM `customerfeedback` f 
+                    JOIN problem ON problem.`pro_problemno`=f.serviceRequestId
+                    JOIN callactivity cal ON cal.caa_problemno=f.serviceRequestId
+                    JOIN `consultant`  cons ON cons.`cns_consno`=cal.`caa_consno`
+                WHERE cal.caa_callacttypeno=51
+                    AND f.`createdAt` >= DATE_FORMAT(NOW(), '%Y-04-01') 
+                    AND f.`createdAt` < DATE_FORMAT(NOW(), '%Y-07-01')
+                    AND  cons.teamID<=5
+                GROUP BY   cons.teamID      
+            UNION         
+                SELECT       
+                    COUNT(IF(f.value=1, 1, NULL)) happy,
+                    COUNT(IF(f.value=2, 1, NULL)) average,
+                    COUNT(IF(f.value=3, 1, NULL)) unhappy,
+                    cons.teamID,
+                    'Q3' quarter
+                FROM `customerfeedback` f 
+                    JOIN problem ON problem.`pro_problemno`=f.serviceRequestId
+                    JOIN callactivity cal ON cal.caa_problemno=f.serviceRequestId
+                    JOIN `consultant`  cons ON cons.`cns_consno`=cal.`caa_consno`
+                WHERE cal.caa_callacttypeno=51
+                    AND f.`createdAt` >= DATE_FORMAT(NOW(), '%Y-07-01') 
+                    AND f.`createdAt` < DATE_FORMAT(NOW(), '%Y-10-01')
+                    AND  cons.teamID<=5
+                GROUP BY   cons.teamID   
+            UNION         
+                SELECT       
+                    COUNT(IF(f.value=1, 1, NULL)) happy,
+                    COUNT(IF(f.value=2, 1, NULL)) average,
+                    COUNT(IF(f.value=3, 1, NULL)) unhappy,
+                    cons.teamID,
+                    'Q4' quarter
+                FROM `customerfeedback` f 
+                    JOIN problem ON problem.`pro_problemno`=f.serviceRequestId
+                    JOIN callactivity cal ON cal.caa_problemno=f.serviceRequestId
+                    JOIN `consultant`  cons ON cons.`cns_consno`=cal.`caa_consno`
+                WHERE cal.caa_callacttypeno=51
+                    AND f.`createdAt` >= DATE_FORMAT(NOW(), '%Y-10-01') 
+                    AND f.`createdAt` <= DATE_FORMAT(NOW(), '%Y-12-31')
+                    AND  cons.teamID<=5
+                GROUP BY   cons.teamID 
+          ";
+          return DBConnect::fetchAll($query,[]);
     }
 }
