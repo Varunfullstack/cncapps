@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1219 - PO Status Report, include orders without SRs
+
 ## [v5.4.1] - 2021-02-04
 ### Fixed
 - Fixed issue with misspelled words not getting saved correctly.
