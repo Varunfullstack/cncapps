@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v5.4.2]
+## [v5.4.2] - 2021-02-08
 ### Fixed
 - Fixed First Time Fix reporting
 - Fixed issue with Internal notes not updating when copy/paste.
