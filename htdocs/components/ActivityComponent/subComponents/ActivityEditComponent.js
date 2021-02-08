@@ -690,6 +690,7 @@ class ActivityEditComponent extends MainComponent {
         }
         let activities = this.getSessionNotes().filter(a => a.id !== data.callActivityID);
         activities.push(activityEdit);
+        console.log(activityEdit);
         sessionStorage.setItem("activityEdit", JSON.stringify(activities));
     }
 
@@ -1589,18 +1590,29 @@ class ActivityEditComponent extends MainComponent {
                     ?
                     <EditorFieldComponent name="cncNextAction"
                                           value={data?.cncNextAction || ""}
-                                          onChange={(value) => this.setValue("cncNextActionTemplate", value)}
+                                          onChange={(value) => {
+                                              console.log(value)
+                                              this.setValue("cncNextActionTemplate", value)
+                                          }}
                     />
                     : null
             )
         );
     }
 
-    getCustomerNotes() {
-        const {el} = this;
-        const {data} = this.state;
-        return el(
-            "div",
+getCustomerNotes() {
+const {
+    el
+}
+
+= this;
+const
+{
+    data
+}
+= this.state;
+return el(
+"div",
             {className: "round-container flex-column flex-1", style: {padding: 5}},
             el('div', {className: "flex-row"},
                 el(

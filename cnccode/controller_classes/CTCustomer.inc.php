@@ -3179,7 +3179,7 @@ class CTCustomer extends CTCNC
                     AND pro_status IN( 'I', 'P')
                 ) AS openSrCount,
                 (SELECT cui_itemno IS NOT NULL FROM custitem WHERE custitem.`cui_itemno` = 4111 AND custitem.`declinedFlag` <> 'Y' AND custitem.`cui_custno` = customer.`cus_custno` and renewalStatus  <> 'D' limit 1) AS hasPrepay,
-                (SELECT item.`itm_desc` FROM custitem LEFT JOIN item ON cui_itemno = item.`itm_itemno` WHERE itm_desc LIKE '%servicedesk%' AND custitem.`declinedFlag` <> 'Y' AND custitem.`cui_custno` = customer.`cus_custno` limit 1 ) AS hasServiceDesk,
+                (SELECT count(*) > 0 FROM custitem LEFT JOIN item ON cui_itemno = item.`itm_itemno` WHERE `itm_itemtypeno` = 56 and renewalStatus <> 'D' AND custitem.`declinedFlag` <> 'Y' AND custitem.`cui_custno` = customer.`cus_custno` ) AS hasServiceDesk,
                 cus_special_attention_flag specialAttentionCustomer
                 FROM customer
     

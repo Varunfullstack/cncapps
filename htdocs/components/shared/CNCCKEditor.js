@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 
 class CNCCKEditor extends React.Component {
     el = React.createElement;
+    onChangeListener = null;
+    internalData = null;
 
     constructor(props) {
         super(props);
@@ -62,8 +64,19 @@ class CNCCKEditor extends React.Component {
                 });
             }
 
+            if (!this.onChangeListener) {
+                this.onChangeListener = editor.on('change', () => {
+                    const newValue = editor.getData();
+                    if (this.props.onChange && newValue != this.internalData) {
+                        this.props.onChange(newValue);
+                        this.internalData = newValue
+                    }
+                })
+            }
+
             if (value) {
                 editor.setData(value);
+                this.internalData = value;
             }
         }).catch(console.error);
     }
@@ -97,7 +110,7 @@ class CNCCKEditor extends React.Component {
         if (this.editor) {
             this.editor.destroy();
         }
-
+        this.onChangeListener = null;
         this.editor = null;
         this.element = null;
         this._destroyed = true;
@@ -115,9 +128,21 @@ class CNCCKEditor extends React.Component {
                  ref={ref => (this.element = ref)}
                  className={`testing ${this.props.excludeFromErrorCount ? 'excludeFromErrorCount' : ''}`}
                  onInput={$event => {
+                     const newValue = this.editor.getData();
                      if (this.props.onChange) {
-                         this.props.onChange(this.editor.getData());
+                         this.props.onChange(newValue);
                      }
+                     this.internalData = newValue
+                 }}
+
+                 onPaste={$event => {
+                     setTimeout(() => {
+                         const newValue = this.editor.getData();
+                         if (this.props.onChange) {
+                             this.props.onChange(newValue);
+                         }
+                         this.internalData = newValue
+                     })
                  }}
             />
             <div key="bottom"

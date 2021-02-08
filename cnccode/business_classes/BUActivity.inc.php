@@ -5009,7 +5009,7 @@ class BUActivity extends Business
     }
 
     /**
-     * @param $body json data
+     * @param Object $body
      * @return DataSet
      * @throws Exception
      */

@@ -1,0 +1,45 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.2.xsd">
+    <changeSet author="pavwebdev" id="hotfix-v5.4.2-0">
+        <tagDatabase tag="hotfix-v5.4.2"/>
+    </changeSet>
+    <changeSet id="hotfix-v5.4.2-0" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="problemnotstartreason"/>
+        </preConditions>
+        <dropTable tableName="problemnotstartreason"/>
+        <rollback>
+            <createTable tableName="problemNotStartReason">
+                <column name="id" type="int(11)" autoIncrement="true">
+                    <constraints nullable="false" primaryKey="true"/>
+                </column>
+                <column name="problemID" type="int(11) UNSIGNED">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="userID" type="int(11)">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="reason" type="varchar(500)">
+                    <constraints nullable="true"/>
+                </column>
+                <column name="createAt" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                    <constraints nullable="true"/>
+                </column>
+            </createTable>
+            <addForeignKeyConstraint baseTableName="problemNotStartReason" baseColumnNames="problemID"
+                                     constraintName="fk_problemNotStartReason_problem"
+                                     referencedTableName="problem"
+                                     referencedColumnNames="pro_problemno"
+                                     onDelete="CASCADE"
+            />
+            <addForeignKeyConstraint baseTableName="problemNotStartReason" baseColumnNames="userID"
+                                     constraintName="fk_problemNotStartReason_user"
+                                     referencedTableName="consultant"
+                                     referencedColumnNames="cns_consno"
+                                     onDelete="CASCADE"
+            />
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

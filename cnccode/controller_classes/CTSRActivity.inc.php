@@ -16,7 +16,6 @@ require_once($cfg['path_dbe'] . '/DBECustomer.inc.php');
 require_once($cfg['path_dbe'] . '/DBEContact.inc.php');
 require_once($cfg['path_dbe'] . '/DBESite.inc.php');
 require_once($cfg['path_dbe'] . '/DBEHeader.inc.php');
-require_once($cfg['path_dbe'] . '/DBEProblemNotStartReason.inc.php');
 require_once($cfg['path_bu'] . '/BUProject.inc.php');
 require_once($cfg['path_bu'] . '/BUExpenseType.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomerItem.inc.php');
@@ -1008,28 +1007,6 @@ class CTSRActivity extends CTCNC
                     );
                     $nextURL       = "SRActivity.php?action=editActivity&callActivityID=" . $newActivityID;
                 }
-                $currentUser    = $this->getDbeUser();
-                $buCustomerItem = new BUCustomerItem($this);
-                $hasServiceDesk = $buCustomerItem->customerHasServiceDeskContract($body->customerID);
-                if (!$body->startWork && $body->priority == 1 && $currentUser->getValue(
-                        DBEUser::teamID
-                    ) == 1 && $hasServiceDesk) {
-                    $dbeProblemNotStartReason = new DBEProblemNotStartReason($this);
-                    $dbeProblemNotStartReason->setValue(
-                        DBEProblemNotStartReason::problemID,
-                        $dsCallActivity->getValue(DBEJCallActivity::problemID)
-                    );
-                    $dbeProblemNotStartReason->setValue(DBEProblemNotStartReason::reason, $body->notFirstTimeFixReason);
-                    $dbeProblemNotStartReason->setValue(
-                        DBEProblemNotStartReason::userID,
-                        $currentUser->getValue(DBEUser::userID)
-                    );
-                    $dbeProblemNotStartReason->setValue(
-                        DBEProblemNotStartReason::createAt,
-                        $body->dateRaised . ' ' . $body->timeRaised . ':00'
-                    );
-                    $dbeProblemNotStartReason->insertRow();
-                }
                 if (isset($body->customerproblemno) && $body->customerproblemno != null) {
                     $buActivity->deleteCustomerRaisedRequest($body->customerproblemno);
                 }
@@ -1044,7 +1021,9 @@ class CTSRActivity extends CTCNC
                     "raiseTypeId"      => $dbeProblem->getValue(DBEProblem::raiseTypeId),
                     "SLAResponseHours" => $dbeProblem->getValue(DBEProblem::slaResponseHours)
                 ];
-            } else return ["status" => 0];
+            } else {
+                return ["status" => 0];
+            }
         } catch (Exception $exception) {
             return ["status" => 3, "error" => $exception->getMessage()];
         }
@@ -1373,30 +1352,54 @@ GROUP BY caa_callacttypeno,
         $startDate  = $_REQUEST["startDate"] ?? null;
         $endDate    = $_REQUEST["endDate"] ?? null;
         $customerID = $_REQUEST["customerID"] ?? null;
-        $query      = "SELECT p.`id`,p.userID,p.`problemID`,p.`reason`,p.`createAt`,CONCAT(c.`firstName`,' ',c.`lastName`) userName ,cus_name customerName
-        FROM `problemnotstartreason` p  JOIN `consultant` c ON p.`userID`=c.`cns_consno`
-        JOIN problem on problem.pro_problemno= p.`problemID`
-        JOIN customer  cu on cu.cus_custno = problem.pro_custno
-        where 1=1 ";
-        $params     = [];
+        $query  = "SELECT
+  problem.`pro_problemno` as problemID,
+  customer.`cus_name` as customerName,
+  engineer.`cns_name` as userName,
+  problem.`notFirstTimeFixReason` as reason,
+  customer.cus_custno as customerID
+FROM
+  problem 
+  JOIN callactivity initial 
+    ON initial.caa_problemno = problem.pro_problemno 
+    AND initial.caa_callacttypeno = 51 
+  JOIN consultant engineer 
+    ON initial.`caa_consno` = engineer.`cns_consno` 
+    JOIN customer ON customer.`cus_custno` = problem.`pro_custno`
+   JOIN
+    (SELECT
+      COUNT(item.`itm_itemno`) AS items,
+      custitem.`cui_custno`
+    FROM
+      custitem
+      JOIN item
+        ON cui_itemno = itm_itemno
+    WHERE `itm_itemtypeno` = 56
+      AND cui_expiry_date >= NOW()
+      AND renewalStatus <> 'D'
+      AND declinedFlag <> 'Y'
+    GROUP BY cui_custno) a
+    ON a.cui_custno = problem.`pro_custno`
+    where problem.`pro_custno` <> 282 AND problem.raiseTypeId = 3 ";
+        $params = [];
         if (isset($problemID) && $problemID != '') {
-            $query               .= " and p.`problemID`=:problemID";
+            $query               .= " and problem.pro_problemno = :problemID";
             $params["problemID"] = $problemID;
         }
         if (isset($customerID) && $customerID != '') {
-            $query                .= " and problem.pro_custno=:customerID";
+            $query                .= " and problem.`pro_custno` = :customerID";
             $params["customerID"] = $customerID;
         }
         if (isset($userID) && $userID != '') {
-            $query            .= " and p.`userID`=:userID";
+            $query            .= " and engineer.`cns_consno`= :userID";
             $params["userID"] = $userID;
         }
         if (isset($startDate) && $startDate != '') {
-            $query               .= " and date(p.`createAt`) >=:startDate";
+            $query               .= " and initial.caa_date >= :startDate";
             $params["startDate"] = $startDate;
         }
         if (isset($endDate) && $endDate != '') {
-            $query             .= " and date(p.`createAt`) <=:endDate";
+            $query             .= " and initial.caa_date <= :endDate";
             $params["endDate"] = $endDate;
         }
         return DBConnect::fetchAll($query, $params);
