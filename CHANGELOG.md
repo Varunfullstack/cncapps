@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.4.2]
+### Fixed
+- Fixed First Time Fix reporting
+- Fixed issue with Internal notes not updating when copy/paste.
+
 ## [v5.4.1] - 2021-02-04
 ### Fixed
 - Fixed issue with misspelled words not getting saved correctly.
