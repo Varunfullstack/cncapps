@@ -102,49 +102,12 @@ class CTHome extends CTCNC
                 echo html_entity_decode($this->getFixedAndReopenData());
                 break;
             case self::GET_LOGGED_ACTIVITY_TIMES:
-                global $db;
-                $db->query(
-                    "SELECT
-  caa_starttime as startTime,
-  caa_endtime as endTime,
-  `caa_consno` as engineerId 
-FROM
-  callactivity
-WHERE callactivity.`caa_date` = '2021-01-29'
-  AND callactivity.`caa_endtime`
-  AND callactivity.`caa_consno` <> 67 order by engineerId, startTime"
-                );
-                $activities = $db->fetchAll();
-                $data       = [];
-                foreach ($activities as $activity) {
-                    $engineerId = $activity['engineerId'];
-                    if (!key_exists($engineerId, $data)) {
-                        $data[$engineerId] = array_fill(0, 24, 0);
-                    }
-                    foreach ($data[$engineerId] as $hour => $amount) {
-                        $thisHour  = DateTime::createFromFormat('H', $hour);
-                        $startTime = DateTime::createFromFormat('H:i', $activity["startTime"]);
-                        $endTime   = DateTime::createFromFormat('H:i', $activity['endTime']);
-                        $nextHour  = (clone($thisHour))->add(new DateInterval('PT1H'));
-                        if ($startTime > $nextHour || $endTime < $thisHour) {
-                            continue;
-                        }
-                        // find the time associated to this hour
-                        if ($startTime < $thisHour) {
-                            $startTime = $thisHour;
-                        }
-                        if ($endTime > $nextHour) {
-                            $endTime = $nextHour;
-                        }
-                        $diff = $startTime->diff($endTime);
-//                        if(!$data[$engineerId][])
-                        $data[$engineerId][$hour] += $diff->i;
-                        if ($data[$engineerId][$hour] > 60) {
-                            $data[$engineerId][$hour] = 60;
-                        }
-                    }
+                $team = 1;
+                if ($this->getParam('team')) {
+                    $team = $this->getParam('team');
                 }
-                echo json_encode(["status" => "ok", "data" => $data]);
+                $data = array_values($this->getLoggedActivityByTimeBracket($team));
+                echo json_encode(["status" => "ok", "data" => $data], JSON_NUMERIC_CHECK);
                 break;
             case self::getUpcomingVisitsData:
                 echo $this->getUpcomingVisitsData();
@@ -1696,5 +1659,85 @@ WHERE callactivity.`caa_date` = '2021-01-29'
                 ['settings' => $body->settings]
             );
         }
+    }
+
+    private function getLoggedActivityByTimeBracket(int $team)
+    {
+        $isStandardUser = false;
+        if (!$this->buUser->isSdManager($this->userID)) {
+            if ($this->buUser->getLevelByUserID($this->userID) <= 5) {
+                $team           = $this->buUser->getLevelByUserID($this->userID);
+                $isStandardUser = true;
+            } else {
+                return [];
+            }
+        }
+        $dbeUser = $this->getDbeUser();
+        $dbeUser->setValue(
+            DBEUser::userID,
+            $this->userID
+        );
+        global $db;
+        $statement  = $db->preparedQuery(
+            "SELECT
+  caa_starttime AS startTime,
+  caa_endtime AS endTime,
+  `caa_consno` AS engineerId,
+  consultant.cns_name AS engineerName
+FROM
+  callactivity
+  LEFT JOIN consultant
+    ON consultant.cns_consno = callactivity.caa_consno
+  LEFT JOIN team
+    ON consultant.`teamID` = team.`teamID`
+WHERE callactivity.`caa_date` = current_date()
+  AND callactivity.`caa_endtime`
+  AND callactivity.`caa_consno` <> 67
+  AND team.`level` = ?
+ORDER BY engineerName,
+  startTime",
+            [
+                [
+                    "type"  => "i",
+                    "value" => $team
+                ]
+            ]
+        );
+        $activities = $statement->fetch_all(MYSQLI_ASSOC);
+        $data       = [];
+        foreach ($activities as $activity) {
+            $engineerName = $activity['engineerName'];
+            if ($isStandardUser && $activity['engineerId'] !== $dbeUser->getValue(DBEUser::userID)) {
+                continue;
+            }
+            if (!key_exists($engineerName, $data)) {
+                $data[$engineerName] = [
+                    "engineerId"   => $activity['engineerId'],
+                    "engineerName" => $activity["engineerName"],
+                    "dataPoints"   => array_fill(0, 24, 0)
+                ];
+            }
+            foreach ($data[$engineerName]["dataPoints"] as $hour => $amount) {
+                $thisHour  = DateTime::createFromFormat('H', $hour);
+                $startTime = DateTime::createFromFormat('H:i', $activity["startTime"]);
+                $endTime   = DateTime::createFromFormat('H:i', $activity['endTime']);
+                $nextHour  = (clone($thisHour))->add(new DateInterval('PT1H'));
+                if ($startTime > $nextHour || $endTime < $thisHour) {
+                    continue;
+                }
+                if ($startTime < $thisHour) {
+                    $startTime = $thisHour;
+                }
+                if ($endTime > $nextHour) {
+                    $endTime = $nextHour;
+                }
+                $diff                                   = $startTime->diff($endTime);
+                $data[$engineerName]["dataPoints"][$hour] += $diff->i;
+                if ($data[$engineerName]["dataPoints"][$hour] > 60) {
+                    $data[$engineerName]["dataPoints"][$hour] = 60;
+                }
+            }
+        }
+        return $data;
     }
 }
