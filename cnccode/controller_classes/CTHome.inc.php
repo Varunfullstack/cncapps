@@ -110,7 +110,7 @@ class CTHome extends CTCNC
   `caa_consno` as engineerId 
 FROM
   callactivity
-WHERE callactivity.`caa_date` = '2021-02-02'
+WHERE callactivity.`caa_date` = '2021-01-29'
   AND callactivity.`caa_endtime`
   AND callactivity.`caa_consno` <> 67 order by engineerId, startTime"
                 );
@@ -136,8 +136,12 @@ WHERE callactivity.`caa_date` = '2021-02-02'
                         if ($endTime > $nextHour) {
                             $endTime = $nextHour;
                         }
-                        $diff                     = $startTime->diff($endTime);
+                        $diff = $startTime->diff($endTime);
+//                        if(!$data[$engineerId][])
                         $data[$engineerId][$hour] += $diff->i;
+                        if ($data[$engineerId][$hour] > 60) {
+                            $data[$engineerId][$hour] = 60;
+                        }
                     }
                 }
                 echo json_encode(["status" => "ok", "data" => $data]);
