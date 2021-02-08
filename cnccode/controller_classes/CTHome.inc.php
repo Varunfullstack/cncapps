@@ -31,6 +31,7 @@ class CTHome extends CTCNC
     const GET_ALL_USER_PERFORMANCE           = 'allUserPerformance';
     const GET_USER_PERFORMANCE               = 'userPerformance';
     const DEFAULT_LAYOUT                     = 'defaultLayout';
+    const GET_LOGGED_ACTIVITY_TIMES          = 'getLoggedActivityTimes';
     /** @var DataSet|DBEHeader */
     private $dsHeader;
     /** @var BUUser */
@@ -99,6 +100,47 @@ class CTHome extends CTCNC
                 break;
             case self::getFixedAndReopenData:
                 echo html_entity_decode($this->getFixedAndReopenData());
+                break;
+            case self::GET_LOGGED_ACTIVITY_TIMES:
+                global $db;
+                $db->query(
+                    "SELECT
+  caa_starttime as startTime,
+  caa_endtime as endTime,
+  `caa_consno` as engineerId 
+FROM
+  callactivity
+WHERE callactivity.`caa_date` = '2021-02-02'
+  AND callactivity.`caa_endtime`
+  AND callactivity.`caa_consno` <> 67 order by engineerId, startTime"
+                );
+                $activities = $db->fetchAll();
+                $data       = [];
+                foreach ($activities as $activity) {
+                    $engineerId = $activity['engineerId'];
+                    if (!key_exists($engineerId, $data)) {
+                        $data[$engineerId] = array_fill(0, 24, 0);
+                    }
+                    foreach ($data[$engineerId] as $hour => $amount) {
+                        $thisHour  = DateTime::createFromFormat('H', $hour);
+                        $startTime = DateTime::createFromFormat('H:i', $activity["startTime"]);
+                        $endTime   = DateTime::createFromFormat('H:i', $activity['endTime']);
+                        $nextHour  = (clone($thisHour))->add(new DateInterval('PT1H'));
+                        if ($startTime > $nextHour || $endTime < $thisHour) {
+                            continue;
+                        }
+                        // find the time associated to this hour
+                        if ($startTime < $thisHour) {
+                            $startTime = $thisHour;
+                        }
+                        if ($endTime > $nextHour) {
+                            $endTime = $nextHour;
+                        }
+                        $diff                     = $startTime->diff($endTime);
+                        $data[$engineerId][$hour] += $diff->i;
+                    }
+                }
+                echo json_encode(["status" => "ok", "data" => $data]);
                 break;
             case self::getUpcomingVisitsData:
                 echo $this->getUpcomingVisitsData();
