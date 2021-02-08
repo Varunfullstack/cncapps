@@ -67,7 +67,7 @@ class DBEDirectDebitContracts extends DBECustomerItem
             self::invoiceToDate,
             DA_DATE,
             DA_NOT_NULL,
-            "DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` + `invoicePeriodMonths` MONTH ), '%d/%m/%Y')"
+            "DATE_FORMAT( date_sub(DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` + `invoicePeriodMonths` MONTH ), INTERVAL 1 day), '%d/%m/%Y')"
         );
         $this->addColumn(
             self::invoiceFromDateYMD,
