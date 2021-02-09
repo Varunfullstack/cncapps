@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Changed
 - Issue 1218 - Include quantities for child items in Sales Orders
+- Issue 1221 - Email sending TO CC fields
 
 ## [v5.4.0]
 ### Added
@@ -32,7 +33,7 @@ This project changes will be shown here.
 ### Fixed
 - Sales Requests popup not clearing down.
 
-## [v5.3.2] - 2021-01-25 
+## [v5.3.2] - 2021-01-25
 ### Fixed
 - On the home page the links in this section are opening the Activity of the SR number, rather than the Activity ID.
 - Same section, stop the character codes from showing on the home page within Upcoming Visits.
