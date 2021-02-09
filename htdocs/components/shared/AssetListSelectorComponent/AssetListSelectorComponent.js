@@ -37,8 +37,8 @@ export default class AssetListSelectorComponent extends React.PureComponent {
             this.state.selectedOption = {
                 isAsset: true,
                 name: this.props.assetName,
-                lastUsername: userName,
-                biosVer: biosVer
+                lastUsername: userName == "undefined" ? "" : userName,
+                biosVer: biosVer == "undefined" ? "" : biosVer
             };
         }
     }
@@ -99,8 +99,7 @@ export default class AssetListSelectorComponent extends React.PureComponent {
         if (!option.isAsset) {
             return option.template.replace(/(<([^>]+)>)/gi, "");
         }
-
-        return `${option.name} ${option.lastUsername} ${option.biosVer}`;
+        return `${option.name} ${option.lastUsername || ""} ${option.biosVer || ""}`;
     }
 
     onChange(event, value, reason) {
