@@ -1,11 +1,9 @@
 # Changelog
 This project changes will be shown here.
-## [unrealesed]  
-### Added
-- Projects
-- General Reports
 
 ## [unreleased]
+### Added
+- Issue 684  - Project System Enhancements
 ### Changed
 - Issue 1218 - Include quantities for child items in Sales Orders
 - Issue 1221 - Email sending TO CC fields
