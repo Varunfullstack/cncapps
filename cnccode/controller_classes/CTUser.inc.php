@@ -987,7 +987,8 @@ class CTUser extends CTCNC
                 'globalExpenseApprover'      => $dbeJUser->getValue(DBEJUser::globalExpenseApprover),
                 'teamID'                     => $dbeJUser->getValue(DBEJUser::teamID),
                 'teamLevel'                  => $dbeJUser->getValue(DBEJUser::teamLevel),
-                'serviceRequestQueueManager' => $dbeJUser->getValue(DBEJUser::queueManager)
+                'serviceRequestQueueManager' => $dbeJUser->getValue(DBEJUser::queueManager),
+                'isProjectManager'      => $dbeJUser->getValue(DBEJUser::projectManagementFlag)=='Y',
             ]
         );
     }

@@ -73,7 +73,7 @@ class AutoComplete extends React.Component {
         const {activeSuggestion, filteredSuggestions, userInput} = this.state;
         const {displayColumn, onSelect} = this.props;
 
-        if (userInput.length == 0) {
+        if (userInput&&userInput.length == 0) {
             this.setState({
                 activeSuggestion: -1,
                 showSuggestions: false,

@@ -21,7 +21,19 @@ class CustomerSearch extends MainComponent {
         if (this.props.onChange)
             this.props.onChange(value)
     }
-
+    getCustomerName=()=>{
+        const {customers}=this.state;
+        
+        let customerName=this.props.customerName;
+        if(this.props.customerID)
+        {
+            const customer=customers.find(c=>c.id==this.props.customerID);
+            if(customer)
+            customerName=customer.name;
+        }
+        console.log(customerName);
+        return customerName;
+    }
     render() {        
         return this.el(AutoComplete, {
             errorMessage: "No Customer found",
@@ -30,7 +42,7 @@ class CustomerSearch extends MainComponent {
             displayColumn: "name",
             pk: "id",
             width: this.props.width || 300,
-            value:this.props.customerName,
+            value:this.getCustomerName(),
             onSelect: this.handleOnCustomerSelect,
         });
     }

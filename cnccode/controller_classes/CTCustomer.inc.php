@@ -1978,7 +1978,7 @@ class CTCustomer extends CTCNC
         Projects
         */
         $addProjectURL = Controller::buildLink(
-            'Project.php',
+            'Projects.php',
             array(
                 'action'     => 'add',
                 'customerID' => $this->getCustomerID()
@@ -2017,7 +2017,7 @@ class CTCustomer extends CTCNC
                     $deleteProjectText = 'delete';
                 }
                 $editProjectLink = Controller::buildLink(
-                    'Project.php',
+                    'Projects.php',
                     array(
                         'action'    => 'edit',
                         'projectID' => $dsProject->getValue(DBEProject::projectID)

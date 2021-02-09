@@ -22,7 +22,18 @@ class DBEProject extends DBEntity
     const outOfHoursBudgetDays = "outOfHoursBudgetDays";
     const inHoursBudgetDays = "inHoursBudgetDays";
     const calculatedBudget = "calculatedBudget";
-
+    
+    const engineersSummary="engineersSummary";
+    const projectManagersSummary="projectManagersSummary";
+    const projectClosureNotes="projectClosureNotes";
+    const projectClosureDate="projectClosureDate";
+    const projectManager="projectManager";    
+    const projectPlanningDate="projectPlanningDate";
+    const expectedHandoverQADate="expectedHandoverQADate";
+    const projectTypeID="projectTypeID";
+    const projectStageID="projectStageID";
+    const ordOriginalHeadID="ordOriginalHeadID";
+    const originalQuoteDocumentFinalAgreed="originalQuoteDocumentFinalAgreed";
     /**
      * calls constructor()
      * @access public
@@ -116,7 +127,61 @@ class DBEProject extends DBEntity
             DA_YN_FLAG,
             DA_NOT_NULL
         );
-
+        $this->addColumn(
+            self::engineersSummary,
+            DA_MEMO,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::projectManagersSummary,
+            DA_MEMO,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::projectClosureNotes,
+            DA_MEMO,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::projectClosureDate,
+            DA_DATE,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::projectManager,
+            DA_INTEGER,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::projectPlanningDate,
+            DA_DATE,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::expectedHandoverQADate,
+            DA_DATE,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::projectTypeID,
+            DA_INTEGER,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::projectStageID,
+            DA_INTEGER,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::ordOriginalHeadID,
+            DA_INTEGER,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::originalQuoteDocumentFinalAgreed,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
 
@@ -179,7 +244,7 @@ class DBEProject extends DBEntity
   project.projectID AS projectID,
   project.customerID,
   description,
-  notes,
+  project.notes,
   project.startDate,
   expiryDate,
   commenceDate,
@@ -192,13 +257,20 @@ class DBEProject extends DBEntity
   round(outOfHoursBudgetDays,2) as outOfHoursBudgetDays,
   round(inHoursBudgetDays,2) as inHoursBudgetDays,
   (SELECT GROUP_CONCAT(problem.`pro_problemno`) FROM problem WHERE pro_linked_ordno = project.`ordHeadID` AND project.ordHeadID <> 0) problemno,
-  calculatedBudget
+  calculatedBudget,
+  projectStageID,
+  stage.name projectStageName,
+  ptype.name projectTypeName,
+  expectedHandoverQADate
 FROM
   project 
   LEFT JOIN consultant engineer ON project.consultantID = engineer.cns_consno
   JOIN customer 
     ON cus_custno = project.customerID
   LEFT JOIN projectUpdates pu on pu.`projectID` = project.`projectID` and  pu.`id` = (select max(a.id) from projectUpdates a where a.projectID = project.`projectID`)
+  LEFT JOIN projectstages stage on stage.id = project.projectStageID
+  LEFT JOIN projecttypes  ptype on ptype.id = project.projectTypeID
+
 WHERE expiryDate >= NOW() OR expiryDate IS NULL
 ORDER BY customerName ASC";
 

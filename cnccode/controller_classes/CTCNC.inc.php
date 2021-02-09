@@ -538,7 +538,7 @@ class CTCNC extends Controller
             ],
             [
                 "id"    => 107,
-                "href"  => "Project.php",
+                "href"  => "Projects.php",
                 "label" => "Projects",
             ],
             [
@@ -1060,6 +1060,11 @@ class CTCNC extends Controller
                 "label" => "Lead Status Types",
                 "href"  => "LeadStatusTypes.php",
             ],
+            [
+                "id"    => 813,
+                "label" => "Project Options",
+                "href"  => "ProjectOptions.php",
+            ],
         ];
     }
 
@@ -1232,5 +1237,8 @@ class CTCNC extends Controller
     }
     function getBody(){
         return json_decode(file_get_contents('php://input'));
+    }
+    function hideMenu(){
+        $this->setHTMLFmt(CT_HTML_FMT_POPUP);
     }
 }

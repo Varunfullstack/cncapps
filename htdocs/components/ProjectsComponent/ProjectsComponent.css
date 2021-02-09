@@ -1,0 +1,40 @@
+.red{
+    color: red;
+}
+.bold{
+    font-weight: bold;
+}
+.white{
+    color: white !important;
+}
+.cke_editable_inline {
+    border: 1px groove #80808040
+}
+.card-header{
+    font-weight: bold;
+    font-size: 14px;
+}
+.form-group{
+    display: flex;
+    flex-direction: column;
+}
+.input{
+    width: 200px;
+    border:1px solid;
+    margin-right: 0px;
+    box-sizing: unset !important;
+    box-shadow: unset;
+    padding: 2px;
+    font-size: 12px;
+    line-height: 16px;
+}
+.mini-tabs{
+    display: flex;
+    flex-direction: row;
+}
+.mini-tab-item{
+    margin: 0 4px 0 4px;
+    background-color: #bdbec1;
+    padding: 5px;
+    border-radius: 10px;
+}

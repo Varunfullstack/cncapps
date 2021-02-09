@@ -268,7 +268,10 @@ dd {
 .btn-search {
     width: 70px;
 }
-
+.btn-danger {
+    background-color: #404041 !important;
+    color: white;
+}
 .nowrap {
     white-space: nowrap;
 }
@@ -1056,3 +1059,19 @@ input:checked + .slider:before {
 .text-left {
     text-align: left;
 }
+
+input:focus:required:invalid {border: 1px solid red;}
+input:required:invalid {border: 1px solid red;}
+input:required:valid { border: 1px solid black; }
+.disable{
+    background-color: #bdbec1 !important;
+}
+.disable:hover{
+    background-color: #bdbec1 !important;
+    color: #000;
+}
+
+select:focus:required:invalid {border: 1px solid red;}
+select:required:invalid {border: 1px solid red;}
+select:required:valid { border: 1px solid black; }
+ 

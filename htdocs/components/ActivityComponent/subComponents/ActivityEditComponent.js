@@ -20,6 +20,7 @@ import {InternalDocumentsComponent} from "./InternalDocumentsComponent";
 import AssetListSelectorComponent from "../../shared/AssetListSelectorComponent/AssetListSelectorComponent";
 import EditorFieldComponent from "../../shared/EditorField/EditorFieldComponent";
 import {TimeBudgetElement} from "./TimeBudgetElement";
+import { LinkServiceRequestOrder } from "./LinkserviceRequestOrder.js";
 
 // noinspection EqualityComparisonWithCoercionJS
 const hiddenAndCustomerNoteAlertMessage = `Customer note must be empty when the activity or entire SR is hidden.`;
@@ -98,6 +99,7 @@ class ActivityEditComponent extends MainComponent {
                 criticalSR: false,
                 monitorSR: false,
             },
+            showSalesOrder:false
         };
     }
 
@@ -873,16 +875,8 @@ class ActivityEditComponent extends MainComponent {
         );
     };
     handleSalesOrder = async (callActivityID, serviceRequestId) => {
-        const salesOrderId = await this.prompt('Sales Order ID:');
-        if (!salesOrderId) {
-            return;
-        }
-        try {
-            await this.api.linkSalesOrder(serviceRequestId, salesOrderId);
-            this.loadCallActivity(callActivityID);
-        } catch (e) {
-            this.alert(e.toString());
-        }
+        this.setState({showSalesOrder:true});
+
     };
     handleUnlink = async (callActivityID, linkedSalesOrderID, serviceRequestId) => {
         const res = await this.confirm(
@@ -1783,9 +1777,12 @@ class ActivityEditComponent extends MainComponent {
         }
         this.setState({data});
     };
-
+    handleSalesOrderClose=()=>{
+        this.setState({showSalesOrder:false});
+        this.loadCallActivity(this.state.currentActivity);
+    }
     render() {
-        const {data} = this.state;
+        const {data,showSalesOrder} = this.state;
         return (
             <div style={{width: "90%"}}>
                 {this.getAlert()}
@@ -1813,6 +1810,8 @@ class ActivityEditComponent extends MainComponent {
                 />
                 <InternalDocumentsComponent serviceRequestId={data?.problemID}/>
                 {this.getTemplateModal()}
+                {showSalesOrder?<LinkServiceRequestOrder serviceRequestID={data.problemID} customerId={data?.customerId} show={showSalesOrder}
+                onClose={this.handleSalesOrderClose}></LinkServiceRequestOrder>:null}
             </div>
         );
     }

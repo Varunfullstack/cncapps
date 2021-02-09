@@ -676,6 +676,9 @@ class CTSalesOrder extends CTCNC
                 $updatedTime = $this->buSalesOrder->updateOrderTime($orderHeadId);
                 echo json_encode(["status" => 'ok', "updatedTime" => $updatedTime]);
                 break;
+            case "customerInitialSalesOrders":
+                echo json_encode($this->getCustomerInitialSalesOrders());
+                break;
             default:
                 $this->checkPermissions(SALES_PERMISSION);
                 $this->displaySearchForm();
@@ -5119,5 +5122,21 @@ class CTSalesOrder extends CTCNC
             }
         }
         return $lastQuoted;
+    }
+    public function getCustomerInitialSalesOrders(){
+        $customerID=@$_REQUEST["customerID"];
+        if(empty($customerID))
+            throw new Exception("Customer Id missing",0);
+
+        $query=" SELECT `odh_ordno` orderID ,
+        `odh_custno` customerID,
+        `odh_type` type,
+        `odh_date` date,
+        odh_ref_cust,
+        (SELECT odl_desc FROM ordline line WHERE ord.`odh_ordno`=line.odl_ordno AND odl_type='C' ORDER BY isRecurring ,odl_item_no LIMIT 1) AS firstComment
+        FROM ordhead ORD
+        WHERE odh_custno=:customerID
+        AND `odh_type`='I' ";
+        return DBConnect::fetchAll($query,["customerID"=>$customerID]);
     }
 }

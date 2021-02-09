@@ -87,7 +87,7 @@ class DBConnect
     {
         // TODO: Implement __clone() method.
     }
-    public static function fetchOne($query,$params=null)
+    public static function fetchOne($query,$params=[])
     {
         $stmt=self::instance()->getDB()->prepare($query);
         if($params)
@@ -97,7 +97,7 @@ class DBConnect
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
-    public static function fetchAll($query,$params)
+    public static function fetchAll($query,$params=[])
     {
         $stmt=self::instance()->getDB()->prepare($query);
         foreach($params as $key=>$value)
