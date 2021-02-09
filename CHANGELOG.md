@@ -9,6 +9,7 @@ This project changes will be shown here.
 - Issue 1221 - Email sending TO CC fields
 - Issue 1219 - PO Status Report, include orders without SRs
 - Issue 1210 - Show Quantities for Direct Debit invoices
+- Issue 1184 - Activity Update button permission
 
 ## [v5.4.1] - 2021-02-04
 ### Fixed

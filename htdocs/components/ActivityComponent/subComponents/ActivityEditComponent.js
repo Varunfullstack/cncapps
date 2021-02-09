@@ -21,6 +21,7 @@ import AssetListSelectorComponent from "../../shared/AssetListSelectorComponent/
 import EditorFieldComponent from "../../shared/EditorField/EditorFieldComponent";
 import {TimeBudgetElement} from "./TimeBudgetElement";
 import { LinkServiceRequestOrder } from "./LinkserviceRequestOrder.js";
+import {ActivityType} from "../../shared/ActivityTypes";
 
 // noinspection EqualityComparisonWithCoercionJS
 const hiddenAndCustomerNoteAlertMessage = `Customer note must be empty when the activity or entire SR is hidden.`;
@@ -615,16 +616,13 @@ class ActivityEditComponent extends MainComponent {
             />)
         }
         const renderUpdateCancelButtons = () => {
-
-            if (data?.callActTypeID !== 59) {
-                const isEnabled = currentUser?.isSDManager || !(data?.callActType === 51 && data?.problemStatus === 'I');
-
+            const isInitialActivityAndServiceRequestNotStarted = data?.callActTypeID === ActivityType.INITIAL && data?.problemStatus === 'I';
+            const isCurrentUserSDManagerOrServiceRequestQueueManager = currentUser?.isSDManager || currentUser?.serviceRequestQueueManager;
+            if (isInitialActivityAndServiceRequestNotStarted || isCurrentUserSDManagerOrServiceRequestQueueManager) {
                 return <Fragment>
                     <button onClick={() => this.setNextStatus("Update")}
-                            disabled={!isEnabled}
                     >Update
                     </button>
-                    <button onClick={() => this.handleCancel(data)}>Cancel</button>
                 </Fragment>
             }
         }
@@ -659,6 +657,10 @@ class ActivityEditComponent extends MainComponent {
             > Parts Used
             </button>
             {renderUpdateCancelButtons()}
+            <button onClick={() => this.handleCancel(data)}
+            >
+                Cancel
+            </button>
         </div>
 
     }
