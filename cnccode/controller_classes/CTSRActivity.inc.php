@@ -56,6 +56,7 @@ class CTSRActivity extends CTCNC
     const VIEW_INTERNAL_DOCUMENT                                 = 'viewInternalDocument';
     const DELETE_INTERNAL_DOCUMENT                               = 'deleteInternalDocument';
     const REMOTE_SUPPORT_ACTIVITY_TYPE_ID                        = 8;
+    const GET_NOT_ATTEMPT_FIRST_TIME_FIX                         = "getNotAttemptFirstTimeFix";
     public  $serverGuardArray = array(
         ""  => "Please select",
         "Y" => "ServerGuard Related",
@@ -200,7 +201,7 @@ class CTSRActivity extends CTCNC
                 $dbeActivity = $buActivity->getLastActivityInProblem($this->getParam('serviceRequestId'));
                 echo json_encode(["status" => "ok", "data" => $dbeActivity->getValue(DBECallActivity::callActivityID)]);
                 exit;
-            case "getNotAttemptFirstTimeFix":
+            case self::GET_NOT_ATTEMPT_FIRST_TIME_FIX:
                 echo json_encode($this->getNotAttemptFirstTimeFix());
                 exit;
             default:
@@ -1391,11 +1392,11 @@ GROUP BY caa_callacttypeno,
             $params["userID"] = $userID;
         }
         if (isset($startDate) && $startDate != '') {
-            $query               .= " and p.`createAt` >=:startDate";
+            $query               .= " and date(p.`createAt`) >=:startDate";
             $params["startDate"] = $startDate;
         }
         if (isset($endDate) && $endDate != '') {
-            $query             .= " and p.`createAt` <=:endDate";
+            $query             .= " and date(p.`createAt`) <=:endDate";
             $params["endDate"] = $endDate;
         }
         return DBConnect::fetchAll($query, $params);

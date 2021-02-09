@@ -68,7 +68,7 @@ usort(
 );
 
 global $twig;
-$body = $twig->render('@internal/itemsNotYetReceivedEmail.html.twig', ["itemsNotYetReceived" => $result]);
+$body = $twig->render('@internal/itemsNotYetReceivedEmail.html.twig', ["itemsNotYetReceived" => $result, "pageDomain" => SITE_URL,"salesOrdersWithoutSRs" => $buItemsNotYetReceived->getOrdersWithoutSR()]);
 
 if (!$outputToScreen) {
 

@@ -38,7 +38,6 @@ class ActivityEditComponent extends MainComponent {
         Escalate: "Escalate",
         Update: "Update"
     };
-    autoSavehandler = null;
 
     constructor(props) {
         super(props);
@@ -133,13 +132,10 @@ class ActivityEditComponent extends MainComponent {
                 currentUser,
                 priorityReasons: priorityChangeReasonStandardTextItems,
             });
-            setTimeout(() => this.autoSave(), 2000);
         });
     }
 
     componentWillUnmount() {
-        clearInterval(this.autoSavehandler);
-
     }
 
     //------------API
@@ -405,9 +401,20 @@ class ActivityEditComponent extends MainComponent {
     }
 
     setValue = (label, value) => {
+        const autoUpdateFields = [
+            'internalNotesTemplate',
+            'cncNextActionTemplate',
+            'reasonTemplate',
+            'customerNotesTemplate',
+        ]
+
         const {data} = this.state;
         data[label] = value;
-        this.setState({data});
+        this.setState({data}, () => {
+            if (autoUpdateFields.indexOf(label) > -1) {
+                this.saveToSessionStorage();
+            }
+        });
     };
     //-----------------Template
     getProjectsElement = () => {
@@ -671,21 +678,21 @@ class ActivityEditComponent extends MainComponent {
                 document.location = `SRActivity.php?action=displayActivity&callActivityID=${data.callActivityID}`;
         }
     };
-    autoSave = () => {
-        this.autoSavehandler = setInterval(() => {
-            const {data} = this.state;
-            const activityEdit = {
-                id: data.callActivityID,
-                internalNotesTemplate: data.internalNotesTemplate,
-                cncNextActionTemplate: data.cncNextActionTemplate,
-                reasonTemplate: data.reasonTemplate,
-                customerNotesTemplate: data.customerNotesTemplate,
-            }
-            let activities = this.getSessionNotes().filter(a => a.id !== data.callActivityID);
-            activities.push(activityEdit);
-            sessionStorage.setItem("activityEdit", JSON.stringify(activities));
-        }, 10000);
+
+    saveToSessionStorage() {
+        const {data} = this.state;
+        const activityEdit = {
+            id: data.callActivityID,
+            internalNotesTemplate: data.internalNotesTemplate,
+            cncNextActionTemplate: data.cncNextActionTemplate,
+            reasonTemplate: data.reasonTemplate,
+            customerNotesTemplate: data.customerNotesTemplate,
+        }
+        let activities = this.getSessionNotes().filter(a => a.id !== data.callActivityID);
+        activities.push(activityEdit);
+        sessionStorage.setItem("activityEdit", JSON.stringify(activities));
     }
+
     getSessionNotes = () => {
         sessionStorage.getItem("activityEdit");
         return JSON.parse(sessionStorage.getItem("activityEdit")) || [];
@@ -1401,8 +1408,8 @@ class ActivityEditComponent extends MainComponent {
         }
         test();
     };
-    handleTemplateValueChange = ($event) => {
-        this.setState({templateValue: $event.editor.getData()});
+    handleTemplateValueChange = (data) => {
+        this.setState({templateValue: data});
     };
     handleTemplateSend = async (type) => {
         const {
@@ -1559,7 +1566,9 @@ class ActivityEditComponent extends MainComponent {
                     ?
                     <EditorFieldComponent name="reason"
                                           value={data?.reason || ""}
-                                          onChange={(value) => this.setValue("reasonTemplate", value)}
+                                          onChange={(value) => {
+                                              this.setValue("reasonTemplate", value)
+                                          }}
                     />
                     : null
             ),

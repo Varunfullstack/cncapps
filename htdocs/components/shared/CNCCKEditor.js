@@ -41,8 +41,6 @@ class CNCCKEditor extends React.Component {
             }
 
             const editor = this.editor = CKEDITOR[constructor](this.element, config);
-
-            this._attachEventHandlers();
             // We must force editability of the inline editor to prevent `element-conflict` error.
             // It can't be done via config due to CKEditor 4 upstream issue (#57, ckeditor/ckeditor4#3866).
             if (type === 'inline' && !readOnly) {
@@ -93,30 +91,6 @@ class CNCCKEditor extends React.Component {
         if (prevProps.style !== props.style && editor.container) {
             editor.container.setStyles(props.style);
         }
-
-        this._attachEventHandlers(prevProps);
-    }
-
-    _attachEventHandlers(prevProps = {}) {
-        const props = this.props;
-
-        Object.keys(this.props).forEach(propName => {
-            if (!propName.startsWith('on') || prevProps[propName] === props[propName]) {
-                return;
-            }
-
-            this._attachEventHandler(propName, prevProps[propName]);
-        });
-    }
-
-    _attachEventHandler(propName, prevHandler) {
-        const evtName = `${propName[2].toLowerCase()}${propName.substr(3)}`;
-
-        if (prevHandler) {
-            this.editor.removeListener(evtName, prevHandler);
-        }
-
-        this.editor.on(evtName, this.props[propName]);
     }
 
     _destroyEditor() {
@@ -140,6 +114,11 @@ class CNCCKEditor extends React.Component {
                  style={this.props.style}
                  ref={ref => (this.element = ref)}
                  className={`testing ${this.props.excludeFromErrorCount ? 'excludeFromErrorCount' : ''}`}
+                 onInput={$event => {
+                     if (this.props.onChange) {
+                         this.props.onChange(this.editor.getData());
+                     }
+                 }}
             />
             <div key="bottom"
                  id="bottom"

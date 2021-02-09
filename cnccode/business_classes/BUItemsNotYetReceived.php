@@ -17,7 +17,7 @@ class BUItemsNotYetReceived extends Business
     public function getItemsNotYetReceived($daysAgo = 7)
     {
         global $db;
-        $query = "SELECT porhead.deliveryConfirmedFlag,
+        $query     = "SELECT porhead.deliveryConfirmedFlag,
        porhead.`poh_porno`                                             as purchaseOrderId,
        customer.`cus_name`                                             as customerName,
        item.`itm_desc`                                                 as itemDescription,
@@ -90,19 +90,65 @@ ORDER BY poh_required_by, ordhead.`odh_custno` DESC, pol_porno, `pol_lineno`
                 ]
             ]
         );
-
-        $data = [];
-
+        $data      = [];
         /** @var ItemNotYetReceived $item */
         while ($item = $statement->fetch_object(ItemNotYetReceived::class)) {
             if (!isset(ItemNotYetReceived::$items[$item->getPurchaseOrderId()])) {
                 ItemNotYetReceived::$items[$item->getPurchaseOrderId()] = true;
             }
-
             if (!$item->isDeliveryConfirmed() && ItemNotYetReceived::$items[$item->getPurchaseOrderId(
                 )] && !$item->isGreenType()) {
                 ItemNotYetReceived::$items[$item->getPurchaseOrderId()] = false;
             }
+            $data[] = $item;
+        }
+        return $data;
+    }
+
+    public function getOrdersWithoutSR(): array
+    {
+        global $db;
+        $statement = $db->preparedQuery(
+            "SELECT
+  ordline.odl_ordno AS salesOrderId,
+  customer.cus_name as customerName,
+  odl_desc AS itemLineDescription
+FROM
+  ordline
+  LEFT JOIN ordhead
+    ON ordhead.odh_ordno = ordline.`odl_ordno`
+  LEFT JOIN problem
+    ON pro_linked_ordno = ordline.odl_ordno
+  LEFT JOIN item
+    ON odl_itemno = item.itm_itemno
+  join customer on ordhead.odh_custno = customer.cus_custno
+WHERE (
+    (
+      odl_type = 'I'
+      AND (
+        (
+          item.renewalTypeID
+          AND (
+            ordline.odl_renewal_cuino IS NULL
+            OR ordline.odl_renewal_cuino = 0
+          )
+        )
+        OR ordline.odl_desc LIKE '%labour%'
+      )
+    )
+    OR (
+      odl_type = 'C'
+      AND ordline.odl_desc LIKE '%labour%'
+    )
+  )
+  AND problem.pro_problemno IS NULL
+  AND odh_type IN ('I', 'P')
+GROUP BY ordline.`odl_ordno`
+",
+            []
+        );
+        $data      = [];
+        while ($item = $statement->fetch_object(\CNCLTD\SalesOrderWithoutServiceRequestDTO::class)) {
             $data[] = $item;
         }
         return $data;
