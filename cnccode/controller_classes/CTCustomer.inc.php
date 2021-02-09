@@ -3288,20 +3288,45 @@ class CTCustomer extends CTCNC
         return $sites;
     }
 
-    function getCustomerAssets()
+    function getCustomerAssets(): array
     {
         $customerId = $_GET["customerId"];
         $labtechDB  = $this->getLabtechDB();
-        $query      = "select  computers.name,computers.assetTag,computers.LastUsername,  computers.BiosVer, computers.BiosName  from computers 
-        join clients on 
-            computers.clientid = clients.clientid
-            and clients.externalID = $customerId     
-            order by computers.name, computers.LastUsername, computers.BiosVer
+        $query      = "SELECT
+  computers.name AS `name`,
+  computers.assetTag AS `assetTag`,
+  computers.LastUsername AS `lastUsername`,
+  computers.BiosVer AS `biosVer`,
+  computers.BiosName AS `biosName`
+FROM
+  computers
+  JOIN clients
+    ON computers.clientid = clients.clientid
+    AND clients.externalID = ?
+UNION
+ALL
+SELECT
+  plugin_vm_esxhosts.`DeviceName` AS `name`,
+  NULL AS `assetTag`,
+  NULL AS `lastUsername`,
+  NULL AS `biosVer`,
+  NULL AS `biosName`
+FROM
+  plugin_vm_esxhosts
+  JOIN `networkdevices`
+    ON networkdevices.deviceID = plugin_vm_esxhosts.deviceID
+  JOIN locations
+    ON networkdevices.LocationID = locations.LocationID
+  JOIN clients
+    ON locations.ClientID = clients.ClientID
+WHERE clients.`ExternalID` = ?
+ORDER BY NAME,
+  lastUsername,
+  biosVer
         ";
         $statement  = $labtechDB->prepare($query);
-        $test       = $statement->execute();
-        $data       = $statement->fetchAll(PDO::FETCH_ASSOC);
-        return $data;
+        $statement->execute([$customerId, $customerId,]);
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
