@@ -26,10 +26,13 @@ class SalesOrdersWithoutSRComponent extends React.PureComponent {
                 <table>
                     <thead>
                     <tr>
-                        <th>
+                        <th style={{textAlign: 'left'}}>
                             SO Number
                         </th>
-                        <th>
+                        <th style={{textAlign: 'left'}}>
+                            Customer
+                        </th>
+                        <th style={{textAlign: 'left'}}>
                             Description
                         </th>
                     </tr>
@@ -42,6 +45,9 @@ class SalesOrdersWithoutSRComponent extends React.PureComponent {
                                         <a href={`/SalesOrder.php?action=displaySalesOrder&ordheadID=${x.salesOrderId}`}
                                            target="_blank"
                                         >{x.salesOrderId}</a>
+                                    </td>
+                                    <td>
+                                        {x.customerName}
                                     </td>
                                     <td>
                                         {x.itemLineDescription}

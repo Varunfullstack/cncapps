@@ -64,44 +64,7 @@ class CTItemsNotYetReceived extends CTCNC
                 echo json_encode($data);
                 break;
             case self::GET_ORDERS_WITHOUT_SR_DATA:
-                global $db;
-                $db->query(
-                    "SELECT
-  ordline.odl_ordno AS salesOrderId,
-  odl_desc AS itemLineDescription
-FROM
-  ordline
-  LEFT JOIN ordhead
-    ON ordhead.odh_ordno = ordline.`odl_ordno`
-  LEFT JOIN problem
-    ON pro_linked_ordno = ordline.odl_ordno
-  LEFT JOIN item
-    ON odl_itemno = item.itm_itemno
-WHERE (
-    (
-      odl_type = 'I'
-      AND (
-        (
-          item.renewalTypeID
-          AND (
-            ordline.odl_renewal_cuino IS NULL
-            OR ordline.odl_renewal_cuino = 0
-          )
-        )
-        OR ordline.odl_desc LIKE '%labour%'
-      )
-    )
-    OR (
-      odl_type = 'C'
-      AND ordline.odl_desc LIKE '%labour%'
-    )
-  )
-  AND problem.pro_problemno IS NULL
-  AND odh_type IN ('I', 'P')
-GROUP BY ordline.`odl_ordno`
-"
-                );
-                $data = $db->fetchAll();
+                $data = $this->buItemsNotYetReceived->getOrdersWithoutSR();
                 echo json_encode(["status" => "ok", "data" => $data]);
                 break;
             default:
