@@ -11,7 +11,7 @@ import CustomerSearch from '../shared/CustomerSearch';
 import ToolTip from '../shared/ToolTip';
 import APIUser from '../services/APIUser';
 import Table from '../shared/table/table';
-//import './CustomerFeedbackComponent.css';
+import './CustomerFeedbackComponent.css';
 class CustomerFeedbackComponent extends MainComponent {
     api = new APICustomerFeedback();
     apiUser=new APIUser();
@@ -24,7 +24,8 @@ class CustomerFeedbackComponent extends MainComponent {
                 from:moment().subtract(1,'M').format('YYYY-MM-DD'),
                 to:'',
                 customerID:'',
-                engineerID:''
+                engineerID:'',
+                customerName:''
             }    
         }
     }
@@ -47,7 +48,7 @@ class CustomerFeedbackComponent extends MainComponent {
                 <tr>
                     <td>Customer</td>
                     <td>
-                        <CustomerSearch onChange={(customer)=>this.setFilter('customerID',customer.id)}></CustomerSearch>
+                        <CustomerSearch width={200} customerName={filter.customerName} onChange={(customer)=>this.handleCustomer}></CustomerSearch>
                     </td>
                 </tr>
                 <tr>
@@ -55,6 +56,7 @@ class CustomerFeedbackComponent extends MainComponent {
                     <td>
                         <select value={filter.engineerID}
                         onChange={(event)=>this.setFilter('engineerID',event.target.value)}
+                        className="input"
                         >
                             <option></option>
                             {users.map(u=><option key={u.id} value={u.id}>{u.name}</option>)}
@@ -63,22 +65,43 @@ class CustomerFeedbackComponent extends MainComponent {
                 </tr>
                 <tr>
                     <td>Date From</td>
-                    <td><input type="date" value={filter.from} onChange={(event)=>this.setFilter('from',event.target.value)}></input></td>
+                    <td><input className="input" type="date" value={filter.from} onChange={(event)=>this.setFilter('from',event.target.value)}></input></td>
                 </tr>
                 <tr>
                     <td>Date To</td>
-                    <td><input type="date" value={filter.to} onChange={(event)=>this.setFilter('to',event.target.value)}></input></td>
+                    <td><input className="input" type="date" value={filter.to} onChange={(event)=>this.setFilter('to',event.target.value)}></input></td>
                 </tr>
                 <tr>
                     <td></td>
                     <td>
-                        <ToolTip title="Search">
+                        <div style={{display:"flex"}}>
+                        <ToolTip title="Search" width={30}>
                             <i className="fal fa-search fa-2x icon pointer" onClick={()=>this.getData()}></i>
                         </ToolTip>
+                        <ToolTip title="Reset" width={30}>
+                            <i className="fal fa-sync fa-2x icon pointer" onClick={()=>this.clearSearch()}></i>
+                        </ToolTip>
+                        </div>
                     </td>
                 </tr>
             </tbody>
         </table>
+    }
+    handleCustomer=(customer)=>{
+        const {filter}=this.state;
+        filter.customerID=customer.id;
+        filter.customerName=customer.name;
+        this.setState({filter});
+    }
+    clearSearch=()=>{
+        const {filter}=this.state;
+        filter.engineerID='';
+        filter.from='';
+        filter.to='';
+        filter.customerID='';
+        filter.customerName='';
+        this.setState({filter});
+
     }
     getSearchResultElement=()=>{
         const {feedbacks}=this.state;

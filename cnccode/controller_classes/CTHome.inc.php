@@ -1670,6 +1670,7 @@ class CTHome extends CTCNC
                     AND f.`createdAt` >= DATE_FORMAT(NOW(), '%Y-01-01') 
                     AND f.`createdAt` < DATE_FORMAT(NOW(), '%Y-04-01')
                     AND  cons.teamID<=5
+                    AND problem.pro_custno <> 282
                 GROUP BY   cons.teamID   
             UNION         
                 SELECT       
@@ -1686,6 +1687,7 @@ class CTHome extends CTCNC
                     AND f.`createdAt` >= DATE_FORMAT(NOW(), '%Y-04-01') 
                     AND f.`createdAt` < DATE_FORMAT(NOW(), '%Y-07-01')
                     AND  cons.teamID<=5
+                    AND problem.pro_custno <> 282
                 GROUP BY   cons.teamID      
             UNION         
                 SELECT       
@@ -1702,6 +1704,7 @@ class CTHome extends CTCNC
                     AND f.`createdAt` >= DATE_FORMAT(NOW(), '%Y-07-01') 
                     AND f.`createdAt` < DATE_FORMAT(NOW(), '%Y-10-01')
                     AND  cons.teamID<=5
+                    AND problem.pro_custno <> 282
                 GROUP BY   cons.teamID   
             UNION         
                 SELECT       
@@ -1718,6 +1721,7 @@ class CTHome extends CTCNC
                     AND f.`createdAt` >= DATE_FORMAT(NOW(), '%Y-10-01') 
                     AND f.`createdAt` <= DATE_FORMAT(NOW(), '%Y-12-31')
                     AND  cons.teamID<=5
+                    AND problem.pro_custno <> 282
                 GROUP BY   cons.teamID 
           ";
           return DBConnect::fetchAll($query,[]);

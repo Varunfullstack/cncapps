@@ -1,5 +1,5 @@
 "use strict";
-import {getTeamCode, groupBy, params, poundFormat} from "../utils/utils";
+import {getTeamCode, groupBy, params, poundFormat, sort} from "../utils/utils";
 import ReactDOM from 'react-dom';
 import React from 'react';
 import '../style.css';
@@ -110,6 +110,7 @@ class HomeComponent extends MainComponent {
                 t.happy=Math.round(t.happy*100/total)+'%';
                 t.average=Math.round(t.average*100/total)+'%';
                 t.unhappy=Math.round(t.unhappy*100/total)+'%';
+                t.teamCode=getTeamCode(t.teamID)
             });
             console.log(teamsFeedback);
             this.setState({
@@ -847,7 +848,7 @@ class HomeComponent extends MainComponent {
     }
     getTeamsFeedback = () => {
         const {teamsFeedback} = this.state;
-        const teams=groupBy(teamsFeedback,'teamID');
+        const teams=groupBy(sort(teamsFeedback,'teamID'),'teamID');
         const quarters=['Q1','Q2','Q3','Q4'];
         return (
             <table className="table table-striped">
