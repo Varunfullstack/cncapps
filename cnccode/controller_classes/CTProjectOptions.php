@@ -83,7 +83,7 @@ class CTProjectOptions extends CTCNC
 
     //------------------start ProjectStages
     function getProjectStages(){
-        return DBConnect::fetchAll("select id, name,stageOrder from projectstages order by stageOrder");
+        return DBConnect::fetchAll("select id, name,stageOrder,displayInSR from projectstages order by stageOrder");
     }
 
     function addProjectStage(){
@@ -91,8 +91,8 @@ class CTProjectOptions extends CTCNC
         if($body->name!='')
         {
             $stageOrder=DBConnect::fetchOne("select max(stageOrder)+1 stageOrder from projectstages")["stageOrder"];
-            $status=DBConnect::execute(" insert into projectstages(name,stageOrder) values(:name,:stageOrder)",
-            ["name"=>$body->name,"stageOrder"=>$stageOrder]);
+            $status=DBConnect::execute(" insert into projectstages(name,stageOrder,displayInSR) values(:name,:stageOrder,:displayInSR)",
+            ["name"=>$body->name,"stageOrder"=>$stageOrder,"displayInSR"=>$body->displayInSR]);
             return ["status"=>$status];
         }
         else return ["status"=>false];
@@ -104,8 +104,8 @@ class CTProjectOptions extends CTCNC
         $type=DBConnect::fetchOne("select * from projectstages where id=:id",["id"=>$id]);
         if(!$type)
             throw new Exception("Not found",404);
-        return ["status"=>DBConnect::execute("update projectstages set name=:name,stageOrder=:stageOrder where id=:id",
-                ["id"=>$id,"name"=>$body->name,"stageOrder"=>$body->stageOrder])];
+        return ["status"=>DBConnect::execute("update projectstages set displayInSR=:displayInSR, name=:name,stageOrder=:stageOrder where id=:id",
+                ["id"=>$id,"name"=>$body->name,"stageOrder"=>$body->stageOrder,"displayInSR"=>$body->displayInSR])];
     }
 
     function deleteProjectStage(){

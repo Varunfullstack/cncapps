@@ -56,7 +56,7 @@ export class LinkServiceRequestOrder extends MainComponent {
                     {salesOrders.map(order=><tr style={{cursor:"pointer"}} key={order.orderID} onClick={()=>this.setState({newOrdHeadID:order.orderID})}>
                       <td>
                         <ToolTip title="Select Order">
-                          <i className="fal fa-check fa-2x icon pointer" style={{color:"white"}}></i>
+                          <i className="fal fa-plus fa-2x icon pointer" style={{color:"white"}}></i>
                         </ToolTip>
                         
                       </td>

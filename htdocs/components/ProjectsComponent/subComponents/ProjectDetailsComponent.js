@@ -38,8 +38,8 @@ export default class ProjectDetailsComponent extends MainComponent {
       data:{
         inHoursQuantity:'',
         outOfHoursQuantity:'',
-        inHoursMeasure:'d',
-        outOfHoursMeasure:'d',
+        inHoursMeasure:'h',
+        outOfHoursMeasure:'h',
         newUpdate:'',
         description:'',
         notes:'',
@@ -110,8 +110,8 @@ export default class ProjectDetailsComponent extends MainComponent {
             console.log({...this.state.data,...data},budgetData);
             data.inHoursQuantity='';
             data.outOfHoursQuantity='';
-            if(data.originalQuoteDocumentFinalAgreed!=''&&data.originalQuoteDocumentFinalAgreed!=null)
-            data.originalQuoteDocumentFinalAgreed="file://///"+data.originalQuoteDocumentFinalAgreed;
+            //if(data.originalQuoteDocumentFinalAgreed!=''&&data.originalQuoteDocumentFinalAgreed!=null)
+            //data.originalQuoteDocumentFinalAgreed="file://///"+data.originalQuoteDocumentFinalAgreed;
             this.setState({data:{...this.state.data,...data},budgetData,showSpinner:false,projectStagesHistory});
         });
     }
@@ -258,7 +258,7 @@ export default class ProjectDetailsComponent extends MainComponent {
                       </td>
                   </tr> 
                   <tr>
-                      <td>Original Quote Document with final agreed document</td>
+                      <td>Original Quote Document agreed with customer</td>
                       <td>
                           <input  className="input" disabled={disabled} value={data.originalQuoteDocumentFinalAgreed||''} onChange={(event)=>this.setValue('originalQuoteDocumentFinalAgreed',event.target.value)}></input>
                       </td>
@@ -292,7 +292,7 @@ export default class ProjectDetailsComponent extends MainComponent {
                   </tr> 
               </tbody>
           </table>
-          {mode=='edit'?this.getOtherInfoElement():null}
+          
           <div style={{display:'block'}}>
             {mode=='edit'?
               <button onClick={()=>this.handleUpdate()}>Update</button>:null
@@ -358,8 +358,7 @@ export default class ProjectDetailsComponent extends MainComponent {
  }
 
  getOtherInfoElement=()=>{
-     let { data ,disabled,mode} = this.state;
-     
+     let { data ,disabled} = this.state;     
     if(!data.calculatedBudget)
     disabled='disabled';
      return (
@@ -482,11 +481,16 @@ export default class ProjectDetailsComponent extends MainComponent {
      );
  }
  getBudgetElement=()=>{
-     const {budgetData}=this.state;
+     const {budgetData,mode}=this.state;
      let cData=groupBy(budgetData.data,'caa_consno');
      let gActivity=groupBy(budgetData.data,'cat_desc');     
      return <div>
          <label>(Hours)</label>
+         {mode=='edit'?this.getOtherInfoElement():null}
+         <br/>
+         {mode=='edit'?
+              <button onClick={()=>this.handleUpdate()}>Update</button>:null
+            }
      <table className="table table-striped" style={{width:750}}>
          <thead>
              <tr>
@@ -641,7 +645,7 @@ handleUpdate=async()=>{
         );
         if (overrite) await this.api.uploadProjectFiles(data.projectID, files);
       }
-      this.setState({data});
+      this.getData();
      // document.location = "Projects.php";
     }
     //this.getData();    
@@ -703,10 +707,10 @@ getActionsElement=()=>{
         </ToolTip>
       ) : null}
       <div style={{width:15}}></div>
-      {data.ordOriginalHeadID ?  <ToolTip title="Sales Order" width={30}>
+      {data.ordOriginalHeadID ?  <ToolTip title="Original Sales Order" width={30}>
         <a href={`SalesOrder.php?action=displaySalesOrder&ordheadID=${data.ordOriginalHeadID}`}   target="_blank">
           <i
-            className="fa fa-tag fa-2x m-5 pointer icon"            
+            className="fal fa-lightbulb fa-2x m-5 pointer icon"            
           ></i>
           </a>
         </ToolTip>:null
@@ -714,15 +718,15 @@ getActionsElement=()=>{
       {!data.ordOriginalHeadID ? 
             <ToolTip title="Original Sales Order" width={30}>
               <i
-                className="fa fa-tag fa-2x m-5 pointer icon"
+                className="fal fa-lightbulb fa-2x m-5 pointer icon"
                 onClick={()=>this.handleSalesOrder(true)}
               ></i>
             </ToolTip>:null
       }
       {data.ordOriginalHeadID ? (
-        <ToolTip title="Unlink Sales Order" width={30}>
+        <ToolTip title="Unlink Original Sales Order" width={30}>
           <i
-            className="fa fa-unlink fa-2x m-5 pointer icon"
+            className="fal fa-lightbulb-slash fa-2x m-5 pointer icon"
             onClick={()=>this.handleUnlinkSalesOrder(true)}
           ></i>
         </ToolTip>
@@ -749,7 +753,7 @@ getActionsElement=()=>{
       </ToolTip>:null
       }
       { !this.isEmpty(data.originalQuoteDocumentFinalAgreed)?
-      <ToolTip title="Original Quote Document with final agreed document" width={30}>        
+      <ToolTip title="Original Quote Document agreed with customer" width={30}>        
           <i className="fal fa-file-check fa-2x m-5 pointer icon" onClick={this.handleDownloadOriginalQuote}></i>        
       </ToolTip>:null
       }
@@ -809,7 +813,7 @@ getSalesOrderModal=()=>{
               {salesOrders.map(order=><tr style={{cursor:"pointer"}} key={order.orderID} onClick={()=>this.setState({newOrdHeadID:order.orderID})}>
                 <td>
                   <ToolTip title="Select Order">
-                    <i className="fal fa-check fa-2x icon pointer" style={{color:"white"}}></i>
+                    <i className="fal fa-plus fa-2x icon pointer" style={{color:"white"}}></i>
                   </ToolTip>
                   
                 </td>

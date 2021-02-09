@@ -526,4 +526,32 @@
         <rollback>
           </rollback>
     </changeSet> 
+    <changeSet id="issue684-20" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">             
+                <tableExists tableName="ProjectTypes" />                            
+        </preConditions>
+
+        <sql>
+            insert into ProjectTypes(name) values('Server or Microsoft 365');
+            insert into ProjectTypes(name) values('Other');         
+        </sql>
+        <rollback>
+        </rollback>
+    </changeSet> 
+     <changeSet id="issue684-21" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">             
+                <tableExists tableName="ProjectStages" />                            
+        </preConditions>
+
+        <addColumn tableName="ProjectStages">
+            <column name="displayInSR" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="true"/>
+            </column>           
+        </addColumn>
+        <sql>
+            update ProjectStages set  displayInSR=1 where name in ('Project in progress','In QA');
+        </sql>
+        <rollback>
+        </rollback>
+    </changeSet> 
 </databaseChangeLog>

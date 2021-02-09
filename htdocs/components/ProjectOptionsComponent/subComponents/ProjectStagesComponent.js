@@ -5,6 +5,7 @@ import {dateFormatExcludeNull, exportCSV, poundFormat} from "../../utils/utils";
 import APIProjectOptions from "../services/APIProjectOptions";
 import ToolTip from "../../shared/ToolTip";
 import Modal from "../../shared/Modal/modal";
+import CheckBox from "../../shared/checkBox";
 
 export class ProjectStagesComponent extends MainComponent {
     api=new APIProjectOptions();
@@ -14,7 +15,8 @@ export class ProjectStagesComponent extends MainComponent {
             ...this.state,
             data:{
                 id:'',
-                name:''
+                name:'',
+                displayInSR:false
             },
             items:[],
             showModal:false
@@ -49,6 +51,18 @@ export class ProjectStagesComponent extends MainComponent {
                 icon: "fal fa-2x fa-file-alt color-gray2 pointer",
                 sortable: true,
                                 
+             },
+             {
+                path: "displayInSR",
+                label: "",
+                hdToolTip: "Display In SR",
+                hdClassName: "text-center",
+                icon: "fal fa-2x fa-eye color-gray2 pointer",
+                sortable: true,
+                className: "text-center",               
+                content:(stage)=><a onClick={()=>{stage.displayInSR=!stage.displayInSR; this.setState({data:stage},()=>this.handleSave())}}>
+                {stage.displayInSR?<i className="fal fa-check-square fa-2x icon pointer"></i>:<i className="fal fa-square fa-2x icon pointer"></i>}
+                </a>
              },
              {
                 path: "edit",
@@ -122,10 +136,20 @@ export class ProjectStagesComponent extends MainComponent {
             return null;
         return <Modal title="Project Stage Name" show={showModal} width={300}
             onClose={()=>this.setState({showModal:false})}
-            content={<div key="content" className="form-group">
+            content={
+                <div key="content" >
+                    <div className="form-group">
                         <label>Name</label>
-                        <input required style={{width:200}} value={data.name} onChange={(event)=>this.setValue("name",event.target.value)} type="text"></input>
+                        <input required style={{width:200}} value={data.name} onChange={(event)=>this.setValue("name",event.target.value)} type="text"></input>                        
                     </div>
+                    <div   className="form-group">
+                        <label>Dislpay In SR</label>
+                        <CheckBox                            
+                            checked={data.displayInSR==1}
+                            onChange={()=>this.setValue("displayInSR",!data.displayInSR)}>
+                        </CheckBox>                       
+                    </div>
+                </div>
         }
         footer={<div key="footer">
             <button onClick={this.handleSave}>Save</button>
@@ -137,6 +161,7 @@ export class ProjectStagesComponent extends MainComponent {
     }
     handleSave=()=>{
         const {data}=this.state;
+        data.displayInSR=data.displayInSR?1:0;
         if(data.id!='')
         {
             this.api.updateProjectStage(data.id,data).then(result=>{

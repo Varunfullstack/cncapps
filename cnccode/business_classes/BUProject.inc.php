@@ -83,7 +83,20 @@ class BUProject extends Business
     public static function getCustomerProjects($customerID)
     {
         if(!isset($customerID))
-        return [];
+            return [];
+        $date=   date(DATE_MYSQL_DATE);
+        $query="SELECT  
+                    `projectID`,
+                    `description`, 
+                    concat('Projects.php?action=edit&projectID=',projectID) editUrl
+                FROM project 
+                    LEFT JOIN  `projectstages` ps ON ps.id=project.`projectStageID`
+                WHERE 
+                    (project.`projectStageID` IS  NULL OR ps.displayInSr=1)
+                    AND `customerID`=:customerId";
+        $query .=" AND (expiryDate >= '$date' or expiryDate is null)";
+        return DBConnect::fetchAll($query,["customerId"=>$customerID]);
+        /*
         $thing = null;
         $buProject = new BUProject($thing);
         $dsProject = new DataSet($thing);
@@ -95,7 +108,7 @@ class BUProject extends Business
         $projects=array();
         while ($dsProject->fetchNext()) {
             $url = Controller::buildLink(
-                'Project.php',
+                'Projects.php',
                 array(
                     'action'    => 'edit',
                     'projectID' => $dsProject->getValue(DBEProject::projectID),
@@ -108,7 +121,7 @@ class BUProject extends Business
                 "editUrl"=> $url 
             ]);
         }
-        return $projects;
+        return $projects;*/
     }
     function getProjectByID($ID,
                             &$dsResults

@@ -9,6 +9,7 @@ class DBEProjectIssues extends DBEntity
 {
     const id = "id";
     const name = "name";     
+    const displayInSR='displayInSR';
     /**
      * calls constructor()
      * @access public
@@ -28,6 +29,11 @@ class DBEProjectIssues extends DBEntity
         $this->addColumn(
             self::name,
             DA_STRING,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::displayInSR,
+            DA_BOOLEAN,
             DA_NOT_NULL
         );
          
