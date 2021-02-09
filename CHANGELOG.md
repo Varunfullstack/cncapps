@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1181 - SR Asset list & assignment improvements.
+
 ## [v5.5.0] - 2021-02-10
 ### Added
 - Issue 684  - Project System Enhancements
