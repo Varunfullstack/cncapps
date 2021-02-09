@@ -111,8 +111,7 @@ class CTHome extends CTCNC
                     $dateTime = DateTime::createFromFormat(DATE_MYSQL_DATE, $this->getParam('date'));
                     if (!$dateTime) {
                         throw new \CNCLTD\Exceptions\JsonHttpException(
-                            2231,
-                            "Please provide date a valid date in YYYY-MM-DD format"
+                            2231, "Please provide date a valid date in YYYY-MM-DD format"
                         );
                     }
                 }
@@ -1691,8 +1690,7 @@ class CTHome extends CTCNC
             $this->userID
         );
         global $db;
-        $statement  = $db->preparedQuery(
-            "SELECT
+        $queryString = "SELECT
   caa_starttime AS startTime,
   caa_endtime AS endTime,
   `caa_consno` AS engineerId,
@@ -1709,7 +1707,9 @@ WHERE callactivity.`caa_date` = ?
   AND team.`level` = ?
   and consultant.excludeFromStatsFlag <> 'Y'
 ORDER BY engineerName,
-  startTime",
+  startTime";
+        $statement   = $db->preparedQuery(
+            $queryString,
             [
                 [
                     "type"  => "s",
@@ -1721,8 +1721,8 @@ ORDER BY engineerName,
                 ],
             ]
         );
-        $activities = $statement->fetch_all(MYSQLI_ASSOC);
-        $data       = [];
+        $activities  = $statement->fetch_all(MYSQLI_ASSOC);
+        $data        = [];
         foreach ($activities as $activity) {
             $engineerName = $activity['engineerName'];
             if ($isStandardUser && $activity['engineerId'] !== $dbeUser->getValue(DBEUser::userID)) {
@@ -1750,7 +1750,8 @@ ORDER BY engineerName,
                     $endTime = $nextHour;
                 }
                 $diff                                     = $startTime->diff($endTime);
-                $data[$engineerName]["dataPoints"][$hour] += $diff->i;
+                $differenceInMinutes                      = ($diff->days * 24 * 60) + ($diff->h * 60) + $diff->i;
+                $data[$engineerName]["dataPoints"][$hour] += $differenceInMinutes;
                 if ($data[$engineerName]["dataPoints"][$hour] > 60) {
                     $data[$engineerName]["dataPoints"][$hour] = 60;
                 }
