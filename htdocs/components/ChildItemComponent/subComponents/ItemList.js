@@ -11,11 +11,12 @@ class ItemList extends React.Component {
 
     static defaultProps = {
         items: [],
-        isDeletable: false
+        isDeletable: false,
+        showCount: true
     };
 
     render() {
-        const {items, isDeletable, onDeleteItem} = this.props;
+        const {items, isDeletable, onDeleteItem, showCount} = this.props;
         return this.el(
             'div',
             {
@@ -39,8 +40,8 @@ class ItemList extends React.Component {
                                 childItem.description
                             )
                         ),
-                        <div key="numberInput"
-                             className="c-item-list__number-input"
+                        showCount ? <div key="numberInput"
+                                         className="c-item-list__number-input"
                         >
                             <input type="number"
                                    min="1"
@@ -49,7 +50,7 @@ class ItemList extends React.Component {
                                        this.props.onQuantityChanged(childItem.childItemId, +$event.target.value);
                                    }}
                             />
-                        </div>,
+                        </div> : "",
                         isDeletable ?
                             this.el(
                                 'div',

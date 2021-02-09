@@ -841,7 +841,7 @@ WHERE custitem.`cui_itemno` = ?
     function addChildItem($parentItemId, $childItemId)
     {
         global $db;
-        $query = "insert ignore into childItem values(?,?) ";
+        $query = "insert ignore into childItem values(?,?, 1) ";
         $db->preparedQuery(
             $query,
             [

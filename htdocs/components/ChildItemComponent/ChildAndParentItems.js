@@ -53,7 +53,7 @@ class ChildAndParentItems extends React.Component {
             {className: 'child-and-parent__parent-list', key: 'child-and-parent__parent-list-container'},
             [
                 this.el('h3', {key: 'child-and-parent__parent-list-title'}, 'Parent Items'),
-                this.el(ItemList, {items: this.state.parentItems, key: 'child-and-parent__parent-list'})
+                this.el(ItemList, {items: this.state.parentItems, key: 'child-and-parent__parent-list', showCount: false})
             ]
         )
     }
