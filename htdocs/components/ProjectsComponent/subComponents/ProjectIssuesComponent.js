@@ -188,7 +188,7 @@ export default class ProjectIssuesComponent extends MainComponent {
         {this.getAlert()}
         <div className="m-5">
         <ToolTip title="New Issue" width={30}>
-          <i className="fa fa-plus fa-2x icon pointer" onClick={this.handleNewIssueModal}></i>
+          <i className="fal fa-plus fa-2x icon pointer" onClick={this.handleNewIssueModal}></i>
         </ToolTip>
         </div>
         {this.getIssueDetailsModal()}

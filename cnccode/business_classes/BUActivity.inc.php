@@ -6436,7 +6436,7 @@ class BUActivity extends Business
         $dbeJCallActivity  = $this->getFirstActivityInServiceRequest($problemID);
         $urlActivity       = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
-        $projectURL        = SITE_URL . '/Project.php?action=add&customerID=' . $dbeJCallActivity->getValue(
+        $projectURL        = SITE_URL . '/Projects.php?action=add&customerID=' . $dbeJCallActivity->getValue(
                 DBEJCallActivity::customerID
             );
         $createProjectLink = "<a href='" . $projectURL . "'>Click here to create a project for this request</a>";
