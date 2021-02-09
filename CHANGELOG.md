@@ -6,6 +6,7 @@ This project changes will be shown here.
 - Issue 1218 - Include quantities for child items in Sales Orders
 - Issue 1221 - Email sending TO CC fields
 - Issue 1219 - PO Status Report, include orders without SRs
+- Issue 1210 - Show Quantities for Direct Debit invoices
 
 ## [v5.4.1] - 2021-02-04
 ### Fixed
@@ -40,7 +41,7 @@ This project changes will be shown here.
 ### Fixed
 - Sales Requests popup not clearing down.
 
-## [v5.3.2] - 2021-01-25 
+## [v5.3.2] - 2021-01-25
 ### Fixed
 - On the home page the links in this section are opening the Activity of the SR number, rather than the Activity ID.
 - Same section, stop the character codes from showing on the home page within Upcoming Visits.
