@@ -31,6 +31,7 @@ class CTHome extends CTCNC
     const GET_ALL_USER_PERFORMANCE           = 'allUserPerformance';
     const GET_USER_PERFORMANCE               = 'userPerformance';
     const DEFAULT_LAYOUT                     = 'defaultLayout';
+    const GET_LOGGED_ACTIVITY_TIMES          = 'getLoggedActivityTimes';
     /** @var DataSet|DBEHeader */
     private $dsHeader;
     /** @var BUUser */
@@ -99,6 +100,23 @@ class CTHome extends CTCNC
                 break;
             case self::getFixedAndReopenData:
                 echo html_entity_decode($this->getFixedAndReopenData());
+                break;
+            case self::GET_LOGGED_ACTIVITY_TIMES:
+                $team = 1;
+                if ($this->getParam('team')) {
+                    $team = $this->getParam('team');
+                }
+                $dateTime = new DateTime();
+                if ($this->getParam('date')) {
+                    $dateTime = DateTime::createFromFormat(DATE_MYSQL_DATE, $this->getParam('date'));
+                    if (!$dateTime) {
+                        throw new \CNCLTD\Exceptions\JsonHttpException(
+                            2231, "Please provide date a valid date in YYYY-MM-DD format"
+                        );
+                    }
+                }
+                $data = array_values($this->getLoggedActivityByTimeBracket($team, $dateTime));
+                echo json_encode(["status" => "ok", "data" => $data], JSON_NUMERIC_CHECK);
                 break;
             case self::getUpcomingVisitsData:
                 echo $this->getUpcomingVisitsData();
@@ -1650,5 +1668,95 @@ class CTHome extends CTCNC
                 ['settings' => $body->settings]
             );
         }
+    }
+
+    private function getLoggedActivityByTimeBracket(int $team, ?DateTime $dateTime = null)
+    {
+        if (!$dateTime) {
+            $dateTime = new DateTime();
+        }
+        $isStandardUser = false;
+        if (!$this->buUser->isSdManager($this->userID)) {
+            if ($this->buUser->getLevelByUserID($this->userID) <= 5) {
+                $team           = $this->buUser->getLevelByUserID($this->userID);
+                $isStandardUser = true;
+            } else {
+                return [];
+            }
+        }
+        $dbeUser = $this->getDbeUser();
+        $dbeUser->setValue(
+            DBEUser::userID,
+            $this->userID
+        );
+        global $db;
+        $queryString = "SELECT
+  caa_starttime AS startTime,
+  caa_endtime AS endTime,
+  `caa_consno` AS engineerId,
+  consultant.cns_name AS engineerName
+FROM
+  callactivity
+  LEFT JOIN consultant
+    ON consultant.cns_consno = callactivity.caa_consno
+  LEFT JOIN team
+    ON consultant.`teamID` = team.`teamID`
+WHERE callactivity.`caa_date` = ?
+  AND callactivity.`caa_endtime`
+  AND callactivity.`caa_consno` <> 67
+  AND team.`level` = ?
+  and consultant.excludeFromStatsFlag <> 'Y'
+ORDER BY engineerName,
+  startTime";
+        $statement   = $db->preparedQuery(
+            $queryString,
+            [
+                [
+                    "type"  => "s",
+                    "value" => $dateTime->format(DATE_MYSQL_DATE)
+                ],
+                [
+                    "type"  => "i",
+                    "value" => $team
+                ],
+            ]
+        );
+        $activities  = $statement->fetch_all(MYSQLI_ASSOC);
+        $data        = [];
+        foreach ($activities as $activity) {
+            $engineerName = $activity['engineerName'];
+            if ($isStandardUser && $activity['engineerId'] !== $dbeUser->getValue(DBEUser::userID)) {
+                continue;
+            }
+            if (!key_exists($engineerName, $data)) {
+                $data[$engineerName] = [
+                    "engineerId"   => $activity['engineerId'],
+                    "engineerName" => $activity["engineerName"],
+                    "dataPoints"   => array_fill(0, 24, 0)
+                ];
+            }
+            foreach ($data[$engineerName]["dataPoints"] as $hour => $amount) {
+                $thisHour  = DateTime::createFromFormat('H', $hour);
+                $startTime = DateTime::createFromFormat('H:i', $activity["startTime"]);
+                $endTime   = DateTime::createFromFormat('H:i', $activity['endTime']);
+                $nextHour  = (clone($thisHour))->add(new DateInterval('PT1H'));
+                if ($startTime > $nextHour || $endTime < $thisHour) {
+                    continue;
+                }
+                if ($startTime < $thisHour) {
+                    $startTime = $thisHour;
+                }
+                if ($endTime > $nextHour) {
+                    $endTime = $nextHour;
+                }
+                $diff                                     = $startTime->diff($endTime);
+                $differenceInMinutes                      = ($diff->days * 24 * 60) + ($diff->h * 60) + $diff->i;
+                $data[$engineerName]["dataPoints"][$hour] += $differenceInMinutes;
+                if ($data[$engineerName]["dataPoints"][$hour] > 60) {
+                    $data[$engineerName]["dataPoints"][$hour] = 60;
+                }
+            }
+        }
+        return $data;
     }
 }
