@@ -48,7 +48,7 @@ class CustomerFeedbackComponent extends MainComponent {
                 <tr>
                     <td>Customer</td>
                     <td>
-                        <CustomerSearch width={200} customerName={filter.customerName} onChange={(customer)=>this.handleCustomer}></CustomerSearch>
+                        <CustomerSearch width={200} customerName={filter.customerName} onChange={(customer)=>this.handleCustomer(customer)}></CustomerSearch>
                     </td>
                 </tr>
                 <tr>
@@ -88,10 +88,14 @@ class CustomerFeedbackComponent extends MainComponent {
         </table>
     }
     handleCustomer=(customer)=>{
-        const {filter}=this.state;
-        filter.customerID=customer.id;
-        filter.customerName=customer.name;
-        this.setState({filter});
+        if(customer)
+        {
+            const {filter}=this.state;
+            filter.customerID=customer.id;
+            filter.customerName=customer.name;
+            console.log(filter);
+            this.setState({filter});
+        }
     }
     clearSearch=()=>{
         const {filter}=this.state;
@@ -168,7 +172,7 @@ class CustomerFeedbackComponent extends MainComponent {
              {
                 path: "createdAt",
                 label: "",
-                hdToolTip: "Create At",
+                hdToolTip: "Date of feedback",
                 //hdClassName: "text-center",
                 icon: "fal fa-2x fa-calendar color-gray2 pointer",
                 sortable: true,                

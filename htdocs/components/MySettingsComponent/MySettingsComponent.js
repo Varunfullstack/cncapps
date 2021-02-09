@@ -106,8 +106,8 @@ class MySettingsComponent extends MainComponent {
     getUserLog() {
         if (this.state.userLog)
             return this.el("dl", {key: "user_log"}, [
-                this.state.userLog.map((log) => {
-                    return this.el('dd', {key: log.userTimeLogID}, log.loggedDate + ' ' + log.startedTime)
+                this.state.userLog.map((log,indx) => {
+                    return this.el('dd', {key: indx}, log.loggedDate + ' ' + log.startedTime)
                 })]);
 
         else return null;
@@ -134,7 +134,7 @@ class MySettingsComponent extends MainComponent {
     }
     getMyAccountTab=()=>{
        return (
-         <table style={{width:400}}>
+         <table style={{width:400}} key="table-active">
            <tbody>
                <tr>
                    <td>Name</td>
@@ -247,7 +247,7 @@ class MySettingsComponent extends MainComponent {
              {
                 path: "createdAt",
                 label: "",
-                hdToolTip: "Create At",
+                hdToolTip: "Date of feedback",
                 //hdClassName: "text-center",
                 icon: "fal fa-2x fa-calendar color-gray2 pointer",
                 sortable: true,                
