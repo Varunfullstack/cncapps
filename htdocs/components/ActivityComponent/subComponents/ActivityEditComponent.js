@@ -604,7 +604,7 @@ class ActivityEditComponent extends MainComponent {
             />)
         }
         const renderUpdateCancelButtons = () => {
-            const isInitialActivityAndServiceRequestNotStarted = data?.callActType === ActivityType.INITIAL && data?.problemStatus === 'I';
+            const isInitialActivityAndServiceRequestNotStarted = data?.callActTypeID === ActivityType.INITIAL && data?.problemStatus === 'I';
             const isCurrentUserSDManagerOrServiceRequestQueueManager = currentUser?.isSDManager || currentUser?.serviceRequestQueueManager;
             if (isInitialActivityAndServiceRequestNotStarted || isCurrentUserSDManagerOrServiceRequestQueueManager) {
                 return <Fragment>
