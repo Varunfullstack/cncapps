@@ -133,12 +133,13 @@ WHERE (
             OR ordline.odl_renewal_cuino = 0
           )
         )
-        OR ordline.odl_desc LIKE '%labour%'
+        OR (ordline.odl_desc LIKE '%labour%' OR ordline.odl_desc LIKE '%installation%')
+        
       )
     )
     OR (
       odl_type = 'C'
-      AND ordline.odl_desc LIKE '%labour%'
+      AND (ordline.odl_desc LIKE '%labour%' OR ordline.odl_desc LIKE '%installation%')
     )
   )
   AND problem.pro_problemno IS NULL
