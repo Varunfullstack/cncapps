@@ -59,6 +59,7 @@
     const defaultTeam = userLevel <= 5 ? userLevel : 1;
     let timeFrameSelector = null;
     let $teamSelector = null;
+    let datePicker = null;
 
     window.addEventListener('DOMContentLoaded', function () {
         // Load the Visualization API and the corechart package.
@@ -73,9 +74,22 @@
         $teamSelector = $('#teamSelector');
         const container = $('#teamIndividualCharts');
         timeFrameSelector = document.getElementById('timeFrameSelector');
+
+        datePicker = document.getElementById('hourlyDatePicker');
+
         timeFrameSelector.addEventListener('change', $event => {
             drawIndividualCharts()
+            if (timeFrameSelector.value == 'hourly') {
+                datePicker.removeAttribute('hidden');
+            } else {
+                datePicker.setAttribute('hidden', '');
+            }
         })
+        datePicker.value = moment().format('YYYY-MM-DD');
+        datePicker.addEventListener('change', $event => {
+            drawIndividualCharts();
+        })
+
 
         $teamSelector.val(defaultTeam);
         if (isManager) {
@@ -100,12 +114,12 @@
 
             const teamId = $teamSelector.val();
             const timeFrame = timeFrameSelector.value;
-            console.log(timeFrame);
 
             let url = '?action=lastWeekHelpDesk';
             const hourly = 'hourly';
             if (timeFrame == hourly) {
-                url = '?action=getLoggedActivityTimes'
+                const dateSelected = datePicker.value;
+                url = '?action=getLoggedActivityTimes&date=' + dateSelected;
             }
 
             this.ajaxOptions = {
@@ -139,12 +153,15 @@
                         dataTable.addColumn('number', 'Hour');
                         dataTable.addColumn('number', '% Logged');
                         dataTable.addRows(
-                            item.dataPoints.map(function (loggedMinutes, index) {
-                                return [
-                                    index,
-                                    loggedMinutes / 60*100
-                                ]
-                            })
+                            item.dataPoints.reduce((acc, loggedMinutes, index) => {
+                                if (index >= 7 && index <= 19) {
+                                    acc.push([
+                                        index,
+                                        loggedMinutes / 60 * 100
+                                    ])
+                                }
+                                return acc;
+                            }, [])
                         );
 
 
@@ -290,6 +307,10 @@
     </option>
     <option value="hourly">Hourly</option>
 </select>
+<input type="date"
+       id="hourlyDatePicker"
+       hidden
+>
 <div id="teamIndividualCharts"
      class="container"
 >

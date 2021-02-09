@@ -106,7 +106,17 @@ class CTHome extends CTCNC
                 if ($this->getParam('team')) {
                     $team = $this->getParam('team');
                 }
-                $data = array_values($this->getLoggedActivityByTimeBracket($team));
+                $dateTime = new DateTime();
+                if ($this->getParam('date')) {
+                    $dateTime = DateTime::createFromFormat(DATE_MYSQL_DATE, $this->getParam('date'));
+                    if (!$dateTime) {
+                        throw new \CNCLTD\Exceptions\JsonHttpException(
+                            2231,
+                            "Please provide date a valid date in YYYY-MM-DD format"
+                        );
+                    }
+                }
+                $data = array_values($this->getLoggedActivityByTimeBracket($team, $dateTime));
                 echo json_encode(["status" => "ok", "data" => $data], JSON_NUMERIC_CHECK);
                 break;
             case self::getUpcomingVisitsData:
@@ -1661,8 +1671,11 @@ class CTHome extends CTCNC
         }
     }
 
-    private function getLoggedActivityByTimeBracket(int $team)
+    private function getLoggedActivityByTimeBracket(int $team, ?DateTime $dateTime = null)
     {
+        if (!$dateTime) {
+            $dateTime = new DateTime();
+        }
         $isStandardUser = false;
         if (!$this->buUser->isSdManager($this->userID)) {
             if ($this->buUser->getLevelByUserID($this->userID) <= 5) {
@@ -1690,17 +1703,22 @@ FROM
     ON consultant.cns_consno = callactivity.caa_consno
   LEFT JOIN team
     ON consultant.`teamID` = team.`teamID`
-WHERE callactivity.`caa_date` = current_date()
+WHERE callactivity.`caa_date` = ?
   AND callactivity.`caa_endtime`
   AND callactivity.`caa_consno` <> 67
   AND team.`level` = ?
+  and consultant.excludeFromStatsFlag <> 'Y'
 ORDER BY engineerName,
   startTime",
             [
                 [
+                    "type"  => "s",
+                    "value" => $dateTime->format(DATE_MYSQL_DATE)
+                ],
+                [
                     "type"  => "i",
                     "value" => $team
-                ]
+                ],
             ]
         );
         $activities = $statement->fetch_all(MYSQLI_ASSOC);
@@ -1731,7 +1749,7 @@ ORDER BY engineerName,
                 if ($endTime > $nextHour) {
                     $endTime = $nextHour;
                 }
-                $diff                                   = $startTime->diff($endTime);
+                $diff                                     = $startTime->diff($endTime);
                 $data[$engineerName]["dataPoints"][$hour] += $diff->i;
                 if ($data[$engineerName]["dataPoints"][$hour] > 60) {
                     $data[$engineerName]["dataPoints"][$hour] = 60;
