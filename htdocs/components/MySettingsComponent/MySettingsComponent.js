@@ -223,7 +223,7 @@ class MySettingsComponent extends MainComponent {
                 //hdClassName: "text-center",
                 icon: "fal fa-2x fa-hashtag color-gray2 pointer",
                 sortable: true,
-                content:(feed)=><a href={`SRActivity.php?action=displayActivity&callActivityID=${feed.problemID}` } target="_blank">{feed.problemID}</a>,
+                content:(feed)=><a href={`SRActivity.php?action=displayActivity&serviceRequestId=${feed.problemID}` } target="_blank">{feed.problemID}</a>,
                 className: "text-center",
              },
             {

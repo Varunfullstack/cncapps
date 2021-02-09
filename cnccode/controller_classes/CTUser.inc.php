@@ -1187,7 +1187,7 @@ class CTUser extends CTCNC
                     JOIN callactivity cal ON cal.caa_problemno=f.serviceRequestId     
                     JOIN customer ON customer.`cus_custno`=problem.`pro_custno`
 
-                WHERE cal.caa_callacttypeno=51
+                WHERE cal.caa_callacttypeno=57
                     AND cal.`caa_consno`=:consID
                     AND (:from is null or f.`createdAt` >= :from )
                     AND (:to is null or f.`createdAt` <= :to)

@@ -1666,7 +1666,7 @@ class CTHome extends CTCNC
                     JOIN problem ON problem.`pro_problemno`=f.serviceRequestId
                     JOIN callactivity cal ON cal.caa_problemno=f.serviceRequestId
                     JOIN `consultant`  cons ON cons.`cns_consno`=cal.`caa_consno`
-                WHERE cal.caa_callacttypeno=51
+                WHERE cal.caa_callacttypeno=57
                     AND f.`createdAt` >= DATE_FORMAT(NOW(), '%Y-01-01') 
                     AND f.`createdAt` < DATE_FORMAT(NOW(), '%Y-04-01')
                     AND  cons.teamID<=5
@@ -1682,7 +1682,7 @@ class CTHome extends CTCNC
                     JOIN problem ON problem.`pro_problemno`=f.serviceRequestId
                     JOIN callactivity cal ON cal.caa_problemno=f.serviceRequestId
                     JOIN `consultant`  cons ON cons.`cns_consno`=cal.`caa_consno`
-                WHERE cal.caa_callacttypeno=51
+                WHERE cal.caa_callacttypeno=57
                     AND f.`createdAt` >= DATE_FORMAT(NOW(), '%Y-04-01') 
                     AND f.`createdAt` < DATE_FORMAT(NOW(), '%Y-07-01')
                     AND  cons.teamID<=5
@@ -1698,7 +1698,7 @@ class CTHome extends CTCNC
                     JOIN problem ON problem.`pro_problemno`=f.serviceRequestId
                     JOIN callactivity cal ON cal.caa_problemno=f.serviceRequestId
                     JOIN `consultant`  cons ON cons.`cns_consno`=cal.`caa_consno`
-                WHERE cal.caa_callacttypeno=51
+                WHERE cal.caa_callacttypeno=57
                     AND f.`createdAt` >= DATE_FORMAT(NOW(), '%Y-07-01') 
                     AND f.`createdAt` < DATE_FORMAT(NOW(), '%Y-10-01')
                     AND  cons.teamID<=5
@@ -1714,7 +1714,7 @@ class CTHome extends CTCNC
                     JOIN problem ON problem.`pro_problemno`=f.serviceRequestId
                     JOIN callactivity cal ON cal.caa_problemno=f.serviceRequestId
                     JOIN `consultant`  cons ON cons.`cns_consno`=cal.`caa_consno`
-                WHERE cal.caa_callacttypeno=51
+                WHERE cal.caa_callacttypeno=57
                     AND f.`createdAt` >= DATE_FORMAT(NOW(), '%Y-10-01') 
                     AND f.`createdAt` <= DATE_FORMAT(NOW(), '%Y-12-31')
                     AND  cons.teamID<=5

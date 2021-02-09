@@ -107,9 +107,9 @@ class HomeComponent extends MainComponent {
             const cardsPerms = this.applyPermission(cards, salesFigures);
             teamsFeedback.map(t=>{
                 const total=t.happy+t.average+t.unhappy;                
-                t.happy=Math.floor(t.happy*100/total)+'%';
-                t.average=Math.floor(t.average*100/total)+'%';
-                t.unhappy=Math.floor(t.unhappy*100/total)+'%';
+                t.happy=Math.round(t.happy*100/total)+'%';
+                t.average=Math.round(t.average*100/total)+'%';
+                t.unhappy=Math.round(t.unhappy*100/total)+'%';
             });
             console.log(teamsFeedback);
             this.setState({
@@ -289,7 +289,7 @@ class HomeComponent extends MainComponent {
                 width: 600,
                 left: "",
                 top: "",
-                scroll: false,
+                scroll: true,
                 visible: true,
             },
 
@@ -309,10 +309,14 @@ class HomeComponent extends MainComponent {
             // merge saved to originial
             for (let i = 0; i < origin.length; i++) {
                 const indx = savedCards.map((c) => c.id).indexOf(origin[i].id);
-                if (indx >= 0) origin[i] = {...origin[i], ...savedCards[indx]};
+                if (indx >= 0) {
+                    const orgignScroll=origin[i].scroll;
+                    origin[i] = {...origin[i], ...savedCards[indx]};                    
+                    origin[i].scroll=orgignScroll;
+                }
             }
         }
-
+        console.log('origin',origin);
         return origin;
     }
     getCardsElement = () => {
