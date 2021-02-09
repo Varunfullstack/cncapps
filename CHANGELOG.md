@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v5.5.0]
 ### Added
 - Issue 684  - Project System Enhancements
 - Issue 1232 - User hourly time graph
