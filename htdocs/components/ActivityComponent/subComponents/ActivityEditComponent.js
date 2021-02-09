@@ -604,13 +604,11 @@ class ActivityEditComponent extends MainComponent {
             />)
         }
         const renderUpdateCancelButtons = () => {
-
-            if (data?.callActTypeID !== ActivityType.TECHNICAL_CHANGE_REQUEST || !currentUser?.isSDManager || currentUser?.serviceRequestQueueManager) {
-                const isEnabled = currentUser?.isSDManager || !(data?.callActType === ActivityType.INITIAL && data?.problemStatus === 'I');
-
+            const isInitialActivityAndServiceRequestNotStarted = data?.callActType === ActivityType.INITIAL && data?.problemStatus === 'I';
+            const isCurrentUserSDManagerOrServiceRequestQueueManager = currentUser?.isSDManager || currentUser?.serviceRequestQueueManager;
+            if (isInitialActivityAndServiceRequestNotStarted || isCurrentUserSDManagerOrServiceRequestQueueManager) {
                 return <Fragment>
                     <button onClick={() => this.setNextStatus("Update")}
-                            disabled={!isEnabled}
                     >Update
                     </button>
                 </Fragment>
