@@ -77,8 +77,7 @@ class BUFeedbackEmail extends Business
                         'serviceRequestId'=> $row->serviceRequestId,
                     ]
                 );
-                $buMail->sendSimpleEmail($body, $subject, $row->cons_email);
-                $buMail->sendSimpleEmail($body, $subject, $row->leader_email);
+                $buMail->sendSimpleEmail($body, $subject, $row->cons_email,CONFIG_SUPPORT_EMAIL,[ $row->leader_email]);                
                 // mark it as notified 
                 DBConnect::execute("update customerfeedback set notified=1 where id=:id",["id"=>$row->id]);
             } while ($row = $results->fetch_object()); 

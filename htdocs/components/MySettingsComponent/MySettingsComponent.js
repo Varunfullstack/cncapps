@@ -23,7 +23,7 @@ class MySettingsComponent extends MainComponent {
             activeTab:this.TAB_MY_ACCOUNT,
             feedbacks:[],
             filter:{
-                from:moment().format("YYYY-MM-01"),
+                from:moment().subtract(3,'M').format("YYYY-MM-01"),
                 to:''
             }
         };
@@ -223,8 +223,8 @@ class MySettingsComponent extends MainComponent {
                 //hdClassName: "text-center",
                 icon: "fal fa-2x fa-hashtag color-gray2 pointer",
                 sortable: true,
-                content:(feed)=><a href={`SRActivity.php?action=displayActivity&callActivityID=${feed.problemID}` } target="_blank">{feed.problemID}</a>
-                //className: "text-center",
+                content:(feed)=><a href={`SRActivity.php?action=displayActivity&callActivityID=${feed.problemID}` } target="_blank">{feed.problemID}</a>,
+                className: "text-center",
              },
             {
                path: "cus_name",

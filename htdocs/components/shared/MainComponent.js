@@ -196,6 +196,12 @@ export default class MainComponent extends React.Component {
         data[property] = value;
         this.setState({data});
     }
+    setFilter=(field,value)=>{
+        console.log(field,value);
+        const {filter}=this.state;
+        filter[field]=value;
+        this.setState({filter});
+    }
     editorHasProblems = async () => {
         return this.apiHeader.getNumberOfAllowedMistaks().then(nMistakes => {
             const wscInstances = WEBSPELLCHECKER.getInstances();
