@@ -67,6 +67,7 @@ class CTUser extends CTCNC
     const GetAge                 = 'getAge';
     const REGISTER_HALF_HOLIDAYS = 'REGISTER_HALF_HOLIDAYS';
     const REQ_SETTINGS          ='settings';
+    const CONST_MY_FEEDBACK     = 'myFeedback';
     /** @var DSForm */
     public $dsUser;
     /** @var DSForm */
@@ -88,7 +89,7 @@ class CTUser extends CTCNC
             $cookieVars,
             $cfg
         );
-        $noPermissionList = ["all", "active", "getCurrentUser", "getUsersByTeamLevel",self::REQ_SETTINGS];
+        $noPermissionList = ['myFeedback',"all", "active", "getCurrentUser", "getUsersByTeamLevel",self::REQ_SETTINGS];
         $roles            = SENIOR_MANAGEMENT_PERMISSION;
         $key              = array_search(@$_REQUEST["action"], $noPermissionList);
         if (false === $key) if (!self::hasPermissions($roles)) {
@@ -283,6 +284,9 @@ class CTUser extends CTCNC
                 else if($method == 'GET')
                 echo json_encode($this->getSettings());
                 exit;            
+            case self::CONST_MY_FEEDBACK:
+                echo json_encode($this->getMyFeedback(),JSON_NUMERIC_CHECK);
+                exit;  
             case CTUSER_ACT_DISPLAY_LIST:
             default:
                 $this->displayList();
@@ -987,7 +991,8 @@ class CTUser extends CTCNC
                 'globalExpenseApprover'      => $dbeJUser->getValue(DBEJUser::globalExpenseApprover),
                 'teamID'                     => $dbeJUser->getValue(DBEJUser::teamID),
                 'teamLevel'                  => $dbeJUser->getValue(DBEJUser::teamLevel),
-                'serviceRequestQueueManager' => $dbeJUser->getValue(DBEJUser::queueManager)
+                'serviceRequestQueueManager' => $dbeJUser->getValue(DBEJUser::queueManager),
+                'isProjectManager'      => $dbeJUser->getValue(DBEJUser::projectManagementFlag)=='Y',
             ]
         );
     }
@@ -1167,5 +1172,27 @@ class CTUser extends CTCNC
         $result=DBConnect::fetchOne("select * from cons_settings where type=:type and consno=:userId",
         ['type'=>$type,'userId'=>$userId]);
         return ['status'=>true,'data'=>json_decode($result['settings'])];
+    }
+    function getMyFeedback(){
+        $from=@$_REQUEST['from']??null;
+        $to=@$_REQUEST['to']??null;
+        $query="SELECT       
+                    f.id,
+                    f.value,     
+                    customer.`cus_name`,
+                    f.`comments`,
+                    DATE_FORMAT(f.`createdAt` , '%d/%m/%Y')   createdAt  ,
+                    serviceRequestId problemID    
+                FROM `customerfeedback` f 
+                    JOIN problem ON problem.`pro_problemno`=f.serviceRequestId
+                    JOIN callactivity cal ON cal.caa_problemno=f.serviceRequestId     
+                    JOIN customer ON customer.`cus_custno`=problem.`pro_custno`
+
+                WHERE cal.caa_callacttypeno=57
+                    AND cal.`caa_consno`=:consID
+                    AND (:from is null or f.`createdAt` >= :from )
+                    AND (:to is null or f.`createdAt` <= :to)
+                order by f.`createdAt` desc";
+        return DBConnect::fetchAll($query,['from'=>$from,'to'=>$to,'consID'=>$this->dbeUser->getPKValue()]);
     }
 }

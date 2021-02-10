@@ -47,7 +47,7 @@ class CNCCKEditor extends React.Component {
             // It can't be done via config due to CKEditor 4 upstream issue (#57, ckeditor/ckeditor4#3866).
             if (type === 'inline' && !readOnly) {
                 editor.on('instanceReady', () => {
-                    editor.setReadOnly(false);
+                    editor.setReadOnly(this.props.readOnly);
                     editor.container.setStyles(style);
                 }, null, null, -1);
             }

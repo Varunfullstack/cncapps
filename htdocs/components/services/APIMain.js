@@ -31,6 +31,17 @@ class APIMain {
         });
     }
 
+    put(url, payload) {
+        return fetch(url, {
+            method: "PUT",
+            body: JSON.stringify(payload)
+        }).then((res) => res.json());
+    }
+    delete(url ) {
+        return fetch(url, {
+            method: "DELETE",            
+        }).then((res) => res.json());
+    }
     postFormData(url, payload) {
         return fetch(url, {
             method: "POST",

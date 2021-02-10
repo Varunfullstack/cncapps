@@ -41,4 +41,7 @@ export default class APIHome extends APIMain {
         return this.post(`${ApiUrls.Home}defaultLayout`, body);
     }
 
+    getTeamsFeedback(){
+        return this.get(`${ApiUrls.Home}teamsFeedback`);
+    }
 }

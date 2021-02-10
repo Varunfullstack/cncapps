@@ -1,6 +1,18 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.5.0] - 2021-02-10
+### Added
+- Issue 684  - Project System Enhancements
+- Issue 1232 - User hourly time graph
+- Issue 1152 - Added Feedback in home and mysettings.
+### Changed
+- Issue 1218 - Include quantities for child items in Sales Orders
+- Issue 1221 - Email sending TO CC fields
+- Issue 1219 - PO Status Report, include orders without SRs
+- Issue 1210 - Show Quantities for Direct Debit invoices
+- Issue 1184 - Activity Update button permission
+
 ## [v5.4.2] - 2021-02-08
 ### Fixed
 - Fixed First Time Fix reporting

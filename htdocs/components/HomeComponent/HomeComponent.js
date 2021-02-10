@@ -1,5 +1,5 @@
 "use strict";
-import {params, poundFormat} from "../utils/utils";
+import {getTeamCode, groupBy, params, poundFormat, sort} from "../utils/utils";
 import ReactDOM from 'react-dom';
 import React from 'react';
 import '../style.css';
@@ -23,6 +23,7 @@ class HomeComponent extends MainComponent {
     CARD_USER_PERFORMANCE = 6;
     CARD_DAILT_STATS = 7;
     CARD_CHARTS = 8;
+    CARD_TEAMS_FEEDBACK = 9;
 
     constructor(props) {
         super(props);
@@ -37,7 +38,8 @@ class HomeComponent extends MainComponent {
             allUserPerformance: [],
             currentUser: null,
             isSdManager: false,
-            minHeight: null
+            minHeight: null,
+            teamsFeedback:[]
         }
     }
 
@@ -95,13 +97,22 @@ class HomeComponent extends MainComponent {
             this.api.getFixedAndReopenData(),
             this.api.getFirstTimeFixData(),
             this.api.getTeamPerformance(),
-            userPerformance
+            userPerformance,
+            this.api.getTeamsFeedback()
         ]
         this.setState({showSpinner: true});
-        Promise.all(requests).then(([upcomingVisit, salesFigures, fixedReopen, firstTimeFixed, teamPerformance, allUserPerformance]) => {
+        Promise.all(requests).then(([upcomingVisit, salesFigures, fixedReopen, firstTimeFixed, teamPerformance, allUserPerformance,teamsFeedback]) => {
             const {cards} = this.state;
-
+            console.log('teamsFeedback',teamsFeedback);
             const cardsPerms = this.applyPermission(cards, salesFigures);
+            teamsFeedback.map(t=>{
+                const total=t.happy+t.average+t.unhappy;                
+                t.happy=Math.round(t.happy*100/total)+'%';
+                t.average=Math.round(t.average*100/total)+'%';
+                t.unhappy=Math.round(t.unhappy*100/total)+'%';
+                t.teamCode=getTeamCode(t.teamID)
+            });
+            console.log(teamsFeedback);
             this.setState({
                 cards: cardsPerms,
                 showSpinner: false,
@@ -110,7 +121,8 @@ class HomeComponent extends MainComponent {
                 fixedReopen,
                 firstTimeFixed,
                 teamPerformance,
-                allUserPerformance
+                allUserPerformance,
+                teamsFeedback
             });
         }).catch(ex => {
             console.error('error', ex);
@@ -268,7 +280,19 @@ class HomeComponent extends MainComponent {
                 scroll: false,
                 visible: true,
             },
-
+            {
+                id: this.CARD_TEAMS_FEEDBACK,
+                order: 9,
+                title: "Team Feedback",
+                minimize: true,
+                position: "relative",
+                height: 150,
+                width: 600,
+                left: "",
+                top: "",
+                scroll: true,
+                visible: true,
+            },
 
         ];
 
@@ -286,10 +310,14 @@ class HomeComponent extends MainComponent {
             // merge saved to originial
             for (let i = 0; i < origin.length; i++) {
                 const indx = savedCards.map((c) => c.id).indexOf(origin[i].id);
-                if (indx >= 0) origin[i] = {...origin[i], ...savedCards[indx]};
+                if (indx >= 0) {
+                    const orgignScroll=origin[i].scroll;
+                    origin[i] = {...origin[i], ...savedCards[indx]};                    
+                    origin[i].scroll=orgignScroll;
+                }
             }
         }
-
+        console.log('origin',origin);
         return origin;
     }
     getCardsElement = () => {
@@ -363,6 +391,8 @@ class HomeComponent extends MainComponent {
                 return this.getDailyStats();
             case this.CARD_CHARTS:
                 return this.getTeamCharts();
+            case this.CARD_TEAMS_FEEDBACK:
+                return this.getTeamsFeedback()
         }
     }
     getUpcomingVisitsElement = () => {
@@ -816,7 +846,62 @@ class HomeComponent extends MainComponent {
                        src="index.php?action=charts"
         ></iframe>
     }
-
+    getTeamsFeedback = () => {
+        const {teamsFeedback} = this.state;
+        const teams=groupBy(sort(teamsFeedback,'teamID'),'teamID');
+        const quarters=['Q1','Q2','Q3','Q4'];
+        return (
+            <table className="table table-striped">
+                <thead>
+                    <tr>
+                        <th  >
+                            Team
+                        </th>
+                        {quarters.map(q=><th className="text-center">{q}</th>)}
+                    </tr>  
+                    <tr>
+                        <th>                             
+                        </th>
+                        {quarters.map(q=><th>
+                            <div className="flex-row" style={{justifyContent:"space-between",paddingRight:15,paddingLeft:15}}>
+                            <i className="fal fa-smile fa-2x"></i>
+                            <i className="fal fa-meh fa-2x "></i>
+                            <i className="fal fa-frown fa-2x "></i>
+                            </div>
+                        </th>)}
+                    </tr>                  
+                </thead>
+                <tbody>
+                   
+                        {teams.map(t=>
+                         <tr>
+                            <th>{getTeamCode(t.groupName)}</th>
+                            <th>{t.items.filter(f=>f.quarter=='Q1')
+                                .map(q=>this.getQuarterElement(q))}
+                            </th>
+                            <th>{t.items.filter(f=>f.quarter=='Q2')
+                                .map(q=>this.getQuarterElement(q))}
+                            </th>
+                            <th>{t.items.filter(f=>f.quarter=='Q3')
+                                .map(q=>this.getQuarterElement(q))}
+                            </th>
+                            <th>{t.items.filter(f=>f.quarter=='Q4')
+                                .map(q=>this.getQuarterElement(q))}
+                            </th>
+                         </tr>
+                        )}
+                   
+                </tbody>
+            </table>
+        );
+    }
+    getQuarterElement=(q)=>{
+        return <div style={{display:"flex",justifyContent:"space-between",paddingRight:15,paddingLeft:15}}>
+                <p className="text-center" style={{width:20}}>{q.happy}</p>
+                <p className="text-center" style={{width:20}}>{q.average}</p>
+                <p className="text-center" style={{width:20}}>{q.unhappy}</p>
+              </div>
+    }
     render() {
         const {minHeight} = this.state;
         return (

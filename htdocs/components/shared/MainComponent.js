@@ -196,6 +196,12 @@ export default class MainComponent extends React.Component {
         data[property] = value;
         this.setState({data});
     }
+    setFilter=(field,value)=>{
+        console.log(field,value);
+        const {filter}=this.state;
+        filter[field]=value;
+        this.setState({filter});
+    }
     editorHasProblems = async () => {
         return this.apiHeader.getNumberOfAllowedMistaks().then(nMistakes => {
             const wscInstances = WEBSPELLCHECKER.getInstances();
@@ -217,5 +223,19 @@ export default class MainComponent extends React.Component {
             }
             return false;
         });
+    }
+    getCorrectDate(date,hasTime=false){
+        let format="DD/MM/YYYY";
+        if(hasTime)
+        format +=" HH:mm";
+        if(date!='' && date!=null)
+        return moment(date).format(format);
+        else return '';
+    }
+    isEmpty(variable){
+        if(variable==null || variable==undefined || variable=='')
+            return true;
+        else 
+            return false;
     }
 }

@@ -5,7 +5,7 @@
  * Date: 28/09/2018
  * Time: 14:50
  */
-
+global $cfg;
 require_once($cfg["path_dbe"] . "/DBECustomerItem.inc.php");
 
 
@@ -67,7 +67,7 @@ class DBEDirectDebitContracts extends DBECustomerItem
             self::invoiceToDate,
             DA_DATE,
             DA_NOT_NULL,
-            "DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` + `invoicePeriodMonths` MONTH ), '%d/%m/%Y')"
+            "DATE_FORMAT( date_sub(DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` + `invoicePeriodMonths` MONTH ), INTERVAL 1 day), '%d/%m/%Y')"
         );
         $this->addColumn(
             self::invoiceFromDateYMD,
@@ -79,7 +79,7 @@ class DBEDirectDebitContracts extends DBECustomerItem
             self::invoiceToDateYMD,
             DA_DATE,
             DA_NOT_NULL,
-            "DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` + `invoicePeriodMonths` MONTH ), '%Y-%m-%d') as invoiceToDateYMD"
+            " date_sub(DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` + `invoicePeriodMonths` MONTH ),interval 1 day) as invoiceToDateYMD"
         );
 
         $this->addColumn(

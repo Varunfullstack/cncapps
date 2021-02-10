@@ -51,7 +51,7 @@ class TableHeader extends React.Component {
                             width: c.width ? c.width : "",
                             //title:c.toolTip?c.toolTip:""
                         },
-                        el('div', {className: "tooltip"},
+                        el('div', {className: "tooltip",style:c.hdStyle},
                             c?.label || " ",
                             c.icon ? el('i', {className: c.icon}) : null,
                             renderSortIcon(c),

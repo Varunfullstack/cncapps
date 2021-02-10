@@ -24,5 +24,14 @@ class APIUser extends APIMain{
     getSettings(page){        
         return this.get(`${ApiUrls.User}settings&type=${page}`);
     }
+    getMyFeedback(from=null,to=null){     
+        let url=`${ApiUrls.User}myFeedback`;   
+        if(from)
+        url +='&from='+from;
+
+        if(to)
+        url +='&to='+to;
+        return this.get(url);
+    }
 }
 export default APIUser;

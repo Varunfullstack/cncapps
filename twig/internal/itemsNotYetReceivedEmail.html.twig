@@ -1,5 +1,7 @@
 {% extends "@internal/wrapper.html.twig" %}
 {# @var itemsNotYetReceived [] #}
+{# @var salesOrdersWithoutSRs \CNCLTD\SalesOrderWithoutServiceRequestDTO[] #}
+{# @var pageDomain string #}
 {% block styles %}
     td.amberBackground {
     background-color: #FFEB9C;
@@ -11,6 +13,43 @@
     }
 {% endblock %}
 {% block content %}
+
+    {% if salesOrdersWithoutSRs|length > 0 %}
+        <h2>Sales Orders with no Service Requests</h2>
+        <table>
+            <thead>
+            <tr>
+                <th style="text-align: left">
+                    SO Number
+                </th>
+                <th style="text-align: left">
+                    Customer
+                </th>
+                <th style="text-align: left">
+                    Description
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for salesOrderWithoutSR in salesOrdersWithoutSRs %}
+                <tr>
+                    <td>
+                        <a href='{{ pageDomain }}/SalesOrder.php?action=displaySalesOrder&ordheadID={{ salesOrderWithoutSR.salesOrderId }}'
+                           target="_blank"
+                        >{{ salesOrderWithoutSR.salesOrderId }}</a>
+                    </td>
+                    <td>
+                        {{ salesOrderWithoutSR.customerName }}
+                    </td>
+                    <td>
+                        {{ salesOrderWithoutSR.itemLineDescription }}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
     <P>
         <span style="color:red;background-color: red">R</span> Not ordered yet.
         <span style="color: orange;background-color: orange">A</span> Ordered but not

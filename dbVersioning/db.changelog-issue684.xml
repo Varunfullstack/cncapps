@@ -1,0 +1,557 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdevmt" id="issue684-0">
+        <tagDatabase tag="issue684"/>
+    </changeSet>
+    <changeSet id="issue684-1" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="project" columnName="outOfHoursInternalBudgetDays"/>
+                <columnExists tableName="project" columnName="inHoursInternalBudgetDays"/>
+            </not>
+        </preConditions>
+         <addColumn tableName="project">
+            <column name="outOfHoursInternalBudgetDays" type="DECIMAL(4,2)" defaultValue="0">
+                <constraints nullable="true"/>
+            </column>
+            <column name="inHoursInternalBudgetDays" type="DECIMAL(4,2)" defaultValue="0">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="project" columnName="outOfHoursInternalBudgetDays" />                            
+            <dropColumn tableName="project" columnName="inHoursInternalBudgetDays" />                            
+        </rollback>
+    </changeSet>    
+    <changeSet id="issue684-2" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ProjectIssues" />                
+            </not>
+        </preConditions>
+         <createTable tableName="ProjectIssues">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="consID" type="int">
+                <constraints 
+                nullable="false" 
+                foreignKeyName="project_consultant_fk" 
+                referencedTableName="consultant"
+                referencedColumnNames="cns_consno"/>
+            </column>
+            <column name="projectID" type="int">
+                <constraints 
+                nullable="false" 
+                foreignKeyName="project_fk" 
+                referencedTableName="project"
+                referencedColumnNames="projectID"/>
+            </column>
+            <column name="issuesRaised" type="text" >
+                <constraints nullable="true"/>
+            </column>
+            <column name="engineersSummary" type="text">
+                <constraints nullable="true"/>
+            </column>
+            <column name="projectManagersSummary" type="text">
+                <constraints nullable="true"/>
+            </column>
+            <column name="notes" type="text">
+                <constraints nullable="true"/>
+            </column>
+            <column name="createAt" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP" >
+                <constraints nullable="true"/>
+            </column>
+        </createTable>  
+        <rollback>
+            <dropTable tableName="ProjectIssues" cascadeConstraints="true" /> 
+        </rollback>
+    </changeSet>  
+    <changeSet id="issue684-3" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ProjectStages" />                
+            </not>
+        </preConditions>
+         <createTable tableName="ProjectStages">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+             
+            <column name="name" type="varchar(100)" >
+                <constraints nullable="false"/>
+            </column>           
+        </createTable>  
+        <sql>
+        insert into ProjectStages(name) values('Pre-planning');
+        insert into ProjectStages(name) values('Pending project commencement');
+        insert into ProjectStages(name) values('Project in progress');
+        insert into ProjectStages(name) values('In QA');
+        insert into ProjectStages(name) values('Pending Completion');
+         <![CDATA[
+        insert into ProjectStages(name) values('Completed & closed');
+        ]]>
+        </sql>
+        <rollback>
+            <dropTable tableName="ProjectStages" /> 
+        </rollback>
+    </changeSet> 
+
+    <changeSet id="issue684-4" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ProjectStagesHistory" />                
+            </not>
+        </preConditions>
+         <createTable tableName="ProjectStagesHistory">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="projectID" type="int">
+                <constraints 
+                nullable="false" 
+                foreignKeyName="project_stage_history_project_fk" 
+                referencedTableName="project"
+                referencedColumnNames="projectID"/>
+            </column>
+            <column name="stageID" type="int">
+                <constraints 
+                nullable="false" 
+                foreignKeyName="project_stage_history_stage_fk" 
+                referencedTableName="ProjectStages"
+                referencedColumnNames="id"/>
+            </column>
+             <column name="consID" type="int">
+                <constraints 
+                nullable="false" 
+                foreignKeyName="project_stage_history_consultant_fk" 
+                referencedTableName="consultant"
+                referencedColumnNames="cns_consno"/>
+            </column>            
+            <column name="stageTimeHours" type="DECIMAL(4,2)" >
+                <constraints nullable="true"/>
+            </column>           
+            <column name="createAt" type="DATETIME" defaultValueComputed ="CURRENT_TIMESTAMP" >
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <rollback>
+            <dropTable tableName="ProjectStagesHistory" /> 
+        </rollback>
+    </changeSet> 
+    <changeSet id="issue684-5" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">            
+                <tableExists tableName="ProjectIssues" />
+        </preConditions>
+
+        <dropColumn tableName="ProjectIssues" columnName="engineersSummary"/>
+        <dropColumn tableName="ProjectIssues" columnName="projectManagersSummary"/>
+        <dropColumn tableName="ProjectIssues" columnName="notes"/>
+
+        <addColumn tableName="project">
+           <column name="engineersSummary" type="text">
+                <constraints nullable="true"/>
+            </column>
+            <column name="projectManagersSummary" type="text">
+                <constraints nullable="true"/>
+            </column>
+             <column name="projectClosureDate" type="date">
+                <constraints nullable="true"/>
+            </column>
+            <column name="projectClosureNotes" type="text">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <rollback>
+            <dropColumn tableName="project" columnName="engineersSummary"/>
+            <dropColumn tableName="project" columnName="projectManagersSummary"/>
+            <dropColumn tableName="project" columnName="projectClosureNotes"/>
+            <dropColumn tableName="project" columnName="projectClosureDate"/>
+        </rollback>
+    </changeSet> 
+    <changeSet id="issue684-6" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ProjectTypes" />                
+            </not>
+        </preConditions>
+         <createTable tableName="ProjectTypes">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+             
+            <column name="name" type="varchar(100)" >
+                <constraints nullable="false"/>
+            </column>           
+            <column name="includeInWeeklyReport" type="tinyint(1)" defaultValue="0" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="notes" type="text">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>  
+        <sql>
+            insert into ProjectTypes(name) values('Leased Line');
+            insert into ProjectTypes(name) values('Office Move');
+            insert into ProjectTypes(name) values('Phone System');         
+        </sql>
+        <rollback>
+            <dropTable tableName="ProjectTypes" /> 
+        </rollback>
+    </changeSet> 
+    <changeSet id="issue684-7" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                 <columnExists tableName="project" columnName="projectStageId"/>             
+            </not>
+        </preConditions>
+         
+         <addColumn tableName="project">
+            <column name="projectStageID" type="int" >                
+                <constraints 
+                nullable="true" 
+                foreignKeyName="project_stage_fk" 
+                referencedTableName="projectstages"
+                referencedColumnNames="id"/>
+            </column>
+            <column name="projectTypeID" type="int" >
+                <constraints 
+                nullable="true" 
+                foreignKeyName="project_type_fk" 
+                referencedTableName="projecttypes"
+                referencedColumnNames="id"/>
+            </column>
+            <column name="expectedHandoverQADate" type="date" >
+                <constraints 
+                nullable="true" 
+                />
+            </column>
+            <column name="projectPlanningDate" type="date" >
+                <constraints 
+                nullable="true" 
+                />
+            </column>
+             <column name="projectManager" type="int">
+                <constraints 
+                nullable="true" 
+                foreignKeyName="project_manager_fk" 
+                referencedTableName="consultant"
+                referencedColumnNames="cns_consno"/>
+            </column>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="project" columnName="projectManager" /> 
+            <dropColumn tableName="project" columnName="projectPlanningDate" />                            
+            <dropColumn tableName="project" columnName="expectedHandoverQADate" />                            
+            <dropColumn tableName="project" columnName="projectTypeID" />  
+            <dropColumn tableName="project" columnName="projectStageID" />                            
+        </rollback>
+    </changeSet> 
+    <changeSet id="issue684-8" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">            
+                 <columnExists tableName="project" columnName="inHoursInternalBudgetDays"/>             
+                 <columnExists tableName="project" columnName="outOfHoursInternalBudgetDays"/>
+        </preConditions>
+        <dropColumn tableName="project" columnName="inHoursInternalBudgetDays" /> 
+        <dropColumn tableName="project" columnName="outOfHoursInternalBudgetDays" />             
+        <rollback>                                    
+        </rollback>
+    </changeSet> 
+    <changeSet id="issue684-9" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">      
+        <not>
+            <columnExists tableName="project" columnName="ordOriginalHeadID"/>
+            <columnExists tableName="project" columnName="originalQuoteDocumentFinalAgreed"/>
+        </not>
+        </preConditions>        
+        <addColumn tableName="project">
+            <column name="ordOriginalHeadID" type="int" >                
+                <constraints 
+                nullable="true" 
+                foreignKeyName="project_ordOriginalHeadID_fk" 
+                referencedTableName="ordhead"
+                referencedColumnNames="odh_ordno"/>
+            </column>            
+            <column name="originalQuoteDocumentFinalAgreed" type="varchar(150)" >
+                <constraints 
+                nullable="true" 
+                />
+            </column>           
+        </addColumn>
+        <rollback>
+        </rollback>
+    </changeSet> 
+     <changeSet id="issue684-10" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="ProjectStagesHistory" columnName="stageTimeHours"/>
+         
+        </preConditions>
+        <modifyDataType    
+            columnName="stageTimeHours"  
+            newDataType="decimal(8,2)"              
+            tableName="ProjectStagesHistory"/>   
+        <rollback>
+        </rollback>
+    </changeSet> 
+     <changeSet id="issue684-11" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">             
+                <tableExists tableName="ProjectStages" />                            
+        </preConditions>
+        <addColumn tableName="ProjectStages">
+            <column name="stageOrder" type="int" defaultValue="0" >                
+                <constraints 
+                nullable="true" 
+                 />
+            </column>                                  
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="ProjectStages" columnName="stageOrder" /> 
+        </rollback>
+    </changeSet> 
+
+    <changeSet id="issue684-12" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">             
+                <tableExists tableName="ProjectStages" />                            
+        </preConditions>
+        <modifyDataType    
+            columnName="stageOrder"  
+            newDataType="decimal(3,3)"              
+            tableName="ProjectStages"/>   
+        <rollback>
+         </rollback>
+    </changeSet> 
+    <changeSet id="issue684-14" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">             
+                <tableExists tableName="ProjectStages" />                            
+        </preConditions>
+        
+          <modifyDataType    
+            columnName="stageOrder"  
+            newDataType="float"              
+            tableName="ProjectStages"/>   
+            <sql>
+        update ProjectStages set stageOrder=id
+        </sql>
+        <rollback>
+         </rollback>
+    </changeSet> 
+    <changeSet id="issue684-15" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">  
+            <not>                
+                <tableExists tableName="reports" />
+                <tableExists tableName="reports_paramters" />
+                <tableExists tableName="reports_categories" />
+                <tableExists tableName="report_paramters" />
+                <tableExists tableName="report_categories" />
+            </not>
+        </preConditions>
+        <createTable tableName="reports">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="title" type="varchar(150)" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="component"  type="varchar(150)" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="active"  type="tinyint(1)"  defaultValue="1" >
+                <constraints nullable="false"/>
+            </column> 
+        </createTable>  
+        <createTable tableName="reports_paramters">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="title" type="varchar(150)" >
+                <constraints nullable="false"/>
+            </column> 
+            <column name="name" type="varchar(150)" >
+                <constraints nullable="false"/>
+            </column> 
+        </createTable>
+        <createTable tableName="reports_categories">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="title" type="varchar(150)" >
+                <constraints nullable="false"/>
+            </column>            
+            <column name="active"  type="tinyint(1)" defaultValue="1" >
+                <constraints nullable="false"/>
+            </column> 
+        </createTable>  
+        
+
+        <createTable tableName="report_paramters">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="reportID" type="int">
+                <constraints 
+                nullable="false" 
+                foreignKeyName="report_paramters_report_fk" 
+                referencedTableName="reports"
+                referencedColumnNames="id"/>
+            </column>
+            <column name="paramterID" type="int">
+                <constraints 
+                nullable="false" 
+                foreignKeyName="report_paramters_paramter_fk" 
+                referencedTableName="reports_paramters"
+                referencedColumnNames="id"/>
+            </column> 
+        </createTable>  
+
+        <createTable tableName="report_categories">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="reportID" type="int">
+                <constraints 
+                nullable="false" 
+                foreignKeyName="report_categories_report_fk" 
+                referencedTableName="reports"
+                referencedColumnNames="id"/>
+            </column>
+            <column name="categoryID" type="int">
+                <constraints 
+                nullable="false" 
+                foreignKeyName="report_categories_category_fk" 
+                referencedTableName="reports_categories"
+                referencedColumnNames="id"/>
+            </column> 
+        </createTable>  
+
+        <rollback>                    
+            <dropTable tableName="reports" />
+            <dropTable tableName="reports_paramters" />
+            <dropTable tableName="reports_categories" />
+            <dropTable tableName="report_paramters" />
+            <dropTable tableName="report_categories" />
+         </rollback>
+
+    </changeSet> 
+    <changeSet id="issue684-16" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">             
+                <tableExists tableName="report_paramters" />                            
+        </preConditions>
+
+        <addColumn tableName="report_paramters">
+            <column name="title" type="varchar(150)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="required" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <rollback>
+        <dropColumn tableName="report_paramters" columnName="title" />                            
+        <dropColumn tableName="report_paramters" columnName="required" />        
+         </rollback>
+    </changeSet> 
+    <changeSet id="issue684-17" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">             
+                <tableExists tableName="report_paramters" />                            
+        </preConditions>
+
+        <addColumn tableName="report_paramters">
+            <column name="paramterOrder" type="float" defaultValue="0">
+                <constraints nullable="true"/>
+            </column>          
+        </addColumn>
+        <rollback>
+        <dropColumn tableName="report_paramters" columnName="paramterOrder" />                                    
+         </rollback>
+    </changeSet> 
+    <changeSet id="issue684-18" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">             
+                <tableExists tableName="project" />                            
+        </preConditions>
+
+         <sql>
+         UPDATE project SET `projectClosureDate`=expiryDate WHERE `expiryDate` IS NOT NULL
+         </sql>
+        <rollback>
+          </rollback>
+    </changeSet> 
+    <changeSet id="issue684-19" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">             
+                <tableExists tableName="reports" />                            
+        </preConditions>
+         <sql>
+            INSERT INTO `reports` (`id`, `title`, `component`, `active`) VALUES('1','Projects By Consultant','RepProjectsByConsultant','1');
+            INSERT INTO `reports` (`id`, `title`, `component`, `active`) VALUES('2','Projects By Consultant \"Project in progress\"','RepProjectsByConsultantInProgress','1');
+            INSERT INTO `reports` (`id`, `title`, `component`, `active`) VALUES('3','Projects By Customer \"stage falls start and end date\"','RepProjectsByCustomerStageFallsStartEnd','1');
+            INSERT INTO `reports` (`id`, `title`, `component`, `active`) VALUES('4','Projects ','RepProjects','1');
+            INSERT INTO `reports` (`id`, `title`, `component`, `active`) VALUES('5','Projects without Clousure Meeting Date ','RepProjectsWithoutClousureMeeting','1');
+
+            INSERT INTO `reports_categories` (`id`, `title`, `active`) VALUES('1','Projects','1');
+            INSERT INTO `reports_categories` (`id`, `title`, `active`) VALUES('2','Technical','1');
+
+
+            INSERT INTO `reports_paramters` (`id`, `title`, `name`) VALUES('1','Consultant','consID');
+            INSERT INTO `reports_paramters` (`id`, `title`, `name`) VALUES('2','Date From','dateFrom');
+            INSERT INTO `reports_paramters` (`id`, `title`, `name`) VALUES('3','Date To','dateTo');
+            INSERT INTO `reports_paramters` (`id`, `title`, `name`) VALUES('4','Customer','customerID');
+            INSERT INTO `reports_paramters` (`id`, `title`, `name`) VALUES('5','Project Stage','projectStageID');
+            INSERT INTO `reports_paramters` (`id`, `title`, `name`) VALUES('6','Project Type','projectTypeID');
+
+            INSERT INTO `report_categories` (`id`, `reportID`, `categoryID`) VALUES('1','1','1');
+            INSERT INTO `report_categories` (`id`, `reportID`, `categoryID`) VALUES('2','2','1');
+            INSERT INTO `report_categories` (`id`, `reportID`, `categoryID`) VALUES('3','3','1');
+            INSERT INTO `report_categories` (`id`, `reportID`, `categoryID`) VALUES('4','4','1');
+            INSERT INTO `report_categories` (`id`, `reportID`, `categoryID`) VALUES('5','5','1');
+
+
+            INSERT INTO `report_paramters` (`id`, `reportID`, `paramterID`, `title`, `required`, `paramterOrder`) VALUES('1','1','1','Project Engineer','1','1');
+            INSERT INTO `report_paramters` (`id`, `reportID`, `paramterID`, `title`, `required`, `paramterOrder`) VALUES('2','1','2',NULL,'0','2');
+            INSERT INTO `report_paramters` (`id`, `reportID`, `paramterID`, `title`, `required`, `paramterOrder`) VALUES('3','1','3',NULL,'0','3');
+            INSERT INTO `report_paramters` (`id`, `reportID`, `paramterID`, `title`, `required`, `paramterOrder`) VALUES('4','2','1','Project Engineer','1','1');
+            INSERT INTO `report_paramters` (`id`, `reportID`, `paramterID`, `title`, `required`, `paramterOrder`) VALUES('5','2','2','Start Date','0','1');
+            INSERT INTO `report_paramters` (`id`, `reportID`, `paramterID`, `title`, `required`, `paramterOrder`) VALUES('6','2','3','End Date','0','1');
+            INSERT INTO `report_paramters` (`id`, `reportID`, `paramterID`, `title`, `required`, `paramterOrder`) VALUES('7','3','4',NULL,'1','1');
+            INSERT INTO `report_paramters` (`id`, `reportID`, `paramterID`, `title`, `required`, `paramterOrder`) VALUES('8','3','2','Start Date','0','2');
+            INSERT INTO `report_paramters` (`id`, `reportID`, `paramterID`, `title`, `required`, `paramterOrder`) VALUES('9','3','3','End Date','0','3');
+            INSERT INTO `report_paramters` (`id`, `reportID`, `paramterID`, `title`, `required`, `paramterOrder`) VALUES('12','4','5',NULL,'0','1');
+            INSERT INTO `report_paramters` (`id`, `reportID`, `paramterID`, `title`, `required`, `paramterOrder`) VALUES('13','4','6',NULL,'0','2');
+            INSERT INTO `report_paramters` (`id`, `reportID`, `paramterID`, `title`, `required`, `paramterOrder`) VALUES('14','4','2','Start Date','0','3');
+            INSERT INTO `report_paramters` (`id`, `reportID`, `paramterID`, `title`, `required`, `paramterOrder`) VALUES('15','4','3','End Date','0','4');
+
+         </sql>
+        <rollback>
+          </rollback>
+    </changeSet> 
+    <changeSet id="issue684-20" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">             
+                <tableExists tableName="ProjectTypes" />                            
+        </preConditions>
+
+        <sql>
+            insert into ProjectTypes(name) values('Server or Microsoft 365');
+            insert into ProjectTypes(name) values('Other');         
+        </sql>
+        <rollback>
+        </rollback>
+    </changeSet> 
+     <changeSet id="issue684-21" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">             
+                <tableExists tableName="ProjectStages" />                            
+        </preConditions>
+
+        <addColumn tableName="ProjectStages">
+            <column name="displayInSR" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="true"/>
+            </column>           
+        </addColumn>
+        <sql>
+            update ProjectStages set  displayInSR=1 where name in ('Project in progress','In QA');
+        </sql>
+        <rollback>
+        </rollback>
+    </changeSet> 
+</databaseChangeLog>

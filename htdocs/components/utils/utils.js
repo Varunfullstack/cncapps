@@ -131,6 +131,12 @@ export const SRQueues = [
     {id: 5, name: "Projects", teamID: 5, code: "P"},
     {id: 4, name: "Sales", teamID: 7, code: "S"},
 ]
+export const getTeamCode=(teamId)=>{
+    const team=SRQueues.find(t=>t.teamID==teamId);
+    if(team)
+    return team.code;
+    else return '';
+}
 export const TeamType = {
     Helpdesk: 1,
     Escalations: 2,
@@ -261,4 +267,7 @@ export function dateFormatExcludeNull(date, fromFormat = "YYYY-MM-DD", toFormat 
         return "";
     }
     return moment(date, fromFormat).format(toFormat);
+}
+export function equal(obj1,obj2){
+    return JSON.stringify(obj1)===JSON.stringify(obj2);
 }

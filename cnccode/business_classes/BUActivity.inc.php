@@ -1484,18 +1484,19 @@ class BUActivity extends Business
             return;
         }
         global $twig;
-        $body            = $twig->render(
+        $body           = $twig->render(
             $template,
             ["data" => $data]
         );
-        $emailRecipients = $this->getEmailRecipients(
+        $dbeSelfContact = new DBEContact($this);
+        $contactID      = $dbejCallactivity->getValue(DBEJCallActivity::contactID);
+        $dbeSelfContact->getRow($contactID);
+        $toEmail              = $dbeSelfContact->getValue(DBEContact::email);
+        $additionalRecipients = $this->getEmailRecipients(
             $dbejCallactivity,
             $othersFlag,
-            $selfFlag
+            $dbeSelfContact
         );
-        if (!$emailRecipients) {
-            return;
-        }
         $createdBy = $dbejCallactivity->getValue(DBEJCallActivity::caaConsno);
         $user      = new DBEUser($this);
         $user->getRow($createdBy);
@@ -1503,7 +1504,7 @@ class BUActivity extends Business
         if ($user->getValue(DBEUser::bccOnCustomerEmails)) {
             $bcc = [$user->getEmail()];
         }
-        $this->sendEmail($body, $subject, $emailRecipients, $bcc);
+        $this->sendEmail($body, $subject, $toEmail, $additionalRecipients, $bcc);
     }
 
     private function shouldSendCustomerEmail(DBEJCallActivity $dbejCallactivity)
@@ -1524,25 +1525,22 @@ class BUActivity extends Business
 
     private function getEmailRecipients(DBEJCallActivity $dbejCallactivity,
                                         string $othersFlag,
-                                        ?string $selfFlag = null
-    )
+                                        DBEContact $contact
+    ): array
     {
-        $dbeSelfContact = new DBEContact($this);
-        $contactID      = $dbejCallactivity->getValue(DBEJCallActivity::contactID);
-        $dbeSelfContact->getRow($contactID);
-        $emails = [];
-        if (!$selfFlag || $dbeSelfContact->getValue($selfFlag) == 'Y') {
-            $emails[] = $dbeSelfContact->getValue(DBEContact::email);
-        }
+
+        $emails     = [];
         $dbeProblem = new DBEProblem($this);
         $dbeProblem->getRow($dbejCallactivity->getValue(DBEJCallActivity::problemID));
         $buCustomer          = new BUCustomer($this);
         $mainSupportContacts = $buCustomer->getMainSupportContacts(
             $dbejCallactivity->getValue(DBEJCallActivity::customerID),
-            $dbeSelfContact->getValue(DBEContact::supportLevel) === DBEContact::supportLevelDelegate
+            $contact->getValue(DBEContact::supportLevel) === DBEContact::supportLevelDelegate
         );
         foreach ($mainSupportContacts as $supportContact) {
-            if ($supportContact[DBEContact::contactID] == $contactID || $supportContact[$othersFlag] != 'Y' || ($supportContact[DBEContact::supportLevel] == DBEContact::supportLevelSupervisor && $dbeSelfContact->getValue(
+            if ($supportContact[DBEContact::contactID] == $contact->getValue(
+                    DBEContact::contactID
+                ) || $supportContact[$othersFlag] != 'Y' || ($supportContact[DBEContact::supportLevel] == DBEContact::supportLevelSupervisor && $contact->getValue(
                         DBEContact::supportLevel
                     ) == DBEContact::supportLevelDelegate) && $dbeProblem->getValue(
                     DBEProblem::authorisedBy
@@ -1551,13 +1549,18 @@ class BUActivity extends Business
             }
             $emails[] = $supportContact[DBEContact::email];
         }
-        return implode(',', $emails);
+        return $emails;
     }
 
-    private function sendEmail(string $body, string $subject, string $emailRecipients, ?array $bcc = [])
+    private function sendEmail(string $body,
+                               string $subject,
+                               string $emailRecipients,
+                               ?array $cc = [],
+                               ?array $bcc = []
+    )
     {
         $buMail = new BUMail($this);
-        $buMail->sendSimpleEmail($body, $subject, $emailRecipients, CONFIG_SUPPORT_EMAIL, [], $bcc);
+        $buMail->sendSimpleEmail($body, $subject, $emailRecipients, CONFIG_SUPPORT_EMAIL, $cc, $bcc);
     }
 
     private function sendMonitoringEmails($callActivityID)
@@ -6441,7 +6444,7 @@ class BUActivity extends Business
         $dbeJCallActivity  = $this->getFirstActivityInServiceRequest($problemID);
         $urlActivity       = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
-        $projectURL        = SITE_URL . '/Project.php?action=add&customerID=' . $dbeJCallActivity->getValue(
+        $projectURL        = SITE_URL . '/Projects.php?action=add&customerID=' . $dbeJCallActivity->getValue(
                 DBEJCallActivity::customerID
             );
         $createProjectLink = "<a href='" . $projectURL . "'>Click here to create a project for this request</a>";

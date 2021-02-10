@@ -6,21 +6,32 @@ import ReactDOM from 'react-dom';
 import '../style.css'
 import MainComponent from '../shared/MainComponent';
 import APIMySettings from './services/APIMySettings';
-
+import APIUser from '../services/APIUser';
+import Table from '../shared/table/table';
+import '../shared/table/table.css';
 class MySettingsComponent extends MainComponent {
     el = React.createElement;
     api=new APIMySettings();
+    apiUser=new APIUser();
     TAB_MY_ACCOUNT=1;
     TAB_MY_SETTINGS=2;
+    TAB_MY_FEEDBACK=3;
     constructor(props) {
         super(props);
         this.state = {
             ...this.state,
-            activeTab:this.TAB_MY_ACCOUNT
+            activeTab:this.TAB_MY_ACCOUNT,
+            feedbacks:[],
+            filter:{
+                from:moment().subtract(3,'M').format("YYYY-MM-01"),
+                to:''
+            }
         };
         this.tabs = [
             {id: this.TAB_MY_ACCOUNT, title: "My Account", icon: null},
             {id: this.TAB_MY_SETTINGS, title: "My Settings", icon: null},
+            {id: this.TAB_MY_FEEDBACK, title: "My Feedback", icon: null},
+
         ];
     }
 
@@ -83,20 +94,20 @@ class MySettingsComponent extends MainComponent {
         else return "";
     };
     setActiveTab = (activeTab) => {         
-        this.setState({activeTab});        
+        this.setState({activeTab},()=>this.loadActiveTabData());        
     };
     getElement(key, label, value) {
-        return [
-            this.el('dt', {key: key + "_label", className: 'col-3'}, label),
-            this.el('dd', {key: key + '_value', className: 'col-9'}, value == null ? '' : value),
-        ];
+        return <tr key>
+            <td>{label}</td>
+            <td>{value}</td>
+        </tr>        
     }
 
     getUserLog() {
         if (this.state.userLog)
             return this.el("dl", {key: "user_log"}, [
-                this.state.userLog.map((log) => {
-                    return this.el('dd', {key: log.userTimeLogID}, log.loggedDate + ' ' + log.startedTime)
+                this.state.userLog.map((log,indx) => {
+                    return this.el('dd', {key: indx}, log.loggedDate + ' ' + log.startedTime)
                 })]);
 
         else return null;
@@ -122,21 +133,43 @@ class MySettingsComponent extends MainComponent {
         // })
     }
     getMyAccountTab=()=>{
-       return  this.el('dl', {className: 'row', key: 'about_me'}, [
-            this.getElement('name', 'Name', this.state.name),
-
-            this.getElement('jobTitle', 'Job Title', this.state.jobTitle),
-
-            this.getElement('startDate', 'Start Date', this.state.startDate),
-
-            this.getElement('lengthOfServices', 'Length Of Service', this.state.lengthOfServices + " years"),
-
-            this.getElement('manager', 'Manager', this.state.manager),
-
-            this.getElement('team', 'Team', this.state.team),
-            this.el('dt', {key: 'userLog', className: 'col-3'}, 'Last login times'),
-            this.getUserLog(),
-        ]);
+       return (
+         <table style={{width:400}} key="table-active">
+           <tbody>
+               <tr>
+                   <td>Name</td>
+                   <td>{ this.state.name}</td>
+               </tr>
+               <tr>
+                   <td>Job Title</td>
+                   <td>{ this.state.jobTitle}</td>
+               </tr>
+               <tr>
+                   <td>Start Date</td>
+                   <td>{ this.state.startDate}</td>
+               </tr>
+               <tr>
+                   <td>Length Of Service</td>
+                   <td>{  this.state.lengthOfServices + " years"}</td>
+               </tr>
+               <tr>
+                   <td>Manager</td>
+                   <td>{ this.state.manager}</td>
+               </tr>
+               <tr>
+                   <td>Team</td>
+                   <td>{ this.state.team}</td>
+               </tr>
+          
+             <tr>
+                 <td>Last login times</td>
+                 <td>{this.getUserLog()}</td>
+             </tr>
+              
+           </tbody>
+         </table>
+       );
+       
     }
     getMySettingTab=()=>{
         return this.el('div',{key:"container"},         
@@ -159,6 +192,98 @@ class MySettingsComponent extends MainComponent {
         this.el('button', {key: 'btnSave', style: {width: 50}, onClick: this.handleOnClick}, 'Save')
         );
     }
+    getMyFeedbackTab= ()=>{
+        const {feedbacks,filter}=this.state;;
+        const columns=[
+            {
+                path: "value",
+                label: "",
+                hdToolTip: "Comments",
+                //hdClassName: "text-center",
+                icon: "fal fa-2x fa-heart color-gray2 pointer",
+                sortable: true,
+                content:(feed)=>{
+                    switch (feed.value) {
+                        case 1:
+                            return <i className="fal fa-smile fa-2x"></i>
+                        case 2:
+                            return <i className="fal fa-meh fa-2x "></i>
+                        case 3:
+                            return <i className="fal fa-frown fa-2x "></i>                    
+                        default:
+                        return  '';
+                    }
+                }
+                //className: "text-center",
+             },
+             {
+                path: "problemID",
+                label: "",
+                hdToolTip: "Service Request",
+                //hdClassName: "text-center",
+                icon: "fal fa-2x fa-hashtag color-gray2 pointer",
+                sortable: true,
+                content:(feed)=><a href={`SRActivity.php?action=displayActivity&serviceRequestId=${feed.problemID}` } target="_blank">{feed.problemID}</a>,
+                className: "text-center",
+             },
+            {
+               path: "cus_name",
+               label: "",
+               hdToolTip: "Customer",
+               //hdClassName: "text-center",
+               icon: "fal fa-2x fa-building color-gray2 pointer",
+               sortable: true,
+               //className: "text-center",
+            },
+            {
+                path: "comments",
+                label: "",
+                hdToolTip: "Comments",
+                //hdClassName: "text-center",
+                icon: "fal fa-2x fa-file-alt color-gray2 pointer",
+                sortable: true,
+                //className: "text-center",
+             },
+             {
+                path: "createdAt",
+                label: "",
+                hdToolTip: "Date of feedback",
+                //hdClassName: "text-center",
+                icon: "fal fa-2x fa-calendar color-gray2 pointer",
+                sortable: true,                
+                className: "text-center",
+             },
+        ]
+        return <div>
+            <div className="flex-row" style={{alignItems:"center",marginBottom:10}}>
+                <div>From</div>
+                <div><input style={{marginLeft:12}} type="date" value={filter.from} onChange={(event)=>this.setFilter('from',event.target.value)}></input></div>
+                <div>To</div>
+                <div><input type="date" value={filter.to} onChange={(event)=>this.setFilter('to',event.target.value)}></input></div>
+            </div>
+        <Table id="myfeedback"
+        data={feedbacks || []}
+        columns={columns}
+        pk="id"
+        search={true}        
+        >
+        </Table>
+        </div>;
+    }
+    setFilter=(field,value)=>{
+        const {filter}=this.state;
+        filter[field]=value;
+        this.setState({filter});
+        this.loadActiveTabData();
+    }
+    loadActiveTabData=()=>{
+        const {activeTab,filter}=this.state;
+        switch(activeTab)
+        {
+            case this.TAB_MY_FEEDBACK:
+                return  this.apiUser.getMyFeedback(filter.from,filter.to).then(feedbacks=>this.setState({feedbacks}));                            
+        }
+    }
     getActiveTab=()=>{
         const {activeTab}=this.state;
         switch(activeTab)
@@ -167,6 +292,8 @@ class MySettingsComponent extends MainComponent {
                 return this.getMyAccountTab();                
             case this.TAB_MY_SETTINGS:
                 return this.getMySettingTab();
+            case this.TAB_MY_FEEDBACK:
+                return this.getMyFeedbackTab();
         }
     }
     render() {        
