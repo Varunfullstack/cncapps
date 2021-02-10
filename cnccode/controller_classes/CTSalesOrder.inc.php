@@ -2260,7 +2260,7 @@ class CTSalesOrder extends CTCNC
                     'updatedTime' => $dsOrdhead->getValue(DBEOrdhead::updatedTime)
                 )
             );
-            $salesOrderLineDesc = '<A class="updatedTimeLink" href="' . $urlEditLine . '">' . Controller::htmlDisplayText(
+            $salesOrderLineDesc = '<A class="updatedTimeLink" href="' . $urlEditLine . '" target="_blank">' . Controller::htmlDisplayText(
                     $dsOrdline->getValue(DBEOrdline::description)
                 ) . '</A>';
         } else {

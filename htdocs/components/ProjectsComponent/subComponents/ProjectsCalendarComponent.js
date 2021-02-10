@@ -6,78 +6,84 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 
 
-export default class ProjectsCalendarComponent extends MainComponent { 
-  api = new APIProjects(); 
-  constructor(props) {
-    super(props);
-    this.state = {
-      ...this.state,
-      showSpinner: false,            
-      projects:[]
-     
-    };     
-  }
+export default class ProjectsCalendarComponent extends MainComponent {
+    api = new APIProjects();
 
-  componentDidMount() {
-    this.getData();
-  }
-  getData(){
-    this.setState({showSpinner:true});
-    this.api.getProjects(this.props.projectID).then(projects=>{
-      console.log('projects',projects);
-      this.setState({projects,showSpinner:false});
-    })
-  }
-  getCalendar=()=>{
-      const {projects}=this.state;
-      if(projects.length==0)
-      return null;
-      const events=projects.filter(p=>p.commenceDate!=null).map(p=>{
-          return {
-              title:p.description,
-              //date:p.commenceDate,              
-              start:p.commenceDate,
-              end:p.expectedHandoverQADate,
-              id:p.projectID,
-              eventContent:"test"
-          }
-      })
-      return <FullCalendar
-      plugins={[ dayGridPlugin ]}
-      initialView="dayGridMonth"
-      weekends={true}
-      events={events}
-      eventContent={this.handleEventRender}
-      eventClick={this.handleEventClick}
-    />
-  }
-  handleEventClick=(event)=>{      
-      window.location=`Projects.php?action=edit&&projectID=${event.event._def.publicId}`
-  }
-  handleEventRender=(arg)=>{
-      const {projects}=this.state;
-      const project=projects.find(p=>p.projectID==arg.event.id);
-      console.log(project);
-    // const el=$(info.el).find(".fc-event-title-container")[0];
-    // el.append(<p>Test</p>);
-    // console.log(info,$(info.el).find(".fc-event-title-container").length);
-    let eventEl = document.createElement('div')    
-    eventEl.innerHTML = `
+    constructor(props) {
+        super(props);
+        this.state = {
+            ...this.state,
+            showSpinner: false,
+            projects: []
+
+        };
+    }
+
+    componentDidMount() {
+        this.getData();
+    }
+
+    getData() {
+        this.setState({showSpinner: true});
+        this.api.getProjects(this.props.projectID).then(projects => {
+            console.log('projects', projects);
+            this.setState({projects, showSpinner: false});
+        })
+    }
+
+    getCalendar = () => {
+        const {projects} = this.state;
+        if (projects.length == 0)
+            return null;
+        const events = projects.filter(p => p.commenceDate != null).map(p => {
+            return {
+                title: p.description,
+                //date:p.commenceDate,
+                start: p.commenceDate,
+                end: p.expectedHandoverQADate,
+                id: p.projectID,
+                eventContent: "test"
+            }
+        })
+        return <FullCalendar
+            plugins={[dayGridPlugin]}
+            initialView="dayGridMonth"
+            weekends={true}
+            events={events}
+            eventContent={this.handleEventRender}
+            eventClick={this.handleEventClick}
+        />
+    }
+    handleEventClick = (event) => {
+        window.open(`Projects.php?action=edit&&projectID=${event.event._def.publicId}`, '_blank');
+    }
+    handleEventRender = (arg) => {
+        const {projects} = this.state;
+        const project = projects.find(p => p.projectID == arg.event.id);
+        console.log(project);
+        // const el=$(info.el).find(".fc-event-title-container")[0];
+        // el.append(<p>Test</p>);
+        // console.log(info,$(info.el).find(".fc-event-title-container").length);
+        let eventEl = document.createElement('div')
+        eventEl.innerHTML = `
       <p>${project.customerName}</p>
       <p>${project.description}</p>
       <p>${project.assignedEngineer}</p>            
       `;
-      let arrayOfDomNodes = [ eventEl ]
+        let arrayOfDomNodes = [eventEl]
 
-    return{ domNodes: arrayOfDomNodes }
+        return {domNodes: arrayOfDomNodes}
 
-  }
-  render() {  
-     return <div>
-                <Spinner  key="spinner" show= {this.state.showSpinner}></Spinner>
-               {this.getCalendar()}
-            </div>
-  }
+    }
+
+    render() {
+        return <div>
+            <Spinner key="spinner"
+                     show={this.state.showSpinner}
+            />
+            {this.getCalendar()}
+        </div>
+    }
 
 }
 

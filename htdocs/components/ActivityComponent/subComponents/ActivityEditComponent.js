@@ -20,7 +20,7 @@ import {InternalDocumentsComponent} from "./InternalDocumentsComponent";
 import AssetListSelectorComponent from "../../shared/AssetListSelectorComponent/AssetListSelectorComponent";
 import EditorFieldComponent from "../../shared/EditorField/EditorFieldComponent";
 import {TimeBudgetElement} from "./TimeBudgetElement";
-import { LinkServiceRequestOrder } from "./LinkserviceRequestOrder.js";
+import {LinkServiceRequestOrder} from "./LinkserviceRequestOrder.js";
 import {ActivityType} from "../../shared/ActivityTypes";
 
 // noinspection EqualityComparisonWithCoercionJS
@@ -100,7 +100,7 @@ class ActivityEditComponent extends MainComponent {
                 criticalSR: false,
                 monitorSR: false,
             },
-            showSalesOrder:false
+            showSalesOrder: false
         };
     }
 
@@ -877,7 +877,7 @@ class ActivityEditComponent extends MainComponent {
         );
     };
     handleSalesOrder = async (callActivityID, serviceRequestId) => {
-        this.setState({showSalesOrder:true});
+        this.setState({showSalesOrder: true});
 
     };
     handleUnlink = async (callActivityID, linkedSalesOrderID, serviceRequestId) => {
@@ -1234,7 +1234,6 @@ class ActivityEditComponent extends MainComponent {
                 key={"rootCauses"}
                 disabled={!data.canChangePriorityFlag}
                 style={{maxWidth: 200, width: "100%"}}
-                required={true}
                 value={data?.rootCauseID || ""}
                 onChange={(event) => this.setValue("rootCauseID", event.target.value)}
             >
@@ -1779,12 +1778,13 @@ class ActivityEditComponent extends MainComponent {
         }
         this.setState({data});
     };
-    handleSalesOrderClose=()=>{
-        this.setState({showSalesOrder:false});
+    handleSalesOrderClose = () => {
+        this.setState({showSalesOrder: false});
         this.loadCallActivity(this.state.currentActivity);
     }
+
     render() {
-        const {data,showSalesOrder} = this.state;
+        const {data, showSalesOrder} = this.state;
         return (
             <div style={{width: "90%"}}>
                 {this.getAlert()}
@@ -1812,8 +1812,11 @@ class ActivityEditComponent extends MainComponent {
                 />
                 <InternalDocumentsComponent serviceRequestId={data?.problemID}/>
                 {this.getTemplateModal()}
-                {showSalesOrder?<LinkServiceRequestOrder serviceRequestID={data.problemID} customerId={data?.customerId} show={showSalesOrder}
-                onClose={this.handleSalesOrderClose}></LinkServiceRequestOrder>:null}
+                {showSalesOrder ? <LinkServiceRequestOrder serviceRequestID={data.problemID}
+                                                           customerId={data?.customerId}
+                                                           show={showSalesOrder}
+                                                           onClose={this.handleSalesOrderClose}
+                ></LinkServiceRequestOrder> : null}
             </div>
         );
     }
