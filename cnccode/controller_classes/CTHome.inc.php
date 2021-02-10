@@ -1780,7 +1780,7 @@ WHERE callactivity.`caa_date` = ?
   AND callactivity.`caa_endtime`
   AND callactivity.`caa_consno` <> 67
   AND team.`level` = ?
-  and callactivity.callacttypeno not in (6,22)
+  and callactivity.caa_callacttypeno not in (6,22)
   and consultant.excludeFromStatsFlag <> 'Y'
 ORDER BY engineerName,
   startTime";
