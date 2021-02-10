@@ -26,16 +26,16 @@ require_once($cfg['path_dbe'] . '/DBEInvoiceTotals.inc.php');
 
 class BUInvoice extends Business
 {
-    const searchFormCustomerID = 'customerID';
-    const searchFormStartDate = 'startDate';
-    const searchFormEndDate = 'endDate';
+    const searchFormCustomerID     = 'customerID';
+    const searchFormStartDate      = 'startDate';
+    const searchFormEndDate        = 'endDate';
     const searchFormStartInvheadID = 'startInvheadID';
-    const searchFormEndInvheadID = 'endInvheadID';
-    const searchFormPrintedFlag = 'printedFlag';
-    const searchFormInvheadID = 'invheadID';
-    const searchFormOrdheadID = 'ordheadID';
-    const searchFormCustomerName = 'customerName';
-    const searchFormInvoiceType = 'invoiceType';
+    const searchFormEndInvheadID   = 'endInvheadID';
+    const searchFormPrintedFlag    = 'printedFlag';
+    const searchFormInvheadID      = 'invheadID';
+    const searchFormOrdheadID      = 'ordheadID';
+    const searchFormCustomerName   = 'customerName';
+    const searchFormInvoiceType    = 'invoiceType';
     /** @var DBEInvhead|DataSet */
     public $dbeInvhead;
     /** @var DBEJInvhead */
@@ -53,9 +53,9 @@ class BUInvoice extends Business
     function __construct(&$owner)
     {
         parent::__construct($owner);
-        $this->dbeInvhead = new DBEInvhead($this);
-        $this->dbeJInvhead = new DBEJInvhead($this);
-        $this->dbeJInvline = new DBEJInvline($this);
+        $this->dbeInvhead   = new DBEInvhead($this);
+        $this->dbeJInvhead  = new DBEJInvhead($this);
+        $this->dbeJInvline  = new DBEJInvline($this);
         $this->buSageExport = new BUSageExport($this);
     }
 
@@ -175,13 +175,12 @@ class BUInvoice extends Business
         }
     }
 
-    function getPrintedInvoicesByRange(
-        $customerID,
-        $startDate,
-        $endDate,
-        $startInvheadID,
-        $endInvheadID,
-        &$dsResults
+    function getPrintedInvoicesByRange($customerID,
+                                       $startDate,
+                                       $endDate,
+                                       $startInvheadID,
+                                       $endInvheadID,
+                                       &$dsResults
     )
     {
         $this->setMethodName('getPrintedInvoicesByRange');
@@ -195,7 +194,6 @@ class BUInvoice extends Business
             $startInvheadID,
             $endInvheadID
         );
-
         return ($this->getData(
             $this->dbeJInvhead,
             $dsResults
@@ -214,19 +212,15 @@ class BUInvoice extends Business
     )
     {
         $this->setMethodName('createInvoiceFromDespatch');
-
         /*
         If there is no value then do not create an invoice
         */
         $dsDespatch->initialise();
         $dsOrdline->initialise();
-
         $totalValue = 0;
-
         while ($dsDespatch->fetchNext()) {
 
             $dsOrdline->fetchNext();
-
             if ($dsDespatch->getValue(BUDespatch::despatchQtyToDespatch) > 0) {
 
                 if ($dsOrdline->getValue(DBEOrdline::lineType) == 'I') {
@@ -240,11 +234,9 @@ class BUInvoice extends Business
             }
 
         }
-
         if ($totalValue == 0) {
             return false;
         }
-
         $invheadID = $this->generateInvHeaderFromOrder($dsOrdhead);
         // invoice lines
         $dsDespatch->initialise();
@@ -321,12 +313,10 @@ class BUInvoice extends Business
             DBEInvhead::customerID,
             $dsOrdhead->getValue(DBEOrdhead::customerID)
         );
-
         $this->dbeInvhead->setValue(
             DBEInvhead::transactionType,
             $dsOrdhead->getValue(DBEOrdhead::transactionType)
         );
-
         $this->dbeInvhead->setValue(
             DBEInvhead::siteNo,
             $dsOrdhead->getValue(DBEOrdhead::invSiteNo)
@@ -379,28 +369,22 @@ class BUInvoice extends Business
             DBEInvhead::paymentTermsID,
             $dsOrdhead->getValue(DBEOrdhead::paymentTermsID)
         );
-
         $this->dbeInvhead->setValue(
             DBEInvhead::vatCode,
             $dsOrdhead->getValue(DBEOrdhead::vatCode)
         );
-
         $this->dbeInvhead->setValue(
             DBEInvhead::directDebitFlag,
             $dsOrdhead->getValue(DBEOrdhead::directDebitFlag)
         );
-
-
         $dbeVat = new DBEVat($this);
         $dbeVat->getRow();
         $vatCode = $dsOrdhead->getValue(DBEOrdhead::vatCode);
         $vatRate = $dbeVat->getValue((integer)$vatCode[1]); // use second part of code as column no
-
         $this->dbeInvhead->setValue(
             DBEInvhead::vatRate,
             $vatRate
         );
-
         $this->dbeInvhead->setValue(
             DBEInvhead::intPORef,
             $dsOrdhead->getValue(DBEOrdhead::quotationOrdheadID)
@@ -444,9 +428,7 @@ class BUInvoice extends Business
         If there is no value then do not create an invoice
         */
         $totalValue = 0;
-
         $dsOrdline->initialise();
-
         while ($dsOrdline->fetchNext()) {
 
             if ($dsOrdline->getValue(DBEOrdline::lineType) == 'I') {
@@ -458,7 +440,6 @@ class BUInvoice extends Business
             }
 
         }
-
         if ($totalValue == 0) {
             ?>
             <div>
@@ -467,9 +448,7 @@ class BUInvoice extends Business
             <?php
             return false;
         }
-
         $invheadID = $this->generateInvHeaderFromOrder($dsOrdhead);
-
         // invoice lines
         $dsOrdline->initialise();
         $sequenceNo = 0;
@@ -858,10 +837,9 @@ class BUInvoice extends Business
         $dbeInvline->shuffleRowsUp();
     }
 
-    function updateHeader(
-        $invheadID,
-        $custPORef,
-        $paymentTermsID
+    function updateHeader($invheadID,
+                          $custPORef,
+                          $paymentTermsID
     )
     {
         $this->setMethodName(' updateHeader');
@@ -881,20 +859,16 @@ class BUInvoice extends Business
         return TRUE;
     }
 
-    function updateAddress(
-        $invheadID,
-        $siteNo
+    function updateAddress($invheadID,
+                           $siteNo
     )
     {
         $this->setMethodName('updateAddress');
         if (!$invheadID) {
             $this->raiseError('invheadID not passed');
         }
-
         $dbeInvhead = &$this->dbeInvhead;
-
         $dbeInvhead->getRow($invheadID); //existing values
-
         $buSite = new BUSite($this);
         $dsSite = new DataSet($this);
         $buSite->getSiteByID(
@@ -902,7 +876,6 @@ class BUInvoice extends Business
             (int)$siteNo,
             $dsSite
         );
-
         $buContact = new BUContact($this);
         $dsContact = new DataSet($this);
         if (!$buContact->getContactByID(
@@ -911,7 +884,6 @@ class BUInvoice extends Business
         )) {
             $this->raiseError('contact not found');
         }
-
         $dbeInvhead->setValue(
             DBEInvhead::siteNo,
             $siteNo
@@ -948,7 +920,6 @@ class BUInvoice extends Business
             DBEInvhead::contactName,
             $dsContact->getValue(DBEContact::firstName) . ' ' . $dsContact->getValue(DBEContact::lastName)
         );
-
         $dbeInvhead->updateRow();
         return TRUE;
     }
@@ -964,10 +935,9 @@ class BUInvoice extends Business
         if (!$contactID) {
             $this->raiseError('contactID not passed');
         }
-
         $dbeInvhead = &$this->dbeInvhead;
-        $buContact = new BUContact($this);
-        $dsContact = new DataSet($this);
+        $buContact  = new BUContact($this);
+        $dsContact  = new DataSet($this);
         $buContact->getContactByID(
             $contactID,
             $dsContact
@@ -1123,7 +1093,7 @@ class BUInvoice extends Business
             $this->raiseError('sequenceNo not passed');
         }
         $dbeJInvline = new DBEJInvline($this);
-        $dsInvline = new DSForm($this);
+        $dsInvline   = new DSForm($this);
         $dsInvline->copyColumnsFrom($dbeJInvline);
         $dsInvline->setUpdateModeInsert();
         $dsInvline->setValue(
@@ -1152,11 +1122,9 @@ class BUInvoice extends Business
     function getCustomersWithoutInvoiceContact()
     {
         $buCustomer = new BUCustomer($this);
-        $dsInvhead = new DataSet($this);
+        $dsInvhead  = new DataSet($this);
         $this->getUnprintedInvoices($dsInvhead);
-
         $list = [];
-
         while ($dsInvhead->fetchNext()) {
 
             if (!$buCustomer->getInvoiceContactsByCustomerID(
@@ -1168,13 +1136,11 @@ class BUInvoice extends Business
                     $dsInvhead->getValue(DBEInvhead::customerID),
                     $dsCustomer
                 );
-
                 $list[] = $dsCustomer->getValue(DBECustomer::name);
 
             }
 
         }
-
         return $list;
 
     }
@@ -1205,33 +1171,25 @@ class BUInvoice extends Business
         if (!$dateToUse) {
             $dateToUse = date('Y-m-d');    // use today if blank
         }
-
         $dbeInvhead = new DBEInvhead($this);
-
-        $buCustomer = new BUCustomer($this);
+        $buCustomer                                   = new BUCustomer($this);
         $invoiceWithAllDirectDebitServicesPerCustomer = new DataSet($this);
         $this->getUnprintedInvoices(
             $invoiceWithAllDirectDebitServicesPerCustomer,
             true
         );
-
         $subject = 'Sales Invoice(s)';
-
         $invoiceNumbers = array();
-        $buMail = new BUMail($this);
-
+        $buMail         = new BUMail($this);
         $bankData = [];
         while ($invoiceWithAllDirectDebitServicesPerCustomer->fetchNext()) {
             $invoiceNumbers[] = $invoiceWithAllDirectDebitServicesPerCustomer->getValue(DBEInvhead::invheadID);
-
             $generatedInvoiceFilePath = $this->generateAndStorePDFForInvoice(
                 $dbeInvhead,
                 $invoiceWithAllDirectDebitServicesPerCustomer,
                 $dateToUse
             );
-
             $fileName = "{$invoiceWithAllDirectDebitServicesPerCustomer->getValue(DBEInvhead::invheadID)}.pdf";
-
             $attachments = new \CNCLTD\Email\AttachmentCollection();
             $attachments->add(
                 $generatedInvoiceFilePath,
@@ -1239,27 +1197,24 @@ class BUInvoice extends Business
                 $fileName,
                 true
             );
-
             $dsCustomer = new DataSet($this);
             $buCustomer->getCustomerByID(
                 $invoiceWithAllDirectDebitServicesPerCustomer->getValue(DBEInvhead::customerID),
                 $dsCustomer
             );
-
             $dsSite = new DataSet($this);
             $buCustomer->getSiteByCustomerIDSiteNo(
                 $invoiceWithAllDirectDebitServicesPerCustomer->getValue(DBEInvhead::customerID),
                 $dsCustomer->getValue(DBECustomer::invoiceSiteNo),
                 $dsSite
             );
-
-            $paymentDate = $this->calculateDirectDebitPaymentDate(
+            $paymentDate         = $this->calculateDirectDebitPaymentDate(
                 DateTime::createFromFormat(
                     'Y-m-d',
                     $dateToUse
                 )
             )->format('d M Y');
-            $invoiceTotal = $this->getInvoiceTotal(
+            $invoiceTotal        = $this->getInvoiceTotal(
                 $invoiceWithAllDirectDebitServicesPerCustomer->getValue(DBEInvhead::invheadID)
             );
             $unEncryptedSortCode = null;
@@ -1271,7 +1226,6 @@ class BUInvoice extends Business
                     OPENSSL_PKCS1_OAEP_PADDING
                 );
             }
-
             $unEncryptedAccountNumber = null;
             if ($dsCustomer->getValue(DBECustomer::accountNumber)) {
                 openssl_private_decrypt(
@@ -1281,10 +1235,8 @@ class BUInvoice extends Business
                     OPENSSL_PKCS1_OAEP_PADDING
                 );
             }
-
-            $vatValue = $invoiceTotal * ($dbeInvhead->getValue(DBEInvhead::vatRate) / 100);
+            $vatValue    = $invoiceTotal * ($dbeInvhead->getValue(DBEInvhead::vatRate) / 100);
             $totalAmount = $invoiceTotal + $vatValue;
-
             $bankRow = [
                 $unEncryptedSortCode,
                 $dsCustomer->getValue(DBECustomer::accountName),
@@ -1296,22 +1248,19 @@ class BUInvoice extends Business
                 $invoiceWithAllDirectDebitServicesPerCustomer->getValue(DBEInvhead::invheadID),
                 $invoiceWithAllDirectDebitServicesPerCustomer->getValue(DBEInvhead::transactionType)
             ];
-
             $bankData[] = $bankRow;
-            $dsContact = new DataSet($this);
+            $dsContact  = new DataSet($this);
             $buCustomer->getInvoiceContactsByCustomerID(
                 $invoiceWithAllDirectDebitServicesPerCustomer->getValue(DBEInvhead::customerID),
                 $dsContact
             );
-
             $buHeader = new BUHeader($this);
             /** @var DBEHeader $dsHeader */
             $dsHeader = null;
             $buHeader->getHeader($dsHeader);
-
             while ($dsContact->fetchNext()) {
                 $directDebitInvoiceEmailDTO = new DirectDebitInvoiceDTO(
-                    $dsContact->getValue(DBEContact::firstName),
+                    $dsContact->getValue(DBEContact::firstName) . " " . $dsContact->getValue(DBEContact::lastName),
                     $dsCustomer->getValue(DBECustomer::name),
                     $dsSite->getValue(DBESite::add1),
                     $dsSite->getValue(DBESite::town),
@@ -1327,15 +1276,11 @@ class BUInvoice extends Business
                     '@customerFacing/DirectDebitInvoice/DirectDebitInvoice.html.twig',
                     ["data" => $directDebitInvoiceEmailDTO]
                 );
-
                 $toEmail = $dsContact->getValue(DBEContact::email);
-
                 $buMail->sendEmailWithAttachments($body, $subject, $toEmail, $attachments, CONFIG_SALES_EMAIL);
             }
         }
-
         $this->sendDirectDebitSageSalesEmail($invoiceNumbers, $bankData);
-
         return count($invoiceNumbers);
     }
 
@@ -1351,15 +1296,12 @@ class BUInvoice extends Business
     ): string
     {
         $dbeInvhead->getRow($invoiceWithAllDirectDebitServicesPerCustomer->getValue(DBEInvhead::invheadID));
-
-        $buPdfInvoice = new BUPDFInvoice(
-            $this,
-            $this
+        $buPdfInvoice             = new BUPDFInvoice(
+            $this, $this
         );
         $buPdfInvoice->_dateToUse = $dateToUse;
-        $pdfFileName = $buPdfInvoice->generateFile($invoiceWithAllDirectDebitServicesPerCustomer);
-        $fileSize = filesize($pdfFileName);
-
+        $pdfFileName              = $buPdfInvoice->generateFile($invoiceWithAllDirectDebitServicesPerCustomer);
+        $fileSize                 = filesize($pdfFileName);
         $dbeInvhead->setValue(
             DBEInvhead::pdfFile,
             fread(
@@ -1370,12 +1312,10 @@ class BUInvoice extends Business
                 $fileSize
             )
         );
-
         $dbeInvhead->setValue(
             DBEInvhead::datePrinted,
             $dateToUse
         );
-
         $dbeInvhead->updateRow();
         return $pdfFileName;
     }
@@ -1385,17 +1325,15 @@ class BUInvoice extends Business
         $lastYearBh = common_getUKBankHolidays($date->format('Y') - 1);
         $thisYearBh = common_getUKBankHolidays($date->format('Y'));
         $nextYearBh = common_getUKBankHolidays((int)$date->format('Y') + 1);
-
         $bankHolidays = array_merge(
             $lastYearBh,
             $thisYearBh,
             $nextYearBh
         );
-        $dateCloned = clone $date;
-        $counter = 0;
+        $dateCloned   = clone $date;
+        $counter      = 0;
         while ($counter < 5) {
             $dateCloned->add(new DateInterval('P1D'));
-
             if (in_array(
                     $dateCloned->format('Y-m-d'),
                     $bankHolidays
@@ -1404,7 +1342,6 @@ class BUInvoice extends Business
             }
             $counter++;
         }
-
         return $dateCloned;
     }
 
@@ -1432,15 +1369,12 @@ class BUInvoice extends Business
     private function sendDirectDebitSageSalesEmail(array $invoiceNumbers, array $bankData): void
     {
         $this->buSageExport->generateSageSalesDataByInvoiceNumbers($invoiceNumbers);
-
-
         $senderEmail = CONFIG_SALES_EMAIL;
-        $toEmail = CONFIG_SALES_EMAIL;
-        $senderName = 'CNC Sales';
-        $subject = 'Sage Import Files';
-
+        $toEmail     = CONFIG_SALES_EMAIL;
+        $senderName  = 'CNC Sales';
+        $subject     = 'Sage Import Files';
         $buMail = new BUMail($this);
-        $hdrs = array(
+        $hdrs   = array(
             'From'    => $senderName . " <" . $senderEmail . ">",
             'To'      => $toEmail,
             'Subject' => $subject
@@ -1459,23 +1393,20 @@ class BUInvoice extends Business
             'trans.csv'
         );
         $data = $this->generateBankExport($bankData);
-
         $buMail->mime->addAttachment(
             $data,
             'Text/csv',
             'bankExport.csv',
             false
         );
-
         $mime_params = array(
             'text_encoding' => '7bit',
             'text_charset'  => 'UTF-8',
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-        $body = $buMail->mime->get($mime_params);
-        $hdrs = $buMail->mime->headers($hdrs);
-
+        $body        = $buMail->mime->get($mime_params);
+        $hdrs        = $buMail->mime->headers($hdrs);
         $buMail->putInQueue(
             $senderEmail,
             $toEmail,
@@ -1493,12 +1424,9 @@ class BUInvoice extends Business
         if ($fd === FALSE) {
             die('Failed to open temporary file');
         }
-
-
         $headers = $bankData[0];
         array_shift($bankData);
         $records = $bankData;
-
         fputcsv(
             $fd,
             $headers
@@ -1509,7 +1437,6 @@ class BUInvoice extends Business
                 $record
             );
         }
-
         rewind($fd);
         $csv = stream_get_contents($fd);
         fclose($fd); //
@@ -1530,56 +1457,45 @@ class BUInvoice extends Business
         if (!$dateToUse) {
             $dateToUse = date('Y-m-d');    // use today if blank
         }
-
         $dbeInvhead = new DBEInvhead($this);
-
         $buCustomer = new BUCustomer($this);
-        $dsInvhead = new DataSet($this);
+        $dsInvhead  = new DataSet($this);
         $this->getUnprintedInvoices($dsInvhead);
-
-        $invoiceCount = 0;
-        $subject = 'CNC Sales Invoice(s)';
+        $invoiceCount   = 0;
+        $subject        = 'CNC Sales Invoice(s)';
         $invoiceNumbers = array();
-
         /** @var BUMail $buMail */
         $buMail = new BUMail($this);
-
         /** @var SalesInvoiceEmailDTO[] $invoiceEmails */
         $invoiceEmails = [];
         while ($dsInvhead->fetchNext()) {
             $invoiceCount++;
-
             $customerId = $dsInvhead->getValue(DBEInvhead::customerID);
             if (!key_exists($customerId, $invoiceEmails)) {
                 $invoiceEmails[$customerId] = new SalesInvoiceEmailDTO();
-
                 $dsContact = new DataSet($this);
                 $buCustomer->getInvoiceContactsByCustomerID(
                     $customerId,
                     $dsContact
                 );
-
                 while ($dsContact->fetchNext()) {
                     $invoiceEmails[$customerId]->addEmail($dsContact->getValue(DBEContact::email));
                 }
             }
-
             $invoiceId = $dsInvhead->getValue(DBEInvhead::invheadID);
             $dbeInvhead->getRow($invoiceId);
             $invoiceNumbers[] = $invoiceId;
-            $invoiceTotal = $this->getInvoiceTotal($invoiceId);
+            $invoiceTotal     = $this->getInvoiceTotal($invoiceId);
             $invoiceEmails[$customerId]->addInvoice($invoiceId, $invoiceTotal);
-
             /*
             * generate PDF Invoice
             */
-            $buPdfInvoice = new BUPDFInvoice(
-                $this,
-                $this
+            $buPdfInvoice             = new BUPDFInvoice(
+                $this, $this
             );
             $buPdfInvoice->_dateToUse = $dateToUse;
-            $pdfFileName = $buPdfInvoice->generateFile($dsInvhead);
-            $fileSize = filesize($pdfFileName);
+            $pdfFileName              = $buPdfInvoice->generateFile($dsInvhead);
+            $fileSize                 = filesize($pdfFileName);
             /*
             Save PDF file into BLOB field on database
             */
@@ -1597,22 +1513,18 @@ class BUInvoice extends Business
                 DBEInvhead::datePrinted,
                 $dateToUse
             );
-
             $dbeInvhead->updateRow();
             unset($buPdfInvoice);
             $fileName = $invoiceId . '.pdf';
             $invoiceEmails[$customerId]->addPDFInvoiceAttachment($pdfFileName, $fileName);
         }
-
         if ($invoiceCount) {
             global $twig;
-
             foreach ($invoiceEmails as $invoiceEmail) {
                 $body = $twig->render(
                     '@customerFacing/SalesInvoice/SalesInvoice.html.twig',
                     ["data" => $invoiceEmail]
                 );
-
                 $buMail->sendEmailWithAttachments(
                     $body,
                     $subject,
@@ -1634,9 +1546,8 @@ class BUInvoice extends Business
     {
         $buMail = new BUMail($this);
         $this->buSageExport->generateSageSalesDataByInvoiceNumbers($invoiceNumbers);
-        $subject = 'Sage Import Files';
+        $subject     = 'Sage Import Files';
         $attachments = new \CNCLTD\Email\AttachmentCollection();
-
         $fileName = SAGE_EXPORT_DIR . '/sales.csv';
         $attachments->add(
             $fileName,
@@ -1644,7 +1555,6 @@ class BUInvoice extends Business
             'sales.csv',
             true
         );
-
         $fileName = SAGE_EXPORT_DIR . '/trans.csv';
         $attachments->add(
             $fileName,
@@ -1652,7 +1562,6 @@ class BUInvoice extends Business
             'trans.csv',
             true
         );
-
         $buMail->sendEmailWithAttachments(
             'Sage import files from invoice run attached.',
             $subject,
@@ -1691,21 +1600,14 @@ class BUInvoice extends Business
         if (!$dateToUse) {
             $dateToUse = date('Y-m-d');    // use today if blank
         }
-
-
         $this->getUnprintedInvoices(
             $dsInvhead,
             $directDebit
         );
-
-
         $buPdfInvoice = new BUPDFInvoice(
-            $this,
-            $this
+            $this, $this
         );
-
         $buPdfInvoice->_dateToUse = $dateToUse;
-
         return $buPdfInvoice->generateBatchFile($dsInvhead);
 
     }
@@ -1719,16 +1621,12 @@ class BUInvoice extends Business
             $invoiceID
         );
         $this->dbeJInvhead->getRow();
-
-        $buPdfInvoice = new BUPDFInvoice(
-            $this,
-            $this
+        $buPdfInvoice             = new BUPDFInvoice(
+            $this, $this
         );
         $buPdfInvoice->_dateToUse = $dbeInvhead->getValue(DBEInvhead::datePrinted);
-
         $pdfFileName = $buPdfInvoice->generateFile($this->dbeJInvhead);
-        $fileSize = filesize($pdfFileName);
-
+        $fileSize    = filesize($pdfFileName);
         $fileString = fread(
             fopen(
                 $pdfFileName,
@@ -1740,13 +1638,9 @@ class BUInvoice extends Business
             DBEInvhead::pdfFile,
             $fileString
         );
-
         $dbeInvhead->updateRow();
-
         unset($buPdfInvoice);
         unlink($pdfFileName); // delete temp file
-
-
         return $fileString;
 
     }
