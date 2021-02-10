@@ -283,7 +283,7 @@ class HomeComponent extends MainComponent {
             {
                 id: this.CARD_TEAMS_FEEDBACK,
                 order: 9,
-                title: "Teams Feedback",
+                title: "Team Feedback",
                 minimize: true,
                 position: "relative",
                 height: 150,
