@@ -38,6 +38,7 @@ class DBEJProblem extends DBEProblem
     const ENGINEER_FIXED_NAME              = 'engineerFixedName';
     const FIXED_TEAM_ID                    = 'fixedTeamId';
     const IS_FIX_SLA_BREACHED              = 'isFixSLABreached';
+    const contactName                      = 'contactName';
 
 
     /**
@@ -271,6 +272,18 @@ class DBEJProblem extends DBEProblem
 	else 0
 	END'
         );
+        $this->addColumn(
+          self::contactName,
+          DA_STRING,
+          DA_ALLOW_NULL,
+          "(select concat(contact.con_first_name, ' ', contact.con_last_name) from contact where con_contno = initial.caa_contno)"
+      );
+      $this->addColumn(
+        self::emailSubjectSummary,
+        DA_STRING,
+        DA_ALLOW_NULL,
+        'emailSubjectSummary'
+      );
         $this->setAddColumnsOff();
         $this->setPK(0);
     }
