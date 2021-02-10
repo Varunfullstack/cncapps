@@ -717,7 +717,12 @@ class CTCNC extends Controller
                 "label" => "Password Services",
                 "href"  => "PasswordServices.php"
             ],
-            
+            [
+                "id"    => 225,
+                "label" => "Customer Feedback",
+                "href"  => "CustomerFeedback.php"
+            ],
+
         ];
 
     }
@@ -1240,5 +1245,19 @@ class CTCNC extends Controller
     }
     function hideMenu(){
         $this->setHTMLFmt(CT_HTML_FMT_POPUP);
+    }
+    public function getParamOrNull($paramName)
+    {
+        if (!$paramName) {
+            return null;
+        }
+
+        if (!isset($_REQUEST[$paramName])) {
+            return null;
+        }
+        if (@$_REQUEST[$paramName]=='') {
+            return null;
+        }
+        return $_REQUEST[$paramName];
     }
 }

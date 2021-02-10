@@ -5,6 +5,7 @@ This project changes will be shown here.
 ### Added
 - Issue 684  - Project System Enhancements
 - Issue 1232 - User hourly time graph
+- Issue 1152 - Added Feedback in home and mysettings.
 ### Changed
 - Issue 1218 - Include quantities for child items in Sales Orders
 - Issue 1221 - Email sending TO CC fields
