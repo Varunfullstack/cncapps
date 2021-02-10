@@ -132,7 +132,7 @@ export const SRQueues = [
     {id: 4, name: "Sales", teamID: 7, code: "S"},
 ]
 export const getTeamCode=(teamId)=>{
-    const team=SRQueues.find(t=>t.id==teamId);
+    const team=SRQueues.find(t=>t.teamID==teamId);
     if(team)
     return team.code;
     else return '';
