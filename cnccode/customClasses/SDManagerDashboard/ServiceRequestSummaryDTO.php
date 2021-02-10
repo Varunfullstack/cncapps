@@ -241,6 +241,7 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
         $instance->slaFixHoursP2              = $dbeCustomer->getValue(\DBECustomer::slaFixHoursP2);
         $instance->slaFixHoursP3              = $dbeCustomer->getValue(\DBECustomer::slaFixHoursP3);        
         $instance->contactName                = $problem->getValue(DBEJProblem::contactName);
+        $instance->emailSubjectSummary                = $problem->getValue(DBEJProblem::emailSubjectSummary);
 
         return $instance;        
     }
