@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v5.5.1]
+## [v5.5.1] - 2021-02-11
 ### Fixed
 - Fix link in Feedback notify email.
 - Use fixed activity instead of initial
