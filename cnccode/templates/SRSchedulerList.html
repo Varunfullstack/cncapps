@@ -590,11 +590,15 @@
     function updateCustomerID(customerId) {
         $('input[name="customerId"]').val(customerId);
         currentSRScheduler.customerId = customerId;
+        currentSRScheduler.assetTitle = null;
+        currentSRScheduler.assetName = null;
+        currentSRScheduler.emptyAssetReason = null;
         if (currentSRScheduler.customerId) {
             onSetCustomerID();
         } else {
             onUnsetCustomerID();
         }
+        reRenderAssetPicker()
     }
 
     function onSetCustomerID() {
@@ -604,11 +608,13 @@
         contactNameInput.attr('disabled', false);
         contactNameInput[0].dataset.customerId = currentSRScheduler.customerId;
         linkedSalesOrderInput.attr('disabled', false);
-        console.log('set customer id');
-        reRenderAssetPicker()
     }
 
-    function reRenderAssetPicker(){
+    function reRenderAssetPicker() {
+        if (!currentSRScheduler.customerId) {
+            document.getElementById('reactAssetPicker').innerHTML = "";
+            return;
+        }
         document.AssetPickerComponentRender("#reactAssetPicker", currentSRScheduler.customerId, (value) => {
             if (!value) {
                 currentSRScheduler.assetName = null;
