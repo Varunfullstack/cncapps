@@ -39,7 +39,7 @@ class HomeComponent extends MainComponent {
             currentUser: null,
             isSdManager: false,
             minHeight: null,
-            teamsFeedback:[]
+            teamsFeedback: []
         }
     }
 
@@ -101,18 +101,17 @@ class HomeComponent extends MainComponent {
             this.api.getTeamsFeedback()
         ]
         this.setState({showSpinner: true});
-        Promise.all(requests).then(([upcomingVisit, salesFigures, fixedReopen, firstTimeFixed, teamPerformance, allUserPerformance,teamsFeedback]) => {
+        Promise.all(requests).then(([upcomingVisit, salesFigures, fixedReopen, firstTimeFixed, teamPerformance, allUserPerformance, teamsFeedback]) => {
             const {cards} = this.state;
-            console.log('teamsFeedback',teamsFeedback);
             const cardsPerms = this.applyPermission(cards, salesFigures);
-            teamsFeedback.map(t=>{
-                const total=t.happy+t.average+t.unhappy;                
-                t.happy=Math.round(t.happy*100/total)+'%';
-                t.average=Math.round(t.average*100/total)+'%';
-                t.unhappy=Math.round(t.unhappy*100/total)+'%';
-                t.teamCode=getTeamCode(t.teamID)
+            teamsFeedback.map(t => {
+                const total = t.happy + t.average + t.unhappy;
+                t.happy = Math.round(t.happy * 100 / total) + '%';
+                t.average = Math.round(t.average * 100 / total) + '%';
+                t.unhappy = Math.round(t.unhappy * 100 / total) + '%';
+                t.teamCode = getTeamCode(t.teamID)
+                t.total = total;
             });
-            console.log(teamsFeedback);
             this.setState({
                 cards: cardsPerms,
                 showSpinner: false,
@@ -311,13 +310,13 @@ class HomeComponent extends MainComponent {
             for (let i = 0; i < origin.length; i++) {
                 const indx = savedCards.map((c) => c.id).indexOf(origin[i].id);
                 if (indx >= 0) {
-                    const orgignScroll=origin[i].scroll;
-                    origin[i] = {...origin[i], ...savedCards[indx]};                    
-                    origin[i].scroll=orgignScroll;
+                    const orgignScroll = origin[i].scroll;
+                    origin[i] = {...origin[i], ...savedCards[indx]};
+                    origin[i].scroll = orgignScroll;
                 }
             }
         }
-        console.log('origin',origin);
+        console.log('origin', origin);
         return origin;
     }
     getCardsElement = () => {
@@ -346,7 +345,7 @@ class HomeComponent extends MainComponent {
                                 <h4 className="card-title">{c.title}</h4>
                                 <i className={!c.minimize ? "fa fa-minus pointer ml-4" : "fa fa-plus"}
                                    onClick={() => this.handleMinimizeCard(c)}
-                                ></i>
+                                />
                             </div>
                             <div className="card-body"
                                  style={{height: c.height - 90, overflowY: c.scroll ? "auto" : ""}}
@@ -449,7 +448,7 @@ class HomeComponent extends MainComponent {
             <table className="table table-striped">
                 <thead>
                 <tr>
-                    <th></th>
+                    <th/>
                     <th>Invoiced This Month</th>
                     <th>Invoices Waiting</th>
                     <th>Sales Orders</th>
@@ -572,7 +571,7 @@ class HomeComponent extends MainComponent {
         return <table className="table table-striped">
             <thead>
             <tr>
-                <th></th>
+                <th/>
                 <th>Target</th>
                 <th>Q1</th>
                 <th>Q2</th>
@@ -608,7 +607,7 @@ class HomeComponent extends MainComponent {
             <tr>
                 <td colSpan={6}
                     style={{height: 10}}
-                ></td>
+                />
             </tr>
             <tr>
                 <td>Esc SLA %</td>
@@ -637,7 +636,7 @@ class HomeComponent extends MainComponent {
             <tr>
                 <td colSpan={6}
                     style={{height: 10}}
-                ></td>
+                />
             </tr>
             <tr>
                 <td>SP SLA %</td>
@@ -666,7 +665,7 @@ class HomeComponent extends MainComponent {
             <tr>
                 <td colSpan={6}
                     style={{height: 10}}
-                ></td>
+                />
             </tr>
             <tr>
                 <td>Project SLA %</td>
@@ -710,7 +709,7 @@ class HomeComponent extends MainComponent {
             <table className="table table-striped">
                 <thead>
                 <tr>
-                    <th></th>
+                    <th/>
                     <th>Target %</th>
                     <th>Actual %</th>
                     <th>Hours</th>
@@ -752,8 +751,8 @@ class HomeComponent extends MainComponent {
                     </th>
                 </tr>
                 <tr>
-                    <th></th>
-                    <th></th>
+                    <th/>
+                    <th/>
                     <th>%</th>
                     <th>Hours</th>
                     <th>%</th>
@@ -794,7 +793,7 @@ class HomeComponent extends MainComponent {
                             onClick={() => this.handleMinimizeCard(c)}
                         >
                             {c.title}
-                            <i className="fa fa-plus ml-3"></i>
+                            <i className="fa fa-plus ml-3"/>
                         </div>
                     ))}
             </div>
@@ -824,7 +823,7 @@ class HomeComponent extends MainComponent {
                        width="100%"
                        height="100%"
                        src="popup.php?action=dailyStats"
-        ></iframe>
+        />
     }
 
     getTeamCharts() {
@@ -844,71 +843,89 @@ class HomeComponent extends MainComponent {
                        width="100%"
                        height="100%"
                        src="index.php?action=charts"
-        ></iframe>
+        />
     }
+
     getTeamsFeedback = () => {
         const {teamsFeedback} = this.state;
-        const teams=groupBy(sort(teamsFeedback,'teamID'),'teamID');
-        const quarters=['Q1','Q2','Q3','Q4'];
+        const teams = groupBy(sort(teamsFeedback, 'teamID'), 'teamID');
+        const quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
         return (
             <table className="table table-striped">
                 <thead>
-                    <tr>
-                        <th  >
-                            Team
-                        </th>
-                        {quarters.map(q=><th className="text-center">{q}</th>)}
-                    </tr>  
-                    <tr>
-                        <th>                             
-                        </th>
-                        {quarters.map(q=><th>
-                            <div className="flex-row" style={{justifyContent:"space-between",paddingRight:15,paddingLeft:15}}>
-                            <i className="fal fa-smile fa-2x"></i>
-                            <i className="fal fa-meh fa-2x "></i>
-                            <i className="fal fa-frown fa-2x "></i>
-                            </div>
-                        </th>)}
-                    </tr>                  
+                <tr>
+                    <th>
+                        Team
+                    </th>
+                    {quarters.map(q => <th className="text-center">{q}</th>)}
+                </tr>
+                <tr>
+                    <th>
+                    </th>
+                    {quarters.map(q => <th>
+                        <div className="flex-row"
+                             style={{justifyContent: "space-between", paddingRight: 15, paddingLeft: 15}}
+                        >
+                            <i className="fal fa-smile fa-2x"/>
+                            <i className="fal fa-meh fa-2x "/>
+                            <i className="fal fa-frown fa-2x "/>
+                            <i className="fal fa-sigma fa-2x"/>
+                        </div>
+                    </th>)}
+                </tr>
                 </thead>
                 <tbody>
-                   
-                        {teams.map(t=>
-                         <tr>
-                            <th>{getTeamCode(t.groupName)}</th>
-                            <th>{t.items.filter(f=>f.quarter=='Q1')
-                                .map(q=>this.getQuarterElement(q))}
-                            </th>
-                            <th>{t.items.filter(f=>f.quarter=='Q2')
-                                .map(q=>this.getQuarterElement(q))}
-                            </th>
-                            <th>{t.items.filter(f=>f.quarter=='Q3')
-                                .map(q=>this.getQuarterElement(q))}
-                            </th>
-                            <th>{t.items.filter(f=>f.quarter=='Q4')
-                                .map(q=>this.getQuarterElement(q))}
-                            </th>
-                         </tr>
-                        )}
-                   
+
+                {teams.map(t =>
+                    <tr>
+                        <th>{getTeamCode(t.groupName)}</th>
+                        <th>
+                            {
+                                t.items.filter(f => f.quarter == 'Q1')
+                                    .map(q => this.getQuarterElement(q))
+                            }
+                        </th>
+                        <th>{t.items.filter(f => f.quarter == 'Q2')
+                            .map(q => this.getQuarterElement(q))}
+                        </th>
+                        <th>{t.items.filter(f => f.quarter == 'Q3')
+                            .map(q => this.getQuarterElement(q))}
+                        </th>
+                        <th>{t.items.filter(f => f.quarter == 'Q4')
+                            .map(q => this.getQuarterElement(q))}
+                        </th>
+                    </tr>
+                )}
+
                 </tbody>
             </table>
         );
     }
-    getQuarterElement=(q)=>{
-        return <div style={{display:"flex",justifyContent:"space-between",paddingRight:15,paddingLeft:15}}>
-                <p className="text-center" style={{width:20}}>{q.happy}</p>
-                <p className="text-center" style={{width:20}}>{q.average}</p>
-                <p className="text-center" style={{width:20}}>{q.unhappy}</p>
-              </div>
+    getQuarterElement = (q) => {
+        return <div style={{display: "flex", justifyContent: "space-between", paddingRight: 15, paddingLeft: 15}}>
+            <p className="text-center"
+               style={{width: 20}}
+            >{q.happy}</p>
+            <p className="text-center"
+               style={{width: 20}}
+            >{q.average}</p>
+            <p className="text-center"
+               style={{width: 20}}
+            >{q.unhappy}</p>
+
+            <p className="text-center"
+               style={{width: 20}}
+            >{q.total}</p>
+        </div>
     }
+
     render() {
         const {minHeight} = this.state;
         return (
             <div id="main-container"
                  style={{minHeight: minHeight, marginBottom: 50}}
             >
-                <Spinner show={this.state.showSpinner}></Spinner>
+                <Spinner show={this.state.showSpinner}/>
                 {
                     this.getCardsElement()
                 }
