@@ -24,6 +24,9 @@ class DBESRScheduler extends DBEntity implements JsonSerializable
     const updatedAt           = "updatedAt";
     const linkedSalesOrderId  = "linkedSalesOrderId";
     const emailSubjectSummary = "emailSubjectSummary";
+    const assetName           = "assetName";
+    const assetTitle          = "assetTitle";
+    const emptyAssetReason    = "emptyAssetReason";
 
     /**
      * calls constructor()
@@ -116,6 +119,21 @@ class DBESRScheduler extends DBEntity implements JsonSerializable
         $this->addColumn(
             self::emailSubjectSummary,
             DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::assetName,
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::assetTitle,
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::emptyAssetReason,
+            DA_TEXT,
             DA_ALLOW_NULL
         );
         $this->setAddColumnsOff();

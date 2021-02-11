@@ -604,6 +604,10 @@
         contactNameInput.attr('disabled', false);
         contactNameInput[0].dataset.customerId = currentSRScheduler.customerId;
         linkedSalesOrderInput.attr('disabled', false);
+        console.log('set customer id');
+        document.AssetPickerComponentRender("#reactAssetPicker", currentSRScheduler.customerId, (value) => {
+            console.log(value);
+        })
     }
 
     function changeUntilOrCount(value) {
@@ -627,7 +631,6 @@
     }
 
     function onUnsetCustomerID() {
-//we want to enable the customer site input
         customerSiteDescInput.attr('disabled', true);
         delete customerSiteDescInput[0].dataset['customerId'];
         contactNameInput.attr('disabled', true);
@@ -764,6 +767,15 @@
             <option value="5">Projects</option>
             <option value="4">Sales</option>
         </select>
+    </div>
+    <div>
+        <div style="width: 100px; display: inline-block">
+            Asset List
+        </div>
+        <div id="reactAssetPicker"
+             style="display: inline-block; width: 626px;"
+        >
+        </div>
     </div>
     <div>
         <div style="width: 100px; display: inline-block">

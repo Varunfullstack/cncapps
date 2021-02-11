@@ -117,6 +117,9 @@ class CTSRScheduler extends CTCNC
                 $newItem->setValue(DBESRScheduler::details, $this->getParam('details'));
                 $newItem->setValue(DBESRScheduler::internalNotes, $this->getParam('internalNotes'));
                 $newItem->setValue(DBESRScheduler::linkedSalesOrderId, $this->getParam('linkedSalesOrderId'));
+                $newItem->setValue(DBESRScheduler::assetName, $this->getParam('assetName'));
+                $newItem->setValue(DBESRScheduler::assetTitle, $this->getParam('assetTitle'));
+                $newItem->setValue(DBESRScheduler::emptyAssetReason, $this->getParam('emptyAssetReason'));
                 $newItem->setValue(DBESRScheduler::createdBy, $this->userID);
                 $newItem->setValue(DBESRScheduler::updatedBy, $this->userID);
                 $newItem->setValue(DBESRScheduler::createdAt, (new DateTime())->format(DATE_MYSQL_DATETIME));
@@ -271,6 +274,8 @@ class CTSRScheduler extends CTCNC
         $this->setTemplateFiles(
             array('SRSchedulerList' => 'SRSchedulerList')
         );
+        $this->loadReactScript('AssetPickerComponent.js');
+//        $this->loadReactCSS('AssetPickerComponent.css');
         $this->template->parse('CONTENTS', 'SRSchedulerList', true);
         $this->parsePage();
     }

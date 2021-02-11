@@ -46,6 +46,9 @@ export default class AssetListSelectorComponent extends React.PureComponent {
 
     async componentDidMount() {
         const {customerId} = this.props;
+        if(!customerId){
+            return;
+        }
         await Promise.all([
             this.APICustomer.getCustomerAssets(customerId),
             this.APIStandardText.getOptionsByType("Missing Asset Reason")
