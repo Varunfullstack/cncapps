@@ -1,6 +1,12 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.5.1]
+### Fixed
+- Fix link in Feedback notify email.
+- Use fixed activity instead of initial
+- Fix aesthetic issue
+
 ## [v5.5.0] - 2021-02-10
 ### Added
 - Issue 684  - Project System Enhancements

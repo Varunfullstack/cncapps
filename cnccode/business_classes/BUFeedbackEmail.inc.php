@@ -23,7 +23,7 @@ class BUFeedbackEmail extends Business
 
     function getFeedback()
     {
-        $sql ="SELECT 
+        $sql = "SELECT 
         f.id,
         f.serviceRequestId,
         f.comments,
@@ -37,50 +37,49 @@ class BUFeedbackEmail extends Business
         ) AS rate,
         problem.`pro_custno`,
         customer.`cus_name` customer,
-        cal.caa_consno,
+        fixed.caa_consno,
         cons.`cns_name` cons_name,
         CONCAT(cons.cns_logname,'@cnc-ltd.co.uk') cons_email,
         teamLeader.`cns_name` leader_name,
         CONCAT(teamLeader.cns_logname,'@cnc-ltd.co.uk') leader_email            
          FROM `customerfeedback` f 
          JOIN problem ON problem.`pro_problemno`=f.serviceRequestId
-         JOIN callactivity cal ON cal.caa_problemno=f.serviceRequestId
-         JOIN `consultant`  cons ON cons.`cns_consno`=cal.`caa_consno`
+         JOIN callactivity `fixed`
+    ON fixed.caa_problemno = f.serviceRequestId AND fixed.caa_callacttypeno = 57
+         JOIN `consultant`  cons ON cons.`cns_consno`= fixed.`caa_consno`
          JOIN team ON team.`teamID` = cons.teamID
          JOIN `consultant`  teamLeader ON teamLeader.`cns_consno`=team.`leaderId`
-        JOIN customer ON customer.`cus_custno`=problem.`pro_custno`
-         WHERE cal.caa_callacttypeno=51
-         AND f.notified=0         
+         JOIN customer ON customer.`cus_custno` = problem.`pro_custno`
+WHERE  f.notified = 0 
         ";
-
         return $this->db->query($sql);
 
     }
 
     function sendEmail()
     {
-        $buMail = new BUMail($this);        
+        $buMail  = new BUMail($this);
         $results = $this->getFeedback();
-        if ($row = $results->fetch_object()) {            
+        if ($row = $results->fetch_object()) {
             do {
 
-                $urlService = SITE_URL. '/SRActivity.php?action=displayActivity&callActivityID=' . $row->serviceRequestId;
+                $urlService = SITE_URL . '/SRActivity.php?action=displayActivity&serviceRequestId=' . $row->serviceRequestId;
                 global $twig;
-                $subject="You've just had feedback for SR".$row->serviceRequestId." for customer ".$row->customer;
-                $body = $twig->render(
+                $subject = "You've just had feedback for SR" . $row->serviceRequestId . " for customer " . $row->customer;
+                $body    = $twig->render(
                     '@internal/feedbackEmail.html.twig',
                     [
-                        'customer'   => $row->customer,
-                        'urlService' => $urlService,
-                        'rate'       => $row->rate,
-                        'comments'   => $row->comments,
-                        'serviceRequestId'=> $row->serviceRequestId,
+                        'customer'         => $row->customer,
+                        'urlService'       => $urlService,
+                        'rate'             => $row->rate,
+                        'comments'         => $row->comments,
+                        'serviceRequestId' => $row->serviceRequestId,
                     ]
                 );
-                $buMail->sendSimpleEmail($body, $subject, $row->cons_email,CONFIG_SUPPORT_EMAIL,[ $row->leader_email]);                
+                $buMail->sendSimpleEmail($body, $subject, $row->cons_email, CONFIG_SUPPORT_EMAIL, [$row->leader_email]);
                 // mark it as notified 
-                DBConnect::execute("update customerfeedback set notified=1 where id=:id",["id"=>$row->id]);
-            } while ($row = $results->fetch_object()); 
+                DBConnect::execute("update customerfeedback set notified=1 where id=:id", ["id" => $row->id]);
+            } while ($row = $results->fetch_object());
         }
     }
 }
