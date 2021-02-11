@@ -161,7 +161,10 @@ class DBESRScheduler extends DBEntity implements JsonSerializable
             self::createdAt           => $this->getValue(self::createdAt),
             self::updatedAt           => $this->getValue(self::updatedAt),
             self::linkedSalesOrderId  => $this->getValue(self::linkedSalesOrderId),
-            self::emailSubjectSummary => $this->getValue(self::emailSubjectSummary)
+            self::emailSubjectSummary => $this->getValue(self::emailSubjectSummary),
+            self::assetTitle          => $this->getValue(self::assetTitle),
+            self::assetName           => $this->getValue(self::assetName),
+            self::emptyAssetReason    => $this->getValue(self::emptyAssetReason),
         ];
     }
 

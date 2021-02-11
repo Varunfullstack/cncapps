@@ -605,8 +605,23 @@
         contactNameInput[0].dataset.customerId = currentSRScheduler.customerId;
         linkedSalesOrderInput.attr('disabled', false);
         console.log('set customer id');
+        reRenderAssetPicker()
+    }
+
+    function reRenderAssetPicker(){
         document.AssetPickerComponentRender("#reactAssetPicker", currentSRScheduler.customerId, (value) => {
-            console.log(value);
+            if (!value) {
+                currentSRScheduler.assetName = null;
+                currentSRScheduler.assetTitle = null;
+                currentSRScheduler.emptyAssetReason = null;
+                return;
+            }
+            if (value.isAsset) {
+                currentSRScheduler.assetName = value.name;
+                currentSRScheduler.assetTitle = value.name + " " + value.lastUsername + " " + value.biosVer;
+            } else {
+                currentSRScheduler.emptyAssetReason = value.template;
+            }
         })
     }
 
