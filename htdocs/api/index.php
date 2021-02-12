@@ -854,7 +854,7 @@ $app->group(
                     $dbeQuotation->updateRow();
 
                 } catch (Exception $exception) {
-                    echo 'catch';
+                    error_log($exception->getMessage());
                     $response->getBody()->write(
                         $twig->render(
                             '@api/acceptQuotation.html.twig',
