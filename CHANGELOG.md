@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.5.2]
+### Fixed
+- Fixed issue with Project page not allowing to save from the summary box.
+
 ## [v5.5.1] - 2021-02-11
 ### Fixed
 - Fix link in Feedback notify email.
