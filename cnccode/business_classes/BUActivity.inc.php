@@ -7066,8 +7066,13 @@ FROM
             DBEProblem::slaResponseHours,
             $slaResponseHours
         );
-        $dbeProblem->setValue(DBEProblem::assetName, $record->getMonitorAgentName());
-        $dbeProblem->setValue(DBEProblem::assetTitle, $record->getMonitorAgentName());
+        if ($record->getMonitorAgentName()) {
+            // try to find the computer name from Labtech
+            $labtechRepo  = new CNCLTD\LabtechRepo\LabtechPDORepo();
+            $computerName = $labtechRepo->getComputerNameForComputerId($record->getMonitorAgentName());
+            $dbeProblem->setValue(DBEProblem::assetName, $computerName);
+            $dbeProblem->setValue(DBEProblem::assetTitle, $computerName);
+        }
         $dbeProblem->setValue(DBEProblem::emailSubjectSummary, substr($record->getSubjectLine(), 0, 100));
         $dbeProblem->setValue(
             DBEProblem::customerID,
