@@ -116,7 +116,6 @@ export default class AssetListSelectorComponent extends React.PureComponent {
     }
 
     filterOptions(options, {inputValue}) {
-        console.log(options);
         return options.filter(x => {
             return (
                 (x.isAsset &&

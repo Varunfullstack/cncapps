@@ -120,6 +120,19 @@ try {
             date(DATE_MYSQL_DATETIME)
         );
         $dbeProblem->setValue(
+            DBEProblem::assetName,
+            $dbeSrScheduler->getValue(DBESRScheduler::assetName)
+        );
+        $dbeProblem->setValue(
+            DBEProblem::assetTitle,
+            $dbeSrScheduler->getValue(DBESRScheduler::assetTitle)
+        );
+        $dbeProblem->setValue(
+            DBEProblem::emptyAssetReason,
+            $dbeSrScheduler->getValue(DBESRScheduler::emptyAssetReason)
+        );
+
+        $dbeProblem->setValue(
             DBEProblem::contactID,
             $dbeContact->getValue(DBEContact::contactID)
         );

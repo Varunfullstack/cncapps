@@ -1497,8 +1497,8 @@ class BUActivity extends Business
             $othersFlag,
             $dbeSelfContact
         );
-        $createdBy = $dbejCallactivity->getValue(DBEJCallActivity::caaConsno);
-        $user      = new DBEUser($this);
+        $createdBy            = $dbejCallactivity->getValue(DBEJCallActivity::caaConsno);
+        $user                 = new DBEUser($this);
         $user->getRow($createdBy);
         $bcc = [];
         if ($user->getValue(DBEUser::bccOnCustomerEmails)) {
@@ -7046,6 +7046,7 @@ FROM
         if (!$siteNo) {
             $siteNo = $dbeContact->getValue(DBEContact::siteNo);
         }
+        $record->getMonitorName()
         $dbeProblem->setValue(
             DBEProblem::hdLimitMinutes,
             $this->dsHeader->getValue(DBEHeader::hdTeamLimitMinutes)
@@ -9105,6 +9106,8 @@ FROM
                 DBEProblem::contactID,
                 $dbeContact->getValue(DBEContact::contactID)
             );
+            $dbeProblem->setValue(DBEProblem::assetName, $serverName);
+            $dbeProblem->setValue(DBEProblem::assetTitle, $serverName);
             $dbeProblem->setValue(
                 DBEProblem::hideFromCustomerFlag,
                 'Y'
@@ -9831,6 +9834,9 @@ FROM
                     $dbeContact->getValue(DBEContact::contactID)
                 )
             );
+            $buStandardText = new BUStandardText($this);
+            $buStandardText->getStandardTextByID(129, $dbeStandardText);
+            $dbeProblem->setValue(DBEProblem::emptyAssetReason, $dbeStandardText->getValue(DBEStandardText::stt_text));
             $dbeProblem->setValue(
                 DBEProblem::customerID,
                 $customerID

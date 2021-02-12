@@ -2,7 +2,17 @@ import ReactDOM from "react-dom";
 import React from "react";
 import AssetListSelectorComponent from "../shared/AssetListSelectorComponent/AssetListSelectorComponent";
 
-document.AssetPickerComponentRender = (elementId, customerId, onChange) => {
+document.AssetPickerComponentRender = (elementId, customerId, noAssetReason, assetName,assetTitle, onChange) => {
     const domContainer = document.querySelector(elementId);
-    ReactDOM.render(React.createElement(AssetListSelectorComponent,{customerId, onChange}), domContainer);
+    ReactDOM.render(React.createElement(AssetListSelectorComponent, {
+        customerId,
+        noAssetReason,
+        assetName,
+        assetTitle,
+        onChange
+    }), domContainer);
+}
+
+document.unmountComponentAtNode = (node) => {
+    ReactDOM.unmountComponentAtNode(node);
 }

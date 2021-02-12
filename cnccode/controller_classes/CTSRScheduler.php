@@ -80,6 +80,9 @@ class CTSRScheduler extends CTCNC
                 $toUpdateItem->setValue(DBESRScheduler::updatedBy, $this->userID);
                 $toUpdateItem->setValue(DBESRScheduler::updatedAt, (new DateTime())->format(DATE_MYSQL_DATE));
                 $toUpdateItem->setValue(DBESRScheduler::emailSubjectSummary, $this->getParam('emailSubjectSummary'));
+                $toUpdateItem->setValue(DBESRScheduler::assetName, $this->getParam('assetName'));
+                $toUpdateItem->setValue(DBESRScheduler::assetTitle, $this->getParam('assetTitle'));
+                $toUpdateItem->setValue(DBESRScheduler::emptyAssetReason, $this->getParam('emptyAssetReason'));
                 // before we update we want to test the rule
                 try {
                     $rrule = new \RRule\RRule($this->getParam('rruleString'));

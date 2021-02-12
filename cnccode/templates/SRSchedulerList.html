@@ -512,8 +512,8 @@
     }
 
     function setSRScheduler(srScheduler) {
-
-        currentSRScheduler = srScheduler;
+        console.log(srScheduler);
+        currentSRScheduler = jsonCopy(srScheduler);
         $('#customerString').val(srScheduler.customerName);
         if (+currentSRScheduler.priority === 5) {
             linkedSalesOrderContainer.show();
@@ -590,9 +590,6 @@
     function updateCustomerID(customerId) {
         $('input[name="customerId"]').val(customerId);
         currentSRScheduler.customerId = customerId;
-        currentSRScheduler.assetTitle = null;
-        currentSRScheduler.assetName = null;
-        currentSRScheduler.emptyAssetReason = null;
         if (currentSRScheduler.customerId) {
             onSetCustomerID();
         } else {
@@ -612,23 +609,31 @@
 
     function reRenderAssetPicker() {
         if (!currentSRScheduler.customerId) {
-            document.getElementById('reactAssetPicker').innerHTML = "";
+            document.unmountComponentAtNode(document.getElementById('reactAssetPicker'))
+            // .innerHTML = "";
             return;
         }
-        document.AssetPickerComponentRender("#reactAssetPicker", currentSRScheduler.customerId, (value) => {
-            if (!value) {
-                currentSRScheduler.assetName = null;
-                currentSRScheduler.assetTitle = null;
-                currentSRScheduler.emptyAssetReason = null;
-                return;
-            }
-            if (value.isAsset) {
-                currentSRScheduler.assetName = value.name;
-                currentSRScheduler.assetTitle = value.name + " " + value.lastUsername + " " + value.biosVer;
-            } else {
-                currentSRScheduler.emptyAssetReason = value.template;
-            }
-        })
+        console.log(currentSRScheduler.customerId, currentSRScheduler.emptyAssetReason, currentSRScheduler.assetName);
+        document.AssetPickerComponentRender(
+            "#reactAssetPicker",
+            currentSRScheduler.customerId,
+            currentSRScheduler.emptyAssetReason,
+            currentSRScheduler.assetName,
+            currentSRScheduler.assetTitle,
+            (value) => {
+                if (!value) {
+                    currentSRScheduler.assetName = null;
+                    currentSRScheduler.assetTitle = null;
+                    currentSRScheduler.emptyAssetReason = null;
+                    return;
+                }
+                if (value.isAsset) {
+                    currentSRScheduler.assetName = value.name;
+                    currentSRScheduler.assetTitle = value.name + " " + value.lastUsername + " " + value.biosVer;
+                } else {
+                    currentSRScheduler.emptyAssetReason = value.template;
+                }
+            })
     }
 
     function changeUntilOrCount(value) {
