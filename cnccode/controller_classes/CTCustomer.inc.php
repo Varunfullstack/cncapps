@@ -1072,7 +1072,7 @@ class CTCustomer extends CTCNC
                 echo $this->getCurrentUser();
                 exit;
             case "searchCustomers":
-                echo json_encode($this->searchCustomers());
+                echo json_encode($this->searchCustomers(),JSON_NUMERIC_CHECK);
                 exit;
             case "getCustomerSR":
                 echo json_encode($this->getCustomerSR());
