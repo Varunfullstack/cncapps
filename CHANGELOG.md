@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 1244 - Monthly Asset and Mailbox List Export
+
 ## [v5.5.2] - 2021-02-12
 ### Fixed
 - Fixed issue with Project page not allowing to save from the summary box.
