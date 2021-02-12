@@ -1,9 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
-## [v5.5.2]
+## [v5.5.2] - 2021-02-12
 ### Fixed
 - Fixed issue with Project page not allowing to save from the summary box.
+- Fixed issue where failed Signable generation wasn't being recorded in the error_log.
 
 ## [v5.5.1] - 2021-02-11
 ### Fixed
