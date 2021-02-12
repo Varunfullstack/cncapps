@@ -81,7 +81,7 @@ export default class KPIReportComponent extends MainComponent {
         const reports = [
             {
                 id: this.REP_SR_FIXED,
-                title: "SR Fixed",
+                title: "SRs Fixed",
                 parameters: [
                     this.reportparameters.dateFrom,
                     this.reportparameters.dateTo,
@@ -101,7 +101,7 @@ export default class KPIReportComponent extends MainComponent {
             },
             {
                 id: this.SRS_BY_CONTRACTS,
-                title: "SRs Raised By Contract",
+                title: "SRs Fixed By Contract",
                 parameters: [
                     this.reportparameters.dateFrom,
                     this.reportparameters.dateTo,
@@ -121,7 +121,7 @@ export default class KPIReportComponent extends MainComponent {
             },
             {
                 id: this.REP_SERVICE_REQUEST,
-                title: "Service Request",
+                title: "Historic Daily SR Statistics",
                 parameters: [
                     this.reportparameters.dateFrom,
                     this.reportparameters.dateTo,
@@ -131,7 +131,7 @@ export default class KPIReportComponent extends MainComponent {
             },
             {
                 id: this.REP_SERVICE_REQUEST_SOURCE,
-                title: "Historic Daily SR Statistics",
+                title: "SR Source",
                 parameters: [
                     this.reportparameters.dateFrom,
                     this.reportparameters.dateTo,
@@ -218,7 +218,7 @@ export default class KPIReportComponent extends MainComponent {
                         </React.Fragment>
                     ) : null}
                     {this.hasParameter(this.reportparameters.resultType) ? (
-                        <td>Type</td>
+                        <td>Scale</td>
                     ) : null}
                     {this.hasParameter(this.reportparameters.resultType) ? (
                         <td>
