@@ -41,4 +41,16 @@
             </column>
         </addColumn>
     </changeSet>
+    <changeSet id="issue1181-4" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="automated_request" columnName="cwaComputerId"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="automated_request">
+            <column name="cwaComputerId" type="text">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

@@ -7046,7 +7046,6 @@ FROM
         if (!$siteNo) {
             $siteNo = $dbeContact->getValue(DBEContact::siteNo);
         }
-        $record->getMonitorName()
         $dbeProblem->setValue(
             DBEProblem::hdLimitMinutes,
             $this->dsHeader->getValue(DBEHeader::hdTeamLimitMinutes)
@@ -7067,6 +7066,8 @@ FROM
             DBEProblem::slaResponseHours,
             $slaResponseHours
         );
+        $dbeProblem->setValue(DBEProblem::assetName, $record->getMonitorAgentName());
+        $dbeProblem->setValue(DBEProblem::assetTitle, $record->getMonitorAgentName());
         $dbeProblem->setValue(DBEProblem::emailSubjectSummary, substr($record->getSubjectLine(), 0, 100));
         $dbeProblem->setValue(
             DBEProblem::customerID,
