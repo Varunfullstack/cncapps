@@ -10,8 +10,7 @@ require_once($cfg["path_dbe"] . "/DBConnect.php");
 
 class CTSDManagerDashboard extends CTCurrentActivityReport
 {
-    const DAILY_STATS_SUMMARY = "dailyStatsSummary";
-
+    const DAILY_STATS_SUMMARY = "dailyStatsSummary";    
     function __construct($requestMethod,
                          $postVars,
                          $getVars,
@@ -449,4 +448,5 @@ WHERE pro_custno <> 282
             $string
         );
     }
+    
 }

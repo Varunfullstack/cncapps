@@ -12,7 +12,8 @@ class CTKPIReport extends CTCNC
     const GET_PRIORITY_RAISED                     = "priorityRaised";
     const GET_SERVICE_REQUESTS_RAISED_BY_CONTRACT = "serviceRequestsRaisedByContract";
     const GET_QUOTATION_CONVERSION                = "quotationConversion";
-
+    const GET_DAILY_STATS                         = "dailyStats";
+    const GET_DAILY_SOURCE                        = 'dailySource';
     /**
      * CTKPIReport constructor.
      */
@@ -42,6 +43,12 @@ class CTKPIReport extends CTCNC
             case self::GET_QUOTATION_CONVERSION:
                 echo json_encode($this->getQuotationConversion());
                 exit;
+            case self::GET_DAILY_STATS:
+                echo json_encode($this->getDailyStats(), JSON_NUMERIC_CHECK);
+                exit;
+            case self::GET_DAILY_SOURCE:
+                echo json_encode($this->getDailySource(), JSON_NUMERIC_CHECK);
+                exit;                
             default:
                 $this->setTemplate();
                 break;
@@ -216,5 +223,119 @@ WHERE problem.`pro_date_raised` >= '2020-01-01'
         $query .= " GROUP BY  date order by date";
         return DBConnect::fetchAll($query, $params);
     }
+    function getDailyStats()
+    {
+        $from=(@$_REQUEST['from']??'')==''?null:$_REQUEST['from'];;
+        $to=(@$_REQUEST['to']??'')==''?null:$_REQUEST['to'];
+        $customerID=(@$_REQUEST['customerID']??'')==''?null:$_REQUEST['customerID'];
 
+        $query ="SELECT
+        COUNT(DISTINCT pro_problemno ) AS total,
+        DATE_FORMAT(pro_date_raised,'%Y-%m-%d') date,
+        'raisedToday' AS type
+      FROM problem p        
+      WHERE pro_custno <> 282   
+        AND (:customerID is null or pro_custno=:customerID)       
+        AND (:from is null or pro_date_raised>=:from)
+        AND (:to is null or pro_date_raised<=:to)
+      GROUP BY type, date
+      
+      UNION 
+      
+      SELECT
+        COUNT(DISTINCT p.`pro_problemno`) AS total,
+        DATE_FORMAT(c.caa_date,'%Y-%m-%d') date,
+        'fixedToday' AS type
+      FROM
+        callactivity c
+        JOIN problem p ON c.caa_problemno = p.pro_problemno
+      WHERE pro_custno <> 282
+        AND c.`caa_consno` <> 67
+        AND c.caa_callacttypeno = 57        
+        AND pro_status = 'F'
+        AND (:customerID is null or pro_custno=:customerID)       
+        AND (:from is null or c.caa_date>=:from)
+        AND (:to is null or c.caa_date<=:to)
+      GROUP BY type, date
+      
+      UNION 
+      
+      SELECT
+      COUNT(*)  AS total,
+      DATE_FORMAT(pro_reopened_date,'%Y-%m-%d') date,
+        'reopenToday' AS type
+        FROM
+        problem
+        LEFT JOIN callactivity AS FIXED ON problem.`pro_problemno` = fixed.`caa_problemno`   
+      WHERE pro_custno <> 282
+        AND fixed.`caa_callacttypeno` = 57
+        AND  DATE_FORMAT(fixed.`caa_date`,'%Y-%m-%d')  = DATE_FORMAT(`pro_reopened_date`,'%Y-%m-%d')        
+        AND (fixed.`caa_callactivityno` IS NULL OR fixed.`caa_consno` <> 67)
+        AND (:customerID is null or pro_custno=:customerID)       
+        AND (:from is null or fixed.`caa_date`>=:from)
+        AND (:to is null or fixed.`caa_date`<=:to)
+         
+      GROUP BY type, date
+      
+      UNION
+      
+      SELECT
+        COUNT(pro_problemno) AS total,
+        DATE_FORMAT(pro_date_raised,'%Y-%m-%d') date,
+        'startedToday' AS type
+      FROM
+        `callactivity` c
+        JOIN problem p
+          ON c.`caa_problemno` = p.`pro_problemno`
+      WHERE pro_custno <> 282
+          AND caa_callacttypeno = 51
+        AND pro_status <> 'I'        
+        AND (:customerID is null or pro_custno=:customerID)       
+        AND (:from is null or pro_date_raised>=:from)
+        AND (:to is null or pro_date_raised<=:to)
+       GROUP BY type, date
+       
+       UNION 
+       
+       SELECT
+        COUNT(DISTINCT pro_custno) total,
+        DATE_FORMAT(caa_date,'%Y-%m-%d') date,
+        'uniqueCustomer' AS type
+      FROM
+        `callactivity` c
+        JOIN problem
+          ON problem.`pro_problemno` = c.`caa_problemno`
+      WHERE pro_custno <> 282
+        AND caa_callacttypeno = 51
+        AND `caa_date` >'2020-10-08' 
+        AND (:customerID is null or pro_custno=:customerID)       
+        AND (:from is null or `caa_date`>=:from)
+        AND (:to is null or `caa_date`<=:to)
+       GROUP BY type, date";
+
+        return DBConnect::fetchAll($query,["from"=>$from,"to"=>$to,"customerID"=>$customerID]);
+    }
+    /**
+     * @param bool|string $today
+     * @return array
+     */
+    private function getDailySource()
+    {
+        $from=(@$_REQUEST['from']??'')==''?null:$_REQUEST['from'];;
+        $to=(@$_REQUEST['to']??'')==''?null:$_REQUEST['to'];
+        $customerID=(@$_REQUEST['customerID']??'')==''?null:$_REQUEST['customerID'];
+
+        $query = "SELECT r.`description` as type,
+                    COUNT(*)  total, 
+                    DATE_FORMAT(pro_date_raised ,'%Y-%m-%d') date
+                FROM problem p LEFT JOIN `problemraisetype` r ON p.`raiseTypeId`=r.`id`
+                WHERE    
+                    pro_custno <> 282
+                    AND (:customerID is null or pro_custno=:customerID)       
+                    AND (:from is null or `pro_date_raised`>=:from)
+                    AND (:to is null or `pro_date_raised`<=:to)                     
+                GROUP BY r.`description`,DATE";
+
+        return DBConnect::fetchAll($query,["from"=>$from,"to"=>$to,"customerID"=>$customerID]);
+    }
 }

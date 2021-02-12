@@ -12,6 +12,12 @@ import CustomerSearch from '../shared/CustomerSearch';
 import PrioritiesRaisedComponent from './subComponents/PrioritiesRaisedComponent';
 import QuotationConversionComponent from './subComponents/QuotationConversionComponent';
 import ServiceRequestsRaisedByContract from "./subComponents/ServiceRequestsRaisedByContract";
+import APISDManagerDashboard from '../SDManagerDashboardComponent/services/APISDManagerDashboard';
+import ServiceRequestComponent from './subComponents/ServiceRequestComponent';
+import DailySourceComponent from './subComponents/DailySourceComponent';
+
+import { groupBy } from '../utils/utils';
+
 
 export const ReportType = {Daily: "day", Weekly: "week", Monthly: "month"}
 
@@ -25,6 +31,9 @@ export default class KPIReportComponent extends MainComponent {
     REP_PRIORITIES_RAISED = 2;
     SRS_BY_CONTRACTS = 3;
     REP_QUOTATION_CONVERSION = 4;
+    REP_SERVICE_REQUEST=5;
+    REP_SERVICE_REQUEST_SOURCE=6;
+    apiSDManagerDashboard = new APISDManagerDashboard();
 
     /**
      * SRS_BY_CONTRAC
@@ -109,7 +118,27 @@ export default class KPIReportComponent extends MainComponent {
                     this.reportparameters.customer,
                     this.reportparameters.resultType,
                 ]
-            }
+            },
+            {
+                id: this.REP_SERVICE_REQUEST,
+                title: "Service Request",
+                parameters: [
+                    this.reportparameters.dateFrom,
+                    this.reportparameters.dateTo,
+                    this.reportparameters.customer,
+                    this.reportparameters.resultType,
+                ]
+            },
+            {
+                id: this.REP_SERVICE_REQUEST_SOURCE,
+                title: "Historic Daily SR Statistics",
+                parameters: [
+                    this.reportparameters.dateFrom,
+                    this.reportparameters.dateTo,
+                    this.reportparameters.customer,
+                    this.reportparameters.resultType,
+                ]
+            },
         ];
         if (!activeReport)
             activeReport = reports[0];
@@ -244,13 +273,15 @@ export default class KPIReportComponent extends MainComponent {
     handleReportView = () => {
         const {filter, activeReport} = this.state;
         this.setState({_showSpinner: true});
-        if (filter.from == "") {
-            this.alert("You must enter the start date");
-            return;
-        }
+        // if (filter.from == "") {
+        //     this.alert("You must enter the start date");
+        //     return;
+        // }        
+
         switch (activeReport?.id) {
             case this.REP_SR_FIXED:
                 this.api.getSRFixed(filter.from, filter.to, filter.customerID).then((data) => {
+                    console.log(data);
                     this.processData(data);
                 });
                 break;
@@ -269,6 +300,47 @@ export default class KPIReportComponent extends MainComponent {
                     this.processData(data, false);
                 });
                 break;
+            case this.REP_SERVICE_REQUEST:                
+                this.api.getDailyStats(filter.from, filter.to, filter.customerID).then((result) => {
+                    let data=groupBy(result,'date');
+                    data=data.map(g=>{
+                        const getItemType=(type)=>g.items.find(s=>s.type==type)?.total||0;
+                     return {
+                         'date':g.groupName, 
+                        "raisedToday":getItemType("raisedToday"),
+                        "reopenToday":getItemType("reopenToday"),
+                        "startedToday":getItemType("startedToday"),
+                        "fixedToday":getItemType("fixedToday"),
+                        "uniqueCustomer":getItemType("uniqueCustomer"),
+                    }
+                    });
+                     console.log(data);
+                     this.processData(data, false);
+
+                });
+                break;
+            case this.REP_SERVICE_REQUEST_SOURCE:                
+                this.api.getDailySource(filter.from, filter.to, filter.customerID).then((result) => {
+                    let data=groupBy(result,'date');
+                    data=data.map(g=>{
+                        const getItemType=(type)=>g.items.find(s=>s.type==type)?.total||0;
+                     return {
+                        "date"  :g.groupName, 
+                        "OnSite":getItemType("On site"),
+                        "Manual":getItemType("Manual"),
+                        "Email" :getItemType("Email"),
+                        "Alert" :getItemType("Alert"),
+                        "Phone" :getItemType("Phone"),
+                        "Portal":getItemType("Portal"),
+                        "Sales" :getItemType("Sales"),
+                    }
+                    });
+                     console.log(data);
+                     this.processData(data, false);
+
+                });
+                break;
+                
         }
 
     };
@@ -307,7 +379,13 @@ export default class KPIReportComponent extends MainComponent {
                 return <QuotationConversionComponent data={data}
                                                      filter={filter}
                 ></QuotationConversionComponent>
-            default:
+            case this.REP_SERVICE_REQUEST:
+                return <ServiceRequestComponent data={data}
+                filter={filter}></ServiceRequestComponent>
+            case this.REP_SERVICE_REQUEST_SOURCE:
+                return <DailySourceComponent data={data}
+                filter={filter}></DailySourceComponent>
+            default:           
                 return null;
         }
     }
