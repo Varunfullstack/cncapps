@@ -78,8 +78,8 @@ class CurrentActivityService extends APIMain {
         }).then(res => res.json());
     }
 
-    getCustomerOpenSR(customerID) {
-        return fetch(`${this.baseURL}getCustomerOpenSR&customerID=${customerID}`).then(res => res.json());
+    getCustomerOpenSR(customerID,srNumber) {
+        return fetch(`${this.baseURL}getCustomerOpenSR&customerID=${customerID}&srNumber=${srNumber}`).then(res => res.json());
     }
 
     assignToBeLoggedToServiceRequest(toBeLogged, serviceRequestId) {

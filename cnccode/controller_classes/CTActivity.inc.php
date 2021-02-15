@@ -1649,32 +1649,44 @@ class CTActivity extends CTCNC
                 $dbeProblemRaiseType = new  DBEProblemRaiseType($this);
                 $dbeProblemRaiseType->setPKValue($raiseTypeId);
                 $dbeProblemRaiseType->getRow();
+                $return = "<div style='font-size: 14px;font-weight: 100; display:inline-block'>
+                  <div class='tooltip' > ";
+                $title  = "";
                 switch ($dbeProblemRaiseType->getValue(DBEProblemRaiseType::description)) {
                     case 'Email':
-                        return "<i class='fa fa-envelope' title='This Service Request was raised by email'></i>";
+                        $return .= "<i class='fal fa-envelope ml-5 pointer' style='font-size: 18px;' ></i>";
+                        $title  = "This Service Request was raised by email";
                         break;
                     case 'Portal':
-                        //return "<i class='fab fa-edge' title='This Service Request was raised by the portal'></i>";
-                        return "<i class='icon-chrome_icon' style='font-size: 18px; margin:5px; color:#000080 ' ></i>";
+                        $return .= "<i class='icon-chrome_icon' style='font-size: 18px; margin:5px; color:#000080 ' ></i>";
+                        $title  = "This Service Request was raised by the portal";
                         break;
                     case 'Phone':
-                        return "<i class='fa fa-phone' title='This Service Request was raised by phone'></i>";
+                        $return .= "<i class='fal fa-phone ml-5 pointer' style='font-size: 18px;' ></i>";
+                        $title  = "This Service Request was raised by phone";
                         break;
                     case 'On site':
-                        return "<i class='fas fa-building' title='This Service Request was raised by an on site engineer'></i>";
+                        $return .= "<i class='fal fa-building ml-5 pointer' style='font-size: 18px;' ></i>";
+                        $title  = "This Service Request was raised by an on site engineer";
                         break;
                     case 'Alert':
-                        return "<i class='fas fa-bell' title='This Service Request was raised by an alert'></i>";
+                        $return .= "<i class='fal fa-bell ml-5 pointer' style='font-size: 18px;' ></i>";
+                        $title  = "This Service Request was raised by an alert";
                         break;
                     case 'Sales':
-                        return "<i class='fas fa-shopping-cart' title='This Service Request was raised via Sales'></i>";
+                        $return .= "<i class='fal fa-shopping-cart ml-5 pointer' style='font-size: 18px;' ></i>";
+                        $title  = "This Service Request was raised via Sales";
                         break;
                     case 'Manual':
-                        return "<i class='fas fa-user-edit' title='This Service Request was raised manually'></i>";
+                        $return .= "<i class='fal fa-user-edit ml-5 pointer' style='font-size: 18px;' ></i>";
+                        $title  = "This Service Request was raised manually";
                         break;
                 }
+                $return .= "<div class='tooltiptext tooltip-bottom' style='width:300px' >$title</div> </div> ";
+                return $return;
             }
-        } else return null;
+        }
+        return null;
     } // end cancelEdit
 
     /**
@@ -2604,12 +2616,15 @@ class CTActivity extends CTCNC
             'ActivityReasonPopup',
             'ActivityReasonPopup.inc'
         );
+        $this->template->setVar('javaScript', "<link rel='stylesheet' href='components/shared/ToolTip.css'>");        
+
         $problemId             = $this->getParam('problemID');
         $activitiesByProblemID = $this->buActivity->getActivitiesByProblemID($problemId);
         $dbeProblem            = new DBEJProblem($this);
         $dbeProblem->getRow($problemId);
         $dbeJContract = new DBEJContract($this);
-        $title        = $problemId . ' - ' . $dbeProblem->getValue(DBEJProblem::customerName);
+        $title        = $problemId . ' - ' . $dbeProblem->getValue(DBEJProblem::customerName)
+                        .$this->getProblemRaiseIcon($dbeProblem);
         $this->template->set_block(
             'ActivityReasonPopup',
             'activityBlock',
@@ -2677,6 +2692,8 @@ class CTActivity extends CTCNC
                 $lastActivityText   = "$date $startTime - $endTime ($duration) $activityType - $contactName - $siteAddress - $userName";
                 $lastActivityReason = $reason;
                 $lastCncNextAction  = $activitiesByProblemID->getValue(DBEJCallActivity::cncNextAction);
+                $lastCustomerSummary  = $activitiesByProblemID->getValue(DBEJCallActivity::customerSummary);
+
             }
             $this->template->parse(
                 'rows',
@@ -2717,6 +2734,7 @@ class CTActivity extends CTCNC
                 'lastActivityText'    => $lastActivityText,
                 'lastActivityReason'  => $lastActivityReason,
                 'lastCncNextAction'   => $lastCncNextAction,
+                'lastCustomerSummary' => $lastCustomerSummary
             )
         );
         $this->template->parse(

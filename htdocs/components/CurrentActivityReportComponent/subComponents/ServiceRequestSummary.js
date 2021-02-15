@@ -74,10 +74,10 @@ export class ServiceRequestSummary extends Component {
                     {summaryData.initial || "-"}/{summaryData.total}
                 </dd>
                 {
-                    summaryData.serviceRequestsPerEngineer.map(item =>
-                        <Fragment>
-                            <dt>{item.label}:</dt>
-                            <dd>{item.initial || "-"}/{item.total}</dd>
+                    summaryData.serviceRequestsPerEngineer.map((item,indx) =>
+                        <Fragment  key={"f"+indx}>
+                            <dt key={indx}>{item.label}:</dt>
+                            <dd key={'t'+indx}>{item.initial || "-"}/{item.total}</dd>
                         </Fragment>
                     )
                 }

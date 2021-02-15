@@ -10717,10 +10717,10 @@ FROM
      * @param $customerID
      * @return DBEJProblem
      */
-    function getCustomerOpenSR($customerID)
+    function getCustomerOpenSR($customerID,$srNumber=null)
     {
         $dbeJProblem = new DBEJProblem($this);
-        $dbeJProblem->getCustomerOpenRows($customerID);
+        $dbeJProblem->getCustomerOpenRows($customerID,$srNumber);
         return $dbeJProblem;
 
     }

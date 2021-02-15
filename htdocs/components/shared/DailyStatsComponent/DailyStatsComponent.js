@@ -44,26 +44,29 @@ class DailyStatsComponent extends MainComponent {
         });
     };
 
-    getSummaryElemen = () => {
+    getSummaryElement = () => {
         const {el} = this;
         const {summary} = this.state;
         if (this.loading)
             return null;
+        const evenBackgroundColor    ="#00628B";
+        const eventTextColor         ="#E6E6E6";
         return <table>
             <tbody>
             <tr>
                 <td>{this.getOpenSrCard(summary.prioritySummary)}</td>
-                <td>{this.getTeamSrCard(summary.openSrTeamSummary, "#00628B", "#E6E6E6")}</td>
+                <td>{this.getTeamSrCard(summary.openSrTeamSummary, evenBackgroundColor, eventTextColor)}</td>
                 <td>{this.getDailySourceCard(summary.dailySourceSummary)}</td>
-                <td>{this.getTotalCardWithBiggerNumber("Unique Customers", summary.uniqueCustomerTodaySummary.total, "#00628B", "#E6E6E6")}</td>
+                <td>{this.getTotalCardWithBiggerNumber("Unique Customers", summary.uniqueCustomerTodaySummary.total, evenBackgroundColor, eventTextColor)}</td>
                 <td>{this.getTotalCardWithBiggerNumber("Near SLA", summary.nearSLASummary.total)}</td>
+                <td>{this.getTotalCardWithBiggerNumber("Near Fix SLA Breach", summary.nearFixSLABreach, evenBackgroundColor, eventTextColor)}</td>
             </tr>
             <tr>
-                <td>{this.getTotalCardWithBiggerNumber("Raised Today", summary.raisedTodaySummary.total, "#00628B", "#E6E6E6")}</td>
+                <td>{this.getTotalCardWithBiggerNumber("Raised Today", summary.raisedTodaySummary.total, evenBackgroundColor, eventTextColor)}</td>
                 <td>{this.getTotalCardWithBiggerNumber("Today's Started", summary.raisedStartTodaySummary.total)}</td>
-                <td>{this.getTotalCardWithBiggerNumber("Fixed Today", summary.fixedTodaySummary.total, "#00628B", "#E6E6E6")}</td>
+                <td>{this.getTotalCardWithBiggerNumber("Fixed Today", summary.fixedTodaySummary.total, evenBackgroundColor, eventTextColor)}</td>
                 <td>{this.getTotalCardWithBiggerNumber("Reopened Today", summary.reopenTodaySummary.total)}</td>
-                <td>{this.getTotalCardWithBiggerNumber("Breached SLA", summary.breachedSLATodaySummary.total, "#00628B", "#E6E6E6")}</td>
+                <td>{this.getTotalCardWithBiggerNumber("Breached SLA", summary.breachedSLATodaySummary.total, evenBackgroundColor, eventTextColor)}</td>
             </tr>
             </tbody>
         </table>
@@ -265,7 +268,7 @@ class DailyStatsComponent extends MainComponent {
                 <Spinner key="spinner"
                          show={this.state.showSpinner}
                 />
-                {this.getSummaryElemen()},
+                {this.getSummaryElement()},
                 {this.getDailyStatsLink()}
             </div>
         );

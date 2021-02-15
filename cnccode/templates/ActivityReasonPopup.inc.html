@@ -1,4 +1,12 @@
 <!-- Template: ActivityReasonPopup.inc.html -->
+<style>
+    h1 a{
+        color: #000080;
+    }
+    .ml-5{
+        margin-left: 5px;
+    }
+</style>
 <P class="hiddenText">{problemHiddenText}</P>
 <BR/>
 <table width="100%">
@@ -17,6 +25,12 @@
         <td bgcolor="#f1f9d1">
             <label for="" style="color:#992211">CNC Next Action</label>            
             {lastCncNextAction}
+        </td>
+    </tr>
+    <tr>
+        <td bgcolor="#bfe8f2">
+            <label for=""  >Customer Summary</label>            
+            {lastCustomerSummary}
         </td>
     </tr>
     <tr>
