@@ -218,7 +218,7 @@ class InboxOpenSRComponent extends React.Component {
             }),
             <label style={{marginLeft:30,whiteSpace:"nowrap"}}>SR Number</label>
             ,
-            el('input',{style:{height:16},className:"form-control", onChange:(event)=>this.setFilter('srNumber',event.target.value)})
+            el('input',{style:{height:14},className:"form-control", onChange:(event)=>this.setFilter('srNumber',event.target.value)})
         )
     }
     setFilter=(field,value)=>{

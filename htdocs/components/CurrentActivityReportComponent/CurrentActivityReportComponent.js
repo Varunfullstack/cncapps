@@ -22,6 +22,7 @@ import '../style.css';
 import './CurrentActivityReportComponent.css';
 import '../shared/ToolTip.css'
 import APIActivity from '../services/APIActivity';
+import MovingSRComponent from './subComponents/MovingSRComponent';
 
 
 const AUTORELOAD_INTERVAL_TIME = 2 * 60 * 1000;
@@ -63,18 +64,13 @@ class CurrentActivityReportComponent extends MainComponent {
             _showSpinner: false,
             userFilter: "",
             filter,
-           
             changeQueuData:{
-                priorityTemplateText:"",
-                priorities:[],
-                priorityReasons:[],
-                priorityId:'',
-                priorityTemplate:'',
-                movingSrReason:"",
-                problem:null,
+                show:false,
                 newTeam:'',
-                queue:''
+                queue:'',
+                problem:null
             }
+           
         };
         this.apiCurrentActivityService = new CurrentActivityService();
         this.teams = [
@@ -343,144 +339,41 @@ class CurrentActivityReportComponent extends MainComponent {
                 });
         }
     }
-    setChangeQueueData=(field,value)=>{
-        const {changeQueuData}=this.state;
-        changeQueuData[field]=value;
-        this.setState({changeQueuData});
-    }
+    
     getAssignTeamModal=()=>{
-        const {showAssignModal,changeQueuData}=this.state;
-        if(!showAssignModal)
+        const {changeQueuData} =this.state;
+        if(!changeQueuData.show)
             return null;
-        //const {priorityTemplateText,priorityId,priorities,priorityReasons,priorityTemplate}=this.state.changeQueuData;
-        return <Modal key="modal"
-        width={650}
-        show={showAssignModal}
-        title="Change queue / priority"
-        content={
-        <div key="content">
-            <div className="form-group">
-                <label>The reason for moving this SR</label>
-                <textarea style={{border:"1px solid white",minHeight:50}}  onChange={(event)=>this.setChangeQueueData("movingSrReason",event.target.value)}></textarea>
-                {/* <CNCCKEditor type="inline"  style={{border:"1px solid white",minHeight:50}}  onChange={(text)=>this.setChangeQueueData("movingSrReason",text)}></CNCCKEditor> */}
-            </div>
-            <div className="form-group">
-                <label>Priority</label>
-                <select style={{width:360}} value={changeQueuData.priorityId} onChange={(event)=>this.setChangeQueueData("priorityId",event.target.value)}>
-                    <option></option>
-                    {changeQueuData.priorities.map(r=><option key={r.id} value={r.id}>{r.name}</option>)}
-                </select>
-            </div>
-            <div className="form-group">
-                <label>Priority change template</label>
-                <select style={{width:360}} value={changeQueuData.priorityTemplate?.id} onChange={(event)=>this.handleTemplateChange(event.target.value)}>
-                    <option></option>
-                    {changeQueuData.priorityReasons.map(r=><option key={r.id} value={r.id}>{r.name}</option>)}
-                </select>
-            </div>
-            <div className="form-group">
-                <label>The reason for change priority</label>
-                <CNCCKEditor value={changeQueuData.priorityTemplateText} type="inline"  style={{border:"1px solid white",minHeight:50}} onChange={(text)=>this.setChangeQueueData("priorityTemplateText",text)}></CNCCKEditor>
-            </div>
-        </div>
-        }
-        footer={<div key="footer">
-            <button onClick={()=>this.handleSaveMovingSR()}>Save</button>
-            <button onClick={()=>this.setState({showAssignModal:false})}>Cancel</button>
-        </div>}
-        >
-
-        </Modal>
+        else 
+            return <MovingSRComponent
+            key="MovingSR"
+            problem={changeQueuData.problem}
+            queue={changeQueuData.queue}
+            show={changeQueuData.show}
+            newTeam={changeQueuData.newTeam}
+            onClose={this.handleMovingModalClose}
+            ></MovingSRComponent>        
     }
-    handleSaveMovingSR=()=>{
-        const {changeQueuData}=this.state;        
-        let queueChanged=false,priorityChange=false;
-        const callApis=[];
-        if(changeQueuData.problem.status=="P"&&changeQueuData.movingSrReason=="")
-        {
-            this.alert("Please enter Moving Sr Reason");
-            return;
-        } else if (changeQueuData.movingSrReason!=""){
-            queueChanged=true;
-        }   
-        
-        if(changeQueuData.priorityId!=changeQueuData.problem.priority && changeQueuData.priorityTemplateText=="")
-        {
-            this.alert("Please enter priority change Reason");
-            return;
-        } else if (changeQueuData.priorityId!=changeQueuData.problem.priority && changeQueuData.priorityTemplateText!=""){
-            priorityChange=true;
-        }
-
-        //console.log(changeQueuData);
-        if(queueChanged)
-            callApis.push(this.apiCurrentActivityService
-            .changeQueue(changeQueuData.problem.problemID, changeQueuData.newTeam, changeQueuData.movingSrReason)
-            );
-
-        if(priorityChange)
-        {
-            //update priority
-            const payload = {
-                callActivityID: parseInt(changeQueuData.problem.callActivityID),
-                priorityChangeReason: changeQueuData.priorityTemplateText,
-                priority: parseInt(changeQueuData.priorityId)
-            }
-            //console.log(payload);
-            callApis.push(this.apiActivity.changeProblemPriority(payload));
-            
-        }
-        Promise.all(callApis).then(([changeQueue,changePriority])=>{
-            this.loadQueue(changeQueuData.queue);
-            this.setState({showAssignModal:false});
-        });
-    }
-    handleTemplateChange=(templateId)=>{
-        const {changeQueuData}=this.state;        
-        const priorityTemplate=changeQueuData.priorityReasons.find(p=>p.id==templateId);
-       // console.log(priorityReasons,templateId,priorityTemplate);
-        changeQueuData.priorityTemplate=priorityTemplate;
-        changeQueuData.priorityTemplateText=priorityTemplate.template;
+    handleMovingModalClose=(reload=true)=>{
+        const {changeQueuData} =this.state;
+        if(reload)
+        this.loadQueue(changeQueuData.queue);
+        changeQueuData.show=false;
+        changeQueuData.newTeam='';
+        changeQueuData.queue='';
+        changeQueuData.problem=null;
         this.setState({changeQueuData});
-        //this.setState({priorityTemplate,priorityTemplateText:priorityTemplate.template});
-    }    
+    }
+    
    
     // Shared methods
     moveToAnotherTeam = async ({target}, problem, code) => {
-        const {changeQueuData}=this.state;        
-        const priorityReasons=await this.apiStandardText.getOptionsByType("Priority Change Reason");
-        const priorities = await this.apiActivity.getPriorities();
-        console.log(priorityReasons);
-        changeQueuData.priorityReasons=priorityReasons;
-        changeQueuData.priorityTemplateText="";
-        changeQueuData.priorityTemplate="";
-        changeQueuData.priorityId=problem.priority;
-        changeQueuData.movingSrReason="";
-        changeQueuData.priorities=priorities;
-        changeQueuData.problem=problem;
+        const {changeQueuData} =this.state;
         changeQueuData.newTeam=target.value;
+        changeQueuData.problem=problem;
+        changeQueuData.show=true;
         changeQueuData.queue=code;
-        this.setState({ showAssignModal:true , changeQueuData});
-        console.log(problem);
-        /*
-        let answer = null;
-        if (problem.status === "P") {
-            answer = await this.prompt(
-                "Please provide a reason for moving this SR into a different queue"
-            );
-            if (!answer) {
-                return;
-            }
-        }
-
-        this.apiCurrentActivityService
-            .changeQueue(problem.problemID, target.value, answer)
-            .then((res) => {
-                if (res && res.status) {
-                    this.loadQueue(code);
-                }
-            });
-        */
+        this.setState({changeQueuData});               
     };
     /**
      * Move to another queue
