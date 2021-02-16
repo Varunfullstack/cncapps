@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unrealesed] 
+### Added
+-issue 1255 Add Expenses Next ProcessingDate ExpenseDashboard	
+
 ## [v5.5.4] - 2021-02-16
 ### Added
 - CNC 25 Years of Business Logo 	

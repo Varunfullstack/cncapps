@@ -1285,7 +1285,14 @@ WHERE
     function displayReport()
     {
 
-
+        $dbeHeader=new DBEHeader($this);
+        $expensesNextProcessingDate=$dbeHeader->getValue(DBEHeader::expensesNextProcessingDate);
+        if(!empty($expensesNextProcessingDate))
+        {
+            $expensesNextProcessingDate = new DateTime($expensesNextProcessingDate);
+            $expensesNextProcessingDate ='Next payroll processing date is '.$expensesNextProcessingDate->format('d-m-Y');
+        }
+     
         $this->setMethodName('displayReport');
         $this->setTemplateFiles(
             'ExpenseDashboard',
@@ -1351,6 +1358,7 @@ WHERE caa_endtime
                 'approvedOvertimeValue' => $overtimeSummary['approved'],
                 'pendingOvertimeValue'  => $overtimeSummary['pending'],
                 'runningTotalsLink'     => $isApprover ? '<a href="?action=runningTotals" target="_blank">Running Totals</a>' : null,
+                'expensesNextProcessingDate' => $expensesNextProcessingDate
             ]
         );
         $this->template->parse(
