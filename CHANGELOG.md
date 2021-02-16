@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.5.4] - 2021-02-16
+### Added
+- CNC 25 Years of Business Logo 	
+
 ## [v5.5.3] - 2021-02-12
 ### Fixed
 - Fixed issue with "Start Work" showing when it shouldn't.
