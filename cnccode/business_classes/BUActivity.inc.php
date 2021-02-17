@@ -7070,6 +7070,9 @@ FROM
             // try to find the computer name from Labtech
             $labtechRepo  = new CNCLTD\LabtechRepo\LabtechPDORepo();
             $computerName = $labtechRepo->getComputerNameForComputerId($record->getMonitorAgentName());
+            if(!$computerName){
+                echo "Couldn't match Monitor Agent Name value : {$record->getMonitorAgentName()} to a computer name.";
+            }
             $dbeProblem->setValue(DBEProblem::assetName, $computerName);
             $dbeProblem->setValue(DBEProblem::assetTitle, $computerName);
         }

@@ -46,7 +46,7 @@ export default class AssetListSelectorComponent extends React.PureComponent {
 
     async componentDidMount() {
         const {customerId} = this.props;
-        if(!customerId){
+        if (!customerId) {
             return;
         }
         await Promise.all([
@@ -92,6 +92,12 @@ export default class AssetListSelectorComponent extends React.PureComponent {
     }
 
     stringSearch(haystack, needle) {
+        if (!needle) {
+            return true;
+        }
+        if (!haystack) {
+            return false;
+        }
         return haystack.toLowerCase().indexOf(needle.toLowerCase()) > -1;
     }
 
