@@ -14,6 +14,7 @@ import InboxOpenSRComponent from './subComponents/InboxOpenSRComponent';
 import {getServiceRequestWorkTitle, sort} from '../utils/utils';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import CallBackModal from './subComponents/CallBackModal';
 
 import '../style.css';
 import '../shared/ToolTip.css'
@@ -56,6 +57,8 @@ class CurrentActivityReportComponent extends MainComponent {
             _showSpinner: false,
             userFilter: "",
             filter,
+            showCallBackModal:false,
+            currentProblem:null
         };
         this.apiCurrentActivityService = new CurrentActivityService();
         this.teams = [
@@ -572,7 +575,20 @@ class CurrentActivityReportComponent extends MainComponent {
             this.alert(err.toString());
         }
     }
-
+    onCallBack=(problem)=>{        
+        console.log(problem);  
+        this.setState({showCallBackModal:true,currentProblem:problem});
+    }
+    getCallBackModal=()=>{
+        const {showCallBackModal,currentProblem}=this.state;
+        if(!showCallBackModal)
+        return null;
+        return <CallBackModal key="modal" show={showCallBackModal} 
+        onClose={()=>this.setState({showCallBackModal:false})}
+        problem={currentProblem}
+        >
+        </CallBackModal>
+    }
     render() {
         const {
             el,
@@ -593,6 +609,7 @@ class CurrentActivityReportComponent extends MainComponent {
             getFollowOnElement,
             getCustomerOpenSR,
             assignToRequest,
+            onCallBack
         } = this;
         const {
             helpDeskInboxFiltered,
@@ -610,6 +627,7 @@ class CurrentActivityReportComponent extends MainComponent {
 
         } = this.state;
         return el("div", {style: {backgroundColor: "white"}}, [
+            this.getCallBackModal(),
             this.getConfirm(),
             this.getAlert(),
             this.getPrompt(),
@@ -630,7 +648,8 @@ class CurrentActivityReportComponent extends MainComponent {
                     allocateAdditionalTime,
                     requestAdditionalTime,
                     getAllocatedElement,
-                    getFollowOnElement
+                    getFollowOnElement,
+                    onCallBack
                 })
                 : null,
 

@@ -38,8 +38,8 @@ class DBEJProblem extends DBEProblem
     const ENGINEER_FIXED_NAME              = 'engineerFixedName';
     const FIXED_TEAM_ID                    = 'fixedTeamId';
     const IS_FIX_SLA_BREACHED              = 'isFixSLABreached';
-
-
+    const contactName                      = 'contactName';
+    const contactID                        = 'contactID';
     /**
      * calls constructor()
      * @access public
@@ -270,6 +270,18 @@ class DBEJProblem extends DBEProblem
 	WHEN `pro_priority` = 3 THEN customer.`slaP3PenaltiesAgreed` && customer.`slaFixHoursP3` - problem.pro_working_hours <= 0
 	else 0
 	END'
+        );
+        $this->addColumn(
+          self::contactName,
+          DA_STRING,
+          DA_ALLOW_NULL,
+          "(select  concat(con_first_name,' ',con_last_name) contactName from contact where con_contno = initial.caa_contno) contactName"
+        );
+        $this->addColumn(
+          self::contactID,
+          DA_STRING,
+          DA_ALLOW_NULL,
+          "(select  con_contno  from contact where con_contno = initial.caa_contno) contactID"
         );
         $this->setAddColumnsOff();
         $this->setPK(0);

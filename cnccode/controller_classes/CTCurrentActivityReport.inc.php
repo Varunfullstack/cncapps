@@ -17,6 +17,8 @@ require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUUser.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg['path_dbe'] . '/DBEPendingReopened.php');
+require_once($cfg['path_dbe'] . '/DBECallback.inc.php');
+
 
 // Actions
 class CTCurrentActivityReport extends CTCNC
@@ -38,6 +40,7 @@ class CTCurrentActivityReport extends CTCNC
     var $priority      = array();
     var $loggedInUserIsSdManager;
     var $customerFilterList;
+    const CONST_CALLBACK='callback';
     /**
      * @var BUCustomerItem
      */
@@ -82,6 +85,7 @@ class CTCurrentActivityReport extends CTCNC
      */
     function defaultAction()
     {
+        $method=$this->getRequestMethodeName();
         switch ($this->getAction()) {
             case "getHelpDeskInbox":
                 echo json_encode($this->renderQueue(1));
@@ -131,6 +135,13 @@ class CTCurrentActivityReport extends CTCNC
                 break;
             case 'getCustomerOpenSR':
                 echo json_encode($this->renderQueue(13));
+                exit;
+            case self::CONST_CALLBACK:
+                switch ($method) {
+                    case 'POST':
+                        echo json_encode($this->addCallBack());
+                        break;                    
+                }
                 exit;
             default:
                 $this->setTemplate();
@@ -554,5 +565,52 @@ class CTCurrentActivityReport extends CTCNC
             return 'green';
         }
     }
+    public function addCallBack(){         
+        $body=$this->getBody();
+        $problemID=$body->problemID;
+        $customerID=$body->customerID;
+        $contactID=$body->contactID;
+        $callActivityID=$body->callActivityID;
+        $description=$body->description;
+        $callback_datetime=$body->date.' '.$body->time.':00';        
+        // echo  $callback_datetime;
+        // exit;
+        if(empty($problemID)||empty($customerID))
+            return $this->getResponseError(400,"Missing data");
+        $dbeCallback=new DBECallback($this);
+        $dbeCallback->setValue(DBECallback::problemID,$problemID);
+        $dbeCallback->setValue(DBECallback::callActivityID,$callActivityID);
+        $dbeCallback->setValue(DBECallback::contactID,$contactID);
+        $dbeCallback->setValue(DBECallback::description,$description);
+        $dbeCallback->setValue(DBECallback::callback_datetime,$callback_datetime);
+        $dbeCallback->setValue(DBECallback::consID,$this->dbeUser->getPKValue());
+        $dbeCallback->setValue(DBECallback::createAt,date('Y-m-d H:i:s'));
+        $dbeCallback->setValue(DBECallback::is_callback,0);
 
+         $dbeCallback->insertRow();
+        return ["status"=>true];
+        // $query="INSERT INTO `contact_callback` (            
+        //     `consID`,
+        //     `problemID`,
+        //     `callActivityID`,
+        //     `contactID`,
+        //     `description`,
+        //     `callback_datetime`,
+        //     `is_callback`,
+        //     `createAt`
+        //   )
+        //   VALUES
+        //     (              
+        //       'consID',
+        //       'problemID',
+        //       'callActivityID',
+        //       'contactID',
+        //       'description',
+        //       'callback_datetime',
+        //       'is_callback',
+        //       'createAt'
+        //     );
+        //   "
+        return $body;
+    }
 }

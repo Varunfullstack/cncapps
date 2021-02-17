@@ -99,6 +99,9 @@ class CurrentActivityService extends APIMain {
 
 
     }
+    addCallback(body){
+       return this.post(`${this.baseURL}callback`,body).then((res) => res.json());
+    }
 }
 
 export default CurrentActivityService;

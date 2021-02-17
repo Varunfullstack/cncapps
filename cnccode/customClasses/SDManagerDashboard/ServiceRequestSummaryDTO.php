@@ -148,7 +148,8 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
     private $slaFixHoursP2;
     /** @var float */
     private $slaFixHoursP3;
-
+    /** @var float */
+    private $contactName;
 
     /**
      * ServiceRequestSummaryDTO constructor.
@@ -238,6 +239,9 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
         $instance->slaFixHoursP1              = $dbeCustomer->getValue(\DBECustomer::slaFixHoursP1);
         $instance->slaFixHoursP2              = $dbeCustomer->getValue(\DBECustomer::slaFixHoursP2);
         $instance->slaFixHoursP3              = $dbeCustomer->getValue(\DBECustomer::slaFixHoursP3);
+        $instance->contactName                = $problem->getValue(DBEJProblem::contactName);
+        $instance->contactID                  = $problem->getValue(DBEJProblem::contactID);
+
         return $instance;
     }
 
@@ -294,6 +298,8 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
             "slaFixHoursP1"              => $this->slaFixHoursP1,
             "slaFixHoursP2"              => $this->slaFixHoursP2,
             "slaFixHoursP3"              => $this->slaFixHoursP3,
+            "contactName"                => $this->contactName,
+            "contactID"                => $this->contactID,
         ];
     }
 

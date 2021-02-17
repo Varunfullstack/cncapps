@@ -673,8 +673,7 @@ class DBEntity extends DataAccess
                 var_dump($query);
             }
             $this->setQueryString($query);
-        }
-
+        }        
         $ret = $this->runQuery();
         $this->resetQueryString();
         return $ret;

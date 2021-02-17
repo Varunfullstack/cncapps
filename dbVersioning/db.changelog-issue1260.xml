@@ -1,0 +1,63 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdevMt" id="issue1260-0">
+        <tagDatabase tag="issue1260"/>
+    </changeSet>  
+    <changeSet id="issue1260-1" author="pavwebdevmt">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="contact_callback" />                
+            </not>
+        </preConditions>
+        <createTable tableName="contact_callback">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>      
+            <column name="consID" type="int">
+                <constraints 
+                nullable="false" 
+                foreignKeyName="callback_consultant_fk" 
+                referencedTableName="consultant"
+                referencedColumnNames="cns_consno"/>
+            </column>      
+            <column name="problemID" type="int(11) unsigned" >
+                <constraints 
+                nullable="false" 
+                foreignKeyName="callback_problem_fk" 
+                referencedTableName="problem"
+                referencedColumnNames="pro_problemno"/>
+            </column>
+            <column name="callActivityID" type="int">
+                <constraints 
+                nullable="false" 
+                foreignKeyName="callback_callactivity_fk" 
+                referencedTableName="callactivity"
+                referencedColumnNames="caa_callactivityno"/>
+            </column>
+             <column name="contactID" type="int">
+                <constraints 
+                nullable="false" 
+                foreignKeyName="callback_contact_fk" 
+                referencedTableName="contact"
+                referencedColumnNames="con_contno"/>
+            </column>
+            <column name="description" type="text" >
+                <constraints nullable="true"/>
+            </column>
+            <column name="callback_datetime" type="DATETIME">
+                <constraints nullable="true"/>
+            </column>     
+            <column name="is_callback" type="tinyint(1)" defaultValue="0" >
+                <constraints nullable="true"/>
+            </column>            
+            <column name="createAt" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP" >
+                <constraints nullable="true"/>
+            </column>
+        </createTable>  
+        <rollback>
+            <dropTable tableName="contact_callback"  /> 
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

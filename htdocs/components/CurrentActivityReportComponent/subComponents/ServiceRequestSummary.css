@@ -6,3 +6,7 @@
 .service-request-summary dt {
     padding-left: 10px;
 }
+.form-group{
+    display: flex;
+    flex-direction: column;
+}
