@@ -104,13 +104,11 @@ export default class ServiceRequestComponent extends MainComponent {
         if (filter.resultType == ReportType.Weekly) {
             filterData = this.getWeeklyData(data);
             dataLabels = this.getWeeklyLabels(data);
-            console.log(dataLabels);
         }
         if (filter.resultType == ReportType.Monthly) {
             filterData = this.getMonthlyData(data);
             dataLabels = this.getMonthlyLabels(data);
         }
-        console.log({filterData, dataLabels});
         return {filterData, dataLabels};
     };
 
@@ -221,7 +219,6 @@ export default class ServiceRequestComponent extends MainComponent {
     getChart = () => {
         const {data, filter} = this.state;
         const {filterData, dataLabels} = this.getChartData(data, filter);
-        //console.log('chart data',filterData, dataLabels);
         const chartData = {
             labels: dataLabels,
             datasets: filterData,

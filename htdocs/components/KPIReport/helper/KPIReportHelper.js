@@ -1,10 +1,11 @@
 import {groupBy} from "../../utils/utils";
+import moment from "moment";
 
 export class KPIReportHelper {
     getWeeks(data, property) {
         let gdata = data.map((d) => {
             const dt = moment(d.date);
-            return {value: d[property], date: d.date, week: dt.week() + dt.year()};
+            return {value: d[property], date: d.date, week: dt.format('WYYYY')};
         });
         gdata = groupBy(gdata, "week").map((g, i) => {
             g.week = g.items[0].date;
@@ -24,7 +25,7 @@ export class KPIReportHelper {
             return {
                 value: d[property],
                 date: d.date,
-                month: dt.format("MMM") + " " + dt.year(),
+                month: dt.format("MMM YYYY"),
             };
         });
 

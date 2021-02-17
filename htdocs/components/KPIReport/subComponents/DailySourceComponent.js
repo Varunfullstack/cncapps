@@ -246,7 +246,6 @@ export default class DailySourceComponent extends MainComponent {
     }
 
     getChartData = (data, filter) => {
-        console.log(data);
         let filterData = [];
         let dataLabels = [];
         if (filter.resultType == ReportType.Daily) {
@@ -316,7 +315,6 @@ export default class DailySourceComponent extends MainComponent {
     getWeeklyAveragedData(data, property) {
         return this.getAveragedDataByKey(data, property, (item) => {
             const dt = moment(item.date);
-            console.log(item.date, dt.format('WYYYY'));
             return dt.format('WYYYY');
         })
     }

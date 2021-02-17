@@ -140,8 +140,10 @@ export default class KPIReportComponent extends MainComponent {
                 ]
             },
         ];
+        reports.sort((a, b) => a.title.localeCompare(b.title));
         if (!activeReport)
             activeReport = reports[0];
+
         this.setState({reports, activeReport}, () => this.handleReportView());
     }
 
@@ -150,7 +152,6 @@ export default class KPIReportComponent extends MainComponent {
     }
 
     getInitEndDate() {
-        ////console.log("end date",moment().subtract(1, 'weeks').startOf('w')).format('YYYY-MM-DD');
         return moment().subtract(1, 'weeks').startOf('w').format('YYYY-MM-DD');
     }
 
@@ -158,11 +159,11 @@ export default class KPIReportComponent extends MainComponent {
         const {filter, data} = this.state;
         filter[field] = value;
         this.setState({filter});
-        //console.log(filter);
     };
 
     getFilterElement = () => {
         const {filter, reports} = this.state;
+
         return (
             <table>
                 <tbody>
@@ -281,7 +282,6 @@ export default class KPIReportComponent extends MainComponent {
         switch (activeReport?.id) {
             case this.REP_SR_FIXED:
                 this.api.getSRFixed(filter.from, filter.to, filter.customerID).then((data) => {
-                    console.log(data);
                     this.processData(data);
                 });
                 break;
@@ -314,9 +314,7 @@ export default class KPIReportComponent extends MainComponent {
                             "uniqueCustomer": getItemType("uniqueCustomer"),
                         }
                     });
-                    console.log(data);
                     this.processData(data, false);
-
                 });
                 break;
             case this.REP_SERVICE_REQUEST_SOURCE:
@@ -335,7 +333,6 @@ export default class KPIReportComponent extends MainComponent {
                             "Sales": getItemType("Sales"),
                         }
                     });
-                    console.log(data);
                     this.processData(data, false);
 
                 });
@@ -392,6 +389,50 @@ export default class KPIReportComponent extends MainComponent {
         }
     }
 
+    getChartDescription = () => {
+        const {activeReport, data, filter} = this.state;
+        switch (activeReport?.id) {
+            case this.REP_SR_FIXED:
+                return (
+                    <span>
+                        Graph shows the number of SRs fixed by team.
+                    </span>
+                );
+            case this.REP_PRIORITIES_RAISED:
+                return (
+                    <span>
+                        Graph shows the number of SRs raised by priority.
+                    </span>
+                );
+            case this.SRS_BY_CONTRACTS:
+                return (
+                    <span>
+                        Graph shows the number of SRs fixed by types of contract.
+                    </span>
+                );
+            case this.REP_QUOTATION_CONVERSION:
+                return (
+                    <span>
+                       Graph shows the number of quotes and those that were then converted to orders.
+                    </span>
+                );
+            case this.REP_SERVICE_REQUEST:
+                return (
+                    <span>
+                       Graph shows a snapshot of daily statistics. Weekly & monthly graphs are the average number per day over that time period.
+                    </span>
+                );
+            case this.REP_SERVICE_REQUEST_SOURCE:
+                return (
+                    <span>
+                       Graph shows the source of the SRs. Graph shows a snapshot of daily statistics.
+                    </span>
+                );
+            default:
+                return null;
+        }
+    }
+
     render() {
         const {_showSpinner} = this.state;
 
@@ -400,7 +441,14 @@ export default class KPIReportComponent extends MainComponent {
                 <Spinner show={_showSpinner}/>
                 {this.getAlert()}
                 <h3>Filter Data</h3>
-                {this.getFilterElement()}
+                <div style={{display: 'flex', flexDirection: "row"}}>
+                    <div style={{flex: "0 1 auto"}}>
+                        {this.getFilterElement()}
+                    </div>
+                    <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                        {this.getChartDescription()}
+                    </div>
+                </div>
 
                 {this.getActiveChart()}
             </div>

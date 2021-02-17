@@ -14,6 +14,7 @@ class CTKPIReport extends CTCNC
     const GET_QUOTATION_CONVERSION                = "quotationConversion";
     const GET_DAILY_STATS                         = "dailyStats";
     const GET_DAILY_SOURCE                        = 'dailySource';
+
     /**
      * CTKPIReport constructor.
      */
@@ -48,7 +49,7 @@ class CTKPIReport extends CTCNC
                 exit;
             case self::GET_DAILY_SOURCE:
                 echo json_encode($this->getDailySource(), JSON_NUMERIC_CHECK);
-                exit;                
+                exit;
             default:
                 $this->setTemplate();
                 break;
@@ -223,13 +224,13 @@ WHERE problem.`pro_date_raised` >= '2020-01-01'
         $query .= " GROUP BY  date order by date";
         return DBConnect::fetchAll($query, $params);
     }
+
     function getDailyStats()
     {
-        $from=(@$_REQUEST['from']??'')==''?null:$_REQUEST['from'];;
-        $to=(@$_REQUEST['to']??'')==''?null:$_REQUEST['to'];
-        $customerID=(@$_REQUEST['customerID']??'')==''?null:$_REQUEST['customerID'];
-
-        $query ="SELECT
+        $from       = (@$_REQUEST['from'] ?? '') == '' ? null : $_REQUEST['from'];
+        $to         = (@$_REQUEST['to'] ?? '') == '' ? null : $_REQUEST['to'];
+        $customerID = (@$_REQUEST['customerID'] ?? '') == '' ? null : $_REQUEST['customerID'];
+        $query = "SELECT
         COUNT(DISTINCT pro_problemno ) AS total,
         DATE_FORMAT(pro_date_raised,'%Y-%m-%d') date,
         'raisedToday' AS type
@@ -252,7 +253,7 @@ WHERE problem.`pro_date_raised` >= '2020-01-01'
       WHERE pro_custno <> 282
         AND c.`caa_consno` <> 67
         AND c.caa_callacttypeno = 57        
-        AND pro_status = 'F'
+        AND pro_status in ('F','C')
         AND (:customerID is null or pro_custno=:customerID)       
         AND (:from is null or c.caa_date>=:from)
         AND (:to is null or c.caa_date<=:to)
@@ -312,19 +313,18 @@ WHERE problem.`pro_date_raised` >= '2020-01-01'
         AND (:from is null or `caa_date`>=:from)
         AND (:to is null or `caa_date`<=:to)
        GROUP BY type, date";
-
-        return DBConnect::fetchAll($query,["from"=>$from,"to"=>$to,"customerID"=>$customerID]);
+        return DBConnect::fetchAll($query, ["from" => $from, "to" => $to, "customerID" => $customerID]);
     }
+
     /**
      * @param bool|string $today
      * @return array
      */
     private function getDailySource()
     {
-        $from=(@$_REQUEST['from']??'')==''?null:$_REQUEST['from'];;
-        $to=(@$_REQUEST['to']??'')==''?null:$_REQUEST['to'];
-        $customerID=(@$_REQUEST['customerID']??'')==''?null:$_REQUEST['customerID'];
-
+        $from = (@$_REQUEST['from'] ?? '') == '' ? null : $_REQUEST['from'];;
+        $to         = (@$_REQUEST['to'] ?? '') == '' ? null : $_REQUEST['to'];
+        $customerID = (@$_REQUEST['customerID'] ?? '') == '' ? null : $_REQUEST['customerID'];
         $query = "SELECT r.`description` as type,
                     COUNT(*)  total, 
                     DATE_FORMAT(pro_date_raised ,'%Y-%m-%d') date
@@ -335,7 +335,6 @@ WHERE problem.`pro_date_raised` >= '2020-01-01'
                     AND (:from is null or `pro_date_raised`>=:from)
                     AND (:to is null or `pro_date_raised`<=:to)                     
                 GROUP BY r.`description`,DATE";
-
-        return DBConnect::fetchAll($query,["from"=>$from,"to"=>$to,"customerID"=>$customerID]);
+        return DBConnect::fetchAll($query, ["from" => $from, "to" => $to, "customerID" => $customerID]);
     }
 }
