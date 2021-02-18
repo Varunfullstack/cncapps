@@ -67,6 +67,7 @@ class CTCurrentActivityReport extends CTCNC
         );
         $this->buActivity     = new BUActivity($this);
         $this->buCustomerItem = new BUCustomerItem($this);
+        $checkPermissions=!in_array($this->getAction(),[self::CONST_CALLBACK]);
         if ($checkPermissions) {
 
             $roles = [
@@ -140,7 +141,10 @@ class CTCurrentActivityReport extends CTCNC
                 switch ($method) {
                     case 'POST':
                         echo json_encode($this->addCallBack());
-                        break;                    
+                        break;   
+                    case 'GET':
+                        echo json_encode($this->getMyCallback());
+                        break; 
                 }
                 exit;
             default:
@@ -586,31 +590,21 @@ class CTCurrentActivityReport extends CTCNC
         $dbeCallback->setValue(DBECallback::consID,$this->dbeUser->getPKValue());
         $dbeCallback->setValue(DBECallback::createAt,date('Y-m-d H:i:s'));
         $dbeCallback->setValue(DBECallback::is_callback,0);
-
-         $dbeCallback->insertRow();
-        return ["status"=>true];
-        // $query="INSERT INTO `contact_callback` (            
-        //     `consID`,
-        //     `problemID`,
-        //     `callActivityID`,
-        //     `contactID`,
-        //     `description`,
-        //     `callback_datetime`,
-        //     `is_callback`,
-        //     `createAt`
-        //   )
-        //   VALUES
-        //     (              
-        //       'consID',
-        //       'problemID',
-        //       'callActivityID',
-        //       'contactID',
-        //       'description',
-        //       'callback_datetime',
-        //       'is_callback',
-        //       'createAt'
-        //     );
-        //   "
-        return $body;
+        $dbeCallback->insertRow();
+        return ["status"=>true];              
+    }
+    public function getMyCallback(){
+        $query="SELECT cb.id, cb.consID,cb.problemID,cb.callActivityID,cb.contactID,cb.DESCRIPTION,cb.callback_datetime,cb.is_callback,cb.createAt,
+                    concat(c.con_first_name,' ',c.con_last_name) contactName,
+                    cus_name customerName,
+                    TIMESTAMPDIFF(MINUTE,NOW(),cb.callback_datetime) timeRemain
+                FROM contact_callback cb
+                JOIN  `problem` p ON cb.problemID=p.`pro_problemno`
+                JOIN contact c on c.con_contno =cb.contactID
+                JOIN customer cu on cu.cus_custno = p.pro_custno
+                WHERE p.`pro_consno`=:consID
+                order by timeRemain asc
+                ";
+        return DBConnect::fetchAll($query,["consID"=>$this->dbeUser->getPKValue()]);
     }
 }

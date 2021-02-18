@@ -18,6 +18,7 @@ import CallBackModal from './subComponents/CallBackModal';
 
 import '../style.css';
 import '../shared/ToolTip.css'
+import CallBackComponent from './subComponents/CallBackComponent';
 
 const AUTORELOAD_INTERVAL_TIME = 2 * 60 * 1000;
 
@@ -627,6 +628,7 @@ class CurrentActivityReportComponent extends MainComponent {
 
         } = this.state;
         return el("div", {style: {backgroundColor: "white"}}, [
+            <CallBackComponent  key='callback'></CallBackComponent>,
             this.getCallBackModal(),
             this.getConfirm(),
             this.getAlert(),

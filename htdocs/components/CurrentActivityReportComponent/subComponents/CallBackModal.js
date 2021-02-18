@@ -97,11 +97,12 @@ class CallBackModal extends MainComponent {
       this.setState({data});
   }
   handleSave=()=>{
-    const {data}=this.state;
-   
-        console.log(data);
+    const {data}=this.state;   
+    console.log(data);
     this.apiCurrentActivityService.addCallback(data).then(result=>{
         console.log(result);
+        if(result.status)
+          this.handleClose();
     });
 
    }
@@ -119,7 +120,7 @@ class CallBackModal extends MainComponent {
             <button onClick={this.handleSave}>Save</button>
             <button onClick={this.handleClose}>Cancel</button>
         </div>}
-        onClose={() => this.handleClose}
+        onClose={this.handleClose}
       ></Modal>
     );
   }
