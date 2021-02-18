@@ -10224,11 +10224,6 @@ FROM
             "SITE_URL"        => SITE_URL,
             "callActivityID"  => $dbeCallActivity->getPKValue()
         ];
-        // $content ="The service #ServiceName at #CustomerName comes to the end of contract on the #expireDate.
-        // Please review to ensure that appropriate action is taken and a proposal submitted to the customer.";
-        // $content=str_replace("#ServiceName","<a href='/RenBroadband.php?action=edit&ID=$custItemID' title='$itemDescription'>$itemDescription</a>",$content);
-        // $content=str_replace("#CustomerName", $dsCustomer->getValue(DBECustomer::name),$content);
-        // $content=str_replace("#expireDate", $expireDate,$content);
         global $twig;
         $body            = $twig->render(
             '@internal/activityLeasedLineExpire.html.twig',
@@ -10238,7 +10233,7 @@ FROM
         );
         $dbeStandardText = new DBEStandardText($this);
         $dbeStandardText->getRow($dbeCallActivity->getValue(DBECallActivity::requestType));
-        $toEmail = $dbeStandardText->getValue(DBEStandardText::salesRequestEmail);
+        $toEmail = 'leasedlinecontractexpirations@cnc-ltd.co.uk';
         $hdrs    = array(
             'From'    => $senderEmail,
             'To'      => $toEmail,

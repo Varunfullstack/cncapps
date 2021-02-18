@@ -11,6 +11,10 @@ This project changes will be shown here.
 ### Changed
 - Issue 1181 - SR Asset list & assignment improvements.
 
+## [unreleased]
+### Changed
+- Issue 1262 - Leased Line Expiry Notifications email changed.
+
 ## [v5.5.4] - 2021-02-16
 ### Added
 - CNC 25 Years of Business Logo 	
