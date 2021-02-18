@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1252 - User time log to exclude weekends
+
 ## [v5.5.4] - 2021-02-16
 ### Added
 - CNC 25 Years of Business Logo 	
