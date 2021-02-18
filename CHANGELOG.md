@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1256 - Show when all linked SR linked to a SO are closed
+
 ## [v5.5.4] - 2021-02-16
 ### Added
 - CNC 25 Years of Business Logo 	
