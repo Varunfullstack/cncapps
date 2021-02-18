@@ -1448,10 +1448,10 @@ class CTSalesOrder extends CTCNC
                         )
                     );
                 }
-                $linkedServiceRequestCount = $this->buSalesOrder->countLinkedServiceRequests(
+                $linkedServiceRequests = $this->buSalesOrder->getLinkedServiceRequests(
                     $dsOrdhead->getValue(DBEOrdhead::ordheadID)
                 );
-                if ($linkedServiceRequestCount == 0) {
+                if ($linkedServiceRequests->rowCount() == 0) {
                     /* create new */
                     $urlServiceRequest  = Controller::buildLink(
                         $_SERVER['PHP_SELF'],
@@ -1462,30 +1462,25 @@ class CTSalesOrder extends CTCNC
                     );
                     $linkServiceRequest = '<a href="' . $urlServiceRequest . '" >Create SR</a>';
 
-                } elseif ($linkedServiceRequestCount == 1) {
+                } else {
 
-                    $problemID          = $this->buSalesOrder->getLinkedServiceRequestID(
-                        $dsOrdhead->getValue(DBEOrdhead::ordheadID)
-                    );
-                    $urlServiceRequest  = Controller::buildLink(
-                        'Activity.php',
-                        array(
+                    $linkArguments = [
+                        'action'             => 'search',
+                        'linkedSalesOrderID' => $dsOrdhead->getValue(DBEOrdhead::ordheadID)
+                    ];
+                    if ($linkedServiceRequests->rowCount() == 1) {
+                        $problemID     = $linkedServiceRequests->getValue(DBEProblem::problemID);
+                        $linkArguments = array(
                             'action'    => 'displayFirstActivity',
                             'problemID' => $problemID
-                        )
-                    );
-                    $linkServiceRequest = '<a href="' . $urlServiceRequest . '" target="_blank"><div class="navigateLinkCustomerNoteExists">View SR</div></a>';
-
-                } else {     // many SRs so display search page
+                        );
+                    }
+                    $allSRFinishedClass = $this->areAllLinkedSRsFixed($linkedServiceRequests) ? 'allFixedSRs' : '';
                     $urlServiceRequest  = Controller::buildLink(
                         'Activity.php',
-                        array(
-                            'action'             => 'search',
-                            'linkedSalesOrderID' => $dsOrdhead->getValue(DBEOrdhead::ordheadID)
-                        )
+                        $linkArguments
                     );
-                    $linkServiceRequest = '<a href="' . $urlServiceRequest . '" target="_blank"><div class="navigateLinkCustomerNoteExists">View SRs</div></a>';
-
+                    $linkServiceRequest = "<a href='{$urlServiceRequest}' target='_blank'><div class='navigateLinkCustomerNoteExists {$allSRFinishedClass}'>View SR</div></a>";
                 }
                 $this->template->set_var(
                     array(
@@ -5123,12 +5118,12 @@ class CTSalesOrder extends CTCNC
         }
         return $lastQuoted;
     }
-    public function getCustomerInitialSalesOrders(){
-        $customerID=@$_REQUEST["customerID"];
-        if(empty($customerID))
-            throw new Exception("Customer Id missing",0);
 
-        $query=" SELECT `odh_ordno` orderID ,
+    public function getCustomerInitialSalesOrders()
+    {
+        $customerID = @$_REQUEST["customerID"];
+        if (empty($customerID)) throw new Exception("Customer Id missing", 0);
+        $query = " SELECT `odh_ordno` orderID ,
         `odh_custno` customerID,
         `odh_type` type,
         `odh_date` date,
@@ -5137,6 +5132,17 @@ class CTSalesOrder extends CTCNC
         FROM ordhead ORD
         WHERE odh_custno=:customerID
         AND `odh_type`='I' ";
-        return DBConnect::fetchAll($query,["customerID"=>$customerID]);
+        return DBConnect::fetchAll($query, ["customerID" => $customerID]);
+    }
+
+    private function areAllLinkedSRsFixed(DBEProblem $linkedServiceRequests): bool
+    {
+        do {
+            $isFixed = in_array($linkedServiceRequests->getValue(DBEProblem::status), ["F", "C"]);
+            if (!$isFixed) {
+                return false;
+            }
+        } while ($linkedServiceRequests->fetchNext());
+        return true;
     }
 }
