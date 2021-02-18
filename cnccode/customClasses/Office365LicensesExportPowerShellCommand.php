@@ -1,6 +1,5 @@
 <?php
 
-
 namespace CNCLTD;
 global $cfg;
 require_once($cfg["path_dbe"] . "/DBEPortalCustomerDocument.php");
@@ -40,7 +39,6 @@ use DBEPortalCustomerDocument;
 use DBEProblem;
 use Exception;
 use Mail_mime;
-use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
@@ -68,14 +66,15 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
      * @param bool $debugMode
      * @param bool $alertMode
      * @param bool $reuseData
+     * @param bool $generateMonthYear
      * @throws \PhpOffice\PhpSpreadsheet\Exception
-     * @throws Exception
      */
     public function __construct($dbeCustomer,
                                 LoggerCLI $logger,
                                 $debugMode = false,
                                 $alertMode = false,
-                                $reuseData = false
+                                $reuseData = false,
+                                $generateMonthYear = false
     )
     {
         $this->debugMode   = $debugMode;
@@ -85,13 +84,11 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $customerID        = $dbeCustomer->getValue(DBECustomer::customerID);
         $customerName      = $dbeCustomer->getValue(DBECustomer::name);
         $buCustomer        = new BUCustomer($this);
-
         $logger->info('Getting A Office 365 Data for Customer: ' . $customerID . ' - ' . $customerName);
         // we have to pull from passwords.. the service 10
         $dbePassword        = $buCustomer->getOffice365PasswordItem($customerID);
         $dbePasswordService = new DBEPasswordService($this);
         $dbePasswordService->getRow(10);
-
         if (!$dbePassword->rowCount) {
             $passwordServiceCheck = $buCustomer->getPasswordItemByPasswordServiceId($customerID, 8);
             if ($passwordServiceCheck->rowCount()) {
@@ -100,19 +97,16 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                 $this->createFailedSR($dbeCustomer, $message);
                 return;
             }
-
             $message = 'This customer does not have a Office 365 Admin Portal service password';
             $logger->warning($message);
             return;
         }
-
         if ($dbePassword->rowCount > 1) {
             $this->createFailedSR(
                 $dbeCustomer,
                 "There are multiple {$dbePasswordService->getValue(DBEPasswordService::description)} and there must only be one, please correct"
             );
         }
-
         $buPassword           = new BUPassword($this);
         $userName             = $buPassword->decrypt($dbePassword->getValue(DBEPassword::username));
         $password             = $buPassword->decrypt($dbePassword->getValue(DBEPassword::password));
@@ -151,7 +145,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                     $dbeCustomer,
                     $dbeOffice365Licenses
                 );
-
                 if ($this->alertMode) {
                     $logger->notice(
                         'Alert mode is enabled, will notify of any mailboxes that are on or over the limit'
@@ -163,26 +156,21 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                         $dbeContact->getRow($primaryMainContactId);
                         $subject = "Warning - Some Mailboxes Are Almost Full";
                         $emailTo = $dbeContact->getValue(DBEContact::email);
-
                         global $twig;
-
                         usort(
                             $this->warningMailboxes,
                             function ($a, $b) {
                                 return $b['TotalItemSize'] - $a['TotalItemSize'];
                             }
                         );
-
-                        $body = $twig->render(
+                        $body   = $twig->render(
                             "@customerFacing/Office365AlmostFullMailboxes/Office365AlmostFullMailboxes.html.twig",
                             [
                                 "contactFirstName" => $dbeContact->getValue(DBEContact::firstName),
                                 "mailboxes"        => $this->warningMailboxes
                             ]
                         );
-
                         $buMail = new BUMail($this);
-
                         $buMail->sendSimpleEmail(
                             $body,
                             $subject,
@@ -197,7 +185,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                 $logger->error('Failed to process mailboxes for customer: ' . $exception->getMessage());
             }
         }
-
         if (count($licenses)) {
             try {
                 $this->processLicenses(
@@ -210,7 +197,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                 $logger->error('Failed to process licenses for customer: ' . $exception->getMessage());
             }
         }
-
         if (count($devices)) {
             try {
                 $this->processDevices(
@@ -221,7 +207,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                 $logger->error('Failed to process devices for customer: ' . $exception->getMessage());
             }
         }
-
         if (count($sharePointSites)) {
             try {
                 $this->processSharePointSites($spreadsheet, $sharePointSites, $data['totalSiteUsed']);
@@ -229,14 +214,12 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                 $logger->error('Failed to process sharepoint sites for customer: ' . $exception->getMessage());
             }
         }
-
         if (!count($mailboxes) && !count($licenses) && !count($devices) && !count($sharePointSites)) {
             $message = 'This customer does not have a licences nor mailboxes nor devices nor sharePointSites';
             $logger->warning($message);
             throw new UnexpectedValueException($message);
         }
         global $db;
-
         try {
             $db->preparedQuery(
                 "insert into customerOffice365StorageStats values (?,?,?,?,?) on duplicate key update totalOneDriveStorageUsed = ?, totalEmailStorageUsed = ?, totalSiteStorageUsed = ?",
@@ -283,7 +266,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                 $exception->getLine()
             );
         }
-
         $spreadsheet->removeSheetByIndex(0);
         $spreadsheet->setActiveSheetIndex(0);
         $writer         = new Xlsx($spreadsheet);
@@ -297,56 +279,59 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             );
         }
         $fileName = "Current Mailbox Extract.xlsx";
+        if ($generateMonthYear) {
+            $date     = new DateTime();
+            $fileName = "Mailboxes - {$date->format('F Y')}.xlsx";
+        }
         $filePath = $folderName . $fileName;
         try {
             $writer->save(
                 $filePath
             );
-            $dbeCustomerDocument = new DBEPortalCustomerDocument($thing);
-            $dbeCustomerDocument->getCurrentOffice365Licenses($customerID);
-
-            $dbeCustomerDocument->setValue(
-                DBEPortalCustomerDocument::file,
-                file_get_contents($filePath)
-            );
-
-            if (!$dbeCustomerDocument->getValue(
-                    DBEPortalCustomerDocument::createdDate
-                ) || $dbeCustomerDocument->getValue(DBEPortalCustomerDocument::createdDate) == '0000-00-00 00:00:00') {
-
+            if (!$generateMonthYear) {
+                $dbeCustomerDocument = new DBEPortalCustomerDocument($thing);
+                $dbeCustomerDocument->getCurrentOffice365Licenses($customerID);
                 $dbeCustomerDocument->setValue(
-                    DBEPortalCustomerDocument::createdDate,
-                    (new DateTime())->format(DATE_MYSQL_DATETIME)
+                    DBEPortalCustomerDocument::file,
+                    file_get_contents($filePath)
                 );
+                if (!$dbeCustomerDocument->getValue(
+                        DBEPortalCustomerDocument::createdDate
+                    ) || $dbeCustomerDocument->getValue(
+                        DBEPortalCustomerDocument::createdDate
+                    ) == '0000-00-00 00:00:00') {
+
+                    $dbeCustomerDocument->setValue(
+                        DBEPortalCustomerDocument::createdDate,
+                        (new DateTime())->format(DATE_MYSQL_DATETIME)
+                    );
+                }
+                if (!$dbeCustomerDocument->rowCount) {
+                    $dbeCustomerDocument->setValue(
+                        DBEPortalCustomerDocument::customerID,
+                        $customerID
+                    );
+                    $dbeCustomerDocument->setValue(
+                        DBEPortalCustomerDocument::description,
+                        'Current Mailbox List'
+                    );
+                    $dbeCustomerDocument->setValue(
+                        DBEPortalCustomerDocument::filename,
+                        $fileName
+                    );
+                    $dbeCustomerDocument->setValue(
+                        DBEPortalCustomerDocument::fileMimeType,
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    );
+                    $dbeCustomerDocument->setValue(
+                        DBEPortalCustomerDocument::mainContactOnlyFlag,
+                        'Y'
+                    );
+                    $dbeCustomerDocument->insertRow();
+                } else {
+                    $dbeCustomerDocument->updateRow();
+                }
             }
-
-            if (!$dbeCustomerDocument->rowCount) {
-                $dbeCustomerDocument->setValue(
-                    DBEPortalCustomerDocument::customerID,
-                    $customerID
-                );
-                $dbeCustomerDocument->setValue(
-                    DBEPortalCustomerDocument::description,
-                    'Current Mailbox List'
-                );
-                $dbeCustomerDocument->setValue(
-                    DBEPortalCustomerDocument::filename,
-                    $fileName
-                );
-                $dbeCustomerDocument->setValue(
-                    DBEPortalCustomerDocument::fileMimeType,
-                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                );
-                $dbeCustomerDocument->setValue(
-                    DBEPortalCustomerDocument::mainContactOnlyFlag,
-                    'Y'
-                );
-
-                $dbeCustomerDocument->insertRow();
-            } else {
-                $dbeCustomerDocument->updateRow();
-            }
-
             $logger->info('All good!!. Creating file ' . $fileName);
         } catch (Exception $exception) {
             $logger->error('Failed to save file, possibly file open: ' . $exception->getMessage());
@@ -369,15 +354,12 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $buHeader       = new BUHeader($thing);
         $dsHeader       = new DataSet($thing);
         $buHeader->getHeader($dsHeader);
-
-
         $slaResponseHours = $buActivity->getSlaResponseHours(
             4,
             $customerID,
             $primaryContact->getValue(DBEContact::contactID)
         );
-
-        $dbeProblem = new DBEProblem($thing);
+        $dbeProblem       = new DBEProblem($thing);
         $dbeProblem->setValue(DBEProblem::problemID, null);
         $siteNo = $primaryContact->getValue(DBEContact::siteNo);
         $dbeProblem->setValue(
@@ -428,7 +410,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             DBEJProblem::queueNo,
             2
         );
-
         $dbeProblem->setValue(
             DBEJProblem::rootCauseID,
             83
@@ -442,9 +423,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             BUProblemRaiseType::ALERTID
         );
         $dbeProblem->insertRow();
-
         $dbeCallActivity = new DBECallActivity($thing);
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::callActivityID,
             null
@@ -470,7 +449,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             DBEJCallActivity::startTime,
             $startTime
         );
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::endTime,
             $startTime
@@ -483,16 +461,13 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             DBEJCallActivity::serverGuard,
             'N'
         );
-
         $details = "Office 365 License Export Failed: " . $errorMsg;
         if ($position) {
             $details .= " " . $position;
         }
-
         if ($stackTrace) {
             $details .= " " . $stackTrace;
         }
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::reason,
             $details
@@ -505,7 +480,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             DBEJCallActivity::userID,
             USER_SYSTEM
         );
-
         $dbeCallActivity->insertRow();
     }
 
@@ -525,7 +499,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             $this->createFailedSR($this->dbeCustomer, $data['errorMessage'], $data['stackTrace'], $data['position']);
             throw new Exception('Errors detected');
         }
-
         if (count($data['errors'])) {
             foreach ($data['errors'] as $error) {
                 $this->logger->warning(
@@ -564,7 +537,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             3               => "Total",
             "TotalOneDrive" => 0
         ];
-
         foreach ($mailboxes as $key => $datum) {
             $mailboxLimit = null;
             $licenseValue = null;
@@ -573,7 +545,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                     $datum['Licenses'] = explode(" ", $datum['Licenses']);
                 }
                 $licenseValue = implode(", ", $datum['Licenses']);
-
                 if ($licenseValue && $this->isLeaver(
                         $datum['DisplayName']
                     ) && $datum['RecipientTypeDetails'] == 'SharedMailbox') {
@@ -581,7 +552,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                     $this->raiseCustomerLeaverWithLicenseSR($dbeCustomer, $datum['DisplayName']);
                 }
                 $licensesWithDefender = 0;
-
                 foreach ($datum['Licenses'] as $license) {
                     $dbeOffice365Licenses->getRowForLicense($license);
                     if ($dbeOffice365Licenses->rowCount()) {
@@ -590,7 +560,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                             $dbeOffice365Licenses->getValue(DBEOffice365License::replacement),
                             $licenseValue
                         );
-
                         if ($dbeOffice365Licenses->getValue(DBEOffice365License::includesDefender)) {
                             $licensesWithDefender++;
                         }
@@ -603,7 +572,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                         $this->raiseCNCRequest($license, $dbeCustomer, $datum['DisplayName']);
                     }
                 }
-
                 if ($licensesWithDefender > 1) {
                     $this->raiseMultipleDefenderLicensesSR($dbeCustomer, $datum['DisplayName']);
                 }
@@ -611,7 +579,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             $licensesArray = explode(", ", $licenseValue);
             sort($licensesArray);
             $licenseValue = implode(", ", $licensesArray);
-
             switch ($mailboxes[$key]['RecipientTypeDetails']) {
                 case "SharedMailbox":
                     $mailboxes[$key]['RecipientTypeDetails'] = "Shared";
@@ -632,7 +599,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                 default:
                     $mailboxes[$key]['RecipientTypeDetails'] = "Unknown";
             }
-
             if ($mailboxes[$key]['IsLicensed']) {
                 if ($mailboxes[$key]['RecipientTypeDetails'] == "User") {
                     $licensedUsers++;
@@ -640,7 +606,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                     $otherLicenses++;
                 }
             }
-
             $mailboxes[$key]['Licenses']      = $licenseValue;
             $mailboxes[$key]['IsLicensed']    = $mailboxes[$key]['IsLicensed'] ? 'Yes' : 'No';
             $totalizationRow['TotalMailBox']  += $datum['TotalItemSize'];
@@ -651,7 +616,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             }
             $mailboxLimits[] = $mailboxLimit;
         }
-
         $mailboxesSheet = $spreadSheet->createSheet();
         $mailboxesSheet->setTitle('Mailboxes');
         $mailboxesSheet->fromArray(
@@ -694,7 +658,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             'A' . $highestRow,
             true
         );
-
         $mailboxesSheet->setCellValue(
             "B$highestRow",
             '=sum(B2:B' . ($highestRow - 1) . ')'
@@ -704,8 +667,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             "D$highestRow",
             $formula
         );
-
-
         $legendRowStart = $highestRow + 2;
         $mailboxesSheet->fromArray(
             [
@@ -716,33 +677,23 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             null,
             'A' . $legendRowStart
         );
-        $mailboxesSheet->getStyle("A{$legendRowStart}:A$legendRowStart")
-            ->getFill()
-            ->setFillType(Fill::FILL_SOLID)
-            ->getStartColor()
-            ->setARGB("FFFFC7CE");
-        $mailboxesSheet->getStyle("A" . ($legendRowStart + 1) . ":A" . ($legendRowStart + 1))
-            ->getFill()
-            ->setFillType(Fill::FILL_SOLID)
-            ->getStartColor()
-            ->setARGB("FFFFEB9C");
-
+        $mailboxesSheet->getStyle("A{$legendRowStart}:A$legendRowStart")->getFill()->setFillType(
+            Fill::FILL_SOLID
+        )->getStartColor()->setARGB("FFFFC7CE");
+        $mailboxesSheet->getStyle("A" . ($legendRowStart + 1) . ":A" . ($legendRowStart + 1))->getFill()->setFillType(
+            Fill::FILL_SOLID
+        )->getStartColor()->setARGB("FFFFEB9C");
         $mailboxesSheet->getStyle("A$highestRow:H$highestRow")->getFont()->setBold(true);
-
         $mailboxesSheet->getStyle("A1:H1")->getFont()->setBold(true);
-
         $mailboxesSheet->getStyle("A1:H$highestRow")->getAlignment()->setHorizontal('center');
-
         for ($i = 0; $i < count($mailboxes); $i++) {
             $currentRow = 2 + $i;
-
             if ($mailboxLimits[$i] && !$this->isLeaver($mailboxes[$i]['DisplayName'])) {
                 $usage = $mailboxes[$i]['TotalItemSize'] / $mailboxLimits[$i] * 100;
                 $color = null;
                 if ($usage >= $this->dbeHeader->getValue(DBEHeader::office365MailboxYellowWarningThreshold)) {
                     $color = "FFFFEB9C";
                 }
-
                 if ($usage >= $this->dbeHeader->getValue(DBEHeader::office365MailboxRedWarningThreshold)) {
                     $color                  = "FFFFC7CE";
                     $mailboxes[$i]['Limit'] = $mailboxLimits[$i];
@@ -751,29 +702,21 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                     }
                     $this->warningMailboxes[] = $mailboxes[$i];
                 }
-
                 if ($color) {
-                    $mailboxesSheet->getStyle("A$currentRow:" . $mailboxesSheet->getHighestDataColumn() . "$currentRow")
-                        ->getFill()
-                        ->setFillType(Fill::FILL_SOLID)
-                        ->getStartColor()
-                        ->setARGB($color);
+                    $mailboxesSheet->getStyle(
+                        "A$currentRow:" . $mailboxesSheet->getHighestDataColumn() . "$currentRow"
+                    )->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB($color);
                 }
             }
         }
-
         $mailboxColumn = $mailboxesSheet->getStyle("B2:B$highestRow");
         $mailboxColumn->getNumberFormat()->setFormatCode("#,##0");
         $mailboxColumn->getAlignment()->setHorizontal('right');
-
         $oneDriveSizeColumn = $mailboxesSheet->getStyle("H2:H$highestRow");
         $oneDriveSizeColumn->getNumberFormat()->setFormatCode("#,##0");
         $oneDriveSizeColumn->getAlignment()->setHorizontal('right');
-
-
         foreach (range('A', $mailboxesSheet->getHighestDataColumn()) as $col) {
-            $mailboxesSheet->getColumnDimension($col)
-                ->setAutoSize(true);
+            $mailboxesSheet->getColumnDimension($col)->setAutoSize(true);
         }
     }
 
@@ -797,15 +740,12 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $buHeader       = new BUHeader($thing);
         $dsHeader       = new DataSet($thing);
         $buHeader->getHeader($dsHeader);
-
-
         $slaResponseHours = $buActivity->getSlaResponseHours(
             4,
             $customerID,
             $primaryContact->getValue(DBEContact::contactID)
         );
-
-        $dbeProblem = new DBEProblem($thing);
+        $dbeProblem       = new DBEProblem($thing);
         $dbeProblem->setValue(DBEProblem::problemID, null);
         $siteNo = $primaryContact->getValue(DBEContact::siteNo);
         $dbeProblem->setValue(
@@ -856,7 +796,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             DBEJProblem::queueNo,
             3
         );
-
         $dbeProblem->setValue(
             DBEJProblem::rootCauseID,
             86
@@ -870,9 +809,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             BUProblemRaiseType::ALERTID
         );
         $dbeProblem->insertRow();
-
         $dbeCallActivity = new DBECallActivity($thing);
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::callActivityID,
             null
@@ -898,7 +835,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             DBEJCallActivity::startTime,
             $startTime
         );
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::endTime,
             $startTime
@@ -911,7 +847,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             DBEJCallActivity::serverGuard,
             'N'
         );
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::reason,
             $details
@@ -924,7 +859,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             DBEJCallActivity::userID,
             USER_SYSTEM
         );
-
         $dbeCallActivity->insertRow();
     }
 
@@ -937,15 +871,12 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $buHeader       = new BUHeader($thing);
         $dsHeader       = new DataSet($thing);
         $buHeader->getHeader($dsHeader);
-
-
         $slaResponseHours = $buActivity->getSlaResponseHours(
             4,
             $customerID,
             $primaryContact->getValue(DBEContact::contactID)
         );
-
-        $dbeProblem = new DBEProblem($thing);
+        $dbeProblem       = new DBEProblem($thing);
         $dbeProblem->setValue(DBEProblem::problemID, null);
         $siteNo = $primaryContact->getValue(DBEContact::siteNo);
         $dbeProblem->setValue(
@@ -988,12 +919,10 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             DBEProblem::contactID,
             $primaryContact->getValue(DBEContact::contactID)
         );
-
         $dbeProblem->setValue(
             DBEJProblem::queueNo,
             1
         );
-
         $dbeProblem->setValue(
             DBEJProblem::rootCauseID,
             83
@@ -1007,9 +936,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             BUProblemRaiseType::ALERTID
         );
         $dbeProblem->insertRow();
-
         $dbeCallActivity = new DBECallActivity($thing);
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::callActivityID,
             null
@@ -1035,7 +962,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             DBEJCallActivity::startTime,
             $startTime
         );
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::endTime,
             $startTime
@@ -1048,12 +974,10 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             DBEJCallActivity::serverGuard,
             'N'
         );
-
         $details = "<p>License $license was not found for customer " . $dbeCustomer->getValue(
                 DBECustomer::name
             ) . ($licenseUser ? " which is assigned to user $licenseUser." : '') . "</p>
 <p>Please add this license within CNCAPPS and rerun the license export process for this customer</p>";
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::reason,
             $details
@@ -1066,7 +990,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             DBEJCallActivity::userID,
             USER_SYSTEM
         );
-
         $dbeCallActivity->insertRow();
     }
 
@@ -1118,23 +1041,17 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                 $this->raiseCNCRequest($datum['AccountSkuId'], $dbeCustomer);
             }
         }
-
         if (count($sparedLicenseErrors)) {
             // we have found some spared licenses errors...lets send an email to inform about this
-            $buMail = new BUMail($thing);
-
-
+            $buMail   = new BUMail($thing);
             $template = new Template (
-                EMAIL_TEMPLATE_DIR,
-                "remove"
+                EMAIL_TEMPLATE_DIR, "remove"
             );
-
             $template->set_file(
                 array(
                     'page' => 'SpareLicensesEmail.html',
                 )
             );
-
             $template->set_block('page', 'licensesBlock', 'licenses');
             $template->setVar(
                 [
@@ -1150,42 +1067,31 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                 );
                 $template->parse("licenses", 'licensesBlock', true);
             }
-
             $template->parse(
                 'output',
                 'page',
                 true
             );
-
-            $body = $template->get_var('output');
-
+            $body    = $template->get_var('output');
             $subject = "Unallocated O365 licenses for customer " . $dbeCustomer->getValue(DBECustomer::name);
             $emailTo = CONFIG_SALES_EMAIL;
-
-            $hdrs = array(
+            $hdrs    = array(
                 'From'         => CONFIG_SUPPORT_EMAIL,
                 'To'           => $emailTo,
                 'Subject'      => $subject,
                 'Date'         => date("r"),
                 'Content-Type' => 'text/html; charset=UTF-8'
             );
-
-            $mime = new Mail_mime();
-
+            $mime    = new Mail_mime();
             $mime->setHTMLBody($body);
-
             $mime_params = array(
                 'text_encoding' => '7bit',
                 'text_charset'  => 'UTF-8',
                 'html_charset'  => 'UTF-8',
                 'head_charset'  => 'UTF-8'
             );
-
-            $body = $mime->get($mime_params);
-
-            $hdrs = $mime->headers($hdrs);
-
-
+            $body        = $mime->get($mime_params);
+            $hdrs        = $mime->headers($hdrs);
             $buMail->putInQueue(
                 CONFIG_SUPPORT_EMAIL,
                 "O365sparelicenses@" . CONFIG_PUBLIC_DOMAIN,
@@ -1194,10 +1100,8 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             );
 
         }
-
         $licensesSheet = $spreadSheet->createSheet();
         $licensesSheet->setTitle('Licenses');
-
         $licensesSheet->fromArray(
             [
                 "License Name",
@@ -1224,8 +1128,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $licensesSheet->getStyle("A1:" . $highestCol . "1")->getFont()->setBold(true);
         $licensesSheet->getStyle("A1:$highestCol$highestRow")->getAlignment()->setHorizontal('center');
         foreach (range('A', $licensesSheet->getHighestDataColumn()) as $col) {
-            $licensesSheet->getColumnDimension($col)
-                ->setAutoSize(true);
+            $licensesSheet->getColumnDimension($col)->setAutoSize(true);
         }
     }
 
@@ -1260,8 +1163,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $devicesSheet->getStyle("A1:{$highestColumn}1")->getFont()->setBold(true);
         $devicesSheet->getStyle("A1:{$highestColumn}{$highestRow}")->getAlignment()->setHorizontal('center');
         foreach (range('A', $highestColumn) as $col) {
-            $devicesSheet->getColumnDimension($col)
-                ->setAutoSize(true);
+            $devicesSheet->getColumnDimension($col)->setAutoSize(true);
         }
         $thresholdDate = (new DateTime())->sub(
             new DateInterval('P' . $this->dbeHeader->getValue(DBEHeader::office365ActiveSyncWarnAfterXDays) . 'D')
@@ -1277,14 +1179,10 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                     $color = "FFFFC7CE";
                 }
             }
-
-
             if ($color) {
-                $devicesSheet->getStyle("A$currentRow:{$highestColumn}$currentRow")
-                    ->getFill()
-                    ->setFillType(Fill::FILL_SOLID)
-                    ->getStartColor()
-                    ->setARGB($color);
+                $devicesSheet->getStyle("A$currentRow:{$highestColumn}$currentRow")->getFill()->setFillType(
+                    Fill::FILL_SOLID
+                )->getStartColor()->setARGB($color);
             }
         }
         $dateTime       = new DateTime();
@@ -1297,11 +1195,9 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             null,
             'A' . $legendRowStart
         );
-        $devicesSheet->getStyle("A{$legendRowStart}:A$legendRowStart")
-            ->getFill()
-            ->setFillType(Fill::FILL_SOLID)
-            ->getStartColor()
-            ->setARGB("FFFFC7CE");
+        $devicesSheet->getStyle("A{$legendRowStart}:A$legendRowStart")->getFill()->setFillType(
+            Fill::FILL_SOLID
+        )->getStartColor()->setARGB("FFFFC7CE");
     }
 
     private function processSharePointSites(Spreadsheet $spreadsheet, $sharePointSites, $totalUsed)
@@ -1317,8 +1213,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             'A1'
         );
         $sharePointSites[] = ["Total", $totalUsed];
-
-
         $sharePointSheet->fromArray(
             $sharePointSites,
             null,
@@ -1328,12 +1222,9 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $highestRow    = $sharePointSheet->getHighestRow();
         $highestColumn = $sharePointSheet->getHighestColumn();
         $sharePointSheet->getStyle("A1:{$highestColumn}1")->getFont()->setBold(true);
-
         foreach (range('A', $highestColumn) as $col) {
-            $sharePointSheet->getColumnDimension($col)
-                ->setAutoSize(true);
+            $sharePointSheet->getColumnDimension($col)->setAutoSize(true);
         }
-
         $dateTime = new DateTime();
         $sharePointSheet->setCellValue(
             "B{$highestRow}",

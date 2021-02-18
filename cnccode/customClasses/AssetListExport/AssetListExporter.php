@@ -98,7 +98,7 @@ class AssetListExporter
 
     }
 
-    private function runExportForCustomer($customerId)
+    private function runExportForCustomer($customerId, $generateWithMonthYear = false)
     {
         $dbeCustomer = new DBECustomer($this);
         $dbeCustomer->getRow($customerId);
@@ -146,12 +146,14 @@ class AssetListExporter
         }
         $sheet->getStyle($sheet->calculateWorksheetDimension())->getAlignment()->setHorizontal('center');
         $writer   = new Xlsx($spreadsheet);
-        $fileName = $this->getFileDestinationPath($customerId);
+        $fileName = $this->getFileDestinationPath($customerId, $generateWithMonthYear);
         try {
             $writer->save(
                 $fileName
             );
-            $this->saveOrUpdateAssetListDocumentInPortalDocuments($customerId, $fileName);
+            if (!$generateWithMonthYear) {
+                $this->saveOrUpdateAssetListDocumentInPortalDocuments($customerId, $fileName);
+            }
             $this->updateCustomerInfo($customerId, $tabularData);
             echo '<div>Data was found at labtech, creating file ' . $fileName . '</div>';
         } catch (Exception $exception) {
@@ -241,9 +243,9 @@ class AssetListExporter
         }
     }
 
-    public function exportForCustomer($customerId)
+    public function exportForCustomer($customerId, $generateWithMonthYear = false)
     {
-        $this->runExportForCustomer($customerId);
+        $this->runExportForCustomer($customerId, $generateWithMonthYear);
     }
 
     public function exportForActiveCustomersWithSummary()
@@ -252,12 +254,12 @@ class AssetListExporter
         $this->generateSummary();
     }
 
-    public function exportForActiveCustomers()
+    public function exportForActiveCustomers($generateWithMonthYear = false)
     {
         $dbeCustomer = new DBECustomer($this);
         $dbeCustomer->getActiveCustomers(true);
         while ($dbeCustomer->fetchNext()) {
-            $this->runExportForCustomer($dbeCustomer->getValue(DBECustomer::customerID));
+            $this->runExportForCustomer($dbeCustomer->getValue(DBECustomer::customerID), $generateWithMonthYear);
         }
     }
 
@@ -496,9 +498,10 @@ class AssetListExporter
 
     /**
      * @param $customerId
+     * @param bool $generateWithMonthYear
      * @return string
      */
-    private function getFileDestinationPath($customerId): string
+    private function getFileDestinationPath($customerId, $generateWithMonthYear = true): string
     {
         $customerFolder = $this->buCustomer->getCustomerFolderPath($customerId);
         $folderName     = $customerFolder . "\Review Meetings\\";
@@ -509,8 +512,12 @@ class AssetListExporter
                 true
             );
         }
-        $fileName = $folderName . "Current Asset List Extract.xlsx";
-        return $fileName;
+        $fileDescription = "Current Asset List Extract.xlsx";
+        if ($generateWithMonthYear) {
+            $date            = new DateTime();
+            $fileDescription = "Asset List - {$date->format('F Y')}.xls";
+        }
+        return $folderName . $fileDescription;
     }
 
 
