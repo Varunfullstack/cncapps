@@ -12,6 +12,12 @@ import CustomerSearch from '../shared/CustomerSearch';
 import PrioritiesRaisedComponent from './subComponents/PrioritiesRaisedComponent';
 import QuotationConversionComponent from './subComponents/QuotationConversionComponent';
 import ServiceRequestsRaisedByContract from "./subComponents/ServiceRequestsRaisedByContract";
+import APISDManagerDashboard from '../SDManagerDashboardComponent/services/APISDManagerDashboard';
+import ServiceRequestComponent from './subComponents/ServiceRequestComponent';
+import DailySourceComponent from './subComponents/DailySourceComponent';
+
+import {groupBy} from '../utils/utils';
+
 
 export const ReportType = {Daily: "day", Weekly: "week", Monthly: "month"}
 
@@ -25,6 +31,9 @@ export default class KPIReportComponent extends MainComponent {
     REP_PRIORITIES_RAISED = 2;
     SRS_BY_CONTRACTS = 3;
     REP_QUOTATION_CONVERSION = 4;
+    REP_SERVICE_REQUEST = 5;
+    REP_SERVICE_REQUEST_SOURCE = 6;
+    apiSDManagerDashboard = new APISDManagerDashboard();
 
     /**
      * SRS_BY_CONTRAC
@@ -72,7 +81,7 @@ export default class KPIReportComponent extends MainComponent {
         const reports = [
             {
                 id: this.REP_SR_FIXED,
-                title: "SR Fixed",
+                title: "SRs Fixed",
                 parameters: [
                     this.reportparameters.dateFrom,
                     this.reportparameters.dateTo,
@@ -92,7 +101,7 @@ export default class KPIReportComponent extends MainComponent {
             },
             {
                 id: this.SRS_BY_CONTRACTS,
-                title: "SRs Raised By Contract",
+                title: "SRs Fixed By Contract",
                 parameters: [
                     this.reportparameters.dateFrom,
                     this.reportparameters.dateTo,
@@ -109,10 +118,32 @@ export default class KPIReportComponent extends MainComponent {
                     this.reportparameters.customer,
                     this.reportparameters.resultType,
                 ]
-            }
+            },
+            {
+                id: this.REP_SERVICE_REQUEST,
+                title: "Historic Daily SR Statistics",
+                parameters: [
+                    this.reportparameters.dateFrom,
+                    this.reportparameters.dateTo,
+                    this.reportparameters.customer,
+                    this.reportparameters.resultType,
+                ]
+            },
+            {
+                id: this.REP_SERVICE_REQUEST_SOURCE,
+                title: "SR Source",
+                parameters: [
+                    this.reportparameters.dateFrom,
+                    this.reportparameters.dateTo,
+                    this.reportparameters.customer,
+                    this.reportparameters.resultType,
+                ]
+            },
         ];
+        reports.sort((a, b) => a.title.localeCompare(b.title));
         if (!activeReport)
             activeReport = reports[0];
+
         this.setState({reports, activeReport}, () => this.handleReportView());
     }
 
@@ -121,7 +152,6 @@ export default class KPIReportComponent extends MainComponent {
     }
 
     getInitEndDate() {
-        ////console.log("end date",moment().subtract(1, 'weeks').startOf('w')).format('YYYY-MM-DD');
         return moment().subtract(1, 'weeks').startOf('w').format('YYYY-MM-DD');
     }
 
@@ -129,11 +159,11 @@ export default class KPIReportComponent extends MainComponent {
         const {filter, data} = this.state;
         filter[field] = value;
         this.setState({filter});
-        //console.log(filter);
     };
 
     getFilterElement = () => {
         const {filter, reports} = this.state;
+
         return (
             <table>
                 <tbody>
@@ -168,7 +198,7 @@ export default class KPIReportComponent extends MainComponent {
                                     onChange={($event) =>
                                         this.setFilter("from", $event.target.value)
                                     }
-                                ></input>
+                                />
                             </td>
                         </React.Fragment>
                     ) : null}
@@ -184,12 +214,12 @@ export default class KPIReportComponent extends MainComponent {
                                     onChange={($event) =>
                                         this.setFilter("to", $event.target.value)
                                     }
-                                ></input>
+                                />
                             </td>
                         </React.Fragment>
                     ) : null}
                     {this.hasParameter(this.reportparameters.resultType) ? (
-                        <td>Type</td>
+                        <td>Scale</td>
                     ) : null}
                     {this.hasParameter(this.reportparameters.resultType) ? (
                         <td>
@@ -219,7 +249,7 @@ export default class KPIReportComponent extends MainComponent {
                                     }
                                     }
                                     width={340}
-                                ></CustomerSearch>
+                                />
                             </td>
                         </React.Fragment>
                     ) : null}
@@ -235,7 +265,7 @@ export default class KPIReportComponent extends MainComponent {
         const id = $event.target.value;
         const {reports} = this.state;
         let activeReport = reports[reports.map(r => r.id).indexOf(parseInt(id))];
-        this.setState({activeReport,data: []});
+        this.setState({activeReport, data: []});
     }
     hasParameter = (parameter) => {
         const {activeReport} = this.state;
@@ -244,10 +274,11 @@ export default class KPIReportComponent extends MainComponent {
     handleReportView = () => {
         const {filter, activeReport} = this.state;
         this.setState({_showSpinner: true});
-        if (filter.from == "") {
-            this.alert("You must enter the start date");
-            return;
-        }
+        // if (filter.from == "") {
+        //     this.alert("You must enter the start date");
+        //     return;
+        // }        
+
         switch (activeReport?.id) {
             case this.REP_SR_FIXED:
                 this.api.getSRFixed(filter.from, filter.to, filter.customerID).then((data) => {
@@ -269,6 +300,44 @@ export default class KPIReportComponent extends MainComponent {
                     this.processData(data, false);
                 });
                 break;
+            case this.REP_SERVICE_REQUEST:
+                this.api.getDailyStats(filter.from, filter.to, filter.customerID).then((result) => {
+                    let data = groupBy(result, 'date');
+                    data = data.map(g => {
+                        const getItemType = (type) => g.items.find(s => s.type == type)?.total || 0;
+                        return {
+                            'date': g.groupName,
+                            "raisedToday": getItemType("raisedToday"),
+                            "reopenToday": getItemType("reopenToday"),
+                            "startedToday": getItemType("startedToday"),
+                            "fixedToday": getItemType("fixedToday"),
+                            "uniqueCustomer": getItemType("uniqueCustomer"),
+                        }
+                    });
+                    this.processData(data, false);
+                });
+                break;
+            case this.REP_SERVICE_REQUEST_SOURCE:
+                this.api.getDailySource(filter.from, filter.to, filter.customerID).then((result) => {
+                    let data = groupBy(result, 'date');
+                    data = data.map(g => {
+                        const getItemType = (type) => g.items.find(s => s.type == type)?.total || 0;
+                        return {
+                            "date": g.groupName,
+                            "OnSite": getItemType("On site"),
+                            "Manual": getItemType("Manual"),
+                            "Email": getItemType("Email"),
+                            "Alert": getItemType("Alert"),
+                            "Phone": getItemType("Phone"),
+                            "Portal": getItemType("Portal"),
+                            "Sales": getItemType("Sales"),
+                        }
+                    });
+                    this.processData(data, false);
+
+                });
+                break;
+
         }
 
     };
@@ -294,19 +363,71 @@ export default class KPIReportComponent extends MainComponent {
                 return <SRFixedComponent data={data}
                                          filter={filter}
                                          colors={this.colors}
-                ></SRFixedComponent>;
+                />;
             case this.REP_PRIORITIES_RAISED:
                 return <PrioritiesRaisedComponent data={data}
                                                   filter={filter}
-                ></PrioritiesRaisedComponent>;
+                />;
             case this.SRS_BY_CONTRACTS:
                 return <ServiceRequestsRaisedByContract data={data}
                                                         filter={filter}
-                ></ServiceRequestsRaisedByContract>;
+                />;
             case this.REP_QUOTATION_CONVERSION:
                 return <QuotationConversionComponent data={data}
                                                      filter={filter}
-                ></QuotationConversionComponent>
+                />
+            case this.REP_SERVICE_REQUEST:
+                return <ServiceRequestComponent data={data}
+                                                filter={filter}
+                />
+            case this.REP_SERVICE_REQUEST_SOURCE:
+                return <DailySourceComponent data={data}
+                                             filter={filter}
+                />
+            default:
+                return null;
+        }
+    }
+
+    getChartDescription = () => {
+        const {activeReport, data, filter} = this.state;
+        switch (activeReport?.id) {
+            case this.REP_SR_FIXED:
+                return (
+                    <span>
+                        Graph shows the number of SRs fixed by team.
+                    </span>
+                );
+            case this.REP_PRIORITIES_RAISED:
+                return (
+                    <span>
+                        Graph shows the number of SRs raised by priority.
+                    </span>
+                );
+            case this.SRS_BY_CONTRACTS:
+                return (
+                    <span>
+                        Graph shows the number of SRs fixed by types of contract.
+                    </span>
+                );
+            case this.REP_QUOTATION_CONVERSION:
+                return (
+                    <span>
+                       Graph shows the number of quotes and those that were then converted to orders.
+                    </span>
+                );
+            case this.REP_SERVICE_REQUEST:
+                return (
+                    <span>
+                       Graph shows a snapshot of daily statistics. Weekly & monthly graphs are the average number per day over that time period.
+                    </span>
+                );
+            case this.REP_SERVICE_REQUEST_SOURCE:
+                return (
+                    <span>
+                       Graph shows the source of the SRs. Graph shows a snapshot of daily statistics.
+                    </span>
+                );
             default:
                 return null;
         }
@@ -317,10 +438,17 @@ export default class KPIReportComponent extends MainComponent {
 
         return (
             <div>
-                <Spinner show={_showSpinner}></Spinner>
+                <Spinner show={_showSpinner}/>
                 {this.getAlert()}
                 <h3>Filter Data</h3>
-                {this.getFilterElement()}
+                <div style={{display: 'flex', flexDirection: "row"}}>
+                    <div style={{flex: "0 1 auto"}}>
+                        {this.getFilterElement()}
+                    </div>
+                    <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                        {this.getChartDescription()}
+                    </div>
+                </div>
 
                 {this.getActiveChart()}
             </div>
