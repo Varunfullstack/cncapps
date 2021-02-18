@@ -1,18 +1,12 @@
 # Changelog
 This project changes will be shown here.
-## [unreleased]
-### Added
-- Service Request.
-- Service Request Source.
 
 ## [unreleased]
 ### Added
-- Issue 1244 - Monthly Asset and Mailbox List Export
+- Issue 1244 - Monthly Asset and Mailbox List Export.
+- Issue 1222 - Show Daily SR Stats on KPI Graph. 
 ### Changed
 - Issue 1181 - SR Asset list & assignment improvements.
-
-## [unreleased]
-### Changed
 - Issue 1262 - Leased Line Expiry Notifications email changed.
 
 ## [v5.5.4] - 2021-02-16
