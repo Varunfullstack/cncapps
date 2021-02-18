@@ -1497,8 +1497,8 @@ class BUActivity extends Business
             $othersFlag,
             $dbeSelfContact
         );
-        $createdBy = $dbejCallactivity->getValue(DBEJCallActivity::caaConsno);
-        $user      = new DBEUser($this);
+        $createdBy            = $dbejCallactivity->getValue(DBEJCallActivity::caaConsno);
+        $user                 = new DBEUser($this);
         $user->getRow($createdBy);
         $bcc = [];
         if ($user->getValue(DBEUser::bccOnCustomerEmails)) {
@@ -8698,6 +8698,7 @@ FROM
             $dbeContact->getValue(DBEContact::contactID)
         );
         $dbeProblem       = new DBEProblem($this);
+        $dbeProblem->setValue(DBEProblem::emailSubjectSummary, "Webroot Customer Not Matched");
         /* create new issue */
         $dbeProblem->setValue(
             DBEProblem::slaResponseHours,
@@ -8841,6 +8842,7 @@ FROM
                 DBEProblem::slaResponseHours,
                 $slaResponseHours
             );
+            $dbeProblem->setValue(DBEProblem::emailSubjectSummary, "M365 Backup Alert");
             $dbeProblem->setValue(
                 DBEProblem::customerID,
                 $customerID
@@ -9030,7 +9032,7 @@ FROM
             $details,
             $serverName,
             $serverCustomerItemID,
-            BUProblemRaiseType::ALERTID
+            $isReplication
         );
     }
 
@@ -9049,7 +9051,7 @@ FROM
                                 $details,
                                 $serverName,
                                 $serverCustomerItemID,
-                                $raiseTypeId = null
+                                $isReplication
     )
     {
         $priority   = 2;
@@ -9085,6 +9087,11 @@ FROM
                 DBEProblem::customerID,
                 $customerID
             );
+            $emailSubjectSummary = "OBRS Backup alert for {$serverName}";
+            if ($isReplication) {
+                $emailSubjectSummary = "OBRS Replication alert for {$serverName}";
+            }
+            $dbeProblem->setValue(DBEProblem::emailSubjectSummary, $emailSubjectSummary);
             $dbeProblem->setValue(
                 DBEProblem::status,
                 'I'
@@ -9132,10 +9139,10 @@ FROM
             $dbeProblem->setValue(
                 DBEProblem::userID,
                 null
-            );        // not allocated
-            if ($raiseTypeId != null) $dbeProblem->setValue(
+            );
+            $dbeProblem->setValue(
                 DBEProblem::raiseTypeId,
-                $raiseTypeId
+                BUProblemRaiseType::ALERTID
             );
             $dbeProblem->insertRow();
             $problemID = $dbeProblem->getPKValue();
@@ -9235,7 +9242,7 @@ FROM
             $details,
             $serverName,
             $serverCustomerItemID,
-            BUProblemRaiseType::ALERTID
+            $isReplication
         );
     }
 
@@ -9807,6 +9814,7 @@ FROM
             $dbeCustomer->getRow($customerID);
             $dbeContact->getMainSupportRowsByCustomerID($customerID);
             $dbeContact->fetchNext();
+            $dbeProblem->setValue(DBEProblem::emailSubjectSummary, "{$type} Sales Request");
             $dbeProblem->setValue(
                 DBEProblem::hdLimitMinutes,
                 $this->dsHeader->getValue(DBEHeader::hdTeamLimitMinutes)
@@ -10341,6 +10349,7 @@ FROM
             $dbeContact->getValue(DBEContact::contactID)
         );
         $dbeProblem       = new DBEProblem($this);
+        $dbeProblem->setValue(DBEProblem::emailSubjectSummary, "Webroot Contract Not Found");
         /* create new issue */
         $dbeProblem->setValue(
             DBEProblem::slaResponseHours,
@@ -10500,6 +10509,10 @@ FROM
             $dbeContact->getValue(DBEContact::contactID)
         );
         $dbeProblem->setValue(
+            DBEProblem::emailSubjectSummary,
+            "Duo Customer Not Matched"
+        );
+        $dbeProblem->setValue(
             DBEProblem::hideFromCustomerFlag,
             'Y'
         );
@@ -10630,6 +10643,7 @@ FROM
             DBEProblem::dateRaised,
             date(DATE_MYSQL_DATETIME)
         );
+        $dbeProblem->setValue(DBEProblem::emailSubjectSummary, "Duo Contract Not Found");
         $dbeProblem->setValue(
             DBEProblem::contactID,
             $dbeContact->getValue(DBEContact::contactID)

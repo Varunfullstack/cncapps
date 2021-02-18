@@ -215,7 +215,7 @@ try {
     $buActivity     = new BUActivity($thing);
     $buCustomer     = new BUCustomer($thing);
     $customerId     = 282;
-    $primaryContact = $buCustomer->getPrimaryContact($customerID);
+    $primaryContact = $buCustomer->getPrimaryContact($customerId);
     $buHeader       = new BUHeader($thing);
     $dsHeader       = new DataSet($thing);
     $buHeader->getHeader($dsHeader);
@@ -223,7 +223,7 @@ try {
     $priority = 2;
     $slaResponseHours = $buActivity->getSlaResponseHours(
         $priority,
-        $customerID,
+        $customerId,
         $primaryContact->getValue(DBEContact::contactID)
     );
     $dbeProblem = new DBEProblem($thing);
@@ -251,7 +251,7 @@ try {
     );
     $dbeProblem->setValue(
         DBEProblem::customerID,
-        $customerID
+        $customerId
     );
     $dbeProblem->setValue(
         DBEProblem::status,
