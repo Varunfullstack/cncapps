@@ -4,6 +4,8 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 1244 - Monthly Asset and Mailbox List Export
+### Changed
+- Issue 1181 - SR Asset list & assignment improvements.
 
 ## [v5.5.4] - 2021-02-16
 ### Added

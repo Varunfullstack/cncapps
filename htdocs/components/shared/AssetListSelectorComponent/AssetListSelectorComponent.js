@@ -37,8 +37,8 @@ export default class AssetListSelectorComponent extends React.PureComponent {
             this.state.selectedOption = {
                 isAsset: true,
                 name: this.props.assetName,
-                LastUsername: userName,
-                BiosVer: biosVer
+                lastUsername: userName == "undefined" ? "" : userName,
+                biosVer: biosVer == "undefined" ? "" : biosVer
             };
         }
     }
@@ -46,16 +46,20 @@ export default class AssetListSelectorComponent extends React.PureComponent {
 
     async componentDidMount() {
         const {customerId} = this.props;
+        if (!customerId) {
+            return;
+        }
         await Promise.all([
             this.APICustomer.getCustomerAssets(customerId),
             this.APIStandardText.getOptionsByType("Missing Asset Reason")
         ]).then(([assets, noAssetReasons]) => {
             assets = assets.map((asset) => {
                 if (
-                    asset.BiosName.indexOf("VMware") >= 0 ||
-                    asset.BiosName.indexOf("Virtual Machine") >= 0
+                    asset.biosName &&
+                    (asset.biosName.indexOf("VMware") >= 0 ||
+                        asset.biosName.indexOf("Virtual Machine") >= 0)
                 ) {
-                    asset.BiosVer = "";
+                    asset.biosVer = "";
                 }
                 return asset;
             });
@@ -67,11 +71,11 @@ export default class AssetListSelectorComponent extends React.PureComponent {
             const {maxComputerNameLength, maxUserNameLength} = assets.reduce(
                 (acc, asset) => {
 
-                    if (asset.name.length > acc.maxComputerNameLength) {
+                    if (asset.name && asset.name.length > acc.maxComputerNameLength) {
                         acc.maxComputerNameLength = asset.name.length;
                     }
-                    if (asset.LastUsername.length > acc.maxUserNameLength) {
-                        acc.maxUserNameLength = asset.LastUsername.length;
+                    if (asset.lastUsername && asset.lastUsername.length > acc.maxUserNameLength) {
+                        acc.maxUserNameLength = asset.lastUsername.length;
                     }
                     return acc;
                 }, {maxComputerNameLength: 0, maxUserNameLength: 0})
@@ -88,6 +92,12 @@ export default class AssetListSelectorComponent extends React.PureComponent {
     }
 
     stringSearch(haystack, needle) {
+        if (!needle) {
+            return true;
+        }
+        if (!haystack) {
+            return false;
+        }
         return haystack.toLowerCase().indexOf(needle.toLowerCase()) > -1;
     }
 
@@ -98,8 +108,7 @@ export default class AssetListSelectorComponent extends React.PureComponent {
         if (!option.isAsset) {
             return option.template.replace(/(<([^>]+)>)/gi, "");
         }
-
-        return `${option.name} ${option.LastUsername} ${option.BiosVer}`;
+        return `${option.name} ${option.lastUsername || ""} ${option.biosVer || ""}`;
     }
 
     onChange(event, value, reason) {
@@ -115,10 +124,11 @@ export default class AssetListSelectorComponent extends React.PureComponent {
     filterOptions(options, {inputValue}) {
         return options.filter(x => {
             return (
-                !x.isAsset ||
-                (
-                    this.stringSearch(x.name, inputValue) || this.stringSearch(x.LastUsername, inputValue) || this.stringSearch(x.assetTag, inputValue) || this.stringSearch(x.BiosVer, inputValue)
-                )
+                (x.isAsset &&
+                    (
+                        this.stringSearch(x.name, inputValue) || this.stringSearch(x.lastUsername, inputValue) || this.stringSearch(x.assetTag, inputValue) || this.stringSearch(x.biosVer, inputValue)
+                    )
+                ) || (!x.isAsset && (this.stringSearch(x.name, inputValue) || this.stringSearch(x.template, inputValue)))
 
             );
         });
@@ -171,7 +181,7 @@ export default class AssetListSelectorComponent extends React.PureComponent {
                                               letterSpacing: "normal"
                                           }}
                                           >
-                                              {value.LastUsername}
+                                              {value.lastUsername}
                                           </div>
                                           <div style={{
                                               display: "inline-block",
@@ -180,7 +190,7 @@ export default class AssetListSelectorComponent extends React.PureComponent {
                                               letterSpacing: "normal"
                                           }}
                                           >
-                                              {value.BiosVer}
+                                              {value.biosVer}
                                           </div>
                                       </React.Fragment>
                                   )

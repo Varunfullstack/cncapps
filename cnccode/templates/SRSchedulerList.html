@@ -109,7 +109,9 @@
             details: null,
             internalNotes: null,
             linkedSalesOrderId: null,
-            emailSubjectSummary: null
+            emailSubjectSummary: null,
+            assetName: null,
+            assetTitle: null
         };
     }
 
@@ -510,8 +512,8 @@
     }
 
     function setSRScheduler(srScheduler) {
-
-        currentSRScheduler = srScheduler;
+        console.log(srScheduler);
+        currentSRScheduler = jsonCopy(srScheduler);
         $('#customerString').val(srScheduler.customerName);
         if (+currentSRScheduler.priority === 5) {
             linkedSalesOrderContainer.show();
@@ -593,6 +595,7 @@
         } else {
             onUnsetCustomerID();
         }
+        reRenderAssetPicker()
     }
 
     function onSetCustomerID() {
@@ -602,6 +605,35 @@
         contactNameInput.attr('disabled', false);
         contactNameInput[0].dataset.customerId = currentSRScheduler.customerId;
         linkedSalesOrderInput.attr('disabled', false);
+    }
+
+    function reRenderAssetPicker() {
+        if (!currentSRScheduler.customerId) {
+            document.unmountComponentAtNode(document.getElementById('reactAssetPicker'))
+            // .innerHTML = "";
+            return;
+        }
+        console.log(currentSRScheduler.customerId, currentSRScheduler.emptyAssetReason, currentSRScheduler.assetName);
+        document.AssetPickerComponentRender(
+            "#reactAssetPicker",
+            currentSRScheduler.customerId,
+            currentSRScheduler.emptyAssetReason,
+            currentSRScheduler.assetName,
+            currentSRScheduler.assetTitle,
+            (value) => {
+                if (!value) {
+                    currentSRScheduler.assetName = null;
+                    currentSRScheduler.assetTitle = null;
+                    currentSRScheduler.emptyAssetReason = null;
+                    return;
+                }
+                if (value.isAsset) {
+                    currentSRScheduler.assetName = value.name;
+                    currentSRScheduler.assetTitle = value.name + " " + value.lastUsername + " " + value.biosVer;
+                } else {
+                    currentSRScheduler.emptyAssetReason = value.template;
+                }
+            })
     }
 
     function changeUntilOrCount(value) {
@@ -625,7 +657,6 @@
     }
 
     function onUnsetCustomerID() {
-//we want to enable the customer site input
         customerSiteDescInput.attr('disabled', true);
         delete customerSiteDescInput[0].dataset['customerId'];
         contactNameInput.attr('disabled', true);
@@ -762,6 +793,15 @@
             <option value="5">Projects</option>
             <option value="4">Sales</option>
         </select>
+    </div>
+    <div>
+        <div style="width: 100px; display: inline-block">
+            Asset List
+        </div>
+        <div id="reactAssetPicker"
+             style="display: inline-block; width: 626px;"
+        >
+        </div>
     </div>
     <div>
         <div style="width: 100px; display: inline-block">

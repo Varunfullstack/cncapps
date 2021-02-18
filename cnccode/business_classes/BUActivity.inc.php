@@ -1497,8 +1497,8 @@ class BUActivity extends Business
             $othersFlag,
             $dbeSelfContact
         );
-        $createdBy = $dbejCallactivity->getValue(DBEJCallActivity::caaConsno);
-        $user      = new DBEUser($this);
+        $createdBy            = $dbejCallactivity->getValue(DBEJCallActivity::caaConsno);
+        $user                 = new DBEUser($this);
         $user->getRow($createdBy);
         $bcc = [];
         if ($user->getValue(DBEUser::bccOnCustomerEmails)) {
@@ -7066,6 +7066,16 @@ FROM
             DBEProblem::slaResponseHours,
             $slaResponseHours
         );
+        if ($record->getMonitorAgentName()) {
+            // try to find the computer name from Labtech
+            $labtechRepo  = new CNCLTD\LabtechRepo\LabtechPDORepo();
+            $computerName = $labtechRepo->getComputerNameForComputerId($record->getMonitorAgentName());
+            if(!$computerName){
+                echo "Couldn't match Monitor Agent Name value : {$record->getMonitorAgentName()} to a computer name.";
+            }
+            $dbeProblem->setValue(DBEProblem::assetName, $computerName);
+            $dbeProblem->setValue(DBEProblem::assetTitle, $computerName);
+        }
         $dbeProblem->setValue(DBEProblem::emailSubjectSummary, substr($record->getSubjectLine(), 0, 100));
         $dbeProblem->setValue(
             DBEProblem::customerID,
@@ -9105,6 +9115,8 @@ FROM
                 DBEProblem::contactID,
                 $dbeContact->getValue(DBEContact::contactID)
             );
+            $dbeProblem->setValue(DBEProblem::assetName, $serverName);
+            $dbeProblem->setValue(DBEProblem::assetTitle, $serverName);
             $dbeProblem->setValue(
                 DBEProblem::hideFromCustomerFlag,
                 'Y'
@@ -9831,6 +9843,9 @@ FROM
                     $dbeContact->getValue(DBEContact::contactID)
                 )
             );
+            $buStandardText = new BUStandardText($this);
+            $buStandardText->getStandardTextByID(129, $dbeStandardText);
+            $dbeProblem->setValue(DBEProblem::emptyAssetReason, $dbeStandardText->getValue(DBEStandardText::stt_text));
             $dbeProblem->setValue(
                 DBEProblem::customerID,
                 $customerID

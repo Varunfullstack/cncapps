@@ -80,6 +80,9 @@ class CTSRScheduler extends CTCNC
                 $toUpdateItem->setValue(DBESRScheduler::updatedBy, $this->userID);
                 $toUpdateItem->setValue(DBESRScheduler::updatedAt, (new DateTime())->format(DATE_MYSQL_DATE));
                 $toUpdateItem->setValue(DBESRScheduler::emailSubjectSummary, $this->getParam('emailSubjectSummary'));
+                $toUpdateItem->setValue(DBESRScheduler::assetName, $this->getParam('assetName'));
+                $toUpdateItem->setValue(DBESRScheduler::assetTitle, $this->getParam('assetTitle'));
+                $toUpdateItem->setValue(DBESRScheduler::emptyAssetReason, $this->getParam('emptyAssetReason'));
                 // before we update we want to test the rule
                 try {
                     $rrule = new \RRule\RRule($this->getParam('rruleString'));
@@ -117,6 +120,9 @@ class CTSRScheduler extends CTCNC
                 $newItem->setValue(DBESRScheduler::details, $this->getParam('details'));
                 $newItem->setValue(DBESRScheduler::internalNotes, $this->getParam('internalNotes'));
                 $newItem->setValue(DBESRScheduler::linkedSalesOrderId, $this->getParam('linkedSalesOrderId'));
+                $newItem->setValue(DBESRScheduler::assetName, $this->getParam('assetName'));
+                $newItem->setValue(DBESRScheduler::assetTitle, $this->getParam('assetTitle'));
+                $newItem->setValue(DBESRScheduler::emptyAssetReason, $this->getParam('emptyAssetReason'));
                 $newItem->setValue(DBESRScheduler::createdBy, $this->userID);
                 $newItem->setValue(DBESRScheduler::updatedBy, $this->userID);
                 $newItem->setValue(DBESRScheduler::createdAt, (new DateTime())->format(DATE_MYSQL_DATETIME));
@@ -271,6 +277,8 @@ class CTSRScheduler extends CTCNC
         $this->setTemplateFiles(
             array('SRSchedulerList' => 'SRSchedulerList')
         );
+        $this->loadReactScript('AssetPickerComponent.js');
+//        $this->loadReactCSS('AssetPickerComponent.css');
         $this->template->parse('CONTENTS', 'SRSchedulerList', true);
         $this->parsePage();
     }
