@@ -11,7 +11,7 @@ import {InternalDocumentsComponent} from "./InternalDocumentsComponent";
 import CustomerDocumentUploader from "./CustomerDocumentUploader";
 import Modal from "../../shared/Modal/modal";
 import Table from "../../shared/table/table";
-import { LinkServiceRequestOrder } from "./LinkserviceRequestOrder.js";
+import {LinkServiceRequestOrder} from "./LinkserviceRequestOrder.js";
 
 // noinspection EqualityComparisonWithCoercionJS
 const emptyAssetReasonCharactersToShow = 30;
@@ -38,7 +38,7 @@ class ActivityDisplayComponent extends MainComponent {
             templateType: '',
             templateTitle: '',
             selectedChangeRequestTemplateId: null,
-            showSalesOrder:false,
+            showSalesOrder: false,
             filters: {
                 showTravel: false,
                 showOperationalTasks: false,
@@ -231,18 +231,15 @@ class ActivityDisplayComponent extends MainComponent {
                 }
             /> : null}
 
-            {(data?.canDelete && data?.problemStatus !== "C") ? <ToolTip
+            {(data?.canDelete) ? <ToolTip
                     title={data?.activities.length == 1 ? "Delete Request" : "Delete Activity"}
                     content={<i
                         className="fal fa-trash-alt fa-2x m-5 pointer icon"
                         onClick={() => this.handleDelete(data)}
                     />}
                 />
-                : null}
-            {!data?.canDelete ? <ToolTip
-                title="Delete Activity"
-                content={<i className="fal fa-trash-alt fa-2x m-5 pointer  icon-disable"/>}
-            /> : null}
+                : null
+            }
             {this.getSpacer()}
             {data?.linkedSalesOrderID ? <ToolTip
                     title="Sales Order"
@@ -428,7 +425,7 @@ class ActivityDisplayComponent extends MainComponent {
         window.open("Password.php?action=generate&htmlFmt=popup", 'reason', 'scrollbars=yes,resizable=yes,height=524,width=855,copyhistory=no, menubar=0');
     }
     handleSalesOrder = async (activityId, serviceRequestId) => {
-        this.setState({showSalesOrder:true});
+        this.setState({showSalesOrder: true});
     }
     handleUnlink = async (linkedSalesOrderID, serviceRequestId, activityId) => {
         const res = await this.confirm(`Are you sure you want to unlink this request to Sales Order ${linkedSalesOrderID}`);
@@ -1060,13 +1057,14 @@ class ActivityDisplayComponent extends MainComponent {
             onCancel: () => this.setState({showFollowOn: false})
         }) : null;
     }
-    handleSalesOrderClose=()=>{
-        this.setState({showSalesOrder:false});
+    handleSalesOrderClose = () => {
+        this.setState({showSalesOrder: false});
         this.loadCallActivity(this.state.currentActivity);
     }
+
     render() {
-        const {data,showSalesOrder} = this.state;
-        console.log("showSalesOrder",showSalesOrder);
+        const {data, showSalesOrder} = this.state;
+        console.log("showSalesOrder", showSalesOrder);
         return (
             <div style={{width: "90%"}}>
                 {this.getAlert()}
@@ -1092,8 +1090,11 @@ class ActivityDisplayComponent extends MainComponent {
                 {this.getExpensesElement()}
                 {this.getTemplateModal()}
                 {this.getFooter()}
-                {showSalesOrder?<LinkServiceRequestOrder serviceRequestID={data.problemID} customerId={data?.customerId} show={showSalesOrder}
-                onClose={this.handleSalesOrderClose}></LinkServiceRequestOrder>:null}
+                {showSalesOrder ? <LinkServiceRequestOrder serviceRequestID={data.problemID}
+                                                           customerId={data?.customerId}
+                                                           show={showSalesOrder}
+                                                           onClose={this.handleSalesOrderClose}
+                ></LinkServiceRequestOrder> : null}
             </div>
         );
     }
