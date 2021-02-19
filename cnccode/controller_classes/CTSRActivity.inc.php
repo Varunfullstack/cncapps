@@ -263,14 +263,25 @@ class CTSRActivity extends CTCNC
         $dbeUser->getRow();
         $dbeUserActivity = new DBEUser($this);
         $dbeUserActivity->getRow($dbejCallActivity->getValue(DBEJCallActivity::userID));
-        $hdAssignedMinutes          = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
-        $esAssignedMinutes          = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
-        $imAssignedMinutes          = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
-        $projectTeamAssignedMinutes = $dbeProblem->getValue(DBEProblem::projectTeamLimitMinutes);
-        $projectUsedMinutes         = $buActivity->getUsedTimeForProblemAndTeam($problemID, 5);
-        $hdUsedMinutes              = $buActivity->getHDTeamUsedTime($problemID);
-        $esUsedMinutes              = $buActivity->getESTeamUsedTime($problemID);
-        $imUsedMinutes              = $buActivity->getSPTeamUsedTime($problemID);
+        $hdAssignedMinutes               = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
+        $esAssignedMinutes               = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
+        $imAssignedMinutes               = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
+        $projectTeamAssignedMinutes      = $dbeProblem->getValue(DBEProblem::projectTeamLimitMinutes);
+        $projectUsedMinutes              = $buActivity->getUsedTimeForProblemAndTeam($problemID, 5);
+        $hdUsedMinutes                   = $buActivity->getHDTeamUsedTime($problemID);
+        $esUsedMinutes                   = $buActivity->getESTeamUsedTime($problemID);
+        $imUsedMinutes                   = $buActivity->getSPTeamUsedTime($problemID);
+        $serviceRequestInternalNotesRepo = new CNCLTD\ServiceRequestInternalNote\ServiceRequestInternalNotePDORepository(
+        );
+        $notes                           = $serviceRequestInternalNotesRepo->getServiceRequestInternalNotesForSR(
+            $problemID
+        );
+        $mappedNotes                     = array_map(
+            function (\CNCLTD\ServiceRequestInternalNote\ServiceRequestInternalNote $note) {
+                return \CNCLTD\ServiceRequestInternalNote\ServiceRequestInternalNotePDOMapper::toJSONArray($note);
+            },
+            $notes
+        );
         return [
             "callActivityID"                  => $callActivityID,
             "problemID"                       => $problemID,
@@ -296,6 +307,7 @@ class CTSRActivity extends CTCNC
             "sitePostcode"                    => $dbeSite->getValue(DBESite::postcode),
             "linkedSalesOrderID"              => $dbejCallActivity->getValue(DBEJCallActivity::linkedSalesOrderID),
             "activities"                      => $this->getOtherActivity($problemID),
+            "internalNotes"                   => $mappedNotes,
             'criticalFlag'                    => $dbejCallActivity->getValue(
                 DBEJCallActivity::criticalFlag
             ) == 'Y' ? 1 : 0,
@@ -341,7 +353,6 @@ class CTSRActivity extends CTCNC
             "rootCauseDescription"            => $dbejCallActivity->getValue(DBEJCallActivity::rootCauseDescription),
             "completeDate"                    => $dbejCallActivity->getValue(DBEJCallActivity::completeDate),
             "reason"                          => $dbejCallActivity->getValue(DBEJCallActivity::reason),
-            "internalNotes"                   => $dbejCallActivity->getValue(DBEJCallActivity::internalNotes),
             "currentUser"                     => $currentUser,
             "currentUserBgColor"              => $currentUserBgColor,
             "documents"                       => $this->getActivityDocuments($callActivityID, $problemID),
@@ -1352,7 +1363,7 @@ GROUP BY caa_callacttypeno,
         $startDate  = $_REQUEST["startDate"] ?? null;
         $endDate    = $_REQUEST["endDate"] ?? null;
         $customerID = $_REQUEST["customerID"] ?? null;
-        $query  = "SELECT
+        $query      = "SELECT
   problem.`pro_problemno` as problemID,
   customer.`cus_name` as customerName,
   engineer.`cns_name` as userName,
@@ -1381,7 +1392,7 @@ FROM
     GROUP BY cui_custno) a
     ON a.cui_custno = problem.`pro_custno`
     where problem.`pro_custno` <> 282 AND problem.raiseTypeId = 3 ";
-        $params = [];
+        $params     = [];
         if (isset($problemID) && $problemID != '') {
             $query               .= " and problem.pro_problemno = :problemID";
             $params["problemID"] = $problemID;
