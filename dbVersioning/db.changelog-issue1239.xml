@@ -12,39 +12,44 @@
             </not>
         </preConditions>
         <createTable tableName="serviceRequestInternalNote">
-            <column name="id" type="bigint(11)" autoIncrement="true">
+            <column name="id" type="int(11) unsigned" autoIncrement="true">
                 <constraints nullable="false" primaryKeyName="PRIMARY" primaryKey="true"/>
             </column>
-            <column name="serviceRequestId" type="bigInt(11)">
+            <column name="serviceRequestId" type="int(11) unsigned">
                 <constraints nullable="false" foreignKeyName="FK_SRIN_serviceRequestId" referencedTableName="problem"
                              referencedColumnNames="pro_problemno" deleteCascade="true"/>
             </column>
-            <column name="createdBy" type="bigInt(11)">
+            <column name="createdBy" type="int(11)">
                 <constraints nullable="false" foreignKeyName="FK_SRIN_createdBy" referencedTableName="consultant"
                              referencedColumnNames="cns_consno" deleteCascade="false"/>
             </column>
             <column name="createdAt" type="dateTime" defaultValueComputed="CURRENT_TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
-            <column name="updatedBy" type="bigInt(11)">
+            <column name="updatedBy" type="int(11)">
                 <constraints nullable="false" foreignKeyName="FK_SRIN_updatedBy" referencedTableName="consultant"
                              referencedColumnNames="cns_consno" deleteCascade="false"/>
             </column>
             <column name="updatedAt" type="dateTime" defaultValueComputed="CURRENT_TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
-            <column name="content" type="longtext">
+            <column name="content" type="mediumtext">
                 <constraints nullable="true"/>
             </column>
         </createTable>
     </changeSet>
-    <changeSet id="issue1239-1" author="pavwebdev">
+    <changeSet id="issue1239-2" author="pavwebdev">
         <preConditions>
             <tableExists tableName="serviceRequestInternalNote"/>
         </preConditions>
         <sql>
             insert into serviceRequestInternalNote(serviceRequestId, createdBy, createdAt, updatedBy, updatedAt, content)
-            select pro_problemno, 67, pro_date_raised, 64, pro_date_raised, pro_internal_notes
+            select pro_problemno,
+                   67,
+                   pro_date_raised,
+                   67,
+                   pro_date_raised,
+                   if(pro_internal_notes = "", null, pro_internal_notes)
             from problem;
         </sql>
         <rollback/>
