@@ -119,6 +119,10 @@ A:VISITED {
     text-align: center;
 }
 
+.navigateLinkCustomerNoteExists.allFixedSRs {
+    color: green;
+}
+
 H1 {
     color: #000080;
     font-size: 1.5em;
