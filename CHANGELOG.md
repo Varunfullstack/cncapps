@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 1239 - Internal Notes to record to include who and when they were added
+
 ## [v5.5.4] - 2021-02-16
 ### Added
 - CNC 25 Years of Business Logo 	
