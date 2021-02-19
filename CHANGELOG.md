@@ -8,6 +8,7 @@ This project changes will be shown here.
 ### Changed
 - Issue 1181 - SR Asset list & assignment improvements.
 - Issue 1262 - Leased Line Expiry Notifications email changed.
+- Issue 1252 - User time log to exclude weekends
 
 ## [v5.5.4] - 2021-02-16
 ### Added
