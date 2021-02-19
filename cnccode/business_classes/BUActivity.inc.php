@@ -10120,6 +10120,7 @@ FROM
             DBEJProblem::customerID,
             $customerID
         );
+        $dbeProblem->setValue(DBEProblem::emailSubjectSummary, "Leased Line Renewal Notification");
         $dbeProblem->setValue(
             DBEJProblem::status,
             $problemStatus
