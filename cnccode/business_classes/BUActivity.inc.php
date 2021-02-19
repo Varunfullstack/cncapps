@@ -506,9 +506,9 @@ class BUActivity extends Business
         if (!$emailBody) { // if there is a body then don't display activity details
             $content .= 'REASON:' . "<BR/><BR/>";
             $content .= $dbeJCallActivity->getValue(DBECallActivity::reason) . "<BR/><BR/>";
-            if ($dbeJCallActivity->getValue(DBECallActivity::internalNotes)) {
+            if ($dbeJCallActivity->getValue(DBEJCallActivity::internalNotes)) {
                 $content .= 'NOTES:' . "<BR/><BR/>";
-                $content .= $dbeJCallActivity->getValue(DBECallActivity::internalNotes) . "<BR/><BR/>";
+                $content .= $dbeJCallActivity->getValue(DBEJCallActivity::internalNotes) . "<BR/><BR/>";
             }
         } else {
             $content = $emailBody . "<BR/><BR/>";
