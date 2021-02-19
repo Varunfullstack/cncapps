@@ -263,14 +263,22 @@ class CTSRActivity extends CTCNC
         $dbeUser->getRow();
         $dbeUserActivity = new DBEUser($this);
         $dbeUserActivity->getRow($dbejCallActivity->getValue(DBEJCallActivity::userID));
-        $hdAssignedMinutes          = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
-        $esAssignedMinutes          = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
-        $imAssignedMinutes          = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
-        $projectTeamAssignedMinutes = $dbeProblem->getValue(DBEProblem::projectTeamLimitMinutes);
-        $projectUsedMinutes         = $buActivity->getUsedTimeForProblemAndTeam($problemID, 5);
-        $hdUsedMinutes              = $buActivity->getHDTeamUsedTime($problemID);
-        $esUsedMinutes              = $buActivity->getESTeamUsedTime($problemID);
-        $imUsedMinutes              = $buActivity->getSPTeamUsedTime($problemID);
+        $hdAssignedMinutes                     = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
+        $esAssignedMinutes                     = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
+        $imAssignedMinutes                     = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
+        $projectTeamAssignedMinutes            = $dbeProblem->getValue(DBEProblem::projectTeamLimitMinutes);
+        $projectUsedMinutes                    = $buActivity->getUsedTimeForProblemAndTeam($problemID, 5);
+        $hdUsedMinutes                         = $buActivity->getHDTeamUsedTime($problemID);
+        $esUsedMinutes                         = $buActivity->getESTeamUsedTime($problemID);
+        $imUsedMinutes                         = $buActivity->getSPTeamUsedTime($problemID);
+        $isProblemClosed                       = $dbejCallActivity->getValue(DBEJCallActivity::problemStatus) == 'C';
+        $isManagerUser                         = $this->isSdManager() || $this->isSRQueueManager();
+        $isUserManagerAndActivityNotAStatus    = $dbejCallActivity->getValue(
+                DBEJCallActivity::status
+            ) != 'A' && $isManagerUser;
+        $isNotUserManagerAndActivityHasEndTime = !$isManagerUser && !$dbejCallActivity->getValue(
+                DBEJCallActivity::endTime
+            );
         return [
             "callActivityID"                  => $callActivityID,
             "problemID"                       => $problemID,
@@ -312,10 +320,7 @@ class CTSRActivity extends CTCNC
                 $this,
                 $dbeProblem
             ),
-            "canDelete"                       => !$dbejCallActivity->getValue(
-                    DBEJCallActivity::endTime
-                ) || ($dbejCallActivity->getValue(DBEJCallActivity::status) != 'A' && ($this->isSdManager(
-                        ) || $this->isSRQueueManager())),
+            "canDelete"                       => !$isProblemClosed && ($isUserManagerAndActivityNotAStatus || $isNotUserManagerAndActivityHasEndTime),
             "hasExpenses"                     => count($expenses) ? true : false,
             "isSDManager"                     => $buUser->isSdManager($this->userID),
             "hideFromCustomerFlag"            => $dbejCallActivity->getValue(DBEJCallActivity::hideFromCustomerFlag),
@@ -1352,7 +1357,7 @@ GROUP BY caa_callacttypeno,
         $startDate  = $_REQUEST["startDate"] ?? null;
         $endDate    = $_REQUEST["endDate"] ?? null;
         $customerID = $_REQUEST["customerID"] ?? null;
-        $query  = "SELECT
+        $query      = "SELECT
   problem.`pro_problemno` as problemID,
   customer.`cus_name` as customerName,
   engineer.`cns_name` as userName,
@@ -1381,7 +1386,7 @@ FROM
     GROUP BY cui_custno) a
     ON a.cui_custno = problem.`pro_custno`
     where problem.`pro_custno` <> 282 AND problem.raiseTypeId = 3 ";
-        $params = [];
+        $params     = [];
         if (isset($problemID) && $problemID != '') {
             $query               .= " and problem.pro_problemno = :problemID";
             $params["problemID"] = $problemID;
