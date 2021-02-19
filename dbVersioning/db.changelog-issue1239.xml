@@ -1,0 +1,52 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdevmt" id="issue1239-0">
+        <tagDatabase tag="issue1239"/>
+    </changeSet>
+    <changeSet id="issue1239-1" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="serviceRequestInternalNote"/>
+            </not>
+        </preConditions>
+        <createTable tableName="serviceRequestInternalNote">
+            <column name="id" type="bigint(11)" autoIncrement="true">
+                <constraints nullable="false" primaryKeyName="PRIMARY" primaryKey="true"/>
+            </column>
+            <column name="serviceRequestId" type="bigInt(11)">
+                <constraints nullable="false" foreignKeyName="FK_SRIN_serviceRequestId" referencedTableName="problem"
+                             referencedColumnNames="pro_problemno" deleteCascade="true"/>
+            </column>
+            <column name="createdBy" type="bigInt(11)">
+                <constraints nullable="false" foreignKeyName="FK_SRIN_createdBy" referencedTableName="consultant"
+                             referencedColumnNames="cns_consno" deleteCascade="false"/>
+            </column>
+            <column name="createdAt" type="dateTime" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updatedBy" type="bigInt(11)">
+                <constraints nullable="false" foreignKeyName="FK_SRIN_updatedBy" referencedTableName="consultant"
+                             referencedColumnNames="cns_consno" deleteCascade="false"/>
+            </column>
+            <column name="updatedAt" type="dateTime" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content" type="longtext">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="issue1239-1" author="pavwebdev">
+        <preConditions>
+            <tableExists tableName="serviceRequestInternalNote"/>
+        </preConditions>
+        <sql>
+            insert into serviceRequestInternalNote(serviceRequestId, createdBy, createdAt, updatedBy, updatedAt, content)
+            select pro_problemno, 67, pro_date_raised, 64, pro_date_raised, pro_internal_notes
+            from problem;
+        </sql>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>
