@@ -58,11 +58,11 @@ try {
         }
         $customerId = $dbeSrScheduler->getValue(DBESRScheduler::customerId);
         $logger->info('Creating SR for customer ' . $customerId);
-        $dbeProblem = new DBEProblem($thing);
-        $dbeContact = new DBEContact($thing);
-        $buActivity = new BUActivity($thing);
-        $contactId  = $dbeSrScheduler->getValue(DBESRScheduler::contactId);
-        $priority   = $dbeSrScheduler->getValue(DBESRScheduler::priority);
+        $dbeProblem          = new DBEProblem($thing);
+        $dbeContact          = new DBEContact($thing);
+        $buActivity          = new BUActivity($thing);
+        $contactId           = $dbeSrScheduler->getValue(DBESRScheduler::contactId);
+        $priority            = $dbeSrScheduler->getValue(DBESRScheduler::priority);
         $queue               = $dbeSrScheduler->getValue(DBESRScheduler::teamId);
         $hiddenFromCustomer  = $dbeSrScheduler->getValue(DBESRScheduler::hideFromCustomer);
         $siteNo              = $dbeSrScheduler->getValue(DBESRScheduler::siteNo);
@@ -219,16 +219,17 @@ try {
     $buHeader       = new BUHeader($thing);
     $dsHeader       = new DataSet($thing);
     $buHeader->getHeader($dsHeader);
-    $siteNo   = 0;
-    $priority = 2;
+    $siteNo           = 0;
+    $priority         = 2;
     $slaResponseHours = $buActivity->getSlaResponseHours(
         $priority,
         $customerId,
         $primaryContact->getValue(DBEContact::contactID)
     );
-    $dbeProblem = new DBEProblem($thing);
+    $dbeProblem       = new DBEProblem($thing);
     $dbeProblem->setValue(DBEProblem::problemID, null);
     $siteNo = $primaryContact->getValue(DBEContact::siteNo);
+    $dbeProblem->setValue(DBEProblem::emailSubjectSummary, "Scheduled SR Creation Failure");
     $dbeProblem->setValue(
         DBEProblem::hdLimitMinutes,
         $dsHeader->getValue(DBEHeader::hdTeamLimitMinutes)

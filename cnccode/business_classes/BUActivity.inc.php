@@ -4485,6 +4485,7 @@ class BUActivity extends Business
         $reason          = 'Top-up - Invoice No ' . $invoiceID;
         $callActivityID  = $this->createActivityFromCustomerID(
             $customerID,
+            "PrePay Top Up",
             false,
             'C'
         );
@@ -4536,6 +4537,7 @@ class BUActivity extends Business
     }
 
     function createActivityFromCustomerID($customerID,
+                                          $emailSubjectSummary,
                                           $userID = false,
                                           $problemStatus = 'I',
                                           $contractCustomerItemID = false
@@ -4564,6 +4566,7 @@ class BUActivity extends Business
             DBEJProblem::customerID,
             $customerID
         );
+        $dbeProblem->setValue(DBEProblem::emailSubjectSummary, $emailSubjectSummary);
         $dbeProblem->setValue(
             DBEJProblem::status,
             $problemStatus
@@ -5525,6 +5528,7 @@ class BUActivity extends Business
             $reason          = 'Prepay Adjustment';
             $callActivityID  = $this->createActivityFromCustomerID(
                 $customerID,
+                "PrePay Adjustment",
                 false,
                 'C',
                 $dbeCustomerItem->getValue(DBECustomerItem::customerItemID)
