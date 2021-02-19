@@ -1497,8 +1497,8 @@ class BUActivity extends Business
             $othersFlag,
             $dbeSelfContact
         );
-        $createdBy = $dbejCallactivity->getValue(DBEJCallActivity::caaConsno);
-        $user      = new DBEUser($this);
+        $createdBy            = $dbejCallactivity->getValue(DBEJCallActivity::caaConsno);
+        $user                 = new DBEUser($this);
         $user->getRow($createdBy);
         $bcc = [];
         if ($user->getValue(DBEUser::bccOnCustomerEmails)) {
@@ -6950,12 +6950,19 @@ FROM
             echo "<div>The sender contact was not found, or this is a server Guard,  we need to pull the primary contact of the customer: " . $customerID . "</div>";
             $buCustomer = new BUCustomer($this);
             $dbeContact = $buCustomer->getPrimaryContact($customerID);
-            if (!$dbeContact->rowCount()) {
+            if (!$dbeContact) {
+                $customerInfo = $customerID;
+                if ($customerID) {
+                    $dbeCustomer = new DBECustomer($this);
+                    if ($dbeCustomer->getRow($customerID)) {
+                        $customerInfo = $dbeCustomer->getValue(DBECustomer::name);
+                    }
+                }
                 $this->addCustomerRaisedRequest(
                     $record,
                     null,
                     null,
-                    "There is no primary contact associated with the customer: {$customerID} "
+                    "There is no primary contact associated with the customer: {$customerInfo} "
                 );
                 return;
             }

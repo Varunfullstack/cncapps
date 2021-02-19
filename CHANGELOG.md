@@ -1,6 +1,12 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.5.5] - 2021-02-19
+### Changed
+- Improved readability of the "To Be Logged" requests that's created when the customer doesn't have a Primary Contact.
+### Fixed
+- Fixed issue with Automated requests when there's no Primary Contact for the customer defined.
+
 ## [v5.5.4] - 2021-02-16
 ### Added
 - CNC 25 Years of Business Logo 	
