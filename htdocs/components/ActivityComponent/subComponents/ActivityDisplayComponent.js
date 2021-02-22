@@ -11,10 +11,13 @@ import {InternalDocumentsComponent} from "./InternalDocumentsComponent";
 import CustomerDocumentUploader from "./CustomerDocumentUploader";
 import Modal from "../../shared/Modal/modal";
 import Table from "../../shared/table/table";
-import { LinkServiceRequestOrder } from "./LinkserviceRequestOrder.js";
+import {LinkServiceRequestOrder} from "./LinkserviceRequestOrder.js";
+import moment from "moment";
+import {InternalNotesListComponent} from "../../shared/InternalNotesListComponent/InternalNotesListComponent";
 
 // noinspection EqualityComparisonWithCoercionJS
 const emptyAssetReasonCharactersToShow = 30;
+
 
 class ActivityDisplayComponent extends MainComponent {
     api = new APIActivity();
@@ -38,7 +41,7 @@ class ActivityDisplayComponent extends MainComponent {
             templateType: '',
             templateTitle: '',
             selectedChangeRequestTemplateId: null,
-            showSalesOrder:false,
+            showSalesOrder: false,
             filters: {
                 showTravel: false,
                 showOperationalTasks: false,
@@ -428,7 +431,7 @@ class ActivityDisplayComponent extends MainComponent {
         window.open("Password.php?action=generate&htmlFmt=popup", 'reason', 'scrollbars=yes,resizable=yes,height=524,width=855,copyhistory=no, menubar=0');
     }
     handleSalesOrder = async (activityId, serviceRequestId) => {
-        this.setState({showSalesOrder:true});
+        this.setState({showSalesOrder: true});
     }
     handleUnlink = async (linkedSalesOrderID, serviceRequestId, activityId) => {
         const res = await this.confirm(`Are you sure you want to unlink this request to Sales Order ${linkedSalesOrderID}`);
@@ -712,32 +715,30 @@ class ActivityDisplayComponent extends MainComponent {
 
     }
     getNotesElement = () => {
-        const {el} = this;
         const {data} = this.state;
-        return el(
-            "div",
-            {className: "round-container"},
-            el(
-                "div",
-                {className: "flex-row"},
-                el(
-                    "label",
-                    {className: "label mt-5 mr-3 ml-1 mb-5", style: {display: "block"}},
-                    "Internal Notes"
-                ),
-                el(ToolTip, {
-                    width: 15,
-                    title:
-                        "These are internal notes only and not visible to the customer. These are per Service Request.",
-                    content: el("i", {
-                        className: "fal fa-info-circle mt-5 pointer icon",
-                    }),
-                })
-            ),
-            el("div", {
-                dangerouslySetInnerHTML: {__html: data?.internalNotes},
-            })
-        );
+        return (
+            <div className="round-container">
+                <div className="flex-row">
+                    <label className="label mt-5 mr-3 ml-1 mb-5"
+                           style={{display: "block"}}
+                    >
+                        Internal Notes
+                    </label>
+                    <ToolTip
+                        width="15"
+                        title="These are internal notes only and not visible to the customer. These are per Service Request."
+                        content={
+                            <i className="fal fa-info-circle mt-5 pointer icon"/>
+                        }
+                    >
+
+                    </ToolTip>
+                </div>
+                <div className="internalNotesContainer">
+                    <InternalNotesListComponent internalNotes={data?.internalNotes}/>
+                </div>
+            </div>
+        )
     }
     getcustomerNotesElement = () => {
         const {el} = this;
@@ -1060,13 +1061,14 @@ class ActivityDisplayComponent extends MainComponent {
             onCancel: () => this.setState({showFollowOn: false})
         }) : null;
     }
-    handleSalesOrderClose=()=>{
-        this.setState({showSalesOrder:false});
+    handleSalesOrderClose = () => {
+        this.setState({showSalesOrder: false});
         this.loadCallActivity(this.state.currentActivity);
     }
+
     render() {
-        const {data,showSalesOrder} = this.state;
-        console.log("showSalesOrder",showSalesOrder);
+        const {data, showSalesOrder} = this.state;
+        console.log("showSalesOrder", showSalesOrder);
         return (
             <div style={{width: "90%"}}>
                 {this.getAlert()}
@@ -1092,8 +1094,11 @@ class ActivityDisplayComponent extends MainComponent {
                 {this.getExpensesElement()}
                 {this.getTemplateModal()}
                 {this.getFooter()}
-                {showSalesOrder?<LinkServiceRequestOrder serviceRequestID={data.problemID} customerId={data?.customerId} show={showSalesOrder}
-                onClose={this.handleSalesOrderClose}></LinkServiceRequestOrder>:null}
+                {showSalesOrder ? <LinkServiceRequestOrder serviceRequestID={data.problemID}
+                                                           customerId={data?.customerId}
+                                                           show={showSalesOrder}
+                                                           onClose={this.handleSalesOrderClose}
+                ></LinkServiceRequestOrder> : null}
             </div>
         );
     }

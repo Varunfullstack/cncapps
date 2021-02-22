@@ -123,7 +123,6 @@ class ProjectsComponent extends MainComponent {
     }
     setProjectsSummaryElement = () => {
         const {projectsSummary} = this.state;
-        console.log(projectsSummary);
         const total = projectsSummary
             .map((p) => p.total)
             .reduce((prev, cur) => prev + cur, 0);

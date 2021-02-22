@@ -9,6 +9,9 @@
  */
 
 use CNCLTD\AutomatedRequest;
+use CNCLTD\ServiceRequestInternalNote\infra\ServiceRequestInternalNotePDORepository;
+use CNCLTD\ServiceRequestInternalNote\ServiceRequestInternalNote;
+use CNCLTD\ServiceRequestInternalNote\UseCases\AddServiceRequestInternalNote;
 use CNCLTD\SolarwindsAccountItem;
 use CNCLTD\TwigDTOs\SiteVisitDTO;
 
@@ -464,17 +467,18 @@ class BUActivity extends Business
         );
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($callActivityID);
-        $dbeProblem = new DBEProblem($this);
-        $dbeProblem->getRow($dbeCallActivity->getValue(DBECallActivity::problemID));
-        $dbeProblem->setValue(
-            DBEJProblem::internalNotes,
-            $dbeProblem->getValue(DBEProblem::internalNotes) . '<BR/><BR/><STRONG>' . 'Parts Used on ' . date(
-                'd/m/Y H:i'
-            ) . ' from  ' . $dbeUser->getValue(DBEUser::firstName) . ' ' . $dbeUser->getValue(
-                DBEUser::lastName
-            ) . '</STRONG><BR/><BR/>' . $message
+        $internalNotesRepo = new ServiceRequestInternalNotePDORepository();
+        $newNoteDate       = new DateTimeImmutable();
+        $newInternalNote   = ServiceRequestInternalNote::create(
+            $internalNotesRepo->newIdentity(),
+            $dbeCallActivity->getValue(DBECallActivity::problemID),
+            $dbeUser,
+            $newNoteDate,
+            $dbeUser,
+            $newNoteDate,
+            "<STRONG>Parts Used on {$newNoteDate->format(DATE_CNC_DATE_TIME_FORMAT)} from {$dbeUser->getValue(DBEUser::firstName)} {$dbeUser->getValue(                DBEUser::lastName            )}</STRONG><BR/><BR/>{$message}"
         );
-        $dbeProblem->updateRow();
+        $internalNotesRepo->addServiceRequestInternalNote($newInternalNote);
     }
 
     /**
@@ -1224,10 +1228,6 @@ class BUActivity extends Business
             $dsCallActivity->getValue(DBEJCallActivity::contractCustomerItemID)
         );
         $problem->setValue(
-            DBEJProblem::internalNotes,
-            $dsCallActivity->getValue(DBEJCallActivity::internalNotes)
-        );
-        $problem->setValue(
             DBEJProblem::completeDate,
             $dsCallActivity->getValue(DBEJCallActivity::completeDate)
         );
@@ -1497,8 +1497,8 @@ class BUActivity extends Business
             $othersFlag,
             $dbeSelfContact
         );
-        $createdBy = $dbejCallactivity->getValue(DBEJCallActivity::caaConsno);
-        $user      = new DBEUser($this);
+        $createdBy            = $dbejCallactivity->getValue(DBEJCallActivity::caaConsno);
+        $user                 = new DBEUser($this);
         $user->getRow($createdBy);
         $bcc = [];
         if ($user->getValue(DBEUser::bccOnCustomerEmails)) {
@@ -5101,14 +5101,6 @@ class BUActivity extends Business
             DBEProblem::criticalFlag,
             $body->criticalSRFlag ? 'Y' : 'N'
         );
-        $notes = $body->internalNotes;
-        if (isset($body->internalNotesAppend)) {
-            $notes .= $body->internalNotesAppend;
-        }
-        $dbeProblem->setValue(
-            DBEProblem::internalNotes,
-            $notes
-        );
         $dbeProblem->setValue(
             DBEProblem::contactID,
             $body->contactID
@@ -5148,6 +5140,16 @@ class BUActivity extends Business
             );
         }
         $dbeProblem->insertRow();
+        $useCase = new AddServiceRequestInternalNote(
+            new ServiceRequestInternalNotePDORepository()
+        );
+        $notes   = $body->internalNotes;
+        if (isset($body->internalNotesAppend)) {
+            $notes .= $body->internalNotesAppend;
+        }
+        $internalNoteUser = new DBEUser($this);
+        $internalNoteUser->getRow($userID);
+        $useCase($dbeProblem, $internalNoteUser, $notes);
         if ($body->monitorSRFlag) {
             $this->toggleMonitoringFlag($dbeProblem->getPKValue());
         }
@@ -5757,16 +5759,6 @@ class BUActivity extends Business
 
 
         }
-        if (trim($internalNotes) && $internalNotes != $dbeProblem->getValue(DBEJProblem::internalNotes)) {
-
-            $dbeProblem->setValue(
-                DBEJProblem::internalNotes,
-                $internalNotes
-            );
-            $dbeProblem->updateRow();
-
-        }
-
     }
 
     /**
@@ -6234,10 +6226,6 @@ class BUActivity extends Business
             $dsInput->getValue(BURenContract::serviceRequestCustomerItemID)
         );
         $dbeProblem->setValue(
-            DBEJProblem::internalNotes,
-            $internalNotes
-        );
-        $dbeProblem->setValue(
             DBEJProblem::linkedSalesOrderID,
             $ordheadID
         );
@@ -6296,6 +6284,12 @@ class BUActivity extends Business
             $this->getSuitableEmailSubjectSummary($ordheadID, $selectedOrderLine)
         );
         $dbeProblem->insertRow();
+        $useCase          = new AddServiceRequestInternalNote(
+            new ServiceRequestInternalNotePDORepository()
+        );
+        $internalNoteUser = new DBEUser($this);
+        $internalNoteUser->getRow(USER_SYSTEM);
+        $useCase($dbeProblem, $internalNoteUser, $internalNotes);
         $reason = "<p>An order has been received for the items below:</p>";
         // insert selected items
         $reason .= '<table>';
@@ -6455,12 +6449,33 @@ class BUActivity extends Business
                 'customerName'                => $dbeJProblem->getValue(DBEJProblem::customerName),
                 'reason'                      => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
                 'createProjectLink'           => $createProjectLink,
-                'internalNotes'               => $dbeJCallActivity->getValue(
-                    DBEJCallActivity::internalNotes
-                ),
                 'CONFIG_SERVICE_REQUEST_DESC' => CONFIG_SERVICE_REQUEST_DESC
             )
         );
+        $template->setBlock('page', 'internalNotesBlock', 'internalNotes');
+        $repo                         = new ServiceRequestInternalNotePDORepository();
+        $internalNotes                = $repo->getServiceRequestInternalNotesForSR($problemID);
+        $internalNotesConsultantNames = [];
+        foreach ($internalNotes as $internalNote) {
+            $updatedByUserId = $internalNote->getUpdatedBy();
+            if (!key_exists($updatedByUserId, $internalNotesConsultantNames)) {
+                $dbeUser = new DBEUser($this);
+                $dbeUser->getRow($updatedByUserId);
+                $internalNotesConsultantNames[$updatedByUserId] = "{$dbeUser->getValue(DBEUser::firstName)} {$dbeUser->getValue(DBEUser::lastName)}";
+            }
+            $template->set_var(
+                array(
+                    'internalNoteDate'          => $internalNote->getUpdatedAt()->format(DATE_MYSQL_DATETIME),
+                    'internalNoteUpdatedByName' => $internalNotesConsultantNames[$updatedByUserId],
+                    'internalNoteContent'       => $internalNote->getContent(),
+                )
+            );
+            $template->parse(
+                'internalNotes',
+                'internalNotesBlock',
+                true
+            );
+        }
         $template->parse(
             'output',
             'page',

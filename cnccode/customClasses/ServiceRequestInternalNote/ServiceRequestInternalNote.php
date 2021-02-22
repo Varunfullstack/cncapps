@@ -1,13 +1,18 @@
 <?php
 
 namespace CNCLTD\ServiceRequestInternalNote;
+
+use DateTimeImmutable;
+
 class ServiceRequestInternalNote
 {
     private $id;
     private $serviceRequestId;
     private $createdBy;
+    /** @var DateTimeImmutable $createdAt */
     private $createdAt;
     private $updatedBy;
+    /** @var DateTimeImmutable $updatedAt */
     private $updatedAt;
     private $content;
 
@@ -21,7 +26,14 @@ class ServiceRequestInternalNote
      * @param $updatedAt
      * @param $content
      */
-    private function __construct($id, $serviceRequestId, $createdBy, $createdAt, $updatedBy, $updatedAt, $content)
+    private function __construct($id,
+                                 $serviceRequestId,
+                                 $createdBy,
+                                 DateTimeImmutable $createdAt,
+                                 $updatedBy,
+                                 DateTimeImmutable $updatedAt,
+                                 $content
+    )
     {
 
         $this->id               = $id;
@@ -36,9 +48,9 @@ class ServiceRequestInternalNote
     public static function create($id,
                                   $serviceRequestId,
                                   $createdBy,
-                                  \DateTimeImmutable $createdAt,
+                                  DateTimeImmutable $createdAt,
                                   $updatedBy,
-                                  \DateTimeImmutable $updatedAt,
+                                  DateTimeImmutable $updatedAt,
                                   $comment
     ): ServiceRequestInternalNote
     {
@@ -70,9 +82,9 @@ class ServiceRequestInternalNote
     }
 
     /**
-     * @return mixed
+     * @return DateTimeImmutable
      */
-    public function getCreatedAt()
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }
@@ -86,9 +98,9 @@ class ServiceRequestInternalNote
     }
 
     /**
-     * @return mixed
+     * @return DateTimeImmutable
      */
-    public function getUpdatedAt()
+    public function getUpdatedAt(): DateTimeImmutable
     {
         return $this->updatedAt;
     }
@@ -99,6 +111,13 @@ class ServiceRequestInternalNote
     public function getContent()
     {
         return $this->content;
+    }
+
+    public function updateContent($content, \DBEUser $currentUser)
+    {
+        $this->content   = $content;
+        $this->updatedBy = $currentUser->getValue(\DBEUser::userID);
+        $this->updatedAt = new DateTimeImmutable();
     }
 
 }

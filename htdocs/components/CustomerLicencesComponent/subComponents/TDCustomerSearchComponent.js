@@ -126,7 +126,6 @@ class TDCustomerSearchComponent extends React.Component {
                     if (!b.cncCustName) {
                         return -1;
                     }
-                    console.log(direction);
                     if (direction == 'asc') {
                         return a.cncCustName.localeCompare(b.cncCustName);
                     }

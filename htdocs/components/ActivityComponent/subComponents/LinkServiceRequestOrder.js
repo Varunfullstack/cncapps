@@ -25,7 +25,6 @@ export class LinkServiceRequestOrder extends MainComponent {
     componentDidMount() {
         if(this.props.customerId)
         this.api.getCustomerInitialSalesOrders(this.props.customerId).then(salesOrders=>{
-            console.log(salesOrders);
             this.setState({salesOrders});
         });
     }
@@ -89,12 +88,10 @@ export class LinkServiceRequestOrder extends MainComponent {
           this.alert("Please Enter Order Number");
           return;
         }
-        console.log(serviceRequestID,newOrdHeadID);
-        this.apiActivity.linkSalesOrder(serviceRequestID,newOrdHeadID).then(result=>{                
+        this.apiActivity.linkSalesOrder(serviceRequestID,newOrdHeadID).then(result=>{
             this.setState({newOrdHeadID:'' });
             this.handleClose();         
         }).catch(ex=>{
-          console.log(ex);
           this.alert("Failed to save order");
         });
       

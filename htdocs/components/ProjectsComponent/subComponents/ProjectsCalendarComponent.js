@@ -26,7 +26,6 @@ export default class ProjectsCalendarComponent extends MainComponent {
     getData() {
         this.setState({showSpinner: true});
         this.api.getProjects(this.props.projectID).then(projects => {
-            console.log('projects', projects);
             this.setState({projects, showSpinner: false});
         })
     }
@@ -60,10 +59,6 @@ export default class ProjectsCalendarComponent extends MainComponent {
     handleEventRender = (arg) => {
         const {projects} = this.state;
         const project = projects.find(p => p.projectID == arg.event.id);
-        console.log(project);
-        // const el=$(info.el).find(".fc-event-title-container")[0];
-        // el.append(<p>Test</p>);
-        // console.log(info,$(info.el).find(".fc-event-title-container").length);
         let eventEl = document.createElement('div')
         eventEl.innerHTML = `
       <p>${project.customerName}</p>

@@ -15,7 +15,9 @@
     </tr>
     <tr>
         <td bgcolor="#f1f9d1">
-            <label for="" style="color:#992211">CNC Next Action</label>            
+            <label for=""
+                   style="color:#992211"
+            >CNC Next Action</label>
             {lastCncNextAction}
         </td>
     </tr>
@@ -25,10 +27,10 @@
     <tr>
         <td></td>
     </tr>
-    
+
     <!-- BEGIN activityBlock -->
     {originalRequestHeader}
-    
+
     <tr>
         <td class="{colorClass}"
             align="left"
@@ -37,14 +39,14 @@
             {activityType} - {contactName} - {siteAddress} - {userName}
         </td>
     </tr>
-   
+
     <tr>
         <td class="hiddenText">{activityHiddenText}</td>
     </tr>
-   
+
     <tr>
         <td>{reason}</td>
-    </tr>    
+    </tr>
     <!-- END activityBlock -->
     <tr>
         <td bgcolor="#cccccc"
@@ -52,8 +54,19 @@
         >Internal Notes
         </td>
     </tr>
+    <!-- BEGIN internalNotesBlock -->
     <tr>
-        <td>{internalNotes}</td>
+        <td class="boring-gray"
+            align="left"
+        >
+            {internalNoteDate} by {internalNoteUpdatedByName}
+        </td>
     </tr>
+    <tr>
+        <td>
+            {internalNoteContent}
+        </td>
+    </tr>
+    <!-- END internalNotesBlock -->
 </table>
 <!-- End Template: ActivityReasonPopup.inc.html -->

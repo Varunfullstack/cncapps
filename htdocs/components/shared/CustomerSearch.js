@@ -31,7 +31,6 @@ class CustomerSearch extends MainComponent {
             if(customer)
             customerName=customer.name;
         }
-        console.log(customerName);
         return customerName;
     }
     render() {        

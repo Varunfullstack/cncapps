@@ -48,7 +48,6 @@ class MySettingsComponent extends MainComponent {
                     data.userLog = data.userLog.map(log => {
                         return {...log, loggedDate: moment(log.loggedDate).format('DD-MM-YYYY')};
                     });
-                console.log(data);
                 this.setState({...data});
             })
     }
@@ -123,7 +122,6 @@ class MySettingsComponent extends MainComponent {
             sendEmailAssignedService:(this.state.sendEmailAssignedService ? 1 : 0),
             bccOnCustomerEmails:(this.state.bccOnCustomerEmails ? 1 : 0),
         }
-        console.log(body);
         this.api.saveMySettings(body).then(result=>{
             // if(result.status)
             //     this.alert('Setting saved successfully');

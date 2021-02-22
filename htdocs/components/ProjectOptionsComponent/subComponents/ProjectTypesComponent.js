@@ -28,7 +28,6 @@ export class ProjectTypesComponent extends MainComponent {
     }
     getData=()=>{
         this.api.getProjectTypes().then(items=>{
-            console.log(items);
             this.setState({items,showModal:false});
         })
     }
@@ -109,12 +108,10 @@ export class ProjectTypesComponent extends MainComponent {
         </Table>
     }
     handleEdit=(type)=>{
-        console.log(type);
         this.setState({data:{...type},showModal:true});
     }
     handleDelete=async (type)=>{
         const confirm=await this.confirm("Are you sure to delete it")
-        console.log(confirm);
         if(confirm)
         this.api.deleteProjectType(type.id).then(result=>{
             this.getData();
@@ -163,14 +160,12 @@ export class ProjectTypesComponent extends MainComponent {
         if(data.id!='')
         {
             this.api.updateProjectType(data.id,data).then(result=>{
-                console.log(result);
                 this.getData();
             });
         }
         else //new 
         {
             this.api.addProjectType(data).then(result=>{
-                console.log(result);
                 this.getData();
             });
         }

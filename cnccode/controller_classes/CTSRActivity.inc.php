@@ -6,6 +6,11 @@ use CNCLTD\InternalDocuments\Base64FileDTO;
 use CNCLTD\InternalDocuments\Entity\InternalDocumentMapper;
 use CNCLTD\InternalDocuments\InternalDocumentRepository;
 use CNCLTD\InternalDocuments\UseCases\AddDocumentsToServiceRequest;
+use CNCLTD\ServiceRequestInternalNote\infra\ServiceRequestInternalNotePDORepository;
+use CNCLTD\ServiceRequestInternalNote\ServiceRequestInternalNote;
+use CNCLTD\ServiceRequestInternalNote\ServiceRequestInternalNotePDOMapper;
+use CNCLTD\ServiceRequestInternalNote\UseCases\AddServiceRequestInternalNote;
+use CNCLTD\ServiceRequestInternalNote\UseCases\ChangeServiceRequestInternalNote;
 
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBECallActivity.inc.php');
@@ -56,6 +61,8 @@ class CTSRActivity extends CTCNC
     const DELETE_INTERNAL_DOCUMENT                               = 'deleteInternalDocument';
     const REMOTE_SUPPORT_ACTIVITY_TYPE_ID                        = 8;
     const GET_NOT_ATTEMPT_FIRST_TIME_FIX                         = "getNotAttemptFirstTimeFix";
+    const ADD_INTERNAL_NOTE                                      = "addInternalNote";
+    const CHANGE_SERVICE_REQUEST_INTERNAL_NOTE                   = "changeServiceRequestInternalNote";
     public  $serverGuardArray = array(
         ""  => "Please select",
         "Y" => "ServerGuard Related",
@@ -63,6 +70,10 @@ class CTSRActivity extends CTCNC
     );
     private $buActivity;
     private $internalDocumentRepository;
+    /**
+     * @var ServiceRequestInternalNotePDORepository
+     */
+    private $serviceRequestInternalNoteRepository;
 
     function __construct($requestMethod,
                          $postVars,
@@ -78,7 +89,7 @@ class CTSRActivity extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles                            = [
+        $roles                                      = [
             SALES_PERMISSION,
             ACCOUNTS_PERMISSION,
             TECHNICAL_PERMISSION,
@@ -87,8 +98,9 @@ class CTSRActivity extends CTCNC
             MAINTENANCE_PERMISSION,
             RENEWALS_PERMISSION,
         ];
-        $this->buActivity                 = new BUActivity($this);
-        $this->internalDocumentRepository = new InternalDocumentRepository();
+        $this->buActivity                           = new BUActivity($this);
+        $this->internalDocumentRepository           = new InternalDocumentRepository();
+        $this->serviceRequestInternalNoteRepository = new ServiceRequestInternalNotePDORepository();
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
@@ -137,6 +149,12 @@ class CTSRActivity extends CTCNC
                 exit;
             case self::GET_CALL_ACTIVITY_BASIC_INFO:
                 echo json_encode($this->getCallActivityBasicInfo());
+                exit;
+            case self::ADD_INTERNAL_NOTE:
+                echo json_encode($this->addInternalNoteController());
+                exit;
+            case self::CHANGE_SERVICE_REQUEST_INTERNAL_NOTE:
+                echo json_encode($this->changeServiceRequestInternalNoteController());
                 exit;
             case self::GET_DOCUMENTS:
                 echo json_encode($this->getActivityDocuments($_REQUEST["callActivityID"], $_REQUEST["problemID"]));
@@ -271,16 +289,41 @@ class CTSRActivity extends CTCNC
         $hdUsedMinutes                   = $buActivity->getHDTeamUsedTime($problemID);
         $esUsedMinutes                   = $buActivity->getESTeamUsedTime($problemID);
         $imUsedMinutes                   = $buActivity->getSPTeamUsedTime($problemID);
-        $serviceRequestInternalNotesRepo = new CNCLTD\ServiceRequestInternalNote\ServiceRequestInternalNotePDORepository(
+        $serviceRequestInternalNotesRepo = new CNCLTD\ServiceRequestInternalNote\infra\ServiceRequestInternalNotePDORepository(
         );
         $notes                           = $serviceRequestInternalNotesRepo->getServiceRequestInternalNotesForSR(
             $problemID
         );
+        $consultants                     = [];
         $mappedNotes                     = array_map(
-            function (\CNCLTD\ServiceRequestInternalNote\ServiceRequestInternalNote $note) {
-                return \CNCLTD\ServiceRequestInternalNote\ServiceRequestInternalNotePDOMapper::toJSONArray($note);
+            function (ServiceRequestInternalNote $note) use ($consultants) {
+                $updatedByUserId = $note->getUpdatedBy();
+                if (!key_exists($updatedByUserId, $consultants)) {
+                    $dbeUser = new DBEUser($this);
+                    $dbeUser->getRow($updatedByUserId);
+                    $consultants[$updatedByUserId] = "{$dbeUser->getValue(DBEUser::firstName)} {$dbeUser->getValue(DBEUser::lastName)}";
+                }
+                $createdByUserId = $note->getCreatedBy();
+                if (!key_exists($createdByUserId, $consultants)) {
+                    $dbeUser = new DBEUser($this);
+                    $dbeUser->getRow($createdByUserId);
+                    $consultants[$createdByUserId] = "{$dbeUser->getValue(DBEUser::firstName)} {$dbeUser->getValue(DBEUser::lastName)}";
+                }
+                $array              = ServiceRequestInternalNotePDOMapper::toJSONArray($note);
+                $array['updatedBy'] = $consultants[$updatedByUserId];
+                $array['createdBy'] = $consultants[$createdByUserId];
+                return $array;
             },
             $notes
+        );
+        usort(
+            $mappedNotes,
+            function ($a, $b) {
+                if ($a['createdAt'] <= $b['createdAt']) {
+                    return 1;
+                }
+                return -1;
+            }
         );
         return [
             "callActivityID"                  => $callActivityID,
@@ -1468,6 +1511,54 @@ FROM
         } catch (\Exception $exception) {
             throw new JsonHttpException(2215, "Failed to delete document");
         }
+    }
+
+    private function addInternalNoteController(): array
+    {
+        $data             = $this->getJSONData();
+        $serviceRequestId = @$data['serviceRequestId'];
+        $content          = @$data['content'];
+        if (!$serviceRequestId) {
+            throw new JsonHttpException(231, "Service request ID required");
+        }
+        if (!$content) {
+            throw new JsonHttpException(321, "Content required");
+        }
+        $dbeProblem = new DBEProblem($this);
+        if (!$dbeProblem->getRow($serviceRequestId)) {
+            throw new JsonHttpException(123, "Service Request Not Found!");
+        }
+        $usecase = new AddServiceRequestInternalNote($this->serviceRequestInternalNoteRepository);
+        try {
+            $usecase->__invoke($dbeProblem, $this->getDbeUser(), $content);
+        } catch (Exception $exception) {
+            throw new JsonHttpException(123, $exception->getMessage());
+        }
+        return ["status" => "ok"];
+    }
+
+    private function changeServiceRequestInternalNoteController(): array
+    {
+        $data             = $this->getJSONData();
+        $serviceRequestId = @$data['serviceRequestId'];
+        $content          = @$data['content'];
+        if (!$serviceRequestId) {
+            throw new JsonHttpException(231, "Service request ID required");
+        }
+        if (!$content) {
+            throw new JsonHttpException(321, "Content required");
+        }
+        $dbeProblem = new DBEProblem($this);
+        if (!$dbeProblem->getRow($serviceRequestId)) {
+            throw new JsonHttpException(123, "Service Request Not Found!");
+        }
+        $usecase = new ChangeServiceRequestInternalNote($this->serviceRequestInternalNoteRepository);
+        try {
+            $usecase->__invoke($serviceRequestId, $content, $this->getDbeUser());
+        } catch (Exception $exception) {
+            throw new JsonHttpException(123, $exception->getMessage());
+        }
+        return ["status" => "ok"];
     }
 }
 

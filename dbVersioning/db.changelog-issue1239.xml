@@ -52,6 +52,10 @@
                    if(pro_internal_notes = "", null, pro_internal_notes)
             from problem;
         </sql>
+        <sql>
+            insert into db_sequence
+            values ('serviceRequestInternalNote', (select max(id) + 1 from serviceRequestInternalNote));
+        </sql>
         <rollback/>
     </changeSet>
 </databaseChangeLog>

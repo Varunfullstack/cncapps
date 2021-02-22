@@ -27,7 +27,6 @@ export class ProjectStagesComponent extends MainComponent {
     }
     getData=()=>{
         this.api.getProjectStages().then(items=>{
-            console.log(items);
             this.setState({items,showModal:false});
         })
     }
@@ -117,12 +116,10 @@ export class ProjectStagesComponent extends MainComponent {
        
     }
     handleEdit=(stage)=>{
-        console.log(stage);
         this.setState({data:stage,showModal:true});
     }
     handleDelete=async (stage)=>{
         const confirm=await this.confirm("Are you sure to delete it")
-        console.log(confirm);
         if(confirm)
         this.api.deleteProjectStage(stage.id).then(result=>{
             this.getData();
@@ -165,14 +162,12 @@ export class ProjectStagesComponent extends MainComponent {
         if(data.id!='')
         {
             this.api.updateProjectStage(data.id,data).then(result=>{
-                console.log(result);
                 this.getData();
             });
         }
         else //new 
         {
             this.api.addProjectStage(data).then(result=>{
-                console.log(result);
                 this.getData();
             });
         }

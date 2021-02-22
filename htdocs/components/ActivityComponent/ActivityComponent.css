@@ -72,3 +72,30 @@
     font-weight: bold !important;
 
 }
+
+.internalNotesContainer {
+    display: flex;
+    flex-direction: column;
+    max-height: 500px;
+    overflow-y: scroll;
+    padding: 4px;
+}
+
+.internalNoteItem {
+    margin-top: 5px;
+    border-radius: 5px;
+    padding: 10px;
+    border: 1px solid #bdbec1;
+}
+
+.internalNoteItem .internalNoteItem_header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    border-bottom: 1px solid #bdbec1;
+    padding-bottom: 2px;
+}
+
+.internalNoteItem .internalNoteItem_content {
+    margin-top: 10px;
+}

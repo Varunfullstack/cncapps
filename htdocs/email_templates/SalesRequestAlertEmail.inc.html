@@ -1,27 +1,59 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title></title>
+<head>
+    <meta http-equiv="Content-Type"
+          content="text/html; charset=UTF-8"
+    >
+    <title></title>
     <style type="text/css">
-    <!--
-    BODY, P, TD, TH {
-      font-family: Arial, Helvetica, sans-serif;
-      font-size: 9pt;
-    }
-    .singleBorder {
-      border: #e1e1f0 2px solid;
-    }
-    TABLE {
-      border-spacing: 1px;
-    }
-    -->
+        <!--
+        BODY, P, TD, TH {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 9pt;
+        }
+
+        .singleBorder {
+            border: #e1e1f0 2px solid;
+        }
+
+        TABLE {
+            border-spacing: 1px;
+        }
+
+        -->
     </style>
-  </head>
-  <body>
-   <p>Please advise sales when this <A href="{urlActivity}">incident</A> has been actioned and a date for installation (if applicable) advised to the customer.</p>
-   <p>{createProjectLink}</p>
-   <P>{reason}</p>
-   <P>{internalNotes}</p>
-  </body>
+</head>
+<body>
+<p>Please advise sales when this <A href="{urlActivity}">incident</A> has been actioned and a date for installation (if
+    applicable) advised to the customer.</p>
+<p>{createProjectLink}</p>
+<P>{reason}</p>
+<table>
+    <thead>
+
+    </thead>
+    <tbody>
+    <tr>
+        <td bgcolor="#cccccc"
+            align="left"
+        >Internal Notes
+        </td>
+    </tr>
+    <!-- BEGIN internalNotesBlock -->
+    <tr>
+        <td class="boring-gray"
+            align="left"
+        >
+            {internalNoteDate} by {internalNoteUpdatedByName}
+        </td>
+    </tr>
+    <tr>
+        <td>
+            {internalNoteContent}
+        </td>
+    </tr>
+    <!-- END internalNotesBlock -->
+    </tbody>
+</table>
+</body>
 </html>

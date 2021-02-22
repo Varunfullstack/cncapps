@@ -130,7 +130,6 @@ export default class PrioritiesRaisedComponent extends MainComponent {
         fill,
       },
     ];
-    //console.log(teams);
     return teams;
   }
  
@@ -183,7 +182,6 @@ export default class PrioritiesRaisedComponent extends MainComponent {
         fill,
       },
     ];
-    //console.log(teams);
     return teams;
   }
   getChartData = (data,filter) => {     
@@ -206,7 +204,6 @@ export default class PrioritiesRaisedComponent extends MainComponent {
   getChart = () => {
     const {data,filter}=this.state;
     const { filterData, dataLabels } = this.getChartData(data,filter);
-    //console.log('chart data',filterData, dataLabels);
     const chartData = {
       labels: dataLabels,
       datasets: filterData,

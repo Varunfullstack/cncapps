@@ -22,6 +22,8 @@ import EditorFieldComponent from "../../shared/EditorField/EditorFieldComponent"
 import {TimeBudgetElement} from "./TimeBudgetElement";
 import {LinkServiceRequestOrder} from "./LinkserviceRequestOrder.js";
 import {ActivityType} from "../../shared/ActivityTypes";
+import {InternalNotesListComponent} from "../../shared/InternalNotesListComponent/InternalNotesListComponent";
+import AddInternalNoteModalComponent from "../../Modals/AddInternalNoteModalComponent";
 
 // noinspection EqualityComparisonWithCoercionJS
 const hiddenAndCustomerNoteAlertMessage = `Customer note must be empty when the activity or entire SR is hidden.`;
@@ -45,6 +47,8 @@ class ActivityEditComponent extends MainComponent {
         super(props);
         this.state = {
             ...this.state,
+            addInternalNoteModalShow: false,
+            internalNoteEdit: '',
             customerContactActivityDurationThresholdValue: null,
             remoteSupportActivityDurationThresholdValue: null,
             activityDurationWarned: false,
@@ -61,8 +65,7 @@ class ActivityEditComponent extends MainComponent {
                 documents: [],
                 reasonTemplate: "",
                 reason: "",
-                internalNotes: "",
-                internalNotesTemplate: "",
+                internalNotes: [],
                 date: "",
                 alarmDate: "",
                 alarmTime: "",
@@ -138,6 +141,7 @@ class ActivityEditComponent extends MainComponent {
         });
     }
 
+
     componentWillUnmount() {
     }
 
@@ -154,19 +158,15 @@ class ActivityEditComponent extends MainComponent {
             });
             res.reasonTemplate = res.reason;
             res.cncNextActionTemplate = res.cncNextAction;
-            res.internalNotesTemplate = res.internalNotes;
             res.customerNotesTemplate = res.customerNotes;
             res.callActTypeIDOld = res.callActTypeID;
             res.orignalPriority = res.priority;
             const session = this.getSessionActivity(res.callActivityID);
             if (session) {
                 res.customerNotes = session.customerNotesTemplate || res.customerNotes;
-                res.internalNotes = session.internalNotesTemplate || res.internalNotes;
                 res.cncNextAction = session.cncNextActionTemplate || res.cncNextAction;
                 res.reason = session.reasonTemplate || res.reason;
-
                 res.customerNotesTemplate = session.customerNotesTemplate || res.customerNotesTemplate;
-                res.internalNotesTemplate = session.internalNotesTemplate || res.internalNotesTemplate;
                 res.cncNextActionTemplate = session.cncNextActionTemplate || res.cncNextActionTemplate;
                 res.reasonTemplate = session.reasonTemplate || res.reasonTemplate;
             }
@@ -214,7 +214,6 @@ class ActivityEditComponent extends MainComponent {
         data.reason = data.reasonTemplate;
         data.cncNextAction = data.cncNextActionTemplate;
         data.customerNotes = data.customerNotesTemplate;
-        data.internalNotes = data.internalNotesTemplate;
         data.priority = this.state.priorities.find((p) => p.name == data.priority).id;
 
         delete data.activities;
@@ -235,7 +234,6 @@ class ActivityEditComponent extends MainComponent {
             "contactNotes",
             "techNotes",
             "reason",
-            "internalNotes",
             "nextStatus",
             "escalationReason",
             "customerNotes",
@@ -405,7 +403,6 @@ class ActivityEditComponent extends MainComponent {
 
     setValue = (label, value) => {
         const autoUpdateFields = [
-            'internalNotesTemplate',
             'cncNextActionTemplate',
             'reasonTemplate',
             'customerNotesTemplate',
@@ -687,7 +684,6 @@ class ActivityEditComponent extends MainComponent {
         const {data} = this.state;
         const activityEdit = {
             id: data.callActivityID,
-            internalNotesTemplate: data.internalNotesTemplate,
             cncNextActionTemplate: data.cncNextActionTemplate,
             reasonTemplate: data.reasonTemplate,
             customerNotesTemplate: data.customerNotesTemplate,
@@ -1595,19 +1591,19 @@ class ActivityEditComponent extends MainComponent {
         );
     }
 
-getCustomerNotes() {
-const {
-    el
-}
+    getCustomerNotes() {
+        const {
+            el
+        }
 
-= this;
-const
-{
-    data
-}
-= this.state;
-return el(
-"div",
+            = this;
+        const
+            {
+                data
+            }
+                = this.state;
+        return el(
+            "div",
             {className: "round-container flex-column flex-1", style: {padding: 5}},
             el('div', {className: "flex-row"},
                 el(
@@ -1631,39 +1627,60 @@ return el(
         );
     }
 
-    getActivityInternalNotes() {
-        const {el} = this;
+
+    addInternalNote = () => {
+        this.setState({
+            addInternalNoteModalShow: true,
+        });
+    }
+
+    editInternalNote = () => {
         const {data} = this.state;
-        return el(
-            "div",
-            {className: "round-container flex-column flex-1", style: {padding: 5}},
-            el('div', {className: "flex-row"},
-                el(
-                    "label",
-                    {className: "label m-5 mr-2", style: {display: "block"}},
-                    "Internal Notes"
-                ),
-                el(ToolTip, {
-                    width: 5,
-                    title: "These are internal notes only and not visible to the customer. These are per Service Request.",
-                    content: el("i", {className: "fal fa-info-circle mt-5 pointer icon"})
-                })
-            ),
-            this.state._activityLoaded
-                ?
-                <EditorFieldComponent name="internal"
-                                      value={data?.internalNotes || ""}
-                                      onChange={(value) => this.setValue("internalNotesTemplate", value)}
-                                      excludeFromErrorCount={true}
-                />
-                : null
+        this.setState({
+            addInternalNoteModalShow: true,
+            internalNoteEdit: data?.internalNotes[0].content
+        });
+    }
+
+    getActivityInternalNotes() {
+        const {data} = this.state;
+
+        return (
+            <div className="round-container">
+                <div className="flex-row">
+                    <label className="label mt-5 mr-3 ml-1 mb-5"
+                           style={{display: "block"}}
+                    >
+                        Internal Notes
+                    </label>
+                    <ToolTip
+                        width="15"
+                        title="These are internal notes only and not visible to the customer. These are per Service Request."
+                        content={
+                            <i className="fal fa-info-circle mt-5 pointer icon"/>
+                        }
+                    >
+
+                    </ToolTip>
+                </div>
+
+                <div className="internalNotesActions">
+                    <button onClick={this.addInternalNote}>Add</button>
+                    {
+                        data?.internalNotes && data.internalNotes.length === 1 ?
+                            <button onClick={this.editInternalNote}>Edit</button>
+                            :
+                            ''
+                    }
+                </div>
+
+                <div className="internalNotesContainer">
+                    <InternalNotesListComponent internalNotes={data?.internalNotes}/>
+                </div>
+            </div>
         );
     }
 
-    getTimeBudgetElement = () => {
-        const {data, currentUser} = this.state;
-        return
-    }
     getTimeBudget = () => {
         const {data, currentUser} = this.state;
         switch (currentUser?.teamID) {
@@ -1735,6 +1752,73 @@ return el(
             });
     }
 
+    hideNewInternalNoteModal = () => {
+        this.setState({addInternalNoteModalShow: false, internalNoteEdit: ''});
+    }
+
+    async saveNewInternalNote(value) {
+        const {data, currentActivity} = this.state;
+        try {
+            const response = await fetch('?action=addInternalNote', {
+                method: 'POST',
+                body: JSON.stringify(
+                    {content: value, serviceRequestId: data.problemID}
+                )
+            });
+            const res = await response.json();
+            if (!res.status === 'ok') {
+                throw new Error('Failed to save internal note');
+            }
+            this.loadCallActivity(currentActivity);
+        } catch (error) {
+            console.error(error);
+            alert(error);
+        }
+        this.hideNewInternalNoteModal();
+    }
+
+    async updateInternalNote(value) {
+        const {data, currentActivity} = this.state;
+        try {
+            const response = await fetch('?action=changeServiceRequestInternalNote', {
+                method: 'POST',
+                body: JSON.stringify(
+                    {content: value, serviceRequestId: data.problemID}
+                )
+            });
+            const res = await response.json();
+            if (!res.status === 'ok') {
+                throw new Error('Failed to save internal note');
+            }
+            this.loadCallActivity(currentActivity);
+        } catch (error) {
+            console.error(error);
+            alert(error);
+        }
+        this.hideNewInternalNoteModal();
+    }
+
+    saveInternalNote = async (value) => {
+        const {internalNoteEdit} = this.state;
+
+        if (!internalNoteEdit) {
+            return this.saveNewInternalNote(value)
+        }
+        return this.updateInternalNote(value);
+    }
+
+    getAddInternalNoteModalComponent = () => {
+        const {addInternalNoteModalShow, internalNoteEdit} = this.state;
+        return (
+            <AddInternalNoteModalComponent
+                value={internalNoteEdit}
+                show={addInternalNoteModalShow}
+                onChange={this.saveInternalNote}
+                onCancel={this.hideNewInternalNoteModal}
+            />
+        )
+    }
+
     handlePriorityTemplateChange = (value) => {
         const {data} = this.state;
         if (value !== "" && value !== undefined) {
@@ -1803,6 +1887,7 @@ return el(
                 {this.getConfirm()}
                 {this.getPrompt()}
                 {this.getPriorityChangeReason()}
+                {this.getAddInternalNoteModalComponent()}
                 {this.getProjectsElement()}
                 <ActivityHeaderComponent serviceRequestData={data}/>
                 <div className="activities-edit-container">

@@ -32,13 +32,11 @@ export default class RepProjects extends MainComponent {
         const {dateFrom, dateTo, projectStageID, projectTypeID} = this.props;
         this.api.getProjectsSearch('', dateFrom, dateTo, projectStageID, projectTypeID)
             .then(projects => {
-                console.log('projects', projects);
                 this.setState({projects, showModal: false, loadData: false});
             });
     }
 
     getProjectsTable = () => {
-        //console.log('props',this.props);
         const {projects} = this.state;
         const columns = [
             {

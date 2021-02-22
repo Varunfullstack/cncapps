@@ -10,6 +10,7 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
+use CNCLTD\ServiceRequestInternalNote\infra\ServiceRequestInternalNotePDORepository;
 use CNCLTD\Utils;
 
 global $cfg;
@@ -2684,6 +2685,34 @@ class CTActivity extends CTCNC
                 true
             );
         }
+        $this->template->set_block(
+            'ActivityReasonPopup',
+            'internalNotesBlock',
+            'internalNotes'
+        );
+        $repo                         = new ServiceRequestInternalNotePDORepository();
+        $internalNotes                = $repo->getServiceRequestInternalNotesForSR($problemId);
+        $internalNotesConsultantNames = [];
+        foreach ($internalNotes as $internalNote) {
+            $updatedByUserId = $internalNote->getUpdatedBy();
+            if (!key_exists($updatedByUserId, $internalNotesConsultantNames)) {
+                $dbeUser = new DBEUser($this);
+                $dbeUser->getRow($updatedByUserId);
+                $internalNotesConsultantNames[$updatedByUserId] = "{$dbeUser->getValue(DBEUser::firstName)} {$dbeUser->getValue(DBEUser::lastName)}";
+            }
+            $this->template->set_var(
+                array(
+                    'internalNoteDate'          => $internalNote->getUpdatedAt()->format(DATE_MYSQL_DATETIME),
+                    'internalNoteUpdatedByName' => $internalNotesConsultantNames[$updatedByUserId],
+                    'internalNoteContent'       => $internalNote->getContent(),
+                )
+            );
+            $this->template->parse(
+                'internalNotes',
+                'internalNotesBlock',
+                true
+            );
+        }
         $url  = Controller::buildLink(
             'SRActivity.php',
             array(
@@ -2711,7 +2740,6 @@ class CTActivity extends CTCNC
         }
         $this->template->set_var(
             array(
-                'internalNotes'       => $dbeProblem->getValue(DBEJProblem::internalNotes),
                 'contractDescription' => $contractDescription,
                 'problemHiddenText'   => $problemHiddenText,
                 'lastActivityText'    => $lastActivityText,

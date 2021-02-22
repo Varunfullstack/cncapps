@@ -24,7 +24,6 @@ export default class ProjectStagesHistoryComponent extends MainComponent {
   }
   getData(){
     this.api.getProjectStagesHistory(this.props.projectID).then(stages=>{
-      console.log('stages',stages);
       this.setState({stages,showModal:false});
     })
   }
