@@ -39,7 +39,7 @@
         </createTable>
     </changeSet>
     <changeSet id="issue1239-2" author="pavwebdev">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <tableExists tableName="serviceRequestInternalNote"/>
         </preConditions>
         <sql>
@@ -57,5 +57,31 @@
             values ('serviceRequestInternalNote', (select max(id) + 1 from serviceRequestInternalNote));
         </sql>
         <rollback/>
+    </changeSet>
+    <changeSet id="issue1239-3" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="problem" columnName="pro_internal_notes"/>
+        </preConditions>
+        <dropColumn tableName="problem" columnName="pro_internal_notes"/>
+        <rollback>
+            <addColumn tableName="problem">
+                <column name="pro_internal_notes" remarks="Internal CNC Notes" type="MEDIUMTEXT"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet id="issue1239-4" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="callactivity" columnName="internalNotes"/>
+        </preConditions>
+        <dropIndex tableName="callactivity" indexName="internalNotes_full"/>
+        <dropColumn tableName="callactivity" columnName="internalNotes"/>
+        <rollback>
+            <addColumn tableName="callactivity">
+                <column name="internalNotes" type="MEDIUMTEXT"/>
+            </addColumn>
+            <createIndex indexName="internalNotes_full" tableName="callactivity">
+                <column name="internalNotes"/>
+            </createIndex>
+        </rollback>
     </changeSet>
 </databaseChangeLog>

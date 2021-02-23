@@ -452,12 +452,7 @@ class DBECallActivitySearch extends DBEntity
 					AGAINST ('" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $search
-                ) . "' IN BOOLEAN MODE)
-          OR MATCH (pro_internal_notes)
-          AGAINST ('" . mysqli_real_escape_string(
-                    $this->db->link_id(),
-                    $search
-                ) . "' IN BOOLEAN MODE) )";
+                ) . "' IN BOOLEAN MODE))";
         }
 
         if ($serviceRequestSpentTime != '' && $this->testSpentTimeSearchString($serviceRequestSpentTime)) {

@@ -19,7 +19,6 @@ class DBEProblem extends DBEntity
     const respondedHours                   = "respondedHours";
     const workingHours                     = "workingHours";
     const sentSlaAlertFlag                 = "sentSlaAlertFlag";
-    const internalNotes                    = "internalNotes";
     const completionAlertCount             = "completionAlertCount";
     const completeDate                     = "completeDate";
     const hideFromCustomerFlag             = "hideFromCustomerFlag";
