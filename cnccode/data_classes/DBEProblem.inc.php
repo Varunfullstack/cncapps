@@ -154,12 +154,6 @@ class DBEProblem extends DBEntity
             "pro_sent_sla_alert_flag"
         );
         $this->addColumn(
-            self::internalNotes,
-            DA_MEMO,
-            DA_ALLOW_NULL,
-            "pro_internal_notes"
-        );
-        $this->addColumn(
             self::completionAlertCount,
             DA_INTEGER,
             DA_ALLOW_NULL,

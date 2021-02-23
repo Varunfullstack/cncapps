@@ -278,12 +278,6 @@ class DBEJCallActivity extends DBECallActivity
             "problem.pro_awaiting_customer_response_flag"
         );
         $this->addColumn(
-            self::internalNotes,
-            DA_MEMO,
-            DA_ALLOW_NULL,
-            "problem.pro_internal_notes"
-        );
-        $this->addColumn(
             self::completeDate,
             DA_DATE,
             DA_ALLOW_NULL,

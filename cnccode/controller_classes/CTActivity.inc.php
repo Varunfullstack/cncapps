@@ -2944,10 +2944,6 @@ class CTActivity extends CTCNC
             DBEJCallActivity::reason,
             $_POST['reason']
         );
-        $this->dsCallActivity->setValue(
-            DBEJCallActivity::internalNotes,
-            $_POST['internalNotes']
-        );
         $this->dsCallActivity->post();
         if (($previousStartTime != $this->dsCallActivity->getValue(
                     DBECallActivity::startTime
@@ -3582,11 +3578,28 @@ class CTActivity extends CTCNC
         if ($dsSite->getValue(DBESite::what3Words)) {
             $what3WordsLink = "https://what3words.com/{$dsSite->getValue(DBESite::what3Words)}\n\n";
         }
-        $notes = 'Details:\n\n' . CTActivity::prepareForICS($dsCallActivity->getValue(DBEJCallActivity::reason));
-        if ($dsCallActivity->getValue(DBEJCallActivity::internalNotes)) {
-            $notes .= '\n\nInternal Notes:\n\n' . CTActivity::prepareForICS(
-                    $dsCallActivity->getValue(DBEJCallActivity::internalNotes)
-                );
+        $notes             = 'Details:\n\n' . CTActivity::prepareForICS(
+                $dsCallActivity->getValue(DBEJCallActivity::reason)
+            );
+        $internalNotesRepo = new ServiceRequestInternalNotePDORepository();
+        $internalNotes     = $internalNotesRepo->getServiceRequestInternalNotesForSR(
+            $dsCallActivity->getValue(DBEJCallActivity::problemID)
+        );
+        if (count($internalNotes)) {
+            $notes                    .= '\n\nInternal Notes:\n\n';
+            $internalNotesConsultants = [];
+            foreach ($internalNotes as $internalNote) {
+                $updatedByConsultantId = $internalNote->getUpdatedBy();
+                if (!key_exists($updatedByConsultantId, $internalNotesConsultants)) {
+                    $updatedByConsultant = new DBEUser($this);
+                    $updatedByConsultant->getRow($updatedByConsultantId);
+                    $internalNotesConsultants[$updatedByConsultantId] = "{$updatedByConsultant->getValue(DBEUser::firstName)} {$updatedByConsultant->getValue(DBEUser::lastName)}";
+                }
+                $notes             .= "\n\n{$internalNote->getUpdatedAt()->format(DATE_CNC_DATE_TIME_FORMAT)} by {$internalNotesConsultants[$updatedByConsultantId]}";
+                $processedContents = CTActivity::prepareForICS($internalNote->getContent());
+                $notes             .= "\n\n{$processedContents}";
+            }
+            $notes .= "\n\n";
         }
         $this->template->set_var(
             array(

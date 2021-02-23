@@ -508,11 +508,26 @@ class BUActivity extends Business
         );
         $content = "";
         if (!$emailBody) { // if there is a body then don't display activity details
-            $content .= 'REASON:' . "<BR/><BR/>";
-            $content .= $dbeJCallActivity->getValue(DBECallActivity::reason) . "<BR/><BR/>";
-            if ($dbeJCallActivity->getValue(DBEJCallActivity::internalNotes)) {
-                $content .= 'NOTES:' . "<BR/><BR/>";
-                $content .= $dbeJCallActivity->getValue(DBEJCallActivity::internalNotes) . "<BR/><BR/>";
+            $content           .= 'REASON:' . "<BR/><BR/>";
+            $content           .= $dbeJCallActivity->getValue(DBECallActivity::reason) . "<BR/><BR/>";
+            $internalNotesRepo = new ServiceRequestInternalNotePDORepository();
+            $notes             = $internalNotesRepo->getServiceRequestInternalNotesForSR(
+                $dbeJCallActivity->getValue(DBEJCallActivity::problemID)
+            );
+            $consultants       = [];
+            if (count($notes)) {
+                $content .= "<div>NOTES:</div><table><tbody>";
+                foreach ($notes as $note) {
+                    $updatedByUserId = $note->getUpdatedBy();
+                    if (!key_exists($updatedByUserId, $consultants)) {
+                        $updatedByConsultant = new DBEUser($this);
+                        $updatedByConsultant->getRow($updatedByUserId);
+                        $consultants[$updatedByUserId] = "{$updatedByConsultant->getValue(DBEUser::firstName)} {$updatedByConsultant->getValue(DBEUser::lastName)}";
+                    }
+                    $content .= "<tr><td>{$note->getUpdatedAt()->format(DATE_CNC_DATE_TIME_FORMAT)} by {$consultants[$updatedByUserId]}</td></tr>";
+                    $content .= "<tr><td>{$note->getContent()}</td></tr>";
+                }
+                $content .= "</tbody></table>";
             }
         } else {
             $content = $emailBody . "<BR/><BR/>";
@@ -2903,10 +2918,29 @@ class BUActivity extends Business
                 ),
                 'comments'           => $comments,
                 'urlDisplayActivity' => $urlDisplayActivity,
-                'internalNotes'      => $this->dbeProblem->getValue(DBEJCallActivity::internalNotes),
                 'managerName'        => $managerName
             )
         );
+        $template->setBlock('page', 'internalNotesBlock', 'notes');
+        $internalNotesRepo        = new ServiceRequestInternalNotePDORepository();
+        $notes                    = $internalNotesRepo->getServiceRequestInternalNotesForSR($problemID);
+        $internalNotesConsultants = [];
+        foreach ($notes as $note) {
+            $updatedByConsultantId = $note->getUpdatedBy();
+            if (!key_exists($updatedByConsultantId, $internalNotesConsultants)) {
+                $updatedByConsultant = new DBEUser($this);
+                $updatedByConsultant->getRow($updatedByConsultantId);
+                $internalNotesConsultants[] = "{$updatedByConsultant->getValue(DBEUser::firstName)} {$updatedByConsultant->getValue(DBEUser::lastName)}";
+            }
+            $template->setVar(
+                [
+                    "internalNotesDate"      => $note->getUpdatedAt()->format(DATE_CNC_DATE_TIME_FORMAT),
+                    "internalNotesUpdatedBy" => $internalNotesConsultants[$updatedByConsultantId],
+                    "internalNotesContent"   => $note->getContent(),
+                ]
+            );
+            $template->parse('notes', 'internalNotesBlock', true);
+        }
         $template->parse(
             'output',
             'page',
@@ -4806,10 +4840,6 @@ class BUActivity extends Business
             @$_SESSION [$sessionKey] ['criticalSRFlag']
         );
         $dbeProblem->setValue(
-            DBEProblem::internalNotes,
-            @$_SESSION [$sessionKey] ['internalNotes']
-        );
-        $dbeProblem->setValue(
             DBEProblem::contactID,
             @$_SESSION [$sessionKey] ['contactID']
         );
@@ -4822,6 +4852,14 @@ class BUActivity extends Business
             @$_SESSION [$sessionKey] ['projectID']
         );
         $dbeProblem->insertRow();
+        if (@$_SESSION[$sessionKey]['internalNotes']) {
+            $addInternalNoteUseCase = new AddServiceRequestInternalNote(new ServiceRequestInternalNotePDORepository());
+            $addInternalNoteUseCase(
+                $dbeProblem,
+                $userID ? $userID : USER_SYSTEM,
+                $_SESSION[$sessionKey]['internalNotes']
+            );
+        }
         $this->setProblemRaise($dbeProblem, $dsCallActivity);
         if ($_SESSION[$sessionKey]['monitorSRFlag'] === 'Y') {
             $this->toggleMonitoringFlag($dbeProblem->getPKValue());
