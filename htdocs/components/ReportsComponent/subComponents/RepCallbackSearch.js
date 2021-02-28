@@ -94,7 +94,7 @@ export default class RepCallbackSearch extends MainComponent {
                 label: "",
                 hdToolTip: " ",
                 hdClassName: "text-center",
-                icon: "fal fa-2x fa-signal color-gray2 pointer",
+                icon: "fal fa-2x fa-monitor-heart-rate color-gray2 pointer",
                 sortable: true,
                 content:(callback)=>
                 <div className="flex-row" style={{justifyContent:"center"}}>              
