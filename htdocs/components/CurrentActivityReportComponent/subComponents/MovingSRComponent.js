@@ -91,7 +91,7 @@ class MovingSRComponent extends MainComponent {
                 </select>
             </div>
             <div className="form-group">
-                <label>Reason for changing this SR priority</label>
+                <label>Reason for changing this SR priority (this will be sent to the customer)"</label>
                 <CNCCKEditor value={changeQueuData.priorityTemplateText} type="inline"  style={{border:"1px solid white",minHeight:50}} onChange={(text)=>this.setChangeQueueData("priorityTemplateText",text)}></CNCCKEditor>
             </div>
         </div>

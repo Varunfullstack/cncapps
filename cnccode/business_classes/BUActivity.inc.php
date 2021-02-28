@@ -806,7 +806,9 @@ class BUActivity extends Business
             );
             $dbeProblem->updateRow();
             $message = "{$this->dbeUser->getValue(DBEUser::name)} Escalated from {$this->workQueueDescriptionArray[$oldQueueNo]} to {$this->workQueueDescriptionArray[$newQueueNo]}";
-            if ($dbeProblem->getValue(DBEProblem::status) == 'P') {
+            //if ($dbeProblem->getValue(DBEProblem::status) == 'P') 
+            if($reason!='')
+            {
                 $message .= " because of {$reason}";
             }
             $message .= ".";
