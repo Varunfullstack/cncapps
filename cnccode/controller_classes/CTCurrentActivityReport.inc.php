@@ -41,6 +41,8 @@ class CTCurrentActivityReport extends CTCNC
     var $loggedInUserIsSdManager;
     var $customerFilterList;
     const CONST_CALLBACK='callback';
+    const CONST_CALLBACK_SEARCH='callbackSearch';
+
     /**
      * @var BUCustomerItem
      */
@@ -145,8 +147,17 @@ class CTCurrentActivityReport extends CTCNC
                     case 'GET':
                         echo json_encode($this->getMyCallback());
                         break; 
+                    case 'DELETE':
+                        echo json_encode($this->cancelCallBack());
+                        break; 
+                    case 'PUT':
+                        echo json_encode($this->updateCallbackStatus());
+                        break; 
                 }
                 exit;
+            case self::CONST_CALLBACK_SEARCH:
+                echo json_encode($this->callBackSearch());
+                break; 
             default:
                 $this->setTemplate();
                 break;
@@ -581,6 +592,10 @@ class CTCurrentActivityReport extends CTCNC
         // exit;
         if(empty($problemID)||empty($customerID))
             return $this->getResponseError(400,"Missing data");
+        $dbeContact=new DBEContact($this);
+        $dbeContact->getRow($contactID);
+        $contactName=$dbeContact->getValue(DBEContact::firstName)." ".$dbeContact->getValue(DBEContact::lastName);
+        $callDateTime=new DateTime($callback_datetime);
         $dbeCallback=new DBECallback($this);
         $dbeCallback->setValue(DBECallback::problemID,$problemID);
         $dbeCallback->setValue(DBECallback::callActivityID,$callActivityID);
@@ -589,22 +604,142 @@ class CTCurrentActivityReport extends CTCNC
         $dbeCallback->setValue(DBECallback::callback_datetime,$callback_datetime);
         $dbeCallback->setValue(DBECallback::consID,$this->dbeUser->getPKValue());
         $dbeCallback->setValue(DBECallback::createAt,date('Y-m-d H:i:s'));
-        $dbeCallback->setValue(DBECallback::is_callback,0);
+        $dbeCallback->setValue(DBECallback::status,CallBackStatus::AWAITING);
         $dbeCallback->insertRow();
+        // add activity
+        $dbeCallActivity = new DBECallActivity($this);
+        $dbeCallActivity->setValue(DBECallActivity::callActTypeID, 11);
+        $dbeCallActivity->setValue(DBECallActivity::contactID, $contactID);
+        $dbeCallActivity->setValue(DBECallActivity::userID, $this->dbeUser->getPKValue());
+        $dbeCallActivity->setValue(DBECallActivity::date, date('Y-m-d'));
+        $dbeCallActivity->setValue(DBECallActivity::startTime, date('H:i'));
+        $endTime = new DateTime();
+        $endTime->add(new DateInterval('PT1M'));
+        $dbeCallActivity->setValue(DBECallActivity::endTime, $endTime->format('H:i'));
+        $dbeCallActivity->setValue(DBECallActivity::reason, $contactName . ' called in regarding this update');
+        $dbeCallActivity->setValue(DBECallActivity::cncNextAction,"Please call $contactName at ".$callDateTime->format('Y-m-d')." at ".$callDateTime->format('H:i'));
+        $dbeCallActivity->setValue(DBECallActivity::awaitingCustomerResponseFlag, "N");        
+        $dbeCallActivity->setValue(DBECallActivity::problemID,  $problemID);
+        $dbeCallActivity->insertRow();    
+
         return ["status"=>true];              
     }
     public function getMyCallback(){
-        $query="SELECT cb.id, cb.consID,cb.problemID,cb.callActivityID,cb.contactID,cb.DESCRIPTION,cb.callback_datetime,cb.is_callback,cb.createAt,
+        $query="SELECT cb.id, cb.consID,cb.problemID,cb.callActivityID,cb.contactID,cb.DESCRIPTION,cb.callback_datetime,cb.createAt,
                     concat(c.con_first_name,' ',c.con_last_name) contactName,
                     cus_name customerName,
-                    TIMESTAMPDIFF(MINUTE,NOW(),cb.callback_datetime) timeRemain
+                    TIMESTAMPDIFF(MINUTE,NOW(),cb.callback_datetime) timeRemain,
+                    cb.status
                 FROM contact_callback cb
                 JOIN  `problem` p ON cb.problemID=p.`pro_problemno`
                 JOIN contact c on c.con_contno =cb.contactID
                 JOIN customer cu on cu.cus_custno = p.pro_custno
                 WHERE p.`pro_consno`=:consID
+                and cb.status='awaiting'
                 order by timeRemain asc
                 ";
         return DBConnect::fetchAll($query,["consID"=>$this->dbeUser->getPKValue()]);
+    }
+
+    public function updateCallbackStatus(){
+        try {
+            $id = @$_REQUEST['id'];
+            $status = @$_REQUEST['status'];
+
+            if (!isset($id) || !isset($status))
+                return ['status' => false, 'error' => "Missing data"];
+
+            $dbeCallBack = new DBECallback($this);
+            $dbeCallBack->getRow($id);
+            $dbeCallBack->setValue(DBECallback::status, $status);
+            $dbeCallBack->updateRow();
+            $contactID = $dbeCallBack->getValue(DBECallback::contactID);
+            $problemID = $dbeCallBack->getValue(DBECallback::problemID);
+            $dbeContact = new DBEContact($this);
+            $dbeContact->getRow($contactID);
+            $contactName = $dbeContact->getValue(DBEContact::firstName) . " " . $dbeContact->getValue(DBEContact::lastName);
+
+            // add activity
+            $dbeCallActivity = new DBECallActivity($this);
+            $dbeCallActivity->setValue(DBECallActivity::callActTypeID, 11);
+            $dbeCallActivity->setValue(DBECallActivity::contactID, $contactID);
+            $dbeCallActivity->setValue(DBECallActivity::userID, $this->dbeUser->getPKValue());
+            $dbeCallActivity->setValue(DBECallActivity::date, date('Y-m-d'));
+            $dbeCallActivity->setValue(DBECallActivity::startTime, date('H:i'));
+            $endTime = new DateTime();
+            $dbeCallActivity->setValue(DBECallActivity::endTime, $endTime->format('H:i'));
+            $dbeCallActivity->setValue(DBECallActivity::reason, $contactName . ' called in regarding this update');
+            //$dbeCallActivity->setValue(DBECallActivity::cncNextAction,"Please call $contactName at ".$callDateTime->format('Y-m-d')." at ".$callDateTime->format('H:i'));
+            $dbeCallActivity->setValue(DBECallActivity::awaitingCustomerResponseFlag, "N");
+            $dbeCallActivity->setValue(DBECallActivity::problemID,  $problemID);
+            $dbeCallActivity->insertRow();
+            return ['status' => true];
+        } catch (Exception $ex) {
+            return ['status' => false, 'error' => $ex->getMessage()];
+        }
+
+    }
+
+    public function cancelCallBack(){
+        try {            
+             
+            $id= $_REQUEST['id'];
+            $reason= $_REQUEST['reason'];
+
+            if(!isset($id)||!isset($reason))
+                return ['status' => false,'error'=>"Missing data"];
+            $dbeCallBack = new DBECallback($this);
+            $dbeCallBack->getRow($id);
+        
+
+            $staffName = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(DBEUser::lastName);
+            $dbeCallActivity = new DBECallActivity($this);
+            $dbeCallActivity->setValue(DBECallActivity::callActTypeID, 11);
+            $dbeCallActivity->setValue(DBECallActivity::contactID, $dbeCallBack->getValue(DBECallback::contactID));
+            $dbeCallActivity->setValue(DBECallActivity::userID, $this->dbeUser->getPKValue());
+            $dbeCallActivity->setValue(DBECallActivity::date, date('Y-m-d'));
+            $dbeCallActivity->setValue(DBECallActivity::startTime, date('H:i'));
+            $endTime = new DateTime();
+            $dbeCallActivity->setValue(DBECallActivity::endTime, $endTime->format('H:i'));
+            $dbeCallActivity->setValue(DBECallActivity::reason, $staffName . ' cancelled this call back for the following reason: ' . $reason);
+            $dbeCallActivity->setValue(DBECallActivity::awaitingCustomerResponseFlag, "N");
+            $dbeCallActivity->setValue(DBECallActivity::hideFromCustomerFlag, "Y");
+            $dbeCallActivity->setValue(DBECallActivity::problemID,  $dbeCallBack->getValue(DBECallback::problemID));
+            $dbeCallActivity->insertRow();            
+            // update call back to be cancelled
+            
+            $dbeCallBack->setValue(DBECallback::status, CallBackStatus::CANCELED);
+            $dbeCallBack->updateRow();
+            return ['status' => true];
+        } catch (Exception $ex) {
+            return ['status' => false,'error'=>$ex->getMessage()];
+        }
+    }
+    public function callBackSearch(){
+      
+        $consID=$this->getParamOrNull('consID');
+        $customerID=$this->getParamOrNull('customerID');
+        $from=$this->getParamOrNull('from');
+        $to=$this->getParamOrNull('to');
+        $status=$this->getParamOrNull('status');         
+        $query="SELECT cb.id, cb.consID,cb.problemID,cb.callActivityID,cb.contactID,cb.DESCRIPTION,cb.callback_datetime,cb.createAt,
+        concat(c.con_first_name,' ',c.con_last_name) contactName,
+        cus_name customerName,
+        TIMESTAMPDIFF(MINUTE,NOW(),cb.callback_datetime) timeRemain,
+        cb.status,
+        concat(cons.firstName,' ',cons.lastName) consName
+    FROM contact_callback cb
+        JOIN  `problem` p ON cb.problemID=p.`pro_problemno`
+        JOIN contact c on c.con_contno =cb.contactID
+        JOIN customer cu on cu.cus_custno = p.pro_custno
+        JOIN consultant cons on cons.cns_consno=p.`pro_consno`
+    WHERE (:consID is null or p.`pro_consno`=:consID)
+        and (:customerID is null or p.`pro_custno`=:customerID)
+        and (:from is null or cb.createAt >=:from)
+        and (:to is null or cb.createAt <=:to)
+        and (:status is null or cb.status =:status)
+        order by timeRemain asc
+        ";
+        return DBConnect::fetchAll($query,["consID"=>$consID,"customerID"=>$customerID,"from"=>$from,"to"=>$to,"status"=>$status]);
     }
 }

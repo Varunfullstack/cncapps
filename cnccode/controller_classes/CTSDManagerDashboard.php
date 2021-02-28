@@ -10,8 +10,8 @@ require_once($cfg["path_dbe"] . "/DBConnect.php");
 
 class CTSDManagerDashboard extends CTCurrentActivityReport
 {
-    const DAILY_STATS_SUMMARY = "dailyStatsSummary";
-
+    const DAILY_STATS_SUMMARY           = "dailyStatsSummary";
+    const CONST_MISSED_CALL_BACK        = "missedCallBack";
     function __construct($requestMethod,
                          $postVars,
                          $getVars,
@@ -67,6 +67,9 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
                 exit;
             case self::DAILY_STATS_SUMMARY:
                 echo json_encode($this->getDailyStatsSummary(), JSON_NUMERIC_CHECK);
+                exit;
+            case self::CONST_MISSED_CALL_BACK:
+                echo json_encode($this->missedCallBack(), JSON_NUMERIC_CHECK);
                 exit;
             case "react":
             default:
@@ -448,5 +451,37 @@ WHERE pro_custno <> 282
             ' ',
             $string
         );
+    }
+    function missedCallBack(){
+        $query="SELECT cb.id, cb.consID,cb.problemID,cb.callActivityID,cb.contactID,cb.DESCRIPTION,cb.callback_datetime,cb.createAt,
+        concat(c.con_first_name,' ',c.con_last_name) contactName,
+        cus_name customerName,
+        TIMESTAMPDIFF(MINUTE,NOW(),cb.callback_datetime) timeRemain,
+        cb.status,
+        concat(cons.firstName,' ',cons.lastName) consName
+    FROM contact_callback cb
+        JOIN  `problem` p ON cb.problemID=p.`pro_problemno`
+        JOIN contact c on c.con_contno =cb.contactID
+        JOIN customer cu on cu.cus_custno = p.pro_custno
+        JOIN consultant cons on cons.cns_consno=p.`pro_consno`
+    WHERE cb.status=:status 
+    AND TIMESTAMPDIFF(HOUR,NOW(),cb.callback_datetime) >48 ";      
+    
+        if ($_REQUEST['hd']=='false') {
+            $query .= ' and pro_queue_no <> 1 ';
+        }
+        if ($_REQUEST['es']=='false') {
+            $query .= ' and pro_queue_no <> 2 ';
+        }
+        if ($_REQUEST['sp']=='false') {
+            $query .= ' and pro_queue_no <> 3 ';
+        }
+        if ($_REQUEST['p']=='false') {
+            $query .= ' and pro_queue_no <> 5 ';
+        }
+        $limit = $_REQUEST['limit'];
+        $query .=" order by timeRemain asc limit ".$limit;
+
+        return DBConnect::fetchAll( $query,["status"=>CallBackStatus::AWAITING]);
     }
 }

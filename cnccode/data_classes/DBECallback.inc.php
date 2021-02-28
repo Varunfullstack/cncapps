@@ -4,7 +4,12 @@
 * @access public
 */
 require_once($cfg["path_gc"] . "/DBEntity.inc.php");
-
+class CallBackStatus
+{
+    const AWAITING='awaiting';
+    const CONTACTED='contacted';
+    const CANCELED='canceled';
+}
 class DBECallback extends DBEntity
 {
     const id                = "id";
@@ -14,7 +19,7 @@ class DBECallback extends DBEntity
     const contactID         ='contactID';    
     const description       ='description';
     const callback_datetime ='callback_datetime';
-    const is_callback       ='is_callback';
+    const status       ='status';
     const createAt          ='createAt';
     
     /**
@@ -65,8 +70,8 @@ class DBECallback extends DBEntity
             DA_NOT_NULL
         );        
         $this->addColumn(
-            self::is_callback,
-            DA_BOOLEAN,
+            self::status,
+            DA_STRING,
             DA_NOT_NULL
         );
         $this->addColumn(
