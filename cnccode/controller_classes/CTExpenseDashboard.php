@@ -1285,7 +1285,10 @@ WHERE
     function displayReport()
     {
 
-        $dbeHeader=new DBEHeader($this);
+        $buHeader  = new BUHeader($this);
+        $dbeHeader = new DataSet($this);
+        $buHeader->getHeader($dbeHeader);
+        
         $expensesNextProcessingDate=$dbeHeader->getValue(DBEHeader::expensesNextProcessingDate);
         if(!empty($expensesNextProcessingDate))
         {
