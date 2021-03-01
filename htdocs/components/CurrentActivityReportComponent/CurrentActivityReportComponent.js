@@ -758,7 +758,8 @@ class CurrentActivityReportComponent extends MainComponent {
                     requestAdditionalTime,
                     getAllocatedElement,
                     getFollowOnElement,
-                    getCustomerOpenSR
+                    getCustomerOpenSR,
+                    onCallBack
                 })
                 : null,
         ]);
