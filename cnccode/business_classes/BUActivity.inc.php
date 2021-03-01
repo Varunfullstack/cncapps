@@ -4485,6 +4485,7 @@ class BUActivity extends Business
         $reason          = 'Top-up - Invoice No ' . $invoiceID;
         $callActivityID  = $this->createActivityFromCustomerID(
             $customerID,
+            "PrePay Top Up",
             false,
             'C'
         );
@@ -4536,6 +4537,7 @@ class BUActivity extends Business
     }
 
     function createActivityFromCustomerID($customerID,
+                                          $emailSubjectSummary,
                                           $userID = false,
                                           $problemStatus = 'I',
                                           $contractCustomerItemID = false
@@ -4564,6 +4566,7 @@ class BUActivity extends Business
             DBEJProblem::customerID,
             $customerID
         );
+        $dbeProblem->setValue(DBEProblem::emailSubjectSummary, $emailSubjectSummary);
         $dbeProblem->setValue(
             DBEJProblem::status,
             $problemStatus
@@ -5525,6 +5528,7 @@ class BUActivity extends Business
             $reason          = 'Prepay Adjustment';
             $callActivityID  = $this->createActivityFromCustomerID(
                 $customerID,
+                "PrePay Adjustment",
                 false,
                 'C',
                 $dbeCustomerItem->getValue(DBECustomerItem::customerItemID)
@@ -8708,6 +8712,7 @@ FROM
             $dbeContact->getValue(DBEContact::contactID)
         );
         $dbeProblem       = new DBEProblem($this);
+        $dbeProblem->setValue(DBEProblem::emailSubjectSummary, "Webroot Customer Not Matched");
         /* create new issue */
         $dbeProblem->setValue(
             DBEProblem::slaResponseHours,
@@ -8851,6 +8856,7 @@ FROM
                 DBEProblem::slaResponseHours,
                 $slaResponseHours
             );
+            $dbeProblem->setValue(DBEProblem::emailSubjectSummary, "M365 Backup Alert");
             $dbeProblem->setValue(
                 DBEProblem::customerID,
                 $customerID
@@ -9040,7 +9046,7 @@ FROM
             $details,
             $serverName,
             $serverCustomerItemID,
-            BUProblemRaiseType::ALERTID
+            $isReplication
         );
     }
 
@@ -9059,7 +9065,7 @@ FROM
                                 $details,
                                 $serverName,
                                 $serverCustomerItemID,
-                                $raiseTypeId = null
+                                $isReplication
     )
     {
         $priority   = 2;
@@ -9095,6 +9101,11 @@ FROM
                 DBEProblem::customerID,
                 $customerID
             );
+            $emailSubjectSummary = "OBRS Backup alert for {$serverName}";
+            if ($isReplication) {
+                $emailSubjectSummary = "OBRS Replication alert for {$serverName}";
+            }
+            $dbeProblem->setValue(DBEProblem::emailSubjectSummary, $emailSubjectSummary);
             $dbeProblem->setValue(
                 DBEProblem::status,
                 'I'
@@ -9144,10 +9155,10 @@ FROM
             $dbeProblem->setValue(
                 DBEProblem::userID,
                 null
-            );        // not allocated
-            if ($raiseTypeId != null) $dbeProblem->setValue(
+            );
+            $dbeProblem->setValue(
                 DBEProblem::raiseTypeId,
-                $raiseTypeId
+                BUProblemRaiseType::ALERTID
             );
             $dbeProblem->insertRow();
             $problemID = $dbeProblem->getPKValue();
@@ -9247,7 +9258,7 @@ FROM
             $details,
             $serverName,
             $serverCustomerItemID,
-            BUProblemRaiseType::ALERTID
+            $isReplication
         );
     }
 
@@ -9819,6 +9830,7 @@ FROM
             $dbeCustomer->getRow($customerID);
             $dbeContact->getMainSupportRowsByCustomerID($customerID);
             $dbeContact->fetchNext();
+            $dbeProblem->setValue(DBEProblem::emailSubjectSummary, "{$type} Sales Request");
             $dbeProblem->setValue(
                 DBEProblem::hdLimitMinutes,
                 $this->dsHeader->getValue(DBEHeader::hdTeamLimitMinutes)
@@ -10127,6 +10139,7 @@ FROM
             DBEJProblem::customerID,
             $customerID
         );
+        $dbeProblem->setValue(DBEProblem::emailSubjectSummary, "Leased Line Renewal Notification");
         $dbeProblem->setValue(
             DBEJProblem::status,
             $problemStatus
@@ -10351,6 +10364,7 @@ FROM
             $dbeContact->getValue(DBEContact::contactID)
         );
         $dbeProblem       = new DBEProblem($this);
+        $dbeProblem->setValue(DBEProblem::emailSubjectSummary, "Webroot Contract Not Found");
         /* create new issue */
         $dbeProblem->setValue(
             DBEProblem::slaResponseHours,
@@ -10510,6 +10524,10 @@ FROM
             $dbeContact->getValue(DBEContact::contactID)
         );
         $dbeProblem->setValue(
+            DBEProblem::emailSubjectSummary,
+            "Duo Customer Not Matched"
+        );
+        $dbeProblem->setValue(
             DBEProblem::hideFromCustomerFlag,
             'Y'
         );
@@ -10640,6 +10658,7 @@ FROM
             DBEProblem::dateRaised,
             date(DATE_MYSQL_DATETIME)
         );
+        $dbeProblem->setValue(DBEProblem::emailSubjectSummary, "Duo Contract Not Found");
         $dbeProblem->setValue(
             DBEProblem::contactID,
             $dbeContact->getValue(DBEContact::contactID)

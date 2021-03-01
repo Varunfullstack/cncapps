@@ -361,6 +361,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         );
         $dbeProblem       = new DBEProblem($thing);
         $dbeProblem->setValue(DBEProblem::problemID, null);
+        $dbeProblem->setValue(DBEProblem::emailSubjectSummary, "M365 Export Report Error");
         $siteNo = $primaryContact->getValue(DBEContact::siteNo);
         $dbeProblem->setValue(
             DBEProblem::hdLimitMinutes,
@@ -748,6 +749,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $dbeProblem       = new DBEProblem($thing);
         $dbeProblem->setValue(DBEProblem::problemID, null);
         $siteNo = $primaryContact->getValue(DBEContact::siteNo);
+        $dbeProblem->setValue(DBEProblem::emailSubjectSummary, "M365 Export Report Error");
         $dbeProblem->setValue(
             DBEProblem::hdLimitMinutes,
             $dsHeader->getValue(DBEHeader::hdTeamLimitMinutes)
@@ -930,7 +932,9 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $dbeProblem->setValue(
             DBEJProblem::userID,
             null
-        );        // not allocated
+        );
+
+        $dbeProblem->setValue(DBEProblem::emailSubjectSummary, "M365 Export Report Error");
         $dbeProblem->setValue(
             DBEProblem::raiseTypeId,
             BUProblemRaiseType::ALERTID

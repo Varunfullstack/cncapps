@@ -10,6 +10,7 @@ This project changes will be shown here.
 - Issue 1262 - Leased Line Expiry Notifications email changed.
 - Issue 1252 - User time log to exclude weekends
 - Issue 1256 - Show when all linked SR linked to a SO are closed
+- Issue 1263 - Set emailSubjectSummary for system generated requests
 ### Fixed
 - Issue 1269 - Delete Activity icon is missing for some users
 

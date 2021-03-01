@@ -1,5 +1,6 @@
 /vendor
-/.idea
+.idea/*
+htdocs/components/.idea/*
 /stencil/.idea
 node_modules/
 sessions/*
