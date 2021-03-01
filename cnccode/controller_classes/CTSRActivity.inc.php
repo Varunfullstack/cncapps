@@ -10,7 +10,6 @@ use CNCLTD\ServiceRequestInternalNote\infra\ServiceRequestInternalNotePDOReposit
 use CNCLTD\ServiceRequestInternalNote\ServiceRequestInternalNote;
 use CNCLTD\ServiceRequestInternalNote\ServiceRequestInternalNotePDOMapper;
 use CNCLTD\ServiceRequestInternalNote\UseCases\AddServiceRequestInternalNote;
-use CNCLTD\ServiceRequestInternalNote\UseCases\ChangeServiceRequestInternalNote;
 
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBECallActivity.inc.php');
@@ -63,6 +62,7 @@ class CTSRActivity extends CTCNC
     const GET_NOT_ATTEMPT_FIRST_TIME_FIX                         = "getNotAttemptFirstTimeFix";
     const ADD_INTERNAL_NOTE                                      = "addInternalNote";
     const CHANGE_SERVICE_REQUEST_INTERNAL_NOTE                   = "changeServiceRequestInternalNote";
+    const SAVE_TASK_LIST                                         = "saveTaskList";
     public  $serverGuardArray = array(
         ""  => "Please select",
         "Y" => "ServerGuard Related",
@@ -153,9 +153,6 @@ class CTSRActivity extends CTCNC
             case self::ADD_INTERNAL_NOTE:
                 echo json_encode($this->addInternalNoteController());
                 exit;
-            case self::CHANGE_SERVICE_REQUEST_INTERNAL_NOTE:
-                echo json_encode($this->changeServiceRequestInternalNoteController());
-                exit;
             case self::GET_DOCUMENTS:
                 echo json_encode($this->getActivityDocuments($_REQUEST["callActivityID"], $_REQUEST["problemID"]));
                 exit;
@@ -221,6 +218,8 @@ class CTSRActivity extends CTCNC
             case self::GET_NOT_ATTEMPT_FIRST_TIME_FIX:
                 echo json_encode($this->getNotAttemptFirstTimeFix());
                 exit;
+            case self::SAVE_TASK_LIST:
+                echo json_encode($this->saveTaskListController());
             default:
                 $this->setTemplate();
                 break;
@@ -325,6 +324,13 @@ class CTSRActivity extends CTCNC
                 return -1;
             }
         );
+        $taskListUpdatedByUserId = $dbeProblem->getValue(DBEProblem::taskListUpdatedBy);
+        if (!key_exists($taskListUpdatedByUserId, $consultants)) {
+            $dbeUser = new DBEUser($this);
+            $dbeUser->getRow($taskListUpdatedByUserId);
+            $consultants[$taskListUpdatedByUserId] = "{$dbeUser->getValue(DBEUser::firstName)} {$dbeUser->getValue(DBEUser::lastName)}";
+        }
+        $taskListUpdatedBy = $consultants[$taskListUpdatedByUserId];
         return [
             "callActivityID"                  => $callActivityID,
             "problemID"                       => $problemID,
@@ -442,6 +448,9 @@ class CTSRActivity extends CTCNC
             "isOnSiteActivity"                => $dbeActivityType->getValue(DBECallActType::onSiteFlag) == 'Y',
             "openHours"                       => $dbeProblem->getValue(DBEProblem::openHours),
             "workingHours"                    => $dbeProblem->getValue(DBEProblem::workingHours),
+            "taskList"                        => $dbeProblem->getValue(DBEProblem::taskList),
+            "taskListUpdatedAt"               => $dbeProblem->getValue(DBEProblem::taskListUpdatedAt),
+            "taskListUpdatedBy"               => $taskListUpdatedBy
         ];
     }
 
@@ -1537,7 +1546,7 @@ FROM
         return ["status" => "ok"];
     }
 
-    private function changeServiceRequestInternalNoteController(): array
+    private function saveTaskListController()
     {
         $data             = $this->getJSONData();
         $serviceRequestId = @$data['serviceRequestId'];
@@ -1552,12 +1561,10 @@ FROM
         if (!$dbeProblem->getRow($serviceRequestId)) {
             throw new JsonHttpException(123, "Service Request Not Found!");
         }
-        $usecase = new ChangeServiceRequestInternalNote($this->serviceRequestInternalNoteRepository);
-        try {
-            $usecase->__invoke($serviceRequestId, $content, $this->getDbeUser());
-        } catch (Exception $exception) {
-            throw new JsonHttpException(123, $exception->getMessage());
-        }
+        $dbeProblem->setValue(DBEProblem::taskList, $content);
+        $dbeProblem->setValue(DBEProblem::taskListUpdatedAt, (new DateTimeImmutable())->format(DATE_MYSQL_DATETIME));
+        $dbeProblem->setValue(DBEProblem::taskListUpdatedBy, $this->userID);
+        $dbeProblem->updateRow();
         return ["status" => "ok"];
     }
 }

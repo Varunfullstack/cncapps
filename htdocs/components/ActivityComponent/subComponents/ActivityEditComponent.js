@@ -24,6 +24,7 @@ import {LinkServiceRequestOrder} from "./LinkserviceRequestOrder.js";
 import {ActivityType} from "../../shared/ActivityTypes";
 import {InternalNotesListComponent} from "../../shared/InternalNotesListComponent/InternalNotesListComponent";
 import AddInternalNoteModalComponent from "../../Modals/AddInternalNoteModalComponent";
+import EditTaskListModalComponent from "../../Modals/EditTaskListModalComponent";
 
 // noinspection EqualityComparisonWithCoercionJS
 const hiddenAndCustomerNoteAlertMessage = `Customer note must be empty when the activity or entire SR is hidden.`;
@@ -49,6 +50,8 @@ class ActivityEditComponent extends MainComponent {
             ...this.state,
             addInternalNoteModalShow: false,
             internalNoteEdit: '',
+            taskListEdit: '',
+            taskListEditModalShow: false,
             customerContactActivityDurationThresholdValue: null,
             remoteSupportActivityDurationThresholdValue: null,
             activityDurationWarned: false,
@@ -1627,18 +1630,45 @@ class ActivityEditComponent extends MainComponent {
         );
     }
 
+    editTaskList = () => {
+        const {data} = this.state;
+        this.setState({
+            taskListEditModalShow: true,
+            taskListEdit: data?.taskList,
+        })
+    }
+
+    hideTaskListModal() {
+        this.setState({
+            taskListEditModalShow: false,
+            taskListEdit: '',
+        })
+    }
+
+    async updateTaskList(value) {
+        const {data, currentActivity} = this.state;
+        try {
+            const response = await fetch('?action=saveTaskList', {
+                method: 'POST',
+                body: JSON.stringify(
+                    {content: value, serviceRequestId: data.problemID}
+                )
+            });
+            const res = await response.json();
+            if (!res.status === 'ok') {
+                throw new Error('Failed to save task list');
+            }
+            this.loadCallActivity(currentActivity);
+        } catch (error) {
+            console.error(error);
+            alert(error);
+        }
+        this.hideTaskListModal();
+    }
 
     addInternalNote = () => {
         this.setState({
             addInternalNoteModalShow: true,
-        });
-    }
-
-    editInternalNote = () => {
-        const {data} = this.state;
-        this.setState({
-            addInternalNoteModalShow: true,
-            internalNoteEdit: data?.internalNotes[0].content
         });
     }
 
@@ -1666,16 +1696,42 @@ class ActivityEditComponent extends MainComponent {
 
                 <div className="internalNotesActions">
                     <button onClick={this.addInternalNote}>Add</button>
-                    {
-                        data?.internalNotes && data.internalNotes.length === 1 ?
-                            <button onClick={this.editInternalNote}>Edit</button>
-                            :
-                            ''
-                    }
                 </div>
 
                 <div className="internalNotesContainer">
                     <InternalNotesListComponent internalNotes={data?.internalNotes}/>
+                </div>
+            </div>
+        );
+    }
+
+    getTaskList() {
+        const {data} = this.state;
+
+        return (
+            <div className="round-container">
+                <div className="flex-row">
+                    <label className="label mt-5 mr-3 ml-1 mb-5"
+                           style={{display: "block"}}
+                    >
+                        Task List
+                    </label>
+                    <ToolTip
+                        width="15"
+                        title="These are the tasks associated with the Service Request. These are per Service Request."
+                        content={
+                            <i className="fal fa-info-circle mt-5 pointer icon"/>
+                        }
+                    >
+                    </ToolTip>
+                </div>
+
+                <div className="internalNotesActions">
+                    <button onClick={this.editTaskList}>Edit</button>
+                </div>
+
+                <div className="internalNotesContainer">
+                    <div dangerouslySetInnerHTML={{__html: data?.taskList}}/>
                 </div>
             </div>
         );
@@ -1777,34 +1833,8 @@ class ActivityEditComponent extends MainComponent {
         this.hideNewInternalNoteModal();
     }
 
-    async updateInternalNote(value) {
-        const {data, currentActivity} = this.state;
-        try {
-            const response = await fetch('?action=changeServiceRequestInternalNote', {
-                method: 'POST',
-                body: JSON.stringify(
-                    {content: value, serviceRequestId: data.problemID}
-                )
-            });
-            const res = await response.json();
-            if (!res.status === 'ok') {
-                throw new Error('Failed to save internal note');
-            }
-            this.loadCallActivity(currentActivity);
-        } catch (error) {
-            console.error(error);
-            alert(error);
-        }
-        this.hideNewInternalNoteModal();
-    }
-
     saveInternalNote = async (value) => {
-        const {internalNoteEdit} = this.state;
-
-        if (!internalNoteEdit) {
-            return this.saveNewInternalNote(value)
-        }
-        return this.updateInternalNote(value);
+        return this.saveNewInternalNote(value)
     }
 
     getAddInternalNoteModalComponent = () => {
@@ -1815,6 +1845,17 @@ class ActivityEditComponent extends MainComponent {
                 show={addInternalNoteModalShow}
                 onChange={this.saveInternalNote}
                 onCancel={this.hideNewInternalNoteModal}
+            />
+        )
+    }
+    getEditTaskListModalComponent = () => {
+        const {taskListEditModalShow, taskListEdit} = this.state;
+        return (
+            <EditTaskListModalComponent
+                value={taskListEdit}
+                show={taskListEditModalShow}
+                onChange={this.updateTaskList}
+                onCancel={this.hideTaskListModal}
             />
         )
     }
@@ -1888,6 +1929,7 @@ class ActivityEditComponent extends MainComponent {
                 {this.getPrompt()}
                 {this.getPriorityChangeReason()}
                 {this.getAddInternalNoteModalComponent()}
+                {this.getEditTaskListModalComponent()}
                 {this.getProjectsElement()}
                 <ActivityHeaderComponent serviceRequestData={data}/>
                 <div className="activities-edit-container">
@@ -1900,6 +1942,7 @@ class ActivityEditComponent extends MainComponent {
                 {this.getActivityNotes()}
                 {this.getCustomerNotes()}
                 {this.getActivityInternalNotes()}
+                {this.getTaskList()}
                 <CustomerDocumentUploader
                     onDeleteDocument={(id) => this.deleteDocument(id)}
                     onFilesUploaded={() => this.handleUpload()}

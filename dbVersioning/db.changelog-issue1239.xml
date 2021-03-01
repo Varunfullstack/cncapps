@@ -60,6 +60,55 @@
     </changeSet>
     <changeSet id="issue1239-3" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="problem" columnName="taskList"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="problem">
+            <column name="taskList" type="longtext">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue1239-4" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="problem" columnName="taskListUpdatedAt"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="problem">
+            <column name="taskListUpdatedAt" type="dateTime" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue1239-5" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="problem" columnName="taskListUpdatedBy"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="problem">
+            <column name="taskListUpdatedBy" type="int(11)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue1239-6" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="problem" columnName="taskListUpdatedBy"/>
+            <columnExists tableName="problem" columnName="taskList"/>
+            <columnExists tableName="problem" columnName="taskListUpdatedAt"/>
+        </preConditions>
+        <sql>
+            update problem
+            set taskList          = pro_internal_notes,
+                taskListUpdatedAt = pro_date_raised,
+                taskListUpdatedBy = 67
+        </sql>
+    </changeSet>
+    <changeSet id="issue1239-7" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
             <columnExists tableName="problem" columnName="pro_internal_notes"/>
         </preConditions>
         <dropColumn tableName="problem" columnName="pro_internal_notes"/>
@@ -69,7 +118,7 @@
             </addColumn>
         </rollback>
     </changeSet>
-    <changeSet id="issue1239-4" author="pavwebdev">
+    <changeSet id="issue1239-8" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="callactivity" columnName="internalNotes"/>
         </preConditions>
@@ -79,9 +128,6 @@
             <addColumn tableName="callactivity">
                 <column name="internalNotes" type="MEDIUMTEXT"/>
             </addColumn>
-            <createIndex indexName="internalNotes_full" tableName="callactivity">
-                <column name="internalNotes"/>
-            </createIndex>
         </rollback>
     </changeSet>
 </databaseChangeLog>
