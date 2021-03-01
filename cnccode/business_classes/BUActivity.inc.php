@@ -2887,9 +2887,7 @@ class BUActivity extends Business
             'page',
             'ServiceTimeAllocatedEmail.inc.html'
         );
-        $urlDisplayActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJLastCallActivity->getValue(
-                DBEJCallActivity::callActivityID
-            );
+        $urlDisplayActivity = 'http://' . $_SERVER ['HTTP_HOST'] . "/SRActivity.php?action=displayActivity&serviceRequestId={$problemID}";
         $userName           = $dbeUser->getValue(DBEUser::firstName) . ' ' . $dbeUser->getValue(DBEUser::lastName);
         $template->setVar(
             array(

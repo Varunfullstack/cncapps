@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 1250 - Additional Time Emails has wrong activity data
+
 ## [v5.5.5] - 2021-02-19
 ### Changed
 - Improved readability of the "To Be Logged" requests that's created when the customer doesn't have a Primary Contact.
