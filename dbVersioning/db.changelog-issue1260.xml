@@ -48,10 +48,7 @@
             </column>
             <column name="callback_datetime" type="DATETIME">
                 <constraints nullable="true"/>
-            </column>     
-            <column name="is_callback" type="tinyint(1)" defaultValue="0" >
-                <constraints nullable="true"/>
-            </column>            
+            </column>             
             <column name="createAt" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP" >
                 <constraints nullable="true"/>
             </column>
@@ -64,14 +61,13 @@
         <preConditions onFail="MARK_RAN">             
                 <tableExists tableName="contact_callback" />                        
         </preConditions>
-        <dropColumn tableName="contact_callback" columnName="is_callback"/>
         <addColumn tableName="contact_callback">
             <column name="status" type="ENUM('awaiting', 'contacted', 'canceled')" defaultValue="awaiting">
                 <constraints nullable="false"/>
             </column>
         </addColumn>
         <rollback>
-            <dropColumn tableName="status" columnName="is_callback"/>
+
         </rollback>
     </changeSet>
      <changeSet id="issue1260-3" author="pavwebdevmt">
