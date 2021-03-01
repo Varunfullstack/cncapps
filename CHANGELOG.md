@@ -1,8 +1,5 @@
 # Changelog
 This project changes will be shown here.
-## [unreleased] 
-### Changed
-- Issue 1238 Service Request Display Additional Information
 
 ## [unreleased]
 ### Added
@@ -15,6 +12,7 @@ This project changes will be shown here.
 - Issue 1252 - User time log to exclude weekends
 - Issue 1256 - Show when all linked SR linked to a SO are closed
 - Issue 1263 - Set emailSubjectSummary for system generated requests
+- Issue 1238 Service Request Display Additional Information
 ### Fixed
 - Issue 1269 - Delete Activity icon is missing for some users
 
