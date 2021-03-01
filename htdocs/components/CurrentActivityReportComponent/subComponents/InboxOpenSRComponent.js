@@ -4,6 +4,7 @@ import Table from "./../../shared/table/table";
 import CurrentActivityService from "../services/CurrentActivityService";
 import React from 'react';
 import {ColumnRenderer} from "./ColumnRenderer";
+import ToolTip from "../../shared/ToolTip";
 
 class InboxOpenSRComponent extends React.Component {
     code = "OSR";
