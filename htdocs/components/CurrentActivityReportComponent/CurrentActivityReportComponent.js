@@ -668,6 +668,7 @@ class CurrentActivityReportComponent extends MainComponent {
                     allocateAdditionalTime,
                     requestAdditionalTime,
                     getAllocatedElement,
+                    onCallBack
                 })
                 : null,
 
@@ -684,6 +685,7 @@ class CurrentActivityReportComponent extends MainComponent {
                     allocateAdditionalTime,
                     requestAdditionalTime,
                     getAllocatedElement,
+                    onCallBack
                 })
                 : null,
 
@@ -700,6 +702,7 @@ class CurrentActivityReportComponent extends MainComponent {
                     allocateAdditionalTime,
                     requestAdditionalTime,
                     getAllocatedElement,
+                    onCallBack
                 })
                 : null,
 
@@ -716,6 +719,7 @@ class CurrentActivityReportComponent extends MainComponent {
                     allocateAdditionalTime,
                     requestAdditionalTime,
                     getAllocatedElement,
+                    onCallBack
                 })
                 : null,
 
