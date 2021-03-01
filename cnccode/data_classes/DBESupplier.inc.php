@@ -3,24 +3,22 @@
 * @authors Karim Ahmed
 * @access public
 */
+global $cfg;
 require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBESupplier extends DBEntity
 {
-    const supplierID = "supplierID";
-    const name = "name";
-    const add1 = "add1";
-    const add2 = "add2";
-    const town = "town";
-    const county = "county";
-    const postcode = "postcode";
-    const phone = "phone";
-    const fax = "fax";
-    const webSiteURL = "webSiteURL";
-    const payMethodID = "payMethodID";
-    const creditLimit = "creditLimit";
-    const scopeID = "scopeID";
-    const contactID = "contactID";
+    const supplierID   = "supplierID";
+    const name         = "name";
+    const add1         = "add1";
+    const add2         = "add2";
+    const town         = "town";
+    const county       = "county";
+    const postcode     = "postcode";
+    const phone        = "phone";
+    const fax          = "fax";
+    const webSiteURL   = "webSiteURL";
+    const payMethodID  = "payMethodID";
     const cncAccountNo = "cncAccountNo";
 
     /**
@@ -99,24 +97,6 @@ class DBESupplier extends DBEntity
             DA_ID,
             DA_NOT_NULL,
             "sup_payno"
-        );
-        $this->addColumn(
-            self::creditLimit,
-            DA_STRING,
-            DA_ALLOW_NULL,
-            "sup_credit_limit"
-        );
-        $this->addColumn(
-            self::scopeID,
-            DA_ID,
-            DA_NOT_NULL,
-            "sup_scopeno"
-        );
-        $this->addColumn(
-            self::contactID,
-            DA_ID,
-            DA_NOT_NULL,
-            "sup_contno"
         );
         $this->addColumn(
             self::cncAccountNo,

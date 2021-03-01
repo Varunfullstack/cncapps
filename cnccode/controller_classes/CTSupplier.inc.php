@@ -104,7 +104,7 @@ class CTSupplier extends CTCNC
                 break;
             case self::GET_SUPPLIERS:
                 $this->getSuppliersController();
-                break;
+                exit;
             case CTSUPPLIER_ACT_SUPPLIER_SEARCH_FORM:
             default:
                 $this->checkPermissions(MAINTENANCE_PERMISSION);
@@ -209,17 +209,11 @@ class CTSupplier extends CTCNC
                 'webSiteURL'          => Controller::htmlInputText(
                     $this->dsSupplier->getValue(DBESupplier::webSiteURL)
                 ),
-                'creditLimit'         => Controller::htmlInputText(
-                    $this->dsSupplier->getValue(DBESupplier::creditLimit)
-                ),
-                'creditLimitMessage'  => Controller::htmlDisplayText(
-                    $this->dsSupplier->getMessage(DBESupplier::creditLimit)
-                ),
                 'cncAccountNo'        => Controller::htmlInputText(
                     $this->dsSupplier->getValue(DBESupplier::cncAccountNo)
                 ),
                 'cncAccountNoMessage' => Controller::htmlDisplayText(
-                    $this->dsSupplier->getMessage(DBESupplier::creditLimit)
+                    $this->dsSupplier->getMessage(DBESupplier::cncAccountNo)
                 ),
                 'urlSubmit'           => $urlSubmit
             )
@@ -494,10 +488,7 @@ class CTSupplier extends CTCNC
 
     private function getSuppliersController()
     {
-        $dbeSuppliers = new DBESupplier($this);
-        $dbeSuppliers->getRows();
-
-
-
+        $repo = new \CNCLTD\Exceptions\infra\MySQLSupplierRepository();
+        echo json_encode(["status" => "ok", "data" => $repo->getAllSuppliers()]);
     }
 }
