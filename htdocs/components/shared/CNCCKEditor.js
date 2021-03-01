@@ -1,7 +1,7 @@
 import React from 'react';
 import {getEditorNamespace} from 'ckeditor4-integrations-common';
 import PropTypes from 'prop-types';
-
+//readOnly, type, onBeforeLoad, style, value, disableClipboard
 class CNCCKEditor extends React.Component {
     el = React.createElement;
     onChangeListener = null;

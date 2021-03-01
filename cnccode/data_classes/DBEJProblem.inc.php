@@ -984,7 +984,7 @@ class DBEJProblem extends DBEProblem
      * @return bool
      * @internal param mixed $future TRUE= ONLY return future alarmed requests
      */
-    function getCustomerOpenRows($customerID)
+    function getCustomerOpenRows($customerID,$srNumber=null)
     {
         $sql = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " LEFT JOIN customer ON cus_custno = pro_custno
            LEFT JOIN consultant ON cns_consno = pro_consno
@@ -1007,9 +1007,15 @@ class DBEJProblem extends DBEProblem
             left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
             left join team queueTeam on queueTeam.level = pro_queue_no
         WHERE 1=1";
-        $sql .= " AND pro_custno=$customerID";
+       
         $sql .= " AND pro_status <> 'C' and pro_status <> 'F' ";
+        if($customerID!=null && !empty($customerID))
+          $sql .= " AND pro_custno=$customerID";
+        if($srNumber!=null && !empty($srNumber))
+          $sql .= " AND problem.pro_problemno like '%$srNumber%'";
         $sql .= " ORDER BY pro_alarm_date, pro_alarm_time";
+        // echo   $sql;
+        // exit;
         $this->setQueryString($sql);
         return (parent::getRows());
     }

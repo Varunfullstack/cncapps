@@ -130,7 +130,7 @@ class CTCurrentActivityReport extends CTCNC
                 $this->pendingReopenedDescriptionPopUp();
                 break;
             case 'getCustomerOpenSR':
-                echo json_encode($this->renderQueue(13));
+                echo json_encode($this->renderQueue(self::CUSTOMER_OPEN_SR));
                 exit;
             default:
                 $this->setTemplate();
@@ -146,7 +146,7 @@ class CTCurrentActivityReport extends CTCNC
                 false
             );
         } else if ($queueNo == self::CUSTOMER_OPEN_SR) {
-            $serviceRequests = $this->buActivity->getCustomerOpenSR($_REQUEST["customerID"]);
+            $serviceRequests = $this->buActivity->getCustomerOpenSR($_REQUEST["customerID"],$_REQUEST["srNumber"]);
         } else {
             $serviceRequests = $this->buActivity->getProblemsByQueue($queueNo);
         }

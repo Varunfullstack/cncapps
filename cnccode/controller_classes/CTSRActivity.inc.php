@@ -279,6 +279,21 @@ class CTSRActivity extends CTCNC
         $isNotUserManagerAndActivityHasEndTime = !$isManagerUser && !$dbejCallActivity->getValue(
                 DBEJCallActivity::endTime
             );
+        $requestName ='';
+        $status=$dbeProblem->getValue(DBEProblem::status);
+        if($status=='I' ||$status=='P')
+            {
+                $requestUserID=$dbeProblem->getValue(DBEProblem::userID);
+                if(!empty($requestUserID))
+                {
+                    $requestUser=new DBEUser($this);
+                    $requestUser->getRow($requestUserID);
+                    $requestName =$requestUser->getValue(DBEUser::firstName).' '.substr($requestUser->getValue(DBEUser::lastName),0,1);
+                }
+                else  $requestName ='Unassigned';
+
+            }
+       // $requestName =$dbeProblem->getValue(DBEProblem::userID);
         return [
             "callActivityID"                  => $callActivityID,
             "problemID"                       => $problemID,
@@ -393,6 +408,8 @@ class CTSRActivity extends CTCNC
             "isOnSiteActivity"                => $dbeActivityType->getValue(DBECallActType::onSiteFlag) == 'Y',
             "openHours"                       => $dbeProblem->getValue(DBEProblem::openHours),
             "workingHours"                    => $dbeProblem->getValue(DBEProblem::workingHours),
+            "requestEngineerName"             => $requestName,
+            "emailsubjectsummary"             => $dbeProblem->getValue(DBEProblem::emailSubjectSummary),
         ];
     }
 

@@ -1,5 +1,8 @@
 # Changelog
 This project changes will be shown here.
+## [unreleased] 
+### Changed
+- Issue 1238 Service Request Display Additional Information
 
 ## [unreleased]
 ### Added

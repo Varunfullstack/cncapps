@@ -14,9 +14,16 @@ import InboxOpenSRComponent from './subComponents/InboxOpenSRComponent';
 import {getServiceRequestWorkTitle, sort} from '../utils/utils';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import Modal from '../shared/Modal/modal';
+import CNCCKEditor from '../shared/CNCCKEditor';
+import APIStandardText from '../services/APIStandardText';
 
 import '../style.css';
+import './CurrentActivityReportComponent.css';
 import '../shared/ToolTip.css'
+import APIActivity from '../services/APIActivity';
+import MovingSRComponent from './subComponents/MovingSRComponent';
+
 
 const AUTORELOAD_INTERVAL_TIME = 2 * 60 * 1000;
 
@@ -25,7 +32,8 @@ class CurrentActivityReportComponent extends MainComponent {
     apiCurrentActivityService;
     autoReloadInterval;
     teams;
-
+    apiStandardText = new APIStandardText();
+    apiActivity= new APIActivity();
     constructor(props) {
         super(props);
         const filter = this.getLocalStorageFilter();
@@ -56,6 +64,13 @@ class CurrentActivityReportComponent extends MainComponent {
             _showSpinner: false,
             userFilter: "",
             filter,
+            changeQueuData:{
+                show:false,
+                newTeam:'',
+                queue:'',
+                problem:null
+            }
+           
         };
         this.apiCurrentActivityService = new CurrentActivityService();
         this.teams = [
@@ -297,19 +312,19 @@ class CurrentActivityReportComponent extends MainComponent {
                     break;
                 case "OSR":
                     if (this.state.openSrCustomerID)
-                        this.getCustomerOpenSR(this.state.openSrCustomerID);
+                        this.getCustomerOpenSR(this.state.openSrCustomerID,this.state.srNumber);
                     break;
             }
         }
     };
-    getCustomerOpenSR = (customerID) => {
+    getCustomerOpenSR = (customerID,srNumber) => {
         const {filter} = this.state;
-
-        if (customerID != null) {
+        if (customerID != '' || srNumber !='') {
+            console.log('get sr');
             this.showSpinner();
-            this.setState({openSrCustomerID: customerID})
+            this.setState({openSrCustomerID: customerID,srNumber})
             this.apiCurrentActivityService
-                .getCustomerOpenSR(customerID)
+                .getCustomerOpenSR(customerID,srNumber)
                 .then((res) => {
                     const openSRInbox = this.prepareResult(res);
                     sort(openSRInbox, "queueNo");
@@ -324,25 +339,41 @@ class CurrentActivityReportComponent extends MainComponent {
                 });
         }
     }
+    
+    getAssignTeamModal=()=>{
+        const {changeQueuData} =this.state;
+        if(!changeQueuData.show)
+            return null;
+        else 
+            return <MovingSRComponent
+            key="MovingSR"
+            problem={changeQueuData.problem}
+            queue={changeQueuData.queue}
+            show={changeQueuData.show}
+            newTeam={changeQueuData.newTeam}
+            onClose={this.handleMovingModalClose}
+            ></MovingSRComponent>        
+    }
+    handleMovingModalClose=(reload=true)=>{
+        const {changeQueuData} =this.state;
+        if(reload)
+        this.loadQueue(changeQueuData.queue);
+        changeQueuData.show=false;
+        changeQueuData.newTeam='';
+        changeQueuData.queue='';
+        changeQueuData.problem=null;
+        this.setState({changeQueuData});
+    }
+    
+   
     // Shared methods
     moveToAnotherTeam = async ({target}, problem, code) => {
-        let answer = null;
-        if (problem.status === "P") {
-            answer = await this.prompt(
-                "Please provide a reason for moving this SR into a different queue"
-            );
-            if (!answer) {
-                return;
-            }
-        }
-
-        this.apiCurrentActivityService
-            .changeQueue(problem.problemID, target.value, answer)
-            .then((res) => {
-                if (res && res.status) {
-                    this.loadQueue(code);
-                }
-            });
+        const {changeQueuData} =this.state;
+        changeQueuData.newTeam=target.value;
+        changeQueuData.problem=problem;
+        changeQueuData.show=true;
+        changeQueuData.queue=code;
+        this.setState({changeQueuData});               
     };
     /**
      * Move to another queue
@@ -614,6 +645,7 @@ class CurrentActivityReportComponent extends MainComponent {
             this.getAlert(),
             this.getPrompt(),
             this.getFollowOnElement(),
+            this.getAssignTeamModal(),
             el(Spinner, {key: "spinner", show: _showSpinner}),
             getTabsElement(),
             filter.activeTab !== 'TBL' && filter.activeTab !== "PR" ? getEngineersFilterElement() : null,

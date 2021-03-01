@@ -10,11 +10,19 @@ class InboxOpenSRComponent extends React.Component {
     el = React.createElement;
     apiCurrentActivityService;
     apiCustomer = new APICustomers();
-
+    timeOut;
     constructor(props) {
         super(props);
         this.apiCurrentActivityService = new CurrentActivityService();
-        this.state = {customers: [], data: this.props.data, customer: null}
+        this.state = {
+            customers: [], 
+            data: this.props.data, 
+            customer: null,
+            filter:{
+                srNumber:'',
+                customer:null
+            }
+        }
     }
 
     componentDidMount() {
@@ -206,15 +214,31 @@ class InboxOpenSRComponent extends React.Component {
                 displayColumn: "name",
                 pk: "id",
                 width: 300,
-                onSelect: this.handleOnCustomerSelect,
-            })
+                onSelect:(customer)=>this.setFilter('customer',customer),
+            }),
+            <label style={{marginLeft:30,whiteSpace:"nowrap"}}>SR Number</label>
+            ,
+            el('input',{style:{height:14},className:"form-control", onChange:(event)=>this.setFilter('srNumber',event.target.value)})
         )
     }
-    handleOnCustomerSelect = (customer) => {
-
-        if (customer != null) {
-            this.props.getCustomerOpenSR(customer.id);
-        }
+    setFilter=(field,value)=>{
+        const {filter}=this.state;
+        filter[field]=value;
+        this.setState({filter},()=>{
+            if(field=='srNumber'&&value.length>=4)
+            {
+                //console.log('srNumber');
+                clearTimeout(this.timeOut);
+                this.timeOut=setTimeout(()=>this.handleOnCustomerSelect(),1000);
+            }
+            else if(field=='customer')
+                this.handleOnCustomerSelect()
+        });
+    }
+    handleOnCustomerSelect = () => {
+        const {filter}=this.state;        
+        this.props.getCustomerOpenSR((filter.customer?.id||''),filter.srNumber);
+        
     }
 
     static getDerivedStateFromProps(props, current_state) {

@@ -178,11 +178,30 @@ class ActivityDisplayComponent extends MainComponent {
 
     getActions = () => {
         const {data, currentUser} = this.state;
-
-        return <div
+        return <div>
+            {
+                data?.problemStatus !== "C" &&  data?.problemStatus !== "F"  ? 
+                <div style={{marginBottom:-40}}>
+                    <ToolTip title="SR currently assigned to" width={150}>
+                        <div style={{display:"flex",alignItems:"center"}}>
+                    <i className="fal fa-user-hard-hat fa-2x m-5 pointer icon"></i>
+                    <label>
+                    {
+                        data?.requestEngineerName
+                    }
+                    </label>
+                    </div>
+                    </ToolTip>
+                </div>:null
+            }        
+        <div
             className="activities-container"
             style={{display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center"}}
         >
+            
+                    
+              
+
 
             {
                 data?.problemStatus !== "C" ? <ToolTip
@@ -368,6 +387,7 @@ class ActivityDisplayComponent extends MainComponent {
                     />}
                 />
                 : this.getSpacer()}
+        </div>
         </div>
     }
 
@@ -817,9 +837,10 @@ class ActivityDisplayComponent extends MainComponent {
                         el('td', {className: "display-label"}, "User"),
                         el('td', {colSpan: 3, className: "display-content"}, data?.engineerName),
                     ),
-
+                    
                     el('tr', null,
-                        el('td', {colSpan: 4}),
+                        el('td', {className: "display-label"}, "Summary"),
+                        el('td', {className: "display-content",colSpan:3}, data?.emailsubjectsummary),                        
                         el('td', {className: "display-label"}, "Asset"),
                         el('td', {colSpan: 3, className: "nowrap"}, data?.assetName || (data?.emptyAssetReason) || ''),
                     ),

@@ -76,14 +76,15 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
 
     function getQueue()
     {
-        $queue = $_REQUEST["queue"];
+       
+        $queue = $_REQUEST["queue"] ;
         if (!isset($queue)) return [];
         $buProblem         = new BUActivity($this);
         $isP5              = $_REQUEST["p5"] == "true";
         $showHelpDesk      = $_REQUEST["hd"] == "true";
         $showEscalation    = $_REQUEST["es"] == "true";
         $showSmallProjects = $_REQUEST["sp"] == "true";
-        $showProjects      = $_REQUEST["p"] == "true";
+        $showProjects      = $_REQUEST["p"]  == "true";
         $limit             = $_REQUEST["limit"] ?? 10;
         $code              = 'shortestSLARemaining';
         if ($queue == 9) {
@@ -123,7 +124,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             case 11: //Held for QA
                 $code = 'holdForQA';
                 break;
-        }
+        }        
         return $this->renderQueueJson(
             $buProblem->getSDDashBoardData(
                 $limit,
@@ -222,6 +223,18 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         $raisedStartTodaySummary    = $this->getRaisedAndStartedToday();
         $uniqueCustomerTodaySummary = $this->getUniqueCustomer();
         $breachedSLATodaySummary    = $this->getBreachedSLA();
+        $buProblem         = new BUActivity($this);
+        $nearFixSLABreach= $this->renderQueueJson(
+            $buProblem->getSDDashBoardData(
+                10000,
+                "shortestSLAFixRemaining",
+                false,
+                true,
+                true,
+                true,
+                true
+            )
+        );
         return [
             "prioritySummary"            => $prioritySummary,
             "openSrTeamSummary"          => $openSrTeamSummary,
@@ -232,7 +245,8 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             "reopenTodaySummary"         => $reopenTodaySummary,
             "raisedStartTodaySummary"    => $raisedStartTodaySummary,
             'breachedSLATodaySummary'    => $breachedSLATodaySummary,
-            'uniqueCustomerTodaySummary' => $uniqueCustomerTodaySummary
+            'uniqueCustomerTodaySummary' => $uniqueCustomerTodaySummary,
+            "nearFixSLABreach"           => count($nearFixSLABreach)
         ];
     }
 

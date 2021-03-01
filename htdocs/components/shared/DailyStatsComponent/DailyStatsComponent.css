@@ -10,8 +10,8 @@
 }
 
 .resizable .sd-card {
-    width: calc((100vw - 146px) / 5);
-    height: calc((100vw - 146px) / 5);
+    width: calc((100vw - 146px) / 6);
+    height: calc((100vw - 146px) / 6);
 }
 
 .sd-card td {
@@ -32,12 +32,12 @@
 
 .sd-card-title {
     margin-top: 5px;
-    font-size: 22px;
+    font-size: 20px;
     font-weight: bold;
 }
 
 .resizable .sd-card-title {
-    font-size: 2vw;
+    font-size: 1.5vw;
 }
 
 .total {
