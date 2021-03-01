@@ -4,7 +4,8 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 1244 - Monthly Asset and Mailbox List Export.
-- Issue 1222 - Show Daily SR Stats on KPI Graph. 
+- Issue 1222 - Show Daily SR Stats on KPI Graph.
+- Issue 1255 - Add Expenses Next ProcessingDate ExpenseDashboard.
 ### Changed
 - Issue 1181 - SR Asset list & assignment improvements.
 - Issue 1262 - Leased Line Expiry Notifications email changed.
