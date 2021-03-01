@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 1251 - Prevent Child Item addition until item is saved
+
 ## [v5.5.5] - 2021-02-19
 ### Changed
 - Improved readability of the "To Be Logged" requests that's created when the customer doesn't have a Primary Contact.
