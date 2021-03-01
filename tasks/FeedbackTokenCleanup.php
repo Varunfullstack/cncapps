@@ -22,3 +22,4 @@ if (isset($options['d'])) {
 }
 global $db;
 $query = "delete feedbacktoken from feedbacktoken left join problem on problem.pro_problemno = feedbacktoken.serviceRequestId where problem.pro_problemno is null";
+$db->query($query);
