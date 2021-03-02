@@ -80,7 +80,17 @@ class InboxSalesComponent extends React.Component {
                 ],
             },
             ColumnRenderer.getOnHoldColumn(),
-
+            {
+                hide: false,
+                order: 11.5,
+                path: "contactName",
+                key: 'contactName',
+                label: "",
+                hdToolTip: "Contact",
+                icon: "fal fa-2x fa-id-card-alt color-gray2 ",
+                sortable: false,
+                hdClassName: "text-center",
+            },
             ColumnRenderer.getSLABreachedColumn(),
             {
                 hide: false,

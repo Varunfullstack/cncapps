@@ -85,6 +85,17 @@ class InboxOpenSRComponent extends React.Component {
             },
             {
                 hide: false,
+                order: 11.5,
+                path: "contactName",
+                key: 'contactName',
+                label: "",
+                hdToolTip: "Contact",
+                icon: "fal fa-2x fa-id-card-alt color-gray2 ",
+                sortable: false,
+                hdClassName: "text-center",
+            },
+            {
+                hide: false,
                 order: 6,
                 path: "problemID",
                 label: "",
@@ -223,9 +234,8 @@ class InboxOpenSRComponent extends React.Component {
 
     render() {
         const {getTableElement,} = this;
-        return [
-            getTableElement(),
-        ];
+        return getTableElement();
+
     }
 }
 

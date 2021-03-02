@@ -63,6 +63,17 @@ class InboxEscalationsComponent extends React.Component {
             },
             {
                 hide: false,
+                order: 11.5,
+                path: "contactName",
+                key: 'contactName',
+                label: "",
+                hdToolTip: "Contact",
+                icon: "fal fa-2x fa-id-card-alt color-gray2 ",
+                sortable: false,
+                hdClassName: "text-center",
+            },
+            {
+                hide: false,
                 order: 5,
                 path: null,
                 label: "",
@@ -193,7 +204,7 @@ class InboxEscalationsComponent extends React.Component {
         const {data} = this.props;
         return (
             <Fragment>
-                <ServiceRequestSummary data={data}/>
+                <ServiceRequestSummary key={data.serviceRequestId} data={data}/>
                 {getTableElement()}
             </Fragment>
         )
