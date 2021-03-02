@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1236 - Include contact name on Current SRs and SR summary only.
+
 ## [v5.5.5] - 2021-02-19
 ### Changed
 - Improved readability of the "To Be Logged" requests that's created when the customer doesn't have a Primary Contact.
