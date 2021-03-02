@@ -34,7 +34,7 @@ class LastStepComponent extends MainComponent {
                 hideFromCustomerFlag: data.hideFromCustomerFlag || false,
                 monitorSRFlag: data.monitorSRFlag || false,
                 priority: data.priority || -1,
-                internalNotesAppend: data.internalNotesAppend || "",
+                checkList: data.checkList || "",
                 contactID: data.contactID || -1,
                 startTime: data.startTime || "",
                 date: data.date || "",
@@ -272,10 +272,13 @@ class LastStepComponent extends MainComponent {
     };
     handleCheckListChange = (value) => {
         const {data, checkList} = this.state;
-        const index = checkList.findIndex((c) => c.id == value);
-        if (index > -1) {
-            data.internalNotesAppend = checkList[index].content;
-        } else data.internalNotesAppend = "";
+        const foundCheckList = checkList.find((c) => c.id == value);
+        let content = "";
+        if (foundCheckList) {
+            content = foundCheckList.content;
+        }
+
+        this.setState({data: {...data, checkList: content}});
     };
     getCheckList = () => {
         const {el, setValue} = this;

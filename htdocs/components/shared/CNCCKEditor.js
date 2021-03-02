@@ -85,15 +85,15 @@ class CNCCKEditor extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        const {props, editor} = this;
+        const {props} = this;
+        const {editor} = this.state;
 
         if (prevProps.value !== props.value) {
             this.setState({internalData: props.value});
         }
 
-
-        if (!prevState.editor && this.state.editor) {
-            this.state.editor.setData(this.state.internalData);
+        if (!prevState.editor && editor) {
+            editor.setData(this.state.internalData);
         }
         /* istanbul ignore next */
         if (!editor) {
@@ -114,11 +114,10 @@ class CNCCKEditor extends React.Component {
     }
 
     _destroyEditor() {
-        if (this.editor) {
-            this.editor.destroy();
+        if (this.state.editor) {
+            this.state.editor.destroy();
         }
         this.onChangeListener = null;
-        this.editor = null;
         this.element = null;
         this._destroyed = true;
     }
@@ -135,7 +134,7 @@ class CNCCKEditor extends React.Component {
                  ref={ref => (this.element = ref)}
                  className={`testing ${this.props.excludeFromErrorCount ? 'excludeFromErrorCount' : ''}`}
                  onInput={$event => {
-                     const newValue = this.editor.getData();
+                     const newValue = this.state.editor.getData();
                      if (this.props.onChange) {
                          this.props.onChange(newValue);
                      }
@@ -144,7 +143,7 @@ class CNCCKEditor extends React.Component {
 
                  onPaste={$event => {
                      setTimeout(() => {
-                         const newValue = this.editor.getData();
+                         const newValue = this.state.editor.getData();
                          if (this.props.onChange) {
                              this.props.onChange(newValue);
                          }

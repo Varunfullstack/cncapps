@@ -32,7 +32,6 @@ class AddInternalNoteModalComponent extends React.Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (JSON.stringify(prevProps) !== JSON.stringify(this.props)) {
-            console.log('AddInternalNoteModalComponent:componentDidUpdate', this.props.value)
             this.setState({value: this.props.value});
         }
     }
@@ -46,24 +45,23 @@ class AddInternalNoteModalComponent extends React.Component {
 
     renderEditableField() {
         const {value} = this.state;
-        console.log('AddInternalNoteModalComponent', value);
         return (
             <React.Fragment key="editorField">
-                <div id="top"
+                <div id="internalNoteTop"
                      key="topElement"
                 />
                 <CNCCKEditor key="AddInternalNote"
                              name="AddInternalNote"
                              value={value}
                              onChange={(data) => this.handleTemplateValueChange(data)}
-                             height="100"
+                             height="200"
                              type="inline"
                              className="CNCCKEditor"
                              sharedSpaces={true}
-                             top="top"
-                             bottom="bottom"
+                             top="internalNoteTop"
+                             bottom="internalNoteBottom"
                 />
-                <div id="bottom"
+                <div id="internalNoteBottom"
                      key="bottomElement"
                 />
             </React.Fragment>

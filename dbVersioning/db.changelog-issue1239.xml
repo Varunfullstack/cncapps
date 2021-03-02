@@ -130,4 +130,28 @@
             </addColumn>
         </rollback>
     </changeSet>
+    <changeSet id="issue1239-9" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="ordhead" columnName="odh_service_request_text"/>
+        </preConditions>
+        <renameColumn tableName="ordhead" oldColumnName="odh_service_request_text"
+                      newColumnName="serviceRequestInternalNote"
+                      columnDataType="text"/>
+    </changeSet>
+    <changeSet id="issue1239-10" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="ordhead" columnName="serviceRequestTaskList"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="ordhead">
+            <column name="serviceRequestTaskList" type="text">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <sql>
+            update ordhead
+            set serviceRequestTaskList = serviceRequestInternalNote;
+        </sql>
+    </changeSet>
 </databaseChangeLog>

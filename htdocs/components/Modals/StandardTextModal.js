@@ -64,7 +64,9 @@ class StandardTextModal extends React.Component {
         }
         return (
 
-            <select onChange={this.handleTemplateChanged} autoFocus="true"
+            <select onChange={this.handleTemplateChanged}
+                    autoFocus={true}
+                    key="standardTextSelect"
                     style={{display: "block"}}
             >
                 <option key="empty"
@@ -86,8 +88,9 @@ class StandardTextModal extends React.Component {
         if (noEditor) {
             return (
                 <textarea
-                    autoFocus="true"
+                    autoFocus={true}
                     value={value}
+                    key="editableField"
                     onChange={($event) => {
                         this.handleTemplateValueChange($event.target.value)
                     }}
@@ -97,8 +100,10 @@ class StandardTextModal extends React.Component {
         }
 
         return (
-            <React.Fragment>
-                <div id="top"/>
+            <React.Fragment key="editableField">
+                <div id="top"
+                     key="top"
+                />
                 <CNCCKEditor key={'salesRequest'}
                              name="salesRequest"
                              value={value}
@@ -110,7 +115,9 @@ class StandardTextModal extends React.Component {
                              top="top"
                              bottom="bottom"
                 />
-                <div id="bottom"/>
+                <div id="bottom"
+                     key="bottom"
+                />
             </React.Fragment>
 
         )
@@ -126,7 +133,9 @@ class StandardTextModal extends React.Component {
                 show,
                 className: "standardTextModal",
                 content: (
-                    <div style={{height: 150}}>
+                    <div style={{height: 150}}
+                         key="container"
+                    >
                         {this.renderOptions()}
                         {this.renderEditableField()}
                     </div>

@@ -220,6 +220,7 @@ class CTSRActivity extends CTCNC
                 exit;
             case self::SAVE_TASK_LIST:
                 echo json_encode($this->saveTaskListController());
+                exit;
             default:
                 $this->setTemplate();
                 break;

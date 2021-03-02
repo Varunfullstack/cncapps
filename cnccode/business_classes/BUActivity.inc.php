@@ -5178,16 +5178,21 @@ class BUActivity extends Business
             );
         }
         $dbeProblem->insertRow();
-        $useCase = new AddServiceRequestInternalNote(
+        $useCase          = new AddServiceRequestInternalNote(
             new ServiceRequestInternalNotePDORepository()
         );
-        $notes   = $body->internalNotes;
-        if (isset($body->internalNotesAppend)) {
-            $notes .= $body->internalNotesAppend;
-        }
+        $notes            = $body->internalNotes;
         $internalNoteUser = new DBEUser($this);
-        $internalNoteUser->getRow($userID);
+        $internalNoteUser->getRow($this->loggedInUserID);
         $useCase($dbeProblem, $internalNoteUser, $notes);
+        if (isset($body->checkList)) {
+            $dbeProblem->setValue(DBEProblem::taskList, $body->checkList);
+            $dbeProblem->setValue(
+                DBEProblem::taskListUpdatedAt,
+                (new DateTimeImmutable())->format(DATE_MYSQL_DATETIME)
+            );
+            $dbeProblem->setValue(DBEProblem::taskListUpdatedBy, $this->loggedInUserID);
+        }
         if ($body->monitorSRFlag) {
             $this->toggleMonitoringFlag($dbeProblem->getPKValue());
         }
@@ -6172,7 +6177,7 @@ class BUActivity extends Business
         );
         $dateRaised              = date(DATE_MYSQL_DATE . ' ' . DATE_MYSQL_TIME);
         $timeRaised              = date(CONFIG_MYSQL_TIME_HOURS_MINUTES);
-        $cleanServiceRequestText = str_replace("\r\n", "", $dsInput->getValue(BURenContract::serviceRequestText));
+        $cleanServiceRequestText = str_replace("\r\n", "", $dsInput->getValue(DBEOrdhead::serviceRequestInternalNote));
         $internalNotes           = "
 <p>Sales Order Number: {$ordheadID}</p>
 <p>{$cleanServiceRequestText}</p>";
@@ -6216,6 +6221,14 @@ class BUActivity extends Business
             $dsOrdhead->getValue(DBEOrdhead::delContactID)
         );
         $dbeProblem       = new DBEProblem($this);
+        if ($dsInput->getValue(DBEOrdhead::serviceRequestTaskList)) {
+            $dbeProblem->setValue(DBEProblem::taskList, $dsInput->getValue(DBEOrdhead::serviceRequestTaskList));
+            $dbeProblem->setValue(DBEProblem::taskListUpdatedBy, USER_SYSTEM);
+            $dbeProblem->setValue(
+                DBEProblem::taskListUpdatedAt,
+                (new DateTimeImmutable())->format(DATE_MYSQL_DATETIME)
+            );
+        }
         $dbeProblem->setValue(
             DBEJProblem::customerID,
             $dsOrdhead->getValue(DBEOrdhead::customerID)

@@ -1,34 +1,33 @@
-import Modal from "../shared/Modal/modal";
 import React from 'react';
-import CNCCKEditor from "../shared/CNCCKEditor";
 import * as PropTypes from "prop-types";
+import StandardTextModal from "./StandardTextModal";
+import Modal from "../shared/Modal/modal";
 
-class EditTaskListModalComponent extends React.Component {
-    el = React.createElement;
-    static defaultProps = {
-        show: false,
-        value: "",
-    }
+class EditTaskListModalComponent extends StandardTextModal {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            value: this.props.value,
+
+    // constructor(props) {
+    //     super(props);
+    //     this.state = {
+    //         ...this.state,
+    //     }
+    // }
+
+    handleTemplateChanged = (event) => {
+        const id = +event.target.value;
+        const {options} = this.props;
+        let selectedOptionId = null;
+        if (id) {
+            const op = options.find(s => s.id == id);
+            selectedOptionId = op.id;
         }
+        this.setState({selectedOptionId});
     }
 
-    initialState() {
-        return {value: this.props.value};
-    }
-
-    handleTemplateValueChange = (value) => {
-        this.setState({value});
-    }
-    handleTemplateOk = () => {
-        if (this.props.onChange)
-            this.props.onChange(this.state.value);
-        this.setState(this.initialState());
-    }
+    // handleTemplateValueChange = (value) => {
+    //     console.log('handleTemplateValueChange:', value);
+    //     this.setState({value});
+    // }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (JSON.stringify(prevProps) !== JSON.stringify(this.props)) {
@@ -36,76 +35,84 @@ class EditTaskListModalComponent extends React.Component {
         }
     }
 
-    onCancel() {
-        if (this.props.onCancel) {
-            this.props.onCancel();
-        }
-        this.setState(this.initialState());
-    }
-
-    renderEditableField() {
-        const {value} = this.state;
-        return (
-            <React.Fragment key="editorField">
-                <div id="top"
-                     key="topElement"
-                />
-                <CNCCKEditor key="EditTaskList"
-                             name="EditTaskList"
-                             value={value}
-                             onChange={(data) => this.handleTemplateValueChange(data)}
-                             height="100"
-                             type="inline"
-                             className="CNCCKEditor"
-                             sharedSpaces={true}
-                             top="top"
-                             bottom="bottom"
-                />
-                <div id="bottom"
-                     key="bottomElement"
-                />
-            </React.Fragment>
-
-        )
+    appendTaskList = () => {
+        const {options} = this.props;
+        const {selectedOptionId} = this.state;
+        const foundStandardText = options.find(x => x.id === selectedOptionId);
+        this.setState({value: `${this.state.value}${foundStandardText.template}`});
     }
 
     getTemplateModal = () => {
-        const {show} = this.props;
-        return (
-            <Modal
-                width="900"
-                onClose={() => this.onCancel()}
-                title="Task List"
-                show={show}
-                className="standardTextModal"
-                content={(
+        const {title, okTitle, show} = this.props;
+        const {selectedOptionId} = this.state;
+        const {el} = this;
+        return el(Modal, {
+                width: 900,
+                onClose: () => this.onCancel(),
+                title,
+                show,
+                className: "standardTextModal",
+                content: (
                     <div style={{height: 150}}
-                         key="editableFieldContainer"
+                         key="container"
                     >
+                        {this.renderOptions()}
+                        <button disabled={!selectedOptionId}
+                                onClick={this.appendTaskList}
+                        >Add
+                        </button>
                         {this.renderEditableField()}
                     </div>
-                )}
-                footer={
-                    <div key="footer">
-                        <button key="saveButton"
-                                onClick={this.handleTemplateOk}
-                        >
-                            Save
-                        </button>
-                        <button key="cancelButton"
-                                onClick={() => this.onCancel()}
-                        >
-                            Cancel
-                        </button>
-                    </div>
-                }
-            />
+                ),
+                footer: el('div', {key: "footer"},
+                    el('button', {onClick: this.handleTemplateOk}, okTitle),
+                    el('button', {onClick: () => this.onCancel()}, "Cancel"),
+                )
+            }
         )
     }
 
-    render() {
-        return (this.getTemplateModal());
-    }
+    // renderEditableField() {
+    //     const {noEditor} = this.props;
+    //     const {value} = this.state;
+    //     console.log('renderFieldValue', value);
+    //     if (noEditor) {
+    //         return (
+    //             <textarea
+    //                 autoFocus={true}
+    //                 value={value}
+    //                 key="editableField"
+    //                 onChange={($event) => {
+    //                     this.handleTemplateValueChange($event.target.value)
+    //                 }}
+    //                 style={{height: "100px", width: "700px"}}
+    //             />
+    //         )
+    //     }
+    //
+    //     return (
+    //         <React.Fragment key="editableField">
+    //             <div id="top"
+    //                  key="top"
+    //             />
+    //             <CNCCKEditor key={'salesRequest'}
+    //                          name="salesRequest"
+    //                          value={value}
+    //                          onChange={(data) => this.handleTemplateValueChange(data)}
+    //                          height="100"
+    //                          type="inline"
+    //                          className="CNCCKEditor"
+    //                          sharedSpaces={true}
+    //                          top="top"
+    //                          bottom="bottom"
+    //             />
+    //             <div id="bottom"
+    //                  key="bottom"
+    //             />
+    //         </React.Fragment>
+    //
+    //     )
+    // }
 }
 
 EditTaskListModalComponent.propTypes = {

@@ -1620,7 +1620,7 @@ class CTSalesOrder extends CTCNC
                 'delPostcode'                  => $dsOrdhead->getValue(DBEOrdhead::delPostcode),
                 'ordheadID'                    => $dsOrdhead->getValue(DBEOrdhead::ordheadID),
                 'serviceRequestCustomerItemID' => $dsOrdhead->getValue(DBEOrdhead::serviceRequestCustomerItemID),
-                'serviceRequestText'           => $dsOrdhead->getValue(DBEOrdhead::serviceRequestText),
+                'serviceRequestText'           => $dsOrdhead->getValue(DBEOrdhead::serviceRequestInternalNote),
                 'markupOriginalQuote'          => $markupOriginalQuote,
                 'urlUpdateDelAddress'          => $urlUpdateDelAddress,
                 'urlUpdateInvAddress'          => $urlUpdateInvAddress,
@@ -4453,17 +4453,22 @@ class CTSalesOrder extends CTCNC
             DA_ALLOW_NULL
         );
         $dsInput->addColumn(
-            DBEOrdhead::serviceRequestText,
+            DBEOrdhead::serviceRequestInternalNote,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $dsInput->addColumn(
+            DBEOrdhead::serviceRequestTaskList,
             DA_STRING,
             DA_ALLOW_NULL
         );
         /*
     get existing values
     */
-        if (!$dsOrdhead->getValue(DBEOrdhead::serviceRequestText)) {
+        if (!$dsOrdhead->getValue(DBEOrdhead::serviceRequestInternalNote)) {
             $dsInput->setValue(
-                DBEOrdhead::serviceRequestText,
-                $dsOrdhead->getValue(DBEOrdhead::serviceRequestText)
+                DBEOrdhead::serviceRequestInternalNote,
+                $dsOrdhead->getValue(DBEOrdhead::serviceRequestInternalNote)
             );
             $dsInput->setValue(
                 DBEOrdhead::serviceRequestCustomerItemID,
@@ -4472,6 +4477,10 @@ class CTSalesOrder extends CTCNC
             $dsInput->setValue(
                 DBEOrdhead::serviceRequestPriority,
                 $dsOrdhead->getValue(DBEOrdhead::serviceRequestPriority)
+            );
+            $dsInput->setValue(
+                DBEOrdhead::serviceRequestTaskList,
+                $dsOrdhead->getValue(DBEOrdhead::serviceRequestInternalNote)
             );
         }
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -4498,7 +4507,8 @@ class CTSalesOrder extends CTCNC
                         $this->getOrdheadID(),
                         $dsInput->getValue(DBEOrdhead::serviceRequestCustomerItemID),
                         $dsInput->getValue(DBEOrdhead::serviceRequestPriority),
-                        $dsInput->getValue(DBEOrdhead::serviceRequestText)
+                        $dsInput->getValue(DBEOrdhead::serviceRequestInternalNote),
+                        $dsInput->getValue(DBEOrdhead::serviceRequestTaskList)
                     );
                 }
                 /*
@@ -4530,13 +4540,16 @@ class CTSalesOrder extends CTCNC
         );
         $this->template->set_var(
             array(
-                'etaDate'                             => $dsInput->getValue(self::etaDate),
-                'etaDateMessage'                      => $dsInput->getMessage(self::etaDate),
-                'serviceRequestText'                  => $dsInput->getValue(DBEOrdhead::serviceRequestText),
-                'serviceRequestPriorityMessage'       => $dsInput->getMessage(DBEOrdhead::serviceRequestPriority),
-                'serviceRequestCustomerItemIDMessage' => $dsInput->getMessage(DBEOrdhead::serviceRequestCustomerItemID),
-                'urlSubmit'                           => $urlSubmit,
-                'salesOrderHeaderId'                  => $this->getOrdheadID()
+                'etaDate'                              => $dsInput->getValue(self::etaDate),
+                'etaDateMessage'                       => $dsInput->getMessage(self::etaDate),
+                DBEOrdhead::serviceRequestInternalNote => $dsInput->getValue(DBEOrdhead::serviceRequestInternalNote),
+                DBEOrdhead::serviceRequestTaskList     => $dsInput->getValue(DBEOrdhead::serviceRequestTaskList),
+                'serviceRequestPriorityMessage'        => $dsInput->getMessage(DBEOrdhead::serviceRequestPriority),
+                'serviceRequestCustomerItemIDMessage'  => $dsInput->getMessage(
+                    DBEOrdhead::serviceRequestCustomerItemID
+                ),
+                'urlSubmit'                            => $urlSubmit,
+                'salesOrderHeaderId'                   => $this->getOrdheadID()
             )
         );
         $this->contractDropdown(
@@ -4819,7 +4832,7 @@ class CTSalesOrder extends CTCNC
                     $this->formErrorMessage = $exception->getMessage();
                     $this->formError        = true;
                 }
-            };
+            }
         } else {
             if ($this->getParam('customerID')) {
                 $dbeCustomer = new DBECustomer($this);
@@ -5123,12 +5136,12 @@ class CTSalesOrder extends CTCNC
         }
         return $lastQuoted;
     }
-    public function getCustomerInitialSalesOrders(){
-        $customerID=@$_REQUEST["customerID"];
-        if(empty($customerID))
-            throw new Exception("Customer Id missing",0);
 
-        $query=" SELECT `odh_ordno` orderID ,
+    public function getCustomerInitialSalesOrders()
+    {
+        $customerID = @$_REQUEST["customerID"];
+        if (empty($customerID)) throw new Exception("Customer Id missing", 0);
+        $query = " SELECT `odh_ordno` orderID ,
         `odh_custno` customerID,
         `odh_type` type,
         `odh_date` date,
@@ -5137,6 +5150,6 @@ class CTSalesOrder extends CTCNC
         FROM ordhead ORD
         WHERE odh_custno=:customerID
         AND `odh_type`='I' ";
-        return DBConnect::fetchAll($query,["customerID"=>$customerID]);
+        return DBConnect::fetchAll($query, ["customerID" => $customerID]);
     }
 }

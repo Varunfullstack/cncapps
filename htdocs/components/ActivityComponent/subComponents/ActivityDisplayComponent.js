@@ -14,6 +14,8 @@ import Table from "../../shared/table/table";
 import {LinkServiceRequestOrder} from "./LinkserviceRequestOrder.js";
 import moment from "moment";
 import {InternalNotesListComponent} from "../../shared/InternalNotesListComponent/InternalNotesListComponent";
+import {InternalNoteItemComponent} from "../../shared/InternalNoteItemComponent/InternalNoteItemComponent";
+import {InternalNotes} from "./InternalNotesComponent";
 
 // noinspection EqualityComparisonWithCoercionJS
 const emptyAssetReasonCharactersToShow = 30;
@@ -976,7 +978,7 @@ class ActivityDisplayComponent extends MainComponent {
         const {templateDefault, templateOptions, _showModal, templateTitle, templateType} = this.state;
         const {el} = this;
         return el(
-            Modal, {//autoFocus:true
+            Modal, {
                 width: 900, key: templateType, onClose: () => this.setState({_showModal: false}),
                 title: templateTitle,
                 show: _showModal,
@@ -1066,9 +1068,40 @@ class ActivityDisplayComponent extends MainComponent {
         this.loadCallActivity(this.state.currentActivity);
     }
 
+    getTaskListElement() {
+        const {data} = this.state;
+        if (!data) {
+            return '';
+        }
+        return (
+            <div className="round-container">
+                <div className="flex-row">
+                    <label className="label mt-5 mr-3 ml-1 mb-5"
+                           style={{display: "block"}}
+                    >
+                        Task List
+                    </label>
+                    <ToolTip
+                        width="15"
+                        title="These are the tasks associated with the Service Request. These are per Service Request."
+                        content={
+                            <i className="fal fa-info-circle mt-5 pointer icon"/>
+                        }
+                    >
+                    </ToolTip>
+                </div>
+                <div className="internalNotesContainer">
+                    <InternalNoteItemComponent updatedAt={moment(data.taskListUpdatedAt).format('DD/MM/YYYY HH:mm')}
+                                               updatedBy={data.taskListUpdatedBy}
+                                               content={data?.taskList}
+                    />
+                </div>
+            </div>
+        )
+    }
+
     render() {
         const {data, showSalesOrder} = this.state;
-        console.log("showSalesOrder", showSalesOrder);
         return (
             <div style={{width: "90%"}}>
                 {this.getAlert()}
@@ -1082,7 +1115,10 @@ class ActivityDisplayComponent extends MainComponent {
                 {this.getContentElement()}
                 {this.getDetailsElement()}
                 {this.getcustomerNotesElement()}
-                {this.getNotesElement()}
+                <InternalNotes onClick={this.addInternalNote}
+                               data={data}
+                />
+                {this.getTaskListElement()}
                 <CustomerDocumentUploader
                     onDeleteDocument={(id) => this.deleteDocument(id)}
                     onFilesUploaded={() => this.handleUpload()}
