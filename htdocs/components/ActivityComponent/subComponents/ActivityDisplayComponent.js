@@ -1100,6 +1100,10 @@ class ActivityDisplayComponent extends MainComponent {
         )
     }
 
+    onNoteAdded = () => {
+        this.loadCallActivity(this.state.currentActivity)
+    }
+
     render() {
         const {data, showSalesOrder} = this.state;
         return (
@@ -1115,7 +1119,7 @@ class ActivityDisplayComponent extends MainComponent {
                 {this.getContentElement()}
                 {this.getDetailsElement()}
                 {this.getcustomerNotesElement()}
-                <InternalNotes onClick={this.addInternalNote}
+                <InternalNotes onNoteAdded={this.onNoteAdded}
                                data={data}
                 />
                 {this.getTaskListElement()}
