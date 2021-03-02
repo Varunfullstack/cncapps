@@ -140,7 +140,7 @@ class InboxOpenSRComponent extends React.Component {
             {
                 hide: false,
                 order: 12,
-                path: "reason",
+                path: "emailSubjectSummary",
                 label: "",
                 hdToolTip: "Description of the Service Request",
                 icon: "fal fa-2x fa-file-alt color-gray2 ",
@@ -152,7 +152,7 @@ class InboxOpenSRComponent extends React.Component {
                         {
                             className: "pointer",
                             onClick: () => srDescription(problem),
-                            dangerouslySetInnerHTML: {__html: problem.reason}
+                            dangerouslySetInnerHTML: {__html: problem.emailSubjectSummary}
                         },
                     ),
             },
