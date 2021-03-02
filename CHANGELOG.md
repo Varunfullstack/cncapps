@@ -17,6 +17,7 @@ This project changes will be shown here.
 ### Fixed
 - Issue 1269 - Delete Activity icon is missing for some users
 - Issue 1187 - Old user login tidy up.
+- Issue 1250 - Additional Time Emails has wrong activity data
 
 ## [v5.5.5] - 2021-02-19
 ### Changed
