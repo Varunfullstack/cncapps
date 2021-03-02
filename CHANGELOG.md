@@ -6,6 +6,7 @@ This project changes will be shown here.
 - Issue 1244 - Monthly Asset and Mailbox List Export.
 - Issue 1222 - Show Daily SR Stats on KPI Graph.
 - Issue 1255 - Add Expenses Next ProcessingDate ExpenseDashboard.
+- Issue 1268 - Tidy up feedbackuptoken table
 ### Changed
 - Issue 1181 - SR Asset list & assignment improvements.
 - Issue 1262 - Leased Line Expiry Notifications email changed.
@@ -15,6 +16,12 @@ This project changes will be shown here.
 - Issue 1238 Service Request Display Additional Information
 ### Fixed
 - Issue 1269 - Delete Activity icon is missing for some users
+
+## [v5.5.5] - 2021-02-19
+### Changed
+- Improved readability of the "To Be Logged" requests that's created when the customer doesn't have a Primary Contact.
+### Fixed
+- Fixed issue with Automated requests when there's no Primary Contact for the customer defined.
 
 ## [v5.5.4] - 2021-02-16
 ### Added

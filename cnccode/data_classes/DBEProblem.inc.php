@@ -443,6 +443,15 @@ class DBEProblem extends DBEntity
         }
     }
 
+    public function deleteRow($pkValue = '')
+    {
+        parent::deleteRow($pkValue);
+        global $db;
+        $query = "delete feedbacktoken from feedbacktoken left join problem on problem.pro_problemno = feedbacktoken.serviceRequestId where problem.pro_problemno is null";
+        $db->query($query);
+
+    }
+
     public static function statusFromDB($dbValue)
     {
         $matches = [
