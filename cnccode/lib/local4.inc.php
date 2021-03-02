@@ -199,7 +199,7 @@ class auSweetcode extends Auth
         }
         $this->db->query(
             sprintf(
-                "select %s, %s " . "        from %s " . "       where %s = '%s' ",
+                "select %s, %s " . "        from %s " . "       where %s = '%s' and activeFlag = 'Y' ",
                 PHPLIB_COLUMN_PERMS,
                 PHPLIB_COLUMN_USERID,
                 $this->database_table,

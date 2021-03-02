@@ -16,6 +16,7 @@ This project changes will be shown here.
 - Issue 1238 Service Request Display Additional Information
 ### Fixed
 - Issue 1269 - Delete Activity icon is missing for some users
+- Issue 1187 - Old user login tidy up.
 
 ## [v5.5.5] - 2021-02-19
 ### Changed
