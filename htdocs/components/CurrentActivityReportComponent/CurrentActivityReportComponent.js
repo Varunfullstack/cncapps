@@ -594,8 +594,8 @@ class CurrentActivityReportComponent extends MainComponent {
         console.log(callActivityID);
         //const {currentProblem}=this.state;
         this.setState({showCallBackModal:false});
-        if(callActivityID!=null)
-            window.location=`SRActivity.php?action=editActivity&callActivityID=${callActivityID}&isFollow=1`;
+        //if(callActivityID!=null)
+        //    window.location=`SRActivity.php?action=editActivity&callActivityID=${callActivityID}&isFollow=1`;
         //window.location=`SRActivity.php?action=displayActivity&serviceRequestId=`+currentProblem.problemID;
     }
     render() {

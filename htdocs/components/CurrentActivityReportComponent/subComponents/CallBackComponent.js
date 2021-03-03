@@ -186,6 +186,9 @@ class CallBackComponent extends MainComponent {
       if(result.status)
       {
         this.getData();
+        if(result.callActivityID!=null)
+            window.location=`SRActivity.php?action=editActivity&callActivityID=${result.callActivityID}&isFollow=1`;
+     
       }
 
     })
