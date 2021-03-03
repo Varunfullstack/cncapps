@@ -100,7 +100,9 @@ class StandardTextModal extends React.Component {
         }
 
         return (
-            <React.Fragment key="editableField">
+            <div key="editableField"
+                 className="modal_editor"
+            >
                 <div id="top"
                      key="top"
                 />
@@ -108,7 +110,7 @@ class StandardTextModal extends React.Component {
                              name="salesRequest"
                              value={value}
                              onChange={(data) => this.handleTemplateValueChange(data)}
-                             height="100"
+                             height="500"
                              type="inline"
                              className="CNCCKEditor"
                              sharedSpaces={true}
@@ -118,7 +120,7 @@ class StandardTextModal extends React.Component {
                 <div id="bottom"
                      key="bottom"
                 />
-            </React.Fragment>
+            </div>
 
         )
     }

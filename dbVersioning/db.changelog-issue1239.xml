@@ -43,14 +43,18 @@
             <tableExists tableName="serviceRequestInternalNote"/>
         </preConditions>
         <sql>
+            <![CDATA[
             insert into serviceRequestInternalNote(serviceRequestId, createdBy, createdAt, updatedBy, updatedAt, content)
             select pro_problemno,
                    67,
                    pro_date_raised,
                    67,
                    pro_date_raised,
-                   if(pro_internal_notes = "", null, pro_internal_notes)
-            from problem;
+                   pro_internal_notes
+            from problem
+            where pro_internal_notes is not null
+              and pro_internal_notes <> "";
+            ]]>
         </sql>
         <sql>
             insert into db_sequence
@@ -106,6 +110,7 @@
                 taskListUpdatedAt = pro_date_raised,
                 taskListUpdatedBy = 67
         </sql>
+        <rollback/>
     </changeSet>
     <changeSet id="issue1239-7" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
@@ -153,5 +158,6 @@
             update ordhead
             set serviceRequestTaskList = serviceRequestInternalNote;
         </sql>
+        <rollback/>
     </changeSet>
 </databaseChangeLog>

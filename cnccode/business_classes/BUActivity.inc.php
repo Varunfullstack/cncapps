@@ -5178,14 +5178,16 @@ class BUActivity extends Business
             );
         }
         $dbeProblem->insertRow();
-        $useCase          = new AddServiceRequestInternalNote(
-            new ServiceRequestInternalNotePDORepository()
-        );
-        $notes            = $body->internalNotes;
-        $internalNoteUser = new DBEUser($this);
-        $internalNoteUser->getRow($this->loggedInUserID);
-        $useCase($dbeProblem, $internalNoteUser, $notes);
-        if (isset($body->checkList)) {
+        if (isset($body->internalNotes) && $body->internalNotes) {
+            $useCase          = new AddServiceRequestInternalNote(
+                new ServiceRequestInternalNotePDORepository()
+            );
+            $notes            = $body->internalNotes;
+            $internalNoteUser = new DBEUser($this);
+            $internalNoteUser->getRow($this->loggedInUserID);
+            $useCase($dbeProblem, $internalNoteUser, $notes);
+        }
+        if (isset($body->checkList) && $body->checkList) {
             $dbeProblem->setValue(DBEProblem::taskList, $body->checkList);
             $dbeProblem->setValue(
                 DBEProblem::taskListUpdatedAt,

@@ -14,8 +14,8 @@ import Table from "../../shared/table/table";
 import {LinkServiceRequestOrder} from "./LinkserviceRequestOrder.js";
 import moment from "moment";
 import {InternalNotesListComponent} from "../../shared/InternalNotesListComponent/InternalNotesListComponent";
-import {InternalNoteItemComponent} from "../../shared/InternalNoteItemComponent/InternalNoteItemComponent";
 import {InternalNotes} from "./InternalNotesComponent";
+import {TaskListComponent} from "./TaskListComponent";
 
 // noinspection EqualityComparisonWithCoercionJS
 const emptyAssetReasonCharactersToShow = 30;
@@ -1074,30 +1074,14 @@ class ActivityDisplayComponent extends MainComponent {
             return '';
         }
         return (
-            <div className="round-container">
-                <div className="flex-row">
-                    <label className="label mt-5 mr-3 ml-1 mb-5"
-                           style={{display: "block"}}
-                    >
-                        Task List
-                    </label>
-                    <ToolTip
-                        width="15"
-                        title="These are the tasks associated with the Service Request. These are per Service Request."
-                        content={
-                            <i className="fal fa-info-circle mt-5 pointer icon"/>
-                        }
-                    >
-                    </ToolTip>
-                </div>
-                <div className="internalNotesContainer">
-                    <InternalNoteItemComponent updatedAt={moment(data.taskListUpdatedAt).format('DD/MM/YYYY HH:mm')}
-                                               updatedBy={data.taskListUpdatedBy}
-                                               content={data?.taskList}
-                    />
-                </div>
-            </div>
-        )
+            <TaskListComponent
+                taskListUpdatedAt={data.taskListUpdatedAt}
+                taskListUpdatedBy={data.taskListUpdatedBy}
+                taskList={data.taskList}
+                problemId={data.problemID}
+                onUpdatedTaskList={this.onTaskListUpdated}
+            />
+        );
     }
 
     onNoteAdded = () => {

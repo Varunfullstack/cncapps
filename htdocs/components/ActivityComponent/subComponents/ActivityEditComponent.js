@@ -22,12 +22,12 @@ import EditorFieldComponent from "../../shared/EditorField/EditorFieldComponent"
 import {TimeBudgetElement} from "./TimeBudgetElement";
 import {LinkServiceRequestOrder} from "./LinkserviceRequestOrder.js";
 import {ActivityType} from "../../shared/ActivityTypes";
-import {InternalNoteItemComponent} from "../../shared/InternalNoteItemComponent/InternalNoteItemComponent";
 import {InternalNotes} from "./InternalNotesComponent";
-import EditTaskListModalComponent from "../../Modals/EditTaskListModalComponent";
+import {TaskListComponent} from "./TaskListComponent";
 
 // noinspection EqualityComparisonWithCoercionJS
 const hiddenAndCustomerNoteAlertMessage = `Customer note must be empty when the activity or entire SR is hidden.`;
+
 
 class ActivityEditComponent extends MainComponent {
     el = React.createElement;
@@ -48,8 +48,6 @@ class ActivityEditComponent extends MainComponent {
         super(props);
         this.state = {
             ...this.state,
-            taskListEdit: '',
-            taskListEditModalShow: false,
             customerContactActivityDurationThresholdValue: null,
             remoteSupportActivityDurationThresholdValue: null,
             activityDurationWarned: false,
@@ -105,7 +103,7 @@ class ActivityEditComponent extends MainComponent {
                 monitorSR: false,
             },
             showSalesOrder: false,
-            allStandardTexts: [],
+
         };
     }
 
@@ -127,9 +125,8 @@ class ActivityEditComponent extends MainComponent {
             this.api.getPriorities(),
             this.api.getRootCauses(),
             this.apiUser.getCurrentUser(),
-            this.apiStandardText.getOptionsByType("Priority Change Reason"),
-            this.apiStandardText.getAllTypes()
-        ]).then(async ([activityTypes, activeUsers, priorities, rootCauses, currentUser, priorityChangeReasonStandardTextItems, allStandardTexts]) => {
+            this.apiStandardText.getOptionsByType("Priority Change Reason")
+        ]).then(async ([activityTypes, activeUsers, priorities, rootCauses, currentUser, priorityChangeReasonStandardTextItems]) => {
             const notSDManagerActivityTypes = activityTypes.filter(c => c.visibleInSRFlag === 'Y');
 
             this.setState({
@@ -139,8 +136,7 @@ class ActivityEditComponent extends MainComponent {
                 priorities,
                 rootCauses,
                 currentUser,
-                priorityReasons: priorityChangeReasonStandardTextItems,
-                allStandardTexts
+                priorityReasons: priorityChangeReasonStandardTextItems
             });
         });
     }
@@ -1629,80 +1625,32 @@ class ActivityEditComponent extends MainComponent {
         );
     }
 
-    editTaskList = () => {
-        const {data} = this.state;
-        this.setState({
-            taskListEditModalShow: true,
-            taskListEdit: data?.taskList,
-        })
-    }
-
-    hideTaskListModal = () => {
-        this.setState({
-            taskListEditModalShow: false,
-            taskListEdit: '',
-        })
-    }
 
     onNoteAdded = () => {
         const {currentActivity} = this.state;
         this.loadCallActivity(currentActivity);
     }
 
-    updateTaskList = async (value) => {
-        const {data, currentActivity} = this.state;
-        try {
-            const response = await fetch('?action=saveTaskList', {
-                method: 'POST',
-                body: JSON.stringify(
-                    {content: value, serviceRequestId: data.problemID}
-                )
-            });
-            const res = await response.json();
-            if (!res.status === 'ok') {
-                throw new Error('Failed to save task list');
-            }
-            this.loadCallActivity(currentActivity);
-        } catch (error) {
-            console.error(error);
-            alert(error);
-        }
-        this.hideTaskListModal();
+    onTaskListUpdated = () => {
+        const {currentActivity} = this.state;
+        this.loadCallActivity(currentActivity);
     }
 
 
     getTaskList() {
         const {data} = this.state;
+        if (!data) {
+            return '';
+        }
 
         return (
-            <div className="round-container">
-                <div className="flex-row">
-                    <label className="label mt-5 mr-3 ml-1 mb-5"
-                           style={{display: "block"}}
-                    >
-                        Task List
-                    </label>
-                    <ToolTip
-                        width="15"
-                        title="These are the tasks associated with the Service Request. These are per Service Request."
-                        content={
-                            <i className="fal fa-info-circle mt-5 pointer icon"/>
-                        }
-                    >
-                    </ToolTip>
-                </div>
-
-                <div className="internalNotesActions">
-                    <button onClick={this.editTaskList}>Edit</button>
-                </div>
-                <div className="internalNotesContainer">
-                    <InternalNoteItemComponent updatedAt={moment(data.taskListUpdatedAt).format('DD/MM/YYYY HH:mm')}
-                                               updatedBy={data.taskListUpdatedBy}
-                                               content={data?.taskList}
-                    />
-
-                </div>
-            </div>
+            <TaskListComponent
+                taskListUpdatedAt={data.taskListUpdatedAt}
+                taskListUpdatedBy={data.taskListUpdatedBy}
+                taskList={data.taskList}
+                problemId={data.problemID}
+                onUpdatedTaskList={this.onTaskListUpdated}
+            />
         );
     }
 
@@ -1777,23 +1725,6 @@ class ActivityEditComponent extends MainComponent {
             });
     }
 
-
-    getEditTaskListModalComponent = () => {
-        const {taskListEditModalShow, taskListEdit, allStandardTexts} = this.state;
-        return (
-            <EditTaskListModalComponent
-                okTitle="Save"
-                key="taskListEdit"
-                value={taskListEdit}
-                show={taskListEditModalShow}
-                options={allStandardTexts.map(x => ({...x, template: x.content, name: x.title}))}
-                title="Task List Edit"
-                onChange={this.updateTaskList}
-                onCancel={this.hideTaskListModal}
-            />
-        )
-    }
-
     handlePriorityTemplateChange = (value) => {
         const {data} = this.state;
         if (value !== "" && value !== undefined) {
@@ -1862,7 +1793,6 @@ class ActivityEditComponent extends MainComponent {
                 {this.getConfirm()}
                 {this.getPrompt()}
                 {this.getPriorityChangeReason()}
-                {this.getEditTaskListModalComponent()}
                 {this.getProjectsElement()}
                 <ActivityHeaderComponent serviceRequestData={data}/>
                 <div className="activities-edit-container">

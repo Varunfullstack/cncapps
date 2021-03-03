@@ -46,7 +46,9 @@ class AddInternalNoteModalComponent extends React.Component {
     renderEditableField() {
         const {value} = this.state;
         return (
-            <React.Fragment key="editorField">
+            <div key="editorField"
+                 className="modal_editor"
+            >
                 <div id="internalNoteTop"
                      key="topElement"
                 />
@@ -54,9 +56,9 @@ class AddInternalNoteModalComponent extends React.Component {
                              name="AddInternalNote"
                              value={value}
                              onChange={(data) => this.handleTemplateValueChange(data)}
-                             height="200"
-                             type="inline"
                              className="CNCCKEditor"
+                             type="inline"
+                             height="500"
                              sharedSpaces={true}
                              top="internalNoteTop"
                              bottom="internalNoteBottom"
@@ -64,7 +66,7 @@ class AddInternalNoteModalComponent extends React.Component {
                 <div id="internalNoteBottom"
                      key="bottomElement"
                 />
-            </React.Fragment>
+            </div>
 
         )
     }

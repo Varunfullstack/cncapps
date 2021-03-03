@@ -45,15 +45,11 @@ export class InternalNotes extends React.Component {
                         content={
                             <i className="fal fa-info-circle mt-5 pointer icon"/>
                         }
-                    >
-
-                    </ToolTip>
+                    />
+                    <a onClick={this.addInternalNote}
+                       className="icon pointer ml-5"
+                    ><i className="fal fa-plus fa-2x"/></a>
                 </div>
-
-                <div className="internalNotesActions">
-                    <button onClick={this.addInternalNote}>Add</button>
-                </div>
-
                 <div className="internalNotesContainer">
                     <InternalNotesListComponent internalNotes={this.props.data?.internalNotes}/>
                 </div>
