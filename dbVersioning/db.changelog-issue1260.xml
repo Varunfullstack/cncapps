@@ -59,7 +59,9 @@
     </changeSet>
      <changeSet id="issue1260-2" author="pavwebdevmt">
         <preConditions onFail="MARK_RAN">             
-                <tableExists tableName="contact_callback" />                        
+            <not>
+                <columnExists tableName="contact_callback" columnName="status"  />                
+            </not>                 
         </preConditions>
         <addColumn tableName="contact_callback">
             <column name="status" type="ENUM('awaiting', 'contacted', 'canceled')" defaultValue="awaiting">
@@ -71,6 +73,9 @@
         </rollback>
     </changeSet>
      <changeSet id="issue1260-3" author="pavwebdevmt">
+     <preConditions onFail="MARK_RAN" >             
+         <sqlCheck  expectedResult="0">select count(*) from reports where id=6</sqlCheck>                 
+        </preConditions>
         <sql>
             INSERT INTO `reports_categories` (`id`, `title`, `active`) VALUES('3','Customer Call back','1');
             INSERT INTO `reports` (`id`, `title`, `component`, `active`) VALUES('6','Call back search','RepCallbackSearch','1');
@@ -87,8 +92,10 @@
          </rollback>
     </changeSet>
       <changeSet id="issue1260-4" author="pavwebdevmt">
-        <preConditions onFail="MARK_RAN">             
-                <tableExists tableName="contact_callback" />                        
+        <preConditions onFail="MARK_RAN">                               
+            <not>
+                <columnExists tableName="contact_callback" columnName="notifyTeamLead"  />                
+            </not>                     
         </preConditions>
         <addColumn tableName="contact_callback">
             <column name="notifyTeamLead " type="tinyint(1)" defaultValue="0">
@@ -97,6 +104,21 @@
         </addColumn>
         <rollback>
             <dropColumn tableName="contact_callback" columnName="notifyTeamLead" />
+        </rollback>
+    </changeSet>
+      <changeSet id="issue1260-5" author="pavwebdevmt">
+        <preConditions onFail="MARK_RAN">                               
+            <not>
+                <columnExists tableName="consultant" columnName="callBackEmail"  />                
+            </not>                     
+        </preConditions>
+        <addColumn tableName="consultant">
+            <column name="callBackEmail " type="tinyint(1)" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="consultant" columnName="callBackEmail" />
         </rollback>
     </changeSet>
 </databaseChangeLog>

@@ -1,0 +1,8 @@
+{% extends "@internal/wrapper.html.twig" %}
+{# @var data #}
+{% block content %}    
+    <p>A call back request was taken at {{createAt}} for {{contactName}} from {{customerName}} for SR  <a href="{{ urlService }}">{{ serviceRequestId }}</a> </p>
+    <p>Please call the customer back at {{callback_datetime}} </p>
+    <p>{{reason}} </p>     
+
+{% endblock %}

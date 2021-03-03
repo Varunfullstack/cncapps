@@ -103,7 +103,8 @@ class CTMySettings extends CTCNC
             'startDate'                => $dsUser->getValue(DBEJUser::startDate),
             'sendEmailAssignedService' => $dsUser->getValue(DBEJUser::sendEmailWhenAssignedService),
             'userLog'                  => $this->getUserTimeLog($userId),
-            "bccOnCustomerEmails"=> $dsUser->getValue(DBEUser::bccOnCustomerEmails)
+            "bccOnCustomerEmails"=> $dsUser->getValue(DBEUser::bccOnCustomerEmails),
+            "callBackEmail"=> $dsUser->getValue(DBEUser::callBackEmail)
         );
         return $result;
     }
@@ -171,6 +172,7 @@ class CTMySettings extends CTCNC
         $dbeUser->getRow();
         $dbeUser->setValue(DBEJUser::sendEmailWhenAssignedService, $body->sendEmailAssignedService);
         $dbeUser->setValue(DBEJUser::bccOnCustomerEmails, $body->bccOnCustomerEmails);
+        $dbeUser->setValue(DBEJUser::callBackEmail, $body->callBackEmail);
         $dbeUser->updateRow();
         return ["status"=>true];
     }

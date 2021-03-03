@@ -24,12 +24,28 @@ class CallBackComponent extends MainComponent {
     if( this.dataInterval)
     clearTimeout( this.dataInterval);
   }
+  componentDidUpdate(prevProps,prevState)
+  {
+    console.log(prevProps,this.props);
+    if(prevProps.team!=this.props.team||prevProps.customerID!=this.props.customerID)
+      this.getData();
+  }
   getData=()=>{
-    this.apiCurrentActivityService.getMyCallback()
+    this.apiCurrentActivityService.getMyCallback(this.props.team,this.props.customerID)
     .then(callbacks=>{
       console.log('callbacks',callbacks);
       this.setState({callbacks});
     });
+  }
+  getCallBackContact=(callback)=>{
+    if(callback.useID==null)
+    return  <ToolTip title="This SR has not been assigned to an engineer" width={30}>
+              <i className="fal fa-2x fa-user-slash color-gray2 pointer" onClick={()=>this.createCustomerContact(callback)}></i>               
+            </ToolTip> ;
+    else
+    return   <ToolTip title="Create customer contact" width={30}>
+              <i className="fal fa-2x fa-phone color-gray2 pointer" onClick={()=>this.createCustomerContact(callback)}></i>               
+            </ToolTip>
   }
   getContent=()=>{
       const { callbacks} = this.state;
@@ -43,10 +59,8 @@ class CallBackComponent extends MainComponent {
           hdClassName: "text-center",
            
           sortable: false,
-          content:(problem)=><div className="flex-row" style={{justifyContent:"center"}}>             
-          <ToolTip title="Create customer contact" width={30}>
-              <i className="fal fa-2x fa-phone color-gray2 pointer" onClick={()=>this.createCustomerContact(problem)}></i>               
-          </ToolTip>             
+          content:(callback)=><div className="flex-row" style={{justifyContent:"center"}}>             
+          {this.getCallBackContact(callback)}           
           </div>,
           className: "text-center",         
         },

@@ -585,13 +585,18 @@ class CTCurrentActivityReport extends CTCNC
         $problemID=$body->problemID;
         $customerID=$body->customerID;
         $contactID=$body->contactID;
+        $contactName=$body->contactName;
         $callActivityID=$body->callActivityID;
         $description=$body->description;
         $callback_datetime=$body->date.' '.$body->time.':00';        
+        $notifyTeamLead=$body->notifyTeamLead?1:0;
         // echo  $callback_datetime;
         // exit;
         if(empty($problemID)||empty($customerID))
             return $this->getResponseError(400,"Missing data");
+        $problem=new DBEProblem($this);
+        $problem->getRow($problemID);
+
         $dbeContact=new DBEContact($this);
         $dbeContact->getRow($contactID);
         $contactName=$dbeContact->getValue(DBEContact::firstName)." ".$dbeContact->getValue(DBEContact::lastName);
@@ -605,6 +610,8 @@ class CTCurrentActivityReport extends CTCNC
         $dbeCallback->setValue(DBECallback::consID,$this->dbeUser->getPKValue());
         $dbeCallback->setValue(DBECallback::createAt,date('Y-m-d H:i:s'));
         $dbeCallback->setValue(DBECallback::status,CallBackStatus::AWAITING);
+        $dbeCallback->setValue(DBECallback::notifyTeamLead,  $notifyTeamLead);
+
         $dbeCallback->insertRow();
         // add activity
         $dbeCallActivity = new DBECallActivity($this);
@@ -623,23 +630,106 @@ class CTCurrentActivityReport extends CTCNC
         $dbeCallActivity->setValue(DBECallActivity::problemID,  $problemID);
         $dbeCallActivity->insertRow();    
 
+        $problem->setValue(DBEProblem::awaitingCustomerResponseFlag,'N');
+        $problem->setValue(DBEProblem::alarmDate,null);
+        $problem->setValue(DBEProblem::alarmTime,null);
+        $problem->updateRow();
+        // Send email to engineer and team leader
+        
+        if($problem->getValue(DBEProblem::userID)!=null)
+        {
+            //get problem consultant
+            $engineer=new DBEUser($this);
+            $engineer->getRow($problem->getValue(DBEProblem::userID));
+            //get consultant team
+            $team=new DBETeam($this);
+            $team->getRow( $engineer->getValue(DBEUser::teamID));
+            //get team leader
+            $teamLeader=new DBEUser($this);
+            $teamLeader->getRow( $team->getValue(DBETeam::leaderId) );
+
+            $engineerEmail=$engineer->getValue(DBEUser::username)."@cnc-ltd.co.uk";
+            $teamLeaderEmail=$teamLeader->getValue(DBEUser::username)."@cnc-ltd.co.uk";
+            $customer=new DBECustomer($this);
+            $customer->getRow($customerID);
+            $to="";
+            $cc=[];
+            $subject="You have a call back request for  $contactName from ".$customer->getValue(DBECustomer::name);
+            if($notifyTeamLead)
+            {
+                // send email to both
+                $to=$engineerEmail;
+                $cc []=$teamLeaderEmail;
+            }
+            else if($engineer->getValue(DBEUser::callBackEmail)){ // check if the engineer has callback email check
+                // send email to engineer only
+                $to=$engineerEmail;
+            }
+            if($to!="")
+            {
+                $buMail  = new BUMail($this);
+                global $twig;
+                $urlService = SITE_URL . '/SRActivity.php?action=displayActivity&serviceRequestId=' . $dbeCallback->getValue(DBECallback::problemID);
+
+                $body    = $twig->render(
+                    '@internal/callBackEmail.html.twig',
+                    [
+                        'createAt'         =>  date('d/m/Y h:i', strtotime($dbeCallback->getValue(DBECallback::createAt))) ,
+                        'urlService'       => $urlService,
+                        'contactName'      => $contactName,
+                        'customerName'     => $customer->getValue(DBECustomer::name),
+                        'serviceRequestId' =>  $dbeCallback->getValue(DBECallback::problemID),
+                        'callback_datetime' => date('d/m/Y h:i', strtotime($dbeCallback->getValue(DBECallback::callback_datetime))) ,
+                        'reason' => $description!=""?"Additional Information: ". $description:"",
+                    ]
+                );
+                $buMail->sendSimpleEmail($body, $subject, $to, CONFIG_SUPPORT_EMAIL, $cc );    
+            }
+        }
+        
         return ["status"=>true,"callActivityID"=>$dbeCallActivity->getPKValue()];              
     }
     public function getMyCallback(){
+        $unAssigned="";
+        $team=$_REQUEST["team"]??'';
+        $customerID=$_REQUEST["customerID"]??'';
+        $customerCondition="";
+        if($this->isSdManager()||$this->isSRQueueManager())
+        {            
+            
+            $teamCondition="";
+            if ($team == 'H')
+                $teamCondition .= " and pro_queue_no = 1";
+            if ($team == 'E')
+                $teamCondition .= " and pro_queue_no = 2";
+            if ($team == 'SP')
+                $teamCondition .= " and pro_queue_no = 3";
+            if ($team == 'P')
+                $teamCondition .= " and pro_queue_no = 5";
+            if ($team == 'S')
+                $teamCondition .= " and pro_queue_no = 4";
+            if ($customerID != '')
+                $customerCondition = " and  p.pro_custno = $customerID";
+            $unAssigned="or (p.`pro_consno`is null $teamCondition )";
+        }
         $query="SELECT cb.id, cb.consID,cb.problemID,cb.callActivityID,cb.contactID,cb.DESCRIPTION,cb.callback_datetime,cb.createAt,
                     concat(c.con_first_name,' ',c.con_last_name) contactName,
                     cus_name customerName,
                     TIMESTAMPDIFF(MINUTE,NOW(),cb.callback_datetime) timeRemain,
-                    cb.status
+                    cb.status,
+                    p.pro_consno useID
                 FROM contact_callback cb
                 JOIN  `problem` p ON cb.problemID=p.`pro_problemno`
                 JOIN contact c on c.con_contno =cb.contactID
                 JOIN customer cu on cu.cus_custno = p.pro_custno
-                WHERE p.`pro_consno`=:consID
+                WHERE (p.`pro_consno`=:consID $unAssigned)
                 and cb.status='awaiting'
+                $customerCondition
                 order by timeRemain asc
                 ";
-        return DBConnect::fetchAll($query,["consID"=>$this->dbeUser->getPKValue()]);
+        $myCallBack=DBConnect::fetchAll($query,["consID"=>$this->dbeUser->getPKValue()]);
+        
+        return  $myCallBack;
     }
 
     public function updateCallbackStatus(){

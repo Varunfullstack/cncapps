@@ -25,7 +25,8 @@ class MySettingsComponent extends MainComponent {
             filter:{
                 from:moment().subtract(3,'M').format("YYYY-MM-01"),
                 to:''
-            }
+            },
+            callBackEmail:false
         };
         this.tabs = [
             {id: this.TAB_MY_ACCOUNT, title: "My Account", icon: null},
@@ -122,6 +123,7 @@ class MySettingsComponent extends MainComponent {
         const body={
             sendEmailAssignedService:(this.state.sendEmailAssignedService ? 1 : 0),
             bccOnCustomerEmails:(this.state.bccOnCustomerEmails ? 1 : 0),
+            callBackEmail:(this.state.callBackEmail ? 1 : 0),
         }
         console.log(body);
         this.api.saveMySettings(body).then(result=>{
@@ -188,6 +190,14 @@ class MySettingsComponent extends MainComponent {
                 label: "BCC on customer emails.",
                 checked: this.state.bccOnCustomerEmails,
                 onChange: ()=>this.setState({'bccOnCustomerEmails':!this.state.bccOnCustomerEmails})
+            }, null),
+        this.el(CheckBox,
+            {
+                key: 'callBackEmail',
+                name: 'callBackEmail',
+                label: "Send me an email when I receive a call back request.",
+                checked: this.state.callBackEmail,
+                onChange: ()=>this.setState({'callBackEmail':!this.state.callBackEmail})
             }, null),
         this.el('button', {key: 'btnSave', style: {width: 50}, onClick: this.handleOnClick}, 'Save')
         );

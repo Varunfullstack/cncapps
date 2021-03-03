@@ -21,7 +21,7 @@ class DBECallback extends DBEntity
     const callback_datetime ='callback_datetime';
     const status       ='status';
     const createAt          ='createAt';
-    
+    const notifyTeamLead          ='notifyTeamLead';
     /**
      * calls constructor()
      * @access public
@@ -79,7 +79,11 @@ class DBECallback extends DBEntity
             DA_DATETIME,
             DA_NOT_NULL
         );
-         
+        $this->addColumn(
+            self::notifyTeamLead,
+            DA_BOOLEAN,
+            DA_NOT_NULL
+        );
         //$this->setPK(0);
         $this->setAddColumnsOff();
         $this->db->connect();

@@ -104,8 +104,8 @@ class CurrentActivityService extends APIMain {
        return this.post(`${this.baseURL}callback`,body).then((res) => res.json());
     }
 
-    getMyCallback() {
-        return this.get(`${this.baseURL}callback`);
+    getMyCallback(team='',customerID='') {
+        return this.get(`${this.baseURL}callback&team=${team}&customerID=${customerID}`);
     }
     cancelCallBack(id,reason){
         return this.delete(`${this.baseURL}callback&id=${id}&reason=${reason}`);

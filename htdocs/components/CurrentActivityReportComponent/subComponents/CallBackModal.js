@@ -24,6 +24,7 @@ class CallBackModal extends MainComponent {
             problemID:this.props.problem.problemID,
             contactName:this.props.problem.contactName,
             callActivityID:this.props.problem.callActivityID,
+            notifyTeamLead:false
         },
         contcts:[]
     }
@@ -75,7 +76,12 @@ class CallBackModal extends MainComponent {
                     {contcts.map(c=><option key={c.id}  value={c.id}>{c.firstName+' '+ c.lastName}</option>)}
                 </select>
             </div>
-
+            <div className="flex-row">
+                <input type="checkbox" onChange={(event) =>
+                this.setValue("notifyTeamLead", !this.state.data.notifyTeamLead)
+              }></input>
+                <label>This is high profile, notify Team Lead as well (reason must be supplied)</label>                
+            </div>
           <div className="form-group">
             <label>Reason for the call back (this will be visible on the portal)</label>
             <textarea
@@ -105,6 +111,11 @@ class CallBackModal extends MainComponent {
       this.alert("Data and time must be in future.")  ;
       return;
     } 
+    if(data.notifyTeamLead && data.description=='')
+    {
+      this.alert("Please provide the reason.")  ;
+      return;
+    }
     this.apiCurrentActivityService.addCallback(data).then(result=>{
         console.log(result);
         if(result.status)

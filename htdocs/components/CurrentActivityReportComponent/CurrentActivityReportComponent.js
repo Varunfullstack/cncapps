@@ -192,8 +192,8 @@ class CurrentActivityReportComponent extends MainComponent {
         filter.activeTab = code;
         this.loadQueue(code);
         this.checkAutoReload(code);
-        this.saveFilterToLocalStorage(filter);
-        this.setState({filter});
+        this.saveFilterToLocalStorage(filter); 
+        this.setState({filter,openSrCustomerID:''});
     };
     loadData = () => {
         const {filter} = this.state;
@@ -636,7 +636,7 @@ class CurrentActivityReportComponent extends MainComponent {
 
         } = this.state;
         return el("div", {style: {backgroundColor: "white"}}, [
-            <CallBackComponent  key='callback'></CallBackComponent>,
+            <CallBackComponent  key='callback' team={filter.activeTab} customerID={this.state.openSrCustomerID}></CallBackComponent>,
             this.getCallBackModal(),
             this.getConfirm(),
             this.getAlert(),
