@@ -404,7 +404,7 @@ class HomeComponent extends MainComponent {
                 <th>Time</th>
                 <th>Customer</th>
                 <th>Engineer</th>
-                <th>Email Subject Summary</th>
+                <th>Reason</th>
                 <th>SR</th>
             </tr>
             </thead>
