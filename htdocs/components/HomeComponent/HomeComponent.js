@@ -404,7 +404,7 @@ class HomeComponent extends MainComponent {
                 <th>Time</th>
                 <th>Customer</th>
                 <th>Engineer</th>
-                <th>Reason</th>
+                <th>Email Subject Summary</th>
                 <th>SR</th>
             </tr>
             </thead>
@@ -428,7 +428,7 @@ class HomeComponent extends MainComponent {
                     {c.engineerName}
                 </td>
                 <td>
-                    {c.reason.replace(/\n/g, " ")}
+                    {c.emailSubjectSummary}
                 </td>
                 <td>
                     <a target="_blank"

@@ -330,56 +330,6 @@ GROUP BY engineer.`cns_consno`  order by engineer.firstName"
 
     }
 
-    function getUpcomingVisits()
-    {
-        global $db;
-        $result = $db->query(
-            "SELECT 
-  caa_problemno AS serviceRequestID,
-  caa_callactivityno AS callActivityID,
-  caa_date AS date,
-  caa_starttime AS time,
-  cus_name AS customerName,
-  CONCAT(
-    consultant.firstName,
-    ' ',
-    consultant.lastName
-  ) AS engineerName,
-  (SELECT 
-    reason 
-  FROM
-    callactivity firstActivity 
-  WHERE firstActivity.caa_problemno = callactivity.`caa_problemno` 
-    AND firstActivity.caa_callacttypeno = 51) AS reason 
-FROM
-  callactivity 
-  LEFT JOIN problem 
-    ON problem.`pro_problemno` = caa_problemno 
-  LEFT JOIN customer 
-    ON customer.`cus_custno` = problem.pro_custno 
-  LEFT JOIN consultant 
-    ON consultant.`cns_consno` = callactivity.`caa_consno` 
-WHERE callactivity.`caa_callacttypeno` IN (4, 7) 
-  AND caa_date >= date(NOW()) 
-  AND caa_date <= date((NOW() + INTERVAL 1 WEEK)) 
-  AND (
-    caa_endtime IS NULL 
-    OR caa_endtime = \"\"
-  ) 
-ORDER BY caa_date ASC,
-  caa_starttime ASC "
-        );
-        $data   = [];
-        while ($row = $result->fetch_assoc()) {
-            $row['reason'] = substr(
-                Utils::stripEverything($row['reason']),
-                0
-            );
-            $data[]        = $row;
-        }
-        return $data;
-    }
-
     function updateAll()
     {
         global $db;
@@ -419,9 +369,8 @@ WHERE user_time_log.`userTimeLogID` IS NULL
         );
         $firstTimeFix   = $this->getFirstTimeFixData();
         $fixedAndReopen = $this->getFixedAndReopenData();
-        $upcomingVisits = $this->getUpcomingVisits();
         $db->preparedQuery(
-            "update homeData set firstTimeFix = ? ,fixedAndReopenData = ?, upcomingVisitsData = ?",
+            "update homeData set firstTimeFix = ? ,fixedAndReopenData = ?",
             [
                 [
                     "type"  => "s",
@@ -430,29 +379,9 @@ WHERE user_time_log.`userTimeLogID` IS NULL
                 [
                     "type"  => "s",
                     "value" => json_encode($fixedAndReopen)
-                ],
-                [
-                    "type"  => "s",
-                    "value" => json_encode($upcomingVisits)
                 ]
             ]
         );
     }
-
-    function updateUpcomingVisits()
-    {
-        global $db;
-        $upcomingVisits = $this->getUpcomingVisits();
-        $db->preparedQuery(
-            "update homeData set upcomingVisitsData = ?",
-            [
-                [
-                    "type"  => "s",
-                    "value" => json_encode($upcomingVisits)
-                ]
-            ]
-        );
-    }
-
 
 }
