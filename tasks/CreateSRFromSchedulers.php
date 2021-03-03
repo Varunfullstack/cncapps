@@ -158,7 +158,7 @@ try {
         $useCase = new AddServiceRequestInternalNote(
             new ServiceRequestInternalNotePDORepository()
         );
-        $internalNoteUser = new DBEUser($this);
+        $internalNoteUser = new DBEUser($thing);
         $internalNoteUser->getRow(USER_SYSTEM);
         $useCase($dbeProblem, $internalNoteUser, $internalNotes);
         $problemID = $dbeProblem->getPKValue();

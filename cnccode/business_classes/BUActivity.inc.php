@@ -6225,7 +6225,7 @@ class BUActivity extends Business
         $dbeProblem       = new DBEProblem($this);
         if ($dsInput->getValue(DBEOrdhead::serviceRequestTaskList)) {
             $dbeProblem->setValue(DBEProblem::taskList, $dsInput->getValue(DBEOrdhead::serviceRequestTaskList));
-            $dbeProblem->setValue(DBEProblem::taskListUpdatedBy, USER_SYSTEM);
+            $dbeProblem->setValue(DBEProblem::taskListUpdatedBy, $GLOBALS['auth']->is_authenticated());
             $dbeProblem->setValue(
                 DBEProblem::taskListUpdatedAt,
                 (new DateTimeImmutable())->format(DATE_MYSQL_DATETIME)
@@ -6341,7 +6341,7 @@ class BUActivity extends Business
             new ServiceRequestInternalNotePDORepository()
         );
         $internalNoteUser = new DBEUser($this);
-        $internalNoteUser->getRow(USER_SYSTEM);
+        $internalNoteUser->getRow($GLOBALS['auth']->is_authenticated());
         $useCase($dbeProblem, $internalNoteUser, $internalNotes);
         $reason = "<p>An order has been received for the items below:</p>";
         // insert selected items

@@ -24,7 +24,7 @@ class DBECallActivitySearch extends DBEntity
     const status = "status";
     const problemStatus = "problemStatus";
     const reason = "reason";
-    const internalNotes = "internalNotes";
+    const internalNotes = "serviceRequestInternalNote.content";
     const curValue = "curValue";
     const priority = "priority";
     const statementYearMonth = "statementYearMonth";
@@ -346,7 +346,9 @@ class DBECallActivitySearch extends DBEntity
             ON callactivity.caa_cuino = custitem.cui_cuino 
           LEFT JOIN problem 
             ON problem.pro_problemno = callactivity.caa_problemno 
-          LEFT JOIN item 
+          left join serviceRequestInternalNote
+            on serviceRequestInternalNote.serviceRequestId = problem.pro_problemno
+          LEFT JOIN item  
             ON custitem.cui_itemno = item.itm_itemno 
           LEFT JOIN project 
             ON project.projectID = problem.pro_projectno  
