@@ -601,18 +601,53 @@ class CTCurrentActivityReport extends CTCNC
         $dbeContact->getRow($contactID);
         $contactName=$dbeContact->getValue(DBEContact::firstName)." ".$dbeContact->getValue(DBEContact::lastName);
         $callDateTime=new DateTime($callback_datetime);
-        $dbeCallback=new DBECallback($this);
-        $dbeCallback->setValue(DBECallback::problemID,$problemID);
-        $dbeCallback->setValue(DBECallback::callActivityID,$callActivityID);
-        $dbeCallback->setValue(DBECallback::contactID,$contactID);
-        $dbeCallback->setValue(DBECallback::description,$description);
-        $dbeCallback->setValue(DBECallback::callback_datetime,$callback_datetime);
-        $dbeCallback->setValue(DBECallback::consID,$this->dbeUser->getPKValue());
-        $dbeCallback->setValue(DBECallback::createAt,date('Y-m-d H:i:s'));
-        $dbeCallback->setValue(DBECallback::status,CallBackStatus::AWAITING);
-        $dbeCallback->setValue(DBECallback::notifyTeamLead,  $notifyTeamLead);
-
-        $dbeCallback->insertRow();
+        // $dbeCallback=new DBECallback($this);
+        // $dbeCallback->setValue(DBECallback::problemID,$problemID);
+        // $dbeCallback->setValue(DBECallback::callActivityID,$callActivityID);
+        // $dbeCallback->setValue(DBECallback::contactID,$contactID);
+        // $dbeCallback->setValue(DBECallback::description,$description);
+        // $dbeCallback->setValue(DBECallback::callback_datetime,$callback_datetime);
+        // $dbeCallback->setValue(DBECallback::consID,$this->dbeUser->getPKValue());
+        // $dbeCallback->setValue(DBECallback::createAt,date('Y-m-d H:i:s'));
+        // $dbeCallback->setValue(DBECallback::status,CallBackStatus::AWAITING);
+        // $dbeCallback->setValue(DBECallback::notifyTeamLead,  $notifyTeamLead);        
+        // $dbeCallback->insertRow();
+        $query="INSERT INTO `contact_callback` (
+            
+            `consID`,
+            `problemID`,
+            `callActivityID`,
+            `contactID`,
+            `description`,
+            `callback_datetime`,
+            `createAt`,
+            `status`,
+            `notifyTeamLead`
+          )
+          VALUES
+            (              
+              :consID,
+              :problemID,
+              :callActivityID,
+              :contactID,
+              :description,
+              :callback_datetime,
+              :createAt,
+              :status,
+              :notifyTeamLead
+            );
+          ";
+          $createAt=date('Y-m-d H:i:s');
+          DBConnect::execute($query,["consID"=>$this->dbeUser->getPKValue(),
+          "problemID"=>$problemID,
+          "callActivityID"=>$callActivityID,
+          "contactID"=>$contactID,
+          "description"=>$description,
+          "callback_datetime"=>$callback_datetime,
+          "createAt"=>$createAt,
+          "status"=>CallBackStatus::AWAITING,
+          "notifyTeamLead"=>$notifyTeamLead,
+           ]);
         // add activity
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->setValue(DBECallActivity::callActTypeID, 11);
@@ -669,17 +704,17 @@ class CTCurrentActivityReport extends CTCNC
             {
                 $buMail  = new BUMail($this);
                 global $twig;
-                $urlService = SITE_URL . '/SRActivity.php?action=displayActivity&serviceRequestId=' . $dbeCallback->getValue(DBECallback::problemID);
+                $urlService = SITE_URL . '/SRActivity.php?action=displayActivity&serviceRequestId=' . $problemID;
 
                 $body    = $twig->render(
                     '@internal/callBackEmail.html.twig',
                     [
-                        'createAt'         =>  date('d/m/Y h:i', strtotime($dbeCallback->getValue(DBECallback::createAt))) ,
+                        'createAt'         =>  date('d/m/Y h:i', strtotime($createAt)) ,
                         'urlService'       => $urlService,
                         'contactName'      => $contactName,
                         'customerName'     => $customer->getValue(DBECustomer::name),
-                        'serviceRequestId' =>  $dbeCallback->getValue(DBECallback::problemID),
-                        'callback_datetime' => date('d/m/Y h:i', strtotime($dbeCallback->getValue(DBECallback::callback_datetime))) ,
+                        'serviceRequestId' =>  $problemID,
+                        'callback_datetime' => date('d/m/Y h:i', strtotime($callback_datetime)) ,
                         'reason' => $description!=""?"Additional Information: ". $description:"",
                     ]
                 );
