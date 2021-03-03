@@ -613,16 +613,17 @@ class CTCurrentActivityReport extends CTCNC
         $dbeCallActivity->setValue(DBECallActivity::userID, $this->dbeUser->getPKValue());
         $dbeCallActivity->setValue(DBECallActivity::date, date('Y-m-d'));
         $dbeCallActivity->setValue(DBECallActivity::startTime, date('H:i'));
-        $endTime = new DateTime();
-        $endTime->add(new DateInterval('PT1M'));
-        $dbeCallActivity->setValue(DBECallActivity::endTime, $endTime->format('H:i'));
-        $dbeCallActivity->setValue(DBECallActivity::reason, $contactName . ' called in regarding this update');
+        // $endTime = new DateTime();
+        // $endTime->add(new DateInterval('PT1M'));
+        // $dbeCallActivity->setValue(DBECallActivity::endTime, $endTime->format('H:i'));
+        $additionalInfo=!empty($description)?"<p> Additional information: ".$description.'</p>':'';
+        $dbeCallActivity->setValue(DBECallActivity::reason, $contactName . ' called in regarding this update '.$additionalInfo);
         $dbeCallActivity->setValue(DBECallActivity::cncNextAction,"Please call $contactName at ".$callDateTime->format('Y-m-d')." at ".$callDateTime->format('H:i'));
         $dbeCallActivity->setValue(DBECallActivity::awaitingCustomerResponseFlag, "N");        
         $dbeCallActivity->setValue(DBECallActivity::problemID,  $problemID);
         $dbeCallActivity->insertRow();    
 
-        return ["status"=>true];              
+        return ["status"=>true,"callActivityID"=>$dbeCallActivity->getPKValue()];              
     }
     public function getMyCallback(){
         $query="SELECT cb.id, cb.consID,cb.problemID,cb.callActivityID,cb.contactID,cb.DESCRIPTION,cb.callback_datetime,cb.createAt,

@@ -86,4 +86,17 @@
         <rollback>
          </rollback>
     </changeSet>
+      <changeSet id="issue1260-4" author="pavwebdevmt">
+        <preConditions onFail="MARK_RAN">             
+                <tableExists tableName="contact_callback" />                        
+        </preConditions>
+        <addColumn tableName="contact_callback">
+            <column name="notifyTeamLead " type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="contact_callback" columnName="notifyTeamLead" />
+        </rollback>
+    </changeSet>
 </databaseChangeLog>

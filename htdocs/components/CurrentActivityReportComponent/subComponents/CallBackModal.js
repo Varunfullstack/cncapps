@@ -13,10 +13,11 @@ class CallBackModal extends MainComponent {
   constructor(props) {
     super(props);
     this.state={
+      ...this.state,
         templateOptions:[],
         data:{
              description:"",
-            time:moment().add(10,'minute').format("HH:mm"),
+            time:moment().add(30,'minute').format("HH:mm"),
             date:moment().format("YYYY-MM-DD"),
             contactID:this.props.problem.contactID,
             customerID:this.props.problem.customerID,
@@ -35,9 +36,9 @@ class CallBackModal extends MainComponent {
     this.setState({contcts});
   })
   }
-  handleClose = () => {    
+  handleClose = (callActivityID=null) => {    
     if(this.props.onClose)
-        this.props.onClose();
+        this.props.onClose(callActivityID);
   };
   getContent=()=>{
       const { data ,contcts} = this.state;
@@ -76,7 +77,7 @@ class CallBackModal extends MainComponent {
             </div>
 
           <div className="form-group">
-            <label>Reason for the call back</label>
+            <label>Reason for the call back (this will be visible on the portal)</label>
             <textarea
               className="modal-input"
               style={{}}
@@ -99,16 +100,23 @@ class CallBackModal extends MainComponent {
   handleSave=()=>{
     const {data}=this.state;   
     console.log(data);
+    if(moment(data.date+" "+data.time)<moment())
+    {
+      this.alert("Data and time must be in future.")  ;
+      return;
+    } 
     this.apiCurrentActivityService.addCallback(data).then(result=>{
         console.log(result);
         if(result.status)
-          this.handleClose();
+          this.handleClose(result.callActivityID);
     });
 
    }
   render() {
     if (!this.props.show) return null;
     return (
+      <div>
+        {this.getAlert()}
       <Modal
         width={600}
         show={this.props.show}
@@ -118,10 +126,11 @@ class CallBackModal extends MainComponent {
         </div>}
         footer={<div key="footer">
             <button onClick={this.handleSave}>Save</button>
-            <button onClick={this.handleClose}>Cancel</button>
+            <button onClick={()=>this.handleClose()}>Cancel</button>
         </div>}
-        onClose={this.handleClose}
+        onClose={()=>this.handleClose()}
       ></Modal>
+      </div>
     );
   }
 }

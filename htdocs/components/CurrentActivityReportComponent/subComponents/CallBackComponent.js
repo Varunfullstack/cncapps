@@ -33,6 +33,8 @@ class CallBackComponent extends MainComponent {
   }
   getContent=()=>{
       const { callbacks} = this.state;
+      if(!callbacks||callbacks.length==0)
+      return null;
       const columns=[
         {
           path: "customerContact",

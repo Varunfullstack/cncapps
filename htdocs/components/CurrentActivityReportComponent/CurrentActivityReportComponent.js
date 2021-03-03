@@ -585,10 +585,18 @@ class CurrentActivityReportComponent extends MainComponent {
         if(!showCallBackModal)
         return null;
         return <CallBackModal key="modal" show={showCallBackModal} 
-        onClose={()=>this.setState({showCallBackModal:false})}
+        onClose={this.handleCallBackClose}
         problem={currentProblem}
         >
         </CallBackModal>
+    }
+    handleCallBackClose=(callActivityID)=>{
+        console.log(callActivityID);
+        //const {currentProblem}=this.state;
+        this.setState({showCallBackModal:false});
+        if(callActivityID!=null)
+            window.location=`SRActivity.php?action=editActivity&callActivityID=${callActivityID}&isFollow=1`;
+        //window.location=`SRActivity.php?action=displayActivity&serviceRequestId=`+currentProblem.problemID;
     }
     render() {
         const {

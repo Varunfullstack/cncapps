@@ -66,7 +66,7 @@ class SDManagerDashboardComponent extends MainComponent {
             {id: CUSTOMER_TAB, title: "Customer", icon: null},
             {id: HELD_FOR_QA_TAB, title: "Held for QA", icon: null},
             {id: DAILY_STATS_TAB, title: "Daily Stats", icon: null},
-            {id: TAB_MISSED_CALL_BACKS, title: "Missed Call Backs", icon: null},
+            {id: TAB_MISSED_CALL_BACKS, title: "Call Backs", icon: null},
         ];
     }
 

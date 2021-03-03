@@ -80,7 +80,7 @@ class DBECallback extends DBEntity
             DA_NOT_NULL
         );
          
-        $this->setPK(0);
+        //$this->setPK(0);
         $this->setAddColumnsOff();
         $this->db->connect();
     }
