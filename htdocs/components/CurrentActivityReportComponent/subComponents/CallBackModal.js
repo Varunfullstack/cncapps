@@ -47,7 +47,7 @@ class CallBackModal extends MainComponent {
         <div>
             
           <div className="form-group">
-            <label>Callback date / time</label>            
+            <label>Call back date / time</label>            
             <div className="flex-row">
               <input
                 type="date"
