@@ -40,11 +40,11 @@ class CallBackComponent extends MainComponent {
   getCallBackContact=(callback)=>{
     if(callback.useID==null)
     return  <ToolTip title="This SR has not been assigned to an engineer" width={30}>
-              <i className="fal fa-2x fa-user-slash color-gray2 pointer" onClick={()=>this.createCustomerContact(callback)}></i>               
+              <i className="fal fa-2x fa-user-slash color-gray icon pointer" onClick={()=>this.createCustomerContact(callback)}></i>               
             </ToolTip> ;
     else
     return   <ToolTip title="Create customer contact" width={30}>
-              <i className="fal fa-2x fa-phone color-gray2 pointer" onClick={()=>this.createCustomerContact(callback)}></i>               
+              <i className="fal fa-2x fa-phone color-gray icon pointer" onClick={()=>this.createCustomerContact(callback)}></i>               
             </ToolTip>
   }
   getContent=()=>{
@@ -146,7 +146,7 @@ class CallBackComponent extends MainComponent {
             content:(problem)=><div className="flex-row" style={{justifyContent:"center"}}>
                 {problem.timeRemain<0?
             <ToolTip title="Call back time expired" width={30}>
-                <i className="fal fa-2x fa-alarm-exclamation color-gray2 pointer"></i>               
+                <i className="fal fa-2x fa-alarm-exclamation color-gray icon pointer"></i>               
             </ToolTip>:null}            
             </div>,
             className: "text-center",         
@@ -160,7 +160,7 @@ class CallBackComponent extends MainComponent {
             sortable: false,
             content:(problem)=><div className="flex-row" style={{justifyContent:"center"}}>              
             <ToolTip title="Cancel call back" width={30}>
-                <i className="fal fa-2x fa-phone-slash color-gray2 pointer" onClick={()=>this.cancelCallBack(problem)}></i>               
+                <i className="fal fa-2x fa-phone-slash color-gray icon pointer" onClick={()=>this.cancelCallBack(problem)}></i>               
             </ToolTip>            
             </div>,
             className: "text-center",         
