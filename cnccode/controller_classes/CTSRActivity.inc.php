@@ -1465,7 +1465,7 @@ FROM
       AND declinedFlag <> 'Y'
     GROUP BY cui_custno) a
     ON a.cui_custno = problem.`pro_custno`
-    where problem.`pro_custno` <> 282 AND problem.raiseTypeId = 3 ";
+    where problem.`pro_custno` <> 282 AND problem.raiseTypeId = 3 and a.items and notFirstTimeFixReason is not null";
         $params     = [];
         if (isset($problemID) && $problemID != '') {
             $query               .= " and problem.pro_problemno = :problemID";
