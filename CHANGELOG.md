@@ -1,5 +1,8 @@
 # Changelog
 This project changes will be shown here.
+## [unreleased]
+### Added
+- CNC-1266 Save projects filter in local browser cache
 
 ## [unreleased]
 ### Added
