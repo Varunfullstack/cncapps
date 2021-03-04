@@ -1,8 +1,5 @@
 # Changelog
 This project changes will be shown here.
-## [unreleased]
-### Added
-- CNC-1266 Save projects filter in local browser cache
 
 ## [unreleased]
 ### Added
@@ -11,13 +8,14 @@ This project changes will be shown here.
 - Issue 1255 - Add Expenses Next ProcessingDate ExpenseDashboard.
 - Issue 1268 - Tidy up feedbackuptoken table
 - Issue 1272 - Internal Stats API for website to include total number of proactively raised SRs
+- Issue 1266 - Save projects filter in local browser cache
 ### Changed
 - Issue 1181 - SR Asset list & assignment improvements.
 - Issue 1262 - Leased Line Expiry Notifications email changed.
 - Issue 1252 - User time log to exclude weekends
 - Issue 1256 - Show when all linked SR linked to a SO are closed
 - Issue 1263 - Set emailSubjectSummary for system generated requests
-- Issue 1238 Service Request Display Additional Information
+- Issue 1238 - Service Request Display Additional Information
 - Issue 1236 - Include contact name on Current SRs and SR summary only.
 ### Fixed
 - Issue 1269 - Delete Activity icon is missing for some users
