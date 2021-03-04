@@ -7,6 +7,9 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 global $cfg;
+
+use CNCLTD\Utils;
+
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBESalesOrderTotals.inc.php');
 require_once($cfg['path_dbe'] . '/DBEInvoiceTotals.inc.php');
@@ -151,7 +154,7 @@ class CTHome extends CTCNC
                 if ($method == 'POST') echo json_encode($this->setDefaultLayout());
                 break;
             case self::GET_FEEDBACK_TEAMS:
-                echo json_encode($this->getFeedbackTeams(),JSON_NUMERIC_CHECK);
+                echo json_encode($this->getFeedbackTeams(), JSON_NUMERIC_CHECK);
                 break;
             default:
                 $this->displayReact();
@@ -316,9 +319,46 @@ class CTHome extends CTCNC
     private function getUpcomingVisitsData()
     {
         global $db;
-        $db->query("select upcomingVisitsData from homeData limit 1");
-        $db->next_record(MYSQLI_ASSOC);
-        return html_entity_decode($db->Record['upcomingVisitsData']);
+        $result = $db->query(
+            "SELECT 
+  caa_problemno AS serviceRequestID,
+  caa_callactivityno AS callActivityID,
+  caa_date AS date,
+  caa_starttime AS time,
+  cus_name AS customerName,
+  CONCAT(
+    consultant.firstName,
+    ' ',
+    consultant.lastName
+  ) AS engineerName,
+  emailSubjectSummary 
+FROM
+  callactivity 
+  LEFT JOIN problem 
+    ON problem.`pro_problemno` = caa_problemno 
+  LEFT JOIN customer 
+    ON customer.`cus_custno` = problem.pro_custno 
+  LEFT JOIN consultant 
+    ON consultant.`cns_consno` = callactivity.`caa_consno` 
+WHERE callactivity.`caa_callacttypeno` IN (4, 7) 
+  AND caa_date >= date(NOW()) 
+  AND caa_date <= date((NOW() + INTERVAL 1 WEEK)) 
+  AND (
+    caa_endtime IS NULL 
+    OR caa_endtime = \"\"
+  ) 
+ORDER BY caa_date ASC,
+  caa_starttime ASC "
+        );
+        $data   = [];
+        while ($row = $result->fetch_assoc()) {
+            $row['emailSubjectSummary'] = substr(
+                Utils::stripEverything($row['emailSubjectSummary']),
+                0
+            );
+            $data[]                     = $row;
+        }
+        return html_entity_decode(json_encode($data));
     }
 
     /**
@@ -1673,8 +1713,10 @@ class CTHome extends CTCNC
             );
         }
     }
-    function getFeedbackTeams(){
-        $query="SELECT       
+
+    function getFeedbackTeams()
+    {
+        $query = "SELECT       
                     COUNT(IF(f.value=1, 1, NULL)) happy,
                     COUNT(IF(f.value=2, 1, NULL)) average,
                     COUNT(IF(f.value=3, 1, NULL)) unhappy,
@@ -1742,7 +1784,7 @@ class CTHome extends CTCNC
                     AND problem.pro_custno <> 282
                 GROUP BY   cons.teamID 
           ";
-          return DBConnect::fetchAll($query,[]);
+        return DBConnect::fetchAll($query, []);
     }
 
     private function getLoggedActivityByTimeBracket(int $team, ?DateTime $dateTime = null)

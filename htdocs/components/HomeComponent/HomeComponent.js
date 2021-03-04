@@ -428,7 +428,7 @@ class HomeComponent extends MainComponent {
                     {c.engineerName}
                 </td>
                 <td>
-                    {c.reason.replace(/\n/g, " ")}
+                    {c.emailSubjectSummary}
                 </td>
                 <td>
                     <a target="_blank"

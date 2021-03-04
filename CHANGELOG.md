@@ -14,6 +14,7 @@ This project changes will be shown here.
 - Issue 1256 - Show when all linked SR linked to a SO are closed
 - Issue 1263 - Set emailSubjectSummary for system generated requests
 - Issue 1238 Service Request Display Additional Information
+- Issue 1236 - Include contact name on Current SRs and SR summary only.
 ### Fixed
 - Issue 1269 - Delete Activity icon is missing for some users
 - Issue 1187 - Old user login tidy up.
