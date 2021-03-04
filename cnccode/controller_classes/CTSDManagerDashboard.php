@@ -465,7 +465,7 @@ WHERE pro_custno <> 282
         JOIN customer cu on cu.cus_custno = p.pro_custno
         JOIN consultant cons on cons.cns_consno=p.`pro_consno`
     WHERE cb.status=:status 
-     AND TIMESTAMPDIFF(HOUR,cb.callback_datetime,NOW()) >=72  ";      
+     AND TIMESTAMPDIFF(HOUR,cb.callback_datetime,NOW()) <=72  ";      
     
         if ($_REQUEST['hd']=='false') {
             $query .= ' and pro_queue_no <> 1 ';
