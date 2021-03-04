@@ -1,6 +1,6 @@
 <?php
 
-namespace CNCLTD\Exceptions\infra;
+namespace CNCLTD\Supplier\infra;
 class SupplierMySQLDTO
 {
     private $sup_suppno;

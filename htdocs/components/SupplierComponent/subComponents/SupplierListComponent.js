@@ -1,6 +1,8 @@
 import React from "react";
 import Table from "../../shared/table/table";
 import {SupplierService} from "../../services/SupplierService";
+import {SHOW_ACTIVE} from "../../customerEditMain/visibilityFilterTypes";
+import {VisibilityFilterOptions} from "../../customerEditMain/actions";
 
 
 export class SupplierListComponent extends React.PureComponent {
@@ -9,7 +11,8 @@ export class SupplierListComponent extends React.PureComponent {
         super(props, context);
         this.editSupplier = this.props.onSupplierEdit;
         this.state = {
-            data: []
+            data: [],
+            visibilityFilter: VisibilityFilterOptions.SHOW_ACTIVE
         }
         this.getTableElement = this.getTableElement.bind(this);
     }
@@ -62,7 +65,23 @@ export class SupplierListComponent extends React.PureComponent {
                 hdClassName: "text-left",
                 className: "text-left",
                 content: (supplierRow) => {
-                    return `${supplierRow.mainContactTitle ? `${supplierRow.mainContactTitle}. ` : ''}${supplierRow.mainContactName}${supplierRow.mainContactPosition ? ` (${supplierRow.mainContactPosition})` : ''}`
+                    return `${supplierRow.mainContactTitle ? `${supplierRow.mainContactTitle}. ` : ''}${supplierRow.mainContactName ?? ""}${supplierRow.mainContactPosition ? ` (${supplierRow.mainContactPosition})` : ''}`
+                }
+
+            },
+            {
+                hide: false,
+                order: 3,
+                path: "mainContactPhone",
+                key: "mainContactPhone",
+                label: "Contact Phone",
+                hdToolTip: "Contact Phone",
+                sortable: true,
+                width: "55",
+                hdClassName: "text-left",
+                className: "text-left",
+                content: (supplierRow) => {
+                    return supplierRow.mainContactPhone
                 }
 
             },
@@ -71,37 +90,67 @@ export class SupplierListComponent extends React.PureComponent {
                 order: 20,
                 path: "id",
                 key: "address2",
-                label: "Supplier Address",
-                hdToolTip: "Supplier Address",
-                sortable: true,
+                sortable: false,
                 width: "55",
                 hdClassName: "text-center",
                 className: "text-center",
                 content: (supplierRow) => (
-                    <button onClick={this.editSupplier(supplierRow)}>Test</button>
+                    <button onClick={this.editSupplierRowFunction(supplierRow)}><i className="fal fa-pencil"/></button>
                 )
-
-
             },
 
         ];
         columns = columns
             .filter((c) => c.hide == false)
             .sort((a, b) => (a.order > b.order ? 1 : -1));
-        const {data} = this.state;
-        console.log(data);
+        const {data, visibilityFilter} = this.state;
 
         return <Table
-            data={data || []}
+            data={data.filter(x => !(visibilityFilter === VisibilityFilterOptions.SHOW_ACTIVE && !x.active))}
             columns={columns}
             pk="id"
             search={true}
         />
     }
 
+    editSupplierRowFunction = (supplierRow) => {
+        return () => {
+            // navigate to the edit page
+            console.log(supplierRow);
+        }
+    }
+
+    onToggleVisibility = () => {
+        let visibilityFilterOption = VisibilityFilterOptions.SHOW_ALL;
+        if (this.state.visibilityFilter === VisibilityFilterOptions.SHOW_ALL) {
+            visibilityFilterOption = VisibilityFilterOptions.SHOW_ACTIVE;
+        }
+        this.setState({visibilityFilter: visibilityFilterOption});
+    }
+
     render() {
+        const {visibilityFilter} = this.state;
+
         return (
             <React.Fragment>
+                <div>
+                    <div className="toggle-inline">
+                        <label>Show Inactive</label>
+                        <label className="switch"
+                        >
+
+                            <input type="checkbox"
+                                   name="showOnlyActiveSites"
+                                   onChange={this.onToggleVisibility}
+                                   title="Show only active sites"
+                                   value="1"
+                                   checked={visibilityFilter === SHOW_ACTIVE}
+                                   className="form-control"
+                            />
+                            <span className="slider round"/>
+                        </label>
+                    </div>
+                </div>
                 {this.getTableElement()}
             </React.Fragment>
         )

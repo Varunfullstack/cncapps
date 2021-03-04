@@ -1,10 +1,10 @@
 <?php
 
-namespace CNCLTD\Exceptions\infra;
+namespace CNCLTD\Supplier\infra;
 
-use CNCLTD\Exceptions\Supplier;
-use CNCLTD\Exceptions\SupplierId;
-use CNCLTD\Exceptions\SupplierRepository;
+use CNCLTD\Supplier\Supplier;
+use CNCLTD\Supplier\SupplierId;
+use CNCLTD\Supplier\SupplierRepository;
 use dbSweetcode;
 use Exception;
 use ReflectionClass;
@@ -52,7 +52,6 @@ class MySQLSupplierRepository implements SupplierRepository
         }
         $reflection = new ReflectionClass(Supplier::class);
 //        $supplier = $reflection->newInstanceWithoutConstructor();
-
     }
 
     public function getAllSuppliers(): array
@@ -68,6 +67,7 @@ select supplier.sup_suppno                                      as id,
        supplier.sup_postcode                                    as postcode,
        supplier.sup_cnc_accno                                   as cncAccountCode,
        supplier.sup_web_site_url                                as websiteURL,
+       supplier.active                                          as active,
        mainContact.title                                        as mainContactTitle,
        mainContact.position                                     as mainContactPosition,
        concat(mainContact.firstName, ' ', mainContact.lastName) as mainContactName,

@@ -8,6 +8,40 @@
     <changeSet author="pavwebdev" id="issue648-1">
         <preConditions onFail="MARK_RAN">
             <not>
+                <columnExists tableName="supplier" columnName="active"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="supplier">
+            <column name="active" type="tinyint(1)" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <sql>
+            <![CDATA[
+            UPDATE
+                supplier
+            SET supplier.active = 0
+            WHERE supplier.`sup_suppno` IN
+                  (SELECT a.con_suppno
+                   FROM (SELECT con_suppno,
+                                COUNT(
+                                            con_email IS NOT NULL
+                                            OR con_email <> ""
+                                    ) AS validEmails
+                         FROM contact
+                         WHERE contact.`con_suppno` IS NOT NULL
+                           AND con_suppno <> 0
+                         GROUP BY con_suppno) a
+                   WHERE validEmails = 0);
+            ]]>
+        </sql>
+        <rollback>
+            <dropColumn tableName="supplier" columnName="active"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue648-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
                 <tableExists tableName="supplierContact"/>
             </not>
         </preConditions>
@@ -40,8 +74,11 @@
             <column name="active" type="tinyint(1)" defaultValue="1">
                 <constraints nullable="false"/>
             </column>
+            <column name="isMain" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
-        <sql splitStatements="true">
+        <sql>
             <![CDATA[
             insert into supplierContact (id, supplierId, title, position, firstName, lastName, email, phone, active,
                                          isMain)
@@ -51,7 +88,7 @@
                    con_position,
                    con_first_name,
                    con_last_name,
-                   con_email,
+                   if(con_email is null or con_email = '', "notprovided@cnc-ltd.co.uk", con_email),
                    con_phone,
                    active,
                    coalesce((select sup_contno = con_contno from supplier where supplier.sup_suppno = con_suppno),
@@ -81,17 +118,17 @@
                 lastName  = if(lastName = "", null, lastName),
                 email     = if(email = "", null, email),
                 phone     = if(phone = "", null, phone);
-
-
             delete
             from contact
             where con_suppno is not null
               and con_suppno <> 0;
             ]]>
         </sql>
-        <rollback/>
+        <rollback>
+            <dropTable tableName="supplierContact"/>
+        </rollback>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue648-2">
+    <changeSet author="pavwebdev" id="issue648-3">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="supplierContactAuditLog"/>
@@ -169,7 +206,7 @@
             <dropTable tableName="supplierContactAuditLog"/>
         </rollback>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue648-3">
+    <changeSet author="pavwebdev" id="issue648-4">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="contact" columnName="con_suppno"/>
         </preConditions>
@@ -182,7 +219,7 @@
             </addColumn>
         </rollback>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue648-4">
+    <changeSet author="pavwebdev" id="issue648-5">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="contactAuditLog" columnName="con_suppno"/>
         </preConditions>
@@ -195,7 +232,7 @@
             </addColumn>
         </rollback>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue648-5">
+    <changeSet author="pavwebdev" id="issue648-6">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="supplier" columnName="sup_contact"/>
         </preConditions>
@@ -206,7 +243,7 @@
             </addColumn>
         </rollback>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue648-6">
+    <changeSet author="pavwebdev" id="issue648-7">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="supplier" columnName="sup_pay_method"/>
         </preConditions>
@@ -217,7 +254,7 @@
             </addColumn>
         </rollback>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue648-7">
+    <changeSet author="pavwebdev" id="issue648-8">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="supplier" columnName="sup_approval"/>
         </preConditions>
@@ -228,7 +265,7 @@
             </addColumn>
         </rollback>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue648-8">
+    <changeSet author="pavwebdev" id="issue648-9">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="supplier" columnName="sup_scopeno"/>
         </preConditions>
@@ -239,7 +276,7 @@
             </addColumn>
         </rollback>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue648-9">
+    <changeSet author="pavwebdev" id="issue648-10">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="supplier" columnName="sup_date_quest"/>
         </preConditions>
@@ -250,7 +287,7 @@
             </addColumn>
         </rollback>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue648-10">
+    <changeSet author="pavwebdev" id="issue648-11">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="supplier" columnName="sup_credit_limit"/>
         </preConditions>
@@ -261,5 +298,4 @@
             </addColumn>
         </rollback>
     </changeSet>
-
 </databaseChangeLog>

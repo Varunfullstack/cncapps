@@ -1,6 +1,6 @@
 <?php
 
-namespace CNCLTD\Exceptions\infra;
+namespace CNCLTD\Supplier\infra;
 class SupplierWithMainContactMysqlDTO implements \JsonSerializable
 {
     private $id;
@@ -12,6 +12,7 @@ class SupplierWithMainContactMysqlDTO implements \JsonSerializable
     private $postcode;
     private $cncAccountCode;
     private $websiteURL;
+    private $active;
     private $mainContactTitle;
     private $mainContactPosition;
     private $mainContactName;
@@ -138,8 +139,8 @@ class SupplierWithMainContactMysqlDTO implements \JsonSerializable
     /**
      * @return mixed
      */
-    public function getMainContactMobile()
+    public function getActive()
     {
-        return $this->mainContactMobile;
+        return $this->active;
     }
 }

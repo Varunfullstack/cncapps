@@ -5,6 +5,10 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
+
+use CNCLTD\Supplier\infra\MySQLSupplierRepository;
+
 require_once($cfg['path_bu'] . '/BUSupplier.inc.php');
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
@@ -488,7 +492,7 @@ class CTSupplier extends CTCNC
 
     private function getSuppliersController()
     {
-        $repo = new \CNCLTD\Exceptions\infra\MySQLSupplierRepository();
+        $repo = new MySQLSupplierRepository();
         echo json_encode(["status" => "ok", "data" => $repo->getAllSuppliers()]);
     }
 }
