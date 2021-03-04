@@ -1024,7 +1024,8 @@ class CTUser extends CTCNC
                 $users,
                 array(
                     'id'   => $dbeUser->getValue(DBEUser::userID),
-                    'name' => $dbeUser->getValue(DBEUser::name)
+                    'name' => $dbeUser->getValue(DBEUser::name),
+                    'teamId'=>$dbeUser->getValue(DBEUser::teamID),
                 )
             );
         }

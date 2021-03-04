@@ -12,11 +12,15 @@ import CustomerSearch from '../shared/CustomerSearch';
 import PrioritiesRaisedComponent from './subComponents/PrioritiesRaisedComponent';
 import QuotationConversionComponent from './subComponents/QuotationConversionComponent';
 import ServiceRequestsRaisedByContract from "./subComponents/ServiceRequestsRaisedByContract";
+import BillingConsultancyComponent from './subComponents/BillingConsultancyComponent';
+import APIUser from '../services/APIUser';
+import Toggle from '../shared/Toggle';
 
 export const ReportType = {Daily: "day", Weekly: "week", Monthly: "month"}
 
 export default class KPIReportComponent extends MainComponent {
     api;
+    apiUsers=new APIUser();
     ResultType;
     colors;
     reports;
@@ -25,6 +29,7 @@ export default class KPIReportComponent extends MainComponent {
     REP_PRIORITIES_RAISED = 2;
     SRS_BY_CONTRACTS = 3;
     REP_QUOTATION_CONVERSION = 4;
+    REP_CONFIRMED_BILLED_PER_ENGINEER=5;
 
     /**
      * SRS_BY_CONTRAC
@@ -42,18 +47,28 @@ export default class KPIReportComponent extends MainComponent {
                 from: this.getInitStartDate(),
                 to: this.getInitEndDate(),
                 resultType: this.ResultType.Weekly,
-                customerID: ''
+                customerID: '',
+                consName:'',
+                teams:{
+                    hd:true,
+                    es:true,
+                    sp:true,
+                    p:true
+                }
             },
             data: [],
             reports: [],
-            activeReport: null
+            activeReport: null,
+            consultants:[]
         };
         this.api = new APIKPIReport();
         this.reportparameters = {
             dateFrom: 'dateFrom',
             dateTo: 'dateTo',
             customer: 'customer',
-            resultType: 'resultType'
+            resultType: 'resultType',
+            consName:'consName',
+            teams:'teams'
         };
         moment.locale("en");
         moment.updateLocale("en", {
@@ -65,6 +80,7 @@ export default class KPIReportComponent extends MainComponent {
 
     componentDidMount() {
         this.getReports();
+        
     }
 
     getReports = () => {
@@ -110,9 +126,20 @@ export default class KPIReportComponent extends MainComponent {
                     this.reportparameters.resultType,
                 ]
             }
+            ,
+            {
+                id: this.REP_CONFIRMED_BILLED_PER_ENGINEER,
+                title: "Billed Consultancy By Person",
+                parameters: [
+                    this.reportparameters.dateFrom,
+                    this.reportparameters.dateTo, 
+                    this.reportparameters.consName,
+                    this.reportparameters.teams
+                ]
+            }
         ];
         if (!activeReport)
-            activeReport = reports[0];
+            activeReport = reports[4];
         this.setState({reports, activeReport}, () => this.handleReportView());
     }
 
@@ -121,7 +148,7 @@ export default class KPIReportComponent extends MainComponent {
     }
 
     getInitEndDate() {
-        ////console.log("end date",moment().subtract(1, 'weeks').startOf('w')).format('YYYY-MM-DD');
+        //////console.log("end date",moment().subtract(1, 'weeks').startOf('w')).format('YYYY-MM-DD');
         return moment().subtract(1, 'weeks').startOf('w').format('YYYY-MM-DD');
     }
 
@@ -129,11 +156,11 @@ export default class KPIReportComponent extends MainComponent {
         const {filter, data} = this.state;
         filter[field] = value;
         this.setState({filter});
-        //console.log(filter);
+        ////console.log(filter);
     };
 
     getFilterElement = () => {
-        const {filter, reports} = this.state;
+        const {filter, reports,activeReport,consultants} = this.state;
         return (
             <table>
                 <tbody>
@@ -142,6 +169,7 @@ export default class KPIReportComponent extends MainComponent {
                     <td colSpan="5">
                         <select style={{width: 180}}
                                 onChange={this.handleReportChange}
+                                value={activeReport?.id}
                         >
                             {reports.map((r) => (
                                 <option key={r.id}
@@ -208,6 +236,54 @@ export default class KPIReportComponent extends MainComponent {
                     ) : null}
                 </tr>
                 <tr>
+                    {this.hasParameter(this.reportparameters.teams) ? (
+                        <React.Fragment>
+                            <td>Teams</td>
+                            <td colSpan={3}>
+                               <div>
+                                   
+                            <label className="mr-3 ml-5">HD</label>
+                            <Toggle checked={filter.teams.hd}
+                                    onChange={(value) => this.setFilterTeam("hd", !filter.teams.hd)}
+                            />
+                            <label className="mr-3 ml-5">ES</label>
+                            <Toggle checked={filter.teams.es}
+                                    onChange={(value) => this.setFilterTeam("es", !filter.teams.es)}
+                            />
+                            <label className="mr-3 ml-5">SP</label>
+                            <Toggle checked={filter.teams.sp}
+                                    onChange={(value) => this.setFilterTeam("sp", !filter.teams.sp)}
+                            />
+                            <label className="mr-3 ml-5">P</label>
+                            <Toggle checked={filter.teams.p}
+                                    onChange={(value) => this.setFilterTeam("p", !filter.teams.p)}
+                            />
+                             
+                               </div>
+                            </td>
+                        </React.Fragment>
+                    ) : null}
+                    <td>
+                     </td>
+                </tr>
+                <tr>
+                    {this.hasParameter(this.reportparameters.consName) ? (
+                        <React.Fragment>
+                            <td>Consultant</td>
+                            <td colSpan={3}>
+                               <select style={{width:340}} value={filter.consName} 
+                               onChange={(event)=>this.setFilter('consName',event.target.value)}
+                               >
+                                <option>All</option>
+                                {consultants.map(c=><option key={c.id} value={c.name}>{c.name}</option>)}
+                               </select>
+                            </td>
+                        </React.Fragment>
+                    ) : null}
+                    <td>
+                     </td>
+                </tr>
+                <tr>
                     {this.hasParameter(this.reportparameters.customer) ? (
                         <React.Fragment>
                             <td>Customer</td>
@@ -231,6 +307,11 @@ export default class KPIReportComponent extends MainComponent {
             </table>
         );
     };
+    setFilterTeam=(team,value)=>{
+        const {filter}=this.state;
+        filter.teams[team]=value;
+        this.setState({filter});
+    }
     handleReportChange = ($event) => {
         const id = $event.target.value;
         const {reports} = this.state;
@@ -241,13 +322,21 @@ export default class KPIReportComponent extends MainComponent {
         const {activeReport} = this.state;
         return activeReport != null && activeReport.parameters.indexOf(parameter) >= 0;
     }
-    handleReportView = () => {
-        const {filter, activeReport} = this.state;
+    handleReportView = async() => {
+        let {filter, activeReport,consultants} = this.state;
+ 
         this.setState({_showSpinner: true});
         if (filter.from == "") {
             this.alert("You must enter the start date");
             return;
         }
+        if(activeReport&&activeReport.parameters.indexOf(this.reportparameters.consName)>=0&&consultants.length==0)
+        {
+            //console.log('have users');
+            consultants=await this.apiUsers.getActiveUsers();
+            this.setState({consultants});
+        }
+
         switch (activeReport?.id) {
             case this.REP_SR_FIXED:
                 this.api.getSRFixed(filter.from, filter.to, filter.customerID).then((data) => {
@@ -269,10 +358,18 @@ export default class KPIReportComponent extends MainComponent {
                     this.processData(data, false);
                 });
                 break;
+            case this.REP_CONFIRMED_BILLED_PER_ENGINEER:
+                this.api.getEngineerMonthlyBilling(filter.from, filter.to).then((data) => {
+                    ////console.log('Engineer Billing',data);                   
+                    this.processData(data, false,false,false);
+                    //console.log('Engineer Billing',data,this.state.filter);
+                });
+                break;
         }
+       
 
     };
-    processData = (data, skipWeekEnds = true) => {
+    processData = (data, skipWeekEnds = true,daily=true,weekly=true,monthly=true) => {
         const {filter} = this.state;
         if (skipWeekEnds) {
             data = data.filter((a) => {
@@ -281,14 +378,15 @@ export default class KPIReportComponent extends MainComponent {
                 else return true;
             });
         }
-        if (data.length <= 100) filter.resultType = this.ResultType.Daily;
-        if (data.length > 100 && data.length < 200)
+        if (data.length <= 100&&daily) filter.resultType = this.ResultType.Daily;
+        if (data.length > 100 && data.length < 200&&weekly)
             filter.resultType = this.ResultType.Weekly;
-        else filter.resultType = this.ResultType.Monthly;
+        else if(monthly)
+        filter.resultType = this.ResultType.Monthly;
         this.setState({data, _showSpinner: false, filter});
     }
     getActiveChart = () => {
-        const {activeReport, data, filter} = this.state;
+        const {activeReport, data, filter,consultants} = this.state;
         switch (activeReport?.id) {
             case this.REP_SR_FIXED:
                 return <SRFixedComponent data={data}
@@ -306,7 +404,11 @@ export default class KPIReportComponent extends MainComponent {
             case this.REP_QUOTATION_CONVERSION:
                 return <QuotationConversionComponent data={data}
                                                      filter={filter}
-                ></QuotationConversionComponent>
+                ></QuotationConversionComponent>;
+            case this.REP_CONFIRMED_BILLED_PER_ENGINEER:
+                return <BillingConsultancyComponent data={data}
+                        filter={filter} consultants={consultants}>
+                        </BillingConsultancyComponent>;
             default:
                 return null;
         }

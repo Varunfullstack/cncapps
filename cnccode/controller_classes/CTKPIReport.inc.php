@@ -12,7 +12,7 @@ class CTKPIReport extends CTCNC
     const GET_PRIORITY_RAISED                     = "priorityRaised";
     const GET_SERVICE_REQUESTS_RAISED_BY_CONTRACT = "serviceRequestsRaisedByContract";
     const GET_QUOTATION_CONVERSION                = "quotationConversion";
-
+    const GET_ENGINEER_MONTHLY_BILLING            = "engineerMonthlyBilling";
     /**
      * CTKPIReport constructor.
      */
@@ -41,6 +41,9 @@ class CTKPIReport extends CTCNC
                 exit;
             case self::GET_QUOTATION_CONVERSION:
                 echo json_encode($this->getQuotationConversion());
+                exit;
+            case self::GET_ENGINEER_MONTHLY_BILLING:
+                echo json_encode($this->getEngineerMonthlyBilling());
                 exit;
             default:
                 $this->setTemplate();
@@ -217,4 +220,42 @@ WHERE problem.`pro_date_raised` >= '2020-01-01'
         return DBConnect::fetchAll($query, $params);
     }
 
+    function getEngineerMonthlyBilling(){
+        $from       = @$_REQUEST["from"]??'';
+        $to         = @$_REQUEST["to"]??'';        
+        $query      = "SELECT
+        inl_desc,
+        inh_date_printed_yearmonth,
+        SUM(`inl_qty` * `inl_unit_price`) AS amount
+      FROM
+        invline
+        JOIN invhead
+          ON invline.`inl_invno` = invhead.`inh_invno`
+      WHERE inl_itemno IN (
+          1502,
+          1503,
+          2237,
+          16865,
+          2325,
+          9251,
+          9637,
+          10437,
+          10654
+        )
+        AND inl_desc LIKE '%- consultancy%'           
+       ";
+        $params     = array();
+
+        if ($from != '') {
+            $query          .= "  AND inh_date_printed >= :from ";
+            $params["from"] = $from;
+        }
+        if ($to != '') {
+            $query        .= "  AND inh_date_printed <= :to ";
+            $params["to"] = $to;
+        }
+        
+        $query .= "  GROUP BY  invhead.`inh_date_printed_yearmonth`, inl_desc  order by inh_date_printed_yearmonth";
+        return DBConnect::fetchAll($query, $params);
+    }
 }
