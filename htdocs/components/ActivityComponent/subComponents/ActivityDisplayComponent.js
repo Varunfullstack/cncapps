@@ -1031,7 +1031,12 @@ class ActivityDisplayComponent extends MainComponent {
         const templateDefault = '';
         this.setState({templateOptions: options, _showModal: true, templateType: type, templateTitle, templateDefault})
     }
-    //-------------end template
+
+    onTaskListUpdated = () => {
+        const {currentActivity} = this.state;
+        this.loadCallActivity(currentActivity);
+    }
+
     getFooter = () => {
         return (
             <div className="activities-container">

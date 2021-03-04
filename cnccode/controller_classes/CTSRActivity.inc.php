@@ -326,12 +326,15 @@ class CTSRActivity extends CTCNC
             }
         );
         $taskListUpdatedByUserId = $dbeProblem->getValue(DBEProblem::taskListUpdatedBy);
-        if (!key_exists($taskListUpdatedByUserId, $consultants)) {
-            $dbeUser = new DBEUser($this);
-            $dbeUser->getRow($taskListUpdatedByUserId);
-            $consultants[$taskListUpdatedByUserId] = "{$dbeUser->getValue(DBEUser::firstName)} {$dbeUser->getValue(DBEUser::lastName)}";
+        $taskListUpdatedBy       = null;
+        if ($taskListUpdatedByUserId) {
+            if (!key_exists($taskListUpdatedByUserId, $consultants)) {
+                $dbeUser = new DBEUser($this);
+                $dbeUser->getRow($taskListUpdatedByUserId);
+                $consultants[$taskListUpdatedByUserId] = "{$dbeUser->getValue(DBEUser::firstName)} {$dbeUser->getValue(DBEUser::lastName)}";
+            }
+            $taskListUpdatedBy = $consultants[$taskListUpdatedByUserId];
         }
-        $taskListUpdatedBy = $consultants[$taskListUpdatedByUserId];
         return [
             "callActivityID"                  => $callActivityID,
             "problemID"                       => $problemID,
@@ -416,22 +419,18 @@ class CTSRActivity extends CTCNC
             'alarmTime'                       => $dbejCallActivity->getValue(DBEJCallActivity::alarmTime),
             'alarmDateMessage'                => $dbejCallActivity->getValue(DBEJCallActivity::alarmDate),
             'alarmTimeMessage'                => $dbejCallActivity->getValue(DBEJCallActivity::alarmTime),
-            'canChangeInitialDateAndTime'     => $dbeUser->getValue(
-                DBEUser::queueManager
-            ) == 'Y' ? true : false,
+            'canChangeInitialDateAndTime'     => $dbeUser->getValue(DBEUser::queueManager) == 'Y',
             "isInitalDisabled"                => $this->isInitalDisabled($dbejCallActivity),
             'contactSupportLevel'             => $dbeContact->getValue(DBEContact::supportLevel),
             'hdRemainMinutes'                 => $hdAssignedMinutes - $hdUsedMinutes,
             'esRemainMinutes'                 => $esAssignedMinutes - $esUsedMinutes,
             'imRemainMinutes'                 => $imAssignedMinutes - $imUsedMinutes,
             'projectRemainMinutes'            => $projectTeamAssignedMinutes - $projectUsedMinutes,
-            "canChangePriorityFlag"           => $dbeUser->getValue(DBEUser::changePriorityFlag) == 'Y' ? true : false,
+            "canChangePriorityFlag"           => $dbeUser->getValue(DBEUser::changePriorityFlag) == 'Y',
             "userID"                          => $dbejCallActivity->getValue(DBEJCallActivity::userID),
             "actUserTeamId"                   => $dbeUserActivity->getValue(DBEUser::teamID),
             "contractCustomerItemID"          => $dbejCallActivity->getValue(DBEJCallActivity::contractCustomerItemID),
-            "changeSRContractsFlag"           => $dbeUser->getValue(
-                DBEUser::changeSRContractsFlag
-            ) == 'Y' ? true : false,
+            "changeSRContractsFlag"           => $dbeUser->getValue(DBEUser::changeSRContractsFlag) == 'Y',
             "rootCauseID"                     => $dbejCallActivity->getValue(DBEJCallActivity::rootCauseID),
             'submitAsOvertime'                => $dbejCallActivity->getValue(DBECallActivity::submitAsOvertime),
             "siteMaxTravelHours"              => $dbeSite->getValue(DBESite::maxTravelHours),

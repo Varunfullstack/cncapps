@@ -26,7 +26,8 @@ class EditTaskListModalComponent extends StandardTextModal {
         const {options} = this.props;
         const {selectedOptionId} = this.state;
         const foundStandardText = options.find(x => x.id === selectedOptionId);
-        this.setState({value: `${this.state.value}${foundStandardText.template}`});
+        const cleanValue = this.state.value ?? '';
+        this.setState({value: `${cleanValue}${foundStandardText.template}`});
     }
 
     getTemplateModal = () => {

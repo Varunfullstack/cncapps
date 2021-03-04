@@ -37,6 +37,7 @@ export class TaskListComponent extends React.Component {
             if (!res.status === 'ok') {
                 throw new Error('Failed to save task list');
             }
+            debugger;
             if (onUpdatedTaskList) {
                 onUpdatedTaskList();
             }
@@ -99,10 +100,14 @@ export class TaskListComponent extends React.Component {
                 ><i className="fal fa-edit fa-2x"/></a>
             </div>
             <div className="internalNotesContainer">
-                <InternalNoteItemComponent updatedAt={moment(this.props.taskListUpdatedAt).format("DD/MM/YYYY HH:mm")}
-                                           updatedBy={this.props.taskListUpdatedBy}
-                                           content={this.props.taskList}
-                />
+                {
+                    !this.props.taskListUpdatedAt ?
+                        '' :
+                        <InternalNoteItemComponent updatedAt={moment(this.props.taskListUpdatedAt).format("DD/MM/YYYY HH:mm")}
+                                                   updatedBy={this.props.taskListUpdatedBy}
+                                                   content={this.props.taskList}
+                        />
+                }
 
             </div>
         </div>;
@@ -114,5 +119,5 @@ TaskListComponent.propTypes = {
     taskListUpdatedBy: PropTypes.string,
     taskList: PropTypes.string,
     problemId: PropTypes.number,
-    onUpdatedTaskList: PropTypes.func
+    // onUpdatedTaskList: PropTypes.func
 };
