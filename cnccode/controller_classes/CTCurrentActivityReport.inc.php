@@ -598,7 +598,7 @@ class CTCurrentActivityReport extends CTCNC
         $problem->getRow($problemID);
 
         $dbeContact=new DBEContact($this);
-        $dbeContact->getRow($contactID);
+        $dbeContact->getRow($contactID);       
         $contactName=$dbeContact->getValue(DBEContact::firstName)." ".$dbeContact->getValue(DBEContact::lastName);
         $callDateTime=new DateTime($callback_datetime);
         // $dbeCallback=new DBECallback($this);
@@ -652,6 +652,7 @@ class CTCurrentActivityReport extends CTCNC
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->setValue(DBECallActivity::callActTypeID, 11);
         $dbeCallActivity->setValue(DBECallActivity::contactID, $contactID);
+        $dbeCallActivity->setValue(DBECallActivity::siteNo, $dbeContact->getValue(DBEContact::siteNo));
         $dbeCallActivity->setValue(DBECallActivity::userID, $this->dbeUser->getPKValue());
         $dbeCallActivity->setValue(DBECallActivity::date, date('Y-m-d'));
         $dbeCallActivity->setValue(DBECallActivity::startTime, date('H:i'));
@@ -789,6 +790,7 @@ class CTCurrentActivityReport extends CTCNC
             $dbeCallActivity = new DBECallActivity($this);
             $dbeCallActivity->setValue(DBECallActivity::callActTypeID, 11);
             $dbeCallActivity->setValue(DBECallActivity::contactID, $contactID);
+            $dbeCallActivity->setValue(DBECallActivity::siteNo, $dbeContact->getValue(DBEContact::siteNo));
             $dbeCallActivity->setValue(DBECallActivity::userID, $this->dbeUser->getPKValue());
             $dbeCallActivity->setValue(DBECallActivity::date, date('Y-m-d'));
             $dbeCallActivity->setValue(DBECallActivity::startTime, date('H:i'));
@@ -816,12 +818,14 @@ class CTCurrentActivityReport extends CTCNC
                 return ['status' => false,'error'=>"Missing data"];
             $dbeCallBack = new DBECallback($this);
             $dbeCallBack->getRow($id);
-        
+            $dbeContact = new DBEContact($this);
+            $dbeContact->getRow($dbeCallBack->getValue(DBECallback::contactID));
 
             $staffName = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(DBEUser::lastName);
             $dbeCallActivity = new DBECallActivity($this);
             $dbeCallActivity->setValue(DBECallActivity::callActTypeID, 11);
             $dbeCallActivity->setValue(DBECallActivity::contactID, $dbeCallBack->getValue(DBECallback::contactID));
+            $dbeCallActivity->setValue(DBECallActivity::siteNo, $dbeContact->getValue(DBEContact::siteNo));
             $dbeCallActivity->setValue(DBECallActivity::userID, $this->dbeUser->getPKValue());
             $dbeCallActivity->setValue(DBECallActivity::date, date('Y-m-d'));
             $dbeCallActivity->setValue(DBECallActivity::startTime, date('H:i'));

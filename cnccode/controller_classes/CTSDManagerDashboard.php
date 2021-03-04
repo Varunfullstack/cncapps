@@ -481,7 +481,8 @@ WHERE pro_custno <> 282
         }
         $limit = $_REQUEST['limit'];
         $query .=" order by timeRemain asc limit ".$limit;
-
+        // echo  $query;
+        // exit;
         return DBConnect::fetchAll( $query,["status"=>CallBackStatus::AWAITING]);
     }
 }
