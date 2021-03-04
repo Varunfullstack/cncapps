@@ -1260,4 +1260,12 @@ class CTCNC extends Controller
         }
         return $_REQUEST[$paramName];
     }
+    function getRequestMethodeName(){
+       return $_SERVER['REQUEST_METHOD'];
+    }
+    function getResponseError($code,$message)
+    {
+        http_response_code($code);
+        return ["status"=>false,"error"=>$message];
+    }
 }

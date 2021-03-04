@@ -4,6 +4,7 @@ import Table from "./../../shared/table/table";
 import CurrentActivityService from "../services/CurrentActivityService";
 import React from 'react';
 import {ColumnRenderer} from "./ColumnRenderer";
+import ToolTip from "../../shared/ToolTip";
 
 class InboxOpenSRComponent extends React.Component {
     code = "OSR";
@@ -51,6 +52,21 @@ class InboxOpenSRComponent extends React.Component {
             getAllocatedElement,
         } = this.props;
         let columns = [
+            {
+                hide: false,
+                order: 0.9,
+                path: null,
+                label: "",
+                key: "CallBack",
+                sortable: false,
+                hdClassName: "text-center",
+                className: "text-center",
+                content: (problem) =>
+                <ToolTip title="Call back">
+                    <i className="fal fa-2x fa-phone icon pointer color-gray" onClick={()=>this.props.onCallBack(problem)}></i>
+                </ToolTip>
+                   
+            },
             ColumnRenderer.getWorkIconColumn(startWork, this.code),
             ColumnRenderer.getSpecialAttentionColumn(),
             ColumnRenderer.getFixSLAWarningColumn(),

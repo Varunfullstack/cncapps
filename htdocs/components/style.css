@@ -1074,4 +1074,9 @@ input:required:valid { border: 1px solid black; }
 select:focus:required:invalid {border: 1px solid red;}
 select:required:invalid {border: 1px solid red;}
 select:required:valid { border: 1px solid black; }
- 
+.modal-input{
+    color:white;
+    background-color: transparent;
+    border-color: whitesmoke;
+
+}

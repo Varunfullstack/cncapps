@@ -15,6 +15,7 @@ import ActivityFollowOn from "../Modals/ActivityFollowOn";
 import moment from "moment";
 import Spinner from "../shared/Spinner/Spinner";
 import {ColumnRenderer} from "../CurrentActivityReportComponent/subComponents/ColumnRenderer";
+import MissedCallBackComponent from "./subComponents/MissedCallBackComponent";
 
 const CUSTOMER_TAB = 9;
 
@@ -27,6 +28,7 @@ const SHORTEST_SLA_FIX_REMAINING = 3;
 const AUTO_RELOAD_TIME = 60 * 1000;
 
 const CRITICAL_SERVICE_REQUESTS = 4;
+const TAB_MISSED_CALL_BACKS=12;
 
 class SDManagerDashboardComponent extends MainComponent {
     el = React.createElement;
@@ -64,7 +66,7 @@ class SDManagerDashboardComponent extends MainComponent {
             {id: CUSTOMER_TAB, title: "Customer", icon: null},
             {id: HELD_FOR_QA_TAB, title: "Held for QA", icon: null},
             {id: DAILY_STATS_TAB, title: "Daily Stats", icon: null},
-
+            {id: TAB_MISSED_CALL_BACKS, title: "Call Backs", icon: null},
         ];
     }
 
@@ -258,8 +260,10 @@ class SDManagerDashboardComponent extends MainComponent {
     ;
 
     getQueueElement = () => {
-        const {filter, queueData} = this.state;
+        const { queueData} = this.state;        
         const {el} = this;
+        const filter = {...this.state.filter};        
+
         if ([1, 2, 3, CRITICAL_SERVICE_REQUESTS, SHORTEST_SLA_FIX_REMAINING, 5, 6, 7, 8, HELD_FOR_QA_TAB].indexOf(filter.activeTab) >= 0) {
             let columns = [
                 {
@@ -599,6 +603,8 @@ class SDManagerDashboardComponent extends MainComponent {
         } else if (filter.activeTab == 10) {
             return el(DailyStatsComponent);
         }
+        else if(filter.activeTab==TAB_MISSED_CALL_BACKS)
+        return <MissedCallBackComponent filter={filter}></MissedCallBackComponent>
     }
     srDescription = (problem) => {
         window.open(

@@ -40,6 +40,7 @@ class DBEJProblem extends DBEProblem
     const IS_FIX_SLA_BREACHED              = 'isFixSLABreached';
     const contactName                      = 'contactName';
 
+    const contactID = 'contactID';
 
     /**
      * calls constructor()
@@ -273,17 +274,23 @@ class DBEJProblem extends DBEProblem
 	END'
         );
         $this->addColumn(
-          self::contactName,
-          DA_STRING,
-          DA_ALLOW_NULL,
-          "(select concat(contact.con_first_name, ' ', contact.con_last_name) from contact where con_contno = initial.caa_contno)"
-      );
-      $this->addColumn(
-        self::emailSubjectSummary,
-        DA_STRING,
-        DA_ALLOW_NULL,
-        'emailSubjectSummary'
-      );
+            self::contactName,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "(select concat(contact.con_first_name, ' ', contact.con_last_name) from contact where con_contno = initial.caa_contno)"
+        );
+        $this->addColumn(
+            self::emailSubjectSummary,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            'emailSubjectSummary'
+        );
+        $this->addColumn(
+            self::contactID,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "(select  con_contno  from contact where con_contno = initial.caa_contno) contactID"
+        );
         $this->setAddColumnsOff();
         $this->setPK(0);
     }
@@ -997,7 +1004,7 @@ class DBEJProblem extends DBEProblem
      * @return bool
      * @internal param mixed $future TRUE= ONLY return future alarmed requests
      */
-    function getCustomerOpenRows($customerID,$srNumber=null)
+    function getCustomerOpenRows($customerID, $srNumber = null)
     {
         $sql = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " LEFT JOIN customer ON cus_custno = pro_custno
            LEFT JOIN consultant ON cns_consno = pro_consno
@@ -1020,12 +1027,9 @@ class DBEJProblem extends DBEProblem
             left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
             left join team queueTeam on queueTeam.level = pro_queue_no
         WHERE 1=1";
-       
         $sql .= " AND pro_status <> 'C' and pro_status <> 'F' ";
-        if($customerID!=null && !empty($customerID))
-          $sql .= " AND pro_custno=$customerID";
-        if($srNumber!=null && !empty($srNumber))
-          $sql .= " AND problem.pro_problemno like '%$srNumber%'";
+        if ($customerID != null && !empty($customerID)) $sql .= " AND pro_custno=$customerID";
+        if ($srNumber != null && !empty($srNumber)) $sql .= " AND problem.pro_problemno like '%$srNumber%'";
         $sql .= " ORDER BY pro_alarm_date, pro_alarm_time";
         // echo   $sql;
         // exit;

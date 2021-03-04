@@ -150,8 +150,11 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
     private $slaFixHoursP3;
     /** @var string */
     private $contactName;
-        /** @var string */
+    /** @var string */
     private $emailSubjectSummary;
+    /** @var int */
+    private $contactID;
+
     /**
      * ServiceRequestSummaryDTO constructor.
      */
@@ -239,11 +242,12 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
         $instance->slaP3PenaltiesAgreed       = $dbeCustomer->getValue(\DBECustomer::slaP3PenaltiesAgreed);
         $instance->slaFixHoursP1              = $dbeCustomer->getValue(\DBECustomer::slaFixHoursP1);
         $instance->slaFixHoursP2              = $dbeCustomer->getValue(\DBECustomer::slaFixHoursP2);
-        $instance->slaFixHoursP3              = $dbeCustomer->getValue(\DBECustomer::slaFixHoursP3);        
+        $instance->slaFixHoursP3              = $dbeCustomer->getValue(\DBECustomer::slaFixHoursP3);
         $instance->contactName                = $problem->getValue(DBEJProblem::contactName);
-        $instance->emailSubjectSummary                = $problem->getValue(DBEJProblem::emailSubjectSummary);
-
-        return $instance;        
+        $instance->emailSubjectSummary        = $problem->getValue(DBEJProblem::emailSubjectSummary);
+        $instance->contactName = $problem->getValue(DBEJProblem::contactName);
+        $instance->contactID   = $problem->getValue(DBEJProblem::contactID);
+        return $instance;
     }
 
     private static function getProblemHistoryURL($problemId)
@@ -298,9 +302,10 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
             "slaP3PenaltiesAgreed"       => $this->slaP3PenaltiesAgreed,
             "slaFixHoursP1"              => $this->slaFixHoursP1,
             "slaFixHoursP2"              => $this->slaFixHoursP2,
-            "slaFixHoursP3"              => $this->slaFixHoursP3,   
-            "contactName"                =>$this->contactName,
+            "slaFixHoursP3"              => $this->slaFixHoursP3,
+            "contactName"                => $this->contactName,
             "emailSubjectSummary"        => $this->emailSubjectSummary,
+            "contactID"                  => $this->contactID,
         ];
     }
 

@@ -9,6 +9,7 @@ import { params, sort } from '../utils/utils';
 import './../style.css';
 import './ReportsComponent.css';
 import APIReports from './services/APIReports';
+import RepCallbackSearch from './subComponents/RepCallbackSearch';
 import RepProjects from './subComponents/RepProjects';
 import RepProjectsByConsultant from './subComponents/RepProjectsByConsultant';
 import RepProjectsByConsultantInProgress from './subComponents/RepProjectsByConsultantInProgress';
@@ -41,7 +42,8 @@ class ReportsComponent extends MainComponent {
       RepProjectsByConsultantInProgress:RepProjectsByConsultantInProgress,
       RepProjectsByCustomerStageFallsStartEnd:RepProjectsByCustomerStageFallsStartEnd,
       RepProjects:RepProjects,
-      RepProjectsWithoutClousureMeeting:RepProjectsWithoutClousureMeeting
+      RepProjectsWithoutClousureMeeting:RepProjectsWithoutClousureMeeting,
+      RepCallbackSearch:RepCallbackSearch
   };
   }
 
@@ -81,7 +83,7 @@ class ReportsComponent extends MainComponent {
     return <tr>
         <td>Report Categories</td>
         <td>
-            <select style={{width:200}} value={currentCategoryID} 
+            <select style={{width:300}} value={currentCategoryID} 
             onChange={(event)=>this.handleCategoryChange(event.target.value)}
 
             >
@@ -210,6 +212,13 @@ class ReportsComponent extends MainComponent {
         return <input type="date"  required={paramter.required} value={ paramter.value} onChange={(event)=>this.setParamterValue(paramter,event.target.value)} ></input>;       
       case 'customerID':
         return <CustomerSearch onChange={(customer)=>this.setParamterValue(paramter,customer.id)}></CustomerSearch>
+        case 'callbackStatus':
+        return <select required={paramter.required} value={paramter.value} onChange={(event)=>this.setParamterValue(paramter,event.target.value)} >
+          <option value="">All</option>
+          <option value="awaiting">Awaiting</option>
+          <option value="contacted">Contacted</option>
+          <option value="canceled">Canceled</option>
+        </select>
       default:
         break;
     }
@@ -249,6 +258,7 @@ class ReportsComponent extends MainComponent {
     const {currentReportID,reports,compParamters}=this.state;
      if(currentReportID=='')
     return null;
+   // console.log(currentReportID,reports);
     const report=reports.find(r=>r.id==currentReportID);
     const RepComponent= this.components[report.component];
    // console.log('current report',report.component,RepComponent);

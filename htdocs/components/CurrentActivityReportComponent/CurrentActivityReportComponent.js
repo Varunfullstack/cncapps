@@ -17,6 +17,7 @@ import ReactDOM from 'react-dom';
 import Modal from '../shared/Modal/modal';
 import CNCCKEditor from '../shared/CNCCKEditor';
 import APIStandardText from '../services/APIStandardText';
+import CallBackModal from './subComponents/CallBackModal';
 
 import '../style.css';
 import './CurrentActivityReportComponent.css';
@@ -24,6 +25,7 @@ import '../shared/ToolTip.css'
 import APIActivity from '../services/APIActivity';
 import MovingSRComponent from './subComponents/MovingSRComponent';
 
+import CallBackComponent from './subComponents/CallBackComponent';
 
 const AUTORELOAD_INTERVAL_TIME = 2 * 60 * 1000;
 
@@ -69,8 +71,9 @@ class CurrentActivityReportComponent extends MainComponent {
                 newTeam:'',
                 queue:'',
                 problem:null
-            }
-           
+            },
+            showCallBackModal:false,
+            currentProblem:null
         };
         this.apiCurrentActivityService = new CurrentActivityService();
         this.teams = [
@@ -204,7 +207,7 @@ class CurrentActivityReportComponent extends MainComponent {
         this.loadQueue(code);
         this.checkAutoReload(code);
         this.saveFilterToLocalStorage(filter);
-        this.setState({filter});
+        this.setState({filter,openSrCustomerID:''});
     };
     loadData = () => {
         const {filter} = this.state;
@@ -339,12 +342,12 @@ class CurrentActivityReportComponent extends MainComponent {
                 });
         }
     }
-    
+
     getAssignTeamModal=()=>{
         const {changeQueuData} =this.state;
         if(!changeQueuData.show)
             return null;
-        else 
+        else
             return <MovingSRComponent
             key="MovingSR"
             problem={changeQueuData.problem}
@@ -352,7 +355,7 @@ class CurrentActivityReportComponent extends MainComponent {
             show={changeQueuData.show}
             newTeam={changeQueuData.newTeam}
             onClose={this.handleMovingModalClose}
-            ></MovingSRComponent>        
+            ></MovingSRComponent>
     }
     handleMovingModalClose=(reload=true)=>{
         const {changeQueuData} =this.state;
@@ -364,8 +367,8 @@ class CurrentActivityReportComponent extends MainComponent {
         changeQueuData.problem=null;
         this.setState({changeQueuData});
     }
-    
-   
+
+
     // Shared methods
     moveToAnotherTeam = async ({target}, problem, code) => {
         const {changeQueuData} =this.state;
@@ -373,7 +376,7 @@ class CurrentActivityReportComponent extends MainComponent {
         changeQueuData.problem=problem;
         changeQueuData.show=true;
         changeQueuData.queue=code;
-        this.setState({changeQueuData});               
+        this.setState({changeQueuData});
     };
     /**
      * Move to another queue
@@ -603,7 +606,28 @@ class CurrentActivityReportComponent extends MainComponent {
             this.alert(err.toString());
         }
     }
-
+    onCallBack=(problem)=>{
+        console.log(problem);
+        this.setState({showCallBackModal:true,currentProblem:problem});
+    }
+    getCallBackModal=()=>{
+        const {showCallBackModal,currentProblem}=this.state;
+        if(!showCallBackModal)
+        return null;
+        return <CallBackModal key="modal" show={showCallBackModal}
+        onClose={this.handleCallBackClose}
+        problem={currentProblem}
+        >
+        </CallBackModal>
+    }
+    handleCallBackClose=(callActivityID)=>{
+        console.log(callActivityID);
+        //const {currentProblem}=this.state;
+        this.setState({showCallBackModal:false});
+        //if(callActivityID!=null)
+        //    window.location=`SRActivity.php?action=editActivity&callActivityID=${callActivityID}&isFollow=1`;
+        //window.location=`SRActivity.php?action=displayActivity&serviceRequestId=`+currentProblem.problemID;
+    }
     render() {
         const {
             el,
@@ -624,6 +648,7 @@ class CurrentActivityReportComponent extends MainComponent {
             getFollowOnElement,
             getCustomerOpenSR,
             assignToRequest,
+            onCallBack
         } = this;
         const {
             helpDeskInboxFiltered,
@@ -641,6 +666,8 @@ class CurrentActivityReportComponent extends MainComponent {
 
         } = this.state;
         return el("div", {style: {backgroundColor: "white"}}, [
+            <CallBackComponent  key='callback' team={filter.activeTab} customerID={this.state.openSrCustomerID}></CallBackComponent>,
+            this.getCallBackModal(),
             this.getConfirm(),
             this.getAlert(),
             this.getPrompt(),
@@ -662,7 +689,8 @@ class CurrentActivityReportComponent extends MainComponent {
                     allocateAdditionalTime,
                     requestAdditionalTime,
                     getAllocatedElement,
-                    getFollowOnElement
+                    getFollowOnElement,
+                    onCallBack
                 })
                 : null,
 
@@ -679,6 +707,7 @@ class CurrentActivityReportComponent extends MainComponent {
                     allocateAdditionalTime,
                     requestAdditionalTime,
                     getAllocatedElement,
+                    onCallBack
                 })
                 : null,
 
@@ -695,6 +724,7 @@ class CurrentActivityReportComponent extends MainComponent {
                     allocateAdditionalTime,
                     requestAdditionalTime,
                     getAllocatedElement,
+                    onCallBack
                 })
                 : null,
 
@@ -711,6 +741,7 @@ class CurrentActivityReportComponent extends MainComponent {
                     allocateAdditionalTime,
                     requestAdditionalTime,
                     getAllocatedElement,
+                    onCallBack
                 })
                 : null,
 
@@ -727,6 +758,7 @@ class CurrentActivityReportComponent extends MainComponent {
                     allocateAdditionalTime,
                     requestAdditionalTime,
                     getAllocatedElement,
+                    onCallBack
                 })
                 : null,
 
@@ -765,7 +797,8 @@ class CurrentActivityReportComponent extends MainComponent {
                     requestAdditionalTime,
                     getAllocatedElement,
                     getFollowOnElement,
-                    getCustomerOpenSR
+                    getCustomerOpenSR,
+                    onCallBack
                 })
                 : null,
         ]);

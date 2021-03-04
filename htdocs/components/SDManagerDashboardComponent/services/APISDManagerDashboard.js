@@ -10,4 +10,8 @@ export default class APISDManagerDashboard extends APIMain {
   getDailyStatsSummary() {
     return this.get(`${ApiUrls.sdDashboard}dailyStatsSummary` );
   }
+  getMissedCallBacks(hd,es,sp,p,limit){    
+    return this.get(`${ApiUrls.sdDashboard}missedCallBack&hd=${hd}&es=${es}&sp=${sp}&p=${p}&limit=${limit}` );
+
+  }
 }
