@@ -34,15 +34,43 @@ class ProjectsComponent extends MainComponent {
     }
 
     componentDidMount() {
-        this.api.getPRojectsSummary().then(projects => {
+           
+        this.loadProjectsSummary(); 
+    }
+    loadProjectsSummary=async ()=>{
+        const projectsSummary= await  this.loadprojectsSummaryStorage(); 
+        this.api.getPRojectsSummary()
+        .then(projects => {
             projects.map(p => {
-                p.filter = true;
+                const item=projectsSummary.find(ps=>ps.name==p.name);                 
+                if(item)
+                    p.filter = item.filter;
+                else
+                    p.filter = true;
                 return p;
             });
             return projects;
-        }).then(projectsSummary => this.setState({projectsSummary}))
+        }).then(projectsSummary =>{
+            this.setState({projectsSummary})
+            this.saveProjectSummaryLocal(projectsSummary);
+        });
     }
 
+    loadprojectsSummaryStorage = async () => {
+        return new Promise((res,rej)=>{
+            let projectsSummary = localStorage.getItem("projectsSummary");
+            if (projectsSummary) projectsSummary = JSON.parse(projectsSummary);
+            else projectsSummary = [];
+            res(projectsSummary);
+            // this.setState({projectsSummary}, () => {            
+            // });
+        })
+        
+    };
+    saveProjectSummaryLocal=(projectsSummary)=>{
+        console.log('save',projectsSummary);
+        localStorage.setItem("projectsSummary",JSON.stringify(projectsSummary))
+    }
     isActive = (code) => {
         const {activeTab} = this.state;
         if (activeTab == code) return "active";
@@ -154,6 +182,7 @@ class ProjectsComponent extends MainComponent {
         const indx = projectsSummary.map(p => p.name).indexOf(item.name);
         projectsSummary[indx].filter = !projectsSummary[indx].filter;
         this.setState({projectsSummary});
+        this.saveProjectSummaryLocal(projectsSummary);
     }
     getActionElement = () => {
         const action = params.get('action');
