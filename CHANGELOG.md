@@ -7,6 +7,7 @@ This project changes will be shown here.
 - Issue 1222 - Show Daily SR Stats on KPI Graph.
 - Issue 1255 - Add Expenses Next ProcessingDate ExpenseDashboard.
 - Issue 1268 - Tidy up feedbackuptoken table
+- Issue 1272 - Internal Stats API for website to include total number of proactively raised SRs
 ### Changed
 - Issue 1181 - SR Asset list & assignment improvements.
 - Issue 1262 - Leased Line Expiry Notifications email changed.
