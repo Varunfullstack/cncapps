@@ -15,6 +15,7 @@ class CTKPIReport extends CTCNC
     const GET_DAILY_STATS                         = "dailyStats";
     const GET_DAILY_SOURCE                        = 'dailySource';
 
+    const GET_ENGINEER_MONTHLY_BILLING            = "engineerMonthlyBilling";
     /**
      * CTKPIReport constructor.
      */
@@ -43,6 +44,9 @@ class CTKPIReport extends CTCNC
                 exit;
             case self::GET_QUOTATION_CONVERSION:
                 echo json_encode($this->getQuotationConversion());
+                exit;
+            case self::GET_ENGINEER_MONTHLY_BILLING:
+                echo json_encode($this->getEngineerMonthlyBilling());
                 exit;
             case self::GET_DAILY_STATS:
                 echo json_encode($this->getDailyStats(), JSON_NUMERIC_CHECK);
@@ -336,5 +340,43 @@ WHERE problem.`pro_date_raised` >= '2020-01-01'
                     AND (:to is null or `pro_date_raised`<=:to)                     
                 GROUP BY r.`description`,DATE";
         return DBConnect::fetchAll($query, ["from" => $from, "to" => $to, "customerID" => $customerID]);
+    }
+    function getEngineerMonthlyBilling(){
+        $from       = @$_REQUEST["from"]??'';
+        $to         = @$_REQUEST["to"]??'';
+        $query      = "SELECT
+        inl_desc,
+        inh_date_printed_yearmonth,
+        SUM(`inl_qty` * `inl_unit_price`) AS amount
+      FROM
+        invline
+        JOIN invhead
+          ON invline.`inl_invno` = invhead.`inh_invno`
+      WHERE inl_itemno IN (
+          1502,
+          1503,
+          2237,
+          16865,
+          2325,
+          9251,
+          9637,
+          10437,
+          10654
+        )
+        AND inl_desc LIKE '%- consultancy%'           
+       ";
+        $params     = array();
+
+        if ($from != '') {
+            $query          .= "  AND inh_date_printed >= :from ";
+            $params["from"] = $from;
+        }
+        if ($to != '') {
+            $query        .= "  AND inh_date_printed <= :to ";
+            $params["to"] = $to;
+        }
+
+        $query .= "  GROUP BY  invhead.`inh_date_printed_yearmonth`, inl_desc  order by inh_date_printed_yearmonth";
+        return DBConnect::fetchAll($query, $params);
     }
 }

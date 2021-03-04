@@ -10,6 +10,7 @@ This project changes will be shown here.
 - Issue 1272 - Internal Stats API for website to include total number of proactively raised SRs
 - Issue 1266 - Save projects filter in local browser cache
 - Issue 1239 - Internal Notes to record to include who and when they were added
+- Issue 1259 - Add Engineer monthly billing graph.
 ### Changed
 - Issue 1181 - SR Asset list & assignment improvements.
 - Issue 1262 - Leased Line Expiry Notifications email changed.
