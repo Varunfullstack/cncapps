@@ -27,10 +27,8 @@ export class Modal extends React.Component {
                 $(".modal-content").draggable({                    
                     cancel: ".undraggable",
                     start:function(){
-                                     //console.log("drag");
-                                 },     
+                                 },
                     stop:function(){
-                        //console.log("stop");
                         $this.setState({startDrag:false})
     
                     },  
@@ -39,17 +37,14 @@ export class Modal extends React.Component {
         }
     } 
     handleMouseMove=()=>{
-        //console.log(this.state.startDrag);
         if(!this.state.startDrag)
          this.setState({startDrag:true},()=>this.getDrag());
     }
     hanldeMouseOut=()=>{
-        //console.log(this.state.startDrag);
         if(this.state.startDrag)
         this.setState({startDrag:false});
     }
     handleContainerMouseMove=()=>{
-        //console.log('container');
         if(this.state.startDrag)
         this.setState({startDrag:false});
     }

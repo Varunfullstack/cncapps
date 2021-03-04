@@ -12,9 +12,14 @@ import CustomerDocumentUploader from "./CustomerDocumentUploader";
 import Modal from "../../shared/Modal/modal";
 import Table from "../../shared/table/table";
 import {LinkServiceRequestOrder} from "./LinkserviceRequestOrder.js";
+import moment from "moment";
+import {InternalNotesListComponent} from "../../shared/InternalNotesListComponent/InternalNotesListComponent";
+import {InternalNotes} from "./InternalNotesComponent";
+import {TaskListComponent} from "./TaskListComponent";
 
 // noinspection EqualityComparisonWithCoercionJS
 const emptyAssetReasonCharactersToShow = 30;
+
 
 class ActivityDisplayComponent extends MainComponent {
     api = new APIActivity();
@@ -180,7 +185,7 @@ class ActivityDisplayComponent extends MainComponent {
         const {data, currentUser} = this.state;
         return <div>
             {
-                data?.problemStatus !== "C" &&  data?.problemStatus !== "F"  ? 
+                data?.problemStatus !== "C" &&  data?.problemStatus !== "F"  ?
                 <div style={{marginBottom:-40}}>
                     <ToolTip title="SR currently assigned to" width={150}>
                         <div style={{display:"flex",alignItems:"center"}}>
@@ -193,14 +198,14 @@ class ActivityDisplayComponent extends MainComponent {
                     </div>
                     </ToolTip>
                 </div>:null
-            }        
+            }
         <div
             className="activities-container"
             style={{display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center"}}
         >
-            
-                    
-              
+
+
+
 
 
             {
@@ -729,32 +734,30 @@ class ActivityDisplayComponent extends MainComponent {
 
     }
     getNotesElement = () => {
-        const {el} = this;
         const {data} = this.state;
-        return el(
-            "div",
-            {className: "round-container"},
-            el(
-                "div",
-                {className: "flex-row"},
-                el(
-                    "label",
-                    {className: "label mt-5 mr-3 ml-1 mb-5", style: {display: "block"}},
-                    "Internal Notes"
-                ),
-                el(ToolTip, {
-                    width: 15,
-                    title:
-                        "These are internal notes only and not visible to the customer. These are per Service Request.",
-                    content: el("i", {
-                        className: "fal fa-info-circle mt-5 pointer icon",
-                    }),
-                })
-            ),
-            el("div", {
-                dangerouslySetInnerHTML: {__html: data?.internalNotes},
-            })
-        );
+        return (
+            <div className="round-container">
+                <div className="flex-row">
+                    <label className="label mt-5 mr-3 ml-1 mb-5"
+                           style={{display: "block"}}
+                    >
+                        Internal Notes
+                    </label>
+                    <ToolTip
+                        width="15"
+                        title="These are internal notes only and not visible to the customer. These are per Service Request."
+                        content={
+                            <i className="fal fa-info-circle mt-5 pointer icon"/>
+                        }
+                    >
+
+                    </ToolTip>
+                </div>
+                <div className="internalNotesContainer">
+                    <InternalNotesListComponent internalNotes={data?.internalNotes}/>
+                </div>
+            </div>
+        )
     }
     getcustomerNotesElement = () => {
         const {el} = this;
@@ -837,10 +840,10 @@ class ActivityDisplayComponent extends MainComponent {
                         el('td', {className: "display-label"}, "User"),
                         el('td', {colSpan: 3, className: "display-content"}, data?.engineerName),
                     ),
-                    
+
                     el('tr', null,
                         el('td', {className: "display-label"}, "Summary"),
-                        el('td', {className: "display-content",colSpan:3}, data?.emailsubjectsummary),                        
+                        el('td', {className: "display-content",colSpan:3}, data?.emailsubjectsummary),
                         el('td', {className: "display-label"}, "Asset"),
                         el('td', {colSpan: 3, className: "nowrap"}, data?.assetName || (data?.emptyAssetReason) || ''),
                     ),
@@ -993,7 +996,7 @@ class ActivityDisplayComponent extends MainComponent {
         const {templateDefault, templateOptions, _showModal, templateTitle, templateType} = this.state;
         const {el} = this;
         return el(
-            Modal, {//autoFocus:true
+            Modal, {
                 width: 900, key: templateType, onClose: () => this.setState({_showModal: false}),
                 title: templateTitle,
                 show: _showModal,
@@ -1046,7 +1049,12 @@ class ActivityDisplayComponent extends MainComponent {
         const templateDefault = '';
         this.setState({templateOptions: options, _showModal: true, templateType: type, templateTitle, templateDefault})
     }
-    //-------------end template
+
+    onTaskListUpdated = () => {
+        const {currentActivity} = this.state;
+        this.loadCallActivity(currentActivity);
+    }
+
     getFooter = () => {
         return (
             <div className="activities-container">
@@ -1083,9 +1091,28 @@ class ActivityDisplayComponent extends MainComponent {
         this.loadCallActivity(this.state.currentActivity);
     }
 
+    getTaskListElement() {
+        const {data} = this.state;
+        if (!data) {
+            return '';
+        }
+        return (
+            <TaskListComponent
+                taskListUpdatedAt={data.taskListUpdatedAt}
+                taskListUpdatedBy={data.taskListUpdatedBy}
+                taskList={data.taskList}
+                problemId={data.problemID}
+                onUpdatedTaskList={this.onTaskListUpdated}
+            />
+        );
+    }
+
+    onNoteAdded = () => {
+        this.loadCallActivity(this.state.currentActivity)
+    }
+
     render() {
         const {data, showSalesOrder} = this.state;
-        console.log("showSalesOrder", showSalesOrder);
         return (
             <div style={{width: "90%"}}>
                 {this.getAlert()}
@@ -1099,7 +1126,10 @@ class ActivityDisplayComponent extends MainComponent {
                 {this.getContentElement()}
                 {this.getDetailsElement()}
                 {this.getcustomerNotesElement()}
-                {this.getNotesElement()}
+                <InternalNotes onNoteAdded={this.onNoteAdded}
+                               data={data}
+                />
+                {this.getTaskListElement()}
                 <CustomerDocumentUploader
                     onDeleteDocument={(id) => this.deleteDocument(id)}
                     onFilesUploaded={() => this.handleUpload()}

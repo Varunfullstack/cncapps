@@ -25,13 +25,11 @@ export default class RepProjectsWithoutClousureMeeting extends MainComponent {
     this.setState({showModal:true});        
     this.api.getProjectsWithoutClousureMeeting()
     .then(projects=>{
-      console.log('projects',projects);
       this.setState({projects,showModal:false,loadData:false});
     });
   }
   getProjectsTable=()=>{
-    //console.log('props',this.props);
-    const {projects} = this.state;    
+    const {projects} = this.state;
     const columns=[
         {
             path: "customerName",

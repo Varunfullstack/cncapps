@@ -19,7 +19,6 @@ class DBEProblem extends DBEntity
     const respondedHours                   = "respondedHours";
     const workingHours                     = "workingHours";
     const sentSlaAlertFlag                 = "sentSlaAlertFlag";
-    const internalNotes                    = "internalNotes";
     const completionAlertCount             = "completionAlertCount";
     const completeDate                     = "completeDate";
     const hideFromCustomerFlag             = "hideFromCustomerFlag";
@@ -69,6 +68,9 @@ class DBEProblem extends DBEntity
     const notFirstTimeFixReason            = "notFirstTimeFixReason";
     const emptyAssetReason                 = "emptyAssetReason";
     const holdForQA                        = "holdForQA";
+    const taskList                         = "taskList";
+    const taskListUpdatedBy                = "taskListUpdatedBy";
+    const taskListUpdatedAt                = "taskListUpdatedAt";
 
     /**
      * calls constructor()
@@ -152,12 +154,6 @@ class DBEProblem extends DBEntity
             DA_YN,
             DA_ALLOW_NULL,
             "pro_sent_sla_alert_flag"
-        );
-        $this->addColumn(
-            self::internalNotes,
-            DA_MEMO,
-            DA_ALLOW_NULL,
-            "pro_internal_notes"
         );
         $this->addColumn(
             self::completionAlertCount,
@@ -435,6 +431,21 @@ class DBEProblem extends DBEntity
             DA_NOT_NULL,
             null,
             false
+        );
+        $this->addColumn(
+            self::taskList,
+            DA_TEXT,
+            DA_ALLOW_NULL,
+        );
+        $this->addColumn(
+            self::taskListUpdatedBy,
+            DA_ID,
+            DA_ALLOW_NULL,
+        );
+        $this->addColumn(
+            self::taskListUpdatedAt,
+            DA_DATETIME,
+            DA_ALLOW_NULL,
         );
         $this->setAddColumnsOff();
         $this->setPK(0);

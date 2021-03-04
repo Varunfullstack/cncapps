@@ -1,7 +1,9 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Content-Type"
+          content="text/html; charset=UTF-8"
+    >
     <title></title>
     <style type="text/css">
         <!--
@@ -28,6 +30,19 @@
 <h2>Last Activity</h2>
 <P>{reason}</p>
 <h2>Internal Notes</h2>
-<P>{internalNotes}</p>
+<table>
+    <tbody>
+    <!-- BEGIN internalNotesBlock -->
+    <tr>
+        <td>
+            {internalNotesDate} by {internalNotesUpdatedBy}
+        </td>
+        <td>
+            {internalNotesContent}
+        </td>
+    </tr>
+    <!-- END internalNotesBlock -->
+    </tbody>
+</table>
 </body>
 </html>

@@ -1,7 +1,6 @@
 export class ActivityHelper{
     getSalesOrderModal=()=>{
         const {showSalesOrder,newOrdHeadID,originalOrder,salesOrders}=this.state;
-        ////console.log(showSalesOrder);
         let title="Linked to Sales Order";
         if(originalOrder)
         title="Linked to original Sales Order";

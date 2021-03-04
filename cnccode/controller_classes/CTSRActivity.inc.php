@@ -6,6 +6,10 @@ use CNCLTD\InternalDocuments\Base64FileDTO;
 use CNCLTD\InternalDocuments\Entity\InternalDocumentMapper;
 use CNCLTD\InternalDocuments\InternalDocumentRepository;
 use CNCLTD\InternalDocuments\UseCases\AddDocumentsToServiceRequest;
+use CNCLTD\ServiceRequestInternalNote\infra\ServiceRequestInternalNotePDORepository;
+use CNCLTD\ServiceRequestInternalNote\ServiceRequestInternalNote;
+use CNCLTD\ServiceRequestInternalNote\ServiceRequestInternalNotePDOMapper;
+use CNCLTD\ServiceRequestInternalNote\UseCases\AddServiceRequestInternalNote;
 
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBECallActivity.inc.php');
@@ -56,6 +60,9 @@ class CTSRActivity extends CTCNC
     const DELETE_INTERNAL_DOCUMENT                               = 'deleteInternalDocument';
     const REMOTE_SUPPORT_ACTIVITY_TYPE_ID                        = 8;
     const GET_NOT_ATTEMPT_FIRST_TIME_FIX                         = "getNotAttemptFirstTimeFix";
+    const ADD_INTERNAL_NOTE                                      = "addInternalNote";
+    const CHANGE_SERVICE_REQUEST_INTERNAL_NOTE                   = "changeServiceRequestInternalNote";
+    const SAVE_TASK_LIST                                         = "saveTaskList";
     public  $serverGuardArray = array(
         ""  => "Please select",
         "Y" => "ServerGuard Related",
@@ -63,6 +70,10 @@ class CTSRActivity extends CTCNC
     );
     private $buActivity;
     private $internalDocumentRepository;
+    /**
+     * @var ServiceRequestInternalNotePDORepository
+     */
+    private $serviceRequestInternalNoteRepository;
 
     function __construct($requestMethod,
                          $postVars,
@@ -78,7 +89,7 @@ class CTSRActivity extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles                            = [
+        $roles                                      = [
             SALES_PERMISSION,
             ACCOUNTS_PERMISSION,
             TECHNICAL_PERMISSION,
@@ -87,8 +98,9 @@ class CTSRActivity extends CTCNC
             MAINTENANCE_PERMISSION,
             RENEWALS_PERMISSION,
         ];
-        $this->buActivity                 = new BUActivity($this);
-        $this->internalDocumentRepository = new InternalDocumentRepository();
+        $this->buActivity                           = new BUActivity($this);
+        $this->internalDocumentRepository           = new InternalDocumentRepository();
+        $this->serviceRequestInternalNoteRepository = new ServiceRequestInternalNotePDORepository();
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
@@ -137,6 +149,9 @@ class CTSRActivity extends CTCNC
                 exit;
             case self::GET_CALL_ACTIVITY_BASIC_INFO:
                 echo json_encode($this->getCallActivityBasicInfo());
+                exit;
+            case self::ADD_INTERNAL_NOTE:
+                echo json_encode($this->addInternalNoteController());
                 exit;
             case self::GET_DOCUMENTS:
                 echo json_encode($this->getActivityDocuments($_REQUEST["callActivityID"], $_REQUEST["problemID"]));
@@ -202,6 +217,9 @@ class CTSRActivity extends CTCNC
                 exit;
             case self::GET_NOT_ATTEMPT_FIRST_TIME_FIX:
                 echo json_encode($this->getNotAttemptFirstTimeFix());
+                exit;
+            case self::SAVE_TASK_LIST:
+                echo json_encode($this->saveTaskListController());
                 exit;
             default:
                 $this->setTemplate();
@@ -294,6 +312,52 @@ class CTSRActivity extends CTCNC
 
             }
        // $requestName =$dbeProblem->getValue(DBEProblem::userID);
+        $serviceRequestInternalNotesRepo = new CNCLTD\ServiceRequestInternalNote\infra\ServiceRequestInternalNotePDORepository(
+        );
+        $notes                           = $serviceRequestInternalNotesRepo->getServiceRequestInternalNotesForSR(
+            $problemID
+        );
+        $consultants                     = [];
+        $mappedNotes                     = array_map(
+            function (ServiceRequestInternalNote $note) use ($consultants) {
+                $updatedByUserId = $note->getUpdatedBy();
+                if (!key_exists($updatedByUserId, $consultants)) {
+                    $dbeUser = new DBEUser($this);
+                    $dbeUser->getRow($updatedByUserId);
+                    $consultants[$updatedByUserId] = "{$dbeUser->getValue(DBEUser::firstName)} {$dbeUser->getValue(DBEUser::lastName)}";
+                }
+                $createdByUserId = $note->getCreatedBy();
+                if (!key_exists($createdByUserId, $consultants)) {
+                    $dbeUser = new DBEUser($this);
+                    $dbeUser->getRow($createdByUserId);
+                    $consultants[$createdByUserId] = "{$dbeUser->getValue(DBEUser::firstName)} {$dbeUser->getValue(DBEUser::lastName)}";
+                }
+                $array              = ServiceRequestInternalNotePDOMapper::toJSONArray($note);
+                $array['updatedBy'] = $consultants[$updatedByUserId];
+                $array['createdBy'] = $consultants[$createdByUserId];
+                return $array;
+            },
+            $notes
+        );
+        usort(
+            $mappedNotes,
+            function ($a, $b) {
+                if ($a['createdAt'] <= $b['createdAt']) {
+                    return 1;
+                }
+                return -1;
+            }
+        );
+        $taskListUpdatedByUserId = $dbeProblem->getValue(DBEProblem::taskListUpdatedBy);
+        $taskListUpdatedBy       = null;
+        if ($taskListUpdatedByUserId) {
+            if (!key_exists($taskListUpdatedByUserId, $consultants)) {
+                $dbeUser = new DBEUser($this);
+                $dbeUser->getRow($taskListUpdatedByUserId);
+                $consultants[$taskListUpdatedByUserId] = "{$dbeUser->getValue(DBEUser::firstName)} {$dbeUser->getValue(DBEUser::lastName)}";
+            }
+            $taskListUpdatedBy = $consultants[$taskListUpdatedByUserId];
+        }
         return [
             "callActivityID"                  => $callActivityID,
             "problemID"                       => $problemID,
@@ -319,6 +383,7 @@ class CTSRActivity extends CTCNC
             "sitePostcode"                    => $dbeSite->getValue(DBESite::postcode),
             "linkedSalesOrderID"              => $dbejCallActivity->getValue(DBEJCallActivity::linkedSalesOrderID),
             "activities"                      => $this->getOtherActivity($problemID),
+            "internalNotes"                   => $mappedNotes,
             'criticalFlag'                    => $dbejCallActivity->getValue(
                 DBEJCallActivity::criticalFlag
             ) == 'Y' ? 1 : 0,
@@ -361,7 +426,6 @@ class CTSRActivity extends CTCNC
             "rootCauseDescription"            => $dbejCallActivity->getValue(DBEJCallActivity::rootCauseDescription),
             "completeDate"                    => $dbejCallActivity->getValue(DBEJCallActivity::completeDate),
             "reason"                          => $dbejCallActivity->getValue(DBEJCallActivity::reason),
-            "internalNotes"                   => $dbejCallActivity->getValue(DBEJCallActivity::internalNotes),
             "currentUser"                     => $currentUser,
             "currentUserBgColor"              => $currentUserBgColor,
             "documents"                       => $this->getActivityDocuments($callActivityID, $problemID),
@@ -375,22 +439,18 @@ class CTSRActivity extends CTCNC
             'alarmTime'                       => $dbejCallActivity->getValue(DBEJCallActivity::alarmTime),
             'alarmDateMessage'                => $dbejCallActivity->getValue(DBEJCallActivity::alarmDate),
             'alarmTimeMessage'                => $dbejCallActivity->getValue(DBEJCallActivity::alarmTime),
-            'canChangeInitialDateAndTime'     => $dbeUser->getValue(
-                DBEUser::queueManager
-            ) == 'Y' ? true : false,
+            'canChangeInitialDateAndTime'     => $dbeUser->getValue(DBEUser::queueManager) == 'Y',
             "isInitalDisabled"                => $this->isInitalDisabled($dbejCallActivity),
             'contactSupportLevel'             => $dbeContact->getValue(DBEContact::supportLevel),
             'hdRemainMinutes'                 => $hdAssignedMinutes - $hdUsedMinutes,
             'esRemainMinutes'                 => $esAssignedMinutes - $esUsedMinutes,
             'imRemainMinutes'                 => $imAssignedMinutes - $imUsedMinutes,
             'projectRemainMinutes'            => $projectTeamAssignedMinutes - $projectUsedMinutes,
-            "canChangePriorityFlag"           => $dbeUser->getValue(DBEUser::changePriorityFlag) == 'Y' ? true : false,
+            "canChangePriorityFlag"           => $dbeUser->getValue(DBEUser::changePriorityFlag) == 'Y',
             "userID"                          => $dbejCallActivity->getValue(DBEJCallActivity::userID),
             "actUserTeamId"                   => $dbeUserActivity->getValue(DBEUser::teamID),
             "contractCustomerItemID"          => $dbejCallActivity->getValue(DBEJCallActivity::contractCustomerItemID),
-            "changeSRContractsFlag"           => $dbeUser->getValue(
-                DBEUser::changeSRContractsFlag
-            ) == 'Y' ? true : false,
+            "changeSRContractsFlag"           => $dbeUser->getValue(DBEUser::changeSRContractsFlag) == 'Y',
             "rootCauseID"                     => $dbejCallActivity->getValue(DBEJCallActivity::rootCauseID),
             'submitAsOvertime'                => $dbejCallActivity->getValue(DBECallActivity::submitAsOvertime),
             "siteMaxTravelHours"              => $dbeSite->getValue(DBESite::maxTravelHours),
@@ -410,6 +470,9 @@ class CTSRActivity extends CTCNC
             "workingHours"                    => $dbeProblem->getValue(DBEProblem::workingHours),
             "requestEngineerName"             => $requestName,
             "emailsubjectsummary"             => $dbeProblem->getValue(DBEProblem::emailSubjectSummary),
+            "taskList"                        => $dbeProblem->getValue(DBEProblem::taskList),
+            "taskListUpdatedAt"               => $dbeProblem->getValue(DBEProblem::taskListUpdatedAt),
+            "taskListUpdatedBy"               => $taskListUpdatedBy
         ];
     }
 
@@ -1479,6 +1542,52 @@ FROM
         } catch (\Exception $exception) {
             throw new JsonHttpException(2215, "Failed to delete document");
         }
+    }
+
+    private function addInternalNoteController(): array
+    {
+        $data             = $this->getJSONData();
+        $serviceRequestId = @$data['serviceRequestId'];
+        $content          = @$data['content'];
+        if (!$serviceRequestId) {
+            throw new JsonHttpException(231, "Service request ID required");
+        }
+        if (!$content) {
+            throw new JsonHttpException(321, "Content required");
+        }
+        $dbeProblem = new DBEProblem($this);
+        if (!$dbeProblem->getRow($serviceRequestId)) {
+            throw new JsonHttpException(123, "Service Request Not Found!");
+        }
+        $usecase = new AddServiceRequestInternalNote($this->serviceRequestInternalNoteRepository);
+        try {
+            $usecase->__invoke($dbeProblem, $this->getDbeUser(), $content);
+        } catch (Exception $exception) {
+            throw new JsonHttpException(123, $exception->getMessage());
+        }
+        return ["status" => "ok"];
+    }
+
+    private function saveTaskListController()
+    {
+        $data             = $this->getJSONData();
+        $serviceRequestId = @$data['serviceRequestId'];
+        $content          = @$data['content'];
+        if (!$serviceRequestId) {
+            throw new JsonHttpException(231, "Service request ID required");
+        }
+        if (!$content) {
+            throw new JsonHttpException(321, "Content required");
+        }
+        $dbeProblem = new DBEProblem($this);
+        if (!$dbeProblem->getRow($serviceRequestId)) {
+            throw new JsonHttpException(123, "Service Request Not Found!");
+        }
+        $dbeProblem->setValue(DBEProblem::taskList, $content);
+        $dbeProblem->setValue(DBEProblem::taskListUpdatedAt, (new DateTimeImmutable())->format(DATE_MYSQL_DATETIME));
+        $dbeProblem->setValue(DBEProblem::taskListUpdatedBy, $this->userID);
+        $dbeProblem->updateRow();
+        return ["status" => "ok"];
     }
 }
 

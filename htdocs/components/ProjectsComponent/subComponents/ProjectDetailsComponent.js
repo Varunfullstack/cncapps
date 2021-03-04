@@ -102,9 +102,6 @@ export default class ProjectDetailsComponent extends MainComponent {
     }
 
     componentDidMount() {
-        //console.log(this.state.mode);
-
-        console.log("customerID", this.state.data.customerID);
         if (this.state.mode == "edit") this.getData();
         this.getUsers();
     }
@@ -117,7 +114,6 @@ export default class ProjectDetailsComponent extends MainComponent {
             this.apiProjectOptions.getProjectTypes(),
             this.apiUsers.getActiveUsers(),
         ]).then(([currentUser, users, projectStages, projectTypes, engineers]) => {
-            //console.log(currentUser,projectStages,projectTypes);
 
             this.setState({
                 users,
@@ -131,7 +127,6 @@ export default class ProjectDetailsComponent extends MainComponent {
     };
     getData = () => {
         const {projectID} = this.props;
-        console.log("projectID", projectID);
         if (projectID != null) {
             this.setState({showSpinner: true});
             Promise.all([
@@ -139,7 +134,6 @@ export default class ProjectDetailsComponent extends MainComponent {
                 this.api.getBudgetData(projectID),
                 this.api.getProjectStagesHistory(projectID),
             ]).then(([data, budgetData, projectStagesHistory]) => {
-                console.log({...this.state.data, ...data}, budgetData);
                 data.inHoursQuantity = "";
                 data.outOfHoursQuantity = "";
                 //if(data.originalQuoteDocumentFinalAgreed!=''&&data.originalQuoteDocumentFinalAgreed!=null)
@@ -500,7 +494,6 @@ export default class ProjectDetailsComponent extends MainComponent {
                             data.projectStageID
                         )
                         .then((result) => {
-                            console.log(result);
                             if (result.status)
                                 this.api
                                     .getProjectStagesHistory(data.projectID)
@@ -875,7 +868,6 @@ export default class ProjectDetailsComponent extends MainComponent {
         if (this.isDataValid()) {
             const ret = await this.api.addProject(data);
             if (ret.projectID) {
-                console.log(data);
                 data.projectID = ret.projectID;
                 if (data.projectStageID)
                     this.setState({data}, () => {
@@ -904,7 +896,6 @@ export default class ProjectDetailsComponent extends MainComponent {
     };
     getActionsElement = () => {
         const {data, currentUser} = this.state;
-        //console.log('calc',!data.calculatedBudget&&currentUser?.isProjectManager);
         return (
             <div className="flex-row"
                  style={{alignItems: "center"}}

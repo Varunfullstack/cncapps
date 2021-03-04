@@ -3,20 +3,19 @@ import {getEditorNamespace} from 'ckeditor4-integrations-common';
 import PropTypes from 'prop-types';
 //readOnly, type, onBeforeLoad, style, value, disableClipboard
 class CNCCKEditor extends React.Component {
-    el = React.createElement;
     onChangeListener = null;
-    internalData = null;
 
     constructor(props) {
         super(props);
-
+        this.state = {
+            internalData: '',
+            editor: null
+        }
         this.element = null;
-        this.editor = null;
         this._destroyed = false;
     }
 
     componentDidMount() {
-
         this._initEditor();
     }
 
@@ -41,8 +40,8 @@ class CNCCKEditor extends React.Component {
             if (onBeforeLoad) {
                 onBeforeLoad(CKEDITOR);
             }
-
-            const editor = this.editor = CKEDITOR[constructor](this.element, config);
+            const editor = CKEDITOR[constructor](this.element, config);
+            this.setState({editor});
             // We must force editability of the inline editor to prevent `element-conflict` error.
             // It can't be done via config due to CKEditor 4 upstream issue (#57, ckeditor/ckeditor4#3866).
             if (type === 'inline' && !readOnly) {
@@ -67,16 +66,16 @@ class CNCCKEditor extends React.Component {
             if (!this.onChangeListener) {
                 this.onChangeListener = editor.on('change', () => {
                     const newValue = editor.getData();
-                    if (this.props.onChange && newValue != this.internalData) {
+                    if (this.props.onChange && newValue != this.state.internalData) {
                         this.props.onChange(newValue);
-                        this.internalData = newValue
+                        this.setState({internalData: newValue});
                     }
                 })
             }
 
             if (value) {
                 editor.setData(value);
-                this.internalData = value;
+                this.setState({internalData: value});
             }
         }).catch(console.error);
     }
@@ -85,9 +84,17 @@ class CNCCKEditor extends React.Component {
         this._destroyEditor();
     }
 
-    componentDidUpdate(prevProps) {
-        const {props, editor} = this;
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        const {props} = this;
+        const {editor} = this.state;
 
+        if (prevProps.value !== props.value) {
+            this.setState({internalData: props.value});
+        }
+
+        if (!prevState.editor && editor) {
+            editor.setData(this.state.internalData);
+        }
         /* istanbul ignore next */
         if (!editor) {
             return;
@@ -107,11 +114,10 @@ class CNCCKEditor extends React.Component {
     }
 
     _destroyEditor() {
-        if (this.editor) {
-            this.editor.destroy();
+        if (this.state.editor) {
+            this.state.editor.destroy();
         }
         this.onChangeListener = null;
-        this.editor = null;
         this.element = null;
         this._destroyed = true;
     }
@@ -128,20 +134,20 @@ class CNCCKEditor extends React.Component {
                  ref={ref => (this.element = ref)}
                  className={`testing ${this.props.excludeFromErrorCount ? 'excludeFromErrorCount' : ''}`}
                  onInput={$event => {
-                     const newValue = this.editor.getData();
+                     const newValue = this.state.editor.getData();
                      if (this.props.onChange) {
                          this.props.onChange(newValue);
                      }
-                     this.internalData = newValue
+                     this.setState({internalData: newValue});
                  }}
 
                  onPaste={$event => {
                      setTimeout(() => {
-                         const newValue = this.editor.getData();
+                         const newValue = this.state.editor.getData();
                          if (this.props.onChange) {
                              this.props.onChange(newValue);
                          }
-                         this.internalData = newValue
+                         this.setState({internalData: newValue});
                      })
                  }}
             />

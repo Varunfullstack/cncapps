@@ -1,6 +1,8 @@
 <?php
 
 use CNCLTD\LoggerCLI;
+use CNCLTD\ServiceRequestInternalNote\infra\ServiceRequestInternalNotePDORepository;
+use CNCLTD\ServiceRequestInternalNote\UseCases\AddServiceRequestInternalNote;
 
 require_once(__DIR__ . "/../htdocs/config.inc.php");
 global $cfg;
@@ -161,12 +163,17 @@ try {
             DBEProblem::linkedSalesOrderID,
             $dbeSrScheduler->getValue(DBESRScheduler::linkedSalesOrderId)
         );
-        $dbeProblem->setValue(DBEProblem::internalNotes, $internalNotes);
         $dbeProblem->setValue(
             DBEProblem::raiseTypeId,
             BUProblemRaiseType::MANUALID
         );
         $dbeProblem->insertRow();
+        $useCase = new AddServiceRequestInternalNote(
+            new ServiceRequestInternalNotePDORepository()
+        );
+        $internalNoteUser = new DBEUser($thing);
+        $internalNoteUser->getRow(USER_SYSTEM);
+        $useCase($dbeProblem, $internalNoteUser, $internalNotes);
         $problemID = $dbeProblem->getPKValue();
         $dbeCallActivity->setValue(
             DBECallActivity::callActivityID,

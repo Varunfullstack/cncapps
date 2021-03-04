@@ -28,7 +28,6 @@ export default class ProjectSummaryComponent extends MainComponent {
 
     getData() {
         this.api.getProjectSummary(this.props.projectID).then(data => {
-            console.log('summary', data);
             this.setState({data, showModal: false});
         })
     }
@@ -77,10 +76,8 @@ export default class ProjectSummaryComponent extends MainComponent {
     }
     handleSave = () => {
         const {data} = this.state;
-        console.log(data);
         this.setState({showSpinner: true});
         this.api.updateProjectSummary(this.props.projectID, data).then(result => {
-            console.log(result);
             if (result.status)
                 setTimeout(() => this.setState({showSpinner: false}), 1000);
         })

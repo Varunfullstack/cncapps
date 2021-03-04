@@ -66,13 +66,11 @@ class ReportsComponent extends MainComponent {
   }
   getReportCategories=()=>{
     this.api.getReportCategoriesActive().then(categories=>{
-      // console.log(categories);
        this.setState({categories});
    });   
   }
   loadConsultants=()=>{
     this.apiUsers.getActiveUsers().then(consultants=>{
-      //console.log(consultants);
       this.setState({consultants})
     });
   }
@@ -95,7 +93,6 @@ class ReportsComponent extends MainComponent {
   }
   handleCategoryChange=(categoryID)=>{
     this.api.getCategoryReports(categoryID).then(reports=>{
-      console.log('reports',reports);
       this.setState({currentCategoryID:categoryID,reports});
 
     })
@@ -134,24 +131,20 @@ class ReportsComponent extends MainComponent {
   }
   loadProjectStages=()=>{
     this.apiProjectOptions.getProjectStages().then(projectStages=>{
-      //console.log(projectStages);
       this.setState({projectStages});
     })
   }
   loadProjectTypes=()=>{
     this.apiProjectOptions.getProjectTypes().then(projectTypes=>{
-      //console.log(projectTypes);
       this.setState({projectTypes});
     })
   }
   handleReportChange=(reportID)=>{
-    //console.log(reportID);    
     if(reportID)
     this.api.getReportParamters(reportID)
     .then(paramters=>{
       if(paramters.length>0){
         paramters=  paramters.map(p=>{p.value=''; return p;})  ;
-        //console.log(paramters);   
         this.loadParamtersData(paramters);
         paramters=sort(paramters,'paramterOrder');
         this.setState({paramters});
@@ -162,7 +155,6 @@ class ReportsComponent extends MainComponent {
   }
   getParamtersElement=()=>{
     const {paramters}=this.state;
-    //console.log('paramters',paramters.length);
     if(paramters.length==0)
     return null;
     return paramters.map(p=><tr key={p.id}>
@@ -251,7 +243,6 @@ class ReportsComponent extends MainComponent {
       compParamters[paramters[i].name]=paramters[i].value;
     }
     this.setState({compParamters});
-    //console.log(paramters,this.isParamtersValid());
 
   }
   getCurrentReportComponent=()=>{
@@ -261,7 +252,6 @@ class ReportsComponent extends MainComponent {
    // console.log(currentReportID,reports);
     const report=reports.find(r=>r.id==currentReportID);
     const RepComponent= this.components[report.component];
-   // console.log('current report',report.component,RepComponent);
     return <RepComponent {...compParamters}></RepComponent>;
   }
   handleClear=()=>{

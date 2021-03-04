@@ -22,9 +22,12 @@ import EditorFieldComponent from "../../shared/EditorField/EditorFieldComponent"
 import {TimeBudgetElement} from "./TimeBudgetElement";
 import {LinkServiceRequestOrder} from "./LinkserviceRequestOrder.js";
 import {ActivityType} from "../../shared/ActivityTypes";
+import {InternalNotes} from "./InternalNotesComponent";
+import {TaskListComponent} from "./TaskListComponent";
 
 // noinspection EqualityComparisonWithCoercionJS
 const hiddenAndCustomerNoteAlertMessage = `Customer note must be empty when the activity or entire SR is hidden.`;
+
 
 class ActivityEditComponent extends MainComponent {
     el = React.createElement;
@@ -61,8 +64,7 @@ class ActivityEditComponent extends MainComponent {
                 documents: [],
                 reasonTemplate: "",
                 reason: "",
-                internalNotes: "",
-                internalNotesTemplate: "",
+                internalNotes: [],
                 date: "",
                 alarmDate: "",
                 alarmTime: "",
@@ -100,7 +102,8 @@ class ActivityEditComponent extends MainComponent {
                 criticalSR: false,
                 monitorSR: false,
             },
-            showSalesOrder: false
+            showSalesOrder: false,
+
         };
     }
 
@@ -122,7 +125,7 @@ class ActivityEditComponent extends MainComponent {
             this.api.getPriorities(),
             this.api.getRootCauses(),
             this.apiUser.getCurrentUser(),
-            this.apiStandardText.getOptionsByType("Priority Change Reason"),
+            this.apiStandardText.getOptionsByType("Priority Change Reason")
         ]).then(async ([activityTypes, activeUsers, priorities, rootCauses, currentUser, priorityChangeReasonStandardTextItems]) => {
             const notSDManagerActivityTypes = activityTypes.filter(c => c.visibleInSRFlag === 'Y');
 
@@ -133,10 +136,11 @@ class ActivityEditComponent extends MainComponent {
                 priorities,
                 rootCauses,
                 currentUser,
-                priorityReasons: priorityChangeReasonStandardTextItems,
+                priorityReasons: priorityChangeReasonStandardTextItems
             });
         });
     }
+
 
     componentWillUnmount() {
     }
@@ -154,19 +158,15 @@ class ActivityEditComponent extends MainComponent {
             });
             res.reasonTemplate = res.reason;
             res.cncNextActionTemplate = res.cncNextAction;
-            res.internalNotesTemplate = res.internalNotes;
             res.customerNotesTemplate = res.customerNotes;
             res.callActTypeIDOld = res.callActTypeID;
             res.orignalPriority = res.priority;
             const session = this.getSessionActivity(res.callActivityID);
             if (session) {
                 res.customerNotes = session.customerNotesTemplate || res.customerNotes;
-                res.internalNotes = session.internalNotesTemplate || res.internalNotes;
                 res.cncNextAction = session.cncNextActionTemplate || res.cncNextAction;
                 res.reason = session.reasonTemplate || res.reason;
-
                 res.customerNotesTemplate = session.customerNotesTemplate || res.customerNotesTemplate;
-                res.internalNotesTemplate = session.internalNotesTemplate || res.internalNotesTemplate;
                 res.cncNextActionTemplate = session.cncNextActionTemplate || res.cncNextActionTemplate;
                 res.reasonTemplate = session.reasonTemplate || res.reasonTemplate;
             }
@@ -214,7 +214,6 @@ class ActivityEditComponent extends MainComponent {
         data.reason = data.reasonTemplate;
         data.cncNextAction = data.cncNextActionTemplate;
         data.customerNotes = data.customerNotesTemplate;
-        data.internalNotes = data.internalNotesTemplate;
         data.priority = this.state.priorities.find((p) => p.name == data.priority).id;
 
         delete data.activities;
@@ -235,7 +234,6 @@ class ActivityEditComponent extends MainComponent {
             "contactNotes",
             "techNotes",
             "reason",
-            "internalNotes",
             "nextStatus",
             "escalationReason",
             "customerNotes",
@@ -405,7 +403,6 @@ class ActivityEditComponent extends MainComponent {
 
     setValue = (label, value) => {
         const autoUpdateFields = [
-            'internalNotesTemplate',
             'cncNextActionTemplate',
             'reasonTemplate',
             'customerNotesTemplate',
@@ -687,14 +684,12 @@ class ActivityEditComponent extends MainComponent {
         const {data} = this.state;
         const activityEdit = {
             id: data.callActivityID,
-            internalNotesTemplate: data.internalNotesTemplate,
             cncNextActionTemplate: data.cncNextActionTemplate,
             reasonTemplate: data.reasonTemplate,
             customerNotesTemplate: data.customerNotesTemplate,
         }
         let activities = this.getSessionNotes().filter(a => a.id !== data.callActivityID);
         activities.push(activityEdit);
-        console.log(activityEdit);
         sessionStorage.setItem("activityEdit", JSON.stringify(activities));
     }
 
@@ -1586,7 +1581,6 @@ class ActivityEditComponent extends MainComponent {
                     <EditorFieldComponent name="cncNextAction"
                                           value={data?.cncNextAction || ""}
                                           onChange={(value) => {
-                                              console.log(value)
                                               this.setValue("cncNextActionTemplate", value)
                                           }}
                     />
@@ -1595,19 +1589,19 @@ class ActivityEditComponent extends MainComponent {
         );
     }
 
-getCustomerNotes() {
-const {
-    el
-}
+    getCustomerNotes() {
+        const {
+            el
+        }
 
-= this;
-const
-{
-    data
-}
-= this.state;
-return el(
-"div",
+            = this;
+        const
+            {
+                data
+            }
+                = this.state;
+        return el(
+            "div",
             {className: "round-container flex-column flex-1", style: {padding: 5}},
             el('div', {className: "flex-row"},
                 el(
@@ -1631,39 +1625,35 @@ return el(
         );
     }
 
-    getActivityInternalNotes() {
-        const {el} = this;
+
+    onNoteAdded = () => {
+        const {currentActivity} = this.state;
+        this.loadCallActivity(currentActivity);
+    }
+
+    onTaskListUpdated = () => {
+        const {currentActivity} = this.state;
+        this.loadCallActivity(currentActivity);
+    }
+
+
+    getTaskList() {
         const {data} = this.state;
-        return el(
-            "div",
-            {className: "round-container flex-column flex-1", style: {padding: 5}},
-            el('div', {className: "flex-row"},
-                el(
-                    "label",
-                    {className: "label m-5 mr-2", style: {display: "block"}},
-                    "Internal Notes"
-                ),
-                el(ToolTip, {
-                    width: 5,
-                    title: "These are internal notes only and not visible to the customer. These are per Service Request.",
-                    content: el("i", {className: "fal fa-info-circle mt-5 pointer icon"})
-                })
-            ),
-            this.state._activityLoaded
-                ?
-                <EditorFieldComponent name="internal"
-                                      value={data?.internalNotes || ""}
-                                      onChange={(value) => this.setValue("internalNotesTemplate", value)}
-                                      excludeFromErrorCount={true}
-                />
-                : null
+        if (!data) {
+            return '';
+        }
+
+        return (
+            <TaskListComponent
+                taskListUpdatedAt={data.taskListUpdatedAt}
+                taskListUpdatedBy={data.taskListUpdatedBy}
+                taskList={data.taskList}
+                problemId={data.problemID}
+                onUpdatedTaskList={this.onTaskListUpdated}
+            />
         );
     }
 
-    getTimeBudgetElement = () => {
-        const {data, currentUser} = this.state;
-        return
-    }
     getTimeBudget = () => {
         const {data, currentUser} = this.state;
         switch (currentUser?.teamID) {
@@ -1814,7 +1804,10 @@ return el(
                 {this.getContentElement()}
                 {this.getActivityNotes()}
                 {this.getCustomerNotes()}
-                {this.getActivityInternalNotes()}
+                <InternalNotes onNoteAdded={this.onNoteAdded}
+                               data={data}
+                />
+                {this.getTaskList()}
                 <CustomerDocumentUploader
                     onDeleteDocument={(id) => this.deleteDocument(id)}
                     onFilesUploaded={() => this.handleUpload()}

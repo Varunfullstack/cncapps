@@ -27,7 +27,6 @@ export default class EditorFieldComponent extends React.PureComponent {
                              style={style}
                              key="cncEditor"
                              onChange={data => {
-                                 console.log("on change runs!", data);
                                  onChange(data)
                              }}
                              minCharCount={minCharCount}

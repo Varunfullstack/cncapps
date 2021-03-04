@@ -32,15 +32,12 @@ export default class ProjectIssuesComponent extends MainComponent {
 
     getData() {
         this.api.getProjectIssues(this.props.projectID).then(issues => {
-            console.log('issues', issues);
             this.setState({issues, showModal: false});
         })
     }
 
     getIssuesTable = () => {
         const {issues} = this.state;
-        if (issues.length > 0)
-            console.log(this.props.currentUser.id, issues[0].consID);
         const columns = [
             {
                 path: "engineerName",
@@ -160,12 +157,10 @@ export default class ProjectIssuesComponent extends MainComponent {
     }
     handleIssueDetails = () => {
         const {currentIssue, newIssue} = this.state;
-        console.log(currentIssue);
         if (currentIssue.issuesRaised == "") {
             this.alert("Please enter issue raised");
             return;
         }
-        console.log("newIssue", newIssue);
         if (newIssue)
             this.api
                 .addProjectIssues(this.props.projectID, currentIssue)

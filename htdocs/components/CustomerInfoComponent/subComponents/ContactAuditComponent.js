@@ -44,7 +44,6 @@ class ContactAuditComponent extends MainComponent {
     });
   };
   handleCustomerSelect = (customer) => {
-    console.log(customer);
     const {filter}=this.state;
     filter.customerID=customer.id;
     filter.customerName=customer.name;

@@ -98,16 +98,12 @@ export default class LogServiceRequestComponent extends MainComponent {
     updateSRData = async (data, save = false) => {
         const newData = {...this.state.data, ...data};
         this.setActiveStep(newData.nextStep);
-
         this.setState({data: newData});
         if (save) {
             const customData = {...newData};
             this.setState({_showSpinner: true});
-            if (newData.internalNotes.indexOf(newData.internalNotesAppend) == -1)
-                newData.internalNotes += newData.internalNotesAppend;
             newData.callActTypeID = null;
             const result = await this.api.createProblem(customData);
-
 
             if (result.status) {
                 if (newData.uploadFiles.length > 0) {

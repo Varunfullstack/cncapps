@@ -1556,7 +1556,8 @@ class BUSalesOrder extends Business
     function updateServiceRequestDetails($ordheadID,
                                          $serviceRequestCustomerItemID,
                                          $serviceRequestPriority,
-                                         $serviceRequestText
+                                         $serviceRequestInternalNote,
+                                         $serviceRequestTaskList
     )
     {
         if (!$ordheadID) {
@@ -1576,8 +1577,12 @@ class BUSalesOrder extends Business
             $serviceRequestPriority
         );
         $dbeOrdhead->setValue(
-            DBEOrdhead::serviceRequestText,
-            $serviceRequestText
+            DBEOrdhead::serviceRequestInternalNote,
+            $serviceRequestInternalNote
+        );
+        $dbeOrdhead->setValue(
+            DBEOrdhead::serviceRequestTaskList,
+            $serviceRequestTaskList
         );
         $dbeOrdhead->post();
     }
@@ -1597,7 +1602,7 @@ class BUSalesOrder extends Business
             null
         );
         $dbeOrdhead->setValue(
-            DBEOrdhead::serviceRequestText,
+            DBEOrdhead::serviceRequestInternalNote,
             null
         );
         $dbeOrdhead->post();

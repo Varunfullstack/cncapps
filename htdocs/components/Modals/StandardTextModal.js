@@ -64,7 +64,9 @@ class StandardTextModal extends React.Component {
         }
         return (
 
-            <select onChange={this.handleTemplateChanged} autoFocus="true"
+            <select onChange={this.handleTemplateChanged}
+                    autoFocus={true}
+                    key="standardTextSelect"
                     style={{display: "block"}}
             >
                 <option key="empty"
@@ -86,8 +88,9 @@ class StandardTextModal extends React.Component {
         if (noEditor) {
             return (
                 <textarea
-                    autoFocus="true"
+                    autoFocus={true}
                     value={value}
+                    key="editableField"
                     onChange={($event) => {
                         this.handleTemplateValueChange($event.target.value)
                     }}
@@ -97,21 +100,27 @@ class StandardTextModal extends React.Component {
         }
 
         return (
-            <React.Fragment>
-                <div id="top"/>
+            <div key="editableField"
+                 className="modal_editor"
+            >
+                <div id="top"
+                     key="top"
+                />
                 <CNCCKEditor key={'salesRequest'}
                              name="salesRequest"
                              value={value}
                              onChange={(data) => this.handleTemplateValueChange(data)}
-                             height="100"
+                             height="500"
                              type="inline"
                              className="CNCCKEditor"
                              sharedSpaces={true}
                              top="top"
                              bottom="bottom"
                 />
-                <div id="bottom"/>
-            </React.Fragment>
+                <div id="bottom"
+                     key="bottom"
+                />
+            </div>
 
         )
     }
@@ -126,7 +135,9 @@ class StandardTextModal extends React.Component {
                 show,
                 className: "standardTextModal",
                 content: (
-                    <div style={{height: 150}}>
+                    <div style={{height: 150}}
+                         key="container"
+                    >
                         {this.renderOptions()}
                         {this.renderEditableField()}
                     </div>

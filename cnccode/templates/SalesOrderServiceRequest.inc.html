@@ -2,13 +2,21 @@
     window.addEventListener('DOMContentLoaded', function () {
         window.etaDate = $('#etaDate').get(0);
         let reason = CKEDITOR.replace(
-            'serviceRequestText',
+            'taskLists',
             {
                 customConfig: '/ckeditor_config.js'
             }
         );
-        reason.config.width = "100%";
+        // reason.config.width = "50%";
         reason.config.height = "250px";
+        let internalNote = CKEDITOR.replace(
+            'internalNote',
+            {
+                customConfig: '/ckeditor_config.js'
+            }
+        )
+        // internalNote.config.width = "50%";
+        internalNote.config.height = "250px";
     });
 
     function insertValueQuery(myListBox, myQuery) {
@@ -109,16 +117,33 @@
                 <input type="button"
                        name="insert"
                        value="Insert"
-                       onclick="insertValueQuery( standardText, 'serviceRequestText' )"
+                       onclick="insertValueQuery( standardText, 'taskLists' )"
                        title="Insert"
                 />
             </td>
         </tr>
         <tr>
+            <td>
+                Task Lists
+            </td>
+        </tr>
+        <tr>
             <td colspan="2">
-                <textarea id="serviceRequestText"
-                          name="inputForm[1][serviceRequestText]"
-                >{serviceRequestText}</textarea>
+                <textarea id="taskLists"
+                          name="inputForm[1][serviceRequestTaskList]"
+                >{serviceRequestTaskList}</textarea>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Internal Note
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <textarea id="internalNote"
+                          name="inputForm[1][serviceRequestInternalNote]"
+                >{serviceRequestInternalNote}</textarea>
             </td>
         </tr>
         <tr>

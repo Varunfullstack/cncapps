@@ -31,11 +31,9 @@ export default class CurrentProjectsComponent extends MainComponent {
     const projectID=params.get("projectID");
     if(action)
       mode=action;
-    console.log('Action',action);
     this.setState({ showSpinner: true ,projectID,mode});
     if(mode=='list')
     this.api.getProjects().then((projects) => {
-      console.log('projects',projects);
       projects.map((p) => {
         p.inHoursClass =this.helper.getRedClass(p.inHoursUsed , p.inHoursBudget);
         p.outHoursClass =this.helper.getRedClass(p.outHoursUsed , p.outHoursBudget);
@@ -48,7 +46,6 @@ export default class CurrentProjectsComponent extends MainComponent {
     let { projects } = this.state;
     const {projectsSummary}=this.props;
     //apply Filter
-    console.log('projectsSummary',projectsSummary);
     if(projectsSummary){
       projects= projects.filter(p=>{
         if(p.projectStageName==null)

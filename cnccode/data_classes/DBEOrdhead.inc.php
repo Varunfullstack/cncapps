@@ -7,62 +7,63 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEOrdhead extends DBEntity
 {
-    const INITIAL_TYPE = 'I';
-    const ordheadID = "ordheadID";
-    const customerID = "customerID";
-    const type = "type";
-    const partInvoice = "partInvoice";
-    const date = "date";
-    const requestedDate = "requestedDate";
-    const promisedDate = "promisedDate";
-    const expectedDate = "expectedDate";
-    const quotationOrdheadID = "quotationOrdheadID";
-    const custPORef = "custPORef";
-    const vatCode = "vatCode";
-    const vatRate = "vatRate";
-    const invSiteNo = "invSiteNo";
-    const invAdd1 = "invAdd1";
-    const invAdd2 = "invAdd2";
-    const invAdd3 = "invAdd3";
-    const invTown = "invTown";
-    const invCounty = "invCounty";
-    const invPostcode = "invPostcode";
-    const invContactID = "invContactID";
-    const invContactName = "invContactName";
-    const invContactSalutation = "invContactSalutation";
-    const invContactPhone = "invContactPhone";
-    const invSitePhone = "invSitePhone";
-    const invContactFax = "invContactFax";
-    const invContactEmail = "invContactEmail";
-    const delSiteNo = "delSiteNo";
-    const delAdd1 = "delAdd1";
-    const delAdd2 = "delAdd2";
-    const delAdd3 = "delAdd3";
-    const delTown = "delTown";
-    const delCounty = "delCounty";
-    const delPostcode = "delPostcode";
-    const delContactID = "delContactID";
-    const delContactName = "delContactName";
-    const delContactSalutation = "delContactSalutation";
-    const delContactPhone = "delContactPhone";
-    const delSitePhone = "delSitePhone";
-    const delContactFax = "delContactFax";
-    const delContactEmail = "delContactEmail";
-    const debtorCode = "debtorCode";
-    const wip = "wip";
-    const consultantID = "consultantID";
-    const paymentTermsID = "paymentTermsID";
-    const addItem = "addItem";
-    const callID = "callID";
-    const quotationSubject = "quotationSubject";
-    const quotationIntroduction = "quotationIntroduction";
-    const updatedTime = "updatedTime";
+    const INITIAL_TYPE                 = 'I';
+    const ordheadID                    = "ordheadID";
+    const customerID                   = "customerID";
+    const type                         = "type";
+    const partInvoice                  = "partInvoice";
+    const date                         = "date";
+    const requestedDate                = "requestedDate";
+    const promisedDate                 = "promisedDate";
+    const expectedDate                 = "expectedDate";
+    const quotationOrdheadID           = "quotationOrdheadID";
+    const custPORef                    = "custPORef";
+    const vatCode                      = "vatCode";
+    const vatRate                      = "vatRate";
+    const invSiteNo                    = "invSiteNo";
+    const invAdd1                      = "invAdd1";
+    const invAdd2                      = "invAdd2";
+    const invAdd3                      = "invAdd3";
+    const invTown                      = "invTown";
+    const invCounty                    = "invCounty";
+    const invPostcode                  = "invPostcode";
+    const invContactID                 = "invContactID";
+    const invContactName               = "invContactName";
+    const invContactSalutation         = "invContactSalutation";
+    const invContactPhone              = "invContactPhone";
+    const invSitePhone                 = "invSitePhone";
+    const invContactFax                = "invContactFax";
+    const invContactEmail              = "invContactEmail";
+    const delSiteNo                    = "delSiteNo";
+    const delAdd1                      = "delAdd1";
+    const delAdd2                      = "delAdd2";
+    const delAdd3                      = "delAdd3";
+    const delTown                      = "delTown";
+    const delCounty                    = "delCounty";
+    const delPostcode                  = "delPostcode";
+    const delContactID                 = "delContactID";
+    const delContactName               = "delContactName";
+    const delContactSalutation         = "delContactSalutation";
+    const delContactPhone              = "delContactPhone";
+    const delSitePhone                 = "delSitePhone";
+    const delContactFax                = "delContactFax";
+    const delContactEmail              = "delContactEmail";
+    const debtorCode                   = "debtorCode";
+    const wip                          = "wip";
+    const consultantID                 = "consultantID";
+    const paymentTermsID               = "paymentTermsID";
+    const addItem                      = "addItem";
+    const callID                       = "callID";
+    const quotationSubject             = "quotationSubject";
+    const quotationIntroduction        = "quotationIntroduction";
+    const updatedTime                  = "updatedTime";
     const serviceRequestCustomerItemID = "serviceRequestCustomerItemID";
-    const serviceRequestPriority = "serviceRequestPriority";
-    const serviceRequestText = "serviceRequestText";
-    const quotationCreateDate = "quotationCreateDate";
-    const directDebitFlag = "ordhead.directDebitFlag";
-    const transactionType = 'ordhead.transactionType';
+    const serviceRequestPriority       = "serviceRequestPriority";
+    const serviceRequestInternalNote   = "serviceRequestInternalNote";
+    const quotationCreateDate          = "quotationCreateDate";
+    const directDebitFlag              = "ordhead.directDebitFlag";
+    const transactionType              = 'ordhead.transactionType';
+    const serviceRequestTaskList       = "serviceRequestTaskList";
 
     /**
      * calls constructor()
@@ -380,10 +381,16 @@ class DBEOrdhead extends DBEntity
             'odh_service_request_priority'
         );
         $this->addColumn(
-            self::serviceRequestText,
+            self::serviceRequestInternalNote,
             DA_MEMO,
             DA_ALLOW_NULL,
-            'odh_service_request_text'
+            'serviceRequestInternalNote'
+        );
+        $this->addColumn(
+            self::serviceRequestTaskList,
+            DA_MEMO,
+            DA_ALLOW_NULL,
+            'serviceRequestTaskList'
         );
         $this->addColumn(
             self::quotationCreateDate,
@@ -396,13 +403,11 @@ class DBEOrdhead extends DBEntity
             DA_YN_FLAG,
             DA_NOT_NULL
         );
-
         $this->addColumn(
             self::transactionType,
             DA_TEXT,
             DA_ALLOW_NULL
         );
-
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -445,9 +450,9 @@ class DBEOrdhead extends DBEntity
             $this->raiseError('ordheadID not set');
         }
         $this->setQueryString(
-            "UPDATE " . $this->getTableName() .
-            " SET " . $this->getDBColumnName(self::type) . "='C'" .
-            " WHERE " . $this->getPKDBName() . "=" . $this->getPKValue()
+            "UPDATE " . $this->getTableName() . " SET " . $this->getDBColumnName(
+                self::type
+            ) . "='C'" . " WHERE " . $this->getPKDBName() . "=" . $this->getPKValue()
         );
         $this->runQuery();
         $this->resetQueryString();
@@ -459,10 +464,11 @@ class DBEOrdhead extends DBEntity
     )
     {
         $this->setQueryString(
-            "SELECT COUNT(*) FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName(self::customerID) . "=" . $customerID .
-            " AND (" . $this->getDBColumnName(self::delSiteNo) . "=" . $siteNo .
-            " OR " . $this->getDBColumnName(self::invSiteNo) . "=" . $siteNo . ")"
+            "SELECT COUNT(*) FROM " . $this->getTableName() . " WHERE " . $this->getDBColumnName(
+                self::customerID
+            ) . "=" . $customerID . " AND (" . $this->getDBColumnName(
+                self::delSiteNo
+            ) . "=" . $siteNo . " OR " . $this->getDBColumnName(self::invSiteNo) . "=" . $siteNo . ")"
         );
         if ($this->runQuery()) {
             if ($this->nextRecord()) {
@@ -476,9 +482,9 @@ class DBEOrdhead extends DBEntity
     function countRowsByContactID($contactID)
     {
         $this->setQueryString(
-            "SELECT COUNT(*) FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName(self::delContactID) . "=" . $contactID .
-            " OR " . $this->getDBColumnName(self::invContactID) . "=" . $contactID
+            "SELECT COUNT(*) FROM " . $this->getTableName() . " WHERE " . $this->getDBColumnName(
+                self::delContactID
+            ) . "=" . $contactID . " OR " . $this->getDBColumnName(self::invContactID) . "=" . $contactID
         );
         if ($this->runQuery()) {
             if ($this->nextRecord()) {

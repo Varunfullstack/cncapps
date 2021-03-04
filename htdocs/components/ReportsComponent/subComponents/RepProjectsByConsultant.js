@@ -30,13 +30,11 @@ export default class RepProjectsByConsultant extends MainComponent {
     const {consID,dateFrom,dateTo}=this.props;
     this.api.getProjectsSearch(consID,dateFrom,dateTo)
     .then(projects=>{
-      console.log('projects',projects);
       this.setState({projects,showModal:false,loadData:false});
     });
   }
   getProjectsTable=()=>{
-    //console.log('props',this.props);
-    const {projects} = this.state;    
+    const {projects} = this.state;
     const columns=[
         {
             path: "customerName",
