@@ -26,19 +26,19 @@ export const ReportType = {Daily: "day", Weekly: "week", Monthly: "month"}
 
 export default class KPIReportComponent extends MainComponent {
     api;
-    apiUsers=new APIUser();
+    apiUsers = new APIUser();
     ResultType;
     colors;
     reports;
     reportparameters;
-    REP_SR_FIXED = 1;
-    REP_PRIORITIES_RAISED = 2;
-    SRS_BY_CONTRACTS = 3;
-    REP_QUOTATION_CONVERSION = 4;
-    REP_SERVICE_REQUEST = 5;
-    REP_SERVICE_REQUEST_SOURCE = 6;
+    REP_SR_FIXED = 'srFixed';
+    REP_PRIORITIES_RAISED = 'prioritiesRaise';
+    SRS_BY_CONTRACTS = 'srsByContracts';
+    REP_QUOTATION_CONVERSION = 'quotationConversion';
+    REP_SERVICE_REQUEST = 'serviceRequest';
+    REP_SERVICE_REQUEST_SOURCE = 'serviceRequestSource';
     apiSDManagerDashboard = new APISDManagerDashboard();
-    REP_CONFIRMED_BILLED_PER_ENGINEER=5;
+    REP_CONFIRMED_BILLED_PER_ENGINEER = 'confirmedBilledPerEngineer';
 
     /**
      * SRS_BY_CONTRAC
@@ -57,18 +57,18 @@ export default class KPIReportComponent extends MainComponent {
                 to: this.getInitEndDate(),
                 resultType: this.ResultType.Weekly,
                 customerID: '',
-                consName:'',
-                teams:{
-                    hd:true,
-                    es:true,
-                    sp:true,
-                    p:true
+                consName: '',
+                teams: {
+                    hd: true,
+                    es: true,
+                    sp: true,
+                    p: true
                 }
             },
             data: [],
             reports: [],
             activeReport: null,
-            consultants:[]
+            consultants: []
         };
         this.api = new APIKPIReport();
         this.reportparameters = {
@@ -76,8 +76,8 @@ export default class KPIReportComponent extends MainComponent {
             dateTo: 'dateTo',
             customer: 'customer',
             resultType: 'resultType',
-            consName:'consName',
-            teams:'teams'
+            consName: 'consName',
+            teams: 'teams'
         };
         moment.locale("en");
         moment.updateLocale("en", {
@@ -187,7 +187,7 @@ export default class KPIReportComponent extends MainComponent {
     };
 
     getFilterElement = () => {
-        const {filter, reports,activeReport,consultants} = this.state;
+        const {filter, reports, activeReport, consultants} = this.state;
         return (
             <table>
                 <tbody>
@@ -267,48 +267,51 @@ export default class KPIReportComponent extends MainComponent {
                         <React.Fragment>
                             <td>Teams</td>
                             <td colSpan={3}>
-                               <div>
+                                <div>
 
-                            <label className="mr-3 ml-5">HD</label>
-                            <Toggle checked={filter.teams.hd}
-                                    onChange={(value) => this.setFilterTeam("hd", !filter.teams.hd)}
-                            />
-                            <label className="mr-3 ml-5">ES</label>
-                            <Toggle checked={filter.teams.es}
-                                    onChange={(value) => this.setFilterTeam("es", !filter.teams.es)}
-                            />
-                            <label className="mr-3 ml-5">SP</label>
-                            <Toggle checked={filter.teams.sp}
-                                    onChange={(value) => this.setFilterTeam("sp", !filter.teams.sp)}
-                            />
-                            <label className="mr-3 ml-5">P</label>
-                            <Toggle checked={filter.teams.p}
-                                    onChange={(value) => this.setFilterTeam("p", !filter.teams.p)}
-                            />
+                                    <label className="mr-3 ml-5">HD</label>
+                                    <Toggle checked={filter.teams.hd}
+                                            onChange={(value) => this.setFilterTeam("hd", !filter.teams.hd)}
+                                    />
+                                    <label className="mr-3 ml-5">ES</label>
+                                    <Toggle checked={filter.teams.es}
+                                            onChange={(value) => this.setFilterTeam("es", !filter.teams.es)}
+                                    />
+                                    <label className="mr-3 ml-5">SP</label>
+                                    <Toggle checked={filter.teams.sp}
+                                            onChange={(value) => this.setFilterTeam("sp", !filter.teams.sp)}
+                                    />
+                                    <label className="mr-3 ml-5">P</label>
+                                    <Toggle checked={filter.teams.p}
+                                            onChange={(value) => this.setFilterTeam("p", !filter.teams.p)}
+                                    />
 
-                               </div>
+                                </div>
                             </td>
                         </React.Fragment>
                     ) : null}
                     <td>
-                     </td>
+                    </td>
                 </tr>
                 <tr>
                     {this.hasParameter(this.reportparameters.consName) ? (
                         <React.Fragment>
                             <td>Consultant</td>
                             <td colSpan={3}>
-                               <select style={{width:340}} value={filter.consName}
-                               onChange={(event)=>this.setFilter('consName',event.target.value)}
-                               >
-                                <option>All</option>
-                                {consultants.map(c=><option key={c.id} value={c.name}>{c.name}</option>)}
-                               </select>
+                                <select style={{width: 340}}
+                                        value={filter.consName}
+                                        onChange={(event) => this.setFilter('consName', event.target.value)}
+                                >
+                                    <option>All</option>
+                                    {consultants.map(c => <option key={c.id}
+                                                                  value={c.name}
+                                    >{c.name}</option>)}
+                                </select>
                             </td>
                         </React.Fragment>
                     ) : null}
                     <td>
-                     </td>
+                    </td>
                 </tr>
                 <tr>
                     {this.hasParameter(this.reportparameters.customer) ? (
@@ -334,33 +337,32 @@ export default class KPIReportComponent extends MainComponent {
             </table>
         );
     };
-    setFilterTeam=(team,value)=>{
-        const {filter}=this.state;
-        filter.teams[team]=value;
+    setFilterTeam = (team, value) => {
+        const {filter} = this.state;
+        filter.teams[team] = value;
         this.setState({filter});
     }
     handleReportChange = ($event) => {
         const id = $event.target.value;
         const {reports} = this.state;
-        let activeReport = reports[reports.map(r => r.id).indexOf(parseInt(id))];
+        let activeReport = reports[reports.map(r => r.id).indexOf(id)];
         this.setState({activeReport, data: []});
     }
     hasParameter = (parameter) => {
         const {activeReport} = this.state;
         return activeReport != null && activeReport.parameters.indexOf(parameter) >= 0;
     }
-    handleReportView = async() => {
-        let {filter, activeReport,consultants} = this.state;
+    handleReportView = async () => {
+        let {filter, activeReport, consultants} = this.state;
 
         this.setState({_showSpinner: true});
         // if (filter.from == "") {
         //     this.alert("You must enter the start date");
         //     return;
         // }
-if(activeReport&&activeReport.parameters.indexOf(this.reportparameters.consName)>=0&&consultants.length==0)
-        {
+        if (activeReport && activeReport.parameters.indexOf(this.reportparameters.consName) >= 0 && consultants.length == 0) {
             //console.log('have users');
-            consultants=await this.apiUsers.getActiveUsers();
+            consultants = await this.apiUsers.getActiveUsers();
             this.setState({consultants});
         }
         switch (activeReport?.id) {
@@ -423,7 +425,7 @@ if(activeReport&&activeReport.parameters.indexOf(this.reportparameters.consName)
                 break;
             case this.REP_CONFIRMED_BILLED_PER_ENGINEER:
                 this.api.getEngineerMonthlyBilling(filter.from, filter.to).then((data) => {
-                    this.processData(data, false,false,false);
+                    this.processData(data, false, false, false);
                 });
                 break;
 
@@ -431,7 +433,7 @@ if(activeReport&&activeReport.parameters.indexOf(this.reportparameters.consName)
 
 
     };
-    processData = (data, skipWeekEnds = true,daily=true,weekly=true,monthly=true) => {
+    processData = (data, skipWeekEnds = true, daily = true, weekly = true, monthly = true) => {
         const {filter} = this.state;
         if (skipWeekEnds) {
             data = data.filter((a) => {
@@ -440,15 +442,15 @@ if(activeReport&&activeReport.parameters.indexOf(this.reportparameters.consName)
                 else return true;
             });
         }
-        if (data.length <= 100&&daily) filter.resultType = this.ResultType.Daily;
-        if (data.length > 100 && data.length < 200&&weekly)
+        if (data.length <= 100 && daily) filter.resultType = this.ResultType.Daily;
+        if (data.length > 100 && data.length < 200 && weekly)
             filter.resultType = this.ResultType.Weekly;
-        else if(monthly)
-        filter.resultType = this.ResultType.Monthly;
+        else if (monthly)
+            filter.resultType = this.ResultType.Monthly;
         this.setState({data, _showSpinner: false, filter});
     }
     getActiveChart = () => {
-        const {activeReport, data, filter,consultants} = this.state;
+        const {activeReport, data, filter, consultants} = this.state;
         switch (activeReport?.id) {
             case this.REP_SR_FIXED:
                 return <SRFixedComponent data={data}
@@ -477,7 +479,9 @@ if(activeReport&&activeReport.parameters.indexOf(this.reportparameters.consName)
                 />
             case this.REP_CONFIRMED_BILLED_PER_ENGINEER:
                 return <BillingConsultancyComponent data={data}
-                                                    filter={filter} consultants={consultants}>
+                                                    filter={filter}
+                                                    consultants={consultants}
+                >
                 </BillingConsultancyComponent>;
             default:
                 return null;
