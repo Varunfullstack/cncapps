@@ -16,6 +16,7 @@ class SupplierMySQLDTO
     private $sup_contno;
     private $sup_cnc_accno;
     private $sup_payno;
+    private $active;
 
 
     /**
@@ -123,5 +124,12 @@ class SupplierMySQLDTO
         return $this->sup_cnc_accno;
     }
 
+    /**
+     * @return bool
+     */
+    public function getActive(): bool
+    {
+        return (bool)$this->active;
+    }
 
 }

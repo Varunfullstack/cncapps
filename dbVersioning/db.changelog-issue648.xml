@@ -84,12 +84,12 @@
                                          isMain)
             select con_contno,
                    con_suppno,
-                   con_title,
+                   if(con_title is null or con_title = '', 'Mx', con_title),
                    con_position,
                    con_first_name,
                    con_last_name,
                    if(con_email is null or con_email = '', "notprovided@cnc-ltd.co.uk", con_email),
-                   con_phone,
+                   if(con_phone is null or con_phone = '', 'not-provided', con_phone),
                    active,
                    coalesce((select sup_contno = con_contno from supplier where supplier.sup_suppno = con_suppno),
                             0) as isMain

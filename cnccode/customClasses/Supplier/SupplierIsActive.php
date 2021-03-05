@@ -4,14 +4,20 @@ namespace CNCLTD\Supplier;
 class SupplierIsActive
 {
 
-    private $active;
+    private $value;
 
     /**
-     * @return mixed
+     * SupplierIsActive constructor.
+     * @param $value
      */
-    public function isActive()
+    public function __construct(bool $value) { $this->value = $value; }
+
+    /**
+     * @return bool
+     */
+    public function getValue(): bool
     {
-        return $this->active;
+        return $this->value;
     }
 
 }

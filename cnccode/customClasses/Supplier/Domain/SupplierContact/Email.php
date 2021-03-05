@@ -30,8 +30,8 @@ class Email
         if (strlen($value) > self::MAX_LENGTH) {
             throw new StringTooLongException(self::MAX_LENGTH);
         }
-        if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
-            throw new InvalidEmailException();
+        if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
+            throw new InvalidEmailException($value);
         }
         $this->value = $value;
     }

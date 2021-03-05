@@ -14,6 +14,16 @@ export class SupplierEditComponent extends React.PureComponent {
         }
     }
 
+    async componentDidMount() {
+        const response = await fetch(`/Supplier.php?action=getSupplierData&supplierId=${this.state.supplierId}`);
+        const jsonResponse = await response.json();
+        if (!jsonResponse || jsonResponse.status !== 'ok') {
+            alert('Failed to retrieve Supplier: ' + jsonResponse.message);
+        } else {
+            this.setState({supplier: jsonResponse.data});
+        }
+    }
+
     render() {
 
         const {supplier} = this.state;

@@ -18,7 +18,7 @@ class Position
      * @param $value
      * @throws StringTooLongException
      */
-    public function __construct(string $value)
+    public function __construct(?string $value)
     {
         if (strlen($value) > self::MAX_LENGTH) {
             throw new StringTooLongException(self::MAX_LENGTH);

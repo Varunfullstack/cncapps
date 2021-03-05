@@ -114,6 +114,7 @@ class CTSupplier extends CTCNC
                 exit;
             case self::GET_SUPPLIER_DATA:
                 $this->getSupplierDataController();
+                exit;
             default:
                 $this->checkPermissions(MAINTENANCE_PERMISSION);
                 $this->reactController();
@@ -508,13 +509,13 @@ class CTSupplier extends CTCNC
         try {
             $supplierId = new SupplierId((int)$supplierIdValue);
         } catch (Exception $exception) {
-            throw new JsonHttpException(6512, 'Invalid supplier Id');
+            throw new JsonHttpException(400, 'Invalid supplier Id');
         }
         $repo = new MySQLSupplierRepository();
         try {
             $supplier = $repo->getSupplierWithContactsById($supplierId);
         } catch (Exception $exception) {
-            throw new JsonHttpException(5523, "Supplier not found!");
+            throw new JsonHttpException(400, "Supplier not found or failed!:" . $exception->getMessage());
         }
         echo json_encode(["status" => "ok", "data" => $supplier]);
     }

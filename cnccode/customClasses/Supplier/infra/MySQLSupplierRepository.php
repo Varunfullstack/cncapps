@@ -2,9 +2,36 @@
 
 namespace CNCLTD\Supplier\infra;
 
+use CNCLTD\Exceptions\ContactAlreadyExistsException;
+use CNCLTD\Exceptions\EmptyStringException;
+use CNCLTD\Exceptions\InvalidEmailException;
+use CNCLTD\Exceptions\InvalidIdException;
+use CNCLTD\Exceptions\StringTooLongException;
+use CNCLTD\Exceptions\SupplierContactMainInactiveException;
+use CNCLTD\Exceptions\URLNotValidException;
+use CNCLTD\Supplier\Domain\SupplierContact\Active;
+use CNCLTD\Supplier\Domain\SupplierContact\Email;
+use CNCLTD\Supplier\Domain\SupplierContact\FirstName;
+use CNCLTD\Supplier\Domain\SupplierContact\LastName;
+use CNCLTD\Supplier\Domain\SupplierContact\Phone;
+use CNCLTD\Supplier\Domain\SupplierContact\Position;
+use CNCLTD\Supplier\Domain\SupplierContact\SupplierContactId;
+use CNCLTD\Supplier\Domain\SupplierContact\Title;
 use CNCLTD\Supplier\Supplier;
+use CNCLTD\Supplier\SupplierAccountCode;
+use CNCLTD\Supplier\SupplierAddress1;
+use CNCLTD\Supplier\SupplierAddress2;
+use CNCLTD\Supplier\SupplierCounty;
+use CNCLTD\Supplier\SupplierFax;
 use CNCLTD\Supplier\SupplierId;
+use CNCLTD\Supplier\SupplierIsActive;
+use CNCLTD\Supplier\SupplierName;
+use CNCLTD\Supplier\SupplierPaymentMethodId;
+use CNCLTD\Supplier\SupplierPhone;
+use CNCLTD\Supplier\SupplierPostcode;
 use CNCLTD\Supplier\SupplierRepository;
+use CNCLTD\Supplier\SupplierTown;
+use CNCLTD\Supplier\SupplierWebsiteURL;
 use dbSweetcode;
 use Exception;
 use ReflectionClass;
@@ -95,6 +122,17 @@ from supplier
         return new SupplierId($nextId);
     }
 
+    /**
+     * @param SupplierId $supplierId
+     * @return Supplier
+     * @throws ContactAlreadyExistsException
+     * @throws EmptyStringException
+     * @throws InvalidEmailException
+     * @throws InvalidIdException
+     * @throws StringTooLongException
+     * @throws SupplierContactMainInactiveException
+     * @throws URLNotValidException
+     */
     public function getSupplierWithContactsById(SupplierId $supplierId)
     {
         $statement = $this->sweetCodeDB->preparedQuery(
@@ -109,6 +147,7 @@ from supplier
         if (!$statement) {
             throw new Exception('Failed to retrieve Supplier!');
         }
+        /** @var SupplierMySQLDTO $supplierDTO */
         $supplierDTO = $statement->fetch_object(SupplierMySQLDTO::class);
         if (!$supplierId) {
             throw new Exception('Supplier not found');
@@ -122,7 +161,53 @@ from supplier
                 ]
             ]
         );
-
-
+        if (!$supplierContactsStatement) {
+            throw new Exception('Failed to retrieve supplier contacts');
+        }
+        $mainContact = null;
+        $contacts    = [];
+        /** @var SupplierContactMysqlDTO $contact */
+        while ($contact = $supplierContactsStatement->fetch_object(SupplierContactMysqlDTO::class)) {
+            if ($contact->getIsMain()) {
+                $mainContact = $contact;
+            } else {
+                $contacts[] = $contact;
+            }
+        }
+        $supplier = Supplier::create(
+            new SupplierId((int)$supplierDTO->getId()),
+            new SupplierName($supplierDTO->getName()),
+            new SupplierAddress1($supplierDTO->getAddress1()),
+            new SupplierAddress2($supplierDTO->getAddress2()),
+            new SupplierTown($supplierDTO->getTown()),
+            new SupplierCounty($supplierDTO->getCounty()),
+            new SupplierPostcode($supplierDTO->getPostcode()),
+            new SupplierPhone($supplierDTO->getPhone()),
+            new SupplierWebsiteURL($supplierDTO->getWebsiteUrl()),
+            new SupplierFax($supplierDTO->getFax()),
+            new SupplierPaymentMethodId($supplierDTO->getPayMethodId()),
+            new SupplierAccountCode($supplierDTO->getCNCAccountCode()),
+            new SupplierIsActive($supplierDTO->getActive()),
+            new SupplierContactId($mainContact->getId()),
+            new Position($mainContact->getPosition()),
+            new Title($mainContact->getTitle()),
+            new FirstName($mainContact->getFirstName()),
+            new LastName($mainContact->getLastName()),
+            new Email($mainContact->getEmail()),
+            new Phone($mainContact->getPhone())
+        );
+        foreach ($contacts as $contact) {
+            $supplier->addContact(
+                new SupplierContactId($contact->getId()),
+                new Title($contact->getTitle()),
+                new Position($contact->getPosition()),
+                new FirstName($contact->getFirstName()),
+                new LastName($contact->getLastName()),
+                new Phone($contact->getPhone()),
+                new Email($contact->getEmail()),
+                new Active($contact->getActive())
+            );
+        }
+        return $supplier;
     }
 }
