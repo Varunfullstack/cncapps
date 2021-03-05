@@ -7,7 +7,9 @@
  */
 global $cfg;
 
+use CNCLTD\Exceptions\JsonHttpException;
 use CNCLTD\Supplier\infra\MySQLSupplierRepository;
+use CNCLTD\Supplier\SupplierId;
 
 require_once($cfg['path_bu'] . '/BUSupplier.inc.php');
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
@@ -54,7 +56,8 @@ define(
 
 class CTSupplier extends CTCNC
 {
-    const GET_SUPPLIERS = "getSuppliers";
+    const GET_SUPPLIERS     = "getSuppliers";
+    const GET_SUPPLIER_DATA = "getSupplierData";
     /**
      * Dataset for supplier record storage.
      *
@@ -109,10 +112,11 @@ class CTSupplier extends CTCNC
             case self::GET_SUPPLIERS:
                 $this->getSuppliersController();
                 exit;
-            case CTSUPPLIER_ACT_SUPPLIER_SEARCH_FORM:
+            case self::GET_SUPPLIER_DATA:
+                $this->getSupplierDataController();
             default:
                 $this->checkPermissions(MAINTENANCE_PERMISSION);
-                $this->displaySearchForm();
+                $this->reactController();
                 break;
         }
     }
@@ -379,9 +383,8 @@ class CTSupplier extends CTCNC
      * @access private
      * @throws Exception
      */
-    function displaySearchForm()
+    function reactController()
     {
-        $this->setMethodName('displaySearchForm');
         $this->setContainerTemplate();
         $this->setPageTitle("Supplier");
         $this->loadReactScript('SupplierComponent.js');
@@ -494,5 +497,25 @@ class CTSupplier extends CTCNC
     {
         $repo = new MySQLSupplierRepository();
         echo json_encode(["status" => "ok", "data" => $repo->getAllSuppliers()]);
+    }
+
+    /**
+     * @throws JsonHttpException
+     */
+    private function getSupplierDataController()
+    {
+        $supplierIdValue = @$_REQUEST['supplierId'];
+        try {
+            $supplierId = new SupplierId((int)$supplierIdValue);
+        } catch (Exception $exception) {
+            throw new JsonHttpException(6512, 'Invalid supplier Id');
+        }
+        $repo = new MySQLSupplierRepository();
+        try {
+            $supplier = $repo->getSupplierWithContactsById($supplierId);
+        } catch (Exception $exception) {
+            throw new JsonHttpException(5523, "Supplier not found!");
+        }
+        echo json_encode(["status" => "ok", "data" => $supplier]);
     }
 }

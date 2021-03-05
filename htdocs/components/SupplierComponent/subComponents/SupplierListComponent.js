@@ -1,7 +1,6 @@
 import React from "react";
 import Table from "../../shared/table/table";
 import {SupplierService} from "../../services/SupplierService";
-import {SHOW_ACTIVE} from "../../customerEditMain/visibilityFilterTypes";
 import {VisibilityFilterOptions} from "../../customerEditMain/actions";
 
 
@@ -24,6 +23,8 @@ export class SupplierListComponent extends React.PureComponent {
     }
 
     getTableElement() {
+        const {data, visibilityFilter} = this.state;
+
         let columns = [
             {
                 hide: false,
@@ -86,6 +87,28 @@ export class SupplierListComponent extends React.PureComponent {
 
             },
             {
+                hide: visibilityFilter === VisibilityFilterOptions.SHOW_ACTIVE,
+                order: 4,
+                path: "active",
+                key: "id",
+                label: "Active",
+                hdToolTip: "Active",
+                sortable: true,
+                width: "55",
+                hdClassName: "text-center",
+                className: "text-center",
+                content: (supplierRow) => {
+                    let icon = "fa-times"
+                    if (supplierRow.active) {
+                        icon = "fa-check";
+                    }
+                    return (
+                        <i className={`fal ${icon} fa-2x`}/>
+                    )
+                }
+
+            },
+            {
                 hide: false,
                 order: 20,
                 path: "id",
@@ -95,7 +118,8 @@ export class SupplierListComponent extends React.PureComponent {
                 hdClassName: "text-center",
                 className: "text-center",
                 content: (supplierRow) => (
-                    <button onClick={this.editSupplierRowFunction(supplierRow)}><i className="fal fa-pencil"/></button>
+                    <button onClick={this.editSupplierRowFunction(supplierRow)}><i className="fal fa-pencil fa-2x"/>
+                    </button>
                 )
             },
 
@@ -103,7 +127,6 @@ export class SupplierListComponent extends React.PureComponent {
         columns = columns
             .filter((c) => c.hide == false)
             .sort((a, b) => (a.order > b.order ? 1 : -1));
-        const {data, visibilityFilter} = this.state;
 
         return <Table
             data={data.filter(x => !(visibilityFilter === VisibilityFilterOptions.SHOW_ACTIVE && !x.active))}
@@ -116,7 +139,10 @@ export class SupplierListComponent extends React.PureComponent {
     editSupplierRowFunction = (supplierRow) => {
         return () => {
             // navigate to the edit page
-            console.log(supplierRow);
+            const newURL = new URL(document.location);
+            newURL.searchParams.append('action', 'edit');
+            newURL.searchParams.append('supplierId', supplierRow.id);
+            window.location = newURL;
         }
     }
 
@@ -134,22 +160,13 @@ export class SupplierListComponent extends React.PureComponent {
         return (
             <React.Fragment>
                 <div>
-                    <div className="toggle-inline">
-                        <label>Show Inactive</label>
-                        <label className="switch"
-                        >
-
-                            <input type="checkbox"
-                                   name="showOnlyActiveSites"
-                                   onChange={this.onToggleVisibility}
-                                   title="Show only active sites"
-                                   value="1"
-                                   checked={visibilityFilter === SHOW_ACTIVE}
-                                   className="form-control"
-                            />
-                            <span className="slider round"/>
-                        </label>
-                    </div>
+                    <select className="fa-"
+                            onChange={this.onToggleVisibility}
+                            value={visibilityFilter}
+                    >
+                        <option value={VisibilityFilterOptions.SHOW_ACTIVE}>Active Only</option>
+                        <option value={VisibilityFilterOptions.SHOW_ALL}>Show All</option>
+                    </select>
                 </div>
                 {this.getTableElement()}
             </React.Fragment>

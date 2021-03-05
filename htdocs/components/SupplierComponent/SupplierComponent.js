@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 import {params} from "../utils/utils";
 import '../style.css';
 import {SupplierListComponent} from "./subComponents/SupplierListComponent";
+import {SupplierEditComponent} from "./subComponents/SupplierEditComponent";
 
 export class SupplierComponent extends React.PureComponent {
 
@@ -13,8 +14,10 @@ export class SupplierComponent extends React.PureComponent {
 
     getElement(action) {
         switch (action) {
+            case "edit":
+                return <SupplierEditComponent key="supplierEdit"/>
             default:
-                return <SupplierListComponent key="test"/>
+                return <SupplierListComponent key="supplierList"/>
         }
     }
 

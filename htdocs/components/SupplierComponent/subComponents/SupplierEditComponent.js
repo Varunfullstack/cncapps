@@ -1,20 +1,27 @@
 import React from 'react';
 import Select from "../../customerEditMain/Select";
 import EncryptedTextInput from "../../customerEditMain/EncryptedTextInput";
+import {params} from "../../utils/utils";
 
-export class SupplierListComponent extends React.PureComponent {
+export class SupplierEditComponent extends React.PureComponent {
 
     constructor(props, context) {
         super(props, context);
+        const supplierId = params.get('supplierId');
         this.state = {
-            supplier: {
-                name: '',
-
-            }
+            supplierId,
+            supplier: null
         }
     }
 
     render() {
+
+        const {supplier} = this.state;
+
+        if (!supplier) {
+            return '';
+        }
+
         return (
             <div className="mt-3">
                 <div className="row">

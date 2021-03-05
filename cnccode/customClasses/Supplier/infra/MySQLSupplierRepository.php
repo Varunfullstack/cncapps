@@ -94,4 +94,35 @@ from supplier
         $nextId = $this->sweetCodeDB->nextid($this->tableName);
         return new SupplierId($nextId);
     }
+
+    public function getSupplierWithContactsById(SupplierId $supplierId)
+    {
+        $statement = $this->sweetCodeDB->preparedQuery(
+            'select * from supplier where sup_suppno = ? ',
+            [
+                [
+                    "type"  => "i",
+                    "value" => $supplierId->value()
+                ]
+            ]
+        );
+        if (!$statement) {
+            throw new Exception('Failed to retrieve Supplier!');
+        }
+        $supplierDTO = $statement->fetch_object(SupplierMySQLDTO::class);
+        if (!$supplierId) {
+            throw new Exception('Supplier not found');
+        }
+        $supplierContactsStatement = $this->sweetCodeDB->preparedQuery(
+            'select * from supplierContact where supplierId = ?',
+            [
+                [
+                    "type"  => "i",
+                    "value" => $supplierId->value()
+                ]
+            ]
+        );
+
+
+    }
 }
