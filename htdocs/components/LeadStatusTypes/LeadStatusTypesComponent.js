@@ -147,7 +147,7 @@ class LeadStatusTypesComponent extends MainComponent {
         return <Modal 
         width={500}
         show={this.state.showModal}
-        title={mode=="new"?"Add New Type":""}
+        title={mode=="new"?"Add New Type":"Edit Type"}
         onClose={this.hideModal}
         content={
             <div key="content">

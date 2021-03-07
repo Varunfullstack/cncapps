@@ -110,7 +110,7 @@ class CustomerTypeComponent extends MainComponent {
         return <Modal 
         width={500}
         show={this.state.showModal}
-        title={mode=="new"?"Add New Type":""}
+        title={mode=="new"?"Add New Type":"Edit Type"}
         onClose={this.hideModal}
         content={
             <div key="content">
@@ -131,7 +131,7 @@ class CustomerTypeComponent extends MainComponent {
     }
     handleSave=()=>{
         const { data, mode } = this.state;
-        if (data.name == "") {
+        if (data.description == "") {
           this.alert("Type name required.");
           return;
         }
