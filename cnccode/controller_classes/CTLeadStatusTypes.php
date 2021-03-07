@@ -206,42 +206,44 @@ class CTLeadStatusTypes extends CTCNC
             'LeadStatus',
             true
         );
+        $this->loadReactScript('LeadStatusTypesComponent.js');
+        $this->loadReactCSS('LeadStatusTypesComponent.css');
 
-        $URLDeleteItem = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            [
-                'action' => 'delete'
-            ]
-        );
+        // $URLDeleteItem = Controller::buildLink(
+        //     $_SERVER['PHP_SELF'],
+        //     [
+        //         'action' => 'delete'
+        //     ]
+        // );
 
-        $URLUpdateItem = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            [
-                'action' => 'update'
-            ]
-        );
+        // $URLUpdateItem = Controller::buildLink(
+        //     $_SERVER['PHP_SELF'],
+        //     [
+        //         'action' => 'update'
+        //     ]
+        // );
 
-        $URLCreateItem = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            [
-                'action' => 'create'
-            ]
-        );
+        // $URLCreateItem = Controller::buildLink(
+        //     $_SERVER['PHP_SELF'],
+        //     [
+        //         'action' => 'create'
+        //     ]
+        // );
 
-        $URLGetData = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            [
-                'action' => 'getData'
-            ]
-        );
-        $this->template->setVar(
-            [
-                "URLDeleteItem" => $URLDeleteItem,
-                "URLUpdateItem" => $URLUpdateItem,
-                "URLAddItem"    => $URLCreateItem,
-                "URLGetData"    => $URLGetData
-            ]
-        );
+        // $URLGetData = Controller::buildLink(
+        //     $_SERVER['PHP_SELF'],
+        //     [
+        //         'action' => 'getData'
+        //     ]
+        // );
+        // $this->template->setVar(
+        //     [
+        //         "URLDeleteItem" => $URLDeleteItem,
+        //         "URLUpdateItem" => $URLUpdateItem,
+        //         "URLAddItem"    => $URLCreateItem,
+        //         "URLGetData"    => $URLGetData
+        //     ]
+        // );
 
         $this->parsePage();
     }
