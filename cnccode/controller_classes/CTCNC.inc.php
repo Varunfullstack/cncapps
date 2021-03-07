@@ -11,6 +11,7 @@ global $cfg;
 use CNCLTD\FavouriteMenu;
 use CNCLTD\MenuItem;
 use CNCLTD\SideMenu;
+use CNCLTD\Exceptions\APIException;
 
 require_once($cfg ['path_gc'] . '/DataSet.inc.php');
 require_once($cfg ['path_gc'] . '/Controller.inc.php');
@@ -1277,5 +1278,14 @@ class CTCNC extends Controller
     {
         http_response_code($code);
         return ["status" => false, "error" => $message];
+    }
+    public function success($data=null)
+    {
+        return ["state"=>true,"data"=>$data];
+    }
+    public function fail($code,$message)
+    {
+        return new APIException($code,$message);
+
     }
 }

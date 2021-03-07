@@ -171,7 +171,8 @@ class Table extends React.Component {
             selectedKey,
             search,
             searchLabelStyle,
-            hasFooter
+            hasFooter,
+            style
         } = props;
         const {sortColumn} = this.state;
         const {handleSearch} = this;
@@ -187,7 +188,7 @@ class Table extends React.Component {
                 this.sort(filterData, this.state.sortColumn.path, this.state.sortColumn.order);
             }
         }
-        return [
+        return el("div",{style:style},
             el("div", {className: "flex-row", key: "tableSearch"},
                 search
                     ? el("div", {key: "tableSearch", style: {marginBottom: 5}, className: "flex-row"}, [
@@ -211,7 +212,8 @@ class Table extends React.Component {
             el("table", {
                 key: "table" + this.props.id,
                 id: "table" + this.props.id,
-                className: "table " + striped
+                className: "table " + striped,
+                
             }, [
                 el(TableHeader, {
                     key: "tableHeader",
@@ -232,7 +234,7 @@ class Table extends React.Component {
                     : null,
                 hasFooter ? el(TableFooter, {key: "tableFooter", id: "tableFooter", columns}) : null
             ]),
-        ];
+            );
     }
 }
 

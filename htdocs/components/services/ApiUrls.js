@@ -20,5 +20,7 @@ export default class ApiUrls {
     static Reports = "/Reports.php?action=";
     static SalesOrder = "/SalesOrder.php?action=";
     static CustomerFeedback = "/CustomerFeedback.php?action=";
-    static LeadStatusTypes= "/LeadStatusTypes.php";
+    static LeadStatusTypes= "/LeadStatusTypes.php?action=";
+    static CustomerType= "/CustomerType.php?action=";
+
 }

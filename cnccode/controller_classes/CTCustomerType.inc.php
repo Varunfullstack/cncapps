@@ -6,18 +6,16 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use CNCLTD\Exceptions\APIException;
+
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomerType.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
-// Actions
-define('CTCUSTOMERTYPE_ACT_DISPLAY_LIST', 'sectorList');
-define('CTCUSTOMERTYPE_ACT_CREATE', 'createCustomerType');
-define('CTCUSTOMERTYPE_ACT_EDIT', 'editCustomerType');
-define('CTCUSTOMERTYPE_ACT_DELETE', 'deleteCustomerType');
-define('CTCUSTOMERTYPE_ACT_UPDATE', 'updateCustomerType');
-
+  
 class CTCustomerType extends CTCNC
 {
+    const CONST_TYPES="types";
     /** @var DSForm */
     public $dsCustomerType;
     /** @var BUCustomerType */
@@ -45,17 +43,22 @@ class CTCustomerType extends CTCNC
     {
         $this->checkPermissions(MAINTENANCE_PERMISSION);
         switch ($this->getAction()) {
-            case CTCUSTOMERTYPE_ACT_EDIT:
-            case CTCUSTOMERTYPE_ACT_CREATE:
-                $this->edit();
-                break;
-            case CTCUSTOMERTYPE_ACT_DELETE:
-                $this->delete();
-                break;
-            case CTCUSTOMERTYPE_ACT_UPDATE:
-                $this->update();
-                break;
-            case CTCUSTOMERTYPE_ACT_DISPLAY_LIST:
+            case self::CONST_TYPES:
+                switch ($this->requestMethod) {
+                    case 'GET':
+                        echo json_encode($this->getAllTypes(),JSON_NUMERIC_CHECK);
+                        break;                    
+                    case 'POST':
+                        echo json_encode($this->addType(),JSON_NUMERIC_CHECK);
+                        break;
+                    case 'PUT':
+                        echo json_encode($this->updateType(),JSON_NUMERIC_CHECK);
+                        break;
+                    case 'DELETE':
+                        echo json_encode($this->deleteType(),JSON_NUMERIC_CHECK);
+                        break;
+                }
+                exit;         
             default:
                 $this->displayList();
                 break;
@@ -68,211 +71,101 @@ class CTCustomerType extends CTCNC
      * @throws Exception
      */
     function displayList()
-    {
-        $this->setMethodName('displayList');
+    {        
         $this->setPageTitle('Referral Types');
         $this->setTemplateFiles(
             array('CustomerTypeList' => 'CustomerTypeList.inc')
         );
-        $dsCustomerType = new DataSet($this);
-        $this->buCustomerType->getAll($dsCustomerType);
-
-        $urlCreate = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'action' => CTCUSTOMERTYPE_ACT_CREATE
-            )
+        $this->template->parse(
+            'CONTENTS',
+            'CustomerTypeList',
+            true
         );
-
-        $this->template->set_var(
-            array('urlCreate' => $urlCreate)
-        );
-
-        if ($dsCustomerType->rowCount() > 0) {
-
-            $this->template->set_block(
-                'CustomerTypeList',
-                'CustomerTypeBlock',
-                'customerTypes'
-            );
-
-            while ($dsCustomerType->fetchNext()) {
-
-                $customerTypeID = $dsCustomerType->getValue(DBECustomerType::customerTypeID);
-
-                $urlEdit =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
+        $this->loadReactScript('CustomerTypeComponent.js');
+        $this->loadReactCSS('CustomerTypeComponent.css'); 
+        $this->parsePage();
+    }
+    //-----------------new 
+    function getAllTypes()
+    {
+        try {
+            $dsCustomerType = new DataSet($this);
+            $this->buCustomerType->getAll($dsCustomerType);
+            $data = [];
+            if ($dsCustomerType->rowCount() > 0) {
+                while ($dsCustomerType->fetchNext()) {
+                    $customerTypeID = $dsCustomerType->getValue(DBECustomerType::customerTypeID);
+                    $canDelete = false;                    
+                    if ($this->buCustomerType->canDelete($customerTypeID)) {
+                        $canDelete = true;
+                    }
+                    $data[] =
                         array(
-                            'action'         => CTCUSTOMERTYPE_ACT_EDIT,
-                            'customerTypeID' => $customerTypeID
-                        )
-                    );
-                $txtEdit = '[edit]';
-
-                $urlDelete = null;
-                $txtDelete = null;
-                if ($this->buCustomerType->canDelete($customerTypeID)) {
-                    $urlDelete =
-                        Controller::buildLink(
-                            $_SERVER['PHP_SELF'],
-                            array(
-                                'action'         => CTCUSTOMERTYPE_ACT_DELETE,
-                                'customerTypeID' => $customerTypeID
-                            )
+                            'id' => $customerTypeID,
+                            'description'    => Controller::htmlDisplayText(
+                                $dsCustomerType->getValue(DBECustomerType::description)
+                            ),
+                            'canDelete'      => $canDelete
                         );
-                    $txtDelete = '[delete]';
                 }
-
-                $this->template->set_var(
-                    array(
-                        'customerTypeID' => $customerTypeID,
-                        'description'    => Controller::htmlDisplayText(
-                            $dsCustomerType->getValue(DBECustomerType::description)
-                        ),
-                        'urlEdit'        => $urlEdit,
-                        'urlDelete'      => $urlDelete,
-                        'txtEdit'        => $txtEdit,
-                        'txtDelete'      => $txtDelete
-                    )
-                );
-
-                $this->template->parse('customerTypes', 'CustomerTypeBlock', true);
-
-            }//while $dsCustomerType->fetchNext()
-        }
-        $this->template->parse('CONTENTS', 'CustomerTypeList', true);
-        $this->parsePage();
-    }
-
-    /**
-     * Edit/Add Further Action
-     * @access private
-     * @throws Exception
-     */
-    function edit()
-    {
-        $this->setMethodName('edit');
-        $dsCustomerType = &$this->dsCustomerType; // ref to class var
-
-        if (!$this->getFormError()) {
-            if ($this->getAction() == CTCUSTOMERTYPE_ACT_EDIT) {
-                $this->buCustomerType->getCustomerTypeByID($this->getParam('customerTypeID'), $dsCustomerType);
-                $customerTypeID = $this->getParam('customerTypeID');
-            } else {                                                                    // creating new
-                $dsCustomerType->initialise();
-                $dsCustomerType->setValue(DBECustomerType::customerTypeID, '0');
-                $customerTypeID = '0';
             }
-        } else {                                                                        // form validation error
-            $dsCustomerType->initialise();
-            $dsCustomerType->fetchNext();
-            $customerTypeID = $dsCustomerType->getValue(DBECustomerType::customerTypeID);
-        }
-        $urlDelete = null;
-        $txtDelete = null;
-        if ($this->getAction() == CTCUSTOMERTYPE_ACT_EDIT && $this->buCustomerType->canDelete(
-                $this->getParam('customerTypeID')
-            )) {
-            $urlDelete = Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'         => CTCUSTOMERTYPE_ACT_DELETE,
-                    'customerTypeID' => $customerTypeID
-                )
-            );
-            $txtDelete = 'Delete';
-        }
-        $urlUpdate =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'         => CTCUSTOMERTYPE_ACT_UPDATE,
-                    'customerTypeID' => $customerTypeID
-                )
-            );
-        $urlDisplayList =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTCUSTOMERTYPE_ACT_DISPLAY_LIST
-                )
-            );
-        $this->setPageTitle('Edit Referral Type');
-        $this->setTemplateFiles(
-            array('CustomerTypeEdit' => 'CustomerTypeEdit.inc')
-        );
-        $this->template->set_var(
-            array(
-                'customerTypeID'     => $customerTypeID,
-                'description'        => Controller::htmlInputText(
-                    $dsCustomerType->getValue(DBECustomerType::description)
-                ),
-                'descriptionMessage' => Controller::htmlDisplayText(
-                    $dsCustomerType->getMessage(DBECustomerType::description)
-                ),
-                'urlUpdate'          => $urlUpdate,
-                'urlDelete'          => $urlDelete,
-                'txtDelete'          => $txtDelete,
-                'urlDisplayList'     => $urlDisplayList
-            )
-        );
-        $this->template->parse('CONTENTS', 'CustomerTypeEdit', true);
-        $this->parsePage();
-    }// end function editFurther Action()
-
-    /**
-     * Update call Further Action details
-     * @access private
-     * @throws Exception
-     */
-    function update()
-    {
-        $this->setMethodName('update');
-        $this->formError = (!$this->dsCustomerType->populateFromArray($this->getParam('customerType')));
-        if ($this->formError) {
-            if (!$this->dsCustomerType->getValue(DBECustomerType::customerTypeID)) {
-                $this->setAction(CTCUSTOMERTYPE_ACT_EDIT);
-            } else {
-                $this->setAction(CTCUSTOMERTYPE_ACT_CREATE);
-            }
-            $this->edit();
-            exit;
-        }
-
-        $this->buCustomerType->updateCustomerType($this->dsCustomerType);
-
-        $urlNext = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'customerTypeID' => $this->dsCustomerType->getValue(DBECustomerType::customerTypeID),
-                'action'         => CTCNC_ACT_VIEW
-            )
-        );
-        header('Location: ' . $urlNext);
+            return $this->success($data);
+        } catch (Exception $ex) {
+            return $this->fail(APIException::badRequest, $ex->getMessage());
+        }    
     }
+    function addType(){
+        try {
+            $body = $this->getBody();
+            if (!isset($body->description))
+                return $this->fail(APIException::badRequest, "Missing type description");
 
-    /**
-     * Delete Further Action
-     *
-     * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
-     * @throws Exception
-     */
-    function delete()
+            $dbeCustomerType = new DBECustomerType($this);
+            if($dbeCustomerType->hasType($body->description))
+            {
+                return $this->fail(APIException::conflict,"Conflicted Name");
+            }
+            $dbeCustomerType->setValue(DBECustomerType::description, $body->description);
+            $dbeCustomerType->insertRow();
+            return $this->success();
+        } catch (Exception $ex) {
+            return $this->fail(APIException::badRequest, $ex->getMessage());
+        }  
+    }
+    function deleteType()
     {
-        $this->setMethodName('delete');
-        if (!$this->buCustomerType->deleteCustomerType($this->getParam('customerTypeID'))) {
-            $this->displayFatalError('Cannot delete this row');
-            exit;
+        try {
+            $this->setMethodName('delete');
+            $id=@$_REQUEST["id"];
+            if(!isset($id))
+                return $this->fail(APIException::notFound,"Not found");
+            if (!$this->buCustomerType->deleteCustomerType($id)) {
+                return $this->fail(APIException::conflict,'Cannot delete this row');
+            }
+            return $this->success();
+            
+        } catch (Exception $ex) {
         }
-        $urlNext = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'action' => CTCUSTOMERTYPE_ACT_DISPLAY_LIST
-            )
-        );
-        header('Location: ' . $urlNext);
-        exit;
+    }
+    function updateType(){
+        try {
+            $body = $this->getBody();
+            if (!isset($body->description))
+                return $this->fail(APIException::badRequest, "Missing type description");
+
+            $dbeCustomerType = new DBECustomerType($this);
+            $dbeCustomerType->getRow($body->id);
+            if(!$dbeCustomerType->rowCount)
+                return $this->fail(APIException::notFound, "Not Found");
+            if($dbeCustomerType->hasType($body->description,$body->id))
+            {
+                return $this->fail(APIException::conflict,"Conflicted Name");
+            }
+            $dbeCustomerType->setValue(DBECustomerType::description, $body->description);
+            $dbeCustomerType->updateRow();
+            return $this->success();
+        } catch (Exception $ex) {
+            return $this->fail(APIException::badRequest, $ex->getMessage());
+        }  
     }
 }

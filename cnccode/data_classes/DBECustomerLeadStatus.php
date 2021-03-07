@@ -29,7 +29,7 @@ class DBECustomerLeadStatus extends DBEntity
         $this->addColumn(self::id, DA_ID, DA_NOT_NULL);
         $this->addColumn(self::name, DA_STRING, DA_NOT_NULL);
         $this->addColumn(self::appearOnScreen, DA_BOOLEAN, DA_NOT_NULL, null, 0);
-        $this->addColumn(self::sortOrder, DA_INTEGER, DA_NOT_NULL);
+        $this->addColumn(self::sortOrder, DA_FLOAT, DA_NOT_NULL);
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -49,5 +49,8 @@ class DBECustomerLeadStatus extends DBEntity
     {
         global $db;
         return $db;
+    }
+    public function hasName($name){
+        return DBConnect::fetchOne("select * from customerleadstatus where name=:name",["name"=>$name]);
     }
 }

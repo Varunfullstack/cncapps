@@ -31,6 +31,13 @@ class APIMain {
         });
     }
 
+    postJson(url, payload) {
+        return fetch(url, {
+            method: "POST",
+            body: JSON.stringify(payload)
+        }).then((res) => res.json());
+    }
+
     put(url, payload) {
         return fetch(url, {
             method: "PUT",

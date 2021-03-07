@@ -1,10 +1,16 @@
 <?php
+
+use CNCLTD\Exceptions\APIException;
+use CNCLTD\Exceptions\JsonHttpException;
+
 global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBECustomerLeadStatus.php');
 
 class CTLeadStatusTypes extends CTCNC
 {
+    const CONST_LEAD_STATUS_TYPES="leadStatusTypes";
+
     function __construct($requestMethod,
                          $postVars,
                          $getVars,
@@ -40,149 +46,32 @@ class CTLeadStatusTypes extends CTCNC
      */
     function defaultAction()
     {
+        
+        
         switch ($this->getAction()) {
-            case 'top':
-            case 'bottom':
-            case 'down':
-            case 'up':
-                $this->changeOrder();
-                echo json_encode(["status" => "ok"]);
-                break;
-            case 'delete':
-                if (!$this->getParam('id')) {
-                    http_response_code(400);
-                    throw new Exception('ID is missing');
+            case self::CONST_LEAD_STATUS_TYPES:
+                switch($this->requestMethod)
+                {
+                    case 'GET':
+                        echo json_encode($this->getTypes(),JSON_NUMERIC_CHECK);
+                        break;
+                    case 'POST':
+                        echo json_encode($this->addType());                
+                        break;
+                    case 'PUT':
+                        echo json_encode($this->updateType());
+                        break;
+                    case 'DELETE':
+                        echo json_encode($this->deleteType());
+                        break;
                 }
-
-                $dBECustomerLeadStatus = new DBECustomerLeadStatus($this);
-
-                $dBECustomerLeadStatus->getRow($this->getParam('id'));
-
-                if (!$dBECustomerLeadStatus->rowCount) {
-                    http_response_code(404);
-                    exit;
-                }
-                $dBECustomerLeadStatus->deleteRow();
-                echo json_encode(["status" => "ok"]);
-                break;
-            case 'update':
-
-                if (!$this->getParam('id')) {
-                    throw new Exception('ID is missing');
-                }
-
-                $dBECustomerLeadStatus = new DBECustomerLeadStatus($this);
-
-                $dBECustomerLeadStatus->getRow($this->getParam('id'));
-
-                if (!$dBECustomerLeadStatus->rowCount) {
-                    http_response_code(404);
-                    exit;
-                }
-
-                $dBECustomerLeadStatus->setValue(
-                    DBECustomerLeadStatus::name,
-                    $this->getParam('name')
-                );
-                $dBECustomerLeadStatus->setValue(
-                    DBECustomerLeadStatus::appearOnScreen,
-                    json_decode($this->getParam('appearOnScreen'))
-                );
-                $dBECustomerLeadStatus->updateRow();
-                echo json_encode(["status" => "ok"]);
-                break;
-            case 'create':
-                $dBECustomerLeadStatus = new DBECustomerLeadStatus($this);
-                $dBECustomerLeadStatus->setValue(
-                    DBECustomerLeadStatus::name,
-                    $this->getParam('name')
-                );
-                $dBECustomerLeadStatus->setValue(
-                    DBECustomerLeadStatus::appearOnScreen,
-                    json_decode($this->getParam('appearOnScreen'))
-                );
-                $dBECustomerLeadStatus->setValue(
-                    DBECustomerLeadStatus::sortOrder,
-                    $dBECustomerLeadStatus->getNextSortOrder()
-                );
-                $dBECustomerLeadStatus->insertRow();
-                echo json_encode(
-                    [
-                        "id"             => $dBECustomerLeadStatus->getValue(DBECustomerLeadStatus::id),
-                        "name"           => $dBECustomerLeadStatus->getValue(DBECustomerLeadStatus::name),
-                        "appearOnScreen" => $dBECustomerLeadStatus->getValue(DBECustomerLeadStatus::appearOnScreen),
-                        "sortOrder"      => $dBECustomerLeadStatus->getValue(DBECustomerLeadStatus::sortOrder)
-                    ],
-                    JSON_NUMERIC_CHECK
-                );
-
-                break;
-            case 'getData':
-                $dbeCustomerLeadStatus = new DBECustomerLeadStatus($this);
-                $dbeCustomerLeadStatus->getRows(DBECustomerLeadStatus::sortOrder);
-                $data = [];
-                while ($dbeCustomerLeadStatus->fetchNext()) {
-                    $data[] = [
-                        "id"             => $dbeCustomerLeadStatus->getValue(DBECustomerLeadStatus::id),
-                        "name"           => $dbeCustomerLeadStatus->getValue(DBECustomerLeadStatus::name),
-                        "appearOnScreen" => $dbeCustomerLeadStatus->getValue(DBECustomerLeadStatus::appearOnScreen),
-                        "sortOrder"      => $dbeCustomerLeadStatus->getValue(DBECustomerLeadStatus::sortOrder)
-                    ];
-                }
-                echo json_encode($data, JSON_NUMERIC_CHECK);
-                break;
-            case 'searchName':
-                $term = '';
-                if (isset($_REQUEST['term'])) {
-                    $term = $_REQUEST['term'];
-                }
-                $dbeCustomerLeadStatus = new DBECustomerLeadStatus($this);
-                $dbeCustomerLeadStatus->getRows(DBECustomerLeadStatus::name);
-                $data = [];
-                while ($dbeCustomerLeadStatus->fetchNext()) {
-                    if (preg_match(
-                        '/.*' . $term . '.*/i',
-                        $dbeCustomerLeadStatus->getValue(DBECustomerLeadStatus::name)
-                    )) {
-                        $data[] = [
-                            "name" => $dbeCustomerLeadStatus->getValue(DBECustomerLeadStatus::name),
-                            "id"   => $dbeCustomerLeadStatus->getValue(DBECustomerLeadStatus::id),
-                        ];
-                    }
-                }
-                echo json_encode($data);
-                break;
-            case 'displayForm':
+                exit;                  
             default:
                 $this->displayForm();
                 break;
         }
     }
-
-    private function changeOrder()
-    {
-        $itemId = $this->getParam('itemID');
-        if (!$itemId) {
-            return;
-        }
-        $dbeItemType = new DBECustomerLeadStatus($this);
-        switch ($this->action) {
-            case 'top':
-                $dbeItemType->moveItemToTop($itemId);
-                break;
-            case 'bottom':
-                $dbeItemType->moveItemToBottom($itemId);
-                break;
-            case 'down':
-                $dbeItemType->moveItemDown($itemId);
-                break;
-            case 'up':
-                $dbeItemType->moveItemUp($itemId);
-                break;
-            default:
-                throw new UnexpectedValueException('value not expected');
-        }
-    }
+ 
 
     /**
      * Export expenses that have not previously been exported
@@ -207,49 +96,109 @@ class CTLeadStatusTypes extends CTCNC
             true
         );
         $this->loadReactScript('LeadStatusTypesComponent.js');
-        $this->loadReactCSS('LeadStatusTypesComponent.css');
-
-        // $URLDeleteItem = Controller::buildLink(
-        //     $_SERVER['PHP_SELF'],
-        //     [
-        //         'action' => 'delete'
-        //     ]
-        // );
-
-        // $URLUpdateItem = Controller::buildLink(
-        //     $_SERVER['PHP_SELF'],
-        //     [
-        //         'action' => 'update'
-        //     ]
-        // );
-
-        // $URLCreateItem = Controller::buildLink(
-        //     $_SERVER['PHP_SELF'],
-        //     [
-        //         'action' => 'create'
-        //     ]
-        // );
-
-        // $URLGetData = Controller::buildLink(
-        //     $_SERVER['PHP_SELF'],
-        //     [
-        //         'action' => 'getData'
-        //     ]
-        // );
-        // $this->template->setVar(
-        //     [
-        //         "URLDeleteItem" => $URLDeleteItem,
-        //         "URLUpdateItem" => $URLUpdateItem,
-        //         "URLAddItem"    => $URLCreateItem,
-        //         "URLGetData"    => $URLGetData
-        //     ]
-        // );
-
+        $this->loadReactCSS('LeadStatusTypesComponent.css'); 
         $this->parsePage();
     }
 
     function update()
     {
         $this->defaultAction();
+    }
+    //-----------------new
+    function getTypes()
+    {
+        $dbeCustomerLeadStatus = new DBECustomerLeadStatus($this);
+        $dbeCustomerLeadStatus->getRows(DBECustomerLeadStatus::sortOrder);
+        $data = [];
+        while ($dbeCustomerLeadStatus->fetchNext()) {
+            $data[] = [
+                "id"             => $dbeCustomerLeadStatus->getValue(DBECustomerLeadStatus::id),
+                "name"           => $dbeCustomerLeadStatus->getValue(DBECustomerLeadStatus::name),
+                "appearOnScreen" => $dbeCustomerLeadStatus->getValue(DBECustomerLeadStatus::appearOnScreen),
+                "sortOrder"      => $dbeCustomerLeadStatus->getValue(DBECustomerLeadStatus::sortOrder)
+            ];
+        }
+        return $data;
+    }
+    function addType(){
+        try {
+            $body = $this->getBody();
+            if (!isset($body->name))
+            return $this->fail(APIException::badRequest,"Type Name Required");       
+
+            $dBECustomerLeadStatus = new DBECustomerLeadStatus($this);
+            if ($dBECustomerLeadStatus->hasName($body->name))                
+                return $this->fail(APIException::conflict,"conflicted name");       
+
+            else $dBECustomerLeadStatus = new DBECustomerLeadStatus($this);
+
+            $dBECustomerLeadStatus->setValue(
+                DBECustomerLeadStatus::name,
+                $body->name
+            );
+            $dBECustomerLeadStatus->setValue(
+                DBECustomerLeadStatus::appearOnScreen,
+                $body->appearOnScreen ? 1 : 0
+            );
+            $dBECustomerLeadStatus->setValue(
+                DBECustomerLeadStatus::sortOrder,
+                $dBECustomerLeadStatus->getNextSortOrder()
+            );
+
+            $dBECustomerLeadStatus->insertRow();
+            return $this->success();
+        } catch (Exception $ex) {
+            return $this->fail(APIException::badRequest,$ex->getMessage());       
+        }
+    }
+    function updateType(){
+        try
+        {
+            $body = $this->getBody();
+            if (!isset($body->name))
+                return ["status" => false, 'error' => "Type Name required"];
+
+            $dBECustomerLeadStatus = new DBECustomerLeadStatus($this);
+            $dBECustomerLeadStatus->getRow($body->id);
+            if (!$dBECustomerLeadStatus->rowCount) {
+                return $this->fail(APIException::notFound,"Not Found");
+            }
+            $obj=$dBECustomerLeadStatus->hasName($body->name);
+            if (isset($obj["id"])&&$obj["id"]!=$body->id)
+            {
+                return $this->fail(APIException::conflict,"conflicted name");       
+            }
+
+            $dBECustomerLeadStatus->setValue(
+                DBECustomerLeadStatus::name,
+                $body->name
+            );
+            $dBECustomerLeadStatus->setValue(
+                DBECustomerLeadStatus::appearOnScreen,
+                $body->appearOnScreen ? 1 : 0
+            );
+            $dBECustomerLeadStatus->setValue(
+                DBECustomerLeadStatus::sortOrder,
+                $body->sortOrder
+            );
+            $dBECustomerLeadStatus->updateRow();
+            //$dBECustomerLeadStatus->insertRow();
+            return $this->success();
+        }
+        catch (Exception $ex) {
+            return $this->fail(APIException::badRequest,$ex->getMessage());       
+        }
+    }
+    function deleteType(){
+        $id=@$_REQUEST["id"];
+        if(!isset($id))
+            return $this->fail(APIException::badRequest,"id required");       
+        $dBECustomerLeadStatus = new DBECustomerLeadStatus($this);
+        $dBECustomerLeadStatus->getRow($id);
+        if (!$dBECustomerLeadStatus->rowCount) {
+            return $this->fail(APIException::notFound,"Type not found");
+        }
+        $dBECustomerLeadStatus->deleteRow();
+        return $this->success();
     }
 }

@@ -3,15 +3,15 @@ import React from "react";
 import ReactDOM from "react-dom"; 
 import Spinner from "../shared/Spinner/Spinner";
 import '../style.css';
-import './LeadStatusTypesComponent.css';
-import APILeadStatusTypes from "./services/APILeadStatusTypes.js";
+import './CustomerTypeComponent.css';
+import APICustomerType from "./services/APICustomerType.js";
 import Table from "../shared/table/table.js";
 import ToolTip from "../shared/ToolTip.js";
 import Modal from "../shared/Modal/modal.js";
 import Toggle from "../shared/Toggle.js";
 
-class LeadStatusTypesComponent extends MainComponent {
-   api=new APILeadStatusTypes();
+class CustomerTypeComponent extends MainComponent {
+   api=new APICustomerType();
     constructor(props) {
         super(props);
         this.state = {
@@ -22,9 +22,7 @@ class LeadStatusTypesComponent extends MainComponent {
             mode:"new"   ,
             data:{
                 id:'',
-                name:'',
-                appearOnScreen:false,
-                sortOrder:0
+                description:'',                 
             }
         };
     }
@@ -34,34 +32,25 @@ class LeadStatusTypesComponent extends MainComponent {
     }
 
     getData=()=>{
-        this.api.getAllTypes().then(types=>{
-            this.setState({types});
-            console.log(types);
+        this.api.getAllTypes().then(res=>{
+            if(res.state)
+            this.setState({types:res.data});
+            console.log(res);
         });
     }
 
     getDataTable=()=>{
         const columns=[
             {
-               path: "name",
+               path: "description",
                label: "",
                hdToolTip: "Name",
                hdClassName: "text-center",
                icon: "fal fa-2x fa-text color-gray2 pointer",
                sortable: true,
                //className: "text-center",                
-            },
+            },             
             {
-                path: "appearOnScreen",
-                label: "",
-                hdToolTip: "Appear On Lead Status Screen",
-                hdClassName: "text-center",
-                icon: "fal fa-2x fa-eye color-gray2 pointer",
-                sortable: true,
-                content:(type)=>type.appearOnScreen?<i className="fal fa-2x fa-check color-gray "></i>:<i className="fal fa-2x fa-times color-gray "></i>,
-                className: "text-center",                
-             },
-             {
                 path: "edit",
                 label: "",
                 hdToolTip: "Edit",
@@ -69,8 +58,7 @@ class LeadStatusTypesComponent extends MainComponent {
                 icon: "fal fa-2x fa-edit color-gray2 pointer",
                 sortable: false,                
                 className: "text-center",   
-                content:(type)=> <i className="fal fa-2x fa-edit color-gray pointer" onClick={()=>this.showEditModal(type)}></i>,
-             
+                content:(type)=> <i className="fal fa-2x fa-edit color-gray pointer" onClick={()=>this.showEditModal(type)}></i>,             
              },
              {
                 path: "trash",
@@ -80,15 +68,12 @@ class LeadStatusTypesComponent extends MainComponent {
                 icon: "fal fa-2x fa-trash-alt color-gray2 pointer",
                 sortable: false,                
                 className: "text-center",   
-                content:(type)=> <i className="fal fa-2x fa-trash-alt color-gray pointer" onClick={()=>this.handleDelete(type)}></i>,
-             
+                content:(type)=>type.canDelete? <i className="fal fa-2x fa-trash-alt color-gray pointer" onClick={()=>this.handleDelete(type)}></i>:null,             
              }
         ];
     
         return <Table           
         style={{width:500,marginTop:20}}
-        onOrderChange={this.handleOrderChange} 
-        allowRowOrder={true}
         key="leadStatus"
         pk="id"
         columns={columns}
@@ -97,8 +82,7 @@ class LeadStatusTypesComponent extends MainComponent {
         >
         </Table>
     }
-    showEditModal=(data)=>{
-        console.log(data);
+    showEditModal=(data)=>{        
         this.setState({showModal:true,data,mode:'edit'});
     }
     handleDelete=async (type)=>{
@@ -109,34 +93,13 @@ class LeadStatusTypesComponent extends MainComponent {
             if(res.state)
             this.getData();
             else this.alert(res.error);
-        }
-
-        )
+        })
     }
-    handleOrderChange=async (current,next)=>{
-        console.log(current,next);
-        const {types}=this.state;
-        if(next)
-        {
-            current.sortOrder=next.sortOrder;
-            next.sortOrder=current.sortOrder+0.001;
-            await this.api.updateType(next);
-        }
-        if(!next)
-        {        
-            current.sortOrder=Math.max(...types.map(i=>i.sortOrder))+0.001;
-        }     
-        console.log(current,next);
-   
-        await this.api.updateType(current);
-        this.getData();
-    }
+     
     handleNewType=()=>{
         this.setState({mode:"new",showModal:true, data:{
             id:'',
-            name:'',
-            appearOnScreen:false,
-            sortOrder:0
+            description:'',            
         }});
     }
     hideModal=()=>{
@@ -153,13 +116,8 @@ class LeadStatusTypesComponent extends MainComponent {
             <div key="content">
 
                 <div className="form-group">
-                  <label  >Name</label>
-                  <input value={data.name} type="text" name="" id="" className="form-control required" onChange={(event)=>this.setValue("name",event.target.value)} />                   
-                </div>
-
-                <div className="form-group">
-                  <label  >Appear On Lead Status Screen</label>                  
-                  <Toggle checked={data.appearOnScreen} onChange={()=>this.setValue("appearOnScreen",!data.appearOnScreen)} ></Toggle>            
+                  <label >Description</label>
+                  <input value={data.description} type="text" name="" id="" className="form-control required" onChange={(event)=>this.setValue("description",event.target.value)} />                   
                 </div>
             </div>        
         }
@@ -182,10 +140,11 @@ class LeadStatusTypesComponent extends MainComponent {
               console.log(result);
             if (result.state) {
               this.setState({ showModal: false });
-              this.getData();
+             
             } else {
               this.alert(result.error);
             }
+            this.getData();
           });
         }
         else if(mode=='edit')
@@ -193,16 +152,16 @@ class LeadStatusTypesComponent extends MainComponent {
             this.api.updateType(data).then((result) => {
                 console.log(result);
               if (result.state) {
-                this.setState({ showModal: false });
-                this.getData();
+                this.setState({ showModal: false });              
               } else {
                 this.alert(result.error);
               }
+              this.getData();
             });
         }
         console.log(data);
     }
-    render() {
+    render() {        
         return <div>
             <Spinner show={this.state.showSpinner}></Spinner>
             <ToolTip title="New Type" width={30}>
@@ -216,9 +175,9 @@ class LeadStatusTypesComponent extends MainComponent {
     }
 }
 
-export default LeadStatusTypesComponent;
+export default CustomerTypeComponent;
 document.addEventListener('DOMContentLoaded', () => {
-    const domContainer = document.querySelector("#reactLeadStatusTypesComponent");
+    const domContainer = document.querySelector("#reactCustomerType");
     if (domContainer)
-        ReactDOM.render(React.createElement(LeadStatusTypesComponent), domContainer);
+        ReactDOM.render(React.createElement(CustomerTypeComponent), domContainer);
 });

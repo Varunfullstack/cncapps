@@ -84,12 +84,12 @@ export default class ProjectIssuesComponent extends MainComponent {
             {
                 path: "2",
                 label: "",
-                icon: "fal fa-2x fa-trash color-gray2 pointer",
+                icon: "fal fa-2x fa-trash-alt color-gray2 pointer",
                 hdToolTip: "Delete",
                 className: "text-center",
                 content: (issue) => {
                     return issue.consID == this.props.currentUser.id ?
-                        <i className="fal  fa-trash color-gray2 pointer"
+                        <i className="fal  fa-trash-alt color-gray2 pointer"
                            onClick={() => this.handleDeleteIssue(issue.id)}
                         ></i>
                         : null
