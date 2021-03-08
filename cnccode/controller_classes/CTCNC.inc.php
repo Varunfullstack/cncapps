@@ -1283,7 +1283,7 @@ class CTCNC extends Controller
     {
         return ["state"=>true,"data"=>$data];
     }
-    public function fail($code,$message)
+    public function fail($code,$message="")
     {
         return new APIException($code,$message);
 

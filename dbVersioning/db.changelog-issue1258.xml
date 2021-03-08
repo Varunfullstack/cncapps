@@ -14,4 +14,13 @@
             newDataType="float"            
             tableName="customerleadstatus"/> 
     </changeSet>
+     <changeSet id="issue1258-2" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">           
+                <columnExists tableName="itemtype" columnName="sortOrder"/>            
+        </preConditions>
+        <modifyDataType  
+            columnName="sortOrder"  
+            newDataType="float"            
+            tableName="itemtype"/> 
+    </changeSet>
 </databaseChangeLog>
