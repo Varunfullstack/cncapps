@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 1247 - Customer approval for extra chargeable work
+
 ## [v5.6.0] - 2021-03-10
 ### Added
 - Issue 1244 - Monthly Asset and Mailbox List Export.
