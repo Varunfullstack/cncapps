@@ -344,7 +344,7 @@ foreach ($sitesResponse->sites as $site) {
                 $testText = '';
             }
             $logger->warning(
-                "Webroot endpoint deactivated due to being retired in Automate and not seen recently in Webroot{$testText}"
+                "$computerName Webroot endpoint deactivated due to being retired in Automate and not seen recently in Webroot{$testText}"
             );
             continue;
         }
