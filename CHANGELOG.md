@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v5.6.0]
+## [v5.6.0] - 2021-03-10
 ### Added
 - Issue 1244 - Monthly Asset and Mailbox List Export.
 - Issue 1222 - Show Daily SR Stats on KPI Graph.
