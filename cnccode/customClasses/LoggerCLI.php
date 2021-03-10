@@ -49,5 +49,10 @@ class LoggerCLI
     {
         $this->log->warning($message);
     }
+
+    public function debug($message, $context = [])
+    {
+        $this->log->debug($message, $context);
+    }
 }
 

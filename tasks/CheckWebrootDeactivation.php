@@ -331,12 +331,28 @@ foreach ($sitesResponse->sites as $site) {
             ];
         }
         $mid = explode(":::", $device->machineId)[0];
+        if ($debugMode) {
+            $logger->debug("Extracted MID: $mid from $customerName endpoint $computerName");
+        }
         if (empty($matches[$customerName][$computerName]["webrootMIDs"][$mid])) {
             $matches[$customerName][$computerName]["webrootMIDs"][$mid] = true;
+            if ($debugMode) {
+                $logger->debug("Registering MID: $mid for $customerName endpoint $computerName");
+            }
         } else {
+            if ($debugMode) {
+                $logger->debug(
+                    "Duplicated MID : $mid from $customerName endpoint $computerName found, raising duplicated MDI request"
+                );
+            }
             raiseDuplicatedMIDRequest($computerName, $customerName);
         }
         $lastSeenDateTime = new DateTime($device->lastSeen);
+        if ($debugMode) {
+            $logger->debug(
+                "$customerName endpoint $computerName: checking webroot lastSeen: {$lastSeenDateTime->format(DATE_MYSQL_DATETIME)} against threshold date {$toCheckDate->format(DATE_MYSQL_DATETIME)}"
+            );
+        }
         if ($lastSeenDateTime <= $toCheckDate && isLabtechRetired($computerName, $customerName, $labtechDB)) {
             $testText = ' (Not actually deactivated testOnly)';
             if (!$testMode) {
@@ -348,19 +364,38 @@ foreach ($sitesResponse->sites as $site) {
             );
             continue;
         }
+        if ($debugMode) {
+            $logger->debug(
+                "$customerName endpoint $computerName: Checking labtech vs webroot availability, check is skipped if there's no labtech match"
+            );
+        }
         if (!empty($matches[$customerName][$computerName]['labtech'])) {
-            if ($lastSeenDateTime <= $toCheckDate && $matches[$customerName][$computerName]['labtech']->lastSeenDateTime > $toCheckDate) {
+            $labtechLastSeenDateTime = $matches[$customerName][$computerName]['labtech']->lastSeenDateTime;
+            if ($debugMode) {
+                $logger->debug(
+                    "$customerName endpoint $computerName: Labtech data present, checking dates webrootLastSeen {$lastSeenDateTime->format(DATE_MYSQL_DATETIME)}, thresholdDate {$toCheckDate->format(DATE_MYSQL_DATETIME)}, labtechLastSeen {$labtechLastSeenDateTime->format(DATE_MYSQL_DATETIME)}"
+                );
+            }
+            if ($lastSeenDateTime <= $toCheckDate && $labtechLastSeenDateTime > $toCheckDate) {
                 raiseSeenInLabtechButNotWebrootRequest(
                     $computerName,
                     $customerName,
                     $dsHeader->getValue(DBEHeader::computerLastSeenThresholdDays)
                 );
+                $logger->warning("$computerName raising seen in Automate but not in Webroot request");
             }
-            if ($lastSeenDateTime > $toCheckDate && $matches[$customerName][$computerName]['labtech']->lastSeenDateTime <= $toCheckDate) {
+            if ($lastSeenDateTime > $toCheckDate && $labtechLastSeenDateTime <= $toCheckDate) {
                 raiseSeenInWebrootButNotLabtechRequest(
                     $computerName,
                     $customerName,
                     $dsHeader->getValue(DBEHeader::computerLastSeenThresholdDays)
+                );
+                $logger->warning("$computerName raising seen in Webroot but not in Automate request");
+            }
+        } else {
+            if ($debugMode) {
+                $logger->debug(
+                    "$customerName endpoint $computerName: No Labtech data, skipping availability checks"
                 );
             }
         }
