@@ -338,7 +338,7 @@ foreach ($sitesResponse->sites as $site) {
         }
         $lastSeenDateTime = new DateTime($device->lastSeen);
         if ($lastSeenDateTime <= $toCheckDate && isLabtechRetired($computerName, $customerName, $labtechDB)) {
-            $testText = ' (Not actually deleted testOnly)';
+            $testText = ' (Not actually deactivated testOnly)';
             if (!$testMode) {
                 $webrootAPI->deactivateEndpoint($site->siteId, $device->endpointId);
                 $testText = '';
