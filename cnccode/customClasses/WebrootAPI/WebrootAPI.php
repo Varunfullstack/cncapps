@@ -1,8 +1,6 @@
 <?php
 
-
 namespace CNCLTD\WebrootAPI;
-
 
 use DateInterval;
 use DateTime;
@@ -41,32 +39,60 @@ class WebrootAPI
                 ]
             ]
         );
-        $this->user = $user;
-        $this->password = $password;
-        $this->clientId = $clientId;
+        $this->user         = $user;
+        $this->password     = $password;
+        $this->clientId     = $clientId;
         $this->clientSecret = $clientSecret;
-        $this->gsmKey = $gsmKey;
+        $this->gsmKey       = $gsmKey;
+    }
+
+    public function getEndpointsRaw($siteKeyCode)
+    {
+        return $this->getAuthenticatedFromURL(
+            "api/console/gsm/{$this->gsmKey}/sites/{$siteKeyCode}/endpoints"
+        );
+    }
+
+    public function getDevicesRaw($siteKeyCode)
+    {
+        return $this->getAuthenticatedFromURL(
+            "api/status/site/{$siteKeyCode}?returnedInfo=SystemAnalyzer&batchSize=1000"
+        );
     }
 
     /**
      * @param $siteKeyCode
-     * @return SiteDevice[]
+     * @return Endpoint[]
      * @throws GuzzleException
      */
-    public function getDevices($siteKeyCode)
+    public function getEndpoints($siteKeyCode)
     {
-        $response = $this->getAuthenticatedFromURL(
-            "api/status/site/{$siteKeyCode}?returnedInfo=SystemAnalyzer&batchSize=1000"
+        $page       = 1;
+        $firstBatch = $this->getEndpointsBatch($siteKeyCode);
+        $endpoints  = $firstBatch->endpoints;
+        $totalPages = $firstBatch->totalPages;
+        while ($page < $totalPages) {
+            $page++;
+            $nextBatch = $this->getEndpointsBatch($siteKeyCode, $page);
+            $endpoints = array_merge($endpoints, $nextBatch->endpoints);
+        }
+        return $endpoints;
+    }
+
+    private function getEndpointsBatch($siteKeyCode, $pageNumber = 1): GetEndpointsResponse
+    {
+        $response    = $this->getAuthenticatedFromURL(
+            "api/console/gsm/{$this->gsmKey}/sites/{$siteKeyCode}/endpoints?pageNr=$pageNumber"
         );
         $jsonDecoder = new JsonDecoder(true);
-        $jsonDecoder->register(new SiteDeviceTransformer());
-        $jsonDecoder->register(new GetSiteDevicesResponseTransformer());
-        /** @var GetSiteDevicesResponse $data */
-        $data = $jsonDecoder->decode((string)$response->getBody(), GetSiteDevicesResponse::class);
+        $jsonDecoder->register(new EndpointTransformer());
+        $jsonDecoder->register(new GetEndpointsResponseTransformer());
+        /** @var GetEndpointsResponse $data */
+        $data = $jsonDecoder->decode((string)$response->getBody(), GetEndpointsResponse::class);
         if (!$data) {
             throw new Exception('Failed to parse body');
         }
-        return $data->devices;
+        return $data;
     }
 
     /**
@@ -75,25 +101,29 @@ class WebrootAPI
      * @throws GuzzleException
      * @throws Exception
      */
-    private function getAuthenticatedFromURL($url)
+    private function getAuthenticatedFromURL($url): ResponseInterface
     {
-        $accessToken = $this->getAccessToken();
+        $request = new Request('GET', $url);
+        return $this->sendAuthenticatedRequest($request);
+    }
+
+    private function sendAuthenticatedRequest($request): ResponseInterface
+    {
+        $this->getAccessToken();
         do {
-            if (!$accessToken) {
+            if (!$this->accessToken) {
                 throw new Exception('Unable to retrieve an access token');
             }
-            $request = new Request(
-                'GET', $url, [
-                         "Authorization" => "Bearer $accessToken"
-                     ]
-            );
+            if (!$request->hasHeader('Authorization')) {
+                $request = $request->withAddedHeader('Authorization', "Bearer {$this->accessToken}");
+            }
             try {
                 return $this->guzzleClient->send($request);
             } catch (ClientException $exception) {
                 $response = $exception->getResponse();
                 if ($response->getStatusCode() === 401) {
                     $this->clearToken();
-                    $accessToken = $this->getAccessToken();
+                    $this->getAccessToken();
                 } else {
                     throw $exception;
                 }
@@ -106,12 +136,12 @@ class WebrootAPI
     {
         if (!$this->accessToken) {
             // we have to ask for the access token
-            $request = new Request(
+            $request    = new Request(
                 'POST', '/auth/token', [
                           "Content-Type" => "application/x-www-form-urlencoded"
                       ]
             );
-            $response = $this->guzzleClient->send(
+            $response   = $this->guzzleClient->send(
                 $request,
                 [
                     "auth"        => [$this->clientId, $this->clientSecret],
@@ -123,14 +153,13 @@ class WebrootAPI
                     ]
                 ]
             );
-
-            $body = (string)$response->getBody();
+            $body       = (string)$response->getBody();
             $parsedBody = json_decode($body);
             if (!$parsedBody) {
                 throw new Exception('Failed to parse response body');
             }
-            $this->accessToken = $parsedBody->access_token;
-            $this->expiresAt = (new DateTime())->add(new DateInterval("PT{$parsedBody->expires_in}S"));
+            $this->accessToken  = $parsedBody->access_token;
+            $this->expiresAt    = (new DateTime())->add(new DateInterval("PT{$parsedBody->expires_in}S"));
             $this->refreshToken = $parsedBody->refresh_token;
             return $this->accessToken;
         }
@@ -138,7 +167,7 @@ class WebrootAPI
         if ((new DateTime()) >= $this->expiresAt) {
             // our token is expired..lets get a new one
             $this->accessToken = null;
-            $this->expiresAt = null;
+            $this->expiresAt   = null;
             // we have to ask for the access token
             $request = new Request(
                 'POST', '/auth/token', [
@@ -147,7 +176,7 @@ class WebrootAPI
             );
             try {
 
-                $response = $this->guzzleClient->send(
+                $response   = $this->guzzleClient->send(
                     $request,
                     [
                         "auth"        => [$this->clientId, $this->clientSecret],
@@ -158,13 +187,13 @@ class WebrootAPI
                         ]
                     ]
                 );
-                $body = (string)$response->getBody();
+                $body       = (string)$response->getBody();
                 $parsedBody = json_decode($body);
                 if (!$parsedBody) {
                     throw new Exception('Failed to parse response body');
                 }
-                $this->accessToken = $parsedBody->access_token;
-                $this->expiresAt = (new DateTime())->add(new DateInterval("PT{$parsedBody->expires_in}S"));
+                $this->accessToken  = $parsedBody->access_token;
+                $this->expiresAt    = (new DateTime())->add(new DateInterval("PT{$parsedBody->expires_in}S"));
                 $this->refreshToken = $parsedBody->refresh_token;
                 return $this->accessToken;
             } catch (ClientException $exception) {
@@ -182,7 +211,7 @@ class WebrootAPI
     private function clearToken()
     {
         $this->accessToken = null;
-        $this->expiresAt = null;
+        $this->expiresAt   = null;
     }
 
     /**
@@ -191,7 +220,7 @@ class WebrootAPI
      */
     public function getSites()
     {
-        $response = $this->getAuthenticatedFromURL("api/console/gsm/{$this->gsmKey}/sites");
+        $response    = $this->getAuthenticatedFromURL("api/console/gsm/{$this->gsmKey}/sites");
         $jsonDecoder = new JsonDecoder(true);
         $jsonDecoder->register(new SiteTransformer());
         $jsonDecoder->register(new GetSitesResponseTransformer());
@@ -200,6 +229,18 @@ class WebrootAPI
             throw new Exception('Failed to parse body');
         }
         return $data;
+    }
+
+    public function deactivateEndpoint($siteId, $endpointId)
+    {
+        $request = new Request(
+            'POST', "api/console/gsm/{$this->gsmKey}/sites/{$siteId}/endpoints/deactivate", [], json_encode(
+                      [
+                          "EndpointsList" => $endpointId
+                      ]
+                  )
+        );
+        return $this->sendAuthenticatedRequest($request);
     }
 
 }

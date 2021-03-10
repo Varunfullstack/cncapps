@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 1249 - Webroot & Automate asset comparison and resolution.
+
 ## [v5.6.1] - 2021-03-11 
 ### Fixed
 - Unable to edit contracts.
