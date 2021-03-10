@@ -1,13 +1,12 @@
 <?php
-/**
- * PurchaseOrder business class
- *
- * @access public
- * @authors Karim Ahmed - Sweet Code Limited
- */
+global $cfg;
+
+use CNCLTD\Supplier\infra\MySQLSupplierRepository;
+use CNCLTD\Supplier\Supplier;
+use CNCLTD\Supplier\SupplierId;
+
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BUSalesOrder.inc.php");
-require_once($cfg["path_bu"] . "/BUSupplier.inc.php");
 require_once($cfg["path_bu"] . "/BUHeader.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJPorhead.inc.php");
 require_once($cfg["path_dbe"] . "/DBEPorhead.inc.php");
@@ -18,8 +17,6 @@ require_once($cfg["path_dbe"] . "/DBECustomerItem.inc.php");
 
 class BUPurchaseOrder extends Business
 {
-    /** @var DataSet|DBESupplier */
-    public $dsSupplier;
     /** @var DataSet|DBEOrdhead */
     public $dsOrdhead;
     /** @var DataSet|DBEOrdline */
@@ -46,8 +43,8 @@ class BUPurchaseOrder extends Business
     function __construct(&$owner)
     {
         parent::__construct($owner);
-        $this->dbePorhead = new DBEPorhead($this);
-        $this->dbePorline = new DBEPorline($this);
+        $this->dbePorhead  = new DBEPorhead($this);
+        $this->dbePorline  = new DBEPorline($this);
         $this->dbeJPorline = new DBEJPorline($this);
         $this->dbeJPorhead = new DBEJPorhead($this);
     }
@@ -59,7 +56,6 @@ class BUPurchaseOrder extends Business
     {
         $dsOrdhead = &$this->dsOrdhead;
         $dsOrdline = &$this->dsOrdline;
-        $dsSupplier = &$this->dsSupplier;
         $this->setMethodName('createPOsFromSO');
         if ($ordheadID == '') {
             $this->raiseError('ordheadID not passed');
@@ -74,29 +70,28 @@ class BUPurchaseOrder extends Business
         )) {
             $this->raiseError('sales order not found');
         }
-
         if ($buSalesOrder->countPurchaseOrders($dsOrdhead->getValue(DBEOrdhead::ordheadID)) > 0) {
             $this->raiseError('There are already purchase orders for this sales order!');
         }
-
         $buSalesOrder->getOrderItemsForPO(
             $ordheadID,
             $dsOrdline
         );
         // generate one PO for each distinct supplier ID found
-        $lastSupplierID = '0';
-        $buSupplier = new BUSupplier($this);
-        $this->counter = 0;
+        $lastSupplierID = null;
+        $supplierRepo   = new MySQLSupplierRepository();
+        $this->counter  = 0;
         while ($dsOrdline->fetchNext()) {
             // new supplier so create PO header
             if ($dsOrdline->getValue(DBEJOrdline::supplierID) != $lastSupplierID) {
-                $buSupplier->getSupplierByID(
-                    $dsOrdline->getValue(DBEJOrdline::supplierID),
-                    $dsSupplier
+
+                $supplier      = $supplierRepo->getById(
+                    new SupplierId($dsOrdline->getValue(DBEJOrdline::supplierID))
                 );
                 $this->counter = 1;
                 $this->insertPOHeader(
                     $userID,
+                    $supplier,
                     $requiredByDate
                 );
             }
@@ -109,15 +104,14 @@ class BUPurchaseOrder extends Business
     /*
     * Create new purchase order against given sales order/supplier
     */
-
     function insertPOHeader($userID,
+                            Supplier $supplier,
                             DateTime $requiredByDate = null
     )
     {
-        $dsOrdhead = &$this->dsOrdhead;
-        $dsSupplier = &$this->dsSupplier;
+        $dsOrdhead  = &$this->dsOrdhead;
         $dbePorhead = &$this->dbePorhead;
-        $buHeader = new BUHeader($this);
+        $buHeader   = new BUHeader($this);
         $dbePorhead->setValue(
             DBEPorhead::porheadID,
             0
@@ -132,7 +126,7 @@ class BUPurchaseOrder extends Business
         );
         $dbePorhead->setValue(
             DBEPorhead::supplierID,
-            $dsSupplier->getValue(DBEJSupplier::supplierID)
+            $supplier->id()->value()
         );
         $dbePorhead->setValue(
             DBEPorhead::userID,
@@ -150,7 +144,6 @@ class BUPurchaseOrder extends Business
             DBEPorhead::printedFlag,
             'N'
         );
-
         if ($requiredByDate) {
             $dbePorhead->setValue(
                 DBEPorhead::requiredBy,
@@ -177,8 +170,8 @@ class BUPurchaseOrder extends Business
             null
         );
         $dbePorhead->setValue(
-            DBEPorhead::contactID,
-            $dsSupplier->getValue(DBEJSupplier::contactID)
+            DBEPorhead::supplierContactId,
+            $supplier->mainContact()->id()->value()
         );
         $dbePorhead->setValue(
             DBEPorhead::invoices,
@@ -186,7 +179,7 @@ class BUPurchaseOrder extends Business
         ); // sales invoices (not sure if required now)
         $dbePorhead->setValue(
             DBEPorhead::payMethodID,
-            $dsSupplier->getValue(DBEJSupplier::payMethodID)
+            $supplier->paymentMethodId()->value()
         ); // default
         $dbePorhead->setValue(
             DBEPorhead::locationID,
@@ -198,7 +191,7 @@ class BUPurchaseOrder extends Business
 
     function insertPOLine()
     {
-        $dsOrdline = &$this->dsOrdline;
+        $dsOrdline  = &$this->dsOrdline;
         $dbePorline = &$this->dbePorline;
         $dbePorline->setValue(
             DBEPorline::porheadID,
@@ -232,7 +225,6 @@ class BUPurchaseOrder extends Business
             DBEPorline::stockcat,
             $dsOrdline->getValue(DBEJOrdline::stockcat)
         );
-
         $dbePorline->insertRow();
     }
 
@@ -242,7 +234,6 @@ class BUPurchaseOrder extends Business
     )
     {
         $dsOrdhead = &$this->dsOrdhead;
-        $dsSupplier = &$this->dsSupplier;
         $this->setMethodName('createNewPO');
         if ($ordheadID == '') {
             $this->raiseError('ordheadID not passed');
@@ -260,25 +251,21 @@ class BUPurchaseOrder extends Business
         )) {
             $this->raiseError('sales order not found');
         }
-        $buSupplier = new BUSupplier($this);
-        $buSupplier->getSupplierByID(
-            $supplierID,
-            $dsSupplier
-        );
-        return ($this->insertPOHeader($userID));
+        $supplierRepo = new MySQLSupplierRepository();
+        $supplier     = $supplierRepo->getById(new SupplierId($supplierID));
+        return $this->insertPOHeader($userID, $supplier);
     }
 
-    function search(
-        $supplierID,
-        $porheadID,
-        $ordheadID,
-        $supplierRef,
-        $type,
-        $lineText,
-        $partNo,
-        $fromDate,
-        $toDate,
-        &$dsResults
+    function search($supplierID,
+                    $porheadID,
+                    $ordheadID,
+                    $supplierRef,
+                    $type,
+                    $lineText,
+                    $partNo,
+                    $fromDate,
+                    $toDate,
+                    &$dsResults
     )
     {
         $this->setMethodName('search');
@@ -417,7 +404,7 @@ class BUPurchaseOrder extends Business
             $this->raiseError('porheadID not passed');
         }
         $dbeJPorline = new DBEJPorline($this);
-        $dsPorline = new DSForm($this);
+        $dsPorline   = new DSForm($this);
         $dsPorline->copyColumnsFrom($dbeJPorline);
         $dsPorline->setAllowEmpty('itemID');
         $dsPorline->setUpdateModeInsert();
@@ -650,7 +637,6 @@ class BUPurchaseOrder extends Business
             );
             $dsPorhead->post();
         }
-
         if ($dsPorhead->getValue(DBEJPorhead::deliveryConfirmedFlag) == '') {
             $dsPorhead->setUpdateModeUpdate();
             $dsPorhead->setValue(
@@ -659,16 +645,14 @@ class BUPurchaseOrder extends Business
             );
             $dsPorhead->post();
         }
-
-
         $this->dbePorhead->getRow($dsPorhead->getValue(DBEJPorhead::porheadID)); //existing values
         $this->dbePorhead->setValue(
             DBEPorhead::supplierID,
             $dsPorhead->getValue(DBEJPorhead::supplierID)
         );
         $this->dbePorhead->setValue(
-            DBEPorhead::contactID,
-            $dsPorhead->getValue(DBEJPorhead::contactID)
+            DBEPorhead::supplierContactId,
+            $dsPorhead->getValue(DBEJPorhead::supplierContactId)
         );
         $this->dbePorhead->setValue(
             DBEPorhead::supplierRef,

@@ -1,6 +1,7 @@
 <?php
 
 namespace CNCLTD\Supplier;
+
 use CNCLTD\Exceptions\EmptyStringException;
 use CNCLTD\Exceptions\StringTooLongException;
 use CNCLTD\ValueObjectCompare;
@@ -8,12 +9,13 @@ use CNCLTD\ValueObjectCompare;
 class SupplierTown
 {
     use ValueObjectCompare;
+
     const MAX_LENGTH = 25;
     /** @var string */
     private $value;
 
     /**
-     * SupplierAddress1 constructor.
+     * SupplierTown constructor.
      * @param $value
      * @throws EmptyStringException
      * @throws StringTooLongException
@@ -21,7 +23,7 @@ class SupplierTown
     public function __construct(string $value)
     {
         if (!$value) {
-            throw new EmptyStringException();
+            throw new EmptyStringException("Town");
         }
         if (strlen($value) > self::MAX_LENGTH) {
             throw new StringTooLongException(self::MAX_LENGTH);

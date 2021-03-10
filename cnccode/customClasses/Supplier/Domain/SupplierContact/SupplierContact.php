@@ -1,10 +1,6 @@
 <?php
 
 namespace CNCLTD\Supplier\Domain\SupplierContact;
-
-use CNCLTD\Exceptions\SupplierContactArchivedException;
-use CNCLTD\Exceptions\SupplierContactMainInactiveException;
-
 class SupplierContact
 {
 
@@ -40,10 +36,6 @@ class SupplierContact
      * @var Active
      */
     private $active;
-    /**
-     * @var Main
-     */
-    private $main;
 
     /**
      * SupplierContact constructor.
@@ -62,8 +54,7 @@ class SupplierContact
                                  LastName $lastName,
                                  Phone $phone,
                                  Email $email,
-                                 Active $active,
-                                 Main $main
+                                 Active $active
     )
     {
         $this->id        = $id;
@@ -74,7 +65,6 @@ class SupplierContact
         $this->phone     = $phone;
         $this->email     = $email;
         $this->active    = $active;
-        $this->main      = $main;
     }
 
     /**
@@ -86,8 +76,6 @@ class SupplierContact
      * @param Phone $phone
      * @param Email $email
      * @param Active $active
-     * @param Main $main
-     * @throws SupplierContactMainInactiveException
      */
     public static function create(SupplierContactId $id,
                                   Title $title,
@@ -96,15 +84,11 @@ class SupplierContact
                                   LastName $lastName,
                                   Phone $phone,
                                   Email $email,
-                                  Active $active,
-                                  Main $main
+                                  Active $active
     ): SupplierContact
     {
-        if ($main->value() && !$active->value()) {
-            throw new SupplierContactMainInactiveException();
-        }
         return new self(
-            $id, $title, $position, $firstName, $lastName, $phone, $email, $active, $main
+            $id, $title, $position, $firstName, $lastName, $phone, $email, $active
         );
     }
 
@@ -114,31 +98,81 @@ class SupplierContact
     }
 
     /**
-     * @throws SupplierContactArchivedException
+     * @return SupplierContactId
      */
-    public function demote()
+    public function getId(): SupplierContactId
     {
-        $this->checkArchived();
-        $this->main = new Main(false);
+        return $this->id;
     }
 
     /**
-     * @throws SupplierContactArchivedException
+     * @return Title
      */
-    public function promote()
+    public function getTitle(): Title
     {
-        $this->checkArchived();
-        $this->main = new Main(true);
+        return $this->title;
     }
 
     /**
-     * @throws SupplierContactArchivedException
+     * @return Position
      */
-    private function checkArchived(): void
+    public function getPosition(): Position
     {
-        if (!$this->active->value()) {
-            throw new SupplierContactArchivedException();
-        }
+        return $this->position;
     }
 
+    /**
+     * @return FirstName
+     */
+    public function getFirstName(): FirstName
+    {
+        return $this->firstName;
+    }
+
+    /**
+     * @return LastName
+     */
+    public function getLastName(): LastName
+    {
+        return $this->lastName;
+    }
+
+    /**
+     * @return Phone
+     */
+    public function getPhone(): Phone
+    {
+        return $this->phone;
+    }
+
+    /**
+     * @return Email
+     */
+    public function getEmail(): Email
+    {
+        return $this->email;
+    }
+
+    /**
+     * @return Active
+     */
+    public function getActive(): Active
+    {
+        return $this->active;
+    }
+
+    public function reactivate()
+    {
+        $this->active = new Active(true);
+    }
+
+    public function archive()
+    {
+        $this->active = new Active(false);
+    }
+
+    public function fullName(): string
+    {
+        return "{$this->firstName->value()} {$this->lastName->value()}";
+    }
 }

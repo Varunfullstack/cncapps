@@ -1,556 +1,646 @@
 import React from 'react';
-import Select from "../../customerEditMain/Select";
-import EncryptedTextInput from "../../customerEditMain/EncryptedTextInput";
 import {params} from "../../utils/utils";
+import '../../style.css';
+import {VisibilityFilterOptions} from "../../customerEditMain/actions";
+import Table from "../../shared/table/table";
+import Modal from "../../shared/Modal/modal";
+import {SupplierService} from "../../services/SupplierService";
+
+const EmptyEditingContact = {
+    title: '',
+    position: '',
+    firstName: '',
+    lastName: '',
+    phone: '',
+    email: '',
+    id: '',
+    active: true
+};
 
 export class SupplierEditComponent extends React.PureComponent {
+
 
     constructor(props, context) {
         super(props, context);
         const supplierId = params.get('supplierId');
         this.state = {
             supplierId,
-            supplier: null
+            supplier: null,
+            activeTab: SupplierEditTabs.MAIN_SUPPLIER_TAB,
+            paymentMethods: [],
+            visibilityFilter: VisibilityFilterOptions.SHOW_ACTIVE,
+            showContactEditModal: false,
+            editingContact: EmptyEditingContact
         }
     }
 
-    async componentDidMount() {
-        const response = await fetch(`/Supplier.php?action=getSupplierData&supplierId=${this.state.supplierId}`);
+
+    updateField = ($event) => {
+        const value = $event.target.value;
+        const property = $event.target.name;
+        this.setState({supplier: {...this.state.supplier, [property]: value}});
+    };
+    saveSupplier = async () => {
+        const response = await fetch(
+            '/Supplier.php?action=updateSupplier',
+            {
+                method: 'POST',
+                body: JSON.stringify(this.state.supplier)
+            }
+        );
         const jsonResponse = await response.json();
         if (!jsonResponse || jsonResponse.status !== 'ok') {
-            alert('Failed to retrieve Supplier: ' + jsonResponse.message);
-        } else {
-            this.setState({supplier: jsonResponse.data});
+            alert(`Could not save supplier: ${jsonResponse?.message}`);
+            return;
+        }
+        const supplierData = await this.fetchSupplierData(this.state.supplier.id);
+        this.setState({supplier: supplierData});
+    };
+    archiveOrReactivateSupplier = () => {
+        const {supplier} = this.state;
+
+        return Promise.resolve()
+            .then(() => {
+                if (supplier.isActive) {
+                    return this.archiveSupplier(supplier.id);
+                }
+                return this.reactivateSupplier(supplier.id);
+            })
+            .then(() => {
+                return this.fetchSupplierData(supplier.id);
+            })
+            .then(supplierData => {
+                this.setState({supplier: supplierData});
+            })
+    };
+
+
+    async componentDidMount() {
+        try {
+            const [supplierData, paymentMethods] = await Promise.all([this.fetchSupplierData(this.state.supplierId), this.fetchPaymentMethods()]);
+            this.setState({supplier: supplierData, paymentMethods});
+        } catch (error) {
+            alert(error);
+        }
+    }
+
+    async fetchSupplierData(supplierId) {
+        return SupplierService.getSupplierById(supplierId);
+    }
+
+    async fetchPaymentMethods() {
+        const response = await fetch(`/Supplier.php?action=getPaymentMethods`);
+        const jsonResponse = await response.json();
+        if (!jsonResponse || jsonResponse.status !== 'ok') {
+            throw new Error('Failed to retrieve Supplier: ' + jsonResponse.message);
+        }
+        return jsonResponse.data;
+    }
+
+    setActiveTab = (tabToActivate) => {
+        return () => {
+            this.setState({activeTab: tabToActivate})
         }
     }
 
     render() {
 
-        const {supplier} = this.state;
+        const {supplier, activeTab} = this.state;
 
         if (!supplier) {
             return '';
         }
 
+
         return (
-            <div className="mt-3">
-                <div className="row">
-                    <div className="col-md-6 mb-3">
-                        <h2>Customer - {supplier.name}
-                            <a href="#">
-                                <i className="fal fa-globe"/>
-                            </a>
-                        </h2>
-                    </div>
+            <React.Fragment>
+
+                <div
+                    key="tab"
+                    className="tab-container"
+                >
+                    <i
+                        key={SupplierEditTabs.MAIN_SUPPLIER_TAB}
+                        className={`nowrap ${activeTab === SupplierEditTabs.MAIN_SUPPLIER_TAB ? 'active' : ''}`}
+                        onClick={this.setActiveTab(SupplierEditTabs.MAIN_SUPPLIER_TAB)}
+                    >
+                        Supplier
+                    </i>
+                    <i
+                        key={SupplierEditTabs.CONTACTS_TAB}
+                        className={`nowrap ${activeTab === SupplierEditTabs.CONTACTS_TAB ? 'active' : ''}`}
+                        onClick={this.setActiveTab(SupplierEditTabs.CONTACTS_TAB)}
+                    >
+                        Contacts
+                    </i>
                 </div>
-                <div className="row">
-                    <div className="col-md-6">
-                        <div className="card mb-3">
-                            <div className="card-body">
-                                <div className="row">
-                                    <div className="col-md-12">
-                                        <h5>Key Details</h5>
-                                    </div>
-                                    <div className="col-lg-6">
-                                        <label>Customer {supplier.id}</label>
-                                        <div className="form-group">
-                                            <input type="text"
-                                                   onChange={($event) => this.handleUpdateGenericField($event)}
-                                                   value={supplier.name || ''}
-                                                   size="50"
-                                                   maxLength="50"
-                                                   name="name"
-                                                   className="form-control input-sm"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-3">
-                                        <label>Referred</label>
-                                        <div className="form-group form-inline pt-1">
-                                            <label className="switch">
-                                                <input type="checkbox"
-                                                       checked={customer.referredFlag === 'Y'}
-                                                       onChange={$event => this.handleFlagUpdate($event)}
-                                                       name="referredFlag"
-                                                />
-                                                <span className="slider round"/>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-3">
-                                        <label>24 Hour Cover</label>
-                                        <div className="form-group form-inline pt-1">
-                                            <label className="switch"
-                                            >
-                                                <input type="checkbox"
-                                                       checked={customer.support24HourFlag === 'Y'}
-                                                       onChange={$event => this.handleFlagUpdate($event)}
-                                                       name="support24HourFlag"
-                                                />
-                                                <span className="slider round"/>
-                                            </label>
-
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-6">
-                                        <label htmlFor="">Special Attention</label>
-                                        <div className="form-group form-inline">
-                                            <label className="switch mr-3">
-                                                <input type="checkbox"
-                                                       onChange={$event => this.handleFlagUpdate($event)}
-                                                       checked={customer.specialAttentionFlag === 'Y'}
-                                                       name="specialAttentionFlag"
-                                                />
-                                                <span className="slider round"/>
-                                            </label>
-                                            <div className="form-group mr-3">
-                                                <label className="pr-3"
-                                                >
-                                                    Until
-                                                </label>
-                                                <input type="date"
-                                                       value={customer.specialAttentionEndDate || ''}
-                                                       size="10"
-                                                       maxLength="10"
-                                                       className="form-control input-sm"
-                                                       onChange={($event) => this.handleUpdateGenericField($event)}
-                                                       name="specialAttentionEndDate"
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="card mb-3">
-                            <div className="card-body">
-                                <div className="row">
-                                    <div className="col-md-12"><h5>Review Meetings</h5></div>
-                                    <div className="col-lg-12">
-                                        <div className="form-inline">
-                                            <div className="form-group mr-3">
-                                                <label htmlFor="ex3"
-                                                       className="col-form-label pr-3"
-                                                >Last Review Meeting
-                                                </label>
-                                                <input type="date"
-                                                       onChange={($event) => this.handleUpdateGenericField($event)}
-                                                       value={customer.lastReviewMeetingDate || ''}
-                                                       size="10"
-                                                       maxLength="10"
-                                                       className="form-control input-sm"
-                                                       name="lastReviewMeetingDate"
-                                                />
-                                            </div>
-                                            <div className="checkbox mr-3 d-flex p-2 justify-content-between align-items-center">
-                                                <label className="pr-3">Booked</label>
-                                                <label className="switch inline"
-                                                >
-                                                    <input type="checkbox"
-                                                           onChange={this.handleCheckboxFieldUpdate}
-                                                           checked={customer.reviewMeetingBooked}
-                                                           name="reviewMeetingBooked"
-                                                    />
-                                                    <span className="slider round"/>
-                                                </label>
-
-                                            </div>
-                                            <div className="form-group">
-                                                <label htmlFor="ex4"
-                                                       className="col-form-label pr-3"
-                                                >Frequency</label>
-                                                <Select
-                                                    options={
-                                                        [
-                                                            {label: 'Monthly', value: 1},
-                                                            {label: "Two Monthly", value: 2},
-                                                            {label: 'Quarterly', value: 3},
-                                                            {label: "Six-Monthly", value: 6},
-                                                            {label: 'Annually', value: 12}
-                                                        ]
-                                                    }
-                                                    selectedOption={customer.reviewMeetingFrequencyMonths || ''}
-                                                    onChange={($event) => this.handleUpdateGenericField($event)}
-                                                    name="reviewMeetingFrequencyMonths"
-                                                    className="form-control input-sm"
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="card mb-3">
-                            <div className="card-body">
-                                <div className="row">
-                                    <div className="col-md-12"><h5>Accounts</h5></div>
-                                    <div className="col-lg-4">
-                                        <label>Became Customer</label>
-                                        <div className="form-group">
-
-                                            <input type="date"
-                                                   value={customer.becameCustomerDate || ''}
-                                                   onChange={($event) => this.handleUpdateGenericField($event)}
-                                                   size="10"
-                                                   maxLength="10"
-                                                   className="form-control input-sm"
-                                                   name="becameCustomerDate"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-4">
-                                        <label>Dropped Date</label>
-                                        <div className="form-group">
-                                            <input type="date"
-                                                   value={customer.droppedCustomerDate || ''}
-                                                   onChange={($event) => this.handleUpdateGenericField($event)}
-                                                   size="10"
-                                                   maxLength="10"
-                                                   className="form-control input-sm"
-                                                   name="droppedCustomerDate"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-4">
-                                        <label>Account Manager</label>
-                                        <div className="form-group">
-                                            <Select options={accountManagers}
-                                                    selectedOption={customer.accountManagerUserID || ''}
-                                                    onChange={($event) => this.handleUpdateGenericField($event)}
-                                                    key={'accountManager'}
-                                                    className="form-control input-sm"
-                                                    name="accountManagerUserID"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="card">
-                            <div className="card-body">
-                                <div className="row">
-                                    <div className="col-md-12"><h5>Sector and Size</h5></div>
-                                    <div className="col-lg-6">
-                                        <label htmlFor="">Type</label>
-                                        <div className="form-group">
-                                            <Select options={customerTypes}
-                                                    className="form-control input-sm"
-                                                    selectedOption={customer.customerTypeID || ''}
-                                                    onChange={($event) => this.handleUpdateGenericField($event)}
-                                                    name="customerTypeID"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-6">
-                                        <label htmlFor="">Sector</label>
-                                        <div className="form-group">
-                                            <Select options={sectors}
-                                                    selectedOption={customer.sectorID || ''}
-                                                    onChange={($event) => this.handleUpdateGenericField($event)}
-                                                    className="form-control input-sm"
-                                                    name="sectorID"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-4">
-                                        <label htmlFor="">PCs</label>
-                                        <div className="form-group">
-                                            <input type="number"
-                                                   value={customer.noOfPCs || ''}
-                                                   onChange={($event) => this.handleUpdateGenericField($event)}
-                                                   className="form-control input-sm"
-                                                   name="noOfPCs"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-4">
-                                        <label>Servers</label>
-                                        <div className="form-group">
-                                            <input type="number"
-                                                   value={customer.noOfServers || ''}
-                                                   onChange={($event) => this.handleUpdateGenericField($event)}
-                                                   className="form-control input-sm"
-                                                   name="noOfServers"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-4">
-                                        <label>Sites</label>
-                                        <div className="form-group">
-                                            <input type="number"
-                                                   value={customer.noOfSites || ''}
-                                                   onChange={($event) => this.handleUpdateGenericField($event)}
-                                                   size="2"
-                                                   maxLength="2"
-                                                   className="form-control input-sm"
-                                                   name="noOfSites"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-4">
-                                        <label htmlFor="">Sort Code</label>
-                                        <div className="form-group">
-                                            <EncryptedTextInput encryptedValue={customer.sortCode}
-                                                                onChange={this.handleUpdateGenericField}
-                                                                mask='99-99-99'
-                                                                name="sortCode"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-4">
-                                        <label htmlFor="">Account Name</label>
-                                        <div className="form-group">
-                                            <EncryptedTextInput className="form-control input-sm"
-                                                                encryptedValue={customer.accountName || ''}
-                                                                name="accountName"
-                                                                onChange={this.handleUpdateGenericField}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-4">
-                                        <label htmlFor="">Account Number</label>
-                                        <div className="form-group">
-                                            <EncryptedTextInput
-                                                encryptedValue={customer.accountNumber}
-                                                onChange={this.handleUpdateGenericField}
-                                                mask='99999999'
-                                                name="accountNumber"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-4">
-                                        <label>Reg</label>
-                                        <div className="form-group">
-                                            <input type="text"
-                                                   value={customer.regNo || ''}
-                                                   onChange={($event) => this.handleUpdateGenericField($event)}
-                                                   size="10"
-                                                   maxLength="10"
-                                                   className="form-control input-sm"
-                                                   name="regNo"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-4">
-                                        <label>Pre-pay Top Up</label>
-                                        <div className="form-group">
-                                            <input type="text"
-                                                   value={customer.gscTopUpAmount || ''}
-                                                   onChange={($event) => this.handleUpdateGenericField($event)}
-                                                   size="10"
-                                                   maxLength="10"
-                                                   className="form-control input-sm"
-                                                   name="gscTopUpAmount"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="col-md-6">
-                        <div className="card mb-3">
-                            <div className="card-body">
-                                <div className="row">
-                                    <div className="col-md-12"><h5>Service Level Agreements</h5></div>
-
-                                    <div className="col-lg-12">
-                                        <label htmlFor="">SLA Response Hours</label>
-                                        <div className="form-group form-inline">
-                                            <label style={{margin: "0 .5rem"}}>1</label>
-                                            <input type="number"
-                                                   value={customer.slaP1 || ''}
-                                                   onChange={($event) => this.handleUpdateGenericField($event)}
-                                                   size="1"
-                                                   maxLength="3"
-                                                   className="form-control col-sm-4"
-                                                   name="slaP1"
-                                            />
-                                            <label style={{margin: "0 .5rem"}}>2</label>
-                                            <input type="number"
-                                                   value={customer.slaP2 || ''}
-                                                   onChange={($event) => this.handleUpdateGenericField($event)}
-                                                   size="1"
-                                                   maxLength="3"
-                                                   className="form-control col-sm-4"
-                                                   name="slaP2"
-                                            />
-                                        </div>
-                                        <div className="form-group form-inline">
-
-                                            <label style={{margin: "0 .5rem"}}>3</label>
-                                            <input type="number"
-                                                   value={customer.slaP3 || ''}
-                                                   onChange={($event) => this.handleUpdateGenericField($event)}
-                                                   size="1"
-                                                   maxLength="3"
-                                                   className="form-control col-sm-4"
-                                                   name="slaP3"
-                                            />
-                                            <label style={{margin: "0 .5rem"}}>4</label>
-                                            <input type="number"
-                                                   value={customer.slaP4 || ''}
-                                                   onChange={($event) => this.handleUpdateGenericField($event)}
-                                                   size="1"
-                                                   maxLength="3"
-                                                   className="form-control col-sm-4"
-                                                   name="slaP3"
-                                            />
-
-                                        </div>
-
-                                        <div className="form-group form-inline">
-                                            <label style={{margin: "0 .5rem"}}>5</label>
-                                            <input type="number"
-                                                   value={customer.slaP5 || ''}
-                                                   onChange={($event) => this.handleUpdateGenericField($event)}
-                                                   size="1"
-                                                   maxLength="3"
-                                                   className="form-control col-sm-4"
-                                                   name="slaP5"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-12">
-                                        <label htmlFor="">SLA Response Fix Hours</label>
-                                        <div className="form-group form-inline">
-                                            <label style={{margin: "0 .5rem"}}>1</label>
-                                            <input value={customer.slaFixHoursP1 || ''}
-                                                   type="number"
-                                                   size="1"
-                                                   step="0.1"
-                                                   maxLength="4"
-                                                   max="999.9"
-                                                   onChange={($event) => this.handleUpdateGenericField($event)}
-                                                   className="form-control col-sm-4"
-                                                   name="slaFixHoursP1"
-                                            />
-                                            <label style={{margin: "0 .5rem"}}>2</label>
-                                            <input value={customer.slaFixHoursP2 || ''}
-                                                   type="number"
-                                                   size="1"
-                                                   step="0.1"
-                                                   maxLength="4"
-                                                   max="999.9"
-                                                   onChange={($event) => this.handleUpdateGenericField($event)}
-                                                   className="form-control col-sm-4"
-                                                   name="slaFixHoursP2"
-                                            />
-                                        </div>
-                                        <div className="form-group form-inline">
-                                            <label style={{margin: "0 .5rem"}}>3</label>
-                                            <input value={customer.slaFixHoursP3 || ''}
-                                                   type="number"
-                                                   size="1"
-                                                   step="0.1"
-                                                   maxLength="4"
-                                                   max="999.9"
-                                                   onChange={($event) => this.handleUpdateGenericField($event)}
-                                                   className="form-control col-sm-4"
-                                                   name="slaFixHoursP3"
-                                            />
-                                            <label style={{margin: "0 .5rem"}}>4</label>
-                                            <input value={customer.slaFixHoursP4 || ''}
-                                                   type="number"
-                                                   size="1"
-                                                   step="0.1"
-                                                   maxLength="4"
-                                                   max="999.9"
-                                                   onChange={($event) => this.handleUpdateGenericField($event)}
-                                                   className="form-control col-sm-4"
-                                                   name="slaFixHoursP4"
-                                            />
-
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-4">
-                                        <label htmlFor="">SLA Penalties Agreed</label>
-                                        <div className="form-group form-inline pt-1 d-flex">
-                                            <div className="toggle-inline">
-                                                <label>1</label>
-                                                <label className="switch"
-                                                >
-                                                    <input type="checkbox"
-                                                           checked={customer.slaP1PenaltiesAgreed || ''}
-                                                           onChange={($event) => this.handleCheckboxFieldUpdate($event)}
-                                                           name="slaP1PenaltiesAgreed"
-                                                    />
-                                                    <span className="slider round"/>
-                                                </label>
-                                            </div>
-
-                                            <div className="toggle-inline">
-                                                <label>2</label>
-                                                <label className="switch"
-                                                >
-                                                    <input type="checkbox"
-                                                           checked={customer.slaP2PenaltiesAgreed || ''}
-                                                           onChange={($event) => this.handleCheckboxFieldUpdate($event)}
-                                                           name="slaP2PenaltiesAgreed"
-                                                    />
-                                                    <span className="slider round"/>
-                                                </label>
-                                            </div>
-                                            <div className="toggle-inline">
-                                                <label>3</label>
-                                                <label className="switch"
-                                                >
-                                                    <input type="checkbox"
-                                                           checked={customer.slaP3PenaltiesAgreed || ''}
-                                                           onChange={($event) => this.handleCheckboxFieldUpdate($event)}
-                                                           name="slaP3PenaltiesAgreed"
-                                                    />
-                                                    <span className="slider round"/>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-4">
-                                        <label>Last Modified:</label>
-                                        <div className="form-group">
-                                            <h6>{customer.lastModified}</h6>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="card">
-                            <div className="card-body">
-                                <div className="row">
-                                    <div className="col-md-12"><h5>Technical Notes</h5></div>
-                                    <div className="col-lg-6">
-                                        <label>Technical Notes</label>
-                                        <div className="form-group">
-                                                <textarea className="form-control input-sm"
-                                                          cols="30"
-                                                          rows="2"
-                                                          value={customer.techNotes || ''}
-                                                          onChange={($event) => this.handleUpdateGenericField($event)}
-                                                          name="techNotes"
-                                                />
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-6">
-                                        <label>Active Directory Name</label>
-                                        <div className="form-group">
-                                            <input type="text"
-                                                   value={customer.activeDirectoryName || ''}
-                                                   onChange={($event) => this.handleUpdateGenericField($event)}
-                                                   size="54"
-                                                   maxLength="255"
-                                                   className="form-control input-sm"
-                                                   name="activeDirectoryName"
-                                            />
-                                        </div>
-                                    </div>
-
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div className="tab-content">
+                    {activeTab === SupplierEditTabs.MAIN_SUPPLIER_TAB ? this.getSupplierMainTab() : this.getSupplierContactsTab()}
                 </div>
-            </div>
+            </React.Fragment>
+        );
+    }
+
+    getSupplierMainTab() {
+        const {supplier, paymentMethods} = this.state;
+        const activeContacts = supplier.contacts.filter(x => x.active).sort((a, b) => {
+            return `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
+        });
+        return (
+            <React.Fragment>
+
+                <label htmlFor=""
+                       className="span"
+                >
+                    <span>town</span>
+                    <input
+                        type="text"
+                        value={supplier.town}
+                        name="town"
+                        onChange={this.updateField}
+                        maxLength="25"
+                        required
+                        readOnly={!supplier.isActive}
+                    />
+                </label>
+
+                <label htmlFor=""
+                       className="span"
+                >
+                    <span>county</span>
+                    <input
+                        type="text"
+                        name="county"
+                        value={supplier.county}
+                        onChange={this.updateField}
+                        maxLength="25"
+                        required
+                        readOnly={!supplier.isActive}
+                    />
+                </label>
+
+                <label htmlFor=""
+                       className="span"
+                >
+                    <span>postcode</span>
+                    <input
+                        type="text"
+                        name="postcode"
+                        value={supplier.postcode}
+                        onChange={this.updateField}
+                        maxLength="25"
+                        required
+                        readOnly={!supplier.isActive}
+                    />
+                </label>
+
+                <label htmlFor=""
+                       className="span"
+                >
+                    <span>name</span>
+                    <input
+                        type="text"
+                        name="name"
+                        value={supplier.name}
+                        onChange={this.updateField}
+                        maxLength="35"
+                        required
+                        readOnly={!supplier.isActive}
+                    />
+                </label>
+
+                <label htmlFor=""
+                       className="span"
+                >
+                    <span>address1</span>
+                    <input
+                        type="text"
+                        name="name"
+                        value={supplier.address1}
+                        onChange={this.updateField}
+                        maxLength="35"
+                        required
+                        readOnly={!supplier.isActive}
+                    />
+                </label>
+
+                <label htmlFor=""
+                       className="span"
+                >
+                    <span>address2</span>
+                    <input
+                        type="text"
+                        name="address2"
+                        value={supplier.address2}
+                        onChange={this.updateField}
+                        maxLength="35"
+                        readOnly={!supplier.isActive}
+                    />
+                </label>
+
+                <label htmlFor=""
+                       className="span"
+                >
+                    <span>websiteURL</span>
+                    <input
+                        type="text"
+                        name="websiteURL"
+                        value={supplier.websiteURL}
+                        onChange={this.updateField}
+                        maxLength="100"
+                        readOnly={!supplier.isActive}
+                    />
+                </label>
+
+                <label htmlFor=""
+                       className="span"
+                >
+                    <span>Payment Method</span>
+                    <select
+                        name="paymentMethodId"
+                        value={supplier.paymentMethodId}
+                        onChange={this.updateField}
+                        required
+                        disabled={!supplier.isActive}
+                    >
+                        {paymentMethods.map(x => <option key={x.id}
+                                                         value={x.id}
+                        >{x.description}</option>)}
+                    </select>
+                </label>
+
+                <label htmlFor=""
+                       className="span"
+                >
+                    <span>accountCode</span>
+                    <input
+                        type="text"
+                        name="accountCode"
+                        value={supplier.accountCode}
+                        onChange={this.updateField}
+                        maxLength="20"
+                        readOnly={!supplier.isActive}
+                    />
+                </label>
+                <label>
+                    <select name="mainSupplierContactId"
+                            onChange={this.updateField}
+                            required
+                            disabled={!supplier.isActive}
+                            value={supplier.mainSupplierContactId}
+                    >
+                        {
+                            activeContacts.map(c => <option key={c.id}
+                                                            value={c.id}
+                            >{`${c.firstName} ${c.lastName}`}</option>)
+                        }
+                    </select>
+                </label>
+                <button onClick={this.saveSupplier}
+                        disabled={!supplier.isActive}
+                >Save
+                </button>
+                {
+                    supplier.id ?
+                        <button onClick={this.archiveOrReactivateSupplier}>
+                            {
+                                supplier.isActive ? 'Archive' : 'Reactivate'
+                            }
+                        </button>
+                        : ''
+                }
+            </React.Fragment>
+        )
+
+    }
+
+    static addToolTip(element, title) {
+        return (
+            <div className="tooltip">
+                {element}
+                <div className="tooltiptext tooltip-bottom">
+                    {title}
+                </div>
+            </div>)
+    }
+
+    getSupplierContactsTab() {
+
+        const {supplier, visibilityFilter} = this.state;
+
+
+        const contacts = supplier.contacts ?? [];
+        let columns = [
+            {
+                hide: false,
+                order: 2,
+                path: "firstName",
+                key: "firstName",
+                hdToolTip: "Name",
+                icon: "fal fa-2x  fa-id-card-alt",
+                sortable: true,
+                width: "55",
+                hdClassName: "text-left",
+                className: "text-left",
+                content: (contactRow) => {
+                    return `${contactRow.title ? `${contactRow.title}. ` : ''}${(contactRow.firstName + " " + contactRow.lastName) ?? ""}${contactRow.position ? ` (${contactRow.position})` : ''}`
+                }
+
+            },
+            {
+                hide: false,
+                order: 3,
+                path: "phone",
+                key: "phone",
+                hdToolTip: "Phone",
+                icon: "fal fa-2x  fa-phone",
+                sortable: true,
+                width: "55",
+                hdClassName: "text-left",
+                className: "text-left",
+                content: (contactRow) => {
+                    return contactRow.phone
+                }
+
+            },
+            {
+                hide: false,
+                order: 4,
+                path: "email",
+                key: "email",
+                hdToolTip: "Email",
+                icon: "fal fa-2x fa-at",
+                sortable: true,
+                width: "55",
+                hdClassName: "text-left",
+                className: "text-left",
+            },
+            {
+                hide: visibilityFilter === VisibilityFilterOptions.SHOW_ACTIVE,
+                order: 10,
+                path: "active",
+                key: "active",
+                hdToolTip: "Active",
+                icon: "fal fa-2x fa-eye",
+                sortable: true,
+                width: "55",
+                hdClassName: "text-center",
+                className: "text-center",
+                content: (contactRow) => {
+                    let icon = "fa-times"
+                    if (contactRow.active) {
+                        icon = "fa-check";
+                    }
+                    return (
+                        <i className={`fal ${icon} fa-2x color-gray`}/>
+                    )
+                }
+
+            },
+            {
+                hide: false,
+                order: 20,
+                path: "id",
+                key: "id",
+                icon: "fal fa-2x fa-edit",
+                sortable: false,
+                width: "55",
+                hdClassName: "text-center",
+                className: "text-center",
+                content: (contactRow) => (<i onClick={this.editContactRowFunction(contactRow)}
+                                             className="fal fa-edit fa-2x color-gray pointer"
+                />)
+            },
+        ];
+        columns = columns
+            .filter((c) => c.hide == false)
+            .sort((a, b) => (a.order > b.order ? 1 : -1));
+
+        return (
+            <React.Fragment>
+                {this.getContactEditModal()}
+                <div>
+                    <select onChange={this.onToggleVisibility}
+                            value={visibilityFilter}
+                    >
+                        <option value={VisibilityFilterOptions.SHOW_ACTIVE}>Active Only</option>
+                        <option value={VisibilityFilterOptions.SHOW_ALL}>Show All</option>
+                    </select>
+                </div>
+                <i className="fal fa-plus fa-2x pointer"
+                   onClick={this.addNewContact}
+                />
+                <Table
+                    data={contacts.filter(x => !(visibilityFilter === VisibilityFilterOptions.SHOW_ACTIVE && !x.active))}
+                    columns={columns}
+                    pk="id"
+                    search={true}
+                />
+            </React.Fragment>
+        )
+            ;
+    }
+
+    archiveContact = async (contact) => {
+        const {supplier} = this.state;
+        await SupplierService.archiveContact(contact, supplier);
+        this.hideContactEditModal();
+        const supplierData = await this.fetchSupplierData(this.state.supplier.id);
+        this.setState({supplier: supplierData});
+    }
+
+    reactivateContact = async (contact) => {
+        const {supplier} = this.state;
+        await SupplierService.reactivateContact(contact, supplier);
+        this.hideContactEditModal();
+        const supplierData = await this.fetchSupplierData(this.state.supplier.id);
+        this.setState({supplier: supplierData});
+    }
+
+    addNewContact = () => {
+        this.setState({showContactEditModal: true, editingContact: EmptyEditingContact});
+    }
+    editingContactChangedField = ($event) => {
+        const {editingContact} = this.state;
+        const {target} = $event;
+        const updatedEditingContact = {...editingContact, [target.name]: target.value};
+
+        this.setState({editingContact: updatedEditingContact});
+        this.handleValidation(updatedEditingContact, target);
+    }
+
+    handleValidation = (updatedEditingContact, htmlElement) => {
+        let isValid = true;
+        if (!updatedEditingContact.position || !updatedEditingContact.firstName || !updatedEditingContact.lastName || !updatedEditingContact.phone || !updatedEditingContact.email || (htmlElement && !htmlElement.checkValidity())) {
+            isValid = false;
+        }
+        this.setState({isEditingContactValid: isValid});
+    }
+
+    hideContactEditModal = () => {
+        this.setState({showContactEditModal: false, editingContact: EmptyEditingContact, isEditingContactValid: false});
+    }
+
+    getContactEditModal = () => {
+        const {editingContact, showContactEditModal, isEditingContactValid, supplier} = this.state;
+
+        return (
+            <Modal show={showContactEditModal}
+                   title={`Contact Edit ${!editingContact.active ? ' (Readonly Archived)' : ''}`}
+                   onClose={this.hideContactEditModal}
+            >
+                <div>
+                    <label>
+                        <span>
+                            Title
+                        </span>
+                        <input name="title"
+                               value={editingContact.title}
+                               maxLength="45"
+                               onChange={this.editingContactChangedField}
+                               readOnly={!editingContact.active}
+                        />
+                    </label>
+
+                    <label>
+                        <span>
+                            Position*
+                        </span>
+                        <input name="position"
+                               value={editingContact.position || ''}
+                               maxLength="50"
+                               required
+                               readOnly={!editingContact.active}
+                               onChange={this.editingContactChangedField}
+                        />
+                    </label>
+                    <label>
+                        <span>
+                            First Name*
+                        </span>
+                        <input name="firstName"
+                               value={editingContact.firstName}
+                               maxLength="25"
+                               required
+                               readOnly={!editingContact.active}
+                               onChange={this.editingContactChangedField}
+                        />
+                    </label>
+                    <label>
+                        <span>
+                            Last Name*
+                        </span>
+                        <input name="lastName"
+                               value={editingContact.lastName}
+                               maxLength="35"
+                               required
+                               readOnly={!editingContact.active}
+                               onChange={this.editingContactChangedField}
+                        />
+                    </label>
+                    <label>
+                        <span>
+                            Phone*
+                        </span>
+                        <input name="phone"
+                               value={editingContact.phone}
+                               maxLength="25"
+                               required
+                               readOnly={!editingContact.active}
+                               onChange={this.editingContactChangedField}
+                        />
+                    </label>
+                    <label>
+                        <span>
+                            Email*
+                        </span>
+                        <input name="email"
+                               value={editingContact.email}
+                               maxLength="60"
+                               required
+                               type="email"
+                               readOnly={!editingContact.active}
+                               onChange={this.editingContactChangedField}
+                        />
+                    </label>
+                </div>
+                <button disabled={!isEditingContactValid}
+                        onClick={this.saveContact}
+                >Save
+                </button>
+                <button onClick={this.hideContactEditModal}>Cancel</button>
+                {this.renderArchiveButtons(editingContact, supplier)}
+            </Modal>
         )
     }
+
+    renderArchiveButtons = (editingContact, supplier) => {
+        if (!editingContact.id || editingContact.id === supplier.mainSupplierContactId) {
+            return '';
+        }
+
+        let fn = () => this.archiveContact(editingContact);
+        let text = "Archive";
+        if (!editingContact.active) {
+            fn = () => this.reactivateContact(editingContact);
+            text = 'Reactivate';
+        }
+        return (<button onClick={fn}>{text}</button>);
+    }
+
+    saveContact = async () => {
+        const {editingContact, supplier} = this.state;
+
+        let promise = SupplierService.createSupplierContact;
+        if (editingContact.id) {
+            promise = SupplierService.updateSupplierContact
+        }
+        await promise(supplier, editingContact);
+        const supplierData = await this.fetchSupplierData(supplier.id);
+        this.setState({supplier: supplierData});
+        this.hideContactEditModal();
+    }
+
+    editContactRowFunction = (contactRow) => {
+        return () => {
+            this.setState(
+                {
+                    editingContact: {...contactRow},
+                    showContactEditModal: true
+                }
+            );
+            this.handleValidation(contactRow)
+        }
+    }
+
+    onToggleVisibility = () => {
+        let visibilityFilterOption = VisibilityFilterOptions.SHOW_ALL;
+        if (this.state.visibilityFilter === VisibilityFilterOptions.SHOW_ALL) {
+            visibilityFilterOption = VisibilityFilterOptions.SHOW_ACTIVE;
+        }
+        this.setState({visibilityFilter: visibilityFilterOption});
+    }
+
+    archiveSupplier(id) {
+        return fetch(`/Supplier.php?action=archiveSupplier`,
+            {
+                method: 'POST',
+                body: JSON.stringify({id})
+            }
+        )
+    }
+
+    reactivateSupplier(id) {
+        return fetch(`/Supplier.php?action=reactivateSupplier`,
+            {
+                method: 'POST',
+                body: JSON.stringify({id})
+            }
+        )
+    }
+}
+
+export const SupplierEditTabs = {
+    MAIN_SUPPLIER_TAB: "MAIN_SUPPLIER_TAB",
+    CONTACTS_TAB: 'CONTACTS_TAB'
 }

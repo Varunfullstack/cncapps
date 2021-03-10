@@ -74,43 +74,45 @@
             <column name="active" type="tinyint(1)" defaultValue="1">
                 <constraints nullable="false"/>
             </column>
-            <column name="isMain" type="tinyint(1)" defaultValue="0">
-                <constraints nullable="false"/>
-            </column>
         </createTable>
         <sql>
             <![CDATA[
-            insert into supplierContact (id, supplierId, title, position, firstName, lastName, email, phone, active,
-                                         isMain)
+            UPDATE
+                supplier
+            SET `sup_contno` =
+                    (SELECT con_contno
+                     FROM contact
+                     WHERE con_suppno = supplier.`sup_suppno`
+                     LIMIT 1)
+            WHERE supplier.sup_contno = 0
+               OR supplier.sup_contno IS NULL;
+
+            insert into supplierContact (id, supplierId, title, position, firstName, lastName, email, phone, active)
             select con_contno,
                    con_suppno,
                    if(con_title is null or con_title = '', 'Mx', con_title),
-                   con_position,
-                   con_first_name,
-                   con_last_name,
-                   if(con_email is null or con_email = '', "notprovided@cnc-ltd.co.uk", con_email),
+                   if(con_position = '', null, con_position),
+                   if(con_first_name is null or con_first_name = '', 'firstName', con_first_name),
+                   if(con_last_name is null or con_last_name = '', 'lastName', con_last_name),
+                   if(con_email is null or con_email = '', "notprovided@cnc-ltd.co.uk", trim(con_email)),
                    if(con_phone is null or con_phone = '', 'not-provided', con_phone),
-                   active,
-                   coalesce((select sup_contno = con_contno from supplier where supplier.sup_suppno = con_suppno),
-                            0) as isMain
+                   active
             from contact
             where con_suppno is not null
               and con_suppno <> 0;
             UPDATE
                 supplierContact
-            SET isMain = 1,
-                ACTIVE = 1
-            WHERE id IN
-                  (SELECT a.id
-                   FROM (SELECT sup_name,
-                                sup_suppno,
-                                supplierContact.id,
-                                SUM(supplierContact.isMain) AS mainContactsCount
-                         FROM supplier
-                                  LEFT JOIN supplierContact
-                                            ON supplier.`sup_suppno` = supplierContact.supplierId
-                         GROUP BY supplier.`sup_suppno`) a
-                   WHERE mainContactsCount < 1);
+            SET ACTIVE           = 1,
+                sup_web_site_url = if(sup_web_site_url = '', null, sup_web_site_url)
+            WHERE id IN (select sup_contno from supplier);
+            UPDATE
+                supplier
+            SET sup_web_site_url = if(sup_web_site_url = '', null, sup_web_site_url),
+                sup_cnc_accno    = if(sup_cnc_accno = '' OR sup_cnc_accno IS NULL, 'notprovided', sup_cnc_accno),
+                sup_add2         = if(sup_add2 = '', null, sup_add2),
+                sup_county       = if(sup_county = '' OR sup_county IS NULL, 'notprovided', sup_county),
+                sup_postcode     = if(sup_postcode = '', 'notprovided', sup_postcode);
+
             UPDATE
                 supplierContact
             SET title     = IF(title = "", NULL, title),
@@ -171,14 +173,16 @@
             <column name="active" type="tinyint(1)" defaultValue="1">
                 <constraints nullable="false"/>
             </column>
-            <column name="isMain" type="tinyint(1)" defaultValue="0">
-                <constraints nullable="false"/>
-            </column>
         </createTable>
         <sql splitStatements="true">
             <![CDATA[
+            update contact join supplier on contact.con_suppno = supplier.sup_suppno
+            set con_phone = supplier.sup_phone
+            where (contact.con_phone is null or contact.con_phone = "")
+              and (sup_phone is not null and sup_phone <> "");
+
             insert into supplierContactAuditLog(action, createdAt, userId, id, supplierId, title, position, firstName,
-                                                lastName, email, phone, active, isMain)
+                                                lastName, email, phone, active)
             select `action`,
                    createdAt,
                    userId,
@@ -190,9 +194,7 @@
                    con_last_name,
                    con_email,
                    con_phone,
-                   active,
-                   coalesce((select sup_contno = con_contno from supplier where supplier.sup_suppno = con_suppno),
-                            0) as isMain
+                   active
             from contactAuditLog
             where con_suppno is not null
               and con_suppno <> 0;
@@ -295,6 +297,28 @@
         <rollback>
             <addColumn tableName="supplier">
                 <column name="sup_credit_limit" type="decimal(10,2)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue648-12">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="supplier" columnName="sup_phone"/>
+        </preConditions>
+        <dropColumn tableName="supplier" columnName="sup_phone"/>
+        <rollback>
+            <addColumn tableName="supplier">
+                <column name="sup_phone" type="char(20)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue648-13">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="supplier" columnName="sup_fax"/>
+        </preConditions>
+        <dropColumn tableName="supplier" columnName="sup_fax"/>
+        <rollback>
+            <addColumn tableName="supplier">
+                <column name="sup_fax" type="char(20)"/>
             </addColumn>
         </rollback>
     </changeSet>

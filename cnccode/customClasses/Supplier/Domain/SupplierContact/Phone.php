@@ -4,11 +4,14 @@ namespace CNCLTD\Supplier\Domain\SupplierContact;
 
 use CNCLTD\Exceptions\EmptyStringException;
 use CNCLTD\Exceptions\StringTooLongException;
+use CNCLTD\ValueObject;
 use CNCLTD\ValueObjectCompare;
+use CNCLTD\ValueObjectIsNull;
 
-class Phone
+class Phone implements ValueObject
 {
     use ValueObjectCompare;
+    use ValueObjectIsNull;
 
     const MAX_LENGTH = 25;
     /** @var string */
@@ -23,7 +26,7 @@ class Phone
     public function __construct(string $value)
     {
         if (!$value) {
-            throw new EmptyStringException();
+            throw new EmptyStringException('Phone');
         }
         if (strlen($value) > self::MAX_LENGTH) {
             throw new StringTooLongException(self::MAX_LENGTH);

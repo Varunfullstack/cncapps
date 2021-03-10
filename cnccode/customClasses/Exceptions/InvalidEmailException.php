@@ -10,6 +10,6 @@ class InvalidEmailException extends \Exception
      */
     public function __construct($invalidEmail)
     {
-        parent::__construct("Email is not valid: {$invalidEmail}");
+        parent::__construct("Email is not valid: '{$invalidEmail}'");
     }
 }

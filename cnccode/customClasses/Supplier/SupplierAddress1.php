@@ -23,7 +23,7 @@ class SupplierAddress1
     public function __construct(string $value)
     {
         if (!$value) {
-            throw new EmptyStringException();
+            throw new EmptyStringException("Address 1");
         }
         if (strlen($value) > self::MAX_LENGTH) {
             throw new StringTooLongException(self::MAX_LENGTH);

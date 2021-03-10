@@ -10,9 +10,9 @@ class DBEPorhead extends DBEntity
 
     const porheadID = "porheadID";
     const type = "type";
-    const supplierID = "supplierID";
-    const contactID = "contactID";
-    const date = "date";
+    const supplierID        = "supplierID";
+    const supplierContactId = "contactID";
+    const date              = "date";
     const ordheadID = "ordheadID";
     const supplierRef = "supplierRef";
     const directDeliveryFlag = "directDeliveryFlag";
@@ -59,7 +59,7 @@ class DBEPorhead extends DBEntity
             "poh_suppno"
         );
         $this->addColumn(
-            self::contactID,
+            self::supplierContactId,
             DA_ID,
             DA_NOT_NULL,
             "poh_contno"

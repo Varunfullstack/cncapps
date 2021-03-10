@@ -2,12 +2,16 @@
 
 namespace CNCLTD\Supplier\Domain\SupplierContact;
 
+use CNCLTD\Exceptions\EmptyStringException;
 use CNCLTD\Exceptions\StringTooLongException;
+use CNCLTD\ValueObject;
 use CNCLTD\ValueObjectCompare;
+use CNCLTD\ValueObjectIsNull;
 
-class Position
+class Position implements ValueObject
 {
     use ValueObjectCompare;
+    use ValueObjectIsNull;
 
     const MAX_LENGTH = 50;
     /** @var string */
@@ -16,17 +20,20 @@ class Position
     /**
      * SupplierAddress1 constructor.
      * @param $value
-     * @throws StringTooLongException
+     * @throws StringTooLongException|EmptyStringException
      */
     public function __construct(?string $value)
     {
+        if ($value === "") {
+            throw new EmptyStringException('Position');
+        }
         if (strlen($value) > self::MAX_LENGTH) {
             throw new StringTooLongException(self::MAX_LENGTH);
         }
         $this->value = $value;
     }
 
-    public function value(): string
+    public function value(): ?string
     {
         return $this->value;
     }

@@ -15,6 +15,7 @@ use CNCLTD\Supplier\Domain\SupplierContact\FirstName;
 use CNCLTD\Supplier\Domain\SupplierContact\LastName;
 use CNCLTD\Supplier\Domain\SupplierContact\Phone;
 use CNCLTD\Supplier\Domain\SupplierContact\Position;
+use CNCLTD\Supplier\Domain\SupplierContact\SupplierContact;
 use CNCLTD\Supplier\Domain\SupplierContact\SupplierContactId;
 use CNCLTD\Supplier\Domain\SupplierContact\Title;
 use CNCLTD\Supplier\Supplier;
@@ -22,19 +23,16 @@ use CNCLTD\Supplier\SupplierAccountCode;
 use CNCLTD\Supplier\SupplierAddress1;
 use CNCLTD\Supplier\SupplierAddress2;
 use CNCLTD\Supplier\SupplierCounty;
-use CNCLTD\Supplier\SupplierFax;
 use CNCLTD\Supplier\SupplierId;
 use CNCLTD\Supplier\SupplierIsActive;
 use CNCLTD\Supplier\SupplierName;
 use CNCLTD\Supplier\SupplierPaymentMethodId;
-use CNCLTD\Supplier\SupplierPhone;
 use CNCLTD\Supplier\SupplierPostcode;
 use CNCLTD\Supplier\SupplierRepository;
 use CNCLTD\Supplier\SupplierTown;
 use CNCLTD\Supplier\SupplierWebsiteURL;
 use dbSweetcode;
 use Exception;
-use ReflectionClass;
 
 class MySQLSupplierRepository implements SupplierRepository
 {
@@ -55,32 +53,9 @@ class MySQLSupplierRepository implements SupplierRepository
     }
 
     /**
-     * @param SupplierId $supplierId
-     * @return Supplier|void
+     * @return SupplierWithMainContactMysqlDTO[]
      * @throws Exception
      */
-    public function getById(SupplierId $supplierId): Supplier
-    {
-        $statement = $this->sweetCodeDB->preparedQuery(
-            'select * from supplier where sup_suppno = ? ',
-            [
-                [
-                    "type"  => "i",
-                    "value" => $supplierId->value()
-                ]
-            ]
-        );
-        if (!$statement) {
-            throw new Exception('Failed to retrieve Supplier!');
-        }
-        $supplierDTO = $statement->fetch_object(SupplierMySQLDTO::class);
-        if (!$supplierId) {
-            throw new Exception('Supplier not found');
-        }
-        $reflection = new ReflectionClass(Supplier::class);
-//        $supplier = $reflection->newInstanceWithoutConstructor();
-    }
-
     public function getAllSuppliers(): array
     {
         $statement = $this->sweetCodeDB->preparedQuery(
@@ -101,7 +76,7 @@ select supplier.sup_suppno                                      as id,
        mainContact.email                                        as mainContactEmail,
        mainContact.phone                                        as mainContactPhone
 from supplier
-         left join supplierContact mainContact on mainContact.supplierId = supplier.sup_suppno and mainContact.isMain",
+         left join supplierContact mainContact on mainContact.id = supplier.sup_contno",
             []
         );
         $list      = [];
@@ -133,7 +108,7 @@ from supplier
      * @throws SupplierContactMainInactiveException
      * @throws URLNotValidException
      */
-    public function getSupplierWithContactsById(SupplierId $supplierId)
+    public function getById(SupplierId $supplierId): Supplier
     {
         $statement = $this->sweetCodeDB->preparedQuery(
             'select * from supplier where sup_suppno = ? ',
@@ -168,7 +143,7 @@ from supplier
         $contacts    = [];
         /** @var SupplierContactMysqlDTO $contact */
         while ($contact = $supplierContactsStatement->fetch_object(SupplierContactMysqlDTO::class)) {
-            if ($contact->getIsMain()) {
+            if ($contact->getId() === $supplierDTO->getMainSupplierContactId()) {
                 $mainContact = $contact;
             } else {
                 $contacts[] = $contact;
@@ -182,9 +157,7 @@ from supplier
             new SupplierTown($supplierDTO->getTown()),
             new SupplierCounty($supplierDTO->getCounty()),
             new SupplierPostcode($supplierDTO->getPostcode()),
-            new SupplierPhone($supplierDTO->getPhone()),
             new SupplierWebsiteURL($supplierDTO->getWebsiteUrl()),
-            new SupplierFax($supplierDTO->getFax()),
             new SupplierPaymentMethodId($supplierDTO->getPayMethodId()),
             new SupplierAccountCode($supplierDTO->getCNCAccountCode()),
             new SupplierIsActive($supplierDTO->getActive()),
@@ -209,5 +182,222 @@ from supplier
             );
         }
         return $supplier;
+    }
+
+    public function save(Supplier $supplier): void
+    {
+        $supplierParams = [
+            [
+                "type"  => "s",
+                "value" => $supplier->name()->value()
+            ],
+            [
+                "type"  => "s",
+                "value" => $supplier->address1()->value()
+            ],
+            [
+                "type"  => "s",
+                "value" => $supplier->address2()->value()
+            ],
+            [
+                "type"  => "s",
+                "value" => $supplier->town()->value()
+            ],
+            [
+                "type"  => "s",
+                "value" => $supplier->county()->value()
+            ],
+            [
+                "type"  => "s",
+                "value" => $supplier->postcode()->value()
+            ],
+            [
+                "type"  => "s",
+                "value" => $supplier->websiteURL()->value()
+            ],
+            [
+                "type"  => "i",
+                "value" => $supplier->paymentMethodId()->value()
+            ],
+            [
+                "type"  => "s",
+                "value" => $supplier->accountCode()->value()
+            ],
+            [
+                "type"  => "i",
+                "value" => $supplier->isActive()->value()
+            ],
+            [
+                "type"  => "i",
+                "value" => $supplier->mainContact()->id()->value()
+            ],
+            [
+                "type"  => "i",
+                "value" => $supplier->id()->value()
+            ]
+        ];
+        if ($this->existsSupplierId($supplier->id())) {
+            $query = "update supplier set sup_name = ?, sup_add1 = ?, sup_add2 = ?, sup_town = ?, sup_county = ?, sup_postcode = ?, sup_web_site_url = ?, sup_payno = ?, sup_cnc_accno = ?, active = ?, sup_contno = ? where sup_suppno = ? ";
+        } else {
+            $query = "insert into supplier(sup_name,
+                     sup_add1,
+                     sup_add2,
+                     sup_town,
+                     sup_county,
+                     sup_postcode,
+                     sup_web_site_url,
+                     sup_payno,
+                     sup_cnc_accno,
+                     active,
+                     sup_contno,
+                     sup_suppno)
+values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?) ";
+        }
+        $this->sweetCodeDB->preparedQuery(
+            $query,
+            $supplierParams
+        );
+        /** @var SupplierContact[] $contacts */
+        $contacts           = $supplier->getContacts();
+        $updateContactQuery = "update supplierContact set title = ?, position = ?, firstName = ?, lastName = ?, email = ?, phone = ?, active = ? where id = ? ";
+        $action             = 'update';
+        $insertContactQuery = "insert into supplierContact(title, position, firstName, lastName, email, phone, active, id, supplierId)
+values (?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?)";
+        foreach ($contacts as $contact) {
+
+            $contactParameters = [
+                [
+                    "type"  => "s",
+                    "value" => $contact->getTitle()->value()
+                ],
+                [
+                    "type"  => "s",
+                    "value" => $contact->getPosition()->value()
+                ],
+                [
+                    "type"  => "s",
+                    "value" => $contact->getFirstName()->value()
+                ],
+                [
+                    "type"  => "s",
+                    "value" => $contact->getLastName()->value()
+                ],
+                [
+                    "type"  => "s",
+                    "value" => $contact->getEmail()->value()
+                ],
+                [
+                    "type"  => "s",
+                    "value" => $contact->getPhone()->value()
+                ],
+                [
+                    "type"  => "i",
+                    "value" => $contact->getActive()->value()
+                ],
+                [
+                    "type"  => "i",
+                    "value" => $contact->getId()->value()
+                ]
+            ];
+            $query             = $updateContactQuery;
+            $params            = $contactParameters;
+            if (!$this->existsSupplierContactId($contact->id())) {
+                $query  = $insertContactQuery;
+                $action = 'insert';
+                $params = array_merge(
+                    $contactParameters,
+                    [
+                        [
+                            "type"  => "i",
+                            "value" => $supplier->id()->value()
+                        ]
+                    ]
+                );
+            }
+            if ($action !== 'insert' && !isset($supplier->getContactDirty()[$contact->getId()->value()])) {
+                continue;
+            }
+            $currentUser          = $GLOBALS['auth']->is_authenticated();
+            $contactAuditLogQuery = "insert into supplierContactAuditLog(`action`, userId, id, supplierId, title, position, firstName, lastName, email,
+                                    phone,
+                                    `active`)
+select '$action' as `action`,
+        $currentUser as `userId`,
+       supplierContact.id,
+       supplierContact.supplierId,
+       supplierContact.title,
+       supplierContact.position,
+       supplierContact.firstName,
+       supplierContact.lastName,
+       supplierContact.email,
+       supplierContact.phone,
+       supplierContact.active
+from supplierContact
+where id = ? ";
+            $this->sweetCodeDB->preparedQuery(
+                $query,
+                $params
+            );
+            $this->sweetCodeDB->preparedQuery(
+                $contactAuditLogQuery,
+                [
+                    [
+                        "type"  => "i",
+                        "value" => $contact->id()->value()
+                    ]
+                ]
+            );
+        }
+    }
+
+    private function existsSupplierId(SupplierId $id): bool
+    {
+        $query  = "select count(*) > 0  from supplier where sup_suppno = ?";
+        $result = $this->sweetCodeDB->preparedQuery(
+            $query,
+            [
+                [
+                    "type"  => "i",
+                    "value" => $id->value()
+                ]
+            ]
+        );
+        $row    = $result->fetch_row();
+        return (bool)$row[0];
+    }
+
+    private function existsSupplierContactId(SupplierContactId $id): bool
+    {
+        $query  = "select count(*) > 0  from supplierContact where id = ?";
+        $result = $this->sweetCodeDB->preparedQuery(
+            $query,
+            [
+                [
+                    "type"  => "i",
+                    "value" => $id->value()
+                ]
+            ]
+        );
+        $row    = $result->fetch_row();
+        return (bool)$row[0];
+
+    }
+
+    /**
+     * @return SupplierContactId
+     * @throws InvalidIdException
+     */
+    public function nextContactIdentity(): SupplierContactId
+    {
+        $nextId = $this->sweetCodeDB->nextid('supplierContact');
+        return new SupplierContactId($nextId);
     }
 }

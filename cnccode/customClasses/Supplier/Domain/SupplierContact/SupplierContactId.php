@@ -3,9 +3,10 @@
 namespace CNCLTD\Supplier\Domain\SupplierContact;
 
 use CNCLTD\Exceptions\InvalidIdException;
+use CNCLTD\ValueObject;
 use CNCLTD\ValueObjectCompare;
 
-class SupplierContactId
+class SupplierContactId implements ValueObject
 {
     use ValueObjectCompare;
 
@@ -28,5 +29,10 @@ class SupplierContactId
     public function value(): int
     {
         return $this->value;
+    }
+
+    public function isNull(): bool
+    {
+        return $this->value === null;
     }
 }

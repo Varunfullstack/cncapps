@@ -5,11 +5,14 @@ namespace CNCLTD\Supplier\Domain\SupplierContact;
 use CNCLTD\Exceptions\EmptyStringException;
 use CNCLTD\Exceptions\InvalidEmailException;
 use CNCLTD\Exceptions\StringTooLongException;
+use CNCLTD\ValueObject;
 use CNCLTD\ValueObjectCompare;
+use CNCLTD\ValueObjectIsNull;
 
-class Email
+class Email implements ValueObject
 {
     use ValueObjectCompare;
+    use ValueObjectIsNull;
 
     const MAX_LENGTH = 60;
     /** @var string */
@@ -25,7 +28,7 @@ class Email
     public function __construct(string $value)
     {
         if (!$value) {
-            throw new EmptyStringException();
+            throw new EmptyStringException("Email");
         }
         if (strlen($value) > self::MAX_LENGTH) {
             throw new StringTooLongException(self::MAX_LENGTH);

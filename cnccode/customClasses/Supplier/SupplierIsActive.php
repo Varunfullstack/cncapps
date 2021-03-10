@@ -15,7 +15,7 @@ class SupplierIsActive
     /**
      * @return bool
      */
-    public function getValue(): bool
+    public function value(): bool
     {
         return $this->value;
     }

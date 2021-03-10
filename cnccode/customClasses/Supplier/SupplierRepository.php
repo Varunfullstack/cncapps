@@ -11,5 +11,6 @@ interface SupplierRepository
 
     public function getById(SupplierId $supplierId): Supplier;
 
+    public function save(Supplier $supplier): void;
 
 }

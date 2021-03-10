@@ -16,7 +16,7 @@ class SupplierWebsiteURL
     private $value;
 
     /**
-     * SupplierAddress1 constructor.
+     * SupplierWebsiteURL constructor.
      * @param $value
      * @throws EmptyStringException
      * @throws StringTooLongException
@@ -25,13 +25,17 @@ class SupplierWebsiteURL
     public function __construct(?string $value)
     {
         if ($value !== null && !$value) {
-            throw new EmptyStringException();
+            throw new EmptyStringException("Website URL");
         }
         if (strlen($value) > self::MAX_LENGTH) {
             throw new StringTooLongException(self::MAX_LENGTH);
         }
         if ($value && !filter_var($value, FILTER_VALIDATE_URL)) {
-            throw new URLNotValidException();
+            // try to add the https:// and see if we can fix it
+            $value = "https://$value";
+            if (!filter_var($value, FILTER_VALIDATE_URL)) {
+                throw new URLNotValidException();
+            }
         }
         $this->value = $value;
     }

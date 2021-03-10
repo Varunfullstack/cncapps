@@ -2,11 +2,14 @@
 
 namespace CNCLTD\Supplier\Domain\SupplierContact;
 
+use CNCLTD\ValueObject;
 use CNCLTD\ValueObjectCompare;
+use CNCLTD\ValueObjectIsNull;
 
-class Active
+class Active implements ValueObject
 {
     use ValueObjectCompare;
+    use ValueObjectIsNull;
 
     /** @var bool */
     private $value;
@@ -24,5 +27,4 @@ class Active
     {
         return $this->value;
     }
-
 }

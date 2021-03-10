@@ -233,11 +233,12 @@ class DB_Sql
             $a_params
         );
         if (!mysqli_stmt_execute($statement)) {
+            var_dump('here');
             $jsonParams = json_encode($parameters);
             $error      = mysqli_error(self::$Link_ID);
             throw new Exception("Failed to execute prepared query : {$error} $queryString, {$jsonParams}");
         }
-        $result = mysqli_stmt_get_result($statement);
+        $result      = mysqli_stmt_get_result($statement);
         $this->Row   = 0;
         $this->Errno = mysqli_errno(self::$Link_ID);
         $this->Error = mysqli_error(self::$Link_ID);
@@ -467,7 +468,7 @@ class DB_Sql
         $this->Row    += 1;
         $this->Errno  = mysqli_errno(self::$Link_ID);
         $this->Error  = mysqli_error(self::$Link_ID);
-        $stat = is_array($this->Record);
+        $stat         = is_array($this->Record);
         if (!$stat && $this->Auto_Free) {
             $this->free();
         }
