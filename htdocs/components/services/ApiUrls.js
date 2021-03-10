@@ -24,6 +24,7 @@ export default class ApiUrls {
     static CustomerType = "/CustomerType.php?action=";
     static Sector = "/Sector.php?action=";
     static ItemType = "/ItemType.php?action=";
-
+    static ExpenseType = "/ExpenseType.php?action=";
+    static Manufacturer = "/Manufacturer.php?action=";
 
 }
