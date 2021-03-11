@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v5.6.1] 
+## [v5.6.1] - 2021-03-11 
 ### Fixed
 - Unable to edit contracts.
 - Fixed information sent when priority changed email is sent to customer.
