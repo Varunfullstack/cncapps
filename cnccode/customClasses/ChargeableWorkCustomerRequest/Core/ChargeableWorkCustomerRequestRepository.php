@@ -3,5 +3,11 @@
 namespace CNCLTD\ChargeableWorkCustomerRequest\Core;
 interface ChargeableWorkCustomerRequestRepository
 {
-    public function getNextIdentity(): ChargeableWorkCustomerRequestId;
+    public function getNextIdentity(): ChargeableWorkCustomerRequestTokenId;
+
+    public function getById(ChargeableWorkCustomerRequestTokenId $id): ChargeableWorkCustomerRequest;
+
+    public function save(ChargeableWorkCustomerRequest $chargeableWorkCustomerRequest);
+
+    public function getByToken(ChargeableWorkCustomerRequestTokenId $token): ChargeableWorkCustomerRequest;
 }

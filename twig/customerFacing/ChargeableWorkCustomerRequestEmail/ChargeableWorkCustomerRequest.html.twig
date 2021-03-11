@@ -1,0 +1,37 @@
+{% extends '@customerFacing/wrapper.html.twig' %}
+{# @var data \CNCLTD\TwigDTOs\ChargeableWorkCustomerRequestEmailDTO #}
+{% block headerTitle %}
+    Service Request Information
+{% endblock %}
+
+{% block headerContet %}
+    We've got something to tell you
+{% endblock %}
+
+{% block content %}
+    <p>{{ data.requesteeFirstName }}</p>
+    <p>
+        We've worked on your Service Request {{ data.serviceRequestId }} and have an update for you.
+        More detailed information is available in our portal but here's something you should know.
+    </p>
+    <table style="width: 100%">
+        <tr>
+            <td class="details">
+                {{ data.lastActivityCustomerNotes | raw }}
+            </td>
+        </tr>
+    </table>
+    <p>
+        This update was added by {{ data.engineerFullName }}
+    </p>
+{% endblock %}
+
+{% block serviceRequestURL %}https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ data.serviceRequestId }}{% endblock %}
+
+{% block footerStatus %}
+    {{ data.serviceRequestStatus }}
+{% endblock %}
+
+{% block feedback %}
+
+{% endblock %}
