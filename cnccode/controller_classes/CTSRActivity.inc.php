@@ -272,13 +272,7 @@ class CTSRActivity extends CTCNC
             $currentUserBgColor = self::CONTENT;
             $currentUser        = null;
         }
-        $expenses = $this->getActivityExpenses($callActivityID);
-        $dbeUser  = $this->getDbeUser();
-        $dbeUser->setValue(
-            DBEUser::userID,
-            $this->userID
-        );
-        $dbeUser->getRow();
+        $expenses        = $this->getActivityExpenses($callActivityID);
         $dbeUserActivity = new DBEUser($this);
         $dbeUserActivity->getRow($dbejCallActivity->getValue(DBEJCallActivity::userID));
         $hdAssignedMinutes                     = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
@@ -297,21 +291,21 @@ class CTSRActivity extends CTCNC
         $isNotUserManagerAndActivityHasEndTime = !$isManagerUser && !$dbejCallActivity->getValue(
                 DBEJCallActivity::endTime
             );
-        $requestName ='';
-        $status=$dbeProblem->getValue(DBEProblem::status);
-        if($status=='I' ||$status=='P')
-            {
-                $requestUserID=$dbeProblem->getValue(DBEProblem::userID);
-                if(!empty($requestUserID))
-                {
-                    $requestUser=new DBEUser($this);
-                    $requestUser->getRow($requestUserID);
-                    $requestName =$requestUser->getValue(DBEUser::firstName).' '.substr($requestUser->getValue(DBEUser::lastName),0,1);
-                }
-                else  $requestName ='Unassigned';
+        $requestName                           = '';
+        $status                                = $dbeProblem->getValue(DBEProblem::status);
+        if ($status == 'I' || $status == 'P') {
+            $requestUserID = $dbeProblem->getValue(DBEProblem::userID);
+            if (!empty($requestUserID)) {
+                $requestUser = new DBEUser($this);
+                $requestUser->getRow($requestUserID);
+                $requestName = $requestUser->getValue(DBEUser::firstName) . ' ' . substr(
+                        $requestUser->getValue(DBEUser::lastName),
+                        0,
+                        1
+                    );
+            } else  $requestName = 'Unassigned';
 
-            }
-       // $requestName =$dbeProblem->getValue(DBEProblem::userID);
+        }
         $serviceRequestInternalNotesRepo = new CNCLTD\ServiceRequestInternalNote\infra\ServiceRequestInternalNotePDORepository(
         );
         $notes                           = $serviceRequestInternalNotesRepo->getServiceRequestInternalNotesForSR(
@@ -322,15 +316,15 @@ class CTSRActivity extends CTCNC
             function (ServiceRequestInternalNote $note) use ($consultants) {
                 $updatedByUserId = $note->getUpdatedBy();
                 if (!key_exists($updatedByUserId, $consultants)) {
-                    $dbeUser = new DBEUser($this);
-                    $dbeUser->getRow($updatedByUserId);
-                    $consultants[$updatedByUserId] = "{$dbeUser->getValue(DBEUser::firstName)} {$dbeUser->getValue(DBEUser::lastName)}";
+                    $createdByUser = new DBEUser($this);
+                    $createdByUser->getRow($updatedByUserId);
+                    $consultants[$updatedByUserId] = "{$createdByUser->getValue(DBEUser::firstName)} {$createdByUser->getValue(DBEUser::lastName)}";
                 }
                 $createdByUserId = $note->getCreatedBy();
                 if (!key_exists($createdByUserId, $consultants)) {
-                    $dbeUser = new DBEUser($this);
-                    $dbeUser->getRow($createdByUserId);
-                    $consultants[$createdByUserId] = "{$dbeUser->getValue(DBEUser::firstName)} {$dbeUser->getValue(DBEUser::lastName)}";
+                    $updatedByUser = new DBEUser($this);
+                    $updatedByUser->getRow($createdByUserId);
+                    $consultants[$createdByUserId] = "{$updatedByUser->getValue(DBEUser::firstName)} {$updatedByUser->getValue(DBEUser::lastName)}";
                 }
                 $array              = ServiceRequestInternalNotePDOMapper::toJSONArray($note);
                 $array['updatedBy'] = $consultants[$updatedByUserId];
@@ -352,12 +346,13 @@ class CTSRActivity extends CTCNC
         $taskListUpdatedBy       = null;
         if ($taskListUpdatedByUserId) {
             if (!key_exists($taskListUpdatedByUserId, $consultants)) {
-                $dbeUser = new DBEUser($this);
-                $dbeUser->getRow($taskListUpdatedByUserId);
-                $consultants[$taskListUpdatedByUserId] = "{$dbeUser->getValue(DBEUser::firstName)} {$dbeUser->getValue(DBEUser::lastName)}";
+                $taskListUpdatedByUser = new DBEUser($this);
+                $taskListUpdatedByUser->getRow($taskListUpdatedByUserId);
+                $consultants[$taskListUpdatedByUserId] = "{$taskListUpdatedByUser->getValue(DBEUser::firstName)} {$taskListUpdatedByUser->getValue(DBEUser::lastName)}";
             }
             $taskListUpdatedBy = $consultants[$taskListUpdatedByUserId];
         }
+        $currentLoggedInUser = $this->getDbeUser();
         return [
             "callActivityID"                  => $callActivityID,
             "problemID"                       => $problemID,
@@ -439,18 +434,18 @@ class CTSRActivity extends CTCNC
             'alarmTime'                       => $dbejCallActivity->getValue(DBEJCallActivity::alarmTime),
             'alarmDateMessage'                => $dbejCallActivity->getValue(DBEJCallActivity::alarmDate),
             'alarmTimeMessage'                => $dbejCallActivity->getValue(DBEJCallActivity::alarmTime),
-            'canChangeInitialDateAndTime'     => $dbeUser->getValue(DBEUser::queueManager) == 'Y',
+            'canChangeInitialDateAndTime'     => $currentLoggedInUser->getValue(DBEUser::queueManager) == 'Y',
             "isInitalDisabled"                => $this->isInitalDisabled($dbejCallActivity),
             'contactSupportLevel'             => $dbeContact->getValue(DBEContact::supportLevel),
             'hdRemainMinutes'                 => $hdAssignedMinutes - $hdUsedMinutes,
             'esRemainMinutes'                 => $esAssignedMinutes - $esUsedMinutes,
             'imRemainMinutes'                 => $imAssignedMinutes - $imUsedMinutes,
             'projectRemainMinutes'            => $projectTeamAssignedMinutes - $projectUsedMinutes,
-            "canChangePriorityFlag"           => $dbeUser->getValue(DBEUser::changePriorityFlag) == 'Y',
+            "canChangePriorityFlag"           => $currentLoggedInUser->getValue(DBEUser::changePriorityFlag) == 'Y',
             "userID"                          => $dbejCallActivity->getValue(DBEJCallActivity::userID),
             "actUserTeamId"                   => $dbeUserActivity->getValue(DBEUser::teamID),
             "contractCustomerItemID"          => $dbejCallActivity->getValue(DBEJCallActivity::contractCustomerItemID),
-            "changeSRContractsFlag"           => $dbeUser->getValue(DBEUser::changeSRContractsFlag) == 'Y',
+            "changeSRContractsFlag"           => $currentLoggedInUser->getValue(DBEUser::changeSRContractsFlag) == 'Y',
             "rootCauseID"                     => $dbejCallActivity->getValue(DBEJCallActivity::rootCauseID),
             'submitAsOvertime'                => $dbejCallActivity->getValue(DBECallActivity::submitAsOvertime),
             "siteMaxTravelHours"              => $dbeSite->getValue(DBESite::maxTravelHours),

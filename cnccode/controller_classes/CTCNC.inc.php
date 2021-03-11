@@ -281,6 +281,10 @@ class CTCNC extends Controller
     {
         if (!$this->dbeUser) {
             $this->dbeUser = new DBEUser ($this);
+            if ($this->userID) {
+                $this->dbeUser->getRow($this->userID);
+            }
+
         }
         return $this->dbeUser;
     }
@@ -722,7 +726,6 @@ class CTCNC extends Controller
                 "label" => "Customer Feedback",
                 "href"  => "CustomerFeedback.php"
             ],
-
         ];
 
     }
@@ -1240,32 +1243,39 @@ class CTCNC extends Controller
         }
         echo $js_code;
     }
-    function getBody(){
+
+    function getBody()
+    {
         return json_decode(file_get_contents('php://input'));
     }
-    function hideMenu(){
+
+    function hideMenu()
+    {
         $this->setHTMLFmt(CT_HTML_FMT_POPUP);
     }
+
     public function getParamOrNull($paramName)
     {
         if (!$paramName) {
             return null;
         }
-
         if (!isset($_REQUEST[$paramName])) {
             return null;
         }
-        if (@$_REQUEST[$paramName]=='') {
+        if (@$_REQUEST[$paramName] == '') {
             return null;
         }
         return $_REQUEST[$paramName];
     }
-    function getRequestMethodeName(){
-       return $_SERVER['REQUEST_METHOD'];
+
+    function getRequestMethodeName()
+    {
+        return $_SERVER['REQUEST_METHOD'];
     }
-    function getResponseError($code,$message)
+
+    function getResponseError($code, $message)
     {
         http_response_code($code);
-        return ["status"=>false,"error"=>$message];
+        return ["status" => false, "error" => $message];
     }
 }
