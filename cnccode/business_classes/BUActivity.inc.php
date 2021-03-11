@@ -826,8 +826,7 @@ class BUActivity extends Business
             $dbeProblem->updateRow();
             $message = "{$this->dbeUser->getValue(DBEUser::name)} Escalated from {$this->workQueueDescriptionArray[$oldQueueNo]} to {$this->workQueueDescriptionArray[$newQueueNo]}";
             //if ($dbeProblem->getValue(DBEProblem::status) == 'P') 
-            if($reason!='')
-            {
+            if ($reason != '') {
                 $message .= " because of {$reason}";
             }
             $message .= ".";
@@ -1380,7 +1379,10 @@ class BUActivity extends Business
         $hasNewReasonAndItsFinishedAndHasCustomerNotes = (!isset($oldReason) || $oldReason != $newReason) && $dsCallActivity->getValue(
                 DBEJCallActivity::endTime
             ) && $trimmedCustomerNotes;
-        if ($hasNewReasonAndItsFinishedAndHasCustomerNotes) {
+        $isHiddenFromCustomer                          = $dbeCallActivity->getValue(
+                DBEJCallActivity::hideFromCustomerFlag
+            ) == 'Y' || $problem->getValue(DBEProblem::hideFromCustomerFlag) == 'Y';
+        if ($hasNewReasonAndItsFinishedAndHasCustomerNotes && !$isHiddenFromCustomer) {
             $this->sendActivityLoggedEmail($dbeCallActivity->getValue(DBEJCallActivity::callActivityID));
         }
         $this->sendMonitoringEmails($dbeCallActivity->getValue(DBEJCallActivity::callActivityID));
@@ -1484,7 +1486,6 @@ class BUActivity extends Business
      * @param DBEJCallActivity $dbejCallactivity
      * @param string $othersFlag
      * @param string $subject
-     * @param string|null $selfFlag
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
@@ -1493,10 +1494,10 @@ class BUActivity extends Business
                                        $data,
                                        DBEJCallActivity $dbejCallactivity,
                                        string $othersFlag,
-                                       string $subject,
-                                       ?string $selfFlag = null
+                                       string $subject
     ): void
     {
+
         if (!$this->shouldSendCustomerEmail($dbejCallactivity)) {
             return;
         }
@@ -1532,11 +1533,11 @@ class BUActivity extends Business
         $dbeCallActType = new DBECallActType($this);
         $dbeCallActType->getRow($dbejCallactivity->getValue(DBEJCallActivity::callActTypeID));
         $dbeFirstActivity = $this->getFirstActivityInServiceRequest($serviceRequestId);
-        return $dbeCallActType->getValue(DBEJCallActType::customerEmailFlag) == 'Y' && $dbeProblem->getValue(
+        return $dbeProblem->getValue(
                 DBEProblem::hideFromCustomerFlag
             ) == 'N' && $dbeFirstActivity->getValue(
                 DBEJCallActivity::serverGuard
-            ) == 'N' && $dbejCallactivity->getValue(DBECallActivity::hideFromCustomerFlag) == 'N';
+            ) == 'N';
 
     }
 
@@ -2264,8 +2265,16 @@ class BUActivity extends Business
                 $problemID,
                 'Priority Changed from ' . $oldPriority . ' to ' . $problem->getValue(DBEJProblem::priority) . $reason
             );
-            $activity = $this->getLastActivityInProblem($problemID);
-            $this->sendPriorityChangedEmail($oldPriority, $priority, $slaResponseHours, $activity->getValue(DBECallActivity::callActivityID));
+            $activity             = $this->getLastActivityInProblem($problemID);
+            $isHiddenFromCustomer = $problem->getValue(DBEProblem::hideFromCustomerFlag) == 'Y';
+            if (!$isHiddenFromCustomer) {
+                $this->sendPriorityChangedEmail(
+                    $oldPriority,
+                    $priority,
+                    $slaResponseHours,
+                    $activity->getValue(DBECallActivity::callActivityID)
+                );
+            }
             return true;
         }
         return false;
@@ -5048,9 +5057,10 @@ class BUActivity extends Business
         );
         $template   = '@customerFacing/ServiceLogged/ServiceLogged.html.twig';
         $subject    = "Service Request {$serviceRequestId} - {$dbejCallactivity->getValue(DBEJCallActivity::emailSubjectSummary)} - Logged";
-        $selfFlag   = DBEContact::initialLoggingEmailFlag;
         $othersFlag = DBEContact::othersInitialLoggingEmailFlag;
-        $this->sendCustomerEmail($template, $data, $dbejCallactivity, $othersFlag, $subject);
+        if ($dbejCallactivity->getValue(DBEJCallActivity::hideFromCustomerFlag) !== 'Y') {
+            $this->sendCustomerEmail($template, $data, $dbejCallactivity, $othersFlag, $subject);
+        }
     }
 
     /**
@@ -6583,9 +6593,8 @@ class BUActivity extends Business
         );
         $template   = '@customerFacing/SalesOrderServiceRequestCreated/SalesOrderServiceRequestCreated.html.twig';
         $subject    = "Service Request {$dbejCallactivity->getValue(DBEJCallActivity::problemID)} - {$dbejCallactivity->getValue(DBEJCallActivity::emailSubjectSummary)} - Logged";
-        $selfFlag   = DBEContact::initialLoggingEmailFlag;
         $othersFlag = DBEContact::othersInitialLoggingEmailFlag;
-        $this->sendCustomerEmail($template, $data, $dbejCallactivity, $othersFlag, $subject, $selfFlag);
+        $this->sendCustomerEmail($template, $data, $dbejCallactivity, $othersFlag, $subject);
     }
 
     function getOnSiteActivitiesWithinFiveDaysOfActivity($callActivityID)
@@ -7150,7 +7159,7 @@ FROM
             // try to find the computer name from Labtech
             $labtechRepo  = new CNCLTD\LabtechRepo\LabtechPDORepo();
             $computerName = $labtechRepo->getComputerNameForComputerId($record->getMonitorAgentName());
-            if(!$computerName){
+            if (!$computerName) {
                 echo "Couldn't match Monitor Agent Name value : {$record->getMonitorAgentName()} to a computer name.";
             }
             $dbeProblem->setValue(DBEProblem::assetName, $computerName);
@@ -8261,7 +8270,9 @@ FROM
         if ($dbeProblem->getValue(DBEJProblem::escalatedUserID)) {
             $this->sendNotifyEscalatorUserEmail($problemID);
         }
-        $this->sendFixedEmail($problemID);
+        if ($dbeProblem->getValue(DBEProblem::hideFromCustomerFlag) == 'N') {
+            $this->sendFixedEmail($problemID);
+        }
         return true;
     }
 
@@ -10822,10 +10833,10 @@ FROM
      * @param $customerID
      * @return DBEJProblem
      */
-    function getCustomerOpenSR($customerID,$srNumber=null)
+    function getCustomerOpenSR($customerID, $srNumber = null)
     {
         $dbeJProblem = new DBEJProblem($this);
-        $dbeJProblem->getCustomerOpenRows($customerID,$srNumber);
+        $dbeJProblem->getCustomerOpenRows($customerID, $srNumber);
         return $dbeJProblem;
 
     }
