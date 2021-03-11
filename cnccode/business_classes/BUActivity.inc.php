@@ -2285,12 +2285,10 @@ class BUActivity extends Business
         $dbejCallactivity = new DBEJCallActivity($this);
         $dbejCallactivity->getRow($activityId);
         $serviceRequestId = $dbejCallactivity->getValue(DBEJCallActivity::problemID);
-        $buActivity       = new BUActivity($this);
-        $lastActivity     = $buActivity->getLastActivityInProblem($serviceRequestId);
         $status           = $this->getServiceRequestStatusText($dbejCallactivity);
         $data             = new \CNCLTD\TwigDTOs\PriorityChangedDTO(
             $serviceRequestId,
-            $lastActivity->getValue(DBEJCallActivity::reason),
+            $dbejCallactivity->getValue(DBEJCallActivity::reason),
             $dbejCallactivity->getValue(DBEJCallActivity::contactFirstName),
             $oldPriority,
             $newPriority,
