@@ -898,7 +898,7 @@ class BUActivity extends Business
     function logOperationalActivity($problemID,
                                     $description,
                                     $resetAwaitingCustomer = false
-    )
+    ): DBECallActivity
     {
         $lastActivity    = $this->getLastActivityInProblem($problemID);
         $dbeCallActivity = new DBECallActivity($this);
@@ -940,6 +940,7 @@ class BUActivity extends Business
             'C'
         );              // Checked
         $dbeCallActivity->insertRow();
+        return $dbeCallActivity;
     }
 
     function getLastActivityInProblem($problemID)
@@ -2261,18 +2262,17 @@ class BUActivity extends Business
             );
             $problem->setValue(DBEProblem::priority, $priority);
             $problem->updateRow();
-            $this->logOperationalActivity(
+            $operationalActivity = $this->logOperationalActivity(
                 $problemID,
                 'Priority Changed from ' . $oldPriority . ' to ' . $problem->getValue(DBEJProblem::priority) . $reason
             );
-            $activity             = $this->getLastActivityInProblem($problemID);
             $isHiddenFromCustomer = $problem->getValue(DBEProblem::hideFromCustomerFlag) == 'Y';
             if (!$isHiddenFromCustomer) {
                 $this->sendPriorityChangedEmail(
                     $oldPriority,
                     $priority,
                     $slaResponseHours,
-                    $activity->getValue(DBECallActivity::callActivityID)
+                    $operationalActivity->getValue(DBECallActivity::callActivityID)
                 );
             }
             return true;
