@@ -9,6 +9,7 @@ use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestRepos
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestRequesteeId;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestRequesterId;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestServiceRequestId;
+use CNCLTD\CommunicationService\CommunicationService;
 
 class CreateChargeableWorkCustomerRequest
 {
@@ -44,6 +45,6 @@ class CreateChargeableWorkCustomerRequest
             new ChargeableWorkCustomerRequestRequesterId($requester->getValue(\DBEUser::userID))
         );
         $this->repository->save($newRequest);
-
+        CommunicationService::sendExtraChargeableWorkRequestToContact($newRequest);
     }
 }
