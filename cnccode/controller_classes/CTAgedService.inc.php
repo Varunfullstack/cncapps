@@ -91,7 +91,7 @@ class CTAgedService extends CTCNC
         $sp       = $this->getParam("sp") == 'true';
         $p        = $this->getParam("p") == 'true';
         $p5       = false;
-        $rows     = $this->buDailyReport->getOustandingRequests(
+        $rows     = $this->buDailyReport->getOutstandingRequests(
             $daysAgo,
             $p5,
             $hd,

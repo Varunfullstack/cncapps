@@ -2260,11 +2260,12 @@ class BUActivity extends Business
             );
             $problem->setValue(DBEProblem::priority, $priority);
             $problem->updateRow();
-            $this->sendPriorityChangedEmail($oldPriority, $priority, $slaResponseHours, $callActivityID);
             $this->logOperationalActivity(
                 $problemID,
                 'Priority Changed from ' . $oldPriority . ' to ' . $problem->getValue(DBEJProblem::priority) . $reason
             );
+            $activity = $this->getLastActivityInProblem($problemID);
+            $this->sendPriorityChangedEmail($oldPriority, $priority, $slaResponseHours, $activity->getValue(DBECallActivity::callActivityID));
             return true;
         }
         return false;
