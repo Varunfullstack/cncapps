@@ -1,6 +1,14 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.6.1] 
+### Fixed
+- Unable to edit contracts.
+- Fixed information sent when priority changed email is sent to customer.
+### Changed
+- Show SR Summary in Aged SR Report.
+- Daily Stats box formatting.
+
 ## [v5.6.0] - 2021-03-10
 ### Added
 - Issue 1244 - Monthly Asset and Mailbox List Export.
