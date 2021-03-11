@@ -24,7 +24,7 @@ class CommunicationService
             $request->getServiceRequestId()->value(),
             $dbeProblem->getValue(\DBEProblem::emailSubjectSummary)
         );
-        $twig->render('@customerFacing/ActivityLogged/ActivityLogged.html.twig', ["data" => $dto]);
+        $twig->render('@customerFacing/ChargeableWorkCustomerRequestEmail/ChargeableWorkCustomerRequest.html.twig', ["data" => $dto]);
 
     }
 }
