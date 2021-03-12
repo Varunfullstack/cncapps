@@ -102,8 +102,7 @@
               and con_suppno <> 0;
             UPDATE
                 supplierContact
-            SET ACTIVE           = 1,
-                sup_web_site_url = if(sup_web_site_url = '', null, sup_web_site_url)
+            SET ACTIVE           = 1
             WHERE id IN (select sup_contno from supplier);
             UPDATE
                 supplier

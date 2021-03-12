@@ -1,7 +1,6 @@
 import React from 'react';
 import {params} from "../../utils/utils";
 import '../../style.css';
-import {VisibilityFilterOptions} from "../../customerEditMain/actions";
 import Table from "../../shared/table/table";
 import Modal from "../../shared/Modal/modal";
 import {SupplierService} from "../../services/SupplierService";
@@ -16,6 +15,11 @@ const EmptyEditingContact = {
     id: '',
     active: true
 };
+
+export const VisibilityFilterOptions = {
+    SHOW_ALL: 'SHOW_ALL',
+    SHOW_ACTIVE: 'SHOW_ACTIVE'
+}
 
 export class SupplierEditComponent extends React.PureComponent {
 

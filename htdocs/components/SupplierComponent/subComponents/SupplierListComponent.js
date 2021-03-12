@@ -1,8 +1,9 @@
 import React from "react";
 import Table from "../../shared/table/table";
 import {SupplierService} from "../../services/SupplierService";
-import {VisibilityFilterOptions} from "../../customerEditMain/actions";
+
 import Modal from "../../shared/Modal/modal";
+import {VisibilityFilterOptions} from "./SupplierEditComponent";
 
 const NewSupplierForm = {
     town: '',
