@@ -9,6 +9,7 @@ require_once(__DIR__ . "/../htdocs/config.inc.php");
 require_once($cfg ["path_bu"] . "/BUHeader.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 require_once($cfg["path_bu"] . '/BUCustomer.inc.php');
+require_once($cfg["path_bu"] . '/BUActivity.inc.php');
 $logName = 'CheckWebrootDeactivation';
 $logger  = new LoggerCLI($logName);
 // increasing execution time to infinity...
@@ -114,12 +115,22 @@ while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
     );
 }
 $sitesResponse = $webrootAPI->getSites();
-function raiseDuplicatedMIDRequest($computerName, $customerName)
+function getCustomerByNameOrNull($customerName): ?DBECustomer
 {
     $dbeCustomer = new DBECustomer($thing);
-    $customer    = $dbeCustomer->getCustomerByName($customerName);
-    $customerId  = 282;
-    $reason      = "$computerName is duplicated in Webroot Portal, please check and retire as appropriate";
+    $dbeCustomer->getCustomerByName($customerName);
+    if (!$dbeCustomer->rowCount) {
+        return null;
+    }
+    $dbeCustomer->fetchNext();
+    return $dbeCustomer;
+}
+
+function raiseDuplicatedMIDRequest($computerName, $customerName)
+{
+    $customer   = getCustomerByNameOrNull($customerName);
+    $customerId = 282;
+    $reason     = "$computerName is duplicated in Webroot Portal, please check and retire as appropriate";
     if (!$customer) {
         $reason .= " for customer $customerName";
     } else {
@@ -131,10 +142,9 @@ function raiseDuplicatedMIDRequest($computerName, $customerName)
 
 function raiseSeenInLabtechButNotWebrootRequest($computerName, $customerName, $thresholdDays)
 {
-    $dbeCustomer = new DBECustomer($thing);
-    $customer    = $dbeCustomer->getCustomerByName($customerName);
-    $customerId  = 282;
-    $reason      = "$computerName has not been seen in Webroot for over $thresholdDays days but has been reporting online within CW Automate so Webroot might be broken. Please review and correct";
+    $reason     = "$computerName has not been seen in Webroot for over $thresholdDays days but has been reporting online within CW Automate so Webroot might be broken. Please review and correct";
+    $customer   = getCustomerByNameOrNull($customerName);
+    $customerId = 282;
     if (!$customer) {
         $reason .= " for customer $customerName";
     } else {
@@ -146,10 +156,9 @@ function raiseSeenInLabtechButNotWebrootRequest($computerName, $customerName, $t
 
 function raiseSeenInWebrootButNotLabtechRequest($computerName, $customerName, $thresholdDays)
 {
-    $dbeCustomer = new DBECustomer($thing);
-    $customer    = $dbeCustomer->getCustomerByName($customerName);
-    $customerId  = 282;
-    $reason      = "$computerName has been seen in Webroot for within $thresholdDays days but has not been reporting online within CW Automate so the agent might be broken. Please review and correct";
+    $reason     = "$computerName has been seen in Webroot for within $thresholdDays days but has not been reporting online within CW Automate so the agent might be broken. Please review and correct";
+    $customer   = getCustomerByNameOrNull($customerName);
+    $customerId = 282;
     if (!$customer) {
         $reason .= " for customer $customerName";
     } else {
@@ -165,8 +174,11 @@ function raiseRequest($customerId, $reason, $computerName, $emailSubjectSummary)
     $buActivity     = new BUActivity($thing);
     $buCustomer     = new BUCustomer($thing);
     $primaryContact = $buCustomer->getPrimaryContact($customerId);
-    $buHeader       = new BUHeader($thing);
-    $dsHeader       = new DataSet($thing);
+    if (!$primaryContact) {
+        throw new Exception("Customer doesn't have a primary contact set");
+    }
+    $buHeader = new BUHeader($thing);
+    $dsHeader = new DataSet($thing);
     $buHeader->getHeader($dsHeader);
     $priority         = 3;
     $slaResponseHours = $buActivity->getSlaResponseHours(
@@ -345,7 +357,11 @@ foreach ($sitesResponse->sites as $site) {
                     "Duplicated MID : $mid from $customerName endpoint $computerName found, raising duplicated MDI request"
                 );
             }
-            raiseDuplicatedMIDRequest($computerName, $customerName);
+            try {
+                raiseDuplicatedMIDRequest($computerName, $customerName);
+            } catch (\Exception $exception) {
+                $logger->error($exception->getMessage());
+            }
         }
         $lastSeenDateTime = new DateTime($device->lastSeen);
         if ($debugMode) {
@@ -377,19 +393,27 @@ foreach ($sitesResponse->sites as $site) {
                 );
             }
             if ($lastSeenDateTime <= $toCheckDate && $labtechLastSeenDateTime > $toCheckDate) {
-                raiseSeenInLabtechButNotWebrootRequest(
-                    $computerName,
-                    $customerName,
-                    $dsHeader->getValue(DBEHeader::computerLastSeenThresholdDays)
-                );
+                try {
+                    raiseSeenInLabtechButNotWebrootRequest(
+                        $computerName,
+                        $customerName,
+                        $dsHeader->getValue(DBEHeader::computerLastSeenThresholdDays)
+                    );
+                } catch (\Exception $exception) {
+                    $logger->error($exception->getMessage());
+                }
                 $logger->warning("$computerName raising seen in Automate but not in Webroot request");
             }
             if ($lastSeenDateTime > $toCheckDate && $labtechLastSeenDateTime <= $toCheckDate) {
-                raiseSeenInWebrootButNotLabtechRequest(
-                    $computerName,
-                    $customerName,
-                    $dsHeader->getValue(DBEHeader::computerLastSeenThresholdDays)
-                );
+                try {
+                    raiseSeenInWebrootButNotLabtechRequest(
+                        $computerName,
+                        $customerName,
+                        $dsHeader->getValue(DBEHeader::computerLastSeenThresholdDays)
+                    );
+                } catch (\Exception $exception) {
+                    $logger->error($exception->getMessage());
+                }
                 $logger->warning("$computerName raising seen in Webroot but not in Automate request");
             }
         } else {
