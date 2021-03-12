@@ -287,6 +287,12 @@ class CTHeader extends CTCNC
                 'mailshot3FlagDefChecked'                                            => $this->getChecked(
                     $dsHeader->getValue(DBEJHeader::mailshot3FlagDef)
                 ),
+                'mailshot4FlagDesc'                                                  => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::mailshot4FlagDesc)
+                ),
+                'mailshot4FlagDefChecked'                                            => $this->getChecked(
+                    $dsHeader->getValue(DBEJHeader::mailshot4FlagDef)
+                ),
                 'mailshot8FlagDesc'                                                  => Controller::htmlInputText(
                     $dsHeader->getValue(DBEJHeader::mailshot8FlagDesc)
                 ),

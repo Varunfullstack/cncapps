@@ -7,8 +7,6 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
-use CNCLTD\Exceptions\JsonHttpException;
-use CNCLTD\Exceptions\ProjectCannotBeDeletedException;
 use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\Settings;
 use PhpOffice\PhpWord\SimpleType\JcTable;
@@ -63,7 +61,6 @@ class CTProject extends CTCNC
     const HOURLY_OOH_LABOUR_CHARGE = 16865;
     const GET_BUDGET_DATA = "getBudgetData";
     const CURRENT_PROJECTS_REPORT = "currentProjectsReport";
-    const ADD_PROJECT = 'addProject';
     var $dsProject = '';
     /** @var BUProject */
     var $buProject;
@@ -207,21 +204,6 @@ class CTProject extends CTCNC
                     JSON_NUMERIC_CHECK
                 );
                 break;
-            case self::ADD_PROJECT:
-                $data = $this->getJSONData();
-                $project = $this->createProject($data);
-                $buProject = new BUProject($this);
-                $projectData = [
-                    "id"          => $project->getValue(DBEProject::projectID),
-                    "name"        => $project->getValue(DBEProject::description),
-                    "notes"       => $project->getValue(DBEProject::notes),
-                    "startDate"   => $project->getValue(DBEProject::commenceDate),
-                    "expiryDate"  => $project->getValue(DBEProject::completedDate),
-                    "isDeletable" => $buProject->canDelete($project->getValue(DBEProject::projectID)),
-                ];
-
-                echo json_encode(["status" => "ok", "data" => $projectData]);
-                exit;
             case self::CURRENT_PROJECTS_REPORT:
                 $this->currentProjectReport();
                 break;
@@ -565,12 +547,21 @@ class CTProject extends CTCNC
             $this->getParam('projectID'),
             $dsProject
         );
-        try {
-            $this->buProject->deleteProject($this->getParam('projectID'));
-            echo json_encode(["status" => "ok"]);
+
+        if (!$this->buProject->deleteProject($this->getParam('projectID'))) {
+            $this->displayFatalError('Cannot delete this project');
             exit;
-        } catch (ProjectCannotBeDeletedException $exception) {
-            throw new JsonHttpException(400, 'Failed to delete project');
+        } else {
+            $urlNext =
+                Controller::buildLink(
+                    'Customer.php',
+                    array(
+                        'customerID' => $dsProject->getValue(DBEProject::customerID),
+                        'action'     => CTCNC_ACT_DISP_EDIT
+                    )
+                );
+            header('Location: ' . $urlNext);
+            exit;
         }
     }
 
@@ -1152,45 +1143,6 @@ GROUP BY caa_callacttypeno,
             $data[] = $db->Record;
         }
         return $data;
-    }
-
-    /**
-     * @param $data
-     * @throws JsonHttpException
-     */
-    private function createProject($data)
-    {
-        $this->guardAgainstMissingProjectData($data);
-        $dbeProject = new DBEProject($this);
-        $dbeProject->setValue(DBEProject::customerID, $data['customerId']);
-        $dbeProject->setValue(DBEProject::description, $data['description']);
-        $dbeProject->setValue(DBEProject::notes, $data['summary']);
-        $dbeProject->setValue(DBEProject::openedDate, $data['openedDate']);
-        $dbeProject->insertRow();
-        return $dbeProject;
-    }
-
-    /**
-     * @param $data
-     * @throws JsonHttpException
-     */
-    private function guardAgainstMissingProjectData($data)
-    {
-        if (!$data) {
-            throw new JsonHttpException(400, 'Required data is missing');
-        }
-        if (empty($data['customerId'])) {
-            throw new JsonHttpException(400, 'Required Customer Id');
-        }
-        if (empty($data['description'])) {
-            throw new JsonHttpException(400, 'Required Description');
-        }
-        if (empty($data['summary'])) {
-            throw new JsonHttpException(400, 'Required Summary');
-        }
-        if (empty($data['openedDate'])) {
-            throw new JsonHttpException(400, 'Required Opened Date');
-        }
     }
 
     /**

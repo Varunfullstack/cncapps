@@ -167,6 +167,288 @@ class CTContact extends CTCNC
     }
 
     /**
+     * Add/Edit Contact
+     *
+     * @access private
+     * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
+     */
+    function contactForm()
+    {
+        $this->setMethodName('contactForm');
+        // initialisation stuff
+        if ($this->getAction() == CTCNC_ACT_CONTACT_ADD) {
+            $urlSubmit = $this->contactFormPrepareAdd();
+        } else {
+            $urlSubmit = $this->contactFormPrepareEdit();
+        }
+        // template
+        $buHeader = new BUHeader($this);
+        $dsHeader = new DataSet($this);
+        $buHeader->getHeader($dsHeader);
+        $this->setTemplateFiles(
+            'ContactEdit',
+            'ContactEdit.inc'
+        );
+
+        $this->template->set_block(
+            'CustomerEdit',
+            'selectSupportLevel',
+            null
+        );
+
+        $this->template->set_block(
+            'ContactEdit',
+            'supportLevelBlock',
+            'selectSupportLevel'
+        );
+
+        $buContact = new BUContact($this);
+
+        $buContact->supportLevelDropDown(
+            $this->dsContact->getValue(DBEContact::supportLevel),
+            $this->template
+        );
+
+        $buCustomer = new BUCustomer($this);
+
+        $this->template->set_var(
+            array(
+                'contactID'                            => $this->dsContact->getValue(DBEContact::contactID),
+                'supplierID'                           => $this->dsContact->getValue(DBEContact::supplierID),
+                'customerID'                           => $this->dsContact->getValue(DBEContact::customerID),
+                'siteNo'                               => $this->dsContact->getValue(DBEContact::siteNo),
+                'firstName'                            => Controller::htmlInputText(
+                    $this->dsContact->getValue(DBEContact::firstName)
+                ),
+                'linkedInURL'                          => $this->dsContact->getValue(DBEContact::linkedInURL),
+                'firstNameMessage'                     => Controller::htmlDisplayText(
+                    $this->dsContact->getMessage(DBEContact::firstName)
+                ),
+                'lastName'                             => Controller::htmlInputText(
+                    $this->dsContact->getValue(DBEContact::lastName)
+                ),
+                'lastNameMessage'                      => Controller::htmlDisplayText(
+                    $this->dsContact->getMessage(DBEContact::lastName)
+                ),
+                'position'                             => Controller::htmlInputText(
+                    $this->dsContact->getValue(DBEContact::position)
+                ),
+                'positionMessage'                      => Controller::htmlDisplayText(
+                    $this->dsContact->getMessage(DBEContact::position)
+                ),
+                'title'                                => Controller::htmlInputText(
+                    $this->dsContact->getValue(DBEContact::title)
+                ),
+                'titleMessage'                         => Controller::htmlDisplayText(
+                    $this->dsContact->getMessage(DBEContact::title)
+                ),
+                'email'                                => Controller::htmlInputText(
+                    $this->dsContact->getValue(DBEContact::email)
+                ),
+                'emailMessage'                         => Controller::htmlDisplayText(
+                    $this->dsContact->getMessage(DBEContact::email)
+                ),
+                'portalPasswordButtonClass'            => $this->dsContact->getValue(
+                    DBEContact::portalPassword
+                ) ? 'lockedIcon' : 'unlockedIcon',
+                'failedLoginCount'                     => Controller::htmlDisplayText(
+                    $this->dsContact->getValue(DBEContact::failedLoginCount)
+                ),
+                'failedLoginCountMessage'              => Controller::htmlDisplayText(
+                    $this->dsContact->getMessage(DBEContact::failedLoginCount)
+                ),
+                'notes'                                => Controller::htmlInputText(
+                    $this->dsContact->getValue(DBEContact::notes)
+                ),
+                'notesMessage'                         => Controller::htmlDisplayText(
+                    $this->dsContact->getMessage(DBEContact::notes)
+                ),
+                'phone'                                => Controller::htmlDisplayText(
+                    $this->dsContact->getValue(DBEContact::phone)
+                ),
+                'phoneMessage'                         => Controller::htmlDisplayText(
+                    $this->dsContact->getMessage(DBEContact::phone)
+                ),
+                'mobilePhone'                          => Controller::htmlDisplayText(
+                    $this->dsContact->getValue(DBEContact::mobilePhone)
+                ),
+                'mobilePhoneMessage'                   => Controller::htmlDisplayText(
+                    $this->dsContact->getMessage(DBEContact::mobilePhone)
+                ),
+                'accountsFlagChecked'                  => Controller::htmlChecked(
+                    $this->dsContact->getValue(DBEContact::accountsFlag)
+                ),
+                'sendMailshotFlagChecked'              => Controller::htmlChecked(
+                    $this->dsContact->getValue(DBEContact::sendMailshotFlag)
+                ),
+                'discontinuedFlagChecked'              => Controller::htmlChecked(
+                    $this->dsContact->getValue(DBEContact::discontinuedFlag)
+                ),
+                'reviewUserFlagChecked'                => Controller::htmlChecked(
+                    $this->dsContact->getValue(DBEContact::reviewUser)
+                ),
+                'initialLoggingEmailFlagChecked'       => $this->getChecked(
+                    $this->dsContact->getValue(DBEContact::initialLoggingEmailFlag)
+                ),
+                'workStartedEmailFlagChecked'          => $this->getChecked(
+                    $this->dsContact->getValue(DBEContact::workStartedEmailFlag)
+                ),
+                'workUpdatesEmailFlagChecked'          => $this->getChecked(
+                    $this->dsContact->getValue(DBEContact::workUpdatesEmailFlag)
+                ),
+                'fixedEmailFlagChecked'                => $this->getChecked(
+                    $this->dsContact->getValue(DBEContact::fixedEmailFlag)
+                ),
+                'pendingClosureEmailFlagChecked'       => $this->getChecked(
+                    $this->dsContact->getValue(DBEContact::pendingClosureEmailFlag)
+                ),
+                'closureEmailFlagChecked'              => $this->getChecked(
+                    $this->dsContact->getValue(DBEContact::closureEmailFlag)
+                ),
+                'othersInitialLoggingEmailFlagChecked' => $this->getChecked(
+                    $this->dsContact->getValue(DBEContact::othersInitialLoggingEmailFlag)
+                ),
+                'othersWorkStartedEmailFlagChecked'    => $this->getChecked(
+                    $this->dsContact->getValue(DBEContact::othersWorkStartedEmailFlag)
+                ),
+                'othersWorkUpdatesEmailFlagChecked'    => $this->getChecked(
+                    $this->dsContact->getValue(DBEContact::othersWorkUpdatesEmailFlag)
+                ),
+                'othersFixedEmailFlagChecked'          => $this->getChecked(
+                    $this->dsContact->getValue(DBEContact::othersFixedEmailFlag)
+                ),
+                'othersPendingClosureEmailFlagChecked' => $this->getChecked(
+                    $this->dsContact->getValue(DBEContact::othersPendingClosureEmailFlag)
+                ),
+                'othersClosureEmailFlagChecked'        => $this->getChecked(
+                    $this->dsContact->getValue(DBEContact::othersClosureEmailFlag)
+                ),
+                'hrUserFlagChecked'                    => Controller::htmlChecked(
+                    $this->dsContact->getValue(DBEContact::hrUser)
+                ),
+                'topUpValidation'                      => $buCustomer->hasPrepayContract(
+                    DBEContact::customerID
+                ) ? 'data-validation="atLeastOne"' : null,
+                'mailshot2FlagDesc'                    => Controller::htmlDisplayText(
+                    $dsHeader->getValue(DBEHeader::mailshot2FlagDesc)
+                ),
+                'mailshot3FlagDesc'                    => Controller::htmlDisplayText(
+                    $dsHeader->getValue(DBEHeader::mailshot3FlagDesc)
+                ),
+                'mailshot4FlagDesc'                    => Controller::htmlDisplayText(
+                    $dsHeader->getValue(DBEHeader::mailshot4FlagDesc)
+                ),
+                'mailshot8FlagDesc'                    => Controller::htmlDisplayText(
+                    $dsHeader->getValue(DBEHeader::mailshot8FlagDesc)
+                ),
+                'mailshot9FlagDesc'                    => Controller::htmlDisplayText(
+                    $dsHeader->getValue(DBEHeader::mailshot9FlagDesc)
+                ),
+                'mailshot11FlagDesc'                   => Controller::htmlDisplayText(
+                    $dsHeader->getValue(DBEHeader::mailshot11FlagDesc)
+                ),
+                'mailshot2FlagChecked'                 => Controller::htmlChecked(
+                    $this->dsContact->getValue(DBEContact::mailshot2Flag)
+                ),
+                'mailshot3FlagChecked'                 => Controller::htmlChecked(
+                    $this->dsContact->getValue(DBEContact::mailshot3Flag)
+                ),
+                'mailshot4FlagChecked'                 => Controller::htmlChecked(
+                    $this->dsContact->getValue(DBEContact::mailshot4Flag)
+                ),
+                'mailshot8FlagChecked'                 => Controller::htmlChecked(
+                    $this->dsContact->getValue(DBEContact::mailshot8Flag)
+                ),
+                'mailshot9FlagChecked'                 => Controller::htmlChecked(
+                    $this->dsContact->getValue(DBEContact::mailshot9Flag)
+                ),
+                'mailshot11FlagChecked'                => Controller::htmlChecked(
+                    $this->dsContact->getValue(DBEContact::mailshot11Flag)
+                ),
+                'pendingLeaverFlagChecked'             => ($this->dsContact->getValue(
+                        DBEContact::pendingLeaverFlag
+                    ) == 'Y') ? CT_CHECKED : null,
+                'pendingLeaverDate'                    => $this->dsContact->getValue(DBEContact::pendingLeaverDate),
+                'urlSubmit'                            => $urlSubmit,
+                //				'urlCancel' => $urlCancel
+            )
+        );
+        $this->template->parse(
+            'CONTENTS',
+            'ContactEdit',
+            true
+        );
+        $this->parsePage();
+    }
+
+    /**
+     * Prepare for add
+     *
+     * @access private
+     * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
+     */
+    function contactFormPrepareAdd()
+    {
+        // If form error then preserve values in $this->dsContact else initialise new
+        $this->setPageTitle(CTCONTACT_TXT_NEW_CONTACT);
+        if (!$this->getFormError()) {
+            if (!$this->getParam('supplierID') && !$this->getParam('customerID')) {
+                $this->raiseError('supplierID or customerID not passed');
+            }
+            if ($this->getParam('customerID') && $this->getParam('siteNo') == "") {
+                $this->raiseError('siteNo not passed');
+            }
+            $this->buContact->initialiseNewContact(
+                $this->getParam('supplierID'),
+                $this->getParam('customerID'),
+                $this->getParam('siteNo'),
+                $this->dsContact
+            );
+        }
+        return Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'  => CTCONTACT_ACT_CONTACT_INSERT,
+                'htmlFmt' => CT_HTML_FMT_POPUP
+            )
+        );
+    }
+
+    /**
+     * Prepare for edit
+     *
+     * @access private
+     * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
+     */
+    function contactFormPrepareEdit()
+    {
+        $this->setPageTitle(CTCONTACT_TXT_UPDATE_CONTACT);
+        // if updating and not a form error then validate passed id and get row from DB
+        if (!$this->getFormError()) {
+            if (empty($this->getParam('contactID'))) {
+                $this->displayFatalError(CTCONTACT_MSG_CONTACTID_NOT_PASSED);
+            }
+            if (!$this->buContact->getContactByID(
+                $this->getParam('contactID'),
+                $this->dsContact
+            )) {
+                $this->displayFatalError(CTCONTACT_MSG_CONTACT_NOT_FND);
+            }
+        }
+        return Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'  => CTCONTACT_ACT_CONTACT_UPDATE,
+                'htmlFmt' => CT_HTML_FMT_POPUP
+            )
+
+        );
+    }
+
+    /**
      * Update contact record
      * @access private
      * @throws Exception

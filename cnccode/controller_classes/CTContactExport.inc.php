@@ -19,9 +19,10 @@ require_once($cfg['path_dbe'] . '/DBEStandardText.inc.php');
 class CTContactExport extends CTCNC
 {
     const searchFormCustomerID          = 'customerID';
-    const searchFormMailshot            = 'mailshot';
+    const searchFormSendMailshotFlag    = 'sendMailshotFlag';
     const searchFormMailshot2Flag       = 'mailshot2Flag';
     const searchFormMailshot3Flag       = 'mailshot3Flag';
+    const searchFormMailshot4Flag       = 'mailshot4Flag';
     const searchFormMailshot8Flag       = 'mailshot8Flag';
     const searchFormMailshot9Flag       = 'mailshot9Flag';
     const searchFormMailshot11Flag      = 'mailshot11Flag';
@@ -264,7 +265,7 @@ WHERE customer.`cus_referred` <> 'Y'
             DA_ALLOW_NULL
         );
         $dsSearchForm->addColumn(
-            self::searchFormMailshot,
+            self::searchFormSendMailshotFlag,
             DA_YN,
             DA_ALLOW_NULL
         );
@@ -281,6 +282,11 @@ WHERE customer.`cus_referred` <> 'Y'
         );
         $dsSearchForm->addColumn(
             self::searchFormMailshot3Flag,
+            DA_YN,
+            DA_ALLOW_NULL
+        );
+        $dsSearchForm->addColumn(
+            self::searchFormMailshot4Flag,
             DA_YN,
             DA_ALLOW_NULL
         );
@@ -473,7 +479,9 @@ WHERE customer.`cus_referred` <> 'Y'
                 'prospectFlagCustomerSelected' => $dsSearchForm->getValue(
                     self::searchFormProspectFlag
                 ) == 'N' ? 'SELECTED' : null,
-                'mailshotChecked'              => $dsSearchForm->getValue(self::searchFormMailshot) ? "checked" : null,
+                'sendMailshotFlagChecked'      => Controller::htmlChecked(
+                    $dsSearchForm->getValue(self::searchFormSendMailshotFlag)
+                ),
                 'exportEmailOnlyFlagChecked'   => Controller::htmlChecked(
                     $dsSearchForm->getValue(self::searchFormExportEmailOnlyFlag)
                 ),
@@ -482,6 +490,9 @@ WHERE customer.`cus_referred` <> 'Y'
                 ),
                 'mailshot3FlagChecked'         => Controller::htmlChecked(
                     $dsSearchForm->getValue(self::searchFormMailshot3Flag)
+                ),
+                'mailshot4FlagChecked'         => Controller::htmlChecked(
+                    $dsSearchForm->getValue(self::searchFormMailshot4Flag)
                 ),
                 'mailshot8FlagChecked'         => Controller::htmlChecked(
                     $dsSearchForm->getValue(self::searchFormMailshot8Flag)
@@ -497,6 +508,9 @@ WHERE customer.`cus_referred` <> 'Y'
                 ),
                 'mailshot3FlagDesc'            => Controller::htmlDisplayText(
                     $dsHeader->getValue(DBEHeader::mailshot3FlagDesc)
+                ),
+                'mailshot4FlagDesc'            => Controller::htmlDisplayText(
+                    $dsHeader->getValue(DBEHeader::mailshot4FlagDesc)
                 ),
                 'mailshot8FlagDesc'            => Controller::htmlDisplayText(
                     $dsHeader->getValue(DBEHeader::mailshot8FlagDesc)
