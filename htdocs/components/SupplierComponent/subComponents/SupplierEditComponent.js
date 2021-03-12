@@ -606,13 +606,12 @@ export class SupplierEditComponent extends React.PureComponent {
     }
 
     editContactRowFunction = (contactRow) => {
+
         return () => {
-            this.setState(
-                {
-                    editingContact: {...contactRow},
-                    showContactEditModal: true
-                }
-            );
+            this.setState({
+                editingContact: {...contactRow},
+                showContactEditModal: true
+            });
             this.handleValidation(contactRow)
         }
     }
