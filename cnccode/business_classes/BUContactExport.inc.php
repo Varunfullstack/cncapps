@@ -66,7 +66,7 @@ class BUContactExport extends Business
         {$DBEContact->getDBColumnName($DBEContact::email)} AS EmailAddress,
         CONCAT({$DBEContact->getDBColumnName($DBEContact::firstName)},' ',{$DBEContact->getDBColumnName($DBEContact::lastName)}) AS DisplayName,
         {$dbeCustomer->getDBColumnName(DBECustomer::becameCustomerDate)} is not null and {$dbeCustomer->getDBColumnName(DBECustomer::droppedCustomerDate)} is null AS Prospect";
-            if ($dsSearchForm->getValue(CTContactExport::searchFormMailshot)) {
+            if ($dsSearchForm->getValue(CTContactExport::searchFormSendMailshotFlag)) {
                 $query .= ", {$dbeCustomer->getDBColumnName(DBECustomer::mailshotFlag)} AS `Mailshot`";
             }
             if ($dsSearchForm->getValue(CTContactExport::searchFormMailshot2Flag)) {
@@ -77,6 +77,11 @@ class BUContactExport extends Business
             if ($dsSearchForm->getValue(CTContactExport::searchFormMailshot3Flag)) {
                 $query .= ", {$DBEContact->getDBColumnName($DBEContact::mailshot3Flag)} AS `" . $dsHeader->getValue(
                         DBEHeader::mailshot3FlagDesc
+                    ) . "`";
+            }
+            if ($dsSearchForm->getValue(CTContactExport::searchFormMailshot4Flag)) {
+                $query .= ", {$DBEContact->getDBColumnName($DBEContact::mailshot4Flag)} AS `" . $dsHeader->getValue(
+                        DBEHeader::mailshot4FlagDesc
                     ) . "`";
             }
             if ($dsSearchForm->getValue(CTContactExport::searchFormMailshot8Flag)) {
@@ -200,7 +205,7 @@ class BUContactExport extends Business
                 $possibleOrQueries .= $condition;
             }
         }
-        if ($dsSearchForm->getValue(DBEContact::mailshot)) {
+        if ($dsSearchForm->getValue(DBEContact::sendMailshotFlag)) {
             if (strlen($possibleOrQueries)) {
                 $possibleOrQueries .= $searchCriteria;
             }
@@ -229,6 +234,12 @@ class BUContactExport extends Business
                 $possibleOrQueries .= $searchCriteria;
             }
             $possibleOrQueries .= "  {$DBEContact->getDBColumnName($DBEContact::mailshot3Flag)} =  'Y' ";
+        }
+        if ($dsSearchForm->getValue(DBEContact::mailshot4Flag)) {
+            if (strlen($possibleOrQueries)) {
+                $possibleOrQueries .= $searchCriteria;
+            }
+            $possibleOrQueries .= "  {$DBEContact->getDBColumnName($DBEContact::mailshot4Flag)} =  'Y' ";
         }
         if ($dsSearchForm->getValue(DBEContact::mailshot8Flag)) {
             if (strlen($possibleOrQueries)) {

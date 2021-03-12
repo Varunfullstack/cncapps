@@ -332,6 +332,10 @@ class BUContact extends Business
             $customerID
         );
         $dsResults->setValue(
+            DBEContact::discontinuedFlag,
+            'N'
+        );
+        $dsResults->setValue(
             DBEContact::notes,
             null
         );
@@ -342,6 +346,10 @@ class BUContact extends Business
         $dsResults->setValue(
             DBEContact::mailshot3Flag,
             $dsHeader->getValue(DBEHeader::mailshot3FlagDef)
+        );
+        $dsResults->setValue(
+            DBEContact::mailshot4Flag,
+            $dsHeader->getValue(DBEHeader::mailshot4FlagDef)
         );
         $dsResults->setValue(
             DBEContact::mailshot8Flag,
@@ -375,11 +383,19 @@ class BUContact extends Business
         // create/populate new dataset
         $dsResults->copyColumnsFrom($this->dbeContact);
         $dsResults->setValue(
+            DBEContact::discontinuedFlag,
+            'N'
+        );
+        $dsResults->setValue(
             DBEContact::mailshot2Flag,
             'N'
         );
         $dsResults->setValue(
             DBEContact::mailshot3Flag,
+            'N'
+        );
+        $dsResults->setValue(
+            DBEContact::mailshot4Flag,
             'N'
         );
         $dsResults->setValue(

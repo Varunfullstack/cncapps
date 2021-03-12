@@ -1,0 +1,115 @@
+<!-- Template: ActivitySearch.inc.html -->
+<script language='JavaScript' src="CommonJS.js"></script>
+
+<P class="formErrorMessage">{formError}</P>
+<form name="searchForm" method="post" action="{urlSubmit}">
+    <table width="500px" border="0" cellspacing="0" cellpadding="1">
+        <tr>
+            <td class="promptText">
+                <div align="right">Send Mailshot</div>
+            </td>
+            <td>
+                <input type="checkbox" name="searchForm[1][sendMailshotFlag]" value="Y" {sendMailshotFlagChecked}>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">{mailshot2FlagDesc}</div>
+            </td>
+            <td>
+                <input type="checkbox" name="searchForm[1][mailshot2Flag]" value="Y" {mailshot2FlagChecked}>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">{mailshot3FlagDesc}</div>
+            </td>
+            <td>
+                <input type="checkbox" name="searchForm[1][mailshot3Flag]" value="Y" {mailshot3FlagChecked}>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">{mailshot4FlagDesc}</div>
+            </td>
+            <td>
+                <input type="checkbox" name="searchForm[1][mailshot2Flag]" value="Y" {mailshot4FlagChecked}>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="promptText">
+                <div align="right">{mailshot8FlagDesc}</div>
+            </td>
+            <td>
+                <input type="checkbox" name="searchForm[1][mailshot8Flag]" value="Y" {mailshot8FlagChecked}>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">{mailshot9FlagDesc}</div>
+            </td>
+            <td>
+                <input type="checkbox" name="searchForm[1][mailshot9Flag]" value="Y" {mailshot9FlagChecked}>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">Broadband Renewal</div>
+            </td>
+            <td>
+                <input type="checkbox" name="searchForm[1][broadbandRenewalFlag]" value="Y"
+                       {broadbandRenewalFlagChecked}>
+                <input
+                        type="text"
+                        name="searchForm[1][broadbandIsp]"
+                        value="{broadbandIsp}"
+                >
+            </td>
+
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">Contract Renewal</div>
+            </td>
+            <td>
+                <input type="checkbox" name="searchForm[1][contractRenewalFlag]" value="Y" {contractRenewalFlagChecked}>
+                <select
+                        name="searchForm[1][contractRenewalTypeID]"
+                >
+                    <option value="">All types</option>
+                    <!-- BEGIN contractRenwalTypeBlock -->
+                    <option {contractRenwalTypeSelected} value="{contractRenwalTypeID}">{contractRenwalTypeDesc}
+                    </option>
+                    <!-- END contractRenwalTypeBlock -->
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">Quotation Renewal</div>
+            </td>
+            <td>
+                <input type="checkbox" name="searchForm[1][quotationRenewalFlag]" value="Y"
+                       {quotationRenewalFlagChecked}>
+                <select
+                        name="searchForm[1][quotationRenewalTypeID]"
+                >
+                    <option value="">All types</option>
+                    <!-- BEGIN quotationRenwalTypeBlock -->
+                    <option {quotationRenwalTypeSelected} value="{quotationRenwalTypeID}">{quotationRenwalTypeDesc}
+                    </option>
+                    <!-- END quotationRenwalTypeBlock -->
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td><input type="submit" name="Search" value="Search"
+                       onClick="submit();"> <input type="submit" name="CSV"
+                                                   value="CSV"> <input type="button" name="Clear" value="Clear"
+                                                                       onClick="document.location='Activity.php'"/></td>
+        </tr>
+    </table>
+</form>
+<!-- End Template: ActivitySearch.inc.html -->

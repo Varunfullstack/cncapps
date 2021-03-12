@@ -12,7 +12,7 @@ page_open(
     )
 );
 header("Cache-control: private");
-global $cfg;
+
 $ctPurchaseOrder = new CTPurchaseOrder(
     $_SERVER['REQUEST_METHOD'], $_POST, $_GET, $_COOKIE, $cfg
 );

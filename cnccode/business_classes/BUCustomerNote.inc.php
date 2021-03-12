@@ -24,76 +24,37 @@ class BUCustomerNote extends Business
     }
 
     function updateNote(
+        $customerID,
+        $customerNoteID,
         $details,
-        $customerNoteID = null,
-        $customerID = null,
-        $lastUpdatedDateTimeString = null
+        $ordheadID = false
     )
     {
         $this->setMethodName('updateNote');
 
         $dbeCustomerNote = new DBECustomerNote($this);
-        $isNewNote = !$customerNoteID || $customerNoteID == -1;
-        $nowDateTimeString = (new DateTime())->format(DATE_MYSQL_DATETIME);
-        if (!$isNewNote) {
+
+
+        if ($customerNoteID) {
             $dbeCustomerNote->getRow($customerNoteID);
-            // if it's an update we have to check the last updated date time and if it's lower throw an error
-            if (!$lastUpdatedDateTimeString || $dbeCustomerNote->getValue(
-                    DBECustomerNote::modifiedAt
-                ) > $lastUpdatedDateTimeString) {
-                throw new \CNCLTD\Exceptions\JsonHttpException(
-                    400, "The note has been modified by someone else", [
-                           "errorCode"           => 1002,
-                           "lastUpdatedDateTime" => $dbeCustomerNote->getValue(DBECustomerNote::modifiedAt)
-                       ]
-                );
-            }
         } else {
             $dbeCustomerNote->setValue(DBECustomerNote::customerID, $customerID);
             $dbeCustomerNote->setValue(DBECustomerNote::createdUserID, $GLOBALS['auth']->is_authenticated());
-            $dbeCustomerNote->setValue(DBECustomerNote::created, $nowDateTimeString);
+            $dbeCustomerNote->setValue(DBECustomerNote::created, (new DateTime())->format('d/m/Y H:i:s'));
         }
+        $dbeCustomerNote->setValue(DBECustomerNote::orderID, $ordheadID);
         $dbeCustomerNote->setValue(DBECustomerNote::details, $details);
         $dbeCustomerNote->setValue(DBECustomerNote::modifiedUserID, $GLOBALS['auth']->is_authenticated());
-        $dbeCustomerNote->setValue(DBECustomerNote::modifiedAt, $nowDateTimeString);
+        $dbeCustomerNote->setValue(DBECustomerNote::modifiedAt, (new DateTime())->format('d/m/Y H:i:s'));
 
-        if (!$isNewNote) {
+        if ($customerNoteID) {
             $dbeCustomerNote->updateRow();
+            return $this->getNote($customerID, false, 'this', $customerNoteID);
         } else {
             $dbeCustomerNote->insertRow();
+            return $this->getNote($customerID, false, 'last');
+
         }
-        return $this->getNoteByID($dbeCustomerNote->getValue(DBECustomerNote::customerNoteID));
-    }
-
-    function getNoteByID($noteId)
-    {
-        $this->setMethodName('getNotesByCustomerID');
-
-        $sql = "
-      SELECT
-        `cno_customernoteno` as id,
-        `cno_custno` as customerId,
-        `cno_created` as createdAt,
-        `cno_modified` as modifiedAt,
-        `cno_modified_consno` as modifiedById,
-        `cno_details` as note,
-        `cno_created_consno` as createdById,
-        `cns_name` as modifiedByName
-      FROM
-        customernote
-        JOIN
-          consultant ON cns_consno = cno_modified_consno
-      WHERE
-        cno_customernoteno = ?
-      ORDER BY
-        cno_created desc";
-
-        $statement = $this->db->prepare($sql);
-        $statement->bind_param('i', $noteId);
-        $statement->execute();
-        $result = $statement->get_result();
-
-        return $result->fetch_assoc();
     }
 
     function getNote(
@@ -177,29 +138,27 @@ class BUCustomerNote extends Business
 
         $sql = "
       SELECT
-        `cno_customernoteno` as id,
-        `cno_custno` as customerId,
-        `cno_created` as createdAt,
-        `cno_modified` as modifiedAt,
-        `cno_modified_consno` as modifiedById,
-        `cno_details` as note,
-        `cno_created_consno` as createdById,
-        `cns_name` as modifiedByName
+        `cno_customernoteno`,
+        `cno_custno`,
+        `cno_created`,
+        `cno_modified`,
+        `cno_modified_consno`,
+        `cno_details`,
+        `cno_created_consno`,
+        `cno_ordno`,
+        `cns_name`
       FROM
         customernote
         JOIN
           consultant ON cns_consno = cno_modified_consno
       WHERE
-        cno_custno = ?
+        cno_custno = $customerID
       ORDER BY
         cno_created desc";
 
-        $statement = $this->db->prepare($sql);
-        $statement->bind_param('i', $customerID);
-        $statement->execute();
-        $result = $statement->get_result();
+        $ret = $this->db->query($sql);
 
-        return $result->fetch_all(MYSQLI_ASSOC);
+        return $ret;
 
     } // end function getnotesbycustomerid
 

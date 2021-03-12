@@ -11,7 +11,7 @@ page_open(
         ''
     )
 );
-global $cfg;
+
 header("Cache-control: private");
 $ctSupplier = new CTSupplier(
     $_SERVER['REQUEST_METHOD'], $_POST, $_GET, $_COOKIE, $cfg

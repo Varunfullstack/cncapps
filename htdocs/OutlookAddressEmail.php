@@ -73,7 +73,7 @@ FROM contact
 JOIN supplier ON
 	con_suppno = sup_suppno
 WHERE
-	mailshot AND
+	con_mailshot =  "Y" AND
 	con_suppno <> 0
 )
 ORDER BY Company, LastName';

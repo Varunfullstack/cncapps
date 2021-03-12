@@ -29,6 +29,7 @@ class CustomerValidation
         $atLeastOneAtMostOneStatement = false;
         $atLeastOneMain = false;
         $atLeastOneReview = false;
+        $statementCount = 0;
         $atLeastOneTopUp = !$buCustomer->hasPrepayContract($this->customerId);
         $atLeastOneReport = false;
 
@@ -40,6 +41,15 @@ class CustomerValidation
 
             if ($dsContacts->getValue(\DBEContact::mailshot2Flag) == 'Y' && !$atLeastOneInvoice) {
                 $atLeastOneInvoice = true;
+            }
+
+            if ($dsContacts->getValue(\DBEContact::mailshot4Flag) == 'Y') {
+                if (!$atLeastOneAtMostOneStatement && !$statementCount) {
+                    $atLeastOneAtMostOneStatement = true;
+                    $statementCount++;
+                } else {
+                    $atLeastOneAtMostOneStatement = false;
+                }
             }
 
             if ($dsContacts->getValue(

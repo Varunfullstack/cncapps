@@ -1,0 +1,219 @@
+<!-- Template: PasswordSearch.inc.html -->
+
+<script type="text/javascript">
+    const autocompleteURL = "/Customer.php?action=searchName";
+    window.addEventListener('DOMContentLoaded', function () {
+        $('#customerString')[0].addEventListener('autocompleteselect', function ($event) {
+            $('#customerID').val($event.detail.item.value);
+        });
+    });
+
+    function checkCustomerId() {
+        if (!$('#customerID').val()) {
+            alert('Please select a specific customer');
+            return false;
+        }
+        return true;
+    }
+
+</script>
+<style>
+    input[type=text], select {
+        -ms-box-sizing: content-box;
+        -moz-box-sizing: content-box;
+        -webkit-box-sizing: content-box;
+        box-sizing: content-box;
+        padding: 5px;
+        width: 243px;
+        font-size: 14px
+    }
+
+    button {
+        padding: 5px 9px;
+        font-size: 14px;
+    }
+
+    hr {
+        margin-top: 20px;
+    }
+</style>
+
+<H2>{customerName}</H2>
+
+<form name="search"
+      id="search"
+      method="post"
+      action="{urlSubmit}"
+      onsubmit="return checkCustomerId();"
+>
+    <input type="hidden"
+           name="action"
+           value="search"
+    >
+    <table width="500px"
+           border="0"
+           cellspacing="0"
+           cellpadding="1"
+    >
+        <tr>
+            <td width="130"
+                class="promptText"
+            >
+                <div align="right">Customer</div>
+            </td>
+            <td>
+                <input
+                        type="hidden"
+                        name="searchForm[1][customerID]"
+                        id="customerID"
+                        value="{customerID}"
+                > <input
+                    type="text"
+                    id="customerString"
+                    name="customerString"
+                    value="{customerString}"
+                    required
+                    maxlength="50"
+                    customer-search
+            >
+                <button>
+                    Search
+                </button>
+            </td>
+        </tr>
+        <tr>
+            <td><font class="formErrorMessage">
+                {customerStringMessage} </font></td>
+        </tr>
+    </table>
+
+</form>
+
+
+<input type="hidden"
+       name="action"
+       value="search"
+>
+<table width="500px"
+       border="0"
+       cellspacing="0"
+       cellpadding="1"
+>
+    <tr>
+        <td width="130"
+            class="promptText"
+        >
+            <div align="right">Lead Status</div>
+        </td>
+        <td>
+            <select id="customerLeadSelector">
+                <option value="">-- Search All --</option>
+                <!-- BEGIN customerLeadStatusBlock -->
+                <option {customerLeadStatusSelected}
+                        value="{customerLeadStatusId}"
+                >
+                    {customerLeadStatusName}
+                </option>
+                <!-- END customerLeadStatusBlock -->
+            </select>
+            <button onclick="searchCustomers()">
+                Search
+            </button>
+        </td>
+    </tr>
+</table>
+<hr/>
+<script>
+
+    var dataTableObject = {
+        dom: 'Blfrtip',
+        buttons: [
+            {
+                extend: 'csv',
+                bom: true
+            }
+        ],
+        columns: [
+            {data: 'customerName'},
+            {data: 'contactPhone'},
+            {data: 'contactName'},
+            {data: 'jobTitle'},
+            {data: 'customerReviewDate'},
+            {data: 'bluestoneLeadStatus'}
+        ],
+        columnDefs: [
+            {
+                render: function (data, type, row) {
+                    return '<a href="' + row.customerLink + '">' + data + '</a>';
+                },
+                targets: 0
+            }
+        ],
+        paging: false
+    };
+
+    var dataTable = null;
+
+    function searchCustomers() {
+        spinnerComponent.showSpinner();
+        $.ajax({
+            url: '{ajaxURL}',
+            data: {customerLeadID: $('#customerLeadSelector').val()},
+            method: 'POST'
+        }).then(function (data) {
+            if (!dataTable) {
+                $('#tableWrapper').show();
+                var theTable = $('#theTable');
+                dataTableObject.data = data;
+                dataTable = theTable.DataTable(dataTableObject);
+            } else {
+                dataTable.clear();
+                dataTable.rows.add(data);
+                dataTable.draw();
+            }
+
+        }, error => {
+
+        }).then(() => {
+            spinnerComponent.hideSpinner();
+        })
+    }
+</script>
+<style>
+    table.dataTable tfoot th {
+        padding-right: 0px !important;
+    }
+</style>
+<div style="display: none"
+     id="tableWrapper"
+>
+    <table id="theTable">
+        <thead>
+        <tr>
+            <th>
+                Customer
+            </th>
+            <th>
+                Contact Phone
+            </th>
+            <th>
+                Contact Name
+            </th>
+            <th>
+                Contact Job Title
+            </th>
+            <th>
+                To be Reviewed On
+            </th>
+            <th>
+                Lead Status
+            </th>
+        </tr>
+        </thead>
+        <tbody id="dataBody">
+        </tbody>
+    </table>
+</div>
+
+
+<!-- End Template: PasswordSearch.inc.html -->
