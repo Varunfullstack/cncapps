@@ -5,12 +5,16 @@
  * Date: 22/08/2018
  * Time: 10:39
  */
+
+use CNCLTD\Exceptions\APIException;
+
 global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 
 class CTCreateSalesRequest extends CTCNC
 {
+    const CONST_SALES_REQUEST='salesRequest';
     function __construct($requestMethod,
                          $postVars,
                          $getVars,
@@ -43,46 +47,37 @@ class CTCreateSalesRequest extends CTCNC
     {
 
         switch ($this->getAction()) {
-            case 'createSalesRequest':
-                if (!isset($_REQUEST['customerID'])) {
-                    echo json_encode(["error" => "Customer ID is missing"]);
-                    http_response_code(400);
-                    exit;
+            case self::CONST_SALES_REQUEST:
+                switch ($this->requestMethod) {                    
+                    case 'POST':
+                        echo  json_encode($this->createSalesRequest(),JSON_NUMERIC_CHECK);
+                        break;
+                   
                 }
-                $customerID = $_REQUEST['customerID'];
-
-                if (!isset($_REQUEST['message'])) {
-                    echo json_encode(["error" => "Message is missing"]);
-                    http_response_code(400);
-                    exit;
-                }
-                $message = $_REQUEST['message'];
-                if (!isset($_REQUEST['type'])) {
-                    echo json_encode(["error" => "Type is missing"]);
-                    http_response_code(400);
-                    exit;
-                }
-                $type = $_REQUEST['type'];
-                $files = @$_FILES['file'];
-                try {
-                    $this->createSalesRequest($customerID, $message, $type, $files);
-                } catch (\Exception $exception) {
-                    echo json_encode(["error" => $exception->getMessage()]);
-                    http_response_code(400);
-                    exit;
-                }
-                echo json_encode(["status" => "ok"]);
-                break;
+                exit;
             default:
                 $this->showPage();
                 break;
         }
     }
 
-    function createSalesRequest($customerID, $message, $type, $files = null)
+    function createSalesRequest()
     {
+        $body=json_decode($this->getParam("data"));
+        
+        if (!isset($body->customerId)) {
+            return $this->fail(APIException::badRequest,"Customer ID is missing");            
+        }
+        if (!isset($body->message)) {
+            return $this->fail(APIException::badRequest,"Message is missing");            
+        }        
+        if (!isset($body->type)) {
+            return $this->fail(APIException::badRequest,"Type is missing");                        
+        }        
+         $files = @$_FILES['file']??null;        
         $buActivity = new BUActivity($this);
-        $buActivity->sendSalesRequest(null, $message, $type, true, $customerID, $files);
+        $buActivity->sendSalesRequest(null, $body->message, $body->type, true, $body->customerId, $files );
+        return $this->success(count($files));
     }
 
     /**
@@ -96,7 +91,8 @@ class CTCreateSalesRequest extends CTCNC
         );
 
         $this->setPageTitle('Create Sales Request');
-
+        $this->loadReactScript('SalesRequestComponent.js');
+        $this->loadReactCSS('SalesRequestComponent.css');     
         $this->template->parse(
             'CONTENTS',
             'CreateSalesRequest',

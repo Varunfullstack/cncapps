@@ -14,10 +14,13 @@ class APIMain {
             .then((res) => res.json());
     }
 
-    uploadFiles(url, files, name) {
+    uploadFiles(url, files, name,data=null) {
         let payload = new FormData();
         for (const file of files)
             payload.append(name, file);
+        if(data)
+        payload.append('data', JSON.stringify(data));
+
         return fetch(url, {
             method: "POST",
             body: payload

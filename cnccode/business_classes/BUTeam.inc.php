@@ -60,7 +60,8 @@ class BUTeam extends Business
         t.level,
         t.activeFlag,
         tr.name AS teamRoleName,
-        leader.cns_name as leaderName
+        leader.cns_name as leaderName,
+        t.leaderId
       FROM
         team t
         JOIN team_role tr ON tr.teamRoleID = t.teamRoleID

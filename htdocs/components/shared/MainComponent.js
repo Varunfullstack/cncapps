@@ -238,4 +238,17 @@ export default class MainComponent extends React.Component {
         else 
             return false;
     }
+    getTrueFalseElement(value){
+        return value?<i className="fal fa-2x fa-check color-gray "></i>:<i className="fal fa-2x fa-times color-gray "></i>
+    }
+    getEditElement(obj,callBack,display=true){
+        if(!display)
+            return null;
+        return <i className="fal fa-2x fa-edit color-gray pointer" onClick={()=>callBack(obj)}></i>
+    }
+    getDeleteElement(obj,callBack,display=true){
+        if(!display)
+            return null;
+        return <i className="fal fa-2x fa-trash-alt color-gray pointer" onClick={()=>callBack(obj)}></i>
+    }
 }

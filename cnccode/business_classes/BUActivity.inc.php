@@ -10037,6 +10037,7 @@ FROM
                     DBEUser::lastName
                 )
             );
+            //$dbeCallActivity->setShowSQLOn();
             $dbeCallActivity->insertRow();
             $this->setProblemRaise($dbeProblem, $dbeCallActivity, BUProblemRaiseType::SALES); //sendSalesRequest
         }

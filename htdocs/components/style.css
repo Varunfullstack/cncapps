@@ -755,6 +755,9 @@ hr {
 .color-gray2 {
     color: #3C3C3C
 }
+.color-red{
+    color: rgb(177, 5, 5);
+}
 
 /*current activity style*/
 
@@ -1078,5 +1081,10 @@ select:required:valid { border: 1px solid black; }
     color:white;
     background-color: transparent;
     border-color: whitesmoke;
-
+}
+/*------------*/
+.btn-secondary
+{
+    background-color: #bdbec1;
+    border-color: #bdbec1;
 }
