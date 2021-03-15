@@ -19,10 +19,10 @@ require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 
 class BURenContract extends Business
 {
-    const etaDate                      = 'etaDate';
-    const serviceRequestCustomerItemID = 'serviceRequestCustomerItemID';
-    const serviceRequestPriority       = 'serviceRequestPriority';
-    const serviceRequestText           = 'serviceRequestText';
+    const etaDate                       = 'etaDate';
+    const serviceRequestCustomerItemID  = 'serviceRequestCustomerItemID';
+    const serviceRequestPriority        = 'serviceRequestPriority';
+    const SERVICE_REQUEST_INTERNAL_NOTE = 'serviceRequestInternalNote';
 
     var $dbeRenContract  = "";
     var $dbeJRenContract = "";
@@ -213,7 +213,6 @@ class BURenContract extends Business
         $previousCustomerID = 99999;
         $generateInvoice    = false;
         echo "<div> Contract Renewals - START </div>";
-        var_dump('here');
         while ($dsRenContract->fetchNext()) {
             ?>
             <div>
@@ -512,7 +511,12 @@ class BURenContract extends Business
                         DA_ALLOW_NULL
                     );
                     $dsInput->addColumn(
-                        self::serviceRequestText,
+                        self::SERVICE_REQUEST_INTERNAL_NOTE,
+                        DA_STRING,
+                        DA_ALLOW_NULL
+                    );
+                    $dsInput->addColumn(
+                        DBEOrdhead::serviceRequestTaskList,
                         DA_STRING,
                         DA_ALLOW_NULL
                     );
@@ -528,7 +532,7 @@ class BURenContract extends Business
                         onto: <a href="' . SITE_URL . '/RenContract.php?action=edit&ID=' . $renContractId . '">Contract</a></p> 
                         <p>Please check that the above SSL Certificate is still required before renewing</p>';
                     $dsInput->setValue(
-                        self::serviceRequestText,
+                        self::SERVICE_REQUEST_INTERNAL_NOTE,
                         $serviceRequestText
                     );
                     $dsInput->setValue(

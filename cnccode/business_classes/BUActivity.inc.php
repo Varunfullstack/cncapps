@@ -2262,7 +2262,7 @@ class BUActivity extends Business
             );
             $problem->setValue(DBEProblem::priority, $priority);
             $problem->updateRow();
-            $operationalActivity = $this->logOperationalActivity(
+            $operationalActivity  = $this->logOperationalActivity(
                 $problemID,
                 'Priority Changed from ' . $oldPriority . ' to ' . $problem->getValue(DBEJProblem::priority) . $reason
             );
@@ -6350,11 +6350,15 @@ class BUActivity extends Business
             $this->getSuitableEmailSubjectSummary($ordheadID, $selectedOrderLine)
         );
         $dbeProblem->insertRow();
-        $useCase          = new AddServiceRequestInternalNote(
+        $useCase             = new AddServiceRequestInternalNote(
             new ServiceRequestInternalNotePDORepository()
         );
-        $internalNoteUser = new DBEUser($this);
-        $internalNoteUser->getRow($GLOBALS['auth']->is_authenticated());
+        $internalNoteUser    = new DBEUser($this);
+        $internalNotesUserID = USER_SYSTEM;
+        if (isset($GLOBALS['auth'])) {
+            $internalNotesUserID = $GLOBALS['auth']->is_authenticated();
+        }
+        $internalNoteUser->getRow($internalNotesUserID);
         $useCase($dbeProblem, $internalNoteUser, $internalNotes);
         $reason = "<p>An order has been received for the items below:</p>";
         // insert selected items
