@@ -149,7 +149,7 @@ class CTSupplier extends CTCNC
     function reactController()
     {
         $this->setContainerTemplate();
-        $this->setPageTitle("Supplier");
+        $this->setPageTitle('Supplier', '<a href="/Supplier.php" style="color:#000080">Supplier</a>');
         $this->loadReactScript('SupplierComponent.js');
         $this->loadReactCSS('SupplierComponent.css');
         $this->template->setVar('CONTENTS', '<div id="reactMainActivity"></div>');

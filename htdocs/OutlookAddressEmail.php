@@ -52,9 +52,9 @@ WHERE
 )
 UNION
 (SELECT
-	con_title AS Title,
-	con_last_name AS LastName,
-	con_first_name AS FirstName,
+	title AS Title,
+	lastName AS LastName,
+	firstName AS FirstName,
 	sup_name AS Company,
 	sup_add1 AS BusinessStreet,
 	sup_add2 AS BusinessStreet2,
@@ -62,19 +62,16 @@ UNION
 	sup_town AS BusinessCity,
 	sup_county AS BusinessState,
 	sup_postcode AS BusinessPostalCode,
-	sup_phone AS BusinessPhone,
-	con_phone AS BusinessPhone2,
-	con_mobile_phone AS `Mobile Phone`,
-	con_fax AS BusinessFax,
-	con_email AS `E-mail Address`,
+	phone AS BusinessPhone,
+	phone AS BusinessPhone2,
+	phone AS `Mobile Phone`,
+	phone AS BusinessFax,
+	email AS `E-mail Address`,
 	"Supplier" AS Categories,
-	concat( con_first_name," ",con_last_name) AS `E-mail Display Name`
-FROM contact
+	concat( firstName," ",lastName) AS `E-mail Display Name`
+FROM supplierContact
 JOIN supplier ON
-	con_suppno = sup_suppno
-WHERE
-	con_mailshot =  "Y" AND
-	con_suppno <> 0
+	supplierId = sup_suppno
 )
 ORDER BY Company, LastName';
 if (!$result = mysqli_query($db2, $query)) {

@@ -80,58 +80,6 @@ class BUContact extends Business
     }
 
     /**
-     * Get Contact rows whose names match the search string or, if the string is numeric, try to select by customerID
-     * @parameter String $nameSearchString String to match against or numeric contactID
-     * @parameter DataSet &$dsResults results
-     * @param $supplierID
-     * @param $matchString
-     * @param DataSet $dsResults
-     * @return bool : One or more rows
-     * @access public
-     */
-    function getSupplierContactsByNameMatch($supplierID,
-                                            $matchString,
-                                            &$dsResults
-    )
-    {
-        $this->setMethodName('getSupplierContactsByNameMatch');
-        if (!$matchString) {
-            $this->raiseError(BUCONTACT_MATCH_STR_NT_PASD);
-        }
-        if (!$supplierID) {
-            $this->raiseError('supplierID not passed');
-        }
-        $matchString = trim($matchString);
-        $ret = FALSE;
-        if (is_numeric($matchString)) {
-            $ret = ($this->getContactByID(
-                $matchString,
-                $dsResults
-            ));
-        }
-        if (!$ret) {
-            $this->dbeContact->setValue(
-                DBEContact::supplierID,
-                $supplierID
-            );
-            if ($matchString{0} == '?') {  // get all contacts for supplier
-                $this->dbeContact->getSupplierRows();
-            } else {                                                // try to match
-                $this->dbeContact->getSupplierContactRowsByNameMatch($matchString);
-            }
-            $ret = ($this->getData(
-                $this->dbeContact,
-                $dsResults
-            ));
-            $dsResults->columnSort(
-                DBEContact::lastName,
-                DBEContact::firstName
-            );
-        }
-        return $ret;
-    }
-
-    /**
      * Get general support contact statement row by customerID
      * @parameter integer $contactID
      * @parameter DataSet &$dsResults results
@@ -194,7 +142,6 @@ class BUContact extends Business
         $dsResults->columnSort(
             DBEContact::lastName,
             DBEContact::firstName
-
         );
         return $ret;
     }
@@ -223,7 +170,7 @@ class BUContact extends Business
             $this->raiseError('customerID not passed');
         }
         $matchString = trim($matchString);
-        $ret = FALSE;
+        $ret         = FALSE;
         if (is_numeric($matchString)) {
             $ret = ($this->getContactByID(
                 $matchString,
@@ -247,13 +194,11 @@ class BUContact extends Business
                     );
                 }
             } else {                                                // try to match
-
                 $this->dbeContact->getSupportContactRowsByNameMatch(
                     $customerID,
                     $matchString
                 );
             }
-
             $ret = ($this->getData(
                 $this->dbeContact,
                 $dsResults
@@ -322,10 +267,6 @@ class BUContact extends Business
         $dsResults->setValue(
             DBEContact::siteNo,
             $siteNo
-        );
-        $dsResults->setValue(
-            DBEContact::supplierID,
-            $supplierID
         );
         $dsResults->setValue(
             DBEContact::customerID,
@@ -443,14 +384,12 @@ class BUContact extends Business
          * + topUp at least one per customer if prepay contract, ignore if referred
          * + Reports at least one per customer, ignore if referred
          */
-
         if (empty($dsContact->getValue(DBEContact::firstName))) {
             $dsContact->setMessage(
                 DBEContact::firstName,
                 'First Name is required'
             );
         }
-
         if (empty($dsContact->getValue(DBEContact::lastName))) {
             $dsContact->setMessage(
                 DBEContact::lastName,
@@ -463,7 +402,6 @@ class BUContact extends Business
                 'Title is required'
             );
         }
-
         if (!empty($dsContact->getValue(DBEContact::email))) {
 
             $buCustomer = new BUCustomer($this);
@@ -483,7 +421,6 @@ class BUContact extends Business
     }
 
 
-
     public function getTodayLeaverContacts(&$dsResults)
     {
         $this->setMethodName('getContactByCustomerID');
@@ -493,6 +430,7 @@ class BUContact extends Business
             $dsResults
         );
     }
+
     public function getContactsWithPendingFurloughActionForToday(&$dsResults)
     {
         $this->setMethodName('getContactByCustomerID');

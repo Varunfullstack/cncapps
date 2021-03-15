@@ -124,7 +124,29 @@ export class SupplierListComponent extends React.PureComponent {
                 hdClassName: "text-left",
                 className: "text-left",
                 content: (supplierRow) => {
-                    return supplierRow.mainContactPhone
+                    if (!supplierRow.mainContactPhone) {
+                        return '';
+                    }
+                    return <a href={`tel:${supplierRow.mainContactPhone}`}>{supplierRow.mainContactPhone}</a>
+                }
+
+            },
+            {
+                hide: false,
+                order: 4.1,
+                path: "mainContactEmail",
+                key: "mainContactEmail",
+                icon: "fal fa-2x  fa-at color-gray2 ",
+                hdToolTip: "Email",
+                sortable: true,
+                width: "55",
+                hdClassName: "text-left",
+                className: "text-left",
+                content: (supplierRow) => {
+                    if (!supplierRow.mainContactEmail) {
+                        return '';
+                    }
+                    return <a href={`mailto:${supplierRow.mainContactEmail}`}>{supplierRow.mainContactEmail}</a>
                 }
 
             },

@@ -405,6 +405,17 @@ class Supplier
         if (!$contact->getActive()->value()) {
             throw new SupplierContactAlreadyArchivedException();
         }
+        $newContact = SupplierContact::create(
+            $supplierContactId,
+            $contact->getTitle(),
+            $contact->getPosition(),
+            $contact->getFirstName(),
+            $contact->getLastName(),
+            $contact->getPhone(),
+            $contact->getEmail(),
+            new Active(false)
+        );
+        $this->contacts[$supplierContactId->value()]     = $newContact;
         $this->contactDirty[$supplierContactId->value()] = true;
     }
 

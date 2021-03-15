@@ -21,7 +21,7 @@ class CTCustomerCRM extends CTCustomer
 {
 
     const CTCUSTOMER_ACT_SEARCH_LEAD = 'searchLead';
-    const searchFormCustomerID = 'customerID';
+    const searchFormCustomerID       = 'customerID';
     private $reviewMeetingFrequencyMonths;
     private $lastReviewMeetingDate;
     private $reviewMeetingEmailSentFlag;
@@ -99,12 +99,10 @@ class CTCustomerCRM extends CTCustomer
                 DBESite::postcode,
                 strtoupper($value['postcode'])
             );
-
             $this->dsSite->setValue(
                 DBESite::phone,
                 $value['sitePhone']
             );
-
             $this->dsSite->post();
         }
     }
@@ -121,16 +119,12 @@ class CTCustomerCRM extends CTCustomer
         if (!is_object($dsDestination)) {
             $dsDestination = new Dataset($this);
         } else {
-            if (
-                ($dsDestination->getClassname() != DA_CLASSNAME_DATASET) &
-                (!is_subclass_of(
+            if (($dsDestination->getClassname() != DA_CLASSNAME_DATASET) & (!is_subclass_of(
                     $dsDestination,
                     DA_CLASSNAME_DATASET
-                ))
-            ) {
+                ))) {
                 $this->raiseError(
-                    "dsDestination must be subclass or class of " .
-                    DA_CLASSNAME_DATASET
+                    "dsDestination must be subclass or class of " . DA_CLASSNAME_DATASET
                 );
             }
         }
@@ -172,7 +166,6 @@ class CTCustomerCRM extends CTCustomer
         if (!is_array($customerArray)) {
             return;
         }
-
         foreach ($customerArray as $value) {
 
             $this->buCustomer->getCustomerByID(
@@ -196,7 +189,6 @@ class CTCustomerCRM extends CTCustomer
                 DBECustomer::websiteURL,
                 @$value['websiteURL']
             );
-
             $this->dsCustomer->setValue(
                 DBECustomer::meetingDateTime,
                 @$value['meetingDateTime']
@@ -225,12 +217,10 @@ class CTCustomerCRM extends CTCustomer
                 DBECustomer::decisionMakerBackground,
                 @$value[DBECustomer::decisionMakerBackground]
             );
-
             $this->dsCustomer->setValue(
                 DBECustomer::primaryMainContactID,
                 @$value[DBECustomer::primaryMainContactID]
             );
-
             $this->dsCustomer->setValue(
                 DBECustomer::opportunityDeal,
                 @$value[DBECustomer::opportunityDeal]
@@ -243,21 +233,17 @@ class CTCustomerCRM extends CTCustomer
                 'Y-m-d',
                 @$value[DBECustomer::reviewDate]
             );
-
             if ($reviewDate) {
                 $reviewDateValue = null;
                 if ($reviewDate) {
                     $reviewDateValue = $reviewDate->format(DATE_MYSQL_DATE);
                 }
-
                 $this->dsCustomer->setValue(
                     DBECustomer::reviewDate,
                     $reviewDateValue
                 );
 
             }
-
-
             $this->dsCustomer->setValue(
                 DBECustomer::reviewTime,
                 @$value[DBECustomer::reviewTime]
@@ -373,9 +359,8 @@ class CTCustomerCRM extends CTCustomer
                 } catch (Exception $exception) {
                     http_response_code(400);
                     $response["status"] = "error";
-                    $response["error"] = $exception->getMessage();
+                    $response["error"]  = $exception->getMessage();
                 }
-
                 echo json_encode($response);
                 break;
             case 'archiveContact':
@@ -386,9 +371,8 @@ class CTCustomerCRM extends CTCustomer
                 } catch (Exception $exception) {
                     http_response_code(400);
                     $response["status"] = "error";
-                    $response["error"] = $exception->getMessage();
+                    $response["error"]  = $exception->getMessage();
                 }
-
                 echo json_encode($response);
                 break;
             default:
@@ -401,14 +385,12 @@ class CTCustomerCRM extends CTCustomer
     {
 
         $this->setMethodName('search');
-
         $dsSearchForm = new DSForm($this);
         $dsSearchForm->addColumn(
             self::searchFormCustomerID,
             DA_STRING,
             DA_NOT_NULL
         );
-
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (!$dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
                 $this->setFormErrorOn();
@@ -421,25 +403,20 @@ class CTCustomerCRM extends CTCustomer
                         'customerID' => $this->getCustomerID()
                     )
                 );
-
                 header('Location: ' . $link);
             }
 
         } else {
             $this->setMethodName('displaySearchForm');
-
             $this->setTemplateFiles(
                 array(
                     'CustomerCRM' => 'CRMSearch.inc'
                 )
             );
-
             $urlSubmit = Controller::buildLink(
                 $_SERVER ['PHP_SELF'],
                 array('action' => CTCNC_ACT_SEARCH)
             );
-
-
             $this->setPageTitle('Customer CRM');
             $customerString = null;
             if ($dsSearchForm->getValue(self::searchFormCustomerID)) {
@@ -451,16 +428,13 @@ class CTCustomerCRM extends CTCustomer
                 );
                 $customerString = $dsCustomer->getValue(DBECustomer::name);
             }
-
-            $urlCustomerPopup =
-                Controller::buildLink(
-                    CTCNC_PAGE_CUSTOMER,
-                    array(
-                        'action'  => CTCNC_ACT_DISP_CUST_POPUP,
-                        'htmlFmt' => CT_HTML_FMT_POPUP
-                    )
-                );
-
+            $urlCustomerPopup = Controller::buildLink(
+                CTCNC_PAGE_CUSTOMER,
+                array(
+                    'action'  => CTCNC_ACT_DISP_CUST_POPUP,
+                    'htmlFmt' => CT_HTML_FMT_POPUP
+                )
+            );
             $this->template->set_block(
                 'CustomerCRM',
                 'customerLeadStatusBlock',
@@ -470,7 +444,6 @@ class CTCustomerCRM extends CTCustomer
              * @var DataSet $dsCustomerLeadStatuses
              */
             $this->buCustomer->getCustomerLeadStatuses($dsCustomerLeadStatuses);
-
             while ($dsCustomerLeadStatuses->fetchNext()) {
                 $this->template->set_var(
                     array(
@@ -489,15 +462,12 @@ class CTCustomerCRM extends CTCustomer
                     true
                 );
             }
-
-            $linkURL =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => 'searchLead'
-                    )
-                );
-
+            $linkURL = Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => 'searchLead'
+                )
+            );
             $this->template->set_var(
                 array(
                     'formError'         => $this->formError,
@@ -509,13 +479,11 @@ class CTCustomerCRM extends CTCustomer
                     'ajaxURL'           => $linkURL,
                 )
             );
-
             $this->template->parse(
                 'CONTENTS',
                 'CustomerCRM',
                 true
             );
-
             $this->parsePage();
         }
 
@@ -545,10 +513,8 @@ class CTCustomerCRM extends CTCustomer
         // in the post we should find the id of the status we are searching for
         /** @var DBEContact $results */
         $results = $this->buCustomer->getContactsByLeadStatus($customerLeadID);
-
         $data = [];
-
-        $customers = [];
+        $customers              = [];
         $dsCustomerLeadStatuses = new DataSet($this);
         $this->buCustomer->getCustomerLeadStatuses($dsCustomerLeadStatuses);
         $leadStatuses = [];
@@ -557,15 +523,12 @@ class CTCustomerCRM extends CTCustomer
                 DBECustomerLeadStatus::id
             )] = $dsCustomerLeadStatuses->getValue(DBECustomerLeadStatus::name);
         }
-
         while ($results->fetchNext()) {
             $customerID = $results->getValue(DBEContact::customerID);
-
             if (!isset($customers[$customerID])) {
                 $dbeCustomer = new DBECustomer($this);
                 $dbeCustomer->getRow($results->getValue(DBEContact::customerID));
-
-                $link = Controller::buildLink(
+                $link                   = Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'     => 'displayEditForm',
@@ -580,9 +543,7 @@ class CTCustomerCRM extends CTCustomer
                 ];
 
             }
-
             $phone = $results->getValue(DBEContact::phone);
-
             if (!$phone) {
                 $site = new DBESite($this);
                 $site->setValue(
@@ -594,10 +555,8 @@ class CTCustomerCRM extends CTCustomer
                     $results->getValue(DBEContact::siteNo)
                 );
                 $site->getRow();
-
                 $phone = $site->getValue(DBESite::phone);
             }
-
             $contactData = [
                 "contactName"  => $results->getValue(DBEContact::firstName) . " " . $results->getValue(
                         DBEContact::lastName
@@ -605,14 +564,13 @@ class CTCustomerCRM extends CTCustomer
                 "jobTitle"     => $results->getValue(DBEContact::position),
                 'contactPhone' => $phone
             ];
-            $data[] = array_merge(
+            $data[]      = array_merge(
                 $contactData,
                 $customers[$customerID]
             );
 
 
         }
-
         header('Content-Type: application/json;charset=utf-8');
         return json_encode($data);
 
@@ -626,7 +584,7 @@ class CTCustomerCRM extends CTCustomer
     function displayEditForm()
     {
         $this->setMethodName('displayEditForm');
-        $deleteCustomerURL = null;
+        $deleteCustomerURL  = null;
         $deleteCustomerText = null;
         if ($this->getAction() != CTCUSTOMER_ACT_ADDCUSTOMER) {
             if ((!$this->formError) & ($this->getAction(
@@ -639,13 +597,12 @@ class CTCustomerCRM extends CTCustomer
                 }
             }
             $this->dsCustomer->fetchNext();
-
             // If we can delete this customer set the link
             if ($this->buCustomer->canDeleteCustomer(
                 $this->getCustomerID(),
                 $this->userID
             )) {
-                $deleteCustomerURL = Controller::buildLink(
+                $deleteCustomerURL  = Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'     => CTCUSTOMER_ACT_DELETECUSTOMER,
@@ -666,21 +623,18 @@ class CTCustomerCRM extends CTCustomer
             'CustomerEdit',
             'CustomerCRM.inc'
         );
-
 // Parameters
         if ($this->getParam('save_page')) {
             $this->setSessionParam('save_page', $this->getParam('save_page'));
         } else {
             $this->setSessionParam('save_page', false);
         }
-        $submitURL =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTCUSTOMER_ACT_UPDATE
-                )
-            );
-
+        $submitURL = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => CTCUSTOMER_ACT_UPDATE
+            )
+        );
         if ($this->getSessionParam('save_page')) {
             $cancelURL = $this->getSessionParam('save_page');
         } else {
@@ -689,14 +643,13 @@ class CTCustomerCRM extends CTCustomer
                 array('action' => CTCUSTOMER_ACT_DISP_SEARCH)
             );
         }
-        $addSiteURL =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'     => CTCUSTOMER_ACT_ADDSITE,
-                    'customerID' => $this->getCustomerID(),
-                )
-            );
+        $addSiteURL = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'     => CTCUSTOMER_ACT_ADDSITE,
+                'customerID' => $this->getCustomerID(),
+            )
+        );
         if (!$this->formError) {              // Not displaying form error page so get customer record
             $this->dsCustomer->setValue(
                 self::customerFormNameClass,
@@ -716,7 +669,6 @@ class CTCustomerCRM extends CTCustomer
         if ($this->dsCustomer->getValue(DBECustomer::websiteURL)) {
             $color = "green";
         }
-
         $this->setPageTitle(
             $title,
             $title . ' <i class="fas fa-globe" onclick="checkWebsite()" style="color:' . $color . '"></i>'
@@ -724,12 +676,11 @@ class CTCustomerCRM extends CTCustomer
         /*
         Get the list of custom letter template file names from the custom letter directory
         */
-        $dir = LETTER_TEMPLATE_DIR . "/custom/";
+        $dir                   = LETTER_TEMPLATE_DIR . "/custom/";
         $customLetterTemplates = [];
         if (is_dir($dir)) {
 
             $dh = opendir($dir);
-
             while (false !== ($filename = readdir($dh))) {
 
                 $ext = explode(
@@ -737,65 +688,49 @@ class CTCustomerCRM extends CTCustomer
                     $filename
                 );
                 $ext = $ext[count($ext) - 1];
-
                 if ($ext == 'htm') {
                     $customLetterTemplates[] = $filename;
                 }
             }
         }
-
         if ($customerFolderPath = $this->buCustomer->customerFolderExists(
             $this->dsCustomer->getValue(DBECustomer::customerID)
         )) {
-            $customerFolderLink =
-                '<a href="file:' . $customerFolderPath . '" target="_blank" title="Open Folder">Open Folder</a>';
+            $customerFolderLink = '<a href="file:' . $customerFolderPath . '" target="_blank" title="Open Folder">Open Folder</a>';
         } else {
-            $urlCreateCustomerFolder =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'     => 'createCustomerFolder',
-                        'customerID' => $this->getCustomerID(),
-                    )
-                );
-            $customerFolderLink =
-                '<a href="http:' . $urlCreateCustomerFolder . '" title="Create Folder">Create Customer Folder</a>';
+            $urlCreateCustomerFolder = Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'     => 'createCustomerFolder',
+                    'customerID' => $this->getCustomerID(),
+                )
+            );
+            $customerFolderLink      = '<a href="http:' . $urlCreateCustomerFolder . '" title="Create Folder">Create Customer Folder</a>';
         }
-        $renewalLinkURL =
-            Controller::buildLink(
-                'RenewalReport.php',
-                array(
-                    'action'     => 'produceReport',
-                    'customerID' => $this->getCustomerID()
-                )
-            );
-
-
+        $renewalLinkURL = Controller::buildLink(
+            'RenewalReport.php',
+            array(
+                'action'     => 'produceReport',
+                'customerID' => $this->getCustomerID()
+            )
+        );
         $renewalLink = '<a href="' . $renewalLinkURL . '" target="_blank" title="Renewals">Renewal Information</a>';
-
-        $passwordLinkURL =
-            Controller::buildLink(
-                'Password.php',
-                array(
-                    'action'     => 'list',
-                    'customerID' => $this->getCustomerID()
-                )
-            );
-
-
+        $passwordLinkURL = Controller::buildLink(
+            'Password.php',
+            array(
+                'action'     => 'list',
+                'customerID' => $this->getCustomerID()
+            )
+        );
         $passwordLink = '<a href="' . $passwordLinkURL . '" target="_blank" title="Passwords">Service Passwords</a>';
-
         $bodyTagExtras = 'onLoad="loadNote(\'last\')"';
-
-        $urlContactPopup =
-            Controller::buildLink(
-                CTCNC_PAGE_CONTACT,
-                array(
+        $urlContactPopup = Controller::buildLink(
+            CTCNC_PAGE_CONTACT,
+            array(
 //          'action' => CTCNC_ACT_CONTACT_EDIT,
 'htmlFmt' => CT_HTML_FMT_POPUP
-                )
-            );
-
+            )
+        );
         $site = new DBESite($this);
         $site->setValue(
             DBESite::siteNo,
@@ -806,7 +741,6 @@ class CTCustomerCRM extends CTCustomer
             $this->getCustomerID()
         );
         $site->getRowByCustomerIDSiteNo();
-
         $this->template->set_var(
             array(
                 'urlContactPopup'                    => $urlContactPopup,
@@ -836,8 +770,12 @@ class CTCustomerCRM extends CTCustomer
                 'specialAttentionEndDate'            => $this->dsCustomer->getValue(
                     DBECustomer::specialAttentionEndDate
                 ),
-                'lastReviewMeetingDate'              => $this->dsCustomer->getValue(DBECustomer::lastReviewMeetingDate),
-                'dateMeetingConfirmedDate'           => $this->dsCustomer->getValue(DBECustomer::dateMeetingConfirmed),
+                'lastReviewMeetingDate'              => $this->dsCustomer->getValue(
+                    DBECustomer::lastReviewMeetingDate
+                ),
+                'dateMeetingConfirmedDate'           => $this->dsCustomer->getValue(
+                    DBECustomer::dateMeetingConfirmed
+                ),
                 'meetingDateTime'                    => Controller::dateToISO(
                     $this->dsCustomer->getValue(DBECustomer::meetingDateTime)
                 ),
@@ -851,7 +789,9 @@ class CTCustomerCRM extends CTCustomer
                     $this->dsCustomer->getValue(DBECustomer::reportSent)
                 ),
                 DBECustomer::crmComments             => $this->dsCustomer->getValue(DBECustomer::crmComments),
-                DBECustomer::companyBackground       => $this->dsCustomer->getValue(DBECustomer::companyBackground),
+                DBECustomer::companyBackground       => $this->dsCustomer->getValue(
+                    DBECustomer::companyBackground
+                ),
                 DBECustomer::decisionMakerBackground => $this->dsCustomer->getValue(
                     DBECustomer::decisionMakerBackground
                 ),
@@ -897,8 +837,12 @@ class CTCustomerCRM extends CTCustomer
                 'referred'                           => $this->dsCustomer->getValue(
                     DBECustomer::referredFlag
                 ) == 'Y' ? 'true' : 'false',
-                'becameCustomerDate'                 => $this->dsCustomer->getValue(DBECustomer::becameCustomerDate),
-                'droppedCustomerDate'                => $this->dsCustomer->getValue(DBECustomer::droppedCustomerDate),
+                'becameCustomerDate'                 => $this->dsCustomer->getValue(
+                    DBECustomer::becameCustomerDate
+                ),
+                'droppedCustomerDate'                => $this->dsCustomer->getValue(
+                    DBECustomer::droppedCustomerDate
+                ),
                 'reviewAction'                       => $this->dsCustomer->getValue(DBECustomer::reviewAction),
                 'comments'                           => $this->dsCustomer->getValue(DBECustomer::comments),
                 'techNotes'                          => $this->dsCustomer->getValue(DBECustomer::techNotes),
@@ -911,11 +855,9 @@ class CTCustomerCRM extends CTCustomer
                 'slaFixHoursP2'                      => $this->dsCustomer->getValue(DBECustomer::slaFixHoursP2),
                 'slaFixHoursP3'                      => $this->dsCustomer->getValue(DBECustomer::slaFixHoursP3),
                 'slaFixHoursP4'                      => $this->dsCustomer->getValue(DBECustomer::slaFixHoursP4),
-
                 'add1' => $site->getValue(DBESite::add1),
                 'add2' => $site->getValue(DBESite::add2),
                 'add3' => $site->getValue(DBESite::add3),
-
                 'town'                 => $site->getValue(DBESite::town),
                 'county'               => $site->getValue(DBESite::county),
                 'postcode'             => $site->getValue(DBESite::postcode),
@@ -944,17 +886,15 @@ class CTCustomerCRM extends CTCustomer
                 )
             );
         }
-        $noOfPCs =
-            array(
-                '0',
-                '1-5',
-                '6-10',
-                '11-25',
-                '26-50',
-                '51-99',
-                '100+'
-            );
-
+        $noOfPCs = array(
+            '0',
+            '1-5',
+            '6-10',
+            '11-25',
+            '26-50',
+            '51-99',
+            '100+'
+        );
         $this->template->set_block(
             'CustomerEdit',
             'noOfPCsBlock',
@@ -975,13 +915,11 @@ class CTCustomerCRM extends CTCustomer
                 true
             );
         }
-
         $this->template->set_block(
             'CustomerEdit',
             'customerTypeBlock',
             'customertypes'
         );
-
         $dsCustomerType = new DataSet($this);
         $this->buCustomer->getCustomerTypes($dsCustomerType);
         while ($dsCustomerType->fetchNext()) {
@@ -1000,7 +938,6 @@ class CTCustomerCRM extends CTCustomer
                 true
             );
         }
-
         $this->template->set_block(
             'CustomerEdit',
             'reviewFrequencyBlock',
@@ -1022,43 +959,34 @@ class CTCustomerCRM extends CTCustomer
                 true
             );
         }
-
         $this->template->set_block(
             'CustomerEdit',
             'templateSupportLevelBlock',
             'templateSelectSupportLevel'
         );
-
         $this->template->set_block(
             'CustomerEdit',
             'templateCustomLetterBlock',
             'templateCustomLetters'
         );
-
         /*
        Display all the custom letters
        */
         foreach ($customLetterTemplates as $index => $filename) {
 
-            $customLetterURL =
-                Controller::buildLink(
-                    'LetterForm.php',
-                    array(
-                        'contactID'      => $this->dsContact->getValue(DBEContact::contactID),
-                        'letterTemplate' => $filename
-                    )
-                );
-
-
+            $customLetterURL = Controller::buildLink(
+                'LetterForm.php',
+                array(
+                    'contactID'      => $this->dsContact->getValue(DBEContact::contactID),
+                    'letterTemplate' => $filename
+                )
+            );
             $this->template->set_var(
-
                 array(
                     'customLetterURL'  => $customLetterURL,
                     'customLetterName' => $filename
-
                 )
             );
-
             $this->template->parse(
                 'templateCustomLetters',
                 'templateCustomLetterBlock',
@@ -1066,7 +994,6 @@ class CTCustomerCRM extends CTCustomer
             );
 
         } // end foreach
-
         $buContact = new BUContact($this);
         $buContact->supportLevelDropDown(
             null,
@@ -1077,7 +1004,6 @@ class CTCustomerCRM extends CTCustomer
             'templateSelectSupportLevel',
             'templateSupportLevelBlock'
         );
-
         $this->template->set_block(
             'CustomerEdit',
             'customerLeadStatusBlock',
@@ -1087,7 +1013,6 @@ class CTCustomerCRM extends CTCustomer
          * @var DataSet $dsCustomerLeadStatuses
          */
         $this->buCustomer->getCustomerLeadStatuses($dsCustomerLeadStatuses);
-
         while ($dsCustomerLeadStatuses->fetchNext()) {
 
             $this->template->set_var(
@@ -1107,7 +1032,6 @@ class CTCustomerCRM extends CTCustomer
                 true
             );
         }
-
         $buSector = new BUSector($this);
         $this->template->set_block(
             'CustomerEdit',
@@ -1166,11 +1090,9 @@ class CTCustomerCRM extends CTCustomer
             'reviewUserBlock',
             'reviewUsers'
         );
-
         $buUser = new BUUser($this);
         $dsUser = new DataSet($this);
         $buUser->getAllUsers($dsUser);
-
         while ($dsUser->fetchNext()) {
 
             $this->template->set_var(
@@ -1182,14 +1104,12 @@ class CTCustomerCRM extends CTCustomer
                         )) ? CT_SELECTED : null
                 )
             );
-
             $this->template->parse(
                 'reviewUsers',
                 'reviewUserBlock',
                 true
             );
         }
-
         /*
         Account Manager users
         */
@@ -1198,10 +1118,8 @@ class CTCustomerCRM extends CTCustomer
             'accountManagerBlock',
             'accountManagers'
         );
-
         $buUser = new BUUser($this);
         $buUser->getAllUsers($dsUser);
-
         while ($dsUser->fetchNext()) {
 
             $this->template->set_var(
@@ -1213,39 +1131,33 @@ class CTCustomerCRM extends CTCustomer
                         )) ? CT_SELECTED : null
                 )
             );
-
             $this->template->parse(
                 'accountManagers',
                 'accountManagerBlock',
                 true
             );
         }
-
         /*
         Projects
         */
-        $addProjectURL =
-            Controller::buildLink(
-                'Project.php',
-                array(
-                    'action'     => 'add',
-                    'customerID' => $this->getCustomerID()
-                )
-            );
-
+        $addProjectURL = Controller::buildLink(
+            'Project.php',
+            array(
+                'action'     => 'add',
+                'customerID' => $this->getCustomerID()
+            )
+        );
         $this->template->set_var(
             array(
                 'addProjectText' => 'Add project',
                 'addProjectURL'  => $addProjectURL
             )
         );
-
         $this->template->set_block(
             'CustomerEdit',
             'projectBlock',
             'projects'
         );      // have to declare innermost block first
-
         if ($this->getAction() != CTCUSTOMER_ACT_ADDCUSTOMER) {
 
             $buProject = new BUProject($this);
@@ -1254,31 +1166,26 @@ class CTCustomerCRM extends CTCustomer
                 $this->getCustomerID(),
                 $dsProject
             );
-
             while ($dsProject->fetchNext()) {
                 $deleteProjectLink = null;
                 $deleteProjectText = null;
                 if ($buProject->canDelete($dsProject->getValue(DBEProject::projectID))) {
-                    $deleteProjectLink =
-                        Controller::buildLink(
-                            'Project.php',
-                            array(
-                                'action'    => 'delete',
-                                'projectID' => $dsProject->getValue(DBEProject::projectID)
-                            )
-                        );
-                    $deleteProjectText = 'delete';
-                }
-
-                $editProjectLink =
-                    Controller::buildLink(
+                    $deleteProjectLink = Controller::buildLink(
                         'Project.php',
                         array(
-                            'action'    => 'edit',
+                            'action'    => 'delete',
                             'projectID' => $dsProject->getValue(DBEProject::projectID)
                         )
                     );
-
+                    $deleteProjectText = 'delete';
+                }
+                $editProjectLink = Controller::buildLink(
+                    'Project.php',
+                    array(
+                        'action'    => 'edit',
+                        'projectID' => $dsProject->getValue(DBEProject::projectID)
+                    )
+                );
                 $this->template->set_var(
                     array(
                         'projectID'         => $dsProject->getValue(DBEProject::projectID),
@@ -1301,7 +1208,6 @@ class CTCustomerCRM extends CTCustomer
                         'deleteProjectText' => $deleteProjectText
                     )
                 );
-
                 $this->template->parse(
                     'projects',
                     'projectBlock',
@@ -1311,52 +1217,41 @@ class CTCustomerCRM extends CTCustomer
             }
 
         }
-
-
         $this->template->set_block(
             'CustomerEdit',
             'selectInvoiceContactBlock',
             'invoiceContacts'
         );
-
         $this->template->set_block(
             'CustomerEdit',
             'selectDeliverContactBlock',
             'deliverContacts'
         );
-
-
         $this->template->set_block(
             'CustomerEdit',
             'siteBlock',
             'sites'
         );
-
-
         $this->template->set_block(
             'CustomerEdit',
             'customLetterBlock',
             'customLetters'
         );      //
-
         $this->template->set_block(
             'CustomerEdit',
             'selectSiteBlock',
             'selectSites'
         );
-
         $this->template->set_block(
             'CustomerEdit',
             'supportLevelBlock',
             'selectSupportLevel'
         );
-
         $this->template->set_block(
             'CustomerEdit',
             'contactBlock',
             'contacts'
         );      // have to declare innermost block first
-
         if ((!$this->formError) & ($this->getAction() != CTCUSTOMER_ACT_ADDCUSTOMER) & ($this->getAction(
                 ) != CTCUSTOMER_ACT_DISP_SUCCESS)) {                                                      // Only get from DB if not displaying form error(s)
             $this->buCustomer->getSitesByCustomerID(
@@ -1364,13 +1259,11 @@ class CTCustomerCRM extends CTCustomer
                 $this->dsSite,
                 true
             );
-
             $this->buCustomer->getContactsByCustomerID(
                 $this->dsCustomer->getValue(DBECustomer::customerID),
                 $this->dsContact,
                 false
             );
-
             if ($this->getAction() == CTCUSTOMER_ACT_ADDCONTACT) {
                 $this->buCustomer->addNewContactRow(
                     $this->dsContact,
@@ -1378,7 +1271,6 @@ class CTCustomerCRM extends CTCustomer
                     $this->getSiteNo()
                 );
             }
-
             if ($this->getAction() == CTCUSTOMER_ACT_ADDSITE) {
                 $this->buCustomer->addNewSiteRow(
                     $this->dsSite,
@@ -1386,31 +1278,26 @@ class CTCustomerCRM extends CTCustomer
                 );
             }
         }
-
         $this->dsSite->initialise();
-
         $errorClass = null;
         if (!$this->formError) {// Only get from DB if not displaying form error(s)
             $errorClass = CTCUSTOMER_CLS_TABLE_EDIT_HEADER;
         }
-
-        $addContactURL =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'     => CTCUSTOMER_ACT_ADDCONTACT,
-                    'customerID' => $site->getValue(DBESite::customerID),
-                    'siteNo'     => $site->getValue(DBESite::siteNo)
-                )
-            );
-
-        $deleteSiteURL = null;
+        $addContactURL = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'     => CTCUSTOMER_ACT_ADDCONTACT,
+                'customerID' => $site->getValue(DBESite::customerID),
+                'siteNo'     => $site->getValue(DBESite::siteNo)
+            )
+        );
+        $deleteSiteURL  = null;
         $deleteSiteText = null;
         if ($this->buCustomer->canDeleteSite(
             $site->getValue(DBESite::customerID),
             $site->getValue(DBESite::siteNo)
         )) {
-            $deleteSiteURL = Controller::buildLink(
+            $deleteSiteURL  = Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'     => CTCUSTOMER_ACT_DELETESITE,
@@ -1448,7 +1335,6 @@ class CTCustomerCRM extends CTCustomer
                 'sageRef'        => $site->getValue(DBESite::sageRef),
                 'debtorCode'     => $site->getValue(DBESite::debtorCode),
                 'maxTravelHours' => $site->getValue(DBESite::maxTravelHours),
-
                 'invoiceSiteFlagChecked' => ($this->dsCustomer->getValue(DBECustomer::invoiceSiteNo) == $site->getValue(
                         DBESite::siteNo
                     )) ? CT_CHECKED : null,
@@ -1460,35 +1346,28 @@ class CTCustomerCRM extends CTCustomer
                 'deleteSiteURL'          => $deleteSiteURL
             )
         );
-
         $this->template->set_block(
             'CustomerEdit',
             'invoiceContacts',
             null
         );
-
-
         $this->parseContactSelector(
             $site->getValue(DBESite::invoiceContactID),
             $this->dsContact,
             'invoiceContacts',
             'selectInvoiceContactBlock'
         );
-
         $this->template->set_block(
             'CustomerEdit',
             'deliverContacts',
             null
         );
-
         $this->parseContactSelector(
             $site->getValue(DBESite::deliverContactID),
             $this->dsContact,
             'deliverContacts',
             'selectDeliverContactBlock'
         );
-
-
         if ((!$this->formError) & ($this->getAction() != CTCUSTOMER_ACT_ADDCUSTOMER)) {
             $this->template->set_var(
                 array(
@@ -1497,16 +1376,13 @@ class CTCustomerCRM extends CTCustomer
                 )
             );
         }
-
         $this->template->parse(
             'sites',
             'siteBlock',
             true
         );
-
         $this->dsContact->initialise();
         $this->dsContact->sortAscending(DBEContact::lastName);
-
         while ($this->dsContact->fetchNext()) {
 
             $this->template->set_block(
@@ -1519,54 +1395,46 @@ class CTCustomerCRM extends CTCustomer
                 'customLetters',
                 null
             );
-
             $this->template->set_block(
                 'CustomerEdit',
                 'selectSupportLevel',
                 null
             );
-
-            $deleteContactURL = null;
+            $deleteContactURL  = null;
             $deleteContactLink = null;
-            $clientFormURL = null;
-            $dearJohnURL = null;
-            $dmLetterURL = null;
-            $customLetter1URL = null;
+            $clientFormURL     = null;
+            $dearJohnURL       = null;
+            $dmLetterURL       = null;
+            $customLetter1URL  = null;
             if ($this->dsContact->getValue(DBEContact::contactID) != 0) {
-                $deleteContactURL =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'    => CTCUSTOMER_ACT_DELETECONTACT,
-                            'contactID' => $this->dsContact->getValue(DBEContact::contactID)
-                        )
-                    );
+                $deleteContactURL = Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action'    => CTCUSTOMER_ACT_DELETECONTACT,
+                        'contactID' => $this->dsContact->getValue(DBEContact::contactID)
+                    )
+                );
                 /** @noinspection HtmlDeprecatedAttribute */
-                $deleteContactLink =
-                    '<a href="' . $deleteContactURL . '"><img align=middle border=0 hspace=2 src="images/icondelete.gif" alt="Delete contact" onClick="if(!confirm(\'Are you sure you want to delete this contact?\')) return(false)"></a>';
-                $dearJohnURL =
-                    Controller::buildLink(
-                        'DearJohnForm.php',
-                        array(
-                            'contactID' => $this->dsContact->getValue(DBEContact::contactID)
-                        )
-                    );
-                $dmLetterURL =
-                    Controller::buildLink(
-                        'DMLetterForm.php',
-                        array(
-                            'contactID' => $this->dsContact->getValue(DBEContact::contactID)//,
-                            //                  'letterTemplate' => 'dm_letter'
-                        )
-                    );
+                $deleteContactLink = '<a href="' . $deleteContactURL . '"><img align=middle border=0 hspace=2 src="images/icondelete.gif" alt="Delete contact" onClick="if(!confirm(\'Are you sure you want to delete this contact?\')) return(false)"></a>';
+                $dearJohnURL       = Controller::buildLink(
+                    'DearJohnForm.php',
+                    array(
+                        'contactID' => $this->dsContact->getValue(DBEContact::contactID)
+                    )
+                );
+                $dmLetterURL       = Controller::buildLink(
+                    'DMLetterForm.php',
+                    array(
+                        'contactID' => $this->dsContact->getValue(DBEContact::contactID)//,
+                        //                  'letterTemplate' => 'dm_letter'
+                    )
+                );
             }
-
             $this->template->set_var(
                 array(
                     'contactID'                            => $this->dsContact->getValue(DBEContact::contactID),
                     'siteNo'                               => $this->dsContact->getValue(DBEContact::siteNo),
                     'customerID'                           => $this->dsContact->getValue(DBEContact::customerID),
-                    'supplierID'                           => $this->dsContact->getValue(DBEContact::supplierID),
                     'title'                                => $this->dsContact->getValue(DBEContact::title),
                     'titleClass'                           => $this->dsContact->getValue(self::contactFormTitleClass),
                     'firstName'                            => $this->dsContact->getValue(DBEContact::firstName),
@@ -1686,43 +1554,33 @@ class CTCustomerCRM extends CTCustomer
                     ) ? 'green' : 'red'
                 )
             );
-
             $this->siteDropdown(
                 $this->dsContact->getValue(DBEContact::customerID),
                 $this->dsContact->getValue(DBEContact::siteNo)
             );
-
             $buContact = new BUContact($this);
-
             $buContact->supportLevelDropDown(
                 $this->dsContact->getValue(DBEContact::supportLevel),
                 $this->template
             );
-
             /*
             Display all the custom letters
             */
             foreach ($customLetterTemplates as $index => $filename) {
 
-                $customLetterURL =
-                    Controller::buildLink(
-                        'LetterForm.php',
-                        array(
-                            'contactID'      => $this->dsContact->getValue(DBEContact::contactID),
-                            'letterTemplate' => $filename
-                        )
-                    );
-
-
+                $customLetterURL = Controller::buildLink(
+                    'LetterForm.php',
+                    array(
+                        'contactID'      => $this->dsContact->getValue(DBEContact::contactID),
+                        'letterTemplate' => $filename
+                    )
+                );
                 $this->template->set_var(
-
                     array(
                         'customLetterURL'  => $customLetterURL,
                         'customLetterName' => $filename
-
                     )
                 );
-
                 $this->template->parse(
                     'customLetters',
                     'customLetterBlock',
@@ -1730,8 +1588,6 @@ class CTCustomerCRM extends CTCustomer
                 );
 
             } // end foreach
-
-
             $this->template->parse(
                 'contacts',
                 'contactBlock',
@@ -1754,26 +1610,21 @@ class CTCustomerCRM extends CTCustomer
                 false,
                 false
             );
-
             $this->template->set_block(
                 'CustomerEdit',
                 'orderBlock',
                 'orders'
             );
-
             while ($dbeJOrdhead->fetchNext()) {
 
                 $ordheadID = $dbeJOrdhead->getPKValue();
-
-                $orderURL =
-                    Controller::buildLink(
-                        'SalesOrder.php',
-                        array(
-                            'action'    => CTCNC_ACT_DISP_SALESORDER,
-                            'ordheadID' => $ordheadID
-                        )
-                    );
-
+                $orderURL = Controller::buildLink(
+                    'SalesOrder.php',
+                    array(
+                        'action'    => CTCNC_ACT_DISP_SALESORDER,
+                        'ordheadID' => $ordheadID
+                    )
+                );
                 $this->template->set_var(
                     array(
                         'orderURL'  => $orderURL,
@@ -1786,7 +1637,6 @@ class CTCustomerCRM extends CTCustomer
                         'custPORef' => $dbeJOrdhead->getValue(DBEJOrdhead::custPORef)
                     )
                 );
-
                 $this->template->parse(
                     'orders',
                     'orderBlock',
@@ -1802,7 +1652,6 @@ class CTCustomerCRM extends CTCustomer
                 'CustomerEdit'
             );
         }
-
         $this->template->parse(
             'CONTENTS',
             'CustomerEdit',
@@ -1837,21 +1686,18 @@ class CTCustomerCRM extends CTCustomer
             if (isset($this->postVars["form"]["contact"])) {
                 $this->buCustomer->updateContact($this->dsContact);
             }
-
             $this->setAction(CTCUSTOMER_ACT_DISP_SUCCESS);
             if ($this->getSessionParam('save_page')) {
                 header('Location: ' . $_SESSION['save_page']);
                 exit;
             } else {
-                $nextURL =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'     => CTCNC_ACT_DISP_EDIT,
-                            'customerID' => $this->getCustomerID()
-                        )
-                    );
-
+                $nextURL = Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action'     => CTCNC_ACT_DISP_EDIT,
+                        'customerID' => $this->getCustomerID()
+                    )
+                );
                 header('Location: ' . $nextURL);
                 exit;
             }
