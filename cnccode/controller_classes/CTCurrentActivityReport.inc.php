@@ -686,7 +686,7 @@ class CTCurrentActivityReport extends CTCNC
             $customer->getRow($customerID);
             $to      = "";
             $cc      = [];
-            $subject = "You have a call back request for  $contactName from " . $customer->getValue(DBECustomer::name);
+            $subject = "You have a call back request for $contactName from " . $customer->getValue(DBECustomer::name);
             if ($notifyTeamLead) {
                 // send email to both
                 $to    = $engineerEmail;
@@ -696,18 +696,19 @@ class CTCurrentActivityReport extends CTCNC
                 $to = $engineerEmail;
             }
             if ($to != "") {
-                $buMail = new BUMail($this);
+                $dateTimeFormat = 'd/m/Y H:i';
+                $buMail         = new BUMail($this);
                 global $twig;
                 $urlService = SITE_URL . '/SRActivity.php?action=displayActivity&serviceRequestId=' . $problemID;
                 $body       = $twig->render(
                     '@internal/callBackEmail.html.twig',
                     [
-                        'createAt'          => date('d/m/Y h:i', strtotime($createAt)),
+                        'createAt'          => date($dateTimeFormat, strtotime($createAt)),
                         'urlService'        => $urlService,
                         'contactName'       => $contactName,
                         'customerName'      => $customer->getValue(DBECustomer::name),
                         'serviceRequestId'  => $problemID,
-                        'callback_datetime' => date('d/m/Y h:i', strtotime($callback_datetime)),
+                        'callback_datetime' => $callDateTime->format($dateTimeFormat),
                         'reason'            => $description != "" ? "Additional Information: " . $description : "",
                     ]
                 );
