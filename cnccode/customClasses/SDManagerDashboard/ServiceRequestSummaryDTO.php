@@ -206,7 +206,7 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
         }
         $minutesRemaining                     = $assignedMinutes - $usedMinutes;
         $instance->hoursRemainingForSLA       = $problem->getValue(DBEJProblem::hoursRemainingForSLA);
-        $instance->isBeingWorkedOn            = $problem->isRequestBeingWorkedOn();
+        $instance->isBeingWorkedOn            = $problem->getValue(DBEJProblem::IS_BEING_WORKED_ON);
         $instance->status                     = $problem->getValue(DBEJProblem::status);
         $instance->isSLABreached              = $problem->isSLABreached();
         $instance->totalActivityDurationHours = $problem->getValue(DBEJProblem::totalActivityDurationHours);
@@ -245,8 +245,8 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
         $instance->slaFixHoursP3              = $dbeCustomer->getValue(\DBECustomer::slaFixHoursP3);
         $instance->contactName                = $problem->getValue(DBEJProblem::contactName);
         $instance->emailSubjectSummary        = $problem->getValue(DBEJProblem::emailSubjectSummary);
-        $instance->contactName = $problem->getValue(DBEJProblem::contactName);
-        $instance->contactID   = $problem->getValue(DBEJProblem::contactID);
+        $instance->contactName                = $problem->getValue(DBEJProblem::contactName);
+        $instance->contactID                  = $problem->getValue(DBEJProblem::contactID);
         return $instance;
     }
 

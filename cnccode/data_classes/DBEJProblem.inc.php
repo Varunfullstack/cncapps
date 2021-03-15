@@ -40,7 +40,8 @@ class DBEJProblem extends DBEProblem
     const IS_FIX_SLA_BREACHED              = 'isFixSLABreached';
     const contactName                      = 'contactName';
 
-    const contactID = 'contactID';
+    const contactID          = 'contactID';
+    const IS_BEING_WORKED_ON = "isBeingWorkedOn";
 
     /**
      * calls constructor()
@@ -237,6 +238,12 @@ class DBEJProblem extends DBEProblem
                 ' ',
                 COALESCE(CONCAT(pro_alarm_time,':00'), '00:00:00')
             )"
+        );
+        $this->addColumn(
+            self::IS_BEING_WORKED_ON,
+            DA_BOOLEAN,
+            DA_ALLOW_NULL,
+            "(SELECT COUNT(*) > 0 FROM callactivity t WHERE CONCAT(t.caa_date,' ',t.caa_starttime,':00') <= NOW() AND t.caa_endtime IS NULL AND t.caa_problemno = pro_problemno) AS isBeingWorkedOn"
         );
         $this->addColumn(
             self::FIXED_DATE,
