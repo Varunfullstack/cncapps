@@ -861,20 +861,13 @@ class DBEJProblem extends DBEProblem
                 $sql .= " and  " . $this->getDBColumnName(self::criticalFlag) . " = 'Y' order by hoursRemaining desc ";
                 break;
             case 'currentOpenSRs':
-                $sql .= " and last.caa_endtime is null AND (
-    (
-      last.caa_date = CURDATE()
-      AND last.caa_starttime <= TIME(NOW())
-    )
-    OR last.caa_date < CURDATE()
-  )  order by hoursRemaining desc";
+                $sql .= " and (SELECT COUNT(*) > 0 FROM callactivity t WHERE CONCAT(t.caa_date,' ',t.caa_starttime,':00') <= NOW() AND t.caa_endtime IS NULL AND t.caa_problemno = pro_problemno) order by hoursRemaining desc";
                 break;
             case "holdForQA":
                 $sql .= " and holdForQA=1";
 
         }
         $sql .= ' limit ' . $limit;
-//        var_dump($sql);
         $this->setQueryString($sql);
         return (parent::getRows());
     }

@@ -1,59 +1,49 @@
 <?php
+
 use CNCLTD\LoggerCLI;
 
 require_once(__DIR__ . "/../htdocs/config.inc.php");
 global $cfg;
-
-$logName = 'OpenCallEmail';
-$logger = new LoggerCLI($logName);
-
+$logName = 'ActiveCallEmail';
+$logger  = new LoggerCLI($logName);
 // increasing execution time to infinity...
 ini_set('max_execution_time', 0);
-
 if (!is_cli()) {
     echo 'This script can only be ran from command line';
     exit;
 }
 // Script example.php
 $shortopts = "d";
-$longopts = [
+$longopts  = [
     "outputEmails"
 ];
-$options = getopt($shortopts, $longopts);
+$options   = getopt($shortopts, $longopts);
 $debugMode = false;
 if (isset($options['d'])) {
     $debugMode = true;
 }
 $thing = null;
 require_once($cfg["path_bu"] . "/BUMail.inc.php");
-
 define(
     'OS_CALL_EMAIL_FROM_USER',
     'sales@' . CONFIG_PUBLIC_DOMAIN
 );
 define(
     'OS_CALL_EMAIL_SUBJECT',
-    'Open SR Activities'
+    'Active SR Activities'
 );
 define(
     'FORMAT_MYSQL_UK_DATE',
     '%e/%c/%Y'
 );
-
 $domain = CONFIG_PUBLIC_DOMAIN;
-
-
 //we are going to use this to add to the monitoring db
-$dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME;
+$dsn             = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME;
 $databaseOptions = [
     PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
 ];
-
 if (!$pdoDB = new PDO(
-    $dsn,
-    DB_USER,
-    DB_PASSWORD,
-    $databaseOptions
+    $dsn, DB_USER, DB_PASSWORD, $databaseOptions
 )) {
     echo 'Could not connect to mysql host ' . DB_HOST;
     exit;
@@ -72,9 +62,7 @@ class EngineerActivity
 }
 
 $outputEmails = isset($options['outputEmails']);
-
-$query =
-    'SELECT
+$query = 'SELECT
   caa_callactivityno as activityId,
   cus_name as customerName,
   CONCAT(firstName, " ", lastName) AS engineerName,
@@ -93,24 +81,18 @@ FROM
     JOIN team ON consultant.`teamID` = team.`teamID`
   JOIN customer
     ON pro_custno = cus_custno
-WHERE caa_date <= NOW()
-  AND (
-    caa_endtime = ""
-    OR caa_endtime IS NULL
-  )
+WHERE CONCAT(t.caa_date," ",t.caa_starttime,":00") <= NOW() AND t.caa_endtime IS NULL
 ORDER BY engineerName,
   caa_date,
   pro_custno';                                                // and on-site
-
 $pdoStatement = $pdoDB->query($query);
-
-//this finds all the engineers that have open activities
+//this finds all the engineers that have active activities
 /*
 Send each engineer an email
 */
 /** @var EngineerActivity[] $activities */
 $activities = $pdoStatement->fetchAll(PDO::FETCH_CLASS, EngineerActivity::class);
-$engineers = array_reduce(
+$engineers  = array_reduce(
     $activities,
     function ($acc, EngineerActivity $engineerActivity) {
         if (!isset($acc[$engineerActivity->engineerId])) {
@@ -121,15 +103,13 @@ $engineers = array_reduce(
     },
     []
 );
-
-
 $managers = [];
 /**
  * @var int $engineerId
  * @var EngineerActivity[] $engineerActivities
  */
 foreach ($engineers as $engineerId => $engineerActivities) {
-    $logName = null;
+    $logName      = null;
     $engineerName = null;
     if (!$outputEmails) {
         ob_start();
@@ -137,7 +117,7 @@ foreach ($engineers as $engineerId => $engineerActivities) {
     ?>
     <HTML lang="en">
     <P>
-        Your following activities are open (no end time entered):
+        Your following activities are active (no end time entered):
     </P>
     <TABLE>
         <TR>
@@ -159,28 +139,24 @@ foreach ($engineers as $engineerId => $engineerActivities) {
             if (!$engineerName) {
                 $engineerName = $engineerActivity->engineerName;
             }
-
-
             $managerId = $engineerActivity->engineerManagerId;
             if ($managerId && (strtotime($engineerActivity->activityDate) <= strtotime(
                         '-5 days',
                         time()
                     ))) {
-                //this guy has a manager and this activity was open more than 5 days ago
+                //this guy has a manager and this activity was active more than 5 days ago
                 if (!isset($managers[$managerId])) {
                     $managers[$managerId] = (object)[
                         "minionConsultants" => []
                     ];
                 }
-
                 if (!isset($managers[$managerId]->minionConsultants[$engineerId])) {
                     $managers[$managerId]->minionConsultants[$engineerId] = (object)[
                         "name"           => $engineerActivity->engineerName,
-                        "openActivities" => []
+                        "activeActivities" => []
                     ];
                 }
-
-                $managers[$managerId]->minionConsultants[$engineerId]->openActivities[] = $engineerActivity;
+                $managers[$managerId]->minionConsultants[$engineerId]->activeActivities[] = $engineerActivity;
             }
             ?>
             <TR>
@@ -200,40 +176,32 @@ foreach ($engineers as $engineerId => $engineerActivities) {
     </TABLE>
     </HTML>
     <?php
-
     if (!$outputEmails) {
         $body = ob_get_contents();
         ob_end_clean();
-
-        $buMail = new BUMail($thing);
-        $emailSubject = "You have open requests";
-
+        $buMail       = new BUMail($thing);
+        $emailSubject = "You have active requests";
         $buMail->mime->setHTMLBody($body);
-
         $mime_params = array(
             'text_encoding' => '7bit',
             'text_charset'  => 'UTF-8',
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-
         $body = $buMail->mime->get($mime_params);
-
         $sendTo = $logName . '@' . $domain;
-        $hdrs = array(
+        $hdrs   = array(
             'To'           => $sendTo,
             'From'         => CONFIG_SUPPORT_EMAIL,
             'Subject'      => $emailSubject,
             'Content-Type' => 'text/html; charset=UTF-8'
         );
-
         $hdrs = $buMail->mime->headers($hdrs);
         $sent = $buMail->send(
             $sendTo,
             $hdrs,
             $body
         );
-
         if ($sent) {
             echo "email sent to {$engineerName} email: {$sendTo}";
             echo '<br>';
@@ -243,19 +211,14 @@ foreach ($engineers as $engineerId => $engineerActivities) {
         }
     }
 }
-
 foreach ($managers as $managerId => $manager) {
     //get information about the manager
-
     $managersRows = $pdoDB->query('SELECT cns_logname FROM consultant WHERE cns_consno = ' . $managerId);
-
     $managerRow = $managersRows->fetch(PDO::FETCH_ASSOC);
-
     if (!$managerRow) {
         echo "<br>Manager with id $managerId not found, skipping<br>";
         continue;
     }
-
     if (!$outputEmails) {
         ob_start();
     }
@@ -267,7 +230,7 @@ foreach ($managers as $managerId => $manager) {
         }
     </style>
     <P>
-        The following consultants under your management have open activities for 2 days or more
+        The following consultants under your management have active activities for 2 days or more
     </P>
     <TABLE>
         <TR>
@@ -287,28 +250,28 @@ foreach ($managers as $managerId => $manager) {
         <?php
         foreach ($manager->minionConsultants as $minionConsultant) {
             $isFirst = true;
-            /** @var EngineerActivity $openActivity */
-            foreach ($minionConsultant->openActivities as $openActivity) {
+            /** @var EngineerActivity $activeActivity */
+            foreach ($minionConsultant->activeActivities as $activeActivity) {
 
                 ?>
                 <TR>
                     <?php
                     if ($isFirst) { ?>
-                        <TD rowspan="<?= count($minionConsultant->openActivities); ?>">
+                        <TD rowspan="<?= count($minionConsultant->activeActivities); ?>">
                             <?= $minionConsultant->name ?>
                         </TD>
                         <?php
                     }
                     ?>
                     <TD>
-                        <A href="<?= SITE_URL ?>/SRActivity.php?action=displayActivity&callActivityID=<?= $openActivity->activityId ?>"><?= $openActivity->activityId ?></A>
+                        <A href="<?= SITE_URL ?>/SRActivity.php?action=displayActivity&callActivityID=<?= $activeActivity->activityId ?>"><?= $activeActivity->activityId ?></A>
                     </TD>
 
                     <TD>
-                        <?= $openActivity->customerName ?>
+                        <?= $activeActivity->customerName ?>
                     </TD>
                     <TD>
-                        <?= $openActivity->activityDate ?>
+                        <?= $activeActivity->activityDate ?>
                     </TD>
                 </TR>
                 <?php
@@ -321,38 +284,32 @@ foreach ($managers as $managerId => $manager) {
     </TABLE>
     </HTML>
     <?php
-
     if (!$outputEmails) {
         $body = ob_get_contents();
         ob_end_clean();
-
-        $emailSubject = "Your managed engineers have open requests";
-
+        $emailSubject = "Your managed engineers have active requests";
         $buMail = new BUMail($thing);
         $buMail->mime->setHTMLBody($body);
-
         $mime_params = array(
             'text_encoding' => '7bit',
             'text_charset'  => 'UTF-8',
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-
-        $body = $buMail->mime->get($mime_params);
+        $body   = $buMail->mime->get($mime_params);
         $sendTo = $managerRow['cns_logname'] . '@' . $domain;
-        $hdrs = array(
+        $hdrs   = array(
             'To'           => $sendTo,
             'From'         => CONFIG_SUPPORT_EMAIL,
             'Subject'      => $emailSubject,
             'Content-Type' => 'text/html; charset=UTF-8'
         );
-        $hdrs = $buMail->mime->headers($hdrs);
-        $sent = $buMail->send(
+        $hdrs   = $buMail->mime->headers($hdrs);
+        $sent   = $buMail->send(
             $sendTo,
             $hdrs,
             $body
         );
-
         if ($sent) {
             echo 'email sent to ' . $managerRow['cns_logname'] . ' email: ' . $sendTo;
         } else {

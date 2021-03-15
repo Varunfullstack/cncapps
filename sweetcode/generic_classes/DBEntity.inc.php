@@ -38,6 +38,7 @@
 global $cfg;
 
 use CNCLTD\Exceptions\ColumnOutOfRangeException;
+use CNCLTD\Exceptions\DBQueryException;
 
 require_once($cfg["path_gc"] . "/DataAccess.inc.php");
 define(
@@ -177,7 +178,7 @@ class DBEntity extends DataAccess
         }
         if ($this->getShowSQL()) {
             try {
-                throw new Exception();
+                throw new Exception('test');
             } catch (Exception $exception) {
                 echo $this->getClassname() . ": " . $this->getQueryString() . "<BR/>" . $exception->getTraceAsString(
                     ) . " <HR/>";
@@ -201,13 +202,7 @@ class DBEntity extends DataAccess
             $this->firstRowFetched = FALSE;
             $ret                   = TRUE;
         } else {
-            global $server_type;
-            if ($server_type == 'development') {
-                var_dump($this->db->Error);
-            }
-            error_log(json_encode(["error" => $this->db->Error, "query" => $this->getQueryString()]));
-            $this->raiseError("Query problem");
-            $ret = FALSE;
+            throw new DBQueryException($this->db->Error, $this->queryString);
         }
         return $ret;
     }
@@ -710,8 +705,7 @@ class DBEntity extends DataAccess
             }
             return $this->getValueNoCheckByColumnNumber($ixColumn);
         } else {
-            throw new \CCNCLTD\Exceptions\ColumnOutOfRangeException($ixPassedColumn);
-            return DA_OUT_OF_RANGE;
+            throw new ColumnOutOfRangeException($ixPassedColumn);
         }
     }
 
@@ -1008,8 +1002,7 @@ class DBEntity extends DataAccess
         }
         $ixColumn = $this->columnExists($column);
         if ($ixColumn == DA_OUT_OF_RANGE) {
-            throw new \CCNCLTD\Exceptions\ColumnOutOfRangeException($column);
-            return DA_OUT_OF_RANGE;
+            throw new ColumnOutOfRangeException($column);
         }
         $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
             ) . " WHERE " . $this->getDBColumnName($ixColumn) . "=" . $this->getFormattedValue($ixColumn);
@@ -1064,8 +1057,7 @@ class DBEntity extends DataAccess
         }
         $ixColumn = $this->columnExists($column);
         if ($ixColumn == DA_OUT_OF_RANGE) {
-            throw new \CCNCLTD\Exceptions\ColumnOutOfRangeException($column);
-            return DA_OUT_OF_RANGE;
+            throw new ColumnOutOfRangeException($column);
         }
         $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
             ) . " WHERE " . $this->getDBColumnName($ixColumn) . "=" . $this->getFormattedValue($ixColumn);
@@ -1088,8 +1080,7 @@ class DBEntity extends DataAccess
         }
         $ixColumn = $this->columnExists($column);
         if ($ixColumn == DA_OUT_OF_RANGE) {
-            throw new \CCNCLTD\Exceptions\ColumnOutOfRangeException($column);
-            return DA_OUT_OF_RANGE;
+            throw new ColumnOutOfRangeException($column);
         }
         $this->setQueryString(
             "SELECT COUNT(*)" . " FROM " . $this->getTableName() . " WHERE " . $this->getDBColumnName(

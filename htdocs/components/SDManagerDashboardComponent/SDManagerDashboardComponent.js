@@ -59,7 +59,7 @@ class SDManagerDashboardComponent extends MainComponent {
             {id: 2, title: "Current Open P1 Requests", icon: null},
             {id: SHORTEST_SLA_FIX_REMAINING, title: "Shortest SLA Fix Remaining", icon: null},
             {id: CRITICAL_SERVICE_REQUESTS, title: "Critical Service Requests", icon: null},
-            {id: 5, title: "Current Open SRs", icon: null},
+            {id: 5, title: "Current Active SRs", icon: null},
             {id: 6, title: "Oldest Updated SRs", icon: null},
             {id: 7, title: "Longest Open SR", icon: null},
             {id: 8, title: "Most Hours Logged", icon: null},

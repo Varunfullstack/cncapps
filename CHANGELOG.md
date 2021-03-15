@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.6.3] - 2021-03-15
+### Changed
+- Changed the concept "open" to "active" where required, meaning Service Requests where there's at least one activity
+with dateTime in the past and there's no end time.
+
 ## [v5.6.2] - 2021-03-15
 ### Changed
 - Increase call back automated activity to 3 minutes
