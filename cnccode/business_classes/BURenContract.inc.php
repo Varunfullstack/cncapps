@@ -213,6 +213,7 @@ class BURenContract extends Business
         $previousCustomerID = 99999;
         $generateInvoice    = false;
         echo "<div> Contract Renewals - START </div>";
+        var_dump('here');
         while ($dsRenContract->fetchNext()) {
             ?>
             <div>
@@ -220,6 +221,7 @@ class BURenContract extends Business
             </div>
             <?php
             if ($dbeJCustomerItem->getRow($dsRenContract->getValue(DBECustomerItem::customerItemID))) {
+
                 /*
                  * Group many contracts for same customer under one sales order
          * unless it is an SSL cert in which case it has it's own order
@@ -236,7 +238,7 @@ class BURenContract extends Business
                     /*
                     If generating invoices and an order has been started
                     */
-                    if ($generateInvoice && !!$dsOrdhead) {
+                    if ($generateInvoice && (bool)$dsOrdhead) {
 
                         $buSalesOrder->setStatusCompleted($dsOrdhead->getValue(DBEOrdhead::ordheadID));
                         $buSalesOrder->getOrderByOrdheadID(
@@ -269,11 +271,11 @@ class BURenContract extends Business
                     );
                     ?>
                     <div>Creating new Sales Order: <?= $dsOrdhead->getValue(DBEOrdhead::ordheadID) ?></div>
+
                     <?php
                 }
                 $generateInvoice = $dsRenContract->getValue(DBECustomerItem::autoGenerateContractInvoice) === 'Y';
                 if ($dsRenContract->getValue(DBECustomerItem::officialOrderNumber)) {
-
                     $custPORef = $dsRenContract->getValue(DBECustomerItem::officialOrderNumber);
                     if ($dsOrdhead->getValue(DBEOrdhead::custPORef)) {
                         $custPORef = $dsOrdhead->getValue(DBEOrdhead::custPORef) . '/' . $custPORef;

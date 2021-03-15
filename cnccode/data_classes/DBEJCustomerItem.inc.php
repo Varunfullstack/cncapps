@@ -4,24 +4,27 @@
 * @access public
 */
 global $cfg;
+
+use CNCLTD\Exceptions\ColumnOutOfRangeException;
+
 require_once($cfg["path_dbe"] . "/DBECustomerItem.inc.php");
 
 class DBEJCustomerItem extends DBECustomerItem
 {
 
-    const customerName = "customerName";
-    const siteDescription = "siteDescription";
+    const customerName       = "customerName";
+    const siteDescription    = "siteDescription";
     const contractItemTypeID = "contractItemTypeID";
-    const itemDescription = "itemDescription";
-    const itemNotes = "itemNotes";
-    const renewalTypeID = "renewalTypeID";
-    const partNo = "partNo";
-    const servercareFlag = "servercareFlag";
-    const invoiceFromDate = "invoiceFromDate";
-    const invoiceToDate = "invoiceToDate";
+    const itemDescription    = "itemDescription";
+    const itemNotes          = "itemNotes";
+    const renewalTypeID      = "renewalTypeID";
+    const partNo             = "partNo";
+    const servercareFlag     = "servercareFlag";
+    const invoiceFromDate    = "invoiceFromDate";
+    const invoiceToDate      = "invoiceToDate";
     const invoiceFromDateYMD = "invoiceFromDateYMD";
-    const invoiceToDateYMD = "invoiceToDateYMD";
-    const reoccurring = "reocurring";
+    const invoiceToDateYMD   = "invoiceToDateYMD";
+    const reoccurring        = "reocurring";
 
     /**
      * calls constructor()
@@ -94,41 +97,36 @@ class DBEJCustomerItem extends DBECustomerItem
             DA_NOT_NULL,
             "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths + custitem.invoicePeriodMonths MONTH ), '%d/%m/%Y')"
         );
-
         $this->addColumn(
             self::invoiceFromDateYMD,
             DA_DATE,
             DA_NOT_NULL,
             "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths MONTH ), '%Y-%m-%d') as invoiceFromDateYMD"
         );
-
         $this->addColumn(
             self::invoiceToDateYMD,
             DA_DATE,
             DA_NOT_NULL,
             "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths + custitem.invoicePeriodMonths MONTH ), '%Y-%m-%d') as invoiceToDateYMD"
         );
-
         $this->addColumn(
             self::reoccurring,
             DA_BOOLEAN,
             DA_NOT_NULL,
             "itemtype.reoccurring"
         );
-
         $this->setAddColumnsOff();
     }
 
-    function getRowsBySearchCriteria(
-        $customerID,
-        $ordheadID,
-        $startDate,
-        $endDate,
-        $itemText,
-        $contractText,
-        $serialNo,
-        $renewalStatus,
-        $row_limit = 1000
+    function getRowsBySearchCriteria($customerID,
+                                     $ordheadID,
+                                     $startDate,
+                                     $endDate,
+                                     $itemText,
+                                     $contractText,
+                                     $serialNo,
+                                     $renewalStatus,
+                                     $row_limit = 1000
     )
     {
         $this->setMethodName('getRowsBySearchCriteria');
@@ -138,11 +136,7 @@ class DBEJCustomerItem extends DBECustomerItem
                         JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno
                         left join itemtype on ity_itemtypeno = citem.itm_itemtypeno
                         ";
-
-
         $filters = [];
-
-
         if ($customerID != '') {
             $filters[] = $this->getDBColumnName(self::customerID) . "=" . $customerID;
         }
@@ -167,14 +161,12 @@ class DBEJCustomerItem extends DBECustomerItem
                     $serialNo
                 ) . "%'";
         }
-
         if ($itemText != '') {
             $filters[] = " citem.itm_desc LIKE '%" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $itemText
                 ) . "%'";
         }
-
         /*
         If searching on contract text, need to sub-query to match item descriptions
         on custitem_contract
@@ -187,7 +179,6 @@ class DBEJCustomerItem extends DBECustomerItem
     ON cic_contractcuino = contractCustomerItem.`cui_cuino`
   LEFT JOIN item AS contractItem ON contractCustomerItem.cui_itemno = contractItem.`itm_itemno`
   ";
-
             if ($renewalStatus) {
 
                 $filters[] = " contractCustomerItem.renewalStatus ='" . mysqli_real_escape_string(
@@ -202,25 +193,20 @@ class DBEJCustomerItem extends DBECustomerItem
                     ) . "%'";
             }
         }
-
         if (count($filters)) {
             $baseQuery .= " where " . implode(" and ", $filters);
         }
-
         if ($row_limit) {
             $baseQuery .= " LIMIT 0," . $row_limit;
         }
-
         $this->setQueryString($baseQuery);
-
         return (parent::getRows());
     }
 
     function getRow($ID = null)
     {
         $this->setMethodName('getRow');
-        $queryString =
-            "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} 
+        $queryString = "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} 
                 JOIN item AS citem ON cui_itemno = itm_itemno 
                 JOIN customer ON cui_custno = cus_custno 
                 JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno
@@ -241,17 +227,14 @@ class DBEJCustomerItem extends DBECustomerItem
         }
         $ixColumn = $this->columnExists($column);
         if ($ixColumn == DA_OUT_OF_RANGE) {
-            $this->raiseError("Column " . $column . " out of range");
-            return DA_OUT_OF_RANGE;
+            throw new ColumnOutOfRangeException($column);
         }
-        $queryString =
-            "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} 
+        $queryString = "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} 
                 JOIN item AS citem ON cui_itemno = itm_itemno 
                 JOIN customer ON cui_custno = cus_custno 
                 JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno
                 join itemtype on ity_itemtypeno = citem.itm_itemtypeno
                 WHERE {$this->getDBColumnName($ixColumn)}={$this->getFormattedValue($ixColumn)}";
-
         if ($sortColumn != '') {
             $ixSortColumn = $this->columnExists($sortColumn);
             if ($ixSortColumn == DA_OUT_OF_RANGE) {
@@ -261,17 +244,13 @@ class DBEJCustomerItem extends DBECustomerItem
                 $queryString .= " ORDER BY " . $this->getDBColumnName($ixSortColumn);
             }
         }
-
         $this->setQueryString($queryString);
         return ($this->getRows());
     }
 
     function getItemsByContractID($customerItemId)
     {
-        $queryString =
-            "SELECT " .
-            $this->getDBColumnNamesAsString() .
-            " FROM
+        $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM
           custitem_contract
           JOIN custitem ON cic_cuino = cui_cuino 
           JOIN item AS citem ON cui_itemno = itm_itemno
@@ -283,7 +262,6 @@ class DBEJCustomerItem extends DBECustomerItem
 
        ORDER BY 
         itm_desc";
-
         $this->setQueryString($queryString);
         return ($this->getRows());
     }
@@ -300,10 +278,7 @@ class DBEJCustomerItem extends DBECustomerItem
             $this->raiseError('customerID not set');
         }
         $this->setQueryString(
-            "SELECT " . $this->getDBColumnNamesAsString() .
-
-            " FROM " . $this->getTableName() .
-            " JOIN item AS citem ON cui_itemno = itm_itemno
+            "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " JOIN item AS citem ON cui_itemno = itm_itemno
  			    JOIN customer ON cui_custno = cus_custno
  			    JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno
           JOIN custitem_contract cic ON cic.cic_cuino = custitem.cui_cuino
@@ -311,23 +286,20 @@ class DBEJCustomerItem extends DBECustomerItem
           JOIN item con_item ON con.cui_itemno = con_item.itm_itemno
           join itemtype on ity_itemtypeno = citem.itm_itemtypeno
       
- 		   WHERE " . $this->getDBColumnName(self::customerID) . "=" . $this->getValue(self::customerID) .
-            " AND citem.itm_itemtypeno = " . CONFIG_SERVER_ITEMTYPEID .
-            " AND con_item.itm_itemtypeno = " . CONFIG_SERVERCARE_ITEMTYPEID .
-            " AND con.renewalStatus = 'R'" .
-            " AND " . $this->getDBColumnName(self::serverName) . " > ''
+ 		   WHERE " . $this->getDBColumnName(self::customerID) . "=" . $this->getValue(
+                self::customerID
+            ) . " AND citem.itm_itemtypeno = " . CONFIG_SERVER_ITEMTYPEID . " AND con_item.itm_itemtypeno = " . CONFIG_SERVERCARE_ITEMTYPEID . " AND con.renewalStatus = 'R'" . " AND " . $this->getDBColumnName(
+                self::serverName
+            ) . " > ''
       ORDER BY citem.itm_desc, custitem.installationDate"
-
         );
-
         return (parent::getRows());
     }
 
     function getContractDescriptionsByCustomerItemID($customerItemID)
     {
-        $db = new dbSweetcode();
-        $select =
-            "SELECT
+        $db     = new dbSweetcode();
+        $select = "SELECT
         GROUP_CONCAT( i.itm_desc ) as contracts
       FROM
         custitem_contract cic
@@ -343,9 +315,8 @@ class DBEJCustomerItem extends DBECustomerItem
 
     public function getCountCustomerDirectDebitItems($customerID)
     {
-        $db = new dbSweetcode();
-        $select =
-            "SELECT COUNT(custitem.`cui_cuino`) as directDebitCount FROM custitem WHERE directDebitFlag = 'Y' AND `cui_custno` = $customerID";
+        $db     = new dbSweetcode();
+        $select = "SELECT COUNT(custitem.`cui_cuino`) as directDebitCount FROM custitem WHERE directDebitFlag = 'Y' AND `cui_custno` = $customerID";
         $db->query($select);
         if (!$db->num_rows()) {
             return 0;

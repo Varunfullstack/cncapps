@@ -1,6 +1,14 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.6.2]
+### Changed
+- Increase call back automated activity to 3 minutes
+- User 24 hour time in call back request email
+### Fixed
+- Daily renewals getting stuck.
+- Calculation of Open SR status
+
 ## [v5.6.1] - 2021-03-11 
 ### Fixed
 - Unable to edit contracts.

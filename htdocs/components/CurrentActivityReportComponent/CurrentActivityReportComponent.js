@@ -14,8 +14,6 @@ import InboxOpenSRComponent from './subComponents/InboxOpenSRComponent';
 import {getServiceRequestWorkTitle, sort} from '../utils/utils';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Modal from '../shared/Modal/modal';
-import CNCCKEditor from '../shared/CNCCKEditor';
 import APIStandardText from '../services/APIStandardText';
 import CallBackModal from './subComponents/CallBackModal';
 
@@ -35,7 +33,8 @@ class CurrentActivityReportComponent extends MainComponent {
     autoReloadInterval;
     teams;
     apiStandardText = new APIStandardText();
-    apiActivity= new APIActivity();
+    apiActivity = new APIActivity();
+
     constructor(props) {
         super(props);
         const filter = this.getLocalStorageFilter();
@@ -66,14 +65,14 @@ class CurrentActivityReportComponent extends MainComponent {
             _showSpinner: false,
             userFilter: "",
             filter,
-            changeQueuData:{
-                show:false,
-                newTeam:'',
-                queue:'',
-                problem:null
+            changeQueuData: {
+                show: false,
+                newTeam: '',
+                queue: '',
+                problem: null
             },
-            showCallBackModal:false,
-            currentProblem:null
+            showCallBackModal: false,
+            currentProblem: null
         };
         this.apiCurrentActivityService = new CurrentActivityService();
         this.teams = [
@@ -207,7 +206,7 @@ class CurrentActivityReportComponent extends MainComponent {
         this.loadQueue(code);
         this.checkAutoReload(code);
         this.saveFilterToLocalStorage(filter);
-        this.setState({filter,openSrCustomerID:''});
+        this.setState({filter, openSrCustomerID: ''});
     };
     loadData = () => {
         const {filter} = this.state;
@@ -315,19 +314,19 @@ class CurrentActivityReportComponent extends MainComponent {
                     break;
                 case "OSR":
                     if (this.state.openSrCustomerID)
-                        this.getCustomerOpenSR(this.state.openSrCustomerID,this.state.srNumber);
+                        this.getCustomerOpenSR(this.state.openSrCustomerID, this.state.srNumber);
                     break;
             }
         }
     };
-    getCustomerOpenSR = (customerID,srNumber) => {
+    getCustomerOpenSR = (customerID, srNumber) => {
         const {filter} = this.state;
-        if (customerID != '' || srNumber !='') {
+        if (customerID != '' || srNumber != '') {
             console.log('get sr');
             this.showSpinner();
-            this.setState({openSrCustomerID: customerID,srNumber})
+            this.setState({openSrCustomerID: customerID, srNumber})
             this.apiCurrentActivityService
-                .getCustomerOpenSR(customerID,srNumber)
+                .getCustomerOpenSR(customerID, srNumber)
                 .then((res) => {
                     const openSRInbox = this.prepareResult(res);
                     sort(openSRInbox, "queueNo");
@@ -343,39 +342,39 @@ class CurrentActivityReportComponent extends MainComponent {
         }
     }
 
-    getAssignTeamModal=()=>{
-        const {changeQueuData} =this.state;
-        if(!changeQueuData.show)
+    getAssignTeamModal = () => {
+        const {changeQueuData} = this.state;
+        if (!changeQueuData.show)
             return null;
         else
             return <MovingSRComponent
-            key="MovingSR"
-            problem={changeQueuData.problem}
-            queue={changeQueuData.queue}
-            show={changeQueuData.show}
-            newTeam={changeQueuData.newTeam}
-            onClose={this.handleMovingModalClose}
+                key="MovingSR"
+                problem={changeQueuData.problem}
+                queue={changeQueuData.queue}
+                show={changeQueuData.show}
+                newTeam={changeQueuData.newTeam}
+                onClose={this.handleMovingModalClose}
             ></MovingSRComponent>
     }
-    handleMovingModalClose=(reload=true)=>{
-        const {changeQueuData} =this.state;
-        if(reload)
-        this.loadQueue(changeQueuData.queue);
-        changeQueuData.show=false;
-        changeQueuData.newTeam='';
-        changeQueuData.queue='';
-        changeQueuData.problem=null;
+    handleMovingModalClose = (reload = true) => {
+        const {changeQueuData} = this.state;
+        if (reload)
+            this.loadQueue(changeQueuData.queue);
+        changeQueuData.show = false;
+        changeQueuData.newTeam = '';
+        changeQueuData.queue = '';
+        changeQueuData.problem = null;
         this.setState({changeQueuData});
     }
 
 
     // Shared methods
     moveToAnotherTeam = async ({target}, problem, code) => {
-        const {changeQueuData} =this.state;
-        changeQueuData.newTeam=target.value;
-        changeQueuData.problem=problem;
-        changeQueuData.show=true;
-        changeQueuData.queue=code;
+        const {changeQueuData} = this.state;
+        changeQueuData.newTeam = target.value;
+        changeQueuData.problem = problem;
+        changeQueuData.show = true;
+        changeQueuData.queue = code;
         this.setState({changeQueuData});
     };
     /**
@@ -606,28 +605,26 @@ class CurrentActivityReportComponent extends MainComponent {
             this.alert(err.toString());
         }
     }
-    onCallBack=(problem)=>{
+
+    onCallBack = (problem) => {
         console.log(problem);
-        this.setState({showCallBackModal:true,currentProblem:problem});
+        this.setState({showCallBackModal: true, currentProblem: problem});
     }
-    getCallBackModal=()=>{
-        const {showCallBackModal,currentProblem}=this.state;
-        if(!showCallBackModal)
-        return null;
-        return <CallBackModal key="modal" show={showCallBackModal}
-        onClose={this.handleCallBackClose}
-        problem={currentProblem}
+    getCallBackModal = () => {
+        const {showCallBackModal, currentProblem} = this.state;
+        if (!showCallBackModal)
+            return null;
+        return <CallBackModal key="modal"
+                              show={showCallBackModal}
+                              onClose={this.handleCallBackClose}
+                              problem={currentProblem}
         >
         </CallBackModal>
     }
-    handleCallBackClose=(callActivityID)=>{
-        console.log(callActivityID);
-        //const {currentProblem}=this.state;
-        this.setState({showCallBackModal:false});
-        //if(callActivityID!=null)
-        //    window.location=`SRActivity.php?action=editActivity&callActivityID=${callActivityID}&isFollow=1`;
-        //window.location=`SRActivity.php?action=displayActivity&serviceRequestId=`+currentProblem.problemID;
+    handleCallBackClose = (callActivityID) => {
+        this.setState({showCallBackModal: false});
     }
+
     render() {
         const {
             el,
@@ -666,7 +663,10 @@ class CurrentActivityReportComponent extends MainComponent {
 
         } = this.state;
         return el("div", {style: {backgroundColor: "white"}}, [
-            <CallBackComponent  key='callback' team={filter.activeTab} customerID={this.state.openSrCustomerID}></CallBackComponent>,
+            <CallBackComponent key='callback'
+                               team={filter.activeTab}
+                               customerID={this.state.openSrCustomerID}
+            ></CallBackComponent>,
             this.getCallBackModal(),
             this.getConfirm(),
             this.getAlert(),

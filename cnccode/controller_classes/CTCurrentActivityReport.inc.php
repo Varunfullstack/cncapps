@@ -40,8 +40,8 @@ class CTCurrentActivityReport extends CTCNC
     var $priority      = array();
     var $loggedInUserIsSdManager;
     var $customerFilterList;
-    const CONST_CALLBACK='callback';
-    const CONST_CALLBACK_SEARCH='callbackSearch';
+    const CONST_CALLBACK        = 'callback';
+    const CONST_CALLBACK_SEARCH = 'callbackSearch';
 
     /**
      * @var BUCustomerItem
@@ -69,7 +69,7 @@ class CTCurrentActivityReport extends CTCNC
         );
         $this->buActivity     = new BUActivity($this);
         $this->buCustomerItem = new BUCustomerItem($this);
-        $checkPermissions=!in_array($this->getAction(),[self::CONST_CALLBACK]);
+        $checkPermissions     = !in_array($this->getAction(), [self::CONST_CALLBACK]);
         if ($checkPermissions) {
 
             $roles = [
@@ -88,7 +88,7 @@ class CTCurrentActivityReport extends CTCNC
      */
     function defaultAction()
     {
-        $method=$this->getRequestMethodeName();
+        $method = $this->getRequestMethodeName();
         switch ($this->getAction()) {
             case "getHelpDeskInbox":
                 echo json_encode($this->renderQueue(1));
@@ -143,21 +143,21 @@ class CTCurrentActivityReport extends CTCNC
                 switch ($method) {
                     case 'POST':
                         echo json_encode($this->addCallBack());
-                        break;   
+                        break;
                     case 'GET':
                         echo json_encode($this->getMyCallback());
-                        break; 
+                        break;
                     case 'DELETE':
                         echo json_encode($this->cancelCallBack());
-                        break; 
+                        break;
                     case 'PUT':
                         echo json_encode($this->updateCallbackStatus());
-                        break; 
+                        break;
                 }
                 exit;
             case self::CONST_CALLBACK_SEARCH:
                 echo json_encode($this->callBackSearch());
-                break; 
+                break;
             default:
                 $this->setTemplate();
                 break;
@@ -172,7 +172,7 @@ class CTCurrentActivityReport extends CTCNC
                 false
             );
         } else if ($queueNo == self::CUSTOMER_OPEN_SR) {
-            $serviceRequests = $this->buActivity->getCustomerOpenSR($_REQUEST["customerID"],$_REQUEST["srNumber"]);
+            $serviceRequests = $this->buActivity->getCustomerOpenSR($_REQUEST["customerID"], $_REQUEST["srNumber"]);
         } else {
             $serviceRequests = $this->buActivity->getProblemsByQueue($queueNo);
         }
@@ -275,7 +275,7 @@ class CTCurrentActivityReport extends CTCNC
                     $customerRaisedRequests->Record['cpr_reason'],
                     150
                 );
-                $bgColour = self::RED;    // customer raised
+                $bgColour        = self::RED;    // customer raised
                 if ($customerRaisedRequests->Record['cpr_source'] == 'S') {
                     $bgColour = self::CONTENT;
                 }
@@ -522,7 +522,7 @@ class CTCurrentActivityReport extends CTCNC
     {
 
         // user selection
-        $userSelected = ($selectedID == 0) ? CT_SELECTED : null;
+        $userSelected    = ($selectedID == 0) ? CT_SELECTED : null;
         $urlAllocateUser = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
@@ -531,7 +531,7 @@ class CTCurrentActivityReport extends CTCNC
                 'problemID' => $problemID
             )
         );
-        $string = '<option ' . $userSelected . ' value="' . $urlAllocateUser . '"></option>';
+        $string          = '<option ' . $userSelected . ' value="' . $urlAllocateUser . '"></option>';
         foreach ($this->allocatedUser as $value) {
 
             $userSelected    = ($selectedID == $value['userID']) ? CT_SELECTED : null;
@@ -543,7 +543,7 @@ class CTCurrentActivityReport extends CTCNC
                     'problemID' => $problemID
                 )
             );
-            $string .= '<option ' . $userSelected . ' value="' . $urlAllocateUser . '">' . $value['userName'] . '</option>';
+            $string          .= '<option ' . $userSelected . ' value="' . $urlAllocateUser . '">' . $value['userName'] . '</option>';
 
         }
         return $string;
@@ -580,39 +580,27 @@ class CTCurrentActivityReport extends CTCNC
             return 'green';
         }
     }
-    public function addCallBack(){         
-        $body=$this->getBody();
-        $problemID=$body->problemID;
-        $customerID=$body->customerID;
-        $contactID=$body->contactID;
-        $contactName=$body->contactName;
-        $callActivityID=$body->callActivityID;
-        $description=$body->description;
-        $callback_datetime=$body->date.' '.$body->time.':00';        
-        $notifyTeamLead=$body->notifyTeamLead?1:0;
-        // echo  $callback_datetime;
-        // exit;
-        if(empty($problemID)||empty($customerID))
-            return $this->getResponseError(400,"Missing data");
-        $problem=new DBEProblem($this);
-        $problem->getRow($problemID);
 
-        $dbeContact=new DBEContact($this);
-        $dbeContact->getRow($contactID);       
-        $contactName=$dbeContact->getValue(DBEContact::firstName)." ".$dbeContact->getValue(DBEContact::lastName);
-        $callDateTime=new DateTime($callback_datetime);
-        // $dbeCallback=new DBECallback($this);
-        // $dbeCallback->setValue(DBECallback::problemID,$problemID);
-        // $dbeCallback->setValue(DBECallback::callActivityID,$callActivityID);
-        // $dbeCallback->setValue(DBECallback::contactID,$contactID);
-        // $dbeCallback->setValue(DBECallback::description,$description);
-        // $dbeCallback->setValue(DBECallback::callback_datetime,$callback_datetime);
-        // $dbeCallback->setValue(DBECallback::consID,$this->dbeUser->getPKValue());
-        // $dbeCallback->setValue(DBECallback::createAt,date('Y-m-d H:i:s'));
-        // $dbeCallback->setValue(DBECallback::status,CallBackStatus::AWAITING);
-        // $dbeCallback->setValue(DBECallback::notifyTeamLead,  $notifyTeamLead);        
-        // $dbeCallback->insertRow();
-        $query="INSERT INTO `contact_callback` (
+    public function addCallBack()
+    {
+        $body              = $this->getBody();
+        $problemID         = $body->problemID;
+        $customerID        = $body->customerID;
+        $contactID         = $body->contactID;
+        $callActivityID    = $body->callActivityID;
+        $description       = $body->description;
+        $callback_datetime = $body->date . ' ' . $body->time . ':00';
+        $notifyTeamLead    = $body->notifyTeamLead ? 1 : 0;
+        if (empty($problemID) || empty($customerID)) return $this->getResponseError(400, "Missing data");
+        $problem = new DBEProblem($this);
+        $problem->getRow($problemID);
+        $dbeContact = new DBEContact($this);
+        $dbeContact->getRow($contactID);
+        $contactName  = $dbeContact->getValue(DBEContact::firstName) . " " . $dbeContact->getValue(
+                DBEContact::lastName
+            );
+        $callDateTime = new DateTime($callback_datetime);
+        $query        = "INSERT INTO `contact_callback` (
             
             `consID`,
             `problemID`,
@@ -637,17 +625,21 @@ class CTCurrentActivityReport extends CTCNC
               :notifyTeamLead
             );
           ";
-          $createAt=date('Y-m-d H:i:s');
-          DBConnect::execute($query,["consID"=>$this->dbeUser->getPKValue(),
-          "problemID"=>$problemID,
-          "callActivityID"=>$callActivityID,
-          "contactID"=>$contactID,
-          "description"=>$description,
-          "callback_datetime"=>$callback_datetime,
-          "createAt"=>$createAt,
-          "status"=>CallBackStatus::AWAITING,
-          "notifyTeamLead"=>$notifyTeamLead,
-           ]);
+        $createAt     = date('Y-m-d H:i:s');
+        DBConnect::execute(
+            $query,
+            [
+                "consID"            => $this->dbeUser->getPKValue(),
+                "problemID"         => $problemID,
+                "callActivityID"    => $callActivityID,
+                "contactID"         => $contactID,
+                "description"       => $description,
+                "callback_datetime" => $callback_datetime,
+                "createAt"          => $createAt,
+                "status"            => CallBackStatus::AWAITING,
+                "notifyTeamLead"    => $notifyTeamLead,
+            ]
+        );
         // add activity
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->setValue(DBECallActivity::callActTypeID, 11);
@@ -655,100 +647,94 @@ class CTCurrentActivityReport extends CTCNC
         $dbeCallActivity->setValue(DBECallActivity::siteNo, $dbeContact->getValue(DBEContact::siteNo));
         $dbeCallActivity->setValue(DBECallActivity::userID, $this->dbeUser->getPKValue());
         $dbeCallActivity->setValue(DBECallActivity::date, date('Y-m-d'));
-        $dbeCallActivity->setValue(DBECallActivity::startTime, date('H:i'));
-        $endTime = new DateTime();
-        $endTime->add(new DateInterval('PT1M'));
+        $endTime   = new DateTime();
+        $startTime = (clone $endTime)->sub(new DateInterval('PT3M'));
+        $dbeCallActivity->setValue(DBECallActivity::startTime, $startTime->format('H:i'));
         $dbeCallActivity->setValue(DBECallActivity::endTime, $endTime->format('H:i'));
-        $additionalInfo=!empty($description)?"<p> Additional information: ".$description.'</p>':'';
-        $dbeCallActivity->setValue(DBECallActivity::reason, $contactName . ' called in regarding this update '.$additionalInfo);
-        $dbeCallActivity->setValue(DBECallActivity::cncNextAction,"Please call $contactName at ".$callDateTime->format('Y-m-d')." at ".$callDateTime->format('H:i'));
-        $dbeCallActivity->setValue(DBECallActivity::awaitingCustomerResponseFlag, "N");        
-        $dbeCallActivity->setValue(DBECallActivity::problemID,  $problemID);
-        $dbeCallActivity->insertRow();    
-
-        $problem->setValue(DBEProblem::awaitingCustomerResponseFlag,'N');
-        $problem->setValue(DBEProblem::alarmDate,null);
-        $problem->setValue(DBEProblem::alarmTime,null);
+        $additionalInfo = !empty($description) ? "<p> Additional information: " . $description . '</p>' : '';
+        $dbeCallActivity->setValue(
+            DBECallActivity::reason,
+            $contactName . ' called in regarding this update ' . $additionalInfo
+        );
+        $dbeCallActivity->setValue(
+            DBECallActivity::cncNextAction,
+            "Please call $contactName at " . $callDateTime->format(
+                'Y-m-d'
+            ) . " at " . $callDateTime->format('H:i')
+        );
+        $dbeCallActivity->setValue(DBECallActivity::awaitingCustomerResponseFlag, "N");
+        $dbeCallActivity->setValue(DBECallActivity::problemID, $problemID);
+        $dbeCallActivity->insertRow();
+        $problem->setValue(DBEProblem::awaitingCustomerResponseFlag, 'N');
+        $problem->setValue(DBEProblem::alarmDate, null);
+        $problem->setValue(DBEProblem::alarmTime, null);
         $problem->updateRow();
         // Send email to engineer and team leader
-        
-        if($problem->getValue(DBEProblem::userID)!=null)
-        {
+        if ($problem->getValue(DBEProblem::userID) != null) {
             //get problem consultant
-            $engineer=new DBEUser($this);
+            $engineer = new DBEUser($this);
             $engineer->getRow($problem->getValue(DBEProblem::userID));
             //get consultant team
-            $team=new DBETeam($this);
-            $team->getRow( $engineer->getValue(DBEUser::teamID));
+            $team = new DBETeam($this);
+            $team->getRow($engineer->getValue(DBEUser::teamID));
             //get team leader
-            $teamLeader=new DBEUser($this);
-            $teamLeader->getRow( $team->getValue(DBETeam::leaderId) );
-
-            $engineerEmail=$engineer->getValue(DBEUser::username)."@cnc-ltd.co.uk";
-            $teamLeaderEmail=$teamLeader->getValue(DBEUser::username)."@cnc-ltd.co.uk";
-            $customer=new DBECustomer($this);
+            $teamLeader = new DBEUser($this);
+            $teamLeader->getRow($team->getValue(DBETeam::leaderId));
+            $engineerEmail   = $engineer->getValue(DBEUser::username) . "@cnc-ltd.co.uk";
+            $teamLeaderEmail = $teamLeader->getValue(DBEUser::username) . "@cnc-ltd.co.uk";
+            $customer        = new DBECustomer($this);
             $customer->getRow($customerID);
-            $to="";
-            $cc=[];
-            $subject="You have a call back request for  $contactName from ".$customer->getValue(DBECustomer::name);
-            if($notifyTeamLead)
-            {
+            $to      = "";
+            $cc      = [];
+            $subject = "You have a call back request for  $contactName from " . $customer->getValue(DBECustomer::name);
+            if ($notifyTeamLead) {
                 // send email to both
-                $to=$engineerEmail;
-                $cc []=$teamLeaderEmail;
-            }
-            else if($engineer->getValue(DBEUser::callBackEmail)){ // check if the engineer has callback email check
+                $to    = $engineerEmail;
+                $cc [] = $teamLeaderEmail;
+            } else if ($engineer->getValue(DBEUser::callBackEmail)) { // check if the engineer has callback email check
                 // send email to engineer only
-                $to=$engineerEmail;
+                $to = $engineerEmail;
             }
-            if($to!="")
-            {
-                $buMail  = new BUMail($this);
+            if ($to != "") {
+                $buMail = new BUMail($this);
                 global $twig;
                 $urlService = SITE_URL . '/SRActivity.php?action=displayActivity&serviceRequestId=' . $problemID;
-
-                $body    = $twig->render(
+                $body       = $twig->render(
                     '@internal/callBackEmail.html.twig',
                     [
-                        'createAt'         =>  date('d/m/Y h:i', strtotime($createAt)) ,
-                        'urlService'       => $urlService,
-                        'contactName'      => $contactName,
-                        'customerName'     => $customer->getValue(DBECustomer::name),
-                        'serviceRequestId' =>  $problemID,
-                        'callback_datetime' => date('d/m/Y h:i', strtotime($callback_datetime)) ,
-                        'reason' => $description!=""?"Additional Information: ". $description:"",
+                        'createAt'          => date('d/m/Y h:i', strtotime($createAt)),
+                        'urlService'        => $urlService,
+                        'contactName'       => $contactName,
+                        'customerName'      => $customer->getValue(DBECustomer::name),
+                        'serviceRequestId'  => $problemID,
+                        'callback_datetime' => date('d/m/Y h:i', strtotime($callback_datetime)),
+                        'reason'            => $description != "" ? "Additional Information: " . $description : "",
                     ]
                 );
-                $buMail->sendSimpleEmail($body, $subject, $to, CONFIG_SUPPORT_EMAIL, $cc );    
+                $buMail->sendSimpleEmail($body, $subject, $to, CONFIG_SUPPORT_EMAIL, $cc);
             }
         }
-        
-        return ["status"=>true,"callActivityID"=>$dbeCallActivity->getPKValue()];              
+        return ["status" => true, "callActivityID" => $dbeCallActivity->getPKValue()];
     }
-    public function getMyCallback(){
-        $unAssigned="";
-        $team=$_REQUEST["team"]??'';
-        $customerID=$_REQUEST["customerID"]??'';
-        $customerCondition="";
-        if($this->isSdManager()||$this->isSRQueueManager())
-        {            
-            
-            $teamCondition="";
-            if ($team == 'H')
-                $teamCondition .= " and pro_queue_no = 1";
-            if ($team == 'E')
-                $teamCondition .= " and pro_queue_no = 2";
-            if ($team == 'SP')
-                $teamCondition .= " and pro_queue_no = 3";
-            if ($team == 'P')
-                $teamCondition .= " and pro_queue_no = 5";
-            if ($team == 'S')
-                $teamCondition .= " and pro_queue_no = 4";
-            if ($customerID != '')
-                $customerCondition = " and  p.pro_custno = $customerID";
-            $unAssigned="or (p.`pro_consno`is null $teamCondition )";
+
+    public function getMyCallback()
+    {
+        $unAssigned        = "";
+        $team              = $_REQUEST["team"] ?? '';
+        $customerID        = $_REQUEST["customerID"] ?? '';
+        $customerCondition = "";
+        if ($this->isSdManager() || $this->isSRQueueManager()) {
+
+            $teamCondition = "";
+            if ($team == 'H') $teamCondition .= " and pro_queue_no = 1";
+            if ($team == 'E') $teamCondition .= " and pro_queue_no = 2";
+            if ($team == 'SP') $teamCondition .= " and pro_queue_no = 3";
+            if ($team == 'P') $teamCondition .= " and pro_queue_no = 5";
+            if ($team == 'S') $teamCondition .= " and pro_queue_no = 4";
+            if ($customerID != '') $customerCondition = " and  p.pro_custno = $customerID";
+            $unAssigned = "or (p.`pro_consno`is null $teamCondition )";
         }
-        $query="SELECT cb.id, cb.consID,cb.problemID,cb.callActivityID,cb.contactID,cb.DESCRIPTION,cb.callback_datetime,cb.createAt,
+        $query      = "SELECT cb.id, cb.consID,cb.problemID,cb.callActivityID,cb.contactID,cb.DESCRIPTION,cb.callback_datetime,cb.createAt,
                     concat(c.con_first_name,' ',c.con_last_name) contactName,
                     cus_name customerName,
                     TIMESTAMPDIFF(MINUTE,NOW(),cb.callback_datetime) timeRemain,
@@ -763,29 +749,27 @@ class CTCurrentActivityReport extends CTCNC
                 $customerCondition
                 order by timeRemain asc
                 ";
-        $myCallBack=DBConnect::fetchAll($query,["consID"=>$this->dbeUser->getPKValue()]);
-        
-        return  $myCallBack;
+        $myCallBack = DBConnect::fetchAll($query, ["consID" => $this->dbeUser->getPKValue()]);
+        return $myCallBack;
     }
 
-    public function updateCallbackStatus(){
+    public function updateCallbackStatus()
+    {
         try {
-            $id = @$_REQUEST['id'];
+            $id     = @$_REQUEST['id'];
             $status = @$_REQUEST['status'];
-
-            if (!isset($id) || !isset($status))
-                return ['status' => false, 'error' => "Missing data"];
-
+            if (!isset($id) || !isset($status)) return ['status' => false, 'error' => "Missing data"];
             $dbeCallBack = new DBECallback($this);
             $dbeCallBack->getRow($id);
             $dbeCallBack->setValue(DBECallback::status, $status);
             $dbeCallBack->updateRow();
-            $contactID = $dbeCallBack->getValue(DBECallback::contactID);
-            $problemID = $dbeCallBack->getValue(DBECallback::problemID);
+            $contactID  = $dbeCallBack->getValue(DBECallback::contactID);
+            $problemID  = $dbeCallBack->getValue(DBECallback::problemID);
             $dbeContact = new DBEContact($this);
             $dbeContact->getRow($contactID);
-            $contactName = $dbeContact->getValue(DBEContact::firstName) . " " . $dbeContact->getValue(DBEContact::lastName);
-
+            $contactName = $dbeContact->getValue(DBEContact::firstName) . " " . $dbeContact->getValue(
+                    DBEContact::lastName
+                );
             // add activity
             $dbeCallActivity = new DBECallActivity($this);
             $dbeCallActivity->setValue(DBECallActivity::callActTypeID, 11);
@@ -796,32 +780,32 @@ class CTCurrentActivityReport extends CTCNC
             $dbeCallActivity->setValue(DBECallActivity::startTime, date('H:i'));
             // $endTime = new DateTime();
             // $dbeCallActivity->setValue(DBECallActivity::endTime, $endTime->format('H:i'));
-            $dbeCallActivity->setValue(DBECallActivity::reason, 'I have returned the call for '.$contactName );
+            $dbeCallActivity->setValue(DBECallActivity::reason, 'I have returned the call for ' . $contactName);
             //$dbeCallActivity->setValue(DBECallActivity::cncNextAction,"Please call $contactName at ".$callDateTime->format('Y-m-d')." at ".$callDateTime->format('H:i'));
             $dbeCallActivity->setValue(DBECallActivity::awaitingCustomerResponseFlag, "N");
-            $dbeCallActivity->setValue(DBECallActivity::problemID,  $problemID);
+            $dbeCallActivity->setValue(DBECallActivity::problemID, $problemID);
             $dbeCallActivity->insertRow();
-            return ['status' => true,"callActivityID"=>$dbeCallActivity->getPKValue()];         
+            return ['status' => true, "callActivityID" => $dbeCallActivity->getPKValue()];
         } catch (Exception $ex) {
             return ['status' => false, 'error' => $ex->getMessage()];
         }
 
     }
 
-    public function cancelCallBack(){
-        try {            
-             
-            $id= $_REQUEST['id'];
-            $reason= $_REQUEST['reason'];
+    public function cancelCallBack()
+    {
+        try {
 
-            if(!isset($id)||!isset($reason))
-                return ['status' => false,'error'=>"Missing data"];
+            $id     = $_REQUEST['id'];
+            $reason = $_REQUEST['reason'];
+            if (!isset($id) || !isset($reason)) return ['status' => false, 'error' => "Missing data"];
             $dbeCallBack = new DBECallback($this);
             $dbeCallBack->getRow($id);
             $dbeContact = new DBEContact($this);
             $dbeContact->getRow($dbeCallBack->getValue(DBECallback::contactID));
-
-            $staffName = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(DBEUser::lastName);
+            $staffName       = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(
+                    DBEUser::lastName
+                );
             $dbeCallActivity = new DBECallActivity($this);
             $dbeCallActivity->setValue(DBECallActivity::callActTypeID, 11);
             $dbeCallActivity->setValue(DBECallActivity::contactID, $dbeCallBack->getValue(DBECallback::contactID));
@@ -831,28 +815,32 @@ class CTCurrentActivityReport extends CTCNC
             $dbeCallActivity->setValue(DBECallActivity::startTime, date('H:i'));
             $endTime = new DateTime();
             $dbeCallActivity->setValue(DBECallActivity::endTime, $endTime->format('H:i'));
-            $dbeCallActivity->setValue(DBECallActivity::reason, $staffName . ' cancelled this call back for the following reason: ' . $reason);
+            $dbeCallActivity->setValue(
+                DBECallActivity::reason,
+                $staffName . ' cancelled this call back for the following reason: ' . $reason
+            );
             $dbeCallActivity->setValue(DBECallActivity::awaitingCustomerResponseFlag, "N");
             $dbeCallActivity->setValue(DBECallActivity::hideFromCustomerFlag, "Y");
-            $dbeCallActivity->setValue(DBECallActivity::problemID,  $dbeCallBack->getValue(DBECallback::problemID));
-            $dbeCallActivity->insertRow();            
+            $dbeCallActivity->setValue(DBECallActivity::problemID, $dbeCallBack->getValue(DBECallback::problemID));
+            $dbeCallActivity->insertRow();
             // update call back to be cancelled
-            
             $dbeCallBack->setValue(DBECallback::status, CallBackStatus::CANCELED);
             $dbeCallBack->updateRow();
             return ['status' => true];
         } catch (Exception $ex) {
-            return ['status' => false,'error'=>$ex->getMessage()];
+            return ['status' => false, 'error' => $ex->getMessage()];
         }
     }
-    public function callBackSearch(){
-      
-        $consID=$this->getParamOrNull('consID');
-        $customerID=$this->getParamOrNull('customerID');
-        $from=$this->getParamOrNull('from');
-        $to=$this->getParamOrNull('to');
-        $status=$this->getParamOrNull('status');         
-        $query="SELECT cb.id, cb.consID,cb.problemID,cb.callActivityID,cb.contactID,cb.DESCRIPTION,cb.callback_datetime,cb.createAt,
+
+    public function callBackSearch()
+    {
+
+        $consID     = $this->getParamOrNull('consID');
+        $customerID = $this->getParamOrNull('customerID');
+        $from       = $this->getParamOrNull('from');
+        $to         = $this->getParamOrNull('to');
+        $status     = $this->getParamOrNull('status');
+        $query      = "SELECT cb.id, cb.consID,cb.problemID,cb.callActivityID,cb.contactID,cb.DESCRIPTION,cb.callback_datetime,cb.createAt,
         concat(c.con_first_name,' ',c.con_last_name) contactName,
         cus_name customerName,
         TIMESTAMPDIFF(MINUTE,NOW(),cb.callback_datetime) timeRemain,
@@ -870,6 +858,15 @@ class CTCurrentActivityReport extends CTCNC
         and (:status is null or cb.status =:status)
         order by timeRemain asc
         ";
-        return DBConnect::fetchAll($query,["consID"=>$consID,"customerID"=>$customerID,"from"=>$from,"to"=>$to,"status"=>$status]);
+        return DBConnect::fetchAll(
+            $query,
+            [
+                "consID"     => $consID,
+                "customerID" => $customerID,
+                "from"       => $from,
+                "to"         => $to,
+                "status"     => $status
+            ]
+        );
     }
 }

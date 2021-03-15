@@ -2938,7 +2938,7 @@ class BUActivity extends Business
             if (!key_exists($updatedByConsultantId, $internalNotesConsultants)) {
                 $updatedByConsultant = new DBEUser($this);
                 $updatedByConsultant->getRow($updatedByConsultantId);
-                $internalNotesConsultants[] = "{$updatedByConsultant->getValue(DBEUser::firstName)} {$updatedByConsultant->getValue(DBEUser::lastName)}";
+                $internalNotesConsultants[$updatedByConsultantId] = "{$updatedByConsultant->getValue(DBEUser::firstName)} {$updatedByConsultant->getValue(DBEUser::lastName)}";
             }
             $template->setVar(
                 [
@@ -6465,7 +6465,7 @@ class BUActivity extends Business
         $sql = "UPDATE
       ordhead
     SET
-      odh_service_request_text = null,
+      serviceRequestInternalNote = null,
       odh_service_request_custitemno = 0
     WHERE
       odh_ordno = " . $ordheadID;

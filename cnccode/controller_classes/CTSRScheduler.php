@@ -7,6 +7,9 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 global $cfg;
+
+use CNCLTD\Exceptions\ColumnOutOfRangeException;
+
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBESRScheduler.php');
 require_once($cfg['path_dbe'] . '/DBECustomer.inc.php');
@@ -162,7 +165,7 @@ class CTSRScheduler extends CTCNC
                                 $columnIdx  = $orderItem['column'];
                                 $columnName = $columns[$columnIdx]['name'];
                                 if (!array_key_exists($columnName, $item1)) {
-                                    throw new Exception("Column name does not exist {$columnName}");
+                                    throw new ColumnOutOfRangeException($columnName);
                                 }
                                 $comparison = $item1[$columnName] <=> $item2[$columnName];
                                 if ($orderItem['dir'] == 'desc') {

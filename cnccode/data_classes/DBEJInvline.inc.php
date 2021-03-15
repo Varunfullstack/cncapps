@@ -3,6 +3,9 @@
 * @authors Karim Ahmed
 * @access public
 */
+
+use CNCLTD\Exceptions\ColumnOutOfRangeException;
+global $cfg;
 require_once($cfg["path_dbe"] . "/DBEInvline.inc.php");
 
 class DBEJInvline extends DBEInvline
@@ -46,15 +49,15 @@ class DBEJInvline extends DBEInvline
         }
         $ixColumn = $this->columnExists($column);
         if ($ixColumn == DA_OUT_OF_RANGE) {
-            $this->raiseError("Column " . $column . " out of range");
-            return DA_OUT_OF_RANGE;
+            throw new ColumnOutOfRangeException($column);
         }
         $this->setQueryString(
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " LEFT JOIN item ON " . $this->getDBColumnName(self::itemID) . "=itm_itemno" .
-            " WHERE " . $this->getDBColumnName($ixColumn) . "=" . $this->getFormattedValue($ixColumn) .
-            " ORDER BY " . $this->getDBColumnName(self::sequenceNo)
+            "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " LEFT JOIN item ON " . $this->getDBColumnName(
+                self::itemID
+            ) . "=itm_itemno" . " WHERE " . $this->getDBColumnName($ixColumn) . "=" . $this->getFormattedValue(
+                $ixColumn
+            ) . " ORDER BY " . $this->getDBColumnName(self::sequenceNo)
         );
         return ($this->getRows());
     }
@@ -68,11 +71,12 @@ class DBEJInvline extends DBEInvline
             $this->raiseError('sequenceNo not set');
         }
         $this->setQueryString(
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " LEFT JOIN item ON " . $this->getDBColumnName(self::itemID) . "=itm_itemno" .
-            " WHERE " . $this->getDBColumnName(self::invheadID) . "=" . $this->getFormattedValue(self::invheadID) .
-            " AND " . $this->getDBColumnName(self::sequenceNo) . "=" . $this->getFormattedValue(self::sequenceNo)
+            "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " LEFT JOIN item ON " . $this->getDBColumnName(
+                self::itemID
+            ) . "=itm_itemno" . " WHERE " . $this->getDBColumnName(self::invheadID) . "=" . $this->getFormattedValue(
+                self::invheadID
+            ) . " AND " . $this->getDBColumnName(self::sequenceNo) . "=" . $this->getFormattedValue(self::sequenceNo)
         );
         return (parent::getRow());
     }

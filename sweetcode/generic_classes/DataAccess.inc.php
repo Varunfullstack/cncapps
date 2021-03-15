@@ -6,8 +6,10 @@
  * @author Karim Ahmed
  * @access virtual
  */
-require_once($cfg["path_gc"] . "/BaseObject.inc.php");
 
+use CNCLTD\Exceptions\ColumnOutOfRangeException;
+
+require_once($cfg["path_gc"] . "/BaseObject.inc.php");
 define(
     "DA_NOT_NULL",
     0
@@ -21,7 +23,6 @@ define(
     "DA_STRING",
     "string"
 );
-
 define(
     "DA_PROBLEM_STATUS",
     "problem_status"
@@ -38,7 +39,6 @@ define(
     "DA_MEMO",
     "memo"
 );
-
 define(
     "DA_FLOAT",
     "float"
@@ -83,17 +83,14 @@ define(
     "DA_JSON_ARRAY",
     "json_array"
 );
-
 define(
     "DA_PHONE",
     "phone"
 );
-
 define(
     'DA_SUPPORT_LEVEL',
     'supportLevel'
 );
-
 // a PHP array of values
 // Update modes
 define(
@@ -112,7 +109,6 @@ define(
     "DA_MODE_DELETE",
     3
 );
-
 define(
     "DA_PK_NOT_SET",
     -1
@@ -125,7 +121,6 @@ define(
     "DA_COLUMN_NOT_ADDED",
     -1
 );
-
 define(
     "DA_QUOTE_SINGLE",
     "'"
@@ -147,7 +142,6 @@ define(
     "DA_CLASSNAME_DATAACCESS",
     "dataaccess"
 );
-
 define(
     "DA_AFTER_COLUMNS_CREATED",
     0
@@ -198,34 +192,33 @@ class DataAccess extends BaseObject
 {
 
 // Instance variables
-
-    public $eof = FALSE;                                    // End of file flag(TRUE/FALSE)
-    public $colName = array();                                // Array of column names
-    public $colNameInverse = array();                // Array of column names
-    public $colType = array();                                // Array of column types
-    public $colNull = array();                                // Array of column null flags
-    public $row = array();                                // Current row values array
-    public $updateMode = DA_MODE_NONE;    // insert, delete or update
-    public $pk = DA_PK_NOT_SET;                    // Primary key column
-    public $allowAddColumns = TRUE;        // Add columns allowed?
-    public $clearRowsBeforeReplicate = FALSE;
-    public $firstRowFetched = FALSE;
-    public $beforePostObject = "";
-    public $beforePostMethod = "";            // Happens just before each data row is posted to destination
-    public $afterPostObject = "";
-    public $afterPostMethod = "";            // Happens just after each data row is posted to destination
+    public $eof                       = FALSE;                                    // End of file flag(TRUE/FALSE)
+    public $colName                   = array();                                // Array of column names
+    public $colNameInverse            = array();                // Array of column names
+    public $colType                   = array();                                // Array of column types
+    public $colNull                   = array();                                // Array of column null flags
+    public $row                       = array();                                // Current row values array
+    public $updateMode                = DA_MODE_NONE;    // insert, delete or update
+    public $pk                        = DA_PK_NOT_SET;                    // Primary key column
+    public $allowAddColumns           = TRUE;        // Add columns allowed?
+    public $clearRowsBeforeReplicate  = FALSE;
+    public $firstRowFetched           = FALSE;
+    public $beforePostObject          = "";
+    public $beforePostMethod          = "";            // Happens just before each data row is posted to destination
+    public $afterPostObject           = "";
+    public $afterPostMethod           = "";            // Happens just after each data row is posted to destination
     public $afterColumnsCreatedObject = "";
     public $afterColumnsCreatedMethod = "";// Happens just after the columns have been created on dest
-    public $postRow = "";                                // Flag to indicate whether row is posted to destination
-    public $quoteForColumnValues = DA_QUOTE_DOUBLE;
-    public $allowUpdate = FALSE;            // Flag to indicate whether row is posted to destination
-    public $ignoreNULL = FALSE;            // Flag to indicate allow NULL rule is enforced
-    public $newRowValue = 0;                    // This value in a primary key column indicates to INSERT a new row into a Data Access object
-    public $failOutOfRange = TRUE;
-    public $_colCount = 0;
-    public $colValidation = [];
+    public $postRow                   = "";                                // Flag to indicate whether row is posted to destination
+    public $quoteForColumnValues      = DA_QUOTE_DOUBLE;
+    public $allowUpdate               = FALSE;            // Flag to indicate whether row is posted to destination
+    public $ignoreNULL                = FALSE;            // Flag to indicate allow NULL rule is enforced
+    public $newRowValue               = 0;                    // This value in a primary key column indicates to INSERT a new row into a Data Access object
+    public $failOutOfRange            = TRUE;
+    public $_colCount                 = 0;
+    public $colValidation             = [];
     public $debug;
-    public $colDefaultValue = [];
+    public $colDefaultValue           = [];
     /**
      * @var bool
      */
@@ -429,22 +422,18 @@ class DataAccess extends BaseObject
     function replicate(&$data)
     {
         $this->setMethodName("replicate");
-        $ret = FALSE;
+        $ret             = FALSE;
         $this->_colCount = $this->colCount();
         if (!is_subclass_of(
             $data,
             DA_CLASSNAME_DATAACCESS
-        ))
-            $this->raiseError("The object passed is not a subclass of " . DA_CLASSNAME_DATAACCESS);
+        )) $this->raiseError("The object passed is not a subclass of " . DA_CLASSNAME_DATAACCESS);
         // For safety's sake, at the moment we do not allow replicate to delete all rows from database
         // objects.
-        if (
-            is_subclass_of(
+        if (is_subclass_of(
                 $this,
                 DA_CLASSNAME_DATASET
-            ) or
-            ($this->getClassname() == DA_CLASSNAME_DATASET)
-        ) {
+            ) or ($this->getClassname() == DA_CLASSNAME_DATASET)) {
             if ($this->getClearRowsBeforeReplicate()) {
                 $this->clearRows();
             }
@@ -453,9 +442,7 @@ class DataAccess extends BaseObject
             is_subclass_of(
                 $data,
                 DA_CLASSNAME_DATASET
-            ) or
-            ($data->getClassname() == DA_CLASSNAME_DATASET)
-        ) {
+            ) or ($data->getClassname() == DA_CLASSNAME_DATASET)) {
             $data->initialise();
         }
         $this->allowUpdate = FALSE;
@@ -472,14 +459,13 @@ class DataAccess extends BaseObject
             if ($ixThisColumn != DA_OUT_OF_RANGE) { // column exists
                 // add to cross-ref table for columns
                 $crossRef[$ixCol] = $ixThisColumn;
-                $thisName = $this->getName($ixThisColumn);
+                $thisName         = $this->getName($ixThisColumn);
                 if (($this->getPKName() != "") & ($thisName == $this->getPKName())) {
                     $data->setPK($thisName);
                     $this->allowUpdate = TRUE;
                 }
             }
         }
-
         if ($this->afterColumnsCreatedMethod != "") {
             $this->callback(
                 DA_AFTER_COLUMNS_CREATED,
@@ -500,7 +486,6 @@ class DataAccess extends BaseObject
             If the primary key value in data is not found on any row in this then do nothing to this
             */
             $this->setPostRowOn();                    // Default = call the post() method
-
             $this->setUpdateModeInsert();    // Default data set operation is insert
             /*
             Set mode to update if we are allowed to and data has a pk value.
@@ -544,15 +529,11 @@ class DataAccess extends BaseObject
             Unless the source is a DBEntity, update the source data row with the new PK generated if it
             exists and doesn't already have a value.
             */
-            if (
-                (!is_subclass_of(
+            if ((!is_subclass_of(
                     $data,
                     DA_CLASSNAME_DBENTITY
-                )) &&
-                ($this->getUpdateMode() == DA_MODE_INSERT) &&
-                ($data->getPKName() != "") &&
-                ($data->getPKValue() == $this->getNewRowValue())
-            ) {
+                )) && ($this->getUpdateMode() == DA_MODE_INSERT) && ($data->getPKName() != "") && ($data->getPKValue(
+                    ) == $this->getNewRowValue())) {
                 $data->setUpdateModeUpdate();
                 $data->setPKValue($this->getPKValue());
                 $data->post();
@@ -565,16 +546,12 @@ class DataAccess extends BaseObject
             }
             $data->fetchNext();
         }
-        if (
-            is_subclass_of(
+        if (is_subclass_of(
                 $this,
                 DA_CLASSNAME_DATASET
-            ) or
-            ($this->getClassname() == DA_CLASSNAME_DATASET)
-        ) {
+            ) or ($this->getClassname() == DA_CLASSNAME_DATASET)) {
             $this->initialise();                // So the dataset is ready to use
         }
-
         return $ret;
     }
 
@@ -609,7 +586,6 @@ class DataAccess extends BaseObject
      * return $this->class_name;
      * }
      */
-
     /**
      * Copy columns from given dataset
      * @access public
@@ -671,19 +647,16 @@ class DataAccess extends BaseObject
             }
             return DA_OUT_OF_RANGE;
         }
-
         if (!$this->_colCount) {
             if ($this->debug) {
                 echo '<div>ColumnExists: there are no columns defined </div>';
             }
             return DA_OUT_OF_RANGE;
         }
-
         if (is_numeric($ixColumn)) {
             if ($this->debug) {
                 echo '<div>ColumnExists: column given is numeric: ' . $ixColumn . ' </div>';
             }
-
             if (!key_exists($ixColumn, $this->colName)) {
                 if ($this->debug) {
                     echo '<div>ColumnExists: The column does not exist: ' . $ixColumn . ' </div>';
@@ -695,18 +668,15 @@ class DataAccess extends BaseObject
             }
             return $ixColumn;
         }
-
         if (!isset($this->colNameInverse[$ixColumn])) {
             if ($this->debug) {
                 echo '<div>ColumnExists: The column does not exist ' . $ixColumn . ' </div>';
             }
             return DA_OUT_OF_RANGE;
         }
-
         if ($this->debug) {
             echo '<div>ColumnExists: The given column index: ' . $ixColumn . ' does exist</div>';
         }
-
         return $this->colNameInverse[$ixColumn];
     }
 
@@ -721,7 +691,7 @@ class DataAccess extends BaseObject
         if ($this->columnExists($ixColumn) != DA_OUT_OF_RANGE) {
             return $this->colName[$ixColumn];
         } else {
-            $this->raiseError("Column " . $ixColumn . " out of range");
+            throw new \CCNCLTD\Exceptions\ColumnOutOfRangeException($ixColumn);
             return "";
         }
     }
@@ -772,7 +742,6 @@ class DataAccess extends BaseObject
                             $null,
                             $defaultValue = null,
                             $validationFunction = null
-
     )
     {
         // Note: Must call setName first to create column
@@ -788,12 +757,10 @@ class DataAccess extends BaseObject
             $ixColumn,
             $null
         );
-
         $this->setDefaultValue(
             $ixColumn,
             $defaultValue
         );
-
         $this->setValidationFunction(
             $ixColumn,
             $validationFunction
@@ -814,9 +781,9 @@ class DataAccess extends BaseObject
                      $name
     )
     {
-        $this->colName[$ixColumn] = $name;
+        $this->colName[$ixColumn]    = $name;
         $this->colNameInverse[$name] = $ixColumn;
-        $this->_colCount = $this->colCount();
+        $this->_colCount             = $this->colCount();
         return TRUE;
     }
 
@@ -831,11 +798,11 @@ class DataAccess extends BaseObject
                      $type
     )
     {
-        $ret = FALSE;
+        $ret      = FALSE;
         $ixColumn = $this->columnExists($ixPassedColumn);
         if ($ixColumn != DA_OUT_OF_RANGE) {
             $this->colType[$ixColumn] = $type;
-            $ret = TRUE;
+            $ret                      = TRUE;
         } else {
             $this->raiseError("SetType(): Column " . $ixPassedColumn . " out of range");
         }
@@ -853,26 +820,25 @@ class DataAccess extends BaseObject
                      $nullflag
     )
     {
-        $ret = FALSE;
+        $ret      = FALSE;
         $ixColumn = $this->columnExists($ixColumn);
         if ($ixColumn != DA_OUT_OF_RANGE) {
             $this->colNull[$ixColumn] = $nullflag;
-            $ret = TRUE;
+            $ret                      = TRUE;
         } else {
             $this->raiseError("SetNull(): Column " . $ixColumn . " out of range");
         }
         return $ret;
     }
 
-    private
-    function setDefaultValue($ixColumn,
-                             $defaultValue
+    private function setDefaultValue($ixColumn,
+                                     $defaultValue
     )
     {
         if ($this->debug) {
             echo '<div>Setting default value of column: ' . $ixColumn . ' -> ' . $defaultValue . '</div>';
         }
-        $ret = FALSE;
+        $ret      = FALSE;
         $ixColumn = $this->columnExists($ixColumn);
         if ($ixColumn != DA_OUT_OF_RANGE) {
             if ($this->debug) {
@@ -882,7 +848,6 @@ class DataAccess extends BaseObject
             if ($this->debug) {
                 var_dump($this->colDefaultValue);
             }
-
             $ret = TRUE;
         } else {
             $this->raiseError("SetDefaultValue(): Column " . $ixColumn . " out of range");
@@ -890,16 +855,15 @@ class DataAccess extends BaseObject
         return $ret;
     }
 
-    protected
-    function setValidationFunction($ixColumn,
-                                   $validationFunction
+    protected function setValidationFunction($ixColumn,
+                                             $validationFunction
     )
     {
-        $ret = FALSE;
+        $ret      = FALSE;
         $ixColumn = $this->columnExists($ixColumn);
         if ($ixColumn != DA_OUT_OF_RANGE) {
             $this->colValidation[$ixColumn] = $validationFunction;
-            $ret = TRUE;
+            $ret                            = TRUE;
         } else {
             $this->raiseError("SetNull(): Column " . $ixColumn . " out of range");
         }
@@ -918,7 +882,7 @@ class DataAccess extends BaseObject
         if ($ixColumn != DA_OUT_OF_RANGE) {
             return $this->colType[$ixColumn];
         } else {
-            $this->raiseError("Column " . $ixPassedColumn . " out of range");
+            throw new \CCNCLTD\Exceptions\ColumnOutOfRangeException($ixPassedColumn);
             return DA_OUT_OF_RANGE;
         }
     }
@@ -942,10 +906,10 @@ class DataAccess extends BaseObject
     function setPK($ixPassedColumn, $pkAutoIncrement = true)
     {
         $this->pkAutoIncrement = $pkAutoIncrement;
-        $ixColumn = $this->columnExists($ixPassedColumn);
+        $ixColumn              = $this->columnExists($ixPassedColumn);
         if ($ixColumn != DA_OUT_OF_RANGE) {
             $this->pk = $ixColumn;
-            $ret = TRUE;
+            $ret      = TRUE;
         } else {
             $this->raiseError("Primary Key Column " . $ixPassedColumn . " out of range");
             $ret = FALSE;
@@ -983,9 +947,7 @@ class DataAccess extends BaseObject
      * @param $ixPassedColumn
      * @return null|Callable
      */
-    protected
-    function getValidationFunction($ixPassedColumn
-    )
+    protected function getValidationFunction($ixPassedColumn)
     {
         $ixColumn = $this->columnExists($ixPassedColumn);
         if ($ixColumn == DA_OUT_OF_RANGE) {
@@ -1049,7 +1011,7 @@ class DataAccess extends BaseObject
      */
     function fetchNext()
     {
-        $this->eof = FALSE;
+        $this->eof             = FALSE;
         $this->firstRowFetched = TRUE;
         return false;
     }
@@ -1103,8 +1065,7 @@ class DataAccess extends BaseObject
         if ($ixColumn != DA_OUT_OF_RANGE) {
             return $this->getValueNoCheckByColumnNumber($ixColumn);
         } else {
-            $this->raiseError("column " . $ixPassedColumn . " out of range");
-            return DA_OUT_OF_RANGE;
+            throw new ColumnOutOfRangeException($ixPassedColumn);
         }
     }
 
@@ -1128,18 +1089,15 @@ class DataAccess extends BaseObject
         if ($type == DA_ID || $type == DA_INTEGER) {
             return (int)$this->row[$ixColumnNumber];
         }
-
         if ($type == DA_FLOAT) {
             return (float)$this->row[$ixColumnNumber];
         }
-
         if ($type == DA_JSON_ARRAY) {
             if (is_array($this->row[$ixColumnNumber])) {
                 return $this->row[$ixColumnNumber];
             }
             return json_decode($this->row[$ixColumnNumber]);
         }
-
         return $this->row[$ixColumnNumber];
 
     }
@@ -1207,21 +1165,15 @@ class DataAccess extends BaseObject
             if ($this->debug) {
                 echo '<div>The column ' . $ixColumn . ' does exist</div>';
             }
-
             if ($this->debug) {
                 echo '</br>The given value is: ';
                 var_dump($value);
                 echo '</br>';
             }
-
-            if (
-                $value === null &&
-                $this->getNull($ixColumn) == DA_NOT_NULL &&
-                $this->getDefaultValue($ixColumn) == null &&
-                $this->colType[$ixColumn] != DA_BOOLEAN &&
-                $this->getPK() != $ixColumn &&
-                !$this->getIgnoreNULL()
-            ) {
+            if ($value === null && $this->getNull($ixColumn) == DA_NOT_NULL && $this->getDefaultValue(
+                    $ixColumn
+                ) == null && $this->colType[$ixColumn] != DA_BOOLEAN && $this->getPK(
+                ) != $ixColumn && !$this->getIgnoreNULL()) {
 
                 if ($this->debug) {
                     echo '<div>The column does not allow null values, there is no default value set, the column type is 
@@ -1232,8 +1184,6 @@ not a boolean, the given value is null, column given is not the PK, and there is
                 );
                 return FALSE;
             }
-
-
             if ($value === null && $this->getDefaultValue($ixColumn) !== null) {
                 if ($this->debug) {
                     echo '<div>The value given is NULL and there is a default value set: ' . $this->getDefaultValue(
@@ -1241,11 +1191,8 @@ not a boolean, the given value is null, column given is not the PK, and there is
                         ) . '</div>';
                 }
                 $this->row[$ixColumn] = $this->getDefaultValue($ixColumn);
-
                 return true;
             }
-
-
             if ($this->debug) {
                 echo '<div>The value given is ' . $value . '</div>';
             }
@@ -1253,8 +1200,6 @@ not a boolean, the given value is null, column given is not the PK, and there is
             return TRUE;
 
         }
-
-
         if ($this->debug) {
             echo '<div> The column does not exist</div>';
         }
@@ -1276,7 +1221,6 @@ not a boolean, the given value is null, column given is not the PK, and there is
     )
     {
         $colType = $this->colType[$colIdx];
-
         if ($value === null) {
             return null;
         }
@@ -1325,21 +1269,17 @@ not a boolean, the given value is null, column given is not the PK, and there is
         if ($string == '0000-00-00 00:00:00') {
             return null;
         }
-
         $date = DateTime::createFromFormat(
             'd/m/Y H:i:s',
             $string
         );
-
         if ($date) {
             return $date->format(DATE_MYSQL_DATETIME);
         }
-
         $date = DateTime::createFromFormat(
             'Y-m-d H:i:s',
             $string
         );
-
         if (!$date) {
             return null;
         }
@@ -1354,31 +1294,24 @@ not a boolean, the given value is null, column given is not the PK, and there is
         if ($string == '0000-00-00') {
             return null;
         }
-
         $date = DateTime::createFromFormat(
             'd/m/Y',
             $string
         );
-
         if ($date) {
             return $date->format(DATE_MYSQL_DATE);
         }
-
         $date = DateTime::createFromFormat(
             'Y-m-d',
             $string
         );
-
         if ($date) {
             return $date->format(DATE_MYSQL_DATE);
         }
-
         $date = DateTime::createFromFormat('Y-m-d H:i:s', $string);
-
         if (!$date) {
             return null;
         }
-
         return $date->format(DATE_MYSQL_DATE);
     }
 
@@ -1442,7 +1375,6 @@ not a boolean, the given value is null, column given is not the PK, and there is
      * }
      * }
      */
-
     /**
      * Get the current update mode
      * @access private
@@ -1482,16 +1414,12 @@ not a boolean, the given value is null, column given is not the PK, and there is
     )
     {
         $this->setMethodName("setCallbackMethod");
-        if (!is_object($object))
-            $this->raiseError("No callback object passed");
-        if ($methodName == "")
-            $this->raiseError("No method passed");
+        if (!is_object($object)) $this->raiseError("No callback object passed");
+        if ($methodName == "") $this->raiseError("No method passed");
         if (!method_exists(
             $object,
             $methodName
-        ))
-            $this->raiseError("Method " . $methodName . "() does not exist on the callback object");
-
+        )) $this->raiseError("Method " . $methodName . "() does not exist on the callback object");
         switch ($methodType) {
             case DA_AFTER_COLUMNS_CREATED:
                 $this->afterColumnsCreatedObject =& $object;
@@ -1533,7 +1461,7 @@ not a boolean, the given value is null, column given is not the PK, and there is
                     $value
     )
     {
-        $ret = FALSE;
+        $ret            = FALSE;
         $ixColumnNumber = $this->columnExists($ixColumn);
         if ($ixColumnNumber != DA_OUT_OF_RANGE) {
             $this->initialise();
@@ -1646,8 +1574,7 @@ not a boolean, the given value is null, column given is not the PK, and there is
                     $validationFunction
                 );
             }
-            $ret = $ixColumn;        // found column
-
+            $ret             = $ixColumn;        // found column
             $this->_colCount = $this->colCount(); // Added this to avoid overhead of calling colCount()
         }                                            // between index(column no) and name
         return $ret;
@@ -1743,10 +1670,9 @@ not a boolean, the given value is null, column given is not the PK, and there is
         $colString = "";
         for ($ixCol = 0; $ixCol < $this->_colCount; $ixCol++) {
             if ($colString != "") $colString = $colString . DA_COLUMN_SEPARATOR;
-            $colString = $colString .
-                $this->quoteForColumnValues .
-                $this->getValue($ixCol) .
-                $this->quoteForColumnValues;
+            $colString = $colString . $this->quoteForColumnValues . $this->getValue(
+                    $ixCol
+                ) . $this->quoteForColumnValues;
         }
         return $colString;
     }
@@ -1762,9 +1688,8 @@ not a boolean, the given value is null, column given is not the PK, and there is
         $colString = "";
         for ($ixCol = 0; $ixCol < $this->colCount(); $ixCol++) {
             if ($colString != "") $colString = $colString . DA_COLUMN_SEPARATOR;
-            $value = $this->getExcelValue($ixCol);
-            $colString = $colString .
-//				$this->quoteForColumnValues.
+            $value     = $this->getExcelValue($ixCol);
+            $colString = $colString . //				$this->quoteForColumnValues.
                 $value;//.
 //				$this->quoteForColumnValues;
         }
@@ -1790,38 +1715,31 @@ not a boolean, the given value is null, column given is not the PK, and there is
             "",
             $value
         );                // and double quotes
-
         return $value;
     }
 
     function checkValid($columnNameOrIndex, $value)
     {
         $colIdx = $this->columnExists($columnNameOrIndex);
-
         if ($this->debug) {
             echo '<div>Check Valid: ';
             var_dump($columnNameOrIndex, $value);
             var_dump($this->colNull);
             echo '</div>';
         }
-
         if ($this->getPK() != $colIdx && $this->getNull($colIdx) == DA_NOT_NULL && $value === null) {
             return DATASET_MSG_REQUIRED;
         }
-
         $validationFunction = $this->getValidationFunction($columnNameOrIndex);
         if ($validationFunction) {
             return $validationFunction($value);
         }
-
         if ($value === '') {
             $value = null;
         }
-
         if ($value === null) {
             return true;
         }
-
         $columnType = $this->getType($columnNameOrIndex);
         switch ($columnType) {
             case DA_YN_FLAG:
