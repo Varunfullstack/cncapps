@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v5.6.2]
+## [v5.6.2] - 2021-03-15
 ### Changed
 - Increase call back automated activity to 3 minutes
 - User 24 hour time in call back request email
