@@ -33,6 +33,7 @@ class AutoComplete extends React.Component {
                 (suggestion) =>
                     (displayColumn ? suggestion[displayColumn] : suggestion).toLowerCase().indexOf(userInput.toLowerCase()) > -1
             );
+
         if (filteredSuggestions.length > displayLength) {
             filteredSuggestions = [
                 {
@@ -126,8 +127,8 @@ class AutoComplete extends React.Component {
         const {userInput} = this.state;
         displayLength = displayLength ?? 10;
         let {filteredSuggestions} = this.state;
-        if (filteredSuggestions.length == 0 && userInput == '') // display first n of items
-        {
+        if (filteredSuggestions.length == 0 && !userInput) {
+
             filteredSuggestions = items.slice(0, displayLength);
             if (items.length > displayLength) {
                 filteredSuggestions = [
@@ -209,17 +210,23 @@ class AutoComplete extends React.Component {
             }
         }
         let defaultValue = this.props.value ? this.props.value : "";
-        return React.createElement("div", null, React.createElement("input", {
-            className: "form-control " + (required ? "required" : ""),
-            type: "text",
-            onChange: onChange,
-            onKeyDown: onKeyDown,
-            value: userInput || (!filtered && defaultValue) || "",
-            onClick: handleOnClick,
-            onBlur: handleOnBlur,
-            style: {width: width || '100%'},
-            autoComplete: "off",
-        }), suggestionsListComponent);
+        return (
+            <div>
+                <input className={`form-control ${required ? "required" : ''}`}
+                       type="text"
+                       onChange={onChange}
+                       onKeyDown={onKeyDown}
+                       value={userInput || (!filtered && defaultValue) || ''}
+                       onClick={handleOnClick}
+                       onBlur={handleOnBlur}
+                       disabled={this.props.disabled}
+                       style={{width: width || '100%'}}
+                       autoComplete="off"
+
+                />
+                {suggestionsListComponent}
+            </div>
+        )
     }
 }
 

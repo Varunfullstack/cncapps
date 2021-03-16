@@ -10,8 +10,6 @@ class SupplierMySQLDTO
     private $sup_town;
     private $sup_county;
     private $sup_postcode;
-    private $sup_phone;
-    private $sup_fax;
     private $sup_web_site_url;
     private $sup_contno;
     private $sup_cnc_accno;
@@ -73,22 +71,6 @@ class SupplierMySQLDTO
     public function getPostcode()
     {
         return $this->sup_postcode;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getPhone()
-    {
-        return $this->sup_phone;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getFax()
-    {
-        return $this->sup_fax;
     }
 
     /**

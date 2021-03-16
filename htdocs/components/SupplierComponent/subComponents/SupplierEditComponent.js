@@ -5,6 +5,8 @@ import Table from "../../shared/table/table";
 import Modal from "../../shared/Modal/modal";
 import {SupplierService} from "../../services/SupplierService";
 
+import './SupplierEditComponent.css';
+
 const EmptyEditingContact = {
     title: '',
     position: '',
@@ -152,141 +154,12 @@ export class SupplierEditComponent extends React.PureComponent {
         });
         return (
             <React.Fragment>
-
-                <label htmlFor=""
-                       className="span"
+                <div style={{width: "500px"}}
+                     className="supplier_edit_form"
                 >
-                    <span>town</span>
-                    <input
-                        type="text"
-                        value={supplier.town}
-                        name="town"
-                        onChange={this.updateField}
-                        maxLength="25"
-                        required
-                        readOnly={!supplier.isActive}
-                    />
-                </label>
-
-                <label htmlFor=""
-                       className="span"
-                >
-                    <span>county</span>
-                    <input
-                        type="text"
-                        name="county"
-                        value={supplier.county}
-                        onChange={this.updateField}
-                        maxLength="25"
-                        required
-                        readOnly={!supplier.isActive}
-                    />
-                </label>
-
-                <label htmlFor=""
-                       className="span"
-                >
-                    <span>postcode</span>
-                    <input
-                        type="text"
-                        name="postcode"
-                        value={supplier.postcode}
-                        onChange={this.updateField}
-                        maxLength="25"
-                        required
-                        readOnly={!supplier.isActive}
-                    />
-                </label>
-
-                <label htmlFor=""
-                       className="span"
-                >
-                    <span>name</span>
-                    <input
-                        type="text"
-                        name="name"
-                        value={supplier.name}
-                        onChange={this.updateField}
-                        maxLength="35"
-                        required
-                        readOnly={!supplier.isActive}
-                    />
-                </label>
-
-                <label htmlFor=""
-                       className="span"
-                >
-                    <span>address1</span>
-                    <input
-                        type="text"
-                        name="name"
-                        value={supplier.address1}
-                        onChange={this.updateField}
-                        maxLength="35"
-                        required
-                        readOnly={!supplier.isActive}
-                    />
-                </label>
-
-                <label htmlFor=""
-                       className="span"
-                >
-                    <span>address2</span>
-                    <input
-                        type="text"
-                        name="address2"
-                        value={supplier.address2}
-                        onChange={this.updateField}
-                        maxLength="35"
-                        readOnly={!supplier.isActive}
-                    />
-                </label>
-
-                <label htmlFor=""
-                       className="span"
-                >
-                    <span>websiteURL</span>
-                    <input
-                        type="text"
-                        name="websiteURL"
-                        value={supplier.websiteURL}
-                        onChange={this.updateField}
-                        maxLength="100"
-                        readOnly={!supplier.isActive}
-                    />
-                </label>
-
-                <label htmlFor=""
-                       className="span"
-                >
-                    <span>Payment Method</span>
-                    <select
-                        name="paymentMethodId"
-                        value={supplier.paymentMethodId}
-                        onChange={this.updateField}
-                        required
-                        disabled={!supplier.isActive}
-                    >
-                        {paymentMethods.map(x => <option key={x.id}
-                                                         value={x.id}
-                        >{x.description}</option>)}
-                    </select>
-                </label>
-
-                <label htmlFor=""
-                       className="span"
-                >
-                    <span>accountCode</span>
-                    <input
-                        type="text"
-                        name="accountCode"
-                        value={supplier.accountCode}
-                        onChange={this.updateField}
-                        maxLength="20"
-                        readOnly={!supplier.isActive}
-                    />
-                </label>
-                <label>
+                    <label htmlFor="mainSupplierContactId">
+                        Supplier Main Contact
+                    </label>
                     <select name="mainSupplierContactId"
                             onChange={this.updateField}
                             required
@@ -299,7 +172,115 @@ export class SupplierEditComponent extends React.PureComponent {
                             >{`${c.firstName} ${c.lastName}`}</option>)
                         }
                     </select>
-                </label>
+                    <label htmlFor="name">
+                        Name
+                    </label>
+                    <input
+                        type="text"
+                        name="name"
+                        value={supplier.name}
+                        onChange={this.updateField}
+                        maxLength="35"
+                        required
+                        readOnly={!supplier.isActive}
+                    />
+                    <label htmlFor="address1">
+                        Address1
+                    </label>
+                    <input
+                        type="text"
+                        name="address1"
+                        value={supplier.address1}
+                        onChange={this.updateField}
+                        maxLength="35"
+                        required
+                        readOnly={!supplier.isActive}
+                    />
+                    <label htmlFor="address2">
+                        Address2
+                    </label>
+                    <input
+                        type="text"
+                        name="address2"
+                        value={supplier.address2 || ''}
+                        onChange={this.updateField}
+                        maxLength="35"
+                        readOnly={!supplier.isActive}
+                    />
+                    <label htmlFor="town">
+                        Town
+                    </label>
+                    <input
+                        type="text"
+                        value={supplier.town}
+                        name="town"
+                        onChange={this.updateField}
+                        maxLength="25"
+                        required
+                        readOnly={!supplier.isActive}
+                    />
+                    <label htmlFor="county">
+                        County
+                    </label>
+                    <input
+                        type="text"
+                        name="county"
+                        value={supplier.county}
+                        onChange={this.updateField}
+                        maxLength="25"
+                        required
+                        readOnly={!supplier.isActive}
+                    />
+                    <label htmlFor="postcode">
+                        Postcode
+                    </label>
+                    <input
+                        type="text"
+                        name="postcode"
+                        value={supplier.postcode}
+                        onChange={this.updateField}
+                        maxLength="25"
+                        required
+                        readOnly={!supplier.isActive}
+                    />
+                    <label htmlFor="websiteURL">
+                        Website URL
+                    </label>
+                    <input
+                        type="text"
+                        name="websiteURL"
+                        value={supplier.websiteURL || ''}
+                        onChange={this.updateField}
+                        maxLength="100"
+                        readOnly={!supplier.isActive}
+                    />
+                    <label htmlFor="paymentMethodId">
+                        Payment Method
+                    </label>
+                    <select
+                        name="paymentMethodId"
+                        value={supplier.paymentMethodId}
+                        onChange={this.updateField}
+                        required
+                        disabled={!supplier.isActive}
+                    >
+                        {paymentMethods.map(x => <option key={x.id}
+                                                         value={x.id}
+                        >{x.description}</option>)}
+                    </select>
+                    <label htmlFor="accountCode">
+                        Account Code
+                    </label>
+                    <input
+                        type="text"
+                        name="accountCode"
+                        value={supplier.accountCode}
+                        onChange={this.updateField}
+                        maxLength="20"
+                        readOnly={!supplier.isActive}
+                    />
+
+                </div>
                 <button onClick={this.saveSupplier}
                         disabled={!supplier.isActive}
                 >Save
@@ -363,7 +344,10 @@ export class SupplierEditComponent extends React.PureComponent {
                 hdClassName: "text-left",
                 className: "text-left",
                 content: (contactRow) => {
-                    return contactRow.phone
+                    if (!contactRow.phone) {
+                        return '';
+                    }
+                    return <a href={`tel:${contactRow.phone}`}>{contactRow.phone}</a>
                 }
 
             },
@@ -378,6 +362,12 @@ export class SupplierEditComponent extends React.PureComponent {
                 width: "55",
                 hdClassName: "text-left",
                 className: "text-left",
+                content: contactRow => {
+                    if (!contactRow.email) {
+                        return '';
+                    }
+                    return <a href={`mailto:${contactRow.email}`}>{contactRow.email}</a>
+                }
             },
             {
                 hide: visibilityFilter === VisibilityFilterOptions.SHOW_ACTIVE,
@@ -493,43 +483,26 @@ export class SupplierEditComponent extends React.PureComponent {
                    title={`Contact Edit ${!editingContact.active ? ' (Readonly Archived)' : ''}`}
                    onClose={this.hideContactEditModal}
             >
-                <div>
-                    <label>
-                        <span>
-                            Title
-                        </span>
-                        <input name="title"
-                               value={editingContact.title}
-                               maxLength="45"
-                               onChange={this.editingContactChangedField}
-                               readOnly={!editingContact.active}
-                        />
+                <div className="contact_edit_form">
+                    <label htmlFor="title">
+                        Title
                     </label>
-
+                    <input name="title"
+                           value={editingContact.title}
+                           maxLength="45"
+                           onChange={this.editingContactChangedField}
+                           readOnly={!editingContact.active}
+                    />
                     <label>
-                        <span>
-                            Position*
-                        </span>
-                        <input name="position"
-                               value={editingContact.position || ''}
-                               maxLength="50"
-                               required
-                               readOnly={!editingContact.active}
-                               onChange={this.editingContactChangedField}
-                        />
+                        First Name*
                     </label>
-                    <label>
-                        <span>
-                            First Name*
-                        </span>
-                        <input name="firstName"
-                               value={editingContact.firstName}
-                               maxLength="25"
-                               required
-                               readOnly={!editingContact.active}
-                               onChange={this.editingContactChangedField}
-                        />
-                    </label>
+                    <input name="firstName"
+                           value={editingContact.firstName}
+                           maxLength="25"
+                           required
+                           readOnly={!editingContact.active}
+                           onChange={this.editingContactChangedField}
+                    />
                     <label>
                         <span>
                             Last Name*
@@ -537,6 +510,18 @@ export class SupplierEditComponent extends React.PureComponent {
                         <input name="lastName"
                                value={editingContact.lastName}
                                maxLength="35"
+                               required
+                               readOnly={!editingContact.active}
+                               onChange={this.editingContactChangedField}
+                        />
+                    </label>
+                    <label>
+                        <span>
+                            Position*
+                        </span>
+                        <input name="position"
+                               value={editingContact.position || ''}
+                               maxLength="50"
                                required
                                readOnly={!editingContact.active}
                                onChange={this.editingContactChangedField}

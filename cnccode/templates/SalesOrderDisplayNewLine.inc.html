@@ -13,6 +13,7 @@
         const curUnitCostInput = document.querySelector("input[name='ordline[1][curUnitCost]']")
         const curUnitSaleInput = document.querySelector("input[name='ordline[1][curUnitSale]']")
         const autocompleteItemContainer = document.getElementById('autocompleteItem');
+        const reactSupplierSearchContainer = document.getElementById("reactSupplierSearchContainer");
 
         let props = {
             autocompleteSelectedCallBack: (selectedItem) => {
@@ -134,14 +135,15 @@
         }
 
         function disableAllExceptDescription() {
-            supplierNameInput.disabled = true;
+
+            document.unmountComponentAtNode(reactSupplierSearchContainer);
             qtyOrderedInput.disabled = true;
             curUnitCostInput.disabled = true;
             curUnitSaleInput.disabled = true;
         }
 
         function enableAllExceptDescription() {
-            supplierNameInput.disabled = false;
+            document.renderSupplierSearchComponent(reactSupplierSearchContainer, 'supplierID');
             qtyOrderedInput.disabled = false;
             curUnitCostInput.disabled = false;
             curUnitSaleInput.disabled = false;
@@ -161,7 +163,8 @@
 
         function clearInputs() {
             itemDescriptionInput.value = "";
-            supplierNameInput.value = "";
+            document.unmountComponentAtNode(reactSupplierSearchContainer);
+            document.renderSupplierSearchComponent(reactSupplierSearchContainer, 'supplierID');
             qtyOrderedInput.value = "";
             curUnitCostInput.value = "";
             curUnitSaleInput.value = "";
@@ -292,18 +295,9 @@
                 <font class="formErrorMessage">{descriptionMessage}</font>
             </td>
             <td class="field">
-                <input
-                        type="text"
-                        name="ordline[1][supplierName]"
-                        id="supplierName"
-                        value="{supplierName}"
-                        onChange="javascript:validateSupplierName()"
-                        onKeydown="javascript:checkFunctionKey(supplierName)"
-                        size="35"
-                        maxlength="50"
-                        style="width: 100px"
-                >
-                <font class="formErrorMessage">{supplierNameMessage}</font>
+                <div id="reactSupplierSearchContainer"
+                     data-input-id="supplierID"
+                ></div>
             </td>
             <td class="fieldRight"
                 align="right"

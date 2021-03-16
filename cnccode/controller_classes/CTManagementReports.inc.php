@@ -9,7 +9,6 @@
 global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUManagementReports.inc.php');
-require_once($cfg['path_dbe'] . '/DBESupplier.inc.php');
 require_once($cfg['path_dbe'] . '/DBECustomer.inc.php');
 require_once($cfg['path_func'] . '/Common.inc.php');
 require_once($cfg['path_bu'] . '/BUSector.inc.php');
@@ -89,13 +88,13 @@ class CTManagementReports extends CTCNC
                 'htmlFmt' => CT_HTML_FMT_POPUP
             )
         );
-        $fetchDataUrl = Controller::buildLink(
+        $fetchDataUrl     = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action' => self::GetSalesByCustomerDataAction
             )
         );
-        $customerName = null;
+        $customerName     = null;
         if ($this->getParam('customerID')) {
             $dbeCustomer = new DBECustomer($this);
             $dbeCustomer->getRow($this->getParam('customerID'));
@@ -140,7 +139,7 @@ class CTManagementReports extends CTCNC
     private function parseSectorSelector($selectedSectorID)
     {
 
-        $buSector = new BUSector($this);
+        $buSector  = new BUSector($this);
         $dsResults = new DataSet($this);
         $buSector->getAll($dsResults);
         $this->template->set_var(
@@ -216,15 +215,15 @@ class CTManagementReports extends CTCNC
                 'htmlFmt' => CT_HTML_FMT_POPUP
             )
         );
-        $results      = $this->buManagementReports->getSpendBySupplier(
+        $results          = $this->buManagementReports->getSpendBySupplier(
             $this->getParam('supplierID'),
             $this->getParam('year')
         );
-        $supplierName = null;
+        $supplierName     = null;
         if ($this->getParam('supplierID')) {
-            $dbeSupplier = new DBESupplier($this);
-            $dbeSupplier->getRow($this->getParam('supplierID'));
-            $supplierName = $dbeSupplier->getValue(DBESupplier::name);
+            $supplierRepo = new \CNCLTD\Supplier\infra\MySQLSupplierRepository();
+            $supplier     = $supplierRepo->getById(new \CNCLTD\Supplier\SupplierId($this->getParam('supplierID')));
+            $supplierName = $supplier->name()->value();
         }
         $this->template->set_block('ManagementReportsSpendSupplier', 'resultsBlock', 'results');
         while ($row = $results->fetch_object()) {
@@ -470,7 +469,7 @@ class CTManagementReports extends CTCNC
         $this->template->set_block('ManagementReportsSpendManufacturer', 'resultsBlock', 'results');
         $grandTotal = 0;
         while ($row = $results->fetch_object()) {
-            $total = $row->month1 + $row->month2 + $row->month3 + $row->month4 + $row->month5 + $row->month6 + $row->month7 + $row->month8 + $row->month9 + $row->month10 + $row->month11 + $row->month12;
+            $total      = $row->month1 + $row->month2 + $row->month3 + $row->month4 + $row->month5 + $row->month6 + $row->month7 + $row->month8 + $row->month9 + $row->month10 + $row->month11 + $row->month12;
             $grandTotal += $total;
             $this->template->set_var(
                 array(

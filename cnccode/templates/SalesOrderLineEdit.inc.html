@@ -162,17 +162,9 @@
         <tr>
             <td class="promptText">Supplier</td>
             <td class="field">
-                <input
-                        type="text"
-                        name="ordline[1][supplierName]"
-                        id="supplierName"
-                        value="{supplierName}"
-                        onChange="javascript:validateSupplierName()"
-                        onKeydown="javascript:checkFunctionKey(supplierName)"
-                        size="50"
-                        maxlength="50"
-                >
-                <font class="formErrorMessage">{supplierNameMessage}</font>
+                <div id="reactSupplierSearchContainer"
+                     data-input-id="supplierID"
+                ></div>
             </td>
         </tr>
         <tr>

@@ -111,7 +111,6 @@
                 sup_add2         = if(sup_add2 = '', null, sup_add2),
                 sup_county       = if(sup_county = '' OR sup_county IS NULL, 'notprovided', sup_county),
                 sup_postcode     = if(sup_postcode = '', 'notprovided', sup_postcode);
-
             UPDATE
                 supplierContact
             SET title     = IF(title = "", NULL, title),
@@ -119,6 +118,7 @@
                 lastName  = if(lastName = "", null, lastName),
                 email     = if(email = "", null, email),
                 phone     = if(phone = "", null, phone);
+
             delete
             from contact
             where con_suppno is not null

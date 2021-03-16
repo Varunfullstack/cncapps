@@ -7,11 +7,18 @@ class SupplierSearch extends MainComponent {
 
     constructor(props) {
         super(props);
-        this.state = {suppliers: []}
+        this.state = {
+            suppliers: [],
+            loading: false,
+        }
     }
 
     componentDidMount() {
-        SupplierService.getSuppliersSummaryData().then(suppliers => this.setState({suppliers}))
+        this.setState({loading: true}, async () => {
+            let suppliers = await SupplierService.getSuppliersSummaryData();
+            suppliers = suppliers.filter(x => x.active).sort((a, b) => a.name.localeCompare(b.name));
+            this.setState({suppliers, loading: false});
+        })
     }
 
     handleOnSelect = (value) => {
@@ -20,14 +27,20 @@ class SupplierSearch extends MainComponent {
     }
 
     render() {
+        const {suppliers, loading} = this.state;
+        if (loading) {
+            return <div className="loading"/>
+        }
+
         return <AutoComplete
             errorMessage={"No Supplier found"}
-            items={this.state.suppliers}
+            items={suppliers}
             displayLength={"40"}
             displayColumn={"name"}
             pk={"id"}
             width={this.props.width || 300}
             onSelect={this.handleOnSelect}
+            disabled={this.props.disabled}
         />
     }
 }
