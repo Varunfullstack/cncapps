@@ -1,6 +1,9 @@
 <?php
 
 namespace CNCLTD\ChargeableWorkCustomerRequest\Core;
+
+use CNCLTD\ChargeableWorkCustomerRequest\infra\ChargeableWorkCustomerRequestMySQLDTO;
+
 class ChargeableWorkCustomerRequest
 {
     /** @var ChargeableWorkCustomerRequestTokenId */
@@ -40,7 +43,7 @@ class ChargeableWorkCustomerRequest
         $this->id                      = $id;
         $this->createdAt               = $createdAt;
         $this->serviceRequestId        = $serviceRequestId;
-        $this->requesteeId               = $requestee;
+        $this->requesteeId             = $requestee;
         $this->additionalTimeRequested = $additionalTimeRequested;
         $this->processedDateTime       = $processedDateTime;
         $this->requesterId             = $requesterId;
@@ -58,6 +61,28 @@ class ChargeableWorkCustomerRequest
     {
         return new self(
             $id, $createdAt, $serviceRequestId, $requesteeId, $additionalTimeRequested, $processedDateTime, $requesterId
+        );
+    }
+
+    public static function fromMySQLDTO(ChargeableWorkCustomerRequestMySQLDTO $dto): ChargeableWorkCustomerRequest
+    {
+        $id                      = new ChargeableWorkCustomerRequestTokenId($dto->getId());
+        $createdAt               = \DateTimeImmutable::createFromFormat(DATE_MYSQL_DATETIME, $dto->getCreatedAt());
+        $serviceRequestId        = new ChargeableWorkCustomerRequestServiceRequestId($dto->getServiceRequestId());
+        $requesteeId             = new ChargeableWorkCustomerRequestRequesteeId($dto->getRequesteeId());
+        $additionalTimeRequested = new ChargeableWorkCustomerRequestAdditionalTimeRequested(
+            $dto->getAdditionalTimeRequested()
+        );
+        $processedDateTime       = new ChargeableWorkCustomerRequestProcessedDateTime($dto->getProcessedDateTime());
+        $requesterId             = new ChargeableWorkCustomerRequestRequesterId($dto->getRequesterId());
+        return self::create(
+            $id,
+            $createdAt,
+            $serviceRequestId,
+            $requesteeId,
+            $additionalTimeRequested,
+            $processedDateTime,
+            $requesterId
         );
     }
 
