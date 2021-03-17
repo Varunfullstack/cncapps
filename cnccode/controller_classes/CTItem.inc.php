@@ -7,6 +7,7 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
+use CNCLTD\Exceptions\APIException;
 use CNCLTD\Exceptions\JsonHttpException;
 
 global $cfg;
@@ -66,6 +67,11 @@ class CTItem extends CTCNC
     const        GET_ITEM                   = 'GET_ITEM';
     const        UPDATE_CONTRACTS_PRICE     = 'updateContractsPrice';
     const        UPDATE_CHILD_ITEM_QUANTITY = 'UPDATE_CHILD_ITEM_QUANTITY';
+    const  CONST_ITEMS='items';
+    const  CONST_WARRANTY="warranty";
+    const CONST_RENEWAL_TYPES='renewalTypes';
+    const CONST_ITEM_BILLING_CATEGORY='itemBillingCategory';
+    const CONST_CHILD_ITEMS='childItems';
     /** @var DSForm */
     public $dsItem;
     /**
@@ -108,6 +114,40 @@ class CTItem extends CTCNC
     {
         $this->setParentFormFields();
         switch ($this->getAction()) {
+            case self::CONST_ITEMS:
+                switch($this->requestMethod){
+                    case 'GET':
+                        echo json_encode($this->getItems(),JSON_NUMERIC_CHECK);
+                         break;
+                     case 'POST':
+                         echo json_encode($this->addItem());
+                         break;
+                     case 'PUT':
+                         echo json_encode($this->updateItem());
+                         break;
+                    // case 'DELETE':
+                    //     echo json_encode($this->deleteProjectIssue());
+                    //     break;
+                }            
+                break;
+            case self::CONST_CHILD_ITEMS:
+                switch($this->requestMethod){
+                    case 'GET':
+                        
+                        case 'POST':
+                            echo json_encode($this->updateChildItems());
+                            break; 
+                }            
+                break;
+            case self::CONST_WARRANTY:
+                echo json_encode($this->getWarranties(),JSON_NUMERIC_CHECK);
+                break;
+            case self::CONST_RENEWAL_TYPES:
+                echo json_encode($this->getRenewalTypes(),JSON_NUMERIC_CHECK);
+                break;
+            case self::CONST_ITEM_BILLING_CATEGORY:
+                echo json_encode($this->getItemBillingCategory(),JSON_NUMERIC_CHECK);
+                break;
             case CTCNC_ACT_ITEM_ADD:
             case CTCNC_ACT_ITEM_EDIT:
                 $this->checkPermissions(SALES_PERMISSION);
@@ -1057,7 +1097,11 @@ WHERE custitem.`cui_itemno` = ?
             'ItemList',
             'ItemList'
         );
-        $this->loadReactScript('ItemListTypeAheadRenderer.js');
+        $this->setPageTitle('Items');
+
+        //$this->loadReactScript('ItemListTypeAheadRenderer.js');
+        $this->loadReactScript('ItemsComponent.js');
+        $this->loadReactCSS('ItemsComponent.css');     
         $this->template->parse('CONTENTS', 'ItemList');
         $this->parsePage();
     }
@@ -1094,5 +1138,220 @@ WHERE custitem.`cui_itemno` = ?
         global $db;
         $repo = new \CNCLTD\ChildItem\ChildItemRepository($db);
         $repo->updateChildItemQuantity($parentItemId, $childItemId, $quantity);
+    }
+    function getItems()
+    {
+        $data = [];
+        $limit=@$_REQUEST["limit"]??50;
+        $page =@$_REQUEST["page"]??1;
+        $offset=$limit*($page-1);
+         $dbeItem           = new DBEItem($this);
+         $dbeItemType       = new DBEItemType($this);
+        // $dbeManufacturer   = new DBEManufacturer($this);
+        $orderColumns = [
+            "description"   => "itm_desc",
+            "costPrice"     => "itm_sstk_cost",
+            "curUnitSale"   => "itm_sstk_price",
+            "partNumber"    => "itm_unit_of_sale",
+            "renewalTypeID" => "renewalTypeID",
+            "discontinued"  => "itm_discontinued",
+            "itemCategory"  => "ity_desc",
+            "manufacturer"  => "man_name"
+        ];
+        $orderBy =$orderColumns[(@$_REQUEST["orderBy"]??"description")];
+        $orderDir =@$_REQUEST["orderDir"]??'asc';
+        $q='%'.(@$_REQUEST["q"]??"").'%';
+        $query ="SELECT 
+          
+         itm_desc  as description , 
+         itm_sstk_cost as curUnitCost,
+         itm_sstk_price as curUnitSale,
+         itm_unit_of_sale as partNo,
+         renewalTypeID,
+         itm_discontinued as discontinuedFlag,
+         ity_desc as itemCategory,
+         man_name as manufacturerName,  
+         {$dbeItem->getDBColumnName($dbeItem::itemID)} as itemID,       
+         {$dbeItem->getDBColumnName($dbeItem::itemTypeID)} as itemTypeID,
+         {$dbeItem->getDBColumnName($dbeItem::warrantyID)} as warrantyID,
+         {$dbeItem->getDBColumnName($dbeItem::partNoOld)} as partNoOld,
+         {$dbeItem->getDBColumnName($dbeItem::serialNoFlag)} as serialNoFlag,
+         {$dbeItem->getDBColumnName($dbeItem::discontinuedFlag)} as discontinuedFlag,
+         {$dbeItem->getDBColumnName($dbeItem::servercareFlag)} as servercareFlag,
+         {$dbeItem->getDBColumnName($dbeItem::renewalTypeID)} as renewalTypeID,
+         {$dbeItem->getDBColumnName($dbeItem::allowDirectDebit)} as allowDirectDebit,
+         {$dbeItem->getDBColumnName($dbeItem::itemBillingCategoryID)} as itemBillingCategoryID,
+         {$dbeItem->getDBColumnName($dbeItem::contractResponseTime)} as contractResponseTime,
+         {$dbeItem->getDBColumnName($dbeItem::allowSRLog)} as allowSRLog,
+         {$dbeItem->getDBColumnName($dbeItem::isStreamOne)} as isStreamOne,
+         {$dbeItem->getDBColumnName($dbeItem::excludeFromPOCompletion)} as excludeFromPOCompletion,
+         {$dbeItem->getDBColumnName($dbeItem::manufacturerID)} as manufacturerID,
+         {$dbeItem->getDBColumnName($dbeItem::notes)} as notes, 
+         {$dbeItem->getDBColumnName($dbeItem::stockcat)} as stockcat
+         
+        FROM Item
+        left JOIN itemtype on Item.itm_itemtypeno   = itemtype.ity_itemtypeno
+        LEFT JOIN manufact on Item.itm_manno        = manufact.man_manno
+        where 
+            itm_desc            like :q OR
+            itm_sstk_cost       like :q OR
+            itm_sstk_price      like :q OR
+            itm_unit_of_sale    like :q OR
+            itm_discontinued    like :q OR
+            ity_desc            like :q OR
+            man_name            like :q
+
+        ORDER BY $orderBy $orderDir
+        LIMIT $limit OFFSET $offset
+        ";
+        $data=DBConnect::fetchAll($query,['q'=>$q]);
+        return $this->success($data);
+    }
+    function getWarranties( )
+    {
+        // Manufacturer selector
+        $dbeWarranty = new DBEWarranty($this);
+        $dbeWarranty->getRows();
+        $data =[];
+        
+        while ($dbeWarranty->fetchNext()) {
+            $data []=
+                array(
+                    'name' => $dbeWarranty->getValue(DBEWarranty::description),
+                    'id'          => $dbeWarranty->getValue(DBEWarranty::warrantyID),                                   
+            );
+             
+        } 
+        return $this->success($data);
+    }
+    function getRenewalTypes( )
+    {
+        $dbeRenewalType = new DBERenewalType($this);
+        $dbeRenewalType->getRows();
+        $data =[];
+       
+        $allowedDirectDebitRenewals = [1, 2, 5];
+        while ($dbeRenewalType->fetchNext()) {
+            $data []=
+                array(
+                    'name'   => $dbeRenewalType->getValue(DBERenewalType::description),
+                    'id'            => $dbeRenewalType->getValue(DBERenewalType::renewalTypeID),
+                    'allowsDirectDebit' => in_array(
+                        $dbeRenewalType->getValue(DBERenewalType::renewalTypeID),
+                        $allowedDirectDebitRenewals
+                    ) ? 'data-allows-direct-debit="true"' : null,
+            );
+            
+        }  
+        return $this->success($data);
+    }
+
+    function getItemBillingCategory()
+    {
+        $dbeItemBillingCategory = new DBEItemBillingCategory($this);
+        $dbeItemBillingCategory->getRows(DBEItemBillingCategory::name);
+        $data =[];
+        while ($dbeItemBillingCategory->fetchNext()) {
+            $data []=
+                array(
+                    'name'     => $dbeItemBillingCategory->getValue(DBEItemBillingCategory::name),
+                    'id'       => $dbeItemBillingCategory->getValue(DBEItemBillingCategory::id),
+                                    
+            );
+        }
+        return $this->success($data);
+    }
+    function updateItem()
+    {
+        try{
+            $body = $this->getBody(true); 
+            if (! $body) {
+                return $this->fail(APIException::badRequest,"Bad Request");
+            }
+            //$this->dsItem->debug=true;
+            if (!$this->dsItem->populateFromArray( ["item"=>$body] )) {
+                $this->setFormErrorOn();
+                $this->setAction(CTCNC_ACT_ITEM_EDIT);          
+                $this->setParam('itemID', $this->dsItem->getValue(DBEItem::itemID));
+                return $this->fail(APIException::badRequest,$this->getFormErrorMessage());
+            }
+            $this->setAction(CTCNC_ACT_ITEM_EDIT);
+            //return $this->success(["itemID"=>$this->dsItem->getValue(DBEItem::itemID)]);
+            $this->buItem->updateItem($this->dsItem);        
+            return $this->success();
+        }
+        catch(Exception $ex){
+            return $this->fail($ex->getMessage());
+        }
+    }
+    function addItem(){
+        try{
+            $body = $this->getBody(true); 
+            if (! $body) {
+                return $this->fail(APIException::badRequest,"Bad Request");
+            }            
+            //return $this->success(["item"=>$body] );
+            //$this->dsItem->debug=true; 
+            
+          
+            if (!$this->dsItem->populateFromArray(  ['item'=>$body]  )) {
+                $this->setFormErrorOn();
+                $this->setAction(CTCNC_ACT_ITEM_ADD);                          
+                return $this->fail(APIException::badRequest,$this->getFormErrorMessage());
+            }
+            // $this->buItem->initialiseNewItem(
+            //     $this->dsItem,
+            //     $body["renewalTypeID"]
+            // );
+            //$this->setAction(CTITEM_ACT_ITEM_INSERT); 
+            //return $this->success(["itemID"=>$this->dsItem->getValue(DBEItem::itemID)]);
+            
+             $this->buItem->updateItem($this->dsItem);        
+            return $this->success(["itemId"=>$this->dsItem->getPKValue()]);
+        }
+        catch(Exception $ex){
+            return $this->fail(APIException::badRequest, $ex->getMessage());
+        }
+    }
+    function updateChildItems(){
+        $itemId=@$_REQUEST["itemId"];
+        if(!$itemId)
+            return $this->fail(APIException::badRequest,"Missing ItemID");
+        $items=$this->getBody();          
+        $childs=DBConnect::fetchAll("SELECT * FROM item JOIN childItem ON childItem.`childItemId` = item.`itm_itemno` WHERE childItem.`parentItemId` = :itemId",["itemId"=>$itemId]);  
+        //update current childs quantity
+        foreach($items as $item)
+        {           
+            DBConnect::execute("UPDATE childItem set quantity=:quantity where parentItemId=:parentId and childItemId=:childId",
+            ["quantity"=>$item->quantity,"parentId"=> $itemId,"childId"=>$item->id]);            
+        }
+        //deleted items
+        foreach($childs as $child)
+        {   //childItemId
+            $deleted=true;
+            foreach($items as $item)
+            {         
+                if($child["childItemId"]==$item->id)
+                    $deleted=false;
+            }
+            if($deleted)
+            DBConnect::execute("DELETE from childItem where childItemId=:childId and parentItemId=:parentId",
+            ["childId"=>$child["childItemId"],"parentId"=>$itemId]);            
+            
+        }
+        // add new items
+        foreach($items as $item)
+        {          
+            $found=false;
+            foreach($childs as $child)
+            { 
+                if($child["childItemId"]==$item->id)
+                $found=true;
+            } 
+            if(!$found)  
+            DBConnect::execute("INSERT into childItem(childItemId,parentItemId,quantity) values(:childId,:parentId,:quantity)",
+                 ["quantity"=>$item->quantity,"parentId"=> $itemId,"childId"=>$item->id]);
+        }      
+        return $this->success();
     }
 }

@@ -1245,9 +1245,8 @@ class CTCNC extends Controller
         echo $js_code;
     }
 
-    function getBody()
-    {
-        return json_decode(file_get_contents('php://input'));
+    function getBody($associative=false){
+        return json_decode(file_get_contents('php://input'),$associative);
     }
 
     function hideMenu()

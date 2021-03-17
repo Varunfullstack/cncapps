@@ -26,7 +26,7 @@ class CTManufacturer extends CTCNC
 {
     const SEARCH_MANUFACTURER_BY_NAME = "SEARCH_MANUFACTURER_BY_NAME";
     const CONST_ITEMS='items';
-
+    const CONST_MANUFACTURER_LIST='manufacturerList';
     /** @var DSForm */
     public $dsManufacturer;
     /**
@@ -56,6 +56,9 @@ class CTManufacturer extends CTCNC
     {
         $this->setParentFormFields();
         switch ($this->getAction()) {
+            case self::CONST_MANUFACTURER_LIST:
+                echo  json_encode($this->getManufacturerList(),JSON_NUMERIC_CHECK);
+                break;
             case self::CONST_ITEMS:
                 switch ($this->requestMethod) {
                     case 'GET':
@@ -275,5 +278,23 @@ class CTManufacturer extends CTCNC
         $dbeManufacturer->getRow($id);        
         $dbeManufacturer->deleteRow();
         return $this->success();
+    }
+    function getManufacturerList(){
+        $data=[];       
+        $dsManufacturer = new DataSet($this);
+        $this->buManufacturer->getAll($dsManufacturer);        
+        if ($dsManufacturer->rowCount() > 0) {            
+            while ($dsManufacturer->fetchNext()) {
+                $manufacturerID = $dsManufacturer->getValue(DBEManufacturer::manufacturerID);                
+                $data []=
+                    array(
+                        'id' => $manufacturerID,
+                        'name'           => Controller::htmlDisplayText(
+                            $dsManufacturer->getValue(DBEManufacturer::name)
+                        ) 
+                    );    
+            }
+        }
+        return $this->success( $data);
     }
 }

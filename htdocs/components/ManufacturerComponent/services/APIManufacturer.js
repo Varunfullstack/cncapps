@@ -5,6 +5,10 @@ export default class APIManufacturer extends APIMain {
   getAllTypes() {
     return this.get(`${ApiUrls.Manufacturer}items`);
   }
+  getTypeList()
+  {
+    return this.get(`${ApiUrls.Manufacturer}manufacturerList`);
+  }
 
   addType(body) {
     return this.postJson(`${ApiUrls.Manufacturer}items`, body);

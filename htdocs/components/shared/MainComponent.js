@@ -251,4 +251,7 @@ export default class MainComponent extends React.Component {
             return null;
         return <i className="fal fa-2x fa-trash-alt color-gray pointer" onClick={()=>callBack(obj)}></i>
     }
+    getTableStyle(){
+        return "table table-striped";
+    }
 }
