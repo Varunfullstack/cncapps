@@ -20,6 +20,7 @@ class AutoComplete extends React.Component {
 
     }
 
+
     // Event fired when the input value is changed
     onChange = (e) => {
 
@@ -155,9 +156,6 @@ class AutoComplete extends React.Component {
         }, 200);
     }
 
-    componentDidUpdate(prevProps) {
-
-    }
 
     static getDerivedStateFromProps(props, state) {
         if (props.value != state.value) {

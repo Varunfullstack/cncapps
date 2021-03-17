@@ -38,31 +38,6 @@
                         );
                     }
                     break;
-                case "supplierName":
-                    if (document.getElementById("supplierID").value != "0") {
-                        window.open(
-                            '{urlSupplierEdit}&supplierID=' +
-                            escape(document.getElementById("supplierID").value) +
-                            '&parentIDField=supplierID' +
-                            '&parentDescField=supplierName',
-                            'supplier',
-                            'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
-                        );
-                    }
-                    break;
-
-                case "updateSupplierName":
-                    if (document.getElementById("updateSupplierID").value != "0") {
-                        window.open(
-                            '{urlSupplierEdit}&supplierID=' +
-                            escape(document.getElementById("updateSupplierID").value) +
-                            '&parentIDField=updateSupplierID' +
-                            '&parentDescField=updateSupplierName',
-                            'supplier',
-                            'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
-                        );
-                    }
-                    break;
                 case "invSiteDesc":
                     if (document.getElementById("invSiteNo").value != "") {
                         window.open(
@@ -220,6 +195,8 @@
         orderHeadIdInput = document.querySelector('[name="form[ordheadID]"]');
         toggleCheckBoxes = document.querySelectorAll('[name="Toggle"]');
         updateSupplierName = document.querySelector('#updateSupplierName');
+        updateSupplierName.style.display = 'none';
+        document.renderSupplierSearchComponent(updateSupplierName, {inputId: 'updateSupplierID', defaultText: ''})
         requiredByDateInput = document.querySelector('#requiredByDate');
         tbcInput = document.querySelector('#tbc');
         lineSelectors = document.querySelectorAll('input[type="checkbox"][name="selectedOrderLine[]"]');
@@ -876,18 +853,21 @@
                        title="Date TBC"
                        style="display: none"
                 >
-                <input {updateSupplierNameStyle}
-                       type="text"
-                       name="form[updateSupplierName]"
-                       id="updateSupplierName"
-                       value="{updateSupplierName}"
-                       onChange="javascript:validateUpdateSupplierName()"
-                       onKeydown="javascript:checkFunctionKey(updateSupplierName)"
-                       size="35"
-                       maxlength="50"
-                       placeholder="Supplier Name or ID"
-                >
-                <font class="formErrorMessage">{updateSupplierNameMessage}</font>
+                <div id="updateSupplierName">
+
+                </div>
+                <!--                <input {updateSupplierNameStyle}-->
+                <!--                       type="text"-->
+                <!--                       name="form[updateSupplierName]"-->
+                <!--                       id="updateSupplierName"-->
+                <!--                       value="{updateSupplierName}"-->
+                <!--                       onChange="javascript:validateUpdateSupplierName()"-->
+                <!--                       onKeydown="javascript:checkFunctionKey(updateSupplierName)"-->
+                <!--                       size="35"-->
+                <!--                       maxlength="50"-->
+                <!--                       placeholder="Supplier Name or ID"-->
+                <!--                >-->
+                <!--                <font class="formErrorMessage">{updateSupplierNameMessage}</font>-->
                 <button id="performActionButton"
                         {readOnly}
                         type="button"

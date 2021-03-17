@@ -91,7 +91,7 @@ export default class SupplierContactSelectorComponent extends React.PureComponen
 
         if (selectedOption) {
             return (
-                <div>
+                <div style={{display: "inline-block"}}>
                 <span>
                     {this.getOptionText(selectedOption)}
                 </span>

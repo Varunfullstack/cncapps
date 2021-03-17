@@ -69,6 +69,7 @@
         addToRecurringButton.disabled = true;
         let typeSelected = typeSelector.value;
         updateButtons();
+        document.renderSupplierSearchComponent(reactSupplierSearchContainer, {inputId: 'supplierID', defaultText: ''});
 
         function checkLineValid(typeSelected) {
             if (typeSelected === 'C') {
@@ -135,24 +136,17 @@
         }
 
         function disableAllExceptDescription() {
-
-            document.unmountComponentAtNode(reactSupplierSearchContainer);
+            reactSupplierSearchContainer.style.display = 'none';
             qtyOrderedInput.disabled = true;
             curUnitCostInput.disabled = true;
             curUnitSaleInput.disabled = true;
         }
 
         function enableAllExceptDescription() {
-            document.renderSupplierSearchComponent(reactSupplierSearchContainer, 'supplierID');
+            reactSupplierSearchContainer.style.display = 'block';
             qtyOrderedInput.disabled = false;
             curUnitCostInput.disabled = false;
             curUnitSaleInput.disabled = false;
-        }
-
-        function renderReactElement(component, props, targetNode, callback) {
-            const reactElement = React.createElement(TypeAheadSearch, props, null);
-            ReactDOM.render(reactElement, targetNode, callback);
-            return reactElement;
         }
 
         typeSelector.addEventListener('change', ($event) => {
@@ -163,8 +157,7 @@
 
         function clearInputs() {
             itemDescriptionInput.value = "";
-            document.unmountComponentAtNode(reactSupplierSearchContainer);
-            document.renderSupplierSearchComponent(reactSupplierSearchContainer, 'supplierID');
+            document.renderSupplierSearchComponent(reactSupplierSearchContainer, {inputId: 'supplierID', defaultText: ''});
             qtyOrderedInput.value = "";
             curUnitCostInput.value = "";
             curUnitSaleInput.value = "";

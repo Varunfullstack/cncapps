@@ -72,6 +72,7 @@ export class PurchaseOrderSupplierAndContactInputsComponent extends React.PureCo
             <React.Fragment>
                 <a href={`tel:${selectedSupplierContact.phone}`}
                    target="_blank"
+                   style={{marginRight:"4px"}}
                 >
                     <i className="fal fa-phone"/>
                 </a>

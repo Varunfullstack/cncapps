@@ -18,22 +18,19 @@ export class SupplierSearchComponent extends React.PureComponent {
         return (
             <SupplierSearch onChange={this.handleChange}
                             disabled={this.props.disabled}
+                            defaultText={this.props.defaultText}
             />
         )
     }
 }
 
-document.renderSupplierSearchComponent = (domContainer, inputId) => {
+document.renderSupplierSearchComponent = (domContainer, {inputId, defaultText}) => {
     const element = document.getElementById(inputId)
-    const instance = ReactDOM.render(React.createElement(SupplierSearchComponent, {inputId}), domContainer);
-    element.reactInstance = instance;
+    element.reactInstance = ReactDOM.render(React.createElement(SupplierSearchComponent, {
+        inputId,
+        defaultText
+    }), domContainer);
 }
-document.addEventListener('DOMContentLoaded', () => {
-    const domContainer = document.getElementById("reactSupplierSearchContainer");
-    const inputId = domContainer.dataset.inputId;
-    document.renderSupplierSearchComponent(domContainer,inputId);
-})
-
 
 document.unmountComponentAtNode = (node) => {
     ReactDOM.unmountComponentAtNode(node);

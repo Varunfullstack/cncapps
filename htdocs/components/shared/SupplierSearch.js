@@ -37,6 +37,7 @@ class SupplierSearch extends MainComponent {
             items={suppliers}
             displayLength={"40"}
             displayColumn={"name"}
+            value={this.props.defaultText}
             pk={"id"}
             width={this.props.width || 300}
             onSelect={this.handleOnSelect}
