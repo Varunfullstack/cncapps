@@ -19,7 +19,7 @@ class CommunicationService
         $dto = new ChargeableWorkCustomerRequestEmailDTO(
             PORTAL_URL . '/notSureWhereToPointThisYet',
             PORTAL_URL . '/notSureWhereToPointThisYet',
-            $request->getAdditionalTimeRequested()->value(),
+            $request->getAdditionalHoursRequested()->value(),
             $dbeContact->getValue(\DBEContact::firstName),
             $request->getServiceRequestId()->value(),
             $dbeProblem->getValue(\DBEProblem::emailSubjectSummary)

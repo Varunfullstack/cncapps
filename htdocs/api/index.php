@@ -1,13 +1,32 @@
 <?php
 
+use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestTokenId;
+use CNCLTD\ChargeableWorkCustomerRequest\infra\ChargeableWorkCustomerRequestMySQLRepository;
+use CNCLTD\ChargeableWorkCustomerRequest\usecases\ApprovePendingChargeableWorkCustomerRequest;
+use CNCLTD\ChargeableWorkCustomerRequest\usecases\GetPendingToProcessChargeableRequestInfo;
+use CNCLTD\CustomerFeedback;
+use CNCLTD\CustomerFeedbackRepository;
+use CNCLTD\Exceptions\ChargeableWorkCustomerRequestAlreadyProcessedException;
+use CNCLTD\Exceptions\ChargeableWorkCustomerRequestNotFoundException;
+use CNCLTD\Exceptions\ContactNotFoundException;
+use CNCLTD\FeedbackTokenGenerator;
+use CNCLTD\JsonBodyParserMiddleware;
+use CNCLTD\SignableProcess;
+use DI\Container;
+use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Signable\ApiClient;
 use Signable\DocumentWithoutTemplate;
 use Signable\Envelopes;
 use Signable\Party;
+use Slim\Exception\HttpNotFoundException;
+use Slim\Factory\AppFactory;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
+use Slim\Routing\RouteCollectorProxy;
 use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
 
 require_once __DIR__ . '/../config.inc.php';
 global $cfg;
@@ -15,16 +34,16 @@ require_once($cfg["path_dbe"] . "/DBEQuotation.inc.php");
 require_once($cfg["path_dbe"] . "/DBESignableEnvelope.inc.php");
 require_once($cfg["path_bu"] . "/BUSalesOrder.inc.php");
 require_once($cfg["path_bu"] . "/BURenewal.inc.php");
-$container = new \DI\Container();
-\Slim\Factory\AppFactory::setContainer($container);
-$app   = \Slim\Factory\AppFactory::create();
+$container = new Container();
+AppFactory::setContainer($container);
+$app   = AppFactory::create();
 $thing = null;
-$app->add(new \CNCLTD\JsonBodyParserMiddleware());
+$app->add(new JsonBodyParserMiddleware());
 $app->addErrorMiddleware(true, true, true);
 $container->set(
     'twig',
     function () {
-        $loader = new \Twig\Loader\FilesystemLoader('', __DIR__ . '/../../twig');
+        $loader = new FilesystemLoader('', __DIR__ . '/../../twig');
         $loader->addPath('api', 'api');
         return new Environment($loader, ["cache" => __DIR__ . '/../../cache']);
     }
@@ -35,23 +54,23 @@ $container->set(
         $logger      = new Logger('api-log');
         $logFileName = 'api.log';
         $logPath     = APPLICATION_LOGS . '/' . $logFileName;
-        $logger->pushHandler(new \Monolog\Handler\RotatingFileHandler($logPath, 14, Logger::INFO));
+        $logger->pushHandler(new RotatingFileHandler($logPath, 14, Logger::INFO));
         return $logger;
     }
 );
 $app->group(
     '/internal-api',
-    function (\Slim\Routing\RouteCollectorProxy $group) {
+    function (RouteCollectorProxy $group) {
         $group->get(
             '/',
-            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
+            function (Request $request, Response $response) {
                 $response->getBody()->write('CNC Internal API');
                 return $response;
             }
         );
         $group->get(
             '/customerStats/{customerId}',
-            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response, $args) {
+            function (Request $request, Response $response, $args) {
                 $queryParams = $request->getQueryParams();
                 $endDate     = new DateTime();
                 $startDate   = (clone $endDate)->sub(new DateInterval('P365D'));
@@ -280,7 +299,7 @@ WHERE
         );
         $group->get(
             '/SRCount/{customerId}',
-            function (Request $request, Response  $response, $args) {
+            function (Request $request, Response $response, $args) {
                 $queryParams = $request->getQueryParams();
                 $endDate     = new DateTime();
                 $startDate   = (clone $endDate)->sub(new DateInterval('P365D'));
@@ -309,7 +328,7 @@ WHERE
                     ["type" => "s", "value" => $startDate->format(DATE_MYSQL_DATE)],
                     ["type" => "s", "value" => $endDate->format(DATE_MYSQL_DATE)],
                 ];
-                $query = "SELECT
+                $query  = "SELECT
  
   SUM(
     problem.pro_hide_from_customer_flag <> 'Y'
@@ -333,7 +352,7 @@ ORDER BY raisedManually DESC";
         );
         $group->get(
             '/SRCountByPerson/{customerId}',
-            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response, $args) {
+            function (Request $request, Response $response, $args) {
                 $queryParams = $request->getQueryParams();
                 $endDate     = new DateTime();
                 $startDate   = (clone $endDate)->sub(new DateInterval('P365D'));
@@ -362,7 +381,7 @@ ORDER BY raisedManually DESC";
                     ["type" => "s", "value" => $startDate->format(DATE_MYSQL_DATE)],
                     ["type" => "s", "value" => $endDate->format(DATE_MYSQL_DATE)],
                 ];
-                $query = "SELECT
+                $query  = "SELECT
           CONCAT(con_first_name, ' ' , con_last_name) AS name,
              SUM(
     problem.pro_hide_from_customer_flag <> 'Y'
@@ -385,7 +404,7 @@ ORDER BY raisedManually DESC";
         );
         $group->get(
             '/SRCountByRootCause/{customerId}',
-            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response, $args) {
+            function (Request $request, Response $response, $args) {
                 $queryParams = $request->getQueryParams();
                 $endDate     = new DateTime();
                 $startDate   = (clone $endDate)->sub(new DateInterval('P365D'));
@@ -414,7 +433,7 @@ ORDER BY raisedManually DESC";
                     ["type" => "s", "value" => $startDate->format(DATE_MYSQL_DATE)],
                     ["type" => "s", "value" => $endDate->format(DATE_MYSQL_DATE)],
                 ];
-                $query = "SELECT
+                $query  = "SELECT
           rtc_desc AS rootCauseDescription,
           COUNT(*) AS count
         FROM
@@ -433,7 +452,7 @@ ORDER BY raisedManually DESC";
         );
         $group->get(
             '/SRCountByLocation/{customerId}',
-            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response, $args) {
+            function (Request $request, Response $response, $args) {
                 $queryParams = $request->getQueryParams();
                 $endDate     = new DateTime();
                 $startDate   = (clone $endDate)->sub(new DateInterval('P365D'));
@@ -462,7 +481,7 @@ ORDER BY raisedManually DESC";
                     ["type" => "s", "value" => $startDate->format(DATE_MYSQL_DATE)],
                     ["type" => "s", "value" => $endDate->format(DATE_MYSQL_DATE)],
                 ];
-                $query = "SELECT
+                $query  = "SELECT
   address.`add_postcode`,
   address.`add_town`,
   COUNT(*) AS COUNT
@@ -493,7 +512,7 @@ ORDER BY COUNT DESC";
         );
         $group->get(
             '/stats',
-            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
+            function (Request $request, Response $response) {
                 global $db;
                 $queryParams = $request->getQueryParams();
                 $endDate     = new DateTime();
@@ -608,14 +627,14 @@ WHERE
                     }
                     $response->getBody()->write(json_encode($data, JSON_NUMERIC_CHECK));
                     return $response;
-                } catch (\Exception $exception) {
+                } catch (Exception $exception) {
                     throw new Exception('Failed operation');
                 }
             }
         );
         $group->post(
             '/termsAndConditionsRequest',
-            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
+            function (Request $request, Response $response) {
                 $requestBody = $request->getParsedBody();
                 if (!isset($requestBody['contactId'])) {
                     $response->getBody()->write(
@@ -628,7 +647,7 @@ WHERE
                     $buRenewal->sendTermsAndConditionsEmailToContact($requestBody['contactId']);
                     $response->getBody()->write(json_encode(["status" => "ok"]));
                     return $response;
-                } catch (\CNCLTD\Exceptions\ContactNotFoundException $exception) {
+                } catch (ContactNotFoundException $exception) {
                     $response->getBody()->write(
                         json_encode(["status" => "error", "error" => "Contact not found!"])
                     );
@@ -638,7 +657,7 @@ WHERE
         );
         $group->post(
             '/renewalsRequest',
-            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
+            function (Request $request, Response $response) {
                 $requestBody = $request->getParsedBody();
                 if (!isset($requestBody['contactId'])) {
                     $response->getBody()->write(
@@ -651,7 +670,7 @@ WHERE
                     $buRenewal->sendRenewalEmailToContact($requestBody['contactId']);
                     $response->getBody()->write(json_encode(["status" => "ok"]));
                     return $response;
-                } catch (\CNCLTD\Exceptions\ContactNotFoundException $exception) {
+                } catch (ContactNotFoundException $exception) {
                     $response->getBody()->write(
                         json_encode(["status" => "error", "error" => "Contact not found!"])
                     );
@@ -661,7 +680,7 @@ WHERE
         );
         $group->get(
             '/tokenData',
-            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
+            function (Request $request, Response $response) {
                 $queryParams = $request->getQueryParams();
                 if (empty($queryParams['token'])) {
 
@@ -669,7 +688,7 @@ WHERE
                     return $response->withStatus(400);
                 }
                 global $db;
-                $feedbackTokenGenerator = new \CNCLTD\FeedbackTokenGenerator($db);
+                $feedbackTokenGenerator = new FeedbackTokenGenerator($db);
                 $data                   = $feedbackTokenGenerator->getTokenData($queryParams['token']);
                 if (!$data) {
                     $response->getBody()->write(json_encode(["error" => "Token not found!"]));
@@ -681,7 +700,7 @@ WHERE
         );
         $group->post(
             '/feedback',
-            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
+            function (Request $request, Response $response) {
                 $data = $request->getParsedBody();
                 if (!$data) {
                     $response->getBody()->write(json_encode(["error" => "Data is missing"]));
@@ -692,7 +711,7 @@ WHERE
                     return $response->withStatus(400);
                 }
                 global $db;
-                $feedbackTokenGenerator = new \CNCLTD\FeedbackTokenGenerator($db);
+                $feedbackTokenGenerator = new FeedbackTokenGenerator($db);
                 $tokenData              = $feedbackTokenGenerator->getTokenData($data['token']);
                 if (!$tokenData) {
                     $response->getBody()->write(json_encode(["status" => "error", "message" => "Token not found!"]));
@@ -712,9 +731,9 @@ WHERE
                     );
                     return $response->withStatus(400);
                 }
-                $contactId = $dbeProblem->getValue(DBEProblem::contactID);
-                $customerFeedbackRepo               = new \CNCLTD\CustomerFeedbackRepository($db);
-                $customerFeedback                   = new \CNCLTD\CustomerFeedback();
+                $contactId                          = $dbeProblem->getValue(DBEProblem::contactID);
+                $customerFeedbackRepo               = new CustomerFeedbackRepository($db);
+                $customerFeedback                   = new CustomerFeedback();
                 $customerFeedback->serviceRequestId = $tokenData->serviceRequestId;
                 $customerFeedback->contactId        = $contactId;
                 $customerFeedback->value            = $data['value'];
@@ -725,21 +744,91 @@ WHERE
                 return $response;
             }
         );
+        $group->get(
+            '/pendingChargeableWorkCustomerRequest/{tokenId}',
+            function (Request $request, Response $response, $args) {
+                $tokenId = $args['tokenId'];
+                if (!$tokenId) {
+                    $response->getBody()->write(
+                        json_encode(["status" => "error", "message" => "Token id required!", "code" => 1264])
+                    );
+                    return $response->withStatus(400);
+                }
+                $chargeableRequestRepo = new ChargeableWorkCustomerRequestMySQLRepository();
+                $usecase               = new GetPendingToProcessChargeableRequestInfo($chargeableRequestRepo);
+                try {
+                    $info = $usecase(new ChargeableWorkCustomerRequestTokenId($tokenId));
+                    $response->getBody()->write(
+                        json_encode(["status" => "ok", "data" => $info])
+                    );
+                    return $response->withStatus(400);
+
+                } catch (ChargeableWorkCustomerRequestNotFoundException $exception) {
+
+                    $response->getBody()->write(
+                        json_encode(["status" => "error", "message" => "Request not found!", "code" => 1265])
+                    );
+                    return $response->withStatus(404);
+
+                } catch (ChargeableWorkCustomerRequestAlreadyProcessedException $exception) {
+                    $response->getBody()->write(
+                        json_encode(["status" => "error", "message" => "Request already processed!", "code" => 1266])
+                    );
+                    return $response->withStatus(404);
+                }
+            }
+        );
+        $group->post(
+            '/pendingChargeableWorkCustomerRequest/{tokenId}/approve',
+            function (Request $request, Response $response, $args) {
+                $tokenId = $args['tokenId'];
+                if (!$tokenId) {
+                    $response->getBody()->write(
+                        json_encode(["status" => "error", "message" => "Token id required!", "code" => 1264])
+                    );
+                    return $response->withStatus(400);
+                }
+                $chargeableRequestRepo = new ChargeableWorkCustomerRequestMySQLRepository();
+                $usecase               = new ApprovePendingChargeableWorkCustomerRequest($chargeableRequestRepo);
+                $requestData           = $request->getParsedBody();
+                $comments              = $requestData['comments'];
+                try {
+                    $info = $usecase(new ChargeableWorkCustomerRequestTokenId($tokenId),$comments);
+                    $response->getBody()->write(
+                        json_encode(["status" => "ok", "data" => $info])
+                    );
+                    return $response->withStatus(400);
+
+                } catch (ChargeableWorkCustomerRequestNotFoundException $exception) {
+
+                    $response->getBody()->write(
+                        json_encode(["status" => "error", "message" => "Request not found!", "code" => 1265])
+                    );
+                    return $response->withStatus(404);
+
+                } catch (ChargeableWorkCustomerRequestAlreadyProcessedException $exception) {
+                    $response->getBody()->write(
+                        json_encode(["status" => "error", "message" => "Request already processed!", "code" => 1266])
+                    );
+                    return $response->withStatus(404);
+                }
+            }
+        );
     }
 );
 $app->group(
     '/api',
-    function (\Slim\Routing\RouteCollectorProxy $group) {
+    function (RouteCollectorProxy $group) {
         $group->get(
             '/',
-            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
+            function (Request $request, Response $response) {
                 $response->getBody()->write('<h1>CNC API v1</h1>');
                 return $response;
             }
         );
         $group->get(
             '/signedConfirmation',
-            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
+            function (Request $request, Response $response) {
                 /** @var Environment $twig */
                 $twig = $this->get('twig');
                 $response->getBody()->write(
@@ -750,7 +839,7 @@ $app->group(
         );
         $group->get(
             '/acceptQuotation',
-            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
+            function (Request $request, Response $response) {
                 /** @var Environment $twig */
                 $twig        = $this->get('twig');
                 $queryParams = $request->getQueryParams();
@@ -787,7 +876,7 @@ $app->group(
                 try {
                     $pdfData = $BUPdfSalesQuote->createSignableOrderForm($dbeQuotation);
                     ApiClient::setApiKey("fc2d9ba05f3f3d9f2e9de4d831e8fed9");
-                    $envDocs = [];
+                    $envDocs           = [];
                     $dsDeliveryContact = new DBEContact($this);
                     $dsDeliveryContact->getRow($dbeQuotation->getValue(DBEQuotation::deliveryContactID));
                     $firstName = $dsDeliveryContact->getValue(DBEContact::firstName);
@@ -797,20 +886,20 @@ $app->group(
                     if ($server_type !== MAIN_CONFIG_SERVER_TYPE_LIVE) {
                         $email = "sales@" . CONFIG_PUBLIC_DOMAIN;
                     }
-                    $ordHeadID        = $dbeQuotation->getValue(DBEQuotation::ordheadID);
-                    $versionNo        = $dbeQuotation->getValue(DBEQuotation::versionNo);
-                    $orderFile        = $ordHeadID . '_' . $versionNo . '.pdf';
-                    $envelopeDocument = new DocumentWithoutTemplate(
+                    $ordHeadID         = $dbeQuotation->getValue(DBEQuotation::ordheadID);
+                    $versionNo         = $dbeQuotation->getValue(DBEQuotation::versionNo);
+                    $orderFile         = $ordHeadID . '_' . $versionNo . '.pdf';
+                    $envelopeDocument  = new DocumentWithoutTemplate(
                         'Customer Form', null, base64_encode($pdfData), $orderFile
                     );
-                    $envDocs[] = $envelopeDocument;
-                    $envelopeParties = [];
+                    $envDocs[]         = $envelopeDocument;
+                    $envelopeParties   = [];
                     $envelopeParty     = new Party(
                         $firstName . ' ' . $lastName, $email, 'signer1', 'Please sign here', 'no', false
                     );
                     $envelopeParties[] = $envelopeParty;
                     $expiration        = 7 * 24;
-                    $signableResponse = Envelopes::createNewWithoutTemplate(
+                    $signableResponse  = Envelopes::createNewWithoutTemplate(
                         "Document #" . $ordHeadID . "_" . $versionNo . "_" . uniqid(),
                         $envDocs,
                         $envelopeParties,
@@ -863,11 +952,11 @@ $app->group(
         );
         $group->group(
             '/signable-hooks',
-            function (\Slim\Routing\RouteCollectorProxy $signableHooksGroup) {
+            function (RouteCollectorProxy $signableHooksGroup) {
                 $signableHooksGroup->post(
                     '/',
-                    function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
-                        /** @var \Psr\Log\LoggerInterface $logger */
+                    function (Request $request, Response $response) {
+                        /** @var LoggerInterface $logger */
                         $logger      = $this->get('logger');
                         $requestType = [
                             "envelope_fingerprint" => "the envelope ID basically",
@@ -944,7 +1033,7 @@ $app->group(
                         if ($associativeArguments) {
                             $arguments = array_values($associativeArguments);
                         }
-                        /** @var \CNCLTD\SignableProcess $objectInstance */
+                        /** @var SignableProcess $objectInstance */
                         $objectInstance = $r->newInstanceArgs($arguments);
                         try {
                             $objectInstance->process($signableRequest, $logger);
@@ -958,7 +1047,7 @@ $app->group(
                 );
                 $signableHooksGroup->get(
                     '/',
-                    function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
+                    function (Request $request, Response $response) {
                         // we are receiving information about a signed document
                         $response->getBody()->write(json_encode(["message" => "this is the signed hook"]));
                         return $response->withHeader('Content-Type', 'application/json');
@@ -976,7 +1065,7 @@ $app->any(
 );
 try {
     $app->run();
-} catch (\Slim\Exception\HttpNotFoundException $exception) {
+} catch (HttpNotFoundException $exception) {
     http_response_code(404);
     echo json_encode(["Error" => "Resource not found"]);
 }

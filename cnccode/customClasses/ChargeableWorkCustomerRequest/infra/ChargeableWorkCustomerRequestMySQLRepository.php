@@ -29,10 +29,9 @@ class ChargeableWorkCustomerRequestMySQLRepository implements ChargeableWorkCust
 
     }
 
-
     public function getNextIdentity(): ChargeableWorkCustomerRequestTokenId
     {
-        return $this->dbInstance->nextid($this->tableName);
+        return new ChargeableWorkCustomerRequestTokenId(uniqid());
     }
 
     public function getById(ChargeableWorkCustomerRequestTokenId $id): ChargeableWorkCustomerRequest
@@ -42,7 +41,7 @@ class ChargeableWorkCustomerRequestMySQLRepository implements ChargeableWorkCust
             $query,
             [
                 [
-                    "type"  => "i",
+                    "type"  => "s",
                     "value" => $id->value()
                 ]
             ]
@@ -57,11 +56,72 @@ class ChargeableWorkCustomerRequestMySQLRepository implements ChargeableWorkCust
 
     public function save(ChargeableWorkCustomerRequest $chargeableWorkCustomerRequest)
     {
-        // TODO: Implement save() method.
+        $date          = null;
+        $dateTimeValue = $chargeableWorkCustomerRequest->getProcessedDateTime()->value();
+        if ($dateTimeValue) {
+            $date = $dateTimeValue->format(DATE_MYSQL_DATETIME);
+        }
+        if ($this->existsId($chargeableWorkCustomerRequest->getId())) {
+            $query = "update {$this->tableName} set processedDateTime = ? where id = ? ";
+            $this->dbInstance->preparedQuery(
+                $query,
+                [
+                    [
+                        "type"  => "s",
+                        "value" => $date
+                    ],
+                    [
+                        "type"  => "s",
+                        "value" => $chargeableWorkCustomerRequest->getId()->value()
+                    ],
+                ]
+            );
+        } else {
+            $query = "insert into {$this->tableName}(id,createdAt, serviceRequestId, requesteeId, additionalTimeRested,requesterId) values (?,?,?,?,?,?)";
+            $this->dbInstance->preparedQuery(
+                $query,
+                [
+                    [
+                        "type"  => "s",
+                        "value" => $chargeableWorkCustomerRequest->getId()->value()
+                    ],
+                    [
+                        "type"  => "s",
+                        "value" => $chargeableWorkCustomerRequest->getCreatedAt()->format(DATE_MYSQL_DATETIME)
+                    ],
+                    [
+                        "type"  => "i",
+                        "value" => $chargeableWorkCustomerRequest->getServiceRequestId()->value()
+                    ],
+                    [
+                        "type"  => "i",
+                        "value" => $chargeableWorkCustomerRequest->getRequesteeId()->value()
+                    ],
+                    [
+                        "type"  => "i",
+                        "value" => $chargeableWorkCustomerRequest->getAdditionalHoursRequested()->value()
+                    ],
+                    [
+                        "type"  => "i",
+                        "value" => $chargeableWorkCustomerRequest->getRequesterId()->value()
+                    ]
+                ]
+            );
+        }
     }
 
-    public function getByToken(ChargeableWorkCustomerRequestTokenId $token): ChargeableWorkCustomerRequest
+    private function existsId(ChargeableWorkCustomerRequestTokenId $id)
     {
-        // TODO: Implement getByToken() method.
+        $query     = "select count(*) > 0 as `exists` from {$this->tableName} where id = ?";
+        $statement = $this->dbInstance->preparedQuery(
+            $query,
+            [
+                [
+                    "type"  => "s",
+                    "value" => $id->value()
+                ]
+            ]
+        );
+        return $statement->fetch_row()[0];
     }
 }

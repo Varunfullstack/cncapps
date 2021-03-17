@@ -6,7 +6,7 @@ use CNCLTD\shared\core\ValueObject;
 use CNCLTD\shared\core\ValueObjectCompare;
 use CNCLTD\shared\core\ValueObjectIsNull;
 
-class ChargeableWorkCustomerRequestAdditionalTimeRequested implements ValueObject
+class ChargeableWorkCustomerRequestAdditionalHoursRequested implements ValueObject
 {
     use ValueObjectIsNull;
     use ValueObjectCompare;
@@ -18,7 +18,13 @@ class ChargeableWorkCustomerRequestAdditionalTimeRequested implements ValueObjec
      * ChargeableWorkCustomerRequestAdditionalTimeRequested constructor.
      * @param int $value
      */
-    public function __construct(int $value) { $this->value = $value; }
+    public function __construct(int $value)
+    {
+        if (!in_array($value, [1, 2, 3, 4], true)) {
+            throw new AdditionalHoursRequestedInvalidValueException($value);
+        }
+        $this->value = $value;
+    }
 
     public function value(): int
     {

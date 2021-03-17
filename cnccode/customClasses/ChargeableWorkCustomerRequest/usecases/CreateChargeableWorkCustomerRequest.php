@@ -3,7 +3,7 @@
 namespace CNCLTD\ChargeableWorkCustomerRequest\usecases;
 
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequest;
-use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestAdditionalTimeRequested;
+use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestAdditionalHoursRequested;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestProcessedDateTime;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestRepository;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestRequesteeId;
@@ -35,19 +35,20 @@ class CreateChargeableWorkCustomerRequest
 
     public function __invoke(\DBEProblem $serviceRequest,
                              \DBEUser $requester,
-                             int $additionalTimeRequested,
-                             \DBEContact $requestee
+                             int $additionalTimeRequested
     )
     {
 
-        $id = $this->repository->getNextIdentity();
+        $id               = $this->repository->getNextIdentity();
         $serviceRequestId = $serviceRequest->getValue(\DBEProblem::problemID);
+        $requestee        = new \DBEContact($this);
+        $requestee->getRow();
         $newRequest = ChargeableWorkCustomerRequest::create(
             $id,
             new \DateTimeImmutable(),
             new ChargeableWorkCustomerRequestServiceRequestId($serviceRequestId),
-            new ChargeableWorkCustomerRequestRequesteeId($requestee->getValue(\DBEContact::contactID)),
-            new ChargeableWorkCustomerRequestAdditionalTimeRequested($additionalTimeRequested),
+            new ChargeableWorkCustomerRequestRequesteeId($serviceRequest->getValue(\DBEProblem::contactID)),
+            new ChargeableWorkCustomerRequestAdditionalHoursRequested($additionalTimeRequested),
             new ChargeableWorkCustomerRequestProcessedDateTime(null),
             new ChargeableWorkCustomerRequestRequesterId($requester->getValue(\DBEUser::userID))
         );
@@ -55,10 +56,14 @@ class CreateChargeableWorkCustomerRequest
         CommunicationService::sendExtraChargeableWorkRequestToContact($newRequest);
         $requesterFullName = "{$requester->getValue(\DBEUser::firstName)} {$requester->getValue(\DBEUser::lastName)}";
         $requesteeFullName = "{$requestee->getValue(\DBEContact::firstName)} {$requestee->getValue(\DBEContact::lastName)}";
-        $this->BUActivity->logOperationalActivity(
-            $serviceRequestId,
-            "Person $requesterFullName sent a request for $additionalTimeRequested hours to $requesteeFullName"
+        $contactActivity   = $this->BUActivity->addCustomerContactActivityToServiceRequest(
+            $serviceRequest,
+            "Person $requesterFullName sent a request for $additionalTimeRequested hours to $requesteeFullName",
+            $requester
         );
-
+        $contactActivity->setValue(\DBECallActivity::awaitingCustomerResponseFlag, 'Y');
+        $contactActivity->updateRow();
+        $serviceRequest->setValue(\DBEProblem::awaitingCustomerResponseFlag, 'Y');
+        $serviceRequest->updateRow();
     }
 }

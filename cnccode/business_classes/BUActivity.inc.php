@@ -826,8 +826,7 @@ class BUActivity extends Business
             $dbeProblem->updateRow();
             $message = "{$this->dbeUser->getValue(DBEUser::name)} Escalated from {$this->workQueueDescriptionArray[$oldQueueNo]} to {$this->workQueueDescriptionArray[$newQueueNo]}";
             //if ($dbeProblem->getValue(DBEProblem::status) == 'P') 
-            if($reason!='')
-            {
+            if ($reason != '') {
                 $message .= " because of {$reason}";
             }
             $message .= ".";
@@ -7149,7 +7148,7 @@ FROM
             // try to find the computer name from Labtech
             $labtechRepo  = new CNCLTD\LabtechRepo\LabtechPDORepo();
             $computerName = $labtechRepo->getComputerNameForComputerId($record->getMonitorAgentName());
-            if(!$computerName){
+            if (!$computerName) {
                 echo "Couldn't match Monitor Agent Name value : {$record->getMonitorAgentName()} to a computer name.";
             }
             $dbeProblem->setValue(DBEProblem::assetName, $computerName);
@@ -10821,10 +10820,10 @@ FROM
      * @param $customerID
      * @return DBEJProblem
      */
-    function getCustomerOpenSR($customerID,$srNumber=null)
+    function getCustomerOpenSR($customerID, $srNumber = null)
     {
         $dbeJProblem = new DBEJProblem($this);
-        $dbeJProblem->getCustomerOpenRows($customerID,$srNumber);
+        $dbeJProblem->getCustomerOpenRows($customerID, $srNumber);
         return $dbeJProblem;
 
     }
@@ -10837,7 +10836,7 @@ FROM
     public function addCustomerContactActivityToServiceRequest(DBEProblem $DBEProblem,
                                                                $cpr_reason,
                                                                DBEUser $currentUser
-    )
+    ): DBECallActivity
     {
         $initialActivity = $this->getFirstActivityInServiceRequest(
             $DBEProblem->getValue(DBEProblem::problemID),
@@ -10889,6 +10888,7 @@ FROM
             $currentUser->getValue(DBEUser::userID)
         );
         $dbeCallActivity->insertRow();
+        return $dbeCallActivity;
     }
 
     private function getSuitableEmailSubjectSummary($ordheadID, $selectedOrderLine)

@@ -14,8 +14,8 @@ class ChargeableWorkCustomerRequest
     private $serviceRequestId;
     /** @var ChargeableWorkCustomerRequestRequesteeId */
     private $requesteeId;
-    /** @var ChargeableWorkCustomerRequestAdditionalTimeRequested */
-    private $additionalTimeRequested;
+    /** @var ChargeableWorkCustomerRequestAdditionalHoursRequested */
+    private $additionalHoursRequested;
     /** @var ChargeableWorkCustomerRequestProcessedDateTime */
     private $processedDateTime;
     /** @var ChargeableWorkCustomerRequestRequesterId */
@@ -27,7 +27,7 @@ class ChargeableWorkCustomerRequest
      * @param \DateTimeImmutable $createdAt
      * @param ChargeableWorkCustomerRequestServiceRequestId $serviceRequestId
      * @param ChargeableWorkCustomerRequestRequesteeId $requestee
-     * @param ChargeableWorkCustomerRequestAdditionalTimeRequested $additionalTimeRequested
+     * @param ChargeableWorkCustomerRequestAdditionalHoursRequested $additionalTimeRequested
      * @param ChargeableWorkCustomerRequestProcessedDateTime $processedDateTime
      * @param ChargeableWorkCustomerRequestRequesterId $requesterId
      */
@@ -35,7 +35,7 @@ class ChargeableWorkCustomerRequest
                                  \DateTimeImmutable $createdAt,
                                  ChargeableWorkCustomerRequestServiceRequestId $serviceRequestId,
                                  ChargeableWorkCustomerRequestRequesteeId $requestee,
-                                 ChargeableWorkCustomerRequestAdditionalTimeRequested $additionalTimeRequested,
+                                 ChargeableWorkCustomerRequestAdditionalHoursRequested $additionalTimeRequested,
                                  ChargeableWorkCustomerRequestProcessedDateTime $processedDateTime,
                                  ChargeableWorkCustomerRequestRequesterId $requesterId
     )
@@ -44,7 +44,7 @@ class ChargeableWorkCustomerRequest
         $this->createdAt               = $createdAt;
         $this->serviceRequestId        = $serviceRequestId;
         $this->requesteeId             = $requestee;
-        $this->additionalTimeRequested = $additionalTimeRequested;
+        $this->additionalHoursRequested = $additionalTimeRequested;
         $this->processedDateTime       = $processedDateTime;
         $this->requesterId             = $requesterId;
     }
@@ -54,7 +54,7 @@ class ChargeableWorkCustomerRequest
                                   \DateTimeImmutable $createdAt,
                                   ChargeableWorkCustomerRequestServiceRequestId $serviceRequestId,
                                   ChargeableWorkCustomerRequestRequesteeId $requesteeId,
-                                  ChargeableWorkCustomerRequestAdditionalTimeRequested $additionalTimeRequested,
+                                  ChargeableWorkCustomerRequestAdditionalHoursRequested $additionalTimeRequested,
                                   ChargeableWorkCustomerRequestProcessedDateTime $processedDateTime,
                                   ChargeableWorkCustomerRequestRequesterId $requesterId
     ): ChargeableWorkCustomerRequest
@@ -70,7 +70,7 @@ class ChargeableWorkCustomerRequest
         $createdAt               = \DateTimeImmutable::createFromFormat(DATE_MYSQL_DATETIME, $dto->getCreatedAt());
         $serviceRequestId        = new ChargeableWorkCustomerRequestServiceRequestId($dto->getServiceRequestId());
         $requesteeId             = new ChargeableWorkCustomerRequestRequesteeId($dto->getRequesteeId());
-        $additionalTimeRequested = new ChargeableWorkCustomerRequestAdditionalTimeRequested(
+        $additionalTimeRequested = new ChargeableWorkCustomerRequestAdditionalHoursRequested(
             $dto->getAdditionalTimeRequested()
         );
         $processedDateTime       = new ChargeableWorkCustomerRequestProcessedDateTime($dto->getProcessedDateTime());
@@ -119,11 +119,11 @@ class ChargeableWorkCustomerRequest
     }
 
     /**
-     * @return ChargeableWorkCustomerRequestAdditionalTimeRequested
+     * @return ChargeableWorkCustomerRequestAdditionalHoursRequested
      */
-    public function getAdditionalTimeRequested(): ChargeableWorkCustomerRequestAdditionalTimeRequested
+    public function getAdditionalHoursRequested(): ChargeableWorkCustomerRequestAdditionalHoursRequested
     {
-        return $this->additionalTimeRequested;
+        return $this->additionalHoursRequested;
     }
 
     /**
@@ -140,5 +140,10 @@ class ChargeableWorkCustomerRequest
     public function getRequesterId(): ChargeableWorkCustomerRequestRequesterId
     {
         return $this->requesterId;
+    }
+
+    public function approve()
+    {
+        $this->processedDateTime = new ChargeableWorkCustomerRequestProcessedDateTime(new \DateTimeImmutable());
     }
 }
