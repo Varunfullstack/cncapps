@@ -157,7 +157,10 @@
 
         function clearInputs() {
             itemDescriptionInput.value = "";
-            document.renderSupplierSearchComponent(reactSupplierSearchContainer, {inputId: 'supplierID', defaultText: ''});
+            document.renderSupplierSearchComponent(reactSupplierSearchContainer, {
+                inputId: 'supplierID',
+                defaultText: ''
+            });
             qtyOrderedInput.value = "";
             curUnitCostInput.value = "";
             curUnitSaleInput.value = "";
@@ -287,8 +290,11 @@
                 >
                 <font class="formErrorMessage">{descriptionMessage}</font>
             </td>
-            <td class="field">
+            <td class="field"
+                style="padding-right: 20px"
+            >
                 <div id="reactSupplierSearchContainer"
+                     style="width: 150px;"
                      data-input-id="supplierID"
                 ></div>
             </td>

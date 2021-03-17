@@ -2536,6 +2536,8 @@ class CTSalesOrder extends CTCNC
                            $parentPage = 'SalesOrderLineEdit'
     )
     {
+        $this->loadReactCSS('SupplierSearchComponent.css');
+        $this->loadReactScript('SupplierSearchComponent.js');
         // Lines
         if ($this->dsOrdline->getValue(DBEJOrdline::lineType) != "I") {                    // Comment line
             $this->template->set_var(
@@ -3906,6 +3908,7 @@ class CTSalesOrder extends CTCNC
             )
         );
         $this->displaySalesOrderHeader($dsOrdhead);
+
         $this->orderLineForm($dsOrdhead);
         $this->template->parse(
             'salesOrderLineEditJS',

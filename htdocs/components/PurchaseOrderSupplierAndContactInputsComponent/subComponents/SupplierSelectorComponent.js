@@ -116,8 +116,9 @@ export default class SupplierSelectorComponent extends React.PureComponent {
             />
         );
     }
-
 }
+
+
 
 SupplierSelectorComponent.propTypes = {
     supplierId: PropTypes.number,

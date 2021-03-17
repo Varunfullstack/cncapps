@@ -1,7 +1,9 @@
-import SupplierSearch from "../shared/SupplierSearch";
 import ReactDOM from "react-dom";
 import React from "react";
 import '../style.css';
+import SupplierSelectorComponent
+    from "../PurchaseOrderSupplierAndContactInputsComponent/subComponents/SupplierSelectorComponent";
+import PropTypes from "prop-types";
 
 export class SupplierSearchComponent extends React.PureComponent {
 
@@ -11,24 +13,33 @@ export class SupplierSearchComponent extends React.PureComponent {
 
     handleChange = (value) => {
         const input = document.getElementById(this.props.inputId);
-        input.value = value.id;
+        let id = null;
+        if (value) {
+            id = value.id;
+        }
+        input.value = id;
     }
 
     render() {
         return (
-            <SupplierSearch onChange={this.handleChange}
-                            disabled={this.props.disabled}
-                            defaultText={this.props.defaultText}
+            <SupplierSelectorComponent onChange={this.handleChange}
+                                       supplierId={this.props.supplierId}
             />
         )
     }
 }
 
-document.renderSupplierSearchComponent = (domContainer, {inputId, defaultText}) => {
+
+SupplierSearchComponent.propTypes = {
+    supplierId: PropTypes.number,
+    inputId: PropTypes.string.isRequired
+}
+
+document.renderSupplierSearchComponent = (domContainer, {inputId, supplierId}) => {
     const element = document.getElementById(inputId)
     element.reactInstance = ReactDOM.render(React.createElement(SupplierSearchComponent, {
         inputId,
-        defaultText
+        supplierId
     }), domContainer);
 }
 
