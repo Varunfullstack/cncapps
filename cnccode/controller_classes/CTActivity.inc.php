@@ -2108,6 +2108,7 @@ class CTActivity extends CTCNC
             $this->updateSession('callActTypeID', CONFIG_INITIAL_ACTIVITY_TYPE_ID);
             $this->updateSession('customerID', $this->getParam('customerID'));
             $this->updateSession('raiseTypeId', $this->getParam('raiseTypeId'));
+            $this->updateSession('emailSubjectSummary', $this->getParam('emailSubjectSummary'));
             if ($this->getParam('pendingReopenedID')) $this->updateSession(
                 'pendingReopenedID',
                 $this->getParam('pendingReopenedID')
@@ -2292,6 +2293,7 @@ class CTActivity extends CTCNC
                 'thirdPartyContactLink'       => $this->getThirdPartyContactLink(
                     @ $_SESSION[$this->sessionKey]['customerID']
                 ),
+                'emailSubjectSummary'          => @$_SESSION[$this->sessionKey]['emailSubjectSummary'],
                 'generatePasswordLink'        => $this->getGeneratePasswordLink(),
                 'DISABLED'                    => $disabled,
                 'submitURL'                   => $submitURL,
@@ -2609,15 +2611,15 @@ class CTActivity extends CTCNC
             'ActivityReasonPopup',
             'ActivityReasonPopup.inc'
         );
-        $this->template->setVar('javaScript', "<link rel='stylesheet' href='components/shared/ToolTip.css'>");        
-
+        $this->template->setVar('javaScript', "<link rel='stylesheet' href='components/shared/ToolTip.css'>");
         $problemId             = $this->getParam('problemID');
         $activitiesByProblemID = $this->buActivity->getActivitiesByProblemID($problemId);
         $dbeProblem            = new DBEJProblem($this);
         $dbeProblem->getRow($problemId);
         $dbeJContract = new DBEJContract($this);
-        $title        = $problemId . ' - ' . $dbeProblem->getValue(DBEJProblem::customerName)
-                        .$this->getProblemRaiseIcon($dbeProblem);
+        $title        = $problemId . ' - ' . $dbeProblem->getValue(
+                DBEJProblem::customerName
+            ) . $this->getProblemRaiseIcon($dbeProblem);
         $this->template->set_block(
             'ActivityReasonPopup',
             'activityBlock',
@@ -2681,11 +2683,11 @@ class CTActivity extends CTCNC
                 )
             );
             if (!in_array($activitiesByProblemID->getValue(DBECallActivity::callActTypeID), [60, 61])) {
-                $lastActivityID     = $activitiesByProblemID->getValue(DBECallActivity::callActivityID);
-                $lastActivityText   = "$date $startTime - $endTime ($duration) $activityType - $contactName - $siteAddress - $userName";
-                $lastActivityReason = $reason;
-                $lastCncNextAction  = $activitiesByProblemID->getValue(DBEJCallActivity::cncNextAction);
-                $lastCustomerSummary  = $activitiesByProblemID->getValue(DBEJCallActivity::customerSummary);
+                $lastActivityID      = $activitiesByProblemID->getValue(DBECallActivity::callActivityID);
+                $lastActivityText    = "$date $startTime - $endTime ($duration) $activityType - $contactName - $siteAddress - $userName";
+                $lastActivityReason  = $reason;
+                $lastCncNextAction   = $activitiesByProblemID->getValue(DBEJCallActivity::cncNextAction);
+                $lastCustomerSummary = $activitiesByProblemID->getValue(DBEJCallActivity::customerSummary);
 
             }
             $this->template->parse(

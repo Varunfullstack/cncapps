@@ -4799,6 +4799,10 @@ class BUActivity extends Business
             @$_SESSION [$sessionKey] ['customerID']
         );
         $dbeProblem->setValue(
+            DBEProblem::emailSubjectSummary,
+            @$_SESSION[$sessionKey]['emailSubjectSummary']
+        );
+        $dbeProblem->setValue(
             DBEProblem::raiseTypeId,
             @$_SESSION[$sessionKey]["raiseTypeId"]
         );

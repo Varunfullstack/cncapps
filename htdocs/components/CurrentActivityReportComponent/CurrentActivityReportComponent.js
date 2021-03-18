@@ -322,7 +322,6 @@ class CurrentActivityReportComponent extends MainComponent {
     getCustomerOpenSR = (customerID, srNumber) => {
         const {filter} = this.state;
         if (customerID != '' || srNumber != '') {
-            console.log('get sr');
             this.showSpinner();
             this.setState({openSrCustomerID: customerID, srNumber})
             this.apiCurrentActivityService
@@ -607,7 +606,6 @@ class CurrentActivityReportComponent extends MainComponent {
     }
 
     onCallBack = (problem) => {
-        console.log(problem);
         this.setState({showCallBackModal: true, currentProblem: problem});
     }
     getCallBackModal = () => {

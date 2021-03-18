@@ -12,6 +12,10 @@ class InboxPendingReopenedComponent extends MainComponent {
     constructor(props) {
         super(props);
         this.apiCurrentActivityService = new CurrentActivityService();
+        this.state = {
+            ...this.state,
+            showEmailSubjectSummaryModal: false,
+        }
     }
 
     addToolTip = (element, title) => {
@@ -31,17 +35,24 @@ class InboxPendingReopenedComponent extends MainComponent {
                 this.props.loadQueue(this.code);
             })
         else if (code == 'N') {
-            const data = {
-                action: 'editServiceRequestHeader',
-                contactID: problem.pendingReopenedContactID,
-                customerID: problem.pendingReopenedCustomerID,
-                reason: atob(problem.base64Reason),
-                pendingReopenedID: problem.pendingReopenedID,
-                deletePending: true,
-                raiseTypeId: 1
-            };
 
-            this.redirectPost("Activity.php", data);
+            this.prompt('Please provide an email subject summary for this request', 500, null, false).then(value => {
+                if (!value) {
+                    return;
+                }
+                const data = {
+                    action: 'editServiceRequestHeader',
+                    contactID: problem.pendingReopenedContactID,
+                    customerID: problem.pendingReopenedCustomerID,
+                    reason: atob(problem.base64Reason),
+                    pendingReopenedID: problem.pendingReopenedID,
+                    deletePending: true,
+                    raiseTypeId: 1,
+                    emailSubjectSummary: value
+                };
+
+                this.redirectPost("Activity.php", data);
+            })
         }
     }
 
@@ -307,12 +318,13 @@ class InboxPendingReopenedComponent extends MainComponent {
     };
 
     render() {
-        const {el, getTableElement} = this;
-        const {data} = this.props;
-
-        return el('div', null,
-            this.getConfirm(),
-            getTableElement(),
+        const {getTableElement} = this;
+        return (
+            <div>
+                {this.getConfirm()}
+                {this.getPrompt()}
+                {getTableElement()}
+            </div>
         );
 
     }

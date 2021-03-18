@@ -12,16 +12,17 @@ class InboxOpenSRComponent extends React.Component {
     apiCurrentActivityService;
     apiCustomer = new APICustomers();
     timeOut;
+
     constructor(props) {
         super(props);
         this.apiCurrentActivityService = new CurrentActivityService();
         this.state = {
-            customers: [], 
-            data: this.props.data, 
+            customers: [],
+            data: this.props.data,
             customer: null,
-            filter:{
-                srNumber:'',
-                customer:null
+            filter: {
+                srNumber: '',
+                customer: null
             }
         }
     }
@@ -62,10 +63,12 @@ class InboxOpenSRComponent extends React.Component {
                 hdClassName: "text-center",
                 className: "text-center",
                 content: (problem) =>
-                <ToolTip title="Call back">
-                    <i className="fal fa-2x fa-phone icon pointer color-gray" onClick={()=>this.props.onCallBack(problem)}></i>
-                </ToolTip>
-                   
+                    <ToolTip title="Call back">
+                        <i className="fal fa-2x fa-phone icon pointer color-gray"
+                           onClick={() => this.props.onCallBack(problem)}
+                        ></i>
+                    </ToolTip>
+
             },
             ColumnRenderer.getWorkIconColumn(startWork, this.code),
             ColumnRenderer.getSpecialAttentionColumn(),
@@ -241,31 +244,32 @@ class InboxOpenSRComponent extends React.Component {
                 displayColumn: "name",
                 pk: "id",
                 width: 300,
-                onSelect:(customer)=>this.setFilter('customer',customer),
+                onSelect: (customer) => this.setFilter('customer', customer),
             }),
-            <label style={{marginLeft:30,whiteSpace:"nowrap"}}>SR Number</label>
+            <label style={{marginLeft: 30, whiteSpace: "nowrap"}}>SR Number</label>
             ,
-            el('input',{style:{height:14},className:"form-control", onChange:(event)=>this.setFilter('srNumber',event.target.value)})
+            el('input', {
+                style: {height: 14},
+                className: "form-control",
+                onChange: (event) => this.setFilter('srNumber', event.target.value)
+            })
         )
     }
-    setFilter=(field,value)=>{
-        const {filter}=this.state;
-        filter[field]=value;
-        this.setState({filter},()=>{
-            if(field=='srNumber'&&value.length>=4)
-            {
-                //console.log('srNumber');
+    setFilter = (field, value) => {
+        const {filter} = this.state;
+        filter[field] = value;
+        this.setState({filter}, () => {
+            if (field == 'srNumber' && value.length >= 4) {
                 clearTimeout(this.timeOut);
-                this.timeOut=setTimeout(()=>this.handleOnCustomerSelect(),1000);
-            }
-            else if(field=='customer')
+                this.timeOut = setTimeout(() => this.handleOnCustomerSelect(), 1000);
+            } else if (field == 'customer')
                 this.handleOnCustomerSelect()
         });
     }
     handleOnCustomerSelect = () => {
-        const {filter}=this.state;        
-        this.props.getCustomerOpenSR((filter.customer?.id||''),filter.srNumber);
-        
+        const {filter} = this.state;
+        this.props.getCustomerOpenSR((filter.customer?.id || ''), filter.srNumber);
+
     }
 
     static getDerivedStateFromProps(props, current_state) {

@@ -32,7 +32,6 @@ class CallBackModal extends MainComponent {
 
     componentDidMount() {
         this.apiCustomer.getCustomerContacts(this.props.problem.customerID).then(contcts => {
-            console.log(contcts);
             this.setState({contcts});
         })
     }
@@ -43,7 +42,6 @@ class CallBackModal extends MainComponent {
     };
     getContent = () => {
         const {data, contcts} = this.state;
-        console.log('contact', data.contactID);
         return (
             <div>
 
@@ -111,7 +109,6 @@ class CallBackModal extends MainComponent {
     }
     handleSave = () => {
         const {data} = this.state;
-        console.log(data);
         if (moment(data.date + " " + data.time) < moment()) {
             this.alert("Data and time must be in future.");
             return;
@@ -121,7 +118,6 @@ class CallBackModal extends MainComponent {
             return;
         }
         this.apiCurrentActivityService.addCallback(data).then(result => {
-            console.log(result);
             if (result.status)
                 this.handleClose(result.callActivityID);
         });
