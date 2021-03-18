@@ -1344,14 +1344,6 @@ class CTActivity extends CTCNC
                     addslashes(
                         Utils::stripEverything($this->dsSearchResults->getValue(DBECallActivitySearch::reason))
                     )
-                ) . "," . str_replace(
-                    ',',
-                    '\'',
-                    addslashes(
-                        Utils::stripEverything(
-                            $this->dsSearchResults->getValue(DBECallActivitySearch::internalNotes)
-                        )
-                    )
                 ) . "," . $this->dsSearchResults->getExcelValue(
                     DBECallActivitySearch::managementReviewReason
                 ) . "," . $this->dsSearchResults->getExcelValue(DBECallActivitySearch::rootCause) . "\n";
