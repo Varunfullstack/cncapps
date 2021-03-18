@@ -1184,8 +1184,7 @@ WHERE
             );
             $overtimeApprovedValue = $overtimeDurationApproved;
             if (!$overtimeApprovedValue) {
-                $buExpense             = new BUExpense($this);
-
+                $buExpense = new BUExpense($this);
                 $overtimeApprovedValue = number_format($buExpense->calculateOvertime($activityId), 2, '.', '');
             }
             $dbeCallActivity->setValue(
@@ -1288,14 +1287,13 @@ WHERE
         $buHeader  = new BUHeader($this);
         $dbeHeader = new DataSet($this);
         $buHeader->getHeader($dbeHeader);
-        
-        $expensesNextProcessingDate=$dbeHeader->getValue(DBEHeader::expensesNextProcessingDate);
-        if(!empty($expensesNextProcessingDate))
-        {
+        $expensesNextProcessingDate = $dbeHeader->getValue(DBEHeader::expensesNextProcessingDate);
+        if (!empty($expensesNextProcessingDate)) {
             $expensesNextProcessingDate = new DateTime($expensesNextProcessingDate);
-            $expensesNextProcessingDate ='Next payroll processing date is '.$expensesNextProcessingDate->format('d-m-Y');
+            $expensesNextProcessingDate = 'Next payroll processing date is ' . $expensesNextProcessingDate->format(
+                    'd/m/Y'
+                );
         }
-     
         $this->setMethodName('displayReport');
         $this->setTemplateFiles(
             'ExpenseDashboard',
@@ -1356,11 +1354,11 @@ WHERE caa_endtime
             );
         $this->template->setVar(
             [
-                'approvedExpenseValue'  => $expenseSummary['approved'],
-                'pendingExpenseValue'   => $expenseSummary['pending'],
-                'approvedOvertimeValue' => $overtimeSummary['approved'],
-                'pendingOvertimeValue'  => $overtimeSummary['pending'],
-                'runningTotalsLink'     => $isApprover ? '<a href="?action=runningTotals" target="_blank">Running Totals</a>' : null,
+                'approvedExpenseValue'       => $expenseSummary['approved'],
+                'pendingExpenseValue'        => $expenseSummary['pending'],
+                'approvedOvertimeValue'      => $overtimeSummary['approved'],
+                'pendingOvertimeValue'       => $overtimeSummary['pending'],
+                'runningTotalsLink'          => $isApprover ? '<a href="?action=runningTotals" target="_blank">Running Totals</a>' : null,
                 'expensesNextProcessingDate' => $expensesNextProcessingDate
             ]
         );
