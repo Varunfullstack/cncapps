@@ -1,6 +1,16 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.6.4]
+### Changed
+- Changed the list of Checklists when logging a new request to show only relevant StandardTexts.
+- Show the dates for the financial year in expenses breakdown year to date
+### Fixed
+- Fixed the issue when trying to create a new SR from a pending reopened, not being able to assing a email subjet 
+  summary.
+- Fixed issue with Activity search showing more than one SR where it wasn't supposed to.
+- Fixed formatting issue with date in Expense Dashboard
+
 ## [v5.6.3] - 2021-03-15
 ### Changed
 - Changed the concept "open" to "active" where required, meaning Service Requests where there's at least one activity
