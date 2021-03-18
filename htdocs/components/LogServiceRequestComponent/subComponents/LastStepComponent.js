@@ -95,7 +95,7 @@ class LastStepComponent extends MainComponent {
         );
         this.setState({
             requireAuthorize,
-            checkList: standardTextTypes,
+            checkList: standardTextTypes.filter(x => [1, 3].indexOf(x.typeId) > -1),
             contacts: customerContacts,
             standardTextList: standardTextTypes,
             noWorkOptions: noWorkOptions,
