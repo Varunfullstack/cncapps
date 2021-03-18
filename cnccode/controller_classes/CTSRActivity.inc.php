@@ -1217,8 +1217,8 @@ class CTSRActivity extends CTCNC
     {
         $this->setMethodName('setTemplate');
         $this->setMenuId(102);
-        $title = $this->getTitle();
-        $this->setPageTitle($title);
+        list($title, $header) = $this->getTitle();
+        $this->setPageTitle($title, $header);
         $this->setTemplateFiles(
             'Activity',
             'Activity.inc'
@@ -1254,15 +1254,24 @@ class CTSRActivity extends CTCNC
         }
         switch ($action) {
             case "displayActivity":
-                return "Service Request " . $problemID . $this->getProblemRaiseIcon($dbeProblem);
+                return [
+                    "Service Request $problemID",
+                    "Service Request $problemID {$this->getProblemRaiseIcon($dbeProblem)}"
+                ];
             case "editActivity":
-                return "Edit Service Request " . $problemID . $this->getProblemRaiseIcon($dbeProblem);
+                return [
+                    "Edit Service Request $problemID",
+                    "Edit Service Request $problemID {$this->getProblemRaiseIcon($dbeProblem)}"
+                ];
             case "gatherFixedInformation":
-                return "Service Request Fix Summary " . $problemID . $this->getProblemRaiseIcon($dbeProblem);
+                return [
+                    "Service Request Fix Summary {$problemID}",
+                    "Service Request Fix Summary {$problemID} {$this->getProblemRaiseIcon($dbeProblem)}"
+                ];
             case "gatherManagementReviewDetails":
-                return "Management Review Reason";
+                return ["Management Review Reason"];
             default:
-                return 'Activity';
+                return ["Activity"];
         }
     }
 
