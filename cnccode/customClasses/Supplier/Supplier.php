@@ -405,7 +405,7 @@ class Supplier
         if (!$contact->getActive()->value()) {
             throw new SupplierContactAlreadyArchivedException();
         }
-        $newContact = SupplierContact::create(
+        $newContact                                      = SupplierContact::create(
             $supplierContactId,
             $contact->getTitle(),
             $contact->getPosition(),
@@ -437,6 +437,14 @@ class Supplier
         $hasChangeEmail     = !$supplierContact->getEmail()->isSame($newContact->getEmail());
         $hasChangeActive    = !$supplierContact->getActive()->isSame($newContact->getActive());
         return $hasChangeTitle || $hasChangePosition || $hasChangeFirstName || $hasChangeLastName || $hasChangePhone || $hasChangeEmail || $hasChangeActive;
+    }
+
+    public function getContactById(SupplierContactId $param): ?SupplierContact
+    {
+        if (!isset($this->contacts[$param->value()])) {
+            return null;
+        }
+        return $this->contacts[$param->value()];
     }
 
 }

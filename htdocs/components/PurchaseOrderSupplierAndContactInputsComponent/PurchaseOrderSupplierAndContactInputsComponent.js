@@ -76,7 +76,7 @@ export class PurchaseOrderSupplierAndContactInputsComponent extends React.PureCo
                 >
                     <i className="fal fa-phone"/>
                 </a>
-                <a href={`emailto:${selectedSupplierContact.email}`}
+                <a href={`mailto:${selectedSupplierContact.email}`}
                    target="_blank"
                 >
                     <i className="fal fa-envelope"/>
