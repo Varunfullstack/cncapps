@@ -3,10 +3,12 @@
 namespace CNCLTD\ChargeableWorkCustomerRequest\usecases;
 
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestTokenId;
+use CNCLTD\ChargeableWorkCustomerRequest\DTO\PendingToProcessChargeableRequestInfoDTO;
 use CNCLTD\ChargeableWorkCustomerRequest\infra\ChargeableWorkCustomerRequestMySQLRepository;
-use CNCLTD\Exceptions\ChargeableWorkCustomerRequestAlreadyProcessedException;
 use CNCLTD\Exceptions\ChargeableWorkCustomerRequestNotFoundException;
 use CNCLTD\Exceptions\ServiceRequestNotFoundException;
+use DBEJProblem;
+use DBEProblem;
 
 class GetPendingToProcessChargeableRequestInfo
 {
@@ -27,7 +29,6 @@ class GetPendingToProcessChargeableRequestInfo
     /**
      * @param ChargeableWorkCustomerRequestTokenId $id
      * @return PendingToProcessChargeableRequestInfoDTO
-     * @throws ChargeableWorkCustomerRequestAlreadyProcessedException
      * @throws ChargeableWorkCustomerRequestNotFoundException
      * @throws ServiceRequestNotFoundException
      */
@@ -37,10 +38,7 @@ class GetPendingToProcessChargeableRequestInfo
         if (!$request) {
             throw new ChargeableWorkCustomerRequestNotFoundException();
         }
-        if ($request->getProcessedDateTime()->value()) {
-            throw new ChargeableWorkCustomerRequestAlreadyProcessedException();
-        }
-        $dbeProblem       = new \DBEJProblem($this);
+        $dbeProblem       = new DBEJProblem($this);
         $serviceRequestId = $request->getServiceRequestId()->value();
         if (!$dbeProblem->getRow($serviceRequestId)) {
             throw new ServiceRequestNotFoundException();
@@ -48,9 +46,10 @@ class GetPendingToProcessChargeableRequestInfo
         return new PendingToProcessChargeableRequestInfoDTO(
             $id->value(),
             $serviceRequestId,
-            $dbeProblem->getValue(\DBEProblem::emailSubjectSummary),
-            $dbeProblem->getValue(\DBEJProblem::contactName),
-            $request->getAdditionalHoursRequested()->value()
+            $dbeProblem->getValue(DBEProblem::emailSubjectSummary),
+            $dbeProblem->getValue(DBEJProblem::contactName),
+            $request->getAdditionalHoursRequested()->value(),
+            $request->getReason()->value()
         );
     }
 }

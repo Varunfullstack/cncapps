@@ -1,6 +1,7 @@
 <?php
 global $cfg;
 
+use CNCLTD\ChargeableWorkCustomerRequest\infra\ChargeableWorkCustomerRequestMySQLRepository;
 use CNCLTD\Exceptions\JsonHttpException;
 use CNCLTD\InternalDocuments\Base64FileDTO;
 use CNCLTD\InternalDocuments\Entity\InternalDocumentMapper;
@@ -297,21 +298,22 @@ class CTSRActivity extends CTCNC
         $isNotUserManagerAndActivityHasEndTime = !$isManagerUser && !$dbejCallActivity->getValue(
                 DBEJCallActivity::endTime
             );
-        $requestName ='';
-        $status=$dbeProblem->getValue(DBEProblem::status);
-        if($status=='I' ||$status=='P')
-            {
-                $requestUserID=$dbeProblem->getValue(DBEProblem::userID);
-                if(!empty($requestUserID))
-                {
-                    $requestUser=new DBEUser($this);
-                    $requestUser->getRow($requestUserID);
-                    $requestName =$requestUser->getValue(DBEUser::firstName).' '.substr($requestUser->getValue(DBEUser::lastName),0,1);
-                }
-                else  $requestName ='Unassigned';
+        $requestName                           = '';
+        $status                                = $dbeProblem->getValue(DBEProblem::status);
+        if ($status == 'I' || $status == 'P') {
+            $requestUserID = $dbeProblem->getValue(DBEProblem::userID);
+            if (!empty($requestUserID)) {
+                $requestUser = new DBEUser($this);
+                $requestUser->getRow($requestUserID);
+                $requestName = $requestUser->getValue(DBEUser::firstName) . ' ' . substr(
+                        $requestUser->getValue(DBEUser::lastName),
+                        0,
+                        1
+                    );
+            } else  $requestName = 'Unassigned';
 
-            }
-       // $requestName =$dbeProblem->getValue(DBEProblem::userID);
+        }
+        // $requestName =$dbeProblem->getValue(DBEProblem::userID);
         $serviceRequestInternalNotesRepo = new CNCLTD\ServiceRequestInternalNote\infra\ServiceRequestInternalNotePDORepository(
         );
         $notes                           = $serviceRequestInternalNotesRepo->getServiceRequestInternalNotesForSR(
@@ -348,6 +350,11 @@ class CTSRActivity extends CTCNC
                 return -1;
             }
         );
+
+        $chargeableWorkRequestRepo       = new ChargeableWorkCustomerRequestMySQLRepository();
+        $hasPendingChargeableWorkRequest = $chargeableWorkRequestRepo->getCountRequestsForServiceRequestId(
+            new \CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestServiceRequestId($problemID)
+        ) > 0;
         $taskListUpdatedByUserId = $dbeProblem->getValue(DBEProblem::taskListUpdatedBy);
         $taskListUpdatedBy       = null;
         if ($taskListUpdatedByUserId) {
@@ -466,6 +473,7 @@ class CTSRActivity extends CTCNC
             "emptyAssetReason"                => $dbeProblem->getValue(DBEProblem::emptyAssetReason),
             "holdForQA"                       => $dbeProblem->getValue(DBEProblem::holdForQA),
             "isOnSiteActivity"                => $dbeActivityType->getValue(DBECallActType::onSiteFlag) == 'Y',
+            "hasPendingChargeableWorkRequest" => $hasPendingChargeableWorkRequest,
             "openHours"                       => $dbeProblem->getValue(DBEProblem::openHours),
             "workingHours"                    => $dbeProblem->getValue(DBEProblem::workingHours),
             "requestEngineerName"             => $requestName,

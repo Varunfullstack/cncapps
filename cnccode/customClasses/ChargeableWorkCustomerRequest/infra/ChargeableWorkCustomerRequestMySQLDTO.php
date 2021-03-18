@@ -8,8 +8,8 @@ class ChargeableWorkCustomerRequestMySQLDTO
     private $serviceRequestId;
     private $requesteeId;
     private $additionalTimeRequested;
-    private $processedDateTime;
     private $requesterId;
+    private $reason;
 
     /**
      * @return mixed
@@ -54,17 +54,16 @@ class ChargeableWorkCustomerRequestMySQLDTO
     /**
      * @return mixed
      */
-    public function getProcessedDateTime()
-    {
-        return $this->processedDateTime;
-    }
-
-    /**
-     * @return mixed
-     */
     public function getRequesterId()
     {
         return $this->requesterId;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getReason()
+    {
+        return $this->reason;
+    }
 }

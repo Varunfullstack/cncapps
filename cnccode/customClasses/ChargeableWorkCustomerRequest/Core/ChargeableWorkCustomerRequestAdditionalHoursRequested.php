@@ -2,6 +2,7 @@
 
 namespace CNCLTD\ChargeableWorkCustomerRequest\Core;
 
+use CNCLTD\Exceptions\AdditionalHoursRequestedInvalidValueException;
 use CNCLTD\shared\core\ValueObject;
 use CNCLTD\shared\core\ValueObjectCompare;
 use CNCLTD\shared\core\ValueObjectIsNull;
@@ -17,6 +18,7 @@ class ChargeableWorkCustomerRequestAdditionalHoursRequested implements ValueObje
     /**
      * ChargeableWorkCustomerRequestAdditionalTimeRequested constructor.
      * @param int $value
+     * @throws AdditionalHoursRequestedInvalidValueException
      */
     public function __construct(int $value)
     {

@@ -3,6 +3,7 @@
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestTokenId;
 use CNCLTD\ChargeableWorkCustomerRequest\infra\ChargeableWorkCustomerRequestMySQLRepository;
 use CNCLTD\ChargeableWorkCustomerRequest\usecases\ApprovePendingChargeableWorkCustomerRequest;
+use CNCLTD\ChargeableWorkCustomerRequest\usecases\DenyPendingChargeableWorkCustomerRequest;
 use CNCLTD\ChargeableWorkCustomerRequest\usecases\GetPendingToProcessChargeableRequestInfo;
 use CNCLTD\CustomerFeedback;
 use CNCLTD\CustomerFeedbackRepository;
@@ -770,11 +771,6 @@ WHERE
                     );
                     return $response->withStatus(404);
 
-                } catch (ChargeableWorkCustomerRequestAlreadyProcessedException $exception) {
-                    $response->getBody()->write(
-                        json_encode(["status" => "error", "message" => "Request already processed!", "code" => 1266])
-                    );
-                    return $response->withStatus(404);
                 }
             }
         );
@@ -793,22 +789,45 @@ WHERE
                 $requestData           = $request->getParsedBody();
                 $comments              = $requestData['comments'];
                 try {
-                    $info = $usecase(new ChargeableWorkCustomerRequestTokenId($tokenId),$comments);
+                    $info = $usecase(new ChargeableWorkCustomerRequestTokenId($tokenId), $comments);
                     $response->getBody()->write(
                         json_encode(["status" => "ok", "data" => $info])
                     );
                     return $response->withStatus(400);
 
                 } catch (ChargeableWorkCustomerRequestNotFoundException $exception) {
-
                     $response->getBody()->write(
                         json_encode(["status" => "error", "message" => "Request not found!", "code" => 1265])
                     );
                     return $response->withStatus(404);
 
-                } catch (ChargeableWorkCustomerRequestAlreadyProcessedException $exception) {
+                }
+            }
+        );
+        $group->post(
+            '/pendingChargeableWorkCustomerRequest/{tokenId}/deny',
+            function (Request $request, Response $response, $args) {
+                $tokenId = $args['tokenId'];
+                if (!$tokenId) {
                     $response->getBody()->write(
-                        json_encode(["status" => "error", "message" => "Request already processed!", "code" => 1266])
+                        json_encode(["status" => "error", "message" => "Token id required!", "code" => 1264])
+                    );
+                    return $response->withStatus(400);
+                }
+                $chargeableRequestRepo = new ChargeableWorkCustomerRequestMySQLRepository();
+                $usecase               = new DenyPendingChargeableWorkCustomerRequest($chargeableRequestRepo);
+                $requestData           = $request->getParsedBody();
+                $comments              = $requestData['comments'];
+                try {
+                    $info = $usecase(new ChargeableWorkCustomerRequestTokenId($tokenId), $comments);
+                    $response->getBody()->write(
+                        json_encode(["status" => "ok", "data" => $info])
+                    );
+                    return $response->withStatus(400);
+
+                } catch (ChargeableWorkCustomerRequestNotFoundException $exception) {
+                    $response->getBody()->write(
+                        json_encode(["status" => "error", "message" => "Request not found!", "code" => 1265])
                     );
                     return $response->withStatus(404);
                 }

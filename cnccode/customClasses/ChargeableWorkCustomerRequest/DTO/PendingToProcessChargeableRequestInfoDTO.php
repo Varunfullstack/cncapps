@@ -1,7 +1,10 @@
 <?php
 
-namespace CNCLTD\ChargeableWorkCustomerRequest\usecases;
-class PendingToProcessChargeableRequestInfoDTO implements \JsonSerializable
+namespace CNCLTD\ChargeableWorkCustomerRequest\DTO;
+
+use JsonSerializable;
+
+class PendingToProcessChargeableRequestInfoDTO implements JsonSerializable
 {
     /** @var string */
     public $tokenId;
@@ -13,6 +16,8 @@ class PendingToProcessChargeableRequestInfoDTO implements \JsonSerializable
     public $contactName;
     /** @var int */
     public $additionalTimeRequested;
+    /** @var string */
+    public $reason;
 
     /**
      * PendingToProcessChargeableRequestInfoDTO constructor.
@@ -21,12 +26,14 @@ class PendingToProcessChargeableRequestInfoDTO implements \JsonSerializable
      * @param string $serviceRequestEmailSummarySubject
      * @param string $contactName
      * @param int $additionalTimeRequested
+     * @param string $reason
      */
     public function __construct(string $tokenId,
                                 int $serviceRequestId,
                                 string $serviceRequestEmailSummarySubject,
                                 string $contactName,
-                                int $additionalTimeRequested
+                                int $additionalTimeRequested,
+                                string $reason
     )
     {
         $this->tokenId                           = $tokenId;
@@ -34,6 +41,7 @@ class PendingToProcessChargeableRequestInfoDTO implements \JsonSerializable
         $this->serviceRequestEmailSummarySubject = $serviceRequestEmailSummarySubject;
         $this->contactName                       = $contactName;
         $this->additionalTimeRequested           = $additionalTimeRequested;
+        $this->reason                            = $reason;
     }
 
 

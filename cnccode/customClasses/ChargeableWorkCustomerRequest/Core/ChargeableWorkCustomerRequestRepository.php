@@ -8,4 +8,6 @@ interface ChargeableWorkCustomerRequestRepository
     public function getById(ChargeableWorkCustomerRequestTokenId $id): ChargeableWorkCustomerRequest;
 
     public function save(ChargeableWorkCustomerRequest $chargeableWorkCustomerRequest);
+
+    public function delete(ChargeableWorkCustomerRequest $request);
 }

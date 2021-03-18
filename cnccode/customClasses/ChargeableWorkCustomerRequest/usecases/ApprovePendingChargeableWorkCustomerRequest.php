@@ -3,25 +3,29 @@
 namespace CNCLTD\ChargeableWorkCustomerRequest\usecases;
 
 use BUActivity;
+use BUHeader;
 use BUSalesOrder;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequest;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestRepository;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestTokenId;
 use CNCLTD\CommunicationService\CommunicationService;
-use CNCLTD\Exceptions\ChargeableWorkCustomerRequestAlreadyProcessedException;
 use CNCLTD\Exceptions\ChargeableWorkCustomerRequestNotFoundException;
 use CNCLTD\Exceptions\ServiceRequestNotFoundException;
 use DataSet;
+use DateTimeImmutable;
 use DateTimeInterface;
 use DBEContact;
 use DBECustomer;
+use DBEHeader;
 use DBEItem;
 use DBEJOrdhead;
 use DBEJOrdline;
 use DBEJProblem;
+use DBEJUser;
 use DBEOrdhead;
 use DBEOrdline;
 use DBEProblem;
+use DBEUser;
 
 global $cfg;
 require_once($cfg["path_bu"] . "/BUActivity.inc.php");
@@ -47,7 +51,6 @@ class ApprovePendingChargeableWorkCustomerRequest
     /**
      * @param ChargeableWorkCustomerRequestTokenId $id
      * @param string|null $comments
-     * @throws ChargeableWorkCustomerRequestAlreadyProcessedException
      * @throws ChargeableWorkCustomerRequestNotFoundException
      * @throws ServiceRequestNotFoundException
      */
@@ -55,11 +58,12 @@ class ApprovePendingChargeableWorkCustomerRequest
     {
         $request           = $this->getRequest($id);
         $serviceRequest    = $this->getServiceRequest($request);
-        $requestApprovedAt = new \DateTimeImmutable();
+        $requestApprovedAt = new DateTimeImmutable();
         $this->logCustomerContactActivity($request, $requestApprovedAt, $serviceRequest, $comments);
         $this->createOrUpdateSalesOrder($serviceRequest, $request);
         $this->updateServiceRequest($serviceRequest, $request);
         $this->sendEmailToEngineer($request);
+        $this->deleteChargeableRequest($request);
     }
 
     /**
@@ -74,17 +78,6 @@ class ApprovePendingChargeableWorkCustomerRequest
             throw new ChargeableWorkCustomerRequestNotFoundException();
         }
         return $request;
-    }
-
-    /**
-     * @param ChargeableWorkCustomerRequest $request
-     * @throws ChargeableWorkCustomerRequestAlreadyProcessedException
-     */
-    private function guardAgainstAlreadyProcessed(ChargeableWorkCustomerRequest $request): void
-    {
-        if ($request->getProcessedDateTime()->value()) {
-            throw new ChargeableWorkCustomerRequestAlreadyProcessedException();
-        }
     }
 
     /**
@@ -291,11 +284,11 @@ class ApprovePendingChargeableWorkCustomerRequest
     {
         $dbeProblem->setValue(DBEProblem::priority, 5);
         $requesterId = $request->getRequesterId()->value();
-        $dbeUser     = new \DBEJUser($this);
-        $dbeUser->setValue(\DBEUser::userID, $requesterId);
+        $dbeUser     = new DBEJUser($this);
+        $dbeUser->setValue(DBEUser::userID, $requesterId);
         $dbeUser->getRow();
-        $dbeUser->getValue(\DBEJUser::teamLevel);
-        switch ($dbeUser->getValue(\DBEJUser::teamLevel)) {
+        $dbeUser->getValue(DBEJUser::teamLevel);
+        switch ($dbeUser->getValue(DBEJUser::teamLevel)) {
             case 1:
                 $teamField = DBEProblem::hdLimitMinutes;
                 break;
@@ -318,10 +311,10 @@ class ApprovePendingChargeableWorkCustomerRequest
             );
         }
         if ($dbeProblem->getValue(DBEProblem::queueNo) === 3) {
-            $buHeader = new \BUHeader($this);
+            $buHeader = new BUHeader($this);
             $dsHeader = new DataSet($this);
             $buHeader->getHeader($dsHeader);
-            if ($dsHeader->getValue(\DBEHeader::holdAllSOSmallProjectsP5sforQAReview)) {
+            if ($dsHeader->getValue(DBEHeader::holdAllSOSmallProjectsP5sforQAReview)) {
                 $dbeProblem->setValue(DBEProblem::holdForQA, 1);
             }
         }
@@ -329,10 +322,10 @@ class ApprovePendingChargeableWorkCustomerRequest
         $dbeProblem->updateRow();
     }
 
-    private function getRequester(ChargeableWorkCustomerRequest $request): \DBEUser
+    private function getRequester(ChargeableWorkCustomerRequest $request): DBEUser
     {
         if (!$this->requester) {
-            $dbeUser = new \DBEUser($this);
+            $dbeUser = new DBEUser($this);
             $dbeUser->getRow($request->getRequesterId());
             $this->requester = $dbeUser;
         }
@@ -342,5 +335,10 @@ class ApprovePendingChargeableWorkCustomerRequest
     private function sendEmailToEngineer(ChargeableWorkCustomerRequest $request)
     {
         CommunicationService::sendExtraChargeableWorkRequestApprovedEmail($request);
+    }
+
+    private function deleteChargeableRequest(ChargeableWorkCustomerRequest $request)
+    {
+        $this->repository->delete($request);
     }
 }
