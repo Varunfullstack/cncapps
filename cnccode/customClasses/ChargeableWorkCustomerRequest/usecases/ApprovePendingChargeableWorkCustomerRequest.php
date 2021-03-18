@@ -7,6 +7,7 @@ use BUSalesOrder;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequest;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestRepository;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestTokenId;
+use CNCLTD\CommunicationService\CommunicationService;
 use CNCLTD\Exceptions\ChargeableWorkCustomerRequestAlreadyProcessedException;
 use CNCLTD\Exceptions\ChargeableWorkCustomerRequestNotFoundException;
 use CNCLTD\Exceptions\ServiceRequestNotFoundException;
@@ -31,6 +32,8 @@ class ApprovePendingChargeableWorkCustomerRequest
      * @var ChargeableWorkCustomerRequestRepository
      */
     private $repository;
+    private $requestee;
+    private $requester;
 
     /**
      * ApprovePendingChargeableWorkCustomerRequest constructor.
@@ -50,20 +53,12 @@ class ApprovePendingChargeableWorkCustomerRequest
      */
     public function __invoke(ChargeableWorkCustomerRequestTokenId $id, ?string $comments)
     {
-        $request = $this->getRequest($id);
-        $this->guardAgainstAlreadyProcessed($request);
-        $request->approve();
-        $this->repository->save($request);
-        $dbeProblem        = $this->getServiceRequest($request);
-        $serviceRequestId  = $request->getServiceRequestId()->value();
-        $dbeContact        = $this->getContact($request);
-        $requestApprovedAt = $request->getProcessedDateTime()->value();
-        // log a customer contact activity
-        $this->logOperationalActivity($dbeContact, $request, $requestApprovedAt, $serviceRequestId, $comments);
-        // set the original customer contact activity to NOT awaiting customer,
-        // and set the Service Request as not awaiting customer
-        $this->createOrUpdateSalesOrder($dbeProblem, $request);
-        $this->updateServiceRequest($dbeProblem, $request);
+        $request           = $this->getRequest($id);
+        $serviceRequest    = $this->getServiceRequest($request);
+        $requestApprovedAt = new \DateTimeImmutable();
+        $this->logCustomerContactActivity($request, $requestApprovedAt, $serviceRequest, $comments);
+        $this->createOrUpdateSalesOrder($serviceRequest, $request);
+        $this->updateServiceRequest($serviceRequest, $request);
         $this->sendEmailToEngineer($request);
     }
 
@@ -111,33 +106,35 @@ class ApprovePendingChargeableWorkCustomerRequest
      * @param ChargeableWorkCustomerRequest $request
      * @return DBEContact
      */
-    private function getContact(ChargeableWorkCustomerRequest $request): DBEContact
+    private function getRequestee(ChargeableWorkCustomerRequest $request): DBEContact
     {
-        $dbeContact = new DBEContact($this);
-        $dbeContact->getRow($request->getRequesteeId()->value());
-        return $dbeContact;
+        if (!$this->requestee) {
+            $dbeContact = new DBEContact($this);
+            $dbeContact->getRow($request->getRequesteeId()->value());
+        }
+        return $this->requestee;
     }
 
     /**
-     * @param DBEContact $dbeContact
      * @param ChargeableWorkCustomerRequest $request
      * @param DateTimeInterface|null $requestApprovedAt
-     * @param int $serviceRequestId
+     * @param DBEProblem $serviceRequest
      * @param string|null $comments
      */
-    private function logOperationalActivity(DBEContact $dbeContact,
-                                            ChargeableWorkCustomerRequest $request,
-                                            ?DateTimeInterface $requestApprovedAt,
-                                            int $serviceRequestId,
-                                            ?string $comments
+    private function logCustomerContactActivity(ChargeableWorkCustomerRequest $request,
+                                                ?DateTimeInterface $requestApprovedAt,
+                                                DBEProblem $serviceRequest,
+                                                ?string $comments
     ): void
     {
+        $requestee   = $this->getRequestee($request);
         $buActivity  = new BUActivity($this);
-        $description = "<p>{$dbeContact->getValue(DBEContact::firstName)} {$dbeContact->getValue(DBEContact::lastName)} approved the request for {$request->getAdditionalHoursRequested()->value()} hours at {$requestApprovedAt->format('d/m/Y H:i:s')}</p>";
+        $description = "<p>{$requestee->getValue(DBEContact::firstName)} {$requestee->getValue(DBEContact::lastName)} approved the request for {$request->getAdditionalHoursRequested()->value()} hours at {$requestApprovedAt->format('d/m/Y H:i:s')}</p>";
         if ($comments) {
             $description .= "<p>$comments</p>";
         }
-        $buActivity->logOperationalActivity($serviceRequestId, $description);
+        $requester = $this->getRequester($request);
+        $buActivity->addCustomerContactActivityToServiceRequest($serviceRequest, $description, $requester);
     }
 
     /**
@@ -328,5 +325,22 @@ class ApprovePendingChargeableWorkCustomerRequest
                 $dbeProblem->setValue(DBEProblem::holdForQA, 1);
             }
         }
+        $dbeProblem->setValue(DBEProblem::awaitingCustomerResponseFlag, 'N');
+        $dbeProblem->updateRow();
+    }
+
+    private function getRequester(ChargeableWorkCustomerRequest $request): \DBEUser
+    {
+        if (!$this->requester) {
+            $dbeUser = new \DBEUser($this);
+            $dbeUser->getRow($request->getRequesterId());
+            $this->requester = $dbeUser;
+        }
+        return $this->requester;
+    }
+
+    private function sendEmailToEngineer(ChargeableWorkCustomerRequest $request)
+    {
+        CommunicationService::sendExtraChargeableWorkRequestApprovedEmail($request);
     }
 }

@@ -34,6 +34,4 @@ class ChargeableWorkCustomerRequestEmailDTO
         $this->serviceRequestId    = $serviceRequestId;
         $this->emailSubjectSummary = $emailSubjectSummary;
     }
-
-
 }
