@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v5.6.4]
+## [v5.6.4] - 2021-03-18
 ### Changed
 - Changed the list of Checklists when logging a new request to show only relevant StandardTexts.
 - Show the dates for the financial year in expenses breakdown year to date
