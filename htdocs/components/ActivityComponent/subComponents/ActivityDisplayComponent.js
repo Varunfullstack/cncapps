@@ -16,6 +16,7 @@ import moment from "moment";
 import {InternalNotesListComponent} from "../../shared/InternalNotesListComponent/InternalNotesListComponent";
 import {InternalNotes} from "./InternalNotesComponent";
 import {TaskListComponent} from "./TaskListComponent";
+import AdditionalTimeRequestModal from "../../Modals/AdditionalTimeRequestModal";
 
 // noinspection EqualityComparisonWithCoercionJS
 const emptyAssetReasonCharactersToShow = 30;
@@ -23,6 +24,8 @@ const emptyAssetReasonCharactersToShow = 30;
 
 class ActivityDisplayComponent extends MainComponent {
     api = new APIActivity();
+    additionalTimeRequestResolve;
+    additionalTimeRequestReject;
 
     constructor(props) {
         super(props);
@@ -51,7 +54,8 @@ class ActivityDisplayComponent extends MainComponent {
                 criticalSR: false,
                 monitorSR: false,
                 holdForQA: false
-            }
+            },
+            showAdditionalTimeRequestModal: false
         }
     }
 
@@ -398,8 +402,16 @@ class ActivityDisplayComponent extends MainComponent {
     }
 
     renderChargeableWorkIcon = () => {
+        const {data} = this.state;
+        if (!data) {
+            return '';
+        }
         let title = "Request Customer Approval";
         let icon = "fa-envelope-open-dollar";
+        if (data.hasPendingChargeableWorkRequest) {
+            title = "Chargeable request in process";
+            icon = "fa-hands-usd";
+        }
         return (
             <ToolTip title={title}
                      content={<a className={`fal ${icon}  fa-2x m-5 pointer icon`}
@@ -409,13 +421,26 @@ class ActivityDisplayComponent extends MainComponent {
         )
     }
 
-    handleRequestCustomerApproval = async () => {
-        try {
-            const {additionalHoursRequested, reason} = await this.showRequestCustomerModal();
-            if (value) {
+    showAdditionalTimeRequestModal = async () => {
+        return new Promise((resolve, reject) => {
+            this.setState({showAdditionalTimeRequestModal: true});
+            this.additionalTimeRequestResolve = resolve;
+            this.additionalTimeRequestReject = reject;
+        })
+    }
 
+    handleRequestCustomerApproval = async () => {
+        const {problemID: serviceRequestId} = this.state.data;
+        try {
+            const {reason, timeRequested} = await this.showAdditionalTimeRequestModal();
+            try {
+                await this.api.addAdditionalTimeRequest(serviceRequestId, reason, timeRequested);
+                const {currentActivity} = this.state;
+                await this.loadCallActivity(currentActivity);
+            } catch (error) {
+                this.alert(error);
             }
-        } catch (error) {
+        } catch (rejectedPromise) {
 
         }
     }
@@ -1135,10 +1160,26 @@ class ActivityDisplayComponent extends MainComponent {
         this.loadCallActivity(this.state.currentActivity)
     }
 
+    handleAdditionalTimeRequestModalOnChange = (data) => {
+        if (this.additionalTimeRequestResolve) {
+            this.additionalTimeRequestResolve(data);
+        }
+        this.hideAdditionalTimeRequestModal();
+    }
+
+    hideAdditionalTimeRequestModal = () => {
+        this.setState({showAdditionalTimeRequestModal: false})
+    }
+
     render() {
-        const {data, showSalesOrder} = this.state;
+        const {data, showSalesOrder, showAdditionalTimeRequestModal} = this.state;
         return (
             <div style={{width: "90%"}}>
+                <AdditionalTimeRequestModal key="additionalTimeRequestModal"
+                                            show={showAdditionalTimeRequestModal}
+                                            onChange={this.handleAdditionalTimeRequestModalOnChange}
+                                            onCancel={this.handleAdditionalTimeRequestModalOnCancel}
+                />
                 {this.getAlert()}
                 {this.getConfirm()}
                 {this.getPrompt()}
@@ -1179,6 +1220,13 @@ class ActivityDisplayComponent extends MainComponent {
             return this.loadCallActivity(res.data);
         })
     }
+
+    handleAdditionalTimeRequestModalOnCancel = () => {
+        if (this.additionalTimeRequestReject) {
+            this.additionalTimeRequestReject();
+        }
+        this.hideAdditionalTimeRequestModal();
+    };
 }
 
 export default ActivityDisplayComponent;

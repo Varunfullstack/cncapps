@@ -104,6 +104,7 @@ class ApprovePendingChargeableWorkCustomerRequest
         if (!$this->requestee) {
             $dbeContact = new DBEContact($this);
             $dbeContact->getRow($request->getRequesteeId()->value());
+            $this->requestee = $dbeContact;
         }
         return $this->requestee;
     }
@@ -251,7 +252,7 @@ class ApprovePendingChargeableWorkCustomerRequest
 
     private function updateItemLine(DBEOrdline $labourLine, ChargeableWorkCustomerRequest $request)
     {
-        $quantity = $labourLine->getValue(DBEOrdline::qtyOrdered) + $request->getAdditionalHoursRequested();
+        $quantity = $labourLine->getValue(DBEOrdline::qtyOrdered) + $request->getAdditionalHoursRequested()->value();
         $labourLine->setValue(DBEOrdline::qtyOrdered, $quantity);
         $cost = $labourLine->getValue(DBEOrdline::curUnitCost);
         $labourLine->setValue(DBEOrdline::curTotalCost, $cost * $quantity);
@@ -282,7 +283,9 @@ class ApprovePendingChargeableWorkCustomerRequest
      */
     private function updateServiceRequest(DBEJProblem $dbeProblem, ChargeableWorkCustomerRequest $request): void
     {
-        $dbeProblem->setValue(DBEProblem::priority, 5);
+        $toUpdateProblem = new DBEProblem($this);
+        $toUpdateProblem->getRow($dbeProblem->getValue(DBEProblem::problemID));
+        $toUpdateProblem->setValue(DBEProblem::priority, 5);
         $requesterId = $request->getRequesterId()->value();
         $dbeUser     = new DBEJUser($this);
         $dbeUser->setValue(DBEUser::userID, $requesterId);
@@ -305,28 +308,28 @@ class ApprovePendingChargeableWorkCustomerRequest
                 $teamField = null;
         }
         if ($teamField) {
-            $dbeProblem->setValue(
+            $toUpdateProblem->setValue(
                 $teamField,
-                $dbeProblem->getValue($teamField) + ($request->getAdditionalHoursRequested() * 60)
+                $toUpdateProblem->getValue($teamField) + ($request->getAdditionalHoursRequested()->value() * 60)
             );
         }
-        if ($dbeProblem->getValue(DBEProblem::queueNo) === 3) {
+        if ($toUpdateProblem->getValue(DBEProblem::queueNo) === 3) {
             $buHeader = new BUHeader($this);
             $dsHeader = new DataSet($this);
             $buHeader->getHeader($dsHeader);
             if ($dsHeader->getValue(DBEHeader::holdAllSOSmallProjectsP5sforQAReview)) {
-                $dbeProblem->setValue(DBEProblem::holdForQA, 1);
+                $toUpdateProblem->setValue(DBEProblem::holdForQA, 1);
             }
         }
-        $dbeProblem->setValue(DBEProblem::awaitingCustomerResponseFlag, 'N');
-        $dbeProblem->updateRow();
+        $toUpdateProblem->setValue(DBEProblem::awaitingCustomerResponseFlag, 'N');
+        $toUpdateProblem->updateRow();
     }
 
     private function getRequester(ChargeableWorkCustomerRequest $request): DBEUser
     {
         if (!$this->requester) {
             $dbeUser = new DBEUser($this);
-            $dbeUser->getRow($request->getRequesterId());
+            $dbeUser->getRow($request->getRequesterId()->value());
             $this->requester = $dbeUser;
         }
         return $this->requester;

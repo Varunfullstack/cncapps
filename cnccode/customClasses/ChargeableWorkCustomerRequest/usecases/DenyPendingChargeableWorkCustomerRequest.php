@@ -92,6 +92,7 @@ class DenyPendingChargeableWorkCustomerRequest
         if (!$this->requestee) {
             $dbeContact = new DBEContact($this);
             $dbeContact->getRow($request->getRequesteeId()->value());
+            $this->requestee = $dbeContact;
         }
         return $this->requestee;
     }
@@ -123,15 +124,17 @@ class DenyPendingChargeableWorkCustomerRequest
      */
     private function updateServiceRequest(DBEJProblem $dbeProblem): void
     {
-        $dbeProblem->setValue(DBEProblem::awaitingCustomerResponseFlag, 'N');
-        $dbeProblem->updateRow();
+        $toUpdateProblem = new DBEProblem($this);
+        $toUpdateProblem->getRow($dbeProblem->getValue(DBEProblem::problemID));
+        $toUpdateProblem->setValue(DBEProblem::awaitingCustomerResponseFlag, 'N');
+        $toUpdateProblem->updateRow();
     }
 
     private function getRequester(ChargeableWorkCustomerRequest $request): DBEUser
     {
         if (!$this->requester) {
             $dbeUser = new DBEUser($this);
-            $dbeUser->getRow($request->getRequesterId());
+            $dbeUser->getRow($request->getRequesterId()->value());
             $this->requester = $dbeUser;
         }
         return $this->requester;

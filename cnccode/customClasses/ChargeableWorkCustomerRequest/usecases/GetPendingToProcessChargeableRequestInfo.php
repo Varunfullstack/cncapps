@@ -46,7 +46,7 @@ class GetPendingToProcessChargeableRequestInfo
         return new PendingToProcessChargeableRequestInfoDTO(
             $id->value(),
             $serviceRequestId,
-            $dbeProblem->getValue(DBEProblem::emailSubjectSummary),
+            $dbeProblem->getValue(DBEProblem::emailSubjectSummary) || "",
             $dbeProblem->getValue(DBEJProblem::contactName),
             $request->getAdditionalHoursRequested()->value(),
             $request->getReason()->value()

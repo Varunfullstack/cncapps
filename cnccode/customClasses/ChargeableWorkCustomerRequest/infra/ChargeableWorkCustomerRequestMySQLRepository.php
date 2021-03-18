@@ -69,35 +69,40 @@ class ChargeableWorkCustomerRequestMySQLRepository implements ChargeableWorkCust
      */
     public function save(ChargeableWorkCustomerRequest $chargeableWorkCustomerRequest)
     {
-        $query = "insert into {$this->tableName}(id,createdAt, serviceRequestId, requesteeId, additionalTimeRested,requesterId) values (?,?,?,?,?,?)";
+        $query      = "insert into {$this->tableName}(id,createdAt, serviceRequestId, requesteeId, additionalHoursRequested,requesterId,reason) values (?,?,?,?,?,?,?)";
+        $parameters = [
+            [
+                "type"  => "s",
+                "value" => $chargeableWorkCustomerRequest->getId()->value()
+            ],
+            [
+                "type"  => "s",
+                "value" => $chargeableWorkCustomerRequest->getCreatedAt()->format(DATE_MYSQL_DATETIME)
+            ],
+            [
+                "type"  => "i",
+                "value" => $chargeableWorkCustomerRequest->getServiceRequestId()->value()
+            ],
+            [
+                "type"  => "i",
+                "value" => $chargeableWorkCustomerRequest->getRequesteeId()->value()
+            ],
+            [
+                "type"  => "i",
+                "value" => $chargeableWorkCustomerRequest->getAdditionalHoursRequested()->value()
+            ],
+            [
+                "type"  => "i",
+                "value" => $chargeableWorkCustomerRequest->getRequesterId()->value()
+            ],
+            [
+                "type"  => "s",
+                "value" => $chargeableWorkCustomerRequest->getReason()->value()
+            ]
+        ];
         $this->dbInstance->preparedQuery(
             $query,
-            [
-                [
-                    "type"  => "s",
-                    "value" => $chargeableWorkCustomerRequest->getId()->value()
-                ],
-                [
-                    "type"  => "s",
-                    "value" => $chargeableWorkCustomerRequest->getCreatedAt()->format(DATE_MYSQL_DATETIME)
-                ],
-                [
-                    "type"  => "i",
-                    "value" => $chargeableWorkCustomerRequest->getServiceRequestId()->value()
-                ],
-                [
-                    "type"  => "i",
-                    "value" => $chargeableWorkCustomerRequest->getRequesteeId()->value()
-                ],
-                [
-                    "type"  => "i",
-                    "value" => $chargeableWorkCustomerRequest->getAdditionalHoursRequested()->value()
-                ],
-                [
-                    "type"  => "i",
-                    "value" => $chargeableWorkCustomerRequest->getRequesterId()->value()
-                ]
-            ]
+            $parameters
         );
     }
 
@@ -122,7 +127,7 @@ class ChargeableWorkCustomerRequestMySQLRepository implements ChargeableWorkCust
 
     public function getCountRequestsForServiceRequestId(ChargeableWorkCustomerRequestServiceRequestId $param)
     {
-        $query     = "select count(*) from {$this->tableName} where serviceRequestId = ?";
+        $query     = "select count(*) > 0 from {$this->tableName} where serviceRequestId = ?";
         $statement = $this->dbInstance->preparedQuery(
             $query,
             [

@@ -197,6 +197,19 @@ class APIActivity extends APIMain {
                 }
             })
     }
+
+    async addAdditionalTimeRequest(serviceRequestId, reason, timeRequested) {
+        const response = await fetch(`${ApiUrls.SRActivity}addAdditionalTimeRequest`,
+            {
+                method: 'POST',
+                body: JSON.stringify({serviceRequestId, reason, timeRequested})
+            }
+        )
+        const jsonResponse = await response.json();
+        if (jsonResponse.status !== 'ok') {
+            throw new Error(jsonResponse.message);
+        }
+    }
 }
 
 export default APIActivity;

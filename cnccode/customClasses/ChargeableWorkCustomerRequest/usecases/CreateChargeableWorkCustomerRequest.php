@@ -5,6 +5,7 @@ namespace CNCLTD\ChargeableWorkCustomerRequest\usecases;
 use BUActivity;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequest;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestAdditionalHoursRequested;
+use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestReason;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestRepository;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestRequesteeId;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestRequesterId;
@@ -43,25 +44,29 @@ class CreateChargeableWorkCustomerRequest
      * @param DBEProblem $serviceRequest
      * @param DBEUser $requester
      * @param int $additionalTimeRequested
+     * @param string $reason
      * @throws AdditionalHoursRequestedInvalidValueException
      */
     public function __invoke(DBEProblem $serviceRequest,
                              DBEUser $requester,
-                             int $additionalTimeRequested
+                             int $additionalTimeRequested,
+                             string $reason
     )
     {
 
         $id               = $this->repository->getNextIdentity();
         $serviceRequestId = $serviceRequest->getValue(DBEProblem::problemID);
         $requestee        = new DBEContact($this);
-        $requestee->getRow();
+        $requesteeId      = $serviceRequest->getValue(DBEProblem::contactID);
+        $requestee->getRow($requesteeId);
         $newRequest = ChargeableWorkCustomerRequest::create(
             $id,
             new DateTimeImmutable(),
             new ChargeableWorkCustomerRequestServiceRequestId($serviceRequestId),
-            new ChargeableWorkCustomerRequestRequesteeId($serviceRequest->getValue(DBEProblem::contactID)),
+            new ChargeableWorkCustomerRequestRequesteeId($requesteeId),
             new ChargeableWorkCustomerRequestAdditionalHoursRequested($additionalTimeRequested),
-            new ChargeableWorkCustomerRequestRequesterId($requester->getValue(DBEUser::userID))
+            new ChargeableWorkCustomerRequestRequesterId($requester->getValue(DBEUser::userID)),
+            new ChargeableWorkCustomerRequestReason($reason)
         );
         $this->repository->save($newRequest);
         CommunicationService::sendExtraChargeableWorkRequestToContact($newRequest);

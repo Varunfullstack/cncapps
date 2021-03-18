@@ -7,7 +7,7 @@ class ChargeableWorkCustomerRequestMySQLDTO
     private $createdAt;
     private $serviceRequestId;
     private $requesteeId;
-    private $additionalTimeRequested;
+    private $additionalHoursRequested;
     private $requesterId;
     private $reason;
 
@@ -46,9 +46,9 @@ class ChargeableWorkCustomerRequestMySQLDTO
     /**
      * @return mixed
      */
-    public function getAdditionalTimeRequested()
+    public function getAdditionalHoursRequested()
     {
-        return $this->additionalTimeRequested;
+        return $this->additionalHoursRequested;
     }
 
     /**

@@ -787,13 +787,13 @@ WHERE
                 $chargeableRequestRepo = new ChargeableWorkCustomerRequestMySQLRepository();
                 $usecase               = new ApprovePendingChargeableWorkCustomerRequest($chargeableRequestRepo);
                 $requestData           = $request->getParsedBody();
-                $comments              = $requestData['comments'];
+                $comments              = @$requestData['comments'];
                 try {
-                    $info = $usecase(new ChargeableWorkCustomerRequestTokenId($tokenId), $comments);
+                    $usecase(new ChargeableWorkCustomerRequestTokenId($tokenId), $comments);
                     $response->getBody()->write(
-                        json_encode(["status" => "ok", "data" => $info])
+                        json_encode(["status" => "ok"])
                     );
-                    return $response->withStatus(400);
+                    return $response->withStatus(200);
 
                 } catch (ChargeableWorkCustomerRequestNotFoundException $exception) {
                     $response->getBody()->write(
@@ -819,11 +819,11 @@ WHERE
                 $requestData           = $request->getParsedBody();
                 $comments              = $requestData['comments'];
                 try {
-                    $info = $usecase(new ChargeableWorkCustomerRequestTokenId($tokenId), $comments);
+                    $usecase(new ChargeableWorkCustomerRequestTokenId($tokenId), $comments);
                     $response->getBody()->write(
-                        json_encode(["status" => "ok", "data" => $info])
+                        json_encode(["status" => "ok"])
                     );
-                    return $response->withStatus(400);
+                    return $response->withStatus(200);
 
                 } catch (ChargeableWorkCustomerRequestNotFoundException $exception) {
                     $response->getBody()->write(

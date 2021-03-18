@@ -1,8 +1,11 @@
 <?php
 global $cfg;
 
+use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestServiceRequestId;
 use CNCLTD\ChargeableWorkCustomerRequest\infra\ChargeableWorkCustomerRequestMySQLRepository;
+use CNCLTD\ChargeableWorkCustomerRequest\usecases\CreateChargeableWorkCustomerRequest;
 use CNCLTD\Exceptions\JsonHttpException;
+use CNCLTD\Exceptions\ServiceRequestNotFoundException;
 use CNCLTD\InternalDocuments\Base64FileDTO;
 use CNCLTD\InternalDocuments\Entity\InternalDocumentMapper;
 use CNCLTD\InternalDocuments\InternalDocumentRepository;
@@ -64,6 +67,7 @@ class CTSRActivity extends CTCNC
     const ADD_INTERNAL_NOTE                                      = "addInternalNote";
     const CHANGE_SERVICE_REQUEST_INTERNAL_NOTE                   = "changeServiceRequestInternalNote";
     const SAVE_TASK_LIST                                         = "saveTaskList";
+    const ADD_ADDITIONAL_TIME_REQUEST                            = "addAdditionalTimeRequest";
     public  $serverGuardArray = array(
         ""  => "Please select",
         "Y" => "ServerGuard Related",
@@ -150,6 +154,9 @@ class CTSRActivity extends CTCNC
                 exit;
             case self::GET_CALL_ACTIVITY_BASIC_INFO:
                 echo json_encode($this->getCallActivityBasicInfo());
+                exit;
+            case self::ADD_ADDITIONAL_TIME_REQUEST:
+                echo json_encode($this->addAdditionalTimeRequestController());
                 exit;
             case self::ADD_INTERNAL_NOTE:
                 echo json_encode($this->addInternalNoteController());
@@ -350,13 +357,12 @@ class CTSRActivity extends CTCNC
                 return -1;
             }
         );
-
         $chargeableWorkRequestRepo       = new ChargeableWorkCustomerRequestMySQLRepository();
         $hasPendingChargeableWorkRequest = $chargeableWorkRequestRepo->getCountRequestsForServiceRequestId(
-            new \CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestServiceRequestId($problemID)
-        ) > 0;
-        $taskListUpdatedByUserId = $dbeProblem->getValue(DBEProblem::taskListUpdatedBy);
-        $taskListUpdatedBy       = null;
+                new ChargeableWorkCustomerRequestServiceRequestId($problemID)
+            ) > 0;
+        $taskListUpdatedByUserId         = $dbeProblem->getValue(DBEProblem::taskListUpdatedBy);
+        $taskListUpdatedBy               = null;
         if ($taskListUpdatedByUserId) {
             if (!key_exists($taskListUpdatedByUserId, $consultants)) {
                 $dbeUser = new DBEUser($this);
@@ -1547,7 +1553,7 @@ FROM
             $internalDocument = $this->internalDocumentRepository->getById($documentId);
             $this->internalDocumentRepository->deleteDocument($internalDocument);
             return ["status" => "ok"];
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw new JsonHttpException(2215, "Failed to delete document");
         }
     }
@@ -1595,6 +1601,31 @@ FROM
         $dbeProblem->setValue(DBEProblem::taskListUpdatedAt, (new DateTimeImmutable())->format(DATE_MYSQL_DATETIME));
         $dbeProblem->setValue(DBEProblem::taskListUpdatedBy, $this->userID);
         $dbeProblem->updateRow();
+        return ["status" => "ok"];
+    }
+
+    /**
+     * @return string[]
+     * @throws JsonHttpException
+     */
+    private function addAdditionalTimeRequestController(): array
+    {
+        $data = $this->getJSONData();
+        try {
+            $serviceRequestId = (int)@$data['serviceRequestId'];
+            $reason           = @$data['reason'];
+            $timeRequested    = (int)@$data['timeRequested'];
+            $repo             = new ChargeableWorkCustomerRequestMySQLRepository();
+            $buActivity       = new BUActivity($this);
+            $serviceRequest   = new DBEProblem($this);
+            if (!$serviceRequest->getRow($serviceRequestId)) {
+                throw new ServiceRequestNotFoundException();
+            }
+            $usecase = new CreateChargeableWorkCustomerRequest($repo, $buActivity);
+            $usecase->__invoke($serviceRequest, $this->dbeUser, $timeRequested, $reason);
+        } catch (Exception $exception) {
+            throw new JsonHttpException(123, $exception->getMessage());
+        }
         return ["status" => "ok"];
     }
 }

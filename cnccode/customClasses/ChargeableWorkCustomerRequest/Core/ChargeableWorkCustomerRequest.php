@@ -73,21 +73,21 @@ class ChargeableWorkCustomerRequest
      */
     public static function fromMySQLDTO(ChargeableWorkCustomerRequestMySQLDTO $dto): ChargeableWorkCustomerRequest
     {
-        $id                      = new ChargeableWorkCustomerRequestTokenId($dto->getId());
-        $createdAt               = DateTimeImmutable::createFromFormat(DATE_MYSQL_DATETIME, $dto->getCreatedAt());
-        $serviceRequestId        = new ChargeableWorkCustomerRequestServiceRequestId($dto->getServiceRequestId());
-        $requesteeId             = new ChargeableWorkCustomerRequestRequesteeId($dto->getRequesteeId());
-        $additionalTimeRequested = new ChargeableWorkCustomerRequestAdditionalHoursRequested(
-            $dto->getAdditionalTimeRequested()
+        $id                       = new ChargeableWorkCustomerRequestTokenId($dto->getId());
+        $createdAt                = DateTimeImmutable::createFromFormat(DATE_MYSQL_DATETIME, $dto->getCreatedAt());
+        $serviceRequestId         = new ChargeableWorkCustomerRequestServiceRequestId($dto->getServiceRequestId());
+        $requesteeId              = new ChargeableWorkCustomerRequestRequesteeId($dto->getRequesteeId());
+        $additionalHoursRequested = new ChargeableWorkCustomerRequestAdditionalHoursRequested(
+            $dto->getAdditionalHoursRequested()
         );
-        $requesterId             = new ChargeableWorkCustomerRequestRequesterId($dto->getRequesterId());
-        $reason                  = new ChargeableWorkCustomerRequestReason($dto->getReason());
+        $requesterId              = new ChargeableWorkCustomerRequestRequesterId($dto->getRequesterId());
+        $reason                   = new ChargeableWorkCustomerRequestReason($dto->getReason());
         return self::create(
             $id,
             $createdAt,
             $serviceRequestId,
             $requesteeId,
-            $additionalTimeRequested,
+            $additionalHoursRequested,
             $requesterId,
             $reason
         );
