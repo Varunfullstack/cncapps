@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Controller base class
  * Provides generic functionality to process HTML requests.
@@ -16,7 +15,6 @@
  * @author Karim Ahmed.
  * @access virtual
  */
-
 define(
     "CT_LEVEL_NONE",
     0
@@ -29,7 +27,6 @@ define(
     "CT_LEVEL_PERM",
     2
 );
-
 // Action constants
 define(
     "CT_ACTION_INSERT",
@@ -55,7 +52,6 @@ define(
     "CT_ACTION_DISPLAY_DELETE",
     "displayDeleteForm"
 );
-
 // HTTP request method constants
 define(
     "CT_METHOD_POST",
@@ -65,7 +61,6 @@ define(
     "CT_METHOD_GET",
     "GET"
 );
-
 // Type of document to to client (extend this as necessary)
 define(
     'CT_DOC_TYPE_HTML',
@@ -75,7 +70,6 @@ define(
     'CT_DOC_TYPE_XML',
     'xml'
 );
-
 // HTML display format
 define(
     "CT_HTML_FMT_SCREEN",
@@ -120,42 +114,41 @@ require_once($cfg["path_gc"] . "/BaseObject.inc.php");
 class Controller extends BaseObject
 {
 // instance vars
-    var $requestMethod = "";        // this->requestMethod from html request
-    public $postVars = [];                    // HTTP_POST_VARS from html request
-    var $startTime;
-    var $getVars = "";                    // HTTP_GET_VARS from html request
-    var $cookieVars = "";                // HTTP_COOKIE_VARS from html request
+    var    $requestMethod = "";        // this->requestMethod from html request
+    public $postVars      = [];                    // HTTP_POST_VARS from html request
+    var    $startTime;
+    var    $getVars       = "";                    // HTTP_GET_VARS from html request
+    var    $cookieVars    = "";                // HTTP_COOKIE_VARS from html request
     /**
      * @var Template $template
      */
     public $template;                    // PHPLib template object
-    var $cfg;                            // Configuration variables
+    var    $cfg;                            // Configuration variables
     /** @var dbSweetcode $db */
-    public $db;                                // PHPLib DB object
-    var $formError = FALSE;
-    var $docType = CT_DOC_TYPE_HTML;
-    var $htmlFmt = CT_HTML_FMT_SCREEN;
-    var $formErrorMessage = "";        // HTML formatting
-    var $action = "";
+    public    $db;                                // PHPLib DB object
+    var       $formError        = FALSE;
+    var       $docType          = CT_DOC_TYPE_HTML;
+    var       $htmlFmt          = CT_HTML_FMT_SCREEN;
+    var       $formErrorMessage = "";        // HTML formatting
+    var       $action           = "";
     protected $cachedVersion;
-    private $pageTitle = "";
-    private $pageHeader = "";
+    private   $pageTitle        = "";
+    private   $pageHeader       = "";
 
-    function __construct(
-        $requestMethod,
-        &$postVars,
-        &$getVars,
-        &$cookieVars,
-        &$cfg
+    function __construct($requestMethod,
+                         &$postVars,
+                         &$getVars,
+                         &$cookieVars,
+                         &$cfg
     )
     {
         $this->cfg =& $cfg;
         $this->createTemplate();
         $this->BaseObjectNoOwner();
         $this->pageOpen();
-        $this->postVars =& $postVars;
-        $this->getVars =& $getVars;
-        $this->cookieVars =& $cookieVars;
+        $this->postVars      =& $postVars;
+        $this->getVars       =& $getVars;
+        $this->cookieVars    =& $cookieVars;
         $this->requestMethod = $requestMethod;
         $this->setFormErrorOff();
 
@@ -170,8 +163,7 @@ class Controller extends BaseObject
     function createTemplate()
     {
         $this->template = new Template(
-            $this->cfg["path_templates"],
-            "remove"
+            $this->cfg["path_templates"], "remove"
         );
         return TRUE;
     }
@@ -199,7 +191,6 @@ class Controller extends BaseObject
     public static function dateToISO($getValue)
     {
         $date = new \DateTime($getValue);
-
         return $date->format("Y-m-d\TH:i:s");
 
     }
@@ -218,9 +209,8 @@ class Controller extends BaseObject
             throw new Exception("Too few arguments passed");
         }
         // get args
-        $url = func_get_arg(0);
+        $url        = func_get_arg(0);
         $parameters = func_get_arg(1);
-
         // This bit added so that extensions such as gif for image files may be
         // passed.
         if ($numargs > 2) {
@@ -228,22 +218,17 @@ class Controller extends BaseObject
         } else {
             $fileExtension = "";
         }
-
         if ($url == "") {
             throw new Exception('Invalid URL');
         }
-
         $urlString = $url;
-
-        $first = TRUE;
-
+        $first     = TRUE;
         reset($parameters);
-
         while (list($p, $v) = each($parameters)) {
             $v = urlencode($v);
             if ($first == TRUE) {
                 $urlString = $urlString . "?" . $p . "=" . $v;
-                $first = FALSE;
+                $first     = FALSE;
             } else {
                 $urlString = $urlString . "&" . $p . "=" . $v;
             };
@@ -274,11 +259,8 @@ class Controller extends BaseObject
         if ($url == "") {
             throw new Exception('Invalid URL');
         }
-
         $urlString = $url;
-
         // Do we have at least one parameter already?
-
         if (stristr(
                 $urlString,
                 "?"
@@ -287,12 +269,11 @@ class Controller extends BaseObject
         } else {
             $first = FALSE;
         }
-
         reset($parameters);
         while (list($p, $v) = each($parameters)) {
             if ($first == TRUE) {
                 $urlString = $urlString . "?" . $p . "=" . $v;
-                $first = FALSE;
+                $first     = FALSE;
             } else {
                 $urlString = $urlString . "&" . $p . "=" . $v;
             }
@@ -351,13 +332,11 @@ class Controller extends BaseObject
         if ($html_encode) {
             $string = htmlentities($string);
         }
-
         $string = preg_replace(
             "/((\015\012)|(\015)|(\012))/",
             '<br />',
             $string
         );
-
         return $string;
     }
 
@@ -428,9 +407,9 @@ class Controller extends BaseObject
                 $dateYMD,
                 $regs
             )) {
-                $day = $regs[3][0];
+                $day   = $regs[3][0];
                 $month = $regs[2][0];
-                $year = $regs[1][0];
+                $year  = $regs[1][0];
                 return $day . $separator . $month . $separator . $year;
             } else {
                 return $dateYMD; // it isn't a valid date format so just return it as-is for display
@@ -448,7 +427,6 @@ class Controller extends BaseObject
         if (!$paramName) {
             return null;
         }
-
         if (!isset($_REQUEST[$paramName])) {
             return null;
         }
@@ -489,7 +467,6 @@ class Controller extends BaseObject
     {
         $this->setPageTitle('A Problem Has Occurred');
         $this->setTemplateFiles(array("FatalError" => "FatalError.inc"));
-
         $this->template->set_var(
             array(
                 "errorMessage" => $errorMessage,
@@ -577,7 +554,7 @@ class Controller extends BaseObject
 
     function generateCallTrace()
     {
-        $e = new Exception();
+        $e     = new Exception();
         $trace = explode(
             "\n",
             $e->getTraceAsString()
@@ -588,7 +565,6 @@ class Controller extends BaseObject
         array_pop($trace); // remove call to this method
         $length = count($trace);
         $result = array();
-
         for ($i = 0; $i < $length; $i++) {
             $result[] = ($i + 1) . ')' . substr(
                     $trace[$i],
@@ -598,7 +574,6 @@ class Controller extends BaseObject
                     )
                 ); // replace '#someNum' with '$i)', set the right ordering
         }
-
         return "\t" . implode(
                 "\n\t",
                 $result
@@ -622,12 +597,10 @@ class Controller extends BaseObject
                 "pageHeader" => $this->pageHeader
             ]
         );
-
         $this->template->set_var(
             'environmentClass',
             "environment-" . $GLOBALS['server_type']
         );
-
         if ($this->getFormError()) {
             if ($this->getFormErrorMessage() != '') {
                 $this->template->set_var(
@@ -646,17 +619,17 @@ class Controller extends BaseObject
             "page"
         );
         if (SHOW_TIMINGS) {
-            $timeOfDay = gettimeofday();
-            $endTime = $timeOfDay["sec"] + ($timeOfDay["usec"] / 1000000);
+            $timeOfDay   = gettimeofday();
+            $endTime     = $timeOfDay["sec"] + ($timeOfDay["usec"] / 1000000);
             $executeTime = $endTime - $this->startTime;
-            $timeOfDay = gettimeofday();
-            $startTime = $timeOfDay["sec"] + ($timeOfDay["usec"] / 1000000);
+            $timeOfDay   = gettimeofday();
+            $startTime   = $timeOfDay["sec"] + ($timeOfDay["usec"] / 1000000);
         }
         $this->template->p("CONTENTS");
         if (SHOW_TIMINGS) {
             $timeOfDay = gettimeofday();
-            $endTime = $timeOfDay["sec"] + ($timeOfDay["usec"] / 1000000);
-            $pageTime = $endTime - $startTime;
+            $endTime   = $timeOfDay["sec"] + ($timeOfDay["usec"] / 1000000);
+            $pageTime  = $endTime - $startTime;
             echo "Time to excecute script: " . $executeTime . " seconds.<BR/>";
             echo "Time to return page: " . $pageTime . " seconds.<BR/>";
             echo "Total: " . ($executeTime + $pageTime) . " seconds.<BR/>";
@@ -670,12 +643,10 @@ class Controller extends BaseObject
 
     function setPageTitle($pageTitle, string $pageHeader = null)
     {
-        $this->pageTitle = explode('<', $pageTitle)[0];
-        $this->pageHeader = $pageTitle;
+        $this->pageTitle = $pageTitle;
         if ($pageHeader) {
             $this->pageHeader = $pageHeader;
         }
-
     }
 
     function getFormError()
@@ -757,27 +728,21 @@ class Controller extends BaseObject
             case CT_ACTION_INSERT:
                 $this->insert();
                 break;
-
             case CT_ACTION_DISPLAY_ADD:
                 $this->displayAddForm();
                 break;
-
             case CT_ACTION_DISPLAY_DELETE:
                 $this->displayDeleteForm();
                 break;
-
             case CT_ACTION_DELETE:
                 $this->delete();
                 break;
-
             case CT_ACTION_DISPLAY_EDIT:
                 $this->displayEditForm();
                 break;
-
             case CT_ACTION_UPDATE:
                 $this->update();
                 break;
-
             default:
                 try {
                     $this->defaultAction();
@@ -912,11 +877,9 @@ class Controller extends BaseObject
         if (!$paramName) {
             return null;
         }
-
         if (!isset($_SESSION[$paramName])) {
             return null;
         }
-
         return $_SESSION[$paramName];
     }
 
@@ -961,22 +924,17 @@ class Controller extends BaseObject
     {
         // Truncate if it will become longer than max allowed
         $totalNewLength = strlen($this->pageTitle) + strlen($newString) + 2;
-
         if ($totalNewLength > MAX_PAGE_TITLE) {
-            $this->pageTitle =
-                substr(
-                    $this->pageTitle,
-                    0,
-                    (strlen($this->pageTitle) - ($totalNewLength - MAX_PAGE_TITLE) - 3
-                    )
-                );
+            $this->pageTitle = substr(
+                $this->pageTitle,
+                0,
+                (strlen($this->pageTitle) - ($totalNewLength - MAX_PAGE_TITLE) - 3)
+            );
             $this->pageTitle = $this->pageTitle . "...";
         }
-
         if ($this->pageTitle != "") {
             $this->pageTitle = $this->pageTitle . "> ";
         }
-
         $this->pageTitle = $this->pageTitle . $newString;
     }
 
@@ -1009,7 +967,6 @@ class Controller extends BaseObject
                 $this->getHTMLPostVar($key);
             }
         }
-
         if (isset($this->getVars)) {
 
             while (list ($key, $val) = each($this->getVars)) {
@@ -1034,10 +991,7 @@ class Controller extends BaseObject
         )) {
 //			$this->displayFatalError("Method ".$methodName."() does not exist");
         } else {
-            $command =
-                "if(isset(\$this->getVars[\"" . $variableName . "\"]))" .
-                "\$this->" . $methodName .
-                "(stripslashes(\$this->getVars[\"" . $variableName . "\"]));";
+            $command = "if(isset(\$this->getVars[\"" . $variableName . "\"]))" . "\$this->" . $methodName . "(stripslashes(\$this->getVars[\"" . $variableName . "\"]));";
             eval($command);
         }
     }
@@ -1144,7 +1098,6 @@ class Controller extends BaseObject
         if (!$this->template) {
             throw new Exception('Please define a template first');
         }
-
         $this->template->setVar(
             'javaScript',
             "<script src='components/dist/$string?$version'></script>",
