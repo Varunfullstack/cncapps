@@ -32,6 +32,7 @@ export default class SupplierContactSelectorComponent extends React.PureComponen
             } else {
                 if (allowDefault) {
                     selectedOption = supplier.contacts?.find(x => x.id === supplier.mainSupplierContactId);
+                    onChange(selectedOption);
                 }
             }
         }

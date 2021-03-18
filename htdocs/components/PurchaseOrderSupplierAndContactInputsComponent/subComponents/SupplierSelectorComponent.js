@@ -3,6 +3,9 @@ import React from 'react';
 import {SupplierService} from "../../services/SupplierService";
 import PropTypes from 'prop-types';
 
+export const CHANGE_REASON = {
+    INITIALIZATION: 'INITIALIZATION'
+}
 
 export default class SupplierSelectorComponent extends React.PureComponent {
     static defaultProps = {
@@ -24,6 +27,7 @@ export default class SupplierSelectorComponent extends React.PureComponent {
         let selectedOption = null;
         if (supplierId) {
             selectedOption = suppliers.find(x => x.id === supplierId);
+            this.props.onChange(selectedOption, CHANGE_REASON.INITIALIZATION);
         }
         this.setState({suppliers: suppliers.sort((a, b) => a.name.localeCompare(b.name)), selectedOption});
     }
@@ -69,7 +73,7 @@ export default class SupplierSelectorComponent extends React.PureComponent {
 
         if (selectedOption) {
             return (
-                <div>
+                <div style={{display: 'inline-block'}}>
                 <span>
                     {this.getOptionText(selectedOption)}
                 </span>
@@ -117,7 +121,6 @@ export default class SupplierSelectorComponent extends React.PureComponent {
         );
     }
 }
-
 
 
 SupplierSelectorComponent.propTypes = {

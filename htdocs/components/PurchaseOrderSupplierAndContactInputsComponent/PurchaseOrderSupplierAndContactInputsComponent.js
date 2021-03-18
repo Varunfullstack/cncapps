@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from "react-dom";
 import '../style.css';
-import SupplierSelectorComponent from "./subComponents/SupplierSelectorComponent";
+import SupplierSelectorComponent, {CHANGE_REASON} from "./subComponents/SupplierSelectorComponent";
 import PropTypes from "prop-types";
 import SupplierContactSelectorComponent from "./subComponents/SupplierContactSelectorComponent";
 
@@ -21,13 +21,16 @@ export class PurchaseOrderSupplierAndContactInputsComponent extends React.PureCo
         this.supplierContactInput = document.getElementById(this.props.supplierContactIdInputId);
     }
 
-    onSupplierChange = (supplier) => {
+    onSupplierChange = (supplier, changeReason) => {
         if (!supplier) {
             return this.clearSupplier();
         }
-        if (supplier.id === this.state.supplierId) {
+
+        if (changeReason === CHANGE_REASON.INITIALIZATION) {
+            this.setState({selectedSupplier: supplier});
             return;
         }
+
         this.setSupplierValue(supplier);
     }
 
@@ -69,10 +72,10 @@ export class PurchaseOrderSupplierAndContactInputsComponent extends React.PureCo
             return '';
         }
         return (
-            <React.Fragment>
+            <div style={{verticalAlign: "middle", display: 'inline-block'}}>
                 <a href={`tel:${selectedSupplierContact.phone}`}
                    target="_blank"
-                   style={{marginRight:"4px"}}
+                   style={{marginRight: "4px"}}
                 >
                     <i className="fal fa-phone"/>
                 </a>
@@ -81,7 +84,7 @@ export class PurchaseOrderSupplierAndContactInputsComponent extends React.PureCo
                 >
                     <i className="fal fa-envelope"/>
                 </a>
-            </React.Fragment>
+            </div>
         )
     }
 
@@ -125,6 +128,7 @@ export class PurchaseOrderSupplierAndContactInputsComponent extends React.PureCo
         return (
             <a href={selectedSupplier.websiteURL}
                target="_blank"
+               style={{verticalAlign: "middle"}}
             >
                 <i className="fal fa-globe fa-2x"/>
             </a>
