@@ -24,7 +24,7 @@ import {LinkServiceRequestOrder} from "./LinkserviceRequestOrder.js";
 import {ActivityType} from "../../shared/ActivityTypes";
 import {InternalNotes} from "./InternalNotesComponent";
 import {TaskListComponent} from "./TaskListComponent";
-import AdditionalTimeRequestModal from "../../Modals/AdditionalTimeRequestModal";
+import AdditionalTimeRequestModal from "./Modals/AdditionalTimeRequestModal";
 
 // noinspection EqualityComparisonWithCoercionJS
 const hiddenAndCustomerNoteAlertMessage = `Customer note must be empty when the activity or entire SR is hidden.`;

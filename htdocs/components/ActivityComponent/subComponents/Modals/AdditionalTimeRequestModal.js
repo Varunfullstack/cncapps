@@ -1,6 +1,6 @@
-import Modal from "../shared/Modal/modal";
+import Modal from "../../../shared/Modal/modal";
 import React from 'react';
-import CNCCKEditor from "../shared/CNCCKEditor";
+import CNCCKEditor from "../../../shared/CNCCKEditor";
 import * as PropTypes from "prop-types";
 
 class AdditionalTimeRequestModal extends React.Component {

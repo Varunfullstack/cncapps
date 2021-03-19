@@ -210,6 +210,23 @@ class APIActivity extends APIMain {
             throw new Error(jsonResponse.message);
         }
     }
+
+    async getAdditionalChargeableWorkRequestInfo(id) {
+        const response = await fetch(`${ApiUrls.SRActivity}getAdditionalChargeableWorkRequestInfo&id=${id}`)
+        const jsonResponse = await response.json();
+        if (jsonResponse.status !== 'ok') {
+            throw new Error(jsonResponse.message);
+        }
+        return jsonResponse.data;
+    }
+
+    async cancelChargeableRequest(id) {
+        return this.post(`${ApiUrls.sdDashboard}cancelPendingChargeableRequest`, {id})
+    }
+
+    async resendChargeableRequestEmail(id) {
+        return this.post(`${ApiUrls.sdDashboard}resendPendingChargeableRequestEmail`, {id})
+    }
 }
 
 export default APIActivity;

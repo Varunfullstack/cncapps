@@ -71,6 +71,7 @@ class DBEProblem extends DBEntity
     const taskList                         = "taskList";
     const taskListUpdatedBy                = "taskListUpdatedBy";
     const taskListUpdatedAt                = "taskListUpdatedAt";
+    const prePayChargeApproved             = "prepayChargeApproved";
 
     /**
      * calls constructor()
@@ -446,6 +447,13 @@ class DBEProblem extends DBEntity
             self::taskListUpdatedAt,
             DA_DATETIME,
             DA_ALLOW_NULL,
+        );
+        $this->addColumn(
+            self::prePayChargeApproved,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            0
         );
         $this->setAddColumnsOff();
         $this->setPK(0);

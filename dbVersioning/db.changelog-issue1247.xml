@@ -38,4 +38,16 @@
             </column>
         </createTable>
     </changeSet>
+    <changeSet id="issue1247-2" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="problem" columnName="prepayChargeApproved"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="problem">
+            <column name="prepayChargeApproved" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

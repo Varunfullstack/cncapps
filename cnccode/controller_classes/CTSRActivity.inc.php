@@ -2,8 +2,11 @@
 global $cfg;
 
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestServiceRequestId;
+use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestTokenId;
 use CNCLTD\ChargeableWorkCustomerRequest\infra\ChargeableWorkCustomerRequestMySQLRepository;
 use CNCLTD\ChargeableWorkCustomerRequest\usecases\CreateChargeableWorkCustomerRequest;
+use CNCLTD\ChargeableWorkCustomerRequest\usecases\GetPendingToProcessChargeableRequestInfo;
+use CNCLTD\Exceptions\ChargeableWorkCustomerRequestNotFoundException;
 use CNCLTD\Exceptions\JsonHttpException;
 use CNCLTD\Exceptions\ServiceRequestNotFoundException;
 use CNCLTD\InternalDocuments\Base64FileDTO;
@@ -68,6 +71,7 @@ class CTSRActivity extends CTCNC
     const CHANGE_SERVICE_REQUEST_INTERNAL_NOTE                   = "changeServiceRequestInternalNote";
     const SAVE_TASK_LIST                                         = "saveTaskList";
     const ADD_ADDITIONAL_TIME_REQUEST                            = "addAdditionalTimeRequest";
+    const GET_ADDITIONAL_CHARGEABLE_WORK_REQUEST_INFO            = "getAdditionalChargeableWorkRequestInfo";
     public  $serverGuardArray = array(
         ""  => "Please select",
         "Y" => "ServerGuard Related",
@@ -214,6 +218,9 @@ class CTSRActivity extends CTCNC
             case "toggleHoldForQAFlag":
                 echo json_encode($this->setToggleHoldForQAFlag());
                 exit;
+            case self::GET_ADDITIONAL_CHARGEABLE_WORK_REQUEST_INFO:
+                echo json_encode($this->getAdditionalChargeableWorkRequestInfoController());
+                exit;
             case 'getLastActivityInServiceRequest':
                 $buActivity       = new BUActivity($this);
                 $serviceRequestId = $this->getParam('serviceRequestId');
@@ -357,12 +364,17 @@ class CTSRActivity extends CTCNC
                 return -1;
             }
         );
-        $chargeableWorkRequestRepo       = new ChargeableWorkCustomerRequestMySQLRepository();
-        $hasPendingChargeableWorkRequest = $chargeableWorkRequestRepo->getCountRequestsForServiceRequestId(
+        $chargeableWorkRequestRepo = new ChargeableWorkCustomerRequestMySQLRepository();
+        try {
+            $chargeableRequest   = $chargeableWorkRequestRepo->getChargeableRequestForServiceRequest(
                 new ChargeableWorkCustomerRequestServiceRequestId($problemID)
-            ) > 0;
-        $taskListUpdatedByUserId         = $dbeProblem->getValue(DBEProblem::taskListUpdatedBy);
-        $taskListUpdatedBy               = null;
+            );
+            $chargeableRequestId = $chargeableRequest->getId()->value();
+        } catch (Exception $exception) {
+            $chargeableRequestId = null;
+        }
+        $taskListUpdatedByUserId = $dbeProblem->getValue(DBEProblem::taskListUpdatedBy);
+        $taskListUpdatedBy       = null;
         if ($taskListUpdatedByUserId) {
             if (!key_exists($taskListUpdatedByUserId, $consultants)) {
                 $dbeUser = new DBEUser($this);
@@ -479,7 +491,7 @@ class CTSRActivity extends CTCNC
             "emptyAssetReason"                => $dbeProblem->getValue(DBEProblem::emptyAssetReason),
             "holdForQA"                       => $dbeProblem->getValue(DBEProblem::holdForQA),
             "isOnSiteActivity"                => $dbeActivityType->getValue(DBECallActType::onSiteFlag) == 'Y',
-            "hasPendingChargeableWorkRequest" => $hasPendingChargeableWorkRequest,
+            "chargeableWorkRequestId"         => $chargeableRequestId,
             "openHours"                       => $dbeProblem->getValue(DBEProblem::openHours),
             "workingHours"                    => $dbeProblem->getValue(DBEProblem::workingHours),
             "requestEngineerName"             => $requestName,
@@ -1163,6 +1175,7 @@ class CTSRActivity extends CTCNC
                 "linkedSalesOrderID"          => $callActivity->getValue(DBEJCallActivity::linkedSalesOrderID),
                 "problemHideFromCustomerFlag" => $callActivity->getValue(DBEJCallActivity::problemHideFromCustomerFlag),
                 "rootCauseID"                 => $callActivity->getValue(DBEJCallActivity::rootCauseID),
+                "prePayChargeApproved"        => $callActivity->getValue(DBEJCallActivity::prePayChargeApproved)
             ];
         } else return null;
     }
@@ -1627,6 +1640,23 @@ FROM
             throw new JsonHttpException(123, $exception->getMessage());
         }
         return ["status" => "ok"];
+    }
+
+    /**
+     * @return array
+     * @throws ServiceRequestNotFoundException
+     * @throws ChargeableWorkCustomerRequestNotFoundException
+     */
+    private function getAdditionalChargeableWorkRequestInfoController(): array
+    {
+        $chargeableWorkRequestId = @$_REQUEST['id'];
+        $repo                    = new ChargeableWorkCustomerRequestMySQLRepository();
+        $usecase                 = new GetPendingToProcessChargeableRequestInfo($repo);
+        $data                    = $usecase(new ChargeableWorkCustomerRequestTokenId($chargeableWorkRequestId));
+        return [
+            "status" => "ok",
+            "data"   => $data
+        ];
     }
 }
 

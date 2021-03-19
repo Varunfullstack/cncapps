@@ -43,13 +43,17 @@ class GetPendingToProcessChargeableRequestInfo
         if (!$dbeProblem->getRow($serviceRequestId)) {
             throw new ServiceRequestNotFoundException();
         }
+        $dbeUser = new \DBEUser($this);
+        $dbeUser->getRow($request->getRequesterId()->value());
         return new PendingToProcessChargeableRequestInfoDTO(
             $id->value(),
             $serviceRequestId,
             $dbeProblem->getValue(DBEProblem::emailSubjectSummary),
             $dbeProblem->getValue(DBEJProblem::contactName),
             $request->getAdditionalHoursRequested()->value(),
-            $request->getReason()->value()
+            $request->getReason()->value(),
+            "{$dbeUser->getValue(\DBEUser::firstName)} {$dbeUser->getValue(\DBEUser::lastName)}",
+            $request->getCreatedAt()->format(DATE_MYSQL_DATETIME)
         );
     }
 }

@@ -9,6 +9,8 @@
  */
 
 use CNCLTD\AutomatedRequest;
+use CNCLTD\ChargeableWorkCustomerRequest\infra\ChargeableWorkCustomerRequestMySQLRepository;
+use CNCLTD\ChargeableWorkCustomerRequest\usecases\ClearPendingChargeableRequestsOnServiceRequestClosed;
 use CNCLTD\ServiceRequestInternalNote\infra\ServiceRequestInternalNotePDORepository;
 use CNCLTD\ServiceRequestInternalNote\ServiceRequestInternalNote;
 use CNCLTD\ServiceRequestInternalNote\UseCases\AddServiceRequestInternalNote;
@@ -3863,6 +3865,8 @@ class BUActivity extends Business
             DBEJProblem::awaitingCustomerResponseFlag,
             'N'
         );
+
+
         /** @var $db dbSweetcode */ global $db;
         $statement = $db->preparedQuery(
             'select getOpenHours(?)',
@@ -3873,6 +3877,13 @@ class BUActivity extends Business
             $statement->fetch_array(MYSQLI_NUM)[0]
         );
         $dbeProblem->updateRow();
+
+        // we have to check if there were any pending Chargeable Work Requests, and we have to remove them if that's true
+
+        $repo = new ChargeableWorkCustomerRequestMySQLRepository();
+        $usecase = new ClearPendingChargeableRequestsOnServiceRequestClosed($repo);
+        $usecase($dbeProblem);
+
         return $newActivityID;
 
     }

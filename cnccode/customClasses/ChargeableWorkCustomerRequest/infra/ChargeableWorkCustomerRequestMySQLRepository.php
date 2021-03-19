@@ -6,6 +6,7 @@ use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequest;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestRepository;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestServiceRequestId;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestTokenId;
+use CNCLTD\Exceptions\AdditionalHoursRequestedInvalidValueException;
 use CNCLTD\Exceptions\ChargeableWorkCustomerRequestForServiceRequestAlreadyExists;
 use CNCLTD\Exceptions\ChargeableWorkCustomerRequestNotFoundException;
 use dbSweetcode;
@@ -127,7 +128,7 @@ class ChargeableWorkCustomerRequestMySQLRepository implements ChargeableWorkCust
         );
     }
 
-    public function getCountRequestsForServiceRequestId(ChargeableWorkCustomerRequestServiceRequestId $param)
+    public function getCountRequestsForServiceRequestId(ChargeableWorkCustomerRequestServiceRequestId $serviceRequestId)
     {
         $query     = "select count(*) > 0 from {$this->tableName} where serviceRequestId = ?";
         $statement = $this->dbInstance->preparedQuery(
@@ -135,7 +136,7 @@ class ChargeableWorkCustomerRequestMySQLRepository implements ChargeableWorkCust
             [
                 [
                     "type"  => "i",
-                    "value" => $param->value()
+                    "value" => $serviceRequestId->value()
                 ]
             ]
         );
@@ -154,5 +155,47 @@ class ChargeableWorkCustomerRequestMySQLRepository implements ChargeableWorkCust
         }
     }
 
+    /**
+     * @param ChargeableWorkCustomerRequestServiceRequestId $serviceRequestId
+     * @return ChargeableWorkCustomerRequest
+     * @throws ChargeableWorkCustomerRequestNotFoundException
+     * @throws AdditionalHoursRequestedInvalidValueException
+     * @throws Exception
+     */
+    public function getChargeableRequestForServiceRequest(ChargeableWorkCustomerRequestServiceRequestId $serviceRequestId
+    ): ChargeableWorkCustomerRequest
+    {
+        $query     = "select * from {$this->tableName} where serviceRequestId = ?";
+        $statement = $this->dbInstance->preparedQuery(
+            $query,
+            [
+                [
+                    "type"  => "i",
+                    "value" => $serviceRequestId->value()
+                ]
+            ]
+        );
+        /** @var ChargeableWorkCustomerRequestMySQLDTO $dto */
+        $dto = $statement->fetch_object(ChargeableWorkCustomerRequestMySQLDTO::class);
+        if (!$dto) {
+            throw new ChargeableWorkCustomerRequestNotFoundException();
+        }
+        return ChargeableWorkCustomerRequest::fromMySQLDTO($dto);
+    }
 
+
+    public function deleteChargeableRequestsForServiceRequest(ChargeableWorkCustomerRequestServiceRequestId $serviceRequestId
+    )
+    {
+        $query = "delete from {$this->tableName} where serviceRequestId = ?";
+        $this->dbInstance->preparedQuery(
+            $query,
+            [
+                [
+                    "type"  => "i",
+                    "value" => $serviceRequestId->value()
+                ]
+            ]
+        );
+    }
 }

@@ -38,6 +38,7 @@ export default class PendingChargeableRequestsComponent extends MainComponent {
             });
     }
 
+
     getDataTable = () => {
         const {items} = this.state;
         const columns = [
@@ -47,21 +48,20 @@ export default class PendingChargeableRequestsComponent extends MainComponent {
                 hdToolTip: "Service Request",
                 hdClassName: "text-center",
                 icon: "fal fa-2x fa-hashtag color-gray2 pointer",
-                sortable: true,
+                sortable: false,
                 className: "text-center",
                 content: (item) =>
                     <a href={`SRActivity.php?action=displayActivity&serviceRequestId=${item.serviceRequestId}`}
                        target="_blank"
                     >{item.serviceRequestId}</a>
             },
-
             {
                 path: "customerName",
                 label: "",
                 hdToolTip: "Customer",
                 hdClassName: "text-center",
                 icon: "fal fa-2x fa-building color-gray2 pointer",
-                sortable: true,
+                sortable: false,
             },
             {
                 path: "requesteeName",
@@ -69,7 +69,7 @@ export default class PendingChargeableRequestsComponent extends MainComponent {
                 hdToolTip: "Contact",
                 hdClassName: "text-center",
                 icon: "fal fa-2x fa-id-card-alt color-gray2 pointer",
-                sortable: true,
+                sortable: false,
             },
             {
                 path: "emailSubjectSummary",
@@ -77,7 +77,7 @@ export default class PendingChargeableRequestsComponent extends MainComponent {
                 hdToolTip: "SR Description",
                 hdClassName: "text-center",
                 icon: "fal fa-2x fa-file-alt color-gray2 pointer",
-                sortable: true,
+                sortable: false,
                 className: "text-center",
             },
             {
@@ -86,7 +86,7 @@ export default class PendingChargeableRequestsComponent extends MainComponent {
                 hdToolTip: "Request Reason",
                 hdClassName: "text-center",
                 icon: "fal fa-2x fa-file-alt color-gray2 pointer",
-                sortable: true,
+                sortable: false,
                 content: (item) => <div dangerouslySetInnerHTML={{__html: item.reason}}/>,
                 className: "text-center",
             },
@@ -96,7 +96,7 @@ export default class PendingChargeableRequestsComponent extends MainComponent {
                 hdToolTip: "Requested At",
                 hdClassName: "text-center",
                 icon: "fal fa-2x fa-monitor-heart-rate color-gray2 pointer",
-                sortable: true,
+                sortable: false,
                 content: (item) =>
                     <div>
                         {moment(item.createdAt).format('DD/MM/YYYY HH:mm:ss')}
@@ -110,7 +110,7 @@ export default class PendingChargeableRequestsComponent extends MainComponent {
                 hdToolTip: "Hours Requested",
                 hdClassName: "text-center",
                 icon: "fal fa-2x fa-hourglass  color-gray2 pointer",
-                sortable: true,
+                sortable: false,
                 className: "text-center",
             },
             {
@@ -119,7 +119,7 @@ export default class PendingChargeableRequestsComponent extends MainComponent {
                 hdToolTip: "Requested By",
                 hdClassName: "text-center",
                 icon: "fal fa-2x fa-user-hard-hat color-gray2 pointer",
-                sortable: true,
+                sortable: false,
 
             },
             {

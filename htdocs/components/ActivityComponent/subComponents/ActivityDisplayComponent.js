@@ -16,7 +16,8 @@ import moment from "moment";
 import {InternalNotesListComponent} from "../../shared/InternalNotesListComponent/InternalNotesListComponent";
 import {InternalNotes} from "./InternalNotesComponent";
 import {TaskListComponent} from "./TaskListComponent";
-import AdditionalTimeRequestModal from "../../Modals/AdditionalTimeRequestModal";
+import AdditionalChargeRequestModal from "./Modals/AdditionalTimeRequestModal";
+import ExistingAdditionalChargeableWorkRequestModal from "./Modals/ExistingAdditionalChargeableWorkRequestModal";
 
 // noinspection EqualityComparisonWithCoercionJS
 const emptyAssetReasonCharactersToShow = 30;
@@ -409,7 +410,7 @@ class ActivityDisplayComponent extends MainComponent {
         let title = "Additional Charges";
         let icon = "fa-envelope-open-dollar";
         let handler = this.handleRequestCustomerApproval;
-        if (data.hasPendingChargeableWorkRequest) {
+        if (data.chargeableWorkRequestId) {
             title = "Chargeable request in process";
             icon = "fa-hands-usd";
             handler = this.handleCurrentChargeableWorkRequest
@@ -447,7 +448,11 @@ class ActivityDisplayComponent extends MainComponent {
         }
     }
     handleCurrentChargeableWorkRequest = async () => {
-        
+        const shouldReload = await this.showAdditionalTimeRequestModal();
+        if (shouldReload) {
+            const {currentActivity} = this.state;
+            await this.loadCallActivity(currentActivity);
+        }
     }
 
     shouldShowExpenses(data, currentUser) {
@@ -1177,15 +1182,37 @@ class ActivityDisplayComponent extends MainComponent {
         this.setState({showAdditionalTimeRequestModal: false})
     }
 
+    getAdditionalChargeModal = () => {
+        const {data, showAdditionalTimeRequestModal} = this.state;
+
+        if (!data || !showAdditionalTimeRequestModal) {
+            return '';
+        }
+        console.log('render something');
+        if (data.chargeableWorkRequestId) {
+            return (
+                <ExistingAdditionalChargeableWorkRequestModal
+                    key="existingAdditionalChargeRequest"
+                    chargeableWorkRequestId={data.chargeableWorkRequestId}
+                    show={showAdditionalTimeRequestModal}
+                    onClose={this.handleExistingAdditionalChargeableWorkRequestModalOnClose}
+                />
+            )
+        }
+        return (
+            <AdditionalChargeRequestModal key="additionalTimeRequestModal"
+                                          show={showAdditionalTimeRequestModal}
+                                          onChange={this.handleAdditionalTimeRequestModalOnChange}
+                                          onCancel={this.handleAdditionalTimeRequestModalOnCancel}
+            />
+        )
+    }
+
     render() {
-        const {data, showSalesOrder, showAdditionalTimeRequestModal} = this.state;
+        const {data, showSalesOrder} = this.state;
         return (
             <div style={{width: "90%"}}>
-                <AdditionalTimeRequestModal key="additionalTimeRequestModal"
-                                            show={showAdditionalTimeRequestModal}
-                                            onChange={this.handleAdditionalTimeRequestModalOnChange}
-                                            onCancel={this.handleAdditionalTimeRequestModalOnCancel}
-                />
+                {this.getAdditionalChargeModal()}
                 {this.getAlert()}
                 {this.getConfirm()}
                 {this.getPrompt()}
@@ -1230,6 +1257,12 @@ class ActivityDisplayComponent extends MainComponent {
     handleAdditionalTimeRequestModalOnCancel = () => {
         if (this.additionalTimeRequestReject) {
             this.additionalTimeRequestReject();
+        }
+        this.hideAdditionalTimeRequestModal();
+    };
+    handleExistingAdditionalChargeableWorkRequestModalOnClose = (closingValue) => {
+        if (this.additionalTimeRequestResolve) {
+            this.additionalTimeRequestResolve(closingValue);
         }
         this.hideAdditionalTimeRequestModal();
     };

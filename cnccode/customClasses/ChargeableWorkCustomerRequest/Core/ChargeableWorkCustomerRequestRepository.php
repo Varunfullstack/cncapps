@@ -10,4 +10,13 @@ interface ChargeableWorkCustomerRequestRepository
     public function save(ChargeableWorkCustomerRequest $chargeableWorkCustomerRequest);
 
     public function delete(ChargeableWorkCustomerRequest $request);
+
+    public function getCountRequestsForServiceRequestId(ChargeableWorkCustomerRequestServiceRequestId $serviceRequestId
+    );
+
+    public function getChargeableRequestForServiceRequest(ChargeableWorkCustomerRequestServiceRequestId $serviceRequestId
+    ): ChargeableWorkCustomerRequest;
+
+    public function deleteChargeableRequestsForServiceRequest(ChargeableWorkCustomerRequestServiceRequestId $serviceRequestId
+    );
 }

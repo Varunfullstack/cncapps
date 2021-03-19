@@ -59,9 +59,13 @@ class AcceptPendingChargeableWorkCustomerRequest
         $request           = $this->getRequest($id);
         $serviceRequest    = $this->getServiceRequest($request);
         $requestApprovedAt = new DateTimeImmutable();
-        $this->logCustomerContactActivity($request, $requestApprovedAt, $serviceRequest, $comments);
-        $this->createOrUpdateSalesOrder($serviceRequest, $request);
-        $this->updateServiceRequest($serviceRequest, $request);
+        $buCustomer        = new \BUCustomer($this);
+        $hasPrepay         = $buCustomer->hasPrepayContract($serviceRequest->getValue(DBEProblem::customerID));
+        $this->logCustomerContactActivity($request, $requestApprovedAt, $serviceRequest, $comments, $hasPrepay);
+        if (!$hasPrepay) {
+            $this->createOrUpdateSalesOrder($serviceRequest, $request);
+        }
+        $this->updateServiceRequest($serviceRequest, $request, $hasPrepay);
         $this->sendEmailToEngineer($request);
         $this->deleteChargeableRequest($request);
     }
@@ -114,11 +118,13 @@ class AcceptPendingChargeableWorkCustomerRequest
      * @param DateTimeInterface|null $requestApprovedAt
      * @param DBEProblem $serviceRequest
      * @param string|null $comments
+     * @param bool $hasPrepay
      */
     private function logCustomerContactActivity(ChargeableWorkCustomerRequest $request,
                                                 ?DateTimeInterface $requestApprovedAt,
                                                 DBEProblem $serviceRequest,
-                                                ?string $comments
+                                                ?string $comments,
+                                                bool $hasPrepay
     ): void
     {
         $requestee   = $this->getRequestee($request);
@@ -126,6 +132,9 @@ class AcceptPendingChargeableWorkCustomerRequest
         $description = "<p>{$requestee->getValue(DBEContact::firstName)} {$requestee->getValue(DBEContact::lastName)} approved the request for {$request->getAdditionalHoursRequested()->value()} hours at {$requestApprovedAt->format('d/m/Y H:i:s')}</p>";
         if ($comments) {
             $description .= "<p>$comments</p>";
+        }
+        if (!$hasPrepay) {
+            $description .= "<p>Priority Changed from {$serviceRequest->getValue(DBEProblem::priority)} to 5</p>";
         }
         $requester = $this->getRequester($request);
         $buActivity->addCustomerContactActivityToServiceRequest($serviceRequest, $description, $requester);
@@ -280,12 +289,31 @@ class AcceptPendingChargeableWorkCustomerRequest
     /**
      * @param DBEJProblem $dbeProblem
      * @param ChargeableWorkCustomerRequest $request
+     * @param bool $hasPrepay
      */
-    private function updateServiceRequest(DBEJProblem $dbeProblem, ChargeableWorkCustomerRequest $request): void
+    private function updateServiceRequest(DBEJProblem $dbeProblem,
+                                          ChargeableWorkCustomerRequest $request,
+                                          bool $hasPrepay
+    ): void
     {
-        $toUpdateProblem = new DBEProblem($this);
-        $toUpdateProblem->getRow($dbeProblem->getValue(DBEProblem::problemID));
-        $toUpdateProblem->setValue(DBEProblem::priority, 5);
+        $toUpdateProblem  = new DBEProblem($this);
+        $serviceRequestId = $dbeProblem->getValue(DBEProblem::problemID);
+        $toUpdateProblem->getRow($serviceRequestId);
+        if (!$hasPrepay) {
+            $toUpdateProblem->setValue(DBEProblem::priority, 5);
+        } else {
+            $toUpdateProblem->setValue(DBEProblem::prePayChargeApproved, 1);
+            $buCustomer       = new \BUCustomerItem($this);
+            $datasetContracts = new DataSet($this);
+            $buCustomer->getPrepayContractByCustomerID(
+                $dbeProblem->getValue(DBEProblem::customerID),
+                $datasetContracts
+            );
+            $toUpdateProblem->setValue(
+                DBEProblem::contractCustomerItemID,
+                $datasetContracts->getValue(\DBEJContract::customerItemID)
+            );
+        }
         $requesterId = $request->getRequesterId()->value();
         $dbeUser     = new DBEJUser($this);
         $dbeUser->setValue(DBEUser::userID, $requesterId);

@@ -18,6 +18,12 @@ class PendingToProcessChargeableRequestInfoDTO implements JsonSerializable
     public $additionalTimeRequested;
     /** @var string */
     public $reason;
+    /** @var string */
+    private $requesterFullName;
+    /**
+     * @var string
+     */
+    private $requestedAt;
 
     /**
      * PendingToProcessChargeableRequestInfoDTO constructor.
@@ -27,13 +33,17 @@ class PendingToProcessChargeableRequestInfoDTO implements JsonSerializable
      * @param string $contactName
      * @param int $additionalTimeRequested
      * @param string $reason
+     * @param string $requesterFullName
+     * @param string $requestedAt
      */
     public function __construct(string $tokenId,
                                 int $serviceRequestId,
                                 string $serviceRequestEmailSummarySubject,
                                 string $contactName,
                                 int $additionalTimeRequested,
-                                string $reason
+                                string $reason,
+                                string $requesterFullName,
+                                string $requestedAt
     )
     {
         $this->tokenId                           = $tokenId;
@@ -42,6 +52,8 @@ class PendingToProcessChargeableRequestInfoDTO implements JsonSerializable
         $this->contactName                       = $contactName;
         $this->additionalTimeRequested           = $additionalTimeRequested;
         $this->reason                            = $reason;
+        $this->requesterFullName                 = $requesterFullName;
+        $this->requestedAt                       = $requestedAt;
     }
 
 
