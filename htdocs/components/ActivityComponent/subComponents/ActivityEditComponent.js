@@ -24,6 +24,7 @@ import {LinkServiceRequestOrder} from "./LinkserviceRequestOrder.js";
 import {ActivityType} from "../../shared/ActivityTypes";
 import {InternalNotes} from "./InternalNotesComponent";
 import {TaskListComponent} from "./TaskListComponent";
+import AdditionalTimeRequestModal from "../../Modals/AdditionalTimeRequestModal";
 
 // noinspection EqualityComparisonWithCoercionJS
 const hiddenAndCustomerNoteAlertMessage = `Customer note must be empty when the activity or entire SR is hidden.`;
@@ -44,6 +45,9 @@ class ActivityEditComponent extends MainComponent {
         Update: "Update"
     };
 
+    additionalTimeRequestResolve;
+    additionalTimeRequestReject;
+
     constructor(props) {
         super(props);
         this.state = {
@@ -59,6 +63,7 @@ class ActivityEditComponent extends MainComponent {
             originalContact: null,
             currentUser: null,
             allowLeaving: false,
+            showAdditionalTimeRequestModal: false,
             data: {
                 curValue: "",
                 documents: [],
@@ -560,9 +565,54 @@ class ActivityEditComponent extends MainComponent {
                         hideSeconds: true,
                         hideMinutesTitle: true
                     })
-                }) : null
+                }) : null,
+            this.renderChargeableWorkIcon()
         );
     };
+
+    renderChargeableWorkIcon = () => {
+        const {data} = this.state;
+        if (!data) {
+            return '';
+        }
+        let title = "Request Customer Approval";
+        let icon = "fa-envelope-open-dollar";
+        if (data.hasPendingChargeableWorkRequest) {
+            title = "Chargeable request in process";
+            icon = "fa-hands-usd";
+        }
+        return (
+            <ToolTip title={title}
+                     content={<a className={`fal ${icon}  fa-2x m-5 pointer icon`}
+                                 onClick={this.handleRequestCustomerApproval}
+                     />}
+            />
+        )
+    }
+
+    showAdditionalTimeRequestModal = async () => {
+        return new Promise((resolve, reject) => {
+            this.setState({showAdditionalTimeRequestModal: true});
+            this.additionalTimeRequestResolve = resolve;
+            this.additionalTimeRequestReject = reject;
+        })
+    }
+
+    handleRequestCustomerApproval = async () => {
+        const {problemID: serviceRequestId} = this.state.data;
+        try {
+            const {reason, timeRequested} = await this.showAdditionalTimeRequestModal();
+            try {
+                await this.api.addAdditionalTimeRequest(serviceRequestId, reason, timeRequested);
+                const {currentActivity} = this.state;
+                await this.loadCallActivity(currentActivity);
+            } catch (error) {
+                this.alert(error);
+            }
+        } catch (rejectedPromise) {
+
+        }
+    }
 
     getEmptyAction() {
         return this.el("div", {style: {width: 20}});
@@ -1785,10 +1835,27 @@ class ActivityEditComponent extends MainComponent {
         this.loadCallActivity(this.state.currentActivity);
     }
 
+    handleAdditionalTimeRequestModalOnChange = (data) => {
+        if (this.additionalTimeRequestResolve) {
+            this.additionalTimeRequestResolve(data);
+        }
+        this.hideAdditionalTimeRequestModal();
+        this.alert('Request Sent');
+    }
+
+    hideAdditionalTimeRequestModal = () => {
+        this.setState({showAdditionalTimeRequestModal: false})
+    }
+
     render() {
-        const {data, showSalesOrder} = this.state;
+        const {data, showSalesOrder, showAdditionalTimeRequestModal} = this.state;
         return (
             <div style={{width: "90%"}}>
+                <AdditionalTimeRequestModal key="additionalTimeRequestModal"
+                                            show={showAdditionalTimeRequestModal}
+                                            onChange={this.handleAdditionalTimeRequestModalOnChange}
+                                            onCancel={this.handleAdditionalTimeRequestModalOnCancel}
+                />
                 {this.getAlert()}
                 {this.getConfirm()}
                 {this.getPrompt()}
@@ -1821,10 +1888,17 @@ class ActivityEditComponent extends MainComponent {
                                                            customerId={data?.customerId}
                                                            show={showSalesOrder}
                                                            onClose={this.handleSalesOrderClose}
-                ></LinkServiceRequestOrder> : null}
+                /> : null}
             </div>
         );
     }
+
+    handleAdditionalTimeRequestModalOnCancel = () => {
+        if (this.additionalTimeRequestReject) {
+            this.additionalTimeRequestReject();
+        }
+        this.hideAdditionalTimeRequestModal();
+    };
 }
 
 export default ActivityEditComponent;

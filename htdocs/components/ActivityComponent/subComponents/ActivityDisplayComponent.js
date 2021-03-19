@@ -1165,6 +1165,7 @@ class ActivityDisplayComponent extends MainComponent {
             this.additionalTimeRequestResolve(data);
         }
         this.hideAdditionalTimeRequestModal();
+        this.alert('Request Sent');
     }
 
     hideAdditionalTimeRequestModal = () => {
