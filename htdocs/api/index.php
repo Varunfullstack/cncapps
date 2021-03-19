@@ -2,8 +2,8 @@
 
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestTokenId;
 use CNCLTD\ChargeableWorkCustomerRequest\infra\ChargeableWorkCustomerRequestMySQLRepository;
-use CNCLTD\ChargeableWorkCustomerRequest\usecases\ApprovePendingChargeableWorkCustomerRequest;
-use CNCLTD\ChargeableWorkCustomerRequest\usecases\DenyPendingChargeableWorkCustomerRequest;
+use CNCLTD\ChargeableWorkCustomerRequest\usecases\AcceptPendingChargeableWorkCustomerRequest;
+use CNCLTD\ChargeableWorkCustomerRequest\usecases\RejectPendingChargeableWorkCustomerRequest;
 use CNCLTD\ChargeableWorkCustomerRequest\usecases\GetPendingToProcessChargeableRequestInfo;
 use CNCLTD\CustomerFeedback;
 use CNCLTD\CustomerFeedbackRepository;
@@ -762,7 +762,7 @@ WHERE
                     $response->getBody()->write(
                         json_encode(["status" => "ok", "data" => $info])
                     );
-                    return $response->withStatus(400);
+                    return $response->withStatus(200);
 
                 } catch (ChargeableWorkCustomerRequestNotFoundException $exception) {
 
@@ -775,7 +775,7 @@ WHERE
             }
         );
         $group->post(
-            '/pendingChargeableWorkCustomerRequest/{tokenId}/approve',
+            '/pendingChargeableWorkCustomerRequest/{tokenId}/accept',
             function (Request $request, Response $response, $args) {
                 $tokenId = $args['tokenId'];
                 if (!$tokenId) {
@@ -785,7 +785,7 @@ WHERE
                     return $response->withStatus(400);
                 }
                 $chargeableRequestRepo = new ChargeableWorkCustomerRequestMySQLRepository();
-                $usecase               = new ApprovePendingChargeableWorkCustomerRequest($chargeableRequestRepo);
+                $usecase               = new AcceptPendingChargeableWorkCustomerRequest($chargeableRequestRepo);
                 $requestData           = $request->getParsedBody();
                 $comments              = @$requestData['comments'];
                 try {
@@ -805,7 +805,7 @@ WHERE
             }
         );
         $group->post(
-            '/pendingChargeableWorkCustomerRequest/{tokenId}/deny',
+            '/pendingChargeableWorkCustomerRequest/{tokenId}/reject',
             function (Request $request, Response $response, $args) {
                 $tokenId = $args['tokenId'];
                 if (!$tokenId) {
@@ -815,7 +815,7 @@ WHERE
                     return $response->withStatus(400);
                 }
                 $chargeableRequestRepo = new ChargeableWorkCustomerRequestMySQLRepository();
-                $usecase               = new DenyPendingChargeableWorkCustomerRequest($chargeableRequestRepo);
+                $usecase               = new RejectPendingChargeableWorkCustomerRequest($chargeableRequestRepo);
                 $requestData           = $request->getParsedBody();
                 $comments              = $requestData['comments'];
                 try {

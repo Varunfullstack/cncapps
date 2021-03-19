@@ -30,7 +30,7 @@ use DBEUser;
 global $cfg;
 require_once($cfg["path_bu"] . "/BUActivity.inc.php");
 
-class ApprovePendingChargeableWorkCustomerRequest
+class AcceptPendingChargeableWorkCustomerRequest
 {
     /**
      * @var ChargeableWorkCustomerRequestRepository
@@ -337,7 +337,7 @@ class ApprovePendingChargeableWorkCustomerRequest
 
     private function sendEmailToEngineer(ChargeableWorkCustomerRequest $request)
     {
-        CommunicationService::sendExtraChargeableWorkRequestApprovedEmail($request);
+        CommunicationService::sendExtraChargeableWorkRequestAcceptedEmail($request);
     }
 
     private function deleteChargeableRequest(ChargeableWorkCustomerRequest $request)

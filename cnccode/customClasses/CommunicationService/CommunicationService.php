@@ -61,18 +61,18 @@ class CommunicationService
         );
     }
 
-    public static function sendExtraChargeableWorkRequestApprovedEmail(ChargeableWorkCustomerRequest $request)
+    public static function sendExtraChargeableWorkRequestAcceptedEmail(ChargeableWorkCustomerRequest $request)
     {
         self::sendExtraChargeableWorkRequestProcessedEmail($request);
     }
 
-    public static function sendExtraChargeableWorkRequestDeniedEmail(ChargeableWorkCustomerRequest $request)
+    public static function sendExtraChargeableWorkRequestRejectedEmail(ChargeableWorkCustomerRequest $request)
     {
-        self::sendExtraChargeableWorkRequestProcessedEmail($request, 'denied');
+        self::sendExtraChargeableWorkRequestProcessedEmail($request, 'rejected');
     }
 
     private static function sendExtraChargeableWorkRequestProcessedEmail(ChargeableWorkCustomerRequest $request,
-                                                                         $status = "approved"
+                                                                         $status = "accepted"
     )
     {
         global $twig;

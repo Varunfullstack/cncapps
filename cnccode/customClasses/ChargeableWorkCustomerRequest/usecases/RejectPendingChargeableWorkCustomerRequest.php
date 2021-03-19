@@ -19,7 +19,7 @@ use DBEUser;
 global $cfg;
 require_once($cfg["path_bu"] . "/BUActivity.inc.php");
 
-class DenyPendingChargeableWorkCustomerRequest
+class RejectPendingChargeableWorkCustomerRequest
 {
     /**
      * @var ChargeableWorkCustomerRequestRepository
@@ -29,7 +29,7 @@ class DenyPendingChargeableWorkCustomerRequest
     private $requester;
 
     /**
-     * ApprovePendingChargeableWorkCustomerRequest constructor.
+     * RejectPendingChargeableWorkCustomerRequest constructor.
      * @param ChargeableWorkCustomerRequestRepository $repository
      */
     public function __construct(ChargeableWorkCustomerRequestRepository $repository)
@@ -111,7 +111,7 @@ class DenyPendingChargeableWorkCustomerRequest
     {
         $requestee   = $this->getRequestee($request);
         $buActivity  = new BUActivity($this);
-        $description = "<p>{$requestee->getValue(DBEContact::firstName)} {$requestee->getValue(DBEContact::lastName)} denied the request for {$request->getAdditionalHoursRequested()->value()} hours at {$requestApprovedAt->format('d/m/Y H:i:s')}</p>";
+        $description = "<p>{$requestee->getValue(DBEContact::firstName)} {$requestee->getValue(DBEContact::lastName)} rejected the request for {$request->getAdditionalHoursRequested()->value()} hours at {$requestApprovedAt->format('d/m/Y H:i:s')}</p>";
         if ($comments) {
             $description .= "<p>$comments</p>";
         }
@@ -142,7 +142,7 @@ class DenyPendingChargeableWorkCustomerRequest
 
     private function sendEmailToEngineer(ChargeableWorkCustomerRequest $request)
     {
-        CommunicationService::sendExtraChargeableWorkRequestDeniedEmail($request);
+        CommunicationService::sendExtraChargeableWorkRequestRejectedEmail($request);
     }
 
     private function deleteChargeableRequest(ChargeableWorkCustomerRequest $request)
