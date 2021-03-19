@@ -3,8 +3,8 @@
 namespace CNCLTD\TwigDTOs;
 class ChargeableWorkCustomerRequestEmailDTO
 {
-    public $approvalURL;
-    public $denialURL;
+    public $acceptURL;
+    public $rejectURL;
     public $extraTimeRequested;
     public $requesteeFirstName;
     public $serviceRequestId;
@@ -33,8 +33,8 @@ class ChargeableWorkCustomerRequestEmailDTO
                                 $hourlyRate
     )
     {
-        $this->approvalURL        = $acceptURL;
-        $this->denialURL          = $rejectURL;
+        $this->acceptURL          = $acceptURL;
+        $this->rejectURL          = $rejectURL;
         $this->extraTimeRequested = $extraTimeRequested;
         $this->requesteeFirstName = $requesteeFirstName;
         $this->serviceRequestId   = $serviceRequestId;
