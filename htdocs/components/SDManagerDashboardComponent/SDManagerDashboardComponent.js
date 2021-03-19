@@ -69,7 +69,7 @@ class SDManagerDashboardComponent extends MainComponent {
             {id: HELD_FOR_QA_TAB, title: "Held for QA", icon: null},
             {id: DAILY_STATS_TAB, title: "Daily Stats", icon: null},
             {id: TAB_MISSED_CALL_BACKS, title: "Call Backs", icon: null},
-            {id: PENDING_CHARGEABLE_WORK_REQUESTS_TAB, title: 'Pending Chargeable Work Requests', icon: null}
+            {id: PENDING_CHARGEABLE_WORK_REQUESTS_TAB, title: 'Pending Chargeable Work', icon: null}
         ];
     }
 

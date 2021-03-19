@@ -406,16 +406,18 @@ class ActivityDisplayComponent extends MainComponent {
         if (!data) {
             return '';
         }
-        let title = "Request Customer Approval";
+        let title = "Additional Charges";
         let icon = "fa-envelope-open-dollar";
+        let handler = this.handleRequestCustomerApproval;
         if (data.hasPendingChargeableWorkRequest) {
             title = "Chargeable request in process";
             icon = "fa-hands-usd";
+            handler = this.handleCurrentChargeableWorkRequest
         }
         return (
             <ToolTip title={title}
                      content={<a className={`fal ${icon}  fa-2x m-5 pointer icon`}
-                                 onClick={this.handleRequestCustomerApproval}
+                                 onClick={handler}
                      />}
             />
         )
@@ -443,6 +445,9 @@ class ActivityDisplayComponent extends MainComponent {
         } catch (rejectedPromise) {
 
         }
+    }
+    handleCurrentChargeableWorkRequest = async () => {
+        
     }
 
     shouldShowExpenses(data, currentUser) {

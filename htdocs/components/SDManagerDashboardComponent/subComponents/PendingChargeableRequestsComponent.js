@@ -185,7 +185,7 @@ export default class PendingChargeableRequestsComponent extends MainComponent {
                 return;
             }
             await this.api.resendChargeableRequestEmail(id);
-            await this.alert('The request email has been queued to be sent');
+            await this.alert('The email has been sent');
         }
     }
 

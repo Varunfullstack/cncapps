@@ -54,10 +54,10 @@ class CreateChargeableWorkCustomerRequest
     )
     {
 
-        $id               = $this->repository->getNextIdentity();
         $serviceRequestId = $serviceRequest->getValue(DBEProblem::problemID);
-        $requestee        = new DBEContact($this);
-        $requesteeId      = $serviceRequest->getValue(DBEProblem::contactID);
+        $id          = $this->repository->getNextIdentity();
+        $requestee   = new DBEContact($this);
+        $requesteeId = $serviceRequest->getValue(DBEProblem::contactID);
         $requestee->getRow($requesteeId);
         $newRequest = ChargeableWorkCustomerRequest::create(
             $id,
@@ -74,7 +74,7 @@ class CreateChargeableWorkCustomerRequest
         $requesteeFullName = "{$requestee->getValue(DBEContact::firstName)} {$requestee->getValue(DBEContact::lastName)}";
         $contactActivity   = $this->BUActivity->addCustomerContactActivityToServiceRequest(
             $serviceRequest,
-            "Person $requesterFullName sent a request for $additionalTimeRequested hours to $requesteeFullName",
+            "<p>$requesterFullName sent a request for $additionalTimeRequested hour(s) to $requesteeFullName</p><br/>{$reason}",
             $requester
         );
         $contactActivity->setValue(DBECallActivity::awaitingCustomerResponseFlag, 'Y');

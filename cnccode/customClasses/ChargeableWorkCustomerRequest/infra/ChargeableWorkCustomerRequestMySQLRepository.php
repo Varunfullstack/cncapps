@@ -6,6 +6,7 @@ use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequest;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestRepository;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestServiceRequestId;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestTokenId;
+use CNCLTD\Exceptions\ChargeableWorkCustomerRequestForServiceRequestAlreadyExists;
 use CNCLTD\Exceptions\ChargeableWorkCustomerRequestNotFoundException;
 use dbSweetcode;
 use Exception;
@@ -69,6 +70,7 @@ class ChargeableWorkCustomerRequestMySQLRepository implements ChargeableWorkCust
      */
     public function save(ChargeableWorkCustomerRequest $chargeableWorkCustomerRequest)
     {
+        $this->guardAgainstAlreadyExistsOneForServiceRequest($chargeableWorkCustomerRequest->getServiceRequestId());
         $query      = "insert into {$this->tableName}(id,createdAt, serviceRequestId, requesteeId, additionalHoursRequested,requesterId,reason) values (?,?,?,?,?,?,?)";
         $parameters = [
             [
@@ -138,6 +140,18 @@ class ChargeableWorkCustomerRequestMySQLRepository implements ChargeableWorkCust
             ]
         );
         return $statement->fetch_row()[0];
+    }
+
+    /**
+     * @param ChargeableWorkCustomerRequestServiceRequestId $serviceRequestId
+     * @throws ChargeableWorkCustomerRequestForServiceRequestAlreadyExists
+     */
+    private function guardAgainstAlreadyExistsOneForServiceRequest(ChargeableWorkCustomerRequestServiceRequestId $serviceRequestId
+    )
+    {
+        if ($this->getCountRequestsForServiceRequestId($serviceRequestId)) {
+            throw new ChargeableWorkCustomerRequestForServiceRequestAlreadyExists($serviceRequestId);
+        }
     }
 
 

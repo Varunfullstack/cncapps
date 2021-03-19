@@ -575,7 +575,7 @@ class ActivityEditComponent extends MainComponent {
         if (!data) {
             return '';
         }
-        let title = "Request Customer Approval";
+        let title = "Additional Charges";
         let icon = "fa-envelope-open-dollar";
         if (data.hasPendingChargeableWorkRequest) {
             title = "Chargeable request in process";

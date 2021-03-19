@@ -110,6 +110,9 @@ class AdditionalTimeRequestModal extends React.Component {
                                 </option>
                             </select>
                         </div>
+                        <label>
+                            Reason for additional charges (the customer will see this)
+                        </label>
                         <div style={{height: 150}}
                              key="editableFieldContainer"
                         >
