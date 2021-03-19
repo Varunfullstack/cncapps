@@ -1,6 +1,7 @@
 import React from 'react';
 
 import './ToolTip.css';
+import * as PropTypes from "prop-types";
 
 class ToolTip extends React.Component {
     el = React.createElement;
@@ -11,9 +12,9 @@ class ToolTip extends React.Component {
     }
 
     render() {
-        const {title, children, width, content} = this.props;
+        const {title, children, width, content, style} = this.props;
         return (
-            <div style={{width: width}}>
+            <div style={{width: width, ...style}}>
                 <div className="tooltip">
                     {children}
                     {content}
@@ -27,3 +28,9 @@ class ToolTip extends React.Component {
 }
 
 export default ToolTip;
+
+ToolTip.propTypes = {
+    title: PropTypes.string,
+    width: PropTypes.string,
+    style: PropTypes.object
+};

@@ -16,13 +16,17 @@ class Confirm extends React.Component {
         const {title, width, message, show} = this.props;
         return (
             <Modal
+                key="confirmModal"
                 title={title || "Alert"}
                 show={show}
                 width={width || 300}
                 onClose={() => this.close()}
                 footer={
-                    <Fragment>
-                        <button onClick={() => this.close(true)} autoFocus={true}>Yes</button>
+                    <Fragment key="confirmFooter">
+                        <button onClick={() => this.close(true)}
+                                autoFocus={true}
+                        >Yes
+                        </button>
                         <button onClick={() => this.close(false)}>No</button>
                     </Fragment>
                 }

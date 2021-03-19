@@ -8,7 +8,9 @@ class ChargeableWorkCustomerRequestEmailDTO
     public $extraTimeRequested;
     public $requesteeFirstName;
     public $serviceRequestId;
-    public $emailSubjectSummary;
+    public $htmlReason;
+    public $requesterFullName;
+    public $hourlyRate;
 
     /**
      * ChargeableWorkCustomerRequestEmailDTO constructor.
@@ -17,21 +19,27 @@ class ChargeableWorkCustomerRequestEmailDTO
      * @param $extraTimeRequested
      * @param $requesteeFirstName
      * @param $serviceRequestId
-     * @param $emailSubjectSummary
+     * @param $htmlReason
+     * @param $requesterFullName
+     * @param $hourlyRate
      */
     public function __construct($approvalURL,
                                 $denialURL,
                                 $extraTimeRequested,
                                 $requesteeFirstName,
                                 $serviceRequestId,
-                                $emailSubjectSummary
+                                $htmlReason,
+                                $requesterFullName,
+                                $hourlyRate
     )
     {
-        $this->approvalURL         = $approvalURL;
-        $this->denialURL           = $denialURL;
-        $this->extraTimeRequested  = $extraTimeRequested;
-        $this->requesteeFirstName  = $requesteeFirstName;
-        $this->serviceRequestId    = $serviceRequestId;
-        $this->emailSubjectSummary = $emailSubjectSummary;
+        $this->approvalURL        = $approvalURL;
+        $this->denialURL          = $denialURL;
+        $this->extraTimeRequested = $extraTimeRequested;
+        $this->requesteeFirstName = $requesteeFirstName;
+        $this->serviceRequestId   = $serviceRequestId;
+        $this->htmlReason         = $htmlReason;
+        $this->requesterFullName  = $requesterFullName;
+        $this->hourlyRate         = $hourlyRate;
     }
 }

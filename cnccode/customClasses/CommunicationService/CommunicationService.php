@@ -32,14 +32,21 @@ class CommunicationService
         $dbeContact = new DBEContact($thing);
         $dbeContact->getRow($request->getRequesteeId()->value());
         $dbeProblem = new DBEProblem($thing);
-        $dbeProblem->getRow($request->getServiceRequestId()->value());
+        $dbeUser    = new \DBEUser($thing);
+        $dbeUser->getRow($request->getRequesterId()->value());
+        $serviceRequestId = $request->getServiceRequestId()->value();
+        $dbeProblem->getRow($serviceRequestId);
+        $dbeItem = new \DBEItem($thing);
+        $dbeItem->getRow(CONFIG_CONSULTANCY_HOURLY_LABOUR_ITEMID);
         $dto        = new ChargeableWorkCustomerRequestEmailDTO(
             PORTAL_URL . '/notSureWhereToPointThisYet',
             PORTAL_URL . '/notSureWhereToPointThisYet',
             $request->getAdditionalHoursRequested()->value(),
             $dbeContact->getValue(DBEContact::firstName),
-            $request->getServiceRequestId()->value(),
-            $dbeProblem->getValue(DBEProblem::emailSubjectSummary)
+            $serviceRequestId,
+            $request->getReason()->value(),
+            "{$dbeUser->getValue(\DBEUser::firstName)} {$dbeUser->getValue(\DBEUser::lastName)}",
+            $dbeItem->getValue(\DBEItem::curUnitSale)
         );
         $body       = $twig->render(
             '@customerFacing/ChargeableWorkCustomerRequestEmail/ChargeableWorkCustomerRequest.html.twig',
@@ -47,7 +54,11 @@ class CommunicationService
         );
         $buMail     = self::getBUMail();
         $recipients = $dbeContact->getValue(DBEContact::email);
-        $buMail->sendSimpleEmail($body, "Here is some chargeable work!", $recipients);
+        $buMail->sendSimpleEmail(
+            $body,
+            "Approval needed for Service Request {$serviceRequestId} - {$dbeProblem->getValue(DBEProblem::emailSubjectSummary)}",
+            $recipients
+        );
     }
 
     public static function sendExtraChargeableWorkRequestApprovedEmail(ChargeableWorkCustomerRequest $request)
