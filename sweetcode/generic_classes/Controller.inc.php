@@ -486,17 +486,7 @@ class Controller extends BaseObject
         exit;
     }
 
-    /**
-     * Set template files, automatically includes the page template then calls
-     * the PHPLib template set_file method
-     *
-     * @access private
-     */
-    function setTemplateFiles($handle,
-                              $fileName = ""
-    )
-    {
-
+    function setContainerTemplate(){
         switch ($this->getHTMLFmt()) {
             case CT_HTML_FMT_PRINTER:
                 $file = array("page" => "printer.inc." . $this->getDocType());
@@ -511,6 +501,21 @@ class Controller extends BaseObject
                 $file = array("page" => "screen.inc." . $this->getDocType());
                 break;
         }
+        $this->template->setFile($file);
+    }
+
+    /**
+     * Set template files, automatically includes the page template then calls
+     * the PHPLib template set_file method
+     *
+     * @access private
+     */
+    function setTemplateFiles($handle,
+                              $fileName = ""
+    )
+    {
+
+        $this->setContainerTemplate();
         if (!is_array($handle)) {
 // FOR DOS $file[$handle] = $this->template->fileName($fileName);
             $file[$handle] = $fileName . '.' . $this->getDocType();

@@ -387,7 +387,7 @@ WHERE customer.`cus_referred` <> 'Y'
             }
             $dsSearchForm->setValue(self::searchCriteria, $this->getParam('searchCriteria'));
             $searchCriteria = $this->getParam('searchCriteria');
-            $results = $this->buContactExport->search(
+            $results        = $this->buContactExport->search(
                 $dsSearchForm,
                 $contractItemIDs
             );

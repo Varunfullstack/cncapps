@@ -50,7 +50,6 @@ define(
     'CTCONTACT_TXT_UPDATE_CONTACT',
     'Update Contact'
 );
-
 define(
     'CTCNC_ACT_DISP_CONTACT_POPUP',
     'CTCNC_ACT_DISP_CONTACT_POPUP'
@@ -116,19 +115,16 @@ class CTContact extends CTCNC
                 break;
             case 'search':
                 $itemsPerPage = 20;
-                $page = 1;
-                $term = '';
+                $page         = 1;
+                $term         = '';
                 if (isset($_REQUEST['term'])) {
                     $term = $_REQUEST['term'];
                 }
-
                 if (!isset($_REQUEST['customerId'])) {
                     throw new Exception('Customer ID is required');
                 }
-
                 $customerId = $_REQUEST['customerId'];
-
-                $dsResult = new DataSet($this);
+                $dsResult   = new DataSet($this);
                 $this->buContact->getCustomerContactsByNameMatch($customerId, $term, $dsResult);
                 $sites = [];
                 while ($dsResult->fetchNext()) {
@@ -194,32 +190,25 @@ class CTContact extends CTCNC
             'ContactEdit',
             'ContactEdit.inc'
         );
-
         $this->template->set_block(
             'CustomerEdit',
             'selectSupportLevel',
             null
         );
-
         $this->template->set_block(
             'ContactEdit',
             'supportLevelBlock',
             'selectSupportLevel'
         );
-
         $buContact = new BUContact($this);
-
         $buContact->supportLevelDropDown(
             $this->dsContact->getValue(DBEContact::supportLevel),
             $this->template
         );
-
         $buCustomer = new BUCustomer($this);
-
         $this->template->set_var(
             array(
                 'contactID'                            => $this->dsContact->getValue(DBEContact::contactID),
-                'supplierID'                           => $this->dsContact->getValue(DBEContact::supplierID),
                 'customerID'                           => $this->dsContact->getValue(DBEContact::customerID),
                 'siteNo'                               => $this->dsContact->getValue(DBEContact::siteNo),
                 'firstName'                            => Controller::htmlInputText(
@@ -448,7 +437,6 @@ class CTContact extends CTCNC
                 'action'  => CTCONTACT_ACT_CONTACT_UPDATE,
                 'htmlFmt' => CT_HTML_FMT_POPUP
             )
-
         );
     }
 
@@ -476,17 +464,13 @@ class CTContact extends CTCNC
             $this->contactForm();
             exit;
         }
-
         $this->buContact->validateContact($this->dsContact);
-
-
         $this->buContact->updateContact($this->dsContact);
         // this forces update of contactID back through Javascript to parent HTML window
         $urlNext = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action'      => CTCNC_ACT_DISP_CONTACT_POPUP,
-                'supplierID'  => $this->dsContact->getValue(DBEContact::supplierID),
                 'customerID'  => $this->dsContact->getValue(DBEContact::customerID),
                 'siteNo'      => $this->dsContact->getValue(DBEContact::siteNo),
                 'contactName' => $this->dsContact->getPKValue(),
@@ -521,20 +505,12 @@ class CTContact extends CTCNC
             header('Location: ' . $urlCreate);
             exit;
         }
-        if ($this->getParam('supplierID')) {
-            $this->buContact->getSupplierContactsByNameMatch(
-                $this->getParam('supplierID'),
-                $this->getParam('contactName'),
-                $this->dsContact
-            );
-        } else {
-            $this->buContact->getCustomerContactsByNameMatch(
-                $this->getParam('customerID'),
-                $this->getParam('contactName'),
-                $this->dsContact,
-                $this->getParam('siteNo')
-            );
-        }
+        $this->buContact->getCustomerContactsByNameMatch(
+            $this->getParam('customerID'),
+            $this->getParam('contactName'),
+            $this->dsContact,
+            $this->getParam('siteNo')
+        );
         if ($this->dsContact->rowCount() == 1) {
             $this->setTemplateFiles(
                 'ContactSelect',

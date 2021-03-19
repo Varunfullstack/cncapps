@@ -5,47 +5,35 @@
  * Date: 02/08/2018
  * Time: 10:26
  */
-
 require_once "config.inc.php";
 require_once $cfg['path_dbe'] . '/DBEJContactAudit.php';
 require_once $cfg['path_bu'] . '/BUMail.inc.php';
-
 $thing = null;
-$test = new DBEJContactAudit($thing);
-
+$test  = new DBEJContactAudit($thing);
 $days = isset($_REQUEST['days']) ? $_REQUEST['days'] : 7;
-
 $test->search(
     null,
     new DateTime("$days days ago"),
     new DateTime()
 );
-
 $template = new Template (
-    EMAIL_TEMPLATE_DIR,
-    "remove"
+    EMAIL_TEMPLATE_DIR, "remove"
 );
-
 $template->set_file(
     array(
         'page' => 'ContactAuditLogChangesEmail.html',
     )
 );
-
 $template->set_block(
     'page',
     'contactAuditChangeBlock',
     'items'
 );
-
-
 $rowCount = $test->rowCount();
-
 if (!$rowCount) {
     echo 'Nothing to show';
     exit;
 }
-
 while ($test->fetchNext()) {
     $template->set_var(
         [
@@ -79,28 +67,22 @@ while ($test->fetchNext()) {
             "action"               => $test->getValue(DBEJContactAudit::action),
         ]
     );
-
     $template->parse(
         'items',
         'contactAuditChangeBlock',
         true
     );
 }
-
-
 $template->parse(
     'output',
     'page',
     true
 );
-
 $body = $template->get_var('output');
-
-$thing = null;
+$thing  = null;
 $buMail = new BUMail($thing);
-
 $buMail->mime->setHTMLBody($body);
-$hdrs_array = array(
+$hdrs_array  = array(
     'From'         => CONFIG_SUPPORT_EMAIL,
     'To'           => "ContactChanges@" . CONFIG_PUBLIC_DOMAIN,
     'Subject'      => "Contact Change Audit Log",
@@ -112,8 +94,7 @@ $mime_params = array(
     'html_charset'  => 'UTF-8',
     'head_charset'  => 'UTF-8'
 );
-$body = $buMail->mime->get($mime_params);
-
+$body        = $buMail->mime->get($mime_params);
 $hdrs = $buMail->mime->headers($hdrs_array);
 $buMail->putInQueue(
     CONFIG_SUPPORT_EMAIL,
@@ -121,5 +102,4 @@ $buMail->putInQueue(
     $hdrs,
     $body
 );
-
 echo $body; // and output to page

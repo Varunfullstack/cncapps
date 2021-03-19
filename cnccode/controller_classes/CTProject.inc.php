@@ -472,7 +472,7 @@ class CTProject extends CTCNC
             true
         );
         $this->parsePage();
-    }// end function editFurther Action()
+    }
 
     private function renderConsultantBlock(string $parentPage,
                                            $selectedID
@@ -530,7 +530,7 @@ class CTProject extends CTCNC
             return '<a href="?action=unlinkSalesOrder&projectId=' . $projectID . '" onclick="return confirm(\'Are you sure you want to unlink this project to Sales Order ' . $linkedOrdheadID . '?\');">Unlink</a> <a href="' . $linkURL . '" target="_blank" title="Sales Order">Sales Order</a>';
         }
         return ' <a href="#" style="color: red" onclick="linkedSalesOrderPopup()">Sales Order</a>';
-    }
+    }// end function editFurther Action()
 
     /**
      * Delete Further Action

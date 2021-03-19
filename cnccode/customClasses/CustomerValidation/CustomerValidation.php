@@ -119,6 +119,8 @@ class CustomerValidation
         if (!$atLeastOneReport) {
             $this->globalValidationErrors[] = new ValidationError("At least one contact must have Report flag checked");
         }
+
+
     }
 
     public function getCustomerURL()

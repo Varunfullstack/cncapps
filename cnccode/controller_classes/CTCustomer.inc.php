@@ -314,10 +314,6 @@ class CTCustomer extends CTCNC
                 @$value['customerID']
             );
             $this->dsContact->setValue(
-                DBEContact::supplierID,
-                @$value['supplierID']
-            );
-            $this->dsContact->setValue(
                 DBEContact::siteNo,
                 @$value['siteNo']
             );
@@ -1072,7 +1068,7 @@ class CTCustomer extends CTCNC
                 echo $this->getCurrentUser();
                 exit;
             case "searchCustomers":
-                echo json_encode($this->searchCustomers(),JSON_NUMERIC_CHECK);
+                echo json_encode($this->searchCustomers(), JSON_NUMERIC_CHECK);
                 exit;
             case "getCustomerSR":
                 echo json_encode($this->getCustomerSR());
@@ -2385,7 +2381,6 @@ class CTCustomer extends CTCNC
                     'contactID'                            => $this->dsContact->getValue(DBEContact::contactID),
                     'siteNo'                               => $this->dsContact->getValue(DBEContact::siteNo),
                     'customerID'                           => $this->dsContact->getValue(DBEContact::customerID),
-                    'supplierID'                           => $this->dsContact->getValue(DBEContact::supplierID),
                     'title'                                => $this->dsContact->getValue(DBEContact::title),
                     'titleClass'                           => $this->dsContact->getValue(self::contactFormTitleClass),
                     'firstName'                            => $this->dsContact->getValue(DBEContact::firstName),
@@ -3051,7 +3046,6 @@ class CTCustomer extends CTCNC
         );
         $this->parsePage();
     }
-
 
     /**
      * @return bool

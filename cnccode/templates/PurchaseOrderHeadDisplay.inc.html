@@ -91,51 +91,29 @@
            name="porhead[1][completionNotifiedFlag]"
            value="{completionNotifiedFlag}"
     >
+    <INPUT type="hidden"
+           id="supplierID"
+           name="porhead[1][supplierID]"
+           value="{supplierID}"
+    >
+    <INPUT type="hidden"
+           id="contactID"
+           name="porhead[1][contactID]"
+           value="{contactID}"
+    >
+    <div id="reactPurchaseOrderSupplierAndContactInputs"
+         data-supplier-id="{supplierID}"
+         data-supplier-contact-id="{contactID}"
+         data-supplier-id-input-id="supplierID"
+         data-supplier-contact-id-input-id="contactID"
+    >
+
+    </div>
+
+
     <table width="700px"
            border="0"
     >
-        <tr>
-            <td class="promptText">Supplier</td>
-            <td class="field">
-                <INPUT type="hidden"
-                       id="supplierID"
-                       name="porhead[1][supplierID]"
-                       value="{supplierID}"
-                >
-                <input {DISABLED}
-                       type="text"
-                       name="porhead[1][supplierName]"
-                       value="{supplierName}"
-                       id="supplierName"
-                       onChange="javascript:validateSupplierName()"
-                       onKeydown="javascript:checkFunctionKey(supplierName)"
-                       maxlength="50"
-                       size="30"
-                >
-                {supplierLink}
-            </td>
-        </tr>
-        <tr>
-            <td class="promptText">Contact</td>
-            <td class="field">
-                <INPUT type="hidden"
-                       id="contactID"
-                       name="porhead[1][contactID]"
-                       value="{contactID}"
-                >
-                <input {DISABLED}
-                       type="text"
-                       name="porhead[1][contactName]"
-                       value="{contactName}"
-                       id="contactName"
-                       onChange="javascript:validateContactName()"
-                       onKeydown="javascript:checkFunctionKey(contactName)"
-                       maxlength="30"
-                       size="30"
-                >
-                <a href="tel:{contactPhone}">{contactPhone}</a> {emailLink}
-            </td>
-        </tr>
         <tr>
             <td class="promptText">Order No</td>
             <td class="mainHeadText">{porheadID}</td>

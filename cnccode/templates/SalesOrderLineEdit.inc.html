@@ -9,6 +9,13 @@
     let partNumberRow;
     let itemIdInput;
     document.addEventListener('DOMContentLoaded', () => {
+        const reactSupplierContainer = document.getElementById('reactSupplierSearchContainer');
+        const supplierIDElement = document.getElementById('supplierID');
+        document.renderSupplierSearchComponent(reactSupplierContainer, {
+            inputId: 'supplierID',
+            supplierId: Number(supplierIDElement.value)
+        })
+
         itemIdInput = document.getElementById('itemID');
         itemIdInput.addEventListener('change', ($event) => {
             updatePartNumber();
@@ -162,17 +169,7 @@
         <tr>
             <td class="promptText">Supplier</td>
             <td class="field">
-                <input
-                        type="text"
-                        name="ordline[1][supplierName]"
-                        id="supplierName"
-                        value="{supplierName}"
-                        onChange="javascript:validateSupplierName()"
-                        onKeydown="javascript:checkFunctionKey(supplierName)"
-                        size="50"
-                        maxlength="50"
-                >
-                <font class="formErrorMessage">{supplierNameMessage}</font>
+                <div id="reactSupplierSearchContainer"></div>
             </td>
         </tr>
         <tr>

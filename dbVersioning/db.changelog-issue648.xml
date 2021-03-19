@@ -1,0 +1,324 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue648-0">
+        <tagDatabase tag="issue648"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue648-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="supplier" columnName="active"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="supplier">
+            <column name="active" type="tinyint(1)" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <sql>
+            <![CDATA[
+            UPDATE
+                supplier
+            SET supplier.active = 0
+            WHERE supplier.`sup_suppno` IN
+                  (SELECT a.con_suppno
+                   FROM (SELECT con_suppno,
+                                COUNT(
+                                            con_email IS NOT NULL
+                                            OR con_email <> ""
+                                    ) AS validEmails
+                         FROM contact
+                         WHERE contact.`con_suppno` IS NOT NULL
+                           AND con_suppno <> 0
+                         GROUP BY con_suppno) a
+                   WHERE validEmails = 0);
+            ]]>
+        </sql>
+        <rollback>
+            <dropColumn tableName="supplier" columnName="active"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue648-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="supplierContact"/>
+            </not>
+        </preConditions>
+        <createTable tableName="supplierContact">
+            <column name="id" type="bigint(11)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="Primary"/>
+            </column>
+            <column name="supplierId" type="int(11)">
+                <constraints foreignKeyName="fk_suppliercontact_supplierid" nullable="false"
+                             referencedTableName="supplier" referencedColumnNames="sup_suppno" deleteCascade="true"/>
+            </column>
+            <column name="title" type="char(45)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="position" type="char(50)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="firstName" type="char(25)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="lastName" type="char(35)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="email" type="char(60)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="phone" type="char(25)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="active" type="tinyint(1)" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <sql>
+            <![CDATA[
+            UPDATE
+                supplier
+            SET `sup_contno` =
+                    (SELECT con_contno
+                     FROM contact
+                     WHERE con_suppno = supplier.`sup_suppno`
+                     LIMIT 1)
+            WHERE supplier.sup_contno = 0
+               OR supplier.sup_contno IS NULL;
+
+            insert into supplierContact (id, supplierId, title, position, firstName, lastName, email, phone, active)
+            select con_contno,
+                   con_suppno,
+                   if(con_title is null or con_title = '', 'Mx', con_title),
+                   if(con_position = '', null, con_position),
+                   if(con_first_name is null or con_first_name = '', 'firstName', con_first_name),
+                   if(con_last_name is null or con_last_name = '', 'lastName', con_last_name),
+                   if(con_email is null or con_email = '', "notprovided@cnc-ltd.co.uk", trim(con_email)),
+                   if(con_phone is null or con_phone = '', 'not-provided', con_phone),
+                   active
+            from contact
+            where con_suppno is not null
+              and con_suppno <> 0;
+            UPDATE
+                supplierContact
+            SET ACTIVE           = 1
+            WHERE id IN (select sup_contno from supplier);
+            UPDATE
+                supplier
+            SET sup_web_site_url = if(sup_web_site_url = '', null, sup_web_site_url),
+                sup_cnc_accno    = if(sup_cnc_accno = '' OR sup_cnc_accno IS NULL, 'notprovided', sup_cnc_accno),
+                sup_add2         = if(sup_add2 = '', null, sup_add2),
+                sup_county       = if(sup_county = '' OR sup_county IS NULL, 'notprovided', sup_county),
+                sup_postcode     = if(sup_postcode = '', 'notprovided', sup_postcode);
+            UPDATE
+                supplierContact
+            SET title     = IF(title = "", NULL, title),
+                firstName = if(firstName = "", null, firstName),
+                lastName  = if(lastName = "", null, lastName),
+                email     = if(email = "", null, email),
+                phone     = if(phone = "", null, phone);
+
+            delete
+            from contact
+            where con_suppno is not null
+              and con_suppno <> 0;
+            ]]>
+        </sql>
+        <rollback>
+            <dropTable tableName="supplierContact"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue648-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="supplierContactAuditLog"/>
+            </not>
+        </preConditions>
+        <createTable tableName="supplierContactAuditLog">
+            <column name="action" type="char(8)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="createdAt" type="timestamp" defaultValueComputed="current_timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="userId" type="bigint(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="id" type="bigint(11)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="supplierId" type="bigint(11)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="title" type="char(45)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="position" type="char(50)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="firstName" type="char(25)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="lastName" type="char(35)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="email" type="char(60)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="phone" type="char(25)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="active" type="tinyint(1)" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <sql splitStatements="true">
+            <![CDATA[
+            update contact join supplier on contact.con_suppno = supplier.sup_suppno
+            set con_phone = supplier.sup_phone
+            where (contact.con_phone is null or contact.con_phone = "")
+              and (sup_phone is not null and sup_phone <> "");
+
+            insert into supplierContactAuditLog(action, createdAt, userId, id, supplierId, title, position, firstName,
+                                                lastName, email, phone, active)
+            select `action`,
+                   createdAt,
+                   userId,
+                   con_contno,
+                   con_suppno,
+                   con_title,
+                   con_position,
+                   con_first_name,
+                   con_last_name,
+                   con_email,
+                   con_phone,
+                   active
+            from contactAuditLog
+            where con_suppno is not null
+              and con_suppno <> 0;
+            delete
+            from contactAuditLog
+            where con_suppno is not null
+              and con_suppno <> 0;
+            ]]>
+        </sql>
+        <rollback>
+            <dropTable tableName="supplierContactAuditLog"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue648-4">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contact" columnName="con_suppno"/>
+        </preConditions>
+        <dropColumn tableName="contact" columnName="con_suppno"/>
+        <rollback>
+            <addColumn tableName="contact">
+                <column name="con_suppno" type="int(11)">
+                    <constraints nullable="true"/>
+                </column>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue648-5">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contactAuditLog" columnName="con_suppno"/>
+        </preConditions>
+        <dropColumn tableName="contactAuditLog" columnName="con_suppno"/>
+        <rollback>
+            <addColumn tableName="contactAuditLog">
+                <column name="con_suppno" type="int(11)">
+                    <constraints nullable="true"/>
+                </column>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue648-6">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="supplier" columnName="sup_contact"/>
+        </preConditions>
+        <dropColumn tableName="supplier" columnName="sup_contact"/>
+        <rollback>
+            <addColumn tableName="supplier">
+                <column name="sup_contact" type="CHAR(35)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue648-7">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="supplier" columnName="sup_pay_method"/>
+        </preConditions>
+        <dropColumn tableName="supplier" columnName="sup_pay_method"/>
+        <rollback>
+            <addColumn tableName="supplier">
+                <column name="sup_pay_method" type="CHAR(15)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue648-8">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="supplier" columnName="sup_approval"/>
+        </preConditions>
+        <dropColumn tableName="supplier" columnName="sup_approval"/>
+        <rollback>
+            <addColumn tableName="supplier">
+                <column name="sup_approval" type="CHAR(1)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue648-9">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="supplier" columnName="sup_scopeno"/>
+        </preConditions>
+        <dropColumn tableName="supplier" columnName="sup_scopeno"/>
+        <rollback>
+            <addColumn tableName="supplier">
+                <column name="sup_scopeno" type="smallint(6)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue648-10">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="supplier" columnName="sup_date_quest"/>
+        </preConditions>
+        <dropColumn tableName="supplier" columnName="sup_date_quest"/>
+        <rollback>
+            <addColumn tableName="supplier">
+                <column name="sup_date_quest" type="date"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue648-11">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="supplier" columnName="sup_credit_limit"/>
+        </preConditions>
+        <dropColumn tableName="supplier" columnName="sup_credit_limit"/>
+        <rollback>
+            <addColumn tableName="supplier">
+                <column name="sup_credit_limit" type="decimal(10,2)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue648-12">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="supplier" columnName="sup_phone"/>
+        </preConditions>
+        <dropColumn tableName="supplier" columnName="sup_phone"/>
+        <rollback>
+            <addColumn tableName="supplier">
+                <column name="sup_phone" type="char(20)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue648-13">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="supplier" columnName="sup_fax"/>
+        </preConditions>
+        <dropColumn tableName="supplier" columnName="sup_fax"/>
+        <rollback>
+            <addColumn tableName="supplier">
+                <column name="sup_fax" type="char(20)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

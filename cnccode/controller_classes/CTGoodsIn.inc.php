@@ -7,10 +7,13 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 global $cfg;
+
+use CNCLTD\Supplier\infra\MySQLSupplierRepository;
+use CNCLTD\Supplier\SupplierId;
+
 require_once($cfg['path_bu'] . '/BUPurchaseOrder.inc.php');
 require_once($cfg['path_bu'] . '/BUGoodsIn.inc.php');
 require_once($cfg['path_bu'] . '/BUPDFPurchaseOrder.inc.php');
-require_once($cfg['path_bu'] . '/BUSupplier.inc.php');
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_gc'] . '/DataSet.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
@@ -100,9 +103,9 @@ class CTGoodsIn extends CTCNC
         }
         $this->setMenuId(307);
         $this->buPurchaseOrder = new BUPurchaseOrder($this);
-        $this->buGoodsIn = new BUGoodsIn($this);
-        $this->dsPorhead = new DSForm($this);
-        $this->dsPorline = new DSForm($this);
+        $this->buGoodsIn       = new BUGoodsIn($this);
+        $this->dsPorhead       = new DSForm($this);
+        $this->dsPorline       = new DSForm($this);
         $this->dsPorline->copyColumnsFrom($this->buPurchaseOrder->dbeJPorline);
         $this->dsPorhead->copyColumnsFrom($this->buPurchaseOrder->dbeJPorhead);
     }
@@ -146,8 +149,8 @@ class CTGoodsIn extends CTCNC
         foreach ($_REQUEST as $key => $value) {
             $_REQUEST[$key] = trim($value);
         }
-        if (($this->getParam('porheadID')) and (!is_numeric($this->getParam('porheadID')))) {
-            $this->setFormErrorMessage('Order no must be numeric');;
+        if (($this->getParam('porheadID')) && (!is_numeric($this->getParam('porheadID')))) {
+            $this->setFormErrorMessage('Order no must be numeric');
         }
         if (!$this->getFormError()) {
             $this->buGoodsIn->search(
@@ -161,14 +164,13 @@ class CTGoodsIn extends CTCNC
         }
         if ($this->dsPorhead->rowCount() == 1) {
             $this->dsPorhead->fetchNext();
-            $urlNext =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'    => CTCNC_ACT_DISPLAY_GOODS_IN,
-                        'porheadID' => $this->dsPorhead->getValue(DBEPorhead::porheadID)
-                    )
-                );
+            $urlNext = Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'    => CTCNC_ACT_DISPLAY_GOODS_IN,
+                    'porheadID' => $this->dsPorhead->getValue(DBEPorhead::porheadID)
+                )
+            );
             header('Location: ' . $urlNext);
             exit;
         } else {
@@ -191,18 +193,17 @@ class CTGoodsIn extends CTCNC
         );
 // Parameters
         $this->setPageTitle("Goods In");
-        $submitURL = Controller::buildLink(
+        $submitURL        = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array('action' => CTCNC_ACT_SEARCH)
         );
-        $urlSupplierPopup =
-            Controller::buildLink(
-                CTCNC_PAGE_SUPPLIER,
-                array(
-                    'action'  => CTCNC_ACT_DISP_SUPPLIER_POPUP,
-                    'htmlFmt' => CT_HTML_FMT_POPUP
-                )
-            );
+        $urlSupplierPopup = Controller::buildLink(
+            CTCNC_PAGE_SUPPLIER,
+            array(
+                'action'  => CTCNC_ACT_DISP_SUPPLIER_POPUP,
+                'htmlFmt' => CT_HTML_FMT_POPUP
+            )
+        );
         $this->dsPorhead->initialise();
         if ($this->dsPorhead->rowCount() > 0) {
             $this->template->set_block(
@@ -211,20 +212,18 @@ class CTGoodsIn extends CTCNC
                 'orders'
             );
             $supplierNameCol = $this->dsPorhead->columnExists(DBEJPorhead::supplierName);
-            $typeCol = $this->dsPorhead->columnExists(DBEJPorhead::type);
+            $typeCol         = $this->dsPorhead->columnExists(DBEJPorhead::type);
             $customerNameCol = $this->dsPorhead->columnExists(DBEJPorhead::customerName);
-            $porheadIDCol = $this->dsPorhead->columnExists(DBEJPorhead::porheadID);
-            $supplierRefCol = $this->dsPorhead->columnExists(DBEJPorhead::supplierRef);
-
+            $porheadIDCol    = $this->dsPorhead->columnExists(DBEJPorhead::porheadID);
+            $supplierRefCol  = $this->dsPorhead->columnExists(DBEJPorhead::supplierRef);
             while ($this->dsPorhead->fetchNext()) {
-                $goodsInURL =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'    => CTCNC_ACT_DISPLAY_GOODS_IN,
-                            'porheadID' => $this->dsPorhead->getValue($porheadIDCol)
-                        )
-                    );
+                $goodsInURL   = Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action'    => CTCNC_ACT_DISPLAY_GOODS_IN,
+                        'porheadID' => $this->dsPorhead->getValue($porheadIDCol)
+                    )
+                );
                 $customerName = $this->dsPorhead->getValue($customerNameCol);
                 $supplierName = $this->dsPorhead->getValue($supplierNameCol);
                 $this->template->set_var(
@@ -247,13 +246,9 @@ class CTGoodsIn extends CTCNC
         $supplierName = null;
 // search parameter section
         if ($this->getParam('supplierID')) {
-            $buSupplier = new BUSupplier($this);
-            $dsSupplier = new DataSet($this);
-            $buSupplier->getSupplierByID(
-                $this->getParam('supplierID'),
-                $dsSupplier
-            );
-            $supplierName = $dsSupplier->getValue(DBESupplier::name);
+            $supplierRepo = new MySQLSupplierRepository();
+            $supplier     = $supplierRepo->getById(new SupplierId((int)$this->getParam('supplierID')));
+            $supplierName = $supplier->name()->value();
         }
         $this->template->set_var(
             array(
@@ -336,25 +331,20 @@ class CTGoodsIn extends CTCNC
         $porheadID = $dsPorhead->getValue(DBEPorhead::porheadID);
         $this->setPageTitle('Goods In');
         $this->setTemplateFiles(array('GoodsInDisplay' => 'GoodsInDisplay.inc'));
-
-        $urlReceive =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'    => CTGOODSIN_ACT_RECEIVE,
-                    'porheadID' => $porheadID
-                )
-            );
-
-        $urlPurchaseOrder =
-            Controller::buildLink(
-                CTCNC_PAGE_PURCHASEORDER,
-                array(
-                    'action'    => CTCNC_ACT_DISPLAY_PO,
-                    'porheadID' => $porheadID
-                )
-            );
-
+        $urlReceive       = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'    => CTGOODSIN_ACT_RECEIVE,
+                'porheadID' => $porheadID
+            )
+        );
+        $urlPurchaseOrder = Controller::buildLink(
+            CTCNC_PAGE_PURCHASEORDER,
+            array(
+                'action'    => CTCNC_ACT_DISPLAY_PO,
+                'porheadID' => $porheadID
+            )
+        );
         $this->template->set_var(
             array(
                 'porheadID'        => $porheadID,
@@ -370,7 +360,6 @@ class CTGoodsIn extends CTCNC
         if ($addCustomerItems) {
             $this->buGoodsIn->getAllWarranties($dsWarranty);
         }
-
         $dsPorline->initialise();
         $this->dsGoodsIn->initialise();
         if ($this->dsGoodsIn->rowCount() > 0) {
@@ -446,14 +435,12 @@ class CTGoodsIn extends CTCNC
                             true
                         );
                     } // while ($dsWarranty->fetchNext()
-
                 } else {
                     $this->template->set_var(
                         'DISABLED',
                         'disabled'
                     ); // no serial no or warranty
                 }
-
                 if ($this->dsGoodsIn->getValue(BUGoodsIn::receiveDataSetAllowReceive) == FALSE) {
                     $this->template->set_var(
                         'lineDisabled',
@@ -465,7 +452,6 @@ class CTGoodsIn extends CTCNC
                         null
                     );
                 }
-
                 $this->template->parse(
                     'orderLines',
                     'orderLineBlock',
@@ -527,14 +513,13 @@ class CTGoodsIn extends CTCNC
                 $this->getParam('porheadID'),
                 $dsPorhead
             );
-            $urlNext =
-                Controller::buildLink(
-                    CTCNC_PAGE_PURCHASEORDER,
-                    array(
-                        'action'    => CTCNC_ACT_DISPLAY_PO,
-                        'porheadID' => $this->getParam('porheadID')
-                    )
-                );
+            $urlNext = Controller::buildLink(
+                CTCNC_PAGE_PURCHASEORDER,
+                array(
+                    'action'    => CTCNC_ACT_DISPLAY_PO,
+                    'porheadID' => $this->getParam('porheadID')
+                )
+            );
             header('HTTP/1.1 301 Moved Permanently');
             header('Location: ' . $urlNext);
             exit;

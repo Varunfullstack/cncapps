@@ -17,7 +17,9 @@ class ToolTip extends React.Component {
                 <div className="tooltip">
                     {children}
                     {content}
-                    <div className="tooltiptext tooltip-bottom">
+                    <div className="tooltiptext tooltip-bottom"
+                         key="tooltipText"
+                    >
                         {title}
                     </div>
                 </div>

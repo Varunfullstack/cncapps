@@ -5,6 +5,7 @@
  * Date: 30/03/2018
  * Time: 11:22
  */
+global $cfg;
 require_once($cfg["path_dbe"] . '/DBEPortalCustomerDocumentWithoutFile.inc.php');
 
 class DBEPortalCustomerDocument extends DBEPortalCustomerDocumentWithoutFile

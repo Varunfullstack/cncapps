@@ -1,5 +1,6 @@
 <?php
 require_once("config.inc.php");
+global $cfg;
 require_once($cfg["path_ct"]."/CTCustomer.inc.php");
 session_start();
 page_open(

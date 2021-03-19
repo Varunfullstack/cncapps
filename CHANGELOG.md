@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 648 - Move contacts that are linked to a supplier to a their own table
+
 ## [v5.6.4] - 2021-03-18
 ### Changed
 - Changed the list of Checklists when logging a new request to show only relevant StandardTexts.
@@ -605,7 +609,6 @@ informing about this odd issue.
 - Issue 921 - Record the source of a SR, phone, email or portal
 - Issue 895 - Leased line contract expiry notification
 - Issue 539 - Office 365 license API with Techdata
-
 ### Changed
 - Issue 818 - Confirm Report Logic / calculations
 - Issue 925 - Improve Double Quote handling in passwords fields

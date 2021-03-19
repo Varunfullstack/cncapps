@@ -4,6 +4,7 @@
  * @access virtual
  * @author Karim Ahmed
  */
+global $cfg;
 require_once($cfg["path_gc"] . "/BaseObject.inc.php");
 require_once($cfg["path_gc"] . "/DataSet.inc.php");
 require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
@@ -57,36 +58,6 @@ class Business extends BaseObject
             $this->raiseError("No Primary key column in dsSource");
         }
         return ($dbDestination->replicate($dsSource));
-    }
-
-    /**
-     * Get all rows from a data access object into a dataset
-     * @param DataAccess $dbSource
-     * @param DataAccess $dsDestination
-     * @param bool $withPK
-     * @return bool
-     * @access private
-     */
-    function getData(&$dbSource, &$dsDestination)
-    {
-        if (!is_object($dsDestination)) {
-            $dsDestination = new Dataset($this);
-        } else {
-            if (
-                ($dsDestination->getClassname() != DA_CLASSNAME_DATASET) &
-                (!is_subclass_of($dsDestination, DA_CLASSNAME_DATASET))
-            ) {
-                $this->raiseError(
-                    "dsDestination must be subclass or class of " .
-                    DA_CLASSNAME_DATASET
-                );
-            }
-        }
-        if (gettype($dbSource) != "object")
-            $this->raiseError("dbSource is not initialised");
-        if (!is_subclass_of($dbSource, DA_CLASSNAME_DBENTITY))
-            $this->raiseError("dbSource must be subclass of " . DA_CLASSNAME_DBENTITY);
-        return ($dsDestination->replicate($dbSource));
     }
 
     /**
@@ -165,5 +136,35 @@ class Business extends BaseObject
             $ret = ($this->getData($dbSource, $dsResult));
         }
         return $ret;
+    }
+
+    /**
+     * Get all rows from a data access object into a dataset
+     * @param DataAccess $dbSource
+     * @param DataAccess $dsDestination
+     * @param bool $withPK
+     * @return bool
+     * @access private
+     */
+    function getData(&$dbSource, &$dsDestination)
+    {
+        if (!is_object($dsDestination)) {
+            $dsDestination = new Dataset($this);
+        } else {
+            if (
+                ($dsDestination->getClassname() != DA_CLASSNAME_DATASET) &
+                (!is_subclass_of($dsDestination, DA_CLASSNAME_DATASET))
+            ) {
+                $this->raiseError(
+                    "dsDestination must be subclass or class of " .
+                    DA_CLASSNAME_DATASET
+                );
+            }
+        }
+        if (gettype($dbSource) != "object")
+            $this->raiseError("dbSource is not initialised");
+        if (!is_subclass_of($dbSource, DA_CLASSNAME_DBENTITY))
+            $this->raiseError("dbSource must be subclass of " . DA_CLASSNAME_DBENTITY);
+        return ($dsDestination->replicate($dbSource));
     }
 }

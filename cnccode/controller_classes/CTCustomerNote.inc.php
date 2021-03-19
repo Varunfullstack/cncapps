@@ -6,6 +6,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg['path_bu'] . '/BUCustomerNote.inc.php');
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 
@@ -304,7 +305,7 @@ class CTCustomerNote extends CTCNC
 
             echo $this->createReturnJavascriptString($record, $noteHistory);
 
-        }
     }
+}
 
 }// end of class

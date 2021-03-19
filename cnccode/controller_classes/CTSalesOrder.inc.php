@@ -30,7 +30,6 @@ require_once($cfg["path_dbe"] . "/DBEQuotationTemplate.inc.php");
 require_once($cfg["path_dbe"] . "/DBESignableEnvelope.inc.php");
 require_once($cfg["path_func"] . "/Common.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
-require_once($cfg['path_dbe'] . '/DBESupplier.inc.php');
 // Parameters
 define(
     'CTSALESORDER_VAL_NONE_SELECTED',
@@ -1205,6 +1204,8 @@ class CTSalesOrder extends CTCNC
         if ($dsOrdhead->getValue(DBEOrdhead::customerID)) {
             $projectLink = BUProject::getCurrentProjectLink($dsOrdhead->getValue(DBEOrdhead::customerID));
         }
+        $this->loadReactCSS('SupplierSearchComponent.css');
+        $this->loadReactScript('SupplierSearchComponent.js');
         $this->setTemplateFiles(
             array(
                 'SalesOrderDisplay'                 => 'SalesOrderDisplay.inc',
@@ -2535,6 +2536,8 @@ class CTSalesOrder extends CTCNC
                            $parentPage = 'SalesOrderLineEdit'
     )
     {
+        $this->loadReactCSS('SupplierSearchComponent.css');
+        $this->loadReactScript('SupplierSearchComponent.js');
         // Lines
         if ($this->dsOrdline->getValue(DBEJOrdline::lineType) != "I") {                    // Comment line
             $this->template->set_var(
@@ -3905,6 +3908,7 @@ class CTSalesOrder extends CTCNC
             )
         );
         $this->displaySalesOrderHeader($dsOrdhead);
+
         $this->orderLineForm($dsOrdhead);
         $this->template->parse(
             'salesOrderLineEditJS',
@@ -4101,8 +4105,6 @@ class CTSalesOrder extends CTCNC
                 $childItems          = $childItemRepository->getChildItemsForItem($itemID);
                 $oneOffRowCount      = 1;
                 $recurringRowCount   = 1;
-                $dbeSupplier         = new DBESupplier($this);
-                $dbeSupplier->getRow(53);
                 foreach ($childItems as $childItem) {
                     $toInsertChildDsOrdline = new DataSet($this);
                     $toInsertChildDsOrdline->copyColumnsFrom($dbeOrdline);
@@ -4114,7 +4116,7 @@ class CTSalesOrder extends CTCNC
                     $toInsertChildDsOrdline->setValue(DBEOrdline::lineType, 'I');
                     $toInsertChildDsOrdline->setValue(
                         DBEOrdline::supplierID,
-                        $dbeSupplier->getValue(DBESupplier::supplierID)
+                        53
                     );
                     $toInsertChildDsOrdline->setValue(
                         DBEOrdline::qtyOrdered,
