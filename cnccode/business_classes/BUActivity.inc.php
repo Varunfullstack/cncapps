@@ -881,7 +881,7 @@ class BUActivity extends Business
             if($dbeProblem->getValue(DBEProblem::status) === 'P' && $reason){
                 throw new \CNCLTD\Exceptions\JsonHttpException(400,'Service Request in progress, reason required');
             }
-            $message = "{$this->dbeUser->getValue(DBEUser::name)} Deescalated from {$this->workQueueDescriptionArray[$oldQueueNo]} to {$this->workQueueDescriptionArray[$newQueueNo]} because of {$reason} ";
+            $message = "{$this->dbeUser->getValue(DBEUser::name)} Deescalated from {$this->workQueueDescriptionArray[$oldQueueNo]} to {$this->workQueueDescriptionArray[$newQueueNo]}";
             if ($reason) {
                 $message .= " because of {$reason}";
             }
