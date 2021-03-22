@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.6.5] - 2021-03-22
+### Fixed
+- Fixed changes with page title/header
+
 ## [v5.6.4] - 2021-03-18
 ### Changed
 - Changed the list of Checklists when logging a new request to show only relevant StandardTexts.

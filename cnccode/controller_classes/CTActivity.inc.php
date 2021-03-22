@@ -1923,10 +1923,11 @@ class CTActivity extends CTCNC
             $dsCustomer
         );
         $title = "Existing Service Requests for " . $dsCustomer->getValue(DBECustomer::name);
+        $header = $title;
         if ($dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y') {
-            $title .= "<span style='color: red'> On Special Attention</span>";
+            $header .= "<span style='color: red'> On Special Attention</span>";
         }
-        $this->setPageTitle($title);
+        $this->setPageTitle($title, $header);
         $sessionValue = $this->getSessionParam($this->sessionKey);
         if (!$sessionValue) {
             $sessionValue = [];

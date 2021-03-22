@@ -643,7 +643,8 @@ class Controller extends BaseObject
 
     function setPageTitle($pageTitle, string $pageHeader = null)
     {
-        $this->pageTitle = $pageTitle;
+        $this->pageTitle  = $pageTitle;
+        $this->pageHeader = $pageTitle;
         if ($pageHeader) {
             $this->pageHeader = $pageHeader;
         }
