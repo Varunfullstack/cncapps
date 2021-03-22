@@ -1,7 +1,6 @@
 <?php
 require_once(__DIR__ . "/../htdocs/config.inc.php");
 global $cfg;
-
 require_once $cfg['path_dbe'] . '/DBECustomer.inc.php';
 require_once $cfg['path_dbe'] . '/DBESite.inc.php';
 require_once $cfg['path_dbe'] . '/DBECustomerNote.inc.php';
@@ -12,33 +11,29 @@ if (!is_cli()) {
 }
 // Script example.php
 $shortopts = "p:";
-$longopts = [];
-$options = getopt($shortopts, $longopts);
+$longopts  = [];
+$options   = getopt($shortopts, $longopts);
 if (!isset($options["p"])) {
     echo 'The path to the CSV file to import is mandatory' . PHP_EOL;
     exit;
 }
-
 if (!file_exists($options['p'])) {
     echo 'The file does not exist, or the path is incorrect' . PHP_EOL;
     exit;
 }
-
 $csvFile = fopen("E:\\temp\\customers.csv", 'r');
 if (!$csvFile) {
     echo 'Failed to open file';
     exit;
 }
 $headers = fgetcsv($csvFile);
-$thing = null;
-
+$thing   = null;
 while ($line = fgetcsv($csvFile)) {
     echo "Processing customer {$line[6]}" . PHP_EOL;
     $dbeCustomer = new DBECustomer($thing);
-    $nowDate = (new DateTime())->format(DATE_MYSQL_DATE);
+    $nowDate     = (new DateTime())->format(DATE_MYSQL_DATE);
     $nowDateTime = (new DateTime())->format(DATE_MYSQL_DATETIME);
-    $reviewDate = '2020-06-18';
-
+    $reviewDate  = '2020-06-18';
     $dbeCustomer->setValue(DBECustomer::name, $line[6]);
     $dbeCustomer->getRowsByColumn(DBECustomer::name);
     if (!$dbeCustomer->fetchFirst()) {
@@ -61,8 +56,7 @@ while ($line = fgetcsv($csvFile)) {
         $customerInsert->setValue(DBECustomer::customerTypeID, 47);
         $customerInsert->setValue(DBECustomer::deliverSiteNo, 0);
         $customerInsert->insertRow();
-        $customerId = $customerInsert->getPKValue();
-
+        $customerId      = $customerInsert->getPKValue();
         $dbeCustomerNote = new DBECustomerNote($thing);
         $dbeCustomerNote->setValue(DBECustomerNote::customerID, $customerId);
         $dbeCustomerNote->setValue(DBECustomerNote::created, $nowDateTime);
@@ -75,11 +69,9 @@ while ($line = fgetcsv($csvFile)) {
     } else {
         $customerId = $dbeCustomer->getValue(DBECustomer::customerID);
     }
-
     if (!$customerId) {
         continue;
     }
-
     $dbeSite = new DBESite($thing);
     $dbeSite->setValue(DBESite::siteNo, 0);
     $dbeSite->setValue(DBESite::customerID, $customerId);
@@ -98,8 +90,6 @@ while ($line = fgetcsv($csvFile)) {
         $siteInsert->setValue(DBESite::maxTravelHours, 0);
         $siteInsert->insertRow();
     }
-
-
     $dbeContact = new DBEContact($thing);
     $dbeContact->getRowsByCustomerID($customerId, true);
     if (!$dbeContact->rowCount()) {
@@ -115,7 +105,12 @@ while ($line = fgetcsv($csvFile)) {
         $contactInsert->setValue(DBEContact::position, $line[4]);
         $contactInsert->setValue(DBEContact::email, $line[5]);
         $contactInsert->setValue(DBEContact::siteNo, 0);
+        $contactInsert->setValue(DBEContact::supportLevel, DBEContact::supportLevelMain);
         $contactInsert->insertRow();
+        $customerUpdate = new DBECustomer($thing);
+        $customerUpdate->getRow($customerId);
+        $customerUpdate->setValue(DBECustomer::primaryMainContactID, $contactInsert->getPKValue());
+        $customerUpdate->updateRow();
     }
 
 
