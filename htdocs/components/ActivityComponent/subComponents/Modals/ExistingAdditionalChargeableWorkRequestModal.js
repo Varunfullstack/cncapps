@@ -84,6 +84,9 @@ export default class ExistingAdditionalChargeableWorkRequestModal extends React.
                         <div>
                             Requested By: {chargeableWorkRequest.requesterFullName}
                         </div>
+                        <div>
+                            Reason: <div dangerouslySetInnerHTML={{__html: chargeableWorkRequest.reason}}/>
+                        </div>
                     </React.Fragment>
                 )}
                 footer={

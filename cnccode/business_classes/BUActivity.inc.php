@@ -10898,7 +10898,9 @@ FROM
             DBEJCallActivity::userID,
             $currentUser->getValue(DBEUser::userID)
         );
-        $dbeCallActivity->insertRow();
+        if(!$dbeCallActivity->insertRow()){
+            throw new Exception("Failed to insert customer contact activity {$dbeCallActivity->db->Error}");
+        }
         return $dbeCallActivity;
     }
 

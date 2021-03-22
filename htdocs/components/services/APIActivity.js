@@ -198,14 +198,19 @@ class APIActivity extends APIMain {
             })
     }
 
-    async addAdditionalTimeRequest(serviceRequestId, reason, timeRequested) {
+    async addAdditionalTimeRequest(serviceRequestId, reason, timeRequested, selectedContactId) {
         const response = await fetch(`${ApiUrls.SRActivity}addAdditionalTimeRequest`,
             {
                 method: 'POST',
-                body: JSON.stringify({serviceRequestId, reason, timeRequested})
+                body: JSON.stringify({serviceRequestId, reason, timeRequested, selectedContactId})
             }
         )
-        const jsonResponse = await response.json();
+        let jsonResponse = null;
+        try {
+            jsonResponse = await response.json();
+        } catch (error) {
+            throw new Error('Failed to parse json response');
+        }
         if (jsonResponse.status !== 'ok') {
             throw new Error(jsonResponse.message);
         }

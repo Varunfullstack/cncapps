@@ -37,7 +37,7 @@ export class TaskListComponent extends React.Component {
             if (!res.status === 'ok') {
                 throw new Error('Failed to save task list');
             }
-            debugger;
+
             if (onUpdatedTaskList) {
                 onUpdatedTaskList();
             }

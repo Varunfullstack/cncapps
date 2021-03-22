@@ -12,6 +12,8 @@ use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestReque
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestServiceRequestId;
 use CNCLTD\CommunicationService\CommunicationService;
 use CNCLTD\Exceptions\AdditionalHoursRequestedInvalidValueException;
+use CNCLTD\Exceptions\ChargeableWorkCustomerRequestContactNotFoundException;
+use CNCLTD\Exceptions\ChargeableWorkCustomerRequestContactNotMainException;
 use DateTimeImmutable;
 use DBECallActivity;
 use DBEContact;
@@ -45,20 +47,28 @@ class CreateChargeableWorkCustomerRequest
      * @param DBEUser $requester
      * @param int $additionalTimeRequested
      * @param string $reason
+     * @param int $requesteeId
      * @throws AdditionalHoursRequestedInvalidValueException
+     * @throws ChargeableWorkCustomerRequestContactNotFoundException
+     * @throws ChargeableWorkCustomerRequestContactNotMainException
      */
     public function __invoke(DBEProblem $serviceRequest,
                              DBEUser $requester,
                              int $additionalTimeRequested,
-                             string $reason
+                             string $reason,
+                             int $requesteeId
     )
     {
 
         $serviceRequestId = $serviceRequest->getValue(DBEProblem::problemID);
-        $id          = $this->repository->getNextIdentity();
-        $requestee   = new DBEContact($this);
-        $requesteeId = $serviceRequest->getValue(DBEProblem::contactID);
-        $requestee->getRow($requesteeId);
+        $id               = $this->repository->getNextIdentity();
+        $requestee        = new DBEContact($this);
+        if (!$requestee->getRow($requesteeId)) {
+            throw new ChargeableWorkCustomerRequestContactNotFoundException($requesteeId);
+        }
+        if ($requestee->getValue(DBEContact::supportLevel) !== DBEContact::supportLevelMain) {
+            throw new ChargeableWorkCustomerRequestContactNotMainException($requesteeId);
+        }
         $newRequest = ChargeableWorkCustomerRequest::create(
             $id,
             new DateTimeImmutable(),
@@ -72,7 +82,7 @@ class CreateChargeableWorkCustomerRequest
         CommunicationService::sendExtraChargeableWorkRequestToContact($newRequest);
         $requesterFullName = "{$requester->getValue(DBEUser::firstName)} {$requester->getValue(DBEUser::lastName)}";
         $requesteeFullName = "{$requestee->getValue(DBEContact::firstName)} {$requestee->getValue(DBEContact::lastName)}";
-        $contactActivity   = $this->BUActivity->addCustomerContactActivityToServiceRequest(
+        $contactActivity = $this->BUActivity->addCustomerContactActivityToServiceRequest(
             $serviceRequest,
             "<p>$requesterFullName sent a request for $additionalTimeRequested hour(s) to $requesteeFullName</p><br/>{$reason}",
             $requester

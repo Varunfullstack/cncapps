@@ -24,7 +24,8 @@ import {LinkServiceRequestOrder} from "./LinkserviceRequestOrder.js";
 import {ActivityType} from "../../shared/ActivityTypes";
 import {InternalNotes} from "./InternalNotesComponent";
 import {TaskListComponent} from "./TaskListComponent";
-import AdditionalTimeRequestModal from "./Modals/AdditionalTimeRequestModal";
+import AdditionalChargeRequestModal from "./Modals/AdditionalTimeRequestModal";
+import ExistingAdditionalChargeableWorkRequestModal from "./Modals/ExistingAdditionalChargeableWorkRequestModal";
 
 // noinspection EqualityComparisonWithCoercionJS
 const hiddenAndCustomerNoteAlertMessage = `Customer note must be empty when the activity or entire SR is hidden.`;
@@ -572,22 +573,31 @@ class ActivityEditComponent extends MainComponent {
 
     renderChargeableWorkIcon = () => {
         const {data} = this.state;
-        if (!data) {
+        if (!data || data.problemHideFromCustomerFlag == 'Y') {
             return '';
         }
         let title = "Additional Charges";
         let icon = "fa-envelope-open-dollar";
-        if (data.hasPendingChargeableWorkRequest) {
+        let handler = this.handleRequestCustomerApproval;
+        if (data.chargeableWorkRequestId) {
             title = "Chargeable request in process";
             icon = "fa-hands-usd";
+            handler = this.handleCurrentChargeableWorkRequest
         }
         return (
             <ToolTip title={title}
                      content={<a className={`fal ${icon}  fa-2x m-5 pointer icon`}
-                                 onClick={this.handleRequestCustomerApproval}
+                                 onClick={handler}
                      />}
             />
         )
+    }
+    handleCurrentChargeableWorkRequest = async () => {
+        const shouldReload = await this.showAdditionalTimeRequestModal();
+        if (shouldReload) {
+            const {currentActivity} = this.state;
+            await this.loadCallActivity(currentActivity);
+        }
     }
 
     showAdditionalTimeRequestModal = async () => {
@@ -601,11 +611,12 @@ class ActivityEditComponent extends MainComponent {
     handleRequestCustomerApproval = async () => {
         const {problemID: serviceRequestId} = this.state.data;
         try {
-            const {reason, timeRequested} = await this.showAdditionalTimeRequestModal();
+            let {reason, selectedContactId, timeRequested} = await this.showAdditionalTimeRequestModal();
             try {
-                await this.api.addAdditionalTimeRequest(serviceRequestId, reason, timeRequested);
+                await this.api.addAdditionalTimeRequest(serviceRequestId, reason, timeRequested, selectedContactId);
                 const {currentActivity} = this.state;
                 await this.loadCallActivity(currentActivity);
+                this.alert('Request Sent');
             } catch (error) {
                 this.alert(error);
             }
@@ -1840,22 +1851,54 @@ class ActivityEditComponent extends MainComponent {
             this.additionalTimeRequestResolve(data);
         }
         this.hideAdditionalTimeRequestModal();
-        this.alert('Request Sent');
     }
 
     hideAdditionalTimeRequestModal = () => {
         this.setState({showAdditionalTimeRequestModal: false})
     }
 
+    getAdditionalChargeModal = () => {
+        const {data, showAdditionalTimeRequestModal} = this.state;
+
+        if (!data || !showAdditionalTimeRequestModal) {
+            return '';
+        }
+        if (data.chargeableWorkRequestId) {
+            return (
+                <ExistingAdditionalChargeableWorkRequestModal
+                    key="existingAdditionalChargeRequest"
+                    chargeableWorkRequestId={data.chargeableWorkRequestId}
+                    show={showAdditionalTimeRequestModal}
+                    onClose={this.handleExistingAdditionalChargeableWorkRequestModalOnClose}
+                />
+            )
+        }
+        return (
+            <AdditionalChargeRequestModal key="additionalTimeRequestModal"
+                                          show={showAdditionalTimeRequestModal}
+                                          onChange={this.handleAdditionalTimeRequestModalOnChange}
+                                          onCancel={this.handleAdditionalTimeRequestModalOnCancel}
+                                          serviceRequestData={data}
+            />
+        )
+    }
+    handleExistingAdditionalChargeableWorkRequestModalOnClose = (closingValue) => {
+        if (this.additionalTimeRequestResolve) {
+            this.additionalTimeRequestResolve(closingValue);
+        }
+        this.hideAdditionalTimeRequestModal();
+    };
+
     render() {
-        const {data, showSalesOrder, showAdditionalTimeRequestModal} = this.state;
+        const {data, showSalesOrder, _activityLoaded} = this.state;
+
+        if (!_activityLoaded) {
+            return <div className="loading"/>
+        }
+
         return (
             <div style={{width: "90%"}}>
-                <AdditionalTimeRequestModal key="additionalTimeRequestModal"
-                                            show={showAdditionalTimeRequestModal}
-                                            onChange={this.handleAdditionalTimeRequestModalOnChange}
-                                            onCancel={this.handleAdditionalTimeRequestModalOnCancel}
-                />
+                {this.getAdditionalChargeModal()}
                 {this.getAlert()}
                 {this.getConfirm()}
                 {this.getPrompt()}

@@ -2,9 +2,10 @@ import Modal from "../../../shared/Modal/modal";
 import React from 'react';
 import CNCCKEditor from "../../../shared/CNCCKEditor";
 import * as PropTypes from "prop-types";
+import APICustomers from "../../../services/APICustomers";
 
 class AdditionalTimeRequestModal extends React.Component {
-    el = React.createElement;
+    api = new APICustomers()
     static defaultProps = {
         show: false,
     }
@@ -17,8 +18,36 @@ class AdditionalTimeRequestModal extends React.Component {
     initialState() {
         return {
             reason: '',
-            timeRequested: 0
+            timeRequested: 0,
+            contacts: [],
+            selectedContactId: ''
         };
+    }
+
+    async componentDidMount() {
+        const {serviceRequestData} = this.props;
+
+        let contacts = await this.api.getCustomerContacts(serviceRequestData.customerId);
+        const serviceRequestContactId = parseInt(serviceRequestData.contactID);
+        const {filteredContacts, primaryContact, isSelectedContactMain} = contacts.reduce(
+            (acc, c) => {
+                if (c.id === serviceRequestContactId) {
+                    acc.isSelectedContactMain = c.supportLevel === 'main';
+                }
+
+                if (c.supportLevel == 'main') {
+                    acc.filteredContacts.push(c);
+                    if (c.isPrimary) {
+                        acc.primaryContact = c;
+                    }
+                }
+                return acc;
+            },
+            {filteredContacts: [], primaryContact: null, isSelectedContactMain: false}
+        )
+        const selectedContactId = isSelectedContactMain ? serviceRequestContactId : primaryContact.id;
+
+        this.setState({contacts: filteredContacts, selectedContactId})
     }
 
     handleTemplateValueChange = (reason) => {
@@ -68,18 +97,37 @@ class AdditionalTimeRequestModal extends React.Component {
         )
     }
 
+    changeSelectedContact = ($event) => {
+        console.log($event.target.value);
+        this.setState({selectedContactId: $event.target.value});
+    }
+
     getTemplateModal = () => {
         const {show} = this.props;
-        const {reason, timeRequested} = this.state;
+        const {reason, timeRequested, contacts, selectedContactId} = this.state;
         return (
             <Modal
-                width="900"
+                width="75%"
                 onClose={() => this.onCancel()}
                 title="Additional Time Request"
                 show={show}
                 className="standardTextModal"
                 content={(
                     <React.Fragment key="internalModal">
+                        <div key="contact picker">
+                            <label>
+                                Send request to:
+                            </label>
+                            <select value={selectedContactId}
+                                    onChange={this.changeSelectedContact}
+                            >
+                                {
+                                    contacts.map(x => <option key={x.id}
+                                                              value={x.id}
+                                    >{`${x.firstName} ${x.lastName}`}</option>)
+                                }
+                            </select>
+                        </div>
                         <div key="hoursContainer"
                              style={{marginBottom: "1rem"}}
                         >
@@ -147,7 +195,8 @@ class AdditionalTimeRequestModal extends React.Component {
 AdditionalTimeRequestModal.propTypes = {
     show: PropTypes.bool,
     onChange: PropTypes.func,
-    onCancel: PropTypes.func
+    onCancel: PropTypes.func,
+    serviceRequestData: PropTypes.object
 }
 
 export default AdditionalTimeRequestModal;

@@ -38,6 +38,7 @@ class ActivityDisplayComponent extends MainComponent {
                 isSDManager: false
             },
             data: null,
+            _loadedData: false,
             currentActivity: null,
             _showModal: false,
             templateOptions: [],
@@ -95,7 +96,7 @@ class ActivityDisplayComponent extends MainComponent {
         filters.monitorSR = res.monitoringFlag == "1";
         filters.criticalSR = res.criticalFlag == "1";
         filters.holdForQA = res.holdForQA;
-        this.setState({filters, data: res, currentActivity: +res.callActivityID, currentUser});
+        this.setState({filters, data: res, currentActivity: +res.callActivityID, currentUser, _loadedData: true});
         return '';
 
     }
@@ -404,7 +405,7 @@ class ActivityDisplayComponent extends MainComponent {
 
     renderChargeableWorkIcon = () => {
         const {data} = this.state;
-        if (!data) {
+        if (!data || data.problemHideFromCustomerFlag == 'Y') {
             return '';
         }
         let title = "Additional Charges";
@@ -435,13 +436,18 @@ class ActivityDisplayComponent extends MainComponent {
     handleRequestCustomerApproval = async () => {
         const {problemID: serviceRequestId} = this.state.data;
         try {
-            const {reason, timeRequested} = await this.showAdditionalTimeRequestModal();
+            const {reason, timeRequested, selectedContactId} = await this.showAdditionalTimeRequestModal();
             try {
-                await this.api.addAdditionalTimeRequest(serviceRequestId, reason, timeRequested);
+                await this.api.addAdditionalTimeRequest(serviceRequestId, reason, timeRequested, selectedContactId);
                 const {currentActivity} = this.state;
                 await this.loadCallActivity(currentActivity);
+                this.alert('Request Sent');
             } catch (error) {
-                this.alert(error);
+                let message = error;
+                if (typeof (error) === 'object' && "message" in error) {
+                    message = error.message;
+                }
+                this.alert(`Failed to save request:${message}`);
             }
         } catch (rejectedPromise) {
 
@@ -1152,7 +1158,7 @@ class ActivityDisplayComponent extends MainComponent {
 
     getTaskListElement() {
         const {data} = this.state;
-        if (!data) {
+        if (!data || data.entire) {
             return '';
         }
         return (
@@ -1175,7 +1181,6 @@ class ActivityDisplayComponent extends MainComponent {
             this.additionalTimeRequestResolve(data);
         }
         this.hideAdditionalTimeRequestModal();
-        this.alert('Request Sent');
     }
 
     hideAdditionalTimeRequestModal = () => {
@@ -1188,7 +1193,6 @@ class ActivityDisplayComponent extends MainComponent {
         if (!data || !showAdditionalTimeRequestModal) {
             return '';
         }
-        console.log('render something');
         if (data.chargeableWorkRequestId) {
             return (
                 <ExistingAdditionalChargeableWorkRequestModal
@@ -1204,12 +1208,18 @@ class ActivityDisplayComponent extends MainComponent {
                                           show={showAdditionalTimeRequestModal}
                                           onChange={this.handleAdditionalTimeRequestModalOnChange}
                                           onCancel={this.handleAdditionalTimeRequestModalOnCancel}
+                                          serviceRequestData={data}
             />
         )
     }
 
     render() {
-        const {data, showSalesOrder} = this.state;
+        const {data, showSalesOrder, _loadedData} = this.state;
+
+        if (!_loadedData) {
+            return <div className="loading"/>
+        }
+
         return (
             <div style={{width: "90%"}}>
                 {this.getAdditionalChargeModal()}
@@ -1243,7 +1253,7 @@ class ActivityDisplayComponent extends MainComponent {
                                                            customerId={data?.customerId}
                                                            show={showSalesOrder}
                                                            onClose={this.handleSalesOrderClose}
-                ></LinkServiceRequestOrder> : null}
+                /> : null}
             </div>
         );
     }

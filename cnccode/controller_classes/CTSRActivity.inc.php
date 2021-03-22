@@ -1625,19 +1625,20 @@ FROM
     {
         $data = $this->getJSONData();
         try {
-            $serviceRequestId = (int)@$data['serviceRequestId'];
-            $reason           = @$data['reason'];
-            $timeRequested    = (int)@$data['timeRequested'];
-            $repo             = new ChargeableWorkCustomerRequestMySQLRepository();
-            $buActivity       = new BUActivity($this);
-            $serviceRequest   = new DBEProblem($this);
+            $serviceRequestId  = (int)@$data['serviceRequestId'];
+            $reason            = @$data['reason'];
+            $timeRequested     = (int)@$data['timeRequested'];
+            $selectedContactId = (int)@$data['selectedContactId'];
+            $repo              = new ChargeableWorkCustomerRequestMySQLRepository();
+            $buActivity        = new BUActivity($this);
+            $serviceRequest    = new DBEProblem($this);
             if (!$serviceRequest->getRow($serviceRequestId)) {
                 throw new ServiceRequestNotFoundException();
             }
             $usecase = new CreateChargeableWorkCustomerRequest($repo, $buActivity);
-            $usecase->__invoke($serviceRequest, $this->dbeUser, $timeRequested, $reason);
+            $usecase->__invoke($serviceRequest, $this->dbeUser, $timeRequested, $reason, $selectedContactId);
         } catch (Exception $exception) {
-            throw new JsonHttpException(123, $exception->getMessage());
+            throw new JsonHttpException(400, $exception->getMessage());
         }
         return ["status" => "ok"];
     }

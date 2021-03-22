@@ -31,6 +31,6 @@ export default ToolTip;
 
 ToolTip.propTypes = {
     title: PropTypes.string,
-    width: PropTypes.string,
+    width: PropTypes.any,
     style: PropTypes.object
 };

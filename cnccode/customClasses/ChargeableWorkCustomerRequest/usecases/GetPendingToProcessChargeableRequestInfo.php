@@ -38,7 +38,7 @@ class GetPendingToProcessChargeableRequestInfo
         if (!$request) {
             throw new ChargeableWorkCustomerRequestNotFoundException();
         }
-        $dbeProblem       = new DBEJProblem($this);
+        $dbeProblem = new DBEJProblem($this);
         $serviceRequestId = $request->getServiceRequestId()->value();
         if (!$dbeProblem->getRow($serviceRequestId)) {
             throw new ServiceRequestNotFoundException();
@@ -48,7 +48,9 @@ class GetPendingToProcessChargeableRequestInfo
         return new PendingToProcessChargeableRequestInfoDTO(
             $id->value(),
             $serviceRequestId,
-            $dbeProblem->getValue(DBEProblem::emailSubjectSummary),
+            $dbeProblem->getValue(DBEProblem::emailSubjectSummary) ? $dbeProblem->getValue(
+                DBEProblem::emailSubjectSummary
+            ) : '',
             $dbeProblem->getValue(DBEJProblem::contactName),
             $request->getAdditionalHoursRequested()->value(),
             $request->getReason()->value(),
