@@ -19,9 +19,13 @@ if (!is_cli()) {
     exit;
 }
 // Script example.php
-$shortopts = "dt";
-$longopts  = [];
-$options   = getopt($shortopts, $longopts);
+$shortopts     = "dte";
+$longopts      = [];
+$options       = getopt($shortopts, $longopts);
+$sendEmailMode = false;
+if (isset($options['e'])) {
+    $sendEmailMode = true;
+}
 $debugMode = false;
 if (isset($options['d'])) {
     $debugMode = true;
@@ -88,6 +92,10 @@ while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
         continue;
     }
     $customerName = strtolower($row['customerName']);
+    $customer     = getCustomerByNameOrNull($customerName);
+    if ($customer && $customer->getValue(DBECustomer::excludeFromWebrootChecks)) {
+        continue;
+    }
     $computerName = strtolower($row['computerName']);
     if (empty($matches[$customerName])) {
         $matches[$customerName] = [
@@ -317,6 +325,10 @@ foreach ($sitesResponse->sites as $site) {
         continue;
     }
     $customerName = strtolower($site->siteName);
+    $customer     = getCustomerByNameOrNull($customerName);
+    if ($customer && $customer->getValue(DBECustomer::excludeFromWebrootChecks)) {
+        continue;
+    }
     foreach ($webrootAPI->getEndpoints($site->siteId) as $device) {
 
         if ($device->deactivated) {
@@ -444,6 +456,10 @@ $controlDevices = [];
 while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
 
     $customerName = strtolower($row['customerName']);
+    $customer     = getCustomerByNameOrNull($customerName);
+    if ($customer && $customer->getValue(DBECustomer::excludeFromWebrootChecks)) {
+        continue;
+    }
     $computerName = strtolower($row['computerName']);
     if (!$customerName || !$computerName) {
         $errorTxt = "Control device without customer name or computer name ? CustomerName: {$customerName} ComputerName: {$computerName} rowid: {$row['rowid']} ";
@@ -526,27 +542,29 @@ foreach (array_keys($matches) as $customerName) {
     }
 }
 fclose($csv);
-$buMail  = new BUMail($thing);
-$toEmail = 'unseencomputers@' . CONFIG_PUBLIC_DOMAIN;
-$hdrs    = array(
-    'From'         => 'support@' . CONFIG_PUBLIC_DOMAIN,
-    'To'           => $toEmail,
-    'Subject'      => "Computers not seen recently",
-    'Date'         => date("r"),
-    'Content-Type' => 'text/html; charset=UTF-8'
-);
-global $twig;
-$body = $twig->render('@internal/computersNotSeenRecentlyEmail.html.twig', ["items" => $errors]);
-$buMail->mime->setHTMLBody($body);
-$buMail->mime->addAttachment(DATA_CSV_FILENAME, 'text/csv');
-$mime_params = array(
-    'text_encoding' => '7bit',
-    'text_charset'  => 'UTF-8',
-    'html_charset'  => 'UTF-8',
-    'head_charset'  => 'UTF-8'
-);
-$body        = $buMail->mime->get($mime_params);
-$hdrs        = $buMail->mime->headers($hdrs);
-$buMail->send($toEmail, $hdrs, $body);
+if ($sendEmailMode) {
+    $buMail  = new BUMail($thing);
+    $toEmail = 'unseencomputers@' . CONFIG_PUBLIC_DOMAIN;
+    $hdrs    = array(
+        'From'         => 'support@' . CONFIG_PUBLIC_DOMAIN,
+        'To'           => $toEmail,
+        'Subject'      => "Computers not seen recently",
+        'Date'         => date("r"),
+        'Content-Type' => 'text/html; charset=UTF-8'
+    );
+    global $twig;
+    $body = $twig->render('@internal/computersNotSeenRecentlyEmail.html.twig', ["items" => $errors]);
+    $buMail->mime->setHTMLBody($body);
+    $buMail->mime->addAttachment(DATA_CSV_FILENAME, 'text/csv');
+    $mime_params = array(
+        'text_encoding' => '7bit',
+        'text_charset'  => 'UTF-8',
+        'html_charset'  => 'UTF-8',
+        'head_charset'  => 'UTF-8'
+    );
+    $body        = $buMail->mime->get($mime_params);
+    $hdrs        = $buMail->mime->headers($hdrs);
+    $buMail->send($toEmail, $hdrs, $body);
+}
 echo file_get_contents(DATA_CSV_FILENAME);
 

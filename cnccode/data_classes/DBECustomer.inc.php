@@ -77,6 +77,7 @@ class DBECustomer extends DBCNCEntity
     const streamOneEmail               = "streamOneEmail";
     const inclusiveOOHCallOuts         = "inclusiveOOHCallOuts";
     const eligiblePatchManagement      = "eligiblePatchManagement";
+    const excludeFromWebrootChecks     = "excludeFromWebrootChecks";
 
 
     /**
@@ -475,6 +476,13 @@ class DBECustomer extends DBCNCEntity
         $this->addColumn(
             self::eligiblePatchManagement,
             DA_INTEGER,
+            DA_NOT_NULL,
+            null,
+            0
+        );
+        $this->addColumn(
+            self::excludeFromWebrootChecks,
+            DA_BOOLEAN,
             DA_NOT_NULL,
             null,
             0

@@ -1072,7 +1072,7 @@ class CTCustomer extends CTCNC
                 echo $this->getCurrentUser();
                 exit;
             case "searchCustomers":
-                echo json_encode($this->searchCustomers(),JSON_NUMERIC_CHECK);
+                echo json_encode($this->searchCustomers(), JSON_NUMERIC_CHECK);
                 exit;
             case "getCustomerSR":
                 echo json_encode($this->getCustomerSR());
@@ -1703,6 +1703,9 @@ class CTCustomer extends CTCNC
                 'mailshotFlagChecked'                     => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::mailshotFlag)
                 ),
+                'excludeFromWebrootChecksChecked'         => $this->dsCustomer->getValue(
+                    DBECustomer::excludeFromWebrootChecks
+                ) ? 'checked' : '',
                 'referredFlagChecked'                     => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::referredFlag)
                 ),
