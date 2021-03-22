@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 1265 - Calculate and store the amount of OBRS storage per customer / server
+
 ## [v5.6.5] - 2021-03-22
 ### Fixed
 - Fixed changes with page title/header
