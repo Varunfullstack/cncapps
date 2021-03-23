@@ -20,6 +20,7 @@ export class TaskListComponent extends React.Component {
 
     componentDidMount() {
         this.apiStandardText.getAllTypes().then(allStandardTexts => {
+            allStandardTexts = allStandardTexts.filter(x => [1, 3].indexOf(x.typeId) > -1);
             this.setState({allStandardTexts})
         });
     }

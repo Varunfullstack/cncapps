@@ -3,11 +3,12 @@ This project changes will be shown here.
 
 ## [unreleased]
 ### Added
-- Issue 1247 - Customer approval for extra chargeable work
+- Issue 1247 - Customer approval for extra chargeable work.
 ### Changed
-- Issue 648 - Move contacts that are linked to a supplier to their own table
-- Issue 1230 - Show supported / unsupported customer assets
-- Issue 1294 - Import customers from CSV v2
+- Issue 648 - Move contacts that are linked to a supplier to their own table.
+- Issue 1230 - Show supported / unsupported customer assets.
+- Issue 1294 - Import customers from CSV v2.
+- Issue 1297 - Task List Modal, refine list of items.
 
 ## [v5.6.5] - 2021-03-22
 ### Fixed
