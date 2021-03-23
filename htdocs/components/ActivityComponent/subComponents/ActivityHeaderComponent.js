@@ -34,18 +34,18 @@ export class ActivityHeaderComponent extends React.Component {
                     </a>
                     <span className='contactPhone'>
                         <label>Site:</label>
-                        <a href={`tel:${serviceRequestData.sitePhone}`}> {serviceRequestData.sitePhone} </a>
+                        <a href={`tel:${serviceRequestData.sitePhone}`} target="_blank"> {serviceRequestData.sitePhone} </a>
                     </span>
                     {serviceRequestData.contactPhone ?
                         <span className="contactPhone">
                             <label>DDI:</label>
-                            <a href={`tel:${serviceRequestData.contactPhone}`}>{serviceRequestData.contactPhone}</a>
+                            <a href={`tel:${serviceRequestData.contactPhone}`} target="_blank">{serviceRequestData.contactPhone}</a>
                         </span> : null
                     }
                     {serviceRequestData.contactMobilePhone ?
                         <span className="contactPhone">
                                 <label> Mobile:</label>
-                                <a href={`tel:${serviceRequestData.contactMobilePhone}`}>{serviceRequestData.contactMobilePhone}</a>
+                                <a href={`tel:${serviceRequestData.contactMobilePhone}`} target="_blank">{serviceRequestData.contactMobilePhone}</a>
                             </span>
                         : null
                     }

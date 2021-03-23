@@ -1,9 +1,13 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 1300 - Remove 'leave this site' warning from Edit SR page.
+
 ## [v5.6.5] - 2021-03-22
 ### Fixed
-- Fixed changes with page title/header
+- Fixed changes with page title/header 
 
 ## [v5.6.4] - 2021-03-18
 ### Changed
