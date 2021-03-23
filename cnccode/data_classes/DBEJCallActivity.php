@@ -56,17 +56,18 @@ class DBEJCallActivity extends DBECallActivity
     const projectID                           = "projectID";
     const linkedSalesOrderID                  = "linkedSalesOrderID";
     const totalActivityDurationHours          = "totalActivityDurationHours";
-    const criticalFlag                        = "criticalFlag";
-    const hdLimitMinutes                      = "hdLimitMinutes";
-    const esLimitMinutes                      = "esLimitMinutes";
-    const imLimitMinutes                      = "imLimitMinutes";
-    const hdPauseCount                        = "hdPauseCount";
-    const allocatedUserID                     = "allocatedUserID";
-    const queueNo                             = "queueNo";
-    const caaConsno                           = "caa_consno";
-    const assetName                           = "assetName";
-    const assetTitle                          = "assetTitle";
-    const emailSubjectSummary                 = "emailSubjectSummary";
+    const criticalFlag         = "criticalFlag";
+    const hdLimitMinutes       = "hdLimitMinutes";
+    const esLimitMinutes       = "esLimitMinutes";
+    const imLimitMinutes       = "imLimitMinutes";
+    const hdPauseCount         = "hdPauseCount";
+    const allocatedUserID      = "allocatedUserID";
+    const queueNo              = "queueNo";
+    const caaConsno            = "caa_consno";
+    const assetName            = "assetName";
+    const assetTitle           = "assetTitle";
+    const emailSubjectSummary  = "emailSubjectSummary";
+    const prePayChargeApproved = "prePayChargeApproved";
 
     var $fromString;
 
@@ -378,6 +379,12 @@ class DBEJCallActivity extends DBECallActivity
             DA_TEXT,
             DA_ALLOW_NULL,
             "problem.assetTitle"
+        );
+        $this->addColumn(
+            self::prePayChargeApproved,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            "problem.prePayChargeApproved"
         );
         $this->setAddColumnsOff();
         $this->fromString = $this->getTableName(

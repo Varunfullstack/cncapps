@@ -3334,7 +3334,9 @@ ORDER BY NAME,
         $dbeContact = new DBEContact($this);
         $dbeSite    = new DBESite($this);
         $dbeContact->getRowsByCustomerID($customerID, true);
-        $contacts = array();
+        $buCustomer     = new BUCustomer($this);
+        $primaryContact = $buCustomer->getPrimaryContact($customerID);
+        $contacts       = array();
         while ($dbeContact->fetchNext()) {
             $dbeSite->setValue(
                 DBESite::customerID,
@@ -3362,7 +3364,10 @@ ORDER BY NAME,
                     "mobilePhone"  => $dbeContact->getValue(DBEContact::mobilePhone),
                     "email"        => $dbeContact->getValue(DBEContact::email),
                     'supportLevel' => $dbeContact->getValue(DBEContact::supportLevel),
-                    "notes"        => $dbeContact->getValue(DBEContact::notes)
+                    "notes"        => $dbeContact->getValue(DBEContact::notes),
+                    "isPrimary"    => $primaryContact && $primaryContact->getValue(
+                            DBEContact::contactID
+                        ) === $dbeContact->getValue(DBEContact::contactID)
                 )
             );
         }

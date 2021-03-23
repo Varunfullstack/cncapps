@@ -9,6 +9,8 @@
  */
 
 use CNCLTD\AutomatedRequest;
+use CNCLTD\ChargeableWorkCustomerRequest\infra\ChargeableWorkCustomerRequestMySQLRepository;
+use CNCLTD\ChargeableWorkCustomerRequest\usecases\ClearPendingChargeableRequestsOnServiceRequestClosed;
 use CNCLTD\ServiceRequestInternalNote\infra\ServiceRequestInternalNotePDORepository;
 use CNCLTD\ServiceRequestInternalNote\ServiceRequestInternalNote;
 use CNCLTD\ServiceRequestInternalNote\UseCases\AddServiceRequestInternalNote;
@@ -3882,6 +3884,10 @@ class BUActivity extends Business
             $statement->fetch_array(MYSQLI_NUM)[0]
         );
         $dbeProblem->updateRow();
+        // we have to check if there were any pending Chargeable Work Requests, and we have to remove them if that's true
+        $repo    = new ChargeableWorkCustomerRequestMySQLRepository();
+        $usecase = new ClearPendingChargeableRequestsOnServiceRequestClosed($repo);
+        $usecase($dbeProblem);
         return $newActivityID;
 
     }
@@ -8279,6 +8285,9 @@ FROM
         if ($dbeProblem->getValue(DBEProblem::hideFromCustomerFlag) == 'N') {
             $this->sendFixedEmail($problemID);
         }
+        $repo    = new ChargeableWorkCustomerRequestMySQLRepository();
+        $usecase = new ClearPendingChargeableRequestsOnServiceRequestClosed($repo);
+        $usecase($dbeProblem);
         return true;
     }
 
@@ -10855,7 +10864,7 @@ FROM
     public function addCustomerContactActivityToServiceRequest(DBEProblem $DBEProblem,
                                                                $cpr_reason,
                                                                DBEUser $currentUser
-    )
+    ): DBECallActivity
     {
         $initialActivity = $this->getFirstActivityInServiceRequest(
             $DBEProblem->getValue(DBEProblem::problemID),
@@ -10906,7 +10915,10 @@ FROM
             DBEJCallActivity::userID,
             $currentUser->getValue(DBEUser::userID)
         );
-        $dbeCallActivity->insertRow();
+        if (!$dbeCallActivity->insertRow()) {
+            throw new Exception("Failed to insert customer contact activity {$dbeCallActivity->db->Error}");
+        }
+        return $dbeCallActivity;
     }
 
     private function getSuitableEmailSubjectSummary($ordheadID, $selectedOrderLine)

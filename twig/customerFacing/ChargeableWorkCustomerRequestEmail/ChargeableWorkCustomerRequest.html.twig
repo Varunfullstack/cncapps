@@ -1,0 +1,60 @@
+{% extends '@customerFacing/wrapper.html.twig' %}
+{# @var data \CNCLTD\TwigDTOs\ChargeableWorkCustomerRequestEmailDTO #}
+{% block headerTitle %}
+    Service Request Information
+{% endblock %}
+
+{% block headerContet %}
+    We have a question for you
+{% endblock %}
+
+{% block content %}
+    <p>{{ data.requesteeFirstName }}</p>
+    <p>
+        The requirement for this work has been identified as needing additional charges because either it’s out of scope
+        for your normal support contracts or the requirements have changed and it’s taking longer.
+    </p>
+    <p>
+        To allow us to carry on working on your Service Request, please select the Accept link below to give your
+        authorisation for these charges
+    </p>
+    <p>
+        If you don’t want to continue you can Reject this request and we’ll close down the Service Request but if we
+        haven’t heard from you in 5 working days we’ll assume you don’t want to proceed and will close this down.
+    </p>
+    <p>
+        You can leave additional comments or information when clicking on the links.
+    </p>
+    <p>
+        Additional Time Being Requested: {{ data.extraTimeRequested }} hour(s)
+    </p>
+    <p>
+        Hourly rate: {{ data.hourlyRate | format_currency('GBP',{fraction_digit:2}) }} + VAT
+    </p>
+    <table style="width: 100%">
+        <tr>
+            <td class="details">
+                {{ data.htmlReason | raw }}
+            </td>
+        </tr>
+    </table>
+    <p>
+        Please select an action
+    </p>
+    <p>
+        <a href="{{ data.acceptURL }}">Accept</a> / <a href="{{ data.rejectURL }}">Reject</a>
+    </p>
+    <p>
+        This update was added by {{ data.requesterFullName }}
+    </p>
+{% endblock %}
+
+{% block serviceRequestURL %}https://www.cnc-ltd.co.uk/portal/service-requests/view/?serviceid={{ data.serviceRequestId }}{% endblock %}
+
+{% block footerStatus %}
+    On Hold
+{% endblock %}
+
+{% block feedback %}
+
+{% endblock %}

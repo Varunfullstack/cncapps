@@ -1,0 +1,53 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdevmt" id="issue1247-0">
+        <tagDatabase tag="issue1247"/>
+    </changeSet>
+    <changeSet id="issue1247-1" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="chargeableWorkCustomerRequest"/>
+            </not>
+        </preConditions>
+        <createTable tableName="chargeableWorkCustomerRequest">
+            <column name="id" type="varchar(50)">
+                <constraints nullable="false" primaryKeyName="PRIMARY" primaryKey="true"/>
+            </column>
+            <column name="serviceRequestId" type="int(11) unsigned">
+                <constraints nullable="false" foreignKeyName="FK_CWCR_serviceRequestId" referencedTableName="problem"
+                             referencedColumnNames="pro_problemno" deleteCascade="true"/>
+            </column>
+            <column name="requesterId" type="int(11)">
+                <constraints nullable="false" foreignKeyName="FK_CWCR_requesterId" referencedTableName="consultant"
+                             referencedColumnNames="cns_consno" deleteCascade="false"/>
+            </column>
+            <column name="createdAt" type="dateTime" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="requesteeId" type="int(11)">
+                <constraints nullable="false" foreignKeyName="FK_CWCR_requesteeId" referencedTableName="contact"
+                             referencedColumnNames="con_contno" deleteCascade="false"/>
+            </column>
+            <column name="additionalHoursRequested" type="int(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reason" type="mediumtext">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="issue1247-2" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="problem" columnName="prepayChargeApproved"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="problem">
+            <column name="prepayChargeApproved" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

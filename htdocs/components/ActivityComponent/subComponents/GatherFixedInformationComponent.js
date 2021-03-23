@@ -194,7 +194,8 @@ class GatherFixedInformationComponent extends MainComponent {
             el("option", {key: "empty", value: 99}, "Please select"),
             el("option", {
                 key: "tandm",
-                value: ""
+                value: "",
+                disabled: activity.prePayChargeApproved
             }, "T&M" + (activity.linkedSalesOrderID ? " - Must be selected because this is linked to a Sales Order" : '')),
             groupedContracts?.map((t, index) =>
                 el(
@@ -205,7 +206,7 @@ class GatherFixedInformationComponent extends MainComponent {
                             "option",
                             {
                                 key: i.contractCustomerItemID,
-                                disabled: i.isDisabled,
+                                disabled: i.isDisabled || (activity.prePayChargeApproved && i.contractCustomerItemID !== data?.contractCustomerItemID),
                                 value: i.contractCustomerItemID,
                             },
                             i.contractDescription

@@ -1,7 +1,14 @@
 <?php
 global $cfg;
 
+use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestServiceRequestId;
+use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestTokenId;
+use CNCLTD\ChargeableWorkCustomerRequest\infra\ChargeableWorkCustomerRequestMySQLRepository;
+use CNCLTD\ChargeableWorkCustomerRequest\usecases\CreateChargeableWorkCustomerRequest;
+use CNCLTD\ChargeableWorkCustomerRequest\usecases\GetPendingToProcessChargeableRequestInfo;
+use CNCLTD\Exceptions\ChargeableWorkCustomerRequestNotFoundException;
 use CNCLTD\Exceptions\JsonHttpException;
+use CNCLTD\Exceptions\ServiceRequestNotFoundException;
 use CNCLTD\InternalDocuments\Base64FileDTO;
 use CNCLTD\InternalDocuments\Entity\InternalDocumentMapper;
 use CNCLTD\InternalDocuments\InternalDocumentRepository;
@@ -63,6 +70,8 @@ class CTSRActivity extends CTCNC
     const ADD_INTERNAL_NOTE                                      = "addInternalNote";
     const CHANGE_SERVICE_REQUEST_INTERNAL_NOTE                   = "changeServiceRequestInternalNote";
     const SAVE_TASK_LIST                                         = "saveTaskList";
+    const ADD_ADDITIONAL_TIME_REQUEST                            = "addAdditionalTimeRequest";
+    const GET_ADDITIONAL_CHARGEABLE_WORK_REQUEST_INFO            = "getAdditionalChargeableWorkRequestInfo";
     public  $serverGuardArray = array(
         ""  => "Please select",
         "Y" => "ServerGuard Related",
@@ -150,6 +159,9 @@ class CTSRActivity extends CTCNC
             case self::GET_CALL_ACTIVITY_BASIC_INFO:
                 echo json_encode($this->getCallActivityBasicInfo());
                 exit;
+            case self::ADD_ADDITIONAL_TIME_REQUEST:
+                echo json_encode($this->addAdditionalTimeRequestController());
+                exit;
             case self::ADD_INTERNAL_NOTE:
                 echo json_encode($this->addInternalNoteController());
                 exit;
@@ -205,6 +217,9 @@ class CTSRActivity extends CTCNC
             }
             case "toggleHoldForQAFlag":
                 echo json_encode($this->setToggleHoldForQAFlag());
+                exit;
+            case self::GET_ADDITIONAL_CHARGEABLE_WORK_REQUEST_INFO:
+                echo json_encode($this->getAdditionalChargeableWorkRequestInfoController());
                 exit;
             case 'getLastActivityInServiceRequest':
                 $buActivity       = new BUActivity($this);
@@ -342,6 +357,15 @@ class CTSRActivity extends CTCNC
                 return -1;
             }
         );
+        $chargeableWorkRequestRepo = new ChargeableWorkCustomerRequestMySQLRepository();
+        try {
+            $chargeableRequest   = $chargeableWorkRequestRepo->getChargeableRequestForServiceRequest(
+                new ChargeableWorkCustomerRequestServiceRequestId($problemID)
+            );
+            $chargeableRequestId = $chargeableRequest->getId()->value();
+        } catch (Exception $exception) {
+            $chargeableRequestId = null;
+        }
         $taskListUpdatedByUserId = $dbeProblem->getValue(DBEProblem::taskListUpdatedBy);
         $taskListUpdatedBy       = null;
         if ($taskListUpdatedByUserId) {
@@ -461,6 +485,7 @@ class CTSRActivity extends CTCNC
             "emptyAssetReason"                => $dbeProblem->getValue(DBEProblem::emptyAssetReason),
             "holdForQA"                       => $dbeProblem->getValue(DBEProblem::holdForQA),
             "isOnSiteActivity"                => $dbeActivityType->getValue(DBECallActType::onSiteFlag) == 'Y',
+            "chargeableWorkRequestId"         => $chargeableRequestId,
             "openHours"                       => $dbeProblem->getValue(DBEProblem::openHours),
             "workingHours"                    => $dbeProblem->getValue(DBEProblem::workingHours),
             "requestEngineerName"             => $requestName,
@@ -1144,6 +1169,7 @@ class CTSRActivity extends CTCNC
                 "linkedSalesOrderID"          => $callActivity->getValue(DBEJCallActivity::linkedSalesOrderID),
                 "problemHideFromCustomerFlag" => $callActivity->getValue(DBEJCallActivity::problemHideFromCustomerFlag),
                 "rootCauseID"                 => $callActivity->getValue(DBEJCallActivity::rootCauseID),
+                "prePayChargeApproved"        => $callActivity->getValue(DBEJCallActivity::prePayChargeApproved)
             ];
         } else return null;
     }
@@ -1543,7 +1569,7 @@ FROM
             $internalDocument = $this->internalDocumentRepository->getById($documentId);
             $this->internalDocumentRepository->deleteDocument($internalDocument);
             return ["status" => "ok"];
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw new JsonHttpException(2215, "Failed to delete document");
         }
     }
@@ -1592,6 +1618,49 @@ FROM
         $dbeProblem->setValue(DBEProblem::taskListUpdatedBy, $this->userID);
         $dbeProblem->updateRow();
         return ["status" => "ok"];
+    }
+
+    /**
+     * @return string[]
+     * @throws JsonHttpException
+     */
+    private function addAdditionalTimeRequestController(): array
+    {
+        $data = $this->getJSONData();
+        try {
+            $serviceRequestId  = (int)@$data['serviceRequestId'];
+            $reason            = @$data['reason'];
+            $timeRequested     = (int)@$data['timeRequested'];
+            $selectedContactId = (int)@$data['selectedContactId'];
+            $repo              = new ChargeableWorkCustomerRequestMySQLRepository();
+            $buActivity        = new BUActivity($this);
+            $serviceRequest    = new DBEProblem($this);
+            if (!$serviceRequest->getRow($serviceRequestId)) {
+                throw new ServiceRequestNotFoundException();
+            }
+            $usecase = new CreateChargeableWorkCustomerRequest($repo, $buActivity);
+            $usecase->__invoke($serviceRequest, $this->dbeUser, $timeRequested, $reason, $selectedContactId);
+        } catch (Exception $exception) {
+            throw new JsonHttpException(400, $exception->getMessage());
+        }
+        return ["status" => "ok"];
+    }
+
+    /**
+     * @return array
+     * @throws ServiceRequestNotFoundException
+     * @throws ChargeableWorkCustomerRequestNotFoundException
+     */
+    private function getAdditionalChargeableWorkRequestInfoController(): array
+    {
+        $chargeableWorkRequestId = @$_REQUEST['id'];
+        $repo                    = new ChargeableWorkCustomerRequestMySQLRepository();
+        $usecase                 = new GetPendingToProcessChargeableRequestInfo($repo);
+        $data                    = $usecase(new ChargeableWorkCustomerRequestTokenId($chargeableWorkRequestId));
+        return [
+            "status" => "ok",
+            "data"   => $data
+        ];
     }
 }
 

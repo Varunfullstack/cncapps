@@ -197,6 +197,41 @@ class APIActivity extends APIMain {
                 }
             })
     }
+
+    async addAdditionalTimeRequest(serviceRequestId, reason, timeRequested, selectedContactId) {
+        const response = await fetch(`${ApiUrls.SRActivity}addAdditionalTimeRequest`,
+            {
+                method: 'POST',
+                body: JSON.stringify({serviceRequestId, reason, timeRequested, selectedContactId})
+            }
+        )
+        let jsonResponse = null;
+        try {
+            jsonResponse = await response.json();
+        } catch (error) {
+            throw new Error('Failed to parse json response');
+        }
+        if (jsonResponse.status !== 'ok') {
+            throw new Error(jsonResponse.message);
+        }
+    }
+
+    async getAdditionalChargeableWorkRequestInfo(id) {
+        const response = await fetch(`${ApiUrls.SRActivity}getAdditionalChargeableWorkRequestInfo&id=${id}`)
+        const jsonResponse = await response.json();
+        if (jsonResponse.status !== 'ok') {
+            throw new Error(jsonResponse.message);
+        }
+        return jsonResponse.data;
+    }
+
+    async cancelChargeableRequest(id) {
+        return this.post(`${ApiUrls.sdDashboard}cancelPendingChargeableRequest`, {id})
+    }
+
+    async resendChargeableRequestEmail(id) {
+        return this.post(`${ApiUrls.sdDashboard}resendPendingChargeableRequestEmail`, {id})
+    }
 }
 
 export default APIActivity;

@@ -1,0 +1,8 @@
+{% extends "@internal/wrapper.html.twig" %}
+{# @var data \CNCLTD\TwigDTOs\ChargeableWorkCustomerRequestProcessedEmailDTO #}
+{% block content %}
+    <p>
+        {{ data.requesteeName }} has {{ data.status }} the request for {{ data.additionalHoursRequested }} hours for
+        <a href="{{ data.urlService }}">{{ data.serviceRequestId }}</a>
+    </p>
+{% endblock %}

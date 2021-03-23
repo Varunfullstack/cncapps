@@ -1,6 +1,12 @@
 <?php
 global $cfg;
 
+use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestTokenId;
+use CNCLTD\ChargeableWorkCustomerRequest\DTO\SDManagerPendingChargeableRequestDTO;
+use CNCLTD\ChargeableWorkCustomerRequest\infra\ChargeableWorkCustomerRequestMySQLRepository;
+use CNCLTD\ChargeableWorkCustomerRequest\usecases\CancelPendingChargeableWorkCustomerRequest;
+use CNCLTD\ChargeableWorkCustomerRequest\usecases\ResendPendingChargeableWorkCustomerRequestEmail;
+use CNCLTD\Exceptions\JsonHttpException;
 use CNCLTD\SDManagerDashboard\ServiceRequestSummaryDTO;
 
 require_once($cfg['path_ct'] . '/CTCurrentActivityReport.inc.php');
@@ -10,8 +16,12 @@ require_once($cfg["path_dbe"] . "/DBConnect.php");
 
 class CTSDManagerDashboard extends CTCurrentActivityReport
 {
-    const DAILY_STATS_SUMMARY = "dailyStatsSummary";
-    const CONST_MISSED_CALL_BACK        = "missedCallBack";
+    const DAILY_STATS_SUMMARY                     = "dailyStatsSummary";
+    const CONST_MISSED_CALL_BACK                  = "missedCallBack";
+    const GET_PENDING_CHARGEABLE_REQUESTS         = "getPendingChargeableRequests";
+    const CANCEL_PENDING_CHARGEABLE_REQUEST       = "cancelPendingChargeableRequest";
+    const RESEND_PENDING_CHARGEABLE_REQUEST_EMAIL = "resendPendingChargeableRequestEmail";
+
     function __construct($requestMethod,
                          $postVars,
                          $getVars,
@@ -71,6 +81,15 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             case self::CONST_MISSED_CALL_BACK:
                 echo json_encode($this->missedCallBack(), JSON_NUMERIC_CHECK);
                 exit;
+            case self::GET_PENDING_CHARGEABLE_REQUESTS:
+                echo json_encode($this->getPendingChargeableRequestsController());
+                exit;
+            case self::CANCEL_PENDING_CHARGEABLE_REQUEST:
+                echo json_encode($this->cancelPendingChargeableRequestController());
+                exit;
+            case self::RESEND_PENDING_CHARGEABLE_REQUEST_EMAIL:
+                echo json_encode($this->resendPendingChargeableRequestEmailController());
+                exit;
             case "react":
             default:
                 $this->setTemplate();
@@ -81,14 +100,14 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
     function getQueue()
     {
 
-        $queue = $_REQUEST["queue"] ;
+        $queue = $_REQUEST["queue"];
         if (!isset($queue)) return [];
         $buProblem         = new BUActivity($this);
         $isP5              = $_REQUEST["p5"] == "true";
         $showHelpDesk      = $_REQUEST["hd"] == "true";
         $showEscalation    = $_REQUEST["es"] == "true";
         $showSmallProjects = $_REQUEST["sp"] == "true";
-        $showProjects      = $_REQUEST["p"]  == "true";
+        $showProjects      = $_REQUEST["p"] == "true";
         $limit             = $_REQUEST["limit"] ?? 10;
         $code              = 'shortestSLARemaining';
         if ($queue == 9) {
@@ -227,8 +246,8 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         $raisedStartTodaySummary    = $this->getRaisedAndStartedToday();
         $uniqueCustomerTodaySummary = $this->getUniqueCustomer();
         $breachedSLATodaySummary    = $this->getBreachedSLA();
-        $buProblem         = new BUActivity($this);
-        $nearFixSLABreach= $this->renderQueueJson(
+        $buProblem                  = new BUActivity($this);
+        $nearFixSLABreach           = $this->renderQueueJson(
             $buProblem->getSDDashBoardData(
                 10000,
                 "shortestSLAFixRemaining",
@@ -443,7 +462,6 @@ WHERE pro_custno <> 282
 
     function setTemplate()
     {
-        $isP5 = isset($_REQUEST['showP5']);
         $this->setPageTitle('SD Manager Dashboard');
         $this->setTemplateFiles(
             array('SDManagerDashboard' => 'SDManagerDashboard.rct')
@@ -466,8 +484,10 @@ WHERE pro_custno <> 282
             $string
         );
     }
-    function missedCallBack(){
-        $query="SELECT cb.id, cb.consID,cb.problemID,cb.callActivityID,cb.contactID,cb.DESCRIPTION,cb.callback_datetime,cb.createAt,
+
+    function missedCallBack()
+    {
+        $query = "SELECT cb.id, cb.consID,cb.problemID,cb.callActivityID,cb.contactID,cb.DESCRIPTION,cb.callback_datetime,cb.createAt,
         concat(c.con_first_name,' ',c.con_last_name) contactName,
         cus_name customerName,
         TIMESTAMPDIFF(MINUTE,NOW(),cb.callback_datetime) timeRemain,
@@ -480,23 +500,124 @@ WHERE pro_custno <> 282
         JOIN consultant cons on cons.cns_consno=p.`pro_consno`
     WHERE cb.status=:status 
      AND TIMESTAMPDIFF(HOUR,cb.callback_datetime,NOW()) <=72  ";
-
-        if ($_REQUEST['hd']=='false') {
+        if ($_REQUEST['hd'] == 'false') {
             $query .= ' and pro_queue_no <> 1 ';
         }
-        if ($_REQUEST['es']=='false') {
+        if ($_REQUEST['es'] == 'false') {
             $query .= ' and pro_queue_no <> 2 ';
         }
-        if ($_REQUEST['sp']=='false') {
+        if ($_REQUEST['sp'] == 'false') {
             $query .= ' and pro_queue_no <> 3 ';
         }
-        if ($_REQUEST['p']=='false') {
+        if ($_REQUEST['p'] == 'false') {
             $query .= ' and pro_queue_no <> 5 ';
         }
         $limit = $_REQUEST['limit'];
-        $query .=" order by timeRemain asc limit ".$limit;
-        // echo  $query;
-        // exit;
-        return DBConnect::fetchAll( $query,["status"=>CallBackStatus::AWAITING]);
+        $query .= " order by timeRemain asc limit " . $limit;
+        return DBConnect::fetchAll($query, ["status" => CallBackStatus::AWAITING]);
+    }
+
+    private function getPendingChargeableRequestsController(): array
+    {
+        $query = "SELECT
+       a.id,
+  a.serviceRequestId,
+  c.`cus_name` AS customerName,
+  CONCAT(
+    requestee.`con_first_name`,
+    ' ',
+    requestee.`con_last_name`
+  ) AS requesteeName,
+  sr.`emailSubjectSummary`,
+  a.reason,
+  a.createdAt,
+  a.additionalHoursRequested,
+  CONCAT(
+    requester.`firstName`,
+    ' ',
+    requester.`lastName`
+  ) AS requesterName
+FROM
+  `chargeableworkcustomerrequest` a
+  JOIN problem sr
+    ON sr.pro_problemno = a.serviceRequestId
+  JOIN customer c
+    ON c.`cus_custno` = sr.pro_custno
+  JOIN contact requestee
+    ON requestee.`con_contno` = a.requesteeId
+  JOIN consultant requester
+    ON requester.`cns_consno` = a.requesterId  ";
+        if ($_REQUEST['hd'] == 'false') {
+            $query .= ' and sr.pro_queue_no <> 1 ';
+        }
+        if ($_REQUEST['es'] == 'false') {
+            $query .= ' and sr.pro_queue_no <> 2 ';
+        }
+        if ($_REQUEST['sp'] == 'false') {
+            $query .= ' and sr.pro_queue_no <> 3 ';
+        }
+        if ($_REQUEST['p'] == 'false') {
+            $query .= ' and sr.pro_queue_no <> 5 ';
+        }
+        $limit = $_REQUEST['limit'];
+        $query .= " order by createdAt desc limit " . $limit;
+        global $db;
+        $statement = $db->preparedQuery($query, []);
+        $toReturn  = [];
+        while ($item = $statement->fetch_object(SDManagerPendingChargeableRequestDTO::class)) {
+            $toReturn[] = $item;
+        }
+        return ["status" => "ok", "data" => $toReturn];
+    }
+
+    /**
+     * @return string[]
+     * @throws JsonHttpException
+     */
+    private function cancelPendingChargeableRequestController(): array
+    {
+        $repo      = new ChargeableWorkCustomerRequestMySQLRepository();
+        $usecase   = new CancelPendingChargeableWorkCustomerRequest(
+            $repo, new BUActivity(
+                     $this
+                 )
+        );
+        $jsonData = $this->getJSONData();
+        $requestId = @$jsonData['id'];
+        if (!$requestId) {
+            throw new JsonHttpException(400, 'id is required');
+        }
+        try {
+            $usecase(
+                new ChargeableWorkCustomerRequestTokenId($requestId),
+                $this->getDbeUser()
+            );
+        } catch (Exception $exception) {
+            throw new JsonHttpException(400, $exception->getMessage());
+        }
+        return ["status" => "ok"];
+    }
+
+    /**
+     * @return string[]
+     * @throws JsonHttpException
+     */
+    private function resendPendingChargeableRequestEmailController(): array
+    {
+        $repo      = new ChargeableWorkCustomerRequestMySQLRepository();
+        $usecase   = new ResendPendingChargeableWorkCustomerRequestEmail(
+            $repo, new BUActivity($this), new DBEContact($this)
+        );
+        $jsonData = $this->getJSONData();
+        $requestId = @$jsonData['id'];
+        if (!$requestId) {
+            throw new JsonHttpException(400, 'id is required');
+        }
+        try {
+            $usecase(new ChargeableWorkCustomerRequestTokenId($requestId));
+        } catch (Exception $exception) {
+            throw new JsonHttpException(400, $exception->getMessage());
+        }
+        return ["status" => "ok"];
     }
 }

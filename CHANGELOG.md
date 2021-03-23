@@ -2,8 +2,11 @@
 This project changes will be shown here.
 
 ## [unreleased]
+### Added
+- Issue 1247 - Customer approval for extra chargeable work
 ### Changed
-- Issue 648 - Move contacts that are linked to a supplier to a their own table
+- Issue 648 - Move contacts that are linked to a supplier to their own table
+- Issue 1230 - Show supported / unsupported customer assets
 
 ## [v5.6.4] - 2021-03-18
 ### Changed
@@ -132,9 +135,6 @@ with dateTime in the past and there's no end time.
 - Issue 1227 - New project emails going to main contacts as well.
 - Issue 1225 - Change request approval sometimes forces comments.
 
-## [unreleased]
-### Changed
-- Issue 1230 - Show supported / unsupported customer assets
 
 ## [v5.3.3] - 2021-01-25
 ### Fixed
