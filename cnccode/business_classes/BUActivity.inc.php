@@ -9,11 +9,26 @@
  */
 
 use CNCLTD\AutomatedRequest;
+use CNCLTD\DUOApi\Account;
+use CNCLTD\Email\AttachmentCollection;
+use CNCLTD\Exceptions\ColumnOutOfRangeException;
+use CNCLTD\Exceptions\JsonHttpException;
+use CNCLTD\FeedbackTokenGenerator;
 use CNCLTD\ServiceRequestInternalNote\infra\ServiceRequestInternalNotePDORepository;
 use CNCLTD\ServiceRequestInternalNote\ServiceRequestInternalNote;
 use CNCLTD\ServiceRequestInternalNote\UseCases\AddServiceRequestInternalNote;
 use CNCLTD\SolarwindsAccountItem;
+use CNCLTD\TwigDTOs\ActivityLoggedDTO;
+use CNCLTD\TwigDTOs\PrimaryMainContactNotAuthorisedNotification;
+use CNCLTD\TwigDTOs\PriorityChangedDTO;
+use CNCLTD\TwigDTOs\SalesOrderServiceRequestCreatedDTO;
+use CNCLTD\TwigDTOs\ServiceRequestFixedDTO;
+use CNCLTD\TwigDTOs\ServiceRequestLoggedDTO;
 use CNCLTD\TwigDTOs\SiteVisitDTO;
+use CNCLTD\WebrootAPI\Site;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 global $cfg;
 require_once($cfg ["path_gc"] . "/Business.inc.php");
@@ -824,9 +839,8 @@ class BUActivity extends Business
                 'N'
             );
             $dbeProblem->updateRow();
-
-            if($dbeProblem->getValue(DBEProblem::status) === 'P' && !$reason){
-                throw new \CNCLTD\Exceptions\JsonHttpException(400,'Service Request in progress, reason required');
+            if ($dbeProblem->getValue(DBEProblem::status) === 'P' && !$reason) {
+                throw new JsonHttpException(400, 'Service Request in progress, reason required');
             }
             $message = "{$this->dbeUser->getValue(DBEUser::name)} Escalated from {$this->workQueueDescriptionArray[$oldQueueNo]} to {$this->workQueueDescriptionArray[$newQueueNo]}";
             //if ($dbeProblem->getValue(DBEProblem::status) == 'P') 
@@ -878,8 +892,8 @@ class BUActivity extends Business
                 'N'
             );
             $dbeProblem->updateRow();
-            if($dbeProblem->getValue(DBEProblem::status) === 'P' && !$reason){
-                throw new \CNCLTD\Exceptions\JsonHttpException(400,'Service Request in progress, reason required');
+            if ($dbeProblem->getValue(DBEProblem::status) === 'P' && !$reason) {
+                throw new JsonHttpException(400, 'Service Request in progress, reason required');
             }
             $message = "{$this->dbeUser->getValue(DBEUser::name)} Deescalated from {$this->workQueueDescriptionArray[$oldQueueNo]} to {$this->workQueueDescriptionArray[$newQueueNo]}";
             if ($reason) {
@@ -1451,16 +1465,16 @@ class BUActivity extends Business
 
     /**
      * @param $activityId
-     * @throws \Twig\Error\LoaderError
-     * @throws \Twig\Error\RuntimeError
-     * @throws \Twig\Error\SyntaxError
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     private function sendActivityLoggedEmail($activityId)
     {
         $dbejCallactivity = new DBEJCallActivity($this);
         $dbejCallactivity->getRow($activityId);
         $status     = $this->getServiceRequestStatusText($dbejCallactivity);
-        $data       = new \CNCLTD\TwigDTOs\ActivityLoggedDTO(
+        $data       = new ActivityLoggedDTO(
             $dbejCallactivity->getValue(DBEJCallActivity::contactFirstName),
             $dbejCallactivity->getValue(DBEJCallActivity::customerSummary),
             $dbejCallactivity->getValue(DBEJCallActivity::userName),
@@ -1494,9 +1508,9 @@ class BUActivity extends Business
      * @param DBEJCallActivity $dbejCallactivity
      * @param string $othersFlag
      * @param string $subject
-     * @throws \Twig\Error\LoaderError
-     * @throws \Twig\Error\RuntimeError
-     * @throws \Twig\Error\SyntaxError
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     private function sendCustomerEmail(string $template,
                                        $data,
@@ -2293,7 +2307,7 @@ class BUActivity extends Business
         $dbejCallactivity->getRow($activityId);
         $serviceRequestId = $dbejCallactivity->getValue(DBEJCallActivity::problemID);
         $status           = $this->getServiceRequestStatusText($dbejCallactivity);
-        $data             = new \CNCLTD\TwigDTOs\PriorityChangedDTO(
+        $data             = new PriorityChangedDTO(
             $serviceRequestId,
             $dbejCallactivity->getValue(DBEJCallActivity::reason),
             $dbejCallactivity->getValue(DBEJCallActivity::contactFirstName),
@@ -5052,7 +5066,7 @@ class BUActivity extends Business
                 }
             }
         }
-        $data       = new \CNCLTD\TwigDTOs\ServiceRequestLoggedDTO(
+        $data       = new ServiceRequestLoggedDTO(
             $serviceRequestId,
             $dbejCallactivity->getValue(DBEJCallActivity::contactFirstName),
             $dbejCallactivity->getValue(DBEJCallActivity::reason),
@@ -6597,7 +6611,7 @@ class BUActivity extends Business
         $dbeProblem = new DBEProblem($this);
         $dbeProblem->getRow($dbejCallactivity->getValue(DBEJCallActivity::problemID));
         $team       = $dbeProblem->getValue(DBEProblem::queueNo) === 3 ? "Small Projects" : "Project";
-        $data       = new \CNCLTD\TwigDTOs\SalesOrderServiceRequestCreatedDTO(
+        $data       = new SalesOrderServiceRequestCreatedDTO(
             $dbejCallactivity->getValue(DBEJCallActivity::contactFirstName),
             $dbejCallactivity->getValue(DBEJCallActivity::problemID),
             $dbejCallactivity->getValue(DBEJCallActivity::customerSummary),
@@ -7334,9 +7348,9 @@ FROM
      * @param AutomatedRequest $record
      * @param DBEContact $dbeContact
      * @return bool
-     * @throws \Twig\Error\LoaderError
-     * @throws \Twig\Error\RuntimeError
-     * @throws \Twig\Error\SyntaxError
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     private function contactNotAuthorized(AutomatedRequest $record,
                                           DBEContact $dbeContact
@@ -7369,9 +7383,9 @@ FROM
      * @param DBEContact $primaryMainContactDS
      * @param DBEContact $notAuthorisedContact
      * @param $receivedEmailHTML
-     * @throws \Twig\Error\LoaderError
-     * @throws \Twig\Error\RuntimeError
-     * @throws \Twig\Error\SyntaxError
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     private function notifyPrimaryMainContactAboutNotAuthoriseContact(DBEContact $primaryMainContactDS,
                                                                       DBEContact $notAuthorisedContact,
@@ -7381,7 +7395,7 @@ FROM
         global $twig;
         $notAuthorisedContactFirstName = $notAuthorisedContact->getValue(DBEContact::firstName);
         $notAuthorisedContactLastName  = $notAuthorisedContact->getValue(DBEContact::lastName);
-        $data                          = new \CNCLTD\TwigDTOs\PrimaryMainContactNotAuthorisedNotification(
+        $data                          = new PrimaryMainContactNotAuthorisedNotification(
             $primaryMainContactDS->getValue(DBEContact::firstName),
             $notAuthorisedContactFirstName,
             $notAuthorisedContactLastName,
@@ -7396,7 +7410,7 @@ FROM
         $subject                       = "{$contactName} is not authorised to initiate support calls";
         $requestDate                   = (new DateTime())->format('d-m-Y H:i');
         $fileName                      = " {$contactName} Request At {$requestDate}.html";
-        $attachments                   = new \CNCLTD\Email\AttachmentCollection();
+        $attachments                   = new AttachmentCollection();
         $attachments->add(
             $receivedEmailHTML,
             'application/octet-stream',
@@ -8428,8 +8442,8 @@ FROM
         $fixedActivityInServiceRequest = $buActivity->getFixedActivityInServiceRequest($serviceRequestId);
         $firstActivity                 = $buActivity->getFirstActivityInServiceRequest($serviceRequestId);
         global $db;
-        $feedbackTokenGenerator = new \CNCLTD\FeedbackTokenGenerator($db);
-        $data                   = new \CNCLTD\TwigDTOs\ServiceRequestFixedDTO(
+        $feedbackTokenGenerator = new FeedbackTokenGenerator($db);
+        $data                   = new ServiceRequestFixedDTO(
             $fixedActivityInServiceRequest->getValue(DBEJCallActivity::contactFirstName),
             $firstActivity->getValue(DBEJCallActivity::reason),
             $fixedActivityInServiceRequest->getValue(DBEJCallActivity::customerSummary),
@@ -8789,7 +8803,7 @@ FROM
         }// end if
     }
 
-    function raiseWebrootCustomerNotMatchedSR(\CNCLTD\WebrootAPI\Site $site)
+    function raiseWebrootCustomerNotMatchedSR(Site $site)
     {
         $details    = "<p>This customer doesn't match CNCAPPS for their Webroot protection, please review and correct</p>
 <p>Customer Name: {$site->siteName}</p>";
@@ -8919,159 +8933,128 @@ FROM
         $dbeCallActivity->insertRow();
     }
 
+
+    /**
+     * @param SolarwindsAccountItem $accountItem
+     * @throws ColumnOutOfRangeException
+     */
     function raiseSolarwindsFailedBackupRequest(SolarwindsAccountItem $accountItem)
     {
         $dbeCustomerItem = new DBEJRenContract($this);
         $dbeCustomerItem->setValue(DBEJRenContract::customerItemID, $accountItem->contractId);
         $dbeCustomerItem->getRow();
-        $details    = "<p>Customer " . $dbeCustomerItem->getValue(DBEJRenContract::customerName) . " has not had a successful Office 365 backup for over 24 hours.</p>
+        $details = "<p>Customer " . $dbeCustomerItem->getValue(DBEJRenContract::customerName) . " has not had a successful Office 365 backup for over 24 hours.</p>
                     <p>The last backup was " . $accountItem->lastSuccessfulBackupDate->format('d-m-Y H:i') . ".</p>";
-        $priority   = 2;
-        $dbeProblem = new DBEProblem($this);
-        $dbeContact = new DBEContact($this);
-        $customerID = $dbeCustomerItem->getValue(DBECustomerItem::customerID);
-        $dbeContact->getMainSupportRowsByCustomerID($customerID);
-        if (!$dbeContact->fetchNext()) {
-            return; // no main support contact so abort
-        }
-        $dbeCallActivity = new DBECallActivity($this);
-        /*
-    Is there an existing activity for this exact problem?
+        $this->raiseSolarwindsSR($dbeCustomerItem, $accountItem, $details);
+    }
 
-    If so, we will append to that SR
-    */
-        $callActivityID   = $this->getActivityWithMatchingDescriptionAndContractForCustomer(
-            $customerID,
-            $accountItem->contractId,
-            $details
+    function raiseSolarwindsFailedToUpdateContractRequest(SolarwindsAccountItem $accountItem)
+    {
+        $details    = "Failed to update contracts from Office 365 Backup Checks for account {$accountItem->name}, check the assigned contract Id";
+        $dbeProblem = new DBEProblem($this);
+        $dbeProblem->setValue(
+            DBEProblem::slaResponseHours,
+            0
         );
-        $slaResponseHours = $this->getSlaResponseHours(
-            $priority,
-            $customerID,
+        $buCustomer = new BUCustomer($this);
+        $dbeContact = $buCustomer->getPrimaryContact(282);
+        $dbeProblem->setValue(DBEProblem::emailSubjectSummary, "Failed M365 Solarwinds Backup");
+        $dbeProblem->setValue(
+            DBEProblem::customerID,
+            282
+        );
+        $dbeProblem->setValue(
+            DBEProblem::status,
+            'I'
+        );
+        $dbeProblem->setValue(
+            DBEProblem::priority,
+            3
+        );
+        $dbeProblem->setValue(
+            DBEProblem::queueNo,
+            2
+        );
+        $dbeProblem->setValue(
+            DBEProblem::dateRaised,
+            date(DATE_MYSQL_DATETIME)
+        );
+        $dbeProblem->setValue(
+            DBEProblem::contactID,
             $dbeContact->getValue(DBEContact::contactID)
         );
-        if (!$callActivityID) {
-            /* create new issue */
-            $dbeProblem->setValue(
-                DBEProblem::slaResponseHours,
-                $slaResponseHours
-            );
-            $dbeProblem->setValue(DBEProblem::emailSubjectSummary, "M365 Backup Alert");
-            $dbeProblem->setValue(
-                DBEProblem::customerID,
-                $customerID
-            );
-            $dbeProblem->setValue(
-                DBEProblem::status,
-                'I'
-            );
-            $dbeProblem->setValue(
-                DBEProblem::priority,
-                $priority
-            );
-            $dbeProblem->setValue(
-                DBEProblem::queueNo,
-                2
-            );
-            $dbeProblem->setValue(
-                DBEProblem::dateRaised,
-                date(DATE_MYSQL_DATETIME)
-            );
-            $dbeProblem->setValue(
-                DBEProblem::contactID,
-                $dbeContact->getValue(DBEContact::contactID)
-            );
-            $dbeProblem->setValue(
-                DBEProblem::hideFromCustomerFlag,
-                'Y'
-            );
-            $dbeProblem->setValue(
-                DBEProblem::contractCustomerItemID,
-                $accountItem->contractId
-            );
-            $dbeProblem->setValue(
-                DBEProblem::hdLimitMinutes,
-                $this->dsHeader->getValue(DBEHeader::hdTeamLimitMinutes)
-            );
-            $dbeProblem->setValue(
-                DBEProblem::esLimitMinutes,
-                $this->dsHeader->getValue(DBEHeader::esTeamLimitMinutes)
-            );
-            $dbeProblem->setValue(
-                DBEProblem::smallProjectsTeamLimitMinutes,
-                $this->dsHeader->getValue(DBEHeader::smallProjectsTeamLimitMinutes)
-            );
-            $dbeProblem->setValue(
-                DBEProblem::projectTeamLimitMinutes,
-                $this->dsHeader->getValue(DBEHeader::projectTeamLimitMinutes)
-            );
-            $dbeProblem->setValue(
-                DBEProblem::userID,
-                null
-            );        // not allocated
-            $dbeProblem->setValue(
-                DBEProblem::raiseTypeId,
-                BUProblemRaiseType::ALERTID
-            );
-            $dbeProblem->insertRow();
-            $problemID = $dbeProblem->getPKValue();
-            $dbeCallActivity->setValue(
-                DBEJCallActivity::callActivityID,
-                null
-            );
-            $dbeCallActivity->setValue(
-                DBEJCallActivity::siteNo,
-                $dbeContact->getValue(DBEContact::siteNo)
-            ); // contact default siteno
-            $dbeCallActivity->setValue(
-                DBEJCallActivity::contactID,
-                $dbeContact->getValue(DBEContact::contactID)
-            );
-            $dbeCallActivity->setValue(
-                DBEJCallActivity::callActTypeID,
-                CONFIG_INITIAL_ACTIVITY_TYPE_ID
-            );
-            $dbeCallActivity->setValue(
-                DBEJCallActivity::date,
-                date(DATE_MYSQL_DATE)
-            );
-            $dbeCallActivity->setValue(
-                DBEJCallActivity::startTime,
-                date('H:i')
-            );
-            $dbeCallActivity->setValue(
-                DBEJCallActivity::endTime,
-                date('H:i')
-            );
-            $dbeCallActivity->setValue(
-                DBEJCallActivity::status,
-                'C'
-            );
-            $dbeCallActivity->setValue(
-                DBEJCallActivity::reason,
-                $details
-            );
-            $dbeCallActivity->setValue(
-                DBEJCallActivity::problemID,
-                $problemID
-            );
-            $dbeCallActivity->setValue(
-                DBEJCallActivity::userID,
-                USER_SYSTEM
-            );
-            $dbeCallActivity->insertRow();
-
-        } else {
-            $this->createFollowOnActivity(
-                $callActivityID,
-                CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID,
-                $dbeContact->getValue(DBEContact::contactID),
-                $details,
-                false,
-                true
-            );
-        }
-
+        $dbeProblem->setValue(
+            DBEProblem::hdLimitMinutes,
+            $this->dsHeader->getValue(DBEHeader::hdTeamLimitMinutes)
+        );
+        $dbeProblem->setValue(
+            DBEProblem::esLimitMinutes,
+            $this->dsHeader->getValue(DBEHeader::esTeamLimitMinutes)
+        );
+        $dbeProblem->setValue(
+            DBEProblem::smallProjectsTeamLimitMinutes,
+            $this->dsHeader->getValue(DBEHeader::smallProjectsTeamLimitMinutes)
+        );
+        $dbeProblem->setValue(
+            DBEProblem::projectTeamLimitMinutes,
+            $this->dsHeader->getValue(DBEHeader::projectTeamLimitMinutes)
+        );
+        $dbeProblem->setValue(
+            DBEProblem::userID,
+            null
+        );        // not allocated
+        $dbeProblem->setValue(
+            DBEProblem::raiseTypeId,
+            BUProblemRaiseType::ALERTID
+        );
+        $dbeProblem->insertRow();
+        $problemID       = $dbeProblem->getPKValue();
+        $dbeCallActivity = new DBECallActivity($this);
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::callActivityID,
+            null
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::siteNo,
+            $dbeContact->getValue(DBEContact::siteNo)
+        ); // contact default siteno
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::contactID,
+            $dbeContact->getValue(DBEContact::contactID)
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::callActTypeID,
+            CONFIG_INITIAL_ACTIVITY_TYPE_ID
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::date,
+            date(DATE_MYSQL_DATE)
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::startTime,
+            date('H:i')
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::endTime,
+            date('H:i')
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::status,
+            'C'
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::reason,
+            $details
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::problemID,
+            $problemID
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::userID,
+            USER_SYSTEM
+        );
+        $dbeCallActivity->insertRow();
     }
 
     /**
@@ -10436,11 +10419,11 @@ FROM
     }
 
     /**
-     * @param \CNCLTD\WebrootAPI\Site $site
+     * @param Site $site
      * @param DBECustomer $dbeCustomer
      * @throws Exception
      */
-    public function raiseWebrootContractNotFound(\CNCLTD\WebrootAPI\Site $site, DBECustomer $dbeCustomer)
+    public function raiseWebrootContractNotFound(Site $site, DBECustomer $dbeCustomer)
     {
         $details    = "<p>Customer {$dbeCustomer->getValue(DBECustomer::name)} does not have a Webroot contract but has the software deployed.  Please review this and create the contract.</p>";
         $priority   = 4;
@@ -10571,7 +10554,7 @@ FROM
         $dbeCallActivity->insertRow();
     }
 
-    function raiseDuoCustomerNotMatchedSR(\CNCLTD\DUOApi\Account $account)
+    function raiseDuoCustomerNotMatchedSR(Account $account)
     {
         $details    = "<p>This customer doesn't match CNCAPPS for their DUO protection, please review and correct</p>
 <p>Customer Name: {$account->name}</p>";
@@ -10705,11 +10688,11 @@ FROM
     }
 
     /**
-     * @param \CNCLTD\DUOApi\Account $account
+     * @param Account $account
      * @param DBECustomer $dbeCustomer
      * @throws Exception
      */
-    public function raiseDuoContractNotFound(\CNCLTD\DUOApi\Account $account, DBECustomer $dbeCustomer)
+    public function raiseDuoContractNotFound(Account $account, DBECustomer $dbeCustomer)
     {
         $details    = "<p>Customer {$dbeCustomer->getValue(DBECustomer::name)} does not have a Duo contract but has the software deployed.  Please review this and create the contract.</p>";
         $priority   = 4;
@@ -10954,6 +10937,164 @@ FROM
                 strip_tags(str_replace('&nbsp;', '', $dsCallActivity->getValue(DBECallActivity::customerSummary)))
             )
         );
+    }
+
+    /**
+     * @param DBEJRenContract $dbeCustomerItem
+     * @param SolarwindsAccountItem $accountItem
+     * @param string $details
+     * @throws ColumnOutOfRangeException
+     */
+    private function raiseSolarwindsSR(DBEJRenContract $dbeCustomerItem,
+                                       SolarwindsAccountItem $accountItem,
+                                       string $details
+    ): void
+    {
+        $priority   = 2;
+        $dbeProblem = new DBEProblem($this);
+        $dbeContact = new DBEContact($this);
+        $customerID = $dbeCustomerItem->getValue(DBECustomerItem::customerID);
+        $dbeContact->getMainSupportRowsByCustomerID($customerID);
+        if (!$dbeContact->fetchNext()) {
+            return; // no main support contact so abort
+        }
+        $dbeCallActivity = new DBECallActivity($this);
+        /*
+    Is there an existing activity for this exact problem?
+
+    If so, we will append to that SR
+    */
+        $callActivityID   = $this->getActivityWithMatchingDescriptionAndContractForCustomer(
+            $customerID,
+            $accountItem->contractId,
+            $details
+        );
+        $slaResponseHours = $this->getSlaResponseHours(
+            $priority,
+            $customerID,
+            $dbeContact->getValue(DBEContact::contactID)
+        );
+        if (!$callActivityID) {
+            /* create new issue */
+            $dbeProblem->setValue(
+                DBEProblem::slaResponseHours,
+                $slaResponseHours
+            );
+            $dbeProblem->setValue(DBEProblem::emailSubjectSummary, "M365 Backup Alert");
+            $dbeProblem->setValue(
+                DBEProblem::customerID,
+                $customerID
+            );
+            $dbeProblem->setValue(
+                DBEProblem::status,
+                'I'
+            );
+            $dbeProblem->setValue(
+                DBEProblem::priority,
+                $priority
+            );
+            $dbeProblem->setValue(
+                DBEProblem::queueNo,
+                2
+            );
+            $dbeProblem->setValue(
+                DBEProblem::dateRaised,
+                date(DATE_MYSQL_DATETIME)
+            );
+            $dbeProblem->setValue(
+                DBEProblem::contactID,
+                $dbeContact->getValue(DBEContact::contactID)
+            );
+            $dbeProblem->setValue(
+                DBEProblem::hideFromCustomerFlag,
+                'Y'
+            );
+            $dbeProblem->setValue(
+                DBEProblem::contractCustomerItemID,
+                $accountItem->contractId
+            );
+            $dbeProblem->setValue(
+                DBEProblem::hdLimitMinutes,
+                $this->dsHeader->getValue(DBEHeader::hdTeamLimitMinutes)
+            );
+            $dbeProblem->setValue(
+                DBEProblem::esLimitMinutes,
+                $this->dsHeader->getValue(DBEHeader::esTeamLimitMinutes)
+            );
+            $dbeProblem->setValue(
+                DBEProblem::smallProjectsTeamLimitMinutes,
+                $this->dsHeader->getValue(DBEHeader::smallProjectsTeamLimitMinutes)
+            );
+            $dbeProblem->setValue(
+                DBEProblem::projectTeamLimitMinutes,
+                $this->dsHeader->getValue(DBEHeader::projectTeamLimitMinutes)
+            );
+            $dbeProblem->setValue(
+                DBEProblem::userID,
+                null
+            );        // not allocated
+            $dbeProblem->setValue(
+                DBEProblem::raiseTypeId,
+                BUProblemRaiseType::ALERTID
+            );
+            $dbeProblem->insertRow();
+            $problemID = $dbeProblem->getPKValue();
+            $dbeCallActivity->setValue(
+                DBEJCallActivity::callActivityID,
+                null
+            );
+            $dbeCallActivity->setValue(
+                DBEJCallActivity::siteNo,
+                $dbeContact->getValue(DBEContact::siteNo)
+            ); // contact default siteno
+            $dbeCallActivity->setValue(
+                DBEJCallActivity::contactID,
+                $dbeContact->getValue(DBEContact::contactID)
+            );
+            $dbeCallActivity->setValue(
+                DBEJCallActivity::callActTypeID,
+                CONFIG_INITIAL_ACTIVITY_TYPE_ID
+            );
+            $dbeCallActivity->setValue(
+                DBEJCallActivity::date,
+                date(DATE_MYSQL_DATE)
+            );
+            $dbeCallActivity->setValue(
+                DBEJCallActivity::startTime,
+                date('H:i')
+            );
+            $dbeCallActivity->setValue(
+                DBEJCallActivity::endTime,
+                date('H:i')
+            );
+            $dbeCallActivity->setValue(
+                DBEJCallActivity::status,
+                'C'
+            );
+            $dbeCallActivity->setValue(
+                DBEJCallActivity::reason,
+                $details
+            );
+            $dbeCallActivity->setValue(
+                DBEJCallActivity::problemID,
+                $problemID
+            );
+            $dbeCallActivity->setValue(
+                DBEJCallActivity::userID,
+                USER_SYSTEM
+            );
+            $dbeCallActivity->insertRow();
+
+        } else {
+            $this->createFollowOnActivity(
+                $callActivityID,
+                CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID,
+                $dbeContact->getValue(DBEContact::contactID),
+                $details,
+                false,
+                true
+            );
+        }
     }
 
 }
