@@ -50,46 +50,51 @@ try {
             $logger->error('This item does not have a contractId set, will send an email to inform about this');
             continue;
         }
-        if ($updateMode) {
-            $logger->info('Update mode enabled - Updating contract users');
-            $customerItem = new DBECustomerItem($thing);
-            $customerItem->getRow($accountInfo->contractId);
-            $customerItem->setValue(DBECustomerItem::users, $accountInfo->protectedUsers);
-            $customerItem->setValue(
-                DBECustomerItem::curUnitCost,
-                $customerItem->getValue(
-                    DBECustomerItem::costPricePerMonth
-                ) * 12 * $accountInfo->protectedUsers
-            );
-            $customerItem->setValue(
-                DBECustomerItem::curUnitSale,
-                $customerItem->getValue(
-                    DBECustomerItem::salePricePerMonth
-                ) * 12 * $accountInfo->protectedUsers
-            );
-            $customerItem->updateRow();
-        }
-        if ($accountInfo->protectedUsers !== null) {
-            $customerItem = new DBECustomerItem($thing);
-            $customerItem->getRow($accountInfo->contractId);
-            if ($customerItem->getValue(DBECustomerItem::users) === null) {
-                $customerItem->setValue(DBECustomerItem::users, 0);
-                $updateCustomerItem = new DBECustomerItem($thing);
-                $updateCustomerItem->getRow($accountInfo->contractId);
-                $updateCustomerItem->setValue(DBECustomerItem::users, 0);
-                $updateCustomerItem->updateRow();
-            }
-            try {
-                $db->preparedQuery(
-                    "insert into contractUsersLog(contractId,users, currentUsers) values (?,?,?) ",
-                    [
-                        ["type" => "i", "value" => $accountInfo->contractId],
-                        ["type" => "i", "value" => $accountInfo->protectedUsers],
-                        ["type" => "i", "value" => $customerItem->getValue(DBECustomerItem::users)],
-                    ]
+        $customerItem = new DBECustomerItem($thing);
+        if (!$customerItem->getRow($accountInfo->contractId)) {
+            $logger->error('Contract not found!! Creating SR to inform about this');
+            createFailedToUpdateContractSR($accountInfo);
+        } else {
+            if ($updateMode) {
+                $logger->info('Update mode enabled - Updating contract users');
+                $customerItem = new DBECustomerItem($thing);
+                $customerItem->setValue(DBECustomerItem::users, $accountInfo->protectedUsers);
+                $customerItem->setValue(
+                    DBECustomerItem::curUnitCost,
+                    $customerItem->getValue(
+                        DBECustomerItem::costPricePerMonth
+                    ) * 12 * $accountInfo->protectedUsers
                 );
-            } catch (\Exception $exception) {
-                createFailedToUpdateContractSR($accountInfo);
+                $customerItem->setValue(
+                    DBECustomerItem::curUnitSale,
+                    $customerItem->getValue(
+                        DBECustomerItem::salePricePerMonth
+                    ) * 12 * $accountInfo->protectedUsers
+                );
+                $customerItem->updateRow();
+            }
+            if ($accountInfo->protectedUsers !== null) {
+                $customerItem = new DBECustomerItem($thing);
+                $customerItem->getRow($accountInfo->contractId);
+                if ($customerItem->getValue(DBECustomerItem::users) === null) {
+                    $customerItem->setValue(DBECustomerItem::users, 0);
+                    $updateCustomerItem = new DBECustomerItem($thing);
+                    $updateCustomerItem->getRow($accountInfo->contractId);
+                    $updateCustomerItem->setValue(DBECustomerItem::users, 0);
+                    $updateCustomerItem->updateRow();
+                }
+                try {
+                    $db->preparedQuery(
+                        "insert into contractUsersLog(contractId,users, currentUsers) values (?,?,?) ",
+                        [
+                            ["type" => "i", "value" => $accountInfo->contractId],
+                            ["type" => "i", "value" => $accountInfo->protectedUsers],
+                            ["type" => "i", "value" => $customerItem->getValue(DBECustomerItem::users)],
+                        ]
+                    );
+                } catch (\Exception $exception) {
+                    createFailedToUpdateContractSR($accountInfo);
+                }
             }
         }
         $yesterday = new DateTime();
