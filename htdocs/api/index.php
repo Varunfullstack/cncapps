@@ -280,7 +280,7 @@ WHERE
         );
         $group->get(
             '/SRCount/{customerId}',
-            function (Request $request, Response  $response, $args) {
+            function (Request $request, Response $response, $args) {
                 $queryParams = $request->getQueryParams();
                 $endDate     = new DateTime();
                 $startDate   = (clone $endDate)->sub(new DateInterval('P365D'));
@@ -309,7 +309,7 @@ WHERE
                     ["type" => "s", "value" => $startDate->format(DATE_MYSQL_DATE)],
                     ["type" => "s", "value" => $endDate->format(DATE_MYSQL_DATE)],
                 ];
-                $query = "SELECT
+                $query  = "SELECT
  
   SUM(
     problem.pro_hide_from_customer_flag <> 'Y'
@@ -362,7 +362,7 @@ ORDER BY raisedManually DESC";
                     ["type" => "s", "value" => $startDate->format(DATE_MYSQL_DATE)],
                     ["type" => "s", "value" => $endDate->format(DATE_MYSQL_DATE)],
                 ];
-                $query = "SELECT
+                $query  = "SELECT
           CONCAT(con_first_name, ' ' , con_last_name) AS name,
              SUM(
     problem.pro_hide_from_customer_flag <> 'Y'
@@ -414,7 +414,7 @@ ORDER BY raisedManually DESC";
                     ["type" => "s", "value" => $startDate->format(DATE_MYSQL_DATE)],
                     ["type" => "s", "value" => $endDate->format(DATE_MYSQL_DATE)],
                 ];
-                $query = "SELECT
+                $query  = "SELECT
           rtc_desc AS rootCauseDescription,
           COUNT(*) AS count
         FROM
@@ -428,6 +428,91 @@ ORDER BY raisedManually DESC";
                 $statement = $db->preparedQuery($query, $params);
                 $data      = $statement->fetch_all(MYSQLI_ASSOC);
                 $response->getBody()->write(json_encode($data, JSON_NUMERIC_CHECK));
+                return $response;
+            }
+        );
+        $group->get(
+            '/customerSatisfactionScore/{customerId}',
+            function (Request $request, Response $response, $args) {
+                $db        = DBConnect::instance()->getDB();
+                $statement = $db->prepare(
+                    "SELECT
+  SUM(cf.value = 1) / COUNT(*) AS good,
+  SUM(cf.value = 2) / COUNT(*) AS meh,
+  SUM(cf.value = 2) / COUNT(*) AS bad,
+  COUNT(*) AS total
+FROM
+  customerFeedback cf
+  JOIN contact
+    ON contact.`con_contno` = cf.contactId
+   WHERE contact.`con_custno` = ?
+GROUP BY contact.`con_custno`"
+                );
+                $statement->execute([$args['customerId']]);
+                $response->getBody()->write(
+                    json_encode($statement->fetch(), JSON_NUMERIC_CHECK)
+                );
+                return $response;
+            }
+        );
+        $group->get(
+            '/customerFeedback/{customerId}',
+            function (Request $request, Response $response, $args) {
+                $db          = DBConnect::instance()->getDB();
+                $queryParams = $request->getQueryParams();
+                $endDate     = new DateTime();
+                $startDate   = (clone $endDate)->sub(new DateInterval('P365D'));
+                if (isset($queryParams['startDate'])) {
+                    $startDateString = $queryParams['startDate'];
+                    $startDate       = DateTime::createFromFormat(DATE_MYSQL_DATE, $startDateString);
+                    if (!$startDate) {
+                        $response->getBody()->write(
+                            json_encode(["error" => "The start date parameter format is not valid: YYYY-MM-DD"])
+                        );
+                        return $response->withStatus(400);
+                    }
+                }
+                if (isset($queryParams['endDate'])) {
+                    $endDateString = $queryParams['endDate'];
+                    $endDate       = DateTime::createFromFormat(DATE_MYSQL_DATE, $endDateString);
+                    if (!$endDate) {
+                        $response->getBody()->write(
+                            json_encode(["error" => "The end date parameter format is not valid: YYYY-MM-DD"])
+                        );
+                        return $response->withStatus(400);
+                    }
+                }
+                $statement = $db->prepare(
+                    "SELECT       
+                    f.id,
+                    f.value,     
+                    customer.`cus_name`,
+                    f.`comments`,
+                    createdAt  ,
+                    serviceRequestId problemID    ,
+                    cons.cns_name engineer,
+                    concat(contact.con_first_name, ' ', contact.con_last_name) as contactName
+                FROM `customerfeedback` f 
+                    JOIN problem ON problem.`pro_problemno`=f.serviceRequestId
+                    JOIN callactivity cal ON cal.caa_problemno=f.serviceRequestId     
+                    JOIN consultant cons on cons.cns_consno=cal.caa_consno
+                    JOIN customer ON customer.`cus_custno`=problem.`pro_custno`
+                    join contact on  contact.con_contno = cal.caa_contno
+                WHERE cal.caa_callacttypeno=57                    
+                    AND (:from  is null or date(f.`createdAt`) >= :from )
+                    AND (:to    is null or date(f.`createdAt`) <= :to)
+                    AND problem.`pro_custno`= :customerId"
+                );
+                $statement->execute(
+                    [
+                        "from"       => $startDate->format(DATE_MYSQL_DATE),
+                        "to"         => $endDate->format(DATE_MYSQL_DATE),
+                        "customerId" => $args['customerId']
+                    ]
+                );
+                $response->getBody()->write(
+                    json_encode($statement->fetchAll(), JSON_NUMERIC_CHECK)
+                );
                 return $response;
             }
         );
@@ -462,7 +547,7 @@ ORDER BY raisedManually DESC";
                     ["type" => "s", "value" => $startDate->format(DATE_MYSQL_DATE)],
                     ["type" => "s", "value" => $endDate->format(DATE_MYSQL_DATE)],
                 ];
-                $query = "SELECT
+                $query  = "SELECT
   address.`add_postcode`,
   address.`add_town`,
   COUNT(*) AS COUNT
@@ -712,7 +797,7 @@ WHERE
                     );
                     return $response->withStatus(400);
                 }
-                $contactId = $dbeProblem->getValue(DBEProblem::contactID);
+                $contactId                          = $dbeProblem->getValue(DBEProblem::contactID);
                 $customerFeedbackRepo               = new \CNCLTD\CustomerFeedbackRepository($db);
                 $customerFeedback                   = new \CNCLTD\CustomerFeedback();
                 $customerFeedback->serviceRequestId = $tokenData->serviceRequestId;
@@ -787,7 +872,7 @@ $app->group(
                 try {
                     $pdfData = $BUPdfSalesQuote->createSignableOrderForm($dbeQuotation);
                     ApiClient::setApiKey("fc2d9ba05f3f3d9f2e9de4d831e8fed9");
-                    $envDocs = [];
+                    $envDocs           = [];
                     $dsDeliveryContact = new DBEContact($this);
                     $dsDeliveryContact->getRow($dbeQuotation->getValue(DBEQuotation::deliveryContactID));
                     $firstName = $dsDeliveryContact->getValue(DBEContact::firstName);
@@ -797,20 +882,20 @@ $app->group(
                     if ($server_type !== MAIN_CONFIG_SERVER_TYPE_LIVE) {
                         $email = "sales@" . CONFIG_PUBLIC_DOMAIN;
                     }
-                    $ordHeadID        = $dbeQuotation->getValue(DBEQuotation::ordheadID);
-                    $versionNo        = $dbeQuotation->getValue(DBEQuotation::versionNo);
-                    $orderFile        = $ordHeadID . '_' . $versionNo . '.pdf';
-                    $envelopeDocument = new DocumentWithoutTemplate(
+                    $ordHeadID         = $dbeQuotation->getValue(DBEQuotation::ordheadID);
+                    $versionNo         = $dbeQuotation->getValue(DBEQuotation::versionNo);
+                    $orderFile         = $ordHeadID . '_' . $versionNo . '.pdf';
+                    $envelopeDocument  = new DocumentWithoutTemplate(
                         'Customer Form', null, base64_encode($pdfData), $orderFile
                     );
-                    $envDocs[] = $envelopeDocument;
-                    $envelopeParties = [];
+                    $envDocs[]         = $envelopeDocument;
+                    $envelopeParties   = [];
                     $envelopeParty     = new Party(
                         $firstName . ' ' . $lastName, $email, 'signer1', 'Please sign here', 'no', false
                     );
                     $envelopeParties[] = $envelopeParty;
                     $expiration        = 7 * 24;
-                    $signableResponse = Envelopes::createNewWithoutTemplate(
+                    $signableResponse  = Envelopes::createNewWithoutTemplate(
                         "Document #" . $ordHeadID . "_" . $versionNo . "_" . uniqid(),
                         $envDocs,
                         $envelopeParties,
