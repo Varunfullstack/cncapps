@@ -10899,7 +10899,6 @@ FROM
         if (!$dbeCallActivity->insertRow()) {
             throw new Exception("Failed to insert customer contact activity {$dbeCallActivity->db->Error}");
         }
-        $this->sendUpdatedByAnotherUserEmail($dbeCallActivity->getValue(DBECallActivity::problemID), $dbeCallActivity);
         return $dbeCallActivity;
     }
 
