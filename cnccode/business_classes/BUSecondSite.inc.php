@@ -309,12 +309,14 @@ class BUSecondsite extends Business
 
                     }
 
-                }// end drives
+                }
+
+                $this->logMessage("Should store size {$totalSize} for server {$server['serverName']}");
                 $this->recordServerSize($server['server_cuino'], $totalSize);
                 if ($allServerImagesPassed) {
                     $this->resetSuspendedUntilDate($server['server_cuino']);
                 }
-                if (!$isSuspended && count($missingImages) > 0 && !$customerItemID && !$testRun) {
+                if (!$isSuspended && empty($missingImages) && !$customerItemID && !$testRun) {
 
                     $this->getActivityModel()->raiseSecondSiteMissingImageRequest(
                         $server['custno'],
