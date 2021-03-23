@@ -490,6 +490,7 @@ GROUP BY contact.`con_custno`"
                     f.`comments`,
                     createdAt  ,
                     serviceRequestId problemID    ,
+                    problem.emailSubjectSummary as emailSubjectSummary,       
                     cons.cns_name engineer,
                     concat(contact.con_first_name, ' ', contact.con_last_name) as contactName
                 FROM `customerfeedback` f 
