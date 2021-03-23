@@ -553,6 +553,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                     $this->raiseCustomerLeaverWithLicenseSR($dbeCustomer, $datum['DisplayName']);
                 }
                 $licensesWithDefender = 0;
+                $licensesWithOffice   = 0;
                 foreach ($datum['Licenses'] as $license) {
                     $dbeOffice365Licenses->getRowForLicense($license);
                     if ($dbeOffice365Licenses->rowCount()) {
@@ -563,6 +564,9 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                         );
                         if ($dbeOffice365Licenses->getValue(DBEOffice365License::includesDefender)) {
                             $licensesWithDefender++;
+                        }
+                        if ($dbeOffice365Licenses->getValue(DBEOffice365License::includesOffice)) {
+                            $licensesWithOffice++;
                         }
                         $currentMailboxLimit = $dbeOffice365Licenses->getValue(DBEOffice365License::mailboxLimit);
                         if ($currentMailboxLimit && (!$mailboxLimit || $currentMailboxLimit > $mailboxLimit)) {
@@ -575,6 +579,9 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                 }
                 if ($licensesWithDefender > 1) {
                     $this->raiseMultipleDefenderLicensesSR($dbeCustomer, $datum['DisplayName']);
+                }
+                if ($licensesWithOffice > 1) {
+                    $this->raiseMultipleDefenderLicensesSR($dbeCustomer, $datum['DisplayName'], "Office");
                 }
             }
             $licensesArray = explode(", ", $licenseValue);
@@ -933,7 +940,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             DBEJProblem::userID,
             null
         );
-
         $dbeProblem->setValue(DBEProblem::emailSubjectSummary, "M365 Export Report Error");
         $dbeProblem->setValue(
             DBEProblem::raiseTypeId,
@@ -997,9 +1003,9 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $dbeCallActivity->insertRow();
     }
 
-    function raiseMultipleDefenderLicensesSR(DBECustomer $dbeCustomer, $userName)
+    function raiseMultipleDefenderLicensesSR(DBECustomer $dbeCustomer, $userName, $included = "Defender")
     {
-        $details = "<p>The username $userName has multiple M365 licenses that include Defender, please review and correct.</p>";
+        $details = "<p>The username $userName has multiple M365 licenses that include $included, please review and correct.</p>";
         $this->raiseCustomerServiceRequest($dbeCustomer, $details);
     }
 
