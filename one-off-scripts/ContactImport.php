@@ -29,11 +29,14 @@ if (!$csvFile) {
 $headers = fgetcsv($csvFile);
 $thing   = null;
 while ($line = fgetcsv($csvFile)) {
+    if (!$line[6]) {
+        continue;
+    }
     echo "Processing customer {$line[6]}" . PHP_EOL;
     $dbeCustomer = new DBECustomer($thing);
     $nowDate     = (new DateTime())->format(DATE_MYSQL_DATE);
     $nowDateTime = (new DateTime())->format(DATE_MYSQL_DATETIME);
-    $reviewDate  = '2020-06-18';
+    $reviewDate  = $nowDate;
     $dbeCustomer->setValue(DBECustomer::name, $line[6]);
     $dbeCustomer->getRowsByColumn(DBECustomer::name);
     if (!$dbeCustomer->fetchFirst()) {
@@ -103,7 +106,12 @@ while ($line = fgetcsv($csvFile)) {
         $contactInsert->setValue(DBEContact::position, $line[4]);
         $contactInsert->setValue(DBEContact::email, $line[5]);
         $contactInsert->setValue(DBEContact::siteNo, 0);
+        $contactInsert->setValue(DBEContact::supportLevel, DBEContact::supportLevelMain);
         $contactInsert->insertRow();
+        $customerUpdate = new DBECustomer($thing);
+        $customerUpdate->getRow($customerId);
+        $customerUpdate->setValue(DBECustomer::primaryMainContactID, $contactInsert->getPKValue());
+        $customerUpdate->updateRow();
     }
 
 

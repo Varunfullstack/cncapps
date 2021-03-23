@@ -7,6 +7,11 @@ This project changes will be shown here.
 ### Changed
 - Issue 648 - Move contacts that are linked to a supplier to their own table
 - Issue 1230 - Show supported / unsupported customer assets
+- Issue 1294 - Import customers from CSV v2
+
+## [v5.6.5] - 2021-03-22
+### Fixed
+- Fixed changes with page title/header
 
 ## [v5.6.4] - 2021-03-18
 ### Changed
@@ -134,7 +139,6 @@ with dateTime in the past and there's no end time.
 - Issue 1228 - Aged SRs On Hold Status
 - Issue 1227 - New project emails going to main contacts as well.
 - Issue 1225 - Change request approval sometimes forces comments.
-
 
 ## [v5.3.3] - 2021-01-25
 ### Fixed

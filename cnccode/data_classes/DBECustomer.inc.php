@@ -288,10 +288,10 @@ class DBECustomer extends DBCNCEntity
             DA_NOT_NULL,
             "cus_sla_p5"
         );
-        $this->addColumn(self::slaFixHoursP1, DA_FLOAT, DA_NOT_NULL);
-        $this->addColumn(self::slaFixHoursP2, DA_FLOAT, DA_NOT_NULL);
-        $this->addColumn(self::slaFixHoursP3, DA_FLOAT, DA_NOT_NULL);
-        $this->addColumn(self::slaFixHoursP4, DA_FLOAT, DA_NOT_NULL);
+        $this->addColumn(self::slaFixHoursP1, DA_FLOAT, DA_ALLOW_NULL);
+        $this->addColumn(self::slaFixHoursP2, DA_FLOAT, DA_ALLOW_NULL);
+        $this->addColumn(self::slaFixHoursP3, DA_FLOAT, DA_ALLOW_NULL);
+        $this->addColumn(self::slaFixHoursP4, DA_FLOAT, DA_ALLOW_NULL);
         $this->addColumn(
             self::sendContractEmail,
             DA_STRING,

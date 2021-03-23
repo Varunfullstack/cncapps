@@ -826,6 +826,10 @@ class BUActivity extends Business
                 'N'
             );
             $dbeProblem->updateRow();
+
+            if($dbeProblem->getValue(DBEProblem::status) === 'P' && !$reason){
+                throw new \CNCLTD\Exceptions\JsonHttpException(400,'Service Request in progress, reason required');
+            }
             $message = "{$this->dbeUser->getValue(DBEUser::name)} Escalated from {$this->workQueueDescriptionArray[$oldQueueNo]} to {$this->workQueueDescriptionArray[$newQueueNo]}";
             //if ($dbeProblem->getValue(DBEProblem::status) == 'P') 
             if ($reason != '') {
@@ -876,8 +880,11 @@ class BUActivity extends Business
                 'N'
             );
             $dbeProblem->updateRow();
+            if($dbeProblem->getValue(DBEProblem::status) === 'P' && !$reason){
+                throw new \CNCLTD\Exceptions\JsonHttpException(400,'Service Request in progress, reason required');
+            }
             $message = "{$this->dbeUser->getValue(DBEUser::name)} Deescalated from {$this->workQueueDescriptionArray[$oldQueueNo]} to {$this->workQueueDescriptionArray[$newQueueNo]}";
-            if ($dbeProblem->getValue(DBEProblem::status) == 'P') {
+            if ($reason) {
                 $message .= " because of {$reason}";
             }
             $message .= ".";

@@ -1,0 +1,66 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="xavi" id="issue1294-0">
+        <tagDatabase tag="issue1294"/>
+    </changeSet>
+    <changeSet author="xavi" id="issue1294-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT
+                c.IS_NULLABLE = 'NO'
+                FROM
+                information_schema.columns c
+                WHERE c.`TABLE_SCHEMA` = DATABASE()
+                AND c.`TABLE_NAME` = "customer"
+                AND c.`COLUMN_NAME` = "slaFixHoursP1";
+            </sqlCheck>
+        </preConditions>
+        <dropNotNullConstraint tableName="customer" columnName="slaFixHoursP1" columnDataType="decimal(4,1)"/>
+    </changeSet>
+
+
+    <changeSet author="xavi" id="issue1294-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT
+                c.IS_NULLABLE = 'NO'
+                FROM
+                information_schema.columns c
+                WHERE c.`TABLE_SCHEMA` = DATABASE()
+                AND c.`TABLE_NAME` = "customer"
+                AND c.`COLUMN_NAME` = "slaFixHoursP2";
+            </sqlCheck>
+        </preConditions>
+        <dropNotNullConstraint tableName="customer" columnName="slaFixHoursP2" columnDataType="decimal(4,1)"/>
+    </changeSet>
+    <changeSet author="xavi" id="issue1294-3">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT
+                c.IS_NULLABLE = 'NO'
+                FROM
+                information_schema.columns c
+                WHERE c.`TABLE_SCHEMA` = DATABASE()
+                AND c.`TABLE_NAME` = "customer"
+                AND c.`COLUMN_NAME` = "slaFixHoursP3";
+            </sqlCheck>
+        </preConditions>
+        <dropNotNullConstraint tableName="customer" columnName="slaFixHoursP3" columnDataType="decimal(4,1)"/>
+    </changeSet>
+    <changeSet author="xavi" id="issue1294-4">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT
+                c.IS_NULLABLE = 'NO'
+                FROM
+                information_schema.columns c
+                WHERE c.`TABLE_SCHEMA` = DATABASE()
+                AND c.`TABLE_NAME` = "customer"
+                AND c.`COLUMN_NAME` = "slaFixHoursP4";
+            </sqlCheck>
+        </preConditions>
+        <dropNotNullConstraint tableName="customer" columnName="slaFixHoursP4" columnDataType="decimal(4,1)"/>
+    </changeSet>
+</databaseChangeLog>
