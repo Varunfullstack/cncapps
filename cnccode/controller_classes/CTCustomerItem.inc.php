@@ -346,8 +346,8 @@ class CTCustomerItem extends CTCNC
             while ($this->dsCustomerItem->fetchNext()) {
 
                 $customerItemID = $this->dsCustomerItem->getValue($customerItemIDCol);
-                $urlItem = $this->getContractUrl($this->dsCustomerItem);
-                $checkBox = null;
+                $urlItem        = $this->getContractUrl($this->dsCustomerItem);
+                $checkBox       = null;
                 if ($dsSearchForm->getValue(BUCustomerItem::searchFormCustomerID)) {
                     $checkBox = '<input type="checkbox" id="salesOrder" name="customerItemIDs[' . $customerItemID . ']" value="' . $customerItemID . '" />';
                 }
@@ -705,14 +705,14 @@ class CTCustomerItem extends CTCNC
                 );
             }
         }
-        $urlSiteEdit  = Controller::buildLink(
+        $urlSiteEdit                          = Controller::buildLink(
             CTCNC_PAGE_SITE,
             array(
                 'action'  => CTCNC_ACT_SITE_EDIT,
                 'htmlFmt' => CT_HTML_FMT_POPUP
             )
         );
-        $urlSitePopup = Controller::buildLink(
+        $urlSitePopup                         = Controller::buildLink(
             CTCNC_PAGE_SITE,
             array(
                 'action'  => CTCNC_ACT_SITE_POPUP,
@@ -735,10 +735,10 @@ class CTCustomerItem extends CTCNC
             }
         }
         /* Default to enable 2ndSite fields */
-        $secondsiteReadonly            = null;
-        $secondsiteDisabled            = null;
-        $secondsiteReplicationReadonly = null;
-        $secondsiteReplicationDisabled = null;
+        $secondsiteReadonly                   = null;
+        $secondsiteDisabled                   = null;
+        $secondsiteReplicationReadonly        = null;
+        $secondsiteReplicationDisabled        = null;
         $secondsiteLocalExcludeFlagShow       = 0;
         $secondSiteReplicationExcludeFlagShow = 0;
         if ($buCustomerItem->serverIsUnderLocalSecondsiteContract(
@@ -758,7 +758,7 @@ class CTCustomerItem extends CTCNC
                 $secondsiteReplicationDisabled = CTCNC_HTML_DISABLED;
             }
         }
-        $buUser = new BUUser($this);
+        $buUser                       = new BUUser($this);
         $offsiteBackupSuspendedByText = null;
         if ($dsCustomerItem->getValue(DBEJCustomerItem::secondsiteSuspendedDate) && $dsCustomerItem->getValue(
                 DBEJCustomerItem::secondsiteSuspendedByUserID
@@ -796,6 +796,20 @@ class CTCustomerItem extends CTCNC
             $imageDelayByText = $dsUser->getValue(DBEUser::name) . ' on ' . Controller::dateYMDtoDMY(
                     $dsCustomerItem->getValue(DBEJCustomerItem::secondsiteImageDelayDate)
                 );
+        }
+        $pdoDB     = DBConnect::instance()->getDB();
+        $statement = $pdoDB->prepare(
+            'select checkedAt,sizeInGb from OBRSServerStorage where serverCustomerItemId = :id order by checkedAt desc limit 1'
+        );
+        $statement->execute(["id" => $dsCustomerItem->getValue(DBECustomerItem::customerItemID)]);
+        $serverUsedSpaceData = $statement->fetch();
+        $serverUsedSpaceText = "";
+        if ($serverUsedSpaceData) {
+            $date                = DateTimeImmutable::createFromFormat(
+                DATE_MYSQL_DATETIME,
+                $serverUsedSpaceData['checkedAt']
+            );
+            $serverUsedSpaceText = "{$serverUsedSpaceData['sizeInGb']} GB last checked on {$date->format(DATE_CNC_DATE_TIME_FORMAT)}";
         }
         $this->template->set_var(
             array(
@@ -842,6 +856,7 @@ class CTCustomerItem extends CTCNC
                 'ordheadIDMessage'                                      => Controller::htmlDisplayText(
                     $dsCustomerItem->getMessage(DBECustomerItem::ordheadID)
                 ),
+                'serverUsedSpace'                                       => $serverUsedSpaceText,
                 'porheadID'                                             => Controller::htmlDisplayText(
                     $dsCustomerItem->getValue(DBEJCustomerItem::porheadID)
                 ),
@@ -917,32 +932,32 @@ class CTCustomerItem extends CTCNC
                 'offsiteReplicationValidationSuspendedUntilDateMessage' => Controller::htmlDisplayText(
                     $dsCustomerItem->getMessage(DBECustomerItem::offsiteReplicationValidationSuspendedUntilDate)
                 ),
-                'offsiteBackupSuspendedByText'      => $offsiteBackupSuspendedByText,
-                'offsiteReplicationSuspendedByText' => $offsiteReplicationSuspendedByText,
-                'imageDelayByText'                  => $imageDelayByText,
-                'secondsiteImageDelayDays'                => Controller::htmlDisplayText(
+                'offsiteBackupSuspendedByText'                          => $offsiteBackupSuspendedByText,
+                'offsiteReplicationSuspendedByText'                     => $offsiteReplicationSuspendedByText,
+                'imageDelayByText'                                      => $imageDelayByText,
+                'secondsiteImageDelayDays'                              => Controller::htmlDisplayText(
                     $dsCustomerItem->getValue(DBEJCustomerItem::secondsiteImageDelayDays)
                 ),
-                'secondsiteImageDelayDaysMessage'         => Controller::htmlDisplayText(
+                'secondsiteImageDelayDaysMessage'                       => Controller::htmlDisplayText(
                     $dsCustomerItem->getMessage(DBECustomerItem::secondsiteImageDelayDays)
                 ),
-                'offsiteBackupDelayDisable'               => ($this->dbeUser->getValue(
+                'offsiteBackupDelayDisable'                             => ($this->dbeUser->getValue(
                         DBEUser::offsiteBackupAdditionalPermissionsFlag
                     ) == 'Y') ? 'true' : 'false',
-                'secondSiteLocationPathValidationText'    => $secondSiteLocationPathValidationText,
-                'secondSiteReplicationPathValidationText' => $secondSiteReplicationPathValidationText,
-                'secondsiteLocalExcludeFlagShow'          => $secondsiteLocalExcludeFlagShow,
-                'secondsiteLocalExcludeFlagChecked'       => Controller::htmlChecked(
+                'secondSiteLocationPathValidationText'                  => $secondSiteLocationPathValidationText,
+                'secondSiteReplicationPathValidationText'               => $secondSiteReplicationPathValidationText,
+                'secondsiteLocalExcludeFlagShow'                        => $secondsiteLocalExcludeFlagShow,
+                'secondsiteLocalExcludeFlagChecked'                     => Controller::htmlChecked(
                     $dsCustomerItem->getValue(DBEJCustomerItem::secondsiteLocalExcludeFlag)
                 ),
-                'secondsiteDisabled'                      => $secondsiteDisabled,
-                'secondsiteReadonly'                      => $secondsiteReadonly,
-                "secondSiteReplicationExcludeFlagChecked" => Controller::htmlChecked(
+                'secondsiteDisabled'                                    => $secondsiteDisabled,
+                'secondsiteReadonly'                                    => $secondsiteReadonly,
+                "secondSiteReplicationExcludeFlagChecked"               => Controller::htmlChecked(
                     $dsCustomerItem->getValue(DBECustomerItem::secondSiteReplicationExcludeFlag)
                 ),
-                "secondSiteReplicationExcludeFlagShow"    => $secondSiteReplicationExcludeFlagShow,
-                "secondsiteReplicationReadonly"           => $secondsiteReplicationReadonly,
-                "secondsiteReplicationDisabled"           => $secondsiteReplicationDisabled,
+                "secondSiteReplicationExcludeFlagShow"                  => $secondSiteReplicationExcludeFlagShow,
+                "secondsiteReplicationReadonly"                         => $secondsiteReplicationReadonly,
+                "secondsiteReplicationDisabled"                         => $secondsiteReplicationDisabled,
             )
         );
         $this->template->set_block(
@@ -1004,20 +1019,20 @@ class CTCustomerItem extends CTCNC
                     )
                 );
                 $deleteSecondsiteImageText = 'delete';
-                $editSecondsiteImageLink = Controller::buildLink(
+                $editSecondsiteImageLink   = Controller::buildLink(
                     'OffsiteBackupStatus.php',
                     array(
                         'action'            => 'edit',
                         'secondsiteImageID' => $dsSecondsiteImage->getValue(DBESecondsiteImage::secondsiteImageID)
                     )
                 );
-                $imageTime               = null;
-                $imageAgeDays            = null;
+                $imageTime                 = null;
+                $imageAgeDays              = null;
                 if ($dsSecondsiteImage->getValue(DBESecondsiteImage::status) && $dsSecondsiteImage->getValue(
                         DBESecondsiteImage::imageTime
                     ) > 0) {
 
-                    $imageTime = strftime(
+                    $imageTime    = strftime(
                         "%d/%m/%Y %H:%M:%S",
                         strtotime($dsSecondsiteImage->getValue(DBESecondsiteImage::imageTime))
                     );
@@ -1227,7 +1242,7 @@ class CTCustomerItem extends CTCNC
             $dsCustomerItem->initialise();
             $dsCustomerItem->fetchNext();
         }
-        $urlSubmit = Controller::buildLink(
+        $urlSubmit        = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action' => CTCUSTOMERITEM_ACT_INSERT
@@ -1662,10 +1677,10 @@ class CTCustomerItem extends CTCNC
         $customerHasServiceDeskContract = $buCustomerItem->customerHasServiceDeskContract(
             $dsContract->getValue(DBEJCustomerItem::customerID)
         );
-        $buPDFSupportContract = new BUPDFSupportContract(
+        $buPDFSupportContract           = new BUPDFSupportContract(
             $this, $dsContract, $dsCustomerItem, $dsSite, $dsCustomer, $buActivity, $customerHasServiceDeskContract
         );
-        $pdfFile = $buPDFSupportContract->generateFile();
+        $pdfFile                        = $buPDFSupportContract->generateFile();
         if ($pdfFile != FALSE) {
             header('Pragma: public');
             header('Expires: 0');
