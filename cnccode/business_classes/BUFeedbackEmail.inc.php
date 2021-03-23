@@ -41,15 +41,16 @@ class BUFeedbackEmail extends Business
         cons.`cns_name` cons_name,
         CONCAT(cons.cns_logname,'@cnc-ltd.co.uk') cons_email,
         teamLeader.`cns_name` leader_name,
-        CONCAT(teamLeader.cns_logname,'@cnc-ltd.co.uk') leader_email            
+        CONCAT(teamLeader.cns_logname,'@cnc-ltd.co.uk') leader_email,
+        concat(contact.con_first_name, ' ', contact.con_last_name) as contactName
          FROM `customerfeedback` f 
          JOIN problem ON problem.`pro_problemno`=f.serviceRequestId
-         JOIN callactivity `fixed`
-    ON fixed.caa_problemno = f.serviceRequestId AND fixed.caa_callacttypeno = 57
+         JOIN callactivity `fixed`  ON fixed.caa_problemno = f.serviceRequestId AND fixed.caa_callacttypeno = 57
          JOIN `consultant`  cons ON cons.`cns_consno`= fixed.`caa_consno`
          JOIN team ON team.`teamID` = cons.teamID
          JOIN `consultant`  teamLeader ON teamLeader.`cns_consno`=team.`leaderId`
          JOIN customer ON customer.`cus_custno` = problem.`pro_custno`
+        join contact on  contact.con_contno = cal.caa_contno
 WHERE  f.notified = 0 
         ";
         return $this->db->query($sql);
@@ -74,6 +75,7 @@ WHERE  f.notified = 0
                         'rate'             => $row->rate,
                         'comments'         => $row->comments,
                         'serviceRequestId' => $row->serviceRequestId,
+                        'contactName'      => $row->contactName
                     ]
                 );
                 $buMail->sendSimpleEmail($body, $subject, $row->cons_email, CONFIG_SUPPORT_EMAIL, [$row->leader_email]);

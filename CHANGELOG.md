@@ -11,6 +11,7 @@ This project changes will be shown here.
 - Issue 1230 - Show supported / unsupported customer assets.
 - Issue 1294 - Import customers from CSV v2.
 - Issue 1297 - Task List Modal, refine list of items.
+- Issue 1267 - Customer Feedback Improvements.
 ### Fixed
 - Issue 1299 - Unexpected characters in PDF quotes
 

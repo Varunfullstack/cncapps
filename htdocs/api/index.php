@@ -452,6 +452,92 @@ ORDER BY raisedManually DESC";
             }
         );
         $group->get(
+            '/customerSatisfactionScore/{customerId}',
+            function (Request $request, Response $response, $args) {
+                $db        = DBConnect::instance()->getDB();
+                $statement = $db->prepare(
+                    "SELECT
+  SUM(cf.value = 1) / COUNT(*) AS good,
+  SUM(cf.value = 2) / COUNT(*) AS meh,
+  SUM(cf.value = 2) / COUNT(*) AS bad,
+  COUNT(*) AS total
+FROM
+  customerFeedback cf
+  JOIN contact
+    ON contact.`con_contno` = cf.contactId
+   WHERE contact.`con_custno` = ?
+GROUP BY contact.`con_custno`"
+                );
+                $statement->execute([$args['customerId']]);
+                $response->getBody()->write(
+                    json_encode($statement->fetch(), JSON_NUMERIC_CHECK)
+                );
+                return $response;
+            }
+        );
+        $group->get(
+            '/customerFeedback/{customerId}',
+            function (Request $request, Response $response, $args) {
+                $db          = DBConnect::instance()->getDB();
+                $queryParams = $request->getQueryParams();
+                $endDate     = new DateTime();
+                $startDate   = (clone $endDate)->sub(new DateInterval('P365D'));
+                if (isset($queryParams['startDate'])) {
+                    $startDateString = $queryParams['startDate'];
+                    $startDate       = DateTime::createFromFormat(DATE_MYSQL_DATE, $startDateString);
+                    if (!$startDate) {
+                        $response->getBody()->write(
+                            json_encode(["error" => "The start date parameter format is not valid: YYYY-MM-DD"])
+                        );
+                        return $response->withStatus(400);
+                    }
+                }
+                if (isset($queryParams['endDate'])) {
+                    $endDateString = $queryParams['endDate'];
+                    $endDate       = DateTime::createFromFormat(DATE_MYSQL_DATE, $endDateString);
+                    if (!$endDate) {
+                        $response->getBody()->write(
+                            json_encode(["error" => "The end date parameter format is not valid: YYYY-MM-DD"])
+                        );
+                        return $response->withStatus(400);
+                    }
+                }
+                $statement = $db->prepare(
+                    "SELECT       
+                    f.id,
+                    f.value,     
+                    customer.`cus_name`,
+                    f.`comments`,
+                    createdAt  ,
+                    serviceRequestId problemID    ,
+                    problem.emailSubjectSummary as emailSubjectSummary,       
+                    cons.cns_name engineer,
+                    concat(contact.con_first_name, ' ', contact.con_last_name) as contactName
+                FROM `customerfeedback` f 
+                    JOIN problem ON problem.`pro_problemno`=f.serviceRequestId
+                    JOIN callactivity cal ON cal.caa_problemno=f.serviceRequestId     
+                    JOIN consultant cons on cons.cns_consno=cal.caa_consno
+                    JOIN customer ON customer.`cus_custno`=problem.`pro_custno`
+                    join contact on  contact.con_contno = cal.caa_contno
+                WHERE cal.caa_callacttypeno=57                    
+                    AND (:from  is null or date(f.`createdAt`) >= :from )
+                    AND (:to    is null or date(f.`createdAt`) <= :to)
+                    AND problem.`pro_custno`= :customerId"
+                );
+                $statement->execute(
+                    [
+                        "from"       => $startDate->format(DATE_MYSQL_DATE),
+                        "to"         => $endDate->format(DATE_MYSQL_DATE),
+                        "customerId" => $args['customerId']
+                    ]
+                );
+                $response->getBody()->write(
+                    json_encode($statement->fetchAll(), JSON_NUMERIC_CHECK)
+                );
+                return $response;
+            }
+        );
+        $group->get(
             '/SRCountByLocation/{customerId}',
             function (Request $request, Response $response, $args) {
                 $queryParams = $request->getQueryParams();
