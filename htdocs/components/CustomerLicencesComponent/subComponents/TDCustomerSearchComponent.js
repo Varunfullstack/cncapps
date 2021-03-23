@@ -64,7 +64,7 @@ class TDCustomerSearchComponent extends React.Component {
                 el("input", {
                     key: name,
                     name: name,
-                    type: "text",
+                    type: "search",
                     className: "form-control",
                     onChange: handleChange,
                 })
@@ -73,7 +73,7 @@ class TDCustomerSearchComponent extends React.Component {
     }
 
     getSearchElements() {
-        const {el, handleSearch, handleAddNew} = this;
+        const {el, handleAddNew} = this;
         return el(
             "table",
             {key: "table", style: {maxWidth: 1000}},
@@ -118,7 +118,20 @@ class TDCustomerSearchComponent extends React.Component {
         const columns = [
             {path: "companyName", label: "StreamOne Company Name", sortable: true},
 
-            {path: "cncCustName", label: "CNC Customer", sortable: true},
+            {
+                path: "cncCustName", label: "CNC Customer", sortable: true, sortFn: (direction) => (a, b) => {
+                    if (!a.cncCustName) {
+                        return 1;
+                    }
+                    if (!b.cncCustName) {
+                        return -1;
+                    }
+                    if (direction == 'asc') {
+                        return a.cncCustName.localeCompare(b.cncCustName);
+                    }
+                    return b.cncCustName.localeCompare(a.cncCustName);
+                }
+            },
             {path: "name", label: "Contact Name", sortable: true,},
             {path: "email", label: "Email", sortable: true},
             {
@@ -151,6 +164,7 @@ class TDCustomerSearchComponent extends React.Component {
                 columns: columns,
                 defaultSortPath: "cncCustName",
                 defaultSortOrder: "asc",
+                key: 'result-table',
                 pk: "email",
             });
         }

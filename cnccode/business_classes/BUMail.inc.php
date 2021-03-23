@@ -22,10 +22,10 @@ class BUMail extends Business
 {
 
     const SECONDS_DELAY_UNTIL_SEND = 1;
-    const DELETE_AFTER_SEND = 1;
-    const MAIL_QUEUE_SEND_LIMIT = 20;
-    const MAIL_QUEUE_TRY_LIMIT = 5;
-    public $mime;
+    const DELETE_AFTER_SEND        = 1;
+    const MAIL_QUEUE_SEND_LIMIT    = 20;
+    const MAIL_QUEUE_TRY_LIMIT     = 5;
+    public  $mime;
     private $mailQueue;
     private $buUser;
 
@@ -35,13 +35,11 @@ class BUMail extends Business
     function __construct(&$owner)
     {
         parent::__construct($owner);
-        $this->mime = new Mail_Mime;
+        $this->mime      = new Mail_Mime;
         $this->mailQueue = new Mail_Queue (
-            $GLOBALS['db_options'],
-            $GLOBALS['mail_options']
+            $GLOBALS['db_options'], $GLOBALS['mail_options']
         );
-
-        $this->buUser = new BUUser($this);
+        $this->buUser    = new BUUser($this);
     }
 
     function sendEmailWithAttachments($body,
@@ -59,7 +57,6 @@ class BUMail extends Business
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
-
         $mime = new Mail_mime();
         foreach ($attachmentCollection as $attachment) {
             $mime->addAttachment(
@@ -69,33 +66,28 @@ class BUMail extends Business
                 $attachment->getIsFile()
             );
         }
-
         $mime->setHTMLBody($body);
-
         $mime_params = array(
             'text_encoding' => '7bit',
             'text_charset'  => 'UTF-8',
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-
-        $body = $mime->get($mime_params);
-        $hdrs = $mime->headers($hdrs);
+        $body        = $mime->get($mime_params);
+        $hdrs        = $mime->headers($hdrs);
         $this->putInQueue($fromEmail, $recipients, $hdrs, $body);
     }
 
-    public function putInQueue(
-        $fromEmail,
-        $toEmail,
-        $headers,
-        $body
+    public function putInQueue($fromEmail,
+                               $toEmail,
+                               $headers,
+                               $body
     )
     {
         $parameters = $this->prepareMessage(
             $toEmail,
             $headers
         );
-
         return $this->mailQueue->put(
             $fromEmail,
             $parameters['toEmail'],
@@ -118,24 +110,29 @@ class BUMail extends Business
         */
         if ($GLOBALS ['server_type'] != MAIN_CONFIG_SERVER_TYPE_LIVE) {
             $headers['Subject'] = $headers['Subject'] . ' | Emails to: ' . $toEmail;
-            $toEmail = CONFIG_TEST_EMAIL;
+            $toEmail            = CONFIG_TEST_EMAIL;
         }
-
         $userID = 0;
         if (isset($GLOBALS ['auth'])) {
             $userID = ( string )$GLOBALS ['auth']->is_authenticated();
         }
-        return
-            array(
-                'userID'  => $userID,
-                'toEmail' => $toEmail,
-                'headers' => $headers
-            );
+        return array(
+            'userID'  => $userID,
+            'toEmail' => $toEmail,
+            'headers' => $headers
+        );
 
     }
 
-    function sendSimpleEmail($body, $subject, $recipients, $fromEmail = CONFIG_SUPPORT_EMAIL, $cc = null)
+    function sendSimpleEmail($body,
+                             $subject,
+                             $recipients,
+                             $fromEmail = CONFIG_SUPPORT_EMAIL,
+                             ?array $cc = [],
+                             ?array $bcc = []
+    )
     {
+
         $hdrs = array(
             'From'         => $fromEmail,
             'To'           => $recipients,
@@ -143,24 +140,24 @@ class BUMail extends Business
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
-        if ($cc) {
-            $hdrs['Cc'] = $cc;
+        if (count($cc)) {
+            $hdrs['Cc'] = implode(',', $cc);
+            $recipients = implode(',', [$recipients, $hdrs['Cc']]);
         }
-
+        if (count($bcc)) {
+            $hdrs['Bcc'] = implode(',', $bcc);
+            $recipients  = implode(',', [$recipients, $hdrs['Bcc']]);
+        }
         $mime = new Mail_mime();
-
         $mime->setHTMLBody($body);
-
         $mime_params = array(
             'text_encoding' => '7bit',
             'text_charset'  => 'UTF-8',
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-
-        $body = $mime->get($mime_params);
-
-        $hdrs = $mime->headers($hdrs);
+        $body        = $mime->get($mime_params);
+        $hdrs        = $mime->headers($hdrs);
         $this->putInQueue($fromEmail, $recipients, $hdrs, $body);
     }
 
@@ -172,22 +169,19 @@ class BUMail extends Business
      * @param mixed $body
      * @return mixed
      */
-    public function send(
-        $toEmail,
-        $headers,
-        $body
+    public function send($toEmail,
+                         $headers,
+                         $body
     )
     {
         $parameters = $this->prepareMessage(
             $toEmail,
             $headers
         );
-
-        $mail = new Mail_smtp(
+        $mail       = new Mail_smtp(
             $GLOBALS ['mail_options']
         );
-
-        $sent = $mail->send(
+        $sent       = $mail->send(
             $parameters['toEmail'],
             $parameters['headers'],
             $body
@@ -209,8 +203,7 @@ class BUMail extends Business
     {
         var_dump('Mailqueue call before send', $args);
         $mailId = $args['id'];
-        $sql =
-            "SELECT
+        $sql    = "SELECT
         time_started_sending
       FROM
         mail_queue
@@ -218,9 +211,8 @@ class BUMail extends Business
         id = $mailId";
         $this->db->commit();
         $result = $this->db->query($sql);
-        $row = $result->fetch_object();
-        $ret = false;
-
+        $row    = $result->fetch_object();
+        $ret    = false;
         if (!$row->time_started_sending || (DateTime::createFromFormat(
                 DATE_MYSQL_DATETIME,
                 $row->time_started_sending
@@ -229,14 +221,12 @@ class BUMail extends Business
             /*
             Set is_sending flag
             */
-            $sql =
-                "UPDATE 
+            $sql = "UPDATE 
           mail_queue
         SET
           time_started_sending = NOW()
         WHERE
           id = $mailId";
-
             $this->db->query($sql);
             $this->db->commit();
         }
@@ -250,18 +240,15 @@ class BUMail extends Business
     public function mailqueueCallBackAfterSend($args)
     {
         $mailId = $args['id'];
-
         /*
         ReSet is_sending flag
         */
-        $sql =
-            "UPDATE
+        $sql = "UPDATE
         mail_queue
       SET
         time_started_sending = null
       WHERE
         id = $mailId";
-
         $this->db->query($sql);
         $this->db->commit();
     }

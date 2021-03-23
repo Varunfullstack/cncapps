@@ -4,17 +4,27 @@ import Table from "./../../shared/table/table";
 import CurrentActivityService from "../services/CurrentActivityService";
 import React from 'react';
 import {ColumnRenderer} from "./ColumnRenderer";
+import ToolTip from "../../shared/ToolTip";
 
 class InboxOpenSRComponent extends React.Component {
     code = "OSR";
     el = React.createElement;
     apiCurrentActivityService;
     apiCustomer = new APICustomers();
+    timeOut;
 
     constructor(props) {
         super(props);
         this.apiCurrentActivityService = new CurrentActivityService();
-        this.state = {customers: [], data: this.props.data, customer: null}
+        this.state = {
+            customers: [],
+            data: this.props.data,
+            customer: null,
+            filter: {
+                srNumber: '',
+                customer: null
+            }
+        }
     }
 
     componentDidMount() {
@@ -33,7 +43,7 @@ class InboxOpenSRComponent extends React.Component {
     };
 
     getTableElement = () => {
-        const {el, addToolTip} = this;
+        const {el} = this;
         const {
             getMoveElement,
             srDescription,
@@ -43,12 +53,29 @@ class InboxOpenSRComponent extends React.Component {
             getAllocatedElement,
         } = this.props;
         let columns = [
+            {
+                hide: false,
+                order: 0.9,
+                path: null,
+                label: "",
+                key: "CallBack",
+                sortable: false,
+                hdClassName: "text-center",
+                className: "text-center",
+                content: (problem) =>
+                    <ToolTip title="Call back">
+                        <i className="fal fa-2x fa-phone icon pointer color-gray"
+                           onClick={() => this.props.onCallBack(problem)}
+                        ></i>
+                    </ToolTip>
+
+            },
             ColumnRenderer.getWorkIconColumn(startWork, this.code),
             ColumnRenderer.getSpecialAttentionColumn(),
+            ColumnRenderer.getFixSLAWarningColumn(),
             ColumnRenderer.getFutureWorkColumn(),
-           ColumnRenderer.getRequestTimeColumn(requestAdditionalTime),
-           ColumnRenderer.getOnHoldColumn(),
-
+            ColumnRenderer.getRequestTimeColumn(requestAdditionalTime),
+            ColumnRenderer.getOnHoldColumn(),
             ColumnRenderer.getSLABreachedColumn(),
             {
                 hide: false,
@@ -82,6 +109,17 @@ class InboxOpenSRComponent extends React.Component {
                 hdClassName: "text-center",
                 className: "text-center",
                 content: (problem) => getMoveElement(this.code, problem, problem.queueNo),
+            },
+            {
+                hide: false,
+                order: 11.5,
+                path: "contactName",
+                key: 'contactName',
+                label: "",
+                hdToolTip: "Contact",
+                icon: "fal fa-2x fa-id-card-alt color-gray2 ",
+                sortable: false,
+                hdClassName: "text-center",
             },
             {
                 hide: false,
@@ -129,7 +167,7 @@ class InboxOpenSRComponent extends React.Component {
             {
                 hide: false,
                 order: 12,
-                path: "reason",
+                path: "emailSubjectSummary",
                 label: "",
                 hdToolTip: "Description of the Service Request",
                 icon: "fal fa-2x fa-file-alt color-gray2 ",
@@ -141,7 +179,7 @@ class InboxOpenSRComponent extends React.Component {
                         {
                             className: "pointer",
                             onClick: () => srDescription(problem),
-                            dangerouslySetInnerHTML: {__html: problem.reason}
+                            dangerouslySetInnerHTML: {__html: problem.emailSubjectSummary}
                         },
                     ),
             },
@@ -206,15 +244,32 @@ class InboxOpenSRComponent extends React.Component {
                 displayColumn: "name",
                 pk: "id",
                 width: 300,
-                onSelect: this.handleOnCustomerSelect,
+                onSelect: (customer) => this.setFilter('customer', customer),
+            }),
+            <label style={{marginLeft: 30, whiteSpace: "nowrap"}}>SR Number</label>
+            ,
+            el('input', {
+                style: {height: 14},
+                className: "form-control",
+                onChange: (event) => this.setFilter('srNumber', event.target.value)
             })
         )
     }
-    handleOnCustomerSelect = (customer) => {
+    setFilter = (field, value) => {
+        const {filter} = this.state;
+        filter[field] = value;
+        this.setState({filter}, () => {
+            if (field == 'srNumber' && value.length >= 4) {
+                clearTimeout(this.timeOut);
+                this.timeOut = setTimeout(() => this.handleOnCustomerSelect(), 1000);
+            } else if (field == 'customer')
+                this.handleOnCustomerSelect()
+        });
+    }
+    handleOnCustomerSelect = () => {
+        const {filter} = this.state;
+        this.props.getCustomerOpenSR((filter.customer?.id || ''), filter.srNumber);
 
-        if (customer != null) {
-            this.props.getCustomerOpenSR(customer.id);
-        }
     }
 
     static getDerivedStateFromProps(props, current_state) {
@@ -223,9 +278,8 @@ class InboxOpenSRComponent extends React.Component {
 
     render() {
         const {getTableElement,} = this;
-        return [
-            getTableElement(),
-        ];
+        return getTableElement();
+
     }
 }
 

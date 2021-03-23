@@ -14,9 +14,16 @@ import InboxOpenSRComponent from './subComponents/InboxOpenSRComponent';
 import {getServiceRequestWorkTitle, sort} from '../utils/utils';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import APIStandardText from '../services/APIStandardText';
+import CallBackModal from './subComponents/CallBackModal';
 
 import '../style.css';
+import './CurrentActivityReportComponent.css';
 import '../shared/ToolTip.css'
+import APIActivity from '../services/APIActivity';
+import MovingSRComponent from './subComponents/MovingSRComponent';
+
+import CallBackComponent from './subComponents/CallBackComponent';
 
 const AUTORELOAD_INTERVAL_TIME = 2 * 60 * 1000;
 
@@ -25,6 +32,8 @@ class CurrentActivityReportComponent extends MainComponent {
     apiCurrentActivityService;
     autoReloadInterval;
     teams;
+    apiStandardText = new APIStandardText();
+    apiActivity = new APIActivity();
 
     constructor(props) {
         super(props);
@@ -56,6 +65,14 @@ class CurrentActivityReportComponent extends MainComponent {
             _showSpinner: false,
             userFilter: "",
             filter,
+            changeQueuData: {
+                show: false,
+                newTeam: '',
+                queue: '',
+                problem: null
+            },
+            showCallBackModal: false,
+            currentProblem: null
         };
         this.apiCurrentActivityService = new CurrentActivityService();
         this.teams = [
@@ -189,7 +206,7 @@ class CurrentActivityReportComponent extends MainComponent {
         this.loadQueue(code);
         this.checkAutoReload(code);
         this.saveFilterToLocalStorage(filter);
-        this.setState({filter});
+        this.setState({filter, openSrCustomerID: ''});
     };
     loadData = () => {
         const {filter} = this.state;
@@ -297,19 +314,18 @@ class CurrentActivityReportComponent extends MainComponent {
                     break;
                 case "OSR":
                     if (this.state.openSrCustomerID)
-                        this.getCustomerOpenSR(this.state.openSrCustomerID);
+                        this.getCustomerOpenSR(this.state.openSrCustomerID, this.state.srNumber);
                     break;
             }
         }
     };
-    getCustomerOpenSR = (customerID) => {
+    getCustomerOpenSR = (customerID, srNumber) => {
         const {filter} = this.state;
-
-        if (customerID != null) {
+        if (customerID != '' || srNumber != '') {
             this.showSpinner();
-            this.setState({openSrCustomerID: customerID})
+            this.setState({openSrCustomerID: customerID, srNumber})
             this.apiCurrentActivityService
-                .getCustomerOpenSR(customerID)
+                .getCustomerOpenSR(customerID, srNumber)
                 .then((res) => {
                     const openSRInbox = this.prepareResult(res);
                     sort(openSRInbox, "queueNo");
@@ -324,25 +340,41 @@ class CurrentActivityReportComponent extends MainComponent {
                 });
         }
     }
+
+    getAssignTeamModal = () => {
+        const {changeQueuData} = this.state;
+        if (!changeQueuData.show)
+            return null;
+        else
+            return <MovingSRComponent
+                key="MovingSR"
+                problem={changeQueuData.problem}
+                queue={changeQueuData.queue}
+                show={changeQueuData.show}
+                newTeam={changeQueuData.newTeam}
+                onClose={this.handleMovingModalClose}
+            ></MovingSRComponent>
+    }
+    handleMovingModalClose = (reload = true) => {
+        const {changeQueuData} = this.state;
+        if (reload)
+            this.loadQueue(changeQueuData.queue);
+        changeQueuData.show = false;
+        changeQueuData.newTeam = '';
+        changeQueuData.queue = '';
+        changeQueuData.problem = null;
+        this.setState({changeQueuData});
+    }
+
+
     // Shared methods
     moveToAnotherTeam = async ({target}, problem, code) => {
-        let answer = null;
-        if (problem.status === "P") {
-            answer = await this.prompt(
-                "Please provide a reason for moving this SR into a different queue"
-            );
-            if (!answer) {
-                return;
-            }
-        }
-
-        this.apiCurrentActivityService
-            .changeQueue(problem.problemID, target.value, answer)
-            .then((res) => {
-                if (res && res.status) {
-                    this.loadQueue(code);
-                }
-            });
+        const {changeQueuData} = this.state;
+        changeQueuData.newTeam = target.value;
+        changeQueuData.problem = problem;
+        changeQueuData.show = true;
+        changeQueuData.queue = code;
+        this.setState({changeQueuData});
     };
     /**
      * Move to another queue
@@ -573,6 +605,24 @@ class CurrentActivityReportComponent extends MainComponent {
         }
     }
 
+    onCallBack = (problem) => {
+        this.setState({showCallBackModal: true, currentProblem: problem});
+    }
+    getCallBackModal = () => {
+        const {showCallBackModal, currentProblem} = this.state;
+        if (!showCallBackModal)
+            return null;
+        return <CallBackModal key="modal"
+                              show={showCallBackModal}
+                              onClose={this.handleCallBackClose}
+                              problem={currentProblem}
+        >
+        </CallBackModal>
+    }
+    handleCallBackClose = (callActivityID) => {
+        this.setState({showCallBackModal: false});
+    }
+
     render() {
         const {
             el,
@@ -593,6 +643,7 @@ class CurrentActivityReportComponent extends MainComponent {
             getFollowOnElement,
             getCustomerOpenSR,
             assignToRequest,
+            onCallBack
         } = this;
         const {
             helpDeskInboxFiltered,
@@ -610,10 +661,16 @@ class CurrentActivityReportComponent extends MainComponent {
 
         } = this.state;
         return el("div", {style: {backgroundColor: "white"}}, [
+            <CallBackComponent key='callback'
+                               team={filter.activeTab}
+                               customerID={this.state.openSrCustomerID}
+            ></CallBackComponent>,
+            this.getCallBackModal(),
             this.getConfirm(),
             this.getAlert(),
             this.getPrompt(),
             this.getFollowOnElement(),
+            this.getAssignTeamModal(),
             el(Spinner, {key: "spinner", show: _showSpinner}),
             getTabsElement(),
             filter.activeTab !== 'TBL' && filter.activeTab !== "PR" ? getEngineersFilterElement() : null,
@@ -630,7 +687,8 @@ class CurrentActivityReportComponent extends MainComponent {
                     allocateAdditionalTime,
                     requestAdditionalTime,
                     getAllocatedElement,
-                    getFollowOnElement
+                    getFollowOnElement,
+                    onCallBack
                 })
                 : null,
 
@@ -647,6 +705,7 @@ class CurrentActivityReportComponent extends MainComponent {
                     allocateAdditionalTime,
                     requestAdditionalTime,
                     getAllocatedElement,
+                    onCallBack
                 })
                 : null,
 
@@ -663,6 +722,7 @@ class CurrentActivityReportComponent extends MainComponent {
                     allocateAdditionalTime,
                     requestAdditionalTime,
                     getAllocatedElement,
+                    onCallBack
                 })
                 : null,
 
@@ -679,6 +739,7 @@ class CurrentActivityReportComponent extends MainComponent {
                     allocateAdditionalTime,
                     requestAdditionalTime,
                     getAllocatedElement,
+                    onCallBack
                 })
                 : null,
 
@@ -695,6 +756,7 @@ class CurrentActivityReportComponent extends MainComponent {
                     allocateAdditionalTime,
                     requestAdditionalTime,
                     getAllocatedElement,
+                    onCallBack
                 })
                 : null,
 
@@ -733,7 +795,8 @@ class CurrentActivityReportComponent extends MainComponent {
                     requestAdditionalTime,
                     getAllocatedElement,
                     getFollowOnElement,
-                    getCustomerOpenSR
+                    getCustomerOpenSR,
+                    onCallBack
                 })
                 : null,
         ]);

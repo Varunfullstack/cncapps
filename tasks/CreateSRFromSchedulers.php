@@ -1,6 +1,8 @@
 <?php
 
 use CNCLTD\LoggerCLI;
+use CNCLTD\ServiceRequestInternalNote\infra\ServiceRequestInternalNotePDORepository;
+use CNCLTD\ServiceRequestInternalNote\UseCases\AddServiceRequestInternalNote;
 
 require_once(__DIR__ . "/../htdocs/config.inc.php");
 global $cfg;
@@ -58,11 +60,11 @@ try {
         }
         $customerId = $dbeSrScheduler->getValue(DBESRScheduler::customerId);
         $logger->info('Creating SR for customer ' . $customerId);
-        $dbeProblem = new DBEProblem($thing);
-        $dbeContact = new DBEContact($thing);
-        $buActivity = new BUActivity($thing);
-        $contactId  = $dbeSrScheduler->getValue(DBESRScheduler::contactId);
-        $priority   = $dbeSrScheduler->getValue(DBESRScheduler::priority);
+        $dbeProblem          = new DBEProblem($thing);
+        $dbeContact          = new DBEContact($thing);
+        $buActivity          = new BUActivity($thing);
+        $contactId           = $dbeSrScheduler->getValue(DBESRScheduler::contactId);
+        $priority            = $dbeSrScheduler->getValue(DBESRScheduler::priority);
         $queue               = $dbeSrScheduler->getValue(DBESRScheduler::teamId);
         $hiddenFromCustomer  = $dbeSrScheduler->getValue(DBESRScheduler::hideFromCustomer);
         $siteNo              = $dbeSrScheduler->getValue(DBESRScheduler::siteNo);
@@ -120,6 +122,19 @@ try {
             date(DATE_MYSQL_DATETIME)
         );
         $dbeProblem->setValue(
+            DBEProblem::assetName,
+            $dbeSrScheduler->getValue(DBESRScheduler::assetName)
+        );
+        $dbeProblem->setValue(
+            DBEProblem::assetTitle,
+            $dbeSrScheduler->getValue(DBESRScheduler::assetTitle)
+        );
+        $dbeProblem->setValue(
+            DBEProblem::emptyAssetReason,
+            $dbeSrScheduler->getValue(DBESRScheduler::emptyAssetReason)
+        );
+
+        $dbeProblem->setValue(
             DBEProblem::contactID,
             $dbeContact->getValue(DBEContact::contactID)
         );
@@ -148,12 +163,17 @@ try {
             DBEProblem::linkedSalesOrderID,
             $dbeSrScheduler->getValue(DBESRScheduler::linkedSalesOrderId)
         );
-        $dbeProblem->setValue(DBEProblem::internalNotes, $internalNotes);
         $dbeProblem->setValue(
             DBEProblem::raiseTypeId,
             BUProblemRaiseType::MANUALID
         );
         $dbeProblem->insertRow();
+        $useCase = new AddServiceRequestInternalNote(
+            new ServiceRequestInternalNotePDORepository()
+        );
+        $internalNoteUser = new DBEUser($thing);
+        $internalNoteUser->getRow(USER_SYSTEM);
+        $useCase($dbeProblem, $internalNoteUser, $internalNotes);
         $problemID = $dbeProblem->getPKValue();
         $dbeCallActivity->setValue(
             DBECallActivity::callActivityID,
@@ -215,20 +235,21 @@ try {
     $buActivity     = new BUActivity($thing);
     $buCustomer     = new BUCustomer($thing);
     $customerId     = 282;
-    $primaryContact = $buCustomer->getPrimaryContact($customerID);
+    $primaryContact = $buCustomer->getPrimaryContact($customerId);
     $buHeader       = new BUHeader($thing);
     $dsHeader       = new DataSet($thing);
     $buHeader->getHeader($dsHeader);
-    $siteNo   = 0;
-    $priority = 2;
+    $siteNo           = 0;
+    $priority         = 2;
     $slaResponseHours = $buActivity->getSlaResponseHours(
         $priority,
-        $customerID,
+        $customerId,
         $primaryContact->getValue(DBEContact::contactID)
     );
-    $dbeProblem = new DBEProblem($thing);
+    $dbeProblem       = new DBEProblem($thing);
     $dbeProblem->setValue(DBEProblem::problemID, null);
     $siteNo = $primaryContact->getValue(DBEContact::siteNo);
+    $dbeProblem->setValue(DBEProblem::emailSubjectSummary, "Scheduled SR Creation Failure");
     $dbeProblem->setValue(
         DBEProblem::hdLimitMinutes,
         $dsHeader->getValue(DBEHeader::hdTeamLimitMinutes)
@@ -251,7 +272,7 @@ try {
     );
     $dbeProblem->setValue(
         DBEProblem::customerID,
-        $customerID
+        $customerId
     );
     $dbeProblem->setValue(
         DBEProblem::status,

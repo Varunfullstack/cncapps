@@ -13,13 +13,19 @@
 ></script>
 <style>
     .chart {
-        width: 100%;
+        /* width: 100%; */
         min-height: 200px;
+
     }
 
     .item {
-        width: 30%;
+        /* width: 30%; */
+        flex-basis: 500px;
         margin: 8px;
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .15);
+        border-radius: 10px;
+        padding: 0.2rem;
+        transition: .3s;
     }
 
     .container {
@@ -47,49 +53,77 @@
     </div>
 </script>
 <script type="text/javascript">
-    var userLevel = {userLevel};
-    var userID = {userID};
-    var isManager = {isManager};
-    var defaultTeam = userLevel <= 5 ? userLevel : 1;
-
+    const userLevel = {userLevel};
+    const userID = {userID};
+    const isManager = {isManager};
+    const defaultTeam = userLevel <= 5 ? userLevel : 1;
+    let timeFrameSelector = null;
+    let $teamSelector = null;
+    let datePicker = null;
 
     window.addEventListener('DOMContentLoaded', function () {
         // Load the Visualization API and the corechart package.
         google.charts.load('current', {'packages': ['corechart']});
-        var googleLoadedDeferred = jQuery.Deferred();
-        var googleLoaded = googleLoadedDeferred.promise();
+        const googleLoadedDeferred = jQuery.Deferred();
+        const googleLoaded = googleLoadedDeferred.promise();
 
         googleLoaded.then((test) => {
             console.log('google has loaded!!')
         });
 
-        var teamSelector = $('#teamSelector');
+        $teamSelector = $('#teamSelector');
+        const container = $('#teamIndividualCharts');
+        timeFrameSelector = document.getElementById('timeFrameSelector');
+
+        datePicker = document.getElementById('hourlyDatePicker');
+
+        timeFrameSelector.addEventListener('change', $event => {
+            drawIndividualCharts()
+            if (timeFrameSelector.value == 'hourly') {
+                datePicker.removeAttribute('hidden');
+            } else {
+                datePicker.setAttribute('hidden', '');
+            }
+        })
+        datePicker.value = moment().format('YYYY-MM-DD');
+        datePicker.addEventListener('change', $event => {
+            drawIndividualCharts();
+        })
 
 
-        teamSelector.val(defaultTeam);
+        $teamSelector.val(defaultTeam);
         if (isManager) {
-            teamSelector.show();
+            $teamSelector.show();
         }
-
-
         $('body').on('click', '.details', function () {
-            var userId = $(this).data().userId;
-            var today = moment();
-            var sixtyDaysAgo = moment().subtract(60, 'days');
-            document.location = '?action=detailedCharts&engineerID=' + userId + '&startDate=' + sixtyDaysAgo.format('YYYY-MM-DD') + '&endDate=' + today.format('YYYY-MM-DD')
+            const userId = $(this).data().userId;
+            const today = moment();
+            const sixtyDaysAgo = moment().subtract(60, 'days');
+            window.open('?action=detailedCharts&engineerID=' + userId + '&startDate=' + sixtyDaysAgo.format('YYYY-MM-DD') + '&endDate=' + today.format('YYYY-MM-DD'), '_blank');
+
         });
-        drawIndividualCharts(teamSelector.val());
-        teamSelector.change(function () {
-            drawIndividualCharts($(this).val());
+        drawIndividualCharts();
+        $teamSelector.change(function () {
+            drawIndividualCharts();
         });
         Mustache.tags = ['{%', '%}'];
 
 
-        function drawIndividualCharts(teamId) {
-            var that = this;
+        function drawIndividualCharts() {
+            const that = this;
+
+            const teamId = $teamSelector.val();
+            const timeFrame = timeFrameSelector.value;
+
+            let url = '?action=lastWeekHelpDesk';
+            const hourly = 'hourly';
+            if (timeFrame == hourly) {
+                const dateSelected = datePicker.value;
+                url = '?action=getLoggedActivityTimes&date=' + dateSelected;
+            }
 
             this.ajaxOptions = {
-                url: '?action=lastWeekHelpDesk',
+                url,
                 dataType: 'json',
                 data: {team: teamId}
             };
@@ -100,57 +134,101 @@
             this.container.html('');
             this.source = document.getElementById("member-item-template").innerHTML;
             this.data.then(function (data) {
-                data.forEach(function (item) {
-                    var id = teamId + '-' + item.userID;
-                    var context = {
-                        name: item.userName,
-                        id: id,
-                        userID: item.userID
-                    };
+                if (timeFrame == hourly) {
+                    data.data.forEach(function (item) {
 
-                    var html = Mustache.to_html(that.source, context);
-                    that.container.append(html);
+                        const id = teamId + '-' + item.engineerId;
+                        const context = {
+                            name: item.engineerName,
+                            id: id,
+                            userID: item.engineerId
+                        };
 
-                    var test = that.container.find('#' + id);
+                        const html = Mustache.to_html(that.source, context);
+                        that.container.append(html);
 
-                    var dataTable = new google.visualization.DataTable();
-                    dataTable.addColumn('date', 'Dates');
-                    dataTable.addColumn('number', 'Hours Logged All Clients(except CNC)');
-                    dataTable.addColumn({type: 'string', role: 'style'});
-                    dataTable.addColumn('number', 'Hours Logged Against CNC')
-                    dataTable.addColumn('number', 'Holiday Hours');
-                    dataTable.addColumn('number', 'Sum',);
-                    dataTable.addRows(
-                        item.dataPoints.map(function (row) {
-                            return [
-                                new Date(row['date']),
-                                row['loggedHours'],
-                                row['isHolidays'] ? 'green' : null,
-                                row['cncLoggedHours'],
-                                row['holidayHours'],
-                                row['loggedHours'] + row['cncLoggedHours'] + row['holidayHours'],
-                            ]
-                        })
-                    );
+                        const test = that.container.find('#' + id);
+
+                        const dataTable = new google.visualization.DataTable();
+                        dataTable.addColumn('number', 'Hour');
+                        dataTable.addColumn('number', '% Logged');
+                        dataTable.addRows(
+                            item.dataPoints.reduce((acc, loggedMinutes, index) => {
+                                if (index >= 7 && index <= 19) {
+                                    acc.push([
+                                        index,
+                                        loggedMinutes / 60 * 100
+                                    ])
+                                }
+                                return acc;
+                            }, [])
+                        );
 
 
-                    const storedOptions = {
-                        title: item.userName,
-                        trendlines: {3: {color: '#3c3c3c'}},
-                        legend: 'none',
-                        isStacked: true,
-                        seriesType: 'bars',
-                        series: {
-                            0: {color: '#0082b9'},
-                            1: {color: '#c6c6c6'},
-                            2: {color: 'green'},
-                            3: {type: 'line', areaOpacity: 0, lineWidth: 0, tooltip: {trigger: 'none'}},
-                        }
-                    };
+                        const storedOptions = {
+                            title: item.engineerName,
+                            legend: 'none',
+                            series: {
+                                0: {color: '#0082b9'},
+                            }
+                        };
+                        const chart = new google.visualization.ColumnChart(test[0]);
+                        chart.draw(dataTable, storedOptions);
+                    });
+                } else {
+                    data.forEach(function (item) {
+                        const id = teamId + '-' + item.userID;
+                        const context = {
+                            name: item.userName,
+                            id: id,
+                            userID: item.userID
+                        };
 
-                    var chart = new google.visualization.ComboChart(test[0]);
-                    chart.draw(dataTable, storedOptions);
-                })
+                        const html = Mustache.to_html(that.source, context);
+                        that.container.append(html);
+
+                        const test = that.container.find('#' + id);
+
+                        const dataTable = new google.visualization.DataTable();
+                        dataTable.addColumn('date', 'Dates');
+                        dataTable.addColumn('number', 'Hours Logged All Clients(except CNC)');
+                        dataTable.addColumn({type: 'string', role: 'style'});
+                        dataTable.addColumn('number', 'Hours Logged Against CNC')
+                        dataTable.addColumn('number', 'Holiday Hours');
+                        dataTable.addColumn('number', 'Sum',);
+                        dataTable.addRows(
+                            item.dataPoints.map(function (row) {
+                                return [
+                                    new Date(row['date']),
+                                    row['loggedHours'],
+                                    row['isHolidays'] ? 'green' : null,
+                                    row['cncLoggedHours'],
+                                    row['holidayHours'],
+                                    row['loggedHours'] + row['cncLoggedHours'] + row['holidayHours'],
+                                ]
+                            })
+                        );
+
+
+                        const storedOptions = {
+                            title: item.userName,
+                            trendlines: {3: {color: '#3c3c3c'}},
+                            legend: 'none',
+                            isStacked: true,
+                            seriesType: 'bars',
+                            series: {
+                                0: {color: '#0082b9'},
+                                1: {color: '#c6c6c6'},
+                                2: {color: 'green'},
+                                3: {type: 'line', areaOpacity: 0, lineWidth: 0, tooltip: {trigger: 'none'}},
+                            }
+                        };
+
+                        const chart = new google.visualization.ComboChart(test[0]);
+                        chart.draw(dataTable, storedOptions);
+                    })
+                }
+
             })
 
 
@@ -206,7 +284,7 @@
         flex: 0 0 50%;
     }
 </style>
-<br>
+
 <select name="team"
         class="teamSelector"
         id="teamSelector"
@@ -220,8 +298,19 @@
     <option value="3">Small Projects Team</option>
     <option value="5">Projects Team</option>
 </select>
-<br>
-<br>
+<select class="timeFrameSelector"
+        id="timeFrameSelector"
+>
+    <option value="daily"
+            selected
+    >Daily
+    </option>
+    <option value="hourly">Hourly</option>
+</select>
+<input type="date"
+       id="hourlyDatePicker"
+       hidden
+>
 <div id="teamIndividualCharts"
      class="container"
 >

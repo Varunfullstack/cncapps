@@ -15,10 +15,9 @@ require_once($cfg["path_dbe"] . "/DBEQuotation.inc.php");
 require_once($cfg["path_dbe"] . "/DBESignableEnvelope.inc.php");
 require_once($cfg["path_bu"] . "/BUSalesOrder.inc.php");
 require_once($cfg["path_bu"] . "/BURenewal.inc.php");
-
 $container = new \DI\Container();
 \Slim\Factory\AppFactory::setContainer($container);
-$app = \Slim\Factory\AppFactory::create();
+$app   = \Slim\Factory\AppFactory::create();
 $thing = null;
 $app->add(new \CNCLTD\JsonBodyParserMiddleware());
 $app->addErrorMiddleware(true, true, true);
@@ -30,13 +29,12 @@ $container->set(
         return new Environment($loader, ["cache" => __DIR__ . '/../../cache']);
     }
 );
-
 $container->set(
     'logger',
     function () {
-        $logger = new Logger('api-log');
+        $logger      = new Logger('api-log');
         $logFileName = 'api.log';
-        $logPath = APPLICATION_LOGS . '/' . $logFileName;
+        $logPath     = APPLICATION_LOGS . '/' . $logFileName;
         $logger->pushHandler(new \Monolog\Handler\RotatingFileHandler($logPath, 14, Logger::INFO));
         return $logger;
     }
@@ -55,11 +53,11 @@ $app->group(
             '/customerStats/{customerId}',
             function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response, $args) {
                 $queryParams = $request->getQueryParams();
-                $endDate = new DateTime();
-                $startDate = (clone $endDate)->sub(new DateInterval('P365D'));
+                $endDate     = new DateTime();
+                $startDate   = (clone $endDate)->sub(new DateInterval('P365D'));
                 if (isset($queryParams['startDate'])) {
                     $startDateString = $queryParams['startDate'];
-                    $startDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $startDateString);
+                    $startDate       = DateTime::createFromFormat(DATE_MYSQL_DATE, $startDateString);
                     if (!$startDate) {
                         $response->getBody()->write(
                             json_encode(["error" => "The start date parameter format is not valid: YYYY-MM-DD"])
@@ -67,10 +65,9 @@ $app->group(
                         return $response->withStatus(400);
                     }
                 }
-
                 if (isset($queryParams['endDate'])) {
                     $endDateString = $queryParams['endDate'];
-                    $endDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $endDateString);
+                    $endDate       = DateTime::createFromFormat(DATE_MYSQL_DATE, $endDateString);
                     if (!$endDate) {
                         $response->getBody()->write(
                             json_encode(["error" => "The end date parameter format is not valid: YYYY-MM-DD"])
@@ -78,14 +75,13 @@ $app->group(
                         return $response->withStatus(400);
                     }
                 }
-
-                $params = [
+                $params      = [
                     ["type" => "i", "value" => $args['customerId']],
                     ["type" => "s", "value" => $startDate->format(DATE_MYSQL_DATE)],
                     ["type" => "s", "value" => $endDate->format(DATE_MYSQL_DATE)],
                 ];
                 $isBreakDown = isset($queryParams['breakDown']);
-                $query = "select SUM(1) AS raised,
+                $query       = "select SUM(1) AS raised,
     SUM(pro_status IN ('F' , 'C')) AS `fixed`,
     AVG(problem.`pro_responded_hours`) AS responseTime,
        null as sla,
@@ -169,7 +165,6 @@ WHERE
         problem.pro_custno = ?
   and initial.caa_date between ? and ?
         AND pro_priority < 5";
-
                 if ($isBreakDown) {
                     $query = "SELECT 
     pro_priority as priority,
@@ -271,9 +266,7 @@ WHERE
         group by pro_priority
         order by pro_priority ";
                 }
-
-                /** @var $db dbSweetcode */
-                global $db;
+                /** @var $db dbSweetcode */ global $db;
                 $statement = $db->preparedQuery($query, $params);
                 if ($isBreakDown) {
 
@@ -286,14 +279,14 @@ WHERE
             }
         );
         $group->get(
-            '/SRCountByPerson/{customerId}',
-            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response, $args) {
+            '/SRCount/{customerId}',
+            function (Request $request, Response  $response, $args) {
                 $queryParams = $request->getQueryParams();
-                $endDate = new DateTime();
-                $startDate = (clone $endDate)->sub(new DateInterval('P365D'));
+                $endDate     = new DateTime();
+                $startDate   = (clone $endDate)->sub(new DateInterval('P365D'));
                 if (isset($queryParams['startDate'])) {
                     $startDateString = $queryParams['startDate'];
-                    $startDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $startDateString);
+                    $startDate       = DateTime::createFromFormat(DATE_MYSQL_DATE, $startDateString);
                     if (!$startDate) {
                         $response->getBody()->write(
                             json_encode(["error" => "The start date parameter format is not valid: YYYY-MM-DD"])
@@ -301,10 +294,9 @@ WHERE
                         return $response->withStatus(400);
                     }
                 }
-
                 if (isset($queryParams['endDate'])) {
                     $endDateString = $queryParams['endDate'];
-                    $endDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $endDateString);
+                    $endDate       = DateTime::createFromFormat(DATE_MYSQL_DATE, $endDateString);
                     if (!$endDate) {
                         $response->getBody()->write(
                             json_encode(["error" => "The end date parameter format is not valid: YYYY-MM-DD"])
@@ -312,15 +304,65 @@ WHERE
                         return $response->withStatus(400);
                     }
                 }
-
                 $params = [
                     ["type" => "i", "value" => $args['customerId']],
                     ["type" => "s", "value" => $startDate->format(DATE_MYSQL_DATE)],
                     ["type" => "s", "value" => $endDate->format(DATE_MYSQL_DATE)],
                 ];
-
-                $query =
-                    "SELECT
+                $query = "SELECT
+ 
+  SUM(
+    problem.pro_hide_from_customer_flag <> 'Y'
+  ) AS raisedManually,
+  SUM(
+    problem.pro_hide_from_customer_flag = 'Y'
+  ) AS proactiveWork
+FROM
+  problem
+WHERE pro_custno = ?
+  AND DATE(pro_date_raised) BETWEEN ?
+  AND  ?
+  AND pro_status = 'C'
+ORDER BY raisedManually DESC";
+                /** @var $db dbSweetcode */ global $db;
+                $statement = $db->preparedQuery($query, $params);
+                $data      = $statement->fetch_all(MYSQLI_ASSOC);
+                $response->getBody()->write(json_encode($data, JSON_NUMERIC_CHECK));
+                return $response;
+            }
+        );
+        $group->get(
+            '/SRCountByPerson/{customerId}',
+            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response, $args) {
+                $queryParams = $request->getQueryParams();
+                $endDate     = new DateTime();
+                $startDate   = (clone $endDate)->sub(new DateInterval('P365D'));
+                if (isset($queryParams['startDate'])) {
+                    $startDateString = $queryParams['startDate'];
+                    $startDate       = DateTime::createFromFormat(DATE_MYSQL_DATE, $startDateString);
+                    if (!$startDate) {
+                        $response->getBody()->write(
+                            json_encode(["error" => "The start date parameter format is not valid: YYYY-MM-DD"])
+                        );
+                        return $response->withStatus(400);
+                    }
+                }
+                if (isset($queryParams['endDate'])) {
+                    $endDateString = $queryParams['endDate'];
+                    $endDate       = DateTime::createFromFormat(DATE_MYSQL_DATE, $endDateString);
+                    if (!$endDate) {
+                        $response->getBody()->write(
+                            json_encode(["error" => "The end date parameter format is not valid: YYYY-MM-DD"])
+                        );
+                        return $response->withStatus(400);
+                    }
+                }
+                $params = [
+                    ["type" => "i", "value" => $args['customerId']],
+                    ["type" => "s", "value" => $startDate->format(DATE_MYSQL_DATE)],
+                    ["type" => "s", "value" => $endDate->format(DATE_MYSQL_DATE)],
+                ];
+                $query = "SELECT
           CONCAT(con_first_name, ' ' , con_last_name) AS name,
              SUM(
     problem.pro_hide_from_customer_flag <> 'Y'
@@ -334,12 +376,9 @@ WHERE
           pro_contno
         ORDER BY
           raisedManually DESC";
-
-
-                /** @var $db dbSweetcode */
-                global $db;
+                /** @var $db dbSweetcode */ global $db;
                 $statement = $db->preparedQuery($query, $params);
-                $data = $statement->fetch_all(MYSQLI_ASSOC);
+                $data      = $statement->fetch_all(MYSQLI_ASSOC);
                 $response->getBody()->write(json_encode($data, JSON_NUMERIC_CHECK));
                 return $response;
             }
@@ -348,11 +387,11 @@ WHERE
             '/SRCountByRootCause/{customerId}',
             function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response, $args) {
                 $queryParams = $request->getQueryParams();
-                $endDate = new DateTime();
-                $startDate = (clone $endDate)->sub(new DateInterval('P365D'));
+                $endDate     = new DateTime();
+                $startDate   = (clone $endDate)->sub(new DateInterval('P365D'));
                 if (isset($queryParams['startDate'])) {
                     $startDateString = $queryParams['startDate'];
-                    $startDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $startDateString);
+                    $startDate       = DateTime::createFromFormat(DATE_MYSQL_DATE, $startDateString);
                     if (!$startDate) {
                         $response->getBody()->write(
                             json_encode(["error" => "The start date parameter format is not valid: YYYY-MM-DD"])
@@ -360,10 +399,9 @@ WHERE
                         return $response->withStatus(400);
                     }
                 }
-
                 if (isset($queryParams['endDate'])) {
                     $endDateString = $queryParams['endDate'];
-                    $endDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $endDateString);
+                    $endDate       = DateTime::createFromFormat(DATE_MYSQL_DATE, $endDateString);
                     if (!$endDate) {
                         $response->getBody()->write(
                             json_encode(["error" => "The end date parameter format is not valid: YYYY-MM-DD"])
@@ -371,15 +409,12 @@ WHERE
                         return $response->withStatus(400);
                     }
                 }
-
                 $params = [
                     ["type" => "i", "value" => $args['customerId']],
                     ["type" => "s", "value" => $startDate->format(DATE_MYSQL_DATE)],
                     ["type" => "s", "value" => $endDate->format(DATE_MYSQL_DATE)],
                 ];
-
-                $query =
-                    "SELECT
+                $query = "SELECT
           rtc_desc AS rootCauseDescription,
           COUNT(*) AS count
         FROM
@@ -389,12 +424,9 @@ WHERE
           problem.pro_rootcauseno
         ORDER BY
           count DESC";
-
-
-                /** @var $db dbSweetcode */
-                global $db;
+                /** @var $db dbSweetcode */ global $db;
                 $statement = $db->preparedQuery($query, $params);
-                $data = $statement->fetch_all(MYSQLI_ASSOC);
+                $data      = $statement->fetch_all(MYSQLI_ASSOC);
                 $response->getBody()->write(json_encode($data, JSON_NUMERIC_CHECK));
                 return $response;
             }
@@ -403,11 +435,11 @@ WHERE
             '/SRCountByLocation/{customerId}',
             function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response, $args) {
                 $queryParams = $request->getQueryParams();
-                $endDate = new DateTime();
-                $startDate = (clone $endDate)->sub(new DateInterval('P365D'));
+                $endDate     = new DateTime();
+                $startDate   = (clone $endDate)->sub(new DateInterval('P365D'));
                 if (isset($queryParams['startDate'])) {
                     $startDateString = $queryParams['startDate'];
-                    $startDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $startDateString);
+                    $startDate       = DateTime::createFromFormat(DATE_MYSQL_DATE, $startDateString);
                     if (!$startDate) {
                         $response->getBody()->write(
                             json_encode(["error" => "The start date parameter format is not valid: YYYY-MM-DD"])
@@ -415,10 +447,9 @@ WHERE
                         return $response->withStatus(400);
                     }
                 }
-
                 if (isset($queryParams['endDate'])) {
                     $endDateString = $queryParams['endDate'];
-                    $endDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $endDateString);
+                    $endDate       = DateTime::createFromFormat(DATE_MYSQL_DATE, $endDateString);
                     if (!$endDate) {
                         $response->getBody()->write(
                             json_encode(["error" => "The end date parameter format is not valid: YYYY-MM-DD"])
@@ -426,15 +457,12 @@ WHERE
                         return $response->withStatus(400);
                     }
                 }
-
                 $params = [
                     ["type" => "i", "value" => $args['customerId']],
                     ["type" => "s", "value" => $startDate->format(DATE_MYSQL_DATE)],
                     ["type" => "s", "value" => $endDate->format(DATE_MYSQL_DATE)],
                 ];
-
-                $query =
-                    "SELECT
+                $query = "SELECT
   address.`add_postcode`,
   address.`add_town`,
   COUNT(*) AS COUNT
@@ -456,12 +484,9 @@ WHERE pro_custno = ?
   AND pro_status = 'C'
 GROUP BY address.`add_siteno`
 ORDER BY COUNT DESC";
-
-
-                /** @var $db dbSweetcode */
-                global $db;
+                /** @var $db dbSweetcode */ global $db;
                 $statement = $db->preparedQuery($query, $params);
-                $data = $statement->fetch_all(MYSQLI_ASSOC);
+                $data      = $statement->fetch_all(MYSQLI_ASSOC);
                 $response->getBody()->write(json_encode($data, JSON_NUMERIC_CHECK));
                 return $response;
             }
@@ -471,11 +496,11 @@ ORDER BY COUNT DESC";
             function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
                 global $db;
                 $queryParams = $request->getQueryParams();
-                $endDate = new DateTime();
-                $startDate = (clone $endDate)->sub(new DateInterval('P30D'));
+                $endDate     = new DateTime();
+                $startDate   = (clone $endDate)->sub(new DateInterval('P30D'));
                 if (isset($queryParams['startDate'])) {
                     $startDateString = $queryParams['startDate'];
-                    $startDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $startDateString);
+                    $startDate       = DateTime::createFromFormat(DATE_MYSQL_DATE, $startDateString);
                     if (!$startDate) {
                         $response->getBody()->write(
                             json_encode(["error" => "The start date parameter format is not valid: YYYY-MM-DD"])
@@ -483,10 +508,9 @@ ORDER BY COUNT DESC";
                         return $response->withStatus(400);
                     }
                 }
-
                 if (isset($queryParams['endDate'])) {
                     $endDateString = $queryParams['endDate'];
-                    $endDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $endDateString);
+                    $endDate       = DateTime::createFromFormat(DATE_MYSQL_DATE, $endDateString);
                     if (!$endDate) {
                         $response->getBody()->write(
                             json_encode(["error" => "The end date parameter format is not valid: YYYY-MM-DD"])
@@ -494,13 +518,12 @@ ORDER BY COUNT DESC";
                         return $response->withStatus(400);
                     }
                 }
-
-                $params = [
+                $params      = [
                     ["type" => "s", "value" => $startDate->format(DATE_MYSQL_DATE)],
                     ["type" => "s", "value" => $endDate->format(DATE_MYSQL_DATE)],
                 ];
                 $isBreakDown = isset($queryParams['breakDown']);
-                $query = 'SELECT
+                $query       = 'SELECT
   SUM(1) AS raised,
     SUM(pro_status IN("F","C")) AS `fixed`,
   AVG(if(problem.pro_priority = 1,problem.`pro_responded_hours`, null)) AS responseTime,
@@ -594,14 +617,12 @@ WHERE
             '/termsAndConditionsRequest',
             function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
                 $requestBody = $request->getParsedBody();
-
                 if (!isset($requestBody['contactId'])) {
                     $response->getBody()->write(
                         json_encode(["error" => "ContactId missing"])
                     );
                     return $response->withStatus(400);
                 }
-
                 $buRenewal = new BURenewal($thing);
                 try {
                     $buRenewal->sendTermsAndConditionsEmailToContact($requestBody['contactId']);
@@ -619,14 +640,12 @@ WHERE
             '/renewalsRequest',
             function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
                 $requestBody = $request->getParsedBody();
-
                 if (!isset($requestBody['contactId'])) {
                     $response->getBody()->write(
                         json_encode(["error" => "ContactId missing"])
                     );
                     return $response->withStatus(400);
                 }
-
                 $buRenewal = new BURenewal($thing);
                 try {
                     $buRenewal->sendRenewalEmailToContact($requestBody['contactId']);
@@ -651,7 +670,7 @@ WHERE
                 }
                 global $db;
                 $feedbackTokenGenerator = new \CNCLTD\FeedbackTokenGenerator($db);
-                $data = $feedbackTokenGenerator->getTokenData($queryParams['token']);
+                $data                   = $feedbackTokenGenerator->getTokenData($queryParams['token']);
                 if (!$data) {
                     $response->getBody()->write(json_encode(["error" => "Token not found!"]));
                     return $response->withStatus(400);
@@ -664,20 +683,17 @@ WHERE
             '/feedback',
             function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
                 $data = $request->getParsedBody();
-
                 if (!$data) {
                     $response->getBody()->write(json_encode(["error" => "Data is missing"]));
                     return $response->withStatus(400);
                 }
-
                 if (empty($data['token'])) {
                     $response->getBody()->write(json_encode(["error" => "Token not provided"]));
                     return $response->withStatus(400);
                 }
-
                 global $db;
                 $feedbackTokenGenerator = new \CNCLTD\FeedbackTokenGenerator($db);
-                $tokenData = $feedbackTokenGenerator->getTokenData($data['token']);
+                $tokenData              = $feedbackTokenGenerator->getTokenData($data['token']);
                 if (!$tokenData) {
                     $response->getBody()->write(json_encode(["status" => "error", "message" => "Token not found!"]));
                     return $response->withStatus(400);
@@ -697,13 +713,12 @@ WHERE
                     return $response->withStatus(400);
                 }
                 $contactId = $dbeProblem->getValue(DBEProblem::contactID);
-
-                $customerFeedbackRepo = new \CNCLTD\CustomerFeedbackRepository($db);
-                $customerFeedback = new \CNCLTD\CustomerFeedback();
+                $customerFeedbackRepo               = new \CNCLTD\CustomerFeedbackRepository($db);
+                $customerFeedback                   = new \CNCLTD\CustomerFeedback();
                 $customerFeedback->serviceRequestId = $tokenData->serviceRequestId;
-                $customerFeedback->contactId = $contactId;
-                $customerFeedback->value = $data['value'];
-                $customerFeedback->comments = @$data['comments'];
+                $customerFeedback->contactId        = $contactId;
+                $customerFeedback->value            = $data['value'];
+                $customerFeedback->comments         = @$data['comments'];
                 $customerFeedbackRepo->persistCustomerFeedback($customerFeedback);
                 $feedbackTokenGenerator->invalidateToken($data['token']);
                 $response->getBody()->write(json_encode(["status" => "ok"]));
@@ -722,7 +737,6 @@ $app->group(
                 return $response;
             }
         );
-
         $group->get(
             '/signedConfirmation',
             function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
@@ -734,22 +748,19 @@ $app->group(
                 return $response;
             }
         );
-
         $group->get(
             '/acceptQuotation',
             function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
                 /** @var Environment $twig */
-                $twig = $this->get('twig');
+                $twig        = $this->get('twig');
                 $queryParams = $request->getQueryParams();
-                $code = @$queryParams['code'];
-
+                $code        = @$queryParams['code'];
                 if (!$code) {
                     $response->getBody()->write(
                         $twig->render('@api/acceptQuotation.html.twig', ["message" => "Code not provided"])
                     );
                     return $response->withStatus(400);
                 }
-
                 // we have to find a quotation with the given code
                 $dbeQuotation = new  DBEQuotation($thing);
                 $dbeQuotation->setValue(DBEQuotation::confirmCode, $code);
@@ -762,8 +773,6 @@ $app->group(
                     );
                     return $response->withStatus(400);
                 }
-
-
                 if ($dbeQuotation->getValue(DBEQuotation::signableEnvelopeID)) {
                     $response->getBody()->write(
                         $twig->render(
@@ -773,51 +782,34 @@ $app->group(
                     );
                     return $response->withStatus(400);
                 }
-
                 // we have to generate the PDF file, send it to signable and register it in the DB
                 $BUPdfSalesQuote = new BUSalesOrder($thing);
                 try {
                     $pdfData = $BUPdfSalesQuote->createSignableOrderForm($dbeQuotation);
-
                     ApiClient::setApiKey("fc2d9ba05f3f3d9f2e9de4d831e8fed9");
-
                     $envDocs = [];
-
                     $dsDeliveryContact = new DBEContact($this);
                     $dsDeliveryContact->getRow($dbeQuotation->getValue(DBEQuotation::deliveryContactID));
-
                     $firstName = $dsDeliveryContact->getValue(DBEContact::firstName);
-                    $lastName = $dsDeliveryContact->getValue(DBEContact::lastName);
-                    $email = $dsDeliveryContact->getValue(DBEContact::email);
+                    $lastName  = $dsDeliveryContact->getValue(DBEContact::lastName);
+                    $email     = $dsDeliveryContact->getValue(DBEContact::email);
                     global $server_type;
                     if ($server_type !== MAIN_CONFIG_SERVER_TYPE_LIVE) {
                         $email = "sales@" . CONFIG_PUBLIC_DOMAIN;
                     }
-                    $ordHeadID = $dbeQuotation->getValue(DBEQuotation::ordheadID);
-                    $versionNo = $dbeQuotation->getValue(DBEQuotation::versionNo);
-                    $orderFile = $ordHeadID . '_' . $versionNo . '.pdf';
+                    $ordHeadID        = $dbeQuotation->getValue(DBEQuotation::ordheadID);
+                    $versionNo        = $dbeQuotation->getValue(DBEQuotation::versionNo);
+                    $orderFile        = $ordHeadID . '_' . $versionNo . '.pdf';
                     $envelopeDocument = new DocumentWithoutTemplate(
-                        'Customer Form',
-                        null,
-                        base64_encode($pdfData),
-                        $orderFile
+                        'Customer Form', null, base64_encode($pdfData), $orderFile
                     );
-
                     $envDocs[] = $envelopeDocument;
-
                     $envelopeParties = [];
-
-                    $envelopeParty = new Party(
-                        $firstName . ' ' . $lastName,
-                        $email,
-                        'signer1',
-                        'Please sign here',
-                        'no',
-                        false
+                    $envelopeParty     = new Party(
+                        $firstName . ' ' . $lastName, $email, 'signer1', 'Please sign here', 'no', false
                     );
                     $envelopeParties[] = $envelopeParty;
-                    $expiration = 7 * 24;
-
+                    $expiration        = 7 * 24;
                     $signableResponse = Envelopes::createNewWithoutTemplate(
                         "Document #" . $ordHeadID . "_" . $versionNo . "_" . uniqid(),
                         $envDocs,
@@ -828,12 +820,9 @@ $app->group(
                         0,
                         $expiration
                     );
-
-
                     if (!$signableResponse || $signableResponse->http != 202) {
                         throw new Exception('Failed to send to signable');
                     }
-
                     $dbeSignableEnvelope = new DBESignableEnvelope($this);
                     $dbeSignableEnvelope->setValue(DBESignableEnvelope::id, $signableResponse->envelope_fingerprint);
                     $dbeSignableEnvelope->setValue(DBESignableEnvelope::status, 'envelope-processing');
@@ -854,7 +843,7 @@ $app->group(
                     $dbeQuotation->updateRow();
 
                 } catch (Exception $exception) {
-                    echo 'catch';
+                    error_log($exception->getMessage());
                     $response->getBody()->write(
                         $twig->render(
                             '@api/acceptQuotation.html.twig',
@@ -872,8 +861,6 @@ $app->group(
                 return $response;
             }
         );
-
-
         $group->group(
             '/signable-hooks',
             function (\Slim\Routing\RouteCollectorProxy $signableHooksGroup) {
@@ -881,7 +868,7 @@ $app->group(
                     '/',
                     function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
                         /** @var \Psr\Log\LoggerInterface $logger */
-                        $logger = $this->get('logger');
+                        $logger      = $this->get('logger');
                         $requestType = [
                             "envelope_fingerprint" => "the envelope ID basically",
                             "envelope_documents"   => "an object with the document in this envelope",
@@ -897,19 +884,15 @@ $app->group(
                             'Signable webHook has been called',
                             ["signableEnvelope" => $signableRequest]
                         );
-
                         // for now we are going to ignore add user/add client/contact and add template actions
                         $ignoredActions = ["add-contact", "add-template", "add-user"];
-
                         if (in_array($signableRequest['action'], $ignoredActions)) {
                             $logger->notice('The action will be ignored, stop process');
                             return $response;
                         }
-
                         // we have to find the envelope in our DB
                         $dbeSignableEnvelope = new DBESignableEnvelope($this);
                         $dbeSignableEnvelope->getRow($signableRequest['envelope_fingerprint']);
-
                         if (!$dbeSignableEnvelope->rowCount()) {
                             $logger->notice('The envelope was not found, we are creating the envelope');
                             $dbeSignableEnvelope = new DBESignableEnvelope($this);
@@ -950,16 +933,19 @@ $app->group(
                                 )
                             ]
                         );
-                        $r = new ReflectionClass($dbeSignableEnvelope->getValue(DBESignableEnvelope::processingClass));
-                        $jsonArguments = $dbeSignableEnvelope->getValue(DBESignableEnvelope::processingArguments);
+                        $r                    = new ReflectionClass(
+                            $dbeSignableEnvelope->getValue(DBESignableEnvelope::processingClass)
+                        );
+                        $jsonArguments        = $dbeSignableEnvelope->getValue(
+                            DBESignableEnvelope::processingArguments
+                        );
                         $associativeArguments = json_decode($jsonArguments);
-                        $arguments = [];
+                        $arguments            = [];
                         if ($associativeArguments) {
                             $arguments = array_values($associativeArguments);
                         }
                         /** @var \CNCLTD\SignableProcess $objectInstance */
                         $objectInstance = $r->newInstanceArgs($arguments);
-
                         try {
                             $objectInstance->process($signableRequest, $logger);
                         } catch (Exception $exception) {
@@ -970,7 +956,6 @@ $app->group(
                         return $response->withHeader('Content-Type', 'application/json');
                     }
                 );
-
                 $signableHooksGroup->get(
                     '/',
                     function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {

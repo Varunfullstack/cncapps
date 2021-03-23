@@ -3,19 +3,22 @@
 * @authors Karim Ahmed
 * @access public
 */
+
+use CNCLTD\Exceptions\ColumnOutOfRangeException;
+
 require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBECustomerItemDocument extends DBEntity
 {
     const customerItemDocumentID = "customerItemDocumentID";
-    const customerItemID = "customerItemID";
-    const description = "description";
-    const filename = "filename";
-    const file = "file";
-    const fileLength = "fileLength";
-    const fileMIMEType = "fileMIMEType";
-    const createDate = "createDate";
-    const createUserID = "createUserID";
+    const customerItemID         = "customerItemID";
+    const description            = "description";
+    const filename               = "filename";
+    const file                   = "file";
+    const fileLength             = "fileLength";
+    const fileMIMEType           = "fileMIMEType";
+    const createDate             = "createDate";
+    const createUserID           = "createUserID";
 
     /**
      * customerItems constructor()
@@ -113,19 +116,16 @@ class DBEJCustomerItemDocument extends DBEcustomerItemDocument
         }
         $ixColumn = $this->columnExists($column);
         if ($ixColumn == DA_OUT_OF_RANGE) {
-            $this->raiseError("Column " . $column . " out of range");
-            return DA_OUT_OF_RANGE;
+            throw new ColumnOutOfRangeException($column);
         }
-        $queryString =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() . " LEFT JOIN consultant ON cns_consno = createUserID" .
-            " WHERE " . $this->getDBColumnName($ixColumn) . "=" . $this->getFormattedValue($ixColumn);
-
+        $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " LEFT JOIN consultant ON cns_consno = createUserID" . " WHERE " . $this->getDBColumnName(
+                $ixColumn
+            ) . "=" . $this->getFormattedValue($ixColumn);
         if ($sortColumn != '') {
             $ixSortColumn = $this->columnExists($sortColumn);
             if ($ixSortColumn == DA_OUT_OF_RANGE) {
-                $this->raiseError("Sort Column " . $column . " out of range");
-                return DA_OUT_OF_RANGE;
+                throw new ColumnOutOfRangeException($column);
             } else {
                 $queryString .= " ORDER BY " . $this->getDBColumnName($ixSortColumn);
             }

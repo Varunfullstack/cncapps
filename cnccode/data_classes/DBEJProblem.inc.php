@@ -38,7 +38,10 @@ class DBEJProblem extends DBEProblem
     const ENGINEER_FIXED_NAME              = 'engineerFixedName';
     const FIXED_TEAM_ID                    = 'fixedTeamId';
     const IS_FIX_SLA_BREACHED              = 'isFixSLABreached';
+    const contactName                      = 'contactName';
 
+    const contactID          = 'contactID';
+    const IS_BEING_WORKED_ON = "isBeingWorkedOn";
 
     /**
      * calls constructor()
@@ -237,6 +240,12 @@ class DBEJProblem extends DBEProblem
             )"
         );
         $this->addColumn(
+            self::IS_BEING_WORKED_ON,
+            DA_BOOLEAN,
+            DA_ALLOW_NULL,
+            "(SELECT COUNT(*) > 0 FROM callactivity t WHERE CONCAT(t.caa_date,' ',t.caa_starttime,':00') <= NOW() AND t.caa_endtime IS NULL AND t.caa_problemno = pro_problemno) AS isBeingWorkedOn"
+        );
+        $this->addColumn(
             self::FIXED_DATE,
             DA_STRING,
             DA_ALLOW_NULL,
@@ -270,6 +279,24 @@ class DBEJProblem extends DBEProblem
 	WHEN `pro_priority` = 3 THEN customer.`slaP3PenaltiesAgreed` && customer.`slaFixHoursP3` - problem.pro_working_hours <= 0
 	else 0
 	END'
+        );
+        $this->addColumn(
+            self::contactName,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "(select concat(contact.con_first_name, ' ', contact.con_last_name) from contact where con_contno = initial.caa_contno)"
+        );
+        $this->addColumn(
+            self::emailSubjectSummary,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            'emailSubjectSummary'
+        );
+        $this->addColumn(
+            self::contactID,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "(select  con_contno  from contact where con_contno = initial.caa_contno) contactID"
         );
         $this->setAddColumnsOff();
         $this->setPK(0);
@@ -834,20 +861,13 @@ class DBEJProblem extends DBEProblem
                 $sql .= " and  " . $this->getDBColumnName(self::criticalFlag) . " = 'Y' order by hoursRemaining desc ";
                 break;
             case 'currentOpenSRs':
-                $sql .= " and last.caa_endtime is null AND (
-    (
-      last.caa_date = CURDATE()
-      AND last.caa_starttime <= TIME(NOW())
-    )
-    OR last.caa_date < CURDATE()
-  )  order by hoursRemaining desc";
+                $sql .= " and (SELECT COUNT(*) > 0 FROM callactivity t WHERE CONCAT(t.caa_date,' ',t.caa_starttime,':00') <= NOW() AND t.caa_endtime IS NULL AND t.caa_problemno = pro_problemno) order by hoursRemaining desc";
                 break;
             case "holdForQA":
                 $sql .= " and holdForQA=1";
 
         }
         $sql .= ' limit ' . $limit;
-//        var_dump($sql);
         $this->setQueryString($sql);
         return (parent::getRows());
     }
@@ -984,7 +1004,7 @@ class DBEJProblem extends DBEProblem
      * @return bool
      * @internal param mixed $future TRUE= ONLY return future alarmed requests
      */
-    function getCustomerOpenRows($customerID)
+    function getCustomerOpenRows($customerID, $srNumber = null)
     {
         $sql = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " LEFT JOIN customer ON cus_custno = pro_custno
            LEFT JOIN consultant ON cns_consno = pro_consno
@@ -1007,9 +1027,12 @@ class DBEJProblem extends DBEProblem
             left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
             left join team queueTeam on queueTeam.level = pro_queue_no
         WHERE 1=1";
-        $sql .= " AND pro_custno=$customerID";
         $sql .= " AND pro_status <> 'C' and pro_status <> 'F' ";
+        if ($customerID != null && !empty($customerID)) $sql .= " AND pro_custno=$customerID";
+        if ($srNumber != null && !empty($srNumber)) $sql .= " AND problem.pro_problemno like '%$srNumber%'";
         $sql .= " ORDER BY pro_alarm_date, pro_alarm_time";
+        // echo   $sql;
+        // exit;
         $this->setQueryString($sql);
         return (parent::getRows());
     }

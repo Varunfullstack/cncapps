@@ -278,7 +278,7 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
             if (!$this->getParam('meetingTime')) {
                 throw new Exception('Meeting Time is missing');
             }
-            $dateTime = DateTime::createFromFormat(DATE_MYSQL_DATETIME, "{$meetingDate} {$meetingTime}");
+            $dateTime = DateTime::createFromFormat("d-m-Y H:i", "{$meetingDate} {$meetingTime}");
             $context['meetingDateTime'] = $dateTime;
             $template = '@customerFacing/ITReviewMeetingAgenda/ITReviewMeetingAgenda.html.twig';
         }

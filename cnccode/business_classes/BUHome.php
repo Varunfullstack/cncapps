@@ -19,7 +19,7 @@ class BUHome
     {
         global $db;
         /** @var mysqli_result $query */
-        $query = $db->query(
+        $query          = $db->query(
             "SELECT 
               SUM(fixer.`teamID` = 1) AS hdFixed,
               SUM(fixer.teamID	= 2) AS escFixed,
@@ -35,8 +35,8 @@ class BUHome
               AND fixer.`cns_consno` <> 67
               GROUP BY DATE(problem.pro_fixed_date)"
         );
-        $dailyFixed = $query->fetch_assoc();
-        $sql = "SELECT 
+        $dailyFixed     = $query->fetch_assoc();
+        $sql            = "SELECT 
   SUM(fixer.`teamID` = 1) AS hdFixed,
   SUM(fixer.teamID = 2) AS escFixed,
   SUM(fixer.teamID = 4) AS imtFixed,
@@ -52,9 +52,9 @@ WHERE week( problem.`pro_fixed_date`, 7) = WEEK(CURRENT_DATE, 7)
   AND pro_status = 'F' 
   AND problem.`pro_custno` <> 282 
   AND fixer.`cns_consno` <> 67";
-        $query = $db->query($sql);
-        $weeklyFixed = $query->fetch_assoc();
-        $query       = $db->query(
+        $query          = $db->query($sql);
+        $weeklyFixed    = $query->fetch_assoc();
+        $query          = $db->query(
             "SELECT 
               SUM(teamID = 1) AS hdReopened,
               SUM(teamID = 2) AS escReopened,
@@ -78,8 +78,8 @@ WHERE week( problem.`pro_fixed_date`, 7) = WEEK(CURRENT_DATE, 7)
                 AND problem.pro_reopened_date = CURRENT_DATE 
               GROUP BY pro_problemno) test "
         );
-        $dailyReopened = $query->fetch_assoc();
-        $query = $db->query(
+        $dailyReopened  = $query->fetch_assoc();
+        $query          = $db->query(
             "SELECT 
               SUM(teamID = 1) AS hdReopened,
               SUM(teamID = 2) AS escReopened,
@@ -108,70 +108,22 @@ WHERE week( problem.`pro_fixed_date`, 7) = WEEK(CURRENT_DATE, 7)
         );
         $weeklyReopened = $query->fetch_assoc();
         return [
-            "dailyHdReopened"     => Controller::formatNumber(
-                $dailyReopened['hdReopened'],
-                0
-            ),
-            "dailyEscReopened"    => Controller::formatNumber(
-                $dailyReopened['escReopened'],
-                0
-            ),
-            "dailyImtReopened"    => Controller::formatNumber(
-                $dailyReopened['imtReopened'],
-                0
-            ),
-            "dailyTotalReopened"  => Controller::formatNumber(
-                $dailyReopened['totalReopened'],
-                0
-            ),
-            "dailyHdFixed"        => Controller::formatNumber(
-                $dailyFixed['hdFixed'],
-                0
-            ),
-            "dailyEscFixed"       => Controller::formatNumber(
-                $dailyFixed['escFixed'],
-                0
-            ),
-            "dailyImtFixed"       => Controller::formatNumber(
-                $dailyFixed['imtFixed'],
-                0
-            ),
-            "dailyTotalFixed"     => Controller::formatNumber(
-                $dailyFixed['totalFixed'],
-                0
-            ),
-            "weeklyHdReopened"    => Controller::formatNumber(
-                $weeklyReopened['hdReopened'],
-                0
-            ),
-            "weeklyEscReopened"   => Controller::formatNumber(
-                $weeklyReopened['escReopened'],
-                0
-            ),
-            "weeklyImtReopened"   => Controller::formatNumber(
-                $weeklyReopened['imtReopened'],
-                0
-            ),
-            "weeklyTotalReopened" => Controller::formatNumber(
-                $weeklyReopened['totalReopened'],
-                0
-            ),
-            "weeklyHdFixed"       => Controller::formatNumber(
-                $weeklyFixed['hdFixed'],
-                0
-            ),
-            "weeklyEscFixed"      => Controller::formatNumber(
-                $weeklyFixed['escFixed'],
-                0
-            ),
-            "weeklyImtFixed"      => Controller::formatNumber(
-                $weeklyFixed['imtFixed'],
-                0
-            ),
-            "weeklyTotalFixed"    => Controller::formatNumber(
-                $weeklyFixed['totalFixed'],
-                0
-            ),
+            "dailyHdReopened"     => number_format($dailyReopened['hdReopened']),
+            "dailyEscReopened"    => number_format($dailyReopened['escReopened']),
+            "dailyImtReopened"    => number_format($dailyReopened['imtReopened']),
+            "dailyTotalReopened"  => number_format($dailyReopened['totalReopened']),
+            "dailyHdFixed"        => number_format($dailyFixed['hdFixed']),
+            "dailyEscFixed"       => number_format($dailyFixed['escFixed']),
+            "dailyImtFixed"       => number_format($dailyFixed['imtFixed']),
+            "dailyTotalFixed"     => number_format($dailyFixed['totalFixed']),
+            "weeklyHdReopened"    => number_format($weeklyReopened['hdReopened']),
+            "weeklyEscReopened"   => number_format($weeklyReopened['escReopened']),
+            "weeklyImtReopened"   => number_format($weeklyReopened['imtReopened']),
+            "weeklyTotalReopened" => number_format($weeklyReopened['totalReopened']),
+            "weeklyHdFixed"       => number_format($weeklyFixed['hdFixed']),
+            "weeklyEscFixed"      => number_format($weeklyFixed['escFixed']),
+            "weeklyImtFixed"      => number_format($weeklyFixed['imtFixed']),
+            "weeklyTotalFixed"    => number_format($weeklyFixed['totalFixed']),
         ];
     }
 
@@ -192,9 +144,7 @@ WHERE week( problem.`pro_fixed_date`, 7) = WEEK(CURRENT_DATE, 7)
             initial.caa_endtime
           )
         ) <= (5 * 60) 
-        AND callactivity.`caa_consno` = engineer.`cns_consno` LIMIT 1),
-      0
-    )
+        AND callactivity.`caa_consno` = engineer.`cns_consno` LIMIT 1)   )
   ) AS attemptedFirstTimeFix,
   SUM(
     COALESCE(
@@ -226,9 +176,7 @@ WHERE week( problem.`pro_fixed_date`, 7) = WEEK(CURRENT_DATE, 7)
             fixedActivity.caa_starttime,
             remoteSupport.caa_endtime
           )
-        ) <= (5 * 60) LIMIT 1),
-      0
-    )
+        ) <= (5 * 60) LIMIT 1)   )
   ) AS firstTimeFix,
   SUM(1) AS totalRaised
 FROM
@@ -262,7 +210,7 @@ WHERE problem.`pro_custno` <> 282
     function getFirstTimeFixData()
     {
         global $db;
-        $result = $db->query(
+        $result         = $db->query(
             "SELECT 
   CONCAT(
     engineer.`firstName`,
@@ -283,9 +231,7 @@ WHERE problem.`pro_custno` <> 282
             initial.caa_endtime
           )
         ) <= (5 * 60) 
-        AND callactivity.`caa_consno` = engineer.`cns_consno` limit 1),
-      0
-    )
+        AND callactivity.`caa_consno` = engineer.`cns_consno` limit 1)   ,0)
   ) AS attemptedFirstTimeFix,
   SUM(
     COALESCE(
@@ -317,9 +263,7 @@ WHERE problem.`pro_custno` <> 282
             fixedActivity.caa_starttime,
             remoteSupport.caa_endtime
           )
-        ) <= (5 * 60) limit 1),
-      0
-    )
+        ) <= (5 * 60) limit 1),0   )
   ) AS firstTimeFix,
   SUM(1) AS totalRaised  
 FROM
@@ -354,8 +298,7 @@ GROUP BY engineer.`cns_consno`  order by engineer.firstName"
         $data           = [
             "engineers"      => [],
             "totalRaised"    => 0,
-            "totalAttempted" => 0,
-            "totalAchieved"  => 0
+            "totalAttempted" => 0
         ];
         while ($row = $result->fetch_assoc()) {
             $data["engineers"][] = [
@@ -364,11 +307,11 @@ GROUP BY engineer.`cns_consno`  order by engineer.firstName"
                 'attemptedFirstTimeFix' => $row['attemptedFirstTimeFix'],
                 'totalRaised'           => $row['totalRaised']
             ];
-            $totalRaised    += $row['totalRaised'];
-            $totalAttempted += $row['attemptedFirstTimeFix'];
-            $totalAchieved  += $row['firstTimeFix'];
+            $totalRaised         += $row['totalRaised'];
+            $totalAttempted      += $row['attemptedFirstTimeFix'];
+            $totalAchieved       += $row['firstTimeFix'];
         }
-        $monthlyFigures = $this->getRunningMonthFirstTimeFixedFigures();
+        $monthlyFigures                          = $this->getRunningMonthFirstTimeFixedFigures();
         $data['firstTimeFixAttemptedPct']        = $totalRaised > 0 ? round(
             ($totalAttempted / $totalRaised) * 100
         ) : 'N/A';
@@ -387,62 +330,11 @@ GROUP BY engineer.`cns_consno`  order by engineer.firstName"
 
     }
 
-    function getUpcomingVisits()
-    {
-        global $db;
-        $result = $db->query(
-            "SELECT 
-  caa_problemno AS serviceRequestID,
-  caa_callactivityno AS callActivityID,
-  caa_date AS date,
-  caa_starttime AS time,
-  cus_name AS customerName,
-  CONCAT(
-    consultant.firstName,
-    ' ',
-    consultant.lastName
-  ) AS engineerName,
-  (SELECT 
-    reason 
-  FROM
-    callactivity firstActivity 
-  WHERE firstActivity.caa_problemno = callactivity.`caa_problemno` 
-    AND firstActivity.caa_callacttypeno = 51) AS reason 
-FROM
-  callactivity 
-  LEFT JOIN problem 
-    ON problem.`pro_problemno` = caa_problemno 
-  LEFT JOIN customer 
-    ON customer.`cus_custno` = problem.pro_custno 
-  LEFT JOIN consultant 
-    ON consultant.`cns_consno` = callactivity.`caa_consno` 
-WHERE callactivity.`caa_callacttypeno` IN (4, 7) 
-  AND caa_date >= date(NOW()) 
-  AND caa_date <= date((NOW() + INTERVAL 1 WEEK)) 
-  AND (
-    caa_endtime IS NULL 
-    OR caa_endtime = \"\"
-  ) 
-ORDER BY caa_date ASC,
-  caa_starttime ASC "
-        );
-        $data = [];
-        while ($row = $result->fetch_assoc()) {
-            $row['reason'] = substr(
-                Utils::stripEverything($row['reason']),
-                0,
-                120
-            );
-            $data[]        = $row;
-        }
-        return $data;
-    }
-
     function updateAll()
     {
         global $db;
-
-        $db->query("INSERT INTO user_time_log (
+        $db->query(
+            "INSERT INTO user_time_log (
   userID,
   teamLevel,
   loggedDate,
@@ -457,7 +349,7 @@ SELECT
   consultant.`standardDayHours`,
   MIN(callactivity.`caa_starttime`),
   0
-FROM
+fROM
   consultant
   JOIN team
     ON team.`teamID` = consultant.`teamID`
@@ -473,13 +365,12 @@ WHERE user_time_log.`userTimeLogID` IS NULL
   AND consultant.`activeFlag` = 'Y'
   AND cns_consno <> 67
   AND cns_consno IS NOT NULL
-  GROUP BY consultant.`cns_consno`");
-
+  GROUP BY consultant.`cns_consno`"
+        );
         $firstTimeFix   = $this->getFirstTimeFixData();
         $fixedAndReopen = $this->getFixedAndReopenData();
-        $upcomingVisits = $this->getUpcomingVisits();
         $db->preparedQuery(
-            "update homeData set firstTimeFix = ? ,fixedAndReopenData = ?, upcomingVisitsData = ?",
+            "update homeData set firstTimeFix = ? ,fixedAndReopenData = ?",
             [
                 [
                     "type"  => "s",
@@ -488,29 +379,9 @@ WHERE user_time_log.`userTimeLogID` IS NULL
                 [
                     "type"  => "s",
                     "value" => json_encode($fixedAndReopen)
-                ],
-                [
-                    "type"  => "s",
-                    "value" => json_encode($upcomingVisits)
                 ]
             ]
         );
     }
-
-    function updateUpcomingVisits()
-    {
-        global $db;
-        $upcomingVisits = $this->getUpcomingVisits();
-        $db->preparedQuery(
-            "update homeData set upcomingVisitsData = ?",
-            [
-                [
-                    "type"  => "s",
-                    "value" => json_encode($upcomingVisits)
-                ]
-            ]
-        );
-    }
-
 
 }

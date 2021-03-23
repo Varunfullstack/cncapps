@@ -204,6 +204,7 @@ class Utils
         );
         $description = strip_tags($description);
         $description = trim($description);
+        $description = htmlspecialchars_decode($description);
         return $description;
 
     }

@@ -10,6 +10,7 @@
  * @author Karim Ahmed, Sweet Code Ltd
  *
  **/
+global $cfg;
 require_once($cfg["path_func"] . "/Common.inc.php");
 define(
     'PHPLIB_CLASSNAME_DB',
@@ -117,9 +118,9 @@ define(
  **/
 class dbSweetcode extends DB_Sql
 {
-    var $Host = DB_HOST;
+    var $Host     = DB_HOST;
     var $Database = DB_NAME;
-    var $User = DB_USER;
+    var $User     = DB_USER;
     var $Password = DB_PASSWORD;
 
 
@@ -142,22 +143,22 @@ class CtSweetcode extends CT_File
 
 class CNCCode extends Session
 {
-    var $classname = PHPLIB_CLASSNAME_SESSION;
-    var $cookiename = "";     ## defaults to classname
-    var $magic = "Hocuspocus";  ## ID seed
-    var $mode = "cookie";      ## We propagate session IDs with cookies
-    var $fallback_mode = "get";
-    var $lifetime = 480;                    ## 0 = do session cookies, else minutes
-    var $that_class = PHPLIB_CLASSNAME_SESSION_CONTAINER;  ## name of data storage container
-    var $auto_init = PHPLIB_SESSION_VAR_INIT;        ## initial session variables and values
-    var $allowcache = "no";        ## "public", "private", or "no"
+    var $classname      = PHPLIB_CLASSNAME_SESSION;
+    var $cookiename     = "";     ## defaults to classname
+    var $magic          = "Hocuspocus";  ## ID seed
+    var $mode           = "cookie";      ## We propagate session IDs with cookies
+    var $fallback_mode  = "get";
+    var $lifetime       = 480;                    ## 0 = do session cookies, else minutes
+    var $that_class     = PHPLIB_CLASSNAME_SESSION_CONTAINER;  ## name of data storage container
+    var $auto_init      = PHPLIB_SESSION_VAR_INIT;        ## initial session variables and values
+    var $allowcache     = "no";        ## "public", "private", or "no"
     var $gc_probability = 0;
 }
 
 class auSweetcode extends Auth
 {
-    var $classname = PHPLIB_CLASSNAME_AUTH;
-    var $lifetime = 0;                    // never expire
+    var $classname      = PHPLIB_CLASSNAME_AUTH;
+    var $lifetime       = 0;                    // never expire
     var $database_class = PHPLIB_CLASSNAME_DB;
     var $database_table = PHPLIB_TABLE_AUTH;
 
@@ -177,41 +178,28 @@ class auSweetcode extends Auth
             $_POST["username"] = '';
             $_POST["password"] = '';
         }
-
         $uid = false;
         /*
         Login from allowed client Ip range or localhost only
         */
         $allowedIpPattern = $this->get_allowed_ip_pattern();
-        if ($GLOBALS ['server_type'] == MAIN_CONFIG_SERVER_TYPE_LIVE &&
-            !preg_match(
+        if ($GLOBALS ['server_type'] == MAIN_CONFIG_SERVER_TYPE_LIVE && !preg_match(
                 '/' . $allowedIpPattern . '/',
                 $_SERVER['REMOTE_ADDR']
-            )
-        ) {
+            )) {
             $GLOBALS['loginMessage'] = 'Login blocked: You are not on the CNC network';
             return false;
         }
-
-
-        if (
-            ($GLOBALS ['server_type'] != MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT
-                || $GLOBALS['php7']
-            ) &&
-            !$this->authenticate_on_ldap(
+        if (($GLOBALS ['server_type'] != MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT || $GLOBALS['php7']) && !$this->authenticate_on_ldap(
                 $_POST['username'],
                 $_POST['password']
-            )
-        ) {
+            )) {
             $GLOBALS['loginMessage'] = 'Failed to authenticate';
             return false;
         }
-
         $this->db->query(
             sprintf(
-                "select %s, %s " .
-                "        from %s " .
-                "       where %s = '%s' ",
+                "select %s, %s " . "        from %s " . "       where %s = '%s' and activeFlag = 'Y' ",
                 PHPLIB_COLUMN_PERMS,
                 PHPLIB_COLUMN_USERID,
                 $this->database_table,
@@ -219,17 +207,14 @@ class auSweetcode extends Auth
                 addslashes($_POST["username"])
             )
         );
-
         while ($this->db->next_record()) {
             if ($uid = $this->db->f(PHPLIB_COLUMN_USERID)) {
                 $this->auth["perm"] = $this->db->f(PHPLIB_COLUMN_PERMS);
-
                 $this->record_session_start(
                     $_SERVER['REMOTE_ADDR'],
                     $_POST['username'],
                     DATE('H:i:s')
                 );
-
                 $this->record_work_day_start_time($this->db->f(PHPLIB_COLUMN_USERID));
             } else {
                 $GLOBALS['loginMessage'] = 'Failed to find credentials in database';
@@ -242,14 +227,12 @@ class auSweetcode extends Auth
     function get_allowed_ip_pattern()
     {
         $ret = false;
-
         $this->db->query(
             "SELECT
         hed_allowed_client_ip_pattern
       FROM
         headert"
         );
-
         while ($this->db->next_record()) {
             $ret = $this->db->f('hed_allowed_client_ip_pattern');
         }
@@ -263,28 +246,20 @@ class auSweetcode extends Auth
         if (!$password) {
             return false;
         }
-
         $domain = CONFIG_LDAP_DOMAIN;
-
 // ##### STATIC DC LIST, if your DNS round robin is not setup
 //$dclist = array('10.111.222.111', '10.111.222.100', '10.111.222.200');
-
 // ##### DYNAMIC DC LIST, reverse DNS lookup sorted by round-robin result
         $dclist = gethostbynamel("$domain.local");
-        $dc = null;
+        $dc     = null;
         foreach ($dclist as $k => $dc) if ($this->serviceping($dc) == true) break; else $dc = 0;
 //after this loop, either there will be at least one DC which is available at present, or $dc would return bool false while the next line stops program from further execution
-
         if (!$dc) exit("NO DOMAIN CONTROLLERS AVAILABLE AT PRESENT, PLEASE TRY AGAIN LATER!"); //user being notified
-
 //        $domaincontroller = CONFIG_LDAP_DOMAINCONTROLLER;
 //
 //        $adServer = "ldap://" . $domaincontroller . "." . $domain . ".local";
-
         $ldap = ldap_connect($dc) or die("DC N/A, PLEASE TRY AGAIN LATER.");
-
         $ldaprdn = $domain . "\\" . $username;
-
         ldap_set_option(
             $ldap,
             LDAP_OPT_PROTOCOL_VERSION,
@@ -295,13 +270,11 @@ class auSweetcode extends Auth
             LDAP_OPT_REFERRALS,
             0
         );
-
         $bind = ldap_bind(
             $ldap,
             $ldaprdn,
             $password
         );
-
         if ($bind) {
             $ret = true;
         } else {
@@ -320,22 +293,19 @@ class auSweetcode extends Auth
         }
     }
 
-    function record_session_start(
-        $ip,
-        $user,
-        $time
+    function record_session_start($ip,
+                                  $user,
+                                  $time
     )
     {
         $file_name = SAGE_EXPORT_DIR . '/session_log/' . date('Ymd') . '.csv';
-        $handle = fopen(
+        $handle    = fopen(
             $file_name,
             'a+'
         );
         fwrite(
             $handle,
-            $ip . ',' .
-            $user . ',' .
-            $time . "\n"
+            $ip . ',' . $user . ',' . $time . "\n"
         );
     }
 
@@ -350,12 +320,10 @@ class auSweetcode extends Auth
     {
 
         $bankHolidays = common_getUkBankHolidays(date('Y'));
-
         /*
         Do not record if:
         */
-        if (
-            in_array(
+        if (in_array(
                 date('Y-m-d'),
                 $bankHolidays
             ) or // holiday
@@ -365,7 +333,6 @@ class auSweetcode extends Auth
         ) {
             return;
         }
-
         $this->db->query(
             "SELECT
         team.level as teamLevel,
@@ -378,12 +345,9 @@ class auSweetcode extends Auth
         cns_consno = $userID"
         );
         $this->db->next_record();
-        $teamLevel = $this->db->Record['teamLevel'];
+        $teamLevel        = $this->db->Record['teamLevel'];
         $standardDayHours = $this->db->Record['standardDayHours'];
-
-        $sql =
-
-            "INSERT IGNORE INTO user_time_log
+        $sql = "INSERT IGNORE INTO user_time_log
         (
         `userID`,
         `teamLevel`,
@@ -401,7 +365,6 @@ class auSweetcode extends Auth
           " . $standardDayHours . ",
           TIME( NOW() )
         )";
-
         $this->db->query($sql);
     }
 }
@@ -412,7 +375,7 @@ class auSweetcode extends Auth
  */
 class pmSweetcode extends Perm
 {
-    var $classname = PHPLIB_CLASSNAME_PERM;
+    var $classname   = PHPLIB_CLASSNAME_PERM;
     var $permissions = array(
         SALES_PERMISSION       => 1,
         ACCOUNTS_PERMISSION    => 2,
@@ -430,7 +393,6 @@ class pmSweetcode extends Perm
         global $perm, $auth, $sess;
         global $cfg;
         global $_PHPLIB;
-
         include(PHPLIB_PAGE_PERM_INVALID);
     }
 }

@@ -37,6 +37,52 @@ export class ColumnRenderer {
         }
     }
 
+    static getFixSLAWarningColumn() {
+        return {
+            hide: false,
+            order: 2.1,
+            path: null,
+            key: "fixSLAWarning",
+            label: "",
+            sortable: false,
+            content: (problem) => {
+
+                if (problem.priority > 3) {
+                    return null;
+                }
+
+                let fixHours;
+                let penaltiesAgreed;
+
+                switch (problem.priority) {
+                    case 1:
+                        penaltiesAgreed = problem.slaP1PenaltiesAgreed;
+                        fixHours = problem.slaFixHoursP1;
+                        break;
+                    case 2:
+                        penaltiesAgreed = problem.slaP2PenaltiesAgreed;
+                        fixHours = problem.slaFixHoursP2;
+                        break;
+                    case 3:
+                        penaltiesAgreed = problem.slaP3PenaltiesAgreed;
+                        fixHours = problem.slaFixHoursP3;
+                        break;
+                }
+
+                if (!penaltiesAgreed) {
+                    return null;
+                }
+
+                return ColumnRenderer.addToolTip(
+                    (
+                        <i className="fal fa-2x fa-bullseye-arrow color-gray pointer float-right inbox-icon"/>
+                    ),
+                    `Fix SLA of ${fixHours} hours for this SR. Treat as urgent.`
+                )
+            }
+        }
+    }
+
     static getSpecialAttentionColumn() {
         return {
             hide: false,

@@ -1,0 +1,23 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue1148-0">
+        <tagDatabase tag="issue1148"/>
+    </changeSet>
+    <changeSet id="issue1148-1" author="pavwebdevmt">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="numberOfAllowedMistakes"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="numberOfAllowedMistakes" type="int(2)" defaultValue="10">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <rollback>
+                <dropColumn tableName="headert" columnName="numberOfAllowedMistakes"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

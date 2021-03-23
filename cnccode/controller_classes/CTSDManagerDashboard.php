@@ -11,7 +11,7 @@ require_once($cfg["path_dbe"] . "/DBConnect.php");
 class CTSDManagerDashboard extends CTCurrentActivityReport
 {
     const DAILY_STATS_SUMMARY = "dailyStatsSummary";
-
+    const CONST_MISSED_CALL_BACK        = "missedCallBack";
     function __construct($requestMethod,
                          $postVars,
                          $getVars,
@@ -68,6 +68,9 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             case self::DAILY_STATS_SUMMARY:
                 echo json_encode($this->getDailyStatsSummary(), JSON_NUMERIC_CHECK);
                 exit;
+            case self::CONST_MISSED_CALL_BACK:
+                echo json_encode($this->missedCallBack(), JSON_NUMERIC_CHECK);
+                exit;
             case "react":
             default:
                 $this->setTemplate();
@@ -77,14 +80,15 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
 
     function getQueue()
     {
-        $queue = $_REQUEST["queue"];
+
+        $queue = $_REQUEST["queue"] ;
         if (!isset($queue)) return [];
         $buProblem         = new BUActivity($this);
         $isP5              = $_REQUEST["p5"] == "true";
         $showHelpDesk      = $_REQUEST["hd"] == "true";
         $showEscalation    = $_REQUEST["es"] == "true";
         $showSmallProjects = $_REQUEST["sp"] == "true";
-        $showProjects      = $_REQUEST["p"] == "true";
+        $showProjects      = $_REQUEST["p"]  == "true";
         $limit             = $_REQUEST["limit"] ?? 10;
         $code              = 'shortestSLARemaining';
         if ($queue == 9) {
@@ -223,6 +227,18 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         $raisedStartTodaySummary    = $this->getRaisedAndStartedToday();
         $uniqueCustomerTodaySummary = $this->getUniqueCustomer();
         $breachedSLATodaySummary    = $this->getBreachedSLA();
+        $buProblem         = new BUActivity($this);
+        $nearFixSLABreach= $this->renderQueueJson(
+            $buProblem->getSDDashBoardData(
+                10000,
+                "shortestSLAFixRemaining",
+                false,
+                true,
+                true,
+                true,
+                true
+            )
+        );
         return [
             "prioritySummary"            => $prioritySummary,
             "openSrTeamSummary"          => $openSrTeamSummary,
@@ -233,7 +249,8 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             "reopenTodaySummary"         => $reopenTodaySummary,
             "raisedStartTodaySummary"    => $raisedStartTodaySummary,
             'breachedSLATodaySummary'    => $breachedSLATodaySummary,
-            'uniqueCustomerTodaySummary' => $uniqueCustomerTodaySummary
+            'uniqueCustomerTodaySummary' => $uniqueCustomerTodaySummary,
+            "nearFixSLABreach"           => count($nearFixSLABreach)
         ];
     }
 
@@ -448,5 +465,38 @@ WHERE pro_custno <> 282
             ' ',
             $string
         );
+    }
+    function missedCallBack(){
+        $query="SELECT cb.id, cb.consID,cb.problemID,cb.callActivityID,cb.contactID,cb.DESCRIPTION,cb.callback_datetime,cb.createAt,
+        concat(c.con_first_name,' ',c.con_last_name) contactName,
+        cus_name customerName,
+        TIMESTAMPDIFF(MINUTE,NOW(),cb.callback_datetime) timeRemain,
+        cb.status,
+        concat(cons.firstName,' ',cons.lastName) consName
+    FROM contact_callback cb
+        JOIN  `problem` p ON cb.problemID=p.`pro_problemno`
+        JOIN contact c on c.con_contno =cb.contactID
+        JOIN customer cu on cu.cus_custno = p.pro_custno
+        JOIN consultant cons on cons.cns_consno=p.`pro_consno`
+    WHERE cb.status=:status 
+     AND TIMESTAMPDIFF(HOUR,cb.callback_datetime,NOW()) <=72  ";
+
+        if ($_REQUEST['hd']=='false') {
+            $query .= ' and pro_queue_no <> 1 ';
+        }
+        if ($_REQUEST['es']=='false') {
+            $query .= ' and pro_queue_no <> 2 ';
+        }
+        if ($_REQUEST['sp']=='false') {
+            $query .= ' and pro_queue_no <> 3 ';
+        }
+        if ($_REQUEST['p']=='false') {
+            $query .= ' and pro_queue_no <> 5 ';
+        }
+        $limit = $_REQUEST['limit'];
+        $query .=" order by timeRemain asc limit ".$limit;
+        // echo  $query;
+        // exit;
+        return DBConnect::fetchAll( $query,["status"=>CallBackStatus::AWAITING]);
     }
 }

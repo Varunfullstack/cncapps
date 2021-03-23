@@ -24,6 +24,7 @@ define(
 class CTHeader extends CTCNC
 {
     const GET_PRIORITIES_DESCRIPTIONS = 'getPrioritiesDescriptions';
+    const GET_NUMBER_ALLOWED_MISTAKES = "numberOfAllwoedMistaks";
     /** @var DSForm */
     public $dsHeader;
     /** @var BUHeader */
@@ -71,6 +72,9 @@ class CTHeader extends CTCNC
                 $this->getPrioritiesDescriptions();
                 exit;
             }
+            case self::GET_NUMBER_ALLOWED_MISTAKES:
+                echo json_encode($this->getNumberAllwoedMistakes());
+                exit;
             case CTHEADER_ACT_EDIT:
             default:
                 $this->checkPermissions(MAINTENANCE_PERMISSION);
@@ -640,6 +644,12 @@ class CTHeader extends CTCNC
                 DBEHeader::yearlySicknessThresholdWarning                            => $dsHeader->getValue(
                     DBEHeader::yearlySicknessThresholdWarning
                 ),
+                DBEHeader::antivirusOutOfDateThresholdDays                           => $dsHeader->getValue(
+                    DBEHeader::antivirusOutOfDateThresholdDays
+                ),
+                DBEHeader::offlineAgentThresholdDays                                 => $dsHeader->getValue(
+                    DBEHeader::offlineAgentThresholdDays
+                ),
                 'urlItemPopup'                                                       => $urlItemPopup,
                 'urlUpdate'                                                          => $urlUpdate,
                 DBEHeader::holdAllSOSmallProjectsP5sforQAReview                      => $dsHeader->getValue(
@@ -648,6 +658,9 @@ class CTHeader extends CTCNC
                 DBEHeader::holdAllSOProjectsP5sforQAReview                           => $dsHeader->getValue(
                     DBEHeader::holdAllSOProjectsP5sforQAReview
                 ) ? "checked" : null,
+                DBEHeader::numberOfAllowedMistakes                                   => $dsHeader->getValue(
+                    DBEHeader::numberOfAllowedMistakes
+                ),
             ]
         );
         // VAT code
@@ -785,5 +798,12 @@ class CTHeader extends CTCNC
             ]
         );
 
+    }
+
+    function getNumberAllwoedMistakes()
+    {
+        $dbeHeader = new DBEHeader($this);
+        $dbeHeader->getRow(1);
+        return ["value" => $dbeHeader->getValue(DBEHeader::numberOfAllowedMistakes)];
     }
 }

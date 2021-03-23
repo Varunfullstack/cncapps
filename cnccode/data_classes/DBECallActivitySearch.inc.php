@@ -8,47 +8,46 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBECallActivitySearch extends DBEntity
 {
-    const callActivityID = "callActivityID";
-    const siteNo = "siteNo";
-    const contactID = "contactID";
-    const sequenceNo = "sequenceNo";
-    const callActTypeID = "callActTypeID";
-    const activityType = "activityType";
-    const projectID = "projectID";
-    const problemID = "problemID";
-    const userID = "userID";
-    const userName = "userName";
-    const date = "date";
-    const startTime = "startTime";
-    const endTime = "endTime";
-    const status = "status";
-    const problemStatus = "problemStatus";
-    const reason = "reason";
-    const internalNotes = "internalNotes";
-    const curValue = "curValue";
-    const priority = "priority";
-    const statementYearMonth = "statementYearMonth";
-    const projectDescription = "projectDescription";
-    const duration = "duration";
-    const salePrice = "salePrice";
-    const customerID = "customerID";
-    const customerName = "customerName";
-    const postcode = "postcode";
-    const contactName = "contactName";
-    const customerItemID = "customerItemID";
+    const callActivityID         = "callActivityID";
+    const siteNo                 = "siteNo";
+    const contactID              = "contactID";
+    const sequenceNo             = "sequenceNo";
+    const callActTypeID          = "callActTypeID";
+    const activityType           = "activityType";
+    const projectID              = "projectID";
+    const problemID              = "problemID";
+    const userID                 = "userID";
+    const userName               = "userName";
+    const date                   = "date";
+    const startTime              = "startTime";
+    const endTime                = "endTime";
+    const status                 = "status";
+    const problemStatus          = "problemStatus";
+    const reason                 = "reason";
+    const curValue               = "curValue";
+    const priority               = "priority";
+    const statementYearMonth     = "statementYearMonth";
+    const projectDescription     = "projectDescription";
+    const duration               = "duration";
+    const salePrice              = "salePrice";
+    const customerID             = "customerID";
+    const customerName           = "customerName";
+    const postcode               = "postcode";
+    const contactName            = "contactName";
+    const customerItemID         = "customerItemID";
     const contractCustomerItemID = "contractCustomerItemID";
-    const contractDescription = "contractDescription";
-    const underContractFlag = "underContractFlag";
-    const slaResponseHours = "slaResponseHours";
-    const respondedHours = "respondedHours";
-    const workingHours = "workingHours";
-    const activityDurationHours = "activityDurationHours";
-    const rootCause = "rootCause";
-    const fixEngineer = "fixEngineer";
-    const activityCount = "activityCount";
-    const linkedSalesOrderID = "linkedSalesOrderID";
+    const contractDescription    = "contractDescription";
+    const underContractFlag      = "underContractFlag";
+    const slaResponseHours       = "slaResponseHours";
+    const respondedHours         = "respondedHours";
+    const workingHours           = "workingHours";
+    const activityDurationHours  = "activityDurationHours";
+    const rootCause              = "rootCause";
+    const fixEngineer            = "fixEngineer";
+    const activityCount          = "activityCount";
+    const linkedSalesOrderID     = "linkedSalesOrderID";
     const managementReviewReason = "managementReviewReason";
-    const salesOrderID = 'salesOrderID';
+    const salesOrderID           = 'salesOrderID';
 
     /**
      * calls constructor()
@@ -153,11 +152,6 @@ class DBECallActivitySearch extends DBEntity
         );
         $this->addColumn(
             self::reason,
-            DA_TEXT,
-            DA_ALLOW_NULL
-        );
-        $this->addColumn(
-            self::internalNotes,
             DA_TEXT,
             DA_ALLOW_NULL
         );
@@ -297,47 +291,42 @@ class DBECallActivitySearch extends DBEntity
             DA_ALLOW_NULL,
             "pro_management_review_reason"
         );
-
         $this->addColumn(
             self::salesOrderID,
             DA_ID,
             DA_ALLOW_NULL,
             'pro_linked_ordno'
         );
-
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
 
-    function getRowsBySearchCriteria(
-        $callActivityID = null,
-        $problemID = null,
-        $customerID = null,
-        $userID = null,
-        $status = null,
-        $rootCauseID = null,
-        $priority = null,
-        $activityText = null,
-        $serviceRequestSpentTime = null,
-        $individualActivitySpentTime = null,
-        $fromDate = null,
-        $toDate = null,
-        $contractCustomerItemID = null,
-        $callActTypeID = null,
-        $linkedSalesOrderID = null,
-        $managementReviewOnly = 'N',
-        $breachedSlaOption = '',
-        $sortColumn = false,
-        $sortDirection = 'ASC',
-        $limit = true,
-        $fixSLAStatus = null,
-        $overFixSLAWorkingHours = null
+    function getRowsBySearchCriteria($callActivityID = null,
+                                     $problemID = null,
+                                     $customerID = null,
+                                     $userID = null,
+                                     $status = null,
+                                     $rootCauseID = null,
+                                     $priority = null,
+                                     $activityText = null,
+                                     $serviceRequestSpentTime = null,
+                                     $individualActivitySpentTime = null,
+                                     $fromDate = null,
+                                     $toDate = null,
+                                     $contractCustomerItemID = null,
+                                     $callActTypeID = null,
+                                     $linkedSalesOrderID = null,
+                                     $managementReviewOnly = 'N',
+                                     $breachedSlaOption = '',
+                                     $sortColumn = false,
+                                     $sortDirection = 'ASC',
+                                     $limit = true,
+                                     $fixSLAStatus = null,
+                                     $overFixSLAWorkingHours = null
     )
     {
         $this->setMethodName('getRowsBySearchCriteria');
-        $statement =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            "
+        $statement       = "SELECT " . $this->getDBColumnNamesAsString() . "
             FROM
           callactivity 
           LEFT JOIN callacttype 
@@ -346,7 +335,7 @@ class DBECallActivitySearch extends DBEntity
             ON callactivity.caa_cuino = custitem.cui_cuino 
           LEFT JOIN problem 
             ON problem.pro_problemno = callactivity.caa_problemno 
-          LEFT JOIN item 
+          LEFT JOIN item  
             ON custitem.cui_itemno = item.itm_itemno 
           LEFT JOIN project 
             ON project.projectID = problem.pro_projectno  
@@ -371,26 +360,19 @@ class DBECallActivitySearch extends DBEntity
             ON problem.pro_fixed_consno = fix_consultant.cns_consno
           INNER JOIN customer 
             ON problem.pro_custno = customer.cus_custno";
-
-        $statement .=
-            " WHERE 1=1";
-
+        $statement       .= " WHERE 1=1";
         $whereParameters = false;
-
         if ($callActivityID) {
             if (strpos(
                 $callActivityID,
                 ','
             )) {
-                $whereParameters .=
-                    " AND caa_callactivityno IN (" . $callActivityID . ")";
+                $whereParameters .= " AND caa_callactivityno IN (" . $callActivityID . ")";
 
             } else {
-                $whereParameters .=
-                    " AND caa_callactivityno = " . $callActivityID;
+                $whereParameters .= " AND caa_callactivityno = " . $callActivityID;
             }
         }
-
         if ($overFixSLAWorkingHours) {
             $statement .= " and caa_problemno in (select pro_problemno
                         from problem
@@ -410,56 +392,43 @@ class DBECallActivitySearch extends DBEntity
                                   END
 )";
         }
-
         if ($problemID) {
             if (strpos(
                 $problemID,
                 ','
             )) {
-                $whereParameters .=
-                    " AND caa_problemno IN (" . $problemID . ")";
+                $whereParameters .= " AND caa_problemno IN (" . $problemID . ")";
 
             } else {
-                $whereParameters .=
-                    " AND caa_problemno = " . $problemID;
+                $whereParameters .= " AND caa_problemno = " . $problemID;
             }
         }
-
         if ($customerID != '' and $customerID != 0) {
-            $whereParameters = $whereParameters .
-                " AND " . $this->getDBColumnName(self::customerID) . "=" . $customerID;
+            $whereParameters = $whereParameters . " AND " . $this->getDBColumnName(
+                    self::customerID
+                ) . "=" . $customerID;
         }
-
         if ($linkedSalesOrderID != '' and $linkedSalesOrderID != 0) {
-            $whereParameters = $whereParameters .
-                " AND " . $this->getDBColumnName(self::linkedSalesOrderID) . "=" . $linkedSalesOrderID;
+            $whereParameters = $whereParameters . " AND " . $this->getDBColumnName(
+                    self::linkedSalesOrderID
+                ) . "=" . $linkedSalesOrderID;
         }
-
         if ($userID != '' and $userID != 0) {
-            $whereParameters = $whereParameters .
-                " AND " . $this->getDBColumnName(self::userID) . "=" . $userID;
+            $whereParameters = $whereParameters . " AND " . $this->getDBColumnName(self::userID) . "=" . $userID;
         }
-
         if ($managementReviewOnly == 'Y') {
-            $whereParameters = $whereParameters .
-                " AND " . $this->getDBColumnName(self::managementReviewReason) . "<> ''";
+            $whereParameters = $whereParameters . " AND " . $this->getDBColumnName(
+                    self::managementReviewReason
+                ) . "<> ''";
         }
-
         if ($activityText != '') {
-            $search = str_replace("@", " ", $activityText);
-            $whereParameters .=
-                " AND ( MATCH (reason)
+            $search          = str_replace("@", " ", $activityText);
+            $whereParameters .= " AND ( MATCH (reason)
 					AGAINST ('" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $search
-                ) . "' IN BOOLEAN MODE)
-          OR MATCH (pro_internal_notes)
-          AGAINST ('" . mysqli_real_escape_string(
-                    $this->db->link_id(),
-                    $search
-                ) . "' IN BOOLEAN MODE) )";
+                ) . "' IN BOOLEAN MODE))";
         }
-
         if ($serviceRequestSpentTime != '' && $this->testSpentTimeSearchString($serviceRequestSpentTime)) {
 
             if (preg_match(
@@ -468,14 +437,11 @@ class DBECallActivitySearch extends DBEntity
                 ) === 1) {
                 $serviceRequestSpentTime = '= ' . $serviceRequestSpentTime;
             }
-
-            $whereParameters .=
-                " and pro_total_activity_duration_hours " . mysqli_real_escape_string(
+            $whereParameters .= " and pro_total_activity_duration_hours " . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $serviceRequestSpentTime
                 );
         }
-
         if ($individualActivitySpentTime != '' && $this->testSpentTimeSearchString($individualActivitySpentTime)) {
             if (preg_match(
                     '/^\d/',
@@ -483,47 +449,36 @@ class DBECallActivitySearch extends DBEntity
                 ) === 1) {
                 $individualActivitySpentTime = '= ' . $individualActivitySpentTime;
             }
-
-            $whereParameters .=
-                " and ((TIME_TO_SEC(caa_endtime) - TIME_TO_SEC(caa_starttime))/3600) " . mysqli_real_escape_string(
+            $whereParameters .= " and ((TIME_TO_SEC(caa_endtime) - TIME_TO_SEC(caa_starttime))/3600) " . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $individualActivitySpentTime
                 );
         }
-
-
         switch ($status) {
             case 'INITIAL':
-                $whereParameters .=
-                    " AND pro_status = 'I'";
+                $whereParameters .= " AND pro_status = 'I'";
                 break;
             case 'CUSTOMER':
-                $whereParameters .=
-                    " AND pro_awaiting_customer_response_flag = 'Y'
+                $whereParameters .= " AND pro_awaiting_customer_response_flag = 'Y'
             AND pro_status = 'P'";
                 break;
             case 'CNC':
-                $whereParameters .=
-                    " AND pro_awaiting_customer_response_flag = 'N'
+                $whereParameters .= " AND pro_awaiting_customer_response_flag = 'N'
             AND pro_status = 'P'";
                 break;
             /*
             Checked T&M on Fixed SRs which are due for completion
-            */
-            case 'CHECKED_T_AND_M':
-                $whereParameters .=
-                    " AND caa_status = 'C' AND " . $this->getDBColumnName(self::contractCustomerItemID) . " is null
+            */ case 'CHECKED_T_AND_M':
+            $whereParameters .= " AND caa_status = 'C' AND " . $this->getDBColumnName(self::contractCustomerItemID) . " is null
             AND pro_status = 'F'
             AND pro_complete_date <= now()
             AND holdForQA =0
             AND caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID;
-                break;
+            break;
             /*
             Checked Non-T&M on Fixed SRs which are due for completion
-            */
-            case 'CHECKED_NON_T_AND_M':
-                $whereParameters .=
-                    " AND caa_status = 'C' AND " . $this->getDBColumnName(self::contractCustomerItemID) . " is not null 
+            */ case 'CHECKED_NON_T_AND_M':
+            $whereParameters .= " AND caa_status = 'C' AND " . $this->getDBColumnName(self::contractCustomerItemID) . " is not null 
             AND pro_status = 'F'
             AND pro_complete_date <= now()
             AND holdForQA =0
@@ -536,56 +491,43 @@ class DBECallActivitySearch extends DBEntity
             )
             
             AND caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID;
-                break;
-
+            break;
             case 'UNCHECKED':              // UnChecked
-                $whereParameters .=
-                    " AND caa_status = 'O'
+                $whereParameters .= " AND caa_status = 'O'
             AND caa_endtime <> '' and caa_endtime is not null ";
                 break;
             case 'FIXED':
-                $whereParameters .=
-                    " AND pro_status ='F'";
+                $whereParameters .= " AND pro_status ='F'";
                 break;
             case 'NOT_FIXED':
-                $whereParameters .=
-                    " AND ( pro_status ='I' OR pro_status ='P' )";
+                $whereParameters .= " AND ( pro_status ='I' OR pro_status ='P' )";
                 break;
             case 'COMPLETED':
-                $whereParameters .=
-                    " AND pro_status ='C'";
+                $whereParameters .= " AND pro_status ='C'";
                 break;
             case 'FIXED_OR_COMPLETED':
                 $whereParameters .= " and pro_status in ('F','C') ";
                 break;
             case "HOLD_FOR_QA":
-                $whereParameters .= " AND caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID." AND holdForQA =1 ";
+                $whereParameters .= " AND caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID . " AND holdForQA =1 ";
         }
         // Contract Type:
-
         if ($contractCustomerItemID == '') {                        // Time and materials
-            $whereParameters .=
-                " AND " . $this->getDBColumnName(self::contractCustomerItemID) . " is null";
+            $whereParameters .= " AND " . $this->getDBColumnName(self::contractCustomerItemID) . " is null";
         } elseif ($contractCustomerItemID != 99) {        // anything other than All
-            $whereParameters .=
-                " AND " . $this->getDBColumnName(self::contractCustomerItemID) . " = $contractCustomerItemID";
+            $whereParameters .= " AND " . $this->getDBColumnName(
+                    self::contractCustomerItemID
+                ) . " = $contractCustomerItemID";
         }
-
         if ($fromDate != '') {
-            $whereParameters .=
-                " AND caa_date >= '" . $fromDate . "'";
+            $whereParameters .= " AND caa_date >= '" . $fromDate . "'";
         }
-
         if ($toDate != '') {
-            $whereParameters .=
-                " AND caa_date <= '" . $toDate . "'";
+            $whereParameters .= " AND caa_date <= '" . $toDate . "'";
         }
-
         if ($callActTypeID != '') {
-            $whereParameters .=
-                " AND caa_callacttypeno = " . $callActTypeID;
+            $whereParameters .= " AND caa_callacttypeno = " . $callActTypeID;
         }
-
         if ($fixSLAStatus == 'B') {
             $whereParameters .= " and  pro_priority <> 5
   and pro_working_hours > case pro_priority
@@ -603,10 +545,8 @@ class DBECallActivitySearch extends DBEntity
                               when 4 then slaFixHoursP4
                               else 0 end ";
         }
-
         if ($breachedSlaOption == 'B') {
-            $whereParameters .=
-                " AND (
+            $whereParameters .= " AND (
     (
       pro_status = 'I'
       AND pro_sla_response_hours - pro_working_hours <= 0
@@ -616,34 +556,34 @@ class DBECallActivitySearch extends DBEntity
     )
   )";
         } elseif ($breachedSlaOption == 'N') {
-            $whereParameters .=
-                " AND pro_responded_hours <= pro_sla_response_hours";
+            $whereParameters .= " AND pro_responded_hours <= pro_sla_response_hours";
         }
-
         if ($rootCauseID != '') {
-            $whereParameters .=
-                " AND pro_rootcauseno = " . $rootCauseID;
+            $whereParameters .= " AND pro_rootcauseno = " . $rootCauseID;
         }
-
         if ($priority != '') {
-            $whereParameters .=
-                " AND problem.pro_priority = '" . $priority . "'";
+            $whereParameters .= " AND problem.pro_priority = '" . $priority . "'";
         }
-
         if ($whereParameters) {
             $statement .= $whereParameters;
         }
-
+        if (in_array(
+            $status,
+            [
+                "CHECKED_T_AND_M",
+                "CHECKED_NON_T_AND_M",
+            ]
+        )) {
+            $statement .= " group by pro_problemno";
+        }
         if ($sortColumn) {
             $statement .= " ORDER BY " . $this->getDBColumnName($sortColumn) . " " . $sortDirection;
         } else {
             $statement .= " ORDER BY callactivity.caa_date DESC, callactivity.caa_starttime DESC, callactivity.caa_consno";
         }
-
         if ($limit) {
             $statement .= " LIMIT 0, 150";
         }
-        var_dump($statement);
         $this->setQueryString($statement);
         $ret = (parent::getRows());
         return $ret;
@@ -654,7 +594,6 @@ class DBECallActivitySearch extends DBEntity
         if ($timeSpentString == '') {
             return true;
         }
-
         return preg_match(
             "/((\d+(\.?\d+)?)|=|<|<=|>|>=|<>)\s*(\d+(\.?\d+)?)/",
             $timeSpentString

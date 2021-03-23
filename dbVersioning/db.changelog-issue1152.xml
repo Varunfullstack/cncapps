@@ -1,0 +1,23 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdevmt" id="issue1152-0">
+        <tagDatabase tag="issue1152"/>
+    </changeSet>
+    <changeSet id="issue1152-1" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customerfeedback" columnName="notified"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customerfeedback">
+            <column name="notified" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="true"/>
+            </column>            
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="customerfeedback" columnName="notified" />
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

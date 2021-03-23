@@ -1,0 +1,21 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdevmt" id="issue1212-0">
+        <tagDatabase tag="issue1212"/>
+    </changeSet>
+    <changeSet id="issue1212-1" author="pavwebdev">
+        <sqlFile endDelimiter="#" path="/getOpenHoursUntilNowFunction.sql" stripComments="true"/>
+        <sql>
+            update problem
+            set openHours = getOpenHoursUntilNow(pro_problemno)
+            where pro_status in ('I', 'P');
+        </sql>
+        <rollback>
+            <sql>
+                drop function if exists getOpenHoursUntilNow;
+            </sql>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

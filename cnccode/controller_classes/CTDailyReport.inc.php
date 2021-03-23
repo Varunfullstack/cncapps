@@ -10,12 +10,13 @@ require_once($cfg ['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_bu'] . '/BUDailyReport.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
+require_once($cfg["path_bu"] . "/BUHeader.inc.php");
 
+use CNCLTD\Utils;
 class CTDailyReport extends CTCNC
 {
     private $buDailyReport;
     private $daysAgo = 1;
-
     function __construct($requestMethod,
                          $postVars,
                          $getVars,
@@ -126,6 +127,8 @@ class CTDailyReport extends CTCNC
                 );
                 break;
             case 'showGraphs':
+                if(isset($_REQUEST['popup']))
+                  $this->setHTMLFmt(CT_HTML_FMT_POPUP);
                 $this->setTemplateFiles(['graphs' => 'SevenDayersGraphs']);
                 $this->template->parse(
                     'CONTENTS',
@@ -146,12 +149,12 @@ class CTDailyReport extends CTCNC
                     $this->buDailyReport->getOutstandingReportPerformanceDataBetweenDates($startDate, $endDate),
                     JSON_NUMERIC_CHECK
                 );
-                break;
+                break;            
             default :
                 break;
         }
     }
-
+    
     /**
      * @throws Exception
      */
@@ -407,5 +410,4 @@ class CTDailyReport extends CTCNC
 
 
     } // end function
-
 } // end of class

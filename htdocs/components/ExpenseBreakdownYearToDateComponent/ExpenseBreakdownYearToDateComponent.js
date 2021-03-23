@@ -131,6 +131,7 @@ class ExpenseBreakdownYearToDateComponent extends React.Component {
             return acc;
         }, {});
 
+        const {startDate: financialStartDate, endDate: financialEndDate} = this.getFinancialStartAndEndDates();
         const monthNames = [
             "Jan",
             "Feb",
@@ -271,6 +272,10 @@ class ExpenseBreakdownYearToDateComponent extends React.Component {
                     'div',
                     {className: 'financialYearMileage', key: 'financial-year-mileage'},
                     [
+                        <div key="financialYearDates">
+                            Financial
+                            Year {financialStartDate.format('DD/MM/YYYY')} to {financialEndDate.format('DD/MM/YYYY')}
+                        </div>,
                         this.el(
                             'div',
                             {className: 'financialYearMileage-totalMileage', key: 'totalMileage'},

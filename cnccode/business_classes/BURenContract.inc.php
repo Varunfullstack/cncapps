@@ -19,10 +19,10 @@ require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 
 class BURenContract extends Business
 {
-    const etaDate                      = 'etaDate';
-    const serviceRequestCustomerItemID = 'serviceRequestCustomerItemID';
-    const serviceRequestPriority       = 'serviceRequestPriority';
-    const serviceRequestText           = 'serviceRequestText';
+    const etaDate                       = 'etaDate';
+    const serviceRequestCustomerItemID  = 'serviceRequestCustomerItemID';
+    const serviceRequestPriority        = 'serviceRequestPriority';
+    const SERVICE_REQUEST_INTERNAL_NOTE = 'serviceRequestInternalNote';
 
     var $dbeRenContract  = "";
     var $dbeJRenContract = "";
@@ -220,6 +220,7 @@ class BURenContract extends Business
             </div>
             <?php
             if ($dbeJCustomerItem->getRow($dsRenContract->getValue(DBECustomerItem::customerItemID))) {
+
                 /*
                  * Group many contracts for same customer under one sales order
          * unless it is an SSL cert in which case it has it's own order
@@ -236,7 +237,7 @@ class BURenContract extends Business
                     /*
                     If generating invoices and an order has been started
                     */
-                    if ($generateInvoice && !!$dsOrdhead) {
+                    if ($generateInvoice && (bool)$dsOrdhead) {
 
                         $buSalesOrder->setStatusCompleted($dsOrdhead->getValue(DBEOrdhead::ordheadID));
                         $buSalesOrder->getOrderByOrdheadID(
@@ -269,11 +270,11 @@ class BURenContract extends Business
                     );
                     ?>
                     <div>Creating new Sales Order: <?= $dsOrdhead->getValue(DBEOrdhead::ordheadID) ?></div>
+
                     <?php
                 }
                 $generateInvoice = $dsRenContract->getValue(DBECustomerItem::autoGenerateContractInvoice) === 'Y';
                 if ($dsRenContract->getValue(DBECustomerItem::officialOrderNumber)) {
-
                     $custPORef = $dsRenContract->getValue(DBECustomerItem::officialOrderNumber);
                     if ($dsOrdhead->getValue(DBEOrdhead::custPORef)) {
                         $custPORef = $dsOrdhead->getValue(DBEOrdhead::custPORef) . '/' . $custPORef;
@@ -510,7 +511,12 @@ class BURenContract extends Business
                         DA_ALLOW_NULL
                     );
                     $dsInput->addColumn(
-                        self::serviceRequestText,
+                        self::SERVICE_REQUEST_INTERNAL_NOTE,
+                        DA_STRING,
+                        DA_ALLOW_NULL
+                    );
+                    $dsInput->addColumn(
+                        DBEOrdhead::serviceRequestTaskList,
                         DA_STRING,
                         DA_ALLOW_NULL
                     );
@@ -526,7 +532,7 @@ class BURenContract extends Business
                         onto: <a href="' . SITE_URL . '/RenContract.php?action=edit&ID=' . $renContractId . '">Contract</a></p> 
                         <p>Please check that the above SSL Certificate is still required before renewing</p>';
                     $dsInput->setValue(
-                        self::serviceRequestText,
+                        self::SERVICE_REQUEST_INTERNAL_NOTE,
                         $serviceRequestText
                     );
                     $dsInput->setValue(

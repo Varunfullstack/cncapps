@@ -147,6 +147,7 @@ class CTCustomer extends CTCNC
     const ADD_PORTAL_CUSTOMER_DOCUMENT               = 'addPortalCustomerDocument';
     const DELETE_PORTAL_DOCUMENT                     = "deletePortalDocument";
     const ADD_SITE                                   = "addSite";
+    const CONTACTS_ACTION                            = "contacts";
     public $customerID;
     public $customerString;
     public $contactString;
@@ -640,7 +641,6 @@ class CTCustomer extends CTCNC
         }
         foreach ($customerArray as $customerID => $customer) {
 
-
         }
     }
 
@@ -1113,7 +1113,7 @@ class CTCustomer extends CTCNC
                 echo $this->getCurrentUser();
                 exit;
             case "searchCustomers":
-                echo json_encode($this->searchCustomers());
+                echo json_encode($this->searchCustomers(),JSON_NUMERIC_CHECK);
                 exit;
             case "getCustomerSR":
                 echo json_encode($this->getCustomerSR());
@@ -1127,7 +1127,7 @@ class CTCustomer extends CTCNC
                 echo json_encode($this->getCustomerAssets());
                 exit;
                 break;
-            case "contacts":
+            case self::CONTACTS_ACTION:
                 echo json_encode($this->getCustomerContacts());
                 exit;
                 break;
@@ -2066,6 +2066,9 @@ class CTCustomer extends CTCNC
                 ),
                 'noOfSites'                               => $this->dsCustomer->getValue(DBECustomer::noOfSites),
                 'noOfPCs'                                 => $this->dsCustomer->getValue(DBECustomer::noOfPCs),
+                'patchManagementEligibleComputers'        => $this->dsCustomer->getValue(
+                    DBECustomer::eligiblePatchManagement
+                ),
                 'modifyDate'                              => $this->dsCustomer->getValue(DBECustomer::modifyDate),
                 'reviewDate'                              => $this->dsCustomer->getValue(DBECustomer::reviewDate),
                 'reviewTime'                              => $this->dsCustomer->getValue(DBECustomer::reviewTime),
@@ -2261,7 +2264,7 @@ class CTCustomer extends CTCNC
         Projects
         */
         $addProjectURL = Controller::buildLink(
-            'Project.php',
+            'Projects.php',
             array(
                 'action'     => 'add',
                 'customerID' => $this->getCustomerID()
@@ -2649,7 +2652,6 @@ class CTCustomer extends CTCNC
                 true
             );
         }
-
     }
 
     /**
@@ -3052,7 +3054,7 @@ class CTCustomer extends CTCNC
                     AND pro_status IN( 'I', 'P')
                 ) AS openSrCount,
                 (SELECT cui_itemno IS NOT NULL FROM custitem WHERE custitem.`cui_itemno` = 4111 AND custitem.`declinedFlag` <> 'Y' AND custitem.`cui_custno` = customer.`cus_custno` and renewalStatus  <> 'D' limit 1) AS hasPrepay,
-                (SELECT item.`itm_desc` FROM custitem LEFT JOIN item ON cui_itemno = item.`itm_itemno` WHERE itm_desc LIKE '%servicedesk%' AND custitem.`declinedFlag` <> 'Y' AND custitem.`cui_custno` = customer.`cus_custno` limit 1 ) AS hasServiceDesk,
+                (SELECT count(*) > 0 FROM custitem LEFT JOIN item ON cui_itemno = item.`itm_itemno` WHERE `itm_itemtypeno` = 56 and renewalStatus <> 'D' AND custitem.`declinedFlag` <> 'Y' AND custitem.`cui_custno` = customer.`cus_custno` ) AS hasServiceDesk,
                 cus_special_attention_flag specialAttentionCustomer
                 FROM customer
     
@@ -3161,20 +3163,45 @@ class CTCustomer extends CTCNC
         return $sites;
     }
 
-    function getCustomerAssets()
+    function getCustomerAssets(): array
     {
         $customerId = $_GET["customerId"];
         $labtechDB  = $this->getLabtechDB();
-        $query      = "select  computers.name,computers.assetTag,computers.LastUsername,  computers.BiosVer, computers.BiosName  from computers 
-        join clients on 
-            computers.clientid = clients.clientid
-            and clients.externalID = $customerId     
-            order by computers.name, computers.LastUsername, computers.BiosVer
+        $query      = "SELECT
+  computers.name AS `name`,
+  computers.assetTag AS `assetTag`,
+  computers.LastUsername AS `lastUsername`,
+  computers.BiosVer AS `biosVer`,
+  computers.BiosName AS `biosName`
+FROM
+  computers
+  JOIN clients
+    ON computers.clientid = clients.clientid
+    AND clients.externalID = ?
+UNION
+ALL
+SELECT
+  plugin_vm_esxhosts.`DeviceName` AS `name`,
+  NULL AS `assetTag`,
+  NULL AS `lastUsername`,
+  NULL AS `biosVer`,
+  NULL AS `biosName`
+FROM
+  plugin_vm_esxhosts
+  JOIN `networkdevices`
+    ON networkdevices.deviceID = plugin_vm_esxhosts.deviceID
+  JOIN locations
+    ON networkdevices.LocationID = locations.LocationID
+  JOIN clients
+    ON locations.ClientID = clients.ClientID
+WHERE clients.`ExternalID` = ?
+ORDER BY NAME,
+  lastUsername,
+  biosVer
         ";
         $statement  = $labtechDB->prepare($query);
-        $test       = $statement->execute();
-        $data       = $statement->fetchAll(PDO::FETCH_ASSOC);
-        return $data;
+        $statement->execute([$customerId, $customerId,]);
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
@@ -3187,26 +3214,9 @@ class CTCustomer extends CTCNC
         $customerID = $_REQUEST["customerID"];
         $dbeContact = new DBEContact($this);
         $dbeSite    = new DBESite($this);
-        $dbeContact->getRowsByCustomerID(
-            $customerID,
-            false,
-            true,
-            true
-        );
+        $dbeContact->getRowsByCustomerID($customerID, true);
         $contacts = array();
         while ($dbeContact->fetchNext()) {
-            $startMainContactStyle = null;
-            $endMainContactStyle   = null;
-            if ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelMain) {
-                $startMainContactStyle = '*';
-                $endMainContactStyle   = '*';
-            } elseif ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelDelegate) {
-                $startMainContactStyle = '- Delegate';
-                $endMainContactStyle   = '- Delegate';
-            } elseif ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelSupervisor) {
-                $startMainContactStyle = '- Supervisor';
-                $endMainContactStyle   = '- Supervisor';
-            }
             $dbeSite->setValue(
                 DBESite::customerID,
                 $dbeContact->getValue(DBEContact::customerID)
@@ -3216,29 +3226,24 @@ class CTCustomer extends CTCNC
                 $dbeContact->getValue(DBEContact::siteNo)
             );
             $dbeSite->getRow();
-            $name = $dbeContact->getValue(DBEContact::firstName) . ' ' . $dbeContact->getValue(DBEContact::lastName);
-            if ($dbeContact->getValue(DBEContact::position)) {
-                $name .= ' (' . $dbeContact->getValue(DBEContact::position) . ')';
-            }
             array_push(
                 $contacts,
                 array(
-                    'id'                    => $dbeContact->getValue(DBEContact::contactID),
-                    'name'                  => $name,
-                    'firstName'             => $dbeContact->getValue(DBEContact::firstName),
-                    'lastName'              => $dbeContact->getValue(DBEContact::lastName),
-                    'startMainContactStyle' => $startMainContactStyle,
-                    'endMainContactStyle'   => $endMainContactStyle,
-                    'siteNo'                => $endMainContactStyle,
-                    'siteTitle'             => $dbeSite->getValue(DBESite::add1) . ' ' . $dbeSite->getValue(
+                    'id'           => $dbeContact->getValue(DBEContact::contactID),
+                    'position'     => $dbeContact->getValue(DBEContact::position),
+                    'firstName'    => $dbeContact->getValue(DBEContact::firstName),
+                    'lastName'     => $dbeContact->getValue(DBEContact::lastName),
+                    'siteNo'       => $dbeSite->getValue(DBESite::siteNo),
+                    'active'       => $dbeContact->getValue(DBEContact::active),
+                    'siteTitle'    => $dbeSite->getValue(DBESite::add1) . ' ' . $dbeSite->getValue(
                             DBESite::town
                         ) . ' ' . $dbeSite->getValue(DBESite::postcode),
-                    "sitePhone"             => $dbeSite->getValue(DBESite::phone),
-                    "contactPhone"          => $dbeContact->getValue(DBEContact::phone),
-                    "contactMobilePhone"    => $dbeContact->getValue(DBEContact::mobilePhone),
-                    "contactEmail"          => $dbeContact->getValue(DBEContact::email),
-                    'contactSupportLevel'   => $dbeContact->getValue(DBEContact::supportLevel),
-                    "notes"                 => $dbeContact->getValue(DBEContact::notes)
+                    "sitePhone"    => $dbeSite->getValue(DBESite::phone),
+                    "phone"        => $dbeContact->getValue(DBEContact::phone),
+                    "mobilePhone"  => $dbeContact->getValue(DBEContact::mobilePhone),
+                    "email"        => $dbeContact->getValue(DBEContact::email),
+                    'supportLevel' => $dbeContact->getValue(DBEContact::supportLevel),
+                    "notes"        => $dbeContact->getValue(DBEContact::notes)
                 )
             );
         }
@@ -3247,12 +3252,11 @@ class CTCustomer extends CTCNC
 
     function getCustomerContracts()
     {
-        $customerID             = $_REQUEST["customerId"];
-        $contractCustomerItemID = $_REQUEST["contractCustomerItemID"];
-        $linkedToSalesOrder     = $_REQUEST["linkedToSalesOrder"];
-        $contracts              = array();
-        $buCustomerItem         = new BUCustomerItem($this);
-        $dsContract             = new DataSet($this);
+        $customerID         = $_REQUEST["customerId"];
+        $linkedToSalesOrder = $_REQUEST["linkedToSalesOrder"];
+        $contracts          = array();
+        $buCustomerItem     = new BUCustomerItem($this);
+        $dsContract         = new DataSet($this);
         if ($customerID) {
             $buCustomerItem->getContractsByCustomerID(
                 $customerID,
@@ -3260,16 +3264,6 @@ class CTCustomer extends CTCNC
                 null
             );
         }
-        if (!$contractCustomerItemID) {
-            array_push($contracts, ["id" => "", "name" => "tandMSelected", "renewalType" => null]);
-        }
-        // if ($linkedToSalesOrder) {
-        //     $this->template->set_var(
-        //         [
-        //             'salesOrderReason' => "- Must be selected because this is linked to a Sales Order"
-        //         ]
-        //     );
-        // }
         while ($dsContract->fetchNext()) {
 
             $description = $dsContract->getValue(DBEJContract::itemDescription) . ' ' . $dsContract->getValue(

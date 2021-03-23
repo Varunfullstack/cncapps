@@ -17,6 +17,7 @@ require_once($cfg ['path_gc'] . '/Controller.inc.php');
 require_once($cfg ['path_dbe'] . '/DBEJUser.inc.php');
 require_once($cfg ['path_dbe'] . '/DBETeam.inc.php');
 require_once($cfg['path_bu'] . '/BUUser.inc.php');
+require_once($cfg["path_dbe"] . "/DBConnect.php");
 define(
     'CTCNC_ACT_DISP_CUST_POPUP',
     'dispCustPopup'
@@ -255,7 +256,7 @@ class CTCNC extends Controller
         );
         $dbeUser->getRow();
         $this->favouriteMenu = new FavouriteMenu($this->userID);
-        $this->user = new BUUser($this);
+        $this->user          = new BUUser($this);
         parent::__construct(
             $requestMethod,
             $postVars,
@@ -280,6 +281,10 @@ class CTCNC extends Controller
     {
         if (!$this->dbeUser) {
             $this->dbeUser = new DBEUser ($this);
+            if ($this->userID) {
+                $this->dbeUser->getRow($this->userID);
+            }
+
         }
         return $this->dbeUser;
     }
@@ -321,7 +326,7 @@ class CTCNC extends Controller
     function parsePage()
     {
         global $userName;
-        $menu = new SideMenu($this->favouriteMenu);
+        $menu      = new SideMenu($this->favouriteMenu);
         $urlLogout = Controller::buildLink(
             $_SERVER ['PHP_SELF'],
             array('action' => CTCNC_ACT_LOGOUT)
@@ -537,7 +542,7 @@ class CTCNC extends Controller
             ],
             [
                 "id"    => 107,
-                "href"  => "Project.php",
+                "href"  => "Projects.php",
                 "label" => "Projects",
             ],
             [
@@ -552,18 +557,24 @@ class CTCNC extends Controller
             ],
             [
                 "id"    => 110,
-                "href"  => "DailyReport.php?action=outstandingIncidents&onScreen=true&dashboard=true&daysAgo=7",
+                "href"  => "AgedService.php",
+                //"href"  => "DailyReport.php?action=outstandingIncidents&onScreen=true&dashboard=true&daysAgo=7",
                 "label" => "Aged Service Requests",
             ],
+            // [
+            //     "id"    => 111,
+            //     "href"  => "24HoursSupportCustomersReport.php",
+            //     "label" => "24 Hour Support Customers",
+            // ],
+            // [
+            //     "id"    => 112,
+            //     "href"  => "SpecialAttentionCustomersReport.php",
+            //     "label" => "Special Attention Customers",
+            // ],
             [
-                "id"    => 111,
-                "href"  => "24HoursSupportCustomersReport.php",
-                "label" => "24 Hour Support Customers",
-            ],
-            [
-                "id"    => 112,
-                "href"  => "SpecialAttentionCustomersReport.php",
-                "label" => "Special Attention Customers",
+                "id"    => 113,
+                "href"  => "CustomerInfo.php",
+                "label" => "Customer Information",
             ],
         ];
     }
@@ -605,20 +616,25 @@ class CTCNC extends Controller
     {
 
         return [
+            // [
+            //     "id"    => 202,
+            //     "label" => "Time Requests",
+            //     "href"  => "TimeRequestDashboard.php"
+            // ],
+            // [
+            //     "id"    => 203,
+            //     "label" => "Change Requests",
+            //     "href"  => "ChangeRequestDashboard.php?HD=null&ES=null&SP=null&P=null"
+            // ],
+            // [
+            //     "id"    => 204,
+            //     "label" => "Sales Requests",
+            //     "href"  => "SalesRequestDashboard.php"
+            // ],
             [
                 "id"    => 202,
-                "label" => "Time Requests",
-                "href"  => "TimeRequestDashboard.php"
-            ],
-            [
-                "id"    => 203,
-                "label" => "Change Requests",
-                "href"  => "ChangeRequestDashboard.php?HD=null&ES=null&SP=null&P=null"
-            ],
-            [
-                "id"    => 204,
-                "label" => "Sales Requests",
-                "href"  => "SalesRequestDashboard.php"
+                "label" => "Request Dashboard",
+                "href"  => "RequestDashBoard.php"
             ],
             [
                 "id"    => 205,
@@ -704,6 +720,11 @@ class CTCNC extends Controller
                 "id"    => 221,
                 "label" => "Password Services",
                 "href"  => "PasswordServices.php"
+            ],
+            [
+                "id"    => 225,
+                "label" => "Customer Feedback",
+                "href"  => "CustomerFeedback.php"
             ],
         ];
 
@@ -824,11 +845,11 @@ class CTCNC extends Controller
     private function getDefaultReportsMenu()
     {
         return [
-            [
-                "id"    => 501,
-                "label" => "Contact Audit Log",
-                "href"  => "ContactAudit.php",
-            ],
+            // [
+            //     "id"    => 501,
+            //     "label" => "Contact Audit Log",
+            //     "href"  => "ContactAudit.php",
+            // ],
             [
                 "id"    => 502,
                 "label" => "Office 365 Backup Audit",
@@ -860,11 +881,6 @@ class CTCNC extends Controller
                 "href"  => "ManagementReports.php?action=SpendByManufacturer",
             ],
             [
-                "id"    => 508,
-                "label" => "Quotation Conversion",
-                "href"  => "QuotationConversionReport.php",
-            ],
-            [
                 "id"    => 509,
                 "label" => "Customer Profitability",
                 "href"  => "CustomerProfitabilityReport.php",
@@ -884,6 +900,11 @@ class CTCNC extends Controller
                 "label" => "Customer Profitability Export",
                 "href"  => "CustomerProfitabilityMonthsReport.php",
             ],
+            [
+                "id"    => 513,
+                "label" => "KPI Reports",
+                "href"  => "KPIReport.php",
+            ],
         ];
     }
 
@@ -892,29 +913,34 @@ class CTCNC extends Controller
         return [
             [
                 "id"    => 601,
-                "label" => "Renewal",
-                "href"  => "RenQuotation.php?action=list&orderBy=customerName&orderDirection=asc",
+                "label" => "Renewals",
+                "href"  => "RenewalsDashboard.php",
             ],
-            [
-                "id"    => 602,
-                "label" => "Contract",
-                "href"  => "RenContract.php",
-            ],
-            [
-                "id"    => 603,
-                "label" => "Internet",
-                "href"  => "RenBroadband.php",
-            ],
-            [
-                "id"    => 604,
-                "label" => "Domain",
-                "href"  => "RenDomain.php",
-            ],
-            [
-                "id"    => 605,
-                "label" => "Hosting",
-                "href"  => "RenHosting.php",
-            ],
+            // [
+            //     "id"    => 601,
+            //     "label" => "Renewal",
+            //     "href"  => "RenQuotation.php?action=list&orderBy=customerName&orderDirection=asc",
+            // ],
+            // [
+            //     "id"    => 602,
+            //     "label" => "Contract",
+            //     "href"  => "RenContract.php",
+            // ],
+            // [
+            //     "id"    => 603,
+            //     "label" => "Internet",
+            //     "href"  => "RenBroadband.php",
+            // ],
+            // [
+            //     "id"    => 604,
+            //     "label" => "Domain",
+            //     "href"  => "RenDomain.php",
+            // ],
+            // [
+            //     "id"    => 605,
+            //     "label" => "Hosting",
+            //     "href"  => "RenHosting.php",
+            // ],
             [
                 "id"    => 606,
                 "label" => "Contract Matrix",
@@ -1036,6 +1062,11 @@ class CTCNC extends Controller
                 "id"    => 811,
                 "label" => "Lead Status Types",
                 "href"  => "LeadStatusTypes.php",
+            ],
+            [
+                "id"    => 813,
+                "label" => "Project Options",
+                "href"  => "ProjectOptions.php",
             ],
         ];
     }
@@ -1206,5 +1237,40 @@ class CTCNC extends Controller
             $js_code = '<script>' . $js_code . '</script>';
         }
         echo $js_code;
+    }
+
+    function getBody()
+    {
+        return json_decode(file_get_contents('php://input'));
+    }
+
+    function hideMenu()
+    {
+        $this->setHTMLFmt(CT_HTML_FMT_POPUP);
+    }
+
+    public function getParamOrNull($paramName)
+    {
+        if (!$paramName) {
+            return null;
+        }
+        if (!isset($_REQUEST[$paramName])) {
+            return null;
+        }
+        if (@$_REQUEST[$paramName] == '') {
+            return null;
+        }
+        return $_REQUEST[$paramName];
+    }
+
+    function getRequestMethodeName()
+    {
+        return $_SERVER['REQUEST_METHOD'];
+    }
+
+    function getResponseError($code, $message)
+    {
+        http_response_code($code);
+        return ["status" => false, "error" => $message];
     }
 }

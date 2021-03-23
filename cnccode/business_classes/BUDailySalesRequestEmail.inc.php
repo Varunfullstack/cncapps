@@ -31,7 +31,7 @@ class BUDailySalesRequestEmail extends Business
           ordhead
           JOIN customer ON cus_custno = odh_custno
         WHERE
-          odh_service_request_text > ''";
+          serviceRequestInternalNote > ''";
 
         return $this->db->query($sql);
 

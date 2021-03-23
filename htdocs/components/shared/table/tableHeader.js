@@ -1,16 +1,10 @@
 import React from 'react';
+import '../ToolTip.css'
 
 class TableHeader extends React.Component {
     el = React.createElement;
     raiseSort = (path) => {
-        const sortColumn = {...this.props.sortColumn};
-        if (this.props.sortColumn != null && sortColumn.path == path)
-            sortColumn.order = sortColumn.order == "asc" ? "desc" : "asc";
-        else {
-            sortColumn.path = path;
-            sortColumn.order = "asc";
-        }
-        this.props.onSort(sortColumn);
+        this.props.onSort(path);
     };
     renderSortIcon = (column) => {
         let key = "fa-sort";
@@ -57,7 +51,7 @@ class TableHeader extends React.Component {
                             width: c.width ? c.width : "",
                             //title:c.toolTip?c.toolTip:""
                         },
-                        el('div', {className: "tooltip"},
+                        el('div', {className: "tooltip",style:c.hdStyle},
                             c?.label || " ",
                             c.icon ? el('i', {className: c.icon}) : null,
                             renderSortIcon(c),

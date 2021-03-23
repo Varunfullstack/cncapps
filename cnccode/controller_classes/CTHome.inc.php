@@ -7,6 +7,9 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 global $cfg;
+
+use CNCLTD\Utils;
+
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBESalesOrderTotals.inc.php');
 require_once($cfg['path_dbe'] . '/DBEInvoiceTotals.inc.php');
@@ -26,6 +29,13 @@ class CTHome extends CTCNC
     const getFixedAndReopenData              = "getFixedAndReopenData";
     const getUpcomingVisitsData              = "getUpcomingVisitsData";
     const GET_USER_PERFORMANCE_BETWEEN_DATES = 'getUserPerformanceBetweenDates';
+    const GET_SALES_FIGURES                  = 'salesFigures';
+    const GET_TEAM_PERFORMANCE               = 'teamPerformance';
+    const GET_ALL_USER_PERFORMANCE           = 'allUserPerformance';
+    const GET_USER_PERFORMANCE               = 'userPerformance';
+    const DEFAULT_LAYOUT                     = 'defaultLayout';
+    const GET_LOGGED_ACTIVITY_TIMES          = 'getLoggedActivityTimes';
+    const GET_FEEDBACK_TEAMS                 = 'teamsFeedback';
     /** @var DataSet|DBEHeader */
     private $dsHeader;
     /** @var BUUser */
@@ -60,6 +70,7 @@ class CTHome extends CTCNC
      */
     function defaultAction()
     {
+        $method = $_SERVER['REQUEST_METHOD'];
         switch ($this->getAction()) {
             case 'lastWeekHelpDesk':
                 $team = 1;
@@ -89,10 +100,27 @@ class CTHome extends CTCNC
                 );
                 break;
             case self::getFirstTimeFixData:
-                echo $this->getFirstTimeFixData();
+                echo html_entity_decode($this->getFirstTimeFixData());
                 break;
             case self::getFixedAndReopenData:
-                echo $this->getFixedAndReopenData();
+                echo html_entity_decode($this->getFixedAndReopenData());
+                break;
+            case self::GET_LOGGED_ACTIVITY_TIMES:
+                $team = 1;
+                if ($this->getParam('team')) {
+                    $team = $this->getParam('team');
+                }
+                $dateTime = new DateTime();
+                if ($this->getParam('date')) {
+                    $dateTime = DateTime::createFromFormat(DATE_MYSQL_DATE, $this->getParam('date'));
+                    if (!$dateTime) {
+                        throw new \CNCLTD\Exceptions\JsonHttpException(
+                            2231, "Please provide date a valid date in YYYY-MM-DD format"
+                        );
+                    }
+                }
+                $data = array_values($this->getLoggedActivityByTimeBracket($team, $dateTime));
+                echo json_encode(["status" => "ok", "data" => $data], JSON_NUMERIC_CHECK);
                 break;
             case self::getUpcomingVisitsData:
                 echo $this->getUpcomingVisitsData();
@@ -106,8 +134,30 @@ class CTHome extends CTCNC
                     throw new \CNCLTD\Exceptions\JsonHttpException(123, $exception->getMessage());
                 }
                 break;
+            case self::GET_SALES_FIGURES:
+                echo html_entity_decode(json_encode($this->getSalesFigures()));
+                break;
+            case self::GET_TEAM_PERFORMANCE:
+                echo json_encode($this->getTeamPerformance());
+                break;
+            case self::GET_ALL_USER_PERFORMANCE:
+                echo json_encode($this->getAllUsersPerformance());
+                break;
+            case 'charts' :
+                $this->displayChartsWithoutMenu();
+                break;
+            case self::GET_USER_PERFORMANCE:
+                echo json_encode($this->getUserPerformance());
+                break;
+            case self::DEFAULT_LAYOUT:
+                if ($method == 'GET') echo json_encode($this->getDefaultLayout());
+                if ($method == 'POST') echo json_encode($this->setDefaultLayout());
+                break;
+            case self::GET_FEEDBACK_TEAMS:
+                echo json_encode($this->getFeedbackTeams(), JSON_NUMERIC_CHECK);
+                break;
             default:
-                $this->display();
+                $this->displayReact();
                 break;
         }
     }
@@ -269,15 +319,52 @@ class CTHome extends CTCNC
     private function getUpcomingVisitsData()
     {
         global $db;
-        $db->query("select upcomingVisitsData from homeData limit 1");
-        $db->next_record(MYSQLI_ASSOC);
-        return $db->Record['upcomingVisitsData'];
+        $result = $db->query(
+            "SELECT 
+  caa_problemno AS serviceRequestID,
+  caa_callactivityno AS callActivityID,
+  caa_date AS date,
+  caa_starttime AS time,
+  cus_name AS customerName,
+  CONCAT(
+    consultant.firstName,
+    ' ',
+    consultant.lastName
+  ) AS engineerName,
+  emailSubjectSummary 
+FROM
+  callactivity 
+  LEFT JOIN problem 
+    ON problem.`pro_problemno` = caa_problemno 
+  LEFT JOIN customer 
+    ON customer.`cus_custno` = problem.pro_custno 
+  LEFT JOIN consultant 
+    ON consultant.`cns_consno` = callactivity.`caa_consno` 
+WHERE callactivity.`caa_callacttypeno` IN (4, 7) 
+  AND caa_date >= date(NOW()) 
+  AND caa_date <= date((NOW() + INTERVAL 1 WEEK)) 
+  AND (
+    caa_endtime IS NULL 
+    OR caa_endtime = \"\"
+  ) 
+ORDER BY caa_date ASC,
+  caa_starttime ASC "
+        );
+        $data   = [];
+        while ($row = $result->fetch_assoc()) {
+            $row['emailSubjectSummary'] = substr(
+                Utils::stripEverything($row['emailSubjectSummary']),
+                0
+            );
+            $data[]                     = $row;
+        }
+        return html_entity_decode(json_encode($data));
     }
 
     /**
      * @throws Exception
      */
-    function display()
+    function displayReact()
     {
         /**
          * if user is only in the technical group then display the current activity dash-board
@@ -297,34 +384,17 @@ class CTHome extends CTCNC
         /*
         Otherwise display other sections based upon group membership
         */
-        $this->displayUpcomingVisits();
-        if ($this->hasPermissions(ACCOUNTS_PERMISSION)) {
-            $this->displaySalesFigures();
-        }
         $this->setTemplateFiles(
-            'dashboardTest',
-            'DashboardStats'
-        );
-        $firstTimeFixFigures = $this->displayFirstTimeFixFigures();
-        $fixedReopen         = $this->displayFixedAndReopen();
-        $this->template->set_var(
-            [
-                "thing1" => $fixedReopen,
-                "thing2" => $firstTimeFixFigures
-            ]
+            'HOME',
+            'Home.rct'
         );
         $this->template->parse(
             'CONTENTS',
-            'dashboardTest',
+            'HOME',
             true
         );
-        $this->displayTeamPerformanceReport();
-        if ($this->buUser->isSdManager($this->userID)) {
-            $this->displayAllUsersPerformanceReport();
-        } else {
-            $this->displayUserPerformanceReport();
-        }
-        $this->displayCharts();
+        $this->loadReactScript('HomeComponent.js');
+        $this->loadReactCSS('HomeComponent.css');
         $this->parsePage();
     } // end display projects
 
@@ -978,7 +1048,28 @@ class CTHome extends CTCNC
             'HomeCharts',
             true
         );
+    }
 
+    private function displayChartsWithoutMenu()
+    {
+        $this->setHTMLFmt(CT_HTML_FMT_POPUP);
+        $this->setTemplateFiles(
+            'HomeCharts',
+            'HomeCharts'
+        );
+        $this->template->set_var(
+            [
+                "userLevel" => $teamLevel = $this->buUser->getLevelByUserID($this->userID),
+                "userID"    => $this->buUser->dbeUser->getValue(DBEUser::userID),
+                "isManager" => $this->buUser->isSdManager($this->userID) ? 'true' : 'false',
+            ]
+        );
+        $this->template->parse(
+            'CONTENTS',
+            'HomeCharts',
+            true
+        );
+        $this->parsePage();
     }
 
     /**
@@ -1164,5 +1255,626 @@ class CTHome extends CTCNC
             throw new \CNCLTD\Exceptions\JsonHttpException(531, "End date must have YYYY-MM-DD format");
         }
         return $this->buUser->getUserPerformanceByUserBetweenDates($data['userId'], $startDate, $endDate);
+    }
+
+    //Json data
+    function getSalesFigures()
+    {
+        if (!$this->hasPermissions(ACCOUNTS_PERMISSION)) {
+            http_response_code(400);
+            return ["status" => false];
+        }
+        $result              = [];
+        $dbeSalesOrderTotals = new DBESalesOrderTotals($this);
+        $dbeSalesOrderTotals->getRow();
+        $profit             = $dbeSalesOrderTotals->getValue(
+                DBESalesOrderTotals::saleValue
+            ) - $dbeSalesOrderTotals->getValue(
+                DBESalesOrderTotals::costValue
+            );
+        $result['soSale']   = $dbeSalesOrderTotals->getValue(DBESalesOrderTotals::saleValue);
+        $result['soCost']   = $dbeSalesOrderTotals->getValue(DBESalesOrderTotals::costValue);
+        $result['soProfit'] = $profit;
+        $profitTotal        = $profit;
+        $saleTotal          = $dbeSalesOrderTotals->getValue(DBESalesOrderTotals::saleValue);
+        $costTotal          = $dbeSalesOrderTotals->getValue(DBESalesOrderTotals::costValue);
+        $dbeInvoiceTotals   = new DBEInvoiceTotals($this);
+        $dbeInvoiceTotals->getCurrentMonthTotals();
+        $profit                     = $dbeInvoiceTotals->getValue(
+                DBEInvoiceTotals::saleValue
+            ) - $dbeInvoiceTotals->getValue(
+                DBEInvoiceTotals::costValue
+            );
+        $result['invPrintedSale']   = $dbeInvoiceTotals->getValue(DBEInvoiceTotals::saleValue);
+        $result['invPrintedCost']   = $dbeInvoiceTotals->getValue(DBEInvoiceTotals::costValue);
+        $result['invPrintedProfit'] = $profit;
+        $profitTotal                += $profit;
+        $saleTotal                  += $dbeInvoiceTotals->getValue(DBEInvoiceTotals::saleValue);
+        $costTotal                  += $dbeInvoiceTotals->getValue(DBEInvoiceTotals::costValue);
+        $dbeInvoiceTotals->getUnprintedTotals();
+        $profit                       = $dbeInvoiceTotals->getValue(
+                DBEInvoiceTotals::saleValue
+            ) - $dbeInvoiceTotals->getValue(
+                DBEInvoiceTotals::costValue
+            );
+        $result['invUnprintedSale']   = $dbeInvoiceTotals->getValue(DBEInvoiceTotals::saleValue);
+        $result['invUnprintedCost']   = $dbeInvoiceTotals->getValue(DBEInvoiceTotals::costValue);
+        $result['invUnprintedProfit'] = $profit;
+        $profitTotal                  += $profit;
+        $saleTotal                    += $dbeInvoiceTotals->getValue(DBEInvoiceTotals::saleValue);
+        $costTotal                    += $dbeInvoiceTotals->getValue(DBEInvoiceTotals::costValue);
+        $result['saleTotal']          = $saleTotal;
+        $result['costTotal']          = $costTotal;
+        $result['profitTotal']        = $profitTotal;
+        return ["status" => true, 'data' => $result];
+    }
+
+    function getTeamPerformance()
+    {
+        $data                                         = [];
+        $buTeamPerformance                            = new BUTeamPerformance($this);
+        $data['esTeamTargetSlaPercentage']            = $this->dsHeader->getValue(
+            DBEHeader::esTeamTargetSlaPercentage
+        );
+        $data['esTeamTargetFixHours']                 = $this->dsHeader->getValue(DBEHeader::esTeamTargetFixHours);
+        $data['smallProjectsTeamTargetSlaPercentage'] = $this->dsHeader->getValue(
+            DBEHeader::smallProjectsTeamTargetSlaPercentage
+        );
+        $data['smallProjectsTeamTargetFixHours']      = $this->dsHeader->getValue(
+            DBEHeader::smallProjectsTeamTargetFixHours
+        );
+        $data['hdTeamTargetSlaPercentage']            = $this->dsHeader->getValue(
+            DBEHeader::hdTeamTargetSlaPercentage
+        );
+        $data['hdTeamTargetFixHours']                 = $this->dsHeader->getValue(DBEHeader::hdTeamTargetFixHours);
+        $data['projectTeamTargetSlaPercentage']       = $this->dsHeader->getValue(
+            DBEHeader::projectTeamTargetSlaPercentage
+        );
+        $data['projectTeamTargetFixHours']            = $this->dsHeader->getValue(
+            DBEHeader::projectTeamTargetFixHours
+        );
+        /* Extract data and build report */
+        $results = $buTeamPerformance->getQuarterlyRecordsByYear(date('Y'));
+        foreach ($results as $result) {
+            $esSLAPerformanceClass                = 'performance-warn';
+            $esFixHoursClass                      = 'performance-warn';
+            $hdSLAPerformanceClass                = 'performance-warn';
+            $hdFixHoursClass                      = 'performance-warn';
+            $smallProjectsTeamSLAPerformanceClass = 'performance-warn';
+            $smallProjectsTeamFixHoursClass       = 'performance-warn';
+            $projectTeamSLAPerformanceClass       = 'performance-warn';
+            $projectTeamFixHoursClass             = 'performance-warn';
+            if (round($result['esTeamActualSlaPercentage'], 1) >= round($result['esTeamTargetSlaPercentage'], 1)) {
+                $esSLAPerformanceClass = 'performance-green';
+            }
+            if (round($result['hdTeamActualSlaPercentage'], 1) >= round($result['hdTeamTargetSlaPercentage'], 1)) {
+                $hdSLAPerformanceClass = 'performance-green';
+            }
+            if (round(
+                    $result['smallProjectsTeamActualSlaPercentage']
+                ) >= round($result['smallProjectsTeamTargetSlaPercentage'])) {
+                $smallProjectsTeamSLAPerformanceClass = 'performance-green';
+            }
+            if (round(
+                    $result['projectTeamActualSlaPercentage']
+                ) >= $result['projectTeamTargetSlaPercentage']) {
+                $projectTeamSLAPerformanceClass = 'performance-green';
+            }
+            if ($result['esTeamActualFixHours'] <= $result['esTeamTargetFixHours']) {
+                $esFixHoursClass = 'performance-green';
+            }
+            if ($result['hdTeamActualFixHours'] <= $result['hdTeamTargetFixHours']) {
+                $hdFixHoursClass = 'performance-green';
+            }
+            if ($result['smallProjectsTeamActualFixHours'] <= $result['smallProjectsTeamTargetFixHours']) {
+                $smallProjectsTeamFixHoursClass = 'performance-green';
+            }
+            if ($result['projectTeamActualFixHours'] <= $result['projectTeamTargetFixHours']) {
+                $projectTeamFixHoursClass = 'performance-green';
+            }
+            $data = (object)array_merge(
+                $data,
+                array(
+                    'esTeamActualSlaPercentage' . $result['quarter']                      => number_format(
+                        $result['esTeamActualSlaPercentage'],
+                        1
+                    ),
+                    'esTeamActualFixHours' . $result['quarter']                           => number_format(
+                        $result['esTeamActualFixHours'],
+                        2
+                    ),
+                    'esTeamActualFixQty' . $result['quarter']                             => $result['esTeamActualFixQty'],
+                    'smallProjectsTeamActualSlaPercentage' . $result['quarter']           => number_format(
+                        $result['smallProjectsTeamActualSlaPercentage'],
+                        0
+                    ),
+                    'smallProjectsTeamActualFixHours' . $result['quarter']                => number_format(
+                        $result['smallProjectsTeamActualFixHours'],
+                        2
+                    ),
+                    'smallProjectsTeamActualFixQty' . $result['quarter']                  => $result['smallProjectsTeamActualFixQty'],
+                    'projectTeamActualSlaPercentage' . $result['quarter']                 => number_format(
+                        $result['projectTeamActualSlaPercentage'],
+                        1
+                    ),
+                    'projectTeamActualFixHours' . $result['quarter']                      => number_format(
+                        $result['projectTeamActualFixHours'],
+                        2
+                    ),
+                    'projectTeamActualFixQty' . $result['quarter']                        => $result['projectTeamActualFixQty'],
+                    'hdTeamActualSlaPercentage' . $result['quarter']                      => number_format(
+                        $result['hdTeamActualSlaPercentage'],
+                        1
+                    ),
+                    'hdTeamActualFixHours' . $result['quarter']                           => number_format(
+                        $result['hdTeamActualFixHours'],
+                        2
+                    ),
+                    'hdTeamActualFixQty' . $result['quarter']                             => $result['hdTeamActualFixQty'],
+                    'hdTeamActualSlaPercentage' . $result['quarter'] . 'Class'            => $hdSLAPerformanceClass,
+                    'hdTeamActualFixHours' . $result['quarter'] . 'Class'                 => $hdFixHoursClass,
+                    'esTeamActualSlaPercentage' . $result['quarter'] . 'Class'            => $esSLAPerformanceClass,
+                    'esTeamActualFixHours' . $result['quarter'] . 'Class'                 => $esFixHoursClass,
+                    'smallProjectsTeamActualSlaPercentage' . $result['quarter'] . 'Class' => $smallProjectsTeamSLAPerformanceClass,
+                    'smallProjectsTeamActualFixHours' . $result['quarter'] . 'Class'      => $smallProjectsTeamFixHoursClass,
+                    'projectTeamActualSlaPercentage' . $result['quarter'] . 'Class'       => $projectTeamSLAPerformanceClass,
+                    'projectTeamActualFixHours' . $result['quarter'] . 'Class'            => $projectTeamFixHoursClass,
+                )
+            );
+
+        }
+        return $data;
+    }
+
+    function getAllUsersPerformance()
+    {
+        $data                                 = [];
+        $hdTeamTargetLogPercentage            = $this->dsHeader->getValue(DBEHeader::hdTeamTargetLogPercentage);
+        $esTeamTargetLogPercentage            = $this->dsHeader->getValue(DBEHeader::esTeamTargetLogPercentage);
+        $smallProjectsTeamTargetLogPercentage = $this->dsHeader->getValue(
+            DBEHeader::smallProjectsTeamTargetLogPercentage
+        );
+        $projectTeamTargetLogPercentage       = $this->dsHeader->getValue(DBEHeader::projectTeamTargetLogPercentage);
+        $hdUsers                              = $this->buUser->getUsersByTeamLevel(1);
+        $esUsers                              = $this->buUser->getUsersByTeamLevel(2);
+        $imUsers                              = $this->buUser->getUsersByTeamLevel(3);
+        $projectUsers                         = $this->buUser->getUsersByTeamLevel(5);
+        /*
+        Extract data and build report
+        2 sections: HD users and ES users
+        */
+        $this->template->set_block(
+            'DashboardAllUsersPerformanceReport',
+            'hdUserBlock',
+            'hdUsers'
+        );
+        foreach ($hdUsers as $user) {
+
+            $weekly                = $this->buUser->getUserPerformanceByUser(
+                $user['cns_consno'],
+                7
+            );
+            $monthly               = $this->buUser->getUserPerformanceByUser(
+                $user['cns_consno'],
+                30
+            );
+            $weeklyPercentageClass = null;
+            if ($weekly['performancePercentage'] < $hdTeamTargetLogPercentage) {
+                $weeklyPercentageClass = 'performance-warn';
+            }
+            if ($weekly['performancePercentage'] >= $hdTeamTargetLogPercentage) {
+                $weeklyPercentageClass = 'performance-green';
+            }
+            $monthlyPercentageClass = null;
+            if ($monthly['performancePercentage'] < $hdTeamTargetLogPercentage) {
+                $monthlyPercentageClass = 'performance-warn';
+            }
+            if ($monthly['performancePercentage'] >= $hdTeamTargetLogPercentage) {
+                $monthlyPercentageClass = 'performance-green';
+            }
+            $data [] = array(
+                'team'                   => "hd",
+                'initials'               => $user['initials'],
+                'targetPercentage'       => $hdTeamTargetLogPercentage,
+                'weeklyPercentage'       => number_format(
+                    $weekly['performancePercentage'],
+                    2
+                ),
+                'weeklyHours'            => number_format(
+                    $weekly['loggedHours'],
+                    2
+                ),
+                'monthlyPercentage'      => number_format(
+                    $monthly['performancePercentage'],
+                    2
+                ),
+                'monthlyHours'           => number_format(
+                    $monthly['loggedHours'],
+                    2
+                ),
+                'weeklyPercentageClass'  => $weeklyPercentageClass,
+                'monthlyPercentageClass' => $monthlyPercentageClass
+            );
+
+        }
+        foreach ($esUsers as $user) {
+
+            $weekly                = $this->buUser->getUserPerformanceByUser(
+                $user['cns_consno'],
+                7
+            );
+            $monthly               = $this->buUser->getUserPerformanceByUser(
+                $user['cns_consno'],
+                30
+            );
+            $weeklyPercentageClass = null;
+            if ($weekly['performancePercentage'] < $esTeamTargetLogPercentage) {
+                $weeklyPercentageClass = 'performance-warn';
+            }
+            if ($weekly['performancePercentage'] >= $esTeamTargetLogPercentage) {
+                $weeklyPercentageClass = 'performance-green';
+            }
+            $monthlyPercentageClass = null;
+            if ($monthly['performancePercentage'] < $esTeamTargetLogPercentage) {
+                $monthlyPercentageClass = 'performance-warn';
+            }
+            if ($monthly['performancePercentage'] >= $esTeamTargetLogPercentage) {
+                $monthlyPercentageClass = 'performance-green';
+            }
+            $data [] = array(
+                'team'                   => 'es',
+                'initials'               => $user['initials'],
+                'targetPercentage'       => $esTeamTargetLogPercentage,
+                'weeklyPercentage'       => number_format(
+                    $weekly['performancePercentage'],
+                    2
+                ),
+                'weeklyHours'            => number_format(
+                    $weekly['loggedHours'],
+                    2
+                ),
+                'monthlyPercentage'      => number_format(
+                    $monthly['performancePercentage'],
+                    2
+                ),
+                'monthlyHours'           => number_format(
+                    $monthly['loggedHours'],
+                    2
+                ),
+                'weeklyPercentageClass'  => $weeklyPercentageClass,
+                'monthlyPercentageClass' => $monthlyPercentageClass
+            );
+        }
+        foreach ($imUsers as $user) {
+
+            $weekly                = $this->buUser->getUserPerformanceByUser(
+                $user['cns_consno'],
+                7
+            );
+            $monthly               = $this->buUser->getUserPerformanceByUser(
+                $user['cns_consno'],
+                30
+            );
+            $weeklyPercentageClass = null;
+            if ($weekly['performancePercentage'] < $smallProjectsTeamTargetLogPercentage) {
+                $weeklyPercentageClass = 'performance-warn';
+            }
+            if ($weekly['performancePercentage'] >= $smallProjectsTeamTargetLogPercentage) {
+                $weeklyPercentageClass = 'performance-green';
+            }
+            $monthlyPercentageClass = null;
+            if ($monthly['performancePercentage'] < $smallProjectsTeamTargetLogPercentage) {
+                $monthlyPercentageClass = 'performance-warn';
+            }
+            if ($monthly['performancePercentage'] >= $smallProjectsTeamTargetLogPercentage) {
+                $monthlyPercentageClass = 'performance-green';
+            }
+            $data [] = array(
+                'team'                   => 'sp',
+                'initials'               => $user['initials'],
+                'targetPercentage'       => $smallProjectsTeamTargetLogPercentage,
+                'weeklyPercentage'       => number_format(
+                    $weekly['performancePercentage'],
+                    2
+                ),
+                'weeklyHours'            => number_format(
+                    $weekly['loggedHours'],
+                    2
+                ),
+                'monthlyPercentage'      => number_format(
+                    $monthly['performancePercentage'],
+                    2
+                ),
+                'monthlyHours'           => number_format(
+                    $monthly['loggedHours'],
+                    2
+                ),
+                'weeklyPercentageClass'  => $weeklyPercentageClass,
+                'monthlyPercentageClass' => $monthlyPercentageClass
+            );
+        }
+        /*
+        Projects team users
+        */
+        foreach ($projectUsers as $user) {
+
+            $weekly                = $this->buUser->getUserPerformanceByUser(
+                $user['cns_consno'],
+                7
+            );
+            $monthly               = $this->buUser->getUserPerformanceByUser(
+                $user['cns_consno'],
+                30
+            );
+            $weeklyPercentageClass = null;
+            if ($weekly['performancePercentage'] < $projectTeamTargetLogPercentage) {
+                $weeklyPercentageClass = 'performance-warn';
+            }
+            if ($weekly['performancePercentage'] >= $projectTeamTargetLogPercentage) {
+                $weeklyPercentageClass = 'performance-green';
+            }
+            $monthlyPercentageClass = null;
+            if ($monthly['performancePercentage'] < $projectTeamTargetLogPercentage) {
+                $monthlyPercentageClass = 'performance-warn';
+            }
+            if ($monthly['performancePercentage'] >= $projectTeamTargetLogPercentage) {
+                $monthlyPercentageClass = 'performance-green';
+            }
+            $data [] = array(
+                'team'                   => 'p',
+                'initials'               => $user['initials'],
+                'targetPercentage'       => $projectTeamTargetLogPercentage,
+                'weeklyPercentage'       => number_format(
+                    $weekly['performancePercentage'],
+                    2
+                ),
+                'weeklyHours'            => number_format(
+                    $weekly['loggedHours'],
+                    2
+                ),
+                'monthlyPercentage'      => number_format(
+                    $monthly['performancePercentage'],
+                    2
+                ),
+                'monthlyHours'           => number_format(
+                    $monthly['loggedHours'],
+                    2
+                ),
+                'weeklyPercentageClass'  => $weeklyPercentageClass,
+                'monthlyPercentageClass' => $monthlyPercentageClass
+            );
+
+        }
+        return $data;
+    }
+
+    function getUserPerformance()
+    {
+        $data                = [];
+        $teamLevel           = $this->buUser->getLevelByUserID($this->userID);
+        $targetLogPercentage = 0;
+        switch ($teamLevel) {
+            case 1:
+                $targetLogPercentage = $this->dsHeader->getValue(DBEHeader::hdTeamTargetLogPercentage);
+                break;
+            case 2:
+                $targetLogPercentage = $this->dsHeader->getValue(DBEHeader::esTeamTargetLogPercentage);
+                break;
+            case 3:
+                $targetLogPercentage = $this->dsHeader->getValue(DBEHeader::smallProjectsTeamTargetLogPercentage);
+                break;
+            case 5:
+                $targetLogPercentage = $this->dsHeader->getValue(DBEHeader::projectTeamTargetLogPercentage);
+        }
+        /* Extract data and build report */
+        $weekly  = $this->buUser->getUserPerformanceByUser(
+            $this->userID,
+            7
+        );
+        $monthly = $this->buUser->getUserPerformanceByUser(
+            $this->userID,
+            31
+        );
+        if ($weekly['performancePercentage'] < $targetLogPercentage) {
+            $data['weeklyPercentageClass'] = 'performance-warn';
+        }
+        if ($monthly['performancePercentage'] < $targetLogPercentage) {
+            $data['monthlyPercentageClass'] = 'performance-warn';
+        }
+        $data['targetPercentage']  = $targetLogPercentage;
+        $data['weeklyPercentage']  = number_format($weekly['performancePercentage'], 2);
+        $data['weeklyHours']       = number_format($weekly['loggedHours'], 2);
+        $data['monthlyPercentage'] = number_format($monthly['performancePercentage'], 2);
+        $data['monthlyHours']      = number_format($monthly['loggedHours'], 2);
+        return $data;
+    }
+
+    function getDefaultLayout()
+    {
+        $result = DBConnect::fetchOne("select settings from cons_settings where consno=67 and type='home'");
+        return ['status' => true, 'data' => json_decode($result['settings'])];
+    }
+
+    function setDefaultLayout()
+    {
+        $body    = json_decode(file_get_contents('php://input'));
+        $default = DBConnect::fetchOne("select * from cons_settings where consno=67 and type='home'");
+        if (isset($default['settings'])) //update row
+        {
+            return DBConnect::execute(
+                "update cons_settings set settings=:settings where consno=67 and type='home'",
+                ["settings" => $body->settings]
+            );
+        } else //insert new row
+        {
+            return DBConnect::execute(
+                "insert into cons_settings(consno,type,settings) values(67,'home',:settings)",
+                ['settings' => $body->settings]
+            );
+        }
+    }
+
+    function getFeedbackTeams()
+    {
+        $query = "SELECT       
+                    COUNT(IF(f.value=1, 1, NULL)) happy,
+                    COUNT(IF(f.value=2, 1, NULL)) average,
+                    COUNT(IF(f.value=3, 1, NULL)) unhappy,
+                    cons.teamID,
+                    'Q1' quarter
+                FROM `customerfeedback` f 
+                    JOIN problem ON problem.`pro_problemno`=f.serviceRequestId
+                    JOIN callactivity cal ON cal.caa_problemno=f.serviceRequestId
+                    JOIN `consultant`  cons ON cons.`cns_consno`=cal.`caa_consno`
+                WHERE cal.caa_callacttypeno=57
+                    AND f.`createdAt` >= DATE_FORMAT(NOW(), '%Y-01-01') 
+                    AND f.`createdAt` < DATE_FORMAT(NOW(), '%Y-04-01')
+                    AND  cons.teamID<=5
+                    AND problem.pro_custno <> 282
+                GROUP BY   cons.teamID   
+            UNION         
+                SELECT       
+                    COUNT(IF(f.value=1, 1, NULL)) happy,
+                    COUNT(IF(f.value=2, 1, NULL)) average,
+                    COUNT(IF(f.value=3, 1, NULL)) unhappy,
+                    cons.teamID,
+                    'Q2' quarter
+                FROM `customerfeedback` f 
+                    JOIN problem ON problem.`pro_problemno`=f.serviceRequestId
+                    JOIN callactivity cal ON cal.caa_problemno=f.serviceRequestId
+                    JOIN `consultant`  cons ON cons.`cns_consno`=cal.`caa_consno`
+                WHERE cal.caa_callacttypeno=57
+                    AND f.`createdAt` >= DATE_FORMAT(NOW(), '%Y-04-01') 
+                    AND f.`createdAt` < DATE_FORMAT(NOW(), '%Y-07-01')
+                    AND  cons.teamID<=5
+                    AND problem.pro_custno <> 282
+                GROUP BY   cons.teamID      
+            UNION         
+                SELECT       
+                    COUNT(IF(f.value=1, 1, NULL)) happy,
+                    COUNT(IF(f.value=2, 1, NULL)) average,
+                    COUNT(IF(f.value=3, 1, NULL)) unhappy,
+                    cons.teamID,
+                    'Q3' quarter
+                FROM `customerfeedback` f 
+                    JOIN problem ON problem.`pro_problemno`=f.serviceRequestId
+                    JOIN callactivity cal ON cal.caa_problemno=f.serviceRequestId
+                    JOIN `consultant`  cons ON cons.`cns_consno`=cal.`caa_consno`
+                WHERE cal.caa_callacttypeno=57
+                    AND f.`createdAt` >= DATE_FORMAT(NOW(), '%Y-07-01') 
+                    AND f.`createdAt` < DATE_FORMAT(NOW(), '%Y-10-01')
+                    AND  cons.teamID<=5
+                    AND problem.pro_custno <> 282
+                GROUP BY   cons.teamID   
+            UNION         
+                SELECT       
+                    COUNT(IF(f.value=1, 1, NULL)) happy,
+                    COUNT(IF(f.value=2, 1, NULL)) average,
+                    COUNT(IF(f.value=3, 1, NULL)) unhappy,
+                    cons.teamID,
+                    'Q4' quarter
+                FROM `customerfeedback` f 
+                    JOIN problem ON problem.`pro_problemno`=f.serviceRequestId
+                    JOIN callactivity cal ON cal.caa_problemno=f.serviceRequestId
+                    JOIN `consultant`  cons ON cons.`cns_consno`=cal.`caa_consno`
+                WHERE cal.caa_callacttypeno=57
+                    AND f.`createdAt` >= DATE_FORMAT(NOW(), '%Y-10-01') 
+                    AND f.`createdAt` <= DATE_FORMAT(NOW(), '%Y-12-31')
+                    AND  cons.teamID<=5
+                    AND problem.pro_custno <> 282
+                GROUP BY   cons.teamID 
+          ";
+        return DBConnect::fetchAll($query, []);
+    }
+
+    private function getLoggedActivityByTimeBracket(int $team, ?DateTime $dateTime = null)
+    {
+        if (!$dateTime) {
+            $dateTime = new DateTime();
+        }
+        $isStandardUser = false;
+        if (!$this->buUser->isSdManager($this->userID)) {
+            if ($this->buUser->getLevelByUserID($this->userID) <= 5) {
+                $team           = $this->buUser->getLevelByUserID($this->userID);
+                $isStandardUser = true;
+            } else {
+                return [];
+            }
+        }
+        $dbeUser = $this->getDbeUser();
+        $dbeUser->setValue(
+            DBEUser::userID,
+            $this->userID
+        );
+        global $db;
+        $queryString = "SELECT
+  caa_starttime AS startTime,
+  caa_endtime AS endTime,
+  `caa_consno` AS engineerId,
+  consultant.cns_name AS engineerName
+FROM
+  callactivity
+  LEFT JOIN consultant
+    ON consultant.cns_consno = callactivity.caa_consno
+  LEFT JOIN team
+    ON consultant.`teamID` = team.`teamID`
+WHERE callactivity.`caa_date` = ?
+  AND callactivity.`caa_endtime`
+  AND callactivity.`caa_consno` <> 67
+  AND team.`level` = ?
+  and callactivity.caa_callacttypeno not in (6,22)
+  and consultant.excludeFromStatsFlag <> 'Y'
+ORDER BY engineerName,
+  startTime";
+        $statement   = $db->preparedQuery(
+            $queryString,
+            [
+                [
+                    "type"  => "s",
+                    "value" => $dateTime->format(DATE_MYSQL_DATE)
+                ],
+                [
+                    "type"  => "i",
+                    "value" => $team
+                ],
+            ]
+        );
+        $activities  = $statement->fetch_all(MYSQLI_ASSOC);
+        $data        = [];
+        foreach ($activities as $activity) {
+            $engineerName = $activity['engineerName'];
+            if ($isStandardUser && $activity['engineerId'] !== $dbeUser->getValue(DBEUser::userID)) {
+                continue;
+            }
+            if (!key_exists($engineerName, $data)) {
+                $data[$engineerName] = [
+                    "engineerId"   => $activity['engineerId'],
+                    "engineerName" => $activity["engineerName"],
+                    "dataPoints"   => array_fill(0, 24, 0)
+                ];
+            }
+            foreach ($data[$engineerName]["dataPoints"] as $hour => $amount) {
+                $thisHour  = DateTime::createFromFormat('H', $hour);
+                $startTime = DateTime::createFromFormat('H:i', $activity["startTime"]);
+                $endTime   = DateTime::createFromFormat('H:i', $activity['endTime']);
+                $nextHour  = (clone($thisHour))->add(new DateInterval('PT1H'));
+                if ($startTime > $nextHour || $endTime < $thisHour) {
+                    continue;
+                }
+                if ($startTime < $thisHour) {
+                    $startTime = $thisHour;
+                }
+                if ($endTime > $nextHour) {
+                    $endTime = $nextHour;
+                }
+                $diff                                     = $startTime->diff($endTime);
+                $differenceInMinutes                      = ($diff->days * 24 * 60) + ($diff->h * 60) + $diff->i;
+                $data[$engineerName]["dataPoints"][$hour] += $differenceInMinutes;
+                if ($data[$engineerName]["dataPoints"][$hour] > 60) {
+                    $data[$engineerName]["dataPoints"][$hour] = 60;
+                }
+            }
+        }
+        return $data;
     }
 }

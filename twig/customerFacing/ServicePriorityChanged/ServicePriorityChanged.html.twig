@@ -17,7 +17,11 @@
     </p>
     {% if (data.serviceRequestStatus == 'Logged') %}
         <p>
-            We'll aim to respond to this request within {{ data.SLA }} working hours.
+            {% if data.newPriority == 5 %}
+                This work is project related and we will provide an update or be in touch to discuss the details with you soon.
+            {% else %}
+                We'll aim to respond to this request within {{ data.SLA }} working hours.
+            {% endif %}
         </p>
     {% endif %}
     <table style="width: 100%">

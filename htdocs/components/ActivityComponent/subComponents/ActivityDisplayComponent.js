@@ -1,20 +1,25 @@
 import APIActivity from "../../services/APIActivity.js";
 import {Chars, maxLength, padEnd, params} from "../../utils/utils.js";
-import Toggle from "../../shared/Toggle.js";
-import Table from "../../shared/table/table"
-
-import CNCCKEditor from "../../shared/CNCCKEditor.js";
 import ToolTip from "../../shared/ToolTip.js";
-import ActivityFollowOn from "../../Modals/ActivityFollowOn.js";
 import MainComponent from "../../shared/MainComponent.js";
 import * as React from 'react';
-import Modal from "../../shared/Modal/modal";
-import moment from "moment";
-import CustomerDocumentUploader from "./CustomerDocumentUploader";
+import {TimeBudgetElement} from "./TimeBudgetElement";
+import ActivityFollowOn from "../../Modals/ActivityFollowOn";
+import CNCCKEditor from "../../shared/CNCCKEditor";
+import Toggle from "../../shared/Toggle";
 import {InternalDocumentsComponent} from "./InternalDocumentsComponent";
+import CustomerDocumentUploader from "./CustomerDocumentUploader";
+import Modal from "../../shared/Modal/modal";
+import Table from "../../shared/table/table";
+import {LinkServiceRequestOrder} from "./LinkserviceRequestOrder.js";
+import moment from "moment";
+import {InternalNotesListComponent} from "../../shared/InternalNotesListComponent/InternalNotesListComponent";
+import {InternalNotes} from "./InternalNotesComponent";
+import {TaskListComponent} from "./TaskListComponent";
 
 // noinspection EqualityComparisonWithCoercionJS
 const emptyAssetReasonCharactersToShow = 30;
+
 
 class ActivityDisplayComponent extends MainComponent {
     api = new APIActivity();
@@ -38,6 +43,7 @@ class ActivityDisplayComponent extends MainComponent {
             templateType: '',
             templateTitle: '',
             selectedChangeRequestTemplateId: null,
+            showSalesOrder: false,
             filters: {
                 showTravel: false,
                 showOperationalTasks: false,
@@ -56,8 +62,6 @@ class ActivityDisplayComponent extends MainComponent {
         } else {
             setTimeout(() => this.loadCallActivity(params.get('callActivityID')), 10);
         }
-
-
     }
 
     loadCallActivity = async (callActivityID) => {
@@ -160,158 +164,236 @@ class ActivityDisplayComponent extends MainComponent {
         );
     }
 
-    getActions = () => {
-        const {el} = this;
-        const {data, currentUser} = this.state;
+    handleExtraTime = async (data) => {
 
-        return el('div', {
-                className: "activities-container",
-                style: {display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center"}
-            },
-            data?.problemStatus !== "C" ? el(ToolTip, {
-                title: "Follow On",
-                content: el('i', {className: "fal fa-play fa-2x m-5 pointer icon", onClick: this.handleFollowOn})
-            }) : null,
-            el(ToolTip, {
-                title: "History",
-                content: el('a', {
-                    className: "fal fa-history fa-2x m-5 pointer icon",
-                    href: `Activity.php?action=problemHistoryPopup&problemID=${data?.problemID}&htmlFmt=popup`,
-                    target: "_blank"
-                })
-            }),
-            el(ToolTip, {
-                title: "Passwords",
-                content: el('a', {
-                    className: "fal fa-unlock-alt fa-2x m-5 pointer icon",
-                    href: `Password.php?action=list&customerID=${data?.customerId}`,
-                    target: "_blank"
-                })
-            }),
-            this.getSpacer(),
-            data?.canEdit == 'ALL_GOOD' ? el(ToolTip, {
-                title: "Edit",
-                content: el('a', {
-                    className: "fal fa-edit fa-2x m-5 pointer icon",
-                    href: `SRActivity.php?action=editActivity&callActivityID=${data?.callActivityID}`
-                })
-            }) : null,
-            data?.canEdit !== 'ALL_GOOD' ? el(ToolTip, {
-                title: data?.canEdit,
-                content: el('i', {className: "fal fa-edit fa-2x m-5 pointer icon-disable"})
-            }) : null,
-            (data?.canDelete && data?.problemStatus !== "C") ? el(ToolTip, {
-                title: data?.activities.length == 1 ? "Delete Request" : "Delete Activity",
-                content: el('i', {
-                    className: "fal fa-trash-alt fa-2x m-5 pointer icon",
-                    onClick: () => this.handleDelete(data)
-                })
-            }) : null,
-            !data?.canDelete ? el(ToolTip, {
-                title: "Delete Activity",
-                content: el('i', {className: "fal fa-trash-alt fa-2x m-5 pointer  icon-disable",})
-            }) : null,
-            this.getSpacer(),
-            data?.linkedSalesOrderID ? el(ToolTip, {
-                title: "Sales Order",
-                content: el('a', {
-                    className: "fal fa-tag fa-2x m-5 pointer icon",
-                    href: `SalesOrder.php?action=displaySalesOrder&ordheadID=${data?.linkedSalesOrderID}`,
-                    target: "_blank"
-                })
-            }) : null,
-            !data?.linkedSalesOrderID ? el(ToolTip, {
-                title: "Sales Order",
-                content: el('a', {
-                    className: "fal fa-tag fa-2x m-5 pointer icon",
-                    onClick: () => this.handleSalesOrder(data?.callActivityID, data?.problemID)
-                })
-            }) : null,
-            data?.linkedSalesOrderID ? el(ToolTip, {
-                title: "Unlink Sales order",
-                content: el('a', {
-                    className: "fal fa-unlink fa-2x m-5 pointer icon",
-                    onClick: () => this.handleUnlink(data?.linkedSalesOrderID, data?.problemID, data?.callActivityID)
-                })
-            }) : null,
-            el(ToolTip, {
-                title: "Renewal Information",
-                content: el('a', {
-                    className: "fal fa-tasks fa-2x m-5 pointer icon",
-                    href: `RenewalReport.php?action=produceReport&customerID=${data?.customerId}`,
-                    target: "_blank"
-                })
-            }),
-            // el(ToolTip,{title:"Generate Password",content: el('a',{className:"fal fa-magic fa-2x m-5 pointer icon",onClick:this.handleGeneratPassword})}),
-            el(ToolTip, {
-                title: "Contracts",
-                content: el('a', {
-                    className: "fal fa-file-contract fa-2x m-5 pointer icon",
-                    href: `Activity.php?action=contractListPopup&customerID=${data?.customerId}`,
-                    target: "_blank"
-                })
-            }),
-
-            this.getSpacer(),
-            el(ToolTip, {
-                title: "Contact SR History",
-                content: el('a', {
-                    className: "fal fa-id-card fa-2x m-5 pointer icon",
-                    onClick: () => this.handleContactSRHistory(data?.contactID)
-                })
-            }),
-            el(ToolTip, {
-                title: "Third Party Contacts",
-                content: el('a', {
-                    className: "fal fa-users fa-2x m-5 pointer icon",
-                    href: `ThirdPartyContact.php?action=list&customerID=${data?.customerId}`,
-                    target: "_blank"
-                })
-            }),
-            this.getSpacer(),
-            this.shouldShowExpenses(data, currentUser) ? el(ToolTip, {
-                title: "Expenses",
-                content: el('a', {
-                    className: "fal fa-coins fa-2x m-5 pointer icon",
-                    href: `Expense.php?action=view&callActivityID=${data?.callActivityID}`
-                })
-            }) : this.getSpacer(),
-            data?.problemStatus !== "C" ? el(ToolTip, {
-                title: "Add Travel",
-                content: el('a', {
-                    className: "fal fa-car fa-2x m-5 pointer icon",
-                    href: `Activity.php?action=createFollowOnActivity&callActivityID=${data?.callActivityID}&callActivityTypeID=22`
-                })
-            }) : null,
-            currentUser.isSDManager && data?.problemHideFromCustomerFlag == 'Y' ? el(ToolTip, {
-                title: "Unhide SR",
-                content: el('i', {
-                    className: "fal fa-eye-slash fa-2x m-5 pointer icon",
-                    onClick: () => this.handleUnhideSR(data)
-                })
-            }) : this.getSpacer(),
-            el(ToolTip, {
-                title: "Calendar",
-                content: el('a', {
-                    className: "fal fa-calendar-alt fa-2x m-5 pointer icon",
-                    href: `Activity.php?action=addToCalendar&callActivityID=${data?.callActivityID}`
-                })
-            }),
-            el(ToolTip, {
-                title: "Time Breakdown",
-                content: el('a', {
-                    className: "fal fa-calculator-alt fa-2x m-5 pointer icon",
-                    onClick: () => window.open(`Popup.php?action=timeBreakdown&problemID=${data?.problemID}`, 'popup', 'width=800,height=400')
-                })
-            }),
-            data?.isOnSiteActivity ? el(ToolTip, {
-                title: "Send client a visit confirmation email",
-                content: el('i', {
-                    className: "fal fa-envelope fa-2x m-5 pointer icon",
-                    onClick: () => this.handleConfirmEmail(data)
-                })
-            }) : this.getSpacer(),
+        const reason = await this.prompt(
+            "Please provide your reason to request additional time",
+            600,
+            data.cncNextAction, false, 50
         );
+        if (!reason) {
+            return;
+        }
+        await this.api.activityRequestAdditionalTime(
+            data.callActivityID,
+            reason
+        );
+        this.alert("Additional time has been requested");
+    };
+
+    getActions = () => {
+        const {data, currentUser} = this.state;
+        return <div>
+            {
+                data?.problemStatus !== "C" &&  data?.problemStatus !== "F"  ?
+                <div style={{marginBottom:-40}}>
+                    <ToolTip title="SR currently assigned to" width={150}>
+                        <div style={{display:"flex",alignItems:"center"}}>
+                    <i className="fal fa-user-hard-hat fa-2x m-5 pointer icon"></i>
+                    <label>
+                    {
+                        data?.requestEngineerName
+                    }
+                    </label>
+                    </div>
+                    </ToolTip>
+                </div>:null
+            }
+        <div
+            className="activities-container"
+            style={{display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center"}}
+        >
+
+
+
+
+
+            {
+                data?.problemStatus !== "C" ? <ToolTip
+                        title="Follow On"
+                        content={<i className="fal fa-play fa-2x m-5 pointer icon"
+                                    onClick={this.handleFollowOn}
+                        />}
+                    />
+                    : null
+            }
+            <ToolTip
+                title="History"
+                content={<a
+                    className="fal fa-history fa-2x m-5 pointer icon"
+                    href={`Activity.php?action=problemHistoryPopup&problemID=${data?.problemID}&htmlFmt=popup`}
+                    target="_blank"
+                />
+                }
+            />
+
+            <ToolTip
+                title="Passwords"
+                content={<a
+                    className="fal fa-unlock-alt fa-2x m-5 pointer icon"
+                    href={`Password.php?action=list&customerID=${data?.customerId}`}
+                    target="_blank"
+                />
+                }
+            />
+
+            {this.getSpacer()}
+            {data?.canEdit == 'ALL_GOOD' ? <ToolTip
+                title="Edit"
+                content={<a
+                    className="fal fa-edit fa-2x m-5 pointer icon"
+                    href={`SRActivity.php?action=editActivity&callActivityID=${data?.callActivityID}`}
+                />
+                }
+            /> : null
+            }
+
+
+            {data?.canEdit !== 'ALL_GOOD' ? <ToolTip
+                title={data?.canEdit}
+                content={<i className="fal fa-edit fa-2x m-5 pointer icon-disable"/>
+                }
+            /> : null}
+
+            {(data?.canDelete) ? <ToolTip
+                    title={data?.activities.length == 1 ? "Delete Request" : "Delete Activity"}
+                    content={<i
+                        className="fal fa-trash-alt fa-2x m-5 pointer icon"
+                        onClick={() => this.handleDelete(data)}
+                    />}
+                />
+                : null
+            }
+            {this.getSpacer()}
+            {data?.linkedSalesOrderID ? <ToolTip
+                    title="Sales Order"
+                    content={<a
+                        className="fal fa-tag fa-2x m-5 pointer icon"
+                        href={`SalesOrder.php?action=displaySalesOrder&ordheadID=${data?.linkedSalesOrderID}`}
+                        target="_blank"
+                    />}
+                />
+                : null}
+            {!data?.linkedSalesOrderID ? <ToolTip
+                title="Sales Order"
+                content={<a
+                    className="fal fa-tag fa-2x m-5 pointer icon"
+                    onClick={() => this.handleSalesOrder(data?.callActivityID, data?.problemID)}
+                />
+                }
+            /> : null}
+            {data?.linkedSalesOrderID ? <ToolTip
+                title="Unlink Sales order"
+                content={<a
+                    className="fal fa-unlink fa-2x m-5 pointer icon"
+                    onClick={() => this.handleUnlink(data?.linkedSalesOrderID, data?.problemID, data?.callActivityID)}
+                />
+                }
+            /> : null}
+            <ToolTip
+                title="Renewal Information"
+                content={<a
+                    className="fal fa-tasks fa-2x m-5 pointer icon"
+                    href={`RenewalReport.php?action=produceReport&customerID=${data?.customerId}`}
+                    target="_blank"
+                />
+                }
+            />
+
+
+            <ToolTip title="Generate Password"
+                     content={<a className="fal fa-magic fa-2x m-5 pointer icon"
+                                 onClick={this.handleGeneratPassword}
+                     />}
+            />
+            <ToolTip
+                title="Contracts"
+                content={<a
+                    className="fal fa-file-contract fa-2x m-5 pointer icon"
+                    href={`Activity.php?action=contractListPopup&customerID=${data?.customerId}`}
+                    target="_blank"
+                />
+                }
+            />
+
+            {this.getSpacer()}
+            <ToolTip
+                title="Contact SR History"
+                content={<a
+                    className="fal fa-id-card fa-2x m-5 pointer icon"
+                    onClick={() => this.handleContactSRHistory(data?.contactID)}
+                />}
+            />
+            <ToolTip
+                title="Third Party Contacts"
+                content={<a
+                    className="fal fa-users fa-2x m-5 pointer icon"
+                    href={`ThirdPartyContact.php?action=list&customerID=${data?.customerId}`}
+                    target="_blank"
+                />
+                }
+            />
+
+            {this.getSpacer()}
+            {this.shouldShowExpenses(data, currentUser) ? <ToolTip
+                title="Expenses"
+                content={<a
+                    className="fal fa-coins fa-2x m-5 pointer icon"
+                    href={`Expense.php?action=view&callActivityID=${data?.callActivityID}`}
+                />
+                }
+            /> : this.getSpacer()}
+            {data?.problemStatus !== "C" ? <ToolTip
+                title="Add Travel"
+                content={<a
+                    className="fal fa-car fa-2x m-5 pointer icon"
+                    href={`Activity.php?action=createFollowOnActivity&callActivityID=${data?.callActivityID}&callActivityTypeID=22`}
+                />
+                }
+            /> : null}
+            {currentUser.isSDManager && data?.problemHideFromCustomerFlag == 'Y' ? <ToolTip
+                    title="Unhide SR"
+                    content={<i
+                        className="fal fa-eye-slash fa-2x m-5 pointer icon"
+                        onClick={() => this.handleUnhideSR(data)}
+                    />}
+                />
+                : this.getSpacer()}
+            <TimeBudgetElement
+                currentUserTeamId={currentUser?.teamID}
+                hdRemainMinutes={data?.hdRemainMinutes}
+                esRemainMinutes={data?.esRemainMinutes}
+                imRemainMinutes={data?.imRemainMinutes}
+                projectRemainMinutes={data?.projectRemainMinutes}
+                onExtraTimeRequest={() => this.handleExtraTime(data)}
+            />
+            {this.getSpacer()}
+            <ToolTip
+                title="Calendar"
+                content={<a
+                    className="fal fa-calendar-alt fa-2x m-5 pointer icon"
+                    href={`Activity.php?action=addToCalendar&callActivityID=${data?.callActivityID}`}
+                />
+                }
+            />
+            <ToolTip
+                title="Time Breakdown"
+                content={<a
+                    className="fal fa-calculator-alt fa-2x m-5 pointer icon"
+                    onClick={() => window.open(`Popup.php?action=timeBreakdown&problemID=${data?.problemID}`, 'popup', 'width=800,height=400')}
+                />
+                }
+            />
+            {data?.isOnSiteActivity ? <ToolTip
+                    title="Send client a visit confirmation email"
+                    content={<i
+                        className="fal fa-envelope fa-2x m-5 pointer icon"
+                        onClick={() => this.handleConfirmEmail(data)}
+                    />}
+                />
+                : this.getSpacer()}
+        </div>
+        </div>
     }
 
     shouldShowExpenses(data, currentUser) {
@@ -368,16 +450,7 @@ class ActivityDisplayComponent extends MainComponent {
         window.open("Password.php?action=generate&htmlFmt=popup", 'reason', 'scrollbars=yes,resizable=yes,height=524,width=855,copyhistory=no, menubar=0');
     }
     handleSalesOrder = async (activityId, serviceRequestId) => {
-        const salesOrderId = await this.prompt('Sales Order ID:');
-        if (!salesOrderId) {
-            return;
-        }
-        try {
-            await this.api.linkSalesOrder(serviceRequestId, salesOrderId);
-            this.loadCallActivity(activityId);
-        } catch (e) {
-            this.alert(e.toString());
-        }
+        this.setState({showSalesOrder: true});
     }
     handleUnlink = async (linkedSalesOrderID, serviceRequestId, activityId) => {
         const res = await this.confirm(`Are you sure you want to unlink this request to Sales Order ${linkedSalesOrderID}`);
@@ -535,7 +608,7 @@ class ActivityDisplayComponent extends MainComponent {
                         onClick: this.goPrevActivity
                     })
                 }),
-                el('select', {value: currentActivity, onChange: this.handleActivityChange},
+                el('select', {value: currentActivity || "", onChange: this.handleActivityChange},
                     indx == -1 ? el('option', {value: null}, "") : null,
                     data?.activities.map(a =>
                         el('option', {
@@ -570,11 +643,23 @@ class ActivityDisplayComponent extends MainComponent {
                 this.getToggle("Travel", "showTravel"),
                 this.getToggle("Operational Tasks", "showOperationalTasks"),
                 this.getToggle("ServerGuard Updates", "showServerGuardUpdates"),
-                el('label', {className: "ml-5"}, 'Activity hours: '),
+                el('label', {className: "ml-5"}, 'Request Hours: '),
                 el('label', null, data?.totalActivityDurationHours),
-                el('label', {className: "ml-5"}, 'Chargeable hours: '),
-                el('label', null, data?.chargeableActivityDurationHours)),
-            // this.getOnsiteActivities(data?.onSiteActivities)
+                el('label', {className: "ml-5"}, 'Chargeable: '),
+                el('label', null, data?.chargeableActivityDurationHours),
+                <label className="ml-5">
+                    Awaiting CNC:
+                </label>,
+                <label>
+                    {data?.workingHours}
+                </label>,
+                <label className="ml-5">
+                    On Hold:
+                </label>,
+                <label>
+                    {data?.openHours - data?.workingHours < 0 ? 0 : (data?.openHours - data?.workingHours).toFixed(2)}
+                </label>
+            ),
         );
     }
 
@@ -649,32 +734,30 @@ class ActivityDisplayComponent extends MainComponent {
 
     }
     getNotesElement = () => {
-        const {el} = this;
         const {data} = this.state;
-        return el(
-            "div",
-            {className: "round-container"},
-            el(
-                "div",
-                {className: "flex-row"},
-                el(
-                    "label",
-                    {className: "label mt-5 mr-3 ml-1 mb-5", style: {display: "block"}},
-                    "Internal Notes"
-                ),
-                el(ToolTip, {
-                    width: 15,
-                    title:
-                        "These are internal notes only and not visible to the customer. These are per Service Request.",
-                    content: el("i", {
-                        className: "fal fa-info-circle mt-5 pointer icon",
-                    }),
-                })
-            ),
-            el("div", {
-                dangerouslySetInnerHTML: {__html: data?.internalNotes},
-            })
-        );
+        return (
+            <div className="round-container">
+                <div className="flex-row">
+                    <label className="label mt-5 mr-3 ml-1 mb-5"
+                           style={{display: "block"}}
+                    >
+                        Internal Notes
+                    </label>
+                    <ToolTip
+                        width="15"
+                        title="These are internal notes only and not visible to the customer. These are per Service Request."
+                        content={
+                            <i className="fal fa-info-circle mt-5 pointer icon"/>
+                        }
+                    >
+
+                    </ToolTip>
+                </div>
+                <div className="internalNotesContainer">
+                    <InternalNotesListComponent internalNotes={data?.internalNotes}/>
+                </div>
+            </div>
+        )
     }
     getcustomerNotesElement = () => {
         const {el} = this;
@@ -759,7 +842,8 @@ class ActivityDisplayComponent extends MainComponent {
                     ),
 
                     el('tr', null,
-                        el('td', {colSpan: 4}),
+                        el('td', {className: "display-label"}, "Summary"),
+                        el('td', {className: "display-content",colSpan:3}, data?.emailsubjectsummary),
                         el('td', {className: "display-label"}, "Asset"),
                         el('td', {colSpan: 3, className: "nowrap"}, data?.assetName || (data?.emptyAssetReason) || ''),
                     ),
@@ -832,7 +916,7 @@ class ActivityDisplayComponent extends MainComponent {
                 el(
                     "label",
                     {className: "label mt-5 mr-3 ml-1 mb-5", style: {display: "block"}},
-                    "Internal Notes"
+                    "Expenses"
                 ),
                 el(ToolTip, {
                     width: 15,
@@ -871,8 +955,8 @@ class ActivityDisplayComponent extends MainComponent {
         }
         this.setState({templateDefault, templateOptionId, templateValue});
     }
-    handleTemplateValueChange = ($event) => {
-        this.setState({templateValue: $event.editor.getData()})
+    handleTemplateValueChange = (data) => {
+        this.setState({templateValue: data})
     }
     handleTemplateSend = async (type) => {
         const {templateValue, templateOptionId, data, currentActivity} = this.state;
@@ -914,9 +998,14 @@ class ActivityDisplayComponent extends MainComponent {
         return el(
             Modal, {
                 width: 900, key: templateType, onClose: () => this.setState({_showModal: false}),
-                title: templateTitle, show: _showModal,
+                title: templateTitle,
+                show: _showModal,
                 content: el('div', {key: 'conatiner'},
-                    templateOptions.length > 0 ? el('select', {onChange: this.handleTemplateChanged},
+                    templateOptions.length > 0 ? el('select', {
+                            onChange: this.handleTemplateChanged,
+                            autoFocus: true,
+                            value: ''
+                        },
                         el('option', {key: 'empty', value: -1}, "-- Pick an option --"),
                         templateOptions.map(s => el('option', {key: s.id, value: s.id}, s.name))) : null,
                     el('div', {className: 'modal_editor'},
@@ -960,7 +1049,12 @@ class ActivityDisplayComponent extends MainComponent {
         const templateDefault = '';
         this.setState({templateOptions: options, _showModal: true, templateType: type, templateTitle, templateDefault})
     }
-    //-------------end template
+
+    onTaskListUpdated = () => {
+        const {currentActivity} = this.state;
+        this.loadCallActivity(currentActivity);
+    }
+
     getFooter = () => {
         return (
             <div className="activities-container">
@@ -992,9 +1086,33 @@ class ActivityDisplayComponent extends MainComponent {
             onCancel: () => this.setState({showFollowOn: false})
         }) : null;
     }
+    handleSalesOrderClose = () => {
+        this.setState({showSalesOrder: false});
+        this.loadCallActivity(this.state.currentActivity);
+    }
+
+    getTaskListElement() {
+        const {data} = this.state;
+        if (!data) {
+            return '';
+        }
+        return (
+            <TaskListComponent
+                taskListUpdatedAt={data.taskListUpdatedAt}
+                taskListUpdatedBy={data.taskListUpdatedBy}
+                taskList={data.taskList}
+                problemId={data.problemID}
+                onUpdatedTaskList={this.onTaskListUpdated}
+            />
+        );
+    }
+
+    onNoteAdded = () => {
+        this.loadCallActivity(this.state.currentActivity)
+    }
 
     render() {
-        const {data} = this.state;
+        const {data, showSalesOrder} = this.state;
         return (
             <div style={{width: "90%"}}>
                 {this.getAlert()}
@@ -1008,7 +1126,10 @@ class ActivityDisplayComponent extends MainComponent {
                 {this.getContentElement()}
                 {this.getDetailsElement()}
                 {this.getcustomerNotesElement()}
-                {this.getNotesElement()}
+                <InternalNotes onNoteAdded={this.onNoteAdded}
+                               data={data}
+                />
+                {this.getTaskListElement()}
                 <CustomerDocumentUploader
                     onDeleteDocument={(id) => this.deleteDocument(id)}
                     onFilesUploaded={() => this.handleUpload()}
@@ -1020,6 +1141,11 @@ class ActivityDisplayComponent extends MainComponent {
                 {this.getExpensesElement()}
                 {this.getTemplateModal()}
                 {this.getFooter()}
+                {showSalesOrder ? <LinkServiceRequestOrder serviceRequestID={data.problemID}
+                                                           customerId={data?.customerId}
+                                                           show={showSalesOrder}
+                                                           onClose={this.handleSalesOrderClose}
+                ></LinkServiceRequestOrder> : null}
             </div>
         );
     }

@@ -7,7 +7,7 @@
 .my-account {
     display: flex;
     flex-direction: column;
-    max-width: 500px;
+    
 }
 
 .form-group {
@@ -268,7 +268,10 @@ dd {
 .btn-search {
     width: 70px;
 }
-
+.btn-danger {
+    background-color: #404041 !important;
+    color: white;
+}
 .nowrap {
     white-space: nowrap;
 }
@@ -496,6 +499,10 @@ dd {
 /*end padding*/
 .text-center {
     text-align: center;
+}
+
+.text-top {
+    vertical-align: top !important;
 }
 
 .content-center {
@@ -727,6 +734,7 @@ hr {
     line-height: 1rem;
     font-size: 16px;
     cursor: pointer;
+    margin-top: 10px !important;
 }
 
 .tab-container i:hover {
@@ -1046,4 +1054,29 @@ input:checked + .slider:before {
 .modal_editor .cke_editable_inline {
     min-height: 42px;
     padding: 4px;
+}
+
+.text-left {
+    text-align: left;
+}
+
+input:focus:required:invalid {border: 1px solid red;}
+input:required:invalid {border: 1px solid red;}
+input:required:valid { border: 1px solid black; }
+.disable{
+    background-color: #bdbec1 !important;
+}
+.disable:hover{
+    background-color: #bdbec1 !important;
+    color: #000;
+}
+
+select:focus:required:invalid {border: 1px solid red;}
+select:required:invalid {border: 1px solid red;}
+select:required:valid { border: 1px solid black; }
+.modal-input{
+    color:white;
+    background-color: transparent;
+    border-color: whitesmoke;
+
 }

@@ -26,4 +26,11 @@ class DBEOSSupportDates extends DBEntity
         $this->setAddColumnsOff();
         $this->setPK(self::id);
     }
+
+    public function getEndOfLifeRows()
+    {
+        $query = "select {$this->getFullDBColumnNamesAsString()} from {$this->getTableName()} where {$this->getDBColumnName(self::endOfLifeDate)} is not null";
+        $this->queryString = $query;
+        $this->getRows();
+    }
 }

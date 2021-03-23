@@ -1,6 +1,6 @@
 import APIActivity from "../../services/APIActivity.js";
 import APICallactType from "../../services/APICallactType.js";
-import {groupBy, isEmptyTime, params, pick} from "../../utils/utils.js";
+import {getContactElementName, groupBy, isEmptyTime, params, pick} from "../../utils/utils.js";
 import ToolTip from "../../shared/ToolTip.js";
 import APICustomers from "../../services/APICustomers.js";
 import APIUser from "../../services/APIUser.js";
@@ -14,14 +14,20 @@ import {TeamType} from "../../utils/utils";
 import CNCCKEditor from "../../shared/CNCCKEditor";
 import Modal from "../../shared/Modal/modal";
 import Toggle from "../../shared/Toggle";
+import {ActivityHeaderComponent} from "./ActivityHeaderComponent";
 import CustomerDocumentUploader from "./CustomerDocumentUploader";
 import {InternalDocumentsComponent} from "./InternalDocumentsComponent";
-import {ActivityHeaderComponent} from "./ActivityHeaderComponent";
-import EditorFieldComponent from "../../shared/EditorField/EditorFieldComponent";
 import AssetListSelectorComponent from "../../shared/AssetListSelectorComponent/AssetListSelectorComponent";
+import EditorFieldComponent from "../../shared/EditorField/EditorFieldComponent";
+import {TimeBudgetElement} from "./TimeBudgetElement";
+import {LinkServiceRequestOrder} from "./LinkserviceRequestOrder.js";
+import {ActivityType} from "../../shared/ActivityTypes";
+import {InternalNotes} from "./InternalNotesComponent";
+import {TaskListComponent} from "./TaskListComponent";
 
 // noinspection EqualityComparisonWithCoercionJS
 const hiddenAndCustomerNoteAlertMessage = `Customer note must be empty when the activity or entire SR is hidden.`;
+
 
 class ActivityEditComponent extends MainComponent {
     el = React.createElement;
@@ -37,7 +43,6 @@ class ActivityEditComponent extends MainComponent {
         Escalate: "Escalate",
         Update: "Update"
     };
-    autoSavehandler = null;
 
     constructor(props) {
         super(props);
@@ -51,6 +56,7 @@ class ActivityEditComponent extends MainComponent {
             sites: [],
             priorities: [],
             currentContact: null,
+            originalContact: null,
             currentUser: null,
             allowLeaving: false,
             data: {
@@ -58,8 +64,7 @@ class ActivityEditComponent extends MainComponent {
                 documents: [],
                 reasonTemplate: "",
                 reason: "",
-                internalNotes: "",
-                internalNotesTemplate: "",
+                internalNotes: [],
                 date: "",
                 alarmDate: "",
                 alarmTime: "",
@@ -97,6 +102,8 @@ class ActivityEditComponent extends MainComponent {
                 criticalSR: false,
                 monitorSR: false,
             },
+            showSalesOrder: false,
+
         };
     }
 
@@ -118,7 +125,7 @@ class ActivityEditComponent extends MainComponent {
             this.api.getPriorities(),
             this.api.getRootCauses(),
             this.apiUser.getCurrentUser(),
-            this.apiStandardText.getOptionsByType("Priority Change Reason"),
+            this.apiStandardText.getOptionsByType("Priority Change Reason")
         ]).then(async ([activityTypes, activeUsers, priorities, rootCauses, currentUser, priorityChangeReasonStandardTextItems]) => {
             const notSDManagerActivityTypes = activityTypes.filter(c => c.visibleInSRFlag === 'Y');
 
@@ -129,15 +136,13 @@ class ActivityEditComponent extends MainComponent {
                 priorities,
                 rootCauses,
                 currentUser,
-                priorityReasons: priorityChangeReasonStandardTextItems,
+                priorityReasons: priorityChangeReasonStandardTextItems
             });
-            setTimeout(() => this.autoSave(), 2000);
         });
     }
 
-    componentWillUnmount() {
-        clearInterval(this.autoSavehandler);
 
+    componentWillUnmount() {
     }
 
     //------------API
@@ -153,26 +158,22 @@ class ActivityEditComponent extends MainComponent {
             });
             res.reasonTemplate = res.reason;
             res.cncNextActionTemplate = res.cncNextAction;
-            res.internalNotesTemplate = res.internalNotes;
             res.customerNotesTemplate = res.customerNotes;
             res.callActTypeIDOld = res.callActTypeID;
             res.orignalPriority = res.priority;
             const session = this.getSessionActivity(res.callActivityID);
             if (session) {
                 res.customerNotes = session.customerNotesTemplate || res.customerNotes;
-                res.internalNotes = session.internalNotesTemplate || res.internalNotes;
                 res.cncNextAction = session.cncNextActionTemplate || res.cncNextAction;
                 res.reason = session.reasonTemplate || res.reason;
-
                 res.customerNotesTemplate = session.customerNotesTemplate || res.customerNotesTemplate;
-                res.internalNotesTemplate = session.internalNotesTemplate || res.internalNotesTemplate;
                 res.cncNextActionTemplate = session.cncNextActionTemplate || res.cncNextActionTemplate;
                 res.reasonTemplate = session.reasonTemplate || res.reasonTemplate;
             }
             Promise.all([
                 this.api.getCustomerContactActivityDurationThresholdValue(),
                 this.api.getRemoteSupportActivityDurationThresholdValue(),
-                this.apiCustomer.getCustomerContacts(res.customerId, res.contactID),
+                this.apiCustomer.getCustomerContacts(res.customerId),
                 this.apiCustomer.getCustomerSites(res.customerId),
                 this.api
                     .getCustomerContracts(
@@ -186,6 +187,7 @@ class ActivityEditComponent extends MainComponent {
             ]).then(([customerContactActivityDurationThresholdValue, remoteSupportActivityDurationThresholdValue, contacts, sites, contracts]) => {
                 const currentContact = contacts.find((c) => c.id == res.contactID);
 
+                contacts = contacts.filter(x => x.id === res.contactID || (x.supportLevel && x.supportLevel != 'furlough' && x.active));
 
                 this.setState({
                     customerContactActivityDurationThresholdValue,
@@ -199,6 +201,7 @@ class ActivityEditComponent extends MainComponent {
                     contracts,
                     _activityLoaded: true,
                     currentContact,
+                    originalContact: currentContact
                 }, () => setTimeout(() => this.checkContactNotesAlert(), 2000));
             });
         });
@@ -211,7 +214,6 @@ class ActivityEditComponent extends MainComponent {
         data.reason = data.reasonTemplate;
         data.cncNextAction = data.cncNextActionTemplate;
         data.customerNotes = data.customerNotesTemplate;
-        data.internalNotes = data.internalNotesTemplate;
         data.priority = this.state.priorities.find((p) => p.name == data.priority).id;
 
         delete data.activities;
@@ -232,7 +234,6 @@ class ActivityEditComponent extends MainComponent {
             "contactNotes",
             "techNotes",
             "reason",
-            "internalNotes",
             "nextStatus",
             "escalationReason",
             "customerNotes",
@@ -269,6 +270,12 @@ class ActivityEditComponent extends MainComponent {
 
     async isValid(data) {
 
+        if (!this.isHiddenFromCustomer(data)) {
+            const hasGrammaticalErrors = await this.editorHasProblems();
+            if (hasGrammaticalErrors) {
+                return false;
+            }
+        }
         const callActType = this.state.callActTypes.find((c) => c.id == data.callActTypeID);
         if (!callActType) {
             this.alert("Please select activity type");
@@ -301,7 +308,7 @@ class ActivityEditComponent extends MainComponent {
             return false;
         }
 
-        if (!data.contactSupportLevel) {
+        if (data.originalContact !== data.currentContact && !data.supportLevel) {
             this.alert("Not a nominated support contact");
             return false;
         }
@@ -385,17 +392,29 @@ class ActivityEditComponent extends MainComponent {
 
             }
         }
+
         if (!data.assetName && !this.state.data.emptyAssetReason) {
             this.alert("Please select an asset or a reason");
             return false;
         }
+
         return true;
-    };
+    }
 
     setValue = (label, value) => {
+        const autoUpdateFields = [
+            'cncNextActionTemplate',
+            'reasonTemplate',
+            'customerNotesTemplate',
+        ]
+
         const {data} = this.state;
         data[label] = value;
-        this.setState({data});
+        this.setState({data}, () => {
+            if (autoUpdateFields.indexOf(label) > -1) {
+                this.saveToSessionStorage();
+            }
+        });
     };
     //-----------------Template
     getProjectsElement = () => {
@@ -427,7 +446,7 @@ class ActivityEditComponent extends MainComponent {
 
     getActions = () => {
         const {el} = this;
-        const {data} = this.state;
+        const {data, currentUser} = this.state;
         return el(
             "div",
             {
@@ -485,8 +504,8 @@ class ActivityEditComponent extends MainComponent {
                     title: "Sales Order",
                     content: el("a", {
                         className: "fal fa-tag fa-2x m-5 pointer icon",
-                        href: "javascript:void(0);",
-                        onClick: ($event) => this.handleSalesOrder(data?.callActivityID, data?.problemID),
+                        href: "#",
+                        onClick: () => this.handleSalesOrder(data?.callActivityID, data?.problemID),
                     }),
                 })
                 : null,
@@ -524,13 +543,15 @@ class ActivityEditComponent extends MainComponent {
             }),
 
             this.getEmptyAction(),
-            el(ToolTip, {
-                title: "Request more time",
-                content: el("a", {
-                    className: "fal fa-hourglass-start fa-2x m-5 pointer icon",
-                    onClick: () => this.handleExtraTime(data),
-                }),
-            }), this.getTimeBudgetElement(),
+            (<TimeBudgetElement
+                currentUserTeamId={currentUser?.teamID}
+                hdRemainMinutes={data?.hdRemainMinutes}
+                esRemainMinutes={data?.esRemainMinutes}
+                imRemainMinutes={data?.imRemainMinutes}
+                projectRemainMinutes={data?.projectRemainMinutes}
+                onExtraTimeRequest={() => this.handleExtraTime(data)}
+            />),
+            this.getEmptyAction(),
             data.hdRemainMinutes ?
                 el(ToolTip, {
                     title: "Countdown Timer",
@@ -548,10 +569,11 @@ class ActivityEditComponent extends MainComponent {
     }
 
     handleExtraTime = async (data) => {
+
         const reason = await this.prompt(
             "Please provide your reason to request additional time",
             600,
-            data.cncNextAction, true
+            data.cncNextAction, false, 50
         );
         if (!reason) {
             return;
@@ -586,21 +608,18 @@ class ActivityEditComponent extends MainComponent {
 
             return (<input type="time"
                            key="alarmTime"
-                           value={data?.alarmTime}
+                           value={data?.alarmTime || ""}
                            onChange={($event) => this.setValue("alarmTime", $event.target.value)}
             />)
         }
         const renderUpdateCancelButtons = () => {
-
-            if (data?.callActTypeID !== 59) {
-                const isEnabled = currentUser?.isSDManager || !(data?.callActType === 51 && data?.problemStatus === 'I');
-
+            const isInitialActivityAndServiceRequestNotStarted = data?.callActTypeID === ActivityType.INITIAL && data?.problemStatus === 'I';
+            const isCurrentUserSDManagerOrServiceRequestQueueManager = currentUser?.isSDManager || currentUser?.serviceRequestQueueManager;
+            if (isInitialActivityAndServiceRequestNotStarted || isCurrentUserSDManagerOrServiceRequestQueueManager) {
                 return <Fragment>
                     <button onClick={() => this.setNextStatus("Update")}
-                            disabled={!isEnabled}
                     >Update
                     </button>
-                    <button onClick={() => this.handleCancel(data)}>Cancel</button>
                 </Fragment>
             }
         }
@@ -635,6 +654,10 @@ class ActivityEditComponent extends MainComponent {
             > Parts Used
             </button>
             {renderUpdateCancelButtons()}
+            <button onClick={() => this.handleCancel(data)}
+            >
+                Cancel
+            </button>
         </div>
 
     }
@@ -649,28 +672,27 @@ class ActivityEditComponent extends MainComponent {
         if (await this.confirm(text)) {
             this.setState({allowLeaving: true});
             if (willDelete)
-                this.api.deleteActivity(data.callActivityID).then(res => {
+                this.api.deleteActivity(data.callActivityID).then(() => {
                     document.location = `SRActivity.php?action=displayActivity&serviceRequestId=${data.problemID}`;
                 })
             else
                 document.location = `SRActivity.php?action=displayActivity&callActivityID=${data.callActivityID}`;
         }
     };
-    autoSave = () => {
-        this.autoSavehandler = setInterval(() => {
-            const {data} = this.state;
-            const activityEdit = {
-                id: data.callActivityID,
-                internalNotesTemplate: data.internalNotesTemplate,
-                cncNextActionTemplate: data.cncNextActionTemplate,
-                reasonTemplate: data.reasonTemplate,
-                customerNotesTemplate: data.customerNotesTemplate,
-            }
-            let activities = this.getSessionNotes().filter(a => a.id !== data.callActivityID);
-            activities.push(activityEdit);
-            sessionStorage.setItem("activityEdit", JSON.stringify(activities));
-        }, 10000);
+
+    saveToSessionStorage() {
+        const {data} = this.state;
+        const activityEdit = {
+            id: data.callActivityID,
+            cncNextActionTemplate: data.cncNextActionTemplate,
+            reasonTemplate: data.reasonTemplate,
+            customerNotesTemplate: data.customerNotesTemplate,
+        }
+        let activities = this.getSessionNotes().filter(a => a.id !== data.callActivityID);
+        activities.push(activityEdit);
+        sessionStorage.setItem("activityEdit", JSON.stringify(activities));
     }
+
     getSessionNotes = () => {
         sessionStorage.getItem("activityEdit");
         return JSON.parse(sessionStorage.getItem("activityEdit")) || [];
@@ -688,21 +710,22 @@ class ActivityEditComponent extends MainComponent {
         }
 
         switch (status) {
-            case this.activityStatus.CncAction:
+            case this.activityStatus.CncAction: {
                 //Field Name] is required for [Activity Type] when the next action is [Update type]
-
-                let cncValid = await this.checkCncAction(data, type);
+                const cncValid = await this.checkCncAction(data, type);
                 if (!cncValid)
                     return;
                 break;
-            case this.activityStatus.CustomerAction://holding
+            }
+
+            case this.activityStatus.CustomerAction: {
+                //holding
                 //Field Name] is required for [Activity Type] when the next action is [Update type]
-                let holdValid = await this.checkOnHold(data, type);
+                const holdValid = await this.checkOnHold(data, type);
                 if (!holdValid)
                     return;
-                //if (!await this.confirm("Are you sure this SR is On Hold?")) return;
-
                 break;
+            }
             case this.activityStatus.Fixed:
                 if (!await this.confirm("Are you sure this SR is fixed?")) return false;
                 //return;
@@ -850,16 +873,8 @@ class ActivityEditComponent extends MainComponent {
         );
     };
     handleSalesOrder = async (callActivityID, serviceRequestId) => {
-        const salesOrderId = await this.prompt('Sales Order ID:');
-        if (!salesOrderId) {
-            return;
-        }
-        try {
-            await this.api.linkSalesOrder(serviceRequestId, salesOrderId);
-            this.loadCallActivity(callActivityID);
-        } catch (e) {
-            this.alert(e.toString());
-        }
+        this.setState({showSalesOrder: true});
+
     };
     handleUnlink = async (callActivityID, linkedSalesOrderID, serviceRequestId) => {
         const res = await this.confirm(
@@ -971,7 +986,7 @@ class ActivityEditComponent extends MainComponent {
         const {el} = this;
         const {data, callActTypes, notSDManagerActivityTypes, currentUser} = this.state;
         const selectedActivityType = callActTypes.find((t) => t.id == data.callActTypeID);
-        const isEnabled = currentUser?.isSDManager || (!currentUser?.isSDManager && selectedActivityType && selectedActivityType.visibleInSRFlag === 'Y')
+        const isEnabled = currentUser?.isSDManager || (!currentUser?.isSDManager && selectedActivityType && selectedActivityType.visibleInSRFlag === 'Y') || params.get("isFollow");
         let activityTypesToShow = notSDManagerActivityTypes;
         if (!isEnabled || currentUser?.isSDManager) {
             activityTypesToShow = callActTypes;
@@ -997,6 +1012,8 @@ class ActivityEditComponent extends MainComponent {
             )
         );
     };
+
+
     getContactsElement = () => {
         const {el} = this;
         const {data, contacts, currentContact} = this.state;
@@ -1018,7 +1035,7 @@ class ActivityEditComponent extends MainComponent {
                         el(
                             "option",
                             {key: "i" + item.id, value: item.id},
-                            item.name + " " + (item.startMainContactStyle || "")
+                            getContactElementName(item)
                         )
                     )
                 );
@@ -1034,10 +1051,10 @@ class ActivityEditComponent extends MainComponent {
         const {data, contacts} = this.state;
         const currentContact = contacts.find((c) => c.id == id);
         data.contactID = id;
-        data.contactName = currentContact.name;
-        data.contactPhone = currentContact.contactPhone;
-        data.contactMobilePhone = currentContact.contactMobilePhone;
-        data.contactEmail = currentContact.contactEmail;
+        data.contactName = `${currentContact.firstName} ${currentContact.lastName}`
+        data.contactPhone = currentContact.phone;
+        data.contactMobilePhone = currentContact.mobilePhone;
+        data.contactEmail = currentContact.email;
         data.contactNotes = currentContact.notes;
 
         this.setState({data, currentContact});
@@ -1069,7 +1086,7 @@ class ActivityEditComponent extends MainComponent {
             return <input type="time"
                           key="startTime"
                           disabled={data?.isInitalDisabled}
-                          value={data?.startTime}
+                          value={data?.startTime || ""}
                           onChange={($event) => this.setValue("startTime", $event.target.value)}
             />
         }
@@ -1080,7 +1097,7 @@ class ActivityEditComponent extends MainComponent {
             return <input type="time"
                           key="endTime"
                           disabled={data?.isInitalDisabled}
-                          value={data?.endTime}
+                          value={data?.endTime || ""}
                           onChange={($event) => this.setValue("endTime", $event.target.value)}
             />
         }
@@ -1101,97 +1118,139 @@ class ActivityEditComponent extends MainComponent {
                 this.setValue("endTime", moment().format('HH:mm'))
             }}
             >
-                <i className="fal fa-clock"></i>
+                <i className="fal fa-clock"/>
             </span>
         </div>
     };
     getPriority = () => {
-        const {el} = this;
         const {data, priorities} = this.state;
-        return el(
-            "select",
-            {
-                key: "priorities",
-                disabled: !data.canChangePriorityFlag,
-                required: true,
-                value: data?.priority,
-                onChange: (event) => this.setValue("priority", event.target.value),
-                style: {width: "100%"}
-            },
-            el("option", {key: "empty", value: null}, "Please select"),
-            priorities?.map((t) => el("option", {key: t.id, value: t.name}, t.name))
+        return (
+            <select key="priorities"
+                    disabled={!data.canChangePriorityFlag}
+                    required={true}
+                    value={data?.priority}
+                    onChange={(event) => this.setValue("priority", event.target.value)}
+                    style={{width: "100%"}}
+            >
+                <option key="empty"
+                        value={null}
+                >
+                    Please select
+                </option>
+                {
+                    priorities?.map((t) => <option key={t.id}
+                                                   value={t.name}
+                    >{t.name}</option>)
+                }
+            </select>
         );
     };
     getUsersElement = () => {
-        const {el} = this;
         const {data, users} = this.state;
 
-        return el(
-            "select",
-            {
-                key: "users",
-                required: true,
-                value: data?.userID,
-                onChange: (event) => this.setValue("userID", event.target.value),
-                style: {width: "100%"}
-            },
-            el("option", {key: "empty", value: null}, "Please select"),
-            users?.map((t) => el("option", {key: t.id, value: t.id}, t.name))
+        return (
+            <select
+                key={"users"}
+                required={true}
+                value={data?.userID}
+                onChange={(event) => this.setValue("userID", event.target.value)}
+                style={{width: "100%"}}
+            >
+
+                <option
+                    key={"empty"}
+                    value={null}
+                >
+                    Please select
+                </option>
+                {
+                    users?.map((t) => <option
+                            key={t.id}
+                            value={t.id}
+                        >{t.name}</option>
+                    )
+                }
+            </select>
         );
     };
     getContracts = () => {
-        const {el} = this;
         const {data, contracts} = this.state;
 
-        return el(
-            "select",
-            {
-                key: "contracts",
-                required: true,
-                disabled: !data?.changeSRContractsFlag,
-                value: data?.contractCustomerItemID || "",
-                onChange: (event) => this.setValue("contractCustomerItemID", event.target.value),
-                style: {width: "100%"}
-            },
-            el("option", {key: "empty", value: 99}, "Please select"),
-            el("option", {key: "tandm", value: ""}, "T&M"),
-            contracts?.map((t, index) =>
-                el(
-                    "optgroup",
-                    {key: t.groupName, label: t.groupName},
-                    contracts[index].items.map((i) =>
-                        el(
-                            "option",
-                            {
-                                key: i.contractCustomerItemID,
-                                disabled: i.isDisabled,
-                                value: i.contractCustomerItemID,
-                            },
-                            i.contractDescription
+        return (
+            <select
+
+                key={"contracts"}
+                required={true}
+                disabled={!data?.changeSRContractsFlag}
+                value={data?.contractCustomerItemID || ""}
+                onChange={(event) => this.setValue("contractCustomerItemID", event.target.value)}
+                style={{width: "100%"}}
+            >
+                <option
+                    key={"empty"}
+                    value={99}
+                >Please select
+                </option>
+                <option
+                    key={"tandm"}
+                    value={""}
+                >T&M
+                </option>
+                {
+                    contracts?.map((t, index) => (
+                            <optgroup
+                                key={t.groupName}
+                                label={t.groupName}
+                            >
+                                {
+
+                                    contracts[index].items.map((i) =>
+
+                                        <option key={i.contractCustomerItemID}
+                                                disabled={i.isDisabled}
+                                                value={i.contractCustomerItemID}
+                                        >
+                                            {i.contractDescription}
+                                        </option>
+                                    )
+                                }
+                            </optgroup>
                         )
                     )
-                )
-            )
+                }
+            </select>
         );
     };
     getRootCause = () => {
-        const {el} = this;
+
         const {data, rootCauses} = this.state;
 
-        return el(
-            "select",
-            {
-                key: "rootCauses",
-                disabled: !data.canChangePriorityFlag,
-                style: {maxWidth: 200, width: "100%"},
-                required: true,
-                value: data?.rootCauseID || "",
-                onChange: (event) => this.setValue("rootCauseID", event.target.value),
-            },
-            el("option", {key: "empty", value: ""}, "Not known"),
-            rootCauses?.map((t) =>
-                el("option", {key: t.id, value: t.id}, t.description)
-            )
+        return (
+            <select
+                key={"rootCauses"}
+                disabled={!data.canChangePriorityFlag}
+                style={{maxWidth: 200, width: "100%"}}
+                value={data?.rootCauseID || ""}
+                onChange={(event) => this.setValue("rootCauseID", event.target.value)}
+            >
+                <option
+                    key={"empty"}
+                    value={""}
+                >
+                    Not known
+                </option>
+
+                {
+                    rootCauses?.map((t) =>
+                        <option
+                            key={t.id}
+                            value={t.id}
+                        >
+                            {t.description}
+                        </option>
+                    )
+                }
+            </select>
         );
     };
     getContentElement = () => {
@@ -1340,8 +1399,8 @@ class ActivityEditComponent extends MainComponent {
         }
         test();
     };
-    handleTemplateValueChange = ($event) => {
-        this.setState({templateValue: $event.editor.getData()});
+    handleTemplateValueChange = (data) => {
+        this.setState({templateValue: data});
     };
     handleTemplateSend = async (type) => {
         const {
@@ -1362,7 +1421,7 @@ class ActivityEditComponent extends MainComponent {
                 await this.api.sendChangeRequest(data.problemID, payload);
                 this.alert('Change Request Sent');
                 break;
-            case "partsUsed":
+            case "partsUsed": {
                 const object = {
                     message: templateValue,
                     callActivityID: currentActivity,
@@ -1370,6 +1429,7 @@ class ActivityEditComponent extends MainComponent {
                 await this.api.sendPartsUsed(object);
                 this.alert('Parts Used Sent');
                 break;
+            }
             case "salesRequest":
                 await this.api.sendSalesRequest(
                     data.customerId,
@@ -1392,19 +1452,19 @@ class ActivityEditComponent extends MainComponent {
         } = this.state;
         const {el} = this;
 
-        return el(Modal, {
+        return el(Modal, {//autoFocus:true
             width: 900,
             key: templateType,
-            onClose: () => this.setState({_showModal: false}),
+            onClose: () => this.setState({_showModal: false, templateValue: ""}),
             title: templateTitle,
             show: _showModal,
             content: el(
                 "div",
-                {key: "conatiner"},
+                {key: "container"},
                 templateOptions.length > 0
                     ? el(
                     "select",
-                    {onChange: this.handleTemplateChanged},
+                    {onChange: this.handleTemplateChanged, autoFocus: true},
                     el("option", {key: "empty", value: -1}, "-- Pick an option --"),
                     templateOptions.map((s) =>
                         el("option", {key: s.id, value: s.id}, s.name)
@@ -1424,7 +1484,8 @@ class ActivityEditComponent extends MainComponent {
                             onChange: this.handleTemplateValueChange,
                             sharedSpaces: true,
                             top: "top2",
-                            bottom: "bottom2"
+                            bottom: "bottom2",
+                            autoFocus: templateOptions.length <= 0
                         }),
                         el('div', {id: 'bottom2'}),
                     )
@@ -1495,8 +1556,10 @@ class ActivityEditComponent extends MainComponent {
                 this.state._activityLoaded
                     ?
                     <EditorFieldComponent name="reason"
-                                          value={data?.reason}
-                                          onChange={(value) => this.setValue("reasonTemplate", value)}
+                                          value={data?.reason || ""}
+                                          onChange={(value) => {
+                                              this.setValue("reasonTemplate", value)
+                                          }}
                     />
                     : null
             ),
@@ -1516,8 +1579,10 @@ class ActivityEditComponent extends MainComponent {
                 this.state._activityLoaded
                     ?
                     <EditorFieldComponent name="cncNextAction"
-                                          value={data?.cncNextAction}
-                                          onChange={(value) => this.setValue("cncNextActionTemplate", value)}
+                                          value={data?.cncNextAction || ""}
+                                          onChange={(value) => {
+                                              this.setValue("cncNextActionTemplate", value)
+                                          }}
                     />
                     : null
             )
@@ -1525,8 +1590,16 @@ class ActivityEditComponent extends MainComponent {
     }
 
     getCustomerNotes() {
-        const {el} = this;
-        const {data} = this.state;
+        const {
+            el
+        }
+
+            = this;
+        const
+            {
+                data
+            }
+                = this.state;
         return el(
             "div",
             {className: "round-container flex-column flex-1", style: {padding: 5}},
@@ -1545,58 +1618,42 @@ class ActivityEditComponent extends MainComponent {
             this.state._activityLoaded
                 ?
                 <EditorFieldComponent name="customerNotes"
-                                      value={data?.customerNotes}
+                                      value={data?.customerNotes || ""}
                                       onChange={(value) => this.setValue("customerNotesTemplate", value)}
                 />
                 : null
         );
     }
 
-    getActivityInternalNotes() {
-        const {el} = this;
+
+    onNoteAdded = () => {
+        const {currentActivity} = this.state;
+        this.loadCallActivity(currentActivity);
+    }
+
+    onTaskListUpdated = () => {
+        const {currentActivity} = this.state;
+        this.loadCallActivity(currentActivity);
+    }
+
+
+    getTaskList() {
         const {data} = this.state;
-        return el(
-            "div",
-            {className: "round-container flex-column flex-1", style: {padding: 5}},
-            el('div', {className: "flex-row"},
-                el(
-                    "label",
-                    {className: "label m-5 mr-2", style: {display: "block"}},
-                    "Internal Notes"
-                ),
-                el(ToolTip, {
-                    width: 5,
-                    title: "These are internal notes only and not visible to the customer. These are per Service Request.",
-                    content: el("i", {className: "fal fa-info-circle mt-5 pointer icon"})
-                })
-            ),
-            this.state._activityLoaded
-                ?
-                <EditorFieldComponent name="internal"
-                                      value={data?.internalNotes}
-                                      onChange={(value) => this.setValue("internalNotesTemplate", value)}
-                />
-                : null
+        if (!data) {
+            return '';
+        }
+
+        return (
+            <TaskListComponent
+                taskListUpdatedAt={data.taskListUpdatedAt}
+                taskListUpdatedBy={data.taskListUpdatedBy}
+                taskList={data.taskList}
+                problemId={data.problemID}
+                onUpdatedTaskList={this.onTaskListUpdated}
+            />
         );
     }
 
-    getTimeBudgetElement = () => {
-        const {data, currentUser} = this.state;
-
-        switch (currentUser?.teamID) {
-            case TeamType.Helpdesk:
-                return this.el("h2", {style: {color: "red"}}, `HD:${data?.hdRemainMinutes}`);
-            case TeamType.Escalations:
-                return this.el("h2", {style: {color: "red"}}, `ES:${data?.esRemainMinutes}`);
-            case TeamType.Small_Projects:
-                return this.el("h2", {style: {color: "red"}}, `SP:${data?.imRemainMinutes}`);
-            case TeamType.Projects:
-                return this.el("h2", {style: {color: "red"}}, `P:${data?.projectRemainMinutes}`);
-            default:
-                return null;
-        }
-
-    }
     getTimeBudget = () => {
         const {data, currentUser} = this.state;
         switch (currentUser?.teamID) {
@@ -1604,7 +1661,7 @@ class ActivityEditComponent extends MainComponent {
                 return data?.hdRemainMinutes;
             case TeamType.Escalations:
                 return data?.esRemainMinutes;
-            case TeamType.Small_Projects:
+            case TeamType.SmallProjects:
                 return data?.imRemainMinutes;
             case TeamType.Projects:
                 return data?.projectRemainMinutes;
@@ -1723,9 +1780,13 @@ class ActivityEditComponent extends MainComponent {
         }
         this.setState({data});
     };
+    handleSalesOrderClose = () => {
+        this.setState({showSalesOrder: false});
+        this.loadCallActivity(this.state.currentActivity);
+    }
 
     render() {
-        const {data} = this.state;
+        const {data, showSalesOrder} = this.state;
         return (
             <div style={{width: "90%"}}>
                 {this.getAlert()}
@@ -1743,7 +1804,10 @@ class ActivityEditComponent extends MainComponent {
                 {this.getContentElement()}
                 {this.getActivityNotes()}
                 {this.getCustomerNotes()}
-                {this.getActivityInternalNotes()}
+                <InternalNotes onNoteAdded={this.onNoteAdded}
+                               data={data}
+                />
+                {this.getTaskList()}
                 <CustomerDocumentUploader
                     onDeleteDocument={(id) => this.deleteDocument(id)}
                     onFilesUploaded={() => this.handleUpload()}
@@ -1753,6 +1817,11 @@ class ActivityEditComponent extends MainComponent {
                 />
                 <InternalDocumentsComponent serviceRequestId={data?.problemID}/>
                 {this.getTemplateModal()}
+                {showSalesOrder ? <LinkServiceRequestOrder serviceRequestID={data.problemID}
+                                                           customerId={data?.customerId}
+                                                           show={showSalesOrder}
+                                                           onClose={this.handleSalesOrderClose}
+                ></LinkServiceRequestOrder> : null}
             </div>
         );
     }

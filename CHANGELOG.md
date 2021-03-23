@@ -8,6 +8,218 @@ This project changes will be shown here.
 - Issue 914 - Customer Page Customer Notes, Projects, Portal Documents Rewrite
 - Issue 915 - Customer Page Sites Rewrite
 
+## [v5.6.5] - 2021-03-22
+### Fixed
+- Fixed changes with page title/header
+
+## [v5.6.4] - 2021-03-18
+### Changed
+- Changed the list of Checklists when logging a new request to show only relevant StandardTexts.
+- Show the dates for the financial year in expenses breakdown year to date
+### Fixed
+- Fixed the issue when trying to create a new SR from a pending reopened, not being able to assing a email subjet 
+  summary.
+- Fixed issue with Activity search showing more than one SR where it wasn't supposed to.
+- Fixed formatting issue with date in Expense Dashboard
+
+## [v5.6.3] - 2021-03-15
+### Changed
+- Changed the concept "open" to "active" where required, meaning Service Requests where there's at least one activity
+with dateTime in the past and there's no end time.
+
+## [v5.6.2] - 2021-03-15
+### Changed
+- Increase call back automated activity to 3 minutes
+- User 24 hour time in call back request email
+### Fixed
+- Daily renewals getting stuck.
+- Calculation of Open SR status
+
+## [v5.6.1] - 2021-03-11 
+### Fixed
+- Unable to edit contracts.
+- Fixed information sent when priority changed email is sent to customer.
+### Changed
+- Show SR Summary in Aged SR Report.
+- Daily Stats box formatting.
+
+## [v5.6.0] - 2021-03-10
+### Added
+- Issue 1244 - Monthly Asset and Mailbox List Export.
+- Issue 1222 - Show Daily SR Stats on KPI Graph.
+- Issue 1255 - Add Expenses Next ProcessingDate ExpenseDashboard.
+- Issue 1268 - Tidy up feedbackuptoken table
+- Issue 1272 - Internal Stats API for website to include total number of proactively raised SRs
+- Issue 1266 - Save projects filter in local browser cache
+- Issue 1239 - Internal Notes to record to include who and when they were added
+- Issue 1259 - Add Engineer monthly billing graph.
+### Changed
+- Issue 1181 - SR Asset list & assignment improvements.
+- Issue 1262 - Leased Line Expiry Notifications email changed.
+- Issue 1252 - User time log to exclude weekends
+- Issue 1256 - Show when all linked SR linked to a SO are closed
+- Issue 1263 - Set emailSubjectSummary for system generated requests
+- Issue 1238 - Service Request Display Additional Information
+- Issue 1236 - Include contact name on Current SRs and SR summary only.
+### Fixed
+- Issue 1269 - Delete Activity icon is missing for some users
+- Issue 1187 - Old user login tidy up.
+- Issue 1250 - Additional Time Emails has wrong activity data
+- Issue 1251 - Prevent Child Item addition until item is saved
+
+## [v5.5.5] - 2021-02-19
+### Changed
+- Improved readability of the "To Be Logged" requests that's created when the customer doesn't have a Primary Contact.
+### Fixed
+- Fixed issue with Automated requests when there's no Primary Contact for the customer defined.
+
+## [v5.5.4] - 2021-02-16
+### Added
+- CNC 25 Years of Business Logo 	
+
+## [v5.5.3] - 2021-02-12
+### Fixed
+- Fixed issue with "Start Work" showing when it shouldn't.
+- Fixed countdown timer on Activity Edit page, not considering Hours in the countdown.
+
+## [v5.5.2] - 2021-02-12
+### Fixed
+- Fixed issue with Project page not allowing to save from the summary box.
+- Fixed issue where failed Signable generation wasn't being recorded in the error_log.
+
+## [v5.5.1] - 2021-02-11
+### Fixed
+- Fix link in Feedback notify email.
+- Use fixed activity instead of initial
+- Fix aesthetic issue
+
+## [v5.5.0] - 2021-02-10
+### Added
+- Issue 684  - Project System Enhancements
+- Issue 1232 - User hourly time graph
+- Issue 1152 - Added Feedback in home and mysettings.
+### Changed
+- Issue 1218 - Include quantities for child items in Sales Orders
+- Issue 1221 - Email sending TO CC fields
+- Issue 1219 - PO Status Report, include orders without SRs
+- Issue 1210 - Show Quantities for Direct Debit invoices
+- Issue 1184 - Activity Update button permission
+
+## [v5.4.2] - 2021-02-08
+### Fixed
+- Fixed First Time Fix reporting
+- Fixed issue with Internal notes not updating when copy/paste.
+
+## [v5.4.1] - 2021-02-04
+### Fixed
+- Fixed issue with misspelled words not getting saved correctly.
+- Fixed cosmetic issues in First Time Fix Report.
+- Fixed searching issues in First Time Fix Report.
+
+## [v5.4.0]
+### Added
+- Issue 1211 - Include SR Time Remaining on the Display Activity page.
+- Issue 1202 - Include icon for Fix SLA on dashboards
+### Changed
+- Issue 1206 - Include team engineers at the top of the list in the SD Dashboard when the SR is unassigned.
+- Issue 1186 - Don't notify when assigning requests to yourself.
+- Issue 1185 - Monitored SR Time Calculations for SR with no end time.
+- Issue 1199 - Changed VAT Number formatting.
+- Issue 1203 - Changed Priority 5 email contact for new SR raised wording.
+- Issue 1205 - Changed the way the StreamOne Licenses are displayed.
+- Issue 1207 - Include a unit in the Expenses running totals
+- Issue 1209 - Sales Order search to include Date Last Quoted
+- Issue 1200 - Landing page update after completing a staff appraisal.
+- Issue 1212 - Display CNC & On Hold time in the SR
+- Issue 1220 - RenewalsUpdate Left Align headings
+- Issue 1039 - Asset list Export Information Alternative Data fields
+### Fixed
+- Issue 1185 - Calendar item from an activity has a faulty link.
+- Issue 1228 - Aged SRs On Hold Status
+- Issue 1227 - New project emails going to main contacts as well.
+- Issue 1225 - Change request approval sometimes forces comments.
+
+## [v5.3.3] - 2021-01-25
+### Fixed
+- Sales Requests popup not clearing down.
+
+## [v5.3.2] - 2021-01-25 
+### Fixed
+- On the home page the links in this section are opening the Activity of the SR number, rather than the Activity ID.
+- Same section, stop the character codes from showing on the home page within Upcoming Visits.
+- Fixed style issues on Upcoming visits section of the home page.
+- Fixed style issues on the Sales Figures of the home page.
+
+## [v5.3.1] - 2021-01-22
+### Changed
+- Changed Customer Info show only current customers/contacts for the 24 Hour support tab and Special Attention tab.
+- Changed Customer Info special attention End dates format.
+### Fixed
+- Fixed issue with sorting by dates in RenewalsDashboard.php
+- Fixed issue with RequestDashboard.php remembering previous comments when approving/denying requests.
+- Fixed issue with &nsbp; making it's way into Homdata table.
+- Fixed issue with Call Out History not pulling data when changing the year selector.
+- Fixed issue with Call Out History selector not having the current year selected by default.
+- Fixed style for Daily stats.
+- Fixed issue when creating a follow on activity for users without SDManager Permission not being able to assign 
+  the activity type
+
+## [v5.3.0] - 2021-01-21
+### Added
+- Issue 1192 - Aged SRs Redesign.
+- Issue 1178 - New Home page design.
+- Issue 1195 - Enable draggable modal.
+- Issue 1193 - New Customer Information Tab.
+### Changed
+- Issue 1191 - Convert Service Renewals into a dashboard.
+- Issue 1198 - Increase limit of SD Manager Dashboard.
+- Issue 1196 - My Settings redesign.
+
+## [v5.2.3] - 2021-01-18
+### Fixed
+- Fixed issue with Change request sending the wrong email when approving/denying.
+
+## [v5.2.2] - 2021-01-13
+### Changed
+- Disabled Webspellchecker rule DASH_RULE.
+- Only force to enter comments when denying a request (time/change/sales).
+### Fixed
+- Fixed issue where time request had to be denied with a time value. 
+- Fixed several typos in Request Dashboard.
+- Fixed denied time requests not being processed correctly.
+### Removed
+- Removed P5 filter from Request Dashboard.
+
+## [v5.2.1] - 2021-01-13
+### Fixed
+- Fixed issue with usernames not showing in a dropdown when editing an activity.
+- Fixed issue with user dropdown not selecting the correct value. 
+### Changed
+- Changed behaviour of Sales Request endpoint to include P5 results even when the P5 filter is not sent.
+- Prevented autoClose timer countdown to show when autoclose is disabled.
+- Stop LogServiceRequest "Advise Customer" alert from closing automatically.
+
+## [v5.2.0] - 2021-01-12
+### Added
+- Issue 1038 - Add the means of monitoring the licensing data received from StreamOne.
+- Issue 1160 - KPI Graphs for performance
+### Changed
+- Issue 1170 - Modal Popup GUI Improvements
+- Issue 1164 - Combine Dashboards for Change, Sales and Time Requests
+- Issue 1148 - Set max number of mistakes in editor
+- Issue 1179 - Change Summary Of Resolution min character required.
+
+## [v5.1.4] - 2021-01-05
+### Fixed
+- Fixed issue with holdForQA accepting null value.
+- Fixed issue with direct debit invoices not being flagged as printed.
+- Fixed issue with direct debit invoices not being attached to the emails that get sent to customers.
+
+## [v5.1.3] - 2021-01-05
+### Fixed
+- Fixed issue with wrong date in Customer Review Meeting Documents emails.
+- Fixed issue with Empty asset reason not being saved when logging a new Service Request
+
 ## [v5.1.2] - 2021-01-04
 ### Fixed
 - Fixed issue with truncated activity description and UTF8

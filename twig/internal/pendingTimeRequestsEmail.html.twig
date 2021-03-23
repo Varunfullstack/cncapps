@@ -7,7 +7,7 @@
     }
 {% endblock %}
 {% block content %}
-    <p>These are the pending Time Requests</p>
+    <p>These are the pending Time Requests, <a href="{{ requestDashUrl }}">click here to process them</a></p>
     <table>
         <thead>
         <tr>
@@ -38,9 +38,7 @@
             <th>
                 Time Left On Budget
             </th>
-            <th>
-                Process Time Request
-            </th>
+            
         </tr>
         </thead>
         <tbody>
@@ -55,7 +53,6 @@
                 <td>{{ item.chargeableHours }}</td>
                 <td>{{ item.timeSpentSoFar }}</td>
                 <td>{{ item.timeLeftOnBudget }}</td>
-                <td><a href="{{ item.processURL }}">Process Time Request</a></td>
             </tr>
         {% endfor %}
         </tbody>

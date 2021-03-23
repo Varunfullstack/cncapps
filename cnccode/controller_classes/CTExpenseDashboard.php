@@ -369,67 +369,80 @@ WHERE
                     Header("Location: /NotAllowed.php");
                     exit;
                 }
-                $expenseQuery = "SELECT * FROM 
-(SELECT
-  consultant.`cns_name` AS staffName,
-  (SELECT
-    SUM(exp_value)
-  FROM
-    expense
-    LEFT JOIN callactivity
-      ON `callactivity`.`caa_callactivityno` = expense.`exp_callactivityno`
-  WHERE callactivity.`caa_consno` = consultant.`cns_consno`
-    AND caa_date BETWEEN DATE_FORMAT(NOW(), '%Y')
-    AND NOW()
-    AND exp_exported_flag <> \"N\"
-    AND expense.`approvedBy` IS NOT NULL) AS YTD,
-  b.*
+                $expenseQuery = "SELECT
+  *
 FROM
-  consultant
-  LEFT JOIN
-    (SELECT
-      callactivity.`caa_consno` AS staffId,
-      SUM(
-        IF(
-          expense.`approvedBy` IS NOT NULL,
-          expense.`exp_value`,
-          0
-        )
-      ) AS approvedValue,
-      SUM(
-        IF(
-          expense.`approvedBy` IS NULL
-          AND expense.`deniedReason` IS NULL,
-          expense.`exp_value`,
-          0
-        )
-      ) AS pendingValue
-    FROM
-      expense
-      LEFT JOIN `callactivity`
-        ON `callactivity`.`caa_callactivityno` = expense.`exp_callactivityno`
-    WHERE caa_endtime
-      AND caa_endtime IS NOT NULL
-      AND expense.`exp_exported_flag` <> 'Y'
-    GROUP BY staffId) b
-    ON b.staffId = consultant.`cns_consno`
-WHERE (
-    (consultant.`expenseApproverID` = ? AND
+  (SELECT
+    consultant.`cns_name` AS staffName,
+    b.*,
+    ytdQuery.YTD
+  FROM
+    consultant
+    LEFT JOIN
+      (SELECT
+        callactivity.`caa_consno`,
+        SUM(COALESCE(exp_value, 0)) AS YTD
+      FROM
+        expense
+        LEFT JOIN callactivity
+          ON `callactivity`.`caa_callactivityno` = expense.`exp_callactivityno`
+      WHERE caa_date BETWEEN DATE_FORMAT(NOW(), '%Y-01-01')
+        AND CURRENT_DATE
+        AND exp_exported_flag <> \"N\"
+        AND expense.`approvedBy` IS NOT NULL
+      GROUP BY callactivity.`caa_consno`) ytdQuery
+      ON ytdQuery.caa_consno = consultant.`cns_consno`
+    LEFT JOIN
+      (SELECT
+        callactivity.`caa_consno` AS staffId,
+        SUM(
+          IF(
+            expense.`approvedBy` IS NOT NULL,
+            expense.`exp_value`,
+            0
+          )
+        ) AS approvedValue,
+        SUM(
+          IF(
+            expense.`approvedBy` IS NULL
+            AND expense.`deniedReason` IS NULL,
+            expense.`exp_value`,
+            0
+          )
+        ) AS pendingValue
+      FROM
+        expense
+        LEFT JOIN `callactivity`
+          ON `callactivity`.`caa_callactivityno` = expense.`exp_callactivityno`
+      WHERE caa_endtime
+        AND caa_endtime IS NOT NULL
+        AND expense.`exp_exported_flag` <> 'Y'
+      GROUP BY staffId) b
+      ON b.staffId = consultant.`cns_consno`
+  WHERE (
+      (
+        consultant.`expenseApproverID` = ?
+        AND
+        (SELECT
+          1
+        FROM
+          consultant approvers
+        WHERE approvers.isExpenseApprover
+          AND approvers.cns_consno = ?)
+      )
+      OR
       (SELECT
         1
       FROM
-        consultant approvers
-      WHERE approvers.isExpenseApprover
-        AND approvers.cns_consno = ?))
-    OR
-    (SELECT
-      1
-    FROM
-      consultant globalApprovers
-    WHERE globalApprovers.globalExpenseApprover
-      AND globalApprovers.cns_consno = ?) = 1
-  ) 
-  AND consultant.`activeFlag` = \"Y\") a WHERE YTD IS NOT NULL OR approvedValue IS NOT NULL OR pendingValue IS NOT NULL ORDER BY staffName";
+        consultant globalApprovers
+      WHERE globalApprovers.globalExpenseApprover
+        AND globalApprovers.cns_consno = ?) = 1
+    )
+    AND consultant.`activeFlag` = \"Y\") a
+WHERE YTD IS NOT NULL
+  OR approvedValue IS NOT NULL
+  OR pendingValue IS NOT NULL
+ORDER BY staffName";
                 $result       = $db->preparedQuery(
                     $expenseQuery,
                     [
@@ -452,21 +465,25 @@ WHERE (
 FROM
   (SELECT
     consultant.`cns_name` AS staffName,
-    (SELECT
-      SUM(overtimeDurationApproved)
-    FROM
-      callactivity
-    WHERE caa_date BETWEEN DATE_FORMAT(NOW(), '%Y')
-      AND NOW()
-      AND callactivity.`overtimeApprovedBy` IS NOT NULL
-      AND (caa_status = 'C'
-        OR caa_status = 'A')
-      AND caa_ot_exp_flag = 'Y'
-      AND submitAsOvertime
-      AND callactivity.`caa_consno` = consultant.`cns_consno`) AS YTD,
+    ytdQuery.YTD,
     b.*
   FROM
     consultant
+    LEFT JOIN
+      (SELECT
+        callactivity.`caa_consno`,
+        SUM(overtimeDurationApproved) AS YTD
+      FROM
+        callactivity
+      WHERE caa_date BETWEEN DATE_FORMAT(NOW(), '%Y-01-01')
+        AND CURRENT_DATE
+        AND callactivity.`overtimeApprovedBy` IS NOT NULL
+        AND (caa_status = 'C'
+          OR caa_status = 'A')
+        AND caa_ot_exp_flag = 'Y'
+        AND submitAsOvertime
+      GROUP BY callactivity.`caa_consno`) ytdQuery
+      ON ytdQuery.caa_consno = consultant.`cns_consno`
     LEFT JOIN
       (SELECT
         callactivity.caa_consno AS staffId,
@@ -503,15 +520,16 @@ FROM
       GROUP BY staffId) b
       ON b.staffId = consultant.`cns_consno`
   WHERE (
-      (consultant.`expenseApproverID` = ?
-      AND
-      (SELECT
-        1
-      FROM
-        consultant approvers
-      WHERE approvers.isExpenseApprover
-        AND approvers.cns_consno = ?)
-          )
+      (
+        consultant.`expenseApproverID` = ?
+        AND
+        (SELECT
+          1
+        FROM
+          consultant approvers
+        WHERE approvers.isExpenseApprover
+          AND approvers.cns_consno = ?)
+      )
       OR
       (SELECT
         1
@@ -520,7 +538,7 @@ FROM
       WHERE globalApprovers.globalExpenseApprover
         AND globalApprovers.cns_consno = ?) = 1
     )
-    AND consultant.`activeFlag` = \"Y\") a
+    AND consultant.`activeFlag` = 'Y') a
 WHERE YTD IS NOT NULL
   OR approvedValue IS NOT NULL
   OR pendingValue IS NOT NULL
@@ -1166,8 +1184,7 @@ WHERE
             );
             $overtimeApprovedValue = $overtimeDurationApproved;
             if (!$overtimeApprovedValue) {
-                $buExpense             = new BUExpense($this);
-
+                $buExpense = new BUExpense($this);
                 $overtimeApprovedValue = number_format($buExpense->calculateOvertime($activityId), 2, '.', '');
             }
             $dbeCallActivity->setValue(
@@ -1267,7 +1284,16 @@ WHERE
     function displayReport()
     {
 
-
+        $buHeader  = new BUHeader($this);
+        $dbeHeader = new DataSet($this);
+        $buHeader->getHeader($dbeHeader);
+        $expensesNextProcessingDate = $dbeHeader->getValue(DBEHeader::expensesNextProcessingDate);
+        if (!empty($expensesNextProcessingDate)) {
+            $expensesNextProcessingDate = new DateTime($expensesNextProcessingDate);
+            $expensesNextProcessingDate = 'Next payroll processing date is ' . $expensesNextProcessingDate->format(
+                    'd/m/Y'
+                );
+        }
         $this->setMethodName('displayReport');
         $this->setTemplateFiles(
             'ExpenseDashboard',
@@ -1328,11 +1354,12 @@ WHERE caa_endtime
             );
         $this->template->setVar(
             [
-                'approvedExpenseValue'  => $expenseSummary['approved'],
-                'pendingExpenseValue'   => $expenseSummary['pending'],
-                'approvedOvertimeValue' => $overtimeSummary['approved'],
-                'pendingOvertimeValue'  => $overtimeSummary['pending'],
-                'runningTotalsLink'     => $isApprover ? '<a href="?action=runningTotals" target="_blank">Running Totals</a>' : null,
+                'approvedExpenseValue'       => $expenseSummary['approved'],
+                'pendingExpenseValue'        => $expenseSummary['pending'],
+                'approvedOvertimeValue'      => $overtimeSummary['approved'],
+                'pendingOvertimeValue'       => $overtimeSummary['pending'],
+                'runningTotalsLink'          => $isApprover ? '<a href="?action=runningTotals" target="_blank">Running Totals</a>' : null,
+                'expensesNextProcessingDate' => $expensesNextProcessingDate
             ]
         );
         $this->template->parse(

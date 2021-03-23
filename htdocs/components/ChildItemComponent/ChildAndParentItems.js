@@ -53,7 +53,11 @@ class ChildAndParentItems extends React.Component {
             {className: 'child-and-parent__parent-list', key: 'child-and-parent__parent-list-container'},
             [
                 this.el('h3', {key: 'child-and-parent__parent-list-title'}, 'Parent Items'),
-                this.el(ItemList, {items: this.state.parentItems, key: 'child-and-parent__parent-list'})
+                this.el(ItemList, {
+                    items: this.state.parentItems,
+                    key: 'child-and-parent__parent-list',
+                    showCount: false
+                })
             ]
         )
     }
@@ -79,5 +83,8 @@ class ChildAndParentItems extends React.Component {
 export default ChildAndParentItems;
 document.addEventListener('DOMContentLoaded', () => {
     const domContainer = document.querySelector('#reactChildAndParentItemsComponent');
+    if (!domContainer.dataset.itemId) {
+        return;
+    }
     ReactDOM.render(React.createElement(ChildAndParentItems, {itemId: domContainer.dataset.itemId}), domContainer);
 })

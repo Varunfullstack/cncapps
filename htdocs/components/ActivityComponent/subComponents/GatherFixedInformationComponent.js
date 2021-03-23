@@ -10,6 +10,7 @@ import {groupBy, params} from "../../utils/utils.js";
 import React from 'react';
 import CustomerDocumentUploader from "./CustomerDocumentUploader";
 import EditorFieldComponent from "../../shared/EditorField/EditorFieldComponent";
+import {RESOLUTION_SUMMARY_MIN_CHARS} from "../../CONFIG_CONSTANTS";
 
 class GatherFixedInformationComponent extends MainComponent {
     el = React.createElement;
@@ -149,7 +150,7 @@ class GatherFixedInformationComponent extends MainComponent {
                             <EditorFieldComponent name="summaryOfResolution"
                                                   value={initialActivity?.reason}
                                                   onChange={(value) => this.setValue("resolutionSummary", value)}
-                                                  minCharCount={activity.problemHideFromCustomerFlag == 'N' ? 160 : -1}
+                                                  minCharCount={activity.problemHideFromCustomerFlag == 'N' ? RESOLUTION_SUMMARY_MIN_CHARS : -1}
                                                   disableClipboard={true}
                             />
                         )
@@ -369,8 +370,8 @@ class GatherFixedInformationComponent extends MainComponent {
             this.alert("You must enter more text in the summary information");
             return;
         }
-        if (activity.problemHideFromCustomerFlag == 'N' && data.resolutionSummary.length < 160) {
-            this.alert("The resolution summary must have at least 160 characters");
+        if (activity.problemHideFromCustomerFlag == 'N' && data.resolutionSummary.length < RESOLUTION_SUMMARY_MIN_CHARS) {
+            this.alert(`The resolution summary must have at least ${RESOLUTION_SUMMARY_MIN_CHARS} characters`);
             return;
         }
         data.problemID = activity.problemID;

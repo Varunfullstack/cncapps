@@ -55,16 +55,17 @@ define(
 
 class CTItem extends CTCNC
 {
-    public const ADD_CHILD_ITEM         = "ADD_CHILD_ITEM";
-    public const REMOVE_CHILD_ITEM      = "REMOVE_CHILD_ITEM";
-    const        GET_CHILD_ITEMS        = "GET_CHILD_ITEMS";
-    const        GET_PARENT_ITEMS       = "GET_PARENT_ITEMS";
-    const        SEARCH_ITEMS           = "SEARCH_ITEMS";
-    const        CHECK_ITEM_RECURRING   = "CHECK_ITEM_RECURRING";
-    const        DATA_TABLE_GET_DATA    = "DATA_TABLE_GET_DATA";
-    const        SEARCH_ITEMS_JSON      = "SEARCH_ITEMS_JSON";
-    const        GET_ITEM               = 'GET_ITEM';
-    const        UPDATE_CONTRACTS_PRICE = 'updateContractsPrice';
+    public const ADD_CHILD_ITEM             = "ADD_CHILD_ITEM";
+    public const REMOVE_CHILD_ITEM          = "REMOVE_CHILD_ITEM";
+    const        GET_CHILD_ITEMS            = "GET_CHILD_ITEMS";
+    const        GET_PARENT_ITEMS           = "GET_PARENT_ITEMS";
+    const        SEARCH_ITEMS               = "SEARCH_ITEMS";
+    const        CHECK_ITEM_RECURRING       = "CHECK_ITEM_RECURRING";
+    const        DATA_TABLE_GET_DATA        = "DATA_TABLE_GET_DATA";
+    const        SEARCH_ITEMS_JSON          = "SEARCH_ITEMS_JSON";
+    const        GET_ITEM                   = 'GET_ITEM';
+    const        UPDATE_CONTRACTS_PRICE     = 'updateContractsPrice';
+    const        UPDATE_CHILD_ITEM_QUANTITY = 'UPDATE_CHILD_ITEM_QUANTITY';
     /** @var DSForm */
     public $dsItem;
     /**
@@ -223,16 +224,13 @@ WHERE custitem.`cui_itemno` = ?
                 echo json_encode(["status" => "ok"]);
                 exit;
             case self::GET_CHILD_ITEMS:
-                if (!$this->getParam('itemId')) {
+                $parentItemId = $this->getParam('itemId');
+                if (!$parentItemId) {
                     throw new JsonHttpException(400, 'Item Id is mandatory');
                 }
-                $dbeItem = new DBEItem($this);
-                $dbeItem->getChildItems($this->getParam('itemId'));
-                $rows = [];
-                while ($dbeItem->fetchNext()) {
-                    $rows[] = $dbeItem->getRowAsAssocArray();
-                }
-                echo json_encode(["status" => "ok", "data" => $rows]);
+                global $db;
+                $repo = new \CNCLTD\ChildItem\ChildItemRepository($db);
+                echo json_encode(["status" => "ok", "data" => $repo->getChildItemsForItem($parentItemId)]);
                 break;
             case self::GET_PARENT_ITEMS:
                 if (!$this->getParam('itemId')) {
@@ -438,7 +436,23 @@ WHERE custitem.`cui_itemno` = ?
                 $dbeItemType = new DBEItemType($this);
                 $dbeItemType->getRow($itemTypeId);
                 echo json_encode(["status" => "ok", "data" => $dbeItemType->getValue(DBEItemType::reoccurring)]);
-
+                break;
+            }
+            case self::UPDATE_CHILD_ITEM_QUANTITY:
+            {
+                $data = $this->getJSONData();
+                if (!isset($data['parentItemId'])) {
+                    throw new JsonHttpException(400, 'parentItemId is mandatory');
+                }
+                if (!isset($data['childItemId'])) {
+                    throw new JsonHttpException(400, 'child item id is mandatory');
+                }
+                if (!isset($data['quantity'])) {
+                    throw new JsonHttpException(400, 'Quantity should be 1 or more...');
+                }
+                $this->updateChildItemQuantity($data['parentItemId'], $data['childItemId'], $data['quantity']);
+                echo json_encode(["status" => "ok"]);
+                break;
             }
             case CTCNC_ACT_DISP_ITEM_POPUP:
                 $this->displayItemSelectPopup();
@@ -827,7 +841,7 @@ WHERE custitem.`cui_itemno` = ?
     function addChildItem($parentItemId, $childItemId)
     {
         global $db;
-        $query = "insert ignore into childItem values(?,?) ";
+        $query = "insert ignore into childItem values(?,?, 1) ";
         $db->preparedQuery(
             $query,
             [
@@ -1073,5 +1087,12 @@ WHERE custitem.`cui_itemno` = ?
                 true
             );
         }
+    }
+
+    private function updateChildItemQuantity($parentItemId, $childItemId, $quantity)
+    {
+        global $db;
+        $repo = new \CNCLTD\ChildItem\ChildItemRepository($db);
+        $repo->updateChildItemQuantity($parentItemId, $childItemId, $quantity);
     }
 }

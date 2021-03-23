@@ -33,12 +33,12 @@ class Table extends React.Component {
 
     constructor(props) {
         super(props);
+        const sortColumn = {...this.props.columns.find(x => x.path === this.props.defaultSortPath)};
+        sortColumn.order = this.props.defaultSortOrder ? this.props.defaultSortOrder : 'asc';
+
         this.state = {
-            sortColumn: {
-                path: this.props.defaultSortPath,
-                order: this.props.defaultSortOrder ? this.props.defaultSortOrder : 'asc',
-                searchFilter: ""
-            }
+            searchFilter: "",
+            sortColumn,
         }
     }
 
@@ -87,23 +87,25 @@ class Table extends React.Component {
         }
     }
 
-    handleSort = (sortColumn) => {
+    handleSort = (path) => {
+        let {sortColumn} = this.state;
+        const {columns} = this.props;
+
+        if (sortColumn.path !== path) {
+            sortColumn = {...columns.find(x => x.path == path)};
+            sortColumn.order = 'asc';
+        } else {
+            sortColumn.order = sortColumn.order == "asc" ? "desc" : "asc";
+        }
+
         if (sortColumn.path !== this.props.defaultSortPath || sortColumn.order !== this.props.defaultSortOrder) {
             this.disableSortable();
         } else {
             this.enableSortable();
         }
-
-        for (let i = 0; i < this.props.columns.length; i++) {
-            if (this.props.columns[i].path == sortColumn.path) {
-                //check if column is sortable
-                const sortable = this.props.columns[i].sortable ? this.props.columns[i].sortable : false;
-                if (sortable)
-                    this.setState({sortColumn});
-            }
-        }
+        this.setState({sortColumn});
     };
-    get = (o, p) => p.split(".").reduce((a, v) => a[v], o);
+    get = (o, p) => p.split(".").reduce((a, v) => a[v], o) || '';
     sort = (array, path, order = "asc") => {
         return array.sort((a, b) => {
             if (
@@ -175,11 +177,18 @@ class Table extends React.Component {
         const {handleSearch} = this;
         const el = React.createElement;
         const filterData = search ? this.filterData(data, columns) : data;
+        let striped = "table-striped";
+        if (this.props.striped === false)
+            striped = "";
         if (this.state.sortColumn.path != null && data.length > 0) {
-            this.sort(filterData, this.state.sortColumn.path, this.state.sortColumn.order);
+            if (this.state.sortColumn.sortFn) {
+                filterData.sort(this.state.sortColumn.sortFn(this.state.sortColumn.order));
+            } else {
+                this.sort(filterData, this.state.sortColumn.path, this.state.sortColumn.order);
+            }
         }
         return [
-            el("div", {className: "flex-row"},
+            el("div", {className: "flex-row", key: "tableSearch"},
                 search
                     ? el("div", {key: "tableSearch", style: {marginBottom: 5}, className: "flex-row"}, [
                         el(
@@ -202,15 +211,17 @@ class Table extends React.Component {
             el("table", {
                 key: "table" + this.props.id,
                 id: "table" + this.props.id,
-                className: "table table-striped"
+                className: "table " + striped
             }, [
                 el(TableHeader, {
+                    key: "tableHeader",
                     id: "tableHeader",
                     columns: columns,
                     sortColumn: sortColumn,
                     onSort: this.handleSort,
                 }),
                 filterData.length > 0 ? el(TableBody, {
+                        key: "TableBody",
                         id: "tableBody",
                         data: filterData,
                         columns,
@@ -219,7 +230,7 @@ class Table extends React.Component {
                         selectedKey,
                     })
                     : null,
-                hasFooter ? el(TableFooter, {id: "tableFooter", columns}) : null
+                hasFooter ? el(TableFooter, {key: "tableFooter", id: "tableFooter", columns}) : null
             ]),
         ];
     }

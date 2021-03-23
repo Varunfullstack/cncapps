@@ -8,109 +8,113 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEHeader extends DBEntity
 {
-    const headerID = "headerID";
-    const name = "name";
-    const add1 = "add1";
-    const add2 = "add2";
-    const add3 = "add3";
-    const town = "town";
-    const county = "county";
-    const postcode = "postcode";
-    const phone = "phone";
-    const fax = "fax";
-    const goodsContact = "goodsContact";
-    const stdVATCode = "stdVATCode";
-    const billingStartTime = "billingStartTime";
-    const billingEndTime = "billingEndTime";
-    const overtimeStartTime = "overtimeStartTime";
-    const overtimeEndTime = "overtimeEndTime";
-    const gscItemID = "gscItemID";
-    const portalPin = "portalPin";
-    const portal24HourPin = "portal24HourPin";
-    const mailshot2FlagDef = "mailshot2FlagDef";
-    const mailshot3FlagDef = "mailshot3FlagDef";
-    const mailshot8FlagDef = "mailshot8FlagDef";
-    const mailshot9FlagDef = "mailshot9FlagDef";
-    const mailshot11FlagDef = "mailshot11FlagDef";
-    const mailshot2FlagDesc = "mailshot2FlagDesc";
-    const mailshot3FlagDesc = "mailshot3FlagDesc";
-    const mailshot8FlagDesc = "mailshot8FlagDesc";
-    const mailshot9FlagDesc = "mailshot9FlagDesc";
-    const mailshot11FlagDesc = "mailshot11FlagDesc";
-    const hourlyLabourCost = "hourlyLabourCost";
-    const highActivityAlertCount = "highActivityAlertCount";
-    const priority1Desc = "priority1Desc";
-    const priority2Desc = "priority2Desc";
-    const priority3Desc = "priority3Desc";
-    const priority4Desc = "priority4Desc";
-    const priority5Desc = "priority5Desc";
-    const allowedClientIpPattern = "allowedClientIpPattern";
-    const hdTeamLimitMinutes = "hdTeamLimitMinutes";
-    const esTeamLimitMinutes = "esTeamLimitMinutes";
-    const smallProjectsTeamLimitMinutes = "smallProjectsTeamLimitMinutes";
-    const hdTeamTargetLogPercentage = "hdTeamTargetLogPercentage";
-    const esTeamTargetLogPercentage = "esTeamTargetLogPercentage";
-    const smallProjectsTeamTargetLogPercentage = "smallProjectsTeamTargetLogPercentage";
-    const hdTeamTargetSlaPercentage = "hdTeamTargetSlaPercentage";
-    const esTeamTargetSlaPercentage = "esTeamTargetSlaPercentage";
-    const smallProjectsTeamTargetSlaPercentage = "smallProjectsTeamTargetSlaPercentage";
-    const hdTeamTargetFixHours = "hdTeamTargetFixHours";
-    const esTeamTargetFixHours = "esTeamTargetFixHours";
-    const smallProjectsTeamTargetFixHours = "smallProjectsTeamTargetFixHours";
-    const hdTeamTargetFixQtyPerMonth = "hdTeamTargetFixQtyPerMonth";
-    const esTeamTargetFixQtyPerMonth = "esTeamTargetFixQtyPerMonth";
-    const smallProjectsTeamTargetFixQtyPerMonth = "smallProjectsTeamTargetFixQtyPerMonth";
-    const projectTeamTargetLogPercentage = "projectTeamTargetLogPercentage";
-    const projectTeamLimitMinutes = "projectTeamLimitMinutes";
-    const projectTeamMinutesInADay = "projectTeamMinutesInADay";
-    const srAutocompleteThresholdHours = "srAutocompleteThresholdHours";
-    const srPromptContractThresholdHours = "srPromptContractThresholdHours";
-    const remoteSupportWarnHours = "remoteSupportWarnHours";
-    const customerContactWarnHours = "customerContactWarnHours";
-    const RemoteSupportMinWarnHours = "RemoteSupportMinWarnHours";
-    const smallProjectsTeamMinutesInADay = "smallProjectsTeamMinutesInADay";
-    const backupTargetSuccessRate = "backupTargetSuccessRate";
-    const backupReplicationTargetSuccessRate = "backupReplicationTargetSuccessRate";
-    const customerReviewMeetingText = "customerReviewMeetingText";
-    const serviceDeskNotification24hBegin = "serviceDeskNotification24hBegin";
-    const serviceDeskNotification24hEnd = "serviceDeskNotification24hEnd";
-    const srStartersLeaversAutoCompleteThresholdHours = "srStartersLeaversAutoCompleteThresholdHours";
-    const SDDashboardEngineersInSRInPastHours = "SDDashboardEngineersInSRInPastHours";
-    const secondSiteReplicationAdditionalDelayAllowance = "secondSiteReplicationAdditionalDelayAllowance";
-    const SDDashboardEngineersInSREngineersMaxCount = "SDDashboardEngineersInSREngineersMaxCount";
-    const projectCommenceNotification = "projectCommenceNotification";
-    const OSSupportDatesThresholdDays = "OSSupportDatesThresholdDays";
-    const closingSRBufferMinutes = "closingSRBufferMinutes";
-    const sevenDayerAmberDays = "sevenDayerAmberDays";
-    const sevenDayerRedDays = "sevenDayerRedDays";
-    const office365MailboxYellowWarningThreshold = "office365MailboxYellowWarningThreshold";
-    const office365MailboxRedWarningThreshold = "office365MailboxRedWarningThreshold";
-    const autoCriticalP1Hours = "autoCriticalP1Hours";
-    const autoCriticalP2Hours = "autoCriticalP2Hours";
-    const autoCriticalP3Hours = "autoCriticalP3Hours";
-    const sevenDayerTarget = "sevenDayerTarget";
-    const minimumOvertimeMinutesRequired = "minimumOvertimeMinutesRequired";
-    const expensesNextProcessingDate = "expensesNextProcessingDate";
-    const daysInAdvanceExpensesNextMonthAlert = "daysInAdvanceExpensesNextMonthAlert";
-    const closureReminderDays = "closureReminderDays";
-    const solarwindsPartnerName = "solarwindsPartnerName";
-    const solarwindsUsername = "solarwindsUsername";
-    const solarwindsPassword = "solarwindsPassword";
-    const pendingTimeLimitActionThresholdMinutes = "pendingTimeLimitActionThresholdMinutes";
-    const projectTeamTargetSlaPercentage = "projectTeamTargetSlaPercentage";
-    const projectTeamTargetFixHours = "projectTeamTargetFixHours";
-    const projectTeamTargetFixQtyPerMonth = 'projectTeamTargetFixQtyPerMonth';
-    const yearlySicknessThresholdWarning = 'yearlySicknessThresholdWarning';
-    const cDriveFreeSpaceWarningPercentageThreshold = 'cDriveFreeSpaceWarningPercentageThreshold';
-    const otherDriveFreeSpaceWarningPercentageThreshold = 'otherDriveFreeSpaceWarningPercentageThreshold';
-    const office365ActiveSyncWarnAfterXDays = "office365ActiveSyncWarnAfterXDays";
-    const hdTeamManagementTimeApprovalMinutes = "hdTeamManagementTimeApprovalMinutes";
-    const esTeamManagementTimeApprovalMinutes = "esTeamManagementTimeApprovalMinutes";
+    const headerID                                       = "headerID";
+    const name                                           = "name";
+    const add1                                           = "add1";
+    const add2                                           = "add2";
+    const add3                                           = "add3";
+    const town                                           = "town";
+    const county                                         = "county";
+    const postcode                                       = "postcode";
+    const phone                                          = "phone";
+    const fax                                            = "fax";
+    const goodsContact                                   = "goodsContact";
+    const stdVATCode                                     = "stdVATCode";
+    const billingStartTime                               = "billingStartTime";
+    const billingEndTime                                 = "billingEndTime";
+    const overtimeStartTime                              = "overtimeStartTime";
+    const overtimeEndTime                                = "overtimeEndTime";
+    const gscItemID                                      = "gscItemID";
+    const portalPin                                      = "portalPin";
+    const portal24HourPin                                = "portal24HourPin";
+    const mailshot2FlagDef                               = "mailshot2FlagDef";
+    const mailshot3FlagDef                               = "mailshot3FlagDef";
+    const mailshot8FlagDef                               = "mailshot8FlagDef";
+    const mailshot9FlagDef                               = "mailshot9FlagDef";
+    const mailshot11FlagDef                              = "mailshot11FlagDef";
+    const mailshot2FlagDesc                              = "mailshot2FlagDesc";
+    const mailshot3FlagDesc                              = "mailshot3FlagDesc";
+    const mailshot8FlagDesc                              = "mailshot8FlagDesc";
+    const mailshot9FlagDesc                              = "mailshot9FlagDesc";
+    const mailshot11FlagDesc                             = "mailshot11FlagDesc";
+    const hourlyLabourCost                               = "hourlyLabourCost";
+    const highActivityAlertCount                         = "highActivityAlertCount";
+    const priority1Desc                                  = "priority1Desc";
+    const priority2Desc                                  = "priority2Desc";
+    const priority3Desc                                  = "priority3Desc";
+    const priority4Desc                                  = "priority4Desc";
+    const priority5Desc                                  = "priority5Desc";
+    const allowedClientIpPattern                         = "allowedClientIpPattern";
+    const hdTeamLimitMinutes                             = "hdTeamLimitMinutes";
+    const esTeamLimitMinutes                             = "esTeamLimitMinutes";
+    const smallProjectsTeamLimitMinutes                  = "smallProjectsTeamLimitMinutes";
+    const hdTeamTargetLogPercentage                      = "hdTeamTargetLogPercentage";
+    const esTeamTargetLogPercentage                      = "esTeamTargetLogPercentage";
+    const smallProjectsTeamTargetLogPercentage           = "smallProjectsTeamTargetLogPercentage";
+    const hdTeamTargetSlaPercentage                      = "hdTeamTargetSlaPercentage";
+    const esTeamTargetSlaPercentage                      = "esTeamTargetSlaPercentage";
+    const smallProjectsTeamTargetSlaPercentage           = "smallProjectsTeamTargetSlaPercentage";
+    const hdTeamTargetFixHours                           = "hdTeamTargetFixHours";
+    const esTeamTargetFixHours                           = "esTeamTargetFixHours";
+    const smallProjectsTeamTargetFixHours                = "smallProjectsTeamTargetFixHours";
+    const hdTeamTargetFixQtyPerMonth                     = "hdTeamTargetFixQtyPerMonth";
+    const esTeamTargetFixQtyPerMonth                     = "esTeamTargetFixQtyPerMonth";
+    const smallProjectsTeamTargetFixQtyPerMonth          = "smallProjectsTeamTargetFixQtyPerMonth";
+    const projectTeamTargetLogPercentage                 = "projectTeamTargetLogPercentage";
+    const projectTeamLimitMinutes                        = "projectTeamLimitMinutes";
+    const projectTeamMinutesInADay                       = "projectTeamMinutesInADay";
+    const srAutocompleteThresholdHours                   = "srAutocompleteThresholdHours";
+    const srPromptContractThresholdHours                 = "srPromptContractThresholdHours";
+    const remoteSupportWarnHours                         = "remoteSupportWarnHours";
+    const customerContactWarnHours                       = "customerContactWarnHours";
+    const RemoteSupportMinWarnHours                      = "RemoteSupportMinWarnHours";
+    const smallProjectsTeamMinutesInADay                 = "smallProjectsTeamMinutesInADay";
+    const backupTargetSuccessRate                        = "backupTargetSuccessRate";
+    const backupReplicationTargetSuccessRate             = "backupReplicationTargetSuccessRate";
+    const customerReviewMeetingText                      = "customerReviewMeetingText";
+    const serviceDeskNotification24hBegin                = "serviceDeskNotification24hBegin";
+    const serviceDeskNotification24hEnd                  = "serviceDeskNotification24hEnd";
+    const srStartersLeaversAutoCompleteThresholdHours    = "srStartersLeaversAutoCompleteThresholdHours";
+    const SDDashboardEngineersInSRInPastHours            = "SDDashboardEngineersInSRInPastHours";
+    const secondSiteReplicationAdditionalDelayAllowance  = "secondSiteReplicationAdditionalDelayAllowance";
+    const SDDashboardEngineersInSREngineersMaxCount      = "SDDashboardEngineersInSREngineersMaxCount";
+    const projectCommenceNotification                    = "projectCommenceNotification";
+    const OSSupportDatesThresholdDays                    = "OSSupportDatesThresholdDays";
+    const closingSRBufferMinutes                         = "closingSRBufferMinutes";
+    const sevenDayerAmberDays                            = "sevenDayerAmberDays";
+    const sevenDayerRedDays                              = "sevenDayerRedDays";
+    const office365MailboxYellowWarningThreshold         = "office365MailboxYellowWarningThreshold";
+    const office365MailboxRedWarningThreshold            = "office365MailboxRedWarningThreshold";
+    const autoCriticalP1Hours                            = "autoCriticalP1Hours";
+    const autoCriticalP2Hours                            = "autoCriticalP2Hours";
+    const autoCriticalP3Hours                            = "autoCriticalP3Hours";
+    const sevenDayerTarget                               = "sevenDayerTarget";
+    const minimumOvertimeMinutesRequired                 = "minimumOvertimeMinutesRequired";
+    const expensesNextProcessingDate                     = "expensesNextProcessingDate";
+    const daysInAdvanceExpensesNextMonthAlert            = "daysInAdvanceExpensesNextMonthAlert";
+    const closureReminderDays                            = "closureReminderDays";
+    const solarwindsPartnerName                          = "solarwindsPartnerName";
+    const solarwindsUsername                             = "solarwindsUsername";
+    const solarwindsPassword                             = "solarwindsPassword";
+    const pendingTimeLimitActionThresholdMinutes         = "pendingTimeLimitActionThresholdMinutes";
+    const projectTeamTargetSlaPercentage                 = "projectTeamTargetSlaPercentage";
+    const projectTeamTargetFixHours                      = "projectTeamTargetFixHours";
+    const projectTeamTargetFixQtyPerMonth                = 'projectTeamTargetFixQtyPerMonth';
+    const yearlySicknessThresholdWarning                 = 'yearlySicknessThresholdWarning';
+    const cDriveFreeSpaceWarningPercentageThreshold      = 'cDriveFreeSpaceWarningPercentageThreshold';
+    const otherDriveFreeSpaceWarningPercentageThreshold  = 'otherDriveFreeSpaceWarningPercentageThreshold';
+    const office365ActiveSyncWarnAfterXDays              = "office365ActiveSyncWarnAfterXDays";
+    const hdTeamManagementTimeApprovalMinutes            = "hdTeamManagementTimeApprovalMinutes";
+    const esTeamManagementTimeApprovalMinutes            = "esTeamManagementTimeApprovalMinutes";
     const smallProjectsTeamManagementTimeApprovalMinutes = "smallProjectsTeamManagementTimeApprovalMinutes";
-    const fixSLABreachWarningHours = "fixSLABreachWarningHours";
-    const computerLastSeenThresholdDays = "computerLastSeenThresholdDays";
-    const holdAllSOSmallProjectsP5sforQAReview="holdAllSOSmallProjectsP5sforQAReview";
-    const holdAllSOProjectsP5sforQAReview="holdAllSOProjectsP5sforQAReview";
+    const fixSLABreachWarningHours                       = "fixSLABreachWarningHours";
+    const computerLastSeenThresholdDays                  = "computerLastSeenThresholdDays";
+    const holdAllSOSmallProjectsP5sforQAReview           = "holdAllSOSmallProjectsP5sforQAReview";
+    const holdAllSOProjectsP5sforQAReview                = "holdAllSOProjectsP5sforQAReview";
+    const numberOfAllowedMistakes                        = "numberOfAllowedMistakes";
+    const antivirusOutOfDateThresholdDays                = "antivirusOutOfDateThresholdDays";
+    const offlineAgentThresholdDays                      = "offlineAgentThresholdDays";
+
     /**
      * calls constructor()
      * @access public
@@ -361,7 +365,6 @@ class DBEHeader extends DBEntity
             DA_NOT_NULL,
             "hed_im_team_limit_minutes"
         );
-
         $this->addColumn(
             self::projectTeamLimitMinutes,
             DA_FLOAT,
@@ -408,7 +411,6 @@ class DBEHeader extends DBEntity
             DA_NOT_NULL,
             "hed_im_team_target_sla_percentage"
         );
-
         $this->addColumn(
             self::projectTeamTargetSlaPercentage,
             DA_INTEGER,
@@ -554,25 +556,21 @@ class DBEHeader extends DBEntity
             DA_NOT_NULL,
             'secondSiteReplicationAdditionalDelayAllowance'
         );
-
         $this->addColumn(
             self::projectCommenceNotification,
             DA_INTEGER,
             DA_NOT_NULL
         );
-
         $this->addColumn(
             self::OSSupportDatesThresholdDays,
             DA_INTEGER,
             DA_NOT_NULL
         );
-
         $this->addColumn(
             self::closingSRBufferMinutes,
             DA_INTEGER,
             DA_NOT_NULL
         );
-
         $this->addColumn(
             self::office365MailboxYellowWarningThreshold,
             DA_INTEGER,
@@ -583,7 +581,6 @@ class DBEHeader extends DBEntity
             DA_INTEGER,
             DA_NOT_NULL
         );
-
         $this->addColumn(self::sevenDayerAmberDays, DA_INTEGER, DA_NOT_NULL);
         $this->addColumn(self::sevenDayerTarget, DA_INTEGER, DA_NOT_NULL);
         $this->addColumn(self::sevenDayerRedDays, DA_INTEGER, DA_NOT_NULL);
@@ -609,7 +606,21 @@ class DBEHeader extends DBEntity
         $this->addColumn(self::computerLastSeenThresholdDays, DA_INTEGER, DA_NOT_NULL);
         $this->addColumn(self::holdAllSOProjectsP5sforQAReview, DA_BOOLEAN, DA_NOT_NULL);
         $this->addColumn(self::holdAllSOSmallProjectsP5sforQAReview, DA_BOOLEAN, DA_NOT_NULL);
-
+        $this->addColumn(self::numberOfAllowedMistakes, DA_INTEGER, DA_NOT_NULL);
+        $this->addColumn(
+            self::antivirusOutOfDateThresholdDays,
+            DA_INTEGER,
+            DA_NOT_NULL,
+            null,
+            14
+        );
+        $this->addColumn(
+            self::offlineAgentThresholdDays,
+            DA_INTEGER,
+            DA_NOT_NULL,
+            null,
+            30
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
     }

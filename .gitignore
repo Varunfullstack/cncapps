@@ -1,7 +1,8 @@
 /vendor
-/.idea
+.idea/*
+htdocs/components/.idea/*
 /stencil/.idea
-
+node_modules/
 sessions/*
 logs/*
 cache/*
@@ -10,3 +11,5 @@ receipts/*
 /htdocs/components/FixedServiceRequestCountComponent/dist/
 /htdocs/components/FixedServiceRequestCountComponent/node_modules/
 /htdocs/components/FixedServiceRequestCountComponent/.cache/
+/.vscode/ftp-sync.json
+.vscode/launch.json

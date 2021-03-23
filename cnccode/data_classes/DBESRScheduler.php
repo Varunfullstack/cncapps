@@ -24,6 +24,9 @@ class DBESRScheduler extends DBEntity implements JsonSerializable
     const updatedAt           = "updatedAt";
     const linkedSalesOrderId  = "linkedSalesOrderId";
     const emailSubjectSummary = "emailSubjectSummary";
+    const assetName           = "assetName";
+    const assetTitle          = "assetTitle";
+    const emptyAssetReason    = "emptyAssetReason";
 
     /**
      * calls constructor()
@@ -118,6 +121,21 @@ class DBESRScheduler extends DBEntity implements JsonSerializable
             DA_STRING,
             DA_ALLOW_NULL
         );
+        $this->addColumn(
+            self::assetName,
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::assetTitle,
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::emptyAssetReason,
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
         $this->setAddColumnsOff();
         $this->setPK(0);
     }
@@ -143,7 +161,10 @@ class DBESRScheduler extends DBEntity implements JsonSerializable
             self::createdAt           => $this->getValue(self::createdAt),
             self::updatedAt           => $this->getValue(self::updatedAt),
             self::linkedSalesOrderId  => $this->getValue(self::linkedSalesOrderId),
-            self::emailSubjectSummary => $this->getValue(self::emailSubjectSummary)
+            self::emailSubjectSummary => $this->getValue(self::emailSubjectSummary),
+            self::assetTitle          => $this->getValue(self::assetTitle),
+            self::assetName           => $this->getValue(self::assetName),
+            self::emptyAssetReason    => $this->getValue(self::emptyAssetReason),
         ];
     }
 

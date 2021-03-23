@@ -1,6 +1,6 @@
 import Toggle from "../../shared/Toggle.js";
 import APICustomers from "../../services/ApiCustomers.js";
-import {groupBy, SRQueues, TeamType} from "../../utils/utils.js";
+import {getContactElementName, groupBy, SRQueues, TeamType} from "../../utils/utils.js";
 import APIStandardText from "../../services/APIStandardText.js";
 import StandardTextModal from "../../Modals/StandardTextModal.js";
 import MainComponent from "../../shared/MainComponent.js";
@@ -34,7 +34,7 @@ class LastStepComponent extends MainComponent {
                 hideFromCustomerFlag: data.hideFromCustomerFlag || false,
                 monitorSRFlag: data.monitorSRFlag || false,
                 priority: data.priority || -1,
-                internalNotesAppend: data.internalNotesAppend || "",
+                checkList: data.checkList || "",
                 contactID: data.contactID || -1,
                 startTime: data.startTime || "",
                 date: data.date || "",
@@ -77,7 +77,7 @@ class LastStepComponent extends MainComponent {
         this.registerListener();
         const [standardTextTypes, customerContacts, noWorkOptions, noFirstTimeFixOptions, prioritiesDescriptions] = await Promise.all([
             this.apiStandardText.getAllTypes(),
-            this.apiCustomer.getCustomerContacts(this.props.data.customerID),
+            this.apiCustomer.getCustomerContacts(this.props.data.customerID).then(contacts => contacts.filter(x => x.supportLevel && x.supportLevel != 'furlough' && x.active)),
             this.apiStandardText.getOptionsByType(
                 "Unable to offer First Time Fix reason"
             ),
@@ -95,7 +95,7 @@ class LastStepComponent extends MainComponent {
         );
         this.setState({
             requireAuthorize,
-            checkList: standardTextTypes,
+            checkList: standardTextTypes.filter(x => [1, 3].indexOf(x.typeId) > -1),
             contacts: customerContacts,
             standardTextList: standardTextTypes,
             noWorkOptions: noWorkOptions,
@@ -272,10 +272,13 @@ class LastStepComponent extends MainComponent {
     };
     handleCheckListChange = (value) => {
         const {data, checkList} = this.state;
-        const index = checkList.findIndex((c) => c.id == value);
-        if (index > -1) {
-            data.internalNotesAppend = checkList[index].content;
-        } else data.internalNotesAppend = "";
+        const foundCheckList = checkList.find((c) => c.id == value);
+        let content = "";
+        if (foundCheckList) {
+            content = foundCheckList.content;
+        }
+
+        this.setState({data: {...data, checkList: content}});
     };
     getCheckList = () => {
         const {el, setValue} = this;
@@ -329,7 +332,7 @@ class LastStepComponent extends MainComponent {
                                 el(
                                     "option",
                                     {key: "i" + item.id, value: item.id},
-                                    item.name + " " + (item.startMainContactStyle || "")
+                                    getContactElementName(item)
                                 )
                             )
                         );
@@ -348,10 +351,9 @@ class LastStepComponent extends MainComponent {
     checkContactNeedAuthorize = (contactID, contacts) => {
         const {data} = this.state;
         let requireAuthorize;
-        //contactID
         const contact = contacts.find((item) => item.id == contactID);
 
-        if (contact?.startMainContactStyle == "- Delegate") requireAuthorize = true;
+        if (contact?.supportLevel == "delegate") requireAuthorize = true;
         else {
             requireAuthorize = false;
             data.authorisedBy = "";
@@ -365,7 +367,7 @@ class LastStepComponent extends MainComponent {
 
         const contactSupervisor = groupBy(
             contacts.filter((contact) => {
-                return contact.startMainContactStyle == "*" || contact.startMainContactStyle == "- Supervisor";
+                return contact.supportLevel == "main" || contact.supportLevel == "supervisor";
             }),
             "siteTitle"
         );
@@ -394,7 +396,7 @@ class LastStepComponent extends MainComponent {
                                 el(
                                     "option",
                                     {key: "i" + item.id, value: item.id},
-                                    item.name + " " + (item.startMainContactStyle || "")
+                                    getContactElementName(item)
                                 )
                             )
                         );

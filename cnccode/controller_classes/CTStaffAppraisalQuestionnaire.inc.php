@@ -96,7 +96,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                     );
                 } catch (Exception $exception) {
                     $response['status'] = "error";
-                    $response['error'] = $exception->getMessage();
+                    $response['error']  = $exception->getMessage();
                     http_response_code(400);
                 }
                 echo json_encode($response);
@@ -140,7 +140,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                     );
                 } catch (Exception $exception) {
                     $response['status'] = "error";
-                    $response['error'] = $exception->getMessage();
+                    $response['error']  = $exception->getMessage();
                     http_response_code(400);
                 }
                 echo json_encode($response);
@@ -160,20 +160,15 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
 
         $questionnaireAnswer = new DBEStaffAppraisalQuestionnaireAnswer($this);
         $questionnaireAnswer->getRow($questionnaireAnswerID);
-
-
         $mainPDF = new CNCLTD\StaffAppraisalPDF(
-            $questionnaireAnswer,
-            $passPhrase
+            $questionnaireAnswer, $passPhrase
         );
-
         $fileName = PDF_TEMP_DIR . '/test.pdf';
         $mainPDF->Output(
             'F',
             $fileName,
             true
         );
-
         return $fileName;
     }
 
@@ -188,22 +183,17 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             $this->displayFatalError('Questionnaire ID is missing');
             exit;
         }
-
         //check if the questionnaire exists...
         $dbeQuestionnaire = new DBEStaffAppraisalQuestionnaire($this);
-
         $dbeQuestionnaire->getRow($questionnaireID);
-
         if (!$dbeQuestionnaire->rowCount()) {
             $this->displayFatalError('The questionnaire does not exist');
             exit;
         }
-
         $this->setPageTitle($dbeQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::description));
-
         // we first need to know if there's a questionnaire answer for this questionnaire ID and user
         $dbeQuestionnaireAnswer = new DBEStaffAppraisalQuestionnaireAnswer($this);
-        $staffID = $this->userID;
+        $staffID                = $this->userID;
         $dbeQuestionnaireAnswer->getRowByQuestionnaireAndStaff(
             $questionnaireID,
             $staffID
@@ -213,7 +203,6 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             $this->displayFatalError('The logged in user does not have a valid manager assigned');
             exit;
         }
-
         if (!$dbeQuestionnaireAnswer->rowCount()) {
             // we need to create it as there's none
             $dbeQuestionnaireAnswer->setValue(
@@ -224,19 +213,14 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 DBEStaffAppraisalQuestionnaireAnswer::questionnaireID,
                 $questionnaireID
             );
-
             $dbeQuestionnaireAnswer->setValue(
                 DBEStaffAppraisalQuestionnaireAnswer::managerID,
                 $managerID
             );
-
             $dbeQuestionnaireAnswer->insertRow();
             $questionnaireAnswerID = $dbeQuestionnaireAnswer->getPKValue();
-
             // we have to create the 4 Objectives
-
             $dbeObjective = new DBEStaffAppraisalObjectives($this);
-
             for ($i = 0; $i < 4; $i++) {
 
                 $dbeObjective->setValue(
@@ -250,18 +234,14 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 $dbeObjective->insertRow();
             }
         }
-
-
         //here we should have a valid and populated questionnaire answer :D
         $this->setTemplateFiles(
             array('StaffAppraisalEmployeeView' => 'StaffAppraisalEmployeeView')
         );
         $questionnaireAnswerID = $dbeQuestionnaireAnswer->getPKValue();
-        $managerID = $dbeQuestionnaireAnswer->getValue(DBEStaffAppraisalQuestionnaireAnswer::managerID);
-
+        $managerID             = $dbeQuestionnaireAnswer->getValue(DBEStaffAppraisalQuestionnaireAnswer::managerID);
         $dbeManager = new DBEUser($this);
         $dbeManager->getRow($managerID);
-
         $this->template->setVar(
             [
                 "employeeName"             => $this->dbeUser->getValue(
@@ -286,37 +266,27 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 "completePerson"           => "staffMember"
             ]
         );
-
         $dbeQuestions = new DBEStaffAppraisalQuestion($this);
-
         $dbeQuestions->getRowsForQuestionnaire($questionnaireID);
-
-
         $previousQuestionType = null;
-        $questionsBody = "";
+        $questionsBody        = "";
         while ($dbeQuestions->fetchNext()) {
             $currentQuestionType = $dbeQuestions->getValue(DBEStaffAppraisalQuestion::answerTypeID);
-
             if ($previousQuestionType != $dbeQuestions->getValue(DBEStaffAppraisalQuestion::answerTypeID)) {
                 // depending on what was the previous question we need to finish it
                 $questionsBody .= $this->getQuestionFinish($previousQuestionType);
-
                 // now we look at the current question type..to see if we need a header or not
                 $questionsBody .= $this->getQuestionHeader($currentQuestionType);
             }
-
             // now we render the actual question
             $questionsBody .= $this->renderQuestion(
                 $dbeQuestions,
                 $questionnaireAnswerID
             );
-
             $previousQuestionType = $currentQuestionType;
         }
-
         //we have to finish off the last question
         $questionsBody .= $this->getQuestionFinish($previousQuestionType);
-
         $this->template->setVar(
             [
                 "questions"                => $questionsBody,
@@ -329,20 +299,14 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 "questionnaireAnswerID"    => $questionnaireAnswerID
             ]
         );
-
-
         // render objectives
-
         $this->template->set_block(
             "StaffAppraisalEmployeeView",
             "objectivesBlock",
             'objectives'
         );
-
         $dbeObjective = new DBEStaffAppraisalObjectives($this);
-
         $dbeObjective->getRowsByAnswerID($questionnaireAnswerID);
-
         while ($dbeObjective->fetchNext()) {
             $this->template->set_var(
                 array(
@@ -359,8 +323,6 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 true
             );
         }
-
-
         $this->template->parse(
             'CONTENTS',
             'StaffAppraisalEmployeeView',
@@ -391,7 +353,6 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 }
                 break;
         }
-
         // we would need to put a break
         $questionFinish .= "<br>";
         return $questionFinish;
@@ -435,24 +396,18 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 // for this we need to pull the config
                 $dbeQuestionType = new DBEAnswerType($this);
                 $dbeQuestionType->getRow($questionType);
-
                 $answerOptionsString = $dbeQuestionType->getValue(DBEAnswerType::answerOptions);
-
                 $answerOptions = json_decode($answerOptionsString);
-
                 $header = "<table class='1To4Question'>
                                 <thead>
                                     <tr>
                                     <td></td>" . ($isManager ? "<th>Staff Answer</th>" : null);
-
                 foreach ($answerOptions as $key => $option) {
                     $header .= "<th>$option</th>";
                 }
-
                 if ($isManager) {
                     $header .= "<th>Manager Comment</th>";
                 }
-
                 $header .= "        </tr>
                                 </thead>
                                 <tbody>";
@@ -461,43 +416,32 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 // for this we need to pull the config
                 $dbeQuestionType = new DBEAnswerType($this);
                 $dbeQuestionType->getRow($questionType);
-
                 $answerOptionsString = $dbeQuestionType->getValue(DBEAnswerType::answerOptions);
-
                 $answerOptions = json_decode($answerOptionsString);
-
                 $header = "<table class='1To7Question'>
                                 <thead>
                                     <tr>
                                     <td></td>" . ($isManager ? "<th>Staff Answer</th>" : null);
-
                 foreach ($answerOptions as $key => $option) {
                     $header .= "<th>$option</th>";
                 }
-
                 if ($isManager) {
                     $header .= "<th>Manager Comment</th>";
                 }
-
                 $header .= "        </tr>
                                 </thead>
                                 <tbody>";
                 break;
             case 1:
-
                 $header = "<table class='1To7Question'>
                                 <thead>
                                     <tr>
-                                        <th></th> " .
-                    ($isManager ? "<th>Staff Answer</th>" : null) .
-                    "<th>N/A</th>
+                                        <th></th> " . ($isManager ? "<th>Staff Answer</th>" : null) . "<th>N/A</th>
                                         <th>Below Expectations</th>
                                         <th></th>
                                         <th></th>
                                         <th></th>
-                                        <th>Above Expectations</th>" .
-                    ($isManager ? "<th>Manager Comment</th>" : null) .
-                    "</tr>
+                                        <th>Above Expectations</th>" . ($isManager ? "<th>Manager Comment</th>" : null) . "</tr>
                                 </thead>
                                 <tbody>";
                 break;
@@ -512,22 +456,19 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
     {
         // we now look at the current question and render it as we should
         $questionDescription = $dbeQuestions->getValue(DBEStaffAppraisalQuestion::description);
-        $questionID = $dbeQuestions->getValue(DBEStaffAppraisalQuestion::id);
-        $questionType = $dbeQuestions->getValue(DBEStaffAppraisalQuestion::answerTypeID);
-        $question = "";
-
+        $questionID          = $dbeQuestions->getValue(DBEStaffAppraisalQuestion::id);
+        $questionType        = $dbeQuestions->getValue(DBEStaffAppraisalQuestion::answerTypeID);
+        $question            = "";
         $dbeQuestionAnswer = new DBEStaffAppraisalQuestionAnswer($this);
         $dbeQuestionAnswer->getRowByIDAndQuestionnaireAnswerID(
             $dbeQuestions->getValue(DBEStaffAppraisalQuestion::id),
             $questionnaireAnswerID
         );
-
         $isRequired = $dbeQuestions->getValue(DBEStaffAppraisalQuestion::requiredFlag) == 'Y';
-
         switch ($questionType) {
             case 2: //
                 $possibleResponses = ['N/A', 'Yes', 'No'];
-                $question = $this->renderMultipleChoiceQuestion(
+                $question          = $this->renderMultipleChoiceQuestion(
                     $questionDescription,
                     $possibleResponses,
                     $dbeQuestionAnswer,
@@ -538,13 +479,11 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 break;
             case 5:
                 $possibleResponses = [0, 1, 2, 3, 4, 5, 6, 7];
-                $dbeQuestionType = new DBEAnswerType($this);
+                $dbeQuestionType   = new DBEAnswerType($this);
                 $dbeQuestionType->getRow($questionType);
-
                 $answerOptionsString = $dbeQuestionType->getValue(DBEAnswerType::answerOptions);
-
                 $answerOptions = json_decode($answerOptionsString);
-                $question = $this->renderMultipleChoiceQuestion(
+                $question      = $this->renderMultipleChoiceQuestion(
                     $questionDescription,
                     $possibleResponses,
                     $dbeQuestionAnswer,
@@ -556,13 +495,11 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 break;
             case 6:
                 $possibleResponses = [0, 1, 2, 3, 4];
-                $dbeQuestionType = new DBEAnswerType($this);
+                $dbeQuestionType   = new DBEAnswerType($this);
                 $dbeQuestionType->getRow($questionType);
-
                 $answerOptionsString = $dbeQuestionType->getValue(DBEAnswerType::answerOptions);
-
                 $answerOptions = json_decode($answerOptionsString);
-                $question = $this->renderMultipleChoiceQuestion(
+                $question      = $this->renderMultipleChoiceQuestion(
                     $questionDescription,
                     $possibleResponses,
                     $dbeQuestionAnswer,
@@ -574,7 +511,6 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 break;
             case 1:
                 $possibleResponses = [0, 1, 2, 3, 4, 5];
-
                 $question = $this->renderMultipleChoiceQuestion(
                     $questionDescription,
                     $possibleResponses,
@@ -586,11 +522,10 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 break;
             case 3:
             case 4:
-                $value = $dbeQuestionAnswer->getValue(DBEStaffAppraisalQuestionAnswer::staffAnswer);
-                $required = $isRequired ? "required='required'" : null;
+                $value         = $dbeQuestionAnswer->getValue(DBEStaffAppraisalQuestionAnswer::staffAnswer);
+                $required      = $isRequired ? "required='required'" : null;
                 $managerAnswer = $dbeQuestionAnswer->getValue(DBEStaffAppraisalQuestionAnswer::managerAnswer);
-                $question = "<p>$questionDescription " . ($isRequired ? '<span class="requiredStar">*</span>' : null) .
-                    "</p><br><textarea rows='5' name='question[$questionID][staffMemberAnswer]'>$value</textarea><br><br>";
+                $question      = "<p>$questionDescription " . ($isRequired ? '<span class="requiredStar">*</span>' : null) . "</p><br><textarea rows='5' name='question[$questionID][staffMemberAnswer]'>$value</textarea><br><br>";
                 if ($isManager) {
                     /** @noinspection HtmlDeprecatedAttribute */
                     $question = "
@@ -601,11 +536,8 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                     </tr>
                     ";
                 }
-
                 break;
         }
-
-
         return $question;
     }
 
@@ -630,44 +562,33 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
     {
         $question = "<tr><!--suppress HtmlDeprecatedAttribute --><td width='15%'>$questionDescription " . ($isRequired ? '<span class="requiredStar">*</span>' : null) . "</td>";
         $required = $isRequired ? "required='required'" : null;
-
         $whoAnswers = "staffMemberAnswer";
-
         if ($isManager) {
             $staffAnswer = $dbeQuestionAnswer->getValue(DBEStaffAppraisalQuestionAnswer::staffAnswer);
             if ($answerOptions) {
                 $staffAnswer = $answerOptions[$staffAnswer];
             }
-
-            $question .= "<td>" . $staffAnswer . "</td>";
+            $question   .= "<td>" . $staffAnswer . "</td>";
             $whoAnswers = "managerAnswer";
         }
-
-
         foreach ($possibleResponses as $possibleResponse) {
             $checked = "";
-
             $valueKey = DBEStaffAppraisalQuestionAnswer::staffAnswer;
-
             if ($isManager) {
                 $valueKey = DBEStaffAppraisalQuestionAnswer::managerAnswer;
             }
             if ($dbeQuestionAnswer->getValue($valueKey) == $possibleResponse) {
                 $checked = "checked='checked'";
             }
-
-            $question .=
-                "<td>
+            $question .= "<td>
                   <input type='radio' name='question[$questionID][$whoAnswers]' $checked value='$possibleResponse' $required>
                 </td>";
         }
-
         if ($isManager) {
             $managerComment = $dbeQuestionAnswer->getValue(DBEStaffAppraisalQuestionAnswer::managerComment);
             /** @noinspection HtmlDeprecatedAttribute */
             $question .= "<td width='20%'><textarea name='question[$questionID][managerComment]'  rows='5'>$managerComment</textarea></td>";
         }
-
         $question .= "</tr>";
         return $question;
     }// end function editQuestion Action()
@@ -686,51 +607,39 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             exit;
         }
         $dbeQuestionnaire = new DBEStaffAppraisalQuestionnaire($this);
-
         $dbeQuestionnaire->getRow($questionnaireID);
-
         if (!$dbeQuestionnaire->rowCount()) {
             $this->displayFatalError('The questionnaire does not exist');
             exit;
         }
-
         if (!$staffID) {
             $this->displayFatalError('Staff ID is missing');
             exit;
         }
-
         // we first need to know if there's a questionnaire answer for this questionnaire ID and user
         $dbeQuestionnaireAnswer = new DBEStaffAppraisalQuestionnaireAnswer($this);
-
         $dbeQuestionnaireAnswer->getRowByQuestionnaireAndStaff(
             $questionnaireID,
             $staffID
         );
-
         if (!$dbeQuestionnaireAnswer->rowCount()) {
             $this->displayFatalError('The staff member has not answered yet');
             exit;
         }
-
         if ($dbeQuestionnaireAnswer->getValue(DBEStaffAppraisalQuestionnaireAnswer::managerID) != $this->userID) {
             $this->displayFatalError('You are not the manager of the questionnaire/staff member');
             exit;
         }
-
         $staffMember = new DBEUser($this);
         $staffMember->getRow($staffID);
-
-
         //here we should have a valid and populated questionnaire answer :D
         $this->setTemplateFiles(
             array('StaffAppraisalEmployeeView' => 'StaffAppraisalEmployeeView')
         );
         $questionnaireAnswerID = $dbeQuestionnaireAnswer->getPKValue();
-        $managerID = $dbeQuestionnaireAnswer->getValue(DBEStaffAppraisalQuestionnaireAnswer::managerID);
-
+        $managerID             = $dbeQuestionnaireAnswer->getValue(DBEStaffAppraisalQuestionnaireAnswer::managerID);
         $dbeManager = new DBEUser($this);
         $dbeManager->getRow($managerID);
-
         $this->template->setVar(
             [
                 "employeeName"             => $staffMember->getValue(
@@ -769,50 +678,39 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                         'action' => 'completeQuestionnaire'
                     )
                 ),
-
             ]
         );
-
         $dbeQuestions = new DBEStaffAppraisalQuestion($this);
-
         $dbeQuestions->getRowsForQuestionnaire($questionnaireID);
-
-
         $previousQuestionType = null;
-        $questionsBody = "";
+        $questionsBody        = "";
         while ($dbeQuestions->fetchNext()) {
             $currentQuestionType = $dbeQuestions->getValue(DBEStaffAppraisalQuestion::answerTypeID);
-
             if ($previousQuestionType != $dbeQuestions->getValue(DBEStaffAppraisalQuestion::answerTypeID)) {
                 // depending on what was the previous question we need to finish it
                 $questionsBody .= $this->getQuestionFinish(
                     $previousQuestionType,
                     true
                 );
-
                 // now we look at the current question type..to see if we need a header or not
                 $questionsBody .= $this->getQuestionHeader(
                     $currentQuestionType,
                     true
                 );
             }
-
             // now we render the actual question
             $questionsBody .= $this->renderQuestion(
                 $dbeQuestions,
                 $questionnaireAnswerID,
                 true
             );
-
             $previousQuestionType = $currentQuestionType;
         }
-
         //we have to finish off the last question
         $questionsBody .= $this->getQuestionFinish(
             $previousQuestionType,
             true
         );
-
         $this->template->setVar(
             [
                 "questions"                => $questionsBody,
@@ -825,20 +723,14 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 "questionnaireAnswerID"    => $questionnaireAnswerID
             ]
         );
-
-
         // render objectives
-
         $this->template->set_block(
             "StaffAppraisalEmployeeView",
             "objectivesBlock",
             'objectives'
         );
-
         $dbeObjective = new DBEStaffAppraisalObjectives($this);
-
         $dbeObjective->getRowsByAnswerID($questionnaireAnswerID);
-
         while ($dbeObjective->fetchNext()) {
             $this->template->set_var(
                 array(
@@ -855,8 +747,6 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 true
             );
         }
-
-
         $this->template->parse(
             'CONTENTS',
             'StaffAppraisalEmployeeView',
@@ -876,8 +766,6 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             array('StaffAppraisalManagerQuestionnaireList' => 'StaffAppraisalManagerQuestionnaireList.inc')
         );
         $stats = $this->buQuestionnaire->getStats($this->userID);
-
-
         if (count($stats)) {
 
             $this->template->set_block(
@@ -885,11 +773,9 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 'QuestionnaireBlock',
                 'rows'
             );
-
             foreach ($stats as $stat) {
 
                 $questionnaireID = $stat['id'];
-
                 $this->template->set_var(
                     array(
                         'questionnaireID' => $questionnaireID,
@@ -899,7 +785,6 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                         'completed'       => $stat['completed'],
                     )
                 );
-
                 $this->template->parse(
                     'rows',
                     'QuestionnaireBlock',
@@ -907,7 +792,6 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 );
             }//while $dsQuestionnaire->fetchNext()
         }
-
         $this->template->parse(
             'CONTENTS',
             'StaffAppraisalManagerQuestionnaireList',
@@ -925,33 +809,25 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
         if (!$questionnaireID) {
             throw new Exception('QuestionnaireID is missing');
         }
-
         $dbeQuestionnaire = new DBEStaffAppraisalQuestionnaire($this);
-
         $dbeQuestionnaire->getRow($questionnaireID);
-
         if (!$dbeQuestionnaire->rowCount()) {
             throw new Exception('The questionnaire does not exist');
         }
-
         $dateSent = $dbeQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::dateSent);
-
-
         if ($dateSent) {
             throw new Exception('This questionnaire has already been sent');
         }
-
         // we need to pull the list of employees to which we are going to send this
         $dbeUser = new DBEUser($this);
         $dbeUser->getAppraisalUsers();
-
         $buMail = new BUMail($this);
         while ($dbeUser->fetchNext()) {
 
             // we have to create the answer for the user, and send the link through email
             $dbeQuestionnaireAnswer = new DBEStaffAppraisalQuestionnaireAnswer($this);
-            $staffID = $dbeUser->getValue(DBEUser::userID);
-            $managerID = $dbeUser->getValue(DBEUser::managerID);
+            $staffID                = $dbeUser->getValue(DBEUser::userID);
+            $managerID              = $dbeUser->getValue(DBEUser::managerID);
             // we need to create it as there's none
             $dbeQuestionnaireAnswer->setValue(
                 DBEStaffAppraisalQuestionnaireAnswer::staffMemberID,
@@ -961,19 +837,14 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 DBEStaffAppraisalQuestionnaireAnswer::questionnaireID,
                 $questionnaireID
             );
-
             $dbeQuestionnaireAnswer->setValue(
                 DBEStaffAppraisalQuestionnaireAnswer::managerID,
                 $managerID
             );
-
             $dbeQuestionnaireAnswer->insertRow();
             $questionnaireAnswerID = $dbeQuestionnaireAnswer->getPKValue();
-
             // we have to create the 4 Objectives
-
             $dbeObjective = new DBEStaffAppraisalObjectives($this);
-
             for ($i = 0; $i < 4; $i++) {
                 $dbeObjective->setValue(
                     DBEStaffAppraisalObjectives::id,
@@ -986,17 +857,13 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 $dbeObjective->insertRow();
             }
             $template = new Template (
-                EMAIL_TEMPLATE_DIR,
-                "remove"
+                EMAIL_TEMPLATE_DIR, "remove"
             );
-
             $template->setFile(
                 'StaffAppraisalLinkEmail',
                 'StaffAppraisalLinkEmail.html'
             );
-
             $subject = "Staff Appraisal";
-
             $appraisalURL = Controller::buildLink(
                 SITE_URL . '/staffAppraisalQuestionnaire.php',
                 [
@@ -1004,23 +871,18 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                     "questionnaireID" => $questionnaireID
                 ]
             );
-
             $template->setVar(
                 [
                     "staffName"        => $dbeUser->getValue(DBEUser::firstName),
                     "appraisalLinkURL" => $appraisalURL,
                 ]
             );
-
             $template->parse(
                 'OUTPUT',
                 "StaffAppraisalLinkEmail"
             );
-
             $body = $template->getVar('OUTPUT');
-
             $emailTo = $dbeUser->getValue(DBEUser::username) . "@" . CONFIG_PUBLIC_DOMAIN;
-
             $hdrs = array(
                 'From'         => CONFIG_SUPPORT_EMAIL,
                 'To'           => $emailTo,
@@ -1028,22 +890,16 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 'Date'         => date("r"),
                 'Content-Type' => 'text/html; charset=UTF-8'
             );
-
             $mime = new Mail_mime();
-
             $mime->setHTMLBody($body);
-
             $mime_params = array(
                 'text_encoding' => '7bit',
                 'text_charset'  => 'UTF-8',
                 'html_charset'  => 'UTF-8',
                 'head_charset'  => 'UTF-8'
             );
-
             $body = $mime->get($mime_params);
-
             $hdrs = $mime->headers($hdrs);
-
             $buMail->putInQueue(
                 CONFIG_SUPPORT_EMAIL,
                 $emailTo,
@@ -1051,7 +907,6 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 $body
             );
         }
-
         $dbeQuestionnaire->setValue(
             DBEStaffAppraisalQuestionnaire::dateSent,
             (new DateTime())->format(COMMON_MYSQL_DATETIME)
@@ -1073,11 +928,9 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
         if (!isset($type)) {
             throw new Exception('Type is missing');
         }
-
         if (!isset($questionnaireID)) {
             throw new Exception('Questionnaire ID is missing');
         }
-
         return $this->buQuestionnaire->getManagerData(
             $this->userID,
             $type,
@@ -1094,7 +947,6 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
     {
         $this->setMethodName('editQuestion');
         $dsQuestion = &$this->dsQuestion; // ref to class var
-
         if (!$this->getFormError()) {
             if ($this->getAction() == 'editQuestion') {
                 $this->buQuestionnaire->getQuestionByID(
@@ -1121,36 +973,32 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
         }
         $urlDelete = null;
         $txtDelete = null;
-        if (
-            $this->getAction() == 'editQuestion' &&
-            $this->buQuestionnaire->canDeleteQuestionnaire($this->getParam('questionID'))
-        ) {
-            $urlDelete =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'     => 'deleteQuestion',
-                        'questionID' => $questionID
-                    )
-                );
-            $txtDelete = 'Delete';
-        }
-        $urlUpdate =
-            Controller::buildLink(
+        if ($this->getAction() == 'editQuestion' && $this->buQuestionnaire->canDeleteQuestionnaire(
+                $this->getParam('questionID')
+            )) {
+            $urlDelete = Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'action'     => 'updateQuestion',
+                    'action'     => 'deleteQuestion',
                     'questionID' => $questionID
                 )
             );
-        $urlDisplayList =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'          => 'displayQuestionList',
-                    'questionnaireID' => $dsQuestion->getValue(DBEStaffAppraisalQuestion::questionnaireID)
-                )
-            );
+            $txtDelete = 'Delete';
+        }
+        $urlUpdate      = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'     => 'updateQuestion',
+                'questionID' => $questionID
+            )
+        );
+        $urlDisplayList = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'          => 'displayQuestionList',
+                'questionnaireID' => $dsQuestion->getValue(DBEStaffAppraisalQuestion::questionnaireID)
+            )
+        );
         $this->setPageTitle('Edit Question');
         $this->setTemplateFiles(
             array('QuestionEdit' => 'StaffAppraisalQuestionEdit.inc')
@@ -1193,7 +1041,6 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
         Answer types
         */
         $this->answerTypeDropdown($dsQuestion->getValue(DBEStaffAppraisalQuestion::answerTypeID));
-
         $this->template->parse(
             'CONTENTS',
             'QuestionEdit',
@@ -1202,35 +1049,28 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
         $this->parsePage();
     }
 
-    function answerTypeDropdown(
-        $answerTypeID,
-        $templateName = 'QuestionEdit',
-        $blockName = 'answerTypeBlock'
+    function answerTypeDropdown($answerTypeID,
+                                $templateName = 'QuestionEdit',
+                                $blockName = 'answerTypeBlock'
     )
     {
         // Display list of answerTypes that are current at given activity date
         $this->buQuestionnaire->dbeAnswerType->getRows();
-
         $this->template->set_block(
             $templateName,
             $blockName,
             'answerTypes'
         );
-
         while ($this->buQuestionnaire->dbeAnswerType->fetchNext()) {
 
             $answerTypeSelected = ($this->buQuestionnaire->dbeAnswerType->getValue(
                     DBEAnswerType::answerTypeID
                 ) == $answerTypeID) ? CT_SELECTED : null;
-
             $shouldBeConfig = (int)$this->buQuestionnaire->dbeAnswerType->getValue(
                 DBEAnswerType::needsOptions
             );
-
             $isConfigured = $this->buQuestionnaire->dbeAnswerType->getValue(DBEAnswerType::answerOptions);
-
             $configFailed = $shouldBeConfig && !$isConfigured;
-
             $this->template->set_var(
                 array(
                     'answerTypeID'          => $this->buQuestionnaire->dbeAnswerType->getValue(
@@ -1238,13 +1078,11 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                     ),
                     'answerTypeDescription' => $this->buQuestionnaire->dbeAnswerType->getValue(
                             DBEAnswerType::description
-                        ) . ($configFailed ? ' (Needs configuration)' : null)
-                    ,
+                        ) . ($configFailed ? ' (Needs configuration)' : null),
                     'answerTypeSelected'    => $answerTypeSelected,
                     'disabled'              => $configFailed ? 'disabled' : null
                 )
             );
-
             $this->template->parse(
                 'answerTypes',
                 $blockName,
@@ -1270,13 +1108,12 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             $this->displayFatalError('Cannot delete this row');
             exit;
         } else {
-            $urlNext =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => 'displayQuestionList'
-                    )
-                );
+            $urlNext = Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => 'displayQuestionList'
+                )
+            );
             header('Location: ' . $urlNext);
             exit;
         }
@@ -1300,17 +1137,14 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             $this->edit();
             exit;
         }
-
         $this->buQuestionnaire->updateQuestion($this->dsQuestion);
-
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'questionnaireID' => $this->dsQuestion->getValue(DBEStaffAppraisalQuestion::questionnaireID),
-                    'action'          => 'displayQuestionList'
-                )
-            );
+        $urlNext = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'questionnaireID' => $this->dsQuestion->getValue(DBEStaffAppraisalQuestion::questionnaireID),
+                'action'          => 'displayQuestionList'
+            )
+        );
         header('Location: ' . $urlNext);
     }
 
@@ -1323,7 +1157,6 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
     {
         $this->setMethodName('edit');
         $dsQuestionnaire = &$this->dsQuestionnaire; // ref to class var
-
         if (!$this->getFormError()) {
             if ($this->getAction() == 'edit') {
                 $this->buQuestionnaire->getQuestionnaireByID(
@@ -1349,31 +1182,28 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
         if ($this->getAction() == 'edit' && $this->buQuestionnaire->canDeleteQuestionnaire(
                 $this->getParam('questionnaireID')
             )) {
-            $urlDelete =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'          => 'delete',
-                        'questionnaireID' => $questionnaireID
-                    )
-                );
-            $txtDelete = 'Delete';
-        }
-        $urlUpdate =
-            Controller::buildLink(
+            $urlDelete = Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'action'          => 'update',
+                    'action'          => 'delete',
                     'questionnaireID' => $questionnaireID
                 )
             );
-        $urlDisplayList =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'displayList'
-                )
-            );
+            $txtDelete = 'Delete';
+        }
+        $urlUpdate      = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'          => 'update',
+                'questionnaireID' => $questionnaireID
+            )
+        );
+        $urlDisplayList = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => 'displayList'
+            )
+        );
         $this->setPageTitle('Edit Questionnaire');
         $this->setTemplateFiles(
             array('QuestionnaireEdit' => 'StaffAppraisalQuestionnaireEdit.inc')
@@ -1432,30 +1262,24 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             $dsQuestion->getValue(DBEStaffAppraisalQuestion::questionnaireID),
             $dsQuestionnaire
         );
-
         $this->setPageTitle($dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::description));
-
         $urlCreate = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action'          => 'createQuestion',
                 'questionnaireID' => $this->getParam('questionnaireID')
-
             )
         );
-
         $urlReturnToQuestionnaireList = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             []
         );
-
         $this->template->set_var(
             [
                 'urlCreate'                    => $urlCreate,
                 'urlReturnToQuestionnaireList' => $urlReturnToQuestionnaireList
             ]
         );
-
         if ($dsQuestion->rowCount() > 0) {
 
             $this->template->set_block(
@@ -1463,32 +1287,27 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 'QuestionBlock',
                 'rows'
             );
-
             while ($dsQuestion->fetchNext()) {
 
                 $questionID = $dsQuestion->getValue(DBEStaffAppraisalQuestion::id);
-
-                $urlEdit =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'     => 'editQuestion',
-                            'questionID' => $questionID
-                        )
-                    );
+                $urlEdit = Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action'     => 'editQuestion',
+                        'questionID' => $questionID
+                    )
+                );
                 $txtEdit = '[edit]';
-
                 $urlDelete = null;
                 $txtDelete = null;
                 if ($this->buQuestionnaire->canDeleteQuestionnaire($questionID)) {
-                    $urlDelete =
-                        Controller::buildLink(
-                            $_SERVER['PHP_SELF'],
-                            array(
-                                'action'     => 'delete',
-                                'questionID' => $questionID
-                            )
-                        );
+                    $urlDelete = Controller::buildLink(
+                        $_SERVER['PHP_SELF'],
+                        array(
+                            'action'     => 'delete',
+                            'questionID' => $questionID
+                        )
+                    );
                     $txtDelete = '[delete]';
                 }
                 $this->template->set_var(
@@ -1513,10 +1332,8 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                         'urlDelete'                => $urlDelete,
                         'txtEdit'                  => $txtEdit,
                         'txtDelete'                => $txtDelete,
-
                     )
                 );
-
                 $this->template->parse(
                     'rows',
                     'QuestionBlock',
@@ -1547,13 +1364,12 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             $this->displayFatalError('Cannot delete this row');
             exit;
         } else {
-            $urlNext =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => 'displayList'
-                    )
-                );
+            $urlNext = Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => 'displayList'
+                )
+            );
             header('Location: ' . $urlNext);
             exit;
         }
@@ -1579,17 +1395,14 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             $this->edit();
             exit;
         }
-
         $this->buQuestionnaire->updateQuestionnaire($this->dsQuestionnaire);
-
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'questionnaireID' => $this->dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::id),
-                    'action'          => 'view'
-                )
-            );
+        $urlNext = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'questionnaireID' => $this->dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::id),
+                'action'          => 'view'
+            )
+        );
         header('Location: ' . $urlNext);
     }
 
@@ -1600,75 +1413,57 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
     private function saveQuestionnaire()
     {
         // first we need to pull the questionnaireAnswerID
-
         $questionnaireAnswerID = @$this->getParam('questionnaireAnswerID');
-
         if (!$questionnaireAnswerID) {
             throw new Exception('Questionnaire Answer ID is missing!');
         }
-
         $dbeQuestionnaireAnswer = new DBEStaffAppraisalQuestionnaireAnswer($this);
         $dbeQuestionnaireAnswer->getRow($questionnaireAnswerID);
-
         // only the assigned user or manager can make changes to this
-
         $currentUserID = $this->userID;
-
         $isStaffMember = $dbeQuestionnaireAnswer->getValue(
                 DBEStaffAppraisalQuestionnaireAnswer::staffMemberID
             ) == $currentUserID && $this->getParam('completeFor') && $this->getParam('completeFor') == 'staffMember';
-        $isManager = $dbeQuestionnaireAnswer->getValue(
+        $isManager     = $dbeQuestionnaireAnswer->getValue(
                 DBEStaffAppraisalQuestionnaireAnswer::managerID
             ) == $currentUserID && $this->getParam('completeFor') && $this->getParam('completeFor') == 'manager';
-
         if (!($isStaffMember || $isManager)) {
             throw new Exception(
                 'Not authorised, the current user is not the assigned staff member or manager of this questionnaire answer'
             );
         }
-
         if ($isManager) {
             $dbeQuestionnaireAnswer->setValue(
                 DBEStaffAppraisalQuestionnaireAnswer::sickDaysThisYear,
                 $this->getParam('sickDaysThisYear')
             );
-
             $dbeQuestionnaireAnswer->setValue(
                 DBEStaffAppraisalQuestionnaireAnswer::proposedSalary,
                 $this->getParam('proposedSalary')
             );
-
             $dbeQuestionnaireAnswer->setValue(
                 DBEStaffAppraisalQuestionnaireAnswer::proposedBonus,
                 $this->getParam('proposedBonus')
             );
-
             $dbeQuestionnaireAnswer->setValue(
                 DBEStaffAppraisalQuestionnaireAnswer::teamLeaderComments,
                 $this->getParam('teamLeaderComments')
             );
-
             $dbeQuestionnaireAnswer->setValue(
                 DBEStaffAppraisalQuestionnaireAnswer::managerComments,
                 $this->getParam('managerComments')
             );
         }
-
         $dbeQuestionnaireAnswer->updateRow();
-
         $dbeQuestions = new DBEStaffAppraisalQuestion($this);
-
         $dbeQuestions->getRowsForQuestionnaire(
             $dbeQuestionnaireAnswer->getValue(DBEStaffAppraisalQuestionnaireAnswer::questionnaireID)
         );
-
         $questionAnswers = $this->getParam('question');
-
         while ($dbeQuestions->fetchNext()) {
 
             // check if we do have an answer for this in the form
             $questionID = $dbeQuestions->getValue(DBEStaffAppraisalQuestion::id);
-
             if (isset($questionAnswers[$questionID])) {
                 $currentAnswer = $questionAnswers[$questionID];
                 // we need to see if we already have an answer for this question
@@ -1677,7 +1472,6 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                     $questionID,
                     $questionnaireAnswerID
                 );
-
                 if (!$dbeQuestionAnswer->rowCount()) {
                     //we don't have any answers ..so we need to create one
                     $dbeQuestionAnswer->setValue(
@@ -1690,16 +1484,13 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                     );
                     $dbeQuestionAnswer->insertRow();
                 }
-
                 if (isset($currentAnswer['staffMemberAnswer'])) {
                     $dbeQuestionAnswer->setValue(
                         DBEStaffAppraisalQuestionAnswer::staffAnswer,
                         @$currentAnswer['staffMemberAnswer']
                     );
                 }
-
                 //we only update the manager answers if the user is the assigned manager
-
                 if ($isManager) {
 
                     if (isset($currentAnswer['managerAnswer'])) {
@@ -1708,7 +1499,6 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                             @$currentAnswer['managerAnswer']
                         );
                     }
-
                     if (isset($currentAnswer['managerComment'])) {
                         $dbeQuestionAnswer->setValue(
                             DBEStaffAppraisalQuestionAnswer::managerComment,
@@ -1716,23 +1506,16 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                         );
                     }
                 }
-
-
                 $dbeQuestionAnswer->updateRow();
             }
         }
-
         //we now look at objectives
-
         $dbeObjective = new DBEStaffAppraisalObjectives($this);
         $dbeObjective->getRowsByAnswerID($questionnaireAnswerID);
         $objectives = $this->getParam('objective');
-
         while ($dbeObjective->fetchNext()) {
             $objectiveID = $dbeObjective->getValue(DBEStaffAppraisalObjectives::id);
-
             $currentObjective = $objectives[$objectiveID];
-
             $updateObjective = new DBEStaffAppraisalObjectives($this);
             $updateObjective->setValue(DBEStaffAppraisalObjectives::id, $objectiveID);
             $updateObjective->setValue(
@@ -1763,62 +1546,47 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
     private function completeQuestionnaire()
     {
         // first we need to pull the questionnaireAnswerID
-
         $questionnaireAnswerID = @$this->getParam('questionnaireAnswerID');
-
         if (!$questionnaireAnswerID) {
             throw new Exception('Questionnaire Answer ID is missing!');
         }
-
         $dbeQuestionnaireAnswer = new DBEStaffAppraisalQuestionnaireAnswer($this);
         $dbeQuestionnaireAnswer->getRow($questionnaireAnswerID);
-
         // only the assigned user or manager can make changes to this
-
         $currentUserID = $this->userID;
-
         $isStaffMember = $dbeQuestionnaireAnswer->getValue(
                 DBEStaffAppraisalQuestionnaireAnswer::staffMemberID
             ) == $currentUserID && $this->getParam('completeFor') && $this->getParam('completeFor') == 'staffMember';
-        $isManager = $dbeQuestionnaireAnswer->getValue(
+        $isManager     = $dbeQuestionnaireAnswer->getValue(
                 DBEStaffAppraisalQuestionnaireAnswer::managerID
             ) == $currentUserID && $this->getParam('completeFor') && $this->getParam('completeFor') == 'manager';
-
         $this->saveQuestionnaire();
         if ($isStaffMember) {
             $dbeQuestionnaireAnswer->setValue(
                 DBEStaffAppraisalQuestionnaireAnswer::staffCompleted,
                 1
             );
-
             $this->sendStaffCompleteManagerEmail($dbeQuestionnaireAnswer);
         }
-
-
         if ($isManager) {
 
             $passPhrase = $this->getParam('passPhrase');
-
             if (!$passPhrase) {
                 throw new Exception('Passphrase is needed for decrypting data');
             }
-
             $dbeQuestionnaireAnswer->setValue(
                 DBEStaffAppraisalQuestionnaireAnswer::managerCompleted,
                 1
             );
-
-
             // we have to generate the PDF, and send it to signable
             $this->sendToSignable(
                 $dbeQuestionnaireAnswer,
                 $passPhrase
             );
         }
-
         $dbeQuestionnaireAnswer->updateRow();
         echo '<script>alert("Completed Successfully")</script>';
-        Header("Location: /");
+        Header("Location: /StaffAppraisalQuestionnaire.php?action=managerQuestionnaireList");
     }
 
     /**
@@ -1828,30 +1596,20 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
     private function sendStaffCompleteManagerEmail(DBEStaffAppraisalQuestionnaireAnswer $dbeQuestionnaireAnswer)
     {
         $buMail = new BUMail($this);
-
-
         $staffMember = new DBEUser($this);
-
         $staffMember->getRow($dbeQuestionnaireAnswer->getValue(DBEStaffAppraisalQuestionnaireAnswer::staffMemberID));
-
         $manager = new DBEUser($this);
         $manager->getRow($dbeQuestionnaireAnswer->getValue(DBEStaffAppraisalQuestionnaireAnswer::managerID));
-
-
         $template = new Template (
-            EMAIL_TEMPLATE_DIR,
-            "remove"
+            EMAIL_TEMPLATE_DIR, "remove"
         );
-
         $template->setFile(
             'StaffAppraisalStaffCompletedEmail',
             'StaffAppraisalStaffCompletedEmail.html'
         );
-
         $subject = "Appraisal completed by " . $staffMember->getValue(
                 DBEUser::firstName
             ) . " " . $staffMember->getValue(DBEUser::lastName);
-
         $appraisalURL = Controller::buildLink(
             SITE_URL . '/staffAppraisalQuestionnaire.php',
             [
@@ -1862,22 +1620,17 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 "staffID"         => $staffMember->getValue(DBEUser::userID)
             ]
         );
-
         $template->setVar(
             [
                 "appraisalLinkURL" => $appraisalURL,
             ]
         );
-
         $template->parse(
             'OUTPUT',
             "StaffAppraisalStaffCompletedEmail"
         );
-
         $body = $template->getVar('OUTPUT');
-
         $emailTo = $manager->getValue(DBEUser::username) . "@" . CONFIG_PUBLIC_DOMAIN;
-
         $hdrs = array(
             'From'         => CONFIG_SUPPORT_EMAIL,
             'To'           => $emailTo,
@@ -1885,22 +1638,16 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
-
         $mime = new Mail_mime();
-
         $mime->setHTMLBody($body);
-
         $mime_params = array(
             'text_encoding' => '7bit',
             'text_charset'  => 'UTF-8',
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-
         $body = $mime->get($mime_params);
-
         $hdrs = $mime->headers($hdrs);
-
         $buMail->putInQueue(
             CONFIG_SUPPORT_EMAIL,
             $emailTo,
@@ -1914,63 +1661,34 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
     )
     {
         ApiClient::setApiKey("fc2d9ba05f3f3d9f2e9de4d831e8fed9");
-
         $envDocs = [];
-
-        $fileName =
-            $this->getPDFQuestionnaire(
-                $dbeQuestionnaireAnswer->getValue(DBEStaffAppraisalQuestionnaireAnswer::id),
-                $passPhrase
-            );
-
+        $fileName = $this->getPDFQuestionnaire(
+            $dbeQuestionnaireAnswer->getValue(DBEStaffAppraisalQuestionnaireAnswer::id),
+            $passPhrase
+        );
         $manager = new DBEUser($this);
-
         $manager->getRow($dbeQuestionnaireAnswer->getValue(DBEStaffAppraisalQuestionnaireAnswer::managerID));
-
         $staffMember = new DBEUser($this);
-
         $staffMember->getRow($dbeQuestionnaireAnswer->getValue(DBEStaffAppraisalQuestionnaireAnswer::staffMemberID));
-
-        $firstName = $staffMember->getValue(DBEUser::firstName);
+        $firstName        = $staffMember->getValue(DBEUser::firstName);
         $managerFirstName = $manager->getValue(DBEUser::firstName);
-        $lastName = $staffMember->getValue(DBEUser::lastName);
-        $managerLastName = $manager->getValue(DBEUser::lastName);
-        $email = $staffMember->getValue(DBEUser::username) . '@' . CONFIG_PUBLIC_DOMAIN;
-        $managerEmail = $manager->getValue(DBEUser::username) . '@' . CONFIG_PUBLIC_DOMAIN;
-
+        $lastName         = $staffMember->getValue(DBEUser::lastName);
+        $managerLastName  = $manager->getValue(DBEUser::lastName);
+        $email            = $staffMember->getValue(DBEUser::username) . '@' . CONFIG_PUBLIC_DOMAIN;
+        $managerEmail     = $manager->getValue(DBEUser::username) . '@' . CONFIG_PUBLIC_DOMAIN;
         $envelopeDocument = new DocumentWithoutTemplate(
-            'Staff Appraisal',
-            null,
-            base64_encode(file_get_contents($fileName)),
-            "StaffAppraisal.pdf"
+            'Staff Appraisal', null, base64_encode(file_get_contents($fileName)), "StaffAppraisal.pdf"
         );
-
         $envDocs[] = $envelopeDocument;
-
         $envelopeParties = [];
-
         $envelopeParty = new Party(
-            $firstName . ' ' . $lastName,
-            $email,
-            'signer1',
-            'Please sign here',
-            'no',
-            false
+            $firstName . ' ' . $lastName, $email, 'signer1', 'Please sign here', 'no', false
         );
-
         $managerParty = new Party(
-            $managerFirstName . ' ' . $managerLastName,
-            $managerEmail,
-            'signer2',
-            'Please sign here',
-            'no',
-            false
+            $managerFirstName . ' ' . $managerLastName, $managerEmail, 'signer2', 'Please sign here', 'no', false
         );
-
         $envelopeParties[] = $envelopeParty;
         $envelopeParties[] = $managerParty;
-
-
         $response = Envelopes::createNewWithoutTemplate(
             "Document #Appraisal" . "_" . uniqid(),
             $envDocs,
@@ -1981,7 +1699,6 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             0,
             0
         );
-
         if ($response && $response->http == 202) {
             return true;
         }
@@ -2007,19 +1724,15 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
         );
         $dsQuestionnaire = new DataSet($this);
         $this->buQuestionnaire->getAll($dsQuestionnaire);
-
-        $urlCreate =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'create'
-                )
-            );
-
+        $urlCreate = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => 'create'
+            )
+        );
         $this->template->set_var(
             array('urlCreate' => $urlCreate)
         );
-
         if ($dsQuestionnaire->rowCount() > 0) {
 
             $this->template->set_block(
@@ -2027,30 +1740,25 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 'QuestionnaireBlock',
                 'rows'
             );
-
             while ($dsQuestionnaire->fetchNext()) {
 
                 $questionnaireID = $dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::id);
-
-                $urlDisplayQuestionList =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'          => 'displayQuestionList',
-                            'questionnaireID' => $questionnaireID
-                        )
-                    );
-                $urlEdit =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'          => 'edit',
-                            'questionnaireID' => $questionnaireID
-                        )
-                    );
-                $txtEdit = '[edit]';
-
-                $sendURL = Controller::buildLink(
+                $urlDisplayQuestionList = Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action'          => 'displayQuestionList',
+                        'questionnaireID' => $questionnaireID
+                    )
+                );
+                $urlEdit                = Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action'          => 'edit',
+                        'questionnaireID' => $questionnaireID
+                    )
+                );
+                $txtEdit                = '[edit]';
+                $sendURL  = Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     [
                         'action'          => 'sendQuestionnaire',
@@ -2062,21 +1770,18 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 if ($dateSent) {
                     $sendLink = "";
                 }
-
                 $urlDelete = null;
                 $txtDelete = null;
                 if ($this->buQuestionnaire->canDeleteQuestionnaire($questionnaireID)) {
-                    $urlDelete =
-                        Controller::buildLink(
-                            $_SERVER['PHP_SELF'],
-                            array(
-                                'action'          => 'delete',
-                                'questionnaireID' => $questionnaireID
-                            )
-                        );
+                    $urlDelete = Controller::buildLink(
+                        $_SERVER['PHP_SELF'],
+                        array(
+                            'action'          => 'delete',
+                            'questionnaireID' => $questionnaireID
+                        )
+                    );
                     $txtDelete = '[delete]';
                 }
-
                 $this->template->set_var(
                     array(
                         'questionnaireID'        => $questionnaireID,
@@ -2091,7 +1796,6 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                         'sendLink'               => $sendLink
                     )
                 );
-
                 $this->template->parse(
                     'rows',
                     'QuestionnaireBlock',
@@ -2099,20 +1803,16 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 );
 
             }//while $dsQuestionnaire->fetchNext()
-
         }
-
         $sendURL = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             [
                 'action' => 'sendQuestionnaire',
             ]
         );
-
         $this->template->setVar(
             ["sendQuestionnaireURL" => $sendURL]
         );
-
         $this->template->parse(
             'CONTENTS',
             'QuestionnaireList',

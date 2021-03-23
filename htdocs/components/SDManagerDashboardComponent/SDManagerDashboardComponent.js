@@ -4,7 +4,7 @@ import Table from "../shared/table/table";
 import Toggle from "../shared/Toggle";
 import ToolTip from "../shared/ToolTip";
 import {getServiceRequestWorkTitle, getWorkIconClassName, SRQueues} from "../utils/utils";
-import DailyStatsComponent from "./subComponents/DailyStatsComponent";
+import DailyStatsComponent from "../shared/DailyStatsComponent/DailyStatsComponent";
 import APISDManagerDashboard from "./services/APISDManagerDashboard";
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -14,6 +14,8 @@ import './SDManagerDashboardComponent.css';
 import ActivityFollowOn from "../Modals/ActivityFollowOn";
 import moment from "moment";
 import Spinner from "../shared/Spinner/Spinner";
+import {ColumnRenderer} from "../CurrentActivityReportComponent/subComponents/ColumnRenderer";
+import MissedCallBackComponent from "./subComponents/MissedCallBackComponent";
 
 const CUSTOMER_TAB = 9;
 
@@ -26,6 +28,7 @@ const SHORTEST_SLA_FIX_REMAINING = 3;
 const AUTO_RELOAD_TIME = 60 * 1000;
 
 const CRITICAL_SERVICE_REQUESTS = 4;
+const TAB_MISSED_CALL_BACKS=12;
 
 class SDManagerDashboardComponent extends MainComponent {
     el = React.createElement;
@@ -56,14 +59,14 @@ class SDManagerDashboardComponent extends MainComponent {
             {id: 2, title: "Current Open P1 Requests", icon: null},
             {id: SHORTEST_SLA_FIX_REMAINING, title: "Shortest SLA Fix Remaining", icon: null},
             {id: CRITICAL_SERVICE_REQUESTS, title: "Critical Service Requests", icon: null},
-            {id: 5, title: "Current Open SRs", icon: null},
+            {id: 5, title: "Current Active SRs", icon: null},
             {id: 6, title: "Oldest Updated SRs", icon: null},
             {id: 7, title: "Longest Open SR", icon: null},
             {id: 8, title: "Most Hours Logged", icon: null},
             {id: CUSTOMER_TAB, title: "Customer", icon: null},
             {id: HELD_FOR_QA_TAB, title: "Held for QA", icon: null},
             {id: DAILY_STATS_TAB, title: "Daily Stats", icon: null},
-
+            {id: TAB_MISSED_CALL_BACKS, title: "Call Backs", icon: null},
         ];
     }
 
@@ -205,6 +208,9 @@ class SDManagerDashboardComponent extends MainComponent {
                     <option value="20"> 20</option>
                     <option value="25"> 25</option>
                     <option value="30"> 30</option>
+                    <option value="40"> 40</option>
+                    <option value="75"> 75</option>
+                    <option value="100"> 100</option>
                 </select>
             </div>
         );
@@ -254,8 +260,10 @@ class SDManagerDashboardComponent extends MainComponent {
     ;
 
     getQueueElement = () => {
-        const {filter, queueData} = this.state;
+        const { queueData} = this.state;        
         const {el} = this;
+        const filter = {...this.state.filter};        
+
         if ([1, 2, 3, CRITICAL_SERVICE_REQUESTS, SHORTEST_SLA_FIX_REMAINING, 5, 6, 7, 8, HELD_FOR_QA_TAB].indexOf(filter.activeTab) >= 0) {
             let columns = [
                 {
@@ -297,6 +305,7 @@ class SDManagerDashboardComponent extends MainComponent {
                             })
                             : null,
                 },
+                ColumnRenderer.getFixSLAWarningColumn(),
                 {
                     hide: false,
                     order: 3,
@@ -356,7 +365,8 @@ class SDManagerDashboardComponent extends MainComponent {
                             <i className="fal fa-2x fa-alarm-snooze color-gray pointer float-right inbox-icon"
                                key="starIcon"
                             />,
-                            `This Service Request is scheduled for the future date of ${momentAlarmDateTime.format("DD/MM/YYYY HH:mm")}`)
+                            `This Service Request is scheduled for the future date of ${momentAlarmDateTime.format("DD/MM/YYYY HH:mm")}`
+                        )
                     },
                 },
                 {
@@ -515,7 +525,7 @@ class SDManagerDashboardComponent extends MainComponent {
                     icon: "fal fa-2x fa-user-hard-hat color-gray2 ",
                     sortable: false,
                     hdClassName: "text-center",
-                    content: (problem) => this.getAllocatedElement(problem, problem.teamID),
+                    content: (problem) => this.getAllocatedElement(problem, problem.teamID, +problem.queueTeamId),
                 },
                 {
                     display: [HELD_FOR_QA_TAB].indexOf(filter.activeTab) < 0,
@@ -593,6 +603,8 @@ class SDManagerDashboardComponent extends MainComponent {
         } else if (filter.activeTab == 10) {
             return el(DailyStatsComponent);
         }
+        else if(filter.activeTab==TAB_MISSED_CALL_BACKS)
+        return <MissedCallBackComponent filter={filter}></MissedCallBackComponent>
     }
     srDescription = (problem) => {
         window.open(
@@ -602,11 +614,14 @@ class SDManagerDashboardComponent extends MainComponent {
         );
     }
     ;
-    getAllocatedElement = (problem, teamId) => {
+    getAllocatedElement = (problem, teamId, queueTeamId) => {
         const {el} = this;
         const {allocatedUsers} = this.state;
-        const currentTeam = allocatedUsers.filter((u) => u.teamID == teamId);
-        const otherTeams = allocatedUsers.filter((u) => u.teamID !== teamId);
+        let teamIdCompare = teamId || queueTeamId;
+
+        const currentTeam = allocatedUsers.filter((u) => u.teamID == teamIdCompare);
+        const otherTeams = allocatedUsers.filter((u) => u.teamID !== teamIdCompare);
+
         return el(
             "select",
             {
@@ -623,7 +638,7 @@ class SDManagerDashboardComponent extends MainComponent {
                         {
                             value: p.userID,
                             key: "option" + p.userID,
-                            className: teamId == p.teamID ? "in-team" : "",
+                            className: teamIdCompare == p.teamID ? "in-team" : "",
                         },
                         p.fullName
                     )

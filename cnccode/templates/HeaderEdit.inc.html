@@ -1066,7 +1066,7 @@
             </td>
         </tr>
         <tr>
-            <td class="promptText">2S Replication Additional Delay Allowance</td>
+            <td class="promptText">OBRS Replication Additional Delay Allowance</td>
             <td class="inputText">
                 <input
                         {DISABLED}
@@ -1102,6 +1102,34 @@
                        required
                 >
                 <span class="formErrorMessage">{OSSupportDatesThresholdDaysMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Antivirus Out of Date Threshold Days</td>
+            <td class="inputText">
+                <input {DISABLED}
+                       type="number"
+                       max="99"
+                       name="header[1][antivirusOutOfDateThresholdDays]"
+                       value="{antivirusOutOfDateThresholdDays}"
+                       title="Threshold days"
+                       required
+                >
+                <span class="formErrorMessage">{antivirusOutOfDateThresholdDaysMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Offline agent threshold days</td>
+            <td class="inputText">
+                <input {DISABLED}
+                       type="number"
+                       max="99"
+                       name="header[1][offlineAgentThresholdDays]"
+                       value="{offlineAgentThresholdDays}"
+                       title="Threshold days"
+                       required
+                >
+                <span class="formErrorMessage">{offlineAgentThresholdDaysMessage}</span>
             </td>
         </tr>
         <tr>
@@ -1326,6 +1354,16 @@
                        value="true"
                        {DISABLED}
                        {holdAllSOProjectsP5sforQAReview}
+                />
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Number Of Allowed Mistakes in Editor</td>
+            <td class="fieldText">
+                <input name="header[1][numberOfAllowedMistakes]"
+                       type="number"
+                       value="{numberOfAllowedMistakes}"
+                       {DISABLED}                       
                 />
             </td>
         </tr>

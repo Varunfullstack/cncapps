@@ -36,6 +36,10 @@
  * This means we can be safe to always apply mysql_escape_string() to values going into DB without doubling-up.
  */
 global $cfg;
+
+use CNCLTD\Exceptions\ColumnOutOfRangeException;
+use CNCLTD\Exceptions\DBQueryException;
+
 require_once($cfg["path_gc"] . "/DataAccess.inc.php");
 define(
     "DBE_DB_COLUMN_NAME",
@@ -44,7 +48,7 @@ define(
 
 class DBEntity extends DataAccess
 {
-    public const ORDER_DIRECTION_ASCENDING = "ASC";        // a new database connection purely for nextid function.
+    public const ORDER_DIRECTION_ASCENDING  = "ASC";        // a new database connection purely for nextid function.
     public const ORDER_DIRECTION_DESCENDING = "DESC";            // Initialised PHPLib database object
     static $count = 0;
     /** @var dbSweetcode|MDB_PEAR_PROXY|mixed|object|PDO */
@@ -52,21 +56,19 @@ class DBEntity extends DataAccess
     /** @var dbSweetcode */
     public $db;    // RDBMS table name
     public $queryString = "";    // For debug purposes - TRUE causes all SQL statements to be output
-    public $tableName = "";    // For debug purposes - TRUE causes all SQL statements to be output
-    public $showSQL = true;        // For comparison during update
-    public $logSQL = false;    // For comparison during update
+    public $tableName   = "";    // For debug purposes - TRUE causes all SQL statements to be output
+    public $showSQL     = true;        // For comparison during update
+    public $logSQL      = false;    // For comparison during update
     public $rowBefore;
     public $arrayRowBefore;
-    public $rowCount = 0;
-    public $dbColName = [];
+    public $rowCount    = 0;
+    public $dbColName   = [];
 
     // Array of database column names
-
     function __construct(&$owner)
     {
         parent::__construct($owner);
         global $db; //PHPLib DB object
-
         if (!is_object($db)) {
             $this->raiseError("Requires an initialised db object");
         } else {
@@ -176,7 +178,7 @@ class DBEntity extends DataAccess
         }
         if ($this->getShowSQL()) {
             try {
-                throw new Exception();
+                throw new Exception('test');
             } catch (Exception $exception) {
                 echo $this->getClassname() . ": " . $this->getQueryString() . "<BR/>" . $exception->getTraceAsString(
                     ) . " <HR/>";
@@ -185,7 +187,7 @@ class DBEntity extends DataAccess
         }
         if ($this->getLogSQL()) {
             $logFile = CONFIG_SQL_LOG;
-            $handle = fopen(
+            $handle  = fopen(
                 $logFile,
                 'a'
             );
@@ -196,17 +198,11 @@ class DBEntity extends DataAccess
         }
         // Save current row values
         if ($this->db->query($this->getQueryString())) {
-            $this->rowCount = $this->db->num_rows();
+            $this->rowCount        = $this->db->num_rows();
             $this->firstRowFetched = FALSE;
-            $ret = TRUE;
+            $ret                   = TRUE;
         } else {
-            global $server_type;
-            if ($server_type == 'development') {
-                var_dump($this->db->Error);
-            }
-            error_log(json_encode(["error" => $this->db->Error, "query" => $this->getQueryString()]));
-            $this->raiseError("Query problem");
-            $ret = FALSE;
+            throw new DBQueryException($this->db->Error, $this->queryString);
         }
         return $ret;
     }
@@ -323,7 +319,7 @@ class DBEntity extends DataAccess
             $defaultValue,
             $validationFunction
         );
-        $ret = $ixColumnNo;
+        $ret        = $ixColumnNo;
         if ($ixColumnNo != DA_OUT_OF_RANGE) {
             if ($dbColumnName) {
                 $this->setDBColumnName(
@@ -419,9 +415,8 @@ class DBEntity extends DataAccess
                 }
             }
             $this->setQueryString(
-                "SELECT " . $this->getDBColumnNamesAsString() .
-                " FROM " . $this->getTableName() .
-                " WHERE " . $this->getPKWhere()
+                "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+                ) . " WHERE " . $this->getPKWhere()
             );
         }
         if (!$this->runQuery()) {
@@ -544,7 +539,7 @@ class DBEntity extends DataAccess
     function prepareForSQL($colIdx)
     {
         $colType = $this->colType[$colIdx];
-        $value = $this->getSQLValue($colIdx);
+        $value   = $this->getSQLValue($colIdx);
         if ($value === null) {
             return 'null';
         }
@@ -558,7 +553,6 @@ class DBEntity extends DataAccess
                 if ($value === '') {
                     return 'null';
                 }
-
                 return $value;
             case DA_DATETIME:
                 if ($value == '0000-00-00 00:00:00') {
@@ -586,7 +580,6 @@ class DBEntity extends DataAccess
             if (!$this->db->Record) {
                 return null;
             }
-
             if (!key_exists($ixColumn, $this->db->Record)) {
                 return $this->getDefaultValue($ixColumn);
             }
@@ -595,8 +588,7 @@ class DBEntity extends DataAccess
             }
             return $this->db->Record[$ixColumn];
         } else {
-            $this->raiseError("column " . $ixPassedColumn . " out of range");
-            return DA_OUT_OF_RANGE;
+            throw new ColumnOutOfRangeException($ixPassedColumn);
         }
     }
 
@@ -655,7 +647,6 @@ class DBEntity extends DataAccess
         $this->setMethodName("insertRow");
         // Only set the default query if not already set in
         // descendent class.
-
         $this->setYNFlags();
         if ($this->getQueryString() == "") {
             if ($this->getPK() != DA_PK_NOT_SET) {
@@ -663,18 +654,13 @@ class DBEntity extends DataAccess
                     $this->setPKValue($this->getNextPKValue());
                 }
             }
-            $query = "INSERT INTO " . $this->getTableName() .
-                "(" .
-                $this->getDBColumnNamesAsString() .
-                ")VALUES(" .
-                $this->getColumnValuesAsString() .
-                ")";
+            $query = "INSERT INTO " . $this->getTableName() . "(" . $this->getDBColumnNamesAsString(
+                ) . ")VALUES(" . $this->getColumnValuesAsString() . ")";
             if ($this->debug) {
                 var_dump($query);
             }
             $this->setQueryString($query);
         }
-
         $ret = $this->runQuery();
         $this->resetQueryString();
         return $ret;
@@ -719,8 +705,7 @@ class DBEntity extends DataAccess
             }
             return $this->getValueNoCheckByColumnNumber($ixColumn);
         } else {
-            $this->raiseError("column " . $ixPassedColumn . " out of range");
-            return DA_OUT_OF_RANGE;
+            throw new ColumnOutOfRangeException($ixPassedColumn);
         }
     }
 
@@ -747,7 +732,6 @@ class DBEntity extends DataAccess
         if (in_array($type, [DA_JSON_ARRAY, DA_BOOLEAN])) {
             return json_decode($this->db->Record[$ixColumnNumber]);
         }
-
         return $this->db->Record[$ixColumnNumber];
     }
 
@@ -788,7 +772,7 @@ class DBEntity extends DataAccess
     function getNextPKValue()
     {
         $tableName = $this->getTableName();
-        $data = $this->pkdb->nextid($tableName);
+        $data      = $this->pkdb->nextid($tableName);
         return $data;
     }
 
@@ -843,8 +827,7 @@ class DBEntity extends DataAccess
                     }
                 }
             }
-            $query = "DELETE FROM " . $this->getTableName() .
-                " WHERE " . $this->getPKWhere();
+            $query = "DELETE FROM " . $this->getTableName() . " WHERE " . $this->getPKWhere();
             if ($this->debug) {
                 var_dump($query);
             }
@@ -872,7 +855,7 @@ class DBEntity extends DataAccess
      */
     function setRowBefore()
     {
-        $this->rowBefore = $this->getColumnValuesAsString();
+        $this->rowBefore      = $this->getColumnValuesAsString();
         $this->arrayRowBefore = array();
         for ($ixCol = 0; $ixCol < $this->colCount(); $ixCol++) {
             $this->arrayRowBefore[] = $this->getValueByColumnNumber($ixCol);
@@ -900,9 +883,7 @@ class DBEntity extends DataAccess
                 }
             }
             $this->setQueryString(
-                "UPDATE " . $this->getTableName() .
-                " SET " . $this->getUpdateString() .
-                " WHERE " . $this->getPKWhere()
+                "UPDATE " . $this->getTableName() . " SET " . $this->getUpdateString() . " WHERE " . $this->getPKWhere()
             );
         }
         $ret = $this->runQuery();
@@ -921,10 +902,7 @@ class DBEntity extends DataAccess
         $colString = "";
         for ($ixCol = 0; $ixCol < $this->colCount(); $ixCol++) {
             // exclude primary key column if it exists
-            if (
-                ($this->getPK() == DA_PK_NOT_SET) ||
-                ($this->getPKName() != $this->getName($ixCol))
-            ) {
+            if (($this->getPK() == DA_PK_NOT_SET) || ($this->getPKName() != $this->getName($ixCol))) {
                 if ($colString != "") $colString = $colString . ",";
                 $colString = $colString . $this->getDBColumnName($ixCol) . "=" . $this->prepareForSQL($ixCol);
             }
@@ -1024,14 +1002,10 @@ class DBEntity extends DataAccess
         }
         $ixColumn = $this->columnExists($column);
         if ($ixColumn == DA_OUT_OF_RANGE) {
-            $this->raiseError("Column " . $column . " out of range");
-            return DA_OUT_OF_RANGE;
+            throw new ColumnOutOfRangeException($column);
         }
-        $queryString =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName($ixColumn) . "=" . $this->getFormattedValue($ixColumn);
-
+        $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " WHERE " . $this->getDBColumnName($ixColumn) . "=" . $this->getFormattedValue($ixColumn);
         if ($sortColumn != '') {
             $ixSortColumn = $this->columnExists($sortColumn);
             if ($ixSortColumn == DA_OUT_OF_RANGE) {
@@ -1056,9 +1030,7 @@ class DBEntity extends DataAccess
     {
         $this->setMethodName("getRows");
         if (!$this->getQueryString()) {
-            $queryString =
-                "SELECT " . $this->getDBColumnNamesAsString() .
-                " FROM " . $this->getTableName();
+            $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName();
             if ($sortColumn != '') {
                 $sortColumnNo = ($this->columnExists($sortColumn));
                 if ($sortColumnNo == DA_OUT_OF_RANGE) {
@@ -1066,7 +1038,6 @@ class DBEntity extends DataAccess
                 } else {
                     $queryString .= ' ORDER BY ' . $this->getDBColumnName($sortColumnNo);
                 }
-
                 if ($orderDirection) {
                     $queryString .= " $orderDirection ";
                 }
@@ -1086,14 +1057,10 @@ class DBEntity extends DataAccess
         }
         $ixColumn = $this->columnExists($column);
         if ($ixColumn == DA_OUT_OF_RANGE) {
-            $this->raiseError("Column " . $column . " out of range");
-            return DA_OUT_OF_RANGE;
+            throw new ColumnOutOfRangeException($column);
         }
-        $queryString =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName($ixColumn) . "=" . $this->getFormattedValue($ixColumn);
-
+        $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " WHERE " . $this->getDBColumnName($ixColumn) . "=" . $this->getFormattedValue($ixColumn);
         $this->setQueryString($queryString);
         return ($this->getRow());
     }
@@ -1113,13 +1080,12 @@ class DBEntity extends DataAccess
         }
         $ixColumn = $this->columnExists($column);
         if ($ixColumn == DA_OUT_OF_RANGE) {
-            $this->raiseError("Column " . $column . " out of range");
-            return DA_OUT_OF_RANGE;
+            throw new ColumnOutOfRangeException($column);
         }
         $this->setQueryString(
-            "SELECT COUNT(*)" .
-            " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName($ixColumn) . "=" . $this->getFormattedValue($ixColumn)
+            "SELECT COUNT(*)" . " FROM " . $this->getTableName() . " WHERE " . $this->getDBColumnName(
+                $ixColumn
+            ) . "=" . $this->getFormattedValue($ixColumn)
         );
         if ($this->runQuery()) {
             if ($this->nextRecord()) {

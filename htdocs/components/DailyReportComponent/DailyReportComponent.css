@@ -1,0 +1,12 @@
+.red-row {
+    background-color: #FFC7CE !important;
+}
+
+.amber-row {
+    background-color: #FFEB9C !important;
+}
+
+.btn-sm {
+    height: 25px;
+    padding: 2px;
+}

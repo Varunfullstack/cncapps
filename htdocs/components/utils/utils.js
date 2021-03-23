@@ -3,8 +3,10 @@
  * @param {object} o
  * @param {path} p
  */
+import moment from "moment";
+
 export function get(o, p) {
-    return p.split(".").reduce((a, v) => a[v], o);
+    return p.split(".").reduce((a, v) => a[v], o) || '';
 }
 
 
@@ -63,8 +65,10 @@ export function exportCSV(items, fileName, header = []) {
     const replacer = (key, value) => {
         // specify how you want to handle null values here
         value = value == null ? "" : value;
-        value.replace(value, "\n");
-        value.replace(value, "\r");
+        if (value != null) {
+            value.toString().replace(value, "\n");
+            value.toString().replace(value, "\r");
+        }
         return value;
     };
     if (items.length > 0) {
@@ -128,10 +132,16 @@ export const SRQueues = [
     {id: 5, name: "Projects", teamID: 5, code: "P"},
     {id: 4, name: "Sales", teamID: 7, code: "S"},
 ]
+export const getTeamCode=(teamId)=>{
+    const team=SRQueues.find(t=>t.teamID==teamId);
+    if(team)
+    return team.code;
+    else return '';
+}
 export const TeamType = {
     Helpdesk: 1,
     Escalations: 2,
-    Small_Projects: 4,
+    SmallProjects: 4,
     Projects: 5,
     Directors: 6,
     Sales: 7
@@ -240,4 +250,38 @@ export function fileToBase64(file) {
         reader.onload = () => resolve(reader.result);
         reader.onerror = error => reject(error);
     })
+}
+export function getContactElementName(contact) {
+    let name = `${contact.firstName} ${contact.lastName} ${contact.position ? `(${contact.position})` : ''}`;
+    let suffix = "";
+    if (contact.supportLevel == 'main') {
+        suffix = " *";
+    } else if (contact.supportLevel == 'supervisor') {
+        suffix = ' - Supervisor';
+    } else if (contact.supportLevel == 'delegate') {
+        suffix = ' - Delegate';
+    }
+    return `${name}${suffix}`
+}
+
+export function poundFormat(number) {
+    if (number === undefined || number === null) {
+        return null;
+    }
+    return new Intl.NumberFormat('en-GB', {
+        maximumFractionDigits: 2,
+        style: 'currency',
+        currency: 'GBP'
+    }).format(number);
+    // return `£${(+number).toFixed(2)}`
+}
+
+export function dateFormatExcludeNull(date, fromFormat = "YYYY-MM-DD", toFormat = "DD/MM/YYYY") {
+    if (date === undefined || date === null) {
+        return "";
+    }
+    return moment(date, fromFormat).format(toFormat);
+}
+export function equal(obj1,obj2){
+    return JSON.stringify(obj1)===JSON.stringify(obj2);
 }

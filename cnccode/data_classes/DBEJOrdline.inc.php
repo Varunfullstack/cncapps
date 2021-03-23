@@ -4,6 +4,9 @@
 * @access public
 */
 global $cfg;
+
+use CNCLTD\Exceptions\ColumnOutOfRangeException;
+
 require_once($cfg["path_dbe"] . "/DBEOrdline.inc.php");
 
 class DBEJOrdline extends DBEOrdline
@@ -75,23 +78,22 @@ class DBEJOrdline extends DBEOrdline
         }
         $ixColumn = $this->columnExists($column);
         if ($ixColumn == DA_OUT_OF_RANGE) {
-            $this->raiseError("Column " . $column . " out of range");
-            return DA_OUT_OF_RANGE;
+            throw new ColumnOutOfRangeException($column);
         }
-        $query = "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() . " LEFT JOIN supplier ON " . $this->getDBColumnName(
+        $query = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " LEFT JOIN supplier ON " . $this->getDBColumnName(
                 self::supplierID
-            ) . "=sup_suppno" .
-            " LEFT JOIN item ON " . $this->getDBColumnName(self::itemID) . "=itm_itemno" .
-            " WHERE " . $this->getDBColumnName($ixColumn) . "=" . $this->getFormattedValue($ixColumn);
-
+            ) . "=sup_suppno" . " LEFT JOIN item ON " . $this->getDBColumnName(
+                self::itemID
+            ) . "=itm_itemno" . " WHERE " . $this->getDBColumnName($ixColumn) . "=" . $this->getFormattedValue(
+                $ixColumn
+            );
         if ($sortColumn) {
             $query .= " order by {$this->getDBColumnName($sortColumn)}";
         } else {
             $query .= " order by {$this->getDBColumnName(self::isRecurring)},  {$this->getDBColumnName(self::sequenceNo)}";
         }
         $this->setQueryString($query);
-
         return ($this->getRows());
     }
 
@@ -99,11 +101,12 @@ class DBEJOrdline extends DBEOrdline
     {
         $this->setPKValue($pkValue);
         $this->setQueryString(
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() . " LEFT JOIN supplier ON " . $this->getDBColumnName(
+            "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " LEFT JOIN supplier ON " . $this->getDBColumnName(
                 self::supplierID
-            ) . "=sup_suppno" .
-            " LEFT JOIN item ON " . $this->getDBColumnName(self::itemID) . "=itm_itemno where " . $this->getPKWhere()
+            ) . "=sup_suppno" . " LEFT JOIN item ON " . $this->getDBColumnName(
+                self::itemID
+            ) . "=itm_itemno where " . $this->getPKWhere()
         );
         return parent::getRow($pkValue);
     }
@@ -113,18 +116,15 @@ class DBEJOrdline extends DBEOrdline
         if (!$this->getValue(self::ordheadID)) {
             $this->raiseError('ordheadID not set');
         }
-
-        $query =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() . " LEFT JOIN supplier ON " . $this->getDBColumnName(
+        $query = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " LEFT JOIN supplier ON " . $this->getDBColumnName(
                 self::supplierID
-            ) . "=sup_suppno" .
-            " LEFT JOIN item ON " . $this->getDBColumnName(self::itemID) . "=itm_itemno" .
-            " WHERE " . $this->getDBColumnName(self::ordheadID) . "=" . $this->getFormattedValue(self::ordheadID) .
-            " AND " . $this->getDBColumnName(self::sequenceNo) . "=" . $this->getFormattedValue(self::sequenceNo);
-
+            ) . "=sup_suppno" . " LEFT JOIN item ON " . $this->getDBColumnName(
+                self::itemID
+            ) . "=itm_itemno" . " WHERE " . $this->getDBColumnName(self::ordheadID) . "=" . $this->getFormattedValue(
+                self::ordheadID
+            ) . " AND " . $this->getDBColumnName(self::sequenceNo) . "=" . $this->getFormattedValue(self::sequenceNo);
         $this->setQueryString($query);
-
         return (parent::getRow());
     }
 }

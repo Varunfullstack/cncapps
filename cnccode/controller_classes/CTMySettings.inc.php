@@ -53,6 +53,9 @@ class CTMySettings extends CTCNC
             case "getMySettings":
                 echo json_encode($this->getMyData());
                 exit;
+            case "mySettings":
+                echo json_encode($this->saveMySettings());
+                exit;
             case "sendEmailAssignedService":
                 echo $this->setSendEmailAssignedService();
                 exit;
@@ -99,7 +102,9 @@ class CTMySettings extends CTCNC
             'employeeNo'               => $dsUser->getValue(DBEJUser::employeeNo),
             'startDate'                => $dsUser->getValue(DBEJUser::startDate),
             'sendEmailAssignedService' => $dsUser->getValue(DBEJUser::sendEmailWhenAssignedService),
-            'userLog'                  => $this->getUserTimeLog($userId)
+            'userLog'                  => $this->getUserTimeLog($userId),
+            "bccOnCustomerEmails"=> $dsUser->getValue(DBEUser::bccOnCustomerEmails),
+            "callBackEmail"=> $dsUser->getValue(DBEUser::callBackEmail)
         );
         return $result;
     }
@@ -159,5 +164,16 @@ class CTMySettings extends CTCNC
         $dbeUser->setValue(DBEJUser::sendEmailWhenAssignedService, $newVal);
         $dbeUser->updateRow();
         return true;
+    }
+    function saveMySettings(){
+        $body = json_decode(file_get_contents('php://input'));        
+        $dbeUser = new DBEUser($this);
+        $dbeUser->setValue(DBEJUser::userID, $this->userID);
+        $dbeUser->getRow();
+        $dbeUser->setValue(DBEJUser::sendEmailWhenAssignedService, $body->sendEmailAssignedService);
+        $dbeUser->setValue(DBEJUser::bccOnCustomerEmails, $body->bccOnCustomerEmails);
+        $dbeUser->setValue(DBEJUser::callBackEmail, $body->callBackEmail);
+        $dbeUser->updateRow();
+        return ["status"=>true];
     }
 }

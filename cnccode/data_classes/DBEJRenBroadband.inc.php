@@ -71,13 +71,13 @@ class DBEJRenBroadband extends DBECustomerItem
             self::invoiceFromDateYMD,
             DA_DATE,
             DA_NOT_NULL,
-            "DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` MONTH ), '%Y-%m-%d') as invoiceFromDateYMD"
+            "DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` MONTH ) as invoiceFromDateYMD"
         );
         $this->addColumn(
             self::invoiceToDateYMD,
             DA_DATE,
             DA_NOT_NULL,
-            "DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` + `invoicePeriodMonths` MONTH ), '%Y-%m-%d') as invoiceToDateYMD"
+            "DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` + `invoicePeriodMonths` MONTH ) as invoiceToDateYMD"
         );
 
         $this->addColumn(

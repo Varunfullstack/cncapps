@@ -1,6 +1,6 @@
 <!-- Template: screen.inc.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xml:lang="en">
 <head>
     <title>{pageTitle}</title>
     <meta http-equiv="Content-Type"
@@ -34,10 +34,15 @@
             autoSearch: true,
             serviceId: 'LHXUCjpl0y2gdBb',
             lang: 'en_GB',
-            customDictionaryIds: '100920',
+            customDictionaryIds: '100920,100934',
             autoDestroy: true,
             actionItems: ['ignoreAll', 'settings', 'proofreadDialog'],
-            enableAutoSearchIn: ['.spellcheck', '.cke_editable']
+            enableAutoSearchIn: ['.spellcheck', '.cke_editable'],
+            ignoreAllCapsWords: true,
+            ignoreDomainNames: true,
+            ignoreWordsWithMixedCases: true,
+            ignoreWordsWithNumbers: true,
+            disabledRules: ['DASH_RULE', 'EN_QUOTES']
         };
     </script>
     <script src="/components/dist/SpinnerHolderComponent.js"></script>

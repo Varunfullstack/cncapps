@@ -26,8 +26,7 @@ class APICustomers extends APIMain {
 
     getCustomerContacts(customerId) {
         return fetch(`${ApiUrls.Customer}contacts&customerID=${customerId}`)
-            .then(res => res.json())
-            ;
+            .then(res => res.json());
     }
 
     getCustomerProjects(customerId) {

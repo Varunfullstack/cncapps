@@ -676,6 +676,9 @@ class CTSalesOrder extends CTCNC
                 $updatedTime = $this->buSalesOrder->updateOrderTime($orderHeadId);
                 echo json_encode(["status" => 'ok', "updatedTime" => $updatedTime]);
                 break;
+            case "customerInitialSalesOrders":
+                echo json_encode($this->getCustomerInitialSalesOrders());
+                break;
             default:
                 $this->checkPermissions(SALES_PERMISSION);
                 $this->displaySearchForm();
@@ -881,20 +884,25 @@ class CTSalesOrder extends CTCNC
                 $this->setOrdheadID($this->dsOrdhead->getValue($ordheadIDCol));
                 $orderURL = $this->getDisplayOrderURL();
                 $this->setOrdheadID(null);
-                $comment = $this->getFirstCommentLine($this->dsOrdhead->getValue($ordheadIDCol));
+                $comment       = $this->getFirstCommentLine($this->dsOrdhead->getValue($ordheadIDCol));
+                $lastQuoteSent = $this->getLastQuotedDate($this->dsOrdhead->getValue($ordheadIDCol));
                 $this->template->set_var(
                     array(
-                        'listCustomerLink' => $customerLink,
-                        'listOrderURL'     => $orderURL,
-                        'listOrdheadID'    => $this->dsOrdhead->getValue($ordheadIDCol),
-                        'listOrderType'    => $this->getTypeDescription($this->dsOrdhead->getValue($typeCol)),
-                        'listOrderDate'    => strftime(
+                        'listCustomerLink'        => $customerLink,
+                        'listOrderURL'            => $orderURL,
+                        'listOrdheadID'           => $this->dsOrdhead->getValue($ordheadIDCol),
+                        'listOrderType'           => $this->getTypeDescription($this->dsOrdhead->getValue($typeCol)),
+                        'listOrderDate'           => strftime(
                             "%d/%m/%Y",
                             strtotime($this->dsOrdhead->getValue($dateCol))
                         ),
-                        'listCustPORef'    => $this->dsOrdhead->getValue($custPORefCol),
-                        'firstComment'     => $comment,
-                        'rowNum'           => $rowNum
+                        'listOrderLastQuotedDate' => $lastQuoteSent ? strftime(
+                            "%d/%m/%Y",
+                            strtotime($lastQuoteSent)
+                        ) : '',
+                        'listCustPORef'           => $this->dsOrdhead->getValue($custPORefCol),
+                        'firstComment'            => $comment,
+                        'rowNum'                  => $rowNum
                     )
                 );
                 $this->template->parse(
@@ -1440,10 +1448,10 @@ class CTSalesOrder extends CTCNC
                         )
                     );
                 }
-                $linkedServiceRequestCount = $this->buSalesOrder->countLinkedServiceRequests(
+                $linkedServiceRequests = $this->buSalesOrder->getLinkedServiceRequests(
                     $dsOrdhead->getValue(DBEOrdhead::ordheadID)
                 );
-                if ($linkedServiceRequestCount == 0) {
+                if ($linkedServiceRequests->rowCount() == 0) {
                     /* create new */
                     $urlServiceRequest  = Controller::buildLink(
                         $_SERVER['PHP_SELF'],
@@ -1454,30 +1462,25 @@ class CTSalesOrder extends CTCNC
                     );
                     $linkServiceRequest = '<a href="' . $urlServiceRequest . '" >Create SR</a>';
 
-                } elseif ($linkedServiceRequestCount == 1) {
+                } else {
 
-                    $problemID          = $this->buSalesOrder->getLinkedServiceRequestID(
-                        $dsOrdhead->getValue(DBEOrdhead::ordheadID)
-                    );
-                    $urlServiceRequest  = Controller::buildLink(
-                        'Activity.php',
-                        array(
+                    $linkArguments = [
+                        'action'             => 'search',
+                        'linkedSalesOrderID' => $dsOrdhead->getValue(DBEOrdhead::ordheadID)
+                    ];
+                    if ($linkedServiceRequests->rowCount() == 1) {
+                        $problemID     = $linkedServiceRequests->getValue(DBEProblem::problemID);
+                        $linkArguments = array(
                             'action'    => 'displayFirstActivity',
                             'problemID' => $problemID
-                        )
-                    );
-                    $linkServiceRequest = '<a href="' . $urlServiceRequest . '" target="_blank"><div class="navigateLinkCustomerNoteExists">View SR</div></a>';
-
-                } else {     // many SRs so display search page
+                        );
+                    }
+                    $allSRFinishedClass = $this->areAllLinkedSRsFixed($linkedServiceRequests) ? 'allFixedSRs' : '';
                     $urlServiceRequest  = Controller::buildLink(
                         'Activity.php',
-                        array(
-                            'action'             => 'search',
-                            'linkedSalesOrderID' => $dsOrdhead->getValue(DBEOrdhead::ordheadID)
-                        )
+                        $linkArguments
                     );
-                    $linkServiceRequest = '<a href="' . $urlServiceRequest . '" target="_blank"><div class="navigateLinkCustomerNoteExists">View SRs</div></a>';
-
+                    $linkServiceRequest = "<a href='{$urlServiceRequest}' target='_blank'><div class='navigateLinkCustomerNoteExists {$allSRFinishedClass}'>View SR</div></a>";
                 }
                 $this->template->set_var(
                     array(
@@ -1612,7 +1615,7 @@ class CTSalesOrder extends CTCNC
                 'delPostcode'                  => $dsOrdhead->getValue(DBEOrdhead::delPostcode),
                 'ordheadID'                    => $dsOrdhead->getValue(DBEOrdhead::ordheadID),
                 'serviceRequestCustomerItemID' => $dsOrdhead->getValue(DBEOrdhead::serviceRequestCustomerItemID),
-                'serviceRequestText'           => $dsOrdhead->getValue(DBEOrdhead::serviceRequestText),
+                'serviceRequestText'           => $dsOrdhead->getValue(DBEOrdhead::serviceRequestInternalNote),
                 'markupOriginalQuote'          => $markupOriginalQuote,
                 'urlUpdateDelAddress'          => $urlUpdateDelAddress,
                 'urlUpdateInvAddress'          => $urlUpdateInvAddress,
@@ -2252,7 +2255,7 @@ class CTSalesOrder extends CTCNC
                     'updatedTime' => $dsOrdhead->getValue(DBEOrdhead::updatedTime)
                 )
             );
-            $salesOrderLineDesc = '<A class="updatedTimeLink" href="' . $urlEditLine . '">' . Controller::htmlDisplayText(
+            $salesOrderLineDesc = '<A class="updatedTimeLink" href="' . $urlEditLine . '" target="_blank">' . Controller::htmlDisplayText(
                     $dsOrdline->getValue(DBEOrdline::description)
                 ) . '</A>';
         } else {
@@ -4019,10 +4022,10 @@ class CTSalesOrder extends CTCNC
                 DBEOrdline::description,
                 DA_NOT_NULL
             );
-            $dbeItem = new DBEItem($this);
-            $dbeItem->getRow($this->getParam('ordline')[1]['itemID']);
+            $childItem = new DBEItem($this);
+            $childItem->getRow($this->getParam('ordline')[1]['itemID']);
             $itemType = new DBEItemType($this);
-            $itemType->getRow($dbeItem->getValue(DBEItem::itemTypeID));
+            $itemType->getRow($childItem->getValue(DBEItem::itemTypeID));
             if ($itemType->getValue(DBEItemType::reoccurring) && $recurringSequenceNumber) {
                 $sequenceNo = $recurringSequenceNumber;
             } elseif (!$itemType->getValue(DBEItemType::reoccurring) && $oneOffSequenceNumber) {
@@ -4092,21 +4095,22 @@ class CTSalesOrder extends CTCNC
         if ($this->getAction() == CTSALESORDER_ACT_INSERT_ORDLINE) {
             $this->buSalesOrder->insertNewOrderLine($this->dsOrdline);
             if ($this->dsOrdline->getValue(DBEOrdline::lineType) == 'I') {
-                $dbeItem = new DBEItem($this);
-                $itemID  = $this->dsOrdline->getValue(DBEOrdline::itemID);
-                $dbeItem->getChildItems($itemID);
-                $oneOffRowCount    = 1;
-                $recurringRowCount = 1;
-                $dbeSupplier       = new DBESupplier($this);
+                global $db;
+                $itemID              = $this->dsOrdline->getValue(DBEOrdline::itemID);
+                $childItemRepository = new \CNCLTD\ChildItem\ChildItemRepository($db);
+                $childItems          = $childItemRepository->getChildItemsForItem($itemID);
+                $oneOffRowCount      = 1;
+                $recurringRowCount   = 1;
+                $dbeSupplier         = new DBESupplier($this);
                 $dbeSupplier->getRow(53);
-                while ($dbeItem->fetchNext()) {
+                foreach ($childItems as $childItem) {
                     $toInsertChildDsOrdline = new DataSet($this);
                     $toInsertChildDsOrdline->copyColumnsFrom($dbeOrdline);
                     $toInsertChildDsOrdline->setValue(
                         DBEOrdline::ordheadID,
                         $this->dsOrdline->getValue(DBEOrdline::ordheadID)
                     );
-                    $toInsertChildDsOrdline->setValue(DBEOrdline::itemID, $dbeItem->getValue(DBEItem::itemID));
+                    $toInsertChildDsOrdline->setValue(DBEOrdline::itemID, $childItem->getChildItemId());
                     $toInsertChildDsOrdline->setValue(DBEOrdline::lineType, 'I');
                     $toInsertChildDsOrdline->setValue(
                         DBEOrdline::supplierID,
@@ -4114,22 +4118,22 @@ class CTSalesOrder extends CTCNC
                     );
                     $toInsertChildDsOrdline->setValue(
                         DBEOrdline::qtyOrdered,
-                        $this->dsOrdline->getValue(DBEOrdline::qtyOrdered)
+                        $this->dsOrdline->getValue(DBEOrdline::qtyOrdered) * $childItem->getQuantity()
                     );
                     $toInsertChildDsOrdline->setValue(
                         DBEOrdline::curUnitCost,
-                        $dbeItem->getValue(DBEItem::curUnitCost)
+                        $childItem->getCurUnitCost()
                     );
                     $toInsertChildDsOrdline->setValue(
                         DBEOrdline::curUnitSale,
-                        $dbeItem->getValue(DBEItem::curUnitSale)
+                        $childItem->getCurUnitSale()
                     );
                     $toInsertChildDsOrdline->setValue(
                         DBEOrdline::description,
-                        $dbeItem->getValue(DBEItem::description)
+                        $childItem->getDescription()
                     );
                     $dbeItemType = new DBEItemType($this);
-                    $dbeItemType->getRow($dbeItem->getValue(DBEItem::itemID));
+                    $dbeItemType->getRow($childItem->getChildItemId());
                     if ($dbeItemType->getValue(DBEItemType::reoccurring)) {
                         if ($recurringSequenceNumber) {
                             $toInsertChildDsOrdline->setValue(
@@ -4444,17 +4448,22 @@ class CTSalesOrder extends CTCNC
             DA_ALLOW_NULL
         );
         $dsInput->addColumn(
-            DBEOrdhead::serviceRequestText,
+            DBEOrdhead::serviceRequestInternalNote,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $dsInput->addColumn(
+            DBEOrdhead::serviceRequestTaskList,
             DA_STRING,
             DA_ALLOW_NULL
         );
         /*
     get existing values
     */
-        if (!$dsOrdhead->getValue(DBEOrdhead::serviceRequestText)) {
+        if (!$dsOrdhead->getValue(DBEOrdhead::serviceRequestInternalNote)) {
             $dsInput->setValue(
-                DBEOrdhead::serviceRequestText,
-                $dsOrdhead->getValue(DBEOrdhead::serviceRequestText)
+                DBEOrdhead::serviceRequestInternalNote,
+                $dsOrdhead->getValue(DBEOrdhead::serviceRequestInternalNote)
             );
             $dsInput->setValue(
                 DBEOrdhead::serviceRequestCustomerItemID,
@@ -4463,6 +4472,10 @@ class CTSalesOrder extends CTCNC
             $dsInput->setValue(
                 DBEOrdhead::serviceRequestPriority,
                 $dsOrdhead->getValue(DBEOrdhead::serviceRequestPriority)
+            );
+            $dsInput->setValue(
+                DBEOrdhead::serviceRequestTaskList,
+                $dsOrdhead->getValue(DBEOrdhead::serviceRequestInternalNote)
             );
         }
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -4489,7 +4502,8 @@ class CTSalesOrder extends CTCNC
                         $this->getOrdheadID(),
                         $dsInput->getValue(DBEOrdhead::serviceRequestCustomerItemID),
                         $dsInput->getValue(DBEOrdhead::serviceRequestPriority),
-                        $dsInput->getValue(DBEOrdhead::serviceRequestText)
+                        $dsInput->getValue(DBEOrdhead::serviceRequestInternalNote),
+                        $dsInput->getValue(DBEOrdhead::serviceRequestTaskList)
                     );
                 }
                 /*
@@ -4521,13 +4535,16 @@ class CTSalesOrder extends CTCNC
         );
         $this->template->set_var(
             array(
-                'etaDate'                             => $dsInput->getValue(self::etaDate),
-                'etaDateMessage'                      => $dsInput->getMessage(self::etaDate),
-                'serviceRequestText'                  => $dsInput->getValue(DBEOrdhead::serviceRequestText),
-                'serviceRequestPriorityMessage'       => $dsInput->getMessage(DBEOrdhead::serviceRequestPriority),
-                'serviceRequestCustomerItemIDMessage' => $dsInput->getMessage(DBEOrdhead::serviceRequestCustomerItemID),
-                'urlSubmit'                           => $urlSubmit,
-                'salesOrderHeaderId'                  => $this->getOrdheadID()
+                'etaDate'                              => $dsInput->getValue(self::etaDate),
+                'etaDateMessage'                       => $dsInput->getMessage(self::etaDate),
+                DBEOrdhead::serviceRequestInternalNote => $dsInput->getValue(DBEOrdhead::serviceRequestInternalNote),
+                DBEOrdhead::serviceRequestTaskList     => $dsInput->getValue(DBEOrdhead::serviceRequestTaskList),
+                'serviceRequestPriorityMessage'        => $dsInput->getMessage(DBEOrdhead::serviceRequestPriority),
+                'serviceRequestCustomerItemIDMessage'  => $dsInput->getMessage(
+                    DBEOrdhead::serviceRequestCustomerItemID
+                ),
+                'urlSubmit'                            => $urlSubmit,
+                'salesOrderHeaderId'                   => $this->getOrdheadID()
             )
         );
         $this->contractDropdown(
@@ -4810,7 +4827,7 @@ class CTSalesOrder extends CTCNC
                     $this->formErrorMessage = $exception->getMessage();
                     $this->formError        = true;
                 }
-            };
+            }
         } else {
             if ($this->getParam('customerID')) {
                 $dbeCustomer = new DBECustomer($this);
@@ -5096,5 +5113,49 @@ class CTSalesOrder extends CTCNC
             }
         }
         return "";
+    }
+
+    private function getLastQuotedDate(?float $orderId)
+    {
+        $quotes = new DataSet($this);
+        $this->buSalesOrder->getQuotationsByOrdheadID(
+            $orderId,
+            $quotes
+        );
+        $lastQuoted = null;
+        while ($quotes->fetchNext()) {
+            $sentDate = $quotes->getValue(DBEQuotation::sentDateTime);
+            if (!$lastQuoted || ($sentDate && $sentDate > $lastQuoted)) {
+                $lastQuoted = $sentDate;
+            }
+        }
+        return $lastQuoted;
+    }
+
+    public function getCustomerInitialSalesOrders()
+    {
+        $customerID = @$_REQUEST["customerID"];
+        if (empty($customerID)) throw new Exception("Customer Id missing", 0);
+        $query = " SELECT `odh_ordno` orderID ,
+        `odh_custno` customerID,
+        `odh_type` type,
+        `odh_date` date,
+        odh_ref_cust,
+        (SELECT odl_desc FROM ordline line WHERE ord.`odh_ordno`=line.odl_ordno AND odl_type='C' ORDER BY isRecurring ,odl_item_no LIMIT 1) AS firstComment
+        FROM ordhead ORD
+        WHERE odh_custno=:customerID
+        AND `odh_type`='I' ";
+        return DBConnect::fetchAll($query, ["customerID" => $customerID]);
+    }
+
+    private function areAllLinkedSRsFixed(DBEProblem $linkedServiceRequests): bool
+    {
+        do {
+            $isFixed = in_array($linkedServiceRequests->getValue(DBEProblem::status), ["F", "C"]);
+            if (!$isFixed) {
+                return false;
+            }
+        } while ($linkedServiceRequests->fetchNext());
+        return true;
     }
 }

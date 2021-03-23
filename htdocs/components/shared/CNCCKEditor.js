@@ -1,20 +1,21 @@
 import React from 'react';
 import {getEditorNamespace} from 'ckeditor4-integrations-common';
 import PropTypes from 'prop-types';
-
+//readOnly, type, onBeforeLoad, style, value, disableClipboard
 class CNCCKEditor extends React.Component {
-    el = React.createElement;
+    onChangeListener = null;
 
     constructor(props) {
         super(props);
-
+        this.state = {
+            internalData: '',
+            editor: null
+        }
         this.element = null;
-        this.editor = null;
         this._destroyed = false;
     }
 
     componentDidMount() {
-
         this._initEditor();
     }
 
@@ -39,16 +40,13 @@ class CNCCKEditor extends React.Component {
             if (onBeforeLoad) {
                 onBeforeLoad(CKEDITOR);
             }
-
-            const editor = this.editor = CKEDITOR[constructor](this.element, config);
-
-            this._attachEventHandlers();
-
+            const editor = CKEDITOR[constructor](this.element, config);
+            this.setState({editor});
             // We must force editability of the inline editor to prevent `element-conflict` error.
             // It can't be done via config due to CKEditor 4 upstream issue (#57, ckeditor/ckeditor4#3866).
             if (type === 'inline' && !readOnly) {
                 editor.on('instanceReady', () => {
-                    editor.setReadOnly(false);
+                    editor.setReadOnly(this.props.readOnly);
                     editor.container.setStyles(style);
                 }, null, null, -1);
             }
@@ -65,8 +63,19 @@ class CNCCKEditor extends React.Component {
                 });
             }
 
+            if (!this.onChangeListener) {
+                this.onChangeListener = editor.on('change', () => {
+                    const newValue = editor.getData();
+                    if (this.props.onChange && newValue != this.state.internalData) {
+                        this.props.onChange(newValue);
+                        this.setState({internalData: newValue});
+                    }
+                })
+            }
+
             if (value) {
                 editor.setData(value);
+                this.setState({internalData: value});
             }
         }).catch(console.error);
     }
@@ -75,9 +84,17 @@ class CNCCKEditor extends React.Component {
         this._destroyEditor();
     }
 
-    componentDidUpdate(prevProps) {
-        const {props, editor} = this;
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        const {props} = this;
+        const {editor} = this.state;
 
+        if (prevProps.value !== props.value) {
+            this.setState({internalData: props.value});
+        }
+
+        if (!prevState.editor && editor) {
+            editor.setData(this.state.internalData);
+        }
         /* istanbul ignore next */
         if (!editor) {
             return;
@@ -94,49 +111,50 @@ class CNCCKEditor extends React.Component {
         if (prevProps.style !== props.style && editor.container) {
             editor.container.setStyles(props.style);
         }
-
-        this._attachEventHandlers(prevProps);
-    }
-
-    _attachEventHandlers(prevProps = {}) {
-        const props = this.props;
-
-        Object.keys(this.props).forEach(propName => {
-            if (!propName.startsWith('on') || prevProps[propName] === props[propName]) {
-                return;
-            }
-
-            this._attachEventHandler(propName, prevProps[propName]);
-        });
-    }
-
-    _attachEventHandler(propName, prevHandler) {
-        const evtName = `${propName[2].toLowerCase()}${propName.substr(3)}`;
-
-        if (prevHandler) {
-            this.editor.removeListener(evtName, prevHandler);
-        }
-
-        this.editor.on(evtName, this.props[propName]);
     }
 
     _destroyEditor() {
-        if (this.editor) {
-            this.editor.destroy();
+        if (this.state.editor) {
+            this.state.editor.destroy();
         }
-
-        this.editor = null;
+        this.onChangeListener = null;
         this.element = null;
         this._destroyed = true;
     }
 
     render() {
-        return <div id={this.props.name}
-                    name={this.props.name}
-                    style={this.props.style}
-                    ref={ref => (this.element = ref)}
-                    className="testing"
-        />;
+        return <div>
+            <div key="top"
+                 id="top"
+            />
+            <div id={this.props.name}
+                 key="field"
+                 name={this.props.name}
+                 style={this.props.style}
+                 ref={ref => (this.element = ref)}
+                 className={`testing ${this.props.excludeFromErrorCount ? 'excludeFromErrorCount' : ''}`}
+                 onInput={$event => {
+                     const newValue = this.state.editor.getData();
+                     if (this.props.onChange) {
+                         this.props.onChange(newValue);
+                     }
+                     this.setState({internalData: newValue});
+                 }}
+
+                 onPaste={$event => {
+                     setTimeout(() => {
+                         const newValue = this.state.editor.getData();
+                         if (this.props.onChange) {
+                             this.props.onChange(newValue);
+                         }
+                         this.setState({internalData: newValue});
+                     })
+                 }}
+            />
+            <div key="bottom"
+                 id="bottom"
+            />
+        </div>;
     }
 
     getCNCCKEditorConfig = () => {
@@ -170,7 +188,7 @@ class CNCCKEditor extends React.Component {
             width: this.props.width || "auto",
             height: this.props.height || 500,
             resize_minHeight: this.props.height || 500,
-            removePlugins: "liststyle,tabletools,language,tableselection,scayt,wsc,magicline",
+            removePlugins: "liststyle,tabletools,language,tableselection,magicline",
             disableNativeSpellChecker: true,
             wsc_customDictionaryIds: '100920',
             font_defaultLabel: 'Arial',
@@ -181,12 +199,10 @@ class CNCCKEditor extends React.Component {
             defaultConfig.extraPlugins += ",sharedspace";
             defaultConfig.removePlugins += ",floatingspace,maximize,resize,elementspath";
             defaultConfig.sharedSpaces = {
-                top: this.props.top,
-                bottom: this.props.bottom
+                top: this.props.top || "top",
+                bottom: this.props.bottom || "bottom"
             };
         }
-
-
         return defaultConfig;
     }
 

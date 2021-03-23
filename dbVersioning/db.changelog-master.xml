@@ -88,6 +88,13 @@
     <include file="db.changelog-5.0.2.xml"/>
     <include file="db.changelog-5.0.5.xml"/>
     <include file="db.changelog-5.1.0.xml"/>
+    <include file="db.changelog-5.1.4.xml"/>
+    <include file="db.changelog-5.2.0.xml"/>
+    <include file="db.changelog-5.3.0.xml"/>
+    <include file="db.changelog-5.4.0.xml"/>
+    <include file="db.changelog-5.4.2.xml"/>
+    <include file="db.changelog-5.5.0.xml"/>
+    <include file="db.changelog-5.6.0.xml"/>
     <include file="db.changelog-issue987.xml"/>
     <include file="db.changelog-issue909.xml"/>
     <include file="db.changelog-issue916.xml"/>

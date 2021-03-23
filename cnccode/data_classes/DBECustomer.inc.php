@@ -77,6 +77,8 @@ class DBECustomer extends DBCNCEntity
     const streamOneEmail               = "streamOneEmail";
     const lastUpdatedDateTime          = "lastUpdatedDateTime";
     const inclusiveOOHCallOuts         = "inclusiveOOHCallOuts";
+    const eligiblePatchManagement      = "eligiblePatchManagement";
+
     const statementContactId           = "statementContactId";
 
     /**
@@ -482,6 +484,13 @@ class DBECustomer extends DBCNCEntity
             DA_INTEGER,
             DA_ALLOW_NULL
         );
+        $this->addColumn(
+            self::eligiblePatchManagement,
+            DA_INTEGER,
+            DA_NOT_NULL,
+            null,
+            0
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -643,7 +652,7 @@ class DBECustomer extends DBCNCEntity
         $this->setMethodName("getCustomerByName");
         $name        = mysqli_real_escape_string($this->db->link_id(), $name);
         $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " where 
-				cus_name = '{$name}'
+				cus_name like '{$name}'
 				and {$this->getDBColumnName(DBECustomer::referredFlag)} <> 'Y' 
 				and {$this->getDBColumnName(DBECustomer::becameCustomerDate)} is not null and {$this->getDBColumnName(DBECustomer::droppedCustomerDate)} is null
 				LIMIT 1";
@@ -687,13 +696,17 @@ class DBECustomer extends DBCNCEntity
      * Returns list of customers with 24 hour support
      *
      * @access public
+     * @param bool $onlyCurrentCustomers
      * @return bool Success
      */
-    function get24HourSupportCustomers()
+    function get24HourSupportCustomers($onlyCurrentCustomers = false)
     {
         $this->setMethodName("get24HourSupportCustomers");
-        $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " where cus_support_24_hour_flag = 'Y'
-      ORDER BY cus_name";
+$onlyCurrentCustomersCondition = "";
+        if ($onlyCurrentCustomers) {
+            $onlyCurrentCustomersCondition = " and {$this->getDBColumnName(self::droppedCustomerDate)} is null  and {$this->getDBColumnName(self::becameCustomerDate)} is not null ";
+        }        $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " where cus_support_24_hour_flag = 'Y'
+    {$onlyCurrentCustomersCondition}  ORDER BY cus_name";
         $this->setQueryString($queryString);
         $ret = (parent::getRows());
         return $ret;

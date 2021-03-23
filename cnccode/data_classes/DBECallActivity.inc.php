@@ -22,7 +22,6 @@ class DBECallActivity extends DBEntity
     const status                        = "status";
     const expenseExportFlag             = "expenseExportFlag";
     const reason                        = "reason";
-    const internalNotes                 = "internalNotes";
     const curValue                      = "curValue";
     const statementYearMonth            = "statementYearMonth";
     const customerItemID                = "customerItemID";
@@ -135,11 +134,6 @@ class DBECallActivity extends DBEntity
         );
         $this->addColumn(
             self::reason,
-            DA_TEXT,
-            DA_ALLOW_NULL
-        );
-        $this->addColumn(
-            self::internalNotes,
             DA_TEXT,
             DA_ALLOW_NULL
         );

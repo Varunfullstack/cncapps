@@ -1,0 +1,1 @@
+export const RESOLUTION_SUMMARY_MIN_CHARS = 60;

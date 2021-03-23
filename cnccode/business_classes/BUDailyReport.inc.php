@@ -110,7 +110,7 @@ GROUP BY t.month;
                     SITE_URL . '/SRActivity.php',
                     array(
                         'serviceRequestId' => $row[1],
-                        "action" => "displayActivity"
+                        "action"           => "displayActivity"
                     )
                 );
                 $description = substr(
@@ -301,7 +301,7 @@ GROUP BY t.month;
     {
 
         $this->setMethodName('outstandingIncidents');
-        $outstandingRequests = $this->getOustandingRequests(
+        $outstandingRequests = $this->getOutstandingRequests(
             $daysAgo,
             $priorityFiveOnly
         );
@@ -574,27 +574,27 @@ GROUP BY t.month;
 
     } // end function
 
-    function getOustandingRequests($daysAgo = 1,
-                                   $priorityFiveOnly = false
+    function getOutstandingRequests($daysAgo = 1,
+                                    $priorityFiveOnly = false,
+                                    $hd = true,
+                                    $es = true,
+                                    $sp = true,
+                                    $p = true
     )
     {
         $sql = "SELECT 
         cus_name AS `customer`,
         pro_problemno AS `requestID`,
         cns_name AS `assignedTo`,
-        (SELECT 
-          reason 
-        FROM
-          callactivity 
-        WHERE caa_problemno = pro_problemno 
-          AND caa_callacttypeno = 51 limit 1) AS `description`,
+        emailSubjectSummary AS `description`,
         DATEDIFF(NOW(),pro_date_raised ) AS `openDays`,
         pro_total_activity_duration_hours AS `timeSpentHours`,
         last.caa_date as lastUpdatedDate,
         pro_priority as `priority`,
         team.name AS teamName,
         pro_awaiting_customer_response_flag,
-        pro_status
+        pro_status,
+        pro_queue_no queueNo
       FROM
         problem 
         JOIN customer 
@@ -621,10 +621,14 @@ GROUP BY t.month;
         } else {
             $sql .= " AND pro_priority < 5";
         }
+        if (!$hd) $sql .= " AND pro_queue_no <>1   ";
+        if (!$es) $sql .= " AND pro_queue_no <>2   ";
+        if (!$sp) $sql .= " AND pro_queue_no <>3   ";
+        if (!$p) $sql .= " AND pro_queue_no <>5  ";
         $sql .= "      ORDER BY customer,
         pro_problemno";
         return $this->db->query($sql);
-    } // end function
+    }
 
     function focActivities($daysAgo)
     {
@@ -654,7 +658,7 @@ GROUP BY t.month;
                     SITE_URL . '/SRActivity.php',
                     array(
                         'serviceRequestId' => $row[1],
-                        'action'         => 'displayActivity'
+                        'action'           => 'displayActivity'
                     )
                 );
                 $urlActivity = $controller->buildLink(
@@ -882,7 +886,7 @@ GROUP BY t.month;
                     SITE_URL . '/SRActivity.php',
                     array(
                         'serviceRequestId' => $row[1],
-                        "action" => "displayActivity"
+                        "action"           => "displayActivity"
                     )
                 );
                 $template->setVar(
@@ -1015,7 +1019,7 @@ GROUP BY t.month;
                     SITE_URL . '/SRActivity.php',
                     array(
                         'serviceRequestId' => $row[1],
-                        "action" => "displayActivity"
+                        "action"           => "displayActivity"
                     )
                 );
                 $template->setVar(

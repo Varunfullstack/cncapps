@@ -3,6 +3,9 @@
 * @authors Karim Ahmed
 * @access public
 */
+
+use CNCLTD\Exceptions\ColumnOutOfRangeException;
+
 require_once($cfg["path_dbe"] . "/DBEPorline.inc.php");
 
 class DBEJPorline extends DBEPorline
@@ -34,13 +37,11 @@ class DBEJPorline extends DBEPorline
             DA_ALLOW_NULL,
             "itm_unit_of_sale"
         );
-
         $this->addColumn(
             self::excludeFromPOCompletion,
             DA_YN,
             DA_NOT_NULL
         );
-
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -61,15 +62,15 @@ class DBEJPorline extends DBEPorline
         }
         $ixColumn = $this->columnExists($column);
         if ($ixColumn == DA_OUT_OF_RANGE) {
-            $this->raiseError("Column " . $column . " out of range");
-            return DA_OUT_OF_RANGE;
+            throw new ColumnOutOfRangeException($column);
         }
         $this->setQueryString(
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " LEFT JOIN item ON " . $this->getDBColumnName(self::itemID) . "=itm_itemno" .
-            " WHERE " . $this->getDBColumnName($ixColumn) . "=" . $this->getFormattedValue($ixColumn) .
-            " ORDER BY " . $this->getDBColumnName(self::sequenceNo)
+            "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " LEFT JOIN item ON " . $this->getDBColumnName(
+                self::itemID
+            ) . "=itm_itemno" . " WHERE " . $this->getDBColumnName($ixColumn) . "=" . $this->getFormattedValue(
+                $ixColumn
+            ) . " ORDER BY " . $this->getDBColumnName(self::sequenceNo)
         );
         return ($this->getRows());
     }
@@ -83,11 +84,12 @@ class DBEJPorline extends DBEPorline
             $this->raiseError('sequenceNo not set');
         }
         $this->setQueryString(
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " LEFT JOIN item ON " . $this->getDBColumnName(self::itemID) . "=itm_itemno" .
-            " WHERE " . $this->getDBColumnName(self::porheadID) . "=" . $this->getFormattedValue(self::porheadID) .
-            " AND " . $this->getDBColumnName(self::sequenceNo) . "=" . $this->getFormattedValue(self::sequenceNo)
+            "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " LEFT JOIN item ON " . $this->getDBColumnName(
+                self::itemID
+            ) . "=itm_itemno" . " WHERE " . $this->getDBColumnName(self::porheadID) . "=" . $this->getFormattedValue(
+                self::porheadID
+            ) . " AND " . $this->getDBColumnName(self::sequenceNo) . "=" . $this->getFormattedValue(self::sequenceNo)
         );
         return (parent::getRow());
     }
@@ -101,12 +103,15 @@ class DBEJPorline extends DBEPorline
             $this->raiseError('porheadID not set');
         }
         $this->setQueryString(
-            "SELECT COUNT(*)" .
-            " FROM " . $this->getTableName() .
-            " LEFT JOIN item ON " . $this->getDBColumnName(self::itemID) . "= itm_itemno" .
-            " WHERE " . $this->getDBColumnName(self::porheadID) . "=" . $this->getFormattedValue(self::porheadID) .
-            " AND " . $this->getDBColumnName(self::excludeFromPOCompletion) . " = 'N' " .
-            " AND " . $this->getDBColumnName(self::qtyReceived) . " < " . $this->getDBColumnName(self::qtyOrdered)
+            "SELECT COUNT(*)" . " FROM " . $this->getTableName() . " LEFT JOIN item ON " . $this->getDBColumnName(
+                self::itemID
+            ) . "= itm_itemno" . " WHERE " . $this->getDBColumnName(self::porheadID) . "=" . $this->getFormattedValue(
+                self::porheadID
+            ) . " AND " . $this->getDBColumnName(
+                self::excludeFromPOCompletion
+            ) . " = 'N' " . " AND " . $this->getDBColumnName(self::qtyReceived) . " < " . $this->getDBColumnName(
+                self::qtyOrdered
+            )
         );
         if ($this->runQuery()) {
             if ($this->nextRecord()) {

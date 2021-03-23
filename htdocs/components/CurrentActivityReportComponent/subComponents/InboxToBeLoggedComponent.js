@@ -16,7 +16,7 @@ class InboxToBeLoggedComponent extends React.Component {
     addToolTip = (element, title) => {
         return this.el(
             "div",
-            {className: "tooltip"},
+            {className: "tooltip", key:title},
             element,
             this.el("div", {className: "tooltiptext tooltip-bottom"}, title)
         );
@@ -55,7 +55,7 @@ class InboxToBeLoggedComponent extends React.Component {
                 order: 1.1,
                 path: null,
                 label: "",
-                key: "New",
+                key: "assignToRequest",
                 sortable: false,
                 className: "text-center",
                 hdClassName: "text-center",
@@ -72,7 +72,7 @@ class InboxToBeLoggedComponent extends React.Component {
                 order: 2,
                 path: null,
                 label: "",
-                key: "New",
+                key: "createNewRequest",
                 sortable: false,
                 className: "text-center",
                 hdClassName: "text-center",
@@ -175,6 +175,7 @@ class InboxToBeLoggedComponent extends React.Component {
             id: "tobeLogged",
             data: data || [],
             columns: columns,
+            key:"toBeLogged",
             pk: "cpCustomerProblemID",
             search: true,
         });

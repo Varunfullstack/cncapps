@@ -1,0 +1,167 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdevmt" id="issue1239-0">
+        <tagDatabase tag="issue1239"/>
+    </changeSet>
+    <changeSet id="issue1239-1" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="serviceRequestInternalNote"/>
+            </not>
+        </preConditions>
+        <createTable tableName="serviceRequestInternalNote">
+            <column name="id" type="int(11) unsigned" autoIncrement="true">
+                <constraints nullable="false" primaryKeyName="PRIMARY" primaryKey="true"/>
+            </column>
+            <column name="serviceRequestId" type="int(11) unsigned">
+                <constraints nullable="false" foreignKeyName="FK_SRIN_serviceRequestId" referencedTableName="problem"
+                             referencedColumnNames="pro_problemno" deleteCascade="true"/>
+            </column>
+            <column name="createdBy" type="int(11)">
+                <constraints nullable="false" foreignKeyName="FK_SRIN_createdBy" referencedTableName="consultant"
+                             referencedColumnNames="cns_consno" deleteCascade="false"/>
+            </column>
+            <column name="createdAt" type="dateTime" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updatedBy" type="int(11)">
+                <constraints nullable="false" foreignKeyName="FK_SRIN_updatedBy" referencedTableName="consultant"
+                             referencedColumnNames="cns_consno" deleteCascade="false"/>
+            </column>
+            <column name="updatedAt" type="dateTime" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content" type="mediumtext">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="issue1239-2" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="serviceRequestInternalNote"/>
+        </preConditions>
+        <sql>
+            <![CDATA[
+            insert into serviceRequestInternalNote(serviceRequestId, createdBy, createdAt, updatedBy, updatedAt, content)
+            select pro_problemno,
+                   67,
+                   pro_date_raised,
+                   67,
+                   pro_date_raised,
+                   pro_internal_notes
+            from problem
+            where pro_internal_notes is not null
+              and pro_internal_notes <> "";
+            ]]>
+        </sql>
+        <sql>
+            insert into db_sequence
+            values ('serviceRequestInternalNote', (select max(id) + 1 from serviceRequestInternalNote));
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet id="issue1239-3" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="problem" columnName="taskList"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="problem">
+            <column name="taskList" type="longtext">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue1239-4" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="problem" columnName="taskListUpdatedAt"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="problem">
+            <column name="taskListUpdatedAt" type="dateTime" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue1239-5" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="problem" columnName="taskListUpdatedBy"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="problem">
+            <column name="taskListUpdatedBy" type="int(11)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue1239-6" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="problem" columnName="taskListUpdatedBy"/>
+            <columnExists tableName="problem" columnName="taskList"/>
+            <columnExists tableName="problem" columnName="taskListUpdatedAt"/>
+        </preConditions>
+        <sql>
+            <![CDATA[
+            update problem
+            set taskList          = pro_internal_notes,
+                taskListUpdatedAt = pro_date_raised,
+                taskListUpdatedBy = 67
+            where pro_internal_notes is not null
+              and pro_internal_notes <> ""
+            ]]>
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet id="issue1239-7" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="problem" columnName="pro_internal_notes"/>
+        </preConditions>
+        <dropColumn tableName="problem" columnName="pro_internal_notes"/>
+        <rollback>
+            <addColumn tableName="problem">
+                <column name="pro_internal_notes" remarks="Internal CNC Notes" type="MEDIUMTEXT"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet id="issue1239-8" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="callactivity" columnName="internalNotes"/>
+        </preConditions>
+        <dropIndex tableName="callactivity" indexName="internalNotes_full"/>
+        <dropColumn tableName="callactivity" columnName="internalNotes"/>
+        <rollback>
+            <addColumn tableName="callactivity">
+                <column name="internalNotes" type="MEDIUMTEXT"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet id="issue1239-9" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="ordhead" columnName="odh_service_request_text"/>
+        </preConditions>
+        <renameColumn tableName="ordhead" oldColumnName="odh_service_request_text"
+                      newColumnName="serviceRequestInternalNote"
+                      columnDataType="text"/>
+    </changeSet>
+    <changeSet id="issue1239-10" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="ordhead" columnName="serviceRequestTaskList"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="ordhead">
+            <column name="serviceRequestTaskList" type="text">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <sql>
+            update ordhead
+            set serviceRequestTaskList = serviceRequestInternalNote;
+        </sql>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>

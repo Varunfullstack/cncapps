@@ -4,6 +4,7 @@ import CurrentActivityService from "../services/CurrentActivityService";
 import React, {Fragment} from 'react';
 import {ColumnRenderer} from "./ColumnRenderer";
 import {ServiceRequestSummary} from "./ServiceRequestSummary";
+import ToolTip from "../../shared/ToolTip";
 
 class InboxSalesComponent extends React.Component {
     code = "S";
@@ -34,8 +35,24 @@ class InboxSalesComponent extends React.Component {
             getAllocatedElement,
         } = this.props;
         let columns = [
+            {
+                hide: false,
+                order: 0.9,
+                path: null,
+                label: "",
+                key: "CallBack",
+                sortable: false,
+                hdClassName: "text-center",
+                className: "text-center",
+                content: (problem) =>
+                <ToolTip title="Call back">
+                    <i className="fal fa-2x fa-phone icon pointer color-gray" onClick={()=>this.props.onCallBack(problem)}></i>
+                </ToolTip>
+                   
+            },
             ColumnRenderer.getWorkIconColumn(startWork, this.code),
             ColumnRenderer.getSpecialAttentionColumn(),
+            ColumnRenderer.getFixSLAWarningColumn(),
             ColumnRenderer.getFutureWorkColumn(),
             {
                 hide: true,
@@ -79,7 +96,17 @@ class InboxSalesComponent extends React.Component {
                 ],
             },
             ColumnRenderer.getOnHoldColumn(),
-
+            {
+                hide: false,
+                order: 11.5,
+                path: "contactName",
+                key: 'contactName',
+                label: "",
+                hdToolTip: "Contact",
+                icon: "fal fa-2x fa-id-card-alt color-gray2 ",
+                sortable: false,
+                hdClassName: "text-center",
+            },
             ColumnRenderer.getSLABreachedColumn(),
             {
                 hide: false,
@@ -160,7 +187,7 @@ class InboxSalesComponent extends React.Component {
             {
                 hide: false,
                 order: 12,
-                path: "reason",
+                path: "emailSubjectSummary",
                 label: "",
                 hdToolTip: "Description of the Service Request",
                 icon: "fal fa-2x fa-file-alt color-gray2 ",
@@ -172,7 +199,7 @@ class InboxSalesComponent extends React.Component {
                         {
                             className: "pointer",
                             onClick: () => srDescription(problem),
-                            dangerouslySetInnerHTML: {__html: problem.reason}
+                            dangerouslySetInnerHTML: {__html: problem.emailSubjectSummary}
                         },
                     ),
             },

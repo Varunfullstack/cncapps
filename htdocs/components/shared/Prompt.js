@@ -11,6 +11,7 @@ class Prompt extends React.Component {
             show: false,
             title: "",
             width: 300,
+            height: this.props.height,
             reason: this.props.defaultValue
         }
     }
@@ -36,10 +37,15 @@ class Prompt extends React.Component {
             return <EditorFieldComponent name="prompt"
                                          onChange={(value) => this.setState({reason: value})}
                                          value={defaultValue}
+                                         hasToolbar={true}
+                                         autoFocus={true}
+                                         style={{width: this.props.width - 40, height: this.props.height}}
+                                         key="content"
             />
         }
 
         return <textarea key="input"
+                         className="spellcheck"
                          onChange={(event) => this.setState({reason: event.target.value})}
                          style={{width: "97%", minHeight: 30}}
                          defaultValue={defaultValue}
@@ -47,22 +53,34 @@ class Prompt extends React.Component {
     }
 
     render() {
-        const {el} = this;
         const {title, width} = this.state;
         const {defaultValue} = this.props;
-        return (el(
-            Modal, {
-                title: title || "Alert",
-                show: this.state.show,
-                width: width || 500,
-                onClose: () => this.close(),
-                footer: [
-                    el('button', {key: "btnOk", onClick: () => this.close()}, "OK"),
-                    el('button', {key: "btncancel", onClick: () => this.close(true)}, "Cancel"),
-                ],
-                content: this.getContent(defaultValue)
-            }
-        ));
+        return (
+            <Modal
+                title={title || "Alert"}
+                show={this.state.show}
+                width={width || 500}
+                onClose={() => this.close()}
+                footer={[
+                    <button
+                        key={"btnOk"}
+                        onClick={() => this.close()}
+                        autoFocus={true}
+                    >
+                        OK
+                    </button>,
+
+                    <button
+                        key={"btncancel"}
+                        onClick={() => this.close(true)}
+                    >
+                        Cancel
+                    </button>
+                ]
+                }
+                content={this.getContent(defaultValue)}
+            />
+        );
     }
 }
 

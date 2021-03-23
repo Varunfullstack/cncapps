@@ -1,0 +1,71 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue1039-0">
+        <tagDatabase tag="issue1039"/>
+    </changeSet>
+    <changeSet id="issue1039-1" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                select count(*) from OSSupportDates where name = "VMware ESXi 5.1.0";
+            </sqlCheck>
+        </preConditions>
+        <sql splitStatements="true">
+            insert into OSSupportDates(id, name, version, availabilityDate, endOfLifeDate, isServer)
+            values ((select nextId + 1 from db_sequence where seq_name = "ossupportdates"), "VMware ESXi 5.1.0",
+                    "5.1.0", "2012-09-10-", "2016-08-24", 1),
+                   ((select nextId + 2 from db_sequence where seq_name = "ossupportdates"), "VMware ESXi 5.5.0",
+                    "5.5.0", "2013-09-22-", "2018-09-19", 1),
+                   ((select nextId + 3 from db_sequence where seq_name = "ossupportdates"), "VMware ESXi 6.0.0",
+                    "6.0.0", "2015-03-12-", "2020-03-12", 1),
+                   ((select nextId + 4 from db_sequence where seq_name = "ossupportdates"), "VMware ESXi 6.5.0",
+                    "6.5.0", "2016-11-15-", "2021-11-15", 1),
+                   ((select nextId + 5 from db_sequence where seq_name = "ossupportdates"), "VMware ESXi 6.7.0",
+                    "6.7.0", "2018-04-17-", "2022-10-15", 1),
+                   ((select nextId + 6 from db_sequence where seq_name = "ossupportdates"), "VMware ESXi 7.0.0",
+                    "7.0.0", "2020-04-02-", "2022-04-02", 1);
+            update db_sequence
+            set nextId = (select max(id) + 1 from OSSupportDates)
+            where seq_name = "ossupportdates";
+        </sql>
+        <rollback/>
+    </changeSet>
+
+    <changeSet id="issue1039-2" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="antivirusOutOfDateThresholdDays"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="antivirusOutOfDateThresholdDays" type="int(2)" defaultValue="14">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue1039-3" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="offlineAgentThresholdDays"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="offlineAgentThresholdDays" type="int(2)" defaultValue="30">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue1039-4" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="eligiblePatchManagement"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="eligiblePatchManagement" type="int(4)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

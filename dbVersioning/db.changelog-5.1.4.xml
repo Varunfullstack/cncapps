@@ -1,0 +1,28 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.2.xsd">
+    <changeSet author="pavwebdev" id="hotfix-v5.1.4-0">
+        <tagDatabase tag="hotfix-v5.1.4"/>
+    </changeSet>
+    <changeSet id="hotfix-v5.1.4-1" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT is_nullable = "yes" FROM information_schema.`COLUMNS` a WHERE a.`COLUMN_NAME` = 'holdForQA' AND
+                table_schema = DATABASE() AND TABLE_NAME = "problem"
+            </sqlCheck>
+        </preConditions>
+        <addNotNullConstraint tableName="problem" columnName="holdForQA" defaultNullValue="0"
+                              columnDataType="tinyint(1)"/>
+    </changeSet>
+    <changeSet id="hotfix-v5.1.4-2" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT column_default is null FROM information_schema.`COLUMNS` a WHERE a.`COLUMN_NAME` = 'holdForQA'
+                AND
+                table_schema = DATABASE() AND TABLE_NAME = "problem"
+            </sqlCheck>
+        </preConditions>
+        <addDefaultValue tableName="problem" columnName="holdForQA" columnDataType="tinyint(1)" defaultValue="0"/>
+    </changeSet>
+</databaseChangeLog>

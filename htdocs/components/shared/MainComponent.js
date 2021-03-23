@@ -3,10 +3,12 @@ import Confirm from "./Confirm.js";
 import Prompt from "./Prompt.js";
 
 import React from 'react';
+import APIHeader from '../services/APIHeader';
 
 export default class MainComponent extends React.Component {
 
     promptCallback;
+    api;
 
     constructor(props) {
         super(props);
@@ -17,7 +19,8 @@ export default class MainComponent extends React.Component {
                 title: "",
                 width: 500,
                 message: "",
-                isHTML: false
+                isHTML: false,
+                autoClose: true,
             },
             confirm: {
                 show: false,
@@ -30,12 +33,14 @@ export default class MainComponent extends React.Component {
                 show: false,
                 title: "",
                 width: 500,
+                height: 20,
                 message: "",
                 value: null,
                 defaultValue: null,
                 isEditor: false
             },
         };
+        this.apiHeader = new APIHeader();
     }
 
     isSDManager(user) {
@@ -66,13 +71,14 @@ export default class MainComponent extends React.Component {
     }
 
     //----------------alert
-    alert = (message, width = 500, title = "Alert", isHTML = false) => {
+    alert = (message, width = 500, title = "Alert", isHTML = false, autoClose = true) => {
         const {alert} = this.state;
         alert.show = true;
         alert.width = width;
         alert.title = title;
         alert.message = message;
         alert.isHTML = isHTML;
+        alert.autoClose = autoClose;
         this.setState({alert});
         return new Promise((resolve, reject) => {
             setInterval(() => {
@@ -84,13 +90,22 @@ export default class MainComponent extends React.Component {
     getAlert = () => {
         const {alert} = this.state;
         return <Alert
+            key={"alert"}
             show={alert.show}
             width={alert.width}
             title={alert.title}
             message={alert.message}
             isHTML={alert.isHTML}
             onClose={() => this.handleAlertClose()}
+            onAutoClose={this.handleAlertAutoClose}
+            autoClose={alert.autoClose}
         />;
+    }
+    handleAlertAutoClose = () => {
+        const {alert} = this.state;
+        alert.show = false;
+        this.setState({alert});
+        //console.log("auto close");
     }
     handleAlertClose = () => {
         const {alert} = this.state;
@@ -129,6 +144,7 @@ export default class MainComponent extends React.Component {
                 title={confirm.title}
                 message={confirm.message}
                 onClose={confirm.onClose}
+                key="confirmThingy"
             />
         );
     }
@@ -144,10 +160,11 @@ export default class MainComponent extends React.Component {
 
     //-----------------end alert
     //----------------prompt
-    prompt = (title = "Prompt", width = 500, defaultValue = null, isEditor = false) => {
+    prompt = (title = "Prompt", width = 500, defaultValue = null, isEditor = false, height = 20) => {
         const {prompt} = this.state;
         prompt.show = true;
         prompt.width = width;
+        prompt.height = height;
         prompt.title = title;
         prompt.value = null;
         prompt.defaultValue = defaultValue;
@@ -178,5 +195,47 @@ export default class MainComponent extends React.Component {
         const {data} = this.state;
         data[property] = value;
         this.setState({data});
+    }
+    setFilter=(field,value)=>{
+        console.log(field,value);
+        const {filter}=this.state;
+        filter[field]=value;
+        this.setState({filter});
+    }
+    editorHasProblems = async () => {
+        return this.apiHeader.getNumberOfAllowedMistaks().then(nMistakes => {
+            const wscInstances = WEBSPELLCHECKER.getInstances();
+            let count = wscInstances.reduce((acc, instance) => {
+                const containerNode = instance.getContainerNode();
+                if (containerNode.classList.contains('excludeFromErrorCount')) {
+                    return acc;
+                }
+
+                if (!instance.isAllModulesReady()) {
+                    return acc;
+                }
+
+                return acc + instance.getProblemsCount();
+            }, 0)
+            if (count > nMistakes) {
+                this.alert("You have too many spelling or grammatical errors, please correct them before proceeding.");
+                return true
+            }
+            return false;
+        });
+    }
+    getCorrectDate(date,hasTime=false){
+        let format="DD/MM/YYYY";
+        if(hasTime)
+        format +=" HH:mm";
+        if(date!='' && date!=null)
+        return moment(date).format(format);
+        else return '';
+    }
+    isEmpty(variable){
+        if(variable==null || variable==undefined || variable=='')
+            return true;
+        else 
+            return false;
     }
 }

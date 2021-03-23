@@ -127,6 +127,9 @@
             orderCellsTop: true,
             fixedHeader: true,
             pageLength: 50,
+            columnDefs: [
+                {className: "dt-head-left", targets: [0, 1, 2, 3, 4, 5, 6, 7]}
+            ],
             columns: [
                 {
                     data: "contractName", render: function (data, type, row) {

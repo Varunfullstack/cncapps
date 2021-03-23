@@ -5,7 +5,6 @@
  * Date: 15/02/2019
  * Time: 10:37
  */
-
 global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
@@ -17,12 +16,12 @@ require_once($cfg['path_dbe'] . '/DBEStandardText.inc.php');
 class CTBookSalesVisit extends CTCNC
 {
 
-    const searchFormCustomerID = 'customerID';
-    const searchFormAttendees = 'attendees';
+    const searchFormCustomerID      = 'customerID';
+    const searchFormAttendees       = 'attendees';
     const searchFormTypeOfMeetingID = 'typeOfMeetingID';
-    const searchFormContactID = 'contactID';
-    const searchFormMeetingDate = 'meetingDate';
-    const searchFormMeetingTime = 'meetingTime';
+    const searchFormContactID       = 'contactID';
+    const searchFormMeetingDate     = 'meetingDate';
+    const searchFormMeetingTime     = 'meetingTime';
 
     const ACTION_BOOK_SALES_VISIT = 'bookSalesVisit';
     /** @var DSForm */
@@ -54,7 +53,6 @@ class CTBookSalesVisit extends CTCNC
             DA_ID,
             DA_NOT_NULL
         );
-
         $this->dsSearchForm->addColumn(
             self::searchFormAttendees,
             DA_ARRAY,
@@ -109,14 +107,11 @@ class CTBookSalesVisit extends CTCNC
         if ($this->getParam('form')[0]['attendees']) {
             $this->getParam('form')[0]['attendees'] = json_encode($this->getParam('form')[0]['attendees']);
         }
-
         if (!$this->dsSearchForm->populateFromArray($this->getParam('form'))) {
             $this->formError = true;
             return $this->showForm();
         }
-
         $dsSearchForm = &$this->dsSearchForm; // ref to global
-
         if (!$dsSearchForm->getValue(self::searchFormCustomerID)) {
             $dsSearchForm->setMessage(
                 self::searchFormCustomerID,
@@ -124,7 +119,6 @@ class CTBookSalesVisit extends CTCNC
             );
             $this->formError = true;
         }
-
         if (!$dsSearchForm->getValue(self::searchFormAttendees)) {
             $dsSearchForm->setMessage(
                 self::searchFormAttendees,
@@ -132,7 +126,6 @@ class CTBookSalesVisit extends CTCNC
             );
             $this->formError = true;
         }
-
         if (!$dsSearchForm->getValue(self::searchFormTypeOfMeetingID)) {
             $dsSearchForm->setMessage(
                 self::searchFormTypeOfMeetingID,
@@ -140,7 +133,6 @@ class CTBookSalesVisit extends CTCNC
             );
             $this->formError = true;
         }
-
         if (!$dsSearchForm->getValue(self::searchFormContactID)) {
             $dsSearchForm->setMessage(
                 self::searchFormContactID,
@@ -148,7 +140,6 @@ class CTBookSalesVisit extends CTCNC
             );
             $this->formError = true;
         }
-
         if (!$dsSearchForm->getValue(self::searchFormMeetingDate)) {
             $dsSearchForm->setMessage(
                 self::searchFormMeetingDate,
@@ -156,7 +147,6 @@ class CTBookSalesVisit extends CTCNC
             );
             $this->formError = true;
         }
-
         if (!$dsSearchForm->getValue(self::searchFormMeetingTime)) {
             $dsSearchForm->setMessage(
                 self::searchFormMeetingTime,
@@ -164,23 +154,16 @@ class CTBookSalesVisit extends CTCNC
             );
             $this->formError = true;
         }
-
         if ($this->formError) {
             return $this->showForm();
         }
-
         $buActivity = new BUActivity($this);
-
         $dbeContact = new DBEContact($this);
-
         $dbeContact->getRow($dsSearchForm->getValue(self::searchFormContactID));
-
         $dbeProblem = new DBEProblem($this);
         $customerID = $dsSearchForm->getValue(self::searchFormCustomerID);
-
         $siteNo = $dbeContact->getValue(DBEContact::siteNo);
-
-
+        $dbeProblem->setValue(DBEProblem::emailSubjectSummary, "Account Review Meeting");
         $dbeProblem->setValue(
             DBEProblem::hdLimitMinutes,
             $buActivity->dsHeader->getValue(DBEHeader::hdTeamLimitMinutes)
@@ -198,6 +181,9 @@ class CTBookSalesVisit extends CTCNC
             $buActivity->dsHeader->getValue(DBEHeader::projectTeamLimitMinutes)
         );
         $dbeProblem->setValue(DBEProblem::raiseTypeId, 7);
+        $buStandardText = new BUStandardText($this);
+        $buStandardText->getStandardTextByID(129, $dbeStandardText);
+        $dbeProblem->setValue(DBEProblem::emptyAssetReason, $dbeStandardText->getValue(DBEStandardText::stt_text));
         $dbeProblem->setValue(
             DBEProblem::slaResponseHours,
             $buActivity->getSlaResponseHours(
@@ -230,17 +216,14 @@ class CTBookSalesVisit extends CTCNC
             DBEProblem::alarmTime,
             $dsSearchForm->getValue(self::searchFormMeetingTime)
         );
-
         $dbeProblem->setValue(
             DBEProblem::contactID,
             $dbeContact->getValue(DBEContact::contactID)
         );
-
         $dbeProblem->setValue(
             DBEJProblem::hideFromCustomerFlag,
             'Y'
         );
-
         $dbeProblem->setValue(
             DBEJProblem::queueNo,
             4
@@ -249,23 +232,17 @@ class CTBookSalesVisit extends CTCNC
             DBEJProblem::rootCauseID,
             59
         );
-
         $dbeProblem->setValue(
             DBEJProblem::awaitingCustomerResponseFlag,
             'N'
         );
-
         $dbeProblem->setValue(
             DBEJProblem::userID,
             $this->dbeUser->getValue(DBEUser::userID)
         );
         $dbeProblem->insertRow();
-
-
         $dbeCallActivity = new DBECallActivity($this);
-
         $dbeCallActivity->setValue(DBEJCallActivity::curValue, '0.00');
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::callActivityID,
             0
@@ -291,7 +268,6 @@ class CTBookSalesVisit extends CTCNC
             DBEJCallActivity::startTime,
             $startTime
         );
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::endTime,
             $startTime
@@ -300,11 +276,8 @@ class CTBookSalesVisit extends CTCNC
             DBEJCallActivity::status,
             'C'
         );
-
         $standardText = new DBEStandardText($this);
-
         $standardText->getRow($this->dsSearchForm->getValue(self::searchFormTypeOfMeetingID));
-
         $dbeCallActivity->setValue(
             DBEJCallActivity::reason,
             $standardText->getValue(DBEStandardText::stt_text)
@@ -318,15 +291,12 @@ class CTBookSalesVisit extends CTCNC
             $this->dbeUser->getValue(DBEUser::userID)
         );
         $dbeCallActivity->insertRow();
-
         $attendeesJSON = $dsSearchForm->getValue(self::searchFormAttendees);
-        $attendees = $attendeesJSON;
+        $attendees     = $attendeesJSON;
         if (!is_array($attendeesJSON)) {
             $attendees = json_decode($attendeesJSON);
         }
-
         $firstActivityCreated = null;
-
         foreach ($attendees as $attendee) {
             $dbeCallActivity->setValue(
                 DBEJCallActivity::callActivityID,
@@ -348,17 +318,14 @@ class CTBookSalesVisit extends CTCNC
                 DBEJCallActivity::date,
                 $dsSearchForm->getValue(self::searchFormMeetingDate)
             );
-
             $dbeCallActivity->setValue(
                 DBEJCallActivity::startTime,
                 $dsSearchForm->getValue(self::searchFormMeetingTime)
             );
-
             $dbeCallActivity->setValue(
                 DBEJCallActivity::endTime,
                 null
             );
-
             $dbeCallActivity->setValue(
                 DBEJCallActivity::status,
                 'O'
@@ -367,11 +334,8 @@ class CTBookSalesVisit extends CTCNC
                 DBEJCallActivity::awaitingCustomerResponseFlag,
                 'N'
             );
-
             $standardText = new DBEStandardText($this);
-
             $standardText->getRow($this->dsSearchForm->getValue(self::searchFormTypeOfMeetingID));
-
             $dbeCallActivity->setValue(
                 DBEJCallActivity::reason,
                 $standardText->getValue(DBEStandardText::stt_text)
@@ -385,12 +349,10 @@ class CTBookSalesVisit extends CTCNC
                 $attendee
             );
             $dbeCallActivity->insertRow();
-
             if (!$firstActivityCreated) {
                 $firstActivityCreated = $dbeCallActivity->getValue(DBECallActivity::callActivityID);
             }
         }
-
         $this->dsSearchForm->clear();
         $this->setParam('booked', $firstActivityCreated);
         return $this->showForm();
@@ -401,19 +363,17 @@ class CTBookSalesVisit extends CTCNC
      */
     function showForm()
     {
-        $customerString = null;
+        $customerString   = null;
         $urlCustomerPopup = null;
-        $dsSearchForm = &$this->dsSearchForm; // ref to global
-        $bookedActivity = null;
+        $dsSearchForm     = &$this->dsSearchForm; // ref to global
+        $bookedActivity   = null;
         if ($this->getParam('booked')) {
             $bookedActivity = $this->getParam('booked');
         }
-
         $this->setTemplateFiles(
             'BookSalesVisit',
             'BookSalesVisit'
         );
-
         $urlSubmit = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
@@ -448,7 +408,6 @@ class CTBookSalesVisit extends CTCNC
                 )
             );
         }
-
         $this->template->set_var(
             array(
                 'formError'              => $this->formError,
@@ -470,26 +429,20 @@ class CTBookSalesVisit extends CTCNC
                 'bookedActivityURL'      => $bookedActivityURL
             )
         );
-
-
         // activity type selector
         $this->template->set_block(
             'BookSalesVisit',
             'attendeesBlock',
             'attendees'
         );
-
         $dbeUser = new DBEUser($this);
         $dbeUser->getActiveWithPermission(ACCOUNT_MANAGEMENT_PERMISSION);
-
         $selectedAttendees = [];
-
         if ($this->dsSearchForm->getValue(self::searchFormAttendees)) {
             $selectedAttendees = json_decode(
                 $this->dsSearchForm->getValue(self::searchFormAttendees)
             );
         }
-
         while ($dbeUser->fetchNext()) {
             $selected = in_array(
                 $dbeUser->getValue(DBEUser::userID),
@@ -502,35 +455,27 @@ class CTBookSalesVisit extends CTCNC
                     'attendeeSelected' => $selected ? 'selected' : ''
                 ]
             );
-
             $this->template->parse(
                 'attendees',
                 'attendeesBlock',
                 true
             );
         }
-
-
         $dbeStandardTextType = new DBEStandardTextType($this);
-
         $dbeStandardTextType->setValue(
             DBEStandardTextType::description,
             'Sales Meeting Type'
         );
         $dbeStandardTextType->getRowsByColumn(DBEStandardTextType::description);
-
         $dbeStandardTextType->fetchNext();
         $standardTextTypeID = $dbeStandardTextType->getValue(DBEStandardTextType::standardTextTypeID);
-
         $DBEStandardText = new DBEStandardText($this);
         $DBEStandardText->getRowsByTypeID($standardTextTypeID);
-
         $this->template->set_block(
             'BookSalesVisit',
             'typeOfMeetingBlock',
             'typeOfMeetings'
         );
-
         while ($DBEStandardText->fetchNext()) {
 
             $selected = $this->dsSearchForm->getValue(self::searchFormTypeOfMeetingID) == $DBEStandardText->getValue(
@@ -543,15 +488,12 @@ class CTBookSalesVisit extends CTCNC
                     'typeOfMeetingSelected'    => $selected ? 'selected' : ''
                 ]
             );
-
             $this->template->parse(
                 'typeOfMeetings',
                 'typeOfMeetingBlock',
                 true
             );
         }
-
-
         $this->template->parse(
             'CONTENTS',
             'BookSalesVisit',
