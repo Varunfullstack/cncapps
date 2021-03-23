@@ -59,14 +59,18 @@ export default class CustomerDocumentUploader extends React.PureComponent {
                 label: "Description",
                 sortable: false,
                 content: (document) => (
-                    <a href={`Activity.php?action=viewFile&callDocumentID=${document.id}`}>{document.description}</a>)
+                    <a href={`Activity.php?action=viewFile&callDocumentID=${document.id}`}
+                       target="_blank"
+                    >{document.description}</a>)
             },
             {
                 path: "File",
                 label: "File",
                 sortable: false,
                 content: (document) => (
-                    <a href={`Activity.php?action=viewFile&callDocumentID=${document.id}`}>{document.filename}</a>)
+                    <a href={`Activity.php?action=viewFile&callDocumentID=${document.id}`}
+                       target="_blank"
+                    >{document.filename}</a>)
             },
             {
                 path: "createDate",

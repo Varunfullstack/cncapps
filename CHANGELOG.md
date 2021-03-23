@@ -15,6 +15,7 @@ This project changes will be shown here.
 - Issue 1284 - Office 365 Backup Error Handling
 ### Fixed
 - Issue 1299 - Unexpected characters in PDF quotes
+- Issue 1300 - Remove 'leave this site' warning from Edit SR page.
 
 ## [v5.6.5] - 2021-03-22
 ### Fixed
