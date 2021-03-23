@@ -61,7 +61,7 @@ export class Modal extends React.Component {
                 el(
                     "div",
                     {
-                        
+
                         key: "modalContent",
                         className: !startDrag?"modal-content undraggable":" modal-content",
                         style: {maxWidth},

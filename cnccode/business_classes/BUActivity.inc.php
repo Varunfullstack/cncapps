@@ -3865,8 +3865,6 @@ class BUActivity extends Business
             DBEJProblem::awaitingCustomerResponseFlag,
             'N'
         );
-
-
         /** @var $db dbSweetcode */ global $db;
         $statement = $db->preparedQuery(
             'select getOpenHours(?)',
@@ -3877,13 +3875,10 @@ class BUActivity extends Business
             $statement->fetch_array(MYSQLI_NUM)[0]
         );
         $dbeProblem->updateRow();
-
         // we have to check if there were any pending Chargeable Work Requests, and we have to remove them if that's true
-
-        $repo = new ChargeableWorkCustomerRequestMySQLRepository();
+        $repo    = new ChargeableWorkCustomerRequestMySQLRepository();
         $usecase = new ClearPendingChargeableRequestsOnServiceRequestClosed($repo);
         $usecase($dbeProblem);
-
         return $newActivityID;
 
     }
@@ -8271,6 +8266,9 @@ FROM
             $this->sendNotifyEscalatorUserEmail($problemID);
         }
         $this->sendFixedEmail($problemID);
+        $repo    = new ChargeableWorkCustomerRequestMySQLRepository();
+        $usecase = new ClearPendingChargeableRequestsOnServiceRequestClosed($repo);
+        $usecase($dbeProblem);
         return true;
     }
 
@@ -10898,9 +10896,10 @@ FROM
             DBEJCallActivity::userID,
             $currentUser->getValue(DBEUser::userID)
         );
-        if(!$dbeCallActivity->insertRow()){
+        if (!$dbeCallActivity->insertRow()) {
             throw new Exception("Failed to insert customer contact activity {$dbeCallActivity->db->Error}");
         }
+        $this->sendUpdatedByAnotherUserEmail($dbeCallActivity->getValue(DBECallActivity::problemID), $dbeCallActivity);
         return $dbeCallActivity;
     }
 

@@ -4,6 +4,8 @@ import CNCCKEditor from "../../../shared/CNCCKEditor";
 import * as PropTypes from "prop-types";
 import APICustomers from "../../../services/APICustomers";
 
+import './AdditionalTimeRequestModal.css';
+
 class AdditionalTimeRequestModal extends React.Component {
     api = new APICustomers()
     static defaultProps = {
@@ -107,14 +109,16 @@ class AdditionalTimeRequestModal extends React.Component {
         const {reason, timeRequested, contacts, selectedContactId} = this.state;
         return (
             <Modal
-                width="75%"
+                width="600px"
                 onClose={() => this.onCancel()}
                 title="Additional Time Request"
                 show={show}
                 className="standardTextModal"
                 content={(
                     <React.Fragment key="internalModal">
-                        <div key="contact picker">
+                        <div key="contact picker"
+                             className="contactPicker"
+                        >
                             <label>
                                 Send request to:
                             </label>
@@ -130,6 +134,7 @@ class AdditionalTimeRequestModal extends React.Component {
                         </div>
                         <div key="hoursContainer"
                              style={{marginBottom: "1rem"}}
+                             className="hoursContainer"
                         >
                             <label key="someLabel">
                                 Hours to quote for:

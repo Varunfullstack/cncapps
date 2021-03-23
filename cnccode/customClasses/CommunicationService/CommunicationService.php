@@ -39,8 +39,8 @@ class CommunicationService
         $dbeItem = new \DBEItem($thing);
         $dbeItem->getRow(CONFIG_CONSULTANCY_HOURLY_LABOUR_ITEMID);
         $dto        = new ChargeableWorkCustomerRequestEmailDTO(
-            PORTAL_URL . '/notSureWhereToPointThisYet',
-            PORTAL_URL . '/notSureWhereToPointThisYet',
+            PORTAL_URL . '/chargeable-activity-feedback/?token=' . $request->getId()->value() . "&type=accept",
+            PORTAL_URL . '/chargeable-activity-feedback/?token=' . $request->getId()->value() . "&type=reject",
             $request->getAdditionalHoursRequested()->value(),
             $dbeContact->getValue(DBEContact::firstName),
             $serviceRequestId,

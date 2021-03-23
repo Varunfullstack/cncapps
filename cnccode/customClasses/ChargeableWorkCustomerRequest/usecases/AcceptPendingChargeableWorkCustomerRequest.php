@@ -3,6 +3,8 @@
 namespace CNCLTD\ChargeableWorkCustomerRequest\usecases;
 
 use BUActivity;
+use BUCustomer;
+use BUCustomerItem;
 use BUHeader;
 use BUSalesOrder;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequest;
@@ -18,6 +20,7 @@ use DBEContact;
 use DBECustomer;
 use DBEHeader;
 use DBEItem;
+use DBEJContract;
 use DBEJOrdhead;
 use DBEJOrdline;
 use DBEJProblem;
@@ -26,6 +29,7 @@ use DBEOrdhead;
 use DBEOrdline;
 use DBEProblem;
 use DBEUser;
+use Exception;
 
 global $cfg;
 require_once($cfg["path_bu"] . "/BUActivity.inc.php");
@@ -59,7 +63,7 @@ class AcceptPendingChargeableWorkCustomerRequest
         $request           = $this->getRequest($id);
         $serviceRequest    = $this->getServiceRequest($request);
         $requestApprovedAt = new DateTimeImmutable();
-        $buCustomer        = new \BUCustomer($this);
+        $buCustomer        = new BUCustomer($this);
         $hasPrepay         = $buCustomer->hasPrepayContract($serviceRequest->getValue(DBEProblem::customerID));
         $this->logCustomerContactActivity($request, $requestApprovedAt, $serviceRequest, $comments, $hasPrepay);
         if (!$hasPrepay) {
@@ -119,6 +123,7 @@ class AcceptPendingChargeableWorkCustomerRequest
      * @param DBEProblem $serviceRequest
      * @param string|null $comments
      * @param bool $hasPrepay
+     * @throws Exception
      */
     private function logCustomerContactActivity(ChargeableWorkCustomerRequest $request,
                                                 ?DateTimeInterface $requestApprovedAt,
@@ -137,6 +142,7 @@ class AcceptPendingChargeableWorkCustomerRequest
             $description .= "<p>Priority Changed from {$serviceRequest->getValue(DBEProblem::priority)} to 5</p>";
         }
         $requester = $this->getRequester($request);
+
         $buActivity->addCustomerContactActivityToServiceRequest($serviceRequest, $description, $requester);
     }
 
@@ -303,7 +309,7 @@ class AcceptPendingChargeableWorkCustomerRequest
             $toUpdateProblem->setValue(DBEProblem::priority, 5);
         } else {
             $toUpdateProblem->setValue(DBEProblem::prePayChargeApproved, 1);
-            $buCustomer       = new \BUCustomerItem($this);
+            $buCustomer       = new BUCustomerItem($this);
             $datasetContracts = new DataSet($this);
             $buCustomer->getPrepayContractByCustomerID(
                 $dbeProblem->getValue(DBEProblem::customerID),
@@ -311,7 +317,7 @@ class AcceptPendingChargeableWorkCustomerRequest
             );
             $toUpdateProblem->setValue(
                 DBEProblem::contractCustomerItemID,
-                $datasetContracts->getValue(\DBEJContract::customerItemID)
+                $datasetContracts->getValue(DBEJContract::customerItemID)
             );
         }
         $requesterId = $request->getRequesterId()->value();
