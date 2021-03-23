@@ -93,7 +93,10 @@ while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
     }
     $customerName = strtolower($row['customerName']);
     $customer     = getCustomerByNameOrNull($customerName);
-    if ($customer && $customer->getValue(DBECustomer::excludeFromWebrootChecks)) {
+    if ($customer && ($customer->getValue(DBECustomer::excludeFromWebrootChecks) || in_array(
+                $customer->getValue(DBECustomer::customerID),
+                [1746, 2214, 6121]
+            ))) {
         continue;
     }
     $computerName = strtolower($row['computerName']);
@@ -113,7 +116,8 @@ while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
     }
     $lastSeenDateTime = new DateTime($row['lastSeen']);
     if (!empty($matches[$customerName][$computerName]['labtech'])) {
-        $errorTxt = "Duplicated Labtech device: {$customerName} {$computerName}";
+        $errorTxt = "Duplicated Automate device: {$customerName} {$computerName}";
+        raiseDuplicatedMIDRequest($computerName, $customerName, "Automate");
         $logger->error($errorTxt);
         $errors[] = $errorTxt;
         continue;
@@ -134,11 +138,11 @@ function getCustomerByNameOrNull($customerName): ?DBECustomer
     return $dbeCustomer;
 }
 
-function raiseDuplicatedMIDRequest($computerName, $customerName)
+function raiseDuplicatedMIDRequest($computerName, $customerName, $vendorName = "Webroot Portal")
 {
     $customer   = getCustomerByNameOrNull($customerName);
     $customerId = 282;
-    $reason     = "$computerName is duplicated in Webroot Portal, please check and retire as appropriate";
+    $reason     = "$computerName is duplicated in $vendorName, please check and retire as appropriate";
     if (!$customer) {
         $reason .= " for customer $customerName";
     } else {
@@ -326,7 +330,10 @@ foreach ($sitesResponse->sites as $site) {
     }
     $customerName = strtolower($site->siteName);
     $customer     = getCustomerByNameOrNull($customerName);
-    if ($customer && $customer->getValue(DBECustomer::excludeFromWebrootChecks)) {
+    if ($customer && ($customer->getValue(DBECustomer::excludeFromWebrootChecks) || in_array(
+                $customer->getValue(DBECustomer::customerID),
+                [1746, 2214, 6121]
+            ))) {
         continue;
     }
     foreach ($webrootAPI->getEndpoints($site->siteId) as $device) {
@@ -438,6 +445,7 @@ foreach ($sitesResponse->sites as $site) {
         // ignore same computer name and only care if same instance MID
         if (!empty($matches[$customerName][$computerName]['webroot'])) {
             $errorTxt = "Duplicated Webroot device: {$customerName} {$computerName}";
+            raiseDuplicatedMIDRequest($computerName, $customerName);
             $logger->error($errorTxt);
             $errors[] = $errorTxt;
             continue;
@@ -457,7 +465,10 @@ while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
 
     $customerName = strtolower($row['customerName']);
     $customer     = getCustomerByNameOrNull($customerName);
-    if ($customer && $customer->getValue(DBECustomer::excludeFromWebrootChecks)) {
+    if ($customer && ($customer->getValue(DBECustomer::excludeFromWebrootChecks) || in_array(
+                $customer->getValue(DBECustomer::customerID),
+                [1746, 2214, 6121]
+            ))) {
         continue;
     }
     $computerName = strtolower($row['computerName']);

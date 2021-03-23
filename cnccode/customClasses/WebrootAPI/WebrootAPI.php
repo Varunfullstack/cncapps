@@ -73,8 +73,14 @@ class WebrootAPI
         $totalPages = $firstBatch->totalPages;
         while ($page < $totalPages) {
             $page++;
-            $nextBatch = $this->getEndpointsBatch($siteKeyCode, $page);
-            $endpoints = array_merge($endpoints, $nextBatch->endpoints);
+            $nextBatch = $this->getEndpointsBatch(
+                $siteKeyCode,
+                $page
+            );
+            $endpoints = array_merge(
+                $endpoints,
+                $nextBatch->endpoints
+            );
         }
         return $endpoints;
     }
@@ -88,7 +94,10 @@ class WebrootAPI
         $jsonDecoder->register(new EndpointTransformer());
         $jsonDecoder->register(new GetEndpointsResponseTransformer());
         /** @var GetEndpointsResponse $data */
-        $data = $jsonDecoder->decode((string)$response->getBody(), GetEndpointsResponse::class);
+        $data = $jsonDecoder->decode(
+            (string)$response->getBody(),
+            GetEndpointsResponse::class
+        );
         if (!$data) {
             throw new Exception('Failed to parse body');
         }
@@ -103,7 +112,9 @@ class WebrootAPI
      */
     private function getAuthenticatedFromURL($url): ResponseInterface
     {
-        $request = new Request('GET', $url);
+        $request = new Request(
+            'GET', $url
+        );
         return $this->sendAuthenticatedRequest($request);
     }
 
@@ -115,7 +126,10 @@ class WebrootAPI
                 throw new Exception('Unable to retrieve an access token');
             }
             if (!$request->hasHeader('Authorization')) {
-                $request = $request->withAddedHeader('Authorization', "Bearer {$this->accessToken}");
+                $request = $request->withAddedHeader(
+                    'Authorization',
+                    "Bearer {$this->accessToken}"
+                );
             }
             try {
                 return $this->guzzleClient->send($request);
@@ -224,7 +238,10 @@ class WebrootAPI
         $jsonDecoder = new JsonDecoder(true);
         $jsonDecoder->register(new SiteTransformer());
         $jsonDecoder->register(new GetSitesResponseTransformer());
-        $data = $jsonDecoder->decode((string)$response->getBody(), GetSitesResponse::class);
+        $data = $jsonDecoder->decode(
+            (string)$response->getBody(),
+            GetSitesResponse::class
+        );
         if (!$data) {
             throw new Exception('Failed to parse body');
         }
@@ -234,11 +251,14 @@ class WebrootAPI
     public function deactivateEndpoint($siteId, $endpointId)
     {
         $request = new Request(
-            'POST', "api/console/gsm/{$this->gsmKey}/sites/{$siteId}/endpoints/deactivate", [], json_encode(
-                      [
-                          "EndpointsList" => $endpointId
-                      ]
-                  )
+            'POST',
+            "api/console/gsm/{$this->gsmKey}/sites/{$siteId}/endpoints/deactivate",
+            ['Content-Type' => "application/json"],
+            json_encode(
+                [
+                    "EndpointsList" => $endpointId
+                ]
+            )
         );
         return $this->sendAuthenticatedRequest($request);
     }
