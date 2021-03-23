@@ -12,6 +12,7 @@ This project changes will be shown here.
 - Issue 1294 - Import customers from CSV v2.
 - Issue 1297 - Task List Modal, refine list of items.
 - Issue 1267 - Customer Feedback Improvements.
+- Issue 1284 - Office 365 Backup Error Handling
 ### Fixed
 - Issue 1299 - Unexpected characters in PDF quotes
 
