@@ -95,9 +95,5 @@
     <include file="db.changelog-5.4.2.xml"/>
     <include file="db.changelog-5.5.0.xml"/>
     <include file="db.changelog-5.6.0.xml"/>
-    <include file="db.changelog-issue648.xml"/>
-    <include file="db.changelog-issue1247.xml"/>
-    <include file="db.changelog-issue1294.xml"/>
-    <include file="db.changelog-issue1254.xml"/>
-    <include file="db.changelog-issue1265.xml"/>
+    <include file="db.changelog-5.7.0.xml"/>
 </databaseChangeLog>
