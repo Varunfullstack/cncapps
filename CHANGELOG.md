@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1267 - Customer Feedback Improvements.
+
 ## [v5.6.5] - 2021-03-22
 ### Fixed
 - Fixed changes with page title/header
