@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 1254 - Report on duplicate MS Office licenses.
+
 ## [v5.6.5] - 2021-03-22
 ### Fixed
 - Fixed changes with page title/header
