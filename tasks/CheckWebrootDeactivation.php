@@ -4,6 +4,7 @@ const DATA_CSV_FILENAME = 'data.csv';
 use CNCLTD\LoggerCLI;
 use CNCLTD\ToCheckDevice;
 use CNCLTD\WebrootAPI\WebrootAPI;
+use GuzzleHttp\Exception\ClientException;
 
 require_once(__DIR__ . "/../htdocs/config.inc.php");
 require_once($cfg ["path_bu"] . "/BUHeader.inc.php");
@@ -391,7 +392,20 @@ foreach ($sitesResponse->sites as $site) {
         if ($lastSeenDateTime <= $toCheckDate && isLabtechRetired($computerName, $customerName, $labtechDB)) {
             $testText = ' (Not actually deactivated testOnly)';
             if (!$testMode) {
-                $webrootAPI->deactivateEndpoint($site->siteId, $device->endpointId);
+                $logger->info(
+                    "Proceeding to deactivate $computerName Webroot endpoint due to being retired in Automate and not seen recently in Webroot{$testText}"
+                );
+                try {
+                    $webrootAPI->deactivateEndpoint($site->siteId, $device->endpointId);
+                } catch (ClientException $exception) {
+//                    var_dump((string)$exception->getResponse()->getBody());
+//                    var_dump(
+//                        $exception->getRequest()->getUri(),
+//                        $exception->getRequest()->getHeaders(),
+//                        (string)$exception->getRequest()->getBody()
+//                    );
+                    throw new Exception("Failed to deactivate");
+                }
                 $testText = '';
             }
             $logger->warning(
