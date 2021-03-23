@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 1299 - Unexpected characters in PDF quotes
+
 ## [v5.6.5] - 2021-03-22
 ### Fixed
 - Fixed changes with page title/header
