@@ -1,0 +1,28 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="xavi" id="issue1254-0">
+        <tagDatabase tag="issue1254"/>
+    </changeSet>
+    <changeSet id="issue1254-1" author="xavi">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="office365License" columnName="includesOffice"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="office365License">
+            <column name="includesOffice" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <sql>
+            update office365License
+            set includesOffice = 1
+            where id in (2, 5, 9, 17, 26, 48, 61, 62, 79, 80)
+        </sql>
+        <rollback>
+            <dropColumn tableName="office365License"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

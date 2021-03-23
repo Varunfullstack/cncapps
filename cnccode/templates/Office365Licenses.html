@@ -19,6 +19,7 @@
             <th>Friendly Name</th>
             <th>Report on Spare Licenses</th>
             <th>Includes Defender</th>
+            <th>Includes Office</th>
             <th></th>
         </tr>
         </thead>
@@ -51,6 +52,14 @@
                 <i class='fa fa-times'></i>
                 {% /includesDefender %}
             </td>
+            <td>
+                {% #includesOffice %}
+                <i class='fa fa-check'></i>
+                {% /includesOffice %}
+                {% ^includesOffice %}
+                <i class='fa fa-times'></i>
+                {% /includesOffice %}
+            </td>
             <td class="buttons">
                 <button class="editButton">Edit</button>
                 <button class="deleteButton">Delete</button>
@@ -72,10 +81,15 @@
     let rules = [];
 
     function newRule() {
-        return {replacement: "", license: null, mailboxLimit: null, reportOnSpareLicenses: false, includesDefender: false};
+        return {
+            replacement: "",
+            license: null,
+            mailboxLimit: null,
+            reportOnSpareLicenses: false,
+            includesDefender: false,
+            includesOffice: false
+        };
     }
-
-
 
 
     let editingItem = null;
@@ -174,7 +188,6 @@
     }
 
     function addOrUpdateCurrentRule() {
-        console.log('save button');
         if (!isRuleValid()) {
             return;
         }
@@ -217,6 +230,7 @@
         $('#licenseInput').val(rule.license);
         $('#reportOnSpareLicensesInput')[0].checked = (rule.reportOnSpareLicenses);
         $('#includesDefenderInput')[0].checked = rule.includesDefender;
+        $('#includesOfficeInput')[0].checked = rule.includesOffice;
     }
 
     function updateLicense() {
@@ -237,6 +251,10 @@
 
     function updateIncludesATP() {
         currentRule.includesDefender = $('#includesDefenderInput').is(':checked');
+    }
+
+    function updateIncludesOffice() {
+        currentRule.includesOffice = $('#includesOfficeInput').is(':checked');
     }
 
 </script>
@@ -297,6 +315,17 @@
                name="includesDefender"
                onchange="updateIncludesATP()"
                id="includesDefenderInput"
+        >
+    </div>
+    <div>
+        <div style="width: 100px; display: inline-block">
+            Includes Office
+        </div>
+        <input type="checkbox"
+               value="Y"
+               name="includesOffice"
+               onchange="updateIncludesOffice()"
+               id="includesOfficeInput"
         >
     </div>
     <div>
