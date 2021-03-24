@@ -343,9 +343,9 @@
         </addColumn>
         <sql>
             update contactAuditLog
-            set mailshotTemp = COALESCE(con_mailshot, 'N') = 'Y';
+            set initialLoggingEmailTemp = COALESCE(initialLoggingEmailFlag, 'N') = 'Y';
         </sql>
-        <dropColumn tableName="contactAuditLog" columnName="con_mailshot"/>
+        <dropColumn tableName="contactAuditLog" columnName="initialLoggingEmailFlag"/>
         <renameColumn tableName="contactAuditLog" oldColumnName="initialLoggingEmailTemp"
                       newColumnName="initialLoggingEmail"
                       columnDataType="tinyint(1)"/>
