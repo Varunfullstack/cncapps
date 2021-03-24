@@ -2,6 +2,7 @@
 
 namespace CNCLTD\WebrootAPI;
 
+use CNCLTD\LoggerCLI;
 use DateInterval;
 use DateTime;
 use Exception;
@@ -11,6 +12,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
 use Karriere\JsonDecoder\JsonDecoder;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Log\LoggerInterface;
 
 class WebrootAPI
 {
@@ -27,8 +29,12 @@ class WebrootAPI
      */
     private $expiresAt;
     private $refreshToken;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
-    public function __construct($user, $password, $clientId, $clientSecret, $gsmKey)
+    public function __construct($user, $password, $clientId, $clientSecret, $gsmKey, LoggerCLI $logger)
     {
         $this->guzzleClient = new Client(
             [
@@ -44,6 +50,7 @@ class WebrootAPI
         $this->clientId     = $clientId;
         $this->clientSecret = $clientSecret;
         $this->gsmKey       = $gsmKey;
+        $this->logger       = $logger;
     }
 
     public function getEndpointsRaw($siteKeyCode)
@@ -67,11 +74,16 @@ class WebrootAPI
      */
     public function getEndpoints($siteKeyCode)
     {
-        $page       = 1;
-        $firstBatch = $this->getEndpointsBatch($siteKeyCode);
-        $endpoints  = $firstBatch->endpoints;
-        $totalPages = $firstBatch->totalPages;
-        while ($page < $totalPages) {
+
+        $this->logger->debug("Fetching first page of end points of site: $siteKeyCode");
+        $page           = 1;
+        $pageSize       = 300;
+        $firstBatch     = $this->getEndpointsBatch($siteKeyCode, 1, $pageSize);
+        $endpoints      = $firstBatch->endpoints;
+        $totalAvailable = $firstBatch->totalAvailable;
+        $retrievedCount = $pageSize * $page;
+        while ( $retrievedCount < $totalAvailable) {
+            $this->logger->debug("Fetching next page we have retrieved {$retrievedCount}/{$totalAvailable} so far of end points of site: $siteKeyCode");
             $page++;
             $nextBatch = $this->getEndpointsBatch(
                 $siteKeyCode,
@@ -81,14 +93,15 @@ class WebrootAPI
                 $endpoints,
                 $nextBatch->endpoints
             );
+            $retrievedCount = $pageSize * $page;
         }
         return $endpoints;
     }
 
-    private function getEndpointsBatch($siteKeyCode, $pageNumber = 1): GetEndpointsResponse
+    private function getEndpointsBatch($siteKeyCode, $pageNumber = 1, $pageSize = 2000): GetEndpointsResponse
     {
         $response    = $this->getAuthenticatedFromURL(
-            "api/console/gsm/{$this->gsmKey}/sites/{$siteKeyCode}/endpoints?pageNr=$pageNumber"
+            "api/console/gsm/{$this->gsmKey}/sites/{$siteKeyCode}/endpoints?pageNr=$pageNumber&pageSize=$pageSize"
         );
         $jsonDecoder = new JsonDecoder(true);
         $jsonDecoder->register(new EndpointTransformer());

@@ -16,7 +16,7 @@ class GetEndpointsResponseTransformer implements \Karriere\JsonDecoder\Transform
      */
     public function register(ClassBindings $classBindings)
     {
-        $classBindings->register(new AliasBinding('totalPages', "TotalAvailable"));
+        $classBindings->register(new AliasBinding('totalAvailable', "TotalAvailable"));
         $classBindings->register(new AliasBinding('pageNumber', "pageNr"));
         $classBindings->register(new ArrayBinding('endpoints', "Endpoints", Endpoint::class));
     }

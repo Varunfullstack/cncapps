@@ -5,14 +5,13 @@ use CNCLTD\LoggerCLI;
 use CNCLTD\ToCheckDevice;
 use CNCLTD\WebrootAPI\WebrootAPI;
 use GuzzleHttp\Exception\ClientException;
+use Monolog\Logger;
 
 require_once(__DIR__ . "/../htdocs/config.inc.php");
 require_once($cfg ["path_bu"] . "/BUHeader.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 require_once($cfg["path_bu"] . '/BUCustomer.inc.php');
 require_once($cfg["path_bu"] . '/BUActivity.inc.php');
-$logName = 'CheckWebrootDeactivation';
-$logger  = new LoggerCLI($logName);
 // increasing execution time to infinity...
 ini_set('max_execution_time', 0);
 if (!is_cli()) {
@@ -27,14 +26,16 @@ $sendEmailMode = false;
 if (isset($options['e'])) {
     $sendEmailMode = true;
 }
-$debugMode = false;
+$loggerLevel = Logger::INFO;
 if (isset($options['d'])) {
-    $debugMode = true;
+    $loggerLevel = Logger::DEBUG;
 }
 $testMode = false;
 if (isset($options['t'])) {
     $testMode = true;
 }
+$logName  = 'CheckWebrootDeactivation';
+$logger   = new LoggerCLI($logName, $loggerLevel);
 $thing    = null;
 $buHeader = new BUHeader($thing);
 $dsHeader = new DataSet($thing);
@@ -45,7 +46,7 @@ $client_Id     = 'client_e2maZ8d5@' . CONFIG_PUBLIC_DOMAIN;
 $client_secret = '{1!XM^QJcqvM8qj';
 $gsmKey        = "2FB2-LTSW-E06B-3F49-43DC";
 // we are going to ask for a new access token
-$webrootAPI = new WebrootAPI($user, $password, $client_Id, $client_secret, $gsmKey);
+$webrootAPI = new WebrootAPI($user, $password, $client_Id, $client_secret, $gsmKey, $logger);
 $matches    = [];
 $errors     = [];
 // here we have all the webroot computers...
@@ -94,13 +95,14 @@ while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
     }
     $customerName = strtolower($row['customerName']);
     $customer     = getCustomerByNameOrNull($customerName);
+    $computerName = strtolower($row['computerName']);
+    $logger->debug("Processing Automate $computerName for $customerName");
     if ($customer && ($customer->getValue(DBECustomer::excludeFromWebrootChecks) || in_array(
                 $customer->getValue(DBECustomer::customerID),
                 [1746, 2214, 6121]
             ))) {
         continue;
     }
-    $computerName = strtolower($row['computerName']);
     if (empty($matches[$customerName])) {
         $matches[$customerName] = [
             "isWebroot" => $row['isWebroot']
@@ -178,6 +180,20 @@ function raiseSeenInWebrootButNotLabtechRequest($computerName, $customerName, $t
         $customerId = $customer->getValue(DBECustomer::customerID);
     }
     $emailSubjectSummary = "$computerName seen in Webroot but not Automate";
+    raiseRequest($customerId, $reason, $computerName, $emailSubjectSummary);
+}
+
+function raiseDeactivateWebrootRequest($computerName, $customerName, $thresholdDays)
+{
+    $reason     = "$computerName has not been seen in Webroot for within $thresholdDays days and is flagged as retired within CW Automate. Please review and deactivate in Webroot accordingly";
+    $customer   = getCustomerByNameOrNull($customerName);
+    $customerId = 282;
+    if (!$customer) {
+        $reason .= " for customer $customerName";
+    } else {
+        $customerId = $customer->getValue(DBECustomer::customerID);
+    }
+    $emailSubjectSummary = "Deactivate Webroot For Retired Computer";
     raiseRequest($customerId, $reason, $computerName, $emailSubjectSummary);
 }
 
@@ -318,11 +334,11 @@ function raiseRequest($customerId, $reason, $computerName, $emailSubjectSummary)
     $dbeCallActivity->insertRow();
 }
 
-$toCheckDate = (new DateTime())->sub(
-    new DateInterval("P{$dsHeader->getValue(DBEHeader::computerLastSeenThresholdDays)}D")
+$thresholdDays = $dsHeader->getValue(DBEHeader::computerLastSeenThresholdDays);
+$toCheckDate   = (new DateTime())->sub(
+    new DateInterval("P{$thresholdDays}D")
 );
 foreach ($sitesResponse->sites as $site) {
-
     if (!$site->siteName) {
         $errorTxt = "Webroot site without name? accountKey: {$site->accountKeyCode}";
         $logger->error($errorTxt);
@@ -331,10 +347,12 @@ foreach ($sitesResponse->sites as $site) {
     }
     $customerName = strtolower($site->siteName);
     $customer     = getCustomerByNameOrNull($customerName);
+    $logger->debug("Processing Webroot site $customerName");
     if ($customer && ($customer->getValue(DBECustomer::excludeFromWebrootChecks) || in_array(
                 $customer->getValue(DBECustomer::customerID),
                 [1746, 2214, 6121]
             ))) {
+        $logger->debug("Webroot site ignored!");
         continue;
     }
     foreach ($webrootAPI->getEndpoints($site->siteId) as $device) {
@@ -349,6 +367,7 @@ foreach ($sitesResponse->sites as $site) {
             continue;
         }
         $computerName = strtolower($device->hostName);
+        $logger->debug("Processing Webroot endpoint $computerName for site $customerName");
         if (empty($matches[$customerName])) {
             $matches[$customerName] = [
                 "isWebroot" => true,
@@ -363,32 +382,26 @@ foreach ($sitesResponse->sites as $site) {
             ];
         }
         $mid = explode(":::", $device->machineId)[0];
-        if ($debugMode) {
-            $logger->debug("Extracted MID: $mid from $customerName endpoint $computerName");
-        }
+        $logger->debug("Extracted MID: $mid from $customerName endpoint $computerName");
         if (empty($matches[$customerName][$computerName]["webrootMIDs"][$mid])) {
             $matches[$customerName][$computerName]["webrootMIDs"][$mid] = true;
-            if ($debugMode) {
-                $logger->debug("Registering MID: $mid for $customerName endpoint $computerName");
-            }
+            $logger->debug("Registering MID: $mid for $customerName endpoint $computerName");
+
         } else {
-            if ($debugMode) {
-                $logger->debug(
-                    "Duplicated MID : $mid from $customerName endpoint $computerName found, raising duplicated MDI request"
-                );
-            }
+
+            $logger->debug(
+                "Duplicated MID : $mid from $customerName endpoint $computerName found, raising duplicated MDI request"
+            );
             try {
                 raiseDuplicatedMIDRequest($computerName, $customerName);
-            } catch (\Exception $exception) {
+            } catch (Exception $exception) {
                 $logger->error($exception->getMessage());
             }
         }
         $lastSeenDateTime = new DateTime($device->lastSeen);
-        if ($debugMode) {
-            $logger->debug(
-                "$customerName endpoint $computerName: checking webroot lastSeen: {$lastSeenDateTime->format(DATE_MYSQL_DATETIME)} against threshold date {$toCheckDate->format(DATE_MYSQL_DATETIME)}"
-            );
-        }
+        $logger->debug(
+            "$customerName endpoint $computerName: checking webroot lastSeen: {$lastSeenDateTime->format(DATE_MYSQL_DATETIME)} against threshold date {$toCheckDate->format(DATE_MYSQL_DATETIME)}"
+        );
         if ($lastSeenDateTime <= $toCheckDate && isLabtechRetired($computerName, $customerName, $labtechDB)) {
             $testText = ' (Not actually deactivated testOnly)';
             if (!$testMode) {
@@ -396,7 +409,8 @@ foreach ($sitesResponse->sites as $site) {
                     "Proceeding to deactivate $computerName Webroot endpoint due to being retired in Automate and not seen recently in Webroot{$testText}"
                 );
                 try {
-                    $webrootAPI->deactivateEndpoint($site->siteId, $device->endpointId);
+                    raiseDeactivateWebrootRequest($computerName, $customerName, $thresholdDays);
+//                    $webrootAPI->deactivateEndpoint($site->siteId, $device->endpointId);
                 } catch (ClientException $exception) {
 //                    var_dump((string)$exception->getResponse()->getBody());
 //                    var_dump(
@@ -413,26 +427,22 @@ foreach ($sitesResponse->sites as $site) {
             );
             continue;
         }
-        if ($debugMode) {
-            $logger->debug(
-                "$customerName endpoint $computerName: Checking labtech vs webroot availability, check is skipped if there's no labtech match"
-            );
-        }
+        $logger->debug(
+            "$customerName endpoint $computerName: Checking labtech vs webroot availability, check is skipped if there's no labtech match"
+        );
         if (!empty($matches[$customerName][$computerName]['labtech'])) {
             $labtechLastSeenDateTime = $matches[$customerName][$computerName]['labtech']->lastSeenDateTime;
-            if ($debugMode) {
-                $logger->debug(
-                    "$customerName endpoint $computerName: Labtech data present, checking dates webrootLastSeen {$lastSeenDateTime->format(DATE_MYSQL_DATETIME)}, thresholdDate {$toCheckDate->format(DATE_MYSQL_DATETIME)}, labtechLastSeen {$labtechLastSeenDateTime->format(DATE_MYSQL_DATETIME)}"
-                );
-            }
+            $logger->debug(
+                "$customerName endpoint $computerName: Labtech data present, checking dates webrootLastSeen {$lastSeenDateTime->format(DATE_MYSQL_DATETIME)}, thresholdDate {$toCheckDate->format(DATE_MYSQL_DATETIME)}, labtechLastSeen {$labtechLastSeenDateTime->format(DATE_MYSQL_DATETIME)}"
+            );
             if ($lastSeenDateTime <= $toCheckDate && $labtechLastSeenDateTime > $toCheckDate) {
                 try {
                     raiseSeenInLabtechButNotWebrootRequest(
                         $computerName,
                         $customerName,
-                        $dsHeader->getValue(DBEHeader::computerLastSeenThresholdDays)
+                        $thresholdDays
                     );
-                } catch (\Exception $exception) {
+                } catch (Exception $exception) {
                     $logger->error($exception->getMessage());
                 }
                 $logger->warning("$computerName raising seen in Automate but not in Webroot request");
@@ -442,19 +452,19 @@ foreach ($sitesResponse->sites as $site) {
                     raiseSeenInWebrootButNotLabtechRequest(
                         $computerName,
                         $customerName,
-                        $dsHeader->getValue(DBEHeader::computerLastSeenThresholdDays)
+                        $thresholdDays
                     );
-                } catch (\Exception $exception) {
+                } catch (Exception $exception) {
                     $logger->error($exception->getMessage());
                 }
                 $logger->warning("$computerName raising seen in Webroot but not in Automate request");
             }
         } else {
-            if ($debugMode) {
-                $logger->debug(
-                    "$customerName endpoint $computerName: No Labtech data, skipping availability checks"
-                );
-            }
+
+            $logger->debug(
+                "$customerName endpoint $computerName: No Labtech data, skipping availability checks"
+            );
+
         }
         // ignore same computer name and only care if same instance MID
         if (!empty($matches[$customerName][$computerName]['webroot'])) {
