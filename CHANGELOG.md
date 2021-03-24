@@ -6,6 +6,7 @@ This project changes will be shown here.
 - Issue 1247 - Customer approval for extra chargeable work.
 - Issue 1254 - Report on duplicate MS Office licenses.
 - Issue 1265 - Calculate and store the amount of OBRS storage per customer / server
+- Issue 1249 - Webroot & Automate asset comparison and resolution.
 ### Changed
 - Issue 648 - Move contacts that are linked to a supplier to their own table.
 - Issue 1230 - Show supported / unsupported customer assets.

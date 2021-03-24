@@ -1952,6 +1952,7 @@
                         >
                     </td>
                 </tr>
+
                 <tr>
                     <td class="content">Reg</td>
                     <td class="content">
@@ -2295,6 +2296,7 @@
                         >
                     </td>
                 </tr>
+
                 <tr>
                     <td class="content">Account Number</td>
                     <td class="content">
@@ -2308,6 +2310,18 @@
                                name="form[customer][{customerID}][accountNumber]"
                                value="{accountNumber}"
                                class="encrypted"
+                        >
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="content">Exclude from Webroot Checks</td>
+                    <td class="content">
+                        <input name="form[customer][{customerID}][excludeFromWebrootChecks]"
+                               type="checkbox"
+                               {excludeFromWebrootChecksChecked}
+                               value="Y"
+                               {disabled}
                         >
                     </td>
                 </tr>

@@ -1699,6 +1699,9 @@ class CTCustomer extends CTCNC
                 'mailshotFlagChecked'                     => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::mailshotFlag)
                 ),
+                'excludeFromWebrootChecksChecked'         => $this->dsCustomer->getValue(
+                    DBECustomer::excludeFromWebrootChecks
+                ) ? 'checked' : '',
                 'referredFlagChecked'                     => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::referredFlag)
                 ),
