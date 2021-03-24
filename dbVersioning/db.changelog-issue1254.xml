@@ -22,7 +22,7 @@
             where id in (2, 5, 9, 17, 26, 48, 61, 62, 79, 80)
         </sql>
         <rollback>
-            <dropColumn tableName="office365License"/>
+            <dropColumn tableName="office365License" columnName="includesOffice"/>
         </rollback>
     </changeSet>
 </databaseChangeLog>
