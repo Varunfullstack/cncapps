@@ -2620,7 +2620,7 @@ class CTActivity extends CTCNC
         $dbeJContract = new DBEJContract($this);
         $title        = $problemId . ' - ' . $dbeProblem->getValue(
                 DBEJProblem::customerName
-            ) . $this->getProblemRaiseIcon($dbeProblem);
+            );
         $this->template->set_block(
             'ActivityReasonPopup',
             'activityBlock',
@@ -2732,7 +2732,7 @@ class CTActivity extends CTCNC
                 'callActivityID' => $lastActivityID,
             )
         );
-        $link = "<a href='" . $url . "' target='_blank'>$title</a>";
+        $link = "<a href='" . $url . "' target='_blank'>$title{$this->getProblemRaiseIcon($dbeProblem)}</a>";
         $this->setPageTitle($title, $link);
         if ($activitiesByProblemID->getValue(DBEJCallActivity::contractCustomerItemID)) {
             $dbeJContract->getRowByContractID(
