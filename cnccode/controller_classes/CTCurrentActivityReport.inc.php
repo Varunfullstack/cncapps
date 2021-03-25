@@ -18,7 +18,6 @@ require_once($cfg['path_bu'] . '/BUUser.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg['path_dbe'] . '/DBEPendingReopened.php');
 require_once($cfg['path_dbe'] . '/DBECallback.inc.php');
-require_once($cfg["path_dbe"] . "/DBConnect.php");
 
 
 // Actions

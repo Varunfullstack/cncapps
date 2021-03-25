@@ -578,7 +578,14 @@ class CurrentActivityReportComponent extends MainComponent {
         })
     }
     createNewSR = (problem, code) => {
-        window.location = `LogServiceRequest.php?customerproblemno=${problem.cpCustomerProblemID}`
+        const {filter}=this.state;
+        let append="";        
+        switch(filter.activeTab)
+        {
+            case "TBL":
+                append +=`&emailSubject=${problem.emailSubject}`;
+        }         
+        window.location = `LogServiceRequest.php?customerproblemno=${problem.cpCustomerProblemID}${append}`
 
     }
     getFollowOnElement = () => {

@@ -5,6 +5,7 @@ import React from 'react';
 import APIStandardText from "../../services/APIStandardText";
 import EditorFieldComponent from "../../shared/EditorField/EditorFieldComponent";
 import AssetListSelectorComponent from "../../shared/AssetListSelectorComponent/AssetListSelectorComponent";
+import { params } from "../../utils/utils.js";
 
 class CustomerSiteComponent extends MainComponent {
     el = React.createElement;
@@ -29,7 +30,7 @@ class CustomerSiteComponent extends MainComponent {
                 assetName: data.assetName || "",
                 assetTitle: data.assetTitle || "",
                 siteNo: data.siteNo || -1,
-                emailSubjectSummary: data.emailSubjectSummary || "",
+                emailSubjectSummary: data.emailSubjectSummary || params.get("emailSubject")|| "",
                 emptyAssetReason: data.emptyAssetReason || "",
             },
         };
