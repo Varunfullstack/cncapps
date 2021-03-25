@@ -18,6 +18,7 @@ require_once($cfg['path_bu'] . '/BUUser.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg['path_dbe'] . '/DBEPendingReopened.php');
 require_once($cfg['path_dbe'] . '/DBECallback.inc.php');
+require_once($cfg["path_dbe"] . "/DBConnect.php");
 
 
 // Actions
@@ -295,6 +296,7 @@ class CTCurrentActivityReport extends CTCNC
                         'cpUrlCustomer'       => $urlCustomer,
                         'cpBgColor'           => $bgColour,
                         'cpCount'             => $count,
+                        'emailSubject'        => $customerRaisedRequests->Record['emailSubject']
                     )
                 );
             } while ($customerRaisedRequests->next_record());
