@@ -264,7 +264,6 @@
             <addColumn tableName="contact">
                 <column name="fixedEmailFlag" type="char(1)" defaultValue="Y"/>
             </addColumn>
-
         </rollback>
     </changeSet>
     <changeSet author="pavwebdev" id="issue916-24">
@@ -351,4 +350,105 @@
                       columnDataType="tinyint(1)"/>
         <rollback/>
     </changeSet>
+
+    <changeSet author="pavwebdev" id="issue916-29">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contact" columnName="con_accounts_flag"/>
+        </preConditions>
+        <comment>
+            Changing accounts flag to an actual boolean column, and renaming
+        </comment>
+        <addColumn tableName="contact">
+            <column name="accountsTemp" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <sql>
+            update contact
+            set accountsTemp = COALESCE(con_accounts_flag, 'N') = 'Y';
+        </sql>
+        <dropColumn tableName="contact" columnName="con_accounts_flag"/>
+        <renameColumn tableName="contact" oldColumnName="accountsTemp" newColumnName="isAccount"
+                      columnDataType="tinyint(1)"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue916-30">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contactAuditLog" columnName="con_accounts_flag"/>
+        </preConditions>
+        <comment>
+            Changing accounts flag to an actual boolean column, and renaming contact audit log
+        </comment>
+        <addColumn tableName="contactAuditLog">
+            <column name="accountsTemp" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <sql>
+            update contactAuditLog
+            set accountsTemp = COALESCE(con_accounts_flag, 'N') = 'Y';
+        </sql>
+        <dropColumn tableName="contactAuditLog" columnName="con_accounts_flag"/>
+        <renameColumn tableName="contactAuditLog" oldColumnName="accountsTemp"
+                      newColumnName="isAccount"
+                      columnDataType="tinyint(1)"/>
+        <rollback/>
+    </changeSet>
+
+    <changeSet author="pavwebdev" id="issue916-31">
+        <preConditions>
+            <columnExists tableName="customer" columnName="cus_pcx"/>
+        </preConditions>
+        <dropColumn tableName="customer" columnName="cus_pcx"/>
+        <rollback/>
+    </changeSet>
+
+    <changeSet author="pavwebdev" id="issue916-32">
+        <preConditions>
+            <columnExists tableName="customer" columnName="cus_mailshot"/>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="mailshotTemp" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <sql>
+            update customer
+            set mailshotTemp = COALESCE(cus_mailshot, 'N') = 'Y';
+        </sql>
+        <dropColumn tableName="customer" columnName="cus_mailshot"/>
+        <renameColumn tableName="customer" oldColumnName="mailshotTemp"
+                      newColumnName="mailshotAllowed"
+                      columnDataType="tinyint(1)"/>
+        <rollback/>
+    </changeSet>
+
+    <changeSet author="pavwebdev" id="issue916-33">
+        <preConditions>
+            <columnExists tableName="customer" columnName="cus_referred"/>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="isReferredTemp" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <sql>
+            update customer
+            set isReferredTemp = COALESCE(cus_referred, 'N') = 'Y';
+        </sql>
+        <dropColumn tableName="customer" columnName="cus_referred"/>
+        <renameColumn tableName="customer" oldColumnName="isReferredTemp"
+                      newColumnName="isReferred"
+                      columnDataType="tinyint(1)"/>
+        <rollback/>
+    </changeSet>
+
+    <changeSet author="pavwebdev" id="issue916-34">
+        <preConditions>
+            <columnExists tableName="customer" columnName="noOfSites"/>
+        </preConditions>
+        <dropColumn tableName="customer" columnName="noOfSites"/>
+        <rollback/>
+    </changeSet>
+
 </databaseChangeLog>

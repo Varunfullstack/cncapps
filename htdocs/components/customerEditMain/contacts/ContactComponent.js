@@ -16,14 +16,14 @@ export class ContactComponent extends React.Component {
 
     constructor(props, context) {
         super(props, context);
-        this.updateContact = this.updateContact.bind(this);
+        // this.updateContact = this.updateContact.bind(this);
         this.state = {
             originalContact: {...this.props.contact},
             updatedContact: {...this.props.contact}
         }
     }
 
-    updateContact($event) {
+    updateContact = $event => {
         let value = $event.target.value;
         if ($event.target.type === 'checkbox') {
             value = $event.target.checked ? "Y" : "N";
@@ -33,7 +33,8 @@ export class ContactComponent extends React.Component {
             [$event.target.name]: value,
         }
         this.setState({updatedContact});
-    }
+        this.props.onChange(updatedContact);
+    };
 
     render() {
         const {sites} = this.props;
@@ -70,7 +71,7 @@ export class ContactComponent extends React.Component {
                                     >
 
                                         {
-                                            sites.map(site => <option key={site}
+                                            sites.map(site => <option key={site.siteNo}
                                                                       value={site.siteNo}
                                             >
                                                 {`${site.town}`}
@@ -304,23 +305,23 @@ export class ContactComponent extends React.Component {
                                     </label>
                                 </div>
                             </div>
-                            {/*<div className="col-lg-2">*/}
-                            {/*    <label htmlFor="accounts">Accounts</label>*/}
-                            {/*    <div className="form-group form-inline">*/}
-                            {/*        <label className="switch">*/}
-                            {/*            <input id="accounts"*/}
-                            {/*                   type="checkbox"*/}
-                            {/*                   name="form[contact][0][accountsFlag]"*/}
-                            {/*                   value="Y"*/}
-                            {/*                   data-validation="atLeastOne"*/}
-                            {/*                   data-type="accounts"*/}
-                            {/*                   data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"*/}
-                            {/*                   className="tick_field"*/}
-                            {/*            />*/}
-                            {/*            <span className="slider round"/>*/}
-                            {/*        </label>*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
+                            <div className="col-lg-2">
+                                <label htmlFor="isAccount">Accounts</label>
+                                <div className="form-group form-inline">
+                                    <label className="switch">
+                                        <input
+                                               type="checkbox"
+                                               name="isAccount"
+                                               value="1"
+                                               data-validation="atLeastOne"
+                                               data-type="accounts"
+                                               data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
+                                               className="tick_field"
+                                        />
+                                        <span className="slider round"/>
+                                    </label>
+                                </div>
+                            </div>
                             {/*<div className="col-lg-2">*/}
                             {/*    <label htmlFor="inv">Inv</label>*/}
                             {/*    <div className="form-group form-inline">*/}

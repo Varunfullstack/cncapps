@@ -1,8 +1,6 @@
 <?php
 
-
 namespace CNCLTD;
-
 
 use DateTime;
 use DateTimeInterface;
@@ -45,7 +43,7 @@ class QuestionnaireReportGenerator
             $endDate = new DateTime();
         }
         $this->startDate = $startDate;
-        $this->endDate = $endDate;
+        $this->endDate   = $endDate;
         global $db;
         $this->db = $db;
     }
@@ -63,80 +61,67 @@ class QuestionnaireReportGenerator
     function getReport($csv = false)
     {
         global $twig;
-
         $template = '@internal/questionnaireReport/htmlReport.html.twig';
         if ($csv) {
             $template = '@internal/questionnaireReport/csvReport.csv.twig';
         }
-
         $questionnaire = $this->getQuestionnaire();
-
         $questionType = 1; // ratings
-
         $questions = $this->getQuestions($questionType);
-
         $context = [
             "ratings" => []
         ];
-
         foreach ($questions as $value) {
 
             $total = $this->getTotal($value['que_questionno']);
-
-            $context["ratings"][] =
-                [
-                    'ratingTotal'         => $total,
-                    'questionDescription' => $value['que_desc'],
-                    'rating1Percent'      => number_format(
-                        $this->getRatingPercentage(
-                            $value['que_questionno'],
-                            1,
-                            $total
-                        )
-                    ),
-                    'rating2Percent'      => number_format(
-                        $this->getRatingPercentage(
-                            $value['que_questionno'],
-                            2,
-                            $total
-                        )
-                    ),
-                    'rating3Percent'      => number_format(
-                        $this->getRatingPercentage(
-                            $value['que_questionno'],
-                            3,
-                            $total
-                        )
-                    ),
-                    'rating4Percent'      => number_format(
-                        $this->getRatingPercentage(
-                            $value['que_questionno'],
-                            4,
-                            $total
-                        )
-                    ),
-                    'rating5Percent'      => number_format(
-                        $this->getRatingPercentage(
-                            $value['que_questionno'],
-                            5,
-                            $total
-                        )
-                    ),
-                ];
+            $context["ratings"][] = [
+                'ratingTotal'         => $total,
+                'questionDescription' => $value['que_desc'],
+                'rating1Percent'      => number_format(
+                    $this->getRatingPercentage(
+                        $value['que_questionno'],
+                        1,
+                        $total
+                    )
+                ),
+                'rating2Percent'      => number_format(
+                    $this->getRatingPercentage(
+                        $value['que_questionno'],
+                        2,
+                        $total
+                    )
+                ),
+                'rating3Percent'      => number_format(
+                    $this->getRatingPercentage(
+                        $value['que_questionno'],
+                        3,
+                        $total
+                    )
+                ),
+                'rating4Percent'      => number_format(
+                    $this->getRatingPercentage(
+                        $value['que_questionno'],
+                        4,
+                        $total
+                    )
+                ),
+                'rating5Percent'      => number_format(
+                    $this->getRatingPercentage(
+                        $value['que_questionno'],
+                        5,
+                        $total
+                    )
+                ),
+            ];
 
 
         }
-
         $questionType = 2; // Yes/No
-
         $questions = $this->getQuestions($questionType);
-
         $context['yesNoQuestions'] = [];
-
         foreach ($questions as $value) {
 
             $total = $this->getTotal($value['que_questionno']);
-
             $context['yesNoQuestions'][] = [
                 'ynTotal'             => $total,
                 'questionDescription' => $value['que_desc'],
@@ -156,24 +141,19 @@ class QuestionnaireReportGenerator
                 ),
             ];
         }
-
         $questionType = 7; // MultiChoice
-
-        $questions = $this->getQuestions($questionType);
+        $questions                       = $this->getQuestions($questionType);
         $context['multiChoiceQuestions'] = [];
-
         foreach ($questions as $value) {
 
             $total = $this->getTotal($value['que_questionno']);
-
             $valuesAndLabels = $this->getMultiChoiceValuesAndLabels($value['que_questionno']);
-            $values = [];
-            $labels = [];
+            $values          = [];
+            $labels          = [];
             foreach ($valuesAndLabels as $label => $amount) {
                 $labels[] = $label;
                 $values[] = $amount;
             }
-
             $context['multiChoiceQuestions'][] = [
                 'multiChoiceTotal'     => $total,
                 'questionDescription'  => $value['que_desc'],
@@ -186,11 +166,8 @@ class QuestionnaireReportGenerator
                 ),
             ];
         }
-
         $freeText = $this->getAnswers();
-
         $context['textQuestions'] = [];
-
         while ($row = $freeText->fetch_object()) {
             $context['textQuestions'][] = [
                 'freeTextQuestion' => $row->que_desc,
@@ -201,10 +178,10 @@ class QuestionnaireReportGenerator
             ];
         }
         $context['questionnaireDescription'] = $questionnaire->qur_desc;
-        $context['rating1Description'] = $questionnaire->qur_rating_1_desc;
-        $context['rating5Description'] = $questionnaire->qur_rating_5_desc;
-        $context['period'] = $this->getPeriod();
-        $output = $twig->render($template, $context);
+        $context['rating1Description']       = $questionnaire->qur_rating_1_desc;
+        $context['rating5Description']       = $questionnaire->qur_rating_5_desc;
+        $context['period']                   = $this->getPeriod();
+        $output                              = $twig->render($template, $context);
         if ($csv) {
             $output = html_entity_decode($output);
         }
@@ -213,8 +190,7 @@ class QuestionnaireReportGenerator
 
     function getQuestionnaire()
     {
-        $sql =
-            "SELECT
+        $sql = "SELECT
           qur_desc,
           qur_rating_1_desc,
           qur_rating_5_desc
@@ -223,16 +199,13 @@ class QuestionnaireReportGenerator
            questionnaire
           WHERE
            qur_questionnaireno = ?";
-
         $statement = $this->db->preparedQuery($sql, [["type" => "i", "value" => $this->questionnaireId]]);
-
         return $statement->fetch_object();
     }
 
     function getQuestions($answerTypeID = 1)
     {
-        $sql =
-            "SELECT
+        $sql = "SELECT
           que_questionno, que_desc
 
           FROM
@@ -243,7 +216,6 @@ class QuestionnaireReportGenerator
            AND que_answertypeno = ?
           ORDER BY
            que_weight";
-
         $statement = $this->db->preparedQuery(
             $sql,
             [
@@ -257,7 +229,6 @@ class QuestionnaireReportGenerator
                 ],
             ]
         );
-
         $questions = [];
         while ($row = $statement->fetch_assoc()) {
             $questions[] = $row;
@@ -267,8 +238,7 @@ class QuestionnaireReportGenerator
 
     function getTotal($questionID)
     {
-        $sql =
-            "SELECT
+        $sql       = "SELECT
           count(*) as total
           FROM
            answer
@@ -298,8 +268,7 @@ class QuestionnaireReportGenerator
 
     function getRatingPercentage($questionID, $rating, $total)
     {
-        $sql =
-            "SELECT
+        $sql = "SELECT
           count(*) as count
           FROM
            answer
@@ -307,7 +276,6 @@ class QuestionnaireReportGenerator
            ans_questionno = ?
            AND ans_date BETWEEN ? AND ?
            AND ans_answer = ?";
-
         $statement = $this->db->preparedQuery(
             $sql,
             [
@@ -329,8 +297,7 @@ class QuestionnaireReportGenerator
                 ],
             ]
         );
-        $count = $statement->fetch_object()->count;
-
+        $count     = $statement->fetch_object()->count;
         if ($total != 0) {
             return ($count / $total) * 100;
         } else {
@@ -341,8 +308,7 @@ class QuestionnaireReportGenerator
 
     private function getMultiChoiceValuesAndLabels($que_questionno)
     {
-        $sql =
-            "SELECT
+        $sql = "SELECT
 *        
          FROM
            answer           
@@ -350,8 +316,6 @@ class QuestionnaireReportGenerator
            ans_date BETWEEN ? AND ?
            AND ans_questionno = $que_questionno
        ";
-
-
         $mysqliResult = $this->db->preparedQuery(
             $sql,
             [
@@ -365,12 +329,11 @@ class QuestionnaireReportGenerator
                 ],
             ]
         );
-        $labels = [];
+        $labels       = [];
         while ($answer = $mysqliResult->fetch_assoc()) {
             if (!$answer['ans_answer']) {
                 continue;
             }
-
             $answerArray = json_decode($answer['ans_answer']);
             foreach ($answerArray as $answerLabel) {
                 if (!isset($labels[$answerLabel])) {
@@ -384,8 +347,7 @@ class QuestionnaireReportGenerator
 
     function getAnswers()
     {
-        $sql =
-            "SELECT
+        $sql = "SELECT
           que_desc,
           ans_answer,
           ans_name,
@@ -426,85 +388,12 @@ class QuestionnaireReportGenerator
 
     function setPeriod($period)
     {
-        $this->year = substr($period, 0, 4);
-        $this->period = $period;
-        $endDateUnix = strtotime($period . 'last day next month');
-        $startDateUnix = strtotime($period);
+        $this->year      = substr($period, 0, 4);
+        $this->period    = $period;
+        $endDateUnix     = strtotime($period . 'last day next month');
+        $startDateUnix   = strtotime($period);
         $this->startDate = new DateTime($startDateUnix);
-        $this->endDate = new DateTime($endDateUnix);
-    }
-
-    function getRespondantsCsv()
-    {
-        global $cfg;
-
-        $template = new Template ($cfg["path_templates"], "remove");
-
-
-        $respondants = $this->getRespondantsUniqueSurveyContact();
-        $template->set_block('page', 'rowBlock', 'rows');
-
-        while ($row = $respondants->fetch_object()) {
-
-            $template->set_var(
-                array(
-                    'customer'       => $row->customer,
-                    'requestContact' => $row->requestContact,
-                    'surveyContact'  => $row->surveyContact,
-                    'srNumbers'      => $row->srNumbers
-                )
-            );
-
-            $template->parse('rows', 'rowBlock', true);
-
-        }
-
-        $template->parse('output', 'page', true);
-
-        return $template->get_var('output');
-    }
-
-    function getRespondantsUniqueSurveyContact()
-    {
-        $sql =
-            "SELECT
-          ans_name AS surveyContact,
-          pro_contno AS contactID,
-          CONCAT( con_first_name, ' ', con_last_name ) AS requestContact,
-          cus_name AS customer,
-          GROUP_CONCAT( DISTINCT pro_problemno ORDER BY pro_problemno SEPARATOR ' ' ) AS srNumbers
-         
-         FROM
-           answer
-           JOIN question ON ans_questionno = que_questionno
-           JOIN problem ON ans_problemno = pro_problemno
-           JOIN contact ON pro_contno = con_contno
-           JOIN customer ON cus_custno = pro_custno
-           
-          WHERE
-           ans_date BETWEEN ? AND ?
-           AND que_questionnaireno = ?
-           AND cus_mailshot = 'Y'
-          GROUP BY
-            ans_name           ";
-        return $this->db->preparedQuery(
-            $sql,
-            [
-                [
-                    "type"  => "s",
-                    "value" => $this->startDate->format(DATE_MYSQL_DATE)
-                ],
-                [
-                    "type"  => "s",
-                    "value" => $this->endDate->format(DATE_MYSQL_DATE)
-                ],
-                [
-                    "type"  => "i",
-                    "value" => $this->questionnaireId
-                ],
-            ]
-        );
-
+        $this->endDate   = new DateTime($endDateUnix);
     }
 
     function getQuestionnaireDescription()

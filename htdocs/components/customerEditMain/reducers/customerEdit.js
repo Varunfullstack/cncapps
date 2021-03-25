@@ -31,7 +31,6 @@ const initialState = {
         name: '',
         noOfPCs: '',
         noOfServers: '',
-        noOfSites: '',
         primaryMainContactID: '',
         referredFlag: '',
         regNo: '',

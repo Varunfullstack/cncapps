@@ -348,19 +348,6 @@ class CustomerEditMain extends React.PureComponent {
                                         </div>
                                     </div>
                                     <div className="col-lg-4">
-                                        <label>Sites</label>
-                                        <div className="form-group">
-                                            <input type="number"
-                                                   value={customer.noOfSites || ''}
-                                                   onChange={($event) => this.handleUpdateGenericField($event)}
-                                                   size="2"
-                                                   maxLength="2"
-                                                   className="form-control input-sm"
-                                                   name="noOfSites"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-4">
                                         <label htmlFor="">Sort Code</label>
                                         <div className="form-group">
                                             <EncryptedTextInput encryptedValue={customer.sortCode}

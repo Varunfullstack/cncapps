@@ -13,9 +13,9 @@ class ContactsComponent extends React.PureComponent {
         this.onContactChanged = this.onContactChanged.bind(this);
     }
 
-    onContactChanged($event) {
-
-    }
+    onContactChanged = $event => {
+        console.log($event);
+    };
 
     renderContacts() {
         const {contacts, sites} = this.props;

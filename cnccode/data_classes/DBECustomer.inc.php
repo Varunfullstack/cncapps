@@ -16,14 +16,12 @@ class DBECustomer extends DBCNCEntity
     const mailshotFlag                 = "mailshotFlag";
     const createDate                   = "createDate";
     const referredFlag                 = "referredFlag";
-    const pcxFlag                      = "pcxFlag";
     const customerTypeID               = "customerTypeID";
     const gscTopUpAmount               = "gscTopUpAmount";
     const modifyDate                   = "modifyDate";
     const modifyUserID                 = "modifyUserID";
     const noOfPCs                      = "noOfPCs";
     const noOfServers                  = "noOfServers";
-    const noOfSites                    = "noOfSites";
     const comments                     = "comments";
     const reviewDate                   = "reviewDate";
     const reviewTime                   = "reviewTime";
@@ -79,7 +77,7 @@ class DBECustomer extends DBCNCEntity
     const inclusiveOOHCallOuts         = "inclusiveOOHCallOuts";
     const eligiblePatchManagement      = "eligiblePatchManagement";
 
-    const statementContactId           = "statementContactId";
+    const statementContactId = "statementContactId";
 
     /**
      * calls constructor()
@@ -141,12 +139,6 @@ class DBECustomer extends DBCNCEntity
             "cus_referred"
         );
         $this->addColumn(
-            self::pcxFlag,
-            DA_YN_FLAG,
-            DA_ALLOW_NULL,
-            "cus_pcx"
-        );
-        $this->addColumn(
             self::customerTypeID,
             DA_ID,
             DA_NOT_NULL,
@@ -176,13 +168,6 @@ class DBECustomer extends DBCNCEntity
         );
         $this->addColumn(
             self::noOfServers,
-            DA_INTEGER,
-            DA_ALLOW_NULL,
-            null,
-            0
-        );
-        $this->addColumn(
-            self::noOfSites,
             DA_INTEGER,
             DA_ALLOW_NULL,
             null,
@@ -625,25 +610,6 @@ class DBECustomer extends DBCNCEntity
         return $ret;
     }
 
-    /**
-     * Returns next prospect row to be reviewed
-     *
-     * @access public
-     * @return bool Success
-     */
-    function getReviewProspectRow()
-    {
-        $this->setMethodName("getReviewProspectRow");
-        $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " where cus_mailshot = 'Y'
-				AND reviewDate IS NULL
-				AND ( select count(*) from invhead where inh_custno = cus_custno and inh_date_printed > DATE_SUB(CURDATE() ,INTERVAL 6 MONTH ) ) = 0";
-        $queryString .= ' LIMIT 0,1';
-        $this->setQueryString($queryString);
-        $ret = (parent::getRows());
-        return $ret;
-    }
-
-
     function getCustomerByName($name)
     {
         if (!$name) {
@@ -662,37 +628,6 @@ class DBECustomer extends DBCNCEntity
     }
 
     /**
-     * Count review rows
-     *
-     * As function above but returns count row rows
-     *
-     * @access public
-     * @return bool Success
-     */
-    function countReviewRows()
-    {
-        $this->setMethodName("countReviewRows");
-        $queryString = "SELECT COUNT(*)
-			 FROM " . $this->getTableName();
-        $queryString .= ' where cus_mailshot = "Y"';
-        $queryString .= '
-			and ((
-				reviewDate IS NULL
-				and ( select count(*) from invhead where inh_custno = cus_custno and inh_date_printed > DATE_SUB(CURDATE() ,INTERVAL 6 MONTH ) ) = 0
-			)
-			OR
-			(
-				reviewDate IS NOT NULL
-				and reviewDate <= CURDATE()
-			))';
-        $this->setQueryString($queryString);
-        $this->runQuery();
-        $this->fetchNext();
-        $this->resetQueryString();
-        return $this->getDBColumnValue(0);
-    }
-
-    /**
      * Returns list of customers with 24 hour support
      *
      * @access public
@@ -702,10 +637,11 @@ class DBECustomer extends DBCNCEntity
     function get24HourSupportCustomers($onlyCurrentCustomers = false)
     {
         $this->setMethodName("get24HourSupportCustomers");
-$onlyCurrentCustomersCondition = "";
+        $onlyCurrentCustomersCondition = "";
         if ($onlyCurrentCustomers) {
             $onlyCurrentCustomersCondition = " and {$this->getDBColumnName(self::droppedCustomerDate)} is null  and {$this->getDBColumnName(self::becameCustomerDate)} is not null ";
-        }        $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " where cus_support_24_hour_flag = 'Y'
+        }
+        $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " where cus_support_24_hour_flag = 'Y'
     {$onlyCurrentCustomersCondition}  ORDER BY cus_name";
         $this->setQueryString($queryString);
         $ret = (parent::getRows());

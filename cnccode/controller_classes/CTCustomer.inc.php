@@ -703,7 +703,6 @@ class CTCustomer extends CTCNC
                             "name"                         => $dbeCustomer->getValue(DBECustomer::name),
                             "noOfPCs"                      => $dbeCustomer->getValue(DBECustomer::noOfPCs),
                             "noOfServers"                  => $dbeCustomer->getValue(DBECustomer::noOfServers),
-                            "noOfSites"                    => $dbeCustomer->getValue(DBECustomer::noOfSites),
                             "primaryMainContactID"         => $dbeCustomer->getValue(DBECustomer::primaryMainContactID),
                             "referredFlag"                 => $dbeCustomer->getValue(DBECustomer::referredFlag),
                             "regNo"                        => $dbeCustomer->getValue(DBECustomer::regNo),
@@ -934,9 +933,6 @@ class CTCustomer extends CTCNC
                 return $this->getPortalCustomerDocumentsController();
             case 'createCustomerFolder':
                 $this->createCustomerFolder();
-                break;
-            case 'displayNextReviewProspect':
-                $this->displayNextReviewProspect();
                 break;
             case 'displayReviewList':
                 $this->displayReviewList();
@@ -1364,34 +1360,6 @@ class CTCustomer extends CTCNC
             'customerID',
             $customerID
         );
-    }
-
-    /**
-     * Displays next prospect to review (if any)
-     *
-     * @throws Exception
-     */
-    function displayNextReviewProspect()
-    {
-        $this->setMethodName('displayNextReviewProspect');
-        $dsCustomer = new DataSet($this);
-        if ($this->buCustomer->getNextReviewProspect($dsCustomer)) {
-
-            $nextURL = Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'     => CTCNC_ACT_DISP_EDIT,
-                    'customerID' => $dsCustomer->getValue(DBECustomer::customerID)
-                )
-            );
-            header('Location: ' . $nextURL);
-
-        } else {
-            echo "There are no more prospects to review - well done!";
-        }
-        exit;
-
-
     }
 
     /**
@@ -1992,7 +1960,6 @@ class CTCustomer extends CTCNC
                 'customerName'                            => $this->dsCustomer->getValue(DBECustomer::name),
                 'deliverSiteNo'                           => $this->dsCustomer->getValue(DBECustomer::deliverSiteNo),
                 'invoiceSiteNo'                           => $this->dsCustomer->getValue(DBECustomer::invoiceSiteNo),
-                'reviewCount'                             => $this->buCustomer->getReviewCount(),
                 'customerFolderLink'                      => $customerFolderLink,
                 'websiteURL'                              => $this->dsCustomer->getValue(DBECustomer::websiteURL),
                 'customerNameClass'                       => $this->dsCustomer->getValue(self::customerFormNameClass),
@@ -2030,9 +1997,7 @@ class CTCustomer extends CTCNC
                 'support24HourFlagChecked'                => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::support24HourFlag)
                 ),
-                'pcxFlagChecked'                          => $this->getChecked(
-                    $this->dsCustomer->getValue(DBECustomer::pcxFlag)
-                ),
+
                 'createDate'                              => $this->dsCustomer->getValue(DBECustomer::createDate),
                 'mailshot2FlagDesc'                       => $this->buCustomer->dsHeader->getValue(
                     DBEHeader::mailshot2FlagDesc
@@ -2064,7 +2029,7 @@ class CTCustomer extends CTCNC
                 'activeDirectoryName'                     => $this->dsCustomer->getValue(
                     DBECustomer::activeDirectoryName
                 ),
-                'noOfSites'                               => $this->dsCustomer->getValue(DBECustomer::noOfSites),
+
                 'noOfPCs'                                 => $this->dsCustomer->getValue(DBECustomer::noOfPCs),
                 'patchManagementEligibleComputers'        => $this->dsCustomer->getValue(
                     DBECustomer::eligiblePatchManagement

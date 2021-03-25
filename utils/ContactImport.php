@@ -43,7 +43,6 @@ while ($line = fgetcsv($csvFile)) {
         $customerInsert->setValue(DBECustomer::referredFlag, 'Y');
         $customerInsert->setValue(DBECustomer::modifyDate, $nowDateTime);
         $customerInsert->setValue(DBECustomer::noOfServers, 0);
-        $customerInsert->setValue(DBECustomer::noOfSites, 1);
         $customerInsert->setValue(DBECustomer::reviewDate, $reviewDate);
         $customerInsert->setValue(DBECustomer::reviewUserID, 137);
         $customerInsert->setValue(DBECustomer::modifyUserID, 110);

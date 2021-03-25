@@ -33,7 +33,6 @@ define(
 
 class CTSector extends CTCNC
 {
-    const getCustomerWithoutSector = "getCustomerWithoutSector";
     public $dsSector;
     public $buSector;
 
@@ -76,10 +75,6 @@ class CTSector extends CTCNC
             case CTSECTOR_ACT_UPDATE:
                 $this->checkPermissions(MAINTENANCE_PERMISSION);
                 $this->update();
-                break;
-            case self::getCustomerWithoutSector:
-                $this->checkPermissions(SALES_PERMISSION);
-                $this->getCustomerWithoutSector();
                 break;
             case CTSECTOR_ACT_DISPLAY_LIST:
             default:
@@ -228,34 +223,6 @@ class CTSector extends CTCNC
         header('Location: ' . $urlNext);
     }
 
-    /**
-     * Get customer without sector
-     *
-     * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
-     * @throws Exception
-     */
-    function getCustomerWithoutSector()
-    {
-
-        $this->setMethodName('getCustomerWithoutSector');
-
-        if ($customerID = $this->buSector->getCustomerWithoutSector()) {
-            $urlNext =
-                Controller::buildLink(
-                    'Customer.php',
-                    array(
-                        'action'     => 'dispEdit',
-                        'customerID' => $customerID
-                    )
-                );
-            header('Location: ' . $urlNext);
-            exit;
-        } else {
-            $this->setPageTitle('There are no customers without a Sector');
-            $this->parsePage();
-        }
-    }
 
     /**
      * Display list of types
