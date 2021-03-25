@@ -406,19 +406,14 @@ foreach ($sitesResponse->sites as $site) {
             $testText = ' (Not actually deactivated testOnly)';
             if (!$testMode) {
                 $logger->info(
-                    "Proceeding to deactivate $computerName Webroot endpoint due to being retired in Automate and not seen recently in Webroot{$testText}"
+                    "Proceeding to deactivate $computerName Webroot endpoint due to being retired in Automate and not seen recently in Webroot"
                 );
                 try {
                     raiseDeactivateWebrootRequest($computerName, $customerName, $thresholdDays);
-//                    $webrootAPI->deactivateEndpoint($site->siteId, $device->endpointId);
+                    $webrootAPI->deactivateEndpoint($site->siteId, $device->endpointId);
                 } catch (ClientException $exception) {
-//                    var_dump((string)$exception->getResponse()->getBody());
-//                    var_dump(
-//                        $exception->getRequest()->getUri(),
-//                        $exception->getRequest()->getHeaders(),
-//                        (string)$exception->getRequest()->getBody()
-//                    );
-                    throw new Exception("Failed to deactivate");
+                    $body = (string)$exception->getResponse()->getBody();
+                    throw new Exception("Failed to deactivate: {$body}");
                 }
                 $testText = '';
             }
