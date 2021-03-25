@@ -5,6 +5,8 @@ import {SupplierService} from "../../services/SupplierService";
 import Modal from "../../shared/Modal/modal";
 import {VisibilityFilterOptions} from "./SupplierEditComponent";
 
+import './SupplierListComponent.css';
+
 const NewSupplierForm = {
     town: '',
     county: '',
@@ -226,7 +228,6 @@ export class SupplierListComponent extends React.PureComponent {
         const {target} = $event;
         const updatedSupplier = {...this.state.newSupplier, [target.name]: target.value};
         const isNewSupplierValid = this.isNewSupplierValid(updatedSupplier) && target.checkValidity();
-        console.log(isNewSupplierValid);
         this.setState({newSupplier: updatedSupplier, isNewSupplierValid});
     }
 
@@ -293,57 +294,19 @@ export class SupplierListComponent extends React.PureComponent {
             <Modal show={showCreateSupplierModal}
                    title="Create Supplier"
                    onClose={this.hideCreateSupplierModal}
+                   className="supplierCreateModal"
             >
-                <div>
-                    Supplier
-                </div>
-                <div>
-                    <label htmlFor=""
-                           className="span"
-                    >
-                        <span>town</span>
-                        <input
-                            type="text"
-                            value={newSupplier.town}
-                            name="town"
-                            onChange={this.updateField}
-                            maxLength="25"
-                            required
-                        />
-                    </label>
 
-                    <label htmlFor=""
-                           className="span"
-                    >
-                        <span>county</span>
-                        <input
-                            type="text"
-                            name="county"
-                            value={newSupplier.county}
-                            onChange={this.updateField}
-                            maxLength="25"
-                            required
-                        />
-                    </label>
+                <div style={{padding: "20px", width: "75%"}}>
+                    <div>
+                        Supplier
+                    </div>
+                    <div>
+                        <label htmlFor="name"
 
-                    <label htmlFor=""
-                           className="span"
-                    >
-                        <span>postcode</span>
-                        <input
-                            type="text"
-                            name="postcode"
-                            value={newSupplier.postcode}
-                            onChange={this.updateField}
-                            maxLength="25"
-                            required
-                        />
-                    </label>
-
-                    <label htmlFor=""
-                           className="span"
-                    >
-                        <span>name</span>
+                        >
+                            Name
+                        </label>
                         <input
                             type="text"
                             name="name"
@@ -352,12 +315,11 @@ export class SupplierListComponent extends React.PureComponent {
                             maxLength="35"
                             required
                         />
-                    </label>
+                        <label htmlFor="address1"
 
-                    <label htmlFor=""
-                           className="span"
-                    >
-                        <span>address1</span>
+                        >
+                            Address 1
+                        </label>
                         <input
                             type="text"
                             name="address1"
@@ -366,12 +328,12 @@ export class SupplierListComponent extends React.PureComponent {
                             maxLength="35"
                             required
                         />
-                    </label>
 
-                    <label htmlFor=""
-                           className="span"
-                    >
-                        <span>address2</span>
+                        <label htmlFor="address2"
+
+                        >
+                            Address 2
+                        </label>
                         <input
                             type="text"
                             name="address2"
@@ -379,12 +341,52 @@ export class SupplierListComponent extends React.PureComponent {
                             onChange={this.updateField}
                             maxLength="35"
                         />
-                    </label>
+                        <label htmlFor="town"
+                        >
+                            Town
+                        </label>
+                        <input
+                            type="text"
+                            value={newSupplier.town}
+                            name="town"
+                            onChange={this.updateField}
+                            maxLength="25"
+                            required
+                        />
 
-                    <label htmlFor=""
-                           className="span"
-                    >
-                        <span>websiteURL</span>
+                        <label htmlFor="county"
+
+                        >
+                            County
+                        </label>
+                        <input
+                            type="text"
+                            name="county"
+                            value={newSupplier.county}
+                            onChange={this.updateField}
+                            maxLength="25"
+                            required
+                        />
+
+                        <label htmlFor="postcode"
+
+                        >
+                            Postcode
+                        </label>
+                        <input
+                            type="text"
+                            name="postcode"
+                            value={newSupplier.postcode}
+                            onChange={this.updateField}
+                            maxLength="25"
+                            required
+                        />
+
+                        <label htmlFor="websiteURL"
+
+                        >
+                            Website URL
+                        </label>
                         <input
                             type="text"
                             name="websiteURL"
@@ -392,12 +394,12 @@ export class SupplierListComponent extends React.PureComponent {
                             onChange={this.updateField}
                             maxLength="100"
                         />
-                    </label>
 
-                    <label htmlFor=""
-                           className="span"
-                    >
-                        <span>Payment Method</span>
+                        <label htmlFor="paymentMethodId"
+
+                        >
+                            Payment Method
+                        </label>
                         <select
                             name="paymentMethodId"
                             value={newSupplier.paymentMethodId}
@@ -412,12 +414,12 @@ export class SupplierListComponent extends React.PureComponent {
                                                              value={x.id}
                             >{x.description}</option>)}
                         </select>
-                    </label>
 
-                    <label htmlFor=""
-                           className="span"
-                    >
-                        <span>accountCode</span>
+                        <label htmlFor="accountCode"
+
+                        >
+                            Account Code
+                        </label>
                         <input
                             type="text"
                             name="accountCode"
@@ -425,79 +427,80 @@ export class SupplierListComponent extends React.PureComponent {
                             onChange={this.updateField}
                             maxLength="20"
                         />
-                    </label>
-                </div>
-                <div>Main Contact</div>
-                <div>
-                    <label>
+                    </div>
+                    <div>Main Contact</div>
+                    <div>
+                        <label>
                         <span>
                             Title
                         </span>
-                        <input name="mainContactTitle"
-                               value={newSupplier.mainContactTitle}
-                               maxLength="45"
-                               required
-                               onChange={this.updateField}
-                        />
-                    </label>
+                            <input name="mainContactTitle"
+                                   value={newSupplier.mainContactTitle}
+                                   maxLength="45"
+                                   required
+                                   onChange={this.updateField}
+                            />
+                        </label>
 
-                    <label>
+                        <label>
                         <span>
                             Position*
                         </span>
-                        <input name="mainContactPosition"
-                               value={newSupplier.mainContactPosition}
-                               maxLength="50"
-                               required
-                               onChange={this.updateField}
-                        />
-                    </label>
-                    <label>
+                            <input name="mainContactPosition"
+                                   value={newSupplier.mainContactPosition}
+                                   maxLength="50"
+                                   required
+                                   onChange={this.updateField}
+                            />
+                        </label>
+                        <label>
                         <span>
                             First Name*
                         </span>
-                        <input name="mainContactFirstName"
-                               value={newSupplier.mainContactFirstName}
-                               maxLength="25"
-                               required
-                               onChange={this.updateField}
-                        />
-                    </label>
-                    <label>
+                            <input name="mainContactFirstName"
+                                   value={newSupplier.mainContactFirstName}
+                                   maxLength="25"
+                                   required
+                                   onChange={this.updateField}
+                            />
+                        </label>
+                        <label>
                         <span>
                             Last Name*
                         </span>
-                        <input name="mainContactLastName"
-                               value={newSupplier.mainContactLastName}
-                               maxLength="35"
-                               required
-                               onChange={this.updateField}
-                        />
-                    </label>
-                    <label>
+                            <input name="mainContactLastName"
+                                   value={newSupplier.mainContactLastName}
+                                   maxLength="35"
+                                   required
+                                   onChange={this.updateField}
+                            />
+                        </label>
+                        <label>
                         <span>
                             Phone*
                         </span>
-                        <input name="mainContactPhone"
-                               value={newSupplier.mainContactPhone}
-                               maxLength="25"
-                               required
-                               onChange={this.updateField}
-                        />
-                    </label>
-                    <label>
+                            <input name="mainContactPhone"
+                                   value={newSupplier.mainContactPhone}
+                                   maxLength="25"
+                                   required
+                                   onChange={this.updateField}
+                            />
+                        </label>
+                        <label>
                         <span>
                             Email*
                         </span>
-                        <input name="mainContactEmail"
-                               value={newSupplier.mainContactEmail}
-                               maxLength="60"
-                               required
-                               type="email"
-                               onChange={this.updateField}
-                        />
-                    </label>
+                            <input name="mainContactEmail"
+                                   value={newSupplier.mainContactEmail}
+                                   maxLength="60"
+                                   required
+                                   type="email"
+                                   onChange={this.updateField}
+                            />
+                        </label>
+                    </div>
                 </div>
+
                 <div>
                     <button disabled={!isNewSupplierValid}
                             onClick={this.createNewSupplier}

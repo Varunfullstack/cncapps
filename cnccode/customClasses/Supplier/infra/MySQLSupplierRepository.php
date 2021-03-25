@@ -64,7 +64,7 @@ class MySQLSupplierRepository implements SupplierRepository
 select supplier.sup_suppno                                      as id,
        supplier.sup_name                                        as name,
        supplier.sup_add1                                        as address1,
-       supplier.sup_add1                                        as address2,
+       supplier.sup_add2                                        as address2,
        supplier.sup_town                                        as town,
        supplier.sup_county                                      as county,
        supplier.sup_postcode                                    as postcode,
