@@ -82,14 +82,16 @@ class WebrootAPI
         $endpoints      = $firstBatch->endpoints;
         $totalAvailable = $firstBatch->totalAvailable;
         $retrievedCount = $pageSize * $page;
-        while ( $retrievedCount < $totalAvailable) {
-            $this->logger->debug("Fetching next page we have retrieved {$retrievedCount}/{$totalAvailable} so far of end points of site: $siteKeyCode");
+        while ($retrievedCount < $totalAvailable) {
+            $this->logger->debug(
+                "Fetching next page we have retrieved {$retrievedCount}/{$totalAvailable} so far of end points of site: $siteKeyCode"
+            );
             $page++;
-            $nextBatch = $this->getEndpointsBatch(
+            $nextBatch      = $this->getEndpointsBatch(
                 $siteKeyCode,
                 $page
             );
-            $endpoints = array_merge(
+            $endpoints      = array_merge(
                 $endpoints,
                 $nextBatch->endpoints
             );
@@ -131,7 +133,7 @@ class WebrootAPI
         return $this->sendAuthenticatedRequest($request);
     }
 
-    private function sendAuthenticatedRequest($request): ResponseInterface
+    private function sendAuthenticatedRequest($request, $timeOut = 0): ResponseInterface
     {
         $this->getAccessToken();
         do {
@@ -145,7 +147,7 @@ class WebrootAPI
                 );
             }
             try {
-                return $this->guzzleClient->send($request);
+                return $this->guzzleClient->send($request, ["timeout" => $timeOut]);
             } catch (ClientException $exception) {
                 $response = $exception->getResponse();
                 if ($response->getStatusCode() === 401) {
@@ -273,7 +275,7 @@ class WebrootAPI
                 ]
             )
         );
-        return $this->sendAuthenticatedRequest($request);
+        return $this->sendAuthenticatedRequest($request, 20);
     }
 
 }

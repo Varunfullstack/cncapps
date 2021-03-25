@@ -81,11 +81,7 @@ class CallBackComponent extends MainComponent {
                 hdClassName: "text-center",
                 icon: "fal fa-2x fa-hashtag color-gray2 pointer",
                 sortable: true,
-                className: "text-center",
-                content: (problem) =>
-                    <a href={`SRActivity.php?action=displayActivity&serviceRequestId=${problem.problemID}`}
-                       target="_blank"
-                    >{problem.problemID}</a>
+                className: "text-center"
             },
 
             {

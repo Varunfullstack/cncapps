@@ -17,7 +17,7 @@ class CallBackModal extends MainComponent {
             templateOptions: [],
             data: {
                 description: "",
-                time: moment().add(30, 'minute').format("HH:mm"),
+                time: moment().add(2, 'hours').format("HH:mm"),
                 date: moment().format("YYYY-MM-DD"),
                 contactID: this.props.problem.contactID,
                 customerID: this.props.problem.customerID,
