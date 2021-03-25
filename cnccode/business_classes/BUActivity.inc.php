@@ -1646,7 +1646,7 @@ class BUActivity extends Business
             ) - common_convertHHMMToDecimal($dbeJCallActivity->getValue(DBEJCallActivity::startTime));
         $awaitingCustomerResponse = null;
         if ($dbeJCallActivity->getValue(DBEJCallActivity::requestAwaitingCustomerResponseFlag) == 'Y') {
-            $awaitingCustomerResponse = 'Awaiting Customer';
+            $awaitingCustomerResponse = 'On Hold';
         } else {
             $awaitingCustomerResponse = 'Awaiting CNC';
         }

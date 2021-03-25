@@ -1,5 +1,8 @@
 # Changelog
 This project changes will be shown here.
+## [unreleased] - 2021-03-25
+### Changed
+- Monitored SR email, Change Status: Awaiting Customer to Status: On Hold
 
 ## [v5.7.4] - 2021-03-30
 ### Fixed
