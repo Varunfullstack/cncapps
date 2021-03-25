@@ -8,6 +8,7 @@ use CNCLTD\Exceptions\InvalidEmailException;
 use CNCLTD\Exceptions\InvalidIdException;
 use CNCLTD\Exceptions\StringTooLongException;
 use CNCLTD\Exceptions\SupplierContactMainInactiveException;
+use CNCLTD\Exceptions\SupplierContactNotFoundException;
 use CNCLTD\Exceptions\URLNotValidException;
 use CNCLTD\Supplier\Domain\SupplierContact\Active;
 use CNCLTD\Supplier\Domain\SupplierContact\Email;
@@ -148,6 +149,9 @@ from supplier
             } else {
                 $contacts[] = $contact;
             }
+        }
+        if (!$mainContact) {
+            throw new SupplierContactNotFoundException();
         }
         $supplier = Supplier::create(
             new SupplierId((int)$supplierDTO->getId()),

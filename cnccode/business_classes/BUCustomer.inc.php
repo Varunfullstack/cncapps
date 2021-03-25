@@ -1577,8 +1577,7 @@ class BUCustomer extends Business
     {
         $dbeJContract = new DBEJContract($this);
         $dbeJContract->getPrePayContracts($customerId);
-        $array = $dbeJContract->getRowAsArray();
-        return !!count($array);
+        return (bool)$dbeJContract->rowCount();
     }
 
     /**
