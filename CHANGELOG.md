@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v5.7.0]
+## [v5.7.0] - 2021-03-25
 ### Added
 - Issue 1247 - Customer approval for extra chargeable work.
 - Issue 1254 - Report on duplicate MS Office licenses.
