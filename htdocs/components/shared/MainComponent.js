@@ -196,11 +196,11 @@ export default class MainComponent extends React.Component {
         data[property] = value;
         this.setState({data});
     }
-    setFilter=(field,value)=>{
+    setFilter=(field,value,callback=null)=>{
         console.log(field,value);
         const {filter}=this.state;
         filter[field]=value;
-        this.setState({filter});
+        this.setState({filter},callback);
     }
     editorHasProblems = async () => {
         return this.apiHeader.getNumberOfAllowedMistaks().then(nMistakes => {

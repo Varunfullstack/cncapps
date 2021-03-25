@@ -162,6 +162,16 @@ class ItemsComponent extends MainComponent {
                 className: "text-center",               
              },
              {
+                path: "salesStockQty",
+                label: "Stock Level",
+                hdToolTip: "Sale Stock",
+                hdClassName: "text-center",
+                //icon: "fal fa-2x fa-signal color-gray2 pointer",
+                sortable: true,
+                className: "text-center",               
+                content:this.getSalesStock 
+             },
+             {
                 path: "partNo",
                 label: "Part Price",
                 hdToolTip: "Part Price",
@@ -221,6 +231,27 @@ class ItemsComponent extends MainComponent {
         onSort={this.handleSort}
         >
         </Table>
+    }
+    getSalesStock=(item)=>{
+        //console.log(item);
+        return <input type="number" style={{width:40}}  
+        key={item.itemID+"salesStockQty"} 
+        id={item.itemID}
+        value={item.salesStockQty||''} 
+        onChange={this.handleItemSalesStock} ></input>
+
+    }
+    handleItemSalesStock=(event)=>{
+        const itemID=event.target.id;
+        const value=event.target.value;        
+        console.log(itemID,value);
+        const {items}=this.state;
+        const indx=items.findIndex(i=>i.itemID==itemID);
+        items[indx].salesStockQty=value;
+        this.setState({items});
+        this.api.updateItemQty(itemID,value).then(res=>{
+            console.log(res);
+        })
     }
     getChildItemsData=(itemId)=>{
         console.log('get childs');
@@ -539,7 +570,7 @@ class ItemsComponent extends MainComponent {
     }
 
     render() {
-        return <div>
+        return <div key="main">
             {this.getAlert()}
             <Spinner show={this.state.showSpinner}></Spinner>
             <ToolTip title="New Item" width={30}>

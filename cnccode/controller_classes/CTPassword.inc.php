@@ -6,6 +6,9 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use CNCLTD\Exceptions\APIException;
+
 global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUPassword.inc.php');
@@ -17,6 +20,8 @@ require_once($cfg['path_dbe'] . '/DBEPasswordService.inc.php');
 
 class CTPassword extends CTCNC
 {
+    const CONST_PASSWORDS = 'passwords';
+    const CONST_SERVICES='services';
     public static $passwordLevels = [
         ["level" => 0, "description" => "No Access"],
         ["level" => 1, "description" => "Helpdesk Access"],
@@ -60,32 +65,54 @@ class CTPassword extends CTCNC
     function defaultAction()
     {
         switch ($this->getAction()) {
+            case self::CONST_PASSWORDS:
+                switch($this->requestMethod){
+                    case 'GET':
+                        echo json_encode($this->getPasswords(),JSON_NUMERIC_CHECK);
+                         break;
+                     case 'POST':
+                         echo json_encode($this->updatePassword());
+                         break;
+                    //  case 'PUT':
+                    //      echo json_encode($this->updateItem());
+                    //      break;
+                     case 'DELETE':
+                         echo json_encode($this->archivePassword());
+                         break;
+                }            
+                break;
+            case self::CONST_SERVICES:                
+                echo json_encode($this->getPasswordServices(),JSON_NUMERIC_CHECK);
+                break;
             case 'edit':
                 $this->edit();
                 break;
             case 'archive':
-                $this->archive();
+                echo json_encode($this->archivePassword());
                 break;
             case 'generate':
                 $this->generate();
-                break;
-            case 'list':
-
-                if (!$this->getParam('customerID')) {
-                    $this->displayFatalError('Customer ID is not provided');
-                    exit;
-                }
-                $customerID = $this->getParam('customerID');
-                $this->displayList($customerID);
-                break;
-
-            case 'search':
+                break;           
             default:
-                $this->search();
+                $this->setTemplate();
                 break;
         }
     }
 
+    function setTemplate()
+    {
+        $this->setTemplateFiles(
+            'PasswordList',
+            'PasswordList.inc'
+        );
+        $this->setPageTitle('Passwords');
+
+        //$this->loadReactScript('ItemListTypeAheadRenderer.js');
+        $this->loadReactScript('PasswordComponent.js');
+        $this->loadReactCSS('PasswordComponent.css');     
+        $this->template->parse('CONTENTS', 'PasswordList');
+        $this->parsePage();
+    }
     /**
      * Called from sales order line to edit a renewal.
      * The page passes
@@ -289,41 +316,6 @@ class CTPassword extends CTCNC
     {
         return str_replace("\"","&quot;",$str);
     }
-    function archive()
-    {
-        $this->setMethodName('archive');
-
-        if (!$this->buPassword->getPasswordByID(
-            $this->getParam('passwordID'),
-            $dsPassword
-        )) {
-            $this->raiseError('PasswordID ' . $this->getParam('passwordID') . ' not found');
-            exit;
-        }
-        $urlArray = [
-            'action'     => 'list',
-            'customerID' => $dsPassword->getValue(DBEPassword::customerID),
-        ];
-
-        if ($dsPassword->getValue(DBEPassword::level) > $this->getDbeUser()->getValue(DBEUser::passwordLevel)) {
-            $urlArray['error'] = "Not enough level";
-        } else {
-            $this->buPassword->archive(
-                $this->getParam('passwordID'),
-                $this->dbeUser
-            );
-        }
-
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                $urlArray
-            );
-
-        header('Location: ' . $urlNext);
-        exit;
-    }
-
     /**
      * generate a password
      *
@@ -342,280 +334,6 @@ class CTPassword extends CTCNC
             'PasswordGenerate',
             true
         );
-        $this->parsePage();
-
-    }
-
-    /**
-     * Display list of types
-     * @access private
-     * @param $customerID
-     * @throws Exception
-     */
-    function displayList($customerID)
-    {
-        $dbeCustomer = new DBECustomer($this);
-        $showArchived = $this->getParam('archived');
-        $showHigherLevel = $this->getParam('higherLevel');
-        if (empty($customerID)) {
-            $this->raiseError('Please search for a customer by typing and then pressing tab');
-            exit;
-        }
-
-        $this->setMethodName('displayList');
-
-        $this->setPageTitle('Passwords');
-        $dbeCustomer->getRow($customerID);
-
-        if ($dbeCustomer->getValue(DBECustomer::referredFlag) == 'Y') {
-            $this->setTemplateFiles('PasswordReferred', 'PasswordReferred.inc');
-            $this->template->parse(
-                'CONTENTS',
-                'PasswordReferred',
-                true
-            );
-            $this->parsePage();
-            return;
-        }
-
-        $this->setTemplateFiles(
-            array('PasswordList' => 'PasswordList.inc')
-        );
-
-        $dsPassword = new DBEJPassword($this);
-        $passwordLevel = $this->dbeUser->getValue(DBEUser::passwordLevel);
-        if ($showHigherLevel) {
-            $passwordLevel = 5;
-        }
-        $dsPassword->getRowsByCustomerIDAndPasswordLevel(
-            $customerID,
-            $passwordLevel,
-            $showArchived,
-            $this->dbeUser->getValue(DBEUser::salesPasswordAccess)
-        );
-
-        $urlSubmit = null;
-        $urlAdd = null;
-
-        if (!$showArchived) {
-
-            $urlAdd =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'     => 'edit',
-                        'customerID' => $customerID
-                    )
-                );
-
-            $urlSubmit = Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'displayList'
-                )
-            );
-        }
-
-
-        $this->template->set_var(
-            array(
-                'urlSubmit'          => $urlSubmit,
-                'urlAdd'             => $urlAdd,
-                'customerName'       => $dbeCustomer->getValue(DBECustomer::name),
-                'customerID'         => $customerID,
-                'formError'          => $this->getFormErrorMessage(),
-                'hideOnArchived'     => $showArchived ? "hidden" : '',
-                'showOnArchived'     => $showArchived ? '' : 'hidden',
-                'showOnHigherLevel'  => $showHigherLevel ? '' : 'hidden',
-                'hideOnHigherLevel'  => $showHigherLevel ? 'hidden' : '',
-                "weirdColumnHeaders" => $showArchived ? '<th>Archived By</th><th>Archived At</th>' : '<th colspan="2">&nbsp;</th>',
-                'archived'           => $showArchived ? '(Archived Passwords)' : ''
-            )
-        );
-
-        $this->template->set_block(
-            'PasswordList',
-            'passwordBlock',
-            'passwords'
-        );
-        $passwords = [];
-
-        while ($dsPassword->fetchNext()) {
-
-            $urlArchive = Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'     => 'archive',
-                    'passwordID' => $dsPassword->getValue(DBEPassword::passwordID)
-                )
-            );
-
-
-            $urlEdit = Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'     => 'edit',
-                    'passwordID' => $dsPassword->getValue(DBEPassword::passwordID)
-                )
-            );
-            $weirdFields = "<td class=\"contentLeftAlign\"><A href=\"$urlEdit\"><i class='fal fa-edit fa-2x icon'></i></a></td>
-        <td class=\"contentLeftAlign\"><A href=\"$urlArchive\" onClick=\"if(!confirm('Are you sure you want to archive this password?')) return(false)\"><i class='fal fa-archive fa-2x icon'></i></a></td>";
-
-            if ($showArchived) {
-                $weirdFields = "<td class=\"contentLeftAlign\">" . $dsPassword->getValue(DBEPassword::archivedBy) . "</td>
-        <td class=\"contentLeftAlign\">" . $dsPassword->getValue(DBEPassword::archivedAt) . "</td>";
-            }
-
-            $notes = $this->buPassword->decrypt($dsPassword->getValue(DBEPassword::notes));
-            $decryptedURL = $this->buPassword->decrypt($dsPassword->getValue(DBEPassword::URL));
-            $URL = strlen(
-                $decryptedURL
-            ) ? '<a href="' . $decryptedURL . '" target="_blank">' . $decryptedURL . '</a>' : '';
-
-            $userName = $this->buPassword->decrypt(
-                $dsPassword->getValue(DBEPassword::username)
-            );
-            $password = $this->buPassword->decrypt(
-                $dsPassword->getValue(DBEPassword::password)
-            );
-
-            if ($dsPassword->getValue(DBEPassword::level) > $this->dbeUser->getValue(DBEUser::passwordLevel)) {
-                $userName = null;
-                $password = null;
-                $weirdFields = null;
-            }
-
-            $passwords[] = [
-                "notes"               => $notes,
-                "URL"                 => $URL,
-                "serviceName"         => $dsPassword->getValue(DBEJPassword::serviceName),
-                "serviceID"           => $dsPassword->getValue(DBEJPassword::serviceID),
-                'passwordID'          => $dsPassword->getValue(DBEPassword::passwordID),
-                'customerID'          => $dsPassword->getValue(DBEPassword::customerID),
-                DBEPassword::username => $userName,
-                'password'            => $password,
-                "weirdFields"         => $weirdFields,
-                'level'               => $dsPassword->getValue(DBEPassword::level),
-                'sortOrder'           => $dsPassword->getValue(DBEJPassword::sortOrder)
-            ];
-        }
-
-
-        usort(
-            $passwords,
-            function ($a,
-                      $b
-            ) {
-
-                if (!$a[DBEJPassword::serviceID] && $b[DBEJPassword::serviceID]) {
-                    return 1;
-                }
-
-                if (!$b[DBEJPassword::serviceID] && $a[DBEJPassword::serviceID]) {
-                    return -1;
-                }
-
-                if ($a[DBEJPassword::sortOrder] != $b[DBEJPassword::sortOrder]) {
-                    return $a[DBEJPassword::sortOrder] - $b[DBEJPassword::sortOrder];
-                }
-
-                return strcmp(
-                    $a[DBEJPassword::notes],
-                    $b[DBEJPassword::notes]
-                );
-            }
-        );
-
-        foreach ($passwords as $password) {
-            $this->template->set_var(
-                $password
-            );
-            $this->template->parse(
-                'passwords',
-                'passwordBlock',
-                true
-            );
-        }
-
-        $this->template->parse(
-            'CONTENTS',
-            'PasswordList',
-            true
-        );
-        $this->parsePage();
-    }
-
-    function search()
-    {
-        $this->template->setVar("menuId", 104);
-        $this->setMethodName('search');
-        /** @var DSForm $dsSearchForm */
-        $this->buPassword->initialiseSearchForm($dsSearchForm);
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            if (isset($_REQUEST['searchForm'])) {
-                if (!$dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
-                    $this->setFormErrorOn();
-                } else {
-                    $customerID = $dsSearchForm->getValue(DBEPassword::customerID);
-                    header("Location: Password.php?action=list&customerID=$customerID");
-                    exit;
-                }
-            }
-
-        }
-
-        $this->setMethodName('displaySearchForm');
-
-        $this->setTemplateFiles(
-            array(
-                'PasswordSearch' => 'PasswordSearch.inc'
-            )
-        );
-
-        $urlSubmit = Controller::buildLink(
-            $_SERVER ['PHP_SELF'],
-            array('action' => CTCNC_ACT_SEARCH)
-        );
-
-
-        $this->setPageTitle('Passwords');
-        $customerString = null;
-        if ($dsSearchForm->getValue(DBEPassword::customerID)) {
-            $buCustomer = new BUCustomer ($this);
-            $dsCustomer = new DataSet($this);
-            $buCustomer->getCustomerByID(
-                $dsSearchForm->getValue(DBEPassword::customerID),
-                $dsCustomer
-            );
-            $customerString = $dsCustomer->getValue(DBECustomer::name);
-        }
-
-        $urlCustomerPopup =
-            Controller::buildLink(
-                CTCNC_PAGE_CUSTOMER,
-                array(
-                    'action'  => CTCNC_ACT_DISP_CUST_POPUP,
-                    'htmlFmt' => CT_HTML_FMT_POPUP
-                )
-            );
-
-        $this->template->set_var(
-            array(
-                'formError'         => $this->formError,
-                'customerID'        => $dsSearchForm->getValue(DBEPassword::customerID),
-                'customerIDMessage' => $dsSearchForm->getMessage(DBEPassword::customerID),
-                'customerString'    => $customerString,
-                'urlCustomerPopup'  => $urlCustomerPopup,
-                'urlSubmit'         => $urlSubmit
-            )
-        );
-
-        $this->template->parse(
-            'CONTENTS',
-            'PasswordSearch',
-            true
-        );
-
         $this->parsePage();
 
     }
@@ -683,5 +401,183 @@ class CTPassword extends CTCNC
             $ch2
         );
     }
+    //---------------------new 
+    public function getPasswords()
+    {
+        $customerId=@$_REQUEST["customerId"];
+        $showArchived=@$_REQUEST["showArchived"]=="true"?true:false;
+        $showHigherLevel=@$_REQUEST["showHigherLevel"]=="true"?true:false;
+        if(!$customerId)
+            return $this->fail(APIException::badRequest,"Missing paramters");
+        $dbeCustomer =  new DBECustomer($this);
+        $dbeCustomer->getRow($customerId);        
+        if ($dbeCustomer->getValue(DBECustomer::referredFlag) == 'Y') {
+            return $this->fail(APIException::unAuthorized,"This customer is referred and access to passwords has been removed, please direct the customer to Sales if they require any further information.");
+        }        
+        $dsPassword = new DBEJPassword($this);
+        $passwordLevel = $this->dbeUser->getValue(DBEUser::passwordLevel);
+        if ($showHigherLevel) {
+            $passwordLevel = 5;
+        }
+        $dsPassword->getRowsByCustomerIDAndPasswordLevel(
+            $customerId,
+            $passwordLevel,
+            $showArchived,
+            $this->dbeUser->getValue(DBEUser::salesPasswordAccess)
+        );
+        $passwords = [];    
+        while ($dsPassword->fetchNext()) {    
+                $notes = $this->buPassword->decrypt($dsPassword->getValue(DBEPassword::notes));
+                $decryptedURL = $this->buPassword->decrypt($dsPassword->getValue(DBEPassword::URL));
+                $URL = $decryptedURL;
+    
+                $userName = $this->buPassword->decrypt(
+                    $dsPassword->getValue(DBEPassword::username)
+                );
+                $password = $this->buPassword->decrypt(
+                    $dsPassword->getValue(DBEPassword::password)
+                );
+    
+                if ($dsPassword->getValue(DBEPassword::level) > $this->dbeUser->getValue(DBEUser::passwordLevel)) {
+                    $userName = null;
+                    $password = null;
+                    $weirdFields = null;
+                }
+    
+                $passwords[] = [
+                    "notes"               => $this->replaceQuatos($notes),                    
+                    "serviceName"         => $dsPassword->getValue(DBEJPassword::serviceName),
+                    "serviceID"           => $dsPassword->getValue(DBEJPassword::serviceID),
+                    'passwordID'          => $dsPassword->getValue(DBEPassword::passwordID),
+                    'customerID'          => $dsPassword->getValue(DBEPassword::customerID),
+                    DBEPassword::username => $this->replaceQuatos($userName),
+                    'password'            => $this->replaceQuatos($password),
+                    //"weirdFields"         => $weirdFields,
+                    'level'               => $dsPassword->getValue(DBEPassword::level),
+                    'sortOrder'           => $dsPassword->getValue(DBEJPassword::sortOrder),
+                    'URL'                 => $URL,
+                    'archivedAt'          => $dsPassword->getValue(DBEPassword::archivedAt),
+                    'archivedBy'          => $dsPassword->getValue(DBEPassword::archivedBy),
+                ];
+            }
+    
+    
+            usort(
+                $passwords,
+                function ($a,
+                          $b
+                ) {
+    
+                    if (!$a[DBEJPassword::serviceID] && $b[DBEJPassword::serviceID]) {
+                        return 1;
+                    }
+    
+                    if (!$b[DBEJPassword::serviceID] && $a[DBEJPassword::serviceID]) {
+                        return -1;
+                    }
+    
+                    if ($a[DBEJPassword::sortOrder] != $b[DBEJPassword::sortOrder]) {
+                        return $a[DBEJPassword::sortOrder] - $b[DBEJPassword::sortOrder];
+                    }
+    
+                    return strcmp(
+                        $a[DBEJPassword::notes],
+                        $b[DBEJPassword::notes]
+                    );
+                }
+            );
+        return $this->success($passwords );
+    }
 
+    function getPasswordServices(){
+        $customerID =@$_REQUEST["customerId"];
+        $passwordID =@$_REQUEST["passwordId"]??null;
+        if(! $customerID )
+            return $this->fail(APIException::badRequest,"Missing Customer ID");
+
+        $dbePasswordServices = new DBEPasswordService($this);        
+        $dbePasswordServices->getNotInUseServices(
+            $customerID,
+            $passwordID
+        );
+        $services = [];
+        while ($dbePasswordServices->fetchNext()) {            
+            $services []= [
+                "id"          => $dbePasswordServices->getValue(DBEPasswordService::passwordServiceID),
+                "name" => $dbePasswordServices->getValue(DBEPasswordService::description),
+                ]; 
+        }
+        return $this->success($services);
+    }
+    function updatePassword(){
+        $body = $this->getBody();
+        // if (!$body->passwordID)
+        //     return $this->fail(APIException::badRequest, "missing data");
+        $passwordID = $body->passwordID;
+        $dbePassword = new DBEPassword($this);
+        if ($passwordID) {
+            $dbePassword->getRow($passwordID);
+            if (!$dbePassword->rowCount)
+                return $this->fail(APIException::notFound, "Not found");
+        }
+        if ($this->dbeUser->getValue(DBEUser::passwordLevel) < $dbePassword->getValue(DBEPassword::level)) {
+            return $this->fail(APIException::unAuthorized, "unAuthorized");
+        }
+        if (!$this->dbeUser->getValue(DBEUser::salesPasswordAccess)) {
+            $dbePassword->setValue(DBEPassword::salesPassword, $dbePassword->getValue(DBEPassword::salesPassword));
+        }
+        $previousPassword = $dbePassword->getValue(DBEPassword::password);
+        $previousPasswordDecrypted = $this->buPassword->decrypt($previousPassword);
+        $newPassword = $body->password;
+        if ($previousPassword && $previousPasswordDecrypted != $newPassword) {
+            $this->buPassword->archive(
+                $passwordID,
+                $this->dbeUser
+            );
+            $passwordID = null;
+        }
+
+        $dbePassword->setValue(DBEPassword::username, $this->buPassword->encrypt($body->username));
+        $dbePassword->setValue(DBEPassword::password, $this->buPassword->encrypt($body->password));
+        $dbePassword->setValue(DBEPassword::notes, $this->buPassword->encrypt($body->notes));
+        $dbePassword->setValue(DBEPassword::URL, $this->buPassword->encrypt($body->URL));
+        $dbePassword->setValue(DBEPassword::level, $body->level);
+        $dbePassword->setValue(DBEPassword::serviceID, $body->serviceID);
+        $dbePassword->setValue(DBEPassword::level, $body->level);
+        $dbePassword->setValue(DBEPassword::customerID, $body->customerID);
+        $dbePassword->setValue(DBEPassword::encrypted, 1);
+
+        if ($passwordID)
+        {
+            $dbePassword->updateRow();
+            return $this->success("updated");
+        }
+        else
+        {
+            $dbePassword->insertRow();
+            return $this->success("Insert");
+        }
+         
+    }
+    function archivePassword()
+    {
+        $passwordID=$this->getParam('passwordID');
+        if (!$this->buPassword->getPasswordByID(
+            $passwordID,
+            $dsPassword
+        )) {
+            return $this->fail(APIException::notFound,'PasswordID ' . $passwordID . ' not found');            
+        }
+        
+
+        if ($dsPassword->getValue(DBEPassword::level) > $this->getDbeUser()->getValue(DBEUser::passwordLevel)) {            
+            return $this->fail(APIException::unAuthorized,"Not enough level");
+        } else {
+            $this->buPassword->archive(
+                $passwordID,
+                $this->dbeUser
+            );
+        }
+        return $this->success();
+    }
 }// end of class

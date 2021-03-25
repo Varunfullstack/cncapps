@@ -778,12 +778,7 @@ class CTCNC extends Controller
                 "id"    => 307,
                 "label" => "Goods In",
                 "href"  => "GoodsIn.php",
-            ],
-            [
-                "id"    => 308,
-                "label" => "Stock Levels",
-                "href"  => "StockLevel.php",
-            ],
+            ],           
             [
                 "id"    => 309,
                 "label" => "PO Status Report",

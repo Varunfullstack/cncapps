@@ -15,7 +15,8 @@ class AutoComplete extends React.Component {
             // What the user has entered
             userInput: "",
             filtered: false,
-            value: ''
+            value:'',
+            items:[]
         };
 
     }
@@ -56,6 +57,7 @@ class AutoComplete extends React.Component {
             ];
         }
         filteredSuggestions = filteredSuggestions.slice(0, displayLength);
+        console.log(filteredSuggestions);
         // Update the user input and filtered suggestions, reset the active
         // suggestion and make sure the suggestions are shown
         this.setState({
@@ -175,8 +177,9 @@ class AutoComplete extends React.Component {
             state.userInput=props.value;
             return state;
         }
-        else if(props.items.length!=state.filteredSuggestions.length)
+        else if(props.items.length!=state.items.length)
         {
+            console.log('override sugge',);
             state.items=[...props.items];
             state.filteredSuggestions=[...props.items];
             return state;
@@ -239,7 +242,7 @@ class AutoComplete extends React.Component {
                        disabled={this.props.disabled}
                        style={{width: width || '100%'}}
                        autoComplete="off"
-
+                       placeholder={this.props.placeholder}
                 />
                 {suggestionsListComponent}
             </div>

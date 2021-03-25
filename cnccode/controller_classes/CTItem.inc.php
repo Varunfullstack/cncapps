@@ -56,22 +56,23 @@ define(
 
 class CTItem extends CTCNC
 {
-    public const ADD_CHILD_ITEM             = "ADD_CHILD_ITEM";
-    public const REMOVE_CHILD_ITEM          = "REMOVE_CHILD_ITEM";
-    const        GET_CHILD_ITEMS            = "GET_CHILD_ITEMS";
-    const        GET_PARENT_ITEMS           = "GET_PARENT_ITEMS";
-    const        SEARCH_ITEMS               = "SEARCH_ITEMS";
-    const        CHECK_ITEM_RECURRING       = "CHECK_ITEM_RECURRING";
-    const        DATA_TABLE_GET_DATA        = "DATA_TABLE_GET_DATA";
-    const        SEARCH_ITEMS_JSON          = "SEARCH_ITEMS_JSON";
-    const        GET_ITEM                   = 'GET_ITEM';
-    const        UPDATE_CONTRACTS_PRICE     = 'updateContractsPrice';
-    const        UPDATE_CHILD_ITEM_QUANTITY = 'UPDATE_CHILD_ITEM_QUANTITY';
-    const  CONST_ITEMS='items';
-    const  CONST_WARRANTY="warranty";
-    const CONST_RENEWAL_TYPES='renewalTypes';
+    const ADD_CHILD_ITEM             = "ADD_CHILD_ITEM";
+    const REMOVE_CHILD_ITEM          = "REMOVE_CHILD_ITEM";
+    const GET_CHILD_ITEMS            = "GET_CHILD_ITEMS";
+    const GET_PARENT_ITEMS           = "GET_PARENT_ITEMS";
+    const SEARCH_ITEMS               = "SEARCH_ITEMS";
+    const CHECK_ITEM_RECURRING       = "CHECK_ITEM_RECURRING";
+    const DATA_TABLE_GET_DATA        = "DATA_TABLE_GET_DATA";
+    const SEARCH_ITEMS_JSON          = "SEARCH_ITEMS_JSON";
+    const GET_ITEM                   = 'GET_ITEM';
+    const UPDATE_CONTRACTS_PRICE     = 'updateContractsPrice';
+    const UPDATE_CHILD_ITEM_QUANTITY = 'UPDATE_CHILD_ITEM_QUANTITY';
+    const CONST_ITEMS                ='items';
+    const CONST_WARRANTY             ="warranty";
+    const CONST_RENEWAL_TYPES        ='renewalTypes';
     const CONST_ITEM_BILLING_CATEGORY='itemBillingCategory';
-    const CONST_CHILD_ITEMS='childItems';
+    const CONST_CHILD_ITEMS          ='childItems';
+    const CONST_SALESSTOCK_QTY       ='salesStockQty';
     /** @var DSForm */
     public $dsItem;
     /**
@@ -139,6 +140,9 @@ class CTItem extends CTCNC
                             break; 
                 }            
                 break;
+            case self::CONST_SALESSTOCK_QTY:
+                echo json_encode($this->updateSalesStockQty());
+                break;             
             case self::CONST_WARRANTY:
                 echo json_encode($this->getWarranties(),JSON_NUMERIC_CHECK);
                 break;
@@ -1156,7 +1160,8 @@ WHERE custitem.`cui_itemno` = ?
             "renewalTypeID" => "renewalTypeID",
             "discontinued"  => "itm_discontinued",
             "itemCategory"  => "ity_desc",
-            "manufacturer"  => "man_name"
+            "manufacturer"  => "man_name",
+            "salesStockQty" => "itm_sstk_qty"
         ];
         $orderBy =$orderColumns[(@$_REQUEST["orderBy"]??"description")];
         $orderDir =@$_REQUEST["orderDir"]??'asc';
@@ -1187,7 +1192,9 @@ WHERE custitem.`cui_itemno` = ?
          {$dbeItem->getDBColumnName($dbeItem::excludeFromPOCompletion)} as excludeFromPOCompletion,
          {$dbeItem->getDBColumnName($dbeItem::manufacturerID)} as manufacturerID,
          {$dbeItem->getDBColumnName($dbeItem::notes)} as notes, 
-         {$dbeItem->getDBColumnName($dbeItem::stockcat)} as stockcat
+         {$dbeItem->getDBColumnName($dbeItem::stockcat)} as stockcat,
+         {$dbeItem->getDBColumnName($dbeItem::salesStockQty)} as salesStockQty
+
          
         FROM Item
         left JOIN itemtype on Item.itm_itemtypeno   = itemtype.ity_itemtypeno
@@ -1352,6 +1359,20 @@ WHERE custitem.`cui_itemno` = ?
             DBConnect::execute("INSERT into childItem(childItemId,parentItemId,quantity) values(:childId,:parentId,:quantity)",
                  ["quantity"=>$item->quantity,"parentId"=> $itemId,"childId"=>$item->id]);
         }      
+        return $this->success();
+    }
+
+    function updateSalesStockQty(){
+        $itemID   = @$_REQUEST["id"];
+        $value  = @$_REQUEST["value"];
+        if(empty($itemID))
+            return $this->fail(APIException::badRequest,"missing item id");
+        $dbeItem = new DBEItem($this);
+        $dbeItem->getRow($itemID);
+        if(!$dbeItem->rowCount)
+            return $this->fail(APIException::notFound,"not found");
+        $dbeItem->setValue(DBEItem::salesStockQty,$value);
+        $dbeItem->updateRow();
         return $this->success();
     }
 }
