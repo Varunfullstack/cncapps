@@ -1,6 +1,13 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.7.1] - 2021-03-26
+### Fixed
+- ContactImport failing to import
+- Customer Feedback time format
+### Removed
+- Remove the logging of SR when a webroot endpoint should be deactivated.
+
 ## [v5.7.0] - 2021-03-25
 ### Added
 - Issue 1247 - Customer approval for extra chargeable work.
