@@ -5,6 +5,8 @@ This project changes will be shown here.
 ### Fixed
 - ContactImport failing to import
 - Customer Feedback time format
+- Fixed issue with Webroot/Automate duplicated raised SR's not having asset title breaking the activity pages
+- Fixed issue with internal documents not showing on load
 ### Removed
 - Remove the logging of SR when a webroot endpoint should be deactivated.
 

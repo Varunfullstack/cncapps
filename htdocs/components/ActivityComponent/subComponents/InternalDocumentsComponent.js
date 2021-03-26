@@ -18,10 +18,8 @@ export class InternalDocumentsComponent extends MainComponent {
         }
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        if (prevProps.serviceRequestId !== this.props.serviceRequestId) {
-            this.loadDocuments(this.props.serviceRequestId);
-        }
+    componentDidMount() {
+        this.loadDocuments(this.props.serviceRequestId);
     }
 
     async loadDocuments(serviceRequestId) {
