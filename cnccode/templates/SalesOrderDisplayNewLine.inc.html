@@ -70,8 +70,9 @@
         let typeSelected = typeSelector.value;
         updateButtons();
         document.renderSupplierSearchComponent(reactSupplierSearchContainer, {
-            inputId: 'supplierID', defaultText: '', onChange: (id) => {
-                itemIdInput.value = id;
+            defaultText: '',
+            onChange: (id) => {
+                supplierIdInput.value = id;
                 updateButtons();
             }
         });
