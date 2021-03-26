@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.7.2] - 2021-03-26
+### Fixed
+- Fixed issue with wrong assignment of item id when creating a sales order line
+
 ## [v5.7.1] - 2021-03-26
 ### Fixed
 - ContactImport failing to import
