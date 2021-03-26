@@ -151,7 +151,7 @@ function raiseDuplicatedMIDRequest($computerName, $customerName, $vendorName = "
     } else {
         $customerId = $customer->getValue(DBECustomer::customerID);
     }
-    $emailSubjectSummary = "$computerName is duplicated in Webroot Portal";
+    $emailSubjectSummary = "$computerName is duplicated in $vendorName";
     raiseRequest($customerId, $reason, $computerName, $emailSubjectSummary);
 }
 
@@ -275,6 +275,7 @@ function raiseRequest($customerId, $reason, $computerName, $emailSubjectSummary)
         BUProblemRaiseType::ALERTID
     );
     $dbeProblem->setValue(DBEProblem::assetName, $computerName);
+    $dbeProblem->setValue(DBEProblem::assetTitle, $computerName);
     $dbeProblem->setValue(DBEProblem::emailSubjectSummary, $emailSubjectSummary);
     $dbeProblem->setValue(
         DBEProblem::hideFromCustomerFlag,
