@@ -409,7 +409,6 @@ foreach ($sitesResponse->sites as $site) {
                     "Proceeding to deactivate $computerName Webroot endpoint due to being retired in Automate and not seen recently in Webroot"
                 );
                 try {
-                    raiseDeactivateWebrootRequest($computerName, $customerName, $thresholdDays);
                     $webrootAPI->deactivateEndpoint($site->siteId, $device->endpointId);
                 } catch (ClientException $exception) {
                     $body = (string)$exception->getResponse()->getBody();
