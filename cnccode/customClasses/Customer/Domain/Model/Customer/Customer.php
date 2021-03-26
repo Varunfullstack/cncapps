@@ -40,21 +40,35 @@ class Customer implements AggregateRoot
     protected $reviewDate;
     /** @var CustomerReviewTime */
     protected $reviewTime;
-    /** @var  */
+    /** @var  CustomerReviewAction */
     protected $reviewAction;
+    /** @var  CustomerReviewUserId */
     protected $reviewUserID;
+    /** @var  CustomerSectorId */
     protected $sectorID;
+    /** @var  CustomerBecameCustomerDate */
     protected $becameCustomerDate;
+    /** @var  CustomerDroppedDate */
     protected $droppedCustomerDate;
+    /** @var  CustomerLeadStatusId */
     protected $leadStatusId;
+    /** @var  CustomerTechNotes */
     protected $techNotes;
+    /** @var  CustomerIsSpecialAttention */
     protected $specialAttentionFlag;
-    protected $specialAttentionEndDate;
-    protected $support24HourFlag;
+    /** @var  CustomerSpecialAttentionUntilDate */
+    protected $specialAttentionUntilDate;
+    /** @var  CustomerHas24HourSupport */
+    protected $has24HourSupport;
+    /** @var  CustomerPriority1SLA */
     protected $slaP1;
+    /** @var  CustomerPriority2SLA */
     protected $slaP2;
+    /** @var  CustomerPriority3SLA */
     protected $slaP3;
+    /** @var  CustomerPriority4SLA */
     protected $slaP4;
+    /** @var  CustomerPriority5SLA */
     protected $slaP5;
     protected $sendContractEmail;
     protected $sendTandcEmail;
