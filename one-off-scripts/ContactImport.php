@@ -98,8 +98,8 @@ while ($line = fgetcsv($csvFile)) {
     if (!$dbeContact->rowCount()) {
         $contactInsert = new DBEContact($thing);
         $contactInsert->setValue(DBEContact::customerID, $customerId);
-        $contactInsert->setValue(DBEContact::mailshot, 1);
-        $contactInsert->setValue(DBEContact::initialLoggingEmail, 1);
+        $contactInsert->setValue(DBEContact::sendMailshotFlag, 'Y');
+        $contactInsert->setValue(DBEContact::initialLoggingEmailFlag, 'Y');
         $contactInsert->setValue(DBEContact::title, $line[1]);
         $contactInsert->setValue(DBEContact::firstName, $line[2]);
         $contactInsert->setValue(DBEContact::lastName, $line[3]);
