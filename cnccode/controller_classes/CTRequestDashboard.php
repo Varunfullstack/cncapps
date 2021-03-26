@@ -86,6 +86,11 @@ class CTRequestDashboard extends CTCNC
         $this->setTemplateFiles(
             array('RequestDashboard' => 'RequestDashboard.rct')
         );
+        $isAdditionalTimeApprover = $this->dbeUser->getValue(DBEUser::additionalTimeLevelApprover);
+        $this->template->setVar(
+            'additionalTimeLimitApprover',
+            $isAdditionalTimeApprover ? 'true' : 'false',
+        );
         $this->loadReactScript('RequestDashboardComponent.js');
         $this->loadReactCSS('RequestDashboardComponent.css');
         $this->template->parse(
@@ -127,32 +132,34 @@ class CTRequestDashboard extends CTCNC
             $assignedMinutes = 0;
             $dbeProblem      = new DBEJProblem($this);
             $dbeProblem->getRow($problemID);
-            $teamName    = '';
-            $isOverLimit = false;
+            $teamName                          = '';
+            $teamManagementTimeApprovalMinutes = null;
             switch ($teamID) {
                 case 1:
-                    $usedMinutes     = $buActivity->getHDTeamUsedTime($problemID);
-                    $assignedMinutes = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
-                    $isOverLimit     = $assignedMinutes >= $dsHeader->getValue(
-                            DBEHeader::hdTeamManagementTimeApprovalMinutes
-                        );
-                    $teamName        = 'Helpdesk';
+                    $usedMinutes                       = $buActivity->getHDTeamUsedTime($problemID);
+                    $assignedMinutes                   = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
+                    $teamManagementTimeApprovalMinutes = $dsHeader->getValue(
+                        DBEHeader::hdTeamManagementTimeApprovalMinutes
+                    );
+                    $teamName                          = 'Helpdesk';
                     break;
                 case 2:
-                    $usedMinutes     = $buActivity->getESTeamUsedTime($problemID);
-                    $assignedMinutes = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
-                    $isOverLimit     = $assignedMinutes >= $dsHeader->getValue(
-                            DBEHeader::esTeamManagementTimeApprovalMinutes
-                        );
-                    $teamName        = 'Escalation';
+                    $usedMinutes                       = $buActivity->getESTeamUsedTime($problemID);
+                    $assignedMinutes                   = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
+                    $teamManagementTimeApprovalMinutes = $dsHeader->getValue(
+                        DBEHeader::esTeamManagementTimeApprovalMinutes
+                    );
+                    $teamName                          = 'Escalation';
                     break;
                 case 4:
-                    $usedMinutes     = $buActivity->getSPTeamUsedTime($problemID);
-                    $assignedMinutes = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
-                    $isOverLimit     = $assignedMinutes >= $dsHeader->getValue(
-                            DBEHeader::smallProjectsTeamManagementTimeApprovalMinutes
-                        );
-                    $teamName        = 'Small Projects';
+                    $usedMinutes                       = $buActivity->getSPTeamUsedTime($problemID);
+                    $assignedMinutes                   = $dbeProblem->getValue(
+                        DBEProblem::smallProjectsTeamLimitMinutes
+                    );
+                    $teamManagementTimeApprovalMinutes = $dsHeader->getValue(
+                        DBEHeader::smallProjectsTeamManagementTimeApprovalMinutes
+                    );
+                    $teamName                          = 'Small Projects';
                     break;
                 case 5:
                     $usedMinutes     = $buActivity->getUsedTimeForProblemAndTeam($problemID, 5);
@@ -170,18 +177,20 @@ class CTRequestDashboard extends CTCNC
             array_push(
                 $result,
                 [
-                    'customerName'      => $dbejCallActivity->getValue(DBEJCallActivity::customerName),
-                    'notes'             => $dbejCallActivity->getValue(DBEJCallActivity::reason),
-                    'requestedBy'       => $dbejCallActivity->getValue(DBEJCallActivity::userName),
-                    'requestedDateTime' => $requestedDateTimeString,
-                    'chargeableHours'   => $dbeProblem->getValue(DBEJProblem::chargeableActivityDurationHours),
-                    'timeSpentSoFar'    => round($usedMinutes),
-                    'timeLeftOnBudget'  => $leftOnBudget,
-                    'requesterTeam'     => $teamName,
-                    'alertRow'          => $requestedDateTime < $alertTime ? 'warning' : null,
-                    'approvalLevel'     => $isOverLimit ? 'Mgmt' : 'Team Lead',
-                    "callActivityID"    => $dbejCallActivity->getValue(DBEJCallActivity::callActivityID),
-                    'problemID'         => $dbejCallActivity->getValue(DBEJCallActivity::problemID),
+                    'customerName'                  => $dbejCallActivity->getValue(DBEJCallActivity::customerName),
+                    'notes'                         => $dbejCallActivity->getValue(DBEJCallActivity::reason),
+                    'requestedBy'                   => $dbejCallActivity->getValue(DBEJCallActivity::userName),
+                    'requestedDateTime'             => $requestedDateTimeString,
+                    'chargeableHours'               => $dbeProblem->getValue(
+                        DBEJProblem::chargeableActivityDurationHours
+                    ),
+                    'timeSpentSoFar'                => round($usedMinutes),
+                    'timeLeftOnBudget'              => $leftOnBudget,
+                    'requesterTeam'                 => $teamName,
+                    'alertRow'                      => $requestedDateTime < $alertTime ? 'warning' : null,
+                    'teamManagementApprovalMinutes' => $teamManagementTimeApprovalMinutes,
+                    "callActivityID"                => $dbejCallActivity->getValue(DBEJCallActivity::callActivityID),
+                    'problemID'                     => $dbejCallActivity->getValue(DBEJCallActivity::problemID),
                 ]
             );
 

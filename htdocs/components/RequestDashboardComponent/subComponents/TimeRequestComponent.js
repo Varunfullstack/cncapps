@@ -1,10 +1,10 @@
 import MainComponent from "../../shared/MainComponent";
 import Table from "../../shared/table/table";
 import React from 'react';
-import Spinner from "../../shared/Spinner/Spinner";
 import APIRequestDashboard from "../services/APIRequestDashboard";
 import Modal from "../../shared/Modal/modal";
 import CNCCKEditor from "../../shared/CNCCKEditor";
+import Spinner from "../../shared/Spinner/Spinner";
 
 class TimeRequestComponent extends MainComponent {
     el = React.createElement;
@@ -19,11 +19,11 @@ class TimeRequestComponent extends MainComponent {
             showSpinner: false,
             activities: this.props.activities,
             showProcessTimeModal: false,
-            currentActivity: null,
+            currentTimeRequest: null,
             data: {
                 status: null,
                 allocatedTimeAmount: 'minutes',
-                allocatedTimeValue: '',
+                allocatedTimeValue: 0,
                 comments: null,
                 callActivityID: null
             }
@@ -104,14 +104,21 @@ class TimeRequestComponent extends MainComponent {
                 content: (activity) => <span>{moment(activity.requestedDateTime).format("DD/MM/YYYY HH:mm")}</span>
             },
             {
-                path: "approvalLevel",
+                path: "teamManagementApprovalMinutes",
                 label: "",
-                key: "approvalLevel",
+                key: "teamManagementApprovalMinutes",
                 hdToolTip: "Approval Level",
                 icon: "fal fa-2x fa-file-signature color-gray2 ",
                 sortable: false,
                 hdClassName: "text-center",
                 className: "text-center",
+                content: (request) => {
+                    let text = "Team Lead"
+                    if (request.timeSpentSoFar >= request.teamManagementApprovalMinutes) {
+                        text = 'Mgmt';
+                    }
+                    return <span>{text}</span>;
+                }
             },
             {
                 path: "chargeableHours",
@@ -169,24 +176,50 @@ class TimeRequestComponent extends MainComponent {
         />
     }
 
-    processTimeRequest(activity) {
+    processTimeRequest(timeRequest) {
         const {data} = this.state;
         data.comments = "";
         data.allocatedTimeValue = '';
         data.allocatedTimeAmount = "minutes";
-        this.setState({showProcessTimeModal: true, currentActivity: activity, data});
-        this.setValue("callActivityID", activity.callActivityID);
+        this.setState({showProcessTimeModal: true, currentTimeRequest: timeRequest, data});
+        this.setValue("callActivityID", timeRequest.callActivityID);
+    }
+
+    renderNotAllowedError = (isAllowed) => {
+        if (isAllowed) {
+            return <tr/>;
+        }
+
+        return <tr>
+            <td colSpan="2"
+                style={{color: 'red'}}
+            >You are not allowed to add additional minutes to this SR for the selected
+                team, please discuss this with management to proceed.
+            </td>
+        </tr>
     }
 
     getTimeRequestModal = () => {
-        const {el} = this;
-        return el(Modal, {
-            key: "processRequestTime",
-            show: this.state.showProcessTimeModal,
-            width: 720,
-            title: "Time Request",
-            onClose: this.handleCancel,
-            content: <div key="divBody">
+        const {showProcessTimeModal, data, currentTimeRequest} = this.state;
+        const {allocatedTimeValue, allocatedTimeAmount} = data;
+        if (!currentTimeRequest) {
+            return '';
+        }
+        const isAllowed = (allocatedTimeValue * (allocatedTimeAmount === 'minutes' ? 1 : 60) + currentTimeRequest.timeSpentSoFar) < currentTimeRequest.teamManagementApprovalMinutes;
+        return <Modal
+            key="processRequestTime"
+            show={showProcessTimeModal}
+            width="720"
+            title="Time Request"
+            onClose={this.handleCancel}
+            footer={
+                <div key="divFooter">
+                    <button onClick={this.handleApprove} disabled={!isAllowed} >Approve</button>
+                    <button onClick={this.handleDeny}>Deny</button>
+                </div>
+            }
+        >
+            <div key="divBody">
                 <table>
                     <tbody>
                     <tr>
@@ -194,23 +227,25 @@ class TimeRequestComponent extends MainComponent {
                         <td>
                             <input autoFocus={true}
                                    style={{marginLeft: 0}}
-                                   onChange={($event) => this.setValue('allocatedTimeValue', $event.target.value)}
-                                   value={this.state.data.allocatedTimeValue}
+                                   type="number"
+                                   onChange={($event) => this.setValue('allocatedTimeValue', parseInt($event.target.value))}
+                                   value={allocatedTimeValue}
                             />
                             <select onChange={($event) => this.setValue('allocatedTimeAmount', $event.target.value)}
-                                    value={this.state.data.allocatedTimeAmount}
+                                    value={allocatedTimeAmount}
                             >
                                 <option value="minutes">Minutes</option>
                                 <option value="hours">Hours</option>
                             </select>
                         </td>
                     </tr>
+                    {this.renderNotAllowedError(isAllowed)}
                     <tr style={{verticalAlign: "top"}}>
                         <td>Comments</td>
                         <td>
                             <div id="top2"/>
                             <CNCCKEditor
-                                onChange={(data) => this.setValue('comments', data)}
+                                onChange={(receivedData) => this.setValue('comments', receivedData)}
                                 style={{width: 600, height: 200}}
                                 type="inline"
                                 sharedSpaces={true}
@@ -223,17 +258,15 @@ class TimeRequestComponent extends MainComponent {
                     </tr>
                     </tbody>
                 </table>
-            </div>,
-            footer: el(
-                "div",
-                {key: "divFooter"},
-                el("button", {onClick: this.handleApprove}, "Approve"),
-                el("button", {onClick: this.handleDeny}, "Deny"),
-            ),
-        });
+            </div>
+        </Modal>
     }
     handleDeny = () => {
-        const {data} = this.state;
+        const
+            {
+                data
+            }
+                = this.state;
         data.status = "Deny";
         if (!data.comments) {
             this.alert("Please enter a comment");
@@ -277,13 +310,16 @@ class TimeRequestComponent extends MainComponent {
     }
 
     render() {
-        const {el} = this;
-        return el("div", null,
-            el(Spinner, {key: "spinner", show: this.state.showSpinner}),
-            this.getAlert(),
-            this.getDataElement(),
-            this.getTimeRequestModal()
-        );
+        return (
+            <div>
+                <Spinner key="spinner"
+                         show={this.state.showSpinner}
+                />
+                {this.getAlert()}
+                {this.getDataElement()}
+                {this.getTimeRequestModal()}
+            </div>
+        )
     }
 }
 
