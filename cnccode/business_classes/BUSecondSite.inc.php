@@ -316,7 +316,7 @@ class BUSecondsite extends Business
                 if ($allServerImagesPassed) {
                     $this->resetSuspendedUntilDate($server['server_cuino']);
                 }
-                if (!$isSuspended && empty($missingImages) && !$customerItemID && !$testRun) {
+                if (!$isSuspended && count($missingImages) && !$customerItemID && !$testRun) {
 
                     $this->getActivityModel()->raiseSecondSiteMissingImageRequest(
                         $server['custno'],
