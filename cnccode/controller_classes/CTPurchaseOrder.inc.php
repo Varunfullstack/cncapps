@@ -169,9 +169,7 @@ class CTPurchaseOrder extends CTCNC
             case CTCNC_ACT_SEARCH:
                 $this->search();
                 break;
-            case CTPURCHASEORDER_ACT_DISP_SEARCH:
-                $this->displaySearchForm();
-                break;
+
             case CTCNC_ACT_DISPLAY_PO:
                 $this->displayOrder();
                 break;
@@ -204,6 +202,7 @@ class CTPurchaseOrder extends CTCNC
             case CTPURCHASEORDER_ACT_GENERATE_PDF:
                 $this->generatePDF();
                 break;
+            case CTPURCHASEORDER_ACT_DISP_SEARCH:
             default:
                 $this->displaySearchForm();
                 break;

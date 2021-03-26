@@ -69,7 +69,12 @@
         addToRecurringButton.disabled = true;
         let typeSelected = typeSelector.value;
         updateButtons();
-        document.renderSupplierSearchComponent(reactSupplierSearchContainer, {inputId: 'supplierID', defaultText: ''});
+        document.renderSupplierSearchComponent(reactSupplierSearchContainer, {
+            inputId: 'supplierID', defaultText: '', onChange: (id) => {
+                itemIdInput.value = id;
+                updateButtons();
+            }
+        });
 
         function checkLineValid(typeSelected) {
             if (typeSelected === 'C') {

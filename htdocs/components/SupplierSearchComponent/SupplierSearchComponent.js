@@ -12,12 +12,20 @@ export class SupplierSearchComponent extends React.PureComponent {
     }
 
     handleChange = (value) => {
-        const input = document.getElementById(this.props.inputId);
+
         let id = null;
         if (value) {
             id = value.id;
         }
-        input.value = id;
+        if (this.props.inputId) {
+            const input = document.getElementById(this.props.inputId);
+            input.value = id;
+        }
+        console.log(this.props);
+        if (this.props.onChange) {
+            this.props.onChange(id);
+        }
+
     }
 
     render() {
@@ -32,14 +40,16 @@ export class SupplierSearchComponent extends React.PureComponent {
 
 SupplierSearchComponent.propTypes = {
     supplierId: PropTypes.number,
-    inputId: PropTypes.string.isRequired
+    inputId: PropTypes.string,
+    onChange: PropTypes.func
 }
 
-document.renderSupplierSearchComponent = (domContainer, {inputId, supplierId}) => {
+document.renderSupplierSearchComponent = (domContainer, {inputId, supplierId, onChange}) => {
     const element = document.getElementById(inputId)
     element.reactInstance = ReactDOM.render(React.createElement(SupplierSearchComponent, {
         inputId,
-        supplierId
+        supplierId,
+        onChange,
     }), domContainer);
 }
 

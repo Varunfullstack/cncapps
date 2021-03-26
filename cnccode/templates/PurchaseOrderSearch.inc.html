@@ -7,6 +7,14 @@
         }
     }
 
+    document.addEventListener('DOMContentLoaded', () => {
+        const reactSupplierSearchContainer = document.getElementById('reactSupplierSearchContainer');
+        document.renderSupplierSearchComponent(reactSupplierSearchContainer, {
+            inputId: 'supplierID',
+            defaultText: ''
+        });
+    })
+
     function createOrder() {
         if (
             (document.searchForm.supplierID.value != "") &&
@@ -41,8 +49,10 @@
                         id="supplierID"
                         value="{supplierID}"
                 >
-                <div id="reactSupplierSearchContainer" data-input-id="supplierID"></div>
-                </td>
+                <div id="reactSupplierSearchContainer"
+                     data-input-id="supplierID"
+                ></div>
+            </td>
         </tr>
         <tr>
             <td class="promptText">
