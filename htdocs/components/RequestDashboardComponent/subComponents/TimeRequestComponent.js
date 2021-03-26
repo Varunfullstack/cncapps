@@ -205,11 +205,11 @@ class TimeRequestComponent extends MainComponent {
         if (!currentTimeRequest) {
             return '';
         }
-        const isAllowed = (allocatedTimeValue * (allocatedTimeAmount === 'minutes' ? 1 : 60) + currentTimeRequest.timeSpentSoFar) < currentTimeRequest.teamManagementApprovalMinutes;
+        const isAllowed = isAdditionalTimeLimitApprover || (allocatedTimeValue * (allocatedTimeAmount === 'minutes' ? 1 : 60) + currentTimeRequest.timeSpentSoFar) < currentTimeRequest.teamManagementApprovalMinutes;
         return <Modal
             key="processRequestTime"
             show={showProcessTimeModal}
-            width="720"
+            width="700px"
             title="Time Request"
             onClose={this.handleCancel}
             footer={
