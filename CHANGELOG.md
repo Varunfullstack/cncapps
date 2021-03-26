@@ -7,6 +7,7 @@ This project changes will be shown here.
 - Customer Feedback time format
 - Fixed issue with Webroot/Automate duplicated raised SR's not having asset title breaking the activity pages
 - Fixed issue with internal documents not showing on load
+- Fixed issue with saving User losing the siteCustomer assigned
 ### Removed
 - Remove the logging of SR when a webroot endpoint should be deactivated.
 
