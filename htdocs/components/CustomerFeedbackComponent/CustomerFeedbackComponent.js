@@ -232,7 +232,7 @@ class CustomerFeedbackComponent extends MainComponent {
                 sortable: true,
                 className: "text-center",
                 content: feed => {
-                    return moment(feed.createdAt).format('DD/MM/YYYY aa');
+                    return moment(feed.createdAt).format('DD/MM/YYYY');
                 }
             },
         ];
