@@ -66,8 +66,8 @@ class CTUser extends CTCNC
     const DECRYPT                = 'decrypt';
     const GetAge                 = 'getAge';
     const REGISTER_HALF_HOLIDAYS = 'REGISTER_HALF_HOLIDAYS';
-    const REQ_SETTINGS          ='settings';
-    const CONST_MY_FEEDBACK     = 'myFeedback';
+    const REQ_SETTINGS           = 'settings';
+    const CONST_MY_FEEDBACK      = 'myFeedback';
     /** @var DSForm */
     public $dsUser;
     /** @var DSForm */
@@ -89,7 +89,14 @@ class CTUser extends CTCNC
             $cookieVars,
             $cfg
         );
-        $noPermissionList = ['myFeedback',"all", "active", "getCurrentUser", "getUsersByTeamLevel",self::REQ_SETTINGS];
+        $noPermissionList = [
+            'myFeedback',
+            "all",
+            "active",
+            "getCurrentUser",
+            "getUsersByTeamLevel",
+            self::REQ_SETTINGS
+        ];
         $roles            = SENIOR_MANAGEMENT_PERMISSION;
         $key              = array_search(@$_REQUEST["action"], $noPermissionList);
         if (false === $key) if (!self::hasPermissions($roles)) {
@@ -191,8 +198,8 @@ class CTUser extends CTCNC
      * @throws Exception
      */
     function defaultAction()
-    {        
-        $method=$_SERVER['REQUEST_METHOD'] ;
+    {
+        $method = $_SERVER['REQUEST_METHOD'];
         switch ($this->getAction()) {
             case CTUSER_ACT_EDIT:
             case CTUSER_ACT_CREATE:
@@ -279,14 +286,13 @@ class CTUser extends CTCNC
                 echo json_encode($this->getUsersByTeamLevel());
                 exit;
             case self::REQ_SETTINGS:
-                if($method == 'POST')
-                echo json_encode($this->saveSettings());
-                else if($method == 'GET')
-                echo json_encode($this->getSettings());
-                exit;            
+                if ($method == 'POST') echo json_encode(
+                    $this->saveSettings()
+                ); else if ($method == 'GET') echo json_encode($this->getSettings());
+                exit;
             case self::CONST_MY_FEEDBACK:
-                echo json_encode($this->getMyFeedback(),JSON_NUMERIC_CHECK);
-                exit;  
+                echo json_encode($this->getMyFeedback(), JSON_NUMERIC_CHECK);
+                exit;
             case CTUSER_ACT_DISPLAY_LIST:
             default:
                 $this->displayList();
@@ -649,6 +655,7 @@ class CTUser extends CTCNC
                 "basedAtCustomerSiteChecked"                    => $this->dsUser->getValue(
                     DBEUser::basedAtCustomerSite
                 ) ? 'checked' : null,
+                'siteCustId'                                    => $siteCustomerId,
                 'siteCustomerString'                            => $siteCustomerString,
                 'streamOneLicenseManagementChecked'             => Controller::htmlChecked(
                     $dsUser->getValue(DBEJUser::streamOneLicenseManagement)
@@ -992,7 +999,7 @@ class CTUser extends CTCNC
                 'teamID'                     => $dbeJUser->getValue(DBEJUser::teamID),
                 'teamLevel'                  => $dbeJUser->getValue(DBEJUser::teamLevel),
                 'serviceRequestQueueManager' => $dbeJUser->getValue(DBEJUser::queueManager),
-                'isProjectManager'      => $dbeJUser->getValue(DBEJUser::projectManagementFlag)=='Y',
+                'isProjectManager'           => $dbeJUser->getValue(DBEJUser::projectManagementFlag) == 'Y',
             ]
         );
     }
@@ -1023,9 +1030,9 @@ class CTUser extends CTCNC
             array_push(
                 $users,
                 array(
-                    'id'   => $dbeUser->getValue(DBEUser::userID),
-                    'name' => $dbeUser->getValue(DBEUser::name),
-                    'teamId'=>$dbeUser->getValue(DBEUser::teamID),
+                    'id'     => $dbeUser->getValue(DBEUser::userID),
+                    'name'   => $dbeUser->getValue(DBEUser::name),
+                    'teamId' => $dbeUser->getValue(DBEUser::teamID),
                 )
             );
         }
@@ -1145,39 +1152,52 @@ class CTUser extends CTCNC
         );
         $this->parsePage();
     }
+
     function saveSettings()
     {
-        $body =json_decode(file_get_contents('php://input'));
-        
-        if(!isset($body->consID)||!isset($body->type)||!isset($body->settings))
-            return ['status'=>false,'error'=>'missed data'];
+        $body = json_decode(file_get_contents('php://input'));
+        if (!isset($body->consID) || !isset($body->type) || !isset($body->settings)) return [
+            'status' => false,
+            'error'  => 'missed data'
+        ];
         //get data first
-        $consultant=DBConnect::fetchOne("select * from cons_settings where consno=:id and type=:type",['id'=>$body->consID,'type'=>$body->type]);
-        $result=false;
-        if(!$consultant) // insert new recored
+        $consultant = DBConnect::fetchOne(
+            "select * from cons_settings where consno=:id and type=:type",
+            ['id' => $body->consID, 'type' => $body->type]
+        );
+        $result     = false;
+        if (!$consultant) // insert new recored
         {
-            $result=DBConnect::execute("insert into cons_settings(consno,type,settings) values(:consID,:type,:settings)",
-            ['consID'=>$body->consID,'settings'=>$body->settings,'type'=>$body->type]);
+            $result = DBConnect::execute(
+                "insert into cons_settings(consno,type,settings) values(:consID,:type,:settings)",
+                ['consID' => $body->consID, 'settings' => $body->settings, 'type' => $body->type]
+            );
+        } else { // update one
+            $result = DBConnect::execute(
+                "update cons_settings set settings=:settings where consno=:consID and type=:type",
+                ['consID' => $body->consID, 'settings' => $body->settings, 'type' => $body->type]
+            );
         }
-        else { // update one
-            $result=DBConnect::execute("update cons_settings set settings=:settings where consno=:consID and type=:type",
-            ['consID'=>$body->consID,'settings'=>$body->settings,'type'=>$body->type]);
-        }
-        return ['status'=>$result];
+        return ['status' => $result];
     }
-    function getSettings(){
-        $type=$_REQUEST['type'];
-        if(!isset($type))
-            return ['status'=>false];
-        $userId=$this->dbeUser->getValue(DBEUser::userID);
-        $result=DBConnect::fetchOne("select * from cons_settings where type=:type and consno=:userId",
-        ['type'=>$type,'userId'=>$userId]);
-        return ['status'=>true,'data'=>json_decode($result['settings'])];
+
+    function getSettings()
+    {
+        $type = $_REQUEST['type'];
+        if (!isset($type)) return ['status' => false];
+        $userId = $this->dbeUser->getValue(DBEUser::userID);
+        $result = DBConnect::fetchOne(
+            "select * from cons_settings where type=:type and consno=:userId",
+            ['type' => $type, 'userId' => $userId]
+        );
+        return ['status' => true, 'data' => json_decode($result['settings'])];
     }
-    function getMyFeedback(){
-        $from=@$_REQUEST['from']??null;
-        $to=@$_REQUEST['to']??null;
-        $query="SELECT       
+
+    function getMyFeedback()
+    {
+        $from  = @$_REQUEST['from'] ?? null;
+        $to    = @$_REQUEST['to'] ?? null;
+        $query = "SELECT       
                     f.id,
                     f.value,     
                     customer.`cus_name`,
@@ -1194,6 +1214,6 @@ class CTUser extends CTCNC
                     AND (:from is null or f.`createdAt` >= :from )
                     AND (:to is null or f.`createdAt` <= :to)
                 order by f.`createdAt` desc";
-        return DBConnect::fetchAll($query,['from'=>$from,'to'=>$to,'consID'=>$this->dbeUser->getPKValue()]);
+        return DBConnect::fetchAll($query, ['from' => $from, 'to' => $to, 'consID' => $this->dbeUser->getPKValue()]);
     }
 }
