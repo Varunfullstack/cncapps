@@ -153,6 +153,7 @@ class CTExpenseDashboard extends CTCNC
       "Pending"
     )
   ) AS `status`,
+       problem.pro_linked_ordno as linkedOrderId,
   callactivity.`overtimeApprovedDate` as approvedDate,
        callactivity.caa_consno = ? as isSelf,
        ((SELECT
