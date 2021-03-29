@@ -522,7 +522,12 @@ class ActivityEditComponent extends MainComponent {
                     href: `RenewalReport.php?action=produceReport&customerID=${data?.customerId}`,
                     target: "_blank",
                 }),
-            }),
+            }),            
+            <ToolTip title="Generate Password"
+                         content={<a className="fal fa-magic fa-2x m-5 pointer icon"
+                                     onClick={this.handleGeneratePassword}
+                         />}
+                />,
             el(ToolTip, {
                 title: "Contracts",
                 content: el("a", {
@@ -926,13 +931,7 @@ class ActivityEditComponent extends MainComponent {
         return type && type.catRequireCNCNextActionOnHold == 1 && !data.cncNextActionTemplate;
     }
 
-    handleGeneratPassword = () => {
-        window.open(
-            "Password.php?action=generate&htmlFmt=popup",
-            "reason",
-            "scrollbars=yes,resizable=yes,height=524,width=855,copyhistory=no, menubar=0"
-        );
-    };
+    
     handleSalesOrder = async (callActivityID, serviceRequestId) => {
         this.setState({showSalesOrder: true});
 
@@ -1888,7 +1887,9 @@ class ActivityEditComponent extends MainComponent {
         }
         this.hideAdditionalTimeRequestModal();
     };
-
+    handleGeneratePassword = () => {
+        window.open("Password.php?action=generate&htmlFmt=popup", 'reason', 'scrollbars=yes,resizable=yes,height=524,width=855,copyhistory=no, menubar=0');
+    }
     render() {
         const {data, showSalesOrder, _activityLoaded} = this.state;
 
