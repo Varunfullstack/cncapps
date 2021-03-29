@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 1312 - Amending a line in a Sales Order opens a new tab
+
 ## [v5.7.3] - 2021-03-29
 ### Added
 - Create a new one off script that allows to get the sage files sent for any given printed date
