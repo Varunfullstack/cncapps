@@ -8756,17 +8756,17 @@ FROM
             CONFIG_SALES_EMAIL,
             "VisitConfirmation@" . CONFIG_PUBLIC_DOMAIN
         ];
-        $recipientsArray = array_merge($recipientsArray, $bcc);
+
         $buCustomer      = new BUCustomer($this);
-        $cc              = $buCustomer->getMainSupportEmailAddresses(
+        $cc              = $buCustomer->getOthersWorkEmailAddresses(
             $dsCallActivity->getValue(DBEJCallActivity::customerID),
             $contactEmail
         );
-        $recipientsArray = array_merge($recipientsArray, $cc);
+
         $recipients      = implode(",", $recipientsArray);
         $subject         = "On-Site Visit Confirmation for Service Request {$serviceRequestId} {$emailSubjectToAppend}";
         $body            = $twig->render('@customerFacing/SiteVisit/SiteVisit.html.twig', ["data" => $data]);
-        $buMail->sendSimpleEmail($body, $subject, $recipients, CONFIG_SUPPORT_EMAIL, $cc);
+        $buMail->sendSimpleEmail($body, $subject, $recipients, CONFIG_SUPPORT_EMAIL, $cc, $bcc);
     }
 
     /**

@@ -1042,6 +1042,26 @@ class BUCustomer extends Business
         return $emailList;
     }
 
+    function getOthersWorkEmailAddresses($customerID, $excludeEmail){
+
+        if (!$customerID) {
+            $this->raiseError('customerID not passed');
+        }
+        $this->dbeContact->getOthersWorkUpdateRowsByCustomerID($customerID);
+        $emailList = [];
+        while ($this->dbeContact->fetchNext()) {
+            $currentContactEmail = strtolower($this->dbeContact->getValue(DBEContact::email));
+            if ($currentContactEmail === strtolower($excludeEmail)) {
+                continue;
+            }
+            if (array_key_exists($currentContactEmail, $emailList)) {
+                continue;
+            }
+            $emailList[$currentContactEmail] = $currentContactEmail;
+        }
+        return $emailList;
+    }
+
     /**
      *    Check dependent tables:
      *    Calls

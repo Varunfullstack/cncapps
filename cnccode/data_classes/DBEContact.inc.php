@@ -854,4 +854,13 @@ WHERE {$this->getDBColumnName(self::supportLevel)} is not null
         }
         return true;
     }
+
+    public function getOthersWorkUpdateRowsByCustomerID($customerID)
+    {
+        $this->setMethodName("getSpecialAttentionContacts");
+        $queryString = "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} where {$this->getDBColumnName(self::othersWorkUpdatesEmailFlag)} = 'Y' and active and {$this->getDBColumnName(DBEContact::customerID)}  = $customerID ORDER BY con_custno, con_contno";
+        $this->setQueryString($queryString);
+        $ret = (parent::getRows());
+        return $ret;
+    }
 }

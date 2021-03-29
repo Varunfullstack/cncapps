@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1316 - On site Visit Confirmation CC & BCC changes
+
 ## [v5.7.3] - 2021-03-29
 ### Added
 - Create a new one off script that allows to get the sage files sent for any given printed date
