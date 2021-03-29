@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 1314 - Scheduled SRs that are due on Mondays don't get created.
+
 ## [v5.7.4] - 2021-03-30
 ### Fixed
 - Only notify Non UK cctive contacts of UK National Holidays
@@ -40,7 +44,6 @@ This project changes will be shown here.
 - Issue 1297 - Task List Modal, refine list of items.
 - Issue 1267 - Customer Feedback Improvements.
 - Issue 1284 - Office 365 Backup Error Handling
-- Monitored SR email, Change Status: Awaiting Customer to Status: On Hold
 ### Fixed
 - Issue 1299 - Unexpected characters in PDF quotes
 - Issue 1300 - Remove 'leave this site' warning from Edit SR page.

@@ -225,7 +225,7 @@ try {
         );
         $dbeCallActivity->insertRow();
         if (!$hiddenFromCustomer) {
-            $buActivity->sendManuallyLoggedServiceRequestEmail($dbeProblem->getPKValue());
+            $buActivity->sendManuallyLoggedServiceRequestEmail($dbeCallActivity->getPKValue());
         }
         $logger->info('Successfully created SR ');
     }
