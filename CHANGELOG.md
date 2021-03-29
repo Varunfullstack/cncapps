@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 1312 - Amending a line in a Sales Order opens a new tab
+
 ## [v5.7.4] - 2021-03-30
 ### Fixed
 - Only notify Non UK cctive contacts of UK National Holidays
