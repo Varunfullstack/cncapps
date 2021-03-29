@@ -46,11 +46,15 @@ SupplierSearchComponent.propTypes = {
 
 document.renderSupplierSearchComponent = (domContainer, {inputId, supplierId, onChange}) => {
     const element = document.getElementById(inputId)
-    element.reactInstance = ReactDOM.render(React.createElement(SupplierSearchComponent, {
-        inputId,
-        supplierId,
-        onChange,
-    }), domContainer);
+    const renderedInstance =
+        ReactDOM.render(React.createElement(SupplierSearchComponent, {
+            inputId,
+            supplierId,
+            onChange,
+        }), domContainer);
+    if (element) {
+        element.reactInstance = renderedInstance;
+    }
 }
 
 document.unmountComponentAtNode = (node) => {

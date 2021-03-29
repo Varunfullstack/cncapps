@@ -62,7 +62,7 @@ class EngineerActivity
 }
 
 $outputEmails = isset($options['outputEmails']);
-$query = 'SELECT
+$query        = 'SELECT
   caa_callactivityno as activityId,
   cus_name as customerName,
   CONCAT(firstName, " ", lastName) AS engineerName,
@@ -81,7 +81,7 @@ FROM
     JOIN team ON consultant.`teamID` = team.`teamID`
   JOIN customer
     ON pro_custno = cus_custno
-WHERE CONCAT(t.caa_date," ",t.caa_starttime,":00") <= NOW() AND t.caa_endtime IS NULL
+WHERE CONCAT(caa_date," ",caa_starttime,":00") <= NOW() AND caa_endtime IS NULL
 ORDER BY engineerName,
   caa_date,
   pro_custno';                                                // and on-site
@@ -103,7 +103,7 @@ $engineers  = array_reduce(
     },
     []
 );
-$managers = [];
+$managers   = [];
 /**
  * @var int $engineerId
  * @var EngineerActivity[] $engineerActivities
@@ -152,7 +152,7 @@ foreach ($engineers as $engineerId => $engineerActivities) {
                 }
                 if (!isset($managers[$managerId]->minionConsultants[$engineerId])) {
                     $managers[$managerId]->minionConsultants[$engineerId] = (object)[
-                        "name"           => $engineerActivity->engineerName,
+                        "name"             => $engineerActivity->engineerName,
                         "activeActivities" => []
                     ];
                 }
@@ -188,16 +188,16 @@ foreach ($engineers as $engineerId => $engineerActivities) {
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-        $body = $buMail->mime->get($mime_params);
-        $sendTo = $logName . '@' . $domain;
-        $hdrs   = array(
+        $body        = $buMail->mime->get($mime_params);
+        $sendTo      = $logName . '@' . $domain;
+        $hdrs        = array(
             'To'           => $sendTo,
             'From'         => CONFIG_SUPPORT_EMAIL,
             'Subject'      => $emailSubject,
             'Content-Type' => 'text/html; charset=UTF-8'
         );
-        $hdrs = $buMail->mime->headers($hdrs);
-        $sent = $buMail->send(
+        $hdrs        = $buMail->mime->headers($hdrs);
+        $sent        = $buMail->send(
             $sendTo,
             $hdrs,
             $body
@@ -214,7 +214,7 @@ foreach ($engineers as $engineerId => $engineerActivities) {
 foreach ($managers as $managerId => $manager) {
     //get information about the manager
     $managersRows = $pdoDB->query('SELECT cns_logname FROM consultant WHERE cns_consno = ' . $managerId);
-    $managerRow = $managersRows->fetch(PDO::FETCH_ASSOC);
+    $managerRow   = $managersRows->fetch(PDO::FETCH_ASSOC);
     if (!$managerRow) {
         echo "<br>Manager with id $managerId not found, skipping<br>";
         continue;
@@ -288,7 +288,7 @@ foreach ($managers as $managerId => $manager) {
         $body = ob_get_contents();
         ob_end_clean();
         $emailSubject = "Your managed engineers have active requests";
-        $buMail = new BUMail($thing);
+        $buMail       = new BUMail($thing);
         $buMail->mime->setHTMLBody($body);
         $mime_params = array(
             'text_encoding' => '7bit',
@@ -296,16 +296,16 @@ foreach ($managers as $managerId => $manager) {
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-        $body   = $buMail->mime->get($mime_params);
-        $sendTo = $managerRow['cns_logname'] . '@' . $domain;
-        $hdrs   = array(
+        $body        = $buMail->mime->get($mime_params);
+        $sendTo      = $managerRow['cns_logname'] . '@' . $domain;
+        $hdrs        = array(
             'To'           => $sendTo,
             'From'         => CONFIG_SUPPORT_EMAIL,
             'Subject'      => $emailSubject,
             'Content-Type' => 'text/html; charset=UTF-8'
         );
-        $hdrs   = $buMail->mime->headers($hdrs);
-        $sent   = $buMail->send(
+        $hdrs        = $buMail->mime->headers($hdrs);
+        $sent        = $buMail->send(
             $sendTo,
             $hdrs,
             $body

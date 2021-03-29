@@ -1509,10 +1509,10 @@ class BUInvoice extends Business
                     $fileSize
                 )
             );
-            $dbeInvhead->setValue(
-                DBEInvhead::datePrinted,
-                $dateToUse
-            );
+//            $dbeInvhead->setValue(
+//                DBEInvhead::datePrinted,
+//                $dateToUse
+//            );
             $dbeInvhead->updateRow();
             unset($buPdfInvoice);
             $fileName = $invoiceId . '.pdf';
