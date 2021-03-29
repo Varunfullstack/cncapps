@@ -502,6 +502,14 @@
                     }
                 },
                 {
+                    data: "linkedOrderId", name: "linkedOrderId", render: (data, type, row, meta) => {
+                        if (!row.linkedOrderId) {
+                            return '';
+                        }
+                        return '<a href="SalesOrder.php?action=displaySalesOrder&ordheadID=' + row.linkedOrderId + '" target="_blank">' + data + '</a>';
+                    }
+                },
+                {
                     data: 'customerName',
                     name: 'customerName'
                 },
@@ -661,6 +669,9 @@
         </th>
         <th>
             SR Number
+        </th>
+        <th>
+            SO Number
         </th>
         <th>
             Customer
