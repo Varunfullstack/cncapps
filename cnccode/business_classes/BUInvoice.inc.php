@@ -1542,7 +1542,7 @@ class BUInvoice extends Business
     /**
      * @param array $invoiceNumbers
      */
-    private function sendSageSalesEmail(array $invoiceNumbers): void
+    public function sendSageSalesEmail(array $invoiceNumbers): void
     {
         $buMail = new BUMail($this);
         $this->buSageExport->generateSageSalesDataByInvoiceNumbers($invoiceNumbers);
