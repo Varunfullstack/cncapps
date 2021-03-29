@@ -1553,61 +1553,6 @@ class BUSalesOrder extends Business
         $dbeOrdhead->post();
     }
 
-    function updateServiceRequestDetails($ordheadID,
-                                         $serviceRequestCustomerItemID,
-                                         $serviceRequestPriority,
-                                         $serviceRequestInternalNote,
-                                         $serviceRequestTaskList
-    )
-    {
-        if (!$ordheadID) {
-            $this->raiseError('ordheadID not passed');
-        }
-        $dbeOrdhead = new DBEOrdhead($this);
-        if (!$dbeOrdhead->getRow($ordheadID)) {
-            $this->raiseError('order not found');
-        }
-        $dbeOrdhead->setUpdateModeUpdate();
-        $dbeOrdhead->setValue(
-            DBEOrdhead::serviceRequestCustomerItemID,
-            $serviceRequestCustomerItemID
-        );
-        $dbeOrdhead->setValue(
-            DBEOrdhead::serviceRequestPriority,
-            $serviceRequestPriority
-        );
-        $dbeOrdhead->setValue(
-            DBEOrdhead::serviceRequestInternalNote,
-            $serviceRequestInternalNote
-        );
-        $dbeOrdhead->setValue(
-            DBEOrdhead::serviceRequestTaskList,
-            $serviceRequestTaskList
-        );
-        $dbeOrdhead->post();
-    }
-
-    function deleteServiceRequestDetails($ordheadID)
-    {
-        if (!$ordheadID) {
-            $this->raiseError('ordheadID not passed');
-        }
-        $dbeOrdhead = new DBEOrdhead($this);
-        if (!$dbeOrdhead->getRow($ordheadID)) {
-            $this->raiseError('order not found');
-        }
-        $dbeOrdhead->setUpdateModeUpdate();
-        $dbeOrdhead->setValue(
-            DBEOrdhead::serviceRequestCustomerItemID,
-            null
-        );
-        $dbeOrdhead->setValue(
-            DBEOrdhead::serviceRequestInternalNote,
-            null
-        );
-        $dbeOrdhead->post();
-    }
-
     /**
      * get list of order lines for given order
      * amalgamate same item lines onto one
