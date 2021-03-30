@@ -567,7 +567,18 @@ class ActivityEditComponent extends MainComponent {
                         hideMinutesTitle: true
                     })
                 }) : null,
-            this.renderChargeableWorkIcon()
+            this.renderChargeableWorkIcon(),
+            data.what3Words?
+                <ToolTip
+                title="What3words"
+                content={<a
+                    className="fal fa-map-marker-alt fa-2x m-5 pointer icon"
+                    href={`https://what3words.com/${data?.what3Words}`}
+                    target="_blank"
+                    rel="noreferrer"></a>
+               }
+               />:null
+               
         );
     };
 
