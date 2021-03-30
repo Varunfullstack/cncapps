@@ -2260,7 +2260,6 @@ class CTSalesOrder extends CTCNC
                     'updatedTime' => $dsOrdhead->getValue(DBEOrdhead::updatedTime)
                 )
             );
-            $typeClass          = $dsOrdline->getValue(DBEOrdline::itemID) ? 'item' : 'comment';
             $salesOrderLineDesc = '<A onclick="editLinePopup(' . $dsOrdline->getValue(
                     DBEOrdline::id
                 ) . ')" class="updatedTimeLink" href="#">' . Controller::htmlDisplayText(
@@ -2285,7 +2284,7 @@ class CTSalesOrder extends CTCNC
         $this->template->set_var(
             array(
                 'salesOrderLineDesc' => $salesOrderLineDesc,
-                'description'        => $dsOrdline->getValue(DBEOrdline::description) . ' this is some testing',
+                'description'        => $dsOrdline->getValue(DBEOrdline::description),
                 'qtyOrdered'         => number_format($dsOrdline->getValue(DBEOrdline::qtyOrdered), 2, '.', ''),
                 'lineType'           => $dsOrdline->getValue(DBEOrdline::lineType),
                 'partNo'             => Controller::htmlDisplayText($dsOrdline->getValue(DBEJOrdline::partNo)),
@@ -3911,6 +3910,7 @@ class CTSalesOrder extends CTCNC
             )
         );
         $this->displaySalesOrderHeader($dsOrdhead);
+
         $this->orderLineForm($dsOrdhead);
         $this->template->parse(
             'salesOrderLineEditJS',
@@ -4437,40 +4437,56 @@ class CTSalesOrder extends CTCNC
         $dsInput->addColumn(
             self::etaDate,
             DA_DATE,
-            DA_NOT_NULL
+            DA_ALLOW_NULL
         );
         $dsInput->addColumn(
-            self::serviceRequestCustomerItemID,
+            DBEOrdhead::serviceRequestCustomerItemID,
             DA_INTEGER,
-            DA_NOT_NULL
+            DA_ALLOW_NULL
         );
         $dsInput->addColumn(
-            self::serviceRequestPriority,
+            DBEOrdhead::serviceRequestPriority,
             DA_INTEGER,
-            DA_NOT_NULL
+            DA_ALLOW_NULL
         );
         $dsInput->addColumn(
-            self::serviceRequestInternalNote,
+            DBEOrdhead::serviceRequestInternalNote,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsInput->addColumn(
-            self::serviceRequestTaskList,
+            DBEOrdhead::serviceRequestTaskList,
             DA_STRING,
             DA_ALLOW_NULL
         );
-        $dsInput->addColumn(
-            DBEProblem::emailSubjectSummary,
-            DA_STRING,
-            DA_NOT_NULL
-        );
+        /*
+    get existing values
+    */
+        if (!$dsOrdhead->getValue(DBEOrdhead::serviceRequestInternalNote)) {
+            $dsInput->setValue(
+                DBEOrdhead::serviceRequestInternalNote,
+                $dsOrdhead->getValue(DBEOrdhead::serviceRequestInternalNote)
+            );
+            $dsInput->setValue(
+                DBEOrdhead::serviceRequestCustomerItemID,
+                $dsOrdhead->getValue(DBEOrdhead::serviceRequestCustomerItemID)
+            );
+            $dsInput->setValue(
+                DBEOrdhead::serviceRequestPriority,
+                $dsOrdhead->getValue(DBEOrdhead::serviceRequestPriority)
+            );
+            $dsInput->setValue(
+                DBEOrdhead::serviceRequestTaskList,
+                $dsOrdhead->getValue(DBEOrdhead::serviceRequestInternalNote)
+            );
+        }
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             $formError = !$dsInput->populateFromArray($this->getParam('inputForm'));
-            if ($dsInput->getValue(self::serviceRequestCustomerItemID) == 99) {
+            if ($dsInput->getValue(DBEOrdhead::serviceRequestCustomerItemID) == 99) {
                 $formError = true;
             }
-            if ($dsInput->getValue(self::serviceRequestPriority) == 0) {
+            if ($dsInput->getValue(DBEOrdhead::serviceRequestPriority) == 0) {
                 $formError = true;
             }
             if (!$formError) {
@@ -4483,16 +4499,22 @@ class CTSalesOrder extends CTCNC
                         $this->getParam('selectedLines'),
                         $queue
                     );
+                } else {
+                    $this->buSalesOrder->updateServiceRequestDetails(
+                        $this->getOrdheadID(),
+                        $dsInput->getValue(DBEOrdhead::serviceRequestCustomerItemID),
+                        $dsInput->getValue(DBEOrdhead::serviceRequestPriority),
+                        $dsInput->getValue(DBEOrdhead::serviceRequestInternalNote),
+                        $dsInput->getValue(DBEOrdhead::serviceRequestTaskList)
+                    );
                 }
+                /*
+        redirect to order
+        */
                 header('Location: ' . $this->getDisplayOrderURL());
                 exit;
 
             }
-        } else {
-            $dsInput->setValue(
-                DBEProblem::emailSubjectSummary,
-                $buActivity->getSuitableEmailSubjectSummary($this->getOrdheadID(), $this->getParam('selectedLines'))
-            );
         }
         $this->setPageTitle("Service Request");
         $this->setTemplateFiles(
@@ -4515,24 +4537,24 @@ class CTSalesOrder extends CTCNC
         );
         $this->template->set_var(
             array(
-                'etaDate'                             => $dsInput->getValue(self::etaDate),
-                'etaDateMessage'                      => $dsInput->getMessage(self::etaDate),
-                self::serviceRequestInternalNote      => $dsInput->getValue(self::serviceRequestInternalNote),
-                self::serviceRequestTaskList          => $dsInput->getValue(self::serviceRequestTaskList),
-                'serviceRequestPriorityMessage'       => $dsInput->getMessage(self::serviceRequestPriority),
-                'serviceRequestCustomerItemIDMessage' => $dsInput->getMessage(
-                    self::serviceRequestCustomerItemID
+                'etaDate'                              => $dsInput->getValue(self::etaDate),
+                'etaDateMessage'                       => $dsInput->getMessage(self::etaDate),
+                DBEOrdhead::serviceRequestInternalNote => $dsInput->getValue(DBEOrdhead::serviceRequestInternalNote),
+                DBEOrdhead::serviceRequestTaskList     => $dsInput->getValue(DBEOrdhead::serviceRequestTaskList),
+                'serviceRequestPriorityMessage'        => $dsInput->getMessage(DBEOrdhead::serviceRequestPriority),
+                'serviceRequestCustomerItemIDMessage'  => $dsInput->getMessage(
+                    DBEOrdhead::serviceRequestCustomerItemID
                 ),
-                'urlSubmit'                           => $urlSubmit,
-                'salesOrderHeaderId'                  => $this->getOrdheadID()
+                'urlSubmit'                            => $urlSubmit,
+                'salesOrderHeaderId'                   => $this->getOrdheadID()
             )
         );
         $this->contractDropdown(
             $dsOrdhead->getValue(DBEOrdhead::customerID),
-            $dsInput->getValue(self::serviceRequestCustomerItemID)
+            $dsInput->getValue(DBEOrdhead::serviceRequestCustomerItemID)
         );
         $this->priorityDropdown(
-            $dsInput->getValue(self::serviceRequestPriority),
+            $dsInput->getValue(DBEOrdhead::serviceRequestPriority),
             $buActivity
         );
         $this->standardTextList(

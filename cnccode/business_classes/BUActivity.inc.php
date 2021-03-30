@@ -6223,19 +6223,16 @@ class BUActivity extends Business
         );
         $dateRaised              = date(DATE_MYSQL_DATE . ' ' . DATE_MYSQL_TIME);
         $timeRaised              = date(CONFIG_MYSQL_TIME_HOURS_MINUTES);
-        $cleanServiceRequestText = str_replace(
-            "\r\n",
-            "",
-            $dsInput->getValue(CTSalesOrder::serviceRequestInternalNote)
-        );
+        $cleanServiceRequestText = str_replace("\r\n", "", $dsInput->getValue(DBEOrdhead::serviceRequestInternalNote));
         $internalNotes           = "
-                            <p>Sales Order Number: {$ordheadID}</p>
-                            <p>{$cleanServiceRequestText}</p>
-                            ";
-        if ($dsInput->getValue(CTSalesOrder::etaDate)) {
+<p>Sales Order Number: {$ordheadID}</p>
+<p>{$cleanServiceRequestText}</p>";
+        if ($dsInput->getValue(BURenContract::etaDate)) {
             $internalNotes .= '<P>ETA: ' . Controller::dateYMDtoDMY(
-                    $dsInput->getValue(CTSalesOrder::etaDate)
+                    $dsInput->getValue(BURenContract::etaDate)
                 ) . '</P><BR/>';
+        } else {
+            $internalNotes .= '<P>ETA: TBA</P><BR/>';
         }
         /*
     Determine whether delivery is direct or via CNC and set a note accordingly
@@ -6265,13 +6262,13 @@ class BUActivity extends Business
             }
         }
         $slaResponseHours = $this->getSlaResponseHours(
-            $dsInput->getValue(CTSalesOrder::serviceRequestPriority),
+            $dsInput->getValue(BURenContract::serviceRequestPriority),
             $dsOrdhead->getValue(DBEOrdhead::customerID),
             $dsOrdhead->getValue(DBEOrdhead::delContactID)
         );
         $dbeProblem       = new DBEProblem($this);
-        if ($dsInput->getValue(CTSalesOrder::serviceRequestTaskList)) {
-            $dbeProblem->setValue(DBEProblem::taskList, $dsInput->getValue(CTSalesOrder::serviceRequestTaskList));
+        if ($dsInput->getValue(DBEOrdhead::serviceRequestTaskList)) {
+            $dbeProblem->setValue(DBEProblem::taskList, $dsInput->getValue(DBEOrdhead::serviceRequestTaskList));
             $dbeProblem->setValue(DBEProblem::taskListUpdatedBy, $GLOBALS['auth']->is_authenticated());
             $dbeProblem->setValue(
                 DBEProblem::taskListUpdatedAt,
@@ -6308,7 +6305,7 @@ class BUActivity extends Business
         );
         $dbeProblem->setValue(
             DBEJProblem::priority,
-            $dsInput->getValue(CTSalesOrder::serviceRequestPriority)
+            $dsInput->getValue(BURenContract::serviceRequestPriority)
         );
         $dbeProblem->setValue(
             DBEJProblem::hideFromCustomerFlag,
@@ -6318,12 +6315,12 @@ class BUActivity extends Business
             DBEJProblem::contactID,
             $dsOrdhead->getValue(DBEOrdhead::delContactID)
         );
-        if ($dsInput->getValue(CTSalesOrder::serviceRequestCustomerItemID) == -1) {
-            $dsInput->setValue(CTSalesOrder::serviceRequestCustomerItemID, null);
+        if ($dsInput->getValue(BURenContract::serviceRequestCustomerItemID) == -1) {
+            $dsInput->setValue(BURenContract::serviceRequestCustomerItemID, null);
         }
         $dbeProblem->setValue(
             DBEJProblem::contractCustomerItemID,
-            $dsInput->getValue(CTSalesOrder::serviceRequestCustomerItemID)
+            $dsInput->getValue(BURenContract::serviceRequestCustomerItemID)
         );
         $dbeProblem->setValue(
             DBEJProblem::linkedSalesOrderID,
@@ -6340,7 +6337,7 @@ class BUActivity extends Business
             $dsHeader->getValue(DBEHeader::holdAllSOProjectsP5sforQAReview)
         );
         $informCustomer = false;
-        if ($dsInput->getValue(CTSalesOrder::serviceRequestPriority) == 5) {
+        if ($dsInput->getValue(BURenContract::serviceRequestPriority) == 5) {
             $informCustomer      = true;
             $queueProblemColumn  = $queue == 3 ? DBEProblem::smallProjectsTeamLimitMinutes : DBEProblem::projectTeamLimitMinutes;
             $queueHeaderColumn   = $queue == 3 ? DBEHeader::smallProjectsTeamLimitMinutes : DBEHeader::projectTeamLimitMinutes;
@@ -6379,12 +6376,10 @@ class BUActivity extends Business
             }
         }
         $dbeProblem->setValue(DBEProblem::hdLimitMinutes, 10);
-        if (!$dsInput->getValue(CTSalesOrder::emailSubjectSummary)) {
-            $dbeProblem->setValue(
-                DBEProblem::emailSubjectSummary,
-                $this->getSuitableEmailSubjectSummary($ordheadID, $selectedOrderLine)
-            );
-        }
+        $dbeProblem->setValue(
+            DBEProblem::emailSubjectSummary,
+            $this->getSuitableEmailSubjectSummary($ordheadID, $selectedOrderLine)
+        );
         $dbeProblem->insertRow();
         $useCase             = new AddServiceRequestInternalNote(
             new ServiceRequestInternalNotePDORepository()
@@ -10916,7 +10911,7 @@ FROM
         return $dbeCallActivity;
     }
 
-    public function getSuitableEmailSubjectSummary($ordheadID, $selectedOrderLine)
+    private function getSuitableEmailSubjectSummary($ordheadID, $selectedOrderLine)
     {
         $ordline = new DBEOrdline($this);
         $ordline->getLinesForOrder($ordheadID);
