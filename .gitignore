@@ -2,7 +2,27 @@
 .idea/*
 htdocs/components/.idea/*
 /stencil/.idea
+<<<<<<< Updated upstream
 node_modules/
+=======
+<<<<<<< Updated upstream
+
+=======
+<<<<<<< Updated upstream
+node_modules/
+=======
+<<<<<<< Updated upstream
+
+=======
+node_modules/
+<<<<<<< Updated upstream
+=======
+/.vscode/
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 sessions/*
 logs/*
 cache/*
