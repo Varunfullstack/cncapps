@@ -1,49 +1,61 @@
 <script language='JavaScript'>
-function validateDelSiteDesc(){
-	if (Trim(document.getElementById("delSiteDesc").value) != ""){
-		window.open(
-			'{urlSitePopup}&customerID={customerID}'+
-			'&siteDesc=' + escape(document.getElementById("delSiteDesc").value) +
-			'&parentIDField=delSiteNo' +
-			'&parentDescField=delSiteDesc',
-			'address',
-			'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
-		)
-	}
-}
-function validateInvSiteDesc(){
-	if (Trim(document.getElementById("invSiteDesc").value) != ""){
-		window.open(
-			'{urlSitePopup}&customerID={customerID}'+
-			'&siteDesc=' + escape(document.getElementById("invSiteDesc").value) +
-			'&parentIDField=invSiteNo' +
-			'&parentDescField=invSiteDesc',
-			'address',
-			'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
-		)
-	}
-}
-function validateInvContactName(){
-	if (Trim(document.getElementById("invContactName").value) != ""){
-		window.open(
-			'{urlContactPopup}&contactName=' + escape(document.getElementById("invContactName").value)+
-			'&parentIDField=invContactID' +
-			'&parentDescField=invContactName',
-			'contact',
-			'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
-		)
-	}
-}
-function validateDelContactName(){
-	if (Trim(document.getElementById("delContactName").value) != ""){
-		window.open(
-			'{urlContactPopup}&contactName=' + escape(document.getElementById("delContactName").value)+
-//			'&siteNo=' +escape(document.getElementById("delSiteNo").value) +
-			'&parentIDField=delContactID' +
-			'&parentDescField=delContactName',
-			'contact',
-			'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
-		)
-	}
-}
+    function validateDelSiteDesc() {
+        if (Trim(document.getElementById("delSiteDesc").value) != "") {
+            window.open(
+                '{urlSitePopup}&customerID={customerID}' +
+                '&siteDesc=' + escape(document.getElementById("delSiteDesc").value) +
+                '&parentIDField=delSiteNo' +
+                '&parentDescField=delSiteDesc',
+                'address',
+                'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
+            )
+        }
+    }
+
+    function editLinePopup(lineId) {
+        const updatedTime = document.querySelector('input[name="updatedTime"]').value;
+        window.open(
+            "SalesOrder.php?action=editOrdline&lineId=" + lineId + "&updatedTime=" + updatedTime + "&htmlFmt=popup",
+            'Edit Line',
+            'scrollbars=yes,resizable=yes,width=1000,height=550,copyhistory=no, menubar=0'
+        )
+    }
+
+    function validateInvSiteDesc() {
+        if (Trim(document.getElementById("invSiteDesc").value) != "") {
+            window.open(
+                '{urlSitePopup}&customerID={customerID}' +
+                '&siteDesc=' + escape(document.getElementById("invSiteDesc").value) +
+                '&parentIDField=invSiteNo' +
+                '&parentDescField=invSiteDesc',
+                'address',
+                'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
+            )
+        }
+    }
+
+    function validateInvContactName() {
+        if (Trim(document.getElementById("invContactName").value) != "") {
+            window.open(
+                '{urlContactPopup}&contactName=' + escape(document.getElementById("invContactName").value) +
+                '&parentIDField=invContactID' +
+                '&parentDescField=invContactName',
+                'contact',
+                'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
+            )
+        }
+    }
+
+    function validateDelContactName() {
+        if (Trim(document.getElementById("delContactName").value) != "") {
+            window.open(
+                '{urlContactPopup}&contactName=' + escape(document.getElementById("delContactName").value) +
+                //			'&siteNo=' +escape(document.getElementById("delSiteNo").value) +
+                '&parentIDField=delContactID' +
+                '&parentDescField=delContactName',
+                'contact',
+                'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
+            )
+        }
+    }
 </script>

@@ -2240,6 +2240,7 @@ class CTSalesOrder extends CTCNC
                     'action'      => CTSALESORDER_ACT_EDIT_ORDLINE,
                     'lineId'      => $dsOrdline->getValue(DBEOrdline::id),
                     'updatedTime' => $dsOrdhead->getValue(DBEOrdhead::updatedTime),
+                    'htmlFmt'     => CT_HTML_FMT_POPUP
                 )
             );
             // common to comment and item lines
@@ -2259,7 +2260,10 @@ class CTSalesOrder extends CTCNC
                     'updatedTime' => $dsOrdhead->getValue(DBEOrdhead::updatedTime)
                 )
             );
-            $salesOrderLineDesc = '<A class="updatedTimeLink" href="' . $urlEditLine . '" target="_blank">' . Controller::htmlDisplayText(
+            $typeClass          = $dsOrdline->getValue(DBEOrdline::itemID) ? 'item' : 'comment';
+            $salesOrderLineDesc = '<A onclick="editLinePopup(' . $dsOrdline->getValue(
+                    DBEOrdline::id
+                ) . ')" class="updatedTimeLink" href="#">' . Controller::htmlDisplayText(
                     $dsOrdline->getValue(DBEOrdline::description)
                 ) . '</A>';
         } else {
@@ -2281,7 +2285,7 @@ class CTSalesOrder extends CTCNC
         $this->template->set_var(
             array(
                 'salesOrderLineDesc' => $salesOrderLineDesc,
-                'description'        => $dsOrdline->getValue(DBEOrdline::description),
+                'description'        => $dsOrdline->getValue(DBEOrdline::description) . ' this is some testing',
                 'qtyOrdered'         => number_format($dsOrdline->getValue(DBEOrdline::qtyOrdered), 2, '.', ''),
                 'lineType'           => $dsOrdline->getValue(DBEOrdline::lineType),
                 'partNo'             => Controller::htmlDisplayText($dsOrdline->getValue(DBEJOrdline::partNo)),
@@ -2291,10 +2295,6 @@ class CTSalesOrder extends CTCNC
                     'id',
                     $dsOrdline->getValue(DBEOrdline::id)
                 )) ? CT_CHECKED : null,
-                //                'urlMoveLineUp'      => $urlMoveLineUp,
-                //                'urlMoveLineDown'    => $urlMoveLineDown,
-                //                'moveUpHidden'       => $ordline->isFirst() ? 'hidden' : null,
-                //                'moveDownHidden'     => $ordline->isLast() ? 'hidden' : null,
                 'removeDescription'  => $removeDescription,
                 'urlEditLine'        => $urlEditLine,
                 'urlDeleteLine'      => $urlDeleteLine,
@@ -3954,7 +3954,6 @@ class CTSalesOrder extends CTCNC
                 $oneOffSequenceNumber,
                 $recurringSequenceNumber
             );
-            header('Location: ' . $this->getDisplayOrderURL());
             exit;
         }
         if ($this->getParam('ordline')[1]['lineType'] == 'O') {
@@ -3962,7 +3961,6 @@ class CTSalesOrder extends CTCNC
                 $oneOffSequenceNumber,
                 $recurringSequenceNumber
             );
-            header('Location: ' . $this->getDisplayOrderURL());
             exit;
         }
         $this->dsOrdline = new DataSet($this);
@@ -4162,7 +4160,7 @@ class CTSalesOrder extends CTCNC
         } else {
             $this->buSalesOrder->updateOrderLine($this->dsOrdline);
         }
-        header('Location: ' . $this->getDisplayOrderURL());
+        echo "<script>window.opener.location.reload(true); window.close();</script>";
     }
 
     /**
@@ -4517,16 +4515,16 @@ class CTSalesOrder extends CTCNC
         );
         $this->template->set_var(
             array(
-                'etaDate'                              => $dsInput->getValue(self::etaDate),
-                'etaDateMessage'                       => $dsInput->getMessage(self::etaDate),
-                self::serviceRequestInternalNote => $dsInput->getValue(self::serviceRequestInternalNote),
-                self::serviceRequestTaskList     => $dsInput->getValue(self::serviceRequestTaskList),
-                'serviceRequestPriorityMessage'        => $dsInput->getMessage(self::serviceRequestPriority),
-                'serviceRequestCustomerItemIDMessage'  => $dsInput->getMessage(
+                'etaDate'                             => $dsInput->getValue(self::etaDate),
+                'etaDateMessage'                      => $dsInput->getMessage(self::etaDate),
+                self::serviceRequestInternalNote      => $dsInput->getValue(self::serviceRequestInternalNote),
+                self::serviceRequestTaskList          => $dsInput->getValue(self::serviceRequestTaskList),
+                'serviceRequestPriorityMessage'       => $dsInput->getMessage(self::serviceRequestPriority),
+                'serviceRequestCustomerItemIDMessage' => $dsInput->getMessage(
                     self::serviceRequestCustomerItemID
                 ),
-                'urlSubmit'                            => $urlSubmit,
-                'salesOrderHeaderId'                   => $this->getOrdheadID()
+                'urlSubmit'                           => $urlSubmit,
+                'salesOrderHeaderId'                  => $this->getOrdheadID()
             )
         );
         $this->contractDropdown(

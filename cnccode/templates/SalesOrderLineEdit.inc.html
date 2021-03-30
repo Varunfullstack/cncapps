@@ -8,13 +8,29 @@
 <script>
     let partNumberRow;
     let itemIdInput;
+    let lineTypeSelectorElement;
+    let itemDescriptionInput;
+    let qtyOrderedInput;
+    let curUnitCostInput;
+    let curUnitSaleInput
+    let reactSupplierContainer;
+    let supplierIDElement;
+    let isReactElementRendered = false;
+    let hookedListeners = false;
+
+    document.addEventListener('beforeunload', () => {
+        window.opener.location.reload();
+    })
     document.addEventListener('DOMContentLoaded', () => {
-        const reactSupplierContainer = document.getElementById('reactSupplierSearchContainer');
-        const supplierIDElement = document.getElementById('supplierID');
-        document.renderSupplierSearchComponent(reactSupplierContainer, {
-            inputId: 'supplierID',
-            supplierId: Number(supplierIDElement.value)
-        })
+        reactSupplierContainer = document.getElementById('reactSupplierSearchContainer');
+        supplierIDElement = document.getElementById('supplierID');
+        lineTypeSelectorElement = document.getElementById('lineType');
+
+        itemDescriptionInput = document.getElementById("itemDescription");
+        qtyOrderedInput = document.getElementById("qtyOrdered");
+        curUnitCostInput = document.getElementById("curUnitCost");
+        curUnitSaleInput = document.querySelector("input[name='ordline[1][curUnitSale]']");
+
 
         itemIdInput = document.getElementById('itemID');
         itemIdInput.addEventListener('change', ($event) => {
@@ -22,6 +38,7 @@
         })
         partNumberRow = document.getElementById('partNumberRow');
         updatePartNumber();
+        checkInputs();
     })
 
     async function updatePartNumber() {
@@ -69,6 +86,46 @@
     function itemIdChanged($event) {
         console.log($event.target.value);
     }
+
+
+    function checkItemDescriptionFunctionKey() {
+        return checkFunctionKey('itemDescription');
+    }
+
+    function checkInputs() {
+        const lineType = lineTypeSelectorElement.value;
+
+        if (lineType === 'I') {
+            qtyOrderedInput.disabled = false;
+            curUnitCostInput.disabled = false;
+            curUnitSaleInput.disabled = false;
+            document.renderSupplierSearchComponent(reactSupplierContainer, {
+                inputId: 'supplierID',
+                supplierId: Number(supplierIDElement.value)
+            })
+            isReactElementRendered = true;
+            if (!hookedListeners) {
+                itemDescriptionInput.addEventListener('change', validateItemDescription)
+                itemDescriptionInput.addEventListener('keydown', checkItemDescriptionFunctionKey)
+                hookedListeners = true;
+            }
+        } else {
+
+            if (isReactElementRendered) {
+                document.unmountComponentAtNode(reactSupplierContainer);
+                isReactElementRendered = false;
+            }
+            if (hookedListeners) {
+                itemDescriptionInput.removeEventListener('change', validateItemDescription)
+                itemDescriptionInput.removeEventListener('keydown', checkItemDescriptionFunctionKey)
+                hookedListeners = false;
+            }
+            qtyOrderedInput.disabled = true;
+            curUnitCostInput.disabled = true;
+            curUnitSaleInput.disabled = true;
+        }
+    }
+
 </SCRIPT>
 <table width="910px"
        border="0"
@@ -133,6 +190,7 @@
                         type="text"
                         id="lineType"
                         name="ordline[1][lineType]"
+                        onchange="checkInputs()"
                 >
                     <!-- BEGIN lineTypeBlock -->
                     <option {lineTypeSelected}
@@ -150,8 +208,6 @@
                        name="ordline[1][description]"
                        id="itemDescription"
                        value="{description}"
-                       onChange="javascript:validateItemDescription()"
-                       onKeydown="javascript:checkFunctionKey(itemDescription)"
                        size="70"
                        maxlength="70"
                 >
@@ -230,7 +286,7 @@
                 <input type="button"
                        name="Cancel"
                        value="Cancel"
-                       onClick="document.location='{urlCancel}';"
+                       onClick="window.close();"
                 >
                 <input type="reset"
                        name="Reset"
