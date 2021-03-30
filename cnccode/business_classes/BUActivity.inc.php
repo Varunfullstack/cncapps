@@ -6229,7 +6229,7 @@ class BUActivity extends Business
             $dsInput->getValue(CTSalesOrder::serviceRequestInternalNote)
         );
         $internalNotes           = "
-<p>Sales Order Number: {$ordheadID}</p>
+                            <p>Sales Order Number: {$ordheadID}</p>
                             <p>{$cleanServiceRequestText}</p>
                             ";
         if ($dsInput->getValue(CTSalesOrder::etaDate)) {
@@ -6380,10 +6380,10 @@ class BUActivity extends Business
         }
         $dbeProblem->setValue(DBEProblem::hdLimitMinutes, 10);
         if (!$dsInput->getValue(CTSalesOrder::emailSubjectSummary)) {
-        $dbeProblem->setValue(
-            DBEProblem::emailSubjectSummary,
-            $this->getSuitableEmailSubjectSummary($ordheadID, $selectedOrderLine)
-        );
+            $dbeProblem->setValue(
+                DBEProblem::emailSubjectSummary,
+                $this->getSuitableEmailSubjectSummary($ordheadID, $selectedOrderLine)
+            );
         }
         $dbeProblem->insertRow();
         $useCase             = new AddServiceRequestInternalNote(
