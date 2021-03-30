@@ -60,15 +60,17 @@ $query =
     "SELECT 
       con_email,
       con_first_name,
-      con_last_name
+      con_last_name,
+      ACTIVE
     FROM
       contact 
       LEFT JOIN address 
         ON address.`add_custno` = con_custno 
         AND address.`add_siteno` = con_siteno 
-    WHERE (supportLevel = 'support' or supportLevel = 'main')
+    WHERE (supportLevel = 'support' OR supportLevel = 'main')
       AND address.`add_active_flag` = 'Y'
-      AND address.add_non_uk_flag = 'Y'";
+      AND address.add_non_uk_flag = 'Y'
+      AND contact.ACTIVE='1'";
 
 
 $result = $db1->query($query);

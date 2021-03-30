@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.7.4] - 2021-03-30
+### Fixed
+- Only notify Non UK cctive contacts of UK National Holidays
+
 ## [v5.7.3] - 2021-03-29
 ### Added
 - Create a new one off script that allows to get the sage files sent for any given printed date
