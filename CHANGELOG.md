@@ -2,6 +2,10 @@
 This project changes will be shown here.
 
 ## [unreleased]
+### Added
+- Issue 1286 - Add Generate Password Icon to Edit SR page
+### Changed
+- Issue 1276 - Monitored SR email, Change Status: Awaiting Customer to Status: On Hold
 ### Fixed
 - Issue 1314 - Scheduled SRs that are due on Mondays don't get created.
 
