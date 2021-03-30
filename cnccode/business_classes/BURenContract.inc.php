@@ -535,7 +535,7 @@ class BURenContract extends Business
                     );
                     $dsInput->setValue(
                         CTSalesOrder::serviceRequestCustomerItemID,
-                        null
+                        $renContractId
                     );
                     $dsInput->setValue(
                         CTSalesOrder::serviceRequestPriority,
