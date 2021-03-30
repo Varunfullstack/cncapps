@@ -1,8 +1,5 @@
 # Changelog
 This project changes will be shown here.
-## [unreleased] - 2021-03-25
-### Changed
-- Monitored SR email, Change Status: Awaiting Customer to Status: On Hold
 
 ## [v5.7.4] - 2021-03-30
 ### Fixed
@@ -43,6 +40,7 @@ This project changes will be shown here.
 - Issue 1297 - Task List Modal, refine list of items.
 - Issue 1267 - Customer Feedback Improvements.
 - Issue 1284 - Office 365 Backup Error Handling
+- Monitored SR email, Change Status: Awaiting Customer to Status: On Hold
 ### Fixed
 - Issue 1299 - Unexpected characters in PDF quotes
 - Issue 1300 - Remove 'leave this site' warning from Edit SR page.
