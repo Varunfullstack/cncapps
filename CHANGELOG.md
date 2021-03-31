@@ -1,9 +1,7 @@
 # Changelog
 This project changes will be shown here.
-## [unreleased] - 2021-03-25
-### Changed
-- 1273 include email subject into CurrentActivityReport.php
-- 1273 auto populate the Email Subject Summary from the email subject TBL
+
+
 
 ## [unreleased]
 ### Added
@@ -14,6 +12,7 @@ This project changes will be shown here.
 - Issue 1296 - Make Project Stage required and set default value to Pre-planning
 - Issue 1316 - On site Visit Confirmation CC & BCC changes
 - Issue 1292 - Call Back processing open in a new tab
+- Issue 1273 - Include email subject into CurrentActivityReport.php and auto populate the Email Subject Summary from the email subject TBL
 ### Fixed
 - Issue 1314 - Scheduled SRs that are due on Mondays don't get created.
 
