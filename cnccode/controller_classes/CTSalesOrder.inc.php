@@ -4471,21 +4471,21 @@ class CTSalesOrder extends CTCNC
             if ($dsInput->getValue(self::serviceRequestPriority) == 0) {
                 $formError = true;
             }
-
             if (!$dsInput->getValue(DBEProblem::emailSubjectSummary)) {
+                $formError = true;
+            }
+            if (!$dsInput->getValue(self::etaDate)) {
                 $formError = true;
             }
             if (!$formError) {
 
                 $queue = $_REQUEST['queue'] == "Create For Small Projects" ? 3 : 5;
-                if ($dsInput->getValue(self::etaDate)) {
-                    $buActivity->createSalesServiceRequest(
-                        $this->getOrdheadID(),
-                        $dsInput,
-                        $this->getParam('selectedLines'),
-                        $queue
-                    );
-                }
+                $buActivity->createSalesServiceRequest(
+                    $this->getOrdheadID(),
+                    $dsInput,
+                    $this->getParam('selectedLines'),
+                    $queue
+                );
                 header('Location: ' . $this->getDisplayOrderURL());
                 exit;
 

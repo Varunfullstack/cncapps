@@ -6322,6 +6322,13 @@ class BUActivity extends Business
         if ($serviceRequestCustomerItemID == -1) {
             $serviceRequestCustomerItemID = null;
         }
+        $dbeProblem->setValue(DBEProblem::emailSubjectSummary, $dsInput->getValue(CTSalesOrder::emailSubjectSummary));
+        if (!$dsInput->getValue(CTSalesOrder::emailSubjectSummary)) {
+            $dbeProblem->setValue(
+                DBEProblem::emailSubjectSummary,
+                $this->getSuitableEmailSubjectSummary($ordheadID, $selectedOrderLine)
+            );
+        }
         $dbeProblem->setValue(
             DBEJProblem::contractCustomerItemID,
             $dsInput->getValue(CTSalesOrder::serviceRequestCustomerItemID)
@@ -6380,12 +6387,6 @@ class BUActivity extends Business
             }
         }
         $dbeProblem->setValue(DBEProblem::hdLimitMinutes, 10);
-        if (!$dsInput->getValue(CTSalesOrder::emailSubjectSummary)) {
-            $dbeProblem->setValue(
-                DBEProblem::emailSubjectSummary,
-                $this->getSuitableEmailSubjectSummary($ordheadID, $selectedOrderLine)
-            );
-        }
         $dbeProblem->insertRow();
         $useCase             = new AddServiceRequestInternalNote(
             new ServiceRequestInternalNotePDORepository()
