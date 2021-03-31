@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1319 - Don't allow SR to be Fixed when there's an outstanding call back
+
 ## [v5.7.4] - 2021-03-30
 ### Fixed
 - Only notify Non UK cctive contacts of UK National Holidays
