@@ -9,6 +9,7 @@ This project changes will be shown here.
 - Issue 1310 - Show sales orders on overtime page.
 - Issue 1296 - Make Project Stage required and set default value to Pre-planning
 - Issue 1316 - On site Visit Confirmation CC & BCC changes
+- Issue 1292 - Call Back processing open in a new tab
 ### Fixed
 - Issue 1314 - Scheduled SRs that are due on Mondays don't get created.
 
