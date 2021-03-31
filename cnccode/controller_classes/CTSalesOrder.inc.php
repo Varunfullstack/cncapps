@@ -3909,6 +3909,7 @@ class CTSalesOrder extends CTCNC
                 'SalesOrderLineEditJS'  => 'SalesOrderLineEditJS.inc' // javascript
             )
         );
+        $this->template->setVar('isPopup', $this->getParam('htmlFmt') ? 'true' : 'false');
         $this->displaySalesOrderHeader($dsOrdhead);
         $this->orderLineForm($dsOrdhead);
         $this->template->parse(
@@ -4159,7 +4160,7 @@ class CTSalesOrder extends CTCNC
         } else {
             $this->buSalesOrder->updateOrderLine($this->dsOrdline);
         }
-        if ($this->getParam('htmlFmt')) {
+        if ($this->getParam('isPopup') && json_decode($this->getParam('isPopup'))) {
 
             echo "<script>window.opener.location.reload(true); window.close();</script>";
             exit;
