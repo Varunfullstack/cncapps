@@ -1,5 +1,9 @@
 # Changelog
 This project changes will be shown here.
+## [unreleased] - 2021-03-25
+### Changed
+- 1273 include email subject into CurrentActivityReport.php
+- 1273 auto populate the Email Subject Summary from the email subject TBL
 
 ## [unreleased]
 ### Added

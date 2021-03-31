@@ -573,7 +573,7 @@ class LastStepComponent extends MainComponent {
                 )
             )
         );
-    };
+    }
 
     deleteDocument = (file) => {
         let {data} = this.state;

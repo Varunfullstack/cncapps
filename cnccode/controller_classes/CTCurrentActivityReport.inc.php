@@ -295,6 +295,7 @@ class CTCurrentActivityReport extends CTCNC
                         'cpUrlCustomer'       => $urlCustomer,
                         'cpBgColor'           => $bgColour,
                         'cpCount'             => $count,
+                        'emailSubject'        => $customerRaisedRequests->Record['emailSubject']
                     )
                 );
             } while ($customerRaisedRequests->next_record());

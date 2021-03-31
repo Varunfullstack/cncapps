@@ -6701,7 +6701,8 @@ FROM
         cus_name,
         con_custno,
         con_first_name,
-        con_last_name
+        con_last_name,
+        customerproblem.emailSubject
       FROM
         customerproblem
         LEFT JOIN contact ON con_contno = cpr_contno
