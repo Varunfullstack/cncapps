@@ -184,11 +184,7 @@ class DailyReportComponent extends MainComponent {
         const {filter, data} = this.state;
         switch (filter.activeTab) {
             case this.TAB_DETAILS:
-                return <DetailsComponent data={data}
-                                         onChange={() => {
-                                             this.loadTab(filter.activeTab)
-                                         }}
-                />
+                return <DetailsComponent data={data}/>
             case this.TAB_SUMMARY:
                 return <SummaryComponent data={data}/>
             case this.TAB_GRAPH:

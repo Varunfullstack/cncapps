@@ -2,18 +2,12 @@ import MainComponent from "../../shared/MainComponent";
 import React from 'react';
 import Table from "../../shared/table/table";
 import {dateFormatExcludeNull, exportCSV, SRQueues} from "../../utils/utils";
-import CurrentActivityService from "../../CurrentActivityReportComponent/services/CurrentActivityService";
 
 class DetailsComponent extends MainComponent {
 
-    apiCurrentActivityService = new CurrentActivityService();
-
     constructor(props) {
         super(props);
-        this.state = {
-            ...this.state,
-            allocatedUsers: []
-        }
+
     }
 
     componentWillUnmount() {
@@ -21,61 +15,8 @@ class DetailsComponent extends MainComponent {
     }
 
     componentDidMount() {
-        this.apiCurrentActivityService
-            .getAllocatedUsers()
-            .then((res) => this.setState({allocatedUsers: res}));
+
     }
-
-    handleUserOnSelect = (engineerName, serviceRequestID) => {
-        const {allocatedUsers} = this.state;
-        const foundEngineer = allocatedUsers.find(x => x.userName === engineerName);
-        const engineerId = foundEngineer.userID;
-        this.apiCurrentActivityService
-            .allocateUser(serviceRequestID, engineerId)
-            .then(() => {
-                if (this.props.onChange) {
-                    this.props.onChange();
-                }
-            })
-
-    };
-
-    getAllocatedElement = (serviceRequest) => {
-        const {handleUserOnSelect} = this;
-        const {allocatedUsers} = this.state;
-        const teamData = {
-            'Helpdesk': {id: 1, title: 'Helpdesk'},
-            'Escalations': {id: 2, title: 'Escalations',},
-            'Small Projects': {id: 4, title: 'Small Projects'},
-            'Projects': {id: 5, title: 'Projects'},
-            'Sales': {id: 7, title: 'Sales',},
-        }
-
-        const teamId = teamData[serviceRequest.teamName]?.id;
-        const currentTeam = allocatedUsers.filter((u) => u.teamID == teamId);
-        const otherTeams = allocatedUsers.filter((u) => u.teamID !== teamId);
-        return (
-            <select
-
-                key={"allocatedUser"}
-                value={serviceRequest.assignedTo || ""}
-                style={{width: '120px'}}
-                onChange={(event) => handleUserOnSelect(event.target.value, serviceRequest.serviceRequestID)}
-            >
-                <option key="unassigned"/>
-                {
-                    [...currentTeam, ...otherTeams].map(p => {
-                        return <option value={p.userName}
-                                       className={teamId === p.teamID ? "in-team" : ''}
-                                       key={`option-${p.userID}`}
-                        >
-                            {p.userName}
-                        </option>
-                    })
-                }
-            </select>
-        );
-    };
 
     getDetailsElement = () => {
         const {data} = this.props;
@@ -128,9 +69,7 @@ class DetailsComponent extends MainComponent {
                 icon: "fal fa-2x fa-user-hard-hat color-gray2 pointer",
                 sortable: true,
                 classNameColumn: "rowClass",
-                content: (sr) => {
-                    return this.getAllocatedElement(sr)
-                }
+                //className: "text-center",
 
             },
             {
