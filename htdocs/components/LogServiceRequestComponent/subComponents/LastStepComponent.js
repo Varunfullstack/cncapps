@@ -585,6 +585,40 @@ class LastStepComponent extends MainComponent {
         data.internalDocuments = data.internalDocuments.filter(f => f.name !== file.name);
         this.setState({data});
     }
+
+    onFixOrChangeChanged = ($event) => {
+        const {value} = $event.target;
+        let {data} = this.state;
+        let newPriority = data.priority;
+        if(value === 'F'){
+
+        }
+        this.setValue({fixOrChange: value})
+    }
+
+    renderFixOrChange = () => {
+        const {fixOrChange} = this.state;
+        return (
+            <tr>
+                <td>
+                    <label>
+                        Is it fix or a change?
+                    </label>
+                </td>
+                <td>
+                    <select value={fixOrChange}
+                            onChange={this.onFixOrChangeChanged}
+                            style={{width: 200}}
+                    >
+                        <option>Select Requirement</option>
+                        <option value="F">Fix Needed</option>
+                        <option value="C">Change Required</option>
+                    </select>
+                </td>
+            </tr>
+        )
+    }
+
     getElements = () => {
         const {
             el,
@@ -608,6 +642,7 @@ class LastStepComponent extends MainComponent {
                 this.getAuthorizeByElement(),
                 this.getContactsElement(),
                 getProblemPriority(),
+                renderFixOrChange(),
                 getCheckList(),
                 this.getQueueElement()
             )
