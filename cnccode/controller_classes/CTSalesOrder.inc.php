@@ -295,6 +295,11 @@ class CTSalesOrder extends CTCNC
     const CREATE_PURCHASE_ORDERS            = "CREATE_PURCHASE_ORDERS";
     const COPY_TO_ORDER                     = "COPY_TO_ORDER";
     const CONVERT_TO_ORDER                  = "CONVERT_TO_ORDER";
+    const serviceRequestCustomerItemID      = "serviceRequestCustomerItemID";
+    const serviceRequestPriority            = "serviceRequestPriority";
+    const serviceRequestInternalNote        = "serviceRequestInternalNote";
+    const serviceRequestTaskList            = "serviceRequestTaskList";
+    const emailSubjectSummary               = "emailSubjectSummary";
     /** @var */
     public $customerID;
     /** @var */
@@ -1579,72 +1584,70 @@ class CTSalesOrder extends CTCNC
         }
         $this->template->set_var(
             array(
-                'customerID'                   => $dsOrdhead->getValue(DBEOrdhead::customerID),
-                'invContact'                   => $dsOrdhead->getValue(
+                'customerID'           => $dsOrdhead->getValue(DBEOrdhead::customerID),
+                'invContact'           => $dsOrdhead->getValue(
                         DBEOrdhead::invContactSalutation
                     ) . ' ' . $dsOrdhead->getValue(
                         DBEOrdhead::invContactName
                     ),
-                'invContactID'                 => $dsOrdhead->getValue(DBEOrdhead::invContactID),
-                'delContactID'                 => $dsOrdhead->getValue(DBEOrdhead::delContactID),
-                'invContactPhone'              => $dsOrdhead->getValue(DBEOrdhead::invContactPhone),
-                'invSitePhone'                 => $dsOrdhead->getValue(DBEOrdhead::invSitePhone),
-                'invContactFax'                => $dsOrdhead->getValue(DBEOrdhead::invContactFax),
-                'invContactEmail'              => $dsOrdhead->getValue(DBEOrdhead::invContactEmail),
-                'invSiteNo'                    => $dsOrdhead->getValue(DBEOrdhead::invSiteNo),
-                'invAdd1'                      => $dsOrdhead->getValue(DBEOrdhead::invAdd1),
-                'invAdd2'                      => $dsOrdhead->getValue(DBEOrdhead::invAdd2),
-                'invAdd3'                      => $dsOrdhead->getValue(DBEOrdhead::invAdd3),
-                'invTown'                      => $dsOrdhead->getValue(DBEOrdhead::invTown),
-                'invCounty'                    => $dsOrdhead->getValue(DBEOrdhead::invCounty),
-                'invPostcode'                  => $dsOrdhead->getValue(DBEOrdhead::invPostcode),
-                'delContact'                   => $dsOrdhead->getValue(
+                'invContactID'         => $dsOrdhead->getValue(DBEOrdhead::invContactID),
+                'delContactID'         => $dsOrdhead->getValue(DBEOrdhead::delContactID),
+                'invContactPhone'      => $dsOrdhead->getValue(DBEOrdhead::invContactPhone),
+                'invSitePhone'         => $dsOrdhead->getValue(DBEOrdhead::invSitePhone),
+                'invContactFax'        => $dsOrdhead->getValue(DBEOrdhead::invContactFax),
+                'invContactEmail'      => $dsOrdhead->getValue(DBEOrdhead::invContactEmail),
+                'invSiteNo'            => $dsOrdhead->getValue(DBEOrdhead::invSiteNo),
+                'invAdd1'              => $dsOrdhead->getValue(DBEOrdhead::invAdd1),
+                'invAdd2'              => $dsOrdhead->getValue(DBEOrdhead::invAdd2),
+                'invAdd3'              => $dsOrdhead->getValue(DBEOrdhead::invAdd3),
+                'invTown'              => $dsOrdhead->getValue(DBEOrdhead::invTown),
+                'invCounty'            => $dsOrdhead->getValue(DBEOrdhead::invCounty),
+                'invPostcode'          => $dsOrdhead->getValue(DBEOrdhead::invPostcode),
+                'delContact'           => $dsOrdhead->getValue(
                         DBEOrdhead::delContactSalutation
                     ) . ' ' . $dsOrdhead->getValue(
                         DBEOrdhead::delContactName
                     ),
-                'delContactPhone'              => $dsOrdhead->getValue(DBEOrdhead::delContactPhone),
-                'delSitePhone'                 => $dsOrdhead->getValue(DBEOrdhead::delSitePhone),
-                'delContactFax'                => $dsOrdhead->getValue(DBEOrdhead::delContactFax),
-                'delContactEmail'              => $dsOrdhead->getValue(DBEOrdhead::delContactEmail),
-                'delSiteNo'                    => $dsOrdhead->getValue(DBEOrdhead::delSiteNo),
-                'delAdd1'                      => $dsOrdhead->getValue(DBEOrdhead::delAdd1),
-                'delAdd2'                      => $dsOrdhead->getValue(DBEOrdhead::delAdd2),
-                'delAdd3'                      => $dsOrdhead->getValue(DBEOrdhead::delAdd3),
-                'delTown'                      => $dsOrdhead->getValue(DBEOrdhead::delTown),
-                'delCounty'                    => $dsOrdhead->getValue(DBEOrdhead::delCounty),
-                'delPostcode'                  => $dsOrdhead->getValue(DBEOrdhead::delPostcode),
-                'ordheadID'                    => $dsOrdhead->getValue(DBEOrdhead::ordheadID),
-                'serviceRequestCustomerItemID' => $dsOrdhead->getValue(DBEOrdhead::serviceRequestCustomerItemID),
-                'serviceRequestText'           => $dsOrdhead->getValue(DBEOrdhead::serviceRequestInternalNote),
-                'markupOriginalQuote'          => $markupOriginalQuote,
-                'urlUpdateDelAddress'          => $urlUpdateDelAddress,
-                'urlUpdateInvAddress'          => $urlUpdateInvAddress,
-                'urlUpdateDelContact'          => $urlUpdateDelContact,
-                'urlUpdateInvContact'          => $urlUpdateInvContact,
-                'urlUpdateHeader'              => $urlUpdateHeader,
-                'urlDeleteOrder'               => $urlDeleteOrder,
-                'txtDeleteOrder'               => $txtDeleteOrder,
-                'urlSitePopup'                 => $urlSitePopup,
-                'urlSiteEdit'                  => $urlSiteEdit,
-                'urlCustomerDisplay'           => $urlCustomerDisplay,
-                'urlContactPopup'              => $urlContactPopup,
-                'urlContactEdit'               => $urlContactEdit,
-                'urlRenewalReport'             => $urlRenewalReport,
-                'txtRenewalReport'             => $txtRenewalReport,
-                'txtCustomerNote'              => $txtCustomerNote,
-                'urlCustomerNote'              => $urlCustomerNote,
-                'linesMessage'                 => $this->getLinesMessage(),
-                'lineValidationError'          => $this->lineValidationError,
-                'restrictedView'               => $restrictedView,
-                'readOnly'                     => $readOnly,
-                'valuesDisabled'               => $valuesDisabled,
-                'updatedTime'                  => $dsOrdhead->getValue(DBEOrdhead::updatedTime),
-                'currentDocumentsLink'         => $this->getCurrentDocumentsLink(
+                'delContactPhone'      => $dsOrdhead->getValue(DBEOrdhead::delContactPhone),
+                'delSitePhone'         => $dsOrdhead->getValue(DBEOrdhead::delSitePhone),
+                'delContactFax'        => $dsOrdhead->getValue(DBEOrdhead::delContactFax),
+                'delContactEmail'      => $dsOrdhead->getValue(DBEOrdhead::delContactEmail),
+                'delSiteNo'            => $dsOrdhead->getValue(DBEOrdhead::delSiteNo),
+                'delAdd1'              => $dsOrdhead->getValue(DBEOrdhead::delAdd1),
+                'delAdd2'              => $dsOrdhead->getValue(DBEOrdhead::delAdd2),
+                'delAdd3'              => $dsOrdhead->getValue(DBEOrdhead::delAdd3),
+                'delTown'              => $dsOrdhead->getValue(DBEOrdhead::delTown),
+                'delCounty'            => $dsOrdhead->getValue(DBEOrdhead::delCounty),
+                'delPostcode'          => $dsOrdhead->getValue(DBEOrdhead::delPostcode),
+                'ordheadID'            => $dsOrdhead->getValue(DBEOrdhead::ordheadID),
+                'markupOriginalQuote'  => $markupOriginalQuote,
+                'urlUpdateDelAddress'  => $urlUpdateDelAddress,
+                'urlUpdateInvAddress'  => $urlUpdateInvAddress,
+                'urlUpdateDelContact'  => $urlUpdateDelContact,
+                'urlUpdateInvContact'  => $urlUpdateInvContact,
+                'urlUpdateHeader'      => $urlUpdateHeader,
+                'urlDeleteOrder'       => $urlDeleteOrder,
+                'txtDeleteOrder'       => $txtDeleteOrder,
+                'urlSitePopup'         => $urlSitePopup,
+                'urlSiteEdit'          => $urlSiteEdit,
+                'urlCustomerDisplay'   => $urlCustomerDisplay,
+                'urlContactPopup'      => $urlContactPopup,
+                'urlContactEdit'       => $urlContactEdit,
+                'urlRenewalReport'     => $urlRenewalReport,
+                'txtRenewalReport'     => $txtRenewalReport,
+                'txtCustomerNote'      => $txtCustomerNote,
+                'urlCustomerNote'      => $urlCustomerNote,
+                'linesMessage'         => $this->getLinesMessage(),
+                'lineValidationError'  => $this->lineValidationError,
+                'restrictedView'       => $restrictedView,
+                'readOnly'             => $readOnly,
+                'valuesDisabled'       => $valuesDisabled,
+                'updatedTime'          => $dsOrdhead->getValue(DBEOrdhead::updatedTime),
+                'currentDocumentsLink' => $this->getCurrentDocumentsLink(
                     $dsOrdhead->getValue(DBEOrdhead::customerID),
                     $this->buCustomer
                 ),
-                'projectLink'                  => $projectLink
+                'projectLink'          => $projectLink
             )
         );
         $buRenewal = null;
@@ -2237,6 +2240,7 @@ class CTSalesOrder extends CTCNC
                     'action'      => CTSALESORDER_ACT_EDIT_ORDLINE,
                     'lineId'      => $dsOrdline->getValue(DBEOrdline::id),
                     'updatedTime' => $dsOrdhead->getValue(DBEOrdhead::updatedTime),
+                    'htmlFmt'     => CT_HTML_FMT_POPUP
                 )
             );
             // common to comment and item lines
@@ -2256,7 +2260,9 @@ class CTSalesOrder extends CTCNC
                     'updatedTime' => $dsOrdhead->getValue(DBEOrdhead::updatedTime)
                 )
             );
-            $salesOrderLineDesc = '<A class="updatedTimeLink" href="' . $urlEditLine . '" target="_blank">' . Controller::htmlDisplayText(
+            $salesOrderLineDesc = '<A onclick="editLinePopup(' . $dsOrdline->getValue(
+                    DBEOrdline::id
+                ) . ')" class="updatedTimeLink" href="#">' . Controller::htmlDisplayText(
                     $dsOrdline->getValue(DBEOrdline::description)
                 ) . '</A>';
         } else {
@@ -2288,10 +2294,6 @@ class CTSalesOrder extends CTCNC
                     'id',
                     $dsOrdline->getValue(DBEOrdline::id)
                 )) ? CT_CHECKED : null,
-                //                'urlMoveLineUp'      => $urlMoveLineUp,
-                //                'urlMoveLineDown'    => $urlMoveLineDown,
-                //                'moveUpHidden'       => $ordline->isFirst() ? 'hidden' : null,
-                //                'moveDownHidden'     => $ordline->isLast() ? 'hidden' : null,
                 'removeDescription'  => $removeDescription,
                 'urlEditLine'        => $urlEditLine,
                 'urlDeleteLine'      => $urlDeleteLine,
@@ -3907,6 +3909,7 @@ class CTSalesOrder extends CTCNC
                 'SalesOrderLineEditJS'  => 'SalesOrderLineEditJS.inc' // javascript
             )
         );
+        $this->template->setVar('isPopup', $this->getParam('htmlFmt') ? 'true' : 'false');
         $this->displaySalesOrderHeader($dsOrdhead);
         $this->orderLineForm($dsOrdhead);
         $this->template->parse(
@@ -3952,7 +3955,6 @@ class CTSalesOrder extends CTCNC
                 $oneOffSequenceNumber,
                 $recurringSequenceNumber
             );
-            header('Location: ' . $this->getDisplayOrderURL());
             exit;
         }
         if ($this->getParam('ordline')[1]['lineType'] == 'O') {
@@ -3960,7 +3962,6 @@ class CTSalesOrder extends CTCNC
                 $oneOffSequenceNumber,
                 $recurringSequenceNumber
             );
-            header('Location: ' . $this->getDisplayOrderURL());
             exit;
 
         }
@@ -4161,7 +4162,14 @@ class CTSalesOrder extends CTCNC
         } else {
             $this->buSalesOrder->updateOrderLine($this->dsOrdline);
         }
-        header('Location: ' . $this->getDisplayOrderURL());
+        if ($this->getParam('isPopup') && json_decode($this->getParam('isPopup'))) {
+
+            echo "<script>window.opener.location.reload(true); window.close();</script>";
+            exit;
+        } else {
+            header('Location: ' . $this->getDisplayOrderURL());
+            exit;
+        }
     }
 
     /**
