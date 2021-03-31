@@ -35,6 +35,7 @@ require_once($cfg['path_bu'] . '/BUUser.inc.php');
 require_once($cfg['path_bu'] . '/BURootCause.inc.php');
 require_once($cfg['path_bu'] . '/BUActivityType.inc.php');
 require_once($cfg['path_dbe'] . '/DBEJCallActType.php');
+require_once($cfg['path_dbe'] . '/DBECallBack.inc.php');
 require_once($cfg['path_dbe'] . '/DBEJCallActivity.php');
 
 class CTSRActivity extends CTCNC
@@ -377,6 +378,8 @@ class CTSRActivity extends CTCNC
             $taskListUpdatedBy = $consultants[$taskListUpdatedByUserId];
         }
         $currentLoggedInUser = $this->getDbeUser();
+        $callback            = new DBECallback($this);
+        $pendingCallbacks    = $callback->pendingCallbackCountForServiceRequest($problemID);
         return [
             "callActivityID"                  => $callActivityID,
             "problemID"                       => $problemID,
@@ -492,7 +495,8 @@ class CTSRActivity extends CTCNC
             "emailsubjectsummary"             => $dbeProblem->getValue(DBEProblem::emailSubjectSummary),
             "taskList"                        => $dbeProblem->getValue(DBEProblem::taskList),
             "taskListUpdatedAt"               => $dbeProblem->getValue(DBEProblem::taskListUpdatedAt),
-            "taskListUpdatedBy"               => $taskListUpdatedBy
+            "taskListUpdatedBy"               => $taskListUpdatedBy,
+            'pendingCallbacks'                => $pendingCallbacks
         ];
     }
 
@@ -769,6 +773,11 @@ class CTSRActivity extends CTCNC
                 ) > 0) {
                 http_response_code(400);
                 return ["error" => 'Can not fix, there are open activities on this request'];
+            }
+            $callback = new DBECallback($this);
+            if ($callback->pendingCallbackCountForServiceRequest($problemID)) {
+                http_response_code(400);
+                return ["error" => 'Can not fix, there are outstanding callbacks on this request'];
             }
             //check Hold all SRs for QA Review
             if ($this->dbeUser->getValue(DBEUser::holdAllSRsforQAReview) == 1) {
