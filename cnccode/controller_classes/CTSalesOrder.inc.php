@@ -3910,7 +3910,6 @@ class CTSalesOrder extends CTCNC
             )
         );
         $this->displaySalesOrderHeader($dsOrdhead);
-
         $this->orderLineForm($dsOrdhead);
         $this->template->parse(
             'salesOrderLineEditJS',
@@ -4160,7 +4159,14 @@ class CTSalesOrder extends CTCNC
         } else {
             $this->buSalesOrder->updateOrderLine($this->dsOrdline);
         }
-        echo "<script>window.opener.location.reload(true); window.close();</script>";
+        if ($this->getParam('htmlFmt')) {
+
+            echo "<script>window.opener.location.reload(true); window.close();</script>";
+            exit;
+        } else {
+            header('Location: ' . $this->getDisplayOrderURL());
+            exit;
+        }
     }
 
     /**
