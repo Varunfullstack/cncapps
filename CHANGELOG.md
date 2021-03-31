@@ -12,6 +12,7 @@ This project changes will be shown here.
 - Issue 1292 - Call Back processing open in a new tab
 - Issue 1273 - Include email subject into CurrentActivityReport.php and auto populate the Email Subject Summary from the email subject TBL
 - Issue 1298 - Ask if request is a change or a fix when logging
+- Issue 1318 - Allocate SRs from Aged SRs page
 ### Fixed
 - Issue 1314 - Scheduled SRs that are due on Mondays don't get created.
 - Issue 1317 - Duplication of lines in Sales Orders
