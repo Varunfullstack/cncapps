@@ -1,5 +1,8 @@
 # Changelog
 This project changes will be shown here.
+## [unreleased] - 2021-03-30
+### Changed
+-  Make Project Stage required and set default value to Pre-planning
 
 ## [unreleased]
 ### Added
