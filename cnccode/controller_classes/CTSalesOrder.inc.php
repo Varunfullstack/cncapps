@@ -4493,7 +4493,7 @@ class CTSalesOrder extends CTCNC
         } else {
             $dsInput->setValue(
                 DBEProblem::emailSubjectSummary,
-                $buActivity->getSuitableEmailSubjectSummary($this->getOrdheadID(), $this->getParam('selectedLines'))
+                htmlentities($buActivity->getSuitableEmailSubjectSummary($this->getOrdheadID(), $this->getParam('selectedLines')))
             );
             $dsInput->setValue(
                 self::serviceRequestPriority,

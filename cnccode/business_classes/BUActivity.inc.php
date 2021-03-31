@@ -6326,13 +6326,12 @@ class BUActivity extends Business
             DBEJProblem::contractCustomerItemID,
             $serviceRequestCustomerItemID
         );
-        $dbeProblem->setValue(DBEProblem::emailSubjectSummary, $dsInput->getValue(CTSalesOrder::emailSubjectSummary));
-        if (!$dsInput->getValue(CTSalesOrder::emailSubjectSummary)) {
-            $dbeProblem->setValue(
-                DBEProblem::emailSubjectSummary,
-                $this->getSuitableEmailSubjectSummary($ordheadID, $selectedOrderLine)
-            );
+
+        $emailSubjectSummary = $dsInput->getValue(CTSalesOrder::emailSubjectSummary);
+        if (!$emailSubjectSummary) {
+            $emailSubjectSummary = $this->getSuitableEmailSubjectSummary($ordheadID, $selectedOrderLine);
         }
+        $dbeProblem->setValue(DBEProblem::emailSubjectSummary, $emailSubjectSummary);
         $dbeProblem->setValue(
             DBEJProblem::linkedSalesOrderID,
             $ordheadID
