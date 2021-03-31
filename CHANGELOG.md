@@ -13,6 +13,7 @@ This project changes will be shown here.
 - Issue 1273 - Include email subject into CurrentActivityReport.php and auto populate the Email Subject Summary from the email subject TBL
 ### Fixed
 - Issue 1314 - Scheduled SRs that are due on Mondays don't get created.
+- Issue 1317 - Duplication of lines in Sales Orders
 
 ## [v5.7.4] - 2021-03-30
 ### Fixed

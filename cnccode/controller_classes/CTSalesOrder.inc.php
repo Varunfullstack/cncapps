@@ -3908,7 +3908,6 @@ class CTSalesOrder extends CTCNC
             )
         );
         $this->displaySalesOrderHeader($dsOrdhead);
-
         $this->orderLineForm($dsOrdhead);
         $this->template->parse(
             'salesOrderLineEditJS',
@@ -3937,6 +3936,7 @@ class CTSalesOrder extends CTCNC
      */
     function updateOrderLine()
     {
+
         $this->setMethodName('updateOrderLine');
         $oneOffSequenceNumber = null;
         if ($this->getParam('oneOffSequenceNumber')) {
@@ -3946,7 +3946,7 @@ class CTSalesOrder extends CTCNC
         if ($this->getParam('recurringSequenceNumber')) {
             $recurringSequenceNumber = $this->getParam('recurringSequenceNumber');
         }
-        // pasting lines from another Sales Order
+        $this->setOrdheadID($this->getParam('ordline')[1]['ordheadID']);
         if ($this->getParam('ordline')[1]['lineType'] == 'T') {
             $this->pasteLinesFromQuotationTemplate(
                 $oneOffSequenceNumber,
@@ -3962,6 +3962,7 @@ class CTSalesOrder extends CTCNC
             );
             header('Location: ' . $this->getDisplayOrderURL());
             exit;
+
         }
         $this->dsOrdline = new DataSet($this);
         $dbeOrdline      = new DBEOrdline($this);
@@ -4197,7 +4198,6 @@ class CTSalesOrder extends CTCNC
             $oneOffSequenceNumber,
             $recurringSequenceNumber
         );
-        $this->displayOrder();
     }
 
     /**
@@ -4235,7 +4235,6 @@ class CTSalesOrder extends CTCNC
             $oneOffSequenceNumber,
             $recurringSequenceNumber
         );
-        $this->displayOrder();
     }
 
     /**
