@@ -168,6 +168,7 @@ FROM
     AND items
 WHERE problem.`pro_custno` <> 282 
   AND problem.raiseTypeId = 3
+  and problem.pro_priority < 4
   AND engineer.`teamID` = 1 ";
         if ($customerID) {
             $query .= " and pro_custno = " . $customerID;

@@ -181,10 +181,10 @@ FROM
         JOIN
     customer ON problem.`pro_custno` = customer.`cus_custno`
 WHERE
-
+       
         problem.pro_custno = ?
   and initial.caa_date between ? and ?
-        AND pro_priority < 5";
+        AND pro_priority < 4";
                 if ($isBreakDown) {
                     $query = "SELECT 
     pro_priority as priority,
@@ -282,7 +282,7 @@ WHERE
 
         problem.pro_custno = ?
   and initial.caa_date between ? and ?
-        AND pro_priority < 5
+        AND pro_priority < 4
         group by pro_priority
         order by pro_priority ";
                 }
@@ -663,7 +663,7 @@ FROM
   JOIN customer
     ON problem.`pro_custno` = customer.`cus_custno`
 WHERE  caa_date between ? and ?
-  AND pro_priority < 5';
+  AND pro_priority < 4';
                 if ($isBreakDown) {
                     $query = 'SELECT
        pro_priority as priority,
@@ -701,7 +701,7 @@ FROM
     ON problem.`pro_custno` = customer.`cus_custno`
 WHERE 
  caa_date between ? and ?
-  AND pro_priority < 5 
+  AND pro_priority < 4 
   group by pro_priority
         order by pro_priority';
                 }
