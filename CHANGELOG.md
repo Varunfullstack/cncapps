@@ -14,6 +14,7 @@ This project changes will be shown here.
 ### Fixed
 - Issue 1314 - Scheduled SRs that are due on Mondays don't get created.
 - Issue 1317 - Duplication of lines in Sales Orders
+- Issue 1315 - OBRS update path & Check Now
 
 ## [v5.7.4] - 2021-03-30
 ### Fixed
