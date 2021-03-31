@@ -6322,6 +6322,10 @@ class BUActivity extends Business
         if ($serviceRequestCustomerItemID == -1) {
             $serviceRequestCustomerItemID = null;
         }
+        $dbeProblem->setValue(
+            DBEJProblem::contractCustomerItemID,
+            $serviceRequestCustomerItemID
+        );
         $dbeProblem->setValue(DBEProblem::emailSubjectSummary, $dsInput->getValue(CTSalesOrder::emailSubjectSummary));
         if (!$dsInput->getValue(CTSalesOrder::emailSubjectSummary)) {
             $dbeProblem->setValue(
@@ -6329,10 +6333,6 @@ class BUActivity extends Business
                 $this->getSuitableEmailSubjectSummary($ordheadID, $selectedOrderLine)
             );
         }
-        $dbeProblem->setValue(
-            DBEJProblem::contractCustomerItemID,
-            $dsInput->getValue(CTSalesOrder::serviceRequestCustomerItemID)
-        );
         $dbeProblem->setValue(
             DBEJProblem::linkedSalesOrderID,
             $ordheadID
