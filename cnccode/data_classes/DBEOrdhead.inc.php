@@ -7,63 +7,60 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEOrdhead extends DBEntity
 {
-    const INITIAL_TYPE                 = 'I';
-    const ordheadID                    = "ordheadID";
-    const customerID                   = "customerID";
-    const type                         = "type";
-    const partInvoice                  = "partInvoice";
-    const date                         = "date";
-    const requestedDate                = "requestedDate";
-    const promisedDate                 = "promisedDate";
-    const expectedDate                 = "expectedDate";
-    const quotationOrdheadID           = "quotationOrdheadID";
-    const custPORef                    = "custPORef";
-    const vatCode                      = "vatCode";
-    const vatRate                      = "vatRate";
-    const invSiteNo                    = "invSiteNo";
-    const invAdd1                      = "invAdd1";
-    const invAdd2                      = "invAdd2";
-    const invAdd3                      = "invAdd3";
-    const invTown                      = "invTown";
-    const invCounty                    = "invCounty";
-    const invPostcode                  = "invPostcode";
-    const invContactID                 = "invContactID";
-    const invContactName               = "invContactName";
-    const invContactSalutation         = "invContactSalutation";
-    const invContactPhone              = "invContactPhone";
-    const invSitePhone                 = "invSitePhone";
-    const invContactFax                = "invContactFax";
-    const invContactEmail              = "invContactEmail";
-    const delSiteNo                    = "delSiteNo";
-    const delAdd1                      = "delAdd1";
-    const delAdd2                      = "delAdd2";
-    const delAdd3                      = "delAdd3";
-    const delTown                      = "delTown";
-    const delCounty                    = "delCounty";
-    const delPostcode                  = "delPostcode";
-    const delContactID                 = "delContactID";
-    const delContactName               = "delContactName";
-    const delContactSalutation         = "delContactSalutation";
-    const delContactPhone              = "delContactPhone";
-    const delSitePhone                 = "delSitePhone";
-    const delContactFax                = "delContactFax";
-    const delContactEmail              = "delContactEmail";
-    const debtorCode                   = "debtorCode";
-    const wip                          = "wip";
-    const consultantID                 = "consultantID";
-    const paymentTermsID               = "paymentTermsID";
-    const addItem                      = "addItem";
-    const callID                       = "callID";
-    const quotationSubject             = "quotationSubject";
-    const quotationIntroduction        = "quotationIntroduction";
-    const updatedTime                  = "updatedTime";
-    const serviceRequestCustomerItemID = "serviceRequestCustomerItemID";
-    const serviceRequestPriority       = "serviceRequestPriority";
-    const serviceRequestInternalNote   = "serviceRequestInternalNote";
-    const quotationCreateDate          = "quotationCreateDate";
-    const directDebitFlag              = "ordhead.directDebitFlag";
-    const transactionType              = 'ordhead.transactionType';
-    const serviceRequestTaskList       = "serviceRequestTaskList";
+    const INITIAL_TYPE           = 'I';
+    const ordheadID              = "ordheadID";
+    const customerID             = "customerID";
+    const type                   = "type";
+    const partInvoice            = "partInvoice";
+    const date                   = "date";
+    const requestedDate          = "requestedDate";
+    const promisedDate           = "promisedDate";
+    const expectedDate           = "expectedDate";
+    const quotationOrdheadID     = "quotationOrdheadID";
+    const custPORef              = "custPORef";
+    const vatCode                = "vatCode";
+    const vatRate                = "vatRate";
+    const invSiteNo              = "invSiteNo";
+    const invAdd1                = "invAdd1";
+    const invAdd2                = "invAdd2";
+    const invAdd3                = "invAdd3";
+    const invTown                = "invTown";
+    const invCounty              = "invCounty";
+    const invPostcode            = "invPostcode";
+    const invContactID           = "invContactID";
+    const invContactName         = "invContactName";
+    const invContactSalutation   = "invContactSalutation";
+    const invContactPhone        = "invContactPhone";
+    const invSitePhone           = "invSitePhone";
+    const invContactFax          = "invContactFax";
+    const invContactEmail        = "invContactEmail";
+    const delSiteNo              = "delSiteNo";
+    const delAdd1                = "delAdd1";
+    const delAdd2                = "delAdd2";
+    const delAdd3                = "delAdd3";
+    const delTown                = "delTown";
+    const delCounty              = "delCounty";
+    const delPostcode            = "delPostcode";
+    const delContactID           = "delContactID";
+    const delContactName         = "delContactName";
+    const delContactSalutation   = "delContactSalutation";
+    const delContactPhone        = "delContactPhone";
+    const delSitePhone           = "delSitePhone";
+    const delContactFax          = "delContactFax";
+    const delContactEmail        = "delContactEmail";
+    const debtorCode             = "debtorCode";
+    const wip                    = "wip";
+    const consultantID           = "consultantID";
+    const paymentTermsID         = "paymentTermsID";
+    const addItem                = "addItem";
+    const callID                 = "callID";
+    const quotationSubject       = "quotationSubject";
+    const quotationIntroduction  = "quotationIntroduction";
+    const updatedTime            = "updatedTime";
+    const quotationCreateDate    = "quotationCreateDate";
+    const directDebitFlag        = "ordhead.directDebitFlag";
+    const transactionType        = 'ordhead.transactionType';
+    const serviceRequestTaskList = "serviceRequestTaskList";
 
     /**
      * calls constructor()
@@ -367,30 +364,6 @@ class DBEOrdhead extends DBEntity
             self::updatedTime,
             DA_DATETIME,
             DA_ALLOW_NULL
-        );
-        $this->addColumn(
-            self::serviceRequestCustomerItemID,
-            DA_ID,
-            DA_ALLOW_NULL,
-            'odh_service_request_custitemno'
-        );
-        $this->addColumn(
-            self::serviceRequestPriority,
-            DA_ID,
-            DA_ALLOW_NULL,
-            'odh_service_request_priority'
-        );
-        $this->addColumn(
-            self::serviceRequestInternalNote,
-            DA_MEMO,
-            DA_ALLOW_NULL,
-            'serviceRequestInternalNote'
-        );
-        $this->addColumn(
-            self::serviceRequestTaskList,
-            DA_MEMO,
-            DA_ALLOW_NULL,
-            'serviceRequestTaskList'
         );
         $this->addColumn(
             self::quotationCreateDate,

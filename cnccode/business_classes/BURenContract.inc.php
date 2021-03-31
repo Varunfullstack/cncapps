@@ -19,10 +19,8 @@ require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 
 class BURenContract extends Business
 {
-    const etaDate                       = 'etaDate';
-    const serviceRequestCustomerItemID  = 'serviceRequestCustomerItemID';
-    const serviceRequestPriority        = 'serviceRequestPriority';
-    const SERVICE_REQUEST_INTERNAL_NOTE = 'serviceRequestInternalNote';
+    const etaDate = 'etaDate';
+
 
     var $dbeRenContract  = "";
     var $dbeJRenContract = "";
@@ -496,32 +494,32 @@ class BURenContract extends Business
                     $this->addSSLCertificateComment($dbeOrdline, $dsOrdhead);
                     $dsInput = new DSForm($this);
                     $dsInput->addColumn(
-                        self::etaDate,
+                        CTSalesOrder::etaDate,
                         DA_DATE,
-                        DA_ALLOW_NULL
+                        DA_NOT_NULL
                     );
                     $dsInput->addColumn(
-                        self::serviceRequestCustomerItemID,
+                        CTSalesOrder::serviceRequestCustomerItemID,
                         DA_INTEGER,
                         DA_ALLOW_NULL
                     );
                     $dsInput->addColumn(
-                        self::serviceRequestPriority,
+                        CTSalesOrder::serviceRequestPriority,
                         DA_INTEGER,
-                        DA_ALLOW_NULL
+                        DA_NOT_NULL
                     );
                     $dsInput->addColumn(
-                        self::SERVICE_REQUEST_INTERNAL_NOTE,
+                        CTSalesOrder::serviceRequestInternalNote,
                         DA_STRING,
                         DA_ALLOW_NULL
                     );
                     $dsInput->addColumn(
-                        DBEOrdhead::serviceRequestTaskList,
+                        CTSalesOrder::serviceRequestTaskList,
                         DA_STRING,
                         DA_ALLOW_NULL
                     );
                     $dsInput->setValue(
-                        self::etaDate,
+                        CTSalesOrder::etaDate,
                         date('Y-m-d')
                     );
                     $internalNotes      = $dsRenContract->getValue(DBEJRenContract::internalNotes);
@@ -532,17 +530,18 @@ class BURenContract extends Business
                         onto: <a href="' . SITE_URL . '/RenContract.php?action=edit&ID=' . $renContractId . '">Contract</a></p> 
                         <p>Please check that the above SSL Certificate is still required before renewing</p>';
                     $dsInput->setValue(
-                        self::SERVICE_REQUEST_INTERNAL_NOTE,
+                        CTSalesOrder::serviceRequestInternalNote,
                         $serviceRequestText
                     );
                     $dsInput->setValue(
-                        self::serviceRequestCustomerItemID,
-                        null
+                        CTSalesOrder::serviceRequestCustomerItemID,
+                        $renContractId
                     );
                     $dsInput->setValue(
-                        self::serviceRequestPriority,
+                        CTSalesOrder::serviceRequestPriority,
                         5
                     );
+                    $dsInput->setValue(CTSalesOrder::emailSubjectSummary, 'SSL Certificate Installation');
                     $buActivity->createSalesServiceRequest(
                         $dsOrdhead->getValue(DBEOrdhead::ordheadID),
                         $dsInput,
