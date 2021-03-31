@@ -8,6 +8,7 @@ This project changes will be shown here.
 - Issue 1276 - Monitored SR email, Change Status: Awaiting Customer to Status: On Hold
 - Issue 1310 - Show sales orders on overtime page.
 - Issue 1296 - Make Project Stage required and set default value to Pre-planning
+- Issue 1316 - On site Visit Confirmation CC & BCC changes
 ### Fixed
 - Issue 1314 - Scheduled SRs that are due on Mondays don't get created.
 
