@@ -8,6 +8,12 @@ import React from 'react';
 import DragAndDropUploaderComponent from "../../shared/DragAndDropUploaderComponent/DragAndDropUploaderComponent";
 import ToolTip from "../../shared/ToolTip";
 
+
+const FixOrChangeValue = {
+    FIX: 'F',
+    CHANGE: 'C'
+}
+
 class LastStepComponent extends MainComponent {
     el = React.createElement;
 
@@ -27,13 +33,14 @@ class LastStepComponent extends MainComponent {
             requireAuthorize: false,
             prioritiesDescriptions: [],
             isAllowedToLeave: false,
+            fixOrChange: '',
             data: {
                 uploadFiles: [],
                 repeatProblem: data.repeatProblem || false,
                 criticalSRFlag: data.criticalSRFlag || false,
                 hideFromCustomerFlag: data.hideFromCustomerFlag || false,
                 monitorSRFlag: data.monitorSRFlag || false,
-                priority: data.priority || -1,
+                priority: data.priority || '',
                 checkList: data.checkList || "",
                 contactID: data.contactID || -1,
                 startTime: data.startTime || "",
@@ -201,6 +208,7 @@ class LastStepComponent extends MainComponent {
     getNextButton = () => {
         const {el} = this;
         const {customer} = this.props.data;
+        const {fixOrChange, data} = this.state;
         return el(
             "div",
             {
@@ -219,7 +227,7 @@ class LastStepComponent extends MainComponent {
                 {onClick: this.addToQueue, className: "float-right"},
                 "Add To Queue"
             ),
-            !this.state.data.startWork && customer.hasServiceDesk
+            !data.startWork && customer.hasServiceDesk && fixOrChange !== FixOrChangeValue.CHANGE
                 ? el(
                 "button",
                 {onClick: this.handleStartWork, className: "ml-5 float-right"},
@@ -245,7 +253,7 @@ class LastStepComponent extends MainComponent {
     };
     getProblemPriority = () => {
         const {el, setValue} = this;
-        const {data, prioritiesDescriptions} = this.state;
+        const {data, prioritiesDescriptions, fixOrChange} = this.state;
         return el(
             "tr",
             null,
@@ -259,9 +267,17 @@ class LastStepComponent extends MainComponent {
                         value: data.priority,
                         onChange: (event) => setValue("priority", event.target.value),
                         style: {width: 200},
+                        disabled: !fixOrChange
                     },
-                    el("option", {value: -1}, "Select Priority"),
-                    ...prioritiesDescriptions.map(x => {
+                    el("option", {value: ''}, "Select Priority"),
+                    ...prioritiesDescriptions.filter(x => {
+                        if (fixOrChange === FixOrChangeValue.FIX) {
+                            return x.id < 4;
+                        }
+                        if (fixOrChange === FixOrChangeValue.CHANGE) {
+                            return x.id >= 4;
+                        }
+                    }).map(x => {
                         return <option value={x.id}>
                             {x.description}
                         </option>
@@ -469,7 +485,7 @@ class LastStepComponent extends MainComponent {
             return false;
         }
 
-        if (data.priority == -1) {
+        if (!data.priority) {
             this.alert("Please select priority");
             return false;
         }
@@ -519,7 +535,7 @@ class LastStepComponent extends MainComponent {
 
     handleFileSelected(files) {
         this.setState({data: {...this.state.data, uploadFiles: [...files]}});
-    };
+    }
 
     handleInternalDocumentAdded(files) {
         this.setState({data: {...this.state.data, internalDocuments: [...files]}});
@@ -573,7 +589,7 @@ class LastStepComponent extends MainComponent {
                 )
             )
         );
-    };
+    }
 
     deleteDocument = (file) => {
         let {data} = this.state;
@@ -589,11 +605,7 @@ class LastStepComponent extends MainComponent {
     onFixOrChangeChanged = ($event) => {
         const {value} = $event.target;
         let {data} = this.state;
-        let newPriority = data.priority;
-        if(value === 'F'){
-
-        }
-        this.setValue({fixOrChange: value})
+        this.setState({fixOrChange: value, data: {...data, priority: ''}})
     }
 
     renderFixOrChange = () => {
@@ -610,9 +622,9 @@ class LastStepComponent extends MainComponent {
                             onChange={this.onFixOrChangeChanged}
                             style={{width: 200}}
                     >
-                        <option>Select Requirement</option>
-                        <option value="F">Fix Needed</option>
-                        <option value="C">Change Required</option>
+                        <option value=''>Select Requirement</option>
+                        <option value={FixOrChangeValue.FIX}>Fix Needed</option>
+                        <option value={FixOrChangeValue.CHANGE}>Change Required</option>
                     </select>
                 </td>
             </tr>
@@ -641,8 +653,8 @@ class LastStepComponent extends MainComponent {
                 getmonitorSRFlag(),
                 this.getAuthorizeByElement(),
                 this.getContactsElement(),
+                this.renderFixOrChange(),
                 getProblemPriority(),
-                renderFixOrChange(),
                 getCheckList(),
                 this.getQueueElement()
             )
