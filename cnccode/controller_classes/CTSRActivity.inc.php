@@ -35,6 +35,7 @@ require_once($cfg['path_bu'] . '/BUUser.inc.php');
 require_once($cfg['path_bu'] . '/BURootCause.inc.php');
 require_once($cfg['path_bu'] . '/BUActivityType.inc.php');
 require_once($cfg['path_dbe'] . '/DBEJCallActType.php');
+require_once($cfg['path_dbe'] . '/DBECallBack.inc.php');
 require_once($cfg['path_dbe'] . '/DBEJCallActivity.php');
 
 class CTSRActivity extends CTCNC
@@ -72,6 +73,7 @@ class CTSRActivity extends CTCNC
     const SAVE_TASK_LIST                                         = "saveTaskList";
     const ADD_ADDITIONAL_TIME_REQUEST                            = "addAdditionalTimeRequest";
     const GET_ADDITIONAL_CHARGEABLE_WORK_REQUEST_INFO            = "getAdditionalChargeableWorkRequestInfo";
+    const CHECK_SERVICE_REQUEST_PENDING_CALLBACKS                = "checkServiceRequestPendingCallbacks";
     public  $serverGuardArray = array(
         ""  => "Please select",
         "Y" => "ServerGuard Related",
@@ -194,6 +196,9 @@ class CTSRActivity extends CTCNC
                 exit;
             case self::USED_BUDGET_DATA:
                 echo json_encode($this->usedBudgetData());
+                exit;
+            case self::CHECK_SERVICE_REQUEST_PENDING_CALLBACKS:
+                echo json_encode($this->checkServiceRequestPendingCallbacksController());
                 exit;
             case self::GET_CUSTOMER_CONTACT_ACTIVITY_DURATION_THRESHOLD_VALUE:
             {
@@ -377,6 +382,8 @@ class CTSRActivity extends CTCNC
             $taskListUpdatedBy = $consultants[$taskListUpdatedByUserId];
         }
         $currentLoggedInUser = $this->getDbeUser();
+        $callback            = new DBECallback($this);
+        $pendingCallbacks    = $callback->pendingCallbackCountForServiceRequest($problemID);
         return [
             "callActivityID"                  => $callActivityID,
             "problemID"                       => $problemID,
@@ -492,7 +499,8 @@ class CTSRActivity extends CTCNC
             "emailsubjectsummary"             => $dbeProblem->getValue(DBEProblem::emailSubjectSummary),
             "taskList"                        => $dbeProblem->getValue(DBEProblem::taskList),
             "taskListUpdatedAt"               => $dbeProblem->getValue(DBEProblem::taskListUpdatedAt),
-            "taskListUpdatedBy"               => $taskListUpdatedBy
+            "taskListUpdatedBy"               => $taskListUpdatedBy,
+            'pendingCallbacks'                => $pendingCallbacks
         ];
     }
 
@@ -703,6 +711,7 @@ class CTSRActivity extends CTCNC
         }
     }
 
+
     function updateCallActivity()
     {
         $this->setMethodName('updateCallActivity');
@@ -769,6 +778,11 @@ class CTSRActivity extends CTCNC
                 ) > 0) {
                 http_response_code(400);
                 return ["error" => 'Can not fix, there are open activities on this request'];
+            }
+            $callback = new DBECallback($this);
+            if ($callback->pendingCallbackCountForServiceRequest($problemID)) {
+                http_response_code(400);
+                return ["error" => 'Can not fix, there are outstanding callbacks on this request'];
             }
             //check Hold all SRs for QA Review
             if ($this->dbeUser->getValue(DBEUser::holdAllSRsforQAReview) == 1) {
@@ -1660,6 +1674,18 @@ FROM
         return [
             "status" => "ok",
             "data"   => $data
+        ];
+    }
+
+    private function checkServiceRequestPendingCallbacksController()
+    {
+        $data             = $this->getJSONData();
+        $serviceRequestId = (int)@$data['serviceRequestId'];
+        $dbeCallback      = new DBECallback($this);
+        $count            = $dbeCallback->pendingCallbackCountForServiceRequest($serviceRequestId);
+        return [
+            "status" => "ok",
+            "data"   => (bool)$count
         ];
     }
 }
