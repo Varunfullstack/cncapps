@@ -2,10 +2,10 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
-    <changeSet author="xavi" id="issue1312-0">
-        <tagDatabase tag="issue1312"/>
+    <changeSet author="xavi" id="issue1309-0">
+        <tagDatabase tag="issue1309"/>
     </changeSet>
-    <changeSet author="xavi" id="issue1312-1">
+    <changeSet author="xavi" id="issue1309-1">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="ordhead" columnName="odh_service_request_custitemno"/>
         </preConditions>
@@ -16,7 +16,7 @@
             </addColumn>
         </rollback>
     </changeSet>
-    <changeSet author="xavi" id="issue1312-2">
+    <changeSet author="xavi" id="issue1309-2">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="ordhead" columnName="odh_service_request_priority"/>
         </preConditions>
@@ -27,7 +27,7 @@
             </addColumn>
         </rollback>
     </changeSet>
-    <changeSet author="xavi" id="issue1312-3">
+    <changeSet author="xavi" id="issue1309-3">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="ordhead" columnName="serviceRequestInternalNote"/>
         </preConditions>
@@ -40,7 +40,7 @@
             </addColumn>
         </rollback>
     </changeSet>
-    <changeSet author="xavi" id="issue1312-4">
+    <changeSet author="xavi" id="issue1309-4">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="ordhead" columnName="serviceRequestTaskList"/>
         </preConditions>

@@ -6318,8 +6318,9 @@ class BUActivity extends Business
             DBEJProblem::contactID,
             $dsOrdhead->getValue(DBEOrdhead::delContactID)
         );
-        if ($dsInput->getValue(CTSalesOrder::serviceRequestCustomerItemID) == -1) {
-            $dsInput->setValue(CTSalesOrder::serviceRequestCustomerItemID, null);
+        $serviceRequestCustomerItemID = $dsInput->getValue(CTSalesOrder::serviceRequestCustomerItemID);
+        if ($serviceRequestCustomerItemID == -1) {
+            $serviceRequestCustomerItemID = null;
         }
         $dbeProblem->setValue(
             DBEJProblem::contractCustomerItemID,

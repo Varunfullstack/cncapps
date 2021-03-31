@@ -4471,6 +4471,10 @@ class CTSalesOrder extends CTCNC
             if ($dsInput->getValue(self::serviceRequestPriority) == 0) {
                 $formError = true;
             }
+
+            if (!$dsInput->getValue(DBEProblem::emailSubjectSummary)) {
+                $formError = true;
+            }
             if (!$formError) {
 
                 $queue = $_REQUEST['queue'] == "Create For Small Projects" ? 3 : 5;
@@ -4490,6 +4494,10 @@ class CTSalesOrder extends CTCNC
             $dsInput->setValue(
                 DBEProblem::emailSubjectSummary,
                 $buActivity->getSuitableEmailSubjectSummary($this->getOrdheadID(), $this->getParam('selectedLines'))
+            );
+            $dsInput->setValue(
+                self::serviceRequestPriority,
+                5
             );
         }
         $this->setPageTitle("Service Request");
@@ -4513,16 +4521,17 @@ class CTSalesOrder extends CTCNC
         );
         $this->template->set_var(
             array(
-                'etaDate'                              => $dsInput->getValue(self::etaDate),
-                'etaDateMessage'                       => $dsInput->getMessage(self::etaDate),
+                'etaDate'                             => $dsInput->getValue(self::etaDate),
+                'etaDateMessage'                      => $dsInput->getMessage(self::etaDate),
                 self::serviceRequestInternalNote      => $dsInput->getValue(self::serviceRequestInternalNote),
                 self::serviceRequestTaskList          => $dsInput->getValue(self::serviceRequestTaskList),
                 'serviceRequestPriorityMessage'       => $dsInput->getMessage(self::serviceRequestPriority),
-                'serviceRequestCustomerItemIDMessage'  => $dsInput->getMessage(
+                'emailSubjectSummary'                 => $dsInput->getValue(DBEProblem::emailSubjectSummary),
+                'serviceRequestCustomerItemIDMessage' => $dsInput->getMessage(
                     self::serviceRequestCustomerItemID
                 ),
-                'urlSubmit'                            => $urlSubmit,
-                'salesOrderHeaderId'                   => $this->getOrdheadID()
+                'urlSubmit'                           => $urlSubmit,
+                'salesOrderHeaderId'                  => $this->getOrdheadID()
             )
         );
         $this->contractDropdown(
