@@ -275,6 +275,7 @@ FROM
     ON initial.`caa_consno` = engineer.`cns_consno` 
 WHERE problem.`pro_custno` <> 282 
   AND problem.raiseTypeId=3
+  and problem.pro_priority < 4
   AND 
   (SELECT 
     COUNT(item.`itm_itemno`) 
