@@ -788,7 +788,9 @@ class ActivityEditComponent extends MainComponent {
                 break;
             }
             case this.activityStatus.Fixed:
-                if (data.pendingCallbacks) {
+                const hasPendingCallbacks = await this.api.checkServiceRequestPendingCallbacks(data.problemID);
+                console.log(hasPendingCallbacks);
+                if (hasPendingCallbacks) {
                     return this.alert('This request has an outstanding call back and that must be completed / cancelled before marking this as Fixed');
                 }
                 if (!await this.confirm("Are you sure this SR is fixed?")) return false;

@@ -232,6 +232,10 @@ class APIActivity extends APIMain {
     async resendChargeableRequestEmail(id) {
         return this.post(`${ApiUrls.sdDashboard}resendPendingChargeableRequestEmail`, {id})
     }
+
+    async checkServiceRequestPendingCallbacks(serviceRequestId) {
+        return this.post(`${ApiUrls.SRActivity}checkServiceRequestPendingCallbacks`, {serviceRequestId}).then(res => res.json()).then(res => res.data)
+    }
 }
 
 export default APIActivity;

@@ -73,6 +73,7 @@ class CTSRActivity extends CTCNC
     const SAVE_TASK_LIST                                         = "saveTaskList";
     const ADD_ADDITIONAL_TIME_REQUEST                            = "addAdditionalTimeRequest";
     const GET_ADDITIONAL_CHARGEABLE_WORK_REQUEST_INFO            = "getAdditionalChargeableWorkRequestInfo";
+    const CHECK_SERVICE_REQUEST_PENDING_CALLBACKS                = "checkServiceRequestPendingCallbacks";
     public  $serverGuardArray = array(
         ""  => "Please select",
         "Y" => "ServerGuard Related",
@@ -195,6 +196,9 @@ class CTSRActivity extends CTCNC
                 exit;
             case self::USED_BUDGET_DATA:
                 echo json_encode($this->usedBudgetData());
+                exit;
+            case self::CHECK_SERVICE_REQUEST_PENDING_CALLBACKS:
+                echo json_encode($this->checkServiceRequestPendingCallbacksController());
                 exit;
             case self::GET_CUSTOMER_CONTACT_ACTIVITY_DURATION_THRESHOLD_VALUE:
             {
@@ -706,6 +710,7 @@ class CTSRActivity extends CTCNC
             return ['error' => true, 'errorDescription' => $ex->getMessage()];
         }
     }
+
 
     function updateCallActivity()
     {
@@ -1669,6 +1674,18 @@ FROM
         return [
             "status" => "ok",
             "data"   => $data
+        ];
+    }
+
+    private function checkServiceRequestPendingCallbacksController()
+    {
+        $data             = $this->getJSONData();
+        $serviceRequestId = (int)@$data['serviceRequestId'];
+        $dbeCallback      = new DBECallback($this);
+        $count            = $dbeCallback->pendingCallbackCountForServiceRequest($serviceRequestId);
+        return [
+            "status" => "ok",
+            "data"   => (bool)$count
         ];
     }
 }
