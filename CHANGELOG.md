@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1313 - Call back email to include the name of the person that took it
+
 ## [v5.7.4] - 2021-03-30
 ### Fixed
 - Only notify Non UK cctive contacts of UK National Holidays
