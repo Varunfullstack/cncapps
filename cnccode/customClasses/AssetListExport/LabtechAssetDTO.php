@@ -38,7 +38,7 @@ class LabtechAssetDTO
         $this->model         = preg_replace('/\s+/', ' ', $this->model);
         $this->officeVersion = ucwords($this->officeVersion);
         if ($this->isHostServer) {
-            $re  = '/Service tag=(.*?);/m';
+            $re  = '/.*Service tag=(.*?)(;|$)/m';
             $str = $this->serialNumber;
             if (preg_match_all($re, $str, $matches, PREG_SET_ORDER, 0)) {
                 $this->serialNumber = $matches[0][1];
