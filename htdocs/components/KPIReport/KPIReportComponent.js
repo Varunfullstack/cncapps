@@ -302,7 +302,7 @@ export default class KPIReportComponent extends MainComponent {
                                         value={filter.consName}
                                         onChange={(event) => this.setFilter('consName', event.target.value)}
                                 >
-                                    <option>All</option>
+                                    <option value=''>All</option>
                                     {consultants.map(c => <option key={c.id}
                                                                   value={c.name}
                                     >{c.name}</option>)}
