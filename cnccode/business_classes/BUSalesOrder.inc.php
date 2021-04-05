@@ -1263,19 +1263,7 @@ class BUSalesOrder extends Business
                         DBEOrdline::sequenceNo,
                         $sequenceNo
                     );
-                    // get new prices
-                    $dbeItem=new DBEItem($this);
-                    $dbeItem->getRow( $dsNewOrdline->getValue(DBEOrdline::itemID));
-                    if($dbeItem->rowCount>0)
-                    {
-                        $curUnitCost=$dbeItem->getValue(DBEItem::curUnitCost);
-                        $curUnitSale=$dbeItem->getValue(DBEItem::curUnitSale);
-                        $qty= $dsNewOrdline->getValue(DBEOrdline::qtyOrdered);
-                        $dsNewOrdline->setValue(DBEOrdline::curUnitCost,$curUnitCost);
-                        $dsNewOrdline->setValue(DBEOrdline::curUnitSale,$curUnitSale);
-                        $dsNewOrdline->setValue(DBEOrdline::curTotalCost,round($qty*$curUnitCost,2));
-                        $dsNewOrdline->setValue(DBEOrdline::curTotalSale,round($qty*$curUnitSale,2));
-                    }
+                    
                     $dsNewOrdline->post();
                 }
             }
@@ -1813,6 +1801,19 @@ class BUSalesOrder extends Business
                 DBEOrdline::renewalCustomerItemID,
                 0
             );
+            // get new prices
+            $dbeItem=new DBEItem($this);
+            $dbeItem->getRow( $dbeToOrdline->getValue(DBEOrdline::itemID));
+            if($dbeItem->rowCount>0)
+            {
+                $curUnitCost=$dbeItem->getValue(DBEItem::curUnitCost);
+                $curUnitSale=$dbeItem->getValue(DBEItem::curUnitSale);
+                $qty= $dbeToOrdline->getValue(DBEOrdline::qtyOrdered);
+                $dbeToOrdline->setValue(DBEOrdline::curUnitCost,$curUnitCost);
+                $dbeToOrdline->setValue(DBEOrdline::curUnitSale,$curUnitSale);
+                $dbeToOrdline->setValue(DBEOrdline::curTotalCost,round($qty*$curUnitCost,2));
+                $dbeToOrdline->setValue(DBEOrdline::curTotalSale,round($qty*$curUnitSale,2));
+            }
             $dbeToOrdline->insertRow();
             $sequenceNumber = null;
             if ($dbeToOrdline->getValue(DBEOrdline::isRecurring) && $recurringSequenceNumber) {
