@@ -5171,4 +5171,17 @@ class CTSalesOrder extends CTCNC
         } while ($linkedServiceRequests->fetchNext());
         return true;
     }
+    private function inStock($dbeOrderLine)
+    {
+        $dbeItem=new DBEItem($this);
+        $dbeItem->getRow($dbeOrderLine->getValue(DBEOrdline::itemID));
+        $dbeItemType=new DBEItemType($this);
+        $dbeItemType->getRow($dbeItem->getValue(DBEItem::itemTypeID));
+        if (($dbeItemType->getValue(DBEItemType::showStockLevels)
+            &&   $dbeOrderLine->getValue(DBEOrdline::curUnitCost) > 0
+            &&   $dbeOrderLine->getValue(DBEJOrdline::supplierID) == CONFIG_SALES_STOCK_SUPPLIERID
+            &&   $dbeItem->getValue(DBEItem::salesStockQty) >= $dbeOrderLine->getValue(DBEOrdline::qtyOrdered)))
+            return true;
+        return false;
+    }
 }
