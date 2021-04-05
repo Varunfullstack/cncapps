@@ -1,6 +1,14 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.7.5] - 2021-04-21
+### Fixed
+- Asset extract information not pulling serial numbers
+- Files in AssetListExport.zip has misaligned headers
+- Print invoice process fails to update the invoice printed date and year/month field
+- Trans.csv file does not have the date column filled in
+- Updating user resets the consultant.Callbackemail
+
 ## [v5.7.4] - 2021-03-30
 ### Fixed
 - Only notify Non UK cctive contacts of UK National Holidays
