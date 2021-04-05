@@ -30,6 +30,8 @@ export default class ApiUrls {
     static CreateSalesRequest = "/createSalesRequest.php?action=";
     static Item="/Item.php?action=";
     static Password="/Password.php?action=";
+    static PasswordServices="/PasswordServices.php?action=";
+
 
 
 }

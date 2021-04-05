@@ -56,11 +56,11 @@ class PasswordComponent extends MainComponent {
         }
     }
     getInitData(){
-        return {
+        
+        return {            
             URL: '',
             archivedAt: null,
-            archivedBy: null,
-            customerID: null,
+            archivedBy: null,            
             level: '',
             notes: '',
             password: '',
@@ -114,7 +114,12 @@ class PasswordComponent extends MainComponent {
                hdClassName: "text-center",
                //icon: "fal fa-2x fa-text color-gray2 pointer",
                sortable: true,
-               content:(item)=><span className={"pointer "+(item.selectedColumn=="username"?"clip-board":"")}  id={item.passwordID+'username'} onClick={()=>this.copyToClipboard(item,"username")}>{item.username}</span>,
+               content:(item)=>{
+               return <div style={{display:"flex",justifyContent:"space-between"}}>
+                        <span className={"pointer "+(item.selectedColumn=="username"?"clip-board":"")}  id={item.passwordID+'username'} >{item.username}</span>
+                        <i className="fal fa-2x fa-copy color-gray2 pointer" onClick={()=>this.copyToClipboard(item,"username")}></i>
+                      </div>               
+               },
                //className: "pointer",                
             },
             {
@@ -133,7 +138,13 @@ class PasswordComponent extends MainComponent {
                 hdClassName: "text-center",
                 //icon: "fal fa-2x fa-eye color-gray2 pointer",
                 sortable: true,  
-                content:(item)=><span className={"pointer "+(item.selectedColumn=="password"?"clip-board":"")}  id={item.passwordID+'username'} onClick={()=>this.copyToClipboard(item,"password")}>{item.password}</span>,
+                content:(item)=>{
+                    return <div style={{display:"flex",justifyContent:"space-between"}}>
+                             <span className={"pointer "+(item.selectedColumn=="password"?"clip-board":"")}  id={item.passwordID+'password'} >{item.password}</span>
+                             <i className="fal fa-2x fa-copy color-gray2 pointer" onClick={()=>this.copyToClipboard(item,"password")}></i>
+                           </div>               
+                    },
+                    
               
                 //className: "text-center",                
              },

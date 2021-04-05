@@ -6,7 +6,7 @@ export default class APIPassword extends APIMain {
     return this.get(`${ApiUrls.Password}passwords&customerId=${customerId}&showArchived=${showArchived}&showHigherLevel=${showHigherLevel}`)
     }
     getServices(customerId,passwordId){
-        return this.get(`${ApiUrls.Password}services&customerId=${customerId}&passwordId=${passwordId}`)
+        return this.get(`${ApiUrls.Password}services&customerId=${customerId}&passwordId=${passwordId==null?'':passwordId}`)
 
     }
     addPassword(body){

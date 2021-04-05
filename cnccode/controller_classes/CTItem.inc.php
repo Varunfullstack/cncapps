@@ -1166,6 +1166,7 @@ WHERE custitem.`cui_itemno` = ?
         $orderBy =$orderColumns[(@$_REQUEST["orderBy"]??"description")];
         $orderDir =@$_REQUEST["orderDir"]??'asc';
         $q='%'.(@$_REQUEST["q"]??"").'%';
+        $discontinued=!empty($q)?" and  item.itm_discontinued = 'Y' " :"";
         $query ="SELECT 
           
          itm_desc  as description , 
@@ -1193,21 +1194,23 @@ WHERE custitem.`cui_itemno` = ?
          {$dbeItem->getDBColumnName($dbeItem::manufacturerID)} as manufacturerID,
          {$dbeItem->getDBColumnName($dbeItem::notes)} as notes, 
          {$dbeItem->getDBColumnName($dbeItem::stockcat)} as stockcat,
-         {$dbeItem->getDBColumnName($dbeItem::salesStockQty)} as salesStockQty
+         {$dbeItem->getDBColumnName($dbeItem::salesStockQty)} as salesStockQty,
+         {$dbeItemType->getDBColumnName($dbeItemType::allowGlobalPriceUpdate)} as allowGlobalPriceUpdate
 
          
         FROM Item
         left JOIN itemtype on Item.itm_itemtypeno   = itemtype.ity_itemtypeno
         LEFT JOIN manufact on Item.itm_manno        = manufact.man_manno
         where 
-            itm_desc            like :q OR
+            (itm_desc            like :q OR
             itm_sstk_cost       like :q OR
             itm_sstk_price      like :q OR
             itm_unit_of_sale    like :q OR
             itm_discontinued    like :q OR
             ity_desc            like :q OR
             man_name            like :q
-
+            )
+            $discontinued
         ORDER BY $orderBy $orderDir
         LIMIT $limit OFFSET $offset
         ";

@@ -31,8 +31,7 @@ export class PasswordDetails  extends MainComponent{
         return {
             URL: '',
             archivedAt: null,
-            archivedBy: null,
-            customerID: null,
+            archivedBy: null,            
             level: '',
             notes: '',
             password: '',
@@ -54,6 +53,7 @@ export class PasswordDetails  extends MainComponent{
         const {filter}=this.props;
         if(services.length==0&&filter.customer)
         this.api.getServices(filter.customer.id,data.passwordID).then(res=>{
+            console.log("services",res.data);
             this.setState({services:res.data});
         })
     }
@@ -70,7 +70,7 @@ export class PasswordDetails  extends MainComponent{
 
                 <div className="form-group">
                   <label >User Name</label>
-                  <input value={data.username} type="text" name="" id="" className="form-control required" onChange={(event)=>this.setValue("username",event.target.value)} />                   
+                  <input value={data.username} type="text" name="" id="" className="form-control" onChange={(event)=>this.setValue("username",event.target.value)} />                   
                 </div>
                 <div className="form-group">
                   <label >Service</label>
@@ -93,7 +93,7 @@ export class PasswordDetails  extends MainComponent{
                 </div>
                 <div className="form-group">
                   <label >Level</label>                  
-                  <select className="form-control" value={data.level} onChange={(event)=>this.setValue("level",event.target.value)} >
+                  <select className="form-control required" value={data.level} onChange={(event)=>this.setValue("level",event.target.value)} >
                     <option>Select a Level</option>
                     {passwordLevels.map(s=><option key={s.level} value={s.level}>{s.description}</option>)}
                   </select>  
@@ -117,24 +117,19 @@ export class PasswordDetails  extends MainComponent{
     handleSave=()=>{
         const { data } = this.state;
         const {mode} = this.props;
-        if (data.username == "") {
-          this.alert("User name required.");
-          return;
-        }
-        if (data.serviceID == "") {
-            this.alert("Service required.");
-            return;
-          }
+        
           if (data.level == "") {
             this.alert("Level required.");
             return;
           }
         console.log(data,mode);        
+        data.customerID=this.props.data.customerID;
         this.api.updatePassword(data).then((result) => {
             console.log(result);
             if (result.state) {
-            this.setState({ showModal: false });
+            this.setState({ showModal: false,services:[] });
             this.hideModal();
+            //this.getServices();
             } else {
             this.alert(result.error);
             }

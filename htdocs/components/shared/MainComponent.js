@@ -246,11 +246,19 @@ export default class MainComponent extends React.Component {
             return null;
         return <i className="fal fa-2x fa-edit color-gray pointer" onClick={()=>callBack(obj)}></i>
     }
+    getEditIcon( ){
+        return "fal fa-2x fa-edit color-gray2 pointer";
+    }
+
     getDeleteElement(obj,callBack,display=true){
         if(!display)
             return null;
         return <i className="fal fa-2x fa-trash-alt color-gray pointer" onClick={()=>callBack(obj)}></i>
     }
+    getDeleteIcon(){
+        return "fal fa-2x fa-trash-alt color-gray2 pointer";
+    }
+
     getTableStyle(){
         return "table table-striped";
     }

@@ -98,6 +98,7 @@ class ItemsComponent extends MainComponent {
             isStreamOne:0,
             notes:'',            
             stockcat:'',
+            allowGlobalPriceUpdate:0
             
         };
     }
@@ -112,7 +113,7 @@ class ItemsComponent extends MainComponent {
           if (this.scrollTimer) clearTimeout(this.scrollTimer);
           this.scrollTimer = setTimeout(() => {
             filter.page++;
-            this.setState({ filter }, () => this.getData(true));
+            this.setState({ filter,reset:false }, () => this.getData(true));
           }, 500);
         }
         console.log(scrollPercentRounded);
@@ -136,75 +137,75 @@ class ItemsComponent extends MainComponent {
         const columns=[
             {
                path: "description",
-               label: "Description",
+               label: "",
                hdToolTip: "Description",
                hdClassName: "text-center",
-               //icon: "fal fa-2x fa-signal color-gray2 pointer",
+               icon: "fal fa-2x fa-file-alt color-gray2 pointer",
                sortable: true,
                //className: "text-center",               
             },
             {
                 path: "curUnitCost",
-                label: "Cost Price",
+                label: "",
                 hdToolTip: "Cost Price",
                 hdClassName: "text-center",
-                //icon: "fal fa-2x fa-signal color-gray2 pointer",
+                icon: "fal fa-2x fa-coin color-gray2 pointer",
                 sortable: true,
                 className: "text-center",               
              },
              {
                 path: "curUnitSale",
-                label: "Sale Price",
+                label: "",
                 hdToolTip: "Sale Price",
                 hdClassName: "text-center",
-                //icon: "fal fa-2x fa-signal color-gray2 pointer",
+                icon: "fal fa-2x fa-coins color-gray2 pointer",
                 sortable: true,
                 className: "text-center",               
              },
              {
                 path: "salesStockQty",
-                label: "Stock Level",
+                label: "",
                 hdToolTip: "Sale Stock",
                 hdClassName: "text-center",
-                //icon: "fal fa-2x fa-signal color-gray2 pointer",
+                icon: "fal fa-2x fa-boxes color-gray2 pointer",
                 sortable: true,
                 className: "text-center",               
                 content:this.getSalesStock 
              },
              {
                 path: "partNo",
-                label: "Part Price",
+                label: "",
                 hdToolTip: "Part Price",
                 hdClassName: "text-center",
-                //icon: "fal fa-2x fa-signal color-gray2 pointer",
+                icon: "fal fa-2x fa-barcode color-gray2 pointer",
                 sortable: true,
                 //className: "text-center",               
              },
              {
                 path: "itemCategory",
-                label: "Item Category",
+                label: "",
                 hdToolTip: "Item Category",
                 hdClassName: "text-center",
-                //icon: "fal fa-2x fa-signal color-gray2 pointer",
+                icon: "fal fa-2x fa-ballot-check color-gray2 pointer",
                 sortable: true,
                 //className: "text-center",               
              },
              {
                 path: "renewalTypeID",
-                label: "Renewal Type",
+                label: "",
                 hdToolTip: "Renewal Type",
                 hdClassName: "text-center",
-                //icon: "fal fa-2x fa-signal color-gray2 pointer",
+                icon: "fal fa-2x fa-tasks color-gray2 pointer",
                 sortable: true,
                 content:(item)=>this.getRenewalTypeName(item.renewalTypeID)
                 //className: "text-center",               
              },
              {
                 path: "manufacturerName",
-                label: "Manufacturer",
+                label: "",
                 hdToolTip: "Manufacturer",
                 hdClassName: "text-center",
-                //icon: "fal fa-2x fa-signal color-gray2 pointer",
+                icon: "fal fa-2x fa-warehouse-alt color-gray2 pointer",
                 sortable: true,
                 //className: "text-center",               
              },
@@ -337,7 +338,15 @@ class ItemsComponent extends MainComponent {
                     </tr>
                     <tr>
                         <td className="text-right">Unit Cost	</td>
-                        <td><input  value={data.curUnitCost} onChange={(event)=>this.setValue("curUnitCost",event.target.value)} className="form-control"></input></td>
+                        <td>
+                            <div style={{display:"flex"}}>
+                                <input  value={data.curUnitCost} onChange={(event)=>this.setValue("curUnitCost",event.target.value)} className="form-control"></input>
+                                {
+                                    data.allowGlobalPriceUpdate?
+                                    <button onClick={()=>this.updateGlobalPrice('cost',data.curUnitCost,data.itemID)}> Globally Update Contract Pricing</button>:null}
+                            </div>
+                            
+                        </td>
                         <td className="text-right">Renewal Type		</td>
                         <td><select value={data.renewalTypeID||''} onChange={(event)=>this.setValue("renewalTypeID",event.target.value)} className="form-control">
                                 <option>Not a renewal</option>
@@ -347,7 +356,16 @@ class ItemsComponent extends MainComponent {
                     <tr>
                         
                         <td  className="text-right">Unit Sale	</td>
-                        <td><input value={data.curUnitSale} onChange={(event)=>this.setValue("curUnitSale",event.target.value)}  className="form-control"></input></td>
+                        <td>
+                        <div style={{display:"flex"}}>
+                        <input value={data.curUnitSale} onChange={(event)=>this.setValue("curUnitSale",event.target.value)}  className="form-control"></input>
+                                {
+                                    data.allowGlobalPriceUpdate?
+                                    <button onClick={()=>this.updateGlobalPrice('sale',data.curUnitSale,data.itemID)}> Globally Update Contract Pricing</button>:null
+                                }
+                            </div>
+                            
+                        </td>
                         <td  className="text-right">Item Billing Category	</td>
                         <td><select  value={data.itemBillingCategoryID||''} onChange={(event)=>this.setValue("itemBillingCategoryID",event.target.value)}  className="form-control">
                                 <option></option>
@@ -428,6 +446,15 @@ class ItemsComponent extends MainComponent {
                 </tbody>
             </table>
         </div>
+    }
+    updateGlobalPrice=async(type, value, itemId)=> {
+        const res=await this.confirm('This will update all the ' + type + ' prices for all active contracts. Are you sure?');
+        if (!res) {
+            return;
+        }
+       this.api.updateContractsPrice(type, value, itemId).then(res=>{
+          this.setState({reset:true},()=>this.getData()) ;
+       })
     }
     handleChildSelect=(childItem)=>{
         console.log('child',childItem);
@@ -572,6 +599,10 @@ class ItemsComponent extends MainComponent {
     render() {
         return <div key="main">
             {this.getAlert()}
+            <div style={{position:"fixed", zIndex:102}}>
+                {this.getConfirm()}
+            </div>
+            
             <Spinner show={this.state.showSpinner}></Spinner>
             <ToolTip title="New Item" width={30}>
                 <i className="fal fa-2x fa-plus color-gray1 pointer" onClick={this.handleNewItem}></i>

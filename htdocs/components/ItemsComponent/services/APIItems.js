@@ -34,4 +34,12 @@ export default class APIItems extends APIMain {
     updateItemQty(itemId,value){
         return this.post(`${ApiUrls.Item}salesStockQty&id=${itemId}&value=${value}`);        
     }
+    updateContractsPrice( type,value,itemId){
+        return this.post(`${ApiUrls.Item}updateContractsPrice`,{
+            type,
+            value,
+            itemId
+        });
+
+    }
 }

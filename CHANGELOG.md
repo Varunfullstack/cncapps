@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
-## [unreleased] - 2021-03-25
+## [unreleased]
+### Changed
+- Issue 1258 - Rewrite PasswordServices.
+
+## [unreleased]
 ### Changed
 - Issue 1258 - upgrade LeadStatusTypes.php,CustomerType.php,Sector.php,ItemType.php,ExpenseType.php,Manufacturer.php,Team.php,createSalesRequest.php,Item.php,Password.php
 

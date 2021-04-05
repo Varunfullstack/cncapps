@@ -23,4 +23,13 @@
             newDataType="float"            
             tableName="itemtype"/> 
     </changeSet>
+    <changeSet id="issue1258-3" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">           
+                <columnExists tableName="passwordService" columnName="sortOrder"/>            
+        </preConditions>
+        <modifyDataType  
+            columnName="sortOrder"  
+            newDataType="float"            
+            tableName="passwordService"/> 
+    </changeSet>
 </databaseChangeLog>
