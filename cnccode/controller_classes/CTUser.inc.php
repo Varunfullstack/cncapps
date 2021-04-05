@@ -588,6 +588,9 @@ class CTUser extends CTCNC
                 'helpdeskFlagChecked'                           => Controller::htmlChecked(
                     $dsUser->getValue(DBEJUser::helpdeskFlag)
                 ),
+                'callBackEmailChecked'                          => $dsUser->getValue(
+                    DBEJUser::callBackEmail
+                ) ? "checked" : '',
                 'createRenewalSalesOrdersFlagChecked'           => Controller::htmlChecked(
                     $dsUser->getValue(DBEJUser::createRenewalSalesOrdersFlag)
                 ),
