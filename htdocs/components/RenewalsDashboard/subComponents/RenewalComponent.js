@@ -36,7 +36,6 @@ export class RenewalComponent extends MainComponent {
                 hdClassName: "text-center",
                 icon: "fal fa-2x fa-shopping-cart color-gray2 pointer",
                 sortable: true,
-                // className: "text-center",
                 backgroundColorColumn: "sentQuotationColor",
             },
             {
@@ -108,6 +107,7 @@ export class RenewalComponent extends MainComponent {
                 icon: "fal fa-2x fa-coin color-gray2 pointer",
                 sortable: true,
                 className: "text-right",
+                backgroundColorColumn: "sentQuotationColor",
                 content: order => poundFormat(order.costAnnum)
             },
             {
@@ -118,6 +118,7 @@ export class RenewalComponent extends MainComponent {
                 icon: "fal fa-2x fa-coins color-gray2 pointer",
                 sortable: true,
                 className: "text-right",
+                backgroundColorColumn: "sentQuotationColor",
                 content: order => poundFormat(order.saleAnnum)
             },
             {

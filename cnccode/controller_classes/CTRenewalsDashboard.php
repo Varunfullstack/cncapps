@@ -121,8 +121,8 @@ class CTRenewalsDashboard extends CTCNC
                     0,
                     30
                 ),
-                'costAnnum'           => $dsRenQuotation->getValue(DBEJRenQuotation::curUnitCost),
-                'saleAnnum'           => $dsRenQuotation->getValue(DBEJRenQuotation::curUnitSale),
+                'costAnnum'           => $dsRenQuotation->getValue(DBEJRenQuotation::costPrice),
+                'saleAnnum'           => $dsRenQuotation->getValue(DBEJRenQuotation::salePrice),
 
             ];
         }
@@ -216,8 +216,8 @@ class CTRenewalsDashboard extends CTCNC
                     'domain'          => $dsRenDomain->getValue(DBEJCustomerItem::notes),
                     'invoiceFromDate' => $dsRenDomain->getValue(DBEJCustomerItem::invoiceFromDateYMD),
                     'invoiceToDate'   => $dsRenDomain->getValue(DBEJCustomerItem::invoiceToDateYMD),
-                    'costAnnum'           => $dsRenDomain->getValue(DBEJCustomerItem::curUnitCost),
-                    'saleAnnum'           => $dsRenDomain->getValue(DBEJCustomerItem::curUnitSale),
+                    'costAnnum'           => $dsRenDomain->getValue(DBEJCustomerItem::costPrice),
+                    'saleAnnum'           => $dsRenDomain->getValue(DBEJCustomerItem::salePrice),
                 );
             }
         }
