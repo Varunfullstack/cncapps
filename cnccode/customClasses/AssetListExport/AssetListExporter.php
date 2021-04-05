@@ -248,7 +248,6 @@ class AssetListExporter
     public function exportForCustomer($customerId, $generateWithMonthYear = false)
     {
         $this->runExportForCustomer($customerId, $generateWithMonthYear);
-        $this->generateSummary();
     }
 
     public function exportForActiveCustomersWithSummary()
