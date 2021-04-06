@@ -168,10 +168,12 @@ export default class BillingConsultancyComponent extends React.Component {
                    style={{width: 300}}
             >
                 <tbody>
-                {engineers.map(e => <tr>
-                    <td>{e.groupName}</td>
-                    <td>{e.average}</td>
-                </tr>)}
+                {
+                    engineers.map((e,idx) => <tr key={idx}>
+                        <td>{e.groupName}</td>
+                        <td>{e.average}</td>
+                    </tr>)
+                }
                 </tbody>
             </table>
         </div>

@@ -303,9 +303,14 @@ export default class KPIReportComponent extends MainComponent {
                                         onChange={(event) => this.setFilter('consName', event.target.value)}
                                 >
                                     <option value=''>All</option>
-                                    {consultants.map(c => <option key={c.id}
-                                                                  value={c.name}
-                                    >{c.name}</option>)}
+                                    {
+                                        consultants
+                                            .filter(c => c.active)
+                                            .map(c => <option key={c.id}
+                                                              value={c.name}
+                                                >{c.name}</option>
+                                            )
+                                    }
                                 </select>
                             </td>
                         </React.Fragment>
@@ -362,7 +367,7 @@ export default class KPIReportComponent extends MainComponent {
         // }
         if (activeReport && activeReport.parameters.indexOf(this.reportparameters.consName) >= 0 && consultants.length == 0) {
             //console.log('have users');
-            consultants = await this.apiUsers.getActiveUsers();
+            consultants = await this.apiUsers.getAllUsers();
             this.setState({consultants});
         }
         switch (activeReport?.id) {
