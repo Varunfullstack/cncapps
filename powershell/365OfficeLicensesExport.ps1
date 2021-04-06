@@ -23,7 +23,7 @@ try
     }
     $MailboxesReport = @()
     $DevicesReport = @()
-    $PermissionsReport = @()
+    $PermissionsReport = [System.Collections.Generic.List[Object]]::new()
     $Mailboxes = Get-EXOMailbox -ResultSize Unlimited | Where-Object { $_.RecipientTypeDetails -ne "DiscoveryMailbox" }
     [array]$LicensesData = Get-MsolAccountSku | Select-Object  AccountSkuId, ActiveUnits, @{ Name = 'Unallocated'; Expression = { $_.ActiveUnits - $_.ConsumedUnits } }
     $TenantDomainName = (Get-AcceptedDomain | Where-Object { $_.DomainName -like "*onmicrosoft.com" -and $_.DomainName -notlike "*mail.onmicrosoft.com" }).DomainName
@@ -117,22 +117,26 @@ try
             $errors += [String]::Concat("", $PSItem)
         }
 
-        $Permissions = Get-EXOMailboxPermission -Identity $UserPrincipalName | Where-Object { $_.User -Like "@" }
+        $Permissions = Get-EXOMailboxPermission -Identity $UserPrincipalName | Where-Object { $_.User -Like "*@*" }
 
         If ($Null -ne $Permissions)
         {
+            Write-Host "we have permissions!!"
             # Grab each permission and output it into the report
             ForEach ($Permission in $Permissions)
             {
+                Write-Host $Permission | Select-Object -ExpandProperty AccessRights
                 $ReportLine = [PSCustomObject]@{
                     "Mailbox Name" = $DisplayName
                     "Email Address" = $UserPrincipalName
                     "Mailbox Type" = $mailbox.RecipientTypeDetails
-                    Permission = $Permission | Select-Object -ExpandProperty AccessRights
+                    "Permission" = $Permission | Select-Object -ExpandProperty AccessRights
                     "Assigned To" = $Permission.User
                 }
                 $PermissionsReport.Add($ReportLine)
             }
+        } else {
+            Write-Host "we have no permissions!!"
         }
 
 
