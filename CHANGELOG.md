@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 1323 - Include Mailbox Additional Permission in Office 365 Mailbox Export
+
 ## [v5.7.5] - 2021-04-21
 ### Fixed
 - Asset extract information not pulling serial numbers
