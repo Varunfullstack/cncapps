@@ -1305,8 +1305,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $dateTime = new DateTime();
 
         $permissionsSheet->getStyle("A{$highestRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-        $permissionsSheet->getStyle("A{$highestRow}:B{$highestRow}")->getFont()->setBold(true);
-        $permissionsSheet->getStyle("A1:B{$permissionsSheet->getHighestRow()}")->getAlignment()->setHorizontal('center');
         $legendRowStart = $highestRow + 2;
         $permissionsSheet->fromArray(
             ["Report generated at " . $dateTime->format("d-m-Y H:i:s")],
