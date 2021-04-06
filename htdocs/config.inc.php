@@ -496,7 +496,6 @@ switch ($server_type) {
             'on'
         );
         ini_set("error_log", "E:\Sites\dev-error.log");
-        error_log('this is a test');
         $GLOBALS['mail_options'] = array(
             'driver' => 'smtp',
             'host'   => 'cncltd-co-uk0i.mail.protection.outlook.com',
