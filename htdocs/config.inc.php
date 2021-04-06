@@ -495,6 +495,8 @@ switch ($server_type) {
             'display_errors',
             'on'
         );
+        ini_set("error_log", "E:\Sites\dev-error.log");
+        error_log('this is a test');
         $GLOBALS['mail_options'] = array(
             'driver' => 'smtp',
             'host'   => 'cncltd-co-uk0i.mail.protection.outlook.com',
@@ -614,6 +616,7 @@ switch ($server_type) {
             'display_errors',
             'off'
         );
+        ini_set("error_log", "E:\Sites\live-error.log");
         define('PORTAL_URL', "https://www.cnc-ltd.co.uk");
         $GLOBALS['mail_options'] = array(
             'driver' => 'smtp',
@@ -657,6 +660,7 @@ switch ($server_type) {
             'display_errors',
             'on'
         );
+        ini_set("error_log", "E:\\Sites\\test-error.log");
         $GLOBALS['mail_options'] = array(
             'driver' => 'smtp',
             'host'   => 'cncltd-co-uk0i.mail.protection.outlook.com',
@@ -735,6 +739,7 @@ switch ($server_type) {
             'display_errors',
             'on'
         );
+        ini_set("error_log", "E:\\Sites\\web-error.log");
         $GLOBALS['mail_options'] = array(
             'driver' => 'smtp',
             'host'   => 'cncltd-co-uk0i.mail.protection.outlook.com',
@@ -813,6 +818,7 @@ switch ($server_type) {
             'display_errors',
             'on'
         );
+        ini_set("error_log", "E:\\Sites\\design-error.log");
         $GLOBALS['mail_options'] = array(
             'driver' => 'smtp',
             'host'   => 'cncltd-co-uk0i.mail.protection.outlook.com',
@@ -897,6 +903,7 @@ switch ($server_type) {
             'display_errors',
             'on'
         );
+        ini_set("error_log", "E:\Sites\dev2-error.log");
         $GLOBALS['mail_options'] = array(
             'driver' => 'smtp',
             'host'   => 'cncltd-co-uk0i.mail.protection.outlook.com',
