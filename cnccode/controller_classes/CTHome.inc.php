@@ -1372,7 +1372,7 @@ ORDER BY caa_date ASC,
             if ($result['projectTeamActualFixHours'] <= $result['projectTeamTargetFixHours']) {
                 $projectTeamFixHoursClass = 'performance-green';
             }
-            $data = (object)array_merge(
+            $data = array_merge(
                 $data,
                 array(
                     'esTeamActualSlaPercentage' . $result['quarter']                      => number_format(
@@ -1421,7 +1421,6 @@ ORDER BY caa_date ASC,
                     'projectTeamActualFixHours' . $result['quarter'] . 'Class'            => $projectTeamFixHoursClass,
                 )
             );
-
         }
         return $data;
     }
