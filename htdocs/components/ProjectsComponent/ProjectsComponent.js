@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import AppReport from '../ReportsComponent/AppReport';
 import MainComponent from "../shared/MainComponent";
 import Toggle from '../shared/Toggle';
 import {params} from '../utils/utils';
@@ -120,29 +121,11 @@ class ProjectsComponent extends MainComponent {
     };
     getActiveTab = () => {
         const {activeTab, projectsSummary} = this.state;
-
-
         switch (activeTab) {
             case this.TAB_CURRENT_PROJECTS :
                 return <CurrentProjectsComponent projectsSummary={projectsSummary}></CurrentProjectsComponent>
             case this.TAB_REPORTS :
-                return <iframe style={{
-                    border: 0,
-                    overflow: "hidden",
-                    overflowX: "hidden",
-                    overflowY: "hidden",
-                    minHeight: 500,
-                    minWidth: 200,
-                    //position: "absolute",
-                    top: 40,
-                    left: 0,
-                    right: 0,
-                    bottom: 0
-                }}
-                               width="100%"
-                               height="100%"
-                               src={`Reports.php?hideMenu&&categoryID=1&&hideCategories=true&time=` + Date.now()}
-                ></iframe>;
+                return <AppReport categoryID={1} hideCategories={true}></AppReport>;
             case this.TAB_CALENDAR:
                 return <ProjectsCalendarComponent></ProjectsCalendarComponent>
             default:

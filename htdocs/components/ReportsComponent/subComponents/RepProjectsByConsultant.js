@@ -73,6 +73,31 @@ export default class RepProjectsByConsultant extends MainComponent {
             // content:(project)=><a href={`/Project.php?action=edit&projectID=${project.projectID}`} target="_blank">{project.description}</a>
           },
           {
+            path: "inOutHoursBudget",
+            //label: "IHB & INU ",
+            sortable: true,
+            hdToolTip:"In hours budget / used",
+            icon: "fal fa-2x fa-house-day color-gray2 pointer",    
+            className: "text-center",
+            content:(project)=><div className="flex-row flex-center">
+              <div>{project.inHoursBudget}&nbsp;/&nbsp;</div>
+              <div className={project.inHoursClass}>{ project.inHoursUsed}</div>
+            </div>
+          },
+          {
+            path: "outHoursBudgetUsed",
+            //label: "OOHB & OOHU ",
+            hdToolTip:"Out of hours budget / used",
+            icon: "fal fa-2x fa-house-night color-gray2 pointer",    
+            sortable: true,
+            className: "text-center",
+            //width:100,
+            content:(project)=><div className="flex-row flex-center">
+              <div>{project.outHoursBudget}&nbsp;/&nbsp;</div>
+              <div className={project.outHoursClass}>{ project.outHoursUsed}</div>
+            </div>
+          },
+          {
             path: "startDate",
             //label: "Description",
             sortable: true,
@@ -82,7 +107,7 @@ export default class RepProjectsByConsultant extends MainComponent {
             //content:(project)=><div>{this.getCorrectDate(project.startDate)}</div>
           },
     ]
-    return <div style={{maxWidth:1000}}> 
+    return <div  > 
                 <Table
                     columns={columns}
                     pk={"projectID"}

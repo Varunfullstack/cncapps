@@ -87,7 +87,7 @@ export default class APIProjects extends APIMain {
   getProjectsByCustomerStageFallsStartEnd(customerID,dateFrom,dateTo){
     return this.get(`${ApiUrls.Projects}projectsByCustomerStageFallsStartEnd&customerID=${customerID}&dateFrom=${dateFrom}&dateTo=${dateTo}`);
   }
-  getProjectsWithoutClousureMeeting(){
-    return this.get(`${ApiUrls.Projects}projectsWithoutClousureMeeting`);
+  getProjectsWithoutClousureMeeting(consID=''){
+    return this.get(`${ApiUrls.Projects}projectsWithoutClousureMeeting&consID=${consID}`);
   }
 }
