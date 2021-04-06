@@ -23,6 +23,7 @@ try
     }
     $MailboxesReport = @()
     $DevicesReport = @()
+    $PermissionsReport = @()
     $Mailboxes = Get-EXOMailbox -ResultSize Unlimited | Where-Object { $_.RecipientTypeDetails -ne "DiscoveryMailbox" }
     [array]$LicensesData = Get-MsolAccountSku | Select-Object  AccountSkuId, ActiveUnits, @{ Name = 'Unallocated'; Expression = { $_.ActiveUnits - $_.ConsumedUnits } }
     $TenantDomainName = (Get-AcceptedDomain | Where-Object { $_.DomainName -like "*onmicrosoft.com" -and $_.DomainName -notlike "*mail.onmicrosoft.com" }).DomainName
@@ -108,13 +109,33 @@ try
             {
                 $licenses += $license.AccountSkuId
             }
-            $Information = $MSOLUSER | Select-Object @{ Name = 'DisplayName'; Expression = { $DisplayName+" ("+$UserPrincipalName+")" }  }, @{ Name = 'TotalItemSize'; Expression = { $TotalItemSize } }, @{ Name = 'RecipientTypeDetails'; Expression = { [String]::join(";", $RecipientTypeDetails) } }, islicensed, @{ Name = "Licenses"; Expression = { $licenses.SyncRoot } }, @{ Name = 'OWAEnabled'; Expression = { $OWA } }, @{ Name = '2FA'; Expression = { $2FA } }, @{ Name = 'OneDriveStorageUsed'; Expression = { $oneDriveStorageUsage } }
+            $Information = $MSOLUSER | Select-Object @{ Name = 'DisplayName'; Expression = { $DisplayName + " (" + $UserPrincipalName + ")" } }, @{ Name = 'TotalItemSize'; Expression = { $TotalItemSize } }, @{ Name = 'RecipientTypeDetails'; Expression = { [String]::join(";", $RecipientTypeDetails) } }, islicensed, @{ Name = "Licenses"; Expression = { $licenses.SyncRoot } }, @{ Name = 'OWAEnabled'; Expression = { $OWA } }, @{ Name = '2FA'; Expression = { $2FA } }, @{ Name = 'OneDriveStorageUsed'; Expression = { $oneDriveStorageUsage } }
             $MailboxesReport += $Information
         }
         catch
         {
             $errors += [String]::Concat("", $PSItem)
         }
+
+        $Permissions = Get-EXOMailboxPermission -Identity $UserPrincipalName | Where-Object { $_.User -Like "@" }
+
+        If ($Null -ne $Permissions)
+        {
+            # Grab each permission and output it into the report
+            ForEach ($Permission in $Permissions)
+            {
+                $ReportLine = [PSCustomObject]@{
+                    "Mailbox Name" = $DisplayName
+                    "Email Address" = $UserPrincipalName
+                    "Mailbox Type" = $mailbox.RecipientTypeDetails
+                    Permission = $Permission | Select-Object -ExpandProperty AccessRights
+                    "Assigned To" = $Permission.User
+                }
+                $PermissionsReport.Add($ReportLine)
+            }
+        }
+
+
         $mailboxIndex++
         $progressPCT = 0
         if ($mailboxesCount -gt 0)
@@ -123,11 +144,13 @@ try
         }
         Write-Progress -Activity "Procesing Mailboxes" -Status "$progressPCT% Complete:" -PercentComplete $progressPCT
     }
+    [array]$PermissionsReport = $PermissionsReport | Sort-Object -Property @{ Expression = { $_.MailboxType }; Ascending = $False }
     [array]$MailboxesReport = $MailboxesReport | Sort-Object TotalItemSize -Descending
     [array]$DevicesReport = $DevicesReport | Sort-Object DisplayName
     $Report = @{
         mailboxes = $MailboxesReport
         licenses = $LicensesData
+        permissions = $PermissionsReport
         totalOneDriveStorageUsed = $totalOneDriveStorageUsed
         totalEmailStorageUsed = $totalEmailStorageUsed
         totalSiteUsed = $totalSiteUsed
