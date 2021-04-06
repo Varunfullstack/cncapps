@@ -126,10 +126,12 @@ class CTTeam extends CTCNC
     }
 
     function addTeam(){
+        $id=DBConnect::fetchOne("SELECT MAX(teamID)+1 id FROM team")["id"];  
         $body=$this->getBody();
         $dbeTeam=new DBETeam($this);        
         if(!$body->name)
             return $this->fail(APIException::badRequest,"Name required");
+        $dbeTeam->setValue(DBETeam::teamID,$id);
         $dbeTeam->setValue(DBETeam::activeFlag,$body->activeFlag);
         $dbeTeam->setValue(DBETeam::leaderId,$body->leaderId);
         $dbeTeam->setValue(DBETeam::level,$body->level);

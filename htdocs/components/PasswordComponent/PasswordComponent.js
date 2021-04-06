@@ -117,7 +117,7 @@ class PasswordComponent extends MainComponent {
                content:(item)=>{
                return <div style={{display:"flex",justifyContent:"space-between"}}>
                         <span className={"pointer "+(item.selectedColumn=="username"?"clip-board":"")}  id={item.passwordID+'username'} >{item.username}</span>
-                        <i className="fal fa-2x fa-copy color-gray2 pointer" onClick={()=>this.copyToClipboard(item,"username")}></i>
+                        <i className="fal fa-2x fa-copy color-gray pointer" onClick={()=>this.copyToClipboard(item,"username")}></i>
                       </div>               
                },
                //className: "pointer",                
@@ -141,7 +141,7 @@ class PasswordComponent extends MainComponent {
                 content:(item)=>{
                     return <div style={{display:"flex",justifyContent:"space-between"}}>
                              <span className={"pointer "+(item.selectedColumn=="password"?"clip-board":"")}  id={item.passwordID+'password'} >{item.password}</span>
-                             <i className="fal fa-2x fa-copy color-gray2 pointer" onClick={()=>this.copyToClipboard(item,"password")}></i>
+                             <i className="fal fa-2x fa-copy color-gray pointer" onClick={()=>this.copyToClipboard(item,"password")}></i>
                            </div>               
                     },
                     

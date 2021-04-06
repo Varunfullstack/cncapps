@@ -761,21 +761,26 @@ class CTCNC extends Controller
             ],
             [
                 "id"    => 304,
+                "label" => "Items",
+                "href"  => "Item.php"
+            ],
+            [
+                "id"    => 305,
                 "label" => "Create Sales Request",
                 "href"  => "createSalesRequest.php",
             ],
             [
-                "id"    => 305,
+                "id"    => 306,
                 "label" => "Contracts",
                 "href"  => "ContractReport.php",
             ],
             [
-                "id"    => 306,
+                "id"    => 307,
                 "label" => "Renewal Report",
                 "href"  => "RenewalReport.php",
             ],
             [
-                "id"    => 307,
+                "id"    => 308,
                 "label" => "Goods In",
                 "href"  => "GoodsIn.php",
             ],           
@@ -1029,11 +1034,7 @@ class CTCNC extends Controller
                 "label" => "Item Types",
                 "href"  => "ItemType.php",
             ],
-            [
-                "id"    => 812,
-                "label" => "Items",
-                "href"  => "Item.php"
-            ],
+            
             [
                 "id"    => 806,
                 "label" => "Standard Text",

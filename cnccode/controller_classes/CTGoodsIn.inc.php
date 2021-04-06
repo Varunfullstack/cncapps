@@ -101,7 +101,7 @@ class CTGoodsIn extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
-        $this->setMenuId(307);
+        $this->setMenuId(308);
         $this->buPurchaseOrder = new BUPurchaseOrder($this);
         $this->buGoodsIn       = new BUGoodsIn($this);
         $this->dsPorhead       = new DSForm($this);

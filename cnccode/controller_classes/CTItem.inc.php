@@ -95,8 +95,7 @@ class CTItem extends CTCNC
             $cfg
         );
         $roles = [
-            "sales",
-            "technical"
+            "sales",            
         ];
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
@@ -105,6 +104,7 @@ class CTItem extends CTCNC
         $this->buItem = new BUItem($this);
         $this->dsItem = new DSForm($this);    // new specialised dataset with form message support
         $this->dsItem->copyColumnsFrom($this->buItem->dbeItem);
+        $this->setMenuId(304);
     }
 
     /**
