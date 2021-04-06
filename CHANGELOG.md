@@ -1,5 +1,8 @@
 # Changelog
 This project changes will be shown here.
+## [unreleased]
+### Added
+- Added Allocate more time modal
 
 ## [v5.7.6] - 2021-04-06
 ### Changed

@@ -42,7 +42,7 @@ class CTCurrentActivityReport extends CTCNC
     var $customerFilterList;
     const CONST_CALLBACK        = 'callback';
     const CONST_CALLBACK_SEARCH = 'callbackSearch';
-
+    const CONST_ALLOCATE_ADDITIONAL_TIME='allocateAdditionalTime';
     /**
      * @var BUCustomerItem
      */
@@ -157,6 +157,9 @@ class CTCurrentActivityReport extends CTCNC
                 exit;
             case self::CONST_CALLBACK_SEARCH:
                 echo json_encode($this->callBackSearch());
+                break;
+            case self::CONST_ALLOCATE_ADDITIONAL_TIME:
+                echo json_encode($this->allocateAdditionalTime());
                 break;
             default:
                 $this->setTemplate();
@@ -870,4 +873,40 @@ class CTCurrentActivityReport extends CTCNC
             ]
         );
     }
+     /**
+     * @throws Exception
+     */
+    function allocateAdditionalTime()
+    {
+        $this->setMethodName('allocateAdditionalTime');
+        $body=$this->getBody();         
+        $buHeader = new BUHeader($this);
+        /** @var $dsHeader DataSet */
+        $buHeader->getHeader($dsHeader);        
+        $minutesInADay = $dsHeader->getValue(DBEHeader::smallProjectsTeamMinutesInADay);
+        /* validate if this is a POST request */
+        $minutes = 0;
+        switch ($body->allocatedTimeAmount) {
+            case 'minutes':
+                $minutes = $body->allocatedTimeValue;
+                break;
+            case 'hours':
+                $minutes = $body->allocatedTimeValue * 60;
+                break;
+            case 'days':
+                $minutes = $minutesInADay * $body->allocatedTimeValue;
+        }
+            $this->buActivity->allocateAdditionalTime(
+                $body->problemID,
+                $body->teamLevel,
+                $minutes,
+                $body->comments,
+                $this->dbeUser
+            );
+            $this->buActivity->logOperationalActivity(
+                $body->problemID,
+                "<p>Additional time allocated to {$this->buActivity->getTeamName($body->teamLevel)} Team: {$minutes} minutes</p><p>{$body->comments}</p>"
+            );
+         return ["status"=>true];
+        }
 }
