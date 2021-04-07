@@ -76,7 +76,7 @@ class DBEItemType extends DBCNCEntity
         );
         $this->addColumn(
             self::sortOrder,
-            DA_INTEGER,
+            DA_FLOAT,
             DA_NOT_NULL
         );
         $this->addColumn(

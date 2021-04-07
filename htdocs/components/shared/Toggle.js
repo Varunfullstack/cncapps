@@ -1,5 +1,10 @@
 import React from 'react';
-
+/*
+checked, 
+onChange, 
+name, 
+disabled
+*/
 class Toggle extends React.Component {
     constructor(props) {
         super(props);

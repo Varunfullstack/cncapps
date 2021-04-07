@@ -80,10 +80,10 @@ export class ProjectStagesComponent extends MainComponent {
                 label: "",
                 hdToolTip: "Edit",
                 hdClassName: "text-center",
-                icon: "fal fa-2x fa-trash color-gray2 pointer",     
+                icon: "fal fa-2x fa-trash-alt color-gray2 pointer",     
                 className: "text-center",
                 content:(stage)=><ToolTip title="edit" >
-                <i className="fal fa-trash fa-2x pointer icon" onClick={()=>this.handleDelete(stage)}></i>
+                <i className="fal fa-trash-alt fa-2x pointer icon" onClick={()=>this.handleDelete(stage)}></i>
             </ToolTip>
              },
               

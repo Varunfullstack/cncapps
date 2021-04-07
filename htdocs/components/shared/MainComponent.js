@@ -196,11 +196,11 @@ export default class MainComponent extends React.Component {
         data[property] = value;
         this.setState({data});
     }
-    setFilter=(field,value)=>{
+    setFilter=(field,value,callback=null)=>{
         console.log(field,value);
         const {filter}=this.state;
         filter[field]=value;
-        this.setState({filter});
+        this.setState({filter},callback);
     }
     editorHasProblems = async () => {
         return this.apiHeader.getNumberOfAllowedMistaks().then(nMistakes => {
@@ -237,5 +237,29 @@ export default class MainComponent extends React.Component {
             return true;
         else 
             return false;
+    }
+    getTrueFalseElement(value){
+        return value?<i className="fal fa-2x fa-check color-gray "></i>:<i className="fal fa-2x fa-times color-gray "></i>
+    }
+    getEditElement(obj,callBack,display=true){
+        if(!display)
+            return null;
+        return <i className="fal fa-2x fa-edit color-gray pointer" onClick={()=>callBack(obj)}></i>
+    }
+    getEditIcon( ){
+        return "fal fa-2x fa-edit color-gray2 pointer";
+    }
+
+    getDeleteElement(obj,callBack,display=true){
+        if(!display)
+            return null;
+        return <i className="fal fa-2x fa-trash-alt color-gray pointer" onClick={()=>callBack(obj)}></i>
+    }
+    getDeleteIcon(){
+        return "fal fa-2x fa-trash-alt color-gray2 pointer";
+    }
+
+    getTableStyle(){
+        return "table table-striped";
     }
 }

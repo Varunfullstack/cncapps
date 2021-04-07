@@ -60,7 +60,7 @@ class CTRenewalReport extends CTCNC
             $cookieVars,
             $cfg
         );
-        $this->setMenuId(306);
+        $this->setMenuId(307);
         $this->dsSearchForm = new DSForm ($this);
         $this->dsSearchForm->addColumn(
             self::searchFormCustomerID,

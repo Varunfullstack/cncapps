@@ -47,4 +47,8 @@ class DBEManufacturer extends DBCNCEntity
         $ret = (parent::getRows());
         return $ret;
     }
+    function hasName($name,$id=null)
+    {
+        return DBConnect::fetchOne("select * from ".$this->getTableName()." where man_name=:name and (:id=null or man_manno<>:id)",["name"=>$name,"id"=>$id]);
+    }
 }

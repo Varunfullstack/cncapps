@@ -37,6 +37,9 @@ class DBECustomerType extends DBEntity
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
+    function hasType($type,$id=null){
+        return DBConnect::fetchOne("select * from custype where cty_desc=:desc and (:id = null or cty_ctypeno<> :id )",["desc"=>$type,"id"=>$id]);
+    }
 }
 
 ?>

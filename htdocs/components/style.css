@@ -251,6 +251,9 @@ dd {
     border: 1px solid #ced4da;
     border-radius: .25rem;
     transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    box-sizing: border-box; 
+    padding: 2px;
+    margin: 2px ;
 }
 
 .float-right {
@@ -751,9 +754,15 @@ hr {
     color: #C6C6C6 !important;
     /* color:#F8A5B6 */
 }
-
+.color-white {
+    color: #fff !important;
+    /* color:#F8A5B6 */
+}
 .color-gray2 {
     color: #3C3C3C
+}
+.color-red{
+    color: rgb(177, 5, 5);
 }
 
 /*current activity style*/
@@ -1078,5 +1087,16 @@ select:required:valid { border: 1px solid black; }
     color:white;
     background-color: transparent;
     border-color: whitesmoke;
-
+}
+/*------------*/
+.btn-secondary
+{
+    background-color: #bdbec1;
+    border-color: #bdbec1;
+}
+.full-width{
+    width: 100%;
+}
+.align-center{
+    align-items: center;
 }

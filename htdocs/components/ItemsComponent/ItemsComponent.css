@@ -1,0 +1,20 @@
+.table-check td{
+    padding: 0;
+}
+.modal-style  {
+    color: white;
+}
+.modal-style  td{
+    padding: 1px;
+}
+.childs{
+    vertical-align: top;
+    color: white;
+    
+}
+.childs-title{   
+    margin-top:-5px;
+    margin-bottom: -1px;
+    color: white !important;
+}
+ 

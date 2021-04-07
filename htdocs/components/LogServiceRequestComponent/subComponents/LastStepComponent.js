@@ -556,7 +556,7 @@ class LastStepComponent extends MainComponent {
                         {key: file.name + 'tr'},
                         el("td", {key: file.name + 'td'}, file.name),
                         el("td", {key: file.name + 'trash'}, el("i", {
-                            className: "fal fa-trash pointer icon float-right",
+                            className: "fal fa-trash-alt pointer icon float-right",
                             title: "delete file",
                             onClick: () => this.deleteDocument(file)
                         }))
@@ -581,7 +581,7 @@ class LastStepComponent extends MainComponent {
                         {key: file.name + 'tr'},
                         el("td", {key: file.name + 'td'}, file.name),
                         el("td", {key: file.name + 'trash'}, el("i", {
-                            className: "fal fa-trash pointer icon float-right",
+                            className: "fal fa-trash-alt pointer icon float-right",
                             title: "delete file",
                             onClick: () => this.deleteInternalDocument(file)
                         }))

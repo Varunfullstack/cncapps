@@ -9,24 +9,36 @@ class AutoComplete extends React.Component {
             // The active selection's index
             activeSuggestion: 0,
             // The suggestions that match the user's input
-            filteredSuggestions: [],
+            filteredSuggestions: this.props.items||[],
             // Whether or not the suggestion list is shown
             showSuggestions: false,
             // What the user has entered
             userInput: "",
             filtered: false,
-            value: ''
+            value:'',
+            items:[]
         };
 
     }
-
-
+     
     // Event fired when the input value is changed
     onChange = (e) => {
-
         let {items, displayLength, displayColumn} = this.props;
         if (!displayLength) displayLength = 10;
         const userInput = e.currentTarget.value;
+
+        if(this.props.onFilter)
+        {
+            this.props.onFilter(userInput);
+            this.setState({
+                activeSuggestion: e.currentTarget.value.length > 0 ? 0 : -1,                
+                showSuggestions: true,
+                userInput:userInput,
+                filtered: true
+            });
+            return;
+        }
+       
 
         // Filter our suggestions that don't contain the user's input
         let filteredSuggestions = items
@@ -45,6 +57,7 @@ class AutoComplete extends React.Component {
             ];
         }
         filteredSuggestions = filteredSuggestions.slice(0, displayLength);
+        console.log(filteredSuggestions);
         // Update the user input and filtered suggestions, reset the active
         // suggestion and make sure the suggestions are shown
         this.setState({
@@ -155,14 +168,23 @@ class AutoComplete extends React.Component {
             this.setState({showSuggestions: false})
         }, 200);
     }
-
-
-    static getDerivedStateFromProps(props, state) {
-        if (props.value != state.value) {
-            state.value = props.value;
-            state.userInput = props.value;
+ 
+    static getDerivedStateFromProps(props,state){  
+        //console.log("props change");      
+        if(props.value!=state.value)
+        {
+            state.value=props.value;
+            state.userInput=props.value;
             return state;
-        } else return state;
+        }
+        else if(props.items.length!=state.items.length)
+        {
+            console.log('override sugge',);
+            state.items=[...props.items];
+            state.filteredSuggestions=[...props.items];
+            return state;
+        }
+        else return state;
     }
 
     render() {
@@ -220,7 +242,7 @@ class AutoComplete extends React.Component {
                        disabled={this.props.disabled}
                        style={{width: width || '100%'}}
                        autoComplete="off"
-
+                       placeholder={this.props.placeholder}
                 />
                 {suggestionsListComponent}
             </div>

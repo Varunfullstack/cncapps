@@ -6,6 +6,9 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use CNCLTD\Exceptions\APIException;
+
 global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUTeam.inc.php');
@@ -19,6 +22,8 @@ define('CTTEAM_ACT_UPDATE', 'updateTeam');
 
 class CTTeam extends CTCNC
 {
+    const CONST_TEAMS='teams';
+    const CONST_ROLES='roles';
     /** @var DSForm */
     public $dsTeam;
     /** @var BUTeam */
@@ -46,186 +51,38 @@ class CTTeam extends CTCNC
     function defaultAction()
     {
         switch ($this->getAction()) {
-            case CTTEAM_ACT_EDIT:
-            case CTTEAM_ACT_CREATE:
-                $this->edit();
+            case self::CONST_TEAMS:
+                switch ($this->requestMethod) {
+                    case 'GET':
+                        echo  json_encode($this->getTeams(),JSON_NUMERIC_CHECK);
+                        break;
+                    case 'POST':
+                        echo  json_encode($this->addTeam(),JSON_NUMERIC_CHECK);
+                        break;
+                    case 'PUT':
+                        echo  json_encode($this->updateTeam(),JSON_NUMERIC_CHECK);
+                        break;
+                    case 'DELETE':
+                        echo  json_encode($this->deleteTeam(),JSON_NUMERIC_CHECK);
+                        break;
+                    default:
+                        # code...
+                        break;
+                }
+                exit;        
+            case self::CONST_ROLES:
+                echo  json_encode($this->getRoles(),JSON_NUMERIC_CHECK);
                 break;
-            case CTTEAM_ACT_DELETE:
-                $this->delete();
-                break;
-            case CTTEAM_ACT_UPDATE:
-                $this->update();
-                break;
+          
             case CTTEAM_ACT_DISPLAY_LIST:
+                echo  json_encode($this->getTeams(),JSON_NUMERIC_CHECK);
+                break;
             default:
                 $this->displayList();
                 break;
         }
     }
-
-    /**
-     * @throws Exception
-     */
-    function edit()
-    {
-        $this->setMethodName('edit');
-        $dsTeam = &$this->dsTeam; // ref to class var
-
-        if (!$this->getFormError()) {
-            if ($this->getAction() == CTTEAM_ACT_EDIT) {
-                $this->buTeam->getTeamByID($this->getParam('teamID'), $dsTeam);
-                $teamID = $this->getParam('teamID');
-            } else {                                                                    // creating new
-                $dsTeam->initialise();
-                $dsTeam->setValue(DBETeam::teamID, '0');
-                $teamID = '0';
-            }
-        } else {                                                                        // form validation error
-            $dsTeam->initialise();
-            $dsTeam->fetchNext();
-            $teamID = $dsTeam->getValue(DBETeam::teamID);
-        }
-        $urlDelete = null;
-        $txtDelete = null;
-        if ($this->getAction() == CTTEAM_ACT_EDIT && $this->buTeam->canDelete($this->getParam('teamID'))) {
-            $urlDelete =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTTEAM_ACT_DELETE,
-                        'teamID' => $teamID
-                    )
-                );
-            $txtDelete = 'Delete';
-        }
-        $urlUpdate =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTTEAM_ACT_UPDATE,
-                    'teamID' => $teamID
-                )
-            );
-        $urlDisplayList =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTTEAM_ACT_DISPLAY_LIST
-                )
-            );
-        $this->setPageTitle('Edit User Team');
-        $this->setTemplateFiles(
-            array('TeamEdit' => 'TeamEdit.inc')
-        );
-        $this->template->set_var(
-            array(
-                'teamID'            => $teamID,
-                'name'              => Controller::htmlInputText($dsTeam->getValue(DBETeam::name)),
-                'nameMessage'       => Controller::htmlDisplayText($dsTeam->getMessage(DBETeam::name)),
-                'level'             => Controller::htmlInputText($dsTeam->getValue(DBETeam::level)),
-                'levelMessage'      => Controller::htmlDisplayText($dsTeam->getMessage(DBETeam::level)),
-                'activeFlagChecked' => Controller::htmlChecked($dsTeam->getValue(DBETeam::activeFlag)),
-                'urlUpdate'         => $urlUpdate,
-                'urlDelete'         => $urlDelete,
-                'txtDelete'         => $txtDelete,
-                'urlDisplayList'    => $urlDisplayList
-            )
-        );
-
-        $teamRoles = $this->buTeam->getTeamRoles();
-        // Role selection
-        $this->template->set_block('TeamEdit', 'teamRoleBlock', 'teamRoles');
-
-        foreach ($teamRoles as $teamRole) {
-            $teamRoleSelected = ($dsTeam->getValue(
-                    DBETeam::teamRoleID
-                ) == $teamRole['teamRoleID']) ? CT_SELECTED : null;
-
-            $this->template->set_var(
-                array(
-                    'teamRoleSelected' => $teamRoleSelected,
-                    'teamRoleID'       => $teamRole['teamRoleID'],
-                    'teamRoleName'     => $teamRole['name']
-                )
-            );
-            $this->template->parse('teamRoles', 'teamRoleBlock', true);
-        }
-
-        $dbeUser = new DBEUser($this);
-        $dbeUser->getRows();
-        $this->template->set_block('TeamEdit', 'leaderBlock', 'leaders');
-
-        while ($dbeUser->fetchNext()) {
-            $leaderSelected = ($dbeUser->getValue(DBEUser::userID) == $dsTeam->getValue(
-                    DBETeam::leaderId
-                )) ? CT_SELECTED : null;
-
-            $this->template->set_var(
-                [
-                    "leaderID"       => $dbeUser->getValue(DBEUser::userID),
-                    "leaderSelected" => $leaderSelected,
-                    "leaderName"     => $dbeUser->getValue(DBEUser::name)
-                ]
-            );
-            $this->template->parse('leaders', 'leaderBlock', true);
-        }
-
-        $this->template->parse('CONTENTS', 'TeamEdit', true);
-        $this->parsePage();
-    }
-
-    /**
-     * @throws Exception
-     */
-    function delete()
-    {
-        $this->setMethodName('delete');
-        if (!$this->buTeam->deleteTeam($this->getParam('teamID'))) {
-            $this->displayFatalError('Cannot delete this Team');
-            exit;
-        } else {
-            $urlNext =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTTEAM_ACT_DISPLAY_LIST
-                    )
-                );
-            header('Location: ' . $urlNext);
-            exit;
-        }
-    }// end function edit
-
-    /**
-     * @throws Exception
-     */
-    function update()
-    {
-        $this->setMethodName('update');
-        $this->formError = (!$this->dsTeam->populateFromArray($this->getParam('team')));
-        if ($this->formError) {
-            if (!$this->dsTeam->getValue(DBETeam::teamID)) {
-                $this->setAction(CTTEAM_ACT_EDIT);
-            } else {
-                $this->setAction(CTTEAM_ACT_CREATE);
-            }
-            $this->edit();
-            exit;
-        }
-
-        $this->buTeam->updateTeam($this->dsTeam);
-
-        $urlNext = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'teamID' => $this->dsTeam->getValue(DBETeam::teamID),
-                'action' => CTCNC_ACT_VIEW
-            )
-        );
-        header('Location: ' . $urlNext);
-    }
-
-    /**
+/**
      * @throws Exception
      */
     function displayList()
@@ -235,76 +92,90 @@ class CTTeam extends CTCNC
         $this->setTemplateFiles(
             array('TeamList' => 'TeamList.inc')
         );
+        $this->loadReactScript('TeamComponent.js');
+        $this->loadReactCSS('TeamComponent.css');     
 
-        $teams = $this->buTeam->getAll();
-
-        $urlCreate =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTTEAM_ACT_CREATE
-                )
-            );
-
-        $this->template->set_var(
-            array('urlCreate' => $urlCreate)
-        );
-
-        if (count($teams) > 0) {
-
-            $this->template->set_block(
-                'TeamList',
-                'TeamBlock',
-                'teams'
-            );
-
-            foreach ($teams as $team) {
-
-                $teamID = $team['teamID'];
-
-                $urlEdit =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action' => CTTEAM_ACT_EDIT,
-                            'teamID' => $teamID
-                        )
-                    );
-                $txtEdit = '[edit]';
-
-                $urlDelete = null;
-                $txtDelete = null;
-                if ($this->buTeam->canDelete($teamID)) {
-                    $urlDelete =
-                        Controller::buildLink(
-                            $_SERVER['PHP_SELF'],
-                            array(
-                                'action' => CTTEAM_ACT_DELETE,
-                                'teamID' => $teamID
-                            )
-                        );
-                    $txtDelete = '[delete]';
-                }
-                $this->template->set_var(
-                    array(
-                        'teamID'       => $teamID,
-                        'name'         => Controller::htmlDisplayText($team['name']),
-                        'teamRoleName' => Controller::htmlDisplayText($team['teamRoleName']),
-                        'level'        => Controller::htmlDisplayText($team['level']),
-                        'activeFlag'   => Controller::htmlDisplayText($team['activeFlag']),
-                        'leaderName'   => Controller::htmlDisplayText($team['leaderName']),
-                        'urlEdit'      => $urlEdit,
-                        'urlDelete'    => $urlDelete,
-                        'txtEdit'      => $txtEdit,
-                        'txtDelete'    => $txtDelete
-                    )
-                );
-
-                $this->template->parse('teams', 'TeamBlock', true);
-
-            }//while $dsTeam->fetchNext()
-        }
         $this->template->parse('CONTENTS', 'TeamList', true);
         $this->parsePage();
+    }
+    
+    //------------------------- new 
+
+    function getTeams(){
+        $teams = $this->buTeam->getAll();  
+        $data  = [];       
+        foreach ($teams as $team) {
+            $teamID = $team['teamID'];              
+            $canDelete=false;
+            if ($this->buTeam->canDelete($teamID)) {
+                $canDelete=true;
+            }
+            $data []= array(
+                    'teamID'       => $teamID,
+                    'name'         => Controller::htmlDisplayText($team['name']),
+                    'teamRoleName' => Controller::htmlDisplayText($team['teamRoleName']),
+                    'leaderId'     => Controller::htmlDisplayText($team['leaderId']),
+                    'teamRoleID'       => Controller::htmlDisplayText($team['teamRoleID']),
+                    'level'        => Controller::htmlDisplayText($team['level']),
+                    'activeFlag'   => Controller::htmlDisplayText($team['activeFlag']),
+                    'leaderName'   => Controller::htmlDisplayText($team['leaderName']),
+                    'canDelete'      => $canDelete,                    
+                );
+        }
+        return  $data;
+    }
+
+    function addTeam(){
+        $id=DBConnect::fetchOne("SELECT MAX(teamID)+1 id FROM team")["id"];  
+        $body=$this->getBody();
+        $dbeTeam=new DBETeam($this);        
+        if(!$body->name)
+            return $this->fail(APIException::badRequest,"Name required");
+        $dbeTeam->setValue(DBETeam::teamID,$id);
+        $dbeTeam->setValue(DBETeam::activeFlag,$body->activeFlag);
+        $dbeTeam->setValue(DBETeam::leaderId,$body->leaderId);
+        $dbeTeam->setValue(DBETeam::level,$body->level);
+        $dbeTeam->setValue(DBETeam::name,$body->name);
+        $dbeTeam->setValue(DBETeam::teamRoleID,$body->teamRoleID);
+        $dbeTeam->insertRow();
+        return $this->success();
+    }
+
+    function updateTeam(){
+        $body=$this->getBody();
+        $dbeTeam=new DBETeam($this);
+        $dbeTeam->getRow($body->teamID);
+        if(!$dbeTeam->rowCount)
+            return $this->fail(APIException::notFound,"Not found");
+        $dbeTeam->setValue(DBETeam::activeFlag,$body->activeFlag);
+        $dbeTeam->setValue(DBETeam::leaderId,$body->leaderId);
+        $dbeTeam->setValue(DBETeam::level,$body->level);
+        $dbeTeam->setValue(DBETeam::name,$body->name);
+        $dbeTeam->setValue(DBETeam::teamRoleID,$body->teamRoleID);
+        $dbeTeam->updateRow();
+        return $this->success();
+    }
+
+    function deleteTeam(){
+        $teamID=@$_REQUEST["id"];
+        $dbeTeam=new DBETeam($this);
+        $dbeTeam->getRow($teamID);
+        if(!$dbeTeam->rowCount)
+            return $this->fail(APIException::notFound,"Not found");
+        $dbeTeam->deleteRow();
+        return $this->success();
+    }
+    function getRoles(){
+        $teamRoles = $this->buTeam->getTeamRoles();
+        // Role selection
+        $data=[];
+        foreach ($teamRoles as $teamRole) {          
+            $data []=
+                array(                    
+                    'id'       => $teamRole['teamRoleID'],
+                    'name'     => $teamRole['name']
+                );                        
+        }
+        return $this->success($data);
     }
 }
