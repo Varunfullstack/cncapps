@@ -1,5 +1,8 @@
 # Changelog
 This project changes will be shown here.
+## [unreleased] - 2021-03-30
+### Added
+- Add In Stock check to sales order
 
 ## [unreleased]
 ### Added

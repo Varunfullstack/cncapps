@@ -1338,11 +1338,11 @@ class BUSalesOrder extends Business
         );
         $dbeJOrdline->getRowsByColumn(
             DBEJOrdline::ordheadID
-        );
+        );       
         $this->getData(
             $dbeJOrdline,
             $dsJOrdline
-        );
+        );       
         $dsJOrdline->columnSort(
             DBEOrdline::isRecurring,
             SORT_ASC,
