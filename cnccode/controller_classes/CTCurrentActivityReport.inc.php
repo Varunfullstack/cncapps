@@ -704,13 +704,14 @@ class CTCurrentActivityReport extends CTCNC
                 $body       = $twig->render(
                     '@internal/callBackEmail.html.twig',
                     [
-                        'createAt'          => date($dateTimeFormat, strtotime($createAt)),
-                        'urlService'        => $urlService,
-                        'contactName'       => $contactName,
-                        'customerName'      => $customer->getValue(DBECustomer::name),
-                        'serviceRequestId'  => $problemID,
-                        'callback_datetime' => $callDateTime->format($dateTimeFormat),
-                        'reason'            => $description != "" ? "Additional Information: " . $description : "",
+                        'createAt'           => date($dateTimeFormat, strtotime($createAt)),
+                        'urlService'         => $urlService,
+                        'contactName'        => $contactName,
+                        'customerName'       => $customer->getValue(DBECustomer::name),
+                        'serviceRequestId'   => $problemID,
+                        'callback_datetime'  => $callDateTime->format($dateTimeFormat),
+                        'reason'             => $description != "" ? "Additional Information: " . $description : "",
+                        'consultantFullName' => "{$this->dbeUser->getValue(DBEUser::firstName)} {$this->dbeUser->getValue(DBEUser::lastName)}"
                     ]
                 );
                 $buMail->sendSimpleEmail($body, $subject, $to, CONFIG_SUPPORT_EMAIL, $cc);
