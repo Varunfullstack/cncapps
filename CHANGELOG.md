@@ -1,5 +1,24 @@
 # Changelog
 This project changes will be shown here.
+## [unreleased]
+### Added
+- Added Allocate more time modal
+
+## [v5.7.6] - 2021-04-06
+### Changed
+- Added means of getting more information about failed queries
+### Fixed
+- Fixed issue with Team Performance not showing any data.
+- Fixed issue with Feedback email getting sent
+
+
+## [v5.7.5] - 2021-04-21
+### Fixed
+- Asset extract information not pulling serial numbers
+- Files in AssetListExport.zip has misaligned headers
+- Print invoice process fails to update the invoice printed date and year/month field
+- Trans.csv file does not have the date column filled in
+- Updating user resets the consultant.Callbackemail
 
 ## [unreleased]
 ### Added

@@ -50,7 +50,7 @@ class BUFeedbackEmail extends Business
          JOIN team ON team.`teamID` = cons.teamID
          JOIN `consultant`  teamLeader ON teamLeader.`cns_consno`=team.`leaderId`
          JOIN customer ON customer.`cus_custno` = problem.`pro_custno`
-        join contact on  contact.con_contno = cal.caa_contno
+        join contact on  contact.con_contno = fixed.caa_contno
 WHERE  f.notified = 0 
         ";
         return $this->db->query($sql);

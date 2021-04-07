@@ -3019,6 +3019,19 @@ class BUActivity extends Business
                 return 'Projects';
         }
     }
+    public function getQueueTeamLevel($queueID)
+    {
+        switch ($queueID) {
+            case 1:
+                return 1;
+            case 2:
+                return 2;
+            case 4:
+                return 3;
+            default:
+                return 5;
+        }
+    }
 
     /**
      * @param DataAccess $dbeCallActivity

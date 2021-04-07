@@ -174,7 +174,7 @@ class AssetListExporter
         $currentSummaryRow = 2;
         $this->setHeaderRowToBold($summarySheet);
         foreach ($this->customersTabularDataItems as $customersTabularDataItem) {
-            $toExportData = $customersTabularDataItem->getExportData();
+            $toExportData = $customersTabularDataItem->getSummaryData();
             $summarySheet->fromArray($toExportData, null, "A$currentSummaryRow");
             for ($i = 0; $i < count($toExportData); $i++) {
 
@@ -182,16 +182,18 @@ class AssetListExporter
                     $customersTabularDataItem,
                     $i,
                     $summarySheet,
-                    $currentSummaryRow
+                    $currentSummaryRow,
+                    true
                 );
                 $this->setLastContactColorForCurrentRow(
                     $toExportData[$i],
                     $i,
                     $summarySheet,
                     $currentSummaryRow,
-                    $customersTabularDataItem
+                    $customersTabularDataItem,
+                    true
                 );
-                $this->setWarrantyColorForCurrentRow($toExportData[$i], $summarySheet, $currentSummaryRow);
+                $this->setWarrantyColorForCurrentRow($toExportData[$i], $summarySheet, $currentSummaryRow, true);
                 $currentSummaryRow++;
             }
         }
@@ -337,9 +339,9 @@ class AssetListExporter
         return null;
     }
 
-    private function getLastContactColor($exportArray): ?string
+    private function getLastContactColor($exportArray, $isSummary = false): ?string
     {
-        $index               = self::LAST_CONTACT_COLUMN_INDEX - 1;
+        $index               = self::LAST_CONTACT_COLUMN_INDEX - 1 + $isSummary;
         $lastContactDateTime = $exportArray[$index];
         if (!$lastContactDateTime || $lastContactDateTime == "N/A") {
             return null;
@@ -374,21 +376,27 @@ class AssetListExporter
      * @param int $i
      * @param Worksheet $sheet
      * @param int $currentRow
+     * @param bool $isSummary
      * @return void
      */
     private function setEndOfSupportDateColorForCurrentRow(ExportedItemCollection $tabularData,
                                                            int $i,
                                                            Worksheet $sheet,
-                                                           int $currentRow
+                                                           int $currentRow,
+                                                           $isSummary = false
     ): void
     {
         $OSEndOfSupportDateColor = $this->getOSEndOfSupportDateColor($tabularData, $i);
         if ($OSEndOfSupportDateColor) {
-            $columnCoordinate = Coordinate::stringFromColumnIndex(self::OS_END_OF_SUPPORT_DATE_COLUMN_INDEX);
+            $columnCoordinate = Coordinate::stringFromColumnIndex(
+                self::OS_END_OF_SUPPORT_DATE_COLUMN_INDEX + $isSummary
+            );
             $this->setCellSolidColor($sheet, "{$columnCoordinate}{$currentRow}", $OSEndOfSupportDateColor);
-            $columnCoordinate = Coordinate::stringFromColumnIndex(self::OPERATING_SYSTEM_COLUMN_INDEX);
+            $columnCoordinate = Coordinate::stringFromColumnIndex(self::OPERATING_SYSTEM_COLUMN_INDEX + $isSummary);
             $this->setCellSolidColor($sheet, "{$columnCoordinate}{$currentRow}", $OSEndOfSupportDateColor);
-            $columnCoordinate = Coordinate::stringFromColumnIndex(self::OPERATING_SYSTEM_VERSION_COLUMN_INDEX);
+            $columnCoordinate = Coordinate::stringFromColumnIndex(
+                self::OPERATING_SYSTEM_VERSION_COLUMN_INDEX + $isSummary
+            );
             $this->setCellSolidColor($sheet, "{$columnCoordinate}{$currentRow}", $OSEndOfSupportDateColor);
         }
     }
@@ -399,17 +407,19 @@ class AssetListExporter
      * @param Worksheet $sheet
      * @param int $currentRow
      * @param ExportedItemCollection $tabularData
+     * @param bool $isSummary
      */
     private function setLastContactColorForCurrentRow($exportArray,
                                                       int $i,
                                                       Worksheet $sheet,
                                                       int $currentRow,
-                                                      ExportedItemCollection $tabularData
+                                                      ExportedItemCollection $tabularData,
+                                                      $isSummary = false
     )
     {
-        $lastContactColor = $this->getLastContactColor($exportArray);
+        $lastContactColor = $this->getLastContactColor($exportArray, $isSummary);
         if ($lastContactColor) {
-            $columnCoordinate = Coordinate::stringFromColumnIndex(self::LAST_CONTACT_COLUMN_INDEX);
+            $columnCoordinate = Coordinate::stringFromColumnIndex(self::LAST_CONTACT_COLUMN_INDEX + $isSummary);
             $this->setCellSolidColor($sheet, "{$columnCoordinate}{$currentRow}", $lastContactColor);
             $operatingSystem = $tabularData->getOperatingSystem($i);
             if (strpos(strtolower($operatingSystem), "microsoft") > -1) {
@@ -422,12 +432,17 @@ class AssetListExporter
      * @param $exportArray
      * @param Worksheet $sheet
      * @param int $currentRow
+     * @param bool $isSummary
      */
-    private function setWarrantyColorForCurrentRow($exportArray, Worksheet $sheet, int $currentRow): void
+    private function setWarrantyColorForCurrentRow($exportArray,
+                                                   Worksheet $sheet,
+                                                   int $currentRow,
+                                                   $isSummary = false
+    ): void
     {
         $warrantyColor = $this->getWarrantyColor($exportArray);
         if ($warrantyColor) {
-            $columnCoordinate = Coordinate::stringFromColumnIndex(self::WARRANTY_EXPIRY_DATE_COLUMN_INDEX);
+            $columnCoordinate = Coordinate::stringFromColumnIndex(self::WARRANTY_EXPIRY_DATE_COLUMN_INDEX + $isSummary);
             $this->setCellSolidColor($sheet, "{$columnCoordinate}{$currentRow}", $warrantyColor);
         }
     }

@@ -24,7 +24,8 @@ import APIActivity from '../services/APIActivity';
 import MovingSRComponent from './subComponents/MovingSRComponent';
 
 import CallBackComponent from './subComponents/CallBackComponent';
-
+import AllocateMoreTimeComponent from '../shared/AllocateMoreTimeComponent/AllocateMoreTimeComponent';
+ 
 const AUTORELOAD_INTERVAL_TIME = 2 * 60 * 1000;
 
 class CurrentActivityReportComponent extends MainComponent {
@@ -72,7 +73,8 @@ class CurrentActivityReportComponent extends MainComponent {
                 problem: null
             },
             showCallBackModal: false,
-            currentProblem: null
+            currentProblem: null,
+            showAllocateMoreTime:false
         };
         this.apiCurrentActivityService = new CurrentActivityService();
         this.teams = [
@@ -412,7 +414,8 @@ class CurrentActivityReportComponent extends MainComponent {
         );
     }
     allocateAdditionalTime = (problem) => {
-        window.location = `Activity.php?action=allocateAdditionalTime&problemID=${problem.problemID}`;
+        this.setState({"showAllocateMoreTime":true,currentProblem:problem});
+        //window.location = `Activity.php?action=allocateAdditionalTime&problemID=${problem.problemID}`;
     };
     requestAdditionalTime = async (problem) => {
         var reason = await this.prompt(
@@ -629,7 +632,11 @@ class CurrentActivityReportComponent extends MainComponent {
     handleCallBackClose = (callActivityID) => {
         this.setState({showCallBackModal: false});
     }
-
+    handleAllocateMoreTimeClose=()=>{
+        this.setState({"showAllocateMoreTime":false});
+        const {filter} = this.state;     
+        this.loadQueue(   filter.activeTab );
+    }
     render() {
         const {
             el,
@@ -672,6 +679,7 @@ class CurrentActivityReportComponent extends MainComponent {
                                team={filter.activeTab}
                                customerID={this.state.openSrCustomerID}
             ></CallBackComponent>,
+            <AllocateMoreTimeComponent onClose={this.handleAllocateMoreTimeClose} key="showAllocateMoreTime" show={this.state.showAllocateMoreTime} problem={this.state.currentProblem}></AllocateMoreTimeComponent>,
             this.getCallBackModal(),
             this.getConfirm(),
             this.getAlert(),
