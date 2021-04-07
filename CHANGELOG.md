@@ -1,24 +1,5 @@
 # Changelog
 This project changes will be shown here.
-## [unreleased]
-### Added
-- Added Allocate more time modal
-
-## [v5.7.6] - 2021-04-06
-### Changed
-- Added means of getting more information about failed queries
-### Fixed
-- Fixed issue with Team Performance not showing any data.
-- Fixed issue with Feedback email getting sent
-
-
-## [v5.7.5] - 2021-04-21
-### Fixed
-- Asset extract information not pulling serial numbers
-- Files in AssetListExport.zip has misaligned headers
-- Print invoice process fails to update the invoice printed date and year/month field
-- Trans.csv file does not have the date column filled in
-- Updating user resets the consultant.Callbackemail
 
 ## [unreleased]
 ### Added
@@ -27,6 +8,7 @@ This project changes will be shown here.
 - Issue 1289 - Add SR what3Words icon.
 - Issue 1291 - Add In Stock check to sales order.
 - Issue 1290 - Update prices in new order line from "copy to order".
+- Issue 1308 - Added Allocate more time modal.
 ### Changed
 - Issue 1276 - Monitored SR email, Change Status: Awaiting Customer to Status: On Hold
 - Issue 1310 - Show sales orders on overtime page.
@@ -45,6 +27,22 @@ This project changes will be shown here.
 - Issue 1317 - Duplication of lines in Sales Orders
 - Issue 1315 - OBRS update path & Check Now
 - Issue 1312 - Amending a line in a Sales Order opens a new tab
+
+## [v5.7.6] - 2021-04-06
+### Changed
+- Added means of getting more information about failed queries
+### Fixed
+- Fixed issue with Team Performance not showing any data.
+- Fixed issue with Feedback email getting sent
+
+
+## [v5.7.5] - 2021-04-21
+### Fixed
+- Asset extract information not pulling serial numbers
+- Files in AssetListExport.zip has misaligned headers
+- Print invoice process fails to update the invoice printed date and year/month field
+- Trans.csv file does not have the date column filled in
+- Updating user resets the consultant.Callbackemail
 
 ## [v5.7.4] - 2021-03-30
 ### Fixed
