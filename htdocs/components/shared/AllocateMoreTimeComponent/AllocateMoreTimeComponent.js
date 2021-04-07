@@ -28,13 +28,12 @@ class AllocateMoreTimeComponent extends MainComponent {
             key="processRequestTime"
             show={this.props.show}
             width="700px"
-            title="Time Request"
+            title="Allocate more time"
             onClose={this.handleCancel}
             footer={
-                <div key="divFooter">
-                    <button onClick={this.handleCancel}>Cancel</button>
+                <div key="divFooter">                   
                     <button onClick={this.handleSave} >Save</button>
-
+                    <button onClick={this.handleCancel}>Cancel</button>
                 </div>
             }
             >
@@ -92,7 +91,7 @@ class AllocateMoreTimeComponent extends MainComponent {
         }
         data.status = "Approve";
         data.problemID=this.props.problem.problemID;
-        data.teamLevel=this.props.problem.queueTeamId;
+        data.queueID=this.props.problem.queueTeamId;
         console.log(this.props.problem);
        // return;
         this.api.allocateAdditionalTime(data).then(result => {

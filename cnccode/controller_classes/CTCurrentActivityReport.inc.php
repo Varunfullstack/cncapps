@@ -886,6 +886,8 @@ class CTCurrentActivityReport extends CTCNC
         $minutesInADay = $dsHeader->getValue(DBEHeader::smallProjectsTeamMinutesInADay);
         /* validate if this is a POST request */
         $minutes = 0;
+        $teamLevel=$this->buActivity->getQueueTeamLevel($body->queueID);
+
         switch ($body->allocatedTimeAmount) {
             case 'minutes':
                 $minutes = $body->allocatedTimeValue;
@@ -898,14 +900,17 @@ class CTCurrentActivityReport extends CTCNC
         }
             $this->buActivity->allocateAdditionalTime(
                 $body->problemID,
-                $body->teamLevel,
+                $teamLevel,
                 $minutes,
                 $body->comments,
                 $this->dbeUser
             );
+            $dbeTeam=new DBETeam($this);
+            $dbeTeam->getRow($body->teamID);
+
             $this->buActivity->logOperationalActivity(
                 $body->problemID,
-                "<p>Additional time allocated to {$this->buActivity->getTeamName($body->teamLevel)} Team: {$minutes} minutes</p><p>{$body->comments}</p>"
+                "<p>Additional time allocated to {$this->buActivity->getTeamName($teamLevel)} Team: {$minutes} minutes</p><p>{$body->comments}</p>"
             );
          return ["status"=>true];
         }
