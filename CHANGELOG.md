@@ -1,5 +1,8 @@
 # Changelog
 This project changes will be shown here.
+## [unreleased] - 2021-03-30
+### Added
+- update prices in new order line from "copy to order"
 
 ## [unreleased]
 ### Added
