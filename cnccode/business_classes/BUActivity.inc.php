@@ -66,6 +66,8 @@ require_once($cfg["path_dbe"] . "/DBEPendingReopened.php");
 require_once($cfg['path_dbe'] . '/DBECallDocumentWithoutFile.php');
 require_once($cfg["path_ct"] . "/CTProject.inc.php");
 require_once($cfg ["path_bu"] . "/BUProblemRaiseType.inc.php");
+require_once($cfg["path_dbe"] . "/DBConnect.php");
+
 define(
     'BUACTIVITY_RESOLVED',
     9
@@ -6661,27 +6663,33 @@ class BUActivity extends Business
     /**
      * @return mixed
      */
-    function getPendingReopenedRequests()
+    function getPendingReopenedRequests($id=null)
     {
-        $db          = new dbSweetcode(); // database connection for query
-        $queryString = "
-      SELECT
-  pendingReopened.id,
-  problemID,
-  contactID,
-  reason,
-  customer.`cus_name` AS customerName,
-  customer.cus_custno as customerID,
-  problem.`pro_priority` AS priority,
-  createdAt
-FROM
-  pendingReopened
-  LEFT JOIN contact ON pendingReopened.contactID = contact.`con_contno`
-  LEFT JOIN problem ON pendingReopened.problemID = problem.`pro_problemno`
-  LEFT JOIN customer ON problem.pro_custno = customer.`cus_custno`
-  ";
-        $result      = $db->query($queryString);
-        return $result->fetch_all(MYSQLI_ASSOC);
+         $queryString = "SELECT
+        pendingReopened.id,
+        problemID,
+        contactID,
+        reason,
+        customer.`cus_name` AS customerName,
+        customer.cus_custno as customerID,
+        problem.`pro_priority` AS priority,
+        createdAt,
+        cus_name  
+        FROM
+        pendingReopened
+        LEFT JOIN contact ON pendingReopened.contactID = contact.`con_contno`
+        LEFT JOIN problem ON pendingReopened.problemID = problem.`pro_problemno`
+        LEFT JOIN customer ON problem.pro_custno = customer.`cus_custno`
+        ";
+        if(!$id)
+        {
+            return DBConnect::fetchAll($queryString);
+        }
+        else
+        {
+            return DBConnect::fetchOne($queryString);
+        }
+      
     }
 
     function getCustomerRaisedRequests()

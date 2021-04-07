@@ -1,5 +1,8 @@
 # Changelog
 This project changes will be shown here.
+## [unreleased]
+### Changed 
+- issue 1287 New SR from Pending Reopen re-write
 
 ## [v5.7.6] - 2021-04-06
 ### Changed

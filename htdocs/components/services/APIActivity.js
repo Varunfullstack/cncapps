@@ -232,6 +232,9 @@ class APIActivity extends APIMain {
     async resendChargeableRequestEmail(id) {
         return this.post(`${ApiUrls.sdDashboard}resendPendingChargeableRequestEmail`, {id})
     }
+    getPendingReopen(id){
+        return this.get(`${ApiUrls.SRActivity}pendingReopened&id=${id}`);
+    }
 }
 
 export default APIActivity;
