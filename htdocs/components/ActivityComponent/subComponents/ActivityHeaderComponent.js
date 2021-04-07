@@ -1,4 +1,5 @@
 import React from 'react';
+import ToolTip from '../../shared/ToolTip';
 
 import './ActivityHeaderComponent.css'
 
@@ -18,13 +19,27 @@ export class ActivityHeaderComponent extends React.Component {
         return (
             <h2 className="activity-header-component">
                 <span className="company-info">
-                    <a
+                <div style={{display:"flex",alignItems:"center"}}>
+                <a
                         className={serviceRequestData.customerNameDisplayClass}
                         href={`Customer.php?action=dispEdit&customerId=${serviceRequestData.customerId}`}
                         target="_blank"
                     >
                     {`${serviceRequestData.customerName}, ${serviceRequestData.siteAdd1}, ${serviceRequestData.siteAdd2}, ${serviceRequestData.siteAdd3}, ${serviceRequestData.siteTown}, ${serviceRequestData.sitePostcode}`}
                 </a>
+                {serviceRequestData.what3Words?
+                 <ToolTip
+                 title="What3words"
+                 width={30}
+                 content={<a
+                     className="fal fa-map-marker-alt fa-x m-5 pointer icon"
+                     href={`https://what3words.com/${serviceRequestData?.what3Words}`}
+                     target="_blank"
+                     rel="noreferrer"></a>
+                }
+                />:null
+                }
+                </div>
                 </span>
                 <span className="contact-info">
                     <a href={`Customer.php?action=dispEdit&customerId=${serviceRequestData.customerId}`}

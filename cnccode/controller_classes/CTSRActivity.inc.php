@@ -280,6 +280,8 @@ class CTSRActivity extends CTCNC
         $dbeSite->getRowByCustomerIDSiteNo();
         $buActivity      = new BUActivity($this);
         $buUser          = new BUUser($this);
+        $address         = $dbeCustomer->getCustomerSiteAddress($customerId,$siteId);
+        $what3Words      = $address?$address['what3Words']:null;
         $dbeLastActivity = $buActivity->getLastActivityInProblem($problemID);
         if ($dbeLastActivity->getValue(DBEJCallActivity::callActTypeID) == 0 && $dbeLastActivity->getValue(
                 DBEJCallActivity::userID
@@ -500,7 +502,8 @@ class CTSRActivity extends CTCNC
             "taskList"                        => $dbeProblem->getValue(DBEProblem::taskList),
             "taskListUpdatedAt"               => $dbeProblem->getValue(DBEProblem::taskListUpdatedAt),
             "taskListUpdatedBy"               => $taskListUpdatedBy,
-            'pendingCallbacks'                => $pendingCallbacks
+            'pendingCallbacks'                => $pendingCallbacks,
+            "what3Words"                      => $what3Words
         ];
     }
 

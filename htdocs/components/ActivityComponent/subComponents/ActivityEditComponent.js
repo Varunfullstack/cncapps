@@ -573,6 +573,7 @@ class ActivityEditComponent extends MainComponent {
                     })
                 }) : null,
             this.renderChargeableWorkIcon()
+               
         );
     };
 

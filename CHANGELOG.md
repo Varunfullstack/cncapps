@@ -5,6 +5,7 @@ This project changes will be shown here.
 ### Added
 - Issue 1286 - Add Generate Password Icon to Edit SR page
 - Issue 1288 - Add the columns for Cost Price/Annum and Sales Price/Annum for these tabs: Renewals,Domains,Web Hosting.
+- Issue 1289 - Add SR what3Words icon.
 ### Changed
 - Issue 1276 - Monitored SR email, Change Status: Awaiting Customer to Status: On Hold
 - Issue 1310 - Show sales orders on overtime page.

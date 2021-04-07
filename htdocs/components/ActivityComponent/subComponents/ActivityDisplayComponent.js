@@ -133,6 +133,7 @@ class ActivityDisplayComponent extends MainComponent {
         }
         return (
             <div style={{display: "flex", flexDirection: "column"}}>
+                <div style={{display:"flex",alignItems:"center"}}>
                 <a
                     className={data?.customerNameDisplayClass}
                     href={`Customer.php?action=dispEdit&customerId=${data?.customerId}`}
@@ -145,6 +146,20 @@ class ActivityDisplayComponent extends MainComponent {
                     data?.siteTown + ", " +
                     data?.sitePostcode}
                 </a>
+                {data.what3Words?
+                 <ToolTip
+                 title="What3words"
+                 width={30}
+                 content={<a
+                     className="fal fa-map-marker-alt fa-x m-5 pointer icon"
+                     href={`https://what3words.com/${data?.what3Words}`}
+                     target="_blank"
+                     rel="noreferrer"></a>
+                }
+                />:null
+                }
+                </div>
+               
                 <div>
                     <a href={`Customer.php?action=dispEdit&customerId=${data?.customerId}`}
                        target="_blank"
@@ -398,7 +413,7 @@ class ActivityDisplayComponent extends MainComponent {
                     />
                     : this.getSpacer()}
                 {this.renderChargeableWorkIcon()}
-
+                
             </div>
         </div>
     }

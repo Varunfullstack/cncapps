@@ -827,6 +827,12 @@ class DBECustomer extends DBCNCEntity
         $ret = (self::getRows());
         return $ret;
     }
+    public function getCustomerSiteAddress($customerID,$siteID)
+    {
+        $query="select * from address where add_custno=:custID and (:siteID is null or add_siteno=:siteID)";
+        $address=DBConnect::fetchOne($query,["siteID"=>$siteID,"custID"=>$customerID]);
+        return $address;
+    }
 }
 
 ?>
