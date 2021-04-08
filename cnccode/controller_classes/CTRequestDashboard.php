@@ -191,6 +191,8 @@ class CTRequestDashboard extends CTCNC
                     'teamManagementApprovalMinutes' => $teamManagementTimeApprovalMinutes,
                     "callActivityID"                => $dbejCallActivity->getValue(DBEJCallActivity::callActivityID),
                     'problemID'                     => $dbejCallActivity->getValue(DBEJCallActivity::problemID),
+                    "linkedSalesOrderID"            => $dbejCallActivity->getValue(DBEJCallActivity::linkedSalesOrderID),
+
                 ]
             );
 
@@ -279,7 +281,9 @@ class CTRequestDashboard extends CTCNC
                 'requestedDateTime' => $dbejCallActivity->getValue(
                         DBEJCallActivity::date
                     ) . ' ' . $dbejCallActivity->getValue(DBEJCallActivity::startTime) . ':00',
-                'callActivityID'    => $dbejCallActivity->getValue(DBEJCallActivity::callActivityID)
+                'callActivityID'    => $dbejCallActivity->getValue(DBEJCallActivity::callActivityID),
+                "linkedSalesOrderID"=> $dbejCallActivity->getValue(DBEJCallActivity::linkedSalesOrderID),
+
             ];
         }
         return $result;

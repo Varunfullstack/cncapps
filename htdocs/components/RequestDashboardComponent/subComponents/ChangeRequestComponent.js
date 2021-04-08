@@ -72,6 +72,20 @@ class ChangeRequestComponent extends MainComponent {
                 }, problem.problemID)
             },
             {
+                path: "linkedSalesOrderID",
+                label: "",
+                hdToolTip: "Sales Order",
+                hdClassName: "text-center",
+                icon: "fal fa-2x fa-tag color-gray2 pointer",
+                className: "text-center  text-top",
+                classNameColumn: "",
+                sortable: false,
+                content: (problem) => el('a', {
+                    href: `SalesOrder.php?action=displaySalesOrder&ordheadID=${problem.linkedSalesOrderID}`,
+                    target: '_blank'
+                }, problem.linkedSalesOrderID)
+            },
+            {
                 path: "requestBody",
                 label: "",
                 key: "requestBody",

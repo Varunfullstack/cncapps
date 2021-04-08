@@ -790,7 +790,15 @@ class CTCurrentActivityReport extends CTCNC
             //$dbeCallActivity->setValue(DBECallActivity::cncNextAction,"Please call $contactName at ".$callDateTime->format('Y-m-d')." at ".$callDateTime->format('H:i'));
             $dbeCallActivity->setValue(DBECallActivity::awaitingCustomerResponseFlag, "N");
             $dbeCallActivity->setValue(DBECallActivity::problemID, $problemID);
+         
             $dbeCallActivity->insertRow();
+            $dbeProblem=new DBEProblem($this);
+            $dbeProblem->getRow($problemID);
+            $respondedHours = $dbeProblem->getValue(DBEJProblem::workingHours);
+            $dbeProblem->setValue(DBEJProblem::respondedHours,$respondedHours);
+            $dbeProblem->setValue(DBEProblem::status,'P');
+            //$dbeProblem->setValue(DBEProblem::respondedHours,'');
+            $dbeProblem->updateRow();
             return ['status' => true, "callActivityID" => $dbeCallActivity->getPKValue()];
         } catch (Exception $ex) {
             return ['status' => false, 'error' => $ex->getMessage()];
