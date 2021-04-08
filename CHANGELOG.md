@@ -2,7 +2,8 @@
 This project changes will be shown here.
 ## [unreleased]
 ### Added
-- Add sales order to RequestDashboard
+- Issue 1329 - Add sales order to RequestDashboard
+- Issue 1328 - Starting SR from a call back can cause SLA to fail
 
 ## [v5.7.6] - 2021-04-06
 ### Changed
