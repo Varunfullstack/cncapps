@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1326 - Supported Customer Assets Refinements.
+
 ## [v5.7.6] - 2021-04-06
 ### Changed
 - Added means of getting more information about failed queries
