@@ -1,9 +1,5 @@
 # Changelog
 This project changes will be shown here.
-## [unreleased]
-### Added
-- Issue 1329 - Add sales order to RequestDashboard
-- Issue 1328 - Starting SR from a call back can cause SLA to fail
 
 ## [unreleased]
 ### Added
@@ -13,6 +9,8 @@ This project changes will be shown here.
 - Issue 1291 - Add In Stock check to sales order.
 - Issue 1290 - Update prices in new order line from "copy to order".
 - Issue 1308 - Added Allocate more time modal.
+- Issue 1329 - Add sales order to RequestDashboard
+- Issue 1328 - Starting SR from a call back can cause SLA to fail
 ### Changed
 - Issue 1276 - Monitored SR email, Change Status: Awaiting Customer to Status: On Hold
 - Issue 1310 - Show sales orders on overtime page.
