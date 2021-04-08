@@ -241,6 +241,9 @@ class CTSRActivity extends CTCNC
             case self::SAVE_TASK_LIST:
                 echo json_encode($this->saveTaskListController());
                 exit;
+            case "pendingReopened":
+                echo $this->getPendingReopenedRequest();
+                exit;
             default:
                 $this->setTemplate();
                 break;
@@ -1691,6 +1694,16 @@ FROM
             "data"   => (bool)$count
         ];
     }
+    function getPendingReopenedRequest()
+    {
+        $id=@$_REQUEST["id"];
+        if(empty($id))
+            return null;
+        $pendingReopenedRequest = $this->buActivity->getPendingReopenedRequests($id);
+        if ($pendingReopenedRequest)
+                return json_encode($pendingReopenedRequest,JSON_NUMERIC_CHECK);
+        return null;
+    } // end function display
 }
 
 ?>

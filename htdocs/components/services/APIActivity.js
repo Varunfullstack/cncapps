@@ -236,6 +236,9 @@ class APIActivity extends APIMain {
     async checkServiceRequestPendingCallbacks(serviceRequestId) {
         return this.post(`${ApiUrls.SRActivity}checkServiceRequestPendingCallbacks`, {serviceRequestId}).then(res => res.json()).then(res => res.data)
     }
+    getPendingReopen(id){
+        return this.get(`${ApiUrls.SRActivity}pendingReopened&id=${id}`);
+    }
 }
 
 export default APIActivity;

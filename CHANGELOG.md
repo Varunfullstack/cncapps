@@ -1,5 +1,8 @@
 # Changelog
 This project changes will be shown here.
+## [unreleased]
+### Changed 
+- issue 1287 New SR from Pending Reopen re-write
 
 ## [unreleased]
 ### Added
