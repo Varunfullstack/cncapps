@@ -1299,6 +1299,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $highestRow    = $permissionsSheet->getHighestRow();
         $highestColumn = $permissionsSheet->getHighestColumn();
         $permissionsSheet->getStyle("A1:{$highestColumn}1")->getFont()->setBold(true);
+        $permissionsSheet->getStyle("A1:{$highestColumn}{$highestRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
         foreach (range('A', $highestColumn) as $col) {
             $permissionsSheet->getColumnDimension($col)->setAutoSize(true);
         }
