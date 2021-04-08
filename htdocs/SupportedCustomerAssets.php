@@ -1,4 +1,9 @@
 <?php
+
+use CNCLTD\SupportedCustomerAssets\SupportedCustomerAssetsActiveCustomersHTMLGenerator;
+
 require_once("config.inc.php");
-$generator = new \CNCLTD\SupportedCustomerAssets\SupportedCustomerAssetsActiveCustomersHTMLGenerator();
+$customerId = @$_GET['customerId'];
+
+$generator = new SupportedCustomerAssetsActiveCustomersHTMLGenerator($customerId);
 $generator->printHTML();

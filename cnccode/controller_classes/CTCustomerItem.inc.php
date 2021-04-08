@@ -944,6 +944,9 @@ class CTCustomerItem extends CTCNC
                 'offsiteBackupDelayDisable'                             => ($this->dbeUser->getValue(
                         DBEUser::offsiteBackupAdditionalPermissionsFlag
                     ) == 'Y') ? 'true' : 'false',
+                'bypassCWAAgentCheckChecked'                            => $dsCustomerItem->getValue(
+                    DBECustomerItem::bypassCWAAgentCheck
+                ) ? "checked" : '',
                 'secondSiteLocationPathValidationText'                  => $secondSiteLocationPathValidationText,
                 'secondSiteReplicationPathValidationText'               => $secondSiteReplicationPathValidationText,
                 'secondsiteLocalExcludeFlagShow'                        => $secondsiteLocalExcludeFlagShow,

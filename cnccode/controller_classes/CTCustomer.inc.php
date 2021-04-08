@@ -3322,8 +3322,14 @@ ORDER BY NAME,
   biosVer
         ";
         $statement  = $labtechDB->prepare($query);
-        $statement->execute([$customerId, $customerId,]);
-        return $statement->fetchAll(PDO::FETCH_ASSOC);
+        $statement->execute([$customerId, $customerId]);
+        $customerAssets = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $unsupportedCustomerAssetsService = new \CNCLTD\SupportedCustomerAssets\UnsupportedCustomerAssetService();
+        $unsupportedCustomerAssets = $unsupportedCustomerAssetsService->getAllForCustomer($customerId);
+        foreach ($customerAssets as $key => $customerAsset){
+            $customerAssets[$key]['unsupported'] = in_array($customerAsset['name'],$unsupportedCustomerAssets);
+        }
+        return $customerAssets;
     }
 
     /**

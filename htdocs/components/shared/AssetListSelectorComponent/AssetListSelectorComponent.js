@@ -27,6 +27,7 @@ export default class AssetListSelectorComponent extends React.PureComponent {
             assets: [],
             maxUserNameLength: 0,
             maxComputerNameLength: 0,
+            maxBiosVerLength: 0,
             selectedOption: null
         }
         if (this.props.noAssetReason) {
@@ -68,7 +69,7 @@ export default class AssetListSelectorComponent extends React.PureComponent {
                 template: striptags(x.template)
             })).sort((a, b) => a.template.localeCompare(b.template));
 
-            const {maxComputerNameLength, maxUserNameLength} = assets.reduce(
+            const {maxComputerNameLength, maxUserNameLength, maxBiosVerLength} = assets.reduce(
                 (acc, asset) => {
 
                     if (asset.name && asset.name.length > acc.maxComputerNameLength) {
@@ -77,9 +78,12 @@ export default class AssetListSelectorComponent extends React.PureComponent {
                     if (asset.lastUsername && asset.lastUsername.length > acc.maxUserNameLength) {
                         acc.maxUserNameLength = asset.lastUsername.length;
                     }
+                    if (asset.biosVer && asset.biosVer.length > acc.maxBiosVerLength) {
+                        acc.maxBiosVerLength = asset.biosVer.length;
+                    }
                     return acc;
-                }, {maxComputerNameLength: 0, maxUserNameLength: 0})
-            this.setState({noAssetReasons, assets, maxUserNameLength, maxComputerNameLength});
+                }, {maxComputerNameLength: 0, maxUserNameLength: 0, maxBiosVerLength: 0})
+            this.setState({noAssetReasons, assets, maxUserNameLength, maxComputerNameLength, maxBiosVerLength});
         })
     }
 
@@ -135,7 +139,7 @@ export default class AssetListSelectorComponent extends React.PureComponent {
     }
 
     render() {
-        const {maxUserNameLength, maxComputerNameLength, selectedOption} = this.state;
+        const {maxUserNameLength, maxComputerNameLength, maxBiosVerLength, selectedOption} = this.state;
 
 
         if (selectedOption) {
@@ -184,13 +188,22 @@ export default class AssetListSelectorComponent extends React.PureComponent {
                                               {value.lastUsername}
                                           </div>
                                           <div style={{
-                                              display: "inline-block",
+                                              display: "inline-block", width: `${maxBiosVerLength + 4}ch`,
                                               fontSize: 12,
                                               fontFamily: "Arial",
                                               letterSpacing: "normal"
                                           }}
                                           >
                                               {value.biosVer}
+                                          </div>
+                                          <div style={{
+                                              display: "inline-block",
+                                              fontSize: 12,
+                                              fontFamily: "Arial",
+                                              letterSpacing: "normal"
+                                          }}
+                                          >
+                                              {value.unsupported ? <i className="fa fa-2x fa-do-not-enter" /> : ''}
                                           </div>
                                       </React.Fragment>
                                   )

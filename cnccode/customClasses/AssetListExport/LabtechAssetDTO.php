@@ -66,6 +66,14 @@ class LabtechAssetDTO
 
     }
 
+    public function is3CX(): bool
+    {
+        if (!$this->computerName || !preg_match('/.*3CX.*/', $this->computerName)) {
+            return false;
+        }
+        return true;
+    }
+
     private function getUnrepeatedUsername($str)
     {
         $n = strlen($str);

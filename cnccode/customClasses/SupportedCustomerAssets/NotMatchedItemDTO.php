@@ -6,6 +6,7 @@ class NotMatchedItemDTO
     private $customerName;
     private $computerName;
     private $customerItemId;
+    private $customerId;
 
     /**
      * NotMatchedItemDTO constructor.
@@ -13,11 +14,12 @@ class NotMatchedItemDTO
      * @param $computerName
      * @param $customerItemId
      */
-    public function __construct($customerName, $computerName, $customerItemId = null)
+    public function __construct($customerName, $computerName,$customerId, $customerItemId = null)
     {
         $this->customerName   = $customerName;
         $this->computerName   = $computerName;
         $this->customerItemId = $customerItemId;
+        $this->customerId = $customerId;
     }
 
     /**
@@ -42,6 +44,11 @@ class NotMatchedItemDTO
     public function getCustomerItemId()
     {
         return $this->customerItemId;
+    }
+
+    public function customerId()
+    {
+        return $this->customerId;
     }
 
 }
