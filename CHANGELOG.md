@@ -1,8 +1,5 @@
 # Changelog
 This project changes will be shown here.
-## [unreleased]
-### Changed 
-- issue 1287 New SR from Pending Reopen re-write
 
 ## [unreleased]
 ### Added
@@ -28,6 +25,7 @@ This project changes will be shown here.
 - Issue 1258 - upgrade LeadStatusTypes.php,CustomerType.php,Sector.php,ItemType.php,ExpenseType.php,Manufacturer.php,Team.php,createSalesRequest.php,Item.php,Password.php
 - Issue 1313 - Call back email to include the name of the person that took it
 - Issue 1320 - Project page report enhancements
+- Issue 1287 - New SR from Pending Reopen re-write
 ### Fixed
 - Issue 1314 - Scheduled SRs that are due on Mondays don't get created.
 - Issue 1317 - Duplication of lines in Sales Orders
