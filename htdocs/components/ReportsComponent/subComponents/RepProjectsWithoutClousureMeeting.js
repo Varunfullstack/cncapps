@@ -20,10 +20,15 @@ export default class RepProjectsWithoutClousureMeeting extends MainComponent {
   componentDidMount() { 
     this.getData();
   } 
-  
+  componentDidUpdate(prevProps, prevState) { 
+    if(!equal(prevProps,this.props))
+        this.getData();    
+  }
   getData(){
-    this.setState({showModal:true});        
-    this.api.getProjectsWithoutClousureMeeting()
+    this.setState({showModal:true});      
+    const {consID}=this.props;
+    console.log(consID);  
+    this.api.getProjectsWithoutClousureMeeting(consID)
     .then(projects=>{
       this.setState({projects,showModal:false,loadData:false});
     });
@@ -37,7 +42,7 @@ export default class RepProjectsWithoutClousureMeeting extends MainComponent {
             sortable: true,
             hdToolTip: "Customer Name",
             icon: "fal fa-2x fa-building color-gray2 pointer",
-            content:(project)=><a style={{color:'black'}} href={`Projects.php?action=edit&&projectID=${project.projectID}`}>{project.customerName}</a>
+            //content:(project)=><a style={{color:'black'}} href={`Projects.php?action=edit&&projectID=${project.projectID}`}>{project.customerName}</a>
             //className: "text-center",
           },
         {
@@ -68,16 +73,16 @@ export default class RepProjectsWithoutClousureMeeting extends MainComponent {
             // content:(project)=><a href={`/Project.php?action=edit&projectID=${project.projectID}`} target="_blank">{project.description}</a>
           },
           {
-            path: "startDate",
+            path: "commenceDate",
             //label: "Description",
             sortable: true,
-            hdToolTip: "Start Date",
+            hdToolTip: "Project Commencement Date",
             icon:"fal fa-2x fa-calendar color-gray2 pointer",
             //className: "text-center",
             //content:(project)=><div>{this.getCorrectDate(project.startDate)}</div>
           },
     ]
-    return <div style={{maxWidth:1000}}> 
+    return <div > 
                 <Table
                     columns={columns}
                     pk={"projectID"}

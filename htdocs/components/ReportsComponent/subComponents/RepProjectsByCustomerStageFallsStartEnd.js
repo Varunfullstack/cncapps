@@ -82,7 +82,7 @@ export default class RepProjectsByCustomerStageFallsStartEnd extends MainCompone
             //content:(project)=><div>{this.getCorrectDate(project.startDate)}</div>
           },
     ]
-    return <div style={{maxWidth:1000}}> 
+    return <div  > 
                 <Table
                     columns={columns}
                     pk={"projectID"}

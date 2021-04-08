@@ -1006,12 +1006,16 @@ class CTProjects extends CTCNC
         p.notes,
         c.cus_name as customerName,
         ps.name as projectStageName,
-        pt.name as projectTypeName
+        pt.name as projectTypeName,
+        inHoursBudgetDays,       
+        outOfHoursBudgetDays,       
+        calculatedBudget
         from project p
         join customer c on c.cus_custno=p.customerID
         left join projectstages ps on ps.id = p.projectStageID
         left join projecttypes pt on  pt.id = p.projectTypeID
         where 1=1
+        
         ";
         $params = [];
         if (!empty($consID)) {
@@ -1036,6 +1040,25 @@ class CTProjects extends CTCNC
         }
         //return    $params;
         $projects = DBConnect::fetchAll($query, $params);
+        for($i=0;$i<count($projects); $i++)
+        {
+            $inHoursBudget            = "??";
+            $inHoursUsed              = "??";
+            $outHoursBudget           = "??";
+            $outHoursUsed             = "??";
+            if ($projects[$i]['calculatedBudget'] == 'Y') {
+                $hoursUsed      = $this->calculateInHoursOutHoursUsed($projects[$i]['projectID']);
+                $inHoursBudget  = $projects[$i]['inHoursBudgetDays'];
+                $inHoursUsed    = $hoursUsed['inHoursUsed'];
+                $outHoursBudget = $projects[$i]['outOfHoursBudgetDays'];
+                $outHoursUsed   = $hoursUsed['outHoursUsed'];
+                $projects[$i]["inHoursBudget"]= $inHoursBudget;
+                $projects[$i]["inHoursUsed"]= $inHoursUsed;
+                $projects[$i]["outHoursBudget"]= $outHoursBudget;
+                $projects[$i]["outHoursUsed"]= $outHoursUsed;
+             }
+        }
+        
         return $projects;
     }
 
@@ -1127,7 +1150,7 @@ class CTProjects extends CTCNC
 
     function getProjectsWithoutClousureMeeting()
     {
-
+        $consID   = @$_REQUEST["consID"];
         $dateFrom = @$_REQUEST["dateFrom"];
         $dateTo   = @$_REQUEST["dateTo"];
         $query    = "
@@ -1135,7 +1158,7 @@ class CTProjects extends CTCNC
         p.projectID,
         p.customerID,
         p.description,
-        p.startDate,
+        p.commenceDate,
         p.expiryDate,
         p.notes,
         c.cus_name AS customerName,
@@ -1150,6 +1173,10 @@ class CTProjects extends CTCNC
           
         ";
         $params   = [];
+        if (!empty($consID)) {
+            $query            .= " and consultantID=:consID";
+            $params["consID"] = $consID;
+        }
         if (!empty($dateFrom)) {
             $query              .= " and startDate >=:dateFrom";
             $params["dateFrom"] = $dateFrom;
