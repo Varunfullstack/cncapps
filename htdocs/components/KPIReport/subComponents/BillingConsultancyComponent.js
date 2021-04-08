@@ -71,7 +71,7 @@ export default class BillingConsultancyComponent extends React.Component {
                     let value = null;
                     const foundItem = e.items.find(x => x.inh_date_printed_yearmonth === date.format('YYYYMM'));
                     if (foundItem) {
-                        value = foundItem.amount;
+                        value = +foundItem.amount;
                     }
                     return value;
                 }),
@@ -90,7 +90,7 @@ export default class BillingConsultancyComponent extends React.Component {
         const user = consultants.find(c => c.teamId == teamId && c.name == name);
         return !!user;
     }
-    getChartData = (data, filter) => {
+    getChartData = (data) => {
         let filterData = [];
         let dataLabels = [];
         data = this.getDataFilter(data);
@@ -125,8 +125,8 @@ export default class BillingConsultancyComponent extends React.Component {
         return filteredData;
     }
     getChart = () => {
-        const {data, filter} = this.props;
-        const {filterData, dataLabels} = this.getChartData(data, filter);
+        const {data} = this.props;
+        const {filterData, dataLabels} = this.getChartData(data);
         const chartData = {
             labels: dataLabels,
             datasets: filterData,
@@ -152,15 +152,20 @@ export default class BillingConsultancyComponent extends React.Component {
             ;
     };
     getSummaryElement = () => {
-        let {data} = this.props;
-        data = this.getDataFilter(data);
-        const engineers = groupBy(sort(data, 'engineer'), 'engineer');
-        engineers.map(e => {
-            e.average = (e.items.reduce((curr, prev) => {
-                curr += parseFloat(prev.amount);
-                return curr;
-            }, 0) / e.items.length).toFixed(1);
-        });
+        const {data} = this.props;
+        const {filterData} = this.getChartData(data);
+
+
+        const result = filterData.reduce((acc, dataItem) => {
+            acc.push(
+                {
+                    name: dataItem.label,
+                    average: (dataItem.data.reduce((sum, x) => sum + x, 0) / dataItem.data.length).toFixed(2)
+                }
+            )
+            return acc;
+        }, [])
+
 
         return <div>
             <h3>Monthly Average Over The Selected Period</h3>
@@ -169,8 +174,8 @@ export default class BillingConsultancyComponent extends React.Component {
             >
                 <tbody>
                 {
-                    engineers.map((e,idx) => <tr key={idx}>
-                        <td>{e.groupName}</td>
+                    result.map((e, idx) => <tr key={idx}>
+                        <td>{e.name}</td>
                         <td>{e.average}</td>
                     </tr>)
                 }
