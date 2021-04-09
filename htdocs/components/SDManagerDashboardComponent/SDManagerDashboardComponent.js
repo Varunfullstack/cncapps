@@ -17,6 +17,7 @@ import Spinner from "../shared/Spinner/Spinner";
 import {ColumnRenderer} from "../CurrentActivityReportComponent/subComponents/ColumnRenderer";
 import MissedCallBackComponent from "./subComponents/MissedCallBackComponent";
 import PendingChargeableRequestsComponent from "./subComponents/PendingChargeableRequestsComponent";
+import MassAssignmentComponent from "./subComponents/MassAssignmentComponent";
 
 const CUSTOMER_TAB = 9;
 
@@ -38,7 +39,7 @@ class SDManagerDashboardComponent extends MainComponent {
     api = new APISDManagerDashboard();
     apiCurrentActivityService = new CurrentActivityService();
     intervalRef;
-
+    TAB_MASS_ASSIGNMENT=14;
     constructor(props) {
         super(props);
         this.state = {
@@ -69,7 +70,9 @@ class SDManagerDashboardComponent extends MainComponent {
             {id: HELD_FOR_QA_TAB, title: "Held for QA", icon: null},
             {id: DAILY_STATS_TAB, title: "Daily Stats", icon: null},
             {id: TAB_MISSED_CALL_BACKS, title: "Call Backs", icon: null},
-            {id: PENDING_CHARGEABLE_WORK_REQUESTS_TAB, title: 'Pending Chargeable Work', icon: null}
+            {id: PENDING_CHARGEABLE_WORK_REQUESTS_TAB, title: 'Pending Chargeable Work', icon: null},
+            {id: this.TAB_MASS_ASSIGNMENT, title: 'Mass Assignment', icon: null}
+
         ];
     }
 
@@ -117,7 +120,7 @@ class SDManagerDashboardComponent extends MainComponent {
             {
                 key: "tab",
                 className: "tab-container",
-                style: {flexWrap: "wrap", justifyContent: "flex-start", maxWidth: 1300}
+                style: {flexWrap: "wrap", justifyContent: "flex-start", maxWidth: 1500}
             },
             tabs.map((t) => {
                 return el(
@@ -610,6 +613,8 @@ class SDManagerDashboardComponent extends MainComponent {
         } else if (filter.activeTab == PENDING_CHARGEABLE_WORK_REQUESTS_TAB) {
             return <PendingChargeableRequestsComponent filter={filter}/>
         }
+        else if(filter.activeTab == this.TAB_MASS_ASSIGNMENT)
+            return <MassAssignmentComponent filter={filter}></MassAssignmentComponent>
     }
     srDescription = (problem) => {
         window.open(
