@@ -63,10 +63,10 @@ class SupportedCustomerAssets
             ];
         }
         foreach ($tabularData->getExportData() as $key => $exportDatum) {
-            if ($tabularData->isServerAsset($key) || $tabularData->is3CX($key)) {
-                $asset             = $tabularData->getAsset($key);
-                $lowerComputerName = strtolower($asset->getComputerName());
-                if (!isset($this->cncContractAssets[$lowerComputerName])) {
+            $asset             = $tabularData->getAsset($key);
+            $lowerComputerName = strtolower($asset->getComputerName());
+            if (!isset($this->cncContractAssets[$lowerComputerName])) {
+                if ($tabularData->isServerAsset($key) || $tabularData->is3CX($key)) {
                     $this->automateAssets[$lowerComputerName] = [
                         "matched" => false,
                         "item"    => new NotMatchedItemDTO(
@@ -75,9 +75,9 @@ class SupportedCustomerAssets
                             $dbeCustomer->getValue(DBECustomer::customerID)
                         ),
                     ];
-                } else {
-                    $this->cncContractAssets[$lowerComputerName]['matched'] = true;
                 }
+            } else {
+                $this->cncContractAssets[$lowerComputerName]['matched'] = true;
             }
         }
     }
