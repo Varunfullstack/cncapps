@@ -4,6 +4,7 @@ import APIStandardText from "../../services/APIStandardText";
 import React from 'react';
 
 import striptags from "striptags";
+import ToolTip from "../ToolTip";
 
 export const ASSET_SELECTED_TYPE = {
     NO_ASSET_REASON: "NO_ASSET_REASON",
@@ -159,7 +160,14 @@ export default class AssetListSelectorComponent extends React.PureComponent {
                         X
                     </button>
                     {
-                        showUnsupportedWhileSelected && selectedOption.unsupported ? <i className="fa fa-2x fa-do-not-enter" style={{verticalAlign: "middle"}}/> : ''
+                        showUnsupportedWhileSelected && selectedOption.unsupported ?
+                            <ToolTip title="Asset is not covered by support contract"
+                                     style={{display: "inline-block", verticalAlign: 'middle'}}
+                            >
+                                <i className="fa fa-2x fa-do-not-enter"
+                                   style={{verticalAlign: "middle"}}
+                                />
+                            </ToolTip> : ''
                     }
                 </div>
             )
@@ -185,7 +193,8 @@ export default class AssetListSelectorComponent extends React.PureComponent {
                                               minWidth: "2em"
                                           }}
                                           >
-                                              {value.unsupported ? <i className="fa fa-2x fa-do-not-enter" style={{verticalAlign: "middle"}}/> : ''}
+                                              {value.unsupported ? <i className="fa fa-2x fa-do-not-enter"
+                                              /> : ''}
                                           </div>
                                           <div style={{
                                               display: "inline-block",
