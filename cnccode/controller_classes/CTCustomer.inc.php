@@ -8,6 +8,7 @@
  */
 
 use CNCLTD\Encryption;
+use CNCLTD\SupportedCustomerAssets\UnsupportedCustomerAssetService;
 use CNCLTD\Utils;
 
 global $cfg;
@@ -3324,7 +3325,7 @@ ORDER BY NAME,
         $statement  = $labtechDB->prepare($query);
         $statement->execute([$customerId, $customerId]);
         $customerAssets = $statement->fetchAll(PDO::FETCH_ASSOC);
-        $unsupportedCustomerAssetsService = new \CNCLTD\SupportedCustomerAssets\UnsupportedCustomerAssetService();
+        $unsupportedCustomerAssetsService = new UnsupportedCustomerAssetService();
         $unsupportedCustomerAssets = $unsupportedCustomerAssetsService->getAllForCustomer($customerId);
         foreach ($customerAssets as $key => $customerAsset){
             $customerAssets[$key]['unsupported'] = in_array($customerAsset['name'],$unsupportedCustomerAssets);

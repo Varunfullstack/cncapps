@@ -1823,7 +1823,9 @@ class ActivityEditComponent extends MainComponent {
             assetName={data.assetName}
             assetTitle={data.assetTitle}
             customerId={data.customerId}
+            unsupportedCustomerAsset={data.unsupportedCustomerAsset}
             onChange={value => this.handleAssetSelect(value)}
+            showUnsupportedWhileSelected={true}
         />
     }
     handleAssetSelect = (value) => {

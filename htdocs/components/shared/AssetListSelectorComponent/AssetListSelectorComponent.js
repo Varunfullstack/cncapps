@@ -28,18 +28,21 @@ export default class AssetListSelectorComponent extends React.PureComponent {
             maxUserNameLength: 0,
             maxComputerNameLength: 0,
             maxBiosVerLength: 0,
-            selectedOption: null
+            selectedOption: null,
+            isUnsupported: false
         }
         if (this.props.noAssetReason) {
             this.state.selectedOption = {isAsset: false, template: this.props.noAssetReason};
         }
         if (this.props.assetName) {
+
             const [, userName, biosVer] = (this.props.assetTitle || '').split(' ');
             this.state.selectedOption = {
                 isAsset: true,
                 name: this.props.assetName,
                 lastUsername: userName == "undefined" ? "" : userName,
-                biosVer: biosVer == "undefined" ? "" : biosVer
+                biosVer: biosVer == "undefined" ? "" : biosVer,
+                unsupported: this.props.unsupportedCustomerAsset
             };
         }
     }
@@ -140,7 +143,7 @@ export default class AssetListSelectorComponent extends React.PureComponent {
 
     render() {
         const {maxUserNameLength, maxComputerNameLength, maxBiosVerLength, selectedOption} = this.state;
-
+        const {showUnsupportedWhileSelected} = this.props;
 
         if (selectedOption) {
             return (
@@ -155,6 +158,9 @@ export default class AssetListSelectorComponent extends React.PureComponent {
                     >
                         X
                     </button>
+                    {
+                        showUnsupportedWhileSelected && selectedOption.unsupported ? <i className="fa fa-2x fa-do-not-enter" style={{verticalAlign: "middle"}}/> : ''
+                    }
                 </div>
             )
         }
@@ -164,6 +170,7 @@ export default class AssetListSelectorComponent extends React.PureComponent {
                           filterOptions={(options, state) => this.filterOptions(options, state)}
                           getOptionLabel={(option) => this.getOptionText(option)}
                           clearOnBlur={false}
+                          open={true}
                           value={selectedOption}
                           renderOption={(value) => {
                               if (value.isAsset) {
@@ -171,27 +178,34 @@ export default class AssetListSelectorComponent extends React.PureComponent {
                                       <React.Fragment>
                                           <div style={{
                                               display: "inline-block",
-                                              width: `${maxComputerNameLength + 4}ch`, fontSize: 12,
+                                              minWidth: `${maxComputerNameLength + 4}ch`, fontSize: 12,
                                               fontFamily: "Arial",
-                                              letterSpacing: "normal"
+                                              letterSpacing: "normal",
+                                              whiteSpace: 'nowrap'
                                           }}
                                           >
                                               {value.name}
                                           </div>
                                           <div style={{
-                                              display: "inline-block", width: `${maxUserNameLength + 4}ch`,
+                                              display: "inline-block",
+                                              minWidth: `${maxUserNameLength + 4}ch`,
                                               fontSize: 12,
                                               fontFamily: "Arial",
-                                              letterSpacing: "normal"
+                                              letterSpacing: "normal",
+                                              whiteSpace: 'nowrap',
+                                              paddingLeft: "1em"
                                           }}
                                           >
                                               {value.lastUsername}
                                           </div>
                                           <div style={{
-                                              display: "inline-block", width: `${maxBiosVerLength + 4}ch`,
+                                              display: "inline-block",
+                                              minWidth: `${maxBiosVerLength + 4}ch`,
                                               fontSize: 12,
                                               fontFamily: "Arial",
-                                              letterSpacing: "normal"
+                                              letterSpacing: "normal",
+                                              whiteSpace: 'nowrap',
+                                              paddingLeft: "1em"
                                           }}
                                           >
                                               {value.biosVer}
@@ -200,10 +214,12 @@ export default class AssetListSelectorComponent extends React.PureComponent {
                                               display: "inline-block",
                                               fontSize: 12,
                                               fontFamily: "Arial",
-                                              letterSpacing: "normal"
+                                              letterSpacing: "normal",
+                                              whiteSpace: 'nowrap',
+                                              paddingLeft: "1em"
                                           }}
                                           >
-                                              {value.unsupported ? <i className="fa fa-2x fa-do-not-enter" /> : ''}
+                                              {value.unsupported ? <i className="fa fa-2x fa-do-not-enter" style={{verticalAlign: "middle"}}/> : ''}
                                           </div>
                                       </React.Fragment>
                                   )

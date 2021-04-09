@@ -6,7 +6,7 @@ class UnsupportedCustomerAssetService
     /**
      * @param $listOfUnsupportedAssets NotMatchedItemDTO[]
      */
-    public static function update(array $listOfUnsupportedAssets)
+    public function update(array $listOfUnsupportedAssets)
     {
         $db = \DBConnect::instance()->getDB();
         $db->query("delete from UnsupportedCustomerAsset");
@@ -29,5 +29,15 @@ class UnsupportedCustomerAssetService
         $statement = $db->prepare("select assetName from UnsupportedCustomerAsset where customerId = ?");
         $statement->execute([$customerId]);
         return $statement->fetchAll(\PDO::FETCH_COLUMN);
+    }
+
+    public function checkAssetUnsupported($customerId, $assetName): bool
+    {
+        $db        = \DBConnect::instance()->getDB();
+        $statement = $db->prepare(
+            "select assetName from UnsupportedCustomerAsset where customerId = ? and assetName = ?"
+        );
+        $statement->execute([$customerId, $assetName]);
+        return (bool)$statement->columnCount();
     }
 }
