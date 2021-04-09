@@ -1016,8 +1016,10 @@ class CTUser extends CTCNC
             array_push(
                 $users,
                 array(
-                    'id'   => $dbeUser->getValue(DBEUser::userID),
-                    'name' => $dbeUser->getValue(DBEUser::name)
+                    'id'     => $dbeUser->getValue(DBEUser::userID),
+                    'name'   => $dbeUser->getValue(DBEUser::name),
+                    'teamId' => $dbeUser->getValue(DBEUser::teamID),
+                    'active' => $dbeUser->getValue(DBEUser::activeFlag) === 'Y'
                 )
             );
         }

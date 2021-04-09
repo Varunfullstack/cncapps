@@ -360,7 +360,7 @@ WHERE problem.`pro_date_raised` >= '2020-01-01'
           2325,
           9251,
           9637,
-          10437,
+          10437, 
           10654
         )
         AND inl_desc LIKE '%- consultancy%'           

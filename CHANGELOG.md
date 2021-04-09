@@ -32,6 +32,7 @@ This project changes will be shown here.
 - Issue 1317 - Duplication of lines in Sales Orders
 - Issue 1315 - OBRS update path & Check Now
 - Issue 1312 - Amending a line in a Sales Order opens a new tab
+- Issue 1324 - KPI Reports - Billed Consultancy Data showing wrong values
 
 ## [v5.7.6] - 2021-04-06
 ### Changed
