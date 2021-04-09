@@ -8,6 +8,7 @@
  */
 
 use CNCLTD\Encryption;
+use CNCLTD\SupportedCustomerAssets\UnsupportedCustomerAssetService;
 use CNCLTD\Utils;
 
 global $cfg;
@@ -3159,9 +3160,9 @@ class CTCustomer extends CTCNC
                 concat(contact.con_first_name,' ',contact.con_last_name) contact_name,                
                 contact.con_first_name,
                 contact.con_last_name,
-                contact.con_phone,
+                concat(contact.con_phone, ' ') as con_phone,
                 contact.con_notes,
-                address.add_phone,
+                concat(address.add_phone,' ') as add_phone,
                 supportLevel,
                 con_position,
                 cus_referred,
@@ -3322,8 +3323,14 @@ ORDER BY NAME,
   biosVer
         ";
         $statement  = $labtechDB->prepare($query);
-        $statement->execute([$customerId, $customerId,]);
-        return $statement->fetchAll(PDO::FETCH_ASSOC);
+        $statement->execute([$customerId, $customerId]);
+        $customerAssets = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $unsupportedCustomerAssetsService = new UnsupportedCustomerAssetService();
+        $unsupportedCustomerAssets = $unsupportedCustomerAssetsService->getAllForCustomer($customerId);
+        foreach ($customerAssets as $key => $customerAsset){
+            $customerAssets[$key]['unsupported'] = in_array($customerAsset['name'],$unsupportedCustomerAssets);
+        }
+        return $customerAssets;
     }
 
     /**

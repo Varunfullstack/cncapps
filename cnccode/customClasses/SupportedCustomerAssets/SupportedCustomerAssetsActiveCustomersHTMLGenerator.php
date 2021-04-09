@@ -3,6 +3,7 @@
 namespace CNCLTD\SupportedCustomerAssets;
 global $cfg;
 
+use CNCLTD\Exceptions\ColumnOutOfRangeException;
 use DBECustomer;
 
 require_once($cfg["path_dbe"] . "/DBECustomer.inc.php");
@@ -20,14 +21,28 @@ class SupportedCustomerAssetsActiveCustomersHTMLGenerator
 
     /**
      * SupportedCustomerAssetsActiveCustomersHTMLGenerator constructor.
+     * @param null $customerId
+     * @throws ColumnOutOfRangeException
      */
-    public function __construct()
+    public function __construct($customerId = null)
     {
-        $thing       = null;
+        $thing = null;
+        if ($customerId) {
+            $customerAssets                 = new SupportedCustomerAssets($customerId);
+            $this->cncAssetsNotMatched      = array_merge(
+                $this->cncAssetsNotMatched,
+                $customerAssets->getCNCNotMatchedAssets()
+            );
+            $this->automateAssetsNotMatched = array_merge(
+                $this->automateAssetsNotMatched,
+                $customerAssets->getAutomateNotMatchedAssets()
+            );
+            return;
+        }
         $dbeCustomer = new DBECustomer($thing);
         $dbeCustomer->getActiveCustomers(true);
         while ($dbeCustomer->fetchNext()) {
-            $customerAssets                 = new \CNCLTD\SupportedCustomerAssets\SupportedCustomerAssets(
+            $customerAssets                 = new SupportedCustomerAssets(
                 $dbeCustomer->getValue(DBECustomer::customerID)
             );
             $this->cncAssetsNotMatched      = array_merge(

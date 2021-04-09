@@ -8,101 +8,101 @@ require_once($cfg["path_dbe"] . "/DBCNCEntity.inc.php");
 
 class DBECustomerItem extends DBCNCEntity
 {
-    const customerItemID = "customerItemID";
-    const customerID = "customerID";
-    const siteNo = "siteNo";
-    const itemID = "itemID";
-    const warrantyID = "warrantyID";
-    const userID = "userID";
-    const serialNo = "serialNo";
-    const serverName = "serverName";
-    const despatchDate = "despatchDate";
-    const ordheadID = "ordheadID";
-    const porheadID = "porheadID";
-    const curUnitSale = "curUnitSale";
-    const curUnitCost = "curUnitCost";
-    const sOrderDate = "sOrderDate";
-    const users = "users";
-    const expiryDate = "expiryDate";
-    const curGSCBalance = "curGSCBalance";
-    const renewalStatus = "renewalStatus";
-    const customerItemNotes = "customerItemNotes";
-    const slaResponseHours = "slaResponseHours";
-    const months = "months";
-    const salePricePerMonth = "salePricePerMonth";
-    const adslPhone = "adslPhone";
-    const macCode = "macCode";
-    const reference = "reference";
-    const defaultGateway = "defaultGateway";
-    const networkAddress = "networkAddress";
-    const subnetMask = "subnetMask";
-    const routerIPAddress = "routerIPAddress";
-    const hostingUserName = "hostingUserName";
-    const userName = "userName";
-    const password = "password";
-    const etaDate = "etaDate";
-    const installationDate = "installationDate";
-    const initialContractLength = 'initialContractLength';
-    const costPricePerMonth = "costPricePerMonth";
-    const ispID = "ispID";
-    const dualBroadbandFlag = "dualBroadbandFlag";
-    const dnsCompany = "dnsCompany";
-    const ipCurrentNo = "ipCurrentNo";
-    const mx = "mx";
-    const secureServer = "secureServer";
-    const vpns = "vpns";
-    const oma = "oma";
-    const owa = "owa";
-    const remotePortal = "remotePortal";
-    const smartHost = "smartHost";
-    const preparationRecords = "preparationRecords";
-    const assignedTo = "assignedTo";
-    const initialSpeedTest = "initialSpeedTest";
-    const preMigrationNotes = "preMigrationNotes";
-    const postMigrationNotes = "postMigrationNotes";
-    const docsUpdatedAndChecksCompleted = "docsUpdatedAndChecksCompleted";
-    const invoicePeriodMonths = "invoicePeriodMonths";
-    const totalInvoiceMonths = "totalInvoiceMonths";
-    const declinedFlag = "declinedFlag";
-    const bandwidthAllowance = "bandwidthAllowance";
-    const notes = "notes";
-    const hostingCompany = "hostingCompany";
-    const osPlatform = "osPlatform";
-    const domainNames = "domainNames";
-    const controlPanelUrl = "controlPanelUrl";
-    const ftpAddress = "ftpAddress";
-    const ftpUsername = "ftpUsername";
-    const wwwAddress = "wwwAddress";
-    const websiteDeveloper = "websiteDeveloper";
-    const secondsiteLocationPath = "secondsiteLocationPath";
-    const secondsiteServerDriveLetters = "secondsiteServerDriveLetters";
-    const secondsiteStorageUsedGb = "secondsiteStorageUsedGb";
-    const secondsiteValidationSuspendUntilDate = "secondsiteValidationSuspendUntilDate";
-    const secondsiteSuspendedDate = "secondsiteSuspendedDate";
-    const secondsiteSuspendedByUserID = "secondsiteSuspendedByUserID";
+    const customerItemID                                 = "customerItemID";
+    const customerID                                     = "customerID";
+    const siteNo                                         = "siteNo";
+    const itemID                                         = "itemID";
+    const warrantyID                                     = "warrantyID";
+    const userID                                         = "userID";
+    const serialNo                                       = "serialNo";
+    const serverName                                     = "serverName";
+    const despatchDate                                   = "despatchDate";
+    const ordheadID                                      = "ordheadID";
+    const porheadID                                      = "porheadID";
+    const curUnitSale                                    = "curUnitSale";
+    const curUnitCost                                    = "curUnitCost";
+    const sOrderDate                                     = "sOrderDate";
+    const users                                          = "users";
+    const expiryDate                                     = "expiryDate";
+    const curGSCBalance                                  = "curGSCBalance";
+    const renewalStatus                                  = "renewalStatus";
+    const customerItemNotes                              = "customerItemNotes";
+    const slaResponseHours                               = "slaResponseHours";
+    const months                                         = "months";
+    const salePricePerMonth                              = "salePricePerMonth";
+    const adslPhone                                      = "adslPhone";
+    const macCode                                        = "macCode";
+    const reference                                      = "reference";
+    const defaultGateway                                 = "defaultGateway";
+    const networkAddress                                 = "networkAddress";
+    const subnetMask                                     = "subnetMask";
+    const routerIPAddress                                = "routerIPAddress";
+    const hostingUserName                                = "hostingUserName";
+    const userName                                       = "userName";
+    const password                                       = "password";
+    const etaDate                                        = "etaDate";
+    const installationDate                               = "installationDate";
+    const initialContractLength                          = 'initialContractLength';
+    const costPricePerMonth                              = "costPricePerMonth";
+    const ispID                                          = "ispID";
+    const dualBroadbandFlag                              = "dualBroadbandFlag";
+    const dnsCompany                                     = "dnsCompany";
+    const ipCurrentNo                                    = "ipCurrentNo";
+    const mx                                             = "mx";
+    const secureServer                                   = "secureServer";
+    const vpns                                           = "vpns";
+    const oma                                            = "oma";
+    const owa                                            = "owa";
+    const remotePortal                                   = "remotePortal";
+    const smartHost                                      = "smartHost";
+    const preparationRecords                             = "preparationRecords";
+    const assignedTo                                     = "assignedTo";
+    const initialSpeedTest                               = "initialSpeedTest";
+    const preMigrationNotes                              = "preMigrationNotes";
+    const postMigrationNotes                             = "postMigrationNotes";
+    const docsUpdatedAndChecksCompleted                  = "docsUpdatedAndChecksCompleted";
+    const invoicePeriodMonths                            = "invoicePeriodMonths";
+    const totalInvoiceMonths                             = "totalInvoiceMonths";
+    const declinedFlag                                   = "declinedFlag";
+    const bandwidthAllowance                             = "bandwidthAllowance";
+    const notes                                          = "notes";
+    const hostingCompany                                 = "hostingCompany";
+    const osPlatform                                     = "osPlatform";
+    const domainNames                                    = "domainNames";
+    const controlPanelUrl                                = "controlPanelUrl";
+    const ftpAddress                                     = "ftpAddress";
+    const ftpUsername                                    = "ftpUsername";
+    const wwwAddress                                     = "wwwAddress";
+    const websiteDeveloper                               = "websiteDeveloper";
+    const secondsiteLocationPath                         = "secondsiteLocationPath";
+    const secondsiteServerDriveLetters                   = "secondsiteServerDriveLetters";
+    const secondsiteStorageUsedGb                        = "secondsiteStorageUsedGb";
+    const secondsiteValidationSuspendUntilDate           = "secondsiteValidationSuspendUntilDate";
+    const secondsiteSuspendedDate                        = "secondsiteSuspendedDate";
+    const secondsiteSuspendedByUserID                    = "secondsiteSuspendedByUserID";
     const offsiteReplicationValidationSuspendedUntilDate = "offsiteReplicationValidationSuspendedUntilDate";
-    const offsiteReplicationSuspendedByUserID = "offsiteReplicationSuspendedByUserID";
-    const offsiteReplicationSuspendedDate = "offsiteReplicationSuspendedDate";
-    const secondsiteImageDelayDays = "secondsiteImageDelayDays";
-    const secondsiteImageDelayDate = "secondsiteImageDelayDate";
-    const secondsiteImageDelayUserID = "secondsiteImageDelayUserID";
-    const secondsiteLocalExcludeFlag = "secondsiteLocalExcludeFlag";
-    const dateGenerated = "dateGenerated";
-    const startDate = "startDate";
-    const qty = "qty";
-    const salePrice = "salePrice";
-    const costPrice = "costPrice";
-    const comment = "comment";
-    const grantNumber = "grantNumber";
-    const renQuotationTypeID = "renQuotationTypeID";
-    const internalNotes = "internalNotes";
-    const autoGenerateContractInvoice = "autoGenerateContractInvoice";
-    const secondSiteReplicationPath = "secondSiteReplicationPath";
-    const secondSiteReplicationExcludeFlag = "secondSiteReplicationExcludeFlag";
-    const officialOrderNumber = "officialOrderNumber";
-
-    const directDebitFlag = "directDebitFlag";
-    const transactionType = "transactionType";
+    const offsiteReplicationSuspendedByUserID            = "offsiteReplicationSuspendedByUserID";
+    const offsiteReplicationSuspendedDate                = "offsiteReplicationSuspendedDate";
+    const secondsiteImageDelayDays                       = "secondsiteImageDelayDays";
+    const secondsiteImageDelayDate                       = "secondsiteImageDelayDate";
+    const secondsiteImageDelayUserID                     = "secondsiteImageDelayUserID";
+    const secondsiteLocalExcludeFlag                     = "secondsiteLocalExcludeFlag";
+    const dateGenerated                                  = "dateGenerated";
+    const startDate                                      = "startDate";
+    const qty                                            = "qty";
+    const salePrice                                      = "salePrice";
+    const costPrice                                      = "costPrice";
+    const comment                                        = "comment";
+    const grantNumber                                    = "grantNumber";
+    const renQuotationTypeID                             = "renQuotationTypeID";
+    const internalNotes                                  = "internalNotes";
+    const autoGenerateContractInvoice                    = "autoGenerateContractInvoice";
+    const secondSiteReplicationPath                      = "secondSiteReplicationPath";
+    const secondSiteReplicationExcludeFlag               = "secondSiteReplicationExcludeFlag";
+    const officialOrderNumber                            = "officialOrderNumber";
+    const directDebitFlag                                = "directDebitFlag";
+    const transactionType                                = "transactionType";
+    const bypassCWAAgentCheck                            = "bypassCWAAgentCheck";
 
     /**
      * calls constructor()
@@ -511,7 +511,6 @@ class DBECustomerItem extends DBCNCEntity
             DA_ALLOW_NULL,
             "custitem.secondsiteLocationPath"
         );
-
         $this->addColumn(
             self::secondSiteReplicationPath,
             DA_STRING,
@@ -662,29 +661,31 @@ class DBECustomerItem extends DBCNCEntity
             DA_NOT_NULL,
             'custitem.initialContractLength'
         );
-
-
         $this->addColumn(
             self::officialOrderNumber,
             DA_TEXT,
             DA_ALLOW_NULL,
             'custitem.officialOrderNumber'
         );
-
         $this->addColumn(
             self::directDebitFlag,
             DA_YN,
             DA_ALLOW_NULL,
             "custitem.directDebitFlag"
         );
-
         $this->addColumn(
             self::transactionType,
             DA_STRING,
             DA_NOT_NULL,
             'custitem.transactionType'
         );
-
+        $this->addColumn(
+            self::bypassCWAAgentCheck,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            'custitem.bypassCWAAgentCheck',
+            0
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -729,11 +730,9 @@ class DBECustomerItem extends DBCNCEntity
                                           {$this->getDBColumnName(self::customerID)}={$customerID} 
                                       AND {$this->getDBColumnName(self::itemID)}={$itemID} 
                                       ";
-
         if ($onlyActive) {
             $query .= " and {$this->getDBColumnName(self::declinedFlag)} <> 'Y' and {$this->getDBColumnName(self::renewalStatus)} = 'R'";
         }
-
         $db->query($query);
         if (!$db->num_rows()) {
             return 0;
@@ -754,10 +753,10 @@ class DBECustomerItem extends DBCNCEntity
             $this->raiseError('itemID not set');
         }
         $this->setQueryString(
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName(self::customerID) . "=" . $customerID .
-            " AND " . $this->getDBColumnName(self::itemID) . "=" . $itemID
+            "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " WHERE " . $this->getDBColumnName(
+                self::customerID
+            ) . "=" . $customerID . " AND " . $this->getDBColumnName(self::itemID) . "=" . $itemID
         );
         return (parent::getRows());
     }
@@ -769,11 +768,12 @@ class DBECustomerItem extends DBCNCEntity
             $this->raiseError('customerID not set');
         }
         $this->setQueryString(
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName(self::customerID) . "=" . $customerID .
-            " AND " . $this->getDBColumnName(self::itemID) . "=" . CONFIG_DEF_PREPAY_ITEMID .
-            " AND " . $this->getDBColumnName(self::renewalStatus) . "<> 'D'"
+            "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " WHERE " . $this->getDBColumnName(
+                self::customerID
+            ) . "=" . $customerID . " AND " . $this->getDBColumnName(
+                self::itemID
+            ) . "=" . CONFIG_DEF_PREPAY_ITEMID . " AND " . $this->getDBColumnName(self::renewalStatus) . "<> 'D'"
         );
         return (parent::getRow());
     }
@@ -791,24 +791,22 @@ class DBECustomerItem extends DBCNCEntity
             $this->raiseError('days not set');
         }
         $this->setQueryString(
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName(self::expiryDate) . "<= DATE_ADD(NOW(), INTERVAL " . $days . " DAY)" .
-            " AND " . $this->getDBColumnName(self::expiryDate) . ">= NOW()" .
-            " AND " . $this->getDBColumnName(self::renewalStatus) . "= ''"
+            "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " WHERE " . $this->getDBColumnName(
+                self::expiryDate
+            ) . "<= DATE_ADD(NOW(), INTERVAL " . $days . " DAY)" . " AND " . $this->getDBColumnName(
+                self::expiryDate
+            ) . ">= NOW()" . " AND " . $this->getDBColumnName(self::renewalStatus) . "= ''"
         );
         return (parent::getRows());
     }
 
     function addYearToStartDate($customerItemID)
     {
-        $statement =
-            "
-      UPDATE " . $this->getTableName() .
-            " SET startDate = DATE_ADD( `startDate`, INTERVAL 1 YEAR ),
+        $statement = "
+      UPDATE " . $this->getTableName() . " SET startDate = DATE_ADD( `startDate`, INTERVAL 1 YEAR ),
       dateGenerated = null
         WHERE cui_cuino = $customerItemID;";
-
         $this->setQueryString($statement);
         return $this->runQuery();
 
@@ -818,8 +816,7 @@ class DBECustomerItem extends DBCNCEntity
                                              $customerItemIDs
     )
     {
-        $statement =
-            "DELETE FROM
+        $statement = "DELETE FROM
         custitem_contract
       WHERE
         cic_cuino IN ( " . implode(
@@ -827,7 +824,6 @@ class DBECustomerItem extends DBCNCEntity
                 $customerItemIDs
             ) . ")
         AND cic_contractcuino = $contractID";
-
         return $this->db->query($statement);
 
     }
@@ -852,25 +848,21 @@ class DBECustomerItem extends DBCNCEntity
                          $contractID
     )
     {
-        $statement =
-            "SELECT
+        $statement = "SELECT
         cic_contractcuino
       FROM
         custitem_contract
       WHERE
         cic_cuino = $customerItemID
         AND cic_contractcuino = $contractID";
-
         $this->db->query($statement);
         if (!$this->db->next_record()) {
 
-            $statement =
-                "INSERT INTO
+            $statement = "INSERT INTO
           custitem_contract
         SET
           cic_cuino = $customerItemID,
           cic_contractcuino = $contractID";
-
             $this->db->query($statement);
         }
 
@@ -915,18 +907,14 @@ class DBECustomerItem extends DBCNCEntity
 
     function getExistingContractIDs($customerItemID)
     {
-        $statement =
-            "SELECT
+        $statement = "SELECT
         cic_contractcuino
       FROM
         custitem_contract
       WHERE
         cic_cuino = $customerItemID";
-
         $this->db->query($statement);
-
         $existingContractIDs = array();
-
         while ($row = $this->db->next_record()) {
             $existingContractIDs[] = $this->db->Record['cic_contractcuino'];
         }
@@ -937,13 +925,11 @@ class DBECustomerItem extends DBCNCEntity
                             $contractID
     )
     {
-        $statement =
-            "DELETE FROM
+        $statement = "DELETE FROM
         custitem_contract
       WHERE
         cic_cuino = $customerItemID
         AND cic_contractcuino = $contractID";
-
         return $this->db->query($statement);
 
     }

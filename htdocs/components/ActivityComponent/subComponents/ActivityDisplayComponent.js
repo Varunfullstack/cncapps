@@ -872,71 +872,116 @@ class ActivityDisplayComponent extends MainComponent {
         const {el} = this;
 
 
-        return el('div', {className: "activities-container"},
-            el('table', {style: {width: "100%"}},
-                el('tbody', null,
-                    el('tr', null,
-                        el('td', {className: "display-label", style: {width: "80px"}}, "Status"),
-                        el('td', {className: "display-content"}, data?.problemStatusDetials + this.getAwaitingTitle(data)),
-                        el('td', {className: "display-label"}, data?.authorisedBy ? "Authorised by" : ''),
-                        el('td', {className: "display-content"}, data?.authorisedBy),
-                        el('td', {className: "display-label"}, "Type"),
-                        el('td', {colSpan: 3, className: "nowrap"}, data?.activityType),
-                    ),
+        return (
+            <div className="activities-container">
+                <table style={{width: '100%'}}>
+                    <tbody>
+                    <tr>
+                        <td className="display-label"
+                            style={{width: "80px"}}
+                        >Status
+                        </td>
+                        <td className="display-content">{data?.problemStatusDetials + this.getAwaitingTitle(data)}</td>
+                        <td className="display-label">{data?.authorisedBy ? "Authorised by" : ''}</td>
+                        <td className="display-content">{data?.authorisedBy}</td>
+                        <td className="display-label">Type</td>
+                        <td colSpan="3"
+                            className="nowrap"
+                        >{data?.activityType}</td>
+                    </tr>
 
-                    el('tr', null,
-                        el('td', {className: "display-label"}, "Priority"),
-                        el('td', {className: "display-content"}, data?.priority),
-                        (
-                            <td style={{textAlign: "center"}}
-                                colSpan="1"
-                            >
-                                {this.getHiddenSRElement(data)}
-                            </td>
-                        ),
-                        el('td', null),
 
-                        el('td', {className: "display-label"}, "Date"),
-                        el('td', {colSpan: 3, className: "display-content"}, moment(data?.date).format("DD/MM/YYYY")),
-                    ),
+                    <tr>
+                        <td className="display-label">Priority</td>
+                        <td className="display-content">{data?.priority}</td>
+                        <td style={{textAlign: "center"}}
+                            colSpan="1"
+                        >
+                            {this.getHiddenSRElement(data)}
+                        </td>
+                        <td/>
+                        <td className="display-label">Date</td>
+                        <td colSpan="3"
+                            className="display-content"
+                        > {moment(data?.date).format("DD/MM/YYYY")}</td>
+                    </tr>
 
-                    el('tr', null,
-                        el('td', {className: "display-label"}, "Contract"),
-                        el('td', {className: "display-content"}, data?.contractType),
-                        el('td', {className: "display-label"}, "Completed On"),
-                        el('td', {className: "display-content"}, data?.completeDate ? moment(data?.completeDate).format("DD/MM/YYYY") : null),
+                    <tr>
+                        <td className="display-label">Contract</td>
+                        <td className="display-content">{data?.contractType}</td>
+                        <td className="display-label">Completed On</td>
+                        <td className="display-content">{data?.completeDate ? moment(data?.completeDate).format("DD/MM/YYYY") : null}</td>
 
-                        el('td', {className: "display-label"}, "Time From"),
-                        el('td', {style: {width: 10}}, data?.startTime),
-                        el('td', {className: "display-label", style: {width: 10}}, data?.endTime ? "To" : ""),
-                        el('td', null, data?.endTime),
-                    ),
+                        <td className="display-label">Time From</td>
+                        <td style={{width: 10}}>{data?.startTime}</td>
+                        <td className="display-label"
+                            style={{width: 10}}
+                        >{data?.endTime ? "To" : ""}</td>
+                        <td>{data?.endTime}</td>
+                    </tr>
 
-                    el('tr', null,
-                        el('td', {className: "display-label"}, "Root Cause"),
-                        el('td', {className: "display-content"}, data?.rootCauseDescription),
-                        el('td', {className: "display-label"}, "Top-Up Value"),
-                        el('td', null, data?.curValue),
-                        el('td', {className: "display-label"}, "User"),
-                        el('td', {colSpan: 3, className: "display-content"}, data?.engineerName),
-                    ),
+                    <tr>
+                        <td className="display-label">Root Cause</td>
+                        <td className="display-content">{data?.rootCauseDescription}</td>
+                        <td className="display-label">Top-Up Value</td>
+                        <td>{data?.curValue}</td>
+                        <td className="display-label">User</td>
+                        <td colSpan="3"
+                            className="display-content"
+                        >{data?.engineerName}</td>
+                    </tr>
 
-                    el('tr', null,
-                        el('td', {className: "display-label"}, "Summary"),
-                        el('td', {className: "display-content", colSpan: 3}, data?.emailsubjectsummary),
-                        el('td', {className: "display-label"}, "Asset"),
-                        el('td', {colSpan: 3, className: "nowrap"}, data?.assetName || (data?.emptyAssetReason) || ''),
-                    ),
+                    <tr>
+                        <td className="display-label">Summary</td>
+                        <td className="display-content"
+                            colSpan="3"
+                        >{data?.emailsubjectsummary}</td>
+                        <td className="display-label">Asset</td>
+                        <td colSpan="3"
+                            className="nowrap"
+                        >
+                            {this.getAssetName(data)}
+                        </td>
+                    </tr>
+                    {
+                        data?.currentUser ? (
+                            <tr>
+                                <td
+                                    colSpan="8"
+                                    style={{backgroundColor: data?.currentUserBgColor, textAlign: "center"}}
+                                > {data?.currentUser}</td>
+                            </tr>
 
-                    data?.currentUser ? el('tr', null,
-                        el('td', {
-                            colSpan: 8,
-                            style: {backgroundColor: data?.currentUserBgColor, textAlign: "center"}
-                        }, data?.currentUser),
-                    ) : null,
-                )));
+                        ) : null
+                    }
+                    </tbody>
+                </table>
+            </div>
+        )
+    }
+
+    getAssetName(data) {
+        if (!data) {
+            return '';
+        }
+        if (data.emptyAssetReason) {
+            return data.emptyAssetReason;
+        }
+        return (
+            <React.Fragment>
+                <span>
+                    {data?.assetName}
+                </span>
+                {
+                    data.unsupportedCustomerAsset ? <i className="fa  fa-do-not-enter"
+                                                       style={{verticalAlign: "middle", paddingLeft: "0.5em"}}
+                    /> : ''
+                }
+            </React.Fragment>
+        )
 
     }
+
     getAwaitingTitle = (data) => {
         if (data?.problemStatus !== "F" && data?.problemStatus !== "C") {
             if (data?.awaitingCustomerResponseFlag == 'N')

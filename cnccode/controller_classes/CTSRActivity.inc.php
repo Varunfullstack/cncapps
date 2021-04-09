@@ -17,6 +17,7 @@ use CNCLTD\ServiceRequestInternalNote\infra\ServiceRequestInternalNotePDOReposit
 use CNCLTD\ServiceRequestInternalNote\ServiceRequestInternalNote;
 use CNCLTD\ServiceRequestInternalNote\ServiceRequestInternalNotePDOMapper;
 use CNCLTD\ServiceRequestInternalNote\UseCases\AddServiceRequestInternalNote;
+use CNCLTD\SupportedCustomerAssets\UnsupportedCustomerAssetService;
 
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBECallActivity.inc.php');
@@ -386,9 +387,10 @@ class CTSRActivity extends CTCNC
             }
             $taskListUpdatedBy = $consultants[$taskListUpdatedByUserId];
         }
-        $currentLoggedInUser = $this->getDbeUser();
+        $currentLoggedInUser             = $this->getDbeUser();
         $callback            = new DBECallback($this);
         $pendingCallbacks    = $callback->pendingCallbackCountForServiceRequest($problemID);
+        $unsupportedCustomerAssetService = new UnsupportedCustomerAssetService();
         return [
             "callActivityID"                  => $callActivityID,
             "problemID"                       => $problemID,
@@ -495,6 +497,12 @@ class CTSRActivity extends CTCNC
             'assetName'                       => $dbeProblem->getValue(DBEProblem::assetName),
             'assetTitle'                      => $dbeProblem->getValue(DBEProblem::assetTitle),
             "emptyAssetReason"                => $dbeProblem->getValue(DBEProblem::emptyAssetReason),
+            "unsupportedCustomerAsset"        => $unsupportedCustomerAssetService->checkAssetUnsupported(
+                $customerId,
+                $dbeProblem->getValue(
+                    DBEProblem::assetName
+                )
+            ),
             "holdForQA"                       => $dbeProblem->getValue(DBEProblem::holdForQA),
             "isOnSiteActivity"                => $dbeActivityType->getValue(DBECallActType::onSiteFlag) == 'Y',
             "chargeableWorkRequestId"         => $chargeableRequestId,

@@ -28,12 +28,14 @@ This project changes will be shown here.
 - Issue 1313 - Call back email to include the name of the person that took it
 - Issue 1320 - Project page report enhancements
 - Issue 1287 - New SR from Pending Reopen re-write
+- Issue 1326 - Supported Customer Assets Refinements.
 ### Fixed
 - Issue 1314 - Scheduled SRs that are due on Mondays don't get created.
 - Issue 1317 - Duplication of lines in Sales Orders
 - Issue 1315 - OBRS update path & Check Now
 - Issue 1312 - Amending a line in a Sales Order opens a new tab
 - Issue 1324 - KPI Reports - Billed Consultancy Data showing wrong values
+
 
 ## [v5.7.6] - 2021-04-06
 ### Changed

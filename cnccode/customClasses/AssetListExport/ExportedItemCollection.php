@@ -401,4 +401,12 @@ ORDER BY location, operatingSystem desc, computerName';
         }
         return $this->labTechData[$key]["dataItem"];
     }
+
+    public function is3CX(int $index): bool
+    {
+        if (!isset($this->labTechData[$index])) {
+            return false;
+        }
+        return $this->labTechData[$index]["dataItem"]->is3CX();
+    }
 }

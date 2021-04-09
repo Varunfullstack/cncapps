@@ -1,0 +1,71 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="xavi" id="issue1326-0">
+        <tagDatabase tag="issue1326"/>
+    </changeSet>
+    <changeSet author="xavi" id="issue1326-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="custitem" columnName="bypassCWAAgentCheck"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="custitem">
+            <column name="bypassCWAAgentCheck" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <sql>
+            update custitem
+            set bypassCWAAgentCheck = 1
+            where cui_cuino in (
+                                58206,
+                                53731,
+                                58528,
+                                59846,
+                                48732,
+                                58633,
+                                58634,
+                                40678,
+                                42756,
+                                43716,
+                                40665,
+                                46556,
+                                46009,
+                                42521,
+                                55326,
+                                60912,
+                                61083,
+                                61424,
+                                61030,
+                                61086,
+                                61031,
+                                61032,
+                                61146,
+                                61088,
+                                61090,
+                                61064,
+                                61033)
+        </sql>
+        <rollback>
+            <dropColumn tableName="custitem" columnName="bypassCWAAgentCheck"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="xavi" id="issue1326-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="UnsupportedCustomerAsset"/>
+            </not>
+        </preConditions>
+        <createTable tableName="UnsupportedCustomerAsset">
+            <column name="customerId" type="int(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="assetName" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
