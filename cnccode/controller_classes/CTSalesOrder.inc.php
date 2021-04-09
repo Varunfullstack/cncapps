@@ -1156,10 +1156,10 @@ class CTSalesOrder extends CTCNC
         $urlRenewalReport    = null;
         $txtRenewalReport    = null;
         $txtCustomerNote     = null;
-        $urlCustomerNote     = null;        
+        $urlCustomerNote     = null;
         if ($this->getAction() != CTSALESORDER_ACT_CREATE_QUOTE and $this->getAction(
             ) != CTSALESORDER_ACT_CREATE_ORDER) {
-                
+
             if (!$this->getOrdheadID()) {
                 $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
                 return;
@@ -1177,7 +1177,7 @@ class CTSalesOrder extends CTCNC
                 $dsOrdline = &$this->dsOrdline;                    // this is the dataset with validation problems
                 $dsOrdline->initialise();
             }
-        } else {            
+        } else {
             if (!$this->getCustomerID()) {
                 $this->displayFatalError(CTSALESORDER_MSG_CUSTOMERID_NOT_PASSED);
                 return;
@@ -1189,13 +1189,13 @@ class CTSalesOrder extends CTCNC
                 $this->displayFatalError(CTSALESORDER_MSG_CUS_NOT_FND);
                 return;
             }
-            if ($this->getAction() == CTSALESORDER_ACT_CREATE_ORDER) {                
+            if ($this->getAction() == CTSALESORDER_ACT_CREATE_ORDER) {
                 $this->buSalesOrder->initialiseOrder(
                     $dsOrdhead,
                     $dsOrdline,
                     $dsCustomer
                 );
-            } else {                
+            } else {
                 $this->buSalesOrder->InitialiseQuote(
                     $dsOrdhead,
                     $dsOrdline,
@@ -2205,7 +2205,6 @@ class CTSalesOrder extends CTCNC
             $handle = "recurringOrderLineBlock";
             $name   = "recurringOrderLines";
         }
-        
         $renewalIcon = null;
         if ($dsOrdline->getValue(DBEJOrdline::renewalTypeID)) {
             if (!$buRenewal) {
@@ -2282,7 +2281,6 @@ class CTSalesOrder extends CTCNC
         );
         $ordline           = new DBEOrdline($this);
         $ordline->getRow($dsOrdline->getValue(DBEOrdline::id));
-     
         $this->template->set_var(
             array(
                 'salesOrderLineDesc' => $salesOrderLineDesc,
@@ -2301,7 +2299,6 @@ class CTSalesOrder extends CTCNC
                 'urlDeleteLine'      => $urlDeleteLine,
                 'urlAddLine'         => $urlAddLine,
                 'isRecurring'        => $dsOrdline->getValue(DBEOrdline::isRecurring) ? 'true' : 'false',
-                
             )
         );
         if ($dsOrdline->getValue(
@@ -2327,14 +2324,17 @@ class CTSalesOrder extends CTCNC
                     ) . '</A>';
             } else {
                 $supplierName = Controller::htmlDisplayText($dsOrdline->getValue(DBEJOrdline::supplierName));
-            }             
-            $showStockLevels="";
-            if(($dsOrdline->getValue(DBEJOrdline::showStockLevels)
-            &&   $dsOrdline->getValue(DBEOrdline::curUnitCost)>0
-            &&   $dsOrdline->getValue(DBEJOrdline::supplierID)==CONFIG_SALES_STOCK_SUPPLIERID
-            &&   $dsOrdline->getValue(DBEJOrdline::qtyInStock)>=$dsOrdline->getValue(DBEOrdline::qtyOrdered)
-            ))
-                $showStockLevels="<i class=\"fal fa-2x fa-boxes color-gray icon\"></i>";
+            }
+            $showStockLevels = "";
+            if ($dsOrdline->getValue(DBEJOrdline::showStockLevels) && $dsOrdline->getValue(
+                    DBEOrdline::curUnitCost
+                ) > 0 && $dsOrdline->getValue(
+                    DBEJOrdline::supplierID
+                ) == CONFIG_SALES_STOCK_SUPPLIERID && $dsOrdline->getValue(
+                    DBEJOrdline::qtyInStock
+                ) >= $dsOrdline->getValue(
+                    DBEOrdline::qtyOrdered
+                )) $showStockLevels = "<i class=\"fal fa-2x fa-boxes color-gray icon\"></i>";
             if (!$restrictedView) {
 
                 $this->template->set_var(
@@ -2361,7 +2361,7 @@ class CTSalesOrder extends CTCNC
                         'orderLineProfitClass'    => ($curProfit < 0) ? CTSALESORDER_CLS_ORDER_LINE_LOSS : CTSALESORDER_CLS_ORDER_LINE_ITEM,
                         'orderLineSaleTotalClass' => ($curSaleTotal < 0) ? CTSALESORDER_CLS_ORDER_LINE_LOSS : CTSALESORDER_CLS_ORDER_LINE_ITEM,
                         'orderLineCostTotalClass' => ($curCostTotal < 0) ? CTSALESORDER_CLS_ORDER_LINE_LOSS : CTSALESORDER_CLS_ORDER_LINE_ITEM,
-                        'showStockLevels'    => $showStockLevels
+                        'showStockLevels'         => $showStockLevels
                     )
                 );
                 if (!$dsOrdline->getValue(DBEOrdline::isRecurring)) {
@@ -4513,7 +4513,9 @@ class CTSalesOrder extends CTCNC
         } else {
             $dsInput->setValue(
                 DBEProblem::emailSubjectSummary,
-                htmlentities($buActivity->getSuitableEmailSubjectSummary($this->getOrdheadID(), $this->getParam('selectedLines')))
+                htmlentities(
+                    $buActivity->getSuitableEmailSubjectSummary($this->getOrdheadID(), $this->getParam('selectedLines'))
+                )
             );
             $dsInput->setValue(
                 self::serviceRequestPriority,
@@ -5165,17 +5167,20 @@ class CTSalesOrder extends CTCNC
         } while ($linkedServiceRequests->fetchNext());
         return true;
     }
+
     private function inStock($dbeOrderLine)
     {
-        $dbeItem=new DBEItem($this);
+        $dbeItem = new DBEItem($this);
         $dbeItem->getRow($dbeOrderLine->getValue(DBEOrdline::itemID));
-        $dbeItemType=new DBEItemType($this);
+        $dbeItemType = new DBEItemType($this);
         $dbeItemType->getRow($dbeItem->getValue(DBEItem::itemTypeID));
-        if (($dbeItemType->getValue(DBEItemType::showStockLevels)
-            &&   $dbeOrderLine->getValue(DBEOrdline::curUnitCost) > 0
-            &&   $dbeOrderLine->getValue(DBEJOrdline::supplierID) == CONFIG_SALES_STOCK_SUPPLIERID
-            &&   $dbeItem->getValue(DBEItem::salesStockQty) >= $dbeOrderLine->getValue(DBEOrdline::qtyOrdered)))
-            return true;
+        if (($dbeItemType->getValue(DBEItemType::showStockLevels) && $dbeOrderLine->getValue(
+                DBEOrdline::curUnitCost
+            ) > 0 && $dbeOrderLine->getValue(
+                DBEJOrdline::supplierID
+            ) == CONFIG_SALES_STOCK_SUPPLIERID && $dbeItem->getValue(DBEItem::salesStockQty) >= $dbeOrderLine->getValue(
+                DBEOrdline::qtyOrdered
+            ))) return true;
         return false;
     }
 }

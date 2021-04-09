@@ -56,23 +56,23 @@ define(
 
 class CTItem extends CTCNC
 {
-    const ADD_CHILD_ITEM             = "ADD_CHILD_ITEM";
-    const REMOVE_CHILD_ITEM          = "REMOVE_CHILD_ITEM";
-    const GET_CHILD_ITEMS            = "GET_CHILD_ITEMS";
-    const GET_PARENT_ITEMS           = "GET_PARENT_ITEMS";
-    const SEARCH_ITEMS               = "SEARCH_ITEMS";
-    const CHECK_ITEM_RECURRING       = "CHECK_ITEM_RECURRING";
-    const DATA_TABLE_GET_DATA        = "DATA_TABLE_GET_DATA";
-    const SEARCH_ITEMS_JSON          = "SEARCH_ITEMS_JSON";
-    const GET_ITEM                   = 'GET_ITEM';
-    const UPDATE_CONTRACTS_PRICE     = 'updateContractsPrice';
-    const UPDATE_CHILD_ITEM_QUANTITY = 'UPDATE_CHILD_ITEM_QUANTITY';
-    const CONST_ITEMS                ='items';
-    const CONST_WARRANTY             ="warranty";
-    const CONST_RENEWAL_TYPES        ='renewalTypes';
-    const CONST_ITEM_BILLING_CATEGORY='itemBillingCategory';
-    const CONST_CHILD_ITEMS          ='childItems';
-    const CONST_SALESSTOCK_QTY       ='salesStockQty';
+    const ADD_CHILD_ITEM              = "ADD_CHILD_ITEM";
+    const REMOVE_CHILD_ITEM           = "REMOVE_CHILD_ITEM";
+    const GET_CHILD_ITEMS             = "GET_CHILD_ITEMS";
+    const GET_PARENT_ITEMS            = "GET_PARENT_ITEMS";
+    const SEARCH_ITEMS                = "SEARCH_ITEMS";
+    const CHECK_ITEM_RECURRING        = "CHECK_ITEM_RECURRING";
+    const DATA_TABLE_GET_DATA         = "DATA_TABLE_GET_DATA";
+    const SEARCH_ITEMS_JSON           = "SEARCH_ITEMS_JSON";
+    const GET_ITEM                    = 'GET_ITEM';
+    const UPDATE_CONTRACTS_PRICE      = 'updateContractsPrice';
+    const UPDATE_CHILD_ITEM_QUANTITY  = 'UPDATE_CHILD_ITEM_QUANTITY';
+    const CONST_ITEMS                 = 'items';
+    const CONST_WARRANTY              = "warranty";
+    const CONST_RENEWAL_TYPES         = 'renewalTypes';
+    const CONST_ITEM_BILLING_CATEGORY = 'itemBillingCategory';
+    const CONST_CHILD_ITEMS           = 'childItems';
+    const CONST_SALESSTOCK_QTY        = 'salesStockQty';
     /** @var DSForm */
     public $dsItem;
     /**
@@ -95,7 +95,7 @@ class CTItem extends CTCNC
             $cfg
         );
         $roles = [
-            "sales",            
+            "sales",
         ];
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
@@ -116,41 +116,40 @@ class CTItem extends CTCNC
         $this->setParentFormFields();
         switch ($this->getAction()) {
             case self::CONST_ITEMS:
-                switch($this->requestMethod){
+                switch ($this->requestMethod) {
                     case 'GET':
-                        echo json_encode($this->getItems(),JSON_NUMERIC_CHECK);
-                         break;
-                     case 'POST':
-                         echo json_encode($this->addItem());
-                         break;
-                     case 'PUT':
-                         echo json_encode($this->updateItem());
-                         break;
+                        echo json_encode($this->getItems(), JSON_NUMERIC_CHECK);
+                        break;
+                    case 'POST':
+                        echo json_encode($this->addItem());
+                        break;
+                    case 'PUT':
+                        echo json_encode($this->updateItem());
+                        break;
                     // case 'DELETE':
                     //     echo json_encode($this->deleteProjectIssue());
                     //     break;
-                }            
-                break;
+                }
+                exit;
             case self::CONST_CHILD_ITEMS:
-                switch($this->requestMethod){
+                switch ($this->requestMethod) {
                     case 'GET':
-                        
-                        case 'POST':
-                            echo json_encode($this->updateChildItems());
-                            break; 
-                }            
+                    case 'POST':
+                        echo json_encode($this->updateChildItems());
+                        break;
+                }
                 break;
             case self::CONST_SALESSTOCK_QTY:
                 echo json_encode($this->updateSalesStockQty());
-                break;             
+                break;
             case self::CONST_WARRANTY:
-                echo json_encode($this->getWarranties(),JSON_NUMERIC_CHECK);
+                echo json_encode($this->getWarranties(), JSON_NUMERIC_CHECK);
                 break;
             case self::CONST_RENEWAL_TYPES:
-                echo json_encode($this->getRenewalTypes(),JSON_NUMERIC_CHECK);
+                echo json_encode($this->getRenewalTypes(), JSON_NUMERIC_CHECK);
                 break;
             case self::CONST_ITEM_BILLING_CATEGORY:
-                echo json_encode($this->getItemBillingCategory(),JSON_NUMERIC_CHECK);
+                echo json_encode($this->getItemBillingCategory(), JSON_NUMERIC_CHECK);
                 break;
             case CTCNC_ACT_ITEM_ADD:
             case CTCNC_ACT_ITEM_EDIT:
@@ -1102,10 +1101,9 @@ WHERE custitem.`cui_itemno` = ?
             'ItemList'
         );
         $this->setPageTitle('Items');
-
         //$this->loadReactScript('ItemListTypeAheadRenderer.js');
         $this->loadReactScript('ItemsComponent.js');
-        $this->loadReactCSS('ItemsComponent.css');     
+        $this->loadReactCSS('ItemsComponent.css');
         $this->template->parse('CONTENTS', 'ItemList');
         $this->parsePage();
     }
@@ -1143,14 +1141,15 @@ WHERE custitem.`cui_itemno` = ?
         $repo = new \CNCLTD\ChildItem\ChildItemRepository($db);
         $repo->updateChildItemQuantity($parentItemId, $childItemId, $quantity);
     }
+
     function getItems()
     {
-        $data = [];
-        $limit=@$_REQUEST["limit"]??50;
-        $page =@$_REQUEST["page"]??1;
-        $offset=$limit*($page-1);
-         $dbeItem           = new DBEItem($this);
-         $dbeItemType       = new DBEItemType($this);
+        $data        = [];
+        $limit       = @$_REQUEST["limit"] ?? 50;
+        $page        = @$_REQUEST["page"] ?? 1;
+        $offset      = $limit * ($page - 1);
+        $dbeItem     = new DBEItem($this);
+        $dbeItemType = new DBEItemType($this);
         // $dbeManufacturer   = new DBEManufacturer($this);
         $orderColumns = [
             "description"   => "itm_desc",
@@ -1163,11 +1162,10 @@ WHERE custitem.`cui_itemno` = ?
             "manufacturer"  => "man_name",
             "salesStockQty" => "itm_sstk_qty"
         ];
-        $orderBy =$orderColumns[(@$_REQUEST["orderBy"]??"description")];
-        $orderDir =@$_REQUEST["orderDir"]??'asc';
-        $q='%'.(@$_REQUEST["q"]??"").'%';
-        $discontinued=!empty($q)?" and  item.itm_discontinued = 'Y' " :"";
-        $query ="SELECT 
+        $orderBy      = $orderColumns[(@$_REQUEST["orderBy"] ?? "description")];
+        $orderDir     = @$_REQUEST["orderDir"] ?? 'asc';
+        $q            = '%' . (@$_REQUEST["q"] ?? "") . '%';
+        $query        = "SELECT 
           
          itm_desc  as description , 
          itm_sstk_cost as curUnitCost,
@@ -1206,53 +1204,50 @@ WHERE custitem.`cui_itemno` = ?
             itm_sstk_cost       like :q OR
             itm_sstk_price      like :q OR
             itm_unit_of_sale    like :q OR
-            itm_discontinued    like :q OR
             ity_desc            like :q OR
             man_name            like :q
             )
-            $discontinued
+            and  item.itm_discontinued = 'N'
         ORDER BY $orderBy $orderDir
         LIMIT $limit OFFSET $offset
         ";
-        $data=DBConnect::fetchAll($query,['q'=>$q]);
+        $data         = DBConnect::fetchAll($query, ['q' => $q]);
         return $this->success($data);
     }
-    function getWarranties( )
+
+    function getWarranties()
     {
         // Manufacturer selector
         $dbeWarranty = new DBEWarranty($this);
         $dbeWarranty->getRows();
-        $data =[];
-        
+        $data = [];
         while ($dbeWarranty->fetchNext()) {
-            $data []=
-                array(
-                    'name' => $dbeWarranty->getValue(DBEWarranty::description),
-                    'id'          => $dbeWarranty->getValue(DBEWarranty::warrantyID),                                   
+            $data [] = array(
+                'name' => $dbeWarranty->getValue(DBEWarranty::description),
+                'id'   => $dbeWarranty->getValue(DBEWarranty::warrantyID),
             );
-             
-        } 
+
+        }
         return $this->success($data);
     }
-    function getRenewalTypes( )
+
+    function getRenewalTypes()
     {
         $dbeRenewalType = new DBERenewalType($this);
         $dbeRenewalType->getRows();
-        $data =[];
-       
+        $data                       = [];
         $allowedDirectDebitRenewals = [1, 2, 5];
         while ($dbeRenewalType->fetchNext()) {
-            $data []=
-                array(
-                    'name'   => $dbeRenewalType->getValue(DBERenewalType::description),
-                    'id'            => $dbeRenewalType->getValue(DBERenewalType::renewalTypeID),
-                    'allowsDirectDebit' => in_array(
-                        $dbeRenewalType->getValue(DBERenewalType::renewalTypeID),
-                        $allowedDirectDebitRenewals
-                    ) ? 'data-allows-direct-debit="true"' : null,
+            $data [] = array(
+                'name'              => $dbeRenewalType->getValue(DBERenewalType::description),
+                'id'                => $dbeRenewalType->getValue(DBERenewalType::renewalTypeID),
+                'allowsDirectDebit' => in_array(
+                    $dbeRenewalType->getValue(DBERenewalType::renewalTypeID),
+                    $allowedDirectDebitRenewals
+                ) ? 'data-allows-direct-debit="true"' : null,
             );
-            
-        }  
+
+        }
         return $this->success($data);
     }
 
@@ -1260,54 +1255,51 @@ WHERE custitem.`cui_itemno` = ?
     {
         $dbeItemBillingCategory = new DBEItemBillingCategory($this);
         $dbeItemBillingCategory->getRows(DBEItemBillingCategory::name);
-        $data =[];
+        $data = [];
         while ($dbeItemBillingCategory->fetchNext()) {
-            $data []=
-                array(
-                    'name'     => $dbeItemBillingCategory->getValue(DBEItemBillingCategory::name),
-                    'id'       => $dbeItemBillingCategory->getValue(DBEItemBillingCategory::id),
-                                    
+            $data [] = array(
+                'name' => $dbeItemBillingCategory->getValue(DBEItemBillingCategory::name),
+                'id'   => $dbeItemBillingCategory->getValue(DBEItemBillingCategory::id),
             );
         }
         return $this->success($data);
     }
+
     function updateItem()
     {
-        try{
-            $body = $this->getBody(true); 
-            if (! $body) {
-                return $this->fail(APIException::badRequest,"Bad Request");
+        try {
+            $body = $this->getBody(true);
+            if (!$body) {
+                return $this->fail(APIException::badRequest, "Bad Request");
             }
-            //$this->dsItem->debug=true;
-            if (!$this->dsItem->populateFromArray( ["item"=>$body] )) {
+            unset($body['allowGlobalPriceUpdate']);
+            if (!$this->dsItem->populateFromArray(["item" => $body])) {
                 $this->setFormErrorOn();
-                $this->setAction(CTCNC_ACT_ITEM_EDIT);          
+                $this->setAction(CTCNC_ACT_ITEM_EDIT);
                 $this->setParam('itemID', $this->dsItem->getValue(DBEItem::itemID));
-                return $this->fail(APIException::badRequest,$this->getFormErrorMessage());
+                return $this->fail(APIException::badRequest, $this->getFormErrorMessage());
             }
             $this->setAction(CTCNC_ACT_ITEM_EDIT);
-            //return $this->success(["itemID"=>$this->dsItem->getValue(DBEItem::itemID)]);
-            $this->buItem->updateItem($this->dsItem);        
+            $this->buItem->updateItem($this->dsItem);
             return $this->success();
-        }
-        catch(Exception $ex){
+        } catch (Exception $ex) {
             return $this->fail($ex->getMessage());
         }
     }
-    function addItem(){
-        try{
-            $body = $this->getBody(true); 
-            if (! $body) {
-                return $this->fail(APIException::badRequest,"Bad Request");
-            }            
+
+    function addItem()
+    {
+        try {
+            $body = $this->getBody(true);
+            if (!$body) {
+                return $this->fail(APIException::badRequest, "Bad Request");
+            }
             //return $this->success(["item"=>$body] );
             //$this->dsItem->debug=true; 
-            
-          
-            if (!$this->dsItem->populateFromArray(  ['item'=>$body]  )) {
+            if (!$this->dsItem->populateFromArray(['item' => $body])) {
                 $this->setFormErrorOn();
-                $this->setAction(CTCNC_ACT_ITEM_ADD);                          
-                return $this->fail(APIException::badRequest,$this->getFormErrorMessage());
+                $this->setAction(CTCNC_ACT_ITEM_ADD);
+                return $this->fail(APIException::badRequest, $this->getFormErrorMessage());
             }
             // $this->buItem->initialiseNewItem(
             //     $this->dsItem,
@@ -1315,66 +1307,64 @@ WHERE custitem.`cui_itemno` = ?
             // );
             //$this->setAction(CTITEM_ACT_ITEM_INSERT); 
             //return $this->success(["itemID"=>$this->dsItem->getValue(DBEItem::itemID)]);
-            
-             $this->buItem->updateItem($this->dsItem);        
-            return $this->success(["itemId"=>$this->dsItem->getPKValue()]);
-        }
-        catch(Exception $ex){
+            $this->buItem->updateItem($this->dsItem);
+            return $this->success(["itemId" => $this->dsItem->getPKValue()]);
+        } catch (Exception $ex) {
             return $this->fail(APIException::badRequest, $ex->getMessage());
         }
     }
-    function updateChildItems(){
-        $itemId=@$_REQUEST["itemId"];
-        if(!$itemId)
-            return $this->fail(APIException::badRequest,"Missing ItemID");
-        $items=$this->getBody();          
-        $childs=DBConnect::fetchAll("SELECT * FROM item JOIN childItem ON childItem.`childItemId` = item.`itm_itemno` WHERE childItem.`parentItemId` = :itemId",["itemId"=>$itemId]);  
+
+    function updateChildItems()
+    {
+        $itemId = @$_REQUEST["itemId"];
+        if (!$itemId) return $this->fail(APIException::badRequest, "Missing ItemID");
+        $items  = $this->getBody();
+        $childs = DBConnect::fetchAll(
+            "SELECT * FROM item JOIN childItem ON childItem.`childItemId` = item.`itm_itemno` WHERE childItem.`parentItemId` = :itemId",
+            ["itemId" => $itemId]
+        );
         //update current childs quantity
-        foreach($items as $item)
-        {           
-            DBConnect::execute("UPDATE childItem set quantity=:quantity where parentItemId=:parentId and childItemId=:childId",
-            ["quantity"=>$item->quantity,"parentId"=> $itemId,"childId"=>$item->id]);            
+        foreach ($items as $item) {
+            DBConnect::execute(
+                "UPDATE childItem set quantity=:quantity where parentItemId=:parentId and childItemId=:childId",
+                ["quantity" => $item->quantity, "parentId" => $itemId, "childId" => $item->id]
+            );
         }
         //deleted items
-        foreach($childs as $child)
-        {   //childItemId
-            $deleted=true;
-            foreach($items as $item)
-            {         
-                if($child["childItemId"]==$item->id)
-                    $deleted=false;
+        foreach ($childs as $child) {   //childItemId
+            $deleted = true;
+            foreach ($items as $item) {
+                if ($child["childItemId"] == $item->id) $deleted = false;
             }
-            if($deleted)
-            DBConnect::execute("DELETE from childItem where childItemId=:childId and parentItemId=:parentId",
-            ["childId"=>$child["childItemId"],"parentId"=>$itemId]);            
-            
+            if ($deleted) DBConnect::execute(
+                "DELETE from childItem where childItemId=:childId and parentItemId=:parentId",
+                ["childId" => $child["childItemId"], "parentId" => $itemId]
+            );
+
         }
         // add new items
-        foreach($items as $item)
-        {          
-            $found=false;
-            foreach($childs as $child)
-            { 
-                if($child["childItemId"]==$item->id)
-                $found=true;
-            } 
-            if(!$found)  
-            DBConnect::execute("INSERT into childItem(childItemId,parentItemId,quantity) values(:childId,:parentId,:quantity)",
-                 ["quantity"=>$item->quantity,"parentId"=> $itemId,"childId"=>$item->id]);
-        }      
+        foreach ($items as $item) {
+            $found = false;
+            foreach ($childs as $child) {
+                if ($child["childItemId"] == $item->id) $found = true;
+            }
+            if (!$found) DBConnect::execute(
+                "INSERT into childItem(childItemId,parentItemId,quantity) values(:childId,:parentId,:quantity)",
+                ["quantity" => $item->quantity, "parentId" => $itemId, "childId" => $item->id]
+            );
+        }
         return $this->success();
     }
 
-    function updateSalesStockQty(){
-        $itemID   = @$_REQUEST["id"];
+    function updateSalesStockQty()
+    {
+        $itemID = @$_REQUEST["id"];
         $value  = @$_REQUEST["value"];
-        if(empty($itemID))
-            return $this->fail(APIException::badRequest,"missing item id");
+        if (empty($itemID)) return $this->fail(APIException::badRequest, "missing item id");
         $dbeItem = new DBEItem($this);
         $dbeItem->getRow($itemID);
-        if(!$dbeItem->rowCount)
-            return $this->fail(APIException::notFound,"not found");
-        $dbeItem->setValue(DBEItem::salesStockQty,$value);
+        if (!$dbeItem->rowCount) return $this->fail(APIException::notFound, "not found");
+        $dbeItem->setValue(DBEItem::salesStockQty, $value);
         $dbeItem->updateRow();
         return $this->success();
     }
