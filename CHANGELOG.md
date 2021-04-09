@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v5.8.0]
 ### Added
 - Issue 1286 - Add Generate Password Icon to Edit SR page
 - Issue 1288 - Add the columns for Cost Price/Annum and Sales Price/Annum for these tabs: Renewals,Domains,Web Hosting.
