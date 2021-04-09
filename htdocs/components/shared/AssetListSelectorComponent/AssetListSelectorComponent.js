@@ -178,10 +178,22 @@ export default class AssetListSelectorComponent extends React.PureComponent {
                                       <React.Fragment>
                                           <div style={{
                                               display: "inline-block",
+                                              fontSize: 12,
+                                              fontFamily: "Arial",
+                                              letterSpacing: "normal",
+                                              whiteSpace: 'nowrap',
+                                              minWidth: "2em"
+                                          }}
+                                          >
+                                              {value.unsupported ? <i className="fa fa-2x fa-do-not-enter" style={{verticalAlign: "middle"}}/> : ''}
+                                          </div>
+                                          <div style={{
+                                              display: "inline-block",
                                               minWidth: `${maxComputerNameLength + 4}ch`, fontSize: 12,
                                               fontFamily: "Arial",
                                               letterSpacing: "normal",
-                                              whiteSpace: 'nowrap'
+                                              whiteSpace: 'nowrap',
+                                              paddingLeft: "1em"
                                           }}
                                           >
                                               {value.name}
@@ -210,17 +222,7 @@ export default class AssetListSelectorComponent extends React.PureComponent {
                                           >
                                               {value.biosVer}
                                           </div>
-                                          <div style={{
-                                              display: "inline-block",
-                                              fontSize: 12,
-                                              fontFamily: "Arial",
-                                              letterSpacing: "normal",
-                                              whiteSpace: 'nowrap',
-                                              paddingLeft: "1em"
-                                          }}
-                                          >
-                                              {value.unsupported ? <i className="fa fa-2x fa-do-not-enter" style={{verticalAlign: "middle"}}/> : ''}
-                                          </div>
+
                                       </React.Fragment>
                                   )
                               }
