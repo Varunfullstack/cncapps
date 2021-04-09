@@ -12,6 +12,7 @@ This project changes will be shown here.
 - Issue 1329 - Add sales order to RequestDashboard
 - Issue 1328 - Starting SR from a call back can cause SLA to fail
 - Issue 1323 - Include Mailbox Additional Permission in Office 365 Mailbox Export
+- Issue 1322 - Allow Mass assignment of SRs.
 ### Changed
 - Issue 1276 - Monitored SR email, Change Status: Awaiting Customer to Status: On Hold
 - Issue 1310 - Show sales orders on overtime page.
