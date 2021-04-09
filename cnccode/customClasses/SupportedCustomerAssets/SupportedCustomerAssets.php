@@ -58,7 +58,7 @@ class SupportedCustomerAssets
                     $dbeCustomer->getValue(DBECustomer::name),
                     $customerAssets->getValue(\DBECustomerItem::serverName),
                     $dbeCustomer->getValue(DBECustomer::customerID),
-                    $customerAssets->getValue(\DBECustomerItem::customerItemID)
+                    $validContract->getValue(\DBECustomerItem::customerItemID)
                 ),
             ];
         }
