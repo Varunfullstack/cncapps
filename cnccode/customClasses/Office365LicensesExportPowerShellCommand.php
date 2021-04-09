@@ -130,6 +130,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $licenses        = $data['licenses'];
         $devices         = $data['devices'];
         $sharePointSites = $data['sharePointAndTeams'];
+        $permissions     = $data['permissions'];
         $BUHeader        = new BUHeader($thing);
         $this->dbeHeader = new DataSet($thing);
         $BUHeader->getHeader($this->dbeHeader);
@@ -214,8 +215,14 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                 $logger->error('Failed to process sharepoint sites for customer: ' . $exception->getMessage());
             }
         }
-        if (!count($mailboxes) && !count($licenses) && !count($devices) && !count($sharePointSites)) {
-            $message = 'This customer does not have a licences nor mailboxes nor devices nor sharePointSites';
+        if(count($permissions)){
+            $this->processPermissions(
+                $spreadsheet,
+                $permissions,
+            );
+        }
+        if (!count($mailboxes) && !count($licenses) && !count($devices) && !count($sharePointSites) && !count($permissions)) {
+            $message = 'This customer does not have a licences nor mailboxes nor devices nor sharePointSites nor permissions';
             $logger->warning($message);
             throw new UnexpectedValueException($message);
         }
@@ -1270,5 +1277,40 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                 strtolower($datum),
                 'leaver'
             ) !== false;
+    }
+
+    private function processPermissions(Spreadsheet $spreadsheet, $permissions)
+    {
+        $permissionsSheet = $spreadsheet->createSheet();
+        $permissionsSheet->setTitle('Mailbox Permissions');
+        $permissionsSheet->fromArray(
+            [
+                "Mailbox Name",
+                "Email Address",
+                "Mailbox Type",
+                "Permission",
+                "Assigned To",
+            ],
+            null,
+            'A1'
+        );
+        $permissionsSheet->fromArray($permissions,null,'A2');
+
+        $highestRow    = $permissionsSheet->getHighestRow();
+        $highestColumn = $permissionsSheet->getHighestColumn();
+        $permissionsSheet->getStyle("A1:{$highestColumn}1")->getFont()->setBold(true);
+        $permissionsSheet->getStyle("A1:{$highestColumn}{$highestRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        foreach (range('A', $highestColumn) as $col) {
+            $permissionsSheet->getColumnDimension($col)->setAutoSize(true);
+        }
+        $dateTime = new DateTime();
+
+        $permissionsSheet->getStyle("A{$highestRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+        $legendRowStart = $highestRow + 2;
+        $permissionsSheet->fromArray(
+            ["Report generated at " . $dateTime->format("d-m-Y H:i:s")],
+            null,
+            'A' . $legendRowStart
+        );
     }
 }
