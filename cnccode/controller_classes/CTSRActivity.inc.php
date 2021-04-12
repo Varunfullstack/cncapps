@@ -1186,7 +1186,7 @@ class CTSRActivity extends CTCNC
         if (isset($callActivityID)) {
             $callActivity = new DBEJCallActivity($this);
             $callActivity->getRow($callActivityID);
-            $hasCallOutExpense = $this->hasCallOut(DBECallActivity::problemID);
+            $hasCallOutExpense = $this->hasCallOut($callActivity->getValue(DBECallActivity::problemID));
             return [
                 "callActivityID"              => $callActivity->getValue(DBECallActivity::callActivityID),
                 "problemID"                   => $callActivity->getValue(DBECallActivity::problemID),
@@ -1693,13 +1693,12 @@ FROM
         ];
     }
 
-    private function hasCallOut(string $problemID)
+    private function hasCallOut(int $problemID):bool
     {
-        /** dbswee */
-        global $db;
-        $statement = $db->prepare(
+        /** @var dbSweetcode $db */ global $db;
+        $statement = $db->preparedQuery(
             'SELECT
-  COUNT(*) > 0
+  COUNT(*) > 0 
 FROM
   expense
   JOIN `callactivity` c
@@ -1713,7 +1712,8 @@ AND c.caa_problemno = ? ',
                 ]
             ]
         );
-        $statement->fetch()
+
+        return $statement->fetch_array(MYSQLI_NUM)[0];
     }
 
     private function checkServiceRequestPendingCallbacksController()
