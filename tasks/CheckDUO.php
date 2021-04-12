@@ -5,35 +5,37 @@ use CNCLTD\LoggerCLI;
 global $cfg;
 require_once(__DIR__ . "/../htdocs/config.inc.php");
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
-
 global $db;
 $logName = 'CheckDUO';
-$logger = new LoggerCLI($logName);
-
+$logger  = new LoggerCLI($logName);
 // increasing execution time to infinity...
 ini_set('max_execution_time', 0);
-
 if (!is_cli()) {
     echo 'This script can only be ran from command line';
     exit;
 }
 // Script example.php
 $shortopts = "d";
-$longopts = [];
-$options = getopt($shortopts, $longopts);
+$longopts  = [];
+$options   = getopt($shortopts, $longopts);
 $debugMode = false;
 if (isset($options['d'])) {
     $debugMode = true;
 }
 $thing = null;
-
 $integrationKey = "DI6FY9277NHNHTD7ZXN1";
-$secret = "zAOdK7JTpE0xVLzVrVjkVd0LukEe4RyhsmU5Kq64";
-$apiHostname = "api-8f3a2990.duosecurity.com";
-
-$duoAPI = new \CNCLTD\DUOApi\DUOApi($secret, $integrationKey, $apiHostname);
+$secret         = "zAOdK7JTpE0xVLzVrVjkVd0LukEe4RyhsmU5Kq64";
+$apiHostname    = "api-8f3a2990.duosecurity.com";
+$duoAPI     = new \CNCLTD\DUOApi\DUOApi($secret, $integrationKey, $apiHostname);
 $buActivity = new BUActivity($thing);
+$adminIntegrationKey = "DIOIQ82CWQOP0RC76Q0Z";
+$adminSecret         = "Y2gc5HU5sKSuutTub7xqXwx4EelOJqzzQMmOuAtY";
+$adminHostName       = "api-8f3a2990.duosecurity.com";
 foreach ($duoAPI->getAccountsList() as $account) {
+
+    $clientDUO = new \CNCLTD\DUOApi\DUOApi($adminSecret, $adminIntegrationKey, $account->apiHostname);
+    var_dump($clientDUO->getUsers());
+    continue;
     $dbeCustomer = new DBECustomer($thing);
     $dbeCustomer->getCustomerByName($account->name);
     if (!$dbeCustomer->rowCount()) {
@@ -42,7 +44,6 @@ foreach ($duoAPI->getAccountsList() as $account) {
         continue;
     }
     $dbeCustomer->fetchNext();
-
     $dbeCustomerItem = new DBECustomerItem($thing);
     $dbeCustomerItem->getRowsByCustomerAndItemID(
         $dbeCustomer->getValue(DBECustomer::customerID),
@@ -61,6 +62,7 @@ foreach ($duoAPI->getAccountsList() as $account) {
     $contractId = $dbeCustomerItem->getValue(DBECustomerItem::customerItemID);
     $dbeCustomerItem->getRow($contractId);
     $accountInfo = $duoAPI->getAccountInfo($account->accountId);
+    var_dump($accountInfo);
     $dbeCustomerItem->setValue(DBECustomerItem::users, $accountInfo->userCount);
     $dbeCustomerItem->setValue(
         DBECustomerItem::curUnitSale,

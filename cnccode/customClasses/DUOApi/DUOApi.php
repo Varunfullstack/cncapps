@@ -48,6 +48,22 @@ class DUOApi
         return $duoAccountsResponse->response;
     }
 
+    function getUsers(){
+        $response = $this->duoAPIClient->apiCall('GET', '/admin/v1/users',[]);
+        if (!$response['success']) {
+            throw new Exception('Failed to pull accounts list');
+        }
+
+        return json_decode($response['response']);
+
+//        $jsonDecoder = new JsonDecoder();
+//        $jsonDecoder->register(new AccountTransformer());
+//        $jsonDecoder->register(new AccountsResponseTransformer());
+//        /** @var AccountsResponse $duoAccountsResponse */
+//        $duoAccountsResponse = $jsonDecoder->decode($response['response'], AccountsResponse::class);
+//        return $duoAccountsResponse->response;
+    }
+
     /**
      * @param $accountId
      * @return AccountInfo
