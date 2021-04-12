@@ -147,25 +147,12 @@ FROM
     AND initial.caa_callacttypeno = 51 
   JOIN consultant engineer 
     ON initial.`caa_consno` = engineer.`cns_consno` 
-   JOIN
-    (SELECT
-      COUNT(item.`itm_itemno`) AS items,
-      custitem.`cui_custno`
-    FROM
-      custitem
-      JOIN item
-        ON cui_itemno = itm_itemno
-    WHERE itm_servercare_flag = 'Y'
-      AND (
-        itm_desc <> 'Pre-Pay Contract'
-        OR itm_desc <> 'T & M'
-      )
-      AND cui_expiry_date >= NOW()
-      AND renewalStatus <> 'D'
-      AND declinedFlag <> 'Y'
-    GROUP BY cui_custno) a
-    ON a.cui_custno = problem.`pro_custno`
-    AND items
+   JOIN custitem
+    ON pro_contract_cuino = custitem.`cui_cuino`
+    AND cui_expiry_date >= NOW()
+    AND renewalStatus <> 'D'
+    AND declinedFlag <> 'Y'
+    AND custitem.`cui_itemno` IN (6915, 14535)
 WHERE problem.`pro_custno` <> 282 
   AND problem.raiseTypeId = 3
   and problem.pro_priority < 4
