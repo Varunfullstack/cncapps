@@ -178,7 +178,6 @@ export default class AssetListSelectorComponent extends React.PureComponent {
                           filterOptions={(options, state) => this.filterOptions(options, state)}
                           getOptionLabel={(option) => this.getOptionText(option)}
                           clearOnBlur={false}
-                          open={true}
                           value={selectedOption}
                           renderOption={(value) => {
                               if (value.isAsset) {
