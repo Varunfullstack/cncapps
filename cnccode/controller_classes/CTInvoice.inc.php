@@ -876,7 +876,7 @@ class CTInvoice extends CTCNC
                     true
                 );
                 $lineDescription =
-                    '<A href="' . $urlEditLine . '">' . Controller::htmlDisplayText($itemDescription) . '</A>';
+                    '<A onclick="lineModal(\''.$urlEditLine.'&htmlFmt=popup\')"  >' . Controller::htmlDisplayText($itemDescription) . '</A>';
                 $this->template->set_var(
                     'lineDescription',
                     $lineDescription
@@ -1204,6 +1204,7 @@ class CTInvoice extends CTCNC
                 //				'InvoiceLineEditJS' =>  'InvoiceLineEditJS.inc' // javascript
             )
         );
+        //$this->template->setVar('isPopup', $this->getParam('htmlFmt') ? 'true' : 'false');
         $this->invoiceLineForm();
         $this->template->parse(
             'invoiceLineEditJS',
@@ -1400,7 +1401,9 @@ class CTInvoice extends CTCNC
                 'U'
             );
         }
-        $this->redirectToDisplay($this->dsInvline->getValue(DBEInvline::invheadID));
+        echo "<script>window.close();  window.opener.location.reload();</script>";
+
+        //$this->redirectToDisplay($this->dsInvline->getValue(DBEInvline::invheadID));
     }
 
     /**

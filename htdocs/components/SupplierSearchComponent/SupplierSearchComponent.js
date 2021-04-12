@@ -8,7 +8,7 @@ import PropTypes from "prop-types";
 export class SupplierSearchComponent extends React.PureComponent {
 
     constructor(props, context) {
-        super(props, context);
+        super(props, context);         
     }
 
     handleChange = (value) => {

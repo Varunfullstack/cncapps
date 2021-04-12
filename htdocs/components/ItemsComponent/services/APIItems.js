@@ -2,8 +2,8 @@ import APIMain from "../../services/APIMain";
 import ApiUrls from "../../services/ApiUrls";
 
 export default class APIItems extends APIMain { 
-   getItems(limit=50,page=1,orderBy='description',orderDir='asc',q=''){
-    return this.get(`${ApiUrls.Item}items&limit=${limit}&page=${page}&orderBy=${orderBy}&orderDir=${orderDir}&q=${q}`);
+   getItems(limit=50,page=1,orderBy='description',orderDir='asc',q='',type=1){
+    return this.get(`${ApiUrls.Item}items&limit=${limit}&page=${page}&orderBy=${orderBy}&orderDir=${orderDir}&q=${q}&type=${type}`);
     }
     getWarranty(){
         return this.get(`${ApiUrls.Item}warranty`);
@@ -32,7 +32,7 @@ export default class APIItems extends APIMain {
         
     }
     updateItemQty(itemId,value){
-        return this.post(`${ApiUrls.Item}salesStockQty&id=${itemId}&value=${value}`);        
+        return this.post(`${ApiUrls.Item}salesStockQty&id=${itemId}&value=${value}`).then((res) => res.json());       
     }
     updateContractsPrice( type,value,itemId){
         return this.post(`${ApiUrls.Item}updateContractsPrice`,{

@@ -125,7 +125,20 @@
             curUnitSaleInput.disabled = true;
         }
     }
-
+    function validate(){
+        console.log("validate", supplierIDElement.value);
+        if (lineTypeSelectorElement.value == "I") {
+            if (!supplierIDElement.value) {
+                alert("Please Select Supplier");
+                return false;
+            }
+            if (!qtyOrderedInput.value) {
+                alert("Please Enter Quantity")
+                return false;
+            }
+        }
+        return true;
+    }
 </SCRIPT>
 <table width="910px"
        border="0"
@@ -285,7 +298,7 @@
                 <input type="button"
                        name="Submit"
                        value="Submit"
-                       onClick="submit();"
+                       onClick="validate()&&submit();"
                 >
                 <input type="button"
                        name="Cancel"

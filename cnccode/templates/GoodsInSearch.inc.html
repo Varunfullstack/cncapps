@@ -26,26 +26,42 @@ function createOrder(){
 	}
 }
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const supplierIdInput = document.getElementById("supplierID");
+        const reactSupplierSearchContainer = document.getElementById("reactSupplierSearchContainer");
+        reactSupplierSearchContainer.className="input";
+		const supplierID=supplierIdInput.value==''?null:parseInt(supplierIdInput.value);
+        document.renderSupplierSearchComponent(reactSupplierSearchContainer, {
+            defaultText: '',
+			supplierId:supplierID,
+            onChange: (id) => {
+                //console.log(id);
+                supplierIdInput.value = id;
+                
+            }
+        });
+    })
+</script>
+<style>
+    .input{
+        width: 250px !important;
+    }
+</style>
 <form name="searchForm" method="post" action="{submitURL}">
   <table width="500px" border="0" cellspacing="0" cellpadding="1">
 		<tr> 
 			<td width="100px" class="promptText"><div align="right">Supplier</div></td>
 			<td>
-				<input
-					type="hidden"
-					name="supplierID"
-					value="{supplierID}"
-					id="supplierID"
-				>
-				<input
-					type="text"
-					name="supplierName"
-					id="supplierName"
-					value="{supplierName}"
-					onChange="javascript:validateSupplierName()"
-					size="50"
-					maxlength="50"
-				>
+				<input type="hidden"
+                name="supplierID"
+                id="supplierID"
+                value="{supplierID}"
+                >              
+                <div id="reactSupplierSearchContainer"
+                     style="width: 150px;"
+                     data-input-id="supplierID"
+                ></div>
 		</td>
 		</tr>
 		<tr> 
@@ -55,6 +71,7 @@ function createOrder(){
 					onKeypress="javascript:submitOnReturn()"
 					name="porheadID"
 					value="{porheadID}"
+					class="input"
 				>
 		</td>
 		<tr> 

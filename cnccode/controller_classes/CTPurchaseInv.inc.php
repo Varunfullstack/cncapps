@@ -105,7 +105,7 @@ class CTPurchaseInv extends CTCNC
         }
         $found = false;
         if ($this->getFormError() == 0) {
-
+           
             $found = $this->buPurchaseInv->search(
                 $this->getParam('supplierID'),
                 $this->getParam('porheadID'),
@@ -201,6 +201,8 @@ class CTPurchaseInv extends CTCNC
                 'urlSupplierPopup' => $urlSupplierPopup
             )
         );
+        $this->loadReactCSS('SupplierSearchComponent.css');
+        $this->loadReactScript('SupplierSearchComponent.js');
         $this->template->parse('CONTENTS', 'PurchaseInvSearch', true);
         $this->parsePage();
     }

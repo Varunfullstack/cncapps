@@ -12,13 +12,14 @@ import APIManufacturer from "../ManufacturerComponent/services/APIManufacturer.j
 import ItemSearchComponent from "../shared/ItemSearchComponent.js";
 import '../style.css';
 import './ItemsComponent.css';
+import { debounce } from "@material-ui/core";
 
 class ItemsComponent extends MainComponent {
     api = new APIItems();
     apiItemType = new APIItemTypes();
     apiManufacturer = new APIManufacturer();
     scrollTimer;
-
+    timerSaleStock;
     constructor(props) {
         super(props);
         this.state = {
@@ -28,7 +29,8 @@ class ItemsComponent extends MainComponent {
                 page: 1,
                 orderBy: 'description',
                 orderDir: 'asc',
-                q: ''
+                q: '',
+                type:1
             },
             reset: false,
             items: [],
@@ -133,7 +135,7 @@ class ItemsComponent extends MainComponent {
         const {filter, reset, items} = this.state;
         if (!noSpinner)
             this.setState({showSpinner: true});
-        this.api.getItems(filter.limit, filter.page, filter.orderBy, filter.orderDir, filter.q)
+        this.api.getItems(filter.limit, filter.page, filter.orderBy, filter.orderDir, filter.q,filter.type)
             .then(res => {
                 if (!reset)
                     this.setState({items: [...items, ...res.data], showSpinner: false});
@@ -238,7 +240,7 @@ class ItemsComponent extends MainComponent {
             pk="itemID"
             columns={columns}
             data={items || []}
-            search={true}
+            search={false}
             onSearch={this.handleSearch}
             onSort={this.handleSort}
         >
@@ -250,22 +252,22 @@ class ItemsComponent extends MainComponent {
                       style={{width: 40}}
                       key={item.itemID + "salesStockQty"}
                       id={item.itemID}
-                      value={item.salesStockQty || ''}
+                      defaultValue={item.salesStockQty || ''}
                       onChange={this.handleItemSalesStock}
         ></input>
 
     }
     handleItemSalesStock = (event) => {
-        const itemID = event.target.id;
-        const value = event.target.value;
-        console.log(itemID, value);
-        const {items} = this.state;
-        const indx = items.findIndex(i => i.itemID == itemID);
-        items[indx].salesStockQty = value;
-        this.setState({items});
-        this.api.updateItemQty(itemID, value).then(res => {
-            console.log(res);
-        })
+        if(this.timerSaleStock)
+            clearTimeout(this.timerSaleStock);
+        this.timerSaleStock=setTimeout(()=>{
+            const itemID = event.target.id;
+            const value = event.target.value; 
+            this.api.updateItemQty(itemID, value).then(res => {
+                //console.log(res);
+            })
+        },1000)
+       
     }
     getChildItemsData = (itemId) => {
         console.log('get childs');
@@ -678,7 +680,28 @@ class ItemsComponent extends MainComponent {
     handleClose = () => {
         this.setState({showModal: false});
     }
+    handleSearch=(prop,value)=>{        
+        const {filter}=this.state;
+        filter[prop] = value;
+        filter.page = 1;
+        this.setState({filter, reset: true} );
+        if(this.searchTimer)
+        clearTimeout(this.searchTimer);
+        this.searchTimer=setTimeout(()=> this.getData(),1000);        
+    }
+    getFilterItems=()=>{
+        const {filter}=this.state;
 
+        return <div style={{display:"flex",alignItems:"center",flexDirection:"row",width:400,justifyContent:"center"}}>
+                <label>Search</label>
+                <input className="form-control" value={filter.q} onChange={(event)=>this.handleSearch('q',event.target.value)}></input>
+                <select className="form-control" value={filter.type} onChange={(event)=>this.handleSearch('type',event.target.value)} >
+                    <option value="1">Discontinued</option>
+                    <option value="2">Continued</option>
+                    <option value="3">All Items</option>
+                </select>
+            </div>
+    }
     render() {
         return <div key="main">
             {this.getAlert()}
@@ -697,7 +720,7 @@ class ItemsComponent extends MainComponent {
             <div className="modal-style">
                 {this.getModal()}
             </div>
-
+            {this.getFilterItems()}
             {this.getDataTable()}
         </div>;
     }
