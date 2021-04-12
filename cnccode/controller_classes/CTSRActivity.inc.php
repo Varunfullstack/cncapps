@@ -1186,6 +1186,7 @@ class CTSRActivity extends CTCNC
         if (isset($callActivityID)) {
             $callActivity = new DBEJCallActivity($this);
             $callActivity->getRow($callActivityID);
+            $hasCallOutExpense = $this->hasCallOut(DBECallActivity::problemID);
             return [
                 "callActivityID"              => $callActivity->getValue(DBECallActivity::callActivityID),
                 "problemID"                   => $callActivity->getValue(DBECallActivity::problemID),
@@ -1197,7 +1198,8 @@ class CTSRActivity extends CTCNC
                 "linkedSalesOrderID"          => $callActivity->getValue(DBEJCallActivity::linkedSalesOrderID),
                 "problemHideFromCustomerFlag" => $callActivity->getValue(DBEJCallActivity::problemHideFromCustomerFlag),
                 "rootCauseID"                 => $callActivity->getValue(DBEJCallActivity::rootCauseID),
-                "prePayChargeApproved"        => $callActivity->getValue(DBEJCallActivity::prePayChargeApproved)
+                "prePayChargeApproved"        => $callActivity->getValue(DBEJCallActivity::prePayChargeApproved),
+                "hasCallOutExpense"           => $hasCallOutExpense
             ];
         } else return null;
     }
@@ -1689,6 +1691,29 @@ FROM
             "status" => "ok",
             "data"   => $data
         ];
+    }
+
+    private function hasCallOut(string $problemID)
+    {
+        /** dbswee */
+        global $db;
+        $statement = $db->prepare(
+            'SELECT
+  COUNT(*) > 0
+FROM
+  expense
+  JOIN `callactivity` c
+    ON exp_callactivityno = c.`caa_callactivityno`
+WHERE exp_expensetypeno = 11
+AND c.caa_problemno = ? ',
+            [
+                [
+                    "type"  => "i",
+                    "value" => $problemID
+                ]
+            ]
+        );
+        $statement->fetch()
     }
 
     private function checkServiceRequestPendingCallbacksController()
