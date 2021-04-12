@@ -3,6 +3,7 @@ This project changes will be shown here.
 
 ## [unreleased]
 ### Changed
+- Issue 1217 - Force T&M when SR has Call Out Expense.
 - Issue 1305 - Deleting SR that has a callback is prevented.
 
 ## [v5.8.6] - 2021-04-22
