@@ -1497,7 +1497,6 @@ class BUActivity extends Business
      */
     private function getServiceRequestStatusText(DBEJCallActivity $dbejCallactivity): string
     {
-        var_dump($dbejCallactivity->getValue(DBEJCallActivity::problemStatus));
         $status = DBEProblem::statusFromDB($dbejCallactivity->getValue(DBEJCallActivity::problemStatus));
         if ($dbejCallactivity->getValue(DBEJCallActivity::problemStatus) === 'P' && $dbejCallactivity->getValue(
                 DBEJCallActivity::awaitingCustomerResponseFlag
