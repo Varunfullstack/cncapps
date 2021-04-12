@@ -1697,6 +1697,8 @@ class BUSalesOrder extends Business
     )
     {
         $this->setMethodName('pasteLinesFromOrder');
+        $dbeOrderHead=new DBEOrdhead($this);
+        $dbeOrderHead->getRow($toOrdheadID);
         $dbeFromOrdline = new DBEOrdline($this);
         $colCount       = $dbeFromOrdline->colCount();
         $dbeToOrdline   = new DBEOrdline($this);
@@ -1717,8 +1719,10 @@ class BUSalesOrder extends Business
             DBEOrdline::sequenceNo
         );
         $dbeToOrdline->resetQueryString();
+        if(!$dbeFromOrdline->rowCount)
+            return false;
         while ($dbeFromOrdline->fetchNext()) {
-
+            
             for ($i = 0; $i < $colCount; $i++) {
                 $dbeToOrdline->setValueNoCheckByColumnNumber(
                     $i,
@@ -1746,18 +1750,21 @@ class BUSalesOrder extends Business
                 DBEOrdline::renewalCustomerItemID,
                 0
             );
-            // get new prices
-            $dbeItem=new DBEItem($this);
-            $dbeItem->getRow( $dbeToOrdline->getValue(DBEOrdline::itemID));
-            if($dbeItem->rowCount>0)
+            if($dbeOrderHead->getValue(DBEOrdhead::type)=='Q')
             {
-                $curUnitCost=$dbeItem->getValue(DBEItem::curUnitCost);
-                $curUnitSale=$dbeItem->getValue(DBEItem::curUnitSale);
-                $qty= $dbeToOrdline->getValue(DBEOrdline::qtyOrdered);
-                $dbeToOrdline->setValue(DBEOrdline::curUnitCost,$curUnitCost);
-                $dbeToOrdline->setValue(DBEOrdline::curUnitSale,$curUnitSale);
-                $dbeToOrdline->setValue(DBEOrdline::curTotalCost,round($qty*$curUnitCost,2));
-                $dbeToOrdline->setValue(DBEOrdline::curTotalSale,round($qty*$curUnitSale,2));
+                // get new prices
+                $dbeItem=new DBEItem($this);
+                $dbeItem->getRow( $dbeToOrdline->getValue(DBEOrdline::itemID));
+                if($dbeItem->rowCount>0)
+                {
+                    $curUnitCost=$dbeItem->getValue(DBEItem::curUnitCost);
+                    $curUnitSale=$dbeItem->getValue(DBEItem::curUnitSale);
+                    $qty= $dbeToOrdline->getValue(DBEOrdline::qtyOrdered);
+                    $dbeToOrdline->setValue(DBEOrdline::curUnitCost,$curUnitCost);
+                    $dbeToOrdline->setValue(DBEOrdline::curUnitSale,$curUnitSale);
+                    $dbeToOrdline->setValue(DBEOrdline::curTotalCost,round($qty*$curUnitCost,2));
+                    $dbeToOrdline->setValue(DBEOrdline::curTotalSale,round($qty*$curUnitSale,2));
+                }
             }
             $dbeToOrdline->insertRow();
             $sequenceNumber = null;

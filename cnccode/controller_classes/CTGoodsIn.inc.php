@@ -259,6 +259,8 @@ class CTGoodsIn extends CTCNC
                 'urlSupplierPopup' => $urlSupplierPopup
             )
         );
+        $this->loadReactCSS('SupplierSearchComponent.css');
+        $this->loadReactScript('SupplierSearchComponent.js');
         $this->template->parse(
             'CONTENTS',
             'GoodsInSearch',

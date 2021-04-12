@@ -68,11 +68,17 @@
             })
         );
 
-        document.getElementById('addNewRowButton').addEventListener('click', $event => {
-            open('/Invoice.php?action=addLine&invheadID={invheadID}', '_blank');
-        })
+        // document.getElementById('addNewRowButton').addEventListener('click', $event => {
+         
+        //     //open('/Invoice.php?action=addLine&invheadID={invheadID}', '_blank');
+        // });
+        
     })
-
+    function lineModal(url){
+            window.open(url,
+                            'addLine',
+                            'scrollbars=yes,resizable=no,height=300,width=740,copyhistory=no, menubar=0');                 
+        }
     function checkFunctionKey(field) {
         if (event.keyCode == 120) {			// F9 - edit
             switch (field.id) {
@@ -133,6 +139,7 @@
         title="Add New Row"
         id="addNewRowButton"
         class="salesOrderButton"
+        onclick="lineModal('/Invoice.php?action=addLine&invheadID={invheadID}&htmlFmt=popup')"
 >
     <i class="fal fa-plus fa-2x"></i>
 </button>

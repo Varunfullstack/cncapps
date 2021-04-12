@@ -1165,6 +1165,11 @@ WHERE custitem.`cui_itemno` = ?
         $orderBy      = $orderColumns[(@$_REQUEST["orderBy"] ?? "description")];
         $orderDir     = @$_REQUEST["orderDir"] ?? 'asc';
         $q            = '%' . (@$_REQUEST["q"] ?? "") . '%';
+        $type         = " and  item.itm_discontinued = 'N'";
+        if(@$_REQUEST["type"]=="2")
+            $type         = " and  item.itm_discontinued = 'Y'";
+        else if(@$_REQUEST["type"]=="3")
+        $type         = " ";
         $query        = "SELECT 
           
          itm_desc  as description , 
@@ -1207,7 +1212,7 @@ WHERE custitem.`cui_itemno` = ?
             ity_desc            like :q OR
             man_name            like :q
             )
-            and  item.itm_discontinued = 'N'
+            $type
         ORDER BY $orderBy $orderDir
         LIMIT $limit OFFSET $offset
         ";
