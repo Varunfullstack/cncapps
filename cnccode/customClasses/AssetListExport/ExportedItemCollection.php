@@ -290,18 +290,22 @@ ORDER BY location, operatingSystem desc, computerName';
         $labtechData = $statement->fetchAll(PDO::FETCH_CLASS, LabtechAssetDTO::class);
         // we have to build the information from labtech and os support dates collection
         foreach ($labtechData as $labtechDatum) {
-            $supportDates        = $collection->getMatchingOperatingSystemSupportInformation(
+            $supportDates          = $collection->getMatchingOperatingSystemSupportInformation(
                 $labtechDatum->getOperatingSystem(),
                 $labtechDatum->getVersion()
             );
-            $isServer            = false;
-            $endOfLifeDate       = null;
-            $this->labTechData[] = ["dataItem" => $labtechDatum, "supportDates" => $supportDates];
+            $isServer              = false;
+            $endOfLifeDate         = null;
+            $this->labTechData[]   = ["dataItem" => $labtechDatum, "supportDates" => $supportDates];
+            $operatingSystemString = str_replace('Microsoft Windows', "", $labtechDatum->getOperatingSystem());
             if ($supportDates) {
                 $isServer      = $supportDates[\DBEOSSupportDates::isServer];
                 $dateString    = $supportDates[\DBEOSSupportDates::endOfLifeDate];
                 $dateTime      = \DateTime::createFromFormat(DATE_MYSQL_DATE, $dateString);
                 $endOfLifeDate = $dateTime->format(DATE_CNC_DATE_FORMAT);
+                if (isset($supportDates[\DBEOSSupportDates::friendlyName])) {
+                    $operatingSystemString = "{$operatingSystemString} ({$supportDates[\DBEOSSupportDates::friendlyName]})";
+                }
             }
             $genericRow           = [
                 $labtechDatum->getLocation(),
@@ -317,7 +321,7 @@ ORDER BY location, operatingSystem desc, computerName';
                 $labtechDatum->getMemory(),
                 $labtechDatum->getTotalDisk(),
                 $labtechDatum->getDriveEncryption(),
-                str_replace('Microsoft Windows', "", $labtechDatum->getOperatingSystem()),
+                $operatingSystemString,
                 $labtechDatum->getVersion(),
                 $endOfLifeDate,
                 $labtechDatum->getDomain(),
