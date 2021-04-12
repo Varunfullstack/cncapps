@@ -530,7 +530,7 @@ class AssetListExporter
         $fileDescription = "Current Asset List Extract.xlsx";
         if ($generateWithMonthYear) {
             $date            = new DateTime();
-            $fileDescription = "Asset List - {$date->format('F Y')}.xls";
+            $fileDescription = "Asset List - {$date->format('F Y')}.xlsx";
         }
         return $folderName . $fileDescription;
     }
