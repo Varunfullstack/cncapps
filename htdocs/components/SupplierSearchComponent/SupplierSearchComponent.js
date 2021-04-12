@@ -21,7 +21,6 @@ export class SupplierSearchComponent extends React.PureComponent {
             const input = document.getElementById(this.props.inputId);
             input.value = id;
         }
-        console.log(this.props);
         if (this.props.onChange) {
             this.props.onChange(id);
         }
@@ -45,6 +44,7 @@ SupplierSearchComponent.propTypes = {
 }
 
 document.renderSupplierSearchComponent = (domContainer, {inputId, supplierId, onChange}) => {
+    console.log(supplierId);
     const element = document.getElementById(inputId)
     const renderedInstance =
         ReactDOM.render(React.createElement(SupplierSearchComponent, {

@@ -20,6 +20,14 @@ export default class SupplierSelectorComponent extends React.PureComponent {
         }
     }
 
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (prevProps.supplierId !== this.props.supplierId) {
+            if (!this.props.supplierId) {
+                this.setState({selectedOption: null});
+            }
+        }
+    }
+
 
     async componentDidMount() {
         const {supplierId} = this.props;

@@ -35,11 +35,17 @@
         itemIdInput = document.getElementById('itemID');
         itemIdInput.addEventListener('change', ($event) => {
             updatePartNumber();
+            clearSupplier();
         })
         partNumberRow = document.getElementById('partNumberRow');
         updatePartNumber();
         checkInputs();
     })
+
+    function clearSupplier() {
+        supplierIDElement.value = "";
+        checkInputs();
+    }
 
     async function updatePartNumber() {
         const itemId = itemIdInput.value;
@@ -61,21 +67,21 @@
                 case "itemDescription":
                     if (document.getElementById("itemID").value != "0") {
                         window.open(
-                            '{urlItemEdit}&itemID=' +
-                            escape(document.getElementById("itemID").value) +
-                            '&parentIDField=itemID' +
-                            '&parentDescField=itemDescription',
-                            'item',
-                            'scrollbars=yes,resizable=yes,width=610,height=550,copyhistory=no, menubar=0'
+                                '{urlItemEdit}&itemID=' +
+                                escape(document.getElementById("itemID").value) +
+                                '&parentIDField=itemID' +
+                                '&parentDescField=itemDescription',
+                                'item',
+                                'scrollbars=yes,resizable=yes,width=610,height=550,copyhistory=no, menubar=0'
                         );
                     }
                     break;
                 case "supplierName":
                     if (document.getElementById("supplierID").value != "0") {
                         window.open('{urlSupplierEdit}&supplierID=' +
-                            escape(document.getElementById("supplierID").value),
-                            'suppliers',
-                            'scrollbars=yes,resizable=no,height=400,width=450,copyhistory=no, menubar=0');
+                                escape(document.getElementById("supplierID").value),
+                                'suppliers',
+                                'scrollbars=yes,resizable=no,height=400,width=450,copyhistory=no, menubar=0');
                     }
                     break;
             }
@@ -125,8 +131,8 @@
             curUnitSaleInput.disabled = true;
         }
     }
-    function validate(){
-        console.log("validate", supplierIDElement.value);
+
+    function validate() {
         if (lineTypeSelectorElement.value == "I") {
             if (!supplierIDElement.value) {
                 alert("Please Select Supplier");
@@ -281,6 +287,7 @@
             <td class="promptText">Sale Price</td>
             <td class="field">
                 <input
+                        id="curUnitSale"
                         type="text"
                         name="ordline[1][curUnitSale]"
                         value="{curUnitSale}"
