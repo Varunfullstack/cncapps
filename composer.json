@@ -31,7 +31,7 @@
         "rlanvin/php-rrule": "^2.2",
         "guzzlehttp/guzzle": "^7.0",
         "duosecurity/duo_api_php": "dev-master",
-        "karriere/json-decoder": "^3.1",
+        "karriere/json-decoder": "^4.0.0",
         "ext-sqlite3": "*",
         "data-uri/data-uri": "^0.2.5",
         "html2text/html2text": "^4.3"
@@ -41,5 +41,7 @@
             "CNCLTD\\": "cnccode/customClasses",
             "CNCLTD\\Data\\": "cnccode/data_classes"
         }
-    }
+    },
+    "name": "cncltd/cncaps",
+    "description": ""
 }

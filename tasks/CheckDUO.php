@@ -36,7 +36,7 @@ foreach ($duoAPI->getAccountsList() as $account) {
 
     $clientDUO = new DUOApi($adminSecret, $adminIntegrationKey, $account->apiHostname);
     var_dump($clientDUO->getUsers());
-    continue;
+    exit;
     $dbeCustomer = new DBECustomer($thing);
     $dbeCustomer->getCustomerByName($account->name);
     if (!$dbeCustomer->rowCount()) {

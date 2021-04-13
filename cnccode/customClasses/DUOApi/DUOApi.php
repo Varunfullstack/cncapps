@@ -1,6 +1,5 @@
 <?php
 
-
 namespace CNCLTD\DUOApi;
 
 use Exception;
@@ -23,10 +22,10 @@ class DUOApi
      */
     public function __construct($secretKet, $integrationKey, $host)
     {
-        $this->secretKet = $secretKet;
+        $this->secretKet      = $secretKet;
         $this->integrationKey = $integrationKey;
-        $this->host = $host;
-        $this->duoAPIClient = new \DuoAPI\Auth($integrationKey, $secretKet, $host, null, false);
+        $this->host           = $host;
+        $this->duoAPIClient   = new \DuoAPI\Auth($integrationKey, $secretKet, $host, null, false);
     }
 
     /**
@@ -39,7 +38,6 @@ class DUOApi
         if (!$response['success']) {
             throw new Exception('Failed to pull accounts list');
         }
-
         $jsonDecoder = new JsonDecoder();
         $jsonDecoder->register(new AccountTransformer());
         $jsonDecoder->register(new AccountsResponseTransformer());
@@ -48,20 +46,39 @@ class DUOApi
         return $duoAccountsResponse->response;
     }
 
-    function getUsers(){
-        $response = $this->duoAPIClient->apiCall('GET', '/admin/v1/users',[]);
+
+    private function retrieveUsers($offset = 0): RetrieveUsersResponse
+    {
+        $response = $this->duoAPIClient->apiCall(
+            'GET',
+            '/admin/v1/users',
+            [
+                "offset" => $offset
+            ]
+        );
         if (!$response['success']) {
             throw new Exception('Failed to pull accounts list');
         }
+        $jsonDecoder = new JsonDecoder();
+        $jsonDecoder->register(new UserTransformer());
+        $jsonDecoder->register(new RetrieveUsersResponseTransformer());
+        return $jsonDecoder->decode($response['response'], RetrieveUsersResponse::class);
+    }
 
-        return json_decode($response['response']);
-
-//        $jsonDecoder = new JsonDecoder();
-//        $jsonDecoder->register(new AccountTransformer());
-//        $jsonDecoder->register(new AccountsResponseTransformer());
-//        /** @var AccountsResponse $duoAccountsResponse */
-//        $duoAccountsResponse = $jsonDecoder->decode($response['response'], AccountsResponse::class);
-//        return $duoAccountsResponse->response;
+    /**
+     * @return User[]
+     * @throws Exception
+     */
+    function getUsers(): array
+    {
+        $users      = [];
+        $nextOffset = 0;
+        do {
+            $retrieveUsersResponse = $this->retrieveUsers($nextOffset);
+            $users                 = array_merge($users, $retrieveUsersResponse->response);
+            $nextOffset            = $retrieveUsersResponse->nextOffset;
+        } while ($nextOffset);
+        return $users;
     }
 
     /**
