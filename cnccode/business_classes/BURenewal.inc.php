@@ -106,7 +106,12 @@ class BURenewal extends Business
             $dsCustomer
         );
         while ($dsCustomer->fetchNext()) {
-            $this->sendRenewalEmailToContact($dsCustomer);
+            $buCustomer = new BUCustomer($this);
+            $primaryContact = $buCustomer->getPrimaryContact($dsCustomer->getValue(DBECustomer::customerID));
+            if(!$primaryContact){
+                throw new Exception("Customer {$dsCustomer->getValue(DBECustomer::customerID)} does not have a valid primary main contact");
+            }
+            $this->sendRenewalEmailToContact($primaryContact->getValue(DBEContact::contactID));
             $this->dbeCustomer->getRow($dsCustomer->getValue(DBECustomer::customerID));
             $this->dbeCustomer->setValue(
                 DBECustomer::sendContractEmail,
