@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.8.1]
+### Changed
+
+
 ## [v5.8.0] - 2021-04-12
 ### Added
 - Issue 1286 - Add Generate Password Icon to Edit SR page
