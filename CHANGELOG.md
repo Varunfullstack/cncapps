@@ -5,7 +5,8 @@ This project changes will be shown here.
 ### Added
 - Added the possibility of providing dates to the customerSatisfactionScore API endpoint.
 ### Fixed
-- Fix wrong math in customerSatisfactionScore.
+- Fixed wrong math in customerSatisfactionScore.
+- Fixed wrong customer item link in SupportedCustomerAssets web version pointing to the contract and not to the machine.
 
 ## [v5.8.0] - 2021-04-12
 ### Added
