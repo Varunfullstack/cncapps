@@ -10,6 +10,7 @@ This project changes will be shown here.
 ### Fixed
 - Fixed wrong math in customerSatisfactionScore.
 - Fixed wrong customer item link in SupportedCustomerAssets web version pointing to the contract and not to the machine.
+- Fixed issue with 
 
 ## [v5.8.0] - 2021-04-12
 ### Added
