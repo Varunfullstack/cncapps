@@ -53,7 +53,7 @@ function raiseNotMatchedRequest($customerId, NotMatchedItemDTO $notMatchedItemDT
     $buCustomer     = new BUCustomer($thing);
     $primaryContact = $buCustomer->getPrimaryContact($customerId);
     if (!$primaryContact) {
-        throw new Exception("Customer doesn't have a primary contact set");
+        throw new Exception("Customer $customerId doesn't have a primary contact set");
     }
     $buHeader = new BUHeader($thing);
     $dsHeader = new DataSet($thing);
@@ -119,7 +119,7 @@ function raiseNotMatchedRequest($customerId, NotMatchedItemDTO $notMatchedItemDT
         DBEJProblem::userID,
         null
     );
-    $dbeProblem->setValue(DBEProblem::contractCustomerItemID, $notMatchedItemDTO->getCustomerItemId());
+    $dbeProblem->setValue(DBEProblem::contractCustomerItemID, $notMatchedItemDTO->customerContractId());
     $dbeProblem->setValue(
         DBEProblem::raiseTypeId,
         BUProblemRaiseType::ALERTID
