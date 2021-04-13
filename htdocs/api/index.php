@@ -3,8 +3,8 @@
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestTokenId;
 use CNCLTD\ChargeableWorkCustomerRequest\infra\ChargeableWorkCustomerRequestMySQLRepository;
 use CNCLTD\ChargeableWorkCustomerRequest\usecases\AcceptPendingChargeableWorkCustomerRequest;
-use CNCLTD\ChargeableWorkCustomerRequest\usecases\RejectPendingChargeableWorkCustomerRequest;
 use CNCLTD\ChargeableWorkCustomerRequest\usecases\GetPendingToProcessChargeableRequestInfo;
+use CNCLTD\ChargeableWorkCustomerRequest\usecases\RejectPendingChargeableWorkCustomerRequest;
 use CNCLTD\CustomerFeedback;
 use CNCLTD\CustomerFeedbackRepository;
 use CNCLTD\Exceptions\ChargeableWorkCustomerRequestAlreadyProcessedException;
@@ -459,16 +459,46 @@ ORDER BY raisedManually DESC";
                     "SELECT
   SUM(cf.value = 1) / COUNT(*) AS good,
   SUM(cf.value = 2) / COUNT(*) AS meh,
-  SUM(cf.value = 2) / COUNT(*) AS bad,
+  SUM(cf.value = 3) / COUNT(*) AS bad,
   COUNT(*) AS total
 FROM
   customerFeedback cf
   JOIN contact
     ON contact.`con_contno` = cf.contactId
-   WHERE contact.`con_custno` = ?
+   WHERE contact.`con_custno` = ? 
+and date(createdAt) >= ? and date(createdAt) <= ?
 GROUP BY contact.`con_custno`"
                 );
-                $statement->execute([$args['customerId']]);
+                $queryParams = $request->getQueryParams();
+                $endDate   = new DateTime();
+                $startDate = (clone $endDate)->sub(new DateInterval('P365D'));
+                if (isset($queryParams['startDate'])) {
+                    $startDateString = $queryParams['startDate'];
+                    $startDate       = DateTime::createFromFormat(DATE_MYSQL_DATE, $startDateString);
+                    if (!$startDate) {
+                        $response->getBody()->write(
+                            json_encode(["error" => "The start date parameter format is not valid: YYYY-MM-DD"])
+                        );
+                        return $response->withStatus(400);
+                    }
+                }
+                if (isset($queryParams['endDate'])) {
+                    $endDateString = $queryParams['endDate'];
+                    $endDate       = DateTime::createFromFormat(DATE_MYSQL_DATE, $endDateString);
+                    if (!$endDate) {
+                        $response->getBody()->write(
+                            json_encode(["error" => "The end date parameter format is not valid: YYYY-MM-DD"])
+                        );
+                        return $response->withStatus(400);
+                    }
+                }
+                $statement->execute(
+                    [
+                        $args['customerId'],
+                        $startDate->format(DATE_MYSQL_DATE),
+                        $endDate->format(DATE_MYSQL_DATE)
+                    ]
+                );
                 $response->getBody()->write(
                     json_encode($statement->fetch(), JSON_NUMERIC_CHECK)
                 );

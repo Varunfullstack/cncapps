@@ -2,8 +2,10 @@
 This project changes will be shown here.
 
 ## [v5.8.1]
-### Changed
-
+### Added
+- Added the possibility of providing dates to the customerSatisfactionScore API endpoint.
+### Fixed
+- Fix wrong math in customerSatisfactionScore.
 
 ## [v5.8.0] - 2021-04-12
 ### Added
