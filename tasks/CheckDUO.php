@@ -1,5 +1,6 @@
 <?php
 
+use CNCLTD\DUOApi\DUOApi;
 use CNCLTD\LoggerCLI;
 
 global $cfg;
@@ -22,18 +23,18 @@ $debugMode = false;
 if (isset($options['d'])) {
     $debugMode = true;
 }
-$thing = null;
-$integrationKey = "DI6FY9277NHNHTD7ZXN1";
-$secret         = "zAOdK7JTpE0xVLzVrVjkVd0LukEe4RyhsmU5Kq64";
-$apiHostname    = "api-8f3a2990.duosecurity.com";
-$duoAPI     = new \CNCLTD\DUOApi\DUOApi($secret, $integrationKey, $apiHostname);
-$buActivity = new BUActivity($thing);
+$thing               = null;
+$integrationKey      = "DI6FY9277NHNHTD7ZXN1";
+$secret              = "zAOdK7JTpE0xVLzVrVjkVd0LukEe4RyhsmU5Kq64";
+$apiHostname         = "api-8f3a2990.duosecurity.com";
+$duoAPI              = new DUOApi($secret, $integrationKey, $apiHostname);
+$buActivity          = new BUActivity($thing);
 $adminIntegrationKey = "DIOIQ82CWQOP0RC76Q0Z";
 $adminSecret         = "Y2gc5HU5sKSuutTub7xqXwx4EelOJqzzQMmOuAtY";
 $adminHostName       = "api-8f3a2990.duosecurity.com";
 foreach ($duoAPI->getAccountsList() as $account) {
 
-    $clientDUO = new \CNCLTD\DUOApi\DUOApi($adminSecret, $adminIntegrationKey, $account->apiHostname);
+    $clientDUO = new DUOApi($adminSecret, $adminIntegrationKey, $account->apiHostname);
     var_dump($clientDUO->getUsers());
     continue;
     $dbeCustomer = new DBECustomer($thing);
