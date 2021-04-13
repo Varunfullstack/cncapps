@@ -4,6 +4,9 @@ This project changes will be shown here.
 ## [v5.8.1]
 ### Added
 - Added the possibility of providing dates to the customerSatisfactionScore API endpoint.
+### Changed
+- Made UserName, Service and password columns in Password.php non-wrapping.
+- Moved copy-to-clipboard icon before the field text in the columns to improve alignment.
 ### Fixed
 - Fixed wrong math in customerSatisfactionScore.
 - Fixed wrong customer item link in SupportedCustomerAssets web version pointing to the contract and not to the machine.
