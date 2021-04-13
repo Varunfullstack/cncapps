@@ -16,6 +16,7 @@ require_once($cfg ["path_dbe"] . "/DBEWarranty.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEProblem.inc.php");
 require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
+require_once($cfg["path_ct"]."/CTSalesOrder.inc.php");
 
 class BURenContract extends Business
 {
@@ -518,6 +519,12 @@ class BURenContract extends Business
                         DA_STRING,
                         DA_ALLOW_NULL
                     );
+                    $dsInput->addColumn(
+                        CTSalesOrder::emailSubjectSummary,
+                        DA_STRING,
+                        DA_ALLOW_NULL
+                    );
+
                     $dsInput->setValue(
                         CTSalesOrder::etaDate,
                         date('Y-m-d')
