@@ -7,10 +7,11 @@ This project changes will be shown here.
 ### Changed
 - Made UserName, Service and password columns in Password.php non-wrapping.
 - Moved copy-to-clipboard icon before the field text in the columns to improve alignment.
+- Prevent First Time Fix modal from showing when logging a new SR that is a change and not a fix.
 ### Fixed
 - Fixed wrong math in customerSatisfactionScore.
 - Fixed wrong customer item link in SupportedCustomerAssets web version pointing to the contract and not to the machine.
-- Fixed issue with 
+ 
 
 ## [v5.8.0] - 2021-04-12
 ### Added

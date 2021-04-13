@@ -190,11 +190,11 @@ class LastStepComponent extends MainComponent {
         this.setState({data});
     };
     addToQueue = () => {
-        const {data} = this.state;
+        const {data, fixOrChange} = this.state;
         data.userID = null;
         data.completeDate = null;
         const {currentUser, customer} = this.props.data;
-        if (currentUser.teamLevel == 1 && data.queueNo == TeamType.Helpdesk && (!data.notFirstTimeFixReason) && customer.hasServiceDesk) {
+        if (fixOrChange === FixOrChangeValue.FIX && currentUser.teamLevel == 1 && data.queueNo == TeamType.Helpdesk && (!data.notFirstTimeFixReason) && customer.hasServiceDesk) {
             const _showModal = true;
             this.setState({_showModal});
             return false;
