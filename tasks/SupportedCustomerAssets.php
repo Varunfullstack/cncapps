@@ -36,6 +36,7 @@ while ($dbeCustomer->fetchNext()) {
     );
     foreach ($supportedCustomerAssets->getCNCNotMatchedAssets() as $CNCNotMatchedAsset) {
         try {
+            $logger->warning("Raising SR for customer {$dbeCustomer->getValue(DBECustomer::customerID)} on asset {$CNCNotMatchedAsset->getComputerName()}");
             raiseNotMatchedRequest($dbeCustomer->getValue(DBECustomer::customerID), $CNCNotMatchedAsset);
         } catch (Exception $exception) {
             $logger->error($exception->getMessage());
