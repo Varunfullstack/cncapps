@@ -34,12 +34,15 @@
         "karriere/json-decoder": "^3.1",
         "ext-sqlite3": "*",
         "data-uri/data-uri": "^0.2.5",
-        "html2text/html2text": "^4.3"
+        "html2text/html2text": "^4.3",
+        "phpunit/phpunit": "^9.5"
     },
     "autoload": {
         "psr-4": {
             "CNCLTD\\": "cnccode/customClasses",
             "CNCLTD\\Data\\": "cnccode/data_classes"
         }
-    }
+    },
+    "name": "cnc/cncapps",
+    "description": ""
 }
