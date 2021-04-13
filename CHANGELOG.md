@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v5.8.1]
+## [v5.8.1] - 2021-04-13
 ### Added
 - Added the possibility of providing dates to the customerSatisfactionScore API endpoint.
 ### Changed
