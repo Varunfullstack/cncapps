@@ -39,7 +39,6 @@ class PasswordServicesComponent extends MainComponent {
     getData=()=>{
         this.api.getAllServices().then(res=>{
             this.setState({services:res.data});
-            console.log(res);
         });
     }
 
@@ -109,11 +108,9 @@ class PasswordServicesComponent extends MainComponent {
         </Table>
     }
     showEditModal=(data)=>{
-        console.log(data);
         this.setState({showModal:true,data:{...data},mode:'edit'});
     }
     handleDelete=async (service)=>{
-        console.log(service);
         const conf=await this.confirm("Are you sure to delete this service?")
         if(conf)
           this.api.deleteService(service.passwordServiceID).then(res=>{
@@ -123,7 +120,6 @@ class PasswordServicesComponent extends MainComponent {
           });
     }
     handleOrderChange=async (current,next)=>{
-        console.log(current,next);
         const {services}=this.state;
         if(next)
         {
@@ -135,7 +131,6 @@ class PasswordServicesComponent extends MainComponent {
         {        
             current.sortOrder=Math.max(...services.map(i=>i.sortOrder))+0.001;
         }     
-        console.log(current,next);   
         await this.api.saveService(current);
         this.getData();
     }
@@ -212,7 +207,6 @@ class PasswordServicesComponent extends MainComponent {
                
         data.onePerCustomer=data.onePerCustomer?1:0;
         this.api.saveService(data).then((result) => {
-            console.log(result);
           if (result.state) {
             this.setState({ showModal: false });
             this.getData();
@@ -220,7 +214,6 @@ class PasswordServicesComponent extends MainComponent {
             this.alert(result.error);
           }
         });        
-        console.log(data);
     }
     render() {
         return <div>

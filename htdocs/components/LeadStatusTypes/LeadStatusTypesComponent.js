@@ -36,7 +36,6 @@ class LeadStatusTypesComponent extends MainComponent {
     getData=()=>{
         this.api.getAllTypes().then(types=>{
             this.setState({types});
-            console.log(types);
         });
     }
 
@@ -98,11 +97,9 @@ class LeadStatusTypesComponent extends MainComponent {
         </Table>
     }
     showEditModal=(data)=>{
-        console.log(data);
         this.setState({showModal:true,data,mode:'edit'});
     }
     handleDelete=async (type)=>{
-        console.log(type);
         const conf=await this.confirm("Are you sure to delete this type?")
         if(conf)
         this.api.deleteType(type.id).then(res=>{
@@ -114,7 +111,6 @@ class LeadStatusTypesComponent extends MainComponent {
         )
     }
     handleOrderChange=async (current,next)=>{
-        console.log(current,next);
         const {types}=this.state;
         if(next)
         {
@@ -126,8 +122,7 @@ class LeadStatusTypesComponent extends MainComponent {
         {        
             current.sortOrder=Math.max(...types.map(i=>i.sortOrder))+0.001;
         }     
-        console.log(current,next);
-   
+
         await this.api.updateType(current);
         this.getData();
     }
@@ -179,7 +174,6 @@ class LeadStatusTypesComponent extends MainComponent {
         }
         if (mode == "new") {
           this.api.addType(data).then((result) => {
-              console.log(result);
             if (result.state) {
               this.setState({ showModal: false });
               this.getData();
@@ -191,7 +185,6 @@ class LeadStatusTypesComponent extends MainComponent {
         else if(mode=='edit')
         {
             this.api.updateType(data).then((result) => {
-                console.log(result);
               if (result.state) {
                 this.setState({ showModal: false });
                 this.getData();
@@ -200,7 +193,6 @@ class LeadStatusTypesComponent extends MainComponent {
               }
             });
         }
-        console.log(data);
     }
     render() {
         return <div>

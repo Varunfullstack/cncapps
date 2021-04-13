@@ -35,7 +35,6 @@ class CustomerTypeComponent extends MainComponent {
         this.api.getAllTypes().then(res=>{
             if(res.state)
             this.setState({types:res.data});
-            console.log(res);
         });
     }
 
@@ -86,7 +85,6 @@ class CustomerTypeComponent extends MainComponent {
         this.setState({showModal:true,data,mode:'edit'});
     }
     handleDelete=async (type)=>{
-        console.log(type);
         const conf=await this.confirm("Are you sure to delete this type?")
         if(conf)
         this.api.deleteType(type.id).then(res=>{
@@ -137,7 +135,6 @@ class CustomerTypeComponent extends MainComponent {
         }
         if (mode == "new") {
           this.api.addType(data).then((result) => {
-              console.log(result);
             if (result.state) {
               this.setState({ showModal: false });
              
@@ -150,7 +147,6 @@ class CustomerTypeComponent extends MainComponent {
         else if(mode=='edit')
         {
             this.api.updateType(data).then((result) => {
-                console.log(result);
               if (result.state) {
                 this.setState({ showModal: false });              
               } else {
@@ -159,7 +155,6 @@ class CustomerTypeComponent extends MainComponent {
               this.getData();
             });
         }
-        console.log(data);
     }
     render() {        
         return <div>

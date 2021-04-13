@@ -64,7 +64,6 @@ export default class MassAssignmentComponent extends MainComponent {
               u.total=summary.filter(s=>s.id==u.id)[0].total||0;
             return u;
           });
-        console.log('filteredUsers',filteredUsers);
         filteredUsers=sort(filteredUsers,'name')
         return filteredUsers;
 
@@ -83,29 +82,24 @@ export default class MassAssignmentComponent extends MainComponent {
 
     handleFromSelect=(user)=>{
         this.setFilter("fromUser",user);
-        console.log(user);
     }
     handleToSelect=(user)=>{
         this.setFilter("toUser",user);
-        console.log(user);
     }
     handleOptionSelect=(option)=>{               
         this.setFilter("option",option);
         this.getOptionData();
-        console.log("option",option);
     }
     getOptionData=()=>{
       const {filter}=this.state;
       
       this.api.getUserProblemsSummary(filter.option.id,filter.customer.id).then(summary=>{
-        console.log('summary',summary);
         if(filter.option.id<5)
           filter.customer={id:null,name:null};
         this.setState({summary:summary.problems,filter})
       });
     }
     handleSelectCustomer=(customer)=>{
-      console.log(customer);
       const {filter}=this.state;
       filter.customer=customer;
   

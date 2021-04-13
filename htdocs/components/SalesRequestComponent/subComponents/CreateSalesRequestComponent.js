@@ -26,7 +26,6 @@ export class CreateSalesRequestComponent extends MainComponent {
   }
 
   handleCustomerSelect = (customer) => {
-    console.log(customer);
   };
   componentDidMount() {
     this.apiStandardText
@@ -34,23 +33,18 @@ export class CreateSalesRequestComponent extends MainComponent {
       .then((options) => this.setState({ options }));
   }
   handleTemplateValueChange=(value)=>{
-      console.log(value);
   }
   handleFileSelected=(files, type)=>{
-    console.log(files);
     this.setValue("files",[...files])
   }
   handleTemplateSelect=(templateId)=>{
     
-    console.log(templateId);
     const template=this.state.options.find(o=>o.id==templateId);
-    console.log(template);
     this.setValue("message",template.template);
     this.setValue("type",templateId);
   }
   handleSave=()=>{
       const {data}=this.state;
-      console.log(this.state.data);
       if(data.customerId=='')
       {
           this.alert("Please select customer");
@@ -63,7 +57,6 @@ export class CreateSalesRequestComponent extends MainComponent {
       }
      
     this.api.CreateSalesRequest(data.files,{type:data.type,message:data.message,customerId:data.customerId}).then(res=>{
-        console.log(res);
         if(res.state)
         {
             data.type="";

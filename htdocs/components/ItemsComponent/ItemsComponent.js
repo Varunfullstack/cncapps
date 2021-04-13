@@ -129,7 +129,6 @@ class ItemsComponent extends MainComponent {
                 this.setState({filter, reset: false}, () => this.getData(true));
             }, 500);
         }
-        console.log(scrollPercentRounded);
     }
     getData = (noSpinner = false) => {
         const {filter, reset, items} = this.state;
@@ -142,7 +141,6 @@ class ItemsComponent extends MainComponent {
                 else
                     this.setState({items: res.data, showSpinner: false});
 
-                console.log(reset, res);
             })
     }
     getDataTable = () => {
@@ -155,7 +153,6 @@ class ItemsComponent extends MainComponent {
                 hdClassName: "text-center",
                 icon: "fal fa-2x fa-file-alt color-gray2 pointer",
                 sortable: true,
-                //className: "text-center",
             },
             {
                 path: "curUnitCost",
@@ -192,7 +189,6 @@ class ItemsComponent extends MainComponent {
                 hdClassName: "text-center",
                 icon: "fal fa-2x fa-barcode color-gray2 pointer",
                 sortable: true,
-                //className: "text-center",               
             },
             {
                 path: "itemCategory",
@@ -201,7 +197,6 @@ class ItemsComponent extends MainComponent {
                 hdClassName: "text-center",
                 icon: "fal fa-2x fa-ballot-check color-gray2 pointer",
                 sortable: true,
-                //className: "text-center",               
             },
             {
                 path: "renewalTypeID",
@@ -211,7 +206,6 @@ class ItemsComponent extends MainComponent {
                 icon: "fal fa-2x fa-tasks color-gray2 pointer",
                 sortable: true,
                 content: (item) => this.getRenewalTypeName(item.renewalTypeID)
-                //className: "text-center",               
             },
             {
                 path: "manufacturerName",
@@ -220,20 +214,16 @@ class ItemsComponent extends MainComponent {
                 hdClassName: "text-center",
                 icon: "fal fa-2x fa-warehouse-alt color-gray2 pointer",
                 sortable: true,
-                //className: "text-center",               
             },
             {
                 path: "",
                 label: "",
                 hdToolTip: "Edit",
                 hdClassName: "text-center",
-                //icon: "fal fa-2x fa-signal color-gray2 pointer",
                 sortable: true,
                 content: (item) => this.getEditElement(item, this.handleEdit)
-                //className: "text-center",   
             }
         ]
-        //onOrderChange
         return <Table
             style={{marginTop: 20}}
             key="leadStatus"
@@ -247,7 +237,6 @@ class ItemsComponent extends MainComponent {
         </Table>
     }
     getSalesStock = (item) => {
-        //console.log(item);
         return <input type="number"
                       style={{width: 40}}
                       key={item.itemID + "salesStockQty"}
@@ -264,13 +253,11 @@ class ItemsComponent extends MainComponent {
             const itemID = event.target.id;
             const value = event.target.value; 
             this.api.updateItemQty(itemID, value).then(res => {
-                //console.log(res);
             })
         },1000)
        
     }
     getChildItemsData = (itemId) => {
-        console.log('get childs');
         this.api.getChildItems(itemId).then(res => {
             const childItems = res.data.map(i => {
                 return {id: i.childItemId, name: i.description, quantity: i.quantity};
@@ -279,7 +266,6 @@ class ItemsComponent extends MainComponent {
         });
     }
     handleEdit = (item) => {
-        console.log('items', item.itemID, item);
         this.getChildItemsData(item.itemID);
         this.setState({data: item, showModal: true, isNew: false});
         this.getLookups();
@@ -290,7 +276,6 @@ class ItemsComponent extends MainComponent {
         filter.q = value;
         filter.page = 1;
         this.setState({filter, reset: true}, () => this.getData());
-        console.log('search by ', value);
     }
     handleSort = (column) => {
         const {filter} = this.state;
@@ -298,7 +283,6 @@ class ItemsComponent extends MainComponent {
         filter.orderBy = column.path;
         filter.page = 1;
         this.setState({filter, reset: true}, () => this.getData());
-        console.log('sortby ', column);
     }
 
     getRenewalTypeName(id) {
@@ -529,7 +513,6 @@ class ItemsComponent extends MainComponent {
         })
     }
     handleChildSelect = (childItem) => {
-        console.log('child', childItem);
         this.setState({childItem});
     }
     getChildItemsElement = () => {
@@ -589,7 +572,6 @@ class ItemsComponent extends MainComponent {
     }
 
     handleDeleteChild = (c) => {
-        console.log('delete', c);
         let {childItems} = this.state;
         childItems = childItems.filter(child => child.id != c.id);
         this.setState({childItems});
@@ -630,7 +612,6 @@ class ItemsComponent extends MainComponent {
     }
     handleSave = () => {
         const {data, isNew, childItems} = this.state;
-        //console.log(childItems);
         if (!data.description) {
             this.alert("Please enter description");
             return;
@@ -647,11 +628,9 @@ class ItemsComponent extends MainComponent {
         delete data.manufacturerName;
         if (!isNew) {
             this.api.updateChildItems(data.itemID, childItems).then((res) => {
-                console.log(res);
             });
 
             this.api.updateItem(data).then((res) => {
-                console.log(res);
                 if (res.state) {
                     this.setState({showModal: false, reset: true}, () =>
                         this.getData()
@@ -661,21 +640,16 @@ class ItemsComponent extends MainComponent {
         } else {
             data.itemID = null;
             this.api.addItem(data).then((res) => {
-                console.log(res);
                 if (res.state) {
                     if (childItems.length > 0 && res.data.itemId)
                         this.api
                             .updateChildItems(res.data.itemId, childItems)
-                            .then((res) => {
-                                console.log(res);
-                            });
                     this.setState({showModal: false, reset: true}, () =>
                         this.getData()
                     );
                 }
             });
         }
-        console.log(data);
     }
     handleClose = () => {
         this.setState({showModal: false});

@@ -316,7 +316,6 @@ class HomeComponent extends MainComponent {
                 }
             }
         }
-        console.log('origin', origin);
         return origin;
     }
     getCardsElement = () => {

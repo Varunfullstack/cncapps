@@ -366,7 +366,6 @@ export default class KPIReportComponent extends MainComponent {
         //     return;
         // }
         if (activeReport && activeReport.parameters.indexOf(this.reportparameters.consName) >= 0 && consultants.length == 0) {
-            //console.log('have users');
             consultants = await this.apiUsers.getAllUsers();
             this.setState({consultants});
         }

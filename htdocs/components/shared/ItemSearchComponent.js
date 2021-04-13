@@ -36,7 +36,6 @@ class ItemSearchComponent extends MainComponent {
         })
     }
     handleOnItemSelect=(event)=>{
-        //console.log(event);
         if(this.props.onSelect)
         this.props.onSelect(event);
     }
@@ -44,11 +43,9 @@ class ItemSearchComponent extends MainComponent {
         const {filter}=this.state;
         filter.q=value;
         this.setState({filter},()=>this.getData());
-        //console.log(value);
     }
     render() {
         const {items}=this.state;
-        //console.log('items',items);
         return <div>
              <AutoComplete 
              errorMessage= "No Item found"

@@ -79,7 +79,6 @@ class AllocateMoreTimeComponent extends MainComponent {
         </Modal>
     }
     handleSave=()=>{
-        console.log('save',this.state.data);
         const {data} = this.state;
         if (!data.allocatedTimeValue) {
             this.alert("Please enter Granted Time");
@@ -92,8 +91,6 @@ class AllocateMoreTimeComponent extends MainComponent {
         data.status = "Approve";
         data.problemID=this.props.problem.problemID;
         data.queueID=this.props.problem.queueTeamId;
-        console.log(this.props.problem);
-       // return;
         this.api.allocateAdditionalTime(data).then(result => {
             if (result.status) {
                 this.handleCancel();                 

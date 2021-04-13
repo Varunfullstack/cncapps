@@ -60,25 +60,18 @@ export default class CurrentProjectsComponent extends MainComponent {
         
       })
     }
-    //console.log(projects.length);
     const columns = [
         {
             path: "customerName",
-            //label: "Customer Name",
             sortable: true,
             hdToolTip: "Customer Name",
             icon: "fal fa-2x fa-building color-gray2 pointer",
-            //content:(project)=><a style={{color:'black'}} href={`Projects.php?action=edit&&projectID=${project.projectID}`}>{project.customerName}</a>
-            //className: "text-center",
           },
       {
         path: "description",
-        //label: "Description",
         sortable: true,
         hdToolTip: "Description",
         icon:"fal fa-2x fa-file color-gray2 pointer",
-        //className: "text-center",
-        // content:(project)=><a href={`/Project.php?action=edit&projectID=${project.projectID}`} target="_blank">{project.description}</a>
         content:(project)=><a style={{color:'black'}} href={`Projects.php?action=edit&&projectID=${project.projectID}`}>{project.description}</a>
 
       },    
@@ -225,7 +218,6 @@ export default class CurrentProjectsComponent extends MainComponent {
   };
   handleHistoryClick = async (currentProject) => {
     const history = await this.api.getProjectHistory(currentProject.projectID);
-    //console.log("history", history);
     this.setState({ currentProject, showHistory: true, history });
   };
   getHistoryElement = () => {

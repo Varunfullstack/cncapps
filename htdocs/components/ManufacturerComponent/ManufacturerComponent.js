@@ -27,7 +27,6 @@ class ManufacturerComponent extends MainComponent {
     }
 
     componentDidMount() {  
-        console.log("start");    
         this.getData();
     }
 
@@ -36,7 +35,6 @@ class ManufacturerComponent extends MainComponent {
         this.api.getAllTypes().then(res=>{
             if(res.state)
             this.setState({types:res.data,showSpinner:false});
-            console.log(res);
         });
     }
 
@@ -87,7 +85,6 @@ class ManufacturerComponent extends MainComponent {
         this.setState({showModal:true,data,mode:'edit'});
     }
     handleDelete=async (type)=>{
-        console.log(type);
         const conf=await this.confirm("Are you sure to delete this type?")
         if(conf)
         this.api.deleteType(type.manufacturerID).then(res=>{
@@ -138,7 +135,6 @@ class ManufacturerComponent extends MainComponent {
         }
         if (mode == "new") {
           this.api.addType(data).then((result) => {
-              console.log(result);
             if (result.state) {
               this.setState({ showModal: false });
              
@@ -151,7 +147,6 @@ class ManufacturerComponent extends MainComponent {
         else if(mode=='edit')
         {
             this.api.updateType(data).then((result) => {
-                console.log(result);
               if (result.state) {
                 this.setState({ showModal: false });              
               } else {
@@ -160,7 +155,6 @@ class ManufacturerComponent extends MainComponent {
               this.getData();
             });
         }
-        console.log(data);
     }
     render() {        
         return <div>

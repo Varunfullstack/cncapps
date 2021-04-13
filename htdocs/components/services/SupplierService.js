@@ -44,7 +44,6 @@ export class SupplierService {
     }
 
     static async archiveContact(contact, supplier) {
-        console.log(contact, supplier);
 
         return fetch(
             `${BASE_URL}?action=archiveSupplierContact`,

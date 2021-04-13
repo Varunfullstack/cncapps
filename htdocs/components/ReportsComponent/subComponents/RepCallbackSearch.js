@@ -33,7 +33,6 @@ export default class RepCallbackSearch extends MainComponent {
         const {consID,customerID,dateFrom,dateTo,callbackStatus } = this.props;
         this.api.getCallbackSearch(consID,customerID,dateFrom,dateTo,callbackStatus)
             .then(callbacks => {
-                console.log('callbacks', callbacks);
                 this.setState({callbacks, showModal: false, loadData: false});
             });
     }

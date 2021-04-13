@@ -131,7 +131,6 @@ class CustomerFeedbackComponent extends MainComponent {
             const {filter} = this.state;
             filter.customerID = customer.id;
             filter.customerName = customer.name;
-            console.log(filter);
             this.setState({filter});
         }
     }

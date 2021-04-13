@@ -72,9 +72,7 @@ class SalesRequestComponent extends MainComponent {
     }
 
     handleuserAllocate = (userId, activity) => {
-        //console.log(userId,activity);        
         this.api.setAllocateUser(userId, activity.problemID).then(result => {
-            //console.log(result);
             if (result.status)
                 this.onRefresh();
         })

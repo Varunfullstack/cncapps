@@ -100,7 +100,6 @@ class AdditionalTimeRequestModal extends React.Component {
     }
 
     changeSelectedContact = ($event) => {
-        console.log($event.target.value);
         this.setState({selectedContactId: $event.target.value});
     }
 

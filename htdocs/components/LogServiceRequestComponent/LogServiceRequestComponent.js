@@ -50,10 +50,8 @@ export default class LogServiceRequestComponent extends MainComponent {
         const emailSubjectSummary=params.get("emailSubjectSummary");
         if(pendingReopenedID)
         {
-            console.log(pendingReopenedID,emailSubjectSummary);
             //loading reopen data
             this.api.getPendingReopen(pendingReopenedID).then(res=>{
-                console.log('res',res);
                 // init data;
                 //customer, customerID: customer.cus_custno, nextStep: 2
                 const {data}=this.state;
@@ -64,7 +62,6 @@ export default class LogServiceRequestComponent extends MainComponent {
                 data.pendingReopenedID=pendingReopenedID;
                 data.contactID=res.contactID;
                 data.deletePending='true';
-                console.log(data);
                 this.setState({data});
                 this.setActiveStep(2);
                 this.setActiveStep(3);

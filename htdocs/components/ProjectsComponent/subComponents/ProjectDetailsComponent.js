@@ -1064,7 +1064,6 @@ export default class ProjectDetailsComponent extends MainComponent {
         this.apiSalesOrder
             .getCustomerInitialSalesOrders(data.customerID)
             .then((salesOrders) => {
-                console.log("salesOrders", salesOrders);
                 this.setState({
                     showSalesOrder: true,
                     originalOrder,
@@ -1165,7 +1164,6 @@ export default class ProjectDetailsComponent extends MainComponent {
                 }
             })
             .catch((ex) => {
-                console.log(ex);
                 this.alert("Failed to save order");
             });
     };

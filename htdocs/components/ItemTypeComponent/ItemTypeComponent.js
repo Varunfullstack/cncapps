@@ -44,7 +44,6 @@ class ItemTypeComponent extends MainComponent {
     getData=()=>{
         this.api.getAllTypes().then(res=>{
             this.setState({types:res.data});
-            console.log(res);
         });
     }
 
@@ -145,11 +144,9 @@ class ItemTypeComponent extends MainComponent {
         </Table>
     }
     showEditModal=(data)=>{
-        console.log(data);
         this.setState({showModal:true,data,mode:'edit'});
     }
     handleDelete=async (type)=>{
-        console.log(type);
         const conf=await this.confirm("Are you sure to delete this type?")
         if(conf)
         this.api.deleteType(type.id).then(res=>{
@@ -161,7 +158,6 @@ class ItemTypeComponent extends MainComponent {
         )
     }
     handleOrderChange=async (current,next)=>{
-        console.log(current,next);
         const {types}=this.state;
         if(next)
         {
@@ -173,8 +169,7 @@ class ItemTypeComponent extends MainComponent {
         {        
             current.sortOrder=Math.max(...types.map(i=>i.sortOrder))+0.001;
         }     
-        console.log(current,next);
-   
+
         await this.api.updateType(current);
         this.getData();
     }
@@ -317,7 +312,6 @@ class ItemTypeComponent extends MainComponent {
         data.showInCustomerReview=data.showInCustomerReview?1:0;        
         if (mode == "new") {
           this.api.addType(data).then((result) => {
-              console.log(result);
             if (result.state) {
               this.setState({ showModal: false });
               this.getData();
@@ -329,7 +323,6 @@ class ItemTypeComponent extends MainComponent {
         else if(mode=='edit')
         {
             this.api.updateType(data).then((result) => {
-                console.log(result);
               if (result.state) {
                 this.setState({ showModal: false });
                 this.getData();
@@ -338,7 +331,6 @@ class ItemTypeComponent extends MainComponent {
               }
             });
         }
-        console.log(data);
     }
     render() {
         return <div>

@@ -27,7 +27,6 @@ export default class RepProjectsWithoutClousureMeeting extends MainComponent {
   getData(){
     this.setState({showModal:true});      
     const {consID}=this.props;
-    console.log(consID);  
     this.api.getProjectsWithoutClousureMeeting(consID)
     .then(projects=>{
       this.setState({projects,showModal:false,loadData:false});

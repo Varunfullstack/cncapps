@@ -40,7 +40,6 @@ class TeamComponent extends MainComponent {
     }
 
     componentDidMount() {  
-        console.log("start");    
         this.getData();
         this.api.getRoles().then(res=>this.setState({roles:res.data}));
         this.apiUsers.getAllUsers().then(users=>this.setState({users}));
@@ -51,7 +50,6 @@ class TeamComponent extends MainComponent {
         this.api.getAllTeams().then(res=>{
             
             this.setState({teams:res,showSpinner:false});
-            console.log(res);
         });
     }
 
@@ -62,37 +60,29 @@ class TeamComponent extends MainComponent {
                label: "Name",
                hdToolTip: "Name",
                hdClassName: "text-center",
-               //icon: "fal fa-2x fa-text color-gray2 pointer",
                sortable: true,
-               //className: "text-center",                
-            },  
+            },
             {
                 path: "teamRoleName",
                 label: "Role",
                 hdToolTip: "Role",
                 hdClassName: "text-center",
-                //icon: "fal fa-2x fa-text color-gray2 pointer",
                 sortable: true,
-                //className: "text-center",                
-             },  
+             },
              {
                 path: "leaderName",
                 label: "Leader",
                 hdToolTip: "Leader",
                 hdClassName: "text-center",
-                //icon: "fal fa-2x fa-text color-gray2 pointer",
                 sortable: true,
-                //className: "text-center",                
-             },   
+             },
              {
                 path: "level",
                 label: "Level",
                 hdToolTip: "Level",
                 hdClassName: "text-center",
-                //icon: "fal fa-2x fa-text color-gray2 pointer",
                 sortable: true,
-                //className: "text-center",                
-             },  
+             },
              {
                 path: "activeFlag",
                 label: "Active",
@@ -139,7 +129,6 @@ class TeamComponent extends MainComponent {
         this.setState({showModal:true,data:{...data},mode:'edit'});
     }
     handleDelete=async (type)=>{
-        console.log(type);
         const conf=await this.confirm("Are you sure to delete this team?")
         if(conf)
         this.api.deleteTeam(type.teamID).then(res=>{
@@ -206,14 +195,12 @@ class TeamComponent extends MainComponent {
     }
     handleSave=()=>{
         const { data, mode } = this.state;
-        console.log(data);
         if (data.name == "") {
           this.alert("Type name required.");
           return;
         }        
         if (mode == "new") {
           this.api.addTeam(data).then((result) => {
-              console.log(result);
             if (result.state) {
               this.setState({ showModal: false });
              
@@ -226,7 +213,6 @@ class TeamComponent extends MainComponent {
         else if(mode=='edit')
         {
             this.api.updateTeam(data).then((result) => {
-                console.log(result);
               if (result.state) {
                 this.setState({ showModal: false });              
               } else {
@@ -235,7 +221,6 @@ class TeamComponent extends MainComponent {
               this.getData();
             });
         }
-        console.log(data);
     }
     render() {        
         return <div>

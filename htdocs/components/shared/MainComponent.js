@@ -105,7 +105,6 @@ export default class MainComponent extends React.Component {
         const {alert} = this.state;
         alert.show = false;
         this.setState({alert});
-        //console.log("auto close");
     }
     handleAlertClose = () => {
         const {alert} = this.state;
@@ -197,7 +196,6 @@ export default class MainComponent extends React.Component {
         this.setState({data});
     }
     setFilter=(field,value,callback=null)=>{
-        console.log(field,value);
         const {filter}=this.state;
         filter[field]=value;
         this.setState({filter},callback);

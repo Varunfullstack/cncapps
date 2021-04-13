@@ -69,7 +69,6 @@ class ProjectsComponent extends MainComponent {
         
     };
     saveProjectSummaryLocal=(projectsSummary)=>{
-        console.log('save',projectsSummary);
         localStorage.setItem("projectsSummary",JSON.stringify(projectsSummary))
     }
     isActive = (code) => {

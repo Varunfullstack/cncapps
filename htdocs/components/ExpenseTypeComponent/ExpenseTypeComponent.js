@@ -30,7 +30,6 @@ class ExpenseTypeComponent extends MainComponent {
     }
 
     componentDidMount() {  
-        console.log("start");    
         this.getData();
         this.apiCallactType.getAll().then(ActivityTypes=>this.setState({ActivityTypes}));
     }
@@ -39,7 +38,6 @@ class ExpenseTypeComponent extends MainComponent {
         this.api.getAllTypes().then(res=>{
             if(res.state)
             this.setState({types:res.data});
-            console.log(res);
         });
     }
 
@@ -151,7 +149,6 @@ class ExpenseTypeComponent extends MainComponent {
         this.setState({showModal:true,data:{...data},mode:'edit'});
     }
     handleDelete=async (type)=>{
-        console.log(type);
         const conf=await this.confirm("Are you sure to delete this type?")
         if(conf)
         this.api.deleteType(type.expenseTypeID).then(res=>{
@@ -326,7 +323,6 @@ class ExpenseTypeComponent extends MainComponent {
     handleActivityTypesSelect=(options)=>{
         
         const values=Array.from(options, option => option.value);
-        console.log(values);
         this.setValue("activityTypes",values);
     }
     handleSave=()=>{
@@ -340,10 +336,8 @@ class ExpenseTypeComponent extends MainComponent {
         data.taxable=data.taxable?1:0;
         data.vatFlag=data.vatFlag?'Y':'N';
         data.mileageFlag=data.mileageFlag?'Y':'N';
-        console.log(data);         
         if (mode == "new") {
           this.api.addType(data).then((result) => {
-              console.log(result);
             if (result.state) {
               this.setState({ showModal: false });
              
@@ -356,7 +350,6 @@ class ExpenseTypeComponent extends MainComponent {
         else if(mode=='edit')
         {
             this.api.updateType(data).then((result) => {
-                console.log(result);
               if (result.state) {
                 this.setState({ showModal: false });              
               } else {
@@ -365,7 +358,6 @@ class ExpenseTypeComponent extends MainComponent {
               this.getData();
             });
         }
-        console.log(data);
     }
     render() {        
         return <div>

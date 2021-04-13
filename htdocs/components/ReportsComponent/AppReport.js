@@ -243,7 +243,6 @@ class AppReport extends MainComponent {
     const {currentReportID,reports,compParamters}=this.state;
      if(currentReportID=='')
     return null;
-   // console.log(currentReportID,reports);
     const report=reports.find(r=>r.id==currentReportID);
     const RepComponent= this.components[report.component];
     return <RepComponent {...compParamters}></RepComponent>;

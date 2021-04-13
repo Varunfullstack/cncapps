@@ -57,7 +57,6 @@ class AutoComplete extends React.Component {
             ];
         }
         filteredSuggestions = filteredSuggestions.slice(0, displayLength);
-        console.log(filteredSuggestions);
         // Update the user input and filtered suggestions, reset the active
         // suggestion and make sure the suggestions are shown
         this.setState({
@@ -170,7 +169,6 @@ class AutoComplete extends React.Component {
     }
  
     static getDerivedStateFromProps(props,state){  
-        //console.log("props change");      
         if(props.value!=state.value)
         {
             state.value=props.value;
@@ -179,7 +177,6 @@ class AutoComplete extends React.Component {
         }
         else if(props.items.length!=state.items.length)
         {
-            console.log('override sugge',);
             state.items=[...props.items];
             state.filteredSuggestions=[...props.items];
             return state;
