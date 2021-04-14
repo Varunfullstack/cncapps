@@ -1,6 +1,6 @@
 <?php
 
-namespace CNCLTD\DUOApi;
+namespace CNCLTD\DUOApi\Users;
 class User
 {
     private $email;

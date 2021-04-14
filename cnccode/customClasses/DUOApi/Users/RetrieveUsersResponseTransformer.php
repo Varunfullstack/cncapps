@@ -1,10 +1,9 @@
 <?php
 
-namespace CNCLTD\DUOApi;
+namespace CNCLTD\DUOApi\Users;
 
 use Karriere\JsonDecoder\Bindings\AliasBinding;
 use Karriere\JsonDecoder\Bindings\ArrayBinding;
-use Karriere\JsonDecoder\Bindings\FieldBinding;
 use Karriere\JsonDecoder\ClassBindings;
 
 class RetrieveUsersResponseTransformer implements \Karriere\JsonDecoder\Transformer

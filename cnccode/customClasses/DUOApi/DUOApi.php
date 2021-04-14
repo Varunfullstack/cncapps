@@ -105,4 +105,37 @@ class DUOApi
         return $accountInfoResponse->response;
     }
 
+    public function getAuthenticationLogs(\DateTime $minTime)
+    {
+        $users      = [];
+        $nextOffset = 0;
+        do {
+            $retrieveUsersResponse = $this->retrieveAuthenticationLogs($nextOffset, $minTime);
+            $users                 = array_merge($users, $retrieveUsersResponse->response);
+            $nextOffset            = $retrieveUsersResponse->nextOffset;
+        } while ($nextOffset);
+        return $users;
+    }
+
+    private function retrieveAuthenticationLogs(?string $nextOffset, \DateTime $minTime)
+    {
+        $maxTime = new \DateTime();
+        $params = [];
+        if($nextOffset){
+            $params['next_offset'] = $nextOffset;
+        }
+        $response = $this->duoAPIClient->apiCall(
+            'GET',
+            "/admin/v2/logs/authentication?mintime={$minTime->getTimestamp()}&maxtime={$maxTime->getTimestamp()}",
+            $params
+        );
+        if (!$response['success']) {
+            throw new Exception('Failed to pull accounts list');
+        }
+        $jsonDecoder = new JsonDecoder();
+        $jsonDecoder->register(new UserTransformer());
+        $jsonDecoder->register(new RetrieveUsersResponseTransformer());
+        return $jsonDecoder->decode($response['response'], RetrieveUsersResponse::class);
+    }
+
 }

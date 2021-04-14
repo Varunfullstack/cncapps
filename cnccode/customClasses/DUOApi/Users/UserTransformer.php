@@ -1,6 +1,6 @@
 <?php
 
-namespace CNCLTD\DUOApi;
+namespace CNCLTD\DUOApi\Users;
 
 use Karriere\JsonDecoder\Bindings\AliasBinding;
 use Karriere\JsonDecoder\ClassBindings;

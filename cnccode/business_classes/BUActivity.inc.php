@@ -11,7 +11,7 @@
 use CNCLTD\AutomatedRequest;
 use CNCLTD\ChargeableWorkCustomerRequest\infra\ChargeableWorkCustomerRequestMySQLRepository;
 use CNCLTD\ChargeableWorkCustomerRequest\usecases\ClearPendingChargeableRequestsOnServiceRequestClosed;
-use CNCLTD\DUOApi\Account;
+use CNCLTD\DUOApi\Users\Users\Users\Users\Account;
 use CNCLTD\Email\AttachmentCollection;
 use CNCLTD\Exceptions\ColumnOutOfRangeException;
 use CNCLTD\Exceptions\JsonHttpException;

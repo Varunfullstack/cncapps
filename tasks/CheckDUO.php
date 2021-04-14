@@ -1,6 +1,7 @@
 <?php
 
-use CNCLTD\DUOApi\DUOApi;
+use CNCLTD\DUOApi\Users\Users\Users\Users\DUOApi;
+use CNCLTD\DUOUsersReportGenerator\DUOClientReportGenerator;
 use CNCLTD\LoggerCLI;
 
 global $cfg;
@@ -32,11 +33,28 @@ $buActivity          = new BUActivity($thing);
 $adminIntegrationKey = "DIOIQ82CWQOP0RC76Q0Z";
 $adminSecret         = "Y2gc5HU5sKSuutTub7xqXwx4EelOJqzzQMmOuAtY";
 $adminHostName       = "api-8f3a2990.duosecurity.com";
+/**
+ * @param DUOApi $clientDUO
+ * @param DBECustomer $dbeCustomer
+ * @throws \CNCLTD\Exceptions\ColumnOutOfRangeException
+ */
+function updateClientReport(DUOApi $clientDUO,  DBECustomer $dbeCustomer)
+{
+    $duoReportGenerator = new DUOClientReportGenerator();
+    $minTime            = new DateTime();
+    $minTime->sub(new DateInterval("P60D"));
+    $authenticationLogs = $clientDUO->getAuthenticationLogs($minTime);
+    $spreadsheet = $duoReportGenerator->getReportData($clientDUO->getUsers(), $authenticationLogs);
+    $buPortalCustomerDocument = new BUPortalCustomerDocument($thing);
+    $buPortalCustomerDocument->addOrUpdateDUOClientReportDocument(
+        $dbeCustomer->getValue(DBECustomer::customerID),
+        $spreadsheet
+    );
+}
+
 foreach ($duoAPI->getAccountsList() as $account) {
 
     $clientDUO = new DUOApi($adminSecret, $adminIntegrationKey, $account->apiHostname);
-    var_dump($clientDUO->getUsers());
-    exit;
     $dbeCustomer = new DBECustomer($thing);
     $dbeCustomer->getCustomerByName($account->name);
     if (!$dbeCustomer->rowCount()) {
@@ -45,6 +63,7 @@ foreach ($duoAPI->getAccountsList() as $account) {
         continue;
     }
     $dbeCustomer->fetchNext();
+    updateClientReport($clientDUO, $dbeCustomer);
     $dbeCustomerItem = new DBECustomerItem($thing);
     $dbeCustomerItem->getRowsByCustomerAndItemID(
         $dbeCustomer->getValue(DBECustomer::customerID),
@@ -63,7 +82,6 @@ foreach ($duoAPI->getAccountsList() as $account) {
     $contractId = $dbeCustomerItem->getValue(DBECustomerItem::customerItemID);
     $dbeCustomerItem->getRow($contractId);
     $accountInfo = $duoAPI->getAccountInfo($account->accountId);
-    var_dump($accountInfo);
     $dbeCustomerItem->setValue(DBECustomerItem::users, $accountInfo->userCount);
     $dbeCustomerItem->setValue(
         DBECustomerItem::curUnitSale,
