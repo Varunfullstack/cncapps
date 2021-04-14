@@ -169,7 +169,6 @@ class CTPurchaseOrder extends CTCNC
             case CTCNC_ACT_SEARCH:
                 $this->search();
                 break;
-
             case CTCNC_ACT_DISPLAY_PO:
                 $this->displayOrder();
                 break;
@@ -535,10 +534,11 @@ class CTPurchaseOrder extends CTCNC
                 $dsPorline
             );
         }
-        $porheadID = $dsPorhead->getValue(DBEJPorhead::porheadID);
-        $orderType = $dsPorhead->getValue(DBEJPorhead::type);
-        $disabled  = CTCNC_HTML_DISABLED;                            // default - no editing
-        $title     = null;
+        $porheadID      = $dsPorhead->getValue(DBEJPorhead::porheadID);
+        $orderType      = $dsPorhead->getValue(DBEJPorhead::type);
+        $disabled       = CTCNC_HTML_DISABLED;                            // default - no editing
+        $title          = null;
+        $isPartReceived = false;
         switch ($orderType) {
             case 'I':
                 $title            = 'Purchase Order - Initial';
@@ -589,6 +589,7 @@ class CTPurchaseOrder extends CTCNC
                 $txtDeleteOrder   = 'Delete';
                 break;
             case 'P':
+                $isPartReceived   = true;
                 $title            = 'Purchase Order - Part Received';
                 $disabled         = null; // only initial orders may be edited
                 $urlUpdateHeader  = Controller::buildLink(
@@ -729,6 +730,7 @@ class CTPurchaseOrder extends CTCNC
         }
         $this->template->set_var(
             array(
+                'isPartReceived'               => $isPartReceived ? 'true' : 'false',
                 'supplierID'                   => $dsPorhead->getValue(DBEJPorhead::supplierID),
                 'type'                         => $dsPorhead->getValue(DBEJPorhead::type),
                 'porheadID'                    => $porheadID,
@@ -942,9 +944,14 @@ class CTPurchaseOrder extends CTCNC
                         'SalesOrderLineIcons',
                         true
                     );
-                    $lineDescription = '<A href="' . $urlEditLine . '">' . Controller::htmlDisplayText(
-                            $itemDescription
-                        ) . '</A>';
+                    if ($isPartReceived) {
+                        $lineDescription = Controller::htmlDisplayText($itemDescription);
+                    } else {
+                        $lineDescription = '<A href="' . $urlEditLine . '">' . Controller::htmlDisplayText(
+                                $itemDescription
+                            ) . '</A>';
+                    }
+
                 }// not disabled
                 else { // disabled
                     $lineDescription = Controller::htmlDisplayText($itemDescription);

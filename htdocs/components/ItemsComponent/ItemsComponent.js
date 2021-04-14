@@ -626,6 +626,7 @@ class ItemsComponent extends MainComponent {
         }
         delete data.itemCategory;
         delete data.manufacturerName;
+        delete data.allowGlobalPriceUpdate;
         if (!isNew) {
             this.api.updateChildItems(data.itemID, childItems).then((res) => {
             });

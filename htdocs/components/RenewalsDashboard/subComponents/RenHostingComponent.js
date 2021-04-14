@@ -114,6 +114,8 @@ export class RenHostingComponent extends MainComponent {
                 'Notes': d.notes,
                 'Invoice From': d.invoiceFromDate,
                 'To': d.invoiceToDate,
+                "Cost Price/Annum": poundFormat(order.costAnnum),
+                "Sale Price/Annum": poundFormat(order.saleAnnum),
             }
         })
         exportCSV(exportData, 'Hosting Renewals.csv');

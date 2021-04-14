@@ -158,7 +158,9 @@ export class RenewalComponent extends MainComponent {
                 'Invoice From': d.startDate,
                 'Expire Date': d.nextPeriodStartDate,
                 'Comments': d.comments,
-                'Latest Quote Sent': d.latestQuoteSent
+                'Latest Quote Sent': d.latestQuoteSent,
+                "Cost Price/Annum": poundFormat(order.costAnnum),
+                "Sale Price/Annum": poundFormat(order.saleAnnum),
             }
         })
         exportCSV(exportData, 'Renewals.csv');
