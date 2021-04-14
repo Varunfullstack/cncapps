@@ -1,6 +1,12 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.8.2] - 2021-04-14
+### Fixed
+- Fixed issue preventing from saving new items.
+- Fixed issue with CSV not showing new fields from RenewalsDashboard.
+- Fixed issue that allowed to change a PO that is in Part Received state.
+
 ## [v5.8.1] - 2021-04-13
 ### Added
 - Added the possibility of providing dates to the customerSatisfactionScore API endpoint.
