@@ -271,7 +271,10 @@
         width: 100%;
         padding-bottom: 30px;
     }
-
+    .subSection {
+        width: 100%;
+        padding-bottom: 20px;
+    }
     .reportSection.newPage {
         page-break-before: always;
     }
@@ -313,7 +316,15 @@
         white-space: pre-wrap;
     }
 </style>
-
+<script>
+    function getCustomerStats(){
+        const customerID=document.getElementById("customerID").value;
+        console.log('customerID',customerID);
+        // fetch(`/internal-api/customerStats/`+customerID).then((res) => res.json()).then(res=>{
+        //     console.log(res);
+        // })
+    }
+</script>
 
 <P class="formErrorMessage">{formError}</P>
 <form name="searchForm"
@@ -350,6 +361,7 @@
                     size="50"
                     maxlength="50"
                     customer-search
+                    required
             > <font class="formErrorMessage"> {customerIDMessage} </font></td>
         </tr>
         <tr>
@@ -366,6 +378,7 @@
                         placeholder="MM/YYYY"
                         size="10"
                         maxlength="7"
+                        required
                 > <font class="formErrorMessage"> {startYearMonthMessage} </font></td>
         </tr>
         <tr>
@@ -382,6 +395,7 @@
                         placeholder="MM/YYYY"
                         size="10"
                         maxlength="7"
+                        required
                 > <font class="formErrorMessage"> {endYearMonthMessage} </font></td>
         </tr>
         <tr>
@@ -399,6 +413,7 @@
                        size="10"
                        maxlength="10"
                        autocomplete="off"
+                       required
                 >
                 <font class="formErrorMessage"> {meetingDateMessage} </font></td>
         </tr>
@@ -408,6 +423,7 @@
                 <input type="submit"
                        name="Search"
                        value="Generate"
+                       onclick="getCustomerStats()"
                 >
         </tr>
     </table>
