@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.8.3]
+### Fixed
+- Fixed issue with sales order page not reloading when inserting template
+
 ## [v5.8.2] - 2021-04-14
 ### Fixed
 - Fixed issue preventing from saving new items.
