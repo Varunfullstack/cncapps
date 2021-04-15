@@ -181,6 +181,7 @@ class GatherFixedInformationComponent extends MainComponent {
         const {el} = this;
         const {groupedContracts, data, activity} = this.state;
 
+
         return el(
             "select",
             {
@@ -196,7 +197,7 @@ class GatherFixedInformationComponent extends MainComponent {
                 key: "tandm",
                 value: "",
                 disabled: activity.prePayChargeApproved
-            }, "T&M" + (activity.linkedSalesOrderID ? " - Must be selected because this is linked to a Sales Order" : (data.hasCallOutExpense ? ' - This Service Request has a Call Out Expense and must be closed as T&M' : ''))),
+            }, "T&M" + (activity.linkedSalesOrderID ? " - Must be selected because this is linked to a Sales Order" : (activity.hasCallOutExpense ? ' - This Service Request has a Call Out Expense and must be closed as T&M' : ''))),
             groupedContracts?.map((t, index) =>
                 el(
                     "optgroup",
@@ -206,7 +207,7 @@ class GatherFixedInformationComponent extends MainComponent {
                             "option",
                             {
                                 key: i.contractCustomerItemID,
-                                disabled: i.isDisabled || (activity.prePayChargeApproved && i.contractCustomerItemID !== data?.contractCustomerItemID) || data.hasCallOutExpense,
+                                disabled: i.isDisabled || (activity.prePayChargeApproved && i.contractCustomerItemID !== data?.contractCustomerItemID) || activity.hasCallOutExpense,
                                 value: i.contractCustomerItemID,
                             },
                             i.contractDescription
