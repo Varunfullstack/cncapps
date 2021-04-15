@@ -2,7 +2,35 @@
 
 namespace CNCLTD\DUOApi;
 
+use CNCLTD\DUOApi\AccountInfo\AccountInfo;
+use CNCLTD\DUOApi\AccountInfo\AccountInfoResponse;
+use CNCLTD\DUOApi\AccountInfo\AccountInfoResponseTransformer;
+use CNCLTD\DUOApi\AccountInfo\AccountInfoTransformer;
+use CNCLTD\DUOApi\Accounts\Account;
+use CNCLTD\DUOApi\Accounts\AccountsResponse;
+use CNCLTD\DUOApi\Accounts\AccountsResponseTransformer;
+use CNCLTD\DUOApi\Accounts\AccountTransformer;
+use CNCLTD\DUOApi\AuthLog\AccessDeviceLocationTransformer;
+use CNCLTD\DUOApi\AuthLog\AccessDeviceTransformer;
+use CNCLTD\DUOApi\AuthLog\ApplicationTransformer;
+use CNCLTD\DUOApi\AuthLog\AuthLog;
+use CNCLTD\DUOApi\AuthLog\AuthLogResponseItemTransformer;
+use CNCLTD\DUOApi\AuthLog\AuthLogsMetadataTransformer;
+use CNCLTD\DUOApi\AuthLog\AuthLogsResponse;
+use CNCLTD\DUOApi\AuthLog\AuthLogsResponseTransformer;
+use CNCLTD\DUOApi\AuthLog\AuthLogTransformer;
+use CNCLTD\DUOApi\Users\RetrieveUsersResponse;
+use CNCLTD\DUOApi\Users\RetrieveUsersResponseTransformer;
+use CNCLTD\DUOApi\Users\User;
+use CNCLTD\DUOApi\Users\UserTransformer;
+use DateTime;
+use DuoAPI\Admin;
+use DuoAPI\Auth;
 use Exception;
+use Karriere\JsonDecoder\Exceptions\InvalidBindingException;
+use Karriere\JsonDecoder\Exceptions\InvalidJsonException;
+use Karriere\JsonDecoder\Exceptions\JsonValueException;
+use Karriere\JsonDecoder\Exceptions\NotExistingRootException;
 use Karriere\JsonDecoder\JsonDecoder;
 
 date_default_timezone_set('UTC');
@@ -13,6 +41,10 @@ class DUOApi
     private $integrationKey;
     private $host;
     private $duoAPIClient;
+    /**
+     * @var Admin
+     */
+    private $adminAPIClient;
 
     /**
      * DUOApi constructor.
@@ -25,7 +57,8 @@ class DUOApi
         $this->secretKet      = $secretKet;
         $this->integrationKey = $integrationKey;
         $this->host           = $host;
-        $this->duoAPIClient   = new \DuoAPI\Auth($integrationKey, $secretKet, $host, null, false);
+        $this->duoAPIClient   = new Auth($integrationKey, $secretKet, $host, null, false);
+        $this->adminAPIClient = new Admin($integrationKey, $secretKet, $host);
     }
 
     /**
@@ -105,37 +138,64 @@ class DUOApi
         return $accountInfoResponse->response;
     }
 
-    public function getAuthenticationLogs(\DateTime $minTime)
+    /**
+     * @param DateTime $minTime
+     * @return AuthLog[]
+     * @throws InvalidBindingException
+     * @throws InvalidJsonException
+     * @throws JsonValueException
+     * @throws NotExistingRootException
+     */
+    public function getAuthenticationLogs(DateTime $minTime): array
     {
-        $users      = [];
-        $nextOffset = 0;
+        $authLogs   = [];
+        $nextOffset = null;
         do {
-            $retrieveUsersResponse = $this->retrieveAuthenticationLogs($nextOffset, $minTime);
-            $users                 = array_merge($users, $retrieveUsersResponse->response);
-            $nextOffset            = $retrieveUsersResponse->nextOffset;
+            $authLogsResponse = $this->retrieveAuthenticationLogs($nextOffset, $minTime);
+            $authLogs         = array_merge($authLogs, $authLogsResponse->response()->authLogs());
+            $nextOffset       = $authLogsResponse->response()->metadata()->nextOffset();
         } while ($nextOffset);
-        return $users;
+        return $authLogs;
     }
 
-    private function retrieveAuthenticationLogs(?string $nextOffset, \DateTime $minTime)
+    /**
+     * @param array|null $nextOffset
+     * @param DateTime $minTime
+     * @return AuthLogsResponse
+     * @throws InvalidBindingException
+     * @throws InvalidJsonException
+     * @throws JsonValueException
+     * @throws NotExistingRootException
+     */
+    private function retrieveAuthenticationLogs(?array $nextOffset, DateTime $minTime)
     {
-        $maxTime = new \DateTime();
-        $params = [];
-        if($nextOffset){
-            $params['next_offset'] = $nextOffset;
+        $maxTime = new DateTime();
+        $params  = [
+            "mintime" => $minTime->getTimestamp() * 1000,
+            "maxtime" => $maxTime->getTimestamp() * 1000,
+            "limit"   => 1000
+        ];
+        if ($nextOffset) {
+            $params['next_offset'] = implode(",", $nextOffset);
         }
-        $response = $this->duoAPIClient->apiCall(
+        $response = $this->adminAPIClient->apiCall(
             'GET',
-            "/admin/v2/logs/authentication?mintime={$minTime->getTimestamp()}&maxtime={$maxTime->getTimestamp()}",
+            "/admin/v2/logs/authentication",
             $params
         );
         if (!$response['success']) {
             throw new Exception('Failed to pull accounts list');
         }
         $jsonDecoder = new JsonDecoder();
+        $jsonDecoder->register(new AccessDeviceLocationTransformer());
+        $jsonDecoder->register(new AccessDeviceTransformer());
+        $jsonDecoder->register(new ApplicationTransformer());
         $jsonDecoder->register(new UserTransformer());
-        $jsonDecoder->register(new RetrieveUsersResponseTransformer());
-        return $jsonDecoder->decode($response['response'], RetrieveUsersResponse::class);
+        $jsonDecoder->register(new AuthLogTransformer());
+        $jsonDecoder->register(new AuthLogsMetadataTransformer());
+        $jsonDecoder->register(new AuthLogResponseItemTransformer());
+        $jsonDecoder->register(new AuthLogsResponseTransformer());
+        return $jsonDecoder->decode($response['response'], AuthLogsResponse::class);
     }
 
 }

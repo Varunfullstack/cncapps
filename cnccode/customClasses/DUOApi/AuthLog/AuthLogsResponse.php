@@ -4,6 +4,16 @@ namespace CNCLTD\DUOApi\AuthLog;
 class AuthLogsResponse
 {
     private $stat;
+    /** @var AuthLogResponseItem */
     private $response;
-    private $metadata;
+
+    public function stat()
+    {
+        return $this->stat;
+    }
+
+    public function response(): AuthLogResponseItem
+    {
+        return $this->response;
+    }
 }

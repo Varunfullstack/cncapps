@@ -4,8 +4,9 @@ namespace CNCLTD\DUOApi\AuthLog;
 
 use Karriere\JsonDecoder\Bindings\AliasBinding;
 use Karriere\JsonDecoder\ClassBindings;
+use Karriere\JsonDecoder\Transformer;
 
-class AuthLogsMetadataTransformer implements \Karriere\JsonDecoder\Transformer
+class UserTransformer implements Transformer
 {
 
     /**
@@ -13,8 +14,7 @@ class AuthLogsMetadataTransformer implements \Karriere\JsonDecoder\Transformer
      */
     public function register(ClassBindings $classBindings)
     {
-        $classBindings->register(new AliasBinding('nextOffset', "next_offset"));
-        $classBindings->register(new AliasBinding('totalObjects', 'total_objects'));
+        $classBindings->register(new AliasBinding('name', 'name'));
     }
 
     /**
@@ -22,6 +22,6 @@ class AuthLogsMetadataTransformer implements \Karriere\JsonDecoder\Transformer
      */
     public function transforms()
     {
-        return AuthLogsMetadata::class;
+        return User::class;
     }
 }

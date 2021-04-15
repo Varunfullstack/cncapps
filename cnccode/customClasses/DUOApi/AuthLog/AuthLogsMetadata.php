@@ -5,5 +5,17 @@ class AuthLogsMetadata
 {
     /** @var string[] */
     private $nextOffset;
-    private $total_objects;
+    private $totalObjects;
+
+    public function nextOffset(): ?array
+    {
+        return $this->nextOffset;
+    }
+
+    public function totalObjects()
+    {
+        return $this->totalObjects;
+    }
+
+
 }

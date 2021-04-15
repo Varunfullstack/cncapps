@@ -1,12 +1,13 @@
 <?php
 
-use CNCLTD\DUOApi\Users\Users\Users\Users\DUOApi;
+use CNCLTD\DUOApi\DUOApi;
 use CNCLTD\DUOUsersReportGenerator\DUOClientReportGenerator;
 use CNCLTD\LoggerCLI;
 
 global $cfg;
 require_once(__DIR__ . "/../htdocs/config.inc.php");
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
+require_once($cfg['path_bu'] . '/BUPortalCustomerDocument.inc.php');
 global $db;
 $logName = 'CheckDUO';
 $logger  = new LoggerCLI($logName);
@@ -38,13 +39,16 @@ $adminHostName       = "api-8f3a2990.duosecurity.com";
  * @param DBECustomer $dbeCustomer
  * @throws \CNCLTD\Exceptions\ColumnOutOfRangeException
  */
-function updateClientReport(DUOApi $clientDUO,  DBECustomer $dbeCustomer)
+function updateClientReport(DUOApi $clientDUO, DBECustomer $dbeCustomer)
 {
-    $duoReportGenerator = new DUOClientReportGenerator();
-    $minTime            = new DateTime();
+
+    $minTime = new DateTime();
     $minTime->sub(new DateInterval("P60D"));
-    $authenticationLogs = $clientDUO->getAuthenticationLogs($minTime);
-    $spreadsheet = $duoReportGenerator->getReportData($clientDUO->getUsers(), $authenticationLogs);
+    $duoReportGenerator       = new DUOClientReportGenerator();
+    $spreadsheet              = $duoReportGenerator->getReportData(
+        $clientDUO->getUsers(),
+        $clientDUO->getAuthenticationLogs($minTime)
+    );
     $buPortalCustomerDocument = new BUPortalCustomerDocument($thing);
     $buPortalCustomerDocument->addOrUpdateDUOClientReportDocument(
         $dbeCustomer->getValue(DBECustomer::customerID),
@@ -54,7 +58,7 @@ function updateClientReport(DUOApi $clientDUO,  DBECustomer $dbeCustomer)
 
 foreach ($duoAPI->getAccountsList() as $account) {
 
-    $clientDUO = new DUOApi($adminSecret, $adminIntegrationKey, $account->apiHostname);
+    $clientDUO   = new DUOApi($adminSecret, $adminIntegrationKey, $account->apiHostname);
     $dbeCustomer = new DBECustomer($thing);
     $dbeCustomer->getCustomerByName($account->name);
     if (!$dbeCustomer->rowCount()) {

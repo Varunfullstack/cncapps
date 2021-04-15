@@ -1,7 +1,7 @@
 <?php
 
 
-namespace CNCLTD\DUOApi;
+namespace CNCLTD\DUOApi\AccountInfo;
 
 
 use Karriere\JsonDecoder\Bindings\FieldBinding;

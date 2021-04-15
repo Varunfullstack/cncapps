@@ -1,9 +1,12 @@
-<?php require_once($cfg["path_gc"] . "/Business.inc.php");
+<?php use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
+require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/DBEPortalCustomerDocumentWithoutFile.inc.php");
 require_once($cfg["path_dbe"] . "/DBEPortalCustomerDocument.php");
 
 class BUPortalCustomerDocument extends Business
 {
+    const DUO_USERS_AND_LOGS = 'DUO Users and Logs';
     public $dbePortalCustomerDocument;
     public $dbePortalCustomerDocumentWithoutFile;
     public $dbeCallActivity;
@@ -11,7 +14,7 @@ class BUPortalCustomerDocument extends Business
     function __construct(&$owner)
     {
         parent::__construct($owner);
-        $this->dbePortalCustomerDocument = new DBEPortalCustomerDocument($this);
+        $this->dbePortalCustomerDocument            = new DBEPortalCustomerDocument($this);
         $this->dbePortalCustomerDocumentWithoutFile = new DBEPortalCustomerDocumentWithoutFile($this);
     }
 
@@ -23,19 +26,13 @@ class BUPortalCustomerDocument extends Business
          * @access private
          */
         $this->updateDataAccessObject($dsData, $this->dbePortalCustomerDocumentWithoutFile);
-
         /* file to add? */
         if ($userfile['name']) {
-
-
             $this->dbePortalCustomerDocument->getRow($this->dbePortalCustomerDocumentWithoutFile->getPKValue());
             $this->dbePortalCustomerDocument->setValue(
                 DBEPortalCustomerDocument::file,
                 fread(fopen($userfile ['tmp_name'], 'rb'), $userfile ['size'])
             );
-            echo '<h1>';
-            var_dump($userfile);
-            echo '</h1>';
             $this->dbePortalCustomerDocument->setValue(
                 DBEPortalCustomerDocument::filename,
                 $userfile ['name']
@@ -46,7 +43,6 @@ class BUPortalCustomerDocument extends Business
             );
             $this->dbePortalCustomerDocument->updateRow();
         }
-
         return TRUE;
     }
 
@@ -82,5 +78,44 @@ class BUPortalCustomerDocument extends Business
     {
         $this->setMethodName('deleteDocument');
         return $this->dbePortalCustomerDocument->deleteRow($ID);
+    }
+
+    public function addOrUpdateDUOClientReportDocument(int $customerId, $spreadsheet)
+    {
+        // check if the customer already has a DUO document
+        $duoDocument  = $this->getCustomerDUODocument($customerId);
+        $tempFileName = @tempnam('e:\temp', 'duoDocument');
+        $writer       = new Xlsx($spreadsheet);
+        $writer->save($tempFileName);
+        $data = file_get_contents($tempFileName);
+        $duoDocument->setValue(DBEPortalCustomerDocument::file, $data);
+        if (!$duoDocument->getPKValue()) {
+            $duoDocument->insertRow();
+        } else {
+            $duoDocument->updateRow();
+        }
+    }
+
+    private function getCustomerDUODocument(int $customerId)
+    {
+        $portalCustomerDocument = new DBEPortalCustomerDocument($this);
+        $portalCustomerDocument->getDUODocumentForCustomer($customerId, self::DUO_USERS_AND_LOGS);
+        if (!$portalCustomerDocument->rowCount()) {
+            $portalCustomerDocument->setValue(DBEPortalCustomerDocument::customerID, $customerId);
+            $portalCustomerDocument->setValue(DBEPortalCustomerDocument::description, self::DUO_USERS_AND_LOGS);
+            $portalCustomerDocument->setValue(
+                DBEPortalCustomerDocument::createdDate,
+                (new DateTime())->format(DATE_MYSQL_DATETIME)
+            );
+            $portalCustomerDocument->setValue(DBEPortalCustomerDocument::createdUserID, 0);
+            $portalCustomerDocument->setValue(
+                DBEPortalCustomerDocument::fileMimeType,
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            );
+            $portalCustomerDocument->setValue(DBEPortalCustomerDocument::filename, self::DUO_USERS_AND_LOGS . '.xlsx');
+            $portalCustomerDocument->setValue(DBEPortalCustomerDocument::mainContactOnlyFlag, 'Y');
+            $portalCustomerDocument->setValue(DBEPortalCustomerDocument::customerContract, 0);
+        }
+        return $portalCustomerDocument;
     }
 }
