@@ -2326,11 +2326,12 @@ class CTSalesOrder extends CTCNC
                 $supplierName = Controller::htmlDisplayText($dsOrdline->getValue(DBEJOrdline::supplierName));
             }
             $showStockLevels = "";
-            if ($dsOrdline->getValue(DBEJOrdline::showStockLevels) 
-                && $dsOrdline->getValue(DBEOrdline::curUnitCost) > 0 
-                //&& $dsOrdline->getValue(DBEJOrdline::supplierID) == CONFIG_SALES_STOCK_SUPPLIERID 
-                && $dsOrdline->getValue(DBEJOrdline::qtyInStock) >= $dsOrdline->getValue(DBEOrdline::qtyOrdered)
-                ) $showStockLevels = "<i class=\"fal fa-2x fa-boxes color-gray icon\"></i>";
+            if ($dsOrdline->getValue(DBEJOrdline::showStockLevels) && $dsOrdline->getValue(
+                    DBEOrdline::curUnitCost
+                ) > 0 //&& $dsOrdline->getValue(DBEJOrdline::supplierID) == CONFIG_SALES_STOCK_SUPPLIERID
+                && $dsOrdline->getValue(DBEJOrdline::qtyInStock) >= $dsOrdline->getValue(
+                    DBEOrdline::qtyOrdered
+                )) $showStockLevels = "<i class=\"fal fa-2x fa-boxes color-gray icon\"></i>";
             if (!$restrictedView) {
 
                 $this->template->set_var(
@@ -3957,19 +3958,20 @@ class CTSalesOrder extends CTCNC
             $recurringSequenceNumber = $this->getParam('recurringSequenceNumber');
         }
         $this->setOrdheadID($this->getParam('ordline')[1]['ordheadID']);
-        
-        if ($this->getParam('ordline')[1]['lineType'] == 'T') {            
+        if ($this->getParam('ordline')[1]['lineType'] == 'T') {
             $this->pasteLinesFromQuotationTemplate(
                 $oneOffSequenceNumber,
                 $recurringSequenceNumber
             );
+            header('Location: ' . $this->getDisplayOrderURL());
             exit;
         }
-        if ($this->getParam('ordline')[1]['lineType'] == 'O') {            
+        if ($this->getParam('ordline')[1]['lineType'] == 'O') {
             $this->pasteLinesFromSO(
                 $oneOffSequenceNumber,
                 $recurringSequenceNumber
             );
+            header('Location: ' . $this->getDisplayOrderURL());
             exit;
 
         }
@@ -4244,17 +4246,16 @@ class CTSalesOrder extends CTCNC
             $this->setFormErrorMessage('The sales order you are trying to paste from does not exist');
             $this->displayOrder();
             return;
-        }        
-        if(!$this->buSalesOrder->pasteLinesFromOrder(
+        }
+        if (!$this->buSalesOrder->pasteLinesFromOrder(
             $this->getParam('ordline')[1]['description'],
             $this->getOrdheadID(),
             $oneOffSequenceNumber,
             $recurringSequenceNumber
-        ))
-        {
+        )) {
             $this->setFormErrorMessage('The sales order you are trying to paste from does not have lines');
-         }         
-         header('Location: ' . $this->getDisplayOrderURL());
+        }
+        header('Location: ' . $this->getDisplayOrderURL());
 
     }
 
