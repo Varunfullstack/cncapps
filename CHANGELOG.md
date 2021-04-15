@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 1280 - Duo Usage Portal in Portal.
+
 ## [v5.8.0] - 2021-04-12
 ### Added
 - Issue 1286 - Add Generate Password Icon to Edit SR page
