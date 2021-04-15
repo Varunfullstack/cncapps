@@ -67,7 +67,12 @@ foreach ($duoAPI->getAccountsList() as $account) {
         continue;
     }
     $dbeCustomer->fetchNext();
+    try {
+
     updateClientReport($clientDUO, $dbeCustomer);
+    } catch (\Exception $exception){
+        $logger->error('Could not update client DUO Excel Document');
+    }
     $dbeCustomerItem = new DBECustomerItem($thing);
     $dbeCustomerItem->getRowsByCustomerAndItemID(
         $dbeCustomer->getValue(DBECustomer::customerID),
