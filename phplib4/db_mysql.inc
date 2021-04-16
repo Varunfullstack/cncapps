@@ -233,7 +233,6 @@ class DB_Sql
             $a_params
         );
         if (!mysqli_stmt_execute($statement)) {
-            var_dump('here');
             $jsonParams = json_encode($parameters);
             $error      = mysqli_error(self::$Link_ID);
             throw new Exception("Failed to execute prepared query : {$error} $queryString, {$jsonParams}");

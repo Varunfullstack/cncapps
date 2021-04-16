@@ -25,14 +25,13 @@ if (!is_cli()) {
     exit;
 }
 // Script example.php
-$shortopts  = "du";
-$longopts   = [];
-$options    = getopt($shortopts, $longopts);
-$debugMode  = isset($options['d']);
-$updateMode = isset($options['u']);
-$thing      = null;
-$buHeader   = new BUHeader($thing);
-$dsHeader   = new DataSet($thing);
+$shortopts = "d";
+$longopts  = [];
+$options   = getopt($shortopts, $longopts);
+$debugMode = isset($options['d']);
+$thing     = null;
+$buHeader  = new BUHeader($thing);
+$dsHeader  = new DataSet($thing);
 $buHeader->getHeader($dsHeader);
 // we are going to see if we can log in
 $solarwindsAPI        = new \CNCLTD\SolarwindsBackupAPI(
@@ -44,12 +43,10 @@ $missingContractItems = [];
 /**
  * @param SolarwindsAccountItem $accountInfo
  * @param LoggerCLI $logger
- * @param bool $updateMode
  * @param object $db
  */
 function updateContract(SolarwindsAccountItem $accountInfo,
                         LoggerCLI $logger,
-                        bool $updateMode,
                         object $db
 )
 {
@@ -60,10 +57,11 @@ function updateContract(SolarwindsAccountItem $accountInfo,
         createFailedToUpdateContractSR($accountInfo);
         return;
     }
-    if ($updateMode) {
+    if ($customerItem->getValue(DBECustomerItem::users) !== $accountInfo->protectedUsers) {
         try {
             $logger->info('Update mode enabled - Updating contract users');
             $updateCustomerItem = new DBECustomerItem($thing);
+            $updateCustomerItem->getRow($accountInfo->contractId);
             $updateCustomerItem->setValue(DBECustomerItem::users, $accountInfo->protectedUsers);
             $updateCustomerItem->setValue(
                 DBECustomerItem::curUnitCost,
@@ -78,18 +76,18 @@ function updateContract(SolarwindsAccountItem $accountInfo,
                 ) * 12 * $accountInfo->protectedUsers
             );
             $updateCustomerItem->updateRow();
-            $db->preparedQuery(
-                "insert into contractUsersLog(contractId,users, currentUsers) values (?,?,?) ",
-                [
-                    ["type" => "i", "value" => $accountInfo->contractId],
-                    ["type" => "i", "value" => $accountInfo->protectedUsers],
-                    ["type" => "i", "value" => $updateCustomerItem->getValue(DBECustomerItem::users)],
-                ]
-            );
         } catch (\Exception $exception) {
             createFailedToUpdateContractSR($accountInfo);
         }
     }
+    $db->preparedQuery(
+        "insert into contractUsersLog(contractId,users, currentUsers) values (?,?,?) ",
+        [
+            ["type" => "i", "value" => $accountInfo->contractId],
+            ["type" => "i", "value" => $accountInfo->protectedUsers],
+            ["type" => "i", "value" => $accountInfo->protectedUsers],
+        ]
+    );
 }
 
 /**
@@ -109,13 +107,13 @@ function checkBackupIsUpToDate(SolarwindsAccountItem $accountInfo, LoggerCLI $lo
 try {
     $accountsInfo = $solarwindsAPI->getAccountsInfo();
     foreach ($accountsInfo as $accountInfo) {
-        $logger->info('Processing ' . $accountInfo->name);
+        $logger->info('Processing ' . $accountInfo->name . ", contractId: " . $accountInfo->contractId);
         if (!$accountInfo->contractId) {
             $missingContractItems[] = $accountInfo;
             $logger->error('This item does not have a contractId set, will send an email to inform about this');
             continue;
         }
-        updateContract($accountInfo, $logger, $updateMode, $db);
+        updateContract($accountInfo, $logger, $db);
         checkBackupIsUpToDate($accountInfo, $logger);
     }
     if (count($missingContractItems)) {

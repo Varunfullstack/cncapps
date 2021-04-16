@@ -120,15 +120,18 @@ from contractUsersLog left join custItem ON contractId = custItem.cui_cuino LEFT
 
         if ($startDate) {
             $defaultQuery .= " and date(createdAt) >= ? ";
+            $countQuery .= " and date(createdAt) >= ? ";
             $parameters[] = ["type" => "s", "value" => $startDate];
 
         }
         if ($endDate) {
             $defaultQuery .= " and date(createdAt) <= ? ";
+            $countQuery .= " and date(createdAt) <= ? ";
             $parameters[] = ["type" => "s", "value" => $endDate];
         }
 
         if (!$startDate && !$endDate) {
+            $countQuery .= " and createdAt >= (select max(internal.createdAt) from contractUsersLog internal)";
             $defaultQuery .= " and createdAt >= (select max(internal.createdAt) from contractUsersLog internal)";
         }
 
