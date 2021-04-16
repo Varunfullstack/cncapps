@@ -41,6 +41,71 @@ $solarwindsAPI        = new \CNCLTD\SolarwindsBackupAPI(
     $dsHeader->getValue(DBEHeader::solarwindsPassword)
 );
 $missingContractItems = [];
+/**
+ * @param SolarwindsAccountItem $accountInfo
+ * @param LoggerCLI $logger
+ * @param bool $updateMode
+ * @param object $db
+ */
+function updateContract(SolarwindsAccountItem $accountInfo,
+                        LoggerCLI $logger,
+                        bool $updateMode,
+                        object $db
+)
+{
+    $thing        = null;
+    $customerItem = new DBECustomerItem($thing);
+    if (!$customerItem->getRow($accountInfo->contractId)) {
+        $logger->error('Contract not found!! Creating SR to inform about this');
+        createFailedToUpdateContractSR($accountInfo);
+        return;
+    }
+    if ($updateMode) {
+        try {
+            $logger->info('Update mode enabled - Updating contract users');
+            $updateCustomerItem = new DBECustomerItem($thing);
+            $updateCustomerItem->setValue(DBECustomerItem::users, $accountInfo->protectedUsers);
+            $updateCustomerItem->setValue(
+                DBECustomerItem::curUnitCost,
+                $updateCustomerItem->getValue(
+                    DBECustomerItem::costPricePerMonth
+                ) * 12 * $accountInfo->protectedUsers
+            );
+            $updateCustomerItem->setValue(
+                DBECustomerItem::curUnitSale,
+                $updateCustomerItem->getValue(
+                    DBECustomerItem::salePricePerMonth
+                ) * 12 * $accountInfo->protectedUsers
+            );
+            $updateCustomerItem->updateRow();
+            $db->preparedQuery(
+                "insert into contractUsersLog(contractId,users, currentUsers) values (?,?,?) ",
+                [
+                    ["type" => "i", "value" => $accountInfo->contractId],
+                    ["type" => "i", "value" => $accountInfo->protectedUsers],
+                    ["type" => "i", "value" => $updateCustomerItem->getValue(DBECustomerItem::users)],
+                ]
+            );
+        } catch (\Exception $exception) {
+            createFailedToUpdateContractSR($accountInfo);
+        }
+    }
+}
+
+/**
+ * @param SolarwindsAccountItem $accountInfo
+ * @param LoggerCLI $logger
+ */
+function checkBackupIsUpToDate(SolarwindsAccountItem $accountInfo, LoggerCLI $logger): void
+{
+    $yesterday = new DateTime();
+    $yesterday->sub(new DateInterval('P1D'));
+    if (!$accountInfo->lastSuccessfulBackupDate || $accountInfo->lastSuccessfulBackupDate < $yesterday) {
+        $logger->warning('Backup is not up to date - Sending email to inform');
+        createFailedBackupSR($accountInfo);
+    }
+}
+
 try {
     $accountsInfo = $solarwindsAPI->getAccountsInfo();
     foreach ($accountsInfo as $accountInfo) {
@@ -50,59 +115,8 @@ try {
             $logger->error('This item does not have a contractId set, will send an email to inform about this');
             continue;
         }
-        $customerItem = new DBECustomerItem($thing);
-        if (!$customerItem->getRow($accountInfo->contractId)) {
-            $logger->error('Contract not found!! Creating SR to inform about this');
-            createFailedToUpdateContractSR($accountInfo);
-        } else {
-            if ($updateMode) {
-                $logger->info('Update mode enabled - Updating contract users');
-                $customerItem = new DBECustomerItem($thing);
-                $customerItem->setValue(DBECustomerItem::users, $accountInfo->protectedUsers);
-                $customerItem->setValue(
-                    DBECustomerItem::curUnitCost,
-                    $customerItem->getValue(
-                        DBECustomerItem::costPricePerMonth
-                    ) * 12 * $accountInfo->protectedUsers
-                );
-                $customerItem->setValue(
-                    DBECustomerItem::curUnitSale,
-                    $customerItem->getValue(
-                        DBECustomerItem::salePricePerMonth
-                    ) * 12 * $accountInfo->protectedUsers
-                );
-                $customerItem->updateRow();
-            }
-            if ($accountInfo->protectedUsers !== null) {
-                $customerItem = new DBECustomerItem($thing);
-                $customerItem->getRow($accountInfo->contractId);
-                if ($customerItem->getValue(DBECustomerItem::users) === null) {
-                    $customerItem->setValue(DBECustomerItem::users, 0);
-                    $updateCustomerItem = new DBECustomerItem($thing);
-                    $updateCustomerItem->getRow($accountInfo->contractId);
-                    $updateCustomerItem->setValue(DBECustomerItem::users, 0);
-                    $updateCustomerItem->updateRow();
-                }
-                try {
-                    $db->preparedQuery(
-                        "insert into contractUsersLog(contractId,users, currentUsers) values (?,?,?) ",
-                        [
-                            ["type" => "i", "value" => $accountInfo->contractId],
-                            ["type" => "i", "value" => $accountInfo->protectedUsers],
-                            ["type" => "i", "value" => $customerItem->getValue(DBECustomerItem::users)],
-                        ]
-                    );
-                } catch (\Exception $exception) {
-                    createFailedToUpdateContractSR($accountInfo);
-                }
-            }
-        }
-        $yesterday = new DateTime();
-        $yesterday->sub(new DateInterval('P1D'));
-        if (!$accountInfo->lastSuccessfulBackupDate || $accountInfo->lastSuccessfulBackupDate < $yesterday) {
-            $logger->warning('Backup is not up to date - Sending email to inform');
-            createFailedBackupSR($accountInfo);
-        }
+        updateContract($accountInfo, $logger, $updateMode, $db);
+        checkBackupIsUpToDate($accountInfo, $logger);
     }
     if (count($missingContractItems)) {
         $logger->warning('We have items that do not have contractID, so we have inform about this');
