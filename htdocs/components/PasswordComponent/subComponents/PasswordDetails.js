@@ -74,10 +74,8 @@ export class PasswordDetails extends MainComponent {
 
                     <div className="form-group">
                         <label>User Name</label>
-                        <input value={data.username}
+                        <input value={data.username || ''}
                                type="text"
-                               name=""
-                               id=""
                                className="form-control"
                                onChange={(event) => this.setValue("username", event.target.value)}
                         />
@@ -85,7 +83,7 @@ export class PasswordDetails extends MainComponent {
                     <div className="form-group">
                         <label>Service</label>
                         <select className="form-control"
-                                value={data.serviceID}
+                                value={data.serviceID || ''}
                                 onChange={(event) => this.setValue("serviceID", event.target.value)}
                         >
                             <option>No Service</option>
@@ -96,34 +94,29 @@ export class PasswordDetails extends MainComponent {
                     </div>
                     <div className="form-group">
                         <label>Password</label>
-                        <input value={data.password}
+                        <input value={data.password || ''}
                                type="text"
-                               name=""
-                               id=""
                                className="form-control"
                                onChange={(event) => this.setValue("password", event.target.value)}
                         />
                     </div>
                     <div className="form-group">
                         <label>Notes</label>
-                        <input value={data.notes}
+                        <input value={data.notes || ''}
                                type="text"
-                               name=""
-                               id=""
                                className="form-control"
                                onChange={(event) => this.setValue("notes", event.target.value)}
                         />
                     </div>
                     <div className="form-group">
                         <label>URL</label>
-                        <input value={data.URL}
+                        <input value={data.URL || ''}
                                type="text"
-                               name=""
-                               id=""
                                className="form-control"
                                onChange={(event) => this.setValue("URL", event.target.value)}
                         />
                     </div>
+
                     <div className="form-group">
                         <label>Level</label>
                         <select className="form-control required"
@@ -135,6 +128,15 @@ export class PasswordDetails extends MainComponent {
                                                              value={s.level}
                             >{s.description}</option>)}
                         </select>
+                    </div>
+                    <div className="form-group">
+                        <label>Sales password</label>
+                        <input value={1}
+                               defaultChecked={data.salesPassword}
+                               type="checkbox"
+                               className="form-control"
+                               onChange={(event) => this.setValue("salesPassword", event.target.checked)}
+                        />
                     </div>
                 </div>
             }
@@ -164,21 +166,20 @@ export class PasswordDetails extends MainComponent {
             return;
         }
         data.customerID = this.props.data.customerID;
-        this.api.updatePassword(data).then((result) => {
-            if (result.state) {
-                this.setState({showModal: false, services: []});
-                this.hideModal();
-                //this.getServices();
-            } else {
-                this.alert(result.error);
-            }
-        });
+        this.api.updatePassword(data)
+            .then((result) => {
+                if (result.state) {
+                    this.setState({showModal: false});
+                    this.hideModal();
+                } else {
+                    this.alert(result.error);
+                }
+            });
 
 
     }
 
     render() {
-        this.getServices();
         if (!this.props.show)
             return null;
         return <div>

@@ -71,6 +71,7 @@ class PasswordComponent extends MainComponent {
             serviceName: '',
             sortOrder: '',
             username: '',
+            salesPassword: false
         };
     }
 
@@ -290,12 +291,8 @@ class PasswordComponent extends MainComponent {
         </div>
     }
     handleModalClose = (password) => {
-        const {passwords} = this.state;
-        if (password.passwordID) {
-            let indx = passwords.map(p => p.passwordID).indexOf(password.passwordID);
-            passwords[indx] = {...password};
-        } else this.getData();
-        this.setState({showModal: false, passwords, data: password});
+        this.getData();
+        this.setState({showModal: false, data: password});
     }
 
     render() {

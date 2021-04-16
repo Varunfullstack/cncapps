@@ -12,7 +12,6 @@ class TwentyFourHoursSupportComponent extends MainComponent {
 
     constructor(props) {
         super(props);
-        console.log(moment().year())
         this.state = {
             showSpinner: false,
             customers: [],
@@ -146,7 +145,6 @@ class TwentyFourHoursSupportComponent extends MainComponent {
 
     getMonthValue(items, month) {
         const monthItems = items.find(i => i.groupName == month);
-        //console.log(monthItems);
         if (monthItems)
             return monthItems.items.length;
         else return 0;
