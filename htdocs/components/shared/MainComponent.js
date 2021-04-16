@@ -195,10 +195,10 @@ export default class MainComponent extends React.Component {
         data[property] = value;
         this.setState({data});
     }
-    setFilter=(field,value,callback=null)=>{
-        const {filter}=this.state;
-        filter[field]=value;
-        this.setState({filter},callback);
+    setFilter = (field, value, callback = null) => {
+        const {filter} = this.state;
+        filter[field] = value;
+        this.setState({filter}, callback);
     }
     editorHasProblems = async () => {
         return this.apiHeader.getNumberOfAllowedMistaks().then(nMistakes => {
@@ -222,42 +222,53 @@ export default class MainComponent extends React.Component {
             return false;
         });
     }
-    getCorrectDate(date,hasTime=false){
-        let format="DD/MM/YYYY";
-        if(hasTime)
-        format +=" HH:mm";
-        if(date!='' && date!=null)
-        return moment(date).format(format);
+
+    getCorrectDate(date, hasTime = false) {
+        let format = "DD/MM/YYYY";
+        if (hasTime)
+            format += " HH:mm";
+        if (date != '' && date != null)
+            return moment(date).format(format);
         else return '';
     }
-    isEmpty(variable){
-        if(variable==null || variable==undefined || variable=='')
+
+    isEmpty(variable) {
+        if (variable == null || variable == undefined || variable == '')
             return true;
-        else 
+        else
             return false;
     }
-    getTrueFalseElement(value){
-        return value?<i className="fal fa-2x fa-check color-gray "></i>:<i className="fal fa-2x fa-times color-gray "></i>
+
+    getTrueFalseElement(value) {
+        return value ? <i className="fal fa-2x fa-check color-gray "></i> :
+            <i className="fal fa-2x fa-times color-gray "></i>
     }
-    getEditElement(obj,callBack,display=true){
-        if(!display)
+
+    getEditElement(obj, callBack, display = true) {
+        if (!display)
             return null;
-        return <i className="fal fa-2x fa-edit color-gray pointer" onClick={()=>callBack(obj)}></i>
+        return <i className="fal fa-2x fa-edit color-gray pointer"
+                  onClick={() => callBack(obj)}
+        ></i>
     }
-    getEditIcon( ){
+
+    getEditIcon() {
         return "fal fa-2x fa-edit color-gray2 pointer";
     }
 
-    getDeleteElement(obj,callBack,display=true){
-        if(!display)
+    getDeleteElement(obj, callBack, display = true) {
+        if (!display)
             return null;
-        return <i className="fal fa-2x fa-trash-alt color-gray pointer" onClick={()=>callBack(obj)}></i>
+        return <i className="fal fa-2x fa-trash-alt color-gray pointer"
+                  onClick={() => callBack(obj)}
+        ></i>
     }
-    getDeleteIcon(){
+
+    getDeleteIcon() {
         return "fal fa-2x fa-trash-alt color-gray2 pointer";
     }
 
-    getTableStyle(){
+    getTableStyle() {
         return "table table-striped";
     }
 }

@@ -3,6 +3,11 @@ import React from "react";
 import APIPassword from "../services/APIPassword";
 import Modal from "../../shared/Modal/modal";
 
+export const PASSWORD_DETAILS_CLOSE_REASON = {
+    CANCELLED: 'CANCELLED',
+    UPDATED: 'UPDATED'
+}
+
 export class PasswordDetails extends MainComponent {
     api = new APIPassword();
 
@@ -46,6 +51,7 @@ export class PasswordDetails extends MainComponent {
         };
     }
 
+
     static getDerivedStateFromProps(props, state) {
         if (props.data && state.data && props.data.passwordID != state.data.passwordID)
             state.data = {...props.data};
@@ -53,11 +59,17 @@ export class PasswordDetails extends MainComponent {
 
     }
 
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (this.props.customerId !== prevProps.customerId || this.props?.data?.passwordID !== prevProps?.data?.passwordID) {
+            this.getServices();
+        }
+    }
+
     getServices = () => {
         const {services, data} = this.state;
-        const {filter} = this.props;
-        if (services.length == 0 && filter.customer)
-            this.api.getServices(filter.customer.id, data.passwordID).then(res => {
+        const {customerId} = this.props;
+        if (services.length == 0 && customerId)
+            this.api.getServices(customerId, data.passwordID).then(res => {
                 this.setState({services: res.data});
             })
     }
@@ -152,14 +164,13 @@ export class PasswordDetails extends MainComponent {
 
         </Modal>
     }
-    hideModal = () => {
+    hideModal = (reason = PASSWORD_DETAILS_CLOSE_REASON.CANCELLED) => {
         if (this.props.onClose)
-            this.props.onClose({...this.state.data});
+            this.props.onClose(reason);
         this.setState({data: {...this.getInitData()}})
     }
     handleSave = () => {
         const {data} = this.state;
-        const {mode} = this.props;
 
         if (data.level == "") {
             this.alert("Level required.");
@@ -170,7 +181,7 @@ export class PasswordDetails extends MainComponent {
             .then((result) => {
                 if (result.state) {
                     this.setState({showModal: false});
-                    this.hideModal();
+                    this.hideModal(PASSWORD_DETAILS_CLOSE_REASON.UPDATED);
                 } else {
                     this.alert(result.error);
                 }

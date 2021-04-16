@@ -9,7 +9,7 @@ import Table from "../shared/table/table.js";
 import ToolTip from "../shared/ToolTip.js";
 import Toggle from "../shared/Toggle.js";
 import CustomerSearch from "../shared/CustomerSearch.js";
-import {PasswordDetails} from "./subComponents/PasswordDetails.js";
+import {PASSWORD_DETAILS_CLOSE_REASON, PasswordDetails} from "./subComponents/PasswordDetails.js";
 import {params} from "../utils/utils.js";
 
 class PasswordComponent extends MainComponent {
@@ -79,13 +79,15 @@ class PasswordComponent extends MainComponent {
         const {filter} = this.state;
 
         if (filter.customer && filter.customer.id)
-            this.api.getAllPasswords(filter.customer.id, filter.showArchived, filter.showHigherLevel)
-                .then(res => {
-                    if (res.state)
-                        this.setState({passwords: res.data, error: null});
-                    else
-                        this.setState({error: res.error});
-                });
+            this.setState({showSpinner: true}, () => {
+                this.api.getAllPasswords(filter.customer.id, filter.showArchived, filter.showHigherLevel)
+                    .then(res => {
+                        if (res.state)
+                            this.setState({passwords: res.data, error: null, showSpinner: false});
+                        else
+                            this.setState({error: res.error, showSpinner: false});
+                    });
+            })
     }
     copyToClipboard = (item, prop) => {
         const {passwords} = this.state;
@@ -290,13 +292,15 @@ class PasswordComponent extends MainComponent {
             }
         </div>
     }
-    handleModalClose = (password) => {
-        this.getData();
-        this.setState({showModal: false, data: password});
+    handleModalClose = (reason) => {
+        if (reason === PASSWORD_DETAILS_CLOSE_REASON.UPDATED) {
+            this.getData();
+        }
+        this.setState({showModal: false});
     }
 
     render() {
-        const {error, filter, showModal, data, mode} = this.state;
+        const {error, filter} = this.state;
         return <div className="flex-1">
             <Spinner show={this.state.showSpinner}/>
 
@@ -314,14 +318,23 @@ class PasswordComponent extends MainComponent {
             }
             {!error && filter.customer ? this.getDataTable() : null}
             {error ? <h2 style={{color: "red"}}>{error}</h2> : null}
-            <PasswordDetails onClose={this.handleModalClose}
-                             show={showModal}
-                             data={data}
-                             filter={filter}
-                             mode={mode}
-            />
+
+            {this.getPasswordDetails()}
 
         </div>;
+    }
+
+    getPasswordDetails() {
+        const {filter, showModal, data, mode} = this.state;
+        if (!filter.customer) {
+            return '';
+        }
+        return <PasswordDetails onClose={this.handleModalClose}
+                                show={showModal}
+                                data={data}
+                                customerId={filter.customer.id}
+                                mode={mode}
+        />;
     }
 }
 
