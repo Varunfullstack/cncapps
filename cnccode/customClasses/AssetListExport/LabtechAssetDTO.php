@@ -171,7 +171,7 @@ class LabtechAssetDTO
      */
     public function getSerialNumber()
     {
-        return $this->serialNumber;
+        return trim($this->serialNumber);
     }
 
     /**

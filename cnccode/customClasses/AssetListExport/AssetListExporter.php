@@ -145,6 +145,7 @@ class AssetListExporter
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
         $sheet->getStyle($sheet->calculateWorksheetDimension())->getAlignment()->setHorizontal('center');
+
         $writer   = new Xlsx($spreadsheet);
         $fileName = $this->getFileDestinationPath($customerId, $generateWithMonthYear);
         try {
