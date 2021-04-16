@@ -105,8 +105,8 @@ export class RenDomainComponent  extends MainComponent
                 'Domain':d.domain,                
                 'Invoice From':d.invoiceFromDate,
                 'To':d.invoiceToDate,
-                "Cost Price/Annum": poundFormat(order.costAnnum),
-                "Sale Price/Annum": poundFormat(order.saleAnnum),
+                "Cost Price/Annum": poundFormat(d.costAnnum),
+                "Sale Price/Annum": poundFormat(d.saleAnnum),
             }
         })
         exportCSV(exportData,'Domain Names.csv');
