@@ -1,6 +1,10 @@
 <?php
 
 namespace CNCLTD\AssetListExport;
+
+use DateTime;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
+
 class LabtechAssetDTO
 {
     private $isHostServer;
@@ -58,7 +62,7 @@ class LabtechAssetDTO
             $this->computerName = substr($this->computerName, 0, $firstStopPosition);
         }
         if ($this->antivirusDefinition) {
-            $testDate = \DateTime::createFromFormat(DATE_CNC_DATE_FORMAT, $this->antivirusDefinition);
+            $testDate = DateTime::createFromFormat(DATE_CNC_DATE_FORMAT, $this->antivirusDefinition);
             if (!$testDate || $testDate->format(DATE_CNC_DATE_FORMAT) !== $this->antivirusDefinition) {
                 $this->antivirusDefinition = null;
             }
@@ -148,6 +152,16 @@ class LabtechAssetDTO
     public function getWarrantyStartDate()
     {
         return $this->warrantyStartDate;
+    }
+
+    public function getWarrantyStartDateAsOfficeDate()
+    {
+        return $this->getDateAsExcelDate($this->warrantyStartDate);
+    }
+
+    public function getWarrantyEndDateAsOfficeDate()
+    {
+        return $this->getDateAsExcelDate($this->warrantyExpiryDate);
     }
 
     /**
@@ -276,6 +290,19 @@ class LabtechAssetDTO
     public function getLastContact()
     {
         return $this->lastContact;
+    }
+
+    /**
+     * @param $data
+     * @return bool|float|int
+     */
+    private function getDateAsExcelDate($data)
+    {
+        $dateTime = DateTime::createFromFormat('d/m/Y', $data);
+        if (!$dateTime) {
+            return $data;
+        }
+        return Date::PHPToExcel($dateTime->getTimestamp());
     }
 
 }

@@ -145,7 +145,8 @@ class AssetListExporter
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
         $sheet->getStyle($sheet->calculateWorksheetDimension())->getAlignment()->setHorizontal('center');
-
+        $range = Coordinate::stringFromColumnIndex(6) . ":" . Coordinate::stringFromColumnIndex(7);
+        $sheet->getStyle($range)->getNumberFormat()->setFormatCode('dd/mm/yyyy h:mm:ss');
         $writer   = new Xlsx($spreadsheet);
         $fileName = $this->getFileDestinationPath($customerId, $generateWithMonthYear);
         try {
