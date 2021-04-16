@@ -12,6 +12,21 @@ import CustomerSearch from "../shared/CustomerSearch.js";
 import {PASSWORD_DETAILS_CLOSE_REASON, PasswordDetails} from "./subComponents/PasswordDetails.js";
 import {params} from "../utils/utils.js";
 
+const newPasswordItemInitialState = {
+    URL: '',
+    archivedAt: '',
+    archivedBy: '',
+    level: '',
+    notes: '',
+    password: '',
+    passwordID: '',
+    serviceID: '',
+    serviceName: '',
+    sortOrder: '',
+    username: '',
+    salesPassword: false
+};
+
 class PasswordComponent extends MainComponent {
     api = new APIPassword();
 
@@ -22,10 +37,7 @@ class PasswordComponent extends MainComponent {
             showSpinner: false,
             showModal: false,
             types: [],
-            mode: "new",
-            data: {
-                ...this.getInitData()
-            },
+            passwordItem: null,
             filter: {
                 customer: null,
                 showArchived: false,
@@ -55,24 +67,6 @@ class PasswordComponent extends MainComponent {
             }
             this.setState({filter, data, disabled: true});
         }
-    }
-
-    getInitData() {
-
-        return {
-            URL: '',
-            archivedAt: null,
-            archivedBy: null,
-            level: '',
-            notes: '',
-            password: '',
-            passwordID: null,
-            serviceID: '',
-            serviceName: '',
-            sortOrder: '',
-            username: '',
-            salesPassword: false
-        };
     }
 
     getData = () => {
@@ -237,7 +231,6 @@ class PasswordComponent extends MainComponent {
             ]
         }
         return <Table
-            //style={{ marginTop:20}}
             key="passwords"
             pk="passwordID"
             columns={columns}
@@ -246,9 +239,8 @@ class PasswordComponent extends MainComponent {
         >
         </Table>
     }
-    showEditModal = (data) => {
-        this.setState({showModal: true, data, mode: 'edit'});
-
+    showEditModal = (passwordItem) => {
+        this.setState({showModal: true, passwordItem});
     }
     handleDelete = async (type) => {
         const conf = await this.confirm("Are you sure to archive this password?");
@@ -261,15 +253,14 @@ class PasswordComponent extends MainComponent {
 
     handleNewType = () => {
         const {filter} = this.state;
-        const data = {...this.getInitData()};
-        data.customerID = filter.customer.id;
-        this.setState({mode: "insert", showModal: true, data});
+        const passwordItem = {...newPasswordItemInitialState};
+        passwordItem.customerID = filter.customer.id;
+        this.setState({showModal: true, passwordItem});
     }
     handleCustomerSelect = (customer) => {
-        const {data, filter} = this.state;
-        data.customerID = customer.id;
+        const {filter} = this.state;
         filter.customer = customer;
-        this.setState({data, filter}, () => this.getData())
+        this.setState({filter}, () => this.getData())
     }
     getFilter = () => {
         const {filter, error, disabled} = this.state;
@@ -325,15 +316,14 @@ class PasswordComponent extends MainComponent {
     }
 
     getPasswordDetails() {
-        const {filter, showModal, data, mode} = this.state;
-        if (!filter.customer) {
+        const {filter, showModal, passwordItem} = this.state;
+        if (!filter.customer || !passwordItem) {
             return '';
         }
         return <PasswordDetails onClose={this.handleModalClose}
                                 show={showModal}
-                                data={data}
+                                passwordItem={passwordItem}
                                 customerId={filter.customer.id}
-                                mode={mode}
         />;
     }
 }

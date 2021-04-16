@@ -13,12 +13,10 @@ export class PasswordDetails extends MainComponent {
 
     constructor(props) {
         super(props);
+        console.log(this.props.passwordItem);
         this.state = {
             ...this.state,
-            mode: "insert",
-            data: {
-                ...this.getInitData()
-            },
+            passwordItem: this.props.passwordItem,
             services: [],
             passwordLevels: [
                 {level: 0, description: "No Access"},
@@ -35,58 +33,39 @@ export class PasswordDetails extends MainComponent {
         this.getServices();
     }
 
-    getInitData() {
-        return {
-            URL: '',
-            archivedAt: null,
-            archivedBy: null,
-            level: '',
-            notes: '',
-            password: '',
-            passwordID: null,
-            serviceID: '',
-            serviceName: '',
-            sortOrder: '',
-            username: '',
-        };
-    }
-
-
-    static getDerivedStateFromProps(props, state) {
-        if (props.data && state.data && props.data.passwordID != state.data.passwordID)
-            state.data = {...props.data};
-        return state;
-
-    }
-
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if (this.props.customerId !== prevProps.customerId || this.props?.data?.passwordID !== prevProps?.data?.passwordID) {
+        if (this.props.customerId !== prevProps.customerId || this.props?.passwordItem?.passwordID !== prevProps?.passwordItem?.passwordID) {
             this.getServices();
         }
     }
 
     getServices = () => {
-        const {services, data} = this.state;
+        const {services, passwordItem} = this.state;
         const {customerId} = this.props;
         if (services.length == 0 && customerId)
-            this.api.getServices(customerId, data.passwordID).then(res => {
+            this.api.getServices(customerId, passwordItem.passwordID).then(res => {
                 this.setState({services: res.data});
             })
     }
+
+    setValue = (prop, value) => {
+        this.setState({passwordItem: {...this.state.passwordItem, [prop]: value}})
+    }
+
     getModalElement = () => {
-        const {data, services, passwordLevels} = this.state;
-        const {mode} = this.props;
+        const {passwordItem, services, passwordLevels} = this.state;
+
         return <Modal
             width={500}
             show={this.props.show}
-            title={mode == "new" ? "Add New Password" : "Edit Password"}
+            title={passwordItem.passwordID ? "Edit Password" : "Add New Password"}
             onClose={this.hideModal}
             content={
                 <div key="content">
 
                     <div className="form-group">
                         <label>User Name</label>
-                        <input value={data.username || ''}
+                        <input value={passwordItem.username || ''}
                                type="text"
                                className="form-control"
                                onChange={(event) => this.setValue("username", event.target.value)}
@@ -95,7 +74,7 @@ export class PasswordDetails extends MainComponent {
                     <div className="form-group">
                         <label>Service</label>
                         <select className="form-control"
-                                value={data.serviceID || ''}
+                                value={passwordItem.serviceID || ''}
                                 onChange={(event) => this.setValue("serviceID", event.target.value)}
                         >
                             <option>No Service</option>
@@ -106,7 +85,7 @@ export class PasswordDetails extends MainComponent {
                     </div>
                     <div className="form-group">
                         <label>Password</label>
-                        <input value={data.password || ''}
+                        <input value={passwordItem.password || ''}
                                type="text"
                                className="form-control"
                                onChange={(event) => this.setValue("password", event.target.value)}
@@ -114,7 +93,7 @@ export class PasswordDetails extends MainComponent {
                     </div>
                     <div className="form-group">
                         <label>Notes</label>
-                        <input value={data.notes || ''}
+                        <input value={passwordItem.notes || ''}
                                type="text"
                                className="form-control"
                                onChange={(event) => this.setValue("notes", event.target.value)}
@@ -122,7 +101,7 @@ export class PasswordDetails extends MainComponent {
                     </div>
                     <div className="form-group">
                         <label>URL</label>
-                        <input value={data.URL || ''}
+                        <input value={passwordItem.URL || ''}
                                type="text"
                                className="form-control"
                                onChange={(event) => this.setValue("URL", event.target.value)}
@@ -132,7 +111,7 @@ export class PasswordDetails extends MainComponent {
                     <div className="form-group">
                         <label>Level</label>
                         <select className="form-control required"
-                                value={data.level}
+                                value={passwordItem.level}
                                 onChange={(event) => this.setValue("level", event.target.value)}
                         >
                             <option>Select a Level</option>
@@ -142,13 +121,13 @@ export class PasswordDetails extends MainComponent {
                         </select>
                     </div>
                     <div className="form-group">
-                        <label>Sales password</label>
-                        <input value={1}
-                               defaultChecked={data.salesPassword}
-                               type="checkbox"
-                               className="form-control"
-                               onChange={(event) => this.setValue("salesPassword", event.target.checked)}
-                        />
+                        <label>Sales password {passwordItem.salesPassword}
+                            <input value={1}
+                                   checked={passwordItem.salesPassword}
+                                   type="checkbox"
+                                   onChange={(event) => this.setValue("salesPassword", event.target.checked)}
+                            />
+                        </label>
                     </div>
                 </div>
             }
@@ -167,17 +146,16 @@ export class PasswordDetails extends MainComponent {
     hideModal = (reason = PASSWORD_DETAILS_CLOSE_REASON.CANCELLED) => {
         if (this.props.onClose)
             this.props.onClose(reason);
-        this.setState({data: {...this.getInitData()}})
     }
     handleSave = () => {
-        const {data} = this.state;
+        const {passwordItem} = this.state;
 
-        if (data.level == "") {
+        if (passwordItem.level == "") {
             this.alert("Level required.");
             return;
         }
-        data.customerID = this.props.data.customerID;
-        this.api.updatePassword(data)
+        passwordItem.customerID = this.props.passwordItem.customerID;
+        this.api.updatePassword(passwordItem)
             .then((result) => {
                 if (result.state) {
                     this.setState({showModal: false});
