@@ -59,7 +59,7 @@ class GatherFixedInformationComponent extends MainComponent {
 
         const {data} = this.state;
         data.rootCauseID = activity.rootCauseID;
-        data.contractCustomerItemID = activity.contractCustomerItemID || "99";
+        data.contractCustomerItemID = "99";
         if (!params.get("resolutionSummary")) {
             data.resolutionSummaryDefault = initialActivity?.reason;
             data.resolutionSummary = data.resolutionSummaryDefault;
