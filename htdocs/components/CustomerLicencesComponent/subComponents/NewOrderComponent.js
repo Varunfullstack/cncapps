@@ -60,11 +60,14 @@ class NewOrderComponent extends React.Component {
             });
 
             productList = productList.map((p) => {
-                const streamProduct = streamOneProducts.BodyText.productDetails.filter(
-                    (s) => s.sku == p.sku
-                );
-                if (streamProduct.length > 0) {
-                    p = {...p, ...streamProduct[0]};
+                if(streamOneProducts.Result=='Success')
+                {
+                    const streamProduct = streamOneProducts.BodyText.productDetails.filter(
+                        (s) => s.sku == p.sku
+                    );
+                    if (streamProduct.length > 0) {
+                        p = {...p, ...streamProduct[0]};
+                    }
                 }
                 p.quantity = 0;
                 return p;
