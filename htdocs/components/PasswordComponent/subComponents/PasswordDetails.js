@@ -152,6 +152,10 @@ export class PasswordDetails extends MainComponent {
     handleSave = () => {
         const {passwordItem} = this.state;
 
+        if (passwordItem.level === "") {
+            this.alert("Level required.");
+            return;
+        }
         passwordItem.customerID = this.props.passwordItem.customerID;
 
         this.api.updatePassword(passwordItem)
