@@ -43,6 +43,7 @@ class PasswordComponent extends MainComponent {
                 showArchived: false,
                 showHigherLevel: false
             },
+            customerId: null,
             passwords: [],
             error: null,
             disabled: false
@@ -56,16 +57,16 @@ class PasswordComponent extends MainComponent {
     }
 
     checkParams = () => {
-        const customerID = params.get("customerID");
-        if (customerID && customerID != '') {
-            const {filter, data} = this.state;
-            data.customerID = customerID;
+        const customerId = params.get("customerID");
+        if (customerId && customerId != '') {
+            const {filter} = this.state;
+
             filter.customer = {
-                id: customerID,
+                id: customerId,
                 showArchived: false,
                 showHigherLevel: false
             }
-            this.setState({filter, data, disabled: true});
+            this.setState({filter, customerId, disabled: true});
         }
     }
 
@@ -252,9 +253,8 @@ class PasswordComponent extends MainComponent {
     }
 
     handleNewPassword = () => {
-        const {filter} = this.state;
-        const passwordItem = {...newPasswordItemInitialState};
-        passwordItem.customerID = filter.customer.id;
+        const { customerId} = this.state;
+        const passwordItem = {...newPasswordItemInitialState, customerID: customerId};
         this.setState({showModal: true, passwordItem});
     }
     handleCustomerSelect = (customer) => {
