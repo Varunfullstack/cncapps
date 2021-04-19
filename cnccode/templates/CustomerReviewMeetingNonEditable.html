@@ -37,8 +37,8 @@
         // graphData['renderServerCare'] ? drawChart('serverCareIncidents') : '';
         // drawChart('serviceDesk');
         // drawChart('otherContracts');
-        // drawChart('totalSR');
-        // drawChart('historicTotalSR');
+         drawChart('totalSR');
+         drawChart('historicTotalSR');
         console.log('hasServiceDesk', hasServiceDesk);
         if (hasServiceDesk == "1") {
             drawChart('firstTimeFixRequests', 'pie', 300, 400);
@@ -66,9 +66,7 @@
             width: width,
 
             titleTextStyle: {
-                color: 'gray',    // any HTML string color ('red', '#cc00cc')
-                fontName: 'Times New Roman', // i.e. 'Times New Roman'
-                fontSize: 16, // 12, 18 whatever you want (don't specify px)
+               
                 bold: true,    // true or false
                 italic: false  // true of false
             }
@@ -183,8 +181,8 @@
                 </td>
                 <td class="content">{notes}{coveredItemsString}</td>
                 <td class="content text-center">{quantity}</td>
-                <td class="content">{directDebit}</td>
-                <td class="contentRightAlign" align="right">{salePrice}
+                <td class="content text-center">{directDebit}</td>
+                <td class="text-center" align="right">{salePrice}
                 </td>
             </tr>
             <!-- END itemBlock -->

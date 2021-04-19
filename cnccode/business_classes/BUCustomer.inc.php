@@ -1789,5 +1789,7 @@ WHERE problem.`pro_custno` <> 282
         "endDate"=>$endDate->format('Y-m-d')
         ]);
     }
-    
+    public function getCustomerUnsupportedServers($customerID){
+        return DBConnect::fetchAll("SELECT assetName serverName FROM  unsupportedcustomerasset WHERE customerId=:customerId",["customerId"=>$customerID]);       
+    }
 }

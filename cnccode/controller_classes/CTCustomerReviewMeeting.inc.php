@@ -1107,12 +1107,45 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             );
 
         } // end while
+       
+        //-------------start servers not supported
+        $serverCareContractsTemplate->set_block(
+            'serverCareContracts',
+            'serversNotSupportedItemsBlock',
+            'items2'
+        );
+        $buCustomer=new BUCustomer($this);
+        $servers=$buCustomer->getCustomerUnsupportedServers($customerId);
+        if(!count($servers))
+        {
+            $serverCareContractsTemplate->set_var(
+                [
+                    'hasServersNotSupport'      => "none"
+                ]
+            );
+        }
+        for($i=0;$i<count($servers); $i++){             
+            $serverCareContractsTemplate->set_var(
+                array(                    
+                    'serverName'      => $servers[$i]["serverName"],                    
+                )
+            );
+            $serverCareContractsTemplate->parse(
+                'items2',
+                'serversNotSupportedItemsBlock',
+                true
+            );            
+        }
+         //------------end
+         //----parse template
         $serverCareContractsTemplate->parse(
             'output',
             'serverCareContracts',
             true
         );
-
+       
+        
+       
         return $serverCareContractsTemplate->get_var('output');
 
     }
@@ -1379,7 +1412,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
         ];
 
         $totalSR = [
-            "title"   => "Total SRs",
+            "title"   => "Total Service Requests",
             "columns" => ["Dates", "P1-3", "P4",],
             "data"    => []
         ];
@@ -1421,7 +1454,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             $historicTotalSR['data'][] = $row;
         }
 
-/*
+
         foreach ($data as $datum) {
 
 
@@ -1484,7 +1517,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             ];
 
             $totalSR['data'][] = $row;
-        }*/
+        }
         $BUCustomerItem = new BUCustomerItem($this);
         /** @var DataSet $datasetContracts */
         $datasetContracts = null;
@@ -1694,13 +1727,13 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
         $output = curl_exec($ch);
         $items=json_decode($output, true);
         $keys=[
-            "Total SRs Raised"=>["key"=>"raised","sum"=>true],
-            "Response SLA"=>["key"=>"sla","sum"=>true],
-            "Average Response Time"=>["key"=>"responseTime","sum"=>false],
-            "% of Response SLAs Met"=>["key"=>"slaMet","sum"=>false],
-            ($penaltiesAgreed?"Fix SLA":"Fix OLA")=>["key"=>"fixSLA","sum"=>true],
-            "Average Fix Time (Awaiting CNC)"=>["key"=>"avgTimeAwaitingCNC","sum"=>false],
-            "Average Time from Initial to Fixed"=>["key"=>"avgTimeFromRaiseToFixHours","sum"=>false],
+            "Total SRs Raised"=>["key"=>"raised","sum"=>true,"percent"=>false],
+            "Response SLA"=>["key"=>"sla","sum"=>true,"percent"=>false],
+            "Average Response Time"=>["key"=>"responseTime","sum"=>false,"percent"=>false],
+            "% of Response SLAs Met"=>["key"=>"slaMet","sum"=>false,"percent"=>true],
+            ($penaltiesAgreed?"Fix SLA":"Fix OLA")=>["key"=>"fixSLA","sum"=>true,"percent"=>false],
+            "Average Fix Time (Awaiting CNC)"=>["key"=>"avgTimeAwaitingCNC","sum"=>false,"percent"=>false],
+            "Average Time from Initial to Fixed"=>["key"=>"avgTimeFromRaiseToFixHours","sum"=>false,"percent"=>false],
 
         ];
         foreach($keys as $key=>$value)
@@ -1713,15 +1746,18 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             $allValue=$sum;
             if(!$value["sum"])
                 $allValue=$sum>0?$sum/count($items):0;
-            ;
+            ;            
+            $percent=1;
+            if($value["percent"])
+            $percent=100;
             $template->set_var(
                 array(
                     'description'       => $key,
-                    'p1Value'           =>round($items[0][$column]??0,2),
-                    'p2Value'           =>round($items[1][$column]??0,2),
-                    'p3Value'           =>round($items[2][$column]??0,2),
-                    'p4Value'           =>round($items[3][$column]??0,2),
-                    'allValue'          =>round($allValue,2),
+                    'p1Value'           =>round(($items[0][$column]??0)*$percent,2),
+                    'p2Value'           =>round(($items[1][$column]??0)*$percent,2),
+                    'p3Value'           =>round(($items[2][$column]??0)*$percent,2),
+                    'p4Value'           =>round(($items[3][$column]??0)*$percent,2),
+                    'allValue'          =>round($allValue*$percent,2),
                  )
             );
             $template->parse(
