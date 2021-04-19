@@ -1457,7 +1457,8 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
 
         foreach ($data as $datum) {
 
-
+            if(isset($datum['monthName']))
+            {
             $row = [
                 substr(
                     $datum['monthName'],
@@ -1515,7 +1516,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
                 $datum['otherCount1And3'] + $datum['serviceDeskCount1And3'] + $datum['serverCareCount1And3'] + $datum['prepayCount1And3'],
                 $datum['otherCount4'] + $datum['serviceDeskCount4'] + $datum['serverCareCount4'] + $datum['prepayCount4'],
             ];
-
+        }
             $totalSR['data'][] = $row;
         }
         $BUCustomerItem = new BUCustomerItem($this);
@@ -1732,8 +1733,8 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             "Average Response Time"=>["key"=>"responseTime","sum"=>false,"percent"=>false],
             "% of Response SLAs Met"=>["key"=>"slaMet","sum"=>false,"percent"=>true],
             ($penaltiesAgreed?"Fix SLA":"Fix OLA")=>["key"=>"fixSLA","sum"=>true,"percent"=>false],
-            "Average Fix Time (Awaiting CNC)"=>["key"=>"avgTimeAwaitingCNC","sum"=>false,"percent"=>false],
-            "Average Time from Initial to Fixed"=>["key"=>"avgTimeFromRaiseToFixHours","sum"=>false,"percent"=>false],
+            "Average Fix Time"=>["key"=>"avgTimeAwaitingCNC","sum"=>false,"percent"=>false],
+            //"Average Time from Initial to Fixed"=>["key"=>"avgTimeFromRaiseToFixHours","sum"=>false,"percent"=>false],
 
         ];
         foreach($keys as $key=>$value)
@@ -1749,7 +1750,10 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             ;            
             $percent=1;
             if($value["percent"])
-            $percent=100;
+                $percent=100;
+            $newLine="none";
+            if($value["key"]=="raised"||$value["key"]=="slaMet")
+                $newLine="";
             $template->set_var(
                 array(
                     'description'       => $key,
@@ -1758,6 +1762,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
                     'p3Value'           =>round(($items[2][$column]??0)*$percent,2),
                     'p4Value'           =>round(($items[3][$column]??0)*$percent,2),
                     'allValue'          =>round($allValue*$percent,2),
+                    'newLine'           =>$newLine
                  )
             );
             $template->parse(

@@ -7,7 +7,6 @@
     .sla-table {
         margin-top: 20px;
         border: none;
-
         border-collapse: collapse;
 
     }
@@ -37,8 +36,8 @@
         // graphData['renderServerCare'] ? drawChart('serverCareIncidents') : '';
         // drawChart('serviceDesk');
         // drawChart('otherContracts');
-         drawChart('totalSR');
-         drawChart('historicTotalSR');
+         drawChart('totalSR','line',400);
+         drawChart('historicTotalSR','line',400);
         console.log('hasServiceDesk', hasServiceDesk);
         if (hasServiceDesk == "1") {
             drawChart('firstTimeFixRequests', 'pie', 300, 400);
@@ -64,17 +63,17 @@
             legend: { position: 'bottom' },
             height: height,
             width: width,
-
-            titleTextStyle: {
-               
+            titleTextStyle: {               
                 bold: true,    // true or false
                 italic: false  // true of false
             }
         };
         var chart = null;
         switch (type) {
-            case 'line':
+            case 'line':             
                 chart = new google.visualization.LineChart(document.getElementById(chartName));
+                //options["legend"] = { position: 'none' };
+
                 break;
             case 'pie':
                 chart = new google.visualization.PieChart(document.getElementById(chartName));
@@ -193,15 +192,15 @@
     <h2>Support Analyses
     </h2>
 
-    <table class="collapse">
+    <table class="collapse" style="width: 600px;">
         <tbody>
             <tr>
-                <th style="text-align: left;">SR Priority</th>
-                <td style="text-align: center;">1</td>
-                <td style="text-align: center;">2</td>
-                <td style="text-align: center;">3</td>
-                <td style="text-align: center;">4</td>
-                <td style="text-align: center;">5</td>
+                <th style="text-align: left; width:150px">SR Priority</th>
+                <td style="text-align: center;  width:50px">1</td>
+                <td style="text-align: center;  width:50px">2</td>
+                <td style="text-align: center;  width:50px">3</td>
+                <td style="text-align: center;  width:50px">4</td>
+                <td style="text-align: center;  width:50px">5</td>
             </tr>
 
             <tr>
@@ -215,7 +214,7 @@
         </tbody>
     </table>
 
-    <table class="sla-table">
+    <table class="sla-table" style="width: 90%;">
         <thead>
             <tr>
                 <th></th>
@@ -229,12 +228,16 @@
         <tbody>
             <!-- BEGIN customerSLABlock -->
             <tr>
-                <td style="text-align: right;">{description}</td>
+                <td style="text-align: right;">{description}                
+                </td>
                 <td class="text-center">{p1Value}</td>
                 <td class="text-center">{p2Value}</td>
                 <td class="text-center">{p3Value}</td>
                 <td class="text-center">{p4Value}</td>
                 <td class="text-center">{allValue}</td>
+            </tr>
+            <tr style="display:{newLine}">
+                <td><br></td>
             </tr>
             <!-- END customerSLABlock -->
 
@@ -254,24 +257,33 @@
     <div id="otherContracts"></div>
 </div>
 
+
+
 <div class="reportSection">
-    <div id="totalSR"></div>
+    <div class="subSection">
+        <div id="totalSR"></div>
+    </div>
+    <div class="subSection">
+        <div id="historicTotalSR"></div>
+    </div>    
+    <div  class="subSection" style="display: flex; flex-direction: row;">
+        <table class="sla-table">
+            <tr>
+                <td>
+                    <div id="firstTimeFixRequests" ></div>
+                </td>
+                <td>
+                    <div id="sourceOfRequests" ></div>
+                </td>
+            </tr>
+        </table>
+        
+        
+    </div>
 </div>
 
 <div class="reportSection">
-    <div id="historicTotalSR"></div>
-</div>
-<div class="reportSection">
-    <table class="sla-table">
-        <tr>
-            <td>
-                <div id="firstTimeFixRequests"></div>
-            </td>
-            <td>
-                <div id="sourceOfRequests"></div>
-            </td>
-        </tr>
-    </table>
+   
     <div class="subSection">
         <h3>Service Request Count By User - {reportDate}</h3>
         <table class="collapse requestCount">
@@ -308,8 +320,8 @@
                 <!-- BEGIN rootCauseBlock -->
                 <tr>
 
-                    <td style="padding: 0.2rem;">{srRootCauseDescription}</td>
-                    <td style="padding: 0.2rem;" class="text-center">{srCount}</td>
+                    <td style="padding: 0.4rem 0.5rem ">{srRootCauseDescription}</td>
+                    <td style="padding: 0.4rem 1.8rem " class="text-center">{srCount}</td>
 
                     <!-- END rootCauseBlock -->
                 </tr>
