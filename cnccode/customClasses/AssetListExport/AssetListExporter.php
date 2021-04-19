@@ -145,8 +145,7 @@ class AssetListExporter
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
         $sheet->getStyle($sheet->calculateWorksheetDimension())->getAlignment()->setHorizontal('center');
-        $range = Coordinate::stringFromColumnIndex(6) . ":" . Coordinate::stringFromColumnIndex(7);
-        $sheet->getStyle($range)->getNumberFormat()->setFormatCode('dd/mm/yyyy h:mm:ss');
+        $this->setDateFormats($sheet);
         $writer   = new Xlsx($spreadsheet);
         $fileName = $this->getFileDestinationPath($customerId, $generateWithMonthYear);
         try {
@@ -535,6 +534,19 @@ class AssetListExporter
             $fileDescription = "Asset List - {$date->format('F Y')}.xlsx";
         }
         return $folderName . $fileDescription;
+    }
+
+    /**
+     * @param Worksheet $sheet
+     */
+    private function setDateFormats(Worksheet $sheet): void
+    {
+        $range = Coordinate::stringFromColumnIndex(6) . ":" . Coordinate::stringFromColumnIndex(7);
+        $sheet->getStyle($range)->getNumberFormat()->setFormatCode('dd/mm/yyyy h:mm:ss');
+        $range = Coordinate::stringFromColumnIndex(4) . ":" . Coordinate::stringFromColumnIndex(4);
+        $sheet->getStyle($range)->getNumberFormat()->setFormatCode('dd/mm/yyyy h:mm:ss');
+        $range = Coordinate::stringFromColumnIndex(16) . ":" . Coordinate::stringFromColumnIndex(16);
+        $sheet->getStyle($range)->getNumberFormat()->setFormatCode('dd/mm/yyyy');
     }
 
 

@@ -292,6 +292,11 @@ class LabtechAssetDTO
         return $this->lastContact;
     }
 
+    public function lastContactAsExcelDate()
+    {
+        return $this->getDateAsExcelDate($this->lastContact);
+    }
+
     /**
      * @param $data
      * @return bool|float|int

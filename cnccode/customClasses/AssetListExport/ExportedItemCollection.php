@@ -4,6 +4,7 @@ namespace CNCLTD\AssetListExport;
 
 use DateTime;
 use PDO;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class ExportedItemCollection
 {
@@ -302,7 +303,7 @@ ORDER BY location, operatingSystem desc, computerName';
                 $isServer      = $supportDates[\DBEOSSupportDates::isServer];
                 $dateString    = $supportDates[\DBEOSSupportDates::endOfLifeDate];
                 $dateTime      = \DateTime::createFromFormat(DATE_MYSQL_DATE, $dateString);
-                $endOfLifeDate = $dateTime->format(DATE_CNC_DATE_FORMAT);
+                $endOfLifeDate = Date::PHPToExcel($dateTime->getTimestamp());
                 if (isset($supportDates[\DBEOSSupportDates::friendlyName])) {
                     $operatingSystemString = "{$operatingSystemString} ({$supportDates[\DBEOSSupportDates::friendlyName]})";
                 }
@@ -311,7 +312,7 @@ ORDER BY location, operatingSystem desc, computerName';
                 $labtechDatum->getLocation(),
                 $labtechDatum->getComputerName(),
                 $labtechDatum->getLastUser(),
-                $labtechDatum->getLastContact(),
+                $labtechDatum->lastContactAsExcelDate(),
                 $labtechDatum->getModel(),
                 $labtechDatum->getWarrantyStartDateAsOfficeDate(),
                 $labtechDatum->getWarrantyEndDateAsOfficeDate(),
