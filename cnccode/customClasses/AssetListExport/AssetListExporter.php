@@ -15,6 +15,7 @@ use DBEPortalCustomerDocument;
 use Exception;
 use PDO;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
@@ -347,7 +348,7 @@ class AssetListExporter
         if (!$lastContactDateTime || $lastContactDateTime == "N/A") {
             return null;
         }
-        $date = DateTime::createFromFormat(DATE_CNC_DATE_TIME_FORMAT, $lastContactDateTime);
+        $date = Date::excelToDateTimeObject($lastContactDateTime);
         $date->add(new DateInterval('P' . $this->offlineAgentThresholdDays . 'D'));
         $today = new DateTime();
         if ($date > $today) {
@@ -542,10 +543,12 @@ class AssetListExporter
     private function setDateFormats(Worksheet $sheet): void
     {
         $range = Coordinate::stringFromColumnIndex(6) . ":" . Coordinate::stringFromColumnIndex(7);
-        $sheet->getStyle($range)->getNumberFormat()->setFormatCode('dd/mm/yyyy h:mm:ss');
+        $sheet->getStyle($range)->getNumberFormat()->setFormatCode('dd/mm/yyyy');
         $range = Coordinate::stringFromColumnIndex(4) . ":" . Coordinate::stringFromColumnIndex(4);
         $sheet->getStyle($range)->getNumberFormat()->setFormatCode('dd/mm/yyyy h:mm:ss');
         $range = Coordinate::stringFromColumnIndex(16) . ":" . Coordinate::stringFromColumnIndex(16);
+        $sheet->getStyle($range)->getNumberFormat()->setFormatCode('dd/mm/yyyy');
+        $range = Coordinate::stringFromColumnIndex(20) . ":" . Coordinate::stringFromColumnIndex(20);
         $sheet->getStyle($range)->getNumberFormat()->setFormatCode('dd/mm/yyyy');
     }
 

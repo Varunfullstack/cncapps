@@ -35,17 +35,17 @@ class ExportedItemCollection
   SUBSTRING_INDEX(lastusername, "\\\\", - 1) AS lastUser,
    DATE_FORMAT(
     computers.lastContact,
-    "%d/%m/%Y %H:%i:%s"
+    "%Y-%m-%d %H:%i:%s"
   ) AS lastContact,
   inv_chassis.productname AS model,
  IF(inv_chassis.productname LIKE "%VMware%", "Not Applicable",COALESCE(
      (SELECT
-        DATE_FORMAT(STR_TO_DATE(`plugin_sd_warranty_looker_upper_lookups`.`start_date`,"%c/%e/%Y"),"%d/%m/%Y") 
+        DATE_FORMAT(STR_TO_DATE(`plugin_sd_warranty_looker_upper_lookups`.`start_date`,"%c/%e/%Y"),"%Y-%m-%d 00:00:00") 
       FROM
         plugin_sd_warranty_looker_upper_lookups
       WHERE plugin_sd_warranty_looker_upper_lookups.`computerid` = computers.computerid ), "Unknown")) AS warrantyStartDate,
   IF(inv_chassis.productname LIKE "%VMware%", "Not Applicable",COALESCE((SELECT
-        DATE_FORMAT(STR_TO_DATE(`plugin_sd_warranty_looker_upper_lookups`.`end_date`,"%c/%e/%Y"),"%d/%m/%Y") 
+        DATE_FORMAT(STR_TO_DATE(`plugin_sd_warranty_looker_upper_lookups`.`end_date`,"%c/%e/%Y"),"%Y-%m-%d 00:00:00") 
       FROM
         plugin_sd_warranty_looker_upper_lookups
       WHERE plugin_sd_warranty_looker_upper_lookups.`computerid` = computers.computerid), "Unknown")) AS warrantyExpiryDate,
@@ -107,9 +107,13 @@ IF(
   ) AS "isAzureADJoined",
        SUBSTRING_INDEX(REPLACE(REPLACE(sf.`Name`, "Microsoft Office ",""),"Microsoft 365","365")," - ",1) AS officeVersion,
   virusscanners.name AS antivirus,
-  DATE_FORMAT(
-    STR_TO_DATE(computers.VirusDefs, "%Y%m%d"),
-    "%d/%m/%Y"
+  IF(
+    virusscanners.name IS NOT NULL,
+    DATE_FORMAT(
+      STR_TO_DATE(computers.VirusDefs, "%Y%m%d"),
+      "%Y-%m-%d 00:00:00"
+    ),
+    NULL
   ) AS antivirusDefinition
 FROM
   computers 
@@ -200,15 +204,15 @@ SELECT
       `plugin_sd_warranty_looker_upper_esx_lookups`.`start_date`,
       "%c/%e/%Y"
     ),
-    "%d/%m/%Y"
+    "%Y-%m-%d 00:00:00"
   ) AS warrantyStartDate,
   DATE_FORMAT(
     STR_TO_DATE(
       `plugin_sd_warranty_looker_upper_esx_lookups`.`end_date`,
       "%c/%e/%Y"
     ),
-    "%d/%m/%Y"
-  ) AS warrantyStartDate,
+    "%Y-%m-%d 00:00:00"
+  ) AS warrantyExpiryDate,
   ROUND(
     TIMESTAMPDIFF(
       YEAR,
@@ -273,7 +277,7 @@ FROM
     ON clients.`ClientID` = locations.`ClientID`
     WHERE `clients`.`ExternalID` = ?
 GROUP BY plugin_vm_esxhosts.`DeviceId`
-ORDER BY location, operatingSystem desc, computerName';
+ORDER BY location, operatingSystem DESC, computerName';
         $statement            = $labTechDB->prepare($query);
         $queryExecutionResult = $statement->execute(
             [$customer->getValue(\DBECustomer::customerID), $customer->getValue(\DBECustomer::customerID)]
@@ -328,7 +332,7 @@ ORDER BY location, operatingSystem desc, computerName';
                 $labtechDatum->getDomain(),
                 $labtechDatum->getOfficeVersion(),
                 $labtechDatum->getAntivirus(),
-                $labtechDatum->getAntivirusDefinition()
+                $labtechDatum->antivirusDefinitionAsExcelDate()
             ];
             $this->customerData[] = $genericRow;
             $summaryRow           = array_merge([$customer->getValue(\DBECustomer::name)], $genericRow);

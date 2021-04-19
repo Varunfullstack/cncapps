@@ -62,8 +62,8 @@ class LabtechAssetDTO
             $this->computerName = substr($this->computerName, 0, $firstStopPosition);
         }
         if ($this->antivirusDefinition) {
-            $testDate = DateTime::createFromFormat(DATE_CNC_DATE_FORMAT, $this->antivirusDefinition);
-            if (!$testDate || $testDate->format(DATE_CNC_DATE_FORMAT) !== $this->antivirusDefinition) {
+            $testDate = DateTime::createFromFormat(DATE_MYSQL_DATETIME, $this->antivirusDefinition);
+            if (!$testDate || $testDate->format(DATE_MYSQL_DATETIME) !== $this->antivirusDefinition) {
                 $this->antivirusDefinition = null;
             }
         }
@@ -260,6 +260,11 @@ class LabtechAssetDTO
         return $this->antivirusDefinition;
     }
 
+    public function antivirusDefinitionAsExcelDate()
+    {
+        return $this->getDateAsExcelDate($this->antivirusDefinition);
+    }
+
     /**
      * @return mixed
      */
@@ -303,10 +308,11 @@ class LabtechAssetDTO
      */
     private function getDateAsExcelDate($data)
     {
-        $dateTime = DateTime::createFromFormat('d/m/Y', $data);
+        $dateTime = DateTime::createFromFormat('Y-m-d H:i:s', $data);
         if (!$dateTime) {
             return $data;
         }
+
         return Date::PHPToExcel($dateTime->getTimestamp());
     }
 
