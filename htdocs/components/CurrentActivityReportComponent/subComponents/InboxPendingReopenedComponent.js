@@ -27,6 +27,7 @@ class InboxPendingReopenedComponent extends MainComponent {
         );
     };
     processPendingReopened = async (problem, code) => {
+        console.log(problem);
         if (code == 'R' && !(await this.confirm("Are you sure you want to reopen?"))) return;
         if (code == 'D' && !(await this.confirm("Are you sure you want to delete?"))) return;
 

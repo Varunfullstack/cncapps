@@ -284,8 +284,8 @@ class CTSRActivity extends CTCNC
         $dbeSite->getRowByCustomerIDSiteNo();
         $buActivity      = new BUActivity($this);
         $buUser          = new BUUser($this);
-        $address         = $dbeCustomer->getCustomerSiteAddress($customerId,$siteId);
-        $what3Words      = $address?$address['what3Words']:null;
+        $address         = $dbeCustomer->getCustomerSiteAddress($customerId, $siteId);
+        $what3Words      = $address ? $address['what3Words'] : null;
         $dbeLastActivity = $buActivity->getLastActivityInProblem($problemID);
         if ($dbeLastActivity->getValue(DBEJCallActivity::callActTypeID) == 0 && $dbeLastActivity->getValue(
                 DBEJCallActivity::userID
@@ -388,8 +388,8 @@ class CTSRActivity extends CTCNC
             $taskListUpdatedBy = $consultants[$taskListUpdatedByUserId];
         }
         $currentLoggedInUser             = $this->getDbeUser();
-        $callback            = new DBECallback($this);
-        $pendingCallbacks    = $callback->pendingCallbackCountForServiceRequest($problemID);
+        $callback                        = new DBECallback($this);
+        $pendingCallbacks                = $callback->pendingCallbackCountForServiceRequest($problemID);
         $unsupportedCustomerAssetService = new UnsupportedCustomerAssetService();
         return [
             "callActivityID"                  => $callActivityID,
@@ -1702,14 +1702,17 @@ FROM
             "data"   => (bool)$count
         ];
     }
+
     function getPendingReopenedRequest()
     {
-        $id=@$_REQUEST["id"];
-        if(empty($id))
+        $id = @$_REQUEST["id"];
+        if (empty($id)) {
             return null;
+        }
         $pendingReopenedRequest = $this->buActivity->getPendingReopenedRequests($id);
-        if ($pendingReopenedRequest)
-                return json_encode($pendingReopenedRequest,JSON_NUMERIC_CHECK);
+        if ($pendingReopenedRequest) {
+            return json_encode($pendingReopenedRequest, JSON_NUMERIC_CHECK);
+        }
         return null;
     } // end function display
 }

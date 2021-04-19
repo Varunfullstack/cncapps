@@ -67,7 +67,6 @@ require_once($cfg['path_dbe'] . '/DBECallDocumentWithoutFile.php');
 require_once($cfg["path_ct"] . "/CTProject.inc.php");
 require_once($cfg ["path_bu"] . "/BUProblemRaiseType.inc.php");
 require_once($cfg["path_dbe"] . "/DBConnect.php");
-
 define(
     'BUACTIVITY_RESOLVED',
     9
@@ -3020,6 +3019,7 @@ class BUActivity extends Business
                 return 'Projects';
         }
     }
+
     public function getQueueTeamLevel($queueID)
     {
         switch ($queueID) {
@@ -5472,8 +5472,8 @@ class BUActivity extends Business
                     <TD nowrap
                         style="background-color:#E0DFE3"
                     ><A
-                                href="<?= SITE_URL ?>/SRActivity.php?action=displayActivity&callActivityID=<?= $this->dbeCallActivitySearch->getPKValue(
-                                ); ?>"
+                            href="<?= SITE_URL ?>/SRActivity.php?action=displayActivity&callActivityID=<?= $this->dbeCallActivitySearch->getPKValue(
+                            ); ?>"
                         ><?php
                             echo $this->dbeCallActivitySearch->getPKValue();
                             ?></A>
@@ -6341,7 +6341,6 @@ class BUActivity extends Business
             DBEJProblem::contractCustomerItemID,
             $serviceRequestCustomerItemID
         );
-
         $emailSubjectSummary = $dsInput->getValue(CTSalesOrder::emailSubjectSummary);
         if (!$emailSubjectSummary) {
             $emailSubjectSummary = $this->getSuitableEmailSubjectSummary($ordheadID, $selectedOrderLine);
@@ -6682,9 +6681,9 @@ class BUActivity extends Business
     /**
      * @return mixed
      */
-    function getPendingReopenedRequests($id=null)
+    function getPendingReopenedRequests($id = null)
     {
-         $queryString = "SELECT
+        $queryString = "SELECT
         pendingReopened.id,
         problemID,
         contactID,
@@ -6700,15 +6699,12 @@ class BUActivity extends Business
         LEFT JOIN problem ON pendingReopened.problemID = problem.`pro_problemno`
         LEFT JOIN customer ON problem.pro_custno = customer.`cus_custno`
         ";
-        if(!$id)
-        {
+        if (!$id) {
             return DBConnect::fetchAll($queryString);
+        } else {
+            $queryString .= " where pendingReopened.id = :id";
+            return DBConnect::fetchOne($queryString, ["id" => $id]);
         }
-        else
-        {
-            return DBConnect::fetchOne($queryString);
-        }
-      
     }
 
     function getCustomerRaisedRequests()
@@ -8766,7 +8762,7 @@ class BUActivity extends Business
         if ($dsCallActivity->getValue(DBEJCallActivity::startTime) < '12:00') {
             $visitActivityTimeOfTheDay = 'morning';
         }
-        $data            = new SiteVisitDTO(
+        $data       = new SiteVisitDTO(
             $dsCallActivity->getValue(DBEJCallActivity::contactFirstName),
             $dsCallActivity->getValue(DBEJCallActivity::userName),
             $dsSite->getValue(DBESite::add1),
@@ -8779,21 +8775,19 @@ class BUActivity extends Business
             trim($dsCallActivity->getValue(DBEJCallActivity::customerSummary)),
             $serviceRequestId,
         );
-        $bcc             = [
+        $bcc        = [
             $dsCallActivity->getValue(DBEJCallActivity::userAccount) . '@' . CONFIG_PUBLIC_DOMAIN,
             CONFIG_SALES_EMAIL,
             "VisitConfirmation@" . CONFIG_PUBLIC_DOMAIN
         ];
-
-        $buCustomer      = new BUCustomer($this);
-        $cc              = $buCustomer->getOthersWorkEmailAddresses(
+        $buCustomer = new BUCustomer($this);
+        $cc         = $buCustomer->getOthersWorkEmailAddresses(
             $dsCallActivity->getValue(DBEJCallActivity::customerID),
             $contactEmail
         );
-
-        $recipients      = implode(",", $recipientsArray);
-        $subject         = "On-Site Visit Confirmation for Service Request {$serviceRequestId} {$emailSubjectToAppend}";
-        $body            = $twig->render('@customerFacing/SiteVisit/SiteVisit.html.twig', ["data" => $data]);
+        $recipients = implode(",", $recipientsArray);
+        $subject    = "On-Site Visit Confirmation for Service Request {$serviceRequestId} {$emailSubjectToAppend}";
+        $body       = $twig->render('@customerFacing/SiteVisit/SiteVisit.html.twig', ["data" => $data]);
         $buMail->sendSimpleEmail($body, $subject, $recipients, CONFIG_SUPPORT_EMAIL, $cc, $bcc);
     }
 
