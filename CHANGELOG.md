@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.8.4] - 2021-04-19
+### Fixed
+- Fixe issue with Password not working from SR link
+
 ## [v5.8.3] - 2021-04-19
 ### Fixed
 - Fixed issue with sales order page not reloading when inserting template
