@@ -715,14 +715,6 @@ class CTCustomerCRM extends CTCustomer
             )
         );
         $renewalLink = '<a href="' . $renewalLinkURL . '" target="_blank" title="Renewals">Renewal Information</a>';
-        $passwordLinkURL = Controller::buildLink(
-            'Password.php',
-            array(
-                'action'     => 'list',
-                'customerID' => $this->getCustomerID()
-            )
-        );
-        $passwordLink = '<a href="' . $passwordLinkURL . '" target="_blank" title="Passwords">Service Passwords</a>';
         $bodyTagExtras = 'onLoad="loadNote(\'last\')"';
         $urlContactPopup = Controller::buildLink(
             CTCNC_PAGE_CONTACT,
@@ -821,7 +813,6 @@ class CTCustomerCRM extends CTCustomer
                 ),
                 'submitURL'                          => $submitURL,
                 'renewalLink'                        => $renewalLink,
-                'passwordLink'                       => $passwordLink,
                 'deleteCustomerURL'                  => $deleteCustomerURL,
                 'deleteCustomerText'                 => $deleteCustomerText,
                 'cancelURL'                          => $cancelURL,

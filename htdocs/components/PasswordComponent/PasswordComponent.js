@@ -251,7 +251,7 @@ class PasswordComponent extends MainComponent {
             });
     }
 
-    handleNewType = () => {
+    handleNewPassword = () => {
         const {filter} = this.state;
         const passwordItem = {...newPasswordItemInitialState};
         passwordItem.customerID = filter.customer.id;
@@ -299,11 +299,11 @@ class PasswordComponent extends MainComponent {
             {this.getAlert()}
             {this.getFilter()}
             {
-                !error && filter.customer ? <ToolTip title="New Type"
+                !error && filter.customer ? <ToolTip title="New Password"
                                                      width={30}
                 >
                     <i className="fal fa-2x fa-plus color-gray1 pointer"
-                       onClick={this.handleNewType}
+                       onClick={this.handleNewPassword}
                     />
                 </ToolTip> : null
             }

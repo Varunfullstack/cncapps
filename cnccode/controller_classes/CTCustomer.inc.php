@@ -1604,14 +1604,7 @@ class CTCustomer extends CTCNC
             )
         );
         $renewalLink             = '<a href="' . $renewalLinkURL . '" target="_blank" title="Renewals">Renewal Information</a>';
-        $passwordLinkURL         = Controller::buildLink(
-            'Password.php',
-            array(
-                'action'     => 'list',
-                'customerID' => $this->getCustomerID()
-            )
-        );
-        $passwordLink            = '<a href="' . $passwordLinkURL . '" target="_blank" title="Passwords">Service Passwords</a>';
+
         $thirdPartyLinkURL       = Controller::buildLink(
             'ThirdPartyContact.php',
             [
@@ -1754,7 +1747,6 @@ class CTCustomer extends CTCNC
                 ),
                 'submitURL'                               => $submitURL,
                 'renewalLink'                             => $renewalLink,
-                'passwordLink'                            => $passwordLink,
                 'thirdPartyContactsLink'                  => $thirdPartyLink,
                 'deleteCustomerURL'                       => $deleteCustomerURL,
                 'deleteCustomerText'                      => $deleteCustomerText,

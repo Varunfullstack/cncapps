@@ -13,7 +13,6 @@ export class PasswordDetails extends MainComponent {
 
     constructor(props) {
         super(props);
-        console.log(this.props.passwordItem);
         this.state = {
             ...this.state,
             passwordItem: this.props.passwordItem,
@@ -34,8 +33,11 @@ export class PasswordDetails extends MainComponent {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if (this.props.customerId !== prevProps.customerId || this.props?.passwordItem?.passwordID !== prevProps?.passwordItem?.passwordID) {
+        if (this.props.customerId !== prevProps.customerId || JSON.stringify(this.props.passwordItem) !== JSON.stringify(prevProps?.passwordItem)) {
             this.getServices();
+            if(JSON.stringify(this.props.passwordItem) !== JSON.stringify(this.state.passwordItem)){
+                this.setState({passwordItem: this.props.passwordItem});
+            }
         }
     }
 
@@ -121,7 +123,7 @@ export class PasswordDetails extends MainComponent {
                         </select>
                     </div>
                     <div className="form-group">
-                        <label>Sales password {passwordItem.salesPassword}
+                        <label>Sales password
                             <input value={1}
                                    checked={passwordItem.salesPassword}
                                    type="checkbox"
@@ -155,6 +157,7 @@ export class PasswordDetails extends MainComponent {
             return;
         }
         passwordItem.customerID = this.props.passwordItem.customerID;
+
         this.api.updatePassword(passwordItem)
             .then((result) => {
                 if (result.state) {

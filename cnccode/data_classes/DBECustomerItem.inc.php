@@ -104,6 +104,7 @@ class DBECustomerItem extends DBCNCEntity
     const transactionType                                = "transactionType";
     const bypassCWAAgentCheck                            = "bypassCWAAgentCheck";
 
+
     /**
      * calls constructor()
      * @access public
