@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v5.8.3]
+## [v5.8.3] - 2021-04-19
 ### Fixed
 - Fixed issue with sales order page not reloading when inserting template
 - Fixed issue with sales password handling
@@ -24,7 +24,6 @@ This project changes will be shown here.
 ### Fixed
 - Fixed wrong math in customerSatisfactionScore.
 - Fixed wrong customer item link in SupportedCustomerAssets web version pointing to the contract and not to the machine.
- 
 
 ## [v5.8.0] - 2021-04-12
 ### Added
@@ -61,14 +60,12 @@ This project changes will be shown here.
 - Issue 1312 - Amending a line in a Sales Order opens a new tab
 - Issue 1324 - KPI Reports - Billed Consultancy Data showing wrong values
 
-
 ## [v5.7.6] - 2021-04-06
 ### Changed
 - Added means of getting more information about failed queries
 ### Fixed
 - Fixed issue with Team Performance not showing any data.
 - Fixed issue with Feedback email getting sent
-
 
 ## [v5.7.5] - 2021-04-21
 ### Fixed
