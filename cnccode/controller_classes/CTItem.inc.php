@@ -1150,8 +1150,7 @@ WHERE custitem.`cui_itemno` = ?
         $offset      = $limit * ($page - 1);
         $dbeItem     = new DBEItem($this);
         $dbeItemType = new DBEItemType($this);
-        // $dbeManufacturer   = new DBEManufacturer($this);
-        $orderColumns = [
+        $orderColumns       = [
             "description"   => "itm_desc",
             "costPrice"     => "itm_sstk_cost",
             "curUnitSale"   => "itm_sstk_price",
@@ -1162,15 +1161,18 @@ WHERE custitem.`cui_itemno` = ?
             "manufacturer"  => "man_name",
             "salesStockQty" => "itm_sstk_qty"
         ];
-        $orderBy      = $orderColumns[(@$_REQUEST["orderBy"] ?? "description")];
-        $orderDir     = @$_REQUEST["orderDir"] ?? 'asc';
-        $q            = '%' . (@$_REQUEST["q"] ?? "") . '%';
-        $type         = " and  item.itm_discontinued = 'N'";
-        if(@$_REQUEST["type"]=="2")
-            $type         = " and  item.itm_discontinued = 'Y'";
-        else if(@$_REQUEST["type"]=="3")
-        $type         = " ";
-        $query        = "SELECT 
+        $orderBy            = $orderColumns[(@$_REQUEST["orderBy"] ?? "description")];
+        $orderDir           = @$_REQUEST["orderDir"] ?? 'asc';
+        $q                  = '%' . (@$_REQUEST["q"] ?? "") . '%';
+        $discontinuedFilter = "";
+        if (isset($_REQUEST["discontinued"])) {
+            if ($_REQUEST['discontinued'] == "true") {
+                $discontinuedFilter = " and  item.itm_discontinued = 'Y'";
+            } else {
+                $discontinuedFilter = " and  item.itm_discontinued = 'N'";
+            }
+        }
+        $query = "SELECT 
           
          itm_desc  as description , 
          itm_sstk_cost as curUnitCost,
@@ -1212,11 +1214,11 @@ WHERE custitem.`cui_itemno` = ?
             ity_desc            like :q OR
             man_name            like :q
             )
-            $type
+            $discontinuedFilter
         ORDER BY $orderBy $orderDir
         LIMIT $limit OFFSET $offset
         ";
-        $data         = DBConnect::fetchAll($query, ['q' => $q]);
+        $data  = DBConnect::fetchAll($query, ['q' => $q]);
         return $this->success($data);
     }
 

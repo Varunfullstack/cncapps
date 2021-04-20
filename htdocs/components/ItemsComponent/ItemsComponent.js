@@ -12,7 +12,6 @@ import APIManufacturer from "../ManufacturerComponent/services/APIManufacturer.j
 import ItemSearchComponent from "../shared/ItemSearchComponent.js";
 import '../style.css';
 import './ItemsComponent.css';
-import { debounce } from "@material-ui/core";
 
 class ItemsComponent extends MainComponent {
     api = new APIItems();
@@ -20,6 +19,7 @@ class ItemsComponent extends MainComponent {
     apiManufacturer = new APIManufacturer();
     scrollTimer;
     timerSaleStock;
+
     constructor(props) {
         super(props);
         this.state = {
@@ -30,7 +30,7 @@ class ItemsComponent extends MainComponent {
                 orderBy: 'description',
                 orderDir: 'asc',
                 q: '',
-                type:1
+                discontinued: false
             },
             reset: false,
             items: [],
@@ -51,10 +51,6 @@ class ItemsComponent extends MainComponent {
     componentDidMount() {
         this.getData();
         window.addEventListener('scroll', this.handleScroll, true);
-        // this.apiItemType.getAllTypes().then(itemTypes=>this.setState({itemTypes:sort(itemTypes.data,'description')}));
-        // this.api.getWarranty().then(res=>this.setState({warranties:res.data}));
-        // this.api.getRenewalTypes().then(res=>this.setState({renewalTypes:res.data}));
-        // this.api.getItemBillingCategory().then(res=>this.setState({itemBillingCategories:res.data}));
     }
 
     componentWillUnmount() {
@@ -81,7 +77,6 @@ class ItemsComponent extends MainComponent {
                     showSpinner: false
                 })
             })
-            //this.apiManufacturer.getAllTypes().then(res=>this.setState({manufactureries:res.data,showSpinner:false}));
         }
 
     }
@@ -134,7 +129,7 @@ class ItemsComponent extends MainComponent {
         const {filter, reset, items} = this.state;
         if (!noSpinner)
             this.setState({showSpinner: true});
-        this.api.getItems(filter.limit, filter.page, filter.orderBy, filter.orderDir, filter.q,filter.type)
+        this.api.getItems(filter.limit, filter.page, filter.orderBy, filter.orderDir, filter.q, filter.discontinued)
             .then(res => {
                 if (!reset)
                     this.setState({items: [...items, ...res.data], showSpinner: false});
@@ -247,15 +242,15 @@ class ItemsComponent extends MainComponent {
 
     }
     handleItemSalesStock = (event) => {
-        if(this.timerSaleStock)
+        if (this.timerSaleStock)
             clearTimeout(this.timerSaleStock);
-        this.timerSaleStock=setTimeout(()=>{
+        this.timerSaleStock = setTimeout(() => {
             const itemID = event.target.id;
-            const value = event.target.value; 
+            const value = event.target.value;
             this.api.updateItemQty(itemID, value).then(res => {
             })
-        },1000)
-       
+        }, 1000)
+
     }
     getChildItemsData = (itemId) => {
         this.api.getChildItems(itemId).then(res => {
@@ -270,12 +265,6 @@ class ItemsComponent extends MainComponent {
         this.setState({data: item, showModal: true, isNew: false});
         this.getLookups();
 
-    }
-    handleSearch = (value) => {
-        const {filter} = this.state;
-        filter.q = value;
-        filter.page = 1;
-        this.setState({filter, reset: true}, () => this.getData());
     }
     handleSort = (column) => {
         const {filter} = this.state;
@@ -655,28 +644,43 @@ class ItemsComponent extends MainComponent {
     handleClose = () => {
         this.setState({showModal: false});
     }
-    handleSearch=(prop,value)=>{        
-        const {filter}=this.state;
+    handleSearch = (prop, value) => {
+        const {filter} = this.state;
+        console.log(value);
         filter[prop] = value;
         filter.page = 1;
-        this.setState({filter, reset: true} );
-        if(this.searchTimer)
-        clearTimeout(this.searchTimer);
-        this.searchTimer=setTimeout(()=> this.getData(),1000);        
+        this.setState({filter, reset: true});
+        if (this.searchTimer)
+            clearTimeout(this.searchTimer);
+        this.searchTimer = setTimeout(() => this.getData(), 1000);
     }
-    getFilterItems=()=>{
-        const {filter}=this.state;
+    getFilterItems = () => {
+        const {filter} = this.state;
 
-        return <div style={{display:"flex",alignItems:"center",flexDirection:"row",width:400,justifyContent:"center"}}>
-                <label>Search</label>
-                <input className="form-control" value={filter.q} onChange={(event)=>this.handleSearch('q',event.target.value)}></input>
-                <select className="form-control" value={filter.type} onChange={(event)=>this.handleSearch('type',event.target.value)} >
-                    <option value="1">Discontinued</option>
-                    <option value="2">Continued</option>
-                    <option value="3">All Items</option>
-                </select>
-            </div>
+        return <div style={{
+            display: "flex",
+            alignItems: "center",
+            flexDirection: "row",
+            width: 400,
+            justifyContent: "center"
+        }}
+        >
+            <label>Search</label>
+            <input className="form-control"
+                   value={filter.q}
+                   onChange={(event) => this.handleSearch('q', event.target.value)}
+            ></input>
+            <select className="form-control"
+                    value={filter.discontinued}
+                    onChange={(event) => this.handleSearch('discontinued', event.target.value)}
+            >
+                <option value={true}>Discontinued</option>
+                <option value={false}>Continued</option>
+                <option value="">All Items</option>
+            </select>
+        </div>
     }
+
     render() {
         return <div key="main">
             {this.getAlert()}
