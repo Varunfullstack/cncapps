@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v5.8.5] 
+## [v5.8.5] - 2021-04-20
 ### Fixed
 - Fixed UpdatePriceItemFromStreamOne not sending information in the emails sent regarding missing licenses.
 - Fixed Item.php discontinued filter been swapped.
