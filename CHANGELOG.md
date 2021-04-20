@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.8.5] 
+### Fixed
+- Fixed UpdatePriceItemFromStreamOne not sending information in the emails sent regarding missing licenses.
+- Fixed Item.php discontinued filter been swapped.
+
 ## [v5.8.4] - 2021-04-19
 ### Fixed
 - Fixe issue with Password not working from SR link
