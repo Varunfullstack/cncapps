@@ -3600,7 +3600,7 @@ class CTSalesOrder extends CTCNC
             $this->displayFatalError(CTSALESORDER_MSG_ORDER_NOT_FND);
         }
         $versionNo = $this->buSalesOrder->getNextQuoteVersion($this->getOrdheadID());
-        $quoteFile = $GLOBALS['cfg']['quote_path'] . '/' . $this->getOrdheadID() . '_' . $versionNo;//.'.pdf';
+        $quoteFile = QUOTES_DIR . $this->getOrdheadID() . '_' . $versionNo;//.'.pdf';
         $extension = substr(
             $_FILES['quoteFile']['name'],
             strpos(
@@ -3713,8 +3713,8 @@ class CTSalesOrder extends CTCNC
         header("Content-Type: $ctype");
         header("Content-Disposition: attachment; filename=" . $quoteFile . ";");
         header("Content-Transfer-Encoding: binary");
-        header("Content-Length: " . filesize('quotes/' . $quoteFile));
-        readfile('quotes/' . $quoteFile);
+        header("Content-Length: " . filesize(QUOTES_DIR . $quoteFile));
+        readfile(QUOTES_DIR . $quoteFile);
         exit();
     }
 

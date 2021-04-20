@@ -540,7 +540,7 @@ class CTRenewalReport extends CTCNC
             $mainPDF->useImportedPage($pageId);
         }
 
-        $fileName = PDF_TEMP_DIR . '/' . $customerID . '-Contracts.pdf';
+        $fileName = PDF_TEMP_DIR  . $customerID . '-Contracts.pdf';
 
         $mainPDF->Output(
             'F',
@@ -640,7 +640,7 @@ class CTRenewalReport extends CTCNC
 
         $file = basename($PDFPath);
 
-        $fileName = PDF_TEMP_DIR . '/' . $file;
+        $fileName = PDF_TEMP_DIR  . $file;
 
         $dbeContact = new DBEContact($this);
 
