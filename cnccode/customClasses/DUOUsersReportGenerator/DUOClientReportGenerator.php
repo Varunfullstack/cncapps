@@ -27,8 +27,8 @@ class DUOClientReportGenerator
     {
         $sheet->setTitle('Users');
         // we have to create an array
-        $headers = ["firstName", "lastName", "email", "status", "lastLogin"];
-        $sheet->fromArray($headers);
+        $headers = ["First Name", "Last Name", "Email", "Status", "Last Login"];
+        $this->addHeaders($sheet, $headers);
         usort(
             $users,
             function (User $a, User $b) {
@@ -48,7 +48,7 @@ class DUOClientReportGenerator
             $users
         );
         $sheet->fromArray($rawData, null, 'A2');
-        $this->applyAutoFilterAndAutoSize($sheet);
+        $this->applyAutoFilterAndAlignment($sheet);
         $this->formatDateColumn($sheet, 5);
     }
 
@@ -56,10 +56,8 @@ class DUOClientReportGenerator
     public function getReportData(array $getUsers, array $authenticationLogs): Spreadsheet
     {
         $spreadsheet = new Spreadsheet();
-        $spreadsheet->getDefaultStyle()->getFont()->setName('Arial');
-        $spreadsheet->getDefaultStyle()->getFont()->setSize(10);
-        $usersSheet = $spreadsheet->getActiveSheet();
-        $this->fillUsersSheet($usersSheet, $getUsers);
+        $this->setFont($spreadsheet);
+        $this->fillUsersSheet($spreadsheet->getActiveSheet(), $getUsers);
         $this->fillAuthenticationLogsSheet($spreadsheet->createSheet(), $authenticationLogs);
         return $spreadsheet;
     }
@@ -67,7 +65,6 @@ class DUOClientReportGenerator
     private function fillAuthenticationLogsSheet(Worksheet $sheet, array $authenticationLogs)
     {
         $sheet->setTitle('Authentication Logs');
-        // we have to create an array
         $headers = [
             "Date & Time",
             "Username",
@@ -79,7 +76,7 @@ class DUOClientReportGenerator
             "Access State",
             "Access Country"
         ];
-        $sheet->fromArray($headers);
+        $this->addHeaders($sheet, $headers);
         usort(
             $authenticationLogs,
             function (AuthLog $a, AuthLog $b) {
@@ -103,7 +100,7 @@ class DUOClientReportGenerator
             $authenticationLogs
         );
         $sheet->fromArray($rawData, null, 'A2');
-        $this->applyAutoFilterAndAutoSize($sheet);
+        $this->applyAutoFilterAndAlignment($sheet);
         $this->formatDateColumn($sheet, 1);
     }
 
@@ -126,9 +123,45 @@ class DUOClientReportGenerator
     private function formatDateColumn(Worksheet $sheet, int $columnIndex)
     {
         $columnLetter = Coordinate::stringFromColumnIndex($columnIndex);
-        $styles = $sheet->getStyle("{$columnLetter}:{$columnLetter}");
+        $styles       = $sheet->getStyle("{$columnLetter}:{$columnLetter}");
         $styles->getNumberFormat()->setFormatCode(
             NumberFormat::FORMAT_DATE_DDMMYYYY . " hh:mm:ss"
         );
+    }
+
+    private function formatCenterAlign(Worksheet $sheet)
+    {
+        $sheet->getStyle($sheet->calculateWorksheetDataDimension())->getAlignment()->setHorizontal(
+            Alignment::HORIZONTAL_CENTER
+        );
+    }
+
+    /**
+     * @param Worksheet $sheet
+     * @param $headers
+     */
+    private function addHeaders(Worksheet $sheet, $headers): void
+    {
+        $sheet->fromArray($headers);
+        $sheet->getStyle("A1:{$sheet->getHighestColumn()}1")->getFont()->setBold(true);
+    }
+
+    /**
+     * @param Worksheet $sheet
+     */
+    private function applyAutoFilterAndAlignment(Worksheet $sheet): void
+    {
+        $this->applyAutoFilterAndAutoSize($sheet);
+        $this->formatCenterAlign($sheet);
+    }
+
+    /**
+     * @param Spreadsheet $spreadsheet
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     */
+    private function setFont(Spreadsheet $spreadsheet): void
+    {
+        $spreadsheet->getDefaultStyle()->getFont()->setName('Arial');
+        $spreadsheet->getDefaultStyle()->getFont()->setSize(10);
     }
 }
