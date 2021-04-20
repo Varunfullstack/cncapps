@@ -5,7 +5,7 @@ import React from 'react';
 import APIStandardText from "../../services/APIStandardText";
 import EditorFieldComponent from "../../shared/EditorField/EditorFieldComponent";
 import AssetListSelectorComponent from "../../shared/AssetListSelectorComponent/AssetListSelectorComponent";
-import { params } from "../../utils/utils.js";
+import { params, similarity } from "../../utils/utils.js";
 
 class CustomerSiteComponent extends MainComponent {
     el = React.createElement;
@@ -33,6 +33,7 @@ class CustomerSiteComponent extends MainComponent {
                 emailSubjectSummary: data.emailSubjectSummary || params.get("emailSubject")|| "",
                 emptyAssetReason: data.emptyAssetReason || "",
             },
+            suggestSR:[]
         };
     }
 
@@ -57,7 +58,7 @@ class CustomerSiteComponent extends MainComponent {
     }
 
     componentDidMount = async () => {
-
+        console.log('customer sr',this.props.data.customerSR);
         this.registerListener();
         const {apicustomer} = this;
         const {data} = this.state;
@@ -161,7 +162,7 @@ class CustomerSiteComponent extends MainComponent {
                     </label>
                     <EditorFieldComponent name="reason"
                                           value={this.state.data.reason}
-                                          onChange={(value) => this.setValue("reasonTemplate", value)}
+                                          onChange={(value) => this.handleReasonChange( value)}
                     />
                 </div>
                 <div>
@@ -176,6 +177,22 @@ class CustomerSiteComponent extends MainComponent {
             </React.Fragment>
         );
     };
+    handleReasonChange=(value)=>{
+        const {customerSR}=this.props.data;
+        this.setValue("reasonTemplate", value);
+        console.log("reasonTemplate", value);
+        //start matching
+        console.log('Matching');//customerSR.length
+        for(let i=0; i<customerSR.length;i++)
+        {
+            customerSR[i]['percent']=similarity(value,customerSR[i].reason);
+        }
+        let suggestSR=customerSR.filter(p=>p.percent>0.5);
+        if(!value)
+        suggestSR=[];
+        this.setState({suggestSR})
+        console.log(suggestSR);
+    }
     handleNext = async () => {
         let {data} = this.state;
         data.nextStep = 4;
@@ -213,7 +230,36 @@ class CustomerSiteComponent extends MainComponent {
             el("button", {onClick: handleNext, className: "float-left"}, "Next >")
         );
     };
-
+    getSuggestSR=()=>{
+        const {suggestSR}=this.state;
+        if(suggestSR.length>0)
+        {
+            return <div className="flex-column" style={{position: "absolute",                
+                marginTop: -100,
+                marginLeft: 860,
+                background: "white",
+                
+                minHeight: 100}}>
+                    <div style={{backgroundColor: "#58585a",
+                    color: "white", padding: 5}}>
+                        Try these suggested problems
+                        </div>
+                {suggestSR.map(p=><div key={p.activityID} style={{ padding: 5,}} >
+                    <a href={`SRActivity.php?action=displayActivity&serviceRequestId=${p.problemID}`} target="_blank" rel="noreferrer">
+                        {p.reason}
+                    </a>
+                </div>)}
+            </div>
+        }
+        else
+        return null;
+    }
+    openProblemHistory = (problemId) => {
+        window.open(
+            'Activity.php?action=problemHistoryPopup&problemID=' + problemId + '&htmlFmt=popup',
+            'reason',
+            'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0')
+    }
     render() {
         const {_showSpinner} = this.state;
         const {
@@ -233,6 +279,7 @@ class CustomerSiteComponent extends MainComponent {
             getAssetElement(),
             this.getEmailSubjectSummary(),
             getNotesElement(),
+            this.getSuggestSR(),
             getNextButton(),
         );
     }

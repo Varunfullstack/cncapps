@@ -1,6 +1,8 @@
 # Changelog
 This project changes will be shown here.
-
+## [unreleased]
+### Added
+- Add problem suggestion to log serviec request
 ## [v5.8.3] - 2021-04-19
 ### Fixed
 - Fixed issue with sales order page not reloading when inserting template

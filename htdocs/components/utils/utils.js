@@ -271,3 +271,67 @@ export function dateFormatExcludeNull(date, fromFormat = "YYYY-MM-DD", toFormat 
 export function equal(obj1,obj2){
     return JSON.stringify(obj1)===JSON.stringify(obj2);
 }
+export function similarity(s1, s2) {
+  // get s1 words
+  const s1Words = stripHtml(s1).split(" ");
+  const s2Words = stripHtml(s2).split(" ");
+  let totalSim = 0;
+  for (let i = 0; i < s1Words.length; i++) {
+    let max = 0;
+    for (let j = 0; j < s2Words.length; j++) {
+      const sim = similarityWord(s1Words[i], s2Words[j]);
+      //console.log(sim,s1Words[i], s2Words[j])
+      if (sim > max) max = sim;
+    }
+    totalSim +=parseFloat(max);
+    //console.log(s1Words[i],max)
+  }
+  return totalSim/s1Words.length;
+}
+function stripHtml(html)
+{
+   let tmp = document.createElement("DIV");
+   tmp.innerHTML = html;
+   let txt=tmp.textContent || tmp.innerText || "";
+   //txt.replace("\n","");
+   return txt;
+}
+function similarityWord(s1,s2){
+    var longer = s1;
+    var shorter = s2;
+    if (s1.length < s2.length) {
+      longer = s2;
+      shorter = s1;
+    }
+    var longerLength = longer.length;
+    if (longerLength == 0) {
+      return 1.0;
+    }
+    return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
+}
+function editDistance(s1, s2) {
+    s1 = s1.toLowerCase();
+    s2 = s2.toLowerCase();
+  
+    var costs = new Array();
+    for (var i = 0; i <= s1.length; i++) {
+      var lastValue = i;
+      for (var j = 0; j <= s2.length; j++) {
+        if (i == 0)
+          costs[j] = j;
+        else {
+          if (j > 0) {
+            var newValue = costs[j - 1];
+            if (s1.charAt(i - 1) != s2.charAt(j - 1))
+              newValue = Math.min(Math.min(newValue, lastValue),
+                costs[j]) + 1;
+            costs[j - 1] = lastValue;
+            lastValue = newValue;
+          }
+        }
+      }
+      if (i > 0)
+        costs[s2.length] = lastValue;
+    }
+    return costs[s2.length];
+  }
