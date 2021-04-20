@@ -1,5 +1,5 @@
 <?php use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-
+global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/DBEPortalCustomerDocumentWithoutFile.inc.php");
 require_once($cfg["path_dbe"] . "/DBEPortalCustomerDocument.php");
