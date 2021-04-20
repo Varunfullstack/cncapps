@@ -675,7 +675,7 @@ class ItemsComponent extends MainComponent {
                     onChange={(event) => this.handleSearch('discontinued', event.target.value)}
             >
                 <option value={true}>Discontinued</option>
-                <option value={false}>Continued</option>
+                <option value={false}>Active Items</option>
                 <option value="">All Items</option>
             </select>
         </div>
