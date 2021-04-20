@@ -278,14 +278,13 @@ foreach ($allSubscriptions as $item) {
     }
 }
 $logger->info("Loading all subscriptions and related addOns from streamOne.....");
-$orderDetails     = $buStreamOneApi->getProductsDetails($orderIds, 40);
-$allAddonLicenses = getAddonLicensesFromOrders($orderDetails);
-syncAddons($allAddonLicenses, $cncItems, $forcedMode, $logger);
-$updatedItems       = 0;
-$updatedItemsAddOns = 0;
-$subscription       = null;
+$orderDetails          = $buStreamOneApi->getProductsDetails($orderIds, 40);
+$allAddonLicenses      = getAddonLicensesFromOrders($orderDetails);
+$missingLicensesErrors = syncAddons($allAddonLicenses, $cncItems, $forcedMode, $logger);
+$updatedItems          = 0;
+$updatedItemsAddOns    = 0;
+$subscription          = null;
 $logger->info("All subscriptions number :" . count($allSubscriptions));
-$missingLicensesErrors = [];
 //get all customer subscriptions
 $streamOneLicensesToCheck = [];
 foreach ($allAddonLicenses as $addonLicense) {
@@ -328,52 +327,35 @@ if (!empty($missingLicensesErrors)) {
     $buMail      = new BUMail($thing);
     $senderEmail = CONFIG_SUPPORT_EMAIL;
     $toEmail     = CONFIG_SALES_EMAIL;
-    $hdrs        = array(
-        'From'         => $senderEmail,
-        'To'           => $toEmail,
-        'Subject'      => 'StreamOne licenses not listed for customers',
-        'Date'         => date("r"),
-        'Content-Type' => 'text/html; charset=UTF-8'
-    );
+    $subject     = 'StreamOne licenses not listed for customers';
     global $twig;
+    $missingLicensesErrors = array_map(
+        function (MissingLicenseException $licenseError) {
+            return $licenseError->getMessage();
+        },
+        $missingLicensesErrors
+    );
+    $logger->warning('We have missing Licenses errors, sending email', ["licensesErrors" => $missingLicensesErrors]);
     $html = $twig->render(
         '@internal/streamOneMissingLicensesEmail.html.twig',
         [
-            "items" => array_map(
-                function (MissingLicenseException $licenseError) {
-                    return $licenseError->getMessage();
-                },
-                $missingLicensesErrors
-            )
+            "items" => $missingLicensesErrors
         ]
     );
-    $buMail->mime->setHTMLBody($html);
-    $mime_params = array(
-        'text_encoding' => '7bit',
-        'text_charset'  => 'UTF-8',
-        'html_charset'  => 'UTF-8',
-        'head_charset'  => 'UTF-8'
-    );
-    $body        = $buMail->mime->get($mime_params);
-    $hdrs        = $buMail->mime->headers($hdrs);
-    $buMail->putInQueue(
-        $senderEmail,
+    $buMail->sendSimpleEmail(
+        $html,
+        $subject,
         $toEmail,
-        $hdrs,
-        $body
+        $senderEmail
     );
 }
 $logger->info('updated customers items  ' . $updatedItems);
 $logger->info('updated customers items addOns  ' . $updatedItemsAddOns);
 function storeReceivedData($data)
 {
-    var_dump($data);
     $date    = new DateTime();
     $logPath = APPLICATION_LOGS . "/UpdatePriceItemFromStreamOne-{$date->format('Y-m-d')}.json";
     file_put_contents($logPath, json_encode($data));
-    if (json_last_error()) {
-        var_dump(json_last_error_msg());
-    }
 }
 
 function getAddonLicensesFromOrders($orderDetails)
@@ -411,6 +393,7 @@ function getAddonLicensesFromOrders($orderDetails)
 
 function syncAddons($allAddons, $cncItems, $forcedMode, LoggerCLI $logger)
 {
+    $errors = [];
     foreach ($allAddons as $addOn) {
         try {
             updateContracts(
@@ -425,11 +408,12 @@ function syncAddons($allAddons, $cncItems, $forcedMode, LoggerCLI $logger)
             );
         } catch (Exception $exception) {
             if ($exception instanceof MissingLicenseException) {
-                $missingLicensesErrors[] = $exception;
+                $errors[] = $exception;
             }
             $logger->error($exception->getMessage());
         }
     }
+    return $errors;
 }
 
 function getContractsToCheck(LoggerCLI $loggerCLI): ContractsByStreamOneEmailAndSKUCollection

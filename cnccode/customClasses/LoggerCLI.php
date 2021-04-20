@@ -45,9 +45,9 @@ class LoggerCLI
         $this->log->notice($message);
     }
 
-    public function warning($message)
+    public function warning($message, $context = [])
     {
-        $this->log->warning($message);
+        $this->log->warning($message, $context);
     }
 
     public function debug($message, $context = [])
