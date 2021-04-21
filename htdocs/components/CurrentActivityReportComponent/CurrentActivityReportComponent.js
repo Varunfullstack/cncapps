@@ -25,7 +25,7 @@ import MovingSRComponent from './subComponents/MovingSRComponent';
 
 import CallBackComponent from './subComponents/CallBackComponent';
 import AllocateMoreTimeComponent from '../shared/AllocateMoreTimeComponent/AllocateMoreTimeComponent';
- 
+
 const AUTORELOAD_INTERVAL_TIME = 2 * 60 * 1000;
 
 class CurrentActivityReportComponent extends MainComponent {
@@ -74,7 +74,7 @@ class CurrentActivityReportComponent extends MainComponent {
             },
             showCallBackModal: false,
             currentProblem: null,
-            showAllocateMoreTime:false
+            showAllocateMoreTime: false
         };
         this.apiCurrentActivityService = new CurrentActivityService();
         this.teams = [
@@ -355,7 +355,7 @@ class CurrentActivityReportComponent extends MainComponent {
                 show={changeQueuData.show}
                 newTeam={changeQueuData.newTeam}
                 onClose={this.handleMovingModalClose}
-            ></MovingSRComponent>
+            />
     }
     handleMovingModalClose = (reload = true) => {
         const {changeQueuData} = this.state;
@@ -414,7 +414,7 @@ class CurrentActivityReportComponent extends MainComponent {
         );
     }
     allocateAdditionalTime = (problem) => {
-        this.setState({"showAllocateMoreTime":true,currentProblem:problem});
+        this.setState({"showAllocateMoreTime": true, currentProblem: problem});
         //window.location = `Activity.php?action=allocateAdditionalTime&problemID=${problem.problemID}`;
     };
     requestAdditionalTime = async (problem) => {
@@ -581,13 +581,12 @@ class CurrentActivityReportComponent extends MainComponent {
         })
     }
     createNewSR = (problem, code) => {
-        const {filter}=this.state;
-        let append="";        
-        switch(filter.activeTab)
-        {
+        const {filter} = this.state;
+        let append = "";
+        switch (filter.activeTab) {
             case "TBL":
-                append +=`&emailSubject=${problem.emailSubject}`;
-        }         
+                append += `&emailSubject=${problem.emailSubject}`;
+        }
         window.location = `LogServiceRequest.php?customerproblemno=${problem.cpCustomerProblemID}${append}`
 
     }
@@ -632,11 +631,12 @@ class CurrentActivityReportComponent extends MainComponent {
     handleCallBackClose = (callActivityID) => {
         this.setState({showCallBackModal: false});
     }
-    handleAllocateMoreTimeClose=()=>{
-        this.setState({"showAllocateMoreTime":false});
-        const {filter} = this.state;     
-        this.loadQueue(   filter.activeTab );
+    handleAllocateMoreTimeClose = () => {
+        this.setState({"showAllocateMoreTime": false});
+        const {filter} = this.state;
+        this.loadQueue(filter.activeTab);
     }
+
     render() {
         const {
             el,
@@ -678,8 +678,12 @@ class CurrentActivityReportComponent extends MainComponent {
             <CallBackComponent key='callback'
                                team={filter.activeTab}
                                customerID={this.state.openSrCustomerID}
-            ></CallBackComponent>,
-            <AllocateMoreTimeComponent onClose={this.handleAllocateMoreTimeClose} key="showAllocateMoreTime" show={this.state.showAllocateMoreTime} problem={this.state.currentProblem}></AllocateMoreTimeComponent>,
+            />,
+            <AllocateMoreTimeComponent onClose={this.handleAllocateMoreTimeClose}
+                                       key="showAllocateMoreTime"
+                                       show={this.state.showAllocateMoreTime}
+                                       problem={this.state.currentProblem}
+            />,
             this.getCallBackModal(),
             this.getConfirm(),
             this.getAlert(),

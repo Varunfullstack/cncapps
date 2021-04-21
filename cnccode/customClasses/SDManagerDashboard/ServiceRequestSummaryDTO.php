@@ -154,13 +154,18 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
     private $emailSubjectSummary;
     /** @var int */
     private $contactID;
+    /** @var bool */
+    private $hasCallback;
 
     /**
      * ServiceRequestSummaryDTO constructor.
      */
     public function __construct() { }
 
-    public static function fromDBEJProblem(\DBEJProblem $problem, $withActivityCount = false)
+    public static function fromDBEJProblem(\DBEJProblem $problem,
+                                           \DBEUser $currentUser,
+                                           $withActivityCount = false
+    )
     {
 
         $instance         = new self();
@@ -176,6 +181,7 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
         $assignedMinutes = 0;
         $dbeCustomer     = new \DBECustomer($problem);
         $dbeCustomer->getRow($problem->getValue(DBEJProblem::customerID));
+        $hasCallback = self::hasCallback($serviceRequestId, $currentUser);
         switch ($problem->getValue(DBEJProblem::QUEUE_TEAM_ID)) {
             case 1:
             {
@@ -247,6 +253,7 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
         $instance->emailSubjectSummary        = $problem->getValue(DBEJProblem::emailSubjectSummary);
         $instance->contactName                = $problem->getValue(DBEJProblem::contactName);
         $instance->contactID                  = $problem->getValue(DBEJProblem::contactID);
+        $instance->hasCallback                = $hasCallback;
         return $instance;
     }
 
@@ -260,6 +267,30 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
                 'htmlFmt'   => CT_HTML_FMT_POPUP
             ]
         );
+    }
+
+    /**
+     * @param $stuff
+     * @param float|null $serviceRequestId
+     * @param \DBEUser $currentUser
+     * @return mixed
+     */
+    private static function hasCallback(?int $serviceRequestId, \DBEUser $currentUser)
+    {
+        $dbeCallback = new \DBECallback($stuff);
+        $dbeCallback->getAwaitingForServiceRequest($serviceRequestId);
+        if (!$dbeCallback->rowCount()) {
+            return false;
+        }
+        if ($currentUser->isSDManager() || $currentUser->isSRQueueManager()) {
+            return true;
+        }
+        while ($dbeCallback->fetchNext()) {
+            if ($dbeCallback->getValue(\DBECallback::consID) == $currentUser->getValue(\DBEUser::userID)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public function jsonSerialize()
@@ -306,6 +337,7 @@ class ServiceRequestSummaryDTO implements \JsonSerializable
             "contactName"                => $this->contactName,
             "emailSubjectSummary"        => $this->emailSubjectSummary,
             "contactID"                  => $this->contactID,
+            "hasCallback"                => $this->hasCallback,
         ];
     }
 

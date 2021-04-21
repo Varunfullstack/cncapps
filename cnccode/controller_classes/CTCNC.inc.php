@@ -1196,12 +1196,12 @@ class CTCNC extends Controller
 
     protected function isSRQueueManager()
     {
-        return $this->dbeUser->getValue(DBEJUser::queueManager);
+        return $this->dbeUser->isSRQueueManager();
     }
 
     protected function isSdManager()
     {
-        return $this->dbeUser->getValue(DBEJUser::receiveSdManagerEmailFlag) == 'Y';
+        return $this->dbeUser->isSDManager();
     }
 
     protected function setMenuId(int $int)

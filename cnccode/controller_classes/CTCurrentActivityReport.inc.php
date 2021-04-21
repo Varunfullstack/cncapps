@@ -181,7 +181,7 @@ class CTCurrentActivityReport extends CTCNC
         }
         $result = [];
         while ($serviceRequests->fetchNext()) {
-            $result[] = ServiceRequestSummaryDTO::fromDBEJProblem($serviceRequests);
+            $result[] = ServiceRequestSummaryDTO::fromDBEJProblem($serviceRequests, $this->getDbeUser());
         }
         return $result;
     }

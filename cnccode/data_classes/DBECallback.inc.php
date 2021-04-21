@@ -104,6 +104,18 @@ class DBECallback extends DBEntity
         return $this->rowCount();
     }
 
+    public function getAwaitingForServiceRequest(?int $serviceRequestId)
+    {
+        $serviceRequestId = mysqli_real_escape_string($this->db->link_id(), $serviceRequestId);
+        $this->setQueryString(
+            "select {$this->getColumnNamesAsString()} from {$this->getTableName(
+            )} where {$this->getDBColumnName(
+                self::problemID
+            )} =  {$serviceRequestId} and {$this->getDBColumnName(self::status)} = '" . CallBackStatus::AWAITING . "'"
+        );
+        $this->getRows();
+    }
+
 
 }
 

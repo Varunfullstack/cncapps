@@ -240,7 +240,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             return $result;
         }
         while ($problems->fetchNext()) {
-            $result[] = ServiceRequestSummaryDTO::fromDBEJProblem($problems, true);
+            $result[] = ServiceRequestSummaryDTO::fromDBEJProblem($problems, $this->getDbeUser(), true);
         }
         return $result;
     }
