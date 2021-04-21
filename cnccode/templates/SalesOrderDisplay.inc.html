@@ -271,8 +271,6 @@
                 .forEach(itemRow => {
                             const buttonContainer = itemRow.querySelector('td:last-child > div');
                             const description = itemRow.querySelector('a').text;
-                            const newCost = itemRow.querySelector('.lineItemUnitCost').value;
-                            const newSale = itemRow.querySelector('.lineItemUnitSale').value;
                             const supplierName = itemRow.querySelector('.supplier-name').textContent;
 
                             updateStockLevel(itemRow);
@@ -287,7 +285,9 @@
                                 }
                                 button.title = title;
                                 button.addEventListener('click', async () => {
-
+                                    const newCost = itemRow.querySelector('input.lineItemUnitCost').value;
+                                    const newSale = itemRow.querySelector('input.lineItemUnitSale').value;
+                                    console.log(newSale);
                                     if (!confirm(
                                             "Please confirm you want to change the master item cost price for " +
                                             description +
