@@ -45,9 +45,11 @@ class InboxSalesComponent extends React.Component {
                 hdClassName: "text-center",
                 className: "text-center",
                 content: (problem) =>
-                <ToolTip title="Call back">
-                    <i className="fal fa-2x fa-phone icon pointer color-gray" onClick={()=>this.props.onCallBack(problem)}></i>
-                </ToolTip>
+                    <ToolTip title="Call back">
+                        <i className={`fal fa-2x icon pointer color-gray fa-phone${problem.hasCallback ? '-plus' : ''}`}
+                           onClick={() => this.props.onCallBack(problem)}
+                        />
+                    </ToolTip>
                    
             },
             ColumnRenderer.getWorkIconColumn(startWork, this.code),
