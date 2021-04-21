@@ -21,10 +21,16 @@ export default class SupplierSelectorComponent extends React.PureComponent {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
+
         if (prevProps.supplierId !== this.props.supplierId) {
-            if (!this.props.supplierId) {
-                this.setState({selectedOption: null});
+            let selectedOption = null;
+            if (this.props.supplierId) {
+                const {supplierId} = this.props;
+                const {suppliers} = this.state;
+                selectedOption = suppliers.find(x => x.id === supplierId);
+                this.props.onChange(selectedOption, CHANGE_REASON.INITIALIZATION);
             }
+            this.setState({selectedOption});
         }
     }
 

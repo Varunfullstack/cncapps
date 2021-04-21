@@ -31,6 +31,7 @@ export default class ApiUrls {
     static Item="/Item.php?action=";
     static Password="/Password.php?action=";
     static PasswordServices="/PasswordServices.php?action=";
+    static Supplier="/Supplier.php?action=";
 
 
 

@@ -22,34 +22,48 @@
                 curUnitCostInput.value = selectedItem.curUnitCost;
                 curUnitSaleInput.value = selectedItem.curUnitSale;
                 itemDescriptionInput.value = selectedItem.label;
+                if (selectedItem.supplierId) {
+                    supplierIdInput.value = selectedItem.supplierId;
+                    document.renderSupplierSearchComponent(
+                            reactSupplierSearchContainer, {
+                                onChange: (id) => {
+                                    supplierIdInput.value = id;
+                                    updateButtons();
+                                },
+                                supplierId: selectedItem.supplierId
+                            }
+                    );
+                }
                 updateButtons();
                 document.renderTypeAheadComponent(props, autocompleteItemContainer)
             },
             searchRequest: (term, itemsToShow, responseCB) => {
                 fetch(
-                    '/Item.php?action=SEARCH_ITEMS_JSON',
-                    {
-                        method: 'POST',
-                        body: JSON.stringify({term: props.value, limit: itemsToShow + 1})
-                    }
-                )
-                    .then(x => x.json())
-                    .then(response => {
-                        if (response.status !== 'ok') {
-                            throw new Error(response.message);
+                        '/Item.php?action=SEARCH_ITEMS_JSON',
+                        {
+                            method: 'POST',
+                            body: JSON.stringify({term: props.value, limit: itemsToShow + 1})
                         }
+                )
+                        .then(x => x.json())
+                        .then(response => {
+                            if (response.status !== 'ok') {
+                                throw new Error(response.message);
+                            }
 
-                        responseCB(response.data.map(x => ({
-                            label: x.description,
-                            value: x.itemID,
-                            curUnitCost: x.curUnitCost,
-                            curUnitSale: x.curUnitSale,
-                        })))
-                    })
+                            responseCB(response.data.map(x => ({
+                                label: x.description,
+                                value: x.itemID,
+                                curUnitCost: x.curUnitCost,
+                                curUnitSale: x.curUnitSale,
+                                supplierId: x.supplierId
+                            })))
+                        })
             },
             value: '',
             onInputChange: (value) => {
                 props.value = value;
+
                 document.renderTypeAheadComponent(props, autocompleteItemContainer)
             },
             readOnly: false,
@@ -70,7 +84,7 @@
         let typeSelected = typeSelector.value;
         updateButtons();
         document.renderSupplierSearchComponent(reactSupplierSearchContainer, {
-            defaultText: '',
+
             onChange: (id) => {
                 supplierIdInput.value = id;
                 updateButtons();
@@ -78,7 +92,7 @@
         });
 
         function checkLineValid(typeSelected) {
-            console.log(typeSelected,itemDescriptionInput.value,itemIdInput.value );
+            console.log(typeSelected, itemDescriptionInput.value, itemIdInput.value);
             if (typeSelected === 'C') {
                 return itemDescriptionInput.value !== '';
             }

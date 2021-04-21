@@ -8,30 +8,33 @@ require_once($cfg["path_dbe"] . "/DBCNCEntity.inc.php");
 class DBEItem extends DBCNCEntity
 {
 
-    const itemID = "itemID";
-    const description = "description";
-    const manufacturerID = "manufacturerID";
-    const stockcat = "stockcat";
-    const itemTypeID = "itemTypeID";
-    const curUnitSale = "curUnitSale";
-    const curUnitCost = "curUnitCost";
-    const curMaintStockCost = "curMaintStockCost";
-    const serialNoFlag = "serialNoFlag";
-    const salesStockQty = "salesStockQty";
-    const maintStockQty = "maintStockQty";
-    const discontinuedFlag = "discontinuedFlag";
-    const partNo = "partNo";
-    const warrantyID = "warrantyID";
-    const notes = "notes";
-    const servercareFlag = "servercareFlag";
-    const contractResponseTime = "contractResponseTime";
-    const renewalTypeID = "renewalTypeID";
-    const allowDirectDebit = "allowDirectDebit";
+    const itemID                  = "itemID";
+    const description             = "description";
+    const manufacturerID          = "manufacturerID";
+    const stockcat                = "stockcat";
+    const itemTypeID              = "itemTypeID";
+    const curUnitSale             = "curUnitSale";
+    const curUnitCost             = "curUnitCost";
+    const curMaintStockCost       = "curMaintStockCost";
+    const serialNoFlag            = "serialNoFlag";
+    const salesStockQty           = "salesStockQty";
+    const maintStockQty           = "maintStockQty";
+    const discontinuedFlag        = "discontinuedFlag";
+    const partNo                  = "partNo";
+    const warrantyID              = "warrantyID";
+    const notes                   = "notes";
+    const servercareFlag          = "servercareFlag";
+    const contractResponseTime    = "contractResponseTime";
+    const renewalTypeID           = "renewalTypeID";
+    const allowDirectDebit        = "allowDirectDebit";
     const excludeFromPOCompletion = "excludeFromPOCompletion";
-    const itemBillingCategoryID = "itemBillingCategoryID";
-    const allowSRLog = "allowSRLog";
-    const isStreamOne = "isStreamOne";
-    const partNoOld = "partNoOld";
+    const itemBillingCategoryID   = "itemBillingCategoryID";
+    const allowSRLog              = "allowSRLog";
+    const isStreamOne             = "isStreamOne";
+    const partNoOld               = "partNoOld";
+    const supplierId              = "supplierId";
+    const updatedBy               = "updatedBy";
+    const updatedAt               = "updatedAt";
 
     /**
      * calls constructor()
@@ -186,6 +189,21 @@ class DBEItem extends DBCNCEntity
             DA_ALLOW_NULL,
             "partNoOld"
         );
+        $this->addColumn(
+            self::supplierId,
+            DA_ID,
+            DA_ALLOW_NULL,
+        );
+        $this->addColumn(
+            self::updatedBy,
+            DA_TEXT,
+            DA_ALLOW_NULL,
+        );
+        $this->addColumn(
+            self::updatedAt,
+            DA_DATETIME,
+            DA_ALLOW_NULL
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -201,30 +219,21 @@ class DBEItem extends DBCNCEntity
     function getRowsByDescriptionMatch(string $search, $renewalTypeID = false)
     {
         $this->setMethodName("getRowsByDescriptionMatch");
-        $queryString =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " WHERE 1=1";
-
+        $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " WHERE 1=1";
         if ($search) {
-            $queryString .=
-                " AND MATCH (item.itm_desc, notes, item.itm_unit_of_sale)
+            $queryString .= " AND MATCH (item.itm_desc, notes, item.itm_unit_of_sale)
 				AGAINST ('" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $search
                 ) . "' IN BOOLEAN MODE)";
         }
-
         if ($renewalTypeID) {
             $queryString .= " AND renewalTypeID = $renewalTypeID";
         }
-
-        $queryString .=
-            " AND " . $this->getDBColumnName(self::discontinuedFlag) . " <> 'Y'" .
-            " ORDER BY " . $this->getDBColumnName(self::description) .
-            " LIMIT 0,200";
+        $queryString .= " AND " . $this->getDBColumnName(
+                self::discontinuedFlag
+            ) . " <> 'Y'" . " ORDER BY " . $this->getDBColumnName(self::description) . " LIMIT 0,200";
         $this->setQueryString($queryString);
-
         $ret = (parent::getRows());
         return $ret;
     }
@@ -232,65 +241,26 @@ class DBEItem extends DBCNCEntity
     function getRowsByDescriptionOrPartNoSearch($search, $renewalTypeID = false, $limit = 200)
     {
         $this->setMethodName("getRowsByDescriptionMatch");
-        $queryString =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " WHERE 1=1";
-
+        $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " WHERE 1=1";
         if ($search) {
             $searchEscaped = mysqli_real_escape_string(
                 $this->db->link_id(),
                 "%{$search}%"
             );
-            $queryString .=
-                " AND (item.itm_desc like '{$searchEscaped}' or item.itm_unit_of_sale like '{$searchEscaped}') ";
+            $queryString   .= " AND (item.itm_desc like '{$searchEscaped}' or item.itm_unit_of_sale like '{$searchEscaped}') ";
         }
-
         if ($renewalTypeID) {
             $queryString .= " AND renewalTypeID = $renewalTypeID";
         }
-
-        $queryString .=
-            " AND " . $this->getDBColumnName(self::discontinuedFlag) . " <> 'Y'" .
-            " ORDER BY " . $this->getDBColumnName(self::description);
-
+        $queryString .= " AND " . $this->getDBColumnName(
+                self::discontinuedFlag
+            ) . " <> 'Y'" . " ORDER BY " . $this->getDBColumnName(self::description);
         if ($limit) {
             $queryString .= " LIMIT 0,$limit";
         }
         $this->setQueryString($queryString);
         $ret = (parent::getRows());
         return $ret;
-    }
-
-    /**
-     * Get rows by part number match
-     * Excludes discontinued rows
-     * @access public
-     * @param bool $renewalTypeID
-     * @return bool Success
-     */
-    function getRowsByPartNoMatch($renewalTypeID = false)
-    {
-        $this->setMethodName("getRowsByPartNoMatch");
-        if (!$this->getValue(self::partNo)) {
-            $this->raiseError('partNo not set');
-        }
-        $queryString =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName(self::partNo) . " LIKE " . $this->getFormattedLikeValue(self::partNo) .
-            " AND " . $this->getDBColumnName(self::discontinuedFlag) . " <> 'Y'";
-        if ($renewalTypeID) {
-            $queryString .= " AND renewalTypeID = $renewalTypeID";
-        }
-
-        $queryString .=
-            " ORDER BY " . $this->getDBColumnName(self::partNo) .
-            " LIMIT 0,200";
-
-        $this->setQueryString($queryString);
-
-        return (parent::getRows());
     }
 
     /**
@@ -302,11 +272,10 @@ class DBEItem extends DBCNCEntity
     function updateSalesStockQty($value)
     {
         $this->setMethodName("updateSalesStockQty");
-
         $this->setQueryString(
-            "UPDATE " . $this->getTableName() .
-            " SET " . $this->getDBColumnName(self::salesStockQty) . "=" . $value .
-            " WHERE " . $this->getPKWhere()
+            "UPDATE " . $this->getTableName() . " SET " . $this->getDBColumnName(
+                self::salesStockQty
+            ) . "=" . $value . " WHERE " . $this->getPKWhere()
         );
         return (parent::updateRow());
     }
@@ -321,60 +290,34 @@ class DBEItem extends DBCNCEntity
     {
         $this->setMethodName("updateMaintStockQty");
         $this->setQueryString(
-            "UPDATE " . $this->getTableName() .
-            " SET " . $this->getDBColumnName(self::maintStockQty) . "=" . $value .
-            " WHERE " . $this->getPKWhere()
+            "UPDATE " . $this->getTableName() . " SET " . $this->getDBColumnName(
+                self::maintStockQty
+            ) . "=" . $value . " WHERE " . $this->getPKWhere()
         );
         return (parent::updateRow());
-    }
-
-    function setRowsDiscontinued($discontinueItemIDArray)
-    {
-        $this->setMethodName('setRowsDiscontinued');
-
-        if (!$discontinueItemIDArray) {
-            $this->raiseError('$discontinueItemIDArray not set');
-        }
-
-        $this->setQueryString(
-            "UPDATE " . $this->getTableName() .
-            " SET " . $this->getDBColumnName(self::discontinuedFlag) . " = 'Y'" .
-            " WHERE " . $this->getDBColumnName(self::itemID) . " IN ( " . implode(
-                ',',
-                $discontinueItemIDArray
-            ) . ")"
-        );
-
-        return $this->runQuery();
-
     }
 
     function getRenewalTypeRows($renewalTypeID = false)
     {
 
         $this->setMethodName("getRenewalTypeRows");
-
         if (!$renewalTypeID) {
             $this->raiseError('renewalTypeID not set');
         }
-
-        $queryString =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName(self::renewalTypeID) . " = '" . $renewalTypeID . "'" .
-            " AND " . $this->getDBColumnName(self::discontinuedFlag) . " <> 'Y'" .
-            " ORDER BY " . $this->getDBColumnName(self::description);
-
+        $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
+            ) . " WHERE " . $this->getDBColumnName(
+                self::renewalTypeID
+            ) . " = '" . $renewalTypeID . "'" . " AND " . $this->getDBColumnName(
+                self::discontinuedFlag
+            ) . " <> 'Y'" . " ORDER BY " . $this->getDBColumnName(self::description);
         $this->setQueryString($queryString);
-
         $ret = (parent::getRows());
         return $ret;
     }
 
     public function getItemsByPartNoOrOldPartNo($sku)
     {
-        $queryString =
-            "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} WHERE 
+        $queryString = "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} WHERE 
                               {$this->getDBColumnName(self::partNo)} = '{$sku}' or {$this->getDBColumnName(self::partNoOld)} = '{$sku}' limit 1";
         $this->setQueryString($queryString);
         return parent::getRows();
@@ -384,10 +327,8 @@ class DBEItem extends DBCNCEntity
     {
         global $db;
         $escapedParentItemId = mysqli_real_escape_string($db->link_id(), $parentItemId);
-        $queryString =
-            "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} 
+        $queryString         = "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} 
                 join childItem on parentItemId = '{$escapedParentItemId}' and childItemId =  {$this->getDBColumnName(self::itemID)}";
-
         $this->setQueryString($queryString);
         $ret = (parent::getRows());
     }
@@ -396,10 +337,8 @@ class DBEItem extends DBCNCEntity
     {
         global $db;
         $escapedItemId = mysqli_real_escape_string($db->link_id(), $itemId);
-        $queryString =
-            "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} 
+        $queryString   = "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} 
                 join childItem on childItemId = '{$escapedItemId}' and parentItemId =  {$this->getDBColumnName(self::itemID)}";
-
         $this->setQueryString($queryString);
         $ret = (parent::getRows());
     }

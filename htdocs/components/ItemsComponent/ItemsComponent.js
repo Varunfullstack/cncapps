@@ -12,6 +12,8 @@ import APIManufacturer from "../ManufacturerComponent/services/APIManufacturer.j
 import ItemSearchComponent from "../shared/ItemSearchComponent.js";
 import '../style.css';
 import './ItemsComponent.css';
+import SupplierSelectorComponent
+    from "../PurchaseOrderSupplierAndContactInputsComponent/subComponents/SupplierSelectorComponent";
 
 class ItemsComponent extends MainComponent {
     api = new APIItems();
@@ -42,9 +44,10 @@ class ItemsComponent extends MainComponent {
             warranties: [],
             renewalTypes: [],
             itemBillingCategories: [],
-            manufactureries: [],
+            manufacturers: [],
             childItem: null,
-            childItems: []
+            childItems: [],
+            suppliers: [],
         };
     }
 
@@ -59,21 +62,23 @@ class ItemsComponent extends MainComponent {
 
     getLookups() {
 
-        if (this.state.manufactureries.length == 0) {
+        if (this.state.manufacturers.length == 0) {
             this.setState({showSpinner: true});
             Promise.all([
                 this.apiItemType.getAllTypes().then(res => res.data),
                 this.api.getWarranty().then(res => res.data),
                 this.api.getRenewalTypes().then(res => res.data),
                 this.api.getItemBillingCategory().then(res => res.data),
-                this.apiManufacturer.getTypeList().then(res => res.data)
-            ]).then(([itemTypes, warranties, renewalTypes, itemBillingCategories, manufactureries]) => {
+                this.apiManufacturer.getTypeList().then(res => res.data),
+                this.api.getSuppliers()
+            ]).then(([itemTypes, warranties, renewalTypes, itemBillingCategories, manufacturers, suppliers]) => {
                 this.setState({
                     itemTypes,
                     warranties,
                     renewalTypes,
                     itemBillingCategories,
-                    manufactureries,
+                    manufacturers,
+                    suppliers,
                     showSpinner: false
                 })
             })
@@ -211,6 +216,15 @@ class ItemsComponent extends MainComponent {
                 sortable: true,
             },
             {
+                path: "supplierName",
+                label: "",
+                hdToolTip: "Supplier",
+                hdClassName: "text-center",
+                icon: "fal fa-2x fa-building color-gray2 pointer",
+                sortable: true,
+            },
+
+            {
                 path: "",
                 label: "",
                 hdToolTip: "Edit",
@@ -238,7 +252,7 @@ class ItemsComponent extends MainComponent {
                       id={item.itemID}
                       defaultValue={item.salesStockQty || ''}
                       onChange={this.handleItemSalesStock}
-        ></input>
+        />
 
     }
     handleItemSalesStock = (event) => {
@@ -297,7 +311,7 @@ class ItemsComponent extends MainComponent {
 
     }
     getModalContent = () => {
-        const {data, itemTypes, warranties, renewalTypes, itemBillingCategories, manufactureries} = this.state;
+        const {data, itemTypes, warranties, renewalTypes, itemBillingCategories, manufacturers, suppliers} = this.state;
         return <div key="content">
             <table className="table">
                 <tbody>
@@ -307,13 +321,13 @@ class ItemsComponent extends MainComponent {
                                value={data.description}
                                onChange={(event) => this.setValue("description", event.target.value)}
                                className="form-control"
-                    ></input></td>
+                    /></td>
                     <td className="text-right">Type</td>
                     <td><select className="form-control"
                                 value={data.itemTypeID}
                                 onChange={(event) => this.setValue("itemTypeID", event.target.value)}
                     >
-                        <option></option>
+                        <option/>
                         {itemTypes.map(item => <option key={item.id}
                                                        value={item.id}
                         >{item.description}</option>)}
@@ -327,22 +341,41 @@ class ItemsComponent extends MainComponent {
                                 onChange={(event) => this.setValue("manufacturerID", event.target.value)}
                                 className="form-control"
                         >
-                            <option></option>
-                            {manufactureries.map(w => <option key={w.manufacturerID}
-                                                              value={w.id}
+                            <option/>
+                            {manufacturers.map(w => <option key={w.manufacturerID}
+                                                            value={w.id}
                             >{w.name}</option>)}
                         </select>
                     </td>
                     <td className="text-right">Warranty</td>
-                    <td><select value={data.warrantyID || ''}
+                    <td>
+                        <select value={data.warrantyID || ''}
                                 onChange={(event) => this.setValue("warrantyID", event.target.value)}
                                 className="form-control"
                     >
-                        <option></option>
+                        <option/>
                         {warranties.map(w => <option key={w.id}
                                                      value={w.id}
                         >{w.name}</option>)}
                     </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td className="text-right">Default Supplier</td>
+                    <td>
+                        <SupplierSelectorComponent supplierId={data.supplierId} onChange={(supplier )  => this.setValue("supplierId", supplier?.id)}/>
+                    </td>
+                    <td className="text-right">Warranty</td>
+                    <td>
+                        <select value={data.warrantyID || ''}
+                                onChange={(event) => this.setValue("warrantyID", event.target.value)}
+                                className="form-control"
+                        >
+                            <option/>
+                            {warranties.map(w => <option key={w.id}
+                                                         value={w.id}
+                            >{w.name}</option>)}
+                        </select>
                     </td>
                 </tr>
                 <tr>
@@ -352,7 +385,7 @@ class ItemsComponent extends MainComponent {
                             <input value={data.curUnitCost}
                                    onChange={(event) => this.setValue("curUnitCost", event.target.value)}
                                    className="form-control"
-                            ></input>
+                            />
                             {
                                 data.allowGlobalPriceUpdate ?
                                     <button onClick={() => this.updateGlobalPrice('cost', data.curUnitCost, data.itemID)}> Globally
@@ -379,7 +412,7 @@ class ItemsComponent extends MainComponent {
                             <input value={data.curUnitSale}
                                    onChange={(event) => this.setValue("curUnitSale", event.target.value)}
                                    className="form-control"
-                            ></input>
+                            />
                             {
                                 data.allowGlobalPriceUpdate ?
                                     <button onClick={() => this.updateGlobalPrice('sale', data.curUnitSale, data.itemID)}> Globally
@@ -393,7 +426,7 @@ class ItemsComponent extends MainComponent {
                                 onChange={(event) => this.setValue("itemBillingCategoryID", event.target.value)}
                                 className="form-control"
                     >
-                        <option></option>
+                        <option/>
                         {itemBillingCategories.map(w => <option key={w.id}
                                                                 value={w.id}
                         >{w.name}</option>)}
@@ -404,19 +437,19 @@ class ItemsComponent extends MainComponent {
                     <td><input value={data.partNo}
                                onChange={(event) => this.setValue("partNo", event.target.value)}
                                className="form-control"
-                    ></input></td>
+                    /></td>
                     <td className="text-right">Contract Response Time</td>
                     <td><input value={data.contractResponseTime}
                                onChange={(event) => this.setValue("contractResponseTime", event.target.value)}
                                className="form-control"
-                    ></input></td>
+                    /></td>
                 </tr>
                 <tr>
                     <td className="text-right">Old Part Number</td>
                     <td><input value={data.partNoOld}
                                onChange={(event) => this.setValue("partNoOld", event.target.value)}
                                className="form-control"
-                    ></input></td>
+                    /></td>
                     <td style={{verticalAlign: "top"}}
                         className="childs text-right "
                         colSpan={2}
@@ -431,7 +464,7 @@ class ItemsComponent extends MainComponent {
                     ><textarea value={data.notes}
                                onChange={(event) => this.setValue("notes", event.target.value)}
                                className="form-control"
-                    ></textarea></td>
+                    /></td>
                 </tr>
                 <tr>
                     <td className="text-right">Discontinued</td>
@@ -507,17 +540,17 @@ class ItemsComponent extends MainComponent {
     getChildItemsElement = () => {
         const {childItem} = this.state
         return <div style={{color: "black", textAlign: "left", marginLeft: 10}}>
-            <div style={{display: "flex", borderTop: "1px solid white", height: 5}}></div>
+            <div style={{display: "flex", borderTop: "1px solid white", height: 5}}/>
             <h3 className="childs-title">Child Items</h3>
 
             <div className="flex-row">
                 <ItemSearchComponent width={260}
                                      onSelect={this.handleChildSelect}
                                      value={childItem?.name}
-                ></ItemSearchComponent>
+                />
                 <i className="fal fa-2x fa-plus color-white pointer icon ml-3"
                    onClick={this.handleAddChild}
-                ></i>
+                />
             </div>
             {this.getChildItems()}
         </div>
@@ -545,7 +578,7 @@ class ItemsComponent extends MainComponent {
                                type="number"
                                value={c.quantity}
                                onChange={(event) => this.handleChildQuantity(c.id, event.target.value)}
-                    ></input></td>
+                    /></td>
                     <td>{this.getDeleteElement(c, () => this.handleDeleteChild(c))}</td>
                 </tr>
             )}
@@ -576,7 +609,7 @@ class ItemsComponent extends MainComponent {
         return <input checked={data[name] == trueValue}
                       onChange={() => this.setValue(name, data[name] == trueValue ? falseValue : trueValue)}
                       type="checkbox"
-        ></input>
+        />
     }
     getModal = () => {
         const {isNew, showModal} = this.state;
@@ -616,6 +649,7 @@ class ItemsComponent extends MainComponent {
         delete data.itemCategory;
         delete data.manufacturerName;
         delete data.allowGlobalPriceUpdate;
+        delete data.supplierName;
         if (!isNew) {
             this.api.updateChildItems(data.itemID, childItems).then((res) => {
             });
@@ -646,7 +680,6 @@ class ItemsComponent extends MainComponent {
     }
     handleSearch = (prop, value) => {
         const {filter} = this.state;
-        console.log(value);
         filter[prop] = value;
         filter.page = 1;
         this.setState({filter, reset: true});
@@ -669,7 +702,7 @@ class ItemsComponent extends MainComponent {
             <input className="form-control"
                    value={filter.q}
                    onChange={(event) => this.handleSearch('q', event.target.value)}
-            ></input>
+            />
             <select className="form-control"
                     value={filter.discontinued}
                     onChange={(event) => this.handleSearch('discontinued', event.target.value)}
@@ -688,13 +721,13 @@ class ItemsComponent extends MainComponent {
                 {this.getConfirm()}
             </div>
 
-            <Spinner show={this.state.showSpinner}></Spinner>
+            <Spinner show={this.state.showSpinner}/>
             <ToolTip title="New Item"
                      width={30}
             >
                 <i className="fal fa-2x fa-plus color-gray1 pointer"
                    onClick={this.handleNewItem}
-                ></i>
+                />
             </ToolTip>
             <div className="modal-style">
                 {this.getModal()}

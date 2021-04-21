@@ -1642,6 +1642,7 @@ class CTSalesOrder extends CTCNC
                 'restrictedView'       => $restrictedView,
                 'readOnly'             => $readOnly,
                 'valuesDisabled'       => $valuesDisabled,
+                'salesOrderType'       => $dsOrdhead->getValue(DBEOrdhead::type),
                 'updatedTime'          => $dsOrdhead->getValue(DBEOrdhead::updatedTime),
                 'currentDocumentsLink' => $this->getCurrentDocumentsLink(
                     $dsOrdhead->getValue(DBEOrdhead::customerID),
@@ -2281,6 +2282,8 @@ class CTSalesOrder extends CTCNC
         );
         $ordline           = new DBEOrdline($this);
         $ordline->getRow($dsOrdline->getValue(DBEOrdline::id));
+        $dbeItem = new DBEItem($this);
+        $dbeItem->getRow($dsOrdline->getValue(DBEOrdline::itemID));
         $this->template->set_var(
             array(
                 'salesOrderLineDesc' => $salesOrderLineDesc,
@@ -2299,6 +2302,14 @@ class CTSalesOrder extends CTCNC
                 'urlDeleteLine'      => $urlDeleteLine,
                 'urlAddLine'         => $urlAddLine,
                 'isRecurring'        => $dsOrdline->getValue(DBEOrdline::isRecurring) ? 'true' : 'false',
+                "itemId"             => $dsOrdline->getValue(DBEOrdline::itemID),
+                "supplierId"         => $dsOrdline->getValue(DBEOrdline::supplierID),
+                "itemUpdatedBy"      => $dbeItem->getValue(DBEItem::updatedBy),
+                "itemUpdatedAt"      => $dbeItem->getValue(DBEItem::updatedAt),
+                "itemCost"           => $dbeItem->getValue(DBEItem::curUnitCost),
+                "itemSale"           => $dbeItem->getValue(DBEItem::curUnitSale),
+                "showStock"          => $dsOrdline->getValue(DBEJOrdline::showStockLevels),
+                "amountInStock"      => $dsOrdline->getValue(DBEJOrdline::qtyInStock)
             )
         );
         if ($dsOrdline->getValue(
@@ -2328,8 +2339,7 @@ class CTSalesOrder extends CTCNC
             $showStockLevels = "";
             if ($dsOrdline->getValue(DBEJOrdline::showStockLevels) && $dsOrdline->getValue(
                     DBEOrdline::curUnitCost
-                ) > 0 //&& $dsOrdline->getValue(DBEJOrdline::supplierID) == CONFIG_SALES_STOCK_SUPPLIERID
-                && $dsOrdline->getValue(DBEJOrdline::qtyInStock) >= $dsOrdline->getValue(
+                ) > 0 && $dsOrdline->getValue(DBEJOrdline::qtyInStock) >= $dsOrdline->getValue(
                     DBEOrdline::qtyOrdered
                 )) $showStockLevels = "<i class=\"fal fa-2x fa-boxes color-gray icon\"></i>";
             if (!$restrictedView) {

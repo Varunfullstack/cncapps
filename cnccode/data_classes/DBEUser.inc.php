@@ -540,6 +540,12 @@ class DBEUser extends DBEntity
     {
         return $this->getValue(self::queueManager);
     }
+
+    public function getFullName()
+    {
+        return "{$this->getValue(self::firstName)} {$this->getValue(self::lastName)}";
+    }
+
 }
 
 ?>

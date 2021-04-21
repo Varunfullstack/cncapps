@@ -44,6 +44,7 @@ SupplierSearchComponent.propTypes = {
 }
 
 document.renderSupplierSearchComponent = (domContainer, {inputId, supplierId, onChange}) => {
+    console.log(`supplierId: ${supplierId}`);
     const element = document.getElementById(inputId)
     const renderedInstance =
         ReactDOM.render(React.createElement(SupplierSearchComponent, {

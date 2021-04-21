@@ -1,10 +1,8 @@
 <!-- Template: InvoiceDisplay.inc.html -->
-<script language='JavaScript'
-        src="CommonJS.js"
+<script src="CommonJS.js"
 ></script>
 {invoiceSiteEditJS}
-<script language='JavaScript'>
-
+<script>
 
     function updateSequenceNumbers(items, fromSequenceNo, toSequenceNo) {
         if (!items.length) {
@@ -33,74 +31,71 @@
         const deleteLineButtons = document.querySelectorAll('button.deleteLineButton');
         deleteLineButtons.forEach(el => el.addEventListener('click', ($event) => {
 
-                if (!confirm('Are you sure you want to delete this row?')) {
-                    return;
-                }
+                    if (!confirm('Are you sure you want to delete this row?')) {
+                        return;
+                    }
 
-                const target = $event.target;
-                const row = target.closest('tr');
+                    const target = $event.target;
+                    const row = target.closest('tr');
 
-                const currentSequenceNo = row.dataset.sequenceNo;
+                    const currentSequenceNo = row.dataset.sequenceNo;
 
-                fetch('?action=deleteLine', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        invheadID: {invheadID},
-                        sequenceNo: currentSequenceNo
+                    fetch('?action=deleteLine', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            invheadID: {invheadID},
+                            sequenceNo: currentSequenceNo
+                        })
                     })
+                            .then(x => x.json())
+                            .then(res => {
+                                if (res.status !== 'ok') {
+                                    throw new Error('Failed to delete row: ' + res.message);
+                                }
+                                const tbody = row.closest('tbody');
+                                row.remove();
+                                updateSequenceNumbers(tbody.children, currentSequenceNo, tbody.childElementCount);
+
+                            })
+                            .catch(error => {
+                                alert(error);
+                                console.error(error)
+                            })
+
+
                 })
-                    .then(x => x.json())
-                    .then(res => {
-                        if (res.status !== 'ok') {
-                            throw new Error('Failed to delete row: ' + res.message);
-                        }
-                        const tbody = row.closest('tbody');
-                        row.remove();
-                        updateSequenceNumbers(tbody.children, currentSequenceNo, tbody.childElementCount);
-
-                    })
-                    .catch(error => {
-                        alert(error);
-                        console.error(error)
-                    })
-
-
-            })
         );
 
-        // document.getElementById('addNewRowButton').addEventListener('click', $event => {
-         
-        //     //open('/Invoice.php?action=addLine&invheadID={invheadID}', '_blank');
-        // });
-        
     })
-    function lineModal(url){
-            window.open(url,
-                            'addLine',
-                            'scrollbars=yes,resizable=no,height=300,width=740,copyhistory=no, menubar=0');                 
-        }
+
+    function lineModal(url) {
+        window.open(url,
+                'addLine',
+                'scrollbars=yes,resizable=no,height=300,width=740,copyhistory=no, menubar=0');
+    }
+
     function checkFunctionKey(field) {
         if (event.keyCode == 120) {			// F9 - edit
             switch (field.id) {
                 case "siteDesc":
                     if (document.getElementById("siteNo").value != "") {
                         window.open(
-                            '{urlSiteEdit}&customerID={customerID}' +
-                            '&siteNo=' + escape(document.getElementById("siteNo").value) +
-                            '&parentIDField=siteNo' +
-                            '&parentDescField=siteDesc',
-                            'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
+                                '{urlSiteEdit}&customerID={customerID}' +
+                                '&siteNo=' + escape(document.getElementById("siteNo").value) +
+                                '&parentIDField=siteNo' +
+                                '&parentDescField=siteDesc',
+                                'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
                         );
                     }
                     break;
                 case "contactName":
                     if (document.getElementById("contactID").value != "") {
                         window.open(
-                            '{urlContactEdit}' +
-                            '&contactID=' + escape(document.getElementById("contactID").value) +
-                            '&parentIDField=contactID' +
-                            '&parentDescField=contactName',
-                            'contact', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0');
+                                '{urlContactEdit}' +
+                                '&contactID=' + escape(document.getElementById("contactID").value) +
+                                '&parentIDField=contactID' +
+                                '&parentDescField=contactName',
+                                'contact', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0');
                     }
                     break;
             }

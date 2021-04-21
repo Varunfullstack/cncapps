@@ -56,4 +56,8 @@ export default class APIItems extends APIMain {
         });
 
     }
+
+    getSuppliers() {
+        return this.get(`${ApiUrls.Supplier}getSuppliers`);
+    }
 }
