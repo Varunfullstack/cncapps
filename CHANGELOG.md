@@ -6,6 +6,7 @@ This project changes will be shown here.
 - Issue 1217 - Force T&M when SR has Call Out Expense.
 - Issue 1305 - Deleting SR that has a callback is prevented.
 - Issue 1331 - Asset list export field types
+- Issue 1344 - Show pending call backs against the SR in the queue
 
 ## [v5.8.6] - 2021-04-22
 ### Fixed
