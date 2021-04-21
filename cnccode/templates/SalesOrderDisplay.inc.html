@@ -287,7 +287,7 @@
                                 button.addEventListener('click', async () => {
                                     const newCost = itemRow.querySelector('input.lineItemUnitCost').value;
                                     const newSale = itemRow.querySelector('input.lineItemUnitSale').value;
-                                    console.log(newSale);
+
                                     if (!confirm(
                                             "Please confirm you want to change the master item cost price for " +
                                             description +
@@ -387,7 +387,6 @@
         })
 
         document.querySelector('#performActionButton').addEventListener('click', $event => {
-            console.log('perform action');
             if (!actionSelector.selectedOptions.length) {
                 return;
             }

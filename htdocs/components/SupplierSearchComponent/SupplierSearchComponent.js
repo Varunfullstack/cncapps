@@ -8,7 +8,7 @@ import PropTypes from "prop-types";
 export class SupplierSearchComponent extends React.PureComponent {
 
     constructor(props, context) {
-        super(props, context);         
+        super(props, context);
     }
 
     handleChange = (value) => {
@@ -44,7 +44,6 @@ SupplierSearchComponent.propTypes = {
 }
 
 document.renderSupplierSearchComponent = (domContainer, {inputId, supplierId, onChange}) => {
-    console.log(`supplierId: ${supplierId}`);
     const element = document.getElementById(inputId)
     const renderedInstance =
         ReactDOM.render(React.createElement(SupplierSearchComponent, {
