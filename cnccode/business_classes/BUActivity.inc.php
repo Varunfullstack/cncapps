@@ -10004,10 +10004,6 @@ class BUActivity extends Business
                 DBEJProblem::awaitingCustomerResponseFlag,
                 'N'
             );
-            $dbeProblem->setValue(
-                DBEJProblem::userID,
-                $this->dbeUser->getValue(DBEUser::userID)
-            );
             $dbeProblem->insertRow();
             $problemID = $dbeProblem->getPKValue();
             $dbeSite   = new DBESite($this);
