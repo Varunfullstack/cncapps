@@ -305,6 +305,7 @@ class BUProblemSLA extends Business
                 );
             }
             echo $this->dbeProblem->getValue(DBEProblem::problemID) . ': ' . $workingHours . '<BR/>';
+            $this->ensureHDHasMinimumAssignedMinutes($dsProblems);
             if (!$dryRun) {
                 $this->dbeProblem->updateRow();
             }
@@ -339,6 +340,7 @@ class BUProblemSLA extends Business
                 DBEProblem::awaitingCustomerResponseFlag,
                 $this->awaitingCustomerResponseFlag
             );
+            $this->ensureHDHasMinimumAssignedMinutes($dsProblems);
             if (!$dryRun) {
                 $this->dbeProblem->updateRow();
             }
@@ -382,7 +384,7 @@ class BUProblemSLA extends Business
             }
         }
 
-    } // end function autoCompletion
+    }
 
     /**
      * Calculate number of working hours for a problem
@@ -1087,6 +1089,20 @@ class BUProblemSLA extends Business
             $updateCustomer->getRow($dbeCustomer->getPKValue());
             $updateCustomer->setValue(DBECustomer::specialAttentionFlag, 'N');
             $updateCustomer->updateRow();
+        }
+    }
+
+    /**
+     * @param DBEJProblem $dsProblems
+     * @throws \CNCLTD\Exceptions\ColumnOutOfRangeException
+     */
+    private function ensureHDHasMinimumAssignedMinutes(DBEJProblem $dsProblems): void
+    {
+        $usedMinutes      = $this->buActivity->getHDTeamUsedTime($dsProblems->getValue(DBEJProblem::problemID));
+        $assignedMinutes  = $this->dbeProblem->getValue(DBEProblem::hdLimitMinutes);
+        $minutesRemaining = $assignedMinutes - $usedMinutes;
+        if ($minutesRemaining < 3) {
+            $this->dbeProblem->setValue(DBEProblem::hdLimitMinutes, 3);
         }
     }
 
