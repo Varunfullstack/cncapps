@@ -8,6 +8,7 @@ This project changes will be shown here.
 - Issue 1331 - Asset list export field types
 - Issue 1344 - Show pending call backs against the SR in the queue
 - Issue 1341 - Allocate a minimum of 3 helpdesk minutes to open SRs
+- Issue 1346 - Sales Requests auto assignment
 ### Fixed
 - Issue 1226 - StreamOne error handling
 
