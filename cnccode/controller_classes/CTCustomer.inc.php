@@ -3243,7 +3243,8 @@ class CTCustomer extends CTCNC
                     'urlProblemHistoryPopup' => $urlProblemHistoryPopup,
                     'priority'               => $dsActiveSrs->getValue(DBEJProblem::priority),
                     'status'                 => $dsActiveSrs->getValue(DBEJProblem::status),
-                    'isSpecialAttention'     => $this->isSpecialAttention($dsActiveSrs)
+                    'isSpecialAttention'     => $this->isSpecialAttention($dsActiveSrs),
+                    "assetName"              => $dsActiveSrs->getValue('assetName'),
                 )
             );
         }

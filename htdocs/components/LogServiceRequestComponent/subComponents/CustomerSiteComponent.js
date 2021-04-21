@@ -117,7 +117,14 @@ class CustomerSiteComponent extends MainComponent {
                 data.emptyAssetReason = value.template;
             }
         }
-
+        if(data.assetName)
+        {
+            const {customerSR}=this.props.data;            
+            let suggestSR=customerSR.filter(p=>p.assetName==data.assetName);
+            if(!value)
+                suggestSR=[];
+            this.setState({suggestSR})  
+        }
         this.setState({data});
     };
     getAssetElement = () => {
@@ -179,10 +186,8 @@ class CustomerSiteComponent extends MainComponent {
     };
     handleReasonChange=(value)=>{
         const {customerSR}=this.props.data;
-        this.setValue("reasonTemplate", value);
-        console.log("reasonTemplate", value);
-        //start matching
-        console.log('Matching');//customerSR.length
+        this.setValue("reasonTemplate", value);         
+        //start matching        
         for(let i=0; i<customerSR.length;i++)
         {
             customerSR[i]['percent']=similarity(value,customerSR[i].reason);
@@ -190,8 +195,7 @@ class CustomerSiteComponent extends MainComponent {
         let suggestSR=customerSR.filter(p=>p.percent>0.5);
         if(!value)
         suggestSR=[];
-        this.setState({suggestSR})
-        console.log(suggestSR);
+        this.setState({suggestSR})    
     }
     handleNext = async () => {
         let {data} = this.state;
@@ -245,14 +249,25 @@ class CustomerSiteComponent extends MainComponent {
                         Try these suggested problems
                         </div>
                 {suggestSR.map(p=><div key={p.activityID} style={{ padding: 5,}} >
+
                     <a href={`SRActivity.php?action=displayActivity&serviceRequestId=${p.problemID}`} target="_blank" rel="noreferrer">
-                        {p.reason}
+                     {this.getProblemStatus(p.status)} {p.reason}
                     </a>
                 </div>)}
             </div>
         }
         else
         return null;
+    }
+    getProblemStatus(code){
+        switch (code) {
+          case "I":
+            return "INITIAL: ";
+          case "P":
+            return "IN PROGRESS: ";
+          case "F":
+            return "FIXED: ";
+        }
     }
     openProblemHistory = (problemId) => {
         window.open(
