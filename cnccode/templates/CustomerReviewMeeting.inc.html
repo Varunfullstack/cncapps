@@ -55,8 +55,9 @@
         $('#create-pdf').click(function () {
             $(this).attr('disabled', true);
             //loop through sections looking for large tables
-            updateTables();
             handleEditableText();
+            updateTables();
+           
             var sections = 1;
             $('h2').each(function () {
                 $(this).prepend(sections + '. ');
@@ -116,7 +117,6 @@
 
         $('.reportSection table').each(function () {
             var rowCount = $('tbody tr', $(this)).length;
-
             if (this.id === 'servicesTable') {
                 return;
             }

@@ -2,31 +2,33 @@
     Server Contract = {contractDescription}
 </p>
 <!-- <p>
-    Next Invoice: {nextInvoice}
+Next Invoice: {nextInvoice}
 </p> -->
 <p>
     Servers Under Support
 </p>
-<table>
-    <thead>
-    <tr>
-        <th>Server Details</th>
-        <th>Tag No.</th>
-        <th>Server Name</th>
-        <th>Purchase Date</th>
-    </tr>
-    </thead>
-    <tbody>
-    <!-- BEGIN contractItemsBlock -->
-    <tr>
-        <td>{itemDescription}</td>
-        <td>{serialNo}</td>
-        <td>{serverName}</td>
-        <td>{purchaseDate}</td>
-    </tr>
-    <!-- END contractItemsBlock -->
-    </tbody>
-</table>
+<div class="reportSection noNewPage">    
+    <table>
+        <thead>
+            <tr>
+                <th>Server Details</th>
+                <th>Tag No.</th>
+                <th>Server Name</th>
+                <th>Purchase Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- BEGIN contractItemsBlock -->
+            <tr>
+                <td>{itemDescription}</td>
+                <td>{serialNo}</td>
+                <td>{serverName}</td>
+                <td>{purchaseDate}</td>
+            </tr>
+            <!-- END contractItemsBlock -->
+        </tbody>
+    </table>    
+</div>
 <p>
     Supported Users (Portal) = {usersCount}
 </p>
@@ -36,22 +38,22 @@
 <p>
     PC's with O/S = {pcs}
 </p>
-<div style="display: {hasServersNotSupport}">
-    <p>    
-        Servers Not Support
+<div class="reportSection noNewPage">
+    <p style="display: {hasServersNotSupport}">
+        Servers Not Supported
     </p>
-    <table>
+    <table  style="display: {hasServersNotSupport}" id="serverUnsupported">
         <thead>
-        <tr>
-            <th>Server Name</th>        
-        </tr>
+            <tr>
+                <th>Server Name</th>
+            </tr>
         </thead>
         <tbody>
-        <!-- BEGIN serversNotSupportedItemsBlock -->
-        <tr>
-            <td>{serverName}</td>       
-        </tr>
-        <!-- END serversNotSupportedItemsBlock -->
+            <!-- BEGIN serversNotSupportedItemsBlock -->
+            <tr>
+                <td>{serverName}</td>
+            </tr>
+            <!-- END serversNotSupportedItemsBlock -->
         </tbody>
     </table>
 </div>
