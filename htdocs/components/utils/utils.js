@@ -335,3 +335,14 @@ function editDistance(s1, s2) {
     }
     return costs[s2.length];
   }
+   
+  export function bigger(values) {
+    if (values.length > 0) {
+      let max = values[0];
+      for (let i = 0; i < values.length; i++) {
+        if (values[i] > max) max = values[i];
+      }
+      return max;
+    }
+    return 0;
+  }

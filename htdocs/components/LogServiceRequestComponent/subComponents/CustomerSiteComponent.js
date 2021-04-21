@@ -5,7 +5,7 @@ import React from 'react';
 import APIStandardText from "../../services/APIStandardText";
 import EditorFieldComponent from "../../shared/EditorField/EditorFieldComponent";
 import AssetListSelectorComponent from "../../shared/AssetListSelectorComponent/AssetListSelectorComponent";
-import { params, similarity } from "../../utils/utils.js";
+import { bigger, params, similarity } from "../../utils/utils.js";
 
 class CustomerSiteComponent extends MainComponent {
     el = React.createElement;
@@ -153,8 +153,10 @@ class CustomerSiteComponent extends MainComponent {
                 maxLength: 50,
                 style: {width: 292, margin: 2},
                 className: 'spellcheck',
-                onChange: (event) =>
-                    this.setValue("emailSubjectSummary", event.target.value),
+                onChange: (event) =>{
+                    this.setValue("emailSubjectSummary", event.target.value);
+                    this.checkSuggestSR(event.target.value);
+                },
                 value: this.state.data.emailSubjectSummary,
             })
         );
@@ -185,17 +187,29 @@ class CustomerSiteComponent extends MainComponent {
         );
     };
     handleReasonChange=(value)=>{
-        const {customerSR}=this.props.data;
-        this.setValue("reasonTemplate", value);         
+         this.setValue("reasonTemplate", value);         
         //start matching        
-        for(let i=0; i<customerSR.length;i++)
-        {
-            customerSR[i]['percent']=similarity(value,customerSR[i].reason);
+        this.checkSuggestSR(value);
+    }
+    checkSuggestSR=(value)=>{
+        const { customerSR } = this.props.data;
+
+        for (let i = 0; i < customerSR.length; i++) {
+          const reasonPerc = similarity(value, customerSR[i].reason);
+          const lastReasonPerc = similarity(value, customerSR[i].lastReason);
+          const emailSubjectSummaryPerc = similarity(
+            value,
+            customerSR[i].emailSubjectSummary
+          );
+          customerSR[i]["percent"] = bigger([
+            reasonPerc,
+            lastReasonPerc,
+            emailSubjectSummaryPerc,
+          ]);
         }
-        let suggestSR=customerSR.filter(p=>p.percent>0.5);
-        if(!value)
-        suggestSR=[];
-        this.setState({suggestSR})    
+        let suggestSR = customerSR.filter((p) => p.percent > 0.5);
+        if (!value) suggestSR = [];
+        this.setState({ suggestSR });    
     }
     handleNext = async () => {
         let {data} = this.state;

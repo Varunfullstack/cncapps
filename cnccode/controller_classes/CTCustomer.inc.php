@@ -3245,6 +3245,7 @@ class CTCustomer extends CTCNC
                     'status'                 => $dsActiveSrs->getValue(DBEJProblem::status),
                     'isSpecialAttention'     => $this->isSpecialAttention($dsActiveSrs),
                     "assetName"              => $dsActiveSrs->getValue('assetName'),
+                    "emailSubjectSummary"              => $dsActiveSrs->getValue('emailSubjectSummary'),
                 )
             );
         }
