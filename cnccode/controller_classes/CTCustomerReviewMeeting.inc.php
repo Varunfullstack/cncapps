@@ -1412,13 +1412,13 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
         ];
 
         $totalSR = [
-            "title"   => "Total Service Requests",
+            "title"   => "Recent Service Requests",
             "columns" => ["Dates", "P1-3", "P4",],
             "data"    => []
         ];
 
         $historicTotalSR = [
-            "title"   => "Historic Total SRs",
+            "title"   => "Historic Service Requests",
             "columns" => ["Dates", "P1-3", "P4"],
             "data"    => []
         ];

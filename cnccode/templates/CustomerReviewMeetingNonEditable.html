@@ -40,8 +40,8 @@
          drawChart('historicTotalSR','line',400);
         console.log('hasServiceDesk', hasServiceDesk);
         if (hasServiceDesk == "1") {
-            drawChart('firstTimeFixRequests', 'pie', 300, 400);
-            drawChart('sourceOfRequests', 'pie', 300, 400);
+            drawChart('firstTimeFixRequests', 'pie', 400, 400);
+            drawChart('sourceOfRequests', 'pie', 400, 400);
         }
     }
 
@@ -79,6 +79,7 @@
                 chart = new google.visualization.PieChart(document.getElementById(chartName));
                 options["is3D"] = true;
                 options["legend"] = { position: 'right', maxLines: 4 };
+                options['chartArea']={width: '100%', height: '80%'};
                 break;
 
         }
@@ -214,7 +215,7 @@
         </tbody>
     </table>
 
-    <table class="sla-table" style="width: 70%;">
+    <table class="sla-table" style="width: 100%;">
         <thead>
             <tr>
                 <th></th>
