@@ -635,6 +635,9 @@ FROM
 
     function moveSR()
     {
+        if (!$this->isSRQueueManager() && !$this->isSdManager()) {
+            throw new JsonHttpException(3432, 'Not authorized');
+        }
         $body       = $this->getBody(true);
         $fromUserId = @$body["from"];
         $toUserId   = @$body["to"];
