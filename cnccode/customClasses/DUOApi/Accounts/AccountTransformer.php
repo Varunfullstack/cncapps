@@ -1,7 +1,7 @@
 <?php
 
 
-namespace CNCLTD\DUOApi;
+namespace CNCLTD\DUOApi\Accounts;
 
 
 use Karriere\JsonDecoder\Bindings\AliasBinding;

@@ -1,13 +1,12 @@
 <?php
 
-
-namespace CNCLTD\DUOApi;
-
+namespace CNCLTD\DUOApi\AccountInfo;
 
 use Karriere\JsonDecoder\Bindings\AliasBinding;
 use Karriere\JsonDecoder\ClassBindings;
+use Karriere\JsonDecoder\Transformer;
 
-class AccountInfoTransformer implements \Karriere\JsonDecoder\Transformer
+class AccountInfoTransformer implements Transformer
 {
 
     /**

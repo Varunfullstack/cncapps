@@ -2,6 +2,8 @@
 This project changes will be shown here.
 
 ## [unreleased]
+### Added
+- Issue 1280 - Duo Usage Portal in Portal.
 ### Changed
 - Issue 1217 - Force T&M when SR has Call Out Expense.
 - Issue 1305 - Deleting SR that has a callback is prevented.

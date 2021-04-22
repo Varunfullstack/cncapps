@@ -1,9 +1,6 @@
 <?php
 
-
-namespace CNCLTD\DUOApi;
-
-
+namespace CNCLTD\DUOApi\Accounts;
 class Account
 {
     public $accountId;
