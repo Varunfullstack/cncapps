@@ -24,6 +24,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
     const CONST_MOVE_SR                           = "moveSR";
     const CONST_USER_PROBLEM_SUMMARY              = "userProblemsSummary";
     const CONST_UNASSIGNED_SUMMARY                = "unassignedSummary";
+
     function __construct($requestMethod,
                          $postVars,
                          $getVars,
@@ -96,11 +97,11 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
                 echo json_encode($this->moveSR());
                 exit;
             case self::CONST_USER_PROBLEM_SUMMARY:
-                echo json_encode($this->getUserProblemsSummary(),JSON_NUMERIC_CHECK);
+                echo json_encode($this->getUserProblemsSummary(), JSON_NUMERIC_CHECK);
                 exit;
             case self::CONST_UNASSIGNED_SUMMARY:
-                echo json_encode($this->getUnassignedSummary(),JSON_NUMERIC_CHECK);
-                exit;    
+                echo json_encode($this->getUnassignedSummary(), JSON_NUMERIC_CHECK);
+                exit;
             case "react":
             default:
                 $this->setTemplate();
@@ -593,7 +594,7 @@ FROM
                      $this
                  )
         );
-        $jsonData = $this->getJSONData();
+        $jsonData  = $this->getJSONData();
         $requestId = @$jsonData['id'];
         if (!$requestId) {
             throw new JsonHttpException(400, 'id is required');
@@ -619,7 +620,7 @@ FROM
         $usecase   = new ResendPendingChargeableWorkCustomerRequestEmail(
             $repo, new BUActivity($this), new DBEContact($this)
         );
-        $jsonData = $this->getJSONData();
+        $jsonData  = $this->getJSONData();
         $requestId = @$jsonData['id'];
         if (!$requestId) {
             throw new JsonHttpException(400, 'id is required');
@@ -631,160 +632,150 @@ FROM
         }
         return ["status" => "ok"];
     }
-    function moveSR(){
-        $fromUserId=@$_REQUEST["from"];
-        $toUserId=@$_REQUEST["to"];
-        $option=@$_REQUEST["option"];
-        $customerID=@$_REQUEST["customerID"];
 
-        if(empty($fromUserId)||empty($toUserId)||empty($option))
-        {
-            return ["status"=>false,"Missing Pramters"];
+    function moveSR()
+    {
+        $body       = $this->getBody(true);
+        $fromUserId = @$body["from"];
+        $toUserId   = @$body["to"];
+        $option     = @$body["option"];
+        $customerID = @$body["customerID"];
+        $queue      = @$body['queue'];
+        $exchange   = @$body['exchange'];
+        if ($fromUserId === $toUserId) {
+            throw new JsonHttpException(123, 'Cannot reassign to the same user!');
         }
-        $problems=[];
-        switch($option)
-        {
-            case 1:
-                $problems=DBConnect::fetchAll(
-                    "SELECT DISTINCT pro_problemno AS id 
-                    FROM  problem JOIN  callactivity c ON c.caa_problemno=pro_problemno  
-                    where pro_consno=:enginner",["enginner"=>$fromUserId]
-                    );
-                    break;
-            case 2:
-                $problems=DBConnect::fetchAll(
-                    "SELECT DISTINCT pro_problemno AS id 
-                    FROM  problem JOIN  callactivity c ON c.caa_problemno=pro_problemno  
-                    where pro_consno=:enginner and pro_status='I'",["enginner"=>$fromUserId]
-                    );
-                    break;
-            case 3:
-                $problems=DBConnect::fetchAll(
-                    "SELECT DISTINCT pro_problemno AS id 
-                    FROM  problem JOIN  callactivity c ON c.caa_problemno=pro_problemno  
-                    where pro_consno=:enginner and pro_status='P' ",["enginner"=>$fromUserId]
-                    );
-                    break;
-            case 4:
-                $problems=DBConnect::fetchAll(
-                    "SELECT DISTINCT pro_problemno AS id 
-                    FROM  problem JOIN  callactivity c ON c.caa_problemno=pro_problemno  
-                    where pro_consno=:enginner and pro_awaiting_customer_response_flag ='Y' ",["enginner"=>$fromUserId]
-                    );
-                    break;
-            case 5:
-                $problems=DBConnect::fetchAll(
-                    "SELECT DISTINCT pro_problemno AS id 
-                    FROM  problem JOIN  callactivity c ON c.caa_problemno=pro_problemno  
-                    where pro_consno=:enginner and pro_custno =:customerID ",["enginner"=>$fromUserId,"customerID"=>$customerID]
-                    );
-                break;
-                
+        if (empty($option)) {
+            return ["status" => false, "Missing Parameters"];
         }
-        //send emails
-        foreach ($problems as $problem) {
-            //update problems
-            DBConnect::execute("update problem set pro_consno=:to where pro_problemno=:id", ["id" => $problem["id"], "to" => $toUserId]);
-            if ($toUserId != -1) {
-                $this->allocateProblem($problem["id"], $toUserId);
+        if (!$queue && (!$fromUserId || !$toUserId)) {
+            throw new JsonHttpException(123, "Cannot assign to unassigned or from unassigned if no queue is provided");
+        }
+        $select           = " select pro_problemno id from problem ";
+        $where            = " where pro_consno is null ";
+        $exchangeToWhere  = " where pro_consno is null";
+        $params           = [];
+        $exchangeToParams = [];
+        if ($fromUserId) {
+            $where                     = " where pro_consno = :fromEngineer";
+            $params   ["fromEngineer"] = $fromUserId;
+        }
+        if ($toUserId) {
+            $exchangeToWhere                = " where pro_consno = :toEngineer";
+            $exchangeToParams['toEngineer'] = $toUserId;
+        }
+        if ($queue) {
+            if (!$fromUserId) {
+                $where           .= " and pro_queue_no = :queue ";
+                $params['queue'] = $queue;
+            }
+            if (!$toUserId) {
+                $exchangeToWhere           .= " and pro_queue_no = :queue ";
+                $exchangeToParams['queue'] = $queue;
             }
         }
-        return ["status"=>true];        
+        $additionalWhere  = "";
+        $additionalParams = [];
+        switch ($option) {
+            case 2:
+                $additionalWhere = " and pro_status='I' ";
+                break;
+            case 3:
+                $additionalWhere = " and pro_status='P' ";
+                break;
+            case 4:
+                $additionalWhere = " and pro_awaiting_customer_response_flag ='Y' ";
+                break;
+            case 5:
+                $additionalWhere                = " and pro_custno = :customerID ";
+                $additionalParams['customerID'] = $customerID;
+                break;
+        }
+        $where                   .= $additionalWhere;
+        $exchangeToWhere         .= $additionalWhere;
+        $params                  = array_merge($params, $additionalParams);
+        $exchangeToParams        = array_merge($exchangeToParams, $additionalParams);
+        $query                   = $select . $where;
+        $exchangeQuery           = $select . $exchangeToWhere;
+        $serviceRequests         = DBConnect::fetchAll($query, $params);
+        $exchangeServiceRequests = DBConnect::fetchAll($exchangeQuery, $exchangeToParams);
+        foreach ($serviceRequests as $problem) {
+            $this->allocateProblem($problem["id"], $toUserId);
+        }
+        if ($exchange) {
+            foreach ($exchangeServiceRequests as $serviceRequest) {
+                $this->allocateProblem($serviceRequest['id'], $fromUserId);
+            }
+        }
+        return ["status" => true];
     }
-    function allocateProblem($problemID,$userID){
-        $dbeUser = new DBEUser ($this);
-        $dbeUser->setValue(
-            DBEUser::userID,
-            $this->userID
-        );
-        $dbeUser->getRow();
+
+    function allocateProblem($problemID, $userID)
+    {
         $this->buActivity->allocateUserToRequest(
             $problemID,
             $userID,
-            $dbeUser
+            $this->getDbeUser()
         );
     }
-    function getUserProblemsSummary(){
-       
-        $option=@$_REQUEST["option"];
-        $customerID=@$_REQUEST["customerID"];
-        if(empty($option))
-        {
-            return ["status"=>false,"Missing Pramters"];
+
+    function getUserProblemsSummary()
+    {
+
+        $option     = @$_REQUEST["option"];
+        $customerID = @$_REQUEST["customerID"];
+        $queue      = @$_REQUEST['queueId'];
+        if (empty($option)) {
+            return ["status" => false, "Missing Parameters"];
         }
-        switch($option)
-        {
-            case 1://All sr
-                $problems=DBConnect::fetchAll(
-                    "SELECT pro_consno id,COUNT(DISTINCT pro_problemno ) AS total 
-                    FROM  problem JOIN  callactivity c ON c.caa_problemno=pro_problemno 
-                    WHERE pro_consno IS NOT NULL 
-                    GROUP BY pro_consno "
-                    );                
-                return ["status"=>true,"problems"=>$problems];
-                break;
+        $select  = "SELECT pro_consno id,COUNT(pro_problemno ) total ";
+        $from    = " from problem ";
+        $where   = " where pro_consno is not null ";
+        $groupBy = " group by pro_consno";
+        $params  = [];
+        if ($queue) {
+            $select          = "select pro_consno id, SUM((pro_consno IS NULL AND pro_queue_no = :queue) OR pro_consno IS NOT NULL) total";
+            $where           = " where 1 ";
+            $params["queue"] = $queue;
+        }
+        switch ($option) {
             case 2:// unstarted
-                $problems=DBConnect::fetchAll(
-                    "SELECT pro_consno id,COUNT(DISTINCT pro_problemno ) AS total 
-                    FROM  problem JOIN  callactivity c ON c.caa_problemno=pro_problemno 
-                    WHERE pro_consno IS NOT NULL 
-                    and pro_status='I'
-                    GROUP BY pro_consno "
-                    );                
-                return ["status"=>true,"problems"=>$problems];
+                $where .= " and pro_status = 'I' ";
                 break;
             case 3: // in progress
-                $problems=DBConnect::fetchAll(
-                    "SELECT pro_consno id,COUNT(DISTINCT pro_problemno ) AS total 
-                    FROM  problem JOIN  callactivity c ON c.caa_problemno=pro_problemno                     
-                    WHERE pro_consno IS NOT NULL 
-                    and pro_status='P'
-                    GROUP BY pro_consno "
-                    );                
-                return ["status"=>true,"problems"=>$problems];
+                $where .= " and pro_status = 'P' ";
                 break;
-            case 4: // in hold 
-                $problems=DBConnect::fetchAll(
-                    "SELECT pro_consno id,COUNT(DISTINCT pro_problemno ) AS total 
-                    FROM  problem JOIN  callactivity c ON c.caa_problemno=pro_problemno                     
-                    WHERE pro_consno IS NOT NULL 
-                    and pro_awaiting_customer_response_flag ='Y'
-                    GROUP BY pro_consno "
-                    );                
-                return ["status"=>true,"problems"=>$problems];
+            case 4: // in hold
+                $where .= " and pro_awaiting_customer_response_flag = 'Y' ";
                 break;
             case 5: // in customer
-                $problems=DBConnect::fetchAll(
-                    "SELECT pro_consno id,COUNT(DISTINCT pro_problemno ) AS total 
-                    FROM  problem JOIN  callactivity c ON c.caa_problemno=pro_problemno                     
-                    WHERE pro_consno IS NOT NULL 
-                    and pro_custno =:customerID                    
-                    GROUP BY pro_consno "
-                    ,["customerID"=>$customerID]);                
-                return ["status"=>true,"problems"=>$problems];
+                if (!$customerID) {
+                    throw new JsonHttpException(3220, "Customer ID required for customer type search");
+                }
+                $where                .= "and pro_custno = :customerID";
+                $params["customerID"] = $customerID;
                 break;
         }
-        return ["status"=>false ];
+        $query    = $select . $from . $where . $groupBy;
+        $problems = DBConnect::fetchAll($query, $params);
+        return ["status" => 'ok', "data" => $problems];
     }
-    function getUnassignedSummary(){
-        $hd =isset($_REQUEST["hd"])??false;
-        $es =isset($_REQUEST["es"])??false;
-        $p  =isset($_REQUEST["p"])??false;
-        $sp =isset($_REQUEST["sp"])??false;
-        $query="SELECT count(*) AS total 
+
+    function getUnassignedSummary()
+    {
+        $hd    = isset($_REQUEST["hd"]) ?? false;
+        $es    = isset($_REQUEST["es"]) ?? false;
+        $p     = isset($_REQUEST["p"]) ?? false;
+        $sp    = isset($_REQUEST["sp"]) ?? false;
+        $query = "SELECT count(*) AS total 
         FROM  problem JOIN  callactivity c ON c.caa_problemno=pro_problemno                     
         WHERE pro_consno IS   NULL     
         ";
-        if(!$hd)
-            $query .=" and  pro_queue_no<> 1 ";
-        if(!$es)
-            $query .=" and  pro_queue_no<> 2 ";
-        if(!$p)
-            $query .=" and  pro_queue_no<> 5 ";
-        if(!$sp)
-            $query .=" and  pro_queue_no<> 3 ";
-
-        $problems=DBConnect::fetchAll($query);       
-        return   $problems;      
+        if (!$hd) $query .= " and  pro_queue_no<> 1 ";
+        if (!$es) $query .= " and  pro_queue_no<> 2 ";
+        if (!$p) $query .= " and  pro_queue_no<> 5 ";
+        if (!$sp) $query .= " and  pro_queue_no<> 3 ";
+        $problems = DBConnect::fetchAll($query);
+        return $problems;
     }
 }
