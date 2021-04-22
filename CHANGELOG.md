@@ -10,6 +10,7 @@ This project changes will be shown here.
 - Issue 1341 - Allocate a minimum of 3 helpdesk minutes to open SRs
 - Issue 1346 - Sales Requests auto assignment
 - Issue 1339 - Update item master price from Sales Order
+- Issue 1350 - Grammar Exclusions for Spellchecker
 ### Fixed
 - Issue 1226 - StreamOne error handling
 
