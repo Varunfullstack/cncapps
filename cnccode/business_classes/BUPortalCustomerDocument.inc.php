@@ -89,7 +89,6 @@ class BUPortalCustomerDocument extends Business
         $writer->save($tempFileName);
         $data = file_get_contents($tempFileName);
         $duoDocument->setValue(DBEPortalCustomerDocument::file, $data);
-        $duoDocument->setShowSQLOn();
         if (!$duoDocument->getPKValue()) {
             $duoDocument->insertRow();
         } else {
