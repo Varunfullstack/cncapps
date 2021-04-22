@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1348 - Mass SR Assignment enhancements
+
 ## [v5.8.5] - 2021-04-20
 ### Fixed
 - Fixed UpdatePriceItemFromStreamOne not sending information in the emails sent regarding missing licenses.
