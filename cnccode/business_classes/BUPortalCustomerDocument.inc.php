@@ -6,7 +6,7 @@ require_once($cfg["path_dbe"] . "/DBEPortalCustomerDocument.php");
 
 class BUPortalCustomerDocument extends Business
 {
-    const DUO_USERS_AND_LOGS = 'DUO Users and Logs';
+    const DUO_USERS_AND_LOGS = 'Duo Users and Logs';
     public $dbePortalCustomerDocument;
     public $dbePortalCustomerDocumentWithoutFile;
     public $dbeCallActivity;
@@ -89,6 +89,7 @@ class BUPortalCustomerDocument extends Business
         $writer->save($tempFileName);
         $data = file_get_contents($tempFileName);
         $duoDocument->setValue(DBEPortalCustomerDocument::file, $data);
+        $duoDocument->setShowSQLOn();
         if (!$duoDocument->getPKValue()) {
             $duoDocument->insertRow();
         } else {

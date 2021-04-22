@@ -39,15 +39,15 @@ $adminHostName       = "api-8f3a2990.duosecurity.com";
  * @param DBECustomer $dbeCustomer
  * @throws \CNCLTD\Exceptions\ColumnOutOfRangeException
  */
-function updateClientReport(DUOApi $clientDUO, DBECustomer $dbeCustomer)
+function updateClientReport(DUOApi $clientDUO, DBECustomer $dbeCustomer, $accountId)
 {
 
     $minTime = new DateTime();
     $minTime->sub(new DateInterval("P60D"));
     $duoReportGenerator       = new DUOClientReportGenerator();
     $spreadsheet              = $duoReportGenerator->getReportData(
-        $clientDUO->getUsers(),
-        $clientDUO->getAuthenticationLogs($minTime)
+        $clientDUO->getUsers($accountId),
+        $clientDUO->getAuthenticationLogs($accountId, $minTime)
     );
     $buPortalCustomerDocument = new BUPortalCustomerDocument($thing);
     $buPortalCustomerDocument->addOrUpdateDUOClientReportDocument(
@@ -57,8 +57,6 @@ function updateClientReport(DUOApi $clientDUO, DBECustomer $dbeCustomer)
 }
 
 foreach ($duoAPI->getAccountsList() as $account) {
-
-    $clientDUO   = new DUOApi($adminSecret, $adminIntegrationKey, $account->apiHostname);
     $dbeCustomer = new DBECustomer($thing);
     $dbeCustomer->getCustomerByName($account->name);
     if (!$dbeCustomer->rowCount()) {
@@ -68,7 +66,7 @@ foreach ($duoAPI->getAccountsList() as $account) {
     }
     $dbeCustomer->fetchNext();
     try {
-        updateClientReport($clientDUO, $dbeCustomer);
+        updateClientReport($duoAPI, $dbeCustomer, $account->accountId);
     } catch (\Exception $exception) {
         $logger->error('Could not update client DUO Excel Document');
     }
