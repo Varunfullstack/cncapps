@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 1349 - Duplicate Duplicate Contact Warning.
+
 ## [v5.8.5] - 2021-04-20
 ### Fixed
 - Fixed UpdatePriceItemFromStreamOne not sending information in the emails sent regarding missing licenses.
