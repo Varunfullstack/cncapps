@@ -253,8 +253,8 @@ class PasswordComponent extends MainComponent {
     }
 
     handleNewPassword = () => {
-        const { customerId} = this.state;
-        const passwordItem = {...newPasswordItemInitialState, customerID: customerId};
+        const {filter} = this.state;
+        const passwordItem = {...newPasswordItemInitialState, customerID: filter.customer.id};
         this.setState({showModal: true, passwordItem});
     }
     handleCustomerSelect = (customer) => {
