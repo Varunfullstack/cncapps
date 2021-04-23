@@ -40,41 +40,43 @@ class DBEUser extends DBEntity
     const queueManager              = 'queueManager';
     const projectManagementFlag     = 'projectManagementFlag';
 
-    const encryptedDateOfBirth                   = "encryptedDateOfBirth";
-    const startDate                              = "startDate";
-    const companyHealthcareStartDate             = "companyHealthcareStartDate";
-    const enhancedCNC2YearPensionStartDate       = "enhancedCNC2YearPensionStartDate";
-    const encryptedPensionAdditionalPayments     = "encryptedPensionAdditionalPayments";
-    const encryptedSalary                        = "encryptedSalary";
-    const encryptedSalarySacrifice               = "encryptedSalarySacrifice";
-    const hoursWorkedInAWeek                     = "hoursWorkedInAWeek";
-    const encryptedNationalInsuranceNumber       = "encryptedNationalInsuranceNumber";
-    const encryptedAddress1                      = "encryptedAddress1";
-    const encryptedAddress2                      = "encryptedAddress2";
-    const encryptedAddress3                      = "encryptedAddress3";
-    const encryptedTown                          = "encryptedTown";
-    const encryptedCounty                        = "encryptedCounty";
-    const encryptedPostcode                      = "encryptedPostcode";
-    const staffAppraiserFlag                     = 'staffAppraiserFlag';
-    const passwordLevel                          = 'passwordLevel';
-    const changeSRContractsFlag                  = 'changeSRContractsFlag';
-    const starterLeaverQuestionManagementFlag    = 'starterLeaverQuestionManagementFlag';
-    const offsiteBackupAdditionalPermissionsFlag = 'offsiteBackupAdditionalPermissionsFlag';
-    const salesPasswordAccess                    = 'salesPasswordAccess';
-    const createRenewalSalesOrdersFlag           = "createRenewalSalesOrdersFlag";
-    const expenseApproverID                      = 'expenseApproverID';
-    const autoApproveExpenses                    = 'autoApproveExpenses';
-    const isExpenseApprover                      = "isExpenseApprover";
-    const globalExpenseApprover                  = "globalExpenseApprover";
-    const additionalTimeLevelApprover            = "additionalTimeLevelApprover";
-    const sendEmailWhenAssignedService           = "sendEmailAssignedService";
-    const basedAtCustomerSite                    = "basedAtCustomerSite";
-    const siteCustId                             = "siteCustId";
-    const streamOneLicenseManagement             = "streamOneLicenseManagement";
-    const excludeFromSDManagerDashboard          = "excludeFromSDManagerDashboard";
-    const holdAllSRsforQAReview                  = "holdAllSRsforQAReview";
-    const bccOnCustomerEmails                    = "bccOnCustomerEmails";
-    const callBackEmail                          = "callBackEmail";
+    const encryptedDateOfBirth                            = "encryptedDateOfBirth";
+    const startDate                                       = "startDate";
+    const companyHealthcareStartDate                      = "companyHealthcareStartDate";
+    const enhancedCNC2YearPensionStartDate                = "enhancedCNC2YearPensionStartDate";
+    const encryptedPensionAdditionalPayments              = "encryptedPensionAdditionalPayments";
+    const encryptedSalary                                 = "encryptedSalary";
+    const encryptedSalarySacrifice                        = "encryptedSalarySacrifice";
+    const hoursWorkedInAWeek                              = "hoursWorkedInAWeek";
+    const encryptedNationalInsuranceNumber                = "encryptedNationalInsuranceNumber";
+    const encryptedAddress1                               = "encryptedAddress1";
+    const encryptedAddress2                               = "encryptedAddress2";
+    const encryptedAddress3                               = "encryptedAddress3";
+    const encryptedTown                                   = "encryptedTown";
+    const encryptedCounty                                 = "encryptedCounty";
+    const encryptedPostcode                               = "encryptedPostcode";
+    const staffAppraiserFlag                              = 'staffAppraiserFlag';
+    const passwordLevel                                   = 'passwordLevel';
+    const changeSRContractsFlag                           = 'changeSRContractsFlag';
+    const starterLeaverQuestionManagementFlag             = 'starterLeaverQuestionManagementFlag';
+    const offsiteBackupAdditionalPermissionsFlag          = 'offsiteBackupAdditionalPermissionsFlag';
+    const salesPasswordAccess                             = 'salesPasswordAccess';
+    const createRenewalSalesOrdersFlag                    = "createRenewalSalesOrdersFlag";
+    const expenseApproverID                               = 'expenseApproverID';
+    const autoApproveExpenses                             = 'autoApproveExpenses';
+    const isExpenseApprover                               = "isExpenseApprover";
+    const globalExpenseApprover                           = "globalExpenseApprover";
+    const additionalTimeLevelApprover                     = "additionalTimeLevelApprover";
+    const sendEmailWhenAssignedService                    = "sendEmailAssignedService";
+    const basedAtCustomerSite                             = "basedAtCustomerSite";
+    const siteCustId                                      = "siteCustId";
+    const streamOneLicenseManagement                      = "streamOneLicenseManagement";
+    const excludeFromSDManagerDashboard                   = "excludeFromSDManagerDashboard";
+    const holdAllSRsforQAReview                           = "holdAllSRsforQAReview";
+    const bccOnCustomerEmails                             = "bccOnCustomerEmails";
+    const callBackEmail                                   = "callBackEmail";
+    const massDeletionOnUnstartedServiceRequestPermission = "massDeletionOnUnstartedServiceRequestPermission";
+
     /**
      * calls constructor()
      * @access public
@@ -411,7 +413,8 @@ class DBEUser extends DBEntity
         $this->addColumn(self::sendEmailWhenAssignedService, DA_BOOLEAN, DA_NOT_NULL, null, 1);
         $this->addColumn(self::holdAllSRsforQAReview, DA_BOOLEAN, DA_NOT_NULL, null, 0);
         $this->addColumn(self::bccOnCustomerEmails, DA_BOOLEAN, DA_NOT_NULL, null, 0);
-        $this->addColumn(self::callBackEmail, DA_BOOLEAN, DA_NOT_NULL, null, 0);        
+        $this->addColumn(self::callBackEmail, DA_BOOLEAN, DA_NOT_NULL, null, 0);
+        $this->addColumn(self::massDeletionOnUnstartedServiceRequestPermission, DA_BOOLEAN, DA_NOT_NULL, null, 0);
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
