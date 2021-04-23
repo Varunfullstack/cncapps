@@ -6,6 +6,7 @@ use CNCLTD\ChargeableWorkCustomerRequest\DTO\SDManagerPendingChargeableRequestDT
 use CNCLTD\ChargeableWorkCustomerRequest\infra\ChargeableWorkCustomerRequestMySQLRepository;
 use CNCLTD\ChargeableWorkCustomerRequest\usecases\CancelPendingChargeableWorkCustomerRequest;
 use CNCLTD\ChargeableWorkCustomerRequest\usecases\ResendPendingChargeableWorkCustomerRequestEmail;
+use CNCLTD\Data\CallBackStatus;
 use CNCLTD\Exceptions\JsonHttpException;
 use CNCLTD\SDManagerDashboard\ServiceRequestSummaryDTO;
 
@@ -498,7 +499,7 @@ WHERE pro_custno <> 282
 
     function missedCallBack()
     {
-        $query = "SELECT cb.id, cb.consID,cb.problemID,cb.callActivityID,cb.contactID,cb.DESCRIPTION,cb.callback_datetime,cb.createAt,
+        $query = "SELECT cb.id, cb.consID,cb.problemID,cb.contactID,cb.DESCRIPTION,cb.callback_datetime,cb.createAt,
         concat(c.con_first_name,' ',c.con_last_name) contactName,
         cus_name customerName,
         TIMESTAMPDIFF(MINUTE,NOW(),cb.callback_datetime) timeRemain,

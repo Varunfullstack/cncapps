@@ -7,7 +7,7 @@ This project changes will be shown here.
 
 ## [v5.8.6] - 2021-04-22
 ### Fixed
-- Fixed inability to add new passwords.
+- Fixed inability to add new passwords.    
 
 ## [v5.8.5] - 2021-04-20
 ### Fixed

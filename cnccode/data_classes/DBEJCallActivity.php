@@ -143,7 +143,7 @@ class DBEJCallActivity extends DBECallActivity
         );
         $this->addColumn(
             self::customerID,
-            DA_STRING,
+            DA_ID,
             DA_ALLOW_NULL,
             "problem.pro_custno"
         );

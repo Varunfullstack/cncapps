@@ -18,6 +18,7 @@ import {InternalNotes} from "./InternalNotesComponent";
 import {TaskListComponent} from "./TaskListComponent";
 import AdditionalChargeRequestModal from "./Modals/AdditionalTimeRequestModal";
 import ExistingAdditionalChargeableWorkRequestModal from "./Modals/ExistingAdditionalChargeableWorkRequestModal";
+import CallbackModal from "../../shared/CallbackModal/CallbackModal";
 
 // noinspection EqualityComparisonWithCoercionJS
 const emptyAssetReasonCharactersToShow = 30;
@@ -57,7 +58,8 @@ class ActivityDisplayComponent extends MainComponent {
                 monitorSR: false,
                 holdForQA: false
             },
-            showAdditionalTimeRequestModal: false
+            showAdditionalTimeRequestModal: false,
+            showCallbackModal: false,
         }
     }
 
@@ -133,33 +135,33 @@ class ActivityDisplayComponent extends MainComponent {
         }
         return (
             <div style={{display: "flex", flexDirection: "column"}}>
-                <div style={{display:"flex",alignItems:"center"}}>
-                <a
-                    className={data?.customerNameDisplayClass}
-                    href={`Customer.php?action=dispEdit&customerId=${data?.customerId}`}
-                    target="_blank"
-                >
-                    {data?.customerName + ", " +
-                    data?.siteAdd1 + ", " +
-                    data?.siteAdd2 + ", " +
-                    data?.siteAdd3 + ", " +
-                    data?.siteTown + ", " +
-                    data?.sitePostcode}
-                </a>
-                {data.what3Words?
-                 <ToolTip
-                 title="What3words"
-                 width={30}
-                 content={<a
-                     className="fal fa-map-marker-alt fa-x m-5 pointer icon"
-                     href={`https://what3words.com/${data?.what3Words}`}
-                     target="_blank"
-                     rel="noreferrer"></a>
-                }
-                />:null
-                }
+                <div style={{display: "flex", alignItems: "center"}}>
+                    <a
+                        className={data?.customerNameDisplayClass}
+                        href={`Customer.php?action=dispEdit&customerId=${data?.customerId}`}
+                        target="_blank"
+                    >
+                        {data?.customerName + ", " +
+                        data?.siteAdd1 + ", " +
+                        data?.siteAdd2 + ", " +
+                        data?.siteAdd3 + ", " +
+                        data?.siteTown + ", " +
+                        data?.sitePostcode}
+                    </a>
+                    {data.what3Words ?
+                        <ToolTip
+                            title="What3words"
+                            width={30}
+                            content={<a
+                                className="fal fa-map-marker-alt fa-x m-5 pointer icon"
+                                href={`https://what3words.com/${data?.what3Words}`}
+                                target="_blank"
+                                rel="noreferrer"></a>
+                            }
+                        /> : null
+                    }
                 </div>
-               
+
                 <div>
                     <a href={`Customer.php?action=dispEdit&customerId=${data?.customerId}`}
                        target="_blank"
@@ -226,8 +228,16 @@ class ActivityDisplayComponent extends MainComponent {
                 className="activities-container"
                 style={{display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center"}}
             >
-
-
+                {data?.problemStatus !== "C" ? <ToolTip
+                    title="Call Back"
+                    content={<a
+                        className="fal fa-phone fa-2x m-5 pointer icon"
+                        onClick={this.showCallbackModal}
+                    />
+                    }
+                /> : null
+                }
+                {this.getSpacer()}
                 {
                     data?.problemStatus !== "C" ? <ToolTip
                             title="Follow On"
@@ -413,7 +423,7 @@ class ActivityDisplayComponent extends MainComponent {
                     />
                     : this.getSpacer()}
                 {this.renderChargeableWorkIcon()}
-                
+
             </div>
         </div>
     }
@@ -481,7 +491,22 @@ class ActivityDisplayComponent extends MainComponent {
     }
 
     getSpacer = () => {
-        return this.el('span', {style: {width: 35}})
+        return <span style={{width: "35px"}}/>
+    }
+
+    getCallbackModal = () => {
+        const {showCallbackModal, data} = this.state;
+        if (!showCallbackModal)
+            return null;
+        return <CallbackModal key="modal"
+                              show={showCallbackModal}
+                              onClose={this.handleCallbackClose}
+                              contactID={data.contactID}
+                              customerID={data.customerId}
+                              problemID={data.problemID}
+                              contactName={data.contactName}
+        >
+        </CallbackModal>
     }
     handleConfirmEmail = async (data) => {
         if (!data.customerNotes) {
@@ -1272,6 +1297,9 @@ class ActivityDisplayComponent extends MainComponent {
             />
         )
     }
+    handleCallbackClose = () => {
+        this.setState({showCallbackModal: false});
+    }
 
     render() {
         const {data, showSalesOrder, _loadedData} = this.state;
@@ -1289,6 +1317,7 @@ class ActivityDisplayComponent extends MainComponent {
                 {this.getFollowOnElement()}
                 {this.getProjectsElement()}
                 {this.getHeader()}
+                {this.getCallbackModal()}
                 {this.getActions()}
                 {this.getActivitiesElement()}
                 {this.getContentElement()}
@@ -1335,6 +1364,10 @@ class ActivityDisplayComponent extends MainComponent {
             this.additionalTimeRequestResolve(closingValue);
         }
         this.hideAdditionalTimeRequestModal();
+    };
+
+    showCallbackModal = () => {
+        this.setState({showCallbackModal: true});
     };
 }
 

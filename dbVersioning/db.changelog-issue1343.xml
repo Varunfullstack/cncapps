@@ -1,0 +1,16 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="xavi" id="issue1343-0">
+        <tagDatabase tag="issue1343"/>
+    </changeSet>
+    <changeSet author="xavi" id="issue1343-1">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contact_callback" columnName="callActivityID"/>
+        </preConditions>
+        <dropForeignKeyConstraint baseTableName="contact_callback" constraintName="callback_callactivity_fk"/>
+        <dropColumn tableName="contact_callback" columnName="callActivityID"/>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>

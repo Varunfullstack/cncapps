@@ -44,7 +44,7 @@ class CallBackComponent extends MainComponent {
             >
                 <i className="fal fa-2x fa-user-slash color-gray icon pointer"
                    onClick={() => this.createCustomerContact(callback)}
-                ></i>
+                />
             </ToolTip>;
         else
             return <ToolTip title="Create customer contact"
@@ -52,7 +52,7 @@ class CallBackComponent extends MainComponent {
             >
                 <i className="fal fa-2x fa-phone color-gray icon pointer"
                    onClick={() => this.createCustomerContact(callback)}
-                ></i>
+                />
             </ToolTip>
     }
     getContent = () => {
@@ -159,7 +159,7 @@ class CallBackComponent extends MainComponent {
                         <ToolTip title="Call back time expired"
                                  width={30}
                         >
-                            <i className="fal fa-2x fa-alarm-exclamation color-gray icon pointer"></i>
+                            <i className="fal fa-2x fa-alarm-exclamation color-gray icon pointer"/>
                         </ToolTip> : null}
                 </div>,
                 className: "text-center",
@@ -179,7 +179,7 @@ class CallBackComponent extends MainComponent {
                     >
                         <i className="fal fa-2x fa-phone-slash color-gray icon pointer"
                            onClick={() => this.cancelCallBack(problem)}
-                        ></i>
+                        />
                     </ToolTip>
                 </div>,
                 className: "text-center",
@@ -203,8 +203,7 @@ class CallBackComponent extends MainComponent {
             if (result.status) {
                 this.getData();
                 if (result.callActivityID != null)
-                    //window.location = `SRActivity.php?action=editActivity&callActivityID=${result.callActivityID}&isFollow=1`;
-                    window.open(`SRActivity.php?action=editActivity&callActivityID=${result.callActivityID}&isFollow=1`,"_blank")
+                    window.open(`SRActivity.php?action=editActivity&callActivityID=${result.callActivityID}&isFollow=1`, "_blank")
             }
 
         })
