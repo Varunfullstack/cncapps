@@ -151,14 +151,14 @@ class GatherFixedInformationComponent extends MainComponent {
                                                   value={initialActivity?.reason}
                                                   onChange={(value) => this.setValue("resolutionSummary", value)}
                                                   minCharCount={activity.problemHideFromCustomerFlag == 'N' ? RESOLUTION_SUMMARY_MIN_CHARS : -1}
-                                                  disableClipboard={activity.problemHideFromCustomerFlag == 'N'}
+                                                  disableClipboard={true}
                             />
                         )
                     ),
                 )
             )
         );
-    }
+    };
 
     async updateContract(contractCustomerItemID) {
         if (contractCustomerItemID) {
