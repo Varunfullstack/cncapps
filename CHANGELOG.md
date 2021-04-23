@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1343 - Paste into the Fixed Explanation when the SR is hidden from customer
+
 ## [v5.8.6] - 2021-04-22
 ### Fixed
 - Fixed inability to add new passwords.
