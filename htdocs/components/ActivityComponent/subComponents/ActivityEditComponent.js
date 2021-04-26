@@ -26,6 +26,7 @@ import {InternalNotes} from "./InternalNotesComponent";
 import {TaskListComponent} from "./TaskListComponent";
 import AdditionalChargeRequestModal from "./Modals/AdditionalTimeRequestModal";
 import ExistingAdditionalChargeableWorkRequestModal from "./Modals/ExistingAdditionalChargeableWorkRequestModal";
+import CallbackModal from "../../shared/CallbackModal/CallBackModal";
 
 // noinspection EqualityComparisonWithCoercionJS
 const hiddenAndCustomerNoteAlertMessage = `Customer note must be empty when the activity or entire SR is hidden.`;
@@ -109,10 +110,27 @@ class ActivityEditComponent extends MainComponent {
                 monitorSR: false,
             },
             showSalesOrder: false,
-
+            showCallbackModal: false,
         };
     }
 
+    handleCallbackClose = () => {
+        this.setState({showCallbackModal: false});
+    }
+    getCallbackModal = () => {
+        const {showCallbackModal, data} = this.state;
+        if (!showCallbackModal)
+            return null;
+        return <CallbackModal key="modal"
+                              show={showCallbackModal}
+                              onClose={this.handleCallbackClose}
+                              contactID={data.contactID}
+                              customerID={data.customerId}
+                              problemID={data.problemID}
+                              contactName={data.contactName}
+        >
+        </CallbackModal>
+    }
     componentDidMount() {
         this.loadCallActivity(params.get("callActivityID"));
 
@@ -450,6 +468,10 @@ class ActivityEditComponent extends MainComponent {
         } else return null;
     };
 
+    showCallbackModal = () => {
+        this.setState({showCallbackModal: true});
+    };
+
     getActions = () => {
         const {el} = this;
         const {data, currentUser} = this.state;
@@ -464,6 +486,15 @@ class ActivityEditComponent extends MainComponent {
                     width: 930,
                 },
             },
+            data?.problemStatus !== "C" ? <ToolTip
+                title="Call Back"
+                content={<a
+                    className="fal fa-phone fa-2x m-5 pointer icon"
+                    onClick={this.showCallbackModal}
+                />
+                }
+            /> : null,
+            this.getEmptyAction(),
             el(ToolTip, {
                 title: "History",
                 content: el("a", {
@@ -522,12 +553,12 @@ class ActivityEditComponent extends MainComponent {
                     href: `RenewalReport.php?action=produceReport&customerID=${data?.customerId}`,
                     target: "_blank",
                 }),
-            }),            
+            }),
             <ToolTip title="Generate Password"
-                         content={<a className="fal fa-magic fa-2x m-5 pointer icon"
-                                     onClick={this.handleGeneratePassword}
-                         />}
-                />,
+                     content={<a className="fal fa-magic fa-2x m-5 pointer icon"
+                                 onClick={this.handleGeneratePassword}
+                     />}
+            />,
             el(ToolTip, {
                 title: "Contracts",
                 content: el("a", {
@@ -573,7 +604,6 @@ class ActivityEditComponent extends MainComponent {
                     })
                 }) : null,
             this.renderChargeableWorkIcon()
-               
         );
     };
 
@@ -936,7 +966,7 @@ class ActivityEditComponent extends MainComponent {
         return type && type.catRequireCNCNextActionOnHold == 1 && !data.cncNextActionTemplate;
     }
 
-    
+
     handleSalesOrder = async (callActivityID, serviceRequestId) => {
         this.setState({showSalesOrder: true});
 
@@ -1897,6 +1927,7 @@ class ActivityEditComponent extends MainComponent {
     handleGeneratePassword = () => {
         window.open("Password.php?action=generate&htmlFmt=popup", 'reason', 'scrollbars=yes,resizable=yes,height=524,width=855,copyhistory=no, menubar=0');
     }
+
     render() {
         const {data, showSalesOrder, _activityLoaded} = this.state;
 
@@ -1912,6 +1943,7 @@ class ActivityEditComponent extends MainComponent {
                 {this.getPrompt()}
                 {this.getPriorityChangeReason()}
                 {this.getProjectsElement()}
+                {this.getCallbackModal()}
                 <ActivityHeaderComponent serviceRequestData={data}/>
                 <div className="activities-edit-container">
                     {this.getActions()}

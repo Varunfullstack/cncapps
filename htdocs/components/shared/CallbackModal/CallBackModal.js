@@ -1,9 +1,12 @@
-import CurrentActivityService from "../services/CurrentActivityService";
+import CurrentActivityService from "../../CurrentActivityReportComponent/services/CurrentActivityService";
 import React from "react";
-import Modal from "../../shared/Modal/modal";
+import Modal from "../Modal/modal";
 import APIStandardText from "../../services/APIStandardText";
-import MainComponent from "../../shared/MainComponent";
+import MainComponent from "../MainComponent";
 import APICustomers from "../../services/APICustomers";
+import * as PropTypes from "prop-types";
+import moment from "moment";
+import './CallBackModal.css';
 
 class CallBackModal extends MainComponent {
     apiCurrentActivityService = new CurrentActivityService();
@@ -19,29 +22,28 @@ class CallBackModal extends MainComponent {
                 description: "",
                 time: moment().add(2, 'hours').format("HH:mm"),
                 date: moment().format("YYYY-MM-DD"),
-                contactID: this.props.problem.contactID,
-                customerID: this.props.problem.customerID,
-                problemID: this.props.problem.problemID,
-                contactName: this.props.problem.contactName,
-                callActivityID: this.props.problem.callActivityID,
+                contactID: this.props.contactID,
+                customerID: this.props.customerID,
+                problemID: this.props.problemID,
+                contactName: this.props.contactName,
                 notifyTeamLead: false
             },
-            contcts: []
+            contacts: []
         }
     }
 
     componentDidMount() {
-        this.apiCustomer.getCustomerContacts(this.props.problem.customerID).then(contcts => {
-            this.setState({contcts});
+        this.apiCustomer.getCustomerContacts(this.props.customerID).then(contacts => {
+            this.setState({contacts});
         })
     }
 
-    handleClose = (callActivityID = null) => {
+    handleClose = () => {
         if (this.props.onClose)
-            this.props.onClose(callActivityID);
+            this.props.onClose();
     };
     getContent = () => {
-        const {data, contcts} = this.state;
+        const {data, contacts} = this.state;
         return (
             <div>
 
@@ -54,7 +56,7 @@ class CallBackModal extends MainComponent {
                             style={{width: 120}}
                             value={data.date}
                             onChange={(event) => this.setValue("date", event.target.value)}
-                        ></input>
+                        />
 
                         <input
                             type="time"
@@ -62,7 +64,7 @@ class CallBackModal extends MainComponent {
                             style={{width: 70}}
                             value={data.time}
                             onChange={(event) => this.setValue("time", event.target.value)}
-                        ></input>
+                        />
                     </div>
                 </div>
 
@@ -73,8 +75,8 @@ class CallBackModal extends MainComponent {
                     >
                         <option>
                         </option>
-                        {contcts.map(c => <option key={c.id}
-                                                  value={c.id}
+                        {contacts.map(c => <option key={c.id}
+                                                   value={c.id}
                         >{c.firstName + ' ' + c.lastName}</option>)}
                     </select>
                 </div>
@@ -83,7 +85,7 @@ class CallBackModal extends MainComponent {
                            onChange={(event) =>
                                this.setValue("notifyTeamLead", !this.state.data.notifyTeamLead)
                            }
-                    ></input>
+                    />
                     <label>This is high profile, notify Team Lead as well (reason must be supplied)</label>
                 </div>
                 <div className="form-group">
@@ -95,14 +97,14 @@ class CallBackModal extends MainComponent {
                         onChange={(event) =>
                             this.setValue("description", event.target.value)
                         }
-                    ></textarea>
+                    />
                 </div>
             </div>
         );
     }
     handleContactChange = (contactID) => {
-        const {contcts, data} = this.state;
-        const contact = contcts.find(c => c.id == contactID);
+        const {contacts, data} = this.state;
+        const contact = contacts.find(c => c.id == contactID);
         data.contactID = contactID;
         data.contactName = contact.firstName + ' ' + contact.lastName;
         this.setState({data});
@@ -119,7 +121,7 @@ class CallBackModal extends MainComponent {
         }
         this.apiCurrentActivityService.addCallback(data).then(result => {
             if (result.status)
-                this.handleClose(result.callActivityID);
+                this.handleClose();
         });
 
     }
@@ -127,7 +129,7 @@ class CallBackModal extends MainComponent {
     render() {
         if (!this.props.show) return null;
         return (
-            <div>
+            <div className="callbackmodal">
                 {this.getAlert()}
                 <Modal
                     width={600}
@@ -141,10 +143,18 @@ class CallBackModal extends MainComponent {
                         <button onClick={() => this.handleClose()}>Cancel</button>
                     </div>}
                     onClose={() => this.handleClose()}
-                ></Modal>
+                />
             </div>
         );
     }
 }
 
+CallBackModal.propTypes = {
+    show: PropTypes.bool,
+    onClose: PropTypes.func,
+    contactID: PropTypes.number,
+    customerID: PropTypes.number,
+    problemID: PropTypes.number,
+    contactName: PropTypes.string
+}
 export default CallBackModal;

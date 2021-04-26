@@ -15,7 +15,7 @@ import {getServiceRequestWorkTitle, sort} from '../utils/utils';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import APIStandardText from '../services/APIStandardText';
-import CallBackModal from './subComponents/CallBackModal';
+import CallBackModal from '../shared/CallbackModal/CallBackModal';
 
 import '../style.css';
 import './CurrentActivityReportComponent.css';
@@ -624,11 +624,14 @@ class CurrentActivityReportComponent extends MainComponent {
         return <CallBackModal key="modal"
                               show={showCallBackModal}
                               onClose={this.handleCallBackClose}
-                              problem={currentProblem}
+                              contactID={currentProblem.contactID}
+                              customerID={currentProblem.customerID}
+                              problemID={currentProblem.problemID}
+                              contactName={currentProblem.contactName}
         >
         </CallBackModal>
     }
-    handleCallBackClose = (callActivityID) => {
+    handleCallBackClose = () => {
         this.setState({showCallBackModal: false});
     }
     handleAllocateMoreTimeClose = () => {

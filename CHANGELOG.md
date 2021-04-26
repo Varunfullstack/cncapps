@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 1280 - Duo Usage Portal in Portal.
+- Issue 1342 - Add Call back icon within the SR
 ### Changed
 - Issue 1217 - Force T&M when SR has Call Out Expense.
 - Issue 1305 - Deleting SR that has a callback is prevented.
@@ -19,7 +20,7 @@ This project changes will be shown here.
 
 ## [v5.8.6] - 2021-04-22
 ### Fixed
-- Fixed inability to add new passwords.
+- Fixed inability to add new passwords.    
 
 ## [v5.8.5] - 2021-04-20
 ### Fixed

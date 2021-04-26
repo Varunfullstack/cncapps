@@ -1,23 +1,16 @@
-<?php /*
-* Project table
-* @authors Karim Ahmed
-* @access public
-*/
+<?php
+global $cfg;
+
+use CNCLTD\Data\CallBackStatus;
+
 require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
-class CallBackStatus
-{
-    const AWAITING  = 'awaiting';
-    const CONTACTED = 'contacted';
-    const CANCELED  = 'canceled';
-}
 
 class DBECallback extends DBEntity
 {
     const id                = "id";
     const consID            = "consID";
     const problemID         = "problemID";
-    const callActivityID    = 'callActivityID';
     const contactID         = 'contactID';
     const description       = 'description';
     const callback_datetime = 'callback_datetime';
@@ -48,11 +41,6 @@ class DBECallback extends DBEntity
         );
         $this->addColumn(
             self::problemID,
-            DA_INTEGER,
-            DA_NOT_NULL
-        );
-        $this->addColumn(
-            self::callActivityID,
             DA_INTEGER,
             DA_NOT_NULL
         );
