@@ -39,7 +39,8 @@ class SDManagerDashboardComponent extends MainComponent {
     api = new APISDManagerDashboard();
     apiCurrentActivityService = new CurrentActivityService();
     intervalRef;
-    TAB_MASS_ASSIGNMENT=14;
+    TAB_MASS_ASSIGNMENT = 14;
+
     constructor(props) {
         super(props);
         this.state = {
@@ -612,9 +613,8 @@ class SDManagerDashboardComponent extends MainComponent {
             return <MissedCallBackComponent filter={filter}/>
         } else if (filter.activeTab == PENDING_CHARGEABLE_WORK_REQUESTS_TAB) {
             return <PendingChargeableRequestsComponent filter={filter}/>
-        }
-        else if(filter.activeTab == this.TAB_MASS_ASSIGNMENT)
-            return <MassAssignmentComponent filter={filter}></MassAssignmentComponent>
+        } else if (filter.activeTab == this.TAB_MASS_ASSIGNMENT)
+            return <MassAssignmentComponent filter={filter}/>
     }
     srDescription = (problem) => {
         window.open(

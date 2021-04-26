@@ -3552,7 +3552,7 @@ class CTSalesOrder extends CTCNC
             );
             echo json_encode(["status" => "ok"]);
         } catch (Exception $exception) {
-            throw new JsonHttpException('500', $exception->getMessage());
+            throw new JsonHttpException(500, $exception->getMessage());
         }
     }
 

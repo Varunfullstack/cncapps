@@ -412,7 +412,7 @@ class CTActivityType extends CTCNC
     {
         $data = $this->getJSONData();
         if (!isset($data['fromActivityTypeId'])) {
-            throw new \CNCLTD\Exceptions\JsonHttpException(23, 'fromActivityTypeId is required');
+            throw new \CNCLTD\Exceptions\JsonHttpException(400, 'fromActivityTypeId is required');
         }
         $dbeActivityTypeFrom = new DBECallActType($this);
         $dbeActivityTypeFrom->getRow($data['fromActivityTypeId']);

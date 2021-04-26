@@ -6042,8 +6042,8 @@ class BUActivity extends Business
         );
         $dbeJCallActivity     = $this->getFirstActivityInServiceRequest($problemID);
         $dbeJLastCallActivity = $this->getLastActivityInProblem($problemID);
-        $urlActivity          = SITE_URL . '/SRActivity.php?action=displayActivity&callActivityID=' . $dbeJLastCallActivity->getPKValue(
-            );
+        $activityId           = $dbeJLastCallActivity ? $dbeJLastCallActivity->getValue(DBEJCallActivity::callActivityID) : $dbeJCallActivitygetValue(DBEJCallActivity::callActivityID);
+        $urlActivity          = SITE_URL . "/SRActivity.php?action=displayActivity&callActivityID=$activityId";
         $assignedByUserName   = (string)$DBUser->getValue(DBEUser::name);
         $template->setVar(
             array(
