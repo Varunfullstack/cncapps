@@ -14,6 +14,7 @@ This project changes will be shown here.
 - Issue 1346 - Sales Requests auto assignment
 - Issue 1339 - Update item master price from Sales Order
 - Issue 1350 - Grammar Exclusions for Spellchecker
+- Issue 1343 - Paste into the Fixed Explanation when the SR is hidden from customer
 ### Fixed
 - Issue 1226 - StreamOne error handling
 - Issue 1349 - Duplicate Duplicate Contact Warning.
