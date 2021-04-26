@@ -42,7 +42,7 @@ export default class MassAssignmentComponent extends MainComponent {
     getUsers = () => {
         const {users, summary} = this.state;
         const {hd, es, sp, p} = this.props.filter;
-        console.log(users, summary);
+
         let filteredUsers = [];
         if (hd + es + sp + p === 1) {
             filteredUsers.push({id: null, name: 'Unassigned', team: null});
@@ -111,6 +111,11 @@ export default class MassAssignmentComponent extends MainComponent {
 
         const {filter} = this.state;
         const {hd, es, sp, p} = this.props.filter;
+        if (filter.option.id == 5) {
+            if (!filter.customer.id) {
+                return;
+            }
+        }
 
         let queue = this.getSelectedQueue(hd, es, sp, p);
         this.api.getUserProblemsSummary(filter.option.id, filter.customer.id, queue).then(summary => {
@@ -147,9 +152,9 @@ export default class MassAssignmentComponent extends MainComponent {
         let from = filter.fromUser.id;
         let to = filter.toUser.id;
         if (right) {
-            res = await this.confirm(`Please confirm you want to assign ${filter.option.name} From ${filter.fromUser.name} to ${filter.toUser.name}`)
+            res = await this.confirm(`Please confirm you want to assign ${filter.option.name} From ${filter.fromUser.name ?? 'Unassigned' } to ${filter.toUser.name ?? 'Unassigned' }`)
         } else {
-            res = await this.confirm(`Please confirm you want to assign ${filter.option.name} From ${filter.toUser.name} to ${filter.fromUser.name}`)
+            res = await this.confirm(`Please confirm you want to assign ${filter.option.name} From ${filter.toUser.name ?? 'Unassigned' } to ${filter.fromUser.name ?? 'Unassigned' }`)
             from = filter.toUser.id;
             to = filter.fromUser.id;
         }
@@ -167,7 +172,7 @@ export default class MassAssignmentComponent extends MainComponent {
         const {filter} = this.state;
         let from = filter.fromUser.id;
         let to = filter.toUser.id;
-        const res = await this.confirm(`Please confirm you want to exchange ${filter.option.name} between ${filter.fromUser.name} and ${filter.toUser.name}`);
+        const res = await this.confirm(`Please confirm you want to exchange ${filter.option.name} between ${filter.fromUser.name ?? 'Unassigned'} and ${filter.toUser.name?? 'Unassigned'}`);
         if (res) {
             const {hd, es, sp, p} = this.props.filter;
             let queue = this.getSelectedQueue(hd, es, sp, p);

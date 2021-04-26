@@ -115,7 +115,7 @@ class CTHome extends CTCNC
                     $dateTime = DateTime::createFromFormat(DATE_MYSQL_DATE, $this->getParam('date'));
                     if (!$dateTime) {
                         throw new \CNCLTD\Exceptions\JsonHttpException(
-                            2231, "Please provide date a valid date in YYYY-MM-DD format"
+                            400, "Please provide date a valid date in YYYY-MM-DD format"
                         );
                     }
                 }
@@ -131,7 +131,7 @@ class CTHome extends CTCNC
                         ["status" => "ok", "data" => $this->getUserPerformanceBetweenDatesController()]
                     );
                 } catch (\Exception $exception) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(123, $exception->getMessage());
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, $exception->getMessage());
                 }
                 break;
             case self::GET_SALES_FIGURES:
@@ -1242,17 +1242,17 @@ ORDER BY caa_date ASC,
     {
         $data = $this->getJSONData();
         if (!@$data['startDate'] || !@$data['endDate'] || !@$data['userId']) {
-            throw new \CNCLTD\Exceptions\JsonHttpException(2332, "Start date, end date and user Id are required");
+            throw new \CNCLTD\Exceptions\JsonHttpException(400, "Start date, end date and user Id are required");
         }
         $startDateString = $data['startDate'];
         $startDate       = DateTime::createFromFormat(DATE_MYSQL_DATE, $startDateString);
         if (!$startDate) {
-            throw new \CNCLTD\Exceptions\JsonHttpException(531, "Start date must have YYYY-MM-DD format");
+            throw new \CNCLTD\Exceptions\JsonHttpException(400, "Start date must have YYYY-MM-DD format");
         }
         $endDateString = $data['endDate'];
         $endDate       = DateTime::createFromFormat(DATE_MYSQL_DATE, $endDateString);
         if (!$endDate) {
-            throw new \CNCLTD\Exceptions\JsonHttpException(531, "End date must have YYYY-MM-DD format");
+            throw new \CNCLTD\Exceptions\JsonHttpException(400, "End date must have YYYY-MM-DD format");
         }
         return $this->buUser->getUserPerformanceByUserBetweenDates($data['userId'], $startDate, $endDate);
     }

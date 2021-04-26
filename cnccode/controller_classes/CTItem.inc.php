@@ -193,12 +193,12 @@ class CTItem extends CTCNC
                 $data = $this->getJSONData();
                 $type = @$data['type'];
                 if (!$type) {
-                    throw new JsonHttpException(1, 'type is required');
+                    throw new JsonHttpException(400, 'type is required');
                 }
                 $value  = @$data['value'];
                 $itemId = @$data['itemId'];
                 if (!$itemId) {
-                    throw new JsonHttpException(1, 'itemId is required');
+                    throw new JsonHttpException(400, 'itemId is required');
                 }
                 global $db;
                 $costQuery = "UPDATE

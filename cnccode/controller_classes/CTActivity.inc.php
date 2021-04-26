@@ -449,15 +449,15 @@ class CTActivity extends CTCNC
             case self::ASSIGN_TO_BE_LOGGED_TO_SERVICE_REQUEST:
                 $data = $this->getJSONData();
                 if (!isset($data['toBeLogged'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(51, 'To Be logged id is required');
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'To Be logged id is required');
                 }
                 if (!isset($data['serviceRequestId'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(51, 'Service request id is required');
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'Service request id is required');
                 }
                 try {
                     $this->assignToBeLoggedToServiceRequest($data['toBeLogged'], $data['serviceRequestId']);
                 } catch (Exception $exception) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(51, $exception->getMessage());
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, $exception->getMessage());
                 }
                 echo json_encode(["status" => "ok"]);
                 exit;
@@ -1922,7 +1922,7 @@ class CTActivity extends CTCNC
             $this->getParam('customerID'),
             $dsCustomer
         );
-        $title = "Existing Service Requests for " . $dsCustomer->getValue(DBECustomer::name);
+        $title  = "Existing Service Requests for " . $dsCustomer->getValue(DBECustomer::name);
         $header = $title;
         if ($dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y') {
             $header .= "<span style='color: red'> On Special Attention</span>";
@@ -2294,7 +2294,7 @@ class CTActivity extends CTCNC
                 'thirdPartyContactLink'       => $this->getThirdPartyContactLink(
                     @ $_SESSION[$this->sessionKey]['customerID']
                 ),
-                'emailSubjectSummary'          => @$_SESSION[$this->sessionKey]['emailSubjectSummary'],
+                'emailSubjectSummary'         => @$_SESSION[$this->sessionKey]['emailSubjectSummary'],
                 'generatePasswordLink'        => $this->getGeneratePasswordLink(),
                 'DISABLED'                    => $disabled,
                 'submitURL'                   => $submitURL,
@@ -3580,7 +3580,7 @@ class CTActivity extends CTCNC
         } else {
             $endTime = $dsCallActivity->getValue(DBEJCallActivity::endTime);
         }
-        $urlActivity    = SITE_URL .'/'. Controller::buildLink(
+        $urlActivity    = SITE_URL . '/' . Controller::buildLink(
                 'SRActivity.php',
                 array(
                     'callActivityID' => $dsCallActivity->getValue(DBEJCallActivity::callActivityID),
@@ -4745,18 +4745,18 @@ WHERE caa_problemno = ?
 
             if (!$dbeSalesOrder->getRow($salesOrderId)) {
                 error_log('sales order does not exist ..return json error');
-                throw new \CNCLTD\Exceptions\JsonHttpException(123, "Sales Order Does Not Exist");
+                throw new \CNCLTD\Exceptions\JsonHttpException(400, "Sales Order Does Not Exist");
             }
             $dbeProblem = new DBEProblem($this);
             if (!$dbeProblem->getRow($serviceRequestId)) {
-                throw new \CNCLTD\Exceptions\JsonHttpException(123, "Service Request Does Not Exist");
+                throw new \CNCLTD\Exceptions\JsonHttpException(400, "Service Request Does Not Exist");
             }
             if ($dbeProblem->getValue(DBEProblem::linkedSalesOrderID)) {
-                throw new \CNCLTD\Exceptions\JsonHttpException(123, "Service Request already has a linked sales order");
+                throw new \CNCLTD\Exceptions\JsonHttpException(400, "Service Request already has a linked sales order");
             }
             if ($dbeSalesOrder->getValue(DBEOrdhead::customerID) !== $dbeProblem->getValue(DBEProblem::customerID)) {
                 throw new \CNCLTD\Exceptions\JsonHttpException(
-                    123, "The given sales order does not belong to the customer of the Service Request"
+                    400, "The given sales order does not belong to the customer of the Service Request"
                 );
             }
             $dbeProblem->setValue(

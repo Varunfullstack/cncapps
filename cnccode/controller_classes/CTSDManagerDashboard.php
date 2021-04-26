@@ -636,7 +636,7 @@ FROM
     function moveSR()
     {
         if (!$this->isSRQueueManager() && !$this->isSdManager()) {
-            throw new JsonHttpException(3432, 'Not authorized');
+            throw new JsonHttpException(400, 'Not authorized');
         }
         $body       = $this->getBody(true);
         $fromUserId = @$body["from"];
@@ -646,13 +646,13 @@ FROM
         $queue      = @$body['queue'];
         $exchange   = @$body['exchange'];
         if ($fromUserId === $toUserId) {
-            throw new JsonHttpException(123, 'Cannot reassign to the same user!');
+            throw new JsonHttpException(400, 'Cannot reassign to the same user!');
         }
         if (empty($option)) {
             return ["status" => false, "Missing Parameters"];
         }
         if (!$queue && (!$fromUserId || !$toUserId)) {
-            throw new JsonHttpException(123, "Cannot assign to unassigned or from unassigned if no queue is provided");
+            throw new JsonHttpException(400, "Cannot assign to unassigned or from unassigned if no queue is provided");
         }
         $select           = " select pro_problemno id from problem ";
         $where            = " where pro_consno is null ";
@@ -677,7 +677,6 @@ FROM
                 $exchangeToParams['queue'] = $queue;
             }
         }
-        $additionalWhere  = "";
         $additionalParams = [];
         switch ($option) {
             case 2:
@@ -687,12 +686,14 @@ FROM
                 $additionalWhere = " and pro_status='P' ";
                 break;
             case 4:
-                $additionalWhere = " and pro_awaiting_customer_response_flag ='Y' ";
+                $additionalWhere = " and pro_awaiting_customer_response_flag ='Y' and pro_status in ('P','I')  ";
                 break;
             case 5:
-                $additionalWhere                = " and pro_custno = :customerID ";
+                $additionalWhere                = " and pro_custno = :customerID  and pro_status in ('P','I') ";
                 $additionalParams['customerID'] = $customerID;
                 break;
+            default:
+                $additionalWhere = " and pro_status in ('I','P') ";
         }
         $where                   .= $additionalWhere;
         $exchangeToWhere         .= $additionalWhere;
@@ -749,15 +750,17 @@ FROM
                 $where .= " and pro_status = 'P' ";
                 break;
             case 4: // in hold
-                $where .= " and pro_awaiting_customer_response_flag = 'Y' ";
+                $where .= " and pro_awaiting_customer_response_flag = 'Y'  and pro_status in ('P','I') ";
                 break;
             case 5: // in customer
                 if (!$customerID) {
-                    throw new JsonHttpException(3220, "Customer ID required for customer type search");
+                    throw new JsonHttpException(400, "Customer ID required for customer type search");
                 }
-                $where                .= "and pro_custno = :customerID";
+                $where                .= " and pro_custno = :customerID and pro_status in ('P','I') ";
                 $params["customerID"] = $customerID;
                 break;
+            default:
+                $where .= " and pro_status in ('P','I') ";
         }
         $query    = $select . $from . $where . $groupBy;
         $problems = DBConnect::fetchAll($query, $params);

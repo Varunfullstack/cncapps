@@ -486,7 +486,8 @@ class Controller extends BaseObject
         exit;
     }
 
-    function setContainerTemplate(){
+    function setContainerTemplate()
+    {
         switch ($this->getHTMLFmt()) {
             case CT_HTML_FMT_PRINTER:
                 $file = array("page" => "printer.inc." . $this->getDocType());
@@ -752,6 +753,7 @@ class Controller extends BaseObject
             default:
                 try {
                     $this->defaultAction();
+
                 } catch (\CNCLTD\Exceptions\JsonHttpException $exception) {
                     echo $exception->getMessage();
                     http_response_code($exception->getResponseCode());

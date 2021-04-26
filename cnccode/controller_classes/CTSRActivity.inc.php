@@ -1575,7 +1575,7 @@ FROM
     {
         $documentId = $this->getParam('documentId');
         if (!$documentId) {
-            throw new JsonHttpException(25, "Document Id required");
+            throw new JsonHttpException(400, "Document Id required");
         }
         try {
             $internalDocument = $this->internalDocumentRepository->getById($documentId);
@@ -1583,7 +1583,7 @@ FROM
             header('Content-Disposition: attachment; filename="' . $internalDocument->originalFileName() . '"');
             echo $internalDocument->getFileContents();
         } catch (Exception $exception) {
-            throw new JsonHttpException(51, "Document not found");
+            throw new JsonHttpException(400, "Document not found");
         }
     }
 
@@ -1591,14 +1591,14 @@ FROM
     {
         $documentId = $this->getParam('documentId');
         if (!$documentId) {
-            throw new JsonHttpException(25, "Document Id required");
+            throw new JsonHttpException(400, "Document Id required");
         }
         try {
             $internalDocument = $this->internalDocumentRepository->getById($documentId);
             $this->internalDocumentRepository->deleteDocument($internalDocument);
             return ["status" => "ok"];
         } catch (Exception $exception) {
-            throw new JsonHttpException(2215, "Failed to delete document");
+            throw new JsonHttpException(400, "Failed to delete document");
         }
     }
 
@@ -1608,20 +1608,20 @@ FROM
         $serviceRequestId = @$data['serviceRequestId'];
         $content          = @$data['content'];
         if (!$serviceRequestId) {
-            throw new JsonHttpException(231, "Service request ID required");
+            throw new JsonHttpException(400, "Service request ID required");
         }
         if (!$content) {
-            throw new JsonHttpException(321, "Content required");
+            throw new JsonHttpException(400, "Content required");
         }
         $dbeProblem = new DBEProblem($this);
         if (!$dbeProblem->getRow($serviceRequestId)) {
-            throw new JsonHttpException(123, "Service Request Not Found!");
+            throw new JsonHttpException(400, "Service Request Not Found!");
         }
         $usecase = new AddServiceRequestInternalNote($this->serviceRequestInternalNoteRepository);
         try {
             $usecase->__invoke($dbeProblem, $this->getDbeUser(), $content);
         } catch (Exception $exception) {
-            throw new JsonHttpException(123, $exception->getMessage());
+            throw new JsonHttpException(400, $exception->getMessage());
         }
         return ["status" => "ok"];
     }
@@ -1632,14 +1632,14 @@ FROM
         $serviceRequestId = @$data['serviceRequestId'];
         $content          = @$data['content'];
         if (!$serviceRequestId) {
-            throw new JsonHttpException(231, "Service request ID required");
+            throw new JsonHttpException(400, "Service request ID required");
         }
         if (!$content) {
-            throw new JsonHttpException(321, "Content required");
+            throw new JsonHttpException(400, "Content required");
         }
         $dbeProblem = new DBEProblem($this);
         if (!$dbeProblem->getRow($serviceRequestId)) {
-            throw new JsonHttpException(123, "Service Request Not Found!");
+            throw new JsonHttpException(400, "Service Request Not Found!");
         }
         $dbeProblem->setValue(DBEProblem::taskList, $content);
         $dbeProblem->setValue(DBEProblem::taskListUpdatedAt, (new DateTimeImmutable())->format(DATE_MYSQL_DATETIME));

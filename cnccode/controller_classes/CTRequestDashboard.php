@@ -380,7 +380,7 @@ class CTRequestDashboard extends CTCNC
             $dsCallActivity
         );
         if ($dsCallActivity->getValue(DBECallActivity::salesRequestStatus) !== 'O') {
-            throw new \CNCLTD\Exceptions\JsonHttpException(2005, "This sales request has already been processed");
+            throw new \CNCLTD\Exceptions\JsonHttpException(400, "This sales request has already been processed");
         }
         {
             $notify = true;
@@ -394,7 +394,7 @@ class CTRequestDashboard extends CTCNC
                     $option = 'D';
                     break;
                 default:
-                    throw new \CNCLTD\Exceptions\JsonHttpException(2006, 'Action not valid');
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'Action not valid');
             }
             try {
                 $buActivity->salesRequestProcess(
@@ -405,7 +405,7 @@ class CTRequestDashboard extends CTCNC
                     $notify
                 );
             } catch (\Exception $exception) {
-                throw new \CNCLTD\Exceptions\JsonHttpException(2007, $exception->getMessage());
+                throw new \CNCLTD\Exceptions\JsonHttpException(400, $exception->getMessage());
             }
         }
         return ["status" => true];

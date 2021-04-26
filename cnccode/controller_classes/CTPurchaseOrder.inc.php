@@ -1277,10 +1277,10 @@ class CTPurchaseOrder extends CTCNC
 
         $data = $this->getJSONData();
         if (empty($data['purchaseOrderHeadId'])) {
-            throw new JsonHttpException('Purchase Order Id required');
+            throw new JsonHttpException(400,'Purchase Order Id required');
         }
         if (empty($data['sequenceNumber'])) {
-            throw new JsonHttpException('Sequence Number required');
+            throw new JsonHttpException(400,'Sequence Number required');
         }
         $purchaseOrderHeadId = $data['purchaseOrderHeadId'];
         $sequenceNumber      = $data['sequenceNumber'];
