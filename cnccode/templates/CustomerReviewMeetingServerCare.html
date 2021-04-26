@@ -8,8 +8,8 @@ Next Invoice: {nextInvoice}
 <p>
     Servers Under Support
 </p>
-<div class="reportSection ">    
-    <table style="min-width: 600px;">
+<div class="reportSection noNewPage">    
+    <table id="servicesTable">
         <thead>
             <tr>
                 <th>Server Details</th>
@@ -21,10 +21,10 @@ Next Invoice: {nextInvoice}
         <tbody>
             <!-- BEGIN contractItemsBlock -->
             <tr>
-                <td>{itemDescription}</td>
-                <td>{serialNo}</td>
-                <td>{serverName}</td>
-                <td>{purchaseDate}</td>
+                <td style="padding:2px">{itemDescription}</td>
+                <td style="padding:2px">{serialNo}</td>
+                <td style="padding:2px">{serverName}</td>
+                <td style="padding:2px">{purchaseDate}</td>
             </tr>
             <!-- END contractItemsBlock -->
         </tbody>
