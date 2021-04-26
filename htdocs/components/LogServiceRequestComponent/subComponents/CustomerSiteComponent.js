@@ -11,7 +11,7 @@ class CustomerSiteComponent extends MainComponent {
     el = React.createElement;
     apicustomer = new APICustomers();
     apiStandardText = new APIStandardText();
-
+    suggestTimeOut=null;
     constructor(props) {
         super(props);
         const {data} = this.props;
@@ -116,16 +116,9 @@ class CustomerSiteComponent extends MainComponent {
             } else {
                 data.emptyAssetReason = value.template;
             }
-        }
-        if(data.assetName)
-        {
-            const {customerSR}=this.props.data;            
-            let suggestSR=customerSR.filter(p=>p.assetName==data.assetName);
-            if(!value)
-                suggestSR=[];
-            this.setState({suggestSR})  
-        }
+        }        
         this.setState({data});
+        this.checkSuggestSR();
     };
     getAssetElement = () => {
         const {customerId} = this.props;
@@ -155,7 +148,7 @@ class CustomerSiteComponent extends MainComponent {
                 className: 'spellcheck',
                 onChange: (event) =>{
                     this.setValue("emailSubjectSummary", event.target.value);
-                    this.checkSuggestSR(event.target.value);
+                    this.checkSuggestSR();
                 },
                 value: this.state.data.emailSubjectSummary,
             })
@@ -189,27 +182,35 @@ class CustomerSiteComponent extends MainComponent {
     handleReasonChange=(value)=>{
          this.setValue("reasonTemplate", value);         
         //start matching        
-        this.checkSuggestSR(value);
+        this.checkSuggestSR();
     }
-    checkSuggestSR=(value)=>{
-        const { customerSR } = this.props.data;
-
-        for (let i = 0; i < customerSR.length; i++) {
-          const reasonPerc = similarity(value, customerSR[i].reason);
-          const lastReasonPerc = similarity(value, customerSR[i].lastReason);
-          const emailSubjectSummaryPerc = similarity(
-            value,
-            customerSR[i].emailSubjectSummary
-          );
-          customerSR[i]["percent"] = bigger([
-            reasonPerc,
-            lastReasonPerc,
-            emailSubjectSummaryPerc,
-          ]);
-        }
-        let suggestSR = customerSR.filter((p) => p.percent > 0.5);
-        if (!value) suggestSR = [];
-        this.setState({ suggestSR });    
+    checkSuggestSR=()=>{
+        if(this.suggestTimeOut)
+        clearTimeout(this.suggestTimeOut);
+        this.suggestTimeOut=setTimeout(()=>{
+            const {data}=this.state;
+            const { customerSR } = this.props.data;
+            let suggestSR =[...customerSR];
+            // check if asset selected
+            if(data.assetName)
+            {
+                const {customerSR}=this.props.data;            
+                suggestSR=customerSR.filter(p=>p.assetName==data.assetName);             
+            }
+            for (let i = 0; i < suggestSR.length; i++) {
+              const reasonPerc = similarity(data.reasonTemplate, suggestSR[i].reason);          
+              const emailSubjectSummaryPerc = similarity(data.emailSubjectSummary,suggestSR[i].emailSubjectSummary);
+              suggestSR[i]["percent"] = bigger([
+                reasonPerc,            
+                emailSubjectSummaryPerc,
+              ]);
+            }
+            suggestSR = suggestSR.filter((p) => p.percent > 0.5);
+            if (!data.assetName&&!data.reasonTemplate&&!data.emailSubjectSummaryPerc) 
+                suggestSR = [];
+            this.setState({ suggestSR });    
+        },1000)
+      
     }
     handleNext = async () => {
         let {data} = this.state;
