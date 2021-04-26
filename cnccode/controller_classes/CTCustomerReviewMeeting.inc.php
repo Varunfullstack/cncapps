@@ -492,19 +492,7 @@ class CTCustomerReviewMeeting extends CTCNC
                         $startDate,
                         $endDate
                     )
-                );
-                $textTemplate->set_var(
-                    'startersPCInstallation',
-                    $this->getStarterWithPCInstallation(
-                        $customerId,
-                        $startDate,
-                        $endDate
-                    )
-                );
-                // $textTemplate->set_var(
-                //     'reviewMeetingFrequency',
-                //     $this->getReviewMeetingFrequencyBody($dsCustomer)
-                // );
+                );               
                 $textTemplate->set_block(
                     'page',
                     'managementReviewBlock',
@@ -1279,7 +1267,14 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             $endDate
         );
 
-        if (!$starterSR->rowCount() && !$leaverSR->rowCount()) {
+        $starterPCInstallation = new DBEJProblem($this);
+        $starterPCInstallation->getStartersSRWithPCInstallationRootCause(
+            $customerId,
+            $startDate,
+            $endDate
+        );
+
+        if (!$starterSR->rowCount() && !$leaverSR->rowCount() && !$starterPCInstallation->rowCount()) {
             return "None";
         }
 
@@ -1298,7 +1293,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             'startersBlock',
             'items'
         );
-
+        //------------------starter
         if (!$starterSR->rowCount()) {
             $startersAndLeaversTemplate->parse(
                 'items',
@@ -1335,7 +1330,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             'leaversBlock',
             'leaversItems'
         );
-
+        //-------------------leavers
         if (!$leaverSR->rowCount()) {
             $startersAndLeaversTemplate->parse(
                 'leaversItems',
@@ -1363,6 +1358,37 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             $startersAndLeaversTemplate->parse(
                 'leaversItems',
                 'leaversBlock',
+                true
+            );
+        }
+         //------------------- Starter PC Installation
+         if (!$starterPCInstallation->rowCount()) {
+            $startersAndLeaversTemplate->parse(
+                'PCInstallationItems',
+                'starterPCInstallationBlock',
+                true
+            );
+        } else {
+            $startersAndLeaversTemplate->set_var(
+                'PCInstallationQty',
+                $starterPCInstallation->rowCount()
+            );
+            $workingHours = 0;
+            while ($starterPCInstallation->fetchNext()) {
+                $workingHours += $starterPCInstallation->getValue(DBEJProblem::totalActivityDurationHours);
+            }
+            $avgHours = $workingHours / $starterPCInstallation->rowCount();
+            $startersAndLeaversTemplate->set_var(
+                'PCInstallationAvgMinutes',
+                round(
+                    $avgHours * 60,
+                    0
+                )
+            );
+
+            $startersAndLeaversTemplate->parse(
+                'PCInstallationItems',
+                'starterPCInstallationBlock',
                 true
             );
         }
@@ -1776,78 +1802,5 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
         return  $output;
         //return json_decode($output, true);
     }
-    private function getStarterWithPCInstallation(
-        $customerId,
-        DateTimeInterface $startDate,
-        DateTimeInterface $endDate
-    ) {
-        $starterSR = new DBEJProblem($this);
-        $starterSR->getStartersSRWithPCInstallationRootCause(
-            $customerId,
-            $startDate,
-            $endDate
-        );
-        
-
-        if (!$starterSR->rowCount()) {
-            return "None";
-        }
-
-        $startersPCInstallationTemplate = new Template(
-            $GLOBALS["cfg"]["path_templates"],
-            "remove"
-        );
-
-        $startersPCInstallationTemplate->set_file(
-            'startersPCInstallation',
-            'CustomerReviewMeetingStartersPCInstallation.html'
-        );
-
-        $startersPCInstallationTemplate->set_block(
-            'startersPCInstallation',
-            'startersPCBlock',
-            'items'
-        );
-      
-        if (!$starterSR->rowCount()) {
-            $startersPCInstallationTemplate->parse(
-                'items',
-                'startersPCBlock',
-                true
-            );
-        } else {
-            $startersPCInstallationTemplate->set_var(
-                'startersQty',
-                $starterSR->rowCount()
-            );
-            $workingHours = 0;
-            while ($starterSR->fetchNext()) {
-                $workingHours += $starterSR->getValue(DBEJProblem::totalActivityDurationHours);
-            }
-            $avgHours = $workingHours / $starterSR->rowCount();
-            $startersPCInstallationTemplate->set_var(
-                'startersAvgMinutes',
-                round(
-                    $avgHours * 60,
-                    0
-                )
-            );
-
-            $startersPCInstallationTemplate->parse(
-                'items',
-                'startersPCBlock',
-                true
-            );
-        }
-
-       
-
-        $startersPCInstallationTemplate->parse(
-            'output',
-            'startersPCInstallation',
-            true
-        );
-
-        return $startersPCInstallationTemplate->get_var('output');
-    }
+    
 }
