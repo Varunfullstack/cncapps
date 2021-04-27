@@ -6,7 +6,6 @@
     });
 
     function init(editor) {
-        console.log('test');
         if (editor.addFeature) {
             editor.addFeature({
                 allowedContent: 'img[alt,id,!src]{width,height};'
