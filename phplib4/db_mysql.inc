@@ -85,6 +85,16 @@ class DB_Sql
         return $this->Query_ID;
     }
 
+    function beginTransaction()
+    {
+        $this->link_id()->begin_transaction();
+    }
+
+    function commit()
+    {
+        $this->link_id()->commit();
+    }
+
     function connect($Database = "",
                      $Host = "",
                      $User = "",

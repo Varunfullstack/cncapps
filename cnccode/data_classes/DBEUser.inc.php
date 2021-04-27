@@ -75,7 +75,7 @@ class DBEUser extends DBEntity
     const holdAllSRsforQAReview                  = "holdAllSRsforQAReview";
     const bccOnCustomerEmails                    = "bccOnCustomerEmails";
     const callBackEmail                          = "callBackEmail";
-
+const massDeletionOnUnstartedServiceRequestPermission = "massDeletionOnUnstartedServiceRequestPermission";
     /**
      * calls constructor()
      * @access public
@@ -412,7 +412,7 @@ class DBEUser extends DBEntity
         $this->addColumn(self::sendEmailWhenAssignedService, DA_BOOLEAN, DA_NOT_NULL, null, 1);
         $this->addColumn(self::holdAllSRsforQAReview, DA_BOOLEAN, DA_NOT_NULL, null, 0);
         $this->addColumn(self::bccOnCustomerEmails, DA_BOOLEAN, DA_NOT_NULL, null, 0);
-        $this->addColumn(self::callBackEmail, DA_BOOLEAN, DA_NOT_NULL, null, 0);
+        $this->addColumn(self::callBackEmail, DA_BOOLEAN, DA_NOT_NULL, null, 0);$this->addColumn(self::massDeletionOnUnstartedServiceRequestPermission, DA_BOOLEAN, DA_NOT_NULL, null, 0);
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -546,6 +546,11 @@ class DBEUser extends DBEntity
         return "{$this->getValue(self::firstName)} {$this->getValue(self::lastName)}";
     }
 
+
+    public function canMassDeleteUnstartedSRs()
+    {
+        return $this->getValue(DBEUser::massDeletionOnUnstartedServiceRequestPermission);
+    }
 }
 
 ?>

@@ -123,6 +123,11 @@ class dbSweetcode extends DB_Sql
     var $User     = DB_USER;
     var $Password = DB_PASSWORD;
 
+    public function rollback()
+    {
+        $this->link_id()->rollback();
+    }
+
 
 }
 
@@ -347,7 +352,7 @@ class auSweetcode extends Auth
         $this->db->next_record();
         $teamLevel        = $this->db->Record['teamLevel'];
         $standardDayHours = $this->db->Record['standardDayHours'];
-        $sql = "INSERT IGNORE INTO user_time_log
+        $sql              = "INSERT IGNORE INTO user_time_log
         (
         `userID`,
         `teamLevel`,

@@ -5,6 +5,7 @@ This project changes will be shown here.
 ### Added
 - Issue 1280 - Duo Usage Portal in Portal.
 - Issue 1342 - Add Call back icon within the SR
+- Issue 1347 - Mass deletion of Initial Service Requests
 ### Changed
 - Issue 1217 - Force T&M when SR has Call Out Expense.
 - Issue 1305 - Deleting SR that has a callback is prevented.

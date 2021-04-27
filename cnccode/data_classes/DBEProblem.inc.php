@@ -504,10 +504,28 @@ class DBEProblem extends DBEntity
     public function getToCheckCriticalFlagSRs()
     {
         $this->setQueryString(
-            "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
-            ) . " WHERE " . $this->getDBColumnName(self::status) . " in ('I','P') AND " . $this->getDBColumnName(
+            "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName(
+            )} WHERE {$this->getDBColumnName(self::status)} in ('I','P') AND {$this->getDBColumnName(
                 self::priority
-            ) . " in (1,2,3)"
+            )} in (1,2,3)"
+        );
+        return parent::getRows();
+    }
+
+    public function getUnstartedServiceRequestsForDeletion($search)
+    {
+        if (!$search) {
+            throw new Exception('Search must not be null or empty');
+        }
+        $escapedSearch = mysqli_real_escape_string($this->db->link_id(), $search);
+        $this->setQueryString(
+            "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} 
+                JOIN callactivity `initial`
+    ON initial.caa_problemno = pro_problemno
+    AND initial.caa_callacttypeno = 51 
+    and initial.reason like '%{$escapedSearch}%'
+    and (select count(caa_callactivityno) from callactivity where caa_problemno = pro_problemno) = 1
+WHERE {$this->getDBColumnName(self::linkedSalesOrderID)} is null and  {$this->getDBColumnName(self::status)} = 'I' "
         );
         return parent::getRows();
     }

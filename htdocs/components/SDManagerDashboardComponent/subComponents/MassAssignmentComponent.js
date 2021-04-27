@@ -42,7 +42,6 @@ export default class MassAssignmentComponent extends MainComponent {
     getUsers = () => {
         const {users, summary} = this.state;
         const {hd, es, sp, p} = this.props.filter;
-
         let filteredUsers = [];
         if (hd + es + sp + p === 1) {
             filteredUsers.push({id: null, name: 'Unassigned', team: null});

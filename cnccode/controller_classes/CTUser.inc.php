@@ -17,31 +17,12 @@ require_once($cfg['path_dbe'] . '/DBECustomer.inc.php');
 require_once($cfg['path_dbe'] . '/DBETeam.inc.php');
 require_once($cfg['path_ct'] . '/CTPassword.inc.php');
 // Actions
-define(
-    'CTUSER_ACT_DISPLAY_LIST',
-    'userList'
-);
-define(
-    'CTUSER_ACT_CREATE',
-    'createUser'
-);
-define(
-    'CTUSER_ACT_EDIT',
-    'editUser'
-);
-define(
-    'CTUSER_ACT_DELETE',
-    'deleteUser'
-);
-define(
-    'CTUSER_ACT_UPDATE',
-    'updateUser'
-);
-define(
-    'CTUSER_ACT_ABSENCE_EDIT',
-    'absenceEdit'
-);
-
+const CTUSER_ACT_DISPLAY_LIST = 'userList';
+const CTUSER_ACT_CREATE       = 'createUser';
+const CTUSER_ACT_EDIT         = 'editUser';
+const CTUSER_ACT_DELETE       = 'deleteUser';
+const CTUSER_ACT_UPDATE       = 'updateUser';
+const CTUSER_ACT_ABSENCE_EDIT = 'absenceEdit';
 class CTUser extends CTCNC
 {
     const dateOfBirth               = "dateOfBirth";
@@ -392,281 +373,296 @@ class CTUser extends CTCNC
         }
         $this->template->setVar(
             array(
-                'userID'                                        => $dsUser->getValue(DBEJUser::userID),
-                'name'                                          => Controller::htmlInputText(
+                'userID'                                                 => $dsUser->getValue(DBEJUser::userID),
+                'name'                                                   => Controller::htmlInputText(
                     $dsUser->getValue(DBEJUser::name)
                 ),
-                'nameMessage'                                   => Controller::htmlDisplayText(
+                'nameMessage'                                            => Controller::htmlDisplayText(
                     $dsUser->getMessage(DBEJUser::name)
                 ),
-                'salutation'                                    => Controller::htmlInputText(
+                'salutation'                                             => Controller::htmlInputText(
                     $dsUser->getValue(DBEJUser::salutation)
                 ),
-                'salutationMessage'                             => Controller::htmlDisplayText(
+                'salutationMessage'                                      => Controller::htmlDisplayText(
                     $dsUser->getMessage(DBEJUser::salutation)
                 ),
-                'address1PencilColor'                           => $this->dsUser->getValue(
+                'address1PencilColor'                                    => $this->dsUser->getValue(
                     DBEUser::encryptedAddress1
                 ) ? "greenPencil" : "redPencil",
-                'encryptedAddress1'                             => $this->dsUser->getValue(
+                'encryptedAddress1'                                      => $this->dsUser->getValue(
                     DBEUser::encryptedAddress1
                 ),
-                "dateOfBirthPencilColor"                        => $this->dsUser->getValue(
+                "dateOfBirthPencilColor"                                 => $this->dsUser->getValue(
                     DBEUser::encryptedDateOfBirth
                 ) ? 'greenPencil' : 'redPencil',
-                "encryptedDateOfBirth"                          => $this->dsUser->getValue(
+                "encryptedDateOfBirth"                                   => $this->dsUser->getValue(
                     DBEUser::encryptedDateOfBirth
                 ),
-                "startDate"                                     => $this->dsUser->getValue(DBEUser::startDate),
-                "companyHealthcareStartDate"                    => $this->dsUser->getValue(
+                "startDate"                                              => $this->dsUser->getValue(DBEUser::startDate),
+                "companyHealthcareStartDate"                             => $this->dsUser->getValue(
                     DBEUser::companyHealthcareStartDate
                 ),
-                "enhancedCNC2YearPensionStartDate"              => $this->dsUser->getValue(
+                "enhancedCNC2YearPensionStartDate"                       => $this->dsUser->getValue(
                     DBEUser::enhancedCNC2YearPensionStartDate
                 ),
-                "pensionAdditionalPaymentsPencilColor"          => $this->dsUser->getValue(
+                "pensionAdditionalPaymentsPencilColor"                   => $this->dsUser->getValue(
                     DBEUser::encryptedPensionAdditionalPayments
                 ) ? 'greenPencil' : 'redPencil',
-                "encryptedPensionAdditionalPayments"            => $this->dsUser->getValue(
+                "encryptedPensionAdditionalPayments"                     => $this->dsUser->getValue(
                     DBEUser::encryptedPensionAdditionalPayments
                 ),
-                "salaryPencilColor"                             => $this->dsUser->getValue(
+                "salaryPencilColor"                                      => $this->dsUser->getValue(
                     DBEUser::encryptedSalary
                 ) ? 'greenPencil' : 'redPencil',
-                "encryptedSalary"                               => $this->dsUser->getValue(DBEUser::encryptedSalary),
-                "salarySacrificePencilColor"                    => $this->dsUser->getValue(
+                "encryptedSalary"                                        => $this->dsUser->getValue(
+                    DBEUser::encryptedSalary
+                ),
+                "salarySacrificePencilColor"                             => $this->dsUser->getValue(
                     DBEUser::encryptedSalarySacrifice
                 ) ? 'greenPencil' : 'redPencil',
-                "encryptedSalarySacrifice"                      => $this->dsUser->getValue(
+                "encryptedSalarySacrifice"                               => $this->dsUser->getValue(
                     DBEUser::encryptedSalarySacrifice
                 ),
-                "nationalInsuranceNumberPencilColor"            => $this->dsUser->getValue(
+                "nationalInsuranceNumberPencilColor"                     => $this->dsUser->getValue(
                     DBEUser::encryptedNationalInsuranceNumber
                 ) ? 'greenPencil' : 'redPencil',
-                "encryptedNationalInsuranceNumber"              => $this->dsUser->getValue(
+                "encryptedNationalInsuranceNumber"                       => $this->dsUser->getValue(
                     DBEUser::encryptedNationalInsuranceNumber
                 ),
-                "address2PencilColor"                           => $this->dsUser->getValue(
+                "address2PencilColor"                                    => $this->dsUser->getValue(
                     DBEUser::encryptedAddress2
                 ) ? 'greenPencil' : 'redPencil',
-                "encryptedAddress2"                             => $this->dsUser->getValue(DBEUser::encryptedAddress2),
-                "address3PencilColor"                           => $this->dsUser->getValue(
+                "encryptedAddress2"                                      => $this->dsUser->getValue(
+                    DBEUser::encryptedAddress2
+                ),
+                "address3PencilColor"                                    => $this->dsUser->getValue(
                     DBEUser::encryptedAddress3
                 ) ? 'greenPencil' : 'redPencil',
-                "encryptedAddress3"                             => $this->dsUser->getValue(DBEUser::encryptedAddress3),
-                "townPencilColor"                               => $this->dsUser->getValue(
+                "encryptedAddress3"                                      => $this->dsUser->getValue(
+                    DBEUser::encryptedAddress3
+                ),
+                "townPencilColor"                                        => $this->dsUser->getValue(
                     DBEUser::encryptedTown
                 ) ? 'greenPencil' : 'redPencil',
-                "encryptedTown"                                 => $this->dsUser->getValue(DBEUser::encryptedTown),
-                "countyPencilColor"                             => $this->dsUser->getValue(
+                "encryptedTown"                                          => $this->dsUser->getValue(
+                    DBEUser::encryptedTown
+                ),
+                "countyPencilColor"                                      => $this->dsUser->getValue(
                     DBEUser::encryptedCounty
                 ) ? 'greenPencil' : 'redPencil',
-                "encryptedCounty"                               => $this->dsUser->getValue(DBEUser::encryptedCounty),
-                "postcodePencilColor"                           => $this->dsUser->getValue(
+                "encryptedCounty"                                        => $this->dsUser->getValue(
+                    DBEUser::encryptedCounty
+                ),
+                "postcodePencilColor"                                    => $this->dsUser->getValue(
                     DBEUser::encryptedPostcode
                 ) ? 'greenPencil' : 'redPencil',
-                "encryptedPostcode"                             => $this->dsUser->getValue(DBEUser::encryptedPostcode),
-                'add1'                                          => Controller::htmlInputText(
+                "encryptedPostcode"                                      => $this->dsUser->getValue(
+                    DBEUser::encryptedPostcode
+                ),
+                'add1'                                                   => Controller::htmlInputText(
                     $dsUser->getValue(DBEJUser::add1)
                 ),
-                'add1Message'                                   => Controller::htmlDisplayText(
+                'add1Message'                                            => Controller::htmlDisplayText(
                     $dsUser->getMessage(DBEJUser::add1)
                 ),
-                'add2'                                          => Controller::htmlInputText(
+                'add2'                                                   => Controller::htmlInputText(
                     $dsUser->getValue(DBEJUser::add2)
                 ),
-                'add3'                                          => Controller::htmlInputText(
+                'add3'                                                   => Controller::htmlInputText(
                     $dsUser->getValue(DBEJUser::add3)
                 ),
-                'town'                                          => Controller::htmlInputText(
+                'town'                                                   => Controller::htmlInputText(
                     $dsUser->getValue(DBEJUser::town)
                 ),
-                'townMessage'                                   => Controller::htmlDisplayText(
+                'townMessage'                                            => Controller::htmlDisplayText(
                     $dsUser->getMessage(DBEJUser::town)
                 ),
-                'county'                                        => Controller::htmlInputText(
+                'county'                                                 => Controller::htmlInputText(
                     $dsUser->getValue(DBEJUser::county)
                 ),
-                'postcode'                                      => Controller::htmlInputText(
+                'postcode'                                               => Controller::htmlInputText(
                     $dsUser->getValue(DBEJUser::postcode)
                 ),
-                'postcodeMessage'                               => Controller::htmlDisplayText(
+                'postcodeMessage'                                        => Controller::htmlDisplayText(
                     $dsUser->getMessage(DBEJUser::postcode)
                 ),
-                'username'                                      => Controller::htmlInputText(
+                'username'                                               => Controller::htmlInputText(
                     $dsUser->getValue(DBEJUser::username)
                 ),
-                'usernameMessage'                               => Controller::htmlDisplayText(
+                'usernameMessage'                                        => Controller::htmlDisplayText(
                     $dsUser->getMessage(DBEJUser::username)
                 ),
-                'employeeNo'                                    => Controller::htmlInputText(
+                'employeeNo'                                             => Controller::htmlInputText(
                     $dsUser->getValue(DBEJUser::employeeNo)
                 ),
-                'employeeNoMessage'                             => Controller::htmlDisplayText(
+                'employeeNoMessage'                                      => Controller::htmlDisplayText(
                     $dsUser->getMessage(DBEJUser::employeeNo)
                 ),
-                'jobTitle'                                      => Controller::htmlInputText(
+                'jobTitle'                                               => Controller::htmlInputText(
                     $dsUser->getValue(DBEJUser::jobTitle)
                 ),
-                'jobTitleMessage'                               => Controller::htmlDisplayText(
+                'jobTitleMessage'                                        => Controller::htmlDisplayText(
                     $dsUser->getMessage(DBEJUser::jobTitle)
                 ),
-                'petrolRate'                                    => Controller::htmlInputText(
+                'petrolRate'                                             => Controller::htmlInputText(
                     $dsUser->getValue(DBEJUser::petrolRate)
                 ),
-                'petrolRateMessage'                             => Controller::htmlDisplayText(
+                'petrolRateMessage'                                      => Controller::htmlDisplayText(
                     $dsUser->getMessage(DBEJUser::petrolRate)
                 ),
-                'hourlyPayRate'                                 => Controller::htmlInputText(
+                'hourlyPayRate'                                          => Controller::htmlInputText(
                     $dsUser->getValue(DBEJUser::hourlyPayRate)
                 ),
-                'hourlyPayRateMessage'                          => Controller::htmlDisplayText(
+                'hourlyPayRateMessage'                                   => Controller::htmlDisplayText(
                     $dsUser->getMessage(DBEJUser::hourlyPayRate)
                 ),
-                'standardDayHours'                              => Controller::htmlInputText(
+                'standardDayHours'                                       => Controller::htmlInputText(
                     $dsUser->getValue(DBEJUser::standardDayHours)
                 ),
-                'standardDayHoursMessage'                       => Controller::htmlDisplayText(
+                'standardDayHoursMessage'                                => Controller::htmlDisplayText(
                     $dsUser->getMessage(DBEJUser::standardDayHours)
                 ),
-                'signatureFilename'                             => Controller::htmlInputText(
+                'signatureFilename'                                      => Controller::htmlInputText(
                     $dsUser->getValue(DBEJUser::signatureFilename)
                 ),
-                'signatureFilenameMessage'                      => Controller::htmlDisplayText(
+                'signatureFilenameMessage'                               => Controller::htmlDisplayText(
                     $dsUser->getMessage(DBEJUser::signatureFilename)
                 ),
-                'firstName'                                     => Controller::htmlInputText(
+                'firstName'                                              => Controller::htmlInputText(
                     $dsUser->getValue(DBEUser::firstName)
                 ),
-                'firstNameMessage'                              => Controller::htmlDisplayText(
+                'firstNameMessage'                                       => Controller::htmlDisplayText(
                     $dsUser->getMessage(DBEUser::firstName)
                 ),
-                'lastName'                                      => Controller::htmlInputText(
+                'lastName'                                               => Controller::htmlInputText(
                     $dsUser->getValue(DBEUser::lastName)
                 ),
-                'lastNameMessage'                               => Controller::htmlDisplayText(
+                'lastNameMessage'                                        => Controller::htmlDisplayText(
                     $dsUser->getMessage(DBEUser::lastName)
                 ),
-                'activeFlagChecked'                             => Controller::htmlChecked(
+                'activeFlagChecked'                                      => Controller::htmlChecked(
                     $dsUser->getValue(DBEUser::activeFlag)
                 ),
-                "bccOnCustomerEmailsChecked"                    => $dsUser->getValue(
+                "bccOnCustomerEmailsChecked"                             => $dsUser->getValue(
                     DBEUser::bccOnCustomerEmails
                 ) ? "checked" : "",
-                'globalExpenseApproverChecked'                  => $dsUser->getValue(
+                'globalExpenseApproverChecked'                           => $dsUser->getValue(
                     DBEUser::globalExpenseApprover
                 ) ? 'checked' : null,
-                'salesPasswordAccessChecked'                    => $dsUser->getValue(
+                'salesPasswordAccessChecked'                             => $dsUser->getValue(
                     DBEUser::salesPasswordAccess
                 ) ? 'checked' : null,
-                'starterLeaverQuestionManagementFlagChecked'    => Controller::htmlChecked(
+                'starterLeaverQuestionManagementFlagChecked'             => Controller::htmlChecked(
                     $dsUser->getValue(DBEUser::starterLeaverQuestionManagementFlag)
                 ),
-                'changeSRContractsFlagChecked'                  => Controller::htmlChecked(
+                'changeSRContractsFlagChecked'                           => Controller::htmlChecked(
                     $dsUser->getValue(DBEUser::changeSRContractsFlag)
                 ),
-                'staffAppraiserFlagChecked'                     => Controller::htmlChecked(
+                'staffAppraiserFlagChecked'                              => Controller::htmlChecked(
                     $dsUser->getValue(DBEUser::staffAppraiserFlag)
                 ),
-                "isExpenseApproverChecked"                      => $dsUser->getValue(
+                "isExpenseApproverChecked"                               => $dsUser->getValue(
                     DBEUser::isExpenseApprover
                 ) ? 'checked' : null,
-                'receiveSdManagerEmailFlagChecked'              => Controller::htmlChecked(
+                'receiveSdManagerEmailFlagChecked'                       => Controller::htmlChecked(
                     $dsUser->getValue(DBEJUser::receiveSdManagerEmailFlag)
                 ),
-                'autoApproveExpensesChecked'                    => $dsUser->getValue(
+                'autoApproveExpensesChecked'                             => $dsUser->getValue(
                     DBEJUser::autoApproveExpenses
                 ) ? 'checked' : null,
-                'appearInQueueFlagChecked'                      => Controller::htmlChecked(
+                'appearInQueueFlagChecked'                               => Controller::htmlChecked(
                     $dsUser->getValue(DBEJUser::appearInQueueFlag)
                 ),
-                'changePriorityFlagChecked'                     => Controller::htmlChecked(
+                'changePriorityFlagChecked'                              => Controller::htmlChecked(
                     $dsUser->getValue(
                         DBEJUser::changePriorityFlag
                     )
                 ),
-                'helpdeskFlagChecked'                           => Controller::htmlChecked(
+                'helpdeskFlagChecked'                                    => Controller::htmlChecked(
                     $dsUser->getValue(DBEJUser::helpdeskFlag)
                 ),
-                'callBackEmailChecked'                          => $dsUser->getValue(
+                'callBackEmailChecked'                                   => $dsUser->getValue(
                     DBEJUser::callBackEmail
                 ) ? "checked" : '',
-                'createRenewalSalesOrdersFlagChecked'           => Controller::htmlChecked(
+                'massDeletionOnUnstartedServiceRequestPermissionChecked' => $dsUser->getValue(
+                    DBEUser::massDeletionOnUnstartedServiceRequestPermission
+                ) ? "checked" : '',
+                'createRenewalSalesOrdersFlagChecked'                    => Controller::htmlChecked(
                     $dsUser->getValue(DBEJUser::createRenewalSalesOrdersFlag)
                 ),
-                'salesChecked'                                  => (strpos(
+                'salesChecked'                                           => (strpos(
                         $dsUser->getValue(DBEJUser::perms),
                         SALES_PERMISSION
                     ) !== FALSE) ? CT_CHECKED : null,
-                'accountManagementChecked'                      => (strpos(
+                'accountManagementChecked'                               => (strpos(
                         $dsUser->getValue(DBEJUser::perms),
                         ACCOUNT_MANAGEMENT_PERMISSION
                     ) !== FALSE) ? CT_CHECKED : null,
-                'seniorManagementChecked'                       => (strpos(
+                'seniorManagementChecked'                                => (strpos(
                         $dsUser->getValue(DBEJUser::perms),
                         SENIOR_MANAGEMENT_PERMISSION
                     ) !== FALSE) ? CT_CHECKED : null,
-                'accountsChecked'                               => (strpos(
+                'accountsChecked'                                        => (strpos(
                         $dsUser->getValue(DBEJUser::perms),
                         ACCOUNTS_PERMISSION
                     ) !== FALSE) ? CT_CHECKED : null,
-                'technicalChecked'                              => (strpos(
+                'technicalChecked'                                       => (strpos(
                         $dsUser->getValue(DBEJUser::perms),
                         TECHNICAL_PERMISSION
                     ) !== FALSE) ? CT_CHECKED : null,
-                'supervisorChecked'                             => (strpos(
+                'supervisorChecked'                                      => (strpos(
                         $dsUser->getValue(DBEJUser::perms),
                         SUPERVISOR_PERMISSION
                     ) !== FALSE) ? CT_CHECKED : null,
-                'maintenanceChecked'                            => (strpos(
+                'maintenanceChecked'                                     => (strpos(
                         $dsUser->getValue(DBEJUser::perms),
                         MAINTENANCE_PERMISSION
                     ) !== FALSE) ? CT_CHECKED : null,
-                'renewalsChecked'                               => (strpos(
+                'renewalsChecked'                                        => (strpos(
                         $dsUser->getValue(DBEJUser::perms),
                         RENEWALS_PERMISSION
                     ) !== FALSE) ? CT_CHECKED : null,
-                'queueManagerChecked'                           => $dsUser->getValue(
+                'queueManagerChecked'                                    => $dsUser->getValue(
                     DBEUser::queueManager
                 ) ? 'checked' : '',
-                'excludeFromStatsFlagChecked'                   => Controller::htmlChecked(
+                'excludeFromStatsFlagChecked'                            => Controller::htmlChecked(
                     $dsUser->getValue(DBEUser::excludeFromStatsFlag)
                 ),
-                'projectManagementFlagChecked'                  => Controller::htmlChecked(
+                'projectManagementFlagChecked'                           => Controller::htmlChecked(
                     $dsUser->getValue(DBEUser::projectManagementFlag)
                 ),
-                'offsiteBackupAdditionalPermissionsFlagChecked' => Controller::htmlChecked(
+                'offsiteBackupAdditionalPermissionsFlagChecked'          => Controller::htmlChecked(
                     $dsUser->getValue(DBEUser::offsiteBackupAdditionalPermissionsFlag)
                 ),
-                'additionalTimeLevelApproverChecked'            => $dsUser->getValue(
+                'additionalTimeLevelApproverChecked'                     => $dsUser->getValue(
                     DBEUser::additionalTimeLevelApprover
                 ) ? 'checked' : null,
-                'reportsChecked'                                => (strpos(
+                'reportsChecked'                                         => (strpos(
                         $dsUser->getValue(DBEJUser::perms),
                         REPORTS_PERMISSION
                     ) !== FALSE) ? CT_CHECKED : null,
-                'teamMessage'                                   => Controller::htmlDisplayText(
+                'teamMessage'                                            => Controller::htmlDisplayText(
                     $dsUser->getMessage(DBEJUser::teamID)
                 ),
-                'urlUpdate'                                     => $urlUpdate,
-                'urlDelete'                                     => $urlDelete,
-                'txtDelete'                                     => $txtDelete,
-                'urlDisplayList'                                => $urlDisplayList,
-                "basedAtCustomerSiteChecked"                    => $this->dsUser->getValue(
+                'urlUpdate'                                              => $urlUpdate,
+                'urlDelete'                                              => $urlDelete,
+                'txtDelete'                                              => $txtDelete,
+                'urlDisplayList'                                         => $urlDisplayList,
+                "basedAtCustomerSiteChecked"                             => $this->dsUser->getValue(
                     DBEUser::basedAtCustomerSite
                 ) ? 'checked' : null,
-                "basedAtCustomerSiteChecked"                    => $this->dsUser->getValue(
+                "basedAtCustomerSiteChecked"                             => $this->dsUser->getValue(
                     DBEUser::basedAtCustomerSite
                 ) ? 'checked' : null,
-                'siteCustId'                                    => $siteCustomerId,
-                'siteCustomerString'                            => $siteCustomerString,
-                'streamOneLicenseManagementChecked'             => Controller::htmlChecked(
+                'siteCustId'                                             => $siteCustomerId,
+                'siteCustomerString'                                     => $siteCustomerString,
+                'streamOneLicenseManagementChecked'                      => Controller::htmlChecked(
                     $dsUser->getValue(DBEJUser::streamOneLicenseManagement)
                 ),
-                'excludeFromSDManagerDashboardChecked'          => $dsUser->getValue(
+                'excludeFromSDManagerDashboardChecked'                   => $dsUser->getValue(
                     DBEUser::excludeFromSDManagerDashboard
                 ) ? 'checked' : null,
-                'holdAllSRsforQAReviewChecked'                  => $dsUser->getValue(
+                'holdAllSRsforQAReviewChecked'                           => $dsUser->getValue(
                     DBEUser::holdAllSRsforQAReview
                 ) ? 'checked' : null,
             )
@@ -992,17 +988,24 @@ class CTUser extends CTCNC
         $dbeJUser->getRow();
         return json_encode(
             [
-                'firstName'                  => $dbeJUser->getValue(DBEJUser::firstName),
-                'lastName'                   => $dbeJUser->getValue(DBEJUser::lastName),
-                'id'                         => $dbeJUser->getValue(DBEJUser::userID),
-                'email'                      => $dbeJUser->getEmail(),
-                'isSDManager'                => $this->isSdManager(),
-                'isExpenseApprover'          => $dbeJUser->getValue(DBEJUser::isExpenseApprover),
-                'globalExpenseApprover'      => $dbeJUser->getValue(DBEJUser::globalExpenseApprover),
-                'teamID'                     => $dbeJUser->getValue(DBEJUser::teamID),
-                'teamLevel'                  => $dbeJUser->getValue(DBEJUser::teamLevel),
-                'serviceRequestQueueManager' => $dbeJUser->getValue(DBEJUser::queueManager),
-                'isProjectManager'           => $dbeJUser->getValue(DBEJUser::projectManagementFlag) == 'Y',
+                'firstName'                                       => $dbeJUser->getValue(DBEJUser::firstName),
+                'lastName'                                        => $dbeJUser->getValue(DBEJUser::lastName),
+                'id'                                              => $dbeJUser->getValue(DBEJUser::userID),
+                'email'                                           => $dbeJUser->getEmail(),
+                'isSDManager'                                     => $this->isSdManager(),
+                'isExpenseApprover'                               => $dbeJUser->getValue(DBEJUser::isExpenseApprover),
+                'globalExpenseApprover'                           => $dbeJUser->getValue(
+                    DBEJUser::globalExpenseApprover
+                ),
+                'teamID'                                          => $dbeJUser->getValue(DBEJUser::teamID),
+                'teamLevel'                                       => $dbeJUser->getValue(DBEJUser::teamLevel),
+                'serviceRequestQueueManager'                      => $dbeJUser->getValue(DBEJUser::queueManager),
+                'isProjectManager'                                => $dbeJUser->getValue(
+                        DBEJUser::projectManagementFlag
+                    ) == 'Y',
+                'massDeletionOnUnstartedServiceRequestPermission' => $dbeJUser->getValue(
+                    DBEUser::massDeletionOnUnstartedServiceRequestPermission
+                )
             ]
         );
     }
