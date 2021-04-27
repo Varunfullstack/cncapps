@@ -261,7 +261,7 @@ class CustomerSiteComponent extends MainComponent {
                 minHeight: 100}}>
                     <div style={{backgroundColor: "#58585a",
                     color: "white", padding: 5}}>
-                        Try these suggested problems
+                        Related Service Requests That Might Be Relevant
                         </div>
                 {suggestSR.map(p=><div key={p.activityID} style={{ padding: 5,}} >
 
