@@ -6,12 +6,14 @@ import APIStandardText from "../../services/APIStandardText";
 import EditorFieldComponent from "../../shared/EditorField/EditorFieldComponent";
 import AssetListSelectorComponent from "../../shared/AssetListSelectorComponent/AssetListSelectorComponent";
 import { bigger, params, similarity } from "../../utils/utils.js";
+import APIHeader from "../../services/APIHeader.js";
 
 class CustomerSiteComponent extends MainComponent {
     el = React.createElement;
     apicustomer = new APICustomers();
     apiStandardText = new APIStandardText();
     suggestTimeOut=null;
+    apiHeader=new APIHeader();
     constructor(props) {
         super(props);
         const {data} = this.props;
@@ -33,7 +35,8 @@ class CustomerSiteComponent extends MainComponent {
                 emailSubjectSummary: data.emailSubjectSummary || params.get("emailSubject")|| "",
                 emptyAssetReason: data.emptyAssetReason || "",
             },
-            suggestSR:[]
+            suggestSR:[],
+            keywordMatchingPercent:0.5
         };
     }
 
@@ -70,6 +73,10 @@ class CustomerSiteComponent extends MainComponent {
         if (sites.length == 1) data.siteNo = sites[0].id;
 
         this.setState({sites, data, _showSpinner: false});
+        this.apiHeader.getKeywordMatchingPercent().then(res=>{
+            
+            this.setState({keywordMatchingPercent:res/100})
+        })
     };
     showSpinner = () => {
         this.setState({_showSpinner: true});
@@ -185,6 +192,7 @@ class CustomerSiteComponent extends MainComponent {
         this.checkSuggestSR();
     }
     checkSuggestSR=async ()=>{
+        //console.log(this.state.keywordMatchingPercent);
         if(this.suggestTimeOut)
         clearTimeout(this.suggestTimeOut);
         this.suggestTimeOut=setTimeout(async ()=>{
@@ -205,10 +213,12 @@ class CustomerSiteComponent extends MainComponent {
                 emailSubjectSummaryPerc,
               ]);
             }
-            let suggestSRFinal = customerSR.filter((p) => p.percent > 0.5);
+            let suggestSRFinal = customerSR.filter((p) => p.percent > this.state.keywordMatchingPercent);
+            console.log('suggestSRFinal',suggestSRFinal);
+            console.log('assetSR',assetSR);
             for(let i=0;i<assetSR.length;i++)
             {
-                if(suggestSRFinal.filter(p=>p.activityID==assetSR[i].activityID).length>0)
+                if(suggestSRFinal.filter(p=>p.activityID==assetSR[i].activityID).length==0)
                 suggestSRFinal.push(assetSR[i])
             }
             if (!data.assetName&&!data.reasonTemplate&&!data.emailSubjectSummaryPerc) 

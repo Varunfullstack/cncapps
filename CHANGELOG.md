@@ -2,6 +2,9 @@
 This project changes will be shown here.
 ## [unreleased]
 ### Added
+- Add keywordMatchingPercent to header table to use in words matching
+## [unreleased]
+### Added
 - Add problem suggestion to log serviec request
 ## [v5.8.3] - 2021-04-19
 ### Fixed

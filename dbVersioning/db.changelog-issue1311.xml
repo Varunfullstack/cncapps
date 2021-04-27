@@ -163,4 +163,26 @@
             </sql>
         </rollback>
     </changeSet>
+    <changeSet author="Mustafa" id="issue1311-3">
+         <addColumn tableName="Headert">
+            <column name="keywordMatchingPercent" type="float"/>  
+         </addColumn>        
+        <rollback>
+            <dropColumn tableName="Headert" columnName="keywordMatchingPercent"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="Mustafa" id="issue1311-5">
+      <sql>
+        update Headert set keywordMatchingPercent=0.5
+      </sql>
+        <rollback>
+         </rollback>
+    </changeSet>
+     <changeSet author="Mustafa" id="issue1311-6">
+        <sql>
+            update Headert set keywordMatchingPercent=50
+        </sql>
+        <rollback>
+        </rollback>
+    </changeSet>
 </databaseChangeLog>

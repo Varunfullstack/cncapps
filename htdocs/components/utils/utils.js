@@ -282,17 +282,21 @@ async function loadReservedWords() {
   }
 }
 function removeReservedWords(s) {
-  for (let i = 0; i < words.length; i++)
-    s = s.replaceAll(" " + words[i] + " ", " ");
+  if (s) {
+    for (let i = 0; i < words.length; i++)
+      s = s.replaceAll(" " + words[i] + " ", " ");
+  }
   return s;
 }
 export async function similarity(s1, s2, useDefaultDictionary = true) {
+    if(s1.length==0)
+    return 0;
   if (useDefaultDictionary) {
     await loadReservedWords();
     //console.log(words);
   }
-  s1 = removeReservedWords(s1.toLowerCase());
-  s2 = removeReservedWords(s2.toLowerCase());
+  s1 = removeReservedWords(s1?s1.toLowerCase():null);
+  s2 = removeReservedWords(s2?s2.toLowerCase():null);
 
   // get s1 words
   const s1Words = stripHtml(s1).split(" ");

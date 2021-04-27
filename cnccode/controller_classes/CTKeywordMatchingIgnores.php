@@ -93,7 +93,7 @@ class CTKeywordMatchingIgnores extends CTCNC
      * @return array
      */
     function getAllWords(){
-        return DBConnect::fetchAll("select id,word from keywordMatchingIgnores");
+        return DBConnect::fetchAll("select id,word from keywordMatchingIgnores order by word");
     }
      /**    
      * @return boolean
