@@ -2,21 +2,21 @@
 <table class="collapse">
     <thead>
     <tr>
-        <th>Agent Name</th>
-        <th>Letter</th>
-        <th>Size</th>
-        <th>Free Space</th>
-        <th>Free Percent</th>
+        <th class="text-center">Agent Name</th>
+        <th class="text-center">Letter</th>
+        <th class="text-center">Size</th>
+        <th class="text-center">Free Space</th>
+        <th class="text-center">Free Percent</th>
     </tr>
     </thead>
     <tbody style="font-size: small">
     {% for item in driveSpaceItems %}
         <tr>
-            <td>{{ item.agentName }}</td>
-            <td>{{ item.driveLetter }}</td>
-            <td>{{ item.driveSize|MB2GB }}</td>
-            <td>{{ item.driveFreeSpace|MB2GB }}</td>
-            <td {{ getFreeSpaceClass(item) }}>{{ item.freePercent| freePercentage }}</td>
+            <td class="text-center">{{ item.agentName }}</td>
+            <td class="text-center">{{ item.driveLetter }}</td>
+            <td class="text-center">{{ item.driveSize|MB2GB }}</td>
+            <td class="text-center">{{ item.driveFreeSpace|MB2GB }}</td>
+            <td class="text-center" {{ getFreeSpaceClass(item) }}>{{ item.freePercent| freePercentage }}</td>
         </tr>
     {% endfor %}
     </tbody>

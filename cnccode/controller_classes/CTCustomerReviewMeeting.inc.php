@@ -22,6 +22,7 @@ require_once($cfg ['path_bu'] . '/BUCustomerItem.inc.php');
 require_once($cfg ['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg ['path_bu'] . '/BURenewal.inc.php');
 require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
+ 
 
 class CTCustomerReviewMeeting extends CTCNC
 {
@@ -155,6 +156,7 @@ class CTCustomerReviewMeeting extends CTCNC
         $editableText = null;
         $nonEditableText = null;
         $diskSpaceReport = null;
+        $serviceDeskContractBody="";
         if (isset($_REQUEST ['searchForm'])) {
 
             if (!$dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
@@ -247,7 +249,12 @@ class CTCustomerReviewMeeting extends CTCNC
                     $lastReviewMeetingDateFormatted = $lastReviewMeetingDate->format('d/m/Y');
                 }
 
-
+                // get customer stats
+                $stats=$this->getCustomerStats($customerId,$nonEditableTemplate,$endDate);
+                $haveServiceDesk=false;
+                //$buCustomer->hasServiceDesk($dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormCustomerID));
+                $serviceDeskContractBody=$this->getServiceDeskContractBody($customerId,$haveServiceDesk);
+                //echo $stats; exit;
                 $nonEditableTemplate->set_var(
                     array(
                         'customerName'           => $dsCustomer->getValue(DBECustomer::name),
@@ -273,7 +280,8 @@ class CTCustomerReviewMeeting extends CTCNC
                         'slaP4'                  => $dsCustomer->getValue(DBECustomer::slaP4),
                         'slaP5'                  => $dsCustomer->getValue(DBECustomer::slaP5),
                         "waterMarkURL"           => SITE_URL . '/images/CNC_watermarkActualSize.png',
-                        'reportDate'             => $reportRangeDate
+                        'reportDate'             => $reportRangeDate,
+                        'hasServiceDesk'        => $haveServiceDesk 
                     )
                 );
 
@@ -448,7 +456,7 @@ class CTCustomerReviewMeeting extends CTCNC
                 );
                 $contractsTemplate->set_var(
                     "serviceDeskContract",
-                    $this->getServiceDeskContractBody($customerId)
+                    $serviceDeskContractBody
                 );
                 $contractsTemplate->set_var(
                     'prepayContract',
@@ -484,11 +492,7 @@ class CTCustomerReviewMeeting extends CTCNC
                         $startDate,
                         $endDate
                     )
-                );
-                $textTemplate->set_var(
-                    'reviewMeetingFrequency',
-                    $this->getReviewMeetingFrequencyBody($dsCustomer)
-                );
+                );               
                 $textTemplate->set_block(
                     'page',
                     'managementReviewBlock',
@@ -673,14 +677,21 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
                     'output',
                     'page',
                     true
-                );
-
-                $nonEditableText = $nonEditableTemplate->get_var('output');
+                );                
+                $customStartDate=new DateTime($endDate->format('Y-m-d'));
+                $customStartDate->modify("-3 month");
+                $buCustomer=new BUCustomer($this);
+                $firstTimeFixReport=$buCustomer->getFirstTimeFixSummary($customerId,$customStartDate,$endDate);
+                $raiseTypeSummary=$buCustomer->getProblemRaisedTypeSummary($customerId,$customStartDate,$endDate);
+                 $nonEditableText = $nonEditableTemplate->get_var('output');
                 $results = $buCustomerSrAnalysisReport->getResultsByPeriodRange(
                     $customerId,
                     $startDate,
                     $endDate
                 );
+                $results["firstTimeFix"]= $firstTimeFixReport["firstTimeFix"];
+                $results["attemptedFirstTimeFix"]= $firstTimeFixReport["attemptedFirstTimeFix"];
+                $results["raiseTypeSummary"]=$raiseTypeSummary;
                 $graphData = $this->generateCharts(
                     $results,
                     $customerId,
@@ -773,7 +784,6 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
                 JSON_NUMERIC_CHECK
             ) . "</script>";
 
-
         $this->template->set_var(
             array(
                 'customerID'            => $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormCustomerID),
@@ -791,6 +801,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
                 'diskSpaceReport'       => $diskSpaceReport,
                 'urlSubmit'             => $urlSubmit,
                 'urlGeneratePdf'        => $urlGeneratePdf,
+                
             )
         );
 
@@ -1084,17 +1095,50 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             );
 
         } // end while
+       
+        //-------------start servers not supported
+        $serverCareContractsTemplate->set_block(
+            'serverCareContracts',
+            'serversNotSupportedItemsBlock',
+            'items2'
+        );
+        $buCustomer=new BUCustomer($this);
+        $servers=$buCustomer->getCustomerUnsupportedServers($customerId);
+        if(!count($servers))
+        {
+            $serverCareContractsTemplate->set_var(
+                [
+                    'hasServersNotSupport'      => "none"
+                ]
+            );
+        }
+        for($i=0;$i<count($servers); $i++){             
+            $serverCareContractsTemplate->set_var(
+                array(                    
+                    'serverName'      => $servers[$i]["serverName"],                    
+                )
+            );
+            $serverCareContractsTemplate->parse(
+                'items2',
+                'serversNotSupportedItemsBlock',
+                true
+            );            
+        }
+         //------------end
+         //----parse template
         $serverCareContractsTemplate->parse(
             'output',
             'serverCareContracts',
             true
         );
-
+       
+        
+       
         return $serverCareContractsTemplate->get_var('output');
 
     }
 
-    private function getServiceDeskContractBody($customerId)
+    private function getServiceDeskContractBody($customerId,&$haveServiceDesk )
     {
         $BUCustomerItem = new BUCustomerItem($this);
         /** @var DataSet $datasetContracts */
@@ -1110,12 +1154,17 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
         $datasetContracts->fetchNext();
         $users = $datasetContracts->getValue(DBEJCustomerItem::users);
         $description = $datasetContracts->getValue(DBEJCustomerItem::itemDescription);
+        if(strpos($description,"ServiceDesk") >0)
+            $haveServiceDesk=true;
+        else
+            $haveServiceDesk=false;
         $invoicePeriod = $datasetContracts->getValue(
                 DBEJCustomerItem::invoiceFromDate
             ) . " - " . $datasetContracts->getValue(
                 DBEJCustomerItem::invoiceToDate
             );
-        return "<p>User Support Contract: $description for $users users</p><p>Next Invoice: $invoicePeriod</p>";
+            //<p>Next Invoice: $invoicePeriod</p>
+        return "<p>User Support Contract: $description for $users users</p>";
     }
 
     private function getPrepayContractBody($customerId)
@@ -1218,7 +1267,14 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             $endDate
         );
 
-        if (!$starterSR->rowCount() && !$leaverSR->rowCount()) {
+        $starterPCInstallation = new DBEJProblem($this);
+        $starterPCInstallation->getStartersSRWithPCInstallationRootCause(
+            $customerId,
+            $startDate,
+            $endDate
+        );
+
+        if (!$starterSR->rowCount() && !$leaverSR->rowCount() && !$starterPCInstallation->rowCount()) {
             return "None";
         }
 
@@ -1237,7 +1293,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             'startersBlock',
             'items'
         );
-
+        //------------------starter
         if (!$starterSR->rowCount()) {
             $startersAndLeaversTemplate->parse(
                 'items',
@@ -1274,7 +1330,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             'leaversBlock',
             'leaversItems'
         );
-
+        //-------------------leavers
         if (!$leaverSR->rowCount()) {
             $startersAndLeaversTemplate->parse(
                 'leaversItems',
@@ -1302,6 +1358,37 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             $startersAndLeaversTemplate->parse(
                 'leaversItems',
                 'leaversBlock',
+                true
+            );
+        }
+         //------------------- Starter PC Installation
+         if (!$starterPCInstallation->rowCount()) {
+            $startersAndLeaversTemplate->parse(
+                'PCInstallationItems',
+                'starterPCInstallationBlock',
+                true
+            );
+        } else {
+            $startersAndLeaversTemplate->set_var(
+                'PCInstallationQty',
+                $starterPCInstallation->rowCount()
+            );
+            $workingHours = 0;
+            while ($starterPCInstallation->fetchNext()) {
+                $workingHours += $starterPCInstallation->getValue(DBEJProblem::totalActivityDurationHours);
+            }
+            $avgHours = $workingHours / $starterPCInstallation->rowCount();
+            $startersAndLeaversTemplate->set_var(
+                'PCInstallationAvgMinutes',
+                round(
+                    $avgHours * 60,
+                    0
+                )
+            );
+
+            $startersAndLeaversTemplate->parse(
+                'PCInstallationItems',
+                'starterPCInstallationBlock',
                 true
             );
         }
@@ -1351,17 +1438,34 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
         ];
 
         $totalSR = [
-            "title"   => "Total SRs",
+            "title"   => "Recent Service Requests",
             "columns" => ["Dates", "P1-3", "P4",],
             "data"    => []
         ];
 
         $historicTotalSR = [
-            "title"   => "Historic Total SRs",
+            "title"   => "Historic Service Requests",
             "columns" => ["Dates", "P1-3", "P4"],
             "data"    => []
         ];
+        
+        $firstTimeFixRequests = [
+            "title"   => "Qualifying First Time Fix Requests",
+            "columns" => ["Attempted", "Achieved"],
+            "data"    => [["Attempted",$data["attemptedFirstTimeFix"]],["Achieved",$data["firstTimeFix"]]]
+        ];
 
+        $sourceOfRequests = [
+            "title"   => "Source of Requests (%)",
+            "columns" => ["Title", "Value" ],
+            "data"    => []
+        ];
+        foreach($data["raiseTypeSummary"] as $item)
+        {
+            $sourceOfRequests["data"] []=[$item["description"],$item["total"]];
+        }
+        //$data["raiseTypeSummary"]
+        //echo json_encode($sourceOfRequests); exit;
         foreach ($historicData as $datum) {
             $row = [
                 substr(
@@ -1379,7 +1483,8 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
 
         foreach ($data as $datum) {
 
-
+            if(isset($datum['monthName']))
+            {
             $row = [
                 substr(
                     $datum['monthName'],
@@ -1437,7 +1542,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
                 $datum['otherCount1And3'] + $datum['serviceDeskCount1And3'] + $datum['serverCareCount1And3'] + $datum['prepayCount1And3'],
                 $datum['otherCount4'] + $datum['serviceDeskCount4'] + $datum['serverCareCount4'] + $datum['prepayCount4'],
             ];
-
+        }
             $totalSR['data'][] = $row;
         }
         $BUCustomerItem = new BUCustomerItem($this);
@@ -1449,12 +1554,14 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
         );
 
         return [
-            "serverCareIncidents" => $serverCareIncidents,
-            "serviceDesk"         => $serviceDesk,
-            "otherContracts"      => $otherContracts,
+            // "serverCareIncidents" => $serverCareIncidents,
+            // "serviceDesk"         => $serviceDesk,
+            // "otherContracts"      => $otherContracts,
             "totalSR"             => $totalSR,
             'historicTotalSR'     => $historicTotalSR,
-            "renderServerCare"    => !!$datasetContracts->rowCount()
+            "renderServerCare"    => !!$datasetContracts->rowCount(),
+            "firstTimeFixRequests" =>  $firstTimeFixRequests,
+            "sourceOfRequests"    =>$sourceOfRequests
         ];
     }
 
@@ -1537,4 +1644,80 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             "count" => $supportContactsCounts['total']
         ];
     }
+    private function getCustomerStats($customerID,$template, $endDate){
+        $startDate=new DateTime($endDate->format('Y-m-d'));
+        $start=  $startDate->modify("-3 month")->format('Y-m-d');
+        $end= $endDate->format('Y-m-d');
+       // echo $start.' '.$end; exit;       
+        $ch = curl_init();
+        $dbeCustomer=new DBECustomer($this);
+        $dbeCustomer->getRow($customerID);
+        $penaltiesAgreed =$dbeCustomer->getValue(DBECustomer::slaP1PenaltiesAgreed)||
+        $dbeCustomer->getValue(DBECustomer::slaP2PenaltiesAgreed)||
+        $dbeCustomer->getValue(DBECustomer::slaP3PenaltiesAgreed);
+        // set url
+        curl_setopt($ch, CURLOPT_URL, "https://".$_SERVER['HTTP_HOST']."/internal-api/customerStats/$customerID?breakDown=true&startDate=$start&endDate=$end");
+
+        //return the transfer as a string
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $template->set_block(
+            'page',
+            'customerSLABlock',
+            'customerSLA'
+        );
+        
+        
+        // $output contains the output string
+        $output = curl_exec($ch);
+        $items=json_decode($output, true);
+        $keys=[
+            "Total SRs Raised"=>["key"=>"raised","sum"=>true,"percent"=>false],
+            "Response SLA"=>["key"=>"sla","sum"=>true,"percent"=>false],
+            "Average Response Time"=>["key"=>"responseTime","sum"=>false,"percent"=>false],
+            "% of Response SLAs Met"=>["key"=>"slaMet","sum"=>false,"percent"=>true],
+            ($penaltiesAgreed?"Fix SLA":"Fix OLA")=>["key"=>"fixSLA","sum"=>true,"percent"=>false],
+            "Average Fix Time"=>["key"=>"avgTimeAwaitingCNC","sum"=>false,"percent"=>false],
+            //"Average Time from Initial to Fixed"=>["key"=>"avgTimeFromRaiseToFixHours","sum"=>false,"percent"=>false],
+
+        ];
+        foreach($keys as $key=>$value)
+        { 
+            $column=$value["key"];
+            $sum=(($items[0][$column]??0)+
+            ($items[1][$column]??0)+
+            ($items[2][$column]??0)+
+            ($items[3][$column]??0));
+            $allValue=$sum;
+            if(!$value["sum"])
+                $allValue=$sum>0?$sum/count($items):0;
+            ;            
+            $percent=1;
+            if($value["percent"])
+                $percent=100;
+            $newLine="none";
+            if($value["key"]=="raised"||$value["key"]=="slaMet")
+                $newLine="";
+            $template->set_var(
+                array(
+                    'description'       => $key,
+                    'p1Value'           =>round(($items[0][$column]??0)*$percent,2),
+                    'p2Value'           =>round(($items[1][$column]??0)*$percent,2),
+                    'p3Value'           =>round(($items[2][$column]??0)*$percent,2),
+                    'p4Value'           =>round(($items[3][$column]??0)*$percent,2),
+                    'allValue'          =>round($allValue*$percent,2),
+                    'newLine'           =>$newLine
+                 )
+            );
+            $template->parse(
+                'customerSLA',
+                'customerSLABlock',
+                true
+            );
+        }
+       
+        
+        return  $output;
+        //return json_decode($output, true);
+    }
+    
 }

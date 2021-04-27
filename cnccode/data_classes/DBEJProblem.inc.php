@@ -669,6 +669,41 @@ class DBEJProblem extends DBEProblem
         $this->setQueryString($sql);
         return parent::getRows();
     }
+  public function getStartersSRWithPCInstallationRootCause(
+    $customerID,
+    DateTimeInterface $startDate,
+    DateTimeInterface $endDate
+  ) {
+    $sql = "SELECT DISTINCT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " LEFT JOIN customer ON cus_custno = pro_custno
+            JOIN callactivity `initial`
+            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID . " JOIN callactivity `last`
+            ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
+            (
+            SELECT
+            MAX( ca.caa_callactivityno )
+            FROM callactivity ca
+            WHERE ca.caa_problemno = pro_problemno
+            and ca.caa_callacttypeno NOT IN(43,55,59,60,61)
+            ) 
+            LEFT JOIN consultant ON cns_consno = pro_consno
+            left join callactivity fixed 
+            on fixed.caa_problemno = pro_problemno and fixed.caa_callacttypeno = " . CONFIG_FIXED_ACTIVITY_TYPE_ID . " 
+            left join consultant fixedEngineer on fixed.caa_consno = fixedEngineer.cns_consno
+            left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
+            left join team queueTeam on queueTeam.level = pro_queue_no
+            WHERE            
+            pro_custno = $customerID" . " AND cast(" . $this->getDBColumnName(
+        self::dateRaised
+      ) . " as date) BETWEEN '" . $startDate->format('Y-m-d') . "' AND  '" . $endDate->format(
+        'Y-m-d'
+      ) . "' " . " and " . $this->getDBColumnName(
+        self::hideFromCustomerFlag
+      ) . " <> 'Y'" . " and " . $this->getDBColumnName(self::rootCauseID) . " = ".CONFIG_STARTER_PC_INSTALLATION_ROOT_CAUSE;
+    $sql .= " ORDER BY pro_date_raised DESC";
+    //echo $sql; exit;
+    $this->setQueryString($sql);
+    return parent::getRows();
+  }
 
     public function getLeaversSRByCustomerIDLast12Months($customerID)
     {

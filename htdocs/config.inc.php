@@ -1488,6 +1488,10 @@ define(
     'DATE_CNC_DATE_TIME_FORMAT',
     DATE_CNC_DATE_FORMAT . " H:i:s"
 );
+define(
+    'CONFIG_STARTER_PC_INSTALLATION_ROOT_CAUSE',
+    92
+);
 $cfg["postToSco"]   = FALSE;
 $cfg["txt_chevron"] = "&gt;";
 // System paths and URLs

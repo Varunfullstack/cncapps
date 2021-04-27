@@ -1689,6 +1689,107 @@ class BUCustomer extends Business
             $dsResults
         ));
     }
-
-
+    public function getFirstTimeFixSummary($customerID,$startDate,$endDate){
+ 
+        $query = "SELECT    
+  SUM(
+    COALESCE(
+      (SELECT 
+        1 
+      FROM
+        callactivity 
+      WHERE callactivity.caa_problemno = problem.pro_problemno 
+        AND callactivity.caa_callacttypeno = 8 
+        AND TIME_TO_SEC(
+          TIMEDIFF(
+            callactivity.caa_starttime,
+            initial.caa_endtime
+          )
+        ) <= (5 * 60) 
+        AND callactivity.`caa_consno` = engineer.`cns_consno` 
+      LIMIT 1),
+      0
+    )
+  ) AS attemptedFirstTimeFix,
+  SUM(
+    COALESCE(
+      (SELECT 
+        1 
+      FROM
+        problem test 
+        JOIN callactivity initial 
+          ON initial.caa_problemno = test.pro_problemno 
+          AND initial.caa_callacttypeno = 51 
+        JOIN callactivity remoteSupport 
+          ON remoteSupport.caa_problemno = test.pro_problemno 
+          AND remoteSupport.caa_callacttypeno = 8 
+        JOIN callactivity fixedActivity 
+          ON fixedActivity.caa_problemno = test.pro_problemno 
+          AND fixedActivity.caa_callacttypeno = 57 
+      WHERE test.pro_problemno = problem.`pro_problemno` 
+        AND (test.pro_status = 'F' OR test.pro_status = 'C')
+        AND remoteSupport.caa_consno = engineer.`cns_consno` 
+        AND fixedActivity.caa_consno = engineer.`cns_consno` 
+        AND TIME_TO_SEC(
+          TIMEDIFF(
+            remoteSupport.caa_starttime,
+            initial.caa_endtime
+          )
+        ) <= (5 * 60) 
+        AND TIME_TO_SEC(
+          TIMEDIFF(
+            fixedActivity.caa_starttime,
+            remoteSupport.caa_endtime
+          )
+        ) <= (5 * 60) 
+      LIMIT 1),
+      0
+    )
+  ) AS firstTimeFix
+FROM
+  problem 
+  JOIN callactivity initial 
+    ON initial.caa_problemno = problem.pro_problemno 
+    AND initial.caa_callacttypeno = 51 
+  JOIN consultant engineer 
+    ON initial.`caa_consno` = engineer.`cns_consno` 
+   JOIN custitem
+    ON pro_contract_cuino = custitem.`cui_cuino`
+    AND cui_expiry_date >= NOW()
+    AND renewalStatus <> 'D'
+    AND declinedFlag <> 'Y'
+    AND custitem.`cui_itemno` IN (6915, 14535)
+WHERE problem.`pro_custno` <> 282 
+  AND problem.raiseTypeId = 3
+  and problem.pro_priority < 4
+  AND engineer.`teamID` = 1 ";
+        if ($customerID) {
+            $query .= " and pro_custno = " . $customerID;
+        }       
+        if ($startDate) {
+            $query .= " and initial.caa_date >= '" . $startDate->format('Y-m-d') . "'";
+        }
+        if ($endDate) {
+            $query .= " and initial.caa_date <= '" . $endDate->format('Y-m-d') . "'";
+        }
+       // $query .= " ORDER BY engineer.firstName";
+        //echo $query; exit;
+       return DBConnect::fetchOne($query);         
+    }
+    //get problem raised type summary
+    public function getProblemRaisedTypeSummary($customerID,$startDate,$endDate){
+        $query="SELECT `description` ,COUNT(*) total
+        FROM problem JOIN `problemraisetype` t ON t.id=raiseTypeId
+        WHERE `pro_custno`=:customerID 
+        AND `pro_date_raised`>=:startDate
+        AND `pro_date_raised`<=:endDate
+        GROUP BY raiseTypeId";
+        return DBConnect::fetchAll($query,["customerID"=>$customerID,
+        "startDate"=>$startDate->format('Y-m-d'),
+        "endDate"=>$endDate->format('Y-m-d')
+        ]);
+    }
+    public function getCustomerUnsupportedServers($customerID){
+        return DBConnect::fetchAll("SELECT assetName serverName FROM  unsupportedcustomerasset WHERE customerId=:customerId",["customerId"=>$customerID]);       
+    }
 }

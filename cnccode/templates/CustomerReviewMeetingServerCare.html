@@ -1,32 +1,35 @@
+
 <p>
     Server Contract = {contractDescription}
 </p>
-<p>
-    Next Invoice: {nextInvoice}
-</p>
+<!-- <p>
+Next Invoice: {nextInvoice}
+</p> -->
 <p>
     Servers Under Support
 </p>
-<table>
-    <thead>
-    <tr>
-        <th>Server Details</th>
-        <th>Tag No.</th>
-        <th>Server Name</th>
-        <th>Purchase Date</th>
-    </tr>
-    </thead>
-    <tbody>
-    <!-- BEGIN contractItemsBlock -->
-    <tr>
-        <td>{itemDescription}</td>
-        <td>{serialNo}</td>
-        <td>{serverName}</td>
-        <td>{purchaseDate}</td>
-    </tr>
-    <!-- END contractItemsBlock -->
-    </tbody>
-</table>
+<div class="reportSection noNewPage">    
+    <table id="servicesTable">
+        <thead>
+            <tr>
+                <th>Server Details</th>
+                <th>Tag No.</th>
+                <th>Server Name</th>
+                <th>Purchase Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- BEGIN contractItemsBlock -->
+            <tr>
+                <td style="padding:2px">{itemDescription}</td>
+                <td style="padding:2px">{serialNo}</td>
+                <td style="padding:2px">{serverName}</td>
+                <td style="padding:2px">{purchaseDate}</td>
+            </tr>
+            <!-- END contractItemsBlock -->
+        </tbody>
+    </table>    
+</div>
 <p>
     Supported Users (Portal) = {usersCount}
 </p>
@@ -36,3 +39,22 @@
 <p>
     PC's with O/S = {pcs}
 </p>
+<div class="reportSection noNewPage">
+    <p style="display: {hasServersNotSupport}">
+        Servers Not Supported
+    </p>
+    <table    style="display: {hasServersNotSupport}" id="serverUnsupported">
+        <thead>
+            <tr>
+                <th style=" padding: 0.2rem 1rem;">Server Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- BEGIN serversNotSupportedItemsBlock -->
+            <tr>
+                <td style=" padding: 0.2rem 1rem;">{serverName}</td>
+            </tr>
+            <!-- END serversNotSupportedItemsBlock -->
+        </tbody>
+    </table>
+</div>
