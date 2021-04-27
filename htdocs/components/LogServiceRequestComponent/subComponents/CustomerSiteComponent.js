@@ -184,31 +184,36 @@ class CustomerSiteComponent extends MainComponent {
         //start matching        
         this.checkSuggestSR();
     }
-    checkSuggestSR=()=>{
+    checkSuggestSR=async ()=>{
         if(this.suggestTimeOut)
         clearTimeout(this.suggestTimeOut);
-        this.suggestTimeOut=setTimeout(()=>{
+        this.suggestTimeOut=setTimeout(async ()=>{
             const {data}=this.state;
             const { customerSR } = this.props.data;
-            let suggestSR =[...customerSR];
+            let assetSR =[];
             // check if asset selected
             if(data.assetName)
             {
                 const {customerSR}=this.props.data;            
-                suggestSR=customerSR.filter(p=>p.assetName==data.assetName);             
+                assetSR=customerSR.filter(p=>p.assetName==data.assetName);             
             }
-            for (let i = 0; i < suggestSR.length; i++) {
-              const reasonPerc = similarity(data.reasonTemplate, suggestSR[i].reason);          
-              const emailSubjectSummaryPerc = similarity(data.emailSubjectSummary,suggestSR[i].emailSubjectSummary);
-              suggestSR[i]["percent"] = bigger([
+            for (let i = 0; i < customerSR.length; i++) {
+              const reasonPerc = await similarity(data.reasonTemplate, customerSR[i].reason);          
+              const emailSubjectSummaryPerc = await similarity(data.emailSubjectSummary,customerSR[i].emailSubjectSummary);
+              customerSR[i]["percent"] = bigger([
                 reasonPerc,            
                 emailSubjectSummaryPerc,
               ]);
             }
-            suggestSR = suggestSR.filter((p) => p.percent > 0.5);
+            let suggestSRFinal = customerSR.filter((p) => p.percent > 0.5);
+            for(let i=0;i<assetSR.length;i++)
+            {
+                if(suggestSRFinal.filter(p=>p.activityID==assetSR[i].activityID).length>0)
+                suggestSRFinal.push(assetSR[i])
+            }
             if (!data.assetName&&!data.reasonTemplate&&!data.emailSubjectSummaryPerc) 
-                suggestSR = [];
-            this.setState({ suggestSR });    
+                suggestSRFinal = [];
+            this.setState({ suggestSR:suggestSRFinal });    
         },1000)
       
     }

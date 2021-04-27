@@ -14,7 +14,7 @@ class JsonHttpException extends \Exception
      * @param $message
      * @param array $additionalData
      */
-    public function __construct($responseCode, $message, $additionalData = [])
+    public function __construct($responseCode, $message="", $additionalData = [])
     {
         $encodedMessage = json_encode(["status" => "error", "message" => $message, "extraData" => $additionalData]);
         parent::__construct($encodedMessage);

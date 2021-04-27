@@ -74,7 +74,7 @@ class CTSRActivity extends CTCNC
     const SAVE_TASK_LIST                                         = "saveTaskList";
     const ADD_ADDITIONAL_TIME_REQUEST                            = "addAdditionalTimeRequest";
     const GET_ADDITIONAL_CHARGEABLE_WORK_REQUEST_INFO            = "getAdditionalChargeableWorkRequestInfo";
-    const CHECK_SERVICE_REQUEST_PENDING_CALLBACKS                = "checkServiceRequestPendingCallbacks";
+    const CHECK_SERVICE_REQUEST_PENDING_CALLBACKS                = "checkServiceRequestPendingCallbacks";    
     public  $serverGuardArray = array(
         ""  => "Please select",
         "Y" => "ServerGuard Related",

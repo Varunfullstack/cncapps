@@ -1,0 +1,166 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="mustafa" id="issue1311-0">
+        <tagDatabase tag="issue1311"/>
+    </changeSet>
+    <changeSet author="xavi" id="issue1311-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="keywordMatchingIgnores"/>
+            </not>
+        </preConditions>
+        <createTable tableName="keywordMatchingIgnores">
+            <column name="id" type="int(11)" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="word" type="nvarchar(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <rollback>
+            <dropTable tableName="keywordMatchingIgnores"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="xavi" id="issue1311-2">
+        <preConditions onFail="MARK_RAN">            
+                <tableExists tableName="keywordMatchingIgnores"/>            
+        </preConditions>
+        <sql>
+        INSERT INTO keywordMatchingIgnores (word)
+            VALUES
+            ('i'),
+            ('me'),
+            ('my'),
+            ('myself'),
+            ('we'),
+            ('our'),
+            ('ours'),
+            ('ourselves'),
+            ('you'),
+            ('your'),
+            ('yours'),
+            ('yourself'),
+            ('yourselves'),
+            ('he'),
+            ('him'),
+            ('his'),
+            ('himself'),
+            ('she'),
+            ('her'),
+            ('hers'),
+            ('herself'),
+            ('it'),
+            ('its'),
+            ('itself'),
+            ('they'),
+            ('them'),
+            ('their'),
+            ('theirs'),
+            ('themselves'),
+            ('what'),
+            ('which'),
+            ('who'),
+            ('whom'),
+            ('this'),
+            ('that'),
+            ('these'),
+            ('those'),
+            ('am'),
+            ('is'),
+            ('are'),
+            ('was'),
+            ('were'),
+            ('be'),
+            ('been'),
+            ('being'),
+            ('have'),
+            ('has'),
+            ('had'),
+            ('having'),
+            ('do'),
+            ('does'),
+            ('did'),
+            ('doing'),
+            ('a'),
+            ('an'),
+            ('the'),
+            ('and'),
+            ('but'),
+            ('if'),
+            ('or'),
+            ('because'),
+            ('as'),
+            ('until'),
+            ('while'),
+            ('of'),
+            ('at'),
+            ('by'),
+            ('for'),
+            ('with'),
+            ('about'),
+            ('against'),
+            ('between'),
+            ('into'),
+            ('through'),
+            ('during'),
+            ('before'),
+            ('after'),
+            ('above'),
+            ('below'),
+            ('to'),
+            ('from'),
+            ('up'),
+            ('down'),
+            ('in'),
+            ('out'),
+            ('on'),
+            ('off'),
+            ('over'),
+            ('under'),
+            ('again'),
+            ('further'),
+            ('then'),
+            ('once'),
+            ('here'),
+            ('there'),
+            ('when'),
+            ('where'),
+            ('why'),
+            ('how'),
+            ('all'),
+            ('any'),
+            ('both'),
+            ('each'),
+            ('few'),
+            ('more'),
+            ('most'),
+            ('other'),
+            ('some'),
+            ('such'),
+            ('no'),
+            ('nor'),
+            ('not'),
+            ('only'),
+            ('own'),
+            ('same'),
+            ('so'),
+            ('than'),
+            ('too'),
+            ('very'),
+            ('can'),
+            ('will'),
+            ('just'),
+            ('done'),
+            ('should'),
+            ('now')
+
+        </sql>
+        <rollback>
+            <sql>
+            delete from keywordMatchingIgnores
+            </sql>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

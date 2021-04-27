@@ -4,6 +4,7 @@
  * @param {path} p
  */
 import moment from "moment";
+import APIKeywordMatchingIgnores from "../KeywordMatchingIgnoresComponent/services/APIKeywordMatchingIgnores";
 
 export function get(o, p) {
     return p.split(".").reduce((a, v) => a[v], o) || '';
@@ -271,7 +272,28 @@ export function dateFormatExcludeNull(date, fromFormat = "YYYY-MM-DD", toFormat 
 export function equal(obj1,obj2){
     return JSON.stringify(obj1)===JSON.stringify(obj2);
 }
-export function similarity(s1, s2) {
+//-------------------start similarity
+let words = [];
+async function loadReservedWords() {
+  if (words.length == 0) {
+    const api = new APIKeywordMatchingIgnores();
+    let res = await api.getWords();
+    words = res.map((w) => w.word);
+  }
+}
+function removeReservedWords(s) {
+  for (let i = 0; i < words.length; i++)
+    s = s.replaceAll(" " + words[i] + " ", " ");
+  return s;
+}
+export async function similarity(s1, s2, useDefaultDictionary = true) {
+  if (useDefaultDictionary) {
+    await loadReservedWords();
+    //console.log(words);
+  }
+  s1 = removeReservedWords(s1.toLowerCase());
+  s2 = removeReservedWords(s2.toLowerCase());
+
   // get s1 words
   const s1Words = stripHtml(s1).split(" ");
   const s2Words = stripHtml(s2).split(" ");
@@ -283,11 +305,12 @@ export function similarity(s1, s2) {
       //console.log(sim,s1Words[i], s2Words[j])
       if (sim > max) max = sim;
     }
-    totalSim +=parseFloat(max);
+    totalSim += parseFloat(max);
     //console.log(s1Words[i],max)
   }
-  return totalSim/s1Words.length;
+  return totalSim / s1Words.length;
 }
+//-------------end similarity
 function stripHtml(html)
 {
    let tmp = document.createElement("DIV");
