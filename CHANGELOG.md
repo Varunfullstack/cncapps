@@ -16,6 +16,7 @@ This project changes will be shown here.
 - Issue 1350 - Grammar Exclusions for Spellchecker
 - Issue 1343 - Paste into the Fixed Explanation when the SR is hidden from customer
 - Issue 1348 - Mass SR Assignment enhancements
+- Issue 1330 - Review Meeting Agenda Enhancements
 ### Fixed
 - Issue 1226 - StreamOne error handling
 - Issue 1349 - Duplicate Duplicate Contact Warning.
