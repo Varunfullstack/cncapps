@@ -11132,4 +11132,159 @@ class BUActivity extends Business
         }
     }
 
+    public function raiseMassDeletionServiceRequest(DBEUser $getDbeUser,
+                                                    int $foundTotalSRs,
+                                                    int $successDeletedCount,
+                                                    array $failedDeletions,
+                                                    $search
+    )
+    {
+        $dbeProblem       = new DBEProblem($this);
+        $priority         = 4;
+        $customerID       = 282;
+        $buCustomer       = new BUCustomer($this);
+        $primaryContact   = $buCustomer->getPrimaryContact($customerID);
+        $slaResponseHours = $this->getSlaResponseHours(
+            $priority,
+            $customerID,
+            $primaryContact->getValue(DBEContact::contactID)
+        );
+        $dbeProblem->setValue(
+            DBEProblem::slaResponseHours,
+            $slaResponseHours
+        );
+        $dbeProblem->setValue(DBEProblem::emailSubjectSummary, "Mass Deletion of SRs");
+        $dbeProblem->setValue(
+            DBEProblem::customerID,
+            $customerID
+        );
+        $dbeProblem->setValue(
+            DBEProblem::status,
+            'F'
+        );
+        $dbeProblem->setValue(
+            DBEProblem::priority,
+            $priority
+        );
+        $dbeProblem->setValue(
+            DBEProblem::queueNo,
+            2
+        );
+        $dbeProblem->setValue(
+            DBEProblem::dateRaised,
+            date(DATE_MYSQL_DATETIME)
+        );
+        $dbeProblem->setValue(
+            DBEProblem::contactID,
+            $primaryContact->getValue(DBEContact::contactID)
+        );
+        $dbeProblem->setValue(
+            DBEProblem::hdLimitMinutes,
+            $this->dsHeader->getValue(DBEHeader::hdTeamLimitMinutes)
+        );
+        $dbeProblem->setValue(
+            DBEProblem::esLimitMinutes,
+            $this->dsHeader->getValue(DBEHeader::esTeamLimitMinutes)
+        );
+        $dbeProblem->setValue(
+            DBEProblem::smallProjectsTeamLimitMinutes,
+            $this->dsHeader->getValue(DBEHeader::smallProjectsTeamLimitMinutes)
+        );
+        $dbeProblem->setValue(
+            DBEProblem::projectTeamLimitMinutes,
+            $this->dsHeader->getValue(DBEHeader::projectTeamLimitMinutes)
+        );
+        $buCustomerItem       = new BUCustomerItem($this);
+        $serviceDeskContracts = new DataSet($this);
+        $buCustomerItem->getServiceDeskValidContractsByCustomerID($customerID, $serviceDeskContracts);
+        $dbeProblem->setValue(
+            DBEProblem::contractCustomerItemID,
+            $serviceDeskContracts->getValue(DBEJContract::customerItemID)
+        );
+        $dbeProblem->setValue(
+            DBEProblem::userID,
+            $getDbeUser->getValue(DBEUser::userID)
+        );        // not allocated
+        $dbeProblem->setValue(
+            DBEProblem::raiseTypeId,
+            BUProblemRaiseType::MANUALID
+        );
+        $dbeProblem->setValue(
+            DBEProblem::rootCauseID,
+            69
+        );
+        $dbeProblem->insertRow();
+        $problemID       = $dbeProblem->getPKValue();
+        $dbeCallActivity = new DBECallActivity($this);
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::callActivityID,
+            null
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::siteNo,
+            $primaryContact->getValue(DBEContact::siteNo)
+        ); // contact default siteno
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::contactID,
+            $primaryContact->getValue(DBEContact::contactID)
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::callActTypeID,
+            CONFIG_INITIAL_ACTIVITY_TYPE_ID
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::date,
+            date(DATE_MYSQL_DATE)
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::startTime,
+            date('H:i')
+        );
+        $endTime = $this->getEndtime(CONFIG_INITIAL_ACTIVITY_TYPE_ID);
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::endTime,
+            $endTime
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::status,
+            'C'
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::reason,
+            "Mass Deletion of Service Requests Required."
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::problemID,
+            $problemID
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::userID,
+            $getDbeUser->getValue(DBEUser::userID)
+        );
+        $dbeCallActivity->insertRow();
+        // create the remote support activity
+        $dbeCallActivity->setValue(DBECallActivity::callActivityID, null);
+        $dbeCallActivity->setValue(DBECallActivity::callActTypeID, CTSRActivity::REMOTE_SUPPORT_ACTIVITY_TYPE_ID);
+        $dbeCallActivity->setValue(DBECallActivity::startTime, $endTime);
+        $currentDate= new DateTimeImmutable();
+
+        $reason = "<p>{$getDbeUser->getFullName()} mass deleted $successDeletedCount/$foundTotalSRs using this criteria of '{$search}' on {$currentDate->format(DATE_CNC_DATE_FORMAT." \a\\t H:i:s")} </p>";
+        if ($failedDeletions) {
+            $reason .= "<h3>Some SR's failed to be deleted </h3><ul>";
+            foreach ($failedDeletions as $failedDeletion) {
+                $reason .= "<li>{$failedDeletion}</li>";
+            }
+            $reason .= "</ul>";
+        }
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::reason,
+            $reason
+        );
+        $dbeCallActivity->insertRow();
+        $dbeCallActivity->setValue(DBECallActivity::callActivityID, null);
+        $dbeCallActivity->setValue(DBECallActivity::callActTypeID, CONFIG_FIXED_ACTIVITY_TYPE_ID);
+        $dbeCallActivity->setValue(DBECallActivity::reason, "Mass Deletion of Service Requests has been carried out.");
+        $dbeCallActivity->insertRow();
+    }
+
 }

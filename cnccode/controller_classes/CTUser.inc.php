@@ -17,31 +17,12 @@ require_once($cfg['path_dbe'] . '/DBECustomer.inc.php');
 require_once($cfg['path_dbe'] . '/DBETeam.inc.php');
 require_once($cfg['path_ct'] . '/CTPassword.inc.php');
 // Actions
-define(
-    'CTUSER_ACT_DISPLAY_LIST',
-    'userList'
-);
-define(
-    'CTUSER_ACT_CREATE',
-    'createUser'
-);
-define(
-    'CTUSER_ACT_EDIT',
-    'editUser'
-);
-define(
-    'CTUSER_ACT_DELETE',
-    'deleteUser'
-);
-define(
-    'CTUSER_ACT_UPDATE',
-    'updateUser'
-);
-define(
-    'CTUSER_ACT_ABSENCE_EDIT',
-    'absenceEdit'
-);
-
+const CTUSER_ACT_DISPLAY_LIST = 'userList';
+const CTUSER_ACT_CREATE       = 'createUser';
+const CTUSER_ACT_EDIT         = 'editUser';
+const CTUSER_ACT_DELETE       = 'deleteUser';
+const CTUSER_ACT_UPDATE       = 'updateUser';
+const CTUSER_ACT_ABSENCE_EDIT = 'absenceEdit';
 class CTUser extends CTCNC
 {
     const dateOfBirth               = "dateOfBirth";
@@ -1007,17 +988,24 @@ class CTUser extends CTCNC
         $dbeJUser->getRow();
         return json_encode(
             [
-                'firstName'                  => $dbeJUser->getValue(DBEJUser::firstName),
-                'lastName'                   => $dbeJUser->getValue(DBEJUser::lastName),
-                'id'                         => $dbeJUser->getValue(DBEJUser::userID),
-                'email'                      => $dbeJUser->getEmail(),
-                'isSDManager'                => $this->isSdManager(),
-                'isExpenseApprover'          => $dbeJUser->getValue(DBEJUser::isExpenseApprover),
-                'globalExpenseApprover'      => $dbeJUser->getValue(DBEJUser::globalExpenseApprover),
-                'teamID'                     => $dbeJUser->getValue(DBEJUser::teamID),
-                'teamLevel'                  => $dbeJUser->getValue(DBEJUser::teamLevel),
-                'serviceRequestQueueManager' => $dbeJUser->getValue(DBEJUser::queueManager),
-                'isProjectManager'           => $dbeJUser->getValue(DBEJUser::projectManagementFlag) == 'Y',
+                'firstName'                                       => $dbeJUser->getValue(DBEJUser::firstName),
+                'lastName'                                        => $dbeJUser->getValue(DBEJUser::lastName),
+                'id'                                              => $dbeJUser->getValue(DBEJUser::userID),
+                'email'                                           => $dbeJUser->getEmail(),
+                'isSDManager'                                     => $this->isSdManager(),
+                'isExpenseApprover'                               => $dbeJUser->getValue(DBEJUser::isExpenseApprover),
+                'globalExpenseApprover'                           => $dbeJUser->getValue(
+                    DBEJUser::globalExpenseApprover
+                ),
+                'teamID'                                          => $dbeJUser->getValue(DBEJUser::teamID),
+                'teamLevel'                                       => $dbeJUser->getValue(DBEJUser::teamLevel),
+                'serviceRequestQueueManager'                      => $dbeJUser->getValue(DBEJUser::queueManager),
+                'isProjectManager'                                => $dbeJUser->getValue(
+                        DBEJUser::projectManagementFlag
+                    ) == 'Y',
+                'massDeletionOnUnstartedServiceRequestPermission' => $dbeJUser->getValue(
+                    DBEUser::massDeletionOnUnstartedServiceRequestPermission
+                )
             ]
         );
     }

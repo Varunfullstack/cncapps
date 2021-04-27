@@ -532,6 +532,16 @@ class DBEUser extends DBEntity
         $this->setQueryString($query);
         return parent::getRows();
     }
+
+    public function canMassDeleteUnstartedSRs()
+    {
+        return $this->getValue(DBEUser::massDeletionOnUnstartedServiceRequestPermission);
+    }
+
+    public function getFullName()
+    {
+        return "{$this->getValue(self::firstName)} {$this->getValue(self::lastName)}";
+    }
 }
 
 ?>

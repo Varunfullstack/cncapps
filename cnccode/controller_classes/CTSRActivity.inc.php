@@ -75,6 +75,7 @@ class CTSRActivity extends CTCNC
     const ADD_ADDITIONAL_TIME_REQUEST                            = "addAdditionalTimeRequest";
     const GET_ADDITIONAL_CHARGEABLE_WORK_REQUEST_INFO            = "getAdditionalChargeableWorkRequestInfo";
     const CHECK_SERVICE_REQUEST_PENDING_CALLBACKS                = "checkServiceRequestPendingCallbacks";
+    const DELETE_UNSTARTED_SERVICE_REQUESTS                      = "deleteUnstartedServiceRequests";
     public  $serverGuardArray = array(
         ""  => "Please select",
         "Y" => "ServerGuard Related",
@@ -242,6 +243,8 @@ class CTSRActivity extends CTCNC
             case self::SAVE_TASK_LIST:
                 echo json_encode($this->saveTaskListController());
                 exit;
+            case self::DELETE_UNSTARTED_SERVICE_REQUESTS:
+                echo json_encode($this->deleteUnstartedServiceRequests());
             case "pendingReopened":
                 echo $this->getPendingReopenedRequest();
                 exit;
@@ -1715,6 +1718,112 @@ FROM
         }
         return null;
     } // end function display
+
+    private function deleteUnstartedServiceRequests()
+    {
+        if (!$this->getDbeUser()->canMassDeleteUnstartedSRs()) {
+            throw new JsonHttpException(403, "You don't have the required permission to perform this operation");
+        }
+        $dbeProblem = new DBEProblem($this);
+        $body       = $this->getBody(true);
+        $search     = @$body['search'];
+        if (!$search) {
+            throw new JsonHttpException(400, 'Cannot delete without a search value');
+        }
+
+        $dbeProblem->getUnstartedServiceRequestsForDeletion($search);
+
+        $serviceRequestsIds = [];
+        while ($dbeProblem->fetchNext()) {
+            $serviceRequestsIds[] = $dbeProblem->getValue(DBEProblem::problemID);
+        }
+        $totalCount = count($serviceRequestsIds);
+        if (!$totalCount) {
+            return ["status" => "ok", "result" => "No Service Requests found to be deleted"];
+        }
+        $failedDeletions = [];
+        /** @var $db dbSweetcode */ global $db;
+        foreach ($serviceRequestsIds as $serviceRequestId) {
+            $db->beginTransaction();
+            try {
+
+                $deleteCallDocumentStatement                = $db->preparedQuery(
+                    'delete from calldocument where problemID = ? ',
+                    [
+                        [
+                            "type"  => "i",
+                            "value" => $serviceRequestId
+                        ]
+                    ]
+                );
+                $deleteContactCallback                      = $db->preparedQuery(
+                    'delete from contact_callback where problemID = ? ',
+                    [
+                        [
+                            "type"  => "i",
+                            "value" => $serviceRequestId
+                        ]
+                    ]
+                );
+                $deleteInternalDocumentStatement            = $db->preparedQuery(
+                    'delete from internalDocument where serviceRequestId = ? ',
+                    [
+                        [
+                            "type"  => "i",
+                            "value" => $serviceRequestId
+                        ]
+                    ]
+                );
+                $deleteProblemMonitoringStatement           = $db->preparedQuery(
+                    'delete from problem_monitoring where problemId = ? ',
+                    [
+                        [
+                            "type"  => "i",
+                            "value" => $serviceRequestId
+                        ]
+                    ]
+                );
+                $deleteServiceRequestInternalNotesStatement = $db->preparedQuery(
+                    'delete from serviceRequestInternalNote where serviceRequestId = ? ',
+                    [
+                        [
+                            "type"  => "i",
+                            "value" => $serviceRequestId
+                        ]
+                    ]
+                );
+                $deleteActivityStatement                    = $db->preparedQuery(
+                    'delete from callactivity where caa_problemno = ? ',
+                    [
+                        [
+                            "type"  => "i",
+                            "value" => $serviceRequestId
+                        ]
+                    ]
+                );
+                $db->commit();
+            } catch (Exception $exception) {
+                $db->rollback();
+                $failedDeletions[] = "Failed to delete SR $serviceRequestId due to error: {$exception->getMessage()}";
+            }
+        }
+        // now we have to create an SR with the information about the deleted SR's
+        $buActivity   = new BUActivity($this);
+        $successCount = $totalCount - count($failedDeletions);
+        try {
+
+            $buActivity->raiseMassDeletionServiceRequest(
+                $this->getDbeUser(),
+                $totalCount,
+                $successCount,
+                $failedDeletions,
+                $search
+            );
+        } catch (\Exception $exception) {
+            throw new JsonHttpException(500, $exception->getMessage());
+        }
+        return ["status" => "ok", "result" => "{$successCount}/{$totalCount} of found SR's deleted successfully"];
+    }
 }
 
 ?>
