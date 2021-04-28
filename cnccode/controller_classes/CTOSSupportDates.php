@@ -132,7 +132,7 @@ class CTOSSupportDates extends CTCNC
                         "friendlyName"                   => $DBEOSSupportDates->getValue(
                             DBEOSSupportDates::friendlyName
                         ),
-                        "'thirdPartyPatchingCapable' =>" => $DBEOSSupportDates->getValue(
+                        "thirdPartyPatchingCapable" => $DBEOSSupportDates->getValue(
                             DBEOSSupportDates::thirdPartyPatchingCapable
                         ),
                     ],
