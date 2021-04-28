@@ -25,6 +25,7 @@ class CTHeader extends CTCNC
 {
     const GET_PRIORITIES_DESCRIPTIONS = 'getPrioritiesDescriptions';
     const GET_NUMBER_ALLOWED_MISTAKES = "numberOfAllwoedMistaks";
+    const KEYWORD_MATCHING_PERCENT    = "keywordMatchingPercent";
     /** @var DSForm */
     public $dsHeader;
     /** @var BUHeader */
@@ -74,6 +75,9 @@ class CTHeader extends CTCNC
             }
             case self::GET_NUMBER_ALLOWED_MISTAKES:
                 echo json_encode($this->getNumberAllwoedMistakes());
+                exit;
+            case self::KEYWORD_MATCHING_PERCENT:
+                echo json_encode($this->getKeywordMatchingPercent());
                 exit;
             case CTHEADER_ACT_EDIT:
             default:
@@ -667,6 +671,8 @@ class CTHeader extends CTCNC
                 DBEHeader::numberOfAllowedMistakes                                   => $dsHeader->getValue(
                     DBEHeader::numberOfAllowedMistakes
                 ),
+                'keywordMatchingPercent'                                             => $dsHeader->getValue(DBEHeader::keywordMatchingPercent),
+
             ]
         );
         // VAT code
@@ -811,5 +817,11 @@ class CTHeader extends CTCNC
         $dbeHeader = new DBEHeader($this);
         $dbeHeader->getRow(1);
         return ["value" => $dbeHeader->getValue(DBEHeader::numberOfAllowedMistakes)];
+    }
+
+    function getKeywordMatchingPercent(){
+        $dbeHeader = new DBEHeader($this);
+        $dbeHeader->getRow(1);
+        return $dbeHeader->getValue(DBEHeader::keywordMatchingPercent);
     }
 }

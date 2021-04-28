@@ -32,7 +32,5 @@ export default class ApiUrls {
     static Password="/Password.php?action=";
     static PasswordServices="/PasswordServices.php?action=";
     static Supplier="/Supplier.php?action=";
-
-
-
+    static KeywordMatchingIgnores="/KeywordMatchingIgnores.php?action=";
 }

@@ -43,7 +43,7 @@ class CTPasswordServices extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
-        $this->setMenuId(221);
+        $this->setMenuId(222);
         $this->buPasswordService = new BUPasswordService($this);
         $this->dsPasswordService = new DSForm($this);
         $this->dsPasswordService->copyColumnsFrom($this->buPasswordService->dbePasswordService);

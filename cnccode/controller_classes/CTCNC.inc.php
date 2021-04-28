@@ -394,7 +394,7 @@ class CTCNC extends Controller
             $SDManagerSection["icon"],
             $SDManagerSection["key"],
             $this->isAppraiser(),
-            223,
+            224,
             "Staff Appraisals",
             "StaffAppraisalQuestionnaire.php",
             $SDManagerSection["label"]
@@ -658,7 +658,7 @@ class CTCNC extends Controller
                 "href"  => "SLAPerformance.php"
             ],
             [
-                "id"    => 224,
+                "id"    => 225,
                 "label" => "SR Source",
                 "href"  => "SRSource.php"
             ],
@@ -709,21 +709,26 @@ class CTCNC extends Controller
             ],
             [
                 "id"    => 219,
+                "label" => "Keyword Matching Ignores",
+                "href"  => "KeywordMatchingIgnores.php"
+            ],
+            [
+                "id"    => 220,
                 "label" => "OS Support Dates",
                 "href"  => "OSSupportDates.php"
             ],
             [
-                "id"    => 220,
+                "id"    => 221,
                 "label" => "Office 365 Licenses",
                 "href"  => "Office365Licenses.php"
             ],
             [
-                "id"    => 221,
+                "id"    => 222,
                 "label" => "Password Services",
                 "href"  => "PasswordServices.php"
             ],
             [
-                "id"    => 225,
+                "id"    => 226,
                 "label" => "Customer Feedback",
                 "href"  => "CustomerFeedback.php"
             ],

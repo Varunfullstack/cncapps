@@ -5,13 +5,15 @@ import React from 'react';
 import APIStandardText from "../../services/APIStandardText";
 import EditorFieldComponent from "../../shared/EditorField/EditorFieldComponent";
 import AssetListSelectorComponent from "../../shared/AssetListSelectorComponent/AssetListSelectorComponent";
-import { params } from "../../utils/utils.js";
+import { bigger, params, similarity } from "../../utils/utils.js";
+import APIHeader from "../../services/APIHeader.js";
 
 class CustomerSiteComponent extends MainComponent {
     el = React.createElement;
     apicustomer = new APICustomers();
     apiStandardText = new APIStandardText();
-
+    suggestTimeOut=null;
+    apiHeader=new APIHeader();
     constructor(props) {
         super(props);
         const {data} = this.props;
@@ -33,6 +35,8 @@ class CustomerSiteComponent extends MainComponent {
                 emailSubjectSummary: data.emailSubjectSummary || params.get("emailSubject")|| "",
                 emptyAssetReason: data.emptyAssetReason || "",
             },
+            suggestSR:[],
+            keywordMatchingPercent:0.5
         };
     }
 
@@ -57,7 +61,7 @@ class CustomerSiteComponent extends MainComponent {
     }
 
     componentDidMount = async () => {
-
+        console.log('customer sr',this.props.data.customerSR);
         this.registerListener();
         const {apicustomer} = this;
         const {data} = this.state;
@@ -69,6 +73,10 @@ class CustomerSiteComponent extends MainComponent {
         if (sites.length == 1) data.siteNo = sites[0].id;
 
         this.setState({sites, data, _showSpinner: false});
+        this.apiHeader.getKeywordMatchingPercent().then(res=>{
+            
+            this.setState({keywordMatchingPercent:res/100})
+        })
     };
     showSpinner = () => {
         this.setState({_showSpinner: true});
@@ -115,9 +123,9 @@ class CustomerSiteComponent extends MainComponent {
             } else {
                 data.emptyAssetReason = value.template;
             }
-        }
-
+        }        
         this.setState({data});
+        this.checkSuggestSR();
     };
     getAssetElement = () => {
         const {customerId} = this.props;
@@ -145,8 +153,10 @@ class CustomerSiteComponent extends MainComponent {
                 maxLength: 50,
                 style: {width: 292, margin: 2},
                 className: 'spellcheck',
-                onChange: (event) =>
-                    this.setValue("emailSubjectSummary", event.target.value),
+                onChange: (event) =>{
+                    this.setValue("emailSubjectSummary", event.target.value);
+                    this.checkSuggestSR();
+                },
                 value: this.state.data.emailSubjectSummary,
             })
         );
@@ -161,7 +171,7 @@ class CustomerSiteComponent extends MainComponent {
                     </label>
                     <EditorFieldComponent name="reason"
                                           value={this.state.data.reason}
-                                          onChange={(value) => this.setValue("reasonTemplate", value)}
+                                          onChange={(value) => this.handleReasonChange( value)}
                     />
                 </div>
                 <div>
@@ -176,6 +186,47 @@ class CustomerSiteComponent extends MainComponent {
             </React.Fragment>
         );
     };
+    handleReasonChange=(value)=>{
+         this.setValue("reasonTemplate", value);         
+        //start matching        
+        this.checkSuggestSR();
+    }
+    checkSuggestSR=async ()=>{
+        //console.log(this.state.keywordMatchingPercent);
+        if(this.suggestTimeOut)
+        clearTimeout(this.suggestTimeOut);
+        this.suggestTimeOut=setTimeout(async ()=>{
+            const {data}=this.state;
+            const { customerSR } = this.props.data;
+            let assetSR =[];
+            // check if asset selected
+            if(data.assetName)
+            {
+                const {customerSR}=this.props.data;            
+                assetSR=customerSR.filter(p=>p.assetName==data.assetName);             
+            }
+            for (let i = 0; i < customerSR.length; i++) {
+              const reasonPerc = await similarity(data.reasonTemplate, customerSR[i].reason);          
+              const emailSubjectSummaryPerc = await similarity(data.emailSubjectSummary,customerSR[i].emailSubjectSummary);
+              customerSR[i]["percent"] = bigger([
+                reasonPerc,            
+                emailSubjectSummaryPerc,
+              ]);
+            }
+            let suggestSRFinal = customerSR.filter((p) => p.percent > this.state.keywordMatchingPercent);
+            console.log('suggestSRFinal',suggestSRFinal);
+            console.log('assetSR',assetSR);
+            for(let i=0;i<assetSR.length;i++)
+            {
+                if(suggestSRFinal.filter(p=>p.activityID==assetSR[i].activityID).length==0)
+                suggestSRFinal.push(assetSR[i])
+            }
+            if (!data.assetName&&!data.reasonTemplate&&!data.emailSubjectSummaryPerc) 
+                suggestSRFinal = [];
+            this.setState({ suggestSR:suggestSRFinal });    
+        },1000)
+      
+    }
     handleNext = async () => {
         let {data} = this.state;
         data.nextStep = 4;
@@ -213,7 +264,47 @@ class CustomerSiteComponent extends MainComponent {
             el("button", {onClick: handleNext, className: "float-left"}, "Next >")
         );
     };
+    getSuggestSR=()=>{
+        const {suggestSR}=this.state;
+        if(suggestSR.length>0)
+        {
+            return <div className="flex-column" style={{position: "absolute",                
+                marginTop: -100,
+                marginLeft: 860,
+                background: "white",
+                
+                minHeight: 100}}>
+                    <div style={{backgroundColor: "#58585a",
+                    color: "white", padding: 5}}>
+                        Related Service Requests That Might Be Relevant
+                        </div>
+                {suggestSR.map(p=><div key={p.activityID} style={{ padding: 5,}} >
 
+                    <a href={`SRActivity.php?action=displayActivity&serviceRequestId=${p.problemID}`} target="_blank" rel="noreferrer">
+                     {this.getProblemStatus(p.status)} {p.reason}
+                    </a>
+                </div>)}
+            </div>
+        }
+        else
+        return null;
+    }
+    getProblemStatus(code){
+        switch (code) {
+          case "I":
+            return "INITIAL: ";
+          case "P":
+            return "IN PROGRESS: ";
+          case "F":
+            return "FIXED: ";
+        }
+    }
+    openProblemHistory = (problemId) => {
+        window.open(
+            'Activity.php?action=problemHistoryPopup&problemID=' + problemId + '&htmlFmt=popup',
+            'reason',
+            'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0')
+    }
     render() {
         const {_showSpinner} = this.state;
         const {
@@ -233,6 +324,7 @@ class CustomerSiteComponent extends MainComponent {
             getAssetElement(),
             this.getEmailSubjectSummary(),
             getNotesElement(),
+            this.getSuggestSR(),
             getNextButton(),
         );
     }

@@ -35,7 +35,7 @@ class CTOffice365Licenses extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
-        $this->setMenuId(220);
+        $this->setMenuId(221);
         $this->buActivity = new BUActivity($this);
     }
 

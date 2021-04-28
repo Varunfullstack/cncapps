@@ -39,7 +39,7 @@ class CTSRSource extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
-        $this->setMenuId(224);
+        $this->setMenuId(225);
         $this->buServiceRequestReport = new BUServiceRequestReport ($this);
     }
 

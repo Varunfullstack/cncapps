@@ -32,7 +32,7 @@ class CTCustomerFeedback extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
-        $this->setMenuId(225);
+        $this->setMenuId(226);
     }
 
     /**
