@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [unreleased] 
 ### Added
 - Issue 1355 - Added a one off script to create Microsoft 365 Support items in contracts for customers.
 ### Fixed
