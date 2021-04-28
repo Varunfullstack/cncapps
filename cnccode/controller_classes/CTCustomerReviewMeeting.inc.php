@@ -681,7 +681,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
                 $customStartDate=new DateTime($endDate->format('Y-m-d'));
                 $customStartDate->modify("-3 month");
                 $buCustomer=new BUCustomer($this);
-                $firstTimeFixReport=$buCustomer->getFirstTimeFixSummary($customerId,$customStartDate,$endDate);
+                $firstTimeFixReport=$buCustomer->getFirstTimeFixSummary($customerId,$startDate,$endDate);
                 $raiseTypeSummary=$buCustomer->getProblemRaisedTypeSummary($customerId,$customStartDate,$endDate);
                  $nonEditableText = $nonEditableTemplate->get_var('output');
                 $results = $buCustomerSrAnalysisReport->getResultsByPeriodRange(
