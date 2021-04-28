@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v5.9.0]
+## [v5.9.0] - 2021-04-28
 ### Added
 - Issue 1280 - Duo Usage Portal in Portal.
 - Issue 1342 - Add Call back icon within the SR
