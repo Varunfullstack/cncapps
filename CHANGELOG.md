@@ -4,6 +4,8 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 1355 - Added a one off script to create Microsoft 365 Support items in contracts for customers.
+### Fixed
+- Issue 1360 - Creating sales orders for customers with incomplete details.
 
 ## [v5.9.1] - 2021-04-29
 ### Fixed
