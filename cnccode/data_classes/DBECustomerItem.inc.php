@@ -103,6 +103,7 @@ class DBECustomerItem extends DBCNCEntity
     const directDebitFlag                                = "directDebitFlag";
     const transactionType                                = "transactionType";
     const bypassCWAAgentCheck                            = "bypassCWAAgentCheck";
+    const PATCH_MANAGEMENT_ITEM_ID                       = 17124;
 
 
     /**
@@ -933,6 +934,11 @@ class DBECustomerItem extends DBCNCEntity
         AND cic_contractcuino = $contractID";
         return $this->db->query($statement);
 
+    }
+
+    public function getPatchManagementContractForCustomer($customerId)
+    {
+        $this->getRowsByCustomerAndItemID($customerId, self::PATCH_MANAGEMENT_ITEM_ID, true);
     }
 
 }

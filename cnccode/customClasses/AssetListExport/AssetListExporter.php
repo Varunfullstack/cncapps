@@ -509,6 +509,9 @@ class AssetListExporter
         $updateCustomer->setValue(DBECustomer::noOfServers, $tabularData->getNumberOfServers());
         $updateCustomer->setValue(DBECustomer::eligiblePatchManagement, $this->patchManagementEligibleComputers);
         $updateCustomer->updateRow();
+        $buContract = new \BURenContract($this);
+        $buContract->updatePatchManagementContractForCustomer($customerId, $this->patchManagementEligibleComputers);
+
     }
 
     /**

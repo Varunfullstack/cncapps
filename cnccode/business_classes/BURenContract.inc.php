@@ -16,7 +16,7 @@ require_once($cfg ["path_dbe"] . "/DBEWarranty.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEProblem.inc.php");
 require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
-require_once($cfg["path_ct"]."/CTSalesOrder.inc.php");
+require_once($cfg["path_ct"] . "/CTSalesOrder.inc.php");
 
 class BURenContract extends Business
 {
@@ -524,7 +524,6 @@ class BURenContract extends Business
                         DA_STRING,
                         DA_ALLOW_NULL
                     );
-
                     $dsInput->setValue(
                         CTSalesOrder::etaDate,
                         date('Y-m-d')
@@ -793,5 +792,28 @@ class BURenContract extends Business
         );
         $dbeOrdline->insertRow();
         $dbeOrdline->moveItemToTop();
+    }
+
+    public function updatePatchManagementContractForCustomer($customerId, int $patchManagementEligibleComputers)
+    {
+        $dbeCustomerItem = new DBECustomerItem($this);
+        $dbeCustomerItem->getPatchManagementContractForCustomer($customerId);
+        if (!$dbeCustomerItem->fetchNext()) {
+            return;
+        }
+        $dbeCustomerItem->setValue(DBECustomerItem::users, $patchManagementEligibleComputers);
+        $dbeCustomerItem->setValue(
+            DBECustomerItem::curUnitSale,
+            $dbeCustomerItem->getValue(
+                DBECustomerItem::salePricePerMonth
+            ) * 12 * $patchManagementEligibleComputers
+        );
+        $dbeCustomerItem->setValue(
+            DBECustomerItem::curUnitCost,
+            $dbeCustomerItem->getValue(
+                DBECustomerItem::costPricePerMonth
+            ) * 12 * $patchManagementEligibleComputers
+        );
+        $dbeCustomerItem->updateRow();
     }
 }
