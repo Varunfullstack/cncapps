@@ -4,7 +4,28 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+namespace CNCLTD\Business;
 global $cfg;
+
+use BUActivity;
+use BUCustomerItem;
+use BUInvoice;
+use BUItem;
+use BUMail;
+use BUSalesOrder;
+use CTSalesOrder;
+use DataSet;
+use DBECustomer;
+use DBECustomerItem;
+use DBEItem;
+use DBEJCustomerItem;
+use DBEJOrdhead;
+use DBEJRenContract;
+use DBEOrdhead;
+use DBEOrdline;
+use DSForm;
+
 require_once($cfg ["path_gc"] . "/Business.inc.php");
 require_once($cfg ["path_bu"] . "/BUCustomerItem.inc.php");
 require_once($cfg ["path_bu"] . "/BUActivity.inc.php");
@@ -18,7 +39,7 @@ require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 require_once($cfg["path_ct"] . "/CTSalesOrder.inc.php");
 
-class BURenContract extends Business
+class BURenContract extends \Business
 {
     const etaDate = 'etaDate';
 
@@ -35,9 +56,9 @@ class BURenContract extends Business
     function __construct(&$owner)
     {
         parent::__construct($owner);
-        $this->dbeRenContract  = new DBECustomerItem($this);
-        $this->dbeJRenContract = new DBEJRenContract ($this);
-        $this->buCustomerItem  = new BUCustomerItem($this);
+        $this->dbeRenContract  = new \DBECustomerItem($this);
+        $this->dbeJRenContract = new \DBEJRenContract ($this);
+        $this->buCustomerItem  = new \BUCustomerItem($this);
     }
 
     function updateRenContract(&$dsData)
@@ -75,7 +96,7 @@ class BURenContract extends Business
 
     /**
      * @param $customerID
-     * @param DataSet|DBEOrdline $orderLineDS
+     * @param \DataSet|\DBEOrdline $orderLineDS
      * @param $customerItemID
      * @param int $siteNo
      */
@@ -85,7 +106,7 @@ class BURenContract extends Business
                               $siteNo = 0
     )
     {
-        $itemID = $orderLineDS->getValue(DBEOrdline::itemID);
+        $itemID = $orderLineDS->getValue(\DBEOrdline::itemID);
         // create a customer item
         $dbeItem = new DBEItem ($this);
         $dbeItem->getRow($itemID);

@@ -5,6 +5,7 @@ namespace CNCLTD\AssetListExport;
 use BUCustomer;
 use BUHeader;
 use BUPassword;
+use CNCLTD\Business\BURenContract;
 use DataSet;
 use DateInterval;
 use DateTime;
@@ -509,7 +510,7 @@ class AssetListExporter
         $updateCustomer->setValue(DBECustomer::noOfServers, $tabularData->getNumberOfServers());
         $updateCustomer->setValue(DBECustomer::eligiblePatchManagement, $this->patchManagementEligibleComputers);
         $updateCustomer->updateRow();
-        $buContract = new \BURenContract($this);
+        $buContract = new BURenContract($this);
         $buContract->updatePatchManagementContractForCustomer($customerId, $this->patchManagementEligibleComputers);
 
     }

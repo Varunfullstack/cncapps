@@ -51,7 +51,7 @@ require_once($cfg ["path_bu"] . "/BUCustomer.inc.php");
 require_once($cfg ["path_bu"] . "/BUSite.inc.php");
 require_once($cfg ["path_bu"] . "/BUHeader.inc.php");
 require_once($cfg ["path_bu"] . "/BUSalesOrder.inc.php");
-require_once($cfg ["path_bu"] . "/BURenContract.inc.php");
+require_once($cfg ["path_bu"] . "/Burencontract.php");
 require_once($cfg ["path_bu"] . "/BUContact.inc.php");
 require_once($cfg ["path_bu"] . "/BUProblemSLA.inc.php");
 require_once($cfg ["path_func"] . "/activity.inc.php");
