@@ -31,248 +31,69 @@ require_once($cfg["path_dbe"] . "/DBESignableEnvelope.inc.php");
 require_once($cfg["path_func"] . "/Common.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 // Parameters
-define(
-    'CTSALESORDER_VAL_NONE_SELECTED',
-    -1
-);
+const CTSALESORDER_VAL_NONE_SELECTED = -1;
 // Actions
-define(
-    'CTSALESORDER_ACT_DISP_SEARCH',
-    'dispSearch'
-);
-define(
-    'CTSALESORDER_ACT_SEARCH',
-    'search'
-);
-define(
-    'CTSALESORDER_ACT_DELETE_ORDER',
-    'deleteOrder'
-);
-define(
-    'CTSALESORDER_ACT_ORDER_LINES_SUBMIT',
-    'orderLinesSubmit'
-);
-define(
-    'CTSALESORDER_ACT_UPLOAD_QUOTE_DOC',
-    'uploadQuoteDoc'
-);
-define(
-    'CTSALESORDER_ACT_SEND_QUOTE_DOC',
-    'sendQuoteDoc'
-);
-define(
-    'CTSALESORDER_ACT_DELETE_QUOTE_DOC',
-    'deleteQuoteDoc'
-);
-define(
-    'CTSALESORDER_ACT_DISPLAY_QUOTE_DOC',
-    'displayQuoteDoc'
-);
-define(
-    'CTSALESORDER_ACT_CREATE_QUOTE',
-    'createQuote'
-);
-define(
-    'CTSALESORDER_ACT_CREATE_TEMPLATED_QUOTE',
-    'createTemplatedQuote'
-);
-define(
-    'CTSALESORDER_ACT_CREATE_ORDER',
-    'createOrder'
-);
-define(
-    'CTSALESORDER_ACT_COPY_TO_ORDER',
-    'copyToOrder'
-);        // bulk copy to initial order using selector
-define(
-    'CTSALESORDER_ACT_CONVERT_TO_ORDER',
-    'convertToOrder'
-);  // bulk convert to initial order using selector
-define(
-    'CTSALESORDER_ACT_CREATE_MANUAL_ORDER_FORM',
-    'genManualOrderForm'
-);
-define(
-    'CTSALESORDER_ACT_CHANGE_SUPPLIER',
-    'changeSupplier'
-);
-define(
-    'CTSALESORDER_ACT_UPDATE_LINES',
-    'updateLines'
-);                    // bulk update of lines
-define(
-    'CTSALESORDER_ACT_INSERT_FROM_ORDER',
-    'insertFromOrder'
-);// insert lines from another order
-define(
-    'CTSALESORDER_ACT_ADD_ORDLINE',
-    'addOrdline'
-);
-define(
-    'CTSALESORDER_ACT_EDIT_ORDLINE',
-    'editOrdline'
-);
-define(
-    'CTSALESORDER_ACT_UPDATE_ORDLINE',
-    'updtOrdline'
-);
-define(
-    'CTSALESORDER_ACT_INSERT_ORDLINE',
-    'insrtOrdline'
-);
-define(
-    'CTSALESORDER_ACT_MOVE_ORDLINE_UP',
-    'moveUpOrdline'
-);
-define(
-    'CTSALESORDER_ACT_MOVE_ORDLINE_DOWN',
-    'moveDownOrdline'
-);
-define(
-    'CTSALESORDER_ACT_DELETE_ORDLINE',
-    'delOrdline'
-);
-define(
-    'CTSALESORDER_ACT_UPDATE_DEL_ADDRESS',
-    'updDelAdd'
-);
-define(
-    'CTSALESORDER_ACT_UPDATE_INV_ADDRESS',
-    'updInvAdd'
-);
-define(
-    'CTSALESORDER_ACT_UPDATE_DEL_CONTACT',
-    'updDelCon'
-);
-define(
-    'CTSALESORDER_ACT_UPDATE_INV_CONTACT',
-    'updInvCon'
-);
-define(
-    'CTSALESORDER_ACT_UPDATE_HEADER',
-    'updateHead'
-);
+const CTSALESORDER_ACT_DISP_SEARCH              = 'dispSearch';
+const CTSALESORDER_ACT_SEARCH                   = 'search';
+const CTSALESORDER_ACT_DELETE_ORDER             = 'deleteOrder';
+const CTSALESORDER_ACT_ORDER_LINES_SUBMIT       = 'orderLinesSubmit';
+const CTSALESORDER_ACT_UPLOAD_QUOTE_DOC         = 'uploadQuoteDoc';
+const CTSALESORDER_ACT_SEND_QUOTE_DOC           = 'sendQuoteDoc';
+const CTSALESORDER_ACT_DELETE_QUOTE_DOC         = 'deleteQuoteDoc';
+const CTSALESORDER_ACT_DISPLAY_QUOTE_DOC        = 'displayQuoteDoc';
+const CTSALESORDER_ACT_CREATE_QUOTE             = 'createQuote';
+const CTSALESORDER_ACT_CREATE_TEMPLATED_QUOTE   = 'createTemplatedQuote';
+const CTSALESORDER_ACT_CREATE_ORDER             = 'createOrder';
+const CTSALESORDER_ACT_COPY_TO_ORDER            = 'copyToOrder';        // bulk copy to initial order using selector
+const CTSALESORDER_ACT_CONVERT_TO_ORDER         = 'convertToOrder';  // bulk convert to initial order using selector
+const CTSALESORDER_ACT_CREATE_MANUAL_ORDER_FORM = 'genManualOrderForm';
+const CTSALESORDER_ACT_CHANGE_SUPPLIER          = 'changeSupplier';
+const CTSALESORDER_ACT_UPDATE_LINES             = 'updateLines';                    // bulk update of lines
+const CTSALESORDER_ACT_INSERT_FROM_ORDER        = 'insertFromOrder';// insert lines from another order
+const CTSALESORDER_ACT_ADD_ORDLINE              = 'addOrdline';
+const CTSALESORDER_ACT_EDIT_ORDLINE             = 'editOrdline';
+const CTSALESORDER_ACT_UPDATE_ORDLINE           = 'updtOrdline';
+const CTSALESORDER_ACT_INSERT_ORDLINE           = 'insrtOrdline';
+const CTSALESORDER_ACT_MOVE_ORDLINE_UP          = 'moveUpOrdline';
+const CTSALESORDER_ACT_MOVE_ORDLINE_DOWN        = 'moveDownOrdline';
+const CTSALESORDER_ACT_DELETE_ORDLINE           = 'delOrdline';
+const CTSALESORDER_ACT_UPDATE_DEL_ADDRESS       = 'updDelAdd';
+const CTSALESORDER_ACT_UPDATE_INV_ADDRESS       = 'updInvAdd';
+const CTSALESORDER_ACT_UPDATE_DEL_CONTACT       = 'updDelCon';
+const CTSALESORDER_ACT_UPDATE_INV_CONTACT       = 'updInvCon';
+const CTSALESORDER_ACT_UPDATE_HEADER            = 'updateHead';
 // Messages
-define(
-    'CTSALESORDER_MSG_CUSTTRING_REQ',
-    'Please enter customer to search for'
-);
-define(
-    'CTSALESORDER_MSG_NONE_FND',
-    'No customers found'
-);
-define(
-    'CTSALESORDER_MSG_CUSTOMERID_NOT_PASSED',
-    'customerID not passed'
-);
-define(
-    'CTSALESORDER_MSG_CUS_NOT_FND',
-    'Customer not found'
-);
-define(
-    'CTSALESORDER_MSG_SELECT_USER',
-    'User?'
-);
-define(
-    'CTSALESORDER_MSG_SELECT_SALUTATION',
-    'Salutation?'
-);
-define(
-    'CTSALESORDER_MSG_SELECT_INTRODUCTION',
-    'Introduction?'
-);
-define(
-    'CTSALESORDER_MSG_NO_LINES',
-    'Select lines to include'
-);
-define(
-    'CTSALESORDER_MSG_USER_NOT_FND',
-    'User not found'
-);
-define(
-    'CTSALESORDER_MSG_PROBLEM_SENDING_QUOTE',
-    'Quote could not be sent'
-);
-define(
-    'CTSALESORDER_MSG_QUOTEID_NOT_PASSED',
-    'quotationID not passed'
-);
-define(
-    'CTSALESORDER_MSG_CONTACTID_NOT_PASSED',
-    'contactID not passed'
-);
-define(
-    'CTSALESORDER_MSG_QUOTE_NOT_FOUND',
-    'Quote not found'
-);
-define(
-    'CTSALESORDER_MSG_MUST_BE_QUOTE_OR_INITIAL',
-    'Not Quote or Initial Order'
-);
-define(
-    'CTSALESORDER_MSG_ORDHEADID_NOT_PASSED',
-    'ordheadID not passed'
-);
-define(
-    'CTSALESORDER_MSG_ORDER_NOT_FND',
-    'Order not found'
-);
-define(
-    'CTSALESORDER_MSG_ORDLINE_NOT_FND',
-    'Order Line not found'
-);
-define(
-    'CTSALESORDER_MSG_SEQNO_NOT_PASSED',
-    'sequenceNo not passed'
-);
-define(
-    'CTSALESORDER_NOT_NUMERIC',
-    'Must be a number'
-);
-define(
-    'CTSALESORDER_TO_DATE_SMALLER',
-    'End date must be greater than start date'
-);
-define(
-    'CTSALESORDER_CLS_FORM_ERROR',
-    'formError'
-);
-define(
-    'CTSALESORDER_CLS_ORDER_LINE_ITEM',
-    'orderLineItem'
-);
+const CTSALESORDER_MSG_CUSTTRING_REQ            = 'Please enter customer to search for';
+const CTSALESORDER_MSG_NONE_FND                 = 'No customers found';
+const CTSALESORDER_MSG_CUSTOMERID_NOT_PASSED    = 'customerID not passed';
+const CTSALESORDER_MSG_CUS_NOT_FND              = 'Customer not found';
+const CTSALESORDER_MSG_SELECT_USER              = 'User?';
+const CTSALESORDER_MSG_SELECT_SALUTATION        = 'Salutation?';
+const CTSALESORDER_MSG_SELECT_INTRODUCTION      = 'Introduction?';
+const CTSALESORDER_MSG_NO_LINES                 = 'Select lines to include';
+const CTSALESORDER_MSG_USER_NOT_FND             = 'User not found';
+const CTSALESORDER_MSG_PROBLEM_SENDING_QUOTE    = 'Quote could not be sent';
+const CTSALESORDER_MSG_QUOTEID_NOT_PASSED       = 'quotationID not passed';
+const CTSALESORDER_MSG_CONTACTID_NOT_PASSED     = 'contactID not passed';
+const CTSALESORDER_MSG_QUOTE_NOT_FOUND          = 'Quote not found';
+const CTSALESORDER_MSG_MUST_BE_QUOTE_OR_INITIAL = 'Not Quote or Initial Order';
+const CTSALESORDER_MSG_ORDHEADID_NOT_PASSED     = 'ordheadID not passed';
+const CTSALESORDER_MSG_ORDER_NOT_FND            = 'Order not found';
+const CTSALESORDER_MSG_ORDLINE_NOT_FND          = 'Order Line not found';
+const CTSALESORDER_MSG_SEQNO_NOT_PASSED         = 'sequenceNo not passed';
+const CTSALESORDER_NOT_NUMERIC                  = 'Must be a number';
+const CTSALESORDER_TO_DATE_SMALLER              = 'End date must be greater than start date';
+const CTSALESORDER_CLS_FORM_ERROR               = 'formError';
+const CTSALESORDER_CLS_ORDER_LINE_ITEM          = 'orderLineItem';
 //define('CTSALESORDER_CLS_ORDER_LINE_COMMENT', 'orderLineComment');
-define(
-    'CTSALESORDER_CLS_ORDER_LINE_LOSS',
-    'orderLineLoss'
-);
-define(
-    'CTSALESORDER_CLS_ORDER_TOTAL_ITEM',
-    'orderTotalItem'
-);
-define(
-    'CTSALESORDER_CLS_ORDER_TOTAL_LOSS',
-    'orderTotalLoss'
-);
-define(
-    'CTSALESORDER_NOTEPAD_ITEM',
-    'IT'
-);
-define(
-    'CTSALESORDER_TXT_INTRODUCTION',
-    'With reference to your recent enquiry, I have great pleasure in providing you with the following prices:'
-);
+const CTSALESORDER_CLS_ORDER_LINE_LOSS  = 'orderLineLoss';
+const CTSALESORDER_CLS_ORDER_TOTAL_ITEM = 'orderTotalItem';
+const CTSALESORDER_CLS_ORDER_TOTAL_LOSS = 'orderTotalLoss';
+const CTSALESORDER_NOTEPAD_ITEM         = 'IT';
+const CTSALESORDER_TXT_INTRODUCTION     = 'With reference to your recent enquiry, I have great pleasure in providing you with the following prices:';
 //define('CTSALESORDER_TXT_EMAIL_SUBJECT_START', 'Your Quotation Ref:');
-define(
-    'CTSALESORDER_TXT_SEND',
-    'Send'
-);
-define(
-    'CTSALESORDER_TXT_DELETE',
-    'Delete'
-);
-
-
+const CTSALESORDER_TXT_SEND   = 'Send';
+const CTSALESORDER_TXT_DELETE = 'Delete';
 class CTSalesOrder extends CTCNC
 {
     const etaDate                           = 'etaDate';
