@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 1223 - Update Patch Management Contract numbers automatically
+
 ## [v5.8.6] - 2021-04-22
 ### Fixed
 - Fixed inability to add new passwords.
