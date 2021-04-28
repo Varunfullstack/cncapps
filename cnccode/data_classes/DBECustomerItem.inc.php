@@ -866,7 +866,6 @@ class DBECustomerItem extends DBCNCEntity
           cic_contractcuino = $contractID";
             $this->db->query($statement);
         }
-
     }
 
     function updateContract($customerItemID,
