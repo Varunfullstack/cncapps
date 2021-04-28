@@ -49,22 +49,25 @@
         }
 
         var file = item.getAsFile();
-        var reader = new FileReader();
+        imageCompression(file, {maxWidthOrHeight: 600}).then(file => {
+            var reader = new FileReader();
 
-        reader.onload = function (evt) {
-            var element = editor.document.createElement('img', {
-                attributes: {
-                    src: evt.target.result
-                }
-            });
+            reader.onload = function (evt) {
+                var element = editor.document.createElement('img', {
+                    attributes: {
+                        src: evt.target.result
+                    }
+                });
 
-            // We use a timeout callback to prevent a bug where insertElement inserts at first caret
-            // position
-            setTimeout(function () {
-                editor.insertElement(element);
-            }, 10);
-        };
+                // We use a timeout callback to prevent a bug where insertElement inserts at first caret
+                // position
+                setTimeout(function () {
+                    editor.insertElement(element);
+                }, 10);
+            };
 
-        reader.readAsDataURL(file);
+            reader.readAsDataURL(file);
+        })
+
     }
 })();
