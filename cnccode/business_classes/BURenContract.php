@@ -14,6 +14,7 @@ use BUInvoice;
 use BUItem;
 use BUMail;
 use BUSalesOrder;
+use Business;
 use CTSalesOrder;
 use DataSet;
 use DBECustomer;
@@ -39,7 +40,7 @@ require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 require_once($cfg["path_ct"] . "/CTSalesOrder.inc.php");
 
-class BURenContract extends \Business
+class BURenContract extends Business
 {
     const etaDate = 'etaDate';
 
@@ -56,9 +57,9 @@ class BURenContract extends \Business
     function __construct(&$owner)
     {
         parent::__construct($owner);
-        $this->dbeRenContract  = new \DBECustomerItem($this);
-        $this->dbeJRenContract = new \DBEJRenContract ($this);
-        $this->buCustomerItem  = new \BUCustomerItem($this);
+        $this->dbeRenContract  = new DBECustomerItem($this);
+        $this->dbeJRenContract = new DBEJRenContract ($this);
+        $this->buCustomerItem  = new BUCustomerItem($this);
     }
 
     function updateRenContract(&$dsData)
@@ -96,7 +97,7 @@ class BURenContract extends \Business
 
     /**
      * @param $customerID
-     * @param \DataSet|\DBEOrdline $orderLineDS
+     * @param DataSet|DBEOrdline $orderLineDS
      * @param $customerItemID
      * @param int $siteNo
      */
@@ -106,7 +107,7 @@ class BURenContract extends \Business
                               $siteNo = 0
     )
     {
-        $itemID = $orderLineDS->getValue(\DBEOrdline::itemID);
+        $itemID = $orderLineDS->getValue(DBEOrdline::itemID);
         // create a customer item
         $dbeItem = new DBEItem ($this);
         $dbeItem->getRow($itemID);
@@ -822,19 +823,21 @@ class BURenContract extends \Business
         if (!$dbeCustomerItem->fetchNext()) {
             return;
         }
-        $dbeCustomerItem->setValue(DBECustomerItem::users, $patchManagementEligibleComputers);
-        $dbeCustomerItem->setValue(
+        $dbeCustomerItemUpdate = new DBECustomerItem($this);
+        $dbeCustomerItemUpdate->getRow($dbeCustomerItem->getValue(DBECustomerItem::customerItemID));
+        $dbeCustomerItemUpdate->setValue(DBECustomerItem::users, $patchManagementEligibleComputers);
+        $dbeCustomerItemUpdate->setValue(
             DBECustomerItem::curUnitSale,
             $dbeCustomerItem->getValue(
                 DBECustomerItem::salePricePerMonth
             ) * 12 * $patchManagementEligibleComputers
         );
-        $dbeCustomerItem->setValue(
+        $dbeCustomerItemUpdate->setValue(
             DBECustomerItem::curUnitCost,
             $dbeCustomerItem->getValue(
                 DBECustomerItem::costPricePerMonth
             ) * 12 * $patchManagementEligibleComputers
         );
-        $dbeCustomerItem->updateRow();
+        $dbeCustomerItemUpdate->updateRow();
     }
 }

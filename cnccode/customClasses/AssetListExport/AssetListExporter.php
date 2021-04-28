@@ -422,10 +422,6 @@ class AssetListExporter
         if ($lastContactColor) {
             $columnCoordinate = Coordinate::stringFromColumnIndex(self::LAST_CONTACT_COLUMN_INDEX + $isSummary);
             $this->setCellSolidColor($sheet, "{$columnCoordinate}{$currentRow}", $lastContactColor);
-            $operatingSystem = $tabularData->getOperatingSystem($i);
-            if (strpos(strtolower($operatingSystem), "microsoft") > -1) {
-                $this->patchManagementEligibleComputers++;
-            }
         }
     }
 
@@ -508,11 +504,10 @@ class AssetListExporter
         $updateCustomer->getRow($customerId);
         $updateCustomer->setValue(DBECustomer::noOfPCs, $tabularData->getNumberOfPcs());
         $updateCustomer->setValue(DBECustomer::noOfServers, $tabularData->getNumberOfServers());
-        $updateCustomer->setValue(DBECustomer::eligiblePatchManagement, $this->patchManagementEligibleComputers);
+        $updateCustomer->setValue(DBECustomer::eligiblePatchManagement, $tabularData->patchManagementEligibleComputers());
         $updateCustomer->updateRow();
         $buContract = new BURenContract($this);
-        $buContract->updatePatchManagementContractForCustomer($customerId, $this->patchManagementEligibleComputers);
-
+        $buContract->updatePatchManagementContractForCustomer($customerId, $tabularData->patchManagementEligibleComputers());
     }
 
     /**
