@@ -1,0 +1,37 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="mustafa" id="issue1240-0">
+        <tagDatabase tag="issue1240"/>
+    </changeSet>
+    <changeSet author="mustafa" id="issue1240-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="callactivity_customer_contact" />
+            </not>
+        </preConditions>     
+        <createTable  tableName="callactivity_customer_contact">
+            <column name="callactivityID" type="int" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="isInbound" type="TINYINT(1)">        
+            </column>    
+        </createTable>        
+        <rollback>
+            <dropTable tableName="callactivity_customer_contact" />
+        </rollback>
+    </changeSet>
+     <changeSet author="mustafa" id="issue1240-2">
+        <preConditions onFail="MARK_RAN">            
+                <tableExists tableName="callactivity_customer_contact" />         
+        </preConditions>     
+       <addForeignKeyConstraint baseColumnNames="callactivityID"
+                             baseTableName="callactivity_customer_contact"
+                             constraintName="fk_callactivity_customer_contact"
+                             referencedColumnNames="caa_callactivityno"
+                             referencedTableName="callactivity"/>
+        <rollback>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
