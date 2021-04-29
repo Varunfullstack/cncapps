@@ -5,6 +5,7 @@ This project changes will be shown here.
 ### Added
 - Issue 1355 - Added a one off script to create Microsoft 365 Support items in contracts for customers.
 - Issue 1223 - Update Patch Management Contract numbers automatically
+- Issue 1358 - Include Tasklist in the SR History Popup.
 ### Changed
 - Issue 1359 - Change priority from Current Service Request page.
 ### Fixed
