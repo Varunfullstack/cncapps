@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.9.1] - 2021-04-29
+### Fixed
+- Fixed issue with ensuring HD had at least 3 minutes not working as intended.
+
 ## [v5.9.0] - 2021-04-28
 ### Added
 - Issue 1280 - Duo Usage Portal in Portal.

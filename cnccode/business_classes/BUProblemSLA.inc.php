@@ -1102,7 +1102,10 @@ class BUProblemSLA extends Business
         $assignedMinutes  = $this->dbeProblem->getValue(DBEProblem::hdLimitMinutes);
         $minutesRemaining = $assignedMinutes - $usedMinutes;
         if ($minutesRemaining < 3) {
-            $this->dbeProblem->setValue(DBEProblem::hdLimitMinutes, 3);
+            $this->dbeProblem->setValue(
+                DBEProblem::hdLimitMinutes,
+                $this->dbeProblem->getValue(DBEProblem::hdLimitMinutes) + 3
+            );
         }
     }
 
