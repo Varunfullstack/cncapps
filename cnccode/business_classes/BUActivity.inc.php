@@ -11283,4 +11283,27 @@ class BUActivity extends Business
         $dbeCallActivity->insertRow();
     }
 
+    function updateInbound($callactivityID,$value )
+    {
+        
+        if(is_null($value))
+        {
+            DBConnect::execute("delete from callactivity_customer_contact where callactivityID=:callactivityID",["callactivityID"=>$callactivityID]);
+            
+        }
+        else{
+            //get row
+            $row=DBConnect::fetchOne("select * from callactivity_customer_contact where callactivityID=:callactivityID",["callactivityID"=>$callactivityID]);
+            if($row)
+            {
+                //update 
+                DBConnect::execute("update callactivity_customer_contact set isInbound=:value where callactivityID=:callactivityID",["callactivityID"=>$callactivityID,"value"=>$value?1:0]);
+            }
+            else
+            {
+                //insert
+                DBConnect::execute("insert into callactivity_customer_contact(callactivityID,isInbound) values(:callactivityID,:value)",["callactivityID"=>$callactivityID,"value"=>$value?1:0]);
+            }
+        }
+    }
 }

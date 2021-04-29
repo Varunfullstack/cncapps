@@ -1,5 +1,8 @@
 # Changelog
 This project changes will be shown here.
+## [unreleased]
+### Added
+- Add daily contact to sdmanger and KPIReport
 
 ## [v5.9.1] - 2021-04-29
 ### Fixed
@@ -26,6 +29,7 @@ This project changes will be shown here.
 ### Fixed
 - Issue 1226 - StreamOne error handling
 - Issue 1349 - Duplicate Duplicate Contact Warning.
+
 
 ## [v5.8.6] - 2021-04-22
 ### Fixed

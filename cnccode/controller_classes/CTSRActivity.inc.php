@@ -816,8 +816,11 @@ class CTSRActivity extends CTCNC
             );
             $dsCallActivity->post();
         }
-        if(isset($body->Inbound))
-        $this->updateInbound($body->callActivityID,$body->Inbound);
+        if(isset($body->Inbound)||is_null($body->Inbound))
+        {           
+            $this->buActivity->updateInbound($body->callActivityID,$body->Inbound);
+        }
+      
         //-----------check status
         $dsCallActivity->setUpdateModeUpdate();
         $updateAwaitingCustomer = false;
@@ -873,28 +876,7 @@ class CTSRActivity extends CTCNC
         }
         return ["status" => "1"];
     }
-    function updateInbound($callactivityID,$value )
-    {
-        if($value==null)
-        {
-            DBConnect::execute("delete from callactivity_customer_contact where callactivityID=:callactivityID",["callactivityID"=>$callactivityID]);
-            return;
-        }
-        else{
-            //get row
-            $row=DBConnect::fetchOne("select * from callactivity_customer_contact where callactivityID=:callactivityID",["callactivityID"=>$callactivityID]);
-            if($row)
-            {
-                //update 
-                DBConnect::execute("update callactivity_customer_contact set isInbound=:value where callactivityID=:callactivityID",["callactivityID"=>$callactivityID,"value"=>$value?1:0]);
-            }
-            else
-            {
-                //insert
-                DBConnect::execute("insert into callactivity_customer_contact(callactivityID,isInbound) values(:callactivityID,:value)",["callactivityID"=>$callactivityID,"value"=>$value?1:0]);
-            }
-        }
-    }
+    
     function checkIsInbound($callactivityID){
         $row=DBConnect::fetchOne("select isInbound from callactivity_customer_contact where callactivityID=:callactivityID",["callactivityID"=>$callactivityID]);
         if($row)

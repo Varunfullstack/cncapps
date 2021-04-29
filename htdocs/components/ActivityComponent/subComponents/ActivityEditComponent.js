@@ -1090,22 +1090,26 @@ class ActivityEditComponent extends MainComponent {
         }
 
         return this.getElementControl(
-            "Type",
-            "Type",
+          "Type",
+          "Type",
+          el(
+            "div",{style:{display:"flex",flexDirection:"row"}},
             el(
-                "select",
-                {
-                    disabled: !isEnabled,
-                    required: true,
-                    value: data?.callActTypeID || "",
-                    onChange: (event) =>this.handleTypeChange(event.target.value),
-                    style: {width: "100%"}
-                },
-                el("option", {key: "empty", value: ""}, "Please select"),
-                activityTypesToShow.map((t) =>
-                    el("option", {key: t.id, value: t.id}, t.description)
-                )
-            )
+              "select",
+              {
+                disabled: !isEnabled,
+                required: true,
+                value: data?.callActTypeID || "",
+                onChange: (event) => this.handleTypeChange(event.target.value),
+                style: { width: "100%" },
+              },
+              el("option", { key: "empty", value: "" }, "Please select"),
+              activityTypesToShow.map((t) =>
+                el("option", { key: t.id, value: t.id }, t.description)
+              )
+            ),
+            this.getInboundIcon()
+          )
         );
     };
 
@@ -1140,6 +1144,39 @@ class ActivityEditComponent extends MainComponent {
                 </div>
             </div>
         </Modal>
+    }
+    getInboundIcon=()=>{
+        const { data } = this.state;
+        switch (data.Inbound) {
+          case true:
+            return (
+              <ToolTip title="Inbound Contact" width={15}>
+                <img
+                className="pointer"
+                  onClick={() =>
+                    this.setState({ showInboundOutboundModal: true })
+                  }
+                  style={{ width: 15 }}
+                  src="../../../images/icons/phone-arrow-down-left.png"
+                ></img>
+              </ToolTip>
+            );
+          case false:
+            return (
+              <ToolTip title="Outbound Contact" width={15}>
+                <img
+                 className="pointer"
+                  onClick={() =>
+                    this.setState({ showInboundOutboundModal: true })
+                  }
+                  style={{ width: 15 }}
+                  src="../../../images/icons/phone-arrow-up-right.PNG"
+                ></img>
+              </ToolTip>
+            );
+          default:
+            return null;
+        }
     }
     getContactsElement = () => {
         const {el} = this;

@@ -1308,15 +1308,28 @@ class ActivityDisplayComponent extends MainComponent {
     }
 
     getInboundIcon=()=>{
-        const {data} = this.state;
-        switch(data.Inbound)
-        {            
-            case true:
-                return <img style={{width:15}} src="../../../images/icons/phone-arrow-down-left.png"></img>
-            case false:
-                return <img  style={{width:15}}  src="../../../images/icons/phone-arrow-up-right.PNG"></img>
-            default :
-                return null
+        const { data } = this.state;
+        switch (data.Inbound) {
+          case true:
+            return (
+              <ToolTip title="Inbound Contact" width={15}>
+                <img
+                  style={{ width: 15 }}
+                  src="../../../images/icons/phone-arrow-down-left.png"
+                ></img>
+              </ToolTip>
+            );
+          case false:
+            return (
+              <ToolTip title="Outbound Contact" width={15}>
+                <img
+                  style={{ width: 15 }}
+                  src="../../../images/icons/phone-arrow-up-right.PNG"
+                ></img>
+              </ToolTip>
+            );
+          default:
+            return null;
         }
     }
     render() {

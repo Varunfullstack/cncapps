@@ -34,4 +34,17 @@
         <rollback>
         </rollback>
     </changeSet>
+    <changeSet author="mustafa" id="issue1240-3">
+        <preConditions onFail="MARK_RAN">            
+                <tableExists tableName="callactivity_customer_contact" />         
+        </preConditions>     
+        <addColumn tableName="callactivity_customer_contact">
+            <column name="create_at" defaultValue="now()" type="datetime">
+            </column>
+        </addColumn>
+        <rollback>
+        <dropColumn tableName="callactivity_customer_contact" columnName="create_at">
+        </dropColumn>
+        </rollback>
+    </changeSet>
 </databaseChangeLog>
