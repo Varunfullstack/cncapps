@@ -3,6 +3,7 @@
 namespace CNCLTD\ChargeableWorkCustomerRequest\usecases;
 
 use BUActivity;
+use CNCLTD\ChargeableWorkCustomerRequest\Core\CancelReason;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestRepository;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestTokenId;
 use CNCLTD\Exceptions\ChargeableWorkCustomerRequestNotFoundException;
@@ -31,7 +32,7 @@ class CancelPendingChargeableWorkCustomerRequest
         $this->BUActivity = $BUActivity;
     }
 
-    public function __invoke(ChargeableWorkCustomerRequestTokenId $id, DBEUser $currentUser)
+    public function __invoke(ChargeableWorkCustomerRequestTokenId $id, CancelReason $cancelReason, DBEUser $currentUser)
     {
         $request = $this->repository->getById($id);
         if (!$request) {
@@ -40,7 +41,8 @@ class CancelPendingChargeableWorkCustomerRequest
         $serviceRequestId    = $request->getServiceRequestId()->value();
         $currentUserFullName = "{$currentUser->getValue(DBEUser::firstName)} {$currentUser->getValue(DBEUser::lastName)}";
         $currentDateTime     = new DateTimeImmutable();
-        $description         = "The request for extra work has been cancelled by {$currentUserFullName} at  {$currentDateTime->format('H:i d/m/Y')}";
+        $description         = "<p>The request for extra work has been cancelled by {$currentUserFullName} at  {$currentDateTime->format('H:i d/m/Y')}</p>
+                                <p>Reason: {$cancelReason->value()}</p>";
         $this->BUActivity->logOperationalActivity($serviceRequestId, $description);
         $this->repository->delete($request);
     }

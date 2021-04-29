@@ -1,6 +1,7 @@
 <?php
 global $cfg;
 
+use CNCLTD\ChargeableWorkCustomerRequest\Core\CancelReason;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestTokenId;
 use CNCLTD\ChargeableWorkCustomerRequest\DTO\SDManagerPendingChargeableRequestDTO;
 use CNCLTD\ChargeableWorkCustomerRequest\infra\ChargeableWorkCustomerRequestMySQLRepository;
@@ -600,9 +601,14 @@ FROM
         if (!$requestId) {
             throw new JsonHttpException(400, 'id is required');
         }
+        $cancelReason = @$jsonData['cancelReason'];
+        if (!$cancelReason) {
+            throw new JsonHttpException(400, 'Cancel reason is required');
+        }
         try {
-            $usecase(
+            $usecase->__invoke(
                 new ChargeableWorkCustomerRequestTokenId($requestId),
+                new CancelReason($cancelReason),
                 $this->getDbeUser()
             );
         } catch (Exception $exception) {
