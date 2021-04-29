@@ -293,7 +293,6 @@ export async function similarity(s1, s2, useDefaultDictionary = true) {
     return 0;
   if (useDefaultDictionary) {
     await loadReservedWords();
-    //console.log(words);
   }
   s1 = removeReservedWords(s1?s1.toLowerCase():null);
   s2 = removeReservedWords(s2?s2.toLowerCase():null);
@@ -306,11 +305,9 @@ export async function similarity(s1, s2, useDefaultDictionary = true) {
     let max = 0;
     for (let j = 0; j < s2Words.length; j++) {
       const sim = similarityWord(s1Words[i], s2Words[j]);
-      //console.log(sim,s1Words[i], s2Words[j])
       if (sim > max) max = sim;
     }
     totalSim += parseFloat(max);
-    //console.log(s1Words[i],max)
   }
   return totalSim / s1Words.length;
 }

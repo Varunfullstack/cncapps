@@ -396,6 +396,7 @@ class CurrentActivityReportComponent extends MainComponent {
             [
                 el("option", {value: "", key: "null"}),
                 options.map((e) => el("option", {value: e.id, key: e.id}, e.title)),
+                (<option key="priorityChange" >PRI</option>)
             ]
         );
     };
