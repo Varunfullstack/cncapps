@@ -61,7 +61,6 @@ class CustomerSiteComponent extends MainComponent {
     }
 
     componentDidMount = async () => {
-        console.log('customer sr',this.props.data.customerSR);
         this.registerListener();
         const {apicustomer} = this;
         const {data} = this.state;
@@ -192,7 +191,6 @@ class CustomerSiteComponent extends MainComponent {
         this.checkSuggestSR();
     }
     checkSuggestSR=async ()=>{
-        //console.log(this.state.keywordMatchingPercent);
         if(this.suggestTimeOut)
         clearTimeout(this.suggestTimeOut);
         this.suggestTimeOut=setTimeout(async ()=>{
@@ -214,8 +212,6 @@ class CustomerSiteComponent extends MainComponent {
               ]);
             }
             let suggestSRFinal = customerSR.filter((p) => p.percent > this.state.keywordMatchingPercent);
-            console.log('suggestSRFinal',suggestSRFinal);
-            console.log('assetSR',assetSR);
             for(let i=0;i<assetSR.length;i++)
             {
                 if(suggestSRFinal.filter(p=>p.activityID==assetSR[i].activityID).length==0)
