@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 1358 - Include Tasklist in the SR History Popup.
+
 ## [v5.9.1] - 2021-04-29
 ### Fixed
 - Fixed issue with ensuring HD had at least 3 minutes not working as intended.
