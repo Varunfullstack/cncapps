@@ -47,4 +47,21 @@
         </dropColumn>
         </rollback>
     </changeSet>
+     <changeSet author="mustafa" id="issue1240-4">
+        <preConditions onFail="MARK_RAN">            
+                <tableExists tableName="callactivity_customer_contact" />         
+        </preConditions>    
+          <dropForeignKeyConstraint baseTableName="callactivity_customer_contact"
+        constraintName="fk_callactivity_customer_contact" /> 
+        
+       <addForeignKeyConstraint baseColumnNames="callactivityID"
+                             baseTableName="callactivity_customer_contact"
+                             constraintName="fk_callactivity_customer_contact"
+                             referencedColumnNames="caa_callactivityno"
+                             referencedTableName="callactivity"
+                             onDelete="CASCADE"
+                             />
+        <rollback>
+        </rollback>
+    </changeSet>
 </databaseChangeLog>

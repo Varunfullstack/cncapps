@@ -1128,7 +1128,7 @@ class ActivityEditComponent extends MainComponent {
         width={300}
         show={this.state.showInboundOutboundModal}
         title="Select contact type"
-        footer={<div key="footerActions" style={{display:"flex",justifyContent:"space-between"}}>            
+        footer={<div key="footerActions" >            
             <button  onClick={()=>this.setState({showInboundOutboundModal:false})}>OK</button>
             <button  onClick={()=>this.setState({showInboundOutboundModal:false,Inbound:null})}>Cancel</button>
         </div>}
@@ -1151,27 +1151,18 @@ class ActivityEditComponent extends MainComponent {
           case true:
             return (
               <ToolTip title="Inbound Contact" width={15}>
-                <img
-                className="pointer"
-                  onClick={() =>
+                  <i  onClick={() =>
                     this.setState({ showInboundOutboundModal: true })
-                  }
-                  style={{ width: 15 }}
-                  src="../../../images/icons/phone-arrow-down-left.png"
-                ></img>
+                  } className="fal fa-sign-in pointer icon"></i>                 
               </ToolTip>
             );
           case false:
             return (
               <ToolTip title="Outbound Contact" width={15}>
-                <img
-                 className="pointer"
-                  onClick={() =>
+                  <i onClick={() =>
                     this.setState({ showInboundOutboundModal: true })
-                  }
-                  style={{ width: 15 }}
-                  src="../../../images/icons/phone-arrow-up-right.PNG"
-                ></img>
+                  } className="fal fa-sign-out  pointer icon"></i>
+                
               </ToolTip>
             );
           default:

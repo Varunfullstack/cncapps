@@ -3422,6 +3422,8 @@ class CTActivity extends CTCNC
             $GLOBALS['auth']->is_authenticated(),
             $this->getParam('moveToUsersQueue')
         );
+        if(isset($_REQUEST["inbound"]))
+            $this->buActivity->updateInbound($newActivityID ,$_REQUEST["inbound"]=="true"?true:false );
         $urlNext       = Controller::buildLink(
         //$_SERVER['PHP_SELF'],
             "SRActivity.php",

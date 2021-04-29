@@ -1313,19 +1313,13 @@ class ActivityDisplayComponent extends MainComponent {
           case true:
             return (
               <ToolTip title="Inbound Contact" width={15}>
-                <img
-                  style={{ width: 15 }}
-                  src="../../../images/icons/phone-arrow-down-left.png"
-                ></img>
+                <i  className="fal fa-sign-in pointer icon"></i>   
               </ToolTip>
             );
           case false:
             return (
               <ToolTip title="Outbound Contact" width={15}>
-                <img
-                  style={{ width: 15 }}
-                  src="../../../images/icons/phone-arrow-up-right.PNG"
-                ></img>
+                <i  className="fal fa-sign-out  pointer icon"></i>
               </ToolTip>
             );
           default:
