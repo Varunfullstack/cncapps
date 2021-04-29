@@ -74,7 +74,7 @@ export default class ExistingAdditionalChargeableWorkRequestModal extends React.
 
         return (
             <Modal
-                width="450"
+                width="600px"
                 onClose={this.signalClose}
                 title="Additional Chargeable Work Request"
                 show={show}
@@ -98,13 +98,15 @@ export default class ExistingAdditionalChargeableWorkRequestModal extends React.
                                 Cancel Reason
                             </label>
                             <br/>
-                            <input style={{width: "50%"}} value={cancelReason} onChange={this.updateCancelReason}/>
-                            <button key="cancelRequestButton"
-                                    disabled={!cancelReason}
-                                    onClick={() => this.cancelRequest()}
-                            >
-                                Cancel Request
-                            </button>
+                            <div style={{display: "flex"}}>
+                                <input style={{flexGrow: 1}} value={cancelReason} onChange={this.updateCancelReason}/>
+                                <button key="cancelRequestButton"
+                                        disabled={!cancelReason}
+                                        onClick={() => this.cancelRequest()}
+                                >
+                                    Cancel Request
+                                </button>
+                            </div>
                         </div>
                     </React.Fragment>
                 )}
