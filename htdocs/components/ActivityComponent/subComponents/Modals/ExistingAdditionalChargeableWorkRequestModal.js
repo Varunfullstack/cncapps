@@ -98,7 +98,7 @@ export default class ExistingAdditionalChargeableWorkRequestModal extends React.
                                 Cancel Reason
                             </label>
                             <br/>
-                            <input style={{width: "80%"}} value={cancelReason} onChange={this.updateCancelReason}/>
+                            <input style={{width: "50%"}} value={cancelReason} onChange={this.updateCancelReason}/>
                             <button key="cancelRequestButton"
                                     disabled={!cancelReason}
                                     onClick={() => this.cancelRequest()}
