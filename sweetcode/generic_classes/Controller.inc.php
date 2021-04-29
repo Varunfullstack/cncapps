@@ -465,18 +465,10 @@ class Controller extends BaseObject
      */
     function displayFatalError($errorMessage)
     {
-        $this->setPageTitle('A Problem Has Occurred');
+        $this->setPageTitle('Oooops! A Problem Has Occurred!');
         $this->setTemplateFiles(array("FatalError" => "FatalError.inc"));
-        $this->template->set_var(
-            array(
-                "errorMessage" => $errorMessage,
-                "className"    => $this->getClassName(),
-                "methodName"   => $this->getMethodName(),
-                "trace"        => $this->generateCallTrace(),
-                "url"          => $_SERVER['PHP_SELF'],
-                "arguments"    => isset($_SERVER['argv']) ? $_SERVER['argv'] : null
-            )
-        );
+        $trace = $this->generateCallTrace();
+        error_log($errorMessage . " " . $trace);
         $this->template->parse(
             "CONTENTS",
             "FatalError",

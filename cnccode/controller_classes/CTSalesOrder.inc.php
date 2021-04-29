@@ -1011,11 +1011,16 @@ class CTSalesOrder extends CTCNC
                 return;
             }
             if ($this->getAction() == CTSALESORDER_ACT_CREATE_ORDER) {
-                $this->buSalesOrder->initialiseOrder(
-                    $dsOrdhead,
-                    $dsOrdline,
-                    $dsCustomer
-                );
+                try {
+
+                    $this->buSalesOrder->initialiseOrder(
+                        $dsOrdhead,
+                        $dsOrdline,
+                        $dsCustomer
+                    );
+                } catch (\Exception $exception) {
+                    $this->displayFatalError($exception->getMessage());
+                }
             } else {
                 $this->buSalesOrder->InitialiseQuote(
                     $dsOrdhead,

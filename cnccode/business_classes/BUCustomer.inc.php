@@ -212,7 +212,7 @@ class BUCustomer extends Business
     {
         $this->setMethodName('getContactByID');
         if (!$contactID) {
-            $this->raiseError('contactID not passed');
+            throw new Exception('Contact ID required');
         }
         return ($this->getDatasetByPK(
             $contactID,
