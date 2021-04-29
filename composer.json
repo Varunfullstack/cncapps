@@ -40,7 +40,8 @@
     "autoload": {
         "psr-4": {
             "CNCLTD\\": "cnccode/customClasses",
-            "CNCLTD\\Data\\": "cnccode/data_classes"
+            "CNCLTD\\Data\\": "cnccode/data_classes",
+            "CNCLTD\\Business\\": "cnccode/business_classes"
         }
     },
     "name": "cnc/cncapps",

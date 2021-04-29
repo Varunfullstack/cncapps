@@ -4,7 +4,29 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+namespace CNCLTD\Business;
 global $cfg;
+
+use BUActivity;
+use BUCustomerItem;
+use BUInvoice;
+use BUItem;
+use BUMail;
+use BUSalesOrder;
+use Business;
+use CTSalesOrder;
+use DataSet;
+use DBECustomer;
+use DBECustomerItem;
+use DBEItem;
+use DBEJCustomerItem;
+use DBEJOrdhead;
+use DBEJRenContract;
+use DBEOrdhead;
+use DBEOrdline;
+use DSForm;
+
 require_once($cfg ["path_gc"] . "/Business.inc.php");
 require_once($cfg ["path_bu"] . "/BUCustomerItem.inc.php");
 require_once($cfg ["path_bu"] . "/BUActivity.inc.php");
@@ -16,7 +38,7 @@ require_once($cfg ["path_dbe"] . "/DBEWarranty.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEProblem.inc.php");
 require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
-require_once($cfg["path_ct"]."/CTSalesOrder.inc.php");
+require_once($cfg["path_ct"] . "/CTSalesOrder.inc.php");
 
 class BURenContract extends Business
 {
@@ -524,7 +546,6 @@ class BURenContract extends Business
                         DA_STRING,
                         DA_ALLOW_NULL
                     );
-
                     $dsInput->setValue(
                         CTSalesOrder::etaDate,
                         date('Y-m-d')
@@ -793,5 +814,30 @@ class BURenContract extends Business
         );
         $dbeOrdline->insertRow();
         $dbeOrdline->moveItemToTop();
+    }
+
+    public function updatePatchManagementContractForCustomer($customerId, int $patchManagementEligibleComputers)
+    {
+        $dbeCustomerItem = new DBECustomerItem($this);
+        $dbeCustomerItem->getPatchManagementContractForCustomer($customerId);
+        if (!$dbeCustomerItem->fetchNext()) {
+            return;
+        }
+        $dbeCustomerItemUpdate = new DBECustomerItem($this);
+        $dbeCustomerItemUpdate->getRow($dbeCustomerItem->getValue(DBECustomerItem::customerItemID));
+        $dbeCustomerItemUpdate->setValue(DBECustomerItem::users, $patchManagementEligibleComputers);
+        $dbeCustomerItemUpdate->setValue(
+            DBECustomerItem::curUnitSale,
+            $dbeCustomerItem->getValue(
+                DBECustomerItem::salePricePerMonth
+            ) * 12 * $patchManagementEligibleComputers
+        );
+        $dbeCustomerItemUpdate->setValue(
+            DBECustomerItem::curUnitCost,
+            $dbeCustomerItem->getValue(
+                DBECustomerItem::costPricePerMonth
+            ) * 12 * $patchManagementEligibleComputers
+        );
+        $dbeCustomerItemUpdate->updateRow();
     }
 }

@@ -1,7 +1,6 @@
 <?php
 
 use CNCLTD\Exceptions\APIException;
-use CNCLTD\Exceptions\JsonHttpException;
 
 global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');

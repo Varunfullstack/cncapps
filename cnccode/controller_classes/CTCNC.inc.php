@@ -8,10 +8,10 @@
  */
 global $cfg;
 
+use CNCLTD\Exceptions\APIException;
 use CNCLTD\FavouriteMenu;
 use CNCLTD\MenuItem;
 use CNCLTD\SideMenu;
-use CNCLTD\Exceptions\APIException;
 
 require_once($cfg ['path_gc'] . '/DataSet.inc.php');
 require_once($cfg ['path_gc'] . '/Controller.inc.php');

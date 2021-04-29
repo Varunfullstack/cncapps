@@ -2,17 +2,26 @@
 
 namespace CNCLTD\AssetListExport;
 
+use BUHeader;
+use DataSet;
+use DateInterval;
 use DateTime;
+use DBEHeader;
 use PDO;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class ExportedItemCollection
 {
-    private $pcs          = 0;
-    private $servers      = 0;
-    private $labTechData  = [];
-    private $summaryData  = [];
-    private $customerData = [];
+    private $pcs                              = 0;
+    private $servers                          = 0;
+    private $labTechData                      = [];
+    private $summaryData                      = [];
+    private $customerData                     = [];
+    private $patchManagementEligibleComputers = 0;
+    /**
+     * @var array|bool|float|int|string|null
+     */
+    private $offlineAgentThresholdDays;
 
 
     /**
@@ -26,6 +35,10 @@ class ExportedItemCollection
                                 \PDO $labTechDB
     )
     {
+        $BUHeader  = new BUHeader($this);
+        $dbeHeader = new DataSet($this);
+        $BUHeader->getHeader($dbeHeader);
+        $this->offlineAgentThresholdDays = $dbeHeader->getValue(DBEHeader::offlineAgentThresholdDays);
         /** @noinspection SqlIdentifierLength */
         $query                = /** @lang MySQL */
             'SELECT
@@ -312,6 +325,7 @@ ORDER BY location, operatingSystem DESC, computerName';
                     $operatingSystemString = "{$operatingSystemString} ({$supportDates[\DBEOSSupportDates::friendlyName]})";
                 }
             }
+            $this->countPatchManagementElegible($labtechDatum);
             $genericRow           = [
                 $labtechDatum->getLocation(),
                 $labtechDatum->getComputerName(),
@@ -343,6 +357,24 @@ ORDER BY location, operatingSystem DESC, computerName';
                 $this->pcs++;
             }
         }
+    }
+
+    public function countPatchManagementElegible(LabtechAssetDTO $labtechDatum)
+    {
+        if (strpos(strtolower($labtechDatum->getOperatingSystem()), "microsoft") === false) {
+            return;
+        }
+        $lastContactDateTime = $labtechDatum->getLastContact();
+        if (!$lastContactDateTime || $lastContactDateTime == "N/A") {
+            return;
+        }
+        $date = DateTime::createFromFormat(DATE_CNC_DATE_TIME_FORMAT, $lastContactDateTime);
+        $date->add(new DateInterval('P' . $this->offlineAgentThresholdDays . 'D'));
+        $today = new DateTime();
+        if ($date < $today) {
+            return;
+        }
+        $this->patchManagementEligibleComputers++;
     }
 
     public function getOSEndOfSupportDate($index): ?DateTime
@@ -417,5 +449,13 @@ ORDER BY location, operatingSystem DESC, computerName';
             return false;
         }
         return $this->labTechData[$index]["dataItem"]->is3CX();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function patchManagementEligibleComputers()
+    {
+        return $this->patchManagementEligibleComputers;
     }
 }

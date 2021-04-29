@@ -6,12 +6,13 @@
  */
 global $cfg;
 
+use CNCLTD\Business\BURenContract;
 use CNCLTD\Exceptions\ContactNotFoundException;
 
 
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BURenBroadband.inc.php");
-require_once($cfg["path_bu"] . "/BURenContract.inc.php");
+require_once($cfg["path_bu"] . "/Burencontract.php");
 require_once($cfg["path_bu"] . "/BURenQuotation.inc.php");
 require_once($cfg["path_bu"] . "/BURenDomain.inc.php");
 require_once($cfg["path_bu"] . "/BURenHosting.inc.php");
