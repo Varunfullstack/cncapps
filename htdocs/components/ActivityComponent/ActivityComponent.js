@@ -1,5 +1,5 @@
 "use strict";
-import {params} from "../utils/utils";
+
 import ReactDOM from 'react-dom';
 import React from 'react';
 import ActivityDisplayComponent from "./subComponents/ActivityDisplayComponent";
@@ -8,6 +8,7 @@ import GatherFixedInformationComponent from "./subComponents/GatherFixedInformat
 import GatherManagementReviewDetailsComponent from "./subComponents/GatherManagementReviewDetailsComponent";
 import './ActivityComponent.css';
 import '../style.css';
+import {params} from "../utils/utils";
 
 class ActivityComponent extends React.Component {
     constructor(props) {

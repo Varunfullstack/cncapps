@@ -3,7 +3,7 @@ import Table from "../shared/table/table";
 import ToolTip from "../shared/ToolTip";
 import React from "react";
 import ReactDOM from "react-dom";
-import Spinner from "../shared/Spinner/Spinner";
+
 import "./../style.css";
 import "./KeywordMatchingIgnoresComponent.css";
 import APIKeywordMatchingIgnores from "./services/APIKeywordMatchingIgnores";

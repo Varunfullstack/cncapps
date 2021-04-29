@@ -8,6 +8,7 @@ This project changes will be shown here.
 - Issue 1358 - Include Tasklist in the SR History Popup.
 ### Changed
 - Issue 1359 - Change priority from Current Service Request page.
+- Issue 1357 - Enter reason when cancelling a chargeable customer request.
 ### Fixed
 - Issue 1360 - Creating sales orders for customers with incomplete details.
 

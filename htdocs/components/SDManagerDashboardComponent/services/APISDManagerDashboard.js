@@ -21,8 +21,8 @@ export default class APISDManagerDashboard extends APIMain {
         return this.get(`${ApiUrls.sdDashboard}getPendingChargeableRequests&hd=${hd}&es=${es}&sp=${sp}&p=${p}&limit=${limit}`).then(res => res.data);
     }
 
-    async cancelChargeableRequest(id) {
-        return this.post(`${ApiUrls.sdDashboard}cancelPendingChargeableRequest`, {id})
+    async cancelChargeableRequest(id,cancelReason) {
+        return this.post(`${ApiUrls.sdDashboard}cancelPendingChargeableRequest`, {id,cancelReason})
     }
 
     async resendChargeableRequestEmail(id) {

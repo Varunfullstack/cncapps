@@ -168,11 +168,11 @@ export default class PendingChargeableRequestsComponent extends MainComponent {
 
     createCancelRequestHandle = (id) => {
         return async () => {
-            const response = await this.confirm('Are you sure you want to cancel this request?');
+            const response = await this.prompt('Please provide a reason to cancel this request');
             if (!response) {
                 return;
             }
-            await this.api.cancelChargeableRequest(id);
+            await this.api.cancelChargeableRequest(id,response);
             await this.alert('The request has been cancelled');
             await this.getData();
         }
@@ -198,6 +198,7 @@ export default class PendingChargeableRequestsComponent extends MainComponent {
             {this.getDataTable()}
             {this.getConfirm()}
             {this.getAlert()}
+            {this.getPrompt()}
         </div>
     }
 

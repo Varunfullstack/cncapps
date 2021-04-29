@@ -225,8 +225,8 @@ class APIActivity extends APIMain {
         return jsonResponse.data;
     }
 
-    async cancelChargeableRequest(id) {
-        return this.post(`${ApiUrls.sdDashboard}cancelPendingChargeableRequest`, {id})
+    async cancelChargeableRequest(id, cancelReason) {
+        return this.post(`${ApiUrls.sdDashboard}cancelPendingChargeableRequest`, {id, cancelReason})
     }
 
     async resendChargeableRequestEmail(id) {

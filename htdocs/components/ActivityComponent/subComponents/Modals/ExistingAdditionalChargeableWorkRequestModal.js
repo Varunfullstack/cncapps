@@ -34,6 +34,7 @@ export default class ExistingAdditionalChargeableWorkRequestModal extends React.
          */
         this.state = {
             chargeableWorkRequest: null,
+            cancelReason: ''
         }
     }
 
@@ -51,7 +52,8 @@ export default class ExistingAdditionalChargeableWorkRequestModal extends React.
 
     cancelRequest = async () => {
         const {chargeableWorkRequestId} = this.props;
-        await this.api.cancelChargeableRequest(chargeableWorkRequestId);
+        const {cancelReason} = this.state;
+        await this.api.cancelChargeableRequest(chargeableWorkRequestId, cancelReason);
         this.props.onClose(true);
     };
 
@@ -59,16 +61,20 @@ export default class ExistingAdditionalChargeableWorkRequestModal extends React.
         this.props.onClose(closingValue);
     }
 
+    updateCancelReason = ($event) => {
+        this.setState({cancelReason: $event.target.value});
+    }
+
     render() {
         const {show} = this.props;
-        const {chargeableWorkRequest} = this.state;
+        const {chargeableWorkRequest, cancelReason} = this.state;
         if (!chargeableWorkRequest) {
             return '';
         }
 
         return (
             <Modal
-                width="900"
+                width="600px"
                 onClose={this.signalClose}
                 title="Additional Chargeable Work Request"
                 show={show}
@@ -87,6 +93,21 @@ export default class ExistingAdditionalChargeableWorkRequestModal extends React.
                         <div>
                             Reason: <div dangerouslySetInnerHTML={{__html: chargeableWorkRequest.reason}}/>
                         </div>
+                        <div style={{borderTop: "0.1em solid #e9ecef", paddingTop: "1em"}}>
+                            <label>
+                                Cancel Reason
+                            </label>
+                            <br/>
+                            <div style={{display: "flex"}}>
+                                <input style={{flexGrow: 1}} value={cancelReason} onChange={this.updateCancelReason}/>
+                                <button key="cancelRequestButton"
+                                        disabled={!cancelReason}
+                                        onClick={() => this.cancelRequest()}
+                                >
+                                    Cancel Request
+                                </button>
+                            </div>
+                        </div>
                     </React.Fragment>
                 )}
                 footer={
@@ -95,11 +116,6 @@ export default class ExistingAdditionalChargeableWorkRequestModal extends React.
                                 onClick={this.resendEmail}
                         >
                             Resend Email
-                        </button>
-                        <button key="cancelRequestButton"
-                                onClick={() => this.cancelRequest()}
-                        >
-                            Cancel Request
                         </button>
                     </div>
                 }
