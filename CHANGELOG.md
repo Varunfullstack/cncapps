@@ -5,6 +5,8 @@ This project changes will be shown here.
 ### Added
 - Issue 1355 - Added a one off script to create Microsoft 365 Support items in contracts for customers.
 - Issue 1223 - Update Patch Management Contract numbers automatically
+### Changed
+- Issue 1359 - Change priority from Current Service Request page.
 ### Fixed
 - Issue 1360 - Creating sales orders for customers with incomplete details.
 
