@@ -2757,7 +2757,8 @@ class CTActivity extends CTCNC
                 'lastActivityText'    => $lastActivityText,
                 'lastActivityReason'  => $lastActivityReason,
                 'lastCncNextAction'   => $lastCncNextAction,
-                'lastCustomerSummary' => $lastCustomerSummary
+                'lastCustomerSummary' => $lastCustomerSummary,
+                'taskListContent' => $dbeProblem->getValue(DBEProblem::taskList)
             )
         );
         $this->template->parse(
