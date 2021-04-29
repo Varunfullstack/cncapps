@@ -74,7 +74,7 @@ export default class ExistingAdditionalChargeableWorkRequestModal extends React.
 
         return (
             <Modal
-                width="900"
+                width="450"
                 onClose={this.signalClose}
                 title="Additional Chargeable Work Request"
                 show={show}
