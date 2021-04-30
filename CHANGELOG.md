@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1356 - Show Asset on Fixed Summary page
+
 ## [v5.9.1] - 2021-04-29
 ### Fixed
 - Fixed issue with ensuring HD had at least 3 minutes not working as intended.
