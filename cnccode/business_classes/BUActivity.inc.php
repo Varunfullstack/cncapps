@@ -4718,7 +4718,7 @@ class BUActivity extends Business
             0.00
         );
         $dbeCallActivity->insertRow();
-        $this->setProblemRaise($dbeProblem, $dbeCallActivity); //createActivityFromCustomerID
+        $this->setProblemRaise($dbeProblem, $dbeCallActivity);
         return $dbeCallActivity->getPKValue();
     }
 
@@ -4731,72 +4731,32 @@ class BUActivity extends Business
         if ($raiseType != null) {
             $dbeProblem->setValue(
                 DBEProblem::raiseTypeId,
-                $this->getProblemRaiseType($raiseType)
+                $raiseType
             );
             $dbeProblem->updateRow();
             return;
         }
+        $dbeUser = new DBEUser($this);
         if (isset($GLOBALS['auth'])) {
             // get team
             $userID = $GLOBALS['auth']->is_authenticated();
             if (isset($userID)) {
-                $dbeUser = new DBEUser($this);
                 $dbeUser->setPKValue($userID);
                 $dbeUser->getRow();
-                $teamId = $dbeUser->getValue(DBEUser::teamID);
             }
         }
-        //For each problem, where callactivity.caa_callacttypeno = 57 and callactivity.caa_serverguard = Y, then set the problem source as Alert.
-        if (isset($dbeProblem) && isset($callActivity) && $callActivity->getValue(
-                DBEJCallActivity::callActTypeID
-            ) == 57 && $callActivity->getValue(DBEJCallActivity::serverGuard) == 'Y') {
-            $dbeProblem->setValue(
-                DBEProblem::raiseTypeId,
-                $this->getProblemRaiseType(BUProblemRaiseType::ALERT)
-            );
-        } else if (isset($dbeProblem) && isset($callActivity) && $dbeProblem->getValue(
-                DBEJProblem::linkedSalesOrderID
-            ) > 0//&& $dbeProblem->getValue(DBEJProblem::priority) == 5
-        ) {
-            $dbeProblem->setValue(
-                DBEProblem::raiseTypeId,
-                $this->getProblemRaiseType(BUProblemRaiseType::SALES)
-            );
-        } else if //For each problem, where callactivity.caa_callactivityno = 57 and callactivity.caa_consno = 67 and callactivity.caa_serverguard = N, then set the problem source as Email.
-        (isset($dbeProblem) && isset($callActivity) && $callActivity->getValue(
-                DBEJCallActivity::callActTypeID
-            ) == 57 && $callActivity->getValue(DBEJCallActivity::caaConsno) == 67 && $callActivity->getValue(
-                DBEJCallActivity::serverGuard
-            ) == 'N') {
-            $dbeProblem->setValue(
-                DBEProblem::raiseTypeId,
-                $this->getProblemRaiseType(BUProblemRaiseType::EMAIL)
-            );
-        } else if (isset($teamId) && $teamId == 1) //created by help desk
-        {
-            $raiseType = BUProblemRaiseType::PHONE;
-            if ($dbeUser->getValue(DBEUser::basedAtCustomerSite) == 1 && $dbeProblem->getValue(
-                    DBEProblem::customerID
-                ) == $dbeUser->getValue(DBEUser::siteCustId)) $raiseType = BUProblemRaiseType::ONSITE;
-            $dbeProblem->setValue(
-                DBEProblem::raiseTypeId,
-                $this->getProblemRaiseType($raiseType)
-            );
-        } else {
-            $dbeProblem->setValue(
-                DBEProblem::raiseTypeId,
-                $this->getProblemRaiseType(BUProblemRaiseType::MANUAL)
-            );
+        $teamId    = $dbeUser->getValue(DBEUser::teamID);
+        $raiseType = $this->getAppropriateRaiseType($dbeProblem, $callActivity, $teamId, $dbeUser);
+        $dbeProblem->setValue(
+            DBEProblem::raiseTypeId,
+            $raiseType
+        );
+        if ($raiseType === BUProblemRaiseType::PHONEID && $callActivity->getValue(
+                DBECallActivity::callActTypeID
+            ) === CONFIG_INITIAL_ACTIVITY_TYPE_ID) {
+            $this->createActivityCustomerContactType($callActivity->getValue(DBECallActivity::callActivityID), true);
         }
-        if (isset($dbeProblem)) $dbeProblem->updateRow();
-    }
-
-    private function getProblemRaiseType($description)
-    {
-        $buProblemRaiseType = new BUProblemRaiseType($this);
-        $id                 = null;
-        $id                 = $buProblemRaiseType->getProblemRaiseTypeByName($description)['id'];
-        return $id;
+        $dbeProblem->updateRow();
     }
 
     /**
@@ -5149,7 +5109,7 @@ class BUActivity extends Business
             $body->customerID
         );
         if (isset($body->customerproblemno)) {
-            $dbeProblem->setValue(DBEProblem::raiseTypeId, $this->getProblemRaiseType(BUProblemRaiseType::EMAIL));
+            $dbeProblem->setValue(DBEProblem::raiseTypeId, BUProblemRaiseType::EMAILID);
             $customerRaisedRequest = $this->getCustomerRaisedRequest($body->customerproblemno);
             $dbeProblem->setValue(DBEProblem::emailSubjectSummary, $customerRaisedRequest['emailSubject']);
         }
@@ -6042,7 +6002,9 @@ class BUActivity extends Business
         );
         $dbeJCallActivity     = $this->getFirstActivityInServiceRequest($problemID);
         $dbeJLastCallActivity = $this->getLastActivityInProblem($problemID);
-        $activityId           = $dbeJLastCallActivity ? $dbeJLastCallActivity->getValue(DBEJCallActivity::callActivityID) : $dbeJCallActivitygetValue(DBEJCallActivity::callActivityID);
+        $activityId           = $dbeJLastCallActivity ? $dbeJLastCallActivity->getValue(
+            DBEJCallActivity::callActivityID
+        ) : $dbeJCallActivitygetValue(DBEJCallActivity::callActivityID);
         $urlActivity          = SITE_URL . "/SRActivity.php?action=displayActivity&callActivityID=$activityId";
         $assignedByUserName   = (string)$DBUser->getValue(DBEUser::name);
         $template->setVar(
@@ -6515,7 +6477,7 @@ class BUActivity extends Business
         }
         //$dbeCallActivity->setValue( 'overtimeExportedFlag', 'N' );
         $dbeCallActivity->insertRow();
-        $this->setProblemRaise($dbeProblem, $dbeCallActivity, BUProblemRaiseType::SALES); //createSalesServiceRequest
+        $this->setProblemRaise($dbeProblem, $dbeCallActivity, BUProblemRaiseType::SALESID); //createSalesServiceRequest
         $db  = new dbSweetcode(); // database connection for query
         $sql = "UPDATE
       ordhead
@@ -10057,7 +10019,7 @@ class BUActivity extends Business
             );
             //$dbeCallActivity->setShowSQLOn();
             $dbeCallActivity->insertRow();
-            $this->setProblemRaise($dbeProblem, $dbeCallActivity, BUProblemRaiseType::SALES); //sendSalesRequest
+            $this->setProblemRaise($dbeProblem, $dbeCallActivity, BUProblemRaiseType::SALESID); //sendSalesRequest
         }
         $buStandardText  = new BUStandardText($this);
         $dbeStandardText = new DataSet($this);
@@ -11262,9 +11224,8 @@ class BUActivity extends Business
         $dbeCallActivity->setValue(DBECallActivity::callActivityID, null);
         $dbeCallActivity->setValue(DBECallActivity::callActTypeID, CTSRActivity::REMOTE_SUPPORT_ACTIVITY_TYPE_ID);
         $dbeCallActivity->setValue(DBECallActivity::startTime, $endTime);
-        $currentDate= new DateTimeImmutable();
-
-        $reason = "<p>{$getDbeUser->getFullName()} mass deleted $successDeletedCount/$foundTotalSRs using this criteria of '{$search}' on {$currentDate->format(DATE_CNC_DATE_FORMAT." \a\\t H:i:s")} </p>";
+        $currentDate = new DateTimeImmutable();
+        $reason      = "<p>{$getDbeUser->getFullName()} mass deleted $successDeletedCount/$foundTotalSRs using this criteria of '{$search}' on {$currentDate->format(DATE_CNC_DATE_FORMAT." \a\\t H:i:s")} </p>";
         if ($failedDeletions) {
             $reason .= "<h3>Some SR's failed to be deleted </h3><ul>";
             foreach ($failedDeletions as $failedDeletion) {
@@ -11283,27 +11244,74 @@ class BUActivity extends Business
         $dbeCallActivity->insertRow();
     }
 
-    function updateInbound($callactivityID,$value )
+    function updateInbound($callactivityID, $value)
     {
-        
-        if(is_null($value))
-        {
-            DBConnect::execute("delete from callactivity_customer_contact where callactivityID=:callactivityID",["callactivityID"=>$callactivityID]);
-            
-        }
-        else{
+
+        if (is_null($value)) {
+            DBConnect::execute(
+                "delete from callactivity_customer_contact where callactivityID=:callactivityID",
+                ["callactivityID" => $callactivityID]
+            );
+
+        } else {
             //get row
-            $row=DBConnect::fetchOne("select * from callactivity_customer_contact where callactivityID=:callactivityID",["callactivityID"=>$callactivityID]);
-            if($row)
-            {
+            $row = DBConnect::fetchOne(
+                "select * from callactivity_customer_contact where callactivityID=:callactivityID",
+                ["callactivityID" => $callactivityID]
+            );
+            if ($row) {
                 //update 
-                DBConnect::execute("update callactivity_customer_contact set isInbound=:value where callactivityID=:callactivityID",["callactivityID"=>$callactivityID,"value"=>$value?1:0]);
-            }
-            else
-            {
-                //insert
-                DBConnect::execute("insert into callactivity_customer_contact(callactivityID,isInbound) values(:callactivityID,:value)",["callactivityID"=>$callactivityID,"value"=>$value?1:0]);
+                DBConnect::execute(
+                    "update callactivity_customer_contact set isInbound=:value where callactivityID=:callactivityID",
+                    ["callactivityID" => $callactivityID, "value" => $value ? 1 : 0]
+                );
+            } else {
+                $this->createActivityCustomerContactType($callactivityID, $value);
             }
         }
+    }
+
+    private function createActivityCustomerContactType($activityId, $isInbound)
+    {
+        DBConnect::execute(
+            "insert into callactivity_customer_contact(callactivityID,isInbound) values(:callactivityID,:value)",
+            ["callactivityID" => $activityId, "value" => (boolean)$isInbound]
+        );
+    }
+
+    /**
+     * @param $dbeProblem
+     * @param $callActivity
+     * @param $teamId
+     * @param DBEUser $dbeUser
+     * @return int
+     * @throws ColumnOutOfRangeException
+     */
+    private function getAppropriateRaiseType($dbeProblem, $callActivity, $teamId, DBEUser $dbeUser): int
+    {
+        if (isset($callActivity) && $callActivity->getValue(
+                DBEJCallActivity::callActTypeID
+            ) == 57 && $callActivity->getValue(DBEJCallActivity::serverGuard) == 'Y') {
+            return BUProblemRaiseType::ALERTID;
+        }
+        if (isset($callActivity) && $dbeProblem->getValue(DBEJProblem::linkedSalesOrderID)) {
+            return BUProblemRaiseType::SALESID;
+        }
+        if (isset($callActivity) && $callActivity->getValue(
+                DBEJCallActivity::callActTypeID
+            ) == 57 && $callActivity->getValue(DBEJCallActivity::caaConsno) == 67 && $callActivity->getValue(
+                DBEJCallActivity::serverGuard
+            ) == 'N') {
+            return BUProblemRaiseType::EMAILID;
+        }
+        if (isset($teamId) && $teamId == 1) {
+            if ($dbeUser->getValue(DBEUser::basedAtCustomerSite) == 1 && $dbeProblem->getValue(
+                    DBEProblem::customerID
+                ) == $dbeUser->getValue(DBEUser::siteCustId)) {
+                return BUProblemRaiseType::ONSITEID;
+            }
+            return BUProblemRaiseType::PHONEID;
+        }
+        return BUProblemRaiseType::MANUALID;
     }
 }
