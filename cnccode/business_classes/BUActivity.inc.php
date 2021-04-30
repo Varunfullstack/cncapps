@@ -6004,7 +6004,7 @@ class BUActivity extends Business
         $dbeJLastCallActivity = $this->getLastActivityInProblem($problemID);
         $activityId           = $dbeJLastCallActivity ? $dbeJLastCallActivity->getValue(
             DBEJCallActivity::callActivityID
-        ) : $dbeJCallActivitygetValue(DBEJCallActivity::callActivityID);
+        ) : $dbeJCallActivity->getValue(DBEJCallActivity::callActivityID);
         $urlActivity          = SITE_URL . "/SRActivity.php?action=displayActivity&callActivityID=$activityId";
         $assignedByUserName   = (string)$DBUser->getValue(DBEUser::name);
         $template->setVar(
@@ -11275,7 +11275,7 @@ class BUActivity extends Business
     {
         DBConnect::execute(
             "insert into callactivity_customer_contact(callactivityID,isInbound) values(:callactivityID,:value)",
-            ["callactivityID" => $activityId, "value" => (boolean)$isInbound]
+            ["callactivityID" => $activityId, "value" => (int)$isInbound]
         );
     }
 
