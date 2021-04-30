@@ -5,6 +5,8 @@ import React from 'react';
 
 import striptags from "striptags";
 import ToolTip from "../ToolTip";
+import CNCCKEditor from "../CNCCKEditor";
+import PropTypes from "prop-types";
 
 export const ASSET_SELECTED_TYPE = {
     NO_ASSET_REASON: "NO_ASSET_REASON",
@@ -260,5 +262,12 @@ export default class AssetListSelectorComponent extends React.PureComponent {
             />
         );
     }
-
 }
+
+AssetListSelectorComponent.propTypes = {
+    noAssetReason: PropTypes.string,
+    assetName: PropTypes.string,
+    assetTitle: PropTypes.string,
+    customerId: PropTypes.number,
+    onChange: PropTypes.func
+};
