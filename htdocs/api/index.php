@@ -731,7 +731,7 @@ FROM
     ON problem.`pro_custno` = customer.`cus_custno`
 WHERE 
  caa_date between ? and ?
-  AND pro_priority < 4 
+  AND pro_priority < 5 
   group by pro_priority
         order by pro_priority';
                 }
