@@ -517,7 +517,8 @@ class CTSRActivity extends CTCNC
             "taskListUpdatedAt"               => $dbeProblem->getValue(DBEProblem::taskListUpdatedAt),
             "taskListUpdatedBy"               => $taskListUpdatedBy,
             'pendingCallbacks'                => $pendingCallbacks,
-            "what3Words"                      => $what3Words
+            "what3Words"                      => $what3Words,
+            "Inbound"                         => $this->checkIsInbound($callActivityID)
         ];
     }
 
@@ -815,6 +816,11 @@ class CTSRActivity extends CTCNC
             );
             $dsCallActivity->post();
         }
+        if(isset($body->Inbound)||is_null($body->Inbound))
+        {           
+            $this->buActivity->updateInbound($body->callActivityID,$body->Inbound);
+        }
+      
         //-----------check status
         $dsCallActivity->setUpdateModeUpdate();
         $updateAwaitingCustomer = false;
@@ -862,6 +868,7 @@ class CTSRActivity extends CTCNC
                 $buActivity->createTravelActivity($body->callActivityID);
             }
         }
+        //update Inbound and outbound
         if ($body->nextStatus == 'Fixed') {
             //try to close all the activities
             http_response_code(301);
@@ -869,7 +876,18 @@ class CTSRActivity extends CTCNC
         }
         return ["status" => "1"];
     }
-
+    
+    function checkIsInbound($callactivityID){
+        $row=DBConnect::fetchOne("select isInbound from callactivity_customer_contact where callactivityID=:callactivityID",["callactivityID"=>$callactivityID]);
+        if($row)
+        {
+            if($row["isInbound"]==1)
+            return true;
+            else
+            return false;
+        }
+        else return null;
+    }
     function validTime($body, $dbeProblem, $buActivity, $dbeCallActivity)
     {
         $problemID       = $dbeCallActivity->getValue(DBECallActivity::problemID);

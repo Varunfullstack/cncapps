@@ -911,8 +911,14 @@ class ActivityDisplayComponent extends MainComponent {
                         <td className="display-content">{data?.authorisedBy}</td>
                         <td className="display-label">Type</td>
                         <td colSpan="3"
-                            className="nowrap"
-                        >{data?.activityType}</td>
+                            className="nowrap display-content"
+                            
+                        >
+                            <div style={{display:"flex", alignItems:"center"}}>
+                            <label className="mr-3">{data?.activityType}</label>                        
+                            {this.getInboundIcon()}
+                            </div>
+                            </td>
                     </tr>
 
 
@@ -1301,6 +1307,25 @@ class ActivityDisplayComponent extends MainComponent {
         this.setState({showCallbackModal: false});
     }
 
+    getInboundIcon=()=>{
+        const { data } = this.state;
+        switch (data.Inbound) {
+          case true:
+            return (
+              <ToolTip title="Inbound Contact" width={15}>
+                <i  className="fal fa-sign-in pointer icon"></i>   
+              </ToolTip>
+            );
+          case false:
+            return (
+              <ToolTip title="Outbound Contact" width={15}>
+                <i  className="fal fa-sign-out  pointer icon"></i>
+              </ToolTip>
+            );
+          default:
+            return null;
+        }
+    }
     render() {
         const {data, showSalesOrder, _loadedData} = this.state;
 

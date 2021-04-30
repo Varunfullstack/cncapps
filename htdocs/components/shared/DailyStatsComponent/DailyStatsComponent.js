@@ -49,17 +49,18 @@ class DailyStatsComponent extends MainComponent {
         const {summary} = this.state;
         if (this.loading)
             return null;
-        const evenBackgroundColor    ="#00628B";
-        const eventTextColor         ="#E6E6E6";
+        const evenBackgroundColor = "#00628B";
+        const eventTextColor = "#E6E6E6";
         return <table>
             <tbody>
             <tr>
                 <td>{this.getOpenSrCard(summary.prioritySummary)}</td>
                 <td>{this.getTeamSrCard(summary.openSrTeamSummary, evenBackgroundColor, eventTextColor)}</td>
                 <td>{this.getDailySourceCard(summary.dailySourceSummary)}</td>
-                <td>{this.getTotalCardWithBiggerNumber("Unique Customers", summary.uniqueCustomerTodaySummary.total, evenBackgroundColor, eventTextColor)}</td>
+                <td>{this.getDailyInboundOutBoundCard(summary.inboundOutbound, evenBackgroundColor)}</td>
                 <td>{this.getTotalCardWithBiggerNumber("Near SLA", summary.nearSLASummary.total)}</td>
                 <td>{this.getTotalCardWithBiggerNumber("Near Fix SLA Breach", summary.nearFixSLABreach, evenBackgroundColor, eventTextColor)}</td>
+
             </tr>
             <tr>
                 <td>{this.getTotalCardWithBiggerNumber("Raised Today", summary.raisedTodaySummary.total, evenBackgroundColor, eventTextColor)}</td>
@@ -67,6 +68,7 @@ class DailyStatsComponent extends MainComponent {
                 <td>{this.getTotalCardWithBiggerNumber("Fixed Today", summary.fixedTodaySummary.total, evenBackgroundColor, eventTextColor)}</td>
                 <td>{this.getTotalCardWithBiggerNumber("Reopened Today", summary.reopenTodaySummary.total)}</td>
                 <td>{this.getTotalCardWithBiggerNumber("Breached SLA", summary.breachedSLATodaySummary.total, evenBackgroundColor, eventTextColor)}</td>
+                <td>{this.getTotalCardWithBiggerNumber("Unique Customers", summary.uniqueCustomerTodaySummary.total)}</td>
             </tr>
             </tbody>
         </table>
@@ -260,6 +262,26 @@ class DailyStatsComponent extends MainComponent {
             onClick: () => window.open('popup.php?action=dailyStats', 'popup', 'width=1250,height=600')
         })
     }
+    getDailyInboundOutBoundCard = (data,
+                                   backgroundColor = "#C6C6C6",
+                                   textColor = "#FFFFFF") => {
+        return <div className="sd-card" style={{backgroundColor: backgroundColor, color: textColor}}>
+            <label className="sd-card-title">Daily Contact</label>
+            <table style={{color: textColor}}>
+                <tbody>
+                <tr>
+                    <td>Inbound</td>
+                    <td>{data.inbound}</td>
+                </tr>
+                <tr>
+                    <td>Outbound</td>
+                    <td>{data.outbound}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    };
 
     render() {
         return (

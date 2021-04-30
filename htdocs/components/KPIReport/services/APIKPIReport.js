@@ -35,4 +35,7 @@ export default class APIKPIReport extends APIMain {
             return data;
         });
     }
+    getDailyContact(from,to){
+        return this.get(`${ApiUrls.KPIReport}dailyContact&from=${from}&to=${to}`);
+    }
 }

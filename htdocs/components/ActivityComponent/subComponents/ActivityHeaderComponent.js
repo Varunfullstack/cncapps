@@ -66,7 +66,7 @@ export class ActivityHeaderComponent extends React.Component {
                     }
                     <a href={`mailto:${serviceRequestData.contactEmail}?cc=support@cnc-ltd.co.uk&subject=Service Request ${serviceRequestData.problemID} - ${serviceRequestData.serviceRequestEmailSubject} - Update`} target="_blank">
                                 <i className="fal fa-envelope ml-5"/>
-                    </a>
+                    </a>                    
                 </span>
 
                 <p className='formErrorMessage mt-2'>{serviceRequestData.contactNotes}</p>
@@ -75,4 +75,5 @@ export class ActivityHeaderComponent extends React.Component {
 
         )
     }
+    
 }

@@ -61,6 +61,9 @@ class BUImportRequests extends Business
             )) {      // error string returned
                 echo $automatedRequest->getAutomatedRequestID() . " processed successfully<BR/>";
                 $processedMessages++;
+                $dbeLastActivity = $this->buActivity->getLastActivityInProblem($automatedRequest->getServiceRequestID());
+                if($dbeLastActivity->rowCount>0)
+                 $this->buActivity->updateInbound($dbeLastActivity->getValue(DBEJCallActivity::callActivityID),true);
             } else {
                 echo $automatedRequest->getAutomatedRequestID() . " failed<BR/>";
                 $this->sendFailureEmail(

@@ -147,7 +147,6 @@ class CTActivity extends CTCNC
     const EDIT_LINKED_SALES_ORDER                      = 'editLinkedSalesOrder';
     const EDIT_SERVICE_REQUEST_HEADER                  = 'editServiceRequestHeader';
     const DISPLAY_OPEN_SRS                             = 'displayOpenSrs';
-    const EDIT_VALUE_ONLY_SERVICE_REQUEST              = 'editValueOnlyServiceRequest';
     const DISPLAY_LAST_ACTIVITY                        = 'displayLastActivity';
     const DISPLAY_FIRST_ACTIVITY                       = 'displayFirstActivity';
     const DISPLAY_SERVICE_REQUEST_FOR_CONTACT_POPUP    = 'displayServiceRequestForContactPopup';
@@ -292,9 +291,6 @@ class CTActivity extends CTCNC
                 break;
             case self::DISPLAY_LAST_ACTIVITY:
                 $this->displayLastActivity();
-                break;
-            case self::EDIT_VALUE_ONLY_SERVICE_REQUEST:
-                $this->editValueOnlyServiceRequest();
                 break;
             case self::DISPLAY_OPEN_SRS:
                 $this->displayOpenSrs();
@@ -1799,104 +1795,6 @@ class CTActivity extends CTCNC
         $this->redirectToDisplay($dbeCallActivity->getValue(DBEJCallActivity::callActivityID));
 
     }
-
-    /**
-     * edit a value only SR
-     * @access private
-     * @throws Exception
-     */
-    function editValueOnlyServiceRequest()
-    {
-        $this->setMethodName('editValueOnlyServiceRequest');
-        $this->validateSession();
-        $this->setTemplateFiles(
-            'ServiceRequestValueEdit',
-            'ServiceRequestValueEdit.inc'
-        );
-        // Parameters
-        $this->setPageTitle("Create Activity: Value");
-        $error = [];
-        /* validate if this is a POST request */
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $sessionValue = $this->getSessionParam($this->sessionKey);
-            if (!$sessionValue) {
-                $sessionValue = [];
-            }
-            if ($this->getParam('curValue') && !is_numeric($this->getParam('curValue'))) {
-                $error['curValue'] = 'Enter a currency value';
-            }
-            if (!$this->getParam('contractCustomerItemID')) {
-                $error['contractCustomerItemID'] = 'Required';
-            } else {
-                $sessionValue['contractCustomerItemID'] = $this->getParam('contractCustomerItemID');
-
-            }
-            if (count($error) == 0) {
-                $sessionValue['callActivityID']         = 0;
-                $sessionValue['date']                   = date('d/m/Y');
-                $sessionValue['curValue']               = $this->getParam('curValue');
-                $sessionValue['startTime']              = date('H:i');
-                $sessionValue['status']                 = 'C';
-                $sessionValue['contractCustomerItemID'] = $this->getParam('contractCustomerItemID');
-                $sessionValue['userID']                 = $GLOBALS['auth']->is_authenticated();
-                $this->setSessionParam($this->sessionKey, $sessionValue);
-                $dsCallActivity = $this->buActivity->createActivityFromSession($this->sessionKey);
-                $callActivityID = $dsCallActivity->getValue(DBEJCallActivity::callActivityID);
-                unset ($_SESSION[$this->sessionKey]); // clear the session variable
-                $nextURL = Controller::buildLink(
-                    'SRActivity.php',
-                    array(
-                        'action'         => 'displayActivity',
-                        'callActivityID' => $callActivityID
-                    )
-                );
-                header('Location: ' . $nextURL);
-
-            }
-        }// end IF POST
-        $this->setTemplateFiles(
-            'ServiceRequestValueEdit',
-            'ServiceRequestValueEdit.inc'
-        );
-        $submitURL = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array('action' => 'editValueOnlyServiceRequest')
-        );
-        $backURL   = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array('action' => 'activityCreate1')
-        );
-        $this->template->set_var(
-            array(
-                'customerName'                  => $_SESSION[$this->sessionKey]['customerName'],
-                'renewalsLink'                  => $this->getRenewalsLink($_SESSION[$this->sessionKey]['customerID']),
-                'curValue'                      => $_SESSION[$this->sessionKey]['curValue'],
-                'curValueMessage'               => $error['curValue'],
-                'contractCustomerItemID'        => $_SESSION[$this->sessionKey]['contractCustomerItemID'],
-                'contractCustomerItemIDMessage' => $error['contractCustomerItemID'],
-                'submitURL'                     => $submitURL,
-                'backURL'                       => $backURL
-            )
-        );
-        $this->contractDropdown(
-            $_SESSION[$this->sessionKey]['customerID'],
-            $_SESSION[$this->sessionKey]['contractCustomerItemID'],
-            'ServiceRequestValueEdit',
-            'contractBlock'
-        );
-        $this->template->parse(
-            'activityWizardHeader',
-            'ActivityWizardHeader',
-            true
-        );
-        $this->template->parse(
-            'CONTENTS',
-            'ServiceRequestValueEdit',
-            true
-        );
-        $this->parsePage();
-
-    }  // end finaliseProblem
 
     function validateSession()
     {
@@ -3423,7 +3321,11 @@ class CTActivity extends CTCNC
             $GLOBALS['auth']->is_authenticated(),
             $this->getParam('moveToUsersQueue')
         );
-        $urlNext       = Controller::buildLink(
+        if (isset($_REQUEST["inbound"])) $this->buActivity->updateInbound(
+            $newActivityID,
+            $_REQUEST["inbound"] == "true" ? true : false
+        );
+        $urlNext = Controller::buildLink(
         //$_SERVER['PHP_SELF'],
             "SRActivity.php",
             array(

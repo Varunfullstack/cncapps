@@ -283,7 +283,8 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             "raisedStartTodaySummary"    => $raisedStartTodaySummary,
             'breachedSLATodaySummary'    => $breachedSLATodaySummary,
             'uniqueCustomerTodaySummary' => $uniqueCustomerTodaySummary,
-            "nearFixSLABreach"           => count($nearFixSLABreach)
+            "nearFixSLABreach"           => count($nearFixSLABreach),
+            "inboundOutbound"            => $this->getInboundOutboundSummary()
         ];
     }
 
@@ -790,5 +791,9 @@ FROM
         if (!$sp) $query .= " and  pro_queue_no<> 3 ";
         $problems = DBConnect::fetchAll($query);
         return $problems;
+    }
+    function getInboundOutboundSummary()
+    {
+        return DBConnect::fetchOne("SELECT COUNT(IF(isInbound=1,1,NULL)) inbound,COUNT(IF(isInbound=0,1,NULL)) outbound FROM callactivity_customer_contact WHERE DATE_FORMAT(create_at,'%Y-%m-%d')=DATE_FORMAT(NOW(),'%Y-%m-%d')");
     }
 }
