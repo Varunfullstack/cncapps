@@ -186,110 +186,244 @@ WHERE
   and initial.caa_date between ? and ?
         AND pro_priority <= 4";
                 if ($isBreakDown) {
-                    $query = "SELECT 
-    pro_priority as priority,
-    SUM(1) AS raised,
-    SUM(pro_status IN ('F' , 'C')) AS `fixed`,
-    AVG(problem.`pro_responded_hours`) AS responseTime,
-       CASE problem.`pro_priority`
-            WHEN 1 THEN customer.`cus_sla_p1`
-            WHEN 2 THEN customer.`cus_sla_p2`
-            WHEN 3 THEN customer.`cus_sla_p3`
-            WHEN 4 THEN customer.`cus_sla_p4`
-            ELSE 0 end as sla,
-       CASE problem.`pro_priority`
-            WHEN 1 THEN customer.slaFixHoursP1
-            WHEN 2 THEN customer.slaFixHoursP2
-            WHEN 3 THEN customer.slaFixHoursP3
-            WHEN 4 THEN customer.slaFixHoursP4
-                else 0 end as fixSLA,
-       AVG(IF(pro_status IN ('F' , 'C'),
-        problem.`pro_responded_hours` < CASE problem.`pro_priority`
-            WHEN 1 THEN customer.`cus_sla_p1`
-            WHEN 2 THEN customer.`cus_sla_p2`
-            WHEN 3 THEN customer.`cus_sla_p3`
-            WHEN 4 THEN customer.`cus_sla_p4`
-            ELSE 0
-        END,
-        NULL)) AS slaMet,
-       sum(IF(pro_status IN ('F' , 'C'),
-        problem.`pro_responded_hours` < CASE problem.`pro_priority`
-            WHEN 1 THEN customer.`cus_sla_p1`
-            WHEN 2 THEN customer.`cus_sla_p2`
-            WHEN 3 THEN customer.`cus_sla_p3`
-            WHEN 4 THEN customer.`cus_sla_p4`
-            ELSE 0
-        END,
-        NULL)) AS slaMetRaw,
-       AVG(IF(pro_status IN ('F' , 'C'),
-        problem.`pro_working_hours` > CASE problem.`pro_priority`
-            WHEN 1 THEN customer.`slaFixHoursP1`
-            WHEN 2 THEN customer.`slaFixHoursP2`
-            WHEN 3 THEN customer.`slaFixHoursP3`
-            WHEN 4 THEN customer.`slaFixHoursP4`
-        END,
-        NULL)) AS fixSLAFailedPct,
-       sum(IF(pro_status IN ('F' , 'C'),
-        problem.`pro_working_hours` > CASE problem.`pro_priority`
-            WHEN 1 THEN customer.slaFixHoursP1
-            WHEN 2 THEN customer.slaFixHoursP2
-            WHEN 3 THEN customer.slaFixHoursP3
-            WHEN 4 THEN customer.slaFixHoursP4
-            ELSE 0
-        END,
-        NULL)) AS fixSLAFailedCount,
-       sum(
-               if(
-                       pro_status in ('F', 'C'),
-                       timestampdiff(HOUR, concat(initial.caa_date, ' ', initial.caa_endtime, ':00'),
-                                     concat(fixed.caa_date, ' ', fixed.caa_starttime, ':00')) >
-                       CASE problem.`pro_priority`
-                           WHEN 1 THEN customer.slaFixHoursP1
-                           WHEN 2 THEN customer.slaFixHoursP2
-                           WHEN 3 THEN customer.slaFixHoursP3
-                           WHEN 4 THEN customer.slaFixHoursP4
-                           END,
-                       null
-                   )
-           )                              as overFixSLAWorkingHours,
-    AVG(IF(pro_status IN ('F' , 'C'),
-        openHours < 8,
-        NULL)) AS closedWithin8Hours,
-    AVG(IF(pro_status = 'C',
-        problem.`pro_reopened_date` IS NOT NULL,
-        NULL)) AS reopened,
-       sum(IF(pro_status = 'C',
-        problem.`pro_reopened_date` IS NOT NULL,
-        NULL)) AS reopenedCount,
-    AVG(IF(pro_status IN ('F' , 'C'),
-        problem.`pro_chargeable_activity_duration_hours`, 
-        NULL)) AS avgChargeableTime,
-    AVG(IF(pro_status IN ('F' , 'C'),
-        problem.pro_working_hours,
-        NULL)) AS avgTimeAwaitingCNC,
-    AVG(IF(pro_status IN ('F' , 'C'),
-        openHours,
-        NULL)) AS avgTimeFromRaiseToFixHours
-FROM
-    problem
-        LEFT JOIN
-    callactivity initial ON initial.`caa_problemno` = problem.`pro_problemno`
-        AND initial.`caa_callacttypeno` = 51
-        left join callactivity fixed on fixed.caa_problemno = problem.pro_problemno and fixed.caa_callacttypeno = 57
-        JOIN
-    customer ON problem.`pro_custno` = customer.`cus_custno`
-WHERE
 
-        problem.pro_custno = ?
-  and initial.caa_date between ? and ?
-        AND pro_priority <= 4
-        group by pro_priority
-        order by pro_priority ";
+                    $params = [
+                        ["type" => "i", "value" => $args['customerId']],
+                        ["type" => "i", "value" => $args['customerId']],
+                        ["type" => "i", "value" => $args['customerId']],
+                        ["type" => "i", "value" => $args['customerId']],
+                        ["type" => "i", "value" => $args['customerId']],
+                        ["type" => "s", "value" => $startDate->format(DATE_MYSQL_DATE)],
+                        ["type" => "s", "value" => $endDate->format(DATE_MYSQL_DATE)],
+                    ];
+                    $query = "
+
+SELECT
+  priorities.*,
+  raised,
+  FIXED,
+  responseTime,
+  slaMet,
+  slaMetRaw,
+  fixSLAFailedPct,
+  fixSLAFailedCount,
+  overFixSLAWorkingHours,
+  closedWithin8Hours,
+  reopened,
+  reopenedCount,
+  avgChargeableTime,
+  avgTimeAwaitingCNC,
+  avgTimeFromRaiseToFixHours
+FROM
+  (SELECT
+    1 AS priority,
+    customer.`cus_sla_p1` AS sla,
+    customer.`slaFixHoursP1` AS fixSLA
+  FROM
+    customer
+  WHERE customer.`cus_custno` = ?
+  UNION
+  ALL
+  SELECT
+    2 AS priority,
+    customer.`cus_sla_p2` AS sla,
+    customer.`slaFixHoursP2` AS fixSLA
+  FROM
+    customer
+  WHERE customer.`cus_custno` = ?
+  UNION
+  ALL
+  SELECT
+    3 AS priority,
+    customer.`cus_sla_p3` AS sla,
+    customer.`slaFixHoursP3` AS fixSLA
+  FROM
+    customer
+  WHERE customer.`cus_custno` = ?
+  UNION
+  ALL
+  SELECT
+    4 AS priority,
+    customer.`cus_sla_p4` AS sla,
+    customer.`slaFixHoursP4` AS fixSLA
+  FROM
+    customer
+  WHERE customer.`cus_custno` = ?) priorities
+  LEFT JOIN
+    (SELECT
+      pro_priority AS priority,
+      SUM(1) AS raised,
+      SUM(pro_status IN ('F', 'C')) AS `fixed`,
+      AVG(problem.`pro_responded_hours`) AS responseTime,
+      AVG(
+        IF(
+          pro_status IN ('F', 'C'),
+          problem.`pro_responded_hours` <
+          CASE
+            problem.`pro_priority`
+            WHEN 1
+            THEN customer.`cus_sla_p1`
+            WHEN 2
+            THEN customer.`cus_sla_p2`
+            WHEN 3
+            THEN customer.`cus_sla_p3`
+            WHEN 4
+            THEN customer.`cus_sla_p4`
+            ELSE 0
+          END,
+          NULL
+        )
+      ) AS slaMet,
+      SUM(
+        IF(
+          pro_status IN ('F', 'C'),
+          problem.`pro_responded_hours` <
+          CASE
+            problem.`pro_priority`
+            WHEN 1
+            THEN customer.`cus_sla_p1`
+            WHEN 2
+            THEN customer.`cus_sla_p2`
+            WHEN 3
+            THEN customer.`cus_sla_p3`
+            WHEN 4
+            THEN customer.`cus_sla_p4`
+            ELSE 0
+          END,
+          NULL
+        )
+      ) AS slaMetRaw,
+      AVG(
+        IF(
+          pro_status IN ('F', 'C'),
+          problem.`pro_working_hours` >
+          CASE
+            problem.`pro_priority`
+            WHEN 1
+            THEN customer.`slaFixHoursP1`
+            WHEN 2
+            THEN customer.`slaFixHoursP2`
+            WHEN 3
+            THEN customer.`slaFixHoursP3`
+            WHEN 4
+            THEN customer.`slaFixHoursP4`
+          END,
+          NULL
+        )
+      ) AS fixSLAFailedPct,
+      SUM(
+        IF(
+          pro_status IN ('F', 'C'),
+          problem.`pro_working_hours` >
+          CASE
+            problem.`pro_priority`
+            WHEN 1
+            THEN customer.slaFixHoursP1
+            WHEN 2
+            THEN customer.slaFixHoursP2
+            WHEN 3
+            THEN customer.slaFixHoursP3
+            WHEN 4
+            THEN customer.slaFixHoursP4
+            ELSE 0
+          END,
+          NULL
+        )
+      ) AS fixSLAFailedCount,
+      SUM(
+        IF(
+          pro_status IN ('F', 'C'),
+          TIMESTAMPDIFF(
+            HOUR,
+            CONCAT(
+              initial.caa_date,
+              ' ',
+              initial.caa_endtime,
+              ':00'
+            ),
+            CONCAT(
+              fixed.caa_date,
+              ' ',
+              fixed.caa_starttime,
+              ':00'
+            )
+          ) >
+          CASE
+            problem.`pro_priority`
+            WHEN 1
+            THEN customer.slaFixHoursP1
+            WHEN 2
+            THEN customer.slaFixHoursP2
+            WHEN 3
+            THEN customer.slaFixHoursP3
+            WHEN 4
+            THEN customer.slaFixHoursP4
+          END,
+          NULL
+        )
+      ) AS overFixSLAWorkingHours,
+      AVG(
+        IF(
+          pro_status IN ('F', 'C'),
+          openHours < 8,
+          NULL
+        )
+      ) AS closedWithin8Hours,
+      AVG(
+        IF(
+          pro_status = 'C',
+          problem.`pro_reopened_date` IS NOT NULL,
+          NULL
+        )
+      ) AS reopened,
+      SUM(
+        IF(
+          pro_status = 'C',
+          problem.`pro_reopened_date` IS NOT NULL,
+          NULL
+        )
+      ) AS reopenedCount,
+      AVG(
+        IF(
+          pro_status IN ('F', 'C'),
+          problem.`pro_chargeable_activity_duration_hours`,
+          NULL
+        )
+      ) AS avgChargeableTime,
+      AVG(
+        IF(
+          pro_status IN ('F', 'C'),
+          problem.pro_working_hours,
+          NULL
+        )
+      ) AS avgTimeAwaitingCNC,
+      AVG(
+        IF(
+          pro_status IN ('F', 'C'),
+          openHours,
+          NULL
+        )
+      ) AS avgTimeFromRaiseToFixHours
+    FROM
+      problem
+      LEFT JOIN callactivity initial
+        ON initial.`caa_problemno` = problem.`pro_problemno`
+        AND initial.`caa_callacttypeno` = 51
+      LEFT JOIN callactivity FIXED
+        ON fixed.caa_problemno = problem.pro_problemno
+        AND fixed.caa_callacttypeno = 57
+      JOIN customer
+        ON problem.`pro_custno` = customer.`cus_custno`
+    WHERE problem.pro_custno = ?
+      AND initial.caa_date BETWEEN ?
+      AND ?
+      AND pro_priority <= 4
+    GROUP BY pro_priority) stats
+    ON stats.priority = priorities.priority";
                 }
                 /** @var $db dbSweetcode */ global $db;
                 $statement = $db->preparedQuery($query, $params);
                 if ($isBreakDown) {
-
                     $data = $statement->fetch_all(MYSQLI_ASSOC);
                 } else {
                     $data = $statement->fetch_assoc();
@@ -454,8 +588,8 @@ ORDER BY raisedManually DESC";
         $group->get(
             '/customerSatisfactionScore/{customerId}',
             function (Request $request, Response $response, $args) {
-                $db        = DBConnect::instance()->getDB();
-                $statement = $db->prepare(
+                $db          = DBConnect::instance()->getDB();
+                $statement   = $db->prepare(
                     "SELECT
   SUM(cf.value = 1) / COUNT(*) AS good,
   SUM(cf.value = 2) / COUNT(*) AS meh,
@@ -470,8 +604,8 @@ and date(createdAt) >= ? and date(createdAt) <= ?
 GROUP BY contact.`con_custno`"
                 );
                 $queryParams = $request->getQueryParams();
-                $endDate   = new DateTime();
-                $startDate = (clone $endDate)->sub(new DateInterval('P365D'));
+                $endDate     = new DateTime();
+                $startDate   = (clone $endDate)->sub(new DateInterval('P365D'));
                 if (isset($queryParams['startDate'])) {
                     $startDateString = $queryParams['startDate'];
                     $startDate       = DateTime::createFromFormat(DATE_MYSQL_DATE, $startDateString);
