@@ -6,6 +6,7 @@ This project changes will be shown here.
 - Issue 1355 - Added a one off script to create Microsoft 365 Support items in contracts for customers.
 - Issue 1223 - Update Patch Management Contract numbers automatically
 - Issue 1358 - Include Tasklist in the SR History Popup.
+- Issue 1117 - CKEditor allow pasting embedded image.
 ### Changed
 - Issue 1359 - Change priority from Current Service Request page.
 - Issue 1357 - Enter reason when cancelling a chargeable customer request.
@@ -40,7 +41,7 @@ This project changes will be shown here.
 
 ## [v5.8.6] - 2021-04-22
 ### Fixed
-- Fixed inability to add new passwords.    
+- Fixed inability to add new passwords.
 
 ## [v5.8.5] - 2021-04-20
 ### Fixed
