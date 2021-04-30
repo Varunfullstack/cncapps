@@ -1202,10 +1202,7 @@ class CTSRActivity extends CTCNC
                 "problemHideFromCustomerFlag" => $callActivity->getValue(DBEJCallActivity::problemHideFromCustomerFlag),
                 "rootCauseID"                 => $callActivity->getValue(DBEJCallActivity::rootCauseID),
                 "prePayChargeApproved"        => $callActivity->getValue(DBEJCallActivity::prePayChargeApproved),
-                "hasCallOutExpense"           => $hasCallOutExpense,
-                "assetName"                   => $callActivity->getValue(DBEJCallActivity::assetName),
-                "assetTitle"                  => $callActivity->getValue(DBEJCallActivity::assetTitle),
-                "noAssetReason"               => $callActivity->getValue(DBEJCallActivity::emptyAssetReason),
+                "hasCallOutExpense"           => $hasCallOutExpense
             ];
         } else return null;
     }
@@ -1699,7 +1696,7 @@ FROM
         ];
     }
 
-    private function hasCallOut(int $problemID): bool
+    private function hasCallOut(int $problemID):bool
     {
         /** @var dbSweetcode $db */ global $db;
         $statement = $db->preparedQuery(
@@ -1718,6 +1715,7 @@ AND c.caa_problemno = ? ',
                 ]
             ]
         );
+
         return $statement->fetch_array(MYSQLI_NUM)[0];
     }
 
@@ -1757,7 +1755,9 @@ AND c.caa_problemno = ? ',
         if (!$search) {
             throw new JsonHttpException(400, 'Cannot delete without a search value');
         }
+
         $dbeProblem->getUnstartedServiceRequestsForDeletion($search);
+
         $serviceRequestsIds = [];
         while ($dbeProblem->fetchNext()) {
             $serviceRequestsIds[] = $dbeProblem->getValue(DBEProblem::problemID);
