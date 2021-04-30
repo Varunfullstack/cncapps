@@ -1,8 +1,5 @@
 # Changelog
 This project changes will be shown here.
-## [unreleased]
-### Added
-- Add daily contact to sdmanger and KPIReport
 
 ## [unreleased] 
 ### Added
@@ -10,6 +7,7 @@ This project changes will be shown here.
 - Issue 1223 - Update Patch Management Contract numbers automatically
 - Issue 1358 - Include Tasklist in the SR History Popup.
 - Issue 1117 - CKEditor allow pasting embedded image.
+- Issue 1240 - Designate Customer Contact as Inbound or Outbound.
 ### Changed
 - Issue 1359 - Change priority from Current Service Request page.
 - Issue 1357 - Enter reason when cancelling a chargeable customer request.
