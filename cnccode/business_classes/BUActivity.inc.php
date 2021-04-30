@@ -5306,7 +5306,7 @@ class BUActivity extends Business
         if ($dbeProblem->getValue(DBEProblem::raiseTypeId) === BUProblemRaiseType::PHONEID && $dbeCallActivity->getValue(
                 DBECallActivity::callActTypeID
             ) === CONFIG_INITIAL_ACTIVITY_TYPE_ID) {
-            $this->createActivityCustomerContactType($dbeCallActivity->getValue(DBECallActivity::callActivityID), false);
+            $this->createActivityCustomerContactType($dbeCallActivity->getValue(DBECallActivity::callActivityID), true);
         }
         $buCustomer = new BUCustomer($this);
         $dsCustomer = new DataSet($this);
