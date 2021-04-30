@@ -11,6 +11,7 @@ import React from 'react';
 import CustomerDocumentUploader from "./CustomerDocumentUploader";
 import EditorFieldComponent from "../../shared/EditorField/EditorFieldComponent";
 import {RESOLUTION_SUMMARY_MIN_CHARS} from "../../CONFIG_CONSTANTS";
+import AssetListSelectorComponent from "../../shared/AssetListSelectorComponent/AssetListSelectorComponent";
 
 class GatherFixedInformationComponent extends MainComponent {
     el = React.createElement;
@@ -155,6 +156,16 @@ class GatherFixedInformationComponent extends MainComponent {
                             />
                         )
                     ),
+                    <tr>
+                        <td className="display-label">
+                            Asset
+                        </td>
+                        <td>
+                            <AssetListSelectorComponent assetName={activity.assetName} assetTitle={activity.assetTitle}
+                                                        noAssetReason={activity.emptyAssetReason}
+                                                        customerId={activity.customerID} onChange={console.log}/>
+                        </td>
+                    </tr>
                 )
             )
         );
