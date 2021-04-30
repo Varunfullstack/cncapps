@@ -4751,11 +4751,6 @@ class BUActivity extends Business
             DBEProblem::raiseTypeId,
             $raiseType
         );
-        if ($raiseType === BUProblemRaiseType::PHONEID && $callActivity->getValue(
-                DBECallActivity::callActTypeID
-            ) === CONFIG_INITIAL_ACTIVITY_TYPE_ID) {
-            $this->createActivityCustomerContactType($callActivity->getValue(DBECallActivity::callActivityID), true);
-        }
         $dbeProblem->updateRow();
     }
 
@@ -5290,7 +5285,7 @@ class BUActivity extends Business
             $GLOBALS['auth']->is_authenticated()
         ); // user that created activity
         $dsCallActivity->post();
-        $this->setProblemRaise($dbeProblem, $dsCallActivity); //createActivityFromSession
+        $this->setProblemRaise($dbeProblem, $dsCallActivity);
         $dbeContact = null;
         if ($body->contactID) {
             $dbeContact = new DBEContact($this);
@@ -5307,6 +5302,11 @@ class BUActivity extends Business
                 $fields['submittedTo'] = 'Service Desk';
             }
             $this->sendServiceRequestLoggedEmail($dsCallActivity->getValue(DBECallActivity::callActivityID), false);
+        }
+        if ($dbeProblem->getValue(DBEProblem::raiseTypeId) === BUProblemRaiseType::PHONEID && $dbeCallActivity->getValue(
+                DBECallActivity::callActTypeID
+            ) === CONFIG_INITIAL_ACTIVITY_TYPE_ID) {
+            $this->createActivityCustomerContactType($dbeCallActivity->getValue(DBECallActivity::callActivityID), false);
         }
         $buCustomer = new BUCustomer($this);
         $dsCustomer = new DataSet($this);
@@ -11304,7 +11304,7 @@ class BUActivity extends Business
             ) == 'N') {
             return BUProblemRaiseType::EMAILID;
         }
-        if (isset($teamId) && $teamId == 1) {
+        if ($teamId == 1) {
             if ($dbeUser->getValue(DBEUser::basedAtCustomerSite) == 1 && $dbeProblem->getValue(
                     DBEProblem::customerID
                 ) == $dbeUser->getValue(DBEUser::siteCustId)) {
