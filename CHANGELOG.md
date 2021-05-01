@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v5.9.2]
+## [v5.9.2] - 2021-05-01
 ### Fixed
 - Fixed issue with SLAPerformance
 
