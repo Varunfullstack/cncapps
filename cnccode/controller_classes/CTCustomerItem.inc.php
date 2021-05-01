@@ -1290,6 +1290,7 @@ class CTCustomerItem extends CTCNC
         $this->setTemplateFiles(
             array('CustomerItemAdd' => 'CustomerItemAdd.inc')
         );
+        $this->loadReactScript('ItemListTypeAheadRenderer.js');
         $this->template->set_var(
             array(
                 'urlSubmit'           => $urlSubmit,

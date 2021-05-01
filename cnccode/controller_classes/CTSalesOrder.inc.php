@@ -2583,7 +2583,8 @@ class CTSalesOrder extends CTCNC
                     'qtyOrdered'            => $this->dsOrdline->getValue(DBEJOrdline::qtyOrdered),
                     'curUnitCost'           => $this->dsOrdline->getValue(DBEJOrdline::curUnitCost),
                     'curUnitSale'           => $this->dsOrdline->getValue(DBEJOrdline::curUnitSale),
-                    'renewalCustomerItemID' => $this->dsOrdline->getValue(DBEJOrdline::renewalCustomerItemID)
+                    'renewalCustomerItemID' => $this->dsOrdline->getValue(DBEJOrdline::renewalCustomerItemID),
+                    'itemDescription'       => json_encode($this->dsOrdline->getValue(DBEJOrdline::itemDescription))
                 )
             );
         }
@@ -3927,6 +3928,7 @@ class CTSalesOrder extends CTCNC
                 'SalesOrderLineEditJS'  => 'SalesOrderLineEditJS.inc' // javascript
             )
         );
+        $this->loadReactScript('ItemListTypeAheadRenderer.js');
         $this->template->setVar('isPopup', $this->getParam('htmlFmt') ? 'true' : 'false');
         $this->displaySalesOrderHeader($dsOrdhead);
         $this->orderLineForm($dsOrdhead);
