@@ -3,6 +3,50 @@
 
     const autocompleteURL = "/Customer.php?action=searchName";
     window.addEventListener('DOMContentLoaded', function () {
+        const itemIdInput = document.getElementById('itemID');
+        const autocompleteItemElement = document.getElementById('autocompleteItem');
+        let props = {
+            autocompleteSelectedCallBack: (selectedItem) => {
+                props.value = selectedItem.label;
+                itemIdInput.value = selectedItem.value;
+                document.renderTypeAheadComponent(props, autocompleteItemElement)
+            },
+            searchRequest: (term, itemsToShow, responseCB) => {
+                fetch(
+                        '/Item.php?action=SEARCH_ITEMS_JSON',
+                        {
+                            method: 'POST',
+                            body: JSON.stringify({term: props.value, limit: itemsToShow + 1})
+                        }
+                )
+                        .then(x => x.json())
+                        .then(response => {
+                            if (response.status !== 'ok') {
+                                throw new Error(response.message);
+                            }
+
+                            responseCB(response.data.map(x => ({
+                                label: x.description,
+                                value: x.itemID,
+                                curUnitCost: x.curUnitCost,
+                                curUnitSale: x.curUnitSale,
+                                supplierId: x.supplierId,
+                                partNumber: x.partNo
+                            })))
+                        })
+            },
+            value: "",
+            onInputChange: (value) => {
+                props.value = value;
+                document.renderTypeAheadComponent(props, autocompleteItemElement)
+            },
+            readOnly: false,
+            showClear: false,
+        }
+
+        document.renderTypeAheadComponent(props, autocompleteItemElement);
+
+
         $('#customerName')[0].addEventListener('autocompleteselect', function ($event) {
             $('#customerID').val($event.detail.item.value);
         });
@@ -11,12 +55,12 @@
     function validatesiteDesc() {
         if (Trim(document.getElementById("siteDesc").value) != "") {
             window.open(
-                '{urlSitePopup}&customerID=' + document.getElementById("customerID").value +
-                '&siteDesc=' + escape(document.getElementById("siteDesc").value) +
-                '&parentIDField=siteNo' +
-                '&parentDescField=siteDesc',
-                'address',
-                'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
+                    '{urlSitePopup}&customerID=' + document.getElementById("customerID").value +
+                    '&siteDesc=' + escape(document.getElementById("siteDesc").value) +
+                    '&parentIDField=siteNo' +
+                    '&parentDescField=siteDesc',
+                    'address',
+                    'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
             )
         }
     }
@@ -24,43 +68,20 @@
     function checkFunctionKey(field) {
         if (event.keyCode == 120) {			// F9 - edit
             switch (field.id) {
-                case "itemDescription":
-                    if (+document.getElementById("itemID").value != 0) {
-                        window.open(
-                            '{urlItemEdit}&itemID=' +
-                            escape(document.getElementById("itemID").value) +
-                            '&parentIDField=itemID' +
-                            '&parentDescField=itemDescription',
-                            'item',
-                            'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
-                        );
-                    }
-                    break;
                 case "siteDesc":
                     if (document.getElementById("siteNo").value != "") {
                         window.open(
-                            '{urlSiteEdit}&customerID={customerID}' +
-                            '&siteNo=' + escape(document.getElementById("siteNo").value) +
-                            '&parentIDField=siteNo' +
-                            '&parentDescField=siteDesc',
-                            'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
+                                '{urlSiteEdit}&customerID={customerID}' +
+                                '&siteNo=' + escape(document.getElementById("siteNo").value) +
+                                '&parentIDField=siteNo' +
+                                '&parentDescField=siteDesc',
+                                'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
                         );
                     }
                     break;
             }
         }
         return;
-    }
-
-    function validateItemDescription() {
-        if (Trim(document.getElementById("itemDescription").value) != "") {
-            window.open('{urlItemPopup}&itemDescription=' +
-                escape(document.getElementById("itemDescription").value) +
-                '&parentIDField=itemID' +
-                '&parentSlaResponseHoursField=slaResponseHours' +
-                '&parentDescField=itemDescription',
-                'items', 'scrollbars=yes,resizable=no,width=450,height=400,copyhistory=no, menubar=0')
-        }
     }
 
 </SCRIPT>
@@ -82,16 +103,7 @@
                         id="itemID"
                         value="{itemID}"
                 />
-                <input
-                        type="text"
-                        name="customerItem[1][itemDescription]"
-                        id="itemDescription"
-                        value="{itemDescription}"
-                        onChange="javascript:validateItemDescription()"
-                        onKeydown="javascript:checkFunctionKey(itemDescription)"
-                        size="50"
-                        maxlength="50"
-                > <font class="formErrorMessage">{descriptionMessage}</font></td>
+                <div id="autocompleteItem"></div>
         </tr>
         <TR>
             <td class="promptText">Customer</td>

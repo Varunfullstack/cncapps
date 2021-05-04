@@ -8,11 +8,20 @@ This project changes will be shown here.
 - Issue 1358 - Include Tasklist in the SR History Popup.
 - Issue 1117 - CKEditor allow pasting embedded image.
 - Issue 1240 - Designate Customer Contact as Inbound or Outbound.
+- Issue 1370 - Include Percentage of values in SR Source report
 ### Changed
 - Issue 1359 - Change priority from Current Service Request page.
 - Issue 1357 - Enter reason when cancelling a chargeable customer request.
 ### Fixed
 - Issue 1360 - Creating sales orders for customers with incomplete details.
+
+## [v5.9.3] - 2021-05-04
+### Fixed
+- Fixed issue with Meeting agenda showing repeated months in Recent Service Requests graph.
+
+## [v5.9.2] - 2021-05-01
+### Fixed
+- Fixed issue with SLAPerformance
 
 ## [v5.9.1] - 2021-04-29
 ### Fixed

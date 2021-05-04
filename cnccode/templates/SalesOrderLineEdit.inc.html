@@ -17,6 +17,10 @@
     let supplierIDElement;
     let isReactElementRendered = false;
     let hookedListeners = false;
+    let itemSearchRowElement;
+    let autocompleteItemElement;
+    let itemDescriptionLabelElement;
+    let itemDescription = {itemDescription}
 
     document.addEventListener('beforeunload', () => {
         window.opener.location.reload();
@@ -25,18 +29,63 @@
         reactSupplierContainer = document.getElementById('reactSupplierSearchContainer');
         supplierIDElement = document.getElementById('supplierID');
         lineTypeSelectorElement = document.getElementById('lineType');
-
+        itemSearchRowElement = document.getElementById('itemSearchRow');
+        autocompleteItemElement = document.getElementById('autocompleteItem');
+        itemDescriptionLabelElement = document.getElementById('itemDescriptionLabel');
         itemDescriptionInput = document.getElementById("itemDescription");
         qtyOrderedInput = document.getElementById("qtyOrdered");
         curUnitCostInput = document.getElementById("curUnitCost");
         curUnitSaleInput = document.querySelector("input[name='ordline[1][curUnitSale]']");
-
-
         itemIdInput = document.getElementById('itemID');
-        itemIdInput.addEventListener('change', ($event) => {
-            updatePartNumber();
-            clearSupplier();
-        })
+
+        let props = {
+            autocompleteSelectedCallBack: (selectedItem) => {
+                props.value = selectedItem.label;
+                itemIdInput.value = selectedItem.value;
+                curUnitCostInput.value = selectedItem.curUnitCost;
+                curUnitSaleInput.value = selectedItem.curUnitSale;
+                itemDescriptionInput.value = selectedItem.label;
+                updatePartNumber(selectedItem.partNumber);
+                document.renderTypeAheadComponent(props, autocompleteItemElement)
+                if (selectedItem.supplierId) {
+                    supplierIDElement.value = selectedItem.supplierId;
+                }
+                checkInputs();
+            },
+            searchRequest: (term, itemsToShow, responseCB) => {
+                fetch(
+                        '/Item.php?action=SEARCH_ITEMS_JSON',
+                        {
+                            method: 'POST',
+                            body: JSON.stringify({term: props.value, limit: itemsToShow + 1})
+                        }
+                )
+                        .then(x => x.json())
+                        .then(response => {
+                            if (response.status !== 'ok') {
+                                throw new Error(response.message);
+                            }
+
+                            responseCB(response.data.map(x => ({
+                                label: x.description,
+                                value: x.itemID,
+                                curUnitCost: x.curUnitCost,
+                                curUnitSale: x.curUnitSale,
+                                supplierId: x.supplierId,
+                                partNumber: x.partNo
+                            })))
+                        })
+            },
+            value: itemDescription,
+            onInputChange: (value) => {
+                props.value = value;
+                document.renderTypeAheadComponent(props, autocompleteItemElement)
+            },
+            readOnly: false,
+            showClear: false,
+        }
+
+        document.renderTypeAheadComponent(props, autocompleteItemElement);
         partNumberRow = document.getElementById('partNumberRow');
         updatePartNumber();
         checkInputs();
@@ -47,55 +96,15 @@
         checkInputs();
     }
 
-    async function updatePartNumber() {
-        const itemId = itemIdInput.value;
+    async function updatePartNumber(partNumber) {
         let display = 'none';
         let text = '';
-        if (itemId) {
-            const response = await fetch('/Item.php?action=GET_ITEM&itemId=' + itemId);
-            const r = await response.json();
+        if (partNumber) {
             display = 'table-row';
-            text = r.data.partNo;
+            text = partNumber;
         }
         partNumberRow.style.display = display;
         partNumberRow.querySelector('.field').textContent = text;
-    }
-
-    function checkFunctionKey(field) {
-        if (event.keyCode == 120) {			// F9 - edit
-            switch (field.id) {
-                case "itemDescription":
-                    if (document.getElementById("itemID").value != "0") {
-                        window.open(
-                                '{urlItemEdit}&itemID=' +
-                                escape(document.getElementById("itemID").value) +
-                                '&parentIDField=itemID' +
-                                '&parentDescField=itemDescription',
-                                'item',
-                                'scrollbars=yes,resizable=yes,width=610,height=550,copyhistory=no, menubar=0'
-                        );
-                    }
-                    break;
-                case "supplierName":
-                    if (document.getElementById("supplierID").value != "0") {
-                        window.open('{urlSupplierEdit}&supplierID=' +
-                                escape(document.getElementById("supplierID").value),
-                                'suppliers',
-                                'scrollbars=yes,resizable=no,height=400,width=450,copyhistory=no, menubar=0');
-                    }
-                    break;
-            }
-        }
-        return;
-    }
-
-    function itemIdChanged($event) {
-        console.log($event.target.value);
-    }
-
-
-    function checkItemDescriptionFunctionKey() {
-        return checkFunctionKey('itemDescription');
     }
 
     function checkInputs() {
@@ -105,26 +114,19 @@
             qtyOrderedInput.disabled = false;
             curUnitCostInput.disabled = false;
             curUnitSaleInput.disabled = false;
+            itemSearchRowElement.style.display = 'table-row';
+            itemDescriptionLabelElement.textContent = "Description";
             document.renderSupplierSearchComponent(reactSupplierContainer, {
                 inputId: 'supplierID',
                 supplierId: Number(supplierIDElement.value)
             })
             isReactElementRendered = true;
-            if (!hookedListeners) {
-                itemDescriptionInput.addEventListener('change', validateItemDescription)
-                itemDescriptionInput.addEventListener('keydown', checkItemDescriptionFunctionKey)
-                hookedListeners = true;
-            }
         } else {
-
+            itemSearchRowElement.style.display = 'none';
+            itemDescriptionLabelElement.textContent = "Comment";
             if (isReactElementRendered) {
                 document.unmountComponentAtNode(reactSupplierContainer);
                 isReactElementRendered = false;
-            }
-            if (hookedListeners) {
-                itemDescriptionInput.removeEventListener('change', validateItemDescription)
-                itemDescriptionInput.removeEventListener('keydown', checkItemDescriptionFunctionKey)
-                hookedListeners = false;
             }
             qtyOrderedInput.disabled = true;
             curUnitCostInput.disabled = true;
@@ -224,8 +226,19 @@
                 </select>
             </td>
         </tr>
+        <tr id="itemSearchRow"
+            style="display: none"
+        >
+            <td class="promptText">Selected Item</td>
+            <td class="field">
+                <div id="autocompleteItem"></div>
+            </td>
+        </tr>
         <tr>
-            <td class="promptText">Item</td>
+            <td class="promptText"
+                id="itemDescriptionLabel"
+            >Item
+            </td>
             <td class="field">
                 <input type="text"
                        name="ordline[1][description]"
@@ -237,6 +250,7 @@
                 <font class="formErrorMessage">{descriptionMessage}</font>
             </td>
         </tr>
+
         <tr id="partNumberRow"
             style="display: none"
         >

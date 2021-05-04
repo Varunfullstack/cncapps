@@ -1087,6 +1087,8 @@ class CTPurchaseOrder extends CTCNC
                 'PurchaseOrderLineEditJS' => 'PurchaseOrderLineEditJS.inc' // javascript
             )
         );
+
+        $this->loadReactScript('ItemListTypeAheadRenderer.js');
         $this->orderLineForm();
         $this->template->setVar(
             'disableOnPartReceive',

@@ -7,6 +7,7 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
+use CNCLTD\StatsFromJSON\StatsFromJSON;
 use Twig\Environment;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
@@ -22,7 +23,7 @@ require_once($cfg ['path_bu'] . '/BUCustomerItem.inc.php');
 require_once($cfg ['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg ['path_bu'] . '/BURenewal.inc.php');
 require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
- 
+
 
 class CTCustomerReviewMeeting extends CTCNC
 {
@@ -64,7 +65,6 @@ class CTCustomerReviewMeeting extends CTCNC
             case 'generatePdf':
                 echo json_encode($this->generatePdf());
                 break;
-
             default:
                 $this->search();
                 break;
@@ -76,37 +76,28 @@ class CTCustomerReviewMeeting extends CTCNC
      *
      * @throws Exception
      */
-
     function generatePdf()
     {
 
-        $text = $this->getParam('html');
-
+        $text           = $this->getParam('html');
         $agendaTemplate = new Template (
-            $GLOBALS ["cfg"] ["path_templates"],
-            "remove"
+            $GLOBALS ["cfg"] ["path_templates"], "remove"
         );
-
         $agendaTemplate->set_file(
             'page',
             'CustomerReviewMeetingAgendaDocument.inc.html'
         );
-
-
         $agendaTemplate->set_var(
             [
                 'htmlBody' => $text,
                 'URL'      => SITE_URL . '/images/test.png'
             ]
         );
-
         $agendaTemplate->parse(
             'output',
             'page',
             true
         );
-
-
         $html = $agendaTemplate->get_var('output');
         try {
             $this->buCustomerReviewMeeting->generateAgendaPdf(
@@ -118,28 +109,24 @@ class CTCustomerReviewMeeting extends CTCNC
             http_response_code(500);
             return ["status" => $exception->getMessage(), "description" => "Failed to generate files"];
         }
-
         $startDate = (DateTime::createFromFormat(
             "m/Y",
             $this->getParam('startYearMonth')
         ))->modify('first day of this month ');
-        $endDate = (DateTime::createFromFormat(
+        $endDate   = (DateTime::createFromFormat(
             "m/Y",
             $this->getParam('endYearMonth')
         ))->modify('last day of this month');
-
         $this->buCustomerReviewMeeting->generateSalesPdf(
             $this->getParam('customerID'),
             $startDate,
             $endDate,
             $this->getParam('meetingDateYmd')
         );
-
         $this->buCustomerReviewMeeting->generateMeetingNotes(
             $this->getParam('customerID'),
             $this->getParam('meetingDateYmd')
         );
-
         return ["status" => "ok"];
     }
 
@@ -152,95 +139,77 @@ class CTCustomerReviewMeeting extends CTCNC
         $dsSearchForm = new DSForm ($this);
         $this->buCustomerReviewMeeting->initialiseSearchForm($dsSearchForm);
         $this->setTemplateFiles(array('CustomerReviewMeeting' => 'CustomerReviewMeeting.inc'));
-        $graphData = null;
-        $editableText = null;
-        $nonEditableText = null;
-        $diskSpaceReport = null;
-        $serviceDeskContractBody="";
+        $graphData               = null;
+        $editableText            = null;
+        $nonEditableText         = null;
+        $diskSpaceReport         = null;
+        $serviceDeskContractBody = "";
         if (isset($_REQUEST ['searchForm'])) {
 
             if (!$dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
                 $this->setFormErrorOn();
             } else {
-                $startDate = (DateTime::createFromFormat(
+                $startDate                  = (DateTime::createFromFormat(
                     "m/Y",
                     $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormStartYearMonth)
                 ))->modify('first day of this month ');
-                $endDate = (DateTime::createFromFormat(
+                $endDate                    = (DateTime::createFromFormat(
                     "m/Y",
                     $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormEndYearMonth)
                 ))->modify('last day of this month');
-
-                $reportRangeDate = $startDate->format('F Y') . " to " . $endDate->format('F Y');
-
-                $customerId = $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormCustomerID);
-                $buCustomer = new BUCustomer($this);
-                $buActivity = new BUActivity($this);
-
-                $buServiceDeskReport = new BUServiceDeskReport($this);
-
+                $reportRangeDate            = $startDate->format('F Y') . " to " . $endDate->format('F Y');
+                $customerId                 = $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormCustomerID);
+                $buCustomer                 = new BUCustomer($this);
+                $buActivity                 = new BUActivity($this);
+                $buServiceDeskReport        = new BUServiceDeskReport($this);
                 $buCustomerSrAnalysisReport = new BUCustomerSrAnalysisReport($this);
-
-                $buContact = new BUContact($this);
-
+                $buContact                  = new BUContact($this);
                 /** @var DBECustomer|DataSet $dsCustomer */
                 $dsCustomer = null;
-
                 $buCustomer->getCustomerByID(
                     $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormCustomerID),
                     $dsCustomer
                 );
-
-
-                $textTemplate = new Template (
-                    $GLOBALS ["cfg"] ["path_templates"],
-                    "remove"
+                $textTemplate        = new Template (
+                    $GLOBALS ["cfg"] ["path_templates"], "remove"
                 );
-
                 $nonEditableTemplate = new Template (
-                    $GLOBALS ["cfg"] ["path_templates"],
-                    "remove"
+                    $GLOBALS ["cfg"] ["path_templates"], "remove"
                 );
-
                 $nonEditableTemplate->set_file(
                     'page',
                     'CustomerReviewMeetingNonEditable.html'
                 );
-
-
                 $textTemplate->set_file(
                     'page',
                     'CustomerReviewMeetingEditable.html'
                 );
-
                 $textTemplate->setVar('reportDate', $reportRangeDate);
-
-                $becameCustomerDateString = $dsCustomer->getValue(DBECustomer::becameCustomerDate);
+                $becameCustomerDateString    = $dsCustomer->getValue(DBECustomer::becameCustomerDate);
                 $becameCustomerDateFormatted = null;
-                $years = null;
+                $years                       = null;
                 if ($becameCustomerDateString) {
-                    $becameCustomerDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $becameCustomerDateString);
+                    $becameCustomerDate          = DateTime::createFromFormat(
+                        DATE_MYSQL_DATE,
+                        $becameCustomerDateString
+                    );
                     $becameCustomerDateFormatted = $becameCustomerDate->format('d/m/Y');
-                    $today = new DateTime();
-                    $years = $today->diff($becameCustomerDate)->y;
+                    $today                       = new DateTime();
+                    $years                       = $today->diff($becameCustomerDate)->y;
                 }
-
                 $accountManagerDS = new DBEUser($tthis);
                 $accountManagerDS->getRow($dsCustomer->getValue(DBECustomer::accountManagerUserID));
-
-                $primaryContact = $buCustomer->getPrimaryContact($customerId);
-
+                $primaryContact     = $buCustomer->getPrimaryContact($customerId);
                 $primaryContactName = null;
                 if ($primaryContact) {
                     $primaryContactName = $primaryContact->getValue(
                             DBEContact::firstName
                         ) . " " . $primaryContact->getValue(DBEContact::lastName);
                 }
-
                 $lastReviewMeetingDateFormatted = null;
-                $lastReviewMeetingDate = null;
+                $lastReviewMeetingDate          = null;
                 if ($dsCustomer->getValue(DBECustomer::lastReviewMeetingDate)) {
-                    $lastReviewMeetingDate = DateTime::createFromFormat(
+                    $lastReviewMeetingDate          = DateTime::createFromFormat(
                         DATE_MYSQL_DATE,
                         $dsCustomer->getValue(
                             DBECustomer::lastReviewMeetingDate
@@ -248,12 +217,11 @@ class CTCustomerReviewMeeting extends CTCNC
                     );
                     $lastReviewMeetingDateFormatted = $lastReviewMeetingDate->format('d/m/Y');
                 }
-
                 // get customer stats
-                $stats=$this->getCustomerStats($customerId,$nonEditableTemplate,$endDate);
-                $haveServiceDesk=false;
+                $stats           = $this->getCustomerStats($customerId, $nonEditableTemplate, $startDate, $endDate);
+                $haveServiceDesk = false;
                 //$buCustomer->hasServiceDesk($dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormCustomerID));
-                $serviceDeskContractBody=$this->getServiceDeskContractBody($customerId,$haveServiceDesk);
+                $serviceDeskContractBody = $this->getServiceDeskContractBody($customerId, $haveServiceDesk);
                 //echo $stats; exit;
                 $nonEditableTemplate->set_var(
                     array(
@@ -274,38 +242,30 @@ class CTCustomerReviewMeeting extends CTCNC
                         'meetingDate'            => self::dateYMDtoDMY(
                             $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormMeetingDate)
                         ),
-                        'slaP1'                  => $dsCustomer->getValue(DBECustomer::slaP1),
-                        'slaP2'                  => $dsCustomer->getValue(DBECustomer::slaP2),
-                        'slaP3'                  => $dsCustomer->getValue(DBECustomer::slaP3),
-                        'slaP4'                  => $dsCustomer->getValue(DBECustomer::slaP4),
-                        'slaP5'                  => $dsCustomer->getValue(DBECustomer::slaP5),
                         "waterMarkURL"           => SITE_URL . '/images/CNC_watermarkActualSize.png',
                         'reportDate'             => $reportRangeDate,
-                        'hasServiceDesk'        => $haveServiceDesk 
+                        'hasServiceDesk'         => $haveServiceDesk
                     )
                 );
-
                 $historicStartDate = (clone $endDate)->sub(new DateInterval('P3Y'));
                 if (isset($becameCustomerDate) && $becameCustomerDate > $historicStartDate) {
                     $historicStartDate = $becameCustomerDate;
                 }
-                $historicData = $buCustomerSrAnalysisReport->getResultsByPeriodRange(
+                $historicData       = $buCustomerSrAnalysisReport->getResultsByPeriodRange(
                     $customerId,
                     $historicStartDate,
                     $endDate
                 );
-
                 $supportedUsersData = $this->getSupportedUsersData(
                     $customerId,
                     $dsCustomer->getValue(DBECustomer::name)
                 );
-                $buRenewal = new BURenewal($this);
-                $items = $buRenewal->getRenewalsAndExternalItemsByCustomer(
+                $buRenewal          = new BURenewal($this);
+                $items              = $buRenewal->getRenewalsAndExternalItemsByCustomer(
                     $customerId,
                     $this,
                     true
                 );
-
                 usort(
                     $items,
                     function ($a,
@@ -314,22 +274,18 @@ class CTCustomerReviewMeeting extends CTCNC
                         return $a['itemTypeDescription'] <=> $b['itemTypeDescription'];
                     }
                 );
-
                 $nonEditableTemplate->set_block(
                     'page',
                     'itemBlock',
                     'items'
                 );
-
                 $totalSalePrice = 0;
-                $dbeItemType = new DBEItemType($this);
+                $dbeItemType    = new DBEItemType($this);
                 $dbeItemType->getCustomerReviewRows();
-
                 $itemTypes = [];
-
                 while ($dbeItemType->fetchNext()) {
                     $itemTypes[$dbeItemType->getValue(DBEItemType::description)] = [];
-                    $itemsCopy = $items;
+                    $itemsCopy                                                   = $items;
                     foreach ($itemsCopy as $index => $item) {
                         if ($item['itemTypeDescription'] != $dbeItemType->getValue(DBEItemType::description)) {
                             continue;
@@ -339,18 +295,14 @@ class CTCustomerReviewMeeting extends CTCNC
                     }
 
                 }
-
-
                 foreach ($itemTypes as $typeName => $itemTypeContainer) {
 
                     $itemTypeHeader = '<tr><td colspan="5"><h3>' . $typeName . '</h3></td></tr>';
-
                     $nonEditableTemplate->set_var(
                         array(
                             'itemTypeHeader' => $itemTypeHeader
                         )
                     );
-
                     if (!count($itemTypeContainer)) {
                         $nonEditableTemplate->set_var(
                             array(
@@ -375,7 +327,6 @@ class CTCustomerReviewMeeting extends CTCNC
                                 continue;
                             }
                             $coveredItemsString = null;
-
                             if ($removeHeader) {
                                 $nonEditableTemplate->set_var(
                                     array(
@@ -383,7 +334,6 @@ class CTCustomerReviewMeeting extends CTCNC
                                     )
                                 );
                             }
-
                             if (count($item['coveredItems']) > 0) {
                                 foreach ($item['coveredItems'] as $coveredItem) {
                                     $coveredItemsString .= '<br/>' . $coveredItem;
@@ -396,14 +346,12 @@ class CTCustomerReviewMeeting extends CTCNC
                             }
                             $itemClass = 'externalItem';
                             $salePrice = null;
-
                             if (!is_null($item['customerItemID'])) {
-                                $formatter = new NumberFormatter('en_GB', NumberFormatter::CURRENCY);
-                                $itemClass = null;
-                                $salePrice = $formatter->formatCurrency($item['salePrice'], 'GBP');
+                                $formatter      = new NumberFormatter('en_GB', NumberFormatter::CURRENCY);
+                                $itemClass      = null;
+                                $salePrice      = $formatter->formatCurrency($item['salePrice'], 'GBP');
                                 $totalSalePrice += $item['salePrice'];
                             }
-
                             $nonEditableTemplate->set_var(
                                 array(
                                     'notes'              => $item['notes'],
@@ -429,24 +377,19 @@ class CTCustomerReviewMeeting extends CTCNC
                     }
 
                 }
-
-
                 $nonEditableTemplate->set_var(
                     [
                         "supportContactInfo" => $supportedUsersData['data'],
                         "supportUsersCount"  => $supportedUsersData['count']
                     ]
                 );
-
                 $contractsTemplate = new Template (
-                    $GLOBALS ["cfg"] ["path_templates"],
-                    "remove"
+                    $GLOBALS ["cfg"] ["path_templates"], "remove"
                 );
                 $contractsTemplate->set_file(
                     'contracts',
                     'CustomerReviewMeetingContractsSection.html'
                 );
-
                 $contractsTemplate->set_var(
                     "serverContract",
                     $this->getServerCareContractBody(
@@ -462,25 +405,20 @@ class CTCustomerReviewMeeting extends CTCNC
                     'prepayContract',
                     $this->getPrepayContractBody($customerId)
                 );
-
                 $contractsTemplate->set_var(
                     '24HourFlag',
                     $dsCustomer->getValue(DBECustomer::support24HourFlag) == 'N' ? "Do you require 24x7 cover?" : null
                 );
-
                 $contractsTemplate->parse(
                     'output',
                     'contracts',
                     true
                 );
-
                 $contractsBody = $contractsTemplate->get_var('output');
-
                 $textTemplate->set_var(
                     'contracts',
                     $contractsBody
                 );
-
                 $textTemplate->set_var(
                     'p1Incidents',
                     $this->getP1IncidentsBody($customerId)
@@ -492,35 +430,29 @@ class CTCustomerReviewMeeting extends CTCNC
                         $startDate,
                         $endDate
                     )
-                );               
+                );
                 $textTemplate->set_block(
                     'page',
                     'managementReviewBlock',
                     'reviews'
                 );
                 $dsReviews = new DataSet($this);
-
                 $buActivity->getManagementReviewsInPeriod(
                     $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormCustomerID),
                     $lastReviewMeetingDate ? $lastReviewMeetingDate : $startDate,
                     new DateTime(),
                     $dsReviews
                 );
-
                 $itemNo = 0;
-
                 while ($dsReviews->fetchNext()) {
 
                     $itemNo++;
-
-                    $urlServiceRequest =
-                        Controller::buildLink(
-                            'SRActivity.php',
-                            array(
-                                'serviceRequestId' => $dsReviews->getValue(DBEProblem::problemID)
-                            )
-                        );
-
+                    $urlServiceRequest = Controller::buildLink(
+                        'SRActivity.php',
+                        array(
+                            'serviceRequestId' => $dsReviews->getValue(DBEProblem::problemID)
+                        )
+                    );
                     $textTemplate->set_var(
                         array(
                             'reviewHeading'        => 'Review Item ' . $itemNo . '. SR no ' . $dsReviews->getValue(
@@ -530,7 +462,6 @@ class CTCustomerReviewMeeting extends CTCNC
                             'managementReviewText' => $dsReviews->getValue(DBEProblem::managementReviewReason),
                         )
                     );
-
                     $textTemplate->parse(
                         'reviews',
                         'managementReviewBlock',
@@ -538,21 +469,17 @@ class CTCustomerReviewMeeting extends CTCNC
                     );
 
                 } // end while
-
                 $buServiceDeskReport->setStartPeriod($startDate);
                 $buServiceDeskReport->setEndPeriod($endDate);
                 $buServiceDeskReport->customerID = $dsSearchForm->getValue(
                     BUCustomerReviewMeeting::searchFormCustomerID
                 );
-
-                $srCountByUser = $buServiceDeskReport->getIncidentsGroupedByUser();
-
+                $srCountByUser                   = $buServiceDeskReport->getIncidentsGroupedByUser();
                 $nonEditableTemplate->set_block(
                     'page',
                     'userBlock',
                     'users'
                 );
-
                 while ($row = $srCountByUser->fetch_object()) {
                     $inactiveMark = $row->active ? null : ' *';
                     $nonEditableTemplate->set_var(
@@ -562,22 +489,18 @@ class CTCustomerReviewMeeting extends CTCNC
                             'srHiddenCount' => $row->hiddenCount
                         )
                     );
-
                     $nonEditableTemplate->parse(
                         'users',
                         'userBlock',
                         true
                     );
                 }
-
                 $srCountByRootCause = $buServiceDeskReport->getIncidentsGroupedByRootCause();
-
                 $nonEditableTemplate->set_block(
                     'page',
                     'rootCauseBlock',
                     'rootCauses'
                 );
-
                 while ($row = $srCountByRootCause->fetch_object()) {
 
                     $nonEditableTemplate->set_var(
@@ -586,34 +509,26 @@ class CTCustomerReviewMeeting extends CTCNC
                             'srCount'                => $row->count
                         )
                     );
-
                     $nonEditableTemplate->parse(
                         'rootCauses',
                         'rootCauseBlock',
                         true
                     );
                 }
-
                 $buHeader = new BUHeader($this);
                 $dsHeader = new DataSet($this);
                 $buHeader->getHeader($dsHeader);
-
-                $dsn = 'mysql:host=' . LABTECH_DB_HOST . ';dbname=' . LABTECH_DB_NAME;
+                $dsn     = 'mysql:host=' . LABTECH_DB_HOST . ';dbname=' . LABTECH_DB_NAME;
                 $options = [
                     PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
                 ];
                 try {
                     $labtechDB = new PDO(
-                        $dsn,
-                        LABTECH_DB_USERNAME,
-                        LABTECH_DB_PASSWORD,
-                        $options
+                        $dsn, LABTECH_DB_USERNAME, LABTECH_DB_PASSWORD, $options
                     );
                 } catch (\Exception $exception) {
                     throw new \MongoDB\Driver\Exception\ConnectionException('Unable to connect to labtech');
                 }
-
-
                 $statement = $labtechDB->prepare(
                     'SELECT computers.name as agentName,letter as driveLetter,size as driveSize, free as driveFreeSpace, free/size  as freePercent FROM  drives 
 JOIN computers ON computers.`ComputerID` = drives.`ComputerID`
@@ -621,46 +536,40 @@ JOIN clients ON computers.`ClientID` = clients.`ClientID`
 WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND clients.`ExternalID` = ?'
                 );
                 $statement->execute([$customerId]);
-
                 $diskSpaceData = $statement->fetchAll(PDO::FETCH_ASSOC);
-                /** @var $twig Environment */
-                global $twig;
+                /** @var $twig Environment */ global $twig;
                 $twig->addFilter(
                     new TwigFilter(
-                        'freePercentage',
-                        function ($string) use ($dsHeader) {
-                            $pctValue = $string * 100;
-                            return number_format($pctValue) . "%";
-                        }
+                        'freePercentage', function ($string) use ($dsHeader) {
+                        $pctValue = $string * 100;
+                        return number_format($pctValue) . "%";
+                    }
                     )
                 );
                 $twig->addFilter(
                     new TwigFilter(
-                        'MB2GB',
-                        function ($string) {
-                            if (!$string) {
-                                return null;
-                            }
-                            return number_format($string / 1024, 0, '', '') . 'GB';
+                        'MB2GB', function ($string) {
+                        if (!$string) {
+                            return null;
                         }
+                        return number_format($string / 1024, 0, '', '') . 'GB';
+                    }
                     )
                 );
                 $twig->addFunction(
                     new TwigFunction(
-                        'getFreeSpaceClass',
-                        function ($item) use ($dsHeader) {
-                            $threshold = $dsHeader->getValue(DBEHeader::otherDriveFreeSpaceWarningPercentageThreshold);
-                            if ($item['driveLetter'] === 'C') {
-                                $threshold = $dsHeader->getValue(DBEHeader::cDriveFreeSpaceWarningPercentageThreshold);
-                            }
-                            $pctValue = $item['freePercent'] * 100;
-                            $colorStyle = null;
-                            if ($pctValue <= $threshold) {
-                                $colorStyle = 'style="color: red "';
-                            }
-                            return "$colorStyle";
-                        },
-                        ['is_safe' => ['all', "html"], 'pre_escaped' => 'html']
+                        'getFreeSpaceClass', function ($item) use ($dsHeader) {
+                        $threshold = $dsHeader->getValue(DBEHeader::otherDriveFreeSpaceWarningPercentageThreshold);
+                        if ($item['driveLetter'] === 'C') {
+                            $threshold = $dsHeader->getValue(DBEHeader::cDriveFreeSpaceWarningPercentageThreshold);
+                        }
+                        $pctValue   = $item['freePercent'] * 100;
+                        $colorStyle = null;
+                        if ($pctValue <= $threshold) {
+                            $colorStyle = 'style="color: red "';
+                        }
+                        return "$colorStyle";
+                    }, ['is_safe' => ['all', "html"], 'pre_escaped' => 'html']
                     )
                 );
                 $diskSpaceReport = '';
@@ -670,51 +579,52 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
                         ["driveSpaceItems" => $diskSpaceData]
                     );
                 }
-
                 $nonEditableTemplate->setVar('diskSpaceSection', $diskSpaceReport);
-
                 $nonEditableTemplate->parse(
                     'output',
                     'page',
                     true
-                );                
-                $customStartDate=new DateTime($endDate->format('Y-m-d'));
+                );
+                $customStartDate = new DateTime($endDate->format('Y-m-d'));
                 $customStartDate->modify("-3 month");
-                $buCustomer=new BUCustomer($this);
-                $firstTimeFixReport=$buCustomer->getFirstTimeFixSummary($customerId,$startDate,$endDate);
-                $raiseTypeSummary=$buCustomer->getProblemRaisedTypeSummary($customerId,$customStartDate,$endDate);
-                 $nonEditableText = $nonEditableTemplate->get_var('output');
-                $results = $buCustomerSrAnalysisReport->getResultsByPeriodRange(
+                $buCustomer                       = new BUCustomer($this);
+                $firstTimeFixReport               = $buCustomer->getFirstTimeFixSummary(
                     $customerId,
                     $startDate,
                     $endDate
                 );
-                $results["firstTimeFix"]= $firstTimeFixReport["firstTimeFix"];
-                $results["attemptedFirstTimeFix"]= $firstTimeFixReport["attemptedFirstTimeFix"];
-                $results["raiseTypeSummary"]=$raiseTypeSummary;
-                $graphData = $this->generateCharts(
+                $raiseTypeSummary                 = $buCustomer->getProblemRaisedTypeSummary(
+                    $customerId,
+                    $customStartDate,
+                    $endDate
+                );
+                $nonEditableText                  = $nonEditableTemplate->get_var('output');
+                $results                          = $buCustomerSrAnalysisReport->getResultsByPeriodRange(
+                    $customerId,
+                    $startDate,
+                    $endDate
+                );
+                $results["firstTimeFix"]          = $firstTimeFixReport["firstTimeFix"];
+                $results["attemptedFirstTimeFix"] = $firstTimeFixReport["attemptedFirstTimeFix"];
+                $results["raiseTypeSummary"]      = $raiseTypeSummary;
+                $graphData                        = $this->generateCharts(
                     $results,
                     $customerId,
                     $historicData
                 );
-
-                $supportedUsersData = $this->getSupportedUsersLevelsCount(
+                $supportedUsersData               = $this->getSupportedUsersLevelsCount(
                     $buContact,
                     $customerId,
                     $dsCustomer->getValue(DBECustomer::name)
                 );
-
-
                 $textTemplate->set_var(
                     'mainContacts',
                     $supportedUsersData['data']
                 );
-
                 $textTemplate->set_var(
                     'customerReviewMeetingText',
                     $dsHeader->getValue(DBEHeader::customerReviewMeetingText)
                 );
-
                 $textTemplate->parse(
                     'output',
                     'page',
@@ -742,11 +652,10 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
                     $this->getParam('meetingDateYmd')
                 );
                 $nonEditableText = $this->getParam('nonEditableText');
-                $editableText = $this->getParam('editableText');
+                $editableText    = $this->getParam('editableText');
 
             }
         }
-
         $urlCustomerPopup = Controller::buildLink(
             CTCNC_PAGE_CUSTOMER,
             array(
@@ -754,20 +663,16 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
                 'htmlFmt' => CT_HTML_FMT_POPUP
             )
         );
-
-        $urlSubmit = Controller::buildLink(
+        $urlSubmit        = Controller::buildLink(
             $_SERVER ['PHP_SELF'],
             array('action' => CTCNC_ACT_SEARCH)
         );
-
-        $urlGeneratePdf =
-            Controller::buildLink(
-                $_SERVER ['PHP_SELF'],
-                array(
-                    'action' => 'generatePdf'
-                )
-            );
-
+        $urlGeneratePdf   = Controller::buildLink(
+            $_SERVER ['PHP_SELF'],
+            array(
+                'action' => 'generatePdf'
+            )
+        );
         $this->setPageTitle('Customer Review Meeting Agenda');
         $customerString = null;
         if ($dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormCustomerID) != 0) {
@@ -778,12 +683,10 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             );
             $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
-
         echo "<script> let graphData = " . json_encode(
                 $graphData,
                 JSON_NUMERIC_CHECK
             ) . "</script>";
-
         $this->template->set_var(
             array(
                 'customerID'            => $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormCustomerID),
@@ -801,10 +704,8 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
                 'diskSpaceReport'       => $diskSpaceReport,
                 'urlSubmit'             => $urlSubmit,
                 'urlGeneratePdf'        => $urlGeneratePdf,
-                
             )
         );
-
         $this->template->parse(
             'CONTENTS',
             'CustomerReviewMeeting',
@@ -836,7 +737,6 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             case 12:
                 $frequency = 'Annually';
                 break;
-
             default:
                 $frequency = 'N/A';
         }
@@ -850,7 +750,6 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
         /** @var DBEContact $dsSupportContact */
         $dsSupportContact = new DBEContact($this);
         $dsSupportContact->getRowsByCustomerID($customerId);
-
         $supportContacts = [
             "main"             => [],
             "supervisor"       => [],
@@ -858,22 +757,20 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             "delegate"         => [],
             "no support level" => []
         ];
-
-        $duplicates = [];
-        $userMap = [];
-        $count = 0;
+        $duplicates      = [];
+        $userMap         = [];
+        $count           = 0;
         while ($dsSupportContact->fetchNext()) {
 
             $firstName = $dsSupportContact->getValue(DBEContact::firstName);
-            $lastName = $dsSupportContact->getValue(DBEContact::lastName);
-            $userId = $dsSupportContact->getValue(DBEContact::contactID);
-            $key = strtolower($firstName . $lastName);
+            $lastName  = $dsSupportContact->getValue(DBEContact::lastName);
+            $userId    = $dsSupportContact->getValue(DBEContact::contactID);
+            $key       = strtolower($firstName . $lastName);
             if (isset($userMap[$key])) {
 
                 if (!isset($duplicates[$userMap[$key]['id']])) {
                     $duplicates[$userMap[$key]['id']] = $userMap[$key];
                 }
-
                 $duplicates[$userId] = [
                     "firstName"  => $firstName,
                     "lastName"   => $lastName,
@@ -888,7 +785,6 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
                     "customerId" => $customerId
                 ];
             }
-
             if ($dsSupportContact->getValue(DBEContact::supportLevel)) {
                 $supportContacts[$dsSupportContact->getValue(DBEContact::supportLevel)][] = [
                     "firstName" => $firstName,
@@ -900,36 +796,29 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
                     "lastName"  => $lastName
                 ];
             }
-
             $count++;
         }
-
         if (count($duplicates)) {
 
-            $buMail = new BUMail($this);
+            $buMail      = new BUMail($this);
             $senderEmail = CONFIG_SUPPORT_EMAIL;
-            $toEmail = 'sales@' . CONFIG_PUBLIC_DOMAIN;
-
-            $template = new Template(
-                $GLOBALS ["cfg"]["path_templates"],
-                "remove"
+            $toEmail     = 'sales@' . CONFIG_PUBLIC_DOMAIN;
+            $template    = new Template(
+                $GLOBALS ["cfg"]["path_templates"], "remove"
             );
             $template->set_file(
                 'page',
                 'CustomerReviewMeetingContactDuplicates.html'
             );
-
             $template->set_var(
                 'customerName',
                 $customerName
             );
-
             $template->set_block(
                 'page',
                 'contactBlock',
                 'contacts'
             );
-
             foreach ($duplicates as $key => $row) {
 
                 $template->set_var(
@@ -937,47 +826,37 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
                         'contactID'        => $row['id'],
                         'contactFirstName' => $row['firstName'],
                         'contactLastName'  => $row['lastName'],
-
                     )
                 );
-
                 $template->parse(
                     'contacts',
                     'contactBlock',
                     true
                 );
             }
-
             $template->parse(
                 'output',
                 'page',
                 true
             );
-
-            $body = $template->get_var('output');
-
+            $body    = $template->get_var('output');
             $subject = 'Possible duplicated customer contacts';
-
-            $hdrs = array(
+            $hdrs    = array(
                 'From'         => $senderEmail,
                 'To'           => $toEmail,
                 'Subject'      => $subject,
                 'Date'         => date("r"),
                 'Content-Type' => 'text/html; charset=UTF-8'
             );
-
             $buMail->mime->setHTMLBody($body);
-
             $mime_params = array(
                 'text_encoding' => '7bit',
                 'text_charset'  => 'UTF-8',
                 'html_charset'  => 'UTF-8',
                 'head_charset'  => 'UTF-8'
             );
-            $body = $buMail->mime->get($mime_params);
-
-            $hdrs = $buMail->mime->headers($hdrs);
-
+            $body        = $buMail->mime->get($mime_params);
+            $hdrs        = $buMail->mime->headers($hdrs);
             $buMail->putInQueue(
                 $senderEmail,
                 $toEmail,
@@ -986,14 +865,12 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             );
 
         }
-
         $sectionTemplate = '<div style="clear: both;margin-bottom: 22px"></div><div style="font-weight: bold; font-size: small;text-align: left; ">{type} Contacts ({count})</div>
     <br>
     <ul class="ul3">
         {contactData}
     </ul>';
-
-        $toReturn = "";
+        $toReturn        = "";
         foreach ($supportContacts as $type => $data) {
 
             $contactsInfo = "";
@@ -1004,9 +881,8 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             $currentSection = str_replace('{type}', ucwords($type), $currentSection);
             $currentSection = str_replace('{count}', count($supportContacts[$type]), $currentSection);
             $currentSection = str_replace('{contactData}', $contactsInfo, $currentSection);
-            $toReturn .= $currentSection;
+            $toReturn       .= $currentSection;
         }
-
         return [
             "data"  => $toReturn,
             "count" => $count
@@ -1024,18 +900,14 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             $customerId,
             $datasetContracts
         );
-
         $serverCareContract = null;
-
         if (!$datasetContracts->rowCount()) {
             return $serverCareContractBody = "Server Care: None";
         }
         $datasetContracts->fetchNext();
         $serverCareContractsTemplate = new Template (
-            $GLOBALS ["cfg"] ["path_templates"],
-            "remove"
+            $GLOBALS ["cfg"] ["path_templates"], "remove"
         );
-
         $serverCareContractsTemplate->set_file(
             'serverCareContracts',
             'CustomerReviewMeetingServerCare.html'
@@ -1059,7 +931,6 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
                 'pcs'        => $dbeCustomer->getValue(DBECustomer::noOfPCs)
             ]
         );
-
         $serverCareContractsTemplate->set_block(
             'serverCareContracts',
             'contractItemsBlock',
@@ -1067,18 +938,15 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
         );
         /** @var DataSet $dsServer */
         $dsServer = null;
-
         $BUCustomerItem->getServersByCustomerID(
             $customerId,
             $dsServer
         );
-
         while ($dsServer->fetchNext()) {
             $purchaseDate = null;
             if ($dsServer->getValue(DBEJCustomerItem::sOrderDate)) {
                 $purchaseDate = self::dateYMDtoDMY($dsServer->getValue(DBEJCustomerItem::sOrderDate));
             }
-
             $serverCareContractsTemplate->set_var(
                 array(
                     'itemDescription' => $dsServer->getValue(DBEJCustomerItem::itemDescription),
@@ -1087,7 +955,6 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
                     'purchaseDate'    => $purchaseDate,
                 )
             );
-
             $serverCareContractsTemplate->parse(
                 'items',
                 'contractItemsBlock',
@@ -1095,50 +962,45 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             );
 
         } // end while
-       
         //-------------start servers not supported
         $serverCareContractsTemplate->set_block(
             'serverCareContracts',
             'serversNotSupportedItemsBlock',
             'items2'
         );
-        $buCustomer=new BUCustomer($this);
-        $servers=$buCustomer->getCustomerUnsupportedServers($customerId);
-        if(!count($servers))
-        {
+        $buCustomer = new BUCustomer($this);
+        $servers    = $buCustomer->getCustomerUnsupportedServers($customerId);
+        if (!count($servers)) {
             $serverCareContractsTemplate->set_var(
                 [
-                    'hasServersNotSupport'      => "none"
+                    'hasServersNotSupport' => "none"
                 ]
             );
         }
-        for($i=0;$i<count($servers); $i++){             
+        for ($i = 0; $i < count($servers); $i++) {
             $serverCareContractsTemplate->set_var(
-                array(                    
-                    'serverName'      => $servers[$i]["serverName"],                    
+                array(
+                    'serverName' => $servers[$i]["serverName"],
                 )
             );
             $serverCareContractsTemplate->parse(
                 'items2',
                 'serversNotSupportedItemsBlock',
                 true
-            );            
+            );
         }
-         //------------end
-         //----parse template
+        //------------end
+        //----parse template
         $serverCareContractsTemplate->parse(
             'output',
             'serverCareContracts',
             true
         );
-       
-        
-       
         return $serverCareContractsTemplate->get_var('output');
 
     }
 
-    private function getServiceDeskContractBody($customerId,&$haveServiceDesk )
+    private function getServiceDeskContractBody($customerId, &$haveServiceDesk)
     {
         $BUCustomerItem = new BUCustomerItem($this);
         /** @var DataSet $datasetContracts */
@@ -1147,23 +1009,20 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             $customerId,
             $datasetContracts
         );
-
         if (!$datasetContracts->rowCount()) {
             return $this->getPrepayContractBody($customerId);
         }
         $datasetContracts->fetchNext();
-        $users = $datasetContracts->getValue(DBEJCustomerItem::users);
+        $users       = $datasetContracts->getValue(DBEJCustomerItem::users);
         $description = $datasetContracts->getValue(DBEJCustomerItem::itemDescription);
-        if(strpos($description,"ServiceDesk") >0)
-            $haveServiceDesk=true;
-        else
-            $haveServiceDesk=false;
+        if (strpos($description, "ServiceDesk") > 0) $haveServiceDesk = true; else
+            $haveServiceDesk = false;
         $invoicePeriod = $datasetContracts->getValue(
                 DBEJCustomerItem::invoiceFromDate
             ) . " - " . $datasetContracts->getValue(
                 DBEJCustomerItem::invoiceToDate
             );
-            //<p>Next Invoice: $invoicePeriod</p>
+        //<p>Next Invoice: $invoicePeriod</p>
         return "<p>User Support Contract: $description for $users users</p>";
     }
 
@@ -1186,43 +1045,32 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
     private function getP1IncidentsBody($customerId)
     {
         $dbeProblem = new DBEJProblem($this);
-
         $dbeProblem->getP1byCustomerIdLast30Days($customerId);
-
-
         if (!$dbeProblem->rowCount()) {
             return "None";
         }
-
         $p1IncidentsTemplate = new Template (
-            $GLOBALS ["cfg"] ["path_templates"],
-            "remove"
+            $GLOBALS ["cfg"] ["path_templates"], "remove"
         );
-
         $p1IncidentsTemplate->set_file(
             'p1Incidents',
             'CustomerReviewMeetingP1Incidents.html'
         );
-
         $p1IncidentsTemplate->set_block(
             'p1Incidents',
             'incidentsBlock',
             'items'
         );
-
         while ($dbeProblem->fetchNext()) {
 
-            $dateRaised = $dbeProblem->getValue(DBEJProblem::dateRaised);
-
-            $dateTime = DateTime::createFromFormat(
+            $dateRaised     = $dbeProblem->getValue(DBEJProblem::dateRaised);
+            $dateTime       = DateTime::createFromFormat(
                 'Y-m-d H:i:s',
                 $dateRaised
             );
-
-            $dateRaised = $dateTime->format('d/m/Y');
-            $slaResponse = $dbeProblem->getValue(DBEJProblem::slaResponseHours);
+            $dateRaised     = $dateTime->format('d/m/Y');
+            $slaResponse    = $dbeProblem->getValue(DBEJProblem::slaResponseHours);
             $respondedHours = $dbeProblem->getValue(DBEJProblem::respondedHours);
-
             $p1IncidentsTemplate->set_var(
                 [
                     "id"      => $dbeProblem->getValue(DBEJProblem::problemID) . "<br>" . $dateRaised,
@@ -1231,20 +1079,17 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
                     "SLA"     => $respondedHours > $slaResponse ? "Not Achieved" : "Achieved",
                 ]
             );
-
             $p1IncidentsTemplate->parse(
                 'items',
                 'incidentsBlock',
                 true
             );
         }
-
         $p1IncidentsTemplate->parse(
             'output',
             'p1Incidents',
             true
         );
-
         return $p1IncidentsTemplate->get_var('output');
     }
 
@@ -1259,35 +1104,28 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             $startDate,
             $endDate
         );
-
         $leaverSR = new DBEJProblem($this);
         $leaverSR->getLeaversSRByCustomerIDInDateRange(
             $customerId,
             $startDate,
             $endDate
         );
-
         $starterPCInstallation = new DBEJProblem($this);
         $starterPCInstallation->getStartersSRWithPCInstallationRootCause(
             $customerId,
             $startDate,
             $endDate
         );
-
         if (!$starterSR->rowCount() && !$leaverSR->rowCount() && !$starterPCInstallation->rowCount()) {
             return "None";
         }
-
         $startersAndLeaversTemplate = new Template (
-            $GLOBALS ["cfg"] ["path_templates"],
-            "remove"
+            $GLOBALS ["cfg"] ["path_templates"], "remove"
         );
-
         $startersAndLeaversTemplate->set_file(
             'startersAndLeavers',
             'CustomerReviewMeetingStartersAndLeavers.html'
         );
-
         $startersAndLeaversTemplate->set_block(
             'startersAndLeavers',
             'startersBlock',
@@ -1317,14 +1155,12 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
                     0
                 )
             );
-
             $startersAndLeaversTemplate->parse(
                 'items',
                 'startersBlock',
                 true
             );
         }
-
         $startersAndLeaversTemplate->set_block(
             'startersAndLeavers',
             'leaversBlock',
@@ -1354,15 +1190,14 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
                     0
                 )
             );
-
             $startersAndLeaversTemplate->parse(
                 'leaversItems',
                 'leaversBlock',
                 true
             );
         }
-         //------------------- Starter PC Installation
-         if (!$starterPCInstallation->rowCount()) {
+        //------------------- Starter PC Installation
+        if (!$starterPCInstallation->rowCount()) {
             $startersAndLeaversTemplate->parse(
                 'PCInstallationItems',
                 'starterPCInstallationBlock',
@@ -1385,21 +1220,17 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
                     0
                 )
             );
-
             $startersAndLeaversTemplate->parse(
                 'PCInstallationItems',
                 'starterPCInstallationBlock',
                 true
             );
         }
-
-
         $startersAndLeaversTemplate->parse(
             'output',
             'startersAndLeavers',
             true
         );
-
         return $startersAndLeaversTemplate->get_var('output');
     }
 
@@ -1419,55 +1250,46 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
     )
     {
 
-        $serverCareIncidents = [
+        $serverCareIncidents  = [
             "title"   => "ServerCare Incidents",
             "columns" => ["Dates", "ServerSR", "AvgResponse", "Changes"],
             "data"    => []
         ];
-
-        $serviceDesk = [
+        $serviceDesk          = [
             "title"   => "ServiceDesk/Pre-Pay Incidents",
             "columns" => ["Dates", "UserSR", "AvgResponse", "Changes",],
             "data"    => []
         ];
-
-        $otherContracts = [
+        $otherContracts       = [
             "title"   => "Other Contract Incidents",
             "columns" => ["Dates", "OtherSR", "AvgResponse", "Changes",],
             "data"    => []
         ];
-
-        $totalSR = [
+        $totalSR              = [
             "title"   => "Recent Service Requests",
             "columns" => ["Dates", "P1-3", "P4",],
             "data"    => []
         ];
-
-        $historicTotalSR = [
+        $historicTotalSR      = [
             "title"   => "Historic Service Requests",
             "columns" => ["Dates", "P1-3", "P4"],
             "data"    => []
         ];
-        
         $firstTimeFixRequests = [
             "title"   => "Qualifying First Time Fix Requests",
             "columns" => ["Attempted", "Achieved"],
-            "data"    => [["Attempted",$data["attemptedFirstTimeFix"]],["Achieved",$data["firstTimeFix"]]]
+            "data"    => [["Attempted", $data["attemptedFirstTimeFix"]], ["Achieved", $data["firstTimeFix"]]]
         ];
-
-        $sourceOfRequests = [
+        $sourceOfRequests     = [
             "title"   => "Source of Requests (%)",
-            "columns" => ["Title", "Value" ],
+            "columns" => ["Title", "Value"],
             "data"    => []
         ];
-        foreach($data["raiseTypeSummary"] as $item)
-        {
-            $sourceOfRequests["data"] []=[$item["description"],$item["total"]];
+        foreach ($data["raiseTypeSummary"] as $item) {
+            $sourceOfRequests["data"] [] = [$item["description"], $item["total"]];
         }
-        //$data["raiseTypeSummary"]
-        //echo json_encode($sourceOfRequests); exit;
         foreach ($historicData as $datum) {
-            $row = [
+            $row                       = [
                 substr(
                     $datum['monthName'],
                     0,
@@ -1476,74 +1298,63 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
                 $datum['otherCount1And3'] + $datum['serviceDeskCount1And3'] + $datum['serverCareCount1And3'] + $datum['prepayCount1And3'],
                 $datum['otherCount4'] + $datum['serviceDeskCount4'] + $datum['serverCareCount4'] + $datum['prepayCount4'],
             ];
-
             $historicTotalSR['data'][] = $row;
         }
-
-
         foreach ($data as $datum) {
-
-            if(isset($datum['monthName']))
-            {
-            $row = [
-                substr(
-                    $datum['monthName'],
-                    0,
-                    3
-                ) . "-" . $datum['year'],
-                $datum['serverCareCount1And3'],
-                number_format(
-                    $datum['serverCareHoursResponded'],
-                    1
-                ),
-                $datum['serverCareCount4']
-            ];
-
-            $serverCareIncidents['data'][] = $row;
-
-            $row = [
-                substr(
-                    $datum['monthName'],
-                    0,
-                    3
-                ) . "-" . $datum['year'],
-                $datum['serviceDeskCount1And3'] + $datum['prepayCount1And3'],
-                number_format(
-                    $datum['serviceDeskHoursResponded'] + $datum['prepayHoursResponded'],
-                    1
-                ),
-                $datum['serviceDeskCount4'] + $datum['prepayCount4'],
-            ];
-
-            $serviceDesk['data'][] = $row;
-
-            $row = [
-                substr(
-                    $datum['monthName'],
-                    0,
-                    3
-                ) . "-" . $datum['year'],
-                $datum['otherCount1And3'],
-                number_format(
-                    $datum['otherHoursResponded'],
-                    1
-                ),
-                $datum['otherCount4'],
-            ];
-
-            $otherContracts['data'][] = $row;
-
-            $row = [
-                substr(
-                    $datum['monthName'],
-                    0,
-                    3
-                ) . "-" . $datum['year'],
-                $datum['otherCount1And3'] + $datum['serviceDeskCount1And3'] + $datum['serverCareCount1And3'] + $datum['prepayCount1And3'],
-                $datum['otherCount4'] + $datum['serviceDeskCount4'] + $datum['serverCareCount4'] + $datum['prepayCount4'],
-            ];
-        }
-            $totalSR['data'][] = $row;
+            if (isset($datum['monthName'])) {
+                $row                           = [
+                    substr(
+                        $datum['monthName'],
+                        0,
+                        3
+                    ) . "-" . $datum['year'],
+                    $datum['serverCareCount1And3'],
+                    number_format(
+                        $datum['serverCareHoursResponded'],
+                        1
+                    ),
+                    $datum['serverCareCount4']
+                ];
+                $serverCareIncidents['data'][] = $row;
+                $row                           = [
+                    substr(
+                        $datum['monthName'],
+                        0,
+                        3
+                    ) . "-" . $datum['year'],
+                    $datum['serviceDeskCount1And3'] + $datum['prepayCount1And3'],
+                    number_format(
+                        $datum['serviceDeskHoursResponded'] + $datum['prepayHoursResponded'],
+                        1
+                    ),
+                    $datum['serviceDeskCount4'] + $datum['prepayCount4'],
+                ];
+                $serviceDesk['data'][]         = $row;
+                $row                           = [
+                    substr(
+                        $datum['monthName'],
+                        0,
+                        3
+                    ) . "-" . $datum['year'],
+                    $datum['otherCount1And3'],
+                    number_format(
+                        $datum['otherHoursResponded'],
+                        1
+                    ),
+                    $datum['otherCount4'],
+                ];
+                $otherContracts['data'][]      = $row;
+                $row                           = [
+                    substr(
+                        $datum['monthName'],
+                        0,
+                        3
+                    ) . "-" . $datum['year'],
+                    $datum['otherCount1And3'] + $datum['serviceDeskCount1And3'] + $datum['serverCareCount1And3'] + $datum['prepayCount1And3'],
+                    $datum['otherCount4'] + $datum['serviceDeskCount4'] + $datum['serverCareCount4'] + $datum['prepayCount4'],
+                ];
+                $totalSR['data'][]             = $row;
+            }
         }
         $BUCustomerItem = new BUCustomerItem($this);
         /** @var DataSet $datasetContracts */
@@ -1552,16 +1363,12 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             $customerId,
             $datasetContracts
         );
-
         return [
-            // "serverCareIncidents" => $serverCareIncidents,
-            // "serviceDesk"         => $serviceDesk,
-            // "otherContracts"      => $otherContracts,
-            "totalSR"             => $totalSR,
-            'historicTotalSR'     => $historicTotalSR,
-            "renderServerCare"    => !!$datasetContracts->rowCount(),
-            "firstTimeFixRequests" =>  $firstTimeFixRequests,
-            "sourceOfRequests"    =>$sourceOfRequests
+            "totalSR"              => $totalSR,
+            'historicTotalSR'      => $historicTotalSR,
+            "renderServerCare"     => !!$datasetContracts->rowCount(),
+            "firstTimeFixRequests" => $firstTimeFixRequests,
+            "sourceOfRequests"     => $sourceOfRequests
         ];
     }
 
@@ -1576,7 +1383,6 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             $dsSupportContact,
             $customerId
         );
-
         $supportContactsCounts = [
             "main"       => 0,
             "supervisor" => 0,
@@ -1586,22 +1392,19 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             "none"       => 0,
             "total"      => 0
         ];
-
-        $duplicates = [];
-        $userMap = [];
-
+        $duplicates            = [];
+        $userMap               = [];
         while ($dsSupportContact->fetchNext()) {
 
             $firstName = $dsSupportContact->getValue('firstName');
-            $lastName = $dsSupportContact->getValue('lastName');
-            $userId = $dsSupportContact->getValue('contactID');
-            $key = strtolower($firstName . $lastName);
+            $lastName  = $dsSupportContact->getValue('lastName');
+            $userId    = $dsSupportContact->getValue('contactID');
+            $key       = strtolower($firstName . $lastName);
             if (isset($userMap[$key])) {
 
                 if (!isset($duplicates[$userMap[$key]['id']])) {
                     $duplicates[$userMap[$key]['id']] = $userMap[$key];
                 }
-
                 $duplicates[$userId] = [
                     "firstName"  => $firstName,
                     "lastName"   => $lastName,
@@ -1616,11 +1419,9 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
                     "customerId" => $customerId
                 ];
             }
-
             if ($dsSupportContact->getValue(DBEContact::supportLevel) == 'none') {
                 var_dump($dsSupportContact->getValue(DBEContact::contactID));
             }
-
             if (!$dsSupportContact->getValue(DBEContact::supportLevel)) {
                 $supportContactsCounts['none']++;
             } else {
@@ -1628,7 +1429,6 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             }
             $supportContactsCounts['total']++;
         }
-
         $supportContactInfo = "<table><thead><tr><th>Type</th><th>Qty</th></tr></thead><tbody>";
         $supportContactInfo .= "<tr><td>Main</td><td>$supportContactsCounts[main]</td></tr>";
         $supportContactInfo .= "<tr><td>Supervisor</td><td>$supportContactsCounts[supervisor]</td></tr>";
@@ -1638,86 +1438,60 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
         $supportContactInfo .= "<tr><td>No Level</td><td>$supportContactsCounts[none]</td></tr>";
         $supportContactInfo .= "<tr><td>Total</td><td>$supportContactsCounts[total]</td></tr>";
         $supportContactInfo .= "</tbody></table>";
-
         return [
             "data"  => $supportContactInfo,
             "count" => $supportContactsCounts['total']
         ];
     }
-    private function getCustomerStats($customerID,$template, $endDate){
-        $startDate=new DateTime($endDate->format('Y-m-d'));
-        $start=  $startDate->modify("-3 month")->format('Y-m-d');
-        $end= $endDate->format('Y-m-d');
-       // echo $start.' '.$end; exit;       
-        $ch = curl_init();
-        $dbeCustomer=new DBECustomer($this);
-        $dbeCustomer->getRow($customerID);
-        $penaltiesAgreed =$dbeCustomer->getValue(DBECustomer::slaP1PenaltiesAgreed)||
-        $dbeCustomer->getValue(DBECustomer::slaP2PenaltiesAgreed)||
-        $dbeCustomer->getValue(DBECustomer::slaP3PenaltiesAgreed);
-        // set url
-        curl_setopt($ch, CURLOPT_URL, "https://".$_SERVER['HTTP_HOST']."/internal-api/customerStats/$customerID?breakDown=true&startDate=$start&endDate=$end");
 
-        //return the transfer as a string
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    private function getCustomerStats($customerID, $template, $startDate, $endDate)
+    {
+
+        $start       = $startDate->format('Y-m-d');
+        $end         = $endDate->format('Y-m-d');
+        $dbeCustomer = new DBECustomer($this);
+        $dbeCustomer->getRow($customerID);
+        $penaltiesAgreed = $dbeCustomer->getValue(DBECustomer::slaP1PenaltiesAgreed) || $dbeCustomer->getValue(
+                DBECustomer::slaP2PenaltiesAgreed
+            ) || $dbeCustomer->getValue(DBECustomer::slaP3PenaltiesAgreed);
+        $output          = $this->fetchJSONStats($customerID, $start, $end);
         $template->set_block(
             'page',
             'customerSLABlock',
             'customerSLA'
         );
-        
-        
         // $output contains the output string
-        $output = curl_exec($ch);
-        $items=json_decode($output, true);
-        $keys=[
-            "Total SRs Raised"=>["key"=>"raised","sum"=>true,"percent"=>false],
-            "Response SLA"=>["key"=>"sla","sum"=>true,"percent"=>false],
-            "Average Response Time"=>["key"=>"responseTime","sum"=>false,"percent"=>false],
-            "% of Response SLAs Met"=>["key"=>"slaMet","sum"=>false,"percent"=>true],
-            ($penaltiesAgreed?"Fix SLA":"Fix OLA")=>["key"=>"fixSLA","sum"=>true,"percent"=>false],
-            "Average Fix Time"=>["key"=>"avgTimeAwaitingCNC","sum"=>false,"percent"=>false],
-            //"Average Time from Initial to Fixed"=>["key"=>"avgTimeFromRaiseToFixHours","sum"=>false,"percent"=>false],
-
-        ];
-        foreach($keys as $key=>$value)
-        { 
-            $column=$value["key"];
-            $sum=(($items[0][$column]??0)+
-            ($items[1][$column]??0)+
-            ($items[2][$column]??0)+
-            ($items[3][$column]??0));
-            $allValue=$sum;
-            if(!$value["sum"])
-                $allValue=$sum>0?$sum/count($items):0;
-            ;            
-            $percent=1;
-            if($value["percent"])
-                $percent=100;
-            $newLine="none";
-            if($value["key"]=="raised"||$value["key"]=="slaMet")
-                $newLine="";
-            $template->set_var(
-                array(
-                    'description'       => $key,
-                    'p1Value'           =>round(($items[0][$column]??0)*$percent,2),
-                    'p2Value'           =>round(($items[1][$column]??0)*$percent,2),
-                    'p3Value'           =>round(($items[2][$column]??0)*$percent,2),
-                    'p4Value'           =>round(($items[3][$column]??0)*$percent,2),
-                    'allValue'          =>round($allValue*$percent,2),
-                    'newLine'           =>$newLine
-                 )
-            );
+        $statsFromJSON = new StatsFromJSON();
+        $data          = $statsFromJSON($output, $penaltiesAgreed);
+        foreach ($data as $datum) {
+            $template->set_var($datum->toDisplayArray());
             $template->parse(
                 'customerSLA',
                 'customerSLABlock',
                 true
             );
         }
-       
-        
-        return  $output;
-        //return json_decode($output, true);
+        return $output;
     }
-    
+
+    /**
+     * @param $customerID
+     * @param $start
+     * @param $end
+     * @return bool|string
+     */
+    private function fetchJSONStats($customerID, $start, $end)
+    {
+        $ch = curl_init();
+// set url
+        curl_setopt(
+            $ch,
+            CURLOPT_URL,
+            "https://" . $_SERVER['HTTP_HOST'] . "/internal-api/customerStats/$customerID?breakDown=true&startDate=$start&endDate=$end"
+        );
+        //return the transfer as a string
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        return curl_exec($ch);
+    }
+
 }
