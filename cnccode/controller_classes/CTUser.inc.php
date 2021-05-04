@@ -587,6 +587,9 @@ class CTUser extends CTCNC
                 'massDeletionOnUnstartedServiceRequestPermissionChecked' => $dsUser->getValue(
                     DBEUser::massDeletionOnUnstartedServiceRequestPermission
                 ) ? "checked" : '',
+                'forceClosingPermissionChecked'                          => $dsUser->getValue(
+                    DBEUser::forceClosingPermission
+                ) ? 'checked' : '',
                 'createRenewalSalesOrdersFlagChecked'                    => Controller::htmlChecked(
                     $dsUser->getValue(DBEJUser::createRenewalSalesOrdersFlag)
                 ),
@@ -1005,6 +1008,9 @@ class CTUser extends CTCNC
                     ) == 'Y',
                 'massDeletionOnUnstartedServiceRequestPermission' => $dbeJUser->getValue(
                     DBEUser::massDeletionOnUnstartedServiceRequestPermission
+                ),
+                'forceClosingPermission'                          => $dbeJUser->getValue(
+                    DBEUser::forceClosingPermission
                 )
             ]
         );
