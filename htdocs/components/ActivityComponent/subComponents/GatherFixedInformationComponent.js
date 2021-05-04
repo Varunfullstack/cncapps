@@ -109,7 +109,6 @@ class GatherFixedInformationComponent extends MainComponent {
     getDetails = () => {
         const {el} = this;
         const {activity, data, initialActivity} = this.state;
-        console.log(data.assetName,data.assetTitle, data.emptyAssetReason);
         return el(
             "div",
             {className: "contianer-round flex-row"},
@@ -139,7 +138,17 @@ class GatherFixedInformationComponent extends MainComponent {
                         el("td", {className: "display-label"}, "Root Cause"),
                         el("td", null, this.getRootCause())
                     ),
-
+                    <tr>
+                        <td className="display-label">
+                            Asset
+                        </td>
+                        <td>
+                            <AssetListSelectorComponent assetName={data.assetName} assetTitle={data.assetTitle}
+                                                        emptyAssetReason={data.emptyAssetReason}
+                                                        customerId={activity.customerID}
+                                                        onChange={this.handleAssetSelect}/>
+                        </td>
+                    </tr>,
                     el(
                         "tr",
                         null,
@@ -162,17 +171,7 @@ class GatherFixedInformationComponent extends MainComponent {
                                                   disableClipboard={activity.problemHideFromCustomerFlag == 'N'}
                             />
                         )
-                    ),
-                    <tr>
-                        <td className="display-label">
-                            Asset
-                        </td>
-                        <td>
-                            <AssetListSelectorComponent assetName={data.assetName} assetTitle={data.assetTitle}
-                                                        emptyAssetReason={data.emptyAssetReason}
-                                                        customerId={activity.customerID} onChange={this.handleAssetSelect}/>
-                        </td>
-                    </tr>
+                    )
                 )
             )
         );
@@ -193,6 +192,7 @@ class GatherFixedInformationComponent extends MainComponent {
         }
         this.setState({data});
     };
+
     async updateContract(contractCustomerItemID) {
         if (contractCustomerItemID) {
             const {contracts, activity} = this.state;
@@ -409,7 +409,8 @@ class GatherFixedInformationComponent extends MainComponent {
             this.alert(`The resolution summary must have at least ${RESOLUTION_SUMMARY_MIN_CHARS} characters`);
             return;
         }
-        if(!activity.emptyAssetReason && !activity.assetName){
+
+        if (!data.emptyAssetReason && !data.assetName) {
             this.alert(`Assset, or empty reason is required`);
             return;
         }
