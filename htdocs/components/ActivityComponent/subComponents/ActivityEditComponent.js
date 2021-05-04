@@ -131,6 +131,7 @@ class ActivityEditComponent extends MainComponent {
         >
         </CallbackModal>
     }
+
     componentDidMount() {
         this.loadCallActivity(params.get("callActivityID"));
 
@@ -1853,7 +1854,7 @@ class ActivityEditComponent extends MainComponent {
             return '';
         }
         return <AssetListSelectorComponent
-            noAssetReason={data.emptyAssetReason}
+            emptyAssetReason={data.emptyAssetReason}
             assetName={data.assetName}
             assetTitle={data.assetTitle}
             customerId={data.customerId}
