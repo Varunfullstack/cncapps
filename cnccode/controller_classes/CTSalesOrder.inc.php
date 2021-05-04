@@ -3540,7 +3540,6 @@ class CTSalesOrder extends CTCNC
                 $data['emailSubject'],
                 $this->dsSelectedOrderLine
             );
-            EXIT;
             echo json_encode(["status" => "ok"]);
         } catch (Exception $exception) {
             throw new JsonHttpException('500', $exception->getMessage());
