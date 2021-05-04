@@ -311,8 +311,8 @@ export async function similarity(s1, s2, useDefaultDictionary = true) {
         for (let j = 0; j < s2Words.length; j++) {
             const sim = similarityWord(s1Words[i], s2Words[j]);
             if (sim > max) max = sim;
-    }
-    totalSim += parseFloat(max);
+        }
+        totalSim += parseFloat(max);
     }
     return totalSim / s1Words.length;
 }

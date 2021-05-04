@@ -1228,7 +1228,10 @@ class CTSRActivity extends CTCNC
                 "problemHideFromCustomerFlag" => $callActivity->getValue(DBEJCallActivity::problemHideFromCustomerFlag),
                 "rootCauseID"                 => $callActivity->getValue(DBEJCallActivity::rootCauseID),
                 "prePayChargeApproved"        => $callActivity->getValue(DBEJCallActivity::prePayChargeApproved),
-                "hasCallOutExpense"           => $hasCallOutExpense
+                "hasCallOutExpense"           => $hasCallOutExpense,
+                "assetName"                   => $callActivity->getValue(DBEJCallActivity::assetName),
+                "assetTitle"                  => $callActivity->getValue(DBEJCallActivity::assetTitle),
+                "emptyAssetReason"            => $callActivity->getValue(DBEJCallActivity::emptyAssetReason),
             ];
         } else return null;
     }
@@ -1237,11 +1240,17 @@ class CTSRActivity extends CTCNC
     {
         $body = file_get_contents('php://input');
         $body = json_decode($body);
-        if (!isset($body->problemID) || !isset($body->contractCustomerItemID) || !isset($body->rootCauseID) || !isset($body->resolutionSummary)) {
+        if (!isset($body->problemID) || !isset($body->contractCustomerItemID) || !isset($body->rootCauseID) || !isset($body->resolutionSummary) || (!isset($body->emptyAssetReason) && !isset($body->assetName))) {
             http_response_code(400);
             return ["error" => $body];
         }
-        $buActivity = new BUActivity($this);
+        $buActivity     = new BUActivity($this);
+        $serviceRequest = new DBEProblem($this);
+        $serviceRequest->getRow($body->problemID);
+        $serviceRequest->setValue(DBEProblem::assetTitle, $body->assetTitle);
+        $serviceRequest->setValue(DBEProblem::assetName, $body->assetName);
+        $serviceRequest->setValue(DBEProblem::emptyAssetReason, $body->emptyAssetReason);
+        $serviceRequest->updateRow();
         $buActivity->setProblemToFixed(
             $body->problemID,
             false,

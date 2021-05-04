@@ -56,18 +56,19 @@ class DBEJCallActivity extends DBECallActivity
     const projectID                           = "projectID";
     const linkedSalesOrderID                  = "linkedSalesOrderID";
     const totalActivityDurationHours          = "totalActivityDurationHours";
-    const criticalFlag         = "criticalFlag";
-    const hdLimitMinutes       = "hdLimitMinutes";
-    const esLimitMinutes       = "esLimitMinutes";
-    const imLimitMinutes       = "imLimitMinutes";
-    const hdPauseCount         = "hdPauseCount";
-    const allocatedUserID      = "allocatedUserID";
-    const queueNo              = "queueNo";
-    const caaConsno            = "caa_consno";
-    const assetName            = "assetName";
-    const assetTitle           = "assetTitle";
-    const emailSubjectSummary  = "emailSubjectSummary";
-    const prePayChargeApproved = "prePayChargeApproved";
+    const criticalFlag                        = "criticalFlag";
+    const hdLimitMinutes                      = "hdLimitMinutes";
+    const esLimitMinutes                      = "esLimitMinutes";
+    const imLimitMinutes                      = "imLimitMinutes";
+    const hdPauseCount                        = "hdPauseCount";
+    const allocatedUserID                     = "allocatedUserID";
+    const queueNo                             = "queueNo";
+    const caaConsno                           = "caa_consno";
+    const assetName                           = "assetName";
+    const assetTitle          = "assetTitle";
+    const emptyAssetReason    = "emptyAssetReason";
+    const emailSubjectSummary = "emailSubjectSummary";
+    const prePayChargeApproved                = "prePayChargeApproved";
 
     var $fromString;
 
@@ -381,12 +382,17 @@ class DBEJCallActivity extends DBECallActivity
             "problem.assetTitle"
         );
         $this->addColumn(
+            self::emptyAssetReason,
+            DA_TEXT,
+            DA_ALLOW_NULL,
+            "problem.emptyAssetReason"
+        );
+        $this->addColumn(
             self::prePayChargeApproved,
             DA_BOOLEAN,
             DA_NOT_NULL,
             "problem.prePayChargeApproved"
         );
-
         $this->setAddColumnsOff();
         $this->fromString = $this->getTableName(
             ) . " LEFT JOIN " . " callacttype ON caa_callacttypeno = cat_callacttypeno" . " LEFT JOIN " . " item AS activity_type_item ON cat_itemno = activity_type_item.itm_itemno" . " LEFT JOIN " . " consultant ON consultant.cns_consno = caa_consno" . " LEFT JOIN " . " problem as problem ON problem.pro_problemno = callactivity.caa_problemno" . " LEFT JOIN " . " customer ON cus_custno = pro_custno" . " LEFT JOIN " . " address ON add_custno = pro_custno" . " AND add_siteno = caa_siteno" . " LEFT JOIN " . " custitem AS contract ON problem.pro_contract_cuino = contract.cui_cuino" . " LEFT JOIN " . " item AS contractitem ON contract.cui_itemno = contractitem.itm_itemno" . " LEFT JOIN " . " project ON problem.pro_projectno = project.projectID" . " LEFT JOIN " . " contact ON con_contno = caa_contno" . " LEFT JOIN " . " consultant as completed_user ON callactivity.caa_completed_consno = completed_user.cns_consno" . " LEFT JOIN " . " rootcause ON rootcause.rtc_rootcauseno = problem.pro_rootcauseno" . " LEFT JOIN  " . " team ON consultant.teamID = team.teamID";

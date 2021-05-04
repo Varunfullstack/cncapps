@@ -11,6 +11,7 @@ import React from 'react';
 import CustomerDocumentUploader from "./CustomerDocumentUploader";
 import EditorFieldComponent from "../../shared/EditorField/EditorFieldComponent";
 import {RESOLUTION_SUMMARY_MIN_CHARS} from "../../CONFIG_CONSTANTS";
+import AssetListSelectorComponent from "../../shared/AssetListSelectorComponent/AssetListSelectorComponent";
 
 class GatherFixedInformationComponent extends MainComponent {
     el = React.createElement;
@@ -33,7 +34,10 @@ class GatherFixedInformationComponent extends MainComponent {
                 problemID: null,
                 contractCustomerItemID: null,
                 rootCauseID: null,
-                resolutionSummary: null
+                resolutionSummary: null,
+                assetName: null,
+                assetTitle: null,
+                emptyAssetReason: null,
             },
             showModal: false,
             modalType: null,
@@ -64,6 +68,9 @@ class GatherFixedInformationComponent extends MainComponent {
             data.resolutionSummaryDefault = initialActivity?.reason;
             data.resolutionSummary = data.resolutionSummaryDefault;
         }
+        data.assetName = activity.assetName;
+        data.assetTitle = activity.assetTitle;
+        data.emptyAssetReason = activity.emptyAssetReason;
         this.setState({
             data,
             activity,
@@ -131,7 +138,17 @@ class GatherFixedInformationComponent extends MainComponent {
                         el("td", {className: "display-label"}, "Root Cause"),
                         el("td", null, this.getRootCause())
                     ),
-
+                    <tr>
+                        <td className="display-label">
+                            Asset
+                        </td>
+                        <td>
+                            <AssetListSelectorComponent assetName={data.assetName} assetTitle={data.assetTitle}
+                                                        emptyAssetReason={data.emptyAssetReason}
+                                                        customerId={activity.customerID}
+                                                        onChange={this.handleAssetSelect}/>
+                        </td>
+                    </tr>,
                     el(
                         "tr",
                         null,
@@ -154,11 +171,27 @@ class GatherFixedInformationComponent extends MainComponent {
                                                   disableClipboard={activity.problemHideFromCustomerFlag == 'N'}
                             />
                         )
-                    ),
+                    )
                 )
             )
         );
     }
+
+    handleAssetSelect = (value) => {
+        const {data} = this.state;
+        data.assetName = "";
+        data.assetTitle = "";
+        data.emptyAssetReason = "";
+        if (value) {
+            if (value.isAsset) {
+                data.assetName = value.name;
+                data.assetTitle = value.name + " " + value.LastUsername + " " + value.BiosVer;
+            } else {
+                data.emptyAssetReason = value.template;
+            }
+        }
+        this.setState({data});
+    };
 
     async updateContract(contractCustomerItemID) {
         if (contractCustomerItemID) {
@@ -376,6 +409,12 @@ class GatherFixedInformationComponent extends MainComponent {
             this.alert(`The resolution summary must have at least ${RESOLUTION_SUMMARY_MIN_CHARS} characters`);
             return;
         }
+
+        if (!data.emptyAssetReason && !data.assetName) {
+            this.alert(`Assset, or empty reason is required`);
+            return;
+        }
+
         data.problemID = activity.problemID;
         this.apiActivity.saveFixedInformation(data).then(result => {
             if (result.status) {

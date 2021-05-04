@@ -5,6 +5,8 @@ import React from 'react';
 
 import striptags from "striptags";
 import ToolTip from "../ToolTip";
+import CNCCKEditor from "../CNCCKEditor";
+import PropTypes from "prop-types";
 
 export const ASSET_SELECTED_TYPE = {
     NO_ASSET_REASON: "NO_ASSET_REASON",
@@ -24,7 +26,7 @@ export default class AssetListSelectorComponent extends React.PureComponent {
 
 
         this.state = {
-            noAssetReasons: [],
+            emptyAssetReason: [],
             assets: [],
             maxUserNameLength: 0,
             maxComputerNameLength: 0,
@@ -32,8 +34,8 @@ export default class AssetListSelectorComponent extends React.PureComponent {
             selectedOption: null,
             isUnsupported: false
         }
-        if (this.props.noAssetReason) {
-            this.state.selectedOption = {isAsset: false, template: this.props.noAssetReason};
+        if (this.props.emptyAssetReason) {
+            this.state.selectedOption = {isAsset: false, template: this.props.emptyAssetReason};
         }
         if (this.props.assetName) {
 
@@ -57,7 +59,7 @@ export default class AssetListSelectorComponent extends React.PureComponent {
         await Promise.all([
             this.APICustomer.getCustomerAssets(customerId),
             this.APIStandardText.getOptionsByType("Missing Asset Reason")
-        ]).then(([assets, noAssetReasons]) => {
+        ]).then(([assets, emptyAssetReasons]) => {
             assets = assets.map((asset) => {
                 if (
                     asset.biosName &&
@@ -68,7 +70,7 @@ export default class AssetListSelectorComponent extends React.PureComponent {
                 }
                 return asset;
             });
-            noAssetReasons = noAssetReasons.map(x => ({
+            emptyAssetReasons = emptyAssetReasons.map(x => ({
                 ...x,
                 template: striptags(x.template)
             })).sort((a, b) => a.template.localeCompare(b.template));
@@ -87,15 +89,15 @@ export default class AssetListSelectorComponent extends React.PureComponent {
                     }
                     return acc;
                 }, {maxComputerNameLength: 0, maxUserNameLength: 0, maxBiosVerLength: 0})
-            this.setState({noAssetReasons, assets, maxUserNameLength, maxComputerNameLength, maxBiosVerLength});
+            this.setState({emptyAssetReasons, assets, maxUserNameLength, maxComputerNameLength, maxBiosVerLength});
         })
     }
 
     getOptions() {
-        const {noAssetReasons, assets} = this.state;
+        const {emptyAssetReasons, assets} = this.state;
         return [
             ...assets.map(x => ({...x, isAsset: true})),
-            ...noAssetReasons.map(x => ({...x, isAsset: false}))
+            ...emptyAssetReasons.map(x => ({...x, isAsset: false}))
         ];
     }
 
@@ -260,5 +262,12 @@ export default class AssetListSelectorComponent extends React.PureComponent {
             />
         );
     }
-
 }
+
+AssetListSelectorComponent.propTypes = {
+    emptyAssetReason: PropTypes.string,
+    assetName: PropTypes.string,
+    assetTitle: PropTypes.string,
+    customerId: PropTypes.number,
+    onChange: PropTypes.func
+};
