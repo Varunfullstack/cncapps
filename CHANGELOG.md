@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.9.3] - 2021-05-04
+### Fixed
+- Fixed issue with Meeting agenda showing repeated months in Recent Service Requests graph.
+
 ## [v5.9.2] - 2021-05-01
 ### Fixed
 - Fixed issue with SLAPerformance
