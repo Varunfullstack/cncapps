@@ -1370,13 +1370,16 @@ class ActivityDisplayComponent extends MainComponent {
         this.setState({showCallbackModal: true});
     };
     forceClosingSR = async () => {
-
+        const {filters, data} = this.state;
+        if (filters.holdForQA) {
+            this.alert('Please clear the QA flag before marking this Service Request as complete.');
+            return;
+        }
         const answer = await this.confirm('Please confirm you want to mark this Service Request as completed.')
         if (!answer) {
             return;
         }
         try {
-            const {data} = this.state;
             const res = await this.api.forceCloseServiceRequest(data.problemID);
             window.location.reload();
         } catch (error) {
