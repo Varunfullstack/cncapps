@@ -80,7 +80,7 @@ export class ProjectTypesComponent extends MainComponent {
                 icon: "fal fa-2x fa-edit color-gray2 pointer",
                 className: "text-center",
                 content: (type) => <ToolTip title="edit">
-                    <i className="fal fa-edit color-gray2 fa-2x pointer icon" onClick={() => this.handleEdit(type)}/>
+                    <i className="fal fa-edit color-gray fa-2x pointer icon" onClick={() => this.handleEdit(type)}/>
                 </ToolTip>
 
             },
@@ -92,7 +92,7 @@ export class ProjectTypesComponent extends MainComponent {
                 icon: "fal fa-2x fa-trash-alt color-gray2 pointer",
                 className: "text-center",
                 content: (type) => <ToolTip title="edit">
-                    <i className="fal fa-trash-alt  color-gray2 fa-2x pointer icon"
+                    <i className="fal fa-trash-alt  color-gray fa-2x pointer icon"
                        onClick={() => this.handleDelete(type)}/>
                 </ToolTip>
             },

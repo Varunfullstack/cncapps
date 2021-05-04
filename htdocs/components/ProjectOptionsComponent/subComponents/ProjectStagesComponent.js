@@ -7,6 +7,8 @@ import ToolTip from "../../shared/ToolTip";
 import Modal from "../../shared/Modal/modal";
 import CheckBox from "../../shared/checkBox";
 
+import '../../style.css';
+
 export class ProjectStagesComponent extends MainComponent {
     api = new APIProjectOptions();
 
@@ -66,8 +68,8 @@ export class ProjectStagesComponent extends MainComponent {
                     stage.displayInSR = !stage.displayInSR;
                     this.setState({data: stage}, () => this.handleSave())
                 }}>
-                    {stage.displayInSR ? <i className="fal fa-check-square fa-2x color-gray2 icon pointer"/> :
-                        <i className="fal fa-square fa-2x icon pointer"/>}
+                    {stage.displayInSR ? <i className="fal fa-check-square fa-2x color-gray icon pointer"/> :
+                        <i className="fal fa-square fa-2x color-gray icon pointer"/>}
                 </a>
             },
             {
@@ -78,7 +80,7 @@ export class ProjectStagesComponent extends MainComponent {
                 icon: "fal fa-2x fa-edit color-gray2 pointer",
                 className: "text-center",
                 content: (stage) => <ToolTip title="edit">
-                    <i className="fal fa-edit fa-2x pointer color-gray2 icon" onClick={() => this.handleEdit(stage)}/>
+                    <i className="fal fa-edit fa-2x pointer color-gray icon" onClick={() => this.handleEdit(stage)}/>
                 </ToolTip>
 
             },
@@ -90,7 +92,7 @@ export class ProjectStagesComponent extends MainComponent {
                 icon: "fal fa-2x fa-trash-alt color-gray2 pointer",
                 className: "text-center",
                 content: (stage) => <ToolTip title="edit">
-                    <i className="fal fa-trash-alt fa-2x pointer icon" onClick={() => this.handleDelete(stage)}/>
+                    <i className="fal fa-trash-alt fa-2x  color-gray pointer icon" onClick={() => this.handleDelete(stage)}/>
                 </ToolTip>
             },
 
