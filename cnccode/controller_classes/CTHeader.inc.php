@@ -78,7 +78,7 @@ class CTHeader extends CTCNC
                 exit;
             case self::KEYWORD_MATCHING_PERCENT:
                 echo json_encode($this->getKeywordMatchingPercent());
-                exit;
+                exit;            
             case CTHEADER_ACT_EDIT:
             default:
                 $this->checkPermissions(MAINTENANCE_PERMISSION);
@@ -87,11 +87,25 @@ class CTHeader extends CTCNC
                     Header("Location: /NotAllowed.php");
                     exit;
                 }
-                $this->edit();
+                $this->initTemplate();
                 break;
         }
     }
 
+    function initTemplate(){
+        $this->setPageTitle('Edit Header');
+        $this->setTemplateFiles(
+            array('HeaderEdit' => 'HeaderEdit.inc')
+        );
+        $this->template->parse(
+            'CONTENTS',
+            'HeaderEdit',
+            true
+        );
+        $this->loadReactScript('HomeComponent.js');
+        $this->loadReactCSS('HomeComponent.css');
+        $this->parsePage();
+    }
     /**
      * Update
      * @access private
