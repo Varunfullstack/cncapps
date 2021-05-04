@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 1370 - Include Percentage of values in SR Source report
+
 ## [v5.9.3] - 2021-05-04
 ### Fixed
 - Fixed issue with Meeting agenda showing repeated months in Recent Service Requests graph.
