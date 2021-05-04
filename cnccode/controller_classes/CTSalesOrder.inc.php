@@ -2534,7 +2534,7 @@ class CTSalesOrder extends CTCNC
                     DBEQuotation::fileExtension
                 );        // if no extension in DB then assume PDF
         }
-        return file_exists('quotes/' . $quoteFile);
+        return file_exists(QUOTES_DIR . $quoteFile);
     }
 
     /**
@@ -2853,7 +2853,7 @@ class CTSalesOrder extends CTCNC
             return;
         }
         $this->setOrdheadID($this->dsQuotation->getValue(DBEQuotation::ordheadID));
-        $quoteFile = 'quotes/' . $this->dsQuotation->getValue(
+        $quoteFile = QUOTES_DIR . $this->dsQuotation->getValue(
                 DBEQuotation::ordheadID
             ) . '_' . $this->dsQuotation->getValue(
                 DBEQuotation::versionNo
@@ -3150,7 +3150,7 @@ class CTSalesOrder extends CTCNC
             throw new Exception(CTSALESORDER_MSG_ORDER_NOT_FND);
         }
         $versionNo = $this->buSalesOrder->getNextQuoteVersion($orderHeadId);
-        $orderFile = 'quotes/' . $orderHeadId . '_' . $versionNo . '.pdf';
+        $orderFile = QUOTES_DIR. $orderHeadId . '_' . $versionNo . '.pdf';
         $this->buSalesOrder->getUserByID(
             $this->userID,
             $this->dsUser
@@ -3540,6 +3540,7 @@ class CTSalesOrder extends CTCNC
                 $data['emailSubject'],
                 $this->dsSelectedOrderLine
             );
+            EXIT;
             echo json_encode(["status" => "ok"]);
         } catch (Exception $exception) {
             throw new JsonHttpException('500', $exception->getMessage());
@@ -4754,8 +4755,8 @@ class CTSalesOrder extends CTCNC
             );
             $versionNo       = $this->buSalesOrder->getNextQuoteVersion($ordHeadID);
             $previousVersion = $this->dsQuotation->getValue(DBEQuotation::versionNo);
-            $previousFile    = 'quotes/' . $ordHeadID . '_' . $previousVersion . '.pdf';
-            $newFile         = 'quotes/' . $ordHeadID . '_' . $versionNo . '.pdf';
+            $previousFile    = QUOTES_DIR . $ordHeadID . '_' . $previousVersion . '.pdf';
+            $newFile         = QUOTES_DIR. $ordHeadID . '_' . $versionNo . '.pdf';
             copy(
                 $previousFile,
                 $newFile

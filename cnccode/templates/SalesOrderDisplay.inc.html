@@ -6,18 +6,18 @@
 
     function customerNotePopup() {
         window.open(
-            '{urlCustomerNote}',
-            'item',
-            'scrollbars=yes,resizable=yes,width=660,height=560,copyhistory=no, menubar=0'
+                '{urlCustomerNote}',
+                'item',
+                'scrollbars=yes,resizable=yes,width=660,height=560,copyhistory=no, menubar=0'
         );
 
     }
 
     function serviceRequestPopup() {
         window.open(
-            '{urlServiceRequest}',
-            'item',
-            'scrollbars=yes,resizable=yes,width=900,height=800,copyhistory=no, menubar=0'
+                '{urlServiceRequest}',
+                'item',
+                'scrollbars=yes,resizable=yes,width=900,height=800,copyhistory=no, menubar=0'
         );
 
     }
@@ -29,54 +29,54 @@
                 case "itemDescription":
                     if (document.getElementById("itemID").value != "0") {
                         window.open(
-                            '{urlItemEdit}&itemID=' +
-                            escape(document.getElementById("itemID").value) +
-                            '&parentIDField=itemID' +
-                            '&parentDescField=itemDescription',
-                            'item',
-                            'scrollbars=yes,resizable=yes,width=610,height=560,copyhistory=no, menubar=0'
+                                '{urlItemEdit}&itemID=' +
+                                escape(document.getElementById("itemID").value) +
+                                '&parentIDField=itemID' +
+                                '&parentDescField=itemDescription',
+                                'item',
+                                'scrollbars=yes,resizable=yes,width=610,height=560,copyhistory=no, menubar=0'
                         );
                     }
                     break;
                 case "invSiteDesc":
                     if (document.getElementById("invSiteNo").value != "") {
                         window.open(
-                            '{urlSiteEdit}&customerID={customerID}' +
-                            '&siteNo=' + escape(document.getElementById("invSiteNo").value) +
-                            '&parentIDField=invSiteNo' +
-                            '&parentDescField=invSiteDesc',
-                            'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
+                                '{urlSiteEdit}&customerID={customerID}' +
+                                '&siteNo=' + escape(document.getElementById("invSiteNo").value) +
+                                '&parentIDField=invSiteNo' +
+                                '&parentDescField=invSiteDesc',
+                                'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
                         );
                     }
                     break;
                 case "delSiteDesc":
                     if (document.getElementById("delSiteNo").value != "") {
                         window.open(
-                            '{urlSiteEdit}&customerID={customerID}' +
-                            '&siteNo=' + escape(document.getElementById("delSiteNo").value) +
-                            '&parentIDField=delSiteNo' +
-                            '&parentDescField=delSiteDesc',
-                            'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0');
+                                '{urlSiteEdit}&customerID={customerID}' +
+                                '&siteNo=' + escape(document.getElementById("delSiteNo").value) +
+                                '&parentIDField=delSiteNo' +
+                                '&parentDescField=delSiteDesc',
+                                'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0');
                     }
                     break;
                 case "invContactName":
                     if (document.getElementById("invContactID").value != "") {
                         window.open(
-                            '{urlContactEdit}' +
-                            '&contactID=' + escape(document.getElementById("invContactID").value) +
-                            '&parentIDField=invContactID' +
-                            '&parentDescField=invContactName',
-                            'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0');
+                                '{urlContactEdit}' +
+                                '&contactID=' + escape(document.getElementById("invContactID").value) +
+                                '&parentIDField=invContactID' +
+                                '&parentDescField=invContactName',
+                                'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0');
                     }
                     break;
                 case "delContactName":
                     if (document.getElementById("delContactID").value != "") {
                         window.open(
-                            '{urlContactEdit}' +
-                            '&contactID=' + escape(document.getElementById("delContactID").value) +
-                            '&parentIDField=delContactID' +
-                            '&parentDescField=delContactName',
-                            'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0');
+                                '{urlContactEdit}' +
+                                '&contactID=' + escape(document.getElementById("delContactID").value) +
+                                '&parentIDField=delContactID' +
+                                '&parentDescField=delContactName',
+                                'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0');
                     }
                     break;
             }
@@ -164,25 +164,25 @@
                 fetch('?action=MOVE_LINE_TO_POSITION', {
                     method: 'POST',
                     body: JSON.stringify(
-                        {
-                            lineId: movingLineId,
-                            replacedLineId,
-                            updatedTime
-                        }
+                            {
+                                lineId: movingLineId,
+                                replacedLineId,
+                                updatedTime
+                            }
                     )
                 })
-                    .then(x => x.json())
-                    .then(response => {
-                        if (response.status !== 'ok') {
-                            throw new Error(response.message);
-                        }
-                        updateUpdatedTimeInput(response.updatedTime);
-                        updateSequenceNumbers(ui.item.parent().children(), fromSequenceNo, toSequenceNo);
-                    })
-                    .catch(errorResponse => {
-                        alert(errorResponse);
-                        oneOffSortableJQuery.sortable('cancel');
-                    })
+                        .then(x => x.json())
+                        .then(response => {
+                            if (response.status !== 'ok') {
+                                throw new Error(response.message);
+                            }
+                            updateUpdatedTimeInput(response.updatedTime);
+                            updateSequenceNumbers(ui.item.parent().children(), fromSequenceNo, toSequenceNo);
+                        })
+                        .catch(errorResponse => {
+                            alert(errorResponse);
+                            oneOffSortableJQuery.sortable('cancel');
+                        })
 
             }
         });
@@ -314,31 +314,31 @@
                     }
 
                     fetch('?action=' + selectedOptionText,
-                        {
-                            method: 'POST',
-                            body: JSON.stringify(
-                                {
-                                    orderHeadId,
-                                    selectedLines
-                                }
-                            )
-                        }
+                            {
+                                method: 'POST',
+                                body: JSON.stringify(
+                                        {
+                                            orderHeadId,
+                                            selectedLines
+                                        }
+                                )
+                            }
                     )
-                        .then(x => x.json())
-                        .then(res => {
-                            if (res.status !== 'ok') {
-                                throw new Error(res.message);
-                            }
+                            .then(x => x.json())
+                            .then(res => {
+                                if (res.status !== 'ok') {
+                                    throw new Error(res.message);
+                                }
 
-                            if (res.orderHeadId !== orderHeadId) {
-                                open('SalesOrder.php?action=displaySalesOrder&ordheadID=' + res.orderHeadId)
-                            } else {
-                                window.location.reload();
-                            }
-                        })
-                        .catch(error => {
-                            alert(error.message);
-                        })
+                                if (res.orderHeadId !== orderHeadId) {
+                                    open('SalesOrder.php?action=displaySalesOrder&ordheadID=' + res.orderHeadId)
+                                } else {
+                                    window.location.reload();
+                                }
+                            })
+                            .catch(error => {
+                                alert(error.message);
+                            })
 
                     break;
                 }
@@ -390,29 +390,29 @@
                     const updatedTime = getUpdatedTimeCurrentValue();
 
                     fetch('?action=DELETE_LINES',
-                        {
-                            method: 'POST',
-                            body: JSON.stringify({
-                                selectedLines,
-                                updatedTime,
-                            })
-                        }
-                    )
-                        .then(response => response.json())
-                        .then(response => {
-                            if (response.status !== 'ok') {
-                                throw new Error(response.message);
+                            {
+                                method: 'POST',
+                                body: JSON.stringify({
+                                    selectedLines,
+                                    updatedTime,
+                                })
                             }
+                    )
+                            .then(response => response.json())
+                            .then(response => {
+                                if (response.status !== 'ok') {
+                                    throw new Error(response.message);
+                                }
 
-                            updateUpdatedTimeInput(response.updatedTime);
-                            getSelectedHTMLRows().forEach(row => {
-                                deleteRowAndUpdate(row);
+                                updateUpdatedTimeInput(response.updatedTime);
+                                getSelectedHTMLRows().forEach(row => {
+                                    deleteRowAndUpdate(row);
+                                })
+
                             })
-
-                        })
-                        .catch(error => {
-                            alert(error.message);
-                        })
+                            .catch(error => {
+                                alert(error.message);
+                            })
                     break
                 }
 
@@ -432,24 +432,24 @@
                     }
 
                     fetch('?action=CHANGE_SUPPLIER_FOR_LINES',
-                        {
-                            method: 'POST',
-                            body: JSON.stringify({
-                                selectedLines,
-                                supplierId
-                            })
-                        }
-                    )
-                        .then(response => response.json())
-                        .then(response => {
-                            if (response.status == 'error') {
-                                throw new Error(response.message);
+                            {
+                                method: 'POST',
+                                body: JSON.stringify({
+                                    selectedLines,
+                                    supplierId
+                                })
                             }
-                            document.location.reload();
-                        })
-                        .catch(error => {
-                            alert(error.message);
-                        })
+                    )
+                            .then(response => response.json())
+                            .then(response => {
+                                if (response.status == 'error') {
+                                    throw new Error(response.message);
+                                }
+                                document.location.reload();
+                            })
+                            .catch(error => {
+                                alert(error.message);
+                            })
                     break;
                 }
                 case 'CREATE_MANUAL_ORDER_FORM': {
@@ -462,24 +462,24 @@
                     }
 
                     fetch('?action=CREATE_MANUAL_ORDER_FORM',
-                        {
-                            method: 'POST',
-                            body: JSON.stringify({
-                                selectedLines,
-                                orderHeadId
-                            })
-                        }
-                    )
-                        .then(response => response.json())
-                        .then(response => {
-                            if (response.status == 'error') {
-                                throw new Error(response.message);
+                            {
+                                method: 'POST',
+                                body: JSON.stringify({
+                                    selectedLines,
+                                    orderHeadId
+                                })
                             }
-                            document.location.reload();
-                        })
-                        .catch(error => {
-                            alert(error.message);
-                        })
+                    )
+                            .then(response => response.json())
+                            .then(response => {
+                                if (response.status == 'error') {
+                                    throw new Error(response.message);
+                                }
+                                document.location.reload();
+                            })
+                            .catch(error => {
+                                alert(error.message);
+                            })
                     break;
                 }
                 case 'CREATE_SIGNABLE_QUOTE': {
@@ -501,27 +501,29 @@
                     }
 
                     fetch('?action=CREATE_SIGNABLE_QUOTE',
-                        {
-                            method: 'POST',
-                            body: JSON.stringify({
-                                selectedLines,
-                                salutation,
-                                introduction,
-                                emailSubject,
-                                orderHeadId
-                            })
-                        }
-                    )
-                        .then(response => response.json())
-                        .then(response => {
-                            if (response.status == 'error') {
-                                throw new Error(response.message);
+                            {
+                                method: 'POST',
+                                body: JSON.stringify({
+                                    selectedLines,
+                                    salutation,
+                                    introduction,
+                                    emailSubject,
+                                    orderHeadId
+                                })
                             }
-                            document.location.reload();
-                        })
-                        .catch(error => {
-                            alert(error.message);
-                        })
+                    )
+                            .then(response => response.json())
+                            .then(response => {
+                                console.log(response);
+                                if (response.status == 'error') {
+                                    throw new Error(response.message);
+                                }
+                                // document.location.reload();
+                            })
+                            .catch(error => {
+                                console.log(error);
+                                alert(error.message);
+                            })
 
                     break;
                 }
@@ -548,25 +550,25 @@
             const updatedTime = getUpdatedTimeCurrentValue();
 
             fetch('?action=DELETE_LINE',
-                {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        lineId,
-                        updatedTime
-                    })
-                }
-            )
-                .then(r => r.json())
-                .then(response => {
-                    if (response.status !== 'ok') {
-                        throw new Error(response.message);
+                    {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            lineId,
+                            updatedTime
+                        })
                     }
-                    updateUpdatedTimeInput(response.updatedTime);
-                    deleteRowAndUpdate(parentRow);
-                })
-                .catch(error => {
-                    alert(error);
-                })
+            )
+                    .then(r => r.json())
+                    .then(response => {
+                        if (response.status !== 'ok') {
+                            throw new Error(response.message);
+                        }
+                        updateUpdatedTimeInput(response.updatedTime);
+                        deleteRowAndUpdate(parentRow);
+                    })
+                    .catch(error => {
+                        alert(error);
+                    })
         }
 
         function updateUpdatedTimeInput(newValue) {
@@ -601,12 +603,12 @@
                     unitCost
                 })
             })
-                .then(() => {
-                    alert('Price updated');
-                })
-                .catch(() => {
-                    alert('Failed to update price');
-                })
+                    .then(() => {
+                        alert('Price updated');
+                    })
+                    .catch(() => {
+                        alert('Failed to update price');
+                    })
         }
 
         function handleUpdateLine($event) {
@@ -643,13 +645,13 @@
                     unitCost,
                 })
             })
-                .catch(() => {
-                    alert('Failed trying to save');
-                })
-                .then(() => {
-                    rowOverlay.parentNode.removeChild(rowOverlay);
-                    location.reload();
-                })
+                    .catch(() => {
+                        alert('Failed trying to save');
+                    })
+                    .then(() => {
+                        rowOverlay.parentNode.removeChild(rowOverlay);
+                        location.reload();
+                    })
 
         }
 
@@ -942,12 +944,12 @@
         </td>
         <td class="listHeadText financialColumn">
             <DIV>Profit(%)</DIV>
-        </td>         
+        </td>
         <td class="orderLineClass createPOColumn"
         >
             <div>{salesOrderDisplayCreatePO}</div>
         </td>
-       
+
     </tr>
     </thead>
     <tbody class="sortableLines"
