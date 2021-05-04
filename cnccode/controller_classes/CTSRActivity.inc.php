@@ -6,6 +6,7 @@ use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestToken
 use CNCLTD\ChargeableWorkCustomerRequest\infra\ChargeableWorkCustomerRequestMySQLRepository;
 use CNCLTD\ChargeableWorkCustomerRequest\usecases\CreateChargeableWorkCustomerRequest;
 use CNCLTD\ChargeableWorkCustomerRequest\usecases\GetPendingToProcessChargeableRequestInfo;
+use CNCLTD\Exceptions\APIException;
 use CNCLTD\Exceptions\ChargeableWorkCustomerRequestNotFoundException;
 use CNCLTD\Exceptions\JsonHttpException;
 use CNCLTD\Exceptions\ServiceRequestNotFoundException;
@@ -76,6 +77,7 @@ class CTSRActivity extends CTCNC
     const GET_ADDITIONAL_CHARGEABLE_WORK_REQUEST_INFO            = "getAdditionalChargeableWorkRequestInfo";
     const CHECK_SERVICE_REQUEST_PENDING_CALLBACKS                = "checkServiceRequestPendingCallbacks";
     const DELETE_UNSTARTED_SERVICE_REQUESTS                      = "deleteUnstartedServiceRequests";
+    const FORCE_CLOSE_SERVICE_REQUEST                            = "forceCloseServiceRequest";
     public  $serverGuardArray = array(
         ""  => "Please select",
         "Y" => "ServerGuard Related",
@@ -129,6 +131,9 @@ class CTSRActivity extends CTCNC
         switch ($this->getAction()) {
             case self::GET_CALL_ACTIVITY:
                 echo json_encode($this->getActivityDetails());
+                exit;
+            case self::FORCE_CLOSE_SERVICE_REQUEST:
+                echo json_encode($this->forceCloseServiceRequest());
                 exit;
             case self::MESSAGE_TO_SALES:
                 echo json_encode($this->messageToSales());
@@ -314,6 +319,7 @@ class CTSRActivity extends CTCNC
         $imUsedMinutes                         = $buActivity->getSPTeamUsedTime($problemID);
         $isProblemClosed                       = $dbejCallActivity->getValue(DBEJCallActivity::problemStatus) == 'C';
         $isManagerUser                         = $this->isSdManager() || $this->isSRQueueManager();
+        $isAllowedForceCloseSR                 = $this->isAllowedForceClosingSR();
         $isUserManagerAndActivityNotAStatus    = $dbejCallActivity->getValue(
                 DBEJCallActivity::status
             ) != 'A' && $isManagerUser;
@@ -396,6 +402,7 @@ class CTSRActivity extends CTCNC
         $unsupportedCustomerAssetService = new UnsupportedCustomerAssetService();
         return [
             "callActivityID"                  => $callActivityID,
+            'isAllowedForceClosingSR'         => $isAllowedForceCloseSR,
             "problemID"                       => $problemID,
             "projectLink"                     => $projectLink,
             "customerNameDisplayClass"        => $customerNameDisplayClass,
@@ -443,6 +450,7 @@ class CTSRActivity extends CTCNC
             "priority"                        => $buActivity->priorityArray[$dbejCallActivity->getValue(
                 DBEJCallActivity::priority
             )],
+            "priorityNumber"                  => $dbejCallActivity->getValue(DBEJCallActivity::priority),
             "problemStatusDetials"            => $buActivity->problemStatusArray[$dbeProblem->getValue(
                 DBEProblem::status
             )],
@@ -1714,7 +1722,7 @@ FROM
         ];
     }
 
-    private function hasCallOut(int $problemID):bool
+    private function hasCallOut(int $problemID): bool
     {
         /** @var dbSweetcode $db */ global $db;
         $statement = $db->preparedQuery(
@@ -1733,7 +1741,6 @@ AND c.caa_problemno = ? ',
                 ]
             ]
         );
-
         return $statement->fetch_array(MYSQLI_NUM)[0];
     }
 
@@ -1773,9 +1780,7 @@ AND c.caa_problemno = ? ',
         if (!$search) {
             throw new JsonHttpException(400, 'Cannot delete without a search value');
         }
-
         $dbeProblem->getUnstartedServiceRequestsForDeletion($search);
-
         $serviceRequestsIds = [];
         while ($dbeProblem->fetchNext()) {
             $serviceRequestsIds[] = $dbeProblem->getValue(DBEProblem::problemID);
@@ -1866,6 +1871,27 @@ AND c.caa_problemno = ? ',
             throw new JsonHttpException(500, $exception->getMessage());
         }
         return ["status" => "ok", "result" => "{$successCount}/{$totalCount} of found SR's deleted successfully"];
+    }
+
+    private function isAllowedForceClosingSR()
+    {
+        return $this->dbeUser->isAllowedForceClosingSR();
+    }
+
+    private function forceCloseServiceRequest()
+    {
+        $jsonBody = $this->getBody(true);
+        $serviceRequestId = @$jsonBody['serviceRequestId'];
+        if (!$serviceRequestId) {
+            throw new APIException(400, "Service Request Id Required");
+        }
+        $buProblemSLA   = new BUProblemSLA($this);
+        $serviceRequest = new DBEProblem($this);
+        $serviceRequest->getRow($serviceRequestId);
+        $buProblemSLA->closeServiceRequest($serviceRequest,false, true);
+        return [
+            "status" => "ok"
+        ];
     }
 }
 

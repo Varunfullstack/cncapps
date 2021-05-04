@@ -710,130 +710,140 @@ class BUProblemSLA extends Business
         } // end if ( $dbeJCallActivity = $this->buActivity->getFirstActivityInProblem( $problemID ) ){
     }
 
+    function closeServiceRequest(DBEProblem $dsProblems, $debug = false, $forced = false)
+    {
+        if ($dsProblems->getValue(DBEProblem::holdForQA) == 1) {
+            return;
+        }
+        $problemID       = $dsProblems->getValue(DBEProblem::problemID);
+        $dbeCallActivity = $this->buActivity->getLastActivityInProblem($problemID);
+        if (!$dbeCallActivity) {
+            return;
+        }
+        if ($debug) {
+            ?>
+            <div>
+            Problem: <?= $problemID ?>
+            <?php
+        }
+        $buActivity    = new BUActivity($this);
+        $fixedActivity = $buActivity->getFixedActivityInServiceRequest($problemID);
+        if (!$fixedActivity) {
+            if ($debug) {
+                ?>
+                <h2>This SR doesn't have a fixed activity!!</h2>
+                </div>
+                <?php
+            }
+            $this->sendNoFixedActivityAlert($problemID);
+            return;
+        }
+        $this->dbeProblem->getRow($problemID);
+        $fixedDate          = strtotime($this->dbeProblem->getValue(DBEProblem::completeDate));
+        $hoursUntilComplete = $this->getWorkingHoursBetweenUnixDates(
+            date('U'),
+            // from now
+            strtotime(
+                $this->dbeProblem->getValue(
+                    DBEProblem::completeDate
+                ) . ' ' . $dbeCallActivity->getValue(
+                    DBEJCallActivity::endTime
+                )
+            )
+        );
+        $dbeCustomer        = new DBECustomer($this);
+        $dbeCustomer->getRow($this->dbeProblem->getValue(DBEProblem::customerID));
+        $buCustomerItem       = new BUCustomerItem($this);
+        $startersLeavers      = [62, 58];
+        $serverCareContractID = $buCustomerItem->getValidServerCareContractID(
+            $this->dbeProblem->getValue(DBEProblem::customerID)
+        );
+        $thresholdCheck       = $this->dbeProblem->getValue(
+                DBEProblem::totalActivityDurationHours
+            ) <= $this->startersLeaversAutoCompleteThresholdHours;
+        $fixedDateCheck       = $fixedDate <= time();
+        $isStarterOrLeaver    = in_array(
+            $this->dbeProblem->getValue(DBEProblem::rootCauseID),
+            $startersLeavers
+        );
+        if ($debug) {
+
+            ?>
+
+            <div>
+                Rootcause id = <?= $this->dbeProblem->getValue(DBEProblem::rootCauseID) ?>
+            </div>
+            <div>
+                Server Care Contract id = <?= $serverCareContractID ?>
+            </div>
+            <div>
+                Fixed Date = <?= $fixedDate ?>
+            </div>
+            <div>
+                Total Activity Duration Hours = <?= $this->dbeProblem->getValue(
+                    DBEProblem::totalActivityDurationHours
+                ) ?>
+            </div>
+            <ul>
+                <li>
+                    Server Care Check: <?= $serverCareContractID ? 'true' : 'false' ?>
+                </li>
+                <li>
+                    $thresholdCheck: <?= $thresholdCheck ? 'true' : 'false' ?>
+                </li>
+                <li>
+                    $fixedDateCheck: <?= $fixedDateCheck ? 'true' : 'false' ?>
+                </li>
+                <li>
+                    $reasonCheck: <?= $isStarterOrLeaver ? 'true' : 'false' ?>
+                </li>
+            </ul>
+            </div>
+            <?php
+        }
+
+        if ($isStarterOrLeaver && $serverCareContractID && $thresholdCheck && $fixedDateCheck) {
+
+            $this->dbeProblem->setValue(
+                DBEJProblem::contractCustomerItemID,
+                $serverCareContractID
+            );
+            $this->dbeProblem->updateRow();
+            $this->buActivity->setProblemToCompleted($problemID);
+            return;
+        }
+
+        if ($forced || ($this->dbeProblem->getValue(
+                DBEProblem::contractCustomerItemID
+            ) != 0 && $hoursUntilComplete <= 0 && $this->dbeProblem->getValue(
+                DBEProblem::totalActivityDurationHours
+            ) <= $this->srAutocompleteThresholdHours) ) {
+            $this->buActivity->setProblemToCompleted($problemID);
+            return;
+        }
+        /*
+        if within 2 working days of complete date send an email up to maximum 2 emails.
+        */
+        if ($hoursUntilComplete <= ($this->workingHoursInDay * 2) && $this->dbeProblem->getValue(
+                DBEProblem::completionAlertCount
+            ) < 2) {
+            $this->dbeProblem->setValue(
+                DBEProblem::completionAlertCount,
+                $this->dbeProblem->getValue(DBEProblem::completionAlertCount) + 1
+            );
+            $this->dbeProblem->updateRow();
+        }
+    }
+
     /**
      * @throws Exception
      */
     function autoCompletion()
     {
-        $dbeCustomer = new DBECustomer($this);
-        $dsProblems  = $this->buActivity->getProblemsByStatus(
-            'F',
-            true
-        ); // fixed status
+        $dsProblems = $this->buActivity->getProblemsByStatus('F');
         while ($dsProblems->fetchNext()) {
-            if ($dsProblems->getValue(DBEProblem::holdForQA) == 1) continue;
-            $problemID       = $dsProblems->getValue(DBEProblem::problemID);
-            $dbeCallActivity = $this->buActivity->getLastActivityInProblem($problemID);
-            if ($dbeCallActivity) {
-
-                ?>
-                <div>
-                Problem: <?= $problemID ?>
-                <?php
-                $buActivity    = new BUActivity($this);
-                $fixedActivity = $buActivity->getFixedActivityInServiceRequest($problemID);
-                if (!$fixedActivity) {
-                    ?>
-                    <h2>This SR doesn't have a fixed activity!!</h2>
-                    </div>
-                    <?php
-                    $this->sendNoFixedActivityAlert($problemID);
-                    continue;
-                }
-                $this->dbeProblem->getRow($problemID);
-                $fixedDate          = strtotime($this->dbeProblem->getValue(DBEProblem::completeDate));
-                $hoursUntilComplete = $this->getWorkingHoursBetweenUnixDates(
-                    date('U'),
-                    // from now
-                    strtotime(
-                        $this->dbeProblem->getValue(
-                            DBEProblem::completeDate
-                        ) . ' ' . $dbeCallActivity->getValue(
-                            DBEJCallActivity::endTime
-                        )
-                    )
-                );
-                /*
-                Autocomplete NON-T&M SRs that have activity duration of less than one hour and have reached their complete date
-                */
-                $dbeCustomer->getRow($this->dbeProblem->getValue(DBEProblem::customerID));
-                $buCustomerItem       = new BUCustomerItem($this);
-                $startersLeavers      = [62, 58];
-                $serverCareContractID = $serverCareContractID = $buCustomerItem->getValidServerCareContractID(
-                    $this->dbeProblem->getValue(DBEProblem::customerID)
-                );
-                $thresholdCheck       = $this->dbeProblem->getValue(
-                        DBEProblem::totalActivityDurationHours
-                    ) <= $this->startersLeaversAutoCompleteThresholdHours;
-                $fixedDateCheck       = $fixedDate <= time();
-                $reasonCheck          = in_array(
-                    $this->dbeProblem->getValue(DBEProblem::rootCauseID),
-                    $startersLeavers
-                );
-                ?>
-
-                <div>
-                    Rootcause id = <?= $this->dbeProblem->getValue(DBEProblem::rootCauseID) ?>
-                </div>
-                <div>
-                    Server Care Contract id = <?= $serverCareContractID ?>
-                </div>
-                <div>
-                    Fixed Date = <?= $fixedDate ?>
-                </div>
-                <div>
-                    Total Activity Duration Hours = <?= $this->dbeProblem->getValue(
-                        DBEProblem::totalActivityDurationHours
-                    ) ?>
-                </div>
-                <ul>
-                    <li>
-                        Server Care Check: <?= $serverCareContractID ? 'true' : 'false' ?>
-                    </li>
-                    <li>
-                        $thresholdCheck: <?= $thresholdCheck ? 'true' : 'false' ?>
-                    </li>
-                    <li>
-                        $fixedDateCheck: <?= $fixedDateCheck ? 'true' : 'false' ?>
-                    </li>
-                    <li>
-                        $reasonCheck: <?= $reasonCheck ? 'true' : 'false' ?>
-                    </li>
-                </ul>
-                </div>
-                <?php
-                if ($serverCareContractID && $thresholdCheck && $fixedDateCheck && $reasonCheck) {
-                    $this->dbeProblem->setValue(
-                        DBEJProblem::contractCustomerItemID,
-                        $serverCareContractID
-                    );
-                    $this->dbeProblem->updateRow();
-                    $this->buActivity->setProblemToCompleted($problemID);
-                    continue;
-                }
-                if ($this->dbeProblem->getValue(
-                        DBEProblem::contractCustomerItemID
-                    ) != 0 && $hoursUntilComplete <= 0 & $this->dbeProblem->getValue(
-                        DBEProblem::totalActivityDurationHours
-                    ) <= $this->srAutocompleteThresholdHours) {
-                    $this->buActivity->setProblemToCompleted($problemID);
-                } else {
-                    /*
-                    if within 2 working days of complete date send an email up to maximum 2 emails.
-                    */
-                    if ($hoursUntilComplete <= ($this->workingHoursInDay * 2) && $this->dbeProblem->getValue(
-                            DBEProblem::completionAlertCount
-                        ) < 2) {
-                        $this->dbeProblem->setValue(
-                            DBEProblem::completionAlertCount,
-                            $this->dbeProblem->getValue(DBEProblem::completionAlertCount) + 1
-                        );
-                        $this->dbeProblem->updateRow();
-                    }// end if last activity = true
-                }
-
-            } // end older than 4 weeks check
-        }    // end while fetch next
+            $this->closeServiceRequest($dsProblems);
+        }
     }
 
     private function sendNoFixedActivityAlert($serviceRequestId)

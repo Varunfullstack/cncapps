@@ -12,6 +12,7 @@ This project changes will be shown here.
 ### Changed
 - Issue 1359 - Change priority from Current Service Request page.
 - Issue 1357 - Enter reason when cancelling a chargeable customer request.
+- Issue 1361 - Add option to Force Completion of an SR
 ### Fixed
 - Issue 1360 - Creating sales orders for customers with incomplete details.
 

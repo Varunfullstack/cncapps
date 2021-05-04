@@ -423,7 +423,7 @@ class ActivityDisplayComponent extends MainComponent {
                     />
                     : this.getSpacer()}
                 {this.renderChargeableWorkIcon()}
-
+                {this.renderForceCompletionAction()}
             </div>
         </div>
     }
@@ -1393,6 +1393,41 @@ class ActivityDisplayComponent extends MainComponent {
 
     showCallbackModal = () => {
         this.setState({showCallbackModal: true});
+    };
+    forceClosingSR = async () => {
+        const {filters, data} = this.state;
+        if (filters.holdForQA) {
+            this.alert('Please clear the QA flag before marking this Service Request as complete.');
+            return;
+        }
+        const answer = await this.confirm('Please confirm you want to mark this Service Request as completed.')
+        if (!answer) {
+            return;
+        }
+        try {
+            const res = await this.api.forceCloseServiceRequest(data.problemID);
+            window.location.reload();
+        } catch (error) {
+            console.log(error);
+            let message = "Failed to close service request";
+            if ('error' in error) {
+                message = error.error.message;
+            }
+            this.alert(message);
+        }
+    };
+
+    renderForceCompletionAction = () => {
+        const {data} = this.state;
+
+        if (!data.isAllowedForceClosingSR || data.problemStatus !== 'F' || ![1, 2, 3].includes(data.priorityNumber)) {
+            return null;
+        }
+        return (
+            <ToolTip title={'Force Early SR Completion'}>
+                <a className={`fal fa-door-closed fa-2x m-5 pointer icon`} onClick={this.forceClosingSR}/>
+            </ToolTip>
+        )
     };
 }
 
