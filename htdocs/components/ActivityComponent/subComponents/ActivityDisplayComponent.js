@@ -1369,8 +1369,24 @@ class ActivityDisplayComponent extends MainComponent {
     showCallbackModal = () => {
         this.setState({showCallbackModal: true});
     };
-    forceClosingSR = () => {
+    forceClosingSR = async () => {
 
+        const answer = await this.confirm('Please confirm you want to mark this Service Request as completed.')
+        if (!answer) {
+            return;
+        }
+        try {
+            const {data} = this.state;
+            const res = await this.api.forceCloseServiceRequest(data.problemID);
+            window.location.reload();
+        } catch (error) {
+            console.log(error);
+            let message = "Failed to close service request";
+            if ('error' in error) {
+                message = error.error.message;
+            }
+            this.alert(message);
+        }
     };
 
     renderForceCompletionAction = () => {

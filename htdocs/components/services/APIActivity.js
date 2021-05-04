@@ -245,6 +245,11 @@ class APIActivity extends APIMain {
         const res = await this.post(`${ApiUrls.SRActivity}deleteUnstartedServiceRequests`, {search});
         return await res.json();
     }
+
+    async forceCloseServiceRequest(serviceRequestId) {
+        const res = await this.post(`${ApiUrls.SRActivity}forceCloseServiceRequest`, {serviceRequestId});
+        return await res.json();
+    }
 }
 
 export default APIActivity;

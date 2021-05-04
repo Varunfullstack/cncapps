@@ -6,6 +6,7 @@ use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestToken
 use CNCLTD\ChargeableWorkCustomerRequest\infra\ChargeableWorkCustomerRequestMySQLRepository;
 use CNCLTD\ChargeableWorkCustomerRequest\usecases\CreateChargeableWorkCustomerRequest;
 use CNCLTD\ChargeableWorkCustomerRequest\usecases\GetPendingToProcessChargeableRequestInfo;
+use CNCLTD\Exceptions\APIException;
 use CNCLTD\Exceptions\ChargeableWorkCustomerRequestNotFoundException;
 use CNCLTD\Exceptions\JsonHttpException;
 use CNCLTD\Exceptions\ServiceRequestNotFoundException;
@@ -76,6 +77,7 @@ class CTSRActivity extends CTCNC
     const GET_ADDITIONAL_CHARGEABLE_WORK_REQUEST_INFO            = "getAdditionalChargeableWorkRequestInfo";
     const CHECK_SERVICE_REQUEST_PENDING_CALLBACKS                = "checkServiceRequestPendingCallbacks";
     const DELETE_UNSTARTED_SERVICE_REQUESTS                      = "deleteUnstartedServiceRequests";
+    const FORCE_CLOSE_SERVICE_REQUEST                            = "forceCloseServiceRequest";
     public  $serverGuardArray = array(
         ""  => "Please select",
         "Y" => "ServerGuard Related",
@@ -129,6 +131,9 @@ class CTSRActivity extends CTCNC
         switch ($this->getAction()) {
             case self::GET_CALL_ACTIVITY:
                 echo json_encode($this->getActivityDetails());
+                exit;
+            case self::FORCE_CLOSE_SERVICE_REQUEST:
+                echo json_encode($this->forceCloseServiceRequest());
                 exit;
             case self::MESSAGE_TO_SALES:
                 echo json_encode($this->messageToSales());
@@ -1853,6 +1858,22 @@ AND c.caa_problemno = ? ',
     private function isAllowedForceClosingSR()
     {
         return $this->dbeUser->isAllowedForceClosingSR();
+    }
+
+    private function forceCloseServiceRequest()
+    {
+        $jsonBody = $this->getBody(true);
+        $serviceRequestId = @$jsonBody['serviceRequestId'];
+        if (!$serviceRequestId) {
+            throw new APIException(400, "Service Request Id Required");
+        }
+        $buProblemSLA   = new BUProblemSLA($this);
+        $serviceRequest = new DBEProblem($this);
+        $serviceRequest->getRow($serviceRequestId);
+        $buProblemSLA->closeServiceRequest($serviceRequest,false, true);
+        return [
+            "status" => "ok"
+        ];
     }
 }
 
