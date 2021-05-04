@@ -423,7 +423,7 @@ class ActivityDisplayComponent extends MainComponent {
                     />
                     : this.getSpacer()}
                 {this.renderChargeableWorkIcon()}
-
+                {this.renderForceCompletionAction()}
             </div>
         </div>
     }
@@ -1368,6 +1368,22 @@ class ActivityDisplayComponent extends MainComponent {
 
     showCallbackModal = () => {
         this.setState({showCallbackModal: true});
+    };
+    forceClosingSR = () => {
+
+    };
+
+    renderForceCompletionAction = () => {
+        const {data} = this.state;
+
+        if (!data.isAllowedForceClosingSR || data.problemStatus !== 'F' || ![1, 2, 3].includes(data.priorityNumber)) {
+            return null;
+        }
+        return (
+            <ToolTip title={'Force Early SR Completion'}>
+                <a className={`fal fa-door-closed fa-2x m-5 pointer icon`} onClick={this.forceClosingSR}/>
+            </ToolTip>
+        )
     };
 }
 

@@ -555,6 +555,11 @@ class DBEUser extends DBEntity
     {
         return $this->getValue(DBEUser::massDeletionOnUnstartedServiceRequestPermission);
     }
+
+    public function isAllowedForceClosingSR()
+    {
+        return $this->getValue(DBEUser::forceClosingPermission);
+    }
 }
 
 ?>
