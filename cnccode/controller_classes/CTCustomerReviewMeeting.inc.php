@@ -587,19 +587,19 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
                 );
                 $customStartDate = new DateTime($endDate->format('Y-m-d'));
                 $customStartDate->modify("-3 month");
-                $buCustomer                       = new BUCustomer($this);
-                $firstTimeFixReport               = $buCustomer->getFirstTimeFixSummary(
+                $buCustomer         = new BUCustomer($this);
+                $firstTimeFixReport = $buCustomer->getFirstTimeFixSummary(
                     $customerId,
                     $startDate,
                     $endDate
                 );
-                $raiseTypeSummary                 = $buCustomer->getProblemRaisedTypeSummary(
+                $raiseTypeSummary   = $buCustomer->getProblemRaisedTypeSummary(
                     $customerId,
                     $customStartDate,
                     $endDate
                 );
-                $nonEditableText                  = $nonEditableTemplate->get_var('output');
-                $results                          = $buCustomerSrAnalysisReport->getResultsByPeriodRange(
+                $nonEditableText    = $nonEditableTemplate->get_var('output');
+                $results            = $buCustomerSrAnalysisReport->getResultsByPeriodRange(
                     $customerId,
                     $startDate,
                     $endDate
@@ -1301,7 +1301,6 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
             $historicTotalSR['data'][] = $row;
         }
         foreach ($data as $datum) {
-
             if (isset($datum['monthName'])) {
                 $row                           = [
                     substr(
@@ -1354,8 +1353,8 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND c
                     $datum['otherCount1And3'] + $datum['serviceDeskCount1And3'] + $datum['serverCareCount1And3'] + $datum['prepayCount1And3'],
                     $datum['otherCount4'] + $datum['serviceDeskCount4'] + $datum['serverCareCount4'] + $datum['prepayCount4'],
                 ];
+                $totalSR['data'][]             = $row;
             }
-            $totalSR['data'][] = $row;
         }
         $BUCustomerItem = new BUCustomerItem($this);
         /** @var DataSet $datasetContracts */
