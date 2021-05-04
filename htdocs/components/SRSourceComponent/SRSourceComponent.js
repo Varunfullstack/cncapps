@@ -208,21 +208,31 @@ class SRSourceComponent extends React.Component {
         return Object.entries(summary);
     }
     getSummaryElements = () => {
-        const {el, makeid} = this;
         const {resultSummary} = this.state.search;
-        if (resultSummary) {
+        if (resultSummary && resultSummary.length) {
             let tableWidth = 100 * resultSummary.length;
-            return el('table', {key: 'summaryTable', className: 'table table-striped', style: {width: tableWidth}}, [
-                el('thead', {key: 'summaryHead'},
-                    el('tr', {key: makeid()}, resultSummary.map(s => el('th', {key: makeid()}, this.getIconElement(s[0]))))
-                ),
-                el('tbody', {key: 'summaryBody'},
-                    el('tr', {key: makeid()}, resultSummary.map(s => el('td', {
-                        key: makeid(),
-                        style: {textAlign: "center"}
-                    }, s[1])))
-                )
-            ])
+            console.log(resultSummary);
+            const total = resultSummary[resultSummary.length - 1][1];
+            console.log(total);
+            return <table key='summaryTable' className='table table-striped' style={{width: tableWidth}}>
+                <thead key='summaryHead'>
+                <tr key='summaryHeaderRow'>
+                    {resultSummary.map((s, idx) => <th key={idx}>{this.getIconElement(s[0])}</th>)}
+                </tr>
+                </thead>
+                <tbody key="summaryBody">
+                <tr key="summaryDataRow">
+                    {
+                        resultSummary.map((s, idx) => <td key={idx} style={{textAlign: "center"}}>{s[1]}</td>)
+                    }
+                </tr>
+                <tr key="percentageRow">
+                    {
+                        resultSummary.map((s, idx) => <td key={idx} style={{textAlign: "center"}}>{((s[1] / total)*100).toFixed(2)}%</td>)
+                    }
+                </tr>
+                </tbody>
+            </table>
         } else return null;
 
     }
@@ -235,7 +245,6 @@ class SRSourceComponent extends React.Component {
                     content: el("i", {className: "fal fa-envelope fa-2x icon pointer"})
                 });
             case "Portal":
-                //return el(ToolTip,{title:"Portal",content:el("i", { className: "fab fa-edge fa-2x icon pointer"  })});
                 return el(ToolTip, {
                     title: "Portal",
                     content: el("i", {className: "icon-chrome_icon fa-2x icon pointer"})
@@ -297,6 +306,7 @@ class SRSourceComponent extends React.Component {
         const {result} = this.state.search;
         if (result != null) {
             return this.el(Table, {
+                key: 'resultTable',
                 id: 'reaulttable',
                 data: result,
                 columns: columns,
@@ -310,8 +320,8 @@ class SRSourceComponent extends React.Component {
     render() {
         const {showSpinner} = this.state;
         return (
-            <div className="sr-source">
-                <Spinner show={showSpinner}/>
+            <div className="sr-source" key='something'>
+                <Spinner show={showSpinner} key="spinner"/>
                 {this.getSearchElements()}
                 {this.getSummaryElements()}
                 {this.getSearchResultElement()}
