@@ -6,40 +6,41 @@ import APIProjectOptions from "./services/APIProjectOptions";
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Spinner from "../shared/Spinner/Spinner";
-import { ProjectStagesComponent } from "./subComponents/ProjectStagesComponent";
+import {ProjectStagesComponent} from "./subComponents/ProjectStagesComponent";
 import {ProjectTypesComponent} from "./subComponents/ProjectTypesComponent";
 import './../style.css';
-import './ProjectOptionsComponent.css'; 
+import './ProjectOptionsComponent.css';
 
 class ProjectOptionsComponent extends MainComponent {
     el = React.createElement;
     tabs = [];
-    api = new APIProjectOptions();    
-    TAB_STAGES=1;
-    TAB_TYPES=2;
+    api = new APIProjectOptions();
+    TAB_STAGES = 1;
+    TAB_TYPES = 2;
+
     constructor(props) {
         super(props);
         this.state = {
             ...this.state,
             showSpinner: false,
-            filter: {                
+            filter: {
                 activeTab: 1,
-                
+
             },
-            data: [],            
+            data: [],
         };
         this.tabs = [
-            {id: this.TAB_STAGES, title: "Stages", icon: null},  
-            {id: this.TAB_TYPES, title: "Types", icon: null},            
-          
+            {id: this.TAB_STAGES, title: "Stages", icon: null},
+            {id: this.TAB_TYPES, title: "Types", icon: null},
+
         ];
     }
 
     componentDidMount() {
-         
+
     }
 
-    
+
     isActive = (code) => {
         const {filter} = this.state;
         if (filter.activeTab == code) return "active";
@@ -47,11 +48,10 @@ class ProjectOptionsComponent extends MainComponent {
     };
     setActiveTab = (code) => {
         const {filter} = this.state;
-        filter.activeTab = code;        
-        this.setState({filter, data: []});         
+        filter.activeTab = code;
+        this.setState({filter, data: []});
     };
 
-    
 
     getTabsElement = () => {
         const {el, tabs} = this;
@@ -88,31 +88,32 @@ class ProjectOptionsComponent extends MainComponent {
             })
         );
     };
-     
+
     setFilterValue = (property, value) => {
         const {filter} = this.state;
         filter[property] = value;
-        this.setState({filter} );
+        this.setState({filter});
     };
-  
-    getActiveTab=()=>{
-        const {filter}=this.state;
+
+    getActiveTab = () => {
+        const {filter} = this.state;
         switch (filter.activeTab) {
-            case this.TAB_STAGES:                
-                return <ProjectStagesComponent></ProjectStagesComponent>    
+            case this.TAB_STAGES:
+                return <ProjectStagesComponent></ProjectStagesComponent>
             case this.TAB_TYPES:
-            return <ProjectTypesComponent></ProjectTypesComponent>    
+                return <ProjectTypesComponent></ProjectTypesComponent>
             default:
                 break;
         }
     }
+
     render() {
         const {el} = this;
         return el("div", null,
             el(Spinner, {key: "spinner", show: this.state.showSpinner}),
-            this.getAlert(),          
-            this.getTabsElement(),     
-            this.getActiveTab()        
+            this.getAlert(),
+            this.getTabsElement(),
+            this.getActiveTab()
         );
     }
 }

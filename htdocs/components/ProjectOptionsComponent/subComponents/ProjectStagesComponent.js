@@ -8,39 +8,42 @@ import Modal from "../../shared/Modal/modal";
 import CheckBox from "../../shared/checkBox";
 
 export class ProjectStagesComponent extends MainComponent {
-    api=new APIProjectOptions();
+    api = new APIProjectOptions();
+
     constructor(props) {
         super(props);
         this.state = {
             ...this.state,
-            data:{
-                id:'',
-                name:'',
-                displayInSR:false
+            data: {
+                id: '',
+                name: '',
+                displayInSR: false
             },
-            items:[],
-            showModal:false
+            items: [],
+            showModal: false
         };
     }
+
     componentDidMount() {
         this.getData();
     }
-    getData=()=>{
-        this.api.getProjectStages().then(items=>{
-            this.setState({items,showModal:false});
+
+    getData = () => {
+        this.api.getProjectStages().then(items => {
+            this.setState({items, showModal: false});
         })
     }
-    getDataTableElement=()=>{
-        const {items}=this.state;
-        const columns=[
+    getDataTableElement = () => {
+        const {items} = this.state;
+        const columns = [
             {
-               path: "id",
-               label: "",
-               hdToolTip: "ID",
-               hdClassName: "text-center",
-               icon: "fal fa-2x fa-hashtag color-gray2 pointer",
-               sortable: true,
-               className: "text-center",               
+                path: "id",
+                label: "",
+                hdToolTip: "ID",
+                hdClassName: "text-center",
+                icon: "fal fa-2x fa-hashtag color-gray2 pointer",
+                sortable: true,
+                className: "text-center",
             },
             {
                 path: "name",
@@ -49,136 +52,138 @@ export class ProjectStagesComponent extends MainComponent {
                 hdClassName: "text-center",
                 icon: "fal fa-2x fa-file-alt color-gray2 pointer",
                 sortable: true,
-                                
-             },
-             {
+
+            },
+            {
                 path: "displayInSR",
                 label: "",
                 hdToolTip: "Display In SR",
                 hdClassName: "text-center",
                 icon: "fal fa-2x fa-eye color-gray2 pointer",
                 sortable: true,
-                className: "text-center",               
-                content:(stage)=><a onClick={()=>{stage.displayInSR=!stage.displayInSR; this.setState({data:stage},()=>this.handleSave())}}>
-                {stage.displayInSR?<i className="fal fa-check-square fa-2x icon pointer"></i>:<i className="fal fa-square fa-2x icon pointer"></i>}
+                className: "text-center",
+                content: (stage) => <a onClick={() => {
+                    stage.displayInSR = !stage.displayInSR;
+                    this.setState({data: stage}, () => this.handleSave())
+                }}>
+                    {stage.displayInSR ? <i className="fal fa-check-square fa-2x color-gray2 icon pointer"/> :
+                        <i className="fal fa-square fa-2x icon pointer"/>}
                 </a>
-             },
-             {
+            },
+            {
                 path: "edit",
                 label: "",
                 hdToolTip: "Edit",
                 hdClassName: "text-center",
-                icon: "fal fa-2x fa-edit color-gray2 pointer",       
+                icon: "fal fa-2x fa-edit color-gray2 pointer",
                 className: "text-center",
-                content:(stage)=><ToolTip title="edit" >
-                    <i className="fal fa-edit fa-2x pointer icon" onClick={()=>this.handleEdit(stage)}></i>
+                content: (stage) => <ToolTip title="edit">
+                    <i className="fal fa-edit fa-2x pointer color-gray2 icon" onClick={() => this.handleEdit(stage)}/>
                 </ToolTip>
-                
-             },
-             {
+
+            },
+            {
                 path: "delete",
                 label: "",
                 hdToolTip: "Edit",
                 hdClassName: "text-center",
-                icon: "fal fa-2x fa-trash-alt color-gray2 pointer",     
+                icon: "fal fa-2x fa-trash-alt color-gray2 pointer",
                 className: "text-center",
-                content:(stage)=><ToolTip title="edit" >
-                <i className="fal fa-trash-alt fa-2x pointer icon" onClick={()=>this.handleDelete(stage)}></i>
-            </ToolTip>
-             },
-              
+                content: (stage) => <ToolTip title="edit">
+                    <i className="fal fa-trash-alt fa-2x pointer icon" onClick={() => this.handleDelete(stage)}/>
+                </ToolTip>
+            },
+
         ];
-        return <Table    
-        allowRowOrder={true}
-        onOrderChange={this.handleOrderChange}    
-        key="stages"
-        pk="id"
-        columns={columns}
-        data={items||[]}
-        search={true}
+        return <Table
+            allowRowOrder={true}
+            onOrderChange={this.handleOrderChange}
+            key="stages"
+            pk="id"
+            columns={columns}
+            data={items || []}
+            search={true}
         >
 
         </Table>
     }
-    handleOrderChange=async (current, next)=>{        
-        const {items}=this.state;
-        if(next)
-        {
-            current.stageOrder=next.stageOrder;
-            next.stageOrder=current.stageOrder+0.001;
-            await this.api.updateProjectStage(next.id,next);
+    handleOrderChange = async (current, next) => {
+        const {items} = this.state;
+        if (next) {
+            current.stageOrder = next.stageOrder;
+            next.stageOrder = current.stageOrder + 0.001;
+            await this.api.updateProjectStage(next.id, next);
         }
-        if(!next)
-        {        
-            current.stageOrder=Math.max(...items.map(i=>i.stageOrder))+0.001;
-        }        
-        await this.api.updateProjectStage(current.id,current);
-       
+        if (!next) {
+            current.stageOrder = Math.max(...items.map(i => i.stageOrder)) + 0.001;
+        }
+        await this.api.updateProjectStage(current.id, current);
+
     }
-    handleEdit=(stage)=>{
-        this.setState({data:stage,showModal:true});
+    handleEdit = (stage) => {
+        this.setState({data: stage, showModal: true});
     }
-    handleDelete=async (stage)=>{
-        const confirm=await this.confirm("Are you sure to delete it")
-        if(confirm)
-        this.api.deleteProjectStage(stage.id).then(result=>{
-            this.getData();
-        }).catch(ex=>{
-            this.alert("Stage can't be delete");
-        })
+    handleDelete = async (stage) => {
+        const confirm = await this.confirm("Are you sure to delete it")
+        if (confirm)
+            this.api.deleteProjectStage(stage.id).then(result => {
+                this.getData();
+            }).catch(ex => {
+                this.alert("Stage can't be delete");
+            })
     }
-    getModal=()=>{
-        const {data,showModal}=this.state;
-        if(!data)
+    getModal = () => {
+        const {data, showModal} = this.state;
+        if (!data)
             return null;
         return <Modal title="Project Stage Name" show={showModal} width={300}
-            onClose={()=>this.setState({showModal:false})}
-            content={
-                <div key="content" >
-                    <div className="form-group">
-                        <label>Name</label>
-                        <input required style={{width:200}} value={data.name} onChange={(event)=>this.setValue("name",event.target.value)} type="text"></input>                        
-                    </div>
-                    <div   className="form-group">
-                        <label>Dislpay In SR</label>
-                        <CheckBox                            
-                            checked={data.displayInSR==1}
-                            onChange={()=>this.setValue("displayInSR",!data.displayInSR)}>
-                        </CheckBox>                       
-                    </div>
-                </div>
-        }
-        footer={<div key="footer">
-            <button onClick={this.handleSave}>Save</button>
-            <button   onClick={()=>this.setState({showModal:false})} >Cancel</button>
-        </div>}
+                      onClose={() => this.setState({showModal: false})}
+                      content={
+                          <div key="content">
+                              <div className="form-group">
+                                  <label>Name</label>
+                                  <input required style={{width: 200}} value={data.name}
+                                         onChange={(event) => this.setValue("name", event.target.value)} type="text"/>
+                              </div>
+                              <div className="form-group">
+                                  <label>Dislpay In SR</label>
+                                  <CheckBox
+                                      checked={data.displayInSR == 1}
+                                      onChange={() => this.setValue("displayInSR", !data.displayInSR)}>
+                                  </CheckBox>
+                              </div>
+                          </div>
+                      }
+                      footer={<div key="footer">
+                          <button onClick={this.handleSave}>Save</button>
+                          <button onClick={() => this.setState({showModal: false})}>Cancel</button>
+                      </div>}
         >
 
         </Modal>
     }
-    handleSave=()=>{
-        const {data}=this.state;
-        data.displayInSR=data.displayInSR?1:0;
-        if(data.id!='')
-        {
-            this.api.updateProjectStage(data.id,data).then(result=>{
+    handleSave = () => {
+        const {data} = this.state;
+        data.displayInSR = data.displayInSR ? 1 : 0;
+        if (data.id != '') {
+            this.api.updateProjectStage(data.id, data).then(result => {
                 this.getData();
             });
-        }
-        else //new 
+        } else //new
         {
-            this.api.addProjectStage(data).then(result=>{
+            this.api.addProjectStage(data).then(result => {
                 this.getData();
             });
         }
     }
-    handleNew=()=>{
-        this.setState({showModal:true,data:{id:'',name:''}});
+    handleNew = () => {
+        this.setState({showModal: true, data: {id: '', name: ''}});
     }
+
     render() {
-        return <div style={{width:500}}>
+        return <div style={{width: 500}}>
             <ToolTip width={30} title="New Stage">
-            <i className="fal fa-plus fa-2x m-5 pointer" onClick={this.handleNew}></i>            
+                <i className="fal fa-plus fa-2x m-5 pointer" onClick={this.handleNew}/>
             </ToolTip>
             {this.getAlert()}
             {this.getConfirm()}
