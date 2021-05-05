@@ -24,9 +24,8 @@ export default class AssetListSelectorComponent extends React.PureComponent {
     constructor(props, context) {
         super(props, context);
 
-
         this.state = {
-            emptyAssetReason: [],
+            emptyAssetReasons: [],
             assets: [],
             maxUserNameLength: 0,
             maxComputerNameLength: 0,
@@ -94,6 +93,7 @@ export default class AssetListSelectorComponent extends React.PureComponent {
     }
 
     getOptions() {
+
         const {emptyAssetReasons, assets} = this.state;
         return [
             ...assets.map(x => ({...x, isAsset: true})),
