@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1363 - Make homepage Daily Stats clickable to show results
+
 ## [v5.10.3] - 2021-05-12
 ## Fixed 
 - Fixed issue with customer stats.
@@ -66,7 +70,6 @@ This project changes will be shown here.
 ### Fixed
 - Issue 1226 - StreamOne error handling
 - Issue 1349 - Duplicate Duplicate Contact Warning.
-
 
 ## [v5.8.6] - 2021-04-22
 ### Fixed
