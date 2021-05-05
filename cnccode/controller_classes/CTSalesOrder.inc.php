@@ -888,7 +888,7 @@ class CTSalesOrder extends CTCNC
 
     function getTypeDescription($type)
     {
-        return $this->orderTypeArray[$type];
+        return @$this->orderTypeArray[$type];
     }
 
     function getCustomerString()
