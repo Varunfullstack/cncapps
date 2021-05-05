@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v5.10.0] 
+## [v5.10.0] - 2021-05-05
 ### Added
 - Issue 1355 - Added a one off script to create Microsoft 365 Support items in contracts for customers.
 - Issue 1223 - Update Patch Management Contract numbers automatically
