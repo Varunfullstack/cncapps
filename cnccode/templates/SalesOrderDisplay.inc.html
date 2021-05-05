@@ -604,12 +604,12 @@
                     )
                             .then(response => response.json())
                             .then(response => {
-                                if (response.status == 'error') {
+                                console.log(response);if (response.status == 'error') {
                                     throw new Error(response.message);
                                 }
                                 document.location.reload();
                             })
-                            .catch(error => {
+                            .catch(error => {console.log(error);
                                 alert(error.message);
                             })
 

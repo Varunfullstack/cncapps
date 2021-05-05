@@ -971,7 +971,7 @@ define(
 );
 define(
     'PDF_TEMP_DIR',
-    BASE_DRIVE . "/htdocs/pdfTemp"
+    BASE_DRIVE . "/files/pdfTemp/"
 );
 define(
     'PDF_RESOURCE_DIR',
@@ -979,7 +979,7 @@ define(
 );
 define(
     'INTERNAL_DOCUMENTS_FOLDER',
-    BASE_DRIVE . '/serviceRequestsDocuments'
+    BASE_DRIVE . '/files/serviceRequestsDocuments'
 );
 define(
     "APPLICATION_DIR",
@@ -1003,11 +1003,11 @@ define(
 );
 define(
     "QUOTES_DIR",
-    BASE_DRIVE . "/htdocs/quotes"
+    BASE_DRIVE . "/files/quotes/"
 );
 define(
     "DELIVERY_NOTES_DIR",
-    BASE_DRIVE . "/htdocs/delivery_notes"
+    BASE_DRIVE . "/files/deliveryNotes/"
 );
 define(
     "LETTER_TEMPLATE_DIR",
@@ -1035,9 +1035,8 @@ define(
 );
 define(
     'RECEIPT_PATH',
-    BASE_DRIVE . '/receipts/'
+    BASE_DRIVE . '/files/receipts/'
 );
-$cfg['quote_path'] = BASE_DRIVE . "/htdocs/quotes";
 define(
     "PHPLIB_SESSIONS_DIR",
     BASE_DRIVE . "/sessions/"

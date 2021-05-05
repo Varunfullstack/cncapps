@@ -2370,7 +2370,7 @@ class CTSalesOrder extends CTCNC
                     DBEQuotation::fileExtension
                 );        // if no extension in DB then assume PDF
         }
-        return file_exists('quotes/' . $quoteFile);
+        return file_exists(QUOTES_DIR . $quoteFile);
     }
 
     /**
@@ -2690,7 +2690,7 @@ class CTSalesOrder extends CTCNC
             return;
         }
         $this->setOrdheadID($this->dsQuotation->getValue(DBEQuotation::ordheadID));
-        $quoteFile = 'quotes/' . $this->dsQuotation->getValue(
+        $quoteFile = QUOTES_DIR . $this->dsQuotation->getValue(
                 DBEQuotation::ordheadID
             ) . '_' . $this->dsQuotation->getValue(
                 DBEQuotation::versionNo
@@ -2987,7 +2987,7 @@ class CTSalesOrder extends CTCNC
             throw new Exception(CTSALESORDER_MSG_ORDER_NOT_FND);
         }
         $versionNo = $this->buSalesOrder->getNextQuoteVersion($orderHeadId);
-        $orderFile = 'quotes/' . $orderHeadId . '_' . $versionNo . '.pdf';
+        $orderFile = QUOTES_DIR. $orderHeadId . '_' . $versionNo . '.pdf';
         $this->buSalesOrder->getUserByID(
             $this->userID,
             $this->dsUser
@@ -3437,7 +3437,7 @@ class CTSalesOrder extends CTCNC
             $this->displayFatalError(CTSALESORDER_MSG_ORDER_NOT_FND);
         }
         $versionNo = $this->buSalesOrder->getNextQuoteVersion($this->getOrdheadID());
-        $quoteFile = $GLOBALS['cfg']['quote_path'] . '/' . $this->getOrdheadID() . '_' . $versionNo;//.'.pdf';
+        $quoteFile = QUOTES_DIR . $this->getOrdheadID() . '_' . $versionNo;//.'.pdf';
         $extension = substr(
             $_FILES['quoteFile']['name'],
             strpos(
@@ -3550,8 +3550,8 @@ class CTSalesOrder extends CTCNC
         header("Content-Type: $ctype");
         header("Content-Disposition: attachment; filename=" . $quoteFile . ";");
         header("Content-Transfer-Encoding: binary");
-        header("Content-Length: " . filesize('quotes/' . $quoteFile));
-        readfile('quotes/' . $quoteFile);
+        header("Content-Length: " . filesize(QUOTES_DIR . $quoteFile));
+        readfile(QUOTES_DIR . $quoteFile);
         exit();
     }
 
@@ -4592,8 +4592,8 @@ class CTSalesOrder extends CTCNC
             );
             $versionNo       = $this->buSalesOrder->getNextQuoteVersion($ordHeadID);
             $previousVersion = $this->dsQuotation->getValue(DBEQuotation::versionNo);
-            $previousFile    = 'quotes/' . $ordHeadID . '_' . $previousVersion . '.pdf';
-            $newFile         = 'quotes/' . $ordHeadID . '_' . $versionNo . '.pdf';
+            $previousFile    = QUOTES_DIR . $ordHeadID . '_' . $previousVersion . '.pdf';
+            $newFile         = QUOTES_DIR. $ordHeadID . '_' . $versionNo . '.pdf';
             copy(
                 $previousFile,
                 $newFile

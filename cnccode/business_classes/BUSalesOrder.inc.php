@@ -278,7 +278,7 @@ class BUSalesOrder extends Business
         );
         // delete quote docs from DB and quote directory
         while ($dsQuotation->fetchNext()) {
-            $quoteFile = 'quotes/' . $dsQuotation->getValue(DBEQuotation::ordheadID) . '_' . $dsQuotation->getValue(
+            $quoteFile = QUOTES_DIR . $dsQuotation->getValue(DBEQuotation::ordheadID) . '_' . $dsQuotation->getValue(
                     DBEQuotation::versionNo
                 ) . '.' . $dsQuotation->getValue(DBEQuotation::fileExtension);
             $this->deleteQuotationDoc($dsQuotation->getValue(DBEQuotation::quotationID));

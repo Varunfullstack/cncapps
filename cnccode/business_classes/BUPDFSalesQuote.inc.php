@@ -79,8 +79,8 @@ class BUPDFSalesQuote extends Business
             $emailSubject = $dsOrdhead->getValue(DBEOrdhead::quotationSubject);
         }
         $versionNo = $this->buSalesOrder->getNextQuoteVersion($ordheadID);
-        $quoteFile = 'quotes/' . $ordheadID . '_' . $versionNo . '.pdf';
-        $buItem    = new BUItem($this);
+
+        $quoteFile = QUOTES_DIR . $ordheadID . '_' . $versionNo . '.pdf';
         $userID    = $GLOBALS ['auth']->is_authenticated();
         $dsUser    = new DataSet($this);
         $this->buSalesOrder->getUserByID(
@@ -558,7 +558,7 @@ class BUPDFSalesQuote extends Business
             $dsUser
         );
         $quoteFileName = "{$dbeQuotation->getValue(DBEOrdhead::ordheadID)}_{$dbeQuotation->getValue(DBEQuotation::versionNo)}.pdf";
-        $quoteFile     = "quotes/{$quoteFileName}";
+        $quoteFile     = QUOTES_DIR.$quoteFileName;
         global $twig;
         $DBEJRenQuotation = new DBEJRenQuotation($this);
         $DBEJRenQuotation->getRowsBySalesOrderID($dsOrdhead->getValue(DBEOrdhead::ordheadID));
@@ -627,7 +627,7 @@ class BUPDFSalesQuote extends Business
             $userID,
             $dsUser
         );
-        $quoteFile   = 'quotes/' . $dbeQuotation->getValue(DBEQuotation::ordheadID) . '_' . $dbeQuotation->getValue(
+        $quoteFile   = QUOTES_DIR . $dbeQuotation->getValue(DBEQuotation::ordheadID) . '_' . $dbeQuotation->getValue(
                 DBEQuotation::versionNo
             ) . '.pdf';
         $body        = $dbeQuotation->getValue(DBEQuotation::documentType) . ' ' . $dsOrdhead->getValue(

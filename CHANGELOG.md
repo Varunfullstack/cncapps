@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1229 - Rearrange external files location
+
 ## [v5.10.0] 
 ### Added
 - Issue 1355 - Added a one off script to create Microsoft 365 Support items in contracts for customers.
