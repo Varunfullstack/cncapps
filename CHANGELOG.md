@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1372 - Improved Error handling for Removing qsystem assigned SRs
+
 ## [v5.9.3] - 2021-05-04
 ### Fixed
 - Fixed issue with Meeting agenda showing repeated months in Recent Service Requests graph.
