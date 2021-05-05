@@ -368,7 +368,7 @@ ORDER BY location, operatingSystem DESC, computerName';
         if (!$lastContactDateTime || $lastContactDateTime == "N/A") {
             return;
         }
-        $date = DateTime::createFromFormat(DATE_CNC_DATE_TIME_FORMAT, $lastContactDateTime);
+        $date = DateTime::createFromFormat(DATE_MYSQL_DATETIME, $lastContactDateTime);
         $date->add(new DateInterval('P' . $this->offlineAgentThresholdDays . 'D'));
         $today = new DateTime();
         if ($date < $today) {

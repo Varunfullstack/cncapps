@@ -366,7 +366,7 @@ class AssetListExporter
         if (!$warrantyExpiryDate || $warrantyExpiryDate == "Unknown" || $warrantyExpiryDate == "Not Applicable") {
             return null;
         }
-        $date  = DateTime::createFromFormat(DATE_CNC_DATE_FORMAT, $warrantyExpiryDate);
+        $date = Date::excelToDateTimeObject($warrantyExpiryDate);
         $today = new DateTime();
         if ($date > $today) {
             return null;
@@ -506,10 +506,16 @@ class AssetListExporter
         $updateCustomer->getRow($customerId);
         $updateCustomer->setValue(DBECustomer::noOfPCs, $tabularData->getNumberOfPcs());
         $updateCustomer->setValue(DBECustomer::noOfServers, $tabularData->getNumberOfServers());
-        $updateCustomer->setValue(DBECustomer::eligiblePatchManagement, $tabularData->patchManagementEligibleComputers());
+        $updateCustomer->setValue(
+            DBECustomer::eligiblePatchManagement,
+            $tabularData->patchManagementEligibleComputers()
+        );
         $updateCustomer->updateRow();
         $buContract = new BURenContract($this);
-        $buContract->updatePatchManagementContractForCustomer($customerId, $tabularData->patchManagementEligibleComputers());
+        $buContract->updatePatchManagementContractForCustomer(
+            $customerId,
+            $tabularData->patchManagementEligibleComputers()
+        );
     }
 
     /**
