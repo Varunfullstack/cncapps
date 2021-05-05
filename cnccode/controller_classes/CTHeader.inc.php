@@ -26,6 +26,7 @@ class CTHeader extends CTCNC
     const GET_PRIORITIES_DESCRIPTIONS = 'getPrioritiesDescriptions';
     const GET_NUMBER_ALLOWED_MISTAKES = "numberOfAllwoedMistaks";
     const KEYWORD_MATCHING_PERCENT    = "keywordMatchingPercent";
+    const CONST_HEADER="header";
     /** @var DSForm */
     public $dsHeader;
     /** @var BUHeader */
@@ -56,9 +57,28 @@ class CTHeader extends CTCNC
      * @throws Exception
      */
     function defaultAction()
-    {
-
+    {        
         switch ($this->getAction()) {
+            case self::CONST_HEADER:
+                switch ($this->requestMethod) {
+                    case 'GET':
+                        echo  json_encode($this->getHeader(),JSON_NUMERIC_CHECK);
+                        break;
+                    // case 'POST':
+                    //     echo  json_encode($this->addItemType(),JSON_NUMERIC_CHECK);
+                    //     break;
+                    // case 'PUT':
+                    //     echo  json_encode($this->updateItemType(),JSON_NUMERIC_CHECK);
+                    //     break;
+                    // case 'DELETE':
+                    //     echo  json_encode($this->deleteItemType(),JSON_NUMERIC_CHECK);
+                    //     break;
+                    default:
+                        # code...
+                        break;
+                }
+                exit;                
+
             case CTHEADER_ACT_UPDATE:
                 $this->checkPermissions(MAINTENANCE_PERMISSION);
                 $roles = SENIOR_MANAGEMENT_PERMISSION;
@@ -96,14 +116,14 @@ class CTHeader extends CTCNC
         $this->setPageTitle('Edit Header');
         $this->setTemplateFiles(
             array('HeaderEdit' => 'HeaderEdit.inc')
-        );
+        );        
         $this->template->parse(
             'CONTENTS',
             'HeaderEdit',
             true
-        );
-        $this->loadReactScript('HomeComponent.js');
-        $this->loadReactCSS('HomeComponent.css');
+        );        
+        $this->loadReactScript('HeaderComponent.js');
+        $this->loadReactCSS('HeaderComponent.css');
         $this->parsePage();
     }
     /**
@@ -837,5 +857,45 @@ class CTHeader extends CTCNC
         $dbeHeader = new DBEHeader($this);
         $dbeHeader->getRow(1);
         return $dbeHeader->getValue(DBEHeader::keywordMatchingPercent);
+    }
+    // -------------new code
+    function getHeader(){
+        $dbeHeader = new DBEJHeader($this);
+        $dbeHeader->getRow(1);
+        $header=[
+            "name"=>$dbeHeader->getValue(DBEHeader::name),
+            "add1"=>$dbeHeader->getValue(DBEHeader::add1),
+            "add2"=>$dbeHeader->getValue(DBEHeader::add2),
+            "add3"=>$dbeHeader->getValue(DBEHeader::add3),
+            "town"=>$dbeHeader->getValue(DBEHeader::town),
+            "county"=>$dbeHeader->getValue(DBEHeader::county),
+            "postcode"=>$dbeHeader->getValue(DBEHeader::postcode),
+            "phone"=>$dbeHeader->getValue(DBEHeader::phone),
+            "fax"=>$dbeHeader->getValue(DBEHeader::fax),
+            "goodsContact"=>$dbeHeader->getValue(DBEHeader::goodsContact),
+            "gscItemID"=>$dbeHeader->getValue(DBEHeader::gscItemID),
+            'gscItemDescription'=> $dbeHeader->getValue(DBEJHeader::gscItemDescription),
+            "yearlySicknessThresholdWarning"=>$dbeHeader->getValue(DBEHeader::yearlySicknessThresholdWarning),
+            "stdVATCode"=>$dbeHeader->getValue(DBEHeader::stdVATCode),
+            "billingStartTime"=>$dbeHeader->getValue(DBEHeader::billingStartTime),
+            "billingEndTime"=>$dbeHeader->getValue(DBEHeader::billingEndTime),
+            "overtimeStartTime"=>$dbeHeader->getValue(DBEHeader::overtimeStartTime),
+            "overtimeEndTime"=>$dbeHeader->getValue(DBEHeader::overtimeEndTime),
+            "hourlyLabourCost"=>$dbeHeader->getValue(DBEHeader::hourlyLabourCost),
+            "minimumOvertimeMinutesRequired"=>$dbeHeader->getValue(DBEHeader::minimumOvertimeMinutesRequired),
+            "daysInAdvanceExpensesNextMonthAlert"=>$dbeHeader->getValue(DBEHeader::daysInAdvanceExpensesNextMonthAlert),
+            "fixSLABreachWarningHours"=>$dbeHeader->getValue(DBEHeader::fixSLABreachWarningHours),
+            "srAutocompleteThresholdHours"=>$dbeHeader->getValue(DBEHeader::srAutocompleteThresholdHours),
+            "srStartersLeaversAutoCompleteThresholdHours"=>$dbeHeader->getValue(DBEHeader::srStartersLeaversAutoCompleteThresholdHours),
+            "srPromptContractThresholdHours"=>$dbeHeader->getValue(DBEHeader::srPromptContractThresholdHours),
+            "fixSLABreachWarningHours"=>$dbeHeader->getValue(DBEHeader::fixSLABreachWarningHours),
+            "fixSLABreachWarningHours"=>$dbeHeader->getValue(DBEHeader::fixSLABreachWarningHours),
+            "fixSLABreachWarningHours"=>$dbeHeader->getValue(DBEHeader::fixSLABreachWarningHours),
+            "fixSLABreachWarningHours"=>$dbeHeader->getValue(DBEHeader::fixSLABreachWarningHours),
+            "fixSLABreachWarningHours"=>$dbeHeader->getValue(DBEHeader::fixSLABreachWarningHours),
+            "fixSLABreachWarningHours"=>$dbeHeader->getValue(DBEHeader::fixSLABreachWarningHours),
+
+        ];
+        return $this->success($header);
     }
 }

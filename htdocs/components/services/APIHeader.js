@@ -10,6 +10,10 @@ class APIHeader extends APIMain {
     getKeywordMatchingPercent(){
         return this.get(`${ApiUrls.Header}keywordMatchingPercent`);
     }
+    getHeaderData(){
+        return this.get(`${ApiUrls.Header}header`);
+
+    }
 }
 
 export default APIHeader;
