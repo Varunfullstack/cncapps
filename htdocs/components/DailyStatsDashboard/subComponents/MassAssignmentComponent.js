@@ -1,13 +1,13 @@
 import MainComponent from "../../shared/MainComponent";
 import React from 'react';
 import {sort} from "../../utils/utils";
-import APISDManagerDashboard from "../services/APISDManagerDashboard";
+import DailyStatsDashboardAPI from "../services/DailyStatsDashboardAPI";
 import APIUser from "../../services/APIUser";
 import ToolTip from "../../shared/ToolTip";
 import CustomerSearch from "../../shared/CustomerSearch";
 
 export default class MassAssignmentComponent extends MainComponent {
-    api = new APISDManagerDashboard();
+    api = new DailyStatsDashboardAPI();
     apiUser = new APIUser();
 
     constructor(props) {

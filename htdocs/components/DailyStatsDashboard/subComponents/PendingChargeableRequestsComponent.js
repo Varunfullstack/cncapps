@@ -3,12 +3,12 @@ import React from 'react';
 import Spinner from "../../shared/Spinner/Spinner";
 import Table from "../../shared/table/table";
 import {equal} from "../../utils/utils";
-import APISDManagerDashboard from "../services/APISDManagerDashboard";
+import DailyStatsDashboardAPI from "../services/DailyStatsDashboardAPI";
 import moment from "moment";
 import ToolTip from "../../shared/ToolTip";
 
 export default class PendingChargeableRequestsComponent extends MainComponent {
-    api = new APISDManagerDashboard();
+    api = new DailyStatsDashboardAPI();
 
     constructor(props) {
         super(props);

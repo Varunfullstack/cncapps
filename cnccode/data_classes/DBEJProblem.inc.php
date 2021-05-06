@@ -1230,7 +1230,7 @@ class DBEJProblem extends DBEProblem
           left join team queueTeam on queueTeam.level = pro_queue_no 
           where {$this->getDBColumnName(DBEProblem::customerID)} <> 282
            AND {$this->getDBColumnName(DBEProblem::dateRaised)} between '{$dateTimeImmutable->format(DATE_MYSQL_DATE)}'
-           AND ('{$dateTimeImmutable->format(DATE_MYSQL_DATE)}' + Interval 1 day)";
+           AND (date('{$dateTimeImmutable->format(DATE_MYSQL_DATE)}') + Interval 1 day)";
         $this->setQueryString($query);
         return parent::getRows();
     }
@@ -1259,12 +1259,12 @@ class DBEJProblem extends DBEProblem
           where {$this->getDBColumnName(DBEProblem::customerID)} <> 282
            AND {$this->getDBColumnName(DBEProblem::status)} = 'I'
            AND {$this->getDBColumnName(DBEProblem::dateRaised)} between '{$dateTimeImmutable->format(DATE_MYSQL_DATE)}'
-           AND ('{$dateTimeImmutable->format(DATE_MYSQL_DATE)}' + Interval 1 day)";
+           AND (date('{$dateTimeImmutable->format(DATE_MYSQL_DATE)}') + Interval 1 day)";
         $this->setQueryString($query);
         return parent::getRows();
     }
 
-    public function getFixedOn(DateTimeImmutable $date)
+    public function getFixedOn(DateTimeImmutable $date): bool
     {
         $query = "SELECT {$this->getDBColumnNamesAsString()} FROM  {$this->getTableName()}  LEFT JOIN customer ON cus_custno = pro_custno
           LEFT JOIN consultant ON cns_consno = pro_consno
@@ -1285,16 +1285,78 @@ class DBEJProblem extends DBEProblem
           left join consultant fixedEngineer on fixed.caa_consno = fixedEngineer.cns_consno
           left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
           left join team queueTeam on queueTeam.level = pro_queue_no 
-           AND .`caa_consno` <> 67
-  AND c.caa_callacttypeno = 57
-  AND c.caa_date = CURDATE()
-  AND pro_status = 'F'
-          
           where {$this->getDBColumnName(DBEProblem::customerID)} <> 282
            AND {$this->getDBColumnName(DBEProblem::status)} in ('C','F')
-           and {$this->getDBColumnName(self::fixedUserID)}
-           AND {$this->getDBColumnName(DBEProblem::dateRaised)} between '{$dateTimeImmutable->format(DATE_MYSQL_DATE)}'
-           AND ('{$dateTimeImmutable->format(DATE_MYSQL_DATE)}' + Interval 1 day)";
+           and {$this->getDBColumnName(self::fixedUserID)} <> 67
+           AND {$this->getDBColumnName(DBEJProblem::fixedDate)} between '{$date->format(DATE_MYSQL_DATE)}'
+           AND (date('{$date->format(DATE_MYSQL_DATE)}') + Interval 1 day)";
+        $this->setQueryString($query);
+        return parent::getRows();
+    }
+
+    public function getReopenedOn(DateTimeImmutable $date)
+    {
+        $query = "SELECT {$this->getDBColumnNamesAsString()} FROM  {$this->getTableName()}  LEFT JOIN customer ON cus_custno = pro_custno
+          LEFT JOIN consultant ON cns_consno = pro_consno
+          left join team on consultant.teamID = team.teamID
+          JOIN callactivity `initial`
+            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID . " 
+          left JOIN callactivity `last`
+            ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
+              (
+              SELECT
+                MAX( ca.caa_callactivityno )
+              FROM callactivity ca
+              WHERE ca.caa_problemno = pro_problemno
+              and ca.caa_callacttypeno NOT IN(43,55,59,60,61)
+            ) 
+          left join callactivity fixed 
+            on fixed.caa_problemno = pro_problemno and fixed.caa_callacttypeno = " . CONFIG_FIXED_ACTIVITY_TYPE_ID . " 
+          left join consultant fixedEngineer on fixed.caa_consno = fixedEngineer.cns_consno
+          left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
+          left join team queueTeam on queueTeam.level = pro_queue_no 
+          where {$this->getDBColumnName(DBEProblem::customerID)} <> 282
+          and {$this->getDBColumnName(self::fixedUserID)} <> 67
+          AND {$this->getDBColumnName(DBEProblem::reopenedDate)}  between '{$date->format(DATE_MYSQL_DATE)}'
+          AND (date('{$date->format(DATE_MYSQL_DATE)}') + Interval 1 day)";
+        $this->setQueryString($query);
+        return parent::getRows();
+    }
+
+    public function getBreachedSLAOn(DateTimeImmutable $date): bool
+    {
+        $query = "SELECT {$this->getDBColumnNamesAsString()} FROM  {$this->getTableName()}  LEFT JOIN customer ON cus_custno = pro_custno
+          LEFT JOIN consultant ON cns_consno = pro_consno
+          left join team on consultant.teamID = team.teamID
+          JOIN callactivity `initial`
+            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID . " 
+          left JOIN callactivity `last`
+            ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
+              (
+              SELECT
+                MAX( ca.caa_callactivityno )
+              FROM callactivity ca
+              WHERE ca.caa_problemno = pro_problemno
+              and ca.caa_callacttypeno NOT IN(43,55,59,60,61)
+            ) 
+          left join callactivity fixed 
+            on fixed.caa_problemno = pro_problemno and fixed.caa_callacttypeno = " . CONFIG_FIXED_ACTIVITY_TYPE_ID . " 
+          left join consultant fixedEngineer on fixed.caa_consno = fixedEngineer.cns_consno
+          left join team fixedTeam on fixedEngineer.teamID = fixedTeam.teamID 
+          left join team queueTeam on queueTeam.level = pro_queue_no 
+          WHERE {$this->getDBColumnName(self::customerID)} <> 282
+          AND {$this->getDBColumnName(self::priority)} <> 5
+          AND (
+              (
+                {$this->getDBColumnName(self::status)} = 'I'
+                AND {$this->getDBColumnName(self::slaResponseHours)} - {$this->getDBColumnName(self::workingHours)} <= 0
+              )
+              OR (
+                {$this->getDBColumnName(self::respondedHours)} > {$this->getDBColumnName(self::slaResponseHours)}
+              )
+          )
+          AND {$this->getDBColumnName(DBEProblem::dateRaised)}  between '{$date->format(DATE_MYSQL_DATE)}'
+          AND (date('{$date->format(DATE_MYSQL_DATE)}') + Interval 1 day);";
         $this->setQueryString($query);
         return parent::getRows();
     }

@@ -15,6 +15,8 @@ class CTDailyStatsDashboard extends CTCNC
     const RAISED_ON           = "raisedOn";
     const STARTED_ON          = "startedOn";
     const FIXED_ON            = "fixedOn";
+    const REOPENED_ON         = "reopenedOn";
+    const BREACHED_SLA_ON     = "breachedSLAOn";
 
     /**
      * CTDailyStatsDashboard constructor.
@@ -63,6 +65,18 @@ class CTDailyStatsDashboard extends CTCNC
                 json_encode($this->getFixedOnServiceRequestsController());
                 break;
             }
+            case self::REOPENED_ON:
+            {
+                json_encode($this->getReopenedOnServiceRequestsController());
+                break;
+            }
+            case self::BREACHED_SLA_ON: {
+                json_encode($this->getBreachedSLAOnServiceRequestsController());
+                break;
+            }
+            default: {
+                $this->mainPageController();
+            }
         }
     }
 
@@ -80,7 +94,7 @@ class CTDailyStatsDashboard extends CTCNC
         return $this->getJsonResponse($serviceRequestDB);
     }
 
-    private function getRaisedonServiceRequestsController()
+    private function getRaisedOnServiceRequestsController()
     {
         $date             = $this->getRequestedDateOrToday();
         $serviceRequestDB = new \DBEJProblem($this);
@@ -131,5 +145,38 @@ class CTDailyStatsDashboard extends CTCNC
         $serviceRequestDB = new \DBEJProblem($this);
         $serviceRequestDB->getFixedOn($date);
         return $this->getJsonResponse($serviceRequestDB);
+    }
+
+    private function getReopenedOnServiceRequestsController(): array
+    {
+        $date             = $this->getRequestedDateOrToday();
+        $serviceRequestDB = new \DBEJProblem($this);
+        $serviceRequestDB->getReopenedOn($date);
+        return $this->getJsonResponse($serviceRequestDB);
+    }
+
+    private function getBreachedSLAOnServiceRequestsController(): array
+    {
+        $date             = $this->getRequestedDateOrToday();
+        $serviceRequestDB = new \DBEJProblem($this);
+        $serviceRequestDB->getBreachedSLAOn($date);
+        return $this->getJsonResponse($serviceRequestDB);
+    }
+
+    private function mainPageController()
+    {
+        $this->setMenuId(513);
+        $this->setPageTitle('KPI Reports');
+        $this->setTemplateFiles(
+            array('KPIReport' => 'KPIReport.rct')
+        );
+        $this->loadReactScript('KPIReportComponent.js');
+        $this->loadReactCSS('KPIReportComponent.css');
+        $this->template->parse(
+            'CONTENTS',
+            'KPIReport',
+            true
+        );
+        $this->parsePage();
     }
 }

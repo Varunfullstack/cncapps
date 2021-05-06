@@ -4,10 +4,10 @@ import Spinner from "../../shared/Spinner/Spinner";
 import Table from "../../shared/table/table";
 import {equal} from "../../utils/utils";
 import ToolTip from "../../shared/ToolTip";
-import APISDManagerDashboard from "../services/APISDManagerDashboard";
+import DailyStatsDashboardAPI from "../services/DailyStatsDashboardAPI";
 
 export default class MissedCallBackComponent extends MainComponent {
-    api = new APISDManagerDashboard();
+    api = new DailyStatsDashboardAPI();
 
     constructor(props) {
         super(props);
