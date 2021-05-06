@@ -268,7 +268,7 @@ class DBEJProblem extends DBEProblem
             self::QUEUE_TEAM_NAME,
             DA_ID,
             DA_ALLOW_NULL,
-            'queueTeam.teamName'
+            'queueTeam.name'
         );
         $this->addColumn(
             self::QUEUE_TEAM_ID,
