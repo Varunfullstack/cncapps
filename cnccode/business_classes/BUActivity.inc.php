@@ -3639,7 +3639,9 @@ class BUActivity extends Business
 
         $buMail      = new BUMail($this);
         $dbeJProblem = new DBEJProblem($this);
-        $dbeJProblem->getRow($problemID);
+        if(!$dbeJProblem->getRow($problemID)){
+            return;
+        };
         $senderEmail = CONFIG_SUPPORT_EMAIL;
         $toEmail     = 'sremoved@' . CONFIG_PUBLIC_DOMAIN;
         $activityRef = $problemID . ' ' . $dbeJProblem->getValue(DBEJProblem::customerName);

@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Changed
 - Issue 1229 - Rearrange external files location
+- Issue 1372 - Improved Error handling for Removing qsystem assigned SRs
 
 ## [v5.10.0] 
 ### Added
