@@ -792,7 +792,6 @@ class CTUser extends CTCNC
     function update()
     {
         $this->setMethodName('update');
-
         $this->formError = (!$this->dsUser->populateFromArray($this->getParam('user')));
         $userData        = $this->getParam('user')[1];
         $this->updateEncryptedData($userData, $this->dsUser);
@@ -811,6 +810,9 @@ class CTUser extends CTCNC
             if (!$this->dsUser->getValue(DBEJUser::userID)) {
                 $this->setAction(CTUSER_ACT_CREATE);
             } else {
+                $dbeUser = new DBEUser($this);
+                $dbeUser->getRow($this->dsUser->getValue(DBEUser::userID));
+                $this->dsUser->setValue(DBEUser::bccOnCustomerEmails, $dbeUser->getValue(DBEUser::bccOnCustomerEmails));
                 $this->setAction(CTUSER_ACT_EDIT);
             }
             $this->edit();
