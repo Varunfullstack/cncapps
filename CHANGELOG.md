@@ -2,7 +2,8 @@
 This project changes will be shown here.
 
 ## [v5.10.2]
-
+### Fixed
+- Fix issue with BCC on customer emails flag
 
 ## [v5.10.1] - 2021-05-07
 ### Changed

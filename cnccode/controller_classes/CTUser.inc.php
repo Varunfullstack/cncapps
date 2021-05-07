@@ -792,6 +792,7 @@ class CTUser extends CTCNC
     function update()
     {
         $this->setMethodName('update');
+
         $this->formError = (!$this->dsUser->populateFromArray($this->getParam('user')));
         $userData        = $this->getParam('user')[1];
         $this->updateEncryptedData($userData, $this->dsUser);
