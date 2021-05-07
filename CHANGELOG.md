@@ -6,6 +6,8 @@ This project changes will be shown here.
 - Change Daily Stats "Daily Contact" text colour
 ### Fixed
 - OSSupportDates fails to load
+### Updated
+- Updated CKEditor version
 
 ## [v5.10.0] - 2021-05-05
 ### Added
