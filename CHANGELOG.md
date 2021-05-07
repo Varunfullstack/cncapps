@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v5.10.1] - 2021-05-06
+## [v5.10.1] - 2021-05-07
 ### Changed
 - Change Daily Stats "Daily Contact" text colour
 ### Fixed
