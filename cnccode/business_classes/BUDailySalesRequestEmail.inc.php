@@ -30,6 +30,7 @@ class BUDailySalesRequestEmail extends Business
         FROM
           ordhead
           JOIN customer ON cus_custno = odh_custno
+         
         WHERE
           serviceRequestInternalNote > ''";
 
