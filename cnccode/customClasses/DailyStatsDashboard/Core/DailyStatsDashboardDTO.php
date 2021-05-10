@@ -1,6 +1,9 @@
 <?php
 
 namespace CNCLTD\DailyStatsDashboard\Core;
+
+use CNCLTD\Data\DBEJProblem;
+
 class DailyStatsDashboardDTO implements \JsonSerializable
 {
     /** @var string */
@@ -15,13 +18,18 @@ class DailyStatsDashboardDTO implements \JsonSerializable
     private $assignedTeamName;
     /** @var string */
     private $assignedEngineerName;
+    /**
+     * @var int|null
+     */
+    private $teamId;
 
-    public function __construct(?string $serviceRequestId,
-                                ?string $customerName,
-                                ?string $priority,
-                                ?string $subjectSummary,
-                                ?string $assignedTeamName,
-                                ?string $assignedEngineerName
+    private function __construct(?string $serviceRequestId,
+                                 ?string $customerName,
+                                 ?string $priority,
+                                 ?string $subjectSummary,
+                                 ?string $assignedTeamName,
+                                 ?string $assignedEngineerName,
+                                 ?int $teamId
     )
     {
         $this->serviceRequestId     = $serviceRequestId;
@@ -30,17 +38,19 @@ class DailyStatsDashboardDTO implements \JsonSerializable
         $this->subjectSummary       = $subjectSummary;
         $this->assignedTeamName     = $assignedTeamName;
         $this->assignedEngineerName = $assignedEngineerName;
+        $this->teamId               = $teamId;
     }
 
-    public static function fromServiceRequestDB(\DBEJProblem $serviceRequestDB): DailyStatsDashboardDTO
+    public static function fromServiceRequestDB(DBEJProblem $serviceRequestDB): DailyStatsDashboardDTO
     {
         return new self(
-            $serviceRequestDB->getValue(\DBEJProblem::problemID),
-            $serviceRequestDB->getValue(\DBEJProblem::customerName),
-            $serviceRequestDB->getValue(\DBEJProblem::priority),
-            $serviceRequestDB->getValue(\DBEJProblem::emailSubjectSummary),
-            $serviceRequestDB->getValue(\DBEJProblem::QUEUE_TEAM_NAME),
-            $serviceRequestDB->getValue(\DBEJProblem::engineerName)
+            $serviceRequestDB->getValue(DBEJProblem::problemID),
+            $serviceRequestDB->getValue(DBEJProblem::customerName),
+            $serviceRequestDB->getValue(DBEJProblem::priority),
+            $serviceRequestDB->getValue(DBEJProblem::emailSubjectSummary),
+            $serviceRequestDB->getValue(DBEJProblem::QUEUE_TEAM_NAME),
+            $serviceRequestDB->getValue(DBEJProblem::engineerName),
+            $serviceRequestDB->getValue(DBEJProblem::teamID)
         );
     }
 
@@ -92,6 +102,13 @@ class DailyStatsDashboardDTO implements \JsonSerializable
         return $this->assignedEngineerName;
     }
 
+    /**
+     * @return int|null
+     */
+    public function teamId(): ?int
+    {
+        return $this->teamId;
+    }
 
     public function jsonSerialize()
     {

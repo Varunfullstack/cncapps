@@ -3,6 +3,8 @@
 namespace CNCLTD\Controller;
 
 use CNCLTD\DailyStatsDashboard\Core\DailyStatsDashboardDTO;
+use CNCLTD\Data\DBEJProblem;
+use CNCLTD\DataDBEJProblem;
 use CTCNC;
 
 global $cfg;
@@ -10,7 +12,7 @@ require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 
 class CTDailyStatsDashboard extends CTCNC
 {
-    const GET_NEAR_SLA        = "getNearSLA";
+    const NEAR_SLA            = "nearSLA";
     const NEAR_FIX_SLA_BREACH = "nearFixSLABreach";
     const RAISED_ON           = "raisedOn";
     const STARTED_ON          = "startedOn";
@@ -40,41 +42,50 @@ class CTDailyStatsDashboard extends CTCNC
     function defaultAction()
     {
         switch ($this->getAction()) {
-            case self::GET_NEAR_SLA :
+            case self::NEAR_SLA :
             {
-                json_encode($this->getNearSLAServiceRequestsController());
+                $jsonData = json_encode($this->getNearSLAServiceRequestsController(), JSON_NUMERIC_CHECK);
+                echo $jsonData;
                 break;
             }
             case self::NEAR_FIX_SLA_BREACH:
             {
-                json_encode($this->getNearFixSLABreachServiceRequestsController());
+                $jsonData = json_encode($this->getNearFixSLABreachServiceRequestsController(), JSON_NUMERIC_CHECK);
+                echo $jsonData;
                 break;
             }
             case self::RAISED_ON:
             {
-                json_encode($this->getRaisedOnServiceRequestsController());
+                $jsonData = json_encode($this->getRaisedOnServiceRequestsController(), JSON_NUMERIC_CHECK);
+                echo $jsonData;
                 break;
             }
             case self::STARTED_ON:
             {
-                json_encode($this->getStartedOnServiceRequestsController());
+                $jsonData = json_encode($this->getStartedOnServiceRequestsController(), JSON_NUMERIC_CHECK);
+                echo $jsonData;
                 break;
             }
             case self::FIXED_ON:
             {
-                json_encode($this->getFixedOnServiceRequestsController());
+                $jsonData = json_encode($this->getFixedOnServiceRequestsController(), JSON_NUMERIC_CHECK);
+                echo $jsonData;
                 break;
             }
             case self::REOPENED_ON:
             {
-                json_encode($this->getReopenedOnServiceRequestsController());
+                $jsonData = json_encode($this->getReopenedOnServiceRequestsController(), JSON_NUMERIC_CHECK);
+                echo $jsonData;
                 break;
             }
-            case self::BREACHED_SLA_ON: {
-                json_encode($this->getBreachedSLAOnServiceRequestsController());
+            case self::BREACHED_SLA_ON:
+            {
+                $jsonData = json_encode($this->getBreachedSLAOnServiceRequestsController(), JSON_NUMERIC_CHECK);
+                echo $jsonData;
                 break;
             }
-            default: {
+            default:
+            {
                 $this->mainPageController();
             }
         }
@@ -82,14 +93,14 @@ class CTDailyStatsDashboard extends CTCNC
 
     private function getNearSLAServiceRequestsController(): array
     {
-        $serviceRequestDB = new \DBEJProblem($this);
+        $serviceRequestDB = new DBEJProblem($this);
         $serviceRequestDB->getNearSLA();
         return $this->getJsonResponse($serviceRequestDB);
     }
 
     private function getNearFixSLABreachServiceRequestsController(): array
     {
-        $serviceRequestDB = new \DBEJProblem($this);
+        $serviceRequestDB = new DBEJProblem($this);
         $serviceRequestDB->getDashBoardRows(1000000, "shortestSLAFixRemaining");
         return $this->getJsonResponse($serviceRequestDB);
     }
@@ -97,16 +108,16 @@ class CTDailyStatsDashboard extends CTCNC
     private function getRaisedOnServiceRequestsController()
     {
         $date             = $this->getRequestedDateOrToday();
-        $serviceRequestDB = new \DBEJProblem($this);
+        $serviceRequestDB = new DBEJProblem($this);
         $serviceRequestDB->getRaisedOn($date);
         return $this->getJsonResponse($serviceRequestDB);
     }
 
     /**
-     * @param \DBEJProblem $serviceRequestDB
+     * @param DBEJProblem $serviceRequestDB
      * @return array
      */
-    private function getJsonResponse(\DBEJProblem $serviceRequestDB): array
+    private function getJsonResponse(DBEJProblem $serviceRequestDB): array
     {
         $toReturn = [];
         while ($serviceRequestDB->fetchNext()) {
@@ -118,7 +129,7 @@ class CTDailyStatsDashboard extends CTCNC
     private function getStartedOnServiceRequestsController(): array
     {
         $date             = $this->getRequestedDateOrToday();
-        $serviceRequestDB = new \DBEJProblem($this);
+        $serviceRequestDB = new DBEJProblem($this);
         $serviceRequestDB->getStartedOn($date);
         return $this->getJsonResponse($serviceRequestDB);
     }
@@ -142,7 +153,7 @@ class CTDailyStatsDashboard extends CTCNC
     private function getFixedOnServiceRequestsController(): array
     {
         $date             = $this->getRequestedDateOrToday();
-        $serviceRequestDB = new \DBEJProblem($this);
+        $serviceRequestDB = new DBEJProblem($this);
         $serviceRequestDB->getFixedOn($date);
         return $this->getJsonResponse($serviceRequestDB);
     }
@@ -150,7 +161,7 @@ class CTDailyStatsDashboard extends CTCNC
     private function getReopenedOnServiceRequestsController(): array
     {
         $date             = $this->getRequestedDateOrToday();
-        $serviceRequestDB = new \DBEJProblem($this);
+        $serviceRequestDB = new DBEJProblem($this);
         $serviceRequestDB->getReopenedOn($date);
         return $this->getJsonResponse($serviceRequestDB);
     }
@@ -158,7 +169,7 @@ class CTDailyStatsDashboard extends CTCNC
     private function getBreachedSLAOnServiceRequestsController(): array
     {
         $date             = $this->getRequestedDateOrToday();
-        $serviceRequestDB = new \DBEJProblem($this);
+        $serviceRequestDB = new DBEJProblem($this);
         $serviceRequestDB->getBreachedSLAOn($date);
         return $this->getJsonResponse($serviceRequestDB);
     }
@@ -166,15 +177,15 @@ class CTDailyStatsDashboard extends CTCNC
     private function mainPageController()
     {
         $this->setMenuId(513);
-        $this->setPageTitle('KPI Reports');
+        $this->setPageTitle('Daily Stats Dashboard');
         $this->setTemplateFiles(
-            array('KPIReport' => 'KPIReport.rct')
+            array('DailyStatsDashboard' => 'DailyStatsDashboard.rct')
         );
-        $this->loadReactScript('KPIReportComponent.js');
-        $this->loadReactCSS('KPIReportComponent.css');
+        $this->loadReactScript('DailyStatsDashboardComponent.js');
+        $this->loadReactCSS('DailyStatsDashboardComponent.css');
         $this->template->parse(
             'CONTENTS',
-            'KPIReport',
+            'DailyStatsDashboard',
             true
         );
         $this->parsePage();

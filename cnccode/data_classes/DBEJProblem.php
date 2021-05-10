@@ -1,5 +1,14 @@
 <?php
+namespace CNCLTD\Data;
 global $cfg;
+
+use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
+use DBECustomer;
+use DBEProblem;
+use DBETeam;
+
 require_once($cfg["path_dbe"] . "/DBEProblem.inc.php");
 
 class DBEJProblem extends DBEProblem
