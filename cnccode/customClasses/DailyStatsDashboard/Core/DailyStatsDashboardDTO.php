@@ -3,8 +3,10 @@
 namespace CNCLTD\DailyStatsDashboard\Core;
 
 use CNCLTD\Data\DBEJProblem;
+use CNCLTD\Exceptions\ColumnOutOfRangeException;
+use JsonSerializable;
 
-class DailyStatsDashboardDTO implements \JsonSerializable
+class DailyStatsDashboardDTO implements JsonSerializable
 {
     /** @var string */
     private $serviceRequestId;
@@ -41,6 +43,9 @@ class DailyStatsDashboardDTO implements \JsonSerializable
         $this->teamId               = $teamId;
     }
 
+    /**
+     * @throws ColumnOutOfRangeException
+     */
     public static function fromServiceRequestDB(DBEJProblem $serviceRequestDB): DailyStatsDashboardDTO
     {
         return new self(

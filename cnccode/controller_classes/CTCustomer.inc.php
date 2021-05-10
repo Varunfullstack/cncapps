@@ -7,6 +7,7 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
+use CNCLTD\Data\DBEJProblem;
 use CNCLTD\Encryption;
 use CNCLTD\SupportedCustomerAssets\UnsupportedCustomerAssetService;
 use CNCLTD\Utils;

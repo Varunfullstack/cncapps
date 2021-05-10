@@ -8,6 +8,7 @@ use CNCLTD\ChargeableWorkCustomerRequest\infra\ChargeableWorkCustomerRequestMySQ
 use CNCLTD\ChargeableWorkCustomerRequest\usecases\CancelPendingChargeableWorkCustomerRequest;
 use CNCLTD\ChargeableWorkCustomerRequest\usecases\ResendPendingChargeableWorkCustomerRequestEmail;
 use CNCLTD\Data\CallBackStatus;
+use CNCLTD\Data\DBEJProblem;
 use CNCLTD\Exceptions\JsonHttpException;
 use CNCLTD\SDManagerDashboard\ServiceRequestSummaryDTO;
 

@@ -6,6 +6,7 @@
  * Time: 10:39
  */
 
+use CNCLTD\Data\DBEJProblem;
 use Twig\Environment;
 
 global $cfg;

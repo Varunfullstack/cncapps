@@ -4,8 +4,10 @@ namespace CNCLTD\Controller;
 
 use CNCLTD\DailyStatsDashboard\Core\DailyStatsDashboardDTO;
 use CNCLTD\Data\DBEJProblem;
-use CNCLTD\DataDBEJProblem;
+use CNCLTD\Exceptions\ColumnOutOfRangeException;
 use CTCNC;
+use DateTimeImmutable;
+use Exception;
 
 global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
@@ -39,6 +41,9 @@ class CTDailyStatsDashboard extends CTCNC
         );
     }
 
+    /**
+     * @throws Exception
+     */
     function defaultAction()
     {
         switch ($this->getAction()) {
@@ -91,6 +96,9 @@ class CTDailyStatsDashboard extends CTCNC
         }
     }
 
+    /**
+     * @throws ColumnOutOfRangeException
+     */
     private function getNearSLAServiceRequestsController(): array
     {
         $serviceRequestDB = new DBEJProblem($this);
@@ -98,6 +106,9 @@ class CTDailyStatsDashboard extends CTCNC
         return $this->getJsonResponse($serviceRequestDB);
     }
 
+    /**
+     * @throws ColumnOutOfRangeException
+     */
     private function getNearFixSLABreachServiceRequestsController(): array
     {
         $serviceRequestDB = new DBEJProblem($this);
@@ -105,7 +116,10 @@ class CTDailyStatsDashboard extends CTCNC
         return $this->getJsonResponse($serviceRequestDB);
     }
 
-    private function getRaisedOnServiceRequestsController()
+    /**
+     * @throws ColumnOutOfRangeException
+     */
+    private function getRaisedOnServiceRequestsController(): array
     {
         $date             = $this->getRequestedDateOrToday();
         $serviceRequestDB = new DBEJProblem($this);
@@ -116,6 +130,7 @@ class CTDailyStatsDashboard extends CTCNC
     /**
      * @param DBEJProblem $serviceRequestDB
      * @return array
+     * @throws ColumnOutOfRangeException
      */
     private function getJsonResponse(DBEJProblem $serviceRequestDB): array
     {
@@ -126,6 +141,9 @@ class CTDailyStatsDashboard extends CTCNC
         return ["status" => "ok", "data" => $toReturn];
     }
 
+    /**
+     * @throws ColumnOutOfRangeException
+     */
     private function getStartedOnServiceRequestsController(): array
     {
         $date             = $this->getRequestedDateOrToday();
@@ -135,14 +153,14 @@ class CTDailyStatsDashboard extends CTCNC
     }
 
     /**
-     * @return \DateTimeImmutable
+     * @return DateTimeImmutable
      */
-    private function getRequestedDateOrToday(): \DateTimeImmutable
+    private function getRequestedDateOrToday(): DateTimeImmutable
     {
-        $date          = new \DateTimeImmutable();
+        $date          = new DateTimeImmutable();
         $requestedDate = @$_REQUEST['date'];
         if ($requestedDate) {
-            $possibleDate = \DateTimeImmutable::createFromFormat(DATE_MYSQL_DATE, $requestedDate);
+            $possibleDate = DateTimeImmutable::createFromFormat(DATE_MYSQL_DATE, $requestedDate);
             if ($possibleDate) {
                 $date = $possibleDate;
             }
@@ -150,6 +168,9 @@ class CTDailyStatsDashboard extends CTCNC
         return $date;
     }
 
+    /**
+     * @throws ColumnOutOfRangeException
+     */
     private function getFixedOnServiceRequestsController(): array
     {
         $date             = $this->getRequestedDateOrToday();
@@ -158,6 +179,9 @@ class CTDailyStatsDashboard extends CTCNC
         return $this->getJsonResponse($serviceRequestDB);
     }
 
+    /**
+     * @throws ColumnOutOfRangeException
+     */
     private function getReopenedOnServiceRequestsController(): array
     {
         $date             = $this->getRequestedDateOrToday();
@@ -166,6 +190,9 @@ class CTDailyStatsDashboard extends CTCNC
         return $this->getJsonResponse($serviceRequestDB);
     }
 
+    /**
+     * @throws ColumnOutOfRangeException
+     */
     private function getBreachedSLAOnServiceRequestsController(): array
     {
         $date             = $this->getRequestedDateOrToday();
@@ -174,6 +201,9 @@ class CTDailyStatsDashboard extends CTCNC
         return $this->getJsonResponse($serviceRequestDB);
     }
 
+    /**
+     * @throws Exception
+     */
     private function mainPageController()
     {
         $this->setMenuId(513);

@@ -1,5 +1,6 @@
 <?php
 
+use CNCLTD\Data\DBEJProblem;
 use CNCLTD\LoggerCLI;
 use CNCLTD\SupportedCustomerAssets\NotMatchedItemDTO;
 use CNCLTD\SupportedCustomerAssets\SupportedCustomerAssets;

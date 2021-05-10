@@ -11,7 +11,9 @@ use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequest;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestRepository;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestTokenId;
 use CNCLTD\CommunicationService\CommunicationService;
+use CNCLTD\Data\DBEJProblem;
 use CNCLTD\Exceptions\ChargeableWorkCustomerRequestNotFoundException;
+use CNCLTD\Exceptions\ColumnOutOfRangeException;
 use CNCLTD\Exceptions\ServiceRequestNotFoundException;
 use DataSet;
 use DateTimeImmutable;
@@ -23,13 +25,11 @@ use DBEItem;
 use DBEJContract;
 use DBEJOrdhead;
 use DBEJOrdline;
-use DBEJProblem;
 use DBEJUser;
 use DBEOrdhead;
 use DBEOrdline;
 use DBEProblem;
 use DBEUser;
-use Exception;
 
 global $cfg;
 require_once($cfg["path_bu"] . "/BUActivity.inc.php");
@@ -56,7 +56,7 @@ class AcceptPendingChargeableWorkCustomerRequest
      * @param ChargeableWorkCustomerRequestTokenId $id
      * @param string|null $comments
      * @throws ChargeableWorkCustomerRequestNotFoundException
-     * @throws ServiceRequestNotFoundException
+     * @throws ServiceRequestNotFoundException|ColumnOutOfRangeException
      */
     public function __invoke(ChargeableWorkCustomerRequestTokenId $id, ?string $comments)
     {
@@ -120,14 +120,15 @@ class AcceptPendingChargeableWorkCustomerRequest
     /**
      * @param ChargeableWorkCustomerRequest $request
      * @param DateTimeInterface|null $requestApprovedAt
-     * @param DBEProblem $serviceRequest
+     * @param DBEJProblem $serviceRequest
      * @param string|null $comments
      * @param bool $hasPrepay
-     * @throws Exception
+     * @throws ColumnOutOfRangeException
+     * @throws \Exception
      */
     private function logCustomerContactActivity(ChargeableWorkCustomerRequest $request,
                                                 ?DateTimeInterface $requestApprovedAt,
-                                                DBEProblem $serviceRequest,
+                                                DBEJProblem $serviceRequest,
                                                 ?string $comments,
                                                 bool $hasPrepay
     ): void
@@ -150,6 +151,7 @@ class AcceptPendingChargeableWorkCustomerRequest
      * @param DBEJProblem $DBEJProblem
      * @param ChargeableWorkCustomerRequest $request
      * @return void
+     * @throws ColumnOutOfRangeException
      */
     private function createOrUpdateSalesOrder(DBEJProblem $DBEJProblem, ChargeableWorkCustomerRequest $request): void
     {
@@ -202,6 +204,7 @@ class AcceptPendingChargeableWorkCustomerRequest
      * @param float|null $customerID
      * @param DBEJProblem $DBEJProblem
      * @return void
+     * @throws ColumnOutOfRangeException
      */
     private function insertCommentLine(?float $ordheadID, ?float $customerID, DBEJProblem $DBEJProblem): void
     {
@@ -223,6 +226,7 @@ class AcceptPendingChargeableWorkCustomerRequest
      * @param  $ordheadID
      * @param $customerID
      * @param ChargeableWorkCustomerRequest $request
+     * @throws ColumnOutOfRangeException
      */
     private function insertItemLine($ordheadID,
                                     $customerID,
@@ -265,6 +269,9 @@ class AcceptPendingChargeableWorkCustomerRequest
         return $dbeOrdline;
     }
 
+    /**
+     * @throws ColumnOutOfRangeException
+     */
     private function updateItemLine(DBEOrdline $labourLine, ChargeableWorkCustomerRequest $request)
     {
         $quantity = $labourLine->getValue(DBEOrdline::qtyOrdered) + $request->getAdditionalHoursRequested()->value();
@@ -279,6 +286,7 @@ class AcceptPendingChargeableWorkCustomerRequest
     /**
      * @param DataSet $dsOrdline
      * @return DBEOrdline|null
+     * @throws ColumnOutOfRangeException
      */
     private function getLabourLine(DataSet $dsOrdline): ?DBEOrdline
     {
@@ -296,6 +304,7 @@ class AcceptPendingChargeableWorkCustomerRequest
      * @param DBEJProblem $dbeProblem
      * @param ChargeableWorkCustomerRequest $request
      * @param bool $hasPrepay
+     * @throws ColumnOutOfRangeException
      */
     private function updateServiceRequest(DBEJProblem $dbeProblem,
                                           ChargeableWorkCustomerRequest $request,
