@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 1393 - Parts Used Send button issue.
+
 ## [v5.10.2]
 ### Fixed
 - Fix issue with BCC on customer emails flag
