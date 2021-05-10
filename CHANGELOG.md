@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 1375 - Error logged for DailySalesRequestEmail.php.
+
 ## [v5.10.2]
 ### Fixed
 - Fix issue with BCC on customer emails flag
