@@ -6,6 +6,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BURenHosting.inc.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
@@ -183,6 +184,8 @@ class CTRenHosting extends CTCNC
         $this->setTemplateFiles(
             array('RenHostingEdit' => 'RenHostingEdit.inc')
         );
+        $this->loadReactScript('ItemSelectorWrapperComponent.js');
+        $this->loadReactCSS('ItemSelectorWrapperComponent.css');
         $readonly = null;
         $disabled = null;
 
