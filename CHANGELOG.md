@@ -1,5 +1,8 @@
 # Changelog
 This project changes will be shown here.
+## [unreleased]
+### Change
+- Update Header.php to be in react and update app exception
 
 ## [v5.10.2]
 ### Fixed
