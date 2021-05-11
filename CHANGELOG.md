@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 1382 - IP Range restriction error.
+
 ## [v5.10.2]
 ### Fixed
 - Fix issue with BCC on customer emails flag
