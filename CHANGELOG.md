@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1380 - Edit Items within contracts & renewals
+
 ## [v5.10.2]
 ### Fixed
 - Fix issue with BCC on customer emails flag
