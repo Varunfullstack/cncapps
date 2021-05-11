@@ -16,7 +16,7 @@ export class ItemSelectorWrapperComponent extends React.PureComponent {
 
         let id = null;
         if (value) {
-            id = value.id;
+            id = value.itemID;
         }
         if (this.props.inputId) {
             const input = document.getElementById(this.props.inputId);

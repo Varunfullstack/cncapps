@@ -1,5 +1,4 @@
 import React from "react";
-import {SupplierService} from "../../services/SupplierService";
 import {Autocomplete} from "@material-ui/lab";
 import PropTypes from "prop-types";
 import APIItems from "../../ItemsComponent/services/APIItems";
@@ -17,7 +16,7 @@ export default class ItemSelectorComponent extends React.PureComponent {
     constructor(props, context) {
         super(props, context);
         this.state = {
-            suppliers: [],
+            items: [],
             selectedOption: null
         }
     }
@@ -29,7 +28,7 @@ export default class ItemSelectorComponent extends React.PureComponent {
             if (this.props.itemId) {
                 const {itemId} = this.props;
                 const {items} = this.state;
-                selectedOption = items.find(x => x.id === itemId);
+                selectedOption = items.find(x => x.itemID === itemId);
                 this.props.onChange(selectedOption, CHANGE_REASON.INITIALIZATION);
             }
             this.setState({selectedOption});
@@ -39,19 +38,19 @@ export default class ItemSelectorComponent extends React.PureComponent {
 
     async componentDidMount() {
         const {itemId} = this.props;
-        const items = await this.api.getItems(100000, 1, 'description', 'asc', null, false)
+        const {data: items} = await this.api.getItems(100000, 1, 'description', 'asc', '', false);
         let selectedOption = null;
         if (itemId) {
-            selectedOption = items.find(x => x.id === itemId);
+            selectedOption = items.find(x => x.itemID === itemId);
             this.props.onChange(selectedOption, CHANGE_REASON.INITIALIZATION);
         }
-        this.setState({suppliers: items.sort((a, b) => a.description.localeCompare(b.name)), selectedOption});
+        this.setState({items: items.sort((a, b) => a.description.localeCompare(b.name)), selectedOption});
     }
 
     getOptions() {
-        const { items} = this.state;
+        const {items} = this.state;
         return [
-            ...items.filter(x => x.active)
+            ...items.filter(x => x.discontinuedFlag !== 'Y')
         ];
     }
 
@@ -64,7 +63,7 @@ export default class ItemSelectorComponent extends React.PureComponent {
             return "";
         }
 
-        return option.name;
+        return option.description;
     }
 
     onChange(event, value, reason) {
@@ -79,14 +78,12 @@ export default class ItemSelectorComponent extends React.PureComponent {
 
     filterOptions(options, {inputValue}) {
         return options.filter(x => {
-            return x.discontinued !== 'Y' && this.stringSearch(x.name, inputValue);
+            return x.discontinuedFlag !== 'Y' && this.stringSearch(x.description, inputValue);
         });
     }
 
     render() {
         const {selectedOption} = this.state;
-
-
         if (selectedOption) {
             return (
                 <div style={{display: 'inline-block'}}>
