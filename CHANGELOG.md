@@ -2,7 +2,7 @@
 This project changes will be shown here.
 
 ## [unreleased]
-### Fixed
+### Removed
 - Issue 1375 - Error logged for DailySalesRequestEmail.php.
 
 ## [v5.10.2]
