@@ -9,6 +9,7 @@ import CNCCKEditor from '../shared/CNCCKEditor';
 import './HeaderComponent.css';
 import './../style.css';
 import '../shared/table/table.css';
+import PortalDocumentComponent from './subComponents/PortalDocumentComponent';
 
 class HeaderComponent extends MainComponent {
   el = React.createElement;
@@ -40,21 +41,21 @@ class HeaderComponent extends MainComponent {
       showSpinner: false,
       currentUser: null,
       data: {
-        name: "",
-        add1:"",
-        add2:"",
-        add3:"",
-        town:"",
-        county:"",
-        postcode:"",
-        phone:"",
-        fax:"",
-        goodsContact:"",
-        gscItemID:"",
-        gscItemDescription:"",
-        yearlySicknessThresholdWarning:"",
-        stdVATCode:"",
-        billingEndTime:""
+        // name: "",
+        // add1:"",
+        // add2:"",
+        // add3:"",
+        // town:"",
+        // county:"",
+        // postcode:"",
+        // phone:"",
+        // fax:"",
+        // goodsContact:"",
+        // gscItemID:"",
+        // gscItemDescription:"",
+        // yearlySicknessThresholdWarning:"",
+        // stdVATCode:"",
+        // billingEndTime:""
       },
       filter: {
         activeTab: "",
@@ -86,7 +87,7 @@ class HeaderComponent extends MainComponent {
   componentDidMount() {
     this.loadFilterFromStorage();
     this.api.getHeaderData().then((res) => {
-      console.log(res);
+      //console.log(res);
       if (res.state) this.setState({ data: res.data });
     });
   }
@@ -105,7 +106,6 @@ class HeaderComponent extends MainComponent {
 
   getTabsElement = () => {
     const { el, tabs } = this;
-    const { currentUser } = this.state;
     return el(
       "div",
       {
@@ -376,12 +376,17 @@ class HeaderComponent extends MainComponent {
   }
   getPortalTab = () => {
     return (
+      <div>
       <table className="table table-striped"  style={{width:500}}>
         <tbody>        
           {this.getInput("Portal PIN","portalPin",this.inputType.Number,true,"","","",5,5)}     
           {this.getInput("Portal 24 Hour Support PIN","portal24HourPin",this.inputType.Number,true,"","","",5,5)}                 
         </tbody>
       </table>
+      <PortalDocumentComponent>
+
+      </PortalDocumentComponent>
+      </div>
     );
   }
   
@@ -420,7 +425,7 @@ class HeaderComponent extends MainComponent {
           {this.getInput("Office 365 Active Sync Warn After X Days","office365ActiveSyncWarnAfterXDays",this.inputType.Number,true,"days after which a warning should be sent","","",5,5)}
           {this.getInput("C Drive Free Space Warning Percentage Threshold","cDriveFreeSpaceWarningPercentageThreshold",this.inputType.Number,true,"C Drive Free Space Warning Percentage Threshold","","",5,5)}
           {this.getInput("Other Drive Free Space Warning Percentage Threshold","otherDriveFreeSpaceWarningPercentageThreshold",this.inputType.Number,true,"Other Drive Free Space Warning Percentage Threshold","","",5,5)}
-          {this.getInput("Computers seen online within XX Days","computerLastSeenThresholdDays",this.inputType.Number,true,"Threshold to ignore computers from the report if they have been seen within CWA, CWC & Webroot console within these days","","",5,5)}
+          {this.getInput("Computers seen online within XX Days","computerLastSeenThresholdDays",this.inputType.Number,true,"Threshold to ignore computers from the report if they have been seen within CWA, CWC & Webroot //console within these days","","",5,5)}
         </tbody>
       </table>
     );
@@ -562,14 +567,14 @@ class HeaderComponent extends MainComponent {
     data.mailshot8FlagDef=data.mailshot8FlagDef?"Y":"N";
     data.mailshot4FlagDef=data.mailshot4FlagDef?"Y":"N";
     data.mailshot3FlagDef=data.mailshot3FlagDef?"Y":"N";
-    data.mailshot2FlagDef=data.mailshot2FlagDef?"Y":"N";
-    data.OSSupportDatesThresholdDays=data.OSSupportDatesThresholdDays?1:0;    
-    
-    console.log(data);
+    data.mailshot2FlagDef=data.mailshot2FlagDef?"Y":"N";     
+    //console.log(data);
     this.api.updateHeaderData(data).then(res=>{
-      console.log(res);
-      if(res.state)
-      this.alert("data saved");
+      //console.log(res);
+      // if(res.state)
+      // this.alert("data saved");
+    },err=>{      
+      this.alert("Please enter all required fields")
     })
   }
   render() {

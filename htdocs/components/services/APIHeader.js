@@ -13,13 +13,9 @@ class APIHeader extends APIMain {
     getHeaderData(){
         return this.get(`${ApiUrls.Header}header`);
 
-    }
-    getPortalDocuments(){
-        return this.get(`${ApiUrls.Header}portalDocument`);
-
-    }
+    }    
     updateHeaderData(body){
-        return this.put(`${ApiUrls.Header}header`,body);
+        return this.put(`${ApiUrls.Header}header`,body,true);
     }
 
 }
