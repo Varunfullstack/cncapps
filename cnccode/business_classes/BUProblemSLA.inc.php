@@ -408,6 +408,7 @@ class BUProblemSLA extends Business
             DATE_MYSQL_DATETIME,
             $serviceRequest->getValue(DBEProblem::dateRaised)
         );
+
         return $this->getWorkingHoursBetweenUnixDates($raisedAt->format('U'), $startedAt->format('U'));
     }
 
