@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [v5.10.3] 
 ## Fixed 
 - Fixed issue with customer stats.
+- Created one off script to fix issue with callbacks setting the wrong responded hours value.
 
 ## [v5.10.2]
 ### Fixed
