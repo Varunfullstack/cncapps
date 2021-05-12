@@ -1,5 +1,4 @@
 <?php
-
 /**
  * My Account controller class
  * CNC Ltd
@@ -17,12 +16,11 @@ class CTMySettings extends CTCNC
     /** @var DSForm */
     public $dsUser;
 
-    function __construct(
-        $requestMethod,
-        $postVars,
-        $getVars,
-        $cookieVars,
-        $cfg
+    function __construct($requestMethod,
+                         $postVars,
+                         $getVars,
+                         $cookieVars,
+                         $cfg
     )
     {
         parent::__construct(
@@ -75,13 +73,11 @@ class CTMySettings extends CTCNC
         $this->setPageTitle('My Account');
         $this->loadReactScript('MySettingsComponent.js');
         $this->loadReactCSS('MySettingsComponent.css');
-
         $this->template->parse(
             'CONTENTS',
             'MySettings',
             true
         );
-
         $this->parsePage();
     }
 
@@ -90,11 +86,10 @@ class CTMySettings extends CTCNC
         $BUUser = new BUUser($this);
         $dsUser = new DataSet($this);
         $BUUser->getUserByID($this->userID, $dsUser);
-        //$BUUser->getUserByID(29, $dsUser);
-        $teamId = $dsUser->getValue(DBEJUser::teamID);
+        $teamId    = $dsUser->getValue(DBEJUser::teamID);
         $managerId = $dsUser->getValue(DBEJUser::managerID);
-        $userId = $dsUser->getValue(DBEJUser::userID);
-        $result = array(
+        $userId    = $dsUser->getValue(DBEJUser::userID);
+        $result    = array(
             'name'                     => $dsUser->getValue(DBEJUser::name),
             'jobTitle'                 => $dsUser->getValue(DBEJUser::jobTitle),
             'team'                     => !$teamId ? '' : $this->getTeamName($teamId),
@@ -103,8 +98,8 @@ class CTMySettings extends CTCNC
             'startDate'                => $dsUser->getValue(DBEJUser::startDate),
             'sendEmailAssignedService' => $dsUser->getValue(DBEJUser::sendEmailWhenAssignedService),
             'userLog'                  => $this->getUserTimeLog($userId),
-            "bccOnCustomerEmails"=> $dsUser->getValue(DBEUser::bccOnCustomerEmails),
-            "callBackEmail"=> $dsUser->getValue(DBEUser::callBackEmail)
+            "bccOnCustomerEmails"      => $dsUser->getValue(DBEUser::bccOnCustomerEmails),
+            "callBackEmail"            => $dsUser->getValue(DBEUser::callBackEmail)
         );
         return $result;
     }
@@ -135,10 +130,8 @@ class CTMySettings extends CTCNC
 
     public function fetchAll($query, $params)
     {
-        $db = new PDO(
-            'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8',
-            DB_USER,
-            DB_PASSWORD
+        $db   = new PDO(
+            'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8', DB_USER, DB_PASSWORD
         );
         $stmt = $db->prepare($query, $params);
         foreach ($params as $key => $value) {
@@ -156,8 +149,7 @@ class CTMySettings extends CTCNC
     function setSendEmailAssignedService()
     {
         $newVal = $this->getParam('sendEmailAssignedService');
-        if (!isset($newVal))
-            return false;
+        if (!isset($newVal)) return false;
         $dbeUser = new DBEUser($this);
         $dbeUser->setValue(DBEJUser::userID, $this->userID);
         $dbeUser->getRow();
@@ -165,8 +157,10 @@ class CTMySettings extends CTCNC
         $dbeUser->updateRow();
         return true;
     }
-    function saveMySettings(){
-        $body = json_decode(file_get_contents('php://input'));        
+
+    function saveMySettings()
+    {
+        $body    = json_decode(file_get_contents('php://input'));
         $dbeUser = new DBEUser($this);
         $dbeUser->setValue(DBEJUser::userID, $this->userID);
         $dbeUser->getRow();
@@ -174,6 +168,6 @@ class CTMySettings extends CTCNC
         $dbeUser->setValue(DBEJUser::bccOnCustomerEmails, $body->bccOnCustomerEmails);
         $dbeUser->setValue(DBEJUser::callBackEmail, $body->callBackEmail);
         $dbeUser->updateRow();
-        return ["status"=>true];
+        return ["status" => true];
     }
 }

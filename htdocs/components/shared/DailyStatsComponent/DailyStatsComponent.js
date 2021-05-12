@@ -57,7 +57,7 @@ class DailyStatsComponent extends MainComponent {
                 <td>{this.getOpenSrCard(summary.prioritySummary)}</td>
                 <td>{this.getTeamSrCard(summary.openSrTeamSummary, evenBackgroundColor, eventTextColor)}</td>
                 <td>{this.getDailySourceCard(summary.dailySourceSummary)}</td>
-                <td>{this.getDailyInboundOutBoundCard(summary.inboundOutbound, evenBackgroundColor)}</td>
+                <td>{this.getDailyInboundOutBoundCard(summary.inboundOutbound, evenBackgroundColor,eventTextColor)}</td>
                 <td>{this.getTotalCardWithBiggerNumber("Near SLA", summary.nearSLASummary.total)}</td>
                 <td>{this.getTotalCardWithBiggerNumber("Near Fix SLA Breach", summary.nearFixSLABreach, evenBackgroundColor, eventTextColor)}</td>
 
@@ -264,7 +264,7 @@ class DailyStatsComponent extends MainComponent {
     }
     getDailyInboundOutBoundCard = (data,
                                    backgroundColor = "#C6C6C6",
-                                   textColor = "#FFFFFF") => {
+                                   textColor) => {
         return <div className="sd-card" style={{backgroundColor: backgroundColor, color: textColor}}>
             <label className="sd-card-title">Daily Contact</label>
             <table style={{color: textColor}}>

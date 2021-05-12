@@ -815,6 +815,15 @@ class CTUser extends CTCNC
             $this->edit();
             exit;
         }
+
+        if($this->dsUser->getValue(DBEJUser::userID)){
+            $dbeUser = new DBEUser($this);
+            $dbeUser->getRow($this->dsUser->getValue(DBEUser::userID));
+            $this->dsUser->setUpdateModeUpdate();
+            $this->dsUser->setValue(DBEUser::bccOnCustomerEmails, $dbeUser->getValue(DBEUser::bccOnCustomerEmails));
+            $this->dsUser->post();
+        }
+
         $this->buUser->updateUser($this->dsUser);
         $urlNext = Controller::buildLink(
             $_SERVER['PHP_SELF'],

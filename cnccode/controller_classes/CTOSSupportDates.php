@@ -78,10 +78,6 @@ class CTOSSupportDates extends CTCNC
                 $DBEOSSupportDates->setValue(DBEOSSupportDates::endOfLifeDate, $endOfLifeDateString);
                 $DBEOSSupportDates->setValue(DBEOSSupportDates::isServer, $this->getParam('isServer') === 'on');
                 $DBEOSSupportDates->setValue(DBEOSSupportDates::friendlyName, $_REQUEST['friendlyName']);
-                $DBEOSSupportDates->setValue(
-                    DBEOSSupportDates::thirdPartyPatchingCapable,
-                    $this->getParam('thirdPartyPatchingCapable') === 'on'
-                );
                 $DBEOSSupportDates->updateRow();
                 echo json_encode(["status" => "ok"]);
                 break;
@@ -108,10 +104,6 @@ class CTOSSupportDates extends CTCNC
                 $DBEOSSupportDates->setValue(DBEOSSupportDates::availabilityDate, $availabilityDateString);
                 $DBEOSSupportDates->setValue(DBEOSSupportDates::endOfLifeDate, $endOfLifeDateString);
                 $DBEOSSupportDates->setValue(DBEOSSupportDates::isServer, $this->getParam('isServer') === 'on');
-                $DBEOSSupportDates->setValue(
-                    DBEOSSupportDates::thirdPartyPatchingCapable,
-                    $this->getParam('thirdPartyPatchingCapable') === 'on'
-                );
                 $DBEOSSupportDates->setValue(DBEOSSupportDates::friendlyName, $_REQUEST['friendlyName']);
                 $DBEOSSupportDates->insertRow();
                 echo json_encode(
@@ -131,9 +123,6 @@ class CTOSSupportDates extends CTCNC
                         "isServer"                       => $DBEOSSupportDates->getValue(DBEOSSupportDates::isServer),
                         "friendlyName"                   => $DBEOSSupportDates->getValue(
                             DBEOSSupportDates::friendlyName
-                        ),
-                        "thirdPartyPatchingCapable" => $DBEOSSupportDates->getValue(
-                            DBEOSSupportDates::thirdPartyPatchingCapable
                         ),
                     ],
                     JSON_NUMERIC_CHECK
@@ -159,9 +148,6 @@ class CTOSSupportDates extends CTCNC
                         ),
                         "isServer"                  => $DBEOSSupportDates->getValue(DBEOSSupportDates::isServer),
                         "friendlyName"              => $DBEOSSupportDates->getValue(DBEOSSupportDates::friendlyName),
-                        "thirdPartyPatchingCapable" => $DBEOSSupportDates->getValue(
-                            DBEOSSupportDates::thirdPartyPatchingCapable
-                        ),
                     ];
                 }
                 echo json_encode(

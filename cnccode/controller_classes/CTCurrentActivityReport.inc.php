@@ -786,8 +786,6 @@ class CTCurrentActivityReport extends CTCNC
             $dbeCallActivity->insertRow();
             $dbeProblem = new DBEProblem($this);
             $dbeProblem->getRow($problemID);
-            $respondedHours = $dbeProblem->getValue(DBEJProblem::workingHours);
-            $dbeProblem->setValue(DBEJProblem::respondedHours, $respondedHours);
             $dbeProblem->setValue(DBEProblem::status, 'P');
             $dbeProblem->updateRow();
             return ['status' => true, "callActivityID" => $dbeCallActivity->getPKValue()];

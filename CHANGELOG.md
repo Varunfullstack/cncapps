@@ -5,8 +5,23 @@ This project changes will be shown here.
 ### Changed
 - Issue 1229 - Rearrange external files location
 - Issue 1372 - Improved Error handling for Removing qsystem assigned SRs
+ 
+## [v5.10.3] - 2021-05-12
+## Fixed 
+- Fixed issue with customer stats.
+- Created one off script to fix issue with callbacks setting the wrong responded hours value.
 
-## [v5.10.0] 
+## [v5.10.2] - 2021-05-10
+### Fixed
+- Fix issue with BCC on customer emails flag
+
+## [v5.10.1] - 2021-05-07
+### Changed
+- Change Daily Stats "Daily Contact" text colour
+### Fixed
+- OSSupportDates fails to load
+
+## [v5.10.0] - 2021-05-05
 ### Added
 - Issue 1355 - Added a one off script to create Microsoft 365 Support items in contracts for customers.
 - Issue 1223 - Update Patch Management Contract numbers automatically

@@ -146,13 +146,13 @@
             const data = $(this).data();
 
             generateInput(
-                data.name,
-                $(this).closest('td'),
-                {decryptedData: ''},
-                data.extraData,
-                data.customClass,
-                data.customFunction,
-                data.additionalAttributes
+                    data.name,
+                    $(this).closest('td'),
+                    {decryptedData: ''},
+                    data.extraData,
+                    data.customClass,
+                    data.customFunction,
+                    data.additionalAttributes
             );
         })
     }
@@ -727,17 +727,6 @@
                 />
             </td>
         </tr>
-        <!-- <tr>
-            <td class="promptText">BCC on customer emails</td>
-            <td class="fieldText">
-                <input name="user[1][bccOnCustomerEmails]"
-                       type="checkbox"
-                       value="true"
-                       {DISABLED}
-                       {bccOnCustomerEmailsChecked}
-                />
-            </td>
-        </tr> -->
         <tr>
             <td class="promptText">&nbsp;</td>
             <td class="fieldText">&nbsp;</td>

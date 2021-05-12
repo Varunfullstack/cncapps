@@ -1,0 +1,18 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.2.xsd">
+    <changeSet author="pavwebdev" id="hotfix-v5.10.2-0">
+        <tagDatabase tag="hotfix-v5.10.2"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="hotfix-v5.10.2-1">
+        <sql>
+            <![CDATA[
+            update consultant left join team on consultant.teamID = team.teamID
+            set bccOnCustomerEmails = 1
+            where consultant.activeFlag = 'Y'
+            ]]>
+        </sql>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>

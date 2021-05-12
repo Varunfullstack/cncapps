@@ -386,6 +386,32 @@ class BUProblemSLA extends Business
 
     }
 
+    function getRespondedHours($serviceRequestId)
+    {
+        // get the first activity after initial that is not travel and not operational activity
+        $serviceRequest = new DBEProblem($this);
+        $serviceRequest->getRow($serviceRequestId);
+        $this->dbeJCallActivity->getRowsByProblemID($serviceRequestId, false, false);
+        $found = false;
+        while (!$found && $this->dbeJCallActivity->fetchNext()) {
+            if ($this->dbeJCallActivity->getValue(DBECallActivity::callActTypeID) !== CONFIG_INITIAL_ACTIVITY_TYPE_ID) {
+                $found = true;
+            }
+        }
+        $startedDate = $this->dbeJCallActivity->getValue(DBECallActivity::date);
+        $startTime   = $this->dbeJCallActivity->getValue(DBECallActivity::startTime);
+        $startedAt = DateTimeImmutable::createFromFormat(
+            DATE_MYSQL_DATE . " " . CONFIG_MYSQL_TIME_HOURS_MINUTES,
+            $startedDate . " " . $startTime
+        );
+        $raisedAt  = DateTimeImmutable::createFromFormat(
+            DATE_MYSQL_DATETIME,
+            $serviceRequest->getValue(DBEProblem::dateRaised)
+        );
+
+        return $this->getWorkingHoursBetweenUnixDates($raisedAt->format('U'), $startedAt->format('U'));
+    }
+
     /**
      * Calculate number of working hours for a problem
      *
@@ -801,7 +827,6 @@ class BUProblemSLA extends Business
             </div>
             <?php
         }
-
         if ($isStarterOrLeaver && $serverCareContractID && $thresholdCheck && $fixedDateCheck) {
 
             $this->dbeProblem->setValue(
@@ -812,12 +837,11 @@ class BUProblemSLA extends Business
             $this->buActivity->setProblemToCompleted($problemID);
             return;
         }
-
         if ($forced || ($this->dbeProblem->getValue(
-                DBEProblem::contractCustomerItemID
-            ) != 0 && $hoursUntilComplete <= 0 && $this->dbeProblem->getValue(
-                DBEProblem::totalActivityDurationHours
-            ) <= $this->srAutocompleteThresholdHours) ) {
+                    DBEProblem::contractCustomerItemID
+                ) != 0 && $hoursUntilComplete <= 0 && $this->dbeProblem->getValue(
+                    DBEProblem::totalActivityDurationHours
+                ) <= $this->srAutocompleteThresholdHours)) {
             $this->buActivity->setProblemToCompleted($problemID);
             return;
         }
