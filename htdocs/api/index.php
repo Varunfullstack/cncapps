@@ -103,7 +103,7 @@ $app->group(
                 $isBreakDown = isset($queryParams['breakDown']);
                 $query       = "select SUM(1) AS raised,
     SUM(pro_status IN ('F' , 'C')) AS `fixed`,
-    AVG(problem.`pro_responded_hours`) AS responseTime,
+    AVG(if(pro_status IN ('F', 'C'),problem.`pro_responded_hours`,null) AS responseTime,
        null as sla,
     AVG(IF(pro_status IN ('F' , 'C'),
         problem.`pro_responded_hours` < CASE problem.`pro_priority`
@@ -254,7 +254,7 @@ FROM
       pro_priority AS priority,
       SUM(1) AS raised,
       SUM(pro_status IN ('F', 'C')) AS `fixed`,
-      AVG(problem.`pro_responded_hours`) AS responseTime,
+      AVG(if(pro_status IN ('F', 'C'),problem.`pro_responded_hours`, null) AS responseTime,
       AVG(
         IF(
           pro_status IN ('F', 'C'),
@@ -796,7 +796,7 @@ ORDER BY COUNT DESC";
                 $query       = 'SELECT
   SUM(1) AS raised,
     SUM(pro_status IN("F","C")) AS `fixed`,
-  AVG(if(problem.pro_priority = 1,problem.`pro_responded_hours`, null)) AS responseTime,
+  AVG(if(problem.pro_priority = 1 and pro_status IN ("F","C") ,problem.`pro_responded_hours`, null)) AS responseTime,
   AVG(
    IF(pro_status IN ("F","C"),   
    problem.`pro_responded_hours` < 
@@ -833,7 +833,7 @@ WHERE  caa_date between ? and ?
        pro_priority as priority,
   SUM(1) AS raised,
     SUM(pro_status IN("F","C")) AS `fixed`,
-  AVG(if(problem.pro_priority = 1,problem.`pro_responded_hours`, null)) AS responseTime,
+  AVG(if(problem.pro_priority = 1 and pro_status IN ("F","C"),problem.`pro_responded_hours`, null)) AS responseTime,
   AVG(
    IF(pro_status IN ("F","C"),   
    problem.`pro_responded_hours` < 
