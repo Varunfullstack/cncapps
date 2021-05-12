@@ -34,5 +34,6 @@ export default class ApiUrls {
     static Supplier="/Supplier.php?action=";
     static KeywordMatchingIgnores="/KeywordMatchingIgnores.php?action=";
     static PortalDocument="/PortalDocument.php?action=";
+    static StarterLeaverManagement="/StarterLeaverManagement.php?action=";
 
 }

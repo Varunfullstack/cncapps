@@ -1,7 +1,7 @@
 class APIMain {
     get(url) {
         return fetch(url)
-            .then((res) => res.json());
+        .then((res) => this.handleResponse(res));
     }
 
     getCustomers() {

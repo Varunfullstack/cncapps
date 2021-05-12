@@ -14,7 +14,7 @@ class CTStarterLeaverManagement extends CTCNC
 {
     /** @var DSForm */
     public $dsStandardText;
-
+    const CONST_CUSTOMERS="customers";
     function __construct($requestMethod,
                          $postVars,
                          $getVars,
@@ -54,6 +54,9 @@ class CTStarterLeaverManagement extends CTCNC
 
 
         switch ($this->getAction()) {
+            case self::CONST_CUSTOMERS:
+                echo json_encode($this->getCustomersHaveQuestions(),JSON_NUMERIC_CHECK);                
+                exit;
             case 'addQuestion':
 
                 try {
@@ -207,67 +210,7 @@ class CTStarterLeaverManagement extends CTCNC
         );
         $this->parsePage();
 /*
-        $this->setMethodName('displayList');
-        $this->setPageTitle('Starter Leaver Management');
-        $this->setTemplateFiles(
-            [
-                'StarterLeaverManagement'      => 'StarterLeaverManagement',
-                'StarterLeaverQuestionSection' => 'StarterLeaverQuestionSection'
-            ]
-        );
-
-
-        $dbeStarterLeaverQuestion = new DBEStarterLeaverQuestion($this);
-
-
-        $this->template->setBlock(
-            "StarterLeaverManagement",
-            "customersBlock",
-            "customers"
-        );
-
-        $customers = $dbeStarterLeaverQuestion->getCustomers();
-
-        foreach ($customers as $customer) {
-            $this->template->setVar(
-                [
-                    "customerName" => $customer['customerName'],
-                    "starterLink"  => $customer['starters'] ? "<a  href='StarterLeaverManagement.php?action=displayCustomerQuestions&customerID=" . $customer['customerID'] . "&type=starter'>Starter Questions</a>" : '',
-                    "leaverLink"   => $customer['leavers'] ? "<a  href='StarterLeaverManagement.php?action=displayCustomerQuestions&customerID=" . $customer['customerID'] . "&type=leaver'>Leaver Questions</a>" : '',
-                ]
-            );
-
-            $this->template->parse(
-                "customers",
-                "customersBlock",
-                true
-            );
-        }
-
-
-        $this->template->setVar(
-            [
-                "questionID" => "0",
-                "addOrEdit"  => "Add",
-                'action'     => "StarterLeaverManagement.php?action=addQuestion",
-                'toUpdate'   => 'null',
-                'type'       => 'null'
-            ]
-        );
-
-        $this->template->parse(
-            'starterLeaverQuestionCreationSection',
-            "StarterLeaverQuestionSection",
-            true
-        );
-
-
-        $this->template->parse(
-            'CONTENTS',
-            'StarterLeaverManagement',
-            true
-        );
-        $this->parsePage();
+       
         */
     }
 
@@ -509,5 +452,23 @@ class CTStarterLeaverManagement extends CTCNC
 
 
     }
+    //-----------------new 
+    function getCustomersHaveQuestions()
+    {
+        $data = [];
+        $dbeStarterLeaverQuestion = new DBEStarterLeaverQuestion($this);
+        $customers = $dbeStarterLeaverQuestion->getCustomers();
 
+        foreach ($customers as $customer) {
+            $data[] =
+                [
+                    "customerName" => $customer['customerName'],
+                    "starter"  => $customer['starters'],
+                    "leaver"   => $customer['leavers'],
+                    //"starterLink"  => $customer['starters'] ? "<a  href='StarterLeaverManagement.php?action=displayCustomerQuestions&customerID=" . $customer['customerID'] . "&type=starter'>Starter Questions</a>" : '',
+                    //"leaverLink"   => $customer['leavers'] ? "<a  href='StarterLeaverManagement.php?action=displayCustomerQuestions&customerID=" . $customer['customerID'] . "&type=leaver'>Leaver Questions</a>" : '',
+                ];
+        }
+        return $this->success($data);
+    }
 }
