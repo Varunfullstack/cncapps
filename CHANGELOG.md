@@ -1,12 +1,12 @@
 # Changelog
 This project changes will be shown here.
 
-## [v5.10.3] 
+## [v5.10.3] - 2021-05-12
 ## Fixed 
 - Fixed issue with customer stats.
 - Created one off script to fix issue with callbacks setting the wrong responded hours value.
 
-## [v5.10.2]
+## [v5.10.2] - 2021-05-10
 ### Fixed
 - Fix issue with BCC on customer emails flag
 
