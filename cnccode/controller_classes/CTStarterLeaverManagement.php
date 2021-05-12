@@ -193,6 +193,20 @@ class CTStarterLeaverManagement extends CTCNC
      */
     function displayList()
     {
+        //-------new 
+        $this->setPageTitle('Starter Leaver Management');
+        $this->setTemplateFiles(
+            array('StarterLeaverManagement' => 'StarterLeaverManagement')
+        );
+        $this->loadReactScript('StarterLeaverManagementComponent.js');
+        $this->loadReactCSS('StarterLeaverManagementComponent.css');
+        $this->template->parse(
+            'CONTENTS',
+            'StarterLeaverManagement',
+            true
+        );
+        $this->parsePage();
+/*
         $this->setMethodName('displayList');
         $this->setPageTitle('Starter Leaver Management');
         $this->setTemplateFiles(
@@ -254,6 +268,7 @@ class CTStarterLeaverManagement extends CTCNC
             true
         );
         $this->parsePage();
+        */
     }
 
     /**
