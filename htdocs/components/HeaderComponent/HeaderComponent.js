@@ -529,31 +529,31 @@ class HeaderComponent extends MainComponent {
           <tr>
             <td className="text-center"  style={{width:40}}>1</td>
             <td>
-              {this.getInputElement("priority1Desc",this.inputType.Text,true,"","",50,50)}
+              {this.getInputElement("priority1Desc",this.inputType.Text,true,"","",65,65)}
             </td>             
           </tr>
           <tr>
             <td className="text-center"  style={{width:40}}>2</td>
             <td>
-              {this.getInputElement("priority2Desc",this.inputType.Text,true,"","",50,50)}
+              {this.getInputElement("priority2Desc",this.inputType.Text,true,"","",65,65)}
             </td>              
           </tr>
           <tr>
             <td className="text-center"  style={{width:40}}>3</td>
             <td>
-              {this.getInputElement("priority3Desc",this.inputType.Text,true,"","",50,50)}
+              {this.getInputElement("priority3Desc",this.inputType.Text,true,"","",65,65)}
             </td>             
           </tr>
           <tr>
             <td className="text-center"  style={{width:40}}>4</td>
             <td>
-              {this.getInputElement("priority4Desc",this.inputType.Text,true,"","",50,50)}
+              {this.getInputElement("priority4Desc",this.inputType.Text,true,"","",65,65)}
             </td>             
           </tr>
           <tr>
             <td className="text-center"  style={{width:40}}>5</td>
             <td>
-              {this.getInputElement("priority5Desc",this.inputType.Text,true,"","",50,50)}
+              {this.getInputElement("priority5Desc",this.inputType.Text,true,"","",65,65)}
             </td>              
           </tr>
         </tbody>
