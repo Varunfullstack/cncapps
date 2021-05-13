@@ -40,6 +40,7 @@
         "psr-4": {
             "CNCLTD\\": "cnccode/customClasses",
             "CNCLTD\\Data\\": "cnccode/data_classes",
+            "CNCLTD\\Controller\\": "cnccode/controller_classes",
             "CNCLTD\\Business\\": "cnccode/business_classes"
         }
     },

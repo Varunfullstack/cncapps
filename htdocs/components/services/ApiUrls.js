@@ -5,6 +5,7 @@ export default class ApiUrls {
     static User = "/User.php?action=";
     static callActType = "/ActivityType.php?action=";
     static sdDashboard = "/SDManagerDashboard.php?action=";
+    static DailyStatsDashboard = "/DailyStatsDashboard.php?action=";
     static FirstTimeFixReport = "/FirstTimeFixReport.php?action=";
     static RequestDashboard = "/RequestDashboard.php?action=";
     static KPIReport = "/KPIReport.php?action=";
@@ -28,11 +29,10 @@ export default class ApiUrls {
     static Manufacturer = "/Manufacturer.php?action=";
     static Team = "/Team.php?action=";
     static CreateSalesRequest = "/createSalesRequest.php?action=";
-    static Item="/Item.php?action=";
-    static Password="/Password.php?action=";
-    static PasswordServices="/PasswordServices.php?action=";
-    static Supplier="/Supplier.php?action=";
-    static KeywordMatchingIgnores="/KeywordMatchingIgnores.php?action=";
+    static Item = "/Item.php?action=";
+    static Password = "/Password.php?action=";
+    static PasswordServices = "/PasswordServices.php?action=";
+    static Supplier = "/Supplier.php?action=";
+    static KeywordMatchingIgnores = "/KeywordMatchingIgnores.php?action=";
     static PortalDocument="/PortalDocument.php?action=";
-
 }

@@ -1,4 +1,6 @@
 <?php
+
+use CNCLTD\Data\DBEJProblem;
 use CNCLTD\LoggerCLI;
 require_once(__DIR__ . "/../htdocs/config.inc.php");
 global $cfg;

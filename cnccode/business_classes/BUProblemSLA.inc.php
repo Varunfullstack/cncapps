@@ -5,6 +5,9 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+use CNCLTD\Data\DBEJProblem;
+
+
 global $cfg;
 require_once($cfg ["path_gc"] . "/Business.inc.php");
 require_once($cfg ["path_gc"] . "/Controller.inc.php");
@@ -14,7 +17,7 @@ require_once($cfg ["path_dbe"] . "/DBECallActivity.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEJCallActivity.php");
 require_once($cfg ["path_dbe"] . "/DBEProblem.inc.php");
 require_once($cfg ["path_dbe"] . "/DBERootCause.inc.php");
-require_once($cfg ["path_dbe"] . "/DBEJProblem.inc.php");
+
 require_once($cfg ["path_bu"] . "/BUCustomerItem.inc.php");
 require_once($cfg ["path_func"] . "/Common.inc.php");
 require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");

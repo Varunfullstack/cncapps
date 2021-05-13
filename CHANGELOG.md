@@ -1,8 +1,5 @@
 # Changelog
 This project changes will be shown here.
-## [unreleased]
-### Change
-- Update Header.php to be in react and update app exception
 
 ## [unreleased]
 ### Added
@@ -11,6 +8,8 @@ This project changes will be shown here.
 - Issue 1229 - Rearrange external files location
 - Issue 1372 - Improved Error handling for Removing qsystem assigned SRs
 - Issue 1380 - Edit Items within contracts & renewals
+- Issue 1364 - Update Header.php to be in react and update app exception
+- Issue 1363 - Make homepage Daily Stats clickable to show results
 ### Fixed
 - Issue 1393 - Parts Used Send button issue.
 - Issue 1382 - IP Range restriction error.
@@ -82,7 +81,6 @@ This project changes will be shown here.
 ### Fixed
 - Issue 1226 - StreamOne error handling
 - Issue 1349 - Duplicate Duplicate Contact Warning.
-
 
 ## [v5.8.6] - 2021-04-22
 ### Fixed

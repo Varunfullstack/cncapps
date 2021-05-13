@@ -11,6 +11,7 @@
 use CNCLTD\AutomatedRequest;
 use CNCLTD\ChargeableWorkCustomerRequest\infra\ChargeableWorkCustomerRequestMySQLRepository;
 use CNCLTD\ChargeableWorkCustomerRequest\usecases\ClearPendingChargeableRequestsOnServiceRequestClosed;
+use CNCLTD\Data\DBEJProblem;
 use CNCLTD\DUOApi\Accounts\Account;
 use CNCLTD\Email\AttachmentCollection;
 use CNCLTD\Exceptions\ColumnOutOfRangeException;
@@ -41,7 +42,6 @@ require_once($cfg ["path_dbe"] . "/DBEJCallActivity.php");
 require_once($cfg ["path_dbe"] . "/DBEProblem.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEItem.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEItemType.inc.php");
-require_once($cfg ["path_dbe"] . "/DBEJProblem.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECallActivitySearch.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECallDocument.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECallActType.inc.php");

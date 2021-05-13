@@ -7,6 +7,7 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
+use CNCLTD\Data\DBEJProblem;
 use CNCLTD\StatsFromJSON\StatsFromJSON;
 use Twig\Environment;
 use Twig\TwigFilter;

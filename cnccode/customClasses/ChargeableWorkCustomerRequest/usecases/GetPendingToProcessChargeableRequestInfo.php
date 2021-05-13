@@ -5,10 +5,11 @@ namespace CNCLTD\ChargeableWorkCustomerRequest\usecases;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestTokenId;
 use CNCLTD\ChargeableWorkCustomerRequest\DTO\PendingToProcessChargeableRequestInfoDTO;
 use CNCLTD\ChargeableWorkCustomerRequest\infra\ChargeableWorkCustomerRequestMySQLRepository;
+use CNCLTD\Data\DBEJProblem;
 use CNCLTD\Exceptions\ChargeableWorkCustomerRequestNotFoundException;
 use CNCLTD\Exceptions\ServiceRequestNotFoundException;
-use DBEJProblem;
 use DBEProblem;
+use DBEUser;
 
 class GetPendingToProcessChargeableRequestInfo
 {
@@ -43,7 +44,7 @@ class GetPendingToProcessChargeableRequestInfo
         if (!$dbeProblem->getRow($serviceRequestId)) {
             throw new ServiceRequestNotFoundException();
         }
-        $dbeUser = new \DBEUser($this);
+        $dbeUser = new DBEUser($this);
         $dbeUser->getRow($request->getRequesterId()->value());
         return new PendingToProcessChargeableRequestInfoDTO(
             $id->value(),
@@ -54,7 +55,7 @@ class GetPendingToProcessChargeableRequestInfo
             $dbeProblem->getValue(DBEJProblem::contactName),
             $request->getAdditionalHoursRequested()->value(),
             $request->getReason()->value(),
-            "{$dbeUser->getValue(\DBEUser::firstName)} {$dbeUser->getValue(\DBEUser::lastName)}",
+            "{$dbeUser->getValue(DBEUser::firstName)} {$dbeUser->getValue(DBEUser::lastName)}",
             $request->getCreatedAt()->format(DATE_MYSQL_DATETIME)
         );
     }

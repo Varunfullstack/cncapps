@@ -1,5 +1,8 @@
 <?php
 global $cfg;
+
+use CNCLTD\Data\DBEJProblem;
+
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg["path_dbe"] . "/DBConnect.php");
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');

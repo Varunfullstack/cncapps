@@ -1,6 +1,7 @@
 <?php
 global $cfg;
 const DATA_CSV_FILENAME = 'data.csv';
+use CNCLTD\Data\DBEJProblem;
 use CNCLTD\LoggerCLI;
 use CNCLTD\ToCheckDevice;
 use CNCLTD\WebrootAPI\WebrootAPI;

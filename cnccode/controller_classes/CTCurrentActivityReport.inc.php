@@ -168,6 +168,9 @@ class CTCurrentActivityReport extends CTCNC
         }
     }
 
+    /**
+     * @throws \CNCLTD\Exceptions\ColumnOutOfRangeException
+     */
     private function renderQueue($queueNo)
     {
         if ($queueNo == self::FIXED_AWAITING_CLOSURE) {

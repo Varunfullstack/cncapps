@@ -8,6 +8,7 @@ use CNCLTD\ChargeableWorkCustomerRequest\infra\ChargeableWorkCustomerRequestMySQ
 use CNCLTD\ChargeableWorkCustomerRequest\usecases\CancelPendingChargeableWorkCustomerRequest;
 use CNCLTD\ChargeableWorkCustomerRequest\usecases\ResendPendingChargeableWorkCustomerRequestEmail;
 use CNCLTD\Data\CallBackStatus;
+use CNCLTD\Data\DBEJProblem;
 use CNCLTD\Exceptions\JsonHttpException;
 use CNCLTD\SDManagerDashboard\ServiceRequestSummaryDTO;
 
@@ -264,12 +265,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         $nearFixSLABreach           = $this->renderQueueJson(
             $buProblem->getSDDashBoardData(
                 10000,
-                "shortestSLAFixRemaining",
-                false,
-                true,
-                true,
-                true,
-                true
+                "shortestSLAFixRemaining"
             )
         );
         return [
@@ -400,13 +396,15 @@ WHERE pro_custno <> 282
     private function getReopenToday(): array
     {
         $query = "SELECT
-COUNT(*)  AS total
-  FROM
+  COUNT(*) AS total
+FROM
   problem
-  LEFT JOIN callactivity AS FIXED ON problem.`pro_problemno` = fixed.`caa_problemno` AND fixed.`caa_date` = CURDATE() AND fixed.`caa_callacttypeno` = 57
+  JOIN callactivity AS FIXED
+    ON problem.`pro_problemno` = fixed.`caa_problemno`
+    AND fixed.`caa_callacttypeno` = 57
 WHERE pro_custno <> 282
   AND `pro_reopened_date` = CURDATE()
-  AND (fixed.`caa_callactivityno` IS NULL OR fixed.`caa_consno` <> 67)";
+  AND fixed.`caa_consno` <> 67";
         return DBConnect::fetchOne($query, []);
     }
 

@@ -10,6 +10,7 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
+use CNCLTD\Data\DBEJProblem;
 use CNCLTD\ServiceRequestInternalNote\infra\ServiceRequestInternalNotePDORepository;
 use CNCLTD\Utils;
 
@@ -1490,7 +1491,7 @@ class CTActivity extends CTCNC
 
     }
 
-    private function checkMonitoring($problemID)
+    private function checkMonitoring($problemID): bool
     {
         return $this->buActivity->checkMonitoringFlag($problemID);
     }
@@ -1594,7 +1595,7 @@ class CTActivity extends CTCNC
      * @return string
      * @throws Exception
      */
-    private function getServiceRequestForContactLink($contactID)
+    private function getServiceRequestForContactLink($contactID): string
     {
         $contactHistory = Controller::buildLink(
             'Activity.php',
