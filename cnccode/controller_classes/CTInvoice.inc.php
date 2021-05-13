@@ -1738,9 +1738,21 @@ class CTInvoice extends CTCNC
         if (!$key) {
             throw new Exception('Passphrase not valid');
         }
+
+        if(!isset($_POST['collectionDate'])){
+            throw new Exception('Passphrase not valid');
+        }
+
+        $collectionDateString = $_POST['collectionDate'];
+        $collectionDate = DateTimeImmutable::createFromFormat('Y-m-d',$collectionDateString);
+        if(!$collectionDate){
+            throw new Exception('Collection date format is not YYYY-MM-DD');
+        }
+
         // generate PDF invoices:
         $invoiceCount = $buInvoice->printDirectDebitInvoices(
             date('Y-m-01'),
+            $collectionDate,
             $key
         );
 
