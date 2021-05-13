@@ -162,6 +162,7 @@ class CNCCode extends Session
 
 class auSweetcode extends Auth
 {
+    const MAX_RETRIES = 10;
     var $classname      = PHPLIB_CLASSNAME_AUTH;
     var $lifetime       = 0;                    // never expire
     var $database_class = PHPLIB_CLASSNAME_DB;
@@ -188,10 +189,10 @@ class auSweetcode extends Auth
         Login from allowed client Ip range or localhost only
         */
         $allowedIpPattern = $this->get_allowed_ip_pattern();
-        if ($GLOBALS ['server_type'] == MAIN_CONFIG_SERVER_TYPE_LIVE && !preg_match(
-                '/' . $allowedIpPattern . '/',
-                $_SERVER['REMOTE_ADDR']
-            )) {
+        if (!preg_match(
+            '/' . $allowedIpPattern . '/',
+            $_SERVER['REMOTE_ADDR']
+        )) {
             $GLOBALS['loginMessage'] = 'Login blocked: You are not on the CNC network';
             return false;
         }
@@ -229,19 +230,32 @@ class auSweetcode extends Auth
         return $uid;
     }
 
+    static $retries = 0;
+
     function get_allowed_ip_pattern()
     {
-        $ret = false;
-        $this->db->query(
-            "SELECT
-        hed_allowed_client_ip_pattern
-      FROM
-        headert"
-        );
-        while ($this->db->next_record()) {
-            $ret = $this->db->f('hed_allowed_client_ip_pattern');
+        $toReturn = false;
+        while (self::$retries <= self::MAX_RETRIES) {
+            try {
+                $ret = false;
+                $this->db->query(
+                    "SELECT
+                        hed_allowed_client_ip_pattern
+                        FROM
+                            headert"
+                );
+                while ($this->db->next_record()) {
+                    $ret = $this->db->f('hed_allowed_client_ip_pattern');
+                }
+                return $ret;
+            } catch (Throwable $exception) {
+                self::$retries++;
+                if (self::$retries > self::MAX_RETRIES) {
+                    throw new Exception('Failed to fetch allowed client IP pattern');
+                }
+            }
         }
-        return $ret;
+        return $toReturn;
     }
 
     function authenticate_on_ldap($username,

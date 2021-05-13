@@ -10,6 +10,7 @@ This project changes will be shown here.
 - Issue 1380 - Edit Items within contracts & renewals
 ### Fixed
 - Issue 1393 - Parts Used Send button issue.
+- Issue 1382 - IP Range restriction error.
 ### Removed
 - Issue 1375 - Error logged for DailySalesRequestEmail.php.
  
