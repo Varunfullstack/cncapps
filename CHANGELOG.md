@@ -7,6 +7,8 @@ This project changes will be shown here.
 ### Changed
 - Issue 1229 - Rearrange external files location
 - Issue 1372 - Improved Error handling for Removing qsystem assigned SRs
+### Removed
+- Issue 1375 - Error logged for DailySalesRequestEmail.php.
  
 ## [v5.10.3] - 2021-05-12
 ## Fixed 
