@@ -11274,7 +11274,7 @@ class BUActivity extends Business
         }
     }
 
-    private function createActivityCustomerContactType($activityId, $isInbound)
+    function createActivityCustomerContactType($activityId, $isInbound)
     {
         DBConnect::execute(
             "insert into callactivity_customer_contact(callactivityID,isInbound) values(:callactivityID,:value)",

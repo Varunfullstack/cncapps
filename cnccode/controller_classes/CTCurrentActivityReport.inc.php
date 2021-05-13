@@ -651,6 +651,7 @@ class CTCurrentActivityReport extends CTCNC
         $dbeCallActivity->setValue(DBECallActivity::siteNo, $dbeContact->getValue(DBEContact::siteNo));
         $dbeCallActivity->setValue(DBECallActivity::userID, $this->dbeUser->getPKValue());
         $dbeCallActivity->setValue(DBECallActivity::date, date('Y-m-d'));
+
         $endTime   = new DateTime();
         $startTime = (clone $endTime)->sub(new DateInterval('PT3M'));
         $dbeCallActivity->setValue(DBECallActivity::startTime, $startTime->format('H:i'));
@@ -720,6 +721,10 @@ class CTCurrentActivityReport extends CTCNC
                 $buMail->sendSimpleEmail($body, $subject, $to, CONFIG_SUPPORT_EMAIL, $cc);
             }
         }
+
+        $buActivity = new BUActivity($this);
+        $buActivity->updateInbound($dbeCallActivity->getPKValue(),true);
+
         return ["status" => true, "callActivityID" => $dbeCallActivity->getPKValue()];
     }
 

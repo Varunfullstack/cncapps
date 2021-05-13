@@ -11,6 +11,7 @@ This project changes will be shown here.
 - Issue 1364 - Update Header.php to be in react and update app exception
 - Issue 1363 - Make homepage Daily Stats clickable to show results
 - Issue 1389 - Customer Feedback date criteria.
+- Issue 1395 - Set Call backs as Inbound Customer Contact.
 ### Fixed
 - Issue 1393 - Parts Used Send button issue.
 - Issue 1382 - IP Range restriction error.
