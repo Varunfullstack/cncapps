@@ -74,6 +74,7 @@
         </tr>
     </table>
     <br>
+    <h1>Direct Debit Invoices</h1>
     <br>
     <table class='singleBorder'
            width="500px"
@@ -109,7 +110,7 @@
                 <input type="date"
                        disabled
                        id="collectionDate"
-                       onchange="updateCollectionDate"
+                       onchange="updateCollectionDate()"
                 >
             </td>
         </tr>
@@ -134,9 +135,10 @@
     </table>
     <script>
 
-        function updateCollectionDate($event) {
+        function updateCollectionDate() {
+
             sendButton.setAttribute('disabled', "");
-            if ($event.target.value) {
+            if (collectionDateInput.value) {
                 sendButton.removeAttribute('disabled');
             }
         }
