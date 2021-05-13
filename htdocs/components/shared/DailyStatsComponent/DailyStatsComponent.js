@@ -52,22 +52,13 @@ class DailyStatsComponent extends MainComponent {
         const evenBackgroundColor = "#00628B";
         const eventTextColor = "#E6E6E6";
 
-        // const TabsOrder = [
-        //     TABS.NEAR_SLA,
-        //     TABS.NEAR_FIX_SLA_BREACH,
-        //     TABS.RAISED_ON,
-        //     TABS.STARTED_ON,
-        //     TABS.FIXED_ON,
-        //     TABS.REOPENED_ON,
-        //     TABS.BREACHED_ON,
-        // ]
         return <table>
             <tbody>
             <tr>
                 <td>{this.getOpenSrCard(summary.prioritySummary)}</td>
                 <td>{this.getTeamSrCard(summary.openSrTeamSummary, evenBackgroundColor, eventTextColor)}</td>
                 <td>{this.getDailySourceCard(summary.dailySourceSummary)}</td>
-                <td>{this.getDailyInboundOutBoundCard(summary.inboundOutbound, evenBackgroundColor,eventTextColor)}</td>
+                <td>{this.getDailyInboundOutBoundCard(summary.inboundOutbound, evenBackgroundColor, eventTextColor)}</td>
                 <td>{this.getTotalCardWithBiggerNumber("Near SLA", summary.nearSLASummary.total)}</td>
                 <td>{this.getTotalCardWithBiggerNumber("Near Fix SLA Breach", summary.nearFixSLABreach, evenBackgroundColor, eventTextColor)}</td>
 
@@ -339,7 +330,7 @@ class DailyStatsComponent extends MainComponent {
     };
 
 
-    getTotalCardWithBiggerNumberA = (cardInfo, backgroundColor = "#C6C6C6", textColor = "#3C3C3C", linkOpen = null) => {
+    getTotalCardWithBiggerNumber = (cardInfo, backgroundColor = "#C6C6C6", textColor = "#3C3C3C", linkOpen = null) => {
         return this.getTotalCard(cardInfo.label, cardInfo.total, backgroundColor, textColor, 'total-big', linkOpen);
     }
 
