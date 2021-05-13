@@ -93,8 +93,8 @@ class CTCustomerFeedback extends CTCNC
                     JOIN customer ON customer.`cus_custno`=problem.`pro_custno`
                     join contact on  contact.con_contno = cal.caa_contno
                 WHERE cal.caa_callacttypeno=57                    
-                    AND (:from  is null or f.`createdAt` >= :from )
-                    AND (:to    is null or f.`createdAt` <= :to)
+                    AND (:from  is null or date(f.`createdAt`) >= :from )
+                    AND (:to    is null or date(f.`createdAt`) <= :to) 
                     AND (:customerID is null or problem.`pro_custno`=:customerID)
                     AND (:engineerID is null or cal.caa_consno=:engineerID)
 ";

@@ -10,12 +10,17 @@ This project changes will be shown here.
 - Issue 1380 - Edit Items within contracts & renewals
 - Issue 1364 - Update Header.php to be in react and update app exception
 - Issue 1363 - Make homepage Daily Stats clickable to show results
+- Issue 1389 - Customer Feedback date criteria.
 ### Fixed
 - Issue 1393 - Parts Used Send button issue.
 - Issue 1382 - IP Range restriction error.
 ### Removed
 - Issue 1375 - Error logged for DailySalesRequestEmail.php.
- 
+
+## [v5.10.4] - 2021-05-13
+### Fixed
+- Fixed issue with PrePay contracts when fixing a Service Request.
+
 ## [v5.10.3] - 2021-05-12
 ## Fixed 
 - Fixed issue with customer stats.
