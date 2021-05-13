@@ -3448,7 +3448,8 @@ ORDER BY NAME,
                 $this->buCustomer->insertCustomer(
                     $this->dsCustomer,
                     $this->dsSite,
-                    $this->dsContact
+                    $this->dsContact,
+                    $this->dbeUser
                 );
                 $this->dsCustomer->initialise();
                 $this->dsCustomer->fetchNext();

@@ -2,6 +2,8 @@
 This project changes will be shown here.
 
 ## [unreleased]
+### Added
+- Issue 1385 - Send notification when a new customer is added.
 ### Changed
 - Issue 1229 - Rearrange external files location
 - Issue 1372 - Improved Error handling for Removing qsystem assigned SRs
