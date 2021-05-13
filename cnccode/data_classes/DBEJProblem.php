@@ -489,7 +489,7 @@ class DBEJProblem extends DBEProblem
         return (parent::getRows());
     }
 
-    function getRow($pkID)
+    function getRow($pkID = null)
     {
         $this->setPKValue($pkID);
         $sql = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() . " LEFT JOIN customer ON cus_custno = pro_custno

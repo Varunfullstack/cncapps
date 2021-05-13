@@ -6,7 +6,6 @@ export default class DailyStatsDashboardAPI extends APIMain {
         const response = await fetch(
             `${ApiUrls.DailyStatsDashboard}nearSLA`
         )
-        console.log(response);
         return this._getDataOrErrorFromResponse(response);
     }
 

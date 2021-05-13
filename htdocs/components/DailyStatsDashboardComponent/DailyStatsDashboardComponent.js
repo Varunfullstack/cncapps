@@ -8,19 +8,20 @@ import Table from "../shared/table/table";
 import '../style.css';
 import moment from "moment";
 import {getTeamCode} from "../utils/utils";
+import ToolTip from "../shared/ToolTip";
 
 
 const TABS = {
     NEAR_SLA: {
         id: 'NEAR_SLA',
-        description: "Near Sla",
+        description: "Near Sla Today",
         dataLoader: (api) => {
             return api.getNearSLA();
         }
     },
     NEAR_FIX_SLA_BREACH: {
         id: 'NEAR_FIX_SLA_BREACH',
-        description: 'Near Fix Sla Breach',
+        description: 'Near Fix Sla Breach Today',
         dataLoader: (api) => {
             return api.getNearFixSLABreach();
         }
@@ -111,6 +112,8 @@ class DailyStatsDashboardComponent extends MainComponent {
         return activeTab.id == tabId ? "active" : "";
     };
     setActiveTab = (tab) => {
+
+
         this.setState({activeTab: tab, data: []});
         this.loadTab(tab);
     };
@@ -143,10 +146,11 @@ class DailyStatsDashboardComponent extends MainComponent {
 
 
     getFilterElement = () => {
-        const {selectedDate} = this.state;
+        const {selectedDate, activeTab} = this.state;
         return (
             <div className="m-5">
-                <input type="date" value={selectedDate || ''} onChange={this.updateSelectedDate}/>
+                <input type="date" value={selectedDate || ''} onChange={this.updateSelectedDate}
+                       disabled={activeTab.id === TABS.NEAR_SLA.id || activeTab.id === TABS.NEAR_FIX_SLA_BREACH.id}/>
             </div>
         );
     }
@@ -275,6 +279,7 @@ class DailyStatsDashboardComponent extends MainComponent {
                 {this.getAlert()}
                 {this.getFilterElement()}
                 {this.getTabsElement()}
+                {this.getTotalElement()}
                 {this.getQueueElement()}
             </div>
         );
@@ -285,6 +290,18 @@ class DailyStatsDashboardComponent extends MainComponent {
             this.loadTab(this.state.activeTab);
         });
     };
+
+    getTotalElement = () => {
+        const {data} = this.state;
+        return (
+            <div>
+                <ToolTip title="Total" width="50px">
+                    <i className="fal fa-2x fa-sigma"/>
+                    <span style={{marginLeft: "1em", fontSize: "large"}}>{data.length}</span>
+                </ToolTip>
+            </div>
+        )
+    }
 }
 
 export default DailyStatsDashboardComponent;
