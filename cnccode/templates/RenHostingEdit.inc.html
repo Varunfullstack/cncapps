@@ -26,40 +26,17 @@
         }
     }
 
+    let itemIdInput;
+    let itemSelectorElement;
     window.addEventListener('DOMContentLoaded', function () {
         checkDirectDebit();
+        itemIdInput = document.getElementById('itemID');
+        itemSelectorElement = document.getElementById('itemSelector');
+        document.renderItemSelectorComponent(itemSelectorElement, {
+            itemId: +itemIdInput.value, inputId: 'itemID'
+        })
+
     });
-
-    function checkFunctionKey(field) {
-        if (event.keyCode == 120) {      // F9 - edit
-            switch (field.id) {
-                case "itemDescription":
-                    if (document.getElementById("itemID").value != "0") {
-                        window.open(
-                            '{urlItemEdit}&itemID=' +
-                            escape(document.getElementById("itemID").value) +
-                            '&parentIDField=itemID' +
-                            '&parentDescField=itemDescription',
-                            'item',
-                            'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
-                        );
-                    }
-                    break;
-            }
-        }
-        return;
-    }
-
-    function validateItemDescription() {
-        if (Trim(document.getElementById("itemDescription").value) != "") {
-            window.open('{urlItemPopup}&itemDescription=' +
-                escape(document.getElementById("itemDescription").value) +
-                '&parentIDField=itemID' +
-                '&parentSlaResponseHoursField=slaResponseHours' +
-                '&parentDescField=itemDescription',
-                'items', 'scrollbars=yes,resizable=no,width=450,height=400,copyhistory=no, menubar=0')
-        }
-    }
 </script>
 <FORM method="post"
       action="{urlUpdate}"
@@ -133,16 +110,9 @@
                                      name="renHosting[1][itemID]"
                                      id="itemID"
                                      value="{itemID}"
-            > <input type="text"
-                     {readonly}
-                     name="renHosting[1][itemDescription]"
-                     id="itemDescription"
-                     value="{itemDescription}"
-                     onChange="javascript:validateItemDescription()"
-                     onKeydown="javascript:checkFunctionKey(itemDescription)"
-                     size="50"
-                     maxlength="50"
-            > <font class="formErrorMessage">{itemDescriptionMessage}</font></td>
+            >
+                <div id="itemSelector"></div>
+            </td>
         </tr>
         {prices}
         <tr>

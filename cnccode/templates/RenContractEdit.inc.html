@@ -12,16 +12,16 @@
             return;
         }
         fetch('?action=addItemToContract&contractCustomerItemId={customerItemID}&itemToAddId=' + itemId)
-            .then(res => res.json())
-            .then(res => {
-                if (res.status !== 'ok') {
-                    throw new Error(res.message);
-                }
-                document.location.reload();
-            })
-            .catch(error => {
-                alert(error);
-            })
+                .then(res => res.json())
+                .then(res => {
+                    if (res.status !== 'ok') {
+                        throw new Error(res.message);
+                    }
+                    document.location.reload();
+                })
+                .catch(error => {
+                    alert(error);
+                })
     }
 </script>
 <style>
@@ -32,55 +32,59 @@
 </style>
 <script language='JavaScript'>
     const clientCheckDirectDebit = {clientCheckDirectDebit};
+    let itemIdInput;
+    let itemSelectorElement;
+    let allowDirectDebitElement;
+
+    let directDebitCheckboxElement;
     window.addEventListener('DOMContentLoaded', function () {
-        window.despatchDate = $('#despatchDate').get(0);
-        window.expiryDate = $('#expiryDate').get(0);
+        window.despatchDate = document.getElementById('despatchDate');
+        window.expiryDate = document.getElementById('expiryDate');
+        allowDirectDebitElement = document.getElementById('allowDirectDebit');
+        itemIdInput = document.getElementById('itemID');
+        itemSelectorElement = document.getElementById('itemSelector');
+        directDebitCheckboxElement = document.getElementById('directDebit');
         checkDirectDebit();
+
+
+        document.renderItemSelectorComponent(itemSelectorElement, {
+            itemId: +itemIdInput.value, inputId: 'itemID'
+        })
     });
 
     function checkDirectDebit() {
-        const directDebitCheckbox = $('#directDebit');
 
-        const parent = directDebitCheckbox.parent();
-        if (clientCheckDirectDebit && $('#allowDirectDebit').val() !== 'false') {
-            directDebitCheckbox.attr('disabled', false);
-            if (parent.children().length > 1) {
-                parent.find('span').remove();
+        const parent = directDebitCheckboxElement.parentElement;
+        if (clientCheckDirectDebit && allowDirectDebitElement.value !== 'false') {
+            directDebitCheckboxElement.removeAttribute('disabled');
+            if (parent.children.length > 1) {
+                parent.querySelector('span').remove();
             }
         } else {
             if (!clientCheckDirectDebit) {
-                if (parent.children().length < 2) {
-                    parent.append('<span class="redText">This customer needs bank details before Direct Debit can be used.</span>')
+                if (parent.children.length < 2) {
+                    const span = document.createElement('span');
+                    span.textContent = "This customer needs bank details before Direct Debit can be used.";
+                    span.className = "redText";
+                    parent.append(span)
                 }
             }
-            directDebitCheckbox.attr('disabled', true);
-            directDebitCheckbox.prop('checked', false)
+            directDebitCheckboxElement.setAttribute('disabled', true);
+            directDebitCheckboxElement.checked = false;
         }
     }
 
     function checkFunctionKey(field) {
         if (event.keyCode == 120) {      // F9 - edit
             switch (field.id) {
-                case "itemDescription":
-                    if (document.getElementById("itemID").value != "0") {
-                        window.open(
-                            '{urlItemEdit}&itemID=' +
-                            escape(document.getElementById("itemID").value) +
-                            '&parentIDField=itemID' +
-                            '&parentDescField=itemDescription',
-                            'item',
-                            'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
-                        );
-                    }
-                    break;
                 case "siteDesc":
                     if (document.getElementById("siteNo").value != "") {
                         window.open(
-                            '{urlSiteEdit}&customerID={customerID}' +
-                            '&siteNo=' + escape(document.getElementById("siteNo").value) +
-                            '&parentIDField=siteNo' +
-                            '&parentDescField=siteDesc',
-                            'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
+                                '{urlSiteEdit}&customerID={customerID}' +
+                                '&siteNo=' + escape(document.getElementById("siteNo").value) +
+                                '&parentIDField=siteNo' +
+                                '&parentDescField=siteDesc',
+                                'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
                         );
                     }
                     break;
@@ -89,26 +93,16 @@
         return;
     }
 
-    function validateItemDescription() {
-        if (Trim(document.getElementById("itemDescription").value) != "") {
-            window.open('{urlItemPopup}&itemDescription=' +
-                escape(document.getElementById("itemDescription").value) +
-                '&parentIDField=itemID' +
-                '&parentSlaResponseHoursField=slaResponseHours' +
-                '&parentDescField=itemDescription',
-                'items', 'scrollbars=yes,resizable=no,width=450,height=400,copyhistory=no, menubar=0')
-        }
-    }
 
     function validateSiteDesc() {
         if (Trim(document.getElementById("siteDesc").value) != "") {
             window.open(
-                '{urlSitePopup}&customerID={customerID}' +
-                '&siteDesc=' + escape(document.getElementById("siteDesc").value) +
-                '&parentIDField=siteNo' +
-                '&parentDescField=siteDesc',
-                'address',
-                'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
+                    '{urlSitePopup}&customerID={customerID}' +
+                    '&siteDesc=' + escape(document.getElementById("siteDesc").value) +
+                    '&parentIDField=siteNo' +
+                    '&parentDescField=siteDesc',
+                    'address',
+                    'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
             )
         }
     }
@@ -222,16 +216,7 @@
                        id="itemID"
                        value="{itemID}"
                 >
-                <input type="text"
-                       {readonly}
-                       name="renContract[1][itemDescription]"
-                       id="itemDescription"
-                       value="{itemDescription}"
-                       onChange="javascript:validateItemDescription()"
-                       onKeydown="javascript:checkFunctionKey(itemDescription)"
-                       size="50"
-                       maxlength="50"
-                > <font class="formErrorMessage">{itemDescriptionMessage}</font>
+                <div id="itemSelector"></div>
             </td>
         </tr>
         {prices}
