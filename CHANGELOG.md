@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v5.11.0]
 ### Added
 - Issue 1385 - Send notification when a new customer is added.
 ### Changed
