@@ -11,21 +11,27 @@ class ToolTip extends React.Component {
         this.state = {};
     }
 
-    render() {
-        const {title, children, width, content, style} = this.props;
-        return (
-            <div style={{width: width, ...style}}>
-                <div className="tooltip">
-                    {children}
-                    {content}
-                    <div className="tooltiptext tooltip-bottom"
-                         key="tooltipText"
-                    >
-                        {title}
-                    </div>
-                </div>
+    render() {        
+        const { title, children, width, content, style } = this.props;
+        if (!title)
+          return (
+            <div style={{ width: width, ...style }}>
+              {children}
+              {content}
             </div>
-        );
+          );
+        else
+          return (
+            <div style={{ width: width, ...style }}>
+              <div className="tooltip">
+                {children}
+                {content}
+                <div className="tooltiptext tooltip-bottom" key="tooltipText">
+                  {title}
+                </div>
+              </div>
+            </div>
+          );
     }
 }
 

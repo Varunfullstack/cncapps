@@ -6,6 +6,9 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use CNCLTD\Exceptions\APIException;
+
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUPortalDocument.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
@@ -22,7 +25,7 @@ class CTPortalDocument extends CTCNC
     public $dsPortalDocument;
     /** @var BUPortalDocument */
     public $buPortalDocument;
-
+    const CONST_PORTAL_DOCUMENTS="documents";
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
@@ -46,16 +49,22 @@ class CTPortalDocument extends CTCNC
     function defaultAction()
     {
         switch ($this->getAction()) {
-            case CTPORTALDOCUMENT_ACT_EDIT:
-            case CTPORTALDOCUMENT_ACT_ADD:
-                $this->edit();
-                break;
-            case CTPORTALDOCUMENT_ACT_DELETE:
-                $this->delete();
-                break;
-            case CTPORTALDOCUMENT_ACT_UPDATE:
-                $this->update();
-                break;
+            case self::CONST_PORTAL_DOCUMENTS:
+                switch ($this->requestMethod) {
+                    case 'GET':
+                        echo  json_encode($this->getDocuuments(),JSON_NUMERIC_CHECK);
+                        break;                    
+                    case 'POST':
+                            echo  json_encode($this->updateDocument(),JSON_NUMERIC_CHECK);
+                        break;
+                     case 'DELETE':
+                         echo  json_encode($this->delete(),JSON_NUMERIC_CHECK);
+                         break;
+                    default:
+                        # code...
+                        break;
+                }
+                exit;         
             case 'viewFile':
                 $this->viewFile();
                 break;
@@ -63,94 +72,6 @@ class CTPortalDocument extends CTCNC
                 header('Location: /');
         }
     }
-
-    /**
-     * Edit/Add Further Action
-     * @access private
-     * @throws Exception
-     */
-    function edit()
-    {
-        $this->setMethodName('edit');
-        $dsPortalDocument = &$this->dsPortalDocument; // ref to class var
-
-        if (!$this->getFormError()) {
-            if ($this->getAction() == CTPORTALDOCUMENT_ACT_EDIT) {
-                $this->buPortalDocument->getDocumentByID($this->getParam('portalDocumentID'), $dsPortalDocument);
-                $portalDocumentID = $this->getParam('portalDocumentID');
-            } else {                                                                    // creating new
-                $dsPortalDocument->initialise();
-                $dsPortalDocument->setValue(DBEPortalDocument::portalDocumentID, null);
-                $portalDocumentID = null;
-            }
-        } else {                                                                        // form validation error
-            $dsPortalDocument->initialise();
-            $dsPortalDocument->fetchNext();
-            $portalDocumentID = $dsPortalDocument->getValue(DBEPortalDocument::portalDocumentID);
-        }
-        $urlDelete = null;
-        $txtDelete = null;
-        if ($this->getAction() == CTPORTALDOCUMENT_ACT_EDIT) {
-            $urlDelete =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'           => CTPORTALDOCUMENT_ACT_DELETE,
-                        'portalDocumentID' => $portalDocumentID
-                    )
-                );
-            $txtDelete = 'Delete';
-        }
-        $urlUpdate =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'           => CTPORTALDOCUMENT_ACT_UPDATE,
-                    'portalDocumentID' => $portalDocumentID
-                )
-            );
-        $urlDisplayHeader =
-            Controller::buildLink(
-                'Header.php',
-                array()
-            );
-        $this->setPageTitle('Edit Document');
-        $this->setTemplateFiles(
-            array('PortalDocumentEdit' => 'PortalDocumentEdit.inc')
-        );
-        $this->template->set_var(
-            array(
-                'portalDocumentID'              => $portalDocumentID,
-                'filename'                      => Controller::htmlDisplayText(
-                    $dsPortalDocument->getValue(DBEPortalDocument::filename)
-                ),
-                'description'                   => Controller::htmlInputText(
-                    $dsPortalDocument->getValue(DBEPortalDocument::description)
-                ),
-                'descriptionMessage'            => Controller::htmlDisplayText(
-                    $dsPortalDocument->getMessage(DBEPortalDocument::description)
-                ),
-                'mainContactOnlyFlagChecked'    => Controller::htmlChecked(
-                    $dsPortalDocument->getValue(DBEPortalDocument::mainContactOnlyFlag)
-                ),
-                'mainContactOnlyFlagMessage'    => Controller::htmlDisplayText(
-                    $dsPortalDocument->getMessage(DBEPortalDocument::mainContactOnlyFlag)
-                ),
-                'requiresAcceptanceFlagChecked' => Controller::htmlChecked(
-                    $dsPortalDocument->getValue(DBEPortalDocument::requiresAcceptanceFlag)
-                ),
-                'requiresAcceptanceFlagMessage' => Controller::htmlDisplayText(
-                    $dsPortalDocument->getMessage(DBEPortalDocument::requiresAcceptanceFlag)
-                ),
-                'urlUpdate'                     => $urlUpdate,
-                'urlDelete'                     => $urlDelete,
-                'urlDisplayHeader'              => $urlDisplayHeader,
-                'txtDelete'                     => $txtDelete,
-            )
-        );
-        $this->template->parse('CONTENTS', 'PortalDocumentEdit', true);
-        $this->parsePage();
-    }// end function editFurther Action()
 
     function viewFile()
     {
@@ -174,47 +95,6 @@ class CTPortalDocument extends CTCNC
     }
 
     /**
-     * @throws Exception
-     */
-    function update()
-    {
-        $this->setMethodName('update');
-        $this->formError = (!$this->dsPortalDocument->populateFromArray($this->getParam('portalDocument')));
-        /*
-        Need a file when creating new
-        */
-        if (!$_FILES['userfile']['name'] && !$this->dsPortalDocument->getValue(DBEPortalDocument::portalDocumentID)) {
-            $this->setFormErrorMessage('Please enter a file path');
-        } else {
-            /* uploading a file */
-
-            if ($_FILES['userfile']['name'] && !is_uploaded_file($_FILES['userfile']['tmp_name'])) {
-                $this->setFormErrorMessage('Document not loaded - is it bigger than 6 MBytes?');
-            }
-
-        }
-
-        if ($this->formError) {
-            if (!$this->dsPortalDocument->getValue(DBEPortalDocument::portalDocumentID)) {
-                $this->setAction(CTPORTALDOCUMENT_ACT_EDIT);
-            } else {
-                $this->setAction(CTPORTALDOCUMENT_ACT_ADD);
-            }
-            $this->edit();
-            exit;
-        }
-
-        $this->buPortalDocument->updateDocument($this->dsPortalDocument, $_FILES['userfile']);
-
-        $urlNext =
-            Controller::buildLink(
-                'Header.php',
-                array()
-            );
-        header('Location: ' . $urlNext);
-    }
-
-    /**
      * Delete Further Action
      *
      * @access private
@@ -228,19 +108,80 @@ class CTPortalDocument extends CTCNC
         $this->buPortalDocument->getDocumentByID($this->getParam('portalDocumentID'), $dsPortalDocument);
 
         if (!$this->buPortalDocument->deleteDocument($this->getParam('portalDocumentID'))) {
-            $this->displayFatalError('Cannot delete this document');
-            exit;
-        } else {
-            $urlNext =
-                Controller::buildLink(
-                    'Header.php',
+            return $this->fail('Cannot delete this document');            
+        } 
+        return $this->success();
+    }
+    //----------new code
+    function getDocuuments(){
+        $data=[];
+        if ($this->getAction() != 'add') {
+            $buPortalDocument = new BUPortalDocument($this);
+            $dsPortalDocument = new DataSet($this);
+            $buPortalDocument->getDocuments($dsPortalDocument);
+            
+            while ($dsPortalDocument->fetchNext()) {
+
+                $urlEditDocument   = Controller::buildLink(
+                    'PortalDocument.php',
                     array(
-                        'action' => CTCNC_ACT_DISP_EDIT
+                        'action'           => 'edit',
+                        'portalDocumentID' => $dsPortalDocument->getValue(DBEPortalDocument::portalDocumentID)
                     )
                 );
-            header('Location: ' . $urlNext);
-            exit;
+                $urlViewFile       = Controller::buildLink(
+                    'PortalDocument.php',
+                    array(
+                        'action'           => 'viewFile',
+                        'portalDocumentID' => $dsPortalDocument->getValue(DBEPortalDocument::portalDocumentID)
+                    )
+                );
+                $urlDeleteDocument = Controller::buildLink(
+                    'PortalDocument.php',
+                    array(
+                        'action'           => 'delete',
+                        'portalDocumentID' => $dsPortalDocument->getValue(DBEPortalDocument::portalDocumentID)
+                    )
+                );
+                $data []=
+                    array(
+                        'portalDocumentID'       => $dsPortalDocument->getValue(DBEPortalDocument::portalDocumentID),
+                        'description'            => $dsPortalDocument->getValue(DBEPortalDocument::description),
+                        'filename'               => $dsPortalDocument->getValue(DBEPortalDocument::filename),
+                        'mainContactOnlyFlag'    => $dsPortalDocument->getValue(DBEPortalDocument::mainContactOnlyFlag),
+                        'requiresAcceptanceFlag' => $dsPortalDocument->getValue(
+                            DBEPortalDocument::requiresAcceptanceFlag
+                        ),
+                        'createDate'             => $dsPortalDocument->getValue(DBEPortalDocument::createdDate),
+                        'urlViewFile'            => $urlViewFile,
+                        'urlEditDocument'        => $urlEditDocument,
+                        'urlDeleteDocument'      => $urlDeleteDocument,
+                        
+                    );
+            }
         }
+        return $this->success($data);
     }
-
+    function updateDocument(){
+        $data=json_decode($_REQUEST["data"],true);                
+        $this->formError = (!$this->dsPortalDocument->populateFromArray(['data'=>$data]));
+        if ($this->formError) {
+            return $this->fail(APIException::badRequest,'Missing data');
+        }
+        /*
+        Need a file when creating new
+        */
+        if (isset($_FILES['userfile'])&&!$_FILES['userfile']['name'] && !$this->dsPortalDocument->getValue(DBEPortalDocument::portalDocumentID)) {
+            return $this->fail(APIException::badRequest,'Please enter a file path');
+        } else {
+            /* uploading a file */
+            if (isset($_FILES['userfile'])&&$_FILES['userfile']['name'] && !is_uploaded_file($_FILES['userfile']['tmp_name'])) {                
+                return $this->fail(APIException::badRequest,'Document not loaded - is it bigger than 6 MBytes?');
+            }
+        }
+       
+        $this->buPortalDocument->updateDocument($this->dsPortalDocument, $_FILES['userfile']??null);
+        return $this->success();    
+       
+    }
 }
