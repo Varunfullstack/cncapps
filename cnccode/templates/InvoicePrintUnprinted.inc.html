@@ -74,6 +74,7 @@
         </tr>
     </table>
     <br>
+    <h1>Direct Debit Invoices</h1>
     <br>
     <table class='singleBorder'
            width="500px"
@@ -94,7 +95,57 @@
             <td align="right">{directDebitInvoiceSale}</td>
         </tr>
     </table>
+    <table width="400px"
+           border="0"
+           cellspacing="0"
+           cellpadding="1"
+           id="test"
+    >
+        <tr>
+            <td width="150px"
+                class="promptText"
+            >Collection Date
+            </td>
+            <td class="field">
+                <input type="date"
+                       disabled
+                       id="collectionDate"
+                       onchange="updateCollectionDate()"
+                >
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <button type="button"
+                        name="Trial"
+                        onclick="generatePreview()"
+                >
+                    Preview
+                </button>
+                <input type="button"
+                       disabled
+                       name="Print"
+                       value="Send"
+                       id="sendButton"
+                       onClick="return handlePassphrase();"
+                >
+            </td>
+        </tr>
+    </table>
     <script>
+
+        function updateCollectionDate() {
+
+            sendButton.setAttribute('disabled', "");
+            if (collectionDateInput.value) {
+                sendButton.removeAttribute('disabled');
+            }
+        }
+
+        const sendButton = document.getElementById('sendButton');
+        const collectionDateInput = document.getElementById('collectionDate');
+
         function generatePreview() {
             var object = {};
 
@@ -115,7 +166,7 @@
                         document.body.appendChild(a);
                         a.click();
                         a.remove();
-                        document.getElementById('sendButton').removeAttribute('disabled');
+                        collectionDateInput.removeAttribute('disabled');
                     }
 
                     if (xhttp.status === 400) {
@@ -137,64 +188,35 @@
             if (!passPhrase) {
                 return false;
             }
-            // $('form').append("<input type='hidden' value='" + passPhrase + "' name='passphrase'>");
 
-            var formData = new FormData();
-            formData.append('passphrase', passPhrase);
-            var object = {};
-            formData.forEach(function (value, key) {
-                object[key] = value;
-            });
-            // var json = JSON.stringify(object);
-            $.ajax({
-                url: '?action=sendDirectDebitInvoices',
-                method: 'POST',
-                type: 'post',
-                dataType: 'json',
-                data: object
-            }).then(function (result) {
-                alert(result.invoiceCount + " invoices sent");
-                window.location.reload();
-            }).catch(function (error) {
+            const collectionDate = collectionDateInput.value;
 
-                let message = 'Failed to send Invoices';
+            fetch(
+                    '?action=sendDirectDebitInvoices',
+                    {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            passPhrase,
+                            collectionDate
+                        })
+                    }
+            )
+                    .then(response => response.json())
+                    .then(res => {
+                        alert(res.invoiceCount + " invoices sent");
+                        window.location.reload();
+                    })
+                    .catch(function (error) {
 
-                if (error.responseJSON) {
-                    message += ": " + error.responseJSON.error;
-                }
-                alert(message);
-            }).then(function () {
-            });
+                        let message = 'Failed to send Invoices';
 
+                        if (error.responseJSON) {
+                            message += ": " + error.responseJSON.error;
+                        }
+                        alert(message);
+                    })
             return true;
         }
     </script>
-
-    <table width="400px"
-           border="0"
-           cellspacing="0"
-           cellpadding="1"
-           id="test"
-    >
-        <tr>
-            <td>&nbsp;</td>
-            <td>
-                <button type="button"
-                        name="Trial"
-                        onclick="generatePreview()"
-                >
-                    Preview
-                </button>
-                <input type="button"
-
-                       disabled
-                       name="Print"
-                       value="Send"
-                       id="sendButton"
-                       onClick="return handlePassphrase();"
-                >
-            </td>
-        </tr>
-    </table>
 </form>
 <!-- End Template: InvoicePrintUnprinted.inc.html -->
