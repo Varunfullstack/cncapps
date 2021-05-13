@@ -59,31 +59,28 @@ class DailyStatsComponent extends MainComponent {
                 <td>{this.getTeamSrCard(summary.openSrTeamSummary, evenBackgroundColor, eventTextColor)}</td>
                 <td>{this.getDailySourceCard(summary.dailySourceSummary)}</td>
                 <td>{this.getDailyInboundOutBoundCard(summary.inboundOutbound, evenBackgroundColor, eventTextColor)}</td>
-                <td>{this.getTotalCardWithBiggerNumber("Near SLA", summary.nearSLASummary.total)}</td>
-                <td>{this.getTotalCardWithBiggerNumber("Near Fix SLA Breach", summary.nearFixSLABreach, evenBackgroundColor, eventTextColor)}</td>
-
                 <td>{
-                    this.getTotalCardWithBiggerNumberA({
+                    this.getTotalCardWithBiggerNumber({
                             label: "Unique Customers",
                             total: summary.uniqueCustomerTodaySummary.total
                         },
-                        evenBackgroundColor,
-                        eventTextColor
                     )
                 }</td>
                 <td>
                     {
-                        this.getTotalCardWithBiggerNumberA(
+                        this.getTotalCardWithBiggerNumber(
                             {label: "Near SLA", total: summary.nearSLASummary.total},
-                            "#C6C6C6",
-                            "#3C3C3C",
-                            '/DailyStatsDashboard.php?tab=NEAR_SLA'
+                            evenBackgroundColor,
+                            eventTextColor,
+                        '/DailyStatsDashboard.php?tab=NEAR_SLA'
                         )
                     }
                 </td>
+            </tr>
+            <tr>
                 <td>
                     {
-                        this.getTotalCardWithBiggerNumberA({
+                        this.getTotalCardWithBiggerNumber({
                                 label: "Near Fix SLA Breach",
                                 total: summary.nearFixSLABreach
                             },
@@ -93,68 +90,65 @@ class DailyStatsComponent extends MainComponent {
                         )
                     }
                 </td>
-            </tr>
-            <tr>
                 <td>
-                    {this.getTotalCardWithBiggerNumberA({
+                    {this.getTotalCardWithBiggerNumber({
                             label: "Raised Today",
                             total: summary.raisedTodaySummary.total
                         },
-                        evenBackgroundColor,
-                        eventTextColor,
+                        "#C6C6C6",
+                        "#3C3C3C",
                         '/DailyStatsDashboard.php?tab=RAISED_ON'
                     )
                     }
                 </td>
                 <td>
                     {
-                        this.getTotalCardWithBiggerNumberA({
+                        this.getTotalCardWithBiggerNumber({
                                 label: "Today's Started",
                                 total: summary.raisedStartTodaySummary.total,
                             },
-                            "#C6C6C6",
-                            "#3C3C3C",
+                            evenBackgroundColor,
+                            eventTextColor,
                             '/DailyStatsDashboard.php?tab=STARTED_ON'
                         )
                     }
                 </td>
                 <td>
                     {
-                        this.getTotalCardWithBiggerNumberA({
+                        this.getTotalCardWithBiggerNumber({
                                 label: "Fixed Today",
                                 total: summary.fixedTodaySummary.total
                             },
-                            evenBackgroundColor,
-                            eventTextColor,
+                            "#C6C6C6",
+                            "#3C3C3C",
                             '/DailyStatsDashboard.php?tab=FIXED_ON'
                         )
                     }
                 </td>
                 <td>
                     {
-                        this.getTotalCardWithBiggerNumberA({
+                        this.getTotalCardWithBiggerNumber({
                                 label: "Reopened Today",
                                 total: summary.reopenTodaySummary.total
                             },
-                            "#C6C6C6",
-                            "#3C3C3C",
+                            evenBackgroundColor,
+                            eventTextColor,
                             '/DailyStatsDashboard.php?tab=REOPENED_ON'
                         )
                     }
                 </td>
                 <td>
                     {
-                        this.getTotalCardWithBiggerNumberA({
+                        this.getTotalCardWithBiggerNumber({
                                 label: "Breached SLA",
                                 total: summary.breachedSLATodaySummary.total
                             },
-                            evenBackgroundColor,
-                            eventTextColor,
+                            "#C6C6C6",
+                            "#3C3C3C",
                             '/DailyStatsDashboard.php?tab=BREACHED_ON'
                         )
                     }
                 </td>
-                <td>{this.getTotalCardWithBiggerNumber("Unique Customers", summary.uniqueCustomerTodaySummary.total)}</td>
             </tr>
             </tbody>
         </table>
