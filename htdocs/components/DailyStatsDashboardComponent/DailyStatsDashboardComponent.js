@@ -14,14 +14,14 @@ import ToolTip from "../shared/ToolTip";
 const TABS = {
     NEAR_SLA: {
         id: 'NEAR_SLA',
-        description: "Near Sla Today",
+        description: "Near SLA Today",
         dataLoader: (api) => {
             return api.getNearSLA();
         }
     },
     NEAR_FIX_SLA_BREACH: {
         id: 'NEAR_FIX_SLA_BREACH',
-        description: 'Near Fix Sla Breach Today',
+        description: 'Near Fix SLA Breach Today',
         dataLoader: (api) => {
             return api.getNearFixSLABreach();
         }
