@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.10.4] - 2021-05-13
+### Fixed
+- Fixed issue with PrePay contracts when fixing a Service Request.
+
 ## [v5.10.3] - 2021-05-12
 ## Fixed 
 - Fixed issue with customer stats.
