@@ -15,6 +15,7 @@ This project changes will be shown here.
 ### Fixed
 - Issue 1393 - Parts Used Send button issue.
 - Issue 1382 - IP Range restriction error.
+- Issue 1396 - Double quote characters not displaying on password page.
 ### Removed
 - Issue 1375 - Error logged for DailySalesRequestEmail.php.
 
