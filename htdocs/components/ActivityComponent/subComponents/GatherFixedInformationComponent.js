@@ -240,7 +240,7 @@ class GatherFixedInformationComponent extends MainComponent {
                             "option",
                             {
                                 key: i.contractCustomerItemID,
-                                disabled: i.isDisabled || (activity.prePayChargeApproved && i.contractCustomerItemID !== data?.contractCustomerItemID) || activity.hasCallOutExpense,
+                                disabled: i.isDisabled || (activity.prePayChargeApproved && i.contractCustomerItemID !== activity?.contractCustomerItemID) || activity.hasCallOutExpense,
                                 value: i.contractCustomerItemID,
                             },
                             i.contractDescription
