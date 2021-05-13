@@ -284,7 +284,7 @@ class HeaderComponent extends MainComponent {
           {this.getInput("Fax","fax")}
           {this.getInput("Goods Contact","goodsContact")}
           {this.getInput("GSC Item","gscItemDescription")}
-          {this.getInput("Yearly Sickness Threshold Warning","yearlySicknessThresholdWarning",this.inputType.Number)}
+          {this.getInput("Yearly Sickness Threshold Warning","yearlySicknessThresholdWarning",this.inputType.Number,true,"Payroll will be alerted if a person has more sick days than this per year")}
         </tbody>
       </table>
     );
@@ -299,11 +299,11 @@ class HeaderComponent extends MainComponent {
           {this.getSelectInput("Standard VAT Code","stdVATCode",stdVatCodes)}   
           {this.getInput("Billing Start Time","billingStartTime",this.inputType.Time,true)}
           {this.getInput("Billing End Time","billingEndTime",this.inputType.Time,true)}
-          {this.getInput("Shift Start(Overtime Calculation)","overtimeStartTime",this.inputType.Time,true)}
-          {this.getInput("Shift End (Overtime Calculation)","overtimeEndTime",this.inputType.Time,true)}
-          {this.getInput("Hourly Labour Cost","hourlyLabourCost",this.inputType.Number,true)}
-          {this.getInput("Minimum Overtime Minutes Required","minimumOvertimeMinutesRequired",this.inputType.Number,true)}
-          {this.getInput("Days In Advance Expenses Next Month Alert	","daysInAdvanceExpensesNextMonthAlert",this.inputType.Number,true,"The days before Next Month's Processing date that we are going to start sending alerts about unauthorized expenses or overtime")} 
+          {this.getInput("Shift Start (Overtime Calculation)","overtimeStartTime",this.inputType.Time,true,"Times before this will be counted as overtime")}
+          {this.getInput("Shift End (Overtime Calculation)","overtimeEndTime",this.inputType.Time,true,"Times after this will be counted as overtime")}
+          {this.getInput("Minimum Overtime Minutes Required","minimumOvertimeMinutesRequired",this.inputType.Number,true,"Activites under this amount won't be considered for overtime")}
+          {this.getInput("Hourly Labour Cost","hourlyLabourCost",this.inputType.Number,true,"Hourly internal cost of running CNC")}
+		  {this.getInput("Days In Advance Expenses Next Month Alert	","daysInAdvanceExpensesNextMonthAlert",this.inputType.Number,true,"The days before Next Months Processing date that we are going to start sending alerts about unauthorised expenses or overtime")} 
         </tbody>
       </table>
     );
@@ -368,8 +368,8 @@ class HeaderComponent extends MainComponent {
     return (
       <table className="table table-striped"  style={{width:500}}>
         <tbody>        
-          {this.getInput("Number Of Allowed Mistakes in Editor","numberOfAllowedMistakes",this.inputType.Number,true,"","","",5,5)}     
-          {this.getInput("Keyword Matching Likeness %","keywordMatchingPercent",this.inputType.Number,true,"","","",5,5)}                 
+          {this.getInput("Number Of Allowed Mistakes in Editor","numberOfAllowedMistakes",this.inputType.Number,true,"Text editor grammar and spelling mistake threshold","","",5,5)}     
+          {this.getInput("Keyword Matching Likeness %","keywordMatchingPercent",this.inputType.Number,true,"Likeless needed for a match when logging new SRs and comparing to existing","","",5,5)}                 
         </tbody>
       </table>
     );
@@ -379,8 +379,8 @@ class HeaderComponent extends MainComponent {
       <div>
       <table className="table table-striped"  style={{width:500}}>
         <tbody>        
-          {this.getInput("Portal PIN","portalPin",this.inputType.Number,true,"","","",5,5)}     
-          {this.getInput("Portal 24 Hour Support PIN","portal24HourPin",this.inputType.Number,true,"","","",5,5)}                 
+          {this.getInput("Portal PIN","portalPin",this.inputType.Number,true,"Visible for all cusomter contacts with ServiceDesk or Plus contract","","",5,5)}     
+          {this.getInput("Portal 24 Hour Support PIN","portal24HourPin",this.inputType.Number,true,"Visible for Main Contacts only","","",5,5)}                 
         </tbody>
       </table>
       <PortalDocumentComponent>
@@ -407,8 +407,8 @@ class HeaderComponent extends MainComponent {
       <table className="table table-striped"  style={{width:500}}>
         <tbody>        
           {this.getInput("Project Commence Notification","projectCommenceNotification",this.inputType.Number,true,"","","",5,5)}     
-          {this.getInput("Hold all SO Small Projects P5s for for QA Review","holdAllSOSmallProjectsP5sforQAReview",this.inputType.CheckBox,true,"","","",5,5)}                 
-          {this.getInput("Hold all SO Projects P5s for for QA Review","holdAllSOProjectsP5sforQAReview",this.inputType.CheckBox,true,"","","",5,5)}                 
+          {this.getInput("Hold all SO Small Projects P5s for for QA Review","holdAllSOSmallProjectsP5sforQAReview",this.inputType.CheckBox,true,"Will automatically mark all SRs raised from a Sales Order as Hold for QA for this team if selected","","",5,5)}                 
+          {this.getInput("Hold all SO Projects P5s for for QA Review","holdAllSOProjectsP5sforQAReview",this.inputType.CheckBox,true,"Will automatically mark all SRs raised from a Sales Order as Hold for QA for this team if selected","","",5,5)}                 
         </tbody>
       </table>
     );
@@ -446,7 +446,7 @@ class HeaderComponent extends MainComponent {
     return (
       <table className="table "  style={{width:700}}>
         <tbody>        
-          {this.getInput("Customer Review Meeting Text","customerReviewMeetingText",this.inputType.Editor,true,"","","",70,70)}          
+          {this.getInput("Customer Review Meeting Text","customerReviewMeetingText",this.inputType.Editor,true,"Entries here will show in the Meeting Agenda editor","","",70,70)}          
         </tbody>
       </table>
     );
@@ -529,31 +529,31 @@ class HeaderComponent extends MainComponent {
           <tr>
             <td className="text-center"  style={{width:40}}>1</td>
             <td>
-              {this.getInputElement("priority1Desc",this.inputType.Text,true,"","",65,65)}
+              {this.getInputElement("priority1Desc",this.inputType.Text,true,"Priority 1 description, this text oontrols the wording in the portal and CNCAPPS","",65,65)}
             </td>             
           </tr>
           <tr>
             <td className="text-center"  style={{width:40}}>2</td>
             <td>
-              {this.getInputElement("priority2Desc",this.inputType.Text,true,"","",65,65)}
+              {this.getInputElement("priority2Desc",this.inputType.Text,true,"Priority 2 description, this text oontrols the wording in the portal and CNCAPPS","",65,65)}
             </td>              
           </tr>
           <tr>
             <td className="text-center"  style={{width:40}}>3</td>
             <td>
-              {this.getInputElement("priority3Desc",this.inputType.Text,true,"","",65,65)}
+              {this.getInputElement("priority3Desc",this.inputType.Text,true,"Priority 3 description, this text oontrols the wording in the portal and CNCAPPS","",65,65)}
             </td>             
           </tr>
           <tr>
             <td className="text-center"  style={{width:40}}>4</td>
             <td>
-              {this.getInputElement("priority4Desc",this.inputType.Text,true,"","",65,65)}
+              {this.getInputElement("priority4Desc",this.inputType.Text,true,"Priority 4 description, this text oontrols the wording in the portal and CNCAPPS","",65,65)}
             </td>             
           </tr>
           <tr>
             <td className="text-center"  style={{width:40}}>5</td>
             <td>
-              {this.getInputElement("priority5Desc",this.inputType.Text,true,"","",65,65)}
+              {this.getInputElement("priority5Desc",this.inputType.Text,true,"Priority 5 description, this text oontrols the wording in the portal and CNCAPPS","",65,65)}
             </td>              
           </tr>
         </tbody>
