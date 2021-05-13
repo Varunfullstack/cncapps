@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1389 - Customer Feedback date criteria.
+
 ## [v5.10.4] - 2021-05-13
 ### Fixed
 - Fixed issue with PrePay contracts when fixing a Service Request.
