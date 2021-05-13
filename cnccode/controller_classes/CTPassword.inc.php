@@ -172,13 +172,13 @@ class CTPassword extends CTCNC
                 $password = null;
             }
             $passwords[] = [
-                "notes"               => $this->replaceQuotes($notes),
+                "notes"               => $notes,
                 "serviceName"         => $dsPassword->getValue(DBEJPassword::serviceName),
                 "serviceID"           => $dsPassword->getValue(DBEJPassword::serviceID),
                 'passwordID'          => $dsPassword->getValue(DBEPassword::passwordID),
                 'customerID'          => $dsPassword->getValue(DBEPassword::customerID),
-                DBEPassword::username => $this->replaceQuotes($userName),
-                'password'            => $this->replaceQuotes($password),
+                DBEPassword::username => $userName,
+                'password'            => $password,
                 'salesPassword'       => $dsPassword->getValue(DBEPassword::salesPassword),
                 'level'               => $dsPassword->getValue(DBEPassword::level),
                 'sortOrder'           => $dsPassword->getValue(DBEJPassword::sortOrder),

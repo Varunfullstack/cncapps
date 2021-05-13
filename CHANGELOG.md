@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 1396 - Double quote characters not displaying on password page.
+
 ## [v5.10.4] - 2021-05-13
 ### Fixed
 - Fixed issue with PrePay contracts when fixing a Service Request.
