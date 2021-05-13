@@ -487,12 +487,13 @@ class BUActivity extends Business
         $dbeCallActivity->getRow($callActivityID);
         $internalNotesRepo = new ServiceRequestInternalNotePDORepository();
         $newNoteDate       = new DateTimeImmutable();
+        $userId         = $dbeUser->getValue(DBEUser::userID);
         $newInternalNote   = ServiceRequestInternalNote::create(
             $internalNotesRepo->newIdentity(),
             $dbeCallActivity->getValue(DBECallActivity::problemID),
-            $dbeUser,
+            $userId,
             $newNoteDate,
-            $dbeUser,
+            $userId,
             $newNoteDate,
             "<STRONG>Parts Used on {$newNoteDate->format(DATE_CNC_DATE_TIME_FORMAT)} from {$dbeUser->getValue(DBEUser::firstName)} {$dbeUser->getValue(                DBEUser::lastName            )}</STRONG><BR/><BR/>{$message}"
         );
