@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 1385 - Send notification when a new customer is added.
+
 ## [v5.10.3] - 2021-05-12
 ## Fixed 
 - Fixed issue with customer stats.
