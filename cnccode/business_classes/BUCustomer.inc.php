@@ -395,7 +395,8 @@ class BUCustomer extends Business
      */
     function insertCustomer(&$dsData,
                             &$dsSite,
-                            &$dsContact
+                            &$dsContact,
+                            DBEUser $currentUser
     )
     {
         $this->setMethodName('insertCustomer');
@@ -429,6 +430,15 @@ class BUCustomer extends Business
         );
         $dsSite->post();
         $ret = $ret & ($this->updateSite($dsSite));        // Then update site delivery and invoice contacts
+        if ($ret) {
+            $buMail = new BUMail($this);
+            $buMail->sendSimpleEmail(
+                "<p>{$dsData->getValue(DBECustomer::name)} has been added to CNCAPPS by {$currentUser->getFullName()}.</p><p>Click <a href='Customer.php?action=dispEdit&customerID={$dsData->getValue(DBECustomer::customerID)}'>here</a> to see the details.</p>",
+                "A new customer has been added to CNCAPPS",
+                'newcustomercreated@cnc-ltd.co.uk',
+                'sales@cnc-ltd.co.uk'
+            );
+        }
         return $ret;
     }
 
@@ -1042,7 +1052,8 @@ class BUCustomer extends Business
         return $emailList;
     }
 
-    function getOthersWorkEmailAddresses($customerID, $excludeEmail){
+    function getOthersWorkEmailAddresses($customerID, $excludeEmail)
+    {
 
         if (!$customerID) {
             $this->raiseError('customerID not passed');
@@ -1689,8 +1700,10 @@ class BUCustomer extends Business
             $dsResults
         ));
     }
-    public function getFirstTimeFixSummary($customerID,$startDate,$endDate){
- 
+
+    public function getFirstTimeFixSummary($customerID, $startDate, $endDate)
+    {
+
         $query = "SELECT    
   SUM(
     COALESCE(
@@ -1765,31 +1778,42 @@ WHERE problem.`pro_custno` <> 282
   AND engineer.`teamID` = 1 ";
         if ($customerID) {
             $query .= " and pro_custno = " . $customerID;
-        }       
+        }
         if ($startDate) {
             $query .= " and initial.caa_date >= '" . $startDate->format('Y-m-d') . "'";
         }
         if ($endDate) {
             $query .= " and initial.caa_date <= '" . $endDate->format('Y-m-d') . "'";
         }
-       // $query .= " ORDER BY engineer.firstName";
+        // $query .= " ORDER BY engineer.firstName";
         //echo $query; exit;
-       return DBConnect::fetchOne($query);         
+        return DBConnect::fetchOne($query);
     }
+
     //get problem raised type summary
-    public function getProblemRaisedTypeSummary($customerID,$startDate,$endDate){
-        $query="SELECT `description` ,COUNT(*) total
+    public function getProblemRaisedTypeSummary($customerID, $startDate, $endDate)
+    {
+        $query = "SELECT `description` ,COUNT(*) total
         FROM problem JOIN `problemraisetype` t ON t.id=raiseTypeId
         WHERE `pro_custno`=:customerID 
         AND `pro_date_raised`>=:startDate
         AND `pro_date_raised`<=:endDate
         GROUP BY raiseTypeId";
-        return DBConnect::fetchAll($query,["customerID"=>$customerID,
-        "startDate"=>$startDate->format('Y-m-d'),
-        "endDate"=>$endDate->format('Y-m-d')
-        ]);
+        return DBConnect::fetchAll(
+            $query,
+            [
+                "customerID" => $customerID,
+                "startDate"  => $startDate->format('Y-m-d'),
+                "endDate"    => $endDate->format('Y-m-d')
+            ]
+        );
     }
-    public function getCustomerUnsupportedServers($customerID){
-        return DBConnect::fetchAll("SELECT assetName serverName FROM  unsupportedcustomerasset WHERE customerId=:customerId",["customerId"=>$customerID]);       
+
+    public function getCustomerUnsupportedServers($customerID)
+    {
+        return DBConnect::fetchAll(
+            "SELECT assetName serverName FROM  unsupportedcustomerasset WHERE customerId=:customerId",
+            ["customerId" => $customerID]
+        );
     }
 }
