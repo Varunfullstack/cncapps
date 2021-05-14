@@ -28,35 +28,35 @@ const TABS = {
     },
     RAISED_ON: {
         id: 'RAISED_ON',
-        description: 'Raised On',
+        description: 'Raised',
         dataLoader: (api, date) => {
             return api.getRaisedOn(date);
         },
     },
     STARTED_ON: {
         id: 'STARTED_ON',
-        description: 'Started On',
+        description: 'Started',
         dataLoader: (api, date) => {
             return api.getStartedOn(date);
         },
     },
     FIXED_ON: {
         id: 'FIXED_ON',
-        description: 'Fixed On',
+        description: 'Fixed',
         dataLoader: (api, date) => {
             return api.getFixedOn(date);
         },
     },
     REOPENED_ON: {
         id: 'REOPENED_ON',
-        description: 'Reopened On',
+        description: 'Reopened',
         dataLoader: (api, date) => {
             return api.getReopenedOn(date);
         },
     },
     BREACHED_ON: {
         id: 'BREACHED_ON',
-        description: 'Breached On',
+        description: 'Breached',
         dataLoader: (api, date) => {
             return api.breachedSLAOn(date);
         },
