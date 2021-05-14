@@ -81,7 +81,7 @@ class CTReceipt extends CTCNC
                 // all good ...so we should show the file
                 header("Content-Type: " . $dbeReceipt->getValue(DBEReceipt::fileMIMEType));
                 header("Content-Disposition: inline;");
-                readfile($dbeReceipt->getValue(RECEIPT_PATH.DBEReceipt::filePath));
+                readfile(RECEIPT_PATH.$dbeReceipt->getValue(DBEReceipt::filePath));
                 break;
             case 'upload':
                 $expenseID = $this->getParam('expenseID');
