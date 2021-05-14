@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v5.11.1]
+## [v5.11.1] - 2021-05-14
 ### Fixed
 - Fixed issue with receipts not having the right path.
 - Fixed issue with SLAPerformance showing errors.
