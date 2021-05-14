@@ -433,7 +433,7 @@ class BUCustomer extends Business
         if ($ret) {
             $buMail = new BUMail($this);
             $buMail->sendSimpleEmail(
-                "<p>{$dsData->getValue(DBECustomer::name)} has been added to CNCAPPS by {$currentUser->getFullName()}.</p><p>Click <a href='Customer.php?action=dispEdit&customerID={$dsData->getValue(DBECustomer::customerID)}'>here</a> to see the details.</p>",
+                "<p>{$dsData->getValue(DBECustomer::name)} has been added to CNCAPPS by {$currentUser->getFullName()}.</p><p>Click <a href='".SITE_URL."/Customer.php?action=dispEdit&customerID={$dsData->getValue(DBECustomer::customerID)}'>here</a> to see the details.</p>",
                 "A new customer has been added to CNCAPPS",
                 'newcustomercreated@cnc-ltd.co.uk',
                 'sales@cnc-ltd.co.uk'
