@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1399 - Force Customer Name when creating Templated Sales Quotation.
+
 ## [v5.11.1] - 2021-05-14
 ### Fixed
 - Fixed issue with receipts not having the right path.

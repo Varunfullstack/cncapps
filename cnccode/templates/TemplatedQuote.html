@@ -1,12 +1,19 @@
 <script>
+
+
+    let createButton;
     window.addEventListener('DOMContentLoaded', function () {
-        $('#customerString')[0].addEventListener('autocompleteselect', function ($event) {
-            $('#customerID').val($event.detail.item.value);
+        const customerIdInput = document.getElementById('customerID');
+        createButton = document.getElementById('createButton');
+        document.getElementById('customerString').addEventListener('autocompleteselect', function ($event) {
+            customerIdInput.value = $event.detail.item.value;
+            createButton.removeAttribute('disabled');
         });
     });
 
     function clearForm() {
         document.createTemplatedQuotationForm.reset();
+        createButton.setAttribute('disabled', '');
     }
 
     const openTabURL = '{openTabURL}';
@@ -67,7 +74,10 @@
         </tr>
         </tbody>
     </table>
-    <button>Create</button>
+    <button disabled
+            id="createButton"
+    >Create
+    </button>
     <button type="button"
             onclick="clearForm();"
     >Clear
