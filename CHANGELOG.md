@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.11.1]
+### Fixed
+- Fixed issue with receipts not having the right path.
+- Fixed issue with SLAPerformance showing errors.
+
 ## [v5.11.0] - 2021-05-14
 ### Added
 - Issue 1385 - Send notification when a new customer is added.

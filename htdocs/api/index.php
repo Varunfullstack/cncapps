@@ -103,7 +103,7 @@ $app->group(
                 $isBreakDown = isset($queryParams['breakDown']);
                 $query       = "select SUM(1) AS raised,
     SUM(pro_status IN ('F' , 'C')) AS `fixed`,
-    AVG(if(pro_status IN ('F', 'C'),problem.`pro_responded_hours`,null) AS responseTime,
+    AVG(if(pro_status IN ('F', 'C'),problem.`pro_responded_hours`,null)) AS responseTime,
        null as sla,
     AVG(IF(pro_status IN ('F' , 'C'),
         problem.`pro_responded_hours` < CASE problem.`pro_priority`
@@ -254,7 +254,7 @@ FROM
       pro_priority AS priority,
       SUM(1) AS raised,
       SUM(pro_status IN ('F', 'C')) AS `fixed`,
-      AVG(if(pro_status IN ('F', 'C'),problem.`pro_responded_hours`, null) AS responseTime,
+      AVG(if(pro_status IN ('F', 'C'),problem.`pro_responded_hours`, null)) AS responseTime,
       AVG(
         IF(
           pro_status IN ('F', 'C'),
@@ -794,7 +794,7 @@ ORDER BY COUNT DESC";
                 ];
                 $isBreakDown = isset($queryParams['breakDown']);
                 $query       = 'SELECT
-  SUM(1) AS raised,
+    SUM(1) AS raised,
     SUM(pro_status IN("F","C")) AS `fixed`,
   AVG(if(problem.pro_priority = 1 and pro_status IN ("F","C") ,problem.`pro_responded_hours`, null)) AS responseTime,
   AVG(
@@ -830,44 +830,103 @@ WHERE  caa_date between ? and ?
   AND pro_priority < 4';
                 if ($isBreakDown) {
                     $query = 'SELECT
-       pro_priority as priority,
-  SUM(1) AS raised,
-    SUM(pro_status IN("F","C")) AS `fixed`,
-  AVG(if(problem.pro_priority = 1 and pro_status IN ("F","C"),problem.`pro_responded_hours`, null)) AS responseTime,
-  AVG(
-   IF(pro_status IN ("F","C"),   
-   problem.`pro_responded_hours` < 
-    CASE
-      problem.`pro_priority`
-      WHEN 1
-      THEN customer.`cus_sla_p1`
-      WHEN 2
-      THEN customer.`cus_sla_p2`
-      WHEN 3
-      THEN customer.`cus_sla_p3`
-      WHEN 4
-      THEN customer.`cus_sla_p4`
-      ELSE 0
-    END,
-    NULL) 
-  ) AS slaMet,
-    AVG(IF(pro_status IN ("F","C"), openHours < 8, NULL)) AS closedWithin8Hours,
-    AVG(IF(pro_status ="C" and pro_hide_from_customer_flag <> "Y",problem.`pro_reopened_date` IS NOT NULL, NULL)) AS reopened,
-    AVG(IF(pro_status IN ("F","C"), problem.`pro_chargeable_activity_duration_hours`,NULL)) AS avgChargeableTime,
-    AVG(IF(pro_status IN ("F","C"), problem.pro_working_hours,NULL)) AS avgTimeAwaitingCNC,
-    AVG(IF(pro_status IN ("F","C"), openHours,NULL)) AS avgTimeFromRaiseToFixHours
+  p.priority, data.avgChargeableTime, raised, fixed, responseTime, slaMet, closedWithin8Hours, reopened, avgChargeableTime, avgTimeAwaitingCNC, avgTimeFromRaiseToFixHours
 FROM
-  problem
-  LEFT JOIN callactivity initial
-    ON initial.`caa_problemno` = problem.`pro_problemno`
-    AND initial.`caa_callacttypeno` = 51
-  JOIN customer
-    ON problem.`pro_custno` = customer.`cus_custno`
-WHERE 
- caa_date between ? and ?
-  AND pro_priority < 5 
-  group by pro_priority
-        order by pro_priority';
+  (SELECT
+    1 AS priority
+  UNION
+  ALL
+  SELECT
+    2 AS priority
+  UNION
+  ALL
+  SELECT
+    3 AS priority
+  UNION
+  ALL
+  SELECT
+    4 AS priority) p
+  LEFT JOIN
+    (SELECT
+      pro_priority AS priority,
+      SUM(1) AS raised,
+      SUM(pro_status IN ("F", "C")) AS `fixed`,
+      AVG(
+        IF(
+          problem.pro_priority = 1
+          AND pro_status IN ("F", "C"),
+          problem.`pro_responded_hours`,
+          NULL
+        )
+      ) AS responseTime,
+      AVG(
+        IF(
+          pro_status IN ("F", "C"),
+          problem.`pro_responded_hours` <
+          CASE
+            problem.`pro_priority`
+            WHEN 1
+            THEN customer.`cus_sla_p1`
+            WHEN 2
+            THEN customer.`cus_sla_p2`
+            WHEN 3
+            THEN customer.`cus_sla_p3`
+            WHEN 4
+            THEN customer.`cus_sla_p4`
+            ELSE 0
+          END,
+          NULL
+        )
+      ) AS slaMet,
+      AVG(
+        IF(
+          pro_status IN ("F", "C"),
+          openHours < 8,
+          NULL
+        )
+      ) AS closedWithin8Hours,
+      AVG(
+        IF(
+          pro_status = "C"
+          AND pro_hide_from_customer_flag <> "Y",
+          problem.`pro_reopened_date` IS NOT NULL,
+          NULL
+        )
+      ) AS reopened,
+      AVG(
+        IF(
+          pro_status IN ("F", "C"),
+          problem.`pro_chargeable_activity_duration_hours`,
+          NULL
+        )
+      ) AS avgChargeableTime,
+      AVG(
+        IF(
+          pro_status IN ("F", "C"),
+          problem.pro_working_hours,
+          NULL
+        )
+      ) AS avgTimeAwaitingCNC,
+      AVG(
+        IF(
+          pro_status IN ("F", "C"),
+          openHours,
+          NULL
+        )
+      ) AS avgTimeFromRaiseToFixHours
+    FROM
+      problem
+      LEFT JOIN callactivity initial
+        ON initial.`caa_problemno` = problem.`pro_problemno`
+        AND initial.`caa_callacttypeno` = 51
+      JOIN customer
+        ON problem.`pro_custno` = customer.`cus_custno`
+    WHERE caa_date BETWEEN ?
+      AND ?
+      AND pro_priority < 5
+    GROUP BY pro_priority
+    ORDER BY pro_priority) data
+    ON data.priority = p.priority';
                 }
                 try {
                     $statement = $db->preparedQuery($query, $params);

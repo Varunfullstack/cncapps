@@ -81,7 +81,7 @@ class CTReceipt extends CTCNC
                 // all good ...so we should show the file
                 header("Content-Type: " . $dbeReceipt->getValue(DBEReceipt::fileMIMEType));
                 header("Content-Disposition: inline;");
-                readfile($dbeReceipt->getValue(DBEReceipt::filePath));
+                readfile($dbeReceipt->getValue(RECEIPT_PATH.DBEReceipt::filePath));
                 break;
             case 'upload':
                 $expenseID = $this->getParam('expenseID');
@@ -148,7 +148,9 @@ class CTReceipt extends CTCNC
             throw new RuntimeException('Invalid type of file');
         }
 
-        $filePath = RECEIPT_PATH . uniqid('receipt') . "." . $ext;
+        $fileName = uniqid('receipt') . "." . $ext;
+
+        $filePath = RECEIPT_PATH . $fileName;
         if ($ext === "pdf") {
             if (filesize($fileUploaded) > 1024 * 1024) {
                 throw new RuntimeException('The file is too big, max 1MB');
@@ -162,7 +164,7 @@ class CTReceipt extends CTCNC
         }
         $dbeReceipt = new DBEReceipt($this);
         $dbeReceipt->setValue(DBEReceipt::fileMIMEType, $mimeType);
-        $dbeReceipt->setValue(DBEReceipt::filePath, $filePath);
+        $dbeReceipt->setValue(DBEReceipt::filePath, $fileName);
         $dbeReceipt->setValue(DBEReceipt::expenseId, $expenseID);
         $dbeReceipt->insertRow();
         return $dbeReceipt->getPKValue();
