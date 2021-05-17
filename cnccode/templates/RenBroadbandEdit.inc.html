@@ -9,8 +9,7 @@
 ></script>
 <script src=".javascript/DirectDebitLogic.js"
 ></script>
-<script language='JavaScript'>
-
+<script>
     const clientCheckDirectDebit = {clientCheckDirectDebit};
 
     let itemIdInput;
@@ -29,58 +28,59 @@
                 }
         );
 
-        function checkDirectDebit() {
-            const directDebitCheckbox = $('#directDebit');
-            const parent = directDebitCheckbox.parent();
-            if (clientCheckDirectDebit && $('#allowDirectDebit').val() !== 'false') {
-                directDebitCheckbox.attr('disabled', false);
-                if (parent.children().length > 1) {
-                    parent.find('span').remove();
+    });
+
+    function checkDirectDebit() {
+        const directDebitCheckbox = $('#directDebit');
+        const parent = directDebitCheckbox.parent();
+        if (clientCheckDirectDebit && $('#allowDirectDebit').val() !== 'false') {
+            directDebitCheckbox.attr('disabled', false);
+            if (parent.children().length > 1) {
+                parent.find('span').remove();
+            }
+        } else {
+            if (!clientCheckDirectDebit) {
+                if (parent.children().length < 2) {
+                    parent.append('<span class="redText">This customer needs bank details before Direct Debit can be used.</span>')
                 }
-            } else {
-                if (!clientCheckDirectDebit) {
-                    if (parent.children().length < 2) {
-                        parent.append('<span class="redText">This customer needs bank details before Direct Debit can be used.</span>')
+            }
+            directDebitCheckbox.attr('disabled', true);
+            directDebitCheckbox.prop('checked', false)
+        }
+
+    }
+
+    function checkFunctionKey(field) {
+        if (event.keyCode == 120) {      // F9 - edit
+            switch (field.id) {
+                case "siteDesc":
+                    if (document.getElementById("siteNo").value != "") {
+                        window.open(
+                                '{urlSiteEdit}&customerID={customerID}' +
+                                '&siteNo=' + escape(document.getElementById("siteNo").value) +
+                                '&parentIDField=siteNo' +
+                                '&parentDescField=siteDesc',
+                                'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
+                        );
                     }
-                }
-                directDebitCheckbox.attr('disabled', true);
-                directDebitCheckbox.prop('checked', false)
-            }
-
-        }
-
-        function checkFunctionKey(field) {
-            if (event.keyCode == 120) {      // F9 - edit
-                switch (field.id) {
-                    case "siteDesc":
-                        if (document.getElementById("siteNo").value != "") {
-                            window.open(
-                                    '{urlSiteEdit}&customerID={customerID}' +
-                                    '&siteNo=' + escape(document.getElementById("siteNo").value) +
-                                    '&parentIDField=siteNo' +
-                                    '&parentDescField=siteDesc',
-                                    'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
-                            );
-                        }
-                        break;
-                }
-            }
-            return;
-        }
-
-        function validatesiteDesc() {
-            if (Trim(document.getElementById("siteDesc").value) != "") {
-                window.open(
-                        '{urlSitePopup}&customerID={customerID}' +
-                        '&siteDesc=' + escape(document.getElementById("siteDesc").value) +
-                        '&parentIDField=siteNo' +
-                        '&parentDescField=siteDesc',
-                        'address',
-                        'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
-                )
+                    break;
             }
         }
+        return;
+    }
 
+    function validatesiteDesc() {
+        if (Trim(document.getElementById("siteDesc").value) != "") {
+            window.open(
+                    '{urlSitePopup}&customerID={customerID}' +
+                    '&siteDesc=' + escape(document.getElementById("siteDesc").value) +
+                    '&parentIDField=siteNo' +
+                    '&parentDescField=siteDesc',
+                    'address',
+                    'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
+            )
+        }
+    }
 </script>
 <TABLE width="200px"
        border="0"

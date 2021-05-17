@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.11.2]
+### Fixed
+- Fixe issue with Broadband contracts.
+
 ## [v5.11.1] - 2021-05-14
 ### Fixed
 - Fixed issue with receipts not having the right path.
