@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 1402 - Standard Rate Card.
+
 ## [v5.11.4]
 ### Changed
 - Change createSalesRequest button to Submit.
