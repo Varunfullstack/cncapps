@@ -26,6 +26,8 @@ trait SortableWithQueryDBE
                                                    {$this->getDiscriminatorCondition()}
                                                    
                                                    ";
+
+        var_dump($query);
         $result = $db->query($query);
         if (!$result) {
             throw new \Exception("Failed to execute query: $query");
