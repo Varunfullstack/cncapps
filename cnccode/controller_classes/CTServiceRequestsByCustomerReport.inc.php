@@ -16,8 +16,8 @@ class CTServiceRequestsByCustomerReport extends CTCNC
 {
 
     const searchFormFromDate = 'fromDate';
-    const searchFormToDate = 'toDate';
-    const searchFormDays = 'days';
+    const searchFormToDate   = 'toDate';
+    const searchFormDays     = 'days';
 
     private $buActivity;
 
@@ -35,10 +35,6 @@ class CTServiceRequestsByCustomerReport extends CTCNC
             $cookieVars,
             $cfg
         );
-        if (!$this->isUserSDManager()) {
-            Header("Location: /NotAllowed.php");
-            exit;
-        }
         $this->setMenuId(213);
         $this->buActivity = new BUActivity($this);
     }
@@ -54,9 +50,12 @@ class CTServiceRequestsByCustomerReport extends CTCNC
             case 'email':
                 $this->email();
                 break;
-
             case 'search':
             default:
+                if (!$this->isUserSDManager()) {
+                    Header("Location: /NotAllowed.php");
+                    exit;
+                }
                 $this->search();
                 break;
 
@@ -67,44 +66,35 @@ class CTServiceRequestsByCustomerReport extends CTCNC
     {
         $this->setMethodName('email');
         $dsSearchForm = $this->initialiseSearchForm();
-        $days = $this->getParam('days');
+        $days         = $this->getParam('days');
         $dsSearchForm->setValue(
             self::searchFormDays,
             $days
         );
-
         $results = $this->buActivity->getSrPercentages($days);
-
         if ($results) {
-            $buMail = new BUMail($this);
+            $buMail      = new BUMail($this);
             $senderEmail = CONFIG_SUPPORT_EMAIL;
-            $toEmail = 'monthlysdreport@' . CONFIG_PUBLIC_DOMAIN;
-
+            $toEmail     = 'monthlysdreport@' . CONFIG_PUBLIC_DOMAIN;
             $this->template = new Template(
-                EMAIL_TEMPLATE_DIR,
-                "remove"
+                EMAIL_TEMPLATE_DIR, "remove"
             );
             $this->template->set_file(
                 'page',
                 'ServiceRequestsByCustomerReportEmail.inc.html'
             );
-
             $this->renderReport(
                 'page',
                 $results,
                 $dsSearchForm
             );
-
             $this->template->parse(
                 'output',
                 'page',
                 true
             );
-
             $body = $this->template->get_var('output');
-
             $subject = 'Service Requests By Customer - Days: ' . $days;
-
             $hdrs = array(
                 'From'         => $senderEmail,
                 'To'           => $toEmail,
@@ -112,26 +102,21 @@ class CTServiceRequestsByCustomerReport extends CTCNC
                 'Date'         => date("r"),
                 'Content-Type' => 'text/html; charset=UTF-8'
             );
-
             $buMail->mime->setHTMLBody($body);
-
             $mime_params = array(
                 'text_encoding' => '7bit',
                 'text_charset'  => 'UTF-8',
                 'html_charset'  => 'UTF-8',
                 'head_charset'  => 'UTF-8'
             );
-            $body = $buMail->mime->get($mime_params);
-
+            $body        = $buMail->mime->get($mime_params);
             $hdrs = $buMail->mime->headers($hdrs);
-
             $buMail->putInQueue(
                 $senderEmail,
                 $toEmail,
                 $hdrs,
                 $body
             );
-
             echo 'email queued to be sent';
         }
 
@@ -159,7 +144,6 @@ class CTServiceRequestsByCustomerReport extends CTCNC
             self::searchFormDays,
             7
         );
-
         return $dsSearchForm;
 
     }
@@ -175,15 +159,13 @@ class CTServiceRequestsByCustomerReport extends CTCNC
     )
     {
         $totalPercentage = 0;
-        $totalHours = 0;
-        $totalSrCount = 0;
-
+        $totalHours      = 0;
+        $totalSrCount    = 0;
         $this->template->set_block(
             $templateName,
             'customersBlock',
             'customers'
         );
-
         foreach ($results as $row) {
 
             $this->template->set_var(
@@ -205,12 +187,10 @@ class CTServiceRequestsByCustomerReport extends CTCNC
                 'customersBlock',
                 true
             );
-
-            $totalHours += $row['hours'];
+            $totalHours      += $row['hours'];
             $totalPercentage += $row['percentage'];
-            $totalSrCount += $row['srCount'];
+            $totalSrCount    += $row['srCount'];
         }
-
         $this->template->set_var(
             array(
                 'days'            => $dsSearchForm->getValue(self::searchFormDays),
@@ -228,11 +208,9 @@ class CTServiceRequestsByCustomerReport extends CTCNC
 
 
     } // end renderReport()
-
     /*
     Send email report for past $days
     */
-
     /**
      * @throws Exception
      */
@@ -251,7 +229,6 @@ class CTServiceRequestsByCustomerReport extends CTCNC
                     $dsSearchForm->getValue(self::searchFormFromDate),
                     $dsSearchForm->getValue(self::searchFormToDate)
                 );
-
                 if ($results) {
 
                     $this->renderReport(
@@ -261,17 +238,13 @@ class CTServiceRequestsByCustomerReport extends CTCNC
                     );
 
                 }//end if $results
-
             }
         }
-
         $urlSubmit = Controller::buildLink(
             $_SERVER ['PHP_SELF'],
             array('action' => CTCNC_ACT_SEARCH)
         );
-
         $this->setPageTitle('Service Requests By Customer Report');
-
         $this->template->set_var(
             array(
                 'formError'       => $this->formError,
@@ -284,7 +257,6 @@ class CTServiceRequestsByCustomerReport extends CTCNC
                 'urlSubmit'       => $urlSubmit
             )
         );
-
         $this->template->parse(
             'CONTENTS',
             'ServiceRequestsByCustomerReport',
