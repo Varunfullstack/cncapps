@@ -583,7 +583,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                         }
                     } else {
                         $this->logger->warning('Raising a License not found SR while processing Mailboxes:' . $license);
-                        $this->raiseCNCRequest($license, $dbeCustomer, $datum['DisplayName']);
+                        $this->raiseCustomerServiceRequest($dbeCustomer, "License not found {$license} while processing mailbox {$datum['DisplayName']} ");
                     }
                 }
                 if ($licensesWithDefender > 1) {
@@ -1057,7 +1057,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                 }
             } else {
                 $this->logger->warning('Raising a License not found SR while processing Licenses');
-                $this->raiseCNCRequest($datum['AccountSkuId'], $dbeCustomer);
+                $this->raiseCustomerServiceRequest($dbeCustomer,"License not found while processing licenses :{$datum['AccountSkuId']}");
             }
         }
         if (count($sparedLicenseErrors)) {
