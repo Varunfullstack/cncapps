@@ -7,5 +7,5 @@ interface ValueObject
 
     public function isNull(): bool;
 
-    public function isSame(ValueObject $object): bool;
+    public function isSame(self $object): bool;
 }

@@ -5,6 +5,6 @@ trait ValueObjectCompare
 {
     public function isSame(ValueObject $object): bool
     {
-        return $this->value === $object->value();
+        return $this->value() === $object->value();
     }
 }

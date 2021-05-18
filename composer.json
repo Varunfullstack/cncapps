@@ -34,7 +34,8 @@
         "karriere/json-decoder": "^4.0.0",
         "ext-sqlite3": "*",
         "data-uri/data-uri": "^0.2.5",
-        "html2text/html2text": "^4.3"
+        "html2text/html2text": "^4.3",
+        "ramsey/uuid": "^4.1"
     },
     "autoload": {
         "psr-4": {
