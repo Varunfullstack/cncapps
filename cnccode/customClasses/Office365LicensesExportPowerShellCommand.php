@@ -1057,7 +1057,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                 }
             } else {
                 $this->logger->warning('Raising a License not found SR while processing Licenses');
-                $this->raiseCustomerServiceRequest($dbeCustomer,"License not found while processing licenses :{$datum['AccountSkuId']}");
+                $this->raiseCNCRequest($datum['AccountSkuId'], $dbeCustomer);
             }
         }
         if (count($sparedLicenseErrors)) {
