@@ -60,17 +60,17 @@ class AcceptPendingChargeableWorkCustomerRequest
      */
     public function __invoke(ChargeableWorkCustomerRequestTokenId $id, ?string $comments)
     {
-        $request           = $this->getRequest($id);
-        $serviceRequest    = $this->getServiceRequest($request);
-        $requestApprovedAt = new DateTimeImmutable();
-        $buCustomer        = new BUCustomer($this);
-        $hasPrepay         = $buCustomer->hasPrepayContract($serviceRequest->getValue(DBEProblem::customerID));
+        $request             = $this->getRequest($id);
+        $serviceRequest      = $this->getServiceRequest($request);
+        $requestApprovedAt   = new DateTimeImmutable();
+        $buCustomer          = new BUCustomer($this);
+        $hasPrepay           = $buCustomer->hasPrepayContract($serviceRequest->getValue(DBEProblem::customerID));
         $hasLinkedSalesOrder = (bool)$serviceRequest->getValue(DBEJProblem::linkedSalesOrderID);
         $this->logCustomerContactActivity($request, $requestApprovedAt, $serviceRequest, $comments, $hasPrepay);
         if (!$hasPrepay || $hasLinkedSalesOrder) {
             $this->createOrUpdateSalesOrder($serviceRequest, $request);
         }
-        $this->updateServiceRequest($serviceRequest, $request, $hasPrepay);
+        $this->updateServiceRequest($serviceRequest, $request, $hasPrepay, $hasLinkedSalesOrder);
         $this->sendEmailToEngineer($request);
         $this->deleteChargeableRequest($request);
     }
@@ -144,7 +144,6 @@ class AcceptPendingChargeableWorkCustomerRequest
             $description .= "<p>Priority Changed from {$serviceRequest->getValue(DBEProblem::priority)} to 5</p>";
         }
         $requester = $this->getRequester($request);
-
         $buActivity->addCustomerContactActivityToServiceRequest($serviceRequest, $description, $requester);
     }
 
@@ -305,30 +304,34 @@ class AcceptPendingChargeableWorkCustomerRequest
      * @param DBEJProblem $dbeProblem
      * @param ChargeableWorkCustomerRequest $request
      * @param bool $hasPrepay
+     * @param $hasLinkedSalesOrder
      * @throws ColumnOutOfRangeException
      */
     private function updateServiceRequest(DBEJProblem $dbeProblem,
                                           ChargeableWorkCustomerRequest $request,
-                                          bool $hasPrepay
+                                          bool $hasPrepay,
+                                          bool $hasLinkedSalesOrder
     ): void
     {
         $toUpdateProblem  = new DBEProblem($this);
         $serviceRequestId = $dbeProblem->getValue(DBEProblem::problemID);
         $toUpdateProblem->getRow($serviceRequestId);
-        if (!$hasPrepay) {
-            $toUpdateProblem->setValue(DBEProblem::priority, 5);
-        } else {
-            $toUpdateProblem->setValue(DBEProblem::prePayChargeApproved, 1);
-            $buCustomer       = new BUCustomerItem($this);
-            $datasetContracts = new DataSet($this);
-            $buCustomer->getPrepayContractByCustomerID(
-                $dbeProblem->getValue(DBEProblem::customerID),
-                $datasetContracts
-            );
-            $toUpdateProblem->setValue(
-                DBEProblem::contractCustomerItemID,
-                $datasetContracts->getValue(DBEJContract::customerItemID)
-            );
+        if (!$hasLinkedSalesOrder) {
+            if (!$hasPrepay) {
+                $toUpdateProblem->setValue(DBEProblem::priority, 5);
+            } else {
+                $toUpdateProblem->setValue(DBEProblem::prePayChargeApproved, 1);
+                $buCustomer       = new BUCustomerItem($this);
+                $datasetContracts = new DataSet($this);
+                $buCustomer->getPrepayContractByCustomerID(
+                    $dbeProblem->getValue(DBEProblem::customerID),
+                    $datasetContracts
+                );
+                $toUpdateProblem->setValue(
+                    DBEProblem::contractCustomerItemID,
+                    $datasetContracts->getValue(DBEJContract::customerItemID)
+                );
+            }
         }
         $requesterId = $request->getRequesterId()->value();
         $dbeUser     = new DBEJUser($this);
