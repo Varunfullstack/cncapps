@@ -57,10 +57,15 @@ class APIMain {
             body: JSON.stringify(payload),
           }).then((res) => this.handleResponse(res));
     }
-    delete(url ) {
+    delete(url ,handleException=false) {
+      if (!handleException)
         return fetch(url, {
             method: "DELETE",            
         }).then((res) => res.json());
+        else
+        return fetch(url, {
+          method: "DELETE",            
+      }).then((res) => this.handleResponse(res));
     }
     postFormData(url, payload) {
         return fetch(url, {

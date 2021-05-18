@@ -8,7 +8,9 @@ import APIStarterLeaverManagement from "./services/APIStarterLeaverManagement.js
 import Table from "../shared/table/table.js";
 import ToolTip from "../shared/ToolTip.js";
 import QuestionDetailsComponent from "./subComponents/QuestionDetailsComponent.js";
-
+import QuestionsComponent from "./subComponents/QuestionsComponent.js";
+import AutoComplete from "../shared/AutoComplete/autoComplete.js";
+import CustomerSearch from "../shared/CustomerSearch.js";
 class StarterLeaverManagementComponent extends MainComponent {
     api=new APIStarterLeaverManagement();
     constructor(props) {
@@ -17,21 +19,20 @@ class StarterLeaverManagementComponent extends MainComponent {
             ...this.state,    
             showSpinner:false,    
             customers:[],
-            showAddModal:false
+            showAddModal:false,             
+            activCustomer:null
         };
     }
 
     componentDidMount() {     
         this.getData();  
     }
-
-
     getData(){
         this.api.getCustomersHaveQuestions().then(res=>{
-            console.log("customers",res);
+            //console.log("customers",res);
             this.setState({"customers":res.data});
         },error=>{
-            console.log(error);
+            //console.log(error);
             this.alert("Error in loading customers");
         });
     }
@@ -45,36 +46,50 @@ class StarterLeaverManagementComponent extends MainComponent {
                hdClassName: "text-center",
                icon: "fal fa-2x fa-building color-gray2 pointer",
                sortable: true,
-               //className: "text-center",               
+               //className: "text-center",    
+               classNameColumn:"active"
             },
             {
-                path: "starter",
+                path: "edit",
                 label: "",
                 hdToolTip: "Starter Questions",
                 hdClassName: "text-center",
-                icon: "fal fa-2x fa-hourglass-start color-gray2 pointer",
+                icon: "fal fa-2x fa-edit color-gray2 pointer",
                 sortable: true,
                 className: "text-center",         
-                content:(customer)=>customer.starter>0?
-                <ToolTip title="Starter Question">
-                    <i className="fal fa-2x fa-hourglass-start color-gray pointer"></i>
-                </ToolTip>
-                :null      
+                content:(customer)=><ToolTip title="Edit Questions">
+                                        <i className="fal fa-2x fa-edit color-gray pointer" onClick={()=>this.handleEdit(customer)}></i>
+                                    </ToolTip>   ,
+                classNameColumn:"active"                 
              },
-             {
-                path: "leaver",
-                label: "",
-                hdToolTip: "Leaver Questions",
-                hdClassName: "text-center",
-                icon: "fal fa-2x fa-hourglass-end color-gray2 pointer",
-                sortable: true,
-                className: "text-center",             
-                content:(customer)=>customer.leaver>0?
-                <ToolTip title="Leaver Question">
-                <i className="fal fa-2x fa-hourglass-end color-gray pointer"></i>
-                </ToolTip>:null   ,
+            // {
+            //     path: "starter",
+            //     label: "",
+            //     hdToolTip: "Starter Questions",
+            //     hdClassName: "text-center",
+            //     icon: "fal fa-2x fa-hourglass-start color-gray2 pointer",
+            //     sortable: true,
+            //     className: "text-center",         
+            //     content:(customer)=>customer.starter>0?
+            //     <ToolTip title="Starter Question">
+            //         <i className="fal fa-2x fa-hourglass-start color-gray pointer"></i>
+            //     </ToolTip>
+            //     :null      
+            //  },
+            //  {
+            //     path: "leaver",
+            //     label: "",
+            //     hdToolTip: "Leaver Questions",
+            //     hdClassName: "text-center",
+            //     icon: "fal fa-2x fa-hourglass-end color-gray2 pointer",
+            //     sortable: true,
+            //     className: "text-center",             
+            //     content:(customer)=>customer.leaver>0?
+            //     <ToolTip title="Leaver Question">
+            //     <i className="fal fa-2x fa-hourglass-end color-gray pointer"></i>
+            //     </ToolTip>:null   ,
                   
-             },
+            //  },
         ];
         return <Table        
         pk="customerName"
@@ -86,21 +101,49 @@ class StarterLeaverManagementComponent extends MainComponent {
         </Table>
 
     }
+    getCustomersElement=()=>{
+        const {customers}=this.state;
+        if(customers.length==0)
+        return null;
+        return <CustomerSearch
+        onChange={this.handleOnSelect}
+        placeholder="Select Customer"
+        >
+        </CustomerSearch>         
+    }
+    handleOnSelect=(customer)=>{
+        //console.log(customer);       
+        this.setState({activCustomer:customer});
+
+    }
     handleCloseAddModal=()=>{
         this.setState({showAddModal:false});
     }
+    handleNewQuestion=()=>{
+        if(this.state.activCustomer==null)
+            this.alert("Please select customer");
+        else
+        this.setState({ showAddModal: true });
+    }
     render() {
-        return <div>
-            <Spinner show={this.state.showSpinner}></Spinner>            
+        const {activCustomer}=this.state;
+        return (
+          <div>
+            <Spinner show={this.state.showSpinner}></Spinner>
             {this.getAlert()}
-            <ToolTip width={30} title="Add New Question">
-                <i className="fal fa-2x fa-plus color-gray2 pointer mb-5" onClick={()=>this.setState({showAddModal:true})}></i>
-            </ToolTip>
-            <div style={{width:500}}>
-            {this.getCustomersTable()}
-            <QuestionDetailsComponent onClose={this.handleCloseAddModal} show={this.state.showAddModal} ></QuestionDetailsComponent>
+           
+            <div className="flex-row">
+            {this.getCustomersElement()} 
+               
             </div>
-        </div>;
+            <QuestionsComponent  customer={activCustomer}></QuestionsComponent>
+            <QuestionDetailsComponent
+              customer={activCustomer}
+              onClose={this.handleCloseAddModal}
+              show={this.state.showAddModal}
+            ></QuestionDetailsComponent>
+          </div>
+        );
     }
 }
 
