@@ -70,11 +70,9 @@ class AcceptPendingChargeableWorkCustomerRequest
         if (!$hasPrepay || $hasLinkedSalesOrder) {
             $this->createOrUpdateSalesOrder($serviceRequest, $request);
         }
-        var_dump($hasPrepay, $hasLinkedSalesOrder);
-        exit;
         $this->updateServiceRequest($serviceRequest, $request, $hasPrepay, $hasLinkedSalesOrder);
-//        $this->sendEmailToEngineer($request);
-//        $this->deleteChargeableRequest($request);
+        $this->sendEmailToEngineer($request);
+        $this->deleteChargeableRequest($request);
     }
 
     /**
@@ -236,7 +234,7 @@ class AcceptPendingChargeableWorkCustomerRequest
     ): void
     {
         $dbeOrdline = $this->getNewLine($ordheadID, $customerID);
-        $dbeItem = new DBEItem($this);
+        $dbeItem    = new DBEItem($this);
         $dbeItem->getRow(CONFIG_CONSULTANCY_HOURLY_LABOUR_ITEMID);
         $amount = $request->getAdditionalHoursRequested()->value();
         $dbeOrdline->setValue(DBEOrdline::lineType, 'I');
