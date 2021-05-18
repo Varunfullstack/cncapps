@@ -65,8 +65,9 @@ class AcceptPendingChargeableWorkCustomerRequest
         $requestApprovedAt = new DateTimeImmutable();
         $buCustomer        = new BUCustomer($this);
         $hasPrepay         = $buCustomer->hasPrepayContract($serviceRequest->getValue(DBEProblem::customerID));
+        $hasLinkedSalesOrder = (bool)$serviceRequest->getValue(DBEJProblem::linkedSalesOrderID);
         $this->logCustomerContactActivity($request, $requestApprovedAt, $serviceRequest, $comments, $hasPrepay);
-        if (!$hasPrepay) {
+        if (!$hasPrepay || $hasLinkedSalesOrder) {
             $this->createOrUpdateSalesOrder($serviceRequest, $request);
         }
         $this->updateServiceRequest($serviceRequest, $request, $hasPrepay);
