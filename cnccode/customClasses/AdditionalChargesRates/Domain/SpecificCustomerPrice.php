@@ -8,8 +8,7 @@ class SpecificCustomerPrice
     /** @var SalePrice */
     private $salePrice;
 
-    private function __construct(,
-                                CustomerId $customerId,
+    public function __construct(CustomerId $customerId,
                                 SalePrice $salePrice
     )
     {

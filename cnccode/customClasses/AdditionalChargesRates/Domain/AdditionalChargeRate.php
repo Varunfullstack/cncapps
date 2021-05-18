@@ -19,6 +19,7 @@ class AdditionalChargeRate
      * @var AdditionalChargeRateId
      */
     private $id;
+    private $updatedSpecifics = [];
 
     public function __construct(AdditionalChargeRateId $id,
                                 Description $description,
@@ -93,11 +94,26 @@ class AdditionalChargeRate
         $this->allowCustomerSpecificPrices = new AllowCustomerSpecificPrices(false);
     }
 
-    public function addCustomerSpecificPrice(CustomerId $customerId, SalePrice $salePrice)
+    public function setCustomerPrice(CustomerId $customerId, SalePrice $salePrice)
     {
 
-        foreach ($this->specificCustomerPrices as $specificCustomerPrice) {
-            if ($spe)
+        foreach ($this->specificCustomerPrices as $key => $specificCustomerPrice) {
+            if ($specificCustomerPrice->customerId->isSame($customerId)) {
+                $this->specificCustomerPrices[$key] = new SpecificCustomerPrice($customerId, $salePrice);
+                $this->updatedSpecifics[$customerId->value()] = $salePrice->value();
+                return;
+            }
+        }
+
+
+
+    }
+
+    private function findSpecificCustomerPrice(CustomerId $customerId){
+        foreach ($this->specificCustomerPrices as $key => $specificCustomerPrice) {
+            if ($specificCustomerPrice->customerId->isSame($customerId)) {
+                return $
+            }
         }
     }
 }
