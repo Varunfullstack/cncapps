@@ -104,7 +104,7 @@ export default class QuestionDetailsComponent extends MainComponent {
     return (
       <Modal
         show={this.props.show}
-        title="Add New Question"
+        title={data.questionID?"Edit Question":"Add New Question"}
         width={600}
         footer={
           <div key="footer" onClose={this.handleCancel}>
@@ -142,7 +142,7 @@ export default class QuestionDetailsComponent extends MainComponent {
                     className="form-control"
                     value={data.name}
                     onChange={(event) =>
-                      this.setValue("name", event.target.value)
+                      this.setValue("name", event.target.value.replace(" ",""))
                     }
                   ></input>
                 </td>

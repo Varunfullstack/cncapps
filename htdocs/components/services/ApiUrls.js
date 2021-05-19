@@ -35,5 +35,9 @@ export default class ApiUrls {
     static KeywordMatchingIgnores="/KeywordMatchingIgnores.php?action=";
     static PortalDocument="/PortalDocument.php?action=";
     static StarterLeaverManagement="/StarterLeaverManagement.php?action=";
+    static RootCause="/RootCause.php?action=";
+    static UtilityEmails="/UtilityEmails.php?action=";
+    static IgnoredADDomains="/IgnoredADDomains.php?action=";
+    
 
 }

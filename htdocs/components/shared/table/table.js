@@ -42,22 +42,25 @@ class Table extends React.Component {
         }
     }
 
-    componentDidMount() {
+    componentDidMount() {        
+    }
+    componentDidUpdate(prevProps, prevState) {
         if (this.props.allowRowOrder) {
             setTimeout(() => {
                 $("#table" + this.props.id + " tbody").sortable({
+                    cursor: "move",
                     helper: this.fixHelperModified,
                     stop: this.updateIndex
                 }).disableSelection()
-            }, 2000);
+            }, 1000);
         }
     }
-
     fixHelperModified = (e, tr) => {
         var $originals = tr.children();
         var $helper = tr.clone();
         $helper.children().each(function (index) {
-            $(this).width($originals.eq(index).width())
+            $(this).width($originals.eq(index).width());
+            $(this).css('background-color', '#00b9f1');
         });
         return $helper;
     }

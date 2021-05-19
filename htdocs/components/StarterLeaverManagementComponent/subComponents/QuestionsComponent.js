@@ -160,16 +160,36 @@ export default class QuestionsComponent extends MainComponent {
          },
          
     ]
+    // if(questions.length==0)
+    // return null;
     return <Table        
     pk="questionID"
     columns={columns}
     search={true}
     data={questions}
+    onOrderChange={this.handleOrderChange} 
+    allowRowOrder={true}
     >
     </Table>
 
     
   };
+  handleOrderChange=async (current,next)=>{
+    const {questions}=this.state;
+    if(next)
+    {
+        current.sortOrder=next.sortOrder;
+        next.sortOrder=current.sortOrder+0.001;
+        await this.api.updateQuestion(next);
+    }
+    if(!next)
+    {        
+        current.sortOrder=Math.max(...questions.map(i=>i.sortOrder))+0.001;
+    }    
+
+    await this.api.updateQuestion(current);
+    this.getCustomerQuestions();
+}
   handleEdit=(question)=>{
       //console.log(question);
       this.setState({data:question,showModal:true})
@@ -183,7 +203,7 @@ export default class QuestionsComponent extends MainComponent {
       const {customer}=this.state;
       if(customer)
     this.api.getCustomerQuestions(customer.id).then(result=>{
-        //console.log(result);
+        console.log(result);
         this.setState({questions:result.data});
     })
   }
