@@ -6,6 +6,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBEOffice365License.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
@@ -15,7 +16,6 @@ class CTOffice365Licenses extends CTCNC
 {
     /** @var BUActivity */
     public $buActivity;
-    public $dsOffice365License;
 
     function __construct($requestMethod,
                          $postVars,
@@ -113,15 +113,15 @@ class CTOffice365Licenses extends CTCNC
                 $dbeOffice365License->setValue(DBEOffice365License::license, $this->getParam('license'));
                 $dbeOffice365License->setValue(
                     DBEOffice365License::reportOnSpareLicenses,
-                    (bool)$this->getParam('reportOnSpareLicenses')
+                    json_decode($this->getParam('reportOnSpareLicenses'))
                 );
                 $dbeOffice365License->setValue(
                     DBEOffice365License::includesDefender,
-                    (bool)$this->getParam('includesDefender')
+                    json_decode($this->getParam('includesDefender'))
                 );
                 $dbeOffice365License->setValue(
-                    DBEOffice365License::includesDefender,
-                    (bool)$this->getParam('includesOffice')
+                    DBEOffice365License::includesOffice,
+                    json_decode($this->getParam('includesOffice'))
                 );
                 $dbeOffice365License->insertRow();
                 echo json_encode(
