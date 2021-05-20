@@ -92,27 +92,28 @@ class AdditionalChargeRate
     public function disallowCustomerSpecificPrices()
     {
         $this->allowCustomerSpecificPrices = new AllowCustomerSpecificPrices(false);
+        $this->specificCustomerPrices = [];
     }
 
-    public function setCustomerPrice(CustomerId $customerId, SalePrice $salePrice)
+    public function addCustomerPrice(CustomerId $customerId, SalePrice $salePrice)
     {
-
+        $newPrice = new SpecificCustomerPrice($customerId, $salePrice);
         foreach ($this->specificCustomerPrices as $key => $specificCustomerPrice) {
             if ($specificCustomerPrice->customerId->isSame($customerId)) {
-                $this->specificCustomerPrices[$key] = new SpecificCustomerPrice($customerId, $salePrice);
-                $this->updatedSpecifics[$customerId->value()] = $salePrice->value();
+                $this->specificCustomerPrices[$key] = $newPrice;
                 return;
             }
         }
-
-
-
+        $this->specificCustomerPrices[] = $newPrice;
     }
 
-    private function findSpecificCustomerPrice(CustomerId $customerId){
+    public function removeCustomerPrice(CustomerId $customerId)
+    {
+        $newPrice = new SpecificCustomerPrice($customerId, $salePrice);
         foreach ($this->specificCustomerPrices as $key => $specificCustomerPrice) {
             if ($specificCustomerPrice->customerId->isSame($customerId)) {
-                return $
+                $this->specificCustomerPrices[$key] = $newPrice;
+                return;
             }
         }
     }
