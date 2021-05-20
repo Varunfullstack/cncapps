@@ -18,15 +18,15 @@ export default class APISDManagerDashboard extends APIMain {
     }
 
     getPendingChargeableRequests(hd, es, sp, p, limit) {
-        return this.get(`${ApiUrls.sdDashboard}getPendingChargeableRequests&hd=${hd}&es=${es}&sp=${sp}&p=${p}&limit=${limit}`).then(res => res.data);
+        return this.get(`${ApiUrls.PendingChargeableRequests}getPendingChargeableRequests&hd=${hd}&es=${es}&sp=${sp}&p=${p}&limit=${limit}`).then(res => res.data);
     }
 
     async cancelChargeableRequest(id,cancelReason) {
-        return this.post(`${ApiUrls.sdDashboard}cancelPendingChargeableRequest`, {id,cancelReason})
+        return this.post(`${ApiUrls.PendingChargeableRequests}cancelPendingChargeableRequest`, {id,cancelReason})
     }
 
     async resendChargeableRequestEmail(id) {
-        return this.post(`${ApiUrls.sdDashboard}resendPendingChargeableRequestEmail`, {id})
+        return this.post(`${ApiUrls.PendingChargeableRequests}resendPendingChargeableRequestEmail`, {id})
     }
 
     getUserProblemsSummary(option, customerID, queue) {

@@ -226,11 +226,11 @@ class APIActivity extends APIMain {
     }
 
     async cancelChargeableRequest(id, cancelReason) {
-        return this.post(`${ApiUrls.sdDashboard}cancelPendingChargeableRequest`, {id, cancelReason})
+        return this.post(`${ApiUrls.PendingChargeableRequests}cancelPendingChargeableRequest`, {id, cancelReason})
     }
 
     async resendChargeableRequestEmail(id) {
-        return this.post(`${ApiUrls.sdDashboard}resendPendingChargeableRequestEmail`, {id})
+        return this.post(`${ApiUrls.PendingChargeableRequests}resendPendingChargeableRequestEmail`, {id})
     }
 
     async checkServiceRequestPendingCallbacks(serviceRequestId) {
