@@ -1,6 +1,14 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.11.4]
+### Changed
+- Change createSalesRequest button to Submit.
+- Make "Other Request" option the default one, and enforce an option to be selected to continue.
+### Fixed
+- Fixed issue in Office365Licenses while trying to add a new record.
+- Fixed issue when a user is trying to cancel a chargeable request.
+
 ## [v5.11.3] - 2021-05-18
 ### Fixed
 - Fixed issue with Office365 license export.
