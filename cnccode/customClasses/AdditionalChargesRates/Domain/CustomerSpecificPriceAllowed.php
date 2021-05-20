@@ -5,7 +5,7 @@ namespace CNCLTD\AdditionalChargesRates\Domain;
 use CNCLTD\shared\core\ValueObject;
 use CNCLTD\shared\core\ValueObjectCompare;
 
-class AllowCustomerSpecificPrices implements ValueObject
+class CustomerSpecificPriceAllowed implements ValueObject
 {
 
     use ValueObjectCompare;
@@ -14,12 +14,12 @@ class AllowCustomerSpecificPrices implements ValueObject
     private $value;
 
     /**
-     * AllowCustomerSpecificPrices constructor.
+     * CustomerSpecificPriceAllowed constructor.
      * @param bool $value
      */
     public function __construct(bool $value) { $this->value = $value; }
 
-    public function value()
+    public function value(): bool
     {
         return $this->value;
     }

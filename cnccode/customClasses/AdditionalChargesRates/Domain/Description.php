@@ -10,6 +10,9 @@ class Description implements ValueObject
 
     private $value;
 
+    /**
+     * @throws EmptyStringException
+     */
     public function __construct($value)
     {
         if (!$value) {

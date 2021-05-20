@@ -4,6 +4,7 @@ namespace CNCLTD\AdditionalChargesRates\Domain;
 
 use CNCLTD\shared\core\ValueObject;
 use CNCLTD\shared\core\ValueObjectCompare;
+use Ramsey\Uuid\Uuid;
 
 class AdditionalChargeRateId implements ValueObject
 {
@@ -30,7 +31,7 @@ class AdditionalChargeRateId implements ValueObject
      */
     public static function fromNative(string $id): AdditionalChargeRateId
     {
-        if (!\Ramsey\Uuid\Uuid::isValid($id)) {
+        if (!Uuid::isValid($id)) {
             throw new InvalidAdditionalChargeRageIdValue($id);
         }
         return new self($id);
@@ -38,7 +39,7 @@ class AdditionalChargeRateId implements ValueObject
 
     public static function create(): AdditionalChargeRateId
     {
-        $uuid = \Ramsey\Uuid\Uuid::uuid4();
+        $uuid = Uuid::uuid4();
         return new self($uuid);
     }
 

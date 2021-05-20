@@ -1,7 +1,9 @@
 <?php
 
 namespace CNCLTD\AdditionalChargesRates\Domain;
-class InvalidAdditionalChargeRageIdValue extends \Exception
+use Exception;
+
+class InvalidAdditionalChargeRageIdValue extends Exception
 {
 
     /**

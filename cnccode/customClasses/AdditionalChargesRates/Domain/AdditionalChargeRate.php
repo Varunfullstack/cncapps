@@ -4,46 +4,45 @@ namespace CNCLTD\AdditionalChargesRates\Domain;
 class AdditionalChargeRate
 {
     /** @var Description */
-    private $description;
+    protected $description;
     /** @var Notes */
-    private $notes;
+    protected $notes;
     /** @var SalePrice */
-    private $salePrice;
-    /** @var AllowCustomerSpecificPrices */
-    private $allowCustomerSpecificPrices;
+    protected $salePrice;
+    /** @var CustomerSpecificPriceAllowed */
+    protected $customerSpecificPriceAllowed;
     /**
-     * @var array
+     * @var SpecificCustomerPrice[]
      */
-    private $specificCustomerPrices;
+    protected $specificCustomerPrices;
     /**
      * @var AdditionalChargeRateId
      */
-    private $id;
-    private $updatedSpecifics = [];
+    protected $id;
 
     public function __construct(AdditionalChargeRateId $id,
                                 Description $description,
                                 Notes $notes,
                                 SalePrice $salePrice,
-                                AllowCustomerSpecificPrices $allowCustomerSpecificPrices
+                                CustomerSpecificPriceAllowed $customerSpecificPriceAllowed
     )
     {
-        $this->id                          = $id;
-        $this->description                 = $description;
-        $this->notes                       = $notes;
-        $this->salePrice                   = $salePrice;
-        $this->allowCustomerSpecificPrices = $allowCustomerSpecificPrices;
-        $this->specificCustomerPrices      = [];
+        $this->id                           = $id;
+        $this->description                  = $description;
+        $this->notes                        = $notes;
+        $this->salePrice                    = $salePrice;
+        $this->customerSpecificPriceAllowed = $customerSpecificPriceAllowed;
+        $this->specificCustomerPrices       = [];
     }
 
     public static function create(Description $description,
                                   Notes $notes,
                                   SalePrice $salePrice,
-                                  AllowCustomerSpecificPrices $allowCustomerSpecificPrices
+                                  CustomerSpecificPriceAllowed $customerSpecificPriceAllowed
     ): AdditionalChargeRate
     {
         return new self(
-            AdditionalChargeRateId::create(), $description, $notes, $salePrice, $allowCustomerSpecificPrices
+            AdditionalChargeRateId::create(), $description, $notes, $salePrice, $customerSpecificPriceAllowed
         );
     }
 
@@ -81,25 +80,25 @@ class AdditionalChargeRate
 
     public function isCustomerSpecificPriceAllowed(): bool
     {
-        return $this->allowCustomerSpecificPrices->value();
+        return $this->customerSpecificPriceAllowed->value();
     }
 
-    public function allowCustomerSpecificPrices()
+    public function allowCustomerSpecificPrice()
     {
-        $this->allowCustomerSpecificPrices = new AllowCustomerSpecificPrices(true);
+        $this->customerSpecificPriceAllowed = new CustomerSpecificPriceAllowed(true);
     }
 
-    public function disallowCustomerSpecificPrices()
+    public function disallowCustomerSpecificPrice()
     {
-        $this->allowCustomerSpecificPrices = new AllowCustomerSpecificPrices(false);
-        $this->specificCustomerPrices = [];
+        $this->customerSpecificPriceAllowed = new CustomerSpecificPriceAllowed(false);
+        $this->specificCustomerPrices       = [];
     }
 
     public function addCustomerPrice(CustomerId $customerId, SalePrice $salePrice)
     {
         $newPrice = new SpecificCustomerPrice($customerId, $salePrice);
         foreach ($this->specificCustomerPrices as $key => $specificCustomerPrice) {
-            if ($specificCustomerPrice->customerId->isSame($customerId)) {
+            if ($specificCustomerPrice->customerId()->isSame($customerId)) {
                 $this->specificCustomerPrices[$key] = $newPrice;
                 return;
             }
@@ -109,12 +108,20 @@ class AdditionalChargeRate
 
     public function removeCustomerPrice(CustomerId $customerId)
     {
-        $newPrice = new SpecificCustomerPrice($customerId, $salePrice);
         foreach ($this->specificCustomerPrices as $key => $specificCustomerPrice) {
-            if ($specificCustomerPrice->customerId->isSame($customerId)) {
-                $this->specificCustomerPrices[$key] = $newPrice;
+            if ($specificCustomerPrice->customerId()->isSame($customerId)) {
+                unset($this->specificCustomerPrices[$key]);
                 return;
             }
         }
     }
+
+    /**
+     * @return array
+     */
+    public function specificCustomerPrices(): array
+    {
+        return $this->specificCustomerPrices;
+    }
+
 }

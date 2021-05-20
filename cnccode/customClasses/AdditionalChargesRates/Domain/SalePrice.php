@@ -13,7 +13,8 @@ class SalePrice implements ValueObject
      * SalePrice constructor.
      * @param $value
      */
-    public function __construct($value) {
+    public function __construct($value)
+    {
         $this->value = $value;
     }
 

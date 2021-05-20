@@ -3,7 +3,6 @@
 namespace CNCLTD\AdditionalChargesRates\Domain;
 
 use CNCLTD\shared\core\ValueObject;
-use phpDocumentor\Reflection\Types\This;
 
 class Notes implements ValueObject
 {
@@ -14,7 +13,7 @@ class Notes implements ValueObject
         $this->value = $value;
     }
 
-    public function value()
+    public function value(): ?string
     {
         return $this->value;
     }
