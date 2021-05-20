@@ -4,6 +4,7 @@ import AutoComplete from "./AutoComplete/autoComplete.js";
 import React from "react";
 /*
 onChange:Callback
+placeholder
 */
 class CustomerSearch extends MainComponent {
     el = React.createElement;

@@ -384,3 +384,11 @@
     font-size: 20px;
     font-weight: bold;
 }
+ 
+.table tbody tr:hover {
+    color: #000;
+    background-color: #93e6ffad !important;
+}
+.table tbody tr i:hover {
+    /* color: #fff;     */
+}

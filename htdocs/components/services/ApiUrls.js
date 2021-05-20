@@ -38,6 +38,5 @@ export default class ApiUrls {
     static RootCause="/RootCause.php?action=";
     static UtilityEmails="/UtilityEmails.php?action=";
     static IgnoredADDomains="/IgnoredADDomains.php?action=";
-    
-
+    static Office365Licenses="/Office365Licenses.php?action=";
 }

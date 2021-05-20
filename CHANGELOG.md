@@ -2,7 +2,7 @@
 This project changes will be shown here.
 ## [unreleased]
 ### Change
-- Issue 1368 convert StarterLeaverManagement.php,  RootCause.php, UtilityEmails.php, IgnoredADDomains.php
+- Issue 1368 convert StarterLeaverManagement.php,  RootCause.php, UtilityEmails.php, IgnoredADDomains.php, Office365Licenses.php and SRSource.php
 
 ## [unreleased]
 ### Change

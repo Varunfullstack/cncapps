@@ -274,7 +274,7 @@ export default class MainComponent extends React.Component {
     
     isFormValid=(id)=>{
         const elements=$(`#${id} :input`);  
-        console.log(elements);
+        //console.log(elements);
         for(let i=0;i<elements.length;i++)
         {
             if($(elements[i]).prop('required')&&elements[i].value=="")
