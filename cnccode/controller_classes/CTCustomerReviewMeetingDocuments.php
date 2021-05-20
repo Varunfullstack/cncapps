@@ -5,6 +5,9 @@
  * Date: 24/09/2018
  * Time: 11:57
  */
+
+use CNCLTD\Business\BUActivity;
+
 global $cfg;
 require_once($cfg ['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_ct'] . '/CTCustomer.inc.php');
@@ -16,12 +19,12 @@ require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 class CTCustomerReviewMeetingDocuments extends CTCNC
 {
     const FETCH_CUSTOMER_DOCUMENTS = "fetchCustomerDocuments";
-    const UPLOAD_DOCUMENTS = "uploadDocuments";
-    const DELETE_DOCUMENT = "deleteDocument";
-    const SEND_DOCUMENTS = "sendDocuments";
-    const DOWNLOAD_DOCUMENT = "downloadDocument";
+    const UPLOAD_DOCUMENTS         = "uploadDocuments";
+    const DELETE_DOCUMENT          = "deleteDocument";
+    const SEND_DOCUMENTS           = "sendDocuments";
+    const DOWNLOAD_DOCUMENT        = "downloadDocument";
     const IT_REVIEW_MEETING_AGENDA = 'IT_REVIEW_MEETING_AGENDA';
-    const REVIEW_MEETING_RESPONSE = 'REVIEW_MEETING_RESPONSE';
+    const REVIEW_MEETING_RESPONSE  = 'REVIEW_MEETING_RESPONSE';
     private $buCustomerReviewMeetingDocuments;
 
     /**
@@ -47,7 +50,6 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
             $cookieVars,
             $cfg
         );
-
         $roles = ACCOUNT_MANAGEMENT_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
@@ -66,14 +68,10 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
     {
         switch ($this->getAction()) {
             case self::FETCH_CUSTOMER_DOCUMENTS:
-
                 $dbeDocuments = new DBECustomerReviewMeetingDocument($this);
                 $dbeDocuments->getRowsByCustomerID($this->getParam('customerID'));
-
                 $data = [];
-
                 $dbeUser = new DBEUser($this);
-
                 while ($dbeDocuments->fetchNext()) {
 
                     $dbeUser->getRow(
@@ -95,11 +93,9 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
                         ),
                     ];
                 }
-
                 echo json_encode($data);
                 break;
             case self::UPLOAD_DOCUMENTS:
-
                 $response = [];
                 try {
                     $this->uploadDocuments();
@@ -107,7 +103,7 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
                 } catch (Exception $exception) {
                     http_response_code(400);
                     $response['status'] = "error";
-                    $response['error'] = $exception->getMessage();
+                    $response['error']  = $exception->getMessage();
                 }
                 echo json_encode($response);
                 break;
@@ -119,25 +115,23 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
                 } catch (Exception $exception) {
                     http_response_code(400);
                     $response['status'] = "error";
-                    $response['error'] = $exception->getMessage();
+                    $response['error']  = $exception->getMessage();
                 }
                 echo json_encode($response);
                 break;
             case self::SEND_DOCUMENTS:
                 $response = [];
-
                 try {
                     $this->sendDocuments();
                     $response['status'] = "ok";
                 } catch (Exception $exception) {
                     http_response_code(400);
                     $response['status'] = "error";
-                    $response['error'] = $exception->getMessage();
+                    $response['error']  = $exception->getMessage();
                 }
                 echo json_encode($response);
                 break;
             case self::DOWNLOAD_DOCUMENT:
-
                 if (!$this->getParam('documentID')) {
                     echo 'Document ID missing';
                     http_response_code(400);
@@ -145,7 +139,6 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
                 }
                 $dbeDocuments = new DBECustomerReviewMeetingDocument($this);
                 $dbeDocuments->getRow($this->getParam('documentID'));
-
                 header('Content-Description: File Transfer');
                 header('Content-Type: ' . $dbeDocuments->getValue(DBECustomerReviewMeetingDocument::fileMIMEType));
                 header(
@@ -171,27 +164,19 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
     private function uploadDocuments()
     {
         $counter = 0;
-
         $buActivity = new BUActivity($this);
-
-
         if (!isset($_FILES['files']) || !count($_FILES['files']['name'])) {
             throw new Exception('At least one file must be provided');
         }
-
         if (!$this->getParam('customerID')) {
             throw new Exception('Customer ID is missing');
         }
-
         if (!$this->getParam('reviewMeetingDate')) {
             throw new Exception('Review Meeting Date is missing');
         }
-
         $dbeDocuments = new DBECustomerReviewMeetingDocument($this);
-
         foreach ($_FILES['files']['name'] as $fileName) {
             $dbeDocuments->setUpdateModeInsert();
-
             $dbeDocuments->setValue(
                 DBECustomerReviewMeetingDocument::customerID,
                 $this->getParam('customerID')
@@ -236,11 +221,8 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
             throw new Exception("Document id is missing");
         }
         $documentID = $this->getParam('documentID');
-
         $dbeDocuments = new DBECustomerReviewMeetingDocument($this);
-
         $dbeDocuments->deleteRow($documentID);
-
         return true;
     }
 
@@ -256,41 +238,32 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
         if (!$this->getParam('customerID')) {
             throw new Exception('Customer ID is missing');
         }
-
         $templateType = $this->getParam('templateType');
-        $customerID = $this->getParam('customerID');
-
+        $customerID   = $this->getParam('customerID');
         $context = [
             "senderFirstName" => $this->dbeUser->getValue(DBEUser::firstName),
             "senderLastName"  => $this->dbeUser->getValue(DBEUser::lastName),
         ];
-
         $template = '@customerFacing/ReviewMeetingResponse/ReviewMeetingResponse.html.twig';
         if ($templateType == self::IT_REVIEW_MEETING_AGENDA) {
             $meetingTime = $this->getParam('meetingTime');
-
             $meetingDate = $this->getParam('meetingDate');
-
             if (!$this->getParam('meetingDate')) {
                 throw new Exception('Meeting Date is missing');
             }
-
             if (!$this->getParam('meetingTime')) {
                 throw new Exception('Meeting Time is missing');
             }
-            $dateTime = DateTime::createFromFormat("d-m-Y H:i", "{$meetingDate} {$meetingTime}");
+            $dateTime                   = DateTime::createFromFormat("d-m-Y H:i", "{$meetingDate} {$meetingTime}");
             $context['meetingDateTime'] = $dateTime;
-            $template = '@customerFacing/ITReviewMeetingAgenda/ITReviewMeetingAgenda.html.twig';
+            $template                   = '@customerFacing/ITReviewMeetingAgenda/ITReviewMeetingAgenda.html.twig';
         }
-
         global $twig;
-
         $dbeContact = new DBEContact($this);
         $dbeContact->getReviewContactsByCustomerID($customerID);
-
-        $buMail = new BUMail($this);
-        $body = $twig->render($template, $context);
-        $subject = "CNC Review Meeting Documents";
+        $buMail          = new BUMail($this);
+        $body            = $twig->render($template, $context);
+        $subject         = "CNC Review Meeting Documents";
         $recipientsArray = [];
         while ($dbeContact->fetchNext()) {
             $recipientsArray[] = $dbeContact->getValue(DBEContact::email);
@@ -320,8 +293,7 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
                 'htmlFmt' => CT_HTML_FMT_POPUP
             )
         );
-
-        $fetchDataURL = Controller::buildLink(
+        $fetchDataURL   = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             [
                 'action' => self::FETCH_CUSTOMER_DOCUMENTS
@@ -333,31 +305,24 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
                 'action' => self::UPLOAD_DOCUMENTS
             ]
         );
-
-        $deleteDocumentURL =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                [
-                    'action' => self::DELETE_DOCUMENT
-                ]
-            );
-
-        $fetchReviewContactsDataURL =
-            Controller::buildLink(
-                CTCNC_PAGE_CUSTOMER,
-                [
-                    'action' => CTCustomer::GET_CUSTOMER_REVIEW_CONTACTS
-                ]
-            );
-
-        $sendReviewEmails =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                [
-                    'action' => self::SEND_DOCUMENTS
-                ]
-            );
-
+        $deleteDocumentURL = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            [
+                'action' => self::DELETE_DOCUMENT
+            ]
+        );
+        $fetchReviewContactsDataURL = Controller::buildLink(
+            CTCNC_PAGE_CUSTOMER,
+            [
+                'action' => CTCustomer::GET_CUSTOMER_REVIEW_CONTACTS
+            ]
+        );
+        $sendReviewEmails = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            [
+                'action' => self::SEND_DOCUMENTS
+            ]
+        );
         $this->template->setVar(
             [
                 "urlCustomerPopup"           => $urlCustomerPopup,
@@ -368,62 +333,50 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
                 "sendReviewEmails"           => $sendReviewEmails
             ]
         );
-
-
         $buStandardText = new BUStandardText($this);
         $dsStandardText = new DataSet($this);
         $buStandardText->getStandardTextByTypeID(
             5,
             $dsStandardText
         );
-
         $this->template->setBlock(
             'customerReviewMeetingDocument',
             'templateTypeBlock',
             'templateTypes'
         );
-
         $this->template->setVar(
             [
                 "templateType"            => null,
                 "templateTypeDescription" => 'Please Select a Standard Text'
             ]
         );
-
         $this->template->parse(
             'templateTypes',
             'templateTypeBlock',
             true
         );
-
-
         $this->template->setVar(
             [
                 "templateType"            => self::IT_REVIEW_MEETING_AGENDA,
                 "templateTypeDescription" => 'IT Review Meeting Agenda'
             ]
         );
-
         $this->template->parse(
             'templateTypes',
             'templateTypeBlock',
             true
         );
-
         $this->template->setVar(
             [
                 "templateType"            => self::REVIEW_MEETING_RESPONSE,
                 "templateTypeDescription" => 'Review Meeting Response'
             ]
         );
-
         $this->template->parse(
             'templateTypes',
             'templateTypeBlock',
             true
         );
-
-
         $this->template->parse(
             'CONTENTS',
             'customerReviewMeetingDocument',

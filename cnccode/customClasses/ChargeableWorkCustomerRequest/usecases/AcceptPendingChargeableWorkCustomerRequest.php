@@ -2,11 +2,11 @@
 
 namespace CNCLTD\ChargeableWorkCustomerRequest\usecases;
 
-use BUActivity;
 use BUCustomer;
 use BUCustomerItem;
 use BUHeader;
 use BUSalesOrder;
+use CNCLTD\Business\BUActivity;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequest;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestRepository;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestTokenId;
@@ -30,9 +30,6 @@ use DBEOrdhead;
 use DBEOrdline;
 use DBEProblem;
 use DBEUser;
-
-global $cfg;
-require_once($cfg["path_bu"] . "/BUActivity.inc.php");
 
 class AcceptPendingChargeableWorkCustomerRequest
 {

@@ -6,16 +6,18 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use CNCLTD\Business\BUActivity;
+
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBEUtilityEmail.inc.php');
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 
 // Actions
 class CTUtilityEmail extends CTCNC
 {
     /** @var BUActivity */
     public $buActivity;
-    public $dsUtilityEmail;
 
     function __construct($requestMethod,
                          $postVars,
@@ -52,11 +54,8 @@ class CTUtilityEmail extends CTCNC
                     http_response_code(400);
                     throw new Exception('ID is missing');
                 }
-
                 $dbeUtilityEmail = new DBEUtilityEmail($this);
-
                 $dbeUtilityEmail->getRow($this->getParam('id'));
-
                 if (!$dbeUtilityEmail->rowCount) {
                     http_response_code(404);
                     exit;
@@ -66,20 +65,15 @@ class CTUtilityEmail extends CTCNC
                 echo json_encode(["status" => "ok"]);
                 break;
             case 'update':
-
                 if (!$this->getParam('id')) {
                     throw new Exception('ID is missing');
                 }
-
                 $dbeUtilityEmail = new DBEUtilityEmail($this);
-
                 $dbeUtilityEmail->getRow($this->getParam('id'));
-
                 if (!$dbeUtilityEmail->rowCount) {
                     http_response_code(404);
                     exit;
                 }
-
                 $dbeUtilityEmail->setValue(
                     DBEUtilityEmail::firstPart,
                     $this->getParam('firstPart')
@@ -88,13 +82,11 @@ class CTUtilityEmail extends CTCNC
                     DBEUtilityEmail::lastPart,
                     $this->getParam('lastPart')
                 );
-
                 $dbeUtilityEmail->updateRow();
                 echo json_encode(["status" => "ok"]);
                 break;
             case 'create':
                 $dbeUtilityEmail = new DBEUtilityEmail($this);
-
                 $dbeUtilityEmail->setValue(
                     DBEUtilityEmail::firstPart,
                     $this->getParam('firstPart')
@@ -103,9 +95,7 @@ class CTUtilityEmail extends CTCNC
                     DBEUtilityEmail::lastPart,
                     $this->getParam('lastPart')
                 );
-
                 $dbeUtilityEmail->insertRow();
-
                 echo json_encode(
                     [
                         "id"        => $dbeUtilityEmail->getValue(DBEUtilityEmail::utilityEmailID),
@@ -114,11 +104,9 @@ class CTUtilityEmail extends CTCNC
                     ],
                     JSON_NUMERIC_CHECK
                 );
-
                 break;
             case 'getData':
                 $dbeUtilityEmails = new DBEUtilityEmail($this);
-
                 $dbeUtilityEmails->getRows();
                 $data = [];
                 while ($dbeUtilityEmails->fetchNext()) {
@@ -153,35 +141,30 @@ class CTUtilityEmail extends CTCNC
             'UtilityEmail',
             'UtilityEmail.inc'
         );
-
         $this->template->parse(
             'CONTENTS',
             'UtilityEmail',
             true
         );
-
         $URLDeleteItem = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             [
                 'action' => 'delete'
             ]
         );
-
         $URLUpdateItem = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             [
                 'action' => 'update'
             ]
         );
-
         $URLCreateItem = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             [
                 'action' => 'create'
             ]
         );
-
-        $URLGetData = Controller::buildLink(
+        $URLGetData    = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             [
                 'action' => 'getData'
@@ -195,7 +178,6 @@ class CTUtilityEmail extends CTCNC
                 "URLGetData"    => $URLGetData
             ]
         );
-
         $this->parsePage();
     }
 

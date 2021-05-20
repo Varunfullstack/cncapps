@@ -6,9 +6,11 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use CNCLTD\Business\BUActivity;
+
 global $cfg;
 require_once($cfg ['path_ct'] . '/CTCNC.inc.php');
-require_once($cfg ['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg ['path_bu'] . '/BUMail.inc.php');
 require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 
@@ -73,9 +75,9 @@ class CTServiceRequestsByCustomerReport extends CTCNC
         );
         $results = $this->buActivity->getSrPercentages($days);
         if ($results) {
-            $buMail      = new BUMail($this);
-            $senderEmail = CONFIG_SUPPORT_EMAIL;
-            $toEmail     = 'monthlysdreport@' . CONFIG_PUBLIC_DOMAIN;
+            $buMail         = new BUMail($this);
+            $senderEmail    = CONFIG_SUPPORT_EMAIL;
+            $toEmail        = 'monthlysdreport@' . CONFIG_PUBLIC_DOMAIN;
             $this->template = new Template(
                 EMAIL_TEMPLATE_DIR, "remove"
             );
@@ -93,9 +95,9 @@ class CTServiceRequestsByCustomerReport extends CTCNC
                 'page',
                 true
             );
-            $body = $this->template->get_var('output');
+            $body    = $this->template->get_var('output');
             $subject = 'Service Requests By Customer - Days: ' . $days;
-            $hdrs = array(
+            $hdrs    = array(
                 'From'         => $senderEmail,
                 'To'           => $toEmail,
                 'Subject'      => $subject,
@@ -110,7 +112,7 @@ class CTServiceRequestsByCustomerReport extends CTCNC
                 'head_charset'  => 'UTF-8'
             );
             $body        = $buMail->mime->get($mime_params);
-            $hdrs = $buMail->mime->headers($hdrs);
+            $hdrs        = $buMail->mime->headers($hdrs);
             $buMail->putInQueue(
                 $senderEmail,
                 $toEmail,

@@ -6,16 +6,14 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBEIgnoredADDomain.inc.php');
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
+
 
 // Actions
 class CTIgnoredADDomains extends CTCNC
 {
-    var $buActivity;
-    public $dsIgnoredADDomains;
-
     function __construct($requestMethod,
                          $postVars,
                          $getVars,
@@ -44,9 +42,7 @@ class CTIgnoredADDomains extends CTCNC
             http_response_code(400);
             throw new Exception('ID is missing');
         }
-
         $DBEIgnoredADDomain = new DBEIgnoredADDomain($this);
-
         $DBEIgnoredADDomain->getRow($this->getParam('id'));
         if (!$DBEIgnoredADDomain->rowCount) {
             http_response_code(404);
@@ -61,16 +57,12 @@ class CTIgnoredADDomains extends CTCNC
         if (!$this->getParam('id')) {
             throw new Exception('ID is missing');
         }
-
         $DBEIgnoredADDomain = new DBEIgnoredADDomain($this);
-
         $DBEIgnoredADDomain->getRow($this->getParam('id'));
-
         if (!$DBEIgnoredADDomain->rowCount) {
             http_response_code(404);
             exit;
         }
-
         $DBEIgnoredADDomain->setValue(
             DBEIgnoredADDomain::domain,
             $this->getParam('domain')
@@ -79,7 +71,6 @@ class CTIgnoredADDomains extends CTCNC
             DBEIgnoredADDomain::customerID,
             $this->getParam('customerID')
         );
-
         $DBEIgnoredADDomain->updateRow();
         echo json_encode(["status" => "ok"]);
     }
@@ -94,7 +85,6 @@ class CTIgnoredADDomains extends CTCNC
         switch ($this->getAction()) {
             case 'create':
                 $DBEIgnoredADDomain = new DBEIgnoredADDomain($this);
-
                 $DBEIgnoredADDomain->setValue(
                     DBEIgnoredADDomain::domain,
                     $this->getParam('domain')
@@ -103,16 +93,13 @@ class CTIgnoredADDomains extends CTCNC
                     DBEIgnoredADDomain::customerID,
                     $this->getParam('customerID')
                 );
-
                 $DBEIgnoredADDomain->insertRow();
-
                 $customerString = null;
                 if ($DBEIgnoredADDomain->getValue(DBEIgnoredADDomain::customerID)) {
                     $dbeCustomer = new DBECustomer($this);
                     $dbeCustomer->getRow($DBEIgnoredADDomain->getValue(DBEIgnoredADDomain::customerID));
                     $customerString = $dbeCustomer->getValue(DBECustomer::name);
                 }
-
                 echo json_encode(
                     [
                         "id"             => $DBEIgnoredADDomain->getValue(DBEIgnoredADDomain::ignoredADDomainID),
@@ -122,11 +109,9 @@ class CTIgnoredADDomains extends CTCNC
                     ],
                     JSON_NUMERIC_CHECK
                 );
-
                 break;
             case 'getData':
                 $DBEIgnoredADDomains = new DBEIgnoredADDomain($this);
-
                 $DBEIgnoredADDomains->getRows();
                 $data = [];
                 while ($DBEIgnoredADDomains->fetchNext()) {
@@ -171,35 +156,30 @@ class CTIgnoredADDomains extends CTCNC
             'IgnoredADDomains',
             'IgnoredADDomains'
         );
-
         $this->template->parse(
             'CONTENTS',
             'IgnoredADDomains',
             true
         );
-
         $URLDeleteItem = $this->buildLink(
             $_SERVER['PHP_SELF'],
             [
                 'action' => 'delete'
             ]
         );
-
         $URLUpdateItem = $this->buildLink(
             $_SERVER['PHP_SELF'],
             [
                 'action' => 'update'
             ]
         );
-
         $URLCreateItem = $this->buildLink(
             $_SERVER['PHP_SELF'],
             [
                 'action' => 'create'
             ]
         );
-
-        $URLGetData = $this->buildLink(
+        $URLGetData    = $this->buildLink(
             $_SERVER['PHP_SELF'],
             [
                 'action' => 'getData'
@@ -213,7 +193,6 @@ class CTIgnoredADDomains extends CTCNC
                 "URLGetData"    => $URLGetData
             ]
         );
-
         $this->parsePage();
     }
 }// end of class

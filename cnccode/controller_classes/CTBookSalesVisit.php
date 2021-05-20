@@ -7,10 +7,10 @@
  */
 global $cfg;
 
+use CNCLTD\Business\BUActivity;
 use CNCLTD\Data\DBEJProblem;
 
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg['path_dbe'] . '/DBEStandardTextType.inc.php');
 require_once($cfg['path_dbe'] . '/DBEStandardText.inc.php');

@@ -1,11 +1,11 @@
 <?php
 global $cfg;
 
+use CNCLTD\Business\BUActivity;
 use CNCLTD\Data\DBEJProblem;
 
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg["path_dbe"] . "/DBConnect.php");
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg ["path_dbe"] . "/DBEJCallActivity.php");
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 
@@ -37,7 +37,6 @@ class CTRequestDashboard extends CTCNC
             $getVars,
             $cookieVars,
             $cfg,
-            false
         );
         if (!self::isSdManager()) {
             Header("Location: /NotAllowed.php");
@@ -194,8 +193,9 @@ class CTRequestDashboard extends CTCNC
                     'teamManagementApprovalMinutes' => $teamManagementTimeApprovalMinutes,
                     "callActivityID"                => $dbejCallActivity->getValue(DBEJCallActivity::callActivityID),
                     'problemID'                     => $dbejCallActivity->getValue(DBEJCallActivity::problemID),
-                    "linkedSalesOrderID"            => $dbejCallActivity->getValue(DBEJCallActivity::linkedSalesOrderID),
-
+                    "linkedSalesOrderID"            => $dbejCallActivity->getValue(
+                        DBEJCallActivity::linkedSalesOrderID
+                    ),
                 ]
             );
 
@@ -277,16 +277,15 @@ class CTRequestDashboard extends CTCNC
         $result = [];
         while ($dbejCallActivity->fetchNext()) {
             $result[] = [
-                'customerName'      => $dbejCallActivity->getValue(DBEJCallActivity::customerName),
-                'problemID'         => $dbejCallActivity->getValue(DBEJCallActivity::problemID),
-                'requestBody'       => $dbejCallActivity->getValue(DBEJCallActivity::reason),
-                'requestedBy'       => $dbejCallActivity->getValue(DBEJCallActivity::userAccount),
-                'requestedDateTime' => $dbejCallActivity->getValue(
+                'customerName'       => $dbejCallActivity->getValue(DBEJCallActivity::customerName),
+                'problemID'          => $dbejCallActivity->getValue(DBEJCallActivity::problemID),
+                'requestBody'        => $dbejCallActivity->getValue(DBEJCallActivity::reason),
+                'requestedBy'        => $dbejCallActivity->getValue(DBEJCallActivity::userAccount),
+                'requestedDateTime'  => $dbejCallActivity->getValue(
                         DBEJCallActivity::date
                     ) . ' ' . $dbejCallActivity->getValue(DBEJCallActivity::startTime) . ':00',
-                'callActivityID'    => $dbejCallActivity->getValue(DBEJCallActivity::callActivityID),
-                "linkedSalesOrderID"=> $dbejCallActivity->getValue(DBEJCallActivity::linkedSalesOrderID),
-
+                'callActivityID'     => $dbejCallActivity->getValue(DBEJCallActivity::callActivityID),
+                "linkedSalesOrderID" => $dbejCallActivity->getValue(DBEJCallActivity::linkedSalesOrderID),
             ];
         }
         return $result;

@@ -2,7 +2,7 @@
 
 namespace CNCLTD\ChargeableWorkCustomerRequest\usecases;
 
-use BUActivity;
+use CNCLTD\Business\BUActivity;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestRepository;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestTokenId;
 use CNCLTD\CommunicationService\CommunicationService;

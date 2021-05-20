@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Customer Activity Report controller class
  * CNC Ltd
@@ -9,8 +8,6 @@
  */
 global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUUser.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg['path_dbe'] . '/DBEPendingReopened.php');
@@ -18,13 +15,12 @@ require_once($cfg['path_dbe'] . '/DBEPendingReopened.php');
 // Actions
 class CTLogServiceRequest extends CTCNC
 {
-    function __construct(
-        $requestMethod,
-        $postVars,
-        $getVars,
-        $cookieVars,
-        $cfg,
-        $checkPermissions = true
+    function __construct($requestMethod,
+                         $postVars,
+                         $getVars,
+                         $cookieVars,
+                         $cfg,
+                         $checkPermissions = true
     )
     {
         parent::__construct(
@@ -34,7 +30,6 @@ class CTLogServiceRequest extends CTCNC
             $cookieVars,
             $cfg
         );
-
         if ($checkPermissions) {
 
             $roles = [
@@ -61,15 +56,12 @@ class CTLogServiceRequest extends CTCNC
         $this->setMethodName('setTemplate');
         $this->setMenuId(101);
         $this->setPageTitle('Log Service Request');
-
         $this->setTemplateFiles(
             'LogServiceRequest',
             'LogServiceRequest.inc'
         );
-
         $this->loadReactScript('LogServiceRequestComponent.js');
         $this->loadReactCSS('LogServiceRequestComponent.css');
-
         $this->template->parse(
             'CONTENTS',
             'LogServiceRequest',

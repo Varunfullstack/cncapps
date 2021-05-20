@@ -10,12 +10,14 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
+use CNCLTD\Business\BUActivity;
+use CNCLTD\core\domain\usecases\AssignToBeLoggedToServiceRequest;
 use CNCLTD\Data\DBEJProblem;
+use CNCLTD\Exceptions\JsonHttpException;
 use CNCLTD\ServiceRequestInternalNote\infra\ServiceRequestInternalNotePDORepository;
 use CNCLTD\Utils;
 
 global $cfg;
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUProject.inc.php');
 require_once($cfg['path_bu'] . '/BUExpense.inc.php');
@@ -446,15 +448,15 @@ class CTActivity extends CTCNC
             case self::ASSIGN_TO_BE_LOGGED_TO_SERVICE_REQUEST:
                 $data = $this->getJSONData();
                 if (!isset($data['toBeLogged'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'To Be logged id is required');
+                    throw new JsonHttpException(400, 'To Be logged id is required');
                 }
                 if (!isset($data['serviceRequestId'])) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'Service request id is required');
+                    throw new JsonHttpException(400, 'Service request id is required');
                 }
                 try {
                     $this->assignToBeLoggedToServiceRequest($data['toBeLogged'], $data['serviceRequestId']);
                 } catch (Exception $exception) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, $exception->getMessage());
+                    throw new JsonHttpException(400, $exception->getMessage());
                 }
                 echo json_encode(["status" => "ok"]);
                 exit;
@@ -2657,7 +2659,7 @@ class CTActivity extends CTCNC
                 'lastActivityReason'  => $lastActivityReason,
                 'lastCncNextAction'   => $lastCncNextAction,
                 'lastCustomerSummary' => $lastCustomerSummary,
-                'taskListContent' => $dbeProblem->getValue(DBEProblem::taskList)
+                'taskListContent'     => $dbeProblem->getValue(DBEProblem::taskList)
             )
         );
         $this->template->parse(
@@ -4635,7 +4637,7 @@ WHERE caa_problemno = ?
 
     private function assignToBeLoggedToServiceRequest($toBeLogged, $serviceRequestId)
     {
-        $usecase = new \CNCLTD\core\domain\usecases\AssignToBeLoggedToServiceRequest();
+        $usecase = new AssignToBeLoggedToServiceRequest();
         $usecase->__invoke($toBeLogged, $serviceRequestId, $this->dbeUser);
     }
 
@@ -4649,17 +4651,17 @@ WHERE caa_problemno = ?
 
             if (!$dbeSalesOrder->getRow($salesOrderId)) {
                 error_log('sales order does not exist ..return json error');
-                throw new \CNCLTD\Exceptions\JsonHttpException(400, "Sales Order Does Not Exist");
+                throw new JsonHttpException(400, "Sales Order Does Not Exist");
             }
             $dbeProblem = new DBEProblem($this);
             if (!$dbeProblem->getRow($serviceRequestId)) {
-                throw new \CNCLTD\Exceptions\JsonHttpException(400, "Service Request Does Not Exist");
+                throw new JsonHttpException(400, "Service Request Does Not Exist");
             }
             if ($dbeProblem->getValue(DBEProblem::linkedSalesOrderID)) {
-                throw new \CNCLTD\Exceptions\JsonHttpException(400, "Service Request already has a linked sales order");
+                throw new JsonHttpException(400, "Service Request already has a linked sales order");
             }
             if ($dbeSalesOrder->getValue(DBEOrdhead::customerID) !== $dbeProblem->getValue(DBEProblem::customerID)) {
-                throw new \CNCLTD\Exceptions\JsonHttpException(
+                throw new JsonHttpException(
                     400, "The given sales order does not belong to the customer of the Service Request"
                 );
             }

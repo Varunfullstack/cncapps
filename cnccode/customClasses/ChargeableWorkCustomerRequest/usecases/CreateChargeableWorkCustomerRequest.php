@@ -2,7 +2,7 @@
 
 namespace CNCLTD\ChargeableWorkCustomerRequest\usecases;
 
-use BUActivity;
+use CNCLTD\Business\BUActivity;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequest;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestAdditionalHoursRequested;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestReason;
@@ -82,7 +82,7 @@ class CreateChargeableWorkCustomerRequest
         CommunicationService::sendExtraChargeableWorkRequestToContact($newRequest);
         $requesterFullName = "{$requester->getValue(DBEUser::firstName)} {$requester->getValue(DBEUser::lastName)}";
         $requesteeFullName = "{$requestee->getValue(DBEContact::firstName)} {$requestee->getValue(DBEContact::lastName)}";
-        $contactActivity = $this->BUActivity->addCustomerContactActivityToServiceRequest(
+        $contactActivity   = $this->BUActivity->addCustomerContactActivityToServiceRequest(
             $serviceRequest,
             "<p>$requesterFullName sent a request for $additionalTimeRequested hour(s) to $requesteeFullName</p><br/>{$reason}",
             $requester

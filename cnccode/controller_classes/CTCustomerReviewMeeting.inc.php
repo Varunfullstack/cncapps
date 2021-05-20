@@ -7,6 +7,7 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
+use CNCLTD\Business\BUActivity;
 use CNCLTD\Data\DBEJProblem;
 use CNCLTD\StatsFromJSON\StatsFromJSON;
 use Twig\Environment;
@@ -21,7 +22,6 @@ require_once($cfg ['path_bu'] . '/BUContact.inc.php');
 require_once($cfg ['path_bu'] . '/BUServiceDeskReport.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomerSrAnalysisReport.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomerItem.inc.php');
-require_once($cfg ['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg ['path_bu'] . '/BURenewal.inc.php');
 require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 

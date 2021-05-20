@@ -8,6 +8,7 @@
  */
 global $cfg;
 
+use CNCLTD\Business\BUActivity;
 use CNCLTD\Exceptions\JsonHttpException;
 
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
@@ -2987,7 +2988,7 @@ class CTSalesOrder extends CTCNC
             throw new Exception(CTSALESORDER_MSG_ORDER_NOT_FND);
         }
         $versionNo = $this->buSalesOrder->getNextQuoteVersion($orderHeadId);
-        $orderFile = QUOTES_DIR. $orderHeadId . '_' . $versionNo . '.pdf';
+        $orderFile = QUOTES_DIR . $orderHeadId . '_' . $versionNo . '.pdf';
         $this->buSalesOrder->getUserByID(
             $this->userID,
             $this->dsUser
@@ -4593,7 +4594,7 @@ class CTSalesOrder extends CTCNC
             $versionNo       = $this->buSalesOrder->getNextQuoteVersion($ordHeadID);
             $previousVersion = $this->dsQuotation->getValue(DBEQuotation::versionNo);
             $previousFile    = QUOTES_DIR . $ordHeadID . '_' . $previousVersion . '.pdf';
-            $newFile         = QUOTES_DIR. $ordHeadID . '_' . $versionNo . '.pdf';
+            $newFile         = QUOTES_DIR . $ordHeadID . '_' . $versionNo . '.pdf';
             copy(
                 $previousFile,
                 $newFile

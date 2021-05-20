@@ -2,7 +2,7 @@
 
 namespace CNCLTD\Controller;
 
-use BUActivity;
+use CNCLTD\Business\BUActivity;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\CancelReason;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestTokenId;
 use CNCLTD\ChargeableWorkCustomerRequest\DTO\SDManagerPendingChargeableRequestDTO;

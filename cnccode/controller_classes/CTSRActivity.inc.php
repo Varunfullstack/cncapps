@@ -1,6 +1,7 @@
 <?php
 global $cfg;
 
+use CNCLTD\Business\BUActivity;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestServiceRequestId;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestTokenId;
 use CNCLTD\ChargeableWorkCustomerRequest\infra\ChargeableWorkCustomerRequestMySQLRepository;
@@ -32,7 +33,6 @@ require_once($cfg['path_dbe'] . '/DBEHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUProject.inc.php');
 require_once($cfg['path_bu'] . '/BUExpenseType.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomerItem.inc.php');
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUUser.inc.php');
 require_once($cfg['path_bu'] . '/BURootCause.inc.php');
 require_once($cfg['path_bu'] . '/BUActivityType.inc.php');
@@ -824,11 +824,9 @@ class CTSRActivity extends CTCNC
             );
             $dsCallActivity->post();
         }
-        if(isset($body->Inbound)||is_null($body->Inbound))
-        {           
-            $this->buActivity->updateInbound($body->callActivityID,$body->Inbound);
+        if (isset($body->Inbound) || is_null($body->Inbound)) {
+            $this->buActivity->updateInbound($body->callActivityID, $body->Inbound);
         }
-      
         //-----------check status
         $dsCallActivity->setUpdateModeUpdate();
         $updateAwaitingCustomer = false;
@@ -884,18 +882,19 @@ class CTSRActivity extends CTCNC
         }
         return ["status" => "1"];
     }
-    
-    function checkIsInbound($callactivityID){
-        $row=DBConnect::fetchOne("select isInbound from callactivity_customer_contact where callactivityID=:callactivityID",["callactivityID"=>$callactivityID]);
-        if($row)
-        {
-            if($row["isInbound"]==1)
-            return true;
-            else
-            return false;
-        }
-        else return null;
+
+    function checkIsInbound($callactivityID)
+    {
+        $row = DBConnect::fetchOne(
+            "select isInbound from callactivity_customer_contact where callactivityID=:callactivityID",
+            ["callactivityID" => $callactivityID]
+        );
+        if ($row) {
+            if ($row["isInbound"] == 1) return true; else
+                return false;
+        } else return null;
     }
+
     function validTime($body, $dbeProblem, $buActivity, $dbeCallActivity)
     {
         $problemID       = $dbeCallActivity->getValue(DBECallActivity::problemID);
@@ -1889,7 +1888,7 @@ AND c.caa_problemno = ? ',
 
     private function forceCloseServiceRequest()
     {
-        $jsonBody = $this->getBody(true);
+        $jsonBody         = $this->getBody(true);
         $serviceRequestId = @$jsonBody['serviceRequestId'];
         if (!$serviceRequestId) {
             throw new APIException(400, "Service Request Id Required");
@@ -1897,7 +1896,7 @@ AND c.caa_problemno = ? ',
         $buProblemSLA   = new BUProblemSLA($this);
         $serviceRequest = new DBEProblem($this);
         $serviceRequest->getRow($serviceRequestId);
-        $buProblemSLA->closeServiceRequest($serviceRequest,false, true);
+        $buProblemSLA->closeServiceRequest($serviceRequest, false, true);
         return [
             "status" => "ok"
         ];

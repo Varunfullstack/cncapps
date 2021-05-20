@@ -7,6 +7,7 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
+use CNCLTD\Business\BUActivity;
 use CNCLTD\Data\DBEJProblem;
 use CNCLTD\Encryption;
 use CNCLTD\SupportedCustomerAssets\UnsupportedCustomerAssetService;
@@ -1605,7 +1606,6 @@ class CTCustomer extends CTCNC
             )
         );
         $renewalLink             = '<a href="' . $renewalLinkURL . '" target="_blank" title="Renewals">Renewal Information</a>';
-
         $thirdPartyLinkURL       = Controller::buildLink(
             'ThirdPartyContact.php',
             [
@@ -3246,7 +3246,7 @@ class CTCustomer extends CTCNC
                     'status'                 => $dsActiveSrs->getValue(DBEJProblem::status),
                     'isSpecialAttention'     => $this->isSpecialAttention($dsActiveSrs),
                     "assetName"              => $dsActiveSrs->getValue('assetName'),
-                    "emailSubjectSummary"              => $dsActiveSrs->getValue('emailSubjectSummary'),
+                    "emailSubjectSummary"    => $dsActiveSrs->getValue('emailSubjectSummary'),
                 )
             );
         }
@@ -3319,11 +3319,11 @@ ORDER BY NAME,
         ";
         $statement  = $labtechDB->prepare($query);
         $statement->execute([$customerId, $customerId]);
-        $customerAssets = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $customerAssets                   = $statement->fetchAll(PDO::FETCH_ASSOC);
         $unsupportedCustomerAssetsService = new UnsupportedCustomerAssetService();
-        $unsupportedCustomerAssets = $unsupportedCustomerAssetsService->getAllForCustomer($customerId);
-        foreach ($customerAssets as $key => $customerAsset){
-            $customerAssets[$key]['unsupported'] = in_array($customerAsset['name'],$unsupportedCustomerAssets);
+        $unsupportedCustomerAssets        = $unsupportedCustomerAssetsService->getAllForCustomer($customerId);
+        foreach ($customerAssets as $key => $customerAsset) {
+            $customerAssets[$key]['unsupported'] = in_array($customerAsset['name'], $unsupportedCustomerAssets);
         }
         return $customerAssets;
     }

@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection ALL */
 /** @noinspection HtmlDeprecatedAttribute */
 
 /**
@@ -8,6 +8,19 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
+namespace CNCLTD\Business;
+
+use BUCustomer;
+use BUCustomerItem;
+use BUHeader;
+use BUMail;
+use BUProblemRaiseType;
+use BUProblemSLA;
+use BUSalesOrder;
+use Business;
+use BUSite;
+use BUStandardText;
+use BUUser;
 use CNCLTD\AutomatedRequest;
 use CNCLTD\ChargeableWorkCustomerRequest\infra\ChargeableWorkCustomerRequestMySQLRepository;
 use CNCLTD\ChargeableWorkCustomerRequest\usecases\ClearPendingChargeableRequestsOnServiceRequestClosed;
@@ -17,6 +30,7 @@ use CNCLTD\Email\AttachmentCollection;
 use CNCLTD\Exceptions\ColumnOutOfRangeException;
 use CNCLTD\Exceptions\JsonHttpException;
 use CNCLTD\FeedbackTokenGenerator;
+use CNCLTD\LabtechRepo\LabtechPDORepo;
 use CNCLTD\ServiceRequestInternalNote\infra\ServiceRequestInternalNotePDORepository;
 use CNCLTD\ServiceRequestInternalNote\ServiceRequestInternalNote;
 use CNCLTD\ServiceRequestInternalNote\UseCases\AddServiceRequestInternalNote;
@@ -29,6 +43,56 @@ use CNCLTD\TwigDTOs\ServiceRequestFixedDTO;
 use CNCLTD\TwigDTOs\ServiceRequestLoggedDTO;
 use CNCLTD\TwigDTOs\SiteVisitDTO;
 use CNCLTD\WebrootAPI\Site;
+use Controller;
+use CTCNC;
+use CTProject;
+use CTSalesOrder;
+use CTSRActivity;
+use DataAccess;
+use DataSet;
+use DateInterval;
+use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
+use DBConnect;
+use DBECallActivity;
+use DBECallActivitySearch;
+use DBECallActType;
+use DBECallDocument;
+use DBECallDocumentWithoutFile;
+use DBEContact;
+use DBECustomer;
+use DBECustomerItem;
+use DBEHeader;
+use DBEItem;
+use DBEItemType;
+use DBEJCallActivity;
+use DBEJCallActType;
+use DBEJCallDocument;
+use DBEJContract;
+use DBEJCustomerItem;
+use DBEJHeader;
+use DBEJOrdhead;
+use DBEJOrdline;
+use DBEJPorhead;
+use DBEJRenContract;
+use DBEJUser;
+use DBEOrdhead;
+use DBEOrdline;
+use DBEPendingReopened;
+use DBEPorhead;
+use DBEProblem;
+use DBESite;
+use DBEStandardText;
+use DBETeam;
+use DBEUser;
+use DBEUtilityEmail;
+use dbSweetcode;
+use DSForm;
+use Exception;
+use Mail_mime;
+use mysqli_result;
+use Template;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
@@ -487,7 +551,7 @@ class BUActivity extends Business
         $dbeCallActivity->getRow($callActivityID);
         $internalNotesRepo = new ServiceRequestInternalNotePDORepository();
         $newNoteDate       = new DateTimeImmutable();
-        $userId         = $dbeUser->getValue(DBEUser::userID);
+        $userId            = $dbeUser->getValue(DBEUser::userID);
         $newInternalNote   = ServiceRequestInternalNote::create(
             $internalNotesRepo->newIdentity(),
             $dbeCallActivity->getValue(DBECallActivity::problemID),
@@ -3640,7 +3704,7 @@ class BUActivity extends Business
 
         $buMail      = new BUMail($this);
         $dbeJProblem = new DBEJProblem($this);
-        if(!$dbeJProblem->getRow($problemID)){
+        if (!$dbeJProblem->getRow($problemID)) {
             return;
         };
         $senderEmail = CONFIG_SUPPORT_EMAIL;
@@ -5306,7 +5370,9 @@ class BUActivity extends Business
             }
             $this->sendServiceRequestLoggedEmail($dsCallActivity->getValue(DBECallActivity::callActivityID), false);
         }
-        if ($dbeProblem->getValue(DBEProblem::raiseTypeId) === BUProblemRaiseType::PHONEID && $dbeCallActivity->getValue(
+        if ($dbeProblem->getValue(
+                DBEProblem::raiseTypeId
+            ) === BUProblemRaiseType::PHONEID && $dbeCallActivity->getValue(
                 DBECallActivity::callActTypeID
             ) === CONFIG_INITIAL_ACTIVITY_TYPE_ID) {
             $this->createActivityCustomerContactType($dbeCallActivity->getValue(DBECallActivity::callActivityID), true);
@@ -7179,7 +7245,7 @@ class BUActivity extends Business
         );
         if ($record->getMonitorAgentName()) {
             // try to find the computer name from Labtech
-            $labtechRepo  = new CNCLTD\LabtechRepo\LabtechPDORepo();
+            $labtechRepo  = new LabtechPDORepo();
             $computerName = $labtechRepo->getComputerNameForComputerId($record->getMonitorAgentName());
             if (!$computerName) {
                 echo "Couldn't match Monitor Agent Name value : {$record->getMonitorAgentName()} to a computer name.";

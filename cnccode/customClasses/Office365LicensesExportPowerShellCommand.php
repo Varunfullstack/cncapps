@@ -11,18 +11,17 @@ require_once($cfg["path_dbe"] . "/DBEPasswordService.inc.php");
 require_once($cfg["path_dbe"] . "/DBEProblem.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJCallActivity.php");
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUPassword.inc.php');
 require_once($cfg['path_bu'] . '/BUMail.inc.php');
 require_once($cfg["path_bu"] . "/BUProblemRaiseType.inc.php");
 
-use BUActivity;
 use BUCustomer;
 use BUHeader;
 use BUMail;
 use BUPassword;
 use BUProblemRaiseType;
+use CNCLTD\Business\BUActivity;
 use CNCLTD\Data\DBEJProblem;
 use DataSet;
 use DateInterval;
@@ -583,7 +582,10 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                         }
                     } else {
                         $this->logger->warning('Raising a License not found SR while processing Mailboxes:' . $license);
-                        $this->raiseCustomerServiceRequest($dbeCustomer, "License not found {$license} while processing mailbox {$datum['DisplayName']} ");
+                        $this->raiseCustomerServiceRequest(
+                            $dbeCustomer,
+                            "License not found {$license} while processing mailbox {$datum['DisplayName']} "
+                        );
                     }
                 }
                 if ($licensesWithDefender > 1) {

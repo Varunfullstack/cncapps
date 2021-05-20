@@ -3,7 +3,6 @@ global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BUMail.inc.php");
 require_once($cfg["path_dbe"] . "/DBESecondsiteImage.inc.php");
-require_once($cfg["path_bu"] . "/BUActivity.inc.php");
 require_once($cfg["path_bu"] . '/BUSecondsite.inc.php');
 
 class BUSecondsiteReplication extends BUSecondsite
@@ -24,72 +23,55 @@ class BUSecondsiteReplication extends BUSecondsite
     {
 
         $defaultTimeToLookFrom = strtotime('yesterday ' . self::START_IMAGE_TIME);
-
-        $this->imageCount = 0;
+        $this->imageCount  = 0;
         $this->serverCount = 0;
-        $this->log = array();
-
-        $servers = $this->getServers($customerItemID);
+        $this->log         = array();
+        $servers           = $this->getServers($customerItemID);
         $this->serverCount = count($servers);
-
         foreach ($servers as $server) {
 
-            $error = false;
-            $networkPath = false;
+            $error             = false;
+            $networkPath       = false;
             $excludeFromChecks = false;
-
-            $isSuspended = $this->isSuspended($server);
-            $images = [];
+            $isSuspended    = $this->isSuspended($server);
+            $images         = [];
             $timeToLookFrom = null;
-
             if ($isSuspended) {
                 $this->suspendedServerCount++;
             }
-
             if ($server[DBECustomerItem::secondSiteReplicationExcludeFlag] == 'Y') {
                 $this->excludedLocalServers[] = $server;
-                $excludeFromChecks = true;
+                $excludeFromChecks            = true;
             } else {
 
                 if (!$isSuspended && $server['suspendedUntilDate']) {
                     $this->resetSuspendedUntilDate($server['server_cuino']);
                 }
-
-                $days = @$server['imageDelayDays'];
+                $days     = @$server['imageDelayDays'];
                 $dsHeader = new DataSet($this);
                 $buHeader = new BUHeader($this);
                 $buHeader->getHeader($dsHeader);
-
                 $additionalDays = $dsHeader->getValue(DBEHeader::secondSiteReplicationAdditionalDelayAllowance);
-
-                $days += $additionalDays;
-                $timeToLookFrom = strtotime(
+                $days                        += $additionalDays;
+                $timeToLookFrom              = strtotime(
                     '-' . $days . ' days',
                     $defaultTimeToLookFrom
                 );
                 $this->delayedCheckServers[] = $server;
-
                 $images = $this->getImagesByServer($server['server_cuino']);
-
-                if (
-                    !$server['secondSiteReplicationPath'] or
-                    count($images) == 0
-                ) {
+                if (!$server['secondSiteReplicationPath'] or count($images) == 0) {
                     $error = 'Offsite Backup Replication Path Error Or No Images';
                     if (!$isSuspended) {
                         $this->imageCount += count($images);
                         $this->serverErrorCount++;
-
                         $this->logMessage(
                             $server['cus_name'] . ' ' . $server['serverName'] . ' ' . $error,
                             self::LOG_TYPE_ERROR_INCOMPLETE
                         );
-
                         $this->setImageStatusByServer(
                             $server['server_cuino'],
                             self::STATUS_BAD_CONFIG
                         );
-
                         if (!$customerItemID && !$testRun) {
                             $this->getActivityModel()->raiseSecondSiteLocationNotFoundRequest(
                                 $server['custno'],
@@ -107,22 +89,18 @@ class BUSecondsiteReplication extends BUSecondsite
                     $networkPath = $server['secondSiteReplicationPath'];
                     if (!file_exists($networkPath)) {
                         $error = 'Location is not available';
-
                         if (!$isSuspended) {
-                            $images = $this->getImagesByServer($server['server_cuino']);
+                            $images           = $this->getImagesByServer($server['server_cuino']);
                             $this->imageCount += count($images);
                             $this->serverErrorCount++;
-
                             $this->logMessage(
                                 $server['cus_name'] . ' ' . $networkPath . ' ' . $error,
                                 self::LOG_TYPE_ERROR_PATH_MISSING
                             );
-
                             $this->setImageStatusByServer(
                                 $server['server_cuino'],
                                 self::STATUS_SERVER_NOT_FOUND
                             );
-
                             if (!$customerItemID && !$testRun) {
                                 $this->getActivityModel()->raiseSecondSiteLocationNotFoundRequest(
                                     $server['custno'],
@@ -137,14 +115,11 @@ class BUSecondsiteReplication extends BUSecondsite
                     }
                 }
             }
-
             if (!$error && !$excludeFromChecks) {
 
-                $missingImages = array();
+                $missingImages  = array();
                 $missingLetters = array();
-
                 $allServerImagesPassed = true;      // default assumption
-
                 foreach ($images as $image) {
 
                     if (!$isSuspended) {
@@ -156,37 +131,30 @@ class BUSecondsiteReplication extends BUSecondsite
                     } else {
                         $pattern = '/' . $image['imageName'];
                     }
-
                     $pattern .= '.*(-cd\.spi|spf|(?<!-c[w|m|r])\.spi)$/i';
-
                     $matchedFiles = self::preg_ls(
                         $networkPath,
                         $pattern
                     );
-
                     if (count($matchedFiles) == 0) {
 
                         $allServerImagesPassed = false;
-
                         if (!$isSuspended) {
                             $this->imageErrorCount++;
                             /*
                             No matching files of any date
                             */
-                            $missingImages[] = 'No file in ' . $networkPath . ' matches pattern: ' . htmlentities(
+                            $missingImages[]  = 'No file in ' . $networkPath . ' matches pattern: ' . htmlentities(
                                     $pattern
                                 );
                             $missingLetters[] = $image['imageName'];
-
                             $errorMessage = $server['cus_name'] . ' ' . $server['serverName'] . ': No file in ' . $networkPath . ' matches pattern: ' . htmlentities(
                                     $pattern
                                 );
-
                             $this->logMessage(
                                 $errorMessage,
                                 self::LOG_TYPE_ERROR_NO_IMAGE
                             );
-
                             $this->setImageStatus(
                                 $image['secondSiteImageID'],
                                 self::STATUS_IMAGE_NOT_FOUND
@@ -194,9 +162,7 @@ class BUSecondsiteReplication extends BUSecondsite
                         }
                     } else {
                         $mostRecentFileName = false;
-
                         $mostRecentFileTime = 0;
-
                         foreach ($matchedFiles as $file) {
                             $fileModifyTime = filemtime($file);
                             if ($fileModifyTime > $mostRecentFileTime) {
@@ -207,10 +173,8 @@ class BUSecondsiteReplication extends BUSecondsite
                         if ($mostRecentFileTime < $timeToLookFrom) {
 
                             $allServerImagesPassed = false;
-
                             if (!$isSuspended) {
                                 $this->imageErrorCount++;
-
                                 $errorMessage = $server['cus_name'] . ' ' . $server['serverName'] . ': Image is OUT-OF-DATE: ' . $mostRecentFileName . ' ' . DATE(
                                         'd/m/Y H:i:s',
                                         $mostRecentFileTime
@@ -219,17 +183,14 @@ class BUSecondsiteReplication extends BUSecondsite
                                     $errorMessage,
                                     self::LOG_TYPE_ERROR_NO_IMAGE
                                 );
-
                                 $missingImages[] = 'OUT-OF-DATE image found: ' . $mostRecentFileName . ' ' . DATE(
                                         'd/m/Y H:i:s',
                                         $mostRecentFileTime
                                     );
-
                                 $status = self::STATUS_OUT_OF_DATE;
                             } else {
                                 $status = self::STATUS_SUSPENDED;
                             }
-
                             $this->setImageStatus(
                                 $image['secondSiteImageID'],
                                 $status,
@@ -280,9 +241,7 @@ class BUSecondsiteReplication extends BUSecondsite
                                     ),
                                     self::LOG_TYPE_SUCCESS
                                 );
-
                                 $status = self::STATUS_PASSED;
-
                                 $this->setImageStatus(
                                     $image['secondSiteImageID'],
                                     $status,
@@ -304,11 +263,9 @@ class BUSecondsiteReplication extends BUSecondsite
 
 
                 }// end drives
-
                 if ($allServerImagesPassed) {
                     $this->resetSuspendedUntilDate($server['server_cuino']);
                 }
-
                 if (!$isSuspended && count($missingImages) > 0 && !$customerItemID && !$testRun) {
 
                     $this->getActivityModel()->raiseSecondSiteMissingImageRequest(
@@ -324,26 +281,20 @@ class BUSecondsiteReplication extends BUSecondsite
                 }
 
             } // if not error
-
         } // end foreach contracts
         if (!$customerItemID && !$testRun) {
             /** @var dbSweetcode $db */
             $db = $GLOBALS['db'];
-
             //check if we have already stored information for today
             $query = "SELECT created_at FROM backup_performance_log WHERE created_at = date(now()) and isReplication";
-
             $db->query($query);
             $db->next_record();
             $data = $db->Record;
-
             if ($data['created_at']) {
                 return;
             }
-
             $buHeader = new BUHeader($this);
             $buHeader->getHeader($dsHeader);
-
             $query = "INSERT INTO backup_performance_log (
                       created_at,
                       servers,
@@ -403,8 +354,7 @@ class BUSecondsiteReplication extends BUSecondsite
 
     public function getServers($customerItemID = false)
     {
-        $queryString =
-            "SELECT
+        $queryString = "SELECT
         ci.cui_cuino,
         ci.cui_custno AS custno,
         c.cus_name,
@@ -431,29 +381,22 @@ class BUSecondsiteReplication extends BUSecondsite
       WHERE
         i.itm_itemtypeno IN ( " . CONFIG_2NDSITE_CNC_ITEMTYPEID . "," . CONFIG_2NDSITE_LOCAL_ITEMTYPEID . ")
         AND ci.declinedFlag <> 'Y'";
-
         if ($customerItemID) {
             $queryString .= " AND ser.cui_cuino = $customerItemID";
         }
-
         $queryString .= " ORDER BY c.cus_name, serverName";
-
         $db = $GLOBALS['db'];
-
         $db->query($queryString);
-
         $servers = array();
         while ($db->next_record()) {
             $servers[] = $db->Record;
         }
-
         return $servers;
     }
 
     function resetSuspendedUntilDate($cuino)
     {
-        $queryString =
-            "UPDATE
+        $queryString = "UPDATE
     custitem 
     SET
     offsiteReplicationValidationSuspendedUntilDate = NULL,
@@ -461,17 +404,14 @@ class BUSecondsiteReplication extends BUSecondsite
         offsiteReplicationSuspendedDate = null
     WHERE
     cui_cuino = $cuino";
-
         $db = $GLOBALS['db'];
-
         $db->query($queryString);
 
     }
 
     public function getImagesByServer($customerItemID)
     {
-        $queryString =
-            "SELECT
+        $queryString = "SELECT
         secondSiteImageID,
         imageName,
         replicationStatus
@@ -479,44 +419,35 @@ class BUSecondsiteReplication extends BUSecondsite
         secondsite_image
       WHERE
         customerItemID = $customerItemID";
-
         $db = $GLOBALS['db'];
-
         $db->query($queryString);
-
         $images = array();
         while ($db->next_record()) {
             $images[] = $db->Record;
         }
-
         return $images;
     }
 
     /*
     Get second site images by server
     */
-
     function setImageStatusByServer($customerItemID,
                                     $status
     )
     {
-        $queryString =
-            "UPDATE
+        $queryString = "UPDATE
         secondsite_image 
       SET
         replicationStatus = '$status'
       WHERE
         customerItemID = $customerItemID";
-
         $db = $GLOBALS['db'];
-
         $db->query($queryString);
     }
 
     /*
     Get second site images by status
     */
-
     function setImageStatus($secondSiteImageID,
                             $status,
                             $imagePath = null,
@@ -524,8 +455,7 @@ class BUSecondsiteReplication extends BUSecondsite
     )
     {
 
-        $queryString =
-            "UPDATE
+        $queryString = "UPDATE
         secondsite_image 
       SET
         replicationStatus = ?,
@@ -535,7 +465,6 @@ class BUSecondsiteReplication extends BUSecondsite
         secondSiteImageID = ?";
         /** @var dbSweetcode $db */
         $db = $GLOBALS['db'];
-
         $db->preparedQuery(
             $queryString,
             [
@@ -561,8 +490,7 @@ class BUSecondsiteReplication extends BUSecondsite
 
     function getImagesByStatus($status)
     {
-        $queryString =
-            "SELECT
+        $queryString = "SELECT
         ci.cui_cuino,
         ci.cui_custno as custno,
         c.cus_name,
@@ -589,32 +517,26 @@ class BUSecondsiteReplication extends BUSecondsite
       WHERE
         i.itm_itemtypeno IN ( " . CONFIG_2NDSITE_CNC_ITEMTYPEID . "," . CONFIG_2NDSITE_LOCAL_ITEMTYPEID . ")
         AND ci.declinedFlag <> 'Y'";
-
         if ($status === self::STATUS_EXCLUDED) {
             $queryString .= " AND ser.secondSiteReplicationExcludeFlag = 'Y' group by serverName ";
         } else {
             $queryString .= " AND ser.secondSiteReplicationExcludeFlag <> 'Y' AND replicationStatus = '$status' ";
         }
         $queryString .= " ORDER BY c.cus_name, serverName, ssi.imageName";
-
         $db = $GLOBALS['db'];
-
         $db->query($queryString);
-
         $images = array();
         while ($db->next_record()) {
             $images[] = $db->Record;
         }
-
         return $images;
 
     }
 
     function getPerformanceDataAvailableYears()
     {
-        $query = "SELECT  DISTINCT YEAR(created_at) AS YEAR  FROM backup_performance_log where isReplication";
+        $query  = "SELECT  DISTINCT YEAR(created_at) AS YEAR  FROM backup_performance_log where isReplication";
         $result = $this->db->query($query);
-
         return array_map(
             function ($item) {
                 return $item[0];

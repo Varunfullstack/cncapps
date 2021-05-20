@@ -1,9 +1,12 @@
 <?php
+
+use CNCLTD\Business\BUActivity;
+
 global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BUMail.inc.php");
 require_once($cfg["path_dbe"] . "/DBESecondsiteImage.inc.php");
-require_once($cfg["path_bu"] . "/BUActivity.inc.php");
+
 
 class BUSecondsite extends Business
 {

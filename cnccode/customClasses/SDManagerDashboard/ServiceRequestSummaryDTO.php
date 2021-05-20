@@ -2,7 +2,7 @@
 
 namespace CNCLTD\SDManagerDashboard;
 
-use BUActivity;
+use CNCLTD\Business\BUActivity;
 use CNCLTD\Data\DBEJProblem;
 use CNCLTD\Exceptions\ColumnOutOfRangeException;
 use CNCLTD\Utils;

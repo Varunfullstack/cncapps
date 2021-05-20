@@ -7,14 +7,13 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
+use CNCLTD\Business\BUActivity;
 use CNCLTD\Data\CallBackStatus;
 use CNCLTD\SDManagerDashboard\ServiceRequestSummaryDTO;
 use CNCLTD\Utils;
 
 global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUUser.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg['path_dbe'] . '/DBEPendingReopened.php');
@@ -651,7 +650,6 @@ class CTCurrentActivityReport extends CTCNC
         $dbeCallActivity->setValue(DBECallActivity::siteNo, $dbeContact->getValue(DBEContact::siteNo));
         $dbeCallActivity->setValue(DBECallActivity::userID, $this->dbeUser->getPKValue());
         $dbeCallActivity->setValue(DBECallActivity::date, date('Y-m-d'));
-
         $endTime   = new DateTime();
         $startTime = (clone $endTime)->sub(new DateInterval('PT3M'));
         $dbeCallActivity->setValue(DBECallActivity::startTime, $startTime->format('H:i'));
@@ -721,10 +719,8 @@ class CTCurrentActivityReport extends CTCNC
                 $buMail->sendSimpleEmail($body, $subject, $to, CONFIG_SUPPORT_EMAIL, $cc);
             }
         }
-
         $buActivity = new BUActivity($this);
-        $buActivity->updateInbound($dbeCallActivity->getPKValue(),true);
-
+        $buActivity->updateInbound($dbeCallActivity->getPKValue(), true);
         return ["status" => true, "callActivityID" => $dbeCallActivity->getPKValue()];
     }
 

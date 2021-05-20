@@ -2,7 +2,7 @@
 
 namespace CNCLTD\ChargeableWorkCustomerRequest\usecases;
 
-use BUActivity;
+use CNCLTD\Business\BUActivity;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequest;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestRepository;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestTokenId;
@@ -17,8 +17,6 @@ use DBEContact;
 use DBEProblem;
 use DBEUser;
 
-global $cfg;
-require_once($cfg["path_bu"] . "/BUActivity.inc.php");
 
 class RejectPendingChargeableWorkCustomerRequest
 {

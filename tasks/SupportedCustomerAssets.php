@@ -1,5 +1,6 @@
 <?php
 
+use CNCLTD\Business\BUActivity;
 use CNCLTD\Data\DBEJProblem;
 use CNCLTD\LoggerCLI;
 use CNCLTD\SupportedCustomerAssets\NotMatchedItemDTO;
@@ -9,7 +10,6 @@ use CNCLTD\SupportedCustomerAssets\UnsupportedCustomerAssetService;
 require_once(__DIR__ . "/../htdocs/config.inc.php");
 global $cfg;
 require_once($cfg["path_dbe"] . "/DBECustomer.inc.php");
-require_once($cfg ["path_bu"] . "/BUActivity.inc.php");
 $logName = 'SupportedCustomerAssets';
 $logger  = new LoggerCLI($logName);
 // increasing execution time to infinity...
@@ -37,7 +37,9 @@ while ($dbeCustomer->fetchNext()) {
     );
     foreach ($supportedCustomerAssets->getCNCNotMatchedAssets() as $CNCNotMatchedAsset) {
         try {
-            $logger->warning("Raising SR for customer {$dbeCustomer->getValue(DBECustomer::customerID)} on asset {$CNCNotMatchedAsset->getComputerName()}");
+            $logger->warning(
+                "Raising SR for customer {$dbeCustomer->getValue(DBECustomer::customerID)} on asset {$CNCNotMatchedAsset->getComputerName()}"
+            );
             raiseNotMatchedRequest($dbeCustomer->getValue(DBECustomer::customerID), $CNCNotMatchedAsset);
         } catch (Exception $exception) {
             $logger->error($exception->getMessage());

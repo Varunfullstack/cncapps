@@ -12,7 +12,6 @@ use CNCLTD\Business\BURenContract;
 
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/Burencontract.php');
-require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg['path_dbe'] . '/DBEItem.inc.php');
@@ -136,7 +135,7 @@ class CTRenContract extends CTCNC
                 try {
                     $this->addItemToContract($contractCustomerItemId, $itemToAddId);
                     $data = ["status" => "ok"];
-                } catch (\Exception $exception) {
+                } catch (Exception $exception) {
                     $data = ["status" => "error", "message" => $exception->getMessage()];
                 }
                 echo json_encode($data);
@@ -211,7 +210,7 @@ class CTRenContract extends CTCNC
             $dsRenContract->fetchNext();
             $customerItemID = $dsRenContract->getValue(DBEJRenContract::customerItemID);
         }
-        $urlUpdate = Controller::buildLink(
+        $urlUpdate      = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action'         => 'update',

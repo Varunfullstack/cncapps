@@ -7,7 +7,6 @@ use CNCLTD\ChargeableWorkCustomerRequest\usecases\GetPendingToProcessChargeableR
 use CNCLTD\ChargeableWorkCustomerRequest\usecases\RejectPendingChargeableWorkCustomerRequest;
 use CNCLTD\CustomerFeedback;
 use CNCLTD\CustomerFeedbackRepository;
-use CNCLTD\Exceptions\ChargeableWorkCustomerRequestAlreadyProcessedException;
 use CNCLTD\Exceptions\ChargeableWorkCustomerRequestNotFoundException;
 use CNCLTD\Exceptions\ContactNotFoundException;
 use CNCLTD\FeedbackTokenGenerator;

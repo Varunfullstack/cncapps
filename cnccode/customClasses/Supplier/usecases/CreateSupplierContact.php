@@ -13,6 +13,7 @@ use CNCLTD\Supplier\CreateSupplierContactRequest;
 use CNCLTD\Supplier\Domain\SupplierContact\Active;
 use CNCLTD\Supplier\infra\MySQLSupplierRepository;
 use CNCLTD\Supplier\SupplierRepository;
+use Exception;
 
 class CreateSupplierContact
 {

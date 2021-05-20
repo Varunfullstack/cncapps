@@ -5,10 +5,12 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use CNCLTD\Business\BUActivity;
+
 global $cfg;
 require_once($cfg ["path_gc"] . "/Business.inc.php");
 require_once($cfg ["path_gc"] . "/Controller.inc.php");
-require_once($cfg ["path_bu"] . "/BUActivity.inc.php");
 require_once $cfg['path_dbe'] . '/DBEProblem.inc.php';
 require_once $cfg['path_dbe'] . '/DBEPendingReopened.php';
 
@@ -61,9 +63,13 @@ class BUImportRequests extends Business
             )) {      // error string returned
                 echo $automatedRequest->getAutomatedRequestID() . " processed successfully<BR/>";
                 $processedMessages++;
-                $dbeLastActivity = $this->buActivity->getLastActivityInProblem($automatedRequest->getServiceRequestID());
-                if($dbeLastActivity->rowCount>0)
-                 $this->buActivity->updateInbound($dbeLastActivity->getValue(DBEJCallActivity::callActivityID),true);
+                $dbeLastActivity = $this->buActivity->getLastActivityInProblem(
+                    $automatedRequest->getServiceRequestID()
+                );
+                if ($dbeLastActivity->rowCount > 0) $this->buActivity->updateInbound(
+                    $dbeLastActivity->getValue(DBEJCallActivity::callActivityID),
+                    true
+                );
             } else {
                 echo $automatedRequest->getAutomatedRequestID() . " failed<BR/>";
                 $this->sendFailureEmail(
@@ -110,10 +116,10 @@ class BUImportRequests extends Business
     )
     {
         global $cfg;
-        $buMail = new BUMail($this);
+        $buMail      = new BUMail($this);
         $senderEmail = CONFIG_SUPPORT_EMAIL;
         $toEmail     = "CNCServiceDesk@" . CONFIG_PUBLIC_DOMAIN;
-        $template = new Template(
+        $template    = new Template(
             $cfg["path_templates"], "remove"
         );
         $template->set_file(
@@ -160,8 +166,8 @@ class BUImportRequests extends Business
             'html_charset'  => 'UTF-8',
             'head_charset'  => 'UTF-8'
         );
-        $body = $buMail->mime->get($mime_params);
-        $hdrs = $buMail->mime->headers($hdrs);
+        $body        = $buMail->mime->get($mime_params);
+        $hdrs        = $buMail->mime->headers($hdrs);
         $buMail->putInQueue(
             $senderEmail,
             $toEmail,

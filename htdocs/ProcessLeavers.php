@@ -6,6 +6,7 @@
  * Time: 13:22
  */
 
+use CNCLTD\Business\BUActivity;
 use CNCLTD\Data\DBEJProblem;
 
 require_once("config.inc.php");
@@ -19,7 +20,6 @@ $buContact->getTodayLeaverContacts($dsContact);
 while ($dsContact->fetchNext()) {
     $dbeContact = new DBEContact($thing);
     $dbeContact->getRow($dsContact->getValue(DBEContact::contactID));
-
     $dbeContact->setValue(
         DBEContact::sendMailshotFlag,
         'N'

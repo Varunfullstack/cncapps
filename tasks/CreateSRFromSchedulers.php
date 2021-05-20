@@ -1,13 +1,14 @@
 <?php
 
+use CNCLTD\Business\BUActivity;
 use CNCLTD\LoggerCLI;
 use CNCLTD\ServiceRequestInternalNote\infra\ServiceRequestInternalNotePDORepository;
 use CNCLTD\ServiceRequestInternalNote\UseCases\AddServiceRequestInternalNote;
+use RRule\RRule;
 
 require_once(__DIR__ . "/../htdocs/config.inc.php");
 global $cfg;
 require_once($cfg ['path_dbe'] . '/DBESRScheduler.php');
-require_once($cfg ['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg ["path_bu"] . "/BUProblemRaiseType.inc.php");
 /** @var $db dbSweetcode */
 global $db;
@@ -46,7 +47,7 @@ try {
     while ($dbeSrScheduler->fetchNext()) {
         $schedulerString = $dbeSrScheduler->getValue(DBESRScheduler::rruleString);
         $logger->info('Checking scheduler: ' . $schedulerString);
-        $rrule = new \RRule\RRule($schedulerString);
+        $rrule = new RRule($schedulerString);
         $dates = $rrule->getOccurrencesAfter($startDate, true, 1);
         if (!$dates || !count($dates)) {
             $logger->notice('No more instances to run for this scheduler, deleting it');
@@ -133,7 +134,6 @@ try {
             DBEProblem::emptyAssetReason,
             $dbeSrScheduler->getValue(DBESRScheduler::emptyAssetReason)
         );
-
         $dbeProblem->setValue(
             DBEProblem::contactID,
             $dbeContact->getValue(DBEContact::contactID)
@@ -168,7 +168,7 @@ try {
             BUProblemRaiseType::MANUALID
         );
         $dbeProblem->insertRow();
-        $useCase = new AddServiceRequestInternalNote(
+        $useCase          = new AddServiceRequestInternalNote(
             new ServiceRequestInternalNotePDORepository()
         );
         $internalNoteUser = new DBEUser($thing);
@@ -229,7 +229,7 @@ try {
         }
         $logger->info('Successfully created SR ');
     }
-} catch (\Exception $exception) {
+} catch (Exception $exception) {
     // log the error
     $logger->error('Failed to process scheduler:' . $exception->getMessage());
     $buActivity     = new BUActivity($thing);
