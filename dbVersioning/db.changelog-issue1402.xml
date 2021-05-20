@@ -18,6 +18,9 @@
             <column name="description" type="varchar(50)">
                 <constraints nullable="false"/>
             </column>
+            <column name="notes" type="text">
+                <constraints nullable="true"/>
+            </column>
             <column name="salesPrice" type="decimal(10,2)">
                 <constraints nullable="false"/>
             </column>
