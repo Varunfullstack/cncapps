@@ -8,7 +8,7 @@ require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg["path_dbe"] . "/DBConnect.php");
 require_once($cfg ["path_dbe"] . "/DBEJCallActivity.php");
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
-require_once($cfg['path_dbe'] . '/DBECallDocumentWithoutFile.inc.php');
+require_once($cfg['path_dbe'] . '/DBECallDocumentWithoutFile.php');
 
 class CTRequestDashboard extends CTCNC
 {

@@ -130,10 +130,6 @@ require_once($cfg['path_dbe'] . '/DBECallDocumentWithoutFile.php');
 require_once($cfg["path_ct"] . "/CTProject.inc.php");
 require_once($cfg ["path_bu"] . "/BUProblemRaiseType.inc.php");
 require_once($cfg["path_dbe"] . "/DBConnect.php");
-define(
-    'BUACTIVITY_RESOLVED',
-    9
-);
 
 class BUActivity extends Business
 {
