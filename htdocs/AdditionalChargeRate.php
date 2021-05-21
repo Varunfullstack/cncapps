@@ -12,9 +12,10 @@ page_open(
     )
 );
 global $cfg;
+global $inMemorySymfonyBus;
 header("Cache-control: private");
 $ctActivityType = new CTAdditionalChargeRate(
-    $_SERVER['REQUEST_METHOD'], $_POST, $_GET, $_COOKIE, $cfg
+    $_SERVER['REQUEST_METHOD'], $_POST, $_GET, $_COOKIE, $cfg, $inMemorySymfonyBus
 );
 $ctActivityType->execute();
 page_close();

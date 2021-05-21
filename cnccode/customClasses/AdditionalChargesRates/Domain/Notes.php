@@ -2,7 +2,7 @@
 
 namespace CNCLTD\AdditionalChargesRates\Domain;
 
-use CNCLTD\shared\core\ValueObject;
+use CNCLTD\Shared\Domain\ValueObject;
 
 class Notes implements ValueObject
 {

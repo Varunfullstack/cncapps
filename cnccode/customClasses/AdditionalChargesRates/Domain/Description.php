@@ -3,7 +3,7 @@
 namespace CNCLTD\AdditionalChargesRates\Domain;
 
 use CNCLTD\Exceptions\EmptyStringException;
-use CNCLTD\shared\core\ValueObject;
+use CNCLTD\shared\Domain\ValueObject;
 
 class Description implements ValueObject
 {

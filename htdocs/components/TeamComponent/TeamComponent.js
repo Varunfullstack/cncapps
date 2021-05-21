@@ -1,6 +1,6 @@
 import MainComponent from "../shared/MainComponent.js";
 import React from "react";
-import ReactDOM from "react-dom"; 
+import ReactDOM from "react-dom";
 import Spinner from "../shared/Spinner/Spinner";
 import Table from "../shared/table/table.js";
 import ToolTip from "../shared/ToolTip.js";
@@ -10,6 +10,7 @@ import '../style.css';
 import './TeamComponent.css';
 import APIUser from "../services/APIUser.js";
 import Toggle from "../shared/Toggle.js";
+import {TrueFalseIconComponent} from "../shared/TrueFalseIconComponent/TrueFalseIconComponent";
 
 class TeamComponent extends MainComponent {
    api=new APITeam();
@@ -89,7 +90,7 @@ class TeamComponent extends MainComponent {
                 hdToolTip: "Active",
                 hdClassName: "text-center",                
                 sortable: true,
-                content:(type)=>this.getTrueFalseElement(type.activeFlag=='Y'),
+                content:(type)=><TrueFalseIconComponent value={type.activeFlag == 'Y'}/>,
                 className: "text-center",  
                           
              },           

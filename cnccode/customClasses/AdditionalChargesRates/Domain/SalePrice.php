@@ -2,7 +2,7 @@
 
 namespace CNCLTD\AdditionalChargesRates\Domain;
 
-use CNCLTD\shared\core\ValueObject;
+use CNCLTD\shared\Domain\ValueObject;
 
 class SalePrice implements ValueObject
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace CNCLTD\shared\core;
+namespace CNCLTD\Shared\Domain;
 trait ValueObjectCompare
 {
     public function isSame(ValueObject $object): bool

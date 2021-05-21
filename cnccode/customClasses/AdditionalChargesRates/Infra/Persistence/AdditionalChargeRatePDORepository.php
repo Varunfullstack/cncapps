@@ -10,6 +10,7 @@ use CNCLTD\AdditionalChargesRates\Domain\InvalidAdditionalChargeRageIdValue;
 use CNCLTD\Exceptions\EmptyStringException;
 use PDO;
 use PDOException;
+use PDOStatement;
 
 class AdditionalChargeRatePDORepository implements AdditionalChargeRateRepository
 {
@@ -41,24 +42,7 @@ class AdditionalChargeRatePDORepository implements AdditionalChargeRateRepositor
             )) {
             throw new PDOException("Failed to retrieve AdditionalChargeRate: {$this->pdo->errorInfo()}");
         }
-        $data = $additionalChargeRateStatement->fetch(PDO::FETCH_ASSOC);
-        if (!$data) {
-            throw new AdditionalChargeRateNotFoundException($additionalChargeRateId);
-        }
-        $data['specificCustomerPrices'] = [];
-        if ($data['customerSpecificPriceAllowed']) {
-            $specificCustomerPricesStatement = $this->pdo->prepare(
-                'select additionalChargeRateId, customerId, salePrice from additionalChargeRateCustomerPrices where additionalChargeRateId = ?'
-            );
-            if (!$specificCustomerPricesStatement || !$specificCustomerPricesStatement->execute(
-                    [$additionalChargeRateId->value()]
-                )) {
-                throw new PDOException(
-                    'Failed to retrieve additionalChargeRateCustomerPrices: ' . $this->pdo->errorInfo()
-                );
-            }
-            $data['specificCustomerPrices'] = $specificCustomerPricesStatement->fetchAll(PDO::FETCH_ASSOC);
-        }
+        $data = $this->addSpecificPricesToData($additionalChargeRateStatement, $additionalChargeRateId);
         return AdditionalChargeRatePDO::fromPersistence($data);
     }
 
@@ -120,5 +104,54 @@ class AdditionalChargeRatePDORepository implements AdditionalChargeRateRepositor
                 $insertStatement->execute($values);
             }
         }
+    }
+
+    public function searchAll(): array
+    {
+        $additionalChargeRateStatement = $this->pdo->prepare(
+            'select id,description,notes,salesPrice,customerSpecificPriceAllowed from additionalChargeRate'
+        );
+        if (!$additionalChargeRateStatement || !$additionalChargeRateStatement->execute()) {
+            $errorInfo = print_r($additionalChargeRateStatement->errorInfo());
+            throw new PDOException("Failed to retrieve AdditionalChargeRate: {$errorInfo}");
+        }
+        $toReturn = [];
+        while ($data = $additionalChargeRateStatement->fetch(PDO::FETCH_ASSOC)) {
+            $data       = $this->addSpecificPricesToData($additionalChargeRateStatement, $data['id']);
+            $toReturn[] = AdditionalChargeRatePDO::fromPersistence($data);
+        }
+        return $toReturn;
+    }
+
+    /**
+     * @param PDOStatement $additionalChargeRateStatement
+     * @param AdditionalChargeRateId $additionalChargeRateId
+     * @return mixed
+     * @throws AdditionalChargeRateNotFoundException
+     */
+    private function addSpecificPricesToData(PDOStatement $additionalChargeRateStatement,
+                                             AdditionalChargeRateId $additionalChargeRateId
+    )
+    {
+        $data = $additionalChargeRateStatement->fetch(PDO::FETCH_ASSOC);
+        if (!$data) {
+            throw new AdditionalChargeRateNotFoundException($additionalChargeRateId);
+        }
+        $data['specificCustomerPrices'] = [];
+        if ($data['customerSpecificPriceAllowed']) {
+            $specificCustomerPricesStatement = $this->pdo->prepare(
+                'select additionalChargeRateId, customerId, salePrice from additionalChargeRateCustomerPrices where additionalChargeRateId = ?'
+            );
+            if (!$specificCustomerPricesStatement || !$specificCustomerPricesStatement->execute(
+                    [$additionalChargeRateId->value()]
+                )) {
+                $prettyErrorInfo = print_r($this->pdo->errorInfo());
+                throw new PDOException(
+                    "Failed to retrieve additionalChargeRateCustomerPrices: {$prettyErrorInfo}"
+                );
+            }
+            $data['specificCustomerPrices'] = $specificCustomerPricesStatement->fetchAll(PDO::FETCH_ASSOC);
+        }
+        return $data;
     }
 }

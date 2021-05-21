@@ -2,6 +2,9 @@
 
 namespace CNCLTD\Controller;
 
+use CNCLTD\AdditionalChargesRates\Application\GetAll\GetAllAdditionalChargeRatesQuery;
+use CNCLTD\AdditionalChargesRates\Application\GetAll\GetAllAdditionalChargeRatesResponse;
+use CNCLTD\Shared\Domain\Bus\QueryBus;
 use CTCNC;
 use Exception;
 
@@ -10,11 +13,16 @@ require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 
 class CTAdditionalChargeRate extends CTCNC
 {
+    const GET_ADDITIONAL_CHARGE_RATES = 'getAdditionalChargeRates';
+    /**
+     * @var QueryBus
+     */
+    private $queryBus;
 
     /**
      * CTAdditionalChargeRate constructor.
      */
-    public function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
+    public function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg, QueryBus $queryBus)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
         $roles = SALES_PERMISSION;
@@ -23,6 +31,7 @@ class CTAdditionalChargeRate extends CTCNC
             exit;
         }
         $this->setMenuId(312);
+        $this->queryBus = $queryBus;
     }
 
     /**
@@ -32,27 +41,11 @@ class CTAdditionalChargeRate extends CTCNC
     function defaultAction()
     {
         switch ($this->getAction()) {
-//            case CTACTIVITYTYPE_ACT_EDIT:
-//            case CTACTIVITYTYPE_ACT_CREATE:
-//                $this->edit();
-//                break;
-//            case CTACTIVITYTYPE_ACT_DELETE:
-//                $this->delete();
-//                break;
-//            case CTACTIVITYTYPE_ACT_UPDATE:
-//                $this->update();
-//                break;
-//            case "getCallActTypes":
-//                echo json_encode($this->getCallActTypes());
-//                exit;
-//            case "getAllDetails":
-//                echo json_encode($this->getActTypeList());
-//                exit;
-//            case CTACTIVITYTYPE_ACT_DISPLAY_LIST:
-//            case "updateActivityTypeOrder":
-//                $this->updateActivityTypeOrder();
-//                echo json_encode(["status" => "ok"]);
-//                exit;
+            case self::GET_ADDITIONAL_CHARGE_RATES:
+            {
+                echo json_encode($this->getAdditionalChargeRagesController());
+                break;
+            }
             default:
                 $this->displayReactApp();
                 break;
@@ -70,6 +63,13 @@ class CTAdditionalChargeRate extends CTCNC
         $this->loadReactCSS('AdditionalChargeRateWrapperComponent.css');
         $this->template->parse('CONTENTS', 'AdditionalChargeRateReact', true);
         $this->parsePage();
+    }
+
+    private function getAdditionalChargeRagesController()
+    {
+        /** @var GetAllAdditionalChargeRatesResponse $response */
+        $response = $this->queryBus->ask(new GetAllAdditionalChargeRatesQuery());
+        return ["status" => "ok", "data" => $response->additionalChargesRates()];
     }
 
 }

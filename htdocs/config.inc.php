@@ -1,5 +1,9 @@
 <?php
 
+use CNCLTD\AdditionalChargesRates\Application\GetAll\GetAllAdditionalChargeRatesQuery;
+use CNCLTD\AdditionalChargesRates\Application\GetAll\GetAllAdditionalChargeRatesQueryHandler;
+use CNCLTD\AdditionalChargesRates\Infra\Persistence\AdditionalChargeRatePDORepository;
+use CNCLTD\Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
 use Twig\Environment;
 use Twig\TwigFilter;
 
@@ -1524,4 +1528,10 @@ $db = new dbSweetcode;
 //$db->query("SET sql_mode = ''");    // strict mode off
 //$pkdb= new dbSweetcode;
 //$db->Debug = DEBUG;        // Turn this on if database debug output needed
+$pdoConnection      = new PDO(
+    'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8', DB_USER, DB_PASSWORD
+);
+$inMemorySymfonyBus = new InMemorySymfonyQueryBus(
+    [new GetAllAdditionalChargeRatesQueryHandler(new AdditionalChargeRatePDORepository($pdoConnection))]
+);
 ?>

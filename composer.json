@@ -35,7 +35,9 @@
         "ext-sqlite3": "*",
         "data-uri/data-uri": "^0.2.5",
         "html2text/html2text": "^4.3",
-        "ramsey/uuid": "^4.1"
+        "ramsey/uuid": "^4.1",
+        "symfony/messenger": "^5.2",
+        "lambdish/phunctional": "^2.1"
     },
     "autoload": {
         "psr-4": {

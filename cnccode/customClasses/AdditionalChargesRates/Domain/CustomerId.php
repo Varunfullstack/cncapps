@@ -2,8 +2,8 @@
 
 namespace CNCLTD\AdditionalChargesRates\Domain;
 
-use CNCLTD\shared\core\ValueObject;
-use CNCLTD\shared\core\ValueObjectCompare;
+use CNCLTD\shared\Domain\ValueObject;
+use CNCLTD\shared\Domain\ValueObjectCompare;
 
 class CustomerId implements ValueObject
 {

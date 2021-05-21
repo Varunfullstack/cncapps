@@ -11,7 +11,7 @@
                 <tableExists tableName="additionalChargeRate"/>
             </not>
         </preConditions>
-        <createTable tableName="additionalChargeRage">
+        <createTable tableName="additionalChargeRate">
             <column name="id" type="char(36)">
                 <constraints primaryKey="true" nullable="false"/>
             </column>

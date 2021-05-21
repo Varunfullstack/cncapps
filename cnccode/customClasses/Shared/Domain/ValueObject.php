@@ -1,6 +1,6 @@
 <?php
 
-namespace CNCLTD\shared\core;
+namespace CNCLTD\Shared\Domain;
 interface ValueObject
 {
     public function value();
