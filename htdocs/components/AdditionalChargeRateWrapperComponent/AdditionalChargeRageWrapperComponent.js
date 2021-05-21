@@ -11,7 +11,6 @@ export function AdditionalChargeRateWrapperComponent() {
     )
 }
 
-
 document.addEventListener('DOMContentLoaded', () => {
     const domContainer = document.getElementById('AdditionalChargeRateContainer')
     ReactDOM.render(React.createElement(AdditionalChargeRateWrapperComponent,), domContainer);
