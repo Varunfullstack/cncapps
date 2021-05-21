@@ -672,7 +672,7 @@ class CTUser extends CTCNC
         );
         // manager selection
         $dbeManager = new DBEUser($this);
-        $dbeManager->getRows();
+        $dbeManager->getActiveUsers();
         $this->template->set_block(
             'UserEdit',
             'managerBlock',

@@ -1200,7 +1200,7 @@ class CTActivity extends CTCNC
     {
         // user selection
         $dbeUser = new DBEUser($this);
-        $dbeUser->getRows();
+        $dbeUser->getActiveUsers();
         $this->template->set_block(
             $templateName,
             'userBlock',

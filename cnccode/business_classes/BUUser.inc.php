@@ -51,7 +51,7 @@ class BUUser extends Business
     {
         $this->setMethodName('getAllUsers');
         $dbeUser = new DBEUser($this);
-        $dbeUser->getRows();
+        $dbeUser->getActiveUsers();
         return ($this->getData(
             $dbeUser,
             $dsResults

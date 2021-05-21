@@ -163,25 +163,7 @@ class BUSalesOrder extends Business
         }
 
     }
-
-    /**
-     * Get all users
-     * @parameter DataSet &$dsResults results
-     * @param $dsResults
-     * @return bool : Success
-     * @access public
-     */
-    function getAllUsers(&$dsResults)
-    {
-        $this->setMethodName('getAllUsers');
-        $dbeUser = new DBEUser($this);
-        $dbeUser->getRows();
-        return ($this->getData(
-            $dbeUser,
-            $dsResults
-        ));
-    }
-
+    
     /**
      * Get one users
      * @parameter integer $userID user
