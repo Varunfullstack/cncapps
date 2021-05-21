@@ -144,7 +144,7 @@ class DBEJRenQuotation extends DBECustomerItem
         $ret = (parent::getRow());
     }
 
-    function getRows($orderBy = false,
+    function getRows($sortColumn = false,
                      $orderAscending = true
     )
     {
@@ -161,8 +161,8 @@ class DBEJRenQuotation extends DBECustomerItem
         declinedFlag = 'N'
         AND renewalTypeID = 3";
 
-        if ($orderBy) {
-            $statement .= " ORDER BY $orderBy";
+        if ($sortColumn) {
+            $statement .= " ORDER BY $sortColumn";
             $statement .= $orderAscending ? ' asc' : ' desc';
         } else {
             $statement .= " ORDER BY cus_name";

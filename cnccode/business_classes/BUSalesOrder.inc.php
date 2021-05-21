@@ -1582,7 +1582,7 @@ class BUSalesOrder extends Business
             $this->raiseError('order not found');
         }
         $dbeOrdlinePO = new DBEOrdlinePO($this);
-        $dbeOrdlinePO->getRows($ordheadID);
+        $dbeOrdlinePO->getRowsReadyForGenerationOfPurchaseOrders($ordheadID);
         return ($this->getData(
             $dbeOrdlinePO,
             $dsOrdline

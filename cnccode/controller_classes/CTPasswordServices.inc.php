@@ -108,7 +108,7 @@ class CTPasswordServices extends CTCNC
     function getPasswordServices(){
         
         $dbePasswordService = new DBEPasswordService($this);
-        $dbePasswordService->getRows(DBEPasswordService::sortOrder);       
+        $dbePasswordService->getRows(DBEPasswordService::sortOrder);
         $data = [];
         while ($dbePasswordService->fetchNext()) {
             $passwordServiceID = $dbePasswordService->getValue(DBEPasswordService::passwordServiceID);

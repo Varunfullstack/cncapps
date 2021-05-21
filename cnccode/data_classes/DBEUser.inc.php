@@ -426,16 +426,17 @@ class DBEUser extends DBEntity
         return $this->getValue(DBEUser::username) . '@' . CONFIG_PUBLIC_DOMAIN;
     }
 
-    function getRows($activeOnly = true)
+    function getRows($sortColumn = 'firstName, lastName', $orderDirection = '')
     {
 
         $this->setMethodName("getRows");
         $queryString = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName(
             ) . " JOIN team ON team.teamID = consultant.teamID";
-        if ($activeOnly) {
-            $queryString .= ' WHERE consultant.activeFlag = "Y"';
+        if ($sortColumn) {
+            $queryString .= " order by $sortColumn";
         }
-        $queryString .= ' ORDER BY firstName, lastName';
+
+
         $this->setQueryString($queryString);
         return (parent::getRows());
     }

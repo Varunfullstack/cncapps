@@ -208,7 +208,7 @@ class CTCurrentActivityReport extends CTCNC
     function getAllocatedUsers()
     {
         $dbeUser = new DBEUser($this);
-        $dbeUser->getRows('firstName');
+        $dbeUser->getRows();
         $allocatedUser = array();
         while ($dbeUser->fetchNext()) {
 

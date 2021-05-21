@@ -1,6 +1,5 @@
 <?php /** @noinspection ALL */
 /** @noinspection HtmlDeprecatedAttribute */
-
 /**
  * Call activity business class
  *
@@ -9570,7 +9569,7 @@ class BUActivity extends Business
             ) || $date->format('N') > 5) {
             return; // ignore holidays
         }
-        $this->dbeUser->getRows(true);
+        $this->dbeUser->getActiveUsers();
         while ($this->dbeUser->fetchNext()) {
             $this->createUserTimeLogRecord(
                 $this->dbeUser->getValue(DBEUser::userID),

@@ -152,11 +152,11 @@ class DBEJRenContract extends DBECustomerItem
       ";
     }
 
-    function getRows($orderBy = false)
+    function getRows($sortColumn = false)
     {
         $statement = $this->getBaseQuery() . " WHERE declinedFlag = 'N' AND renewalTypeID = 2";
-        if ($orderBy) {
-            $statement .= " ORDER BY $orderBy";
+        if ($sortColumn) {
+            $statement .= " ORDER BY $sortColumn";
         } else {
             $statement .= " ORDER BY cus_name";
         }
