@@ -2,9 +2,10 @@
 
 namespace CNCLTD\Controller;
 
+use CTCNC;
 use Exception;
 
-class CTAdditionalChargeRate extends \CTCNC
+class CTAdditionalChargeRate extends CTCNC
 {
 
     /**
