@@ -1,0 +1,22 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.2.xsd">
+    <changeSet author="pavwebdev" id="hotfix-v5.11.6-0">
+        <tagDatabase tag="hotfix-v5.11.6"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="hotfix-v5.11.6-1">
+        <sql>
+            drop function if exists getLoggedTimeAvg;
+        </sql>
+        <sqlFile endDelimiter="#" path="/getLoggedTimeAvgFunction.sql" stripComments="true"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="hotfix-v5.11.6-2">
+        <sql>
+            drop function if exists getLoggedTimeTotal;
+        </sql>
+        <sqlFile endDelimiter="#" path="/getLoggedTimeTotalFunction.sql" stripComments="true"/>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>

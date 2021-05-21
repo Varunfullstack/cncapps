@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.11.7] - 2021-05-21
+### Fixed
+- Fixed issue with Daily Stats and performance stats.
+
 ## [v5.11.6] - 2021-05-21
 ### Fixed
 - Fixed issue with OffsiteBackupStatus when doing "check now" on a suspended server.

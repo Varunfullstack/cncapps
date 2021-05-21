@@ -332,7 +332,7 @@ class BUUser extends Business
                         ON user_time_log.`loggedDate` = limited.loggedDate 
                       LEFT JOIN `consultant` 
                         ON userID = consultant.`cns_consno` 
-                    WHERE teamLevel = ?  AND DAYOFWEEK(user_time_log.loggedDate) not in (1,7)
+                    WHERE teamLevel = ?  AND not isBankHoliday(loggedDate)
                       ";
         if ($hideExcluded) {
             $query .= ' and consultant.excludeFromStatsFlag <> "Y"';
@@ -432,7 +432,7 @@ FROM
 WHERE userID = $engineerID 
   AND loggedDate >= '" . $startDate->format('Y-m-d') . "' 
   AND loggedDate <= '" . $endDate->format('Y-m-d') . "' 
-  AND DAYOFWEEK(loggedDate) not in (1,7)
+  AND not isBankHoliday(loggedDate)
 ORDER BY user_time_log.`loggedDate` DESC 
         ";
         $db->query($query);
@@ -467,7 +467,7 @@ ORDER BY user_time_log.`loggedDate` DESC
           loggedDate >= DATE_SUB( DATE( NOW() ), INTERVAL $days DAY )
           AND loggedDate < DATE( NOW() )
           AND userID = $userID 
-          AND DAYOFWEEK(loggedDate) not in (1,7)
+          AND not isBankHoliday(loggedDate)
       GROUP BY cns_consno"
         );
         $db->next_record();
@@ -494,7 +494,7 @@ ORDER BY user_time_log.`loggedDate` DESC
       WHERE
           loggedDate >= ? and loggedDate <= ?
           AND userID = ?    
-          AND DAYOFWEEK(loggedDate) not in (1,7)
+          AND not isBankHoliday(loggedDate)
       GROUP BY cns_consno",
             [
                 [
