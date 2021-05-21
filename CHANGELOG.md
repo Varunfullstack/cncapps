@@ -1,11 +1,12 @@
 # Changelog
 This project changes will be shown here.
 
-## [v5.11.5]
+## [v5.11.5] - 2021-05-21
 ### Fixed
-- Fix issue with RequestDashboard 
+- Fixed issue with RequestDashboard.
+- Fixed several warnings that show up in the error log.
 
-## [v5.11.4]
+## [v5.11.4] - 2021-05-20
 ### Changed
 - Change createSalesRequest button to Submit.
 - Make "Other Request" option the default one, and enforce an option to be selected to continue.
