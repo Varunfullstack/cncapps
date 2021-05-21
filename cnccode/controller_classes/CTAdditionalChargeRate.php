@@ -5,6 +5,9 @@ namespace CNCLTD\Controller;
 use CTCNC;
 use Exception;
 
+global $cfg;
+require_once($cfg['path_ct'] . '/CTCNC.inc.php');
+
 class CTAdditionalChargeRate extends CTCNC
 {
 
@@ -63,8 +66,8 @@ class CTAdditionalChargeRate extends CTCNC
         $this->setTemplateFiles(
             array('AdditionalChargeRateReact' => 'AdditionalChargeRateReact')
         );
-        $this->loadReactScript('AdditionalChargeRateWrapper.js');
-        $this->loadReactCSS('AdditionalChargeRateReactWrapper.css');
+        $this->loadReactScript('AdditionalChargeRateWrapperComponent.js');
+        $this->loadReactCSS('AdditionalChargeRateWrapperComponent.css');
         $this->template->parse('CONTENTS', 'AdditionalChargeRateReact', true);
         $this->parsePage();
     }
