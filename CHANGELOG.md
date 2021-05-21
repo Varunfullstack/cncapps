@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.11.5]
+### Fixed
+- Fix issue with RequestDashboard 
+
 ## [v5.11.4]
 ### Changed
 - Change createSalesRequest button to Submit.
