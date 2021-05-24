@@ -6,6 +6,7 @@ use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequest;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestRepository;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestServiceRequestId;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestTokenId;
+use CNCLTD\Data\DBConnect;
 use CNCLTD\Exceptions\AdditionalHoursRequestedInvalidValueException;
 use CNCLTD\Exceptions\ChargeableWorkCustomerRequestForServiceRequestAlreadyExists;
 use CNCLTD\Exceptions\ChargeableWorkCustomerRequestNotFoundException;
@@ -27,7 +28,7 @@ class ChargeableWorkCustomerRequestMySQLRepository implements ChargeableWorkCust
      */
     public function __construct()
     {
-        $this->dbInstance = \DBConnect::instance()->getDB();
+        $this->dbInstance = DBConnect::instance()->getDB();
 
     }
 

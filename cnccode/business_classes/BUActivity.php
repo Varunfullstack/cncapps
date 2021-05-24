@@ -53,7 +53,6 @@ use DateInterval;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
-use DBConnect;
 use DBECallActivity;
 use DBECallActivitySearch;
 use DBECallActType;
@@ -95,6 +94,7 @@ use Template;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
+use CNCLTD\Data\DBConnect;
 
 global $cfg;
 require_once($cfg ["path_gc"] . "/Business.inc.php");
@@ -129,7 +129,7 @@ require_once($cfg["path_dbe"] . "/DBEPendingReopened.php");
 require_once($cfg['path_dbe'] . '/DBECallDocumentWithoutFile.php');
 require_once($cfg["path_ct"] . "/CTProject.inc.php");
 require_once($cfg ["path_bu"] . "/BUProblemRaiseType.inc.php");
-require_once($cfg["path_dbe"] . "/DBConnect.php");
+
 
 class BUActivity extends Business
 {

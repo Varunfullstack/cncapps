@@ -7,6 +7,7 @@ use CNCLTD\ChargeableWorkCustomerRequest\usecases\GetPendingToProcessChargeableR
 use CNCLTD\ChargeableWorkCustomerRequest\usecases\RejectPendingChargeableWorkCustomerRequest;
 use CNCLTD\CustomerFeedback;
 use CNCLTD\CustomerFeedbackRepository;
+use CNCLTD\Data\DBConnect;
 use CNCLTD\Exceptions\ChargeableWorkCustomerRequestNotFoundException;
 use CNCLTD\Exceptions\ContactNotFoundException;
 use CNCLTD\FeedbackTokenGenerator;
@@ -195,7 +196,7 @@ WHERE
                         ["type" => "s", "value" => $startDate->format(DATE_MYSQL_DATE)],
                         ["type" => "s", "value" => $endDate->format(DATE_MYSQL_DATE)],
                     ];
-                    $query = "
+                    $query  = "
 
 SELECT
   priorities.*,

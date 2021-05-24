@@ -7,6 +7,7 @@ use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestToken
 use CNCLTD\ChargeableWorkCustomerRequest\infra\ChargeableWorkCustomerRequestMySQLRepository;
 use CNCLTD\ChargeableWorkCustomerRequest\usecases\CreateChargeableWorkCustomerRequest;
 use CNCLTD\ChargeableWorkCustomerRequest\usecases\GetPendingToProcessChargeableRequestInfo;
+use CNCLTD\Data\DBConnect;
 use CNCLTD\Exceptions\APIException;
 use CNCLTD\Exceptions\ChargeableWorkCustomerRequestNotFoundException;
 use CNCLTD\Exceptions\JsonHttpException;
@@ -1850,6 +1851,15 @@ AND c.caa_problemno = ? ',
                 );
                 $deleteActivityStatement                    = $db->preparedQuery(
                     'delete from callactivity where caa_problemno = ? ',
+                    [
+                        [
+                            "type"  => "i",
+                            "value" => $serviceRequestId
+                        ]
+                    ]
+                );
+                $deleteServiceRequestStatement              = $db->preparedQuery(
+                    'delete from problem where pro_problemno = ?',
                     [
                         [
                             "type"  => "i",

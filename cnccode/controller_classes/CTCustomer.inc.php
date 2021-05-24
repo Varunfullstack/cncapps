@@ -8,6 +8,7 @@
  */
 
 use CNCLTD\Business\BUActivity;
+use CNCLTD\Data\DBConnect;
 use CNCLTD\Data\DBEJProblem;
 use CNCLTD\Encryption;
 use CNCLTD\SupportedCustomerAssets\UnsupportedCustomerAssetService;
@@ -28,7 +29,6 @@ require_once($cfg["path_bu"] . "/BURenHosting.inc.php");
 require_once($cfg["path_bu"] . "/BUExternalItem.inc.php");
 require_once($cfg["path_bu"] . "/BUCustomerItem.inc.php");
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
-require_once($cfg["path_dbe"] . "/DBConnect.php");
 // Parameters
 define(
     'CTCUSTOMER_VAL_NONE_SELECTED',

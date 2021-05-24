@@ -6,6 +6,9 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use CNCLTD\Data\DBConnect;
+
 global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUProject.inc.php');
@@ -1040,25 +1043,23 @@ class CTProjects extends CTCNC
         }
         //return    $params;
         $projects = DBConnect::fetchAll($query, $params);
-        for($i=0;$i<count($projects); $i++)
-        {
-            $inHoursBudget            = "??";
-            $inHoursUsed              = "??";
-            $outHoursBudget           = "??";
-            $outHoursUsed             = "??";
+        for ($i = 0; $i < count($projects); $i++) {
+            $inHoursBudget  = "??";
+            $inHoursUsed    = "??";
+            $outHoursBudget = "??";
+            $outHoursUsed   = "??";
             if ($projects[$i]['calculatedBudget'] == 'Y') {
-                $hoursUsed      = $this->calculateInHoursOutHoursUsed($projects[$i]['projectID']);
-                $inHoursBudget  = $projects[$i]['inHoursBudgetDays'];
-                $inHoursUsed    = $hoursUsed['inHoursUsed'];
-                $outHoursBudget = $projects[$i]['outOfHoursBudgetDays'];
-                $outHoursUsed   = $hoursUsed['outHoursUsed'];
-                $projects[$i]["inHoursBudget"]= $inHoursBudget;
-                $projects[$i]["inHoursUsed"]= $inHoursUsed;
-                $projects[$i]["outHoursBudget"]= $outHoursBudget;
-                $projects[$i]["outHoursUsed"]= $outHoursUsed;
-             }
+                $hoursUsed                      = $this->calculateInHoursOutHoursUsed($projects[$i]['projectID']);
+                $inHoursBudget                  = $projects[$i]['inHoursBudgetDays'];
+                $inHoursUsed                    = $hoursUsed['inHoursUsed'];
+                $outHoursBudget                 = $projects[$i]['outOfHoursBudgetDays'];
+                $outHoursUsed                   = $hoursUsed['outHoursUsed'];
+                $projects[$i]["inHoursBudget"]  = $inHoursBudget;
+                $projects[$i]["inHoursUsed"]    = $inHoursUsed;
+                $projects[$i]["outHoursBudget"] = $outHoursBudget;
+                $projects[$i]["outHoursUsed"]   = $outHoursUsed;
+            }
         }
-        
         return $projects;
     }
 

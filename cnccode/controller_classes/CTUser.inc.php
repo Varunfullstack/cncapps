@@ -7,6 +7,7 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
+use CNCLTD\Data\DBConnect;
 use CNCLTD\Encryption;
 
 global $cfg;

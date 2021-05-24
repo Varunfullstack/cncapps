@@ -5,9 +5,11 @@
  * Date: 30/03/2018
  * Time: 11:10
  */
+
+use CNCLTD\Data\DBConnect;
+
 global $cfg;
 require_once __DIR__ . '/DBECallActivity.inc.php';
-require_once($cfg["path_dbe"] . "/DBConnect.php");
 
 /*
 * Call activity join
@@ -65,9 +67,9 @@ class DBEJCallActivity extends DBECallActivity
     const queueNo                             = "queueNo";
     const caaConsno                           = "caa_consno";
     const assetName                           = "assetName";
-    const assetTitle          = "assetTitle";
-    const emptyAssetReason    = "emptyAssetReason";
-    const emailSubjectSummary = "emailSubjectSummary";
+    const assetTitle                          = "assetTitle";
+    const emptyAssetReason                    = "emptyAssetReason";
+    const emailSubjectSummary                 = "emailSubjectSummary";
     const prePayChargeApproved                = "prePayChargeApproved";
 
     var $fromString;

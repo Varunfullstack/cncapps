@@ -3,6 +3,7 @@ global $cfg;
 
 use CNCLTD\Business\BUActivity;
 use CNCLTD\Data\CallBackStatus;
+use CNCLTD\Data\DBConnect;
 use CNCLTD\Data\DBEJProblem;
 use CNCLTD\Exceptions\JsonHttpException;
 use CNCLTD\SDManagerDashboard\ServiceRequestSummaryDTO;
@@ -10,7 +11,6 @@ use CNCLTD\SDManagerDashboard\ServiceRequestSummaryDTO;
 require_once($cfg['path_ct'] . '/CTCurrentActivityReport.inc.php');
 require_once($cfg['path_bu'] . '/BUSecondSite.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
-require_once($cfg["path_dbe"] . "/DBConnect.php");
 
 class CTSDManagerDashboard extends CTCurrentActivityReport
 {
@@ -619,8 +619,8 @@ WHERE pro_custno <> 282
         $groupBy = " group by pro_consno";
         $params  = [];
         if ($queue) {
-            $select          = "select pro_consno id, SUM((pro_consno IS NULL AND pro_queue_no = :queue) OR pro_consno IS NOT NULL) total";
-            $where           = " where 1 ";
+            $select          = "select pro_consno id, SUM((pro_consno IS NULL) OR pro_consno IS NOT NULL) total";
+            $where           = " where pro_queue_no = :queue ";
             $params["queue"] = $queue;
         }
         switch ($option) {

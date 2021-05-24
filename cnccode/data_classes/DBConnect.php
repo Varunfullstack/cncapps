@@ -6,6 +6,11 @@
  * Time: 8:48
  */
 
+namespace CNCLTD\Data;
+
+use PDO;
+use PDOException;
+
 class DBConnect
 {
     /**

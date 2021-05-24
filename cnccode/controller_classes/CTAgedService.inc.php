@@ -7,6 +7,7 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
+use CNCLTD\Data\DBConnect;
 use Html2Text\Html2Text;
 
 global $cfg;
@@ -15,7 +16,6 @@ require_once($cfg ['path_bu'] . '/BUDailyReport.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg["path_bu"] . "/BUHeader.inc.php");
-require_once($cfg["path_dbe"] . "/DBConnect.php");
 
 class CTAgedService extends CTCNC
 {
@@ -125,7 +125,7 @@ class CTAgedService extends CTCNC
                 )
             );
             $description = (new Html2Text($description))->getText();
-            $data [] = [
+            $data []     = [
                 'customer'         => $customer,
                 'serviceRequestID' => $serviceRequestId,
                 'assignedTo'       => $assignedTo,

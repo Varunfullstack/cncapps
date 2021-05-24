@@ -9,6 +9,8 @@
 global $cfg;
 
 use CNCLTD\Business\BUActivity;
+use CNCLTD\ChildItem\ChildItemRepository;
+use CNCLTD\Data\DBConnect;
 use CNCLTD\Exceptions\JsonHttpException;
 
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
@@ -1019,7 +1021,7 @@ class CTSalesOrder extends CTCNC
                         $dsOrdline,
                         $dsCustomer
                     );
-                } catch (\Exception $exception) {
+                } catch (Exception $exception) {
                     $this->displayFatalError($exception->getMessage());
                 }
             } else {
@@ -2896,7 +2898,7 @@ class CTSalesOrder extends CTCNC
         try {
             $updatedTime = $this->buSalesOrder->deleteLines($data['selectedLines']);
             echo json_encode(["status" => "ok", "updatedTime" => $updatedTime]);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw new JsonHttpException(500, $exception->getMessage());
         }
     }
@@ -2934,7 +2936,7 @@ class CTSalesOrder extends CTCNC
                 $data['selectedLines']
             );
             echo json_encode(["status" => "ok"]);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw new JsonHttpException(500, $exception->getMessage());
         }
     }
@@ -3952,7 +3954,7 @@ class CTSalesOrder extends CTCNC
             if ($this->dsOrdline->getValue(DBEOrdline::lineType) == 'I') {
                 global $db;
                 $itemID              = $this->dsOrdline->getValue(DBEOrdline::itemID);
-                $childItemRepository = new \CNCLTD\ChildItem\ChildItemRepository($db);
+                $childItemRepository = new ChildItemRepository($db);
                 $childItems          = $childItemRepository->getChildItemsForItem($itemID);
                 $oneOffRowCount      = 1;
                 $recurringRowCount   = 1;

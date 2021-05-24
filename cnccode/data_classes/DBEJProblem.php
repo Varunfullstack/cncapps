@@ -466,7 +466,8 @@ class DBEJProblem extends DBEProblem
            LEFT JOIN consultant ON cns_consno = pro_consno
 
           JOIN callactivity `initial`
-            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID . " JOIN callactivity `last`
+            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID . " 
+          JOIN callactivity `last`
             ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
               (
               SELECT

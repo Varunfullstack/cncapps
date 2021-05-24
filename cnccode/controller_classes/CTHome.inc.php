@@ -8,6 +8,7 @@
  */
 global $cfg;
 
+use CNCLTD\Data\DBConnect;
 use CNCLTD\Exceptions\JsonHttpException;
 use CNCLTD\Utils;
 

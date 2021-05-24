@@ -8,6 +8,7 @@
  */
 
 use CNCLTD\ChildItem\ChildItemRepository;
+use CNCLTD\Data\DBConnect;
 use CNCLTD\Exceptions\APIException;
 use CNCLTD\Exceptions\JsonHttpException;
 
