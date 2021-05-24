@@ -4,6 +4,7 @@ import './table.css';
 import TableHeader from "./tableHeader.js";
 import TableBody from "./tableBody.js";
 import TableFooter from "./tableFooter.js";
+import PropTypes from "prop-types";
 
 /**
  * -- main properties
@@ -28,6 +29,7 @@ import TableFooter from "./tableFooter.js";
  * onOrderChange Event fire on row order changed and return current and next element
  * searchControls add other search control after search element
  */
+
 class Table extends React.Component {
     delayTimer;
 
@@ -223,7 +225,7 @@ class Table extends React.Component {
             el("table", {
                 key: "table" + this.props.id,
                 id: "table" + this.props.id,
-                className: "table " + striped,
+                className: "table  " + striped +" "+ (this.props.hover===false?"":"table-hover"),
                 
             }, [
                 el(TableHeader, {
@@ -248,6 +250,9 @@ class Table extends React.Component {
             );
     }
 }
-
+Table.propTypes={
+    defaultSortPath:PropTypes.string,
+    defaultSortOrder:PropTypes.string,
+}
 export default Table;
 
