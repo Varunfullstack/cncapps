@@ -9,8 +9,6 @@ class AdditionalChargeRate
     protected $notes;
     /** @var SalePrice */
     protected $salePrice;
-    /** @var CustomerSpecificPriceAllowed */
-    protected $customerSpecificPriceAllowed;
     /**
      * @var SpecificCustomerPrice[]
      */
@@ -23,26 +21,23 @@ class AdditionalChargeRate
     public function __construct(AdditionalChargeRateId $id,
                                 Description $description,
                                 Notes $notes,
-                                SalePrice $salePrice,
-                                CustomerSpecificPriceAllowed $customerSpecificPriceAllowed
+                                SalePrice $salePrice
     )
     {
-        $this->id                           = $id;
-        $this->description                  = $description;
-        $this->notes                        = $notes;
-        $this->salePrice                    = $salePrice;
-        $this->customerSpecificPriceAllowed = $customerSpecificPriceAllowed;
-        $this->specificCustomerPrices       = [];
+        $this->id                     = $id;
+        $this->description            = $description;
+        $this->notes                  = $notes;
+        $this->salePrice              = $salePrice;
+        $this->specificCustomerPrices = [];
     }
 
     public static function create(Description $description,
                                   Notes $notes,
-                                  SalePrice $salePrice,
-                                  CustomerSpecificPriceAllowed $customerSpecificPriceAllowed
+                                  SalePrice $salePrice
     ): AdditionalChargeRate
     {
         return new self(
-            AdditionalChargeRateId::create(), $description, $notes, $salePrice, $customerSpecificPriceAllowed
+            AdditionalChargeRateId::create(), $description, $notes, $salePrice
         );
     }
 
@@ -76,22 +71,6 @@ class AdditionalChargeRate
     public function salePrice(): SalePrice
     {
         return $this->salePrice;
-    }
-
-    public function isCustomerSpecificPriceAllowed(): bool
-    {
-        return $this->customerSpecificPriceAllowed->value();
-    }
-
-    public function allowCustomerSpecificPrice()
-    {
-        $this->customerSpecificPriceAllowed = new CustomerSpecificPriceAllowed(true);
-    }
-
-    public function disallowCustomerSpecificPrice()
-    {
-        $this->customerSpecificPriceAllowed = new CustomerSpecificPriceAllowed(false);
-        $this->specificCustomerPrices       = [];
     }
 
     public function addCustomerPrice(CustomerId $customerId, SalePrice $salePrice)

@@ -21,7 +21,7 @@ class AddAdditionalChargeRateUseCase
 
     }
 
-    public function __invoke()
+    public function __invoke(AddAdditionalChargeRateRequest $addAdditionalChargeRateRequest)
     {
         // TODO: Implement __invoke() method.
     }

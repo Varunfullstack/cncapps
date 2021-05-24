@@ -62,41 +62,40 @@ export class Modal extends React.Component {
 
         if (width) maxWidth = width;
         if (show) {
-            return el("div", {key: "myModal", className, id: 'modal'}, [
-                el(
-                    "div",
-                    {
+            return (
+                <div key="myModal" className={className} id="modal">
+                    <div key="modalContent" className={!startDrag ? "modal-content undraggable" : " modal-content"}
+                         style={{maxWidth}}>
+                        <div key="modalHeader" className="modal-header" onMouseMove={this.handleMouseMove}>
+                            <span
+                                key="spanClose"
+                                className="close fa fa-times"
+                                onClick={handleClose}
+                                style={{color: "#FFFFFF"}}>
+                            </span>
+                            <label key="header" className="modal-title">{title}</label>
 
-                        key: "modalContent",
-                        className: !startDrag ? "modal-content undraggable" : " modal-content",
-                        style: {maxWidth},
+                        </div>
+                        <div
+                            key="modalbody"
+                            className="modal-body"
+                            onMouseMove={this.handleContainerMouseMove}
+                        >
+                            {content ? content : null}
 
-                    },
-                    [
-                        el("div", {key: "modalHeader", className: "modal-header", onMouseMove: this.handleMouseMove}, [
-                            el("span", {
-                                key: "spanClose",
-                                className: "close fa fa-times",
-                                onClick: handleClose,
-                                style: {color: "#FFFFFF"}
-                            }),
-                            el("label", {key: "header", className: "modal-title"}, title),
-                        ]),
-                        el("div", {
-                            key: "modalbody",
-                            className: "modal-body",
-                            onMouseMove: this.handleContainerMouseMove
-                        }, [
-                            content ? content : null,
-                        ]),
-                        footer
-                            ? el("div", {key: "modalFooter", className: "modal-footer"}, [
-                                footer,
-                            ])
-                            : null,
-                    ]
-                ),
-            ]);
+                        </div>
+                        {
+                            footer
+                                ? <div key="modalFooter"
+                                       className="modal-footer"
+                                >{footer}
+                                </div>
+                                : null
+                        }
+                    </div>
+
+                </div>
+            )
         } else return null;
     }
 }

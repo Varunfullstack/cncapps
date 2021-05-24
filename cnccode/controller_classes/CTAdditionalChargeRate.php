@@ -2,11 +2,18 @@
 
 namespace CNCLTD\Controller;
 
+use CNCLTD\AdditionalChargesRates\Application\Add\AddAdditionalChargeRateRequest;
 use CNCLTD\AdditionalChargesRates\Application\GetAll\GetAllAdditionalChargeRatesQuery;
 use CNCLTD\AdditionalChargesRates\Application\GetAll\GetAllAdditionalChargeRatesResponse;
+use CNCLTD\AdditionalChargesRates\Application\GetOne\GetOneAdditionalChargeRateResponse;
+use CNCLTD\AdditionalChargesRates\Application\GetOne\GetOneAdditionalChargeRatesQuery;
+use CNCLTD\Exceptions\JsonHttpException;
 use CNCLTD\Shared\Domain\Bus\QueryBus;
 use CTCNC;
 use Exception;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
@@ -14,6 +21,8 @@ require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 class CTAdditionalChargeRate extends CTCNC
 {
     const GET_ADDITIONAL_CHARGE_RATES = 'getAdditionalChargeRates';
+    const GET_BY_ID                   = 'getById';
+    const ADD                         = 'add';
     /**
      * @var QueryBus
      */
@@ -46,6 +55,16 @@ class CTAdditionalChargeRate extends CTCNC
                 echo json_encode($this->getAdditionalChargeRagesController());
                 break;
             }
+            case self::GET_BY_ID:
+            {
+                echo json_encode($this->getAdditionalChargeRateByIdController());
+                break;
+            }
+            case self::ADD:
+            {
+                echo json_encode($this->addController());
+                break;
+            }
             default:
                 $this->displayReactApp();
                 break;
@@ -70,6 +89,43 @@ class CTAdditionalChargeRate extends CTCNC
         /** @var GetAllAdditionalChargeRatesResponse $response */
         $response = $this->queryBus->ask(new GetAllAdditionalChargeRatesQuery());
         return ["status" => "ok", "data" => $response->additionalChargesRates()];
+    }
+
+    private function getAdditionalChargeRateByIdController()
+    {
+        $id = @$_REQUEST['id'];
+        if (!$id) {
+            throw new JsonHttpException(400, 'ID is required');
+        }
+        /** @var GetOneAdditionalChargeRateResponse $response */
+        $response = $this->queryBus->ask(new GetOneAdditionalChargeRatesQuery($id));
+        return ["status" => "ok", "data" => $response];
+    }
+
+    private function addController()
+    {
+
+        $request              = new AddAdditionalChargeRateRequest($this->getBody(true));
+        $validationViolations = $request->validate();
+        if ($validationViolations->count()) {
+            $this->throwValidationErrors($validationViolations);
+        }
+
+
+    }
+
+    protected function throwValidationErrors(ConstraintViolationListInterface $validationViolations): JsonResponse
+    {
+        $validationErrors = [];
+        /** @var ConstraintViolationInterface $validationViolation */
+        foreach ($validationViolations as $validationViolation) {
+            $validationErrors[] = [
+                "field"   => $validationViolation->getPropertyPath(),
+                "message" => $validationViolation->getMessage(),
+                "code"    => $validationViolation->getCode()
+            ];
+        }
+        throw new JsonHttpException(400, 'Validation Failed', $validationErrors);
     }
 
 }

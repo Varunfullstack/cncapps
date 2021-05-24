@@ -37,7 +37,8 @@
         "html2text/html2text": "^4.3",
         "ramsey/uuid": "^4.1",
         "symfony/messenger": "^5.2",
-        "lambdish/phunctional": "^2.1"
+        "lambdish/phunctional": "^2.1",
+        "symfony/validator": "^5.2"
     },
     "autoload": {
         "psr-4": {

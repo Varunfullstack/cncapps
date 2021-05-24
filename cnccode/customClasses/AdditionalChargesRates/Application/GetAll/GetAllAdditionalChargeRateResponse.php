@@ -19,10 +19,6 @@ class GetAllAdditionalChargeRateResponse implements \JsonSerializable
      */
     private $notes;
     /**
-     * @var bool
-     */
-    private $specificCustomerPricesAllowed;
-    /**
      * @var string
      */
     private $salesPrice;
@@ -34,16 +30,14 @@ class GetAllAdditionalChargeRateResponse implements \JsonSerializable
     public function __construct(string $id,
                                 string $description,
                                 string $salesPrice,
-                                ?string $notes,
-                                bool $specificCustomerPricesAllowed
+                                ?string $notes
     )
     {
 
-        $this->id                            = $id;
-        $this->description                   = $description;
-        $this->notes                         = $notes;
-        $this->specificCustomerPricesAllowed = $specificCustomerPricesAllowed;
-        $this->salesPrice                    = $salesPrice;
+        $this->id          = $id;
+        $this->description = $description;
+        $this->notes       = $notes;
+        $this->salesPrice  = $salesPrice;
     }
 
     /**
@@ -68,14 +62,6 @@ class GetAllAdditionalChargeRateResponse implements \JsonSerializable
     public function notes(): ?string
     {
         return $this->notes;
-    }
-
-    /**
-     * @return bool
-     */
-    public function specificCustomerPricesAllowed(): bool
-    {
-        return $this->specificCustomerPricesAllowed;
     }
 
     /**

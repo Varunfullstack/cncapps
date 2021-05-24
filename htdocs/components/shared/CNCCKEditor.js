@@ -224,6 +224,7 @@ CNCCKEditor.propTypes = {
     readOnly: PropTypes.bool,
     onBeforeLoad: PropTypes.func,
     minCharCount: PropTypes.number,
+    onChange: PropTypes.func
 };
 
 CNCCKEditor.defaultProps = {

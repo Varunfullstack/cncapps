@@ -21,8 +21,7 @@ class GetAllAdditionalChargeRatesResponse implements Response
                 $additionalChargesRate->id()->value(),
                 $additionalChargesRate->description()->value(),
                 $additionalChargesRate->salePrice()->value(),
-                $additionalChargesRate->notes()->value(),
-                $additionalChargesRate->isCustomerSpecificPriceAllowed()
+                $additionalChargesRate->notes()->value()
             );
         }
     }

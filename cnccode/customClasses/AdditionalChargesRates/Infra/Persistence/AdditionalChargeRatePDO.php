@@ -4,7 +4,6 @@ namespace CNCLTD\AdditionalChargesRates\Infra\Persistence;
 
 use CNCLTD\AdditionalChargesRates\Domain\AdditionalChargeRate;
 use CNCLTD\AdditionalChargesRates\Domain\AdditionalChargeRateId;
-use CNCLTD\AdditionalChargesRates\Domain\CustomerSpecificPriceAllowed;
 use CNCLTD\AdditionalChargesRates\Domain\CustomerId;
 use CNCLTD\AdditionalChargesRates\Domain\Description;
 use CNCLTD\AdditionalChargesRates\Domain\InvalidAdditionalChargeRageIdValue;
@@ -26,14 +25,11 @@ class AdditionalChargeRatePDO extends AdditionalChargeRate
             new Description($data['description']),
             new Notes($data['notes']),
             new SalePrice($data['salePrice']),
-            new CustomerSpecificPriceAllowed($data['customerSpecificPriceAllowed'])
         );
-        if ($instance->isCustomerSpecificPriceAllowed()) {
-            foreach ($data['specificCustomerPrices'] as $specificPrice) {
-                $instance->specificCustomerPrices[] = new SpecificCustomerPrice(
-                    new CustomerId($specificPrice['customerId']), new SalePrice($specificPrice['salePrice'])
-                );
-            }
+        foreach ($data['specificCustomerPrices'] as $specificPrice) {
+            $instance->specificCustomerPrices[] = new SpecificCustomerPrice(
+                new CustomerId($specificPrice['customerId']), new SalePrice($specificPrice['salePrice'])
+            );
         }
         return $instance;
     }
