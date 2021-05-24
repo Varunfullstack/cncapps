@@ -21,7 +21,7 @@
             <column name="notes" type="text">
                 <constraints nullable="true"/>
             </column>
-            <column name="salesPrice" type="decimal(10,2)">
+            <column name="salePrice" type="decimal(10,2)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -39,7 +39,7 @@
             <column name="customerId" type="int(11)">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="salesPrice" type="decimal(10,2)">
+            <column name="salePrice" type="decimal(10,2)">
                 <constraints nullable="false"/>
             </column>
         </createTable>

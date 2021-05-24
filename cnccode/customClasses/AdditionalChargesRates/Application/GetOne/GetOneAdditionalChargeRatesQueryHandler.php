@@ -2,6 +2,7 @@
 
 namespace CNCLTD\AdditionalChargesRates\Application\GetOne;
 
+use CNCLTD\AdditionalChargesRates\Domain\AdditionalChargeRateId;
 use CNCLTD\AdditionalChargesRates\Domain\AdditionalChargeRateRepository;
 use CNCLTD\Shared\Domain\Bus\QueryHandler;
 
@@ -22,8 +23,9 @@ class GetOneAdditionalChargeRatesQueryHandler implements QueryHandler
 
     public function __invoke(GetOneAdditionalChargeRatesQuery $query): GetOneAdditionalChargeRateResponse
     {
+
         return GetOneAdditionalChargeRateResponse::fromDomain(
-            $this->repository->ofId(new AdditionalChargeRateId($query->id()))
+            $this->repository->ofId(AdditionalChargeRateId::fromNative($query->id()))
         );
     }
 

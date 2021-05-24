@@ -2,6 +2,7 @@
 
 use CNCLTD\AdditionalChargesRates\Application\GetAll\GetAllAdditionalChargeRatesQuery;
 use CNCLTD\AdditionalChargesRates\Application\GetAll\GetAllAdditionalChargeRatesQueryHandler;
+use CNCLTD\AdditionalChargesRates\Application\GetOne\GetOneAdditionalChargeRatesQueryHandler;
 use CNCLTD\AdditionalChargesRates\Infra\Persistence\AdditionalChargeRatePDORepository;
 use CNCLTD\Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
 use Twig\Environment;
@@ -1533,6 +1534,9 @@ $pdoConnection                  = new PDO(
 );
 $additionalChargeRateRepository = new AdditionalChargeRatePDORepository($pdoConnection);
 $inMemorySymfonyBus             = new InMemorySymfonyQueryBus(
-    [new GetAllAdditionalChargeRatesQueryHandler($additionalChargeRateRepository)]
+    [
+        new GetAllAdditionalChargeRatesQueryHandler($additionalChargeRateRepository),
+        new GetOneAdditionalChargeRatesQueryHandler($additionalChargeRateRepository)
+    ]
 );
-?>
+

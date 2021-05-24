@@ -21,7 +21,7 @@ class GetAllAdditionalChargeRateResponse implements \JsonSerializable
     /**
      * @var string
      */
-    private $salesPrice;
+    private $salePrice;
 
 
     /**
@@ -29,7 +29,7 @@ class GetAllAdditionalChargeRateResponse implements \JsonSerializable
      */
     public function __construct(string $id,
                                 string $description,
-                                string $salesPrice,
+                                string $salePrice,
                                 ?string $notes
     )
     {
@@ -37,7 +37,7 @@ class GetAllAdditionalChargeRateResponse implements \JsonSerializable
         $this->id          = $id;
         $this->description = $description;
         $this->notes       = $notes;
-        $this->salesPrice  = $salesPrice;
+        $this->salePrice  = $salePrice;
     }
 
     /**
@@ -67,9 +67,9 @@ class GetAllAdditionalChargeRateResponse implements \JsonSerializable
     /**
      * @return string
      */
-    public function salesPrice(): string
+    public function salePrice(): string
     {
-        return $this->salesPrice;
+        return $this->salePrice;
     }
 
     public function jsonSerialize()

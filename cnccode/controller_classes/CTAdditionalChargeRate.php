@@ -53,17 +53,17 @@ class CTAdditionalChargeRate extends CTCNC
         switch ($this->getAction()) {
             case self::GET_ADDITIONAL_CHARGE_RATES:
             {
-                echo json_encode($this->getAdditionalChargeRagesController());
+                echo json_encode($this->getAdditionalChargeRagesController(), JSON_NUMERIC_CHECK);
                 break;
             }
             case self::GET_BY_ID:
             {
-                echo json_encode($this->getAdditionalChargeRateByIdController());
+                echo json_encode($this->getAdditionalChargeRateByIdController(), JSON_NUMERIC_CHECK);
                 break;
             }
             case self::ADD:
             {
-                echo json_encode($this->addController());
+                echo json_encode($this->addController(), JSON_NUMERIC_CHECK);
                 break;
             }
             default:

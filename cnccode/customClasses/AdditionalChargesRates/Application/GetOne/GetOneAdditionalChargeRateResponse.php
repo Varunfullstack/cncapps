@@ -4,9 +4,10 @@ namespace CNCLTD\AdditionalChargesRates\Application\GetOne;
 
 use CNCLTD\AdditionalChargesRates\Domain\AdditionalChargeRate;
 use CNCLTD\AdditionalChargesRates\Domain\SpecificCustomerPrice;
+use CNCLTD\Shared\Domain\Bus\Response;
 use function Lambdish\Phunctional\map;
 
-class GetOneAdditionalChargeRateResponse implements \JsonSerializable
+class GetOneAdditionalChargeRateResponse implements \JsonSerializable, Response
 {
     /**
      * @var string
@@ -23,7 +24,7 @@ class GetOneAdditionalChargeRateResponse implements \JsonSerializable
     /**
      * @var string
      */
-    private $salesPrice;
+    private $salePrice;
     /**
      * @var array
      */
@@ -35,7 +36,7 @@ class GetOneAdditionalChargeRateResponse implements \JsonSerializable
      */
     private function __construct(string $id,
                                  string $description,
-                                 string $salesPrice,
+                                 string $salePrice,
                                  ?string $notes,
                                  array $customerSpecificPrices
     )
@@ -44,7 +45,7 @@ class GetOneAdditionalChargeRateResponse implements \JsonSerializable
         $this->id                     = $id;
         $this->description            = $description;
         $this->notes                  = $notes;
-        $this->salesPrice             = $salesPrice;
+        $this->salePrice              = $salePrice;
         $this->customerSpecificPrices = $customerSpecificPrices;
     }
 
@@ -93,9 +94,9 @@ class GetOneAdditionalChargeRateResponse implements \JsonSerializable
     /**
      * @return string
      */
-    public function salesPrice(): string
+    public function salePrice(): string
     {
-        return $this->salesPrice;
+        return $this->salePrice;
     }
 
     /**
