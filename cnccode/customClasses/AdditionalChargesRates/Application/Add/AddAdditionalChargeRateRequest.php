@@ -20,11 +20,12 @@ class AddAdditionalChargeRateRequest
 
     public function validate(): ConstraintViolationListInterface
     {
+
         $constraint = new Assert\Collection(
             [
                 'description'            => [new Assert\NotBlank(), new Assert\Length(['min' => 1, 'max' => 100])],
-                'salePrice'              => [new Assert\NotBlank(), new Assert\Regex('\d+\.\d\d')],
-                'customerSpecificPrices' => new Assert\Optional(
+                'salePrice'              => [new Assert\Type('float')],
+                'specificCustomerPrices' => new Assert\Optional(
                     [
                         new Assert\Type('array'),
                         new Assert\All(
@@ -35,10 +36,7 @@ class AddAdditionalChargeRateRequest
                                             new Assert\NotBlank(),
                                             new Assert\Type('integer')
                                         ],
-                                        'salePrice'  => [
-                                            new Assert\NotBlank(),
-                                            new Assert\Regex('\d+\.\d\d')
-                                        ],
+                                        'salePrice'  => [new Assert\Type('float'),],
                                     ]
                                 )
                             ]
@@ -49,5 +47,30 @@ class AddAdditionalChargeRateRequest
         );
         $validator  = Validation::createValidator();
         return $validator->validate($this->jsonData, $constraint);
+    }
+
+    public function description()
+    {
+        return $this->getDataField('description');
+    }
+
+    public function notes()
+    {
+        return $this->getDataField('notes');
+    }
+
+    private function getDataField($field)
+    {
+        return @$this->jsonData[$field];
+    }
+
+    public function salePrice()
+    {
+        return $this->getDataField('salePrice');
+    }
+
+    public function specificCustomerPrices()
+    {
+        return $this->getDataField('specificCustomerPrices');
     }
 }

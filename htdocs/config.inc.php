@@ -1528,10 +1528,11 @@ $db = new dbSweetcode;
 //$db->query("SET sql_mode = ''");    // strict mode off
 //$pkdb= new dbSweetcode;
 //$db->Debug = DEBUG;        // Turn this on if database debug output needed
-$pdoConnection      = new PDO(
+$pdoConnection                  = new PDO(
     'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8', DB_USER, DB_PASSWORD
 );
-$inMemorySymfonyBus = new InMemorySymfonyQueryBus(
-    [new GetAllAdditionalChargeRatesQueryHandler(new AdditionalChargeRatePDORepository($pdoConnection))]
+$additionalChargeRateRepository = new AdditionalChargeRatePDORepository($pdoConnection);
+$inMemorySymfonyBus             = new InMemorySymfonyQueryBus(
+    [new GetAllAdditionalChargeRatesQueryHandler($additionalChargeRateRepository)]
 );
 ?>

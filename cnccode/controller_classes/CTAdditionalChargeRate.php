@@ -3,6 +3,7 @@
 namespace CNCLTD\Controller;
 
 use CNCLTD\AdditionalChargesRates\Application\Add\AddAdditionalChargeRateRequest;
+use CNCLTD\AdditionalChargesRates\Application\Add\AddAdditionalChargeRateUseCase;
 use CNCLTD\AdditionalChargesRates\Application\GetAll\GetAllAdditionalChargeRatesQuery;
 use CNCLTD\AdditionalChargesRates\Application\GetAll\GetAllAdditionalChargeRatesResponse;
 use CNCLTD\AdditionalChargesRates\Application\GetOne\GetOneAdditionalChargeRateResponse;
@@ -104,14 +105,19 @@ class CTAdditionalChargeRate extends CTCNC
 
     private function addController()
     {
-
+        $jsonData = $this->getBody(true);
+        if (!$jsonData) {
+            throw new JsonHttpException(400, 'Request is invalid');
+        }
         $request              = new AddAdditionalChargeRateRequest($this->getBody(true));
         $validationViolations = $request->validate();
         if ($validationViolations->count()) {
             $this->throwValidationErrors($validationViolations);
         }
-
-
+        global $additionalChargeRateRepository;
+        $usecase = new AddAdditionalChargeRateUseCase($additionalChargeRateRepository);
+        $usecase->__invoke($request);
+        return ["status" => "ok"];
     }
 
     protected function throwValidationErrors(ConstraintViolationListInterface $validationViolations): JsonResponse
