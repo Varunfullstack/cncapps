@@ -118,7 +118,7 @@ class CTGoodsIn extends CTCNC
     {
         switch ($this->getAction()) {
             case CTCNC_ACT_SEARCH:
-                $this->search();
+                echo json_encode($this->search(),JSON_NUMERIC_CHECK);
                 break;
             case CTGOODSIN_ACT_DISP_SEARCH:
                 $this->displaySearchForm();
@@ -130,53 +130,31 @@ class CTGoodsIn extends CTCNC
                 $this->receive();
                 break;
             default:
-                $this->displaySearchForm();
+                $this->displaySearch();
                 break;
         }
         exit;
     }
 
-    /**
-     * Run search based upon passed parameters
-     * Display search form with results
+   /**
+     * Display list of types
      * @access private
      * @throws Exception
      */
-    function search()
-    {
-        $this->setMethodName('search');
-        // remove trailing spaces from params passed
-        foreach ($_REQUEST as $key => $value) {
-            $_REQUEST[$key] = trim($value);
-        }
-        if (($this->getParam('porheadID')) && (!is_numeric($this->getParam('porheadID')))) {
-            $this->setFormErrorMessage('Order no must be numeric');
-        }
-        if (!$this->getFormError()) {
-            $this->buGoodsIn->search(
-                $this->dsPorhead,
-                $this->getParam('supplierID'),
-                $this->getParam('porheadID'),
-                null,
-                null,
-                'B'
-            );
-        }
-        if ($this->dsPorhead->rowCount() == 1) {
-            $this->dsPorhead->fetchNext();
-            $urlNext = Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'    => CTCNC_ACT_DISPLAY_GOODS_IN,
-                    'porheadID' => $this->dsPorhead->getValue(DBEPorhead::porheadID)
-                )
-            );
-            header('Location: ' . $urlNext);
-            exit;
-        } else {
-            $this->setAction(CTGOODSIN_ACT_DISP_SEARCH);
-            $this->displaySearchForm();
-        }
+    function displaySearch()
+    {   
+        $this->setPageTitle('Goods In');
+        $this->setTemplateFiles(
+            array('GoodsInComponent' => 'GoodsInSearch.inc')
+        );
+        $this->loadReactScript('GoodsInComponent.js');
+        $this->loadReactCSS('GoodsInComponent.css');
+        $this->template->parse(
+            'CONTENTS',
+            'GoodsInComponent',
+            true
+        );
+        $this->parsePage();
     }
 
     /**
@@ -525,6 +503,49 @@ class CTGoodsIn extends CTCNC
             header('HTTP/1.1 301 Moved Permanently');
             header('Location: ' . $urlNext);
             exit;
+        }
+    }
+    //-------------------new 
+      /**
+     * Run search based upon passed parameters
+     * Display search form with results
+     * @access private
+     * @throws Exception
+     */
+    function search()
+    {
+        $this->setMethodName('search');
+        // remove trailing spaces from params passed
+        foreach ($_REQUEST as $key => $value) {
+            $_REQUEST[$key] = trim($value);
+        }
+        if (($this->getParam('porheadID')) && (!is_numeric($this->getParam('porheadID')))) {
+            $this->setFormErrorMessage('Order no must be numeric');
+        }
+        if (!$this->getFormError()) {
+            $this->buGoodsIn->search(
+                $this->dsPorhead,
+                $this->getParam('supplierID'),
+                $this->getParam('porheadID'),
+                null,
+                null,
+                'B'
+            );
+        }
+        if ($this->dsPorhead->rowCount() == 1) {
+            $this->dsPorhead->fetchNext();
+            $urlNext = Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'    => CTCNC_ACT_DISPLAY_GOODS_IN,
+                    'porheadID' => $this->dsPorhead->getValue(DBEPorhead::porheadID)
+                )
+            );
+            header('Location: ' . $urlNext);
+            exit;
+        } else {
+            $this->setAction(CTGOODSIN_ACT_DISP_SEARCH);
+            $this->displaySearchForm();
         }
     }
 }
