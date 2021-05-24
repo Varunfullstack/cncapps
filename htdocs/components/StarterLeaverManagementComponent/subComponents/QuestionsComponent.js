@@ -203,7 +203,7 @@ export default class QuestionsComponent extends MainComponent {
       const {customer}=this.state;
       if(customer)
     this.api.getCustomerQuestions(customer.id).then(result=>{
-        console.log(result);
+        //console.log(result);
         this.setState({questions:result.data});
     })
   }

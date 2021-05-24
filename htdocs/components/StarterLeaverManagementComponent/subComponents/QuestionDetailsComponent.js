@@ -5,6 +5,7 @@ import CustomerSearch from "../../shared/CustomerSearch.js";
 import Toggle from "../../shared/Toggle.js";
 import Modal from "../../shared/Modal/modal.js";
 import APIStarterLeaverManagement from "../services/APIStarterLeaverManagement.js";
+import { sort } from "../../utils/utils.js";
 
 export default class QuestionDetailsComponent extends MainComponent {
   api = new APIStarterLeaverManagement();
@@ -90,6 +91,7 @@ export default class QuestionDetailsComponent extends MainComponent {
         this.alert("Option exist")
         else
         data.options.push(optionValue);
+        sort(data.options);        
         this.setState({data,optionValue:""});
     }
     else
@@ -108,8 +110,8 @@ export default class QuestionDetailsComponent extends MainComponent {
         width={600}
         footer={
           <div key="footer" onClose={this.handleCancel}>
-            <button onClick={this.handleCancel}>Cancel</button>
             <button onClick={this.hanldeSave}>Save</button>
+            <button onClick={this.handleCancel}>Cancel</button>
           </div>
         }
         onClose={()=>this.props.onClose(true)}

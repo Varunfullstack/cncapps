@@ -40,7 +40,6 @@ class IgnoredADDomainsComponent extends MainComponent {
   getData = () => {
     this.api.getAllDomains().then(
       (res) => {
-        console.log(res);
         this.setState({ types: res.data });
       },
       (error) => this.alert("Error in loading data")
@@ -128,7 +127,6 @@ class IgnoredADDomainsComponent extends MainComponent {
   };
   getModalElement = () => {
     const { mode, data } = this.state;
-    console.log(data);
     if (!this.state.showModal) return null;
     return (
       <Modal

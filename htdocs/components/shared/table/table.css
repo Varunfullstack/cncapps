@@ -385,10 +385,10 @@
     font-weight: bold;
 }
  
-.table tbody tr:hover {
+.table .table-hover tbody tr:hover {
     color: #000;
     background-color: #93e6ffad !important;
 }
-.table tbody tr i:hover {
+.table .table-hover tbody tr i:hover {
     /* color: #fff;     */
 }

@@ -39,7 +39,6 @@ class RootCauseComponent extends MainComponent {
 
     getData=()=>{
         this.api.getAllTypes().then(res=>{
-          console.log(res);
             this.setState({types:res.data});
         },error=>this.alert("Error in loading data"));
     }
@@ -111,7 +110,6 @@ class RootCauseComponent extends MainComponent {
     }
     getModalElement=()=>{
         const {mode,data}=this.state;
-        console.log(data);
         if(!this.state.showModal)
         return null;
         return (

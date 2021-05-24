@@ -172,15 +172,15 @@ class CTOffice365Licenses extends CTCNC
             $dbeOffice365License->setValue(DBEOffice365License::license, $body->license);
             $dbeOffice365License->setValue(
                 DBEOffice365License::reportOnSpareLicenses,
-                json_decode($body->reportOnSpareLicenses)
+                $body->reportOnSpareLicenses
             );
             $dbeOffice365License->setValue(
                 DBEOffice365License::includesDefender,
-                json_decode($body->includesDefender)
+                $body->includesDefender
             );
             $dbeOffice365License->setValue(
                 DBEOffice365License::includesOffice,
-                json_decode($body->includesOffice)
+                $body->includesOffice
             );
             $dbeOffice365License->updateRow();
            return $this->success();

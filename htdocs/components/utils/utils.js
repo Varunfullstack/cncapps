@@ -33,6 +33,7 @@ export function getWorkIconClassName(serviceRequest) {
 }
 
 export function sort(array, path, order = "asc") {
+    if(path)
     return array.sort((a, b) => {
         if (
             get(a, path) > get(b, path) ||
@@ -44,6 +45,22 @@ export function sort(array, path, order = "asc") {
             get(a, path) < get(b, path) ||
             get(b, path) == null ||
             get(a, path) == undefined
+        )
+            return order == "asc" ? -1 : 1;
+        else return 0;
+    });
+    else 
+    return array.sort((a, b) => {
+        if (
+            a > b ||
+            a == null ||
+            a == undefined
+        )
+            return order == "asc" ? 1 : -1;
+        if (
+            a < b ||
+            b == null ||
+            a == undefined
         )
             return order == "asc" ? -1 : 1;
         else return 0;
