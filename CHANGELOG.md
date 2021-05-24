@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.11.9] - 2021-05-24
+### Fixed
+- Fixed issue with SecondSiteBackupValidation
+- Fixed issue with RequestDashboard
+
 ## [v5.11.8] - 2021-05-24
 ### Fixed
 - Fixed issue with graphs
