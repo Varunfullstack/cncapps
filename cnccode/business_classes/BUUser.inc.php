@@ -332,7 +332,7 @@ class BUUser extends Business
                         ON user_time_log.`loggedDate` = limited.loggedDate 
                       LEFT JOIN `consultant` 
                         ON userID = consultant.`cns_consno` 
-                    WHERE teamLevel = ?  AND not isBankHoliday(loggedDate)
+                    WHERE teamLevel = ?  AND not isBankHoliday(user_time_log.loggedDate)
                       ";
         if ($hideExcluded) {
             $query .= ' and consultant.excludeFromStatsFlag <> "Y"';

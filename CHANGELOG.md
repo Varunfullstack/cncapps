@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.11.8]
+### Fixed
+- Fixed issue with graphs
+
 ## [v5.11.7] - 2021-05-21
 ### Fixed
 - Fixed issue with Daily Stats and performance stats.
