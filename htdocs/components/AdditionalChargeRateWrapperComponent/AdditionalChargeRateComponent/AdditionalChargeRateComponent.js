@@ -1,6 +1,5 @@
 import React from "react";
-import Table from "../../shared/table/table";
-import {TrueFalseIconComponent} from "../../shared/TrueFalseIconComponent/TrueFalseIconComponent";
+import {AdditionalChargeRateList} from "./subComponents/AdditionalChargeRateList";
 
 export class AdditionalChargeRate extends React.Component {
 
@@ -16,39 +15,11 @@ export class AdditionalChargeRate extends React.Component {
 
     render() {
         const {additionalChargeRates} = this.state;
-        return <div>
-            <button>Add</button>
-            <Table
-                id="additionalChargeRates"
-                data={additionalChargeRates || []}
-                pk="id"
-                columns={
-                    [
-                        {
-                            path: 'description',
-                            label: 'Description',
-                            sortable: true,
-                        },
-                        {
-                            path: 'salePrice',
-                            label: 'Sale Price',
-                        },
-                        {
-                            path: 'notes',
-                            label: 'Notes'
-                        },
-                        {
-                            path: 'customerSpecificPriceAllowed',
-                            label: 'Allows Specific Customer Prices',
-                            content: additionalCharge => <TrueFalseIconComponent
-                                value={additionalCharge.customerSpecificPriceAllowed}/>
-                        }
-                    ]
-                }
-            >
-
-            </Table>
-        </div>;
+        return (
+            <React.Fragment>
+                <AdditionalChargeRateList additionalChargeRates={additionalChargeRates}/>;
+            </React.Fragment>
+        )
     }
 
     async loadAdditionalChargeRates() {
