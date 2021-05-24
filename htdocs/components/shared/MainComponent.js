@@ -4,8 +4,7 @@ import Prompt from "./Prompt.js";
 
 import React from 'react';
 import APIHeader from '../services/APIHeader';
-import * as PropTypes from "prop-types";
-import {TrueFalseIconComponent} from "./TrueFalseIconComponent/TrueFalseIconComponent";
+import ToolTip from "./ToolTip.js";
 
 export default class MainComponent extends React.Component {
 
@@ -244,6 +243,14 @@ export default class MainComponent extends React.Component {
         return <i className="fal fa-2x fa-edit color-gray pointer"
                   onClick={() => callBack(obj)}
         />
+    }
+
+    getSearchElement(callBack) {     
+        return <ToolTip title="Search" width={30}>
+        <i className="fal fa-2x fa-search color-gray pointer"
+                  onClick={() => callBack()}
+        ></i>
+        </ToolTip>
     }
 
     getEditIcon() {

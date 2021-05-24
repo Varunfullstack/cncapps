@@ -2,11 +2,11 @@ import APIMain from "../../services/APIMain";
 import ApiUrls from "../../services/ApiUrls";
 
 export default class APIGoodsIn extends APIMain { 
-    getSearchResult(){
-    return this.get(`${ApiUrls.GoodsIn}search`)
+    getSearchResult(porheadID,supplierID){
+    return this.get(`${ApiUrls.GoodsIn}search&porheadID=${porheadID}&supplierID=${supplierID}`)
     }
-    addEmail(body){
-        return this.postJson(`${ApiUrls.GoodsIn}emails`,body);
+    getOrderLines(porheadID){
+        return this.get(`${ApiUrls.GoodsIn}lines&porheadID=${porheadID}`)
     }
     updateEmail(body){
         return this.put(`${ApiUrls.GoodsIn}emails`,body);
