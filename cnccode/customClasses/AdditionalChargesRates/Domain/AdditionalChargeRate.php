@@ -85,13 +85,12 @@ class AdditionalChargeRate
         $this->specificCustomerPrices[] = $newPrice;
     }
 
-    public function removeCustomerPrice(CustomerId $customerId)
+    public function setCustomerPrices($customerPrices)
     {
-        foreach ($this->specificCustomerPrices as $key => $specificCustomerPrice) {
-            if ($specificCustomerPrice->customerId()->isSame($customerId)) {
-                unset($this->specificCustomerPrices[$key]);
-                return;
-            }
+        $this->specificCustomerPrices = [];
+        /** @var SpecificCustomerPrice $customerPrice */
+        foreach ($customerPrices as $customerPrice) {
+            $this->addCustomerPrice($customerPrice->customerId(), $customerPrice->salePrice());
         }
     }
 
@@ -101,6 +100,21 @@ class AdditionalChargeRate
     public function specificCustomerPrices(): array
     {
         return $this->specificCustomerPrices;
+    }
+
+    public function changeSalePrice(SalePrice $salePrice)
+    {
+        $this->salePrice = $salePrice;
+    }
+
+    public function changeDescription(Description $description)
+    {
+        $this->description = $description;
+    }
+
+    public function changeNotes(Notes $notes)
+    {
+        $this->notes = $notes;
     }
 
 }

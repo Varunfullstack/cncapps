@@ -1,110 +1,104 @@
 import React from "react";
 import {AdditionalChargeRateList} from "./subComponents/AdditionalChargeRateList";
-import AddInternalNoteModalComponent from "../../Modals/AddInternalNoteModalComponent";
-import Modal from "../../shared/Modal/modal";
-import CNCCKEditor from "../../shared/CNCCKEditor";
-
 import '../../style.css';
 import './AdditionalChargeRateComponent.css';
-import CustomerSearch from "../../shared/CustomerSearch";
-import Table from "../../shared/table/table";
+import {AdditionalChargeRateModal} from "./subComponents/AdditionalChargeRateModal";
+
+
+const NEW_ADDITIONAL_CHARGE_RATE = {
+    description: '',
+    notes: '',
+    salePrice: 0,
+    specificCustomerPrices: []
+}
 
 export class AdditionalChargeRate extends React.Component {
+    setEditingItem = async (id) => {
+        const item = await this.loadById(id)
+        this.setState({editingAdditionalChargeRate: item})
+    };
 
+    async loadById(id) {
+        try {
+            const response = await fetch(`?action=getById&id=${id}`);
+            const res = await response.json();
+            return res.data;
+        } catch (error) {
+            console.error('Failed to retrieve additional charge rates');
+        }
+    }
 
     constructor(props, context) {
         super(props, context);
         this.state = {
             additionalChargeRates: [],
-            showAddOrEditModal: true,
-            isAdd: true,
-            editingAdditionalChargeRate: {
-                specificCustomerPrices: [
-                    {
-                        customer
-                    }
-                ]
-            }
+            editingAdditionalChargeRate: null,
         }
 
         this.loadAdditionalChargeRates();
+
     }
 
     cancelModal = () => {
-        this.setState({showAddOrEditModal: false, isAdd: false, editingAdditionalChargeRate: null})
+        this.setState({
+            editingAdditionalChargeRate: null,
+        })
+    }
+
+    saveAdditionalChargeRate = async (additionalChargeRate) => {
+
+        let action = 'update';
+        if (!additionalChargeRate.id) {
+            action = 'add';
+        }
+        try {
+            const response = await fetch(`?action=${action}`, {
+                method: 'POST',
+                body: JSON.stringify(additionalChargeRate)
+            });
+            const res = await response.json();
+
+            if (res.status !== 'ok') {
+                throw new Error('Failed to save: ');
+            }
+        } catch (exception) {
+            console.error(exception);
+        }
+        this.setState({editingAdditionalChargeRate: null});
+        this.loadAdditionalChargeRates();
     }
 
     render() {
         const {
             additionalChargeRates,
-            isAdd,
             editingAdditionalChargeRate,
-            isEditingAdditionalChargeRateValid
         } = this.state;
+
         return (
             <React.Fragment>
                 {
                     editingAdditionalChargeRate ?
+                        <AdditionalChargeRateModal editingAdditionalChargeRate={editingAdditionalChargeRate}
+                                                   onClose={this.cancelModal}
+                                                   onSave={this.saveAdditionalChargeRate}
+                        />
+                        : null}
 
-                        <Modal show={true} title={isAdd ? 'Add' : 'Edit'} footer={
-                            <React.Fragment>
-                                <button disabled={!isEditingAdditionalChargeRateValid}
-                                        onClick={this.saveContact}
-                                >Save
-                                </button>
-                                <button onClick={this.cancelModal}>Cancel</button>
-                            </React.Fragment>
-                        }>
-                            <div className="additional_charge_rate_form">
-                                <label htmlFor="description"> Description </label>
-                                <input name="description"
-                                       value={editingAdditionalChargeRate.description}
-                                       maxLength="45"
-                                       required
-                                       onChange={this.editingContactChangedField}
-                                />
-                                <label htmlFor="salePrice"> Sale Price </label>
-                                <input name="salePrice"
-                                       value={editingAdditionalChargeRate.salePrice}
-                                       type="number"
-                                       required
-                                       onChange={this.editingContactChangedField}
-                                />
-                                <label> Notes </label>
-                                <div className="modal_editor">
-                                    <CNCCKEditor value={editingAdditionalChargeRate.notes} type="inline"
-                                                 onChange={this.editingContactChangedField}/>
-                                </div>
-                                <div className="specificCustomerPriceEditForm">
-                                    <CustomerSearch/>
-                                    <div>
-                                        <label htmlFor="salePrice">Specific Sale Price </label>
-                                        <input name="salePrice"
-                                               value={editingAdditionalChargeRate.salePrice}
-                                               type="number"
-                                               required
-                                               onChange={this.editingContactChangedField}
-                                        />
-                                    </div>
-                                    <button>Add</button>
-                                </div>
-                                <div>
-                                    <Table>
-
-                                    </Table>
-                                </div>
-                            </div>
-
-                        </Modal> : null
-                }
-                <AdditionalChargeRateList additionalChargeRates={additionalChargeRates}/>
+                <AdditionalChargeRateList additionalChargeRates={additionalChargeRates}
+                                          onAdd={this.newAdditionalChargeRate}
+                                          onEdit={this.setEditingItem}/>
             </React.Fragment>
         )
     }
 
+    newAdditionalChargeRate = () => {
+        this.setState({
+            editingAdditionalChargeRate: NEW_ADDITIONAL_CHARGE_RATE,
+        })
+    }
+
     async loadAdditionalChargeRates() {
         try {
-
             const response = await fetch('?action=getAdditionalChargeRates');
             const res = await response.json();
             this.setState({additionalChargeRates: res.data});

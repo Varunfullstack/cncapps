@@ -2,6 +2,8 @@ import APICustomers from "../services/APICustomers.js";
 import MainComponent from "../shared/MainComponent.js";
 import AutoComplete from "./AutoComplete/autoComplete.js";
 import React from "react";
+import * as PropTypes from "prop-types";
+import {AdditionalChargeRateList} from "../AdditionalChargeRateWrapperComponent/AdditionalChargeRateComponent/subComponents/AdditionalChargeRateList";
 
 /*
 onChange:Callback
@@ -53,3 +55,12 @@ class CustomerSearch extends MainComponent {
 }
 
 export default CustomerSearch;
+
+CustomerSearch.propTypes = {
+    disabled: PropTypes.bool,
+    width: PropTypes.number,
+    placeholder: PropTypes.string,
+    onChange: PropTypes.func,
+    customerID: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    customerName: PropTypes.string
+};

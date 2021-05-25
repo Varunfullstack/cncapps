@@ -8,6 +8,8 @@ use CNCLTD\AdditionalChargesRates\Application\GetAll\GetAllAdditionalChargeRates
 use CNCLTD\AdditionalChargesRates\Application\GetAll\GetAllAdditionalChargeRatesResponse;
 use CNCLTD\AdditionalChargesRates\Application\GetOne\GetOneAdditionalChargeRateResponse;
 use CNCLTD\AdditionalChargesRates\Application\GetOne\GetOneAdditionalChargeRatesQuery;
+use CNCLTD\AdditionalChargesRates\Application\Update\UpdateAdditionalChargeRateRequest;
+use CNCLTD\AdditionalChargesRates\Application\Update\UpdateAdditionalChargeRateUseCase;
 use CNCLTD\Exceptions\JsonHttpException;
 use CNCLTD\Shared\Domain\Bus\QueryBus;
 use CTCNC;
@@ -24,6 +26,7 @@ class CTAdditionalChargeRate extends CTCNC
     const GET_ADDITIONAL_CHARGE_RATES = 'getAdditionalChargeRates';
     const GET_BY_ID                   = 'getById';
     const ADD                         = 'add';
+    const UPDATE                      = 'update';
     /**
      * @var QueryBus
      */
@@ -44,12 +47,18 @@ class CTAdditionalChargeRate extends CTCNC
         $this->queryBus = $queryBus;
     }
 
+    function update()
+    {
+        echo json_encode($this->updateController(), JSON_NUMERIC_CHECK);
+    }
+
     /**
      * Route to function based upon action passed
      * @throws Exception
      */
     function defaultAction()
     {
+
         switch ($this->getAction()) {
             case self::GET_ADDITIONAL_CHARGE_RATES:
             {
@@ -132,6 +141,23 @@ class CTAdditionalChargeRate extends CTCNC
             ];
         }
         throw new JsonHttpException(400, 'Validation Failed', $validationErrors);
+    }
+
+    private function updateController()
+    {
+        $jsonData = $this->getBody(true);
+        if (!$jsonData) {
+            throw new JsonHttpException(400, 'Request is invalid');
+        }
+        $request              = new UpdateAdditionalChargeRateRequest($this->getBody(true));
+        $validationViolations = $request->validate();
+        if ($validationViolations->count()) {
+            $this->throwValidationErrors($validationViolations);
+        }
+        global $additionalChargeRateRepository;
+        $usecase = new UpdateAdditionalChargeRateUseCase($additionalChargeRateRepository);
+        $usecase->__invoke($request);
+        return ["status" => "ok"];
     }
 
 }

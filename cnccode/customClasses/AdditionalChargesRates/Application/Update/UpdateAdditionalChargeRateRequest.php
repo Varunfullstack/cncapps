@@ -1,13 +1,14 @@
 <?php
 
-namespace CNCLTD\AdditionalChargesRates\Application\Add;
+namespace CNCLTD\AdditionalChargesRates\Application\Update;
 
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class AddAdditionalChargeRateRequest
+class UpdateAdditionalChargeRateRequest
 {
+
     private $jsonData;
 
     /**
@@ -28,6 +29,7 @@ class AddAdditionalChargeRateRequest
         ];
         $constraint          = new Assert\Collection(
             [
+                'id'                     => [new Assert\Type('string'), new Assert\NotBlank()],
                 'description'            => [new Assert\NotBlank(), new Assert\Length(['min' => 1, 'max' => 100])],
                 'salePrice'              => $salePriceValidation,
                 'notes'                  => new Assert\Optional(
@@ -82,5 +84,10 @@ class AddAdditionalChargeRateRequest
     public function specificCustomerPrices()
     {
         return $this->getDataField('specificCustomerPrices');
+    }
+
+    public function id()
+    {
+        return $this->getDataField('id');
     }
 }

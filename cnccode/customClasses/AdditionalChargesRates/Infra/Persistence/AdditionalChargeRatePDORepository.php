@@ -40,11 +40,14 @@ class AdditionalChargeRatePDORepository implements AdditionalChargeRateRepositor
         if (!$additionalChargeRateStatement || !$additionalChargeRateStatement->execute(
                 [$additionalChargeRateId->value()]
             )) {
-//            var_dump($additionalChargeRateStatement);
             $errorInfo = json_encode($additionalChargeRateStatement->errorInfo());
             throw new PDOException("Failed to retrieve AdditionalChargeRate: {$errorInfo}");
         }
-        $data = $this->addSpecificPricesToData($additionalChargeRateStatement, $additionalChargeRateId);
+        $data = $additionalChargeRateStatement->fetch(PDO::FETCH_ASSOC);
+        if (!$data) {
+            throw new AdditionalChargeRateNotFoundException($additionalChargeRateId);
+        }
+        $data = $this->addSpecificPricesToData($data, $additionalChargeRateId);
         return AdditionalChargeRatePDO::fromPersistence($data);
     }
 
@@ -59,13 +62,13 @@ class AdditionalChargeRatePDORepository implements AdditionalChargeRateRepositor
                     "id"          => $additionalChargeRate->id()->value(),
                     "description" => $additionalChargeRate->description()->value(),
                     "notes"       => $additionalChargeRate->notes()->value(),
-                    "salePrice"  => $additionalChargeRate->salePrice()->value(),
+                    "salePrice"   => $additionalChargeRate->salePrice()->value(),
                 ]
             )) {
                 throw new PDOException('Failed to insert or update');
             }
-            $this->deleteAdditionalChargeCustomerSpecificPrices($additionalChargeRate);
-            $this->insertAdditionalChargeCustomerSpecificPrices($additionalChargeRate);
+            $this->deleteAdditionalChargeSpecificCustomerPrices($additionalChargeRate);
+            $this->insertAdditionalChargeSpecificCustomerPrices($additionalChargeRate);
             $this->pdo->commit();
         } catch (\Exception $exception) {
             $this->pdo->rollBack();
@@ -77,7 +80,7 @@ class AdditionalChargeRatePDORepository implements AdditionalChargeRateRepositor
     /**
      * @param AdditionalChargeRate $additionalChargeRate
      */
-    private function deleteAdditionalChargeCustomerSpecificPrices(AdditionalChargeRate $additionalChargeRate): void
+    private function deleteAdditionalChargeSpecificCustomerPrices(AdditionalChargeRate $additionalChargeRate): void
     {
         $deleteAdditionalChargeCustomerPricesStatement = $this->pdo->prepare(
             'delete from additionalChargeRateCustomerPrices where additionalChargeRateId = ?'
@@ -92,7 +95,7 @@ class AdditionalChargeRatePDORepository implements AdditionalChargeRateRepositor
     /**
      * @param AdditionalChargeRate $additionalChargeRate
      */
-    private function insertAdditionalChargeCustomerSpecificPrices(AdditionalChargeRate $additionalChargeRate): void
+    private function insertAdditionalChargeSpecificCustomerPrices(AdditionalChargeRate $additionalChargeRate): void
     {
         $values     = [];
         $subQueries = [];
@@ -130,26 +133,25 @@ class AdditionalChargeRatePDORepository implements AdditionalChargeRateRepositor
         }
         $toReturn = [];
         while ($data = $additionalChargeRateStatement->fetch(PDO::FETCH_ASSOC)) {
-            $data       = $this->addSpecificPricesToData($additionalChargeRateStatement, $data['id']);
+            $data       = $this->addSpecificPricesToData(
+                $data,
+                AdditionalChargeRateId::fromNative($data['id'])
+            );
             $toReturn[] = AdditionalChargeRatePDO::fromPersistence($data);
         }
         return $toReturn;
     }
 
     /**
-     * @param PDOStatement $additionalChargeRateStatement
+     * @param array $data
      * @param AdditionalChargeRateId $additionalChargeRateId
-     * @return mixed
-     * @throws AdditionalChargeRateNotFoundException
+     * @return array
      */
-    private function addSpecificPricesToData(PDOStatement $additionalChargeRateStatement,
+    private function addSpecificPricesToData(array $data,
                                              AdditionalChargeRateId $additionalChargeRateId
-    )
+    ): array
     {
-        $data = $additionalChargeRateStatement->fetch(PDO::FETCH_ASSOC);
-        if (!$data) {
-            throw new AdditionalChargeRateNotFoundException($additionalChargeRateId);
-        }
+
         $data['specificCustomerPrices']  = [];
         $specificCustomerPricesStatement = $this->pdo->prepare(
             'select additionalChargeRateId, customerId, salePrice from additionalChargeRateCustomerPrices where additionalChargeRateId = ?'

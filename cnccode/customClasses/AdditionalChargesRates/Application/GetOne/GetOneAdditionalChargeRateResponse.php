@@ -5,9 +5,10 @@ namespace CNCLTD\AdditionalChargesRates\Application\GetOne;
 use CNCLTD\AdditionalChargesRates\Domain\AdditionalChargeRate;
 use CNCLTD\AdditionalChargesRates\Domain\SpecificCustomerPrice;
 use CNCLTD\Shared\Domain\Bus\Response;
+use JsonSerializable;
 use function Lambdish\Phunctional\map;
 
-class GetOneAdditionalChargeRateResponse implements \JsonSerializable, Response
+class GetOneAdditionalChargeRateResponse implements JsonSerializable, Response
 {
     /**
      * @var string
@@ -28,7 +29,7 @@ class GetOneAdditionalChargeRateResponse implements \JsonSerializable, Response
     /**
      * @var array
      */
-    private $customerSpecificPrices;
+    private $specificCustomerPrices;
 
 
     /**
@@ -38,7 +39,7 @@ class GetOneAdditionalChargeRateResponse implements \JsonSerializable, Response
                                  string $description,
                                  string $salePrice,
                                  ?string $notes,
-                                 array $customerSpecificPrices
+                                 array $specificCustomerPrices
     )
     {
 
@@ -46,7 +47,7 @@ class GetOneAdditionalChargeRateResponse implements \JsonSerializable, Response
         $this->description            = $description;
         $this->notes                  = $notes;
         $this->salePrice              = $salePrice;
-        $this->customerSpecificPrices = $customerSpecificPrices;
+        $this->specificCustomerPrices = $specificCustomerPrices;
     }
 
     public static function fromDomain(AdditionalChargeRate $additionalChargeRate): self
@@ -102,9 +103,9 @@ class GetOneAdditionalChargeRateResponse implements \JsonSerializable, Response
     /**
      * @return array
      */
-    public function customerSpecificPrices(): array
+    public function specificCustomerPrices(): array
     {
-        return $this->customerSpecificPrices;
+        return $this->specificCustomerPrices;
     }
 
     public function jsonSerialize()
