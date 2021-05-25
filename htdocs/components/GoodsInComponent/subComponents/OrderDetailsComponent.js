@@ -27,7 +27,6 @@ export default class OrderDetailsComponent extends MainComponent {
     if (porheadID)
       this.api.getOrderLines(porheadID).then(
         (res) => {
-          console.log(res);
           this.setState({ lines: res.lines });
         },
         (error) => this.alert("Error in loading data")
@@ -83,11 +82,12 @@ export default class OrderDetailsComponent extends MainComponent {
         content: (order) => (
           <div style={{ display: "flex", justifyContent: "center" }}>
             <input
+              disabled={order.lineDisabled}
               type="number"
               className="form-control"
               style={{ width: 100 }}
               defaultValue={order.qtyToReceive}
-              onChange={(event)=>this.handleOrderChange(order,"qtyToReceive",event.target.value)}
+              onChange={(event)=>this.handleOrderChange(order,"qtyToReceive",parseInt(event.target.value))}
             ></input>
           </div>
         ),
@@ -103,6 +103,7 @@ export default class OrderDetailsComponent extends MainComponent {
         content: (order) => (
           <div style={{ display: "flex", justifyContent: "center" }}>
             <input
+            disabled={order.lineDisabled||order.disabled}
               className="form-control"
               style={{ width: 150 }}
               value={order.serialNo}
@@ -120,11 +121,12 @@ export default class OrderDetailsComponent extends MainComponent {
         sortable: true,
         //className: "text-center",
         content: (order) => (
-          <select className="form-control" value={order.warrantyID}   onChange={(event)=>this.handleOrderChange(order,"warrantyID",event.target.value)}
+          <select disabled={order.lineDisabled||order.disabled}
+          className="form-control" value={order.warrantyID}   onChange={(event)=>this.handleOrderChange(order,"warrantyID",event.target.value)}
           >
             <option>N/A</option>
-            {order.warranties.map((w) => (
-              <option key={w.warrantyID} value={w.warrantyID}>{w.warrantyDescription}</option>
+            {order.warranties.map((w,indx) => (
+              <option key={indx} value={w.warrantyID}>{w.warrantyDescription}</option>
             ))}
           </select>
         ),
@@ -137,7 +139,8 @@ export default class OrderDetailsComponent extends MainComponent {
         //icon: "fal fa-2x fa-building color-gray2 pointer",
         sortable: true,
         className: "text-center",
-        content: (order) => <Toggle checked={order.renew}  onChange={(event)=>this.handleOrderChange(order,"renew",!order.renew)}></Toggle>,
+        content: (order) => <Toggle disabled={order.lineDisabled||order.disabled}
+        checked={order.renew}  onChange={(event)=>this.handleOrderChange(order,"renew",!order.renew)}></Toggle>,
       },
     ];
 
@@ -159,17 +162,39 @@ export default class OrderDetailsComponent extends MainComponent {
       clearTimeout(this.tableTimeChange);
       this.tableTimeChange=setTimeout(()=>{
         const temp=lines.find(o=>o.itemID==order.itemID);
-        console.log("temp",temp);
         temp[prop]=value;        
        },500)
      
   }
   
   handleSupplierChange = (supplier) => {
-    console.log(supplier);
     this.setFilter("supplierID", supplier?.id || "");
   };
-
+  handlePurchaseOrder=()=>{
+    const { porheadID } = this.props;
+    window.open(`PurchaseOrder.php?action=display&porheadID=${porheadID}`, '_blank');
+  }
+  handleReceive=()=>{
+    const {lines}=this.state;
+    const { porheadID } = this.props;
+    const linesToReceive=lines.filter(l=>l.qtyToReceive>0);
+    if(linesToReceive.length==0)
+    {
+      this.alert("Please enter at least one value to receive");
+      return;
+    }
+    this.api.receive(porheadID,lines).then(res=>{
+      // this.getData();
+      // this.setState({showModal:false});
+      window.location=`PurchaseOrder.php?action=display&porheadID=${porheadID}`;
+      // if(this.props.onClose)
+      // this.props.onClose()
+    }).catch(res=>{
+      console.log(res);
+      //this.alert(error);
+      this.alert(res.error)
+    })
+  }
   render() {
     return (
       <div>
@@ -177,8 +202,8 @@ export default class OrderDetailsComponent extends MainComponent {
         {this.getAlert()}
         {this.getDataTable()}
         <div className="modal-footer">
-          <button>Receive</button>
-          <button>Purchase Order</button>
+          <button onClick={this.handleReceive}>Receive</button>
+          <button onClick={this.handlePurchaseOrder}>Purchase Order</button>
         </div>
       </div>
     );

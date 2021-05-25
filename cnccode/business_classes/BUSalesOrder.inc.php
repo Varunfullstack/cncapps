@@ -1779,7 +1779,7 @@ class BUSalesOrder extends Business
 
     }
 
-    public function notifyPurchaseOrderCompletion(DBEPorhead $purchaseOrderHeader)
+    public function notifyPurchaseOrderCompletion(DBEPorhead $purchaseOrderHeader,$json=false)
     {
         // we need to find out what is the related sales order first
         $salesOrderID                = $purchaseOrderHeader->getValue(DBEPorhead::ordheadID);
@@ -1790,14 +1790,17 @@ class BUSalesOrder extends Business
         );
         $purchaseOrdersForSalesOrder->getRowsByColumn(DBEPorhead::ordheadID);
         $shouldNotify = true;
+        if(!$json)
         echo '<div>We are pulling all the purchase orders for the sales order: ' . $salesOrderID . '</div>';
         while ($purchaseOrdersForSalesOrder->fetchNext()) {
+            if(!$json)
             echo '<div>We are looking at purchase order with ID: ' . $purchaseOrdersForSalesOrder->getValue(
                     DBEPorhead::porheadID
                 ) . '</div>';
             if ($purchaseOrdersForSalesOrder->getValue(DBEPorhead::porheadID) == $purchaseOrderHeader->getValue(
                     DBEPorhead::porheadID
                 )) {
+                if(!$json)
                 echo '<div> This is the same as the one we are processing</div>';
                 continue;
             }
@@ -1807,12 +1810,15 @@ class BUSalesOrder extends Business
                 $purchaseOrdersForSalesOrder->getValue(DBEPorhead::porheadID)
             );
             if ($purchaseOrdersForSalesOrder->getValue(DBEPorhead::completionNotifiedFlag) == 'N') {
+                if(!$json)
                 echo '<div>We are looking at all the lines for the current purchase order</div>';
                 if ($dbePorline->countOutstandingRows()) {
                     $shouldNotify = false;
+                    if(!$json)
                     echo '<div>We have found another purchase order that is not completed yet..so we cannot create the activity</div>';
                     break;
                 } else {
+                    if(!$json)
                     echo '<div> This is the same as the one we are processing</div>';
                 }
             }

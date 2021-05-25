@@ -1103,3 +1103,6 @@ select:required:valid { border: 1px solid black; }
 .white{
     color: white;
 }
+input:disabled{
+    background-color: #cccccc;
+}

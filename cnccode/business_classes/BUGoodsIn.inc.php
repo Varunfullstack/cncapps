@@ -834,7 +834,7 @@ class BUGoodsIn extends Business
 
             if (($dbeJPorline->countOutstandingRows() == 0)) {
                 if ($dsPorhead->getValue(DBEPorhead::completionNotifiedFlag) != 'Y') {
-                    $this->buSalesOrder->notifyPurchaseOrderCompletion($this->dbePorhead);
+                    $this->buSalesOrder->notifyPurchaseOrderCompletion($this->dbePorhead,true);
                 }
                 $this->dbePorhead->setValue(
                     DBEPorhead::type,
@@ -1032,7 +1032,7 @@ class BUGoodsIn extends Business
 
             if (($dbeJPorline->countOutstandingRows() == 0)) {
                 if ($dsPorhead->getValue(DBEPorhead::completionNotifiedFlag) != 'Y') {
-                    $this->buSalesOrder->notifyPurchaseOrderCompletion($this->dbePorhead);
+                    $this->buSalesOrder->notifyPurchaseOrderCompletion($this->dbePorhead,true);
                 }
                 $this->dbePorhead->setValue(
                     DBEJPorhead::type,

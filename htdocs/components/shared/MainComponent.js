@@ -237,12 +237,14 @@ export default class MainComponent extends React.Component {
         return variable == null || variable == '';
     }
 
-    getEditElement(obj, callBack, display = true) {
+    getEditElement(obj, callBack, display = true,title=null) {
         if (!display)
             return null;
-        return <i className="fal fa-2x fa-edit color-gray pointer"
+        return <ToolTip title={title||"Edit"}>
+         <i className="fal fa-2x fa-edit color-gray pointer"
                   onClick={() => callBack(obj)}
-        />
+        ></i>
+        </ToolTip>
     }
 
     getSearchElement(callBack) {     

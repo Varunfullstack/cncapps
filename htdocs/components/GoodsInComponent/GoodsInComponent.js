@@ -37,7 +37,6 @@ class GoodsInComponent extends MainComponent {
     const {porheadID,supplierID}=this.state.filter;
     this.api.getSearchResult(porheadID,supplierID).then(
       (res) => {
-        console.log(res);
         this.setState({ orders: res.data });
       },
       (error) => this.alert("Error in loading data")
@@ -63,7 +62,17 @@ class GoodsInComponent extends MainComponent {
         icon: "fal fa-2x fa-hashtag color-gray2 pointer",
         sortable: true,
         //className: "text-center",
-        content:(order)=><a href={`GoodsIn.php?action=displayGoodsIn&porheadID=${order.porheadID}`}>{order.porheadID}</a>
+        //content:(order)=><a href={`GoodsIn.php?action=displayGoodsIn&porheadID=${order.porheadID}`}>{order.porheadID}</a>
+      },
+      {
+        path: "ordheadID",
+        label: "",
+        hdToolTip: "Sales Order",
+        hdClassName: "text-center",
+        icon: "fal fa-2x fa-tag color-gray2 pointer",
+        sortable: true,
+        className: "text-center",
+        content:(order)=><label>{order.customerID}/{order.ordheadID}</label> 
       },
       {
         path: "orderType",
@@ -98,13 +107,13 @@ class GoodsInComponent extends MainComponent {
         hdToolTip: "Edit",
         hdClassName: "text-center",
         sortable: true,
-        content:(order)=>this.getEditElement(order,this.handleEdit)
+        content:(order)=>this.getEditElement(order,this.handleEdit,true,"Edit order lines")
        },
     ];
 
     return (
       <Table
-        style={{ width: 900, marginTop: 20 }}
+        style={{ width: 1200, marginTop: 20 }}
         key="ordersTable"
         pk="porheadID"
         columns={columns}
@@ -119,7 +128,6 @@ class GoodsInComponent extends MainComponent {
    this.setState({showModal:true,order});
   }
   handleSupplierChange=(supplier)=>{
-    console.log(supplier);
     this.setFilter("supplierID",supplier?.id||"")
   }
   
@@ -132,8 +140,12 @@ class GoodsInComponent extends MainComponent {
     onClose={()=>this.setState({showModal:false,order:null})}
     
     >
-      <OrderDetailsComponent porheadID={order.porheadID}></OrderDetailsComponent>
+      <OrderDetailsComponent onClose={this.handleOnClose} porheadID={order.porheadID}></OrderDetailsComponent>
     </Modal>
+  }
+  handleOnClose=()=>{
+    this.getData();
+    this.setState({showModal:false})
   }
   render() {
     const {filter}=this.state;
