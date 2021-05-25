@@ -3,9 +3,14 @@
 use CNCLTD\AdditionalChargesRates\Application\GetAll\GetAllAdditionalChargeRatesQuery;
 use CNCLTD\AdditionalChargesRates\Application\GetAll\GetAllAdditionalChargeRatesQueryHandler;
 use CNCLTD\AdditionalChargesRates\Application\GetOne\GetOneAdditionalChargeRatesQueryHandler;
+use CNCLTD\AdditionalChargesRates\Application\GetRatesForCustomer\GetRatesForCustomerQueryHandler;
 use CNCLTD\AdditionalChargesRates\Infra\Persistence\AdditionalChargeRatePDORepository;
+use CNCLTD\AdditionalChargesRates\Infra\Persistence\PDOCustomerPricesGetter;
 use CNCLTD\Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
 use Twig\Environment;
+use Twig\Extension\DebugExtension;
+use Twig\Extra\Intl\IntlExtension;
+use Twig\Loader\FilesystemLoader;
 use Twig\TwigFilter;
 
 const DEV_PORTAL_URL = "https://www.cnc-ltd.co.uk:4481";
@@ -124,7 +129,7 @@ function noshell_exec(string $command): string
 {
     static $descriptors = [['pipe', 'r'], ['pipe', 'w'], ['pipe', 'w']], $options = ['bypass_shell' => true];
     if (!$proc = proc_open($command, $descriptors, $pipes, null, null, $options)) {
-        throw new \Error('Creating child process failed');
+        throw new Error('Creating child process failed');
     }
     fclose($pipes[0]);
     $result = stream_get_contents($pipes[1]);
@@ -1052,7 +1057,7 @@ $GLOBALS['db_options'] = array(
     'mail_table' => 'mail_queue'
 );
 require BASE_DRIVE . '/vendor/autoload.php';
-$loader = new \Twig\Loader\FilesystemLoader('', __DIR__ . '/../twig');
+$loader = new FilesystemLoader('', __DIR__ . '/../twig');
 $loader->addPath('internal', 'internal');
 $loader->addPath('customerFacing', 'customerFacing');
 $twig = new Environment(
@@ -1071,8 +1076,8 @@ $twig->addFilter(
     }
     )
 );
-$twig->addExtension(new \Twig\Extra\Intl\IntlExtension());
-$twig->addExtension(new \Twig\Extension\DebugExtension());
+$twig->addExtension(new IntlExtension());
+$twig->addExtension(new DebugExtension());
 define(
     'DOMPDF_ENABLE_AUTOLOAD',
     false
@@ -1536,7 +1541,8 @@ $additionalChargeRateRepository = new AdditionalChargeRatePDORepository($pdoConn
 $inMemorySymfonyBus             = new InMemorySymfonyQueryBus(
     [
         new GetAllAdditionalChargeRatesQueryHandler($additionalChargeRateRepository),
-        new GetOneAdditionalChargeRatesQueryHandler($additionalChargeRateRepository)
+        new GetOneAdditionalChargeRatesQueryHandler($additionalChargeRateRepository),
+        new GetRatesForCustomerQueryHandler(new PDOCustomerPricesGetter($pdoConnection))
     ]
 );
 
