@@ -8,11 +8,9 @@ export default class APIGoodsIn extends APIMain {
     getOrderLines(porheadID){
         return this.get(`${ApiUrls.GoodsIn}lines&porheadID=${porheadID}`)
     }
-    updateEmail(body){
-        return this.put(`${ApiUrls.GoodsIn}emails`,body);
+    receive(porheadID,body){
+        return this.post(`${ApiUrls.GoodsIn}receive&porheadID=${porheadID}`,body,true);
     }
-    deleteEmail(id){        
-        return this.delete(`${ApiUrls.GoodsIn}emails&&id=${id}`);
-    }
+     
    
 }

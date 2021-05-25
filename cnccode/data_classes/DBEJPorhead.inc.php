@@ -16,8 +16,8 @@ class DBEJPorhead extends DBEPorhead
     const contactEmail  = "contactEmail";
     const orderedByName = "orderedByName";
     const raisedByName  = "raisedByName";
-    const webSiteURL    = "webSiteURL";
-
+    const webSiteURL    = "webSiteURL";    
+    const customerID    = "customerID";
     /**
      * calls constructor()
      * @access public
@@ -82,6 +82,12 @@ class DBEJPorhead extends DBEPorhead
             DA_STRING,
             DA_ALLOW_NULL,
             "sup_web_site_url"
+        );
+        $this->addColumn(
+            self::customerID,
+            DA_STRING,
+            DA_NOT_NULL,
+            'cus_custno'
         );
         $this->setAddColumnsOff();
     }
