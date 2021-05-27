@@ -68,7 +68,6 @@ class ActivityEditComponent extends MainComponent {
             showAdditionalTimeRequestModal: false,
             data: {
                 curValue: "",
-                documents: [],
                 reasonTemplate: "",
                 reason: "",
                 internalNotes: [],
@@ -178,10 +177,6 @@ class ActivityEditComponent extends MainComponent {
         this.api.getCallActivityDetails(callActivityID, filters).then((res) => {
             filters.monitorSR = res.monitoringFlag == "1";
             filters.criticalSR = res.criticalFlag == "1";
-            res.documents = res.documents.map((d) => {
-                d.createDate = moment(d.createDate).format("DD/MM/YYYY");
-                return d;
-            });
             res.reasonTemplate = res.reason;
             res.cncNextActionTemplate = res.cncNextAction;
             res.customerNotesTemplate = res.customerNotes;
@@ -244,7 +239,6 @@ class ActivityEditComponent extends MainComponent {
 
         delete data.activities;
         delete data.onSiteActivities;
-        delete data.documents;
         const finalData = pick(data, [
             "callActivityID",
             "alarmDate",
@@ -1071,15 +1065,6 @@ class ActivityEditComponent extends MainComponent {
         );
     };
 
-    async deleteDocument(id) {
-        const {data} = this.state;
-        if (await this.confirm('Are you sure you want to remove this document?')) {
-            await this.api.deleteDocument(this.state.currentActivity, id);
-            data.documents = data.documents.filter(d => d.id !== id);
-            this.setState({data});
-        }
-    }
-
     getTypeElement = () => {
         const {el} = this;
         const {data, callActTypes, notSDManagerActivityTypes, currentUser} = this.state;
@@ -1534,12 +1519,6 @@ class ActivityEditComponent extends MainComponent {
         );
     };
 
-    handleUpload = async () => {
-        const {currentActivity} = this.state;
-        this.loadCallActivity(currentActivity);
-    };
-
-// Parts used, change requestm and sales request
     handleTemplateChanged = (event) => {
         const id = event.target.value;
         const {templateOptions} = this.state;
@@ -2000,13 +1979,7 @@ class ActivityEditComponent extends MainComponent {
                 {this.getCustomerNotes()}
                 <InternalNotes serviceRequestId={data.problemID}/>
                 {this.getTaskList()}
-                <CustomerDocumentUploader
-                    onDeleteDocument={(id) => this.deleteDocument(id)}
-                    onFilesUploaded={() => this.handleUpload()}
-                    serviceRequestId={data?.problemID}
-                    activityId={data?.callActivityID}
-                    documents={data?.documents}
-                />
+                <CustomerDocumentUploader serviceRequestId={data?.problemID}/>
                 <InternalDocumentsComponent serviceRequestId={data?.problemID}/>
                 {this.getTemplateModal()}
                 {showSalesOrder ? <LinkServiceRequestOrder serviceRequestID={data.problemID}

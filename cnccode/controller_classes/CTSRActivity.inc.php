@@ -81,6 +81,8 @@ class CTSRActivity extends CTCNC
     const FORCE_CLOSE_SERVICE_REQUEST                            = "forceCloseServiceRequest";
     const GET_INTERNAL_NOTES                                     = "getInternalNotes";
     const GET_TASK_LIST                                          = "getTaskList";
+    const DELETE_CUSTOMER_DOCUMENT                               = "deleteCustomerDocument";
+    const UPLOAD_CUSTOMER_DOCUMENTS                              = "uploadCustomerDocuments";
     public  $serverGuardArray = array(
         ""  => "Please select",
         "Y" => "ServerGuard Related",
@@ -178,7 +180,7 @@ class CTSRActivity extends CTCNC
                 echo json_encode($this->addInternalNoteController());
                 exit;
             case self::GET_DOCUMENTS:
-                echo json_encode($this->getActivityDocuments($_REQUEST["callActivityID"], $_REQUEST["problemID"]));
+                echo json_encode($this->getServiceRequestCustomerDocumentsController());
                 exit;
             case self::GET_DOCUMENTS_FOR_SERVICE_REQUEST:
                 echo json_encode($this->getDocumentsForServiceRequestController());
@@ -194,6 +196,12 @@ class CTSRActivity extends CTCNC
                 exit;
             case self::GET_TASK_LIST:
                 echo json_encode($this->getTaskListController());
+                exit;
+            case self::DELETE_CUSTOMER_DOCUMENT:
+                echo json_encode($this->deleteCustomerDocumentController());
+                exit;
+            case self::UPLOAD_CUSTOMER_DOCUMENTS:
+                echo json_encode($this->uploadCustomerDocumentsController());
                 exit;
             case self::DELETE_INTERNAL_DOCUMENT:
                 echo json_encode($this->deleteInternalDocument());
@@ -350,7 +358,6 @@ class CTSRActivity extends CTCNC
             } else  $requestName = 'Unassigned';
 
         }
-        $consultants               = [];
         $chargeableWorkRequestRepo = new ChargeableWorkCustomerRequestMySQLRepository();
         try {
             $chargeableRequest   = $chargeableWorkRequestRepo->getChargeableRequestForServiceRequest(
@@ -435,7 +442,6 @@ class CTSRActivity extends CTCNC
             "reason"                          => $dbejCallActivity->getValue(DBEJCallActivity::reason),
             "currentUser"                     => $currentUser,
             "currentUserBgColor"              => $currentUserBgColor,
-            "documents"                       => $this->getActivityDocuments($callActivityID, $problemID),
             "expenses"                        => $expenses,
             "partsUsed"                       => null,
             'disabledChangeRequest'           => $dbeProblem->getValue(DBEProblem::status) == 'P' ? '' : 'disabled',
@@ -628,15 +634,13 @@ class CTSRActivity extends CTCNC
      * @param $problemID
      * @throws Exception
      */
-    function getActivityDocuments($callActivityID,
-                                  $problemID
-    )
+    function getServiceRequestCustomerDocumentsController()
     {
-
+        $serviceRequestId = $_REQUEST["serviceRequestId"];
         $dbeJCallDocument = new DBEJCallDocument($this);
         $dbeJCallDocument->setValue(
             DBEJCallDocument::problemID,
-            $problemID
+            $serviceRequestId
         );
         $dbeJCallDocument->getRowsByColumn(DBEJCallDocument::problemID);
         $documents = array();
@@ -652,7 +656,7 @@ class CTSRActivity extends CTCNC
                 )
             );
         }
-        return $documents;
+        return ["status" => "ok", "data" => $documents];
     }
 
     /**
@@ -1941,6 +1945,50 @@ AND c.caa_problemno = ? ',
                 "lastUpdatedBy" => $taskListUpdatedBy
             ]
         ];
+    }
+
+    private function deleteCustomerDocumentController()
+    {
+        $documentId      = @$_GET['documentId'];
+        $dbeCallDocument = new DBECallDocument($this);
+        if (!$dbeCallDocument->getRow($documentId)) {
+            throw new JsonHttpException(404, 'Document not found');
+        }
+        $dbeCallDocument->deleteRow();
+        return ["status" => "ok"];
+    }
+
+    private function uploadCustomerDocumentsController()
+    {
+        $serviceRequestId = @$_GET['serviceRequestId'];
+        if (!$this->handleUploads($serviceRequestId)) {
+            return ["status" => "error", "message" => "Failed to upload files"];
+        };
+        return ["status" => "ok"];
+    }
+
+    private function handleUploads($problemID)
+    {
+        $fileCount = count($_FILES['userfile']['name']);
+        $hasError  = false;
+        for ($i = 0; $i < $fileCount; $i++) {
+            if (!is_uploaded_file($_FILES['userfile']['tmp_name'][$i])) {
+                $hasError = true;
+                continue;
+            }
+            $file = [
+                'tmp_name' => $_FILES['userfile']['tmp_name'][$i],
+                'size'     => $_FILES['userfile']['size'][$i],
+                'name'     => $_FILES['userfile']['name'][$i],
+                'type'     => $_FILES['userfile']['type'][$i]
+            ];
+            $this->buActivity->uploadDocumentFile(
+                $problemID,
+                $file['name'],
+                $file
+            );
+        }
+        return !$hasError;
     }
 }
 

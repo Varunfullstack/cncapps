@@ -37,8 +37,8 @@ class APIActivity extends APIMain {
         return fetch(`Activity.php?action=sendVisitEmail&callActivityID=${callActivityID}`);
     }
 
-    deleteDocument(callActivityID, id) {
-        return fetch(`Activity.php?action=deleteFile&callActivityID=${callActivityID}&callDocumentID=${id}`);
+    deleteDocument(id) {
+        return fetch(`SRActivity.php?action=deleteCustomerDocument&documentId=${id}`);
 
     }
 
@@ -107,8 +107,10 @@ class APIActivity extends APIMain {
         return fetch(`${ApiUrls.SRActivity}getCallActivityBasicInfo&callActivityID=${Id}`).then(res => res.json());
     }
 
-    getDocuments(callActivityID, problemID) {
-        return fetch(`${ApiUrls.SRActivity}getDocuments&callActivityID=${callActivityID}&problemID=${problemID}`).then(res => res.json());
+    async getServiceRequestCustomerDocuments(serviceRequestId) {
+        const response = await fetch(`${ApiUrls.SRActivity}getDocuments&serviceRequestId=${serviceRequestId}`);
+        const res = await response.json();
+        return res.data;
     }
 
     saveFixedInformation(body) {

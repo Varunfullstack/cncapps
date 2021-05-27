@@ -13,7 +13,6 @@ import Modal from "../../shared/Modal/modal";
 import Table from "../../shared/table/table";
 import {LinkServiceRequestOrder} from "./LinkserviceRequestOrder.js";
 import moment from "moment";
-import {InternalNotesListComponent} from "../../shared/InternalNotesListComponent/InternalNotesListComponent";
 import {InternalNotes} from "./InternalNotesComponent";
 import {TaskListComponent} from "./TaskListComponent";
 import AdditionalChargeRequestModal from "./Modals/AdditionalTimeRequestModal";
@@ -858,15 +857,6 @@ class ActivityDisplayComponent extends MainComponent {
         );
     }
 
-    async deleteDocument(id) {
-        const {data} = this.state;
-        if (await this.confirm('Are you sure you want to remove this document?')) {
-            await this.api.deleteDocument(this.state.currentActivity, id);
-            data.documents = data.documents.filter(d => d.id !== id);
-            this.setState({data});
-        }
-    }
-
     getContentElement = () => {
         const {data} = this.state;
         const {el} = this;
@@ -998,11 +988,6 @@ class ActivityDisplayComponent extends MainComponent {
                 return "";
         } else return "";
 
-    }
-
-    handleUpload() {
-        const {currentActivity} = this.state;
-        this.loadCallActivity(currentActivity);
     }
 
     getExpensesElement = () => {
@@ -1315,13 +1300,7 @@ class ActivityDisplayComponent extends MainComponent {
                 {this.getcustomerNotesElement()}
                 <InternalNotes serviceRequestId={data?.problemID}/>
                 {this.getTaskListElement()}
-                <CustomerDocumentUploader
-                    onDeleteDocument={(id) => this.deleteDocument(id)}
-                    onFilesUploaded={() => this.handleUpload()}
-                    serviceRequestId={data?.problemID}
-                    activityId={data?.callActivityID}
-                    documents={data?.documents}
-                />
+                <CustomerDocumentUploader serviceRequestId={data?.problemID}/>
                 <InternalDocumentsComponent serviceRequestId={data?.problemID}/>
                 {this.getExpensesElement()}
                 {this.getTemplateModal()}

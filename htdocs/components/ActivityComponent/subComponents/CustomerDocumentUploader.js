@@ -12,27 +12,33 @@ export default class CustomerDocumentUploader extends React.PureComponent {
     constructor(props, context) {
         super(props, context);
         this.state = {
-            uploadFiles: []
+            uploadFiles: [],
+            documents: []
         }
     }
 
+    componentDidMount() {
+        this.fetchDocuments();
+    }
+
+
     async deleteDocument(id) {
-        const {onDeleteDocument} = this.props;
-        onDeleteDocument(id);
+        if (await this.confirm('Are you sure you want to remove this document?')) {
+            await this.api.deleteDocument(id);
+            this.fetchDocuments();
+        }
     }
 
     async handleUpload() {
         const {uploadFiles} = this.state;
-        const {onFilesUploaded, serviceRequestId, activityId} = this.props;
+        const {serviceRequestId} = this.props;
         await this.api.uploadFiles(
-            `Activity.php?action=uploadFile&problemID=${serviceRequestId}&callActivityID=${activityId}`,
+            `SRActivity.php?action=uploadCustomerDocuments&serviceRequestId=${serviceRequestId}`,
             uploadFiles,
             "userfile[]"
         );
         this.setState({uploadFiles: []});
-        if (onFilesUploaded) {
-            onFilesUploaded();
-        }
+        this.fetchDocuments();
     }
 
     getSelectedFilesElement() {
@@ -50,8 +56,7 @@ export default class CustomerDocumentUploader extends React.PureComponent {
     }
 
     render() {
-        const {uploadFiles} = this.state;
-        const {documents} = this.props;
+        const {uploadFiles, documents} = this.state;
 
         let columns = [
             {
@@ -133,5 +138,11 @@ export default class CustomerDocumentUploader extends React.PureComponent {
                 </DragAndDropUploaderComponent>
             </div>
         )
+    }
+
+    async fetchDocuments() {
+        const {serviceRequestId} = this.props;
+        const documents = await this.api.getServiceRequestCustomerDocuments(serviceRequestId);
+        this.setState({documents});
     }
 }
