@@ -1181,11 +1181,6 @@ class ActivityDisplayComponent extends MainComponent {
         this.setState({templateOptions: options, _showModal: true, templateType: type, templateTitle, templateDefault})
     }
 
-    onTaskListUpdated = () => {
-        const {currentActivity} = this.state;
-        this.loadCallActivity(currentActivity);
-    }
-
     getFooter = () => {
         return (
             <div className="activities-container">
@@ -1228,13 +1223,7 @@ class ActivityDisplayComponent extends MainComponent {
             return '';
         }
         return (
-            <TaskListComponent
-                taskListUpdatedAt={data.taskListUpdatedAt}
-                taskListUpdatedBy={data.taskListUpdatedBy}
-                taskList={data.taskList}
-                problemId={data.problemID}
-                onUpdatedTaskList={this.onTaskListUpdated}
-            />
+            <TaskListComponent serviceRequestId={data.problemID}/>
         );
     }
 

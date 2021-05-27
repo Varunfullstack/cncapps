@@ -80,6 +80,7 @@ class CTSRActivity extends CTCNC
     const DELETE_UNSTARTED_SERVICE_REQUESTS                      = "deleteUnstartedServiceRequests";
     const FORCE_CLOSE_SERVICE_REQUEST                            = "forceCloseServiceRequest";
     const GET_INTERNAL_NOTES                                     = "getInternalNotes";
+    const GET_TASK_LIST                                          = "getTaskList";
     public  $serverGuardArray = array(
         ""  => "Please select",
         "Y" => "ServerGuard Related",
@@ -189,10 +190,11 @@ class CTSRActivity extends CTCNC
                 $this->viewInternalDocument();
                 exit;
             case self::GET_INTERNAL_NOTES:
-            {
                 echo json_encode($this->getInternalNotesController());
                 exit;
-            }
+            case self::GET_TASK_LIST:
+                echo json_encode($this->getTaskListController());
+                exit;
             case self::DELETE_INTERNAL_DOCUMENT:
                 echo json_encode($this->deleteInternalDocument());
                 exit;
@@ -358,16 +360,6 @@ class CTSRActivity extends CTCNC
         } catch (Exception $exception) {
             $chargeableRequestId = null;
         }
-        $taskListUpdatedByUserId = $dbeProblem->getValue(DBEProblem::taskListUpdatedBy);
-        $taskListUpdatedBy       = null;
-        if ($taskListUpdatedByUserId) {
-            if (!key_exists($taskListUpdatedByUserId, $consultants)) {
-                $taskListUpdatedByUser = new DBEUser($this);
-                $taskListUpdatedByUser->getRow($taskListUpdatedByUserId);
-                $consultants[$taskListUpdatedByUserId] = "{$taskListUpdatedByUser->getValue(DBEUser::firstName)} {$taskListUpdatedByUser->getValue(DBEUser::lastName)}";
-            }
-            $taskListUpdatedBy = $consultants[$taskListUpdatedByUserId];
-        }
         $currentLoggedInUser             = $this->getDbeUser();
         $callback                        = new DBECallback($this);
         $pendingCallbacks                = $callback->pendingCallbackCountForServiceRequest($problemID);
@@ -492,9 +484,6 @@ class CTSRActivity extends CTCNC
             "workingHours"                    => $dbeProblem->getValue(DBEProblem::workingHours),
             "requestEngineerName"             => $requestName,
             "emailsubjectsummary"             => $dbeProblem->getValue(DBEProblem::emailSubjectSummary),
-            "taskList"                        => $dbeProblem->getValue(DBEProblem::taskList),
-            "taskListUpdatedAt"               => $dbeProblem->getValue(DBEProblem::taskListUpdatedAt),
-            "taskListUpdatedBy"               => $taskListUpdatedBy,
             'pendingCallbacks'                => $pendingCallbacks,
             "what3Words"                      => $what3Words,
             "Inbound"                         => $this->checkIsInbound($callActivityID)
@@ -1898,15 +1887,15 @@ AND c.caa_problemno = ? ',
             function (ServiceRequestInternalNote $note) use ($consultants) {
                 $updatedByUserId = $note->getUpdatedBy();
                 if (!key_exists($updatedByUserId, $consultants)) {
-                    $createdByUser = new DBEUser($this);
-                    $createdByUser->getRow($updatedByUserId);
-                    $consultants[$updatedByUserId] = "{$createdByUser->getValue(DBEUser::firstName)} {$createdByUser->getValue(DBEUser::lastName)}";
+                    $updatedByUser = new DBEUser($this);
+                    $updatedByUser->getRow($updatedByUserId);
+                    $consultants[$updatedByUserId] = $updatedByUser->getFullName();
                 }
                 $createdByUserId = $note->getCreatedBy();
                 if (!key_exists($createdByUserId, $consultants)) {
-                    $updatedByUser = new DBEUser($this);
-                    $updatedByUser->getRow($createdByUserId);
-                    $consultants[$createdByUserId] = "{$updatedByUser->getValue(DBEUser::firstName)} {$updatedByUser->getValue(DBEUser::lastName)}";
+                    $createdByUser = new DBEUser($this);
+                    $createdByUser->getRow($createdByUserId);
+                    $consultants[$createdByUserId] = $createdByUser->getFullName();
                 }
                 $array              = ServiceRequestInternalNotePDOMapper::toJSONArray($note);
                 $array['updatedBy'] = $consultants[$updatedByUserId];
@@ -1925,6 +1914,33 @@ AND c.caa_problemno = ? ',
             }
         );
         return ["status" => "ok", "data" => $mappedNotes];
+    }
+
+    private function getTaskListController()
+    {
+        $serviceRequestId = @$_REQUEST['serviceRequestId'];
+        if (!$serviceRequestId) {
+            throw new JsonHttpException(400, "Service Request Id is required");
+        }
+        $serviceRequest = new DBEProblem($this);
+        if (!$serviceRequest->getRow($serviceRequestId)) {
+            throw new JsonHttpException(400, "The service request does not exist");
+        }
+        $taskListUpdatedByUserId = $serviceRequest->getValue(DBEProblem::taskListUpdatedBy);
+        $taskListUpdatedBy       = null;
+        if ($taskListUpdatedByUserId) {
+            $taskListUpdatedByUser = new DBEUser($this);
+            $taskListUpdatedByUser->getRow($taskListUpdatedByUserId);
+            $taskListUpdatedBy = $taskListUpdatedByUser->getFullName();
+        }
+        return [
+            "status" => "ok",
+            "data"   => [
+                "value"         => $serviceRequest->getValue(DBEProblem::taskList),
+                "lastUpdatedAt" => $serviceRequest->getValue(DBEProblem::taskListUpdatedAt),
+                "lastUpdatedBy" => $taskListUpdatedBy
+            ]
+        ];
     }
 }
 

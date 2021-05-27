@@ -30,7 +30,7 @@ export class InternalNotes extends React.Component {
     async fetchInternalNotes() {
         const {serviceRequestId} = this.props;
         const response = await fetch(`/SRActivity.php?action=getInternalNotes&serviceRequestId=${serviceRequestId}`)
-        const res = response.json();
+        const res = await response.json();
         this.setState({internalNotes: res.data});
     }
 
@@ -96,14 +96,13 @@ export class InternalNotes extends React.Component {
     }
 
     saveInternalNote = async (value) => {
-        return this.saveNewInternalNote(value).then(result => {
-            if (this.props.onNoteAdded) {
-                this.props.onNoteAdded();
-            }
-        }).catch()
-            .then(() => {
-                this.hideNewInternalNoteModal();
-            })
+        try {
+            await this.saveNewInternalNote(value)
+            this.fetchInternalNotes();
+        } catch (error) {
+
+        }
+        this.hideNewInternalNoteModal();
     }
 }
 

@@ -1781,13 +1781,6 @@ class ActivityEditComponent extends MainComponent {
         );
     }
 
-
-    onTaskListUpdated = () => {
-        const {currentActivity} = this.state;
-        this.loadCallActivity(currentActivity);
-    }
-
-
     getTaskList() {
         const {data} = this.state;
         if (!data) {
@@ -1795,13 +1788,7 @@ class ActivityEditComponent extends MainComponent {
         }
 
         return (
-            <TaskListComponent
-                taskListUpdatedAt={data.taskListUpdatedAt}
-                taskListUpdatedBy={data.taskListUpdatedBy}
-                taskList={data.taskList}
-                problemId={data.problemID}
-                onUpdatedTaskList={this.onTaskListUpdated}
-            />
+            <TaskListComponent serviceRequestId={data.problemID}/>
         );
     }
 
