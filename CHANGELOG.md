@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v5.11.10]
+## [v5.11.10] - 2021-05-27
 ### Fixed
 - Fixed issue with Header losing the value for ExpensesNextProcessingDate when saving.
 - Fixed issue with SR Asset information.
