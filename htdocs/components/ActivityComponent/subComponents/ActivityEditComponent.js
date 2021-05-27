@@ -87,7 +87,7 @@ class ActivityEditComponent extends MainComponent {
                 priorityChangeReason: "",
                 emptyAssetReason: "",
                 emptyAssetReasonNotify: false,
-                Inbound:null
+                Inbound: null
             },
             currentActivity: "",
             _showModal: false,
@@ -245,7 +245,7 @@ class ActivityEditComponent extends MainComponent {
         delete data.activities;
         delete data.onSiteActivities;
         delete data.documents;
-        const finalData = pick(data, [            
+        const finalData = pick(data, [
             "callActivityID",
             "alarmDate",
             "alarmTime",
@@ -420,7 +420,7 @@ class ActivityEditComponent extends MainComponent {
             }
         }
 
-        if (!data.assetName && !this.state.data.emptyAssetReason) {
+        if (!data.assetName && !data.emptyAssetReason) {
             this.alert("Please select an asset or a reason");
             return false;
         }
@@ -1091,83 +1091,83 @@ class ActivityEditComponent extends MainComponent {
         }
 
         return this.getElementControl(
-          "Type",
-          "Type",
-          el(
-            "div",{style:{display:"flex",flexDirection:"row"}},
+            "Type",
+            "Type",
             el(
-              "select",
-              {
-                disabled: !isEnabled,
-                required: true,
-                value: data?.callActTypeID || "",
-                onChange: (event) => this.handleTypeChange(event.target.value),
-                style: { width: "100%" },
-              },
-              el("option", { key: "empty", value: "" }, "Please select"),
-              activityTypesToShow.map((t) =>
-                el("option", { key: t.id, value: t.id }, t.description)
-              )
-            ),
-            this.getInboundIcon()
-          )
+                "div", {style: {display: "flex", flexDirection: "row"}},
+                el(
+                    "select",
+                    {
+                        disabled: !isEnabled,
+                        required: true,
+                        value: data?.callActTypeID || "",
+                        onChange: (event) => this.handleTypeChange(event.target.value),
+                        style: {width: "100%"},
+                    },
+                    el("option", {key: "empty", value: ""}, "Please select"),
+                    activityTypesToShow.map((t) =>
+                        el("option", {key: t.id, value: t.id}, t.description)
+                    )
+                ),
+                this.getInboundIcon()
+            )
         );
     };
 
-    handleTypeChange=(value)=>{
+    handleTypeChange = (value) => {
         this.setValue("callActTypeID", value);
-        if(value=='11')
-        this.setState({showInboundOutboundModal:true});
+        if (value == '11')
+            this.setState({showInboundOutboundModal: true});
         else
-        this.setValue("Inbound", null);
+            this.setValue("Inbound", null);
     }
-    getInboundOutBoundModal=()=>{
-        const {data}=this.state;
-        const Inbound=data.Inbound==null?false:data.Inbound;
-        const Outbound=data.Inbound==null?false:!data.Inbound;
-        return <Modal 
-        width={300}
-        show={this.state.showInboundOutboundModal}
-        title="Select contact type"
-        footer={<div key="footerActions" >            
-            <button  onClick={()=>this.setState({showInboundOutboundModal:false})}>OK</button>
-            <button  onClick={()=>this.setState({showInboundOutboundModal:false,Inbound:null})}>Cancel</button>
-        </div>}
+    getInboundOutBoundModal = () => {
+        const {data} = this.state;
+        const Inbound = data.Inbound == null ? false : data.Inbound;
+        const Outbound = data.Inbound == null ? false : !data.Inbound;
+        return <Modal
+            width={300}
+            show={this.state.showInboundOutboundModal}
+            title="Select contact type"
+            footer={<div key="footerActions">
+                <button onClick={() => this.setState({showInboundOutboundModal: false})}>OK</button>
+                <button onClick={() => this.setState({showInboundOutboundModal: false, Inbound: null})}>Cancel</button>
+            </div>}
         >
-            <div style={{display:'flex', flexDirection:'row',justifyContent:"space-between"}}>
+            <div style={{display: 'flex', flexDirection: 'row', justifyContent: "space-between"}}>
                 <div>
                     <label className="mr-2">Inbound</label>
-                    <Toggle checked={Inbound} onChange={()=>this.setValue("Inbound",true)}></Toggle>
+                    <Toggle checked={Inbound} onChange={() => this.setValue("Inbound", true)}></Toggle>
                 </div>
                 <div>
                     <label className="mr-2">Outbound</label>
-                    <Toggle  checked={Outbound}  onChange={()=>this.setValue("Inbound",false)}></Toggle>
+                    <Toggle checked={Outbound} onChange={() => this.setValue("Inbound", false)}></Toggle>
                 </div>
             </div>
         </Modal>
     }
-    getInboundIcon=()=>{
-        const { data } = this.state;
+    getInboundIcon = () => {
+        const {data} = this.state;
         switch (data.Inbound) {
-          case true:
-            return (
-              <ToolTip title="Inbound Contact" width={15}>
-                  <i  onClick={() =>
-                    this.setState({ showInboundOutboundModal: true })
-                  } className="fal fa-sign-in pointer icon"></i>                 
-              </ToolTip>
-            );
-          case false:
-            return (
-              <ToolTip title="Outbound Contact" width={15}>
-                  <i onClick={() =>
-                    this.setState({ showInboundOutboundModal: true })
-                  } className="fal fa-sign-out  pointer icon"></i>
-                
-              </ToolTip>
-            );
-          default:
-            return null;
+            case true:
+                return (
+                    <ToolTip title="Inbound Contact" width={15}>
+                        <i onClick={() =>
+                            this.setState({showInboundOutboundModal: true})
+                        } className="fal fa-sign-in pointer icon"></i>
+                    </ToolTip>
+                );
+            case false:
+                return (
+                    <ToolTip title="Outbound Contact" width={15}>
+                        <i onClick={() =>
+                            this.setState({showInboundOutboundModal: true})
+                        } className="fal fa-sign-out  pointer icon"></i>
+
+                    </ToolTip>
+                );
+            default:
+                return null;
         }
     }
     getContactsElement = () => {
@@ -1782,11 +1782,6 @@ class ActivityEditComponent extends MainComponent {
     }
 
 
-    onNoteAdded = () => {
-        const {currentActivity} = this.state;
-        this.loadCallActivity(currentActivity);
-    }
-
     onTaskListUpdated = () => {
         const {currentActivity} = this.state;
         this.loadCallActivity(currentActivity);
@@ -2005,7 +2000,7 @@ class ActivityEditComponent extends MainComponent {
                 {this.getPrompt()}
                 {this.getPriorityChangeReason()}
                 {this.getProjectsElement()}
-                {this.getCallbackModal()}                                
+                {this.getCallbackModal()}
                 <ActivityHeaderComponent serviceRequestData={data}/>
                 <div className="activities-edit-container">
                     {this.getActions()}
@@ -2016,9 +2011,7 @@ class ActivityEditComponent extends MainComponent {
                 {this.getContentElement()}
                 {this.getActivityNotes()}
                 {this.getCustomerNotes()}
-                <InternalNotes onNoteAdded={this.onNoteAdded}
-                               data={data}
-                />
+                <InternalNotes serviceRequestId={data.problemID}/>
                 {this.getTaskList()}
                 <CustomerDocumentUploader
                     onDeleteDocument={(id) => this.deleteDocument(id)}

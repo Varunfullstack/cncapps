@@ -12,8 +12,26 @@ export class InternalNotes extends React.Component {
         this.state = {
             addInternalNoteModalShow: false,
             internalNoteEdit: '',
+            internalNotes: []
         }
 
+    }
+
+    componentDidMount() {
+        this.fetchInternalNotes();
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (prevProps.serviceRequestId !== this.props.serviceRequestId) {
+            this.fetchInternalNotes();
+        }
+    }
+
+    async fetchInternalNotes() {
+        const {serviceRequestId} = this.props;
+        const response = await fetch(`/SRActivity.php?action=getInternalNotes&serviceRequestId=${serviceRequestId}`)
+        const res = response.json();
+        this.setState({internalNotes: res.data});
     }
 
     addInternalNote = () => {
@@ -24,7 +42,7 @@ export class InternalNotes extends React.Component {
 
 
     render() {
-        const {addInternalNoteModalShow, internalNoteEdit} = this.state;
+        const {addInternalNoteModalShow, internalNoteEdit, internalNotes} = this.state;
         return (
             <div className="round-container">
                 <AddInternalNoteModalComponent
@@ -51,7 +69,7 @@ export class InternalNotes extends React.Component {
                     ><i className="fal fa-plus fa-2x"/></a>
                 </div>
                 <div className="internalNotesContainer">
-                    <InternalNotesListComponent internalNotes={this.props.data?.internalNotes}/>
+                    <InternalNotesListComponent internalNotes={internalNotes}/>
                 </div>
             </div>
         );
@@ -63,12 +81,12 @@ export class InternalNotes extends React.Component {
     }
 
     async saveNewInternalNote(value) {
-        const {data} = this.props;
+        const {serviceRequestId} = this.props;
 
-        const response = await fetch('?action=addInternalNote', {
+        const response = await fetch('/SRActivity.php?action=addInternalNote', {
             method: 'POST',
             body: JSON.stringify(
-                {content: value, serviceRequestId: data.problemID}
+                {content: value, serviceRequestId}
             )
         });
         const res = await response.json();
@@ -90,25 +108,5 @@ export class InternalNotes extends React.Component {
 }
 
 InternalNotes.propTypes = {
-    data: PropTypes.shape({
-        date: PropTypes.string,
-        reason: PropTypes.string,
-        projects: PropTypes.any,
-        documents: PropTypes.any,
-        alarmTime: PropTypes.string,
-        cncNextAction: PropTypes.string,
-        customerNotesTemplate: PropTypes.string,
-        reasonTemplate: PropTypes.string,
-        customerNotes: PropTypes.string,
-        internalNotes: PropTypes.any,
-        alarmDate: PropTypes.string,
-        cncNextActionTemplate: PropTypes.string,
-        completeDate: PropTypes.string,
-        emptyAssetReasonNotify: PropTypes.bool,
-        techNotes: PropTypes.string,
-        contactNotes: PropTypes.string,
-        submitAsOvertime: PropTypes.number,
-        priorityChangeReason: PropTypes.string,
-        emptyAssetReason: PropTypes.string
-    })
+    serviceRequestId: PropTypes.number
 };

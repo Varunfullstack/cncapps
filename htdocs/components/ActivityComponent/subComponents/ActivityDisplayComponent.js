@@ -838,32 +838,7 @@ class ActivityDisplayComponent extends MainComponent {
         );
 
     }
-    getNotesElement = () => {
-        const {data} = this.state;
-        return (
-            <div className="round-container">
-                <div className="flex-row">
-                    <label className="label mt-5 mr-3 ml-1 mb-5"
-                           style={{display: "block"}}
-                    >
-                        Internal Notes
-                    </label>
-                    <ToolTip
-                        width="15"
-                        title="These are internal notes only and not visible to the customer. These are per Service Request."
-                        content={
-                            <i className="fal fa-info-circle mt-5 pointer icon"/>
-                        }
-                    >
 
-                    </ToolTip>
-                </div>
-                <div className="internalNotesContainer">
-                    <InternalNotesListComponent internalNotes={data?.internalNotes}/>
-                </div>
-            </div>
-        )
-    }
     getcustomerNotesElement = () => {
         const {el} = this;
         const {data} = this.state;
@@ -912,13 +887,13 @@ class ActivityDisplayComponent extends MainComponent {
                         <td className="display-label">Type</td>
                         <td colSpan="3"
                             className="nowrap display-content"
-                            
+
                         >
-                            <div style={{display:"flex", alignItems:"center"}}>
-                            <label className="mr-3">{data?.activityType}</label>                        
-                            {this.getInboundIcon()}
+                            <div style={{display: "flex", alignItems: "center"}}>
+                                <label className="mr-3">{data?.activityType}</label>
+                                {this.getInboundIcon()}
                             </div>
-                            </td>
+                        </td>
                     </tr>
 
 
@@ -1307,25 +1282,26 @@ class ActivityDisplayComponent extends MainComponent {
         this.setState({showCallbackModal: false});
     }
 
-    getInboundIcon=()=>{
-        const { data } = this.state;
+    getInboundIcon = () => {
+        const {data} = this.state;
         switch (data.Inbound) {
-          case true:
-            return (
-              <ToolTip title="Inbound Contact" width={15}>
-                <i  className="fal fa-sign-in pointer icon"></i>   
-              </ToolTip>
-            );
-          case false:
-            return (
-              <ToolTip title="Outbound Contact" width={15}>
-                <i  className="fal fa-sign-out  pointer icon"></i>
-              </ToolTip>
-            );
-          default:
-            return null;
+            case true:
+                return (
+                    <ToolTip title="Inbound Contact" width={15}>
+                        <i className="fal fa-sign-in pointer icon"></i>
+                    </ToolTip>
+                );
+            case false:
+                return (
+                    <ToolTip title="Outbound Contact" width={15}>
+                        <i className="fal fa-sign-out  pointer icon"></i>
+                    </ToolTip>
+                );
+            default:
+                return null;
         }
     }
+
     render() {
         const {data, showSalesOrder, _loadedData} = this.state;
 
@@ -1348,9 +1324,7 @@ class ActivityDisplayComponent extends MainComponent {
                 {this.getContentElement()}
                 {this.getDetailsElement()}
                 {this.getcustomerNotesElement()}
-                <InternalNotes onNoteAdded={this.onNoteAdded}
-                               data={data}
-                />
+                <InternalNotes serviceRequestId={data?.problemID}/>
                 {this.getTaskListElement()}
                 <CustomerDocumentUploader
                     onDeleteDocument={(id) => this.deleteDocument(id)}

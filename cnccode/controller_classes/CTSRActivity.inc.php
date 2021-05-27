@@ -79,6 +79,7 @@ class CTSRActivity extends CTCNC
     const CHECK_SERVICE_REQUEST_PENDING_CALLBACKS                = "checkServiceRequestPendingCallbacks";
     const DELETE_UNSTARTED_SERVICE_REQUESTS                      = "deleteUnstartedServiceRequests";
     const FORCE_CLOSE_SERVICE_REQUEST                            = "forceCloseServiceRequest";
+    const GET_INTERNAL_NOTES                                     = "getInternalNotes";
     public  $serverGuardArray = array(
         ""  => "Please select",
         "Y" => "ServerGuard Related",
@@ -187,6 +188,11 @@ class CTSRActivity extends CTCNC
             case self::VIEW_INTERNAL_DOCUMENT:
                 $this->viewInternalDocument();
                 exit;
+            case self::GET_INTERNAL_NOTES:
+            {
+                echo json_encode($this->getInternalNotesController());
+                exit;
+            }
             case self::DELETE_INTERNAL_DOCUMENT:
                 echo json_encode($this->deleteInternalDocument());
                 exit;
@@ -342,42 +348,7 @@ class CTSRActivity extends CTCNC
             } else  $requestName = 'Unassigned';
 
         }
-        $serviceRequestInternalNotesRepo = new CNCLTD\ServiceRequestInternalNote\infra\ServiceRequestInternalNotePDORepository(
-        );
-        $notes                           = $serviceRequestInternalNotesRepo->getServiceRequestInternalNotesForSR(
-            $problemID
-        );
-        $consultants                     = [];
-        $mappedNotes                     = array_map(
-            function (ServiceRequestInternalNote $note) use ($consultants) {
-                $updatedByUserId = $note->getUpdatedBy();
-                if (!key_exists($updatedByUserId, $consultants)) {
-                    $createdByUser = new DBEUser($this);
-                    $createdByUser->getRow($updatedByUserId);
-                    $consultants[$updatedByUserId] = "{$createdByUser->getValue(DBEUser::firstName)} {$createdByUser->getValue(DBEUser::lastName)}";
-                }
-                $createdByUserId = $note->getCreatedBy();
-                if (!key_exists($createdByUserId, $consultants)) {
-                    $updatedByUser = new DBEUser($this);
-                    $updatedByUser->getRow($createdByUserId);
-                    $consultants[$createdByUserId] = "{$updatedByUser->getValue(DBEUser::firstName)} {$updatedByUser->getValue(DBEUser::lastName)}";
-                }
-                $array              = ServiceRequestInternalNotePDOMapper::toJSONArray($note);
-                $array['updatedBy'] = $consultants[$updatedByUserId];
-                $array['createdBy'] = $consultants[$createdByUserId];
-                return $array;
-            },
-            $notes
-        );
-        usort(
-            $mappedNotes,
-            function ($a, $b) {
-                if ($a['createdAt'] <= $b['createdAt']) {
-                    return 1;
-                }
-                return -1;
-            }
-        );
+        $consultants               = [];
         $chargeableWorkRequestRepo = new ChargeableWorkCustomerRequestMySQLRepository();
         try {
             $chargeableRequest   = $chargeableWorkRequestRepo->getChargeableRequestForServiceRequest(
@@ -427,7 +398,6 @@ class CTSRActivity extends CTCNC
             "sitePostcode"                    => $dbeSite->getValue(DBESite::postcode),
             "linkedSalesOrderID"              => $dbejCallActivity->getValue(DBEJCallActivity::linkedSalesOrderID),
             "activities"                      => $this->getOtherActivity($problemID),
-            "internalNotes"                   => $mappedNotes,
             'criticalFlag'                    => $dbejCallActivity->getValue(
                 DBEJCallActivity::criticalFlag
             ) == 'Y' ? 1 : 0,
@@ -1910,6 +1880,51 @@ AND c.caa_problemno = ? ',
         return [
             "status" => "ok"
         ];
+    }
+
+    private function getInternalNotesController()
+    {
+        $serviceRequestId = @$_REQUEST['serviceRequestId'];
+        if (!$serviceRequestId) {
+            throw new JsonHttpException(400, "Service Request Id is required");
+        }
+        $serviceRequestInternalNotesRepo = new CNCLTD\ServiceRequestInternalNote\infra\ServiceRequestInternalNotePDORepository(
+        );
+        $notes                           = $serviceRequestInternalNotesRepo->getServiceRequestInternalNotesForSR(
+            $serviceRequestId
+        );
+        $consultants                     = [];
+        $mappedNotes                     = array_map(
+            function (ServiceRequestInternalNote $note) use ($consultants) {
+                $updatedByUserId = $note->getUpdatedBy();
+                if (!key_exists($updatedByUserId, $consultants)) {
+                    $createdByUser = new DBEUser($this);
+                    $createdByUser->getRow($updatedByUserId);
+                    $consultants[$updatedByUserId] = "{$createdByUser->getValue(DBEUser::firstName)} {$createdByUser->getValue(DBEUser::lastName)}";
+                }
+                $createdByUserId = $note->getCreatedBy();
+                if (!key_exists($createdByUserId, $consultants)) {
+                    $updatedByUser = new DBEUser($this);
+                    $updatedByUser->getRow($createdByUserId);
+                    $consultants[$createdByUserId] = "{$updatedByUser->getValue(DBEUser::firstName)} {$updatedByUser->getValue(DBEUser::lastName)}";
+                }
+                $array              = ServiceRequestInternalNotePDOMapper::toJSONArray($note);
+                $array['updatedBy'] = $consultants[$updatedByUserId];
+                $array['createdBy'] = $consultants[$createdByUserId];
+                return $array;
+            },
+            $notes
+        );
+        usort(
+            $mappedNotes,
+            function ($a, $b) {
+                if ($a['createdAt'] <= $b['createdAt']) {
+                    return 1;
+                }
+                return -1;
+            }
+        );
+        return ["status" => "ok", "data" => $mappedNotes];
     }
 }
 
