@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.11.10]
+### Fixed
+- Fixed issue with Header losing the value for ExpensesNextProcessingDate when saving.
+- Fixed issue with SR Asset information.
+
 ## [v5.11.9] - 2021-05-24
 ### Fixed
 - Fixed issue with SecondSiteBackupValidation
