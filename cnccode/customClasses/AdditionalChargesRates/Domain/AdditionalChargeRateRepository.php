@@ -8,4 +8,6 @@ interface AdditionalChargeRateRepository
     function save(AdditionalChargeRate $additionalChargeRate);
 
     public function searchAll();
+
+    public function delete(AdditionalChargeRate $additionalChargeRate);
 }

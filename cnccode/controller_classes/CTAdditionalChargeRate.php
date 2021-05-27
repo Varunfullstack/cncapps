@@ -4,12 +4,16 @@ namespace CNCLTD\Controller;
 
 use CNCLTD\AdditionalChargesRates\Application\Add\AddAdditionalChargeRateRequest;
 use CNCLTD\AdditionalChargesRates\Application\Add\AddAdditionalChargeRateUseCase;
+use CNCLTD\AdditionalChargesRates\Application\Delete\DeleteAdditionalChargeRateUseCase;
 use CNCLTD\AdditionalChargesRates\Application\GetAll\GetAllAdditionalChargeRatesQuery;
 use CNCLTD\AdditionalChargesRates\Application\GetAll\GetAllAdditionalChargeRatesResponse;
 use CNCLTD\AdditionalChargesRates\Application\GetOne\GetOneAdditionalChargeRateResponse;
 use CNCLTD\AdditionalChargesRates\Application\GetOne\GetOneAdditionalChargeRatesQuery;
 use CNCLTD\AdditionalChargesRates\Application\Update\UpdateAdditionalChargeRateRequest;
 use CNCLTD\AdditionalChargesRates\Application\Update\UpdateAdditionalChargeRateUseCase;
+use CNCLTD\AdditionalChargesRates\Domain\AdditionalChargeRateId;
+use CNCLTD\AdditionalChargesRates\Domain\AdditionalChargeRateNotFoundException;
+use CNCLTD\AdditionalChargesRates\Domain\CannotDeleteAdditionalChargeRateException;
 use CNCLTD\Exceptions\JsonHttpException;
 use CNCLTD\Shared\Domain\Bus\QueryBus;
 use CTCNC;
@@ -50,6 +54,11 @@ class CTAdditionalChargeRate extends CTCNC
     function update()
     {
         echo json_encode($this->updateController(), JSON_NUMERIC_CHECK);
+    }
+
+    function delete()
+    {
+        echo json_encode($this->deleteController(), JSON_NUMERIC_CHECK);
     }
 
     /**
@@ -157,6 +166,22 @@ class CTAdditionalChargeRate extends CTCNC
         global $additionalChargeRateRepository;
         $usecase = new UpdateAdditionalChargeRateUseCase($additionalChargeRateRepository);
         $usecase->__invoke($request);
+        return ["status" => "ok"];
+    }
+
+    private function deleteController()
+    {
+        $additionalChargeRateRawId = @$_GET['id'];
+        if (!$additionalChargeRateRawId) {
+            throw new JsonHttpException(400, 'Id is required');
+        }
+        global $additionalChargeRateRepository;
+        $usecase = new DeleteAdditionalChargeRateUseCase($additionalChargeRateRepository);
+        try {
+            $usecase->__invoke(AdditionalChargeRateId::fromNative($additionalChargeRateRawId));
+        } catch (AdditionalChargeRateNotFoundException | CannotDeleteAdditionalChargeRateException $exception) {
+            return ["status" => "error", "message" => $exception->getMessage()];
+        }
         return ["status" => "ok"];
     }
 

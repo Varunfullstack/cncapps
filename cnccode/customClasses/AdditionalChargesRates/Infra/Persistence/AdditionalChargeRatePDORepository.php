@@ -167,4 +167,26 @@ class AdditionalChargeRatePDORepository implements AdditionalChargeRateRepositor
         $data['specificCustomerPrices'] = $specificCustomerPricesStatement->fetchAll(PDO::FETCH_ASSOC);
         return $data;
     }
+
+    public function delete(AdditionalChargeRate $additionalChargeRate)
+    {
+        $this->pdo->beginTransaction();
+        try {
+            $query                   = "delete from additionalChargeRate where id = :id";
+            $deleteStatement = $this->pdo->prepare($query);
+            if (!$deleteStatement->execute(
+                [
+                    "id"          => $additionalChargeRate->id()->value(),
+                ]
+            )) {
+                throw new PDOException('Failed to insert or update');
+            }
+            $this->deleteAdditionalChargeSpecificCustomerPrices($additionalChargeRate);
+            $this->pdo->commit();
+        } catch (\Exception $exception) {
+            $this->pdo->rollBack();
+            error_log("Failed to insert or update Additional Charge Rate: {$exception->getMessage()}");
+            throw new PDOException("Failed to insert or update: {$exception->getMessage()}");
+        }
+    }
 }

@@ -8,12 +8,17 @@ class SpecificCustomerPrice
     /** @var SalePrice */
     private $salePrice;
 
+    /** @var TimeBudgetMinutes */
+    private $timeBudgetMinutes;
+
     public function __construct(CustomerId $customerId,
-                                SalePrice $salePrice
+                                SalePrice $salePrice,
+                                TimeBudgetMinutes $timeBudgetMinutes
     )
     {
-        $this->customerId = $customerId;
-        $this->salePrice  = $salePrice;
+        $this->customerId        = $customerId;
+        $this->salePrice         = $salePrice;
+        $this->timeBudgetMinutes = $timeBudgetMinutes;
     }
 
     /**
@@ -31,4 +36,14 @@ class SpecificCustomerPrice
     {
         return $this->salePrice;
     }
+
+    /**
+     * @return TimeBudgetMinutes
+     */
+    public function timeBudgetMinutes(): TimeBudgetMinutes
+    {
+        return $this->timeBudgetMinutes;
+    }
+
+
 }

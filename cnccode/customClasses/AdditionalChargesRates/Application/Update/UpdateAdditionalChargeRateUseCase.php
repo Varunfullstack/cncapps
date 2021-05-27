@@ -9,6 +9,7 @@ use CNCLTD\AdditionalChargesRates\Domain\Description;
 use CNCLTD\AdditionalChargesRates\Domain\Notes;
 use CNCLTD\AdditionalChargesRates\Domain\SalePrice;
 use CNCLTD\AdditionalChargesRates\Domain\SpecificCustomerPrice;
+use CNCLTD\AdditionalChargesRates\Domain\TimeBudgetMinutes;
 use CNCLTD\AdditionalChargesRates\Infra\Persistence\AdditionalChargeRatePDORepository;
 use function Lambdish\Phunctional\map;
 
@@ -43,7 +44,8 @@ class UpdateAdditionalChargeRateUseCase
                 function ($customerPriceArray) {
                     return new SpecificCustomerPrice(
                         new CustomerId($customerPriceArray['customerId']),
-                        new SalePrice($customerPriceArray['salePrice'])
+                        new SalePrice($customerPriceArray['salePrice']),
+                        new TimeBudgetMinutes($customerPriceArray['timeBudget'])
                     );
                 },
                 $additionalChargeRateRequest->specificCustomerPrices()

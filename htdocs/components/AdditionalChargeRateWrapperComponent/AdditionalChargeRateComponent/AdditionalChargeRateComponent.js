@@ -3,6 +3,7 @@ import {AdditionalChargeRateList} from "./subComponents/AdditionalChargeRateList
 import '../../style.css';
 import './AdditionalChargeRateComponent.css';
 import {AdditionalChargeRateModal} from "./subComponents/AdditionalChargeRateModal";
+import MainComponent from "../../shared/MainComponent";
 
 
 const NEW_ADDITIONAL_CHARGE_RATE = {
@@ -12,7 +13,19 @@ const NEW_ADDITIONAL_CHARGE_RATE = {
     specificCustomerPrices: []
 }
 
-export class AdditionalChargeRate extends React.Component {
+export class AdditionalChargeRate extends MainComponent {
+    constructor(props, context) {
+        super(props, context);
+        this.state = {
+            ...this.state,
+            additionalChargeRates: [],
+            editingAdditionalChargeRate: null,
+        }
+
+        this.loadAdditionalChargeRates();
+
+    }
+
     setEditingItem = async (id) => {
         const item = await this.loadById(id)
         this.setState({editingAdditionalChargeRate: item})
@@ -28,16 +41,6 @@ export class AdditionalChargeRate extends React.Component {
         }
     }
 
-    constructor(props, context) {
-        super(props, context);
-        this.state = {
-            additionalChargeRates: [],
-            editingAdditionalChargeRate: null,
-        }
-
-        this.loadAdditionalChargeRates();
-
-    }
 
     cancelModal = () => {
         this.setState({
@@ -76,6 +79,7 @@ export class AdditionalChargeRate extends React.Component {
 
         return (
             <React.Fragment>
+                {this.getConfirm()}
                 {
                     editingAdditionalChargeRate ?
                         <AdditionalChargeRateModal editingAdditionalChargeRate={editingAdditionalChargeRate}
@@ -86,9 +90,21 @@ export class AdditionalChargeRate extends React.Component {
 
                 <AdditionalChargeRateList additionalChargeRates={additionalChargeRates}
                                           onAdd={this.newAdditionalChargeRate}
-                                          onEdit={this.setEditingItem}/>
+                                          onEdit={this.setEditingItem}
+                                          onDelete={this.deleteItem}
+                />
+
             </React.Fragment>
         )
+    }
+
+    deleteItem = async (item) => {
+        if (!await this.confirm('Are you sure you want to delete this Additional Charge?')) {
+            return;
+        }
+        const response = await fetch(`?action=delete&id=${item.id}`);
+        const res = await response.json();
+        this.loadAdditionalChargeRates();
     }
 
     newAdditionalChargeRate = () => {

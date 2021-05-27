@@ -10,13 +10,20 @@ use CNCLTD\AdditionalChargesRates\Domain\InvalidAdditionalChargeRageIdValue;
 use CNCLTD\AdditionalChargesRates\Domain\Notes;
 use CNCLTD\AdditionalChargesRates\Domain\SalePrice;
 use CNCLTD\AdditionalChargesRates\Domain\SpecificCustomerPrice;
+use CNCLTD\AdditionalChargesRates\Domain\TimeBudgetMinutes;
+use CNCLTD\AdditionalChargesRates\Domain\TimeBudgetMinutesCannotBeNegativeException;
 use CNCLTD\Exceptions\EmptyStringException;
+use CNCLTD\Exceptions\StringTooLongException;
 
 class AdditionalChargeRatePDO extends AdditionalChargeRate
 {
     /**
-     * @throws InvalidAdditionalChargeRageIdValue
+     * @param $data
+     * @return AdditionalChargeRatePDO
      * @throws EmptyStringException
+     * @throws InvalidAdditionalChargeRageIdValue
+     * @throws TimeBudgetMinutesCannotBeNegativeException
+     * @throws StringTooLongException
      */
     public static function fromPersistence($data): AdditionalChargeRatePDO
     {
@@ -25,10 +32,13 @@ class AdditionalChargeRatePDO extends AdditionalChargeRate
             new Description($data['description']),
             new Notes($data['notes']),
             new SalePrice($data['salePrice']),
+            new TimeBudgetMinutes($data['timeBudgetMinutes'])
         );
         foreach ($data['specificCustomerPrices'] as $specificPrice) {
             $instance->specificCustomerPrices[] = new SpecificCustomerPrice(
-                new CustomerId($specificPrice['customerId']), new SalePrice($specificPrice['salePrice'])
+                new CustomerId($specificPrice['customerId']),
+                new SalePrice($specificPrice['salePrice']),
+                new TimeBudgetMinutes($specificPrice['timeBudgetMinutes']),
             );
         }
         return $instance;

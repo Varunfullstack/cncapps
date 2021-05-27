@@ -22,6 +22,14 @@ class GetAllAdditionalChargeRateResponse implements \JsonSerializable
      * @var string
      */
     private $salePrice;
+    /**
+     * @var bool
+     */
+    private $canDelete;
+    /**
+     * @var int
+     */
+    private $timeBudgetMinutes;
 
 
     /**
@@ -30,14 +38,18 @@ class GetAllAdditionalChargeRateResponse implements \JsonSerializable
     public function __construct(string $id,
                                 string $description,
                                 string $salePrice,
-                                ?string $notes
+                                int $timeBudgetMinutes,
+                                ?string $notes,
+                                bool $canDelete
     )
     {
 
-        $this->id          = $id;
-        $this->description = $description;
-        $this->notes       = $notes;
-        $this->salePrice  = $salePrice;
+        $this->id                = $id;
+        $this->description       = $description;
+        $this->notes             = $notes;
+        $this->salePrice         = $salePrice;
+        $this->canDelete         = $canDelete;
+        $this->timeBudgetMinutes = $timeBudgetMinutes;
     }
 
     /**
@@ -71,6 +83,23 @@ class GetAllAdditionalChargeRateResponse implements \JsonSerializable
     {
         return $this->salePrice;
     }
+
+    /**
+     * @return bool
+     */
+    public function canDelete(): bool
+    {
+        return $this->canDelete;
+    }
+
+    /**
+     * @return int
+     */
+    public function timeBudgetMinutes(): int
+    {
+        return $this->timeBudgetMinutes;
+    }
+
 
     public function jsonSerialize()
     {
