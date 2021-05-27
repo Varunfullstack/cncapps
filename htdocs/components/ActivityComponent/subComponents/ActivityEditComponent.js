@@ -1574,7 +1574,6 @@ class ActivityEditComponent extends MainComponent {
                 this.alert('Sales Request Sent');
                 break;
         }
-        this.loadCallActivity(currentActivity);
         this.setState({_showModal: false});
     };
     getTemplateModal = () => {

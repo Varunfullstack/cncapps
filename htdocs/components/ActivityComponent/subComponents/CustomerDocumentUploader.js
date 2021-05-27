@@ -5,6 +5,8 @@ import Table from "../../shared/table/table";
 import APIActivity from "../../services/APIActivity";
 
 import './CustomerDocumentUploader.css';
+import moment from "moment";
+import {dateFormatExcludeNull} from "../../utils/utils";
 
 export default class CustomerDocumentUploader extends React.PureComponent {
     api = new APIActivity();
@@ -81,6 +83,9 @@ export default class CustomerDocumentUploader extends React.PureComponent {
                 path: "createDate",
                 label: "Date",
                 sortable: false,
+                content: document => {
+                    return dateFormatExcludeNull(document.createDate, 'YYYY-MM-DD HH:mm:ss')
+                }
             },
             {
                 path: "delete",
