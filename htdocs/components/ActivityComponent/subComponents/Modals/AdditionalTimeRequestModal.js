@@ -11,6 +11,9 @@ class AdditionalTimeRequestModal extends React.Component {
     static defaultProps = {
         show: false,
     }
+    changeSelectedAdditionalCharge = ($event) => {
+        this.setState({selectedAdditionalCharge: $event.target.value});
+    };
 
     constructor(props) {
         super(props);
@@ -22,7 +25,9 @@ class AdditionalTimeRequestModal extends React.Component {
             reason: '',
             timeRequested: 0,
             contacts: [],
-            selectedContactId: ''
+            selectedContactId: '',
+            specificAdditionalChargeRates: [],
+            selectedAdditionalCharge: ''
         };
     }
 
@@ -50,6 +55,15 @@ class AdditionalTimeRequestModal extends React.Component {
         const selectedContactId = isSelectedContactMain ? serviceRequestContactId : primaryContact.id;
 
         this.setState({contacts: filteredContacts, selectedContactId})
+        this.fetchSpecificAdditionalChargeRates();
+    }
+
+    async fetchSpecificAdditionalChargeRates() {
+        const {serviceRequestData} = this.props;
+        const response = await fetch(`/AdditionalChargeRate.php?action=getSpecificCustomerAdditionalChargeRates&customerId=${serviceRequestData.customerId}`);
+        const res = await response.json();
+        const specificAdditionalChargeRates = res.data;
+        this.setState({specificAdditionalChargeRates});
     }
 
     handleTemplateValueChange = (reason) => {
@@ -105,7 +119,14 @@ class AdditionalTimeRequestModal extends React.Component {
 
     getTemplateModal = () => {
         const {show} = this.props;
-        const {reason, timeRequested, contacts, selectedContactId} = this.state;
+        const {
+            reason,
+            timeRequested,
+            contacts,
+            selectedContactId,
+            specificAdditionalChargeRates,
+            selectedAdditionalCharge
+        } = this.state;
         return (
             <Modal
                 width="600px"
@@ -131,51 +152,80 @@ class AdditionalTimeRequestModal extends React.Component {
                                 }
                             </select>
                         </div>
-                        <div key="hoursContainer"
-                             style={{marginBottom: "1rem"}}
-                             className="hoursContainer"
-                        >
-                            <label key="someLabel">
-                                Hours to quote for:
-                            </label>
-                            <select onChange={this.handleTimeRequestedChange}
-                                    key="someSelect"
-                            >
-                                <option>
-                                    -- Select an option --
-                                </option>
-                                <option value={1}
-                                        key={1}
-                                >1
-                                </option>
-                                <option value={2}
-                                        key={2}
-                                >2
-                                </option>
-                                <option value={3}
-                                        key={3}
-                                >3
-                                </option>
-                                <option value={4}
-                                        key={4}
-                                >4
-                                </option>
-                            </select>
-                        </div>
-                        <label>
-                            Reason for additional charges (the customer will see this)
-                        </label>
-                        <div style={{height: 150}}
-                             key="editableFieldContainer"
-                        >
-                            {this.renderEditableField()}
-                        </div>
+                        {
+                            specificAdditionalChargeRates.length ?
+                                <div key="additionalChargeRates">
+                                    <label>
+                                        Agreed Additional Charges
+                                    </label>
+                                    <select value={selectedAdditionalCharge}
+                                            onChange={this.changeSelectedAdditionalCharge}>
+                                        <option key="noSelection" value={null}>
+                                            -- Pick an option --
+                                        </option>
+                                        {
+                                            specificAdditionalChargeRates.map(x =>
+                                                <option key={x.id} value={x.id}>{x.description}</option>)
+                                        }
+                                    </select>
+                                </div>
+                                :
+                                null
+                        }
+                        {
+                            !selectedAdditionalCharge ?
+
+                                <React.Fragment>
+
+                                    <div key="hoursContainer"
+                                         style={{marginBottom: "1rem"}}
+                                         className="hoursContainer"
+                                    >
+                                        <label key="someLabel">
+                                            Hours to quote for:
+                                        </label>
+                                        <select onChange={this.handleTimeRequestedChange}
+                                                key="someSelect"
+                                                value={timeRequested}
+                                        >
+                                            <option>
+                                                -- Select an option --
+                                            </option>
+                                            <option value={1}
+                                                    key={1}
+                                            >1
+                                            </option>
+                                            <option value={2}
+                                                    key={2}
+                                            >2
+                                            </option>
+                                            <option value={3}
+                                                    key={3}
+                                            >3
+                                            </option>
+                                            <option value={4}
+                                                    key={4}
+                                            >4
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <label>
+                                        Reason for additional charges (the customer will see this)
+                                    </label>
+                                    <div style={{height: 150}}
+                                         key="editableFieldContainer"
+                                    >
+                                        {this.renderEditableField()}
+                                    </div>
+                                </React.Fragment>
+                                : null}
                     </React.Fragment>
                 )}
                 footer={
                     <div key="footer">
                         <button key="saveButton"
-                                disabled={!reason || !timeRequested}
+                                disabled={!selectedAdditionalCharge && !(timeRequested && reason)}
                                 onClick={this.handleTemplateOk}
                         >
                             Save

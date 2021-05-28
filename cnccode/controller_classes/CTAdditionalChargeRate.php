@@ -9,11 +9,14 @@ use CNCLTD\AdditionalChargesRates\Application\GetAll\GetAllAdditionalChargeRates
 use CNCLTD\AdditionalChargesRates\Application\GetAll\GetAllAdditionalChargeRatesResponse;
 use CNCLTD\AdditionalChargesRates\Application\GetOne\GetOneAdditionalChargeRateResponse;
 use CNCLTD\AdditionalChargesRates\Application\GetOne\GetOneAdditionalChargeRatesQuery;
+use CNCLTD\AdditionalChargesRates\Application\GetSpecificRatesForCustomer\GetSpecificRatesForCustomerQuery;
+use CNCLTD\AdditionalChargesRates\Application\GetSpecificRatesForCustomer\GetOneSpecificRateForCustomerResponse;
 use CNCLTD\AdditionalChargesRates\Application\Update\UpdateAdditionalChargeRateRequest;
 use CNCLTD\AdditionalChargesRates\Application\Update\UpdateAdditionalChargeRateUseCase;
 use CNCLTD\AdditionalChargesRates\Domain\AdditionalChargeRateId;
 use CNCLTD\AdditionalChargesRates\Domain\AdditionalChargeRateNotFoundException;
 use CNCLTD\AdditionalChargesRates\Domain\CannotDeleteAdditionalChargeRateException;
+use CNCLTD\AdditionalChargesRates\Domain\CustomerId;
 use CNCLTD\Exceptions\JsonHttpException;
 use CNCLTD\Shared\Domain\Bus\QueryBus;
 use CTCNC;
@@ -27,10 +30,11 @@ require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 
 class CTAdditionalChargeRate extends CTCNC
 {
-    const GET_ADDITIONAL_CHARGE_RATES = 'getAdditionalChargeRates';
-    const GET_BY_ID                   = 'getById';
-    const ADD                         = 'add';
-    const UPDATE                      = 'update';
+    const GET_ADDITIONAL_CHARGE_RATES                   = 'getAdditionalChargeRates';
+    const GET_BY_ID                                     = 'getById';
+    const ADD                                           = 'add';
+    const UPDATE                                        = 'update';
+    const GET_SPECIFIC_CUSTOMER_ADDITIONAL_CHARGE_RATES = 'getSpecificCustomerAdditionalChargeRates';
     /**
      * @var QueryBus
      */
@@ -82,6 +86,11 @@ class CTAdditionalChargeRate extends CTCNC
             case self::ADD:
             {
                 echo json_encode($this->addController(), JSON_NUMERIC_CHECK);
+                break;
+            }
+            case self::GET_SPECIFIC_CUSTOMER_ADDITIONAL_CHARGE_RATES:
+            {
+                echo json_encode($this->getSpecificCustomerAdditionalChargeRatesController(), JSON_NUMERIC_CHECK);
                 break;
             }
             default:
@@ -183,6 +192,17 @@ class CTAdditionalChargeRate extends CTCNC
             return ["status" => "error", "message" => $exception->getMessage()];
         }
         return ["status" => "ok"];
+    }
+
+    private function getSpecificCustomerAdditionalChargeRatesController()
+    {
+        $customerId = @$_REQUEST['customerId'];
+        if (!$customerId) {
+            throw new JsonHttpException(400, 'Customer Id is required');
+        }
+        /** @var GetOneSpecificRateForCustomerResponse $response */
+        $response = $this->queryBus->ask(new GetSpecificRatesForCustomerQuery(new CustomerId($customerId)));
+        return ["status" => "ok", "data" => $response->prices()];
     }
 
 }

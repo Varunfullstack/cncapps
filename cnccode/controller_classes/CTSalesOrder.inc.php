@@ -2385,6 +2385,9 @@ class CTSalesOrder extends CTCNC
     {
         $this->loadReactCSS('SupplierSearchComponent.css');
         $this->loadReactScript('SupplierSearchComponent.js');
+        $this->loadReactCSS('AdditionalChargeRatesSelectorWrapperComponent.css');
+        $this->loadReactScript('AdditionalChargeRatesSelectorWrapperComponent.js');
+        $this->template->setVar("customerId", $dsOrdhead->getValue(DBEOrdhead::customerID));
         // Lines
         if ($this->dsOrdline->getValue(DBEJOrdline::lineType) != "I") {                    // Comment line
             $this->template->set_var(

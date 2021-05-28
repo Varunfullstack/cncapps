@@ -1,11 +1,14 @@
 <?php
 
-use CNCLTD\AdditionalChargesRates\Application\GetAll\GetAllAdditionalChargeRatesQuery;
 use CNCLTD\AdditionalChargesRates\Application\GetAll\GetAllAdditionalChargeRatesQueryHandler;
 use CNCLTD\AdditionalChargesRates\Application\GetOne\GetOneAdditionalChargeRatesQueryHandler;
+use CNCLTD\AdditionalChargesRates\Application\GetOneSpecificRateForCustomer\GetOneSpecificRateForCustomerQueryHandler;
 use CNCLTD\AdditionalChargesRates\Application\GetRatesForCustomer\GetRatesForCustomerQueryHandler;
+use CNCLTD\AdditionalChargesRates\Application\GetSpecificRatesForCustomer\GetSpecificRatesForCustomerQueryHandler;
 use CNCLTD\AdditionalChargesRates\Infra\Persistence\AdditionalChargeRatePDORepository;
 use CNCLTD\AdditionalChargesRates\Infra\Persistence\PDOCustomerPricesGetter;
+use CNCLTD\AdditionalChargesRates\Infra\Persistence\PDOCustomerSpecificPriceGetter;
+use CNCLTD\AdditionalChargesRates\Infra\Persistence\PDOCustomerSpecificPricesGetter;
 use CNCLTD\Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
 use Twig\Environment;
 use Twig\Extension\DebugExtension;
@@ -1239,6 +1242,10 @@ define(
     2237
 );
 define(
+    'CONFIG_ADDITIONAL_CHARGE_ITEMID',
+    18613,
+);
+define(
     'CONFIG_SALES_STOCK_CUSTOMERID',
     2511
 );
@@ -1542,7 +1549,9 @@ $inMemorySymfonyBus             = new InMemorySymfonyQueryBus(
     [
         new GetAllAdditionalChargeRatesQueryHandler($additionalChargeRateRepository),
         new GetOneAdditionalChargeRatesQueryHandler($additionalChargeRateRepository),
-        new GetRatesForCustomerQueryHandler(new PDOCustomerPricesGetter($pdoConnection))
+        new GetRatesForCustomerQueryHandler(new PDOCustomerPricesGetter($pdoConnection)),
+        new GetSpecificRatesForCustomerQueryHandler(new PDOCustomerSpecificPricesGetter($pdoConnection)),
+        new GetOneSpecificRateForCustomerQueryHandler(new PDOCustomerSpecificPriceGetter($pdoConnection))
     ]
 );
 

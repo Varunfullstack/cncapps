@@ -7,6 +7,8 @@ use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestToken
 use CNCLTD\ChargeableWorkCustomerRequest\infra\ChargeableWorkCustomerRequestMySQLRepository;
 use CNCLTD\ChargeableWorkCustomerRequest\usecases\CreateChargeableWorkCustomerRequest;
 use CNCLTD\ChargeableWorkCustomerRequest\usecases\GetPendingToProcessChargeableRequestInfo;
+use CNCLTD\ChargeableWorkCustomerRequest\usecases\ProcessChargeableWorkCustomerRequestFromSpecificCustomerRate;
+use CNCLTD\Data\DBEJProblem;
 use CNCLTD\Exceptions\APIException;
 use CNCLTD\Exceptions\ChargeableWorkCustomerRequestNotFoundException;
 use CNCLTD\Exceptions\JsonHttpException;
@@ -1695,18 +1697,26 @@ FROM
     {
         $data = $this->getJSONData();
         try {
-            $serviceRequestId  = (int)@$data['serviceRequestId'];
-            $reason            = @$data['reason'];
-            $timeRequested     = (int)@$data['timeRequested'];
-            $selectedContactId = (int)@$data['selectedContactId'];
-            $repo              = new ChargeableWorkCustomerRequestMySQLRepository();
-            $buActivity        = new BUActivity($this);
-            $serviceRequest    = new DBEProblem($this);
+            $serviceRequestId           = (int)@$data['serviceRequestId'];
+            $reason                     = @$data['reason'];
+            $timeRequested              = (int)@$data['timeRequested'];
+            $selectedContactId          = (int)@$data['selectedContactId'];
+            $selectedAdditionalChargeId = @$data['selectedAdditionalChargeId'];
+            $repo                       = new ChargeableWorkCustomerRequestMySQLRepository();
+            $buActivity                 = new BUActivity($this);
+            $serviceRequest             = new DBEJProblem($this);
             if (!$serviceRequest->getRow($serviceRequestId)) {
                 throw new ServiceRequestNotFoundException();
             }
-            $usecase = new CreateChargeableWorkCustomerRequest($repo, $buActivity);
-            $usecase->__invoke($serviceRequest, $this->dbeUser, $timeRequested, $reason, $selectedContactId);
+            if ($selectedAdditionalChargeId) {
+                global $inMemorySymfonyBus;
+                $usecase = new ProcessChargeableWorkCustomerRequestFromSpecificCustomerRate($inMemorySymfonyBus);
+                $usecase->__invoke($serviceRequest,$selectedAdditionalChargeId, $this->dbeUser);
+            } else {
+                $usecase = new CreateChargeableWorkCustomerRequest($repo, $buActivity);
+                $usecase->__invoke($serviceRequest, $this->dbeUser, $timeRequested, $reason, $selectedContactId);
+            }
+
         } catch (Exception $exception) {
             throw new JsonHttpException(400, $exception->getMessage());
         }
@@ -1875,7 +1885,7 @@ AND c.caa_problemno = ? ',
                 $failedDeletions,
                 $search
             );
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw new JsonHttpException(500, $exception->getMessage());
         }
         return ["status" => "ok", "result" => "{$successCount}/{$totalCount} of found SR's deleted successfully"];
