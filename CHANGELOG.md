@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.11.11] - 2021-05-28
+### Fixed
+- Fixed issue with Automated Import Requests.
+
 ## [v5.11.10] - 2021-05-27
 ### Fixed
 - Fixed issue with Header losing the value for ExpensesNextProcessingDate when saving.

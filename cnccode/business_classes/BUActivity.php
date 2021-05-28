@@ -7215,7 +7215,8 @@ class BUActivity extends Business
                 $record->getPostcode()
             );
         }
-        if (!$siteNo) {
+
+        if ($siteNo === false) {
             $siteNo = $dbeContact->getValue(DBEContact::siteNo);
         }
         $dbeProblem->setValue(
@@ -7389,6 +7390,7 @@ class BUActivity extends Business
         }
         $dsCustomer = new DBECustomer($this);
         $dsCustomer->getRow($customerID);
+        echo "<p>Logged ServiceRequest with ID: {$dbeProblem->getPKValue()}</p>";
         $this->sendAutomaticallyLoggedServiceRequestEmail($dbeCallActivity->getValue(DBECallActivity::callActivityID));
         return true;
     }
@@ -8002,6 +8004,7 @@ class BUActivity extends Business
     {
         $details = $automatedRequest->getTextBody();
         if (!$automatedRequest->getMonitorStatus()) {
+
             /* Create new request */
             $details = $automatedRequest->getSubjectLine() . "\n\n" . $details . "\n\n";
             $details .= 'Raised from ServerGuard on ' . date(DATE_MYSQL_DATETIME);
@@ -8086,6 +8089,7 @@ class BUActivity extends Business
                         $automatedRequest
                     );
                 }
+                echo "<p>We have added information to the existing request: {$request['pro_problemno']}</p>";
                 return true;
             } else {
                 /* Create new request */
