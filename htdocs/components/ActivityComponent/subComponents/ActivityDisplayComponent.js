@@ -471,7 +471,11 @@ class ActivityDisplayComponent extends MainComponent {
                 await this.api.addAdditionalTimeRequest(serviceRequestId, reason, timeRequested, selectedContactId, selectedAdditionalChargeId);
                 const {currentActivity} = this.state;
                 await this.loadCallActivity(currentActivity);
-                this.alert('Request Sent');
+                let defaultAlertText = 'Request Sent';
+                if(selectedAdditionalChargeId){
+                    defaultAlertText = 'Saved successfully';
+                }
+                this.alert(defaultAlertText);
             } catch (error) {
                 let message = error;
                 if (typeof (error) === 'object' && "message" in error) {
