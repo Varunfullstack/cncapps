@@ -14,6 +14,7 @@ use CNCLTD\CommunicationService\CommunicationService;
 use CNCLTD\Exceptions\AdditionalHoursRequestedInvalidValueException;
 use CNCLTD\Exceptions\ChargeableWorkCustomerRequestContactNotFoundException;
 use CNCLTD\Exceptions\ChargeableWorkCustomerRequestContactNotMainException;
+use CNCLTD\Exceptions\ColumnOutOfRangeException;
 use DateTimeImmutable;
 use DBECallActivity;
 use DBEContact;
@@ -51,6 +52,7 @@ class CreateChargeableWorkCustomerRequest
      * @throws AdditionalHoursRequestedInvalidValueException
      * @throws ChargeableWorkCustomerRequestContactNotFoundException
      * @throws ChargeableWorkCustomerRequestContactNotMainException
+     * @throws ColumnOutOfRangeException
      */
     public function __invoke(DBEProblem $serviceRequest,
                              DBEUser $requester,

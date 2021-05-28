@@ -803,11 +803,11 @@ class CTCNC extends Controller
                 "label" => "Quote Templates",
                 "href"  => "QuoteTemplates.php",
             ],
-            // [
-            //     "id"    => 313,
-            //     "label" => "TechData Orders",
-            //     "href"  => "CustomerLicenses.php?action=searchOrders",
-            // ],
+            [
+                "id"    => 312,
+                "label" => "Additional Charge Rates",
+                "href"  => "AdditionalChargeRate.php",
+            ],
         ];
     }
 

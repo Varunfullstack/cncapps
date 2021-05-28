@@ -1,5 +1,8 @@
 <?php
 
+use CNCLTD\AdditionalChargesRates\Application\GetRatesForCustomer\GetRatesForCustomerQuery;
+use CNCLTD\AdditionalChargesRates\Application\GetRatesForCustomer\GetRatesForCustomerResponse;
+use CNCLTD\AdditionalChargesRates\Domain\CustomerId;
 use CNCLTD\ChargeableWorkCustomerRequest\Core\ChargeableWorkCustomerRequestTokenId;
 use CNCLTD\ChargeableWorkCustomerRequest\infra\ChargeableWorkCustomerRequestMySQLRepository;
 use CNCLTD\ChargeableWorkCustomerRequest\usecases\AcceptPendingChargeableWorkCustomerRequest;
@@ -12,6 +15,7 @@ use CNCLTD\Exceptions\ChargeableWorkCustomerRequestNotFoundException;
 use CNCLTD\Exceptions\ContactNotFoundException;
 use CNCLTD\FeedbackTokenGenerator;
 use CNCLTD\JsonBodyParserMiddleware;
+use CNCLTD\Shared\Domain\Bus\QueryBus;
 use CNCLTD\SignableProcess;
 use DI\Container;
 use Monolog\Handler\RotatingFileHandler;
@@ -47,6 +51,13 @@ $container->set(
         $loader = new FilesystemLoader('', __DIR__ . '/../../twig');
         $loader->addPath('api', 'api');
         return new Environment($loader, ["cache" => __DIR__ . '/../../cache']);
+    }
+);
+$container->set(
+    'queryBus',
+    function () {
+        global $inMemorySymfonyBus;
+        return $inMemorySymfonyBus;
     }
 );
 $container->set(
@@ -582,6 +593,26 @@ ORDER BY raisedManually DESC";
                 $statement = $db->preparedQuery($query, $params);
                 $data      = $statement->fetch_all(MYSQLI_ASSOC);
                 $response->getBody()->write(json_encode($data, JSON_NUMERIC_CHECK));
+                return $response;
+            }
+        );
+        $group->get(
+            '/customerAdditionalChargeRates/{customerId}',
+            function (Request $request, Response $response, $args) {
+                $customerId = @$args['customerId'];
+                if (!$customerId) {
+                    $response->getBody()->write(
+                        json_encode(["error" => "Customer ID required"])
+                    );
+                    return $response->withStatus(400);
+                }
+                /** @var QueryBus $queryBus */
+                $queryBus = $this->get('queryBus');
+                /** @var GetRatesForCustomerResponse $res */
+                $res = $queryBus->ask(new GetRatesForCustomerQuery(new CustomerId($customerId)));
+                $response->getBody()->write(
+                    json_encode($res, JSON_NUMERIC_CHECK)
+                );
                 return $response;
             }
         );

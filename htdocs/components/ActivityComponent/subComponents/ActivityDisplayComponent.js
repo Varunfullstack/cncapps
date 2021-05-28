@@ -460,12 +460,21 @@ class ActivityDisplayComponent extends MainComponent {
     handleRequestCustomerApproval = async () => {
         const {problemID: serviceRequestId} = this.state.data;
         try {
-            const {reason, timeRequested, selectedContactId} = await this.showAdditionalTimeRequestModal();
+            const {
+                reason,
+                timeRequested,
+                selectedContactId,
+                selectedAdditionalChargeId
+            } = await this.showAdditionalTimeRequestModal();
             try {
-                await this.api.addAdditionalTimeRequest(serviceRequestId, reason, timeRequested, selectedContactId);
+                await this.api.addAdditionalTimeRequest(serviceRequestId, reason, timeRequested, selectedContactId, selectedAdditionalChargeId);
                 const {currentActivity} = this.state;
                 await this.loadCallActivity(currentActivity);
-                this.alert('Request Sent');
+                let defaultAlertText = 'Request Sent';
+                if(selectedAdditionalChargeId){
+                    defaultAlertText = 'Saved successfully';
+                }
+                this.alert(defaultAlertText);
             } catch (error) {
                 let message = error;
                 if (typeof (error) === 'object' && "message" in error) {

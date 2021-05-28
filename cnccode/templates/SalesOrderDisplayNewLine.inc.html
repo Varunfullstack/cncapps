@@ -1,9 +1,12 @@
 <!-- Template: SalesOrderDisplayNewLine.inc.html -->
 <script>
+    const customerId = {customerId};
+
     document.addEventListener('DOMContentLoaded', () => {
         const itemIdInput = document.getElementById("itemID");
         const addLineButton = document.querySelector('button[name="addLine"]');
         const addToRecurringButton = document.querySelector('button[name="ordline[1][isRecurring]"]');
+        const additionalChargesButton = document.querySelector('button[name="additionalChargeRate"]');
         const typeSelector = document.getElementById("lineType");
 
         const itemDescriptionInput = document.getElementById("itemDescription");
@@ -15,6 +18,44 @@
         const autocompleteItemContainer = document.getElementById('autocompleteItem');
         const reactSupplierSearchContainer = document.getElementById("reactSupplierSearchContainer");
 
+        const testModal = document.getElementById('modal');
+
+        additionalChargesButton.addEventListener('click', () => {
+            document.AdditionalChargeRatesSelectorRenderer(
+                    testModal,
+                    customerId,
+                    (selectedCharge) => {
+                        console.log(selectedCharge);
+                        document.unmountComponentAtNode(testModal);
+                        // ITEM ID 18613
+                        itemIdInput.value = 18613;
+                        itemDescriptionInput.value = selectedCharge.description;
+                        curUnitSaleInput.value = selectedCharge.salePrice;
+                        curUnitCostInput.value = 0;
+                        const element = document.querySelector('input.typeahead-input');
+                        element.value = selectedCharge.description;
+                        updateSupplier(53);
+                    },
+                    () => {
+                        console.log('on close is called');
+                        document.unmountComponentAtNode(testModal);
+                    }
+            );
+        })
+
+        function updateSupplier(supplierId) {
+            supplierIdInput.value = supplierId;
+            document.renderSupplierSearchComponent(
+                    reactSupplierSearchContainer, {
+                        onChange: (id) => {
+                            supplierIdInput.value = id;
+                            updateButtons();
+                        },
+                        supplierId: supplierId
+                    }
+            );
+        }
+
         let props = {
             autocompleteSelectedCallBack: (selectedItem) => {
                 props.value = selectedItem.label;
@@ -23,16 +64,7 @@
                 curUnitSaleInput.value = selectedItem.curUnitSale;
                 itemDescriptionInput.value = selectedItem.label;
                 if (selectedItem.supplierId) {
-                    supplierIdInput.value = selectedItem.supplierId;
-                    document.renderSupplierSearchComponent(
-                            reactSupplierSearchContainer, {
-                                onChange: (id) => {
-                                    supplierIdInput.value = id;
-                                    updateButtons();
-                                },
-                                supplierId: selectedItem.supplierId
-                            }
-                    );
+                    updateSupplier(selectedItem.supplierId);
                 }
                 updateButtons();
                 document.renderTypeAheadComponent(props, autocompleteItemContainer)
@@ -109,13 +141,23 @@
             }
         }
 
+        function showAdditionalCharge() {
+            additionalChargesButton.style.display = 'inline-block';
+        }
+
+        function hideAdditionalCharge() {
+            additionalChargesButton.style.display = 'none';
+        }
+
         function updateButtons() {
             if (typeSelected === 'I') {
                 hideItemDescription();
                 showItemSearch();
+                showAdditionalCharge()
             } else {
                 hideItemSearch();
                 showItemDescription();
+                hideAdditionalCharge();
             }
             if (typeSelected === 'I' || typeSelected === 'T' || typeSelected === 'O') {
                 showAddLineButton();
@@ -217,6 +259,7 @@
         }
     })
 </script>
+<div id="modal"></div>
 <form name="ordline"
       method="post"
       action="{urlSubmit}"
@@ -364,6 +407,7 @@
                 >
                     <i class="fal fa-plus fa-2x"></i>
                 </button>
+
                 <button name="ordline[1][isRecurring]"
                         style="display: none"
                         value="1"
@@ -372,6 +416,13 @@
 
                 >
                     <i class="fal fa-repeat fa-2x"></i>
+                </button>
+                <button name="additionalChargeRate"
+                        class="salesOrderButton not-so-faint"
+                        title="Additional Charges"
+                        type="button"
+                >
+                    <i class="fal fa-search-dollar fa-2x"></i>
                 </button>
             </td>
             <td width="62">&nbsp;</td>

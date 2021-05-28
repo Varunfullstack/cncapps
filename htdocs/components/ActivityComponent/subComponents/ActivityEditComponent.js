@@ -644,12 +644,21 @@ class ActivityEditComponent extends MainComponent {
     handleRequestCustomerApproval = async () => {
         const {problemID: serviceRequestId} = this.state.data;
         try {
-            let {reason, selectedContactId, timeRequested} = await this.showAdditionalTimeRequestModal();
+            let {
+                reason,
+                selectedContactId,
+                timeRequested,
+                selectedAdditionalChargeId
+            } = await this.showAdditionalTimeRequestModal();
             try {
-                await this.api.addAdditionalTimeRequest(serviceRequestId, reason, timeRequested, selectedContactId);
+                await this.api.addAdditionalTimeRequest(serviceRequestId, reason, timeRequested, selectedContactId, selectedAdditionalChargeId);
                 const {currentActivity} = this.state;
                 await this.loadCallActivity(currentActivity);
-                this.alert('Request Sent');
+                let defaultAlertText = 'Request Sent';
+                if (selectedAdditionalChargeId) {
+                    defaultAlertText = 'Saved successfully';
+                }
+                this.alert(defaultAlertText);
             } catch (error) {
                 this.alert(error);
             }

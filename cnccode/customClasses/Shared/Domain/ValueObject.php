@@ -1,11 +1,11 @@
 <?php
 
-namespace CNCLTD\shared\core;
+namespace CNCLTD\Shared\Domain;
 interface ValueObject
 {
     public function value();
 
     public function isNull(): bool;
 
-    public function isSame(ValueObject $object): bool;
+    public function isSame(self $object): bool;
 }

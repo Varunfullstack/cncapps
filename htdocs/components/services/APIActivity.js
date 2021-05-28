@@ -200,11 +200,11 @@ class APIActivity extends APIMain {
             })
     }
 
-    async addAdditionalTimeRequest(serviceRequestId, reason, timeRequested, selectedContactId) {
+    async addAdditionalTimeRequest(serviceRequestId, reason, timeRequested, selectedContactId, selectedAdditionalChargeId) {
         const response = await fetch(`${ApiUrls.SRActivity}addAdditionalTimeRequest`,
             {
                 method: 'POST',
-                body: JSON.stringify({serviceRequestId, reason, timeRequested, selectedContactId})
+                body: JSON.stringify({serviceRequestId, reason, timeRequested, selectedContactId, selectedAdditionalChargeId})
             }
         )
         let jsonResponse = null;

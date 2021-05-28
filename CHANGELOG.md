@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 1402 - Standard Rate Card.
+
 ## [v5.11.11] - 2021-05-28
 ### Fixed
 - Fixed issue with Automated Import Requests.

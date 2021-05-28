@@ -4,6 +4,8 @@ import Prompt from "./Prompt.js";
 
 import React from 'react';
 import APIHeader from '../services/APIHeader';
+import * as PropTypes from "prop-types";
+import {TrueFalseIconComponent} from "./TrueFalseIconComponent/TrueFalseIconComponent";
 
 export default class MainComponent extends React.Component {
 
@@ -233,15 +235,7 @@ export default class MainComponent extends React.Component {
     }
 
     isEmpty(variable) {
-        if (variable == null || variable == undefined || variable == '')
-            return true;
-        else
-            return false;
-    }
-
-    getTrueFalseElement(value) {
-        return value ? <i className="fal fa-2x fa-check color-gray "></i> :
-            <i className="fal fa-2x fa-times color-gray "></i>
+        return variable == null || variable == '';
     }
 
     getEditElement(obj, callBack, display = true) {
@@ -249,7 +243,7 @@ export default class MainComponent extends React.Component {
             return null;
         return <i className="fal fa-2x fa-edit color-gray pointer"
                   onClick={() => callBack(obj)}
-        ></i>
+        />
     }
 
     getEditIcon() {
@@ -261,7 +255,7 @@ export default class MainComponent extends React.Component {
             return null;
         return <i className="fal fa-2x fa-trash-alt color-gray pointer"
                   onClick={() => callBack(obj)}
-        ></i>
+        />
     }
 
     getDeleteIcon() {

@@ -3,9 +3,9 @@
 namespace CNCLTD\ChargeableWorkCustomerRequest\Core;
 
 use CNCLTD\Exceptions\AdditionalHoursRequestedInvalidValueException;
-use CNCLTD\shared\core\ValueObject;
-use CNCLTD\shared\core\ValueObjectCompare;
-use CNCLTD\shared\core\ValueObjectIsNull;
+use CNCLTD\shared\Domain\ValueObject;
+use CNCLTD\shared\Domain\ValueObjectCompare;
+use CNCLTD\shared\Domain\ValueObjectIsNull;
 
 class ChargeableWorkCustomerRequestAdditionalHoursRequested implements ValueObject
 {
