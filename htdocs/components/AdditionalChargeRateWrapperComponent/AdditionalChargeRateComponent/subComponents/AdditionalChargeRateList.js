@@ -33,6 +33,12 @@ export class AdditionalChargeRateList extends React.Component {
                             path: "salePrice",
                         },
                         {
+                            hdToolTip: "Expected time for the task",
+                            hdClassName: "text-center",
+                            icon: "fal fa-2x fa-clock color-gray2 pointer",
+                            path: "timeBudgetMinutes",
+                        },
+                        {
                             hdToolTip: "Notes",
                             hdClassName: "text-center",
                             icon: "fal fa-2x fa-file color-gray2 pointer",

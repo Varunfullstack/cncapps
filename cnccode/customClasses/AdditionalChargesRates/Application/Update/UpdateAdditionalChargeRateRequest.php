@@ -32,6 +32,7 @@ class UpdateAdditionalChargeRateRequest
                 'id'                     => [new Assert\Type('string'), new Assert\NotBlank()],
                 'description'            => [new Assert\NotBlank(), new Assert\Length(['min' => 1, 'max' => 100])],
                 'salePrice'              => $salePriceValidation,
+                'timeBudgetMinutes'      => [new Assert\Type('int'), new Assert\PositiveOrZero()],
                 'notes'                  => new Assert\Optional(
                     [
                         new Assert\Type('string')
@@ -49,6 +50,7 @@ class UpdateAdditionalChargeRateRequest
                                             new Assert\Type('integer')
                                         ],
                                         'salePrice'  => $salePriceValidation,
+                                        'timeBudgetMinutes'      => [new Assert\Type('int'), new Assert\PositiveOrZero()],
                                     ]
                                 )
                             ]
@@ -89,5 +91,10 @@ class UpdateAdditionalChargeRateRequest
     public function id()
     {
         return $this->getDataField('id');
+    }
+
+    public function timeBudgetMinutes()
+    {
+        return $this->getDataField('timeBudgetMinutes');
     }
 }

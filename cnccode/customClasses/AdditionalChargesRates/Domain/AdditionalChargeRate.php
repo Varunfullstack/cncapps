@@ -137,4 +137,9 @@ class AdditionalChargeRate
         return !count($this->specificCustomerPrices);
     }
 
+    public function changeTimeBudgetMinutes(TimeBudgetMinutes $timeBudgetMinutes)
+    {
+        $this->timeBudgetMinutes = $timeBudgetMinutes;
+    }
+
 }

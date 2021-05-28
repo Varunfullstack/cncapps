@@ -30,6 +30,10 @@ class GetOneAdditionalChargeRateResponse implements JsonSerializable, Response
      * @var array
      */
     private $specificCustomerPrices;
+    /**
+     * @var int
+     */
+    private $timeBudgetMinutes;
 
 
     /**
@@ -39,6 +43,7 @@ class GetOneAdditionalChargeRateResponse implements JsonSerializable, Response
                                  string $description,
                                  string $salePrice,
                                  ?string $notes,
+                                 int $timeBudgetMinutes,
                                  array $specificCustomerPrices
     )
     {
@@ -48,6 +53,7 @@ class GetOneAdditionalChargeRateResponse implements JsonSerializable, Response
         $this->notes                  = $notes;
         $this->salePrice              = $salePrice;
         $this->specificCustomerPrices = $specificCustomerPrices;
+        $this->timeBudgetMinutes      = $timeBudgetMinutes;
     }
 
     public static function fromDomain(AdditionalChargeRate $additionalChargeRate): self
@@ -57,10 +63,13 @@ class GetOneAdditionalChargeRateResponse implements JsonSerializable, Response
             $additionalChargeRate->description()->value(),
             $additionalChargeRate->salePrice()->value(),
             $additionalChargeRate->notes()->value(),
+            $additionalChargeRate->timeBudgetMinutes()->value(),
             map(
                 function (SpecificCustomerPrice $specificCustomerPrice) {
                     return new SpecificCustomerPriceResponse(
-                        $specificCustomerPrice->customerId()->value(), $specificCustomerPrice->salePrice()->value()
+                        $specificCustomerPrice->customerId()->value(),
+                        $specificCustomerPrice->salePrice()->value(),
+                        $specificCustomerPrice->timeBudgetMinutes()->value()
                     );
                 },
                 $additionalChargeRate->specificCustomerPrices()
@@ -106,6 +115,14 @@ class GetOneAdditionalChargeRateResponse implements JsonSerializable, Response
     public function specificCustomerPrices(): array
     {
         return $this->specificCustomerPrices;
+    }
+
+    /**
+     * @return int
+     */
+    public function timeBudgetMinutes(): int
+    {
+        return $this->timeBudgetMinutes;
     }
 
     public function jsonSerialize()

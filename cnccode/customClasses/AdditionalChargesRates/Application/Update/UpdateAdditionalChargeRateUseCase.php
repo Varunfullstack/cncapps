@@ -39,13 +39,14 @@ class UpdateAdditionalChargeRateUseCase
         );
         $existingAdditionalChargeRequest->changeNotes(new Notes($additionalChargeRateRequest->notes()));
         $existingAdditionalChargeRequest->changeSalePrice(new SalePrice($additionalChargeRateRequest->salePrice()));
+        $existingAdditionalChargeRequest->changeTimeBudgetMinutes(new TimeBudgetMinutes($additionalChargeRateRequest->timeBudgetMinutes()));
         $existingAdditionalChargeRequest->setCustomerPrices(
             map(
                 function ($customerPriceArray) {
                     return new SpecificCustomerPrice(
                         new CustomerId($customerPriceArray['customerId']),
                         new SalePrice($customerPriceArray['salePrice']),
-                        new TimeBudgetMinutes($customerPriceArray['timeBudget'])
+                        new TimeBudgetMinutes($customerPriceArray['timeBudgetMinutes'])
                     );
                 },
                 $additionalChargeRateRequest->specificCustomerPrices()

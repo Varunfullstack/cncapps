@@ -25,7 +25,8 @@ class PDOCustomerPricesGetter implements CustomerPricesGetter
     {
         $statement = $this->pdo->prepare(
             'SELECT a.description,
-       IFNULL(cp.salePrice, a.salePrice) as salePrice
+       IFNULL(cp.salePrice, a.salePrice) as salePrice,
+       IFNULL(cp.timeBudgetMinutes, a.timeBudgetMinutes) as timeBudgetMinutes
 FROM additionalChargeRate a
          LEFT JOIN additionalchargeratecustomerprices cp
                    ON cp.`additionalChargeRateId` = a.`id`

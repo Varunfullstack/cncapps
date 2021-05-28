@@ -5,16 +5,18 @@ class SpecificCustomerPriceResponse implements \JsonSerializable
 {
     private $customerId;
     private $salePrice;
+    private $timeBudgetMinutes;
 
     /**
      * SpecificCustomerPriceResponse constructor.
      * @param $customerId
      * @param $salePrice
      */
-    public function __construct($customerId, $salePrice)
+    public function __construct($customerId, $salePrice, $timeBudgetMinutes)
     {
-        $this->customerId = $customerId;
-        $this->salePrice  = $salePrice;
+        $this->customerId        = $customerId;
+        $this->salePrice         = $salePrice;
+        $this->timeBudgetMinutes = $timeBudgetMinutes;
     }
 
     /**
@@ -31,6 +33,14 @@ class SpecificCustomerPriceResponse implements \JsonSerializable
     public function salePrice()
     {
         return $this->salePrice;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function timeBudgetMinutes()
+    {
+        return $this->timeBudgetMinutes;
     }
 
 

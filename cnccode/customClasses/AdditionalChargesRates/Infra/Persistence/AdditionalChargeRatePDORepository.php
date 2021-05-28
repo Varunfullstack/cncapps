@@ -7,7 +7,10 @@ use CNCLTD\AdditionalChargesRates\Domain\AdditionalChargeRateRepository;
 use CNCLTD\AdditionalChargesRates\Domain\AdditionalChargeRate;
 use CNCLTD\AdditionalChargesRates\Domain\AdditionalChargeRateId;
 use CNCLTD\AdditionalChargesRates\Domain\InvalidAdditionalChargeRageIdValue;
+use CNCLTD\AdditionalChargesRates\Domain\TimeBudgetMinutesCannotBeNegativeException;
 use CNCLTD\Exceptions\EmptyStringException;
+use CNCLTD\Exceptions\StringTooLongException;
+use Exception;
 use PDO;
 use PDOException;
 use PDOStatement;
@@ -28,14 +31,18 @@ class AdditionalChargeRatePDORepository implements AdditionalChargeRateRepositor
     }
 
     /**
-     * @throws InvalidAdditionalChargeRageIdValue
+     * @param AdditionalChargeRateId $additionalChargeRateId
+     * @return AdditionalChargeRate
      * @throws AdditionalChargeRateNotFoundException
      * @throws EmptyStringException
+     * @throws InvalidAdditionalChargeRageIdValue
+     * @throws TimeBudgetMinutesCannotBeNegativeException
+     * @throws StringTooLongException
      */
     function ofId(AdditionalChargeRateId $additionalChargeRateId): AdditionalChargeRate
     {
         $additionalChargeRateStatement = $this->pdo->prepare(
-            'select id,description,notes,salePrice from additionalChargeRate where id = ?'
+            'select id,description,notes,salePrice,timeBudgetMinutes from additionalChargeRate where id = ?'
         );
         if (!$additionalChargeRateStatement || !$additionalChargeRateStatement->execute(
                 [$additionalChargeRateId->value()]
@@ -55,14 +62,15 @@ class AdditionalChargeRatePDORepository implements AdditionalChargeRateRepositor
     {
         $this->pdo->beginTransaction();
         try {
-            $query                   = "insert into additionalChargeRate(id,description,notes,salePrice) values (:id,:description,:notes,:salePrice) on duplicate key update description = :description, notes = :notes, salePrice = :salePrice";
+            $query                   = "insert into additionalChargeRate(id,description,notes,salePrice,timeBudgetMinutes) values (:id,:description,:notes,:salePrice,:timeBudgetMinutes) on duplicate key update description = :description, notes = :notes, salePrice = :salePrice, timeBudgetMinutes = :timeBudgetMinutes";
             $insertOrUpdateStatement = $this->pdo->prepare($query);
             if (!$insertOrUpdateStatement->execute(
                 [
-                    "id"          => $additionalChargeRate->id()->value(),
-                    "description" => $additionalChargeRate->description()->value(),
-                    "notes"       => $additionalChargeRate->notes()->value(),
-                    "salePrice"   => $additionalChargeRate->salePrice()->value(),
+                    "id"                => $additionalChargeRate->id()->value(),
+                    "description"       => $additionalChargeRate->description()->value(),
+                    "notes"             => $additionalChargeRate->notes()->value(),
+                    "salePrice"         => $additionalChargeRate->salePrice()->value(),
+                    'timeBudgetMinutes' => $additionalChargeRate->timeBudgetMinutes()->value()
                 ]
             )) {
                 throw new PDOException('Failed to insert or update');
@@ -70,7 +78,7 @@ class AdditionalChargeRatePDORepository implements AdditionalChargeRateRepositor
             $this->deleteAdditionalChargeSpecificCustomerPrices($additionalChargeRate);
             $this->insertAdditionalChargeSpecificCustomerPrices($additionalChargeRate);
             $this->pdo->commit();
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             $this->pdo->rollBack();
             error_log("Failed to insert or update Additional Charge Rate: {$exception->getMessage()}");
             throw new PDOException("Failed to insert or update: {$exception->getMessage()}");
@@ -105,15 +113,16 @@ class AdditionalChargeRatePDORepository implements AdditionalChargeRateRepositor
                 [
                     $additionalChargeRate->id()->value(),
                     $specificCustomerPrice->customerId()->value(),
-                    $specificCustomerPrice->salePrice()->value()
+                    $specificCustomerPrice->salePrice()->value(),
+                    $specificCustomerPrice->timeBudgetMinutes()->value()
                 ]
             );
-            $subQueries[] = "(?,?,?)";
+            $subQueries[] = "(?,?,?,?)";
         }
         if (empty($values)) {
             return;
         }
-        $query           = "insert into additionalChargeRateCustomerPrices(additionalChargeRateId, customerId, salePrice) values ";
+        $query           = "insert into additionalChargeRateCustomerPrices(additionalChargeRateId, customerId, salePrice, timeBudgetMinutes) values ";
         $query           .= implode(',', $subQueries);
         $insertStatement = $this->pdo->prepare($query);
         if (!$insertStatement->execute($values)) {
@@ -125,7 +134,7 @@ class AdditionalChargeRatePDORepository implements AdditionalChargeRateRepositor
     public function searchAll(): array
     {
         $additionalChargeRateStatement = $this->pdo->prepare(
-            'select id,description,notes,salePrice from additionalChargeRate'
+            'select id,description,notes,salePrice,timeBudgetMinutes from additionalChargeRate'
         );
         if (!$additionalChargeRateStatement || !$additionalChargeRateStatement->execute()) {
             $errorInfo = json_encode($additionalChargeRateStatement->errorInfo());
@@ -154,7 +163,7 @@ class AdditionalChargeRatePDORepository implements AdditionalChargeRateRepositor
 
         $data['specificCustomerPrices']  = [];
         $specificCustomerPricesStatement = $this->pdo->prepare(
-            'select additionalChargeRateId, customerId, salePrice from additionalChargeRateCustomerPrices where additionalChargeRateId = ?'
+            'select additionalChargeRateId, customerId, salePrice, timeBudgetMinutes from additionalChargeRateCustomerPrices where additionalChargeRateId = ?'
         );
         if (!$specificCustomerPricesStatement || !$specificCustomerPricesStatement->execute(
                 [$additionalChargeRateId->value()]
@@ -172,21 +181,21 @@ class AdditionalChargeRatePDORepository implements AdditionalChargeRateRepositor
     {
         $this->pdo->beginTransaction();
         try {
-            $query                   = "delete from additionalChargeRate where id = :id";
+            $query           = "delete from additionalChargeRate where id = :id";
             $deleteStatement = $this->pdo->prepare($query);
             if (!$deleteStatement->execute(
                 [
-                    "id"          => $additionalChargeRate->id()->value(),
+                    "id" => $additionalChargeRate->id()->value(),
                 ]
             )) {
                 throw new PDOException('Failed to insert or update');
             }
             $this->deleteAdditionalChargeSpecificCustomerPrices($additionalChargeRate);
             $this->pdo->commit();
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             $this->pdo->rollBack();
-            error_log("Failed to insert or update Additional Charge Rate: {$exception->getMessage()}");
-            throw new PDOException("Failed to insert or update: {$exception->getMessage()}");
+            error_log("Failed to delete Additional Charge Rate: {$exception->getMessage()}");
+            throw new PDOException("Failed to delete Additional Charge Rate : {$exception->getMessage()}");
         }
     }
 }

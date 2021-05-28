@@ -10,7 +10,8 @@ const NEW_ADDITIONAL_CHARGE_RATE = {
     description: '',
     notes: '',
     salePrice: 0,
-    specificCustomerPrices: []
+    specificCustomerPrices: [],
+    timeBudgetMinutes: 0
 }
 
 export class AdditionalChargeRate extends MainComponent {

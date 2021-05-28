@@ -5,11 +5,11 @@ import CNCCKEditor from "../../../shared/CNCCKEditor";
 import CustomerSearch from "../../../shared/CustomerSearch";
 import Table from "../../../shared/table/table";
 import * as PropTypes from "prop-types";
-import MainComponent from "../../../shared/MainComponent";
 
 const EDITING_CUSTOMER_PRICE_INITIAL_STATE = {
     customerId: '',
-    salePrice: ''
+    salePrice: '',
+    timeBudgetMinutes: ''
 }
 
 export class AdditionalChargeRateModal extends React.Component {
@@ -29,7 +29,7 @@ export class AdditionalChargeRateModal extends React.Component {
     }
 
     isAdditionalChargeRateValid(additionalChargeRate) {
-        return additionalChargeRate.description && additionalChargeRate.salePrice;
+        return additionalChargeRate.description && additionalChargeRate.salePrice && additionalChargeRate.timeBudgetMinutes >= 0;
     }
 
     updateEditingAdditionalChargeRateField = ($event, fieldName = null) => {
@@ -37,9 +37,15 @@ export class AdditionalChargeRateModal extends React.Component {
         if (!fieldName) {
             fieldName = $event.target.name;
             value = $event.target.value;
-            if ($event.target.type === 'number') {
-                value = parseFloat(value);
+            if ($event.target.type === 'number' && value) {
+                if ($event.target.name === 'salePrice') {
+                    value = parseFloat(value);
+                }
+                if ($event.target.name === 'timeBudgetMinutes') {
+                    value = parseInt(value);
+                }
             }
+
 
         }
         const updatedAdditionalChargeRate = {...this.state.editingAdditionalChargeRate, [fieldName]: value};
@@ -84,9 +90,25 @@ export class AdditionalChargeRateModal extends React.Component {
     }
 
     updateEditingCustomerPriceSalePrice = ($event) => {
+
+        const {value} = $event.target;
         const updatedSpecificCustomerPrice = {
             ...this.state.editingCustomerPrice,
-            salePrice: parseFloat($event.target.value)
+            salePrice: value ? parseFloat(value) : value
+        };
+        this.setState(
+            {
+                editingCustomerPrice: updatedSpecificCustomerPrice,
+                isSpecificCustomerPriceValid: this.isSpecificCustomerPriceValid(updatedSpecificCustomerPrice)
+            }
+        )
+    }
+
+    updateEditingCustomerPriceTimeBudgetMinutes = ($event) => {
+        const {value} = $event.target;
+        const updatedSpecificCustomerPrice = {
+            ...this.state.editingCustomerPrice,
+            timeBudgetMinutes: value ? parseInt(value) : value
         };
         this.setState(
             {
@@ -149,7 +171,14 @@ export class AdditionalChargeRateModal extends React.Component {
             isSpecificCustomerPriceValid
         } = this.state;
         const {onClose} = this.props;
-        const {salePrice, notes, description, specificCustomerPrices, id} = editingAdditionalChargeRate;
+        const {
+            salePrice,
+            notes,
+            description,
+            specificCustomerPrices,
+            id,
+            timeBudgetMinutes
+        } = editingAdditionalChargeRate;
         return (
 
             <React.Fragment>
@@ -181,6 +210,15 @@ export class AdditionalChargeRateModal extends React.Component {
                                required
                                onChange={this.updateEditingAdditionalChargeRateField}
                         />
+                        <label htmlFor="timeBudgetMinutes">Time Budget (Minutes)</label>
+                        <input name="timeBudgetMinutes"
+                               value={timeBudgetMinutes || ""}
+                               type="number"
+                               min="0"
+                               step="1"
+                               required
+                               onChange={this.updateEditingAdditionalChargeRateField}
+                        />
                         <label> Notes </label>
                         <div className="modal_editor">
                             <CNCCKEditor value={notes} type="inline"
@@ -188,11 +226,14 @@ export class AdditionalChargeRateModal extends React.Component {
                                          onChange={(value) => this.updateEditingAdditionalChargeRateField(value, 'notes')}/>
                         </div>
                         <div className="specificCustomerPriceEditForm">
-                            <CustomerSearch onChange={this.updateEditingCustomerPriceCustomerId}
-                                            customerID={editingCustomerPrice.customerId}
-                                            customerName={customersById[editingCustomerPrice.customerId]?.name || ""}
-                                            disabled={isEditSpecificCustomerPrice}
-                            />
+                            <div>
+                                <label htmlFor="customer">Customer</label>
+                                <CustomerSearch onChange={this.updateEditingCustomerPriceCustomerId}
+                                                customerID={editingCustomerPrice.customerId}
+                                                customerName={customersById[editingCustomerPrice.customerId]?.name || ""}
+                                                disabled={isEditSpecificCustomerPrice}
+                                />
+                            </div>
                             <div>
                                 <label htmlFor="salePrice">Specific Sale Price </label>
                                 <input name="salePrice"
@@ -200,6 +241,17 @@ export class AdditionalChargeRateModal extends React.Component {
                                        type="number"
                                        required
                                        onChange={this.updateEditingCustomerPriceSalePrice}
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="timeBudgetMinutes">Time Budget (Minutes)</label>
+                                <input name="timeBudgetMinutes"
+                                       value={editingCustomerPrice.timeBudgetMinutes || ""}
+                                       type="number"
+                                       min="0"
+                                       step="1"
+                                       required
+                                       onChange={this.updateEditingCustomerPriceTimeBudgetMinutes}
                                 />
                             </div>
                             <button
@@ -221,8 +273,16 @@ export class AdditionalChargeRateModal extends React.Component {
                                                }
                                            },
                                            {
+                                               hdToolTip: "Sale Price",
+                                               hdClassName: "text-center",
+                                               icon: "fal fa-2x fa-coins color-gray2 pointer",
                                                path: "salePrice",
-                                               label: "Sale Price",
+                                           },
+                                           {
+                                               hdToolTip: "Expected time for the task",
+                                               hdClassName: "text-center",
+                                               icon: "fal fa-2x fa-clock color-gray2 pointer",
+                                               path: "timeBudgetMinutes",
                                            },
                                            {
                                                path: "",

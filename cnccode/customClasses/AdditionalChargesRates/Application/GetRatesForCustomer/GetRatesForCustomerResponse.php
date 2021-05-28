@@ -13,7 +13,7 @@ class GetRatesForCustomerResponse implements Response, \JsonSerializable
         $instance = new self();
         foreach ($customerPrices as $customerPriceRaw) {
             $instance->prices[] = new CustomerPriceResponse(
-                $customerPriceRaw['description'], $customerPriceRaw['salePrice']
+                $customerPriceRaw['description'], $customerPriceRaw['salePrice'], $customerPriceRaw['timeBudgetMinutes']
             );
         }
         return $instance;

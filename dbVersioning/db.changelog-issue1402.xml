@@ -24,6 +24,9 @@
             <column name="salePrice" type="decimal(10,2)">
                 <constraints nullable="false"/>
             </column>
+            <column name="timeBudgetMinutes" type="int(10)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
     </changeSet>
     <changeSet author="xavi" id="issue1402-2">
@@ -40,6 +43,9 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="salePrice" type="decimal(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="timeBudgetMinutes" type="int(10)" defaultValue="0">
                 <constraints nullable="false"/>
             </column>
         </createTable>

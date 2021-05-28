@@ -35,6 +35,7 @@ class AddAdditionalChargeRateRequest
                         new Assert\Type('string')
                     ]
                 ),
+                'timeBudgetMinutes'      => [new Assert\Type('int'), new Assert\PositiveOrZero()],
                 'specificCustomerPrices' => new Assert\Optional(
                     [
                         new Assert\Type('array'),
@@ -47,6 +48,7 @@ class AddAdditionalChargeRateRequest
                                             new Assert\Type('integer')
                                         ],
                                         'salePrice'  => $salePriceValidation,
+                                        'timeBudgetMinutes'      => [new Assert\Type('int'), new Assert\PositiveOrZero()],
                                     ]
                                 )
                             ]
@@ -82,5 +84,10 @@ class AddAdditionalChargeRateRequest
     public function specificCustomerPrices()
     {
         return $this->getDataField('specificCustomerPrices');
+    }
+
+    public function timeBudgetMinutes()
+    {
+        return $this->getDataField('timeBudgetMinutes');
     }
 }

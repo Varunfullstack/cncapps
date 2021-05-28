@@ -8,6 +8,7 @@ use CNCLTD\AdditionalChargesRates\Domain\CustomerId;
 use CNCLTD\AdditionalChargesRates\Domain\Description;
 use CNCLTD\AdditionalChargesRates\Domain\Notes;
 use CNCLTD\AdditionalChargesRates\Domain\SalePrice;
+use CNCLTD\AdditionalChargesRates\Domain\TimeBudgetMinutes;
 
 class AddAdditionalChargeRateUseCase
 {
@@ -30,12 +31,14 @@ class AddAdditionalChargeRateUseCase
         $newAdditionalChargeRate = AdditionalChargeRate::create(
             new Description($addAdditionalChargeRateRequest->description()),
             new Notes($addAdditionalChargeRateRequest->notes()),
-            new SalePrice($addAdditionalChargeRateRequest->salePrice())
+            new SalePrice($addAdditionalChargeRateRequest->salePrice()),
+            new TimeBudgetMinutes($addAdditionalChargeRateRequest->timeBudgetMinutes())
         );
         foreach ($addAdditionalChargeRateRequest->specificCustomerPrices() as $specificCustomerPrice) {
             $newAdditionalChargeRate->addCustomerPrice(
                 new CustomerId($specificCustomerPrice['customerId']),
-                new SalePrice($specificCustomerPrice['salePrice'])
+                new SalePrice($specificCustomerPrice['salePrice']),
+                new TimeBudgetMinutes($specificCustomerPrice['timeBudgetMinutes'])
             );
         }
         $this->repository->save($newAdditionalChargeRate);
