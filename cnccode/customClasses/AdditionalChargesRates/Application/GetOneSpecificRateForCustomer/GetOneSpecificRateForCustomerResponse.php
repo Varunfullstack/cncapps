@@ -6,9 +6,13 @@ use CNCLTD\Shared\Domain\Bus\Response;
 
 class GetOneSpecificRateForCustomerResponse implements Response, \JsonSerializable
 {
+    /** @var string */
     private $description;
+    /** @var string */
     private $salePrice;
+    /** @var int */
     private $timeBudgetMinutes;
+    /** @var string */
     private $id;
 
     /**
@@ -43,7 +47,7 @@ class GetOneSpecificRateForCustomerResponse implements Response, \JsonSerializab
     /**
      * @return mixed
      */
-    public function description()
+    public function description(): string
     {
         return $this->description;
     }
@@ -51,7 +55,7 @@ class GetOneSpecificRateForCustomerResponse implements Response, \JsonSerializab
     /**
      * @return mixed
      */
-    public function salePrice()
+    public function salePrice(): string
     {
         return $this->salePrice;
     }
@@ -59,7 +63,7 @@ class GetOneSpecificRateForCustomerResponse implements Response, \JsonSerializab
     /**
      * @return mixed
      */
-    public function timeBudgetMinutes()
+    public function timeBudgetMinutes(): int
     {
         return $this->timeBudgetMinutes;
     }
@@ -67,7 +71,7 @@ class GetOneSpecificRateForCustomerResponse implements Response, \JsonSerializab
     /**
      * @return mixed
      */
-    public function id()
+    public function id(): string
     {
         return $this->id;
     }

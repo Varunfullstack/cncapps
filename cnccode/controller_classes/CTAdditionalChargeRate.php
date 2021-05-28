@@ -11,6 +11,7 @@ use CNCLTD\AdditionalChargesRates\Application\GetOne\GetOneAdditionalChargeRateR
 use CNCLTD\AdditionalChargesRates\Application\GetOne\GetOneAdditionalChargeRatesQuery;
 use CNCLTD\AdditionalChargesRates\Application\GetSpecificRatesForCustomer\GetSpecificRatesForCustomerQuery;
 use CNCLTD\AdditionalChargesRates\Application\GetSpecificRatesForCustomer\GetOneSpecificRateForCustomerResponse;
+use CNCLTD\AdditionalChargesRates\Application\GetSpecificRatesForCustomer\GetSpecificRatesForCustomerResponse;
 use CNCLTD\AdditionalChargesRates\Application\Update\UpdateAdditionalChargeRateRequest;
 use CNCLTD\AdditionalChargesRates\Application\Update\UpdateAdditionalChargeRateUseCase;
 use CNCLTD\AdditionalChargesRates\Domain\AdditionalChargeRateId;
@@ -200,7 +201,7 @@ class CTAdditionalChargeRate extends CTCNC
         if (!$customerId) {
             throw new JsonHttpException(400, 'Customer Id is required');
         }
-        /** @var GetOneSpecificRateForCustomerResponse $response */
+        /** @var GetSpecificRatesForCustomerResponse $response */
         $response = $this->queryBus->ask(new GetSpecificRatesForCustomerQuery(new CustomerId($customerId)));
         return ["status" => "ok", "data" => $response->prices()];
     }

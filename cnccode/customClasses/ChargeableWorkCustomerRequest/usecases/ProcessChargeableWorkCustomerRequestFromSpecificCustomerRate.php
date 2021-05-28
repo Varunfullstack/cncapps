@@ -261,7 +261,10 @@ class ProcessChargeableWorkCustomerRequestFromSpecificCustomerRate
                 );
             }
         }
-        switch ($requester->getValue(DBEJUser::teamLevel)) {
+        $dbejUser = new DBEJUser($this);
+        $dbejUser->setValue(DBEJUser::userID, $requester->getValue(DBEUser::userID));
+        $dbejUser->getRow();
+        switch ($dbejUser->getValue(DBEJUser::teamLevel)) {
             case 1:
                 $teamField = DBEProblem::hdLimitMinutes;
                 break;
@@ -280,7 +283,7 @@ class ProcessChargeableWorkCustomerRequestFromSpecificCustomerRate
         if ($teamField) {
             $toUpdateProblem->setValue(
                 $teamField,
-                $toUpdateProblem->getValue($teamField) + $request->timeBudgetMinutes()->value()
+                $toUpdateProblem->getValue($teamField) + $request->timeBudgetMinutes()
             );
         }
         if ($toUpdateProblem->getValue(DBEProblem::queueNo) === 3) {

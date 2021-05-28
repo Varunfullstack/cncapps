@@ -11,8 +11,8 @@ class AdditionalTimeRequestModal extends React.Component {
     static defaultProps = {
         show: false,
     }
-    changeSelectedAdditionalCharge = ($event) => {
-        this.setState({selectedAdditionalCharge: $event.target.value});
+    changeSelectedAdditionalChargeId = ($event) => {
+        this.setState({selectedAdditionalChargeId: $event.target.value});
     };
 
     constructor(props) {
@@ -27,7 +27,7 @@ class AdditionalTimeRequestModal extends React.Component {
             contacts: [],
             selectedContactId: '',
             specificAdditionalChargeRates: [],
-            selectedAdditionalCharge: ''
+            selectedAdditionalChargeId: ''
         };
     }
 
@@ -125,7 +125,7 @@ class AdditionalTimeRequestModal extends React.Component {
             contacts,
             selectedContactId,
             specificAdditionalChargeRates,
-            selectedAdditionalCharge
+            selectedAdditionalChargeId
         } = this.state;
         return (
             <Modal
@@ -158,8 +158,8 @@ class AdditionalTimeRequestModal extends React.Component {
                                     <label>
                                         Agreed Additional Charges
                                     </label>
-                                    <select value={selectedAdditionalCharge}
-                                            onChange={this.changeSelectedAdditionalCharge}>
+                                    <select value={selectedAdditionalChargeId}
+                                            onChange={this.changeSelectedAdditionalChargeId}>
                                         <option key="noSelection" value={null}>
                                             -- Pick an option --
                                         </option>
@@ -173,7 +173,7 @@ class AdditionalTimeRequestModal extends React.Component {
                                 null
                         }
                         {
-                            !selectedAdditionalCharge ?
+                            !selectedAdditionalChargeId ?
 
                                 <React.Fragment>
 
@@ -225,7 +225,7 @@ class AdditionalTimeRequestModal extends React.Component {
                 footer={
                     <div key="footer">
                         <button key="saveButton"
-                                disabled={!selectedAdditionalCharge && !(timeRequested && reason)}
+                                disabled={!selectedAdditionalChargeId && !(timeRequested && reason)}
                                 onClick={this.handleTemplateOk}
                         >
                             Save

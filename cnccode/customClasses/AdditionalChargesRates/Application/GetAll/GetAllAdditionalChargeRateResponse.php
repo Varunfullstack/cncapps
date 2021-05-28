@@ -2,7 +2,10 @@
 
 namespace CNCLTD\AdditionalChargesRates\Application\GetAll;
 
+use CNCLTD\AdditionalChargesRates\Application\GetOne\SpecificCustomerPriceResponse;
 use CNCLTD\AdditionalChargesRates\Domain\AdditionalChargeRate;
+use CNCLTD\AdditionalChargesRates\Domain\SpecificCustomerPrice;
+use function Lambdish\Phunctional\map;
 
 class GetAllAdditionalChargeRateResponse implements \JsonSerializable
 {
@@ -30,6 +33,10 @@ class GetAllAdditionalChargeRateResponse implements \JsonSerializable
      * @var int
      */
     private $timeBudgetMinutes;
+    /**
+     * @var array
+     */
+    private $specificCustomerPrices;
 
 
     /**
@@ -40,16 +47,27 @@ class GetAllAdditionalChargeRateResponse implements \JsonSerializable
                                 string $salePrice,
                                 int $timeBudgetMinutes,
                                 ?string $notes,
-                                bool $canDelete
+                                bool $canDelete,
+                                array $specificCustomerPrices
     )
     {
 
-        $this->id                = $id;
-        $this->description       = $description;
-        $this->notes             = $notes;
-        $this->salePrice         = $salePrice;
-        $this->canDelete         = $canDelete;
-        $this->timeBudgetMinutes = $timeBudgetMinutes;
+        $this->id                     = $id;
+        $this->description            = $description;
+        $this->notes                  = $notes;
+        $this->salePrice              = $salePrice;
+        $this->canDelete              = $canDelete;
+        $this->timeBudgetMinutes      = $timeBudgetMinutes;
+        $this->specificCustomerPrices = map(
+            function (SpecificCustomerPrice $customerPrice) {
+                return new SpecificCustomerPriceResponse(
+                    $customerPrice->customerId()->value(),
+                    $customerPrice->salePrice()->value(),
+                    $customerPrice->timeBudgetMinutes()->value()
+                );
+            },
+            $specificCustomerPrices
+        );
     }
 
     /**
@@ -100,6 +118,13 @@ class GetAllAdditionalChargeRateResponse implements \JsonSerializable
         return $this->timeBudgetMinutes;
     }
 
+    /**
+     * @return array
+     */
+    public function specificCustomerPrices(): array
+    {
+        return $this->specificCustomerPrices;
+    }
 
     public function jsonSerialize()
     {

@@ -1711,7 +1711,7 @@ FROM
             if ($selectedAdditionalChargeId) {
                 global $inMemorySymfonyBus;
                 $usecase = new ProcessChargeableWorkCustomerRequestFromSpecificCustomerRate($inMemorySymfonyBus);
-                $usecase->__invoke($serviceRequest,$selectedAdditionalChargeId, $this->dbeUser);
+                $usecase->__invoke($serviceRequest, $selectedAdditionalChargeId, $this->dbeUser);
             } else {
                 $usecase = new CreateChargeableWorkCustomerRequest($repo, $buActivity);
                 $usecase->__invoke($serviceRequest, $this->dbeUser, $timeRequested, $reason, $selectedContactId);

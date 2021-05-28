@@ -23,7 +23,8 @@ class GetAllAdditionalChargeRatesResponse implements Response
                 $additionalChargesRate->salePrice()->value(),
                 $additionalChargesRate->timeBudgetMinutes()->value(),
                 $additionalChargesRate->notes()->value(),
-                $additionalChargesRate->canDelete()
+                $additionalChargesRate->canDelete(),
+                $additionalChargesRate->specificCustomerPrices()
             );
         }
     }

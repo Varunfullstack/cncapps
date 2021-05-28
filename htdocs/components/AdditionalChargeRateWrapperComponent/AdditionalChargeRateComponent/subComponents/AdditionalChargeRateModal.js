@@ -265,9 +265,11 @@ export class AdditionalChargeRateModal extends React.Component {
                                    columns={
                                        [
                                            {
+                                               hdToolTip: "Customer",
+                                               hdClassName: "text-center",
+                                               icon: "fal fa-2x fa-building color-gray2 pointer",
+                                               label: "",
                                                path: "customerId",
-                                               label: "Customer",
-                                               sortable: true,
                                                content: (item) => {
                                                    return customersById[item.customerId]?.name;
                                                }

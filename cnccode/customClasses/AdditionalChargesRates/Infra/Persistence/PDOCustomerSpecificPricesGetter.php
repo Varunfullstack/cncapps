@@ -26,7 +26,7 @@ class PDOCustomerSpecificPricesGetter implements CustomerSpecificPricesGetter
     {
         $statement = $this->pdo->prepare(
             'SELECT
-       a.id
+       a.id,
        a.description,
        cp.salePrice,
        cp.timeBudgetMinutes
