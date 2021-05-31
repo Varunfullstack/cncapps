@@ -42,5 +42,6 @@ export default class ApiUrls {
     static Office365Licenses="/Office365Licenses.php?action=";
     static PendingChargeableRequests="/PendingChargeableRequests.php?action="
     static GoodsIn="/GoodsIn.php?action=";
+    static QuoteTemplates="/QuoteTemplates.php?action=";
 
 }
