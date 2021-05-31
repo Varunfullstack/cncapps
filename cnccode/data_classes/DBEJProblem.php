@@ -355,11 +355,19 @@ class DBEJProblem extends DBEProblem
             $sql .= " AND pro_status = '" . $status . "'";
         }
         /* Exclude future dated */
-        $sql .= " AND (pro_alarm_date is null or CONCAT( pro_alarm_date, ' ', pro_alarm_time ) <= NOW())";
+        $sql .= " AND (pro_alarm_date is null or CONCAT( pro_alarm_date, ' ', IFNULL(
+        IF(
+          pro_alarm_time = '',
+          '00:00:00',
+          pro_alarm_time
+        ),
+        '00:00:00' 
+      )) <= NOW())";
         if ($status == 'F' && !$includeAutomaticallyFixed) {
             $sql .= " AND last.caa_consno <> " . USER_SYSTEM;
         }
         $sql .= " ORDER BY pro_alarm_date, pro_alarm_time";
+
         $this->setQueryString($sql);
         return (parent::getRows());
     }
