@@ -10,7 +10,5 @@ export default class APIGoodsIn extends APIMain {
     }
     receive(porheadID,body){
         return this.post(`${ApiUrls.GoodsIn}receive&porheadID=${porheadID}`,body,true);
-    }
-     
-   
+    }   
 }
