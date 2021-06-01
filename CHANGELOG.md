@@ -2,8 +2,12 @@
 This project changes will be shown here.
 
 ## [unreleased]
+
+## [unreleased]
 ### Added
 - Issue 1402 - Standard Rate Card.
+### Changed
+- Issue 1399 - Force Customer Name when creating Templated Sales Quotation.
 
 ## [v5.11.11] - 2021-05-28
 ### Fixed
