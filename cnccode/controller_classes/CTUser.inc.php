@@ -591,6 +591,9 @@ class CTUser extends CTCNC
                 'forceClosingPermissionChecked'                          => $dsUser->getValue(
                     DBEUser::forceClosingPermission
                 ) ? 'checked' : '',
+                'changeSalesOrdersStatusPermissionChecked'               => $dsUser->getValue(
+                    DBEUser::changeSalesOrdersStatusPermission
+                ) ? 'checked' : '',
                 'createRenewalSalesOrdersFlagChecked'                    => Controller::htmlChecked(
                     $dsUser->getValue(DBEJUser::createRenewalSalesOrdersFlag)
                 ),

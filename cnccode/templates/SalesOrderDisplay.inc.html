@@ -120,9 +120,28 @@
     let newLineRecurringSequenceNumberInput;
     let oneOffTable;
     let recurringTable;
+    let performActionButton;
 
     let requiredByDateInput;
     let tbcInput;
+
+    function onActionSelectorValueChanged(value) {
+        let updateSupplierDisplayValue = "inline-block";
+        let purchaseOrderDisplayValue = 'inline-block';
+        if (value !== 'CHANGE_SUPPLIER_FOR_LINES') {
+            updateSupplierDisplayValue = 'none'
+        }
+
+        if (value !== 'CREATE_PURCHASE_ORDERS') {
+            purchaseOrderDisplayValue = 'none';
+        }
+
+        performActionButton.disabled = !value;
+
+        requiredByDateInput.style.display = purchaseOrderDisplayValue;
+        tbcInput.style.display = purchaseOrderDisplayValue;
+        updateSupplierName.style.display = updateSupplierDisplayValue;
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
         window.fromDate = $('#fromDate').get(0);
@@ -195,6 +214,7 @@
         });
 
         actionSelector = document.querySelector('#actionSelector');
+        performActionButton = document.querySelector('#performActionButton');
         supplierToChangeId = document.querySelector('#updateSupplierID');
         salutationInput = document.querySelector('#salutation');
         introductionTextArea = document.querySelector('#introduction');
@@ -214,13 +234,21 @@
         newLineOneOffSequenceNumberInput = document.querySelector('input[name="oneOffSequenceNumber"]')
         newLineRecurringSequenceNumberInput = document.querySelector('input[name="recurringSequenceNumber"]')
 
+        onActionSelectorValueChanged(actionSelector.value);
+
+
         function handleNewLineClick() {
             newLineOneOffSequenceNumberInput.value = getOneOffLastSelectedLineCheckboxSequenceNumber();
             newLineRecurringSequenceNumberInput.value = getRecurringLastSelectedLineCheckboxSequenceNumber();
         }
 
-        newLineSubmitButton.addEventListener('click', handleNewLineClick);
-        newLineSubmitRecurringButton.addEventListener('click', handleNewLineClick);
+        if (newLineSubmitButton) {
+
+            newLineSubmitButton.addEventListener('click', handleNewLineClick);
+        }
+        if (newLineSubmitRecurringButton) {
+            newLineSubmitRecurringButton.addEventListener('click', handleNewLineClick);
+        }
 
 
         toggleCheckBoxes.forEach(el => {
@@ -370,23 +398,14 @@
             return selectedLines;
         }
 
+
         actionSelector.addEventListener('change', $event => {
-            let updateSupplierDisplayValue = "inline-block";
-            let purchaseOrderDisplayValue = 'inline-block';
-            if (actionSelector.value !== 'CHANGE_SUPPLIER_FOR_LINES') {
-                updateSupplierDisplayValue = 'none'
-            }
 
-            if (actionSelector.value !== 'CREATE_PURCHASE_ORDERS') {
-                purchaseOrderDisplayValue = 'none';
-            }
 
-            requiredByDateInput.style.display = purchaseOrderDisplayValue;
-            tbcInput.style.display = purchaseOrderDisplayValue;
-            updateSupplierName.style.display = updateSupplierDisplayValue;
+            onActionSelectorValueChanged($event.target.value);
         })
 
-        document.querySelector('#performActionButton').addEventListener('click', $event => {
+        performActionButton.addEventListener('click', $event => {
             if (!actionSelector.selectedOptions.length) {
                 return;
             }
@@ -604,12 +623,58 @@
                     )
                             .then(response => response.json())
                             .then(response => {
-                                console.log(response);if (response.status == 'error') {
+                                console.log(response);
+                                if (response.status == 'error') {
                                     throw new Error(response.message);
                                 }
                                 document.location.reload();
                             })
-                            .catch(error => {console.log(error);
+                            .catch(error => {
+                                console.log(error);
+                                alert(error.message);
+                            })
+
+                    break;
+                }
+                case 'INITIAL_TO_QUOTATION': {
+                    const salesOrderId = orderHeadIdInput.value;
+                    fetch("?action=INITIAL_TO_QUOTATION&salesOrderId=" + salesOrderId,
+                            {
+                                method: 'POST',
+                            }
+                    )
+                            .then(response => response.json())
+                            .then(response => {
+                                console.log(response);
+                                if (response.status == 'error') {
+                                    throw new Error(response.message);
+                                }
+                                document.location.reload();
+                            })
+                            .catch(error => {
+                                console.log(error);
+                                alert(error.message);
+                            })
+
+                    break;
+                }
+                case 'COMPLETED_TO_INITIAL': {
+                    const salesOrderId = orderHeadIdInput.value;
+                    fetch("?action=COMPLETED_TO_INITIAL&salesOrderId=" + salesOrderId,
+                            {
+                                method: 'POST',
+                            }
+                    )
+                            .then(response => response.json())
+                            .then(response => {
+                                console.log(response);
+                                if (response.status == 'error') {
+                                    throw new Error(response.message);
+                                }
+                                document.location.reload();
+                            })
+                            .catch(error => {
+                                console.log(error);
                                 alert(error.message);
                             })
 
@@ -913,7 +978,7 @@
                         value="{updateSupplierID}"
                 >
 
-                <select {readOnly}
+                <select {actionSelectorReadOnly}
                         id="actionSelector"
                 >
                     <!-- BEGIN actionBlock -->
@@ -949,7 +1014,6 @@
                 >
                 </div>
                 <button id="performActionButton"
-                        {readOnly}
                         type="button"
                         class="salesOrderButton not-so-faint"
                         title="Complete selected action"

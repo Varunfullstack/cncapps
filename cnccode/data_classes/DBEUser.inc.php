@@ -9,37 +9,36 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEUser extends DBEntity
 {
-    const userID                    = "userID";
-    const managerID                 = "managerID";
-    const name                      = "name";
-    const salutation                = "salutation";
-    const add1                      = "add1";
-    const add2                      = "add2";
-    const add3                      = "add3";
-    const town                      = "town";
-    const county                    = "county";
-    const postcode                  = "postcode";
-    const username                  = "username";
-    const employeeNo                = "employeeNo";
-    const petrolRate                = "petrolRate";
-    const perms                     = "perms";
-    const signatureFilename         = "signatureFilename";
-    const jobTitle                  = "jobTitle";
-    const firstName                 = "firstName";
-    const lastName                  = "lastName";
-    const activeFlag                = "activeFlag";
-    const helpdeskFlag              = "helpdeskFlag";
-    const hourlyPayRate             = "hourlyPayRate";
-    const teamID                    = "teamID";
-    const receiveSdManagerEmailFlag = "receiveSdManagerEmailFlag";
-    const changePriorityFlag        = "changePriorityFlag";
-    const appearInQueueFlag         = "appearInQueueFlag";
-    const standardDayHours          = "standardDayHours";
-    const admin                     = 'admin';
-    const excludeFromStatsFlag      = "excludeFromStatsFlag";
-    const queueManager              = 'queueManager';
-    const projectManagementFlag     = 'projectManagementFlag';
-
+    const userID                                          = "userID";
+    const managerID                                       = "managerID";
+    const name                                            = "name";
+    const salutation                                      = "salutation";
+    const add1                                            = "add1";
+    const add2                                            = "add2";
+    const add3                                            = "add3";
+    const town                                            = "town";
+    const county                                          = "county";
+    const postcode                                        = "postcode";
+    const username                                        = "username";
+    const employeeNo                                      = "employeeNo";
+    const petrolRate                                      = "petrolRate";
+    const perms                                           = "perms";
+    const signatureFilename                               = "signatureFilename";
+    const jobTitle                                        = "jobTitle";
+    const firstName                                       = "firstName";
+    const lastName                                        = "lastName";
+    const activeFlag                                      = "activeFlag";
+    const helpdeskFlag                                    = "helpdeskFlag";
+    const hourlyPayRate                                   = "hourlyPayRate";
+    const teamID                                          = "teamID";
+    const receiveSdManagerEmailFlag                       = "receiveSdManagerEmailFlag";
+    const changePriorityFlag                              = "changePriorityFlag";
+    const appearInQueueFlag                               = "appearInQueueFlag";
+    const standardDayHours                                = "standardDayHours";
+    const admin                                           = 'admin';
+    const excludeFromStatsFlag                            = "excludeFromStatsFlag";
+    const queueManager                                    = 'queueManager';
+    const projectManagementFlag                           = 'projectManagementFlag';
     const encryptedDateOfBirth                            = "encryptedDateOfBirth";
     const startDate                                       = "startDate";
     const companyHealthcareStartDate                      = "companyHealthcareStartDate";
@@ -77,6 +76,7 @@ class DBEUser extends DBEntity
     const callBackEmail                                   = "callBackEmail";
     const massDeletionOnUnstartedServiceRequestPermission = "massDeletionOnUnstartedServiceRequestPermission";
     const forceClosingPermission                          = "forceClosingPermission";
+    const changeSalesOrdersStatusPermission               = "changeSalesOrdersStatusPermission";
 
     /**
      * calls constructor()
@@ -417,6 +417,7 @@ class DBEUser extends DBEntity
         $this->addColumn(self::callBackEmail, DA_BOOLEAN, DA_NOT_NULL, null, 0);
         $this->addColumn(self::massDeletionOnUnstartedServiceRequestPermission, DA_BOOLEAN, DA_NOT_NULL, null, 0);
         $this->addColumn(self::forceClosingPermission, DA_BOOLEAN, DA_NOT_NULL, null, 0);
+        $this->addColumn(self::changeSalesOrdersStatusPermission, DA_BOOLEAN, DA_NOT_NULL, null, 0);
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -435,8 +436,6 @@ class DBEUser extends DBEntity
         if ($sortColumn) {
             $queryString .= " order by $sortColumn";
         }
-
-
         $this->setQueryString($queryString);
         return (parent::getRows());
     }
@@ -560,6 +559,11 @@ class DBEUser extends DBEntity
     public function isAllowedForceClosingSR()
     {
         return $this->getValue(DBEUser::forceClosingPermission);
+    }
+
+    public function canChangeSalesOrdersAndPurchaseOrdersStatus(): bool
+    {
+        return $this->getValue(DBEUser::changeSalesOrdersStatusPermission);
     }
 }
 
