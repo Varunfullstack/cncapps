@@ -418,7 +418,6 @@ class DBEUser extends DBEntity
         $this->addColumn(self::massDeletionOnUnstartedServiceRequestPermission, DA_BOOLEAN, DA_NOT_NULL, null, 0);
         $this->addColumn(self::forceClosingPermission, DA_BOOLEAN, DA_NOT_NULL, null, 0);
         $this->addColumn(self::changeSalesOrdersStatusPermission, DA_BOOLEAN, DA_NOT_NULL, null, 0);
-
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -560,6 +559,11 @@ class DBEUser extends DBEntity
     public function isAllowedForceClosingSR()
     {
         return $this->getValue(DBEUser::forceClosingPermission);
+    }
+
+    public function canChangeSalesOrdersAndPurchaseOrdersStatus(): bool
+    {
+        return $this->getValue(DBEUser::changeSalesOrdersStatusPermission);
     }
 }
 

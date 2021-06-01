@@ -17,7 +17,7 @@
             </column>
         </addColumn>
     </changeSet>
-    <changeSet author="xavi" id="issue1379-1">
+    <changeSet author="xavi" id="issue1379-2">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="consultant" columnName="changeSalesOrdersStatusPermission"/>
         </preConditions>
