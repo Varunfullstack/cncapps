@@ -195,11 +195,23 @@ export default class OrderDetailsComponent extends MainComponent {
       this.alert(res.error)
     })
   }
+  handleRecieveAll=(value)=>{
+    let {lines}=this.state;
+    lines.map(line=>line.qtyToReceive=value?line.qtyOS:0);
+    this.setState(lines);
+    console.log("change",value);
+  }
   render() {
     return (
       <div>
         <Spinner show={this.state.showSpinner}></Spinner>
         {this.getAlert()}
+        <div style={{display:"flex","justifyContent":"center","marginBottom":-40,alignItems:"center"}}>
+          <label className="mr-2" style={{marginLeft:200}}>Recevive All</label>
+          <Toggle width={30} onChange={this.handleRecieveAll}>
+
+          </Toggle>
+        </div>
         {this.getDataTable()}
         <div className="modal-footer">
           <button onClick={this.handleReceive}>Receive</button>

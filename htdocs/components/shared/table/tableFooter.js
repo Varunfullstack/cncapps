@@ -15,7 +15,8 @@ class TableFooter extends React.Component {
             el('tr', {key: 'tfootTr'},
                 columns.map(c => el('td', {
                     key: c.key || c.path || c.label.replace(' ', ''),
-                    colSpan: c?.footerColSpan || 1
+                    colSpan: c?.footerColSpan || 1,
+                    className:c.footerClass
                 }, c.footerContent ? c.footerContent(c) : null))));
 
     }
