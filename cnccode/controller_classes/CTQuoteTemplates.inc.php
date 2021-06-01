@@ -160,17 +160,10 @@ class CTQuoteTemplates extends CTCNC
         );
         $this->parsePage();
     } // end function editFurther Action()
-
-
-    //-----------------------------new 
     /**
      * Export expenses that have not previously been exported
      * @access private
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
-     * @throws Exception
+     * @throws Exception     
      */
     function displayForm()
     {

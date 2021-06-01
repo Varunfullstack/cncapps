@@ -43,5 +43,6 @@ export default class ApiUrls {
     static PendingChargeableRequests="/PendingChargeableRequests.php?action="
     static GoodsIn="/GoodsIn.php?action=";
     static QuoteTemplates="/QuoteTemplates.php?action=";
+    static ContractAndNumbersReport="/ContractAndNumbersReport.php?action=";
 
 }
