@@ -3,7 +3,7 @@ This project changes will be shown here.
 
 ## [unreleased]
 ### Added
-- Issue1379 - Change status of Sales Orders & Purchase Orders
+- Issue 1379 - Change status of Sales Orders & Purchase Orders
 
 ## [v5.11.11] - 2021-05-28
 ### Fixed
