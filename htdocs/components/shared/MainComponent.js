@@ -265,4 +265,15 @@ export default class MainComponent extends React.Component {
     getTableStyle() {
         return "table table-striped";
     }
+    
+    isFormValid=(id)=>{
+        const elements=$(`#${id} :input`);  
+        //console.log(elements);
+        for(let i=0;i<elements.length;i++)
+        {
+            if($(elements[i]).prop('required')&&elements[i].value=="")
+                return false;
+        }
+        return true;
+      }
 }

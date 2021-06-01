@@ -68,7 +68,7 @@ class AutoComplete extends React.Component {
     };
     // Event fired when the user clicks on a suggestion
     onClick = (item) => {
-        if (item.id != null) {
+        if (item[this.props.pk] != null) {
             const {displayColumn, onSelect} = this.props;
             // Update the user input and reset the rest of the state
 

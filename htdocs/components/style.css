@@ -1100,3 +1100,6 @@ select:required:valid { border: 1px solid black; }
 .align-center{
     align-items: center;
 }
+.white{
+    color: white;
+}

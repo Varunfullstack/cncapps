@@ -2,12 +2,11 @@
 This project changes will be shown here.
 
 ## [unreleased]
-
-## [unreleased]
 ### Added
 - Issue 1402 - Standard Rate Card.
 ### Changed
 - Issue 1399 - Force Customer Name when creating Templated Sales Quotation.
+- Issue 1368 - convert StarterLeaverManagement.php,  RootCause.php, UtilityEmails.php, IgnoredADDomains.php, Office365Licenses.php and SRSource.php
 
 ## [v5.11.11] - 2021-05-28
 ### Fixed
@@ -151,6 +150,7 @@ This project changes will be shown here.
 ### Fixed
 - Issue 1226 - StreamOne error handling
 - Issue 1349 - Duplicate Duplicate Contact Warning.
+
 
 ## [v5.8.6] - 2021-04-22
 ### Fixed

@@ -35,5 +35,10 @@ export default class ApiUrls {
     static Supplier = "/Supplier.php?action=";
     static KeywordMatchingIgnores = "/KeywordMatchingIgnores.php?action=";
     static PortalDocument="/PortalDocument.php?action=";
+    static StarterLeaverManagement="/StarterLeaverManagement.php?action=";
+    static RootCause="/RootCause.php?action=";
+    static UtilityEmails="/UtilityEmails.php?action=";
+    static IgnoredADDomains="/IgnoredADDomains.php?action=";
+    static Office365Licenses="/Office365Licenses.php?action=";
     static PendingChargeableRequests="/PendingChargeableRequests.php?action="
 }
