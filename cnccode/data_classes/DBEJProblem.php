@@ -359,7 +359,7 @@ class DBEJProblem extends DBEProblem
         IF(
           pro_alarm_time = '',
           '00:00:00',
-          pro_alarm_time
+          pro_alarm_time 
         ),
         '00:00:00' 
       )) <= NOW())";
