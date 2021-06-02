@@ -9,6 +9,7 @@ This project changes will be shown here.
 - Issue 1399 - Force Customer Name when creating Templated Sales Quotation.
 - Issue 1368 - convert StarterLeaverManagement.php,  RootCause.php, UtilityEmails.php, IgnoredADDomains.php, Office365Licenses.php and SRSource.php
 - Issue 1421 - Show On Hold Date & Time on SR
+- Issue 1418 - SR Statistics to breakdown visible and proactive SRs.
 
 ## [v5.11.12] - 2021-06-01
 ### Fixed
