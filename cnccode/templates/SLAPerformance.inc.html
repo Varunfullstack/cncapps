@@ -630,59 +630,69 @@
     </tr>
 </table>
 <style>
+    #reportSection {
+        display: grid;
+        grid-template-rows: 1fr 1fr;
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+
     #reportSection th {
         width: 30px;
     }
 </style>
-<div id="reportSection">
+<div id="reportSection"
+
+>
 
 </div>
 <script id="reportData"
         type="text/template"
 >
     {% #item %}
-    <br>
-    <h3>{% name %}</h3>
-    <table>
-        <thead>
-        <tr>
-            <th style="min-width: 245px;"></th>
-            <th>P1</th>
-            <th>P2</th>
-            <th>P3</th>
-            <th>P4</th>
-            <th>All</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% #data %}
-        <tr>
-            <td>
-                {% description %}
-            </td>
-            <td class="{% p1Class %}"> {% #p1Link %}<a href="{% p1Link %}"
-                                                       target="_blank"
-            >{% p1 %}</a>{% /p1Link %}{% ^p1Link %}{% p1 %}{% /p1Link %}
-            </td>
-            <td class="{% p2Class %}"> {% #p2Link %}<a href="{% p2Link %}"
-                                                       target="_blank"
-            >{% p2 %}</a>{% /p2Link %}{% ^p2Link %}{% p2 %}{% /p2Link %}
-            </td>
-            <td class="{% p3Class %}"> {% #p3Link %}<a href="{% p3Link %}"
-                                                       target="_blank"
-            >{% p3 %}</a>{% /p3Link %}{% ^p3Link %}{% p3 %}{% /p3Link %}
-            </td>
-            <td class="{% p4Class %}"> {% #p4Link %}<a href="{% p4Link %}"
-                                                       target="_blank"
-            >{% p4 %}</a>{% /p4Link %}{% ^p4Link %}{% p4 %}{% /p4Link %}
-            </td>
-            <td class="{% allClass %}"> {% #allLink %}<a href="{% allLink %}"
-                                                         target="_blank"
-            >{% all %}</a>{% /allLink %}{% ^allLink %}{% all %}{% /allLink %}
-            </td>
-        </tr>
-        {% /data %}
-        </tbody>
-    </table>
+    <div>
+        <br>
+        <h3>{% name %}</h3>
+        <table>
+            <thead>
+            <tr>
+                <th style="min-width: 245px;"></th>
+                <th>P1</th>
+                <th>P2</th>
+                <th>P3</th>
+                <th>P4</th>
+                <th>All</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% #data %}
+            <tr>
+                <td>
+                    {% description %}
+                </td>
+                <td class="{% p1Class %}"> {% #p1Link %}<a href="{% p1Link %}"
+                                                           target="_blank"
+                >{% p1 %}</a>{% /p1Link %}{% ^p1Link %}{% p1 %}{% /p1Link %}
+                </td>
+                <td class="{% p2Class %}"> {% #p2Link %}<a href="{% p2Link %}"
+                                                           target="_blank"
+                >{% p2 %}</a>{% /p2Link %}{% ^p2Link %}{% p2 %}{% /p2Link %}
+                </td>
+                <td class="{% p3Class %}"> {% #p3Link %}<a href="{% p3Link %}"
+                                                           target="_blank"
+                >{% p3 %}</a>{% /p3Link %}{% ^p3Link %}{% p3 %}{% /p3Link %}
+                </td>
+                <td class="{% p4Class %}"> {% #p4Link %}<a href="{% p4Link %}"
+                                                           target="_blank"
+                >{% p4 %}</a>{% /p4Link %}{% ^p4Link %}{% p4 %}{% /p4Link %}
+                </td>
+                <td class="{% allClass %}"> {% #allLink %}<a href="{% allLink %}"
+                                                             target="_blank"
+                >{% all %}</a>{% /allLink %}{% ^allLink %}{% all %}{% /allLink %}
+                </td>
+            </tr>
+            {% /data %}
+            </tbody>
+        </table>
+    </div>
     {% /item %}
 </script>
