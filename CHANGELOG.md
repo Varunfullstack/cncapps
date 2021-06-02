@@ -11,6 +11,7 @@ This project changes will be shown here.
 - Issue 1421 - Show On Hold Date & Time on SR
 - Issue 1418 - SR Statistics to breakdown visible and proactive SRs.
 - Issue 1420 - Include numbers of FTF & Source in Meeting Agenda
+- Issue 1428 - Only show active staff on Team Management Modal
 
 ## [v5.11.12] - 2021-06-01
 ### Fixed
