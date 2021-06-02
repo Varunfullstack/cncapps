@@ -12,6 +12,7 @@ This project changes will be shown here.
 - Issue 1418 - SR Statistics to breakdown visible and proactive SRs.
 - Issue 1420 - Include numbers of FTF & Source in Meeting Agenda
 - Issue 1428 - Only show active staff on Team Management Modal
+- Issue 1423 - Project Report showing budgets
 
 ## [v5.11.12] - 2021-06-01
 ### Fixed

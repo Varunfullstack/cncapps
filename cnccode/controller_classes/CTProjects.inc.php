@@ -1012,9 +1012,11 @@ class CTProjects extends CTCNC
         pt.name as projectTypeName,
         inHoursBudgetDays,       
         outOfHoursBudgetDays,       
-        calculatedBudget
+        calculatedBudget,
+        concat(engineer.firstName, ' ', engineer.lastName) as engineerName
         from project p
         join customer c on c.cus_custno=p.customerID
+        join consultant engineer on p.consultantID = engineer.cns_consno    
         left join projectstages ps on ps.id = p.projectStageID
         left join projecttypes pt on  pt.id = p.projectTypeID
         where 1=1
@@ -1026,11 +1028,11 @@ class CTProjects extends CTCNC
             $params["consID"] = $consID;
         }
         if (!empty($dateFrom)) {
-            $query              .= " and startDate >=:dateFrom";
+            $query              .= " and p.startDate >=:dateFrom";
             $params["dateFrom"] = $dateFrom;
         }
         if (!empty($dateTo)) {
-            $query            .= " and startDate <=:dateTo";
+            $query            .= " and p.startDate <=:dateTo";
             $params["dateTo"] = $dateTo;
         }
         if (!empty($projectStageID)) {

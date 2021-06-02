@@ -107,4 +107,5 @@
     <include file="db.changelog-issue1402.xml"/>
     <include file="db.changelog-issue1368.xml"/>
     <include file="db.changelog-issue1379.xml"/>
+    <include file="db.changelog-issue1423.xml"/>
 </databaseChangeLog>

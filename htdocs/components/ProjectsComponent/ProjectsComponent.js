@@ -35,30 +35,31 @@ class ProjectsComponent extends MainComponent {
     }
 
     componentDidMount() {
-           
-        this.loadProjectsSummary(); 
+
+        this.loadProjectsSummary();
     }
-    loadProjectsSummary=async ()=>{
-        const projectsSummary= await  this.loadprojectsSummaryStorage(); 
+
+    loadProjectsSummary = async () => {
+        const projectsSummary = await this.loadprojectsSummaryStorage();
         this.api.getPRojectsSummary()
-        .then(projects => {
-            projects.map(p => {
-                const item=projectsSummary.find(ps=>ps.name==p.name);                 
-                if(item)
-                    p.filter = item.filter;
-                else
-                    p.filter = true;
-                return p;
-            });
-            return projects;
-        }).then(projectsSummary =>{
+            .then(projects => {
+                projects.map(p => {
+                    const item = projectsSummary.find(ps => ps.name == p.name);
+                    if (item)
+                        p.filter = item.filter;
+                    else
+                        p.filter = true;
+                    return p;
+                });
+                return projects;
+            }).then(projectsSummary => {
             this.setState({projectsSummary})
             this.saveProjectSummaryLocal(projectsSummary);
         });
     }
 
     loadprojectsSummaryStorage = async () => {
-        return new Promise((res,rej)=>{
+        return new Promise((res, rej) => {
             let projectsSummary = localStorage.getItem("projectsSummary");
             if (projectsSummary) projectsSummary = JSON.parse(projectsSummary);
             else projectsSummary = [];
@@ -66,10 +67,10 @@ class ProjectsComponent extends MainComponent {
             // this.setState({projectsSummary}, () => {            
             // });
         })
-        
+
     };
-    saveProjectSummaryLocal=(projectsSummary)=>{
-        localStorage.setItem("projectsSummary",JSON.stringify(projectsSummary))
+    saveProjectSummaryLocal = (projectsSummary) => {
+        localStorage.setItem("projectsSummary", JSON.stringify(projectsSummary))
     }
     isActive = (code) => {
         const {activeTab} = this.state;
@@ -122,11 +123,11 @@ class ProjectsComponent extends MainComponent {
         const {activeTab, projectsSummary} = this.state;
         switch (activeTab) {
             case this.TAB_CURRENT_PROJECTS :
-                return <CurrentProjectsComponent projectsSummary={projectsSummary}></CurrentProjectsComponent>
+                return <CurrentProjectsComponent projectsSummary={projectsSummary}/>
             case this.TAB_REPORTS :
-                return <AppReport categoryID={1} hideCategories={true}></AppReport>;
+                return <AppReport categoryID={1} hideCategories={true}/>;
             case this.TAB_CALENDAR:
-                return <ProjectsCalendarComponent></ProjectsCalendarComponent>
+                return <ProjectsCalendarComponent/>
             default:
                 return null;
         }
@@ -150,7 +151,7 @@ class ProjectsComponent extends MainComponent {
                                 <strong className="mr-5">{" : " + p.total}</strong>
                                 <Toggle checked={p.filter}
                                         onChange={() => this.toggleSummaryItem(p)}
-                                ></Toggle>
+                                />
                             </div>
 
                         </div>
@@ -170,11 +171,11 @@ class ProjectsComponent extends MainComponent {
         const projectID = params.get('projectID');
         switch (action) {
             case 'add':
-                return <ProjectDetailsComponent mode={action}></ProjectDetailsComponent>
+                return <ProjectDetailsComponent mode={action}/>
             case 'edit':
                 return <ProjectDetailsComponent mode={action}
                                                 projectID={projectID}
-                ></ProjectDetailsComponent>
+                />
             default:
                 return <div>
                     {this.setProjectsSummaryElement()}

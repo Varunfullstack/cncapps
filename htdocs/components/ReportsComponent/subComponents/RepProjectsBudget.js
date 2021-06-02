@@ -6,9 +6,10 @@ import Table from "../../shared/table/table";
 import {equal} from "../../utils/utils";
 import ProjectsHelper from "../../ProjectsComponent/helper/ProjectsHelper";
 
-export default class RepProjectsByConsultant extends MainComponent {
+export default class RepProjectsBudget extends MainComponent {
     api = new APIProjects();
     helper = new ProjectsHelper();
+
     constructor(props) {
         super(props);
         this.state = {
@@ -67,11 +68,11 @@ export default class RepProjectsByConsultant extends MainComponent {
                                          target="_blank">{project.description}</a>
             },
             {
-                path: "projectStageName",
+                path: "engineerName",
                 //label: "Description",
                 sortable: true,
                 hdToolTip: "Project Stage",
-                icon: "fal fa-2x fa-step-forward color-gray2 pointer",
+                icon: "fal fa-2x fa-user-hard-hat color-gray2 pointer",
                 //className: "text-center",
                 // content:(project)=><a href={`/Project.php?action=edit&projectID=${project.projectID}`} target="_blank">{project.description}</a>
             },
@@ -97,6 +98,28 @@ export default class RepProjectsByConsultant extends MainComponent {
                 </div>
             },
             {
+                path: "inHoursUsed",
+                sortable: true,
+                hdToolTip: "In Hours Budget Difference",
+                icon: "fal fa-2x fa-arrows-h color-gray2 pointer",
+                className: "text-center",
+                content: (project) => {
+                    if (!project.inHoursBudget) {
+                        return '-';
+                    }
+                    const difference = ((project.inHoursBudget - project.inHoursUsed) * -1);
+                    let className = '';
+                    if (difference > 0) {
+                        className = 'red'
+                    }
+                    return (
+                        <div className="flex-row flex-center">
+                            <div className={className}>{difference.toFixed(2)}</div>
+                        </div>
+                    )
+                }
+            },
+            {
                 path: "outHoursBudgetUsed",
                 //label: "OOHB & OOHU ",
                 hdToolTip: "Out of hours budget / used",
@@ -108,6 +131,29 @@ export default class RepProjectsByConsultant extends MainComponent {
                     <div>{project.outHoursBudget}&nbsp;/&nbsp;</div>
                     <div className={project.outHoursClass}>{project.outHoursUsed}</div>
                 </div>
+            },
+            {
+                path: "outHoursUsed",
+                sortable: true,
+                hdToolTip: "Out Hours Budget Difference",
+                icon: "fal fa-2x fa-arrows-h color-gray2 pointer",
+                className: "text-center",
+                content: (project) => {
+                    if (!project.outHoursBudget) {
+                        return '-';
+                    }
+                    const difference = ((project.outHoursBudget - project.outHoursUsed) * -1);
+                    let className = '';
+                    if (difference > 0) {
+                        className = 'red'
+                    }
+
+                    return (
+                        <div className="flex-row flex-center">
+                            <div className={className}>{difference.toFixed(2)}</div>
+                        </div>
+                    )
+                }
             },
             {
                 path: "startDate",
@@ -133,7 +179,7 @@ export default class RepProjectsByConsultant extends MainComponent {
     render() {
 
         return <div>
-            <Spinner key="spinner" show={this.state.showSpinner}></Spinner>
+            <Spinner key="spinner" show={this.state.showSpinner}/>
             {this.getProjectsTable()}
         </div>
     }
