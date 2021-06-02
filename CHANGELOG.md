@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v5.12.0]
 ### Added
 - Issue 1402 - Standard Rate Card.
 - Issue 1379 - Change status of Sales Orders & Purchase Orders
