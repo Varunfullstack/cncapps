@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1418 - SR Statistics to breakdown visible and proactive SRs.
+
 ## [v5.11.12] - 2021-06-01
 ### Fixed
 - Fixed issue with alarm date time not being parsed properly when running AutoCompletion task.
