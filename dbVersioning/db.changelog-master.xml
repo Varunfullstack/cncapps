@@ -103,6 +103,7 @@
     <include file="db.changelog-5.10.2.xml"/>
     <include file="db.changelog-5.11.1.xml"/>
     <include file="db.changelog-5.11.7.xml"/>
+    <include file="db.changelog-5.11.12.xml"/>
     <include file="db.changelog-issue1402.xml"/>
     <include file="db.changelog-issue1368.xml"/>
     <include file="db.changelog-issue1379.xml"/>

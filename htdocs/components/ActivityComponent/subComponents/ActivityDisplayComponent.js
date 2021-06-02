@@ -1,5 +1,5 @@
 import APIActivity from "../../services/APIActivity.js";
-import {Chars, maxLength, padEnd, params} from "../../utils/utils.js";
+import {Chars, dateFormatExcludeNull, maxLength, padEnd, params} from "../../utils/utils.js";
 import ToolTip from "../../shared/ToolTip.js";
 import MainComponent from "../../shared/MainComponent.js";
 import * as React from 'react';
@@ -18,6 +18,7 @@ import {TaskListComponent} from "./TaskListComponent";
 import AdditionalChargeRequestModal from "./Modals/AdditionalTimeRequestModal";
 import ExistingAdditionalChargeableWorkRequestModal from "./Modals/ExistingAdditionalChargeableWorkRequestModal";
 import CallbackModal from "../../shared/CallbackModal/CallbackModal";
+import {format} from "../../../../stencil/cncapps-components/src/utils/utils";
 
 // noinspection EqualityComparisonWithCoercionJS
 const emptyAssetReasonCharactersToShow = 30;
@@ -988,14 +989,17 @@ class ActivityDisplayComponent extends MainComponent {
     }
 
     getAwaitingTitle = (data) => {
-        if (data?.problemStatus !== "F" && data?.problemStatus !== "C") {
-            if (data?.awaitingCustomerResponseFlag == 'N')
-                return " - Awaiting CNC";
-            else if (data?.awaitingCustomerResponseFlag == 'Y')
-                return " - On Hold";
-            else
-                return "";
-        } else return "";
+        if (!(data?.problemStatus !== "F" && data?.problemStatus !== "C")) {
+            return "";
+        }
+        if (data?.awaitingCustomerResponseFlag == 'N')
+            return " - Awaiting CNC";
+
+        if (data?.awaitingCustomerResponseFlag == 'Y') {
+            const dateTime = dateFormatExcludeNull(`${data.alarmDate} ${data.alarmTime}:00`, null, 'DD/MM/YYYY HH:mm')
+            return ` - On Hold until ${dateTime}`;
+        }
+        return "";
 
     }
 

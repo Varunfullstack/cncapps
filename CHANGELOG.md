@@ -8,6 +8,12 @@ This project changes will be shown here.
 ### Changed
 - Issue 1399 - Force Customer Name when creating Templated Sales Quotation.
 - Issue 1368 - convert StarterLeaverManagement.php,  RootCause.php, UtilityEmails.php, IgnoredADDomains.php, Office365Licenses.php and SRSource.php
+- Issue 1421 - Show On Hold Date & Time on SR
+
+## [v5.11.12] - 2021-06-01
+### Fixed
+- Fixed issue with alarm date time not being parsed properly when running AutoCompletion task.
+- Fixed issue with Fixed service requests having open activities.
 
 ## [v5.11.11] - 2021-05-28
 ### Fixed
