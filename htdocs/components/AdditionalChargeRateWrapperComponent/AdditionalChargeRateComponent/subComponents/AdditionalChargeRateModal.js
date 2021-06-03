@@ -5,6 +5,7 @@ import CNCCKEditor from "../../../shared/CNCCKEditor";
 import CustomerSearch from "../../../shared/CustomerSearch";
 import Table from "../../../shared/table/table";
 import * as PropTypes from "prop-types";
+import {poundFormat} from "../../../utils/utils";
 
 const EDITING_CUSTOMER_PRICE_INITIAL_STATE = {
     customerId: '',
@@ -278,17 +279,23 @@ export class AdditionalChargeRateModal extends React.Component {
                                                hdToolTip: "Sale Price",
                                                hdClassName: "text-center",
                                                icon: "fal fa-2x fa-coins color-gray2 pointer",
+                                               className: 'text-right',
                                                path: "salePrice",
+                                               content: (item => {
+                                                   return poundFormat(item.salePrice);
+                                               })
                                            },
                                            {
                                                hdToolTip: "Expected time for the task",
                                                hdClassName: "text-center",
+                                               className: 'text-right',
                                                icon: "fal fa-2x fa-clock color-gray2 pointer",
                                                path: "timeBudgetMinutes",
                                            },
                                            {
                                                path: "",
                                                label: "",
+                                               className: 'text-center',
                                                content: (item) => {
                                                    return (
                                                        <React.Fragment>

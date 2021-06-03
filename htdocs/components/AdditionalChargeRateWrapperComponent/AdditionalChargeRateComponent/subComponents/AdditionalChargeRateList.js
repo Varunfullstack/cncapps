@@ -3,6 +3,7 @@ import Table from "../../../shared/table/table";
 import * as PropTypes from "prop-types";
 import ToolTip from "../../../shared/ToolTip";
 import APICustomers from "../../../services/APICustomers";
+import {poundFormat} from "../../../utils/utils";
 
 const globalType = 'Standard Base Rate';
 
@@ -120,10 +121,15 @@ export class AdditionalChargeRateList extends React.Component {
                             hdClassName: "text-center",
                             icon: "fal fa-2x fa-coins color-gray2 pointer",
                             path: "salePrice",
+                            className: 'text-right',
+                            content: (item => {
+                                return poundFormat(item.salePrice);
+                            })
                         },
                         {
                             hdToolTip: "Expected time for the task",
                             hdClassName: "text-center",
+                            className: 'text-right',
                             icon: "fal fa-2x fa-clock color-gray2 pointer",
                             path: "timeBudgetMinutes",
                         },
