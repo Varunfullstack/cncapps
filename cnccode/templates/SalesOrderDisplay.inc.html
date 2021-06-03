@@ -295,71 +295,75 @@
             stockLevelContainer.innerHTML = htmlContent;
         }
 
-        document.querySelectorAll('tr[data-line-type="I"]')
-                .forEach(itemRow => {
-                            const buttonContainer = itemRow.querySelector('td:last-child > div');
-                            const description = itemRow.querySelector('a').text;
-                            const supplierName = itemRow.querySelector('.supplier-name').textContent;
+        if (salesOrderType !== 'C') {
 
-                            updateStockLevel(itemRow);
 
-                            if (salesOrderType === SALES_ORDER_TYPES.QUOTATION) {
-                                const button = document.createElement('button');
-                                button.type = "button";
-                                button.className = "salesOrderButton";
-                                let title = "Update master item price";
-                                if (itemRow.dataset.itemUpdatedAt) {
-                                    title = "Price updated by " + itemRow.dataset.itemUpdatedBy + " at " + (moment(itemRow.dataset.itemUpdatedAt).format('DD/MM/YYYY HH:mm'))
-                                }
-                                button.title = title;
-                                button.addEventListener('click', async () => {
-                                    const newCost = itemRow.querySelector('input.lineItemUnitCost').value;
-                                    const newSale = itemRow.querySelector('input.lineItemUnitSale').value;
+            document.querySelectorAll('tr[data-line-type="I"]')
+                    .forEach(itemRow => {
+                                const buttonContainer = itemRow.querySelector('td:last-child > div');
+                                const description = itemRow.querySelector('a').text;
+                                const supplierName = itemRow.querySelector('.supplier-name').textContent;
 
-                                    if (!confirm(
-                                            "Please confirm you want to change the master item cost price for " +
-                                            description +
-                                            " from " +
-                                            toPounds(itemRow.dataset.itemCost) + " to " +
-                                            toPounds(newCost) + " and the sale price from " + toPounds(itemRow.dataset.itemSale) +
-                                            " to " + toPounds(newSale) + ". The default supplier will also be updated to " + supplierName
-                                    )) {
-                                        return;
+                                updateStockLevel(itemRow);
+
+                                if (salesOrderType === SALES_ORDER_TYPES.QUOTATION) {
+                                    const button = document.createElement('button');
+                                    button.type = "button";
+                                    button.className = "salesOrderButton";
+                                    let title = "Update master item price";
+                                    if (itemRow.dataset.itemUpdatedAt) {
+                                        title = "Price updated by " + itemRow.dataset.itemUpdatedBy + " at " + (moment(itemRow.dataset.itemUpdatedAt).format('DD/MM/YYYY HH:mm'))
                                     }
+                                    button.title = title;
+                                    button.addEventListener('click', async () => {
+                                        const newCost = itemRow.querySelector('input.lineItemUnitCost').value;
+                                        const newSale = itemRow.querySelector('input.lineItemUnitSale').value;
 
-                                    try {
-
-                                        const response = await fetch(
-                                                '/Item.php?action=updateItemFromSalesOrder',
-                                                {
-                                                    method: 'POST',
-                                                    body: JSON.stringify({
-                                                        itemId: itemRow.dataset.itemId,
-                                                        cost: newCost,
-                                                        sale: newSale,
-                                                        supplierId: itemRow.dataset.supplierId
-                                                    })
-                                                }
-                                        )
-                                        const res = await response.json();
-                                        if (res.status !== 'ok') {
-                                            throw new Error('Failed to save prices');
+                                        if (!confirm(
+                                                "Please confirm you want to change the master item cost price for " +
+                                                description +
+                                                " from " +
+                                                toPounds(itemRow.dataset.itemCost) + " to " +
+                                                toPounds(newCost) + " and the sale price from " + toPounds(itemRow.dataset.itemSale) +
+                                                " to " + toPounds(newSale) + ". The default supplier will also be updated to " + supplierName
+                                        )) {
+                                            return;
                                         }
-                                        alert('Prices saved, reloading page...');
-                                        window.location.reload();
-                                    } catch (error) {
-                                        alert("Failed to save new prices");
-                                    }
+
+                                        try {
+
+                                            const response = await fetch(
+                                                    '/Item.php?action=updateItemFromSalesOrder',
+                                                    {
+                                                        method: 'POST',
+                                                        body: JSON.stringify({
+                                                            itemId: itemRow.dataset.itemId,
+                                                            cost: newCost,
+                                                            sale: newSale,
+                                                            supplierId: itemRow.dataset.supplierId
+                                                        })
+                                                    }
+                                            )
+                                            const res = await response.json();
+                                            if (res.status !== 'ok') {
+                                                throw new Error('Failed to save prices');
+                                            }
+                                            alert('Prices saved, reloading page...');
+                                            window.location.reload();
+                                        } catch (error) {
+                                            alert("Failed to save new prices");
+                                        }
 
 
-                                })
-                                const icon = document.createElement('i');
-                                icon.className = "fal fa-money-check-edit-alt";
-                                button.appendChild(icon);
-                                buttonContainer.appendChild(button);
+                                    })
+                                    const icon = document.createElement('i');
+                                    icon.className = "fal fa-money-check-edit-alt";
+                                    button.appendChild(icon);
+                                    buttonContainer.appendChild(button);
+                                }
                             }
-                        }
-                )
+                    )
+        }
 
         function toPounds(number) {
             if (typeof number !== 'number') {
