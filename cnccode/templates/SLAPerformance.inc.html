@@ -394,11 +394,12 @@
                     Object.keys(commonParams).forEach(key => {
                         urls.forEach(url => url.searchParams.append(key, commonParams[key]))
                     });
-                    reportSectionElement.innerHTML = "<div class='loading' style='position: absolute'></div>";
+                    window.spinnerComponent.showSpinner();
                     Promise.all(urls.map(url => fetch(url.toString()).then(response => response.json()))
                     ).then(getContext)
                             .then((data) => {
                                 const context = {item: data};
+                                window.spinnerComponent.hideSpinner();
                                 reportSectionElement.innerHTML = Mustache.to_html(dataTableTemplate, context);
                             })
                 }
@@ -524,10 +525,7 @@
                         "avgChargeableTime": {
                             label: "Average Time of work carried out",
                             format: x => x ? x.toFixed(2) : x,
-                            assignClass: (a, b) => {
-                                console.log(a, b);
-                                return lowerIsBetter(a, b)
-                            },
+                            assignClass: lowerIsBetter,
                             showInSummary: true,
                         },
                         "avgTimeAwaitingCNC": {
@@ -608,9 +606,6 @@
                     Object.keys(specificCustomerStats).forEach(key => {
                         if (!labels[key]) {
                             return;
-                        }
-                        if (key === 'avgChargeableTime') {
-                            debugger;
                         }
                         tableCombinations.forEach(
                                 combination => {
