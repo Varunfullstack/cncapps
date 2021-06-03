@@ -9,8 +9,12 @@
        <sql>
            insert into reports values (7,"Project Budget","RepProjectsBudget",1);
            insert into report_categories(reportID,categoryID) values (7,1);
-           insert into report_paramters(reportID,paramterID,title,required,paramterOrder) values (7,2,"Date From",1,1),
-           (7,3,"Date To",0,2);
+           insert into report_paramters(reportID,paramterID,title,required,paramterOrder) values
+           (7,2,"Date From",1,1),
+           (7,3,"Date To",0,2),
+           (7,6,"Project Type", 0,2),
+           (7,5,"Project Stage", 0,2)
+           ;
 
        </sql>
     </changeSet>

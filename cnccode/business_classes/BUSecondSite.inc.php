@@ -6,6 +6,8 @@ use CNCLTD\Data\DBConnect;
 global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BUMail.inc.php");
+require_once($cfg["path_bu"] . "/BUHeader.inc.php");
+require_once($cfg["path_bu"] . "/BUCustomer.inc.php");
 require_once($cfg["path_dbe"] . "/DBESecondsiteImage.inc.php");
 require_once($cfg["path_dbe"] . "/DBECustomerItem.inc.php");
 

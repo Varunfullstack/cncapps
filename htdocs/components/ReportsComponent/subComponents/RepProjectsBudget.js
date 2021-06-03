@@ -31,12 +31,22 @@ export default class RepProjectsBudget extends MainComponent {
 
     getData() {
         this.setState({showModal: true});
-        const {consID, dateFrom, dateTo} = this.props;
-        this.api.getProjectsSearch(consID, dateFrom, dateTo)
+        const {consID, dateFrom, dateTo, projectTypeID, projectStageID} = this.props;
+        this.api.getProjectsSearch(consID, dateFrom, dateTo, projectTypeID, projectStageID)
             .then(projects => {
                 projects = projects.map((p) => {
                     p.inHoursClass = this.helper.getRedClass(p.inHoursUsed, p.inHoursBudget);
                     p.outHoursClass = this.helper.getRedClass(p.outHoursUsed, p.outHoursBudget);
+                    p.inHoursDifference = null;
+                    p.outHoursDifference = null;
+                    if (p.inHoursBudget) {
+                        p.inHoursDifference = (p.inHoursBudget - p.inHoursUsed) * -1;
+                    }
+
+                    if (p.outHoursBudget) {
+                        p.outHoursDifference = (p.outHoursBudget - p.outHoursUsed) * -1;
+                    }
+
                     return p;
                 });
                 this.setState({projects, showModal: false, loadData: false});
@@ -98,23 +108,23 @@ export default class RepProjectsBudget extends MainComponent {
                 </div>
             },
             {
-                path: "inHoursUsed",
+                path: "inHoursDifference",
                 sortable: true,
                 hdToolTip: "In Hours Budget Difference",
                 icon: "fal fa-2x fa-arrows-h color-gray2 pointer",
                 className: "text-center",
                 content: (project) => {
-                    if (!project.inHoursBudget) {
+                    if (project.inHoursDifference === null) {
                         return '-';
                     }
-                    const difference = ((project.inHoursBudget - project.inHoursUsed) * -1);
+
                     let className = '';
-                    if (difference > 0) {
+                    if (project.inHoursDifference > 0) {
                         className = 'red'
                     }
                     return (
                         <div className="flex-row flex-center">
-                            <div className={className}>{difference.toFixed(2)}</div>
+                            <div className={className}>{project.inHoursDifference.toFixed(2)}</div>
                         </div>
                     )
                 }
@@ -133,24 +143,23 @@ export default class RepProjectsBudget extends MainComponent {
                 </div>
             },
             {
-                path: "outHoursUsed",
+                path: "outHoursDifference",
                 sortable: true,
                 hdToolTip: "Out Hours Budget Difference",
                 icon: "fal fa-2x fa-arrows-h color-gray2 pointer",
                 className: "text-center",
                 content: (project) => {
-                    if (!project.outHoursBudget) {
+                    if (project.outHoursDifference === null) {
                         return '-';
                     }
-                    const difference = ((project.outHoursBudget - project.outHoursUsed) * -1);
+
                     let className = '';
-                    if (difference > 0) {
+                    if (project.outHoursDifference > 0) {
                         className = 'red'
                     }
-
                     return (
                         <div className="flex-row flex-center">
-                            <div className={className}>{difference.toFixed(2)}</div>
+                            <div className={className}>{project.outHoursDifference.toFixed(2)}</div>
                         </div>
                     )
                 }

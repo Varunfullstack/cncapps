@@ -91,7 +91,9 @@ class CreateChargeableWorkCustomerRequest
         );
         $contactActivity->setValue(DBECallActivity::awaitingCustomerResponseFlag, 'Y');
         $contactActivity->updateRow();
-        $serviceRequest->setValue(DBEProblem::awaitingCustomerResponseFlag, 'Y');
-        $serviceRequest->updateRow();
+        $toUpdateServiceRequest = new DBEProblem($this);
+        $toUpdateServiceRequest->getRow($serviceRequestId);
+        $toUpdateServiceRequest->setValue(DBEProblem::awaitingCustomerResponseFlag, 'Y');
+        $toUpdateServiceRequest->updateRow();
     }
 }

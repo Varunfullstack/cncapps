@@ -280,6 +280,7 @@ class ProcessChargeableWorkCustomerRequestFromSpecificCustomerRate
             default:
                 $teamField = null;
         }
+
         if ($teamField) {
             $toUpdateProblem->setValue(
                 $teamField,
