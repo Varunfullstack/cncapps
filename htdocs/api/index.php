@@ -231,7 +231,7 @@ WHERE
 SELECT
   priorities.*,
   raised,
-  FIXED,
+  fixed,
   responseTime,
   slaMet,
   slaMetRaw,
@@ -441,7 +441,7 @@ FROM
       LEFT JOIN callactivity initial
         ON initial.`caa_problemno` = problem.`pro_problemno`
         AND initial.`caa_callacttypeno` = 51
-      LEFT JOIN callactivity FIXED
+      LEFT JOIN callactivity fixed
         ON fixed.caa_problemno = problem.pro_problemno
         AND fixed.caa_callacttypeno = 57
       JOIN customer
@@ -864,7 +864,7 @@ ORDER BY COUNT DESC";
                 $query       = "SELECT
     SUM(1) AS raised,
     SUM(pro_status IN(\"F\",\"C\")) AS `fixed`,
-  AVG(if(problem.pro_priority = 1 and pro_status IN (\"F\",\"C\") ,problem.`pro_responded_hours`, null)) AS responseTime,
+  AVG(if(pro_status IN (\"F\",\"C\") ,problem.`pro_responded_hours`, null)) AS responseTime,
   AVG(
    IF(pro_status IN (\"F\",\"C\"),   
    problem.`pro_responded_hours` < 
@@ -922,8 +922,7 @@ FROM
       SUM(pro_status IN (\"F\", \"C\")) AS `fixed`,
       AVG(
         IF(
-          problem.pro_priority = 1
-          AND pro_status IN (\"F\", \"C\"),
+          pro_status IN (\"F\", \"C\"),
           problem.`pro_responded_hours`,
           NULL
         )

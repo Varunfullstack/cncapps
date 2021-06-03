@@ -439,6 +439,10 @@
                     )
                 }
 
+                function percentageFormat(x) {
+                    return x === null ? '' : (x * 100).toFixed(2);
+                }
+
                 function getContext(
                         [
                             allCustomersStats,
@@ -457,12 +461,17 @@
                 ) {
 
                     const higherIsBetter = (customer, allCustomers) => {
-                        return customer >= allCustomers ? "performance-green" : 'performance-warn'
+                        if (customer === null) return '';
+                        if (allCustomers === null) return '';
+                        return customer.toFixed(2) >= allCustomers.toFixed(2) ? "performance-green" : 'performance-warn'
                     };
                     const lowerIsBetter = (customer, allCustomers) => {
-                        return customer <= allCustomers ? "performance-green" : 'performance-warn'
+                        if (customer === null) return '';
+                        if (allCustomers === null) return '';
+                        return customer.toFixed(2) <= allCustomers.toFixed(2) ? "performance-green" : 'performance-warn'
                     };
                     const zeroTolerance = (customer, allCustomers) => {
+                        if (customer === null) return '';
                         return customer ? "performance-warn" : "performance-green";
                     }
                     const noColour = (customer, allCustomers) => {
@@ -496,26 +505,29 @@
                         },
                         "slaMet": {
                             label: "% of Response SLAs Met",
-                            format: x => (x * 100).toFixed(2),
+                            format: percentageFormat,
                             assignClass: higherIsBetter,
                             showInSummary: true
                         },
                         "closedWithin8Hours": {
                             label: "% Closed within 8 hours of being raised",
-                            format: x => (x * 100).toFixed(2),
+                            format: percentageFormat,
                             assignClass: higherIsBetter,
                             showInSummary: true
                         },
                         "reopened": {
                             label: "% Reopened SRs",
-                            format: x => (x * 100).toFixed(2),
+                            format: percentageFormat,
                             assignClass: lowerIsBetter,
                             showInSummary: true
                         },
                         "avgChargeableTime": {
                             label: "Average Time of work carried out",
                             format: x => x ? x.toFixed(2) : x,
-                            assignClass: lowerIsBetter,
+                            assignClass: (a, b) => {
+                                console.log(a, b);
+                                return lowerIsBetter(a, b)
+                            },
                             showInSummary: true,
                         },
                         "avgTimeAwaitingCNC": {
@@ -597,7 +609,9 @@
                         if (!labels[key]) {
                             return;
                         }
-
+                        if (key === 'avgChargeableTime') {
+                            debugger;
+                        }
                         tableCombinations.forEach(
                                 combination => {
                                     const allCustomersBreakdownStats = combination[2]
