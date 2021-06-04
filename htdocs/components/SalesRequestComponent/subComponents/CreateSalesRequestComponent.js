@@ -11,7 +11,7 @@ const initialData = {
     customerId: '',
     message: '',
     files: [],
-    type: 68,
+    type: '',
     customerName: ''
 }
 
@@ -31,7 +31,13 @@ export class CreateSalesRequestComponent extends MainComponent {
     componentDidMount() {
         this.apiStandardText
             .getOptionsByType("Sales Request")
-            .then((options) => this.setState({options}));
+            .then((options) => {
+                const otherRequestOption = options.find(x => x.id === 68);
+                this.setState({
+                    options,
+                    data: {...this.state.data, type: otherRequestOption.id, message: otherRequestOption.template}
+                })
+            });
     }
 
     handleFileSelected = (files, type) => {
