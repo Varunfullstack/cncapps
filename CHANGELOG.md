@@ -1,6 +1,12 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.12.1] - 2021-06-04
+### Fixed
+- Fixed issue with salesFigures in the home page.
+- Fixed issue with mySettingsComponent not building properly.
+- Fixed issue with CreateSalesRequests not having the message filled in properly on load.
+
 ## [v5.12.0] - 2021-06-03
 ### Added
 - Issue 1402 - Standard Rate Card.
