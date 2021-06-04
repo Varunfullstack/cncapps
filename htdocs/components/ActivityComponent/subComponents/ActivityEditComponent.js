@@ -27,6 +27,7 @@ import {TaskListComponent} from "./TaskListComponent";
 import AdditionalChargeRequestModal from "./Modals/AdditionalTimeRequestModal";
 import ExistingAdditionalChargeableWorkRequestModal from "./Modals/ExistingAdditionalChargeableWorkRequestModal";
 import CallbackModal from "../../shared/CallbackModal/CallBackModal";
+import {TEMPlATE_TYPES, TemplateModal} from "./Modals/TemplateModal";
 
 // noinspection EqualityComparisonWithCoercionJS
 const hiddenAndCustomerNoteAlertMessage = `Customer note must be empty when the activity or entire SR is hidden.`;
@@ -89,13 +90,7 @@ class ActivityEditComponent extends MainComponent {
                 Inbound: null
             },
             currentActivity: "",
-            _showModal: false,
-            templateOptions: [],
-            templateOptionId: null,
-            templateDefault: "",
-            templateValue: "",
-            templateType: "",
-            templateTitle: "",
+            templateType: null,
             contactNotes: "",
             callActTypes: [],
             notSDManagerActivityTypes: [],
@@ -744,15 +739,15 @@ class ActivityEditComponent extends MainComponent {
                    onChange={(event) => this.setValue("alarmDate", event.target.value)}
             />
             {renderTimeInput()}
-            <button onClick={() => this.handleTemplateDisplay("changeRequest")}
+            <button onClick={() => this.handleTemplateDisplay(TEMPlATE_TYPES.changeRequest)}
                     className="btn-info"
             > Change Request
             </button>
-            <button onClick={() => this.handleTemplateDisplay("salesRequest")}
+            <button onClick={() => this.handleTemplateDisplay(TEMPlATE_TYPES.salesRequest)}
                     className="btn-info"
             > Sales Request
             </button>
-            <button onClick={() => this.handleTemplateDisplay("partsUsed")}
+            <button onClick={() => this.handleTemplateDisplay(TEMPlATE_TYPES.partsUsed)}
                     className="btn-info"
             > Parts Used
             </button>
@@ -1528,152 +1523,29 @@ class ActivityEditComponent extends MainComponent {
         );
     };
 
-    handleTemplateChanged = (event) => {
-        const id = event.target.value;
-        const {templateOptions} = this.state;
-        let templateOptionId = null;
-        let templateValue = "";
-        if (id >= 0) {
-            const op = templateOptions.find((s) => s.id == id);
-            templateValue = op.template;
-            templateOptionId = op.id;
-        }
-        const test = () => {
-            this.setState({templateOptionId, templateValue});
-        }
-        test();
-    };
-    handleTemplateValueChange = (data) => {
-        this.setState({templateValue: data});
-    };
-    handleTemplateSend = async (type) => {
-        const {
-            templateValue,
-            templateOptionId,
-            data,
-            currentActivity,
-        } = this.state;
-        if (templateValue == "") {
-            this.alert("Please enter details");
-            return;
-        }
-        const payload = new FormData();
-        payload.append("message", templateValue);
-        payload.append("type", templateOptionId);
-        switch (type) {
-            case "changeRequest":
-                await this.api.sendChangeRequest(data.problemID, payload);
-                this.alert('Change Request Sent');
-                break;
-            case "partsUsed": {
-                const object = {
-                    message: templateValue,
-                    callActivityID: currentActivity,
-                };
-                await this.api.sendPartsUsed(object);
-                this.alert('Parts Used Sent');
-                break;
-            }
-            case "salesRequest":
-                await this.api.sendSalesRequest(
-                    data.customerId,
-                    data.problemID,
-                    payload
-                );
-                this.alert('Sales Request Sent');
-                break;
-        }
-        this.setState({_showModal: false});
-    };
+
     getTemplateModal = () => {
         const {
-            templateValue,
-            templateOptions,
-            _showModal,
-            templateTitle,
             templateType,
+            data: {customerId, problemID: serviceRequestId},
+            currentActivity: activityId,
         } = this.state;
-        const {el} = this;
 
-        return el(Modal, {//autoFocus:true
-            width: 900,
-            key: templateType,
-            onClose: () => this.setState({_showModal: false, templateValue: ""}),
-            title: templateTitle,
-            show: _showModal,
-            content: el(
-                "div",
-                {key: "container"},
-                templateOptions.length > 0
-                    ? el(
-                    "select",
-                    {onChange: this.handleTemplateChanged, autoFocus: true},
-                    el("option", {key: "empty", value: -1}, "-- Pick an option --"),
-                    templateOptions.map((s) =>
-                        el("option", {key: s.id, value: s.id}, s.name)
-                    )
-                    )
-                    : null,
-                this.state._activityLoaded
-                    ?
-
-                    el('div', {className: 'modal_editor'},
-                        el('div', {id: 'top2'}),
-                        el(CNCCKEditor, {
-                            key: "salesRequestEditor",
-                            name: "salesRequest",
-                            value: templateValue,
-                            type: "inline",
-                            onChange: this.handleTemplateValueChange,
-                            sharedSpaces: true,
-                            top: "top2",
-                            bottom: "bottom2",
-                            autoFocus: templateOptions.length <= 0
-                        }),
-                        el('div', {id: 'bottom2'}),
-                    )
-
-                    : null
-            ),
-            footer: el(
-                "div",
-                {key: "footer", style: {display: "flex", justifyContent: "flex-end"}},
-                el(
-                    "button",
-                    {className: "float-left", onClick: () => this.handleTemplateSend(templateType)},
-                    "Send"
-                ),
-                el(
-                    "button",
-                    {className: "float-right", onClick: () => this.setState({_showModal: false})},
-                    "Cancel"
-                ),
-            ),
-        });
+        if (!templateType) {
+            return '';
+        }
+        return (
+            <TemplateModal key={templateType}
+                           templateType={templateType}
+                           onClose={() => this.setState({templateType: null})}
+                           customerId={customerId}
+                           serviceRequestId={serviceRequestId}
+                           activityId={activityId}
+            />
+        )
     };
     handleTemplateDisplay = async (type) => {
-        let options = [];
-        let templateTitle = "";
-        switch (type) {
-            case "salesRequest":
-                options = await this.api.getSalesRequestOptions();
-                templateTitle = "Sales Request";
-                break;
-            case "changeRequest":
-                options = await this.api.getChangeRequestOptions();
-                templateTitle = "Change Request";
-                break;
-            case "partsUsed":
-                templateTitle = "Parts Used";
-                break;
-        }
-        this.setState({
-            templateOptions: options,
-            _showModal: true,
-            templateType: type,
-            templateTitle,
-            templateDefault: "",
-        });
+        this.setState({templateType: type});
     };
 
     getActivityNotes() {

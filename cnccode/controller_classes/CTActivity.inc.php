@@ -11,6 +11,7 @@
  */
 
 use CNCLTD\Business\BUActivity;
+use CNCLTD\Business\StandardTextNotFoundException;
 use CNCLTD\core\domain\usecases\AssignToBeLoggedToServiceRequest;
 use CNCLTD\Data\DBEJProblem;
 use CNCLTD\Exceptions\JsonHttpException;
@@ -4534,6 +4535,15 @@ class CTActivity extends CTCNC
         $message   = $this->getParam('message');
         $problemID = $this->getParam('problemID');
         $type      = $this->getParam('type');
+        if (!$type) {
+            throw new JsonHttpException(400, "Type is required");
+        }
+        if (!$message) {
+            throw new JsonHttpException(400, "Message is required");
+        }
+        if (!$problemID) {
+            throw new JsonHttpException(400, "Service Request Id is required");
+        }
         try {
 
             $this->buActivity->sendSalesRequest(
@@ -4541,8 +4551,11 @@ class CTActivity extends CTCNC
                 $message,
                 $type
             );
+        } catch (StandardTextNotFoundException $exception) {
+            throw new JsonHttpException(400, $exception->getMessage());
         } catch (Exception $exception) {
-            return ["status" => "error", "message" => $exception->getMessage()];
+            error_log($exception->getMessage());
+            throw new JsonHttpException(500, 'Failed to create sales request');
         }
         return ["status" => "ok"];
     }

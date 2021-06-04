@@ -4,6 +4,9 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use CNCLTD\Business\StandardTextNotFoundException;
+
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/DBEStandardText.inc.php");
 
@@ -34,12 +37,17 @@ class BUStandardText extends Business
         return TRUE;
     }
 
+    /**
+     * @throws StandardTextNotFoundException
+     */
     function getStandardTextByID($ID,
                                  &$dsResults
-    )
+    ): bool
     {
         $this->dbeStandardText->setPKValue($ID);
-        $this->dbeStandardText->getRow();
+        if (!$this->dbeStandardText->getRow()) {
+            throw new StandardTextNotFoundException($ID);
+        };
         return ($this->getData(
             $this->dbeStandardText,
             $dsResults

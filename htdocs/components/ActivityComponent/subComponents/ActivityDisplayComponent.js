@@ -19,6 +19,8 @@ import AdditionalChargeRequestModal from "./Modals/AdditionalTimeRequestModal";
 import ExistingAdditionalChargeableWorkRequestModal from "./Modals/ExistingAdditionalChargeableWorkRequestModal";
 import CallbackModal from "../../shared/CallbackModal/CallbackModal";
 import {format} from "../../../../stencil/cncapps-components/src/utils/utils";
+import * as PropTypes from "prop-types";
+import {TEMPlATE_TYPES, TemplateModal} from "./Modals/TemplateModal";
 
 // noinspection EqualityComparisonWithCoercionJS
 const emptyAssetReasonCharactersToShow = 30;
@@ -41,13 +43,7 @@ class ActivityDisplayComponent extends MainComponent {
             data: null,
             _loadedData: false,
             currentActivity: null,
-            _showModal: false,
-            templateOptions: [],
-            templateOptionId: null,
-            templateDefault: '',
-            templateValue: '',
-            templateType: '',
-            templateTitle: '',
+            templateType: null,
             selectedChangeRequestTemplateId: null,
             showSalesOrder: false,
             filters: {
@@ -472,7 +468,7 @@ class ActivityDisplayComponent extends MainComponent {
                 const {currentActivity} = this.state;
                 await this.loadCallActivity(currentActivity);
                 let defaultAlertText = 'Request Sent';
-                if(selectedAdditionalChargeId){
+                if (selectedAdditionalChargeId) {
                     defaultAlertText = 'Saved successfully';
                 }
                 this.alert(defaultAlertText);
@@ -1066,134 +1062,52 @@ class ActivityDisplayComponent extends MainComponent {
             })
         );
     }
-    // Parts used, change requestm and sales request
-    handleTemplateChanged = (event) => {
 
-        const id = event.target.value;
-        const {templateOptions} = this.state;
-        let templateDefault;
-        let templateOptionId = null;
-        let templateValue = '';
-        if (id >= 0) {
-            const op = templateOptions.filter(s => s.id == id)[0];
-            templateDefault = op.template;
-            templateValue = op.template;
-            templateOptionId = op.id;
-        } else {
-            templateDefault = '';
-        }
-        this.setState({templateDefault, templateOptionId, templateValue});
-    }
-    handleTemplateValueChange = (data) => {
-        this.setState({templateValue: data})
-    }
-    handleTemplateSend = async (type) => {
-        const {templateValue, templateOptionId, data, currentActivity} = this.state;
-        if (templateValue == '') {
-            this.alert('Please enter detials');
-            return;
-        }
-        const payload = new FormData();
-        payload.append("message", templateValue);
-        payload.append("type", templateOptionId);
-        switch (type) {
-            case "changeRequest":
-                await this.api.sendChangeRequest(data.problemID, payload);
-                this.alert('Change Request Sent');
-                break;
-            case "partsUsed":
-                const object = {
-                    message: templateValue,
-                    callActivityID: currentActivity,
-                };
-                const result = await this.api.sendPartsUsed(object);
-                this.alert('Parts Used Sent');
-                break;
-            case "salesRequest":
-                await this.api.sendSalesRequest(
-                    data.customerId,
-                    data.problemID,
-                    payload
-                );
-                this.alert('Sales Request Sent');
-                break;
-        }
-        this.loadCallActivity(currentActivity);
-        this.setState({_showModal: false})
-    }
     getTemplateModal = () => {
-        const {templateDefault, templateOptions, _showModal, templateTitle, templateType} = this.state;
-        const {el} = this;
-        return el(
-            Modal, {
-                width: 900, key: templateType, onClose: () => this.setState({_showModal: false}),
-                title: templateTitle,
-                show: _showModal,
-                content: el('div', {key: 'conatiner'},
-                    templateOptions.length > 0 ? el('select', {
-                            onChange: this.handleTemplateChanged,
-                            autoFocus: true,
-                            value: ''
-                        },
-                        el('option', {key: 'empty', value: -1}, "-- Pick an option --"),
-                        templateOptions.map(s => el('option', {key: s.id, value: s.id}, s.name))) : null,
-                    el('div', {className: 'modal_editor'},
-                        el('div', {id: 'top2'}),
-                        el(CNCCKEditor, {
-                            key: "salesRequestEditor",
-                            name: "salesRequest",
-                            value: templateDefault,
-                            type: "inline",
-                            onChange: this.handleTemplateValueChange,
-                            sharedSpaces: true,
-                            top: "top2",
-                            bottom: "bottom2"
-                        }),
-                        el('div', {id: 'bottom2'}),
-                    )
-                ),
-                footer: el('div', {key: "footer"},
-                    el('button', {onClick: () => this.handleTemplateSend(templateType)}, "Send"),
-                    el('button', {onClick: () => this.setState({_showModal: false})}, "Cancel"),
-                )
-            }
+
+        const {
+            templateType,
+            data: {customerId, problemID: serviceRequestId},
+            currentActivity: activityId,
+        } = this.state;
+
+        if (!templateType) {
+            return '';
+        }
+        return (
+            <TemplateModal key={templateType}
+                           templateType={templateType}
+                           onClose={
+                               (isSent) => {
+                                   if (isSent) this.loadCallActivity(activityId);
+                                   this.setState({templateType: null})
+                               }
+                           }
+                           customerId={customerId}
+                           serviceRequestId={serviceRequestId}
+                           activityId={activityId}
+            />
         )
     }
     handleTemplateDisplay = async (type) => {
-        let options = [];
-        let templateTitle = '';
-        switch (type) {
-            case "salesRequest":
-                options = await this.api.getSalesRequestOptions();
-                templateTitle = "Sales Request";
-                break;
-            case "changeRequest":
-                options = await this.api.getChangeRequestOptions();
-                templateTitle = "Change Request";
-                break;
-            case "partsUsed":
-                templateTitle = "Parts Used";
-                break;
-        }
-        const templateDefault = '';
-        this.setState({templateOptions: options, _showModal: true, templateType: type, templateTitle, templateDefault})
+        this.setState({templateType: type});
     }
 
     getFooter = () => {
         return (
             <div className="activities-container">
                 <button className="m-5 btn-info"
-                        onClick={() => this.handleTemplateDisplay("partsUsed")}
+                        onClick={() => this.handleTemplateDisplay(TEMPlATE_TYPES.partsUsed)}
                 >
                     Parts Used
                 </button>
                 <button className="m-5 btn-info"
-                        onClick={() => this.handleTemplateDisplay("salesRequest")}
+                        onClick={() => this.handleTemplateDisplay(TEMPlATE_TYPES.salesRequest)}
                 >
                     Sales Request
                 </button>
                 <button className="m-5 btn-info"
-                        onClick={() => this.handleTemplateDisplay("changeRequest")}
+                        onClick={() => this.handleTemplateDisplay(TEMPlATE_TYPES.changeRequest)}
                 >
                     Change Request
                 </button>

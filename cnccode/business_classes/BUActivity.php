@@ -7215,7 +7215,6 @@ class BUActivity extends Business
                 $record->getPostcode()
             );
         }
-
         if ($siteNo === false) {
             $siteNo = $dbeContact->getValue(DBEContact::siteNo);
         }
@@ -9957,7 +9956,7 @@ class BUActivity extends Business
      * @param bool $createSR
      * @param null $customerID
      * @param null $files
-     * @throws Exception
+     * @throws StandardTextNotFoundException
      */
     public function sendSalesRequest($problemID,
                                      $message,
