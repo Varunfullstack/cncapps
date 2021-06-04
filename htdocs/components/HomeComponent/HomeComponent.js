@@ -93,7 +93,9 @@ class HomeComponent extends MainComponent {
         const userPerformance = this.state.isSdManager ? this.api.getAllUserPerformance() : this.api.getUserPerformance();
         const requests = [
             this.api.getUpcomingVisits(),
-            this.api.getSalesFigures(),
+            this.api.getSalesFigures().catch(error => {
+                return [];
+            }),
             this.api.getFixedAndReopenData(),
             this.api.getFirstTimeFixData(),
             this.api.getTeamPerformance(),
