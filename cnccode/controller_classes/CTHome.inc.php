@@ -1262,8 +1262,8 @@ ORDER BY caa_date ASC,
     function getSalesFigures()
     {
         if (!$this->hasPermissions(ACCOUNTS_PERMISSION)) {
-            http_response_code(400);
-            return ["status" => false];
+            http_response_code(403);
+            return ["status" => 'error', "message" => "You are not allowed to access this resource"];
         }
         $result              = [];
         $dbeSalesOrderTotals = new DBESalesOrderTotals($this);
@@ -1307,7 +1307,7 @@ ORDER BY caa_date ASC,
         $result['saleTotal']          = $saleTotal;
         $result['costTotal']          = $costTotal;
         $result['profitTotal']        = $profitTotal;
-        return ["status" => true, 'data' => $result];
+        return ["status" => 'ok', 'data' => $result];
     }
 
     function getTeamPerformance()

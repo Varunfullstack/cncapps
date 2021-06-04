@@ -31,7 +31,7 @@ class HomeComponent extends MainComponent {
             cards: [],
             showSpinner: false,
             upcomingVisit: [],
-            salesFigures: {},
+            salesFigures: null,
             fixedReopen: [],
             firstTimeFixed: {},
             teamPerformance: [],
@@ -93,9 +93,11 @@ class HomeComponent extends MainComponent {
         const userPerformance = this.state.isSdManager ? this.api.getAllUserPerformance() : this.api.getUserPerformance();
         const requests = [
             this.api.getUpcomingVisits(),
-            this.api.getSalesFigures().catch(error => {
-                return [];
-            }),
+            this.api.getSalesFigures()
+                .then(response => response.data)
+                .catch(error => {
+                    return null;
+                }),
             this.api.getFixedAndReopenData(),
             this.api.getFirstTimeFixData(),
             this.api.getTeamPerformance(),
@@ -130,7 +132,7 @@ class HomeComponent extends MainComponent {
         })
     }
     applyPermission = (cards, salesFigures) => {
-        if (!salesFigures.status) {
+        if (!salesFigures) {
             const indx = cards.map(c => c.id).indexOf(this.CARD_SALES_FIGURES);
             cards[indx].visible = false;
         }
@@ -443,8 +445,9 @@ class HomeComponent extends MainComponent {
     }
     getSalesFigures = () => {
         let {salesFigures} = this.state;
-        if (salesFigures.status)
-            salesFigures = salesFigures.data;
+        if (!salesFigures) {
+            return null;
+        }
         return (
             <table className="table table-striped">
                 <thead>
