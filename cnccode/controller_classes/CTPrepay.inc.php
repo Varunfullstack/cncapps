@@ -7,6 +7,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg['path_bu'] . '/BUPrepay.inc.php');
 require_once($cfg['path_bu'] . '/BUSite.inc.php');
 require_once($cfg['path_bu'] . '/BUContact.inc.php');

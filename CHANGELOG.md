@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.12.2] - 2021-06-07
+### Fixed
+- Fixed issue with Prepay.
+
 ## [v5.12.1] - 2021-06-04
 ### Fixed
 - Fixed issue with salesFigures in the home page.

@@ -27,6 +27,7 @@ require_once($cfg ["path_dbe"] . "/DBEUser.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEJUser.inc.php");
 require_once($cfg ["path_dbe"] . "/DBESite.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
+require_once($cfg['path_bu'] . '/BUExpense.inc.php');
 
 class BUPrepay extends Business
 {
@@ -103,7 +104,7 @@ class BUPrepay extends Business
         $this->setMethodName('exportPrePayActivities');
         $this->dsData     = $dsData;
         $this->updateFlag = $updateFlag;
-        $dsResults = new DataSet ($this);
+        $dsResults        = new DataSet ($this);
         $dsResults->addColumn(self::exportPrePayCustomerName, DA_STRING, DA_ALLOW_NULL);
         $dsResults->addColumn(self::exportPrePayPreviousBalance, DA_FLOAT, DA_ALLOW_NULL);
         $dsResults->addColumn(self::exportPrePayCurrentBalance, DA_FLOAT, DA_ALLOW_NULL);
@@ -116,7 +117,7 @@ class BUPrepay extends Business
         $dbeVat->getRow();
         $vatCode               = $this->dsHeader->getValue(DBEHeader::stdVATCode);
         $this->standardVatRate = $dbeVat->getValue((integer)$vatCode[1]); // use second part of code as column no
-        $db = new dbSweetcode (); // database connection for query
+        $db                    = new dbSweetcode (); // database connection for query
         /* get a list of valid support customer items */
         $queryString = "
     SELECT
@@ -190,7 +191,7 @@ class BUPrepay extends Business
             " GROUP BY pro_problemno 
       ORDER BY pro_custno, pro_problemno, pro_date_raised";
         $db->query($queryString);
-        $ret = FALSE; // indicates there were no statements to export
+        $ret       = FALSE; // indicates there were no statements to export
         $buContact = new BUContact ($this);
         // ensure all customers have at least one statement contact
         $last_custno    = '9999';
@@ -228,7 +229,7 @@ class BUPrepay extends Business
         while ($db->next_record()) {
 
             $validContracts [$db->Record ['cui_cuino']] = 1; // flag contract as having activity
-            $ret = TRUE; // there was at least one statement to export
+            $ret                                        = TRUE; // there was at least one statement to export
             // new customer so create new html file
             if ($db->Record ['custno'] != $last_custno) {
 
@@ -270,12 +271,12 @@ class BUPrepay extends Business
 
                 } // end if ( $last_custno != '9999' )
                 $this->totalCost = 0; // reset cost
-                $filepath = SAGE_EXPORT_DIR . '/PP_' . substr(
+                $filepath        = SAGE_EXPORT_DIR . '/PP_' . substr(
                         $db->Record ['cus_name'],
                         0,
                         20
                     ) . $date->format('Y-m-d');
-                $htmlFileHandle = fopen($filepath . '.html', 'wb');
+                $htmlFileHandle  = fopen($filepath . '.html', 'wb');
                 if (!$htmlFileHandle) {
                     print_r(error_get_last());
                     $this->raiseError("Unable to open html file " . $filepath);
@@ -371,7 +372,7 @@ class BUPrepay extends Business
         foreach ($validContracts as $key => $value) {
             if ($value == 0) {
 
-                $ret = true;
+                $ret         = true;
                 $queryString = "SELECT
 						cus_name,
             cus_custno,
@@ -637,7 +638,7 @@ class BUPrepay extends Business
 
     function persistPrePayStatement($filename, $custno, $balance)
     {
-        $db = $GLOBALS['db'];
+        $db         = $GLOBALS['db'];
         $fileString = mysqli_real_escape_string($db->link_id(), file_get_contents($filename));
         $sql        = "INSERT INTO
         prepaystatement(
@@ -662,7 +663,7 @@ class BUPrepay extends Business
     function getActivitiesByServiceRequest($serviceRequestRecord)
     {
 
-        $db = new dbSweetcode (); // database connection for query
+        $db          = new dbSweetcode (); // database connection for query
         $queryString = "
       SELECT
           caa_callactivityno,
@@ -782,7 +783,7 @@ class BUPrepay extends Business
                 $reason          = str_replace("\r\n", "", $reason);
                 $reason          = str_replace("\"", "", $reason);
                 $customerContact = trim($db->Record ['con_first_name']) . ' ' . trim($db->Record ['con_last_name']);
-                $firstActivity = false;
+                $firstActivity   = false;
             }
             if ($this->updateFlag) {
                 if (!$dbeCallActivity) {
