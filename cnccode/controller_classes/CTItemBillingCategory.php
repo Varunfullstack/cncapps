@@ -1,5 +1,6 @@
 <?php
 global $cfg;
+use CNCLTD\Exceptions\APIException;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBEItemBillingCategory.php');
 
@@ -41,6 +42,25 @@ class CTItemBillingCategory extends CTCNC
     function defaultAction()
     {
         switch ($this->getAction()) {
+            case 'json':
+                switch ($this->requestMethod) {
+                    case 'GET':
+                        echo  json_encode($this->getItemBillingCategory(),JSON_NUMERIC_CHECK);
+                        break;
+                    case 'POST':
+                        echo  json_encode($this->addItemBillingCategory(),JSON_NUMERIC_CHECK);
+                        break;
+                    case 'PUT':
+                        echo  json_encode($this->updateItemBillingCategory(),JSON_NUMERIC_CHECK);
+                        break;
+                    case 'DELETE':
+                        echo  json_encode($this->deleteItemBillingCategory(),JSON_NUMERIC_CHECK);
+                        break;
+                    default:
+                        # code...
+                        break;
+                }
+                exit; 
             case 'delete':
                 if (!$this->getParam('id')) {
                     http_response_code(400);
@@ -214,4 +234,64 @@ class CTItemBillingCategory extends CTCNC
     {
         $this->defaultAction();
     }
+
+            //--------------------new 
+            function getItemBillingCategory()
+            {
+                $DBEItemBillingCategory = new DBEItemBillingCategory($this);
+                $DBEItemBillingCategory->getRows(); // DBEItemBillingCategory::sortOrder
+                $data = [];
+                while ($DBEItemBillingCategory->fetchNext()) {
+                    $data[] = [
+                        "id"              => $DBEItemBillingCategory->getValue(DBEItemBillingCategory::id),
+                        "name"            => $DBEItemBillingCategory->getValue(DBEItemBillingCategory::name),
+                        "arrearsBilling"  => $DBEItemBillingCategory->getValue(DBEItemBillingCategory::arrearsBilling),
+                    ];
+                }
+               return $this->success($data);
+            }
+    
+            function addItemBillingCategory()
+            {
+                $body=$this->getBody();
+                $DBEItemBillingCategory = new DBEItemBillingCategory($this);
+                $DBEItemBillingCategory->setValue(DBEItemBillingCategory::name,$body->name);
+                $DBEItemBillingCategory->setValue(DBEItemBillingCategory::arrearsBilling, $body->arrearsBilling);
+                $DBEItemBillingCategory->insertRow();
+                return $this->success();
+            }
+    
+            function updateItemBillingCategory()
+            {
+                $body =$this->getBody();
+                if(!isset($body->id))
+                    return $this->fail(APIException::badRequest,"Bad Request");
+        
+                $DBEItemBillingCategory = new DBEItemBillingCategory($this);
+                $DBEItemBillingCategory->getRow($body->id);
+        
+                if (!$DBEItemBillingCategory->rowCount)             
+                    return $this->fail(APIException::notFound,"Not Found");
+        
+                $DBEItemBillingCategory->setValue(DBEItemBillingCategory::name,$body->name);
+                $DBEItemBillingCategory->setValue(DBEItemBillingCategory::arrearsBilling, $body->arrearsBilling);
+                $DBEItemBillingCategory->updateRow();
+                return $this->success();        
+            }
+    
+            function deleteItemBillingCategory()
+            {
+                $id=@$_REQUEST['id'];
+            
+                if (!$id) 
+                    return $this->fail(APIException::notFound, "Id is Missing");
+        
+                $DBEItemBillingCategory = new DBEItemBillingCategory($this);
+                $DBEItemBillingCategory->getRow($id);
+                if (!$DBEItemBillingCategory->rowCount) {
+                    return $this->fail(APIException::notFound, "Not Found");
+                }
+                $DBEItemBillingCategory->deleteRow();
+                return $this->success();
+            }
 }
