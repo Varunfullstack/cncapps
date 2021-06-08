@@ -127,7 +127,7 @@ class DBEJRenQuotation extends DBECustomerItem
 
     }
 
-    function getRow()
+    function getRow($pkValue = null)
     {
         $statement =
             "SELECT " . $this->getDBColumnNamesAsString() .
@@ -145,7 +145,7 @@ class DBEJRenQuotation extends DBECustomerItem
     }
 
     function getRows($sortColumn = false,
-                     $orderAscending = true
+                     $orderDirection = 'ASC'
     )
     {
 
@@ -163,7 +163,7 @@ class DBEJRenQuotation extends DBECustomerItem
 
         if ($sortColumn) {
             $statement .= " ORDER BY $sortColumn";
-            $statement .= $orderAscending ? ' asc' : ' desc';
+            $statement .= $orderDirection === 'ASC' ? ' asc' : ' desc';
         } else {
             $statement .= " ORDER BY cus_name";
         }
