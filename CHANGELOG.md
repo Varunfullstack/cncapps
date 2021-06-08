@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v5.12.3] - 2021-06-08
+### Fixed
+- Fix issue with closing Service Request.
+
 ## [v5.12.2] - 2021-06-07
 ### Fixed
 - Fixed issue with Prepay.

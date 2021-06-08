@@ -1879,7 +1879,8 @@ AND c.caa_problemno = ? ',
         $buProblemSLA   = new BUProblemSLA($this);
         $serviceRequest = new DBEProblem($this);
         $serviceRequest->getRow($serviceRequestId);
-        $buProblemSLA->closeServiceRequest($serviceRequest, false, true);
+        $logger = new \CNCLTD\LoggerCLI('ServiceRequestForciblyClosed');
+        $buProblemSLA->closeServiceRequest($serviceRequest, $logger);
         return [
             "status" => "ok"
         ];

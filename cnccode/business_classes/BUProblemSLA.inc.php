@@ -8,6 +8,8 @@
 
 use CNCLTD\Business\BUActivity;
 use CNCLTD\Data\DBEJProblem;
+use CNCLTD\Exceptions\ColumnOutOfRangeException;
+use CNCLTD\LoggerCLI;
 
 global $cfg;
 require_once($cfg ["path_gc"] . "/Business.inc.php");
@@ -108,7 +110,7 @@ class BUProblemSLA extends Business
         $this->dbeJProblem                               = new DBEJProblem($this);
     }
 
-    function checkFixSLATask(\CNCLTD\LoggerCLI $logger)
+    function checkFixSLATask(LoggerCLI $logger)
     {
 
         $dsProblems = $this->buActivity->getProblemsByStatus(
@@ -737,7 +739,7 @@ class BUProblemSLA extends Business
         } // end if ( $dbeJCallActivity = $this->buActivity->getFirstActivityInProblem( $problemID ) ){
     }
 
-    function closeServiceRequest(DBEProblem $dsProblems, \CNCLTD\LoggerCLI $loggerCLI)
+    function closeServiceRequest(DBEProblem $dsProblems, LoggerCLI $loggerCLI)
     {
         if ($dsProblems->getValue(DBEProblem::holdForQA) == 1) {
             return;
@@ -829,7 +831,7 @@ class BUProblemSLA extends Business
     /**
      * @throws Exception
      */
-    function autoCompletion(\CNCLTD\LoggerCLI $logger)
+    function autoCompletion(LoggerCLI $logger)
     {
         $dsProblems = $this->buActivity->getProblemsByStatus('F');
         while ($dsProblems->fetchNext()) {
@@ -1095,7 +1097,7 @@ class BUProblemSLA extends Business
 
     /**
      * @param DBEJProblem $dsProblems
-     * @throws \CNCLTD\Exceptions\ColumnOutOfRangeException
+     * @throws ColumnOutOfRangeException
      */
     private function ensureHDHasMinimumAssignedMinutes(DBEJProblem $dsProblems): void
     {
