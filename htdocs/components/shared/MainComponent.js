@@ -70,7 +70,11 @@ export default class MainComponent extends React.Component {
             "scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0"
         );
     }
-
+    openTab(url) {
+        window.open(
+            url,          
+        );
+    }
     //----------------alert
     alert = (message, width = 500, title = "Alert", isHTML = false, autoClose = true) => {
         const {alert} = this.state;

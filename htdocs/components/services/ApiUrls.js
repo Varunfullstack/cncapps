@@ -44,5 +44,5 @@ export default class ApiUrls {
     static GoodsIn="/GoodsIn.php?action=";
     static QuoteTemplates="/QuoteTemplates.php?action=";
     static ContractAndNumbersReport="/ContractAndNumbersReport.php?action=";
-
+    static PurchaseInv="/PurchaseInv.php?action=";
 }
