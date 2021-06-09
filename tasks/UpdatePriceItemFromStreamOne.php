@@ -139,8 +139,10 @@ if ($allCustomers->Result == "Success") {
         },
         $allCustomers->BodyText->endCustomersDetails
     );
+
     // get all subscriptions
-    $firstSubscription = json_decode($buStreamOneApi->getAllSubscriptions(1));
+    $firstSubscription = json_decode($buStreamOneApi->getAllSubscriptionsForPage());
+
     if ($firstSubscription->Result == "Success") {
         //"totalRecords":457,"totalPages":23,"page":1,"recordsPerPage":20,"subscriptions":
         $totalPages = $firstSubscription->BodyText->totalPages;
@@ -160,7 +162,7 @@ if ($allCustomers->Result == "Success") {
         //now we have all subscription and we need to map it to customers
         $subscriptionsContacts = [];
         foreach ($allSubscriptions as $subscription) {
-            foreach ($subscription as $key => $value) {
+            foreach ($subscription as $value) {
                 $value   = (object)$value;
                 $contact = [
                     "companyName"   => $value->company,
@@ -292,34 +294,9 @@ foreach ($allAddonLicenses as $addonLicense) {
         $addonLicense->sku, $addonLicense->email
     );
 }
-foreach ($allSubscriptions as $item) {
-    foreach ($item as $subscription) {
-        $subscription = (object)$subscription;
-        try {
+updateSubscriptionContracts($allSubscriptions, $cncItems, $logger );
 
-            if ($subscription->lineStatus == 'active') {
-                $streamOneLicensesToCheck[] = new StreamOneLicenseData(
-                    $subscription->sku, $subscription->endCustomerEmail
-                );
-            }
-            updateContracts(
-                $cncItems,
-                $subscription->sku,
-                $subscription->quantity,
-                $subscription->unitPrice,
-                $subscription->lineStatus,
-                $forcedMode,
-                $subscription->endCustomerEmail,
-                $logger
-            );
-        } catch (Exception $exception) {
-            if ($exception instanceof MissingLicenseException) {
-                $missingLicensesErrors[] = $exception;
-            }
-            $logger->error($exception->getMessage());
-        }
-    }
-}
+
 $logger->info("Received StreamOne Licences", $streamOneLicensesToCheck);
 storeReceivedData($streamOneLicensesToCheck);
 checkAllContractsHaveAMatchingStreamOneLicense($streamOneLicensesToCheck, $logger);
@@ -356,6 +333,30 @@ function storeReceivedData($data)
     $date    = new DateTime();
     $logPath = APPLICATION_LOGS . "/UpdatePriceItemFromStreamOne-{$date->format('Y-m-d')}.json";
     file_put_contents($logPath, json_encode($data));
+}
+
+function updateSubscriptionContracts($allSubscriptions, $cncItems, $logger){
+
+//    foreach ($allSubscriptions as $subscription){
+//        $subscription->
+//    }
+//
+//
+//    // we have to determine the licenses that are a match to a specific contract, we can have the oldsku or the new SKu
+//    $logger->info(
+//        "Attempting to update licenses for {$sku} and email {$licenseEmail} with {$units} and status {$licenseStatus}"
+//    );
+//    $customer = getCustomerFromLicenseEmail($licenseEmail);
+//    if (!$customer) {
+//        throw new Exception(
+//            "Could not find a customer that matches the SKU: {$sku} and email {$licenseEmail} in CNCAPPS"
+//        );
+//    }
+//    $customerId   = $customer['customerID'];
+//    $customerName = $customer['name'];
+
+
+
 }
 
 function getAddonLicensesFromOrders($orderDetails)
@@ -496,7 +497,7 @@ function getCustomerFromLicenseEmail($email)
 function getItemId($cncItems, $sku)
 {
     foreach ($cncItems as $item) {
-        if ($item['itm_unit_of_sale'] == $sku || $item['partNoOld'] == $sku) return $item['itm_itemno'];
+        if ($item['itm_unit_of_sale'] == $sku || $item['partNoOld'] == $sku) return $item;
     }
     return null;
 }
@@ -604,8 +605,8 @@ function updateContracts($cncItems,
     }
     $customerId   = $customer['customerID'];
     $customerName = $customer['name'];
-    $itemId       = getItemId($cncItems, $sku);
-    if (!$itemId) {
+    $item       = getItemId($cncItems, $sku);
+    if (!$item) {
         if ($licenseStatus == 'active') {
             throw new MissingLicenseException(
                 "Customer {$customerName}({$customerId}) {$licenseEmail}  does not have license for SKU {$sku} in CNCAPPS"
@@ -613,6 +614,8 @@ function updateContracts($cncItems,
         }
         return;
     }
+    $itemId = $item['itm_itemno'];
+
     global $db;
     $db->query(
         "select cui_users as units, salePricePerMonth as salePrice from custitem where renewalStatus='R'  AND declinedFlag='N'

@@ -69,7 +69,7 @@ class CTSCustomerLicenses extends CTCNC
                 echo $this->buTechDataApi->getProductList($page);
                 exit;
             case "getAllSubscriptions":
-                echo $this->buTechDataApi->getAllSubscriptions($page);
+                echo $this->buTechDataApi->getAllSubscriptionsForPage($page);
                 exit;
             case "getSubscriptionsByEmail":
                 echo $this->buTechDataApi->getSubscriptionsByEmail($page);
