@@ -45,4 +45,6 @@ export default class ApiUrls {
     static QuoteTemplates="/QuoteTemplates.php?action=";
     static ContractAndNumbersReport="/ContractAndNumbersReport.php?action=";
     static PurchaseInv="/PurchaseInv.php?action=";
+    static PaymentTerms="/PaymentTerms.php?action=";
+    static ItemBillingCategory="/ItemBillingCategory.php?action=";
 }

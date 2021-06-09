@@ -1,5 +1,8 @@
 # Changelog
 This project changes will be shown here.
+## [Unreleased]
+### Changed
+- Issue 1366 - rewrite GoodsIn.php,QuoteTemplates.php, ContractAndNumbersReport.php,  PurchaseInv.php, PaymentTerms.php, ItemBillingCategory.php.
 
 ## [v5.12.3] - 2021-06-08
 ### Fixed
@@ -15,6 +18,8 @@ This project changes will be shown here.
 - Fixed issue with mySettingsComponent not building properly.
 - Fixed issue with CreateSalesRequests not having the message filled in properly on load.
 
+
+ 
 ## [v5.12.0] - 2021-06-03
 ### Added
 - Issue 1402 - Standard Rate Card.
