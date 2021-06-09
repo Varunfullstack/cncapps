@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1431 - StreamOne count current and old part code
+
 ## [v5.12.3] - 2021-06-08
 ### Fixed
 - Fix issue with closing Service Request.
